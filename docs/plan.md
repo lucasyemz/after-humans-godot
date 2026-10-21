@@ -157,15 +157,49 @@ sementes e constantes, então a mesma campanha gera o mesmo corredor da Unreal).
 
 ### Fase 3: Estação Raiz e campanha (7 a 10 dias)
 
-Aqui fica a maior parte da UI.
+Aqui fica a maior parte da UI. Na Unreal são ~12 mil linhas (a Estação, o HUD do refúgio e o fluxo), então a fase
+vai em três etapas:
 
-- A Estação como refúgio (port do `AHShelterStation` e do `AHRefugeWidget`):
-  - os cômodos, a economia (comida, água, energia), os civis e as melhorias;
-  - os modelos 3D da Poly Haven entram como glTF, baixados de novo pelo id (CC0).
-- Preparação da equipe, mapa da expedição, noite e descanso, resultado, memorial e elenco.
-- Fluxo completo de campanha com save no meio da expedição.
+- **3a, regras e o ciclo jogável:** todas as regras da Estação e da campanha com testes, a casca da Estação em corte
+  com as medidas da Unreal, o HUD do refúgio com o serviço de cada cômodo e a volta inteira entre a rua e a Estação.
+- **3b, a Estação em 3D:** a abóbada e o vagão de verdade, o mobiliário de cada cômodo (os modelos da Poly Haven em
+  `SourceArt/ThirdParty`, CC0), a luz de cada sala e os moradores passeando pelos cômodos.
+- **3c, as cenas da Unreal:** o relatório na plataforma com a equipe em fila, a equipe esperando a partida com os
+  cartões da formação, a chegada e a partida do trem com o candidato, e a passagem secreta.
 
 **Pronto quando:** dá para jogar várias jornadas seguidas com volta à Estação, e salvar e carregar em qualquer ponto.
+
+**3a feita em 2026-10-21:**
+- **Regras** (`AHStationRules`, port de FAHStationRooms, FAHStationEconomy, FAHStationCivilians, FAHNightRestRules,
+  FAHShelterRules, FAHRouteFocus e da partida e da volta do FAHGameFlowRules, com os números aprovados na Unreal):
+  - cômodos do nível zero (Forja, Pesquisa e Depósito recuperados ou melhorados com sucata e fragmentos);
+  - economia por volta: suprimentos da Cantina, água do coletor, energia por prioridade, o que estraga acima do
+    Depósito;
+  - civis pelo trem (Dora, Otto, Cora): acolher ou recusar, pontos forte e fraco, fome, pedidos pessoais;
+  - a noite da volta: vigia, suprimentos, sede, eventos;
+  - elenco: recrutar, voluntários, enfermaria, pesquisa, forja e relíquias, formação;
+  - foco da rota: garante a casa da loja certa e marca o objetivo;
+  - a partida (equipe com ataque na posição, fase liberada, suprimentos extras) e a volta (saque, carga do objetivo,
+    pedido, noite, ciclo, trem), uma vez por expedição.
+- **Save:** campanha nova já vem com a Estação; saves antigos migram com todos os cômodos recuperados, como na Unreal.
+- **Estação:** o corte com a plataforma, os dois subterrâneos e o eixo de escadas, nas medidas da Unreal, com as
+  superfícies da Poly Haven e do ambientCG e a luz de cada cômodo (mais fraca sem energia ou com o cômodo vazio). Os
+  heróis ficam espalhados pelos cômodos; os civis, no cômodo deles; o trem aparece com o candidato na plataforma.
+- **HUD do refúgio:** recursos, o menu dos oito cômodos e o painel de cada um (recuperar e melhorar, elenco e
+  memorial, preparação, cantina, depósito, forja, pesquisa, dormitório), o relatório da volta e o trem. A câmera
+  enquadra o cômodo na faixa livre entre o menu e o painel.
+- **Fluxo:** o jogo abre na rua se a expedição está em andamento e na Estação se não está. A partida é pela Preparação;
+  a volta (pela saída da rua, pelo guardião ou pela derrota) leva à Estação com o relatório, a noite e o trem.
+- Testes: `test_station_rules` (117 verificações, inclusive três viagens seguidas e o save com a noite pendente). O
+  runner agora reprova o teste que tiver um erro de script no meio (antes o teste parava e passava com menos
+  verificações).
+
+**Pendências da 3a:**
+- Só a fase 1 tem mapa; as outras aparecem no mapa de fases e liberam em ordem, mas a partida fica fechada até os
+  cenários (Fase 4).
+- O trem parte na hora da decisão (a cena é da 3c); o Bar e o Dormitório continuam sem recuperação, como na Unreal.
+- Recrutas novos usam a arte do fundador da mesma classe.
+- QA em Play: o Lucas ainda não jogou a Estação.
 
 ### Fase 4: os outros cenários (5 a 8 dias)
 

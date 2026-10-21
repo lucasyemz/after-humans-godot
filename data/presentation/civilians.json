@@ -1,0 +1,56 @@
+{
+  "civil_dora": {
+    "file": "res://art/civilians/civil_dora.webp",
+    "canvas": [
+      512,
+      768
+    ],
+    "anchor": [
+      265,
+      740
+    ],
+    "body_reference_pixels": 717,
+    "portrait_uv": [
+      0.263671875,
+      0.026041666666666668,
+      0.810546875,
+      0.390625
+    ]
+  },
+  "civil_cora": {
+    "file": "res://art/civilians/civil_cora.webp",
+    "canvas": [
+      512,
+      768
+    ],
+    "anchor": [
+      285,
+      750
+    ],
+    "body_reference_pixels": 742,
+    "portrait_uv": [
+      0.3564453125,
+      0.006510416666666667,
+      0.8251953125,
+      0.3190104166666667
+    ]
+  },
+  "civil_otto": {
+    "file": "res://art/civilians/civil_otto.webp",
+    "canvas": [
+      512,
+      768
+    ],
+    "anchor": [
+      307,
+      740
+    ],
+    "body_reference_pixels": 712,
+    "portrait_uv": [
+      0.3271484375,
+      0.029296875,
+      0.8447265625,
+      0.3743489583333333
+    ]
+  }
+}

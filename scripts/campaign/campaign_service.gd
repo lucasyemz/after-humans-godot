@@ -89,7 +89,7 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		"inventory": {"seeds": 30, "scrap": 0, "fragments": 0, "bandages": 2, "relics": [], "items": {}},
 		"memorial": [],
 		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false},
-		# Estação (cômodos, civis, economia) e expedição em andamento: entram nas fases 2 e 3 do plano.
+		# Estação (cômodos, civis, economia), noite da volta e fila de voluntários: AHStationRules.init_new_campaign.
 		"station": {},
 		"session": {"screen": "shelter", "expedition": null},
 	}
@@ -108,6 +108,7 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		campaign.roster.append(new_hero(id, class_id, display_name, int(hero_class.BaseMaxHp), roll_perks(GameData.table("perks"), rng)))
 		campaign.unlocked_classes.append(class_id)
 		campaign.preferred_formation.append(id)
+	AHStationRules.init_new_campaign(campaign)
 	return campaign
 
 
@@ -243,6 +244,8 @@ func load_or_new() -> String:
 		source = "new"
 		if has_save():
 			load_warning = "Nenhum salvamento válido foi encontrado. Os dados anteriores foram preservados; um novo jogo só será salvo ao começar."
+	# Saves anteriores à Estação ganham os cômodos, a noite e os civis (idempotente).
+	AHStationRules.migrate(campaign)
 	state = campaign
 	changed.emit()
 	return source

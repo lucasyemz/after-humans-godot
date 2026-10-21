@@ -261,7 +261,7 @@ func _combat_and_return(t) -> void:
 	t.equal(c.session.result, "victory", "com a fase concluída, é vitória")
 	var delivered := R.finish_return(c)
 	t.equal(c.inventory.seeds - seeds, 16, "vitória entrega o achado inteiro")
-	t.equal(delivered.factor, 1.0, "fator da vitória")
+	t.equal(delivered.percent, 100, "vitória entrega 100%")
 	t.equal(c.session.screen, "shelter", "a expedição fecha")
 	# Retirada: metade. Fuga e derrota: nada.
 	var r := _campaign(43)

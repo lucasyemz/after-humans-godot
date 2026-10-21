@@ -60,9 +60,11 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	doors = street.door_list()
 	var campaign: Dictionary = Campaign.state
 	if campaign.get("session", {}).get("expedition") == null:
-		R.start_expedition(campaign, "fase_1", randi())
+		# Sem expedição a rua não tem o que mostrar: a partida é pela Preparação, na Estação.
+		GameFlow.change_to.call_deferred("station", {}, false)
+		return
 	var route: Dictionary = campaign.session.expedition.corridor
-	R.assign_search_sites(route, doors.map(func(d): return d.step), doors.map(func(d): return d.shop))
+	R.assign_search_sites(route, doors.map(func(d): return d.step), doors.map(func(d): return d.shop), campaign.session.expedition.get("focus", ""))
 	Campaign.save()
 	street.apply_corridor_weather(route.weather)
 	_spawn_guards()
@@ -548,16 +550,11 @@ func _show_result() -> void:
 	var result: String = campaign.session.result
 	var delivered := R.finish_return(campaign)
 	Campaign.save()
-	var alive: bool = campaign.roster.any(func(h): return h.alive)
-	hud.show_result(result, delivered, campaign, "Nova expedição" if alive else "Começar outra campanha")
+	hud.show_result(result, delivered, campaign, "Voltar à Estação")
 
 
+## A equipe volta pelo trem: o relatório, a noite e o ciclo da Estação ficam lá. Sem nenhum vivo, a Estação recebe
+## voluntários de graça (FAHShelterRules::CanRecruitVolunteer), então a campanha continua.
 func _on_result_continue() -> void:
 	hud.close_modal()
-	var campaign: Dictionary = Campaign.state
-	if campaign.roster.any(func(h): return h.alive):
-		R.start_expedition(campaign, "fase_1", randi())
-		Campaign.save()
-	else:
-		Campaign.new_game()
-	GameFlow.change_to("street")
+	GameFlow.change_to("station")

@@ -8,6 +8,21 @@ extends SceneTree
 const TestContext = preload("res://tests/test_context.gd")
 
 
+## Conta os erros de script (acesso inválido, chamada inexistente...) durante cada teste. Um erro desses interrompe a
+## função do teste no meio, e sem isto o teste passava com menos verificações. Avisos e push_error não contam.
+class ScriptErrors extends Logger:
+	var count := 0
+	var first := ""
+
+	func _log_error(_function: String, file: String, line: int, _code: String, rationale: String, _editor_notify: bool,
+			error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
+		if error_type != ERROR_TYPE_SCRIPT:
+			return
+		count += 1
+		if first == "":
+			first = "%s:%d %s" % [file, line, rationale]
+
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -22,6 +37,8 @@ func _run() -> void:
 	var files := Array(DirAccess.get_files_at("res://tests")).filter(func(file): return file.begins_with("test_") and file.ends_with(".gd") and file != "test_context.gd")
 	files.sort()
 
+	var errors := ScriptErrors.new()
+	OS.add_logger(errors)
 	var failed := 0
 	var ran := 0
 	var started := Time.get_ticks_msec()
@@ -38,8 +55,12 @@ func _run() -> void:
 			print("FAIL %s (o script não compila)" % test_name)
 			continue
 		var test = script.new()
+		errors.count = 0
+		errors.first = ""
 		await test.run(t)
 		var elapsed := Time.get_ticks_msec() - test_started
+		if errors.count > 0:
+			t.failures.append("%d erro(s) de script durante o teste; o primeiro: %s" % [errors.count, errors.first])
 		var ok := t.failures.is_empty() and t.checks > 0
 		if not ok:
 			failed += 1
@@ -51,5 +72,6 @@ func _run() -> void:
 			print("    " + failure)
 		if t.failures.size() > 10:
 			print("    ... e mais %d falhas" % (t.failures.size() - 10))
+	OS.remove_logger(errors)
 	print("%d de %d testes passaram em %d ms." % [ran - failed, ran, Time.get_ticks_msec() - started])
 	quit(0 if failed == 0 and ran > 0 else 1)

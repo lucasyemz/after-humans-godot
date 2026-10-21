@@ -359,22 +359,9 @@ static func safe_retreat(campaign: Dictionary) -> bool:
 
 
 ## Entrega o achado e fecha a expedição (FinishReturnToShelter): tudo na vitória, metade na retirada, nada na fuga e na
-## derrota. Devolve o resumo do que chegou.
+## derrota. A volta inteira (noite, ciclo da Estação, trem) fica em AHStationRules.finish_return. Devolve o resumo.
 static func finish_return(campaign: Dictionary) -> Dictionary:
-	var session: Dictionary = campaign.get("session", {})
-	if session.get("expedition") == null or session.get("result", "") == "":
-		return {}
-	var factor: float = {"victory": 1.0, "retreat": 0.5}.get(session.result, 0.0)
-	var loot: Dictionary = session.expedition.loot
-	var delivered := {"result": session.result, "factor": factor, "seeds": floori(loot.seeds * factor),
-		"scrap": floori(loot.scrap * factor), "fragments": floori(loot.fragments * factor)}
-	campaign.inventory.seeds += delivered.seeds
-	campaign.inventory.scrap += delivered.scrap
-	campaign.inventory.fragments += delivered.fragments
-	for hero in campaign.roster:
-		hero.expedition_uses = {}
-	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
-	return delivered
+	return AHStationRules.finish_return(campaign)
 
 
 # ---------------------------------------------------------------- estoque compartilhado
@@ -437,7 +424,7 @@ static func _team_alive(campaign: Dictionary) -> Array:
 
 ## Três portas sorteadas pela fase, uma casa trancada a mais em 35% das fases e a casa do acampamento (AssignSearchSites).
 ## door_steps e door_shops vêm da cena: em que trecho fica cada porta e de que loja ela é.
-static func assign_search_sites(route: Dictionary, door_steps: Array, door_shops: Array) -> void:
+static func assign_search_sites(route: Dictionary, door_steps: Array, door_shops: Array, focus: String = "") -> void:
 	if not route.sites.is_empty() or door_steps.is_empty():
 		assign_camp_site(route)
 		return
@@ -450,6 +437,8 @@ static func assign_search_sites(route: Dictionary, door_steps: Array, door_shops
 		doors[j] = swap
 	doors.resize(mini(3, doors.size()))
 	doors.sort()
+	# O foco da rota garante uma casa da loja certa (troca a última porta sorteada).
+	AHStationRules.choose_doors(focus, doors, door_shops)
 	for door in doors:
 		var spots: Array = []
 		for s in 1 + mini(2, floori(random.next() * 3)):
@@ -469,6 +458,7 @@ static func assign_search_sites(route: Dictionary, door_steps: Array, door_shops
 		route.sites.append({"door": door, "step": door_steps[door], "shop": door_shops[door],
 			"spots": [{"choice": false, "searched": false}, {"choice": false, "searched": false}, {"choice": false, "searched": false}],
 			"has_enemy": false, "enemy_defeated": false, "locked": true, "forced": false, "camp_site": false, "camped": false})
+	AHStationRules.mark_objective(focus, route)
 	assign_camp_site(route)
 
 
@@ -561,6 +551,7 @@ static func search_spot(campaign: Dictionary, site_index: int, spot_index: int) 
 		var drop := _rand(route.seed ^ _mul(site.door + 1, 0x9e3779b9))
 		if drop.next() < CROWBAR_DROP_CHANCE and grant_tool(campaign, CROWBAR):
 			text += " Embaixo da bancada, um pé de cabra. (Ferramenta: Pé de cabra)"
+	text += AHStationRules.on_search(campaign, site_index, spot_index)
 	return {"ok": true, "text": text, "event": ""}
 
 
