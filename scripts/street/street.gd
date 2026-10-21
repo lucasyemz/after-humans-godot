@@ -120,6 +120,10 @@ var _forward_plus := false
 var _key_light: OmniLight3D
 ## Passos (#62): um a cada passada de ~75 cm, só fora da luta.
 var _step_distance := 0.37
+## O balanço do passo de cada herói (WalkBobHeight da Unreal: 3 cm, 3 passos por segundo, só andando).
+var _bob_time: Array[float] = []
+const WALK_BOB := 0.03
+const WALK_BOB_STEPS := 3.0
 var _materials := {}
 var _textures := {}
 var _skyline_materials: Array[ShaderMaterial] = []
@@ -927,7 +931,13 @@ func _place_party(delta: float) -> void:
 		# Respiração leve: só a escala vertical, com a base no chão.
 		var breath := 1.0 + 0.012 * sin(_time * 2.2 + index * 1.7)
 		card.scale = Vector3(1, breath, 1)
-		card.position = Vector3(x, _ground_height(z), z - PARTY_DEPTH_STEP * index)
+		# Andando, o passo levanta a placa um pouco (a arte não tem folha de andar).
+		while _bob_time.size() <= index:
+			_bob_time.append(0.0)
+		var moving: bool = delta > 0.0 and Vector2(x - previous.x, z - previous.z).length() > 0.2 * delta
+		_bob_time[index] = _bob_time[index] + delta if moving else 0.0
+		var bob := WALK_BOB * absf(sin(_bob_time[index] * WALK_BOB_STEPS * PI))
+		card.position = Vector3(x, _ground_height(z) + bob, z - PARTY_DEPTH_STEP * index)
 
 
 func _build_camera() -> void:

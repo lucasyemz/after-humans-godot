@@ -70,6 +70,7 @@ def heroes() -> dict:
     actions = json.loads((REPO / "Data/Presentation/ally-actions.json").read_text(encoding="utf-8"))["actions"]
     sources = json.loads((REPO / "SourceArt/AllyActions/Approved20261013/manifest.json").read_text(encoding="utf-8"))["assets"]
     reactions = json.loads((REPO / "SourceArt/AllyActions/Reactions20261020/manifest.json").read_text(encoding="utf-8"))["poses"]
+    item_use = json.loads((REPO / "SourceArt/AllyActions/ItemUse/manifest.json").read_text(encoding="utf-8"))["poses"]
     out = {}
     for hero_id, spec in HEROES.items():
         idle_src = REPO / spec["idle"]
@@ -90,6 +91,13 @@ def heroes() -> dict:
             convert(REPO / pose["source"], dst)
             entry["reactions"][pose["pose"]] = {"file": res(dst), "canvas": pose["canvas"], "anchor": pose["anchor"],
                                                 "body_reference_pixels": pose["body_reference_pixels"]}
+        # Usar item da Mochila (SourceArt/AllyActions/ItemUse): a pose de todos os quatro, com o pé e o topo medidos lá.
+        for pose in (p for p in item_use if p["hero"] == spec["name"]):
+            dst = ART / "heroes" / spec["name"].lower() / "item.webp"
+            convert(REPO / pose["source"], dst)
+            entry["reactions"]["item"] = {"file": res(dst), "canvas": [pose["width"], pose["height"]],
+                                          "anchor": [pose["foot_x"], pose["foot_y"]],
+                                          "body_reference_pixels": pose["foot_y"] - pose["top"]}
         out[hero_id] = entry
     return out
 

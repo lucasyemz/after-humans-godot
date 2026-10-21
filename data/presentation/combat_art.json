@@ -226,6 +226,18 @@
 						1198
 					],
 					"body_reference_pixels": 1950
+				},
+				"item": {
+					"file": "res://art/combat/heroes/bento/item.webp",
+					"canvas": [
+						1216,
+						1294
+					],
+					"anchor": [
+						700,
+						1274
+					],
+					"body_reference_pixels": 1253
 				}
 			}
 		},
@@ -454,6 +466,18 @@
 						1183
 					],
 					"body_reference_pixels": 1600
+				},
+				"item": {
+					"file": "res://art/combat/heroes/nick/item.webp",
+					"canvas": [
+						1178,
+						1335
+					],
+					"anchor": [
+						695,
+						1298
+					],
+					"body_reference_pixels": 1294
 				}
 			}
 		},
@@ -657,7 +681,20 @@
 					}
 				}
 			},
-			"reactions": {}
+			"reactions": {
+				"item": {
+					"file": "res://art/combat/heroes/iris/item.webp",
+					"canvas": [
+						1178,
+						1335
+					],
+					"anchor": [
+						734,
+						1269
+					],
+					"body_reference_pixels": 1236
+				}
+			}
 		},
 		"hero_coruja_vespera": {
 			"name": "Vespera",
@@ -863,7 +900,20 @@
 					}
 				}
 			},
-			"reactions": {}
+			"reactions": {
+				"item": {
+					"file": "res://art/combat/heroes/vespera/item.webp",
+					"canvas": [
+						1178,
+						1335
+					],
+					"anchor": [
+						605,
+						1299
+					],
+					"body_reference_pixels": 1272
+				}
+			}
 		}
 	},
 	"enemies": {

@@ -95,8 +95,11 @@ save (`station` e `session` estão vazios) e a migração de versões antigas do
 **Pendências:**
 - **As patrulhas estão fáceis:** a equipe venceu as 24 lutas automáticas. Precisa de balanceamento ou das patrulhas
   certas do corredor (fase 2).
-- **Arte faltando:** reações de Íris e Véspera, a esquiva e a defesa dos heróis com a arte nova, e as poses dos outros
-  inimigos (a ferramenta já sabe trazê-las).
+- **Arte faltando:** reações de Íris e Véspera (dano e queda) e a esquiva e a defesa dos heróis com a arte nova: não
+  existem na fonte da Unreal (só Bento e Nick têm dano e queda). Já entraram as poses de todos os inimigos e a de usar
+  item dos quatro heróis (`SourceArt/AllyActions/ItemUse`), que a Mochila mostra na luta. As folhas de andar antigas
+  (`T_*_Walk`) ficam de fora, como na Unreal: a caminhada é a pose parada com o passo de 3 cm (`WalkBobHeight`). As
+  poses de dormir do Dormitório esperam a revisão do Lucas (o manifesto diz "not integrated").
 - ~~**Ainda não entraram**~~ feitos depois da Fase 5: a prévia de quem a habilidade atinge (`ability_hit_ids`, port do
   `AbilityHitIds`, com `test_hit_preview`: apontar um alvo diz todos os atingidos e acende o par da granada ou o vizinho
   do coquetel), os itens da Mochila na luta e a crise de instinto com o lance próprio (câmera perto, pose de apoio ou de

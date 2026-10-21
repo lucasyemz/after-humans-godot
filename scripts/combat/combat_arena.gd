@@ -284,6 +284,12 @@ func _play_beat(beat: Dictionary) -> void:
 			if card:
 				_float_text(card, "Fuga!" if beat.get("escaped", false) else "Fuga falhou", Color(1, 0.9, 0.6))
 				await _wait(0.7)
+		"item":
+			# A pose de usar item (ItemUse) enquanto a cura aparece.
+			if actor and card:
+				show_pose(actor, "item")
+			await _show_events(events)
+			await _wait(0.5)
 		_:
 			await _show_events(events)
 	await _settle()
