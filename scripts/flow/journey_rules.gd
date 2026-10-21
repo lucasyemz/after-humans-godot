@@ -1,0 +1,754 @@
+## Regras da jornada (expedição numa fase): port de FAHGameFlowRules (Source/AfterHumans/Flow/AHGameFlowSubsystem.cpp).
+## Sem cena: tudo lê e altera o estado da campanha (Campaign.state) e os testes jogam com isto
+## (tests/test_journey_rules.gd). Os sorteios usam o mesmo gerador (mulberry32) e as mesmas sementes do C++.
+##
+## Estado (dentro de campaign.session):
+##   screen: "shelter", "corridor", "rest" (acampamento) ou "result"
+##   result: "", "victory", "retreat", "fled" ou "defeat"
+##   expedition: {id, seed, phase_id, scenario_id, level, team, food, hope, relationships, loot, opening_used,
+##                objective_completed, corridor}
+##   corridor: {node_id, node_type, seed, index, steps [{type, resolved}], weather, sites, current_house, effects, props}
+##   site: {door, step, shop, spots [{choice, searched}], has_enemy, enemy_defeated, locked, forced, camp_site, camped}
+##   event: null ou {event_id, from_search, resolution, pending_hard_combat}
+class_name AHJourneyRules
+extends RefCounted
+
+const MASK := 0xFFFFFFFF
+const FREE_FOOD := 4
+const MAX_FOOD := 8
+const LOCKED_HOUSE_CHANCE := 0.35
+const CROWBAR_DROP_CHANCE := 0.5
+const CROWBAR := "pe_de_cabra"
+## Inimigos de uma casa usam índices a partir daqui no sorteio (HouseEnemyIndex).
+const HOUSE_ENEMY_INDEX := 100
+
+## Fases da campanha (FAHGameFlowRules::Phases): id, cenário, nome, nível e tipo do nó.
+const PHASES := [
+	{"id": "fase_1", "scenario": "rua-das-vitrines", "name": "Rua das Vitrines", "level": 1, "node_type": "combat"},
+	{"id": "fase_2", "scenario": "ponte-das-raizes", "name": "Ponte das Raízes", "level": 3, "node_type": "combat"},
+	{"id": "fase_3", "scenario": "sala-esquecida", "name": "Sala Esquecida", "level": 5, "node_type": "combat"},
+	{"id": "fase_4", "scenario": "laboratorio-silencioso", "name": "Laboratório Silencioso", "level": 7, "node_type": "combat"},
+	{"id": "fase_5", "scenario": "tuneis-do-eco", "name": "Túneis do Eco", "level": 9, "node_type": "boss"},
+]
+const WEATHERS := {
+	"estacao-raiz": ["clear", "clear", "sunset", "mist", "night", "nightRain"],
+	"rua-das-vitrines": ["clear", "sunset", "rain", "rain", "storm", "mist", "fog", "night", "nightRain"],
+	"ponte-das-raizes": ["clear", "sunset", "rain", "storm", "mist", "fog", "night", "nightRain"],
+	"sala-esquecida": ["clear", "sunset", "mist", "night", "night"],
+	"laboratorio-silencioso": ["clear", "mist", "night", "night"],
+	"tuneis-do-eco": ["night", "night", "night", "mist", "fog"],
+}
+## O que cada ponto de cada loja rende (FixedSpotOutcome): mercearia, oficina e cinema, na ordem dos pontos.
+const FIXED_OUTCOMES := [
+	["trouxa_pano", "racao_lacrada", "pote_sementes"],
+	["primeiros_socorros", "pecas_motor", "pecas_motor"],
+	["desenho_casa", "racao_lacrada", "primeiros_socorros"],
+]
+const SPOT_NAMES := [
+	["o caixa", "a geladeira", "as prateleiras"],
+	["a bancada", "o motor", "o armário de peças"],
+	["a bilheteria", "o carrinho de pipoca", "a escada"],
+]
+const SHOP_NAMES := ["mercearia", "oficina", "cinema"]
+
+
+static func _rand(seed_value: int) -> AHCombatRandom:
+	return AHCombatRandom.new(seed_value & MASK)
+
+
+static func _mul(a: int, b: int) -> int:
+	return AHCombatRandom._mul32(a & MASK, b & MASK)
+
+
+static func phase(phase_id: String) -> Dictionary:
+	for entry in PHASES:
+		if entry.id == phase_id:
+			return entry
+	return {}
+
+
+static func shop_the(shop: int) -> String:
+	return ("o " if shop == 2 else "a ") + SHOP_NAMES[clampi(shop, 0, 2)]
+
+
+# ---------------------------------------------------------------- partida e corredor
+
+## Começa a expedição numa fase (ConfirmDeparture, sem a tela de preparação): a equipe é a formação viva.
+static func start_expedition(campaign: Dictionary, phase_id: String, seed_value: int) -> bool:
+	var info := phase(phase_id)
+	if info.is_empty():
+		return false
+	var team: Array = []
+	for hero_id in campaign.get("preferred_formation", []):
+		for hero in campaign.roster:
+			if hero.id == hero_id and hero.alive and team.size() < 4:
+				team.append(hero_id)
+	if team.is_empty():
+		return false
+	for hero in campaign.roster:
+		hero.expedition_uses = {}
+		if team.has(hero.id):
+			hero.instinct = 10 if hero.trauma else 0
+	var expedition := {
+		"id": "exp_%d" % seed_value, "seed": seed_value & 0x7FFFFFFF, "phase_id": phase_id, "scenario_id": info.scenario,
+		"level": info.level, "team": team, "food": FREE_FOOD, "hope": 80, "relationships": {},
+		"loot": {"seeds": 0, "scrap": 0, "fragments": 0}, "opening_used": false, "objective_completed": false,
+	}
+	expedition.corridor = create_corridor(expedition.seed, phase_id, info.node_type, info.scenario)
+	campaign.session = {"screen": "corridor", "result": "", "expedition": expedition, "event": null}
+	return true
+
+
+## Os dez trechos (CreateCorridor): partida, quatro pares (patrulha e pausa, em ordem sorteada) e o guardião.
+static func create_corridor(seed_value: int, node_id: String, node_type: String, scenario_id: String) -> Dictionary:
+	var phase_seed := seed_value & MASK
+	for i in node_id.length():
+		phase_seed = (phase_seed * 31 + node_id.unicode_at(i)) & MASK
+	var random := _rand(phase_seed)
+	var breaks := ["loot", "rest", "passage", "loot"]
+	for i in range(breaks.size() - 1, 0, -1):
+		var j := floori(random.next() * (i + 1))
+		var swap = breaks[i]
+		breaks[i] = breaks[j]
+		breaks[j] = swap
+	var steps: Array = [{"type": "start", "resolved": true}]
+	for kind in breaks:
+		if random.next() > 0.5:
+			steps.append({"type": "combat", "resolved": false})
+			steps.append({"type": kind, "resolved": false})
+		else:
+			steps.append({"type": kind, "resolved": false})
+			steps.append({"type": "combat", "resolved": false})
+	steps.append({"type": "boss", "resolved": false})
+	var weathers: Array = WEATHERS.get(scenario_id, WEATHERS["rua-das-vitrines"])
+	var weather_random := _rand(phase_seed ^ 0x73e28b19)
+	return {
+		"node_id": node_id, "node_type": node_type, "seed": phase_seed, "index": 0, "steps": steps,
+		"weather": weathers[mini(weathers.size() - 1, floori(weather_random.next() * weathers.size()))],
+		"sites": [], "current_house": -1, "effects": [], "props": {},
+	}
+
+
+static func corridor(campaign: Dictionary):
+	var expedition = campaign.get("session", {}).get("expedition")
+	return expedition.corridor if expedition != null else null
+
+
+static func in_corridor(campaign: Dictionary) -> bool:
+	var session: Dictionary = campaign.get("session", {})
+	return session.get("expedition") != null and session.get("screen") == "corridor" and session.get("result", "") == "" \
+		and session.get("event") == null
+
+
+## Entrar num trecho vizinho (EnterCorridorStep). Devolve "combat", "boss", "rest" ou "" (nada a fazer).
+static func enter_step(campaign: Dictionary, index: int) -> String:
+	if not in_corridor(campaign):
+		return ""
+	var route: Dictionary = corridor(campaign)
+	if index < 0 or index >= route.steps.size() or absi(index - route.index) != 1 or route.current_house != -1:
+		return ""
+	# Avançar exige o trecho atual vencido; recuar sempre pode (o inimigo continua esperando no trecho dele).
+	if index > route.index and not route.steps[route.index].resolved:
+		return ""
+	route.index = index
+	var step: Dictionary = route.steps[index]
+	if step.resolved:
+		return ""
+	match step.type:
+		"combat":
+			return "combat"
+		"boss":
+			return "boss"
+		"rest":
+			step.resolved = true
+			return "rest"
+	step.resolved = true
+	return ""
+
+
+# ---------------------------------------------------------------- inimigos
+
+## Formação de um encontro (GenerateEnemyTeam): do perfil do nó, da frente para trás.
+static func generate_enemy_team(encounter: String, difficulty: int, node_id: String, random: AHCombatRandom, forced_count: int = 0) -> Array:
+	if encounter == "boss":
+		return [
+			{"enemy_id": "porteiro", "unit_id": "enemy_porteiro", "rank": 1},
+			{"enemy_id": "condutor_raiz", "unit_id": "enemy_condutor_1", "rank": 3, "suffix": " Alfa"},
+			{"enemy_id": "condutor_raiz", "unit_id": "enemy_condutor_2", "rank": 4, "suffix": " Beta"},
+		]
+	var hard := encounter == "hard"
+	var base_count := mini(4, 2 + maxi(0, difficulty - 1) / 2)
+	var count := clampi(forced_count, 2, 4) if forced_count > 0 else mini(4, base_count + (1 if hard and difficulty > 2 else 0))
+	var encounters := GameData.table("encounters")
+	var profile = encounters.get(node_id, encounters.get("node_8_hard" if hard else "node_1_combat"))
+	var formation: Array = []
+	if hard and count == 4 and random.next() < 0.05:
+		formation = ["vigia_enferrujado", "carcaca_colonizada", "robot", "robot_fungo"]
+	elif profile != null:
+		var pick := func(pool: Array) -> String:
+			return "" if pool.is_empty() else pool[floori(random.next() * pool.size())]
+		formation.append(pick.call(profile.get("Front", [])))
+		if count == 4:
+			formation.append(pick.call(["cao_eco", "rastejante_raiz"]))
+		formation.append(pick.call(profile.get("Ranged", [])))
+		if count >= 3:
+			formation.append(pick.call(profile.get("Support", [])))
+	var units: Array = []
+	for index in formation.size():
+		units.append({"enemy_id": formation[index], "unit_id": "enemy_%s_%d" % [formation[index], index], "rank": index + 1})
+	return units
+
+
+## Quem espera no trecho (ou na casa, com index >= HOUSE_ENEMY_INDEX), já com a vida e o dano do nível (CorridorEnemies).
+## Cada um: {enemy_id, unit_id, rank, hp, max_hp, damage_bonus, display_name}.
+static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
+	var route: Dictionary = expedition.corridor
+	var level: int = expedition.level
+	var house := index >= HOUSE_ENEMY_INDEX
+	var boss: bool = not house and index < route.steps.size() and route.steps[index].type == "boss"
+	var final: bool = route.node_type == "boss"
+	var random := _rand(route.seed ^ _mul(index + 1, 0x9e3779b9))
+	var enemies := GameData.table("enemies")
+	if boss and final:
+		var group := generate_enemy_team("boss", 1, route.node_id, random)
+		for unit in group.size():
+			var spec: Dictionary = group[unit]
+			var row: Dictionary = enemies[spec.enemy_id]
+			spec.unit_id = "corridor_%d_%d_%d_%s" % [route.seed, index, unit, spec.enemy_id]
+			spec.max_hp = int(row.MaxHp)
+			spec.hp = spec.max_hp
+			spec.damage_bonus = level / 4
+			spec.display_name = row.DisplayName + spec.get("suffix", "")
+		return group
+
+	# Patrulhas comuns leves (2, às vezes 3); 1 ou 2 fortes por fase (3 a 4, nunca a primeira); o guardião, 4.
+	var count := 2
+	var elite := false
+	if boss:
+		count = 4
+	elif house:
+		count = mini(3, 1 + (1 if random.next() < 0.5 else 0) + (1 if level >= 6 else 0))
+	else:
+		var fight := 0
+		for step in mini(index, route.steps.size()):
+			fight += 1 if route.steps[step].type == "combat" else 0
+		var phase_random := _rand(route.seed ^ 0x27d4eb2f)
+		var first_elite := 1 + mini(2, floori(phase_random.next() * 3))
+		var second_elite := 1 + mini(2, floori(phase_random.next() * 3)) if phase_random.next() < 0.4 else -1
+		elite = fight == first_elite or fight == second_elite
+		if elite:
+			count = 3 + (1 if random.next() < 0.5 or level >= 5 else 0)
+		else:
+			count = 2 + (1 if fight >= 2 and random.next() < 0.35 else 0)
+
+	# Count é em posições: um inimigo grande ocupa duas; quem não cabe sai do grupo.
+	var generated := generate_enemy_team("combat", 1, route.node_id, random, maxi(2, count))
+	var units: Array = []
+	var next_rank := 1
+	for spec in generated:
+		var row = enemies.get(spec.enemy_id)
+		var size: int = int(row.get("FormationSize", 0)) if row != null else 0
+		size = size if size > 0 else 1
+		if next_rank + size - 1 > count:
+			continue
+		spec.rank = next_rank
+		next_rank += size
+		units.append(spec)
+	# Mais forte com o nível: vida da tabela (de ~metade no começo até um pouco acima) e dano.
+	var hp_scale := minf(1.3, 0.45 + 0.06 * level)
+	var light := not boss and not elite
+	for unit in units.size():
+		var spec: Dictionary = units[unit]
+		var row: Dictionary = enemies[spec.enemy_id]
+		spec.unit_id = "corridor_%d_%d_%d_%s" % [route.seed, index, unit, spec.enemy_id]
+		var scale := hp_scale * (1.6 if boss and unit == 0 else (0.75 if light else 1.0))
+		spec.max_hp = maxi(4, roundi(float(row.MaxHp) * scale))
+		spec.hp = spec.max_hp
+		spec.damage_bonus = maxi(0, level / 4 + (1 if boss else (-1 if light else 0)))
+		spec.display_name = row.DisplayName
+	if boss and not units.is_empty():
+		units[0].display_name += " · Guardião"
+	# Sozinho (numa casa), um inimigo à distância começa onde tem um ataque.
+	if units.size() == 1:
+		for action_id in enemies[units[0].enemy_id].get("ActionIds", []):
+			var action = GameData.row("enemy_actions", action_id)
+			if action != null and action.get("DamageRange", {}).get("Max", 0) > 0:
+				var origins: Array = action.get("OriginRanks", [])
+				units[0].rank = 1 if origins.is_empty() else int(origins[0])
+				break
+	return units
+
+
+## Começa a luta do trecho atual ou da casa (StartCorridorCombat). Devolve {enemies, opening, boss} ou {} se não há luta.
+static func start_corridor_combat(campaign: Dictionary, party_advantage: bool) -> Dictionary:
+	if not in_corridor(campaign):
+		return {}
+	var expedition: Dictionary = campaign.session.expedition
+	var route: Dictionary = expedition.corridor
+	var index: int = route.index
+	var boss := false
+	if route.current_house >= 0:
+		var site: Dictionary = route.sites[route.current_house]
+		if not site.has_enemy or site.enemy_defeated:
+			return {}
+		index = HOUSE_ENEMY_INDEX + route.current_house
+	else:
+		var step: Dictionary = route.steps[index]
+		if step.resolved or (step.type != "combat" and step.type != "boss"):
+			return {}
+		boss = step.type == "boss"
+	expedition.opening_used = true
+	return {"enemies": corridor_enemies(expedition, index), "opening": party_advantage, "boss": boss}
+
+
+## Fim de uma luta do corredor (EndCombat). result: "victory", "defeat" ou "escaped". As mortes vão para o memorial.
+static func end_combat(campaign: Dictionary, result: String, boss: bool, cause: String = "") -> void:
+	var session: Dictionary = campaign.session
+	var expedition: Dictionary = session.expedition
+	var route: Dictionary = expedition.corridor
+	var info := phase(expedition.phase_id)
+	for hero in campaign.roster:
+		if expedition.team.has(hero.id) and not hero.alive and not campaign.memorial.any(func(e): return e.hero_id == hero.id):
+			campaign.memorial.append({"hero_id": hero.id, "display_name": hero.display_name, "class_id": hero.class_id,
+				"mission_name": info.get("name", ""), "cause": cause, "completed_expeditions": hero.get("completed_expeditions", 0)})
+	if result == "escaped":
+		session.result = "fled"
+		session.screen = "result"
+		return
+	var alive: bool = campaign.roster.any(func(h): return expedition.team.has(h.id) and h.alive)
+	if result != "victory" or not alive:
+		session.result = "defeat"
+		session.screen = "result"
+		return
+	if route.current_house >= 0:
+		route.sites[route.current_house].enemy_defeated = true
+		return
+	route.steps[route.index].resolved = true
+	if boss:
+		expedition.loot.seeds += 6
+		expedition.loot.scrap += 1
+		finish_corridor(campaign)
+
+
+## O guardião vencido conclui a fase (FinishCorridor): saque completo na volta; as casas continuam abertas.
+static func finish_corridor(campaign: Dictionary) -> bool:
+	var expedition: Dictionary = campaign.session.expedition
+	if expedition.objective_completed:
+		return false
+	expedition.loot.seeds += 10
+	expedition.loot.scrap += 2
+	expedition.loot.fragments += 1
+	expedition.objective_completed = true
+	if not campaign.completed_phases.has(expedition.phase_id):
+		campaign.completed_phases.append(expedition.phase_id)
+	for hero in campaign.roster:
+		if expedition.team.has(hero.id) and hero.alive:
+			hero.completed_expeditions = hero.get("completed_expeditions", 0) + 1
+	return true
+
+
+## Voltar à Estação (SafeRetreat): com a fase concluída é vitória; senão, retirada (metade do achado).
+static func safe_retreat(campaign: Dictionary) -> bool:
+	var session: Dictionary = campaign.get("session", {})
+	if session.get("expedition") == null or session.get("result", "") != "" or session.get("event") != null \
+			or not ["corridor", "rest"].has(session.get("screen")):
+		return false
+	session.result = "victory" if session.expedition.objective_completed else "retreat"
+	session.screen = "result"
+	return true
+
+
+## Entrega o achado e fecha a expedição (FinishReturnToShelter): tudo na vitória, metade na retirada, nada na fuga e na
+## derrota. Devolve o resumo do que chegou.
+static func finish_return(campaign: Dictionary) -> Dictionary:
+	var session: Dictionary = campaign.get("session", {})
+	if session.get("expedition") == null or session.get("result", "") == "":
+		return {}
+	var factor: float = {"victory": 1.0, "retreat": 0.5}.get(session.result, 0.0)
+	var loot: Dictionary = session.expedition.loot
+	var delivered := {"result": session.result, "factor": factor, "seeds": floori(loot.seeds * factor),
+		"scrap": floori(loot.scrap * factor), "fragments": floori(loot.fragments * factor)}
+	campaign.inventory.seeds += delivered.seeds
+	campaign.inventory.scrap += delivered.scrap
+	campaign.inventory.fragments += delivered.fragments
+	for hero in campaign.roster:
+		hero.expedition_uses = {}
+	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
+	return delivered
+
+
+# ---------------------------------------------------------------- estoque compartilhado
+
+static func food(campaign: Dictionary) -> int:
+	var expedition = campaign.get("session", {}).get("expedition")
+	return maxi(0, expedition.food) if expedition != null else 0
+
+
+static func has_tool(campaign: Dictionary, tool: String) -> bool:
+	return campaign.get("tools", []).has(tool)
+
+
+## Comida (da expedição, até 8), curativos (do refúgio), sementes e sucata (achado). Devolve quanto mudou.
+static func adjust(campaign: Dictionary, item: String, delta: int) -> int:
+	var expedition = campaign.get("session", {}).get("expedition")
+	match item:
+		"food":
+			if expedition == null:
+				return 0
+			var before: int = expedition.food
+			# Ganhar respeita o limite de 8; gastar nunca passa de zero.
+			expedition.food = clampi(before + delta, 0, MAX_FOOD) if delta > 0 else maxi(0, before + delta)
+			return expedition.food - before
+		"bandages":
+			var before: int = campaign.inventory.bandages
+			campaign.inventory.bandages = maxi(0, before + delta)
+			return campaign.inventory.bandages - before
+		"seeds", "scrap", "fragments":
+			if expedition == null:
+				return 0
+			var before: int = expedition.loot[item]
+			expedition.loot[item] = maxi(0, before + delta)
+			return expedition.loot[item] - before
+	return 0
+
+
+static func grant_tool(campaign: Dictionary, tool: String) -> bool:
+	if tool == "" or has_tool(campaign, tool):
+		return false
+	campaign.tools.append(tool)
+	return true
+
+
+static func lose_tool(campaign: Dictionary, tool: String) -> void:
+	campaign.tools.erase(tool)
+
+
+static func _team_alive(campaign: Dictionary) -> Array:
+	var team: Array = campaign.session.expedition.team
+	var out: Array = []
+	for hero_id in team:
+		for hero in campaign.roster:
+			if hero.id == hero_id and hero.alive:
+				out.append(hero)
+	return out
+
+
+# ---------------------------------------------------------------- casas
+
+## Três portas sorteadas pela fase, uma casa trancada a mais em 35% das fases e a casa do acampamento (AssignSearchSites).
+## door_steps e door_shops vêm da cena: em que trecho fica cada porta e de que loja ela é.
+static func assign_search_sites(route: Dictionary, door_steps: Array, door_shops: Array) -> void:
+	if not route.sites.is_empty() or door_steps.is_empty():
+		assign_camp_site(route)
+		return
+	var random := _rand(route.seed ^ 0x5bd1e995)
+	var doors: Array = range(door_steps.size())
+	for i in range(doors.size() - 1, 0, -1):
+		var j := floori(random.next() * (i + 1))
+		var swap = doors[i]
+		doors[i] = doors[j]
+		doors[j] = swap
+	doors.resize(mini(3, doors.size()))
+	doors.sort()
+	for door in doors:
+		var spots: Array = []
+		for s in 1 + mini(2, floori(random.next() * 3)):
+			spots.append({"choice": false, "searched": false})
+		route.sites.append({"door": door, "step": door_steps[door], "shop": door_shops[door], "spots": spots,
+			"has_enemy": random.next() < 0.4, "enemy_defeated": false, "locked": false, "forced": false,
+			"camp_site": false, "camped": false})
+	# Metade das fases tem um ponto com escolha, numa das casas.
+	if random.next() < 0.5:
+		var site: Dictionary = route.sites[mini(route.sites.size() - 1, floori(random.next() * route.sites.size()))]
+		site.spots[mini(site.spots.size() - 1, floori(random.next() * site.spots.size()))].choice = true
+	# Casa trancada numa porta livre: a loja inteira (3 pontos), sem patrulha. Gerador próprio.
+	var lock := _rand(route.seed ^ 0x2545f491)
+	var free: Array = range(door_steps.size()).filter(func(d): return not doors.has(d))
+	if lock.next() < LOCKED_HOUSE_CHANCE and not free.is_empty():
+		var door: int = free[mini(free.size() - 1, floori(lock.next() * free.size()))]
+		route.sites.append({"door": door, "step": door_steps[door], "shop": door_shops[door],
+			"spots": [{"choice": false, "searched": false}, {"choice": false, "searched": false}, {"choice": false, "searched": false}],
+			"has_enemy": false, "enemy_defeated": false, "locked": true, "forced": false, "camp_site": false, "camped": false})
+	assign_camp_site(route)
+
+
+## Uma das casas abertas é a do acampamento (nunca a trancada). Gerador próprio.
+static func assign_camp_site(route: Dictionary) -> void:
+	if route.sites.any(func(s): return s.camp_site):
+		return
+	var open: Array = range(route.sites.size()).filter(func(i): return not route.sites[i].locked)
+	if open.is_empty():
+		return
+	var random := _rand(route.seed ^ 0x632be59b)
+	route.sites[open[mini(open.size() - 1, floori(random.next() * open.size()))]].camp_site = true
+
+
+static func can_enter_house(campaign: Dictionary, site_index: int) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	if route.current_house != -1 or site_index < 0 or site_index >= route.sites.size():
+		return false
+	var site: Dictionary = route.sites[site_index]
+	return site.step <= route.index and (not site.locked or site.forced)
+
+
+static func enter_house(campaign: Dictionary, site_index: int) -> bool:
+	if not can_enter_house(campaign, site_index):
+		return false
+	corridor(campaign).current_house = site_index
+	return true
+
+
+static func leave_house(campaign: Dictionary) -> bool:
+	if not in_corridor(campaign) or corridor(campaign).current_house == -1:
+		return false
+	corridor(campaign).current_house = -1
+	return true
+
+
+static func can_force_house(campaign: Dictionary, site_index: int) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	if route.current_house != -1 or site_index < 0 or site_index >= route.sites.size():
+		return false
+	var site: Dictionary = route.sites[site_index]
+	return site.step <= route.index and site.locked and not site.forced and has_tool(campaign, CROWBAR)
+
+
+## Arrombar a casa trancada: o pé de cabra quebra e a casa fica aberta até o fim da fase.
+static func force_house(campaign: Dictionary, site_index: int) -> bool:
+	if not can_force_house(campaign, site_index):
+		return false
+	lose_tool(campaign, CROWBAR)
+	corridor(campaign).sites[site_index].forced = true
+	return true
+
+
+static func can_search(campaign: Dictionary, site_index: int, spot_index: int) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	if route.current_house != site_index or site_index < 0 or site_index >= route.sites.size():
+		return false
+	var site: Dictionary = route.sites[site_index]
+	return spot_index >= 0 and spot_index < site.spots.size() and not site.spots[spot_index].searched \
+		and (not site.has_enemy or site.enemy_defeated)
+
+
+## Vasculhar um ponto da casa (SearchHouseSpot). Devolve {ok, text, event}: com escolha, abre um evento busca_*.
+static func search_spot(campaign: Dictionary, site_index: int, spot_index: int) -> Dictionary:
+	if not can_search(campaign, site_index, spot_index):
+		return {"ok": false}
+	var route: Dictionary = corridor(campaign)
+	var site: Dictionary = route.sites[site_index]
+	var spot: Dictionary = site.spots[spot_index]
+	var random := _rand(route.seed ^ _mul((site.door + 1) * 8 + spot_index + 1, 0x85ebca6b))
+	if spot.choice:
+		var choices: Array = GameData.table("events").keys().filter(func(id): return id.begins_with("busca_"))
+		if not choices.is_empty():
+			spot.searched = true
+			var event_id: String = choices[mini(choices.size() - 1, floori(random.next() * choices.size()))]
+			campaign.session.event = {"event_id": event_id, "from_search": true, "resolution": "", "pending_hard_combat": false}
+			return {"ok": true, "text": "", "event": event_id}
+	var fixed_id: String = FIXED_OUTCOMES[site.shop][spot_index] if site.shop >= 0 and site.shop < 3 and spot_index < 3 else ""
+	var fixed = GameData.row("search_outcomes", fixed_id) if fixed_id != "" else null
+	spot.searched = true
+	var text := apply_search_outcome(campaign, random, fixed)
+	# A bancada da oficina pode ter um pé de cabra, se a equipe ainda não tem (sorteio próprio do ponto).
+	if fixed != null and site.shop == 1 and spot_index == 0 and not has_tool(campaign, CROWBAR):
+		var drop := _rand(route.seed ^ _mul(site.door + 1, 0x9e3779b9))
+		if drop.next() < CROWBAR_DROP_CHANCE and grant_tool(campaign, CROWBAR):
+			text += " Embaixo da bancada, um pé de cabra. (Ferramenta: Pé de cabra)"
+	return {"ok": true, "text": text, "event": ""}
+
+
+## Aplica um resultado de busca (ApplySearchOutcome). Sem resultado fixo: sorteia da tabela, 1 em 3 ruim.
+static func apply_search_outcome(campaign: Dictionary, random: AHCombatRandom, fixed) -> String:
+	var expedition: Dictionary = campaign.session.expedition
+	var outcome = fixed
+	if outcome == null:
+		var bad := random.next() < 1.0 / 3.0
+		var pool: Array = GameData.table("search_outcomes").values().filter(func(r): return bool(r.get("bBad", false)) == bad)
+		if pool.is_empty():
+			adjust(campaign, "food", 1)
+			adjust(campaign, "seeds", 1)
+			return "Suprimentos recolhidos · +1 alimento e +1 semente"
+		outcome = pool[mini(pool.size() - 1, floori(random.next() * pool.size()))]
+	adjust(campaign, "food", int(outcome.get("FoodDelta", 0)))
+	adjust(campaign, "bandages", int(outcome.get("BandagesDelta", 0)))
+	adjust(campaign, "seeds", int(outcome.get("SeedsDelta", 0)))
+	adjust(campaign, "scrap", int(outcome.get("ScrapDelta", 0)))
+	expedition.hope = clampi(expedition.hope + int(outcome.get("HopeDelta", 0)), 0, 100)
+	var team := _team_alive(campaign)
+	var hero_name := ""
+	if not team.is_empty():
+		var hero: Dictionary = team[mini(team.size() - 1, floori(random.next() * team.size()))]
+		hero_name = hero.display_name
+		hero.instinct = clampi(hero.instinct + int(outcome.get("InstinctDelta", 0)), 0, 200)
+		grant_tool(campaign, String(outcome.get("GrantTool", "")))
+		if int(outcome.get("Damage", 0)) > 0:
+			hero.hp = maxi(1, hero.hp - int(outcome.Damage))
+	return String(outcome.get("Text", "")).replace("{Heroi}", hero_name)
+
+
+## Vasculhar o objeto de um trecho de suprimentos (uma vez por fase): sorteio da tabela.
+static func search_prop(campaign: Dictionary, step: int) -> Dictionary:
+	if not in_corridor(campaign):
+		return {"ok": false}
+	var route: Dictionary = corridor(campaign)
+	if step < 0 or step >= route.steps.size() or route.steps[step].type != "loot" or step > route.index \
+			or route.props.get(str(step), false) or route.current_house != -1:
+		return {"ok": false}
+	route.props[str(step)] = true
+	var random := _rand(route.seed ^ _mul(step + 1, 0xc2b2ae35))
+	return {"ok": true, "text": apply_search_outcome(campaign, random, null)}
+
+
+# ---------------------------------------------------------------- eventos
+
+static func can_choose(campaign: Dictionary, choice: Dictionary) -> bool:
+	var unavailable: String = choice.get("UnavailableIfUnlocked", "")
+	if unavailable != "" and campaign.unlocked_classes.has(unavailable):
+		return false
+	var expedition: Dictionary = campaign.session.expedition
+	match choice.get("Requirement", ""):
+		"ClassInTeam":
+			return _team_alive(campaign).any(func(h): return h.class_id == choice.get("RequirementClass", ""))
+		"ClassUnlocked":
+			return campaign.unlocked_classes.has(choice.get("RequirementClass", ""))
+		"FoodAtLeast":
+			return food(campaign) >= int(choice.get("RequirementAmount", 0))
+		"ScrapAtLeast":
+			return expedition.loot.scrap >= int(choice.get("RequirementAmount", 0))
+		"HasTool":
+			return has_tool(campaign, choice.get("RequirementTool", ""))
+	return true
+
+
+## Escolher uma opção do evento aberto (ChooseEventOption). Arriscada, pode dar errado (a chance não aparece).
+static func choose_event_option(campaign: Dictionary, choice_id: String, seed_value: int) -> bool:
+	var session: Dictionary = campaign.session
+	var event = session.get("event")
+	if event == null or event.resolution != "" or session.result != "":
+		return false
+	var row = GameData.row("events", event.event_id)
+	var choice = null
+	for option in (row.get("Choices", []) if row != null else []):
+		if option.Id == choice_id:
+			choice = option
+	if choice == null or not can_choose(campaign, choice):
+		return false
+	var random := _rand(seed_value)
+	var failed: bool = float(choice.get("FailChance", 0.0)) > 0.0 and random.next() < float(choice.FailChance)
+	var effects: Dictionary = choice.get("Failure", {}) if failed else choice.get("Success", {})
+	var expedition: Dictionary = session.expedition
+	expedition.hope = clampi(expedition.hope + int(effects.get("HopeDelta", 0)), 0, 100)
+	adjust(campaign, "food", int(effects.get("FoodDelta", 0)))
+	adjust(campaign, "bandages", int(effects.get("BandagesDelta", 0)))
+	adjust(campaign, "scrap", int(effects.get("ScrapDelta", 0)))
+	adjust(campaign, "fragments", int(effects.get("FragmentsDelta", 0)))
+	adjust(campaign, "seeds", int(effects.get("SeedsDelta", 0)))
+	var instinct := 0
+	if int(effects.get("InstinctDelta", 0)) != 0 and choice.get("Requirement", "") == "ClassInTeam":
+		for hero in _team_alive(campaign):
+			if hero.class_id == choice.get("RequirementClass", ""):
+				var relic = GameData.row("relics", hero.get("relic_id", ""))
+				instinct = maxi(0, int(effects.InstinctDelta) - (int(relic.get("EventInstinctReduction", 0)) if relic != null else 0))
+				hero.instinct = clampi(hero.instinct + instinct, 0, 200)
+				break
+	var hurt := ""
+	if int(effects.get("Damage", 0)) > 0:
+		var team := _team_alive(campaign)
+		if not team.is_empty():
+			var hero: Dictionary = team[mini(team.size() - 1, floori(random.next() * team.size()))]
+			hero.hp = maxi(1, hero.hp - int(effects.Damage))
+			hurt = hero.display_name
+	grant_tool(campaign, String(effects.get("GrantTool", "")))
+	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "":
+		lose_tool(campaign, choice.RequirementTool)
+	var unlock: String = effects.get("UnlockClass", "")
+	if unlock != "" and not campaign.unlocked_classes.has(unlock):
+		campaign.unlocked_classes.append(unlock)
+	for effect in effects.get("PhaseEffects", []):
+		if not expedition.corridor.effects.has(effect):
+			expedition.corridor.effects.append(effect)
+	var resolution := String(effects.get("Result", "")).replace("{Instinto}", str(instinct)).replace("{Heroi}", hurt)
+	event.resolution = resolution if resolution != "" else String(choice.get("Text", "…"))
+	event.pending_hard_combat = bool(effects.get("bHardCombat", false))
+	return true
+
+
+## Fecha o evento resolvido. Do objeto de uma casa, a fase continua.
+static func finish_event(campaign: Dictionary) -> bool:
+	var event = campaign.session.get("event")
+	if event == null or event.resolution == "":
+		return false
+	campaign.session.event = null
+	campaign.session.screen = "corridor"
+	return true
+
+
+# ---------------------------------------------------------------- acampamento
+
+static func can_start_camp(campaign: Dictionary) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	if route.current_house < 0 or route.current_house >= route.sites.size():
+		return false
+	var site: Dictionary = route.sites[route.current_house]
+	return site.camp_site and not site.camped and (not site.has_enemy or site.enemy_defeated)
+
+
+static func start_camp(campaign: Dictionary) -> bool:
+	if not can_start_camp(campaign):
+		return false
+	campaign.session.screen = "rest"
+	return true
+
+
+static func _camp_hero(campaign: Dictionary, hero_id: String):
+	if campaign.session.get("screen") != "rest" or not campaign.session.expedition.team.has(hero_id):
+		return null
+	for hero in campaign.roster:
+		if hero.id == hero_id and hero.alive:
+			return hero
+	return null
+
+
+## Comer no acampamento: +10% da vida (mínimo 1) e -5 de instinto; gasta uma comida.
+static func camp_use_food(campaign: Dictionary, hero_id: String) -> bool:
+	var hero = _camp_hero(campaign, hero_id)
+	if hero == null or food(campaign) <= 0 or (hero.hp >= hero.max_hp and hero.instinct <= 0):
+		return false
+	adjust(campaign, "food", -1)
+	hero.hp = mini(hero.max_hp, hero.hp + maxi(1, hero.max_hp / 10))
+	hero.instinct = clampi(hero.instinct - 5, 0, 200)
+	return true
+
+
+## Curativo no acampamento: +8 de vida; gasta um curativo do refúgio.
+static func camp_use_bandage(campaign: Dictionary, hero_id: String) -> bool:
+	var hero = _camp_hero(campaign, hero_id)
+	if hero == null or campaign.inventory.bandages <= 0 or hero.hp >= hero.max_hp:
+		return false
+	adjust(campaign, "bandages", -1)
+	hero.hp = mini(hero.max_hp, hero.hp + 8)
+	return true
+
+
+## Levantar acampamento: a casa fica acampada nesta fase e o tempo passa (nunca o mesmo clima).
+static func leave_camp(campaign: Dictionary, seed_value: int) -> bool:
+	if campaign.session.get("screen") != "rest":
+		return false
+	var expedition: Dictionary = campaign.session.expedition
+	var route: Dictionary = expedition.corridor
+	if route.current_house >= 0:
+		route.sites[route.current_house].camped = true
+	var options: Array = WEATHERS.get(expedition.scenario_id, WEATHERS["rua-das-vitrines"]).filter(func(w): return w != route.weather)
+	var random := _rand(seed_value)
+	route.weather = options[clampi(floori(random.next() * options.size()), 0, options.size() - 1)]
+	campaign.session.screen = "corridor"
+	return true

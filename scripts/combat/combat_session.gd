@@ -13,8 +13,9 @@ var random: AHCombatRandom
 var engine: AHCombatEngine
 
 
-## heroes: heróis da campanha (Campaign.state.roster) na ordem da formação; enemy_ids: inimigos da frente para trás.
-static func create(heroes: Array, enemy_ids: Array, opening: bool = false, seed_value: int = -1, hope: int = 80) -> AHCombatSession:
+## heroes: heróis da campanha (Campaign.state.roster) na ordem da formação. enemies: da frente para trás, cada um o id
+## do inimigo ou já montado pelo corredor ({enemy_id, unit_id, rank, hp, max_hp, damage_bonus, display_name}).
+static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed_value: int = -1, hope: int = 80) -> AHCombatSession:
 	var session := AHCombatSession.new()
 	session.data = GameData.combat
 	session.random = AHCombatRandom.new(seed_value if seed_value >= 0 else randi())
@@ -30,10 +31,19 @@ static func create(heroes: Array, enemy_ids: Array, opening: bool = false, seed_
 		}, index + 1, session.data))
 	var enemies: Array = []
 	var next_rank := 1
-	for index in enemy_ids.size():
-		var unit := AHCombatEngine.make_enemy_unit(enemy_ids[index], "enemy_%s_%d" % [enemy_ids[index], index], next_rank, session.data)
+	for index in enemies_in.size():
+		var spec = enemies_in[index]
+		if typeof(spec) == TYPE_DICTIONARY:
+			var built := AHCombatEngine.make_enemy_unit(spec.enemy_id, spec.unit_id, spec.rank, session.data)
+			built.hp = spec.get("hp", built.hp)
+			built.max_hp = spec.get("max_hp", built.max_hp)
+			built.damage_bonus = spec.get("damage_bonus", 0)
+			built.display_name = spec.get("display_name", built.display_name)
+			enemies.append(built)
+			continue
+		var unit := AHCombatEngine.make_enemy_unit(spec, "enemy_%s_%d" % [spec, index], next_rank, session.data)
 		enemies.append(unit)
-		var row = session.data.enemies.get(enemy_ids[index])
+		var row = session.data.enemies.get(spec)
 		next_rank += row.FormationSize if row != null and row.FormationSize > 0 else 1
 	session.state = AHCombatEngine.init_combat(players, enemies, session.context, session.data, session.random, opening)
 	session.engine = AHCombatEngine.new(session.state, session.context, session.data, session.random)

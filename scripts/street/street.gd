@@ -75,19 +75,20 @@ const CARS := [[-350.0, 0, false], [5650.0, 1, true], [2650.0, 0, true]]
 # Altura do corpo (m) de cada herói e inimigo; a arte e as medidas vêm de data/presentation/combat_art.json.
 const BODY_HEIGHTS := {
 	"hero_cao_bento": 1.86, "hero_gato_nick": 1.76, "hero_sapo_iris": 1.74, "hero_coruja_vespera": 1.88,
-	"robot": 1.8, "robot_fungo": 1.8, "vigia_enferrujado": 2.15,
+	"robot": 1.8, "robot_fungo": 1.8, "vigia_enferrujado": 2.15, "cao_eco": 1.3, "condutor_raiz": 1.9,
+	"sussurrador": 1.8, "rastejante_raiz": 1.25,
 }
-# Patrulhas da rua: onde ficam (X em metros) e quem são, da frente para trás. Chegar perto começa a luta.
-const PATROLS := [
-	{"x": 17.0, "enemies": ["robot", "robot_fungo"]},
-	{"x": 46.0, "enemies": ["vigia_enferrujado", "robot"]},
-]
-const PATROL_TRIGGER := 5.0
+# Prédios com fachada pintada: X inicial (cm), fachada (0 mercearia, 1 oficina, 2 cinema) e espelho. Ordem de Rebuild.
+const FACADE_BUILDINGS := [[-770, 1, true], [430, 0, false], [1635, 1, false], [2830, 2, false], [4030, 0, true], [5230, 1, true], [6430, 2, true]]
+# O corredor de 10 trechos começa em X 0 e tem 78 m (AHStreetCorridor).
+const CORRIDOR_LENGTH := 78.0
+const WEATHER_NAMES := {"clear": "céu limpo", "sunset": "fim de tarde", "rain": "chuva", "storm": "tempestade", "mist": "névoa",
+	"fog": "neblina", "night": "noite", "nightRain": "noite de chuva"}
 const PARTY_SPACING := 1.15
 const LEADER_RADIUS := 0.28
 # Onde o líder pode ir (metros): da rua até o fundo dos becos.
-const WALK_MIN := Vector3(-8.0, 0.0, -14.4)
-const WALK_MAX := Vector3(70.0, 0.0, 2.4)
+const STREET_WALK_MIN := Vector3(-2.0, 0.0, -14.4)
+const STREET_WALK_MAX := Vector3(79.0, 0.0, 2.4)
 
 # Hora do dia: "golden" (fim de tarde, o do Emberfall) e "night". RAIN muda por cima de qualquer uma.
 const MOODS := {
@@ -133,12 +134,21 @@ var _hud_weather: Label
 var _dust: CPUParticles3D
 
 var _leader: CharacterBody3D
-## Heróis da equipe (formação da campanha) e as placas deles, na mesma ordem.
-var _party_ids: Array = []
+## Heróis da equipe (a equipe viva da expedição) e as placas deles, na mesma ordem.
+var party_ids: Array = []
 var _heroes: Array[AHSpriteCard] = []
 var _combat_art := {}
 var _arena: AHCombatArena
-var _patrols: Array = []
+var corridor: AHStreetCorridor
+var exploration_hud: AHExplorationHud
+## Onde o líder pode andar (o corredor fecha o trecho por vencer; dentro de uma casa, a sala).
+var walk_min := STREET_WALK_MIN
+var walk_max := STREET_WALK_MAX
+var _indoor := false
+var _room_x := 0.0
+var _room_width := 0.0
+var _fog_boost := 1.0
+var _storm := false
 var _street_hud: CanvasLayer
 ## A arena aponta a câmera para o meio do lance (null: o meio da arena).
 var combat_focus_x = null
@@ -184,6 +194,10 @@ func _ready() -> void:
 			_capture_dir = arg.trim_prefix("--capture=")
 			# Sem vsync, para medir o custo real do quadro.
 			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+			# Campanha própria da captura, numa pasta própria: o save do jogador fica intacto.
+			Campaign.save_dir = _capture_dir.path_join("save")
+			Campaign.state = Campaign.create_initial(7)
+			AHJourneyRules.start_expedition(Campaign.state, "fase_1", 20261021)
 	_debug_material = StandardMaterial3D.new()
 	_debug_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_debug_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -197,14 +211,17 @@ func _ready() -> void:
 	_build_atmosphere()
 	_build_rain()
 	_build_party()
-	_build_patrols()
 	_build_camera()
 	_build_post_and_hud()
 	_arena = AHCombatArena.new()
 	add_child(_arena)
 	_arena.setup(self)
-	_arena.finished.connect(_on_combat_finished)
 	_apply_weather()
+	exploration_hud = AHExplorationHud.new()
+	_street_hud.add_child(exploration_hud)
+	corridor = AHStreetCorridor.new()
+	add_child(corridor)
+	corridor.setup(self, exploration_hud)
 
 
 # ---------------------------------------------------------------- arte e materiais
@@ -441,9 +458,21 @@ func _build_alley(x0: float, x1: float, variant: int) -> void:
 	_add_shaft(Vector3(mid - 40, -900, 380), 260.0, 620.0)
 
 
+## Portas das fachadas dentro do corredor: X (m), loja, espelho e o trecho onde fica (as de fora ficam fechadas).
+func door_list() -> Array:
+	var doors: Array = []
+	for building in FACADE_BUILDINGS:
+		var overlay: Rect2 = DOOR_OVERLAYS[building[1]]
+		var offset: float = (overlay.position.x + overlay.size.x * 0.5 - 768.0) * FACADE_WIDTH / 1536.0
+		var x: float = (building[0] + FACADE_WIDTH * 0.5 + (-offset if building[2] else offset)) * 0.01
+		if x >= 0.0 and x < CORRIDOR_LENGTH:
+			doors.append({"x": x, "shop": building[1], "mirror": building[2], "step": floori(x / (CORRIDOR_LENGTH / 10.0))})
+	return doors
+
+
 func _build_props() -> void:
 	var door_xs: Array = []
-	for building in [[-770, 1, true], [430, 0, false], [1635, 1, false], [2830, 2, false], [4030, 0, true], [5230, 1, true], [6430, 2, true]]:
+	for building in FACADE_BUILDINGS:
 		var overlay: Rect2 = DOOR_OVERLAYS[building[1]]
 		var offset: float = (overlay.position.x + overlay.size.x * 0.5 - 768.0) * FACADE_WIDTH / 1536.0
 		door_xs.append([building[0] + FACADE_WIDTH * 0.5 + (-offset if building[2] else offset), overlay.size.x * FACADE_WIDTH / 1536.0 * 0.5])
@@ -717,46 +746,19 @@ func _build_party() -> void:
 	add_child(_leader)
 
 	_combat_art = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
-	# A equipe é a formação da campanha (Campaign), só com quem está vivo.
-	for hero_id in Campaign.state.get("preferred_formation", []):
+	# A equipe é a da expedição (ou a formação da campanha antes dela), só com quem está vivo.
+	var expedition = Campaign.state.get("session", {}).get("expedition")
+	for hero_id in (expedition.team if expedition != null else Campaign.state.get("preferred_formation", [])):
 		var hero = Campaign.hero(hero_id)
-		if hero == null or not hero.get("alive", true) or not _combat_art.heroes.has(hero_id) or _party_ids.size() >= 4:
+		if hero == null or not hero.get("alive", true) or not _combat_art.heroes.has(hero_id) or party_ids.size() >= 4:
 			continue
 		var card := AHSpriteCard.new()
 		card.body_height = BODY_HEIGHTS.get(hero_id, 1.8)
 		card.show_art(_combat_art.heroes[hero_id].idle)
 		add_child(card)
-		_party_ids.append(hero_id)
+		party_ids.append(hero_id)
 		_heroes.append(card)
 	_place_leader(Vector3(7.6, 0, 0.45))
-
-
-func _build_patrols() -> void:
-	for spec in PATROLS:
-		var cards: Array = []
-		for index in spec.enemies.size():
-			var enemy_id: String = spec.enemies[index]
-			var card := AHSpriteCard.new()
-			card.body_height = BODY_HEIGHTS.get(enemy_id, 1.8)
-			card.show_art(_combat_art.enemies[enemy_id].idle)
-			card.set_facing(-1.0)
-			add_child(card)
-			cards.append(card)
-		var patrol := {"x": spec.x, "enemies": spec.enemies, "cards": cards, "done": false}
-		_patrols.append(patrol)
-		_reset_patrol(patrol)
-
-
-## Volta a patrulha ao posto dela, parada, olhando para a esquerda (início e depois de uma fuga).
-func _reset_patrol(patrol: Dictionary) -> void:
-	for index in patrol.cards.size():
-		var card: AHSpriteCard = patrol.cards[index]
-		var z: float = -0.8 - 0.03 * index
-		card.position = Vector3(patrol.x + index * 1.35, _ground_height(z), z)
-		card.set_facing(-1.0)
-		card.set_tint(Color.WHITE)
-		card.show_art(_combat_art.enemies[patrol.enemies[index]].idle)
-		card.visible = not patrol.done
 
 
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
@@ -768,6 +770,9 @@ func _place_leader(at: Vector3, facing: float = 1.0) -> void:
 	for index in _heroes.size():
 		_set_facing(index, facing)
 	_place_party(0.0)
+	# Um teleporte (casa, recomeço, captura): a câmera vai junto, sem atravessar a cidade.
+	if _camera != null:
+		_update_camera(0.0)
 
 
 func _set_facing(index: int, facing: float) -> void:
@@ -817,13 +822,18 @@ func _build_camera() -> void:
 func _update_camera(delta: float) -> void:
 	# Teleobjetiva a ~18 m, olhando um pouco de cima (o enquadramento do Emberfall); avança um pouco nos becos.
 	var leader := _leader.position
-	var target := Vector3(clampf(leader.x, -6.0, 66.0), 2.5, clampf(-1.4 + minf(leader.z + 1.0, 0.0) * 0.45, -6.5, -1.4))
+	var target := Vector3(clampf(leader.x, -6.0, 76.0), 2.5, clampf(-1.4 + minf(leader.z + 1.0, 0.0) * 0.45, -6.5, -1.4))
 	var pitch := deg_to_rad(12.0)
 	var distance := 18.5
+	if _indoor:
+		# Dentro da loja, a câmera desce para ficar abaixo do forro e enquadra a sala.
+		target = Vector3(clampf(leader.x, _room_x + 6.3, _room_x + _room_width - 6.3), 1.6, -1.2)
+		pitch = deg_to_rad(4.0)
+		distance = 11.0
 	if _arena != null and _arena.active:
 		# Na luta, a câmera chega mais perto da arena e acompanha o lance.
-		target = Vector3(combat_focus_x if combat_focus_x != null else _arena.center_x, 1.9, -0.9)
-		distance = 12.5 if combat_focus_x != null else 14.5
+		target = Vector3(combat_focus_x if combat_focus_x != null else _arena.center_x, 1.6 if _indoor else 1.9, -0.9)
+		distance = (11.5 if combat_focus_x != null else 12.5) if _indoor else (12.5 if combat_focus_x != null else 14.5)
 	var wanted := target + Vector3(0, sin(pitch) * distance, cos(pitch) * distance)
 	_camera.position = wanted if delta == 0.0 else _camera.position.lerp(wanted, 1.0 - exp(-3.0 * delta))
 	_camera.look_at(Vector3(_camera.position.x, target.y, target.z))
@@ -851,7 +861,7 @@ func _build_post_and_hud() -> void:
 	hud.add_child(_label("RUA DAS VITRINES\nBairro Submerso", 30, Vector2(36, 28)))
 	_hud_weather = _label("", 20, Vector2(36, 112))
 	hud.add_child(_hud_weather)
-	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   K lutar   R chuva   T fim de tarde/noite   P pós-processo   C colisões", 18, Vector2(36, 1030)))
+	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   E interagir   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1030)))
 	_hud_stats = _label("", 18, Vector2(1380, 30))
 	hud.add_child(_hud_stats)
 
@@ -887,7 +897,7 @@ func _apply_weather() -> void:
 	_sky.ground_bottom_color = w.ground
 	_env.ambient_light_energy = w.ambient
 	_env.fog_light_color = w.fog
-	_env.fog_density = w.fog_density
+	_env.fog_density = w.fog_density * _fog_boost
 	# O Compatibility (web) soma a luz direta e o glow mais forte: a mesma cena, calibrada a olho contra o Forward+.
 	_env.tonemap_exposure = w.exposure * (1.0 if _forward_plus else 0.9)
 	_env.glow_intensity = 0.7 if _forward_plus else 0.45
@@ -898,13 +908,17 @@ func _apply_weather() -> void:
 	for material in _skyline_materials:
 		material.set_shader_parameter("haze_color", w.haze)
 	for shaft in _shafts:
-		shaft.visible = _mood == "golden" and not _raining
+		shaft.visible = _mood == "golden" and not _raining and not _indoor
 	for index in _lamp_lights.size():
 		# Os três primeiros são os postes; os outros, as portas.
 		_lamp_lights[index].light_energy = w.lamp_energy * (1.0 if index < LAMP_XS.size() else 0.4)
-	_rain.emitting = _raining
-	_dust.emitting = not _raining
-	_splashes.emitting = _raining
+	# Dentro de uma casa não chove (e a poeira dourada é da rua).
+	_rain.emitting = _raining and not _indoor
+	_rain.visible = not _indoor
+	_dust.emitting = not _raining and not _indoor
+	_dust.visible = not _indoor
+	_splashes.emitting = _raining and not _indoor
+	_splashes.visible = not _indoor
 	_hud_weather.text = ("Noite" if _mood == "night" else "Fim de tarde") + (" · chuva" if _raining else "")
 	_update_sun(0.0)
 
@@ -916,7 +930,7 @@ func _update_sun(delta: float) -> void:
 	if _raining and _capture_dir == "":
 		_next_flash -= delta
 		if _next_flash <= 0.0:
-			_next_flash = randf_range(9.0, 20.0)
+			_next_flash = randf_range(4.0, 9.0) if _storm else randf_range(9.0, 20.0)
 			_flash = 1.0
 	_flash = maxf(0.0, _flash - delta * 3.5)
 	var flicker := _flash * (0.6 + 0.4 * sin(_flash * 40.0))
@@ -975,11 +989,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		for debug in _debug_colliders:
 			debug.visible = not debug.visible
 	elif event.is_action_pressed("debug_combat") and not _arena.active:
-		# Leva a equipe até a próxima patrulha que ainda está de pé.
-		for patrol in _patrols:
-			if not patrol.done:
-				_place_leader(Vector3(patrol.x - PATROL_TRIGGER + 0.5, 0, 0.45))
-				break
+		corridor.debug_next_fight()
 
 
 func _input_vector() -> Vector2:
@@ -989,69 +999,87 @@ func _input_vector() -> Vector2:
 
 
 func _physics_process(_delta: float) -> void:
-	if _arena.active:
+	if _arena.active or (corridor != null and corridor.blocking()):
+		_leader.velocity = Vector3.ZERO
 		return
 	var input := _input_vector()
 	var speed := 4.4 if Input.is_action_pressed("run") else 2.4
 	# Para o fundo e para a frente anda mais devagar (a câmera vê pouco dessa direção).
 	_leader.velocity = Vector3(input.x, 0, input.y * 0.75) * speed
 	_leader.move_and_slide()
-	_leader.position = _leader.position.clamp(WALK_MIN, WALK_MAX)
+	_leader.position = _leader.position.clamp(walk_min, walk_max)
 	if _trail.is_empty() or _leader.position.distance_to(_trail[0]) > 0.05:
 		_trail.push_front(_leader.position)
 		if _trail.size() > 200:
 			_trail.pop_back()
-	# Na captura, as patrulhas só entram em ação na parte da luta (as fotos da rua passam perto delas).
-	if _capture_dir != "" and _combat_phase == 0:
-		return
-	for patrol in _patrols:
-		if not patrol.done and absf(_leader.position.x - patrol.x) < PATROL_TRIGGER and _leader.position.z > -3.5:
-			_start_combat(patrol)
-			break
 
 
-# ---------------------------------------------------------------- luta
+## Na captura, a jornada só começa depois das fotos da rua (elas passam perto das patrulhas).
+func capture_paused() -> bool:
+	return _capture_dir != "" and _combat_phase == 0
 
-func _start_combat(patrol: Dictionary) -> void:
-	var heroes: Array = _party_ids.map(func(id): return Campaign.hero(id))
-	if heroes.is_empty():
-		return
+
+# ---------------------------------------------------------------- jornada (chamado pelo AHStreetCorridor)
+
+func begin_fight() -> void:
 	_street_hud.visible = false
 	_leader.velocity = Vector3.ZERO
-	_arena.set_meta("patrol", patrol)
-	_arena.start(heroes, _heroes, patrol.enemies, patrol.cards, patrol.x - 0.6)
 
 
-func _on_combat_finished(result: String) -> void:
-	var patrol: Dictionary = _arena.get_meta("patrol")
+func end_fight() -> void:
 	_street_hud.visible = true
 	combat_focus_x = null
-	match result:
-		"victory":
-			patrol.done = true
-			for card in patrol.cards:
-				card.visible = false
-			# Quem morreu sai da equipe; os outros seguem do lugar onde terminaram.
-			for index in range(_party_ids.size() - 1, -1, -1):
-				var hero = Campaign.hero(_party_ids[index])
-				if hero == null or not hero.alive:
-					_heroes[index].queue_free()
-					_heroes.remove_at(index)
-					_party_ids.remove_at(index)
-			for index in _heroes.size():
-				_heroes[index].show_art(_combat_art.heroes[_party_ids[index]].idle)
-				_heroes[index].set_tint(Color.WHITE)
-			_place_leader(Vector3(_heroes[0].position.x if not _heroes.is_empty() else patrol.x, 0, 0.45))
-		"escaped":
-			_reset_patrol(patrol)
-			for index in _heroes.size():
-				_heroes[index].show_art(_combat_art.heroes[_party_ids[index]].idle)
-				_heroes[index].set_tint(Color.WHITE)
-			_place_leader(Vector3(patrol.x - PATROL_TRIGGER - 3.0, 0, 0.45), -1.0)
-		_:
-			# Derrota: a rua recomeça com a campanha salva (o protótipo ainda não tem a volta ao refúgio).
-			Campaign.load_or_new()
-			GameFlow.change_to("street")
+
+
+## Quem morreu sai da equipe; os outros voltam a andar do lugar onde terminaram a luta.
+func remove_dead_heroes() -> void:
+	for index in range(party_ids.size() - 1, -1, -1):
+		var hero = Campaign.hero(party_ids[index])
+		if hero == null or not hero.alive:
+			_heroes[index].queue_free()
+			_heroes.remove_at(index)
+			party_ids.remove_at(index)
+	for index in _heroes.size():
+		_heroes[index].show_art(_combat_art.heroes[party_ids[index]].idle)
+		_heroes[index].set_tint(Color.WHITE)
+	if not _heroes.is_empty():
+		_place_leader(Vector3(_heroes[0].position.x, 0, _leader.position.z if not _indoor else -0.5))
+
+
+## Dentro de uma casa: a sala é o limite de andar e da câmera, e o clima da rua some (chuva, poeira, feixes).
+func set_indoor(indoor: bool, room_x: float = 0.0, room_width: float = 0.0) -> void:
+	_indoor = indoor
+	_room_x = room_x
+	_room_width = room_width
+	if indoor:
+		walk_min = Vector3(room_x + 0.35, 0, AHHouseRoom.BACK_Z + 0.4)
+		walk_max = Vector3(room_x + room_width - 0.35, 0, AHHouseRoom.WALK_FRONT_Z - 0.3)
+	else:
+		walk_min = STREET_WALK_MIN
+		walk_max = STREET_WALK_MAX
+	_apply_weather()
+
+
+## O clima sorteado pela fase (e o que muda ao levantar acampamento), nos ajustes da rua.
+func apply_corridor_weather(weather: String) -> void:
+	_mood = "night" if ["night", "nightRain", "storm"].has(weather) else "golden"
+	_raining = ["rain", "storm", "nightRain"].has(weather)
+	_storm = weather == "storm"
+	_fog_boost = 2.6 if ["mist", "fog"].has(weather) else 1.0
+	_next_flash = 4.0
+	_apply_weather()
+
+
+## Quanto a patrulha enxerga, pelo clima: menos à noite, na chuva e na névoa.
+func sight_multiplier() -> float:
+	var value := 1.0
+	if _mood == "night":
+		value *= 0.65
+	if _raining:
+		value *= 0.8
+	if _fog_boost > 1.0:
+		value *= 0.7
+	return value
 
 
 func _process(delta: float) -> void:
@@ -1167,10 +1195,12 @@ func _save_capture(shot_name: String, line: String = "") -> void:
 	print(line)
 
 
-## Depois das fotos da rua: uma luta contra a primeira patrulha. Fotografa o HUD, uma ação no meio, o resultado e a
-## rua depois; o resto da luta é jogado sozinho e rápido.
+## Depois das fotos da rua, a jornada: a equipe se aproxima da primeira patrulha (foto da suspeita), luta (HUD, uma
+## ação, o resultado), entra numa casa e vasculha um ponto. A captura usa uma campanha própria, numa pasta própria.
 func _run_combat_capture(delta: float) -> void:
 	_combat_time += delta
+	var campaign: Dictionary = Campaign.state
+	var route: Dictionary = campaign.session.expedition.corridor
 	match _combat_phase:
 		0:
 			_mood = "golden"
@@ -1181,37 +1211,71 @@ func _run_combat_capture(delta: float) -> void:
 			_apply_weather()
 			_post.set_shader_parameter("enabled", true)
 			_combat_phase = 1
-			_place_leader(Vector3(_patrols[0].x - PATROL_TRIGGER + 0.5, 0, 0.45))
+			corridor.debug_next_fight()
 			_combat_time = 0.0
 		1:
-			if _arena.active and _arena.hud.waiting and _combat_time > 2.5:
-				_save_capture("10-combat-hud")
+			# Anda devagar até a patrulha: a suspeita sobe.
+			_capture_input = Vector2(0.5, 0)
+			var guard = corridor.guards.get(route.index)
+			if guard != null and guard.meter > 0.4 and _combat_time > 0.5 and not FileAccess.file_exists(_capture_dir.path_join("10-patrol-sight.png")):
+				_save_capture("10-patrol-sight", "10-patrol-sight meter=%.2f detected=%s" % [guard.meter, guard.detected])
+			if _arena.active:
+				_capture_input = Vector2.ZERO
+				_combat_phase = 2
+				_combat_time = 0.0
+		2:
+			if _arena.hud.waiting and _combat_time > 2.5:
+				_save_capture("11-combat-hud")
 				var actor := _arena.session.current_actor()
 				var options: Array = _arena.session.ability_options(actor.id).filter(func(o): return o.usable)
 				var option: Dictionary = options[0]
 				_arena.hud.command_chosen.emit({"kind": "ability", "ability_id": option.id,
 					"rank": actor.rank if option.self else option.targets[0]})
-				_combat_phase = 2
-				_combat_time = 0.0
-		2:
-			if _combat_time > 0.75:
-				_save_capture("11-combat-action")
-				_arena.auto_battle = true
-				_arena.speed = 3.0
 				_combat_phase = 3
 				_combat_time = 0.0
 		3:
+			if _combat_time > 0.75:
+				_save_capture("12-combat-action")
+				_arena.auto_battle = true
+				_arena.speed = 3.0
+				_combat_phase = 4
+				_combat_time = 0.0
+		4:
 			if _arena.hud.waiting:
 				_arena.hud.command_chosen.emit({"kind": "defend"})
 			if _arena.hud._result.visible and _combat_time > 0.3:
-				_save_capture("12-combat-result", "12-combat-result result=%s rounds=%d" % [_arena.session.result(), _arena.session.state.round])
-				_combat_phase = 4
+				_save_capture("13-combat-result", "13-combat-result result=%s rounds=%d" % [_arena.session.result(), _arena.session.state.round])
+				_combat_phase = 5
 				_combat_time = 0.0
 			elif not _arena.hud._result.visible:
 				_combat_time = 0.0
-		4:
+		5:
 			if not _arena.active and _combat_time > 1.0:
-				_save_capture("13-after-combat", "13-after-combat patrol_done=%s party=%d" % [_patrols[0].done, _heroes.size()])
-				get_tree().quit()
-			elif _arena.active:
+				_save_capture("14-after-combat", "14-after-combat step=%d resolved=%s party=%d" % [route.index + 1, route.steps[route.index].resolved, _heroes.size()])
+				# Uma casa aberta (atalho da captura: os trechos até ela contam como vencidos).
+				var site_index: int = route.sites.map(func(s): return not s.locked).find(true)
+				while route.index < route.sites[site_index].step:
+					route.steps[route.index].resolved = true
+					AHJourneyRules.enter_step(campaign, route.index + 1)
+				corridor._enter_house(site_index)
+				_combat_phase = 6
 				_combat_time = 0.0
+		6:
+			if _arena.active:
+				_arena.auto_battle = true
+				_arena.speed = 3.0
+				if _arena.hud.waiting:
+					_arena.hud.command_chosen.emit({"kind": "defend"})
+				_combat_time = 0.0
+			elif corridor.room != null and not corridor.busy and _combat_time > 1.5:
+				_save_capture("15-house-inside", "15-house-inside shop=%d spots=%d" % [corridor.room.shop, corridor.room.spot_xs.size()])
+				var spot: int = route.sites[route.current_house].spots.map(func(s): return not s.searched).find(true)
+				if spot >= 0:
+					corridor._search_spot(route.current_house, spot)
+				_combat_phase = 7
+				_combat_time = 0.0
+		7:
+			if _combat_time > 0.8:
+				_save_capture("16-house-search", "16-house-search food=%d seeds=%d event=%s" % [campaign.session.expedition.food,
+					campaign.session.expedition.loot.seeds, str(campaign.session.event != null)])
+				get_tree().quit()

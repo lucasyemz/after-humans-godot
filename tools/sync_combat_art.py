@@ -5,7 +5,7 @@
 - Heróis: a pose parada (SourceArt/HeroStatics), as três fases de cada ação aprovada (preparação, execução e efeito,
   SourceArt/AllyActions/Approved20261013) e as reações atuais (ferido e derrotado, SourceArt/AllyActions/Reactions20261020;
   por enquanto só Bento e Nick). As medidas (âncora no pé e altura do corpo em pixels) vêm dos manifestos de origem.
-- Inimigos da patrulha da rua: parado e poses (SourceArt/Legacy); a âncora e a altura do corpo são medidas pelo alfa.
+- Inimigos das patrulhas da rua: parado e poses (SourceArt/Legacy); a âncora e a altura do corpo são medidas pelo alfa.
 - Ícones das habilidades (SourceArt/ApprovedActionIcons) e os sons do combate (SourceArt/Audio/manifest.json).
 
 As imagens viram WebP com metade da resolução (o jogo nunca mostra mais que isso); as medidas no manifesto ficam nos
@@ -39,6 +39,9 @@ ENEMIES = {
     "vigia_enferrujado": {"idle": "public/characters/approved/vigia_enferrujado/vigia_enferrujado-idle.png",
                           "poses": "public/characters/approved/vigia_enferrujado"},
 }
+# Os outros inimigos das patrulhas da Rua (perfil node_1_combat de encounters.json): parado e poses da arte aprovada.
+for _enemy in ("cao_eco", "condutor_raiz", "sussurrador", "rastejante_raiz"):
+    ENEMIES[_enemy] = {"idle": f"public/characters/approved/{_enemy}/{_enemy}-idle.png", "poses": f"public/characters/approved/{_enemy}"}
 POSES = ["attack1", "attack2", "defense", "hurt", "dodge", "support", "death"]
 AUDIO_CUES = ["BentoAction", "NickAction", "IrisAction", "VesperaAction", "Dodge", "RobotDodge", "RobotHeal", "RobotPunch"]
 

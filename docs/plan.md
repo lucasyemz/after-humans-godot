@@ -100,7 +100,7 @@ save (`station` e `session` estão vazios) e a migração de versões antigas do
 - **Ainda não entraram:** a prévia de quem a habilidade atinge (par da granada, vizinho do coquetel), os itens da
   Mochila na luta e as crises de instinto com a apresentação própria.
 
-### Fase 2: exploração e a primeira jornada (5 a 8 dias)
+### Fase 2: exploração e a primeira jornada (5 a 8 dias) — feita em 2026-10-21
 
 - Corredor de 10 trechos (port do `AHStreetCorridor`): patrulhas, suprimentos, descanso, guardião no fim.
 - Rastreador, visão e detecção (`AHTracker`, `AHSightComponent`): a vantagem de abertura no combate.
@@ -110,6 +110,37 @@ save (`station` e `session` estão vazios) e a migração de versões antigas do
 
 **Pronto quando:** a Jornada 1 inteira (Rua das Vitrines) é jogável: preparar, andar, lutar, vasculhar uma loja,
 descansar, enfrentar o guardião e ver o resultado.
+
+**Feito:** a Rua das Vitrines virou o corredor da jornada (`AHJourneyRules`, port do `FAHGameFlowRules` com as mesmas
+sementes e constantes, então a mesma campanha gera o mesmo corredor da Unreal).
+- **Corredor de 10 trechos** de 7,8 m: patrulhas, suprimentos, eventos, descanso e o guardião no fim. O clima de cada
+  fase sai da semente (fim de tarde, noite, chuva, neblina, tempestade com relâmpagos) e muda depois de acampar. O HUD
+  mostra os trechos, a comida, os curativos, a esperança e o que já foi achado. A equipe não passa de um trecho sem
+  resolvê-lo.
+- **Visão e detecção:** cada patrulha olha num cone de 60° e 14 m (menor de noite, na chuva e na neblina), com raio
+  contra os prédios. A suspeita sobe enquanto vê a equipe ("?"); cheia, a patrulha avista ("!") e corre. Chegar perto
+  sem ser visto dá a vantagem de abertura no combate.
+- **Busca e saque:** as casas da fase (trancadas em ~35%, abertas com pé de cabra ou forçadas) têm até 3 pontos de
+  busca com os resultados da Unreal (comida, sementes, sucata, curativos, o pé de cabra, eventos narrativos com
+  escolhas). Caixotes na rua também dão saque.
+- **Interiores das lojas** (port enxuto do `AHHouseRoom`): mercearia, oficina e cinema com o chão, a parede, o rodapé e
+  os itens pintados de cada loja. Entrar e sair com fade; dentro, a patrulha da casa embosca, os pontos de busca e a
+  fogueira do acampamento (comida e curativo curam; sair muda o clima).
+- **Fim da jornada:** vencer o guardião, recuar pela saída ("Voltar à Estação") ou perder a equipe mostra o resultado
+  (o saque volta inteiro, pela metade ou nada) e começa uma expedição ou campanha nova.
+- Testes: `test_journey_rules` (forma do corredor em 300 sementes, inimigos e arte de todos eles, casas em 400 sementes,
+  busca e pé de cabra, eventos, acampamento, combate, volta e o save). O modo de captura agora joga a suspeita da
+  patrulha, a luta, a entrada numa casa e uma busca.
+
+**Pendências:**
+- **A rua ainda é montada em código** (não virou `.tscn`): fica para o montador da Fase 4.
+- **Mochila sem tela:** os itens contam (comida, curativos, pé de cabra), mas não há a tela da Mochila nem o uso dos
+  itens na luta.
+- **Preparar a expedição** (escolher a equipe e os itens) vem com a Estação, na Fase 3; hoje a equipe é a dos
+  fundadores vivos.
+- **Arte:** os inimigos novos (cão eco, condutor raiz, sussurrador, rastejante) só têm a pose parada; os pontos de busca
+  ainda não têm marcador visual (só o aviso "E Vasculhar…" perto deles).
+- **QA em Play:** o guardião e o descanso passaram pelos testes de regra, mas ainda não por uma jornada inteira jogada.
 
 ### Fase 3: Estação Raiz e campanha (7 a 10 dias)
 

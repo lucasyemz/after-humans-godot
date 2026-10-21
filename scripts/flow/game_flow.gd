@@ -58,6 +58,11 @@ func change_to(scene_id: String, scene_params: Dictionary = {}, fade: bool = tru
 	return true
 
 
+## Escurece (1) ou clareia (0) a tela, para transições dentro da mesma cena (entrar numa casa).
+func fade(alpha: float) -> void:
+	await _fade_to(alpha)
+
+
 func _fade_to(alpha: float) -> void:
 	_fade.visible = true
 	var tween := create_tween()

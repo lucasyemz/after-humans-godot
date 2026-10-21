@@ -94,9 +94,10 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 
 # ---------------------------------------------------------------- início e fim
 
-## Começa a luta: hero_cards e enemy_cards já estão na rua (na ordem da formação).
-func start(heroes: Array, hero_cards: Array, enemy_ids: Array, enemy_cards: Array, at_x: float, seed_value: int = -1) -> void:
-	session = AHCombatSession.create(heroes, enemy_ids, false, seed_value)
+## Começa a luta: hero_cards e enemy_cards já estão na cena (na ordem da formação). enemies: ids ou os inimigos já
+## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
+func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
+	session = AHCombatSession.create(heroes, enemies, opening, seed_value)
 	center_x = at_x
 	cards.clear()
 	for index in session.state.player_team.size():

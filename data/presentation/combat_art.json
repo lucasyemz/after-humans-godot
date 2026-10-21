@@ -1460,6 +1460,394 @@
 					1335
 				]
 			}
+		},
+		"cao_eco": {
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/cao_eco/attack1.webp",
+					"anchor": [
+						589.0,
+						1058
+					],
+					"body_reference_pixels": 609,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"attack2": {
+					"file": "res://art/combat/enemies/cao_eco/attack2.webp",
+					"anchor": [
+						589.5,
+						1059
+					],
+					"body_reference_pixels": 609,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/cao_eco/defense.webp",
+					"anchor": [
+						589.5,
+						1058
+					],
+					"body_reference_pixels": 609,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/cao_eco/hurt.webp",
+					"anchor": [
+						589.0,
+						1059
+					],
+					"body_reference_pixels": 609,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"dodge": {
+					"file": "res://art/combat/enemies/cao_eco/dodge.webp",
+					"anchor": [
+						589.0,
+						1058
+					],
+					"body_reference_pixels": 609,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/cao_eco/support.webp",
+					"anchor": [
+						589.0,
+						1058
+					],
+					"body_reference_pixels": 609,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/cao_eco/death.webp",
+					"anchor": [
+						588.5,
+						1058
+					],
+					"body_reference_pixels": 609,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
+			"idle": {
+				"file": "res://art/combat/enemies/cao_eco/idle.webp",
+				"anchor": [
+					606.0,
+					1058
+				],
+				"body_reference_pixels": 686,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		},
+		"condutor_raiz": {
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/condutor_raiz/attack1.webp",
+					"anchor": [
+						580.5,
+						1094
+					],
+					"body_reference_pixels": 711,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/condutor_raiz/defense.webp",
+					"anchor": [
+						589.0,
+						1093
+					],
+					"body_reference_pixels": 711,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/condutor_raiz/hurt.webp",
+					"anchor": [
+						634.0,
+						1093
+					],
+					"body_reference_pixels": 711,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"dodge": {
+					"file": "res://art/combat/enemies/condutor_raiz/dodge.webp",
+					"anchor": [
+						565.5,
+						1093
+					],
+					"body_reference_pixels": 711,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/condutor_raiz/support.webp",
+					"anchor": [
+						597.0,
+						1093
+					],
+					"body_reference_pixels": 711,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/condutor_raiz/death.webp",
+					"anchor": [
+						591.0,
+						1093
+					],
+					"body_reference_pixels": 711,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
+			"idle": {
+				"file": "res://art/combat/enemies/condutor_raiz/idle.webp",
+				"anchor": [
+					591.0,
+					1094
+				],
+				"body_reference_pixels": 869,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		},
+		"sussurrador": {
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/sussurrador/attack1.webp",
+					"anchor": [
+						635.0,
+						1172
+					],
+					"body_reference_pixels": 892,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"attack2": {
+					"file": "res://art/combat/enemies/sussurrador/attack2.webp",
+					"anchor": [
+						596.5,
+						1172
+					],
+					"body_reference_pixels": 892,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/sussurrador/defense.webp",
+					"anchor": [
+						647.0,
+						1172
+					],
+					"body_reference_pixels": 892,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/sussurrador/hurt.webp",
+					"anchor": [
+						607.0,
+						1172
+					],
+					"body_reference_pixels": 892,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"dodge": {
+					"file": "res://art/combat/enemies/sussurrador/dodge.webp",
+					"anchor": [
+						549.5,
+						1172
+					],
+					"body_reference_pixels": 892,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/sussurrador/support.webp",
+					"anchor": [
+						613.0,
+						1172
+					],
+					"body_reference_pixels": 892,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/sussurrador/death.webp",
+					"anchor": [
+						592.5,
+						1172
+					],
+					"body_reference_pixels": 892,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
+			"idle": {
+				"file": "res://art/combat/enemies/sussurrador/idle.webp",
+				"anchor": [
+					612.0,
+					1173
+				],
+				"body_reference_pixels": 981,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		},
+		"rastejante_raiz": {
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/rastejante_raiz/attack1.webp",
+					"anchor": [
+						596.5,
+						979
+					],
+					"body_reference_pixels": 538,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"attack2": {
+					"file": "res://art/combat/enemies/rastejante_raiz/attack2.webp",
+					"anchor": [
+						601.0,
+						979
+					],
+					"body_reference_pixels": 538,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/rastejante_raiz/defense.webp",
+					"anchor": [
+						594.5,
+						980
+					],
+					"body_reference_pixels": 538,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/rastejante_raiz/hurt.webp",
+					"anchor": [
+						625.0,
+						979
+					],
+					"body_reference_pixels": 538,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"dodge": {
+					"file": "res://art/combat/enemies/rastejante_raiz/dodge.webp",
+					"anchor": [
+						575.0,
+						979
+					],
+					"body_reference_pixels": 538,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/rastejante_raiz/support.webp",
+					"anchor": [
+						606.0,
+						979
+					],
+					"body_reference_pixels": 538,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/rastejante_raiz/death.webp",
+					"anchor": [
+						586.5,
+						979
+					],
+					"body_reference_pixels": 538,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
+			"idle": {
+				"file": "res://art/combat/enemies/rastejante_raiz/idle.webp",
+				"anchor": [
+					593.5,
+					980
+				],
+				"body_reference_pixels": 637,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
 		}
 	},
 	"icons": {

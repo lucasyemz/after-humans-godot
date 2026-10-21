@@ -37,6 +37,29 @@ SOURCE_ART = [
 ]
 
 
+# Interiores das lojas (AHHouseRoom): chão, parede do fundo repetida, rodapé e os itens presos na parede. Viram WebP.
+ROOM_SHOPS = ["grocery", "workshop", "cinema"]
+ROOM_PARTS = ["floor", "walltile-seamless", "trim-cut", *[f"item{i}" for i in range(6)]]
+
+
+def rooms() -> int:
+    from PIL import Image  # só para os interiores: pip install pillow
+    count = 0
+    for shop in ROOM_SHOPS:
+        for part in ROOM_PARTS:
+            src = REPO / "SourceArt" / f"room-{shop}-{part}.png"
+            if not src.exists():
+                continue
+            dst = PROTO / "art" / "rooms" / f"{shop}-{part}.webp"
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+                image = Image.open(src).convert("RGBA")
+                scale = 0.6 if part in ("floor", "walltile-seamless", "trim-cut") else 1.0
+                image.resize((round(image.width * scale), round(image.height * scale)), Image.LANCZOS).save(dst, "WEBP", quality=88, method=4)
+            count += 1
+    return count
+
+
 def copy(src: Path, dst: Path) -> None:
     dst.parent.mkdir(parents=True, exist_ok=True)
     if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime or dst.stat().st_size != src.stat().st_size:
@@ -57,7 +80,8 @@ def main() -> None:
             dst.write_bytes(subprocess.run(["git", "show", f"{WEB_TAG}:{path}"], cwd=REPO, check=True, capture_output=True).stdout)
     for path in SOURCE_ART:
         copy(REPO / path, street / Path(path).name)
-    print(f"dados: {len(DATA) + len(LEGACY_KITS)} arquivos; arte da rua: {len(WEB_STREET) + len(SOURCE_ART)} imagens")
+    print(f"dados: {len(DATA) + len(LEGACY_KITS)} arquivos; arte da rua: {len(WEB_STREET) + len(SOURCE_ART)} imagens; "
+          f"interiores: {rooms()} imagens")
 
 
 if __name__ == "__main__":
