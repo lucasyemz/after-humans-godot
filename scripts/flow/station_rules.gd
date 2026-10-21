@@ -1034,6 +1034,16 @@ static func on_search(campaign: Dictionary, site_index: int, spot_index: int) ->
 	if entry.is_empty() or expedition.get("objective_done", false) or site_index < 0 or site_index >= sites.size() \
 			or int(sites[site_index].get("objective_spot", -1)) != spot_index:
 		return ""
+	return grant_objective(campaign)
+
+
+## Soma o achado do foco ao saque uma vez só e devolve o texto do objetivo (GrantObjective): a casa da rua ou o prop do
+## cenário.
+static func grant_objective(campaign: Dictionary) -> String:
+	var expedition: Dictionary = campaign.session.expedition
+	var entry := focus_def(expedition.get("focus", ""))
+	if entry.is_empty() or expedition.get("objective_done", false):
+		return ""
 	expedition.objective_done = true
 	var loot: Dictionary = expedition.loot
 	if entry.civilian != "":

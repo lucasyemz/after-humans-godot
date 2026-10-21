@@ -22,13 +22,15 @@ const CROWBAR := "pe_de_cabra"
 ## Inimigos de uma casa usam índices a partir daqui no sorteio (HouseEnemyIndex).
 const HOUSE_ENEMY_INDEX := 100
 
-## Fases da campanha (FAHGameFlowRules::Phases): id, cenário, nome, nível e tipo do nó.
+## Fases da campanha (FAHGameFlowRules::Phases): id, cenário, nome, nível, tipo do nó e o mapa de cada uma (#86, aprovado
+## pelo Lucas): a rua na primeira ("" = a Rua das Vitrines), os cenários nas outras; com trecho de passagem, os primeiros
+## transit_steps trechos ficam no mapa de passagem (o Cais antes da Ponte, o Depósito antes dos Dutos).
 const PHASES := [
-	{"id": "fase_1", "scenario": "rua-das-vitrines", "name": "Rua das Vitrines", "level": 1, "node_type": "combat"},
-	{"id": "fase_2", "scenario": "ponte-das-raizes", "name": "Ponte das Raízes", "level": 3, "node_type": "combat"},
-	{"id": "fase_3", "scenario": "sala-esquecida", "name": "Sala Esquecida", "level": 5, "node_type": "combat"},
-	{"id": "fase_4", "scenario": "laboratorio-silencioso", "name": "Laboratório Silencioso", "level": 7, "node_type": "combat"},
-	{"id": "fase_5", "scenario": "tuneis-do-eco", "name": "Túneis do Eco", "level": 9, "node_type": "boss"},
+	{"id": "fase_1", "scenario": "rua-das-vitrines", "name": "Rua das Vitrines", "level": 1, "node_type": "combat", "map": "", "transit": "", "transit_steps": 0},
+	{"id": "fase_2", "scenario": "ponte-das-raizes", "name": "Ponte das Raízes", "level": 3, "node_type": "combat", "map": "RootBridge", "transit": "RiverDock", "transit_steps": 4},
+	{"id": "fase_3", "scenario": "sala-esquecida", "name": "Sala Esquecida", "level": 5, "node_type": "combat", "map": "SealedShelter", "transit": "", "transit_steps": 0},
+	{"id": "fase_4", "scenario": "laboratorio-silencioso", "name": "Laboratório Silencioso", "level": 7, "node_type": "combat", "map": "TriageGate", "transit": "", "transit_steps": 0},
+	{"id": "fase_5", "scenario": "tuneis-do-eco", "name": "Túneis do Eco", "level": 9, "node_type": "boss", "map": "SewerDucts", "transit": "FloodedDepot", "transit_steps": 4},
 ]
 const WEATHERS := {
 	"estacao-raiz": ["clear", "clear", "sunset", "mist", "night", "nightRain"],
@@ -126,6 +128,9 @@ static func create_corridor(seed_value: int, node_id: String, node_type: String,
 		"node_id": node_id, "node_type": node_type, "seed": phase_seed, "index": 0, "steps": steps,
 		"weather": weathers[mini(weathers.size() - 1, floori(weather_random.next() * weathers.size()))],
 		"sites": [], "current_house": -1, "effects": [], "props": {},
+		# Cenários (#86): os props vasculháveis de cada mapa (o trecho de cada um), os já vasculhados, o do objetivo da
+		# rota e o interior lateral aberto (a zona do mapa, -1 fora).
+		"prop_steps": [], "prop_maps": [], "searched_props": [], "objective_prop": -1, "current_room": -1,
 	}
 
 
@@ -595,6 +600,123 @@ static func search_prop(campaign: Dictionary, step: int) -> Dictionary:
 	route.props[str(step)] = true
 	var random := _rand(route.seed ^ _mul(step + 1, 0xc2b2ae35))
 	return {"ok": true, "text": apply_search_outcome(campaign, random, null)}
+
+
+# ---------------------------------------------------------------- cenários (#86)
+
+## O mapa do trecho: o de passagem nos primeiros trechos, depois o da fase ("" = a rua).
+static func map_for_step(phase_id: String, step: int) -> String:
+	var info := phase(phase_id)
+	if info.is_empty():
+		return ""
+	return info.transit if info.transit != "" and step < int(info.transit_steps) else info.map
+
+
+## Os trechos que ficam no mapa: [primeiro, quantos] (PhaseStepRange).
+static func step_range(phase_id: String, transit_map: bool) -> Array:
+	var info := phase(phase_id)
+	var transit: int = clampi(int(info.get("transit_steps", 0)), 0, 9) if info.get("transit", "") != "" else 0
+	return [0, transit] if transit_map else [transit, 10 - transit]
+
+
+## Campos dos cenários num corredor de save anterior a eles.
+static func _scenario_fields(route: Dictionary) -> void:
+	for key in ["prop_steps", "prop_maps", "searched_props"]:
+		if not route.has(key):
+			route[key] = []
+	for key in ["objective_prop", "current_room"]:
+		if not route.has(key):
+			route[key] = -1
+
+
+## Os props do mapa entram no corredor (AssignScenarioProps); voltando ao mesmo mapa, os mesmos (e os já vasculhados).
+## O objetivo da rota cai num prop da segunda metade (trecho >= 4), fixo pela semente. Devolve o índice do primeiro.
+static func assign_scenario_props(campaign: Dictionary, map: String, steps: Array) -> int:
+	var expedition: Dictionary = campaign.session.expedition
+	var route: Dictionary = expedition.corridor
+	_scenario_fields(route)
+	var prop_steps: Array = route.prop_steps
+	var prop_maps: Array = route.prop_maps
+	var existing := prop_maps.find(map)
+	if existing >= 0:
+		var count := prop_maps.count(map)
+		if prop_steps.slice(existing, existing + count) == steps:
+			return existing
+		for i in range(existing + count - 1, existing - 1, -1):
+			prop_steps.remove_at(i)
+			prop_maps.remove_at(i)
+		route.searched_props = []
+		route.objective_prop = -1
+	var first := prop_steps.size()
+	for step in steps:
+		prop_steps.append(step)
+		prop_maps.append(map)
+	if int(route.objective_prop) != -1 or steps.is_empty() or AHStationRules.focus_def(expedition.get("focus", "")).is_empty():
+		return first
+	var later: Array = []
+	for i in range(first, prop_steps.size()):
+		if prop_steps[i] >= 4:
+			later.append(i)
+	var info := phase(expedition.phase_id)
+	if later.is_empty() and not (info.get("transit", "") != "" and steps[0] < int(info.transit_steps)):
+		later = range(first, prop_steps.size())
+	if later.is_empty():
+		return first
+	var random := _rand(route.seed ^ 0x51ed27)
+	route.objective_prop = later[mini(later.size() - 1, floori(random.next() * later.size()))]
+	return first
+
+
+## O trecho guardado pela patrulha de pé: nada nele abre ainda.
+static func _guarded(route: Dictionary, step: int) -> bool:
+	return route.index == step and step < route.steps.size() and not route.steps[step].resolved \
+		and (route.steps[step].type == "combat" or route.steps[step].type == "boss")
+
+
+static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	_scenario_fields(route)
+	if prop < 0 or prop >= route.prop_steps.size() or route.searched_props.has(prop) or route.current_house != -1:
+		return false
+	return route.index >= route.prop_steps[prop] and not _guarded(route, route.prop_steps[prop])
+
+
+## Vasculha o prop (SearchScenarioProp): a tabela das casas (1 em 3 ruim) e o objetivo da rota. Devolve {ok, text}.
+static func search_scenario_prop(campaign: Dictionary, prop: int) -> Dictionary:
+	if not can_search_scenario_prop(campaign, prop):
+		return {"ok": false}
+	var route: Dictionary = corridor(campaign)
+	route.searched_props.append(prop)
+	var random := _rand(route.seed ^ _mul(prop + 1, 0x27d4eb2d))
+	var text := apply_search_outcome(campaign, random, null)
+	if prop == int(route.objective_prop):
+		text += AHStationRules.grant_objective(campaign)
+	return {"ok": true, "text": text}
+
+
+## A porta de um interior lateral abre do trecho dela em diante, sem a patrulha dele de pé (CanEnterScenarioRoom).
+static func can_enter_scenario_room(campaign: Dictionary, door_step: int) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	_scenario_fields(route)
+	return route.current_house == -1 and int(route.current_room) == -1 and route.index >= door_step and not _guarded(route, door_step)
+
+
+static func enter_scenario_room(campaign: Dictionary, zone: int, door_step: int) -> bool:
+	if zone < 0 or not can_enter_scenario_room(campaign, door_step):
+		return false
+	corridor(campaign).current_room = zone
+	return true
+
+
+static func leave_scenario_room(campaign: Dictionary) -> bool:
+	if not in_corridor(campaign) or int(corridor(campaign).get("current_room", -1)) == -1:
+		return false
+	corridor(campaign).current_room = -1
+	return true
 
 
 # ---------------------------------------------------------------- eventos

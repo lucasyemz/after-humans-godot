@@ -166,9 +166,15 @@ func camera_view() -> Vector2:
 
 func slot_position(unit: AHCombat.Unit) -> Vector3:
 	var rank := maxi(unit.rank, 1)
+	# Na rua a luta fica na calçada (HERO_Z, ENEMY_Z); nos cenários, na faixa da zona (um pouco atrás do meio dela).
+	var hero_z: float = HERO_Z
+	var enemy_z: float = ENEMY_Z
+	if _street.get("scenario") != null:
+		hero_z = _street.lane_z - 0.3
+		enemy_z = hero_z - 0.25
 	if unit.is_player:
-		return Vector3(center_x - FRONT_GAP - (rank - 1) * HERO_GAP, _street.call("_ground_height", HERO_Z), HERO_Z - 0.03 * rank)
-	return Vector3(center_x + FRONT_GAP + (rank - 1) * ENEMY_GAP, _street.call("_ground_height", ENEMY_Z), ENEMY_Z - 0.03 * rank)
+		return Vector3(center_x - FRONT_GAP - (rank - 1) * HERO_GAP, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
+	return Vector3(center_x + FRONT_GAP + (rank - 1) * ENEMY_GAP, _street.call("_ground_height", enemy_z), enemy_z - 0.03 * rank)
 
 
 ## Leva cada unidade de pé para a posição dela (depois de trocas, empurrões e mortes).

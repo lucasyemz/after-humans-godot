@@ -8,8 +8,8 @@ extends Control
 const H := preload("res://scripts/ui/combat_hud.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
-## Fases com mapa nesta versão (as outras chegam com os cenários, na Fase 4 do plano).
-const PLAYABLE_PHASES := ["fase_1"]
+## Fases com mapa: todas (a rua e os cenários da Fase 4).
+const PLAYABLE_PHASES := ["fase_1", "fase_2", "fase_3", "fase_4", "fase_5"]
 const RESULT_NAMES := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fuga", "defeat": "Derrota"}
 
 var station: AHStation

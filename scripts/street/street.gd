@@ -145,6 +145,13 @@ var exploration_hud: AHExplorationHud
 var walk_min := STREET_WALK_MIN
 var walk_max := STREET_WALK_MAX
 var _indoor := false
+## Cenário da jornada (#86): o mapa da Unreal no lugar da rua (nulo na Rua das Vitrines). A zona atual dá o piso, a faixa
+## e o enquadramento; nas cobertas não chove.
+var scenario: AHScenarioWorld
+var floor_y := 0.0
+var lane_z := 0.45
+var sheltered := false
+var _zone := {}
 var _room_x := 0.0
 var _room_width := 0.0
 var _fog_boost := 1.0
@@ -203,13 +210,27 @@ func _ready() -> void:
 	_debug_material.albedo_color = Color(1.0, 0.15, 0.1, 0.35)
 	_debug_material.no_depth_test = true
 	_build_environment()
-	_build_street()
-	_build_buildings()
-	_build_props()
-	_build_backdrop()
+	var map := _journey_map()
+	if map != "" and AHScenarioWorld.exists(map):
+		scenario = AHScenarioWorld.new()
+		add_child(scenario)
+		scenario.build(map)
+	else:
+		_build_street()
+		_build_buildings()
+		_build_props()
+		_build_backdrop()
 	_build_atmosphere()
 	_build_rain()
 	_build_party()
+	if scenario and ["FloodedDepot", "SewerDucts"].has(scenario.map_name):
+		# Lanterna de mão no Depósito e nos Dutos (a da Unreal: 160 lm, 10 m, presa ao líder, um pouco à frente).
+		var lantern := OmniLight3D.new()
+		lantern.position = Vector3(0, 0.8, 0.5)
+		lantern.light_energy = 160.0 / AHScenarioWorld.LUMENS_PER_ENERGY * 3.0
+		lantern.omni_range = 10.0
+		lantern.light_color = Color(1.0, 0.8, 0.55)
+		_leader.add_child(lantern)
 	_build_camera()
 	_build_post_and_hud()
 	_arena = AHCombatArena.new()
@@ -218,9 +239,34 @@ func _ready() -> void:
 	_apply_weather()
 	exploration_hud = AHExplorationHud.new()
 	_street_hud.add_child(exploration_hud)
+	if scenario:
+		exploration_hud.place = scenario.display_name
 	corridor = AHStreetCorridor.new()
 	add_child(corridor)
 	corridor.setup(self, exploration_hud)
+
+
+## O mapa do trecho atual da expedição ("" = a rua): o de passagem nos primeiros trechos, depois o da fase.
+func _journey_map() -> String:
+	if _capture_dir != "":
+		return ""
+	var expedition = Campaign.state.get("session", {}).get("expedition")
+	if expedition == null:
+		return ""
+	return AHJourneyRules.map_for_step(expedition.phase_id, int(expedition.corridor.index))
+
+
+## Entra numa zona do cenário: o piso, a faixa (até 1,2 m para cada lado do meio, como a LaneDepth da Unreal), a
+## câmera e se é coberta (sem chuva). As cobertas: Abrigo, Dutos e Depósito inteiros, e as zonas depois da primeira.
+func set_scenario_zone(index: int) -> void:
+	_zone = scenario.zones[index]
+	floor_y = _zone.y
+	lane_z = (_zone.z0 + _zone.z1) * 0.5
+	var half_depth: float = minf(1.2, (_zone.z1 - _zone.z0 - 1.0) * 0.5)
+	walk_min = Vector3(_zone.x0 + 0.4, floor_y, lane_z - half_depth)
+	walk_max = Vector3(_zone.x1 - 0.4, floor_y, lane_z + half_depth)
+	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot"].has(scenario.map_name)
+	_apply_weather()
 
 
 # ---------------------------------------------------------------- arte e materiais
@@ -460,6 +506,8 @@ func _build_alley(x0: float, x1: float, variant: int) -> void:
 ## Portas das fachadas dentro do corredor: X (m), loja, espelho e o trecho onde fica (as de fora ficam fechadas).
 func door_list() -> Array:
 	var doors: Array = []
+	if scenario:
+		return doors
 	for building in FACADE_BUILDINGS:
 		var overlay: Rect2 = DOOR_OVERLAYS[building[1]]
 		var offset: float = (overlay.position.x + overlay.size.x * 0.5 - 768.0) * FACADE_WIDTH / 1536.0
@@ -596,6 +644,7 @@ func _build_atmosphere() -> void:
 	add_child(_dust)
 
 	# Fogueira na rua, com brasas, luz que tremula e fumaça quando a chuva apaga.
+	var fire_start := get_child_count()
 	var texture := _texture("campfire-v1.png")
 	var quad := QuadMesh.new()
 	quad.size = Vector2(0.95, 0.95)
@@ -648,6 +697,17 @@ func _build_atmosphere() -> void:
 	_smoke.color_ramp = _fade_ramp(Color(1, 1, 1, 0.9))
 	_smoke.mesh = _soft_mesh(Vector2(0.5, 0.5), Color(0.62, 0.62, 0.65), 0.6, false)
 	add_child(_smoke)
+	# Nos cenários a fogueira é só da rua: fica escondida e sem colisão.
+	if scenario:
+		for i in range(fire_start, get_child_count()):
+			var node := get_child(i)
+			if node is StaticBody3D:
+				for debug in node.get_children():
+					if debug is MeshInstance3D:
+						_debug_colliders.erase(debug)
+				node.queue_free()
+			elif node is Node3D:
+				node.visible = false
 
 
 func _mote_mesh(size: float, color: Color, energy: float) -> QuadMesh:
@@ -816,6 +876,8 @@ func _trail_point(distance: float) -> Vector3:
 
 
 func _ground_height(z: float) -> float:
+	if scenario:
+		return floor_y
 	return SIDEWALK_TOP_Z * 0.01 if z < SIDEWALK_FRONT_Y * 0.01 else 0.0
 
 
@@ -852,6 +914,17 @@ func _update_camera(delta: float) -> void:
 	var target := Vector3(clampf(leader.x, -6.0, 76.0), 2.5, clampf(-1.4 + minf(leader.z + 1.0, 0.0) * 0.45, -6.5, -1.4))
 	var pitch := deg_to_rad(12.0)
 	var distance := 18.5
+	if scenario and not _zone.is_empty():
+		# A câmera da prévia da Unreal: 19 m de distância, 1,7 m acima do piso, quase reta (0,5°), 30° na horizontal; a
+		# Ponte usa a da rua (28 m, 2,7 m). O centro vai até 4 m das pontas da zona (LaneEdgePadding).
+		var bridge: bool = scenario.map_name == "RootBridge"
+		distance = 28.0 if bridge else 19.0
+		pitch = deg_to_rad(0.5)
+		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(15.0)) / get_viewport().get_visible_rect().size.aspect()))
+		var half_view: float = tan(deg_to_rad(15.0)) * distance
+		var low: float = _zone.x0 + minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
+		var high: float = _zone.x1 - minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
+		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + (2.7 if bridge else 1.7), lane_z)
 	if _indoor:
 		# Dentro da loja, a câmera desce para ficar abaixo do forro e enquadra a sala.
 		# Vai até perto das paredes do lado (elas tapam o que fica fora da sala): na frente da sala a câmera vê só ~3,5 m
@@ -864,13 +937,15 @@ func _update_camera(delta: float) -> void:
 		# tela, acima do painel do HUD, qualquer que seja a distância.
 		var view: Vector2 = _arena.camera_view()
 		distance = view.y
-		target = Vector3(view.x, COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch), -0.9)
+		target = Vector3(view.x, floor_y + COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch),
+			(lane_z - 1.35) if scenario else -0.9)
 	var wanted := target + Vector3(0, sin(pitch) * distance, cos(pitch) * distance)
 	_camera.position = wanted if delta == 0.0 else _camera.position.lerp(wanted, 1.0 - exp(-3.0 * delta))
 	_camera.look_at(Vector3(_camera.position.x, target.y, target.z))
-	_dust.position = Vector3(_camera.position.x, 2.6, -1.0)
-	_rain.position = Vector3(_camera.position.x + 0.8, 9.0, -1.0)
-	_splashes.position = Vector3(_camera.position.x, 0.03, -1.0)
+	var ground := floor_y if scenario else 0.0
+	_dust.position = Vector3(_camera.position.x, ground + 2.6, -1.0 + (lane_z if scenario else 0.0))
+	_rain.position = Vector3(_camera.position.x + 0.8, ground + 9.0, -1.0 + (lane_z if scenario else 0.0))
+	_splashes.position = Vector3(_camera.position.x, ground + 0.03, -1.0 + (lane_z if scenario else 0.0))
 
 
 func _build_post_and_hud() -> void:
@@ -889,7 +964,13 @@ func _build_post_and_hud() -> void:
 	hud.layer = 2
 	add_child(hud)
 	_street_hud = hud
-	hud.add_child(_label("RUA DAS VITRINES\nBairro Submerso", 30, Vector2(36, 28)))
+	var title := "RUA DAS VITRINES\nBairro Submerso"
+	if scenario:
+		# O cabeçalho dos cenários: o mapa e a fase ("CAIS DO RIO · Jornada 2 · Ponte das Raízes").
+		var expedition: Dictionary = Campaign.state.session.expedition
+		var info := AHJourneyRules.phase(expedition.phase_id)
+		title = "%s\nJornada %d · %s" % [scenario.display_name.to_upper(), AHJourneyRules.PHASES.find(info) + 1, info.get("name", "")]
+	hud.add_child(_label(title, 30, Vector2(36, 28)))
 	_hud_weather = _label("", 20, Vector2(36, 112))
 	hud.add_child(_hud_weather)
 	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   E interagir   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1030)))
@@ -915,6 +996,14 @@ func _weather() -> Dictionary:
 	var w: Dictionary = MOODS[_mood].duplicate()
 	if _raining:
 		w.merge(RAIN[_mood], true)
+	var site: Dictionary = AHScenarioWorld.SITES.get(scenario.map_name, {}) if scenario else {}
+	if not site.is_empty():
+		# AdjustForSite da Unreal.
+		w.sun_energy = maxf(w.sun_energy, site.min_night_sun if _mood == "night" else site.min_sun)
+		w.ambient = maxf(w.ambient, site.min_ambient)
+		w.fog_density *= site.fog_scale
+		w.volumetric *= site.fog_scale
+		w.sun_angle = Vector3(minf(w.sun_angle.x, -site.min_elevation), w.sun_angle.y, w.sun_angle.z)
 	return w
 
 
@@ -944,12 +1033,16 @@ func _apply_weather() -> void:
 		# Os três primeiros são os postes; os outros, as portas.
 		_lamp_lights[index].light_energy = w.lamp_energy * (1.0 if index < LAMP_XS.size() else 0.4)
 	# Dentro de uma casa não chove (e a poeira dourada é da rua).
-	_rain.emitting = _raining and not _indoor
-	_rain.visible = not _indoor
-	_dust.emitting = not _raining and not _indoor
-	_dust.visible = not _indoor
-	_splashes.emitting = _raining and not _indoor
-	_splashes.visible = not _indoor
+	var covered := _indoor or sheltered
+	_rain.emitting = _raining and not covered
+	_rain.visible = not covered
+	_dust.emitting = not _raining and not covered
+	_dust.visible = not covered
+	_splashes.emitting = _raining and not covered
+	_splashes.visible = not covered
+	if scenario:
+		# Nos cenários o céu e o sol da rua só tingem; a luz é a das luminárias do mapa (e a lanterna).
+		scenario.set_weather(_wet if not covered else 0.0, Color(1, 1, 1) if _mood == "golden" else Color(0.55, 0.6, 0.75))
 	_hud_weather.text = ("Noite" if _mood == "night" else "Fim de tarde") + (" · chuva" if _raining else "")
 	_update_sun(0.0)
 
@@ -985,6 +1078,8 @@ func _apply_wet() -> void:
 
 
 func _update_fire(delta: float) -> void:
+	if scenario:
+		return
 	# A chuva apaga a fogueira em poucos segundos; sobra fumaça. Quando para, as brasas reacendem devagar.
 	var before := _fire_burn
 	_fire_burn = clampf(_fire_burn + (-0.45 if _raining else 0.12) * delta, 0.0, 1.0)

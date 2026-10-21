@@ -16,6 +16,8 @@ const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprime
 	"boss": "Guardião"}
 const STEP_LETTERS := {"start": "P", "combat": "!", "loot": "S", "rest": "D", "passage": "·", "boss": "G"}
 
+## O lugar da jornada (a Rua ou o cenário): muda os textos da volta e do resultado.
+var place := "Rua das Vitrines"
 var _steps_row: HBoxContainer
 var _step_title: Label
 var _resources: Label
@@ -110,7 +112,7 @@ func refresh(campaign: Dictionary) -> void:
 		var site: Dictionary = route.sites[route.current_house]
 		title = "Dentro %s" % ("do cinema" if site.shop == 2 else "da " + AHJourneyRules.SHOP_NAMES[site.shop])
 	if expedition.objective_completed:
-		title += " · Fase concluída: volte à Estação pelo começo da rua"
+		title += " · Fase concluída: volte à Estação %s" % ("pelo começo da rua" if place == "Rua das Vitrines" else "(E)")
 	_step_title.text = title
 	var tools := PackedStringArray()
 	for tool in campaign.get("tools", []):
@@ -262,9 +264,9 @@ func show_camp(campaign: Dictionary) -> void:
 func show_result(result: String, delivered: Dictionary, campaign: Dictionary, button_text: String) -> void:
 	var box := _open_modal(720)
 	var titles := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fuga", "defeat": "Derrota"}
-	var notes := {"victory": "A Rua das Vitrines está liberada. Todo o achado chega à Estação.",
+	var notes := {"victory": ("A Rua das Vitrines está liberada." if place == "Rua das Vitrines" else "%s: o guardião caiu." % place) + " Todo o achado chega à Estação.",
 		"retreat": "A equipe volta antes do guardião: metade do achado chega à Estação.",
-		"fled": "Na fuga, a equipe larga o que carregava.", "defeat": "A equipe caiu na rua. O achado ficou para trás."}
+		"fled": "Na fuga, a equipe larga o que carregava.", "defeat": "A equipe caiu %s. O achado ficou para trás." % ("na rua" if place == "Rua das Vitrines" else "no caminho")}
 	box.add_child(H.make_label(titles.get(result, result), 44, H.GOLD))
 	var note := H.make_label(notes.get(result, ""), 20, H.TEXT)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

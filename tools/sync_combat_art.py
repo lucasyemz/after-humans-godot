@@ -39,8 +39,8 @@ ENEMIES = {
     "vigia_enferrujado": {"idle": "public/characters/approved/vigia_enferrujado/vigia_enferrujado-idle.png",
                           "poses": "public/characters/approved/vigia_enferrujado"},
 }
-# Os outros inimigos das patrulhas da Rua (perfil node_1_combat de encounters.json): parado e poses da arte aprovada.
-for _enemy in ("cao_eco", "condutor_raiz", "sussurrador", "rastejante_raiz"):
+# Os outros inimigos das patrulhas e o Porteiro (chefe da fase 5): parado e poses da arte aprovada.
+for _enemy in ("cao_eco", "condutor_raiz", "sussurrador", "rastejante_raiz", "ninho_errante", "carcaca_colonizada", "porteiro"):
     ENEMIES[_enemy] = {"idle": f"public/characters/approved/{_enemy}/{_enemy}-idle.png", "poses": f"public/characters/approved/{_enemy}"}
 POSES = ["attack1", "attack2", "defense", "hurt", "dodge", "support", "death"]
 AUDIO_CUES = ["BentoAction", "NickAction", "IrisAction", "VesperaAction", "Dodge", "RobotDodge", "RobotHeal", "RobotPunch"]

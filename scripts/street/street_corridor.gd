@@ -7,6 +7,11 @@
 ## - As três casas sorteadas ficam com a porta aberta pintada; a trancada pede pé de cabra. Dentro, os pontos de busca,
 ##   a emboscada da patrulha da casa e o acampamento. Os trechos de suprimentos têm um objeto para vasculhar.
 ## - O começo da rua é a volta à Estação. Cada chegada a um trecho, luta, busca e acampamento salva a campanha.
+## - Nos cenários (#86) o corredor é uma sequência de segmentos: cada zona caminhável do mapa é um segmento, e os trechos
+##   do mapa se dividem entre elas pelo comprimento (pelo menos um em cada). No fim de uma zona, com o último trecho dela
+##   vencido, a equipe segue para a próxima ("Seguindo para: Navio…"). Os interiores laterais (o navio e o galpão do Cais,
+##   as salas do Depósito) ficam fora da sequência: entra-se pela porta. Os props do mapa são pontos de busca. No fim do
+##   mapa de passagem a equipe viaja para o mapa da fase. Na rua há um segmento só, e nada muda.
 class_name AHStreetCorridor
 extends Node
 
@@ -32,6 +37,11 @@ const ROOMS_X := 300.0
 const ROOM_GAP := 40.0
 const SHOP_ART := ["grocery", "workshop", "cinema"]
 const PROP_ART := ["alley-props-v1.webp", Rect2(828, 119, 282, 360), 105.0, "os caixotes"]
+## Folga das pontas de cada zona do cenário (ZoneMargin) e o espaço entre os da fila (PartySpacing).
+const ZONE_MARGIN := 0.45
+const PARTY_SPACING := 1.3
+## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
+const REACH := 1.1
 
 var street: Node3D
 var hud: AHExplorationHud
@@ -45,6 +55,16 @@ var _room_time := 0.0
 var _fight := {}
 var _action := Callable()
 var _overlays := {}
+## Segmentos do corredor neste mapa: {x0, x1, first, steps, length, zone (-1 na rua)}; o atual; os trechos deste mapa.
+var segments: Array = []
+var segment := 0
+var map_first := 0
+var map_last := 9
+## Interiores laterais: {zone, door_x, door_segment, door_step}; o aberto (índice, -1 fora).
+var side_rooms: Array = []
+var side_room := -1
+## Props do cenário: {prop (índice no corredor), local (no mapa), x, zone, step}.
+var scenario_props: Array = []
 
 
 func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
@@ -64,7 +84,9 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 		GameFlow.change_to.call_deferred("station", {}, false)
 		return
 	var route: Dictionary = campaign.session.expedition.corridor
+	_build_segments(campaign)
 	R.assign_search_sites(route, doors.map(func(d): return d.step), doors.map(func(d): return d.shop), campaign.session.expedition.get("focus", ""))
+	_assign_scenario_props(campaign)
 	Campaign.save()
 	street.apply_corridor_weather(route.weather)
 	_spawn_guards()
@@ -72,8 +94,10 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	_refresh_doors()
 	if route.current_house >= 0:
 		_open_room(route.current_house)
+	elif street.scenario and int(route.get("current_room", -1)) >= 0 and _side_room_of_zone(int(route.current_room)) >= 0:
+		_show_side_room(_side_room_of_zone(int(route.current_room)))
 	else:
-		street._place_leader(Vector3(_step_x(route.index, ARRIVAL_SPOT), 0, 0.45))
+		_enter_segment(_segment_of(route.index), _step_x(route.index, ARRIVAL_SPOT))
 	hud.refresh(campaign)
 	var session: Dictionary = campaign.session
 	if session.result != "":
@@ -90,8 +114,132 @@ func blocking() -> bool:
 	return busy or hud.modal_open() or street._arena.active
 
 
-static func _step_x(index: int, fraction: float) -> float:
-	return MIN_X + STEP_LENGTH * (index + fraction)
+func _step_x(index: int, fraction: float) -> float:
+	if segments.is_empty():
+		return MIN_X + STEP_LENGTH * (index + fraction)
+	var part: Dictionary = segments[_segment_of(index)]
+	return part.x0 + part.length * (index - part.first + fraction)
+
+
+func _segment_of(index: int) -> int:
+	for part in range(segments.size() - 1, -1, -1):
+		if index >= segments[part].first:
+			return part
+	return 0
+
+
+## O trecho sob x no segmento atual (na rua, a rua inteira).
+func _step_under(x: float) -> int:
+	var part: Dictionary = segments[segment]
+	return part.first + clampi(floori((x - part.x0) / part.length), 0, part.steps - 1)
+
+
+## Os segmentos do mapa (SetupScenario): na rua, um só, de 7,8 m por trecho; no cenário, as zonas que não são interior
+## lateral, com os trechos do mapa divididos pelo comprimento (pelo menos um em cada; a sobra vai para as maiores).
+func _build_segments(campaign: Dictionary) -> void:
+	segments.clear()
+	side_rooms.clear()
+	var expedition: Dictionary = campaign.session.expedition
+	if street.scenario == null:
+		segments.append({"x0": MIN_X, "x1": 79.0, "first": 0, "steps": 10, "length": STEP_LENGTH, "zone": -1})
+		return
+	var info := R.phase(expedition.phase_id)
+	var transit_map: bool = street.scenario.map_name == info.get("transit", "")
+	var step_range := R.step_range(expedition.phase_id, transit_map)
+	map_first = step_range[0]
+	map_last = step_range[0] + step_range[1] - 1
+	var doors: Dictionary = {}
+	for door in street.scenario.side_doors:
+		doors[int(door.zone)] = float(door.x)
+	var total := 0.0
+	for zone in street.scenario.zones.size():
+		var z: Dictionary = street.scenario.zones[zone]
+		var part := {"x0": z.x0 + ZONE_MARGIN, "x1": z.x1 - ZONE_MARGIN, "zone": zone}
+		if part.x1 - part.x0 < 3.0:
+			continue
+		if doors.has(zone):
+			side_rooms.append({"zone": zone, "door_x": doors[zone], "x0": part.x0, "x1": part.x1})
+			continue
+		total += part.x1 - part.x0
+		segments.append(part)
+	var count: int = step_range[1]
+	var counts: Array = []
+	var assigned := 0
+	for part in segments:
+		counts.append(maxi(1, roundi(count * (part.x1 - part.x0) / total)))
+		assigned += counts[-1]
+	while assigned != count:
+		var pick := 0
+		for i in range(1, segments.size()):
+			var per: float = (segments[i].x1 - segments[i].x0) / counts[i]
+			var best: float = (segments[pick].x1 - segments[pick].x0) / counts[pick]
+			if (per > best) if assigned < count else (counts[i] > 1 and (counts[pick] <= 1 or per < best)):
+				pick = i
+		if assigned > count and counts[pick] <= 1:
+			break
+		counts[pick] += 1 if assigned < count else -1
+		assigned += 1 if assigned < count else -1
+	var first := map_first
+	for i in segments.size():
+		segments[i].first = first
+		segments[i].steps = counts[i]
+		segments[i].length = (segments[i].x1 - segments[i].x0) / counts[i]
+		first += counts[i]
+	for room_entry in side_rooms:
+		room_entry.door_segment = 0
+		for i in segments.size():
+			if room_entry.door_x >= segments[i].x0 and room_entry.door_x <= segments[i].x1:
+				room_entry.door_segment = i
+		var door_part: Dictionary = segments[room_entry.door_segment]
+		room_entry.door_step = door_part.first + clampi(floori((room_entry.door_x - door_part.x0) / door_part.length), 0, door_part.steps - 1)
+
+
+## Entra num segmento com a frente da fila em front_x (a chegada fica no trecho de entrada).
+func _enter_segment(index: int, front_x: float) -> void:
+	segment = index
+	side_room = -1
+	if street.scenario:
+		street.set_scenario_zone(segments[index].zone)
+		street._place_leader(Vector3(front_x, street.floor_y, street.lane_z))
+	else:
+		street._place_leader(Vector3(front_x, 0, 0.45))
+
+
+## Os props do mapa viram pontos de busca: o trecho de cada um é o da posição dele (nos interiores laterais, o da porta).
+func _assign_scenario_props(campaign: Dictionary) -> void:
+	scenario_props.clear()
+	if street.scenario == null:
+		return
+	var steps: Array = []
+	var entries: Array = []
+	for local in street.scenario.props.size():
+		var prop: Dictionary = street.scenario.props[local]
+		var zone: int = street.scenario.zone_at(prop.x)
+		var step := -1
+		var room_index := _side_room_of_zone(zone)
+		if room_index >= 0:
+			step = side_rooms[room_index].door_step
+		else:
+			for i in segments.size():
+				if segments[i].zone == zone:
+					step = segments[i].first + clampi(floori((prop.x - segments[i].x0) / segments[i].length), 0, segments[i].steps - 1)
+		if step < 0:
+			continue
+		steps.append(step)
+		entries.append({"local": local, "x": float(prop.x), "zone": zone, "step": step, "name": prop.name})
+	var first := R.assign_scenario_props(campaign, street.scenario.map_name, steps)
+	for i in entries.size():
+		entries[i].prop = first + i
+		scenario_props.append(entries[i])
+		if campaign.session.expedition.corridor.searched_props.has(first + i):
+			street.scenario.open_prop(entries[i].local)
+
+
+func _side_room_of_zone(zone: int) -> int:
+	for i in side_rooms.size():
+		if side_rooms[i].zone == zone:
+			return i
+	return -1
 
 
 # ---------------------------------------------------------------- montagem
@@ -99,7 +247,7 @@ static func _step_x(index: int, fraction: float) -> float:
 func _spawn_guards() -> void:
 	var expedition: Dictionary = Campaign.state.session.expedition
 	var route: Dictionary = expedition.corridor
-	for index in route.steps.size():
+	for index in range(map_first, mini(map_last + 1, route.steps.size())):
 		var step: Dictionary = route.steps[index]
 		if step.resolved or (step.type != "combat" and step.type != "boss"):
 			continue
@@ -107,7 +255,7 @@ func _spawn_guards() -> void:
 		var cards: Array = []
 		for i in specs.size():
 			var card := _enemy_card(specs[i].enemy_id)
-			card.position = Vector3(_step_x(index, GUARD_SPOT) + i * 1.35, 0, -0.8 - 0.03 * i)
+			card.position = _guard_position(index, i)
 			cards.append(card)
 		var mark := Label3D.new()
 		mark.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -120,6 +268,15 @@ func _spawn_guards() -> void:
 		guards[index] = {"specs": specs, "cards": cards, "meter": 0.0, "unseen": 99.0, "detected": false, "mark": mark}
 
 
+## Onde fica cada um da patrulha do trecho: na rua, na calçada; no cenário, no piso e na faixa da zona do trecho.
+func _guard_position(index: int, order: int) -> Vector3:
+	var x := _step_x(index, GUARD_SPOT) + order * 1.35
+	if street.scenario == null:
+		return Vector3(x, 0, -0.8 - 0.03 * order)
+	var zone: Dictionary = street.scenario.zones[segments[_segment_of(index)].zone]
+	return Vector3(x, zone.y, (zone.z0 + zone.z1) * 0.5 - 0.55 - 0.03 * order)
+
+
 func _enemy_card(enemy_id: String) -> AHSpriteCard:
 	var card := AHSpriteCard.new()
 	card.body_height = AHCharacterHeights.find(enemy_id)
@@ -130,6 +287,8 @@ func _enemy_card(enemy_id: String) -> AHSpriteCard:
 
 
 func _spawn_props() -> void:
+	if street.scenario:
+		return
 	var route: Dictionary = Campaign.state.session.expedition.corridor
 	for index in route.steps.size():
 		if route.steps[index].type != "loot":
@@ -177,16 +336,33 @@ func _process(delta: float) -> void:
 	if room != null:
 		_room_time += delta
 		_house_frame(campaign, route)
+	elif side_room >= 0:
+		_side_room_frame(campaign, route)
 	else:
 		_street_frame(campaign, route, delta)
 
 
 func _street_frame(campaign: Dictionary, route: Dictionary, delta: float) -> void:
 	var leader: Vector3 = street._leader.position
+	var part: Dictionary = segments[segment]
 	# Trecho por vencer: a equipe não passa da patrulha.
-	var high := 79.0 if route.steps[route.index].resolved else _step_x(route.index, 1.0) - EDGE_MARGIN
+	var high: float = part.x1 if route.steps[route.index].resolved else _step_x(route.index, 1.0) - EDGE_MARGIN
 	street.walk_max.x = high
-	var under := clampi(floori((leader.x - MIN_X) / STEP_LENGTH), 0, route.steps.size() - 1)
+	if street.scenario:
+		street.walk_min.x = part.x0
+		# No fim da zona, com o último trecho dela vencido, segue para a próxima; no começo, volta para a anterior.
+		var last: int = part.first + part.steps - 1
+		if leader.x >= part.x1 - 0.15 and route.index == last and route.steps[last].resolved:
+			if segment < segments.size() - 1:
+				_travel_segment(1)
+				return
+			if last == map_last and map_last < route.steps.size() - 1:
+				_travel_map(campaign, map_last + 1)
+				return
+		if leader.x <= part.x0 + 0.15 and segment > 0:
+			_travel_segment(-1)
+			return
+	var under := _step_under(leader.x)
 	if under != route.index:
 		var next: int = route.index + (1 if under > route.index else -1)
 		var was_resolved: bool = route.steps[next].resolved
@@ -196,9 +372,33 @@ func _street_frame(campaign: Dictionary, route: Dictionary, delta: float) -> voi
 			_announce(next, outcome, not was_resolved)
 			hud.refresh(campaign)
 	for index in [route.index, route.index + 1]:
-		if guards.has(index) and _sight_frame(index, delta, leader):
+		if guards.has(index) and _segment_of(index) == segment and _sight_frame(index, delta, leader):
 			return
 	_choose_action(campaign, route, leader)
+
+
+## A próxima (ou a anterior) zona do mapa, com fade: chega dentro do trecho de entrada, longe do inimigo dele.
+func _travel_segment(direction: int) -> void:
+	var to := segment + direction
+	busy = true
+	var area: String = street.scenario.zones[segments[to].zone].name
+	hud.toast("Seguindo em frente…" if area == "passagem" else "Seguindo para: %s…" % area, 2.0)
+	await GameFlow.fade(1.0)
+	var part: Dictionary = segments[to]
+	var entry: int = part.first if direction > 0 else part.first + part.steps - 1
+	_enter_segment(to, _step_x(entry, ARRIVAL_SPOT if direction > 0 else 1.0 - ARRIVAL_SPOT))
+	await GameFlow.fade(0.0)
+	busy = false
+
+
+## Fim do mapa de passagem: a equipe entra no primeiro trecho do mapa da fase e viaja para ele (só de ida).
+func _travel_map(campaign: Dictionary, next: int) -> void:
+	busy = true
+	R.enter_step(campaign, next)
+	Campaign.save()
+	var info := R.phase(campaign.session.expedition.phase_id)
+	hud.toast("Seguindo para: %s…" % AHScenarioWorld.display_of(info.get("map", "")), 2.0)
+	GameFlow.change_to("street")
 
 
 ## Visão e suspeita do guarda do trecho; true se a luta começou.
@@ -299,7 +499,34 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 			best = absf(_step_x(index, 0.45) - leader.x)
 			text = "E  Vasculhar %s" % PROP_ART[3]
 			action = _search_prop.bind(index)
-	if leader.x < EXIT_X:
+	if street.scenario:
+		best = REACH
+		for entry in scenario_props:
+			if entry.zone != segments[segment].zone or absf(entry.x - leader.x) >= best:
+				continue
+			best = absf(entry.x - leader.x)
+			if route.searched_props.has(entry.prop):
+				text = "%s (já vasculhado)" % entry.name
+				action = Callable()
+			elif R.can_search_scenario_prop(campaign, entry.prop):
+				text = "E  Vasculhar: %s" % entry.name
+				action = _search_scenario_prop.bind(entry)
+		for i in side_rooms.size():
+			var room_entry: Dictionary = side_rooms[i]
+			if room_entry.door_segment != segment or absf(room_entry.door_x - leader.x) >= best:
+				continue
+			best = absf(room_entry.door_x - leader.x)
+			var area: String = street.scenario.zones[room_entry.zone].name
+			if R.can_enter_scenario_room(campaign, room_entry.door_step):
+				text = "E  Entrar: %s" % area
+				action = _enter_side_room.bind(i)
+			else:
+				text = "%s · a patrulha guarda a porta" % area
+				action = Callable()
+	var exit_x: float = EXIT_X if street.scenario == null else segments[0].x0 + EXIT_X
+	# No cenário, com o guardião vencido, a volta vale de qualquer ponto (RequestExpeditionReturn da Unreal).
+	var done_here: bool = street.scenario != null and campaign.session.expedition.objective_completed and text == ""
+	if done_here or (leader.x < exit_x and segment == 0 and map_first == 0):
 		text = "E  Voltar à Estação (%s)" % ("fase concluída: todo o achado" if campaign.session.expedition.objective_completed else "retirada: metade do achado")
 		action = _retreat
 	hud.show_prompt(text)
@@ -348,6 +575,71 @@ func _unhandled_input(event: InputEvent) -> void:
 		var action := _action
 		_action = Callable()
 		action.call()
+
+
+func _search_scenario_prop(entry: Dictionary) -> void:
+	var result := R.search_scenario_prop(Campaign.state, entry.prop)
+	if result.ok:
+		street.scenario.open_prop(entry.local)
+		Campaign.save()
+		hud.toast("%s: %s" % [entry.name, result.text], 5.0)
+		hud.refresh(Campaign.state)
+
+
+# ---------------------------------------------------------------- interiores laterais dos cenários
+
+func _enter_side_room(index: int) -> void:
+	var room_entry: Dictionary = side_rooms[index]
+	if not R.enter_scenario_room(Campaign.state, room_entry.zone, room_entry.door_step):
+		return
+	busy = true
+	Campaign.save()
+	hud.toast("Entrando: %s…" % street.scenario.zones[room_entry.zone].name, 1.5)
+	await GameFlow.fade(1.0)
+	_show_side_room(index)
+	await GameFlow.fade(0.0)
+	busy = false
+
+
+func _show_side_room(index: int) -> void:
+	side_room = index
+	var room_entry: Dictionary = side_rooms[index]
+	street.set_scenario_zone(room_entry.zone)
+	street._place_leader(Vector3(room_entry.x0 + 1.6, street.floor_y, street.lane_z))
+
+
+func _side_room_frame(campaign: Dictionary, route: Dictionary) -> void:
+	var room_entry: Dictionary = side_rooms[side_room]
+	var leader: Vector3 = street._leader.position
+	var text := ""
+	var action := Callable()
+	var best := REACH
+	for entry in scenario_props:
+		if entry.zone != room_entry.zone or absf(entry.x - leader.x) >= best:
+			continue
+		best = absf(entry.x - leader.x)
+		if route.searched_props.has(entry.prop):
+			text = "%s (já vasculhado)" % entry.name
+		elif R.can_search_scenario_prop(campaign, entry.prop):
+			text = "E  Vasculhar: %s" % entry.name
+			action = _search_scenario_prop.bind(entry)
+	if leader.x < room_entry.x0 + EXIT_X:
+		text = "E  Voltar: %s" % street.scenario.zones[segments[room_entry.door_segment].zone].name
+		action = _leave_side_room
+	hud.show_prompt(text)
+	_action = action
+
+
+func _leave_side_room() -> void:
+	var room_entry: Dictionary = side_rooms[side_room]
+	if not R.leave_scenario_room(Campaign.state):
+		return
+	busy = true
+	Campaign.save()
+	await GameFlow.fade(1.0)
+	_enter_segment(room_entry.door_segment, room_entry.door_x)
+	await GameFlow.fade(0.0)
+	busy = false
 
 
 func _search_prop(index: int) -> void:
@@ -489,6 +781,8 @@ func _on_camp_leave() -> void:
 
 ## Começa a luta do trecho (index) ou da casa (index >= HOUSE_ENEMY_INDEX). advantage: a equipe chegou sem ser vista.
 func _start_fight(index: int, advantage: bool) -> void:
+	if street._arena.active:
+		return
 	var fight := R.start_corridor_combat(Campaign.state, advantage)
 	if fight.is_empty():
 		return
@@ -524,7 +818,10 @@ func _on_combat_finished(result: String) -> void:
 			guards[_fight.index].mark.queue_free()
 			guards.erase(_fight.index)
 		if campaign.session.expedition.objective_completed and _fight.boss:
-			hud.toast("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua.", 6.0)
+			if street.scenario:
+				hud.toast("O guardião caiu. Vasculhe o que restou ou volte à Estação (E).", 6.0)
+			else:
+				hud.toast("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua.", 6.0)
 	Campaign.save()
 	hud.refresh(campaign)
 
@@ -532,14 +829,23 @@ func _on_combat_finished(result: String) -> void:
 ## K (teste): anda pelos trechos já liberados até a próxima patrulha e para na frente dela.
 func debug_next_fight() -> void:
 	var campaign: Dictionary = Campaign.state
-	if not R.in_corridor(campaign) or room != null:
+	if not R.in_corridor(campaign) or room != null or side_room >= 0 or busy:
 		return
 	var route: Dictionary = campaign.session.expedition.corridor
-	while route.steps[route.index].resolved and route.index < route.steps.size() - 1:
+	while route.steps[route.index].resolved and route.index < mini(map_last, route.steps.size() - 1):
 		R.enter_step(campaign, route.index + 1)
 	Campaign.save()
+	# Passou do mapa de passagem: viaja para o da fase.
+	if route.steps[route.index].resolved and route.index == map_last and map_last < route.steps.size() - 1:
+		_travel_map(campaign, map_last + 1)
+		return
 	if guards.has(route.index):
-		street._place_leader(Vector3(guards[route.index].cards[0].position.x - CONTACT - 2.5, 0, 0.45))
+		var front: AHSpriteCard = guards[route.index].cards[0]
+		var to := _segment_of(route.index)
+		if to != segment:
+			_enter_segment(to, front.position.x - CONTACT - 2.5)
+		else:
+			street._place_leader(Vector3(front.position.x - CONTACT - 2.5, street.floor_y if street.scenario else 0.0, street.lane_z if street.scenario else 0.45))
 	hud.refresh(campaign)
 
 

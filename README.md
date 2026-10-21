@@ -39,18 +39,21 @@ scripts/combat/   motor de combate, tabelas tipadas, a sessão de luta (comandos
 scripts/ui/       HUD de combate, da exploração e do refúgio
 scripts/world/    AHSpriteCard (personagem pintado com o pé fixo ao trocar de pose) e AHHouseRoom (interior das lojas)
 scripts/street/   Rua das Vitrines montada em código, chuva, colisão e o corredor (patrulhas, visão, portas, saque)
+scripts/scenario/ AHScenarioWorld: monta os seis cenários da Unreal a partir de data/scenarios (zonas, portas, props)
 scripts/station/  Estação Raiz em corte: a montagem transcrita da Unreal (station_build.gd), os auxiliares em cm
                   (station_builder.gd), os moradores, o trem e a câmera de cada cômodo
-shaders/          pós-processamento Emberfall, fogueira que apaga, chuva e fumaça, feixes de luz, halos, silhuetas
+shaders/          cenários (blockout, cards, água com ondas), pós-processamento Emberfall, fogueira que apaga, chuva e fumaça, feixes de luz, halos, silhuetas
 scenes/           boot.tscn (cena inicial: abre a Estação, ou a rua se há expedição), station.tscn e street.tscn
 data/             JSON de produção (classes, habilidades, inimigos...) e a gravação de paridade do combate;
-                  presentation/combat_art.json diz onde está cada pose, ícone e som e mede a âncora no pé
+                  presentation/combat_art.json diz onde está cada pose, ícone e som e mede a âncora no pé;
+                  scenarios/ traz os seis mapas exportados (peças, materiais, luzes, zonas) e as malhas
 audio/            sons do combate
 art/              arte pintada usada pelo jogo (street: a rua; rooms: interiores; station: superfícies, modelos da Poly Haven e cards
-                  da Estação; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones)
+                  da Estação; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários)
 tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas e input)
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
-                  precisa do Pillow) e define_input.gd (grava as ações)
+                  precisa do Pillow), unreal_export_scenarios.py (roda na Unreal e exporta os cenários para
+                  build/unreal-export) e sync_scenarios.py (converte a exportação), e define_input.gd (grava as ações)
 ```
 
 `build/` e `.godot/` são gerados e ficam fora do Git.

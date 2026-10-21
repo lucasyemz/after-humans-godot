@@ -146,7 +146,7 @@ sementes e constantes, então a mesma campanha gera o mesmo corredor da Unreal).
 - `test_scripts` compila todos os scripts do jogo (um erro na arena passava despercebido pelos testes).
 
 **Pendências:**
-- **A rua ainda é montada em código** (não virou `.tscn`): fica para o montador da Fase 4.
+- **A rua ainda é montada em código** (não virou `.tscn`); os cenários da Fase 4 vêm de dados exportados, não de `.tscn`.
 - **Mochila sem tela:** os itens contam (comida, curativos, pé de cabra), mas não há a tela da Mochila nem o uso dos
   itens na luta.
 - **Preparar a expedição** (escolher a equipe e os itens) vem com a Estação, na Fase 3; hoje a equipe é a dos
@@ -256,6 +256,33 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
 - Jornadas 2 a 5 nos mapas certos, com trechos de passagem (Cais para Ponte, Depósito para Dutos) e o Porteiro.
 
 **Pronto quando:** as cinco jornadas da campanha são jogáveis nos seus mapas.
+
+**Feito:** os seis cenários da Unreal entram por exportação, e as jornadas 2 a 5 rodam neles do começo ao Porteiro.
+- **Exportação:** `tools/unreal_export_scenarios.py` roda num commandlet da Unreal (só lê) e grava em `build/unreal-export`
+  as peças de cada mapa (transformações, materiais e parâmetros, luzes, textos), as seções das malhas e as texturas tiradas
+  dos `.uasset` (os caminhos de origem estavam velhos). `tools/sync_scenarios.py` converte para os eixos da Godot e grava
+  `data/scenarios/<Mapa>.json`, `meshes.json` e `art/scenarios/*.webp` (158 texturas, 32 MB).
+- **Montagem** (`AHScenarioWorld`): materiais por tipo (blockout projetado no mundo, superfícies, cards unlit com
+  brilho, fachadas, água com as ondas da Unreal, emissivos), luzes em lúmens, peças fixas unidas por material.
+  Zonas caminháveis saem dos pisos marcados; as portas laterais (Cais: Navio e Galpão; Depósito: Estoque, Manutenção e
+  Arquivo) levam aos interiores fora da sequência de trechos.
+- **Corredor por segmentos** (port do `SetupScenario`): os trechos se dividem entre as zonas pelo comprimento, a equipe
+  viaja de zona no fim de cada uma e troca de mapa no fim do de passagem (Cais → Ponte, Depósito → Dutos). Props
+  vasculháveis com o objetivo da rota (semente ^ 0x51ed27, do trecho 4 em diante), guardados pela patrulha do trecho.
+  Com o guardião vencido, a volta à Estação vale de qualquer ponto do cenário (como o `RequestExpeditionReturn`).
+- **Luz e clima:** lanterna no Depósito e nos Dutos; chuva só ao ar livre; os locais abertos (Cais, Ponte, Portão)
+  levam o mínimo de lua e céu do `AHWeatherSite` da Unreal, para a noite continuar legível.
+- **Arte:** o Porteiro, o ninho errante e a carcaça colonizada entram no `sync_combat_art.py`.
+- **Teste:** `test_scenario_rules` (mapa de cada trecho, faixas, props e objetivo, interiores, dados dos seis mapas).
+  As cinco jornadas foram percorridas pelas cenas de verdade, com lutas automáticas até o resultado.
+
+**Pendências da 4:**
+- Sem colisão nos cenários: a equipe fica presa à faixa da zona, sem bater nos props.
+- O portão animado do Portão de Triagem não entrou (a jornada da Unreal também não o usa), nem as baias do Cais que
+  escondem as outras zonas; o sol exportado é trocado pelo da rua.
+- Os cenários fechados de noite ficam escuros fora do alcance das luminárias e da lanterna: calibrar na QA em Play.
+- O pacote da web cresce com os 32 MB de arte dos cenários; os builds ficam para a Fase 5.
+- QA em Play: o Lucas ainda não jogou as jornadas 2 a 5.
 
 ### Fase 5: acabamento e lançamento (4 a 6 dias)
 
