@@ -12,6 +12,23 @@ const ENEMY_GAP := 1.35
 const FRONT_GAP := 1.0
 const HERO_Z := -0.55
 const ENEMY_Z := -0.8
+## Habilidades a distância (AHArenaBeat::IsRanged): avançam só um passo, sem ir até o alvo.
+const RANGED := ["gato_cacada_precisa", "sapo_carga_voltaica", "sapo_coquetel_corrosivo", "rato_frasco", "rato_poeira",
+	"coruja_disparo_perfurante", "coruja_olho_nas_ruinas", "coruja_granada_fumaca", "coruja_recurso_emergencia",
+	"sapo_ampola_reparo_vivo", "sapo_antidoto_campo", "esporo_contaminante", "voz_do_eco", "esmagamento_fungico",
+	"porteiro_sirene"]
+## Tempos do lance (ACTION_TIMING da web, como na Unreal): preparo, avanço, impacto e volta.
+const PREPARE_SECONDS := 0.2
+const ENTER_SECONDS := 0.18
+const IMPACT_SECONDS := 0.75
+const RETURN_SECONDS := 0.22
+## Na aproximação a câmera vai 60% do caminho até o golpe e fecha para 86% da distância.
+const CLOSE_FOCUS := 0.6
+const CLOSE_DISTANCE := 0.86
+## Folga de cada borda da tela ao enquadrar a luta inteira.
+const FRAME_MARGIN := 0.84
+## Quem age passa na frente dos outros (BringAttackerToFront): um pouco mais perto da câmera.
+const FRONT_LIFT := 0.35
 ## Sons das ações dos heróis: classe -> prefixo da deixa (AHCombatAudioRules).
 const HERO_CUES := {"cao": "BentoAction", "gato": "NickAction", "sapo": "IrisAction", "coruja": "VesperaAction"}
 
@@ -24,6 +41,11 @@ var speed := 1.0
 var center_x := 0.0
 var active := false
 var cards := {}
+## Câmera da luta: o centro e a distância que enquadram todos, e o foco do golpe da vez (close_t 0..1 vai até ele).
+var view_x := 0.0
+var view_distance := 14.0
+var focus_x := 0.0
+var close_t := 0.0
 var _street: Node3D
 var _audio: Array[AudioStreamPlayer] = []
 var _audio_next := 0
@@ -108,9 +130,38 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 	for unit in session.units():
 		rest_pose(unit)
 		cards[unit.id].set_facing(1.0 if unit.is_player else -1.0)
+	_frame_arena()
 	await _sync_positions(0.6)
 	hud.open(session)
 	_run()
+
+
+## Enquadra a luta inteira (como a Unreal): o meio de quem luta e a distância em que o lado mais longo, mais meio
+## personagem, cabe na tela com folga nas bordas.
+func _frame_arena() -> void:
+	var left := center_x - FRONT_GAP * 0.5
+	var right := center_x + FRONT_GAP * 0.5
+	var sprite_half := 0.6
+	for unit in session.units():
+		if unit.rank <= 0:
+			continue
+		var x := slot_position(unit).x
+		left = minf(left, x)
+		right = maxf(right, x)
+		sprite_half = maxf(sprite_half, minf(cards[unit.id].body_height * 0.4, 1.3))
+	view_x = (left + right) * 0.5
+	focus_x = view_x
+	close_t = 0.0
+	var camera := get_viewport().get_camera_3d()
+	var half_fov := deg_to_rad((camera.fov if camera else 26.0) * 0.5)
+	var aspect := get_viewport().get_visible_rect().size.aspect()
+	var fit := ((right - left) * 0.5 + sprite_half) / (tan(half_fov) * aspect * FRAME_MARGIN)
+	view_distance = maxf(fit, 10.0)
+
+
+## O que a câmera da rua usa durante a luta: x e distância, já com a aproximação do golpe.
+func camera_view() -> Vector2:
+	return Vector2(lerpf(view_x, focus_x, CLOSE_FOCUS * close_t), view_distance * lerpf(1.0, CLOSE_DISTANCE, close_t))
 
 
 func slot_position(unit: AHCombat.Unit) -> Vector3:
@@ -221,44 +272,88 @@ func _play_beat(beat: Dictionary) -> void:
 
 func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, kind: String, targets: Array, events: Array) -> void:
 	var home := card.position
-	var toward := 1.0 if actor.is_player else -1.0
 	var hostile := targets.any(func(id): return session.state.find_unit(id) != null and session.state.find_unit(id).is_player != actor.is_player)
-	var focus_x := home.x
-	if not targets.is_empty():
-		var target_card: AHSpriteCard = cards.get(targets[0])
-		if target_card:
-			focus_x = (home.x + target_card.position.x) * 0.5
-	_street.set("combat_focus_x", focus_x)
+	var action = null if actor.is_player else session.enemy_action(actor.enemy_id, ability_id)
+	var hero_action: Dictionary = hero_art(actor.hero_id).get("actions", {}).get(ability_id, {}) if actor.is_player else {}
+	var support: bool = not hostile or (action != null and (action.bIsDefend or action.TargetType == "Self"))
+	# Preparo: a pose de quem age, já na frente dos outros.
 	if actor.is_player:
-		var hero := hero_art(actor.hero_id)
-		var has_art: bool = hero.get("actions", {}).has(ability_id)
 		show_pose(actor, "preparacao", ability_id)
-		await _step(card, home + Vector3(0.35 * toward if hostile else 0.0, 0, 0), 0.22)
-		await _wait(0.28)
+	elif action != null and action.bIsDefend:
+		show_pose(actor, "defense")
+	elif action != null and action.TargetType == "Self":
+		show_pose(actor, "support")
+	else:
+		show_pose(actor, "attack1")
+	card.position.z = home.z + FRONT_LIFT
+	var struck := _nearest_struck(actor, card, events)
+	var advance := 0.0 if support else _advance(actor, card, ability_id, hero_action, struck)
+	var contact := home.x + advance
+	focus_x = (contact + struck.position.x) * 0.5 if struck != null else home.x
+	await _wait(PREPARE_SECONDS)
+	# Avanço até o contato (corpo a corpo) ou um passo (a distância); a câmera chega junto.
+	var tween := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(card, "position:x", contact, ENTER_SECONDS / speed)
+	tween.tween_property(self, "close_t", 1.0, ENTER_SECONDS / speed)
+	await tween.finished
+	# Impacto: a execução, o efeito no alvo, o som e as reações.
+	if actor.is_player:
 		show_pose(actor, "execucao", ability_id)
 		_play_cue(_hero_cue(actor, ability_id))
-		if has_art:
+		if not hero_action.is_empty():
 			for target_id in (targets if not targets.is_empty() else [actor.id]):
 				_spawn_vfx(actor, ability_id, target_id)
 	else:
-		var action = session.enemy_action(actor.enemy_id, ability_id)
-		var pose := "attack1"
-		if action != null:
-			if action.bIsDefend:
-				pose = "defense"
-			elif action.TargetType == "Self":
-				pose = "support"
-		show_pose(actor, pose)
-		await _step(card, home + Vector3(0.45 * toward if hostile else 0.0, 0, 0), 0.2)
 		_play_enemy_cue(actor, action)
 		if action != null:
 			_float_text(card, action.DisplayName, Color(1.0, 0.85, 0.7), 0.9)
-	await _wait(0.12)
-	await _show_events(events)
-	await _wait(0.35)
+	var impact_start := Time.get_ticks_msec()
+	var life := float(hero_action.get("vfx", {}).get("life_seconds", 0.0)) + 0.05
+	await _show_events(events, contact)
+	var held := (Time.get_ticks_msec() - impact_start) * 0.001
+	var impact := maxf(IMPACT_SECONDS * (0.8 if support else 1.0), life) / speed
+	if held < impact:
+		await get_tree().create_timer(impact - held).timeout
+	# Volta: todos ao descanso e a câmera abre de novo.
 	show_pose(actor, "idle")
-	await _step(card, home, 0.25)
-	_street.set("combat_focus_x", null)
+	var back := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	back.tween_property(card, "position", home, RETURN_SECONDS / speed)
+	back.tween_property(self, "close_t", 0.0, RETURN_SECONDS / speed)
+	await back.finished
+
+
+## Quanto quem ataca anda (como a Unreal): até encostar no inimigo atingido mais perto; os inimigos andam 40% do
+## caminho; a distância, só um passo. Ações com contato na mão param com a mão no alvo.
+func _advance(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, hero_action: Dictionary, struck: AHSpriteCard) -> float:
+	if struck == null:
+		return 0.0
+	var gap := struck.position.x - card.position.x
+	var direction := signf(gap)
+	var available := maxf(0.0, absf(gap) - ((card.body_height + struck.body_height) * 0.3 + 0.3))
+	if RANGED.has(ability_id) or ability_id.contains("tiro") or ability_id.contains("descarga"):
+		return direction * minf(available, card.body_height * 0.16)
+	if not actor.is_player:
+		return direction * available * 0.4
+	var execute: Dictionary = hero_action.get("execucao", {})
+	if hero_action.get("vfx", {}).get("anchor_on_hand", false) and execute.has("contact_pixels"):
+		var reach := (float(execute.contact_pixels[0]) - float(execute.anchor[0])) * card.body_height / float(execute.body_reference_pixels)
+		return direction * maxf(0.0, absf(gap) - reach - struck.body_height * 0.15)
+	return direction * available
+
+
+## O inimigo atingido (ferido, esquiva, bloqueio ou morte) mais perto de quem age.
+func _nearest_struck(actor: AHCombat.Unit, card: AHSpriteCard, events: Array) -> AHSpriteCard:
+	var nearest: AHSpriteCard = null
+	for event in events:
+		var unit := session.state.find_unit(event.target_unit_id)
+		var other: AHSpriteCard = cards.get(event.target_unit_id)
+		if unit == null or other == null or unit.is_player == actor.is_player or event.ability_id != "":
+			continue
+		if not [AHCombat.EventType.DAMAGE, AHCombat.EventType.DODGE, AHCombat.EventType.BLOCK, AHCombat.EventType.DEATH].has(event.type):
+			continue
+		if nearest == null or absf(other.position.x - card.position.x) < absf(nearest.position.x - card.position.x):
+			nearest = other
+	return nearest
 
 
 func _step(card: AHSpriteCard, to: Vector3, seconds: float) -> void:
@@ -276,7 +371,7 @@ func _event_targets(events: Array) -> Array:
 
 
 ## Números e reações de cada evento, no alvo.
-func _show_events(events: Array) -> void:
+func _show_events(events: Array, contact_x = null) -> void:
 	var stagger := {}
 	for event in events:
 		var unit := session.state.find_unit(event.target_unit_id)
@@ -291,7 +386,7 @@ func _show_events(events: Array) -> void:
 				card.flash(Color(1.0, 0.15, 0.1))
 				if unit.hp > 0:
 					show_pose(unit, "hurt")
-				_shake(card)
+				_recoil(card, contact_x, 0.11)
 			AHCombat.EventType.HEAL:
 				_float_text(card, event.text, Color(0.45, 1.0, 0.55), 1.0 + lift, 56)
 				card.flash(Color(0.2, 0.9, 0.3))
@@ -299,10 +394,7 @@ func _show_events(events: Array) -> void:
 				_float_text(card, event.text, Color(0.85, 0.95, 1.0), 1.0 + lift, 52)
 				show_pose(unit, "dodge")
 				_play_cue("RobotDodge" if not unit.is_player and _is_machine(unit) else "Dodge")
-				var back := card.position + Vector3(-0.4 if unit.is_player else 0.4, 0, 0)
-				var tween := create_tween()
-				tween.tween_property(card, "position", back, 0.12 / speed)
-				tween.tween_property(card, "position", card.position, 0.25 / speed)
+				_recoil(card, contact_x, 0.2)
 			AHCombat.EventType.CRIT:
 				_float_text(card, event.text, Color(1.0, 0.85, 0.2), 1.4 + lift, 60)
 			AHCombat.EventType.DEATH:
@@ -311,6 +403,7 @@ func _show_events(events: Array) -> void:
 				_float_text(card, event.text, Color(1.0, 0.6, 0.25), 1.6 + lift, 44)
 			AHCombat.EventType.BLOCK:
 				_float_text(card, event.text, Color(0.55, 0.75, 1.0), 0.9 + lift, 40)
+				_recoil(card, contact_x, 0.035)
 			AHCombat.EventType.INSTINCT:
 				_float_text(card, event.text, Color(0.8, 0.6, 1.0), 0.9 + lift, 40)
 			_:
@@ -336,12 +429,15 @@ func _settle() -> void:
 	hud.refresh()
 
 
-func _shake(card: AHSpriteCard) -> void:
-	var origin := card.position
-	var tween := create_tween()
-	for i in 4:
-		tween.tween_property(card, "position", origin + Vector3(0.06 * (1 if i % 2 == 0 else -1), 0, 0), 0.04 / speed)
-	tween.tween_property(card, "position", origin, 0.04 / speed)
+## Empurrão para longe de quem bateu (esquiva mais, bloqueio quase nada); o _settle traz de volta ao posto.
+func _recoil(card: AHSpriteCard, contact_x, strength: float) -> void:
+	var away := 0.0
+	if contact_x != null:
+		away = signf(card.position.x - float(contact_x))
+	if away == 0.0:
+		away = 1.0 if card.position.x > center_x else -1.0
+	var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(card, "position:x", card.position.x + away * card.body_height * strength, 0.12 / speed)
 
 
 func _spawn_vfx(actor: AHCombat.Unit, ability_id: String, target_id: String) -> void:

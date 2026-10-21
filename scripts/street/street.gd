@@ -72,12 +72,6 @@ const SIDEWALK_PROPS := [
 ]
 # Carros: X inicial, modelo, espelho.
 const CARS := [[-350.0, 0, false], [5650.0, 1, true], [2650.0, 0, true]]
-# Altura do corpo (m) de cada herói e inimigo; a arte e as medidas vêm de data/presentation/combat_art.json.
-const BODY_HEIGHTS := {
-	"hero_cao_bento": 1.86, "hero_gato_nick": 1.76, "hero_sapo_iris": 1.74, "hero_coruja_vespera": 1.88,
-	"robot": 1.8, "robot_fungo": 1.8, "vigia_enferrujado": 2.15, "cao_eco": 1.3, "condutor_raiz": 1.9,
-	"sussurrador": 1.8, "rastejante_raiz": 1.25,
-}
 # Prédios com fachada pintada: X inicial (cm), fachada (0 mercearia, 1 oficina, 2 cinema) e espelho. Ordem de Rebuild.
 const FACADE_BUILDINGS := [[-770, 1, true], [430, 0, false], [1635, 1, false], [2830, 2, false], [4030, 0, true], [5230, 1, true], [6430, 2, true]]
 # O corredor de 10 trechos começa em X 0 e tem 78 m (AHStreetCorridor).
@@ -85,7 +79,13 @@ const CORRIDOR_LENGTH := 78.0
 const WEATHER_NAMES := {"clear": "céu limpo", "sunset": "fim de tarde", "rain": "chuva", "storm": "tempestade", "mist": "névoa",
 	"fog": "neblina", "night": "noite", "nightRain": "noite de chuva"}
 const PARTY_SPACING := 1.15
+## Cada herói da fila fica um pouco atrás do anterior, para o da frente ser desenhado por cima.
+const PARTY_DEPTH_STEP := 0.02
+## Dentro das lojas, o centro da câmera fica a esta distância das paredes do lado (m).
+const INDOOR_CAMERA_MARGIN := 3.0
 const LEADER_RADIUS := 0.28
+## Na luta, os pés ficam esta fração da meia tela abaixo do centro (~y 760 de 1080), acima do painel do HUD.
+const COMBAT_FEET_LINE := 0.4
 # Onde o líder pode ir (metros): da rua até o fundo dos becos.
 const STREET_WALK_MIN := Vector3(-2.0, 0.0, -14.4)
 const STREET_WALK_MAX := Vector3(79.0, 0.0, 2.4)
@@ -151,7 +151,6 @@ var _fog_boost := 1.0
 var _storm := false
 var _street_hud: CanvasLayer
 ## A arena aponta a câmera para o meio do lance (null: o meio da arena).
-var combat_focus_x = null
 ## Caminho do líder, do mais novo para o mais velho; os outros heróis ficam a PARTY_SPACING um do outro nele.
 var _trail: Array[Vector3] = []
 
@@ -753,7 +752,7 @@ func _build_party() -> void:
 		if hero == null or not hero.get("alive", true) or not _combat_art.heroes.has(hero_id) or party_ids.size() >= 4:
 			continue
 		var card := AHSpriteCard.new()
-		card.body_height = BODY_HEIGHTS.get(hero_id, 1.8)
+		card.body_height = AHCharacterHeights.find(hero_id)
 		card.show_art(_combat_art.heroes[hero_id].idle)
 		add_child(card)
 		party_ids.append(hero_id)
@@ -763,6 +762,7 @@ func _build_party() -> void:
 
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
 func _place_leader(at: Vector3, facing: float = 1.0) -> void:
+	at = _free_spot(at)
 	_leader.position = at
 	_trail.clear()
 	for step in 80:
@@ -773,6 +773,31 @@ func _place_leader(at: Vector3, facing: float = 1.0) -> void:
 	# Um teleporte (casa, recomeço, captura): a câmera vai junto, sem atravessar a cidade.
 	if _camera != null:
 		_update_camera(0.0)
+
+
+## O ponto livre mais perto: um líder posto dentro de uma caixa de colisão (a fogueira na chegada) fica preso, porque a
+## cápsula não sai dela. Tenta a frente e o fundo, depois os lados, sem sair da área de andar.
+func _free_spot(at: Vector3) -> Vector3:
+	for offset in [Vector2.ZERO, Vector2(0, 0.4), Vector2(0, 0.8), Vector2(0, -0.4), Vector2(0, -0.8),
+			Vector2(0.6, 0), Vector2(-0.6, 0), Vector2(1.2, 0), Vector2(-1.2, 0), Vector2(0.6, 1.2), Vector2(-0.6, 1.2)]:
+		var spot := (at + Vector3(offset.x, 0, offset.y)).clamp(walk_min, walk_max)
+		if not _blocked(spot):
+			return spot
+	return at
+
+
+func _blocked(spot: Vector3) -> bool:
+	var reach := LEADER_RADIUS + 0.05
+	for debug in _debug_colliders:
+		var center: Vector3 = (debug.get_parent() as Node3D).global_position
+		var half: Vector3 = (debug.mesh as BoxMesh).size * 0.5
+		# Caixas abaixo da cápsula (meio-fio) não seguram ninguém.
+		if center.y + half.y < 0.2:
+			continue
+		var nearest := Vector2(clampf(spot.x, center.x - half.x, center.x + half.x), clampf(spot.z, center.z - half.z, center.z + half.z))
+		if nearest.distance_to(Vector2(spot.x, spot.z)) < reach:
+			return true
+	return false
 
 
 func _set_facing(index: int, facing: float) -> void:
@@ -800,7 +825,9 @@ func _place_party(delta: float) -> void:
 	for index in _heroes.size():
 		var card := _heroes[index]
 		var target := _leader.position if index == 0 else _trail_point(PARTY_SPACING * index)
-		var previous := card.position
+		# A posição suavizada não inclui o recuo de desenho (0,02 por herói): somado de novo a cada quadro, ele
+		# acumulava até ~0,25 m por herói a 120 fps e levava os últimos para dentro da parede do fundo das lojas.
+		var previous := card.position + Vector3(0, 0, PARTY_DEPTH_STEP * index)
 		var x := target.x if delta == 0.0 or index == 0 else lerpf(previous.x, target.x, 1.0 - exp(-10.0 * delta))
 		var z := target.z if delta == 0.0 or index == 0 else lerpf(previous.z, target.z, 1.0 - exp(-10.0 * delta))
 		if delta > 0.0 and absf(x - previous.x) > 0.004:
@@ -808,7 +835,7 @@ func _place_party(delta: float) -> void:
 		# Respiração leve: só a escala vertical, com a base no chão.
 		var breath := 1.0 + 0.012 * sin(_time * 2.2 + index * 1.7)
 		card.scale = Vector3(1, breath, 1)
-		card.position = Vector3(x, _ground_height(z), z - 0.02 * index)
+		card.position = Vector3(x, _ground_height(z), z - PARTY_DEPTH_STEP * index)
 
 
 func _build_camera() -> void:
@@ -827,13 +854,17 @@ func _update_camera(delta: float) -> void:
 	var distance := 18.5
 	if _indoor:
 		# Dentro da loja, a câmera desce para ficar abaixo do forro e enquadra a sala.
-		target = Vector3(clampf(leader.x, _room_x + 6.3, _room_x + _room_width - 6.3), 1.6, -1.2)
+		# Vai até perto das paredes do lado (elas tapam o que fica fora da sala): na frente da sala a câmera vê só ~3,5 m
+		# para cada lado, e com a folga maior a equipe saía do quadro nas pontas.
+		target = Vector3(clampf(leader.x, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN), 1.6, -1.2)
 		pitch = deg_to_rad(4.0)
 		distance = 11.0
 	if _arena != null and _arena.active:
-		# Na luta, a câmera chega mais perto da arena e acompanha o lance.
-		target = Vector3(combat_focus_x if combat_focus_x != null else _arena.center_x, 1.6 if _indoor else 1.9, -0.9)
-		distance = (11.5 if combat_focus_x != null else 12.5) if _indoor else (12.5 if combat_focus_x != null else 14.5)
+		# Na luta, a arena enquadra todos e se aproxima do golpe. A altura do alvo põe os pés sempre na mesma linha da
+		# tela, acima do painel do HUD, qualquer que seja a distância.
+		var view: Vector2 = _arena.camera_view()
+		distance = view.y
+		target = Vector3(view.x, COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch), -0.9)
 	var wanted := target + Vector3(0, sin(pitch) * distance, cos(pitch) * distance)
 	_camera.position = wanted if delta == 0.0 else _camera.position.lerp(wanted, 1.0 - exp(-3.0 * delta))
 	_camera.look_at(Vector3(_camera.position.x, target.y, target.z))
@@ -1028,7 +1059,6 @@ func begin_fight() -> void:
 
 func end_fight() -> void:
 	_street_hud.visible = true
-	combat_focus_x = null
 
 
 ## Quem morreu sai da equipe; os outros voltam a andar do lugar onde terminaram a luta.
@@ -1052,8 +1082,10 @@ func set_indoor(indoor: bool, room_x: float = 0.0, room_width: float = 0.0) -> v
 	_room_x = room_x
 	_room_width = room_width
 	if indoor:
-		walk_min = Vector3(room_x + 0.35, 0, AHHouseRoom.BACK_Z + 0.4)
-		walk_max = Vector3(room_x + room_width - 0.35, 0, AHHouseRoom.WALK_FRONT_Z - 0.3)
+		# Folga das paredes: o desenho do personagem é mais largo que a cápsula e afundava nas paredes do lado; no fundo,
+		# os pés ficam fora do rodapé e na frente dos itens pintados da parede.
+		walk_min = Vector3(room_x + AHHouseRoom.SIDE_MARGIN, 0, AHHouseRoom.BACK_Z + AHHouseRoom.BACK_MARGIN)
+		walk_max = Vector3(room_x + room_width - AHHouseRoom.SIDE_MARGIN, 0, AHHouseRoom.WALK_FRONT_Z - 0.3)
 	else:
 		walk_min = STREET_WALK_MIN
 		walk_max = STREET_WALK_MAX

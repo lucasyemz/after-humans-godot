@@ -120,7 +120,7 @@ func _spawn_guards() -> void:
 
 func _enemy_card(enemy_id: String) -> AHSpriteCard:
 	var card := AHSpriteCard.new()
-	card.body_height = street.BODY_HEIGHTS.get(enemy_id, 1.8)
+	card.body_height = AHCharacterHeights.find(enemy_id)
 	card.show_art(street._combat_art.enemies[enemy_id].idle)
 	card.set_facing(-1.0)
 	street.add_child(card)
@@ -387,8 +387,13 @@ func _open_room(site_index: int) -> void:
 	var expedition: Dictionary = Campaign.state.session.expedition
 	var site: Dictionary = expedition.corridor.sites[site_index]
 	room = AHHouseRoom.new()
+	room.debug_material = street._debug_material
 	street.add_child(room)
 	room.build(site.shop, ROOMS_X + site_index * ROOM_GAP, site.spots.size(), site.camp_site)
+	var showing: bool = not street._debug_colliders.is_empty() and street._debug_colliders[0].visible
+	for debug in room.debug_colliders:
+		debug.visible = showing
+		street._debug_colliders.append(debug)
 	street.set_indoor(true, room.position.x, AHHouseRoom.WIDTH)
 	street._place_leader(Vector3(room.entrance_x, 0, -0.5))
 	_room_time = 0.0
@@ -420,6 +425,8 @@ func _close_room() -> void:
 		card.queue_free()
 	room_guards.clear()
 	if room != null:
+		for debug in room.debug_colliders:
+			street._debug_colliders.erase(debug)
 		room.queue_free()
 	room = null
 	street.set_indoor(false)

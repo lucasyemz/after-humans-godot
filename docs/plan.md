@@ -132,6 +132,19 @@ sementes e constantes, então a mesma campanha gera o mesmo corredor da Unreal).
   busca e pé de cabra, eventos, acampamento, combate, volta e o save). O modo de captura agora joga a suspeita da
   patrulha, a luta, a entrada numa casa e uma busca.
 
+**Corrigido depois da primeira QA em Play (21/10):**
+- a equipe nascia dentro da caixa de colisão da fogueira e não andava (o posicionamento agora procura o ponto livre);
+- as alturas dos personagens vêm da tabela da Unreal (`AHCharacterHeights`: Bento 1,72 m, Nick 1,50, Íris 1,38,
+  Véspera 1,66, inimigos pela proporção), em vez de todos com ~1,8 m;
+- os móveis no chão das lojas (prateleiras, balcões, bancadas, cortinas) e a fogueira da casa têm colisão;
+- os heróis de trás entravam na parede do fundo das lojas: o recuo de desenho da fila se acumulava a cada quadro
+  (~0,25 m por herói a 120 fps). Agora a equipe anda com folga das paredes, e a câmera vai até perto das paredes do lado
+  para ninguém sair do quadro nas pontas da sala;
+- combate como na Unreal: quem ataca corpo a corpo vai até o alvo (os inimigos, 40% do caminho; a distância, um passo),
+  passa na frente dos outros e o alvo é empurrado; a câmera enquadra a luta inteira e se aproxima do golpe; os pés ficam
+  acima do painel, que só aparece na hora de escolher a ação, e o registro foi para o canto de cima;
+- `test_scripts` compila todos os scripts do jogo (um erro na arena passava despercebido pelos testes).
+
 **Pendências:**
 - **A rua ainda é montada em código** (não virou `.tscn`): fica para o montador da Fase 4.
 - **Mochila sem tela:** os itens contam (comida, curativos, pé de cabra), mas não há a tela da Mochila nem o uso dos

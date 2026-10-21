@@ -65,7 +65,7 @@ Todos os testes, sem janela (imprime `PASS`/`FAIL` por teste e sai com código 0
 Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o nome do arquivo). O save do jogo fica em
 `user://saves/` (no Windows, `%APPDATA%\Godot\app_userdata\After Humans\saves`); os testes usam uma pasta temporária.
 
-- **Jogar:** `"$GODOT" --path .`. Acrescente `--rendering-method gl_compatibility` para ver no PC o renderer da web.
+- **Jogar:** dois cliques em `play.bat` (ou `play.bat web` para o renderer da web), ou `"$GODOT" --path .`. Acrescente `--rendering-method gl_compatibility` para ver no PC o renderer da web.
   - A/D (ou ←/→) andam pela rua; W/S (ou ↑/↓) vão para o fundo e para a frente, inclusive dentro dos becos.
     No gamepad: analógico esquerdo ou direcional.
   - Shift (ou RB) corre.

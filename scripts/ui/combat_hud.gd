@@ -129,9 +129,11 @@ func _build() -> void:
 	add_child(_message)
 
 	_log = make_label("", 17, MUTED)
-	_log.position = Vector2(36, 770)
-	_log.size = Vector2(900, 60)
-	_log.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	# O registro fica no canto de cima: embaixo ele cobria os pés de quem luta.
+	_log.position = Vector2(36, 18)
+	_log.size = Vector2(620, 60)
+	_log.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_log.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	add_child(_log)
 
 	_panel = PanelContainer.new()
@@ -349,6 +351,8 @@ func ask_command(actor_id: String) -> Dictionary:
 		child.queue_free()
 	_description.text = ""
 	_set_enabled(false)
+	# Durante o lance o painel sai da frente: a luta fica inteira à vista.
+	_panel.visible = false
 	return command
 
 

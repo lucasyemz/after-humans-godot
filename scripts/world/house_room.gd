@@ -11,12 +11,18 @@ const BACK_Z := -4.4
 ## Paredes, chão e teto passam da faixa em direção à câmera, fechando a caixa (FrontY da Unreal); a equipe anda até WALK_FRONT_Z.
 const FRONT_Z := 6.0
 const WALK_FRONT_Z := 1.4
+## A equipe anda a esta distância das paredes do lado e do fundo (m).
+const SIDE_MARGIN := 0.65
+const BACK_MARGIN := 0.75
 const HEIGHT := 3.4
 const WALL_HEIGHT := 3.2
 const DOOR_Z := Vector2(-1.4, 0.4)
 const SPOT_FRACTIONS := [0.36, 0.56, 0.74]
 const GUARD_FRACTION := 0.66
 const ENTRANCE_FRACTION := 0.3
+## Item da parede que começa abaixo disto (m) está apoiado no chão e ganha colisão, com esta profundidade a partir da parede.
+const FLOOR_ITEM_BOTTOM := 0.5
+const FLOOR_ITEM_DEPTH := 0.8
 ## Itens presos na parede do fundo (WallItems da Unreal): loja, item, centro em X, base e altura, em cm.
 const WALL_ITEMS := [
 	[0, 3, 230, 120, 85], [0, 1, 450, 195, 75], [0, 2, 680, 215, 55], [0, 0, 960, 0, 235],
@@ -25,6 +31,9 @@ const WALL_ITEMS := [
 ]
 
 var shop := 0
+## Caixas de colisão visíveis com C (a rua junta estas às dela enquanto a sala está aberta).
+var debug_colliders: Array[MeshInstance3D] = []
+var debug_material: Material
 var spot_xs: Array[float] = []
 var guard_x := 0.0
 var entrance_x := 0.0
@@ -72,14 +81,28 @@ func _box(min_corner: Vector3, max_corner: Vector3, material: Material, solid: b
 	mesh.position = (min_corner + max_corner) * 0.5
 	add_child(mesh)
 	if solid:
-		var body := StaticBody3D.new()
-		body.position = mesh.position
-		var shape := CollisionShape3D.new()
-		var collider := BoxShape3D.new()
-		collider.size = box.size
-		shape.shape = collider
-		body.add_child(shape)
-		add_child(body)
+		_solid(mesh.position, box.size)
+
+
+## Caixa só de colisão, com a caixa de depuração que a tecla C mostra.
+func _solid(center: Vector3, size: Vector3) -> void:
+	var body := StaticBody3D.new()
+	body.position = center
+	var shape := CollisionShape3D.new()
+	var collider := BoxShape3D.new()
+	collider.size = size
+	shape.shape = collider
+	body.add_child(shape)
+	var debug := MeshInstance3D.new()
+	var debug_box := BoxMesh.new()
+	debug_box.size = size
+	debug.mesh = debug_box
+	debug.material_override = debug_material
+	debug.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	debug.visible = false
+	body.add_child(debug)
+	debug_colliders.append(debug)
+	add_child(body)
 
 
 static func _tone(color: Color) -> StandardMaterial3D:
@@ -137,14 +160,7 @@ func _back_wall(art: String) -> void:
 		trim.position = Vector3(WIDTH * 0.5, trim_height * 0.5, BACK_Z + 0.03)
 		add_child(trim)
 	# Parede do fundo com colisão (a equipe não atravessa).
-	var body := StaticBody3D.new()
-	body.position = Vector3(WIDTH * 0.5, HEIGHT * 0.5, BACK_Z - 0.15)
-	var shape := CollisionShape3D.new()
-	var collider := BoxShape3D.new()
-	collider.size = Vector3(WIDTH + 0.6, HEIGHT, 0.3)
-	shape.shape = collider
-	body.add_child(shape)
-	add_child(body)
+	_solid(Vector3(WIDTH * 0.5, HEIGHT * 0.5, BACK_Z - 0.15), Vector3(WIDTH + 0.6, HEIGHT, 0.3))
 
 
 func _walls() -> void:
@@ -162,14 +178,7 @@ func _walls() -> void:
 	add_child(street_light)
 	_box(Vector3(WIDTH, 0, BACK_Z - 0.3), Vector3(WIDTH + 0.3, HEIGHT, FRONT_Z), plaster, true)
 	# Frente aberta para a câmera, mas com colisão (a equipe não sai da sala pela frente).
-	var body := StaticBody3D.new()
-	body.position = Vector3(WIDTH * 0.5, 1.0, WALK_FRONT_Z + 0.1)
-	var shape := CollisionShape3D.new()
-	var collider := BoxShape3D.new()
-	collider.size = Vector3(WIDTH, 2.0, 0.2)
-	shape.shape = collider
-	body.add_child(shape)
-	add_child(body)
+	_solid(Vector3(WIDTH * 0.5, 1.0, WALK_FRONT_Z + 0.1), Vector3(WIDTH, 2.0, 0.2))
 
 
 func _wall_item(art: String, item: int, center_x: float, bottom: float, height: float) -> void:
@@ -189,6 +198,10 @@ func _wall_item(art: String, item: int, center_x: float, bottom: float, height: 
 	card.material_override = material
 	card.position = Vector3(center_x, bottom + height * 0.5, BACK_Z + 0.4)
 	add_child(card)
+	# Móveis no chão (prateleiras, balcões, bancadas, poltronas): a equipe para na frente deles, não passa por dentro.
+	# Os quadros e luminárias presos no alto da parede ficam sem colisão.
+	if bottom < FLOOR_ITEM_BOTTOM:
+		_solid(Vector3(center_x, height * 0.5, BACK_Z + FLOOR_ITEM_DEPTH * 0.5), Vector3(quad.size.x * 0.85, height, FLOOR_ITEM_DEPTH))
 
 
 func _campfire() -> void:
@@ -203,6 +216,7 @@ func _campfire() -> void:
 	fire.material_override = _fire_material
 	fire.position = Vector3(camp_x - position.x, 0.45, 0.35)
 	add_child(fire)
+	_solid(Vector3(camp_x - position.x, 0.3, 0.3), Vector3(0.8, 0.6, 0.55))
 	_fire_light = OmniLight3D.new()
 	_fire_light.position = Vector3(camp_x - position.x, 0.8, 0.6)
 	_fire_light.light_color = Color(1.0, 0.6, 0.3)
