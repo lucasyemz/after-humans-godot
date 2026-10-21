@@ -1,0 +1,149 @@
+# Plano: After Humans na Godot (2026-10-20)
+
+Como levar o jogo da Unreal (referência na pasta acima deste repositório) para a Godot, em fases que terminam jogáveis.
+Parte do protótipo atual: combate com paridade 48/48 e Rua das Vitrines com chuva e colisão.
+
+## Decisão: mapas a partir dos dados e da arte que já existem, sem geração procedural
+
+**Recomendação:** usar a arte pintada e os layouts que já existem, montando cada mapa a partir de dados. A geração
+procedural fica só para variar o conteúdo de cada corrida (inimigos, saque, eventos), não para criar o cenário.
+
+**Por quê:**
+
+- **A arte é a identidade do jogo.** As fachadas, os cards e os interiores são pinturas compostas para um ângulo e uma
+  escala. Um gerador procedural repetiria as mesmas peças e quebraria a composição. O Emberfall gera tudo por código
+  porque é pixel art de blocos; a pintura do After Humans não funciona assim.
+- **O trabalho já está feito.**
+  - Os seis cenários novos (Ponte, Cais, Depósito, Abrigo, Dutos e Portão) estão descritos em
+    `Data/ScenarioPreparation/layouts.json`, na referência: 175 peças com posição, tamanho, arte e colisão.
+  - As 105 imagens de origem estão todas em `SourceArt`, com caminho e hash em `assets.json`.
+  - A Rua das Vitrines já foi portada assim no protótipo.
+- **O gênero pede caminho fixo e conteúdo variável.** No Darkest Dungeon, a referência de espírito, os corredores e
+  salas são fixos; o que muda entre corridas é o que tem neles. A expedição do After Humans já funciona assim: um mapa
+  de nós e corredores de 10 trechos com patrulhas, suprimentos e descanso.
+- **Dá para ajustar à mão.** Uma cena montada por dados vira um `.tscn`, que o Lucas mexe no editor da Godot e qualquer
+  agente lê e edita como texto.
+
+**Como fica na prática:**
+
+1. Um importador (`tools/`) converte cada layout e o manifesto de dressing da Unreal num JSON da Godot, em
+   `data/scenarios/<scenario>.json`, e copia a arte usada.
+2. Um montador (`scripts/world/scenario_builder.gd`, generalizando o `street.gd`) lê esse JSON e cria a cena: pisos,
+   paredes, cards, luzes, colisão, portas e zonas.
+3. O montador gera o `.tscn` uma vez. Dali em diante, o `.tscn` é a fonte e recebe os ajustes finos no editor. O JSON só
+   volta a ser usado se for preciso remontar o mapa do zero.
+4. Por corrida, um gerador com semente (o mesmo mulberry32 do combate) sorteia o que vai em cada trecho a partir das
+   regras de `data/`: patrulhas, props de busca, saque e eventos.
+
+**Onde a geração procedural ajudaria mais tarde:**
+- variações de dressing num cenário (entulho, poças, folhagem) a partir de um kit;
+- o mapa de nós da expedição, que a web já gerava (`expeditionGenerator.ts`);
+- interiores pequenos montados com peças de um conjunto.
+
+Nada disso precisa estar no primeiro jogável.
+
+## Fases
+
+Cada fase termina num build que o Lucas joga, com os testes automáticos verdes. As estimativas são em dias de trabalho
+com agente, sem contar as rodadas de QA.
+
+### Fase 0: fundação (2 a 3 dias) — feita em 2026-10-20
+
+- Autoloads:
+  - `GameData`: lê todos os `data/*.json`;
+  - `Campaign`: estado e save em JSON, com cópia de segurança;
+  - `GameFlow`: troca de cenas e fases.
+- Ações de input no `project.godot` (teclado e gamepad), no lugar das teclas fixas do protótipo.
+- Organização: `scenes/`, `scripts/<area>/` (combat, world, flow, campaign, ui) e `data/`.
+- Testes headless num só comando (`tests/run_all.gd`): paridade, save e load, regras.
+
+**Pronto quando:** salvar e carregar uma campanha nova passa no teste, e a rua abre pelo `GameFlow`.
+
+**Feito:** `tests/run_all.gd` passa com 4 testes e 169 verificações em menos de 1 s (paridade 48/48, campanha nova e
+save com recuperação pela cópia, tabelas e referências, cenas e input). A rua abre pelo boot e pelo `GameFlow`, e o modo
+de captura e os testes de colisão continuam passando. Ficaram para as próximas fases: a Estação e a expedição dentro do
+save (`station` e `session` estão vazios) e a migração de versões antigas do save (o leitor já recusa versão diferente).
+
+### Fase 1: combate jogável na rua (5 a 7 dias)
+
+- Arena na faixa da rua (port do `AHCombatArena`):
+  - 4 posições por lado e entrada dos inimigos;
+  - câmera de ação aproximada;
+  - poses (ataque, defesa, dano, morte, esquiva, apoio) e as fases das ações dos aliados (`_preparacao`, `_execucao`).
+- HUD de combate (port do `AHCombatHUDWidget`): fila de iniciativa, habilidades com alvo e prévia, status, instinto,
+  números de dano.
+- Arte e som:
+  - sprites e poses dos inimigos, vindos de `Content/.../Characters` (exportar da Unreal o que não tiver origem em
+    `SourceArt`);
+  - sons de combate de `SourceArt/Audio`.
+
+**Pronto quando:** uma luta completa contra uma patrulha da rua é jogável do começo ao fim, com vitória, derrota e fuga.
+
+### Fase 2: exploração e a primeira jornada (5 a 8 dias)
+
+- Corredor de 10 trechos (port do `AHStreetCorridor`): patrulhas, suprimentos, descanso, guardião no fim.
+- Rastreador, visão e detecção (`AHTracker`, `AHSightComponent`): a vantagem de abertura no combate.
+- Pontos de busca e saque (`AHSearchSpot`, `AHLootContainer`), mochila e eventos narrativos (`events.json`).
+- Interiores das lojas (port do `AHHouseRoom`): porta, entrar, vasculhar, voltar.
+- A rua deixa de ser montada a cada abertura e vira `.tscn` (com o montador da Fase 4 ou direto do `street.gd`).
+
+**Pronto quando:** a Jornada 1 inteira (Rua das Vitrines) é jogável: preparar, andar, lutar, vasculhar uma loja,
+descansar, enfrentar o guardião e ver o resultado.
+
+### Fase 3: Estação Raiz e campanha (7 a 10 dias)
+
+Aqui fica a maior parte da UI.
+
+- A Estação como refúgio (port do `AHShelterStation` e do `AHRefugeWidget`):
+  - os cômodos, a economia (comida, água, energia), os civis e as melhorias;
+  - os modelos 3D da Poly Haven entram como glTF, baixados de novo pelo id (CC0).
+- Preparação da equipe, mapa da expedição, noite e descanso, resultado, memorial e elenco.
+- Fluxo completo de campanha com save no meio da expedição.
+
+**Pronto quando:** dá para jogar várias jornadas seguidas com volta à Estação, e salvar e carregar em qualquer ponto.
+
+### Fase 4: os outros cenários (5 a 8 dias)
+
+- Importador e montador da seção de decisão acima, aplicados aos seis layouts.
+- Água com ondas (`docs` da Unreal: `Docs/Systems/water.md`), lanterna, portas laterais e zonas.
+- Jornadas 2 a 5 nos mapas certos, com trechos de passagem (Cais para Ponte, Depósito para Dutos) e o Porteiro.
+
+**Pronto quando:** as cinco jornadas da campanha são jogáveis nos seus mapas.
+
+### Fase 5: acabamento e lançamento (4 a 6 dias)
+
+- Áudio completo (música, ambiente, passos) e menu de opções (qualidade gráfica, volume, controles).
+- Builds para Windows e web, testados em hardware fraco e num celular.
+- QA automatizada por captura para cada mapa (como o modo `--capture` da rua) e checklist de Play.
+
+**Total: 28 a 42 dias de trabalho com agente**, perto da faixa da avaliação (24 a 40). O combate e a rua já estão
+adiantados, mas a Estação e a UI pesam mais do que parecia.
+
+## Ordem e paralelismo
+
+- **Em sequência:** 0 → 1 → 2. A primeira jornada jogável é o marco que valida o resto.
+- **Em paralelo:** a Fase 4 (importador e montador dos cenários) pode começar junto com a Fase 2, por outro agente. Ela
+  só precisa do montador da rua e não toca nos mesmos arquivos.
+- **A Fase 3 depende da 2**, porque o fluxo de campanha precisa da jornada pronta.
+
+## Pipeline de arte
+
+| O quê | De onde vem | Como entra |
+|---|---|---|
+| Cards de cenário, props e fachadas | `SourceArt/<Scenario>` e tag `alphaweb` | `tools/sync_assets.py`, com o catálogo `assets.json` |
+| Personagens, poses e ícones | `SourceArt` (HeroStatics, AllyActions, ApprovedActionIcons, CharacterGallery…) | Mesma ferramenta, por personagem |
+| Texturas sem origem fora da Unreal | `.uasset` da referência | Exportar para PNG com um script Python no `UnrealEditor-Cmd` (sem abrir o editor) |
+| Materiais PBR e malhas | Poly Haven e AmbientCG (CC0) | Baixar de novo pelo id, em glTF e PNG, para `art/external/<fornecedor>/<id>/` |
+| Sons | `SourceArt/Audio` | OGG para música e ambiente, WAV para efeitos |
+
+**Regra de leveza:** entra no repositório só o que alguma cena usa. A cada fase, um teste lista os arquivos de `art/`
+que nenhuma cena ou script referencia.
+
+## Riscos
+
+| Risco | Como tratar |
+|---|---|
+| A Estação 3D (3.500 linhas de C++, malhas da Poly Haven) é a peça mais cara | Começar pela versão mais simples (cômodos e serviços); deixar o dressing fino para a Fase 5 |
+| Os ajustes manuais nos mapas da Unreal (scripts de `refine-*` e `polish-*`) não estão nos layouts | Comparar cada mapa com a captura de QA da Unreal e ajustar no `.tscn` |
+| O Compatibility (web) perde a névoa volumétrica e as reflexões | Manter a calibração por renderer, como no protótipo, e testar sempre os dois |
+| Regras de campanha sem gabarito de paridade, como existe no combate | Portar junto os testes de regra da Unreal (`AHShelterRules`, `AHStationEconomy`, `AHNightRestRules`) |

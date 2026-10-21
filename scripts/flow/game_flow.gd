@@ -1,0 +1,67 @@
+## Autoload GameFlow: troca de cenas pelo id, com um fade preto entre elas. As outras partes do jogo pedem a cena pelo id
+## (GameFlow.change_to("street")) e leem os parâmetros da troca em GameFlow.params.
+extends Node
+
+signal scene_changed(scene_id: String)
+
+## Cenas do jogo pelo id. Cada fase do plano acrescenta as suas (combate, estação, cenários).
+const SCENES := {
+	"street": "res://scenes/street.tscn",
+}
+const FADE_SECONDS := 0.25
+
+var current_id := ""
+var params := {}
+var busy := false
+var _fade: ColorRect
+
+
+func _ready() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 100
+	_fade = ColorRect.new()
+	_fade.color = Color.BLACK
+	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.modulate.a = 0.0
+	_fade.visible = false
+	layer.add_child(_fade)
+	add_child(layer)
+
+
+static func scene_path(scene_id: String) -> String:
+	return SCENES.get(scene_id, "")
+
+
+## Primeira cena depois do boot. Por enquanto a rua; com a Estação (fase 3), o refúgio quando não houver expedição.
+func start() -> void:
+	change_to("street", {}, false)
+
+
+## Troca para a cena pelo id. Retorna false se o id não existir ou se já houver uma troca em andamento.
+func change_to(scene_id: String, scene_params: Dictionary = {}, fade: bool = true) -> bool:
+	var path := scene_path(scene_id)
+	if path == "" or busy:
+		push_warning("GameFlow: cena desconhecida ou troca em andamento (%s)." % scene_id)
+		return false
+	busy = true
+	params = scene_params
+	if fade:
+		await _fade_to(1.0)
+	get_tree().change_scene_to_file(path)
+	await get_tree().process_frame
+	current_id = scene_id
+	scene_changed.emit(scene_id)
+	if fade:
+		await _fade_to(0.0)
+	busy = false
+	return true
+
+
+func _fade_to(alpha: float) -> void:
+	_fade.visible = true
+	var tween := create_tween()
+	tween.tween_property(_fade, "modulate:a", alpha, FADE_SECONDS)
+	await tween.finished
+	# Transparente, o retângulo ainda custaria uma passada na tela inteira.
+	_fade.visible = alpha > 0.0

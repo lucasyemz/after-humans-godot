@@ -1,6 +1,6 @@
 ## Motor de combate: port de Source/AfterHumans/Combat/AHCombatEngine.cpp (que já era o port de combatEngine.ts).
 ## Sem cena: lê os dados, altera o estado e devolve eventos. A ordem das chamadas a random.next() segue o C++ linha a
-## linha: mudar a ordem quebra a paridade (tests/parity_test.gd). Os textos do log seguem os do C++.
+## linha: mudar a ordem quebra a paridade (tests/test_combat_parity.gd). Os textos do log seguem os do C++.
 class_name AHCombatEngine
 extends RefCounted
 

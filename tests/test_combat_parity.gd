@@ -1,7 +1,7 @@
-## Paridade com a web: repete as lutas gravadas em Data/combat-parity.txt e compara o estado depois de cada ação,
-## como Source/AfterHumans/Combat/AHCombatParityTest.cpp. Sem janela:
-##   Godot --headless --path . --script res://tests/parity_test.gd
-extends SceneTree
+## Paridade com a web: repete as lutas gravadas em data/combat-parity.txt e compara o estado depois de cada ação,
+## como Source/AfterHumans/Combat/AHCombatParityTest.cpp na referência Unreal. Usa os kits históricos (data/legacy_kits),
+## porque a gravação é anterior aos kits aprovados.
+extends RefCounted
 
 const Unit = AHCombat.Unit
 
@@ -67,12 +67,9 @@ func _snapshot(state: AHCombat.State, context: AHCombat.Context, draws: int) -> 
 	return " ".join(parts)
 
 
-func _init() -> void:
-	var started := Time.get_ticks_msec()
+func run(t) -> void:
 	var data := AHGameData.new()
-	if not data.load_from("res://data", "res://data/legacy_kits"):
-		push_error("Dados ausentes: rode tools/sync_assets.py")
-		quit(2)
+	if not t.check(data.load_from("res://data", "res://data/legacy_kits"), "dados do combate e kits históricos carregam"):
 		return
 	var lines := FileAccess.get_file_as_string("res://data/combat-parity.txt").split("\n")
 	for i in lines.size():
@@ -121,24 +118,15 @@ func _init() -> void:
 		var state := AHCombatEngine.init_combat(players, enemies, context, data, random, scenario.opening, scenario.preserve)
 		var engine := AHCombatEngine.new(state, context, data, random)
 
-		var fight_ok := true
 		var step_index := 0
 		var cursor := line_index + 1
-		var check := func(expected: String) -> bool:
-			var actual := _snapshot(state, context, random.draws)
-			if actual != expected:
-				printerr("Luta %s %d diverge no passo %d.\n web:   %s\n godot: %s" % [key, seed_index, step_index, expected.left(900), actual.left(900)])
-				return false
-			return true
-
-		fight_ok = check.call(lines[cursor])
+		var fight_ok := _compare(t, key, seed_index, step_index, lines[cursor], _snapshot(state, context, random.draws))
 		cursor += 1
 		steps += 1
 		step_index += 1
 		while fight_ok and cursor < lines.size() and not lines[cursor].begins_with("END"):
 			if state.is_over:
-				printerr("Luta %s %d: a Godot terminou antes da web (passo %d)." % [key, seed_index, step_index])
-				fight_ok = false
+				fight_ok = t.check(false, "Luta %s %d: a Godot terminou antes da web (passo %d)." % [key, seed_index, step_index])
 				break
 			var actor_id := state.current_turn_unit_id
 			var actor := state.find_unit(actor_id)
@@ -147,7 +135,7 @@ func _init() -> void:
 					engine.play_auto_turn(actor_id)
 			else:
 				engine.execute_enemy_turn()
-			fight_ok = check.call(lines[cursor])
+			fight_ok = _compare(t, key, seed_index, step_index, lines[cursor], _snapshot(state, context, random.draws))
 			cursor += 1
 			steps += 1
 			step_index += 1
@@ -157,11 +145,17 @@ func _init() -> void:
 				if u.hp <= 0 and not u.deaths_door:
 					deaths.append(u.hero_id)
 			var actual := "END %d %d %s" % [int(state.victory), int(state.escaped), ",".join(deaths)]
-			if actual != lines[cursor].strip_edges(false, true) and actual.strip_edges(false, true) != lines[cursor]:
-				printerr("Luta %s %d: fim diferente. web: %s / godot: %s" % [key, seed_index, lines[cursor], actual])
-				fight_ok = false
+			fight_ok = t.equal(actual.strip_edges(false, true), lines[cursor], "Luta %s %d: fim" % [key, seed_index])
 		matched += 1 if fight_ok else 0
 		line_index = cursor + 1
 
-	print("%d de %d lutas iguais a web (%d passos comparados) em %d ms." % [matched, fights, steps, Time.get_ticks_msec() - started])
-	quit(0 if matched == fights and fights > 0 else 1)
+	t.equal(matched, fights, "lutas iguais à gravação da web")
+	t.equal(fights, 48, "a gravação tem as 48 lutas")
+	t.note("%d de %d lutas, %d passos" % [matched, fights, steps])
+
+
+## Uma verificação por passo só quando diverge (são 3.351 passos): a contagem fica legível.
+func _compare(t, key: String, seed_index: int, step: int, expected: String, actual: String) -> bool:
+	if actual == expected:
+		return true
+	return t.check(false, "Luta %s %d diverge no passo %d.\n      web:   %s\n      godot: %s" % [key, seed_index, step, expected.left(400), actual.left(400)])

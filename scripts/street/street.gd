@@ -914,40 +914,31 @@ func _update_fire(delta: float) -> void:
 # ---------------------------------------------------------------- quadro a quadro
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
-		match event.keycode:
-			KEY_T:
-				_mood = "night" if _mood == "golden" else "golden"
-				_apply_weather()
-			KEY_R:
-				_raining = not _raining
-				_next_flash = 4.0
-				_apply_weather()
-			KEY_P:
-				_post.set_shader_parameter("enabled", not _post.get_shader_parameter("enabled"))
-			KEY_C:
-				for debug in _debug_colliders:
-					debug.visible = not debug.visible
+	if event.is_echo():
+		return
+	if event.is_action_pressed("debug_time"):
+		_mood = "night" if _mood == "golden" else "golden"
+		_apply_weather()
+	elif event.is_action_pressed("debug_rain"):
+		_raining = not _raining
+		_next_flash = 4.0
+		_apply_weather()
+	elif event.is_action_pressed("debug_post"):
+		_post.set_shader_parameter("enabled", not _post.get_shader_parameter("enabled"))
+	elif event.is_action_pressed("debug_colliders"):
+		for debug in _debug_colliders:
+			debug.visible = not debug.visible
 
 
 func _input_vector() -> Vector2:
 	if _capture_dir != "":
 		return _capture_input
-	var input := Vector2(Input.get_axis("ui_left", "ui_right"), Input.get_axis("ui_up", "ui_down"))
-	if Input.is_physical_key_pressed(KEY_A):
-		input.x -= 1.0
-	if Input.is_physical_key_pressed(KEY_D):
-		input.x += 1.0
-	if Input.is_physical_key_pressed(KEY_W):
-		input.y -= 1.0
-	if Input.is_physical_key_pressed(KEY_S):
-		input.y += 1.0
-	return input.limit_length(1.0)
+	return Input.get_vector("move_left", "move_right", "move_back", "move_front")
 
 
 func _physics_process(_delta: float) -> void:
 	var input := _input_vector()
-	var speed := 4.4 if Input.is_physical_key_pressed(KEY_SHIFT) else 2.4
+	var speed := 4.4 if Input.is_action_pressed("run") else 2.4
 	# Para o fundo e para a frente anda mais devagar (a câmera vê pouco dessa direção).
 	_leader.velocity = Vector3(input.x, 0, input.y * 0.75) * speed
 	_leader.move_and_slide()
