@@ -60,33 +60,194 @@ def rooms() -> int:
     return count
 
 
-# Estação Raiz: as superfícies dos cômodos (Poly Haven e ambientCG, CC0), a cor em 1K. Os originais ficam em
-# SourceArt/ThirdParty (fora do Git da Unreal, reproduzíveis pelo manifesto de lá).
-STATION_SURFACES = {
-    **{name: f"SourceArt/ThirdParty/PolyHaven/Shelter/{name}/{name}_diff_2k.jpg" for name in (
-        "wood_planks_grey", "painted_plaster_wall", "worn_tile_floor", "long_white_tiles", "red_brick_03",
-        "concrete_floor_worn_001", "concrete_wall_008", "concrete_floor_painted", "rubber_tiles", "gravel_floor_02",
-        "factory_brick", "rough_concrete", "anti_slip_concrete")},
-    **{name: f"SourceArt/ThirdParty/AmbientCG/{name}/{name}_1K-PNG_Color.png" for name in (
-        "DiamondPlate008A", "CorrugatedSteel009", "Metal021", "MetalPlates006")},
-}
+# Estação Raiz: as superfícies dos cômodos (Poly Haven e ambientCG, CC0). A cor e a normal em 1K e o tamanho real de
+# cada amostra (TileSize da Unreal: as dimensões da Poly Haven em mm, ou o ajuste do import-ambientcg-surfaces.py).
+POLYHAVEN_SHELTER = "SourceArt/ThirdParty/PolyHaven/Shelter"
+AMBIENTCG = {"DiamondPlate008A": (80.0, 0.65), "CorrugatedSteel009": (120.0, 0.45), "Metal021": (200.0, 0.65),
+             "MetalPlates006": (240.0, 0.7)}
 
 
 def station() -> int:
+    import json
+    from PIL import Image, ImageOps
+    manifest = json.loads((REPO / POLYHAVEN_SHELTER / "manifest.json").read_text(encoding="utf-8"))
+    sources = {}
+    for entry in manifest:
+        if entry["kind"] != "texture":
+            continue
+        files = entry["files"]
+        size = entry.get("dimensions_mm") or [2000]
+        sources[entry["id"]] = {"color": files["base_color"]["file"], "normal": files.get("normal", {}).get("file"),
+                                "root": POLYHAVEN_SHELTER, "tile": max(50.0, float(size[0]) / 10.0), "tint": 1.0}
+    for name, (tile, tint) in AMBIENTCG.items():
+        sources[name] = {"color": f"{name}_1K-PNG_Color.png", "normal": f"{name}_1K-PNG_NormalGL.png",
+                         "root": f"SourceArt/ThirdParty/AmbientCG/{name}", "tile": tile, "tint": tint}
+    table = {}
+    for name, info in sources.items():
+        for kind, suffix in (("color", ""), ("normal", "_n")):
+            if not info[kind]:
+                continue
+            src = REPO / info["root"] / info[kind]
+            if not src.exists():
+                print(f"  falta {src}")
+                continue
+            dst = PROTO / "art" / "station" / f"{name}{suffix}.webp"
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+                image = Image.open(src).convert("RGB").resize((1024, 1024), Image.LANCZOS)
+                if kind == "normal" and "_nor_dx" in src.name:
+                    r, g, b = image.split()
+                    image = Image.merge("RGB", (r, ImageOps.invert(g), b))
+                image.save(dst, "WEBP", quality=86, method=4)
+        table[name] = {"tile_cm": info["tile"], "tint": info["tint"], "normal": bool(info["normal"])}
+    target = PROTO / "data" / "presentation" / "station_surfaces.json"
+    target.write_text(json.dumps(table, ensure_ascii=False, indent=2) + chr(10), encoding="utf-8")
+    return len(table)
+
+
+# Os modelos da Poly Haven (CC0) que a Estação da Unreal usa: o FBX como veio e as texturas em 512 px, com o mesmo nome
+# (o FBX as procura pelo nome). Os que só existem como .uasset na Unreal (cadeira do bar, binóculo, kit de química,
+# sofá) ficam de fora; a Estação usa uma peça parecida no lugar deles.
+STATION_MODELS = [
+    "Barrel_02", "brass_pan_01", "brass_pot_01", "caged_hanging_light", "cardboard_box_01", "carved_wooden_plate",
+    "electric_stove", "folding_wooden_stool", "food_apple_01", "hanging_industrial_lamp", "industrial_storage_cart",
+    "industrial_wall_lamp", "korean_fire_extinguisher_01", "long_life_food", "metal_jerrycan_green", "metal_tool_chest",
+    "metal_trash_can", "mounted_fluorescent_lights", "painted_wooden_bench", "painted_wooden_cabinet",
+    "painted_wooden_shelves", "painted_wooden_table", "plastic_bottle_gallon", "plastic_container", "plastic_crate_01",
+    "pot_enamel_01", "power_box_01", "russian_food_cans_01", "security_light", "sledgehammer_01", "steel_frame_shelves_01",
+    "steel_frame_shelves_02", "sweet_potato", "tool_cart", "utility_box_02", "vintage_electric_kettle", "wall_clock",
+    "wicker_basket_01", "wooden_bowl_01", "wooden_bucket_01", "wooden_crate_02", "wooden_cutting_board",
+    "wooden_military_crate",
+]
+
+
+def station_models() -> int:
     from PIL import Image
     count = 0
-    for name, path in STATION_SURFACES.items():
-        src = REPO / path
-        if not src.exists():
-            print(f"  falta {path}")
+    for model in STATION_MODELS:
+        src_dir = REPO / "SourceArt/ThirdParty/PolyHaven/Shelter" / model
+        if not src_dir.exists():
+            print(f"  falta o modelo {model}")
             continue
-        dst = PROTO / "art" / "station" / f"{name}.webp"
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
-            image = Image.open(src).convert("RGB")
-            image.resize((1024, 1024), Image.LANCZOS).save(dst, "WEBP", quality=86, method=4)
+        dst_dir = PROTO / "art" / "station" / "models" / model
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        for src in src_dir.iterdir():
+            dst = dst_dir / src.name
+            if dst.exists() and dst.stat().st_mtime >= src.stat().st_mtime:
+                continue
+            if src.suffix.lower() == ".fbx":
+                shutil.copy2(src, dst)
+            elif src.suffix.lower() in (".jpg", ".png"):
+                image = Image.open(src)
+                image = image.convert("RGBA" if image.mode in ("RGBA", "LA") else "RGB")
+                image = image.resize((min(512, image.width), min(512, image.height)), Image.LANCZOS)
+                if "_nor_dx" in src.name:
+                    # Normal no padrão DirectX: a Godot usa o do OpenGL (o verde invertido).
+                    from PIL import ImageOps
+                    r, g, b, *rest = image.convert("RGB").split()
+                    image = Image.merge("RGB", (r, ImageOps.invert(g), b))
+                if src.suffix.lower() == ".jpg":
+                    image.convert("RGB").save(dst, "JPEG", quality=84)
+                else:
+                    image.save(dst, "PNG", optimize=True)
         count += 1
     return count
+
+
+# Os cards pintados da Estação (os M_<Sala>_<Nome> da Unreal): recortados no alfa visível, como o material M_AHCard
+# recorta pela UV, e na metade da resolução. O nome é o da Unreal (Cantina_Front, Depot_Crate...).
+STATION_CARDS = {
+    "Door": "SourceArt/RootStation/Doors/Proposals/V2/DOOR01_Station_Wood_Closed.png",
+    "Cantina_Front": "SourceArt/RootStation/Cantina/Prepared/Front.png",
+    "Cantina_Pantry": "SourceArt/RootStation/Cantina/Prepared/Pantry.png",
+    "Cantina_Utensils": "SourceArt/RootStation/Cantina/Prepared/Utensils.png",
+    "Depot_Crate": "SourceArt/RootStation/Depot/Issue58/DP01_Provisions_Crate.png",
+    "Depot_Sack": "SourceArt/RootStation/Depot/Issue58/DP02_Sack.png",
+    "Depot_Container": "SourceArt/RootStation/Depot/Issue58/DP03_Metal_Container.png",
+    "Forge_Workbay": "SourceArt/RootStation/Forge/Proposals/V2/forge-workbay-v2.png",
+    "Forge_BenchFront": "SourceArt/RootStation/Forge/Proposals/V1/FG01_Workbench_Front.png",
+    "Forge_ToolRack": "SourceArt/RootStation/Forge/Issue58/FG02_Tool_Rack.png",
+    "Forge_Toolbox": "SourceArt/RootStation/Forge/Issue58/FG03_Toolbox_Open.png",
+    "Forge_Ingots": "SourceArt/RootStation/Forge/Issue58/FG04_Ingots.png",
+    "Bar_Front": "SourceArt/RootStation/Bar/Prepared/Front.png",
+    **{f"Bar_Bottle{i}": f"SourceArt/RootStation/Bar/Prepared/Bottle{i}.png" for i in range(4)},
+    "CharactersRoom_Sofa": "SourceArt/RootStation/CharactersRoom/CR01_Community_Sofa_D.png",
+    "CharactersRoom_Notice": "SourceArt/StationCards/T_Station_Prop_waiting_notice.png",
+    "Research_Bookshelf": "SourceArt/StationCards/T_Station_Prop_research_bookshelf.png",
+    "Research_RadioDesk": "SourceArt/StationCards/T_Station_Prop_research_desk.png",
+    "Research_SampleShelves": "SourceArt/RootStation/Research/Proposals/V1/research-sample-cabinet-v1.png",
+    "Research_Notes": "SourceArt/RootStation/Research/notes.png",
+    "Dormitory_BedLinen": "SourceArt/RootStation/Dormitory/DM01_Bed_Linen_D.png",
+    "Dormitory_PersonalPegs": "SourceArt/RootStation/Dormitory/DM02_Personal_Pegs_D.png",
+    "Preparation_Backpack": "SourceArt/RootStation/Preparation/PR01_Expedition_Backpack_D.png",
+    "Preparation_Crate": "SourceArt/StationCards/T_Station_Prop_depot_crate.png",
+    "Preparation_Routes": "SourceArt/RootStation/Preparation/routes.png",
+    "Preparation_Checklist": "SourceArt/RootStation/Preparation/checklist.png",
+    "Terminal_Bench": "SourceArt/StationCards/T_Station_Prop_waiting_bench.png",
+}
+
+
+def station_cards() -> int:
+    from PIL import Image
+    count = 0
+    for name, path in STATION_CARDS.items():
+        src = REPO / path
+        if not src.exists():
+            print(f"  falta o card {path}")
+            continue
+        dst = PROTO / "art" / "station" / "cards" / f"{name}.webp"
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+            image = Image.open(src).convert("RGBA")
+            box = image.getchannel("A").point(lambda a: 255 if a > 8 else 0).getbbox()
+            if box:
+                image = image.crop(box)
+            scale = min(1.0, 1024.0 / max(image.width, image.height))
+            image = image.resize((max(1, round(image.width * scale)), max(1, round(image.height * scale))), Image.LANCZOS)
+            image.save(dst, "WEBP", quality=90, method=4)
+        count += 1
+    return count
+
+
+# Poses dos moradores na Estação (#80): trabalho por sala e sentado no banco da Cantina, com os pés e o topo da Unreal.
+# Sentado: o contorno ocupa "seated" da altura de pé (FSeatPose.Scale); o pé mais baixo é a base.
+STATION_POSES = {
+    "hero_cao_bento_work": ("Forge/Poses/bento-repair-component-v1.png", 605, 1433, 17, 1.0),
+    "hero_gato_nick_work": ("Depot/Poses/nick-inspect-equipment-v1.png", 610, 1289, 29, 1.0),
+    "hero_sapo_iris_work": ("Research/Poses/iris-analyze-sample-v1.png", 750, 1268, 46, 1.0),
+    "hero_coruja_vespera_work": ("Research/Poses/vespera-read-records-v1.png", 605, 1302, 25, 1.0),
+    "hero_cao_bento_seat": ("CharactersRoom/Poses/bento-seat-v1.png", (47 + 1085) // 2, 1420, 55, 0.72),
+    "hero_gato_nick_seat": ("CharactersRoom/Poses/nick-seat-v1.png", (73 + 1136) // 2, 1278, 56, 0.76),
+    "hero_sapo_iris_seat": ("CharactersRoom/Poses/iris-seat-v1.png", (13 + 1079) // 2, 1372, 78, 0.70),
+    "hero_coruja_vespera_seat": ("CharactersRoom/Poses/vespera-seat-v1.png", (58 + 1126) // 2, 1246, 55, 0.76),
+}
+
+
+def station_poses() -> int:
+    import json
+    from PIL import Image
+    manifest = json.loads((REPO / "SourceArt/RootStation/Civilians/art-manifest.json").read_text(encoding="utf-8"))
+    poses = dict(STATION_POSES)
+    # Trabalho dos civis: a mesma tela e os mesmos pés do idle (a pose _Work_D da #71).
+    for entry in manifest:
+        name = entry["name"].lower()
+        poses[f"civil_{name}_work"] = (f"Civilians/{entry['name']}/{name}-work-v1.png", entry["foot_px"][0], entry["foot_px"][1], entry["top_px"], 1.0)
+    out = {}
+    for pose_id, (path, foot_x, foot_y, top, seated) in poses.items():
+        src = REPO / "SourceArt/RootStation" / path
+        if not src.exists():
+            print(f"  falta a pose {path}")
+            continue
+        dst = PROTO / "art" / "station" / "poses" / f"{pose_id}.webp"
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        image = Image.open(src)
+        if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+            image.convert("RGBA").resize((image.width // 2, image.height // 2), Image.LANCZOS).save(dst, "WEBP", quality=90, method=4)
+        out[pose_id] = {"file": f"res://art/station/poses/{pose_id}.webp", "canvas": [image.width // 2, image.height // 2],
+                        "anchor": [foot_x // 2, foot_y // 2], "body_reference_pixels": round((foot_y - top) / seated / 2)}
+    target = PROTO / "data" / "presentation" / "station_poses.json"
+    target.write_text(json.dumps(out, ensure_ascii=False, indent=2) + chr(10), encoding="utf-8")
+    return len(out)
 
 
 def civilians() -> int:
@@ -136,7 +297,7 @@ def main() -> None:
     for path in SOURCE_ART:
         copy(REPO / path, street / Path(path).name)
     print(f"dados: {len(DATA) + len(LEGACY_KITS)} arquivos; arte da rua: {len(WEB_STREET) + len(SOURCE_ART)} imagens; "
-          f"interiores: {rooms()} imagens; estação: {station()} superfícies; civis: {civilians()}")
+          f"interiores: {rooms()} imagens; estação: {station()} superfícies; civis: {civilians()}; modelos: {station_models()}; cards: {station_cards()}; poses: {station_poses()}")
 
 
 if __name__ == "__main__":

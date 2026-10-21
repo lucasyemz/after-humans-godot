@@ -1,0 +1,134 @@
+{
+  "hero_cao_bento_work": {
+    "file": "res://art/station/poses/hero_cao_bento_work.webp",
+    "canvas": [
+      543,
+      724
+    ],
+    "anchor": [
+      302,
+      716
+    ],
+    "body_reference_pixels": 708
+  },
+  "hero_gato_nick_work": {
+    "file": "res://art/station/poses/hero_gato_nick_work.webp",
+    "canvas": [
+      589,
+      667
+    ],
+    "anchor": [
+      305,
+      644
+    ],
+    "body_reference_pixels": 630
+  },
+  "hero_sapo_iris_work": {
+    "file": "res://art/station/poses/hero_sapo_iris_work.webp",
+    "canvas": [
+      589,
+      667
+    ],
+    "anchor": [
+      375,
+      634
+    ],
+    "body_reference_pixels": 611
+  },
+  "hero_coruja_vespera_work": {
+    "file": "res://art/station/poses/hero_coruja_vespera_work.webp",
+    "canvas": [
+      589,
+      667
+    ],
+    "anchor": [
+      302,
+      651
+    ],
+    "body_reference_pixels": 638
+  },
+  "hero_cao_bento_seat": {
+    "file": "res://art/station/poses/hero_cao_bento_seat.webp",
+    "canvas": [
+      543,
+      724
+    ],
+    "anchor": [
+      283,
+      710
+    ],
+    "body_reference_pixels": 948
+  },
+  "hero_gato_nick_seat": {
+    "file": "res://art/station/poses/hero_gato_nick_seat.webp",
+    "canvas": [
+      589,
+      667
+    ],
+    "anchor": [
+      302,
+      639
+    ],
+    "body_reference_pixels": 804
+  },
+  "hero_sapo_iris_seat": {
+    "file": "res://art/station/poses/hero_sapo_iris_seat.webp",
+    "canvas": [
+      543,
+      724
+    ],
+    "anchor": [
+      273,
+      686
+    ],
+    "body_reference_pixels": 924
+  },
+  "hero_coruja_vespera_seat": {
+    "file": "res://art/station/poses/hero_coruja_vespera_seat.webp",
+    "canvas": [
+      589,
+      667
+    ],
+    "anchor": [
+      296,
+      623
+    ],
+    "body_reference_pixels": 784
+  },
+  "civil_dora_work": {
+    "file": "res://art/station/poses/civil_dora_work.webp",
+    "canvas": [
+      512,
+      768
+    ],
+    "anchor": [
+      265,
+      740
+    ],
+    "body_reference_pixels": 718
+  },
+  "civil_cora_work": {
+    "file": "res://art/station/poses/civil_cora_work.webp",
+    "canvas": [
+      512,
+      768
+    ],
+    "anchor": [
+      285,
+      750
+    ],
+    "body_reference_pixels": 742
+  },
+  "civil_otto_work": {
+    "file": "res://art/station/poses/civil_otto_work.webp",
+    "canvas": [
+      512,
+      768
+    ],
+    "anchor": [
+      307,
+      740
+    ],
+    "body_reference_pixels": 712
+  }
+}

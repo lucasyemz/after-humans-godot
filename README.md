@@ -5,8 +5,10 @@ protótipo da avaliação de migração da Unreal e hoje tem:
 
 - **Combate:** o motor em GDScript, portado do C++ da Unreal. Reproduz as 48 lutas gravadas passo a passo
   (`tests/test_combat_parity.gd`).
-- **Estação Raiz e campanha (fase 3a do plano):** o refúgio entre as expedições, em corte (plataforma do metrô e dois
-  subterrâneos com oito cômodos). A economia da Estação (suprimentos, água, energia), os cômodos que se recuperam, os
+- **Estação Raiz e campanha (fase 3 do plano):** o refúgio entre as expedições, em corte (plataforma do metrô e dois
+  subterrâneos com oito cômodos), transcrito da Estação da Unreal com os modelos da Poly Haven e os cards pintados, e
+  as cenas de lá: o relatório da volta na plataforma, a passagem secreta, o trem com o candidato, a equipe em fila para
+  a partida e os moradores trabalhando e sentando. A economia da Estação (suprimentos, água, energia), os cômodos que se recuperam, os
   civis que chegam pelo trem, a noite da volta, o elenco, a forja, a pesquisa e a Preparação (fase, equipe, foco da
   rota e suprimentos). O jogo abre na Estação; a partida leva à rua e a volta traz de novo, com o relatório.
 - **Jornada na rua (fase 2 do plano):** a Rua das Vitrines é o corredor de 10 trechos da Jornada 1, gerado pela semente
@@ -37,14 +39,15 @@ scripts/combat/   motor de combate, tabelas tipadas, a sessão de luta (comandos
 scripts/ui/       HUD de combate, da exploração e do refúgio
 scripts/world/    AHSpriteCard (personagem pintado com o pé fixo ao trocar de pose) e AHHouseRoom (interior das lojas)
 scripts/street/   Rua das Vitrines montada em código, chuva, colisão e o corredor (patrulhas, visão, portas, saque)
-scripts/station/  Estação Raiz em corte: cômodos, luz, moradores, trem e a câmera de cada cômodo
+scripts/station/  Estação Raiz em corte: a montagem transcrita da Unreal (station_build.gd), os auxiliares em cm
+                  (station_builder.gd), os moradores, o trem e a câmera de cada cômodo
 shaders/          pós-processamento Emberfall, fogueira que apaga, chuva e fumaça, feixes de luz, halos, silhuetas
 scenes/           boot.tscn (cena inicial: abre a Estação, ou a rua se há expedição), station.tscn e street.tscn
 data/             JSON de produção (classes, habilidades, inimigos...) e a gravação de paridade do combate;
                   presentation/combat_art.json diz onde está cada pose, ícone e som e mede a âncora no pé
 audio/            sons do combate
-art/              arte pintada usada pelo jogo (street: a rua; rooms: interiores; station: superfícies da Estação; civilians: os civis do
-                  trem; combat: heróis, inimigos, efeitos e ícones)
+art/              arte pintada usada pelo jogo (street: a rua; rooms: interiores; station: superfícies, modelos da Poly Haven e cards
+                  da Estação; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones)
 tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas e input)
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
                   precisa do Pillow) e define_input.gd (grava as ações)

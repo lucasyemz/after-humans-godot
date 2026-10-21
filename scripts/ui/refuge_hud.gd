@@ -24,6 +24,12 @@ var _feedback: Label
 var _feedback_tween: Tween
 ## Rascunho da Preparação: fase, equipe (da frente para trás), foco e suprimentos extras.
 var _draft := {}
+## Cartões sob cada um da fila na plataforma (relatório e partida), pelo id do herói.
+var _tags: Control
+var _tag_nodes := {}
+var _lineup_signature := ""
+## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
+var _arrived_candidate := ""
 
 
 func _ready() -> void:
@@ -47,6 +53,10 @@ func _ready() -> void:
 	_menu.add_theme_constant_override("separation", 6)
 	add_child(_menu)
 
+	_tags = Control.new()
+	_tags.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_tags.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_tags)
 	_panel = PanelContainer.new()
 	_panel.add_theme_stylebox_override("panel", H.panel_style(0.9))
 	_panel.position = Vector2(1210, 110)
@@ -86,6 +96,15 @@ func refresh() -> void:
 		status.append("alguém espera na plataforma")
 	_subtitle.text = " · ".join(status)
 	_build_menu()
+	if current == "departure" and not _draft.is_empty():
+		# A fila acompanha a equipe do rascunho (trocas e mudanças de ordem).
+		var signature := ",".join(_draft.team)
+		if signature != _lineup_signature:
+			_lineup_signature = signature
+			station.show_departure(_draft.team)
+			for tag in _tag_nodes.values():
+				tag.queue_free()
+			_tag_nodes.clear()
 	if current != "":
 		_show(current)
 
@@ -136,16 +155,87 @@ func open_room(room_id: String) -> void:
 
 func open_service(service: String) -> void:
 	current = service
-	if service == "train" or service == "report":
-		station.focus_platform()
+	match service:
+		"report":
+			var report: Dictionary = Campaign.state.station.last_return
+			station.show_report(report.get("team", []).filter(func(id): return S.hero(Campaign.state, id) != null and S.hero(Campaign.state, id).alive))
+		"train":
+			# O trem traz o candidato: chega do túnel uma vez por visita; depois ele só espera na plataforma.
+			var train: Dictionary = Campaign.state.station.train
+			if train.phase == "waiting" and not station.train_busy():
+				station.open_train(train.candidate_id, _arrived_candidate != train.candidate_id)
+				_arrived_candidate = train.candidate_id
 	refresh()
 
 
 func close_panel() -> void:
 	current = ""
 	_panel.visible = false
+	station.clear_lineup()
+	_lineup_signature = ""
 	station.focus_overview()
 	refresh()
+
+
+## A equipe da Preparação em fila na plataforma, esperando a partida (a câmera sobe pela passagem).
+func open_departure() -> void:
+	if _draft.is_empty():
+		_reset_draft()
+	current = "departure"
+	_lineup_signature = ""
+	refresh()
+
+
+func _process(_delta: float) -> void:
+	var showing := current == "report" or current == "departure"
+	_tags.visible = showing
+	if not showing:
+		return
+	var seen := {}
+	for entry in station.lineup_screen_positions():
+		seen[entry.hero_id] = true
+		if not _tag_nodes.has(entry.hero_id):
+			_tag_nodes[entry.hero_id] = _make_tag(entry.hero_id)
+			_tags.add_child(_tag_nodes[entry.hero_id])
+		var tag: Control = _tag_nodes[entry.hero_id]
+		tag.position = entry.at + Vector2(-tag.size.x * 0.5, 14)
+	for hero_id in _tag_nodes.keys():
+		if not seen.has(hero_id):
+			_tag_nodes[hero_id].queue_free()
+			_tag_nodes.erase(hero_id)
+
+
+## O cartão sob cada um (o relatório no estilo XCOM 2 da Unreal): nome, vida e o estado; na partida, a posição.
+func _make_tag(hero_id: String) -> Control:
+	var entry = S.hero(Campaign.state, hero_id)
+	var box := PanelContainer.new()
+	box.add_theme_stylebox_override("panel", H.panel_style(0.86))
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Do tamanho do espaço de cada um na fila (2,1 m): os cartões não se sobrepõem.
+	box.custom_minimum_size = Vector2(170, 0)
+	box.size = Vector2(170, 0)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 2)
+	box.add_child(column)
+	column.add_child(H.make_label(entry.display_name if entry else hero_id, 20, H.GOLD))
+	if entry:
+		column.add_child(H.make_label("Vida %d/%d" % [entry.hp, entry.max_hp], 16))
+		if current == "departure":
+			var rank: int = _draft.get("team", []).find(hero_id) + 1
+			var attacks := S.attacks_from_rank(entry.class_id, rank)
+			column.add_child(H.make_label("Posição %d" % rank, 15, H.MUTED))
+			var attack := H.make_label(attacks[0] if not attacks.is_empty() else "sem ataque aqui", 15, H.MUTED if not attacks.is_empty() else Color(1.0, 0.6, 0.5))
+			attack.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			attack.custom_minimum_size = Vector2(150, 0)
+			column.add_child(attack)
+		else:
+			var state: Array[String] = ["%d expedições" % int(entry.get("completed_expeditions", 0))]
+			if entry.trauma:
+				state.append("trauma")
+			elif entry.hp < entry.max_hp * 0.5:
+				state.append("ferido")
+			column.add_child(H.make_label(" · ".join(state), 15, H.MUTED))
+	return box
 
 
 func toast(text: String, error: bool = false) -> void:
@@ -180,6 +270,8 @@ func _show(key: String) -> void:
 			_report()
 		"train":
 			_train()
+		"departure":
+			_departure_view()
 		_:
 			_room(key)
 
@@ -406,6 +498,13 @@ func _preparation(c: Dictionary) -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 8)
 	_body.add_child(spacer)
+	if current == "departure":
+		_button("Voltar à Preparação", func():
+			station.clear_lineup()
+			_lineup_signature = ""
+			open_room(S.PREPARATION))
+	else:
+		_button("Escalar a equipe na plataforma", open_departure)
 	var depart := _button("Confirmar partida", _depart)
 	depart.custom_minimum_size = Vector2(0, 56)
 	depart.add_theme_font_size_override("font_size", 24)
@@ -447,6 +546,12 @@ func _depart() -> void:
 	_draft = {}
 	Campaign.save()
 	GameFlow.change_to("street")
+
+
+## A partida na plataforma: a equipe em fila e o mesmo painel da Preparação (equipe, foco, suprimentos, confirmar).
+func _departure_view() -> void:
+	_heading("Partida", "A equipe espera na plataforma, da frente (direita) para trás.")
+	_preparation(Campaign.state)
 
 
 # ---------------------------------------------------------------- Cantina, Depósito, Forja, Pesquisa
@@ -579,6 +684,7 @@ func _report() -> void:
 			_text("A Cora trouxe %d fragmento." % cycle.fragments_produced, 18)
 	_button("Entrar no abrigo", func():
 		Campaign.state.station.last_return.seen = true
+		station.clear_lineup()
 		station.commit()
 		if Campaign.state.night.phase != "none":
 			open_room(S.DORMITORY)
@@ -591,6 +697,9 @@ func _report() -> void:
 func _train() -> void:
 	var c: Dictionary = Campaign.state
 	var train: Dictionary = c.station.train
+	if train.phase == "departing":
+		_heading("O trem parte", "As portas fecham; o trem volta para o túnel.")
+		return
 	if train.phase != "waiting":
 		close_panel()
 		return
@@ -620,14 +729,18 @@ func _decide(candidate_id: String, accept: bool) -> void:
 	if error != "":
 		toast(error, true)
 		return
-	# A partida do trem é a cena da 3c; por enquanto ele parte na hora.
-	S.finish_departure(c)
 	var who := S.civilian(candidate_id)
+	station.commit()
+	toast(("%s vai morar na Estação." % who.name) if accept else "%s segue no trem. Pode voltar numa próxima viagem." % who.name)
+	# O trem fecha e parte (o recusado vai junto); acolhido, o civil fica e vai para o cômodo dele.
+	station.play_train_departure(not accept)
+	await get_tree().create_timer(4.0).timeout
+	S.finish_departure(c)
 	station.commit()
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
+	station.clear_candidate()
 	station._place_residents(rng)
-	toast(("%s vai morar na Estação." % who.name) if accept else "%s segue no trem. Pode voltar numa próxima viagem." % who.name)
 	if Campaign.state.night.phase != "none":
 		open_room(S.DORMITORY)
 	else:

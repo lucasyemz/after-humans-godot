@@ -1,79 +1,82 @@
-## Estação Raiz: o refúgio entre as expedições, em corte (port da planta do AAHShelterStation da Unreal). A plataforma do
-## metrô em cima, o subterrâneo 1 (Dormitório, Sala dos Personagens, Bar, Cantina) e o subterrâneo 2 (Pesquisa, Depósito,
-## Forja, Preparação), com o eixo de escadas à direita. Esta é a casca da Fase 3a: lajes, paredes, materiais da Poly Haven
-## e a luz de cada cômodo, com as mesmas medidas da Unreal; o mobiliário entra na 3b. O HUD (AHRefugeHud) cuida das telas.
+## Estação Raiz: o refúgio entre as expedições, em corte, transcrito do AAHShelterStation da Unreal. A montagem fica em
+## station_build.gd; aqui ficam a câmera (as chaves de posição, campo de visão e inclinação da Unreal), a passagem secreta
+## entre a plataforma e o abrigo, o trem que chega e parte, as filas do relatório e da partida na plataforma e os
+## moradores (passeio, banco da Cantina e poses de trabalho). O HUD (AHRefugeHud) cuida das telas e chama isto.
 ##
-## Medidas em metros, como na Unreal dividida por 100: X para a direita, Y para cima, Z para o fundo negativo (o corte
-## fica em Z 0, de frente para a câmera).
+## Medidas em metros: X para a direita, Y para cima, Z para o fundo negativo (o corte fica em Z 0, de frente para a câmera).
 class_name AHStation
 extends Node3D
 
 const S := preload("res://scripts/flow/station_rules.gd")
-const ART := "res://art/station/"
 
 const STATION_END := 27.6
-const TRACK_END := 25.6
-const PLATFORM_FRONT := -3.6
-const STATION_BACK := -10.0
-const BUFFERS_X := 24.4
-const CORE_X0 := 28.0
 const CORE_X1 := 33.6
-const B1_FLOOR := -5.2
-const B1_CEILING := -2.0
-const B2_FLOOR := -9.4
-const B2_CEILING := -6.2
-const FORGE_FLOOR := -10.4
-const ROOM_BACK := -9.0
-const VAULT_TOP := 6.2
 const LEFT_END := -12.4
-const DOOR_WIDTH := 1.1
-const DOOR_HEIGHT := 2.25
+const DOOR_X := 22.0
+const PANEL_SLIDE := 3.0
 
-const WARM := Color(1.0, 0.74, 0.47)
-const AMBER := Color(1.0, 0.62, 0.32)
-const NEUTRAL := Color(1.0, 0.94, 0.86)
-const COOL := Color(0.82, 0.9, 1.0)
-## Cal amarelada e gasta (o branco puro estourava sob as luminárias).
-const PLASTER_TINT := Color(0.78, 0.72, 0.62)
-const ROCK_TINT := Color(0.17, 0.15, 0.13)
-
-## Cômodos (a tabela Rooms da Unreal, na ordem do menu): id das regras, extensão em X, piso e teto, piso, parede,
-## lambri, cor da luz, porta do fundo e a faixa onde os moradores ficam.
+## Cômodos (a tabela Rooms da Unreal, na ordem do menu): extensão em X, piso e teto e a faixa livre de passeio.
 const ROOMS := [
-	{"id": "characters", "x0": -0.4, "x1": 7.6, "floor": B1_FLOOR, "ceiling": B1_CEILING, "floor_art": "wood_planks_grey",
-		"wall": "painted_plaster_wall", "wainscot": "", "light": WARM, "door": 1.2, "lane": [1.1, 6.1]},
-	{"id": "canteen", "x0": 15.6, "x1": STATION_END, "floor": B1_FLOOR, "ceiling": B1_CEILING, "floor_art": "worn_tile_floor",
-		"wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": WARM, "door": 17.0, "lane": [17.2, 25.6]},
-	{"id": "bar", "x0": 7.6, "x1": 15.6, "floor": B1_FLOOR, "ceiling": B1_CEILING, "floor_art": "wood_planks_grey",
-		"wall": "red_brick_03", "wainscot": "", "light": AMBER, "door": 8.8, "lane": [9.1, 14.1]},
-	{"id": "dormitory", "x0": -12.4, "x1": -0.4, "floor": B1_FLOOR, "ceiling": B1_CEILING, "floor_art": "wood_planks_grey",
-		"wall": "painted_plaster_wall", "wainscot": "", "light": WARM, "door": -2.1, "lane": [-10.9, -1.9]},
-	{"id": "forge", "x0": 11.6, "x1": 21.6, "floor": FORGE_FLOOR, "ceiling": B2_CEILING, "floor_art": "DiamondPlate008A",
-		"wall": "CorrugatedSteel009", "wainscot": "Metal021", "light": NEUTRAL, "door": 12.8, "lane": [13.6, 19.6]},
-	{"id": "depot", "x0": 5.6, "x1": 11.6, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "concrete_floor_worn_001",
-		"wall": "concrete_wall_008", "wainscot": "", "light": NEUTRAL, "door": 6.8, "lane": [7.2, 10.3]},
-	{"id": "research", "x0": -6.4, "x1": 5.6, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "concrete_floor_painted",
-		"wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "door": 3.9, "lane": [-4.9, 4.1]},
-	{"id": "preparation", "x0": 21.6, "x1": STATION_END, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "rubber_tiles",
-		"wall": "concrete_wall_008", "wainscot": "", "light": NEUTRAL, "door": 22.8, "lane": [22.9, 26.2]},
+	{"id": "characters", "x0": -0.4, "x1": 7.6, "floor": -5.2, "ceiling": -2.0, "lane": [1.1, 6.1]},
+	{"id": "canteen", "x0": 15.6, "x1": STATION_END, "floor": -5.2, "ceiling": -2.0, "lane": [17.2, 25.6]},
+	{"id": "bar", "x0": 7.6, "x1": 15.6, "floor": -5.2, "ceiling": -2.0, "lane": [9.1, 14.1]},
+	{"id": "dormitory", "x0": -12.4, "x1": -0.4, "floor": -5.2, "ceiling": -2.0, "lane": [-10.9, -1.9]},
+	{"id": "forge", "x0": 11.6, "x1": 21.6, "floor": -10.4, "ceiling": -6.2, "lane": [13.6, 19.6]},
+	{"id": "depot", "x0": 5.6, "x1": 11.6, "floor": -9.4, "ceiling": -6.2, "lane": [7.2, 10.3]},
+	{"id": "research", "x0": -6.4, "x1": 5.6, "floor": -9.4, "ceiling": -6.2, "lane": [-4.9, 4.1]},
+	{"id": "preparation", "x0": 21.6, "x1": STATION_END, "floor": -9.4, "ceiling": -6.2, "lane": [22.9, 26.2]},
 ]
 ## Profundidade em que os moradores ficam (a faixa de passeio da Unreal, Y -330).
 const LANE_Z := -3.3
 ## Chance de um morador dividir um cômodo já ocupado (no máximo dois).
 const SHARE_ROOM_CHANCE := 0.3
+## Passeio (a Unreal anda a 120 cm/s); quem desce do trem anda a 3 m/s.
+const WALK_SPEED := 1.2
+const TRAIN_WALK_SPEED := 3.0
+## Banco atrás da mesa da Cantina: os dois lugares e a profundidade (CanteenSeats, CanteenSeatY).
+const CANTEEN_SEATS := [17.6, 19.4]
+const CANTEEN_SEAT_Z := -5.94
+## Trabalho por sala (#80): o herói fundador, o cômodo e a pose. Só vale com o cômodo recuperado e ligado.
+const WORK_POSES := {"hero_cao_bento": "forge", "hero_gato_nick": "depot", "hero_sapo_iris": "research", "hero_coruja_vespera": "research"}
+## A fila do relatório e da partida na plataforma, diante da parede de serviço (ReportCenterX, ReportSpacing, ReportY).
+const LINE_CENTER_X := 13.8
+const LINE_SPACING := 2.1
+const LINE_Z := -6.4
+## O trem: entra do túnel em 3,2 s, pausa na porta até 4 s; sai fechando e acelerando (TrainSlideEnd, TrainDoorEnd).
+const TRAIN_SLIDE_END := 3.2
+const TRAIN_DOOR_END := 4.0
+const TRAIN_OUT := -32.0
+## A faixa da tela que o HUD deixa livre (na base de 1920): à direita do menu e, com um painel aberto, à esquerda dele.
+const SCREEN_MENU_RIGHT := 380.0
+const SCREEN_PANEL_LEFT := 1200.0
 
 var hud: AHRefugeHud
 var camera: Camera3D
 var residents := {}
-var _materials := {}
-var _room_lights := {}
-var _camera_target := Vector3.ZERO
-var _camera_distance := 60.0
-var _camera_tween: Tween
+## Na plataforma (o relatório, o trem, a partida) ou no abrigo; a passagem secreta liga os dois.
+var on_platform := false
+var lineup: Array = []
+var _build: AHStationBuild
+var _walkers: Array = []
 var _combat_art := {}
 var _civilian_art := {}
-var _candidate_card: AHSpriteCard
-var _train: Node3D
+var _poses := {}
+var _key := {}
+var _goal := {}
+var _path: Array = []
+var _path_time := 0.0
+var _path_duration := 0.0
+var _path_down := false
+var _panel_open := 0.0
+var _seats := {}
+var _contacts: Array = []
+var _wagon_base := {}
+var _train_mode := 0
+var _train_time := 0.0
+var _warning_time := -1.0
+var _candidate: AHSpriteCard
+var _candidate_id := ""
+var _pending_arrival := ""
 
 
 func _ready() -> void:
@@ -85,12 +88,23 @@ func _ready() -> void:
 		return
 	_combat_art = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
 	_civilian_art = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/civilians.json"))
+	_poses = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/station_poses.json"))
 	_build_environment()
-	_build_platform()
-	_build_levels()
-	for room in ROOMS:
-		_build_room(room)
-	_build_core()
+	var builder := AHStationBuilder.new(self)
+	_build = AHStationBuild.new(builder)
+	_build.build()
+	# O que liga e desliga fica separado; o resto vira uma malha por material.
+	var keep := {}
+	for nodes in _build.dressing.values():
+		for node in nodes:
+			keep[node] = true
+	for entry in _build.stock:
+		for node in entry[1]:
+			keep[node] = true
+	for node in _build.wagon:
+		keep[node] = true
+		_wagon_base[node] = node.position
+	builder.merge_static(keep)
 	_build_camera()
 	_build_post()
 	hud = AHRefugeHud.new()
@@ -99,12 +113,13 @@ func _ready() -> void:
 	layer.layer = 2
 	layer.add_child(hud)
 	add_child(layer)
+	_apply_panel(0.0)
 	_arrive(campaign)
 	refresh()
 
 
 ## Chegada: a volta da expedição (se o jogo fechou no relatório da rua, a entrega acontece aqui), os voluntários a
-## caminho e o que espera o jogador (o relatório, a noite, o trem).
+## caminho e o que espera o jogador (o relatório na plataforma, a noite, o trem).
 func _arrive(campaign: Dictionary) -> void:
 	if campaign.session.get("expedition") != null and campaign.session.get("result", "") != "":
 		S.finish_return(campaign)
@@ -116,6 +131,7 @@ func _arrive(campaign: Dictionary) -> void:
 	if not campaign.station.last_return.is_empty() and not campaign.station.last_return.get("seen", false):
 		hud.open_service("report")
 	elif campaign.night.phase != "none":
+		focus_overview(true)
 		hud.open_room("dormitory")
 	elif S.visit_pending(campaign):
 		hud.open_service("train")
@@ -123,7 +139,7 @@ func _arrive(campaign: Dictionary) -> void:
 		focus_overview(true)
 
 
-## Grava a campanha e atualiza tudo o que mostra o estado (HUD, moradores, trem, luzes com energia).
+## Grava a campanha e atualiza tudo o que mostra o estado (HUD, luzes com energia, mobiliário, estoque, moradores).
 func commit() -> void:
 	Campaign.save()
 	refresh()
@@ -132,84 +148,214 @@ func commit() -> void:
 func refresh() -> void:
 	var campaign: Dictionary = Campaign.state
 	var running := S.running_rooms(campaign)
-	for room_id in _room_lights:
-		var light: OmniLight3D = _room_lights[room_id]
+	for room_id in _build.room_lights:
+		var light: OmniLight3D = _build.room_lights[room_id]
+		if not light.has_meta("energy"):
+			light.set_meta("energy", light.light_energy)
 		var level := S.room_level(campaign, room_id)
 		# Cômodo vazio fica na penumbra; sem energia, a luz cai (as salas que gastam energia).
 		var powered: bool = not [S.CANTEEN, S.RESEARCH, S.FORGE].has(room_id) or running.has(room_id)
-		light.light_energy = (4.0 if powered else 1.4) if level >= 1 else 1.2
-	_update_train(campaign)
+		light.light_energy = float(light.get_meta("energy")) * ((1.0 if powered else 0.4) if level >= 1 else 0.3)
+	# O mobiliário some nos cômodos vazios (nível 0: Forja, Pesquisa, Bar e Dormitório numa jornada nova).
+	for room_id in _build.dressing:
+		var furnished := S.room_level(campaign, room_id) >= 1
+		for node in _build.dressing[room_id]:
+			if is_instance_valid(node):
+				node.visible = furnished
+	# O estoque visível acompanha os suprimentos (#65): cada faixa acende uma prateleira.
+	var band := S.supply_band(S.quantity(campaign, S.SUPPLIES))
+	for entry in _build.stock:
+		for node in entry[1]:
+			if is_instance_valid(node):
+				node.visible = band >= entry[0] and S.room_level(campaign, S.DEPOT) >= 1
 	if hud:
 		hud.refresh()
+
+
+func _process(delta: float) -> void:
+	_tick_camera(delta)
+	if _pending_arrival != "" and _path.is_empty():
+		play_train_arrival(_pending_arrival)
+		_pending_arrival = ""
+	_tick_train(delta)
+	_walk(delta)
+	if _build.ember_light:
+		# Brasas: variação lenta e pequena (duas senoides fora de fase), sem piscar.
+		var time := Time.get_ticks_msec() * 0.001
+		if not _build.ember_light.has_meta("energy"):
+			_build.ember_light.set_meta("energy", _build.ember_light.light_energy)
+		_build.ember_light.light_energy = float(_build.ember_light.get_meta("energy")) * (1.0 + 0.1 * sin(time * 6.3) + 0.05 * sin(time * 14.1 + 1.3))
 
 
 # ---------------------------------------------------------------- câmera
 
 func _build_camera() -> void:
 	camera = Camera3D.new()
-	camera.fov = 26.0
 	camera.far = 300.0
 	add_child(camera)
-	_camera_target = Vector3((LEFT_END + CORE_X1) * 0.5, -2.0, -4.0)
-	_camera_distance = 62.0
-	_place_camera()
+	_key = _overview_key()
+	_goal = _key
+	_apply_key(_key)
 
 
-func _place_camera() -> void:
-	var pitch := deg_to_rad(3.0)
-	camera.position = _camera_target + Vector3(0, sin(pitch) * _camera_distance, cos(pitch) * _camera_distance)
-	camera.look_at(_camera_target)
+## Chave de câmera da Unreal (FCameraKey): posição em cm nos eixos de lá, FOV horizontal e inclinação (positiva olha
+## para cima).
+func ue_key(x: float, y: float, z: float, horizontal_fov: float, pitch: float) -> Dictionary:
+	var aspect := get_viewport().get_visible_rect().size.aspect()
+	var vertical := rad_to_deg(2.0 * atan(tan(deg_to_rad(horizontal_fov * 0.5)) / aspect))
+	return {"pos": AHStationBuilder.v(x, y, z), "fov": vertical, "pitch": pitch}
 
 
-func _move_camera(target: Vector3, distance: float, instant: bool) -> void:
-	if _camera_tween:
-		_camera_tween.kill()
+func _apply_key(key: Dictionary) -> void:
+	camera.position = key.pos
+	camera.rotation = Vector3(deg_to_rad(key.pitch), 0, 0)
+	camera.fov = key.fov
+
+
+static func _lerp_key(a: Dictionary, b: Dictionary, t: float) -> Dictionary:
+	return {"pos": a.pos.lerp(b.pos, t), "fov": lerpf(a.fov, b.fov, t), "pitch": lerpf(a.pitch, b.pitch, t)}
+
+
+func _set_goal(key: Dictionary, instant: bool = false) -> void:
+	_goal = key
 	if instant:
-		_camera_target = target
-		_camera_distance = distance
-		_place_camera()
+		_key = key
+		_apply_key(_key)
+
+
+## A câmera segue a chave com suavização (VInterpTo da Unreal); na passagem, percorre o caminho e abre o painel.
+func _tick_camera(delta: float) -> void:
+	if not _path.is_empty():
+		_path_time += delta
+		# Descendo: 1,2 s só do painel e da alavanca; depois a câmera percorre o caminho.
+		var panel_phase := 1.2 if _path_down else 0.0
+		var open_start := 0.0 if _path_down else 0.35
+		var close_start := _path_duration - 1.0
+		var opening := clampf((_path_time - open_start) / 0.9, 0.0, 1.0)
+		var closing := clampf((_path_time - close_start) / 0.9, 0.0, 1.0)
+		_apply_panel(opening * (1.0 - closing))
+		var travel := clampf((_path_time - panel_phase) / (_path_duration - panel_phase), 0.0, 1.0)
+		var segments := _path.size() - 1
+		var scaled := travel * segments
+		var segment := mini(floori(scaled), segments - 1)
+		var alpha := smoothstep(0.0, 1.0, scaled - segment)
+		_key = _lerp_key(_path[segment], _path[segment + 1], alpha)
+		_apply_key(_key)
+		if _path_time >= _path_duration:
+			_goal = _path[-1]
+			_path.clear()
+			_apply_panel(0.0)
 		return
-	_camera_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_camera_tween.tween_property(self, "_camera_target", target, 0.7)
-	_camera_tween.tween_property(self, "_camera_distance", distance, 0.7)
+	_key = _lerp_key(_key, _goal, 1.0 - exp(-5.0 * delta))
+	_apply_key(_key)
 
 
-func _process(_delta: float) -> void:
-	if camera:
-		_place_camera()
+## Põe a extensão x0..x1 (na profundidade depth) inteira na faixa da tela entre left_px e right_px, com o centro vertical
+## em y. pitch negativo olha de cima (os cômodos); positivo, de baixo (as filas na plataforma, como a Unreal).
+func _framed_key(x0: float, x1: float, y: float, left_px: float, right_px: float, fov: float = 26.0, pitch: float = -3.0,
+		depth: float = -4.5) -> Dictionary:
+	var aspect := get_viewport().get_visible_rect().size.aspect()
+	var half_width_per_meter := tan(deg_to_rad(fov * 0.5)) * aspect
+	var share := (right_px - left_px) / 1920.0
+	var distance := (x1 - x0) / (2.0 * half_width_per_meter * share * 0.94)
+	var offset := ((left_px + right_px) * 0.5 - 960.0) / 1920.0 * 2.0 * half_width_per_meter * distance
+	var target := Vector3((x0 + x1) * 0.5 - offset, y, depth)
+	var tilt := deg_to_rad(-pitch)
+	return {"pos": target + Vector3(0, sin(tilt) * distance, cos(tilt) * distance), "fov": fov, "pitch": pitch}
 
 
-## A faixa da tela que o HUD deixa livre (na base de 1920): à direita do menu e, com um painel aberto, à esquerda dele.
-const SCREEN_MENU_RIGHT := 380.0
-const SCREEN_PANEL_LEFT := 1200.0
+func _overview_key() -> Dictionary:
+	return _framed_key(LEFT_END - 0.5, CORE_X1 + 0.5, -2.4, SCREEN_MENU_RIGHT, 1900.0, 26.0, -3.0, 0.0)
 
 
-## O corte inteiro, à direita do menu.
+## A plataforma, o vagão e o fim da linha (PlatformKey da Unreal).
+func _platform_key() -> Dictionary:
+	return ue_key(1650, 2600, 230, 58, -3)
+
+
 func focus_overview(instant: bool = false) -> void:
-	_frame(LEFT_END - 0.5, CORE_X1 + 0.5, -2.4, SCREEN_MENU_RIGHT, 1900.0, instant)
-
-
-func focus_platform(instant: bool = false) -> void:
-	_frame(0.5, STATION_END, 2.0, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, instant)
+	_go(_overview_key(), false, instant)
 
 
 func focus_room(room_id: String, instant: bool = false) -> void:
 	var room := room_def(room_id)
 	if room.is_empty():
 		return
-	_frame(room.x0 - 0.3, room.x1 + 0.3, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, instant)
+	_go(_framed_key(room.x0 - 0.3, room.x1 + 0.3, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
 
 
-## Põe a extensão x0..x1 inteira na faixa da tela entre left_px e right_px (na base de 1920), com o centro vertical em
-## y. A câmera fica de frente para o corte, então a distância sai da largura que a faixa mostra.
-func _frame(x0: float, x1: float, y: float, left_px: float, right_px: float, instant: bool) -> void:
-	var aspect := get_viewport().get_visible_rect().size.aspect()
-	var half_width_per_meter := tan(deg_to_rad(camera.fov * 0.5)) * aspect
-	var share := (right_px - left_px) / 1920.0
-	# O corte fica em Z 0 e a câmera olha para Z ~ -4: a distância conta até o plano da frente.
-	var distance := (x1 - x0) / (2.0 * half_width_per_meter * share * 0.94) + 4.5
-	var offset := ((left_px + right_px) * 0.5 - 960.0) / 1920.0 * 2.0 * half_width_per_meter * (distance - 4.5)
-	_move_camera(Vector3((x0 + x1) * 0.5 - offset, y, -4.5), distance, instant)
+## A plataforma onde o trem para e o candidato espera.
+func focus_platform(instant: bool = false) -> void:
+	_go(_framed_key(1.0, 21.0, 1.8, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), true, instant)
+
+
+## O trem: a câmera sobe para a plataforma; terminada a passagem, o trem chega com o candidato (uma vez por visita) e a
+## câmera fecha nele de corpo inteiro, à esquerda do painel (FocusTrainCandidate).
+func open_train(candidate_id: String, arrive: bool) -> void:
+	clear_lineup()
+	_go(_platform_key(), true, false)
+	if arrive:
+		_pending_arrival = candidate_id
+	else:
+		show_candidate(candidate_id)
+		_set_goal(_candidate_key())
+
+
+func _candidate_key() -> Dictionary:
+	var feet := _departure_slot(1)
+	return ue_key(feet.x * 100 + 100, feet.z * 100 + 650, 92, 44, 0)
+
+
+## A câmera da fila na plataforma: baixa, olhando um pouco para cima, com a fila inteira à esquerda do painel.
+func _line_key(count: int) -> Dictionary:
+	# A fila ocupa a faixa entre o menu e o painel de ponta a ponta (cada um com ~0,7 m de folga): os personagens grandes,
+	# como o relatório da Unreal, e os cartões embaixo.
+	var half := (maxi(1, count) - 1) * 0.5 * LINE_SPACING + 0.7
+	return _framed_key(LINE_CENTER_X - half, LINE_CENTER_X + half, 1.0, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT + 30.0, 40.0, 3.0, LINE_Z)
+
+
+## Vai para a chave; entre a plataforma e o abrigo, pela passagem secreta (a não ser no instante inicial).
+func _go(key: Dictionary, platform: bool, instant: bool) -> void:
+	if platform != on_platform and not instant:
+		_start_passage(not platform, key)
+	else:
+		_set_goal(key, instant)
+	on_platform = platform
+
+
+## Plataforma -> diante do painel -> porta -> antecâmara -> eixo de escadas -> abrigo (e o inverso), com o painel do
+## mapa da rede abrindo e fechando atrás da equipe (StartPassage da Unreal).
+func _start_passage(down: bool, final: Dictionary) -> void:
+	var door := ue_key(DOOR_X * 100 + 60, 760, 150, 50, -2)
+	var antechamber := ue_key(3080, 1150, 140, 56, -6)
+	var core := ue_key(3080, 1350, -420, 58, -4)
+	var path := [_platform_key(), door, antechamber, core, _overview_key()]
+	if not down:
+		path.reverse()
+	path[-1] = final
+	path[0] = _key
+	_path = path
+	_path_time = 0.0
+	_path_duration = 5.2 if down else 3.6
+	_path_down = down
+
+
+func passage_moving() -> bool:
+	return not _path.is_empty()
+
+
+## O painel desliza 3 m para a esquerda, a alavanca gira e a fresta de luz some (ApplyPanel).
+func _apply_panel(open: float) -> void:
+	_panel_open = clampf(open, 0.0, 1.0)
+	var eased := smoothstep(0.0, 1.0, _panel_open)
+	if _build.panel:
+		_build.panel.position.x = DOOR_X - PANEL_SLIDE * eased
+	if _build.lever:
+		_build.lever.basis = AHStationBuilder.basis(0, 0, -110.0 * clampf(_panel_open * 4.0, 0.0, 1.0))
+	if _build.slit:
+		_build.slit.visible = _panel_open < 0.02
+	if _build.slit_light:
+		_build.slit_light.light_energy = (8.0 if _panel_open < 0.02 else 100.0) / AHStationBuilder.LUMENS_PER_ENERGY
 
 
 static func room_def(room_id: String) -> Dictionary:
@@ -219,21 +365,220 @@ static func room_def(room_id: String) -> Dictionary:
 	return {}
 
 
+# ---------------------------------------------------------------- filas na plataforma
+
+func _line_slot(index: int, count: int) -> Vector3:
+	return Vector3(LINE_CENTER_X + (index - (maxi(1, count) - 1) * 0.5) * LINE_SPACING, 0, LINE_Z)
+
+
+## Posição 1 (a frente) na direita, 4 na esquerda, como na tela de formação.
+func _departure_slot(position: int) -> Vector3:
+	return Vector3(LINE_CENTER_X + (1.5 - position) * LINE_SPACING, 0, LINE_Z)
+
+
+## O relatório: os sobreviventes de pé na plataforma, a câmera baixa e próxima olhando um pouco para cima (ShowReport).
+func show_report(hero_ids: Array, instant: bool = true) -> void:
+	clear_lineup()
+	for index in hero_ids.size():
+		_line_card(hero_ids[index], _line_slot(index, hero_ids.size()))
+	on_platform = true
+	_path.clear()
+	_apply_panel(0.0)
+	_set_goal(_line_key(hero_ids.size()), instant)
+
+
+## A partida: a equipe em fila (posição 1 à direita) com o contato no chão; do abrigo, sobe pela passagem (ShowDeparture).
+func show_departure(front_to_back: Array) -> void:
+	var first := lineup.is_empty()
+	clear_lineup()
+	for position in mini(4, front_to_back.size()):
+		_line_card(front_to_back[position], _departure_slot(position))
+	if first:
+		_go(_line_key(4), true, false)
+
+
+func _line_card(hero_id: String, feet: Vector3) -> void:
+	var entry = S.hero(Campaign.state, hero_id)
+	var art := _hero_art(entry)
+	if art.is_empty():
+		return
+	var card := AHSpriteCard.new()
+	card.body_height = AHCharacterHeights.find(hero_id)
+	card.show_art(art.idle)
+	add_child(card)
+	card.position = feet
+	card.set_facing(1.0)
+	lineup.append({"hero_id": hero_id, "card": card})
+	_contacts.append(_contact(feet, Vector2(0.9, 0.45)))
+	# Quem está na fila não aparece ao mesmo tempo no seu cômodo.
+	if residents.has(hero_id):
+		residents[hero_id].visible = false
+
+
+func clear_lineup() -> void:
+	for entry in lineup:
+		if is_instance_valid(entry.card):
+			entry.card.queue_free()
+		if residents.has(entry.hero_id):
+			residents[entry.hero_id].visible = true
+	lineup.clear()
+	for contact in _contacts:
+		if is_instance_valid(contact):
+			contact.queue_free()
+	_contacts.clear()
+
+
+func _contact(feet: Vector3, size: Vector2) -> MeshInstance3D:
+	var gradient := Gradient.new()
+	gradient.set_color(0, Color(0, 0, 0, 0.45))
+	gradient.set_color(1, Color(0, 0, 0, 0))
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill = GradientTexture2D.FILL_RADIAL
+	texture.fill_from = Vector2(0.5, 0.5)
+	texture.fill_to = Vector2(1.0, 0.5)
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = texture
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	var plane := PlaneMesh.new()
+	plane.size = size
+	var mesh := MeshInstance3D.new()
+	mesh.mesh = plane
+	mesh.material_override = material
+	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mesh.position = feet + Vector3(0, 0.008, 0)
+	add_child(mesh)
+	return mesh
+
+
+## Onde fica, na tela, o pé de cada um da fila (o HUD põe o cartão embaixo).
+func lineup_screen_positions() -> Array:
+	var out: Array = []
+	for entry in lineup:
+		if is_instance_valid(entry.card) and not camera.is_position_behind(entry.card.position):
+			out.append({"hero_id": entry.hero_id, "at": camera.unproject_position(entry.card.position)})
+	return out
+
+
+# ---------------------------------------------------------------- trem
+
+func _offset_wagon(x: float) -> void:
+	for node in _wagon_base:
+		if is_instance_valid(node):
+			node.position = _wagon_base[node] + Vector3(x, 0, 0)
+
+
+## O trem chega do túnel com o candidato: desacelera até parar, pausa na porta e o candidato desce e anda até a
+## plataforma (PlayTrainArrival). O sinal vermelho pisca enquanto ele se aproxima.
+func play_train_arrival(candidate_id: String) -> void:
+	_remove_candidate()
+	_candidate_id = candidate_id
+	_train_mode = 1
+	_train_time = 0.0
+	_warning_time = 0.0
+	_offset_wagon(TRAIN_OUT)
+
+
+## Fecha e acelera para o túnel; fica fora até a próxima chegada. Recusado, o candidato vai junto (PlayTrainDeparture).
+func play_train_departure(candidate_leaves: bool) -> void:
+	_warning_time = -1.0
+	if candidate_leaves:
+		_remove_candidate()
+	_train_mode = 2
+	_train_time = 0.0
+	_offset_wagon(0.0)
+
+
+func train_busy() -> bool:
+	return _train_mode != 0
+
+
+## O candidato esperando na plataforma, sem a chegada (o jogo foi reaberto com o trem parado).
+func show_candidate(candidate_id: String) -> void:
+	if is_instance_valid(_candidate) and _candidate_id == candidate_id:
+		return
+	_remove_candidate()
+	_candidate_id = candidate_id
+	_spawn_candidate(_departure_slot(1))
+	_offset_wagon(0.0)
+
+
+func clear_candidate() -> void:
+	_remove_candidate()
+	_candidate_id = ""
+
+
+func _remove_candidate() -> void:
+	if is_instance_valid(_candidate):
+		_candidate.queue_free()
+	_candidate = null
+	_walkers = _walkers.filter(func(w): return is_instance_valid(w.card))
+
+
+func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
+	var art: Dictionary = _civilian_art.get(_candidate_id, {})
+	if art.is_empty():
+		return null
+	_candidate = AHSpriteCard.new()
+	_candidate.body_height = AHCharacterHeights.find(_candidate_id)
+	_candidate.show_art(art)
+	add_child(_candidate)
+	_candidate.position = feet
+	_candidate.set_facing(1.0)
+	return _candidate
+
+
+func _tick_train(delta: float) -> void:
+	if _warning_time >= 0.0:
+		_warning_time += delta
+	var approaching := _warning_time >= 0.0
+	var bright := not approaching or fmod(_warning_time, 0.8) < 0.4
+	if _build.signal_light:
+		_build.signal_light.light_energy = (90.0 if bright else 9.0) / AHStationBuilder.LUMENS_PER_ENERGY
+	if _build.signal_glow:
+		_build.signal_glow.visible = bright
+	if _train_mode == 0:
+		return
+	var before := _train_time
+	_train_time += delta
+	if _train_mode == 2:
+		var alpha := clampf((_train_time - 0.55) / 2.6, 0.0, 1.0)
+		_offset_wagon(-36.0 * alpha * alpha)
+		if _train_time >= 3.75:
+			_train_mode = 0
+		return
+	if _train_time >= TRAIN_SLIDE_END:
+		_warning_time = -1.0
+	var slide := clampf(_train_time / TRAIN_SLIDE_END, 0.0, 1.0)
+	_offset_wagon(TRAIN_OUT * (1.0 - slide) * (1.0 - slide))
+	var target := _departure_slot(1)
+	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
+		# Desce pela porta do vagão (3,3 m antes do lugar dele) e anda até a plataforma.
+		var card := _spawn_candidate(target - Vector3(3.3, 0, 0))
+		if card:
+			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
+				"speed": TRAIN_WALK_SPEED, "stay": true, "home_z": target.z})
+	if _train_time >= TRAIN_DOOR_END and (not is_instance_valid(_candidate) or absf(_candidate.position.x - target.x) < 0.05):
+		_train_mode = 0
+		_set_goal(_candidate_key())
+
+
 # ---------------------------------------------------------------- moradores
 
-## Cada herói vivo num cômodo sorteado (30% de chance de dividir um já ocupado, no máximo dois), parado na faixa do
-## cômodo; os civis ficam no cômodo deles. O passeio pelos cômodos entra na 3b.
+## Cada herói vivo num cômodo sorteado (30% de chance de dividir um já ocupado, no máximo dois), passeando pela faixa
+## do cômodo; os civis ficam no cômodo deles, alternando o idle e a pose de trabalho.
 func _place_residents(rng: RandomNumberGenerator) -> void:
 	for card in residents.values():
 		card.queue_free()
 	residents.clear()
+	_walkers.clear()
+	_seats.clear()
 	var campaign: Dictionary = Campaign.state
 	var occupancy := {}
 	var free_rooms: Array = ROOMS.map(func(r): return r.id)
 	for entry in S.living(campaign):
-		var art: Dictionary = _combat_art.heroes.get(entry.id, {})
-		if art.is_empty():
-			art = _class_art(entry.class_id)
+		var art := _hero_art(entry)
 		if art.is_empty():
 			continue
 		var room_id: String
@@ -249,10 +594,19 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		card.show_art(art.idle)
 		add_child(card)
 		var lane: Array = room.lane
-		var slot := 0.3 if occupancy[room_id] == 1 else 0.7
-		card.position = Vector3(lerpf(lane[0], lane[1], slot + rng.randf_range(-0.12, 0.12)), room.floor, LANE_Z + rng.randf_range(-0.3, 0.3))
+		var occupants: int = occupancy[room_id]
+		var half: float = (lane[1] - lane[0]) * 0.5
+		# O segundo morador do cômodo passeia na metade da direita da faixa.
+		var lane_min: float = lane[0] if occupants == 1 else lane[0] + half
+		var lane_max: float = lane[1]
+		card.position = Vector3(rng.randf_range(lane_min, lane_max), room.floor, LANE_Z + rng.randf_range(-0.3, 0.3))
 		card.set_facing(1.0 if rng.randf() < 0.5 else -1.0)
 		residents[entry.id] = card
+		var walker := {"card": card, "min": lane_min, "max": lane_max, "target": card.position.x, "wait": rng.randf_range(0.5, 4.0),
+			"phase": rng.randf() * TAU, "room": room_id, "idle": art.idle, "hero_id": entry.id, "home_z": card.position.z,
+			"floor": room.floor, "seat": -1, "sitting": 0.0, "work": WORK_POSES.get(entry.id, "") == room_id and _poses.has(entry.id + "_work"),
+			"working": 0.0, "pause": rng.randf_range(1.0, 4.0)}
+		_walkers.append(walker)
 	for civilian_id in campaign.station.residents:
 		var art: Dictionary = _civilian_art.get(civilian_id, {})
 		var room := room_def(S.civilian(civilian_id).get("room", ""))
@@ -264,12 +618,19 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		add_child(card)
 		card.position = Vector3(lerpf(room.lane[0], room.lane[1], 0.5), room.floor, LANE_Z - 0.4)
 		residents[civilian_id] = card
+		# Civil morador: alterna o idle e a pose de trabalho, parado no posto dele.
+		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
 
 
-## Recrutas novos ainda não têm arte própria: usam a do fundador da mesma classe.
-func _class_art(class_id: String) -> Dictionary:
+## A arte do herói (recrutas novos usam a do fundador da mesma classe).
+func _hero_art(entry) -> Dictionary:
+	if entry == null:
+		return {}
+	var art: Dictionary = _combat_art.heroes.get(entry.id, {})
+	if not art.is_empty():
+		return art
 	for hero_id in _combat_art.heroes:
-		if hero_id.begins_with("hero_%s_" % class_id):
+		if hero_id.begins_with("hero_%s_" % entry.class_id):
 			return _combat_art.heroes[hero_id]
 	return {}
 
@@ -278,90 +639,109 @@ func civilian_art(civilian_id: String) -> Dictionary:
 	return _civilian_art.get(civilian_id, {})
 
 
-## O trem na plataforma enquanto há um candidato esperando (ou partindo), com o candidato na porta.
-func _update_train(campaign: Dictionary) -> void:
-	var train: Dictionary = campaign.station.train
-	_train.visible = train.phase != "none"
-	if _candidate_card:
-		_candidate_card.queue_free()
-		_candidate_card = null
-	if train.phase == "waiting":
-		var art := civilian_art(train.candidate_id)
-		if not art.is_empty():
-			_candidate_card = AHSpriteCard.new()
-			_candidate_card.body_height = AHCharacterHeights.find(train.candidate_id)
-			_candidate_card.show_art(art)
-			add_child(_candidate_card)
-			_candidate_card.position = Vector3(15.4, 0.0, -4.6)
-			_candidate_card.set_facing(1.0)
+## O passeio e o lobby vivo: anda a 1,2 m/s até um ponto da faixa (virado para onde anda, com um balanço de passo),
+## descansa e escolhe outro; na Cantina às vezes senta no banco; quem tem pose de trabalho na sala alterna trabalho e
+## pausa (só com a sala recuperada e ligada); os civis alternam o idle e o trabalho.
+func _walk(delta: float) -> void:
+	var time := Time.get_ticks_msec() * 0.001
+	var running := S.running_rooms(Campaign.state)
+	# Cartas liberadas (o candidato que embarcou, moradores refeitos) saem da lista antes de qualquer acesso.
+	_walkers = _walkers.filter(func(w): return is_instance_valid(w.card))
+	for walker in _walkers:
+		var card: AHSpriteCard = walker.card
+		if not card.visible:
+			continue
+		if walker.has("civilian"):
+			walker.civil_timer -= delta
+			if walker.civil_timer <= 0.0:
+				walker.civil_working = not walker.civil_working
+				var work: Dictionary = _poses.get(walker.civilian + "_work", {})
+				card.show_art(work if walker.civil_working and not work.is_empty() else walker.idle)
+				walker.civil_timer = randf_range(6.0, 10.0) if walker.civil_working else randf_range(4.0, 7.0)
+			continue
+		# Sentado no banco da Cantina: fica um pouco e levanta.
+		if walker.get("sitting", 0.0) > 0.0:
+			walker.sitting -= delta
+			if walker.sitting <= 0.0:
+				_stand_up(walker)
+			continue
+		# Pose de trabalho na sala (Forja, Depósito, Pesquisa), no posto do meio da faixa.
+		if walker.get("work", false):
+			var room_on: bool = S.room_level(Campaign.state, walker.room) >= 1 and (not [S.FORGE, S.RESEARCH].has(walker.room) or running.has(walker.room))
+			if room_on:
+				if walker.working > 0.0:
+					walker.working -= delta
+					if walker.working <= 0.0:
+						card.show_art(walker.idle)
+						card.position.z = walker.home_z
+						walker.pause = randf_range(4.0, 10.0)
+					continue
+				walker.pause -= delta
+				if walker.pause <= 0.0 and walker.wait > 0.0:
+					card.show_art(_poses[walker.hero_id + "_work"])
+					card.position = Vector3((walker.min + walker.max) * 0.5, walker.floor, -5.6)
+					card.set_facing(1.0)
+					card.scale = Vector3.ONE
+					walker.working = randf_range(12.0, 26.0)
+					continue
+		if walker.wait > 0.0:
+			walker.wait -= delta
+			card.scale = Vector3(1, 1.0 + 0.012 * sin(time * 2.2 + walker.phase), 1)
+			if walker.wait <= 0.0:
+				_choose_target(walker)
+			continue
+		var gap: float = walker.target - card.position.x
+		var speed: float = walker.get("speed", WALK_SPEED)
+		if absf(gap) < 0.05:
+			card.scale = Vector3.ONE
+			if walker.get("stay", false):
+				walker.wait = INF
+				continue
+			if walker.get("seat", -1) >= 0:
+				_sit_down(walker)
+				continue
+			walker.wait = randf_range(2.5, 7.0)
+			continue
+		card.set_facing(signf(gap))
+		card.position.x += signf(gap) * minf(absf(gap), speed * delta)
+		card.scale = Vector3(1, 1.0 + 0.025 * absf(sin(time * 7.0 + walker.phase)), 1)
 
 
-# ---------------------------------------------------------------- casca
-
-func _surface(name: String, tint: Color = Color.WHITE, scale: float = 0.5) -> StandardMaterial3D:
-	var key := "%s|%s|%s" % [name, tint.to_html(), scale]
-	if _materials.has(key):
-		return _materials[key]
-	var material := StandardMaterial3D.new()
-	var path := ART + name + ".webp"
-	if ResourceLoader.exists(path):
-		material.albedo_texture = load(path)
-	material.albedo_color = tint
-	material.uv1_triplanar = true
-	material.uv1_world_triplanar = true
-	material.uv1_scale = Vector3.ONE * scale
-	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
-	material.roughness = 0.9
-	_materials[key] = material
-	return material
+func _choose_target(walker: Dictionary) -> void:
+	var card: AHSpriteCard = walker.card
+	# Pelo menos 1 m de caminhada; perto de uma ponta, vai para a outra.
+	var target := randf_range(walker.min, walker.max)
+	if absf(target - card.position.x) < 1.0:
+		target = walker.min if card.position.x > (walker.min + walker.max) * 0.5 else walker.max
+	# Na Cantina, às vezes vai sentar no banco livre atrás da mesa (só os fundadores têm a pose sentada).
+	if walker.get("room", "") == "canteen" and _poses.has(walker.hero_id + "_seat") and randf() < 0.45:
+		for seat in CANTEEN_SEATS.size():
+			if not _seats.has(seat):
+				_seats[seat] = walker
+				walker.seat = seat
+				target = CANTEEN_SEATS[seat]
+				break
+	walker.target = target
 
 
-func _tone(color: Color, emission: float = 0.0) -> StandardMaterial3D:
-	var key := "tone|%s|%s" % [color.to_html(), emission]
-	if _materials.has(key):
-		return _materials[key]
-	var material := StandardMaterial3D.new()
-	material.albedo_color = color
-	material.roughness = 0.95
-	if emission > 0.0:
-		material.emission_enabled = true
-		material.emission = color
-		material.emission_energy_multiplier = emission
-	_materials[key] = material
-	return material
+func _sit_down(walker: Dictionary) -> void:
+	var card: AHSpriteCard = walker.card
+	card.show_art(_poses[walker.hero_id + "_seat"])
+	card.position = Vector3(CANTEEN_SEATS[walker.seat], walker.floor, CANTEEN_SEAT_Z)
+	card.set_facing(1.0)
+	walker.sitting = randf_range(6.0, 11.0)
 
 
-func _box(min_corner: Vector3, max_corner: Vector3, material: Material, shadow: bool = true) -> MeshInstance3D:
-	var mesh := MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = (max_corner - min_corner).abs()
-	mesh.mesh = box
-	mesh.material_override = material
-	mesh.position = (min_corner + max_corner) * 0.5
-	if not shadow:
-		mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(mesh)
-	return mesh
+func _stand_up(walker: Dictionary) -> void:
+	var card: AHSpriteCard = walker.card
+	_seats.erase(walker.seat)
+	walker.seat = -1
+	card.show_art(walker.idle)
+	card.position.z = walker.home_z
+	walker.wait = randf_range(2.0, 5.0)
 
 
-func _light(at: Vector3, color: Color, energy: float, light_range: float, shadow: bool = true) -> OmniLight3D:
-	var light := OmniLight3D.new()
-	light.position = at
-	light.light_color = color
-	light.light_energy = energy
-	light.omni_range = light_range
-	light.omni_attenuation = 1.2
-	light.shadow_enabled = shadow
-	add_child(light)
-	return light
-
-
-## Luminária pendente: a cúpula escura, a lâmpada acesa e a luz.
-func _lamp(at: Vector3, color: Color, energy: float, light_range: float) -> OmniLight3D:
-	_box(at + Vector3(-0.22, 0.0, -0.22), at + Vector3(0.22, 0.12, 0.22), _tone(Color(0.08, 0.07, 0.06)), false)
-	_box(at + Vector3(-0.08, -0.08, -0.08), at + Vector3(0.08, 0.0, 0.08), _tone(color, 4.0), false)
-	return _light(at + Vector3(0, -0.25, 0.4), color, energy, light_range)
-
+# ---------------------------------------------------------------- ambiente
 
 func _build_environment() -> void:
 	var env := Environment.new()
@@ -369,10 +749,11 @@ func _build_environment() -> void:
 	env.background_color = Color(0.03, 0.028, 0.026)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(0.55, 0.5, 0.45)
-	env.ambient_light_energy = 0.4
+	env.ambient_light_energy = 0.25
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.tonemap_white = 5.0
-	env.tonemap_exposure = 1.15
+	# Exposição fixa, como a câmera da Estação na Unreal (não herda o ajuste da rua).
+	env.tonemap_exposure = 1.25
 	env.glow_enabled = true
 	env.glow_strength = 0.9
 	env.glow_hdr_threshold = 1.0
@@ -387,11 +768,12 @@ func _build_environment() -> void:
 	var world := WorldEnvironment.new()
 	world.environment = env
 	add_child(world)
-	# Luz de preenchimento de frente, fraca, para ler o corte (como a câmera da Unreal).
+	# Preenchimento suave de frente (a luz retangular de 70 m da Unreal): só mostra a seção, sem sombra.
 	var fill := DirectionalLight3D.new()
-	fill.rotation_degrees = Vector3(-12, 8, 0)
-	fill.light_color = Color(0.85, 0.82, 0.78)
-	fill.light_energy = 0.22
+	fill.rotation_degrees = Vector3(-6, 0, 0)
+	fill.light_color = Color(0.78, 0.84, 0.95)
+	fill.light_energy = 0.28
+	fill.shadow_enabled = false
 	add_child(fill)
 
 
@@ -411,110 +793,3 @@ func _build_post() -> void:
 	rect.material = post
 	layer.add_child(rect)
 	add_child(layer)
-
-
-## A plataforma do metrô: leito da via com brita, trilhos e dormentes na frente, a plataforma atrás, a parede de
-## azulejos do fundo, o teto de tijolo, o batente no fim da via e o vagão (visível quando o trem traz alguém).
-func _build_platform() -> void:
-	var concrete := _surface("rough_concrete", PLASTER_TINT * 0.8)
-	_box(Vector3(0, -2.0, PLATFORM_FRONT), Vector3(TRACK_END, -1.0, 0), _surface("gravel_floor_02", Color(0.75, 0.72, 0.68), 0.6))
-	for x in range(1, int(TRACK_END * 1.5)):
-		_box(Vector3(x / 1.5 - 0.12, -1.0, -2.95), Vector3(x / 1.5 + 0.12, -0.9, -0.65), _tone(Color(0.16, 0.12, 0.09)))
-	for z in [-2.55, -1.05]:
-		_box(Vector3(0, -0.9, z - 0.04), Vector3(TRACK_END, -0.78, z + 0.04), _tone(Color(0.34, 0.33, 0.32)))
-	_box(Vector3(TRACK_END, -2.0, PLATFORM_FRONT), Vector3(STATION_END, 0.0, 0), concrete)
-	# Batente com a lanterna vermelha do fim da linha.
-	_box(Vector3(BUFFERS_X - 0.3, -1.0, -2.9), Vector3(BUFFERS_X + 0.3, -0.1, -0.7), _tone(Color(0.32, 0.08, 0.05)))
-	_box(Vector3(BUFFERS_X - 0.1, -0.1, -1.9), Vector3(BUFFERS_X + 0.1, 0.1, -1.7), _tone(Color(1.0, 0.15, 0.08), 6.0), false)
-	_light(Vector3(BUFFERS_X - 0.5, 0.3, -1.2), Color(1.0, 0.25, 0.12), 1.2, 4.0, false)
-	# Plataforma: o piso, a borda e a parede do fundo com azulejo até 3 m e tijolo em cima.
-	_box(Vector3(0, -2.0, STATION_BACK), Vector3(STATION_END, 0.0, PLATFORM_FRONT), _surface("anti_slip_concrete", Color(0.8, 0.78, 0.74), 0.5))
-	_box(Vector3(0, -0.05, PLATFORM_FRONT - 0.35), Vector3(STATION_END, 0.0, PLATFORM_FRONT), _tone(Color(0.78, 0.66, 0.2)), false)
-	_box(Vector3(0, 0, STATION_BACK - 0.3), Vector3(STATION_END, 3.0, STATION_BACK), _surface("long_white_tiles", Color(0.82, 0.8, 0.74), 0.6))
-	_box(Vector3(0, 3.0, STATION_BACK - 0.3), Vector3(STATION_END, VAULT_TOP, STATION_BACK), _surface("red_brick_03", Color(0.62, 0.5, 0.44), 0.5))
-	_box(Vector3(-0.3, VAULT_TOP, STATION_BACK - 0.3), Vector3(STATION_END + 0.3, VAULT_TOP + 0.6, 0.4), _surface("red_brick_03", Color(0.5, 0.4, 0.36), 0.5))
-	# Paredes de término: à esquerda o túnel continua escuro; à direita o fim da estação.
-	_box(Vector3(-0.6, -2.0, STATION_BACK - 0.3), Vector3(0, VAULT_TOP, 0.4), _surface("factory_brick", Color(0.35, 0.3, 0.27), 0.5))
-	_box(Vector3(STATION_END, -2.0, STATION_BACK - 0.3), Vector3(CORE_X0, VAULT_TOP + 0.6, 0.4), concrete)
-	for x in [3.0, 9.0, 15.0, 21.0, 26.0]:
-		_lamp(Vector3(x, 5.2, -6.2), NEUTRAL, 2.2, 9.0)
-	# Bancos da plataforma e uma pilastra a cada 6 m.
-	for x in [3.3, 11.3, 14.5]:
-		_box(Vector3(x - 0.8, 0.0, -9.6), Vector3(x + 0.8, 0.45, -9.1), _tone(Color(0.3, 0.2, 0.12)))
-		_box(Vector3(x - 0.8, 0.45, -9.75), Vector3(x + 0.8, 0.95, -9.6), _tone(Color(0.3, 0.2, 0.12)))
-	for x in [6.0, 12.0, 18.0]:
-		_box(Vector3(x - 0.25, 0.0, -9.9), Vector3(x + 0.25, VAULT_TOP, -9.5), _surface("long_white_tiles", Color(0.7, 0.68, 0.62), 0.6))
-	# O vagão: chega com o trem de cada volta e espera enquanto há alguém para decidir.
-	_train = Node3D.new()
-	add_child(_train)
-	var body := _box(Vector3(0.4, -0.75, -3.15), Vector3(13.6, 2.85, -0.45), _tone(Color(0.78, 0.78, 0.76)))
-	body.reparent(_train)
-	for x in [2.6, 6.4, 10.2]:
-		var door := _box(Vector3(x - 0.75, -0.6, -0.44), Vector3(x + 0.75, 2.3, -0.4), _tone(Color(0.72, 0.1, 0.08)))
-		door.reparent(_train)
-	for x in range(1, 13):
-		var window := _box(Vector3(x - 0.3, 1.1, -0.43), Vector3(x + 0.3, 2.0, -0.41), _tone(Color(0.55, 0.45, 0.32), 0.35), false)
-		window.reparent(_train)
-	var nose := _box(Vector3(13.6, -0.75, -3.0), Vector3(14.0, 2.6, -0.6), _tone(Color(0.72, 0.1, 0.08)))
-	nose.reparent(_train)
-
-
-## As lajes entre os níveis e a terra em volta do corte.
-func _build_levels() -> void:
-	var slab := _surface("rough_concrete", Color(0.5, 0.47, 0.43), 0.5)
-	var rock := _surface("rough_concrete", ROCK_TINT * 2.0, 0.35)
-	# Laje do subterrâneo 1 (entre a via e o teto do B1).
-	_box(Vector3(LEFT_END, B1_CEILING, ROOM_BACK - 2.2), Vector3(0, -0.6, 0.0), slab)
-	_box(Vector3(0, B1_CEILING, ROOM_BACK - 2.2), Vector3(STATION_END, -2.0 + 0.001, STATION_BACK - 0.3), slab)
-	_box(Vector3(LEFT_END, B1_CEILING + 0.001, 0), Vector3(STATION_END, B1_CEILING + 0.35, 0.05), _tone(Color(0.32, 0.3, 0.27)))
-	# Laje entre o B1 e o B2.
-	_box(Vector3(LEFT_END, B2_CEILING, ROOM_BACK - 2.2), Vector3(STATION_END, B1_FLOOR - 0.3, 0.0), slab)
-	# Terra: à esquerda da plataforma, embaixo do B2 e no fundo.
-	_box(Vector3(LEFT_END - 4.0, -0.6, ROOM_BACK - 2.4), Vector3(-0.6, VAULT_TOP + 1.0, 0.0), rock)
-	_box(Vector3(LEFT_END - 4.0, FORGE_FLOOR - 3.0, ROOM_BACK - 2.4), Vector3(CORE_X1 + 4.0, B2_FLOOR - 0.3, 0.0), rock)
-	_box(Vector3(LEFT_END - 4.0, FORGE_FLOOR - 3.0, ROOM_BACK - 2.6), Vector3(CORE_X1 + 4.0, VAULT_TOP + 1.0, ROOM_BACK - 2.4), rock)
-	_box(Vector3(LEFT_END - 4.0, B2_FLOOR - 0.3, ROOM_BACK - 2.4), Vector3(-6.4, B2_CEILING, 0.0), rock)
-	_box(Vector3(CORE_X1, FORGE_FLOOR - 3.0, ROOM_BACK - 2.4), Vector3(CORE_X1 + 4.0, VAULT_TOP + 1.0, 0.0), rock)
-	# Corredor de serviço ao fundo de cada nível (atrás das portas dos cômodos).
-	for level in [[B1_FLOOR, B1_CEILING], [B2_FLOOR, B2_CEILING]]:
-		_box(Vector3(LEFT_END, level[0] - 0.3, ROOM_BACK - 2.2), Vector3(STATION_END, level[0], ROOM_BACK), slab)
-		_box(Vector3(LEFT_END, level[0], ROOM_BACK - 2.4), Vector3(STATION_END, level[1], ROOM_BACK - 2.2), _surface("concrete_wall_008", PLASTER_TINT * 0.6))
-
-
-## Um cômodo: piso, parede do fundo (com lambri e a porta do corredor), teto, divisórias e a luminária.
-func _build_room(room: Dictionary) -> void:
-	var x0: float = room.x0
-	var x1: float = room.x1
-	var floor_y: float = room.floor
-	var top: float = room.ceiling
-	_box(Vector3(x0, floor_y - 0.3, ROOM_BACK), Vector3(x1, floor_y, 0.0), _surface(room.floor_art, Color(0.85, 0.82, 0.78), 0.5))
-	var wall_tint := PLASTER_TINT if room.wall == "painted_plaster_wall" else Color(0.75, 0.72, 0.68)
-	var wainscot_top := floor_y + (1.2 if room.wainscot != "" else 0.0)
-	_box(Vector3(x0, wainscot_top, ROOM_BACK - 0.2), Vector3(x1, top, ROOM_BACK), _surface(room.wall, wall_tint, 0.45))
-	if room.wainscot != "":
-		_box(Vector3(x0, floor_y, ROOM_BACK - 0.2), Vector3(x1, wainscot_top, ROOM_BACK + 0.02), _surface(room.wainscot, Color(0.8, 0.8, 0.76), 0.6))
-	# Porta para o corredor do fundo: o vão escuro e o batente.
-	var door_x: float = room.door
-	_box(Vector3(door_x - DOOR_WIDTH * 0.5 - 0.08, floor_y, ROOM_BACK + 0.02), Vector3(door_x + DOOR_WIDTH * 0.5 + 0.08, floor_y + DOOR_HEIGHT + 0.08, ROOM_BACK + 0.06), _tone(Color(0.2, 0.17, 0.13)))
-	_box(Vector3(door_x - DOOR_WIDTH * 0.5, floor_y, ROOM_BACK + 0.06), Vector3(door_x + DOOR_WIDTH * 0.5, floor_y + DOOR_HEIGHT, ROOM_BACK + 0.08), _tone(Color(0.3, 0.33, 0.22)))
-	_box(Vector3(x0 - 0.1, top, ROOM_BACK), Vector3(x1 + 0.1, top + 0.2, 0.0), _surface("concrete_wall_008", Color(0.42, 0.4, 0.37), 0.5))
-	for x in [x0, x1]:
-		_box(Vector3(x - 0.12, floor_y, ROOM_BACK), Vector3(x + 0.12, top, 0.0), _surface("concrete_wall_008", Color(0.55, 0.52, 0.48), 0.5))
-	var light := _lamp(Vector3((x0 + x1) * 0.5, top - 0.35, -4.2), room.light, 4.0, maxf(10.0, (x1 - x0) * 1.0))
-	_room_lights[room.id] = light
-
-
-## O eixo de escadas à direita: patamares em cada nível e os lances entre eles.
-func _build_core() -> void:
-	var concrete := _surface("concrete_wall_008", Color(0.5, 0.47, 0.43), 0.5)
-	_box(Vector3(CORE_X0, FORGE_FLOOR - 0.3, ROOM_BACK - 0.2), Vector3(CORE_X1, VAULT_TOP, ROOM_BACK), concrete)
-	for level in [[0.0, 3.0], [B1_FLOOR, B1_CEILING], [B2_FLOOR, B2_CEILING]]:
-		_box(Vector3(CORE_X0, level[0] - 0.3, ROOM_BACK), Vector3(CORE_X1, level[0], 0.0), _surface("concrete_floor_worn_001", Color(0.7, 0.68, 0.64), 0.5))
-		_lamp(Vector3(CORE_X0 + 1.2, level[1] - 0.4, -2.5), WARM, 1.6, 6.0)
-	for pair in [[0.0, B1_FLOOR], [B1_FLOOR, B2_FLOOR]]:
-		var flight := _box(Vector3(-2.0, -0.12, -0.6), Vector3(2.0, 0.12, 0.6), _tone(Color(0.36, 0.34, 0.31)))
-		var drop: float = pair[0] - pair[1]
-		flight.position = Vector3((CORE_X0 + CORE_X1) * 0.5 + 0.4, (pair[0] + pair[1]) * 0.5, -6.0)
-		flight.scale = Vector3(sqrt(4.0 * 4.0 + drop * drop) / 4.0, 1.0, 1.0)
-		flight.rotation.z = atan2(drop, 4.0)
-	_box(Vector3(CORE_X0 - 0.15, FORGE_FLOOR - 0.3, ROOM_BACK), Vector3(CORE_X0 + 0.05, VAULT_TOP, 0.0), concrete)

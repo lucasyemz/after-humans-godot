@@ -194,6 +194,54 @@ vai em três etapas:
   runner agora reprova o teste que tiver um erro de script no meio (antes o teste parava e passava com menos
   verificações).
 
+**3b feita em 2026-10-21:** a Estação da Unreal transcrita peça por peça (`station_build.gd`, das funções Build* do
+`AAHShelterStation` e dos arquivos de cada sala), com as mesmas medidas em centímetros e os mesmos auxiliares (Box, Beam,
+Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBuilder`.
+- A plataforma com a abóbada de tijolo em arco, as pilastras e nervuras, a via com dormentes, trilhos e o batente com a
+  lanterna, as placas, os bancos pintados, o relógio, o quadro elétrico e os pendentes; a porta de manutenção com o
+  painel do mapa da rede (fechado) e o corredor escondido; o eixo de escadas com os lances, o guarda-corpo e as
+  arandelas.
+- Os oito cômodos com o casco da Unreal (piso, parede com a porta pintada, lambri, rodapé, divisórias, perfil do corte,
+  tubulação, corredor de serviço) e o mobiliário de cada um: a cozinha e o refeitório da Cantina, as estantes do
+  Depósito com o estoque por faixa, a Forja com a fornalha, a coifa, a bigorna de trilho e a bancada pintada, as camas
+  do Dormitório, o balcão e as garrafas do Bar, a sala de estar dos Personagens, a mesa e os armários da Pesquisa, a
+  Preparação com o quadro de rotas; os cantos e os armários baixos das laterais.
+- 43 modelos da Poly Haven (CC0) com as texturas em 512 px e 30 cards pintados recortados no alfa (`tools/sync_assets.py`);
+  as superfícies usam o shader da Unreal (projeção pelo mundo por face, tamanho real da amostra, umidade no rodapé).
+- O mobiliário some nos cômodos vazios e a luz cai sem energia; os moradores passeiam pela faixa do cômodo (anda, para,
+  escolhe outro ponto).
+- As peças fixas viram uma malha por material: no renderizador da web, de 12 mil para 4,7 mil chamadas de desenho
+  (56 → 106 fps nesta máquina).
+
+**3c feita em 2026-10-21:** as cenas da Estação da Unreal.
+- **Câmera:** as chaves da Unreal (posição, campo de visão e inclinação) com a mesma suavização; a vista geral, cada
+  cômodo e a plataforma.
+- **Passagem secreta:** entre a plataforma e o abrigo a câmera percorre o caminho da Unreal (diante do painel, a porta,
+  a antecâmara, o eixo de escadas) enquanto o painel do mapa da rede desliza, a alavanca gira e a fresta de luz some;
+  depois o painel fecha atrás da equipe.
+- **Relatório da volta:** a equipe de pé na plataforma, a câmera baixa olhando um pouco para cima e o cartão sob cada
+  um (vida, expedições, ferido ou trauma).
+- **Partida:** "Escalar a equipe na plataforma" leva a equipe pela passagem até a fila (a posição 1 à direita), com os
+  cartões da posição e do ataque; trocar ou reordenar refaz a fila.
+- **Trem:** chega do túnel desacelerando com o sinal vermelho piscando, pausa na porta e o candidato desce e anda até
+  a plataforma; a câmera fecha nele de corpo inteiro. Decidido, o trem fecha e acelera para o túnel (o recusado vai
+  junto) e o acolhido passa a morar no cômodo dele.
+- **Moradores:** os fundadores trabalham na sala deles (Bento na Forja, Nick no Depósito, Íris e Véspera na Pesquisa),
+  só com a sala recuperada e ligada, alternando trabalho e pausa; na Cantina, às vezes sentam no banco atrás da mesa;
+  os civis alternam o idle e a pose de trabalho. As brasas da Forja tremulam.
+- As poses vêm de `SourceArt/RootStation` (`tools/sync_assets.py`, com os pés e o topo dos manifestos da Unreal).
+
+**Pendências da 3c:**
+- Sem os sons do trem e do sino de chegada (não há fonte em `SourceArt/Audio`; ficam para o áudio da Fase 5).
+- O vagão não abre as portas (o metrô de portas deslizantes é um `.uasset`); o candidato desce pela lateral.
+- As poses de dormir (Dormitório) e as folhas de andar da Íris e da Véspera ainda não entraram.
+
+**Pendências da 3b:**
+- O vagão é o de corte da própria Unreal (o metrô Bombardier, a cadeira do bar, o binóculo, o kit de química, o sofá 3D e
+  a xícara só existem como `.uasset`; ficaram de fora ou com a peça parecida).
+- A coifa da Forja é feita de caixas (a malha cônica da Unreal é gerada em C++).
+- O pacote da web passou de 34 para 65 MB com os modelos.
+
 **Pendências da 3a:**
 - Só a fase 1 tem mapa; as outras aparecem no mapa de fases e liberam em ordem, mas a partida fica fechada até os
   cenários (Fase 4).
