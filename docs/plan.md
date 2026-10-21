@@ -147,8 +147,8 @@ sementes e constantes, então a mesma campanha gera o mesmo corredor da Unreal).
 
 **Pendências:**
 - **A rua ainda é montada em código** (não virou `.tscn`); os cenários da Fase 4 vêm de dados exportados, não de `.tscn`.
-- **Mochila sem tela:** os itens contam (comida, curativos, pé de cabra), mas não há a tela da Mochila nem o uso dos
-  itens na luta.
+- ~~**Mochila sem tela**~~ feita depois da Fase 5: a tela da Mochila (I ou o botão, na exploração e na luta) e os
+  cuidados do `FAHExplorationCare` (comer pouco ou bem, curativo, ampola da Íris), com `test_exploration_care`.
 - **Preparar a expedição** (escolher a equipe e os itens) vem com a Estação, na Fase 3; hoje a equipe é a dos
   fundadores vivos.
 - **Arte:** os inimigos novos (cão eco, condutor raiz, sussurrador, rastejante) só têm a pose parada; os pontos de busca
@@ -311,9 +311,22 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
   pacote). As texturas dos cenários e da Estação passam a WebP 0,75 (sem diferença visível). Web: 120 MB de pacote
   (era 220); Windows: 230 MB. A web abre, mostra a Estação e o mapa de fases no navegador.
 
+- **Hardware fraco:** no Baixo, noite com chuva em 1080p custa 1,5 ms no Compatibility (o renderer da web) e de 2,5 a
+  3 ms no Forward+ (RTX 3050): de 4 a 8 vezes de folga abaixo dos 60 FPS para uma placa mais fraca.
+- **Celular (emulado no navegador, paisagem 812 x 375):** a Estação abre e responde ao toque, mas o texto do HUD fica
+  pequeno (~9 px) e a exploração não anda sem teclado ou controle: não há controle de toque.
+- **Checklist de Play:** [play-checklist.md](play-checklist.md).
+
+- **Mochila** (port do `UAHInventoryWidget` e do `FAHExplorationCare`, #37): suprimentos, ferramentas, recursos e
+  relíquias por grupo; à direita o item com as ações, a cura, o custo e o motivo quando não dá. Fora da luta escolhe o
+  aliado (o mais ferido primeiro): comer pouco (15% da vida, 1 comida), comer bem (35%, 3), curativo (+8) e a ampola
+  da Íris (5 a 8, 3 cargas, recarrega na vitória). Na luta é ação livre do herói da vez, um item por vez dele.
+  `test_exploration_care` traz os testes da Unreal (52 verificações).
+
 **Pendências da 5:**
-- Testar em hardware fraco e num celular (o pacote da web ainda é pesado para dados móveis).
-- Checklist de Play com o Lucas.
+- Celular: controles de toque para andar e interagir, HUD maior em tela pequena e um pacote mais leve (120 MB pesa em
+  dados móveis); falta testar num aparelho de verdade.
+- Passar o checklist de Play com o Lucas.
 
 **Total: 28 a 42 dias de trabalho com agente**, perto da faixa da avaliação (24 a 40). O combate e a rua já estão
 adiantados, mas a Estação e a UI pesam mais do que parecia.

@@ -78,6 +78,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	hud.result_continue.connect(_on_result_continue)
 	hud.menu_return.connect(_retreat)
 	hud.menu_requested.connect(open_menu)
+	hud.inventory_requested.connect(open_inventory)
 	hud.new_campaign.connect(_new_campaign)
 	street._arena.finished.connect(_on_combat_finished)
 	doors = street.door_list()
@@ -581,6 +582,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open_menu()
 		return
+	if event.is_action_pressed("inventory") and not busy and not street._arena.active:
+		get_viewport().set_input_as_handled()
+		if hud.inventory_shown():
+			hud.close_modal()
+		else:
+			open_inventory()
+		return
 	if event.is_action_pressed("interact") and not blocking() and _action.is_valid():
 		get_viewport().set_input_as_handled()
 		var action := _action
@@ -596,6 +604,14 @@ func open_menu() -> void:
 	if not AHExplorationHud.session_open(Campaign.state):
 		return
 	hud.show_menu(session.expedition.objective_completed, session.get("event") == null and ["corridor", "rest"].has(session.get("screen")))
+
+
+## A Mochila da exploração (I ou o botão): fora de luta, evento e resultado.
+func open_inventory() -> void:
+	if busy or street._arena.active or hud.modal_open() or not AHExplorationHud.session_open(Campaign.state):
+		return
+	Sound.play("res://audio/ui/bag_open.ogg")
+	hud.show_inventory()
 
 
 func _new_campaign() -> void:

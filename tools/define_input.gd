@@ -14,6 +14,7 @@ const ACTIONS := {
 	"interact": {"keys": [KEY_E, KEY_ENTER], "buttons": [JOY_BUTTON_A]},
 	"cancel": {"keys": [KEY_BACKSPACE], "buttons": [JOY_BUTTON_B]},
 	"menu": {"keys": [KEY_ESCAPE], "buttons": [JOY_BUTTON_START]},
+	"inventory": {"keys": [KEY_I], "buttons": [JOY_BUTTON_Y]},
 	# Só para teste do protótipo (teclado).
 	"debug_rain": {"keys": [KEY_R]},
 	"debug_time": {"keys": [KEY_T]},

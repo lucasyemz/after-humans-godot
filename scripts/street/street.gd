@@ -1004,7 +1004,7 @@ func _build_post_and_hud() -> void:
 	hud.add_child(_label(title, 30, Vector2(36, 28)))
 	_hud_weather = _label("", 20, Vector2(36, 112))
 	hud.add_child(_hud_weather)
-	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   E interagir   Esc menu   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1030)))
+	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   E interagir   I mochila   Esc menu   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1030)))
 	_hud_stats = _label("", 18, Vector2(1380, 30))
 	hud.add_child(_hud_stats)
 

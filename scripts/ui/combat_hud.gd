@@ -35,6 +35,7 @@ var _markers: Array = []
 var _actor_id := ""
 var _options: Array = []
 var _choosing := ""
+var _bag: PanelContainer
 ## Esperando o comando do herói (a captura usa para jogar por ele).
 var waiting := false
 
@@ -183,10 +184,10 @@ func _build() -> void:
 	_actions.custom_minimum_size = Vector2(200, 0)
 	_actions.add_theme_constant_override("separation", 8)
 	row.add_child(_actions)
-	for spec in [["Mover", "move"], ["Defender", "defend"], ["Fugir", "flee"]]:
+	for spec in [["Mover", "move"], ["Defender", "defend"], ["Mochila", "item"], ["Fugir", "flee"]]:
 		var button := Button.new()
 		button.text = spec[0]
-		button.custom_minimum_size = Vector2(200, 52)
+		button.custom_minimum_size = Vector2(200, 40)
 		style_button(button)
 		button.pressed.connect(_on_action.bind(spec[1]))
 		button.focus_entered.connect(_describe_action.bind(spec[1]))
@@ -342,9 +343,10 @@ func _process(_delta: float) -> void:
 # ---------------------------------------------------------------- turno do herói
 
 ## Mostra as opções do herói e espera o comando: {kind: ability/move/defend/flee, ability_id, rank}.
-func ask_command(actor_id: String) -> Dictionary:
+## note: um aviso que fica na tela enquanto ele decide (o item da Mochila que acabou de usar).
+func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	_actor_id = actor_id
-	_message.text = ""
+	_message.text = note
 	_panel.visible = true
 	_build_abilities()
 	waiting = true
@@ -440,7 +442,8 @@ func _describe(option: Dictionary) -> void:
 
 func _describe_action(kind: String) -> void:
 	_description.text = {"move": "Mover — troca de posição com o aliado vizinho.", "defend": "Defender — +1 Bloqueio e passa a vez.",
-		"flee": "Fugir — 60% de chance de a equipe recuar e sair da luta."}[kind]
+		"flee": "Fugir — 60% de chance de a equipe recuar e sair da luta.",
+		"item": "Mochila — comida ou curativo no herói da vez: ação livre, um item por vez dele."}[kind]
 
 
 func _on_ability(option: Dictionary) -> void:
@@ -453,11 +456,42 @@ func _on_ability(option: Dictionary) -> void:
 
 func _on_action(kind: String) -> void:
 	match kind:
+		"item":
+			_open_bag()
 		"move":
 			_choosing = "move"
 			_show_markers(session.move_targets(_actor_id), false, func(rank): command_chosen.emit({"kind": "move", "rank": rank}))
 		_:
 			command_chosen.emit({"kind": kind})
+
+
+## A Mochila por cima do painel, no herói da vez; o item escolhido vira comando (ação livre: a vez continua).
+func _open_bag() -> void:
+	if _bag != null:
+		return
+	Sound.play("res://audio/ui/bag_open.ogg")
+	_bag = PanelContainer.new()
+	_bag.add_theme_stylebox_override("panel", panel_style(0.96))
+	_bag.position = Vector2(510, 140)
+	_bag.custom_minimum_size = Vector2(900, 0)
+	var panel := AHInventoryPanel.new()
+	panel.session = session
+	panel.closed.connect(_close_bag)
+	panel.combat_item.connect(func(kind):
+		_close_bag()
+		command_chosen.emit({"kind": "item", "item": kind}))
+	_bag.add_child(panel)
+	add_child(_bag)
+
+
+func _close_bag() -> void:
+	if _bag != null:
+		_bag.queue_free()
+	_bag = null
+
+
+func bag_open() -> bool:
+	return _bag != null
 
 
 # ---------------------------------------------------------------- alvos
@@ -506,6 +540,15 @@ func _clear_markers() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# A Mochila: I abre na vez de um herói; Esc, Backspace ou I fecham.
+	if visible and _bag != null and (event.is_action_pressed("cancel") or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):
+		_close_bag()
+		get_viewport().set_input_as_handled()
+		return
+	if visible and waiting and _choosing == "" and event.is_action_pressed("inventory"):
+		_open_bag()
+		get_viewport().set_input_as_handled()
+		return
 	if visible and _choosing != "" and event.is_action_pressed("cancel"):
 		_clear_markers()
 		_set_enabled(true)

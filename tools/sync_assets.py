@@ -276,9 +276,14 @@ def civilians() -> int:
     return len(out)
 
 
-# Mapa de fases (UAHExpeditionMapWidget): o bairro alagado da web, a imagem de cada fase e os ícones dos nós.
+# Mapa de fases (UAHExpeditionMapWidget): o bairro alagado da web, a imagem de cada fase e os ícones dos nós e da
+# Mochila.
 MAP_ICONS = ["node-start", "node-combat", "node-boss", "node-rest", "marker-here", "marker-visited", "marker-available",
-             "ui-arrow-right"]
+             "ui-arrow-right",
+             # Mochila (UAHInventoryWidget): suprimentos, ferramentas, recursos e relíquias.
+             "lobby-food", "res-bandages", "item-ampoule", "tool-crowbar", "tool-flashlight", "tool-mask", "tool-generic",
+             "lobby-seed", "lobby-scrap", "lobby-fragment", "item-generic", "relic-generic", "relic-copper-button",
+             "relic-glass-feather", "relic-memory-collar"]
 
 
 def phase_map() -> int:

@@ -12,6 +12,7 @@ signal camp_leave
 signal result_continue
 signal menu_return
 signal menu_requested
+signal inventory_requested
 signal new_campaign
 
 const H = preload("res://scripts/ui/combat_hud.gd")
@@ -86,6 +87,14 @@ func _ready() -> void:
 	_menu_button.focus_mode = Control.FOCUS_NONE
 	_menu_button.pressed.connect(func(): menu_requested.emit())
 	add_child(_menu_button)
+	var bag := Button.new()
+	bag.text = "Mochila (I)"
+	bag.position = Vector2(1514, 962)
+	bag.custom_minimum_size = Vector2(180, 44)
+	H.style_button(bag)
+	bag.focus_mode = Control.FOCUS_NONE
+	bag.pressed.connect(func(): inventory_requested.emit())
+	add_child(bag)
 
 	_prompt = PanelContainer.new()
 	_prompt.add_theme_stylebox_override("panel", H.panel_style(0.85))
@@ -303,6 +312,22 @@ func show_menu(completed: bool, can_return: bool) -> void:
 	box.add_child(_button("Opções", show_options))
 	box.add_child(_button("Nova campanha", _confirm_new_campaign))
 	resume.grab_focus.call_deferred()
+
+
+## A Mochila por cima da exploração (cuidados no aliado, ferramentas, recursos); Fechar, Esc ou I fecha.
+func show_inventory() -> void:
+	var box := _open_modal(900)
+	_modal.set_meta("menu", true)
+	_modal.set_meta("inventory", true)
+	_modal.position.y = 120
+	var bag := AHInventoryPanel.new()
+	bag.closed.connect(close_modal)
+	bag.used.connect(func(): refresh(Campaign.state))
+	box.add_child(bag)
+
+
+func inventory_shown() -> bool:
+	return modal_open() and _modal.has_meta("inventory")
 
 
 ## As opções por cima da exploração (som, gráficos, jogo, controles); Fechar ou Esc fecha.

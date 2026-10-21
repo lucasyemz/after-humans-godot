@@ -11,6 +11,9 @@ var state: AHCombat.State
 var context: AHCombat.Context
 var random: AHCombatRandom
 var engine: AHCombatEngine
+## A vez do herói que está decidindo (rodada:unidade) e a vez em que ele já usou um item da Mochila.
+var processed_turn_key := ""
+var item_used_turn_key := ""
 
 
 ## heroes: heróis da campanha (Campaign.state.roster) na ordem da formação. enemies: da frente para trás, cada um o id
@@ -153,7 +156,40 @@ func begin_player_turn() -> Dictionary:
 	var actor := current_actor()
 	var events: Array = []
 	var can_act := engine.process_player_turn_start(events)
+	processed_turn_key = turn_key() if can_act else ""
 	return {"source_id": actor.id if actor else "", "kind": "turn_start", "ability_id": "", "events": events, "ok": true, "error": "", "can_act": can_act}
+
+
+func turn_key() -> String:
+	return "%d:%s" % [state.round, state.current_turn_unit_id]
+
+
+## Um item da Mochila no herói da vez (CombatUseItem): ação livre, a vez continua com ele. Gasta da campanha.
+func use_item(campaign: Dictionary, kind: String) -> Dictionary:
+	var quote := AHExplorationCare.combat_quote(campaign, self, kind)
+	var actor := current_actor()
+	var beat := {"source_id": actor.id if actor else "", "kind": "item", "ability_id": "", "events": [], "ok": false,
+		"error": quote.reason, "escaped": false}
+	if not quote.available:
+		return beat
+	if kind == AHExplorationCare.BANDAGE:
+		AHJourneyRules.adjust(campaign, "bandages", -1)
+	else:
+		AHJourneyRules.adjust(campaign, "food", -quote.food_cost)
+	actor.hp = mini(actor.max_hp, actor.hp + quote.heal_max)
+	item_used_turn_key = turn_key()
+	var what: String = {AHExplorationCare.BANDAGE: "usou um curativo", AHExplorationCare.SMALL_MEAL: "comeu pouco"}.get(kind, "comeu bem")
+	var event := AHCombat.Event.new()
+	event.type = AHCombat.EventType.HEAL
+	event.target_unit_id = actor.id
+	event.amount = quote.heal_max
+	event.text = "+%d" % quote.heal_max
+	state.combat_log.append("%s %s: +%d de vida." % [actor.display_name, what, quote.heal_max])
+	beat.events = [event]
+	beat.ok = true
+	beat.error = ""
+	beat.text = "%s %s: +%d de vida." % [actor.display_name, what, quote.heal_max]
+	return beat
 
 
 func use_ability(actor_id: String, ability_id: String, target_rank: int) -> Dictionary:
@@ -210,7 +246,8 @@ func _beat(actor_id: String, kind: String, ability_id: String, result: AHCombat.
 
 # ---------------------------------------------------------------- fim da luta
 
-## Grava na campanha a vida, o instinto e o trauma de cada herói; quem morreu fica com alive = false.
+## Grava na campanha a vida, o instinto e o trauma de cada herói; quem morreu fica com alive = false. Na vitória, a Íris
+## recarrega a ampola.
 func write_back(campaign: Dictionary) -> void:
 	for unit in state.player_team:
 		for hero in campaign.get("roster", []):
@@ -226,3 +263,4 @@ func write_back(campaign: Dictionary) -> void:
 				var ability = data.abilities.get(ability_id)
 				if ability != null and ability.bUsesPerExpedition:
 					hero.expedition_uses[ability_id] = unit.remaining_uses[ability_id]
+	AHExplorationCare.restore_iris_after_victory(campaign, self)

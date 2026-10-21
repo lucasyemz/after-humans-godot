@@ -217,6 +217,16 @@ func _run() -> void:
 					"ability_id": auto.used_ability_id, "events": auto.events, "ok": auto.success, "error": auto.error}
 			else:
 				var command: Dictionary = await hud.ask_command(actor.id)
+				# Mochila: ação livre; o mesmo herói continua decidindo (sem começar a vez de novo).
+				while command.kind == "item":
+					var used := session.use_item(Campaign.state, command.item)
+					if used.ok:
+						Sound.play("res://audio/ui/confirm.ogg")
+						await _play_beat(used)
+						hud.refresh()
+					else:
+						Sound.play("res://audio/ui/deny.ogg")
+					command = await hud.ask_command(actor.id, used.text if used.ok else used.error)
 				beat = _execute(actor.id, command)
 				if not beat.ok:
 					hud.show_message(beat.error)

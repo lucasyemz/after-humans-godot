@@ -37,7 +37,7 @@ scripts/campaign/ Campaign (autoload): campanha nova, save e load
 scripts/flow/     GameFlow (autoload), o boot, as regras da jornada (corredor, casas, busca, acampamento) e as da
                   Estação e da campanha (cômodos, economia, civis, noite, elenco, foco, partida e volta)
 scripts/combat/   motor de combate, tabelas tipadas, a sessão de luta (comandos e lances) e a arena (animação)
-scripts/ui/       HUD de combate, da exploração e do refúgio, e o mapa de fases
+scripts/ui/       HUD de combate, da exploração e do refúgio, o mapa de fases, as opções e a Mochila
 scripts/world/    AHSpriteCard (personagem pintado com o pé fixo ao trocar de pose) e AHHouseRoom (interior das lojas)
 scripts/street/   Rua das Vitrines montada em código, chuva, colisão e o corredor (patrulhas, visão, portas, saque)
 scripts/scenario/ AHScenarioWorld: monta os seis cenários da Unreal a partir de data/scenarios (zonas, portas, props)
@@ -90,6 +90,8 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - T troca entre fim de tarde e noite.
   - P liga e desliga o pós-processamento.
   - C mostra as caixas de colisão.
+  - I abre a Mochila (comida, curativo e a ampola da Íris; na luta, no herói da vez).
+  - Esc abre o menu (continuar, opções, voltar à Estação, nova campanha).
   - E interage: entrar ou forçar a porta de uma loja, vasculhar, abrir caixotes, acender a fogueira, voltar à Estação
     pela saída no começo da rua.
   - K leva a equipe até a próxima patrulha.
