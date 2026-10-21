@@ -64,7 +64,7 @@ save com recuperação pela cópia, tabelas e referências, cenas e input). A ru
 de captura e os testes de colisão continuam passando. Ficaram para as próximas fases: a Estação e a expedição dentro do
 save (`station` e `session` estão vazios) e a migração de versões antigas do save (o leitor já recusa versão diferente).
 
-### Fase 1: combate jogável na rua (5 a 7 dias)
+### Fase 1: combate jogável na rua (5 a 7 dias) — feita em 2026-10-21
 
 - Arena na faixa da rua (port do `AHCombatArena`):
   - 4 posições por lado e entrada dos inimigos;
@@ -78,6 +78,27 @@ save (`station` e `session` estão vazios) e a migração de versões antigas do
   - sons de combate de `SourceArt/Audio`.
 
 **Pronto quando:** uma luta completa contra uma patrulha da rua é jogável do começo ao fim, com vitória, derrota e fuga.
+
+**Feito:** duas patrulhas na rua (robô e robô fungo; vigia enferrujado e robô).
+- A luta acontece no lugar: as 4 posições de cada lado, a câmera mais perto e acompanhando o lance.
+- Ações dos heróis: as três fases da arte aprovada (preparação, execução e efeito no alvo) com o som de cada uma.
+- Reações: ferido e derrotado (por enquanto só Bento e Nick têm a arte nova; Íris e Véspera ficam na pose parada e
+  piscam). Inimigos com ataque, defesa, apoio, ferido, esquiva e morte.
+- HUD: ordem dos turnos, barras sobre cada um, o painel do herói com os motivos de cada habilidade indisponível,
+  marcadores de alvo e o resultado. Funciona com mouse, teclado e gamepad.
+- Fim da luta: vida, instinto e trauma voltam para a campanha; quem morre sai da equipe. Na fuga, a equipe recua e a
+  patrulha volta ao posto. Na derrota, a rua recomeça (o refúgio vem na fase 3).
+- Testes: `test_combat_session` (24 lutas automáticas, opções, fuga, volta para a campanha) e `test_combat_art` (todo
+  arquivo existe, cada habilidade tem ícone, fases e som, e nenhum quadro de folha está vazio). O modo de captura joga
+  uma luta inteira.
+
+**Pendências:**
+- **As patrulhas estão fáceis:** a equipe venceu as 24 lutas automáticas. Precisa de balanceamento ou das patrulhas
+  certas do corredor (fase 2).
+- **Arte faltando:** reações de Íris e Véspera, a esquiva e a defesa dos heróis com a arte nova, e as poses dos outros
+  inimigos (a ferramenta já sabe trazê-las).
+- **Ainda não entraram:** a prévia de quem a habilidade atinge (par da granada, vizinho do coquetel), os itens da
+  Mochila na luta e as crises de instinto com a apresentação própria.
 
 ### Fase 2: exploração e a primeira jornada (5 a 8 dias)
 

@@ -14,6 +14,9 @@ arte. Nada daqui depende dele em tempo de execução, e nada de lá entra neste 
 
 - **Leveza:** entra no Git só o que o jogo usa. A arte de origem pesada (PSD, FBX, PNG não usados), os `.uasset`, os
   builds (`build/`) e o cache (`.godot/`) ficam fora.
+- **Arte e som do combate:** entram por `tools/sync_combat_art.py`, que converte para WebP na metade da resolução e
+  mede a âncora no pé em `data/presentation/combat_art.json`. Personagem novo entra na tabela da ferramenta, nunca
+  copiado à mão.
 - **Dados:** os JSON em `data/` são a fonte de produção. Ao portar uma regra da Unreal, traga junto um teste que compare
   com o comportamento de lá, como `tests/test_combat_parity.gd` faz com o combate.
 - **Nomes:** pastas, cenas, scripts e shaders em inglês e `snake_case`. A arte mantém o nome que tem na origem

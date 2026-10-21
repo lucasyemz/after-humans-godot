@@ -4,7 +4,7 @@ Os arquivos copiados ficam versionados aqui: o projeto roda e exporta sozinho, s
 portar mais conteúdo ou ao atualizar um JSON de produção vindo de lá:  python tools/sync_assets.py
 
 A arte da rua é a mesma que a Unreal importou: as pinturas da versão web (tag alphaweb, public/corridor/assets) e os
-PNG de SourceArt.
+PNG de SourceArt. Os heróis e os inimigos vêm de tools/sync_combat_art.py.
 """
 import shutil
 import subprocess
@@ -33,10 +33,6 @@ SOURCE_ART = [
     "SourceArt/door-open-grocery-crop.png",
     "SourceArt/door-open-workshop-crop.png",
     "SourceArt/door-open-cinema-crop.png",
-    "SourceArt/HeroStatics/bento-idle-v2.png",
-    "SourceArt/HeroStatics/nick-idle-v2.png",
-    "SourceArt/HeroStatics/sapo-iris-static.png",
-    "SourceArt/HeroStatics/coruja-vespera-static.png",
     "SourceArt/ShopfrontStreet/Campfire/campfire-v1.png",
 ]
 

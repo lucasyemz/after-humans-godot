@@ -72,13 +72,17 @@ const SIDEWALK_PROPS := [
 ]
 # Carros: X inicial, modelo, espelho.
 const CARS := [[-350.0, 0, false], [5650.0, 1, true], [2650.0, 0, true]]
-# Equipe: arte, altura em cm.
-const HEROES := [
-	["bento-idle-v2.png", 190.0],
-	["nick-idle-v2.png", 182.0],
-	["sapo-iris-static.png", 180.0],
-	["coruja-vespera-static.png", 192.0],
+# Altura do corpo (m) de cada herói e inimigo; a arte e as medidas vêm de data/presentation/combat_art.json.
+const BODY_HEIGHTS := {
+	"hero_cao_bento": 1.86, "hero_gato_nick": 1.76, "hero_sapo_iris": 1.74, "hero_coruja_vespera": 1.88,
+	"robot": 1.8, "robot_fungo": 1.8, "vigia_enferrujado": 2.15,
+}
+# Patrulhas da rua: onde ficam (X em metros) e quem são, da frente para trás. Chegar perto começa a luta.
+const PATROLS := [
+	{"x": 17.0, "enemies": ["robot", "robot_fungo"]},
+	{"x": 46.0, "enemies": ["vigia_enferrujado", "robot"]},
 ]
+const PATROL_TRIGGER := 5.0
 const PARTY_SPACING := 1.15
 const LEADER_RADIUS := 0.28
 # Onde o líder pode ir (metros): da rua até o fundo dos becos.
@@ -129,9 +133,15 @@ var _hud_weather: Label
 var _dust: CPUParticles3D
 
 var _leader: CharacterBody3D
-var _heroes: Array[MeshInstance3D] = []
-var _hero_materials: Array[StandardMaterial3D] = []
-var _hero_facing: Array[float] = []
+## Heróis da equipe (formação da campanha) e as placas deles, na mesma ordem.
+var _party_ids: Array = []
+var _heroes: Array[AHSpriteCard] = []
+var _combat_art := {}
+var _arena: AHCombatArena
+var _patrols: Array = []
+var _street_hud: CanvasLayer
+## A arena aponta a câmera para o meio do lance (null: o meio da arena).
+var combat_focus_x = null
 ## Caminho do líder, do mais novo para o mais velho; os outros heróis ficam a PARTY_SPACING um do outro nele.
 var _trail: Array[Vector3] = []
 
@@ -159,6 +169,8 @@ var _capture_step := 0
 var _capture_frames := 0
 var _capture_time := 0.0
 var _capture_input := Vector2.ZERO
+var _combat_phase := 0
+var _combat_time := 0.0
 
 
 static func ue(x: float, y: float, z: float) -> Vector3:
@@ -185,8 +197,13 @@ func _ready() -> void:
 	_build_atmosphere()
 	_build_rain()
 	_build_party()
+	_build_patrols()
 	_build_camera()
 	_build_post_and_hud()
+	_arena = AHCombatArena.new()
+	add_child(_arena)
+	_arena.setup(self)
+	_arena.finished.connect(_on_combat_finished)
 	_apply_weather()
 
 
@@ -699,19 +716,47 @@ func _build_party() -> void:
 	_leader.add_child(shape)
 	add_child(_leader)
 
-	for hero in HEROES:
-		var texture := _texture(hero[0])
-		var quad := QuadMesh.new()
-		quad.size = Vector2(hero[1] * texture.get_width() / texture.get_height(), hero[1]) * 0.01
-		var material: StandardMaterial3D = _card_material(hero[0], Rect2(), false, true).duplicate()
-		var card := MeshInstance3D.new()
-		card.mesh = quad
-		card.material_override = material
+	_combat_art = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
+	# A equipe é a formação da campanha (Campaign), só com quem está vivo.
+	for hero_id in Campaign.state.get("preferred_formation", []):
+		var hero = Campaign.hero(hero_id)
+		if hero == null or not hero.get("alive", true) or not _combat_art.heroes.has(hero_id) or _party_ids.size() >= 4:
+			continue
+		var card := AHSpriteCard.new()
+		card.body_height = BODY_HEIGHTS.get(hero_id, 1.8)
+		card.show_art(_combat_art.heroes[hero_id].idle)
 		add_child(card)
+		_party_ids.append(hero_id)
 		_heroes.append(card)
-		_hero_materials.append(material)
-		_hero_facing.append(1.0)
 	_place_leader(Vector3(7.6, 0, 0.45))
+
+
+func _build_patrols() -> void:
+	for spec in PATROLS:
+		var cards: Array = []
+		for index in spec.enemies.size():
+			var enemy_id: String = spec.enemies[index]
+			var card := AHSpriteCard.new()
+			card.body_height = BODY_HEIGHTS.get(enemy_id, 1.8)
+			card.show_art(_combat_art.enemies[enemy_id].idle)
+			card.set_facing(-1.0)
+			add_child(card)
+			cards.append(card)
+		var patrol := {"x": spec.x, "enemies": spec.enemies, "cards": cards, "done": false}
+		_patrols.append(patrol)
+		_reset_patrol(patrol)
+
+
+## Volta a patrulha ao posto dela, parada, olhando para a esquerda (início e depois de uma fuga).
+func _reset_patrol(patrol: Dictionary) -> void:
+	for index in patrol.cards.size():
+		var card: AHSpriteCard = patrol.cards[index]
+		var z: float = -0.8 - 0.03 * index
+		card.position = Vector3(patrol.x + index * 1.35, _ground_height(z), z)
+		card.set_facing(-1.0)
+		card.set_tint(Color.WHITE)
+		card.show_art(_combat_art.enemies[patrol.enemies[index]].idle)
+		card.visible = not patrol.done
 
 
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
@@ -726,12 +771,7 @@ func _place_leader(at: Vector3, facing: float = 1.0) -> void:
 
 
 func _set_facing(index: int, facing: float) -> void:
-	if _hero_facing[index] == facing:
-		return
-	_hero_facing[index] = facing
-	var material := _hero_materials[index]
-	material.uv1_scale.x = absf(material.uv1_scale.x) * (-1.0 if facing < 0.0 else 1.0)
-	material.uv1_offset.x = 1.0 if facing < 0.0 else 0.0
+	_heroes[index].set_facing(facing)
 
 
 ## Ponto do caminho do líder a uma distância dele.
@@ -750,9 +790,10 @@ func _ground_height(z: float) -> float:
 
 
 func _place_party(delta: float) -> void:
+	if _arena != null and _arena.active:
+		return
 	for index in _heroes.size():
 		var card := _heroes[index]
-		var height: float = HEROES[index][1] * 0.01
 		var target := _leader.position if index == 0 else _trail_point(PARTY_SPACING * index)
 		var previous := card.position
 		var x := target.x if delta == 0.0 or index == 0 else lerpf(previous.x, target.x, 1.0 - exp(-10.0 * delta))
@@ -762,7 +803,7 @@ func _place_party(delta: float) -> void:
 		# Respiração leve: só a escala vertical, com a base no chão.
 		var breath := 1.0 + 0.012 * sin(_time * 2.2 + index * 1.7)
 		card.scale = Vector3(1, breath, 1)
-		card.position = Vector3(x, _ground_height(z) + height * 0.5 * breath, z - 0.02 * index)
+		card.position = Vector3(x, _ground_height(z), z - 0.02 * index)
 
 
 func _build_camera() -> void:
@@ -779,6 +820,10 @@ func _update_camera(delta: float) -> void:
 	var target := Vector3(clampf(leader.x, -6.0, 66.0), 2.5, clampf(-1.4 + minf(leader.z + 1.0, 0.0) * 0.45, -6.5, -1.4))
 	var pitch := deg_to_rad(12.0)
 	var distance := 18.5
+	if _arena != null and _arena.active:
+		# Na luta, a câmera chega mais perto da arena e acompanha o lance.
+		target = Vector3(combat_focus_x if combat_focus_x != null else _arena.center_x, 1.9, -0.9)
+		distance = 12.5 if combat_focus_x != null else 14.5
 	var wanted := target + Vector3(0, sin(pitch) * distance, cos(pitch) * distance)
 	_camera.position = wanted if delta == 0.0 else _camera.position.lerp(wanted, 1.0 - exp(-3.0 * delta))
 	_camera.look_at(Vector3(_camera.position.x, target.y, target.z))
@@ -802,10 +847,11 @@ func _build_post_and_hud() -> void:
 	var hud := CanvasLayer.new()
 	hud.layer = 2
 	add_child(hud)
+	_street_hud = hud
 	hud.add_child(_label("RUA DAS VITRINES\nBairro Submerso", 30, Vector2(36, 28)))
 	_hud_weather = _label("", 20, Vector2(36, 112))
 	hud.add_child(_hud_weather)
-	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   R chuva   T fim de tarde/noite   P pós-processo   C colisões", 18, Vector2(36, 1030)))
+	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   K lutar   R chuva   T fim de tarde/noite   P pós-processo   C colisões", 18, Vector2(36, 1030)))
 	_hud_stats = _label("", 18, Vector2(1380, 30))
 	hud.add_child(_hud_stats)
 
@@ -928,6 +974,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("debug_colliders"):
 		for debug in _debug_colliders:
 			debug.visible = not debug.visible
+	elif event.is_action_pressed("debug_combat") and not _arena.active:
+		# Leva a equipe até a próxima patrulha que ainda está de pé.
+		for patrol in _patrols:
+			if not patrol.done:
+				_place_leader(Vector3(patrol.x - PATROL_TRIGGER + 0.5, 0, 0.45))
+				break
 
 
 func _input_vector() -> Vector2:
@@ -937,6 +989,8 @@ func _input_vector() -> Vector2:
 
 
 func _physics_process(_delta: float) -> void:
+	if _arena.active:
+		return
 	var input := _input_vector()
 	var speed := 4.4 if Input.is_action_pressed("run") else 2.4
 	# Para o fundo e para a frente anda mais devagar (a câmera vê pouco dessa direção).
@@ -947,6 +1001,57 @@ func _physics_process(_delta: float) -> void:
 		_trail.push_front(_leader.position)
 		if _trail.size() > 200:
 			_trail.pop_back()
+	# Na captura, as patrulhas só entram em ação na parte da luta (as fotos da rua passam perto delas).
+	if _capture_dir != "" and _combat_phase == 0:
+		return
+	for patrol in _patrols:
+		if not patrol.done and absf(_leader.position.x - patrol.x) < PATROL_TRIGGER and _leader.position.z > -3.5:
+			_start_combat(patrol)
+			break
+
+
+# ---------------------------------------------------------------- luta
+
+func _start_combat(patrol: Dictionary) -> void:
+	var heroes: Array = _party_ids.map(func(id): return Campaign.hero(id))
+	if heroes.is_empty():
+		return
+	_street_hud.visible = false
+	_leader.velocity = Vector3.ZERO
+	_arena.set_meta("patrol", patrol)
+	_arena.start(heroes, _heroes, patrol.enemies, patrol.cards, patrol.x - 0.6)
+
+
+func _on_combat_finished(result: String) -> void:
+	var patrol: Dictionary = _arena.get_meta("patrol")
+	_street_hud.visible = true
+	combat_focus_x = null
+	match result:
+		"victory":
+			patrol.done = true
+			for card in patrol.cards:
+				card.visible = false
+			# Quem morreu sai da equipe; os outros seguem do lugar onde terminaram.
+			for index in range(_party_ids.size() - 1, -1, -1):
+				var hero = Campaign.hero(_party_ids[index])
+				if hero == null or not hero.alive:
+					_heroes[index].queue_free()
+					_heroes.remove_at(index)
+					_party_ids.remove_at(index)
+			for index in _heroes.size():
+				_heroes[index].show_art(_combat_art.heroes[_party_ids[index]].idle)
+				_heroes[index].set_tint(Color.WHITE)
+			_place_leader(Vector3(_heroes[0].position.x if not _heroes.is_empty() else patrol.x, 0, 0.45))
+		"escaped":
+			_reset_patrol(patrol)
+			for index in _heroes.size():
+				_heroes[index].show_art(_combat_art.heroes[_party_ids[index]].idle)
+				_heroes[index].set_tint(Color.WHITE)
+			_place_leader(Vector3(patrol.x - PATROL_TRIGGER - 3.0, 0, 0.45), -1.0)
+		_:
+			# Derrota: a rua recomeça com a campanha salva (o protótipo ainda não tem a volta ao refúgio).
+			Campaign.load_or_new()
+			GameFlow.change_to("street")
 
 
 func _process(delta: float) -> void:
@@ -997,6 +1102,7 @@ func _run_capture(delta: float) -> void:
 	_capture_frames += 1
 	_capture_time += delta
 	if _capture_step >= SHOTS.size():
+		_run_combat_capture(delta)
 		return
 	var shot: Array = SHOTS[_capture_step]
 	if _capture_frames == 1:
@@ -1028,7 +1134,8 @@ func _run_capture(delta: float) -> void:
 		# Andou para +X (carro) ou -Z (fachada): a posição final não pode passar do limite.
 		var reached: float = _leader.position.x if shot[6].x != 0 else _leader.position.z
 		var limit: float = shot[8]
-		var ok := reached <= limit + 0.03 if shot[6].x > 0 else reached >= limit - 0.03
+		# Precisa chegar até o obstáculo e parar nele (parado longe dele também é falha).
+		var ok := absf(reached - limit) <= 0.05
 		line = "%s %s reached=%.2f limit=%.2f\n" % [shot[0], "PASS" if ok else "FAIL", reached, limit]
 	else:
 		var sorted := _frame_ms.slice(60)
@@ -1046,5 +1153,65 @@ func _run_capture(delta: float) -> void:
 	print(line.strip_edges())
 	_capture_step += 1
 	_capture_frames = 0
-	if _capture_step >= SHOTS.size():
-		get_tree().quit()
+
+
+func _save_capture(shot_name: String, line: String = "") -> void:
+	get_viewport().get_texture().get_image().save_png(_capture_dir.path_join(shot_name + ".png"))
+	if line == "":
+		return
+	var path := _capture_dir.path_join("frames.txt")
+	var log_file := FileAccess.open(path, FileAccess.READ_WRITE if FileAccess.file_exists(path) else FileAccess.WRITE)
+	log_file.seek_end()
+	log_file.store_string(line + "\n")
+	log_file.close()
+	print(line)
+
+
+## Depois das fotos da rua: uma luta contra a primeira patrulha. Fotografa o HUD, uma ação no meio, o resultado e a
+## rua depois; o resto da luta é jogado sozinho e rápido.
+func _run_combat_capture(delta: float) -> void:
+	_combat_time += delta
+	match _combat_phase:
+		0:
+			_mood = "golden"
+			_raining = false
+			_wet = 0.0
+			_fire_burn = 1.0
+			_apply_wet()
+			_apply_weather()
+			_post.set_shader_parameter("enabled", true)
+			_combat_phase = 1
+			_place_leader(Vector3(_patrols[0].x - PATROL_TRIGGER + 0.5, 0, 0.45))
+			_combat_time = 0.0
+		1:
+			if _arena.active and _arena.hud.waiting and _combat_time > 2.5:
+				_save_capture("10-combat-hud")
+				var actor := _arena.session.current_actor()
+				var options: Array = _arena.session.ability_options(actor.id).filter(func(o): return o.usable)
+				var option: Dictionary = options[0]
+				_arena.hud.command_chosen.emit({"kind": "ability", "ability_id": option.id,
+					"rank": actor.rank if option.self else option.targets[0]})
+				_combat_phase = 2
+				_combat_time = 0.0
+		2:
+			if _combat_time > 0.75:
+				_save_capture("11-combat-action")
+				_arena.auto_battle = true
+				_arena.speed = 3.0
+				_combat_phase = 3
+				_combat_time = 0.0
+		3:
+			if _arena.hud.waiting:
+				_arena.hud.command_chosen.emit({"kind": "defend"})
+			if _arena.hud._result.visible and _combat_time > 0.3:
+				_save_capture("12-combat-result", "12-combat-result result=%s rounds=%d" % [_arena.session.result(), _arena.session.state.round])
+				_combat_phase = 4
+				_combat_time = 0.0
+			elif not _arena.hud._result.visible:
+				_combat_time = 0.0
+		4:
+			if not _arena.active and _combat_time > 1.0:
+				_save_capture("13-after-combat", "13-after-combat patrol_done=%s party=%d" % [_patrols[0].done, _heroes.size()])
+				get_tree().quit()
+			elif _arena.active:
+				_combat_time = 0.0

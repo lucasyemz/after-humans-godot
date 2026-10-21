@@ -1,0 +1,1506 @@
+{
+	"schema_version": 1,
+	"scale_note": "Medidas em pixels da imagem original; a textura pode ser menor.",
+	"heroes": {
+		"hero_cao_bento": {
+			"name": "Bento",
+			"idle": {
+				"file": "res://art/combat/heroes/bento/idle.webp",
+				"anchor": [
+					473.0,
+					1429
+				],
+				"body_reference_pixels": 1419,
+				"canvas": [
+					1086,
+					1448
+				]
+			},
+			"actions": {
+				"cao_punho_sucata": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/bento/cao_punho_sucata_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							600,
+							1248
+						],
+						"body_reference_pixels": 1080
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/bento/cao_punho_sucata_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							610,
+							1212
+						],
+						"body_reference_pixels": 1080,
+						"contact_pixels": [
+							1120,
+							465
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/bento/cao_punho_sucata_vfx.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							250,
+							740
+						],
+						"height_in_bodies": 0.8125,
+						"opacity": 0.78,
+						"life_seconds": 0.6,
+						"target_height_in_bodies": 0.64,
+						"anchor_on_hand": true
+					}
+				},
+				"cao_impacto_hidraulico": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/bento/cao_impacto_hidraulico_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							615,
+							1298
+						],
+						"body_reference_pixels": 1190
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/bento/cao_impacto_hidraulico_execucao.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							610,
+							1292
+						],
+						"body_reference_pixels": 1190,
+						"contact_pixels": [
+							1140,
+							470
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/bento/cao_impacto_hidraulico_vfx.webp",
+						"canvas": [
+							1098,
+							1432
+						],
+						"anchor": [
+							300,
+							820
+						],
+						"height_in_bodies": 0.875,
+						"opacity": 0.75,
+						"life_seconds": 0.65,
+						"target_height_in_bodies": 0.64,
+						"anchor_on_hand": true
+					}
+				},
+				"cao_fique_atras_de_mim": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/bento/cao_fique_atras_de_mim_preparacao.webp",
+						"canvas": [
+							1099,
+							1431
+						],
+						"anchor": [
+							580,
+							1378
+						],
+						"body_reference_pixels": 1310
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/bento/cao_fique_atras_de_mim_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							595,
+							1323
+						],
+						"body_reference_pixels": 1310,
+						"contact_pixels": [
+							920,
+							450
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/bento/cao_fique_atras_de_mim_vfx.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							600,
+							730
+						],
+						"height_in_bodies": 1.125,
+						"opacity": 0.6,
+						"life_seconds": 0.8,
+						"target_height_in_bodies": 0.5,
+						"anchor_on_hand": false
+					}
+				},
+				"cao_nao_estamos_sos": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/bento/cao_nao_estamos_sos_preparacao.webp",
+						"canvas": [
+							1098,
+							1432
+						],
+						"anchor": [
+							595,
+							1420
+						],
+						"body_reference_pixels": 1410
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/bento/cao_nao_estamos_sos_execucao.webp",
+						"canvas": [
+							1099,
+							1431
+						],
+						"anchor": [
+							580,
+							1417
+						],
+						"body_reference_pixels": 1410,
+						"contact_pixels": [
+							950,
+							600
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/bento/cao_nao_estamos_sos_vfx.webp",
+						"canvas": [
+							1098,
+							1432
+						],
+						"anchor": [
+							550,
+							730
+						],
+						"height_in_bodies": 0.9375,
+						"opacity": 0.65,
+						"life_seconds": 0.8,
+						"target_height_in_bodies": 0.24,
+						"anchor_on_hand": false
+					}
+				}
+			},
+			"reactions": {
+				"hurt": {
+					"file": "res://art/combat/heroes/bento/hurt.webp",
+					"canvas": [
+						1086,
+						1448
+					],
+					"anchor": [
+						590,
+						1428
+					],
+					"body_reference_pixels": 1420
+				},
+				"death": {
+					"file": "res://art/combat/heroes/bento/death.webp",
+					"canvas": [
+						1254,
+						1254
+					],
+					"anchor": [
+						680,
+						1198
+					],
+					"body_reference_pixels": 1950
+				}
+			}
+		},
+		"hero_gato_nick": {
+			"name": "Nick",
+			"idle": {
+				"file": "res://art/combat/heroes/nick/idle.webp",
+				"anchor": [
+					488.5,
+					1286
+				],
+				"body_reference_pixels": 1255,
+				"canvas": [
+					1178,
+					1335
+				]
+			},
+			"actions": {
+				"gato_corte_fase": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/nick/gato_corte_fase_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							630,
+							1300
+						],
+						"body_reference_pixels": 1080
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/nick/gato_corte_fase_execucao.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							665,
+							1239
+						],
+						"body_reference_pixels": 1080,
+						"contact_pixels": [
+							1140,
+							1000
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/nick/gato_corte_fase_vfx.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							1030,
+							1040
+						],
+						"height_in_bodies": 1.0625,
+						"life_seconds": 0.6,
+						"opacity": 0.7,
+						"target_height_in_bodies": 0.7,
+						"anchor_on_hand": true
+					}
+				},
+				"gato_salto_entre_ruinas": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/nick/gato_salto_entre_ruinas_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							615,
+							1252
+						],
+						"body_reference_pixels": 1100
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/nick/gato_salto_entre_ruinas_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							620,
+							1252
+						],
+						"body_reference_pixels": 1100,
+						"contact_pixels": [
+							1170,
+							1020
+						],
+						"anchor_note": "Virtual ground line: authored tucked feet are above it during the jump; scale is shared with preparation."
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/nick/gato_salto_entre_ruinas_vfx.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							1030,
+							1000
+						],
+						"height_in_bodies": 1.0625,
+						"life_seconds": 0.6,
+						"opacity": 0.7,
+						"target_height_in_bodies": 0.7,
+						"anchor_on_hand": true
+					}
+				},
+				"gato_sumir_na_sombra": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/nick/gato_sumir_na_sombra_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							640,
+							1281
+						],
+						"body_reference_pixels": 1210
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/nick/gato_sumir_na_sombra_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							600,
+							1213
+						],
+						"body_reference_pixels": 1210,
+						"contact_pixels": [
+							750,
+							650
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/nick/gato_sumir_na_sombra_vfx.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							620,
+							850
+						],
+						"height_in_bodies": 1.25,
+						"life_seconds": 0.8,
+						"opacity": 0.7,
+						"target_height_in_bodies": 0.34,
+						"anchor_on_hand": false
+					}
+				},
+				"gato_cacada_precisa": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/nick/gato_cacada_precisa_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							640,
+							1298
+						],
+						"body_reference_pixels": 1260
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/nick/gato_cacada_precisa_execucao.webp",
+						"canvas": [
+							1536,
+							1024
+						],
+						"anchor": [
+							675,
+							976
+						],
+						"body_reference_pixels": 1260,
+						"contact_pixels": [
+							1520,
+							432
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/nick/gato_cacada_precisa_vfx.webp",
+						"canvas": [
+							1180,
+							1333
+						],
+						"anchor": [
+							960,
+							370
+						],
+						"height_in_bodies": 1,
+						"life_seconds": 0.6,
+						"opacity": 0.7,
+						"target_height_in_bodies": 0.6,
+						"anchor_on_hand": false
+					}
+				}
+			},
+			"reactions": {
+				"hurt": {
+					"file": "res://art/combat/heroes/nick/hurt.webp",
+					"canvas": [
+						1178,
+						1335
+					],
+					"anchor": [
+						640,
+						1295
+					],
+					"body_reference_pixels": 1274
+				},
+				"death": {
+					"file": "res://art/combat/heroes/nick/death.webp",
+					"canvas": [
+						1254,
+						1254
+					],
+					"anchor": [
+						780,
+						1183
+					],
+					"body_reference_pixels": 1600
+				}
+			}
+		},
+		"hero_sapo_iris": {
+			"name": "Iris",
+			"idle": {
+				"file": "res://art/combat/heroes/iris/idle.webp",
+				"anchor": [
+					587.5,
+					1264
+				],
+				"body_reference_pixels": 1208,
+				"canvas": [
+					1178,
+					1335
+				]
+			},
+			"actions": {
+				"sapo_carga_voltaica": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/iris/sapo_carga_voltaica_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							660,
+							1277
+						],
+						"body_reference_pixels": 1190
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/iris/sapo_carga_voltaica_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							670,
+							1281
+						],
+						"body_reference_pixels": 1190,
+						"contact_pixels": [
+							1150,
+							250
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/iris/sapo_carga_voltaica_vfx.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							555,
+							720
+						],
+						"height_in_bodies": 1.45,
+						"opacity": 0.7,
+						"life_seconds": 0.65,
+						"target_height_in_bodies": 0.6,
+						"anchor_on_hand": false
+					}
+				},
+				"sapo_coquetel_corrosivo": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/iris/sapo_coquetel_corrosivo_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							655,
+							1287
+						],
+						"body_reference_pixels": 1190
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/iris/sapo_coquetel_corrosivo_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							655,
+							1302
+						],
+						"body_reference_pixels": 1190,
+						"contact_pixels": [
+							1140,
+							190
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/iris/sapo_coquetel_corrosivo_vfx.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							590,
+							770
+						],
+						"height_in_bodies": 1.35,
+						"opacity": 0.7,
+						"life_seconds": 0.65,
+						"target_height_in_bodies": 0.55,
+						"anchor_on_hand": false
+					}
+				},
+				"sapo_ampola_reparo_vivo": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/iris/sapo_ampola_reparo_vivo_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							735,
+							1287
+						],
+						"body_reference_pixels": 1240
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/iris/sapo_ampola_reparo_vivo_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							675,
+							1277
+						],
+						"body_reference_pixels": 1240,
+						"contact_pixels": [
+							1090,
+							300
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/iris/sapo_ampola_reparo_vivo_vfx.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							610,
+							750
+						],
+						"height_in_bodies": 1.15,
+						"opacity": 0.7,
+						"life_seconds": 0.8,
+						"target_height_in_bodies": 0.42,
+						"anchor_on_hand": false
+					}
+				},
+				"sapo_antidoto_campo": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/iris/sapo_antidoto_campo_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							730,
+							1300
+						],
+						"body_reference_pixels": 1240
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/iris/sapo_antidoto_campo_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							635,
+							1290
+						],
+						"body_reference_pixels": 1240,
+						"contact_pixels": [
+							1060,
+							240
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/iris/sapo_antidoto_campo_vfx.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							620,
+							760
+						],
+						"height_in_bodies": 1.1,
+						"opacity": 0.7,
+						"life_seconds": 0.8,
+						"target_height_in_bodies": 0.42,
+						"anchor_on_hand": false
+					}
+				}
+			},
+			"reactions": {}
+		},
+		"hero_coruja_vespera": {
+			"name": "Vespera",
+			"idle": {
+				"file": "res://art/combat/heroes/vespera/idle.webp",
+				"anchor": [
+					451.0,
+					1297
+				],
+				"body_reference_pixels": 1271,
+				"canvas": [
+					1178,
+					1335
+				]
+			},
+			"actions": {
+				"coruja_disparo_perfurante": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/vespera/coruja_disparo_perfurante_preparacao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							620,
+							1255
+						],
+						"body_reference_pixels": 1150
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/vespera/coruja_disparo_perfurante_execucao.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							655,
+							1261
+						],
+						"body_reference_pixels": 1150,
+						"contact_pixels": [
+							1140,
+							320
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/vespera/coruja_disparo_perfurante_vfx.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							1060,
+							710
+						],
+						"height_in_bodies": 0.95,
+						"opacity": 0.75,
+						"life_seconds": 0.6,
+						"target_height_in_bodies": 0.64,
+						"anchor_on_hand": false,
+						"flip_with_direction": true
+					}
+				},
+				"coruja_olho_nas_ruinas": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/vespera/coruja_olho_nas_ruinas_preparacao.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							665,
+							1311
+						],
+						"body_reference_pixels": 1250
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/vespera/coruja_olho_nas_ruinas_execucao.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							650,
+							1306
+						],
+						"body_reference_pixels": 1250,
+						"contact_pixels": [
+							1020,
+							210
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/vespera/coruja_olho_nas_ruinas_vfx.webp",
+						"canvas": [
+							1178,
+							1335
+						],
+						"anchor": [
+							590,
+							675
+						],
+						"height_in_bodies": 1.05,
+						"opacity": 0.68,
+						"life_seconds": 0.8,
+						"target_height_in_bodies": 0.61,
+						"anchor_on_hand": false,
+						"flip_with_direction": false
+					}
+				},
+				"coruja_granada_fumaca": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/vespera/coruja_granada_fumaca_preparacao.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							620,
+							1308
+						],
+						"body_reference_pixels": 1200
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/vespera/coruja_granada_fumaca_execucao.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							620,
+							1300
+						],
+						"body_reference_pixels": 1200,
+						"contact_pixels": [
+							1120,
+							280
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/vespera/coruja_granada_fumaca_vfx.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							595,
+							755
+						],
+						"height_in_bodies": 1.1,
+						"opacity": 0.55,
+						"life_seconds": 0.8,
+						"target_height_in_bodies": 0.42,
+						"anchor_on_hand": false,
+						"flip_with_direction": false
+					}
+				},
+				"coruja_recurso_emergencia": {
+					"preparacao": {
+						"file": "res://art/combat/heroes/vespera/coruja_recurso_emergencia_preparacao.webp",
+						"canvas": [
+							1098,
+							1432
+						],
+						"anchor": [
+							650,
+							1420
+						],
+						"body_reference_pixels": 1280
+					},
+					"execucao": {
+						"file": "res://art/combat/heroes/vespera/coruja_recurso_emergencia_execucao.webp",
+						"canvas": [
+							1098,
+							1432
+						],
+						"anchor": [
+							610,
+							1383
+						],
+						"body_reference_pixels": 1280,
+						"contact_pixels": [
+							1020,
+							300
+						]
+					},
+					"vfx": {
+						"file": "res://art/combat/heroes/vespera/coruja_recurso_emergencia_vfx.webp",
+						"canvas": [
+							1179,
+							1334
+						],
+						"anchor": [
+							565,
+							695
+						],
+						"height_in_bodies": 0.95,
+						"opacity": 0.75,
+						"life_seconds": 0.6,
+						"target_height_in_bodies": 0.64,
+						"anchor_on_hand": false,
+						"flip_with_direction": true
+					}
+				}
+			},
+			"reactions": {}
+		}
+	},
+	"enemies": {
+		"robot": {
+			"poses": {
+				"dodge": {
+					"file": "res://art/combat/enemies/robot/dodge.webp",
+					"anchor": [
+						641.0,
+						1277
+					],
+					"body_reference_pixels": 1275,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/robot/defense.webp",
+					"anchor": [
+						602.0,
+						1298
+					],
+					"body_reference_pixels": 1275,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/robot/support.webp",
+					"anchor": [
+						610.0,
+						1301
+					],
+					"body_reference_pixels": 1285,
+					"canvas": [
+						1179,
+						1334
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/robot/hurt.webp",
+					"anchor": [
+						606.5,
+						1287
+					],
+					"body_reference_pixels": 1275,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/robot/death.webp",
+					"anchor": [
+						591.0,
+						1245
+					],
+					"body_reference_pixels": 1275,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"attack1": {
+					"file": "res://art/combat/enemies/robot/attack1.webp",
+					"anchor": [
+						594.5,
+						1268
+					],
+					"body_reference_pixels": 1275,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"attack2": {
+					"file": "res://art/combat/enemies/robot/attack2.webp",
+					"anchor": [
+						593.0,
+						1265
+					],
+					"body_reference_pixels": 1275,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
+			"idle": {
+				"file": "res://art/combat/enemies/robot/idle_sheet.webp",
+				"frames": [
+					[
+						0,
+						0,
+						256,
+						256
+					],
+					[
+						256,
+						0,
+						256,
+						256
+					],
+					[
+						512,
+						0,
+						256,
+						256
+					],
+					[
+						768,
+						0,
+						256,
+						256
+					],
+					[
+						1024,
+						0,
+						256,
+						256
+					],
+					[
+						0,
+						256,
+						256,
+						256
+					],
+					[
+						256,
+						256,
+						256,
+						256
+					],
+					[
+						512,
+						256,
+						256,
+						256
+					],
+					[
+						768,
+						256,
+						256,
+						256
+					],
+					[
+						1024,
+						256,
+						256,
+						256
+					],
+					[
+						0,
+						512,
+						256,
+						256
+					],
+					[
+						256,
+						512,
+						256,
+						256
+					],
+					[
+						512,
+						512,
+						256,
+						256
+					],
+					[
+						768,
+						512,
+						256,
+						256
+					],
+					[
+						1024,
+						512,
+						256,
+						256
+					],
+					[
+						0,
+						768,
+						256,
+						256
+					],
+					[
+						256,
+						768,
+						256,
+						256
+					],
+					[
+						512,
+						768,
+						256,
+						256
+					],
+					[
+						768,
+						768,
+						256,
+						256
+					],
+					[
+						1024,
+						768,
+						256,
+						256
+					],
+					[
+						0,
+						1024,
+						256,
+						256
+					],
+					[
+						256,
+						1024,
+						256,
+						256
+					],
+					[
+						512,
+						1024,
+						256,
+						256
+					]
+				],
+				"fps": 10,
+				"anchor": [
+					126.5,
+					237
+				],
+				"body_reference_pixels": 218,
+				"canvas": [
+					256,
+					256
+				]
+			}
+		},
+		"robot_fungo": {
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/robot_fungo/attack1.webp",
+					"anchor": [
+						609.0,
+						1137
+					],
+					"body_reference_pixels": 928,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"attack2": {
+					"file": "res://art/combat/enemies/robot_fungo/attack2.webp",
+					"anchor": [
+						651.0,
+						1137
+					],
+					"body_reference_pixels": 928,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/robot_fungo/defense.webp",
+					"anchor": [
+						588.5,
+						1137
+					],
+					"body_reference_pixels": 928,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/robot_fungo/hurt.webp",
+					"anchor": [
+						643.0,
+						1137
+					],
+					"body_reference_pixels": 928,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"dodge": {
+					"file": "res://art/combat/enemies/robot_fungo/dodge.webp",
+					"anchor": [
+						580.5,
+						1138
+					],
+					"body_reference_pixels": 928,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/robot_fungo/support.webp",
+					"anchor": [
+						596.0,
+						1137
+					],
+					"body_reference_pixels": 928,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/robot_fungo/death.webp",
+					"anchor": [
+						587.0,
+						1137
+					],
+					"body_reference_pixels": 928,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
+			"idle": {
+				"file": "res://art/combat/enemies/robot_fungo/idle_sheet.webp",
+				"frames": [
+					[
+						0,
+						0,
+						256,
+						256
+					],
+					[
+						256,
+						0,
+						256,
+						256
+					],
+					[
+						512,
+						0,
+						256,
+						256
+					],
+					[
+						768,
+						0,
+						256,
+						256
+					],
+					[
+						1024,
+						0,
+						256,
+						256
+					],
+					[
+						0,
+						256,
+						256,
+						256
+					],
+					[
+						256,
+						256,
+						256,
+						256
+					],
+					[
+						512,
+						256,
+						256,
+						256
+					],
+					[
+						768,
+						256,
+						256,
+						256
+					],
+					[
+						1024,
+						256,
+						256,
+						256
+					],
+					[
+						0,
+						512,
+						256,
+						256
+					],
+					[
+						256,
+						512,
+						256,
+						256
+					],
+					[
+						512,
+						512,
+						256,
+						256
+					],
+					[
+						768,
+						512,
+						256,
+						256
+					],
+					[
+						1024,
+						512,
+						256,
+						256
+					],
+					[
+						0,
+						768,
+						256,
+						256
+					],
+					[
+						256,
+						768,
+						256,
+						256
+					],
+					[
+						512,
+						768,
+						256,
+						256
+					],
+					[
+						768,
+						768,
+						256,
+						256
+					],
+					[
+						1024,
+						768,
+						256,
+						256
+					],
+					[
+						0,
+						1024,
+						256,
+						256
+					],
+					[
+						256,
+						1024,
+						256,
+						256
+					],
+					[
+						512,
+						1024,
+						256,
+						256
+					],
+					[
+						768,
+						1024,
+						256,
+						256
+					],
+					[
+						1024,
+						1024,
+						256,
+						256
+					]
+				],
+				"fps": 10,
+				"anchor": [
+					125.5,
+					219
+				],
+				"body_reference_pixels": 179,
+				"canvas": [
+					256,
+					256
+				]
+			}
+		},
+		"vigia_enferrujado": {
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/vigia_enferrujado/attack1.webp",
+					"anchor": [
+						589.5,
+						1136
+					],
+					"body_reference_pixels": 1004,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"attack2": {
+					"file": "res://art/combat/enemies/vigia_enferrujado/attack2.webp",
+					"anchor": [
+						588.5,
+						1136
+					],
+					"body_reference_pixels": 1004,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/vigia_enferrujado/defense.webp",
+					"anchor": [
+						588.0,
+						1136
+					],
+					"body_reference_pixels": 1004,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/vigia_enferrujado/hurt.webp",
+					"anchor": [
+						589.0,
+						1136
+					],
+					"body_reference_pixels": 1004,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"dodge": {
+					"file": "res://art/combat/enemies/vigia_enferrujado/dodge.webp",
+					"anchor": [
+						588.5,
+						1137
+					],
+					"body_reference_pixels": 1004,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/vigia_enferrujado/support.webp",
+					"anchor": [
+						589.0,
+						1136
+					],
+					"body_reference_pixels": 1004,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/vigia_enferrujado/death.webp",
+					"anchor": [
+						589.0,
+						1136
+					],
+					"body_reference_pixels": 1004,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
+			"idle": {
+				"file": "res://art/combat/enemies/vigia_enferrujado/idle.webp",
+				"anchor": [
+					607.0,
+					1137
+				],
+				"body_reference_pixels": 924,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		}
+	},
+	"icons": {
+		"cao_fique_atras_de_mim": "res://art/combat/icons/cao_fique_atras_de_mim.webp",
+		"cao_impacto_hidraulico": "res://art/combat/icons/cao_impacto_hidraulico.webp",
+		"cao_nao_estamos_sos": "res://art/combat/icons/cao_nao_estamos_sos.webp",
+		"cao_punho_sucata": "res://art/combat/icons/cao_punho_sucata.webp",
+		"coruja_disparo_perfurante": "res://art/combat/icons/coruja_disparo_perfurante.webp",
+		"coruja_granada_fumaca": "res://art/combat/icons/coruja_granada_fumaca.webp",
+		"coruja_olho_nas_ruinas": "res://art/combat/icons/coruja_olho_nas_ruinas.webp",
+		"coruja_recurso_emergencia": "res://art/combat/icons/coruja_recurso_emergencia.webp",
+		"gato_cacada_precisa": "res://art/combat/icons/gato_cacada_precisa.webp",
+		"gato_corte_fase": "res://art/combat/icons/gato_corte_fase.webp",
+		"gato_salto_entre_ruinas": "res://art/combat/icons/gato_salto_entre_ruinas.webp",
+		"gato_sumir_na_sombra": "res://art/combat/icons/gato_sumir_na_sombra.webp",
+		"sapo_ampola_reparo_vivo": "res://art/combat/icons/sapo_ampola_reparo_vivo.webp",
+		"sapo_antidoto_campo": "res://art/combat/icons/sapo_antidoto_campo.webp",
+		"sapo_carga_voltaica": "res://art/combat/icons/sapo_carga_voltaica.webp",
+		"sapo_coquetel_corrosivo": "res://art/combat/icons/sapo_coquetel_corrosivo.webp"
+	},
+	"audio": {
+		"BentoAction1": "res://audio/combat/BentoAction1.mp3",
+		"BentoAction2": "res://audio/combat/BentoAction2.mp3",
+		"BentoAction3": "res://audio/combat/BentoAction3.mp3",
+		"BentoAction4": "res://audio/combat/BentoAction4.mp3",
+		"NickAction1": "res://audio/combat/NickAction1.mp3",
+		"NickAction2": "res://audio/combat/NickAction2.mp3",
+		"NickAction3": "res://audio/combat/NickAction3.mp3",
+		"NickAction4": "res://audio/combat/NickAction4.mp3",
+		"IrisAction1": "res://audio/combat/IrisAction1.wav",
+		"IrisAction2": "res://audio/combat/IrisAction2.mp3",
+		"IrisAction3": "res://audio/combat/IrisAction3.wav",
+		"IrisAction4": "res://audio/combat/IrisAction4.mp3",
+		"VesperaAction1": "res://audio/combat/VesperaAction1.wav",
+		"VesperaAction2": "res://audio/combat/VesperaAction2.wav",
+		"VesperaAction3": "res://audio/combat/VesperaAction3.wav",
+		"VesperaAction4": "res://audio/combat/VesperaAction4.mp3",
+		"Dodge": "res://audio/combat/Dodge.mp3",
+		"RobotDodge": "res://audio/combat/RobotDodge.mp3",
+		"RobotHeal": "res://audio/combat/RobotHeal.wav",
+		"RobotPunch": "res://audio/combat/RobotPunch.wav",
+		"UIClick": "res://audio/combat/UIClick.wav"
+	}
+}

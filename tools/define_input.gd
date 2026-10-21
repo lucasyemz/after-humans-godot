@@ -19,6 +19,7 @@ const ACTIONS := {
 	"debug_time": {"keys": [KEY_T]},
 	"debug_post": {"keys": [KEY_P]},
 	"debug_colliders": {"keys": [KEY_C]},
+	"debug_combat": {"keys": [KEY_K]},
 }
 
 
