@@ -1,34 +1,46 @@
-## HUD de combate (port enxuto do UAHCombatHUDWidget), montado em código:
-## - em cima, a ordem dos turnos da rodada;
-## - sobre cada personagem, nome, vida, instinto (heróis) e status;
-## - embaixo, o herói da vez com as 4 habilidades (ícone, recarga, usos e o motivo quando não dá), Mover, Defender e Fugir;
-## - ao escolher, marcadores sobre os alvos válidos (mouse, teclado ou gamepad; Backspace ou B volta).
+## HUD de combate (a proposta de UX, etapa 1), montado em código na base de 1920x1080:
+## - em cima, a ordem da rodada com o rosto de cada um (quem age agora em dourado, inimigos com aro de cobre);
+## - sob os pés de cada personagem, uma placa com nome, vida em número e os estados por extenso;
+## - embaixo, o herói da vez por inteiro (vida e instinto até a crise), os quatro cartões de habilidade (o número, de
+##   quais posições sai e quais alcança, a tecla e o motivo quando não dá) e as ações com tecla;
+## - ao apontar uma habilidade ou um alvo, a dica completa: o que faz, quem atinge, se derruba e os termos explicados;
+## - o registro da luta à direita, legível.
 class_name AHCombatHud
 extends Control
 
 signal command_chosen(command: Dictionary)
 signal result_closed
 
-const GOLD := Color(0.86, 0.69, 0.4)
-const INK := Color(0.07, 0.06, 0.07, 0.9)
-const TEXT := Color(0.97, 0.9, 0.78)
-const MUTED := Color(0.65, 0.6, 0.55)
+const S = preload("res://scripts/ui/ui_style.gd")
+const GOLD := S.GOLD
+const INK := Color(0.055, 0.066, 0.074, 0.9)
+const TEXT := S.TEXT
+const MUTED := S.MUTED
+## Onde fica o painel de baixo (a placa sob os pés não passa daqui).
+const DOCK_TOP := 846.0
+const ACTIONS := [["Mover", "move", "Q", "combat_move"], ["Defender", "defend", "W", "combat_defend"],
+	["Mochila", "item", "I", "inventory"], ["Fugir", "flee", "F", "combat_flee"]]
 
 var arena: AHCombatArena
 var session: AHCombatSession
-var _turn_row: HBoxContainer
-var _round_label: Label
+var _order: HBoxContainer
+var _order_panel: PanelContainer
 var _panel: PanelContainer
+var _hero_face: TextureRect
 var _hero_name: Label
 var _hero_hp: ProgressBar
 var _hero_hp_text: Label
 var _hero_instinct: ProgressBar
-var _hero_status: Label
+var _hero_instinct_text: Label
+var _hero_status: HFlowContainer
 var _abilities: HBoxContainer
 var _actions: VBoxContainer
 var _description: Label
 var _message: Label
 var _log: Label
+var _log_panel: PanelContainer
+var _tip: PanelContainer
+var _tip_box: VBoxContainer
 var _result: PanelContainer
 var _unit_bars := {}
 var _markers: Array = []
@@ -49,51 +61,23 @@ func _ready() -> void:
 	_build()
 
 
-# ---------------------------------------------------------------- montagem
+# ---------------------------------------------------------------- peças (usadas também pelas outras telas)
 
 static func panel_style(alpha: float = 0.9) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(INK.r, INK.g, INK.b, alpha)
-	style.border_color = GOLD.darkened(0.25)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(6)
-	style.content_margin_left = 14
-	style.content_margin_right = 14
-	style.content_margin_top = 10
-	style.content_margin_bottom = 10
-	return style
+	return S.panel(alpha)
 
 
 static func make_label(text: String, size: int, color: Color = TEXT) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.add_theme_font_size_override("font_size", size)
-	label.add_theme_color_override("font_color", color)
-	label.add_theme_color_override("font_outline_color", Color(0.04, 0.03, 0.03))
-	label.add_theme_constant_override("outline_size", 4)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return label
+	return S.label(text, size, color)
 
 
 static func make_bar(color: Color, height: float) -> ProgressBar:
-	var bar := ProgressBar.new()
-	bar.show_percentage = false
-	bar.custom_minimum_size = Vector2(0, height)
-	var back := StyleBoxFlat.new()
-	back.bg_color = Color(0.02, 0.02, 0.02, 0.85)
-	back.set_corner_radius_all(3)
-	var fill := StyleBoxFlat.new()
-	fill.bg_color = color
-	fill.set_corner_radius_all(3)
-	bar.add_theme_stylebox_override("background", back)
-	bar.add_theme_stylebox_override("fill", fill)
-	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return bar
+	return S.bar(color, height)
 
 
 static func style_button(button: Button, accent: Color = GOLD) -> void:
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
-		var style := panel_style(0.92)
+		var style := S.panel(0.92, Color(S.COPPER, 0.5))
 		match state:
 			"hover", "focus":
 				style.border_color = accent
@@ -113,94 +97,130 @@ static func style_button(button: Button, accent: Color = GOLD) -> void:
 		button.pressed.connect(func(): Sound.click())
 
 
-func _build() -> void:
-	# O HUD é desenhado na base de 1920x1080 (o projeto estica a tela inteira): posições fixas nessa base.
-	var top := VBoxContainer.new()
-	top.position = Vector2(360, 16)
-	top.size = Vector2(1200, 0)
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.alignment = BoxContainer.ALIGNMENT_CENTER
-	add_child(top)
-	_round_label = make_label("", 20, GOLD)
-	_round_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	top.add_child(_round_label)
-	_turn_row = HBoxContainer.new()
-	_turn_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_turn_row.add_theme_constant_override("separation", 8)
-	_turn_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.add_child(_turn_row)
+# ---------------------------------------------------------------- montagem
 
-	_message = make_label("", 26, TEXT)
-	_message.position = Vector2(460, 112)
-	_message.size = Vector2(1000, 40)
+func _build() -> void:
+	_order_panel = PanelContainer.new()
+	var order_style := S.panel(0.86)
+	order_style.content_margin_top = 6
+	order_style.content_margin_bottom = 6
+	_order_panel.add_theme_stylebox_override("panel", order_style)
+	_order_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_order_panel)
+	_order = HBoxContainer.new()
+	_order.add_theme_constant_override("separation", 12)
+	_order.alignment = BoxContainer.ALIGNMENT_CENTER
+	_order.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_order_panel.add_child(_order)
+
+	_message = S.label("", 28, TEXT, "bold")
+	_message.position = Vector2(360, 150)
+	_message.size = Vector2(1200, 44)
 	_message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_message)
 
-	_log = make_label("", 17, MUTED)
-	# O registro fica no canto de cima: embaixo ele cobria os pés de quem luta.
-	_log.position = Vector2(36, 18)
-	_log.size = Vector2(620, 60)
+	_log_panel = PanelContainer.new()
+	var log_style := S.panel(0.78, Color(S.COPPER, 0.35), 1)
+	_log_panel.add_theme_stylebox_override("panel", log_style)
+	_log_panel.position = Vector2(1474, 132)
+	_log_panel.custom_minimum_size = Vector2(420, 0)
+	_log_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_log_panel)
+	var log_box := VBoxContainer.new()
+	log_box.add_theme_constant_override("separation", 4)
+	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_log_panel.add_child(log_box)
+	log_box.add_child(S.label("REGISTRO", 15, S.COPPER, "bold"))
+	_log = S.label("", S.MIN_TEXT, TEXT)
 	_log.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_log.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	add_child(_log)
+	_log.custom_minimum_size = Vector2(390, 0)
+	log_box.add_child(_log)
 
 	_panel = PanelContainer.new()
-	_panel.add_theme_stylebox_override("panel", panel_style())
-	_panel.position = Vector2(30, 838)
-	_panel.size = Vector2(1860, 220)
+	_panel.add_theme_stylebox_override("panel", S.panel(0.92))
+	_panel.position = Vector2(24, DOCK_TOP)
+	_panel.size = Vector2(1872, 210)
 	add_child(_panel)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 22)
+	row.add_theme_constant_override("separation", 18)
 	_panel.add_child(row)
 
+	# O herói da vez: rosto, nome, vida e instinto até a crise.
+	var hero := HBoxContainer.new()
+	hero.custom_minimum_size = Vector2(360, 0)
+	hero.add_theme_constant_override("separation", 14)
+	row.add_child(hero)
+	_hero_face = TextureRect.new()
+	_hero_face.custom_minimum_size = Vector2(104, 104)
+	_hero_face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	hero.add_child(_hero_face)
 	var hero_box := VBoxContainer.new()
-	hero_box.custom_minimum_size = Vector2(360, 0)
-	hero_box.add_theme_constant_override("separation", 6)
-	row.add_child(hero_box)
-	_hero_name = make_label("", 30, GOLD)
+	hero_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hero_box.add_theme_constant_override("separation", 4)
+	hero.add_child(hero_box)
+	_hero_name = S.label("", 30, GOLD, "display")
 	hero_box.add_child(_hero_name)
-	_hero_hp_text = make_label("", 18)
+	_hero_hp_text = S.label("", S.MIN_TEXT)
 	hero_box.add_child(_hero_hp_text)
-	_hero_hp = make_bar(Color(0.78, 0.2, 0.18), 16)
+	_hero_hp = S.bar(Color(0.8, 0.27, 0.22), 14)
 	hero_box.add_child(_hero_hp)
-	hero_box.add_child(make_label("Instinto", 15, MUTED))
-	_hero_instinct = make_bar(Color(0.55, 0.36, 0.85), 10)
+	_hero_instinct_text = S.label("", 16, S.VIOLET)
+	_hero_instinct_text.mouse_filter = Control.MOUSE_FILTER_PASS
+	_hero_instinct_text.tooltip_text = S.GLOSSARY.Instinto
+	hero_box.add_child(_hero_instinct_text)
+	_hero_instinct = S.bar(Color(0.6, 0.48, 0.92), 8)
 	_hero_instinct.max_value = 200
 	hero_box.add_child(_hero_instinct)
-	_hero_status = make_label("", 16, MUTED)
-	_hero_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hero_status = HFlowContainer.new()
+	_hero_status.add_theme_constant_override("h_separation", 6)
+	_hero_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hero_box.add_child(_hero_status)
 
 	var middle := VBoxContainer.new()
 	middle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	middle.add_theme_constant_override("separation", 8)
+	middle.add_theme_constant_override("separation", 6)
 	row.add_child(middle)
-	_description = make_label("", 18, TEXT)
-	_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_description.custom_minimum_size = Vector2(0, 48)
+	_description = S.label("", S.MIN_TEXT, MUTED)
+	_description.custom_minimum_size = Vector2(0, 26)
 	middle.add_child(_description)
 	_abilities = HBoxContainer.new()
-	_abilities.add_theme_constant_override("separation", 12)
+	_abilities.add_theme_constant_override("separation", 10)
 	middle.add_child(_abilities)
 
 	_actions = VBoxContainer.new()
-	_actions.custom_minimum_size = Vector2(200, 0)
-	_actions.add_theme_constant_override("separation", 8)
+	_actions.custom_minimum_size = Vector2(236, 0)
+	_actions.add_theme_constant_override("separation", 6)
 	row.add_child(_actions)
-	for spec in [["Mover", "move"], ["Defender", "defend"], ["Mochila", "item"], ["Fugir", "flee"]]:
+	for spec in ACTIONS:
 		var button := Button.new()
+		button.custom_minimum_size = Vector2(236, 42)
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.text = spec[0]
-		button.custom_minimum_size = Vector2(200, 40)
 		style_button(button)
+		var key := S.key_cap(spec[2])
+		key.position = Vector2(196, 8)
+		button.add_child(key)
 		button.pressed.connect(_on_action.bind(spec[1]))
 		button.focus_entered.connect(_describe_action.bind(spec[1]))
 		button.mouse_entered.connect(_describe_action.bind(spec[1]))
+		button.mouse_exited.connect(_hide_tip)
 		button.set_meta("kind", spec[1])
 		_actions.add_child(button)
 
+	_tip = PanelContainer.new()
+	_tip.add_theme_stylebox_override("panel", S.panel(0.96, GOLD.darkened(0.2)))
+	_tip.custom_minimum_size = Vector2(460, 0)
+	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip.visible = false
+	add_child(_tip)
+	_tip_box = VBoxContainer.new()
+	_tip_box.add_theme_constant_override("separation", 6)
+	_tip_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip.add_child(_tip_box)
+
 	_result = PanelContainer.new()
-	_result.add_theme_stylebox_override("panel", panel_style(0.95))
-	_result.position = Vector2(660, 330)
+	_result.add_theme_stylebox_override("panel", S.panel(0.95))
+	_result.position = Vector2(660, 300)
 	_result.custom_minimum_size = Vector2(600, 0)
 	_result.visible = false
 	add_child(_result)
@@ -216,112 +236,179 @@ func open(new_session: AHCombatSession) -> void:
 		bar.queue_free()
 	_unit_bars.clear()
 	for unit in session.units():
-		_unit_bars[unit.id] = _make_unit_bar(unit)
+		_unit_bars[unit.id] = _make_plate(unit)
 	refresh()
 
 
 func close() -> void:
 	visible = false
 	_clear_markers()
+	_hide_tip()
 	for bar in _unit_bars.values():
 		bar.queue_free()
 	_unit_bars.clear()
 
 
-func _make_unit_bar(unit: AHCombat.Unit) -> Control:
+func _art_of(unit: AHCombat.Unit) -> Dictionary:
+	return arena.hero_art(unit.hero_id).get("idle", {}) if unit.is_player else arena.enemy_art(unit.enemy_id).get("idle", {})
+
+
+## A placa sob os pés: nome e vida em número, a barra, o instinto (heróis) e os estados por extenso.
+func _make_plate(unit: AHCombat.Unit) -> Control:
+	var plate := PanelContainer.new()
+	var style := S.panel(0.84, Color(S.COPPER, 0.4), 1)
+	style.content_margin_left = 8
+	style.content_margin_right = 8
+	style.content_margin_top = 4
+	style.content_margin_bottom = 5
+	plate.add_theme_stylebox_override("panel", style)
+	plate.custom_minimum_size = Vector2(176 if unit.is_player else 246, 0)
+	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var box := VBoxContainer.new()
-	box.custom_minimum_size = Vector2(150, 0)
-	box.add_theme_constant_override("separation", 2)
+	box.add_theme_constant_override("separation", 3)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var name_label := make_label(unit.display_name, 17, TEXT)
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	plate.add_child(box)
+	var top := HBoxContainer.new()
+	top.name = "Top"
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(top)
+	var name_label := S.label(unit.display_name, 17, TEXT, "bold")
 	name_label.name = "Name"
-	box.add_child(name_label)
-	var hp := make_bar(Color(0.78, 0.2, 0.18) if unit.is_player else Color(0.85, 0.45, 0.15), 9)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.clip_text = true
+	top.add_child(name_label)
+	var hp_text := S.label("", 17, MUTED)
+	hp_text.name = "HpText"
+	top.add_child(hp_text)
+	var hp := S.bar(Color(0.8, 0.27, 0.22) if unit.is_player else S.ENEMY, 9)
 	hp.name = "Hp"
 	box.add_child(hp)
 	if unit.is_player:
-		var instinct := make_bar(Color(0.55, 0.36, 0.85), 5)
+		var instinct := S.bar(Color(0.6, 0.48, 0.92), 4)
 		instinct.max_value = 200
 		instinct.name = "Instinct"
 		box.add_child(instinct)
-	var status := make_label("", 14, Color(0.85, 0.82, 0.7))
-	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var status := HFlowContainer.new()
 	status.name = "Status"
+	status.add_theme_constant_override("h_separation", 4)
+	status.add_theme_constant_override("v_separation", 3)
+	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(status)
-	add_child(box)
-	move_child(box, 0)
-	return box
+	plate.set_meta("style", style)
+	add_child(plate)
+	move_child(plate, 0)
+	return plate
 
 
-## Atualiza barras, ordem dos turnos, painel do herói e o registro.
+## Tira os filhos já (não só no fim do quadro), para o painel medir o tamanho novo na hora.
+static func _clear(node: Node) -> void:
+	for child in node.get_children():
+		node.remove_child(child)
+		child.queue_free()
+
+
+func _status_chip(text: String, good: bool, size: int = 15) -> PanelContainer:
+	var chip := PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.22, 0.34, 0.55, 0.55) if good else Color(0.5, 0.15, 0.12, 0.6)
+	style.border_color = Color(S.BLUE, 0.8) if good else Color(S.DANGER, 0.85)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(3)
+	style.content_margin_left = 5
+	style.content_margin_right = 5
+	chip.add_theme_stylebox_override("panel", style)
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_child(S.label(text, size, TEXT))
+	return chip
+
+
+## Atualiza placas, ordem dos turnos, painel do herói e o registro.
 func refresh() -> void:
 	if session == null:
 		return
+	var current := session.state.current_turn_unit_id
 	for unit in session.units():
-		var box: Control = _unit_bars.get(unit.id)
-		if box == null:
+		var plate: PanelContainer = _unit_bars.get(unit.id)
+		if plate == null:
 			continue
 		var card: AHSpriteCard = arena.cards.get(unit.id)
-		box.visible = card != null and card.visible and (unit.hp > 0 or unit.is_player)
+		plate.visible = card != null and card.visible and (unit.hp > 0 or unit.is_player)
+		var box := plate.get_child(0)
 		var hp: ProgressBar = box.get_node("Hp")
 		hp.max_value = unit.max_hp
 		hp.value = unit.hp
+		(box.get_node("Top/HpText") as Label).text = "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else "Último Fôlego"
 		if unit.is_player:
 			(box.get_node("Instinct") as ProgressBar).value = unit.instinct
-		var name_label: Label = box.get_node("Name")
-		name_label.text = "%s %d/%d" % [unit.display_name, unit.hp, unit.max_hp]
-		name_label.add_theme_color_override("font_color", GOLD if unit.id == session.state.current_turn_unit_id else TEXT)
-		(box.get_node("Status") as Label).text = status_text(unit, true)
-	_round_label.text = "Rodada %d" % session.state.round
-	for child in _turn_row.get_children():
-		child.queue_free()
-	for item in session.state.initiative_queue:
-		var unit := session.state.find_unit(item.unit_id)
-		if unit == null or (unit.hp <= 0 and not unit.deaths_door) or (item.acted and item.unit_id != session.state.current_turn_unit_id):
-			continue
-		var chip := PanelContainer.new()
-		var style := panel_style(0.85)
-		style.content_margin_top = 4
-		style.content_margin_bottom = 4
-		style.border_color = GOLD if item.unit_id == session.state.current_turn_unit_id else (Color(0.45, 0.6, 0.85) if unit.is_player else Color(0.8, 0.4, 0.3))
-		chip.add_theme_stylebox_override("panel", style)
-		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		chip.add_child(make_label(unit.display_name, 17))
-		_turn_row.add_child(chip)
+		var style: StyleBoxFlat = plate.get_meta("style")
+		style.border_color = GOLD if unit.id == current else Color(S.COPPER, 0.4)
+		style.set_border_width_all(2 if unit.id == current else 1)
+		var status: HFlowContainer = box.get_node("Status")
+		for child in status.get_children():
+			child.queue_free()
+		for entry in S.statuses(unit):
+			status.add_child(_status_chip(entry[0], entry[1]))
+	_refresh_order(current)
 	var lines := session.state.combat_log
-	_log.text = "\n".join(lines.slice(maxi(0, lines.size() - 2)))
+	_log.text = "\n".join(lines.slice(maxi(0, lines.size() - 3)))
+	_log_panel.visible = not lines.is_empty()
 	var actor := session.current_actor()
 	if actor != null and actor.is_player:
 		_show_hero(actor)
 
 
+## A ordem da rodada com rostos: quem age agora maior e dourado; quem já agiu sai da fila.
+func _refresh_order(current: String) -> void:
+	_clear(_order)
+	var round_label := S.label("RODADA %d" % session.state.round, 17, S.COPPER, "bold")
+	round_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_order.add_child(round_label)
+	for item in session.state.initiative_queue:
+		var unit := session.state.find_unit(item.unit_id)
+		if unit == null or (unit.hp <= 0 and not unit.deaths_door) or (item.acted and item.unit_id != current):
+			continue
+		var now: bool = item.unit_id == current
+		var who := VBoxContainer.new()
+		who.add_theme_constant_override("separation", 2)
+		who.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var ring: Color = GOLD if now else (S.ENEMY if not unit.is_player else Color(1, 1, 1, 0.35))
+		var face := S.portrait(_art_of(unit), 72 if now else 54, ring, 0.07 if now else 0.06)
+		face.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		who.add_child(face)
+		var name_label := S.label(unit.display_name.split(" ")[0] + (" · agora" if now else ""), 16 if now else 15, GOLD if now else MUTED, "bold" if now else "body")
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		who.add_child(name_label)
+		_order.add_child(who)
+	_order_panel.size = _order_panel.get_combined_minimum_size()
+	_order_panel.position = Vector2(960 - _order_panel.size.x * 0.5, 12)
+
+
 func _show_hero(actor: AHCombat.Unit) -> void:
+	var art := _art_of(actor)
+	if _hero_face.get_meta("unit", "") != actor.id:
+		var face := S.portrait(art, 104, GOLD, 0.05)
+		_hero_face.texture = face.texture
+		_hero_face.material = face.material
+		_hero_face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_hero_face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		_hero_face.set_meta("unit", actor.id)
 	_hero_name.text = actor.display_name
 	_hero_hp.max_value = actor.max_hp
 	_hero_hp.value = actor.hp
 	_hero_hp_text.text = "Vida %d/%d%s" % [actor.hp, actor.max_hp, " · Último Fôlego" if actor.deaths_door else ""]
 	_hero_instinct.value = actor.instinct
-	_hero_status.text = status_text(actor, false)
+	_hero_instinct_text.text = "Instinto %d/200 · em 200, crise" % actor.instinct
+	for child in _hero_status.get_children():
+		child.queue_free()
+	for entry in S.statuses(actor):
+		_hero_status.add_child(_status_chip(entry[0], entry[1], 16))
+	if actor.trauma:
+		_hero_status.add_child(_status_chip("Trauma", false, 16))
 
 
-## Fichas e efeitos da unidade em palavras curtas.
-func status_text(unit: AHCombat.Unit, short: bool) -> String:
-	var parts := PackedStringArray()
-	var t := unit.tokens
-	if t.block > 0: parts.append(("Bloq %d" if short else "Bloqueio %d") % t.block)
-	if t.dodge > 0: parts.append(("Esq %d" if short else "Esquiva %d") % t.dodge)
-	if t.vuln > 0: parts.append(("Vuln %d" if short else "Vulnerável %d") % t.vuln)
-	if t.guard > 0: parts.append("Guarda")
-	if unit.mark_duration > 0: parts.append("Marca")
-	if unit.stun_turns > 0: parts.append("Atord")
-	if unit.bleed.duration > 0: parts.append(("Sangr %d" if short else "Sangramento %d") % unit.bleed.magnitude)
-	if unit.blight.duration > 0: parts.append(("Cont %d" if short else "Contaminação %d") % unit.blight.magnitude)
-	if unit.blind: parts.append("Cego")
-	if unit.weak: parts.append("Fraco")
-	if unit.immobilize_turns > 0: parts.append("Imob")
-	if unit.trauma and not short: parts.append("Trauma")
-	return " · ".join(parts)
+## Fichas e efeitos da unidade em palavras curtas (o registro e os testes usam).
+func status_text(unit: AHCombat.Unit, _short: bool) -> String:
+	return " · ".join(S.statuses(unit).map(func(e): return e[0]))
 
 
 func _process(_delta: float) -> void:
@@ -331,21 +418,23 @@ func _process(_delta: float) -> void:
 	if camera == null:
 		return
 	for unit_id in _unit_bars:
-		var box: Control = _unit_bars[unit_id]
+		var plate: Control = _unit_bars[unit_id]
 		var card: AHSpriteCard = arena.cards.get(unit_id)
-		if card == null or not box.visible:
+		if card == null or not plate.visible:
 			continue
-		var point := camera.unproject_position(card.global_position + Vector3(0, card.head_height() + 0.25, 0))
-		box.position = point - Vector2(box.size.x * 0.5, box.size.y)
+		# Sob os pés, sem passar para dentro do painel de baixo.
+		var feet := camera.unproject_position(card.global_position)
+		var y := minf(feet.y + 10, DOCK_TOP - plate.size.y - 6) if _panel.visible else feet.y + 10
+		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
 	for marker in _markers + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")
 		var screen := camera.unproject_position(target)
-		marker.position = screen - Vector2(marker.size.x * 0.5, marker.size.y + 70)
+		marker.position = screen - Vector2(marker.size.x * 0.5, marker.size.y + 24)
 
 
 # ---------------------------------------------------------------- turno do herói
 
-## Mostra as opções do herói e espera o comando: {kind: ability/move/defend/flee, ability_id, rank}.
+## Mostra as opções do herói e espera o comando: {kind: ability/move/defend/flee/item, ability_id, rank}.
 ## note: um aviso que fica na tela enquanto ele decide (o item da Mochila que acabou de usar).
 func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	_actor_id = actor_id
@@ -360,6 +449,7 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 		child.queue_free()
 	_description.text = ""
 	_set_enabled(false)
+	_hide_tip()
 	# Durante o lance o painel sai da frente: a luta fica inteira à vista.
 	_panel.visible = false
 	return command
@@ -381,14 +471,49 @@ func _set_enabled(enabled: bool) -> void:
 			child.disabled = not enabled or child.get_meta("locked", false)
 
 
+## As bolinhas de posição: as do herói da direita (frente) para a esquerda, como na tela; as do inimigo da esquerda
+## (frente) para a direita.
+func _pips(caption: String, ranks: Array, hero_side: bool, color: Color) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tag := S.label(caption, 14, MUTED, "bold")
+	tag.custom_minimum_size = Vector2(24, 0)
+	row.add_child(tag)
+	var order: Array = [4, 3, 2, 1] if hero_side else [1, 2, 3, 4]
+	for rank in order:
+		var dot := Panel.new()
+		dot.custom_minimum_size = Vector2(13, 13)
+		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var style := StyleBoxFlat.new()
+		style.set_corner_radius_all(7)
+		style.set_border_width_all(2)
+		style.border_color = color if ranks.has(rank) else Color(MUTED, 0.6)
+		style.bg_color = color if ranks.has(rank) else Color(0, 0, 0, 0)
+		dot.add_theme_stylebox_override("panel", style)
+		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(dot)
+	return row
+
+
+func _number_of(ability: Dictionary) -> Array:
+	if ability.DamageRange.Max > 0:
+		return ["%d–%d" % [ability.DamageRange.Min, ability.DamageRange.Max], "dano", GOLD]
+	if ability.HealRange.Max > 0:
+		return ["+%d–%d" % [ability.HealRange.Min, ability.HealRange.Max], "cura", S.OK]
+	return ["", "", GOLD]
+
+
 func _build_abilities() -> void:
 	for child in _abilities.get_children():
 		child.queue_free()
 	_options = session.ability_options(_actor_id)
 	var first: Button
-	for option in _options:
+	for index in _options.size():
+		var option: Dictionary = _options[index]
+		var ability: Dictionary = session.data.abilities[option.id]
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(250, 112)
+		button.custom_minimum_size = Vector2(296, 150)
 		button.text = ""
 		style_button(button)
 		var box := HBoxContainer.new()
@@ -401,7 +526,8 @@ func _build_abilities() -> void:
 		box.add_theme_constant_override("separation", 10)
 		button.add_child(box)
 		var icon := TextureRect.new()
-		icon.custom_minimum_size = Vector2(80, 80)
+		icon.custom_minimum_size = Vector2(76, 76)
+		icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -414,19 +540,49 @@ func _build_abilities() -> void:
 		var text_box := VBoxContainer.new()
 		text_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		text_box.add_theme_constant_override("separation", 2)
 		box.add_child(text_box)
-		var name_label := make_label(option.name, 18, TEXT if option.usable else MUTED)
+		var name_label := S.label(option.name, 18, TEXT if option.usable else MUTED, "bold")
 		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_label.custom_minimum_size = Vector2(170, 0)
 		text_box.add_child(name_label)
-		var extra: String = option.reason
-		if extra == "" and option.uses >= 0:
-			extra = "%d uso(s)" % option.uses
-		text_box.add_child(make_label(extra, 14, GOLD if option.usable else Color(0.85, 0.5, 0.4)))
+		var number := _number_of(ability)
+		if number[0] != "":
+			var line := HBoxContainer.new()
+			line.add_theme_constant_override("separation", 6)
+			line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			line.add_child(S.label(number[0], 24, number[2] if option.usable else MUTED, "bold"))
+			var unit_label := S.label(number[1], 15, MUTED)
+			unit_label.size_flags_vertical = Control.SIZE_SHRINK_END
+			line.add_child(unit_label)
+			text_box.add_child(line)
+		if option.usable:
+			text_box.add_child(_pips("de", ability.OriginRanks, true, GOLD))
+			if option.self:
+				text_box.add_child(S.label("em si mesmo", 14, MUTED))
+			else:
+				text_box.add_child(_pips("em", ability.TargetRanks, not option.enemy_side, S.DANGER if option.enemy_side else S.OK))
+			var extra := ""
+			if option.cooldown > 0:
+				extra = "Recarga %d" % option.cooldown
+			elif option.uses >= 0:
+				extra = "%d uso(s)" % option.uses
+			if extra != "":
+				text_box.add_child(S.label(extra, 14, GOLD))
+		else:
+			var why := S.label(option.reason, 15, Color(1.0, 0.6, 0.5))
+			why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			why.custom_minimum_size = Vector2(170, 0)
+			text_box.add_child(why)
+		var key := S.key_cap(str(index + 1))
+		key.position = Vector2(266, 6)
+		button.add_child(key)
 		button.set_meta("locked", not option.usable)
 		button.disabled = not option.usable
 		button.pressed.connect(_on_ability.bind(option))
-		button.focus_entered.connect(_describe.bind(option))
-		button.mouse_entered.connect(_describe.bind(option))
+		button.focus_entered.connect(_describe.bind(option, button))
+		button.mouse_entered.connect(_describe.bind(option, button))
+		button.mouse_exited.connect(_hide_tip)
 		_abilities.add_child(button)
 		if first == null and option.usable:
 			first = button
@@ -435,18 +591,91 @@ func _build_abilities() -> void:
 		var locked: bool = (kind == "move" and session.move_targets(_actor_id).is_empty()) or (kind == "flee" and not session.can_flee())
 		child.set_meta("locked", locked)
 		child.disabled = locked
-	_description.text = "Escolha uma ação para %s." % session.state.find_unit(_actor_id).display_name
+		if kind == "item":
+			child.text = "Mochila · %d" % AHJourneyRules.food(Campaign.state)
+			child.tooltip_text = "%d de comida na Mochila" % AHJourneyRules.food(Campaign.state)
+	_description.text = "Vez de %s: escolha uma habilidade (1–4) ou uma ação." % session.state.find_unit(_actor_id).display_name
 	(first if first else _actions.get_child(1)).grab_focus.call_deferred()
 
 
-func _describe(option: Dictionary) -> void:
-	_description.text = "%s — %s" % [option.name, option.description.replace("\n", " · ")] + ("" if option.usable else "  (%s)" % option.reason)
+# ---------------------------------------------------------------- dicas
+
+func _hide_tip() -> void:
+	if _choosing == "":
+		_tip.visible = false
+
+
+## A dica completa da habilidade sobre o cartão: o número, o texto, quem atinge (ao mirar) e os termos explicados.
+func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> void:
+	var ability: Dictionary = session.data.abilities[option.id]
+	_clear(_tip_box)
+	_tip_box.add_child(S.label(option.name, 26, GOLD, "display"))
+	var number := _number_of(ability)
+	var facts := PackedStringArray()
+	if number[0] != "":
+		facts.append("%s de %s" % [number[0], number[1]])
+	if ability.Cooldown > 0:
+		facts.append("recarga %d" % ability.Cooldown)
+	if ability.UsesMax > 0:
+		facts.append("%d usos por expedição" % ability.UsesMax if ability.bUsesPerExpedition else "%d usos" % ability.UsesMax)
+	if not facts.is_empty():
+		_tip_box.add_child(S.label(" · ".join(facts), S.MIN_TEXT, TEXT, "bold"))
+	var row = GameData.row("abilities", option.id)
+	var text: String = row.get("Description", "") if row != null else ""
+	var body := S.label(text, S.MIN_TEXT, TEXT)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.custom_minimum_size = Vector2(430, 0)
+	_tip_box.add_child(body)
+	if not option.usable:
+		_tip_box.add_child(S.label(option.reason, S.MIN_TEXT, Color(1.0, 0.6, 0.5)))
+	if rank > 0:
+		var ids: Array = session.hit_ids(_actor_id, option.id, rank)
+		var hits := PackedStringArray()
+		for id in ids:
+			var unit := session.state.find_unit(id)
+			if unit == null:
+				continue
+			var note := "%s (vida %d)" % [unit.display_name, unit.hp]
+			if not unit.is_player and ability.DamageRange.Max >= unit.hp:
+				note += " · pode cair"
+			hits.append(note)
+		if not hits.is_empty():
+			var who := S.label("Atinge: " + "; ".join(hits), S.MIN_TEXT, S.DANGER if option.enemy_side else S.OK, "bold")
+			who.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			who.custom_minimum_size = Vector2(430, 0)
+			_tip_box.add_child(who)
+	# Os termos que aparecem no texto, explicados.
+	for word in S.GLOSSARY:
+		if text.contains(word) or text.to_lower().contains(word.to_lower().substr(0, 6)):
+			var gloss := S.label("%s: %s" % [word, S.GLOSSARY[word]], 16, S.VIOLET)
+			gloss.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			gloss.custom_minimum_size = Vector2(430, 0)
+			_tip_box.add_child(gloss)
+	_place_tip(button)
+
+
+func _place_tip(button: Control) -> void:
+	_tip.visible = true
+	_tip.size = _tip.get_combined_minimum_size()
+	var x := 420.0
+	if button != null and is_instance_valid(button) and button.is_inside_tree():
+		x = button.global_position.x + button.size.x * 0.5 - _tip.size.x * 0.5
+	_tip.position = Vector2(clampf(x, 16, 1904 - _tip.size.x), maxf(130, DOCK_TOP - 96 - _tip.size.y))
 
 
 func _describe_action(kind: String) -> void:
-	_description.text = {"move": "Mover — troca de posição com o aliado vizinho.", "defend": "Defender — +1 Bloqueio e passa a vez.",
-		"flee": "Fugir — 60% de chance de a equipe recuar e sair da luta.",
-		"item": "Mochila — comida ou curativo no herói da vez: ação livre, um item por vez dele."}[kind]
+	var texts := {"move": ["Mover", "Troca de posição com o aliado vizinho. Gasta a vez."],
+		"defend": ["Defender", "+1 Bloqueio e passa a vez. " + S.GLOSSARY.Bloqueio],
+		"flee": ["Fugir", "60% de chance de a equipe recuar e sair da luta. Na fuga, larga o que carregava."],
+		"item": ["Mochila", "Comida ou curativo no herói da vez. Ação livre: a vez continua, um item por vez dele."]}
+	_clear(_tip_box)
+	_tip_box.add_child(S.label(texts[kind][0], 26, GOLD, "display"))
+	var body := S.label(texts[kind][1], S.MIN_TEXT, TEXT)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.custom_minimum_size = Vector2(430, 0)
+	_tip_box.add_child(body)
+	_place_tip(_actions)
+	_tip.position.x = 1904 - _tip.size.x
 
 
 func _on_ability(option: Dictionary) -> void:
@@ -477,12 +706,12 @@ func show_crisis(text: String, breakthrough: bool) -> void:
 	_crisis.size = Vector2(1920, 112)
 	_crisis.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_crisis)
-	var title := make_label("CRISE DE INSTINTO", 22, Color("c4b5fd"))
+	var title := S.label("CRISE DE INSTINTO", 22, S.VIOLET, "bold")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.position = Vector2(0, 10)
 	title.size = Vector2(1920, 30)
 	_crisis.add_child(title)
-	var result := make_label(text, 44, Color("fde68a") if breakthrough else Color("f87171"))
+	var result := S.label(text, 40, Color("fde68a") if breakthrough else Color("f87171"), "display")
 	result.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	result.position = Vector2(0, 42)
 	result.size = Vector2(1920, 60)
@@ -501,9 +730,10 @@ func hide_crisis() -> void:
 func _open_bag() -> void:
 	if _bag != null:
 		return
+	_hide_tip()
 	Sound.play("res://audio/ui/bag_open.ogg")
 	_bag = PanelContainer.new()
-	_bag.add_theme_stylebox_override("panel", panel_style(0.96))
+	_bag.add_theme_stylebox_override("panel", S.panel(0.96))
 	_bag.position = Vector2(510, 140)
 	_bag.custom_minimum_size = Vector2(900, 0)
 	var panel := AHInventoryPanel.new()
@@ -528,10 +758,11 @@ func bag_open() -> bool:
 
 # ---------------------------------------------------------------- alvos
 
-## ability_id: a habilidade mirada; apontar uma posição mostra todos que ela atinge dali.
+## ability_id: a habilidade mirada; apontar uma posição mostra todos que ela atinge dali e a dica com o resultado.
 func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id: String = "") -> void:
 	_clear_markers()
 	_set_enabled(false)
+	_choosing = ability_id if ability_id != "" else "move"
 	var team: Array = session.state.enemy_team if enemy_side else session.state.player_team
 	for rank in ranks:
 		var unit = AHCombatEngine._find(team, func(u): return session.engine.occupies_rank(u, rank) and AHCombatEngine.alive_any(u))
@@ -539,16 +770,16 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 		var label := "Posição %d" % rank
 		if unit != null and arena.cards.has(unit.id):
 			var card: AHSpriteCard = arena.cards[unit.id]
-			world = card.global_position + Vector3(0, card.head_height() + 0.3, 0)
+			world = card.global_position + Vector3(0, card.head_height() + 0.2, 0)
 			label = unit.display_name
 		else:
 			var probe := AHCombat.Unit.new()
 			probe.is_player = not enemy_side
 			probe.rank = rank
-			world = arena.slot_position(probe) + Vector3(0, 2.2, 0)
+			world = arena.slot_position(probe) + Vector3(0, 2.0, 0)
 		var marker := Button.new()
 		marker.text = "▼ " + label
-		marker.custom_minimum_size = Vector2(170, 44)
+		marker.custom_minimum_size = Vector2(180, 46)
 		style_button(marker, Color(1.0, 0.85, 0.45))
 		marker.set_meta("world", world)
 		marker.set_meta("rank", rank)
@@ -576,38 +807,35 @@ func _clear_markers() -> void:
 	_markers.clear()
 	_clear_preview()
 	_choosing = ""
+	_tip.visible = false
 
 
-## Quem a habilidade atinge mirando nesta posição (CombatSession.hit_ids, a mesma conta do ataque): o texto diz todos e
-## cada atingido sem marcador próprio ganha a marca "também atingido".
+## Quem a habilidade atinge mirando nesta posição (CombatSession.hit_ids, a mesma conta do ataque): a dica mostra todos
+## com a vida e se podem cair; cada outro atingido acende o próprio marcador ou ganha a marca "também atingido".
 func _preview_hits(ability_id: String, rank: int) -> void:
 	_clear_preview()
+	var option: Array = _options.filter(func(o): return o.id == ability_id)
+	if not option.is_empty():
+		var index := _options.find(option[0])
+		_describe(option[0], _abilities.get_child(index) if index < _abilities.get_child_count() else null, rank)
 	var ids: Array = session.hit_ids(_actor_id, ability_id, rank)
 	if ids.size() <= 1:
 		return
-	var names: Array = []
 	for id in ids:
 		var unit = session.state.find_unit(id)
-		if unit == null:
+		if unit == null or session.engine.occupies_rank(unit, rank) or not arena.cards.has(id):
 			continue
-		names.append(unit.display_name)
-		if session.engine.occupies_rank(unit, rank) or not arena.cards.has(id):
-			continue
-		# Com marcador próprio, ele mesmo acende; sem, uma marca por cima do atingido.
 		var own: Array = _markers.filter(func(m): return session.engine.occupies_rank(unit, int(m.get_meta("rank"))))
 		if not own.is_empty():
 			own[0].text = "◆ %s · também" % unit.display_name
 			own[0].add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
 			continue
 		var card: AHSpriteCard = arena.cards[id]
-		var mark := make_label("◆ também atingido", 18, Color(1.0, 0.85, 0.45))
-		mark.add_theme_color_override("font_outline_color", Color(0.05, 0.04, 0.03))
+		var mark := S.label("◆ também atingido", S.MIN_TEXT, Color(1.0, 0.85, 0.45), "bold")
 		mark.add_theme_constant_override("outline_size", 8)
-		mark.set_meta("world", card.global_position + Vector3(0, card.head_height() + 0.3, 0))
-		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		mark.set_meta("world", card.global_position + Vector3(0, card.head_height() + 0.2, 0))
 		add_child(mark)
 		_preview_marks.append(mark)
-	_description.text = "Atinge %s." % " e ".join(names)
 
 
 func _clear_preview() -> void:
@@ -620,16 +848,29 @@ func _clear_preview() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not visible:
+		return
 	# A Mochila: I abre na vez de um herói; Esc, Backspace ou I fecham.
-	if visible and _bag != null and (event.is_action_pressed("cancel") or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):
+	if _bag != null and (event.is_action_pressed("cancel") or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):
 		_close_bag()
 		get_viewport().set_input_as_handled()
 		return
-	if visible and waiting and _choosing == "" and event.is_action_pressed("inventory"):
-		_open_bag()
-		get_viewport().set_input_as_handled()
-		return
-	if visible and _choosing != "" and event.is_action_pressed("cancel"):
+	if waiting and _choosing == "" and _bag == null:
+		for i in 4:
+			if event.is_action_pressed("combat_ability_%d" % (i + 1)) and i < _abilities.get_child_count():
+				var button: Button = _abilities.get_child(i)
+				if not button.disabled:
+					get_viewport().set_input_as_handled()
+					button.pressed.emit()
+				return
+		for spec in ACTIONS:
+			if event.is_action_pressed(spec[3]):
+				var action: Button = _actions.get_children().filter(func(b): return b.get_meta("kind") == spec[1])[0]
+				get_viewport().set_input_as_handled()
+				if not action.disabled:
+					action.pressed.emit()
+				return
+	if _choosing != "" and event.is_action_pressed("cancel"):
 		_clear_markers()
 		_set_enabled(true)
 		_build_abilities()
@@ -647,25 +888,36 @@ func show_result(result: String, automatic: bool) -> void:
 		child.queue_free()
 	var box := VBoxContainer.new()
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
-	box.add_theme_constant_override("separation", 16)
+	box.add_theme_constant_override("separation", 14)
 	_result.add_child(box)
 	var titles := {"victory": "Vitória", "defeat": "Derrota", "escaped": "Fuga"}
 	var notes := {"victory": "A patrulha foi neutralizada.", "defeat": "Todos caíram nas ruínas.", "escaped": "A equipe recuou pelas sombras."}
-	var title := make_label(titles.get(result, result), 48, GOLD)
+	var title := S.label(titles.get(result, result), 48, GOLD if result == "victory" else S.DANGER, "display")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
-	var note := make_label(notes.get(result, ""), 22)
+	var note := S.label(notes.get(result, ""), 22)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(note)
-	var summary := PackedStringArray()
+	var team := HBoxContainer.new()
+	team.alignment = BoxContainer.ALIGNMENT_CENTER
+	team.add_theme_constant_override("separation", 18)
+	box.add_child(team)
 	for unit in session.state.player_team:
-		summary.append("%s %d/%d%s" % [unit.display_name, unit.hp, unit.max_hp, " (caído)" if unit.hp <= 0 else ""])
-	var lines := make_label("\n".join(summary), 18, MUTED)
-	lines.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(lines)
+		var who := VBoxContainer.new()
+		who.add_theme_constant_override("separation", 4)
+		var fallen: bool = unit.hp <= 0
+		var face := S.portrait(_art_of(unit), 64, S.DANGER if fallen else Color(1, 1, 1, 0.35))
+		face.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		if fallen:
+			face.modulate = Color(0.55, 0.55, 0.6)
+		who.add_child(face)
+		var line := S.label("%s\n%s" % [unit.display_name, "caído" if fallen else "%d/%d" % [unit.hp, unit.max_hp]], 16, MUTED if fallen else TEXT)
+		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		who.add_child(line)
+		team.add_child(who)
 	var button := Button.new()
 	button.text = "Continuar"
-	button.custom_minimum_size = Vector2(220, 52)
+	button.custom_minimum_size = Vector2(240, 52)
 	style_button(button)
 	button.pressed.connect(func(): result_closed.emit())
 	box.add_child(button)

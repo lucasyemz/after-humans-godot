@@ -328,6 +328,19 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
   da Íris (5 a 8, 3 cargas, recarrega na vitória). Na luta é ação livre do herói da vez, um item por vez dele.
   `test_exploration_care` traz os testes da Unreal (52 verificações).
 
+- **Nova HUD, etapa 1 (clareza)**, da proposta de UX aprovada pelo Lucas em 21/10/2026 (direção visual e dicas da
+  primeira vez aprovadas; a intenção dos inimigos fica para depois):
+  - `AHUiStyle`: a folha de estilo única (paleta, painéis, fichas, teclas, barras, rostos recortados da arte) e as
+    fontes da Unreal (Plus Jakarta Sans e Cinzel) como tema padrão de todas as telas; texto de 18 px ou mais.
+  - Modo de desenvolvedor (F1, salvo em `user://settings.cfg`): o contador de quadros e as teclas de teste saem da tela
+    do jogador.
+  - Combate: ordem da rodada com rostos, placas sob os pés com vida em número e estados por extenso, o herói da vez
+    com o instinto até a crise, cartões com as bolinhas de "de" e "em", o número grande e as teclas 1–4 (Q, W, I, F nas
+    ações), a dica completa ao apontar (o que faz, quem atinge, se pode cair, os termos explicados) e o registro legível.
+  - Exploração: o lugar e o objetivo da rota, a rota em trilho com ícones, os recursos com ícone e dica, a equipe com
+    rosto, losangos sobre o que dá para usar, o aviso de interação no próprio objeto, o aviso da patrulha à frente na
+    borda e só as teclas do jogo, que somem depois de um tempo andando.
+
 **Pendências da 5:**
 - Celular: controles de toque para andar e interagir, HUD maior em tela pequena e um pacote mais leve (120 MB pesa em
   dados móveis); falta testar num aparelho de verdade.

@@ -283,7 +283,9 @@ MAP_ICONS = ["node-start", "node-combat", "node-boss", "node-rest", "marker-here
              # Mochila (UAHInventoryWidget): suprimentos, ferramentas, recursos e relíquias.
              "lobby-food", "res-bandages", "item-ampoule", "tool-crowbar", "tool-flashlight", "tool-mask", "tool-generic",
              "lobby-seed", "lobby-scrap", "lobby-fragment", "item-generic", "relic-generic", "relic-copper-button",
-             "relic-glass-feather", "relic-memory-collar"]
+             "relic-glass-feather", "relic-memory-collar",
+             # HUD da exploração: os trechos da rota e a esperança.
+             "node-loot", "node-event", "res-hope", "lobby-energy", "lobby-water", "lobby-settings"]
 
 
 def phase_map() -> int:
@@ -300,6 +302,17 @@ def phase_map() -> int:
     for name in MAP_ICONS:
         copy(REPO / "Content/AfterHumans/UI/Icons" / f"{name}.svg", out / "icons" / f"{name}.svg")
     return len(jobs) + len(MAP_ICONS)
+
+
+# Fontes da interface (as da Unreal, OFL): Plus Jakarta Sans no texto e Cinzel nos títulos, com as licenças.
+FONTS = ["plus-jakarta-sans-latin-400-normal.ttf", "plus-jakarta-sans-latin-700-normal.ttf", "cinzel-latin-600-normal.ttf",
+         "cinzel-latin-700-normal.ttf", "OFL-PlusJakartaSans.txt", "OFL-Cinzel.txt"]
+
+
+def fonts() -> int:
+    for name in FONTS:
+        copy(REPO / "SourceArt/Fonts" / name, PROTO / "art" / "ui" / "fonts" / name)
+    return len(FONTS)
 
 
 def copy(src: Path, dst: Path) -> None:
@@ -323,7 +336,7 @@ def main() -> None:
     for path in SOURCE_ART:
         copy(REPO / path, street / Path(path).name)
     print(f"dados: {len(DATA) + len(LEGACY_KITS)} arquivos; arte da rua: {len(WEB_STREET) + len(SOURCE_ART)} imagens; "
-          f"interiores: {rooms()} imagens; estação: {station()} superfícies; civis: {civilians()}; modelos: {station_models()}; cards: {station_cards()}; poses: {station_poses()}; mapa de fases: {phase_map()}")
+          f"interiores: {rooms()} imagens; estação: {station()} superfícies; civis: {civilians()}; modelos: {station_models()}; cards: {station_cards()}; poses: {station_poses()}; mapa de fases: {phase_map()}; fontes: {fonts()}")
 
 
 if __name__ == "__main__":

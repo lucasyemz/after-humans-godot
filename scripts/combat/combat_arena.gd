@@ -74,6 +74,16 @@ func hero_art(hero_id: String) -> Dictionary:
 	return art.heroes.get(hero_id, {})
 
 
+static var _manifest := {}
+
+
+## A arte de um herói fora da luta (os rostos do HUD da exploração), lida uma vez do manifesto.
+static func hero_art_of(hero_id: String) -> Dictionary:
+	if _manifest.is_empty():
+		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
+	return _manifest.heroes.get(hero_id, {})
+
+
 func enemy_art(enemy_id: String) -> Dictionary:
 	return art.enemies.get(enemy_id, {})
 

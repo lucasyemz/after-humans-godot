@@ -86,6 +86,7 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - A/D (ou ←/→) andam pela rua; W/S (ou ↑/↓) vão para o fundo e para a frente, inclusive dentro dos becos.
     No gamepad: analógico esquerdo ou direcional.
   - Shift (ou RB) corre.
+  - F1 liga o modo de desenvolvedor (fica salvo): o contador de quadros e as teclas de teste abaixo (R, T, P, C, K).
   - R liga e desliga a chuva.
   - T troca entre fim de tarde e noite.
   - P liga e desliga o pós-processamento.
@@ -97,7 +98,8 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - K leva a equipe até a próxima patrulha.
   - Na Estação: o menu da esquerda abre cada cômodo (mouse, ou setas e Enter); Esc volta à vista geral. A partida é na
     Preparação.
-  - Na luta: clique na habilidade e depois no alvo (no teclado ou gamepad, setas e Enter/A; Backspace/B volta).
+  - Na luta: 1 a 4 escolhem a habilidade (ou o clique), depois o alvo; Q move, W defende, I abre a Mochila, F foge
+    (no gamepad, setas e Enter/A; Backspace/B volta).
     Mover, Defender e Fugir ficam à direita.
 - **Capturas, tempos de quadro e teste de colisão:** `"$GODOT" --path . --resolution 1920x1080 -- --capture=<pasta>`.
   Abre uma janela, tira 9 fotos (dia, noite e chuva), testa o líder andando contra um carro e contra uma fachada (`PASS`

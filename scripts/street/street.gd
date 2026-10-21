@@ -138,6 +138,7 @@ var _camera: Camera3D
 var _post: ShaderMaterial
 var _hud_stats: Label
 var _hud_weather: Label
+var _dev_overlay: Control
 var _dust: CPUParticles3D
 
 var _leader: CharacterBody3D
@@ -259,6 +260,7 @@ func _ready() -> void:
 	_street_hud.add_child(exploration_hud)
 	if scenario:
 		exploration_hud.place = scenario.display_name
+	exploration_hud.set_weather(_hud_weather.text)
 	corridor = AHStreetCorridor.new()
 	add_child(corridor)
 	corridor.setup(self, exploration_hud)
@@ -1005,18 +1007,18 @@ func _build_post_and_hud() -> void:
 	hud.layer = 2
 	add_child(hud)
 	_street_hud = hud
-	var title := "RUA DAS VITRINES\nBairro Submerso"
-	if scenario:
-		# O cabeçalho dos cenários: o mapa e a fase ("CAIS DO RIO · Jornada 2 · Ponte das Raízes").
-		var expedition: Dictionary = Campaign.state.session.expedition
-		var info := AHJourneyRules.phase(expedition.phase_id)
-		title = "%s\nJornada %d · %s" % [scenario.display_name.to_upper(), AHJourneyRules.PHASES.find(info) + 1, info.get("name", "")]
-	hud.add_child(_label(title, 30, Vector2(36, 28)))
+	# O nome do lugar, o tempo e os controles ficam no HUD da exploração; aqui só o que é de teste (F1 liga).
 	_hud_weather = _label("", 20, Vector2(36, 112))
+	_hud_weather.visible = false
 	hud.add_child(_hud_weather)
-	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   E interagir   I mochila   Esc menu   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1030)))
-	_hud_stats = _label("", 18, Vector2(1380, 30))
-	hud.add_child(_hud_stats)
+	_dev_overlay = Control.new()
+	_dev_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud.add_child(_dev_overlay)
+	_hud_stats = _label("", 18, Vector2(1380, 1000))
+	_dev_overlay.add_child(_hud_stats)
+	_dev_overlay.add_child(_label("Modo de desenvolvedor (F1)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1046)))
+	_dev_overlay.visible = Settings.dev_mode or _capture_dir != ""
+	Settings.changed.connect(func(): _dev_overlay.visible = Settings.dev_mode or _capture_dir != "")
 
 
 func _label(text: String, size: int, at: Vector2) -> Label:
@@ -1088,6 +1090,8 @@ func _apply_weather() -> void:
 	var readable := (1.0 if _mood == "night" else 0.0) + (0.3 if _raining else 0.0)
 	_key_light.light_energy = 0.7 * clampf(readable, 0.0, 1.2)
 	_hud_weather.text = ("Noite" if _mood == "night" else "Fim de tarde") + (" · chuva" if _raining else "")
+	if exploration_hud:
+		exploration_hud.set_weather(_hud_weather.text)
 	_update_sun(0.0)
 
 
@@ -1145,6 +1149,9 @@ func _update_fire(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
+		return
+	# As teclas de teste só valem no modo de desenvolvedor (F1).
+	if not Settings.dev_mode:
 		return
 	if event.is_action_pressed("debug_time"):
 		_mood = "night" if _mood == "golden" else "golden"

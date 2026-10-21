@@ -378,6 +378,15 @@ func _street_frame(campaign: Dictionary, route: Dictionary, delta: float) -> voi
 	for index in [route.index, route.index + 1]:
 		if guards.has(index) and _segment_of(index) == segment and _sight_frame(index, delta, leader):
 			return
+	var ahead = null
+	for index in [route.index, route.index + 1]:
+		if guards.has(index) and _segment_of(index) == segment:
+			ahead = guards[index]
+			break
+	if ahead != null:
+		hud.set_patrol(ahead.cards[0].global_position + Vector3(0, 1.5, 0), ahead.meter, ahead.detected)
+	else:
+		hud.set_patrol(null, 0.0, false)
 	_choose_action(campaign, route, leader)
 
 
@@ -481,6 +490,7 @@ func _announce(index: int, outcome: String, first_time: bool) -> void:
 func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) -> void:
 	var text := ""
 	var action := Callable()
+	var where = null
 	var best := 1.3
 	for i in route.sites.size():
 		var site: Dictionary = route.sites[i]
@@ -488,6 +498,7 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 		if distance >= best or site.step > route.index:
 			continue
 		var shop := R.shop_the(site.shop)
+		where = _door_point(site)
 		if R.can_enter_house(campaign, i):
 			text = "E  Entrar n%s" % shop
 			action = _enter_house.bind(i)
@@ -503,12 +514,14 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 			best = absf(_step_x(index, 0.45) - leader.x)
 			text = "E  Vasculhar %s" % PROP_ART[3]
 			action = _search_prop.bind(index)
+			where = _prop_point(index)
 	if street.scenario:
 		best = REACH
 		for entry in scenario_props:
 			if entry.zone != segments[segment].zone or absf(entry.x - leader.x) >= best:
 				continue
 			best = absf(entry.x - leader.x)
+			where = _scenario_prop_point(entry)
 			if route.searched_props.has(entry.prop):
 				text = "%s (já vasculhado)" % entry.name
 				action = Callable()
@@ -520,6 +533,7 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 			if room_entry.door_segment != segment or absf(room_entry.door_x - leader.x) >= best:
 				continue
 			best = absf(room_entry.door_x - leader.x)
+			where = _side_door_point(room_entry)
 			var area: String = street.scenario.zones[room_entry.zone].name
 			if R.can_enter_scenario_room(campaign, room_entry.door_step):
 				text = "E  Entrar: %s" % area
@@ -533,8 +547,47 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 	if done_here or (leader.x < exit_x and segment == 0 and map_first == 0):
 		text = "E  Voltar à Estação (%s)" % ("fase concluída: todo o achado" if campaign.session.expedition.objective_completed else "retirada: metade do achado")
 		action = _retreat
-	hud.show_prompt(text)
+		where = null
+	hud.show_prompt(text, where)
 	_action = action
+	hud.set_markers(_marker_points(campaign, route, leader, where))
+
+
+## Onde fica, no mundo, a marca de cada coisa usável: a porta da loja, os caixotes, os props e as portas dos cenários.
+func _door_point(site: Dictionary) -> Vector3:
+	return Vector3(doors[site.door].x, 2.6, -0.7)
+
+
+func _prop_point(index: int) -> Vector3:
+	return props[index].global_position + Vector3(0, 1.5, 0)
+
+
+func _scenario_prop_point(entry: Dictionary) -> Vector3:
+	return Vector3(entry.x, street.floor_y + 1.9, street.lane_z - 0.7)
+
+
+func _side_door_point(room_entry: Dictionary) -> Vector3:
+	return Vector3(room_entry.door_x, street.floor_y + 2.6, street.lane_z - 0.9)
+
+
+## Os losangos do HUD: o que dá para usar a até 14 m da equipe, menos o que já está ao alcance (esse ganha o aviso).
+func _marker_points(campaign: Dictionary, route: Dictionary, leader: Vector3, active) -> Array:
+	var points: Array = []
+	for i in route.sites.size():
+		var site: Dictionary = route.sites[i]
+		if site.step <= route.index and (R.can_enter_house(campaign, i) or R.can_force_house(campaign, i)):
+			points.append(_door_point(site))
+	for index in props:
+		if index <= route.index and not route.props.get(str(index), false):
+			points.append(_prop_point(index))
+	if street.scenario:
+		for entry in scenario_props:
+			if entry.zone == segments[segment].zone and R.can_search_scenario_prop(campaign, entry.prop):
+				points.append(_scenario_prop_point(entry))
+		for room_entry in side_rooms:
+			if room_entry.door_segment == segment and R.can_enter_scenario_room(campaign, room_entry.door_step):
+				points.append(_side_door_point(room_entry))
+	return points.filter(func(p): return absf(p.x - leader.x) < 14.0 and (active == null or p.distance_to(active) > 0.05))
 
 
 func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
@@ -570,6 +623,8 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 		text = "E  Sair para a rua"
 		action = _leave_house
 	hud.show_prompt(text)
+	hud.set_markers([])
+	hud.set_patrol(null, 0.0, false)
 	_action = action
 
 
@@ -673,6 +728,8 @@ func _side_room_frame(campaign: Dictionary, route: Dictionary) -> void:
 		text = "E  Voltar: %s" % street.scenario.zones[segments[room_entry.door_segment].zone].name
 		action = _leave_side_room
 	hud.show_prompt(text)
+	hud.set_markers([])
+	hud.set_patrol(null, 0.0, false)
 	_action = action
 
 

@@ -17,6 +17,8 @@ const RAIN_SCALE := [0.35, 0.55, 0.8, 1.0]
 var level := 2
 var fullscreen := false
 var vsync := true
+## Modo de desenvolvedor (F1): as teclas de teste (K, R, T, P, C) e o contador de quadros. Fica fora da tela do jogador.
+var dev_mode := false
 
 
 func _ready() -> void:
@@ -25,7 +27,20 @@ func _ready() -> void:
 		level = clampi(int(config.get_value("graphics", "level", level)), 0, 3)
 		fullscreen = bool(config.get_value("graphics", "fullscreen", fullscreen))
 		vsync = bool(config.get_value("graphics", "vsync", vsync))
+		dev_mode = bool(config.get_value("dev", "enabled", dev_mode))
+	AHUiStyle.install.call_deferred(get_tree().root)
 	apply()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("debug_toggle"):
+		set_dev_mode(not dev_mode)
+		get_viewport().set_input_as_handled()
+
+
+func set_dev_mode(value: bool) -> void:
+	dev_mode = value
+	_store()
 
 
 func set_level(value: int) -> void:
@@ -48,6 +63,7 @@ func _store() -> void:
 	config.set_value("graphics", "level", level)
 	config.set_value("graphics", "fullscreen", fullscreen)
 	config.set_value("graphics", "vsync", vsync)
+	config.set_value("dev", "enabled", dev_mode)
 	config.save(PATH)
 	apply()
 

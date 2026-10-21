@@ -15,7 +15,16 @@ const ACTIONS := {
 	"cancel": {"keys": [KEY_BACKSPACE], "buttons": [JOY_BUTTON_B]},
 	"menu": {"keys": [KEY_ESCAPE], "buttons": [JOY_BUTTON_START]},
 	"inventory": {"keys": [KEY_I], "buttons": [JOY_BUTTON_Y]},
+	# Combate: as quatro habilidades e as ações (Mochila é a mesma tecla da exploração).
+	"combat_ability_1": {"keys": [KEY_1]},
+	"combat_ability_2": {"keys": [KEY_2]},
+	"combat_ability_3": {"keys": [KEY_3]},
+	"combat_ability_4": {"keys": [KEY_4]},
+	"combat_move": {"keys": [KEY_Q], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
+	"combat_defend": {"keys": [KEY_W], "buttons": [JOY_BUTTON_X]},
+	"combat_flee": {"keys": [KEY_F]},
 	# Só para teste do protótipo (teclado).
+	"debug_toggle": {"keys": [KEY_F1]},
 	"debug_rain": {"keys": [KEY_R]},
 	"debug_time": {"keys": [KEY_T]},
 	"debug_post": {"keys": [KEY_P]},
