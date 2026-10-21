@@ -160,6 +160,11 @@ func begin_player_turn() -> Dictionary:
 	return {"source_id": actor.id if actor else "", "kind": "turn_start", "ability_id": "", "events": events, "ok": true, "error": "", "can_act": can_act}
 
 
+## Quem a habilidade atinge mirando na posição (a prévia do alvo: par da granada, vizinho do coquetel).
+func hit_ids(actor_id: String, ability_id: String, target_rank: int) -> Array:
+	return engine.ability_hit_ids(actor_id, ability_id, target_rank)
+
+
 func turn_key() -> String:
 	return "%d:%s" % [state.round, state.current_turn_unit_id]
 

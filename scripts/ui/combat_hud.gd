@@ -32,10 +32,13 @@ var _log: Label
 var _result: PanelContainer
 var _unit_bars := {}
 var _markers: Array = []
+## A prévia da habilidade mirada: uma marca sobre cada outro atingido (o par da granada, o vizinho do coquetel).
+var _preview_marks: Array = []
 var _actor_id := ""
 var _options: Array = []
 var _choosing := ""
 var _bag: PanelContainer
+var _crisis: Control
 ## Esperando o comando do herói (a captura usa para jogar por ele).
 var waiting := false
 
@@ -334,7 +337,7 @@ func _process(_delta: float) -> void:
 			continue
 		var point := camera.unproject_position(card.global_position + Vector3(0, card.head_height() + 0.25, 0))
 		box.position = point - Vector2(box.size.x * 0.5, box.size.y)
-	for marker in _markers:
+	for marker in _markers + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")
 		var screen := camera.unproject_position(target)
 		marker.position = screen - Vector2(marker.size.x * 0.5, marker.size.y + 70)
@@ -451,7 +454,7 @@ func _on_ability(option: Dictionary) -> void:
 		command_chosen.emit({"kind": "ability", "ability_id": option.id, "rank": session.state.find_unit(_actor_id).rank})
 		return
 	_choosing = option.id
-	_show_markers(option.targets, option.enemy_side, func(rank): command_chosen.emit({"kind": "ability", "ability_id": option.id, "rank": rank}))
+	_show_markers(option.targets, option.enemy_side, func(rank): command_chosen.emit({"kind": "ability", "ability_id": option.id, "rank": rank}), option.id)
 
 
 func _on_action(kind: String) -> void:
@@ -463,6 +466,35 @@ func _on_action(kind: String) -> void:
 			_show_markers(session.move_targets(_actor_id), false, func(rank): command_chosen.emit({"kind": "move", "rank": rank}))
 		_:
 			command_chosen.emit({"kind": kind})
+
+
+## A faixa da crise de instinto: "CRISE DE INSTINTO" e o resultado (superação em dourado, colapso em vermelho).
+func show_crisis(text: String, breakthrough: bool) -> void:
+	hide_crisis()
+	_crisis = ColorRect.new()
+	_crisis.color = Color(0, 0, 0, 0.55)
+	_crisis.position = Vector2(0, 182)
+	_crisis.size = Vector2(1920, 112)
+	_crisis.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_crisis)
+	var title := make_label("CRISE DE INSTINTO", 22, Color("c4b5fd"))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.position = Vector2(0, 10)
+	title.size = Vector2(1920, 30)
+	_crisis.add_child(title)
+	var result := make_label(text, 44, Color("fde68a") if breakthrough else Color("f87171"))
+	result.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	result.position = Vector2(0, 42)
+	result.size = Vector2(1920, 60)
+	_crisis.add_child(result)
+	_crisis.modulate.a = 0.0
+	create_tween().tween_property(_crisis, "modulate:a", 1.0, 0.2)
+
+
+func hide_crisis() -> void:
+	if _crisis != null:
+		_crisis.queue_free()
+	_crisis = null
 
 
 ## A Mochila por cima do painel, no herói da vez; o item escolhido vira comando (ação livre: a vez continua).
@@ -496,7 +528,8 @@ func bag_open() -> bool:
 
 # ---------------------------------------------------------------- alvos
 
-func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable) -> void:
+## ability_id: a habilidade mirada; apontar uma posição mostra todos que ela atinge dali.
+func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id: String = "") -> void:
 	_clear_markers()
 	_set_enabled(false)
 	var team: Array = session.state.enemy_team if enemy_side else session.state.player_team
@@ -518,6 +551,11 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable) -> void:
 		marker.custom_minimum_size = Vector2(170, 44)
 		style_button(marker, Color(1.0, 0.85, 0.45))
 		marker.set_meta("world", world)
+		marker.set_meta("rank", rank)
+		marker.set_meta("label", marker.text)
+		if ability_id != "":
+			marker.mouse_entered.connect(_preview_hits.bind(ability_id, rank))
+			marker.focus_entered.connect(_preview_hits.bind(ability_id, rank))
 		marker.pressed.connect(func():
 			_clear_markers()
 			_set_enabled(true)
@@ -536,7 +574,49 @@ func _clear_markers() -> void:
 	for marker in _markers:
 		marker.queue_free()
 	_markers.clear()
+	_clear_preview()
 	_choosing = ""
+
+
+## Quem a habilidade atinge mirando nesta posição (CombatSession.hit_ids, a mesma conta do ataque): o texto diz todos e
+## cada atingido sem marcador próprio ganha a marca "também atingido".
+func _preview_hits(ability_id: String, rank: int) -> void:
+	_clear_preview()
+	var ids: Array = session.hit_ids(_actor_id, ability_id, rank)
+	if ids.size() <= 1:
+		return
+	var names: Array = []
+	for id in ids:
+		var unit = session.state.find_unit(id)
+		if unit == null:
+			continue
+		names.append(unit.display_name)
+		if session.engine.occupies_rank(unit, rank) or not arena.cards.has(id):
+			continue
+		# Com marcador próprio, ele mesmo acende; sem, uma marca por cima do atingido.
+		var own: Array = _markers.filter(func(m): return session.engine.occupies_rank(unit, int(m.get_meta("rank"))))
+		if not own.is_empty():
+			own[0].text = "◆ %s · também" % unit.display_name
+			own[0].add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
+			continue
+		var card: AHSpriteCard = arena.cards[id]
+		var mark := make_label("◆ também atingido", 18, Color(1.0, 0.85, 0.45))
+		mark.add_theme_color_override("font_outline_color", Color(0.05, 0.04, 0.03))
+		mark.add_theme_constant_override("outline_size", 8)
+		mark.set_meta("world", card.global_position + Vector3(0, card.head_height() + 0.3, 0))
+		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(mark)
+		_preview_marks.append(mark)
+	_description.text = "Atinge %s." % " e ".join(names)
+
+
+func _clear_preview() -> void:
+	for mark in _preview_marks:
+		mark.queue_free()
+	_preview_marks.clear()
+	for marker in _markers:
+		marker.text = marker.get_meta("label")
+		marker.add_theme_color_override("font_color", TEXT)
 
 
 func _unhandled_input(event: InputEvent) -> void:

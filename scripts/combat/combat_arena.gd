@@ -287,6 +287,34 @@ func _play_beat(beat: Dictionary) -> void:
 		_:
 			await _show_events(events)
 	await _settle()
+	# Crise de instinto (como na Unreal): um lance só dela para cada um que entrou em crise e segue de pé.
+	if beat.kind != "crisis":
+		for event in events:
+			if event.type != AHCombat.EventType.CRISIS:
+				continue
+			var unit := session.state.find_unit(event.target_unit_id)
+			if unit != null and (unit.hp > 0 or unit.deaths_door):
+				await _play_crisis(unit, event.text)
+
+
+## O personagem sozinho, a câmera perto: superação na pose de apoio, colapso na de dano, e a faixa no HUD (2,1 s).
+func _play_crisis(unit: AHCombat.Unit, text: String) -> void:
+	var card: AHSpriteCard = cards.get(unit.id)
+	if card == null:
+		return
+	var breakthrough := unit.crisis_outcome == AHCombat.Crisis.BREAKTHROUGH
+	show_pose(unit, "support" if breakthrough else "hurt")
+	card.flash(Color(1.0, 0.85, 0.35) if breakthrough else Color(0.9, 0.2, 0.25), 0.6)
+	hud.show_crisis(text, breakthrough)
+	focus_x = card.position.x
+	var tween := create_tween()
+	tween.tween_property(self, "close_t", 1.0, 0.3 / speed)
+	await _wait(1.65)
+	tween = create_tween()
+	tween.tween_property(self, "close_t", 0.0, 0.25 / speed)
+	await _wait(0.4)
+	hud.hide_crisis()
+	rest_pose(unit)
 
 
 func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, kind: String, targets: Array, events: Array) -> void:
@@ -419,7 +447,9 @@ func _show_events(events: Array, contact_x = null) -> void:
 			AHCombat.EventType.DEATH:
 				_float_text(card, event.text, Color(0.9, 0.9, 0.9), 1.3 + lift, 48)
 			AHCombat.EventType.CRISIS:
-				_float_text(card, event.text, Color(1.0, 0.6, 0.25), 1.6 + lift, 44)
+				# A crise tem o lance próprio (_play_crisis); quem caiu na hora ainda mostra o texto aqui.
+				if unit.hp <= 0 and not unit.deaths_door:
+					_float_text(card, event.text, Color(1.0, 0.6, 0.25), 1.6 + lift, 44)
 			AHCombat.EventType.BLOCK:
 				_float_text(card, event.text, Color(0.55, 0.75, 1.0), 0.9 + lift, 40)
 				_recoil(card, contact_x, 0.035)

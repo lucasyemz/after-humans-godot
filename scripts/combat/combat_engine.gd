@@ -1386,6 +1386,28 @@ func execute_enemy_turn() -> Array:
 
 # ---------------------------------------------------------------- alvos e modo automático
 
+## Quem a habilidade atinge mirando na posição (AbilityHitIds): o alvo e, nas de área, o par (1-2 ou 3-4) ou o vizinho.
+## A prévia do HUD marca todos; é a mesma conta do ataque de verdade (_hit_ids_from). Vazio se a posição não vale.
+func ability_hit_ids(actor_id: String, ability_id: String, target_rank: int) -> Array:
+	var user := _find_unit(actor_id)
+	var ability = find_ability(ability_id)
+	if user == null or ability == null or (ability.TargetType != "Self" and not valid_targets(actor_id, ability_id).has(target_rank)):
+		return []
+	var friendly: Array = state.player_team if user.is_player else state.enemy_team
+	var opposing: Array = state.enemy_team if user.is_player else state.player_team
+	var target = null
+	match ability.TargetType:
+		"Self":
+			target = user
+		"SingleAlly":
+			target = _find(friendly, func(u): return occupies_rank(u, target_rank) and alive_any(u))
+		"SingleOtherAlly":
+			target = _find(friendly, func(u): return occupies_rank(u, target_rank) and u.id != user.id and alive_any(u))
+		_:
+			target = _find(opposing, func(u): return occupies_rank(u, target_rank) and alive_any(u))
+	return _hit_ids_from(target, ability, target_rank, opposing) if target != null else []
+
+
 ## Todas as posições válidas para a habilidade, da frente para trás (a própria, se for em si).
 func valid_targets(actor_id: String, ability_id: String) -> Array:
 	var targets: Array = []

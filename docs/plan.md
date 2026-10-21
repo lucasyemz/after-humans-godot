@@ -97,8 +97,10 @@ save (`station` e `session` estão vazios) e a migração de versões antigas do
   certas do corredor (fase 2).
 - **Arte faltando:** reações de Íris e Véspera, a esquiva e a defesa dos heróis com a arte nova, e as poses dos outros
   inimigos (a ferramenta já sabe trazê-las).
-- **Ainda não entraram:** a prévia de quem a habilidade atinge (par da granada, vizinho do coquetel), os itens da
-  Mochila na luta e as crises de instinto com a apresentação própria.
+- ~~**Ainda não entraram**~~ feitos depois da Fase 5: a prévia de quem a habilidade atinge (`ability_hit_ids`, port do
+  `AbilityHitIds`, com `test_hit_preview`: apontar um alvo diz todos os atingidos e acende o par da granada ou o vizinho
+  do coquetel), os itens da Mochila na luta e a crise de instinto com o lance próprio (câmera perto, pose de apoio ou de
+  dano e a faixa "CRISE DE INSTINTO" com o resultado em dourado ou vermelho).
 
 ### Fase 2: exploração e a primeira jornada (5 a 8 dias) — feita em 2026-10-21
 
