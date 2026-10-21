@@ -10,6 +10,9 @@ signal camp_food(hero_id: String)
 signal camp_bandage(hero_id: String)
 signal camp_leave
 signal result_continue
+signal menu_return
+signal menu_requested
+signal new_campaign
 
 const H = preload("res://scripts/ui/combat_hud.gd")
 const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprimentos", "rest": "Descanso", "passage": "Passagem",
@@ -27,6 +30,8 @@ var _prompt_label: Label
 var _toast: Label
 var _toast_tween: Tween
 var _modal: PanelContainer
+var _menu_button: Button
+var _finish_button: Button
 
 
 func _ready() -> void:
@@ -60,6 +65,27 @@ func _ready() -> void:
 	_party_box.add_theme_constant_override("separation", 4)
 	_party_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_party_box)
+
+	# Botões sempre à mão (mouse): o menu e, com o guardião vencido, concluir a jornada.
+	_finish_button = Button.new()
+	_finish_button.text = "Concluir jornada · Voltar à Estação"
+	_finish_button.position = Vector2(1500, 900)
+	_finish_button.custom_minimum_size = Vector2(384, 52)
+	_finish_button.add_theme_font_size_override("font_size", 20)
+	H.style_button(_finish_button)
+	_finish_button.add_theme_color_override("font_color", H.GOLD)
+	_finish_button.focus_mode = Control.FOCUS_NONE
+	_finish_button.visible = false
+	_finish_button.pressed.connect(func(): menu_return.emit())
+	add_child(_finish_button)
+	_menu_button = Button.new()
+	_menu_button.text = "Menu (Esc)"
+	_menu_button.position = Vector2(1704, 962)
+	_menu_button.custom_minimum_size = Vector2(180, 44)
+	H.style_button(_menu_button)
+	_menu_button.focus_mode = Control.FOCUS_NONE
+	_menu_button.pressed.connect(func(): menu_requested.emit())
+	add_child(_menu_button)
 
 	_prompt = PanelContainer.new()
 	_prompt.add_theme_stylebox_override("panel", H.panel_style(0.85))
@@ -111,6 +137,7 @@ func refresh(campaign: Dictionary) -> void:
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
 		title = "Dentro %s" % ("do cinema" if site.shop == 2 else "da " + AHJourneyRules.SHOP_NAMES[site.shop])
+	_finish_button.visible = expedition.objective_completed and session_open(campaign)
 	if expedition.objective_completed:
 		title += " · Fase concluída: volte à Estação %s" % ("pelo começo da rua" if place == "Rua das Vitrines" else "(E)")
 	_step_title.text = title
@@ -256,6 +283,71 @@ func show_camp(campaign: Dictionary) -> void:
 	var leave := _button("Levantar acampamento", func(): camp_leave.emit())
 	box.add_child(leave)
 	(first if first else leave).grab_focus.call_deferred()
+
+
+# ---------------------------------------------------------------- menu
+
+## Esc na exploração: continuar ou voltar à Estação. Antes do guardião a volta é uma retirada (metade do achado) e
+## pergunta antes, como o Retornar da Unreal ("Abandonar a expedição?").
+func show_menu(completed: bool, can_return: bool) -> void:
+	var box := _open_modal(620)
+	_modal.set_meta("menu", true)
+	box.add_child(H.make_label("Pausa", 34, H.GOLD))
+	var resume := _button("Continuar", close_modal)
+	box.add_child(resume)
+	var text := "Voltar à Estação (fase concluída: todo o achado)" if completed else "Voltar à Estação (retirada: metade do achado)"
+	var back := _button(text, func(): _confirm_return(completed), can_return)
+	box.add_child(back)
+	if not can_return:
+		box.add_child(H.make_label("Termine a luta ou o evento antes de voltar.", 18, H.MUTED))
+	box.add_child(_button("Nova campanha", _confirm_new_campaign))
+	resume.grab_focus.call_deferred()
+
+
+func _confirm_new_campaign() -> void:
+	var box := _open_modal(620)
+	_modal.set_meta("menu", true)
+	box.add_child(H.make_label("Começar uma campanha nova?", 34, H.GOLD))
+	var note := H.make_label("A expedição e todo o progresso salvo são substituídos por uma campanha do zero, na Estação.", 20, H.TEXT)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(580, 0)
+	box.add_child(note)
+	var stay := _button("Cancelar", close_modal)
+	box.add_child(stay)
+	box.add_child(_button("Começar do zero", func():
+		close_modal()
+		new_campaign.emit()))
+	stay.grab_focus.call_deferred()
+
+
+## A expedição ainda está na rua (sem resultado): concluir ou sair faz sentido.
+static func session_open(campaign: Dictionary) -> bool:
+	var session: Dictionary = campaign.get("session", {})
+	return session.get("expedition") != null and session.get("result", "") == ""
+
+
+func menu_shown() -> bool:
+	return modal_open() and _modal.has_meta("menu")
+
+
+func _confirm_return(completed: bool) -> void:
+	if completed:
+		close_modal()
+		menu_return.emit()
+		return
+	var box := _open_modal(620)
+	_modal.set_meta("menu", true)
+	box.add_child(H.make_label("Abandonar a expedição?", 34, H.GOLD))
+	var note := H.make_label("A equipe volta pelo trem sem enfrentar o guardião: só metade do achado chega à Estação.", 20, H.TEXT)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(580, 0)
+	box.add_child(note)
+	var stay := _button("Continuar a expedição", close_modal)
+	box.add_child(stay)
+	box.add_child(_button("Voltar à Estação", func():
+		close_modal()
+		menu_return.emit()))
+	stay.grab_focus.call_deferred()
 
 
 # ---------------------------------------------------------------- resultado

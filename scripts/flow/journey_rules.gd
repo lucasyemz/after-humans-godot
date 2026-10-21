@@ -24,14 +24,21 @@ const HOUSE_ENEMY_INDEX := 100
 
 ## Fases da campanha (FAHGameFlowRules::Phases): id, cenário, nome, nível, tipo do nó e o mapa de cada uma (#86, aprovado
 ## pelo Lucas): a rua na primeira ("" = a Rua das Vitrines), os cenários nas outras; com trecho de passagem, os primeiros
-## transit_steps trechos ficam no mapa de passagem (o Cais antes da Ponte, o Depósito antes dos Dutos).
+## transit_steps trechos ficam no mapa de passagem (o Cais antes da Ponte, o Depósito antes dos Dutos). A dificuldade, a
+## posição no mapa de fases (no espaço 1100 x 660) e a descrição vêm da mesma tabela.
 const PHASES := [
-	{"id": "fase_1", "scenario": "rua-das-vitrines", "name": "Rua das Vitrines", "level": 1, "node_type": "combat", "map": "", "transit": "", "transit_steps": 0},
-	{"id": "fase_2", "scenario": "ponte-das-raizes", "name": "Ponte das Raízes", "level": 3, "node_type": "combat", "map": "RootBridge", "transit": "RiverDock", "transit_steps": 4},
-	{"id": "fase_3", "scenario": "sala-esquecida", "name": "Sala Esquecida", "level": 5, "node_type": "combat", "map": "SealedShelter", "transit": "", "transit_steps": 0},
-	{"id": "fase_4", "scenario": "laboratorio-silencioso", "name": "Laboratório Silencioso", "level": 7, "node_type": "combat", "map": "TriageGate", "transit": "", "transit_steps": 0},
-	{"id": "fase_5", "scenario": "tuneis-do-eco", "name": "Túneis do Eco", "level": 9, "node_type": "boss", "map": "SewerDucts", "transit": "FloodedDepot", "transit_steps": 4},
+	{"id": "fase_1", "scenario": "rua-das-vitrines", "name": "Rua das Vitrines", "level": 1, "node_type": "combat", "map": "", "transit": "", "transit_steps": 0, "difficulty": 0, "map_pos": [330, 300],
+		"description": "Vitrines tomadas por raízes guardam suprimentos. Os sensores ainda distinguem clientes humanos de fauna não autorizada."},
+	{"id": "fase_2", "scenario": "ponte-das-raizes", "name": "Ponte das Raízes", "level": 3, "node_type": "combat", "map": "RootBridge", "transit": "RiverDock", "transit_steps": 4, "difficulty": 1, "map_pos": [520, 470],
+		"description": "A ponte ligava bairros; seus sensores agora vigiam permissões que nenhum morador da Estação possui."},
+	{"id": "fase_3", "scenario": "sala-esquecida", "name": "Sala Esquecida", "level": 5, "node_type": "combat", "map": "SealedShelter", "transit": "", "transit_steps": 0, "difficulty": 2, "map_pos": [640, 210],
+		"description": "Uma placa do Programa Continuidade aponta para o subsolo. Os registros não dizem quem retornou."},
+	{"id": "fase_4", "scenario": "laboratorio-silencioso", "name": "Laboratório Silencioso", "level": 7, "node_type": "combat", "map": "TriageGate", "transit": "", "transit_steps": 0, "difficulty": 2, "map_pos": [830, 430],
+		"description": "Restam interfaces de comunicação e anotações de aprendizagem. Os aparelhos não contam sozinhos a história de seus usuários."},
+	{"id": "fase_5", "scenario": "tuneis-do-eco", "name": "Túneis do Eco", "level": 9, "node_type": "boss", "map": "SewerDucts", "transit": "FloodedDepot", "transit_steps": 4, "difficulty": 3, "map_pos": [980, 190],
+		"description": "Bombas antigas mantêm a água em movimento. Na eclusa central, o Porteiro conserva uma ordem de isolamento da guerra."},
 ]
+const DIFFICULTY_NAMES := ["Fácil", "Moderada", "Difícil", "Muito difícil"]
 const WEATHERS := {
 	"estacao-raiz": ["clear", "clear", "sunset", "mist", "night", "nightRain"],
 	"rua-das-vitrines": ["clear", "sunset", "rain", "rain", "storm", "mist", "fog", "night", "nightRain"],

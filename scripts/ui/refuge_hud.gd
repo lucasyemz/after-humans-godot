@@ -8,8 +8,6 @@ extends Control
 const H := preload("res://scripts/ui/combat_hud.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
-## Fases com mapa: todas (a rua e os cenários da Fase 4).
-const PLAYABLE_PHASES := ["fase_1", "fase_2", "fase_3", "fase_4", "fase_5"]
 const RESULT_NAMES := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fuga", "defeat": "Derrota"}
 
 var station: AHStation
@@ -30,6 +28,8 @@ var _tag_nodes := {}
 var _lineup_signature := ""
 ## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
 var _arrived_candidate := ""
+## Mapa de fases: Preparar expedição abre por cima de tudo; a fase escolhida vai para a Preparação.
+var _map: AHPhaseMap
 
 
 func _ready() -> void:
@@ -76,9 +76,15 @@ func _ready() -> void:
 	_feedback.size = Vector2(800, 40)
 	add_child(_feedback)
 
+	_map = AHPhaseMap.new()
+	_map.visible = false
+	_map.phase_chosen.connect(_on_phase_chosen)
+	_map.closed.connect(func(): _map.visible = false)
+	add_child(_map)
+
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and current != "":
+	if event.is_action_pressed("ui_cancel") and current != "" and not _map.visible:
 		close_panel()
 		get_viewport().set_input_as_handled()
 
@@ -113,6 +119,14 @@ func _build_menu() -> void:
 	for child in _menu.get_children():
 		child.queue_free()
 	_menu_button("Vista geral", "", "overview")
+	var prepare := Button.new()
+	prepare.text = "Preparar expedição"
+	prepare.custom_minimum_size = Vector2(330, 52)
+	prepare.add_theme_font_size_override("font_size", 22)
+	H.style_button(prepare)
+	prepare.add_theme_color_override("font_color", H.GOLD)
+	prepare.pressed.connect(open_map)
+	_menu.add_child(prepare)
 	if S.visit_pending(Campaign.state):
 		_menu_button("Plataforma: o trem chegou", "", "train")
 	for room in AHStation.ROOMS:
@@ -124,6 +138,7 @@ func _build_menu() -> void:
 		if room.id == S.DORMITORY and Campaign.state.night.phase != "none":
 			state += " · noite"
 		_menu_button(room_def.name + state, room.id, "")
+	_menu_button("Nova campanha", "", "new_campaign")
 
 
 func _menu_button(text: String, room_id: String, service: String) -> void:
@@ -175,6 +190,24 @@ func close_panel() -> void:
 	_lineup_signature = ""
 	station.focus_overview()
 	refresh()
+
+
+## Preparar expedição (AAHHUD::OpenPhaseMap): com algo pendente (a noite, o trem), a Preparação diz o quê; senão, o mapa.
+func open_map() -> void:
+	if S.preparation_block(Campaign.state) != "":
+		open_room(S.PREPARATION)
+		return
+	if _draft.is_empty():
+		_reset_draft()
+	_map.open(_draft.phase)
+
+
+func _on_phase_chosen(phase_id: String) -> void:
+	_map.visible = false
+	if _draft.is_empty():
+		_reset_draft()
+	_draft.phase = phase_id
+	open_room(S.PREPARATION)
 
 
 ## A equipe da Preparação em fila na plataforma, esperando a partida (a câmera sobe pela passagem).
@@ -272,8 +305,20 @@ func _show(key: String) -> void:
 			_train()
 		"departure":
 			_departure_view()
+		"new_campaign":
+			_new_campaign_view()
 		_:
 			_room(key)
+
+
+## Começar do zero (com confirmação): o save atual é substituído por uma campanha nova.
+func _new_campaign_view() -> void:
+	_heading("Nova campanha", "Recomeça a Estação, o elenco e as fases do zero.")
+	_text("Todo o progresso salvo (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha nova.", 19, Color(1.0, 0.65, 0.5))
+	_button("Cancelar", close_panel)
+	_button("Começar do zero", func():
+		Campaign.new_game()
+		GameFlow.change_to("station"))
 
 
 func _heading(text: String, subtitle: String = "") -> void:
@@ -432,7 +477,13 @@ func _reset_draft() -> void:
 	for entry in S.living(c):
 		if team.size() < 4 and not team.has(entry.id):
 			team.append(entry.id)
-	_draft = {"phase": "fase_1", "team": team, "focus": S.focus_recommended(c), "extra": 0}
+	# A fase sugerida: a primeira liberada que falta concluir (ou a última, com todas feitas).
+	var next: String = J.PHASES[-1].id
+	for info in J.PHASES:
+		if S.phase_unlocked(c, info.id) and not c.completed_phases.has(info.id):
+			next = info.id
+			break
+	_draft = {"phase": next, "team": team, "focus": S.focus_recommended(c), "extra": 0}
 
 
 func _preparation(c: Dictionary) -> void:
@@ -446,18 +497,14 @@ func _preparation(c: Dictionary) -> void:
 		return
 	if _draft.is_empty():
 		_reset_draft()
-	_section("Fase")
-	for info in J.PHASES:
-		var unlocked := S.phase_unlocked(c, info.id)
-		var playable: bool = PLAYABLE_PHASES.has(info.id)
-		var state := "concluída" if c.completed_phases.has(info.id) else "liberada" if unlocked else "bloqueada"
-		if unlocked and not playable:
-			state = "o mapa chega com os cenários"
-		var id: String = info.id
-		var button := _button("%s%s · nível %d · %s" % ["▸ " if _draft.phase == id else "", info.name, info.level, state],
-			func(): _draft.phase = id; refresh(), unlocked and playable)
-		if _draft.phase == id:
-			button.add_theme_color_override("font_color", H.GOLD)
+	# Missão: o mapa de fases abre por cima; a fase escolhida volta para esta mesma escalação.
+	_section("Missão")
+	var mission := J.phase(_draft.phase)
+	if not S.phase_unlocked(c, _draft.phase):
+		_reset_draft()
+		mission = J.phase(_draft.phase)
+	_text("%s · nível %d · %s" % [mission.name, mission.level, J.DIFFICULTY_NAMES[mission.difficulty]], 20, H.GOLD)
+	_button("Escolher no mapa", func(): _map.open(_draft.phase))
 	_section("Equipe (da frente para trás)")
 	for rank in 4:
 		var hero_id: String = _draft.team[rank] if rank < _draft.team.size() else ""

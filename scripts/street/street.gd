@@ -117,6 +117,7 @@ const RAIN := {
 }
 
 var _forward_plus := false
+var _key_light: OmniLight3D
 var _materials := {}
 var _textures := {}
 var _skyline_materials: Array[ShaderMaterial] = []
@@ -231,6 +232,13 @@ func _ready() -> void:
 		lantern.omni_range = 10.0
 		lantern.light_color = Color(1.0, 0.8, 0.55)
 		_leader.add_child(lantern)
+	# Luz de leitura: acompanha a equipe (e a luta), do lado da câmera, de noite e na chuva.
+	_key_light = OmniLight3D.new()
+	_key_light.omni_range = 9.0
+	_key_light.light_color = Color(1.0, 0.88, 0.72)
+	_key_light.light_energy = 0.0
+	_key_light.shadow_enabled = false
+	add_child(_key_light)
 	_build_camera()
 	_build_post_and_hud()
 	_arena = AHCombatArena.new()
@@ -943,6 +951,7 @@ func _update_camera(delta: float) -> void:
 	_camera.position = wanted if delta == 0.0 else _camera.position.lerp(wanted, 1.0 - exp(-3.0 * delta))
 	_camera.look_at(Vector3(_camera.position.x, target.y, target.z))
 	var ground := floor_y if scenario else 0.0
+	_key_light.position = Vector3(target.x, ground + 2.6, (lane_z if scenario else 0.45) + 2.2)
 	_dust.position = Vector3(_camera.position.x, ground + 2.6, -1.0 + (lane_z if scenario else 0.0))
 	_rain.position = Vector3(_camera.position.x + 0.8, ground + 9.0, -1.0 + (lane_z if scenario else 0.0))
 	_splashes.position = Vector3(_camera.position.x, ground + 0.03, -1.0 + (lane_z if scenario else 0.0))
@@ -973,7 +982,7 @@ func _build_post_and_hud() -> void:
 	hud.add_child(_label(title, 30, Vector2(36, 28)))
 	_hud_weather = _label("", 20, Vector2(36, 112))
 	hud.add_child(_hud_weather)
-	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   E interagir   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1030)))
+	hud.add_child(_label("A/D andar   W/S fundo e frente   Shift correr   E interagir   Esc menu   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1030)))
 	_hud_stats = _label("", 18, Vector2(1380, 30))
 	hud.add_child(_hud_stats)
 
@@ -1043,6 +1052,9 @@ func _apply_weather() -> void:
 	if scenario:
 		# Nos cenários o céu e o sol da rua só tingem; a luz é a das luminárias do mapa (e a lanterna).
 		scenario.set_weather(_wet if not covered else 0.0, Color(1, 1, 1) if _mood == "golden" else Color(0.55, 0.6, 0.75))
+	# Luz de leitura: acende de noite e na chuva, sobre a equipe e a luta.
+	var readable := (1.0 if _mood == "night" else 0.0) + (0.3 if _raining else 0.0)
+	_key_light.light_energy = 0.7 * clampf(readable, 0.0, 1.2)
 	_hud_weather.text = ("Noite" if _mood == "night" else "Fim de tarde") + (" · chuva" if _raining else "")
 	_update_sun(0.0)
 

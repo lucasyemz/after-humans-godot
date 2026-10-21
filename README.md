@@ -36,7 +36,7 @@ scripts/campaign/ Campaign (autoload): campanha nova, save e load
 scripts/flow/     GameFlow (autoload), o boot, as regras da jornada (corredor, casas, busca, acampamento) e as da
                   Estação e da campanha (cômodos, economia, civis, noite, elenco, foco, partida e volta)
 scripts/combat/   motor de combate, tabelas tipadas, a sessão de luta (comandos e lances) e a arena (animação)
-scripts/ui/       HUD de combate, da exploração e do refúgio
+scripts/ui/       HUD de combate, da exploração e do refúgio, e o mapa de fases
 scripts/world/    AHSpriteCard (personagem pintado com o pé fixo ao trocar de pose) e AHHouseRoom (interior das lojas)
 scripts/street/   Rua das Vitrines montada em código, chuva, colisão e o corredor (patrulhas, visão, portas, saque)
 scripts/scenario/ AHScenarioWorld: monta os seis cenários da Unreal a partir de data/scenarios (zonas, portas, props)
@@ -49,7 +49,8 @@ data/             JSON de produção (classes, habilidades, inimigos...) e a gra
                   scenarios/ traz os seis mapas exportados (peças, materiais, luzes, zonas) e as malhas
 audio/            sons do combate
 art/              arte pintada usada pelo jogo (street: a rua; rooms: interiores; station: superfícies, modelos da Poly Haven e cards
-                  da Estação; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários)
+                  da Estação; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários;
+                  ui: o mapa de fases, as imagens das fases e os ícones dos nós)
 tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas e input)
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
                   precisa do Pillow), unreal_export_scenarios.py (roda na Unreal e exporta os cenários para

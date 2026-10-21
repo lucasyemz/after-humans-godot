@@ -276,6 +276,27 @@ def civilians() -> int:
     return len(out)
 
 
+# Mapa de fases (UAHExpeditionMapWidget): o bairro alagado da web, a imagem de cada fase e os ícones dos nós.
+MAP_ICONS = ["node-start", "node-combat", "node-boss", "node-rest", "marker-here", "marker-visited", "marker-available",
+             "ui-arrow-right"]
+
+
+def phase_map() -> int:
+    from PIL import Image
+    out = PROTO / "art" / "ui"
+    jobs = [(REPO / "SourceArt/Legacy/public/ui/flooded-railway-map.png", out / "map" / "flooded-railway-map.webp", 1.0)]
+    for src in sorted((REPO / "SourceArt/Legacy/assets/scenarios").glob("*.png")):
+        jobs.append((src, out / "scenarios" / f"{src.stem}.webp", 0.5))
+    for src, dst, scale in jobs:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+            image = Image.open(src).convert("RGB")
+            image.resize((round(image.width * scale), round(image.height * scale)), Image.LANCZOS).save(dst, "WEBP", quality=88, method=4)
+    for name in MAP_ICONS:
+        copy(REPO / "Content/AfterHumans/UI/Icons" / f"{name}.svg", out / "icons" / f"{name}.svg")
+    return len(jobs) + len(MAP_ICONS)
+
+
 def copy(src: Path, dst: Path) -> None:
     dst.parent.mkdir(parents=True, exist_ok=True)
     if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime or dst.stat().st_size != src.stat().st_size:
@@ -297,7 +318,7 @@ def main() -> None:
     for path in SOURCE_ART:
         copy(REPO / path, street / Path(path).name)
     print(f"dados: {len(DATA) + len(LEGACY_KITS)} arquivos; arte da rua: {len(WEB_STREET) + len(SOURCE_ART)} imagens; "
-          f"interiores: {rooms()} imagens; estação: {station()} superfícies; civis: {civilians()}; modelos: {station_models()}; cards: {station_cards()}; poses: {station_poses()}")
+          f"interiores: {rooms()} imagens; estação: {station()} superfícies; civis: {civilians()}; modelos: {station_models()}; cards: {station_cards()}; poses: {station_poses()}; mapa de fases: {phase_map()}")
 
 
 if __name__ == "__main__":

@@ -276,6 +276,11 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
 - **Teste:** `test_scenario_rules` (mapa de cada trecho, faixas, props e objetivo, interiores, dados dos seis mapas).
   As cinco jornadas foram percorridas pelas cenas de verdade, com lutas automáticas até o resultado.
 
+- **Depois da primeira QA do Lucas:** o mapa de fases da Unreal (`AHPhaseMap`: o bairro alagado, a Estação e as
+  fases como nós, o painel da fase e Preparar expedição, que leva à Preparação); Esc na exploração abre o menu com
+  Continuar e Voltar à Estação (antes do guardião, retirada com confirmação); de noite e na chuva uma luz de leitura
+  acompanha a equipe e a luta.
+
 **Pendências da 4:**
 - Sem colisão nos cenários: a equipe fica presa à faixa da zona, sem bater nos props.
 - O portão animado do Portão de Triagem não entrou (a jornada da Unreal também não o usa), nem as baias do Cais que
