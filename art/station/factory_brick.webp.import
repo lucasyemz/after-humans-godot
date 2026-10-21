@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/factory_brick.webp-2c259d4cb2a4c59f4df89a9917
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.85
+compress/lossy_quality=0.75
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

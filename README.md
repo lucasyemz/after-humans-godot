@@ -31,7 +31,8 @@ Roda no PC (Forward+) e no navegador (Compatibility). O plano para chegar ao jog
 
 ```
 project.godot  export_presets.cfg
-scripts/core/     GameData (autoload): todas as tabelas de data/
+scripts/core/     GameData (autoload): todas as tabelas de data/; Settings (qualidade gráfica, tela cheia, vsync, em
+                  user://settings.cfg) e Sound (música, ambiente, chuva, efeitos e passos nos canais das opções)
 scripts/campaign/ Campaign (autoload): campanha nova, save e load
 scripts/flow/     GameFlow (autoload), o boot, as regras da jornada (corredor, casas, busca, acampamento) e as da
                   Estação e da campanha (cômodos, economia, civis, noite, elenco, foco, partida e volta)
@@ -47,14 +48,16 @@ scenes/           boot.tscn (cena inicial: abre a Estação, ou a rua se há exp
 data/             JSON de produção (classes, habilidades, inimigos...) e a gravação de paridade do combate;
                   presentation/combat_art.json diz onde está cada pose, ícone e som e mede a âncora no pé;
                   scenarios/ traz os seis mapas exportados (peças, materiais, luzes, zonas) e as malhas
-audio/            sons do combate
+audio/            combat (sons das habilidades), music, ambience (cenários e chuva), world (passos, portas, busca),
+                  station e ui
 art/              arte pintada usada pelo jogo (street: a rua; rooms: interiores; station: superfícies, modelos da Poly Haven e cards
                   da Estação; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários;
                   ui: o mapa de fases, as imagens das fases e os ícones dos nós)
 tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas e input)
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
                   precisa do Pillow), unreal_export_scenarios.py (roda na Unreal e exporta os cenários para
-                  build/unreal-export) e sync_scenarios.py (converte a exportação), e define_input.gd (grava as ações)
+                  build/unreal-export) e sync_scenarios.py (converte a exportação), sync_audio.py (trilha e sons, precisa
+                  do soundfile), capture_scenarios.gd (QA dos cenários) e define_input.gd (grava as ações)
 ```
 
 `build/` e `.godot/` são gerados e ficam fora do Git.
@@ -99,8 +102,11 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   ou `FAIL`) e joga a jornada: a suspeita da primeira patrulha, a luta (HUD, uma ação, o resultado, a rua depois), a entrada
   numa casa e uma busca. Usa uma campanha própria, na pasta da captura. Grava
   `frames.txt` e sai.
+- **Captura dos cenários:** `"$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_scenarios.gd -- --out=<pasta>`
+  (opcional `--maps=RiverDock,FloodedDepot`). Em cada zona dos seis mapas: fim de tarde e noite com chuva, tempo de quadro,
+  equipe e patrulhas no piso e o líder preso à faixa (`PASS`/`FAIL`). Sai com código 1 se algo falhar.
 - **Exportar:** `"$GODOT" --headless --path . --export-release "Web" build/web/index.html` e
-  `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/AfterHumansPrototype.exe`. Os export
+  `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/AfterHumans.exe`. Os export
   templates da 4.7.2 precisam estar instalados.
 - **Servir a web:** `python -m http.server 8060 --directory build/web` e abrir `http://localhost:8060`.
 

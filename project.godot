@@ -19,6 +19,8 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 GameData="*res://scripts/core/game_data_service.gd"
 Campaign="*res://scripts/campaign/campaign_service.gd"
 GameFlow="*res://scripts/flow/game_flow.gd"
+Settings="*res://scripts/core/settings_service.gd"
+Sound="*res://scripts/core/sound_service.gd"
 
 [display]
 

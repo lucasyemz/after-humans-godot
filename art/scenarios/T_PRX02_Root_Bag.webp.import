@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/T_PRX02_Root_Bag.webp-46e12ee697e9bd0f5e74bec
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.85
+compress/lossy_quality=0.75
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

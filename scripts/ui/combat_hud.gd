@@ -103,6 +103,10 @@ static func style_button(button: Button, accent: Color = GOLD) -> void:
 	button.add_theme_color_override("font_color", TEXT)
 	button.add_theme_color_override("font_disabled_color", MUTED.darkened(0.3))
 	button.add_theme_font_size_override("font_size", 20)
+	# O clique da interface em todo botão do jogo (SW_UI_Click).
+	if not button.has_meta("click"):
+		button.set_meta("click", true)
+		button.pressed.connect(func(): Sound.click())
 
 
 func _build() -> void:
@@ -440,7 +444,6 @@ func _describe_action(kind: String) -> void:
 
 
 func _on_ability(option: Dictionary) -> void:
-	arena.play_click()
 	if option.self:
 		command_chosen.emit({"kind": "ability", "ability_id": option.id, "rank": session.state.find_unit(_actor_id).rank})
 		return
@@ -449,7 +452,6 @@ func _on_ability(option: Dictionary) -> void:
 
 
 func _on_action(kind: String) -> void:
-	arena.play_click()
 	match kind:
 		"move":
 			_choosing = "move"
@@ -483,7 +485,6 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable) -> void:
 		style_button(marker, Color(1.0, 0.85, 0.45))
 		marker.set_meta("world", world)
 		marker.pressed.connect(func():
-			arena.play_click()
 			_clear_markers()
 			_set_enabled(true)
 			on_pick.call(rank))

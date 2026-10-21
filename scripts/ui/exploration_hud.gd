@@ -300,8 +300,25 @@ func show_menu(completed: bool, can_return: bool) -> void:
 	box.add_child(back)
 	if not can_return:
 		box.add_child(H.make_label("Termine a luta ou o evento antes de voltar.", 18, H.MUTED))
+	box.add_child(_button("Opções", show_options))
 	box.add_child(_button("Nova campanha", _confirm_new_campaign))
 	resume.grab_focus.call_deferred()
+
+
+## As opções por cima da exploração (som, gráficos, jogo, controles); Fechar ou Esc fecha.
+func show_options() -> void:
+	var box := _open_modal(700)
+	_modal.set_meta("menu", true)
+	_modal.position.y = 40
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(660, 960)
+	box.add_child(scroll)
+	var options := AHOptionsPanel.new()
+	options.width = 640
+	options.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	options.closed.connect(close_modal)
+	scroll.add_child(options)
 
 
 func _confirm_new_campaign() -> void:

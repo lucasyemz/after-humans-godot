@@ -138,6 +138,7 @@ func _build_menu() -> void:
 		if room.id == S.DORMITORY and Campaign.state.night.phase != "none":
 			state += " · noite"
 		_menu_button(room_def.name + state, room.id, "")
+	_menu_button("Opções", "", "options")
 	_menu_button("Nova campanha", "", "new_campaign")
 
 
@@ -307,6 +308,11 @@ func _show(key: String) -> void:
 			_departure_view()
 		"new_campaign":
 			_new_campaign_view()
+		"options":
+			var options := AHOptionsPanel.new()
+			options.width = 620
+			options.closed.connect(close_panel)
+			_body.add_child(options)
 		_:
 			_room(key)
 

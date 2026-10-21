@@ -107,6 +107,7 @@ func _ready() -> void:
 	builder.merge_static(keep)
 	_build_camera()
 	_build_post()
+	_build_sound_loops()
 	hud = AHRefugeHud.new()
 	hud.station = self
 	var layer := CanvasLayer.new()
@@ -472,6 +473,7 @@ func _offset_wagon(x: float) -> void:
 ## O trem chega do túnel com o candidato: desacelera até parar, pausa na porta e o candidato desce e anda até a
 ## plataforma (PlayTrainArrival). O sinal vermelho pisca enquanto ele se aproxima.
 func play_train_arrival(candidate_id: String) -> void:
+	Sound.play("res://audio/station/train_arrival.ogg", 0.9)
 	_remove_candidate()
 	_candidate_id = candidate_id
 	_train_mode = 1
@@ -482,12 +484,37 @@ func play_train_arrival(candidate_id: String) -> void:
 
 ## Fecha e acelera para o túnel; fica fora até a próxima chegada. Recusado, o candidato vai junto (PlayTrainDeparture).
 func play_train_departure(candidate_leaves: bool) -> void:
+	Sound.play("res://audio/station/train_departure.ogg", 0.9)
 	_warning_time = -1.0
 	if candidate_leaves:
 		_remove_candidate()
 	_train_mode = 2
 	_train_time = 0.0
 	_offset_wagon(0.0)
+
+
+## A trilha do refúgio (Contemplation, a mesma da exploração) por baixo dos loops da Estação; sem chuva nem ambiente
+## de cenário: a Estação é subterrânea.
+func soundscape() -> Dictionary:
+	return {"music": "res://audio/music/explore_3.mp3", "music_gain": 0.26, "ambience": "res://audio/station/hum_loop.ogg",
+		"ambience_gain": 0.45}
+
+
+## Os loops com lugar (FAHAudio::Loop espacial): o ventilador do Bar e a lâmpada tubular do Depósito.
+func _build_sound_loops() -> void:
+	for spec in [["bar", "res://audio/station/bar_fan_loop.ogg", -2.0], ["depot", "res://audio/station/depot_tube_loop.ogg", -6.0]]:
+		var room: Dictionary = ROOMS.filter(func(r): return r.id == spec[0])[0]
+		var player := AudioStreamPlayer3D.new()
+		var stream: AudioStream = load(spec[1])
+		stream.loop = true
+		player.stream = stream
+		player.bus = "Ambience"
+		player.volume_db = spec[2]
+		player.unit_size = 9.0
+		player.max_distance = 60.0
+		player.position = Vector3((room.x0 + room.x1) * 0.5, room.ceiling - 0.4, LANE_Z)
+		player.autoplay = true
+		add_child(player)
 
 
 func train_busy() -> bool:
@@ -762,9 +789,11 @@ func _build_environment() -> void:
 	env.adjustment_contrast = 1.06
 	env.adjustment_saturation = 1.04
 	if RenderingServer.get_current_rendering_method() == "forward_plus":
-		env.ssao_enabled = true
+		env.ssao_enabled = Settings.effects().ssao
 		env.ssao_radius = 0.9
 		env.ssao_intensity = 1.4
+		# A oclusão acompanha a qualidade das opções (Settings).
+		Settings.changed.connect(func(): env.ssao_enabled = Settings.effects().ssao)
 	var world := WorldEnvironment.new()
 	world.environment = env
 	add_child(world)

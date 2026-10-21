@@ -295,6 +295,26 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
 - Builds para Windows e web, testados em hardware fraco e num celular.
 - QA automatizada por captura para cada mapa (como o modo `--capture` da rua) e checklist de Play.
 
+**Feito (primeira parte):**
+- **Áudio** (`Sound`, port do `UAHSoundscapeSubsystem` e do `FAHAudio`): a mesma tabela do `import-sounds.py` da Unreal,
+  convertida por `tools/sync_audio.py` (WAV para OGG). Música de exploração (uma de três pela expedição; a Ponte tem a
+  sua), batalha e chefe (o Porteiro), a do refúgio na Estação; o ambiente de cada cenário e da rua; a chuva de fora e de
+  dentro; crossfade de 1,5 s e os mesmos ganhos. Passos a cada 75 cm pelo piso (água, madeira, concreto), portas,
+  busca (pano, metal, moedas no objetivo), o clique da interface em todo botão, o trem, o zumbido da Estação e os loops
+  com lugar do Bar e do Depósito.
+- **Opções** (Esc → Opções na exploração, e no menu da Estação): volume de música, ambiente e efeitos, qualidade
+  gráfica (Baixo, Médio, Alto, Ultra: resolução interna, sombra, oclusão, neblina, reflexos e chuva), tela cheia,
+  vsync, velocidade da batalha (1x ou 2x), reduzir os efeitos do ambiente e a lista dos controles.
+- **QA dos cenários:** `tools/capture_scenarios.gd`: 26 conferências nos seis mapas, todas PASS; de 4 a 8 ms por
+  quadro em 1080p no Forward+ (RTX 3050).
+- **Builds:** `build/` ganhou `.gdignore` (a Godot importava a exportação da Unreal e os builds antigos para dentro do
+  pacote). As texturas dos cenários e da Estação passam a WebP 0,75 (sem diferença visível). Web: 120 MB de pacote
+  (era 220); Windows: 230 MB. A web abre, mostra a Estação e o mapa de fases no navegador.
+
+**Pendências da 5:**
+- Testar em hardware fraco e num celular (o pacote da web ainda é pesado para dados móveis).
+- Checklist de Play com o Lucas.
+
 **Total: 28 a 42 dias de trabalho com agente**, perto da faixa da avaliação (24 a 40). O combate e a rua já estão
 adiantados, mas a Estação e a UI pesam mais do que parecia.
 

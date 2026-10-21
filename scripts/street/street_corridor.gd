@@ -604,8 +604,11 @@ func _new_campaign() -> void:
 
 
 func _search_scenario_prop(entry: Dictionary) -> void:
+	var objective_before: bool = Campaign.state.session.expedition.get("objective_done", false)
 	var result := R.search_scenario_prop(Campaign.state, entry.prop)
 	if result.ok:
+		# O prop que abre faz o clique de metal; o achado do objetivo, as moedas; o resto, o pano.
+		_search_sound(objective_before, int(street.scenario.props[entry.local].open) >= 0)
 		street.scenario.open_prop(entry.local)
 		Campaign.save()
 		hud.toast("%s: %s" % [entry.name, result.text], 5.0)
@@ -620,6 +623,7 @@ func _enter_side_room(index: int) -> void:
 		return
 	busy = true
 	Campaign.save()
+	Sound.play("res://audio/world/door_open.ogg")
 	hud.toast("Entrando: %s…" % street.scenario.zones[room_entry.zone].name, 1.5)
 	await GameFlow.fade(1.0)
 	_show_side_room(index)
@@ -662,6 +666,7 @@ func _leave_side_room() -> void:
 		return
 	busy = true
 	Campaign.save()
+	Sound.play("res://audio/world/door_close.ogg")
 	await GameFlow.fade(1.0)
 	_enter_segment(room_entry.door_segment, room_entry.door_x)
 	await GameFlow.fade(0.0)
@@ -669,8 +674,10 @@ func _leave_side_room() -> void:
 
 
 func _search_prop(index: int) -> void:
+	var objective_before: bool = Campaign.state.session.expedition.get("objective_done", false)
 	var result := R.search_prop(Campaign.state, index)
 	if result.ok:
+		_search_sound(objective_before, false)
 		_dim(props[index])
 		Campaign.save()
 		hud.toast(result.text, 5.0)
@@ -697,6 +704,7 @@ func _enter_house(site_index: int) -> void:
 	await GameFlow.fade(1.0)
 	if R.enter_house(Campaign.state, site_index):
 		Campaign.save()
+		Sound.play("res://audio/world/door_open.ogg")
 		_open_room(site_index)
 	await GameFlow.fade(0.0)
 	busy = false
@@ -733,6 +741,7 @@ func _leave_house() -> void:
 	var site: Dictionary = route.sites[route.current_house]
 	if R.leave_house(Campaign.state):
 		Campaign.save()
+		Sound.play("res://audio/world/door_close.ogg")
 		_close_room()
 		street._place_leader(Vector3(doors[site.door].x, 0, 0.45))
 	await GameFlow.fade(0.0)
@@ -753,15 +762,28 @@ func _close_room() -> void:
 
 
 func _search_spot(site_index: int, spot_index: int) -> void:
+	var objective_before: bool = Campaign.state.session.expedition.get("objective_done", false)
 	var result := R.search_spot(Campaign.state, site_index, spot_index)
 	if not result.ok:
 		return
+	_search_sound(objective_before, false)
 	Campaign.save()
 	hud.refresh(Campaign.state)
 	if result.event != "":
 		hud.show_event(Campaign.state)
 	else:
 		hud.toast(result.text, 5.0)
+
+
+## O som da busca (como na Unreal): moedas quando ela cumpriu o objetivo da rota, o clique de metal num prop que abre,
+## o pano no resto.
+func _search_sound(objective_before: bool, opens: bool) -> void:
+	if not objective_before and Campaign.state.session.expedition.get("objective_done", false):
+		Sound.play("res://audio/world/find_coins.ogg")
+	elif opens:
+		Sound.play("res://audio/world/prop_open.ogg")
+	else:
+		Sound.play("res://audio/world/search_cloth_%d.ogg" % randi_range(1, 2))
 
 
 func _on_event_choice(choice_id: String) -> void:

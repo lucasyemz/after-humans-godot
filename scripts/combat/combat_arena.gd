@@ -56,7 +56,7 @@ func setup(street: Node3D) -> void:
 	art = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
 	for i in 6:
 		var player := AudioStreamPlayer.new()
-		player.bus = "Master"
+		player.bus = "SFX"
 		add_child(player)
 		_audio.append(player)
 	hud = AHCombatHud.new()
@@ -120,6 +120,9 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 ## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
 func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
 	session = AHCombatSession.create(heroes, enemies, opening, seed_value)
+	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
+	if speed <= 2.0:
+		speed = float(clampi(int(Campaign.state.get("settings", {}).get("battle_speed", 1)), 1, 2))
 	center_x = at_x
 	cards.clear()
 	for index in session.state.player_team.size():
@@ -525,4 +528,4 @@ func _play_cue(cue: String) -> void:
 
 
 func play_click() -> void:
-	_play_cue("UIClick")
+	Sound.click()

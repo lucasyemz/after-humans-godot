@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/concrete_wall_008_n.webp-fb1752d6f7525f27ec75
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.85
+compress/lossy_quality=0.75
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

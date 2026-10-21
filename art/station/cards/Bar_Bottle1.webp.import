@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/Bar_Bottle1.webp-e298d6216db6f6affa3244f5d0ec
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.85
+compress/lossy_quality=0.75
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

@@ -118,6 +118,8 @@ const RAIN := {
 
 var _forward_plus := false
 var _key_light: OmniLight3D
+## Passos (#62): um a cada passada de ~75 cm, só fora da luta.
+var _step_distance := 0.37
 var _materials := {}
 var _textures := {}
 var _skyline_materials: Array[ShaderMaterial] = []
@@ -244,6 +246,10 @@ func _ready() -> void:
 	_arena = AHCombatArena.new()
 	add_child(_arena)
 	_arena.setup(self)
+	_apply_graphics()
+	Settings.changed.connect(func():
+		_apply_graphics()
+		_apply_weather())
 	_apply_weather()
 	exploration_hud = AHExplorationHud.new()
 	_street_hud.add_child(exploration_hud)
@@ -252,6 +258,22 @@ func _ready() -> void:
 	corridor = AHStreetCorridor.new()
 	add_child(corridor)
 	corridor.setup(self, exploration_hud)
+
+
+## Opção da campanha: sem relâmpagos nem poeira no ar.
+func _reduced_effects() -> bool:
+	return bool(Campaign.state.get("settings", {}).get("reduced_environment_effects", false))
+
+
+## A qualidade gráfica das opções (Settings): oclusão, neblina volumétrica, sombra do sol e densidade da chuva.
+func _apply_graphics() -> void:
+	var fx := Settings.effects()
+	_env.ssao_enabled = _forward_plus and fx.ssao
+	_env.volumetric_fog_enabled = _forward_plus and fx.volumetric_fog
+	_env.ssr_enabled = _forward_plus and _raining and fx.ssr
+	_sun.shadow_enabled = fx.shadows
+	_rain.amount_ratio = fx.rain_scale
+	_splashes.amount_ratio = fx.rain_scale
 
 
 ## O mapa do trecho atual da expedição ("" = a rua): o de passagem nos primeiros trechos, depois o da fase.
@@ -1033,7 +1055,7 @@ func _apply_weather() -> void:
 	if _forward_plus:
 		_env.volumetric_fog_density = w.volumetric
 		_env.volumetric_fog_albedo = w.fog.lightened(0.3)
-		_env.ssr_enabled = _raining
+		_env.ssr_enabled = _raining and Settings.effects().ssr
 	for material in _skyline_materials:
 		material.set_shader_parameter("haze_color", w.haze)
 	for shaft in _shafts:
@@ -1045,7 +1067,7 @@ func _apply_weather() -> void:
 	var covered := _indoor or sheltered
 	_rain.emitting = _raining and not covered
 	_rain.visible = not covered
-	_dust.emitting = not _raining and not covered
+	_dust.emitting = not _raining and not covered and not _reduced_effects()
 	_dust.visible = not covered
 	_splashes.emitting = _raining and not covered
 	_splashes.visible = not covered
@@ -1063,7 +1085,7 @@ func _update_sun(delta: float) -> void:
 	var w := _weather()
 	var direct_scale := 1.0 if _forward_plus else 0.62
 	# Relâmpago (só com chuva): dois clarões rápidos, azulados.
-	if _raining and _capture_dir == "":
+	if _raining and _capture_dir == "" and not _reduced_effects():
 		_next_flash -= delta
 		if _next_flash <= 0.0:
 			_next_flash = randf_range(4.0, 9.0) if _storm else randf_range(9.0, 20.0)
@@ -1136,7 +1158,7 @@ func _input_vector() -> Vector2:
 	return Input.get_vector("move_left", "move_right", "move_back", "move_front")
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if _arena.active or (corridor != null and corridor.blocking()):
 		_leader.velocity = Vector3.ZERO
 		return
@@ -1144,12 +1166,43 @@ func _physics_process(_delta: float) -> void:
 	var speed := 4.4 if Input.is_action_pressed("run") else 2.4
 	# Para o fundo e para a frente anda mais devagar (a câmera vê pouco dessa direção).
 	_leader.velocity = Vector3(input.x, 0, input.y * 0.75) * speed
+	var before := _leader.position
 	_leader.move_and_slide()
 	_leader.position = _leader.position.clamp(walk_min, walk_max)
+	var moved := Vector2(_leader.position.x - before.x, _leader.position.z - before.z).length()
+	if moved > 0.2 * delta:
+		_step_distance += moved
+		if _step_distance >= 0.75:
+			_step_distance = 0.0
+			Sound.footstep("concrete" if _indoor or scenario == null else Sound.surface_of(scenario.map_name))
+	else:
+		_step_distance = 0.37
 	if _trail.is_empty() or _leader.position.distance_to(_trail[0]) > 0.05:
 		_trail.push_front(_leader.position)
 		if _trail.size() > 200:
 			_trail.pop_back()
+
+
+## A paisagem sonora (UAHSoundscapeSubsystem::Decide): exploração calma (uma de três faixas pela expedição; a Ponte
+## tem a sua), batalha ou chefe na luta, o ambiente do lugar e a chuva (de dentro numa casa ou cenário coberto).
+func soundscape() -> Dictionary:
+	var place := scenario.map_name if scenario else "ShopfrontStreet"
+	var want := {"ambience": "res://audio/ambience/%s.ogg" % place, "ambience_gain": 0.8, "rain": "", "rain_gain": 0.7}
+	if _arena != null and _arena.active:
+		var boss: bool = _arena.session != null and _arena.session.state.enemy_team.any(func(u): return u.enemy_id == "porteiro")
+		want.music = "res://audio/music/boss.ogg" if boss else "res://audio/music/battle.ogg"
+		want.music_gain = 0.5
+		want.ambience_gain = 0.4
+	else:
+		var expedition = Campaign.state.get("session", {}).get("expedition")
+		var track := (hash(String(expedition.get("id", ""))) % 3 + 3) % 3 + 1 if expedition != null else 1
+		want.music = ["", "res://audio/music/explore_1.ogg", "res://audio/music/explore_2.mp3", "res://audio/music/explore_3.mp3"][track]
+		if place == "RootBridge":
+			want.music = "res://audio/music/explore_root_bridge.mp3"
+		want.music_gain = 0.32
+	if _raining:
+		want.rain = "res://audio/ambience/rain_indoor.ogg" if _indoor or sheltered else "res://audio/ambience/rain_outdoor.ogg"
+	return want
 
 
 ## Na captura, a jornada só começa depois das fotos da rua (elas passam perto das patrulhas).

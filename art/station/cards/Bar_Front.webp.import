@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/Bar_Front.webp-2551d41261d4a5de0c75a8a5a7d5b0
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.85
+compress/lossy_quality=0.75
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

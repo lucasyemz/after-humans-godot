@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/Forge_BenchFront.webp-bd3113f5ef9e135566feb0e
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.85
+compress/lossy_quality=0.75
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
