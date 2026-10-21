@@ -1,0 +1,31 @@
+; After Humans na Godot. Começou como o protótipo da avaliação de migração (combate 48/48 e Rua das Vitrines).
+
+config_version=5
+
+[application]
+
+config/name="After Humans"
+run/main_scene="res://scenes/street.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+
+[importer_defaults]
+
+texture={
+"compress/mode": 1,
+"compress/lossy_quality": 0.85,
+"mipmaps/generate": true
+}
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
+renderer/rendering_method.web="gl_compatibility"
+textures/canvas_textures/default_texture_filter=2
+anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3

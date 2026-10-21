@@ -1,0 +1,355 @@
+[
+  {
+    "Name": "porta_espera",
+    "Title": "A Porta que Ainda Espera",
+    "Description": "Raízes seguram entreaberta a porta blindada de uma Toca dos Antigos. A placa desbotada ainda se lê: \"ZONA SANITÁRIA 7 — EVACUAÇÃO AO SUBSOLO\". Arranhões antigos cobrem a soleira, como se alguém tivesse tentado entrar muito tempo atrás. Lá dentro, um terminal pisca em economia de energia.",
+    "Choices": [
+      {
+        "Id": "explorar_cao",
+        "Text": "Mandar o cão farejar os Arquivos",
+        "RequirementText": "Requer um cão vivo na equipe",
+        "Requirement": "ClassInTeam",
+        "RequirementClass": "cao",
+        "Success": {
+          "Result": "O cão volta com um Fragmento de dados: listas de nomes, números de setor e a palavra \"quarentena\" repetida em cada linha. Nenhum registro diz quem saiu dali, nem se alguém saiu. O cheiro de mofo e de medo antigo ficou com ele (+{Instinto} de Instinto no cão, +1 Fragmento na carga).",
+          "FragmentsDelta": 1,
+          "InstinctDelta": 10
+        }
+      },
+      {
+        "Id": "partir_porta",
+        "Text": "Respeitar o silêncio e seguir viagem",
+        "Success": {
+          "Result": "Ninguém sabe quem passou por aquela porta. A equipe a encosta com cuidado, como quem deixa a casa pronta para a volta de alguém, e segue unida atrás de suprimentos para a Estação (+5 de Esperança).",
+          "HopeDelta": 5
+        }
+      }
+    ]
+  },
+  {
+    "Name": "voz_interfone",
+    "Title": "Voz no Interfone",
+    "Description": "Um interfone de emergência da antiga estação estala e acende, depois de gerações mudo. Entre chiados, uma voz sintética repete: \"Protocolo de preservação humana ativo. Vetores não autorizados detectados no setor de escoamento. Contenção a caminho.\"",
+    "Choices": [
+      {
+        "Id": "seguir_interfone",
+        "Text": "Seguir o sinal até o setor de escoamento (perigo)",
+        "Success": {
+          "Result": "O sinal leva direto a uma patrulha de contenção. Um visor pisca para a equipe: ORGANISMO ANIMAL · POTENCIAL VETOR BIOLÓGICO · ACESSO NEGADO. Não há como saber o que acordou o interfone, mas vencer o confronto deixa sucata para trás.",
+          "bHardCombat": true
+        }
+      },
+      {
+        "Id": "desligar_interfone",
+        "Text": "Cortar os cabos e silenciar a transmissão (−1 Sucata)",
+        "RequirementText": "Custa 1 Sucata da carga para isolar os circuitos",
+        "Requirement": "ScrapAtLeast",
+        "RequirementAmount": 1,
+        "Success": {
+          "Result": "Uma peça de sucata isola só o interfone; as bombas de escoamento continuam funcionando. Sem a voz repetindo a ordem, a equipe volta a respirar (+10 de Esperança, −1 Sucata).",
+          "HopeDelta": 10,
+          "ScrapDelta": -1
+        }
+      },
+      {
+        "Id": "ignorar_interfone",
+        "Text": "Apressar o passo e ignorar a voz",
+        "Success": {
+          "Result": "A voz vai ficando para trás enquanto o carrinho avança pela água escura. Ela continua repetindo a mesma ordem para ninguém."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "sobrevivente_tuneis",
+    "Title": "Sobrevivente dos Túneis",
+    "Description": "Um guaxinim de colete de manutenção está preso sob um terminal de vigilância desmontado, com a cauda anelada enroscada em bobinas de cabo. \"Desliguei o rastreador dessa coisa antes que ela me marcasse. Faz dias que estou preso aqui. Vocês têm comida?\"",
+    "Choices": [
+      {
+        "Id": "alimentar_rato",
+        "Text": "Oferecer rações limpas (−2 Comidas)",
+        "RequirementText": "Custa 2 Comidas dos suprimentos",
+        "Requirement": "FoodAtLeast",
+        "RequirementAmount": 2,
+        "UnavailableIfUnlocked": "rato",
+        "Success": {
+          "Result": "O guaxinim guarda uma ração e volta a desmontar o terminal. \"Sou Risco. Ainda tem energia útil nessas máquinas, e eu sei tirar sem acordar ninguém. Encontro vocês na Estação Raiz!\" (Classe Guaxinim Sabotador liberada. Risco vai se juntar ao refúgio.)",
+          "FoodDelta": -2,
+          "UnlockClass": "rato",
+          "RecruitName": "Risco"
+        }
+      },
+      {
+        "Id": "trocar_estoque_rato",
+        "Text": "Trocar suprimentos com Risco (+2 Comidas)",
+        "RequirementText": "Disponível quando Risco já foi resgatado em expedições anteriores",
+        "Requirement": "ClassUnlocked",
+        "RequirementClass": "rato",
+        "Success": {
+          "Result": "Nos dutos, a equipe acha um dos esconderijos que Risco marcou com riscos de garra. Ele passou as coordenadas antes da partida (+2 Comidas nos suprimentos).",
+          "FoodDelta": 2
+        }
+      },
+      {
+        "Id": "recusar_rato",
+        "Text": "Guardar os suprimentos e seguir em frente",
+        "Success": {
+          "Result": "O guaxinim apaga a luz do terminal e se encolhe entre os cabos. Na superfície, comida que sobra para um é comida que falta para outro."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_caixa_sanitaria",
+    "Title": "Caixa Lacrada",
+    "Description": "No fundo do móvel, uma caixa metálica com o símbolo de risco biológico dos Antigos. O lacre ainda está intacto e alguma coisa chacoalha lá dentro.",
+    "Choices": [
+      {
+        "Id": "abrir_caixa",
+        "Text": "Romper o lacre",
+        "RequirementText": "Bom e ruim até a próxima luta",
+        "Success": {
+          "Result": "Ampolas vazias e um rolo de gaze esterilizada. Mas o pó químico que escapou do lacre arde nos olhos e no faro de todo mundo. (+2 Curativos; Exposto: a equipe começa a próxima luta Vulnerável)",
+          "BandagesDelta": 2,
+          "PhaseEffects": [
+            "exposto"
+          ]
+        }
+      },
+      {
+        "Id": "deixar_caixa",
+        "Text": "Deixar a caixa lacrada",
+        "Success": {
+          "Result": "O que os Antigos lacraram, ficou lacrado. A equipe segue em frente sem olhar para trás."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_cano_rompido",
+    "Title": "Cano Rompido",
+    "Description": "Um cano de água limpa ainda corre sob o asfalto rachado, e ao lado dele há uma bomba velha de manutenção. Dá para encher os cantis com calma ou tentar desmontar a bomba.",
+    "Choices": [
+      {
+        "Id": "encher_cantis",
+        "Text": "Encher os cantis",
+        "Success": {
+          "Result": "Água limpa é rara na superfície. Por um momento, todo mundo bebe sem pressa. (+5 de Esperança)",
+          "HopeDelta": 5
+        }
+      },
+      {
+        "Id": "desmontar_bomba",
+        "Text": "Desmontar a bomba",
+        "RequirementText": "Bom e ruim até o fim da fase",
+        "Success": {
+          "Result": "A bomba cede peças boas, mas o trabalho debaixo do jato gelado deixa a equipe encharcada e pesada. (+3 Sucata; Cansado até o fim da fase: −1 de velocidade nas lutas)",
+          "ScrapDelta": 3,
+          "PhaseEffects": [
+            "cansado"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_mochila",
+    "Title": "Mochila Esquecida",
+    "Description": "Uma mochila de expedição de outra comunidade, presa num galho. Tem um nome bordado na alça e comida lá dentro.",
+    "Choices": [
+      {
+        "Id": "levar_tudo",
+        "Text": "Levar tudo",
+        "Success": {
+          "Result": "Comida é comida. Mas ninguém comenta o nome bordado no resto do caminho. (+2 Comida, −5 de Esperança)",
+          "FoodDelta": 2,
+          "HopeDelta": -5
+        }
+      },
+      {
+        "Id": "levar_parte",
+        "Text": "Pegar só o necessário e deixar um recado",
+        "Success": {
+          "Result": "A equipe pega uma ração e deixa um bilhete com o caminho da Estação Raiz. Quem sabe alguém aparece. (+1 Comida, +5 de Esperança)",
+          "FoodDelta": 1,
+          "HopeDelta": 5
+        }
+      },
+      {
+        "Id": "deixar_mochila",
+        "Text": "Deixar a mochila onde está",
+        "Success": {
+          "Result": "Alguém pode voltar por ela. A equipe ajeita a alça no galho e segue."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_barricada",
+    "Title": "Barricada Velha",
+    "Description": "Tábuas e placas de metal empilhadas contra uma porta, por alguém que queria manter alguma coisa do lado de dentro, ou do lado de fora.",
+    "Choices": [
+      {
+        "Id": "escudos_placas",
+        "Text": "Carregar as placas como escudo",
+        "RequirementText": "Bom e ruim até o fim da fase",
+        "Success": {
+          "Result": "As placas aguentam pancada, mas pesam nas costas a cada passo. (Preparado e Cansado até o fim da fase: a equipe começa as lutas com 1 Bloqueio e tem −1 de velocidade)",
+          "PhaseEffects": [
+            "preparado",
+            "cansado"
+          ]
+        }
+      },
+      {
+        "Id": "arrombar_porta",
+        "Text": "Arrombar a porta",
+        "RequirementText": "Bom e ruim até a próxima luta",
+        "Success": {
+          "Result": "Atrás da porta, um depósito esquecido. O barulho, porém, ecoou pela rua inteira. (+2 Sementes, +1 Sucata; Exposto: a equipe começa a próxima luta Vulnerável)",
+          "SeedsDelta": 2,
+          "ScrapDelta": 1,
+          "PhaseEffects": [
+            "exposto"
+          ]
+        }
+      },
+      {
+        "Id": "deixar_barricada",
+        "Text": "Deixar a barricada como está",
+        "Success": {
+          "Result": "Se alguém se deu ao trabalho de fechar essa porta, deve ter tido um motivo. A equipe segue."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_choro_porta",
+    "Title": "Choro Atrás da Porta",
+    "Description": "Do outro lado de uma porta de aço emperrada, um choro fino. Um filhote de lontra entrou atrás de comida e a porta fechou com ele lá dentro. A fechadura está tomada de ferrugem.",
+    "Choices": [
+      {
+        "Id": "forcar_pe_de_cabra",
+        "Text": "Forçar a porta com o pé de cabra",
+        "RequirementText": "Requer Pé de cabra",
+        "Requirement": "HasTool",
+        "RequirementTool": "pe_de_cabra",
+        "Success": {
+          "Result": "O pé de cabra range, a porta cede e o filhote sai correndo para os braços da equipe. Ele aponta, agradecido, para um esconderijo da família dele. (+10 de Esperança, +2 Comida)",
+          "HopeDelta": 10,
+          "FoodDelta": 2
+        }
+      },
+      {
+        "Id": "arrombar_ombro",
+        "Text": "Arrombar no ombro",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.5,
+        "Success": {
+          "Result": "Na terceira investida, a porta cede. O filhote foge para a rua sem olhar para trás, mas a equipe sabe o que fez. (+10 de Esperança)",
+          "HopeDelta": 10
+        },
+        "Failure": {
+          "Result": "A porta não se mexe e {Heroi} sai com o ombro roxo. O choro continua do outro lado enquanto a equipe procura outra saída para ele. (−4 de vida, −5 de Esperança)",
+          "Damage": 4,
+          "HopeDelta": -5
+        }
+      },
+      {
+        "Id": "prometer_voltar",
+        "Text": "Prometer voltar com ferramentas",
+        "Success": {
+          "Result": "Ninguém gosta de deixar o choro para trás. A promessa pesa no caminho. (−5 de Esperança)",
+          "HopeDelta": -5
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_poco_escuro",
+    "Title": "Poço de Manutenção",
+    "Description": "A tampa do poço de manutenção está aberta. Lá embaixo, no escuro total, algo reflete: caixas de suprimento empilhadas sobre a água.",
+    "Choices": [
+      {
+        "Id": "descer_lanterna",
+        "Text": "Descer com a lanterna",
+        "RequirementText": "Requer Lanterna",
+        "Requirement": "HasTool",
+        "RequirementTool": "lanterna",
+        "Success": {
+          "Result": "Com a lanterna, a descida é tranquila. As caixas guardam sementes secas e peças embrulhadas em plástico. (+3 Sementes, +1 Sucata)",
+          "SeedsDelta": 3,
+          "ScrapDelta": 1
+        }
+      },
+      {
+        "Id": "descer_escuro",
+        "Text": "Descer tateando no escuro",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.5,
+        "Success": {
+          "Result": "Degrau por degrau, no tato, a equipe chega às caixas e volta com o que conseguiu carregar. (+2 Sementes)",
+          "SeedsDelta": 2
+        },
+        "Failure": {
+          "Result": "Um degrau solto. {Heroi} cai na água gelada e volta sem nada, tremendo. (−3 de vida; Cansado até o fim da fase: −1 de velocidade nas lutas)",
+          "Damage": 3,
+          "PhaseEffects": [
+            "cansado"
+          ]
+        }
+      },
+      {
+        "Id": "deixar_poco",
+        "Text": "Fechar a tampa e seguir",
+        "Success": {
+          "Result": "Melhor não descer onde não se enxerga o fundo. A equipe fecha a tampa e segue."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_sala_esporos",
+    "Title": "Sala dos Esporos",
+    "Description": "Uma sala de enfermaria tomada por um fungo cinzento. Pelo vidro, dá para ver um armário de remédios intacto lá no fundo. O ar lá dentro brilha de esporos.",
+    "Choices": [
+      {
+        "Id": "entrar_mascara",
+        "Text": "Entrar com a máscara com filtro",
+        "RequirementText": "Requer Máscara com filtro",
+        "Requirement": "HasTool",
+        "RequirementTool": "mascara",
+        "Success": {
+          "Result": "Com o filtro, a travessia é só lenta. O armário guarda gaze e ataduras lacradas. (+2 Curativos, +1 Comida)",
+          "BandagesDelta": 2,
+          "FoodDelta": 1
+        }
+      },
+      {
+        "Id": "prender_folego",
+        "Text": "Prender o fôlego e correr",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.4,
+        "Success": {
+          "Result": "Correndo e sem respirar, {Heroi} alcança o armário e volta com o que coube nas mãos. (+1 Curativo)",
+          "BandagesDelta": 1,
+          "Damage": 0
+        },
+        "Failure": {
+          "Result": "No meio do caminho, o fôlego acaba. A equipe sai tossindo, com os olhos ardendo. (−2 de vida; Exposto: a equipe começa a próxima luta Vulnerável)",
+          "Damage": 2,
+          "PhaseEffects": [
+            "exposto"
+          ]
+        }
+      },
+      {
+        "Id": "deixar_sala",
+        "Text": "Deixar a sala fechada",
+        "Success": {
+          "Result": "Nenhum remédio vale respirar aquilo. A equipe passa longe do vidro."
+        }
+      }
+    ]
+  }
+]

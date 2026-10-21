@@ -1,0 +1,13 @@
+[
+  {
+    "Name": "Default",
+    "Max": 200,
+    "Crisis": {
+      "Reset": 120,
+      "HpLoss": 0.2,
+      "HpHeal": 0.15,
+      "TokenCap": 3,
+      "BaseVirtue": 0.25
+    }
+  }
+]

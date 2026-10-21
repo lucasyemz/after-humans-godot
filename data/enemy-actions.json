@@ -1,0 +1,956 @@
+[
+  {
+    "Name": "robot.robot_golpe",
+    "EnemyId": "robot",
+    "DisplayName": "Golpe mecânico",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    }
+  },
+  {
+    "Name": "robot.robot_descarga",
+    "EnemyId": "robot",
+    "DisplayName": "Descarga elétrica",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    }
+  },
+  {
+    "Name": "robot.robot_blindagem",
+    "EnemyId": "robot",
+    "DisplayName": "Blindagem",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "bIsDefend": true
+  },
+  {
+    "Name": "robot.robot_avanco",
+    "EnemyId": "robot",
+    "DisplayName": "Autorreparo",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "HealRange": {
+      "Min": 2,
+      "Max": 4
+    }
+  },
+  {
+    "Name": "robot_fungo.robot_golpe",
+    "EnemyId": "robot_fungo",
+    "DisplayName": "Golpe mecânico",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    }
+  },
+  {
+    "Name": "robot_fungo.robot_descarga",
+    "EnemyId": "robot_fungo",
+    "DisplayName": "Descarga elétrica",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    }
+  },
+  {
+    "Name": "robot_fungo.robot_blindagem",
+    "EnemyId": "robot_fungo",
+    "DisplayName": "Blindagem",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "bIsDefend": true
+  },
+  {
+    "Name": "robot_fungo.robot_avanco",
+    "EnemyId": "robot_fungo",
+    "DisplayName": "Autorreparo",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "HealRange": {
+      "Min": 2,
+      "Max": 4
+    }
+  },
+  {
+    "Name": "cao_eco.mordida_ferrugem",
+    "EnemyId": "cao_eco",
+    "DisplayName": "Garra de Captura",
+    "Description": "Causa 4–6 de dano e Sangramento de 1 por turno durante 2 turnos.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    },
+    "Inflicts": {
+      "Bleed": {
+        "Magnitude": 1,
+        "Duration": 2
+      }
+    }
+  },
+  {
+    "Name": "cao_eco.avancar_matilha",
+    "EnemyId": "cao_eco",
+    "DisplayName": "Rota de Interceptação",
+    "Description": "Avança uma posição para alcançar a linha de frente.",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Advances": 1
+  },
+  {
+    "Name": "ninho_errante.esporo_contaminante",
+    "EnemyId": "ninho_errante",
+    "DisplayName": "Aerossol de Expurgo",
+    "Description": "Pulveriza resíduos: 2–3 de dano e Contaminação de 2 por turno durante 2 turnos.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 3
+    },
+    "Inflicts": {
+      "Blight": {
+        "Magnitude": 2,
+        "Duration": 2
+      }
+    }
+  },
+  {
+    "Name": "ninho_errante.recuo_fumegante",
+    "EnemyId": "ninho_errante",
+    "DisplayName": "Recuo dos Rotores",
+    "Description": "Recua uma posição para manter distância da linha de frente.",
+    "OriginRanks": [
+      1
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Retreats": 1
+  },
+  {
+    "Name": "vigia_enferrujado.golpe_vigia",
+    "EnemyId": "vigia_enferrujado",
+    "DisplayName": "Bastão de Contenção",
+    "Description": "Causa 5–7 de dano contra um alvo na linha de frente.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 5,
+      "Max": 7
+    }
+  },
+  {
+    "Name": "vigia_enferrujado.defender_vigia",
+    "EnemyId": "vigia_enferrujado",
+    "DisplayName": "Escudo de Catraca",
+    "Description": "Ativa uma carga de Blindagem, reduzindo em 50% o próximo dano direto.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "bIsDefend": true
+  },
+  {
+    "Name": "vigia_enferrujado.avanco_pesado",
+    "EnemyId": "vigia_enferrujado",
+    "DisplayName": "Fechar o Cerco",
+    "Description": "Avança uma posição para bloquear a passagem.",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Advances": 1
+  },
+  {
+    "Name": "sussurrador.voz_do_eco",
+    "EnemyId": "sussurrador",
+    "DisplayName": "Ordem Contraditória",
+    "Description": "Reproduz falsas ordens de evacuação e acrescenta 12 de Instinto a um alvo na retaguarda.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "InstinctAdd": 12
+  },
+  {
+    "Name": "sussurrador.deslizar_sombra",
+    "EnemyId": "sussurrador",
+    "DisplayName": "Reposicionar Antena",
+    "Description": "Recua uma posição para continuar transmitindo à distância.",
+    "OriginRanks": [
+      1
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Retreats": 1
+  },
+  {
+    "Name": "rastejante_raiz.lufada_chicote",
+    "EnemyId": "rastejante_raiz",
+    "DisplayName": "Laço de Cabos",
+    "Description": "Causa 3–5 de dano, aplica Vulnerável e tenta empurrar o alvo uma posição.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 3,
+      "Max": 5
+    },
+    "Inflicts": {
+      "bVuln": true,
+      "Push": 1
+    }
+  },
+  {
+    "Name": "rastejante_raiz.esgueirar_frente",
+    "EnemyId": "rastejante_raiz",
+    "DisplayName": "Tração de Emergência",
+    "Description": "Avança uma posição puxando o próprio chassi pelos cabos.",
+    "OriginRanks": [
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Advances": 1
+  },
+  {
+    "Name": "carcaca_colonizada.esmagamento_fungico",
+    "EnemyId": "carcaca_colonizada",
+    "DisplayName": "Jato de Resíduo Industrial",
+    "Description": "Causa 4–6 de dano e Contaminação de 1 por turno durante 3 turnos.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    },
+    "Inflicts": {
+      "Blight": {
+        "Magnitude": 1,
+        "Duration": 3
+      }
+    }
+  },
+  {
+    "Name": "carcaca_colonizada.avanco_lento",
+    "EnemyId": "carcaca_colonizada",
+    "DisplayName": "Esteira de Recolhimento",
+    "Description": "Avança uma posição em direção ao material marcado para coleta.",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Advances": 1
+  },
+  {
+    "Name": "condutor_raiz.descarga_raiz",
+    "EnemyId": "condutor_raiz",
+    "DisplayName": "Arco de Alta Tensão",
+    "Description": "Causa 2–4 de dano a um alvo em qualquer posição.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    }
+  },
+  {
+    "Name": "porteiro.porteiro_golpe_escotilha",
+    "EnemyId": "porteiro",
+    "DisplayName": "Prensa de Contenção",
+    "Description": "Na primeira fase, atinge a linha de frente com 7–10 de dano.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 7,
+      "Max": 10
+    }
+  },
+  {
+    "Name": "porteiro.porteiro_sirene",
+    "EnemyId": "porteiro",
+    "DisplayName": "Protocolo de Dispersão",
+    "Description": "Na primeira fase, acrescenta 10 de Instinto a até dois aliados distintos.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "MultiAlly",
+    "InstinctAdd": 10
+  },
+  {
+    "Name": "porteiro.porteiro_esmagamento_brutal",
+    "EnemyId": "porteiro",
+    "DisplayName": "Sentença de Sucateamento",
+    "Description": "Na segunda fase, causa 9–12 de dano a um alvo na linha de frente.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 9,
+      "Max": 12
+    }
+  },
+  {
+    "Name": "porteiro.porteiro_impacto_hidraulico",
+    "EnemyId": "porteiro",
+    "DisplayName": "Expulsão Hidráulica",
+    "Description": "Na segunda fase, causa 4–6 de dano ao primeiro alvo e tenta empurrá-lo uma posição.",
+    "OriginRanks": [
+      1
+    ],
+    "TargetRanks": [
+      1
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    },
+    "Inflicts": {
+      "Push": 1
+    }
+  },
+  {
+    "Name": "carrasco_industrial.corte_demolicao",
+    "EnemyId": "carrasco_industrial",
+    "DisplayName": "Corte de Demolição",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    },
+    "Inflicts": {
+      "Bleed": {
+        "Magnitude": 1,
+        "Duration": 2
+      }
+    }
+  },
+  {
+    "Name": "recreador.pega_pega",
+    "EnemyId": "recreador",
+    "DisplayName": "Pega-Pega",
+    "Description": "Ataque básico de protótipo. Preferência por alvo marcado e invocação de Pipoco ainda não implementadas.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 3,
+      "Max": 4
+    }
+  },
+  {
+    "Name": "recreador.risada_gravada",
+    "EnemyId": "recreador",
+    "DisplayName": "Risada Gravada",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "InstinctAdd": 6
+  },
+  {
+    "Name": "enraizado.golpe_provisorio",
+    "EnemyId": "enraizado",
+    "DisplayName": "Golpe de Raízes (provisório)",
+    "Description": "Ataque básico temporário exclusivo deste protótipo para permitir teste de combate. Não faz parte do kit conceitual aprovado; armadilhas e controle posicional ainda pendentes.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    }
+  },
+  {
+    "Name": "hospede_rubro.garra_contencao",
+    "EnemyId": "hospede_rubro",
+    "DisplayName": "Garra de Contenção",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    }
+  },
+  {
+    "Name": "nucleo_nulo.pulso_corrompido",
+    "EnemyId": "nucleo_nulo",
+    "DisplayName": "Pulso Corrompido",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "Inflicts": {
+      "bVuln": true
+    }
+  },
+  {
+    "Name": "ilusionista_sucata.golpe_bastao",
+    "EnemyId": "ilusionista_sucata",
+    "DisplayName": "Golpe de Bastão",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 3,
+      "Max": 4
+    }
+  },
+  {
+    "Name": "ilusionista_sucata.caixa_desafinada",
+    "EnemyId": "ilusionista_sucata",
+    "DisplayName": "Caixa Desafinada",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "InstinctAdd": 6
+  },
+  {
+    "Name": "remendador.arco_solda",
+    "EnemyId": "remendador",
+    "DisplayName": "Arco de Solda",
+    "Description": "Ataque de protótipo. Cura e Bloqueio em outro robô ainda não implementados; não cura a si mesmo.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 3
+    }
+  },
+  {
+    "Name": "acoplador.beliscao_mecanico",
+    "EnemyId": "acoplador",
+    "DisplayName": "Beliscão Mecânico",
+    "Description": "Ataque fraco de protótipo. Ligação e Bloqueio para outro robô ainda não implementados.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 2
+    }
+  },
+  {
+    "Name": "felina_ferro.talho_liga",
+    "EnemyId": "felina_ferro",
+    "DisplayName": "Talho de Liga",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 5
+    }
+  },
+  {
+    "Name": "felina_ferro.chicote_cauda",
+    "EnemyId": "felina_ferro",
+    "DisplayName": "Chicote de Cauda",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 3
+    },
+    "Inflicts": {
+      "Push": 1
+    }
+  },
+  {
+    "Name": "patinadora_choque.batida_eletrica",
+    "EnemyId": "patinadora_choque",
+    "DisplayName": "Batida Elétrica",
+    "Description": "Ataque básico de protótipo, sem Atordoamento. Arrancada e Espuma de Contenção ainda pendentes.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 3,
+      "Max": 5
+    }
+  },
+  {
+    "Name": "faisca.serrada_curta",
+    "EnemyId": "faisca",
+    "DisplayName": "Serrada Curta",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 2
+    }
+  },
+  {
+    "Name": "pipoco.buzina_irritante",
+    "EnemyId": "pipoco",
+    "DisplayName": "Buzina Irritante",
+    "Description": "Ação mínima de protótipo; valores experimentais para o encontro de teste.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "InstinctAdd": 3
+  },
+  {
+    "Name": "broto.ataque_basico",
+    "EnemyId": "broto",
+    "DisplayName": "Ataque Básico",
+    "Description": "Única ação: golpe fraco sem status ou controle de movimento. Valores experimentais.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 2
+    }
+  },
+  {
+    "Name": "eco_01.golpe_sucata",
+    "EnemyId": "eco_01",
+    "DisplayName": "Golpe de Sucata",
+    "Description": "Única ação: golpe fraco sem status extra. Mesma regra nas três variantes cosméticas; não significa três invocações simultâneas.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 2
+    }
+  },
+  {
+    "Name": "eco_02.golpe_sucata",
+    "EnemyId": "eco_02",
+    "DisplayName": "Golpe de Sucata",
+    "Description": "Única ação: golpe fraco sem status extra. Mesma regra nas três variantes cosméticas; não significa três invocações simultâneas.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 2
+    }
+  },
+  {
+    "Name": "eco_03.golpe_sucata",
+    "EnemyId": "eco_03",
+    "DisplayName": "Golpe de Sucata",
+    "Description": "Única ação: golpe fraco sem status extra. Mesma regra nas três variantes cosméticas; não significa três invocações simultâneas.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleAlly",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 2
+    }
+  }
+]

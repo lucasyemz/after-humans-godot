@@ -1,0 +1,89 @@
+[
+  {
+    "Name": "racao_lacrada",
+    "bBad": false,
+    "Text": "Atrás de latas amassadas, um pacote de ração ainda lacrado. (+2 Comida)",
+    "FoodDelta": 2
+  },
+  {
+    "Name": "pote_sementes",
+    "bBad": false,
+    "Text": "Um pote de vidro com sementes secas, guardado por alguém que pretendia voltar. (+3 Sementes)",
+    "SeedsDelta": 3
+  },
+  {
+    "Name": "primeiros_socorros",
+    "bBad": false,
+    "Text": "Uma caixa de primeiros socorros dos Antigos, com gazes ainda limpas. (+1 Curativo)",
+    "BandagesDelta": 1
+  },
+  {
+    "Name": "pecas_motor",
+    "bBad": false,
+    "Text": "Peças de motor e fios de cobre que a oficina da Estação vai saber usar. (+2 Sucata)",
+    "ScrapDelta": 2
+  },
+  {
+    "Name": "trouxa_pano",
+    "bBad": false,
+    "Text": "Comida e um punhado de sementes enrolados num pano. (+1 Comida, +1 Semente)",
+    "FoodDelta": 1,
+    "SeedsDelta": 1
+  },
+  {
+    "Name": "desenho_casa",
+    "bBad": false,
+    "Text": "{Heroi} acha um desenho antigo: um cachorro, uma casa e um sol torto. A equipe segue mais leve. (+5 Esperança, +1 Semente)",
+    "HopeDelta": 5,
+    "SeedsDelta": 1
+  },
+  {
+    "Name": "lata_cortante",
+    "bBad": true,
+    "Text": "{Heroi} corta a pata numa lata enferrujada. (−3 de vida)",
+    "Damage": 3
+  },
+  {
+    "Name": "alarme_armario",
+    "bBad": true,
+    "Text": "Um alarme antigo dispara lá dentro e para do nada. {Heroi} fica com o coração na boca. (+8 de Instinto)",
+    "InstinctDelta": 8
+  },
+  {
+    "Name": "comida_estragada",
+    "bBad": true,
+    "Text": "A comida guardada ali estava estragada e o cheiro passou para a ração da equipe. (−1 Comida)",
+    "FoodDelta": -1
+  },
+  {
+    "Name": "esporos",
+    "bBad": true,
+    "Text": "Esporos de fungo sobem quando a porta abre. {Heroi} tosse e se afasta. (−2 de vida, +5 de Instinto)",
+    "Damage": 2,
+    "InstinctDelta": 5
+  },
+  {
+    "Name": "sirene_curta",
+    "bBad": true,
+    "Text": "Uma sirene curta ecoa pela rua. Nada aparece, mas a equipe perde a calma. (−5 de Esperança)",
+    "HopeDelta": -5
+  },
+  {
+    "Name": "achado_pe_de_cabra",
+    "bBad": false,
+    "Text": "Um pé de cabra enferrujado, mas firme. Pode abrir muita porta por aí. (Ferramenta: Pé de cabra)",
+    "GrantTool": "pe_de_cabra"
+  },
+  {
+    "Name": "achado_lanterna",
+    "bBad": false,
+    "Text": "Uma lanterna de manivela que ainda acende depois de umas voltas. (Ferramenta: Lanterna)",
+    "GrantTool": "lanterna"
+  },
+  {
+    "Name": "achado_mascara",
+    "bBad": false,
+    "Text": "Uma máscara dos Antigos com o filtro ainda lacrado no saquinho. (Ferramenta: Máscara com filtro)",
+    "GrantTool": "mascara"
+  }
+]

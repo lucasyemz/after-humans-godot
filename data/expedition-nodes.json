@@ -1,0 +1,149 @@
+[
+  {
+    "Name": "node_0_start",
+    "Layer": 0,
+    "Type": "Start",
+    "Title": "Plataforma da Estação",
+    "Description": "A comunidade mantém trilhos, oficinas e cuidado com ferramentas herdadas. A expedição parte em busca de suprimentos.",
+    "NextNodeIds": [
+      "node_1_combat"
+    ],
+    "bResolved": true,
+    "ScenarioId": "estacao-raiz"
+  },
+  {
+    "Name": "node_1_combat",
+    "Layer": 1,
+    "Type": "Combat",
+    "Title": "Rua das Vitrines",
+    "Description": "Vitrines tomadas por raízes guardam suprimentos. Os sensores ainda distinguem clientes humanos de fauna não autorizada.",
+    "NextNodeIds": [
+      "node_2_event",
+      "node_2_loot"
+    ],
+    "bResolved": false,
+    "ScenarioId": "rua-das-vitrines"
+  },
+  {
+    "Name": "node_2_event",
+    "Layer": 2,
+    "Type": "Event",
+    "Title": "Abrigo Lacrado",
+    "Description": "Uma placa do Programa Continuidade aponta para o subsolo. Os registros não dizem quem retornou.",
+    "EventId": "porta_espera",
+    "NextNodeIds": [
+      "node_3_combat"
+    ],
+    "bResolved": false,
+    "ScenarioId": "sala-esquecida"
+  },
+  {
+    "Name": "node_2_loot",
+    "Layer": 2,
+    "Type": "Loot",
+    "Title": "Depósito Inundado",
+    "Description": "Caixas boiam entre escombros de uma antiga rede de abastecimento. O que restou pode sustentar a Estação.",
+    "NextNodeIds": [
+      "node_3_combat"
+    ],
+    "bResolved": false,
+    "ScenarioId": "rua-das-vitrines"
+  },
+  {
+    "Name": "node_3_combat",
+    "Layer": 3,
+    "Type": "Combat",
+    "Title": "Ponte das Raízes",
+    "Description": "A ponte ligava bairros; seus sensores agora vigiam permissões que nenhum morador da Estação possui.",
+    "NextNodeIds": [
+      "node_4_rest",
+      "node_4_event"
+    ],
+    "bResolved": false,
+    "ScenarioId": "ponte-das-raizes"
+  },
+  {
+    "Name": "node_4_rest",
+    "Layer": 4,
+    "Type": "Rest",
+    "Title": "Câmara Seca",
+    "Description": "Marcas deixadas por outras equipes indicam um patamar seco. Cuidar uns dos outros também sustenta a viagem.",
+    "NextNodeIds": [
+      "node_5_combat"
+    ],
+    "bResolved": false,
+    "ScenarioId": "sala-esquecida"
+  },
+  {
+    "Name": "node_4_event",
+    "Layer": 4,
+    "Type": "Event",
+    "Title": "Central Telefônica",
+    "Description": "Nomes incompletos atravessam uma linha de emergência. Uma ordem se repete, sem origem verificável.",
+    "EventId": "voz_interfone",
+    "NextNodeIds": [
+      "node_5_combat"
+    ],
+    "bResolved": false,
+    "ScenarioId": "laboratorio-silencioso"
+  },
+  {
+    "Name": "node_5_combat",
+    "Layer": 5,
+    "Type": "Combat",
+    "Title": "Laboratório Silencioso",
+    "Description": "Restam interfaces de comunicação e anotações de aprendizagem. Os aparelhos não contam sozinhos a história de seus usuários.",
+    "NextNodeIds": [
+      "node_6_loot"
+    ],
+    "bResolved": false,
+    "ScenarioId": "laboratorio-silencioso"
+  },
+  {
+    "Name": "node_6_loot",
+    "Layer": 6,
+    "Type": "Event",
+    "Title": "Dutos de Esgoto",
+    "Description": "Bombas antigas mantêm a água em movimento. Entre cabos de vigilância, alguém tenta abrir uma saída.",
+    "EventId": "sobrevivente_tuneis",
+    "NextNodeIds": [
+      "node_7_rest"
+    ],
+    "bResolved": false,
+    "ScenarioId": "tuneis-do-eco"
+  },
+  {
+    "Name": "node_7_rest",
+    "Layer": 7,
+    "Type": "Rest",
+    "Title": "Posto Avançado Provisório",
+    "Description": "Um abrigo improvisado permite cuidar das feridas e dividir o pouco que resta antes da eclusa.",
+    "NextNodeIds": [
+      "node_8_hard"
+    ],
+    "bResolved": false,
+    "ScenarioId": "sala-esquecida"
+  },
+  {
+    "Name": "node_8_hard",
+    "Layer": 8,
+    "Type": "HardCombat",
+    "Title": "Portão de Triagem",
+    "Description": "A triagem exige credenciais humanas. A comunidade existe, mas o sistema ainda não a reconhece.",
+    "NextNodeIds": [
+      "node_9_boss"
+    ],
+    "bResolved": false,
+    "ScenarioId": "tuneis-do-eco"
+  },
+  {
+    "Name": "node_9_boss",
+    "Layer": 9,
+    "Type": "Boss",
+    "Title": "Eclusa Central: O Porteiro",
+    "Description": "O Porteiro conserva uma ordem de isolamento da guerra. Seus relés sustentam a defesa da eclusa.",
+    "NextNodeIds": [],
+    "bResolved": false,
+    "ScenarioId": "tuneis-do-eco"
+  }
+]

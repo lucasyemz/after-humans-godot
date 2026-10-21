@@ -1,0 +1,560 @@
+[
+  {
+    "Name": "cao_punho_sucata",
+    "ClassId": "cao",
+    "DisplayName": "Punho de Sucata",
+    "Description": "Golpe frontal; remove 1 Bloqueio antes do dano.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 5,
+      "Max": 8
+    },
+    "RemoveBlock": 1
+  },
+  {
+    "Name": "cao_impacto_hidraulico",
+    "ClassId": "cao",
+    "DisplayName": "Impacto Hidráulico",
+    "Description": "Dano reduzido e Atordoamento: perde uma ação. Não empurra.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "Inflicts": {
+      "Stun": 1
+    },
+    "Cooldown": 2
+  },
+  {
+    "Name": "cao_fique_atras_de_mim",
+    "ClassId": "cao",
+    "DisplayName": "Fique Atrás de Mim",
+    "Description": "Protege um aliado até o início do próximo turno de Bento; Bento recebe 1 Bloqueio.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleOtherAlly",
+    "Inflicts": {
+      "bGuard": true,
+      "Block": 1
+    },
+    "bBlockToSelf": true,
+    "bGuardForTurn": true
+  },
+  {
+    "Name": "cao_nao_estamos_sos",
+    "ClassId": "cao",
+    "DisplayName": "Não Estamos Sós",
+    "Description": "Reduz 12 Instinto e remove 1 Vulnerável do aliado.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "InstinctDelta": -12,
+    "Cleanses": {
+      "bVuln": true
+    },
+    "Cooldown": 2,
+    "CleanseVulnCharges": 1
+  },
+  {
+    "Name": "gato_corte_fase",
+    "ClassId": "gato",
+    "DisplayName": "Corte de Fase",
+    "Description": "Lâmina energética: ignora metade da redução de armadura/Bloqueio.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    },
+    "ArmorPiercePercent": 50
+  },
+  {
+    "Name": "gato_salto_entre_ruinas",
+    "ClassId": "gato",
+    "DisplayName": "Salto Entre Ruínas",
+    "Description": "Golpe leve; recua uma posição quando há espaço e o movimento é permitido.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "AdvanceSelf": -1
+  },
+  {
+    "Name": "gato_sumir_na_sombra",
+    "ClassId": "gato",
+    "DisplayName": "Sumir na Sombra",
+    "Description": "Recebe 1 Esquiva e remove a própria Marca.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Inflicts": {
+      "bDodge": true
+    },
+    "Cleanses": {
+      "bMark": true
+    }
+  },
+  {
+    "Name": "gato_cacada_precisa",
+    "ClassId": "gato",
+    "DisplayName": "Caçada Precisa",
+    "Description": "Dano elevado contra Marcado OU Vulnerável, sem somar bônus. Consome uma Marca ou um Vulnerável.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 7,
+      "Max": 10
+    },
+    "bRequiresMarkOrVuln": true,
+    "Cooldown": 2
+  },
+  {
+    "Name": "sapo_carga_voltaica",
+    "ClassId": "sapo",
+    "DisplayName": "Carga Voltaica",
+    "Description": "Remove 1 Bloqueio antes do dano; +25% de dano em máquinas.",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 7
+    },
+    "RemoveBlock": 1,
+    "MachineDamagePercent": 125
+  },
+  {
+    "Name": "sapo_coquetel_corrosivo",
+    "ClassId": "sapo",
+    "DisplayName": "Coquetel Corrosivo",
+    "Description": "Dano baixo no alvo e vizinho (atrás, ou à frente se não houver); armadura reduzida até o fim do próximo turno de cada alvo.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "bAdjacentTarget": true,
+    "Inflicts": {
+      "ArmorBreakTurns": 1
+    },
+    "Cooldown": 2
+  },
+  {
+    "Name": "sapo_ampola_reparo_vivo",
+    "ClassId": "sapo",
+    "DisplayName": "Ampola de Reparo Vivo",
+    "Description": "Recupera 5–8 Vida de aliado orgânico. 3 cargas compartilhadas com a exploração; recarrega somente após vitória.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "HealRange": {
+      "Min": 5,
+      "Max": 8
+    },
+    "UsesMax": 3,
+    "bUsesPerExpedition": true,
+    "bOrganicOnly": true
+  },
+  {
+    "Name": "sapo_antidoto_campo",
+    "ClassId": "sapo",
+    "DisplayName": "Antídoto de Campo",
+    "Description": "Remove Sangramento e Contaminação de aliado. 2 usos por expedição.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "Cleanses": {
+      "bDot": true
+    },
+    "UsesMax": 2,
+    "bUsesPerExpedition": true
+  },
+  {
+    "Name": "coruja_disparo_perfurante",
+    "ClassId": "coruja",
+    "DisplayName": "Disparo Perfurante",
+    "Description": "Munição elétrica: ignora metade da redução de armadura/Bloqueio.",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 7
+    },
+    "ArmorPiercePercent": 50
+  },
+  {
+    "Name": "coruja_olho_nas_ruinas",
+    "ClassId": "coruja",
+    "DisplayName": "Olho nas Ruínas",
+    "Description": "Marca um inimigo por 2 turnos, sem dano.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "Inflicts": {
+      "bMark": true
+    }
+  },
+  {
+    "Name": "coruja_granada_fumaca",
+    "ClassId": "coruja",
+    "DisplayName": "Granada de Fumaça",
+    "Description": "Selecione um inimigo nas posições 1–2 ou 3–4: aplica Cegueira ao par escolhido. Próximo ataque direto tem 25% de falha por alvo; sem dano.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "Inflicts": {
+      "bBlind": true
+    },
+    "bTargetPair": true,
+    "Cooldown": 2
+  },
+  {
+    "Name": "coruja_recurso_emergencia",
+    "ClassId": "coruja",
+    "DisplayName": "Recurso de Emergência",
+    "Description": "Tiro rápido de pistola; recua 1 posição quando possível.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "AdvanceSelf": -1
+  },
+  {
+    "Name": "rato_frasco",
+    "ClassId": "rato",
+    "DisplayName": "Carga de Eletrólito",
+    "Description": "Arremessa uma célula de bateria rompida: causa 2–4 de dano e aplica Corrosão em máquinas ou Contaminação em animais (2 por turno durante 3 turnos).",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "Inflicts": {
+      "Blight": {
+        "Magnitude": 2,
+        "Duration": 3
+      }
+    }
+  },
+  {
+    "Name": "rato_mordida",
+    "ClassId": "rato",
+    "DisplayName": "Chave de Desmonte",
+    "Description": "Atinge uma junta com uma chave de manutenção: causa 3–5 de dano e deixa o alvo Vulnerável ao próximo golpe direto.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 3,
+      "Max": 5
+    },
+    "Inflicts": {
+      "bVuln": true
+    }
+  },
+  {
+    "Name": "rato_passagem",
+    "ClassId": "rato",
+    "DisplayName": "Cabo de Fuga",
+    "Description": "Aciona um cabo retrátil para recuar uma posição e ganhar uma carga de Esquiva.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "AdvanceSelf": -1,
+    "Inflicts": {
+      "bDodge": true
+    }
+  },
+  {
+    "Name": "rato_poeira",
+    "ClassId": "rato",
+    "DisplayName": "Ponte de Diagnóstico",
+    "Description": "Sobrecarrega o alvo com o scanner: aplica vulnerável e stun por 2 turnos. Um uso por combate.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "UsesMax": 1,
+    "Inflicts": {
+      "bVuln": true,
+      "Stun": 2
+    }
+  },
+  {
+    "Name": "tatu_pancada",
+    "ClassId": "tatu",
+    "DisplayName": "Marreta de Emergência",
+    "Description": "Golpeia a linha de frente com uma ferramenta de resgate, causando 5–7 de dano.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 5,
+      "Max": 7
+    }
+  },
+  {
+    "Name": "tatu_enrolar",
+    "ClassId": "tatu",
+    "DisplayName": "Carapaça Isolante",
+    "Description": "Recolhe-se sob placas isolantes e ganha duas cargas de Bloqueio; cada carga reduz em 50% um golpe direto. Recarga de 2 turnos.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Cooldown": 2,
+    "Inflicts": {
+      "Block": 2
+    }
+  },
+  {
+    "Name": "tatu_investida",
+    "ClassId": "tatu",
+    "DisplayName": "Aríete Hidráulico",
+    "Description": "Aciona o aríete: causa 6–9 de dano, avança uma posição, tenta empurrar o alvo e aplica stun por 1 turno. Recarga de 2 turnos.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 6,
+      "Max": 9
+    },
+    "AdvanceSelf": 1,
+    "PushTarget": 1,
+    "Cooldown": 2,
+    "Inflicts": {
+      "Stun": 1
+    }
+  },
+  {
+    "Name": "tatu_abrigo",
+    "ClassId": "tatu",
+    "DisplayName": "Corredor Seguro",
+    "Description": "Abre uma rota protegida para outro aliado: remove Vulnerável e concede uma carga de Bloqueio. Até 2 usos por combate.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleOtherAlly",
+    "Cleanses": {
+      "bVuln": true
+    },
+    "Inflicts": {
+      "Block": 1
+    },
+    "UsesMax": 2
+  }
+]

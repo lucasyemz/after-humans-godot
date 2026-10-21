@@ -1,0 +1,22 @@
+[
+  {
+    "Name": "cao",
+    "ClassId": "cao",
+    "DisplayName": "Bento"
+  },
+  {
+    "Name": "gato",
+    "ClassId": "gato",
+    "DisplayName": "Nick"
+  },
+  {
+    "Name": "sapo",
+    "ClassId": "sapo",
+    "DisplayName": "Íris"
+  },
+  {
+    "Name": "coruja",
+    "ClassId": "coruja",
+    "DisplayName": "Véspera"
+  }
+]

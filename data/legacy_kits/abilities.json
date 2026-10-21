@@ -1,0 +1,536 @@
+[
+  {
+    "Name": "cao_golpe",
+    "ClassId": "cao",
+    "DisplayName": "Golpe de Placa",
+    "Description": "Esmaga o inimigo com uma placa de sinalização de trânsito.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 5,
+      "Max": 8
+    }
+  },
+  {
+    "Name": "cao_guarda",
+    "ClassId": "cao",
+    "DisplayName": "Fica Atrás de Mim",
+    "Description": "Protege um aliado de ataques de alvo único e assume postura de bloqueio.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleOtherAlly",
+    "Inflicts": {
+      "bGuard": true,
+      "Block": 1
+    }
+  },
+  {
+    "Name": "cao_rosnado",
+    "ClassId": "cao",
+    "DisplayName": "Rosnado",
+    "Description": "Rosna agressivamente, expondo as falhas na guarda inimiga.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetType": "SingleEnemy",
+    "Cooldown": 1,
+    "Inflicts": {
+      "bVuln": true
+    }
+  },
+  {
+    "Name": "cao_consolo",
+    "ClassId": "cao",
+    "DisplayName": "Não Estamos Sós",
+    "Description": "Oferece conforto e segurança, aliviando o pânico da equipe.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "InstinctDelta": -12,
+    "UsesMax": 2
+  },
+  {
+    "Name": "gato_agulha",
+    "ClassId": "gato",
+    "DisplayName": "Corte de Agulha",
+    "Description": "Perfura artérias com agulhas de alfaiate, provocando sangramento profuso.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    },
+    "Inflicts": {
+      "Bleed": {
+        "Magnitude": 2,
+        "Duration": 2
+      }
+    }
+  },
+  {
+    "Name": "gato_salto",
+    "ClassId": "gato",
+    "DisplayName": "Salto Entre Ruínas",
+    "Description": "Salta acrobaticamente através dos escombros avançando para a linha de frente.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 7
+    },
+    "AdvanceSelf": 1
+  },
+  {
+    "Name": "gato_sombra",
+    "ClassId": "gato",
+    "DisplayName": "Sumir na Sombra",
+    "Description": "Recua pelas poças d’água e névoa escura, preparando-se para esquivar.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "AdvanceSelf": -1,
+    "Inflicts": {
+      "bDodge": true
+    }
+  },
+  {
+    "Name": "gato_caca",
+    "ClassId": "gato",
+    "DisplayName": "Caçada Precisa",
+    "Description": "Ataque devastador e cirúrgico contra um alvo previamente Marcado.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "MarkedEnemy",
+    "DamageRange": {
+      "Min": 7,
+      "Max": 10
+    },
+    "bConsumesMark": true
+  },
+  {
+    "Name": "coruja_estilhaco",
+    "ClassId": "coruja",
+    "DisplayName": "Estilhaço",
+    "Description": "Arremessa fragmentos de vidro temperado nas fileiras traseiras inimigas.",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 7
+    }
+  },
+  {
+    "Name": "coruja_marca",
+    "ClassId": "coruja",
+    "DisplayName": "Olhos da Noite",
+    "Description": "Ilumina o alvo com um feixe de espelho e aplica marcado por 2 turnos. A marca permite usar Caçada Precisa, da classe Gato Caçador, que a consome; não aumenta o dano de qualquer ataque.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "Inflicts": {
+      "bMark": true
+    }
+  },
+  {
+    "Name": "coruja_grito",
+    "ClassId": "coruja",
+    "DisplayName": "Grito de Alerta",
+    "Description": "Avista um perigo iminente: remove Vulnerável do aliado e concede Esquiva.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "Cooldown": 2,
+    "Cleanses": {
+      "bVuln": true
+    },
+    "Inflicts": {
+      "bDodge": true
+    }
+  },
+  {
+    "Name": "coruja_rajada",
+    "ClassId": "coruja",
+    "DisplayName": "Investida das Ruínas",
+    "Description": "Avança entre os escombros e empurra o inimigo para trás com um golpe firme.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "PushTarget": 1
+  },
+  {
+    "Name": "capivara_curativo",
+    "ClassId": "capivara",
+    "DisplayName": "Bênção do Livro",
+    "Description": "Abre o livro sagrado e envolve um aliado em luz dourada, restaurando 5–8 de Vida. Pode abençoar a si mesma. Até 3 usos por combate.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "HealRange": {
+      "Min": 5,
+      "Max": 8
+    },
+    "UsesMax": 3
+  },
+  {
+    "Name": "capivara_respira",
+    "ClassId": "capivara",
+    "DisplayName": "Salmo da Serenidade",
+    "Description": "Recita um salmo do livro para reduzir em 15 o Instinto de um aliado ou de si mesma. Recarga de 2 turnos.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "InstinctDelta": -15,
+    "Cooldown": 2
+  },
+  {
+    "Name": "capivara_cajado",
+    "ClassId": "capivara",
+    "DisplayName": "Selo Radiante",
+    "Description": "Projeta um símbolo luminoso das páginas contra um inimigo, causando 3–5 de dano. Pode atingir qualquer posição a partir das posições 2, 3 ou 4.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 3,
+      "Max": 5
+    }
+  },
+  {
+    "Name": "capivara_cha",
+    "ClassId": "capivara",
+    "DisplayName": "Rito de Purificação",
+    "Description": "Traça um selo sagrado sobre um aliado ou sobre si mesma, removendo Sangramento e Contaminação. Até 2 usos por combate.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "Cleanses": {
+      "bDot": true
+    },
+    "UsesMax": 2
+  },
+  {
+    "Name": "rato_frasco",
+    "ClassId": "rato",
+    "DisplayName": "Carga de Eletrólito",
+    "Description": "Arremessa uma célula de bateria rompida: causa 2–4 de dano e aplica Corrosão em máquinas ou Contaminação em animais (2 por turno durante 3 turnos).",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "Inflicts": {
+      "Blight": {
+        "Magnitude": 2,
+        "Duration": 3
+      }
+    }
+  },
+  {
+    "Name": "rato_mordida",
+    "ClassId": "rato",
+    "DisplayName": "Chave de Desmonte",
+    "Description": "Atinge uma junta com uma chave de manutenção: causa 3–5 de dano e deixa o alvo Vulnerável ao próximo golpe direto.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 3,
+      "Max": 5
+    },
+    "Inflicts": {
+      "bVuln": true
+    }
+  },
+  {
+    "Name": "rato_passagem",
+    "ClassId": "rato",
+    "DisplayName": "Cabo de Fuga",
+    "Description": "Aciona um cabo retrátil para recuar uma posição e ganhar uma carga de Esquiva.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "AdvanceSelf": -1,
+    "Inflicts": {
+      "bDodge": true
+    }
+  },
+  {
+    "Name": "rato_poeira",
+    "ClassId": "rato",
+    "DisplayName": "Ponte de Diagnóstico",
+    "Description": "Sobrecarrega o alvo com o scanner: aplica vulnerável e stun por 2 turnos. Um uso por combate.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "UsesMax": 1,
+    "Inflicts": {
+      "bVuln": true,
+      "Stun": 2
+    }
+  },
+  {
+    "Name": "tatu_pancada",
+    "ClassId": "tatu",
+    "DisplayName": "Marreta de Emergência",
+    "Description": "Golpeia a linha de frente com uma ferramenta de resgate, causando 5–7 de dano.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 5,
+      "Max": 7
+    }
+  },
+  {
+    "Name": "tatu_enrolar",
+    "ClassId": "tatu",
+    "DisplayName": "Carapaça Isolante",
+    "Description": "Recolhe-se sob placas isolantes e ganha duas cargas de Bloqueio; cada carga reduz em 50% um golpe direto. Recarga de 2 turnos.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Cooldown": 2,
+    "Inflicts": {
+      "Block": 2
+    }
+  },
+  {
+    "Name": "tatu_investida",
+    "ClassId": "tatu",
+    "DisplayName": "Aríete Hidráulico",
+    "Description": "Aciona o aríete: causa 6–9 de dano, avança uma posição, tenta empurrar o alvo e aplica stun por 1 turno. Recarga de 2 turnos.",
+    "OriginRanks": [
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 6,
+      "Max": 9
+    },
+    "AdvanceSelf": 1,
+    "PushTarget": 1,
+    "Cooldown": 2,
+    "Inflicts": {
+      "Stun": 1
+    }
+  },
+  {
+    "Name": "tatu_abrigo",
+    "ClassId": "tatu",
+    "DisplayName": "Corredor Seguro",
+    "Description": "Abre uma rota protegida para outro aliado: remove Vulnerável e concede uma carga de Bloqueio. Até 2 usos por combate.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleOtherAlly",
+    "Cleanses": {
+      "bVuln": true
+    },
+    "Inflicts": {
+      "Block": 1
+    },
+    "UsesMax": 2
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "Name": "node_1_combat",
+    "Front": [
+      "robot",
+      "cao_eco"
+    ],
+    "Ranged": [
+      "condutor_raiz"
+    ],
+    "Support": [
+      "sussurrador"
+    ]
+  },
+  {
+    "Name": "node_3_combat",
+    "Front": [
+      "cao_eco",
+      "rastejante_raiz"
+    ],
+    "Ranged": [
+      "ninho_errante",
+      "condutor_raiz"
+    ],
+    "Support": [
+      "sussurrador"
+    ]
+  },
+  {
+    "Name": "node_5_combat",
+    "Front": [
+      "robot_fungo",
+      "carcaca_colonizada"
+    ],
+    "Ranged": [
+      "ninho_errante"
+    ],
+    "Support": [
+      "sussurrador",
+      "condutor_raiz"
+    ]
+  },
+  {
+    "Name": "node_8_hard",
+    "Front": [
+      "vigia_enferrujado",
+      "robot"
+    ],
+    "Ranged": [
+      "condutor_raiz",
+      "ninho_errante"
+    ],
+    "Support": [
+      "sussurrador"
+    ]
+  }
+]

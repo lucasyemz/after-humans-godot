@@ -1,0 +1,128 @@
+[
+  {
+    "Name": "cao",
+    "DisplayName": "Cão Guarda",
+    "Species": "Cão",
+    "Role": "Guarda e Defesa",
+    "BaseMaxHp": 34,
+    "BaseSpeed": 2,
+    "Description": "Guarda de ferro reaproveitado e casaco de lã. Protege a equipe e absorve golpes destinados aos companheiros.",
+    "Color": {
+      "R": 217,
+      "G": 119,
+      "B": 6,
+      "A": 255
+    },
+    "AbilityIds": [
+      "cao_golpe",
+      "cao_guarda",
+      "cao_rosnado",
+      "cao_consolo"
+    ]
+  },
+  {
+    "Name": "gato",
+    "DisplayName": "Gato Caçador",
+    "Species": "Gato",
+    "Role": "Sangramento e Mobilidade",
+    "BaseMaxHp": 24,
+    "BaseSpeed": 6,
+    "Description": "Ágil e furtivo, golpeia com agulhas de alfaiate enferrujadas e se esconde nas sombras.",
+    "Color": {
+      "R": 6,
+      "G": 182,
+      "B": 212,
+      "A": 255
+    },
+    "AbilityIds": [
+      "gato_agulha",
+      "gato_salto",
+      "gato_sombra",
+      "gato_caca"
+    ]
+  },
+  {
+    "Name": "coruja",
+    "DisplayName": "Rata Batedora",
+    "Species": "Rata",
+    "Role": "Marca, Alcance e Deslocamento",
+    "BaseMaxHp": 23,
+    "BaseSpeed": 4,
+    "Description": "Rata vigilante de sobretudo negro e máscara de gás. Explora becos contaminados, identifica fraquezas à distância e desestabiliza inimigos.",
+    "Color": {
+      "R": 139,
+      "G": 92,
+      "B": 246,
+      "A": 255
+    },
+    "AbilityIds": [
+      "coruja_estilhaco",
+      "coruja_marca",
+      "coruja_grito",
+      "coruja_rajada"
+    ]
+  },
+  {
+    "Name": "capivara",
+    "DisplayName": "Capivara Guardiã do Livro",
+    "Species": "Capivara",
+    "Role": "Cura e Controle de Instinto",
+    "BaseMaxHp": 30,
+    "BaseSpeed": 2,
+    "Description": "Guardiã encapuzada de saberes transmitidos em um livro. Seus ritos de cuidado restauram a vida, acalmam o Instinto e purificam aliados.",
+    "Color": {
+      "R": 168,
+      "G": 85,
+      "B": 247,
+      "A": 255
+    },
+    "AbilityIds": [
+      "capivara_curativo",
+      "capivara_respira",
+      "capivara_cajado",
+      "capivara_cha"
+    ]
+  },
+  {
+    "Name": "rato",
+    "DisplayName": "Guaxinim Sabotador",
+    "Species": "Guaxinim",
+    "Role": "Sabotagem e Corrosão",
+    "BaseMaxHp": 21,
+    "BaseSpeed": 5,
+    "Description": "Especialista em sabotagem e energia recuperada. Usa luvas isolantes, scanner e baterias para expor falhas e abrir rotas seguras.",
+    "Color": {
+      "R": 132,
+      "G": 204,
+      "B": 22,
+      "A": 255
+    },
+    "AbilityIds": [
+      "rato_frasco",
+      "rato_mordida",
+      "rato_passagem",
+      "rato_poeira"
+    ]
+  },
+  {
+    "Name": "tatu",
+    "DisplayName": "Tatu de Resgate",
+    "Species": "Tatu",
+    "Role": "Resgate e Ruptura de Formação",
+    "BaseMaxHp": 38,
+    "BaseSpeed": 1,
+    "Description": "Especialista em resgate de setores lacrados. Placas laranja, escudo de porta industrial e aríete hidráulico ajudam a proteger a equipe e abrir passagens.",
+    "Color": {
+      "R": 234,
+      "G": 179,
+      "B": 8,
+      "A": 255
+    },
+    "AbilityIds": [
+      "tatu_pancada",
+      "tatu_enrolar",
+      "tatu_investida",
+      "tatu_abrigo"
+    ]
+  }
+]

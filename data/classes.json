@@ -1,0 +1,128 @@
+[
+  {
+    "Name": "cao",
+    "DisplayName": "Cão Protetor",
+    "Species": "Cão",
+    "Role": "Tanque e Proteção",
+    "BaseMaxHp": 34,
+    "BaseSpeed": 2,
+    "Description": "Tanque e Proteção",
+    "Color": {
+      "R": 217,
+      "G": 119,
+      "B": 6,
+      "A": 255
+    },
+    "AbilityIds": [
+      "cao_punho_sucata",
+      "cao_impacto_hidraulico",
+      "cao_fique_atras_de_mim",
+      "cao_nao_estamos_sos"
+    ]
+  },
+  {
+    "Name": "gato",
+    "DisplayName": "Gato Assassino",
+    "Species": "Gato",
+    "Role": "Assassino e Mobilidade",
+    "BaseMaxHp": 24,
+    "BaseSpeed": 6,
+    "Description": "Assassino e Mobilidade",
+    "Color": {
+      "R": 6,
+      "G": 182,
+      "B": 212,
+      "A": 255
+    },
+    "AbilityIds": [
+      "gato_corte_fase",
+      "gato_salto_entre_ruinas",
+      "gato_sumir_na_sombra",
+      "gato_cacada_precisa"
+    ]
+  },
+  {
+    "Name": "sapo",
+    "DisplayName": "Sapo Química",
+    "Species": "Sapo",
+    "Role": "Química e Suporte",
+    "BaseMaxHp": 23,
+    "BaseSpeed": 4,
+    "Description": "Química e Suporte",
+    "Color": {
+      "R": 139,
+      "G": 92,
+      "B": 246,
+      "A": 255
+    },
+    "AbilityIds": [
+      "sapo_carga_voltaica",
+      "sapo_coquetel_corrosivo",
+      "sapo_ampola_reparo_vivo",
+      "sapo_antidoto_campo"
+    ]
+  },
+  {
+    "Name": "coruja",
+    "DisplayName": "Coruja Sniper",
+    "Species": "Coruja",
+    "Role": "Sniper e Controle",
+    "BaseMaxHp": 30,
+    "BaseSpeed": 2,
+    "Description": "Sniper e Controle",
+    "Color": {
+      "R": 168,
+      "G": 85,
+      "B": 247,
+      "A": 255
+    },
+    "AbilityIds": [
+      "coruja_disparo_perfurante",
+      "coruja_olho_nas_ruinas",
+      "coruja_granada_fumaca",
+      "coruja_recurso_emergencia"
+    ]
+  },
+  {
+    "Name": "rato",
+    "DisplayName": "Guaxinim Sabotador",
+    "Species": "Guaxinim",
+    "Role": "Sabotagem e Corrosão",
+    "BaseMaxHp": 21,
+    "BaseSpeed": 5,
+    "Description": "Especialista em sabotagem e energia recuperada. Usa luvas isolantes, scanner e baterias para expor falhas e abrir rotas seguras.",
+    "Color": {
+      "R": 132,
+      "G": 204,
+      "B": 22,
+      "A": 255
+    },
+    "AbilityIds": [
+      "rato_frasco",
+      "rato_mordida",
+      "rato_passagem",
+      "rato_poeira"
+    ]
+  },
+  {
+    "Name": "tatu",
+    "DisplayName": "Tatu de Resgate",
+    "Species": "Tatu",
+    "Role": "Resgate e Ruptura de Formação",
+    "BaseMaxHp": 38,
+    "BaseSpeed": 1,
+    "Description": "Especialista em resgate de setores lacrados. Placas laranja, escudo de porta industrial e aríete hidráulico ajudam a proteger a equipe e abrir passagens.",
+    "Color": {
+      "R": 234,
+      "G": 179,
+      "B": 8,
+      "A": 255
+    },
+    "AbilityIds": [
+      "tatu_pancada",
+      "tatu_enrolar",
+      "tatu_investida",
+      "tatu_abrigo"
+    ]
+  }
+]

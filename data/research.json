@@ -1,0 +1,34 @@
+[
+  {
+    "Name": "res_cao_punho_sucata",
+    "DisplayName": "Treino: Punho de Sucata",
+    "SkillId": "cao_punho_sucata",
+    "ClassId": "cao",
+    "CostFragments": 3,
+    "Description": "+1 nos limites de dano ou cura de Punho de Sucata."
+  },
+  {
+    "Name": "res_gato_corte_fase",
+    "DisplayName": "Treino: Corte de Fase",
+    "SkillId": "gato_corte_fase",
+    "ClassId": "gato",
+    "CostFragments": 3,
+    "Description": "+1 nos limites de dano ou cura de Corte de Fase."
+  },
+  {
+    "Name": "res_sapo_carga_voltaica",
+    "DisplayName": "Treino: Carga Voltaica",
+    "SkillId": "sapo_carga_voltaica",
+    "ClassId": "sapo",
+    "CostFragments": 3,
+    "Description": "+1 nos limites de dano ou cura de Carga Voltaica."
+  },
+  {
+    "Name": "res_coruja_recurso_emergencia",
+    "DisplayName": "Treino: Recurso de Emergência",
+    "SkillId": "coruja_recurso_emergencia",
+    "ClassId": "coruja",
+    "CostFragments": 3,
+    "Description": "+1 nos limites de dano ou cura de Recurso de Emergência."
+  }
+]

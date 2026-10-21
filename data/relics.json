@@ -1,0 +1,20 @@
+[
+  {
+    "Name": "botao_cobre",
+    "DisplayName": "Botão de Cobre",
+    "Description": "+3 de Vida Máxima. Um talismã sólido da época dos humanos.",
+    "MaxHpBonus": 3
+  },
+  {
+    "Name": "pena_vidro",
+    "DisplayName": "Pena de Vidro",
+    "Description": "+1 de Velocidade. Cortada de um vidro de laboratório aerodinâmico.",
+    "SpeedBonus": 1
+  },
+  {
+    "Name": "coleira_lembranca",
+    "DisplayName": "Coleira de Lembrança",
+    "Description": "-2 de Instinto causado por eventos misteriosos (mínimo zero).",
+    "EventInstinctReduction": 2
+  }
+]

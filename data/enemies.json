@@ -1,0 +1,412 @@
+[
+  {
+    "Name": "robot",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Robô",
+    "Description": "Unidade de serviço reaproveitada pela contenção. Ainda mantém o próprio chassi, mas seus registros tratam a equipe como intrusa. Isso não revela a intenção de outras máquinas.",
+    "MaxHp": 26,
+    "Speed": 2,
+    "SpriteKey": "robot",
+    "ActionIds": [
+      "robot.robot_golpe",
+      "robot.robot_descarga",
+      "robot.robot_blindagem",
+      "robot.robot_avanco"
+    ]
+  },
+  {
+    "Name": "robot_fungo",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Robô Fungo",
+    "Description": "Umidade e fungos cobrem este chassi de serviço. Ele continua executando rotinas de contenção; a colonização visível não explica o Eco nem prova quem o comanda.",
+    "MaxHp": 26,
+    "Speed": 2,
+    "SpriteKey": "robot_fungo",
+    "ActionIds": [
+      "robot_fungo.robot_golpe",
+      "robot_fungo.robot_descarga",
+      "robot_fungo.robot_blindagem",
+      "robot_fungo.robot_avanco"
+    ]
+  },
+  {
+    "Name": "cao_eco",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Rastreador Quadrúpede",
+    "Role": "Perseguição e Sangramento",
+    "Description": "Unidade de busca das IAs, com quatro pernas articuladas, sensor frontal vermelho e mandíbula de captura. Continua rastreando animais sem autorização de circulação.",
+    "MaxHp": 18,
+    "Speed": 4,
+    "SpriteKey": "cao_eco",
+    "ActionIds": [
+      "cao_eco.mordida_ferrugem",
+      "cao_eco.avancar_matilha"
+    ]
+  },
+  {
+    "Name": "ninho_errante",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Drone de Expurgo",
+    "Role": "Contaminação à Distância",
+    "Description": "Drone de saneamento com reservatório pressurizado e três rotores protegidos. Seus protocolos classificam os abrigos animais como focos de contaminação.",
+    "MaxHp": 16,
+    "Speed": 2,
+    "SpriteKey": "ninho_errante",
+    "ActionIds": [
+      "ninho_errante.esporo_contaminante",
+      "ninho_errante.recuo_fumegante"
+    ]
+  },
+  {
+    "Name": "vigia_enferrujado",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Sentinela de Triagem",
+    "Role": "Blindagem e Linha de Frente",
+    "Description": "Autômato de controle de acesso com escudo de catraca e visor de identificação. Barra qualquer sobrevivente que não possua uma credencial humana válida.",
+    "MaxHp": 26,
+    "Speed": 1,
+    "SpriteKey": "vigia_enferrujado",
+    "ActionIds": [
+      "vigia_enferrujado.golpe_vigia",
+      "vigia_enferrujado.defender_vigia",
+      "vigia_enferrujado.avanco_pesado"
+    ]
+  },
+  {
+    "Name": "sussurrador",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Emissor de Comando",
+    "Role": "Pressão de Instinto",
+    "Description": "Torre móvel de alto-falantes e antenas que imita anúncios de emergência humanos. Usa alarmes contraditórios para desorientar os sobreviventes.",
+    "MaxHp": 15,
+    "Speed": 3,
+    "SpriteKey": "sussurrador",
+    "ActionIds": [
+      "sussurrador.voz_do_eco",
+      "sussurrador.deslizar_sombra"
+    ]
+  },
+  {
+    "Name": "rastejante_raiz",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Rastejante de Cabos",
+    "Role": "Deslocamento e Exposição",
+    "Description": "Robô de manutenção serpentino com pinças e carretéis de cabos. Arrasta intrusos para fora das rotas que a rede ainda considera restritas.",
+    "MaxHp": 17,
+    "Speed": 5,
+    "SpriteKey": "rastejante_raiz",
+    "ActionIds": [
+      "rastejante_raiz.lufada_chicote",
+      "rastejante_raiz.esgueirar_frente"
+    ]
+  },
+  {
+    "Name": "carcaca_colonizada",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Coletor de Sucata",
+    "Role": "Corrosão e Avanço",
+    "Description": "Compactador autônomo de seis rodas, com reservatório de resíduos industriais e braços de coleta. A guerra deixou sua identificação defeituosa: trata seres vivos como material recuperável.",
+    "MaxHp": 28,
+    "Speed": 1,
+    "SpriteKey": "carcaca_colonizada",
+    "ActionIds": [
+      "carcaca_colonizada.esmagamento_fungico",
+      "carcaca_colonizada.avanco_lento"
+    ]
+  },
+  {
+    "Name": "condutor_raiz",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Relé de Defesa",
+    "Role": "Suporte à Rede da Eclusa",
+    "Description": "Unidade auxiliar com bobinas expostas e cabos de alta tensão. Mantém a proteção do Porteiro enquanto está ativa e dispara arcos elétricos contra intrusos.",
+    "MaxHp": 16,
+    "Speed": 2,
+    "SpriteKey": "condutor_raiz",
+    "ActionIds": [
+      "condutor_raiz.descarga_raiz"
+    ]
+  },
+  {
+    "Name": "porteiro",
+    "DotResist": 0.2,
+    "DisplacementResist": 1,
+    "Category": "Machine",
+    "FormationSize": 2,
+    "DisplayName": "O Porteiro",
+    "Role": "Chefe de Contenção",
+    "Description": "Guardião industrial da eclusa, formado por portas blindadas, pistões e uma lente central de vigilância. Ainda executa a ordem de isolamento dada durante a guerra; na segunda fase, abandona a contenção e ativa força letal.",
+    "MaxHp": 90,
+    "Speed": 2,
+    "SpriteKey": "porteiro",
+    "bIsBoss": true,
+    "ActionIds": [
+      "porteiro.porteiro_golpe_escotilha",
+      "porteiro.porteiro_sirene",
+      "porteiro.porteiro_esmagamento_brutal",
+      "porteiro.porteiro_impacto_hidraulico"
+    ]
+  },
+  {
+    "Name": "carrasco_industrial",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Carrasco Industrial",
+    "Role": "Agressão frontal",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 28,
+    "Speed": 2,
+    "SpriteKey": "carrasco_industrial",
+    "ActionIds": [
+      "carrasco_industrial.corte_demolicao"
+    ]
+  },
+  {
+    "Name": "recreador",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Recreador",
+    "Role": "Pressão de Instinto",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 20,
+    "Speed": 3,
+    "SpriteKey": "recreador",
+    "ActionIds": [
+      "recreador.pega_pega",
+      "recreador.risada_gravada"
+    ]
+  },
+  {
+    "Name": "enraizado",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Enraizado",
+    "Role": "Controle de posições (kit pendente)",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 24,
+    "Speed": 1,
+    "SpriteKey": "enraizado",
+    "ActionIds": [
+      "enraizado.golpe_provisorio"
+    ]
+  },
+  {
+    "Name": "hospede_rubro",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Hóspede Rubro",
+    "Role": "Agressão frontal",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 30,
+    "Speed": 2,
+    "SpriteKey": "hospede_rubro",
+    "ActionIds": [
+      "hospede_rubro.garra_contencao"
+    ]
+  },
+  {
+    "Name": "nucleo_nulo",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Núcleo Nulo",
+    "Role": "Chefe de interferência (teste)",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 60,
+    "Speed": 2,
+    "SpriteKey": "nucleo_nulo",
+    "ActionIds": [
+      "nucleo_nulo.pulso_corrompido"
+    ],
+    "bIsBoss": true
+  },
+  {
+    "Name": "ilusionista_sucata",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Ilusionista de Sucata",
+    "Role": "Distração e Instinto",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 18,
+    "Speed": 3,
+    "SpriteKey": "ilusionista_sucata",
+    "ActionIds": [
+      "ilusionista_sucata.golpe_bastao",
+      "ilusionista_sucata.caixa_desafinada"
+    ]
+  },
+  {
+    "Name": "remendador",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Remendador",
+    "Role": "Suporte ofensivo (cura pendente)",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 16,
+    "Speed": 2,
+    "SpriteKey": "remendador",
+    "ActionIds": [
+      "remendador.arco_solda"
+    ]
+  },
+  {
+    "Name": "acoplador",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Acoplador",
+    "Role": "Suporte modular (ligação pendente)",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 12,
+    "Speed": 3,
+    "SpriteKey": "acoplador",
+    "ActionIds": [
+      "acoplador.beliscao_mecanico"
+    ]
+  },
+  {
+    "Name": "felina_ferro",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Felina de Ferro",
+    "Role": "Duelista (contra-ataque pendente)",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 22,
+    "Speed": 4,
+    "SpriteKey": "felina_ferro",
+    "ActionIds": [
+      "felina_ferro.talho_liga",
+      "felina_ferro.chicote_cauda"
+    ]
+  },
+  {
+    "Name": "patinadora_choque",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Patinadora de Choque",
+    "Role": "Patrulheira móvel (controle pendente)",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 20,
+    "Speed": 4,
+    "SpriteKey": "patinadora_choque",
+    "ActionIds": [
+      "patinadora_choque.batida_eletrica"
+    ]
+  },
+  {
+    "Name": "faisca",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Faísca",
+    "Role": "Auxiliar do Carrasco Industrial",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 8,
+    "Speed": 2,
+    "SpriteKey": "faisca",
+    "ActionIds": [
+      "faisca.serrada_curta"
+    ]
+  },
+  {
+    "Name": "pipoco",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Pipoco",
+    "Role": "Auxiliar do Recreador",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 6,
+    "Speed": 2,
+    "SpriteKey": "pipoco",
+    "ActionIds": [
+      "pipoco.buzina_irritante"
+    ]
+  },
+  {
+    "Name": "broto",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Broto",
+    "Role": "Auxiliar do Enraizado",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 6,
+    "Speed": 1,
+    "SpriteKey": "broto",
+    "ActionIds": [
+      "broto.ataque_basico"
+    ]
+  },
+  {
+    "Name": "eco_01",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Eco-01",
+    "Role": "Eco de Sucata · variante cosmética 1",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 6,
+    "Speed": 2,
+    "SpriteKey": "eco_01",
+    "ActionIds": [
+      "eco_01.golpe_sucata"
+    ]
+  },
+  {
+    "Name": "eco_02",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Eco-02",
+    "Role": "Eco de Sucata · variante cosmética 2",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 6,
+    "Speed": 2,
+    "SpriteKey": "eco_02",
+    "ActionIds": [
+      "eco_02.golpe_sucata"
+    ]
+  },
+  {
+    "Name": "eco_03",
+    "DotResist": 0.2,
+    "DisplacementResist": 0.2,
+    "Category": "Machine",
+    "DisplayName": "Eco-03",
+    "Role": "Eco de Sucata · variante cosmética 3",
+    "Description": "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades.",
+    "MaxHp": 6,
+    "Speed": 2,
+    "SpriteKey": "eco_03",
+    "ActionIds": [
+      "eco_03.golpe_sucata"
+    ]
+  }
+]
