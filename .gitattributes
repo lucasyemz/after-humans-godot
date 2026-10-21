@@ -1,0 +1,4 @@
+# Texto sempre com LF no repositório (os scripts e cenas da Godot, os docs e os dados).
+* text=auto eol=lf
+*.png binary
+*.webp binary
