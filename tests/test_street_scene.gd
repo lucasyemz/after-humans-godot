@@ -1,5 +1,7 @@
-## Um recruta (hero_cao_4, sem arte própria ainda) vai para a rua e para a luta com a arte do fundador da classe. Antes,
-## a rua deixava de fora quem não estava no manifesto da arte: o recruta escalado sumia da equipe e da luta.
+## A rua com uma expedição de verdade:
+## - um recruta (hero_cao_4, sem arte própria ainda) vai para a rua e para a luta com a arte do fundador da classe (antes
+##   a rua deixava de fora quem não estava no manifesto da arte: o recruta escalado sumia da equipe e da luta);
+## - a Mochila aberta na luta fecha quando um comando é escolhido com o mouse, e não passa para a luta seguinte.
 extends RefCounted
 
 const S = preload("res://scripts/flow/station_rules.gd")
@@ -31,6 +33,7 @@ func run(t) -> void:
 		var arena: AHCombatArena = street._arena
 		t.check(arena.active and arena.session.state.player_team.any(func(u): return u.hero_id == recruit.hero_id), "o recruta luta")
 		t.check(not arena.hero_art(recruit.hero_id).is_empty(), "a arena acha a arte do recruta")
+		await _bag(t, tree, arena)
 		tree.unload_current_scene()
 		await tree.process_frame
 	for file in DirAccess.get_files_at(Campaign.save_dir):
@@ -38,3 +41,20 @@ func run(t) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+func _bag(t, tree: SceneTree, arena: AHCombatArena) -> void:
+	var limit := Time.get_ticks_msec() + 20000
+	while not arena.hud.waiting and arena.active and Time.get_ticks_msec() < limit:
+		await tree.process_frame
+	if not t.check(arena.hud.waiting, "a luta pede o comando do herói"):
+		return
+	arena.hud._on_action("item")
+	t.check(arena.hud._bag != null, "a Mochila abre na luta")
+	# Defender clicado com a Mochila aberta (ela não cobre a barra de ações).
+	arena.hud.command_chosen.emit({"kind": "defend"})
+	await tree.process_frame
+	t.check(arena.hud._bag == null, "escolhido o comando, a Mochila fecha")
+	arena.hud._open_bag()
+	arena.hud.close()
+	t.check(arena.hud._bag == null, "fechar o HUD da luta fecha a Mochila")

@@ -244,6 +244,7 @@ func open(new_session: AHCombatSession) -> void:
 
 func close() -> void:
 	visible = false
+	_close_bag()
 	_clear_markers()
 	_hide_tip()
 	for bar in _unit_bars.values():
@@ -486,6 +487,9 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	waiting = true
 	var command: Dictionary = await command_chosen
 	waiting = false
+	# A Mochila não é modal: um comando escolhido com ela aberta (Defender, uma habilidade) fecha ela também. Aberta, ela
+	# travava os atalhos dos próximos heróis e passava para a luta seguinte.
+	_close_bag()
 	# Durante o lance, o painel não mostra os botões de quem já agiu.
 	for child in _abilities.get_children():
 		child.queue_free()
