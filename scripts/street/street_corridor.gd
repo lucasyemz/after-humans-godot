@@ -85,7 +85,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	var campaign: Dictionary = Campaign.state
 	if campaign.get("session", {}).get("expedition") == null:
 		# Sem expedição a rua não tem o que mostrar: a partida é pela Preparação, na Estação.
-		GameFlow.change_to.call_deferred("station", {}, false)
+		GameFlow.redirect("station")
 		return
 	var route: Dictionary = campaign.session.expedition.corridor
 	_build_segments(campaign)

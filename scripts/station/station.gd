@@ -86,7 +86,8 @@ func _ready() -> void:
 	# Quem abre a Estação no meio de uma expedição (o jogo fechou na rua) volta para a rua.
 	var session: Dictionary = campaign.get("session", {})
 	if session.get("expedition") != null and session.get("result", "") == "":
-		GameFlow.change_to.call_deferred("street", {}, false)
+		set_process(false)
+		GameFlow.redirect("street")
 		return
 	_combat_art = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
 	_civilian_art = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/civilians.json"))
