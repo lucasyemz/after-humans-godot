@@ -142,6 +142,7 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 ## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
 func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
 	session = AHCombatSession.create(heroes, enemies, opening, seed_value)
+	session.use_expedition(Campaign.state)
 	Tips.show_tip("combat")
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
 	if speed <= 2.0:
