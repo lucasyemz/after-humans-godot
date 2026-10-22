@@ -46,7 +46,8 @@ scripts/station/  Estação Raiz em corte: a montagem transcrita da Unreal (stat
 shaders/          cenários (blockout, cards, água com ondas), pós-processamento Emberfall, fogueira que apaga, chuva e fumaça, feixes de luz, halos, silhuetas
 scenes/           boot.tscn (cena inicial: abre a Estação, ou a rua se há expedição), station.tscn e street.tscn
 data/             JSON de produção (classes, habilidades, inimigos...) e a gravação de paridade do combate;
-                  expedition-teams.json diz quantos partem em cada jornada (mínimo e máximo);
+                  expedition-teams.json diz quantos partem em cada jornada (mínimo e máximo); em events.json,
+                  Places e Objects dizem em que cenários e objetos cada evento de busca cabe;
                   presentation/combat_art.json diz onde está cada pose, ícone e som e mede a âncora no pé;
                   scenarios/ traz os seis mapas exportados (peças, materiais, luzes, zonas) e as malhas
 audio/            combat (sons das habilidades), music, ambience (cenários e chuva), world (passos, portas, busca),

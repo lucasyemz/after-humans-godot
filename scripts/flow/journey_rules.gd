@@ -59,6 +59,12 @@ const SPOT_NAMES := [
 	["a bilheteria", "o carrinho de pipoca", "a escada"],
 ]
 const SHOP_NAMES := ["mercearia", "oficina", "cinema"]
+## O tipo do objeto vasculhado, pelo nome (#7): os eventos dizem em que tipo cabem (Objects em data/events.json). Móvel:
+## o que tem fundo e gaveta (a "Caixa Lacrada" está no fundo do móvel).
+const OBJECT_KINDS := {
+	"movel": ["armário", "geladeira", "prateleira", "bancada", "fichário", "caixa", "cofre", "bilheteria", "baú"],
+	"bolsa": ["mochila", "bolsa", "maleta", "trouxa", "sacos"],
+}
 
 
 static func _rand(seed_value: int) -> AHCombatRandom:
@@ -83,6 +89,36 @@ static func team_limits(phase_id: String) -> Dictionary:
 	var most := clampi(int(row.get("MaxTeam", 4)) if row != null else 4, 1, 4)
 	var least := clampi(int(row.get("MinTeam", 4)) if row != null else 4, 1, most)
 	return {"min": least, "max": most}
+
+
+## O lugar dos eventos (#7): o cenário da fase (a rua, a ponte, a sala, o laboratório, os túneis).
+static func event_place(campaign: Dictionary) -> String:
+	var expedition = campaign.get("session", {}).get("expedition")
+	return String(phase(expedition.phase_id).get("scenario", "")) if expedition != null else ""
+
+
+static func object_kind(object_name: String) -> String:
+	var lower := object_name.to_lower()
+	for kind in OBJECT_KINDS:
+		for word in OBJECT_KINDS[kind]:
+			if lower.contains(word):
+				return kind
+	return ""
+
+
+## Os eventos de busca que combinam com o lugar e com o objeto (Places e Objects vazios: qualquer um), em ordem fixa.
+static func event_pool(place: String, kind: String) -> Array:
+	var pool: Array = []
+	for id in GameData.table("events").keys():
+		if not String(id).begins_with("busca_"):
+			continue
+		var row: Dictionary = GameData.row("events", id)
+		var places: Array = row.get("Places", [])
+		var objects: Array = row.get("Objects", [])
+		if (places.is_empty() or places.has(place)) and (objects.is_empty() or objects.has(kind)):
+			pool.append(id)
+	pool.sort()
+	return pool
 
 
 static func shop_the(shop: int) -> String:
@@ -558,7 +594,8 @@ static func search_spot(campaign: Dictionary, site_index: int, spot_index: int) 
 	var spot: Dictionary = site.spots[spot_index]
 	var random := _rand(route.seed ^ _mul((site.door + 1) * 8 + spot_index + 1, 0x85ebca6b))
 	if spot.choice:
-		var choices: Array = GameData.table("events").keys().filter(func(id): return id.begins_with("busca_"))
+		# O evento combina com o lugar e com o que se vasculha (#7): nada de esporos na mercearia.
+		var choices := event_pool(event_place(campaign), object_kind(SPOT_NAMES[site.shop][spot_index] if site.shop >= 0 and site.shop < 3 and spot_index < 3 else ""))
 		if not choices.is_empty():
 			spot.searched = true
 			var event_id: String = choices[mini(choices.size() - 1, floori(random.next() * choices.size()))]
@@ -638,7 +675,7 @@ static func step_range(phase_id: String, transit_map: bool) -> Array:
 
 ## Campos dos cenários num corredor de save anterior a eles.
 static func _scenario_fields(route: Dictionary) -> void:
-	for key in ["prop_steps", "prop_maps", "searched_props"]:
+	for key in ["prop_steps", "prop_maps", "searched_props", "choice_props"]:
 		if not route.has(key):
 			route[key] = []
 	for key in ["objective_prop", "current_room"]:
@@ -663,11 +700,16 @@ static func assign_scenario_props(campaign: Dictionary, map: String, steps: Arra
 			prop_steps.remove_at(i)
 			prop_maps.remove_at(i)
 		route.searched_props = []
+		route.choice_props = []
 		route.objective_prop = -1
 	var first := prop_steps.size()
 	for step in steps:
 		prop_steps.append(step)
 		prop_maps.append(map)
+	# Metade dos mapas tem um objeto com escolha (#7), como as casas da rua: vasculhá-lo abre um evento do lugar.
+	var choice_random := _rand(route.seed ^ _mul(hash(map) & MASK, 0x2c1b3c6d))
+	if not steps.is_empty() and choice_random.next() < 0.5:
+		route.choice_props.append(first + mini(steps.size() - 1, floori(choice_random.next() * steps.size())))
 	if int(route.objective_prop) != -1 or steps.is_empty() or AHStationRules.focus_def(expedition.get("focus", "")).is_empty():
 		return first
 	var later: Array = []
@@ -701,16 +743,24 @@ static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
 
 
 ## Vasculha o prop (SearchScenarioProp): a tabela das casas (1 em 3 ruim) e o objetivo da rota. Devolve {ok, text}.
-static func search_scenario_prop(campaign: Dictionary, prop: int) -> Dictionary:
+static func search_scenario_prop(campaign: Dictionary, prop: int, object_name: String = "") -> Dictionary:
 	if not can_search_scenario_prop(campaign, prop):
 		return {"ok": false}
 	var route: Dictionary = corridor(campaign)
 	route.searched_props.append(prop)
+	# O objeto com escolha abre um evento do lugar (o do objetivo da rota fica com o achado dele).
+	if route.choice_props.has(prop) and prop != int(route.objective_prop):
+		var choices := event_pool(event_place(campaign), object_kind(object_name))
+		if not choices.is_empty():
+			var pick := _rand(route.seed ^ _mul(prop + 1, 0x165667b1))
+			var event_id: String = choices[mini(choices.size() - 1, floori(pick.next() * choices.size()))]
+			campaign.session.event = {"event_id": event_id, "from_search": true, "resolution": "", "pending_hard_combat": false}
+			return {"ok": true, "text": "", "event": event_id}
 	var random := _rand(route.seed ^ _mul(prop + 1, 0x27d4eb2d))
 	var text := apply_search_outcome(campaign, random, null)
 	if prop == int(route.objective_prop):
 		text += AHStationRules.grant_objective(campaign)
-	return {"ok": true, "text": text}
+	return {"ok": true, "text": text, "event": ""}
 
 
 ## A porta de um interior lateral abre do trecho dela em diante, sem a patrulha dele de pé (CanEnterScenarioRoom).

@@ -61,6 +61,11 @@ func _props(t) -> void:
 	t.check(R.can_search_scenario_prop(campaign, 0), "patrulha vencida: prop aberto")
 	t.check(R.search_scenario_prop(campaign, 0).ok, "vasculha")
 	t.check(not R.can_search_scenario_prop(campaign, 0), "não vasculha duas vezes")
+	# Se era o objeto com escolha (#7), o evento abriu: deixa para lá e segue.
+	if campaign.session.event != null:
+		var row = GameData.row("events", campaign.session.event.event_id)
+		R.choose_event_option(campaign, row.Choices[-1].Id, 1)
+		R.finish_event(campaign)
 	# O prop do objetivo entrega o objetivo da rota.
 	var objective: int = route.objective_prop
 	for step in range(1, route.prop_steps[objective] + 1):

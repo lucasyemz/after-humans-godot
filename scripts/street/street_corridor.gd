@@ -697,15 +697,19 @@ func _new_campaign() -> void:
 func _search_scenario_prop(entry: Dictionary) -> void:
 	var objective_before: bool = Campaign.state.session.expedition.get("objective_done", false)
 	var stock := _loot_snapshot()
-	var result := R.search_scenario_prop(Campaign.state, entry.prop)
+	var result := R.search_scenario_prop(Campaign.state, entry.prop, entry.name)
 	if result.ok:
 		# O prop que abre faz o clique de metal; o achado do objetivo, as moedas; o resto, o pano.
 		_search_sound(objective_before, int(street.scenario.props[entry.local].open) >= 0)
 		_show_gains(stock)
 		street.scenario.open_prop(entry.local)
 		Campaign.save()
-		hud.toast("%s: %s" % [entry.name, result.text], 5.0)
 		hud.refresh(Campaign.state)
+		# O objeto com escolha abre o evento ali mesmo (#7).
+		if result.event != "":
+			hud.show_event(Campaign.state)
+		else:
+			hud.toast("%s: %s" % [entry.name, result.text], 5.0)
 
 
 # ---------------------------------------------------------------- interiores laterais dos cenários
