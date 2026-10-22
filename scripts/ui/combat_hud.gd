@@ -729,11 +729,11 @@ func _build_abilities(take_focus: bool = true) -> void:
 			line.add_child(unit_label)
 			text_box.add_child(line)
 		if option.usable:
-			text_box.add_child(_pips("de", ability.OriginRanks, true, GOLD))
+			text_box.add_child(_pips(tr("de"), ability.OriginRanks, true, GOLD))
 			if option.self:
 				text_box.add_child(S.label(tr("em si mesmo"), 14, MUTED))
 			else:
-				text_box.add_child(_pips("em", ability.TargetRanks, not option.enemy_side, S.DANGER if option.enemy_side else S.OK))
+				text_box.add_child(_pips(tr("em"), ability.TargetRanks, not option.enemy_side, S.DANGER if option.enemy_side else S.OK))
 			var extra := ""
 			if option.cooldown > 0:
 				extra = tr("Recarga %d") % option.cooldown

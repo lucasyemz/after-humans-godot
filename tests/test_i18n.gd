@@ -32,6 +32,10 @@ func _portuguese_default() -> void:
 	for text in ["Continuar", "Nova campanha", "Vez de %s: escolha uma habilidade (1–4) ou uma ação."]:
 		t.equal(TranslationServer.translate(text), text, "em português, '%s' fica igual" % text)
 	t.equal(Settings._known_language("fr"), "pt_BR", "idioma desconhecido volta ao português")
+	# O leitor acha a palavra solta minúscula e os marcadores com sinal.
+	t.check(Scan.looks_like_text("vazio") and Scan.looks_like_text("de"), "palavra solta minúscula conta como texto")
+	t.check(not Scan.looks_like_text("res://audio/ui/click.ogg") and not Scan.looks_like_text("move_left"), "caminho e id não contam")
+	t.equal(Scan.placeholders("%s · +%d de vida, %+d de instinto"), ["%s", "%d", "%+d"], "o marcador %+d também conta")
 
 
 ## Todo texto de tela das telas convertidas está no PO (ou na lista do que não é texto); com %, passa por tr().
@@ -43,10 +47,11 @@ func _screens_in_table(po: Dictionary) -> void:
 	for path in Scan.CONVERTED:
 		var file: String = path.get_file()
 		for found in Scan.screen_texts(path):
-			if ignored.has("%s: %s" % [file, found.text]):
+			if not found.wrapped and Scan.is_ignored(ignored, file, found.text):
 				continue
 			screen += 1
-			if not po.has(found.text):
+			# As obsoletas (#~) não contam: a Godot as ignora e o texto sairia em português.
+			if not po.has(found.text) or po[found.text].obsolete:
 				outside.append("%s:%d %s" % [file, found.line, found.text])
 			elif not Scan.placeholders(found.text).is_empty() and not found.wrapped:
 				unwrapped.append("%s:%d %s" % [file, found.line, found.text])
@@ -59,11 +64,8 @@ func _screens_in_table(po: Dictionary) -> void:
 		var cut: int = entry.find(": ")
 		var file: String = entry.substr(0, cut)
 		var text: String = entry.substr(cut + 2)
-		var path: String = ""
-		for converted in Scan.CONVERTED:
-			if converted.get_file() == file:
-				path = converted
-		if path == "" or not Scan.screen_texts(path).any(func(f): return f.text == text):
+		var paths: Array = Scan.CONVERTED.filter(func(c): return file == "*" or c.get_file() == file)
+		if paths.is_empty() or not paths.any(func(p): return Scan.screen_texts(p).any(func(f): return f.text == text)):
 			stale.append(entry)
 	t.check(stale.is_empty(), "tools/i18n_ignore.txt sem linhas que sobraram: %s" % [stale])
 
@@ -77,6 +79,8 @@ func _placeholders(po: Dictionary) -> void:
 	var data_total := 0
 	for id in po:
 		var entry: Dictionary = po[id]
+		if entry.obsolete:
+			continue
 		var from_data: bool = entry.refs.all(func(r): return not String(r).contains(".gd:"))
 		if from_data:
 			data_total += 1
@@ -95,7 +99,7 @@ func _placeholders(po: Dictionary) -> void:
 func _data_keys(po: Dictionary) -> void:
 	var texts := Scan.data_texts()
 	t.check(texts.size() > 150, "os dados têm textos (%d)" % texts.size())
-	var missing: Array = texts.filter(func(f): return not po.has(f.text)).map(func(f): return f.where)
+	var missing: Array = texts.filter(func(f): return not po.has(f.text) or po[f.text].obsolete).map(func(f): return f.where)
 	t.check(missing.is_empty(), "todo nome e descrição dos dados tem chave: %s" % [missing.slice(0, 10)])
 	t.check(GameData.row("classes", "cao") != null, "os ids continuam os mesmos")
 

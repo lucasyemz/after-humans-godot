@@ -64,7 +64,8 @@ func _ready() -> void:
 			text_size = clampi(int(String(arg).get_slice("=", 1)), 0, TEXT_SIZES.size() - 1)
 		elif String(arg) == "--touch":
 			touch_controls = 1
-		# --language=en nas capturas: as telas em outro idioma (só na memória).
+		# --language=en: as telas em outro idioma. Nas capturas e nos scripts as opções não são gravadas; jogando, a
+		# próxima opção mudada grava o idioma (como --text-size).
 		elif String(arg).begins_with("--language="):
 			language = _known_language(String(arg).get_slice("=", 1))
 	apply_controls()

@@ -16,7 +16,7 @@ func _initialize() -> void:
 	for path in Scan.CONVERTED:
 		var file: String = path.get_file()
 		for found in Scan.screen_texts(path):
-			if ignored.has("%s: %s" % [file, found.text]):
+			if not found.wrapped and Scan.is_ignored(ignored, file, found.text):
 				continue
 			if not refs.has(found.text):
 				order.append(found.text)

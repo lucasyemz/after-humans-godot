@@ -793,7 +793,7 @@ func _make_tag(hero_id: String) -> Control:
 			if entry.trauma:
 				state.append("trauma")
 			elif entry.hp < entry.max_hp * 0.5:
-				state.append("ferido")
+				state.append(tr("ferido"))
 			column.add_child(H.make_label(" · ".join(state), 15, H.MUTED))
 	return box
 
@@ -880,7 +880,7 @@ func _station_plan(c: Dictionary) -> void:
 		var name_label := U.label(room_def.name, 22, U.GOLD if ready else U.TEXT, "bold")
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		head.add_child(name_label)
-		head.add_child(U.label("vazio" if level < 1 else tr("nível %d de %d") % [level, room_def.max_level], 17, U.MUTED))
+		head.add_child(U.label(tr("vazio") if level < 1 else tr("nível %d de %d") % [level, room_def.max_level], 17, U.MUTED))
 		var now := U.label(S.room_benefit(id, level) if level >= 1 else tr("Ainda vazio."), 17, U.TEXT)
 		now.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		now.custom_minimum_size = Vector2(600, 0)
@@ -1543,8 +1543,8 @@ func _depot(c: Dictionary) -> void:
 		S.quantity(c, "scrap"), S.quantity(c, "fragments")])
 	_text(tr("Água: %d") % c.station.water)
 	var relics: Array = c.inventory.relics.map(func(id): return tr(GameData.row("relics", id).DisplayName) if GameData.row("relics", id) else id)
-	_text(tr("Relíquias no estoque: %s") % (", ".join(relics) if not relics.is_empty() else "nenhuma"))
-	_text(tr("Ferramentas: %s") % (", ".join(c.tools) if not c.tools.is_empty() else "nenhuma"))
+	_text(tr("Relíquias no estoque: %s") % (", ".join(relics) if not relics.is_empty() else tr("nenhuma")))
+	_text(tr("Ferramentas: %s") % (", ".join(c.tools) if not c.tools.is_empty() else tr("nenhuma")))
 
 
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
@@ -1630,7 +1630,7 @@ func _forge(c: Dictionary) -> void:
 	craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), tr("%s pronta. Equipe na Sala dos Personagens.") % tr(relic.DisplayName), "res://audio/ui/forge_confirm.ogg"))
 	box.add_child(craft)
 	if scrap < cost:
-		box.add_child(U.label(tr("Faltam %d %s") % [cost - scrap, "sucata" if cost - scrap == 1 else "sucatas"], 17, U.DANGER))
+		box.add_child(U.label((tr("Faltam %d sucata") if cost - scrap == 1 else tr("Faltam %d sucatas")) % (cost - scrap), 17, U.DANGER))
 
 
 ## O efeito da relíquia em poucas palavras, a partir dos números dela.

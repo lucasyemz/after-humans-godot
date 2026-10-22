@@ -53,6 +53,9 @@ static func looks_like_text(text: String) -> bool:
 	var letters := RegEx.create_from_string("[A-Za-zÀ-ú]")
 	if letters.search(text) == null or text.contains("://") or text.begins_with("--"):
 		return false
+	# Uma palavra solta minúscula ("vazio", "de") é texto; os ids do código ("bold", "menu") ficam em i18n_ignore.txt.
+	if RegEx.create_from_string("^[a-zà-ú]{2,}$").search(text) != null:
+		return true
 	if RegEx.create_from_string("^[a-z0-9_.:\\-/]*$").search(text) != null:
 		return false
 	if RegEx.create_from_string("^[A-Z][a-z0-9]+([A-Z][A-Za-z0-9]*)+$").search(text) != null:
@@ -104,7 +107,13 @@ static func data_texts() -> Array:
 	return out
 
 
-## A lista do que parece texto mas não é (nomes de nó, teclas, unidades): "arquivo: texto" por linha.
+## O literal está na lista do que não é texto: no arquivo dele ou em "*" (os ids do código, em qualquer arquivo).
+static func is_ignored(ignored_list: Dictionary, file: String, text: String) -> bool:
+	return ignored_list.has("%s: %s" % [file, text]) or ignored_list.has("*: " + text)
+
+
+## A lista do que parece texto mas não é (nomes de nó, teclas, unidades): "arquivo: texto" por linha; "*: palavra" vale
+## em todos os arquivos.
 static func ignored() -> Dictionary:
 	var out := {}
 	if not FileAccess.file_exists(IGNORE):
@@ -128,8 +137,9 @@ static func read_po(path: String = PO) -> Dictionary:
 	var refs: Array = []
 	for raw in FileAccess.get_file_as_string(path).split("\n"):
 		var line := raw.strip_edges()
-		# As obsoletas (#~) também valem: o texto que volta recupera a tradução.
-		if line.begins_with("#~ "):
+		# As obsoletas (#~) entram marcadas (a Godot as ignora): o texto que volta recupera a tradução.
+		var obsolete := line.begins_with("#~ ")
+		if obsolete:
 			line = line.substr(3)
 		if line.begins_with("#:") or line.begins_with("#."):
 			refs.append(line.substr(2).strip_edges())
@@ -137,7 +147,7 @@ static func read_po(path: String = PO) -> Dictionary:
 		if line.begins_with("msgid "):
 			if current.has("id") and current.id != "":
 				entries[current.id] = current
-			current = {"id": _po_string(line.substr(6)), "str": "", "plural": "", "strs": [], "refs": refs}
+			current = {"id": _po_string(line.substr(6)), "str": "", "plural": "", "strs": [], "refs": refs, "obsolete": obsolete}
 			refs = []
 			field = "id"
 		elif line.begins_with("msgid_plural "):
@@ -179,6 +189,6 @@ static func po_quote(text: String) -> String:
 ## Os marcadores de formato (%s, %d, %02d, %%) de um texto, na ordem.
 static func placeholders(text: String) -> Array:
 	var out: Array = []
-	for found in RegEx.create_from_string("%[-0-9.]*[sdfx%]").search_all(text):
+	for found in RegEx.create_from_string("%[-+#0-9.]*[sdfx%]").search_all(text):
 		out.append(found.get_string())
 	return out

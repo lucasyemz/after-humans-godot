@@ -157,7 +157,7 @@ func _ready() -> void:
 	_hint = HBoxContainer.new()
 	_hint.add_theme_constant_override("separation", 18)
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for spec in [[["move_left", "move_right"], "andar"], [["run"], "correr"], [["interact"], "interagir"]]:
+	for spec in [[["move_left", "move_right"], tr("andar")], [["run"], tr("correr")], [["interact"], tr("interagir")]]:
 		var group := HBoxContainer.new()
 		group.add_theme_constant_override("separation", 5)
 		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
