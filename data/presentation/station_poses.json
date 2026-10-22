@@ -130,5 +130,53 @@
       740
     ],
     "body_reference_pixels": 712
+  },
+  "hero_cao_bento_sleep": {
+    "file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+    "canvas": [
+      887,
+      443
+    ],
+    "anchor": [
+      445,
+      336
+    ],
+    "body_reference_pixels": 863
+  },
+  "hero_gato_nick_sleep": {
+    "file": "res://art/station/poses/hero_gato_nick_sleep.webp",
+    "canvas": [
+      892,
+      441
+    ],
+    "anchor": [
+      446,
+      366
+    ],
+    "body_reference_pixels": 862
+  },
+  "hero_sapo_iris_sleep": {
+    "file": "res://art/station/poses/hero_sapo_iris_sleep.webp",
+    "canvas": [
+      887,
+      443
+    ],
+    "anchor": [
+      444,
+      369
+    ],
+    "body_reference_pixels": 854
+  },
+  "hero_coruja_vespera_sleep": {
+    "file": "res://art/station/poses/hero_coruja_vespera_sleep.webp",
+    "canvas": [
+      887,
+      443
+    ],
+    "anchor": [
+      447,
+      410
+    ],
+    "body_reference_pixels": 837
   }
 }

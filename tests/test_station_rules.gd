@@ -16,6 +16,7 @@ func run(t) -> void:
 	_civilians(t)
 	_vitals(t)
 	_night_preview(t)
+	_sleepers(t)
 	_thirst(t)
 	_route_focus(t)
 	_shelter(t)
@@ -389,3 +390,22 @@ func _night_preview(t) -> void:
 			t.check(result.watch == row.watch and result.fed == row.fed, "%s: vigia e comida batem (%s)" % [row.hero_id, spec])
 			t.equal([int(entry.hp) - before[row.hero_id][0], int(entry.instinct) - before[row.hero_id][1]], [row.hp_gain, row.instinct_change],
 				"%s: vida e instinto batem (%s)" % [row.hero_id, spec])
+
+
+## À noite, quem dorme deita no beliche: todos menos o vigia, um lugar para cada um da equipe e a pose de cada herói;
+## com a noite resolvida, ninguém fica deitado.
+func _sleepers(t) -> void:
+	var c: Dictionary = Campaign.create_initial(4)
+	var team: Array = c.roster.slice(0, 4).map(func(h): return h.id)
+	c.night.phase = "planning"
+	c.night.participants = team
+	t.equal(AHStation.sleepers(c), team, "sem vigia, os quatro dormem")
+	S.set_watch(c, team[1])
+	t.check(not AHStation.sleepers(c).has(team[1]) and AHStation.sleepers(c).size() == 3, "o vigia não deita")
+	t.equal(AHStation.sleep_slots().size(), 4, "quatro lugares nos beliches")
+	var poses: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/station_poses.json"))
+	for hero_id in team:
+		var pose: Dictionary = poses.get(hero_id + "_sleep", {})
+		t.check(not pose.is_empty() and ResourceLoader.exists(pose.file), "%s tem a pose de dormir" % hero_id)
+	c.night.phase = "dawn"
+	t.equal(AHStation.sleepers(c), [], "no amanhecer ninguém fica deitado")

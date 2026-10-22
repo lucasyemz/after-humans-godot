@@ -131,6 +131,7 @@ func _arrive(campaign: Dictionary) -> void:
 	S.receive_volunteers(campaign, rng)
 	Campaign.save()
 	_place_residents(rng)
+	_update_sleepers()
 	if not campaign.station.last_return.is_empty() and not campaign.station.last_return.get("seen", false):
 		hud.open_service("report")
 	elif campaign.night.phase != "none":
@@ -165,6 +166,7 @@ func refresh() -> void:
 		for node in _build.dressing[room_id]:
 			if is_instance_valid(node):
 				node.visible = furnished
+	_update_sleepers()
 	# O estoque visível acompanha os suprimentos (#65): cada faixa acende uma prateleira.
 	var band := S.supply_band(S.quantity(campaign, S.SUPPLIES))
 	for entry in _build.stock:
@@ -633,6 +635,62 @@ func _tick_train(delta: float) -> void:
 
 # ---------------------------------------------------------------- moradores
 
+## Os quatro lugares dos beliches (m): de baixo à esquerda, de baixo à direita, e os de cima.
+static func sleep_slots() -> Array:
+	var out: Array = []
+	for tier in 2:
+		for x in AHStationBuild.BUNK_X:
+			# Um pouco para a cabeceira (o travesseiro fica à esquerda) e à frente da cama pintada.
+			out.append(AHStationBuilder.vu(Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
+				AHStationBuild.BUNK_FLOOR + tier * AHStationBuild.BUNK_UPPER + AHStationBuild.MATTRESS_TOP)))
+	return out
+
+
+## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview).
+static func sleepers(campaign: Dictionary) -> Array:
+	if campaign.night.phase != "planning":
+		return []
+	return S.night_preview(campaign).heroes.filter(func(row): return not row.watch).map(func(row): return row.hero_id)
+
+
+## À noite, quem dorme deita no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica de pé no Dormitório. Com a
+## noite resolvida, todos voltam a passear.
+func _update_sleepers() -> void:
+	var campaign: Dictionary = Campaign.state
+	var asleep := sleepers(campaign)
+	var slots := sleep_slots()
+	var watch: String = campaign.night.watch_hero_id if campaign.night.phase == "planning" else ""
+	var dorm := room_def(S.DORMITORY)
+	for walker in _walkers:
+		if not walker.has("hero_id") or not is_instance_valid(walker.card):
+			continue
+		var card: AHSpriteCard = walker.card
+		# Cada um tem o seu lugar pela ordem na equipe: trocar o vigia não muda os outros de cama.
+		var slot: int = campaign.night.participants.find(walker.hero_id) if asleep.has(walker.hero_id) else -1
+		if slot >= 0 and slot < slots.size() and _poses.has(walker.hero_id + "_sleep"):
+			walker.sleeping = true
+			card.show_art(_poses[walker.hero_id + "_sleep"])
+			card.position = slots[slot]
+			card.set_facing(1.0)
+			card.scale = Vector3.ONE
+			continue
+		if walker.get("sleeping", false):
+			walker.sleeping = false
+			card.show_art(walker.idle)
+			card.position = Vector3(walker.target, walker.floor, walker.home_z)
+		if walker.hero_id == watch and walker.room != S.DORMITORY:
+			# O vigia vai para o Dormitório e fica perto da porta.
+			walker.room = S.DORMITORY
+			walker.min = dorm.lane[1] - 2.0
+			walker.max = dorm.lane[1]
+			walker.floor = dorm.floor
+			walker.target = walker.max
+			card.position = Vector3(walker.max, dorm.floor, walker.home_z)
+			card.show_art(walker.idle)
+			card.scale = Vector3.ONE
+
+
+
 ## Cada herói vivo num cômodo sorteado (30% de chance de dividir um já ocupado, no máximo dois), passeando pela faixa
 ## do cômodo; os civis ficam no cômodo deles, alternando o idle e a pose de trabalho.
 func _place_residents(rng: RandomNumberGenerator) -> void:
@@ -716,7 +774,7 @@ func _walk(delta: float) -> void:
 	_walkers = _walkers.filter(func(w): return is_instance_valid(w.card))
 	for walker in _walkers:
 		var card: AHSpriteCard = walker.card
-		if not card.visible:
+		if not card.visible or walker.get("sleeping", false):
 			continue
 		if walker.has("civilian"):
 			walker.civil_timer -= delta

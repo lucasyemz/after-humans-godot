@@ -99,7 +99,9 @@ save (`station` e `session` estão vazios) e a migração de versões antigas do
   existem na fonte da Unreal (só Bento e Nick têm dano e queda). Já entraram as poses de todos os inimigos e a de usar
   item dos quatro heróis (`SourceArt/AllyActions/ItemUse`), que a Mochila mostra na luta. As folhas de andar antigas
   (`T_*_Walk`) ficam de fora, como na Unreal: a caminhada é a pose parada com o passo de 3 cm (`WalkBobHeight`). As
-  poses de dormir do Dormitório esperam a revisão do Lucas (o manifesto diz "not integrated").
+  poses de dormir do Dormitório foram aprovadas pelo Lucas em 22/10 e entraram: à noite, quem dorme deita num dos
+  quatro lugares dos beliches (as duas camas viraram beliche e ficam mesmo com o quarto por recuperar); o vigia fica de
+  pé perto da porta (`AHStation.sleepers`, com teste).
 - ~~**Ainda não entraram**~~ feitos depois da Fase 5: a prévia de quem a habilidade atinge (`ability_hit_ids`, port do
   `AbilityHitIds`, com `test_hit_preview`: apontar um alvo diz todos os atingidos e acende o par da granada ou o vizinho
   do coquetel), os itens da Mochila na luta e a crise de instinto com o lance próprio (câmera perto, pose de apoio ou de
@@ -239,7 +241,7 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
 **Pendências da 3c:**
 - Sem os sons do trem e do sino de chegada (não há fonte em `SourceArt/Audio`; ficam para o áudio da Fase 5).
 - O vagão não abre as portas (o metrô de portas deslizantes é um `.uasset`); o candidato desce pela lateral.
-- As poses de dormir (Dormitório) e as folhas de andar da Íris e da Véspera ainda não entraram.
+- As folhas de andar da Íris e da Véspera ainda não entraram (as poses de dormir entraram em 22/10).
 
 **Pendências da 3b:**
 - O vagão é o de corte da própria Unreal (o metrô Bombardier, a cadeira do bar, o binóculo, o kit de química, o sofá 3D e

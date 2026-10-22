@@ -374,7 +374,7 @@ static func room_benefit(room_id: String, level: int) -> String:
 			return "Laboratório vazio. Recuperado, libera as melhorias de classe e gasta 1 de energia." if level <= 0 \
 				else "Melhorias de classe com fragmentos. Gasta 1 de energia."
 		DORMITORY:
-			return "Quartos vazios. A equipe dorme em colchonetes improvisados: o descanso funciona igual." if level <= 0 \
+			return "Quarto por recuperar: só os beliches de ferro. A equipe dorme aqui depois de cada volta." if level <= 0 \
 				else "Descanso da comunidade."
 		BAR:
 			return "Salão vazio, sem uso por enquanto." if level <= 0 else "Um lugar para conversar e fazer uma pausa."

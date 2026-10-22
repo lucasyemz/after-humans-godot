@@ -99,6 +99,7 @@ func build() -> void:
 	_canteen()
 	_depot()
 	_forge()
+	_dormitory_bunks()
 	var mark := b.mark()
 	_dormitory()
 	_tag_dressing("dormitory", mark)
@@ -939,20 +940,38 @@ func _forge() -> void:
 
 # ---------------------------------------------------------------- Dormitório, Preparação, Pesquisa, Bar e Personagens
 
+## As camas do Dormitório (a cama pintada DM01 com a armação rasa atrás), em beliche: quatro lugares, um por herói da
+## equipe, onde quem dorme deita à noite (AHStation.sleep_slots). Ficam mesmo com o quarto por recuperar.
+const BUNK_X := [-1010.0, -660.0]
+const BUNK_Y := -665.0
+const BUNK_FLOOR := -520.0
+const BUNK_UPPER := 125.0
+## Onde o corpo encosta no colchão, sobre a base da cama (a linha do lençol na arte da cama).
+const MATTRESS_TOP := 58.0
+
+
+func _dormitory_bunks() -> void:
+	var f := BUNK_FLOOR
+	var wood := S("wood_table_worn", f, 0, Color(0.58, 0.47, 0.34))
+	var steel := S("green_metal_rust", f, 0, Color(0.5, 0.6, 0.54))
+	var bed_width := 255.0
+	var bed_height := bed_width * 688.0 / 1743.0
+	for x in BUNK_X:
+		for tier in 2:
+			var base := Vector3(x, BUNK_Y, f + tier * BUNK_UPPER)
+			box(base + Vector3(-115, -80, 27), base + Vector3(115, -5, 32), wood)
+			b.card("Dormitory_BedLinen", base, bed_width, bed_height)
+		# Os pés do beliche, do chão até a cama de cima.
+		for dx in [-118.0, 118.0]:
+			for dy in [-72.0, -8.0]:
+				box(Vector3(x + dx - 3, BUNK_Y + dy - 3, f), Vector3(x + dx + 3, BUNK_Y + dy + 3, f + BUNK_UPPER + 40), steel)
+		box(Vector3(x - 118, BUNK_Y - 8, f + BUNK_UPPER + 36), Vector3(x + 118, BUNK_Y - 2, f + BUNK_UPPER + 40), steel)
+
+
 func _dormitory() -> void:
 	var f := -520.0
 	var wood := S("wood_table_worn", f, 0, Color(0.58, 0.47, 0.34))
 	var steel := S("green_metal_rust", f, 0, Color(0.5, 0.6, 0.54))
-	# Duas camas pintadas com a armação rasa atrás (profundidade e contato).
-	var bed_width := 255.0
-	var bed_height := bed_width * 688.0 / 1743.0
-	for index in 2:
-		var base := Vector3(-1010 + index * 350, -665, f)
-		box(base + Vector3(-115, -80, 27), base + Vector3(115, -5, 32), wood)
-		for x in [-115.0, 115.0]:
-			for y in [-72.0, -8.0]:
-				box(base + Vector3(x - 3, y - 3, 0), base + Vector3(x + 3, y + 3, 27), steel)
-		b.card("Dormitory_BedLinen", base, bed_width, bed_height)
 	# O armário com a frente da Cantina e os ganchos com os pertences.
 	var cabinet := Vector3(-345, -720, f)
 	var cabinet_width := 170.0

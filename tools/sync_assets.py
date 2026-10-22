@@ -245,9 +245,25 @@ def station_poses() -> int:
             image.convert("RGBA").resize((image.width // 2, image.height // 2), Image.LANCZOS).save(dst, "WEBP", quality=90, method=4)
         out[pose_id] = {"file": f"res://art/station/poses/{pose_id}.webp", "canvas": [image.width // 2, image.height // 2],
                         "anchor": [foot_x // 2, foot_y // 2], "body_reference_pixels": round((foot_y - top) / seated / 2)}
+    # Dormir (aprovadas pelo Lucas em 22/10/2026): deitados de cabeça à esquerda; a âncora é o meio do corpo no ponto em
+    # que encosta no colchão, e o comprimento do corpo (o vão do alfa) vale a altura do herói.
+    family = json.loads((REPO / "SourceArt/RootStation/Dormitory/Poses/sleep-family-manifest-v1.json").read_text(encoding="utf-8"))
+    for entry in family["heroes"]:
+        pose_id = f"{SLEEP_HEROES[entry['hero']]}_sleep"
+        src = REPO / "SourceArt/RootStation/Dormitory/Poses" / entry["source"]
+        dst = PROTO / "art" / "station" / "poses" / f"{pose_id}.webp"
+        image = Image.open(src)
+        if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+            image.convert("RGBA").resize((image.width // 2, image.height // 2), Image.LANCZOS).save(dst, "WEBP", quality=90, method=4)
+        x0, _top, x1, _bottom = entry["alpha_bounds_90"]
+        out[pose_id] = {"file": f"res://art/station/poses/{pose_id}.webp", "canvas": [image.width // 2, image.height // 2],
+                        "anchor": [(x0 + x1) // 4, entry["support_y_px"] // 2], "body_reference_pixels": (x1 - x0) // 2}
     target = PROTO / "data" / "presentation" / "station_poses.json"
     target.write_text(json.dumps(out, ensure_ascii=False, indent=2) + chr(10), encoding="utf-8")
     return len(out)
+
+
+SLEEP_HEROES = {"bento": "hero_cao_bento", "nick": "hero_gato_nick", "iris": "hero_sapo_iris", "vespera": "hero_coruja_vespera"}
 
 
 def civilians() -> int:
