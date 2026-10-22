@@ -232,7 +232,6 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 
 # ---------------------------------------------------------------- inimigos
 
-## Formação de um encontro (GenerateEnemyTeam): do perfil do nó, da frente para trás.
 ## Quanto um inimigo pesa na luta: a vida e o dano médio do seu golpe mais forte (x3). O Pipoco (sem dano) é o mais
 ## leve; o Carrasco e o Coletor, os mais pesados.
 static func enemy_strength(enemy_id: String) -> float:
@@ -249,7 +248,7 @@ static func enemy_strength(enemy_id: String) -> float:
 
 
 ## O sorteio de uma vaga com a progressão da fase (progress de 0, a primeira patrulha, a 1, a última antes do
-## guardião): a lista em ordem de força e uma janela de metade dela que anda do mais fraco para o mais forte.
+## guardião): a lista em ordem de força e uma janela de metade dela (pelo menos 2) que anda do mais fraco ao mais forte.
 ## Sem progressão (progress < 0, as casas), qualquer um.
 static func _pick_by_progress(pool: Array, progress: float, random: AHCombatRandom) -> String:
 	if pool.is_empty():
@@ -258,11 +257,17 @@ static func _pick_by_progress(pool: Array, progress: float, random: AHCombatRand
 		return pool[floori(random.next() * pool.size())]
 	var sorted := pool.duplicate()
 	sorted.sort_custom(func(a, b): return enemy_strength(a) < enemy_strength(b) or (enemy_strength(a) == enemy_strength(b) and a < b))
-	var window := maxi(1, ceili(sorted.size() * 0.5))
+	# A janela tem pelo menos 2 (com uma lista de 2, qualquer um): a mesma patrulha não se repete em toda partida.
+	var window := mini(sorted.size(), maxi(2, ceili(sorted.size() * 0.5)))
 	var start := roundi(clampf(progress, 0.0, 1.0) * (sorted.size() - window))
 	return sorted[start + mini(window - 1, floori(random.next() * window))]
 
 
+## Os ajudantes do John e o mestre de cada um: na patrulha de 2, o ajudante vem com o mestre se ele estiver na lista.
+const HELPER_MASTERS := {"pipoco": "recreador", "faisca": "carrasco_industrial", "broto": "enraizado"}
+
+
+## Formação de um encontro (GenerateEnemyTeam): do perfil do nó, da frente para trás.
 ## O perfil de patrulha (encounters.json): o da fase (fase_N) ou, numa casa, o da loja (fase_N_mercearia, _oficina,
 ## _cinema); sem perfil próprio, o node_1_combat de sempre. progress: onde a patrulha está na fase (ver _pick_by_progress).
 static func generate_enemy_team(encounter: String, difficulty: int, node_id: String, random: AHCombatRandom, forced_count: int = 0,
@@ -284,12 +289,17 @@ static func generate_enemy_team(encounter: String, difficulty: int, node_id: Str
 	elif profile != null:
 		var pick := func(pool: Array) -> String:
 			return _pick_by_progress(pool, progress, random)
-		formation.append(pick.call(profile.get("Front", [])))
 		# Na primeira metade da fase, a patrulha de 2 é um da frente com um ajudante (os mais fracos, como o Pipoco e
-		# o Broto); da metade para o fim entra quem ataca de longe.
+		# o Broto), e o ajudante vem com o seu mestre se ele estiver na lista; da metade para o fim entra quem ataca de
+		# longe.
+		var front: Array = profile.get("Front", [])
 		if count == 2 and progress >= 0.0 and progress < 0.5 and not profile.get("Support", []).is_empty():
-			formation.append(pick.call(profile.get("Support", [])))
+			var helper: String = pick.call(profile.get("Support", []))
+			var master: String = HELPER_MASTERS.get(helper, "")
+			formation.append(master if front.has(master) else pick.call(front))
+			formation.append(helper)
 		else:
+			formation.append(pick.call(front))
 			if count == 4:
 				formation.append(pick.call(["cao_eco", "rastejante_raiz"]))
 			formation.append(pick.call(profile.get("Ranged", [])))
@@ -331,6 +341,7 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 	var progress := -1.0
 	if boss:
 		count = 4
+		progress = 1.0
 	elif house:
 		count = mini(3, 1 + (1 if random.next() < 0.5 else 0) + (1 if level >= 6 else 0))
 	else:

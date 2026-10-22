@@ -155,16 +155,35 @@ func _john_villains(t) -> void:
 		t.check(AHCharacterHeights.HEIGHTS.has(enemy_id), "%s tem altura própria" % enemy_id)
 
 
-## A fase fica mais difícil até o guardião (Lucas, 22/10/2026): a primeira patrulha pesa menos que a última, a
-## patrulha forte (3 ou 4) só vem nas duas últimas antes do guardião, e o Robô volta às fases 2 e 5.
+## A fase fica mais difícil até o guardião (Lucas, 22/10/2026). O sorteio por vaga anda do mais fraco para o mais
+## forte; a primeira patrulha é sempre de 2 e a forte (3 a 4) só no fim; as fases têm patrulhas variadas; o Robô volta
+## às fases 2 e 5; o ajudante vem com o mestre quando ele está na lista.
 func _progression(t) -> void:
-	var first_total := 0.0
-	var last_total := 0.0
-	var early_elites := 0
-	var phases := 0
+	# O sorteio direto: com progress 0 só a metade fraca da lista, com 1 só a metade forte.
+	var pool := ["robot", "pipoco", "carrasco_industrial", "broto", "cao_eco", "recreador"]
+	var by_strength := pool.duplicate()
+	by_strength.sort_custom(func(a, b): return R.enemy_strength(a) < R.enemy_strength(b) or (R.enemy_strength(a) == R.enemy_strength(b) and a < b))
+	var weak := by_strength.slice(0, 3)
+	var strong := by_strength.slice(3)
+	var random := AHCombatRandom.new(42)
+	var early := {}
+	var late := {}
+	for i in 200:
+		early[R._pick_by_progress(pool, 0.0, random)] = true
+		late[R._pick_by_progress(pool, 1.0, random)] = true
+	t.check(early.keys().all(func(id): return weak.has(id)) and early.size() > 1, "começo da fase: só os mais fracos %s" % [early.keys()])
+	t.check(late.keys().all(func(id): return strong.has(id)) and late.size() > 1, "fim da fase: só os mais fortes %s" % [late.keys()])
+	# Nas rotas: a força média do da frente sobe da primeira para a última patrulha, em cada fase.
 	var robot := {"fase_2": false, "fase_5": false}
 	for phase_id in ["fase_1", "fase_2", "fase_3", "fase_4", "fase_5"]:
-		for seed_value in 40:
+		var first_sum := 0.0
+		var last_sum := 0.0
+		var first_groups := {}
+		var count := 0
+		var first_sizes := {}
+		var master_pairs := 0
+		var helper_alone := 0
+		for seed_value in 60:
 			var campaign: Dictionary = Campaign.create_initial(seed_value + 1)
 			if not R.start_expedition(campaign, phase_id, seed_value * 104729 + 7):
 				continue
@@ -174,23 +193,28 @@ func _progression(t) -> void:
 			for index in route.steps.size():
 				if route.steps[index].type == "combat":
 					fights.append(R.corridor_enemies(expedition, index))
-			if fights.size() < 2:
+			if fights.size() < 3:
 				continue
-			phases += 1
-			var weight := func(group: Array) -> float:
-				return group.reduce(func(sum, spec): return sum + R.enemy_strength(spec.enemy_id) * spec.max_hp / maxf(1.0, float(GameData.row("enemies", spec.enemy_id).MaxHp)), 0.0)
-			first_total += weight.call(fights[0])
-			last_total += weight.call(fights[-1])
-			for i in fights.size() - 2:
-				if fights[i].size() >= 3 and i < fights.size() - 2 and i == 0:
-					early_elites += 1
+			count += 1
+			first_sum += R.enemy_strength(fights[0][0].enemy_id)
+			last_sum += R.enemy_strength(fights[-1][0].enemy_id)
+			first_sizes[fights[0].size()] = true
+			first_groups[",".join(fights[0].map(func(s): return s.enemy_id))] = true
 			for group in fights:
-				for spec in group:
-					if robot.has(phase_id) and spec.enemy_id == "robot":
-						robot[phase_id] = true
-	t.check(phases > 150, "%d fases medidas" % phases)
-	t.check(last_total > first_total * 1.5, "a última patrulha pesa mais que a primeira (%.0f contra %.0f)" % [last_total, first_total])
-	t.equal(early_elites, 0, "a primeira patrulha nunca é a forte")
+				var ids: Array = group.map(func(s): return s.enemy_id)
+				for helper in R.HELPER_MASTERS:
+					if group.size() == 2 and ids.has(helper):
+						if ids.has(R.HELPER_MASTERS[helper]):
+							master_pairs += 1
+						elif GameData.table("encounters").get(phase_id, {}).get("Front", []).has(R.HELPER_MASTERS[helper]):
+							helper_alone += 1
+				if robot.has(phase_id) and ids.has("robot"):
+					robot[phase_id] = true
+		t.check(count > 30, "%s: %d rotas medidas" % [phase_id, count])
+		t.check(last_sum > first_sum, "%s: a última patrulha tem um da frente mais forte que a primeira (%.0f contra %.0f)" % [phase_id, last_sum, first_sum])
+		t.equal(first_sizes.keys(), [2], "%s: a primeira patrulha é sempre de 2" % phase_id)
+		t.check(first_groups.size() >= 2, "%s: a primeira patrulha varia (%d formações)" % [phase_id, first_groups.size()])
+		t.equal(helper_alone, 0, "%s: o ajudante nunca vem sem o mestre quando ele está na lista" % phase_id)
 	t.check(robot.fase_2 and robot.fase_5, "o Robô volta às patrulhas das fases 2 e 5")
 
 
