@@ -141,8 +141,7 @@ func _researched(t, campaign: Dictionary) -> void:
 	var base: Dictionary = session.data.abilities["gato_corte_fase"].DamageRange
 	t.equal([shown.Min, shown.Max, shown.trained], [int(base.Min) + 1, int(base.Max) + 1, true], "a faixa da tela soma o treino")
 	t.check(session.describe("gato_corte_fase").begins_with("Dano %d–%d (treinado)" % [int(base.Min) + 1, int(base.Max) + 1]),
-		"a descrição mostra a faixa treinada (%s)" % session.describe("gato_corte_fase").split("
-")[0])
+		"a descrição mostra a faixa treinada (%s)" % session.describe("gato_corte_fase").split("\n")[0])
 	t.equal(session.effective_range("cao_punho_sucata", "damage").trained, false, "o que não foi treinado fica como nos dados")
 	copy.researched_skills.append("cao_punho_sucata")
 	t.equal(session.context.researched_skills, ["gato_corte_fase"], "a luta guarda uma cópia (a campanha não muda a luta no meio)")

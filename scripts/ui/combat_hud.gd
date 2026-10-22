@@ -561,15 +561,16 @@ func _pips(caption: String, ranks: Array, hero_side: bool, color: Color) -> HBox
 	return row
 
 
-## O número do cartão e da dica: a faixa de verdade nesta luta (com o treino da Pesquisa, "treinado" ao lado).
+## O número do cartão e da dica: a faixa de verdade nesta luta (com o treino da Pesquisa, uma ★ ao lado; a descrição
+## diz "treinado" por extenso).
 func _number_of(ability_id: String) -> Array:
 	var ability: Dictionary = session.data.abilities[ability_id]
 	if ability.DamageRange.Max > 0:
 		var damage := session.effective_range(ability_id, "damage")
-		return ["%d–%d" % [damage.Min, damage.Max], "dano · treinado" if damage.trained else "dano", GOLD]
+		return ["%d–%d" % [damage.Min, damage.Max], "dano ★" if damage.trained else "dano", GOLD]
 	if ability.HealRange.Max > 0:
 		var heal := session.effective_range(ability_id, "heal")
-		return ["+%d–%d" % [heal.Min, heal.Max], "cura · treinado" if heal.trained else "cura", S.OK]
+		return ["+%d–%d" % [heal.Min, heal.Max], "cura ★" if heal.trained else "cura", S.OK]
 	return ["", "", GOLD]
 
 
