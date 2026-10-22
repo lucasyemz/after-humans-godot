@@ -5,6 +5,9 @@
 class_name AHRefugeHud
 extends Control
 
+## Abrir e fechar um painel (#36).
+const PANEL_OPEN := "res://audio/ui/panel_open.ogg"
+const PANEL_CLOSE := "res://audio/ui/panel_close.ogg"
 const H := preload("res://scripts/ui/combat_hud.gd")
 const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
@@ -669,6 +672,8 @@ func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
 
 func open_room(room_id: String) -> void:
 	_reset_focus()
+	if current == "":
+		Sound.play(PANEL_OPEN)
 	current = room_id
 	if room_id == S.PREPARATION and _draft.is_empty():
 		_reset_draft()
@@ -678,6 +683,8 @@ func open_room(room_id: String) -> void:
 
 func open_service(service: String) -> void:
 	_reset_focus()
+	if current == "":
+		Sound.play(PANEL_OPEN)
 	current = service
 	match service:
 		"report":
@@ -694,6 +701,8 @@ func open_service(service: String) -> void:
 
 
 func close_panel() -> void:
+	if current != "":
+		Sound.play(PANEL_CLOSE)
 	current = ""
 	_panel.visible = false
 	_prep_selected = -1
@@ -801,11 +810,14 @@ func toast(text: String, error: bool = false) -> void:
 
 
 ## Aplica uma ação das regras: "" grava e atualiza; senão mostra o motivo.
-func _act(error: String, success: String = "") -> void:
+func _act(error: String, success: String = "", sound: String = "") -> void:
 	if error != "":
 		toast(error, true)
+		Sound.play("res://audio/ui/deny.ogg")
 		return
 	station.commit()
+	if sound != "":
+		Sound.play(sound)
 	if success != "":
 		toast(success)
 
@@ -1615,7 +1627,7 @@ func _forge(c: Dictionary) -> void:
 	craft.custom_minimum_size = Vector2(0, 48)
 	craft.disabled = scrap < cost
 	H.style_button(craft, U.GOLD)
-	craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), tr("%s pronta. Equipe na Sala dos Personagens.") % tr(relic.DisplayName)))
+	craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), tr("%s pronta. Equipe na Sala dos Personagens.") % tr(relic.DisplayName), "res://audio/ui/forge_confirm.ogg"))
 	box.add_child(craft)
 	if scrap < cost:
 		box.add_child(U.label(tr("Faltam %d %s") % [cost - scrap, "sucata" if cost - scrap == 1 else "sucatas"], 17, U.DANGER))
@@ -1640,7 +1652,7 @@ func _research(c: Dictionary) -> void:
 		var id: String = research_id
 		_text("%s · %s" % [tr(row.DisplayName), tr(row.get("Description", ""))], 18, H.MUTED if done else H.TEXT)
 		_button(tr("Pesquisado") if done else tr("Pesquisar (%d fragmentos)") % int(row.CostFragments),
-			func(): _act(S.research(Campaign.state, id), tr("%s concluída.") % tr(row.DisplayName)), not done and S.quantity(c, "fragments") >= int(row.CostFragments))
+			func(): _act(S.research(Campaign.state, id), tr("%s concluída.") % tr(row.DisplayName), "res://audio/station/research_beep.ogg"), not done and S.quantity(c, "fragments") >= int(row.CostFragments))
 
 
 # ---------------------------------------------------------------- Dormitório: a noite da volta

@@ -42,6 +42,9 @@ const SHAKE_CRIT := 1.4
 const SHAKE_SECONDS := 0.3
 const FLASH_SECONDS := 0.07
 const CRIT_TEXT_SIZE := 88
+## A música abaixa (dB) na crise de instinto e no golpe crítico (#36).
+const CRISIS_DUCK_DB := 9.0
+const CRIT_DUCK_DB := 5.0
 ## Sons das ações dos heróis: classe -> prefixo da deixa (AHCombatAudioRules).
 const HERO_CUES := {"cao": "BentoAction", "gato": "NickAction", "sapo": "IrisAction", "coruja": "VesperaAction"}
 
@@ -419,6 +422,9 @@ func _play_crisis(unit: AHCombat.Unit, text: String) -> void:
 	show_pose(unit, "support" if breakthrough else "hurt")
 	card.flash(Color(1.0, 0.85, 0.35) if breakthrough else Color(0.9, 0.2, 0.25), 0.6)
 	hud.show_crisis(text, breakthrough)
+	# A crise tem o som dela e a música abaixa enquanto ela dura (#36).
+	Sound.play("res://audio/combat/crisis.ogg", 0.9)
+	Sound.duck(CRISIS_DUCK_DB, 1.65 / speed)
 	focus_x = card.position.x
 	var tween := create_tween()
 	tween.tween_property(self, "close_t", 1.0, 0.3 / speed)
@@ -580,6 +586,8 @@ func _show_events(events: Array, contact_x = null) -> void:
 		hud.refresh()
 		if contact_x != null and strongest >= 0.0:
 			_shake(strongest, crit_hit)
+			if crit_hit:
+				Sound.duck(CRIT_DUCK_DB, 0.35 / speed)
 			await _hitstop(HITSTOP_CRIT_SECONDS if crit_hit else HITSTOP_SECONDS)
 		await _wait(0.55)
 

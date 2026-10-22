@@ -1,0 +1,466 @@
+{
+	"targets": {
+		"music": -18.0,
+		"ambience": -26.0,
+		"sfx": -20.0,
+		"ui": -24.0
+	},
+	"files": {
+		"res://audio/ambience/FloodedDepot.ogg": {
+			"category": "ambience",
+			"lufs": -31.0,
+			"gain_db": 5.0,
+			"normalized": true
+		},
+		"res://audio/ambience/RiverDock.ogg": {
+			"category": "ambience",
+			"lufs": -30.5,
+			"gain_db": 4.5,
+			"normalized": true
+		},
+		"res://audio/ambience/RootBridge.ogg": {
+			"category": "ambience",
+			"lufs": -29.1,
+			"gain_db": 3.1,
+			"normalized": true
+		},
+		"res://audio/ambience/SealedShelter.ogg": {
+			"category": "ambience",
+			"lufs": -32.5,
+			"gain_db": 6.5,
+			"normalized": true
+		},
+		"res://audio/ambience/SewerDucts.ogg": {
+			"category": "ambience",
+			"lufs": -30.3,
+			"gain_db": 4.3,
+			"normalized": true
+		},
+		"res://audio/ambience/ShopfrontStreet.ogg": {
+			"category": "ambience",
+			"lufs": -32.2,
+			"gain_db": 6.2,
+			"normalized": true
+		},
+		"res://audio/ambience/TriageGate.ogg": {
+			"category": "ambience",
+			"lufs": -28.9,
+			"gain_db": 2.9,
+			"normalized": true
+		},
+		"res://audio/ambience/rain_indoor.ogg": {
+			"category": "ambience",
+			"lufs": -32.9,
+			"gain_db": 6.9,
+			"normalized": true
+		},
+		"res://audio/ambience/rain_outdoor.ogg": {
+			"category": "ambience",
+			"lufs": -24.1,
+			"gain_db": -1.9,
+			"normalized": true
+		},
+		"res://audio/combat/BentoAction1.mp3": {
+			"category": "sfx",
+			"lufs": -12.3,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/BentoAction2.mp3": {
+			"category": "sfx",
+			"lufs": -14.8,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/BentoAction3.mp3": {
+			"category": "sfx",
+			"lufs": -11.2,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/BentoAction4.mp3": {
+			"category": "sfx",
+			"lufs": -17.7,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/Dodge.mp3": {
+			"category": "sfx",
+			"lufs": -20.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/IrisAction1.wav": {
+			"category": "sfx",
+			"lufs": -12.2,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/IrisAction2.mp3": {
+			"category": "sfx",
+			"lufs": -15.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/IrisAction3.wav": {
+			"category": "sfx",
+			"lufs": -13.6,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/IrisAction4.mp3": {
+			"category": "sfx",
+			"lufs": -8.4,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/NickAction1.mp3": {
+			"category": "sfx",
+			"lufs": -12.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/NickAction2.mp3": {
+			"category": "sfx",
+			"lufs": -12.8,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/NickAction3.mp3": {
+			"category": "sfx",
+			"lufs": -15.7,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/NickAction4.mp3": {
+			"category": "sfx",
+			"lufs": -5.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/RobotDodge.mp3": {
+			"category": "sfx",
+			"lufs": -13.7,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/RobotHeal.wav": {
+			"category": "sfx",
+			"lufs": -10.8,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/RobotPunch.wav": {
+			"category": "sfx",
+			"lufs": -12.4,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/UIClick.wav": {
+			"category": "sfx",
+			"lufs": -22.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/VesperaAction1.wav": {
+			"category": "sfx",
+			"lufs": -10.2,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/VesperaAction2.wav": {
+			"category": "sfx",
+			"lufs": -26.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/VesperaAction3.wav": {
+			"category": "sfx",
+			"lufs": -29.4,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/VesperaAction4.mp3": {
+			"category": "sfx",
+			"lufs": -31.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/crisis.ogg": {
+			"category": "sfx",
+			"lufs": -18.8,
+			"gain_db": -1.2,
+			"normalized": true
+		},
+		"res://audio/music/battle.ogg": {
+			"category": "music",
+			"lufs": -12.8,
+			"gain_db": -5.2,
+			"normalized": true
+		},
+		"res://audio/music/boss.ogg": {
+			"category": "music",
+			"lufs": -6.9,
+			"gain_db": -11.1,
+			"normalized": true
+		},
+		"res://audio/music/explore_1.ogg": {
+			"category": "music",
+			"lufs": -13.5,
+			"gain_db": -4.5,
+			"normalized": true
+		},
+		"res://audio/music/explore_2.ogg": {
+			"category": "music",
+			"lufs": -20.7,
+			"gain_db": 2.7,
+			"normalized": true
+		},
+		"res://audio/music/explore_3.ogg": {
+			"category": "music",
+			"lufs": -26.8,
+			"gain_db": 8.8,
+			"normalized": true
+		},
+		"res://audio/music/explore_root_bridge.ogg": {
+			"category": "music",
+			"lufs": -15.7,
+			"gain_db": -2.3,
+			"normalized": true
+		},
+		"res://audio/station/bar_fan_loop.ogg": {
+			"category": "ambience",
+			"lufs": -26.8,
+			"gain_db": 0.8,
+			"normalized": true
+		},
+		"res://audio/station/depot_tube_flicker.ogg": {
+			"category": "sfx",
+			"lufs": -25.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/station/depot_tube_loop.ogg": {
+			"category": "ambience",
+			"lufs": -27.7,
+			"gain_db": 1.7,
+			"normalized": true
+		},
+		"res://audio/station/hum_loop.ogg": {
+			"category": "ambience",
+			"lufs": -28.3,
+			"gain_db": 2.3,
+			"normalized": true
+		},
+		"res://audio/station/research_beep.ogg": {
+			"category": "sfx",
+			"lufs": -22.7,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/station/train_arrival.ogg": {
+			"category": "sfx",
+			"lufs": -21.1,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/station/train_bell.ogg": {
+			"category": "sfx",
+			"lufs": -17.3,
+			"gain_db": -2.7,
+			"normalized": true
+		},
+		"res://audio/station/train_brake.ogg": {
+			"category": "sfx",
+			"lufs": -16.0,
+			"gain_db": -4.0,
+			"normalized": true
+		},
+		"res://audio/station/train_departure.ogg": {
+			"category": "sfx",
+			"lufs": -20.3,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/ui/bag_open.ogg": {
+			"category": "ui",
+			"lufs": -20.2,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/ui/click.ogg": {
+			"category": "ui",
+			"lufs": -22.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/ui/confirm.ogg": {
+			"category": "ui",
+			"lufs": -14.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/ui/defeat.ogg": {
+			"category": "ui",
+			"lufs": -12.5,
+			"gain_db": -11.5,
+			"normalized": true
+		},
+		"res://audio/ui/deny.ogg": {
+			"category": "ui",
+			"lufs": -11.8,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/ui/forge_confirm.ogg": {
+			"category": "ui",
+			"lufs": -22.3,
+			"gain_db": -1.7,
+			"normalized": true
+		},
+		"res://audio/ui/panel_close.ogg": {
+			"category": "ui",
+			"lufs": -17.1,
+			"gain_db": -6.9,
+			"normalized": true
+		},
+		"res://audio/ui/panel_open.ogg": {
+			"category": "ui",
+			"lufs": -16.4,
+			"gain_db": -7.6,
+			"normalized": true
+		},
+		"res://audio/ui/victory.ogg": {
+			"category": "ui",
+			"lufs": -14.8,
+			"gain_db": -9.2,
+			"normalized": true
+		},
+		"res://audio/world/door_close.ogg": {
+			"category": "sfx",
+			"lufs": -10.3,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/door_open.ogg": {
+			"category": "sfx",
+			"lufs": -14.4,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/find_coins.ogg": {
+			"category": "sfx",
+			"lufs": -20.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/find_rare.ogg": {
+			"category": "sfx",
+			"lufs": -16.3,
+			"gain_db": -3.7,
+			"normalized": true
+		},
+		"res://audio/world/footstep_concrete_1.ogg": {
+			"category": "sfx",
+			"lufs": -19.1,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_concrete_2.ogg": {
+			"category": "sfx",
+			"lufs": -20.6,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_concrete_3.ogg": {
+			"category": "sfx",
+			"lufs": -22.1,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_concrete_4.ogg": {
+			"category": "sfx",
+			"lufs": -19.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_concrete_5.ogg": {
+			"category": "sfx",
+			"lufs": -20.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_water_1.ogg": {
+			"category": "sfx",
+			"lufs": -22.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_water_2.ogg": {
+			"category": "sfx",
+			"lufs": -21.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_water_3.ogg": {
+			"category": "sfx",
+			"lufs": -21.1,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_water_4.ogg": {
+			"category": "sfx",
+			"lufs": -21.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_wood_1.ogg": {
+			"category": "sfx",
+			"lufs": -20.6,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_wood_2.ogg": {
+			"category": "sfx",
+			"lufs": -19.6,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_wood_3.ogg": {
+			"category": "sfx",
+			"lufs": -19.3,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_wood_4.ogg": {
+			"category": "sfx",
+			"lufs": -21.4,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/footstep_wood_5.ogg": {
+			"category": "sfx",
+			"lufs": -19.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/prop_open.ogg": {
+			"category": "sfx",
+			"lufs": -28.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/search_cloth_1.ogg": {
+			"category": "sfx",
+			"lufs": -22.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/world/search_cloth_2.ogg": {
+			"category": "sfx",
+			"lufs": -28.6,
+			"gain_db": 0.0,
+			"normalized": false
+		}
+	}
+}

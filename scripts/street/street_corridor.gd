@@ -896,6 +896,9 @@ func _show_gains(before: Dictionary) -> void:
 		if delta > 0:
 			gains.append([spec[1], "+%d %s" % [delta, spec[2] if delta == 1 else spec[3]]])
 	hud.loot_burst(gains, street._leader.global_position + Vector3(0, 1.9, 0))
+	# O achado raro (fragmento ou ferramenta) tem o brilho dele por cima do som da busca (#36).
+	if after.fragments > before.fragments or after.tools > before.tools:
+		Sound.play("res://audio/world/find_rare.ogg")
 
 
 ## O som da busca (como na Unreal): moedas quando ela cumpriu o objetivo da rota, o clique de metal num prop que abre,

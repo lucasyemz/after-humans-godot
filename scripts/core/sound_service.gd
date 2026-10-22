@@ -2,12 +2,21 @@
 ## da cena (port do UAHSoundscapeSubsystem e do FAHAudio). A cena atual diz o que quer tocar por soundscape(), que
 ## devolve {music, music_gain, ambience, ambience_gain, rain, rain_gain} (caminhos em res://audio, "" = nada); a troca
 ## faz um crossfade de 1,5 s. Os efeitos soltos passam por play() e os passos por footstep().
+##
+## Mixagem (#36): um barramento por tipo (Music, Ambience, SFX e UI, que segue o volume de efeitos das opções); cada
+## arquivo tem o ganho da tabela data/presentation/audio_mix.json (tools/measure_audio.py: a música e os ambientes
+## levados ao mesmo volume em LUFS), por baixo do ganho de cada cena; e a música abaixa (duck) na crise de instinto e no
+## golpe crítico.
 extends Node
 
 const FADE_SECONDS := 1.5
-const BUSES := ["Music", "Ambience", "SFX"]
-## O volume de cada canal fica nas opções da campanha (FAHCampaignSettings: 0,6 por padrão).
-const SETTING_OF := {"Music": "music_volume", "Ambience": "ambience_volume", "SFX": "sfx_volume"}
+const BUSES := ["Music", "Ambience", "SFX", "UI"]
+## O volume de cada canal fica nas opções da campanha (FAHCampaignSettings: 0,6 por padrão); a interface segue o de
+## efeitos (as Opções têm três controles).
+const SETTING_OF := {"Music": "music_volume", "Ambience": "ambience_volume", "SFX": "sfx_volume", "UI": "sfx_volume"}
+const MIX := "res://data/presentation/audio_mix.json"
+## Os passos de cada classe (altura e volume): o Bento pesado, o Nick leve.
+const HERO_STEPS := {"cao": [0.88, 0.85], "gato": [1.12, 0.5], "sapo": [1.0, 0.65], "coruja": [1.05, 0.6]}
 const FOOTSTEP_VARIANTS := {"water": 4, "wood": 5, "concrete": 5}
 
 ## Música, ambiente e chuva: um par de players por canal (o que sai e o que entra).
@@ -16,6 +25,14 @@ var _effects: Array[AudioStreamPlayer] = []
 var _next_effect := 0
 var _refresh := 0.0
 var _streams := {}
+## O ganho de cada arquivo da tabela de mixagem (dB).
+var _mix := {}
+## Quanto a música está abaixada agora (dB, 0 = nada) e o tween que a leva e traz.
+var duck_db := 0.0:
+	set(value):
+		duck_db = value
+		_apply_bus("Music")
+var _duck_tween: Tween
 
 
 func _ready() -> void:
@@ -40,18 +57,45 @@ func _ready() -> void:
 		player.bus = "SFX"
 		add_child(player)
 		_effects.append(player)
+	var table = JSON.parse_string(FileAccess.get_file_as_string(MIX)) if FileAccess.file_exists(MIX) else null
+	if typeof(table) == TYPE_DICTIONARY:
+		for path in table.get("files", {}):
+			_mix[path] = float(table.files[path].get("gain_db", 0.0))
 	Campaign.changed.connect(apply_volumes)
 	apply_volumes()
 
 
 ## Os volumes das opções (0 a 1) nos canais.
 func apply_volumes() -> void:
-	var settings: Dictionary = Campaign.state.get("settings", {})
 	for bus in BUSES:
-		var value := clampf(float(settings.get(SETTING_OF[bus], 0.6)), 0.0, 1.0)
-		var index := AudioServer.get_bus_index(bus)
-		AudioServer.set_bus_mute(index, value <= 0.001)
-		AudioServer.set_bus_volume_db(index, linear_to_db(maxf(value, 0.001)))
+		_apply_bus(bus)
+
+
+func _apply_bus(bus: String) -> void:
+	var settings: Dictionary = Campaign.state.get("settings", {}) if Campaign else {}
+	var value := clampf(float(settings.get(SETTING_OF[bus], 0.6)), 0.0, 1.0)
+	var index := AudioServer.get_bus_index(bus)
+	if index < 0:
+		return
+	AudioServer.set_bus_mute(index, value <= 0.001)
+	AudioServer.set_bus_volume_db(index, linear_to_db(maxf(value, 0.001)) + (duck_db if bus == "Music" else 0.0))
+
+
+## O ganho do arquivo na tabela de mixagem (dB; 0 fora dela).
+func mix_db(path: String) -> float:
+	return _mix.get(path, 0.0)
+
+
+## Abaixa a música amount_db por hold segundos (a crise, o crítico) e volta devagar; o mais forte vale.
+func duck(amount_db: float, hold: float) -> void:
+	if -amount_db > duck_db and _duck_tween != null and _duck_tween.is_running():
+		return
+	if _duck_tween:
+		_duck_tween.kill()
+	_duck_tween = create_tween()
+	_duck_tween.tween_property(self, "duck_db", -absf(amount_db), 0.12)
+	_duck_tween.tween_interval(hold)
+	_duck_tween.tween_property(self, "duck_db", 0.0, 0.8)
 
 
 func _process(delta: float) -> void:
@@ -74,7 +118,7 @@ func _switch(index: int, path: String, gain: float) -> void:
 	if channel.path == path:
 		if path != "" and not is_equal_approx(channel.gain, gain):
 			channel.gain = gain
-			_fade(channel, current, linear_to_db(maxf(gain, 0.001)), 0.4)
+			_fade(channel, current, linear_to_db(maxf(gain, 0.001)) + mix_db(path), 0.4)
 		return
 	var old := current
 	channel.path = path
@@ -93,7 +137,7 @@ func _switch(index: int, path: String, gain: float) -> void:
 	fresh.stream = _loop(path)
 	fresh.volume_db = -60.0
 	fresh.play()
-	tween.tween_property(fresh, "volume_db", linear_to_db(maxf(gain, 0.001)), FADE_SECONDS)
+	tween.tween_property(fresh, "volume_db", linear_to_db(maxf(gain, 0.001)) + mix_db(path), FADE_SECONDS)
 
 
 func _fade(channel: Dictionary, player: AudioStreamPlayer, db: float, seconds: float) -> void:
@@ -115,7 +159,8 @@ func _loop(path: String) -> AudioStream:
 	return _streams[path]
 
 
-## Um efeito solto no canal de efeitos (ou outro), com ganho e altura.
+## Um efeito solto no canal de efeitos (ou outro), com ganho e altura. Os sons de audio/ui vão para o canal da
+## interface.
 func play(path: String, gain: float = 1.0, pitch: float = 1.0, bus: String = "SFX") -> void:
 	var stream: AudioStream = load(path)
 	if stream == null:
@@ -123,16 +168,18 @@ func play(path: String, gain: float = 1.0, pitch: float = 1.0, bus: String = "SF
 	var player := _effects[_next_effect]
 	_next_effect = (_next_effect + 1) % _effects.size()
 	player.stream = stream
-	player.bus = bus
-	player.volume_db = linear_to_db(maxf(gain, 0.001))
+	player.bus = "UI" if bus == "SFX" and path.begins_with("res://audio/ui/") else bus
+	player.volume_db = linear_to_db(maxf(gain, 0.001)) + mix_db(path)
 	player.pitch_scale = pitch
 	player.play()
 
 
-## Um passo no piso do lugar (FAHAudio::Footstep): variação ao acaso, 70% e altura de 0,94 a 1,06.
-func footstep(surface: String) -> void:
+## Um passo no piso do lugar (FAHAudio::Footstep): variação ao acaso, altura de 0,94 a 1,06 vezes a do herói que anda
+## (HERO_STEPS) e o volume dele (70% sem herói).
+func footstep(surface: String, class_id: String = "") -> void:
 	var variants: int = FOOTSTEP_VARIANTS.get(surface, 5)
-	play("res://audio/world/footstep_%s_%d.ogg" % [surface, randi_range(1, variants)], 0.7, randf_range(0.94, 1.06))
+	var step: Array = HERO_STEPS.get(class_id, [1.0, 0.7])
+	play("res://audio/world/footstep_%s_%d.ogg" % [surface, randi_range(1, variants)], step[1], step[0] * randf_range(0.94, 1.06))
 
 
 func click() -> void:

@@ -583,11 +583,15 @@ func modal_open() -> bool:
 func close_modal() -> void:
 	if modal_open():
 		_modal.queue_free()
+		Sound.play("res://audio/ui/panel_close.ogg")
 	_modal = null
 
 
 func _open_modal(width: float) -> VBoxContainer:
-	close_modal()
+	if modal_open():
+		_modal.queue_free()
+	else:
+		Sound.play("res://audio/ui/panel_open.ogg")
 	_modal = PanelContainer.new()
 	_modal.add_theme_stylebox_override("panel", H.panel_style(0.95))
 	_modal.custom_minimum_size = Vector2(width, 0)

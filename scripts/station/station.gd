@@ -46,6 +46,8 @@ const LINE_Z := -6.4
 const TRAIN_SLIDE_END := 3.2
 const TRAIN_DOOR_END := 4.0
 const TRAIN_OUT := -32.0
+## Quanto antes de parar o freio começa (s).
+const BRAKE_LEAD := 1.6
 ## A faixa da tela que o HUD deixa livre (na base de 1920): à direita do menu e, com um painel aberto, à esquerda dele.
 const SCREEN_MENU_RIGHT := 380.0
 const SCREEN_PANEL_LEFT := 1200.0
@@ -526,6 +528,8 @@ func play_train_arrival(candidate_id: String) -> void:
 ## Fecha e acelera para o túnel; fica fora até a próxima chegada. Recusado, o candidato vai junto (PlayTrainDeparture).
 func play_train_departure(candidate_leaves: bool) -> void:
 	Sound.play("res://audio/station/train_departure.ogg", 0.9)
+	# O sino avisa que as portas fecham (#36).
+	Sound.play("res://audio/station/train_bell.ogg", 0.7)
 	_warning_time = -1.0
 	if candidate_leaves:
 		_remove_candidate()
@@ -550,7 +554,7 @@ func _build_sound_loops() -> void:
 		stream.loop = true
 		player.stream = stream
 		player.bus = "Ambience"
-		player.volume_db = spec[2]
+		player.volume_db = spec[2] + Sound.mix_db(spec[1])
 		player.unit_size = 9.0
 		player.max_distance = 60.0
 		player.position = Vector3((room.x0 + room.x1) * 0.5, room.ceiling - 0.4, LANE_Z)
@@ -618,6 +622,11 @@ func _tick_train(delta: float) -> void:
 		if _train_time >= 3.75:
 			_train_mode = 0
 		return
+	# O freio no fim da chegada e o sino quando o trem para (#36).
+	if before < TRAIN_SLIDE_END - BRAKE_LEAD and _train_time >= TRAIN_SLIDE_END - BRAKE_LEAD:
+		Sound.play("res://audio/station/train_brake.ogg", 0.8)
+	if before < TRAIN_SLIDE_END and _train_time >= TRAIN_SLIDE_END:
+		Sound.play("res://audio/station/train_bell.ogg", 0.8)
 	if _train_time >= TRAIN_SLIDE_END:
 		_warning_time = -1.0
 	var slide := clampf(_train_time / TRAIN_SLIDE_END, 0.0, 1.0)

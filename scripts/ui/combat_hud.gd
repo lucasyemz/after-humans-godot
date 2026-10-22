@@ -1129,6 +1129,10 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Mostra o fim da luta e espera "Continuar" (no modo automático, segue sozinho).
 func show_result(result: String, automatic: bool) -> void:
 	_panel.visible = false
+	# A vitória e a derrota têm o toque delas (#36); a fuga, não.
+	if result == "victory" or result == "defeat":
+		Sound.play("res://audio/ui/%s.ogg" % result)
+		Sound.duck(9.0, 1.6)
 	_message.text = ""
 	_clear_markers()
 	for child in _result.get_children():

@@ -919,7 +919,9 @@ func _physics_process(delta: float) -> void:
 		_step_distance += moved
 		if _step_distance >= 0.75:
 			_step_distance = 0.0
-			Sound.footstep("concrete" if _indoor or scenario == null else Sound.surface_of(scenario.map_name))
+			# O passo de quem vai na frente (#36: cada herói pisa de um jeito).
+			var leader = Campaign.hero(party_ids[0]) if not party_ids.is_empty() else null
+			Sound.footstep("concrete" if _indoor or scenario == null else Sound.surface_of(scenario.map_name), leader.class_id if leader else "")
 	else:
 		_step_distance = 0.37
 	if _trail.is_empty() or _leader.position.distance_to(_trail[0]) > 0.05:

@@ -62,7 +62,9 @@ tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas 
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
                   precisa do Pillow), unreal_export_scenarios.py (roda na Unreal e exporta os cenários para
                   build/unreal-export) e sync_scenarios.py (converte a exportação), sync_audio.py (trilha e sons, precisa
-                  do soundfile), capture_scenarios.gd e capture_scenario_fight.gd (QA dos cenários), capture_impact.gd (gravação de um golpe) e define_input.gd (grava as ações)
+                  do soundfile), capture_scenarios.gd e capture_scenario_fight.gd (QA dos cenários),
+                  capture_impact.gd (gravação de um golpe), synth_sounds.py e measure_audio.py (os sons gerados e
+                  a tabela de mixagem em LUFS), i18n_update.gd (o PO da tradução) e define_input.gd (grava as ações)
 ```
 
 `build/` e `.godot/` são gerados e ficam fora do Git.
@@ -186,6 +188,21 @@ No PR, o job **Leveza do PR** (`tools/ci_size_check.sh`) avisa, sem falhar, em d
 
 Para conferir antes de abrir o PR: `bash tools/ci_size_check.sh origin/main HEAD`. Ao trocar de versão da Godot, mude
 `GODOT_VERSION`, `GODOT_ZIP` e `GODOT_SHA512` no workflow (a soma está em `SHA512-SUMS.txt` da release).
+
+## Créditos de áudio
+
+A tabela do que toca em cada momento e a mixagem estão em [docs/audio.md](docs/audio.md).
+
+- **Kenney** ([kenney.nl](https://kenney.nl), CC0): portas, busca e moedas (`rpg-audio`) e passos de concreto e madeira (`impact-sounds`).
+- **OpenGameArt.org:** as trilhas da exploração, da Estação, da luta e do chefe, escolhidas pelo Lucas em 20/10/2026. As
+  páginas de origem estão em `tools/sync_audio.py`: `tragic-ambient-main-menu`, `soundscape-dust`, `contemplation`,
+  `soundscape-find-nothing`, `determined-pursuit` e `boss-battle`. O autor e a licença de cada uma estão na página
+  dela; falta trazê-los para cá (pendência da #36).
+- **Feitos no projeto:**
+  - os sons da interface, da Estação, dos ambientes e da chuva, e os passos na água (`SourceArt/Audio/Synth` da Unreal);
+  - os sons de `tools/synth_sounds.py`: sino e freio do trem, painéis, Forja, achado raro, vitória, derrota e crise.
+    São gerados por síntese e são de domínio público (CC0).
+- **Combate:** as ações dos heróis e dos robôs vêm da referência Unreal, por `tools/sync_combat_art.py`.
 
 ## Referência Unreal
 
