@@ -69,7 +69,7 @@ func _ready() -> void:
 			Campaign.state.settings.battle_speed = value
 			_save()
 			_rebuild())
-	_toggle("Reduzir efeitos do ambiente (relâmpagos e poeira)", bool(settings.get("reduced_environment_effects", false)), func(on):
+	_toggle("Reduzir efeitos (clima, tremor e clarão)", bool(settings.get("reduced_environment_effects", false)), func(on):
 		Campaign.state.settings.reduced_environment_effects = on
 		_save()
 		Settings.changed.emit())

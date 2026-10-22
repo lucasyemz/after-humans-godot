@@ -700,6 +700,11 @@ func _update_camera(delta: float) -> void:
 		distance = view.y
 		target = Vector3(view.x, floor_y + combat_lift + COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch),
 			(lane_z - 1.35) if scenario else -0.9)
+	# O tremor do acerto (#33): desloca a vista sem mover a câmera (a suavização não o arrasta), em pixels da tela.
+	var shake: Vector2 = _arena.camera_shake() if _arena != null and _arena.active else Vector2.ZERO
+	var meters_per_pixel := 2.0 * tan(deg_to_rad(_camera.fov * 0.5)) * distance / 1080.0
+	_camera.h_offset = shake.x * meters_per_pixel
+	_camera.v_offset = shake.y * meters_per_pixel
 	var wanted := target + Vector3(0, sin(pitch) * distance, cos(pitch) * distance)
 	_camera.position = wanted if delta == 0.0 else _camera.position.lerp(wanted, 1.0 - exp(-3.0 * delta))
 	_camera.look_at(Vector3(_camera.position.x, target.y, target.z))

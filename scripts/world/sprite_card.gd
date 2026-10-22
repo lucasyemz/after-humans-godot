@@ -101,12 +101,15 @@ func _layout() -> void:
 
 
 ## Pisca numa cor (dano vermelho, cura verde) e volta.
-func flash(color: Color, seconds: float = 0.35) -> void:
+## Pisca na cor e apaga em seconds; com white_seconds, começa com um clarão branco que vira a cor (o acerto, #33).
+func flash(color: Color, seconds: float = 0.35, white_seconds: float = 0.0) -> void:
 	if _flash_tween:
 		_flash_tween.kill()
-	_material.emission = color
+	_material.emission = Color.WHITE if white_seconds > 0.0 else color
 	_material.emission_energy_multiplier = 0.7
 	_flash_tween = create_tween()
+	if white_seconds > 0.0:
+		_flash_tween.tween_property(_material, "emission", color, white_seconds)
 	_flash_tween.tween_property(_material, "emission", Color.BLACK, seconds)
 
 

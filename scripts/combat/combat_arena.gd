@@ -29,6 +29,19 @@ const CLOSE_DISTANCE := 0.86
 const FRAME_MARGIN := 0.84
 ## Quem age passa na frente dos outros (BringAttackerToFront): um pouco mais perto da câmera.
 const FRONT_LIFT := 0.35
+## Impacto do acerto (#33): a pausa curta (o tempo quase para; mais longa no crítico), o tremor da câmera em pixels da
+## tela de 1080 (pelo dano em relação à vida do alvo; o crítico treme mais), quanto ele dura e o clarão branco no alvo
+## antes da cor do dano. O número do crítico sai maior. Tudo se divide pela velocidade da luta; o tremor e o clarão
+## saem com "Reduzir efeitos" e o modo automático (QA e captura) pula a pausa.
+const HITSTOP_SECONDS := 0.07
+const HITSTOP_CRIT_SECONDS := 0.09
+const HITSTOP_TIME_SCALE := 0.03
+const SHAKE_MIN_PIXELS := 4.0
+const SHAKE_MAX_PIXELS := 14.0
+const SHAKE_CRIT := 1.4
+const SHAKE_SECONDS := 0.3
+const FLASH_SECONDS := 0.07
+const CRIT_TEXT_SIZE := 88
 ## Sons das ações dos heróis: classe -> prefixo da deixa (AHCombatAudioRules).
 const HERO_CUES := {"cao": "BentoAction", "gato": "NickAction", "sapo": "IrisAction", "coruja": "VesperaAction"}
 
@@ -49,6 +62,22 @@ var close_t := 0.0
 var _street: Node3D
 var _audio: Array[AudioStreamPlayer] = []
 var _audio_next := 0
+## O tremor da câmera: a força em pixels, o tempo que falta (s, já na velocidade da luta) e a fase do balanço.
+var _shake_pixels := 0.0
+var _shake_left := 0.0
+var _shake_time := 0.0
+## A escala de tempo de antes da pausa do acerto (para devolver), ou -1 fora dela.
+var _hitstop_scale := -1.0
+
+
+func _process(delta: float) -> void:
+	if _shake_left > 0.0:
+		_shake_left = maxf(0.0, _shake_left - delta * speed)
+		_shake_time += delta * speed
+
+
+func _exit_tree() -> void:
+	_end_hitstop()
 
 
 func setup(street: Node3D) -> void:
@@ -497,9 +526,15 @@ func _event_targets(events: Array) -> Array:
 	return ids
 
 
-## Números e reações de cada evento, no alvo.
+## Números e reações de cada evento, no alvo. Num golpe (contact_x), o acerto mais forte dá a pausa e o tremor.
 func _show_events(events: Array, contact_x = null) -> void:
 	var stagger := {}
+	var crits := {}
+	for event in events:
+		if event.type == AHCombat.EventType.CRIT:
+			crits[event.target_unit_id] = true
+	var strongest := -1.0
+	var crit_hit := false
 	for event in events:
 		var unit := session.state.find_unit(event.target_unit_id)
 		var card: AHSpriteCard = cards.get(event.target_unit_id)
@@ -509,11 +544,14 @@ func _show_events(events: Array, contact_x = null) -> void:
 		stagger[unit.id] = lift + 0.32
 		match event.type:
 			AHCombat.EventType.DAMAGE:
-				_float_text(card, event.text, Color(1.0, 0.35, 0.3), 1.0 + lift, 64)
-				card.flash(Color(1.0, 0.15, 0.1))
-				if unit.hp > 0:
-					show_pose(unit, "hurt")
-				_recoil(card, contact_x, 0.11)
+				var crit: bool = crits.has(unit.id)
+				_float_text(card, event.text, Color(1.0, 0.55, 0.2) if crit else Color(1.0, 0.35, 0.3), 1.0 + lift, CRIT_TEXT_SIZE if crit else 64)
+				card.flash(Color(1.0, 0.15, 0.1), 0.35 / speed, 0.0 if reduced_effects() else FLASH_SECONDS / speed)
+				# Quem cai também sente o golpe (a dor e um empurrão maior) antes da pose de queda, no _settle.
+				show_pose(unit, "hurt")
+				_recoil(card, contact_x, 0.11 if unit.hp > 0 else 0.17)
+				strongest = maxf(strongest, float(event.amount) / maxf(1.0, float(unit.max_hp)) + (1.0 if unit.hp <= 0 else 0.0))
+				crit_hit = crit_hit or crit
 			AHCombat.EventType.HEAL:
 				_float_text(card, event.text, Color(0.45, 1.0, 0.55), 1.0 + lift, 56)
 				card.flash(Color(0.2, 0.9, 0.3))
@@ -539,7 +577,50 @@ func _show_events(events: Array, contact_x = null) -> void:
 				_float_text(card, event.text, Color(0.95, 0.92, 0.85), 0.9 + lift, 38)
 	if not events.is_empty():
 		hud.refresh()
+		if contact_x != null and strongest >= 0.0:
+			_shake(strongest, crit_hit)
+			await _hitstop(HITSTOP_CRIT_SECONDS if crit_hit else HITSTOP_SECONDS)
 		await _wait(0.55)
+
+
+func reduced_effects() -> bool:
+	return bool(Campaign.state.get("settings", {}).get("reduced_environment_effects", false))
+
+
+## O tremor do acerto: de SHAKE_MIN a SHAKE_MAX pixels conforme o dano tira da vida do alvo (meia vida ou a queda dão o
+## máximo), mais forte no crítico.
+func _shake(strength: float, crit: bool) -> void:
+	if reduced_effects():
+		return
+	_shake_pixels = minf(lerpf(SHAKE_MIN_PIXELS, SHAKE_MAX_PIXELS, clampf(strength * 2.0, 0.0, 1.0)) * (SHAKE_CRIT if crit else 1.0),
+		SHAKE_MAX_PIXELS * SHAKE_CRIT)
+	_shake_left = SHAKE_SECONDS
+	_shake_time = 0.0
+
+
+## O deslocamento da câmera agora, em pixels da tela de 1080 (a rua converte para a distância da câmera).
+func camera_shake() -> Vector2:
+	if _shake_left <= 0.0 or reduced_effects():
+		return Vector2.ZERO
+	var fade := _shake_left / SHAKE_SECONDS
+	var amplitude := _shake_pixels * fade * fade
+	return Vector2(sin(_shake_time * 71.0), sin(_shake_time * 97.0 + 1.3)) * amplitude
+
+
+## A pausa do acerto: o tempo quase para (os números, o empurrão e o clarão congelam) e volta.
+func _hitstop(seconds: float) -> void:
+	if auto_battle or _hitstop_scale >= 0.0:
+		return
+	_hitstop_scale = Engine.time_scale
+	Engine.time_scale = _hitstop_scale * HITSTOP_TIME_SCALE
+	await get_tree().create_timer(seconds / speed, true, false, true).timeout
+	_end_hitstop()
+
+
+func _end_hitstop() -> void:
+	if _hitstop_scale >= 0.0:
+		Engine.time_scale = _hitstop_scale
+		_hitstop_scale = -1.0
 
 
 ## Depois do lance: mortos caem (inimigos somem), todos voltam à pose de descanso e às posições.
