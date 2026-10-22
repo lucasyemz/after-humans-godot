@@ -30,8 +30,9 @@ const RELIC_ORDER := ["botao_cobre", "pena_vidro", "pena_vidro", "botao_cobre"]
 const TRAINING_ORDER := ["res_cao_punho_sucata", "res_gato_corte_fase", "res_sapo_carga_voltaica", "res_coruja_recurso_emergencia"]
 ## O progresso suposto ao entrar em cada fase sem repetir fases: [relíquias, treinos]. Pela economia: começa com 0 de
 ## sucata e de fragmento; cada fase vencida rende 3 sucatas e 1 fragmento do guardião, mais umas 2 a 4 sucatas das
-## buscas. A Forja (4) e as relíquias (3 cada) cabem a partir da fase 2; a Pesquisa (3 sucatas e 2 fragmentos) mais um
-## treino (3 fragmentos) só antes da fase 5. Para o Lucas ajustar; quem repete fases chega mais perto de max.
+## buscas (mais o foco Peças e o desconto do Otto). A Forja (4) e as relíquias (3 cada) cabem a partir da fase 2. Os
+## guardiões dão só 4 fragmentos até a fase 5; a Pesquisa (2) mais um treino (3) pedem o quinto, da Cora (+1 por volta
+## com a Pesquisa ligada) ou do evento que dá fragmento. Para o Lucas ajustar; quem repete fases chega mais perto de max.
 const GEAR_TYPICAL := {"fase_1": [0, 0], "fase_2": [1, 0], "fase_3": [2, 0], "fase_4": [3, 0], "fase_5": [4, 1]}
 const OPTIONS := ["base", "hp25", "dmg1", "more", "lesscare"]
 ## O mais ferido recebe cuidado enquanto estiver abaixo desta fração da vida.
