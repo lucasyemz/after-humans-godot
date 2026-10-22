@@ -23,12 +23,13 @@ func run(context) -> void:
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-full-journey-%d" % Time.get_ticks_usec()
+	var real_scale := Engine.time_scale
 	Engine.time_scale = TIME_SCALE
 	# As lutas e as buscas sorteiam pelo randi() global: com a semente fixa, a jornada sai sempre igual.
 	seed(SEED)
 	await _play()
 	randomize()
-	Engine.time_scale = 1.0
+	Engine.time_scale = real_scale
 	_release_all()
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
@@ -51,7 +52,7 @@ func _play() -> void:
 	if not await _night():
 		return
 	await _train()
-	_final_checks()
+	await _final_checks()
 
 
 # ---------------------------------------------------------------- Estação → partida
@@ -78,6 +79,15 @@ func _station_to_departure() -> bool:
 		return false
 	t.equal(hud._draft.get("phase", ""), "fase_1", "a Preparação vem com a fase do mapa")
 	t.equal(hud._draft.get("team", []).size(), 4, "a Preparação escala os quatro fundadores")
+	# Escolher no mapa volta ao mapa; Preparar expedição de novo volta à mesma Preparação.
+	if not await _press(hud, "Escolher no mapa", "Escolher no mapa na Preparação"):
+		return false
+	t.check(map.visible, "Escolher no mapa abre o mapa de fases")
+	if not await _press(map, "Preparar expedição", "Preparar expedição de novo no mapa"):
+		return false
+	if not await _until(func(): return not map.visible and hud.current == S.PREPARATION and hud._prep != null and hud._prep.visible, "voltar à Preparação"):
+		return false
+	t.equal(hud._draft.get("phase", ""), "fase_1", "a Preparação continua com a fase 1")
 	if not await _press(hud, "Partir", "o botão Partir da Preparação"):
 		return false
 	if not await _until(func(): return _street() != null and _street().corridor != null and not GameFlow.busy, "a rua abrir depois da partida"):
@@ -86,7 +96,8 @@ func _station_to_departure() -> bool:
 	t.check(expedition != null and expedition.phase_id == "fase_1", "a expedição da fase 1 começou")
 	t.equal(expedition.team.size() if expedition != null else 0, 4, "a equipe da expedição tem os quatro")
 	t.equal(_street().party_ids.size(), 4, "os quatro andam na rua")
-	t.check(Campaign.read_file(Campaign.primary_path()) != null, "a partida ficou gravada")
+	var saved = Campaign.read_file(Campaign.primary_path())
+	t.check(saved != null and saved.session.expedition != null and saved.session.expedition.phase_id == "fase_1", "a partida ficou gravada")
 	return expedition != null
 
 
@@ -110,11 +121,11 @@ func _journey() -> bool:
 			if not await _answer_modal(street):
 				return false
 			continue
-		# Vasculha os caixotes do primeiro trecho de suprimentos já alcançado (anda até eles e aperta Interagir).
-		if not searched and route.steps.any(func(s): return s.type == "combat" and s.resolved):
-			searched = await _search_crates(street, route)
-			if not searched:
+		# Os primeiros caixotes já alcançados (atrás da equipe ou no trecho dela): anda até eles e aperta Interagir.
+		if not searched and _crates_behind(street, route) >= 0:
+			if not await _search_crates(street, route, _crates_behind(street, route)):
 				return false
+			searched = true
 			continue
 		street.corridor.debug_next_fight()
 		await _frames(2)
@@ -125,7 +136,8 @@ func _journey() -> bool:
 	var fought: int = route.steps.filter(func(s): return (s.type == "combat" or s.type == "boss") and s.resolved).size()
 	t.equal(fought, 5, "a jornada venceu as 4 patrulhas e o guardião")
 	t.check(route.steps[9].resolved, "o guardião (trecho 10) ficou vencido")
-	t.check(searched, "a equipe vasculhou os caixotes no caminho")
+	if not t.check(searched, "a equipe vasculhou os caixotes no caminho (nenhum caixote alcançado até o guardião)"):
+		return false
 	var saved = Campaign.read_file(Campaign.primary_path())
 	t.check(saved != null and saved.session.expedition.objective_completed, "o guardião vencido ficou gravado")
 	return true
@@ -170,17 +182,20 @@ func _auto_fight(street) -> bool:
 	return true
 
 
-func _search_crates(street, route: Dictionary) -> bool:
-	var corridor: AHStreetCorridor = street.corridor
-	var index := -1
-	for key in corridor.props:
+## Os caixotes de um trecho já alcançado e ainda não vasculhados (-1 se não há).
+func _crates_behind(street, route: Dictionary) -> int:
+	for key in street.corridor.props:
 		if int(key) <= route.index and not route.props.get(str(key), false):
-			index = int(key)
-	if index < 0:
-		# Os caixotes ainda estão à frente: segue até a próxima patrulha e tenta depois.
-		return await _walk_and_fight_next(street)
+			return int(key)
+	return -1
+
+
+func _search_crates(street, route: Dictionary, index: int) -> bool:
+	var corridor: AHStreetCorridor = street.corridor
 	var food_before: int = Campaign.state.session.expedition.food
 	var loot_before: Dictionary = Campaign.state.session.expedition.loot.duplicate()
+	var bandages_before: int = Campaign.state.inventory.bandages
+	var tools_before: int = Campaign.state.tools.size()
 	street._place_leader(Vector3(corridor._step_x(index, 0.45), 0, 0.45))
 	if not await _until(func(): return corridor._action.is_valid(), "o aviso Vasculhar aparecer perto dos caixotes"):
 		return false
@@ -189,23 +204,14 @@ func _search_crates(street, route: Dictionary) -> bool:
 		return false
 	var expedition: Dictionary = Campaign.state.session.expedition
 	t.check(expedition.food != food_before or expedition.loot != loot_before or Campaign.state.session.event != null
-		or Campaign.state.inventory.bandages > 0, "a busca deu algo, abriu um evento ou mudou o achado")
+		or Campaign.state.inventory.bandages != bandages_before or Campaign.state.tools.size() != tools_before,
+		"a busca deu algo, abriu um evento ou mudou o achado")
 	t.check(Campaign.read_file(Campaign.primary_path()).session.expedition.corridor.props.get(str(index), false), "a busca ficou gravada")
 	# Repetir a busca não dá nada: o mesmo caixote não abre de novo.
 	t.check(not J.search_prop(Campaign.state, index).ok, "o mesmo caixote não abre duas vezes")
 	if street.exploration_hud.modal_open():
-		await _answer_modal(street)
+		return await _answer_modal(street)
 	return true
-
-
-func _walk_and_fight_next(street) -> bool:
-	street.corridor.debug_next_fight()
-	await _frames(2)
-	if not await _walk_into_fight(street):
-		return false
-	if not await _auto_fight(street):
-		return false
-	return false if Campaign.state.session.expedition.objective_completed else await _search_crates(street, Campaign.state.session.expedition.corridor)
 
 
 ## Responde o painel aberto no HUD da exploração (só os botões dele, não o Menu nem a Mochila): a pergunta de risco
@@ -228,16 +234,19 @@ func _answer_modal(street) -> bool:
 
 func _return_report() -> bool:
 	var street = _street()
-	# A volta na rua é pelo começo dela (atrás da fogueira): a equipe chega lá e aperta Interagir.
-	street._place_leader(Vector3(AHStreetCorridor.EXIT_X - 0.4, 0, 0.45))
-	if not await _until(func(): return street.corridor._action.is_valid(), "o aviso Voltar à Estação na saída da rua"):
+	# Com o guardião vencido aparece Concluir jornada · Voltar à Estação.
+	var hud_street: AHExplorationHud = street.exploration_hud
+	if not await _until(func(): return hud_street._finish_button.is_visible_in_tree(), "o botão Concluir jornada aparecer"):
 		return false
-	t.check(street.exploration_hud._prompt_label.text.contains("Voltar à Estação (fase concluída"), "o aviso da saída é a volta com todo o achado")
-	await _action("interact")
+	hud_street._finish_button.pressed.emit()
+	await _frames(3)
 	# O resultado já entrega o achado e fecha a expedição (finish_return); a tela mostra o que chegou.
 	if not await _until(func(): return Campaign.state.station.last_return.get("result", "") == "victory", "o resultado da jornada"):
 		return false
 	t.equal(Campaign.state.session.expedition, null, "a volta fechou a expedição")
+	var delivered: Dictionary = Campaign.state.station.last_return
+	t.check(int(delivered.get("seeds", 0)) > 0, "a vitória entrega sementes (%d)" % int(delivered.get("seeds", 0)))
+	t.check(_has_label(street.exploration_hud, "Chegou à Estação: %d sementes" % int(delivered.get("seeds", 0))), "o resultado mostra o achado")
 	t.check(Campaign.state.completed_phases.has("fase_1"), "a fase 1 ficou concluída")
 	if not await _press(street.exploration_hud, "Voltar à Estação", "Voltar à Estação no resultado"):
 		return false
@@ -253,7 +262,17 @@ func _return_report() -> bool:
 	if not await _press(hud, "Entrar no abrigo", "Entrar no abrigo no relatório"):
 		return false
 	t.check(Campaign.state.station.last_return.get("seen", false), "o relatório fica visto")
-	return await _until(func(): return hud.current == S.DORMITORY, "o Dormitório abrir depois do relatório")
+	if not await _until(func(): return hud.current == S.DORMITORY, "o Dormitório abrir depois do relatório"):
+		return false
+	# Com a noite pendente, Preparar expedição não parte: a Preparação diz o motivo e leva ao Dormitório.
+	hud.close_panel()
+	await _frames(2)
+	hud.open_map()
+	await _frames(2)
+	t.check(not hud._map.visible and hud.current == S.PREPARATION, "com a noite pendente, Preparar expedição abre a Preparação, não o mapa")
+	if not await _press(hud, "Ir ao Dormitório", "Ir ao Dormitório na Preparação bloqueada"):
+		return false
+	return await _until(func(): return hud.current == S.DORMITORY, "o Dormitório abrir pela Preparação")
 
 
 # ---------------------------------------------------------------- noite e trem
@@ -275,8 +294,7 @@ func _night() -> bool:
 
 func _train() -> void:
 	var hud: AHRefugeHud = _station().hud
-	if not S.visit_pending(Campaign.state):
-		t.note("sem trem nesta volta")
+	if not t.check(S.visit_pending(Campaign.state), "o trem chega na primeira volta (a fila de candidatos começa cheia)"):
 		return
 	if not await _until(func(): return hud.current == "train", "a plataforma do trem abrir"):
 		return
@@ -291,6 +309,7 @@ func _train() -> void:
 
 
 func _final_checks() -> void:
+	await _frames(1)
 	var saved = Campaign.read_file(Campaign.primary_path())
 	t.check(saved != null, "o save do fim abre")
 	if saved != null:
@@ -300,6 +319,12 @@ func _final_checks() -> void:
 	var hud: AHRefugeHud = _station().hud
 	t.equal(S.preparation_block(Campaign.state), "", "a Estação fica pronta para a próxima partida")
 	t.equal(hud.current, "", "a Estação volta à vista geral")
+	# O mapa de fases mostra a fase 1 concluída.
+	hud.open_map()
+	await _frames(2)
+	if await _press(hud._map, "Rua das Vitrines", "a fase 1 na lista do mapa"):
+		t.check(_has_label(hud._map, "Concluída"), "o mapa mostra a fase 1 concluída")
+	hud._map.visible = false
 
 
 # ---------------------------------------------------------------- auxiliares
@@ -327,6 +352,13 @@ func _until(condition: Callable, what: String, seconds: float = TIMEOUT) -> bool
 func _frames(count: int) -> void:
 	for i in count:
 		await _tree.process_frame
+
+
+func _has_label(root: Node, part: String) -> bool:
+	for node in root.find_children("*", "Label", true, false):
+		if not node.is_queued_for_deletion() and node.is_visible_in_tree() and node.text.contains(part):
+			return true
+	return false
 
 
 func _buttons(root: Node) -> Array:

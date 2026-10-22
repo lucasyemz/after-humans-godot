@@ -23,7 +23,7 @@ guardar: a pasta é `%APPDATA%\Godot\app_userdata\After Humans\saves`.
 
 - [ ] A música do refúgio e o zumbido tocam; perto do Bar e do Depósito se ouvem o ventilador e a lâmpada.
 - [ ] Cada cômodo do menu abre o painel e a câmera vai até ele; Esc volta à vista geral.
-- [ ] **[auto, menos o som]** O trem chega com o candidato (som de chegada), aceitar ou recusar faz ele partir (som de saída).
+- [ ] **[auto: acolher; recusar e os sons, à mão]** O trem chega com o candidato (som de chegada), aceitar ou recusar faz ele partir (som de saída).
 - [ ] **[auto]** A noite pendente leva ao Dormitório antes da partida.
 - [ ] **[auto]** **Preparar expedição** abre o mapa de fases; escolher uma fase e **Preparar expedição** leva à Preparação com a
       Missão certa; **Escolher no mapa** volta ao mapa.
