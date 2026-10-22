@@ -531,7 +531,8 @@ func _show_events(events: Array, contact_x = null) -> void:
 	var stagger := {}
 	var crits := {}
 	for event in events:
-		if event.type == AHCombat.EventType.CRIT:
+		# Só o crítico sorteado: a SOBRECARGA DO PORTEIRO (troca de fase) também é CRIT e não é golpe crítico.
+		if event.type == AHCombat.EventType.CRIT and event.critical_roll:
 			crits[event.target_unit_id] = true
 	var strongest := -1.0
 	var crit_hit := false

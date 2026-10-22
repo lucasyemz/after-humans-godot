@@ -131,6 +131,7 @@ func _in_street() -> void:
 	crit.type = AHCombat.EventType.CRIT
 	crit.text = "CRÍTICO!"
 	crit.target_unit_id = enemy.id
+	crit.critical_roll = true
 	var hit := AHCombat.Event.new()
 	hit.type = AHCombat.EventType.DAMAGE
 	hit.text = "-%d" % enemy.max_hp
@@ -152,6 +153,19 @@ func _in_street() -> void:
 	t.check(is_equal_approx(Engine.time_scale, 1.0), "o tempo volta depois da pausa")
 	t.check(arena.get_children().filter(func(n): return n is Label3D).size() > before, "os números aparecem")
 	enemy.hp = hp
+	# A troca de fase do chefe (SOBRECARGA DO PORTEIRO) também é CRIT, mas o golpe não foi crítico.
+	await _until_time_back(1.0)
+	var phase := AHCombat.Event.new()
+	phase.type = AHCombat.EventType.CRIT
+	phase.text = "SOBRECARGA DO PORTEIRO!"
+	phase.target_unit_id = enemy.id
+	hit.amount = 3
+	hit.text = "-3"
+	arena._show_events([phase, hit], card.position.x - 1.0)
+	labels = arena.get_children().filter(func(n): return n is Label3D and n.text == "-3")
+	t.check(not labels.is_empty() and labels[-1].font_size == 64, "a troca de fase do chefe não deixa o golpe com cara de crítico")
+	t.check(arena._shake_pixels < AHCombatArena.SHAKE_MAX_PIXELS, "nem com o tremor de crítico")
+	await _until_time_back(1.0)
 	Campaign.state.settings.reduced_environment_effects = true
 	hit.amount = 1
 	arena._show_events([hit], card.position.x - 1.0)

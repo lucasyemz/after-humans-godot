@@ -909,7 +909,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			var rolled := _roll_range(ability.DamageRange.Min + bonus, ability.DamageRange.Max + bonus)
 			if random.next() < CRITICAL_CHANCE:
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)
-				_add_event(events, "CRÍTICO!", EventType.CRIT, target.id)
+				_add_event(events, "CRÍTICO!", EventType.CRIT, target.id).critical_roll = true
 				_log("[CRÍTICO!] %s desferiu um ataque devastador!" % user.display_name)
 			rolled = status_damage(rolled, attempt.weak)
 			if is_machine(target):
@@ -1427,7 +1427,7 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 			var rolled := _roll_range(action.DamageRange.Min + enemy.damage_bonus, action.DamageRange.Max + enemy.damage_bonus)
 			if random.next() < CRITICAL_CHANCE:
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)
-				_add_event(events, "CRÍTICO INIMIGO!", EventType.CRIT, chosen.id)
+				_add_event(events, "CRÍTICO INIMIGO!", EventType.CRIT, chosen.id).critical_roll = true
 				_log("[CRÍTICO!] %s desferiu um golpe brutal em %s!" % [enemy.display_name, chosen.display_name])
 				_change_instinct(chosen, 12, "Pressão de combate")
 				# Rivalidade (-3): o rival estremece ao ver a falha.
