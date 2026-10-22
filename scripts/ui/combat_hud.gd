@@ -290,6 +290,14 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 		instinct.max_value = 200
 		instinct.name = "Instinct"
 		box.add_child(instinct)
+	else:
+		# A intenção: o que ele faria se a vez dele fosse agora (engine.enemy_intent); muda conforme a luta.
+		var intent := S.label("", 15, S.ENEMY, "bold")
+		intent.name = "Intent"
+		intent.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		intent.custom_minimum_size = Vector2(228, 0)
+		intent.mouse_filter = Control.MOUSE_FILTER_PASS
+		box.add_child(intent)
 	var status := HFlowContainer.new()
 	status.name = "Status"
 	status.add_theme_constant_override("h_separation", 4)
@@ -342,6 +350,8 @@ func refresh() -> void:
 		(box.get_node("Top/HpText") as Label).text = "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else "Último Fôlego"
 		if unit.is_player:
 			(box.get_node("Instinct") as ProgressBar).value = unit.instinct
+		elif unit.hp > 0:
+			_show_intent(box.get_node("Intent"), session.engine.enemy_intent(unit.id))
 		var style: StyleBoxFlat = plate.get_meta("style")
 		style.border_color = GOLD if unit.id == current else Color(S.COPPER, 0.4)
 		style.set_border_width_all(2 if unit.id == current else 1)
@@ -350,6 +360,8 @@ func refresh() -> void:
 			child.queue_free()
 		for entry in S.statuses(unit):
 			status.add_child(_status_chip(entry[0], entry[1]))
+		# A placa encolhe de volta quando a intenção ou os estados ficam mais curtos.
+		plate.reset_size.call_deferred()
 	_refresh_order(current)
 	var lines := session.state.combat_log
 	_log.text = "\n".join(lines.slice(maxi(0, lines.size() - 3)))
@@ -357,6 +369,34 @@ func refresh() -> void:
 	var actor := session.current_actor()
 	if actor != null and actor.is_player:
 		_show_hero(actor)
+
+
+## A linha da intenção na placa do inimigo: a ação e em quem (com "?" quando ele está entre dois planos parecidos).
+func _show_intent(label: Label, intent: Dictionary) -> void:
+	var names: Array = intent.target_ids.map(func(id): return session.state.find_unit(id).display_name if session.state.find_unit(id) else id)
+	var text := ""
+	var color: Color = S.ENEMY
+	match intent.kind:
+		"attack":
+			text = "▶ %s → %s" % [intent.name, (" ou " if intent.either else " e ").join(names)] if not names.is_empty() else "▶ %s" % intent.name
+		"heal":
+			text = "▶ %s (se cura)" % intent.name
+			color = S.OK
+		"defend":
+			text = "▶ %s (bloqueio)" % intent.name
+			color = S.BLUE
+		"move":
+			text = "▶ %s" % intent.name
+			color = S.MUTED
+		"stunned":
+			text = intent.name
+			color = S.MUTED
+	if text != "" and not intent.sure and not intent.either:
+		text += " ?"
+	label.text = text
+	label.add_theme_color_override("font_color", color)
+	label.tooltip_text = "Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s." % (
+		"" if intent.sure else "; com \"?\", ele está entre dois planos parecidos")
 
 
 ## A ordem da rodada com rostos: quem age agora maior e dourado; quem já agiu sai da fila.

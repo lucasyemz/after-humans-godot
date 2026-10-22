@@ -11,7 +11,7 @@ const TIPS := {
 	"preparation": ["Montar a equipe", "A posição importa: cada habilidade sai de certas posições e alcança outras (as bolinhas). A frente fica à direita, como na luta. Clique em dois heróis para trocá-los de lugar."],
 	"explore": ["Explorar", "Ande com A e D. Os losangos dourados marcam o que dá para usar: chegue perto e aperte E. A rota no alto mostra os trechos até o guardião."],
 	"patrol": ["Patrulhas", "A patrulha olha à frente. Se ela não te vir até você encostar, a equipe ganha a abertura e age primeiro. A barra amarela é a suspeita dela."],
-	"combat": ["Combate por posição", "Na sua vez, escolha uma habilidade (1 a 4) e depois o alvo. As bolinhas \"de\" dizem de que posições ela sai; as \"em\", quais alcança. Passe o mouse para ver o resultado."],
+	"combat": ["Combate por posição", "Na sua vez, escolha uma habilidade (1 a 4) e depois o alvo. As bolinhas \"de\" dizem de que posições ela sai; as \"em\", quais alcança. Passe o mouse para ver o resultado. O ▶ sob cada inimigo diz o que ele pretende fazer."],
 	"instinct": ["Instinto", "O perigo enche a barra roxa. Em 200 vem a crise: com esperança alta, a superação (cura e bloqueio); com ela baixa, o colapso (trauma e vulnerável). Descansar baixa o instinto."],
 	"search": ["Vasculhar", "Caixotes, armários e casas podem ter comida, sucata e o objetivo da rota. Às vezes há perigo: uma em três buscas sai ruim."],
 	"bag": ["Mochila", "Comida e curativos curam fora da luta e, na luta, como ação livre do herói da vez. A comida é da expedição: o que sobrar não volta."],

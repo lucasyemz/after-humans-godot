@@ -18,6 +18,7 @@ func run(t) -> void:
 	_flee(t, campaign)
 	_write_back(t, campaign)
 	_stats(t)
+	_intents(t, campaign)
 
 
 ## Uma luta jogada pelos dois lados (os heróis pela política fixa da paridade). Devolve o resultado.
@@ -117,3 +118,41 @@ func _stats(t) -> void:
 		total += int(stats[hero_id].damage)
 	t.equal(total, damage, "a soma vai para a expedição")
 	t.check(session.tally.is_empty(), "a contagem da luta zera depois de gravar")
+
+
+## A intenção do HUD (engine.enemy_intent) é o que o inimigo faz: quando ela tem certeza, a ação usada é a mesma e o
+## alvo (depois da proteção) também. Em 12 lutas, todas as vezes que o inimigo age.
+func _intents(t, campaign: Dictionary) -> void:
+	var checked := 0
+	var checked_either := 0
+	var mismatches: Array = []
+	for patrol in PATROLS + [["porteiro"]]:
+		for seed_value in range(6):
+			var session := AHCombatSession.create(campaign.roster.duplicate(true), patrol, false, seed_value)
+			var beats := 0
+			while not session.is_over() and beats < 400:
+				beats += 1
+				if session.is_player_turn():
+					session.auto_player_turn()
+					continue
+				var actor := session.current_actor()
+				var intent := session.engine.enemy_intent(actor.id) if actor else {}
+				# O sangramento e o veneno do começo do turno podem mudar tudo: compara só quem não sofre nada disso.
+				var clean: bool = actor != null and not actor.bleed.is_set() and not actor.blight.is_set()
+				var beat := session.enemy_turn()
+				if clean and intent.get("either", false):
+					var hit_any: Array = session.state.enemy_target_history
+					checked_either += 1
+					if beat.ability_id != intent.id or hit_any.is_empty() or not intent.target_ids.has(hit_any.back()):
+						mismatches.append("%s: um de %s com %s, fez %s" % [actor.display_name, intent.target_ids, intent.id, beat.ability_id])
+					continue
+				if not clean or not intent.get("sure", false) or intent.kind != "attack":
+					continue
+				checked += 1
+				var history: Array = session.state.enemy_target_history
+				var hit: String = history.back() if not history.is_empty() else ""
+				if beat.ability_id != intent.id or (intent.target_ids.size() == 1 and hit != intent.target_ids[0]):
+					mismatches.append("%s: previsto %s em %s, fez %s em %s" % [actor.display_name, intent.id, intent.target_ids, beat.ability_id, hit])
+	t.check(checked > 20, "a intenção foi conferida em %d ataques" % checked)
+	t.check(checked_either > 0, "e em %d com um alvo ou outro (o golpe cai num deles)" % checked_either)
+	t.check(mismatches.is_empty(), "a intenção certa é o que o inimigo faz (%s)" % ", ".join(mismatches.slice(0, 3)))

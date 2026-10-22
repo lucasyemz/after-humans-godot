@@ -1089,8 +1089,9 @@ func _attack_priority(damage_range: Dictionary, instinct_add: int, stun: int, bl
 		+ instinct_add * 0.5 + (20.0 if instinct_add != 0 and recipient.instinct + instinct_add >= 200 else 0.0)) - repetition
 
 
-## Inimigo com habilidades de classe (ramo enemy.classId da web).
-func _execute_class_enemy_turn(enemy: Unit, events: Array) -> Array:
+## As escolhas de um inimigo de classe agora, sem mexer em nada: as habilidades, o parceiro de troca (quando não
+## dá para atacar) e as opções com a nota, da melhor para a pior. O turno e a intenção do HUD usam a mesma conta.
+func _class_enemy_options(enemy: Unit) -> Dictionary:
 	var enemy_class = find_class(enemy.class_id)
 	var abilities: Array = []
 	var ability_ids: Array = []
@@ -1107,14 +1108,7 @@ func _execute_class_enemy_turn(enemy: Unit, events: Array) -> Array:
 		var ability: Dictionary = abilities[index]
 		can_attack = can_attack or (ability.DamageRange.Max > 0 and ability.OriginRanks.has(enemy.rank) and not (enemy.cooldowns.get(ability_ids[index], 0) > 0)
 			and _any(state.player_team, func(t): return alive_any(t) and ability.TargetRanks.has(t.rank)))
-	var enemy_id := enemy.id
-	if swap_partner != null and not can_attack and can_move_voluntarily(enemy, swap_partner):
-		var partner_id: String = swap_partner.id
-		execute_move(enemy_id, swap_partner.rank)
-		_add_event(events, "Troca de posição", EventType.INFO, enemy_id)
-		_add_event(events, "Troca de posição", EventType.INFO, partner_id)
-		return events
-
+	var swap = swap_partner if swap_partner != null and not can_attack and can_move_voluntarily(enemy, swap_partner) else null
 	var options: Array = []
 	for index in abilities.size():
 		var ability: Dictionary = abilities[index]
@@ -1141,11 +1135,28 @@ func _execute_class_enemy_turn(enemy: Unit, events: Array) -> Array:
 			else:
 				score = 2.0
 			options.append({"index": index, "target": target, "score": score})
+	stable_sort(options, func(a, b): return a.score > b.score)
+	return {"abilities": abilities, "ability_ids": ability_ids, "swap": swap, "options": options}
+
+
+## Inimigo com habilidades de classe (ramo enemy.classId da web).
+func _execute_class_enemy_turn(enemy: Unit, events: Array) -> Array:
+	var choices := _class_enemy_options(enemy)
+	var abilities: Array = choices.abilities
+	var ability_ids: Array = choices.ability_ids
+	var options: Array = choices.options
+	var enemy_id := enemy.id
+	if choices.swap != null:
+		var swap_partner = choices.swap
+		var partner_id: String = swap_partner.id
+		execute_move(enemy_id, swap_partner.rank)
+		_add_event(events, "Troca de posição", EventType.INFO, enemy_id)
+		_add_event(events, "Troca de posição", EventType.INFO, partner_id)
+		return events
 	if options.is_empty():
 		execute_defend(enemy_id)
 		_add_event(events, "+1 bloqueio", EventType.BLOCK, enemy_id)
 		return events
-	stable_sort(options, func(a, b): return a.score > b.score)
 	var choice: Dictionary = options[0]
 	var chosen_ability: Dictionary = abilities[choice.index]
 	var chosen_rank: int = choice.target.rank
@@ -1155,6 +1166,75 @@ func _execute_class_enemy_turn(enemy: Unit, events: Array) -> Array:
 	_add_event(events, chosen_ability.DisplayName, EventType.INFO, enemy_id, 0, chosen_id)
 	events.append_array(execute_player_ability(enemy_id, chosen_id, chosen_rank).events)
 	return events
+
+
+## O que o inimigo faria se a vez dele fosse agora (a intenção do HUD): {kind: "attack"|"heal"|"defend"|"move"|
+## "stunned"|"none", name, id (a ação), target_ids, sure, either (os alvos são um ou outro)}. Mesma conta do turno, sem sorteio: com empate, o primeiro candidato e sure
+## falso. Muda conforme a luta (quem cai, quem se protege, a posição).
+func enemy_intent(enemy_id: String) -> Dictionary:
+	var enemy = _find(state.enemy_team, func(u): return u.id == enemy_id)
+	var out := {"kind": "none", "name": "", "id": "", "target_ids": [], "sure": true, "either": false}
+	if enemy == null or enemy.hp <= 0:
+		return out
+	if enemy.stun_turns > 0:
+		out.kind = "stunned"
+		out.name = "Atordoado: perde a vez"
+		return out
+	if enemy.class_id != "":
+		var choices := _class_enemy_options(enemy)
+		if choices.swap != null:
+			out.kind = "move"
+			out.name = "Troca de posição"
+			return out
+		if choices.options.is_empty():
+			out.kind = "defend"
+			out.name = "Defender"
+			return out
+		var choice: Dictionary = choices.options[0]
+		var ability: Dictionary = choices.abilities[choice.index]
+		out.name = ability.DisplayName
+		out.id = choices.ability_ids[choice.index]
+		out.kind = "attack" if ability.DamageRange.Max > 0 else ("heal" if ability.HealRange.Max > 0 else "move")
+		out.target_ids = [choice.target.id]
+		out.sure = choices.options.size() < 2 or choices.options[1].score < choice.score
+		return out
+	var definition = find_enemy(enemy.enemy_id)
+	if definition == null or definition.ActionIds.is_empty():
+		out.kind = "defend"
+		out.name = "Defender"
+		return out
+	var planned := _enemy_plans(enemy)
+	if planned.contenders.is_empty():
+		out.kind = "move" if enemy.rank > 1 else "defend"
+		out.name = "Avançar" if enemy.rank > 1 else "Defender"
+		return out
+	var plan: Dictionary = planned.contenders[0]
+	var action: Dictionary = planned.actions[plan.index]
+	out.name = action.DisplayName
+	out.id = planned.short_ids[plan.index]
+	out.sure = planned.contenders.size() == 1
+	if action.TargetType == "Self":
+		out.kind = "heal" if action.HealRange.Max > 0 else ("defend" if action.bIsDefend else "move")
+		return out
+	out.kind = "attack"
+	if action.TargetType == "MultiAlly":
+		var inflicts: Dictionary = action.Inflicts
+		var targets: Array = state.player_team.filter(func(u): return alive_any(u) and action.TargetRanks.has(u.rank))
+		var priority := func(t): return _attack_priority(action.DamageRange, action.InstinctAdd, inflicts.Stun, inflicts.Bleed.Magnitude, inflicts.Blight.Magnitude, inflicts.bVuln, t, [t])
+		stable_sort(targets, func(a, b): return priority.call(a) > priority.call(b))
+		for index in mini(2, targets.size()):
+			out.target_ids.append(targets[index].id)
+	elif plan.target != null:
+		out.target_ids = [_intercepted_target(plan.target, state.player_team).id]
+		# Empate só entre alvos da mesma ação: a intenção lista os alvos possíveis ("either") em vez da dúvida.
+		var same_action: bool = planned.contenders.all(func(c): return c.index == plan.index and c.target != null)
+		if not out.sure and same_action:
+			for candidate in planned.contenders:
+				var who := _intercepted_target(candidate.target, state.player_team).id
+				if not out.target_ids.has(who):
+					out.target_ids.append(who)
+			out.either = true
+	return out
 
 
 func execute_enemy_turn() -> Array:
@@ -1185,7 +1265,29 @@ func execute_enemy_turn() -> Array:
 		end_unit_turn(enemy)
 		return events
 
-	# Ações válidas da posição atual; o Porteiro troca de repertório na fase 2.
+	var planned := _enemy_plans(enemy)
+	var actions: Array = planned.actions
+	var action_short_ids: Array = planned.short_ids
+	var plan = null
+	var contenders: Array = planned.contenders
+	if not contenders.is_empty():
+		plan = contenders[mini(contenders.size() - 1, floori(random.next() * contenders.size()))]
+
+	var enemy_id: String = enemy.id
+	if plan == null:
+		# Sem ação possível: avança se estiver atrás, senão defende.
+		if enemy.rank > 1 and execute_move(enemy_id, enemy.rank - 1).success:
+			return events
+		execute_defend(enemy_id)
+		return events
+	return _execute_enemy_plan(enemy, actions[plan.index], action_short_ids[plan.index], plan, events)
+
+
+## As ações válidas de um inimigo comum agora e os planos com a nota (chooseEnemyPlan), sem mexer em nada; os
+## candidatos são os que ficam a 1 ponto do melhor (o turno sorteia entre eles). O Porteiro troca de repertório na
+## fase 2.
+func _enemy_plans(enemy: Unit) -> Dictionary:
+	var definition = find_enemy(enemy.enemy_id)
 	var actions: Array = []
 	var action_short_ids: Array = []
 	for action_id in definition.ActionIds:
@@ -1237,24 +1339,18 @@ func execute_enemy_turn() -> Array:
 		for target in legal:
 			plans.append({"index": index, "target": target, "score": _attack_priority(action.DamageRange, action.InstinctAdd, inf.Stun, inf.Bleed.Magnitude, inf.Blight.Magnitude, inf.bVuln, target, living)})
 
-	var plan = null
+	var contenders: Array = []
 	if not plans.is_empty():
 		var best: float = plans[0].score
 		for candidate in plans:
 			best = maxf(best, candidate.score)
-		var contenders: Array = plans.filter(func(c): return c.score >= best - 1)
-		plan = contenders[mini(contenders.size() - 1, floori(random.next() * contenders.size()))]
+		contenders = plans.filter(func(c): return c.score >= best - 1)
+	return {"actions": actions, "short_ids": action_short_ids, "contenders": contenders}
 
+
+func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: String, plan: Dictionary, events: Array) -> Array:
 	var enemy_id: String = enemy.id
-	if plan == null:
-		# Sem ação possível: avança se estiver atrás, senão defende.
-		if enemy.rank > 1 and execute_move(enemy_id, enemy.rank - 1).success:
-			return events
-		execute_defend(enemy_id)
-		return events
-
-	var action: Dictionary = actions[plan.index]
-	var action_short_id: String = action_short_ids[plan.index]
+	var definition = find_enemy(enemy.enemy_id)
 	var action_name: String = action.DisplayName
 	var plan_target_id: String = plan.target.id if plan.target != null else ""
 	_add_event(events, action_name, EventType.INFO, enemy_id, 0, action_short_id)

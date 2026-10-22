@@ -392,6 +392,12 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
   - Navegação por teclado e controle: as setas (ou o direcional) andam entre os cômodos pela posição na tela (a primeira
     vai para o do próximo passo), Interagir abre; a dica das teclas fica embaixo.
 
+- **Intenção dos inimigos** (a proposta de UX, deixada para depois em 21/10 e feita em 22/10): sob cada inimigo, "▶ ação
+  → alvo", o que ele faria se a vez fosse agora (`engine.enemy_intent`). A conta é a mesma do turno: os planos saíram
+  para `_enemy_plans` e `_class_enemy_options`, e a paridade continua 48/48. Muda conforme a luta; empate entre alvos da
+  mesma ação vira "Bento ou Nick"; empate entre ações, "?". `test_combat_session` confere que a intenção certa é o que
+  o inimigo faz.
+
 **Pendências da 5:**
 - Celular: ~~controles de toque~~ feitos (`AHTouchControls`: o analógico que aparece onde o dedo encosta na metade
   esquerda, até a borda corre; o Usar à direita, aceso quando há o que usar; o aviso de interação aceita toque; a luta,
