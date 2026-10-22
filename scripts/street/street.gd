@@ -1224,9 +1224,9 @@ func soundscape() -> Dictionary:
 	else:
 		var expedition = Campaign.state.get("session", {}).get("expedition")
 		var track := (hash(String(expedition.get("id", ""))) % 3 + 3) % 3 + 1 if expedition != null else 1
-		want.music = ["", "res://audio/music/explore_1.ogg", "res://audio/music/explore_2.mp3", "res://audio/music/explore_3.mp3"][track]
+		want.music = ["", "res://audio/music/explore_1.ogg", "res://audio/music/explore_2.ogg", "res://audio/music/explore_3.ogg"][track]
 		if place == "RootBridge":
-			want.music = "res://audio/music/explore_root_bridge.mp3"
+			want.music = "res://audio/music/explore_root_bridge.ogg"
 		want.music_gain = 0.32
 	if _raining:
 		want.rain = "res://audio/ambience/rain_indoor.ogg" if _indoor or sheltered else "res://audio/ambience/rain_outdoor.ogg"

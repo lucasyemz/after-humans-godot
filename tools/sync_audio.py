@@ -1,8 +1,8 @@
 """Traz da referência Unreal a trilha, os ambientes, a chuva, os passos e os sons da exploração, da Estação e da
 interface (a mesma tabela do Tools/Unreal/import-sounds.py da #62), para audio/.
 
-Os WAV viram OGG Vorbis (qualidade 0,45: a trilha e os loops cabem no pacote da web); MP3 e OGG são copiados como
-vieram. Os sons do combate continuam no tools/sync_combat_art.py. Precisa do soundfile:  python -m pip install soundfile
+Os WAV viram OGG Vorbis (qualidade 0,45); a trilha (music/) sempre vira OGG na qualidade 0,3, venha em WAV, MP3 ou OGG
+(cerca de 100 kbps: metade do pacote de música, para a web e o celular); os outros MP3 e OGG são copiados como vieram. Os sons do combate continuam no tools/sync_combat_art.py. Precisa do soundfile:  python -m pip install soundfile
   python tools/sync_audio.py
 """
 import shutil
@@ -16,6 +16,7 @@ WORLD = SYNTH / "World"
 KENNEY = REPO / "SourceArt/Audio/ThirdParty/Kenney"
 OGA = REPO / "SourceArt/Audio/ThirdParty/OpenGameArt"
 QUALITY = 0.45
+MUSIC_QUALITY = 0.3
 
 # (fonte, destino em audio/ sem extensão)
 SOUNDS = [
@@ -56,7 +57,8 @@ for _k in range(4):
 
 
 def convert(src: Path, stem: str) -> Path:
-    if src.suffix.lower() != ".wav":
+    music = stem.startswith("music/")
+    if src.suffix.lower() != ".wav" and not music:
         dst = AUDIO / f"{stem}{src.suffix.lower()}"
         dst.parent.mkdir(parents=True, exist_ok=True)
         if not dst.exists() or dst.stat().st_size != src.stat().st_size:
@@ -65,11 +67,12 @@ def convert(src: Path, stem: str) -> Path:
     import soundfile
     dst = AUDIO / f"{stem}.ogg"
     dst.parent.mkdir(parents=True, exist_ok=True)
-    if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+    quality = MUSIC_QUALITY if music else QUALITY
+    if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime or music:
         # Em blocos: o libsndfile cai ao gravar Vorbis longo de uma vez.
         with soundfile.SoundFile(src) as reader, soundfile.SoundFile(dst, "w", reader.samplerate, reader.channels,
                                                                      format="OGG", subtype="VORBIS",
-                                                                     compression_level=1.0 - QUALITY) as writer:
+                                                                     compression_level=1.0 - quality) as writer:
             for block in reader.blocks(blocksize=8192, dtype="float32", always_2d=True):
                 writer.write(block)
     return dst

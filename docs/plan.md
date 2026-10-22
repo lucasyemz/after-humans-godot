@@ -396,8 +396,11 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
 - Celular: ~~controles de toque~~ feitos (`AHTouchControls`: o analógico que aparece onde o dedo encosta na metade
   esquerda, até a borda corre; o Usar à direita, aceso quando há o que usar; o aviso de interação aceita toque; a luta,
   a Estação e os menus já aceitavam o toque como clique; Opções > Controles de toque: Automático, Sempre ou Desligados;
-  `test_touch_controls`; a captura aceita `--touch`) e ~~texto maior~~ (Opções > Tamanho do texto). Falta um pacote
-  mais leve (120 MB pesa em dados móveis) e testar num aparelho de verdade.
+  `test_touch_controls`; a captura aceita `--touch`) e ~~texto maior~~ (Opções > Tamanho do texto). O pacote da web
+  caiu de 120,5 para 113 MB: a trilha toda em OGG a ~100 kbps (`tools/sync_audio.py`, de 20 para 9 MB; o metrô
+  somou 2,7). O resto é textura, já em WebP com perda a 75%: baixar a qualidade rende só 8 a 14% (não compensa); o que
+  mexe de verdade é a resolução (os cards pintados dos cenários, 30 MB, a 512 px dariam uns 20 MB a menos), decisão de
+  olho do Lucas. Falta testar num aparelho de verdade.
 - As teclas desenhadas nos botões e nas dicas seguem as trocas das Opções (`AHUiStyle.key_name`).
 - Passar o checklist de Play com o Lucas.
 

@@ -532,7 +532,7 @@ func play_train_departure(candidate_leaves: bool) -> void:
 ## A trilha do refúgio (Contemplation, a mesma da exploração) por baixo dos loops da Estação; sem chuva nem ambiente
 ## de cenário: a Estação é subterrânea.
 func soundscape() -> Dictionary:
-	return {"music": "res://audio/music/explore_3.mp3", "music_gain": 0.26, "ambience": "res://audio/station/hum_loop.ogg",
+	return {"music": "res://audio/music/explore_3.ogg", "music_gain": 0.26, "ambience": "res://audio/station/hum_loop.ogg",
 		"ambience_gain": 0.45}
 
 
