@@ -15,7 +15,7 @@ var station: AHStation
 var current := ""
 var _title: Label
 var _subtitle: Label
-var _resources: HFlowContainer
+var _resources: HBoxContainer
 var _menu: VBoxContainer
 var _next_title: Label
 var _next_text: Label
@@ -23,8 +23,17 @@ var _next_button: Button
 var _pending: VBoxContainer
 var _corner: HBoxContainer
 var _overview_button: Button
-## Os nomes clicáveis dos cômodos sobre o corte (só na vista geral).
-var _room_labels := {}
+## A seleção de cômodo da Unreal: só o cômodo apontado ganha os cantos dourados, o nome e o cartão embaixo à esquerda
+## (com Gerenciar). O do próximo passo e o Dormitório com a noite pendente ficam com os cantos apagados.
+var _room_marks: Control
+var _room_tag: PanelContainer
+var _room_tag_label: Label
+var _room_card: PanelContainer
+var _room_card_name: Label
+var _room_card_role: Label
+var _room_card_state: Label
+var _hover_room := ""
+var _room_rects := {}
 var _next := {}
 ## A gaveta da Preparação e o cartão escolhido para trocar (-1: nenhum).
 var _prep: PanelContainer
@@ -48,19 +57,31 @@ var _map: AHPhaseMap
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# A faixa escura do alto (como a barra da Unreal): o título e os recursos leem em cima de um cômodo claro.
+	var shade := TextureRect.new()
+	var fade := Gradient.new()
+	fade.set_color(0, Color(U.INK, 0.85))
+	fade.set_color(1, Color(U.INK, 0.0))
+	var fade_texture := GradientTexture2D.new()
+	fade_texture.gradient = fade
+	fade_texture.fill_from = Vector2(0, 0)
+	fade_texture.fill_to = Vector2(0, 1)
+	shade.texture = fade_texture
+	shade.stretch_mode = TextureRect.STRETCH_SCALE
+	shade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	shade.position = Vector2.ZERO
+	shade.size = Vector2(1920, 150)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(shade)
 	_title = U.label("Estação Raiz", 36, U.GOLD, "display")
 	_title.position = Vector2(32, 18)
 	add_child(_title)
 	_subtitle = U.label("", U.MIN_TEXT, U.MUTED)
 	_subtitle.position = Vector2(34, 18 + U.px(48))
 	add_child(_subtitle)
-	# Com o texto maior os recursos quebram em duas linhas, sempre colados à direita.
-	_resources = HFlowContainer.new()
-	_resources.alignment = FlowContainer.ALIGNMENT_END
-	_resources.add_theme_constant_override("h_separation", 6)
-	_resources.add_theme_constant_override("v_separation", 6)
-	_resources.position = Vector2(700, 24)
-	_resources.size = Vector2(1188, 0)
+	# Em cima à direita: os materiais numa ficha só e Comida, Água e Energia com o que acontece na volta.
+	_resources = HBoxContainer.new()
+	_resources.add_theme_constant_override("separation", 22)
 	_resources.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_resources)
 
@@ -129,6 +150,7 @@ func _ready() -> void:
 	_tags.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_tags.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_tags)
+	_build_room_selection()
 	_panel = PanelContainer.new()
 	_panel.add_theme_stylebox_override("panel", H.panel_style(0.9))
 	_panel.position = Vector2(1210, 110)
@@ -160,6 +182,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and current != "" and not _map.visible:
 		close_panel()
 		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and current == "" and not _map.visible:
+		var room := _room_at(event.position)
+		if room != "":
+			open_room(room)
+			get_viewport().set_input_as_handled()
 
 
 func refresh() -> void:
@@ -168,14 +195,11 @@ func refresh() -> void:
 	for child in _resources.get_children():
 		_resources.remove_child(child)
 		child.queue_free()
-	for spec in [["lobby-seed", "Sementes", str(S.quantity(c, "seeds")), "Moeda da Estação: comida extra na partida, recrutas e o trauma."],
-			["lobby-scrap", "Sucata", str(S.quantity(c, "scrap")), "Recupera cômodos e fabrica relíquias na Forja."],
-			["lobby-fragment", "Fragmentos", str(S.quantity(c, "fragments")), "Restos raros: pesquisas e melhorias."],
-			["res-bandages", "Curativos", str(S.quantity(c, "bandages")), "+8 de vida, na expedição e no acampamento."],
-			["lobby-food", "Suprimentos", "%d/%d" % [f.food, f.food_capacity], "A comida da Estação. A noite da volta pede %d." % f.food_night_need],
-			["lobby-water", "Água", str(f.water), "Os moradores e a equipe bebem a cada ciclo; o coletor repõe."],
-			["lobby-energy", "Energia", "%d/%d" % [f.power_used, f.power_capacity], "Os cômodos usam energia; sem ela, param."]]:
-		_resources.add_child(_resource_chip(spec[0], spec[1], spec[2], spec[3]))
+	_resources.add_child(_materials_chip(c))
+	for vital in S.vitals(c, 4):
+		_resources.add_child(_vital(vital))
+	_resources.size = _resources.get_combined_minimum_size()
+	_resources.position = Vector2(1888 - _resources.size.x, 16)
 	var status: Array[String] = ["Ciclo %d" % c.station.cycle_number, "%d no elenco" % S.living(c).size()]
 	if c.night.phase != "none":
 		status.append("noite por resolver no Dormitório")
@@ -196,31 +220,62 @@ func refresh() -> void:
 		_show(current)
 
 
-func _resource_chip(icon: String, name: String, value: String, tip: String) -> PanelContainer:
+## Os materiais numa ficha só: o ícone e o número de cada um (o nome na dica do mouse).
+func _materials_chip(c: Dictionary) -> PanelContainer:
 	var chip := PanelContainer.new()
 	var style := U.panel(0.86, Color(U.COPPER, 0.45), 1)
-	style.content_margin_left = 10
-	style.content_margin_right = 10
-	style.content_margin_top = 5
-	style.content_margin_bottom = 5
+	style.content_margin_left = 12
+	style.content_margin_right = 12
 	chip.add_theme_stylebox_override("panel", style)
-	chip.tooltip_text = tip
-	chip.mouse_filter = Control.MOUSE_FILTER_PASS
+	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
+	row.add_theme_constant_override("separation", 16)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_child(row)
+	for spec in [["lobby-seed", "seeds", "Sementes: moeda da Estação (comida extra na partida, recrutas e o trauma)."],
+			["lobby-scrap", "scrap", "Sucata: recupera cômodos e fabrica relíquias na Forja."],
+			["lobby-fragment", "fragments", "Fragmentos: restos raros para pesquisas e melhorias."],
+			["res-bandages", "bandages", "Curativos: +8 de vida, na expedição e no acampamento."]]:
+		var item := HBoxContainer.new()
+		item.add_theme_constant_override("separation", 5)
+		item.tooltip_text = spec[2]
+		item.mouse_filter = Control.MOUSE_FILTER_PASS
+		item.add_child(_glyph(spec[0], 22, U.GOLD))
+		item.add_child(U.label(str(S.quantity(c, spec[1])), 19, U.TEXT, "bold"))
+		row.add_child(item)
+	return chip
+
+
+## Comida, Água ou Energia: ícone, nome, o valor e a linha do que acontece na volta (cor de alerta quando falta).
+func _vital(vital: Dictionary) -> Control:
+	var color: Color = U.DANGER if vital.warn else U.OK
+	var box := HBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	box.tooltip_text = vital.tip
+	box.mouse_filter = Control.MOUSE_FILTER_PASS
+	var glyph := _glyph(vital.icon, 32, color if vital.warn else U.TEXT)
+	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	box.add_child(glyph)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 0)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(column)
+	column.add_child(U.label(vital.label, 15, U.MUTED, "bold"))
+	column.add_child(U.label(vital.value, 22, color, "bold"))
+	column.add_child(U.label(vital.note, 15, U.DANGER if vital.warn else U.MUTED))
+	return box
+
+
+func _glyph(icon: String, size: int, color: Color) -> TextureRect:
 	var glyph := TextureRect.new()
 	glyph.texture = load("res://art/ui/icons/%s.svg" % icon)
 	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	glyph.custom_minimum_size = Vector2(22, 22)
-	glyph.modulate = U.GOLD
+	glyph.custom_minimum_size = Vector2(size, size)
+	glyph.modulate = color
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(glyph)
-	row.add_child(U.label(name, 17, U.TEXT))
-	row.add_child(U.label(value, 17, U.GOLD, "bold"))
-	chip.add_child(row)
-	return chip
+	return glyph
 
 
 ## O próximo passo (AHStationRules.next_step) e as pendências; o canto com a vista geral e as Opções.
@@ -242,7 +297,7 @@ func _build_left(c: Dictionary) -> void:
 	_menu.visible = current == "" or current == "options"
 	_overview_button.visible = current != ""
 	_corner.visible = current != S.PREPARATION or S.preparation_block(c) != ""
-	_refresh_room_labels(c)
+	_refresh_room_card()
 
 
 func _pending_row(text: String, action: Callable, color: Color) -> Button:
@@ -273,38 +328,146 @@ func _run_next() -> void:
 			open_map()
 
 
-## O nome e o estado de cada cômodo sobre o corte, clicáveis: o do próximo passo acende em dourado; o Dormitório com a
-## noite pendente, em violeta.
-func _refresh_room_labels(c: Dictionary) -> void:
-	for room in AHStation.ROOMS:
-		var id: String = room.id
-		var level := S.room_level(c, id)
-		var state := "vazio" if level < 1 else ("nível %d" % level if level >= 2 else "aberto")
-		var cost := S.next_level_cost(c, id)
-		if level < 1 and not cost.is_empty():
-			state = "recuperar · %s" % S.cost_text(cost)
-		if id == S.DORMITORY and c.night.phase != "none":
-			state = "noite pendente"
-		var button: Button = _room_labels.get(id)
-		if button == null:
-			button = Button.new()
-			button.focus_mode = Control.FOCUS_NONE
-			H.style_button(button)
-			button.add_theme_font_size_override("font_size", AHUiStyle.px(17))
-			button.pressed.connect(func(): open_room(id))
-			_tags.add_sibling(button)
-			_room_labels[id] = button
-		button.text = "%s\n%s" % [S.room_def(id).name, state]
-		button.tooltip_text = S.room_benefit(id, maxi(1, level))
-		var color: Color = U.GOLD if _next.get("room", "") == id else (U.VIOLET if id == S.DORMITORY and c.night.phase != "none" else U.TEXT)
-		button.add_theme_color_override("font_color", color)
-		var style: StyleBoxFlat = U.panel(0.86, color if color != U.TEXT else Color(U.COPPER, 0.5), 2 if color != U.TEXT else 1)
-		style.content_margin_top = 3
-		style.content_margin_bottom = 3
-		style.content_margin_left = 10
-		style.content_margin_right = 10
-		button.add_theme_stylebox_override("normal", style)
-		button.size = button.get_combined_minimum_size()
+# ---------------------------------------------------------------- seleção de cômodo (como na Unreal)
+
+func _build_room_selection() -> void:
+	_room_marks = Control.new()
+	_room_marks.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_room_marks.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_room_marks.draw.connect(_draw_room_marks)
+	_tags.add_sibling(_room_marks)
+	_room_tag = PanelContainer.new()
+	var tag_style := U.panel(0.92, U.GOLD, 1)
+	tag_style.content_margin_top = 2
+	tag_style.content_margin_bottom = 2
+	tag_style.content_margin_left = 8
+	tag_style.content_margin_right = 8
+	_room_tag.add_theme_stylebox_override("panel", tag_style)
+	_room_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_room_tag_label = U.label("", 19, U.TEXT, "bold")
+	_room_tag.add_child(_room_tag_label)
+	_room_tag.visible = false
+	_room_marks.add_child(_room_tag)
+	# O cartão embaixo à esquerda: nome, papel, estado e Gerenciar.
+	_room_card = PanelContainer.new()
+	_room_card.add_theme_stylebox_override("panel", U.panel(0.92, Color(U.GOLD, 0.8), 1))
+	_room_card.custom_minimum_size = Vector2(466, 0)
+	_room_card.visible = false
+	add_child(_room_card)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	_room_card.add_child(row)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 2)
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(column)
+	_room_card_name = U.label("", 24, U.TEXT, "bold")
+	column.add_child(_room_card_name)
+	_room_card_role = U.label("", 17, U.MUTED)
+	_room_card_role.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_room_card_role.custom_minimum_size = Vector2(270, 0)
+	column.add_child(_room_card_role)
+	_room_card_state = U.label("", 16, U.GOLD)
+	_room_card_state.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_room_card_state.custom_minimum_size = Vector2(270, 0)
+	column.add_child(_room_card_state)
+	var manage := Button.new()
+	manage.text = "Gerenciar ›"
+	manage.custom_minimum_size = Vector2(140, 46)
+	manage.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	manage.focus_mode = Control.FOCUS_NONE
+	H.style_button(manage)
+	manage.pressed.connect(func():
+		if _hover_room != "":
+			open_room(_hover_room))
+	row.add_child(manage)
+
+
+## O estado do cômodo numa linha: vazio, aberto, nível, o custo para recuperar ou a noite pendente.
+func _room_state(c: Dictionary, id: String) -> String:
+	var level := S.room_level(c, id)
+	if id == S.DORMITORY and c.night.phase != "none":
+		return "A noite espera aqui."
+	var cost := S.next_level_cost(c, id)
+	if level < 1:
+		return "Vazio · recuperar por %s" % S.cost_text(cost) if not cost.is_empty() else "Vazio"
+	return "Nível %d de %d" % [level, S.room_def(id).max_level] if S.room_def(id).max_level > 1 else "Aberto"
+
+
+func _refresh_room_card() -> void:
+	if _room_card == null:
+		return
+	var c: Dictionary = Campaign.state
+	var show := _hover_room != "" and current == "" and not _map.visible
+	_room_card.visible = show
+	if not show:
+		return
+	_room_card_name.text = S.room_def(_hover_room).name
+	_room_card_role.text = S.ROOM_ROLES.get(_hover_room, "")
+	_room_card_state.text = _room_state(c, _hover_room)
+	_room_card.size = _room_card.get_combined_minimum_size()
+	_room_card.position = Vector2(32, 990 - _room_card.size.y)
+
+
+## O cômodo debaixo de um ponto da tela ("" se nenhum).
+func _room_at(point: Vector2) -> String:
+	for id in _room_rects:
+		if _room_rects[id].has_point(point):
+			return id
+	return ""
+
+
+func _update_room_hover() -> void:
+	var overview := current == "" and not _map.visible
+	_room_rects = station.room_screen_rects() if overview else {}
+	var hovered := ""
+	if overview:
+		var mouse := get_viewport().get_mouse_position()
+		var over := get_viewport().gui_get_hovered_control()
+		# Em cima de um botão ou cartão do HUD, o cômodo de trás não acende (o cartão da seleção mantém a escolha).
+		if over == null or over == self or over == _room_marks:
+			hovered = _room_at(mouse)
+		elif _room_card.visible and _room_card.get_global_rect().has_point(mouse):
+			hovered = _hover_room
+	if hovered != _hover_room:
+		_hover_room = hovered
+		_refresh_room_card()
+	_room_marks.queue_redraw()
+
+
+func _draw_room_marks() -> void:
+	_room_tag.visible = false
+	if _room_rects.is_empty():
+		return
+	var c: Dictionary = Campaign.state
+	# Os cantos apagados: o cômodo do próximo passo (dourado) e o Dormitório com a noite pendente (violeta).
+	var hints := {}
+	if _next.get("room", "") != "":
+		hints[_next.room] = U.GOLD
+	if c.night.phase != "none":
+		hints[S.DORMITORY] = U.VIOLET
+	for id in hints:
+		if id != _hover_room and _room_rects.has(id):
+			_corners(_room_rects[id], Color(hints[id], 0.5), 2.0, 18.0)
+	if _hover_room == "" or not _room_rects.has(_hover_room):
+		return
+	var rect: Rect2 = _room_rects[_hover_room]
+	_room_marks.draw_rect(rect, Color(U.GOLD, 0.06))
+	_corners(rect, U.GOLD, 3.0, 26.0)
+	_room_tag_label.text = S.room_def(_hover_room).name
+	_room_tag.size = _room_tag.get_combined_minimum_size()
+	_room_tag.position = rect.position + Vector2(10, -_room_tag.size.y * 0.5)
+	_room_tag.visible = true
+
+
+func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
+	var a := rect.position
+	var b := rect.end
+	for corner in [[a, Vector2(1, 1)], [Vector2(b.x, a.y), Vector2(-1, 1)], [Vector2(a.x, b.y), Vector2(1, -1)], [b, Vector2(-1, -1)]]:
+		var p: Vector2 = corner[0]
+		var d: Vector2 = corner[1]
+		_room_marks.draw_line(p, p + Vector2(arm * d.x, 0), color, width)
+		_room_marks.draw_line(p, p + Vector2(0, arm * d.y), color, width)
 
 
 func open_room(room_id: String) -> void:
@@ -371,12 +534,7 @@ func open_departure() -> void:
 
 
 func _process(_delta: float) -> void:
-	var positions: Dictionary = station.room_screen_positions() if current == "" and not _map.visible else {}
-	for id in _room_labels:
-		var button: Button = _room_labels[id]
-		button.visible = positions.has(id)
-		if button.visible:
-			button.position = positions[id] - Vector2(button.size.x * 0.5, 0)
+	_update_room_hover()
 	var showing := current == "report" or current == "departure"
 	_tags.visible = showing
 	if not showing:

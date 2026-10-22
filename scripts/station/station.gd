@@ -453,20 +453,24 @@ func _contact(feet: Vector3, size: Vector2) -> MeshInstance3D:
 	return mesh
 
 
-## Onde fica, na tela, o pé de cada um da fila (o HUD põe o cartão embaixo).
-## Onde cada cômodo aparece na tela (o meio do teto, no plano da faixa de passeio), para o nome clicável do HUD; com a
-## câmera em movimento ou o ponto atrás dela, nada.
-func room_screen_positions() -> Dictionary:
+## O retângulo de cada cômodo na tela (a boca do corte, do piso ao teto), para a seleção com os cantos do HUD; com a
+## câmera em movimento, nada.
+func room_screen_rects() -> Dictionary:
 	var out := {}
 	if camera == null or not _path.is_empty():
 		return out
 	for room in ROOMS:
-		var point := Vector3((room.x0 + room.x1) * 0.5, room.ceiling - 0.35, LANE_Z)
-		if not camera.is_position_behind(point):
-			out[room.id] = camera.unproject_position(point)
+		var a := Vector3(room.x0, room.floor, 0.0)
+		var b := Vector3(room.x1, room.ceiling, 0.0)
+		if camera.is_position_behind(a) or camera.is_position_behind(b):
+			continue
+		var pa := camera.unproject_position(a)
+		var pb := camera.unproject_position(b)
+		out[room.id] = Rect2(Vector2(minf(pa.x, pb.x), minf(pa.y, pb.y)), (pb - pa).abs())
 	return out
 
 
+## Onde fica, na tela, o pé de cada um da fila (o HUD põe o cartão embaixo).
 func lineup_screen_positions() -> Array:
 	var out: Array = []
 	for entry in lineup:

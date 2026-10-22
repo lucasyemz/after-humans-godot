@@ -14,6 +14,7 @@ func run(t) -> void:
 	_departure(t)
 	_return_and_night(t)
 	_civilians(t)
+	_vitals(t)
 	_thirst(t)
 	_route_focus(t)
 	_shelter(t)
@@ -329,3 +330,31 @@ func _save_round_trip(t) -> void:
 	DirAccess.remove_absolute(dir)
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## A barra do alto (o cabeçalho da Unreal): a previsão normal, o excesso acima do Depósito, a falta na noite e a água.
+func _vitals(t) -> void:
+	var c: Dictionary = Campaign.create_initial(5)
+	var vitals: Array = S.vitals(c, 4)
+	t.equal(vitals.map(func(v): return v.id), ["food", "water", "power"], "Comida, Água e Energia, nessa ordem")
+	var f := S.forecast(c, 4)
+	t.equal(vitals[0].value, "%d / %d suprimentos" % [f.food, f.food_capacity], "comida: estoque e capacidade")
+	S.adjust(c, S.SUPPLIES, 20 - S.quantity(c, S.SUPPLIES))
+	t.equal(S.vitals(c, 4)[0].note, "! 8 acima de 12", "comida acima do Depósito avisa o excesso")
+	S.adjust(c, S.SUPPLIES, -S.quantity(c, S.SUPPLIES))
+	var empty: Dictionary = S.vitals(c, 4)[0]
+	var short := S.forecast(c, 4)
+	var expected: bool = short.food + short.food_produced - short.food_spoiled < short.food_night_need
+	t.equal(empty.warn, expected, "comida zerada avisa quando a próxima volta não fecha")
+	c.night.phase = "planning"
+	c.night.participants = c.roster.slice(0, 3).map(func(h): return h.id)
+	c.night.watch_hero_id = ""
+	S.adjust(c, S.SUPPLIES, 1)
+	var night: Dictionary = S.vitals(c, 4)[0]
+	t.equal(night.note, "! Faltam 2 nesta noite", "na noite, a falta conta quem dorme (%s)" % night.note)
+	S.adjust(c, S.SUPPLIES, 2)
+	t.equal(S.vitals(c, 4)[0].note, "Abastecida · demanda 3", "na noite abastecida, a demanda")
+	c.station.water = 0
+	var water: Dictionary = S.vitals(c, 4)[1]
+	t.equal(water.warn, S.forecast(c, 4).thirsty, "água avisa quando falta na volta")
+	t.check(water.note.begins_with("! Falta") == water.warn, "a linha da água diz a falta (%s)" % water.note)

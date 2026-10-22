@@ -350,7 +350,7 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
     gravado (`AH_TIPS_QA=1` mostra só na memória).
   - Estação: o cartão "Próximo passo" (`AHStationRules.next_step`, com teste: relatório, noite, trem, cômodo que já dá
     para recuperar, o que falta para o próximo e a próxima fase) com o botão principal, as pendências, os recursos com
-    ícone e dica e os cômodos com nome e estado clicáveis no próprio corte; a lista de doze botões saiu e a Nova
+    ícone e dica e os cômodos clicáveis no próprio corte; a lista de doze botões saiu e a Nova
     campanha foi para dentro das Opções.
   - Preparação numa tela: os quatro cartões no sentido da luta (rosto, papel, vida, as habilidades que saem daquela
     posição, os avisos), troca com dois cliques, os de fora da equipe, o aviso de quem cura, e à direita a missão, o
@@ -370,6 +370,16 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
   - Tamanho do texto nas Opções (Normal, Grande e Maior: 100%, 115% e 130%), salvo por máquina, com teste. As telas
     ficam na base de 1920x1080 e só as letras crescem: o painel da luta sobe, os ícones das habilidades encolhem e os
     recursos da Estação quebram a linha. Vale nas telas abertas depois da troca. A captura aceita `--text-size=2`.
+
+- **Lobby com o melhor da Unreal** (comparado com as capturas de QA da Unreal de 18 a 20/10/2026):
+  - Seleção de cômodo: as placas fixas saíram; o cômodo apontado ganha os cantos dourados, o nome e o cartão embaixo à
+    esquerda (o papel do cômodo, o estado e Gerenciar). Clicar ou tocar no cômodo abre. O do próximo passo e o
+    Dormitório com a noite pendente ficam com os cantos apagados (`AHStation.room_screen_rects`, `S.ROOM_ROLES`).
+  - Barra do alto como o cabeçalho do `AHRefugeWidget`: Comida, Água e Energia com o valor e o que acontece na volta
+    (falta, acima do Depósito, a noite pendente, salas sem energia), os materiais numa ficha só e a faixa escura atrás
+    (`S.vitals`, com teste).
+  - Ainda da Unreal, para depois: os painéis da Forja e do Dormitório em cartões, o metrô Bombardier (CC BY, 260 mil
+    triângulos) no lugar do vagão verde, Ocultar HUD e a navegação por teclado entre os cômodos.
 
 **Pendências da 5:**
 - Celular: ~~controles de toque~~ feitos (`AHTouchControls`: o analógico que aparece onde o dedo encosta na metade

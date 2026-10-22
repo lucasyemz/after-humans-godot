@@ -311,6 +311,58 @@ static func cost_text(cost: Dictionary) -> String:
 	return "sem custo" if parts.is_empty() else " e ".join(parts)
 
 
+## O papel de cada cômodo em uma linha (os textos do AHShelterStation da Unreal), para o cartão da seleção.
+const ROOM_ROLES := {
+	CHARACTERS: "Conhecer e acompanhar os moradores do abrigo.",
+	CANTEEN: "Preparo e consumo de alimentos.",
+	BAR: "Um lugar para conversar e fazer uma pausa.",
+	DORMITORY: "Descanso e abrigo para a comunidade.",
+	FORGE: "Reparar e adaptar equipamentos recuperados.",
+	DEPOT: "Guardar e organizar suprimentos.",
+	RESEARCH: "Analisar materiais e organizar informações recuperadas.",
+	PREPARATION: "Organizar a equipe e os suprimentos antes de sair.",
+}
+
+
+## A barra do alto da Estação (o cabeçalho do AHRefugeWidget): Comida, Água e Energia com o valor e o que acontece na
+## volta. Cada item: {id, label, icon, value, note, warn, tip}. A noite pendente manda no texto da comida.
+static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
+	var f := forecast(campaign, returning)
+	var food: int = f.food
+	var planning: bool = campaign.night.phase == "planning"
+	var sleepers := 0
+	if planning:
+		for hero_id in campaign.night.participants:
+			var entry = hero(campaign, hero_id)
+			if entry != null and entry.alive and hero_id != campaign.night.watch_hero_id:
+				sleepers += 1
+	var food_short: bool = sleepers > food if planning else food + f.food_produced - f.food_spoiled < f.food_night_need
+	var food_note := ""
+	if planning:
+		food_note = ("! Faltam %d nesta noite" % (sleepers - food)) if food_short else "Abastecida · demanda %d" % sleepers
+	elif food > f.food_capacity:
+		food_note = "! %d acima de %d" % [food - f.food_capacity, f.food_capacity]
+	elif food_short:
+		food_note = "! Falta na volta"
+	else:
+		food_note = "Próxima volta: %d" % f.food_after_night
+	var power_short: bool = not f.unpowered_rooms.is_empty()
+	return [
+		{"id": "food", "label": "COMIDA", "icon": "lobby-food", "value": "%d / %d suprimentos" % [food, f.food_capacity],
+			"note": food_note, "warn": food_short or food > f.food_capacity,
+			"tip": "Estoque e capacidade do Depósito. Na próxima volta, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d." % [
+				f.food_produced, f.food_civilians, f.food_spoiled, f.food_night_need, f.food_after_night]},
+		{"id": "water", "label": "ÁGUA", "icon": "lobby-water", "value": "%d em estoque" % f.water,
+			"note": "! Falta na volta" if f.thirsty else "Próxima volta: %d" % f.water_after, "warn": f.thirsty,
+			"tip": "Na próxima volta, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto." % [
+				f.water_produced, f.water_consumed, f.water_after]},
+		{"id": "power", "label": "ENERGIA", "icon": "lobby-energy", "value": "%d / %d em uso" % [f.power_used, f.power_capacity],
+			"note": ("! %d %s sem energia" % [f.unpowered_rooms.size(), "sala" if f.unpowered_rooms.size() == 1 else "salas"]) if power_short \
+				else "%d livres" % maxi(0, f.power_capacity - f.power_used),
+			"warn": power_short, "tip": "Os cômodos ligados gastam energia; sem ela, param."},
+	]
+
+
 ## O que o cômodo faz no nível dado (texto da tela).
 static func room_benefit(room_id: String, level: int) -> String:
 	match room_id:
