@@ -46,6 +46,9 @@ for _enemy in ("cao_eco", "condutor_raiz", "sussurrador", "rastejante_raiz", "ni
 # parada, voltada à direita como os outros. Entram os que a distribuição dele põe num cenário (Lucas, 22/10/2026).
 GALLERY = REPO / "SourceArt" / "CharacterGallery" / "EnemyHelperIdles20261010"
 GALLERY_ENEMIES = ["recreador", "pipoco", "enraizado", "broto", "carrasco_industrial", "faisca"]
+# As poses de luta deles (Codex, #44) e, para os ajudantes, a versão mais legível nos cenários escuros (#45, -readable).
+GALLERY_POSES = REPO / "SourceArt" / "CharacterGallery" / "JohnCombatPoses20261022"
+GALLERY_HELPERS = {"pipoco", "broto", "faisca"}
 POSES = ["attack1", "attack2", "defense", "hurt", "dodge", "support", "death"]
 AUDIO_CUES = ["BentoAction", "NickAction", "IrisAction", "VesperaAction", "Dodge", "RobotDodge", "RobotHeal", "RobotPunch"]
 
@@ -152,17 +155,26 @@ def enemies() -> dict:
 
 
 def gallery_enemies() -> dict:
-    """Os vilões do John: a pose parada; a âncora e a altura do corpo vêm do manifesto da galeria (body_alpha_bounds),
-    porque as imagens têm faíscas e sombra soltas fora do corpo."""
+    """Os vilões do John: a pose parada e as poses de luta (a mesma tela, o pé no mesmo ponto); a âncora e a altura do
+    corpo de todas vêm do idle no manifesto da galeria (body_alpha_bounds), porque as imagens têm faíscas e sombra
+    soltas fora do corpo, e a derrota deitada não pode crescer."""
     manifest = {e["id"]: e for e in json.loads((GALLERY / "manifest.json").read_text(encoding="utf-8"))["entries"]}
     out = {}
     for enemy_id in GALLERY_ENEMIES:
         entry = manifest[enemy_id]
         folder = ART / "enemies" / enemy_id
-        image = convert(GALLERY / entry["file"], folder / "idle.webp")
+        readable = GALLERY_POSES / f"{enemy_id}-idle-readable.png"
+        idle_src = readable if enemy_id in GALLERY_HELPERS and readable.exists() else GALLERY / entry["file"]
+        image = convert(idle_src, folder / "idle.webp")
         left, top, right, bottom = entry["body_alpha_bounds"]
-        out[enemy_id] = {"poses": {}, "idle": {"file": res(folder / "idle.webp"), "anchor": [(left + right) / 2, bottom],
-                                                "body_reference_pixels": bottom - top, "canvas": [image.width, image.height]}}
+        measures = {"anchor": [(left + right) / 2, bottom], "body_reference_pixels": bottom - top, "canvas": [image.width, image.height]}
+        poses = {}
+        for pose in POSES:
+            src = GALLERY_POSES / f"{enemy_id}-{pose}{'-readable' if enemy_id in GALLERY_HELPERS else ''}.png"
+            if src.exists():
+                convert(src, folder / f"{pose}.webp")
+                poses[pose] = {"file": res(folder / f"{pose}.webp"), **measures}
+        out[enemy_id] = {"poses": poses, "idle": {"file": res(folder / "idle.webp"), **measures}}
     return out
 
 

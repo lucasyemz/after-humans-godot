@@ -2200,7 +2200,68 @@
 			}
 		},
 		"recreador": {
-			"poses": {},
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/recreador/attack1.webp",
+					"anchor": [
+						567.5,
+						1272
+					],
+					"body_reference_pixels": 1222,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/recreador/defense.webp",
+					"anchor": [
+						567.5,
+						1272
+					],
+					"body_reference_pixels": 1222,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/recreador/hurt.webp",
+					"anchor": [
+						567.5,
+						1272
+					],
+					"body_reference_pixels": 1222,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/recreador/support.webp",
+					"anchor": [
+						567.5,
+						1272
+					],
+					"body_reference_pixels": 1222,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/recreador/death.webp",
+					"anchor": [
+						567.5,
+						1272
+					],
+					"body_reference_pixels": 1222,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
 			"idle": {
 				"file": "res://art/combat/enemies/recreador/idle.webp",
 				"anchor": [
@@ -2215,7 +2276,68 @@
 			}
 		},
 		"pipoco": {
-			"poses": {},
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/pipoco/attack1.webp",
+					"anchor": [
+						533.0,
+						1254
+					],
+					"body_reference_pixels": 1148,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/pipoco/defense.webp",
+					"anchor": [
+						533.0,
+						1254
+					],
+					"body_reference_pixels": 1148,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/pipoco/hurt.webp",
+					"anchor": [
+						533.0,
+						1254
+					],
+					"body_reference_pixels": 1148,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"support": {
+					"file": "res://art/combat/enemies/pipoco/support.webp",
+					"anchor": [
+						533.0,
+						1254
+					],
+					"body_reference_pixels": 1148,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/pipoco/death.webp",
+					"anchor": [
+						533.0,
+						1254
+					],
+					"body_reference_pixels": 1148,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
 			"idle": {
 				"file": "res://art/combat/enemies/pipoco/idle.webp",
 				"anchor": [
@@ -2230,7 +2352,56 @@
 			}
 		},
 		"enraizado": {
-			"poses": {},
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/enraizado/attack1.webp",
+					"anchor": [
+						601.0,
+						1277
+					],
+					"body_reference_pixels": 1261,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/enraizado/defense.webp",
+					"anchor": [
+						601.0,
+						1277
+					],
+					"body_reference_pixels": 1261,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/enraizado/hurt.webp",
+					"anchor": [
+						601.0,
+						1277
+					],
+					"body_reference_pixels": 1261,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/enraizado/death.webp",
+					"anchor": [
+						601.0,
+						1277
+					],
+					"body_reference_pixels": 1261,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
 			"idle": {
 				"file": "res://art/combat/enemies/enraizado/idle.webp",
 				"anchor": [
@@ -2245,7 +2416,56 @@
 			}
 		},
 		"broto": {
-			"poses": {},
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/broto/attack1.webp",
+					"anchor": [
+						580.5,
+						1220
+					],
+					"body_reference_pixels": 1102,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/broto/defense.webp",
+					"anchor": [
+						580.5,
+						1220
+					],
+					"body_reference_pixels": 1102,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/broto/hurt.webp",
+					"anchor": [
+						580.5,
+						1220
+					],
+					"body_reference_pixels": 1102,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/broto/death.webp",
+					"anchor": [
+						580.5,
+						1220
+					],
+					"body_reference_pixels": 1102,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
 			"idle": {
 				"file": "res://art/combat/enemies/broto/idle.webp",
 				"anchor": [
@@ -2260,7 +2480,56 @@
 			}
 		},
 		"carrasco_industrial": {
-			"poses": {},
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/carrasco_industrial/attack1.webp",
+					"anchor": [
+						580.5,
+						1279
+					],
+					"body_reference_pixels": 1236,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/carrasco_industrial/defense.webp",
+					"anchor": [
+						580.5,
+						1279
+					],
+					"body_reference_pixels": 1236,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/carrasco_industrial/hurt.webp",
+					"anchor": [
+						580.5,
+						1279
+					],
+					"body_reference_pixels": 1236,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/carrasco_industrial/death.webp",
+					"anchor": [
+						580.5,
+						1279
+					],
+					"body_reference_pixels": 1236,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
 			"idle": {
 				"file": "res://art/combat/enemies/carrasco_industrial/idle.webp",
 				"anchor": [
@@ -2275,7 +2544,56 @@
 			}
 		},
 		"faisca": {
-			"poses": {},
+			"poses": {
+				"attack1": {
+					"file": "res://art/combat/enemies/faisca/attack1.webp",
+					"anchor": [
+						570.0,
+						1237
+					],
+					"body_reference_pixels": 747,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"defense": {
+					"file": "res://art/combat/enemies/faisca/defense.webp",
+					"anchor": [
+						570.0,
+						1237
+					],
+					"body_reference_pixels": 747,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"hurt": {
+					"file": "res://art/combat/enemies/faisca/hurt.webp",
+					"anchor": [
+						570.0,
+						1237
+					],
+					"body_reference_pixels": 747,
+					"canvas": [
+						1178,
+						1335
+					]
+				},
+				"death": {
+					"file": "res://art/combat/enemies/faisca/death.webp",
+					"anchor": [
+						570.0,
+						1237
+					],
+					"body_reference_pixels": 747,
+					"canvas": [
+						1178,
+						1335
+					]
+				}
+			},
 			"idle": {
 				"file": "res://art/combat/enemies/faisca/idle.webp",
 				"anchor": [

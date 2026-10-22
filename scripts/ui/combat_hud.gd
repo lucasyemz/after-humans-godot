@@ -487,6 +487,10 @@ func _process(_delta: float) -> void:
 		# Sob os pés, sem passar para dentro do painel de baixo.
 		var feet := camera.unproject_position(card.global_position)
 		var y := minf(feet.y + 10, _dock_top() - plate.size.y - 6) if _panel.visible else feet.y + 10
+		# Os baixinhos (os ajudantes do John): se a placa subiria por cima do corpo, ela vai acima da cabeça.
+		if y < feet.y and card.body_height < 0.9:
+			var head := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 1.05, 0))
+			y = head.y - plate.size.y - 8
 		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
 	for marker in _markers + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")

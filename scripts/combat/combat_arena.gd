@@ -363,6 +363,9 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 		show_pose(actor, "defense")
 	elif action != null and action.TargetType == "Self":
 		show_pose(actor, "support")
+	elif action != null and int(action.get("DamageRange", {}).get("Max", 0)) <= 0 and enemy_art(actor.enemy_id).get("poses", {}).has("support"):
+		# Golpe sem dano num herói (a Buzina do Pipoco, a Risada do Recreador): a pose de apoio, quando há.
+		show_pose(actor, "support")
 	else:
 		show_pose(actor, "attack1")
 	card.position.z = home.z + FRONT_LIFT
