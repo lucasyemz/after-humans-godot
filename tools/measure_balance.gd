@@ -1,7 +1,11 @@
 ## Mede o equilíbrio das patrulhas (#10) sem mudar nada no jogo: joga no automático todas as lutas do corredor de cada
 ## fase (as 4 patrulhas e o guardião, com os inimigos de J.corridor_enemies) com os quatro fundadores.
 ##   Godot --headless --path . --script res://tools/measure_balance.gd -- [--seeds=40] [--policy=auto|weak] [--option=base]
-## A equipe são os fundadores iniciais, sem relíquia, treino nem pesquisa: as fases finais saem mais difíceis que no jogo.
+## Equipe: os quatro fundadores. --gear diz o que eles levam (relíquias e treinos da Pesquisa):
+##   none (padrão: como saem da campanha nova) · typical (o progresso suposto de cada fase, em GEAR_TYPICAL) · max (as
+##   quatro relíquias e os quatro treinos em qualquer fase).
+## A luta do jogo não lê os treinos pesquisados (campaign.researched_skills não chega a context.researched_skills; só a
+## paridade preenche). --wire-research simula essa ligação, para medir o que o treino daria.
 ## Três medidas por fase:
 ## - luta a luta, cada uma numa cópia limpa da expedição (os quatro vivos e de vida cheia): vitórias, rodadas e a vida
 ##   que sobra;
@@ -20,6 +24,15 @@ const PHASES := ["fase_1", "fase_2", "fase_3", "fase_4", "fase_5"]
 const FOUNDERS := ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]
 const ROUND_LIMIT := 400
 const POLICIES := ["auto", "weak"]
+const GEARS := ["none", "typical", "max"]
+## Relíquias na ordem da formação (posição 1 a 4): vida na frente e atrás, velocidade no meio.
+const RELIC_ORDER := ["botao_cobre", "pena_vidro", "pena_vidro", "botao_cobre"]
+const TRAINING_ORDER := ["res_cao_punho_sucata", "res_gato_corte_fase", "res_sapo_carga_voltaica", "res_coruja_recurso_emergencia"]
+## O progresso suposto ao entrar em cada fase sem repetir fases: [relíquias, treinos]. Pela economia: começa com 0 de
+## sucata e de fragmento; cada fase vencida rende 3 sucatas e 1 fragmento do guardião, mais umas 2 a 4 sucatas das
+## buscas. A Forja (4) e as relíquias (3 cada) cabem a partir da fase 2; a Pesquisa (3 sucatas e 2 fragmentos) mais um
+## treino (3 fragmentos) só antes da fase 5. Para o Lucas ajustar; quem repete fases chega mais perto de max.
+const GEAR_TYPICAL := {"fase_1": [0, 0], "fase_2": [1, 0], "fase_3": [2, 0], "fase_4": [3, 0], "fase_5": [4, 1]}
 const OPTIONS := ["base", "hp25", "dmg1", "more", "lesscare"]
 ## O mais ferido recebe cuidado enquanto estiver abaixo desta fração da vida.
 const CARE_BELOW := 0.7
@@ -28,6 +41,8 @@ const CARE_ORDER := ["iris_ampoule", "full_meal", "small_meal", "bandage"]
 var seeds := 40
 var policy := "auto"
 var option := "base"
+var gear := "none"
+var wire_research := false
 var _rng := RandomNumberGenerator.new()
 ## Ampolas da Íris usadas fora da luta nas jornadas com cuidados da fase (mostra o efeito do lesscare).
 var _ampoules := 0
@@ -53,11 +68,21 @@ func _run() -> void:
 			policy = arg.trim_prefix("--policy=")
 		elif arg.begins_with("--option="):
 			option = arg.trim_prefix("--option=")
-	if not POLICIES.has(policy) or not OPTIONS.has(option):
-		push_error("Política (%s) ou opção (%s) desconhecida." % [" | ".join(POLICIES), " | ".join(OPTIONS)])
+		elif arg.begins_with("--gear="):
+			gear = arg.trim_prefix("--gear=")
+		elif arg == "--wire-research":
+			wire_research = true
+	if not POLICIES.has(policy) or not OPTIONS.has(option) or not GEARS.has(gear):
+		push_error("Política (%s), opção (%s) ou gear (%s) desconhecido." % [" | ".join(POLICIES), " | ".join(OPTIONS), " | ".join(GEARS)])
 		quit(1)
 		return
-	print("política=%s opção=%s sementes=%d · fundadores iniciais, sem relíquias, treinos nem pesquisas" % [policy, option, seeds])
+	var team_text := "fundadores iniciais, sem relíquias nem treinos"
+	if gear == "typical":
+		team_text = "progresso suposto (relíquias/treinos) " + ", ".join(PHASES.map(func(id): return "%s %d/%d" % [id, GEAR_TYPICAL[id][0], GEAR_TYPICAL[id][1]]))
+	elif gear == "max":
+		team_text = "as 4 relíquias e os 4 treinos"
+	print("política=%s opção=%s gear=%s sementes=%d · %s · treinos %s" % [policy, option, gear, seeds, team_text,
+		"ligados na luta (simulado)" if wire_research else "como o jogo está (sem efeito na luta)"])
 	print("fase   | luta      | vitórias | rodadas | vida que sobra | jornada com cuidados: termina · voltam | sem cuidados: termina · voltam")
 	for phase_id in PHASES:
 		_measure(phase_id)
@@ -114,6 +139,7 @@ func _measure(phase_id: String) -> void:
 func _new_campaign(seed_value: int, phase_id: String) -> Dictionary:
 	var campaign: Dictionary = root.get_node("Campaign").create_initial(seed_value)
 	_unlock(campaign)
+	_equip(campaign, phase_id)
 	J.start_expedition(campaign, phase_id, 1000 + seed_value * 7)
 	if option == "lesscare":
 		campaign.session.expedition.food = int(campaign.session.expedition.food) / 2
@@ -141,6 +167,24 @@ func _care(campaign: Dictionary) -> void:
 			return
 
 
+## Relíquias na formação (RELIC_ORDER) e treinos pesquisados (TRAINING_ORDER), conforme --gear.
+func _equip(campaign: Dictionary, phase_id: String) -> void:
+	var counts: Array = [0, 0]
+	if gear == "typical":
+		counts = GEAR_TYPICAL[phase_id]
+	elif gear == "max":
+		counts = [RELIC_ORDER.size(), TRAINING_ORDER.size()]
+	var formation: Array = campaign.preferred_formation
+	for index in mini(counts[0], formation.size()):
+		for hero in campaign.roster:
+			if hero.id == formation[index]:
+				hero.relic_id = RELIC_ORDER[index]
+	for index in counts[1]:
+		var row = root.get_node("GameData").row("research", TRAINING_ORDER[index])
+		if not campaign.researched_skills.has(row.SkillId):
+			campaign.researched_skills.append(row.SkillId)
+
+
 func _unlock(campaign: Dictionary) -> void:
 	campaign.completed_phases = PHASES.slice(0, 4)
 
@@ -158,6 +202,8 @@ func _fight(campaign: Dictionary, index: int, seed_value: int) -> Dictionary:
 	var enemies: Array = _apply_option(J.corridor_enemies(expedition, index), expedition.corridor.steps[index].type == "boss")
 	var session = Session.create(heroes, enemies, false, seed_value * 131 + index)
 	session.use_expedition(campaign)
+	if wire_research:
+		session.context.researched_skills = campaign.researched_skills.duplicate()
 	# O sorteio da política fraca depende só da luta: as opções comparam as mesmas escolhas.
 	_rng.seed = seed_value * 131 + index
 	var beats := 0
@@ -180,11 +226,12 @@ func _fight(campaign: Dictionary, index: int, seed_value: int) -> Dictionary:
 	for hero in campaign.roster:
 		if kept.has(hero.id) and hero.alive:
 			hero.expedition_uses[Care.AMPOULE] = kept[hero.id]
+	# Pela vida da campanha depois do write_back: a relíquia de vida aumenta o máximo só dentro da luta.
 	var hp := 0.0
 	var max_hp := 0.0
-	for unit in session.state.player_team:
-		hp += maxi(0, unit.hp)
-		max_hp += unit.max_hp
+	for hero in heroes:
+		hp += maxi(0, hero.hp) if hero.alive else 0
+		max_hp += hero.max_hp
 	return {"result": session.result() if session.is_over() else "timeout", "rounds": session.state.round,
 		"hp_left": hp / max_hp if max_hp > 0.0 else 0.0}
 
