@@ -63,8 +63,13 @@ jobs:
         if: always()
         run: |
           [ -f tests.log ] || exit 0
-          # Cada FAIL vira uma anotação com a primeira falha dele (a linha indentada logo abaixo).
-          awk '/^FAIL /{name=substr($0,6); getline reason; sub(/^ +/,"",reason); print "::error title=Teste falhou::" name " - " reason}' tests.log
+          # Uma anotação por FAIL, com a primeira falha dele (a primeira linha indentada abaixo, sem os rastros da Godot).
+          awk '
+            function flush() { if (name != "") print "::error title=Teste falhou::" name (reason != "" ? " - " reason : ""); name = ""; reason = "" }
+            /^(PASS|FAIL) / { flush(); if ($1 == "FAIL") name = substr($0, 6); next }
+            name != "" && reason == "" && /^    / && !/^     *(at:|GDScript|\[[0-9]+\])/ { reason = $0; sub(/^ +/, "", reason) }
+            END { flush() }
+          ' tests.log
           line=$(grep -E 'testes passaram' tests.log | tail -n 1 || true)
           {
             echo "## Testes"
