@@ -34,6 +34,13 @@ var _room_card_role: Label
 var _room_card_state: Label
 var _hover_room := ""
 var _room_rects := {}
+## O cômodo escolhido pelo teclado ou pelo controle (setas e direcional); o mouse mexendo volta a mandar.
+var _key_room := ""
+var _last_mouse := Vector2(-1, -1)
+var _key_hints: HBoxContainer
+## Ocultar HUD (F2 ou Back no controle): a interface some para olhar a Estação; o aviso fica embaixo.
+var _hud_hidden := false
+var _hidden_hint: Label
 var _next := {}
 ## A gaveta da Preparação e o cartão escolhido para trocar (-1: nenhum).
 var _prep: PanelContainer
@@ -147,12 +154,23 @@ func _ready() -> void:
 	H.style_button(options)
 	options.pressed.connect(func(): open_service("options"))
 	_corner.add_child(options)
+	var hide_button := Button.new()
+	hide_button.text = "Ocultar HUD"
+	hide_button.custom_minimum_size = Vector2(170, 46)
+	H.style_button(hide_button)
+	hide_button.pressed.connect(func(): set_hud_hidden(true))
+	_corner.add_child(hide_button)
 
 	_tags = Control.new()
 	_tags.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_tags.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_tags)
 	_build_room_selection()
+	_build_key_hints()
+	_hidden_hint = U.label("", 18, U.TEXT, "bold")
+	_hidden_hint.modulate.a = 0.85
+	_hidden_hint.visible = false
+	get_parent().add_child.call_deferred(_hidden_hint)
 	_panel = PanelContainer.new()
 	_panel.add_theme_stylebox_override("panel", H.panel_style(0.9))
 	_panel.position = Vector2(1210, 110)
@@ -178,6 +196,100 @@ func _ready() -> void:
 	_map.closed.connect(func(): _map.visible = false)
 	add_child(_map)
 	Tips.show_tip.call_deferred("station")
+
+
+## Antes dos botões: a interface escondida volta com F2, Esc ou um clique; na vista geral, as setas (ou o direcional)
+## andam entre os cômodos e Interagir abre o escolhido.
+func _input(event: InputEvent) -> void:
+	if _hud_hidden:
+		var click: bool = event is InputEventMouseButton and event.pressed
+		if event.is_action_pressed("hide_hud") or event.is_action_pressed("menu") or click:
+			set_hud_hidden(false)
+			get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("hide_hud") and not _map.visible:
+		set_hud_hidden(true)
+		get_viewport().set_input_as_handled()
+		return
+	if current != "" or _map.visible:
+		return
+	for spec in [["move_left", Vector2.LEFT], ["move_right", Vector2.RIGHT], ["move_back", Vector2.UP], ["move_front", Vector2.DOWN]]:
+		if event.is_action_pressed(spec[0], true):
+			_step_room(spec[1])
+			get_viewport().set_input_as_handled()
+			return
+	if event.is_action_pressed("interact") and _key_room != "":
+		open_room(_key_room)
+		get_viewport().set_input_as_handled()
+
+
+func set_hud_hidden(on: bool) -> void:
+	_hud_hidden = on
+	visible = not on
+	if current == "":
+		if on:
+			station.focus_clean_overview()
+		else:
+			station.focus_overview()
+	if _hidden_hint == null:
+		return
+	_hidden_hint.text = "%s mostra a interface" % U.key_name("hide_hud")
+	_hidden_hint.visible = on
+	_hidden_hint.size = _hidden_hint.get_combined_minimum_size()
+	_hidden_hint.position = Vector2(960 - _hidden_hint.size.x * 0.5, 1030)
+
+
+## O próximo cômodo na direção: o mais perto, com o desvio para o lado contando o dobro; sem nenhum escolhido, começa
+## pelo do próximo passo (ou o primeiro da esquerda).
+func _step_room(direction: Vector2) -> void:
+	if _room_rects.is_empty():
+		return
+	if _key_room == "" or not _room_rects.has(_key_room):
+		var start: String = _hover_room if _hover_room != "" else _next.get("room", "")
+		if not _room_rects.has(start):
+			var ids: Array = _room_rects.keys()
+			ids.sort_custom(func(a, b): return _room_rects[a].position.x < _room_rects[b].position.x)
+			start = ids[0]
+		_key_room = start
+	else:
+		var from: Vector2 = _room_rects[_key_room].get_center()
+		var best := ""
+		var best_score := INF
+		for id in _room_rects:
+			if id == _key_room:
+				continue
+			var offset: Vector2 = _room_rects[id].get_center() - from
+			var along := offset.dot(direction)
+			if along <= 1.0:
+				continue
+			var score := along + absf(offset.dot(Vector2(direction.y, -direction.x))) * 2.0
+			if score < best_score:
+				best_score = score
+				best = id
+		if best != "":
+			_key_room = best
+	_last_mouse = get_viewport().get_mouse_position()
+
+
+func _build_key_hints() -> void:
+	_key_hints = HBoxContainer.new()
+	_key_hints.add_theme_constant_override("separation", 16)
+	_key_hints.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for spec in [[["move_left", "move_right", "move_back", "move_front"], "cômodos"], [["interact"], "abrir"], [["hide_hud"], "ocultar"]]:
+		var group := HBoxContainer.new()
+		group.add_theme_constant_override("separation", 4)
+		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		for action in spec[0]:
+			group.add_child(U.key_cap(_arrow_name(action)))
+		group.add_child(U.label(spec[1], 16, U.MUTED))
+		_key_hints.add_child(group)
+	add_child(_key_hints)
+
+
+## As setas no lugar das letras de andar (a dica fala dos cômodos); as outras ações, a tecla delas.
+static func _arrow_name(action: String) -> String:
+	var arrows := {"move_left": "←", "move_right": "→", "move_back": "↑", "move_front": "↓"}
+	return arrows.get(action, U.key_name(action))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -423,8 +535,12 @@ func _update_room_hover() -> void:
 	var overview := current == "" and not _map.visible
 	_room_rects = station.room_screen_rects() if overview else {}
 	var hovered := ""
-	if overview:
-		var mouse := get_viewport().get_mouse_position()
+	var mouse := get_viewport().get_mouse_position()
+	if mouse.distance_to(_last_mouse) > 2.0:
+		_key_room = ""
+	if overview and _key_room != "" and _room_rects.has(_key_room):
+		hovered = _key_room
+	elif overview:
 		var over := get_viewport().gui_get_hovered_control()
 		# Em cima de um botão ou cartão do HUD, o cômodo de trás não acende (o cartão da seleção mantém a escolha).
 		if over == null or over == self or over == _room_marks:
@@ -435,6 +551,10 @@ func _update_room_hover() -> void:
 		_hover_room = hovered
 		_refresh_room_card()
 	_room_marks.queue_redraw()
+	_key_hints.visible = overview and not Settings.touch_visible()
+	if _key_hints.visible:
+		_key_hints.size = _key_hints.get_combined_minimum_size()
+		_key_hints.position = Vector2(960 - _key_hints.size.x * 0.5, 1030)
 
 
 func _draw_room_marks() -> void:

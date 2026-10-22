@@ -65,6 +65,10 @@ var b: AHStationBuilder
 var dressing := {}
 var stock: Array = []
 var wagon: Array[Node3D] = []
+## As folhas do metrô voltadas à plataforma (a folha e o lado em que desliza: -1 ou 1) e o x (m) da porta, por onde o
+## candidato desce; sem o modelo, nenhuma folha e o x fica NAN (o vagão de caixas).
+var wagon_doors: Array = []
+var train_exit_x := NAN
 var room_lights := {}
 var ember_light: OmniLight3D
 var signal_light: OmniLight3D
@@ -322,9 +326,77 @@ func _track() -> void:
 	signal_light = b.light(Vector3(BUFFERS_X - 20, -180, 44), 90, 300, Color(1, 0.15, 0.08), false)
 
 
-## O vagão em corte (o metrô Bombardier da Unreal só existe como .uasset): piso, lateral de trás com janelas, cabeceiras,
-## teto, truques e a carga de chegada.
+## O metrô Bombardier S Stock (timblewee, CC BY 4.0), exportado da Unreal por tools/unreal_export_metro.py: o corpo no
+## LOD2 e as quatro folhas de porta, no mesmo lugar do vagão da Unreal (BuildWagon). Os materiais de cada seção, na ordem
+## dos slots da Unreal: a chapa de metal tingida (a cor da pintura ou o tom), e o vidro.
+const METRO := "res://art/station/metro/%s.glb"
+const METRO_CAR := Vector3(166.0586, -180.0, -97.8462)
+const METRO_BODY_SLOTS := ["MetroDark", "MetroCream", "MetroGrey", "MetroRed", "MetroMetal", "MetroGlass", "MetroSeat"]
+const METRO_DOOR_SLOTS := ["MetroRed", "MetroDark", "MetroCream", "MetroMetal", "MetroGlass", "MetroGrey"]
+const METRO_COLORS := {"MetroDark": Color(0.07, 0.085, 0.075), "MetroCream": Color(0.76, 0.68, 0.55),
+	"MetroGrey": Color(0.82, 0.87, 0.88), "MetroRed": Color(0.8, 0.09, 0.04), "MetroMetal": Color(0.3, 0.32, 0.3),
+	"MetroSeat": Color(0.12, 0.18, 0.15)}
+## As folhas, com o lado em que deslizam (só as da plataforma abrem) e o meio da porta da plataforma (cm, no vagão).
+const METRO_DOORS := [["SM_BombardierPlatformLeft", -1.0], ["SM_BombardierPlatformRight", 1.0], ["SM_BombardierFrontLeft", 0.0],
+	["SM_BombardierFrontRight", 0.0]]
+const METRO_EXIT_X := 505.0
+var _metro_paint := {}
+
+
 func _wagon() -> void:
+	if _metro():
+		return
+	_box_wagon()
+
+
+func _metro() -> bool:
+	var names: Array = ["SM_BombardierBody"] + METRO_DOORS.map(func(door): return door[0])
+	for name in names:
+		if not ResourceLoader.exists(METRO % name):
+			return false
+	_metro_piece("SM_BombardierBody", METRO_BODY_SLOTS)
+	for door in METRO_DOORS:
+		var leaf := _metro_piece(door[0], METRO_DOOR_SLOTS)
+		if door[1] != 0.0:
+			wagon_doors.append([leaf, door[1]])
+	train_exit_x = (METRO_CAR.x + METRO_EXIT_X) * 0.01
+	# A luminária do teto do vagão e a luz dela, como na Unreal.
+	b.light(Vector3(380, -180, 250), 320, 520, WARM, false)
+	box(Vector3(360, -200, 278), Vector3(400, -160, 288), b.emissive(WARM, 8), false)
+	return true
+
+
+func _metro_piece(name: String, slots: Array) -> Node3D:
+	var node: Node3D = load(METRO % name).instantiate()
+	node.position = AHStationBuilder.vu(METRO_CAR)
+	for child in node.find_children("*", "MeshInstance3D", true, false):
+		var mesh: MeshInstance3D = child
+		for index in mesh.mesh.get_surface_count():
+			var slot: String = slots[index] if index < slots.size() else "MetroMetal"
+			mesh.set_surface_override_material(index, _metro_material(slot))
+	b.root.add_child(node)
+	b.generated.append(node)
+	return node
+
+
+## A pintura (creme, cinza e vermelho) é cor lisa, como o M_MetroPaint da Unreal; o resto é a chapa de metal tingida.
+func _metro_material(slot: String) -> Material:
+	if slot == "MetroGlass":
+		return b.glass()
+	if not ["MetroCream", "MetroGrey", "MetroRed"].has(slot):
+		return S("metal_plate", 0, 0, METRO_COLORS[slot], 0.8)
+	if not _metro_paint.has(slot):
+		var paint := StandardMaterial3D.new()
+		paint.albedo_color = METRO_COLORS[slot]
+		paint.roughness = 0.45
+		paint.metallic = 0.15
+		_metro_paint[slot] = paint
+	return _metro_paint[slot]
+
+
+## O vagão em caixas (o que a Unreal monta quando falta o metrô): piso, lateral de trás com janelas, cabeceiras, teto,
+## truques e a carga de chegada.
+func _box_wagon() -> void:
 	var body := S("green_metal_rust", 0, 0, Color(0.55, 0.72, 0.64), 0.95)
 	var roof := S("metal_plate", 0, 0, Color(0.42, 0.44, 0.42))
 	var floor := S("wood_planks_grey", 10, 0, Color(0.7, 0.6, 0.5))

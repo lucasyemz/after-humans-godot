@@ -15,6 +15,8 @@ const ACTIONS := {
 	"cancel": {"keys": [KEY_BACKSPACE], "buttons": [JOY_BUTTON_B]},
 	"menu": {"keys": [KEY_ESCAPE], "buttons": [JOY_BUTTON_START]},
 	"inventory": {"keys": [KEY_I], "buttons": [JOY_BUTTON_Y]},
+	# Estação: esconde a interface para olhar o corte limpo (o Ocultar HUD da Unreal).
+	"hide_hud": {"keys": [KEY_F2], "buttons": [JOY_BUTTON_BACK]},
 	# Combate: as quatro habilidades e as ações (Mochila é a mesma tecla da exploração).
 	"combat_ability_1": {"keys": [KEY_1]},
 	"combat_ability_2": {"keys": [KEY_2]},

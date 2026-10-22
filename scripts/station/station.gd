@@ -71,6 +71,8 @@ var _panel_open := 0.0
 var _seats := {}
 var _contacts: Array = []
 var _wagon_base := {}
+var _wagon_x := 0.0
+var _door_open := 0.0
 var _train_mode := 0
 var _train_time := 0.0
 var _warning_time := -1.0
@@ -278,6 +280,11 @@ func focus_overview(instant: bool = false) -> void:
 	_go(_overview_key(), false, instant)
 
 
+## Com o HUD oculto, a Estação inteira no meio da tela (sem a faixa do menu à esquerda).
+func focus_clean_overview() -> void:
+	_go(_framed_key(LEFT_END - 0.5, CORE_X1 + 0.5, -2.4, 20.0, 1900.0, 26.0, -3.0, 0.0), false, false)
+
+
 func focus_room(room_id: String, instant: bool = false) -> void:
 	var room := room_def(room_id)
 	if room.is_empty():
@@ -481,10 +488,21 @@ func lineup_screen_positions() -> Array:
 
 # ---------------------------------------------------------------- trem
 
+## O vagão deslocado em x (m); as folhas da plataforma ainda deslizam 88 cm para os lados com a porta aberta
+## (OffsetWagon e SetTrainDoorOpen da Unreal).
 func _offset_wagon(x: float) -> void:
+	_wagon_x = x
+	var slides := {}
+	for door in _build.wagon_doors:
+		slides[door[0]] = door[1] * 0.88 * _door_open
 	for node in _wagon_base:
 		if is_instance_valid(node):
-			node.position = _wagon_base[node] + Vector3(x, 0, 0)
+			node.position = _wagon_base[node] + Vector3(x + slides.get(node, 0.0), 0, 0)
+
+
+func _set_door_open(amount: float) -> void:
+	_door_open = clampf(amount, 0.0, 1.0)
+	_offset_wagon(_wagon_x)
 
 
 ## O trem chega do túnel com o candidato: desacelera até parar, pausa na porta e o candidato desce e anda até a
@@ -496,6 +514,7 @@ func play_train_arrival(candidate_id: String) -> void:
 	_train_mode = 1
 	_train_time = 0.0
 	_warning_time = 0.0
+	_door_open = 0.0
 	_offset_wagon(TRAIN_OUT)
 
 
@@ -587,6 +606,8 @@ func _tick_train(delta: float) -> void:
 	var before := _train_time
 	_train_time += delta
 	if _train_mode == 2:
+		# Fecha primeiro; depois acelera para o túnel.
+		_door_open = clampf(1.0 - _train_time / 0.55, 0.0, 1.0)
 		var alpha := clampf((_train_time - 0.55) / 2.6, 0.0, 1.0)
 		_offset_wagon(-36.0 * alpha * alpha)
 		if _train_time >= 3.75:
@@ -595,11 +616,13 @@ func _tick_train(delta: float) -> void:
 	if _train_time >= TRAIN_SLIDE_END:
 		_warning_time = -1.0
 	var slide := clampf(_train_time / TRAIN_SLIDE_END, 0.0, 1.0)
+	_door_open = clampf((_train_time - TRAIN_SLIDE_END) / (TRAIN_DOOR_END - TRAIN_SLIDE_END), 0.0, 1.0)
 	_offset_wagon(TRAIN_OUT * (1.0 - slide) * (1.0 - slide))
 	var target := _departure_slot(1)
 	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
-		# Desce pela porta do vagão (3,3 m antes do lugar dele) e anda até a plataforma.
-		var card := _spawn_candidate(target - Vector3(3.3, 0, 0))
+		# Desce pela porta do metrô (sem o modelo, 3,3 m antes do lugar dele) e anda até a plataforma.
+		var door := Vector3(_build.train_exit_x, target.y, target.z) if not is_nan(_build.train_exit_x) else target - Vector3(3.3, 0, 0)
+		var card := _spawn_candidate(door)
 		if card:
 			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
 				"speed": TRAIN_WALK_SPEED, "stay": true, "home_z": target.z})

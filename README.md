@@ -51,7 +51,7 @@ data/             JSON de produção (classes, habilidades, inimigos...) e a gra
 audio/            combat (sons das habilidades), music, ambience (cenários e chuva), world (passos, portas, busca),
                   station e ui
 art/              arte pintada usada pelo jogo (street: a rua; rooms: interiores; station: superfícies, modelos da Poly Haven e cards
-                  da Estação; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários;
+                  da Estação, metro: o metrô Bombardier, CC BY 4.0, créditos em art/station/metro/CREDITS.md; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários;
                   ui: o mapa de fases, as imagens das fases e os ícones dos nós)
 tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas e input)
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
@@ -86,7 +86,7 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - A/D (ou ←/→) andam pela rua; W/S (ou ↑/↓) vão para o fundo e para a frente, inclusive dentro dos becos.
     No gamepad: analógico esquerdo ou direcional.
   - Shift (ou RB) corre.
-  - As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo. Com tela de toque aparecem um analógico (andar; até a borda corre) e o botão Usar; Opções > Controles de toque liga sempre ou desliga.
+  - Na Estação, as setas (ou o direcional) andam entre os cômodos, E abre e F2 oculta a interface. As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo. Com tela de toque aparecem um analógico (andar; até a borda corre) e o botão Usar; Opções > Controles de toque liga sempre ou desliga.
   - F1 liga o modo de desenvolvedor (fica salvo): o contador de quadros e as teclas de teste abaixo (R, T, P, C, K).
   - R liga e desliga a chuva.
   - T troca entre fim de tarde e noite.

@@ -383,8 +383,14 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
   - Noite no Dormitório como a da Unreal: um cartão por herói (rosto, vida, instinto, Dormir ou Vigiar e o que a noite
     rende para ele), os suprimentos pedidos e disponíveis, +1 suprimento e Iniciar descanso. A prévia
     (`S.night_preview`) tem teste contra o descanso de verdade (com vigia, comida faltando e sede).
-  - Ainda da Unreal, para depois: o metrô Bombardier (CC BY, 260 mil triângulos) no lugar do vagão verde, Ocultar HUD
-    e a navegação por teclado entre os cômodos.
+  - O metrô Bombardier (CC BY 4.0) no lugar do vagão verde: exportado da Unreal por `tools/unreal_export_metro.py`
+    (o corpo no LOD2, 65 mil triângulos, 5 MB; as quatro folhas), com a pintura lisa como o `M_MetroPaint` e as folhas
+    da plataforma abrindo 88 cm na chegada e na partida; o candidato desce pela porta. Sem os arquivos, volta o vagão de
+    caixas.
+  - Ocultar HUD (F2 ou Back no controle, ou o botão no canto): a Estação inteira no meio da tela; F2, Esc ou um clique
+    trazem a interface de volta.
+  - Navegação por teclado e controle: as setas (ou o direcional) andam entre os cômodos pela posição na tela (a primeira
+    vai para o do próximo passo), Interagir abre; a dica das teclas fica embaixo.
 
 **Pendências da 5:**
 - Celular: ~~controles de toque~~ feitos (`AHTouchControls`: o analógico que aparece onde o dedo encosta na metade
