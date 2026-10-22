@@ -16,6 +16,9 @@ var map_name := ""
 var display_name := ""
 var data := {}
 var zones: Array = []
+## Os obstáculos na faixa de passeio de cada zona (caixas do mundo): o que é sólido na Unreal, entre o piso e a altura
+## da equipe, sem fechar a faixa inteira (sempre sobra passagem).
+var obstacles: Array[AABB] = []
 var side_doors: Array = []
 var props: Array = []
 var _materials: Array = []
@@ -78,6 +81,8 @@ func build(map: String) -> void:
 		if part.get("no_shadow", false) or data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"]:
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(node)
+		if part.get("solid", false):
+			_add_obstacle(node.transform * node.mesh.get_aabb())
 		if prop_parts.has(i):
 			if not _prop_nodes.has(prop_parts[i]):
 				_prop_nodes[prop_parts[i]] = []
@@ -101,6 +106,21 @@ func set_weather(wet: float, tint: Color) -> void:
 		material.set_shader_parameter("weather", Vector4(tint.r, tint.g, tint.b, 1.0))
 	for material in _blockouts:
 		material.set_shader_parameter("wet", wet)
+
+
+## Guarda a caixa se ela atrapalha a passagem em alguma zona: dentro da zona, na altura da equipe, na faixa de passeio
+## (os 1,2 m de cada lado do meio) e sem cobrir a faixa inteira.
+func _add_obstacle(box: AABB) -> void:
+	for zone in zones:
+		var lane: float = (zone.z0 + zone.z1) * 0.5
+		var band := AABB(Vector3(zone.x0, zone.y + 0.15, lane - 1.2), Vector3(zone.x1 - zone.x0, 1.65, 2.4))
+		if not band.intersects(box):
+			continue
+		var clipped := box.intersection(band)
+		if clipped.size.z > 1.6 or box.size.x > 6.0:
+			continue
+		obstacles.append(clipped)
+		return
 
 
 ## O prop vasculhado mostra a versão aberta (o material _Open da Unreal).

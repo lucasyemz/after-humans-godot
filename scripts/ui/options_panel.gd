@@ -11,13 +11,17 @@ signal new_campaign_requested
 const H = preload("res://scripts/ui/combat_hud.gd")
 ## As ações do jogo e o nome delas na tela (as de teste ficam de fora).
 const CONTROLS := [["move_left", "Andar para a esquerda"], ["move_right", "Andar para a direita"], ["move_back", "Para o fundo"],
-	["move_front", "Para a frente"], ["run", "Correr"], ["interact", "Interagir"], ["inventory", "Mochila"], ["cancel", "Voltar"], ["menu", "Menu"]]
+	["move_front", "Para a frente"], ["run", "Correr"], ["interact", "Interagir"], ["inventory", "Mochila"], ["cancel", "Voltar"], ["menu", "Menu"],
+	["combat_ability_1", "Luta: habilidade 1"], ["combat_ability_2", "Luta: habilidade 2"], ["combat_ability_3", "Luta: habilidade 3"],
+	["combat_ability_4", "Luta: habilidade 4"], ["combat_move", "Luta: mover"], ["combat_defend", "Luta: defender"], ["combat_flee", "Luta: fugir"]]
 
 const PAD_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "Start", JOY_BUTTON_RIGHT_SHOULDER: "RB",
 	JOY_BUTTON_DPAD_UP: "↑", JOY_BUTTON_DPAD_DOWN: "↓", JOY_BUTTON_DPAD_LEFT: "←", JOY_BUTTON_DPAD_RIGHT: "→"}
 
 var width := 600.0
 var allow_new_campaign := false
+## A ação esperando a tecla nova ("" = nenhuma).
+var _waiting := ""
 
 
 func _ready() -> void:
@@ -77,13 +81,37 @@ func _ready() -> void:
 	add_child(again)
 
 	_section("Controles")
+	add_child(H.make_label("Trocar: clique e aperte a tecla nova (Esc cancela). Se outra ação usava a tecla, as duas trocam.", 16, H.MUTED))
 	for spec in CONTROLS:
 		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
 		var name := H.make_label(spec[1], 18, H.TEXT)
-		name.custom_minimum_size = Vector2(260, 0)
+		name.custom_minimum_size = Vector2(230, 0)
 		row.add_child(name)
-		row.add_child(H.make_label(_keys(spec[0]), 18, H.GOLD))
+		var keys_label := H.make_label(_keys(spec[0]), 18, H.GOLD)
+		keys_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		keys_label.clip_text = true
+		row.add_child(keys_label)
+		var change := Button.new()
+		change.text = "Aperte uma tecla…" if _waiting == spec[0] else "Trocar"
+		change.custom_minimum_size = Vector2(150, 36)
+		H.style_button(change)
+		if _waiting == spec[0]:
+			change.add_theme_color_override("font_color", H.GOLD)
+		var action: String = spec[0]
+		change.pressed.connect(func():
+			_waiting = action
+			_rebuild())
+		row.add_child(change)
 		add_child(row)
+	var defaults := Button.new()
+	defaults.text = "Restaurar as teclas padrão"
+	defaults.custom_minimum_size = Vector2(0, 40)
+	H.style_button(defaults)
+	defaults.pressed.connect(func():
+		Settings.reset_keys()
+		_rebuild())
+	add_child(defaults)
 	add_child(H.make_label("Mouse: clique nos botões e nos alvos da luta.", 16, H.MUTED))
 
 	if allow_new_campaign:
@@ -104,9 +132,18 @@ func _ready() -> void:
 
 
 func _rebuild() -> void:
+	# Mantém a rolagem (trocar uma tecla lá embaixo não volta o painel para o topo).
+	var scroll: ScrollContainer = null
+	var node := get_parent()
+	while node != null and scroll == null:
+		scroll = node as ScrollContainer
+		node = node.get_parent()
+	var at := scroll.scroll_vertical if scroll else 0
 	for child in get_children():
 		child.queue_free()
 	_ready()
+	if scroll:
+		scroll.set_deferred("scroll_vertical", at)
 
 
 func _title(text: String, size: int) -> void:
@@ -167,6 +204,18 @@ func _toggle(text: String, on: bool, action: Callable) -> void:
 	check.add_theme_color_override("font_color", H.TEXT)
 	check.toggled.connect(func(value): action.call(value))
 	add_child(check)
+
+
+## Esperando a tecla nova: a primeira tecla apertada vira a principal da ação (Esc cancela).
+func _input(event: InputEvent) -> void:
+	if _waiting == "" or not (event is InputEventKey) or not event.pressed or event.echo:
+		return
+	get_viewport().set_input_as_handled()
+	var code: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+	if code != KEY_ESCAPE:
+		Settings.set_key(_waiting, code)
+	_waiting = ""
+	_rebuild()
 
 
 ## As teclas e botões de uma ação, como o InputMap tem (define_input.gd).

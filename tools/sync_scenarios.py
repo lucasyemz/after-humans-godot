@@ -32,6 +32,12 @@ AREAS = {'RiverDock': ['Cais', 'Navio', 'Galpão'], 'FloodedDepot': ['Hall', 'Es
          'SealedShelter': ['Convivência', 'Arquivo', 'Sala técnica']}
 
 
+def solid_collision(component: dict) -> bool:
+    """A colisão do componente bloqueia (o export grava o enum como texto: "QUERY_AND_PHYSICS: 3>", "NO_COLLISION: 0>")."""
+    text = str(component.get('collision', ''))
+    return text != '' and 'NO_COLLISION' not in text and 'NoCollision' not in text and 'QUERY_ONLY' not in text
+
+
 def godot_point(v):
     return [v[0] / 100.0, v[2] / 100.0, v[1] / 100.0]
 
@@ -224,10 +230,10 @@ def convert_map(name, raw_meshes, mesh_ids, names):
                         entry['hidden'] = True
                     if not c.get('shadow', True):
                         entry['no_shadow'] = True
-                    if c.get('collision', 'NoCollision') != 'NoCollision':
+                    if solid_collision(c):
                         entry['solid'] = True
                     parts.append(entry)
-                if floor_tag and kind == 'mesh' and c.get('collision', 'NoCollision') != 'NoCollision':
+                if floor_tag and kind == 'mesh' and solid_collision(c):
                     lo, hi = world_box(c, raw_meshes[c['mesh']])
                     if hi[0] - lo[0] >= 600 and hi[1] - lo[1] >= 380 and hi[2] - lo[2] <= 100:
                         floors.append([lo, hi])

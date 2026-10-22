@@ -287,7 +287,9 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
   acompanha a equipe e a luta.
 
 **Pendências da 4:**
-- Sem colisão nos cenários: a equipe fica presa à faixa da zona, sem bater nos props.
+- ~~Sem colisão nos cenários~~ conferido: na faixa de passeio a Unreal só tem como sólido as paredes das pontas e o
+  piso; os caixotes e props são cards sem colisão, e a equipe fica presa à faixa como lá. O `solid` da exportação foi
+  corrigido (vinha marcado em tudo) e o que for sólido na faixa vira colisão sozinho (`AHScenarioWorld.obstacles`).
 - O portão animado do Portão de Triagem não entrou (a jornada da Unreal também não o usa), nem as baias do Cais que
   escondem as outras zonas; o sol exportado é trocado pelo da rua.
 - Os cenários fechados de noite ficam escuros fora do alcance das luminárias e da lanterna: calibrar na QA em Play.
@@ -363,7 +365,8 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
     ou voltar com metade.
   - Plano da Estação: cada cômodo com o nível, o que faz, o que o próximo nível destrava, o custo e o que falta.
   - Cores para daltonismo nas Opções (azul e laranja no lugar de verde e vermelho, Okabe–Ito), salvas por máquina.
-  - Fica para depois: aumentar o texto (as telas são fixas em 1920x1080) e trocar as teclas.
+  - Trocar as teclas nas Opções (cada ação, com troca automática quando a tecla já é de outra, e restaurar o padrão),
+    salvo por máquina, com teste. Fica para depois: aumentar o texto (as telas são fixas em 1920x1080).
 
 **Pendências da 5:**
 - Celular: controles de toque para andar e interagir, HUD maior em tela pequena e um pacote mais leve (120 MB pesa em

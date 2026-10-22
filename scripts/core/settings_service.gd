@@ -21,16 +21,29 @@ var vsync := true
 var dev_mode := false
 ## Cores para daltonismo: azul e laranja no lugar de verde e vermelho (AHUiStyle.set_colorblind).
 var colorblind := false
+## As teclas trocadas nas Opções: a ação e a tecla principal nova (código físico). As outras teclas da ação (as setas,
+## por exemplo) e os botões do controle continuam.
+var keys := {}
+const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run", "interact", "inventory", "cancel", "menu",
+	"combat_ability_1", "combat_ability_2", "combat_ability_3", "combat_ability_4", "combat_move", "combat_defend", "combat_flee"]
+
+
+## Nos scripts de teste e nas capturas as opções valem só na memória (nada é gravado na pasta de quem joga).
+var _persist := true
 
 
 func _ready() -> void:
+	var args := Array(OS.get_cmdline_args()) + Array(OS.get_cmdline_user_args())
+	_persist = not (args.has("-s") or args.has("--script") or args.any(func(a): return String(a).begins_with("--capture=")))
 	var config := ConfigFile.new()
-	if config.load(PATH) == OK:
+	if _persist and config.load(PATH) == OK:
 		level = clampi(int(config.get_value("graphics", "level", level)), 0, 3)
 		fullscreen = bool(config.get_value("graphics", "fullscreen", fullscreen))
 		vsync = bool(config.get_value("graphics", "vsync", vsync))
 		dev_mode = bool(config.get_value("dev", "enabled", dev_mode))
 		colorblind = bool(config.get_value("accessibility", "colorblind", colorblind))
+		keys = config.get_value("controls", "keys", {})
+	apply_controls()
 	AHUiStyle.install.call_deferred(get_tree().root)
 	apply()
 
@@ -43,6 +56,53 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func set_dev_mode(value: bool) -> void:
 	dev_mode = value
+	_store()
+
+
+## As teclas padrão (as de tools/define_input.gd, no project.godot) com as trocas por cima.
+func apply_controls() -> void:
+	InputMap.load_from_project_settings()
+	for action in keys:
+		if not InputMap.has_action(action):
+			continue
+		# A tecla nova entra no lugar da primeira (a ordem diz qual é a principal).
+		var events := InputMap.action_get_events(action)
+		var key := InputEventKey.new()
+		key.physical_keycode = int(keys[action])
+		var replaced := false
+		for i in events.size():
+			if events[i] is InputEventKey and not replaced:
+				events[i] = key
+				replaced = true
+		if not replaced:
+			events.push_front(key)
+		InputMap.action_erase_events(action)
+		for event in events:
+			InputMap.action_add_event(action, event)
+
+
+## A tecla principal da ação agora (código físico; 0 se não houver).
+func primary_key(action: String) -> int:
+	for event in InputMap.action_get_events(action):
+		if event is InputEventKey:
+			return event.physical_keycode if event.physical_keycode != 0 else event.keycode
+	return 0
+
+
+## Troca a tecla principal; se outra ação já usava essa tecla, ela fica com a antiga desta (troca, sem conflito).
+func set_key(action: String, code: int) -> void:
+	var old := primary_key(action)
+	for other in REMAPPABLE:
+		if other != action and primary_key(other) == code:
+			keys[other] = old
+	keys[action] = code
+	apply_controls()
+	_store()
+
+
+func reset_keys() -> void:
+	keys.clear()
+	apply_controls()
 	_store()
 
 
@@ -67,12 +127,16 @@ func set_vsync(value: bool) -> void:
 
 
 func _store() -> void:
+	if not _persist:
+		apply()
+		return
 	var config := ConfigFile.new()
 	config.set_value("graphics", "level", level)
 	config.set_value("graphics", "fullscreen", fullscreen)
 	config.set_value("graphics", "vsync", vsync)
 	config.set_value("dev", "enabled", dev_mode)
 	config.set_value("accessibility", "colorblind", colorblind)
+	config.set_value("controls", "keys", keys)
 	config.save(PATH)
 	apply()
 

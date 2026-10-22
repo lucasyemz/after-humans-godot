@@ -223,6 +223,7 @@ func _ready() -> void:
 		scenario = AHScenarioWorld.new()
 		add_child(scenario)
 		scenario.build(map)
+		_build_scenario_colliders()
 	else:
 		_build_street()
 		_build_buildings()
@@ -291,6 +292,12 @@ func _journey_map() -> String:
 	if expedition == null:
 		return ""
 	return AHJourneyRules.map_for_step(expedition.phase_id, int(expedition.corridor.index))
+
+
+## A colisão dos obstáculos do cenário (o que a Unreal marca como sólido na faixa de passeio), com as caixas da tecla C.
+func _build_scenario_colliders() -> void:
+	for box in scenario.obstacles:
+		_add_collider(box.get_center(), box.size)
 
 
 ## Entra numa zona do cenário: o piso, a faixa (até 1,2 m para cada lado do meio, como a LaneDepth da Unreal), a
