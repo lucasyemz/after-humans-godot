@@ -10,11 +10,17 @@ const COPPER := Color("c98a4b")
 const GOLD := Color("e9c47c")
 const TEXT := Color("efe5d1")
 const MUTED := Color("a69a84")
-const DANGER := Color("e2675b")
-const OK := Color("86c98f")
+static var DANGER := Color("e2675b")
+## Bom e ruim: verde e vermelho, ou azul e laranja no modo para daltonismo (Okabe–Ito; Settings.colorblind).
+static var OK := Color("86c98f")
 const VIOLET := Color("b7a6f4")
 const ENEMY := Color("d9893d")
 const BLUE := Color("8fb4f0")
+static func set_colorblind(on: bool) -> void:
+	OK = Color("56b4e9") if on else Color("86c98f")
+	DANGER = Color("e69f00") if on else Color("e2675b")
+
+
 ## Texto mínimo na base de 1080p (a regra 2 da proposta).
 const MIN_TEXT := 18
 

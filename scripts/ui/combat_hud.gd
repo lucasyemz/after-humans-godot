@@ -310,7 +310,7 @@ static func _clear(node: Node) -> void:
 func _status_chip(text: String, good: bool, size: int = 15) -> PanelContainer:
 	var chip := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.22, 0.34, 0.55, 0.55) if good else Color(0.5, 0.15, 0.12, 0.6)
+	style.bg_color = Color(0.22, 0.34, 0.55, 0.55) if good else Color(S.DANGER.darkened(0.55), 0.6)
 	style.border_color = Color(S.BLUE, 0.8) if good else Color(S.DANGER, 0.85)
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(3)

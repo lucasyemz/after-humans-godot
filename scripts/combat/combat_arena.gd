@@ -224,6 +224,7 @@ func _run() -> void:
 				hud.show_waiting("%s age" % actor.display_name)
 				await _wait(0.25)
 				var auto := session.engine.play_auto_turn(actor.id)
+				session._count(actor.id, auto.events)
 				beat = {"source_id": actor.id, "kind": "ability" if auto.used_ability_id != "" else "defend",
 					"ability_id": auto.used_ability_id, "events": auto.events, "ok": auto.success, "error": auto.error}
 			else:

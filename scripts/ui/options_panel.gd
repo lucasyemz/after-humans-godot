@@ -63,6 +63,9 @@ func _ready() -> void:
 		Settings.changed.emit())
 
 	_toggle("Dicas da primeira vez", Tips.enabled, func(on): Tips.set_enabled(on))
+	_toggle("Cores para daltonismo (azul e laranja)", Settings.colorblind, func(on):
+		Settings.set_colorblind(on)
+		_rebuild())
 	var again := Button.new()
 	again.text = "Mostrar as dicas de novo"
 	again.custom_minimum_size = Vector2(0, 42)

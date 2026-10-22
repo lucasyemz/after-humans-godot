@@ -17,6 +17,7 @@ func run(t) -> void:
 	_options(t, campaign)
 	_flee(t, campaign)
 	_write_back(t, campaign)
+	_stats(t)
 
 
 ## Uma luta jogada pelos dois lados (os heróis pela política fixa da paridade). Devolve o resultado.
@@ -91,3 +92,28 @@ func _write_back(t, campaign: Dictionary) -> void:
 	var dead = copy.roster.filter(func(h): return h.id == "hero_gato_nick")[0]
 	t.equal(dead.alive, false, "quem morreu na luta fica com alive = false")
 	t.check(Campaign.is_usable(copy), "a campanha continua utilizável depois da luta")
+
+
+## O que cada herói fez na luta soma na expedição (o destaque do relatório da volta).
+func _stats(t) -> void:
+	var campaign: Dictionary = Campaign.create_initial(12)
+	AHJourneyRules.start_expedition(campaign, "fase_1", 7)
+	var session := AHCombatSession.create(campaign.roster.slice(0, 4), PATROLS[0], false, 3)
+	var beats := 0
+	while not session.is_over() and beats < 400:
+		if session.is_player_turn():
+			session.auto_player_turn()
+		else:
+			session.enemy_turn()
+		beats += 1
+	var damage := 0
+	for hero_id in session.tally:
+		damage += int(session.tally[hero_id].damage)
+	t.check(damage > 0, "os heróis causaram dano contado (%d)" % damage)
+	session.write_back(campaign)
+	var stats: Dictionary = campaign.session.expedition.get("stats", {})
+	var total := 0
+	for hero_id in stats:
+		total += int(stats[hero_id].damage)
+	t.equal(total, damage, "a soma vai para a expedição")
+	t.check(session.tally.is_empty(), "a contagem da luta zera depois de gravar")

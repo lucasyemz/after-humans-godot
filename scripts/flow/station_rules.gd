@@ -934,7 +934,7 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 		"seeds": floori(loot.get("seeds", 0) * factor), "scrap": floori(loot.get("scrap", 0) * factor),
 		"fragments": floori(loot.get("fragments", 0) * factor), "water": floori(loot.get("water", 0) * factor),
 		"supplies": floori(loot.get("supplies", 0) * factor), "request": "", "team": expedition.team.duplicate(),
-		"food_left": maxi(0, int(expedition.food))}
+		"food_left": maxi(0, int(expedition.food)), "stats": expedition.get("stats", {}).duplicate(true)}
 	adjust(campaign, "seeds", delivered.seeds)
 	adjust(campaign, "scrap", delivered.scrap)
 	adjust(campaign, "fragments", delivered.fragments)

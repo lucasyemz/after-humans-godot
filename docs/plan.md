@@ -354,6 +354,17 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
     posição, os avisos), troca com dois cliques, os de fora da equipe, o aviso de quem cura, e à direita a missão, o
     foco, a comida e "Partir · destino".
 
+- **Nova HUD, etapa 3 (vontade de voltar):**
+  - O achado de cada busca sobe da equipe com o ícone e voa para o achado no alto.
+  - O relatório da volta conta item a item, diz o que a Estação já pode recuperar (com o botão para ir) e destaca o que
+    cada herói fez (dano, quem derrubou, cura; o melhor ganha a estrela). A luta conta isso por herói
+    (`AHCombatSession.tally`) e a expedição soma (`expedition.stats`, com teste).
+  - A pergunta de risco, uma vez por jornada: no descanso e diante do guardião, com a equipe e o achado à vista: seguir
+    ou voltar com metade.
+  - Plano da Estação: cada cômodo com o nível, o que faz, o que o próximo nível destrava, o custo e o que falta.
+  - Cores para daltonismo nas Opções (azul e laranja no lugar de verde e vermelho, Okabe–Ito), salvas por máquina.
+  - Fica para depois: aumentar o texto (as telas são fixas em 1920x1080) e trocar as teclas.
+
 **Pendências da 5:**
 - Celular: controles de toque para andar e interagir, HUD maior em tela pequena e um pacote mais leve (120 MB pesa em
   dados móveis); falta testar num aparelho de verdade.

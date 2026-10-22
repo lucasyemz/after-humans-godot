@@ -479,11 +479,27 @@ func _announce(index: int, outcome: String, first_time: bool) -> void:
 			if camp >= 0:
 				where = " O acampamento fica %s do trecho %d." % [("no cinema" if route.sites[camp].shop == 2 else "na " + R.SHOP_NAMES[route.sites[camp].shop]), route.sites[camp].step + 1]
 			hud.toast("Trecho %d · Descanso. Um lugar quieto.%s" % [index + 1, where], 5.0)
+			_ask_risk("rest", "Um lugar quieto", "A equipe para no descanso.%s Daqui dá para seguir até o guardião ou voltar à Estação com metade do achado." % where)
 		"combat", "boss":
 			hud.toast("Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro." % [index + 1, label])
+			if outcome == "boss":
+				_ask_risk("boss", "O guardião está à frente", "Vencer o guardião conclui a fase e leva todo o achado. Se a equipe cair, o achado fica para trás; voltar agora leva metade.")
 		_:
 			if first_time:
 				hud.toast("Trecho %d · %s" % [index + 1, label], 2.5)
+
+
+## A pergunta de risco, uma vez por jornada em cada ponto: seguir com a equipe como está ou voltar com metade.
+func _ask_risk(key: String, title: String, text: String) -> void:
+	var expedition: Dictionary = Campaign.state.session.expedition
+	var asked: Array = expedition.get("asked", [])
+	if asked.has(key) or street._capture_dir != "" or expedition.objective_completed:
+		return
+	asked.append(key)
+	expedition.asked = asked
+	Campaign.save()
+	hud.show_choice(title, text, [["Seguir em frente", func(): pass],
+		["Voltar à Estação (metade do achado)", _retreat]])
 
 
 # ---------------------------------------------------------------- interações
@@ -680,10 +696,12 @@ func _new_campaign() -> void:
 
 func _search_scenario_prop(entry: Dictionary) -> void:
 	var objective_before: bool = Campaign.state.session.expedition.get("objective_done", false)
+	var stock := _loot_snapshot()
 	var result := R.search_scenario_prop(Campaign.state, entry.prop)
 	if result.ok:
 		# O prop que abre faz o clique de metal; o achado do objetivo, as moedas; o resto, o pano.
 		_search_sound(objective_before, int(street.scenario.props[entry.local].open) >= 0)
+		_show_gains(stock)
 		street.scenario.open_prop(entry.local)
 		Campaign.save()
 		hud.toast("%s: %s" % [entry.name, result.text], 5.0)
@@ -752,9 +770,11 @@ func _leave_side_room() -> void:
 
 func _search_prop(index: int) -> void:
 	var objective_before: bool = Campaign.state.session.expedition.get("objective_done", false)
+	var stock := _loot_snapshot()
 	var result := R.search_prop(Campaign.state, index)
 	if result.ok:
 		_search_sound(objective_before, false)
+		_show_gains(stock)
 		_dim(props[index])
 		Campaign.save()
 		hud.toast(result.text, 5.0)
@@ -840,16 +860,38 @@ func _close_room() -> void:
 
 func _search_spot(site_index: int, spot_index: int) -> void:
 	var objective_before: bool = Campaign.state.session.expedition.get("objective_done", false)
+	var stock := _loot_snapshot()
 	var result := R.search_spot(Campaign.state, site_index, spot_index)
 	if not result.ok:
 		return
 	_search_sound(objective_before, false)
+	_show_gains(stock)
 	Campaign.save()
 	hud.refresh(Campaign.state)
 	if result.event != "":
 		hud.show_event(Campaign.state)
 	else:
 		hud.toast(result.text, 5.0)
+
+
+## O que a equipe tem agora (para mostrar o que uma busca trouxe).
+func _loot_snapshot() -> Dictionary:
+	var expedition: Dictionary = Campaign.state.session.expedition
+	return {"seeds": int(expedition.loot.seeds), "scrap": int(expedition.loot.scrap), "fragments": int(expedition.loot.fragments),
+		"food": int(expedition.food), "bandages": int(Campaign.state.inventory.bandages), "tools": Campaign.state.get("tools", []).size()}
+
+
+## A diferença vira o efeito do achado no HUD (só o que subiu).
+func _show_gains(before: Dictionary) -> void:
+	var after := _loot_snapshot()
+	var gains: Array = []
+	for spec in [["seeds", "lobby-seed", "semente", "sementes"], ["scrap", "lobby-scrap", "sucata", "sucatas"],
+			["fragments", "lobby-fragment", "fragmento", "fragmentos"], ["food", "lobby-food", "comida", "comidas"],
+			["bandages", "res-bandages", "curativo", "curativos"], ["tools", "tool-generic", "ferramenta", "ferramentas"]]:
+		var delta: int = after[spec[0]] - before[spec[0]]
+		if delta > 0:
+			gains.append([spec[1], "+%d %s" % [delta, spec[2] if delta == 1 else spec[3]]])
+	hud.loot_burst(gains, street._leader.global_position + Vector3(0, 1.9, 0))
 
 
 ## O som da busca (como na Unreal): moedas quando ela cumpriu o objetivo da rota, o clique de metal num prop que abre,

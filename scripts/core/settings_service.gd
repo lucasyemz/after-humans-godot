@@ -19,6 +19,8 @@ var fullscreen := false
 var vsync := true
 ## Modo de desenvolvedor (F1): as teclas de teste (K, R, T, P, C) e o contador de quadros. Fica fora da tela do jogador.
 var dev_mode := false
+## Cores para daltonismo: azul e laranja no lugar de verde e vermelho (AHUiStyle.set_colorblind).
+var colorblind := false
 
 
 func _ready() -> void:
@@ -28,6 +30,7 @@ func _ready() -> void:
 		fullscreen = bool(config.get_value("graphics", "fullscreen", fullscreen))
 		vsync = bool(config.get_value("graphics", "vsync", vsync))
 		dev_mode = bool(config.get_value("dev", "enabled", dev_mode))
+		colorblind = bool(config.get_value("accessibility", "colorblind", colorblind))
 	AHUiStyle.install.call_deferred(get_tree().root)
 	apply()
 
@@ -40,6 +43,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func set_dev_mode(value: bool) -> void:
 	dev_mode = value
+	_store()
+
+
+func set_colorblind(value: bool) -> void:
+	colorblind = value
 	_store()
 
 
@@ -64,6 +72,7 @@ func _store() -> void:
 	config.set_value("graphics", "fullscreen", fullscreen)
 	config.set_value("graphics", "vsync", vsync)
 	config.set_value("dev", "enabled", dev_mode)
+	config.set_value("accessibility", "colorblind", colorblind)
 	config.save(PATH)
 	apply()
 
@@ -77,6 +86,7 @@ func apply() -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if vsync else DisplayServer.VSYNC_DISABLED)
 	get_viewport().scaling_3d_scale = RENDER_SCALE[level]
+	AHUiStyle.set_colorblind(colorblind)
 	changed.emit()
 
 

@@ -14,6 +14,8 @@ var engine: AHCombatEngine
 ## A vez do herói que está decidindo (rodada:unidade) e a vez em que ele já usou um item da Mochila.
 var processed_turn_key := ""
 var item_used_turn_key := ""
+## O que cada herói fez nesta luta (o destaque do relatório da volta): {hero_id: {damage, healing, downs}}.
+var tally := {}
 
 
 ## heroes: heróis da campanha (Campaign.state.roster) na ordem da formação. enemies: da frente para trás, cada um o id
@@ -245,11 +247,35 @@ func enemy_action(enemy_id: String, short_id: String):
 
 
 func _beat(actor_id: String, kind: String, ability_id: String, result: AHCombat.ActionResult) -> Dictionary:
+	_count(actor_id, result.events)
 	return {"source_id": actor_id, "kind": kind, "ability_id": ability_id, "events": result.events, "ok": result.success,
 		"error": result.error, "escaped": result.escaped}
 
 
 # ---------------------------------------------------------------- fim da luta
+
+## Soma o dano, a cura e quem caiu pelas mãos do herói (só os heróis contam).
+func _count(actor_id: String, events: Array) -> void:
+	var actor := state.find_unit(actor_id)
+	if actor == null or not actor.is_player:
+		return
+	var entry: Dictionary = tally.get(actor.hero_id, {"damage": 0, "healing": 0, "downs": 0})
+	for event in events:
+		var target := state.find_unit(event.target_unit_id)
+		if target == null:
+			continue
+		match event.type:
+			AHCombat.EventType.DAMAGE:
+				if not target.is_player:
+					entry.damage += event.amount
+			AHCombat.EventType.HEAL:
+				if target.is_player:
+					entry.healing += event.amount
+			AHCombat.EventType.DEATH:
+				if not target.is_player:
+					entry.downs += 1
+	tally[actor.hero_id] = entry
+
 
 ## Grava na campanha a vida, o instinto e o trauma de cada herói; quem morreu fica com alive = false. Na vitória, a Íris
 ## recarrega a ampola.
@@ -269,3 +295,14 @@ func write_back(campaign: Dictionary) -> void:
 				if ability != null and ability.bUsesPerExpedition:
 					hero.expedition_uses[ability_id] = unit.remaining_uses[ability_id]
 	AHExplorationCare.restore_iris_after_victory(campaign, self)
+	# O que cada um fez soma na expedição (o relatório da volta destaca).
+	var expedition = campaign.get("session", {}).get("expedition")
+	if expedition != null:
+		var stats: Dictionary = expedition.get("stats", {})
+		for hero_id in tally:
+			var total: Dictionary = stats.get(hero_id, {"damage": 0, "healing": 0, "downs": 0})
+			for key in ["damage", "healing", "downs"]:
+				total[key] = int(total.get(key, 0)) + int(tally[hero_id][key])
+			stats[hero_id] = total
+		expedition.stats = stats
+		tally.clear()

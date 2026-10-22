@@ -186,8 +186,8 @@ func _ready() -> void:
 	add_child(_prompt)
 
 	_toast = S.label("", 26, S.TEXT, "bold")
-	_toast.position = Vector2(360, 190)
-	_toast.size = Vector2(1200, 80)
+	_toast.position = Vector2(480, 250)
+	_toast.size = Vector2(960, 80)
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_toast.modulate.a = 0.0
@@ -422,6 +422,40 @@ func show_prompt(text: String, where = null) -> void:
 	_prompt.size = _prompt.get_combined_minimum_size()
 
 
+## O achado de uma busca vira momento: cada item sobe da equipe com o ícone e voa para o achado no alto.
+## gains: [[ícone, texto]], where: o ponto no mundo de onde sai.
+func loot_burst(gains: Array, where: Vector3) -> void:
+	var camera := get_viewport().get_camera_3d()
+	if camera == null or gains.is_empty():
+		return
+	var view := get_viewport_rect().size
+	var start := camera.unproject_position(where) * Vector2(1920.0 / view.x, 1080.0 / view.y)
+	var target := _loot_row.global_position + Vector2(_loot_row.size.x * 0.5, 16)
+	for i in gains.size():
+		var chip := PanelContainer.new()
+		chip.add_theme_stylebox_override("panel", _chip_style())
+		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chip.add_child(row)
+		row.add_child(_icon(gains[i][0], 26, S.GOLD))
+		row.add_child(S.label(gains[i][1], 22, S.GOLD, "bold"))
+		add_child(chip)
+		chip.size = chip.get_combined_minimum_size()
+		chip.pivot_offset = chip.size * 0.5
+		chip.position = start - chip.size * 0.5 + Vector2(0, -40 * i)
+		chip.modulate.a = 0.0
+		var tween := create_tween()
+		tween.tween_interval(0.18 * i)
+		tween.tween_property(chip, "modulate:a", 1.0, 0.15)
+		tween.parallel().tween_property(chip, "position:y", chip.position.y - 60, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_interval(0.5)
+		tween.tween_property(chip, "position", target - chip.size * 0.5, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+		tween.parallel().tween_property(chip, "scale", Vector2(0.4, 0.4), 0.55)
+		tween.tween_callback(chip.queue_free)
+
+
 ## Os losangos sobre o que dá para usar por perto (o corredor manda a cada quadro).
 func set_markers(points: Array) -> void:
 	_marker_points = points
@@ -633,6 +667,37 @@ func show_inventory() -> void:
 
 func inventory_shown() -> bool:
 	return modal_open() and _modal.has_meta("inventory")
+
+
+## Uma escolha de risco (no descanso e diante do guardião): o título, a equipe como está e as opções [[texto, ação]];
+## a primeira é a principal.
+func show_choice(title: String, text: String, options: Array) -> void:
+	var box := _open_modal(720)
+	box.add_child(S.label(title, 34, S.GOLD, "display"))
+	var body := S.label(text, 20, S.TEXT)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.custom_minimum_size = Vector2(680, 0)
+	box.add_child(body)
+	var team := HBoxContainer.new()
+	team.add_theme_constant_override("separation", 8)
+	box.add_child(team)
+	var expedition = Campaign.state.session.expedition
+	for hero_id in expedition.team:
+		var hero = Campaign.hero(hero_id)
+		if hero != null and hero.alive:
+			team.add_child(_mate(hero))
+	box.add_child(S.label("Comida %d/%d · Curativos %d · Achado: %d sementes, %d sucata, %d fragmentos" % [expedition.food, AHJourneyRules.MAX_FOOD,
+		Campaign.state.inventory.bandages, expedition.loot.seeds, expedition.loot.scrap, expedition.loot.fragments], 17, S.MUTED))
+	var first: Button
+	for option in options:
+		var button := _button(option[0], func():
+			close_modal()
+			option[1].call())
+		box.add_child(button)
+		if first == null:
+			first = button
+			button.add_theme_color_override("font_color", S.GOLD)
+	first.grab_focus.call_deferred()
 
 
 ## As opções por cima da exploração (som, gráficos, jogo, controles); Fechar ou Esc fecha.
