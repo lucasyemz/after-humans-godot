@@ -297,7 +297,7 @@ func _spawn_props() -> void:
 	for index in route.steps.size():
 		if route.steps[index].type != "loot":
 			continue
-		var card: MeshInstance3D = street._add_card(PROP_ART[0], PROP_ART[1], Vector3(_step_x(index, 0.45) * 100.0, -285, street.SIDEWALK_TOP_Z), PROP_ART[2])
+		var card: MeshInstance3D = street._dynamic.add_card(PROP_ART[0], PROP_ART[1], Vector3(_step_x(index, 0.45) * 100.0, -285, AHStreetSet.SIDEWALK_TOP_Z), PROP_ART[2])
 		props[index] = card
 		if route.props.get(str(index), false):
 			_dim(card)
@@ -317,11 +317,11 @@ func _refresh_doors() -> void:
 		if _overlays.has(i) or (site.locked and not site.forced):
 			continue
 		var door: Dictionary = doors[site.door]
-		var rect: Rect2 = street.DOOR_OVERLAYS[site.shop]
-		var scale: float = street.FACADE_WIDTH / 1536.0
-		var base: float = street.SIDEWALK_TOP_Z + (1024.0 - (rect.position.y + rect.size.y)) * scale
-		var card: MeshInstance3D = street._add_card("door-open-%s-crop.png" % SHOP_ART[site.shop], Rect2(),
-			Vector3(door.x * 100.0, street.FACADE_FRONT_Y + 2, base), rect.size.y * scale, 0.0, door.mirror, false, true)
+		var rect: Rect2 = AHStreetSet.DOOR_OVERLAYS[site.shop]
+		var scale: float = AHStreetSet.FACADE_WIDTH / 1536.0
+		var base: float = AHStreetSet.SIDEWALK_TOP_Z + (1024.0 - (rect.position.y + rect.size.y)) * scale
+		var card: MeshInstance3D = street._dynamic.add_card("door-open-%s-crop.png" % SHOP_ART[site.shop], Rect2(),
+			Vector3(door.x * 100.0, AHStreetSet.FACADE_FRONT_Y + 2, base), rect.size.y * scale, 0.0, door.mirror, false, true)
 		_overlays[i] = card
 
 

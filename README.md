@@ -39,12 +39,14 @@ scripts/flow/     GameFlow (autoload), o boot, as regras da jornada (corredor, c
 scripts/combat/   motor de combate, tabelas tipadas, a sessão de luta (comandos e lances) e a arena (animação)
 scripts/ui/       HUD de combate, da exploração e do refúgio, o mapa de fases, as opções e a Mochila
 scripts/world/    AHSpriteCard (personagem pintado com o pé fixo ao trocar de pose) e AHHouseRoom (interior das lojas)
-scripts/street/   Rua das Vitrines montada em código, chuva, colisão e o corredor (patrulhas, visão, portas, saque)
+scripts/street/   Rua das Vitrines: a montagem fixa (street_set.gd, gravada em scenes/street_set.tscn), chuva, colisão e o
+                  corredor (patrulhas, visão, portas, saque)
 scripts/scenario/ AHScenarioWorld: monta os seis cenários da Unreal a partir de data/scenarios (zonas, portas, props)
 scripts/station/  Estação Raiz em corte: a montagem transcrita da Unreal (station_build.gd), os auxiliares em cm
                   (station_builder.gd), os moradores, o trem e a câmera de cada cômodo
 shaders/          cenários (blockout, cards, água com ondas), pós-processamento Emberfall, fogueira que apaga, chuva e fumaça, feixes de luz, halos, silhuetas
-scenes/           boot.tscn (cena inicial: abre a Estação, ou a rua se há expedição), station.tscn e street.tscn
+scenes/           boot.tscn (cena inicial: abre a Estação, ou a rua se há expedição), station.tscn, street.tscn e
+                  street_set.tscn (a rua montada, editável no editor)
 data/             JSON de produção (classes, habilidades, inimigos...) e a gravação de paridade do combate;
                   expedition-teams.json diz quantos partem em cada jornada (mínimo e máximo); em events.json,
                   Places e Objects dizem em que cenários e objetos cada evento de busca cabe;
@@ -118,6 +120,14 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   ou `FAIL`) e joga a jornada: a suspeita da primeira patrulha, a luta (HUD, uma ação, o resultado, a rua depois), a entrada
   numa casa e uma busca. Usa uma campanha própria, na pasta da captura. Grava
   `frames.txt` e sai.
+- **A rua no editor:** `scenes/street_set.tscn` é a Rua das Vitrines montada (chão, prédios, becos, postes, carros, props
+  e silhuetas, com a colisão de cada um), e a rua do jogo carrega essa cena. Cada peça é um nó (`Lamp1`, `Building3`,
+  `Car2`, `Prop7`, `Alley4`...) com a placa, a colisão (`Collider`), a luz e o halo dela: mover, girar ou apagar o nó
+  no editor muda o jogo. O que é dinâmico continua em código por cima da cena: o corredor sorteado, as patrulhas, as
+  portas das casas, os caixotes, a fogueira, o clima e a chuva. Para mexer à mão sem perder nada, não rode de novo a
+  ferramenta abaixo; ela é para quando a montagem em código (`scripts/street/street_set.gd`) mudar, e sobrescreve a
+  cena: `"$GODOT" --headless --path . --script res://tools/bake_street.gd -- --force`. Ao mexer na rua, rode a captura
+  (o teste de colisão) acima.
 - **Captura dos cenários:** `"$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_scenarios.gd -- --out=<pasta>`
   (opcional `--maps=RiverDock,FloodedDepot`). Em cada zona dos seis mapas: fim de tarde e noite com chuva, tempo de quadro,
   equipe e patrulhas no piso e o líder preso à faixa (`PASS`/`FAIL`). Sai com código 1 se algo falhar.
