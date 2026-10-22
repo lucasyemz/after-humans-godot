@@ -15,6 +15,7 @@ func run(context) -> void:
 	Campaign.save_dir = "user://test-title-%d" % Time.get_ticks_usec()
 
 	_project()
+	await _options_without_save()
 	await _without_save()
 	await _with_save()
 	await _new_campaign_asks()
@@ -39,6 +40,36 @@ func _project() -> void:
 	var presets := ConfigFile.new()
 	t.equal(presets.load("res://export_presets.cfg"), OK, "export_presets.cfg abre")
 	t.equal(presets.get_value("preset.0.options", "application/icon", ""), "res://art/ui/title/app_icon.png", "o ícone no preset do Windows")
+	t.equal(presets.get_value("preset.1.options", "html/export_icon", false), true, "a Web exporta o ícone do projeto")
+
+
+## Sem save, mexer nas Opções do título não cria save; a campanha nova leva o que foi mexido.
+func _options_without_save() -> void:
+	_clear_saves()
+	Campaign.state = Campaign.create_initial(10)
+	var title := await _open_title()
+	if title == null:
+		return
+	title.options_button.pressed.emit()
+	await _frames(2)
+	_press(title._modal, "2x")
+	await _frames(2)
+	for slider in title._modal.find_children("*", "HSlider", true, false):
+		slider.value = 0.2
+		slider.drag_ended.emit(true)
+		slider.focus_exited.emit()
+	await _frames(2)
+	t.check(not Campaign.has_save(), "as Opções do título sem campanha não gravam save")
+	title.close_modal()
+	await _frames(2)
+	t.equal(_texts(title._buttons), ["Nova campanha", "Opções"], "depois das Opções, ainda sem Continuar")
+	title.new_button.pressed.emit()
+	await _frames(2)
+	t.check(not title.modal_open(), "sem save, Nova campanha não pergunta")
+	t.check(await _settles_on("Station"), "e vai para a Estação")
+	t.equal(int(Campaign.state.settings.battle_speed), 2, "a campanha nova leva a velocidade escolhida no título")
+	var saved = Campaign.read_file(Campaign.primary_path())
+	t.check(saved != null and int(saved.settings.battle_speed) == 2, "e grava com ela")
 
 
 ## Sem save: o jogo abre no título, sem Continuar; Nova campanha é o primeiro botão e começa direto (sem pergunta).
@@ -63,6 +94,7 @@ func _with_save() -> void:
 	if title == null:
 		return
 	t.check(title.continue_button != null, "com save, há Continuar")
+	t.check(title.get_viewport().gui_get_focus_owner() == title.continue_button, "o foco começa no Continuar")
 	t.equal(_texts(title._buttons), ["Continuar", "Nova campanha", "Opções"], "com save: Continuar, Nova campanha e Opções")
 	title.continue_button.pressed.emit()
 	t.check(await _settles_on("Station"), "Continuar leva à Estação")
@@ -107,16 +139,26 @@ func _options_and_keys() -> void:
 	t.check(not title.modal_open(), "Voltar fecha as Opções")
 	AHUiStyle.using_keys = true
 	await _frames(3)
-	var focused := title.get_viewport().gui_get_focus_owner()
-	t.check(focused == title.continue_button, "o foco começa no Continuar")
+	t.check(title.get_viewport().gui_get_focus_owner() == title.options_button, "fechadas as Opções, o foco volta a elas")
+	await _action("ui_up")
+	t.check(title.get_viewport().gui_get_focus_owner() == title.new_button, "↑ leva à Nova campanha")
+	await _action("ui_up")
+	t.check(title.get_viewport().gui_get_focus_owner() == title.continue_button, "↑ leva ao Continuar")
 	await _action("ui_down")
-	t.check(title.get_viewport().gui_get_focus_owner() == title.new_button, "↓ leva à Nova campanha")
 	await _action("ui_down")
-	t.check(title.get_viewport().gui_get_focus_owner() == title.options_button, "↓ leva às Opções")
+	t.check(title.get_viewport().gui_get_focus_owner() == title.options_button, "↓ ↓ volta às Opções")
 	await _action("interact")
 	t.check(title.modal_open(), "Interagir aperta o botão com foco (abre as Opções)")
 	await _action("cancel")
+	await _frames(2)
+	t.check(title.get_viewport().gui_get_focus_owner() == title.options_button, "ao fechar, o foco volta às Opções")
 	AHUiStyle.using_keys = false
+	# Saindo pelo Continuar, a tela não aceita mais nada (o clique seguinte não abre a confirmação).
+	title.continue_button.pressed.emit()
+	title.new_button.pressed.emit()
+	await _frames(1)
+	t.check(not title.modal_open(), "depois do Continuar, Nova campanha não faz nada")
+	t.check(await _settles_on("Station"), "e o Continuar segue para a Estação")
 
 
 ## Save estragado: sem Continuar (o jogo não continua de um arquivo que não abre).
@@ -131,6 +173,21 @@ func _broken_save() -> void:
 	if title == null:
 		return
 	t.check(title.continue_button == null, "save estragado não mostra Continuar")
+	title.options_button.pressed.emit()
+	await _frames(2)
+	_press(title._modal, "2x")
+	await _frames(2)
+	t.equal(FileAccess.get_file_as_string(Campaign.primary_path()), "{ isto não é um save", "as Opções não regravam o save que não abre")
+	title.close_modal()
+	await _frames(2)
+	title.new_button.pressed.emit()
+	await _frames(2)
+	t.check(title.modal_open(), "com um save que não abre, Nova campanha pergunta antes")
+	var texts: Array = title._modal.find_children("*", "Label", true, false).map(func(l): return l.text)
+	t.check(texts.any(func(x): return String(x).contains("não pôde ser aberto")), "e diz que o save não abre")
+	_press(title._modal, "Cancelar")
+	await _frames(2)
+	t.equal(FileAccess.get_file_as_string(Campaign.primary_path()), "{ isto não é um save", "Cancelar não mexe no arquivo")
 
 
 ## Continuar no meio de uma expedição leva à rua.

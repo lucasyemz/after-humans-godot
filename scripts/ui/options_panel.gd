@@ -21,6 +21,9 @@ const PAD_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "Sta
 
 var width := 600.0
 var allow_new_campaign := false
+## As opções da campanha (volumes, velocidade, efeitos) vão para o save. No título sem campanha começada ficam só na
+## memória: mexer nas Opções não cria um save nem regrava um que não abre (#28); a campanha nova leva os valores.
+var save_campaign := true
 ## A ação esperando a tecla nova ("" = nenhuma).
 var _waiting := ""
 
@@ -60,11 +63,11 @@ func _ready() -> void:
 		var value: int = speed
 		button.pressed.connect(func():
 			Campaign.state.settings.battle_speed = value
-			Campaign.save()
+			_save()
 			_rebuild())
 	_toggle("Reduzir efeitos do ambiente (relâmpagos e poeira)", bool(settings.get("reduced_environment_effects", false)), func(on):
 		Campaign.state.settings.reduced_environment_effects = on
-		Campaign.save()
+		_save()
 		Settings.changed.emit())
 
 	_toggle("Dicas da primeira vez", Tips.enabled, func(on): Tips.set_enabled(on))
@@ -214,9 +217,9 @@ func _volume(text: String, key: String, value: float) -> void:
 		Campaign.state.settings[key] = v / 100.0
 		number.text = "%d%%" % v
 		Sound.apply_volumes())
-	slider.drag_ended.connect(func(_changed): Campaign.save())
+	slider.drag_ended.connect(func(_changed): _save())
 	# Clique sem arrastar também grava (as setas e o clique na barra não terminam um arrasto).
-	slider.focus_exited.connect(func(): Campaign.save())
+	slider.focus_exited.connect(func(): _save())
 
 
 func _choice(text: String, chosen: bool, parent: Container) -> Button:
@@ -278,3 +281,8 @@ func _keys(action: String) -> String:
 		elif event is InputEventJoypadButton:
 			names.append("Controle " + PAD_NAMES.get(event.button_index, str(event.button_index)))
 	return " · ".join(names)
+
+
+func _save() -> void:
+	if save_campaign:
+		Campaign.save()

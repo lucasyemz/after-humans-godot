@@ -19,6 +19,10 @@ var _buttons: VBoxContainer
 var _note: Label
 var _modal: PanelContainer
 var _portrait := false
+## Saindo do título (Continuar ou campanha nova): a troca de cena está em andamento e a tela não aceita mais nada.
+var _leaving := false
+## O botão que abriu a janela (Nova campanha, Opções): o foco volta para ele ao fechar.
+var _opener: Button
 var continue_button: Button
 var new_button: Button
 var options_button: Button
@@ -66,7 +70,7 @@ func _build_buttons() -> void:
 		child.queue_free()
 	continue_button = null
 	if can_continue():
-		continue_button = _title_button("Continuar", true, func(): GameFlow.continue_game())
+		continue_button = _title_button("Continuar", true, _continue)
 	new_button = _title_button("Nova campanha", continue_button == null, _ask_new_campaign)
 	options_button = _title_button("Opções", false, _open_options)
 	_note.text = Campaign.load_warning
@@ -91,7 +95,11 @@ func _title_button(text: String, primary: bool, callback: Callable) -> Button:
 		style.content_margin_left = 28
 		style.set_border_width_all(3)
 		button.add_theme_stylebox_override(state, style)
-	button.pressed.connect(callback)
+	button.pressed.connect(func():
+		if _leaving or GameFlow.busy:
+			return
+		_opener = button
+		callback.call())
 	_buttons.add_child(button)
 	return button
 
@@ -142,7 +150,9 @@ func close_modal() -> void:
 	_modal = null
 	_buttons.visible = true
 	S.reset_focus(_buttons)
-	(continue_button if continue_button != null else new_button).grab_focus.call_deferred()
+	var back: Button = _opener if _opener != null and is_instance_valid(_opener) and _opener.is_inside_tree() else \
+		(continue_button if continue_button != null else new_button)
+	back.grab_focus.call_deferred()
 
 
 func _open_modal(width: float) -> VBoxContainer:
@@ -171,14 +181,21 @@ func _modal_button(text: String, callback: Callable) -> Button:
 	return button
 
 
-## Nova campanha: sem save, começa direto; com save, pergunta antes (o progresso é substituído).
+func _continue() -> void:
+	_leaving = true
+	GameFlow.continue_game()
+
+
+## Nova campanha: sem nenhum arquivo de save, começa direto; com arquivo (mesmo um que não abre), pergunta antes.
 func _ask_new_campaign() -> void:
-	if not can_continue():
+	if not Campaign.has_save():
 		_start_new_campaign()
 		return
 	var box := _open_modal(680)
 	box.add_child(H.make_label("Começar uma campanha nova?", 34, H.GOLD))
-	var note := H.make_label("Todo o progresso salvo (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero.", 22, H.TEXT)
+	var text := "Todo o progresso salvo (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero." \
+		if can_continue() else "O save que existe não pôde ser aberto. Uma campanha nova grava por cima dele, e ele não volta mais."
+	var note := H.make_label(text, 22, H.TEXT)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(620, 0)
 	box.add_child(note)
@@ -188,8 +205,15 @@ func _ask_new_campaign() -> void:
 	stay.grab_focus.call_deferred()
 
 
+## A campanha nova leva as opções mexidas no título (volumes, velocidade), que até aqui ficaram só na memória.
 func _start_new_campaign() -> void:
+	if _leaving or GameFlow.busy:
+		return
+	_leaving = true
+	var settings: Dictionary = Campaign.state.get("settings", {}).duplicate(true)
 	Campaign.new_game()
+	Campaign.state.settings.merge(settings, true)
+	Campaign.save()
 	GameFlow.change_to("station")
 
 
@@ -202,6 +226,8 @@ func _open_options() -> void:
 	box.add_child(scroll)
 	var options := AHOptionsPanel.new()
 	options.width = 660
+	# Sem campanha que abre, as Opções não gravam (nem criam save, nem regravam um que não abre).
+	options.save_campaign = can_continue()
 	options.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	options.closed.connect(close_modal)
 	scroll.add_child(options)
