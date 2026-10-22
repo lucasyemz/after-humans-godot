@@ -53,7 +53,8 @@ audio/            combat (sons das habilidades), music, ambience (cenários e ch
 art/              arte pintada usada pelo jogo (street: a rua; rooms: interiores; station: superfícies, modelos da Poly Haven e cards
                   da Estação, metro: o metrô Bombardier, CC BY 4.0, créditos em art/station/metro/CREDITS.md; civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários;
                   ui: o mapa de fases, as imagens das fases e os ícones dos nós)
-tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas e input)
+tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas e input; test_full_journey joga
+                  uma campanha da Estação à volta com as cenas de verdade)
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
                   precisa do Pillow), unreal_export_scenarios.py (roda na Unreal e exporta os cenários para
                   build/unreal-export) e sync_scenarios.py (converte a exportação), sync_audio.py (trilha e sons, precisa
@@ -78,6 +79,10 @@ Todos os testes, sem janela (imprime `PASS`/`FAIL` por teste e sai com código 0
 ```bash
 "$GODOT" --headless --path . --script res://tests/run_all.gd
 ```
+
+Um deles, `test_full_journey`, joga uma campanha inteira com as cenas de verdade, sem janela (uns 15 s): Estação, mapa de
+fases, Preparação, a Rua das Vitrines (andar, vasculhar, as lutas no automático, o guardião), a volta, o relatório, a noite e
+o trem. Os itens do [checklist de Play](docs/play-checklist.md) que ele cobre estão marcados com **[auto]**.
 
 Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o nome do arquivo). O save do jogo fica em
 `user://saves/` (no Windows, `%APPDATA%\Godot\app_userdata\After Humans\saves`); os testes usam uma pasta temporária.
