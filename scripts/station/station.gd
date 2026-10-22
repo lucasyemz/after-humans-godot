@@ -754,7 +754,7 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 
 ## A arte do herói (recrutas novos usam a do fundador da mesma classe).
 func _hero_art(entry) -> Dictionary:
-	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id)
+	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id, String(entry.get("art_variant", "")))
 
 
 func civilian_art(civilian_id: String) -> Dictionary:

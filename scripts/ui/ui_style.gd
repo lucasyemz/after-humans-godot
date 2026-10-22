@@ -408,6 +408,11 @@ static func face_texture(art: Dictionary) -> Texture2D:
 	var file: String = art.get("file", "")
 	if _portraits.has(file):
 		return _portraits[file]
+	# O retrato recortado da entrega #26 (art/ui/portraits, 256x256, olhos em 144,104), quando o parado tem um.
+	var portrait: String = art.get("portrait", "")
+	if portrait != "" and ResourceLoader.exists(portrait):
+		_portraits[file] = load(portrait)
+		return _portraits[file]
 	var texture: Texture2D = load(file)
 	var image := texture.get_image()
 	if image.is_compressed():
