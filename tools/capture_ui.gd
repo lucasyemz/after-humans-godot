@@ -115,6 +115,8 @@ func _return(campaign_service, flow, J, c: Dictionary) -> void:
 	hud.close_panel()
 	c.station.last_return.seen = true
 	hud.open_room(S.DORMITORY)
+	# A câmera vai até o Dormitório na hora (sem esperar a viagem), para a foto mostrar os beliches.
+	current_scene.focus_room(S.DORMITORY, true)
 	await _shot("station-night")
 
 

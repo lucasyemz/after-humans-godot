@@ -611,13 +611,14 @@ func _button(text: String, callback: Callable, enabled: bool = true) -> Button:
 
 # ---------------------------------------------------------------- evento
 
-## Evento aberto (busca_*): título, descrição e as escolhas (as indisponíveis aparecem com o requisito).
 ## A ilustração do cenário em que se está (null se o mapa não tem uma).
 func event_art() -> Texture2D:
 	var path := "res://art/ui/events/%s.webp" % EVENT_ART.get(map_id, "street")
 	return load(path) if ResourceLoader.exists(path) else null
 
 
+## Evento aberto (busca_*): a ilustração do cenário, o título, a descrição e as escolhas (as indisponíveis aparecem com o
+## requisito).
 func show_event(campaign: Dictionary) -> void:
 	var event: Dictionary = campaign.session.event
 	var row = GameData.row("events", event.event_id)
@@ -636,8 +637,8 @@ func show_event(campaign: Dictionary) -> void:
 		picture.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(picture)
-		# Com a ilustração, o cartão sobe para as escolhas caberem na tela.
-		_modal.position.y = 90
+		# Com a ilustração, o cartão sobe para as escolhas caberem na tela, logo abaixo da barra de trechos.
+		_modal.position.y = 125
 	var title := H.make_label(row.get("Title", ""), 34, H.GOLD)
 	box.add_child(title)
 	# O que se vasculhou (#7): o evento vem do objeto.
