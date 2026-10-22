@@ -264,7 +264,7 @@ func _build_aside(c: Dictionary) -> void:
 			var go := Button.new()
 			go.text = "Jogar de novo" if done else "Preparar expedição"
 			go.custom_minimum_size = Vector2(0, 54)
-			go.add_theme_font_size_override("font_size", 22)
+			go.add_theme_font_size_override("font_size", AHUiStyle.px(22))
 			H.style_button(go)
 			var id: String = info.id
 			go.pressed.connect(func(): phase_chosen.emit(id))

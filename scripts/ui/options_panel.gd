@@ -42,7 +42,7 @@ func _ready() -> void:
 		button.pressed.connect(func():
 			Settings.set_level(level)
 			_rebuild())
-	add_child(H.make_label("Qualidade: resolução interna, sombras, oclusão, neblina e quantidade de chuva.", 16, H.MUTED))
+	_hint("Qualidade: resolução interna, sombras, oclusão, neblina e quantidade de chuva.")
 	if not OS.has_feature("web"):
 		_toggle("Tela cheia", Settings.fullscreen, func(on): Settings.set_fullscreen(on))
 		_toggle("Sincronia vertical (vsync)", Settings.vsync, func(on): Settings.set_vsync(on))
@@ -70,6 +70,19 @@ func _ready() -> void:
 	_toggle("Cores para daltonismo (azul e laranja)", Settings.colorblind, func(on):
 		Settings.set_colorblind(on)
 		_rebuild())
+	var sizes := HBoxContainer.new()
+	sizes.add_theme_constant_override("separation", 6)
+	add_child(sizes)
+	var size_label := H.make_label("Tamanho do texto", 19, H.TEXT)
+	size_label.custom_minimum_size = Vector2(260, 0)
+	sizes.add_child(size_label)
+	for i in Settings.TEXT_SIZES.size():
+		var button := _choice(Settings.TEXT_SIZES[i], i == Settings.text_size, sizes)
+		var index := i
+		button.pressed.connect(func():
+			Settings.set_text_size(index)
+			_rebuild())
+	_hint("O texto novo vale nas telas que abrirem depois (a próxima luta, a volta à Estação).")
 	var again := Button.new()
 	again.text = "Mostrar as dicas de novo"
 	again.custom_minimum_size = Vector2(0, 42)
@@ -81,7 +94,7 @@ func _ready() -> void:
 	add_child(again)
 
 	_section("Controles")
-	add_child(H.make_label("Trocar: clique e aperte a tecla nova (Esc cancela). Se outra ação usava a tecla, as duas trocam.", 16, H.MUTED))
+	_hint("Trocar: clique e aperte a tecla nova (Esc cancela). Se outra ação usava a tecla, as duas trocam.")
 	for spec in CONTROLS:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
@@ -112,7 +125,7 @@ func _ready() -> void:
 		Settings.reset_keys()
 		_rebuild())
 	add_child(defaults)
-	add_child(H.make_label("Mouse: clique nos botões e nos alvos da luta.", 16, H.MUTED))
+	_hint("Mouse: clique nos botões e nos alvos da luta.")
 
 	if allow_new_campaign:
 		_section("Campanha")
@@ -148,6 +161,14 @@ func _rebuild() -> void:
 
 func _title(text: String, size: int) -> void:
 	add_child(H.make_label(text, size, H.GOLD))
+
+
+## A explicação em cinza embaixo de uma opção (quebra a linha com o texto maior).
+func _hint(text: String) -> void:
+	var hint := H.make_label(text, 16, H.MUTED)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.custom_minimum_size = Vector2(width - 40, 0)
+	add_child(hint)
 
 
 func _section(text: String) -> void:
@@ -200,7 +221,7 @@ func _toggle(text: String, on: bool, action: Callable) -> void:
 	var check := CheckButton.new()
 	check.text = text
 	check.button_pressed = on
-	check.add_theme_font_size_override("font_size", 19)
+	check.add_theme_font_size_override("font_size", AHUiStyle.px(19))
 	check.add_theme_color_override("font_color", H.TEXT)
 	check.toggled.connect(func(value): action.call(value))
 	add_child(check)

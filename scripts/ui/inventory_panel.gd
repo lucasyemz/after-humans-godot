@@ -112,9 +112,9 @@ func _slot_button(item: Dictionary) -> Button:
 	var button := Button.new()
 	button.custom_minimum_size = Vector2(138, 92)
 	button.text = "\n\n%s%s" % [item.name, ("\n" + item.count) if item.count != "" else ""]
-	button.add_theme_font_size_override("font_size", 15)
+	button.add_theme_font_size_override("font_size", AHUiStyle.px(15))
 	H.style_button(button, H.GOLD if item.id == selected else Color(0.86, 0.69, 0.4))
-	button.add_theme_font_size_override("font_size", 15)
+	button.add_theme_font_size_override("font_size", AHUiStyle.px(15))
 	if item.id == selected:
 		button.add_theme_color_override("font_color", H.GOLD)
 	elif not item.owned:

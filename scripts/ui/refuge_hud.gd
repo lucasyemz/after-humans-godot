@@ -15,7 +15,7 @@ var station: AHStation
 var current := ""
 var _title: Label
 var _subtitle: Label
-var _resources: HBoxContainer
+var _resources: HFlowContainer
 var _menu: VBoxContainer
 var _next_title: Label
 var _next_text: Label
@@ -52,13 +52,15 @@ func _ready() -> void:
 	_title.position = Vector2(32, 18)
 	add_child(_title)
 	_subtitle = U.label("", U.MIN_TEXT, U.MUTED)
-	_subtitle.position = Vector2(34, 66)
+	_subtitle.position = Vector2(34, 18 + U.px(48))
 	add_child(_subtitle)
-	_resources = HBoxContainer.new()
-	_resources.alignment = BoxContainer.ALIGNMENT_END
-	_resources.add_theme_constant_override("separation", 6)
+	# Com o texto maior os recursos quebram em duas linhas, sempre colados à direita.
+	_resources = HFlowContainer.new()
+	_resources.alignment = FlowContainer.ALIGNMENT_END
+	_resources.add_theme_constant_override("h_separation", 6)
+	_resources.add_theme_constant_override("v_separation", 6)
 	_resources.position = Vector2(700, 24)
-	_resources.custom_minimum_size = Vector2(1188, 0)
+	_resources.size = Vector2(1188, 0)
 	_resources.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_resources)
 
@@ -98,7 +100,7 @@ func _ready() -> void:
 	_next_button.add_theme_color_override("font_hover_color", U.INK)
 	_next_button.add_theme_color_override("font_focus_color", U.INK)
 	_next_button.add_theme_font_override("font", U.font("bold"))
-	_next_button.add_theme_font_size_override("font_size", 22)
+	_next_button.add_theme_font_size_override("font_size", AHUiStyle.px(22))
 	_next_button.pressed.connect(_run_next)
 	card_box.add_child(_next_button)
 	_pending = VBoxContainer.new()
@@ -288,7 +290,7 @@ func _refresh_room_labels(c: Dictionary) -> void:
 			button = Button.new()
 			button.focus_mode = Control.FOCUS_NONE
 			H.style_button(button)
-			button.add_theme_font_size_override("font_size", 17)
+			button.add_theme_font_size_override("font_size", AHUiStyle.px(17))
 			button.pressed.connect(func(): open_room(id))
 			_tags.add_sibling(button)
 			_room_labels[id] = button
@@ -767,7 +769,7 @@ func _preparation(c: Dictionary) -> void:
 		_button("Escalar a equipe na plataforma", open_departure)
 	var depart := _button("Confirmar partida", _depart)
 	depart.custom_minimum_size = Vector2(0, 56)
-	depart.add_theme_font_size_override("font_size", 24)
+	depart.add_theme_font_size_override("font_size", AHUiStyle.px(24))
 
 
 func _cycle_slot(rank: int) -> void:
@@ -904,7 +906,7 @@ func _prep_drawer(c: Dictionary) -> void:
 		chip.tooltip_text = (S.focus_reward_text(id) if id != "" else "Sem objetivo extra.") + (" · recomendado" if id == recommended else "")
 		chip.custom_minimum_size = Vector2(0, 34)
 		H.style_button(chip)
-		chip.add_theme_font_size_override("font_size", 17)
+		chip.add_theme_font_size_override("font_size", AHUiStyle.px(17))
 		if _draft.focus == id:
 			chip.add_theme_color_override("font_color", U.GOLD)
 			chip.add_theme_stylebox_override("normal", U.panel(0.92, U.GOLD))
@@ -940,7 +942,7 @@ func _prep_drawer(c: Dictionary) -> void:
 	go.add_theme_color_override("font_color", U.INK)
 	go.add_theme_color_override("font_hover_color", U.INK)
 	go.add_theme_font_override("font", U.font("bold"))
-	go.add_theme_font_size_override("font_size", 22)
+	go.add_theme_font_size_override("font_size", AHUiStyle.px(22))
 	go.pressed.connect(_depart)
 	side.add_child(go)
 

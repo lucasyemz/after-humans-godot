@@ -21,6 +21,10 @@ var vsync := true
 var dev_mode := false
 ## Cores para daltonismo: azul e laranja no lugar de verde e vermelho (AHUiStyle.set_colorblind).
 var colorblind := false
+## O tamanho do texto das telas (AHUiStyle.text_scale): as telas ficam na base de 1920x1080 e só as letras crescem.
+const TEXT_SIZES := ["Normal", "Grande", "Maior"]
+const TEXT_SCALE := [1.0, 1.15, 1.3]
+var text_size := 0
 ## As teclas trocadas nas Opções: a ação e a tecla principal nova (código físico). As outras teclas da ação (as setas,
 ## por exemplo) e os botões do controle continuam.
 var keys := {}
@@ -42,8 +46,14 @@ func _ready() -> void:
 		vsync = bool(config.get_value("graphics", "vsync", vsync))
 		dev_mode = bool(config.get_value("dev", "enabled", dev_mode))
 		colorblind = bool(config.get_value("accessibility", "colorblind", colorblind))
+		text_size = clampi(int(config.get_value("accessibility", "text_size", text_size)), 0, TEXT_SIZES.size() - 1)
 		keys = config.get_value("controls", "keys", {})
+	# --text-size=N nas capturas: confere as telas com o texto maior (só na memória).
+	for arg in args:
+		if String(arg).begins_with("--text-size="):
+			text_size = clampi(int(String(arg).get_slice("=", 1)), 0, TEXT_SIZES.size() - 1)
 	apply_controls()
+	AHUiStyle.text_scale = TEXT_SCALE[text_size]
 	AHUiStyle.install.call_deferred(get_tree().root)
 	apply()
 
@@ -111,6 +121,14 @@ func set_colorblind(value: bool) -> void:
 	_store()
 
 
+## Vale nas telas abertas daqui em diante (os HUDs são montados ao entrar na cena).
+func set_text_size(value: int) -> void:
+	text_size = clampi(value, 0, TEXT_SIZES.size() - 1)
+	AHUiStyle.text_scale = TEXT_SCALE[text_size]
+	AHUiStyle.install(get_tree().root)
+	_store()
+
+
 func set_level(value: int) -> void:
 	level = clampi(value, 0, 3)
 	_store()
@@ -136,6 +154,7 @@ func _store() -> void:
 	config.set_value("graphics", "vsync", vsync)
 	config.set_value("dev", "enabled", dev_mode)
 	config.set_value("accessibility", "colorblind", colorblind)
+	config.set_value("accessibility", "text_size", text_size)
 	config.set_value("controls", "keys", keys)
 	config.save(PATH)
 	apply()

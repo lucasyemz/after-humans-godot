@@ -90,7 +90,7 @@ static func style_button(button: Button, accent: Color = GOLD) -> void:
 		button.add_theme_stylebox_override(state, style)
 	button.add_theme_color_override("font_color", TEXT)
 	button.add_theme_color_override("font_disabled_color", MUTED.darkened(0.3))
-	button.add_theme_font_size_override("font_size", 20)
+	button.add_theme_font_size_override("font_size", S.px(20))
 	# O clique da interface em todo botão do jogo (SW_UI_Click).
 	if not button.has_meta("click"):
 		button.set_meta("click", true)
@@ -165,6 +165,8 @@ func _build() -> void:
 	_hero_hp = S.bar(Color(0.8, 0.27, 0.22), 14)
 	hero_box.add_child(_hero_hp)
 	_hero_instinct_text = S.label("", 16, S.VIOLET)
+	_hero_instinct_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hero_instinct_text.custom_minimum_size = Vector2(230, 0)
 	_hero_instinct_text.mouse_filter = Control.MOUSE_FILTER_PASS
 	_hero_instinct_text.tooltip_text = S.GLOSSARY.Instinto
 	hero_box.add_child(_hero_instinct_text)
@@ -193,13 +195,13 @@ func _build() -> void:
 	row.add_child(_actions)
 	for spec in ACTIONS:
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(236, 42)
+		button.custom_minimum_size = Vector2(236, S.px(42))
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.text = spec[0]
 		style_button(button)
 		var key := S.key_cap(spec[2])
-		key.position = Vector2(196, 8)
 		button.add_child(key)
+		key.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT, Control.PRESET_MODE_MINSIZE, 8)
 		button.pressed.connect(_on_action.bind(spec[1]))
 		button.focus_entered.connect(_describe_action.bind(spec[1]))
 		button.mouse_entered.connect(_describe_action.bind(spec[1]))
@@ -424,7 +426,7 @@ func _process(_delta: float) -> void:
 			continue
 		# Sob os pés, sem passar para dentro do painel de baixo.
 		var feet := camera.unproject_position(card.global_position)
-		var y := minf(feet.y + 10, DOCK_TOP - plate.size.y - 6) if _panel.visible else feet.y + 10
+		var y := minf(feet.y + 10, _dock_top() - plate.size.y - 6) if _panel.visible else feet.y + 10
 		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
 	for marker in _markers + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")
@@ -513,20 +515,23 @@ func _build_abilities() -> void:
 		var option: Dictionary = _options[index]
 		var ability: Dictionary = session.data.abilities[option.id]
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(296, 150)
+		button.custom_minimum_size = Vector2(296, S.px(150))
 		button.text = ""
 		style_button(button)
 		var box := HBoxContainer.new()
 		box.set_anchors_preset(Control.PRESET_FULL_RECT)
 		box.offset_left = 10
 		box.offset_top = 8
-		box.offset_right = -8
+		# À direita fica a tecla, por cima do nome.
+		box.offset_right = -S.px(26)
 		box.offset_bottom = -8
 		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_theme_constant_override("separation", 10)
 		button.add_child(box)
 		var icon := TextureRect.new()
-		icon.custom_minimum_size = Vector2(76, 76)
+		# Com o texto maior o ícone encolhe e o cartão continua com a mesma largura.
+		var icon_size := roundf(76.0 / S.text_scale)
+		icon.custom_minimum_size = Vector2(icon_size, icon_size)
 		icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -575,8 +580,8 @@ func _build_abilities() -> void:
 			why.custom_minimum_size = Vector2(170, 0)
 			text_box.add_child(why)
 		var key := S.key_cap(str(index + 1))
-		key.position = Vector2(266, 6)
 		button.add_child(key)
+		key.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 		button.set_meta("locked", not option.usable)
 		button.disabled = not option.usable
 		button.pressed.connect(_on_ability.bind(option))
@@ -595,7 +600,20 @@ func _build_abilities() -> void:
 			child.text = "Mochila · %d" % AHJourneyRules.food(Campaign.state)
 			child.tooltip_text = "%d de comida na Mochila" % AHJourneyRules.food(Campaign.state)
 	_description.text = "Vez de %s: escolha uma habilidade (1–4) ou uma ação." % session.state.find_unit(_actor_id).display_name
+	# O painel se ajusta antes do foco, que posiciona a dica acima dele.
+	_fit_dock.call_deferred()
 	(first if first else _actions.get_child(1)).grab_focus.call_deferred()
+
+
+## O painel de baixo cresce para cima quando o texto é maior (a base é 210 px, colada a 24 px da borda).
+func _fit_dock() -> void:
+	var height := maxf(210.0, _panel.get_combined_minimum_size().y)
+	_panel.size = Vector2(1872, height)
+	_panel.position = Vector2(24, 1056.0 - height)
+
+
+func _dock_top() -> float:
+	return _panel.position.y
 
 
 # ---------------------------------------------------------------- dicas
@@ -660,7 +678,7 @@ func _place_tip(button: Control) -> void:
 	var x := 420.0
 	if button != null and is_instance_valid(button) and button.is_inside_tree():
 		x = button.global_position.x + button.size.x * 0.5 - _tip.size.x * 0.5
-	_tip.position = Vector2(clampf(x, 16, 1904 - _tip.size.x), maxf(130, DOCK_TOP - 96 - _tip.size.y))
+	_tip.position = Vector2(clampf(x, 16, 1904 - _tip.size.x), maxf(130, _dock_top() - 96 - _tip.size.y))
 
 
 func _describe_action(kind: String) -> void:

@@ -366,7 +366,10 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
   - Plano da Estação: cada cômodo com o nível, o que faz, o que o próximo nível destrava, o custo e o que falta.
   - Cores para daltonismo nas Opções (azul e laranja no lugar de verde e vermelho, Okabe–Ito), salvas por máquina.
   - Trocar as teclas nas Opções (cada ação, com troca automática quando a tecla já é de outra, e restaurar o padrão),
-    salvo por máquina, com teste. Fica para depois: aumentar o texto (as telas são fixas em 1920x1080).
+    salvo por máquina, com teste.
+  - Tamanho do texto nas Opções (Normal, Grande e Maior: 100%, 115% e 130%), salvo por máquina, com teste. As telas
+    ficam na base de 1920x1080 e só as letras crescem: o painel da luta sobe, os ícones das habilidades encolhem e os
+    recursos da Estação quebram a linha. Vale nas telas abertas depois da troca. A captura aceita `--text-size=2`.
 
 **Pendências da 5:**
 - Celular: controles de toque para andar e interagir, HUD maior em tela pequena e um pacote mais leve (120 MB pesa em

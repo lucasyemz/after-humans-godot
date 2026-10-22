@@ -23,6 +23,12 @@ static func set_colorblind(on: bool) -> void:
 
 ## Texto mínimo na base de 1080p (a regra 2 da proposta).
 const MIN_TEXT := 18
+## O tamanho do texto das Opções (Settings.text_size): todo tamanho de fonte das telas passa por px().
+static var text_scale := 1.0
+
+
+static func px(size: int) -> int:
+	return int(round(size * text_scale))
 
 static var _fonts := {}
 static var _portraits := {}
@@ -42,11 +48,11 @@ static func font(kind: String = "body") -> Font:
 static func theme() -> Theme:
 	var t := Theme.new()
 	t.default_font = font("body")
-	t.default_font_size = 20
+	t.default_font_size = px(20)
 	var tip := panel(0.96)
 	t.set_stylebox("panel", "TooltipPanel", tip)
 	t.set_color("font_color", "TooltipLabel", TEXT)
-	t.set_font_size("font_size", "TooltipLabel", MIN_TEXT)
+	t.set_font_size("font_size", "TooltipLabel", px(MIN_TEXT))
 	return t
 
 
@@ -71,7 +77,7 @@ static func label(text: String, size: int = 20, color: Color = TEXT, kind: Strin
 	var l := Label.new()
 	l.text = text
 	l.add_theme_font_override("font", font(kind))
-	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_font_size_override("font_size", px(size))
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", Color(0.03, 0.025, 0.02))
 	l.add_theme_constant_override("outline_size", 4)

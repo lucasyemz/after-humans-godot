@@ -86,7 +86,7 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - A/D (ou ←/→) andam pela rua; W/S (ou ↑/↓) vão para o fundo e para a frente, inclusive dentro dos becos.
     No gamepad: analógico esquerdo ou direcional.
   - Shift (ou RB) corre.
-  - As teclas dá para trocar em Opções > Controles (salvo nesta máquina).
+  - As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo.
   - F1 liga o modo de desenvolvedor (fica salvo): o contador de quadros e as teclas de teste abaixo (R, T, P, C, K).
   - R liga e desliga a chuva.
   - T troca entre fim de tarde e noite.
