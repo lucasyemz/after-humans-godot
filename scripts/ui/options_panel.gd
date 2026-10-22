@@ -37,8 +37,10 @@ func _ready() -> void:
 		_volume(spec[0], spec[1], float(settings.get(spec[1], 0.6)))
 
 	_section("Gráficos")
-	var levels := HBoxContainer.new()
-	levels.add_theme_constant_override("separation", 6)
+	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
+	var levels := HFlowContainer.new()
+	levels.add_theme_constant_override("h_separation", 6)
+	levels.add_theme_constant_override("v_separation", 6)
 	add_child(levels)
 	for i in Settings.LEVEL_NAMES.size():
 		var button := _choice(Settings.LEVEL_NAMES[i], i == Settings.level, levels)
@@ -52,8 +54,10 @@ func _ready() -> void:
 		_toggle("Sincronia vertical (vsync)", Settings.vsync, func(on): Settings.set_vsync(on))
 
 	_section("Jogo")
-	var speeds := HBoxContainer.new()
-	speeds.add_theme_constant_override("separation", 6)
+	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
+	var speeds := HFlowContainer.new()
+	speeds.add_theme_constant_override("h_separation", 6)
+	speeds.add_theme_constant_override("v_separation", 6)
 	add_child(speeds)
 	var label := H.make_label("Velocidade da batalha", 19, H.TEXT)
 	label.custom_minimum_size = Vector2(260, 0)
@@ -74,8 +78,10 @@ func _ready() -> void:
 	_toggle("Cores para daltonismo (azul e laranja)", Settings.colorblind, func(on):
 		Settings.set_colorblind(on)
 		_rebuild())
-	var sizes := HBoxContainer.new()
-	sizes.add_theme_constant_override("separation", 6)
+	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
+	var sizes := HFlowContainer.new()
+	sizes.add_theme_constant_override("h_separation", 6)
+	sizes.add_theme_constant_override("v_separation", 6)
 	add_child(sizes)
 	var size_label := H.make_label("Tamanho do texto", 19, H.TEXT)
 	size_label.custom_minimum_size = Vector2(260, 0)
@@ -97,8 +103,10 @@ func _ready() -> void:
 	add_child(again)
 
 	_section("Controles")
-	var touch := HBoxContainer.new()
-	touch.add_theme_constant_override("separation", 6)
+	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
+	var touch := HFlowContainer.new()
+	touch.add_theme_constant_override("h_separation", 6)
+	touch.add_theme_constant_override("v_separation", 6)
 	add_child(touch)
 	var touch_label := H.make_label("Controles de toque", 19, H.TEXT)
 	touch_label.custom_minimum_size = Vector2(200, 0)
@@ -227,6 +235,11 @@ func _choice(text: String, chosen: bool, parent: Container) -> Button:
 	button.text = text
 	button.custom_minimum_size = Vector2(120, 44)
 	H.style_button(button)
+	# As escolhas lado a lado ficam com a margem de antes das molduras: a linha cabe no painel.
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var style: StyleBox = button.get_theme_stylebox(state)
+		style.content_margin_left = 12
+		style.content_margin_right = 12
 	if chosen:
 		button.add_theme_color_override("font_color", H.GOLD)
 		button.text = "▸ " + text

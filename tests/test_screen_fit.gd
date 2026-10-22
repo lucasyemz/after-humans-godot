@@ -23,6 +23,8 @@ func run(context) -> void:
 		var hud: AHRefugeHud = _tree.current_scene.hud
 		for size in [0, 1, 2]:
 			Settings.set_text_size(size)
+			await _frames(4)
+			_check_screen("vista geral (texto %d)" % size)
 			for screen in ["plan", "characters", "forge", "options", S.PREPARATION]:
 				if screen == "plan" or screen == "options":
 					hud.open_service(screen)
@@ -49,6 +51,13 @@ func _check_screen(name: String) -> void:
 	var view := Rect2(Vector2.ZERO, Vector2(1920, 1080))
 	var off: Array = []
 	var cut: Array = []
+	var plain: Array = []
+	# Os painéis e as listas inteiros na tela (o conteúdo rolável pode passar da vista; a lista não).
+	for node in _tree.root.find_children("*", "Control", true, false):
+		var box: Control = node
+		if (box is PanelContainer or box is ScrollContainer) and box.is_visible_in_tree() and _on_screen_layer(box) and not _in_scroll(box):
+			if not view.grow(1).encloses(box.get_global_rect()):
+				off.append("%s %s" % [box.get_class(), box.get_global_rect()])
 	for node in _tree.root.find_children("*", "BaseButton", true, false):
 		var button: BaseButton = node
 		if not button.is_visible_in_tree() or not _on_screen_layer(button):
@@ -59,12 +68,15 @@ func _check_screen(name: String) -> void:
 		if button.focus_mode == Control.FOCUS_NONE or button.disabled:
 			continue
 		var style := button.get_theme_stylebox("focus")
-		if style is AHFocusCorners:
+		if not style is AHFocusCorners:
+			plain.append(button.text if button is Button else button.name)
+		else:
 			button.grab_focus()
 			if AHFocusCorners.clipped(button) and not style.inside:
 				cut.append(button.text if button is Button else button.name)
 	t.check(off.is_empty(), "%s: nenhum botão fora da tela %s" % [name, off])
 	t.check(cut.is_empty(), "%s: foco que a lista cortaria vai para dentro %s" % [name, cut])
+	t.check(plain.is_empty(), "%s: todo botão com foco mostra as cantoneiras %s" % [name, plain])
 
 
 func _in_scroll(control: Control) -> bool:

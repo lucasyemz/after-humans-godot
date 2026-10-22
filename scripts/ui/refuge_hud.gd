@@ -121,8 +121,9 @@ func _ready() -> void:
 	var gold := StyleBoxFlat.new()
 	gold.bg_color = Color("d9ad62")
 	gold.set_corner_radius_all(5)
-	for state in ["normal", "focus"]:
-		_next_button.add_theme_stylebox_override(state, gold)
+	_next_button.add_theme_stylebox_override("normal", gold)
+	# O foco são as cantoneiras de fora (#25), como nos outros botões.
+	AHFocusCorners.attach(_next_button, AHFocusCorners.new())
 	var gold_hover := gold.duplicate()
 	gold_hover.bg_color = Color("f0cf8a")
 	_next_button.add_theme_stylebox_override("hover", gold_hover)
@@ -1316,7 +1317,7 @@ func _prep_drawer(c: Dictionary) -> void:
 	gold.bg_color = Color("d9ad62")
 	gold.set_corner_radius_all(5)
 	go.add_theme_stylebox_override("normal", gold)
-	go.add_theme_stylebox_override("focus", gold)
+	AHFocusCorners.attach(go, AHFocusCorners.new())
 	var hover := gold.duplicate()
 	hover.bg_color = Color("f0cf8a")
 	go.add_theme_stylebox_override("hover", hover)
