@@ -14,6 +14,7 @@ func run(t) -> void:
 	_house_choice(t)
 	_scenario_choice(t)
 	_requirements(t)
+	_event_art(t)
 	await _scene(t)
 
 
@@ -241,3 +242,19 @@ func _scene(t) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## A ilustração do cenário no topo do cartão de evento (#31, a entrega #22): uma por mapa, e a da rua sem cenário.
+func _event_art(t) -> void:
+	var hud := AHExplorationHud.new()
+	var seen := {}
+	for map_id in ["", "RiverDock", "RootBridge", "SealedShelter", "TriageGate", "FloodedDepot", "SewerDucts"]:
+		hud.map_id = map_id
+		var art := hud.event_art()
+		t.check(art != null and art.get_width() == 1200 and art.get_height() == 500, "o mapa %s tem a ilustração 1200x500" % (map_id if map_id != "" else "da rua"))
+		if art != null:
+			seen[art.resource_path] = true
+	t.equal(seen.size(), 7, "cada mapa com a sua ilustração")
+	hud.map_id = "MapaQueNaoExiste"
+	t.check(hud.event_art() != null and hud.event_art().resource_path.ends_with("street.webp"), "mapa sem ilustração usa a da rua")
+	hud.free()

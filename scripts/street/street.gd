@@ -207,6 +207,7 @@ func _ready() -> void:
 	_street_hud.add_child(exploration_hud)
 	if scenario:
 		exploration_hud.place = scenario.display_name
+		exploration_hud.map_id = scenario.map_name
 	exploration_hud.set_weather(_hud_weather.text)
 	corridor = AHStreetCorridor.new()
 	add_child(corridor)
