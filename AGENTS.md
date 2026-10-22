@@ -29,3 +29,14 @@ arte. Nada daqui depende dele em tempo de execução, e nada de lá entra neste 
   `tools/define_input.gd`, sem tecla fixa no código.
 - **QA em Play:** o Lucas joga e faz a QA. A automação roda sem janela (`--headless`) ou no modo de captura.
 - **Git:** commit e push só quando pedido.
+
+## Ciclo dev e QA
+
+Cada issue passa por duas personas antes de chegar ao Lucas:
+- **Desenvolvedor sênior** (a sessão principal): implementa, roda `tests/run_all.gd` e entrega para a QA a issue, os
+  commits e como testou.
+- **QA sênior** (o agente `qa`, em `.claude/agents/qa.md`): avalia a entrega, tenta quebrar com scripts próprios numa
+  pasta temporária e devolve `VEREDITO: APROVADO` ou `VEREDITO: REPROVADO` com os bugs (onde, como reproduzir,
+  gravidade).
+- Reprovado, o desenvolvedor corrige e manda de novo para a QA, até aprovar. O comentário da issue registra as rodadas
+  (o que a QA achou e como foi corrigido). A QA não altera o código do jogo; o Lucas fecha a issue depois de jogar.
