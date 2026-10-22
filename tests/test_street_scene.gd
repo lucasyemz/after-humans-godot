@@ -1,6 +1,7 @@
 ## A rua com uma expedição de verdade:
-## - um recruta (hero_cao_4, sem arte própria ainda) vai para a rua e para a luta com a arte do fundador da classe (antes
-##   a rua deixava de fora quem não estava no manifesto da arte: o recruta escalado sumia da equipe e da luta);
+## - um recruta (hero_cao_4) vai para a rua e para a luta com a arte própria da classe (#32); sem variação no save, a do
+##   fundador (antes a rua deixava de fora quem não estava no manifesto da arte: o recruta escalado sumia da equipe e da
+##   luta);
 ## - a Mochila aberta na luta fecha quando um comando é escolhido com o mouse, e não passa para a luta seguinte.
 extends RefCounted
 
@@ -8,15 +9,17 @@ const S = preload("res://scripts/flow/station_rules.gd")
 
 
 func run(t) -> void:
-	var bento := AHCombatArena.hero_art_of("hero_cao_bento")
-	t.equal(AHCombatArena.hero_art_of("hero_cao_4"), bento, "o recruta cão usa a arte do Bento")
-	t.equal(AHCombatArena.hero_art_of("hero_peixe_4"), {}, "classe sem arte: nada")
 	var tree: SceneTree = Engine.get_main_loop()
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-street-scene-%d" % Time.get_ticks_usec()
+	# Numa campanha isolada: o save do jogador (que pode ter os seus recrutas) não entra na conta.
 	Campaign.state = Campaign.create_initial(11)
+	var bento := AHCombatArena.hero_art_of("hero_cao_bento")
+	t.equal(AHCombatArena.art_entry({"hero_cao_bento": bento}, "hero_cao_4", ""), bento, "recruta fora do elenco (sem variação): a arte do Bento")
+	t.equal(AHCombatArena.hero_art_of("hero_peixe_4"), {}, "classe sem arte: nada")
 	var recruit := S.recruit(Campaign.state, "cao", RandomNumberGenerator.new(), "Rex")
+	t.equal(AHCombatArena.hero_art_of(recruit.hero_id).get("variant", ""), "dog_recruit_01", "o recruta escalado usa a arte própria")
 	var team := [recruit.hero_id, "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]
 	t.equal(S.confirm_departure(Campaign.state, team, 0, 4242, "fase_1"), "", "parte com o recruta na frente")
 	GameFlow.change_to("street", {}, false)

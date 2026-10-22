@@ -757,7 +757,7 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 	_update_sleepers()
 
 
-## A arte do herói (recrutas novos usam a do fundador da mesma classe).
+## A arte do herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 func _hero_art(entry) -> Dictionary:
 	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id, String(entry.get("art_variant", "")))
 

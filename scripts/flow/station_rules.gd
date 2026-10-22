@@ -911,7 +911,8 @@ static func validate_team(campaign: Dictionary, hero_ids: Array, phase_id: Strin
 	return ""
 
 
-## Quem pode ir para a rua: a rua e a luta mostram cada herói com a arte dele (os recrutas, com a do fundador da classe).
+## Quem pode ir para a rua: a rua e a luta mostram cada herói com a arte dele (o recruta, com a variação da classe ou,
+## sem ela, a do fundador).
 ## Uma classe sem arte nenhuma ainda (o rato e o tatu, liberados por eventos) fica na Estação até a arte chegar: antes
 ## ela partia na equipe e sumia da rua e da luta, e a expedição lutava com três.
 static func can_deploy(entry) -> bool:

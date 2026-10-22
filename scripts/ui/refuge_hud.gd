@@ -1165,9 +1165,9 @@ func _swap(a: int, b: int) -> void:
 
 # ---------------------------------------------------------------- Preparação numa tela (a proposta de UX, tela 4)
 
-## A arte de um herói (os recrutas usam a do fundador da mesma classe).
+## A arte de um herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 static func _hero_art(entry: Dictionary) -> Dictionary:
-	return AHCombatArena.hero_art_of(entry.id).get("idle", {})
+	return AHCombatArena.hero_art_of(entry.id, String(entry.get("art_variant", ""))).get("idle", {})
 
 
 ## A gaveta da Preparação: os quatro cartões no sentido da luta (o fundo à esquerda, a frente à direita), com rosto,

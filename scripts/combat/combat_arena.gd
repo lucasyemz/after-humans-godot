@@ -122,10 +122,10 @@ static var _manifest := {}
 
 
 ## A arte de um herói fora da luta (os rostos do HUD da exploração), lida uma vez do manifesto.
-static func hero_art_of(hero_id: String) -> Dictionary:
+static func hero_art_of(hero_id: String, variant: String = "") -> Dictionary:
 	if _manifest.is_empty():
 		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
-	return art_entry(_manifest.heroes, hero_id)
+	return art_entry(_manifest.heroes, hero_id, variant)
 
 
 func enemy_art(enemy_id: String) -> Dictionary:
@@ -164,8 +164,13 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 		card.set_tint(Color.WHITE)
 	else:
 		show_pose(unit, "death")
-		# Morto de vez fica cinza; no Último Fôlego, só caído.
-		card.set_tint(Color(0.55, 0.55, 0.6) if not unit.deaths_door else Color.WHITE)
+		# Morto de vez fica cinza; no Último Fôlego, só caído. Quem não tem a pose de caído (os recrutas, Íris e Véspera)
+		# fica de pé, então o Último Fôlego escurece um pouco o desenho para não parecer inteiro.
+		var has_fallen: bool = not unit.is_player or hero_art(unit.hero_id).get("reactions", {}).has("death")
+		if not unit.deaths_door:
+			card.set_tint(Color(0.55, 0.55, 0.6))
+		else:
+			card.set_tint(Color.WHITE if has_fallen else Color(0.72, 0.62, 0.62))
 
 
 # ---------------------------------------------------------------- início e fim
