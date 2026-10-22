@@ -167,6 +167,9 @@ static func migrate(campaign: Dictionary) -> void:
 		campaign[key] = String(campaign.get(key, ""))
 	if typeof(campaign.inventory.get("items")) != TYPE_DICTIONARY:
 		campaign.inventory.items = {}
+	# "departing" é só a animação do trem saindo (4 s na tela). Um save gravado nesse meio (o jogo fechou) abriria com o
+	# trem partindo para sempre: a Preparação ficava bloqueada e a plataforma sem botão.
+	finish_departure(campaign)
 
 
 static func _station_defaults() -> Dictionary:
@@ -336,7 +339,7 @@ static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
 			var entry = hero(campaign, hero_id)
 			if entry != null and entry.alive and hero_id != campaign.night.watch_hero_id:
 				sleepers += 1
-	var food_short: bool = sleepers > food if planning else food + f.food_produced - f.food_spoiled < f.food_night_need
+	var food_short: bool = sleepers > food if planning else food + f.food_produced - f.food_civilians - f.food_spoiled < f.food_night_need
 	var food_note := ""
 	if planning:
 		food_note = ("! Faltam %d nesta noite" % (sleepers - food)) if food_short else "Abastecida · demanda %d" % sleepers
@@ -844,22 +847,45 @@ static func set_formation(campaign: Dictionary, hero_ids: Array) -> bool:
 	return true
 
 
-## Quatro vivos diferentes e no máximo dois por classe.
-static func validate_team(campaign: Dictionary, hero_ids: Array) -> String:
+## Vivos diferentes, no máximo dois por classe, e quantos a jornada pede (#6: o mínimo e o máximo de cada fase; sem
+## fase, quatro).
+static func validate_team(campaign: Dictionary, hero_ids: Array, phase_id: String = "") -> String:
 	var unique := {}
 	for hero_id in hero_ids:
 		unique[hero_id] = true
-	if hero_ids.size() != 4 or unique.size() != 4:
-		return "A expedição requer exatamente 4 animais vivos na formação."
+	var limits := J.team_limits(phase_id)
+	var size_text := team_size_text(limits)
+	if unique.size() != hero_ids.size() or hero_ids.size() < limits.min or hero_ids.size() > limits.max:
+		return "Esta jornada pede %s vivos na equipe." % size_text
 	var counts := {}
 	for hero_id in hero_ids:
 		var entry = hero(campaign, hero_id)
 		if entry == null or not entry.alive:
-			return "A expedição requer exatamente 4 animais vivos na formação."
+			return "Esta jornada pede %s vivos na equipe." % size_text
 		counts[entry.class_id] = int(counts.get(entry.class_id, 0)) + 1
 		if counts[entry.class_id] > MAX_PER_CLASS:
 			return "No máximo dois animais da mesma classe na mesma equipe."
 	return ""
+
+
+## Quem pode ir para a rua: a rua e a luta mostram cada herói com a arte dele (os recrutas, com a do fundador da classe).
+## Uma classe sem arte nenhuma ainda (o rato e o tatu, liberados por eventos) fica na Estação até a arte chegar: antes
+## ela partia na equipe e sumia da rua e da luta, e a expedição lutava com três.
+static func can_deploy(entry) -> bool:
+	return entry != null and not AHCombatArena.hero_art_of(String(entry.id)).is_empty()
+
+
+static func deploy_block(entry) -> String:
+	return "" if can_deploy(entry) else "%s ainda não tem arte de combate e fica na Estação por enquanto." % entry.display_name
+
+
+## "1 a 4", "3 ou 4", "4": quantos a jornada aceita, para as telas.
+static func team_size_text(limits: Dictionary) -> String:
+	if limits.min == limits.max:
+		return "%d %s" % [limits.max, "animal" if limits.max == 1 else "animais"]
+	if limits.max - limits.min == 1:
+		return "%d ou %d animais" % [limits.min, limits.max]
+	return "%d a %d animais" % [limits.min, limits.max]
 
 
 ## Os ataques que a classe tem na posição (#95): cada um precisa de um ataque na posição em que parte.
@@ -957,15 +983,18 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 	var unique := {}
 	for hero_id in team:
 		unique[hero_id] = true
-	if team.size() != 4 or unique.size() != 4:
-		return "Escolha quatro integrantes diferentes."
-	for rank in range(1, 5):
+	var limits := J.team_limits(phase_id)
+	if unique.size() != team.size() or team.size() < limits.min or team.size() > limits.max:
+		return "Esta jornada pede %s diferentes na equipe." % team_size_text(limits)
+	for rank in range(1, team.size() + 1):
 		var entry = hero(campaign, team[rank - 1])
 		if entry == null or not entry.alive:
 			return "Só integrantes vivos podem partir."
+		if not can_deploy(entry):
+			return deploy_block(entry)
 		if attacks_from_rank(entry.class_id, rank).is_empty():
 			return "%s não tem ataque na posição %d." % [entry.display_name, rank]
-	var team_block := validate_team(campaign, team)
+	var team_block := validate_team(campaign, team, phase_id)
 	if team_block != "":
 		return team_block
 	if focus != "" and focus_def(focus).is_empty():
@@ -1086,7 +1115,7 @@ static func focus_recommended(campaign: Dictionary, team: int = 4) -> String:
 	var f := forecast(campaign, team)
 	if f.water + f.water_produced < f.water_consumed + team:
 		return FOCUS_WATER
-	if f.food + f.food_produced < f.food_night_need:
+	if f.food + f.food_produced - f.food_civilians < f.food_night_need:
 		return FOCUS_PROVISIONS
 	if _needed_room(campaign)[0] != "":
 		return FOCUS_PARTS

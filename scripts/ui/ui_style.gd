@@ -60,6 +60,78 @@ static func install(root: Window) -> void:
 	root.theme = theme()
 
 
+const _COLOR_NAMES := ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_disabled_color", "icon_normal_color"]
+const _STYLE_NAMES := ["panel", "normal", "hover", "pressed", "focus", "disabled", "fill", "background"]
+
+
+## As Opções valem na hora (#4): o tamanho do texto e as cores para daltonismo mudam nas telas já abertas sem remontá-las
+## (o painel aberto, a rolagem e a seleção ficam como estão).
+## - Todo tamanho de fonte passa por px(); px é inversível (round(round(s·k)/k) = s para k ≥ 1), então o tamanho de antes
+##   volta ao da base e vai para a escala nova.
+## - As cores de bom e de ruim (OK, DANGER) trocam onde aparecem: texto, painéis, barras, linhas e o aro dos rostos, com
+##   a transparência de cada uso.
+## - Depois, quem tem restyle() (os HUDs) refaz o que calcula na hora (posições pelo tamanho do texto, cores derivadas).
+static func retune(root: Node, from_scale: float, from_ok: Color, from_danger: Color) -> void:
+	var swaps := []
+	if not _same_rgb(from_ok, OK):
+		swaps.append([from_ok, OK])
+	if not _same_rgb(from_danger, DANGER):
+		swaps.append([from_danger, DANGER])
+	var rescale := not is_equal_approx(from_scale, text_scale)
+	var styles := {}
+	var hooks: Array = []
+	for node in [root] + root.find_children("*", "", true, false):
+		# Ícones pintados por modulate (o alerta da barra da Estação, os nós da rota).
+		if node is CanvasItem and not swaps.is_empty():
+			node.modulate = _swap(node.modulate, swaps)
+			node.self_modulate = _swap(node.self_modulate, swaps)
+		if node is Control:
+			var control: Control = node
+			if rescale and control.has_theme_font_size_override("font_size"):
+				var base := int(round(control.get_theme_font_size("font_size") / from_scale))
+				control.add_theme_font_size_override("font_size", px(base))
+			if not swaps.is_empty():
+				for color_name in _COLOR_NAMES:
+					if control.has_theme_color_override(color_name):
+						control.add_theme_color_override(color_name, _swap(control.get_theme_color(color_name), swaps))
+				for style_name in _STYLE_NAMES:
+					if control.has_theme_stylebox_override(style_name):
+						var style := control.get_theme_stylebox(style_name)
+						# A mesma caixa pode servir a vários botões: troca uma vez só.
+						if style is StyleBoxFlat and not styles.has(style):
+							styles[style] = true
+							style.bg_color = _swap(style.bg_color, swaps)
+							style.border_color = _swap(style.border_color, swaps)
+				if control is ColorRect:
+					control.color = _swap(control.color, swaps)
+				if control.material is ShaderMaterial and control.material.get_shader_parameter("ring") != null:
+					control.material.set_shader_parameter("ring", _swap(control.material.get_shader_parameter("ring"), swaps))
+		elif node is Line2D and not swaps.is_empty():
+			node.default_color = _swap(node.default_color, swaps)
+		if node.has_method("restyle"):
+			hooks.append(node)
+	# Depois do quadro: os tamanhos mínimos só se refazem com as fontes novas aplicadas.
+	for node in hooks:
+		_restyle.call_deferred(node)
+
+
+## A tela pode ter saído no meio (troca de cena): só refaz quem ainda está na árvore.
+static func _restyle(node: Node) -> void:
+	if is_instance_valid(node) and node.is_inside_tree():
+		node.restyle()
+
+
+static func _same_rgb(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) < 0.004 and absf(a.g - b.g) < 0.004 and absf(a.b - b.b) < 0.004
+
+
+static func _swap(color: Color, swaps: Array) -> Color:
+	for pair in swaps:
+		if _same_rgb(color, pair[0]):
+			return Color(pair[1], color.a)
+	return color
+
+
 static func panel(alpha: float = 0.9, border: Color = Color(COPPER, 0.55), width: int = 2) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(PANEL, alpha)
@@ -111,6 +183,107 @@ static func key_name(action: String) -> String:
 	if code == 0:
 		return "?"
 	return {KEY_ESCAPE: "Esc"}.get(code, OS.get_keycode_string(code))
+
+
+## A tecla de uma ação desenhada; acompanha as trocas das Opções (refresh_keys).
+static func action_cap(action: String) -> PanelContainer:
+	var cap := key_cap(key_name(action))
+	cap.set_meta("ah_action", action)
+	return cap
+
+
+## Depois de trocar uma tecla nas Opções: as teclas desenhadas das telas abertas mostram a nova.
+static func refresh_keys(root: Node) -> void:
+	for node in root.find_children("*", "PanelContainer", true, false):
+		if node.has_meta("ah_action") and node.get_child_count() > 0 and node.get_child(0) is Label:
+			(node.get_child(0) as Label).text = key_name(String(node.get_meta("ah_action")))
+
+
+## Quem joga está no teclado ou no controle (a última entrada não foi o mouse nem o toque); Settings acompanha.
+static var using_keys := false
+
+
+## Teclado e controle (#5): o foco fica sempre num botão da tela aberta (scope). Se o botão com foco sumiu (a tela foi
+## remontada), ficou invisível ou está em outra tela, volta para o botão de mesmo texto (o "+" da Preparação continua no "+") ou para o
+## primeiro da tela. Os HUDs chamam a cada quadro com a tela de cima; é barato quando o foco já está certo.
+static func keep_focus(scope: Control) -> void:
+	# Com a dica da primeira vez aberta, o foco é dela ("Entendi").
+	if scope == null or not scope.is_visible_in_tree() or not using_keys or Tips.showing():
+		return
+	var owner := scope.get_viewport().gui_get_focus_owner()
+	if owner != null and owner.is_visible_in_tree() and scope.is_ancestor_of(owner):
+		if int(scope.get_meta("ah_focus", 0)) != owner.get_instance_id():
+			scope.set_meta("ah_focus", owner.get_instance_id())
+			scope.set_meta("ah_focus_text", (owner as Button).text if owner is Button else "")
+			scope.set_meta("ah_focus_index", focusable(scope).find(owner))
+		scope.set_meta("ah_focus_at", owner.get_global_rect().get_center())
+		return
+	var choices := focusable(scope)
+	if choices.is_empty():
+		return
+	# O de mesmo texto mais perto de onde estava (os "Vigiar" de cada cartão da noite); sem ele (o "+" chegou ao máximo e
+	# desligou), o mais perto na tela, na mesma linha primeiro: o foco nunca pula sozinho para o Partir de baixo.
+	var text := String(scope.get_meta("ah_focus_text", ""))
+	var at: Vector2 = scope.get_meta("ah_focus_at", Vector2(-1, -1))
+	var best: Control = null
+	var best_score := INF
+	for control in choices:
+		var center: Vector2 = control.get_global_rect().get_center()
+		var offset := center - at
+		var score := absf(offset.x) + absf(offset.y) * 3.0
+		if text != "" and control is Button and (control as Button).text == text:
+			score -= 100000.0
+		if at.x < 0.0:
+			score = choices.find(control)
+		if score < best_score:
+			best_score = score
+			best = control
+	best.grab_focus()
+
+
+## Uma tela nova no mesmo lugar (outro cômodo no painel): o foco começa do primeiro botão.
+static func reset_focus(scope: Control) -> void:
+	for key in ["ah_focus", "ah_focus_text", "ah_focus_index", "ah_focus_at"]:
+		if scope.has_meta(key):
+			scope.remove_meta(key)
+	var owner := scope.get_viewport().gui_get_focus_owner() if scope.is_inside_tree() else null
+	if owner != null and scope.is_ancestor_of(owner):
+		owner.release_focus()
+
+
+## Os controles da tela que recebem foco: visíveis, ativos e com foco ligado, na ordem da árvore.
+static func focusable(scope: Node) -> Array:
+	var out: Array = []
+	for node in scope.find_children("*", "Control", true, false):
+		var control: Control = node
+		if control.focus_mode == Control.FOCUS_NONE or not control.is_visible_in_tree() or control.is_queued_for_deletion():
+			continue
+		if control is BaseButton and (control as BaseButton).disabled:
+			continue
+		if control is BaseButton or control is Range or control is LineEdit:
+			out.append(control)
+	return out
+
+
+## Interagir (E, ou a tecla trocada) confirma o botão com foco, como Enter e o A do controle (ui_accept). Devolve true se
+## apertou. O evento que já é ui_accept fica para a própria interface.
+static func press_focused(scope: Control, event: InputEvent) -> bool:
+	if scope == null or not scope.is_visible_in_tree() or not event.is_action_pressed("interact") or event.is_action("ui_accept") or Tips.showing():
+		return false
+	var owner := scope.get_viewport().gui_get_focus_owner()
+	if not (owner is BaseButton) or not scope.is_ancestor_of(owner) or (owner as BaseButton).disabled:
+		return false
+	var button: BaseButton = owner
+	if button.toggle_mode:
+		button.button_pressed = not button.button_pressed
+	else:
+		button.pressed.emit()
+	return true
+
+
+## Voltar: B no controle, Backspace (cancel) ou Esc (ui_cancel).
+static func is_back(event: InputEvent) -> bool:
+	return event.is_action_pressed("cancel") or event.is_action_pressed("ui_cancel")
 
 
 ## A tecla desenhada (a do teclado; o controle mostra a do gamepad).

@@ -277,6 +277,16 @@ func _count(actor_id: String, events: Array) -> void:
 	tally[actor.hero_id] = entry
 
 
+## A luta de uma expedição: a Esperança dela (a pressão de combate com ela baixa) e os laços entre os heróis, que as
+## crises mudam e que valem a expedição inteira (Amizade e rivalidade pedem ±3, de luta em luta).
+func use_expedition(campaign: Dictionary) -> void:
+	var expedition = campaign.get("session", {}).get("expedition")
+	if expedition == null:
+		return
+	context.hope = int(expedition.get("hope", context.hope))
+	context.relationships = Dictionary(expedition.get("relationships", {})).duplicate()
+
+
 ## Grava na campanha a vida, o instinto e o trauma de cada herói; quem morreu fica com alive = false. Na vitória, a Íris
 ## recarrega a ampola.
 func write_back(campaign: Dictionary) -> void:
@@ -285,7 +295,9 @@ func write_back(campaign: Dictionary) -> void:
 			if hero.id != unit.hero_id:
 				continue
 			var dead: bool = unit.hp <= 0 and not unit.deaths_door
-			hero.hp = maxi(unit.hp, 1 if unit.deaths_door else 0)
+			# A relíquia de vida aumenta o máximo só na luta: fora dela a vida volta ao máximo do herói (senão a noite e a
+			# comida "curavam" para baixo).
+			hero.hp = clampi(unit.hp, 1 if unit.deaths_door else 0, int(hero.max_hp))
 			hero.instinct = unit.instinct
 			hero.trauma = unit.trauma
 			hero.alive = not dead
@@ -298,6 +310,7 @@ func write_back(campaign: Dictionary) -> void:
 	# O que cada um fez soma na expedição (o relatório da volta destaca).
 	var expedition = campaign.get("session", {}).get("expedition")
 	if expedition != null:
+		expedition.relationships = context.relationships.duplicate()
 		var stats: Dictionary = expedition.get("stats", {})
 		for hero_id in tally:
 			var total: Dictionary = stats.get(hero_id, {"damage": 0, "healing": 0, "downs": 0})

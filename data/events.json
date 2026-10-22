@@ -103,6 +103,11 @@
     "Name": "busca_caixa_sanitaria",
     "Title": "Caixa Lacrada",
     "Description": "No fundo do móvel, uma caixa metálica com o símbolo de risco biológico dos Antigos. O lacre ainda está intacto e alguma coisa chacoalha lá dentro.",
+    "Places": [],
+    "Objects": [
+      "movel",
+      "armario"
+    ],
     "Choices": [
       {
         "Id": "abrir_caixa",
@@ -128,7 +133,13 @@
   {
     "Name": "busca_cano_rompido",
     "Title": "Cano Rompido",
-    "Description": "Um cano de água limpa ainda corre sob o asfalto rachado, e ao lado dele há uma bomba velha de manutenção. Dá para encher os cantis com calma ou tentar desmontar a bomba.",
+    "Description": "Atrás da máquina, um cano de água limpa ainda corre, preso a uma bomba velha de manutenção. Dá para encher os cantis com calma ou tentar desmontar a bomba.",
+    "Places": [
+      "rua-das-vitrines"
+    ],
+    "Objects": [
+      "maquina"
+    ],
     "Choices": [
       {
         "Id": "encher_cantis",
@@ -156,6 +167,13 @@
     "Name": "busca_mochila",
     "Title": "Mochila Esquecida",
     "Description": "Uma mochila de expedição de outra comunidade, presa num galho. Tem um nome bordado na alça e comida lá dentro.",
+    "Places": [
+      "rua-das-vitrines",
+      "ponte-das-raizes"
+    ],
+    "Objects": [
+      "bolsa"
+    ],
     "Choices": [
       {
         "Id": "levar_tudo",
@@ -187,7 +205,11 @@
   {
     "Name": "busca_barricada",
     "Title": "Barricada Velha",
-    "Description": "Tábuas e placas de metal empilhadas contra uma porta, por alguém que queria manter alguma coisa do lado de dentro, ou do lado de fora.",
+    "Description": "Atrás da carga, tábuas e placas de metal empilhadas contra uma porta, por alguém que queria manter alguma coisa do lado de dentro, ou do lado de fora.",
+    "Places": [],
+    "Objects": [
+      "carga"
+    ],
     "Choices": [
       {
         "Id": "escudos_placas",
@@ -227,6 +249,15 @@
     "Name": "busca_choro_porta",
     "Title": "Choro Atrás da Porta",
     "Description": "Do outro lado de uma porta de aço emperrada, um choro fino. Um filhote de lontra entrou atrás de comida e a porta fechou com ele lá dentro. A fechadura está tomada de ferrugem.",
+    "Places": [
+      "rua-das-vitrines",
+      "sala-esquecida",
+      "laboratorio-silencioso",
+      "tuneis-do-eco"
+    ],
+    "Objects": [
+      "armario"
+    ],
     "Choices": [
       {
         "Id": "forcar_pe_de_cabra",
@@ -268,7 +299,15 @@
   {
     "Name": "busca_poco_escuro",
     "Title": "Poço de Manutenção",
-    "Description": "A tampa do poço de manutenção está aberta. Lá embaixo, no escuro total, algo reflete: caixas de suprimento empilhadas sobre a água.",
+    "Description": "Ao lado, a tampa de um poço de manutenção ficou aberta. Lá embaixo, no escuro total, algo reflete: caixas de suprimento empilhadas sobre a água.",
+    "Places": [
+      "ponte-das-raizes",
+      "sala-esquecida",
+      "tuneis-do-eco"
+    ],
+    "Objects": [
+      "maquina"
+    ],
     "Choices": [
       {
         "Id": "descer_lanterna",
@@ -311,7 +350,15 @@
   {
     "Name": "busca_sala_esporos",
     "Title": "Sala dos Esporos",
-    "Description": "Uma sala de enfermaria tomada por um fungo cinzento. Pelo vidro, dá para ver um armário de remédios intacto lá no fundo. O ar lá dentro brilha de esporos.",
+    "Description": "O kit está vazio, mas aponta para a porta de vidro ao lado: uma enfermaria tomada por um fungo cinzento. Lá no fundo, um armário de remédios intacto. O ar lá dentro brilha de esporos.",
+    "Places": [
+      "sala-esquecida",
+      "laboratorio-silencioso",
+      "tuneis-do-eco"
+    ],
+    "Objects": [
+      "medico"
+    ],
     "Choices": [
       {
         "Id": "entrar_mascara",

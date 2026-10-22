@@ -85,7 +85,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	var campaign: Dictionary = Campaign.state
 	if campaign.get("session", {}).get("expedition") == null:
 		# Sem expedição a rua não tem o que mostrar: a partida é pela Preparação, na Estação.
-		GameFlow.change_to.call_deferred("station", {}, false)
+		GameFlow.redirect("station")
 		return
 	var route: Dictionary = campaign.session.expedition.corridor
 	_build_segments(campaign)
@@ -231,7 +231,7 @@ func _assign_scenario_props(campaign: Dictionary) -> void:
 			continue
 		steps.append(step)
 		entries.append({"local": local, "x": float(prop.x), "zone": zone, "step": step, "name": prop.name})
-	var first := R.assign_scenario_props(campaign, street.scenario.map_name, steps)
+	var first := R.assign_scenario_props(campaign, street.scenario.map_name, steps, entries.map(func(e): return e.name))
 	for i in entries.size():
 		entries[i].prop = first + i
 		scenario_props.append(entries[i])
@@ -297,7 +297,7 @@ func _spawn_props() -> void:
 	for index in route.steps.size():
 		if route.steps[index].type != "loot":
 			continue
-		var card: MeshInstance3D = street._add_card(PROP_ART[0], PROP_ART[1], Vector3(_step_x(index, 0.45) * 100.0, -285, street.SIDEWALK_TOP_Z), PROP_ART[2])
+		var card: MeshInstance3D = street._dynamic.add_card(PROP_ART[0], PROP_ART[1], Vector3(_step_x(index, 0.45) * 100.0, -285, AHStreetSet.SIDEWALK_TOP_Z), PROP_ART[2])
 		props[index] = card
 		if route.props.get(str(index), false):
 			_dim(card)
@@ -317,11 +317,11 @@ func _refresh_doors() -> void:
 		if _overlays.has(i) or (site.locked and not site.forced):
 			continue
 		var door: Dictionary = doors[site.door]
-		var rect: Rect2 = street.DOOR_OVERLAYS[site.shop]
-		var scale: float = street.FACADE_WIDTH / 1536.0
-		var base: float = street.SIDEWALK_TOP_Z + (1024.0 - (rect.position.y + rect.size.y)) * scale
-		var card: MeshInstance3D = street._add_card("door-open-%s-crop.png" % SHOP_ART[site.shop], Rect2(),
-			Vector3(door.x * 100.0, street.FACADE_FRONT_Y + 2, base), rect.size.y * scale, 0.0, door.mirror, false, true)
+		var rect: Rect2 = AHStreetSet.DOOR_OVERLAYS[site.shop]
+		var scale: float = AHStreetSet.FACADE_WIDTH / 1536.0
+		var base: float = AHStreetSet.SIDEWALK_TOP_Z + (1024.0 - (rect.position.y + rect.size.y)) * scale
+		var card: MeshInstance3D = street._dynamic.add_card("door-open-%s-crop.png" % SHOP_ART[site.shop], Rect2(),
+			Vector3(door.x * 100.0, AHStreetSet.FACADE_FRONT_Y + 2, base), rect.size.y * scale, 0.0, door.mirror, false, true)
 		_overlays[i] = card
 
 
@@ -663,7 +663,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open_inventory()
 		return
-	if event.is_action_pressed("interact") and not blocking() and _action.is_valid():
+	if event.is_action_pressed("interact") and not blocking() and _action.is_valid() and not Tips.showing():
 		get_viewport().set_input_as_handled()
 		var action := _action
 		_action = Callable()
@@ -697,15 +697,19 @@ func _new_campaign() -> void:
 func _search_scenario_prop(entry: Dictionary) -> void:
 	var objective_before: bool = Campaign.state.session.expedition.get("objective_done", false)
 	var stock := _loot_snapshot()
-	var result := R.search_scenario_prop(Campaign.state, entry.prop)
+	var result := R.search_scenario_prop(Campaign.state, entry.prop, entry.name)
 	if result.ok:
 		# O prop que abre faz o clique de metal; o achado do objetivo, as moedas; o resto, o pano.
 		_search_sound(objective_before, int(street.scenario.props[entry.local].open) >= 0)
 		_show_gains(stock)
 		street.scenario.open_prop(entry.local)
 		Campaign.save()
-		hud.toast("%s: %s" % [entry.name, result.text], 5.0)
 		hud.refresh(Campaign.state)
+		# O objeto com escolha abre o evento ali mesmo (#7).
+		if result.event != "":
+			hud.show_event(Campaign.state)
+		else:
+			hud.toast("%s: %s" % [entry.name, result.text], 5.0)
 
 
 # ---------------------------------------------------------------- interiores laterais dos cenários

@@ -83,7 +83,6 @@ func _ready() -> void:
 		button.pressed.connect(func():
 			Settings.set_text_size(index)
 			_rebuild())
-	_hint("O texto novo vale nas telas que abrirem depois (a próxima luta, a volta à Estação).")
 	var again := Button.new()
 	again.text = "Mostrar as dicas de novo"
 	again.custom_minimum_size = Vector2(0, 42)
@@ -242,9 +241,20 @@ func _toggle(text: String, on: bool, action: Callable) -> void:
 	add_child(check)
 
 
-## Esperando a tecla nova: a primeira tecla apertada vira a principal da ação (Esc cancela).
+## Esperando a tecla nova: a primeira tecla apertada vira a principal da ação (Esc cancela). No controle, B (Voltar)
+## cancela; com o painel fechado (ou escondido) a espera acaba, sem trocar nada.
 func _input(event: InputEvent) -> void:
-	if _waiting == "" or not (event is InputEventKey) or not event.pressed or event.echo:
+	if _waiting == "":
+		return
+	if not is_visible_in_tree():
+		_waiting = ""
+		return
+	if not (event is InputEventKey) and AHUiStyle.is_back(event):
+		get_viewport().set_input_as_handled()
+		_waiting = ""
+		_rebuild()
+		return
+	if not (event is InputEventKey) or not event.pressed or event.echo:
 		return
 	get_viewport().set_input_as_handled()
 	var code: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
@@ -252,6 +262,10 @@ func _input(event: InputEvent) -> void:
 		Settings.set_key(_waiting, code)
 	_waiting = ""
 	_rebuild()
+
+
+func _exit_tree() -> void:
+	_waiting = ""
 
 
 ## As teclas e botões de uma ação, como o InputMap tem (define_input.gd).

@@ -63,6 +63,14 @@ func change_to(scene_id: String, scene_params: Dictionary = {}, fade: bool = tru
 	return true
 
 
+## Uma cena que, ao abrir, vê que o jogo pertence a outra (a Estação no meio de uma expedição, a rua sem expedição) pede
+## a troca daqui: ela espera a troca que a abriu terminar (change_to recusa enquanto busy) e então troca.
+func redirect(scene_id: String) -> void:
+	while busy:
+		await get_tree().process_frame
+	change_to(scene_id, {}, false)
+
+
 ## Escurece (1) ou clareia (0) a tela, para transições dentro da mesma cena (entrar numa casa).
 func fade(alpha: float) -> void:
 	await _fade_to(alpha)

@@ -11,6 +11,7 @@ func run(t) -> void:
 	t.check(not GameFlow.busy, "a recusa não deixa o GameFlow ocupado")
 	_keys(t)
 	_text_size(t)
+	await _redirects(t)
 
 	for action in ["move_left", "move_right", "move_back", "move_front", "run", "interact", "cancel", "menu"]:
 		if not t.check(InputMap.has_action(action), "ação %s existe" % action):
@@ -51,3 +52,34 @@ func _keys(t) -> void:
 	t.equal([Settings.primary_key("move_left"), Settings.primary_key("move_right")], [right, KEY_J], "a tecla de outra ação troca com a antiga")
 	Settings.reset_keys()
 	t.equal([Settings.primary_key("move_left"), Settings.primary_key("move_right")], [left, right], "restaurar volta às padrão")
+
+
+## A Estação aberta no meio de uma expedição leva à rua; a rua sem expedição leva à Estação. Antes o pedido saía
+## enquanto a troca que abriu a cena ainda estava em andamento, era recusado e a cena ficava quebrada.
+func _redirects(t) -> void:
+	var tree: SceneTree = Engine.get_main_loop()
+	var real_dir: String = Campaign.save_dir
+	var real_state: Dictionary = Campaign.state
+	Campaign.save_dir = "user://test-game-flow-%d" % Time.get_ticks_usec()
+	Campaign.state = Campaign.create_initial(3)
+	AHJourneyRules.start_expedition(Campaign.state, "fase_1", 99)
+	GameFlow.change_to("station", {}, false)
+	t.check(await _settles_on(tree, "Street"), "a Estação no meio da expedição leva à rua")
+	Campaign.state = Campaign.create_initial(3)
+	GameFlow.change_to("street", {}, false)
+	t.check(await _settles_on(tree, "Station"), "a rua sem expedição leva à Estação")
+	tree.unload_current_scene()
+	await tree.process_frame
+	for file in DirAccess.get_files_at(Campaign.save_dir):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir.path_join(file)))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
+	Campaign.save_dir = real_dir
+	Campaign.state = real_state
+
+
+func _settles_on(tree: SceneTree, scene_name: String) -> bool:
+	for frame in 300:
+		await tree.process_frame
+		if not GameFlow.busy and tree.current_scene != null and tree.current_scene.name == scene_name and frame > 5:
+			return true
+	return false

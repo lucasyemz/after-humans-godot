@@ -59,6 +59,17 @@ const SPOT_NAMES := [
 	["a bilheteria", "o carrinho de pipoca", "a escada"],
 ]
 const SHOP_NAMES := ["mercearia", "oficina", "cinema"]
+## O tipo do objeto vasculhado, pelo nome (#7): os eventos dizem em que tipos cabem (Objects em data/events.json). Na
+## ordem: o primeiro tipo com uma palavra no nome vence ("Armário de ferramentas" é armário; "Caixa de fusíveis",
+## máquina; "o caixa" da mercearia, móvel). Sem tipo ("a escada", "Objeto"), o objeto não abre evento.
+const OBJECT_KINDS := [
+	["medico", ["socorros"]],
+	["armario", ["armário"]],
+	["maquina", ["motor", "fusíveis", "ferramentas", "pipoca"]],
+	["bolsa", ["mochila", "bolsa", "maleta", "trouxa"]],
+	["carga", ["caixote", "engradado", "palete", "sacos", "cesto", "mantimentos", "caixa amarrada", "baú"]],
+	["movel", ["geladeira", "prateleira", "bancada", "fichário", "bilheteria", "cofre", "caixa"]],
+]
 
 
 static func _rand(seed_value: int) -> AHCombatRandom:
@@ -76,6 +87,46 @@ static func phase(phase_id: String) -> Dictionary:
 	return {}
 
 
+## Quantos partem em cada jornada (#6): data/expedition-teams.json, por fase (MinTeam e MaxTeam). Sem linha, quatro.
+## A luta tem quatro posições: o máximo nunca passa de 4.
+static func team_limits(phase_id: String) -> Dictionary:
+	var row = GameData.row("expedition_teams", phase_id)
+	var most := clampi(int(row.get("MaxTeam", 4)) if row != null else 4, 1, 4)
+	var least := clampi(int(row.get("MinTeam", 4)) if row != null else 4, 1, most)
+	return {"min": least, "max": most}
+
+
+## O lugar dos eventos (#7): o cenário da fase (a rua, a ponte, a sala, o laboratório, os túneis).
+static func event_place(campaign: Dictionary) -> String:
+	var expedition = campaign.get("session", {}).get("expedition")
+	return String(phase(expedition.phase_id).get("scenario", "")) if expedition != null else ""
+
+
+static func object_kind(object_name: String) -> String:
+	var lower := object_name.to_lower()
+	for entry in OBJECT_KINDS:
+		for word in entry[1]:
+			if lower.contains(word):
+				return entry[0]
+	return ""
+
+
+## Os eventos de busca que combinam com o lugar e com o tipo do objeto (Places vazio: qualquer lugar; Objects vazio:
+## qualquer objeto), em ordem fixa. Objeto sem tipo: nenhum.
+static func event_pool(place: String, kind: String) -> Array:
+	var pool: Array = []
+	for id in GameData.table("events").keys():
+		if not String(id).begins_with("busca_"):
+			continue
+		var row: Dictionary = GameData.row("events", id)
+		var places: Array = row.get("Places", [])
+		var objects: Array = row.get("Objects", [])
+		if (places.is_empty() or places.has(place)) and (objects.is_empty() or (kind != "" and objects.has(kind))):
+			pool.append(id)
+	pool.sort()
+	return pool
+
+
 static func shop_the(shop: int) -> String:
 	return ("o " if shop == 2 else "a ") + SHOP_NAMES[clampi(shop, 0, 2)]
 
@@ -88,9 +139,10 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	if info.is_empty():
 		return false
 	var team: Array = []
+	var most: int = team_limits(phase_id).max
 	for hero_id in campaign.get("preferred_formation", []):
 		for hero in campaign.roster:
-			if hero.id == hero_id and hero.alive and team.size() < 4:
+			if hero.id == hero_id and hero.alive and team.size() < most:
 				team.append(hero_id)
 	if team.is_empty():
 		return false
@@ -458,10 +510,16 @@ static func assign_search_sites(route: Dictionary, door_steps: Array, door_shops
 		route.sites.append({"door": door, "step": door_steps[door], "shop": door_shops[door], "spots": spots,
 			"has_enemy": random.next() < 0.4, "enemy_defeated": false, "locked": false, "forced": false,
 			"camp_site": false, "camped": false})
-	# Metade das fases tem um ponto com escolha, numa das casas.
+	# Metade das fases tem um ponto com escolha, numa das casas, num objeto que tem evento da rua (#7: a geladeira
+	# pode ter a Caixa Lacrada; a escada do cinema, nenhum).
 	if random.next() < 0.5:
-		var site: Dictionary = route.sites[mini(route.sites.size() - 1, floori(random.next() * route.sites.size()))]
-		site.spots[mini(site.spots.size() - 1, floori(random.next() * site.spots.size()))].choice = true
+		var candidates: Array = []
+		for site in route.sites:
+			for spot_index in site.spots.size():
+				if spot_index < 3 and not event_pool("rua-das-vitrines", object_kind(SPOT_NAMES[site.shop][spot_index])).is_empty():
+					candidates.append(site.spots[spot_index])
+		if not candidates.is_empty():
+			candidates[mini(candidates.size() - 1, floori(random.next() * candidates.size()))].choice = true
 	# Casa trancada numa porta livre: a loja inteira (3 pontos), sem patrulha. Gerador próprio.
 	var lock := _rand(route.seed ^ 0x2545f491)
 	var free: Array = range(door_steps.size()).filter(func(d): return not doors.has(d))
@@ -548,11 +606,13 @@ static func search_spot(campaign: Dictionary, site_index: int, spot_index: int) 
 	var spot: Dictionary = site.spots[spot_index]
 	var random := _rand(route.seed ^ _mul((site.door + 1) * 8 + spot_index + 1, 0x85ebca6b))
 	if spot.choice:
-		var choices: Array = GameData.table("events").keys().filter(func(id): return id.begins_with("busca_"))
+		# O evento combina com o lugar e com o que se vasculha (#7): nada de esporos na mercearia.
+		var choices := event_pool(event_place(campaign), object_kind(SPOT_NAMES[site.shop][spot_index] if site.shop >= 0 and site.shop < 3 and spot_index < 3 else ""))
 		if not choices.is_empty():
 			spot.searched = true
 			var event_id: String = choices[mini(choices.size() - 1, floori(random.next() * choices.size()))]
-			campaign.session.event = {"event_id": event_id, "from_search": true, "resolution": "", "pending_hard_combat": false}
+			campaign.session.event = {"event_id": event_id, "from_search": true, "resolution": "", "pending_hard_combat": false,
+				"object": SPOT_NAMES[site.shop][spot_index] if site.shop >= 0 and site.shop < 3 and spot_index < 3 else ""}
 			return {"ok": true, "text": "", "event": event_id}
 	var fixed_id: String = FIXED_OUTCOMES[site.shop][spot_index] if site.shop >= 0 and site.shop < 3 and spot_index < 3 else ""
 	var fixed = GameData.row("search_outcomes", fixed_id) if fixed_id != "" else null
@@ -628,7 +688,7 @@ static func step_range(phase_id: String, transit_map: bool) -> Array:
 
 ## Campos dos cenários num corredor de save anterior a eles.
 static func _scenario_fields(route: Dictionary) -> void:
-	for key in ["prop_steps", "prop_maps", "searched_props"]:
+	for key in ["prop_steps", "prop_maps", "searched_props", "choice_props"]:
 		if not route.has(key):
 			route[key] = []
 	for key in ["objective_prop", "current_room"]:
@@ -638,7 +698,8 @@ static func _scenario_fields(route: Dictionary) -> void:
 
 ## Os props do mapa entram no corredor (AssignScenarioProps); voltando ao mesmo mapa, os mesmos (e os já vasculhados).
 ## O objetivo da rota cai num prop da segunda metade (trecho >= 4), fixo pela semente. Devolve o índice do primeiro.
-static func assign_scenario_props(campaign: Dictionary, map: String, steps: Array) -> int:
+## names: os nomes dos props (o objeto com escolha só cai num que tem evento do lugar; sem nomes, qualquer um).
+static func assign_scenario_props(campaign: Dictionary, map: String, steps: Array, names: Array = []) -> int:
 	var expedition: Dictionary = campaign.session.expedition
 	var route: Dictionary = expedition.corridor
 	_scenario_fields(route)
@@ -653,11 +714,20 @@ static func assign_scenario_props(campaign: Dictionary, map: String, steps: Arra
 			prop_steps.remove_at(i)
 			prop_maps.remove_at(i)
 		route.searched_props = []
+		route.choice_props = []
 		route.objective_prop = -1
 	var first := prop_steps.size()
 	for step in steps:
 		prop_steps.append(step)
 		prop_maps.append(map)
+	# Metade dos mapas tem um objeto com escolha (#7), como as casas da rua: vasculhá-lo abre um evento do lugar.
+	var choice_random := _rand(route.seed ^ _mul(hash(map) & MASK, 0x2c1b3c6d))
+	var compatible: Array = []
+	for i in steps.size():
+		if names.is_empty() or not event_pool(event_place(campaign), object_kind(String(names[i]) if i < names.size() else "")).is_empty():
+			compatible.append(first + i)
+	if not compatible.is_empty() and choice_random.next() < 0.5:
+		route.choice_props.append(compatible[mini(compatible.size() - 1, floori(choice_random.next() * compatible.size()))])
 	if int(route.objective_prop) != -1 or steps.is_empty() or AHStationRules.focus_def(expedition.get("focus", "")).is_empty():
 		return first
 	var later: Array = []
@@ -691,16 +761,25 @@ static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
 
 
 ## Vasculha o prop (SearchScenarioProp): a tabela das casas (1 em 3 ruim) e o objetivo da rota. Devolve {ok, text}.
-static func search_scenario_prop(campaign: Dictionary, prop: int) -> Dictionary:
+static func search_scenario_prop(campaign: Dictionary, prop: int, object_name: String = "") -> Dictionary:
 	if not can_search_scenario_prop(campaign, prop):
 		return {"ok": false}
 	var route: Dictionary = corridor(campaign)
 	route.searched_props.append(prop)
+	# O objeto com escolha abre um evento do lugar (o do objetivo da rota fica com o achado dele).
+	if route.choice_props.has(prop) and prop != int(route.objective_prop):
+		var choices := event_pool(event_place(campaign), object_kind(object_name))
+		if not choices.is_empty():
+			var pick := _rand(route.seed ^ _mul(prop + 1, 0x165667b1))
+			var event_id: String = choices[mini(choices.size() - 1, floori(pick.next() * choices.size()))]
+			campaign.session.event = {"event_id": event_id, "from_search": true, "resolution": "", "pending_hard_combat": false,
+				"object": object_name}
+			return {"ok": true, "text": "", "event": event_id}
 	var random := _rand(route.seed ^ _mul(prop + 1, 0x27d4eb2d))
 	var text := apply_search_outcome(campaign, random, null)
 	if prop == int(route.objective_prop):
 		text += AHStationRules.grant_objective(campaign)
-	return {"ok": true, "text": text}
+	return {"ok": true, "text": text, "event": ""}
 
 
 ## A porta de um interior lateral abre do trecho dela em diante, sem a patrulha dele de pé (CanEnterScenarioRoom).
@@ -779,11 +858,12 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 				hero.instinct = clampi(hero.instinct + instinct, 0, 200)
 				break
 	var hurt := ""
-	if int(effects.get("Damage", 0)) > 0:
+	# O herói sorteado leva o dano; sem dano, só empresta o nome ao texto ({Heroi}).
+	if int(effects.get("Damage", 0)) > 0 or String(effects.get("Result", "")).contains("{Heroi}"):
 		var team := _team_alive(campaign)
 		if not team.is_empty():
 			var hero: Dictionary = team[mini(team.size() - 1, floori(random.next() * team.size()))]
-			hero.hp = maxi(1, hero.hp - int(effects.Damage))
+			hero.hp = maxi(1, hero.hp - int(effects.get("Damage", 0)))
 			hurt = hero.display_name
 	grant_tool(campaign, String(effects.get("GrantTool", "")))
 	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "":

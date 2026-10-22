@@ -83,6 +83,8 @@ func _init() -> void:
 	aside_panel.size = Vector2(584, 1024)
 	add_child(aside_panel)
 	var scroll := ScrollContainer.new()
+	# A rolagem acompanha o foco do teclado e do controle (#5).
+	scroll.follow_focus = true
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	aside_panel.add_child(scroll)
 	_aside = VBoxContainer.new()
@@ -98,13 +100,14 @@ func _ready() -> void:
 
 ## Abre na fase dada (a do rascunho da Preparação) ou na Estação.
 func open(phase_id: String = "") -> void:
+	AHUiStyle.reset_focus(self)
 	selected = phase_id
 	visible = true
 	refresh()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_cancel"):
+	if visible and AHUiStyle.is_back(event):
 		get_viewport().set_input_as_handled()
 		closed.emit()
 
@@ -130,6 +133,13 @@ func refresh() -> void:
 		_add_node(info.id, info.name, _icon_of(info), marker, "Fase %d · %s" % [i + 1, _status(c, info)], open, info.id == selected,
 			false, Vector2(info.map_pos[0], info.map_pos[1]))
 	_build_aside(c)
+
+
+## O tamanho do texto mudou nas Opções (AHUiStyle.retune).
+func restyle() -> void:
+	# Os nós medem o rótulo para ficar centrados no ponto da fase: refeitos com o texto novo (a fase escolhida fica).
+	if visible:
+		refresh()
 
 
 func _status(c: Dictionary, info: Dictionary) -> String:

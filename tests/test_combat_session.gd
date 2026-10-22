@@ -93,6 +93,39 @@ func _write_back(t, campaign: Dictionary) -> void:
 	var dead = copy.roster.filter(func(h): return h.id == "hero_gato_nick")[0]
 	t.equal(dead.alive, false, "quem morreu na luta fica com alive = false")
 	t.check(Campaign.is_usable(copy), "a campanha continua utilizável depois da luta")
+	_relic_hp(t, campaign)
+	_expedition_context(t, campaign)
+
+
+## A relíquia de vida aumenta o máximo só na luta: curado até o máximo dela, o herói volta com a vida do máximo dele.
+func _relic_hp(t, campaign: Dictionary) -> void:
+	var copy: Dictionary = campaign.duplicate(true)
+	var hero = copy.roster.filter(func(h): return h.id == "hero_cao_bento")[0]
+	hero.relic_id = "botao_cobre"
+	var session := AHCombatSession.create(copy.roster, PATROLS[0], false, 5)
+	var bento := session.state.find_unit("unit_hero_cao_bento")
+	t.check(bento.max_hp > hero.max_hp, "na luta, a relíquia aumenta a vida máxima (%d > %d)" % [bento.max_hp, hero.max_hp])
+	bento.hp = bento.max_hp
+	session.write_back(copy)
+	t.equal(hero.hp, hero.max_hp, "fora da luta, a vida não passa do máximo do herói")
+
+
+## A Esperança da expedição entra na luta, e os laços entre os heróis duram a expedição inteira (luta a luta).
+func _expedition_context(t, campaign: Dictionary) -> void:
+	var copy: Dictionary = campaign.duplicate(true)
+	AHJourneyRules.start_expedition(copy, "fase_1", 77)
+	copy.session.expedition.hope = 20
+	copy.session.expedition.relationships = {"hero_cao_bento_hero_gato_nick": 2}
+	var session := AHCombatSession.create(copy.roster, PATROLS[0], false, 5)
+	session.use_expedition(copy)
+	t.equal(session.context.hope, 20, "a luta usa a Esperança da expedição")
+	t.equal(session.context.relationships, {"hero_cao_bento_hero_gato_nick": 2}, "a luta começa com os laços da expedição")
+	session.context.relationships["hero_cao_bento_hero_gato_nick"] = 3
+	session.write_back(copy)
+	t.equal(copy.session.expedition.relationships, {"hero_cao_bento_hero_gato_nick": 3}, "os laços da luta voltam para a expedição")
+	var free := AHCombatSession.create(campaign.duplicate(true).roster, PATROLS[0], false, 5)
+	free.use_expedition({"session": {"expedition": null}})
+	t.equal(free.context.hope, 80, "fora de expedição, a Esperança padrão")
 
 
 ## O que cada herói fez na luta soma na expedição (o destaque do relatório da volta).

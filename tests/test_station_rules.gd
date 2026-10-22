@@ -24,6 +24,7 @@ func run(t) -> void:
 	_loop(t)
 	_next_step(t)
 	_save_round_trip(t)
+	_undeployable(t)
 
 
 ## O próximo passo da Estação: na ordem do que pede atenção (relatório, noite, trem, cômodo, sucata, fase).
@@ -111,7 +112,8 @@ func _rooms(t) -> void:
 func _departure(t) -> void:
 	var c := _campaign()
 	var team: Array = c.preferred_formation.duplicate()
-	t.check(S.confirm_departure(c, team.slice(0, 3), 0, 1, "fase_1") != "", "três integrantes não partem")
+	t.check(S.confirm_departure(c, [], 0, 1, "fase_1") != "", "sem ninguém não parte")
+	t.check(S.confirm_departure(c, team + ["hero_cao_bento"], 0, 1, "fase_1") != "", "cinco (um repetido) não partem")
 	t.check(S.confirm_departure(c, team, 0, 1, "fase_2") != "", "fase 2 bloqueada antes da 1")
 	t.check(S.confirm_departure(c, team, 5, 1, "fase_1") != "", "não passa de 8 suprimentos")
 	t.check(S.confirm_departure(c, team, 0, 1, "fase_1", "request_civil_dora") != "", "pedido fechado sem a Dora")
@@ -179,6 +181,17 @@ func _civilians(t) -> void:
 	t.equal(S.decide_candidate(c, S.OTTO, false), "", "recusa o Otto")
 	t.equal(c.station.candidate_queue, [S.CORA, S.OTTO], "o Otto volta ao fim da fila")
 	S.finish_departure(c)
+	# O jogo fechou com o trem partindo (o save tem "departing"): ao abrir, a partida termina e a Estação fica livre.
+	_trip(c, "retreat", {}, 0, 303)
+	S.resolve_night(c)
+	S.finish_dawn(c)
+	var waiting: String = c.station.train.candidate_id
+	t.equal(S.decide_candidate(c, waiting, true), "", "acolhe quem o trem trouxe")
+	var reopened = Campaign._normalize(JSON.parse_string(JSON.stringify(c)))
+	S.migrate(reopened)
+	t.equal(reopened.station.train.phase, "none", "save com o trem partindo: ao abrir, o trem já foi")
+	t.check(S.is_resident(reopened, waiting) and S.preparation_block(reopened) == "", "o acolhido mora aqui e a partida fica livre")
+	t.equal(reopened.station.train.expedition_id, c.station.train.expedition_id, "a visita continua contada para essa volta")
 	# Otto morando: mais 1 de energia e cômodos 1 sucata mais baratos.
 	var o := _campaign()
 	o.station.residents = [S.OTTO]
@@ -346,8 +359,17 @@ func _vitals(t) -> void:
 	S.adjust(c, S.SUPPLIES, -S.quantity(c, S.SUPPLIES))
 	var empty: Dictionary = S.vitals(c, 4)[0]
 	var short := S.forecast(c, 4)
-	var expected: bool = short.food + short.food_produced - short.food_spoiled < short.food_night_need
+	var expected: bool = short.food + short.food_produced - short.food_civilians - short.food_spoiled < short.food_night_need
 	t.equal(empty.warn, expected, "comida zerada avisa quando a próxima volta não fecha")
+	# Os moradores comem antes da noite: com o Otto e 3 suprimentos, a Cantina (2) dá para ele e sobram 3 para 4.
+	var fed := Campaign.create_initial(5)
+	fed.station.residents = [S.OTTO]
+	fed.station.water = 20
+	S.adjust(fed, S.SUPPLIES, 3 - S.quantity(fed, S.SUPPLIES))
+	var tight := S.forecast(fed, 4)
+	t.check(tight.food_civilians > 0 and tight.food + tight.food_produced - tight.food_civilians < 4, "o Otto come da Cantina (%s)" % tight)
+	t.check(S.vitals(fed, 4)[0].warn, "a falta na volta conta o que os moradores comem")
+	t.equal(S.focus_recommended(fed), S.FOCUS_PROVISIONS, "e o foco recomendado são as provisões")
 	c.night.phase = "planning"
 	c.night.participants = c.roster.slice(0, 3).map(func(h): return h.id)
 	c.night.watch_hero_id = ""
@@ -409,3 +431,20 @@ func _sleepers(t) -> void:
 		t.check(not pose.is_empty() and ResourceLoader.exists(pose.file), "%s tem a pose de dormir" % hero_id)
 	c.night.phase = "dawn"
 	t.equal(AHStation.sleepers(c), [], "no amanhecer ninguém fica deitado")
+
+
+## Uma classe sem arte de combate ainda (o rato do evento dos túneis) não parte: a rua e a luta não teriam como mostrá-la.
+func _undeployable(t) -> void:
+	var c := _campaign(13)
+	c.unlocked_classes.append("rato")
+	var risco := S.recruit(c, "rato", RandomNumberGenerator.new(), "Risco")
+	t.equal(risco.error, "", "o Risco chega à Estação")
+	var entry = S.hero(c, risco.hero_id)
+	t.check(not S.can_deploy(entry), "o rato ainda não tem arte de combate")
+	t.check(S.can_deploy(S.hero(c, "hero_cao_bento")), "os fundadores têm")
+	var cao := S.recruit(c, "cao", RandomNumberGenerator.new(), "Rex")
+	t.check(S.can_deploy(S.hero(c, cao.hero_id)), "o recruta cão usa a arte do Bento")
+	var team := [risco.hero_id, "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]
+	t.equal(S.confirm_departure(c, team, 0, 4242, "fase_1"), "Risco ainda não tem arte de combate e fica na Estação por enquanto.",
+		"a partida com o Risco é recusada, com o motivo")
+	t.equal(c.session.expedition, null, "e a expedição não começa")

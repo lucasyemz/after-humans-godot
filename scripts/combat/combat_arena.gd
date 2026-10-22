@@ -71,7 +71,19 @@ func setup(street: Node3D) -> void:
 # ---------------------------------------------------------------- arte
 
 func hero_art(hero_id: String) -> Dictionary:
-	return art.heroes.get(hero_id, {})
+	return art_entry(art.heroes, hero_id)
+
+
+## A arte de um herói no manifesto: os recrutas (hero_cao_4) usam a do fundador da mesma classe, até terem a própria.
+static func art_entry(heroes: Dictionary, hero_id: String) -> Dictionary:
+	if heroes.has(hero_id):
+		return heroes[hero_id]
+	var parts := hero_id.split("_")
+	if parts.size() > 2 and parts[0] == "hero":
+		for founder in heroes:
+			if String(founder).begins_with("hero_%s_" % parts[1]):
+				return heroes[founder]
+	return {}
 
 
 static var _manifest := {}
@@ -81,7 +93,7 @@ static var _manifest := {}
 static func hero_art_of(hero_id: String) -> Dictionary:
 	if _manifest.is_empty():
 		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
-	return _manifest.heroes.get(hero_id, {})
+	return art_entry(_manifest.heroes, hero_id)
 
 
 func enemy_art(enemy_id: String) -> Dictionary:
@@ -130,6 +142,7 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 ## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
 func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
 	session = AHCombatSession.create(heroes, enemies, opening, seed_value)
+	session.use_expedition(Campaign.state)
 	Tips.show_tip("combat")
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
 	if speed <= 2.0:

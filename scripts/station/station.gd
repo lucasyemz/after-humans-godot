@@ -79,6 +79,7 @@ var _warning_time := -1.0
 var _candidate: AHSpriteCard
 var _candidate_id := ""
 var _pending_arrival := ""
+var _env: Environment
 
 
 func _ready() -> void:
@@ -86,7 +87,8 @@ func _ready() -> void:
 	# Quem abre a Estação no meio de uma expedição (o jogo fechou na rua) volta para a rua.
 	var session: Dictionary = campaign.get("session", {})
 	if session.get("expedition") != null and session.get("result", "") == "":
-		GameFlow.change_to.call_deferred("street", {}, false)
+		set_process(false)
+		GameFlow.redirect("street")
 		return
 	_combat_art = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
 	_civilian_art = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/civilians.json"))
@@ -126,12 +128,13 @@ func _ready() -> void:
 func _arrive(campaign: Dictionary) -> void:
 	if campaign.session.get("expedition") != null and campaign.session.get("result", "") != "":
 		S.finish_return(campaign)
+	# A partida do trem que ficou pela metade (a cena saiu antes do fim da animação).
+	S.finish_departure(campaign)
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	S.receive_volunteers(campaign, rng)
 	Campaign.save()
 	_place_residents(rng)
-	_update_sleepers()
 	if not campaign.station.last_return.is_empty() and not campaign.station.last_return.get("seen", false):
 		hud.open_service("report")
 	elif campaign.night.phase != "none":
@@ -745,19 +748,13 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		residents[civilian_id] = card
 		# Civil morador: alterna o idle e a pose de trabalho, parado no posto dele.
 		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
+	# Refeitos os passeios (depois do trem, por exemplo), quem dorme volta para o beliche.
+	_update_sleepers()
 
 
 ## A arte do herói (recrutas novos usam a do fundador da mesma classe).
 func _hero_art(entry) -> Dictionary:
-	if entry == null:
-		return {}
-	var art: Dictionary = _combat_art.heroes.get(entry.id, {})
-	if not art.is_empty():
-		return art
-	for hero_id in _combat_art.heroes:
-		if hero_id.begins_with("hero_%s_" % entry.class_id):
-			return _combat_art.heroes[hero_id]
-	return {}
+	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id)
 
 
 func civilian_art(civilian_id: String) -> Dictionary:
@@ -890,8 +887,10 @@ func _build_environment() -> void:
 		env.ssao_enabled = Settings.effects().ssao
 		env.ssao_radius = 0.9
 		env.ssao_intensity = 1.4
-		# A oclusão acompanha a qualidade das opções (Settings).
-		Settings.changed.connect(func(): env.ssao_enabled = Settings.effects().ssao)
+		# A oclusão acompanha a qualidade das opções (Settings). Pelo método do nó: a conexão sai junto com a cena (uma
+		# lambda que só usa env não é do nó e ficava conectada a cada visita à Estação).
+		_env = env
+		Settings.changed.connect(_on_settings_changed)
 	var world := WorldEnvironment.new()
 	world.environment = env
 	add_child(world)
@@ -902,6 +901,10 @@ func _build_environment() -> void:
 	fill.light_energy = 0.28
 	fill.shadow_enabled = false
 	add_child(fill)
+
+
+func _on_settings_changed() -> void:
+	_env.ssao_enabled = Settings.effects().ssao
 
 
 func _build_post() -> void:

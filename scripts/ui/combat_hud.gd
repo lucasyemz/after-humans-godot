@@ -199,7 +199,7 @@ func _build() -> void:
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.text = spec[0]
 		style_button(button)
-		var key := S.key_cap(S.key_name(spec[3]))
+		var key := S.action_cap(spec[3])
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT, Control.PRESET_MODE_MINSIZE, 8)
 		button.pressed.connect(_on_action.bind(spec[1]))
@@ -244,6 +244,7 @@ func open(new_session: AHCombatSession) -> void:
 
 func close() -> void:
 	visible = false
+	_close_bag()
 	_clear_markers()
 	_hide_tip()
 	for bar in _unit_bars.values():
@@ -453,7 +454,26 @@ func status_text(unit: AHCombat.Unit, _short: bool) -> String:
 	return " · ".join(S.statuses(unit).map(func(e): return e[0]))
 
 
+## Teclado e controle (#5): a tela de cima da luta, onde o foco fica e onde Interagir confirma o botão com foco.
+func _focus_scope() -> Control:
+	if _bag != null:
+		return _bag
+	if _result.visible:
+		return _result
+	# Escolhendo o alvo: os marcadores ficam no próprio HUD.
+	if _choosing != "":
+		return self
+	return _panel if waiting else null
+
+
+func _input(event: InputEvent) -> void:
+	if visible and S.press_focused(_focus_scope(), event):
+		get_viewport().set_input_as_handled()
+
+
 func _process(_delta: float) -> void:
+	if _bag != null or _result.visible or (waiting and _choosing == ""):
+		S.keep_focus(_focus_scope())
 	if not visible or session == null or arena == null:
 		return
 	var camera := get_viewport().get_camera_3d()
@@ -486,6 +506,9 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	waiting = true
 	var command: Dictionary = await command_chosen
 	waiting = false
+	# A Mochila não é modal: um comando escolhido com ela aberta (Defender, uma habilidade) fecha ela também. Aberta, ela
+	# travava os atalhos dos próximos heróis e passava para a luta seguinte.
+	_close_bag()
 	# Durante o lance, o painel não mostra os botões de quem já agiu.
 	for child in _abilities.get_children():
 		child.queue_free()
@@ -546,7 +569,8 @@ func _number_of(ability: Dictionary) -> Array:
 	return ["", "", GOLD]
 
 
-func _build_abilities() -> void:
+## take_focus: a primeira carta ganha o foco (false quando a Mochila está aberta por cima: o foco fica nela).
+func _build_abilities(take_focus: bool = true) -> void:
 	for child in _abilities.get_children():
 		child.queue_free()
 	_options = session.ability_options(_actor_id)
@@ -619,7 +643,7 @@ func _build_abilities() -> void:
 			why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			why.custom_minimum_size = Vector2(170, 0)
 			text_box.add_child(why)
-		var key := S.key_cap(S.key_name("combat_ability_%d" % (index + 1)))
+		var key := S.action_cap("combat_ability_%d" % (index + 1))
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 		button.set_meta("locked", not option.usable)
@@ -642,7 +666,8 @@ func _build_abilities() -> void:
 	_description.text = "Vez de %s: escolha uma habilidade (1–4) ou uma ação." % session.state.find_unit(_actor_id).display_name
 	# O painel se ajusta antes do foco, que posiciona a dica acima dele.
 	_fit_dock.call_deferred()
-	(first if first else _actions.get_child(1)).grab_focus.call_deferred()
+	if take_focus:
+		(first if first else _actions.get_child(1)).grab_focus.call_deferred()
 
 
 ## O painel de baixo cresce para cima quando o texto é maior (a base é 210 px, colada a 24 px da borda).
@@ -654,6 +679,25 @@ func _fit_dock() -> void:
 
 func _dock_top() -> float:
 	return _panel.position.y
+
+
+## O tamanho do texto ou as cores mudaram nas Opções (AHUiStyle.retune): as fichas e o painel se ajustam ao texto novo.
+## As cartas de habilidade (altura, recuo e ícone pelo tamanho do texto) são refeitas com a mesma carta em foco; os
+## botões de ação crescem junto.
+func restyle() -> void:
+	refresh()
+	for button in _actions.get_children():
+		button.custom_minimum_size.y = S.px(42)
+	if waiting and _choosing == "":
+		var owner := get_viewport().gui_get_focus_owner()
+		var focused: int = _abilities.get_children().find(owner)
+		# Com a Mochila aberta, o foco continua nela (o Enter não escolhe uma carta por trás).
+		_build_abilities(_bag == null)
+		if focused >= 0 and _bag == null:
+			await get_tree().process_frame
+			if focused < _abilities.get_child_count():
+				(_abilities.get_child(focused) as Control).grab_focus()
+	_fit_dock.call_deferred()
 
 
 # ---------------------------------------------------------------- dicas
@@ -855,7 +899,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 	for i in _markers.size():
 		_markers[i].focus_neighbor_left = _markers[(i - 1 + _markers.size()) % _markers.size()].get_path()
 		_markers[i].focus_neighbor_right = _markers[(i + 1) % _markers.size()].get_path()
-	_description.text = "Escolha o alvo (Backspace ou B volta)."
+	_description.text = "Escolha o alvo (%s ou B volta)." % S.key_name("cancel")
 	if not _markers.is_empty():
 		_markers[0].grab_focus.call_deferred()
 
@@ -910,7 +954,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
 	# A Mochila: I abre na vez de um herói; Esc, Backspace ou I fecham.
-	if _bag != null and (event.is_action_pressed("cancel") or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):
+	if _bag != null and (S.is_back(event) or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):
 		_close_bag()
 		get_viewport().set_input_as_handled()
 		return
@@ -929,7 +973,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				if not action.disabled:
 					action.pressed.emit()
 				return
-	if _choosing != "" and event.is_action_pressed("cancel"):
+	if _choosing != "" and S.is_back(event):
 		_clear_markers()
 		_set_enabled(true)
 		_build_abilities()

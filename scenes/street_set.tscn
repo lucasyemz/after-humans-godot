@@ -1,0 +1,3042 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/street/street_set.gd" id="1_tork6"]
+[ext_resource type="Texture2D" path="res://art/street/asphalt-v1.webp" id="2_rxap6"]
+[ext_resource type="Texture2D" path="res://art/street/plaster-v1.webp" id="3_p4qia"]
+[ext_resource type="Texture2D" path="res://art/street/lamp.png" id="4_ie405"]
+[ext_resource type="Shader" path="res://shaders/glow_sprite.gdshader" id="5_jslhb"]
+[ext_resource type="Texture2D" path="res://art/street/alley-brick-v1.webp" id="6_whcdf"]
+[ext_resource type="Texture2D" path="res://art/street/workshop-v1.webp" id="7_uusu1"]
+[ext_resource type="Texture2D" path="res://art/street/side-long-plain.png" id="8_rq5t2"]
+[ext_resource type="Texture2D" path="res://art/street/side-long-fire-escape.png" id="9_ols2i"]
+[ext_resource type="Texture2D" path="res://art/street/alley-props-v1.webp" id="10_hljjp"]
+[ext_resource type="Shader" path="res://shaders/light_shaft.gdshader" id="11_4wtia"]
+[ext_resource type="Texture2D" path="res://art/street/grocery-v1.webp" id="12_ms5ks"]
+[ext_resource type="Texture2D" path="res://art/street/cinema-v1.webp" id="13_4eqid"]
+[ext_resource type="Texture2D" path="res://art/street/props-street-v1.webp" id="14_hd4tk"]
+[ext_resource type="Texture2D" path="res://art/street/props-service-v1.webp" id="15_lyhcx"]
+[ext_resource type="Texture2D" path="res://art/street/props-storefront-v1.webp" id="16_nd71h"]
+[ext_resource type="Texture2D" path="res://art/street/vehicles-profile-v2.webp" id="17_otcsd"]
+[ext_resource type="Shader" path="res://shaders/skyline_card.gdshader" id="18_mwsi2"]
+[ext_resource type="Texture2D" path="res://art/street/background1.png" id="19_jommy"]
+[ext_resource type="Texture2D" path="res://art/street/background2.png" id="20_i0q3h"]
+[ext_resource type="Texture2D" path="res://art/street/background0.png" id="21_uadko"]
+
+[sub_resource type="Gradient" id="Gradient_8x26v"]
+offsets = PackedFloat32Array(0.32, 0.72)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_r518f"]
+seed = 7
+frequency = 0.012
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_q0f0v"]
+noise = SubResource("FastNoiseLite_r518f")
+color_ramp = SubResource("Gradient_8x26v")
+seamless = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cb2rc"]
+albedo_texture = ExtResource("2_rxap6")
+roughness = 0.8
+uv1_scale = Vector3(0.25, 0.25, 0.25)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+metadata/street_piece = "asphalt"
+metadata/puddles = SubResource("NoiseTexture2D_q0f0v")
+
+[sub_resource type="BoxMesh" id="BoxMesh_7uwye"]
+size = Vector3(108, 0.19999999, 10.5)
+
+[sub_resource type="Gradient" id="Gradient_53dgf"]
+offsets = PackedFloat32Array(0.32, 0.72)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_sxfkx"]
+seed = 7
+frequency = 0.012
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_7yyi4"]
+noise = SubResource("FastNoiseLite_sxfkx")
+color_ramp = SubResource("Gradient_53dgf")
+seamless = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o7xnd"]
+albedo_color = Color(0.5882353, 0.5882353, 0.5686275, 1)
+albedo_texture = ExtResource("3_p4qia")
+roughness = 0.75
+uv1_scale = Vector3(0.4, 0.4, 0.4)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+metadata/street_piece = "sidewalk"
+metadata/puddles = SubResource("NoiseTexture2D_7yyi4")
+
+[sub_resource type="BoxMesh" id="BoxMesh_032u1"]
+size = Vector3(108, 0.34999996, 2.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_isywt"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("4_ie405")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_yqdkl"]
+size = Vector2(2.0360656, 4.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_75x5a"]
+size = Vector3(0.24, 4.5, 0.24)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5ot7l"]
+transparency = 1
+no_depth_test = true
+shading_mode = 0
+albedo_color = Color(1, 0.15, 0.1, 0.35)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xm322"]
+size = Vector3(0.24, 4.5, 0.24)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_21x3x"]
+render_priority = 0
+shader = ExtResource("5_jslhb")
+shader_parameter/color = Color(1, 0.72, 0.4, 1)
+shader_parameter/energy = 3.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_j3hi8"]
+size = Vector2(0.7, 0.7)
+
+[sub_resource type="QuadMesh" id="QuadMesh_mew0v"]
+size = Vector2(2.0360656, 4.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3ldyr"]
+size = Vector3(0.24, 4.5, 0.24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3ho6k"]
+size = Vector3(0.24, 4.5, 0.24)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gswex"]
+render_priority = 0
+shader = ExtResource("5_jslhb")
+shader_parameter/color = Color(1, 0.72, 0.4, 1)
+shader_parameter/energy = 3.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_f01ev"]
+size = Vector2(0.7, 0.7)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ib746"]
+size = Vector2(2.0360656, 4.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_i2f2v"]
+size = Vector3(0.24, 4.5, 0.24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_foecj"]
+size = Vector3(0.24, 4.5, 0.24)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bl7hl"]
+render_priority = 0
+shader = ExtResource("5_jslhb")
+shader_parameter/color = Color(1, 0.72, 0.4, 1)
+shader_parameter/energy = 3.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_4co4b"]
+size = Vector2(0.7, 0.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v1log"]
+albedo_texture = ExtResource("6_whcdf")
+roughness = 0.9
+uv1_scale = Vector3(0.33333334, 0.33333334, 0.33333334)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+metadata/street_piece = "brick"
+
+[sub_resource type="BoxMesh" id="BoxMesh_ghxyl"]
+size = Vector3(8.3, 7.6, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c4m4a"]
+size = Vector3(8.3, 7.6, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5hhue"]
+size = Vector3(8.3, 7.6, 11.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2ya4w"]
+albedo_texture = ExtResource("3_p4qia")
+roughness = 0.85
+uv1_scale = Vector3(0.33333334, 0.33333334, 0.33333334)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+metadata/street_piece = "concrete"
+
+[sub_resource type="BoxMesh" id="BoxMesh_1wpjf"]
+size = Vector3(8.3, 0.2999997, 11.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dmbqn"]
+size = Vector3(8.3, 0.2999997, 11.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_b82q0"]
+size = Vector3(8.3, 0.2999997, 11.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pixic"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cjin1"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0xf3l"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0fc75"]
+size = Vector3(9.2, 0.25, 11.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_he1ir"]
+size = Vector3(9.2, 0.25, 11.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_w1end"]
+size = Vector3(9.2, 0.25, 11.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_exkli"]
+cull_mode = 2
+albedo_texture = ExtResource("7_uusu1")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-1, 1, 1)
+uv1_offset = Vector3(1, 0, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_5vspb"]
+size = Vector2(9, 6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wfrhv"]
+cull_mode = 2
+albedo_texture = ExtResource("8_rq5t2")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-1, 1, 1)
+uv1_offset = Vector3(1, 0, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_rjrll"]
+size = Vector2(6, 6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4hn05"]
+cull_mode = 2
+albedo_texture = ExtResource("9_ols2i")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_6flem"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_aydmo"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_6of1v"]
+size = Vector2(6, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vdvqd"]
+size = Vector3(2.9999998, 0.34999996, 11.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1ktfv"]
+size = Vector3(3.4, 6.5, 0.29999924)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_x5jy0"]
+size = Vector3(3.4, 6.5, 0.29999924)
+
+[sub_resource type="BoxMesh" id="BoxMesh_r0nki"]
+size = Vector3(3.4, 6.5, 0.29999924)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_snkjd"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("10_hljjp")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.2467448, 0.29785156, 1)
+uv1_offset = Vector3(0.25, 0.16210938, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_gheqa"]
+size = Vector2(1.6154099, 1.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6fxpl"]
+size = Vector3(1.2923279, 1.3, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ktx2f"]
+size = Vector3(1.2923279, 1.3, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3xvql"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("10_hljjp")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.19921875, 0.2548828, 1)
+uv1_offset = Vector3(0.77473956, 0.21679688, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_vfxhg"]
+size = Vector2(0.70344824, 0.59999996)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_scgts"]
+size = Vector3(0.5627586, 0.59999996, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_83bnp"]
+size = Vector3(0.5627586, 0.59999996, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mww1c"]
+render_priority = 0
+shader = ExtResource("11_4wtia")
+shader_parameter/color = null
+shader_parameter/intensity = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_7hio8"]
+size = Vector2(2.6, 6.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3jm3y"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nbed8"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0m5us"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tuxtp"]
+size = Vector3(9.2, 0.25, 11.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dcsk3"]
+size = Vector3(9.2, 0.25, 11.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tyy1n"]
+size = Vector3(9.2, 0.25, 11.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_32w4d"]
+cull_mode = 2
+albedo_texture = ExtResource("12_ms5ks")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_s86oy"]
+size = Vector2(9, 6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hea6c"]
+cull_mode = 2
+albedo_texture = ExtResource("9_ols2i")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-1, 1, 1)
+uv1_offset = Vector3(1, 0, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_4uqrv"]
+size = Vector2(6, 6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ob5y3"]
+cull_mode = 2
+albedo_texture = ExtResource("8_rq5t2")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_y6dv5"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_vgf18"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_88qc4"]
+size = Vector2(6, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_83vh3"]
+size = Vector3(3.0500011, 0.34999996, 11.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mp2xr"]
+size = Vector3(3.4499998, 6.5, 0.29999924)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4yk2w"]
+size = Vector3(3.4499998, 6.5, 0.29999924)
+
+[sub_resource type="BoxMesh" id="BoxMesh_c0h3q"]
+size = Vector3(3.4499998, 6.5, 0.29999924)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yrvan"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("10_hljjp")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.18359375, 0.3515625, 1)
+uv1_offset = Vector3(0.5390625, 0.11621094, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_g0qwy"]
+size = Vector2(0.8616666, 1.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lr3fg"]
+size = Vector3(0.6893333, 1.1, 0.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2e35l"]
+size = Vector3(0.6893333, 1.1, 0.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3jt0h"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("10_hljjp")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.14192708, 0.33496094, 1)
+uv1_offset = Vector3(0.053385418, 0.56933594, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_5aink"]
+size = Vector2(0.6037901, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ipn3h"]
+size = Vector3(0.48303208, 0.95, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ws42c"]
+size = Vector3(0.48303208, 0.95, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jchra"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("10_hljjp")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-0.19270833, 0.31347656, 1)
+uv1_offset = Vector3(0.46484375, 0.58691406, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_jjy45"]
+size = Vector2(0.92211837, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3le1y"]
+size = Vector3(0.7376947, 1, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7yifu"]
+size = Vector3(0.7376947, 1, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3eupf"]
+render_priority = 0
+shader = ExtResource("11_4wtia")
+shader_parameter/color = null
+shader_parameter/intensity = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_46kw8"]
+size = Vector2(2.6, 6.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fj2gj"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tva5v"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_l8lcc"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_g5jfu"]
+size = Vector3(9.199999, 0.25, 11.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pcyo4"]
+size = Vector3(9.199999, 0.25, 11.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rhbrx"]
+size = Vector3(9.199999, 0.25, 11.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1ikjy"]
+cull_mode = 2
+albedo_texture = ExtResource("7_uusu1")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_542p2"]
+size = Vector2(9, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_xkbkb"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_td028"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_yi5ef"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_701on"]
+size = Vector2(6, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_26brc"]
+size = Vector3(2.9499989, 0.34999996, 11.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6dewx"]
+size = Vector3(3.3500004, 6.5, 0.29999924)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dkb5f"]
+size = Vector3(3.3500004, 6.5, 0.29999924)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ia1pf"]
+size = Vector3(3.3500004, 6.5, 0.29999924)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_88fey"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("10_hljjp")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.140625, 0.32128906, 1)
+uv1_offset = Vector3(0.055989582, 0.13867188, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_qo5kj"]
+size = Vector2(0.6237082, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vdf7f"]
+size = Vector3(0.49896654, 0.95, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_n6qqo"]
+size = Vector3(0.49896654, 0.95, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yihdp"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("10_hljjp")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-0.140625, 0.32128906, 1)
+uv1_offset = Vector3(0.19661458, 0.13867188, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_pepl1"]
+size = Vector2(0.6237082, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_28hdh"]
+size = Vector3(0.49896654, 0.95, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rep5h"]
+size = Vector3(0.49896654, 0.95, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a86xj"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("10_hljjp")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.203125, 0.19824219, 1)
+uv1_offset = Vector3(0.7708333, 0.70214844, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_1wjeg"]
+size = Vector2(0.6916256, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xfbq8"]
+size = Vector3(0.55330044, 0.45, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_si0p7"]
+size = Vector3(0.55330044, 0.45, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nebve"]
+render_priority = 0
+shader = ExtResource("11_4wtia")
+shader_parameter/color = null
+shader_parameter/intensity = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_7vgst"]
+size = Vector2(2.6, 6.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_21nnr"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n0pn6"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vqi5v"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_86m71"]
+size = Vector3(9.199999, 0.25, 11.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7c6os"]
+size = Vector3(9.199999, 0.25, 11.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8xte8"]
+size = Vector3(9.199999, 0.25, 11.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tc53y"]
+cull_mode = 2
+albedo_texture = ExtResource("13_4eqid")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_r32jb"]
+size = Vector2(9, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_jw0ns"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_h87t4"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_wr4r8"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_10pd5"]
+size = Vector2(6, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_kwqqo"]
+size = Vector3(3, 0.34999996, 11.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xu4l5"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1w2x7"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="BoxMesh" id="BoxMesh_kbai0"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="QuadMesh" id="QuadMesh_6g0ow"]
+size = Vector2(1.6154099, 1.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_spur6"]
+size = Vector3(1.2923279, 1.3, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_s1hv2"]
+size = Vector3(1.2923279, 1.3, 0.9)
+
+[sub_resource type="QuadMesh" id="QuadMesh_h5llp"]
+size = Vector2(0.70344824, 0.59999996)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jyle2"]
+size = Vector3(0.5627586, 0.59999996, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5k5ty"]
+size = Vector3(0.5627586, 0.59999996, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dqxhp"]
+render_priority = 0
+shader = ExtResource("11_4wtia")
+shader_parameter/color = null
+shader_parameter/intensity = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_qprkk"]
+size = Vector2(2.6, 6.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tmb7i"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pqv53"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qcnju"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mx1if"]
+size = Vector3(9.199997, 0.25, 11.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o5nao"]
+size = Vector3(9.199997, 0.25, 11.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_m22ts"]
+size = Vector3(9.199997, 0.25, 11.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_goth4"]
+cull_mode = 2
+albedo_texture = ExtResource("12_ms5ks")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-1, 1, 1)
+uv1_offset = Vector3(1, 0, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_s7uvj"]
+size = Vector2(9, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_h1kvx"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_06egw"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ccvrd"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_5huo6"]
+size = Vector2(6, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_06cva"]
+size = Vector3(3, 0.34999996, 11.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7fv6a"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ffdru"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2ilru"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="QuadMesh" id="QuadMesh_8liq7"]
+size = Vector2(0.8616666, 1.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_copod"]
+size = Vector3(0.6893333, 1.1, 0.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_f4obe"]
+size = Vector3(0.6893333, 1.1, 0.7)
+
+[sub_resource type="QuadMesh" id="QuadMesh_yjsl8"]
+size = Vector2(0.6037901, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a7efe"]
+size = Vector3(0.48303208, 0.95, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ybdd2"]
+size = Vector3(0.48303208, 0.95, 0.5)
+
+[sub_resource type="QuadMesh" id="QuadMesh_8y70f"]
+size = Vector2(0.92211837, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_u2qrm"]
+size = Vector3(0.7376947, 1, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cewab"]
+size = Vector3(0.7376947, 1, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mjg1b"]
+render_priority = 0
+shader = ExtResource("11_4wtia")
+shader_parameter/color = null
+shader_parameter/intensity = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_xf6bf"]
+size = Vector2(2.6, 6.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_flf6w"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ndksc"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_uk0on"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_803e5"]
+size = Vector3(9.200001, 0.25, 11.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_es4vs"]
+size = Vector3(9.200001, 0.25, 11.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5wiu8"]
+size = Vector3(9.200001, 0.25, 11.9)
+
+[sub_resource type="QuadMesh" id="QuadMesh_g1d14"]
+size = Vector2(9, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_qablb"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ngmpq"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_crsub"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_trq4h"]
+size = Vector2(6, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6wwat"]
+size = Vector3(2.9999962, 0.34999996, 11.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fk0en"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ww77v"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8ilnx"]
+size = Vector3(3.4000015, 6.5, 0.29999924)
+
+[sub_resource type="QuadMesh" id="QuadMesh_b3f4x"]
+size = Vector2(0.6237082, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_g1mrk"]
+size = Vector3(0.49896654, 0.95, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hoofa"]
+size = Vector3(0.49896654, 0.95, 0.5)
+
+[sub_resource type="QuadMesh" id="QuadMesh_8v01i"]
+size = Vector2(0.6237082, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bq5wr"]
+size = Vector3(0.49896654, 0.95, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gpsys"]
+size = Vector3(0.49896654, 0.95, 0.5)
+
+[sub_resource type="QuadMesh" id="QuadMesh_77n3e"]
+size = Vector2(0.6916256, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aydhp"]
+size = Vector3(0.55330044, 0.45, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3w5ju"]
+size = Vector3(0.55330044, 0.45, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v0jpb"]
+render_priority = 0
+shader = ExtResource("11_4wtia")
+shader_parameter/color = null
+shader_parameter/intensity = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_fhco6"]
+size = Vector2(2.6, 6.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fow0p"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_y2mvh"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_esav2"]
+size = Vector3(9, 6.2, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bbcpa"]
+size = Vector3(9.200005, 0.25, 11.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wlkt3"]
+size = Vector3(9.200005, 0.25, 11.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6hnio"]
+size = Vector3(9.200005, 0.25, 11.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cqtcn"]
+cull_mode = 2
+albedo_texture = ExtResource("13_4eqid")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-1, 1, 1)
+uv1_offset = Vector3(1, 0, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_87dla"]
+size = Vector2(9, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ciqgd"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_q2wrq"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ebrdt"]
+size = Vector2(6, 6)
+
+[sub_resource type="QuadMesh" id="QuadMesh_vkks8"]
+size = Vector2(6, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_acwtj"]
+size = Vector3(18.700005, 7.6, 11.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ng40j"]
+size = Vector3(18.700005, 7.6, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_x4rhq"]
+size = Vector3(18.700005, 7.6, 11.7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_viso8"]
+size = Vector3(18.700005, 0.2999997, 11.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1wnwg"]
+size = Vector3(18.700005, 0.2999997, 11.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yw3so"]
+size = Vector3(18.700005, 0.2999997, 11.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rhx5m"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("14_hd4tk")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.20494418, 0.103668265, 1)
+uv1_offset = Vector3(0.27591705, 0.83094096, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_8ulck"]
+size = Vector2(0.88961536, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ty0sb"]
+size = Vector3(0.7116923, 0.45, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_we4am"]
+size = Vector3(0.7116923, 0.45, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kqxe1"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("14_hd4tk")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.114035085, 0.18341307, 1)
+uv1_offset = Vector3(0.56858057, 0.284689, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_6x4x8"]
+size = Vector2(0.46630436, 0.75)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5y41j"]
+size = Vector3(0.37304348, 0.75, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_eq0co"]
+size = Vector3(0.37304348, 0.75, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gol7c"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("15_lyhcx")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.19218501, 0.16507177, 1)
+uv1_offset = Vector3(0.5279107, 0.054226477, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_a3wu1"]
+size = Vector2(0.6985507, 0.59999996)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mglml"]
+size = Vector3(0.5588406, 0.59999996, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jb1ce"]
+size = Vector3(0.5588406, 0.59999996, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mruwk"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("16_nd71h")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.11802233, 0.21212122, 1)
+uv1_offset = Vector3(0.31578946, 0.5095694, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_mk2il"]
+size = Vector2(0.5842105, 1.05)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mutjv"]
+size = Vector3(0.46736842, 1.05, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_v6amx"]
+size = Vector3(0.46736842, 1.05, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o8cb3"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("15_lyhcx")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.15470494, 0.18421052, 1)
+uv1_offset = Vector3(0.54545456, 0.7703349, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_2oocq"]
+size = Vector2(0.67186147, 0.79999995)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2c0tj"]
+size = Vector3(0.5374892, 0.79999995, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pspic"]
+size = Vector3(0.5374892, 0.79999995, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8xbbt"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("15_lyhcx")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.11881977, 0.19856459, 1)
+uv1_offset = Vector3(0.3141946, 0.51913875, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_d04ny"]
+size = Vector2(0.5684739, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_noc8w"]
+size = Vector3(0.45477912, 0.95, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_q6sxk"]
+size = Vector3(0.45477912, 0.95, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b1fmc"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("14_hd4tk")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.102870815, 0.14274321, 1)
+uv1_offset = Vector3(0.82216907, 0.07655502, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_3ldjj"]
+size = Vector2(0.3963687, 0.55)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vxwuy"]
+size = Vector3(0.31709498, 0.55, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4pbaj"]
+size = Vector3(0.31709498, 0.55, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i4rmn"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("16_nd71h")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.20494418, 0.14194578, 1)
+uv1_offset = Vector3(0.03827751, 0.0645933, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_2ofjw"]
+size = Vector2(1.1550561, 0.79999995)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_78cg4"]
+size = Vector3(0.9240449, 0.79999995, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3qst7"]
+size = Vector3(0.9240449, 0.79999995, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_23tk1"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("14_hd4tk")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.16586922, 0.14194578, 1)
+uv1_offset = Vector3(0.055023924, 0.32057416, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_qxbfh"]
+size = Vector2(0.9932584, 0.84999996)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5l58k"]
+size = Vector3(0.7946067, 0.84999996, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7f3bn"]
+size = Vector3(0.7946067, 0.84999996, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ui72f"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("14_hd4tk")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-0.114035085, 0.18341307, 1)
+uv1_offset = Vector3(0.68261564, 0.284689, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_su1o6"]
+size = Vector2(0.46630436, 0.75)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7qnmf"]
+size = Vector3(0.37304348, 0.75, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5j784"]
+size = Vector3(0.37304348, 0.75, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flofb"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("14_hd4tk")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.1754386, 0.13476874, 1)
+uv1_offset = Vector3(0.04784689, 0.5701754, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_dnrqp"]
+size = Vector2(0.5857988, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_73gqb"]
+size = Vector3(0.46863905, 0.45, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wp46c"]
+size = Vector3(0.46863905, 0.45, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0rwcj"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("15_lyhcx")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-0.20015949, 0.2169059, 1)
+uv1_offset = Vector3(0.47448167, 0.7535885, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_bqyys"]
+size = Vector2(0.9227941, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yess5"]
+size = Vector3(0.7382353, 1, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_kkgok"]
+size = Vector3(0.7382353, 1, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0xb7s"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("14_hd4tk")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.17623605, 0.14673047, 1)
+uv1_offset = Vector3(0.2950558, 0.5629984, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_ttvtj"]
+size = Vector2(0.54048914, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7unkw"]
+size = Vector3(0.43239132, 0.45, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fa1s2"]
+size = Vector3(0.43239132, 0.45, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0mu2d"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("14_hd4tk")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.20494418, 0.18181819, 1)
+uv1_offset = Vector3(0.530303, 0.7719298, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_aian5"]
+size = Vector2(1.0144737, 0.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sheop"]
+size = Vector3(0.811579, 0.9, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4h0it"]
+size = Vector3(0.811579, 0.9, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_57p5c"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("17_otcsd")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(0.3014815, 0.7089844, 1)
+uv1_offset = Vector3(0.0074074073, 0.22851563, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_t51bu"]
+size = Vector2(3.3636365, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ha81l"]
+size = Vector3(3.3636365, 1.4, 1.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nv556"]
+size = Vector3(3.3636365, 1.4, 1.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vavnv"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("17_otcsd")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-0.29592592, 0.7578125, 1)
+uv1_offset = Vector3(0.63666666, 0.1796875, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_ak2lu"]
+size = Vector2(3.0889175, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v2y3i"]
+size = Vector3(3.0889175, 1.4, 1.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_a4wnd"]
+size = Vector3(3.0889175, 1.4, 1.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bn0v2"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("17_otcsd")
+metallic_specular = 0.15
+backlight_enabled = true
+backlight = Color(0.45, 0.45, 0.45, 1)
+uv1_scale = Vector3(-0.3014815, 0.7089844, 1)
+uv1_offset = Vector3(0.30888888, 0.22851563, 0)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="QuadMesh_3yr4n"]
+size = Vector2(3.3636365, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8pipi"]
+size = Vector3(3.3636365, 1.4, 1.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_g2v5l"]
+size = Vector3(3.3636365, 1.4, 1.8)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_81a63"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("19_jommy")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.6
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_geipl"]
+size = Vector2(30.051613, 17)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_djdty"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("20_i0q3h")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.6
+shader_parameter/mirror = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_b2ul2"]
+size = Vector2(28.925373, 17)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_du3q3"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("21_uadko")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.6
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_8jc8i"]
+size = Vector2(28.78869, 17)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h7vwj"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("19_jommy")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.6
+shader_parameter/mirror = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_f4gx1"]
+size = Vector2(30.051613, 17)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uux1b"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("20_i0q3h")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.6
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_6vfw1"]
+size = Vector2(28.925373, 17)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_82ida"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("21_uadko")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.6
+shader_parameter/mirror = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_ug74c"]
+size = Vector2(28.78869, 17)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6iieq"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("19_jommy")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.6
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_rf1y0"]
+size = Vector2(30.051613, 17)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_olpyu"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("20_i0q3h")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_2kc45"]
+size = Vector2(19.567163, 11.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5a466"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("21_uadko")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_sq4gb"]
+size = Vector2(19.4747, 11.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nhe1d"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("19_jommy")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_j2jp4"]
+size = Vector2(20.329031, 11.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_16qpb"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("20_i0q3h")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_5hm2y"]
+size = Vector2(19.567163, 11.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_68mop"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("21_uadko")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_8icay"]
+size = Vector2(19.4747, 11.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_e3g4h"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("19_jommy")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_pfam6"]
+size = Vector2(20.329031, 11.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ar6ku"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("20_i0q3h")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_f0cx1"]
+size = Vector2(19.567163, 11.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fu67q"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("21_uadko")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_g6cwp"]
+size = Vector2(19.4747, 11.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2loas"]
+render_priority = 0
+shader = ExtResource("18_mwsi2")
+shader_parameter/albedo = ExtResource("19_jommy")
+shader_parameter/haze_color = null
+shader_parameter/haze = 0.4
+shader_parameter/mirror = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_ukw7f"]
+size = Vector2(20.329031, 11.5)
+
+[node name="StreetSet" type="Node3D" unique_id=1375068798]
+script = ExtResource("1_tork6")
+
+[node name="Ground" type="Node3D" parent="." unique_id=1179890521]
+
+[node name="Asphalt" type="MeshInstance3D" parent="Ground" unique_id=1216968842]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -0.099999994, 3.75)
+material_override = SubResource("StandardMaterial3D_cb2rc")
+mesh = SubResource("BoxMesh_7uwye")
+
+[node name="Sidewalk" type="MeshInstance3D" parent="Ground" unique_id=2072001500]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -0.024999999, -2.55)
+material_override = SubResource("StandardMaterial3D_o7xnd")
+mesh = SubResource("BoxMesh_032u1")
+
+[node name="Lamp1" type="Node3D" parent="." unique_id=1927000515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.799999, 0.14999999, -2.45)
+
+[node name="Card" type="MeshInstance3D" parent="Lamp1" unique_id=401896787]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2499998, 0)
+material_override = SubResource("StandardMaterial3D_isywt")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_yqdkl")
+
+[node name="Collider" type="StaticBody3D" parent="Lamp1" unique_id=1820071715]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52000046, 2.1, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Lamp1/Collider" unique_id=396680233]
+shape = SubResource("BoxShape3D_75x5a")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Lamp1/Collider" unique_id=573578479 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_xm322")
+
+[node name="Glow" type="MeshInstance3D" parent="Lamp1" unique_id=1194013205]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.52999973, 3.6999998, 0.06000018)
+material_override = SubResource("ShaderMaterial_21x3x")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_j3hi8")
+
+[node name="Light" type="OmniLight3D" parent="Lamp1" unique_id=539309947 groups=["street_lamp_light"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.52999973, 3.5499997, 0.3000002)
+light_color = Color(1, 0.8039216, 0.627451, 1)
+light_energy = 1.6
+light_volumetric_fog_energy = 2.5
+light_specular = 0.35
+shadow_enabled = true
+omni_range = 7.5
+omni_attenuation = 1.4
+
+[node name="Lamp2" type="Node3D" parent="." unique_id=751612194]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.6, 0.14999999, -2.45)
+
+[node name="Card" type="MeshInstance3D" parent="Lamp2" unique_id=1579993148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2499998, 0)
+material_override = SubResource("StandardMaterial3D_isywt")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_mew0v")
+
+[node name="Collider" type="StaticBody3D" parent="Lamp2" unique_id=1056757024]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52000046, 2.1, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Lamp2/Collider" unique_id=1927195082]
+shape = SubResource("BoxShape3D_3ldyr")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Lamp2/Collider" unique_id=1793638664 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3ho6k")
+
+[node name="Glow" type="MeshInstance3D" parent="Lamp2" unique_id=1526769064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5299988, 3.6999998, 0.06000018)
+material_override = SubResource("ShaderMaterial_gswex")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_f01ev")
+
+[node name="Light" type="OmniLight3D" parent="Lamp2" unique_id=641836823 groups=["street_lamp_light"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5299988, 3.5499997, 0.3000002)
+light_color = Color(1, 0.8039216, 0.627451, 1)
+light_energy = 1.6
+light_volumetric_fog_energy = 2.5
+light_specular = 0.35
+shadow_enabled = true
+omni_range = 7.5
+omni_attenuation = 1.4
+
+[node name="Lamp3" type="Node3D" parent="." unique_id=1835340707]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.8, 0.14999999, -2.45)
+
+[node name="Card" type="MeshInstance3D" parent="Lamp3" unique_id=288340810]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2499998, 0)
+material_override = SubResource("StandardMaterial3D_isywt")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ib746")
+
+[node name="Collider" type="StaticBody3D" parent="Lamp3" unique_id=2052646769]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52000046, 2.1, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Lamp3/Collider" unique_id=1514769823]
+shape = SubResource("BoxShape3D_i2f2v")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Lamp3/Collider" unique_id=1450145345 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_foecj")
+
+[node name="Glow" type="MeshInstance3D" parent="Lamp3" unique_id=1231842678]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5299988, 3.6999998, 0.06000018)
+material_override = SubResource("ShaderMaterial_bl7hl")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_4co4b")
+
+[node name="Light" type="OmniLight3D" parent="Lamp3" unique_id=1847621056 groups=["street_lamp_light"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5299988, 3.5499997, 0.3000002)
+light_color = Color(1, 0.8039216, 0.627451, 1)
+light_energy = 1.6
+light_volumetric_fog_energy = 2.5
+light_specular = 0.35
+shadow_enabled = true
+omni_range = 7.5
+omni_attenuation = 1.4
+
+[node name="DoorLight1" type="Node3D" parent="." unique_id=2040975188]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 2.8, -1.4)
+
+[node name="Light" type="OmniLight3D" parent="DoorLight1" unique_id=1143020560 groups=["street_door_light"]]
+light_color = Color(1, 0.8039216, 0.627451, 1)
+light_energy = 0.6
+light_volumetric_fog_energy = 2.5
+light_specular = 0.35
+omni_range = 5.5
+omni_attenuation = 1.4
+
+[node name="DoorLight2" type="Node3D" parent="." unique_id=1435650682]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.75, 2.6, -1.4)
+
+[node name="Light" type="OmniLight3D" parent="DoorLight2" unique_id=1830732562 groups=["street_door_light"]]
+light_color = Color(1, 0.8039216, 0.627451, 1)
+light_energy = 0.6
+light_volumetric_fog_energy = 2.5
+light_specular = 0.35
+omni_range = 5.5
+omni_attenuation = 1.4
+
+[node name="DoorLight3" type="Node3D" parent="." unique_id=589619914]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8, 3, -1.4)
+
+[node name="Light" type="OmniLight3D" parent="DoorLight3" unique_id=1340784026 groups=["street_door_light"]]
+light_color = Color(1, 0.8039216, 0.627451, 1)
+light_energy = 0.6
+light_volumetric_fog_energy = 2.5
+light_specular = 0.35
+omni_range = 5.5
+omni_attenuation = 1.4
+
+[node name="BrickBlock1" type="Node3D" parent="." unique_id=221341764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.849999, 0, -3.3)
+
+[node name="Brick" type="MeshInstance3D" parent="BrickBlock1" unique_id=1611915767]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.8, -5.8499994)
+material_override = SubResource("StandardMaterial3D_v1log")
+mesh = SubResource("BoxMesh_ghxyl")
+
+[node name="Collider" type="StaticBody3D" parent="BrickBlock1" unique_id=1053627422]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.8, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="BrickBlock1/Collider" unique_id=1721471110]
+shape = SubResource("BoxShape3D_c4m4a")
+
+[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock1/Collider" unique_id=472459402 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_5hhue")
+
+[node name="Concrete" type="MeshInstance3D" parent="BrickBlock1" unique_id=382624027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 7.75, -5.8)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_1wpjf")
+
+[node name="Collider2" type="StaticBody3D" parent="BrickBlock1" unique_id=647740640]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 7.75, -5.8)
+
+[node name="Shape" type="CollisionShape3D" parent="BrickBlock1/Collider2" unique_id=367327350]
+shape = SubResource("BoxShape3D_dmbqn")
+
+[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock1/Collider2" unique_id=1160619373 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_b82q0")
+
+[node name="Building1" type="Node3D" parent="." unique_id=1035038284]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1999998, 0, -3.3)
+
+[node name="Concrete" type="MeshInstance3D" parent="Building1" unique_id=1988460127]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_pixic")
+
+[node name="Collider" type="StaticBody3D" parent="Building1" unique_id=1389051777]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building1/Collider" unique_id=1361350621]
+shape = SubResource("BoxShape3D_cjin1")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building1/Collider" unique_id=1827692790 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_0xf3l")
+
+[node name="Concrete2" type="MeshInstance3D" parent="Building1" unique_id=1444514979]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_0fc75")
+
+[node name="Collider2" type="StaticBody3D" parent="Building1" unique_id=56387339]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building1/Collider2" unique_id=1677585430]
+shape = SubResource("BoxShape3D_he1ir")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building1/Collider2" unique_id=1587411910 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_w1end")
+
+[node name="Card" type="MeshInstance3D" parent="Building1" unique_id=724321087]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
+material_override = SubResource("StandardMaterial3D_exkli")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_5vspb")
+
+[node name="Card2" type="MeshInstance3D" parent="Building1" unique_id=1297606286]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_wfrhv")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_rjrll")
+
+[node name="Card3" type="MeshInstance3D" parent="Building1" unique_id=1709643675]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_4hn05")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_6flem")
+
+[node name="Card4" type="MeshInstance3D" parent="Building1" unique_id=993039774]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099998, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_4hn05")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_aydmo")
+
+[node name="Card5" type="MeshInstance3D" parent="Building1" unique_id=854571969]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099998, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_wfrhv")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_6of1v")
+
+[node name="Alley1" type="Node3D" parent="." unique_id=739667205]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0, -3.6)
+
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley1" unique_id=266910258]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3841858e-07, -0.024999999, -5.7000003)
+material_override = SubResource("StandardMaterial3D_o7xnd")
+mesh = SubResource("BoxMesh_vdvqd")
+
+[node name="Brick" type="MeshInstance3D" parent="Alley1" unique_id=35146071]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
+material_override = SubResource("StandardMaterial3D_v1log")
+mesh = SubResource("BoxMesh_1ktfv")
+
+[node name="Collider" type="StaticBody3D" parent="Alley1" unique_id=1517528855]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley1/Collider" unique_id=373985213]
+shape = SubResource("BoxShape3D_x5jy0")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider" unique_id=1144316218 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_r0nki")
+
+[node name="Card" type="MeshInstance3D" parent="Alley1" unique_id=165479036]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29999995, 0.79999995, -6.9)
+material_override = SubResource("StandardMaterial3D_snkjd")
+mesh = SubResource("QuadMesh_gheqa")
+
+[node name="Collider2" type="StaticBody3D" parent="Alley1" unique_id=1758153597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29999995, 0.79999995, -6.9)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley1/Collider2" unique_id=4470326]
+shape = SubResource("BoxShape3D_6fxpl")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider2" unique_id=1426617250 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_ktx2f")
+
+[node name="Card2" type="MeshInstance3D" parent="Alley1" unique_id=1876681282]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8499999, 0.45, -5.2000003)
+material_override = SubResource("StandardMaterial3D_3xvql")
+mesh = SubResource("QuadMesh_vfxhg")
+
+[node name="Collider3" type="StaticBody3D" parent="Alley1" unique_id=744649931]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8499999, 0.45, -5.2000003)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley1/Collider3" unique_id=106553430]
+shape = SubResource("BoxShape3D_scgts")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider3" unique_id=251880054 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_83bnp")
+
+[node name="SunShaft" type="MeshInstance3D" parent="Alley1" unique_id=1897255359 groups=["street_shaft"]]
+transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.4000001, 1.3199999, -5.4)
+material_override = SubResource("ShaderMaterial_mww1c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_7hio8")
+
+[node name="Building2" type="Node3D" parent="." unique_id=41357290]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 0, -3.3)
+
+[node name="Concrete" type="MeshInstance3D" parent="Building2" unique_id=856614417]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.1, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_3jm3y")
+
+[node name="Collider" type="StaticBody3D" parent="Building2" unique_id=734711772]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.1, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building2/Collider" unique_id=358383827]
+shape = SubResource("BoxShape3D_nbed8")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building2/Collider" unique_id=535220317 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_0m5us")
+
+[node name="Concrete2" type="MeshInstance3D" parent="Building2" unique_id=1244924723]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 6.325, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_tuxtp")
+
+[node name="Collider2" type="StaticBody3D" parent="Building2" unique_id=185342794]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 6.325, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building2/Collider2" unique_id=1680927043]
+shape = SubResource("BoxShape3D_dcsk3")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building2/Collider2" unique_id=671747799 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_tyy1n")
+
+[node name="Card" type="MeshInstance3D" parent="Building2" unique_id=170746556]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
+material_override = SubResource("StandardMaterial3D_32w4d")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_s86oy")
+
+[node name="Card2" type="MeshInstance3D" parent="Building2" unique_id=2033016476]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_hea6c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_4uqrv")
+
+[node name="Card3" type="MeshInstance3D" parent="Building2" unique_id=416051223]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_ob5y3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_y6dv5")
+
+[node name="Card4" type="MeshInstance3D" parent="Building2" unique_id=11183433]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099993, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_ob5y3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_vgf18")
+
+[node name="Card5" type="MeshInstance3D" parent="Building2" unique_id=1972001509]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099993, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_hea6c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_88qc4")
+
+[node name="Alley2" type="Node3D" parent="." unique_id=329159417]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.825, 0, -3.6)
+
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley2" unique_id=2128474537]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.024999999, -5.7000003)
+material_override = SubResource("StandardMaterial3D_o7xnd")
+mesh = SubResource("BoxMesh_83vh3")
+
+[node name="Brick" type="MeshInstance3D" parent="Alley2" unique_id=23916181]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.25, -11.549999)
+material_override = SubResource("StandardMaterial3D_v1log")
+mesh = SubResource("BoxMesh_mp2xr")
+
+[node name="Collider" type="StaticBody3D" parent="Alley2" unique_id=856016748]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.25, -11.549999)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley2/Collider" unique_id=411411205]
+shape = SubResource("BoxShape3D_4yk2w")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider" unique_id=856891819 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_c0h3q")
+
+[node name="Card" type="MeshInstance3D" parent="Alley2" unique_id=1335180467]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6000004, 0.7, -6.2000003)
+material_override = SubResource("StandardMaterial3D_yrvan")
+mesh = SubResource("QuadMesh_g0qwy")
+
+[node name="Collider2" type="StaticBody3D" parent="Alley2" unique_id=936270200]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6000004, 0.7, -6.2000003)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley2/Collider2" unique_id=178688430]
+shape = SubResource("BoxShape3D_lr3fg")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider2" unique_id=391739641 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_2e35l")
+
+[node name="Card2" type="MeshInstance3D" parent="Alley2" unique_id=1098614725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6999998, 0.625, -4.6)
+material_override = SubResource("StandardMaterial3D_3jt0h")
+mesh = SubResource("QuadMesh_5aink")
+
+[node name="Collider3" type="StaticBody3D" parent="Alley2" unique_id=436659448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6999998, 0.625, -4.6)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley2/Collider3" unique_id=564102800]
+shape = SubResource("BoxShape3D_ipn3h")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider3" unique_id=1429701154 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_ws42c")
+
+[node name="Card3" type="MeshInstance3D" parent="Alley2" unique_id=1814126224]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39999962, 0.65, -9.4)
+material_override = SubResource("StandardMaterial3D_jchra")
+mesh = SubResource("QuadMesh_jjy45")
+
+[node name="Collider4" type="StaticBody3D" parent="Alley2" unique_id=715441094]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39999962, 0.65, -9.4)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley2/Collider4" unique_id=1099628599]
+shape = SubResource("BoxShape3D_3le1y")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider4" unique_id=1297703917 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_7yifu")
+
+[node name="SunShaft" type="MeshInstance3D" parent="Alley2" unique_id=1318130252 groups=["street_shaft"]]
+transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.40000057, 1.3199999, -5.4)
+material_override = SubResource("ShaderMaterial_3eupf")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_46kw8")
+
+[node name="Building3" type="Node3D" parent="." unique_id=1940657212]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.85, 0, -3.3)
+
+[node name="Concrete" type="MeshInstance3D" parent="Building3" unique_id=1881856378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_fj2gj")
+
+[node name="Collider" type="StaticBody3D" parent="Building3" unique_id=94980012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building3/Collider" unique_id=1600652241]
+shape = SubResource("BoxShape3D_tva5v")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building3/Collider" unique_id=1955959381 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_l8lcc")
+
+[node name="Concrete2" type="MeshInstance3D" parent="Building3" unique_id=1175407581]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9073486e-06, 6.325, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_g5jfu")
+
+[node name="Collider2" type="StaticBody3D" parent="Building3" unique_id=1516791272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9073486e-06, 6.325, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building3/Collider2" unique_id=2118819136]
+shape = SubResource("BoxShape3D_pcyo4")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building3/Collider2" unique_id=1462992034 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_rhbrx")
+
+[node name="Card" type="MeshInstance3D" parent="Building3" unique_id=412691728]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
+material_override = SubResource("StandardMaterial3D_1ikjy")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_542p2")
+
+[node name="Card2" type="MeshInstance3D" parent="Building3" unique_id=991450261]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_wfrhv")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_xkbkb")
+
+[node name="Card3" type="MeshInstance3D" parent="Building3" unique_id=1547169613]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_4hn05")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_td028")
+
+[node name="Card4" type="MeshInstance3D" parent="Building3" unique_id=545564979]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_4hn05")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_yi5ef")
+
+[node name="Card5" type="MeshInstance3D" parent="Building3" unique_id=1625359374]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_wfrhv")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_701on")
+
+[node name="Alley3" type="Node3D" parent="." unique_id=1690473167]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.824999, 0, -3.6)
+
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley3" unique_id=1148176750]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9073486e-06, -0.024999999, -5.7000003)
+material_override = SubResource("StandardMaterial3D_o7xnd")
+mesh = SubResource("BoxMesh_26brc")
+
+[node name="Brick" type="MeshInstance3D" parent="Alley3" unique_id=2101091259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9073486e-06, 3.25, -11.549999)
+material_override = SubResource("StandardMaterial3D_v1log")
+mesh = SubResource("BoxMesh_6dewx")
+
+[node name="Collider" type="StaticBody3D" parent="Alley3" unique_id=918786436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9073486e-06, 3.25, -11.549999)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley3/Collider" unique_id=1485658972]
+shape = SubResource("BoxShape3D_dkb5f")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider" unique_id=881737536 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_ia1pf")
+
+[node name="Card" type="MeshInstance3D" parent="Alley3" unique_id=1160948084]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.69999886, 0.625, -5.4)
+material_override = SubResource("StandardMaterial3D_88fey")
+mesh = SubResource("QuadMesh_qo5kj")
+
+[node name="Collider2" type="StaticBody3D" parent="Alley3" unique_id=1081486823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.69999886, 0.625, -5.4)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley3/Collider2" unique_id=523287604]
+shape = SubResource("BoxShape3D_vdf7f")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider2" unique_id=1482395426 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_n6qqo")
+
+[node name="Card2" type="MeshInstance3D" parent="Alley3" unique_id=231325544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10000038, 0.625, -5.9999995)
+material_override = SubResource("StandardMaterial3D_yihdp")
+mesh = SubResource("QuadMesh_pepl1")
+
+[node name="Collider3" type="StaticBody3D" parent="Alley3" unique_id=1091136692]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10000038, 0.625, -5.9999995)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley3/Collider3" unique_id=175670227]
+shape = SubResource("BoxShape3D_28hdh")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider3" unique_id=1628541140 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_rep5h")
+
+[node name="Card3" type="MeshInstance3D" parent="Alley3" unique_id=1317354178]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.375, -4)
+material_override = SubResource("StandardMaterial3D_a86xj")
+mesh = SubResource("QuadMesh_1wjeg")
+
+[node name="Collider4" type="StaticBody3D" parent="Alley3" unique_id=2072835222]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.375, -4)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley3/Collider4" unique_id=1495443829]
+shape = SubResource("BoxShape3D_xfbq8")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider4" unique_id=1232312726 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_si0p7")
+
+[node name="SunShaft" type="MeshInstance3D" parent="Alley3" unique_id=1352501251 groups=["street_shaft"]]
+transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.39999962, 1.3199999, -5.4)
+material_override = SubResource("ShaderMaterial_nebve")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_7vgst")
+
+[node name="Building4" type="Node3D" parent="." unique_id=1199759372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8, 0, -3.3)
+
+[node name="Concrete" type="MeshInstance3D" parent="Building4" unique_id=74255283]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_21nnr")
+
+[node name="Collider" type="StaticBody3D" parent="Building4" unique_id=565718455]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building4/Collider" unique_id=1268286702]
+shape = SubResource("BoxShape3D_n0pn6")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building4/Collider" unique_id=955652128 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_vqi5v")
+
+[node name="Concrete2" type="MeshInstance3D" parent="Building4" unique_id=699322343]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_86m71")
+
+[node name="Collider2" type="StaticBody3D" parent="Building4" unique_id=1478201496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building4/Collider2" unique_id=354614553]
+shape = SubResource("BoxShape3D_7c6os")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building4/Collider2" unique_id=1292230269 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_8xte8")
+
+[node name="Card" type="MeshInstance3D" parent="Building4" unique_id=183035730]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
+material_override = SubResource("StandardMaterial3D_tc53y")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_r32jb")
+
+[node name="Card2" type="MeshInstance3D" parent="Building4" unique_id=1925210757]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_hea6c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_jw0ns")
+
+[node name="Card3" type="MeshInstance3D" parent="Building4" unique_id=275966335]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_ob5y3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_h87t4")
+
+[node name="Card4" type="MeshInstance3D" parent="Building4" unique_id=420956808]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_ob5y3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_wr4r8")
+
+[node name="Card5" type="MeshInstance3D" parent="Building4" unique_id=2086215035]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_hea6c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_10pd5")
+
+[node name="Alley4" type="Node3D" parent="." unique_id=1618931093]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.8, 0, -3.6)
+
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley4" unique_id=729041431]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.024999999, -5.7000003)
+material_override = SubResource("StandardMaterial3D_o7xnd")
+mesh = SubResource("BoxMesh_kwqqo")
+
+[node name="Brick" type="MeshInstance3D" parent="Alley4" unique_id=427148046]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
+material_override = SubResource("StandardMaterial3D_v1log")
+mesh = SubResource("BoxMesh_xu4l5")
+
+[node name="Collider" type="StaticBody3D" parent="Alley4" unique_id=538485321]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley4/Collider" unique_id=1520953425]
+shape = SubResource("BoxShape3D_1w2x7")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider" unique_id=870925887 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_kbai0")
+
+[node name="Card" type="MeshInstance3D" parent="Alley4" unique_id=1997032802]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29999924, 0.79999995, -6.9)
+material_override = SubResource("StandardMaterial3D_snkjd")
+mesh = SubResource("QuadMesh_6g0ow")
+
+[node name="Collider2" type="StaticBody3D" parent="Alley4" unique_id=1009448568]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29999924, 0.79999995, -6.9)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley4/Collider2" unique_id=1425378268]
+shape = SubResource("BoxShape3D_spur6")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider2" unique_id=327316664 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_s1hv2")
+
+[node name="Card2" type="MeshInstance3D" parent="Alley4" unique_id=1410765918]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8499985, 0.45, -5.2000003)
+material_override = SubResource("StandardMaterial3D_3xvql")
+mesh = SubResource("QuadMesh_h5llp")
+
+[node name="Collider3" type="StaticBody3D" parent="Alley4" unique_id=1602524562]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8499985, 0.45, -5.2000003)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley4/Collider3" unique_id=2074013503]
+shape = SubResource("BoxShape3D_jyle2")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider3" unique_id=79221864 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_5k5ty")
+
+[node name="SunShaft" type="MeshInstance3D" parent="Alley4" unique_id=774772303 groups=["street_shaft"]]
+transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.40000153, 1.3199999, -5.4)
+material_override = SubResource("ShaderMaterial_dqxhp")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_qprkk")
+
+[node name="Building5" type="Node3D" parent="." unique_id=1900776975]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.8, 0, -3.3)
+
+[node name="Concrete" type="MeshInstance3D" parent="Building5" unique_id=1460879656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_tmb7i")
+
+[node name="Collider" type="StaticBody3D" parent="Building5" unique_id=1640517575]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building5/Collider" unique_id=381357901]
+shape = SubResource("BoxShape3D_pqv53")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building5/Collider" unique_id=448619920 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_qcnju")
+
+[node name="Concrete2" type="MeshInstance3D" parent="Building5" unique_id=1405552036]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_mx1if")
+
+[node name="Collider2" type="StaticBody3D" parent="Building5" unique_id=244651066]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building5/Collider2" unique_id=1086841786]
+shape = SubResource("BoxShape3D_o5nao")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building5/Collider2" unique_id=23816184 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_m22ts")
+
+[node name="Card" type="MeshInstance3D" parent="Building5" unique_id=1739469469]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
+material_override = SubResource("StandardMaterial3D_goth4")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_s7uvj")
+
+[node name="Card2" type="MeshInstance3D" parent="Building5" unique_id=1690874508]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.5099983, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_hea6c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_h1kvx")
+
+[node name="Card3" type="MeshInstance3D" parent="Building5" unique_id=171211522]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.5099983, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_ob5y3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_06egw")
+
+[node name="Card4" type="MeshInstance3D" parent="Building5" unique_id=1215695461]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_ob5y3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ccvrd")
+
+[node name="Card5" type="MeshInstance3D" parent="Building5" unique_id=1853892488]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_hea6c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_5huo6")
+
+[node name="Alley5" type="Node3D" parent="." unique_id=529921154]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.8, 0, -3.6)
+
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley5" unique_id=403679841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.024999999, -5.7000003)
+material_override = SubResource("StandardMaterial3D_o7xnd")
+mesh = SubResource("BoxMesh_06cva")
+
+[node name="Brick" type="MeshInstance3D" parent="Alley5" unique_id=246513881]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
+material_override = SubResource("StandardMaterial3D_v1log")
+mesh = SubResource("BoxMesh_7fv6a")
+
+[node name="Collider" type="StaticBody3D" parent="Alley5" unique_id=1856998280]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley5/Collider" unique_id=1312222137]
+shape = SubResource("BoxShape3D_ffdru")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider" unique_id=838683632 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_2ilru")
+
+[node name="Card" type="MeshInstance3D" parent="Alley5" unique_id=1491277082]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5999985, 0.7, -6.2000003)
+material_override = SubResource("StandardMaterial3D_yrvan")
+mesh = SubResource("QuadMesh_8liq7")
+
+[node name="Collider2" type="StaticBody3D" parent="Alley5" unique_id=1446099379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5999985, 0.7, -6.2000003)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley5/Collider2" unique_id=899818745]
+shape = SubResource("BoxShape3D_copod")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider2" unique_id=1292787128 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_f4obe")
+
+[node name="Card2" type="MeshInstance3D" parent="Alley5" unique_id=2134991376]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.625, -4.6)
+material_override = SubResource("StandardMaterial3D_3jt0h")
+mesh = SubResource("QuadMesh_yjsl8")
+
+[node name="Collider3" type="StaticBody3D" parent="Alley5" unique_id=1128723912]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.625, -4.6)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley5/Collider3" unique_id=593030411]
+shape = SubResource("BoxShape3D_a7efe")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider3" unique_id=235237027 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_ybdd2")
+
+[node name="Card3" type="MeshInstance3D" parent="Alley5" unique_id=750536748]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3999977, 0.65, -9.4)
+material_override = SubResource("StandardMaterial3D_jchra")
+mesh = SubResource("QuadMesh_8y70f")
+
+[node name="Collider4" type="StaticBody3D" parent="Alley5" unique_id=575514579]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3999977, 0.65, -9.4)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley5/Collider4" unique_id=11033289]
+shape = SubResource("BoxShape3D_u2qrm")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider4" unique_id=809249097 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_cewab")
+
+[node name="SunShaft" type="MeshInstance3D" parent="Alley5" unique_id=490674402 groups=["street_shaft"]]
+transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.40000153, 1.3199999, -5.4)
+material_override = SubResource("ShaderMaterial_mjg1b")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_xf6bf")
+
+[node name="Building6" type="Node3D" parent="." unique_id=1830906399]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.8, 0, -3.3)
+
+[node name="Concrete" type="MeshInstance3D" parent="Building6" unique_id=2107028067]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_flf6w")
+
+[node name="Collider" type="StaticBody3D" parent="Building6" unique_id=870848900]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building6/Collider" unique_id=287150077]
+shape = SubResource("BoxShape3D_ndksc")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building6/Collider" unique_id=948172432 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_uk0on")
+
+[node name="Concrete2" type="MeshInstance3D" parent="Building6" unique_id=842434637]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8146973e-06, 6.325, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_803e5")
+
+[node name="Collider2" type="StaticBody3D" parent="Building6" unique_id=1602232932]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8146973e-06, 6.325, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building6/Collider2" unique_id=1763906153]
+shape = SubResource("BoxShape3D_es4vs")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building6/Collider2" unique_id=1872634252 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_5wiu8")
+
+[node name="Card" type="MeshInstance3D" parent="Building6" unique_id=35336061]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
+material_override = SubResource("StandardMaterial3D_exkli")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_g1d14")
+
+[node name="Card2" type="MeshInstance3D" parent="Building6" unique_id=760284350]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.510002, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_wfrhv")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_qablb")
+
+[node name="Card3" type="MeshInstance3D" parent="Building6" unique_id=900750189]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.510002, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_4hn05")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ngmpq")
+
+[node name="Card4" type="MeshInstance3D" parent="Building6" unique_id=1424087016]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_4hn05")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_crsub")
+
+[node name="Card5" type="MeshInstance3D" parent="Building6" unique_id=1644588112]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_wfrhv")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_trq4h")
+
+[node name="Alley6" type="Node3D" parent="." unique_id=1420607239]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.8, 0, -3.6)
+
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley6" unique_id=419649825]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8146973e-06, -0.024999999, -5.7000003)
+material_override = SubResource("StandardMaterial3D_o7xnd")
+mesh = SubResource("BoxMesh_6wwat")
+
+[node name="Brick" type="MeshInstance3D" parent="Alley6" unique_id=407327798]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
+material_override = SubResource("StandardMaterial3D_v1log")
+mesh = SubResource("BoxMesh_fk0en")
+
+[node name="Collider" type="StaticBody3D" parent="Alley6" unique_id=1199748996]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley6/Collider" unique_id=275800025]
+shape = SubResource("BoxShape3D_ww77v")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider" unique_id=1845003208 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_8ilnx")
+
+[node name="Card" type="MeshInstance3D" parent="Alley6" unique_id=1811290835]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70000076, 0.625, -5.4)
+material_override = SubResource("StandardMaterial3D_88fey")
+mesh = SubResource("QuadMesh_b3f4x")
+
+[node name="Collider2" type="StaticBody3D" parent="Alley6" unique_id=175845578]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70000076, 0.625, -5.4)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley6/Collider2" unique_id=2135655517]
+shape = SubResource("BoxShape3D_g1mrk")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider2" unique_id=1775507979 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_hoofa")
+
+[node name="Card2" type="MeshInstance3D" parent="Alley6" unique_id=866165955]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.099998474, 0.625, -5.9999995)
+material_override = SubResource("StandardMaterial3D_yihdp")
+mesh = SubResource("QuadMesh_8v01i")
+
+[node name="Collider3" type="StaticBody3D" parent="Alley6" unique_id=1883596655]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.099998474, 0.625, -5.9999995)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley6/Collider3" unique_id=547865050]
+shape = SubResource("BoxShape3D_bq5wr")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider3" unique_id=1218750388 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_gpsys")
+
+[node name="Card3" type="MeshInstance3D" parent="Alley6" unique_id=464828637]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.375, -4)
+material_override = SubResource("StandardMaterial3D_a86xj")
+mesh = SubResource("QuadMesh_77n3e")
+
+[node name="Collider4" type="StaticBody3D" parent="Alley6" unique_id=1327026680]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.375, -4)
+
+[node name="Shape" type="CollisionShape3D" parent="Alley6/Collider4" unique_id=1468429441]
+shape = SubResource("BoxShape3D_aydhp")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider4" unique_id=356309444 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3w5ju")
+
+[node name="SunShaft" type="MeshInstance3D" parent="Alley6" unique_id=1825449444 groups=["street_shaft"]]
+transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.40000153, 1.3199999, -5.4)
+material_override = SubResource("ShaderMaterial_v0jpb")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_fhco6")
+
+[node name="Building7" type="Node3D" parent="." unique_id=1786632972]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.799995, 0, -3.3)
+
+[node name="Concrete" type="MeshInstance3D" parent="Building7" unique_id=1038112256]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_fow0p")
+
+[node name="Collider" type="StaticBody3D" parent="Building7" unique_id=1144496379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building7/Collider" unique_id=1029223871]
+shape = SubResource("BoxShape3D_y2mvh")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building7/Collider" unique_id=79691549 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_esav2")
+
+[node name="Concrete2" type="MeshInstance3D" parent="Building7" unique_id=577621335]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6293945e-06, 6.325, -5.8499994)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_bbcpa")
+
+[node name="Collider2" type="StaticBody3D" parent="Building7" unique_id=908723885]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6293945e-06, 6.325, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="Building7/Collider2" unique_id=1257082302]
+shape = SubResource("BoxShape3D_wlkt3")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Building7/Collider2" unique_id=510188046 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_6hnio")
+
+[node name="Card" type="MeshInstance3D" parent="Building7" unique_id=376885197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
+material_override = SubResource("StandardMaterial3D_cqtcn")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_87dla")
+
+[node name="Card2" type="MeshInstance3D" parent="Building7" unique_id=112343882]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.5099945, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_hea6c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ciqgd")
+
+[node name="Card3" type="MeshInstance3D" parent="Building7" unique_id=1486942090]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.5099945, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_ob5y3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_q2wrq")
+
+[node name="Card4" type="MeshInstance3D" parent="Building7" unique_id=91065413]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.510002, 3.1499999, -2.9999998)
+material_override = SubResource("StandardMaterial3D_ob5y3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ebrdt")
+
+[node name="Card5" type="MeshInstance3D" parent="Building7" unique_id=237981442]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.510002, 3.1499999, -9)
+material_override = SubResource("StandardMaterial3D_hea6c")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_vkks8")
+
+[node name="BrickBlock2" type="Node3D" parent="." unique_id=1542467637]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82.65, 0, -3.3)
+
+[node name="Brick" type="MeshInstance3D" parent="BrickBlock2" unique_id=628595126]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6293945e-06, 3.8, -5.8499994)
+material_override = SubResource("StandardMaterial3D_v1log")
+mesh = SubResource("BoxMesh_acwtj")
+
+[node name="Collider" type="StaticBody3D" parent="BrickBlock2" unique_id=2098512435]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6293945e-06, 3.8, -5.8499994)
+
+[node name="Shape" type="CollisionShape3D" parent="BrickBlock2/Collider" unique_id=1618390021]
+shape = SubResource("BoxShape3D_ng40j")
+
+[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock2/Collider" unique_id=1427336753 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_x4rhq")
+
+[node name="Concrete" type="MeshInstance3D" parent="BrickBlock2" unique_id=185767764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6293945e-06, 7.75, -5.8)
+material_override = SubResource("StandardMaterial3D_2ya4w")
+mesh = SubResource("BoxMesh_viso8")
+
+[node name="Collider2" type="StaticBody3D" parent="BrickBlock2" unique_id=1298657342]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6293945e-06, 7.75, -5.8)
+
+[node name="Shape" type="CollisionShape3D" parent="BrickBlock2/Collider2" unique_id=39085198]
+shape = SubResource("BoxShape3D_1wnwg")
+
+[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock2/Collider2" unique_id=1763826526 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_yw3so")
+
+[node name="Prop1" type="Node3D" parent="." unique_id=577435005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1999999, 0.14999999, -2.85)
+
+[node name="Card" type="MeshInstance3D" parent="Prop1" unique_id=877351552]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
+material_override = SubResource("StandardMaterial3D_rhx5m")
+mesh = SubResource("QuadMesh_8ulck")
+
+[node name="Collider" type="StaticBody3D" parent="Prop1" unique_id=921730489]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop1/Collider" unique_id=728433622]
+shape = SubResource("BoxShape3D_ty0sb")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop1/Collider" unique_id=1294867640 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_we4am")
+
+[node name="Prop2" type="Node3D" parent="." unique_id=1620762469]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 0.14999999, -2.8)
+
+[node name="Card" type="MeshInstance3D" parent="Prop2" unique_id=362546306]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+material_override = SubResource("StandardMaterial3D_kqxe1")
+mesh = SubResource("QuadMesh_6x4x8")
+
+[node name="Collider" type="StaticBody3D" parent="Prop2" unique_id=295917184]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop2/Collider" unique_id=86578110]
+shape = SubResource("BoxShape3D_5y41j")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop2/Collider" unique_id=1858441703 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_eq0co")
+
+[node name="Prop3" type="Node3D" parent="." unique_id=266107697]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.8, 0.14999999, -2.8999999)
+
+[node name="Card" type="MeshInstance3D" parent="Prop3" unique_id=1597634078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+material_override = SubResource("StandardMaterial3D_gol7c")
+mesh = SubResource("QuadMesh_a3wu1")
+
+[node name="Collider" type="StaticBody3D" parent="Prop3" unique_id=804783360]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop3/Collider" unique_id=161496810]
+shape = SubResource("BoxShape3D_mglml")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop3/Collider" unique_id=1924131526 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_jb1ce")
+
+[node name="Prop4" type="Node3D" parent="." unique_id=1387648827]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.4, 0.14999999, -3)
+
+[node name="Card" type="MeshInstance3D" parent="Prop4" unique_id=960093213]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52500004, 0)
+material_override = SubResource("StandardMaterial3D_mruwk")
+mesh = SubResource("QuadMesh_mk2il")
+
+[node name="Collider" type="StaticBody3D" parent="Prop4" unique_id=899879774]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52500004, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop4/Collider" unique_id=1938179123]
+shape = SubResource("BoxShape3D_mutjv")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop4/Collider" unique_id=1118614246 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_v6amx")
+
+[node name="Prop5" type="Node3D" parent="." unique_id=67990892]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.8, 0.14999999, -2.8999999)
+
+[node name="Card" type="MeshInstance3D" parent="Prop5" unique_id=46266500]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40000004, 0)
+material_override = SubResource("StandardMaterial3D_o8cb3")
+mesh = SubResource("QuadMesh_2oocq")
+
+[node name="Collider" type="StaticBody3D" parent="Prop5" unique_id=1632615575]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40000004, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop5/Collider" unique_id=65073537]
+shape = SubResource("BoxShape3D_2c0tj")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop5/Collider" unique_id=1917197942 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_pspic")
+
+[node name="Prop6" type="Node3D" parent="." unique_id=54700005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 0.14999999, -3)
+
+[node name="Card" type="MeshInstance3D" parent="Prop6" unique_id=830816679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47500002, 0)
+material_override = SubResource("StandardMaterial3D_8xbbt")
+mesh = SubResource("QuadMesh_d04ny")
+
+[node name="Collider" type="StaticBody3D" parent="Prop6" unique_id=332258655]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47500002, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop6/Collider" unique_id=81741016]
+shape = SubResource("BoxShape3D_noc8w")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop6/Collider" unique_id=1029710336 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_q6sxk")
+
+[node name="Prop7" type="Node3D" parent="." unique_id=3226400]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.199999, 0.14999999, -2.75)
+
+[node name="Card" type="MeshInstance3D" parent="Prop7" unique_id=927686745]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27499998, 0)
+material_override = SubResource("StandardMaterial3D_b1fmc")
+mesh = SubResource("QuadMesh_3ldjj")
+
+[node name="Collider" type="StaticBody3D" parent="Prop7" unique_id=676020869]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27499998, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop7/Collider" unique_id=155960029]
+shape = SubResource("BoxShape3D_vxwuy")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop7/Collider" unique_id=927874042 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_4pbaj")
+
+[node name="Prop8" type="Node3D" parent="." unique_id=891579528]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.6, 0.14999999, -3)
+
+[node name="Card" type="MeshInstance3D" parent="Prop8" unique_id=1815990859]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40000004, 0)
+material_override = SubResource("StandardMaterial3D_i4rmn")
+mesh = SubResource("QuadMesh_2ofjw")
+
+[node name="Collider" type="StaticBody3D" parent="Prop8" unique_id=413622411]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40000004, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop8/Collider" unique_id=1936480221]
+shape = SubResource("BoxShape3D_78cg4")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop8/Collider" unique_id=1483307777 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3qst7")
+
+[node name="Prop9" type="Node3D" parent="." unique_id=918061075]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.8, 0.14999999, -2.8)
+
+[node name="Card" type="MeshInstance3D" parent="Prop9" unique_id=15784750]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.425, 0)
+material_override = SubResource("StandardMaterial3D_23tk1")
+mesh = SubResource("QuadMesh_qxbfh")
+
+[node name="Collider" type="StaticBody3D" parent="Prop9" unique_id=523465519]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.425, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop9/Collider" unique_id=1505318763]
+shape = SubResource("BoxShape3D_5l58k")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop9/Collider" unique_id=1416292922 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_7f3bn")
+
+[node name="Prop10" type="Node3D" parent="." unique_id=1931703235]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.6, 0.14999999, -2.8)
+
+[node name="Card" type="MeshInstance3D" parent="Prop10" unique_id=1315172337]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+material_override = SubResource("StandardMaterial3D_ui72f")
+mesh = SubResource("QuadMesh_su1o6")
+
+[node name="Collider" type="StaticBody3D" parent="Prop10" unique_id=420393075]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop10/Collider" unique_id=1292473751]
+shape = SubResource("BoxShape3D_7qnmf")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop10/Collider" unique_id=1209249007 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_5j784")
+
+[node name="Prop11" type="Node3D" parent="." unique_id=2134253176]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.2, 0.14999999, -2.8999999)
+
+[node name="Card" type="MeshInstance3D" parent="Prop11" unique_id=920057196]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
+material_override = SubResource("StandardMaterial3D_flofb")
+mesh = SubResource("QuadMesh_dnrqp")
+
+[node name="Collider" type="StaticBody3D" parent="Prop11" unique_id=1524900124]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop11/Collider" unique_id=400701344]
+shape = SubResource("BoxShape3D_73gqb")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop11/Collider" unique_id=1000555505 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_wp46c")
+
+[node name="Prop12" type="Node3D" parent="." unique_id=2135221985]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.2, 0.14999999, -2.95)
+
+[node name="Card" type="MeshInstance3D" parent="Prop12" unique_id=1260507900]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+material_override = SubResource("StandardMaterial3D_0rwcj")
+mesh = SubResource("QuadMesh_bqyys")
+
+[node name="Collider" type="StaticBody3D" parent="Prop12" unique_id=1461939630]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop12/Collider" unique_id=1855569830]
+shape = SubResource("BoxShape3D_yess5")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop12/Collider" unique_id=2143427457 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_kkgok")
+
+[node name="Prop13" type="Node3D" parent="." unique_id=164173504]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.8, 0.14999999, -2.8999999)
+
+[node name="Card" type="MeshInstance3D" parent="Prop13" unique_id=2145907341]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
+material_override = SubResource("StandardMaterial3D_0xb7s")
+mesh = SubResource("QuadMesh_ttvtj")
+
+[node name="Collider" type="StaticBody3D" parent="Prop13" unique_id=1539674868]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop13/Collider" unique_id=1891515593]
+shape = SubResource("BoxShape3D_7unkw")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop13/Collider" unique_id=1031129472 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_fa1s2")
+
+[node name="Prop14" type="Node3D" parent="." unique_id=453146529]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.2, 0.14999999, -2.8999999)
+
+[node name="Card" type="MeshInstance3D" parent="Prop14" unique_id=735650069]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+material_override = SubResource("StandardMaterial3D_0mu2d")
+mesh = SubResource("QuadMesh_aian5")
+
+[node name="Collider" type="StaticBody3D" parent="Prop14" unique_id=1788250730]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Prop14/Collider" unique_id=793554936]
+shape = SubResource("BoxShape3D_sheop")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Prop14/Collider" unique_id=42558325 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_4h0it")
+
+[node name="Car1" type="Node3D" parent="." unique_id=1485955220]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8181818, 0, -1.1)
+
+[node name="Card" type="MeshInstance3D" parent="Car1" unique_id=1574185367]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+material_override = SubResource("StandardMaterial3D_57p5c")
+mesh = SubResource("QuadMesh_t51bu")
+
+[node name="Collider" type="StaticBody3D" parent="Car1" unique_id=1320820198]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Car1/Collider" unique_id=1834424673]
+shape = SubResource("BoxShape3D_ha81l")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Car1/Collider" unique_id=210373826 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_nv556")
+
+[node name="Car2" type="Node3D" parent="." unique_id=606397387]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.044456, 0, -1.1)
+
+[node name="Card" type="MeshInstance3D" parent="Car2" unique_id=18375714]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+material_override = SubResource("StandardMaterial3D_vavnv")
+mesh = SubResource("QuadMesh_ak2lu")
+
+[node name="Collider" type="StaticBody3D" parent="Car2" unique_id=468026942]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Car2/Collider" unique_id=1252129583]
+shape = SubResource("BoxShape3D_v2y3i")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Car2/Collider" unique_id=751732343 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_a4wnd")
+
+[node name="Car3" type="Node3D" parent="." unique_id=1825749554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.181818, 0, -1.1)
+
+[node name="Card" type="MeshInstance3D" parent="Car3" unique_id=5929331]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+material_override = SubResource("StandardMaterial3D_bn0v2")
+mesh = SubResource("QuadMesh_3yr4n")
+
+[node name="Collider" type="StaticBody3D" parent="Car3" unique_id=513615479]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Car3/Collider" unique_id=509385380]
+shape = SubResource("BoxShape3D_8pipi")
+
+[node name="DebugBox" type="MeshInstance3D" parent="Car3/Collider" unique_id=41901908 groups=["street_debug_collider"]]
+visible = false
+material_override = SubResource("StandardMaterial3D_5ot7l")
+cast_shadow = 0
+mesh = SubResource("BoxMesh_g2v5l")
+
+[node name="Skyline" type="Node3D" parent="." unique_id=879920906]
+
+[node name="Silhouette" type="MeshInstance3D" parent="Skyline" unique_id=1431398008 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.57738, 8.5, -55)
+material_override = SubResource("ShaderMaterial_81a63")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_geipl")
+
+[node name="Silhouette2" type="MeshInstance3D" parent="Skyline" unique_id=327639462 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.78869, 8.5, -55)
+material_override = SubResource("ShaderMaterial_djdty")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_b2ul2")
+
+[node name="Silhouette3" type="MeshInstance3D" parent="Skyline" unique_id=720966332 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -55)
+material_override = SubResource("ShaderMaterial_du3q3")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_8jc8i")
+
+[node name="Silhouette4" type="MeshInstance3D" parent="Skyline" unique_id=86311842 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.78869, 8.5, -55)
+material_override = SubResource("ShaderMaterial_h7vwj")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_f4gx1")
+
+[node name="Silhouette5" type="MeshInstance3D" parent="Skyline" unique_id=1060193906 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.57738, 8.5, -55)
+material_override = SubResource("ShaderMaterial_uux1b")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_6vfw1")
+
+[node name="Silhouette6" type="MeshInstance3D" parent="Skyline" unique_id=1873011689 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.36607, 8.5, -55)
+material_override = SubResource("ShaderMaterial_82ida")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ug74c")
+
+[node name="Silhouette7" type="MeshInstance3D" parent="Skyline" unique_id=1480447253 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115.15476, 8.5, -55)
+material_override = SubResource("ShaderMaterial_6iieq")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_rf1y0")
+
+[node name="Silhouette8" type="MeshInstance3D" parent="Skyline" unique_id=889531039 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.949404, 5.75, -34)
+material_override = SubResource("ShaderMaterial_olpyu")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_2kc45")
+
+[node name="Silhouette9" type="MeshInstance3D" parent="Skyline" unique_id=486906273 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.474702, 5.75, -34)
+material_override = SubResource("ShaderMaterial_5a466")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_sq4gb")
+
+[node name="Silhouette10" type="MeshInstance3D" parent="Skyline" unique_id=431029143 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 5.75, -34)
+material_override = SubResource("ShaderMaterial_nhe1d")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_j2jp4")
+
+[node name="Silhouette11" type="MeshInstance3D" parent="Skyline" unique_id=637405984 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.4747, 5.75, -34)
+material_override = SubResource("ShaderMaterial_16qpb")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_5hm2y")
+
+[node name="Silhouette12" type="MeshInstance3D" parent="Skyline" unique_id=35330425 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.9494, 5.75, -34)
+material_override = SubResource("ShaderMaterial_68mop")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_8icay")
+
+[node name="Silhouette13" type="MeshInstance3D" parent="Skyline" unique_id=869467704 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67.4241, 5.75, -34)
+material_override = SubResource("ShaderMaterial_e3g4h")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_pfam6")
+
+[node name="Silhouette14" type="MeshInstance3D" parent="Skyline" unique_id=1531798459 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.8988, 5.75, -34)
+material_override = SubResource("ShaderMaterial_ar6ku")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_f0cx1")
+
+[node name="Silhouette15" type="MeshInstance3D" parent="Skyline" unique_id=481339547 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.37351, 5.75, -34)
+material_override = SubResource("ShaderMaterial_fu67q")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_g6cwp")
+
+[node name="Silhouette16" type="MeshInstance3D" parent="Skyline" unique_id=1011702157 groups=["street_skyline"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 125.84821, 5.75, -34)
+material_override = SubResource("ShaderMaterial_2loas")
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ukw7f")

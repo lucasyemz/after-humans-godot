@@ -26,6 +26,7 @@ var _card: PanelContainer
 var _title: Label
 var _text: Label
 var _current := ""
+var _ok: Button
 var _queue: Array = []
 
 
@@ -85,9 +86,21 @@ func _build() -> void:
 	ok.custom_minimum_size = Vector2(150, 40)
 	AHCombatHud.style_button(ok)
 	ok.add_theme_color_override("font_color", AHUiStyle.GOLD)
-	ok.focus_mode = Control.FOCUS_NONE
 	ok.pressed.connect(dismiss)
 	row.add_child(ok)
+	_ok = ok
+
+
+## O tamanho do texto mudou nas Opções (AHUiStyle.retune): o cartão aberto acompanha.
+func restyle() -> void:
+	if _card.visible:
+		_card.size = _card.get_combined_minimum_size()
+		_card.position = Vector2(960 - _card.size.x * 0.5, 150)
+
+
+## A dica aberta: no teclado e no controle, o foco fica no "Entendi" (Enter, A ou Interagir fecham).
+func showing() -> bool:
+	return _card != null and _card.visible
 
 
 ## Mostra a dica se ela ainda não foi vista (e as dicas estão ligadas). Uma de cada vez; as outras esperam a vez.
@@ -106,6 +119,8 @@ func show_tip(id: String) -> void:
 	_card.position = Vector2(960 - _card.size.x * 0.5, 150)
 	_card.modulate.a = 0.0
 	_card.visible = true
+	if AHUiStyle.using_keys:
+		_ok.grab_focus.call_deferred()
 	create_tween().tween_property(_card, "modulate:a", 1.0, 0.25)
 
 
@@ -146,6 +161,6 @@ func _store() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Enter fecha a dica aberta (sem roubar o Enter de quem joga quando não há dica).
-	if _card.visible and event.is_action_pressed("ui_accept"):
+	if _card.visible and (event.is_action_pressed("ui_accept") or event.is_action_pressed("interact")):
 		dismiss()
 		get_viewport().set_input_as_handled()
