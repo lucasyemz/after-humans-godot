@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Aviso de leveza do PR (#38): roda no GitHub Actions e nunca falha.
 #   tools/ci_size_check.sh <commit da base> [<commit do PR>]
-# Avisa quando o PR acrescenta mais de 5 MB em art/ (soma do que cresce menos o que encolhe ou sai) ou uma imagem em
+# Avisa quando o PR acrescenta mais de 5 MB em art/ (conta líquida: o que cresce menos o que encolhe ou sai) ou uma imagem em
 # docs/ que a Godot importaria (fora de uma pasta com .gdignore). Escreve anotações ::warning:: e, se houver
-# $GITHUB_STEP_SUMMARY, um resumo em Markdown.
+# $GITHUB_STEP_SUMMARY, um resumo em Markdown. Os nomes saem sem escape (core.quotePath=false): acento e espaço contam.
 set -euo pipefail
 
 base="${1:?uso: tools/ci_size_check.sh <base> [<head>]}"
@@ -29,7 +29,7 @@ while IFS=$'\t' read -r status path; do
 	if [ "$delta" -gt 0 ]; then
 		rows+="$delta"$'\t'"$path"$'\n'
 	fi
-done < <(git diff --name-status --no-renames "$base" "$head" -- art/)
+done < <(git -c core.quotePath=false diff --name-status --no-renames "$base" "$head" -- art/)
 
 {
 	echo "## Leveza do PR"
@@ -71,7 +71,7 @@ while IFS= read -r path; do
 		echo "::warning file=$path,title=Imagem em docs/ sem .gdignore::A Godot importa esta imagem e ela entra no pacote. Ponha um .gdignore na pasta ou tire a imagem do Git."
 		echo "- \`$path\` está em docs/ fora de uma pasta com .gdignore." >> "$summary"
 	fi
-done < <(git diff --name-only --diff-filter=A --no-renames "$base" "$head" -- docs/)
+done < <(git -c core.quotePath=false diff --name-only --diff-filter=A --no-renames "$base" "$head" -- docs/)
 
 echo "docs/: $loose imagem(ns) nova(s) fora de .gdignore." >> "$summary"
 echo "art/ +$(mb "$total"); imagens soltas em docs/: $loose"

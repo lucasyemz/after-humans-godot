@@ -8,9 +8,10 @@ on:
   push:
     branches: [main]
 
+# Num PR, um push novo cancela o teste do anterior; na main, cada commit fica com o seu resultado.
 concurrency:
   group: tests-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   GODOT_VERSION: 4.7.2
@@ -62,14 +63,17 @@ jobs:
         if: always()
         run: |
           [ -f tests.log ] || exit 0
-          grep -E '^FAIL ' tests.log | sed -E 's/^FAIL (.*)$/::error title=Teste falhou::\1/' || true
+          # Cada FAIL vira uma anotação com a primeira falha dele (a linha indentada logo abaixo).
+          awk '/^FAIL /{name=substr($0,6); getline reason; sub(/^ +/,"",reason); print "::error title=Teste falhou::" name " - " reason}' tests.log
+          line=$(grep -E 'testes passaram' tests.log | tail -n 1 || true)
           {
             echo "## Testes"
             echo
-            grep -E 'testes passaram' tests.log | tail -n 1 || echo "O runner não chegou ao fim."
+            echo "${line:-O runner não chegou ao fim (travou ou caiu antes do resumo).}"
             echo
             echo '```'
-            grep -E '^(PASS|FAIL) |^    ' tests.log || true
+            # O PASS/FAIL de cada teste e, abaixo de cada FAIL, as falhas dele (não os rastros da Godot).
+            awk '/^(PASS|FAIL) /{print; fail=($1=="FAIL"); next} fail && /^    / && !/^     *(at:|GDScript|\[[0-9]+\])/{print; next} {fail=0}' tests.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -91,4 +95,6 @@ jobs:
           fetch-depth: 0
 
       - name: art/ e docs/
-        run: bash tools/ci_size_check.sh "$(git merge-base origin/${{ github.base_ref }} HEAD)" HEAD
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: bash tools/ci_size_check.sh "$(git merge-base "origin/$BASE_REF" HEAD)" HEAD

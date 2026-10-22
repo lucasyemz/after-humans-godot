@@ -91,20 +91,6 @@ o trem. Os itens do [checklist de Play](docs/play-checklist.md) que ele cobre es
 Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o nome do arquivo). O save do jogo fica em
 `user://saves/` (no Windows, `%APPDATA%\Godot\app_userdata\After Humans\saves`); os testes usam uma pasta temporária.
 
-**No GitHub (CI):** `.github/workflows/tests.yml` roda os mesmos testes em cada PR e em cada push na `main`. Ele:
-- baixa a Godot 4.7.2 Linux (com a soma SHA-512 conferida e cache);
-- importa o projeto (com cache da `.godot/`);
-- roda `tests/run_all.gd`.
-
-Falha deixa o PR vermelho. A lista de `PASS`/`FAIL` aparece no resumo do job, e o log completo fica como artefato.
-
-No PR, o job **Leveza do PR** (`tools/ci_size_check.sh`) avisa, sem falhar, em dois casos:
-- quando `art/` cresce mais de 5 MB, listando os maiores arquivos;
-- quando entra uma imagem em `docs/` fora de uma pasta com `.gdignore`.
-
-Para conferir antes de abrir o PR: `bash tools/ci_size_check.sh origin/main HEAD`. Ao trocar de versão da Godot, mude
-`GODOT_VERSION`, `GODOT_ZIP` e `GODOT_SHA512` no workflow (a soma está em `SHA512-SUMS.txt` da release).
-
 - **Jogar:** dois cliques em `play.bat` (ou `play.bat web` para o renderer da web), ou `"$GODOT" --path .`. Acrescente `--rendering-method gl_compatibility` para ver no PC o renderer da web.
   - A/D (ou ←/→) andam pela rua; W/S (ou ↑/↓) vão para o fundo e para a frente, inclusive dentro dos becos.
     No gamepad: analógico esquerdo ou direcional.
@@ -156,6 +142,23 @@ Para conferir antes de abrir o PR: `bash tools/ci_size_check.sh origin/main HEAD
   `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/AfterHumans.exe`. Os export
   templates da 4.7.2 precisam estar instalados.
 - **Servir a web:** `python -m http.server 8060 --directory build/web` e abrir `http://localhost:8060`.
+
+### Testes no GitHub (CI)
+
+`.github/workflows/tests.yml` roda os mesmos testes em cada PR e em cada push na `main`. Ele:
+- baixa a Godot 4.7.2 Linux (com a soma SHA-512 conferida e cache);
+- importa o projeto (com cache da `.godot/`);
+- roda `tests/run_all.gd`.
+
+Falha deixa o PR vermelho. O resumo do job traz o `PASS`/`FAIL` de cada teste com as falhas, e o log completo fica como
+artefato.
+
+No PR, o job **Leveza do PR** (`tools/ci_size_check.sh`) avisa, sem falhar, em dois casos:
+- quando `art/` cresce mais de 5 MB, listando os maiores arquivos. A conta é líquida: o que entra ou cresce menos o que encolhe ou sai;
+- quando entra uma imagem em `docs/` fora de uma pasta com `.gdignore`.
+
+Para conferir antes de abrir o PR: `bash tools/ci_size_check.sh origin/main HEAD`. Ao trocar de versão da Godot, mude
+`GODOT_VERSION`, `GODOT_ZIP` e `GODOT_SHA512` no workflow (a soma está em `SHA512-SUMS.txt` da release).
 
 ## Referência Unreal
 
