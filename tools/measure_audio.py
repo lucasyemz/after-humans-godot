@@ -1,8 +1,9 @@
 """Mede o volume (LUFS integrado, EBU R128, pelo ffmpeg) de cada som de audio/ e grava a tabela de mixagem
 data/presentation/audio_mix.json (#36). A música e os ambientes (os loops das cenas) e os sons gerados por
 tools/synth_sounds.py são levados ao alvo da categoria: o ganho de cada arquivo (gain_db) é o que falta para chegar lá,
-e o AHSound (Sound) aplica esse ganho por baixo do ganho de cada cena. Os outros efeitos só são medidos (gain_db 0),
-para a tabela de docs/audio.md; mexer neles muda o equilíbrio que já foi acertado jogando.
+e o AHSound (Sound) aplica esse ganho por baixo do ganho de cada cena. A interface toda (audio/ui) também vai ao alvo
+dela: um erro não pode soar mais alto que uma conquista. Os efeitos do mundo e da luta só são medidos (gain_db 0),
+para a tabela de docs/audio.md; mexer neles muda o peso de cada golpe, que foi acertado jogando.
   python tools/measure_audio.py
 """
 import json
@@ -60,7 +61,7 @@ def main():
         stem = str(path.relative_to(AUDIO).with_suffix(""))
         kind = category(stem)
         level = lufs(path)
-        normalized = level is not None and (kind in ("music", "ambience") or stem in SYNTH)
+        normalized = level is not None and (kind in ("music", "ambience", "ui") or stem in SYNTH)
         gain = round(TARGETS[kind] - level, 1) if normalized else 0.0
         files["res://audio/" + str(path.relative_to(AUDIO))] = {"category": kind, "lufs": level, "gain_db": gain, "normalized": normalized}
         print(f"{stem:40s} {kind:9s} {level if level is not None else '-inf':>7} LUFS  {gain:+5.1f} dB")

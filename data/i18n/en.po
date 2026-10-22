@@ -15,12 +15,12 @@ msgstr "Continue"
 
 #: scripts/ui/title_screen.gd:77
 #: scripts/ui/exploration_hud.gd:726
-#: scripts/ui/refuge_hud.gd:904
+#: scripts/ui/refuge_hud.gd:910
 msgid "Nova campanha"
 msgstr "New campaign"
 
 #: scripts/ui/title_screen.gd:81
-#: scripts/ui/title_screen.gd:211
+#: scripts/ui/title_screen.gd:214
 msgid "Campanhas"
 msgstr "Campaigns"
 
@@ -31,77 +31,77 @@ msgstr "Campaigns"
 msgid "Opções"
 msgstr "Options"
 
-#: scripts/ui/title_screen.gd:211
+#: scripts/ui/title_screen.gd:214
 msgid "Em qual espaço começar?"
 msgstr "Which slot should the new campaign use?"
 
-#: scripts/ui/title_screen.gd:226
+#: scripts/ui/title_screen.gd:229
 #: scripts/ui/options_panel.gd:14
 msgid "Voltar"
 msgstr "Back"
 
-#: scripts/ui/title_screen.gd:234
+#: scripts/ui/title_screen.gd:237
 msgid "Espaço %d"
 msgstr "Slot %d"
 
-#: scripts/ui/title_screen.gd:235
+#: scripts/ui/title_screen.gd:238
 msgid " (último usado)"
 msgstr " (last used)"
 
-#: scripts/ui/title_screen.gd:238
+#: scripts/ui/title_screen.gd:241
 msgid "%s — vazio"
 msgstr "%s — empty"
 
-#: scripts/ui/title_screen.gd:240
+#: scripts/ui/title_screen.gd:243
 msgid "%s — o save não abre"
 msgstr "%s — the save won't open"
 
-#: scripts/ui/title_screen.gd:243
+#: scripts/ui/title_screen.gd:246
 msgid "%d h %02d min"
 msgstr "%d h %02d min"
 
-#: scripts/ui/title_screen.gd:244
+#: scripts/ui/title_screen.gd:247
 msgid "%d min"
 msgstr "%d min"
 
-#: scripts/ui/title_screen.gd:245
+#: scripts/ui/title_screen.gd:248
 msgid "%d fase"
 msgstr "%d phase"
 
-#: scripts/ui/title_screen.gd:245
+#: scripts/ui/title_screen.gd:248
 msgid "%d fases"
 msgstr "%d phases"
 
-#: scripts/ui/title_screen.gd:246
+#: scripts/ui/title_screen.gd:249
 msgid "%s — Ciclo %d · %s · %d de %d vivos\n%02d/%02d/%d %02d:%02d · %s jogados%s"
 msgstr "%s — Cycle %d · %s · %d of %d alive\n%02d/%02d/%d %02d:%02d · %s played%s"
 
-#: scripts/ui/title_screen.gd:248
+#: scripts/ui/title_screen.gd:251
 msgid " · em expedição"
 msgstr " · on an expedition"
 
-#: scripts/ui/title_screen.gd:265
+#: scripts/ui/title_screen.gd:268
 #: scripts/ui/exploration_hud.gd:798
 msgid "Começar uma campanha nova?"
 msgstr "Start a new campaign?"
 
-#: scripts/ui/title_screen.gd:266
+#: scripts/ui/title_screen.gd:269
 msgid "Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero. Os outros espaços ficam como estão."
 msgstr "All progress saved in slot %d (completed phases, rooms, resources and heroes) is replaced by a fresh campaign. The other slots stay as they are."
 
-#: scripts/ui/title_screen.gd:267
+#: scripts/ui/title_screen.gd:270
 msgid "O save do espaço %d não pôde ser aberto. Uma campanha nova grava por cima dele, e ele não volta mais."
 msgstr "The save in slot %d could not be opened. A new campaign writes over it, and it won't come back."
 
-#: scripts/ui/title_screen.gd:272
+#: scripts/ui/title_screen.gd:275
 #: scripts/ui/exploration_hud.gd:803
-#: scripts/ui/refuge_hud.gd:906
+#: scripts/ui/refuge_hud.gd:912
 msgid "Cancelar"
 msgstr "Cancel"
 
-#: scripts/ui/title_screen.gd:274
+#: scripts/ui/title_screen.gd:277
 #: scripts/ui/exploration_hud.gd:805
-#: scripts/ui/refuge_hud.gd:907
+#: scripts/ui/refuge_hud.gd:913
 msgid "Começar do zero"
 msgstr "Start from scratch"
 
@@ -258,7 +258,7 @@ msgid "Aperte uma tecla…"
 msgstr "Press a key…"
 
 #: scripts/ui/options_panel.gd:148
-#: scripts/ui/refuge_hud.gd:1110
+#: scripts/ui/refuge_hud.gd:1116
 msgid "Trocar"
 msgstr "Change"
 
@@ -335,7 +335,7 @@ msgid "English (em teste)"
 msgstr "English (beta)"
 
 #: scripts/ui/exploration_hud.gd:20
-#: scripts/ui/refuge_hud.gd:1514
+#: scripts/ui/refuge_hud.gd:1520
 msgid "Partida"
 msgstr "Start"
 
@@ -344,7 +344,7 @@ msgid "Patrulha"
 msgstr "Patrol"
 
 #: scripts/ui/exploration_hud.gd:20
-#: scripts/ui/refuge_hud.gd:1128
+#: scripts/ui/refuge_hud.gd:1134
 msgid "Suprimentos"
 msgstr "Supplies"
 
@@ -654,7 +654,7 @@ msgid " ou "
 msgstr " or "
 
 #: scripts/ui/combat_hud.gd:424
-#: scripts/ui/refuge_hud.gd:1278
+#: scripts/ui/refuge_hud.gd:1284
 msgid " e "
 msgstr " and "
 
@@ -799,7 +799,7 @@ msgid "CRISE DE INSTINTO"
 msgstr "INSTINCT CRISIS"
 
 #: scripts/ui/combat_hud.gd:1017
-#: scripts/ui/refuge_hud.gd:786
+#: scripts/ui/refuge_hud.gd:792
 msgid "Posição %d"
 msgstr "Position %d"
 
@@ -841,7 +841,7 @@ msgid "PRÓXIMO PASSO"
 msgstr "NEXT STEP"
 
 #: scripts/ui/refuge_hud.gd:150
-#: scripts/ui/refuge_hud.gd:1216
+#: scripts/ui/refuge_hud.gd:1222
 msgid "‹ Vista geral"
 msgstr "‹ Overview"
 
@@ -930,7 +930,7 @@ msgid "Vazio · recuperar por %s"
 msgstr "Empty · restore for %s"
 
 #: scripts/ui/refuge_hud.gd:585
-#: scripts/ui/refuge_hud.gd:960
+#: scripts/ui/refuge_hud.gd:966
 msgid "Vazio"
 msgstr "Empty"
 
@@ -942,717 +942,717 @@ msgstr "Level %d of %d"
 msgid "Aberto"
 msgstr "Open"
 
-#: scripts/ui/refuge_hud.gd:782
-#: scripts/ui/refuge_hud.gd:1006
-#: scripts/ui/refuge_hud.gd:1409
-#: scripts/ui/refuge_hud.gd:1872
+#: scripts/ui/refuge_hud.gd:788
+#: scripts/ui/refuge_hud.gd:1012
+#: scripts/ui/refuge_hud.gd:1415
+#: scripts/ui/refuge_hud.gd:1878
 msgid "Vida %d/%d"
 msgstr "Health %d/%d"
 
-#: scripts/ui/refuge_hud.gd:787
+#: scripts/ui/refuge_hud.gd:793
 msgid "sem ataque aqui"
 msgstr "no attack from here"
 
-#: scripts/ui/refuge_hud.gd:792
-#: scripts/ui/refuge_hud.gd:1007
+#: scripts/ui/refuge_hud.gd:798
+#: scripts/ui/refuge_hud.gd:1013
 msgid "%d expedições"
 msgstr "%d expeditions"
 
-#: scripts/ui/refuge_hud.gd:796
+#: scripts/ui/refuge_hud.gd:802
 msgid "ferido"
 msgstr "wounded"
 
-#: scripts/ui/refuge_hud.gd:864
+#: scripts/ui/refuge_hud.gd:870
 msgid "Plano da Estação"
 msgstr "Station plan"
 
-#: scripts/ui/refuge_hud.gd:864
+#: scripts/ui/refuge_hud.gd:870
 msgid "A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos."
 msgstr "The Station grows with what the journeys bring back. Scrap and fragments restore and upgrade the rooms."
 
-#: scripts/ui/refuge_hud.gd:883
+#: scripts/ui/refuge_hud.gd:889
 msgid "vazio"
 msgstr "empty"
 
-#: scripts/ui/refuge_hud.gd:883
+#: scripts/ui/refuge_hud.gd:889
 msgid "nível %d de %d"
 msgstr "level %d of %d"
 
-#: scripts/ui/refuge_hud.gd:884
+#: scripts/ui/refuge_hud.gd:890
 msgid "Ainda vazio."
 msgstr "Still empty."
 
-#: scripts/ui/refuge_hud.gd:889
-#: scripts/ui/refuge_hud.gd:965
-#: scripts/ui/refuge_hud.gd:1837
+#: scripts/ui/refuge_hud.gd:895
+#: scripts/ui/refuge_hud.gd:971
+#: scripts/ui/refuge_hud.gd:1843
 msgid "Recuperar"
 msgstr "Restore"
 
-#: scripts/ui/refuge_hud.gd:889
-#: scripts/ui/refuge_hud.gd:960
+#: scripts/ui/refuge_hud.gd:895
+#: scripts/ui/refuge_hud.gd:966
 msgid "Nível %d"
 msgstr "Level %d"
 
-#: scripts/ui/refuge_hud.gd:895
+#: scripts/ui/refuge_hud.gd:901
 msgid "Ver %s"
 msgstr "See %s"
 
-#: scripts/ui/refuge_hud.gd:904
+#: scripts/ui/refuge_hud.gd:910
 msgid "Recomeça a Estação, o elenco e as fases do zero."
 msgstr "Restarts the Station, the roster and the phases from scratch."
 
-#: scripts/ui/refuge_hud.gd:905
+#: scripts/ui/refuge_hud.gd:911
 msgid "Todo o progresso salvo (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha nova."
 msgstr "All saved progress (completed phases, rooms, resources and heroes) is replaced by a new campaign."
 
-#: scripts/ui/refuge_hud.gd:965
-#: scripts/ui/refuge_hud.gd:1837
+#: scripts/ui/refuge_hud.gd:971
+#: scripts/ui/refuge_hud.gd:1843
 msgid "Melhorar"
 msgstr "Upgrade"
 
-#: scripts/ui/refuge_hud.gd:966
+#: scripts/ui/refuge_hud.gd:972
 msgid "%s (%s)%s"
 msgstr "%s (%s)%s"
 
-#: scripts/ui/refuge_hud.gd:967
+#: scripts/ui/refuge_hud.gd:973
 msgid "%s: nível %d."
 msgstr "%s: level %d."
 
-#: scripts/ui/refuge_hud.gd:992
+#: scripts/ui/refuge_hud.gd:998
 msgid "%s · %s (%s)"
 msgstr "%s · %s (%s)"
 
-#: scripts/ui/refuge_hud.gd:994
-#: scripts/ui/refuge_hud.gd:1917
+#: scripts/ui/refuge_hud.gd:1000
+#: scripts/ui/refuge_hud.gd:1923
 msgid "Ponto forte: %s"
 msgstr "Strength: %s"
 
-#: scripts/ui/refuge_hud.gd:994
+#: scripts/ui/refuge_hud.gd:1000
 msgid "Sem comida ou água no último ciclo: o ponto forte está parado até a próxima volta."
 msgstr "No food or water in the last cycle: the strength is idle until the next return."
 
-#: scripts/ui/refuge_hud.gd:996
-#: scripts/ui/refuge_hud.gd:1918
+#: scripts/ui/refuge_hud.gd:1002
+#: scripts/ui/refuge_hud.gd:1924
 msgid "Ponto fraco: %s"
 msgstr "Weakness: %s"
 
-#: scripts/ui/refuge_hud.gd:997
+#: scripts/ui/refuge_hud.gd:1003
 msgid "Pedido entregue: %s."
 msgstr "Request delivered: %s."
 
-#: scripts/ui/refuge_hud.gd:997
-#: scripts/ui/refuge_hud.gd:1919
+#: scripts/ui/refuge_hud.gd:1003
+#: scripts/ui/refuge_hud.gd:1925
 msgid "Pedido: %s"
 msgstr "Request: %s"
 
-#: scripts/ui/refuge_hud.gd:1003
+#: scripts/ui/refuge_hud.gd:1009
 msgid "Elenco (%d de %d)"
 msgstr "Roster (%d of %d)"
 
-#: scripts/ui/refuge_hud.gd:1006
+#: scripts/ui/refuge_hud.gd:1012
 msgid "Instinto %d"
 msgstr "Instinct %d"
 
-#: scripts/ui/refuge_hud.gd:1011
+#: scripts/ui/refuge_hud.gd:1017
 msgid "relíquia: %s"
 msgstr "relic: %s"
 
-#: scripts/ui/refuge_hud.gd:1011
-#: scripts/ui/refuge_hud.gd:1546
-#: scripts/ui/refuge_hud.gd:1547
+#: scripts/ui/refuge_hud.gd:1017
+#: scripts/ui/refuge_hud.gd:1552
+#: scripts/ui/refuge_hud.gd:1553
 msgid "nenhuma"
 msgstr "none"
 
-#: scripts/ui/refuge_hud.gd:1017
+#: scripts/ui/refuge_hud.gd:1023
 msgid "Tratar trauma (%d sementes)"
 msgstr "Treat trauma (%d seeds)"
 
-#: scripts/ui/refuge_hud.gd:1017
+#: scripts/ui/refuge_hud.gd:1023
 msgid "Trauma tratado."
 msgstr "Trauma treated."
 
-#: scripts/ui/refuge_hud.gd:1020
+#: scripts/ui/refuge_hud.gd:1026
 msgid "Trocar relíquia"
 msgstr "Change relic"
 
-#: scripts/ui/refuge_hud.gd:1021
+#: scripts/ui/refuge_hud.gd:1027
 msgid "Recrutar"
 msgstr "Recruit"
 
-#: scripts/ui/refuge_hud.gd:1026
+#: scripts/ui/refuge_hud.gd:1032
 msgid "voluntário, de graça"
 msgstr "volunteer, free"
 
-#: scripts/ui/refuge_hud.gd:1026
+#: scripts/ui/refuge_hud.gd:1032
 msgid "%d sementes"
 msgstr "%d seeds"
 
-#: scripts/ui/refuge_hud.gd:1029
+#: scripts/ui/refuge_hud.gd:1035
 msgid "Memorial"
 msgstr "Memorial"
 
-#: scripts/ui/refuge_hud.gd:1046
+#: scripts/ui/refuge_hud.gd:1052
 msgid "%s: %s."
 msgstr "%s: %s."
 
-#: scripts/ui/refuge_hud.gd:1046
+#: scripts/ui/refuge_hud.gd:1052
 msgid "sem relíquia"
 msgstr "no relic"
 
-#: scripts/ui/refuge_hud.gd:1053
+#: scripts/ui/refuge_hud.gd:1059
 msgid "%s chegou à Estação."
 msgstr "%s arrived at the Station."
 
-#: scripts/ui/refuge_hud.gd:1085
+#: scripts/ui/refuge_hud.gd:1091
 msgid "Ir ao Dormitório"
 msgstr "Go to the Dormitory"
 
-#: scripts/ui/refuge_hud.gd:1087
+#: scripts/ui/refuge_hud.gd:1093
 msgid "Ir à plataforma"
 msgstr "Go to the platform"
 
-#: scripts/ui/refuge_hud.gd:1092
+#: scripts/ui/refuge_hud.gd:1098
 msgid "Missão"
 msgstr "Mission"
 
-#: scripts/ui/refuge_hud.gd:1097
+#: scripts/ui/refuge_hud.gd:1103
 msgid "%s · nível %d · %s"
 msgstr "%s · level %d · %s"
 
-#: scripts/ui/refuge_hud.gd:1098
-#: scripts/ui/refuge_hud.gd:1283
+#: scripts/ui/refuge_hud.gd:1104
+#: scripts/ui/refuge_hud.gd:1289
 msgid "Escolher no mapa"
 msgstr "Choose on the map"
 
-#: scripts/ui/refuge_hud.gd:1099
+#: scripts/ui/refuge_hud.gd:1105
 msgid "Equipe (da frente para trás)"
 msgstr "Team (front to back)"
 
-#: scripts/ui/refuge_hud.gd:1104
+#: scripts/ui/refuge_hud.gd:1110
 msgid "%d. %s"
 msgstr "%d. %s"
 
-#: scripts/ui/refuge_hud.gd:1113
+#: scripts/ui/refuge_hud.gd:1119
 msgid "Foco da rota"
 msgstr "Route focus"
 
-#: scripts/ui/refuge_hud.gd:1123
-#: scripts/ui/refuge_hud.gd:1300
+#: scripts/ui/refuge_hud.gd:1129
+#: scripts/ui/refuge_hud.gd:1306
 msgid " · recomendado"
 msgstr " · recommended"
 
-#: scripts/ui/refuge_hud.gd:1130
+#: scripts/ui/refuge_hud.gd:1136
 msgid "%d de graça + %d extras (%d sementes)"
 msgstr "%d free + %d extra (%d seeds)"
 
-#: scripts/ui/refuge_hud.gd:1140
+#: scripts/ui/refuge_hud.gd:1146
 msgid "Voltar à Preparação"
 msgstr "Back to Preparation"
 
-#: scripts/ui/refuge_hud.gd:1145
+#: scripts/ui/refuge_hud.gd:1151
 msgid "Escalar a equipe na plataforma"
 msgstr "Line the team up on the platform"
 
-#: scripts/ui/refuge_hud.gd:1146
+#: scripts/ui/refuge_hud.gd:1152
 msgid "Confirmar partida"
 msgstr "Confirm departure"
 
-#: scripts/ui/refuge_hud.gd:1224
+#: scripts/ui/refuge_hud.gd:1230
 msgid "   EQUIPE · %s · CLIQUE EM DOIS PARA TROCAR"
 msgstr "   TEAM · %s · CLICK TWO TO SWAP"
 
-#: scripts/ui/refuge_hud.gd:1228
+#: scripts/ui/refuge_hud.gd:1234
 msgid "← fundo · frente →"
 msgstr "← back · front →"
 
-#: scripts/ui/refuge_hud.gd:1243
+#: scripts/ui/refuge_hud.gd:1249
 msgid "Fora da equipe:"
 msgstr "Not on the team:"
 
-#: scripts/ui/refuge_hud.gd:1251
+#: scripts/ui/refuge_hud.gd:1257
 msgid "Escolha um cartão da equipe e clique aqui para trocar."
 msgstr "Pick a team card and click here to swap."
 
-#: scripts/ui/refuge_hud.gd:1253
+#: scripts/ui/refuge_hud.gd:1259
 msgid " · sem arte de combate"
 msgstr " · no combat art"
 
-#: scripts/ui/refuge_hud.gd:1259
+#: scripts/ui/refuge_hud.gd:1265
 msgid "Deixar na Estação"
 msgstr "Leave at the Station"
 
-#: scripts/ui/refuge_hud.gd:1262
+#: scripts/ui/refuge_hud.gd:1268
 msgid "Parte com um a menos; os de trás andam uma posição para a frente."
 msgstr "Leaves with one fewer; those behind move up one position."
 
-#: scripts/ui/refuge_hud.gd:1267
+#: scripts/ui/refuge_hud.gd:1273
 msgid "%s pede %s na equipe."
 msgstr "%s needs %s on the team."
 
-#: scripts/ui/refuge_hud.gd:1267
+#: scripts/ui/refuge_hud.gd:1273
 msgid "Esta jornada"
 msgstr "This journey"
 
-#: scripts/ui/refuge_hud.gd:1279
+#: scripts/ui/refuge_hud.gd:1285
 msgid "MISSÃO"
 msgstr "MISSION"
 
-#: scripts/ui/refuge_hud.gd:1281
+#: scripts/ui/refuge_hud.gd:1287
 msgid "Fase %d · %s · nível %d+ · %s"
 msgstr "Phase %d · %s · level %d+ · %s"
 
-#: scripts/ui/refuge_hud.gd:1288
+#: scripts/ui/refuge_hud.gd:1294
 msgid "FOCO DA ROTA"
 msgstr "ROUTE FOCUS"
 
-#: scripts/ui/refuge_hud.gd:1300
+#: scripts/ui/refuge_hud.gd:1306
 msgid "Sem objetivo extra."
 msgstr "No extra goal."
 
-#: scripts/ui/refuge_hud.gd:1313
+#: scripts/ui/refuge_hud.gd:1319
 msgid "COMIDA"
 msgstr "FOOD"
 
-#: scripts/ui/refuge_hud.gd:1317
+#: scripts/ui/refuge_hud.gd:1323
 msgid "%d grátis + %d extras"
 msgstr "%d free + %d extra"
 
-#: scripts/ui/refuge_hud.gd:1323
+#: scripts/ui/refuge_hud.gd:1329
 msgid "%d sementes · cura na Mochila e no acampamento"
 msgstr "%d seeds · heals from the Backpack and at camp"
 
-#: scripts/ui/refuge_hud.gd:1325
+#: scripts/ui/refuge_hud.gd:1331
 msgid "Partir · %s"
 msgstr "Depart · %s"
 
-#: scripts/ui/refuge_hud.gd:1390
+#: scripts/ui/refuge_hud.gd:1396
 msgid "Posição vazia"
 msgstr "Empty position"
 
-#: scripts/ui/refuge_hud.gd:1435
+#: scripts/ui/refuge_hud.gd:1441
 msgid "! Sem ataque desta posição"
 msgstr "! No attack from this position"
 
-#: scripts/ui/refuge_hud.gd:1438
+#: scripts/ui/refuge_hud.gd:1444
 msgid "! Vida baixa: leve comida ou curativos"
 msgstr "! Low health: bring food or bandages"
 
-#: scripts/ui/refuge_hud.gd:1441
+#: scripts/ui/refuge_hud.gd:1447
 msgid "! Com trauma: começa com instinto alto"
 msgstr "! Traumatized: starts with high instinct"
 
-#: scripts/ui/refuge_hud.gd:1444
+#: scripts/ui/refuge_hud.gd:1450
 msgid "✓ %d de %d habilidades daqui"
 msgstr "✓ %d of %d abilities from here"
 
-#: scripts/ui/refuge_hud.gd:1465
+#: scripts/ui/refuge_hud.gd:1471
 msgid "Ninguém na equipe cura em combate: leve curativos e comida."
 msgstr "Nobody on the team heals in combat: bring bandages and food."
 
-#: scripts/ui/refuge_hud.gd:1514
+#: scripts/ui/refuge_hud.gd:1520
 msgid "A equipe espera na plataforma, da frente (direita) para trás."
 msgstr "The team waits on the platform, from front (right) to back."
 
-#: scripts/ui/refuge_hud.gd:1522
+#: scripts/ui/refuge_hud.gd:1528
 msgid "Próxima volta (equipe de 4)"
 msgstr "Next return (team of 4)"
 
-#: scripts/ui/refuge_hud.gd:1523
+#: scripts/ui/refuge_hud.gd:1529
 msgid "Suprimentos: %d no estoque, +%d da Cantina, %d para os moradores, a noite pede %d → %d depois da noite."
 msgstr "Supplies: %d in stock, +%d from the Canteen, %d for the residents, the night needs %d → %d after the night."
 
-#: scripts/ui/refuge_hud.gd:1526
+#: scripts/ui/refuge_hud.gd:1532
 msgid "Acima da capacidade do Depósito (%d): %d estragam."
 msgstr "Above the Storeroom's capacity (%d): %d spoil."
 
-#: scripts/ui/refuge_hud.gd:1527
+#: scripts/ui/refuge_hud.gd:1533
 msgid "Água: %d na estação, +%d do coletor, a equipe e os moradores bebem %d → %d%s."
 msgstr "Water: %d at the station, +%d from the collector, the team and residents drink %d → %d%s."
 
-#: scripts/ui/refuge_hud.gd:1528
-#: scripts/ui/refuge_hud.gd:1925
+#: scripts/ui/refuge_hud.gd:1534
+#: scripts/ui/refuge_hud.gd:1931
 msgid " (vai faltar)"
 msgstr " (will run short)"
 
-#: scripts/ui/refuge_hud.gd:1529
+#: scripts/ui/refuge_hud.gd:1535
 msgid "Energia: %d de %d.%s"
 msgstr "Power: %d of %d.%s"
 
-#: scripts/ui/refuge_hud.gd:1530
+#: scripts/ui/refuge_hud.gd:1536
 msgid " Sem energia: %s."
 msgstr " No power: %s."
 
-#: scripts/ui/refuge_hud.gd:1533
+#: scripts/ui/refuge_hud.gd:1539
 msgid "Último ciclo (%d)"
 msgstr "Last cycle (%d)"
 
-#: scripts/ui/refuge_hud.gd:1534
+#: scripts/ui/refuge_hud.gd:1540
 msgid "A Cantina produziu %d; os moradores comeram %d; estragaram %d; a água foi %d de consumo para %d do coletor%s."
 msgstr "The Canteen produced %d; the residents ate %d; %d spoiled; water was %d consumed for %d from the collector%s."
 
-#: scripts/ui/refuge_hud.gd:1536
+#: scripts/ui/refuge_hud.gd:1542
 msgid " e faltou"
 msgstr " and ran short"
 
-#: scripts/ui/refuge_hud.gd:1540
+#: scripts/ui/refuge_hud.gd:1546
 msgid "Estoque"
 msgstr "Stock"
 
-#: scripts/ui/refuge_hud.gd:1541
+#: scripts/ui/refuge_hud.gd:1547
 msgid "Suprimentos: %d de %d"
 msgstr "Supplies: %d of %d"
 
-#: scripts/ui/refuge_hud.gd:1542
+#: scripts/ui/refuge_hud.gd:1548
 msgid "Curativos: %d · Sementes: %d · Sucata: %d · Fragmentos: %d"
 msgstr "Bandages: %d · Seeds: %d · Scrap: %d · Fragments: %d"
 
-#: scripts/ui/refuge_hud.gd:1544
+#: scripts/ui/refuge_hud.gd:1550
 msgid "Água: %d"
 msgstr "Water: %d"
 
-#: scripts/ui/refuge_hud.gd:1546
+#: scripts/ui/refuge_hud.gd:1552
 msgid "Relíquias no estoque: %s"
 msgstr "Relics in stock: %s"
 
-#: scripts/ui/refuge_hud.gd:1547
+#: scripts/ui/refuge_hud.gd:1553
 msgid "Ferramentas: %s"
 msgstr "Tools: %s"
 
-#: scripts/ui/refuge_hud.gd:1559
+#: scripts/ui/refuge_hud.gd:1565
 msgid "Relíquias"
 msgstr "Relics"
 
-#: scripts/ui/refuge_hud.gd:1599
+#: scripts/ui/refuge_hud.gd:1605
 msgid "Estoque: %d"
 msgstr "Stock: %d"
 
-#: scripts/ui/refuge_hud.gd:1623
+#: scripts/ui/refuge_hud.gd:1629
 msgid "Em estoque: %d · Sucata: %d"
 msgstr "In stock: %d · Scrap: %d"
 
-#: scripts/ui/refuge_hud.gd:1626
+#: scripts/ui/refuge_hud.gd:1632
 msgid "Fabricar · %d sucatas"
 msgstr "Craft · %d scrap"
 
-#: scripts/ui/refuge_hud.gd:1630
+#: scripts/ui/refuge_hud.gd:1636
 msgid "%s pronta. Equipe na Sala dos Personagens."
 msgstr "%s is ready. Equip it in the Characters Room."
 
-#: scripts/ui/refuge_hud.gd:1633
+#: scripts/ui/refuge_hud.gd:1639
 msgid "Faltam %d sucata"
 msgstr "%d scrap missing"
 
-#: scripts/ui/refuge_hud.gd:1633
+#: scripts/ui/refuge_hud.gd:1639
 msgid "Faltam %d sucatas"
 msgstr "%d scrap missing"
 
-#: scripts/ui/refuge_hud.gd:1639
+#: scripts/ui/refuge_hud.gd:1645
 msgid "+%d Vida Máxima"
 msgstr "+%d Max Health"
 
-#: scripts/ui/refuge_hud.gd:1641
+#: scripts/ui/refuge_hud.gd:1647
 msgid "+%d Velocidade"
 msgstr "+%d Speed"
 
-#: scripts/ui/refuge_hud.gd:1643
+#: scripts/ui/refuge_hud.gd:1649
 msgid "−%d Instinto de eventos"
 msgstr "−%d Event instinct"
 
-#: scripts/ui/refuge_hud.gd:1648
+#: scripts/ui/refuge_hud.gd:1654
 msgid "Melhorias de classe"
 msgstr "Class upgrades"
 
-#: scripts/ui/refuge_hud.gd:1654
+#: scripts/ui/refuge_hud.gd:1660
 msgid "Pesquisado"
 msgstr "Researched"
 
-#: scripts/ui/refuge_hud.gd:1654
+#: scripts/ui/refuge_hud.gd:1660
 msgid "Pesquisar (%d fragmentos)"
 msgstr "Research (%d fragments)"
 
-#: scripts/ui/refuge_hud.gd:1655
+#: scripts/ui/refuge_hud.gd:1661
 msgid "%s concluída."
 msgstr "%s done."
 
-#: scripts/ui/refuge_hud.gd:1666
+#: scripts/ui/refuge_hud.gd:1672
 msgid "Amanhecer"
 msgstr "Dawn"
 
-#: scripts/ui/refuge_hud.gd:1672
+#: scripts/ui/refuge_hud.gd:1678
 msgid "%s ficou de vigia."
 msgstr "%s kept watch."
 
-#: scripts/ui/refuge_hud.gd:1672
+#: scripts/ui/refuge_hud.gd:1678
 msgid "%s: +%d de vida, −%d de instinto%s."
 msgstr "%s: +%d health, −%d instinct%s."
 
-#: scripts/ui/refuge_hud.gd:1673
+#: scripts/ui/refuge_hud.gd:1679
 msgid " (sem comida)"
 msgstr " (no food)"
 
-#: scripts/ui/refuge_hud.gd:1674
+#: scripts/ui/refuge_hud.gd:1680
 msgid "Começar o dia"
 msgstr "Start the day"
 
-#: scripts/ui/refuge_hud.gd:1675
+#: scripts/ui/refuge_hud.gd:1681
 msgid "Ainda não amanheceu."
 msgstr "It isn't dawn yet."
 
-#: scripts/ui/refuge_hud.gd:1679
+#: scripts/ui/refuge_hud.gd:1685
 msgid "Ninguém precisa descansar agora. Depois de cada expedição, a equipe passa a noite aqui."
 msgstr "Nobody needs rest right now. After each expedition, the team spends the night here."
 
-#: scripts/ui/refuge_hud.gd:1692
+#: scripts/ui/refuge_hud.gd:1698
 msgid "NOITE %d"
 msgstr "NIGHT %d"
 
-#: scripts/ui/refuge_hud.gd:1694
+#: scripts/ui/refuge_hud.gd:1700
 msgid "%d dormindo · %d vigiando"
 msgstr "%d sleeping · %d on watch"
 
-#: scripts/ui/refuge_hud.gd:1696
+#: scripts/ui/refuge_hud.gd:1702
 msgid "+1 suprimento · %d sementes"
 msgstr "+1 supply · %d seeds"
 
-#: scripts/ui/refuge_hud.gd:1701
+#: scripts/ui/refuge_hud.gd:1707
 msgid "Sementes insuficientes."
 msgstr "Not enough seeds."
 
-#: scripts/ui/refuge_hud.gd:1701
+#: scripts/ui/refuge_hud.gd:1707
 msgid "Suprimento comprado."
 msgstr "Supply bought."
 
-#: scripts/ui/refuge_hud.gd:1704
+#: scripts/ui/refuge_hud.gd:1710
 msgid "Faltou água na volta: o descanso rende menos instinto."
 msgstr "Water ran short on the way back: rest recovers less instinct."
 
-#: scripts/ui/refuge_hud.gd:1713
+#: scripts/ui/refuge_hud.gd:1719
 msgid "Suprimentos: %d %s · %d %s"
 msgstr "Supplies: %d %s · %d %s"
 
-#: scripts/ui/refuge_hud.gd:1713
+#: scripts/ui/refuge_hud.gd:1719
 msgid "necessário"
 msgstr "needed"
 
-#: scripts/ui/refuge_hud.gd:1713
+#: scripts/ui/refuge_hud.gd:1719
 msgid "necessários"
 msgstr "needed"
 
-#: scripts/ui/refuge_hud.gd:1714
+#: scripts/ui/refuge_hud.gd:1720
 msgid "disponível"
 msgstr "available"
 
-#: scripts/ui/refuge_hud.gd:1714
+#: scripts/ui/refuge_hud.gd:1720
 msgid "disponíveis"
 msgstr "available"
 
-#: scripts/ui/refuge_hud.gd:1716
+#: scripts/ui/refuge_hud.gd:1722
 msgid "Faltam %d: os cartões marcados recuperam menos."
 msgstr "%d short: the marked cards recover less."
 
-#: scripts/ui/refuge_hud.gd:1717
+#: scripts/ui/refuge_hud.gd:1723
 msgid "Quem vigia não descansa, mas protege os outros dos ruídos da noite."
 msgstr "Whoever keeps watch doesn't rest, but protects the others from the night's noises."
 
-#: scripts/ui/refuge_hud.gd:1719
+#: scripts/ui/refuge_hud.gd:1725
 msgid "Iniciar descanso"
 msgstr "Start resting"
 
-#: scripts/ui/refuge_hud.gd:1723
+#: scripts/ui/refuge_hud.gd:1729
 msgid "A noite não pode passar agora."
 msgstr "The night can't pass right now."
 
-#: scripts/ui/refuge_hud.gd:1746
+#: scripts/ui/refuge_hud.gd:1752
 msgid "Vida %d/%d · Instinto %d"
 msgstr "Health %d/%d · Instinct %d"
 
-#: scripts/ui/refuge_hud.gd:1755
+#: scripts/ui/refuge_hud.gd:1761
 msgid "Dormir"
 msgstr "Sleep"
 
-#: scripts/ui/refuge_hud.gd:1755
-#: scripts/ui/refuge_hud.gd:1764
+#: scripts/ui/refuge_hud.gd:1761
+#: scripts/ui/refuge_hud.gd:1770
 msgid "Vigiar"
 msgstr "Keep watch"
 
-#: scripts/ui/refuge_hud.gd:1773
+#: scripts/ui/refuge_hud.gd:1779
 msgid "Vigiando · não descansa e protege dos ruídos"
 msgstr "On watch · doesn't rest and guards against noises"
 
-#: scripts/ui/refuge_hud.gd:1775
+#: scripts/ui/refuge_hud.gd:1781
 msgid "%s · +%d de vida, %+d de instinto"
 msgstr "%s · +%d health, %+d instinct"
 
-#: scripts/ui/refuge_hud.gd:1775
+#: scripts/ui/refuge_hud.gd:1781
 msgid "Alimentado"
 msgstr "Fed"
 
-#: scripts/ui/refuge_hud.gd:1775
+#: scripts/ui/refuge_hud.gd:1781
 msgid "Sem alimentação"
 msgstr "Not fed"
 
-#: scripts/ui/refuge_hud.gd:1794
+#: scripts/ui/refuge_hud.gd:1800
 msgid "fase concluída"
 msgstr "phase complete"
 
-#: scripts/ui/refuge_hud.gd:1794
+#: scripts/ui/refuge_hud.gd:1800
 msgid "a equipe voltou antes do guardião"
 msgstr "the team came back before the guardian"
 
-#: scripts/ui/refuge_hud.gd:1794
+#: scripts/ui/refuge_hud.gd:1800
 msgid "a equipe caiu"
 msgstr "the team fell"
 
-#: scripts/ui/refuge_hud.gd:1797
+#: scripts/ui/refuge_hud.gd:1803
 msgid "O que chegou%s"
 msgstr "What arrived%s"
 
-#: scripts/ui/refuge_hud.gd:1797
+#: scripts/ui/refuge_hud.gd:1803
 msgid " (%d%% do achado)"
 msgstr " (%d%% of what was found)"
 
-#: scripts/ui/refuge_hud.gd:1799
+#: scripts/ui/refuge_hud.gd:1805
 msgid "semente"
 msgstr "seed"
 
-#: scripts/ui/refuge_hud.gd:1799
+#: scripts/ui/refuge_hud.gd:1805
 msgid "sementes"
 msgstr "seeds"
 
-#: scripts/ui/refuge_hud.gd:1799
+#: scripts/ui/refuge_hud.gd:1805
 msgid "sucata"
 msgstr "scrap"
 
-#: scripts/ui/refuge_hud.gd:1799
+#: scripts/ui/refuge_hud.gd:1805
 msgid "sucatas"
 msgstr "scrap"
 
-#: scripts/ui/refuge_hud.gd:1799
+#: scripts/ui/refuge_hud.gd:1805
 msgid "fragmento"
 msgstr "fragment"
 
-#: scripts/ui/refuge_hud.gd:1799
+#: scripts/ui/refuge_hud.gd:1805
 msgid "fragmentos"
 msgstr "fragments"
 
-#: scripts/ui/refuge_hud.gd:1800
-#: scripts/ui/refuge_hud.gd:1800
+#: scripts/ui/refuge_hud.gd:1806
+#: scripts/ui/refuge_hud.gd:1806
 msgid "água"
 msgstr "water"
 
-#: scripts/ui/refuge_hud.gd:1800
+#: scripts/ui/refuge_hud.gd:1806
 msgid "suprimento"
 msgstr "supply"
 
-#: scripts/ui/refuge_hud.gd:1800
+#: scripts/ui/refuge_hud.gd:1806
 msgid "suprimentos"
 msgstr "supplies"
 
-#: scripts/ui/refuge_hud.gd:1806
+#: scripts/ui/refuge_hud.gd:1812
 msgid "%s recebeu %s: %s"
 msgstr "%s received %s: %s"
 
-#: scripts/ui/refuge_hud.gd:1808
+#: scripts/ui/refuge_hud.gd:1814
 msgid "Nada chegou desta vez."
 msgstr "Nothing arrived this time."
 
-#: scripts/ui/refuge_hud.gd:1833
+#: scripts/ui/refuge_hud.gd:1839
 msgid "Agora dá para"
 msgstr "Now you can"
 
-#: scripts/ui/refuge_hud.gd:1837
+#: scripts/ui/refuge_hud.gd:1843
 msgid "%s %s%s (%s)"
 msgstr "%s %s%s (%s)"
 
-#: scripts/ui/refuge_hud.gd:1840
+#: scripts/ui/refuge_hud.gd:1846
 msgid "A equipe"
 msgstr "The team"
 
-#: scripts/ui/refuge_hud.gd:1863
+#: scripts/ui/refuge_hud.gd:1869
 msgid "  ★ destaque"
 msgstr "  ★ highlight"
 
-#: scripts/ui/refuge_hud.gd:1867
+#: scripts/ui/refuge_hud.gd:1873
 msgid "causou %d de dano"
 msgstr "dealt %d damage"
 
-#: scripts/ui/refuge_hud.gd:1869
+#: scripts/ui/refuge_hud.gd:1875
 msgid "derrubou %d"
 msgstr "took down %d"
 
-#: scripts/ui/refuge_hud.gd:1871
+#: scripts/ui/refuge_hud.gd:1877
 msgid "curou %d"
 msgstr "healed %d"
 
-#: scripts/ui/refuge_hud.gd:1872
+#: scripts/ui/refuge_hud.gd:1878
 msgid "Não voltou: está no Memorial."
 msgstr "Didn't come back: in the Memorial."
 
-#: scripts/ui/refuge_hud.gd:1881
+#: scripts/ui/refuge_hud.gd:1887
 msgid "A Estação no ciclo %d"
 msgstr "The Station in cycle %d"
 
-#: scripts/ui/refuge_hud.gd:1882
+#: scripts/ui/refuge_hud.gd:1888
 msgid "A Cantina produziu %d suprimentos; os moradores comeram %d; estragaram %d. Água: %d bebida, %d do coletor%s."
 msgstr "The Canteen produced %d supplies; the residents ate %d; %d spoiled. Water: %d drunk, %d from the collector%s."
 
-#: scripts/ui/refuge_hud.gd:1884
+#: scripts/ui/refuge_hud.gd:1890
 msgid "; faltou para alguém"
 msgstr "; someone went without"
 
-#: scripts/ui/refuge_hud.gd:1886
+#: scripts/ui/refuge_hud.gd:1892
 msgid "A Cora trouxe %d fragmento."
 msgstr "Cora brought %d fragment."
 
-#: scripts/ui/refuge_hud.gd:1887
+#: scripts/ui/refuge_hud.gd:1893
 msgid "Entrar no abrigo"
 msgstr "Enter the shelter"
 
-#: scripts/ui/refuge_hud.gd:1909
+#: scripts/ui/refuge_hud.gd:1915
 msgid "O trem parte"
 msgstr "The train leaves"
 
-#: scripts/ui/refuge_hud.gd:1909
+#: scripts/ui/refuge_hud.gd:1915
 msgid "As portas fecham; o trem volta para o túnel."
 msgstr "The doors close; the train heads back into the tunnel."
 
-#: scripts/ui/refuge_hud.gd:1915
+#: scripts/ui/refuge_hud.gd:1921
 msgid "O trem chegou"
 msgstr "The train arrived"
 
-#: scripts/ui/refuge_hud.gd:1915
+#: scripts/ui/refuge_hud.gd:1921
 msgid "%s quer morar na Estação"
 msgstr "%s wants to live at the Station"
 
-#: scripts/ui/refuge_hud.gd:1916
+#: scripts/ui/refuge_hud.gd:1922
 msgid "%s · %s (%s). %s"
 msgstr "%s · %s (%s). %s"
 
-#: scripts/ui/refuge_hud.gd:1922
+#: scripts/ui/refuge_hud.gd:1928
 msgid "Na próxima volta"
 msgstr "On the next return"
 
-#: scripts/ui/refuge_hud.gd:1923
+#: scripts/ui/refuge_hud.gd:1929
 msgid "Suprimentos depois da noite: %d → %d · Água depois: %d → %d%s · Energia: %d → %d"
 msgstr "Supplies after the night: %d → %d · Water after: %d → %d%s · Power: %d → %d"
 
-#: scripts/ui/refuge_hud.gd:1927
+#: scripts/ui/refuge_hud.gd:1933
 msgid "A equipe ainda precisa passar a noite: decida depois do Dormitório, se preferir."
 msgstr "The team still has to spend the night: decide after the Dormitory, if you prefer."
 
-#: scripts/ui/refuge_hud.gd:1930
+#: scripts/ui/refuge_hud.gd:1936
 msgid "Acolher %s"
 msgstr "Take in %s"
 
-#: scripts/ui/refuge_hud.gd:1931
+#: scripts/ui/refuge_hud.gd:1937
 msgid "Recusar"
 msgstr "Decline"
 
-#: scripts/ui/refuge_hud.gd:1942
+#: scripts/ui/refuge_hud.gd:1948
 msgid "%s vai morar na Estação."
 msgstr "%s will live at the Station."
 
-#: scripts/ui/refuge_hud.gd:1942
+#: scripts/ui/refuge_hud.gd:1948
 msgid "%s segue no trem. Pode voltar numa próxima viagem."
 msgstr "%s stays on the train. They may come back on a later trip."
 

@@ -47,6 +47,7 @@ refuge_hud.gd: %s · %s
 refuge_hud.gd: %s · %s · %s
 refuge_hud.gd: %s · %d/%d
 refuge_hud.gd: Role
+refuge_hud.gd: UI
 refuge_hud.gd: Description
 refuge_hud.gd: +%d %s
 refuge_hud.gd: %s%s

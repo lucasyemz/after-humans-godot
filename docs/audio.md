@@ -14,16 +14,16 @@ Os sons ficam em `audio/` e tocam pelo autoload `Sound` (`scripts/core/sound_ser
 **Mixagem:**
 - A tabela `data/presentation/audio_mix.json` guarda o volume medido de cada arquivo (LUFS integrado, EBU R128, pelo ffmpeg) e o ganho que o leva ao alvo da categoria. A ferramenta é `tools/measure_audio.py`.
 - O ganho de cada cena (o `music_gain` e o `ambience_gain` de `soundscape()`) entra por cima.
-- A música e os ambientes vão ao alvo. Os efeitos que já existiam só são medidos, para não mexer no equilíbrio que foi acertado jogando. Os efeitos novos, de `tools/synth_sounds.py`, vão ao alvo deles.
+- A música, os ambientes e toda a interface (`audio/ui`) vão ao alvo, para que um erro não soe mais alto que uma conquista. Os efeitos do mundo e da luta que já existiam só são medidos, para não mexer no peso de cada golpe, acertado jogando. Os efeitos novos, de `tools/synth_sounds.py`, vão ao alvo deles.
 
 | Categoria | Alvo |
 | --- | --- |
 | Música | -18 LUFS |
 | Ambiente | -26 LUFS |
 | Efeitos novos | -20 LUFS |
-| Interface nova | -24 LUFS |
+| Interface (toda) | -24 LUFS |
 
-**Abaixar a música (duck):** a música cai 9 dB na crise de instinto, enquanto ela dura, e 9 dB no toque de vitória ou derrota. No golpe crítico cai 5 dB por 0,35 s, e volta em 0,8 s.
+**Abaixar a música (duck):** em tempo de relógio (a pausa do acerto não o segura); um mais fraco não corta um mais forte em curso. A música cai 9 dB na crise de instinto, enquanto ela dura, e 9 dB no toque de vitória ou derrota. No golpe crítico cai 5 dB por 0,35 s, e volta em 0,8 s.
 
 ## Cenas
 
@@ -54,7 +54,7 @@ Os ambientes iam de -24 a -33 LUFS e agora ficam todos em -26.
 | Momento | Som | Onde |
 | --- | --- | --- |
 | Clique, confirmar, negar | `ui/click`, `ui/confirm`, `ui/deny` | Botões, Mochila, ações da Estação recusadas |
-| Abrir e fechar painéis | `ui/panel_open`, `ui/panel_close` **(novo)** | Cômodos e serviços da Estação; janelas da exploração |
+| Abrir e fechar painéis | `ui/panel_open`, `ui/panel_close` **(novo)** | Cômodos e serviços da Estação; janelas da exploração e do título |
 | Abrir a Mochila | `ui/bag_open` | Exploração e luta |
 | Fabricar na Forja | `ui/forge_confirm` **(novo)** | Forja |
 | Pesquisa concluída | `station/research_beep` (existia e não tocava) | Pesquisa |

@@ -149,6 +149,7 @@ func modal_open() -> bool:
 func close_modal() -> void:
 	if modal_open():
 		_modal.queue_free()
+		Sound.play("res://audio/ui/panel_close.ogg")
 	_modal = null
 	_buttons.visible = true
 	S.reset_focus(_buttons)
@@ -160,6 +161,8 @@ func close_modal() -> void:
 func _open_modal(width: float) -> VBoxContainer:
 	if modal_open():
 		_modal.queue_free()
+	else:
+		Sound.play("res://audio/ui/panel_open.ogg")
 	_buttons.visible = false
 	_modal = PanelContainer.new()
 	_modal.add_theme_stylebox_override("panel", H.panel_style(0.95))

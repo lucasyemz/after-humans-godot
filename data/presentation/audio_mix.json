@@ -285,20 +285,20 @@
 		"res://audio/ui/bag_open.ogg": {
 			"category": "ui",
 			"lufs": -20.2,
-			"gain_db": 0.0,
-			"normalized": false
+			"gain_db": -3.8,
+			"normalized": true
 		},
 		"res://audio/ui/click.ogg": {
 			"category": "ui",
 			"lufs": -22.9,
-			"gain_db": 0.0,
-			"normalized": false
+			"gain_db": -1.1,
+			"normalized": true
 		},
 		"res://audio/ui/confirm.ogg": {
 			"category": "ui",
 			"lufs": -14.9,
-			"gain_db": 0.0,
-			"normalized": false
+			"gain_db": -9.1,
+			"normalized": true
 		},
 		"res://audio/ui/defeat.ogg": {
 			"category": "ui",
@@ -309,8 +309,8 @@
 		"res://audio/ui/deny.ogg": {
 			"category": "ui",
 			"lufs": -11.8,
-			"gain_db": 0.0,
-			"normalized": false
+			"gain_db": -12.2,
+			"normalized": true
 		},
 		"res://audio/ui/forge_confirm.ogg": {
 			"category": "ui",

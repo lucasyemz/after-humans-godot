@@ -673,7 +673,7 @@ func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
 func open_room(room_id: String) -> void:
 	_reset_focus()
 	if current == "":
-		Sound.play(PANEL_OPEN)
+		_sound_open.call_deferred()
 	current = room_id
 	if room_id == S.PREPARATION and _draft.is_empty():
 		_reset_draft()
@@ -684,7 +684,7 @@ func open_room(room_id: String) -> void:
 func open_service(service: String) -> void:
 	_reset_focus()
 	if current == "":
-		Sound.play(PANEL_OPEN)
+		_sound_open.call_deferred()
 	current = service
 	match service:
 		"report":
@@ -698,6 +698,12 @@ func open_service(service: String) -> void:
 				station.open_train(train.candidate_id, _arrived_candidate != train.candidate_id)
 				_arrived_candidate = train.candidate_id
 	refresh()
+
+
+## O som de abrir só se o painel ficou aberto (o relatório vazio e o trem sem candidato fecham no mesmo quadro).
+func _sound_open() -> void:
+	if current != "":
+		Sound.play(PANEL_OPEN)
 
 
 func close_panel() -> void:
@@ -817,7 +823,7 @@ func _act(error: String, success: String = "", sound: String = "") -> void:
 		return
 	station.commit()
 	if sound != "":
-		Sound.play(sound)
+		Sound.play(sound, 1.0, 1.0, "UI")
 	if success != "":
 		toast(success)
 

@@ -150,6 +150,10 @@ SOUNDS = {
 
 
 def write(stem, signal):
+    # 25 ms de saída suave: nenhum som termina com sinal ainda tocando (o "tum" no fim da crise).
+    fade = int(0.025 * RATE)
+    signal = signal.copy()
+    signal[-fade:] *= np.linspace(1.0, 0.0, fade)
     peak = np.max(np.abs(signal))
     signal = signal / peak * (10 ** (-3.0 / 20.0)) if peak > 0 else signal
     target = AUDIO / f"{stem}.ogg"
@@ -160,7 +164,8 @@ def write(stem, signal):
             out.setsampwidth(2)
             out.setframerate(RATE)
             out.writeframes((signal * 32767).astype("<i2").tobytes())
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav), "-c:a", "libvorbis", "-q:a", "4", str(target)], check=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav), "-c:a", "libvorbis", "-q:a", "4",
+                        "-fflags", "+bitexact", "-flags:a", "+bitexact", "-serial_offset", "1", str(target)], check=True)
     print(f"{target.relative_to(PROTO)}: {signal.size / RATE:.2f} s")
 
 

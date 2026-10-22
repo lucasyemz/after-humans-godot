@@ -194,15 +194,27 @@ Para conferir antes de abrir o PR: `bash tools/ci_size_check.sh origin/main HEAD
 A tabela do que toca em cada momento e a mixagem estão em [docs/audio.md](docs/audio.md).
 
 - **Kenney** ([kenney.nl](https://kenney.nl), CC0): portas, busca e moedas (`rpg-audio`) e passos de concreto e madeira (`impact-sounds`).
-- **OpenGameArt.org:** as trilhas da exploração, da Estação, da luta e do chefe, escolhidas pelo Lucas em 20/10/2026. As
-  páginas de origem estão em `tools/sync_audio.py`: `tragic-ambient-main-menu`, `soundscape-dust`, `contemplation`,
-  `soundscape-find-nothing`, `determined-pursuit` e `boss-battle`. O autor e a licença de cada uma estão na página
-  dela; falta trazê-los para cá (pendência da #36).
+- **OpenGameArt.org:** as trilhas escolhidas pelo Lucas em 20/10/2026.
+  - `explore_1`: "Tragic ambient main menu", de brandon75689 (enviada por HaelDB), CC0 / OGA-BY 3.0 (vale o CC0).
+    https://opengameart.org/content/tragic-ambient-main-menu
+  - `explore_2`: "Soundscape - Dust - Ambient Guitar", Music by Tri-Tachyon (https://soundcloud.com/tri-tachyon/albums),
+    CC-BY 4.0. https://opengameart.org/content/soundscape-dust-ambient-guitar
+  - `explore_3` (a Estação e a exploração): "Contemplation", de bart (https://opengameart.org), CC-BY 3.0.
+    https://opengameart.org/content/contemplation
+  - `explore_root_bridge`: "Soundscape - Find Nothing", Music by Tri-Tachyon (https://soundcloud.com/tri-tachyon/albums),
+    CC-BY 4.0. https://opengameart.org/content/soundscape-find-nothing
+  - `battle`: "Determined Pursuit (epic orchestra loop)", de Emma_MA, CC0.
+    https://opengameart.org/content/determined-pursuit-epic-orchestra-loop
+  - `boss` (`epic_boss_battle_loop.wav`): **origem não confirmada**. A pasta de origem se chama `boss-battle` e a
+    página com esse nome não abre; "Epic Boss Battle", de migfus20 (CC-BY 4.0), tem outro arquivo. Pendente: confirmar a
+    página e a licença ou trocar a faixa.
 - **Feitos no projeto:**
   - os sons da interface, da Estação, dos ambientes e da chuva, e os passos na água (`SourceArt/Audio/Synth` da Unreal);
   - os sons de `tools/synth_sounds.py`: sino e freio do trem, painéis, Forja, achado raro, vitória, derrota e crise.
     São gerados por síntese e são de domínio público (CC0).
-- **Combate:** as ações dos heróis e dos robôs vêm da referência Unreal, por `tools/sync_combat_art.py`.
+- **Combate:** as ações dos heróis e dos robôs (`audio/combat`) vêm da referência Unreal, por
+  `tools/sync_combat_art.py`; a origem e a licença de cada um não estão registradas lá. Pendente: levantar na pasta da
+  Unreal (`SourceArt/Audio`).
 
 ## Referência Unreal
 

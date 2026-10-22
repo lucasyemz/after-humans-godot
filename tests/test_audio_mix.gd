@@ -62,10 +62,10 @@ func _table() -> void:
 			music += 1
 		elif entry.category == "ambience":
 			ambience += 1
-		if entry.category in ["music", "ambience"]:
+		if entry.category in ["music", "ambience", "ui"]:
 			if not entry.normalized or absf(float(entry.lufs) + float(entry.gain_db) - float(table.targets[entry.category])) > 0.2:
 				off.append(path)
-	t.check(off.is_empty(), "a música e os ambientes no alvo: %s" % [off])
+	t.check(off.is_empty(), "a música, os ambientes e a interface no alvo: %s" % [off])
 	t.check(music >= 6 and ambience >= 9, "as trilhas (%d) e os ambientes (%d) medidos" % [music, ambience])
 	t.check(Sound.mix_db("res://audio/music/boss.ogg") < -5.0 and Sound.mix_db("res://audio/music/explore_3.ogg") > 5.0,
 		"a trilha do chefe abaixa e a da Estação sobe (ficam no mesmo volume)")
@@ -96,10 +96,23 @@ func _duck() -> void:
 	Sound.duck(9.0, 0.05)
 	await _tree.create_timer(0.3).timeout
 	t.check(AudioServer.get_bus_volume_db(music) < before - 3.0, "a música abaixa (%.1f → %.1f dB)" % [before, AudioServer.get_bus_volume_db(music)])
-	Sound.duck(3.0, 0.05)
-	t.check(Sound.duck_db < -3.0, "um abaixamento mais fraco não corta o mais forte")
 	await _tree.create_timer(1.3).timeout
 	t.check(absf(AudioServer.get_bus_volume_db(music) - before) < 0.1, "e volta ao volume das Opções")
+	# Um mais fraco no meio de um mais forte não o corta; depois dele, vale.
+	Sound.duck(9.0, 0.6)
+	await _tree.create_timer(0.2).timeout
+	Sound.duck(3.0, 0.05)
+	await _tree.create_timer(0.2).timeout
+	t.check(Sound.duck_db < -8.0, "um abaixamento mais fraco não corta o mais forte (%.1f dB)" % Sound.duck_db)
+	await _tree.create_timer(1.5).timeout
+	# Na pausa do acerto (o tempo quase parado) a música abaixa do mesmo jeito.
+	var scale := Engine.time_scale
+	Engine.time_scale = 0.03
+	Sound.duck(5.0, 0.35)
+	await _tree.create_timer(0.25, true, false, true).timeout
+	Engine.time_scale = scale
+	t.check(Sound.duck_db < -4.0, "o abaixamento anda mesmo com o tempo quase parado (%.1f dB)" % Sound.duck_db)
+	await _tree.create_timer(1.5).timeout
 
 
 func _audio_files(root: String) -> Array:

@@ -33,6 +33,9 @@ var duck_db := 0.0:
 		duck_db = value
 		_apply_bus("Music")
 var _duck_tween: Tween
+## Até quando (ms do relógio) e quanto vale o abaixamento em curso: um mais fraco não corta o mais forte antes disso.
+var _duck_until := 0
+var _duck_amount := 0.0
 
 
 func _ready() -> void:
@@ -88,11 +91,15 @@ func mix_db(path: String) -> float:
 
 ## Abaixa a música amount_db por hold segundos (a crise, o crítico) e volta devagar; o mais forte vale.
 func duck(amount_db: float, hold: float) -> void:
-	if -amount_db > duck_db and _duck_tween != null and _duck_tween.is_running():
+	var now := Time.get_ticks_msec()
+	if absf(amount_db) < _duck_amount and now < _duck_until:
 		return
+	_duck_amount = absf(amount_db)
+	_duck_until = now + int((0.12 + hold) * 1000.0)
 	if _duck_tween:
 		_duck_tween.kill()
-	_duck_tween = create_tween()
+	# Em tempo de relógio: a pausa do acerto (o tempo quase parado) não segura a música no alto.
+	_duck_tween = create_tween().set_ignore_time_scale(true)
 	_duck_tween.tween_property(self, "duck_db", -absf(amount_db), 0.12)
 	_duck_tween.tween_interval(hold)
 	_duck_tween.tween_property(self, "duck_db", 0.0, 0.8)
