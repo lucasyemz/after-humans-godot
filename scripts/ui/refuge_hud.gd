@@ -1200,7 +1200,8 @@ func _prep_drawer(c: Dictionary) -> void:
 	back.focus_mode = Control.FOCUS_NONE
 	back.pressed.connect(close_panel)
 	head.add_child(back)
-	var title := U.label("   EQUIPE · CLIQUE EM DOIS PARA TROCAR", 15, U.COPPER, "bold")
+	var limits := J.team_limits(_draft.phase)
+	var title := U.label("   EQUIPE · %s · CLIQUE EM DOIS PARA TROCAR" % S.team_size_text(limits).to_upper(), 15, U.COPPER, "bold")
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(title)
@@ -1212,7 +1213,8 @@ func _prep_drawer(c: Dictionary) -> void:
 		slots.add_child(_prep_slot(c, rank))
 	# Os de fora da equipe: com um cartão escolhido, clicar troca.
 	var bench: Array = S.living(c).filter(func(h): return not _draft.team.has(h.id))
-	if not bench.is_empty():
+	var can_leave: bool = _prep_selected >= 0 and _prep_selected < _draft.team.size() and _draft.team.size() > 1
+	if not bench.is_empty() or can_leave:
 		var bench_row := HBoxContainer.new()
 		bench_row.add_theme_constant_override("separation", 8)
 		lineup.add_child(bench_row)
@@ -1229,6 +1231,19 @@ func _prep_drawer(c: Dictionary) -> void:
 				button.text += " · sem arte de combate"
 			button.pressed.connect(func(): _prep_bench(id))
 			bench_row.add_child(button)
+		# Equipe menor (#6): o escolhido fica na Estação e a vaga fica vazia (os de trás andam para a frente).
+		if can_leave:
+			var leave := Button.new()
+			leave.text = "Deixar na Estação"
+			leave.custom_minimum_size = Vector2(0, 40)
+			H.style_button(leave)
+			leave.tooltip_text = "Parte com um a menos; os de trás andam uma posição para a frente."
+			leave.pressed.connect(_prep_leave)
+			bench_row.add_child(leave)
+	var size_block := ""
+	if _draft.team.size() < limits.min or _draft.team.size() > limits.max:
+		size_block = "%s pede %s na equipe." % [J.phase(_draft.phase).get("name", "Esta jornada"), S.team_size_text(limits)]
+		lineup.add_child(U.label(size_block, 17, U.DANGER, "bold"))
 	var warning := _team_warning(c)
 	if warning != "":
 		lineup.add_child(U.label(warning, 17, U.GOLD))
@@ -1301,6 +1316,7 @@ func _prep_drawer(c: Dictionary) -> void:
 	go.add_theme_font_override("font", U.font("bold"))
 	go.add_theme_font_size_override("font_size", AHUiStyle.px(22))
 	go.pressed.connect(_depart)
+	go.disabled = size_block != ""
 	side.add_child(go)
 
 
@@ -1426,6 +1442,14 @@ func _prep_click(index: int) -> void:
 	else:
 		_swap(_prep_selected, index)
 		_prep_selected = -1
+	refresh()
+
+
+func _prep_leave() -> void:
+	if _prep_selected < 0 or _prep_selected >= _draft.team.size() or _draft.team.size() <= 1:
+		return
+	_draft.team.remove_at(_prep_selected)
+	_prep_selected = -1
 	refresh()
 
 

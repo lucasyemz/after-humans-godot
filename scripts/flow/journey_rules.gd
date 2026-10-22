@@ -76,6 +76,15 @@ static func phase(phase_id: String) -> Dictionary:
 	return {}
 
 
+## Quantos partem em cada jornada (#6): data/expedition-teams.json, por fase (MinTeam e MaxTeam). Sem linha, quatro.
+## A luta tem quatro posições: o máximo nunca passa de 4.
+static func team_limits(phase_id: String) -> Dictionary:
+	var row = GameData.row("expedition_teams", phase_id)
+	var most := clampi(int(row.get("MaxTeam", 4)) if row != null else 4, 1, 4)
+	var least := clampi(int(row.get("MinTeam", 4)) if row != null else 4, 1, most)
+	return {"min": least, "max": most}
+
+
 static func shop_the(shop: int) -> String:
 	return ("o " if shop == 2 else "a ") + SHOP_NAMES[clampi(shop, 0, 2)]
 
@@ -88,9 +97,10 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	if info.is_empty():
 		return false
 	var team: Array = []
+	var most: int = team_limits(phase_id).max
 	for hero_id in campaign.get("preferred_formation", []):
 		for hero in campaign.roster:
-			if hero.id == hero_id and hero.alive and team.size() < 4:
+			if hero.id == hero_id and hero.alive and team.size() < most:
 				team.append(hero_id)
 	if team.is_empty():
 		return false

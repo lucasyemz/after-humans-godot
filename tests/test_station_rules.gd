@@ -112,7 +112,8 @@ func _rooms(t) -> void:
 func _departure(t) -> void:
 	var c := _campaign()
 	var team: Array = c.preferred_formation.duplicate()
-	t.check(S.confirm_departure(c, team.slice(0, 3), 0, 1, "fase_1") != "", "três integrantes não partem")
+	t.check(S.confirm_departure(c, [], 0, 1, "fase_1") != "", "sem ninguém não parte")
+	t.check(S.confirm_departure(c, team + ["hero_cao_bento"], 0, 1, "fase_1") != "", "cinco (um repetido) não partem")
 	t.check(S.confirm_departure(c, team, 0, 1, "fase_2") != "", "fase 2 bloqueada antes da 1")
 	t.check(S.confirm_departure(c, team, 5, 1, "fase_1") != "", "não passa de 8 suprimentos")
 	t.check(S.confirm_departure(c, team, 0, 1, "fase_1", "request_civil_dora") != "", "pedido fechado sem a Dora")

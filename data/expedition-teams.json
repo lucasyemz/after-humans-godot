@@ -1,0 +1,7 @@
+[
+  {"Name": "fase_1", "MinTeam": 1, "MaxTeam": 4, "Note": "Proposta (#6): a primeira jornada aceita partir sozinho."},
+  {"Name": "fase_2", "MinTeam": 2, "MaxTeam": 4, "Note": "Proposta (#6)."},
+  {"Name": "fase_3", "MinTeam": 3, "MaxTeam": 4, "Note": "Proposta (#6)."},
+  {"Name": "fase_4", "MinTeam": 3, "MaxTeam": 4, "Note": "Proposta (#6)."},
+  {"Name": "fase_5", "MinTeam": 4, "MaxTeam": 4, "Note": "Proposta (#6): o Porteiro pede a equipe inteira."}
+]
