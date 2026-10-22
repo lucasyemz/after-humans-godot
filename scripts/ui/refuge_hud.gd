@@ -6,6 +6,7 @@ class_name AHRefugeHud
 extends Control
 
 const H := preload("res://scripts/ui/combat_hud.gd")
+const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
 const RESULT_NAMES := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fuga", "defeat": "Derrota"}
@@ -14,8 +15,20 @@ var station: AHStation
 var current := ""
 var _title: Label
 var _subtitle: Label
-var _resources: Label
+var _resources: HBoxContainer
 var _menu: VBoxContainer
+var _next_title: Label
+var _next_text: Label
+var _next_button: Button
+var _pending: VBoxContainer
+var _corner: HBoxContainer
+var _overview_button: Button
+## Os nomes clicáveis dos cômodos sobre o corte (só na vista geral).
+var _room_labels := {}
+var _next := {}
+## A gaveta da Preparação e o cartão escolhido para trocar (-1: nenhum).
+var _prep: PanelContainer
+var _prep_selected := -1
 var _panel: PanelContainer
 var _body: VBoxContainer
 var _feedback: Label
@@ -35,23 +48,80 @@ var _map: AHPhaseMap
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_title = H.make_label("ESTAÇÃO RAIZ", 32, H.GOLD)
-	_title.position = Vector2(36, 22)
+	_title = U.label("Estação Raiz", 36, U.GOLD, "display")
+	_title.position = Vector2(32, 18)
 	add_child(_title)
-	_subtitle = H.make_label("", 19, H.MUTED)
-	_subtitle.position = Vector2(38, 66)
+	_subtitle = U.label("", U.MIN_TEXT, U.MUTED)
+	_subtitle.position = Vector2(34, 66)
 	add_child(_subtitle)
-	_resources = H.make_label("", 19, H.TEXT)
-	_resources.position = Vector2(1000, 24)
-	_resources.size = Vector2(884, 60)
-	_resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_resources = HBoxContainer.new()
+	_resources.alignment = BoxContainer.ALIGNMENT_END
+	_resources.add_theme_constant_override("separation", 6)
+	_resources.position = Vector2(700, 24)
+	_resources.custom_minimum_size = Vector2(1188, 0)
+	_resources.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_resources)
 
+	# À esquerda: o próximo passo com o botão principal e as pendências (a lista de doze botões saiu).
 	_menu = VBoxContainer.new()
-	_menu.position = Vector2(36, 120)
-	_menu.custom_minimum_size = Vector2(330, 0)
-	_menu.add_theme_constant_override("separation", 6)
+	_menu.position = Vector2(32, 112)
+	_menu.custom_minimum_size = Vector2(420, 0)
+	_menu.add_theme_constant_override("separation", 10)
 	add_child(_menu)
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", U.panel(0.9))
+	_menu.add_child(card)
+	var card_box := VBoxContainer.new()
+	card_box.add_theme_constant_override("separation", 8)
+	card.add_child(card_box)
+	card_box.add_child(U.label("PRÓXIMO PASSO", 15, U.COPPER, "bold"))
+	_next_title = U.label("", 26, U.TEXT, "bold")
+	_next_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_next_title.custom_minimum_size = Vector2(390, 0)
+	card_box.add_child(_next_title)
+	_next_text = U.label("", 17, U.MUTED)
+	_next_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_next_text.custom_minimum_size = Vector2(390, 0)
+	card_box.add_child(_next_text)
+	_next_button = Button.new()
+	_next_button.custom_minimum_size = Vector2(0, 54)
+	H.style_button(_next_button, U.GOLD)
+	var gold := StyleBoxFlat.new()
+	gold.bg_color = Color("d9ad62")
+	gold.set_corner_radius_all(5)
+	for state in ["normal", "focus"]:
+		_next_button.add_theme_stylebox_override(state, gold)
+	var gold_hover := gold.duplicate()
+	gold_hover.bg_color = Color("f0cf8a")
+	_next_button.add_theme_stylebox_override("hover", gold_hover)
+	_next_button.add_theme_color_override("font_color", U.INK)
+	_next_button.add_theme_color_override("font_hover_color", U.INK)
+	_next_button.add_theme_color_override("font_focus_color", U.INK)
+	_next_button.add_theme_font_override("font", U.font("bold"))
+	_next_button.add_theme_font_size_override("font_size", 22)
+	_next_button.pressed.connect(_run_next)
+	card_box.add_child(_next_button)
+	_pending = VBoxContainer.new()
+	_pending.add_theme_constant_override("separation", 6)
+	_menu.add_child(_pending)
+
+	# Embaixo à esquerda: a vista geral (com um cômodo aberto) e as Opções.
+	_corner = HBoxContainer.new()
+	_corner.position = Vector2(32, 1000)
+	_corner.add_theme_constant_override("separation", 8)
+	add_child(_corner)
+	_overview_button = Button.new()
+	_overview_button.text = "‹ Vista geral"
+	_overview_button.custom_minimum_size = Vector2(190, 46)
+	H.style_button(_overview_button)
+	_overview_button.pressed.connect(close_panel)
+	_corner.add_child(_overview_button)
+	var options := Button.new()
+	options.text = "Opções"
+	options.custom_minimum_size = Vector2(150, 46)
+	H.style_button(options)
+	options.pressed.connect(func(): open_service("options"))
+	_corner.add_child(options)
 
 	_tags = Control.new()
 	_tags.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -81,6 +151,7 @@ func _ready() -> void:
 	_map.phase_chosen.connect(_on_phase_chosen)
 	_map.closed.connect(func(): _map.visible = false)
 	add_child(_map)
+	Tips.show_tip.call_deferred("station")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -92,16 +163,24 @@ func _unhandled_input(event: InputEvent) -> void:
 func refresh() -> void:
 	var c: Dictionary = Campaign.state
 	var f := S.forecast(c, 4)
-	_resources.text = "Sementes %d · Sucata %d · Fragmentos %d · Curativos %d\nSuprimentos %d/%d · Água %d · Energia %d/%d" % [
-		S.quantity(c, "seeds"), S.quantity(c, "scrap"), S.quantity(c, "fragments"), S.quantity(c, "bandages"),
-		f.food, f.food_capacity, f.water, f.power_used, f.power_capacity]
+	for child in _resources.get_children():
+		_resources.remove_child(child)
+		child.queue_free()
+	for spec in [["lobby-seed", "Sementes", str(S.quantity(c, "seeds")), "Moeda da Estação: comida extra na partida, recrutas e o trauma."],
+			["lobby-scrap", "Sucata", str(S.quantity(c, "scrap")), "Recupera cômodos e fabrica relíquias na Forja."],
+			["lobby-fragment", "Fragmentos", str(S.quantity(c, "fragments")), "Restos raros: pesquisas e melhorias."],
+			["res-bandages", "Curativos", str(S.quantity(c, "bandages")), "+8 de vida, na expedição e no acampamento."],
+			["lobby-food", "Suprimentos", "%d/%d" % [f.food, f.food_capacity], "A comida da Estação. A noite da volta pede %d." % f.food_night_need],
+			["lobby-water", "Água", str(f.water), "Os moradores e a equipe bebem a cada ciclo; o coletor repõe."],
+			["lobby-energy", "Energia", "%d/%d" % [f.power_used, f.power_capacity], "Os cômodos usam energia; sem ela, param."]]:
+		_resources.add_child(_resource_chip(spec[0], spec[1], spec[2], spec[3]))
 	var status: Array[String] = ["Ciclo %d" % c.station.cycle_number, "%d no elenco" % S.living(c).size()]
 	if c.night.phase != "none":
 		status.append("noite por resolver no Dormitório")
 	if S.visit_pending(c):
 		status.append("alguém espera na plataforma")
 	_subtitle.text = " · ".join(status)
-	_build_menu()
+	_build_left(c)
 	if current == "departure" and not _draft.is_empty():
 		# A fila acompanha a equipe do rascunho (trocas e mudanças de ordem).
 		var signature := ",".join(_draft.team)
@@ -115,50 +194,114 @@ func refresh() -> void:
 		_show(current)
 
 
-func _build_menu() -> void:
-	for child in _menu.get_children():
+func _resource_chip(icon: String, name: String, value: String, tip: String) -> PanelContainer:
+	var chip := PanelContainer.new()
+	var style := U.panel(0.86, Color(U.COPPER, 0.45), 1)
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	style.content_margin_top = 5
+	style.content_margin_bottom = 5
+	chip.add_theme_stylebox_override("panel", style)
+	chip.tooltip_text = tip
+	chip.mouse_filter = Control.MOUSE_FILTER_PASS
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var glyph := TextureRect.new()
+	glyph.texture = load("res://art/ui/icons/%s.svg" % icon)
+	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	glyph.custom_minimum_size = Vector2(22, 22)
+	glyph.modulate = U.GOLD
+	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(glyph)
+	row.add_child(U.label(name, 17, U.TEXT))
+	row.add_child(U.label(value, 17, U.GOLD, "bold"))
+	chip.add_child(row)
+	return chip
+
+
+## O próximo passo (AHStationRules.next_step) e as pendências; o canto com a vista geral e as Opções.
+func _build_left(c: Dictionary) -> void:
+	_next = S.next_step(c)
+	_next_title.text = _next.title
+	_next_text.text = _next.text
+	_next_button.text = _next.button
+	for child in _pending.get_children():
+		_pending.remove_child(child)
 		child.queue_free()
-	_menu_button("Vista geral", "", "overview")
-	var prepare := Button.new()
-	prepare.text = "Preparar expedição"
-	prepare.custom_minimum_size = Vector2(330, 52)
-	prepare.add_theme_font_size_override("font_size", 22)
-	H.style_button(prepare)
-	prepare.add_theme_color_override("font_color", H.GOLD)
-	prepare.pressed.connect(open_map)
-	_menu.add_child(prepare)
-	if S.visit_pending(Campaign.state):
-		_menu_button("Plataforma: o trem chegou", "", "train")
-	for room in AHStation.ROOMS:
-		var level := S.room_level(Campaign.state, room.id)
-		var room_def := S.room_def(room.id)
-		var state := "" if level >= 1 else " · vazio"
-		if level >= 2:
-			state = " · nível %d" % level
-		if room.id == S.DORMITORY and Campaign.state.night.phase != "none":
-			state += " · noite"
-		_menu_button(room_def.name + state, room.id, "")
-	_menu_button("Opções", "", "options")
-	_menu_button("Nova campanha", "", "new_campaign")
+	if S.visit_pending(c) and _next.action != "train":
+		_pending.add_child(_pending_row("O trem chegou: alguém espera na plataforma", func(): open_service("train"), U.GOLD))
+	if c.night.phase != "none" and _next.action != "dormitory":
+		_pending.add_child(_pending_row("A noite espera no Dormitório", func(): open_room(S.DORMITORY), U.VIOLET))
+	if _next.action != "depart" and S.preparation_block(c) == "":
+		_pending.add_child(_pending_row("Preparar expedição", open_map, U.COPPER))
+	_menu.visible = current == "" or current == "options"
+	_overview_button.visible = current != ""
+	_corner.visible = current != S.PREPARATION or S.preparation_block(c) != ""
+	_refresh_room_labels(c)
 
 
-func _menu_button(text: String, room_id: String, service: String) -> void:
+func _pending_row(text: String, action: Callable, color: Color) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.custom_minimum_size = Vector2(330, 46)
-	H.style_button(button)
-	var key := room_id if room_id != "" else service
-	if key == current or (key == "overview" and current == ""):
-		button.add_theme_color_override("font_color", H.GOLD)
-	button.pressed.connect(func():
-		if service == "overview":
-			close_panel()
-		elif service != "":
-			open_service(service)
-		else:
-			open_room(room_id))
-	_menu.add_child(button)
+	button.custom_minimum_size = Vector2(420, 44)
+	H.style_button(button, color)
+	var style: StyleBoxFlat = button.get_theme_stylebox("normal").duplicate()
+	style.border_width_left = 4
+	style.border_color = color
+	button.add_theme_stylebox_override("normal", style)
+	button.pressed.connect(action)
+	return button
+
+
+func _run_next() -> void:
+	match _next.get("action", "depart"):
+		"report":
+			open_service("report")
+		"dormitory":
+			open_room(S.DORMITORY)
+		"train":
+			open_service("train")
+		"room":
+			open_room(_next.room)
+		_:
+			open_map()
+
+
+## O nome e o estado de cada cômodo sobre o corte, clicáveis: o do próximo passo acende em dourado; o Dormitório com a
+## noite pendente, em violeta.
+func _refresh_room_labels(c: Dictionary) -> void:
+	for room in AHStation.ROOMS:
+		var id: String = room.id
+		var level := S.room_level(c, id)
+		var state := "vazio" if level < 1 else ("nível %d" % level if level >= 2 else "aberto")
+		var cost := S.next_level_cost(c, id)
+		if level < 1 and not cost.is_empty():
+			state = "recuperar · %s" % S.cost_text(cost)
+		if id == S.DORMITORY and c.night.phase != "none":
+			state = "noite pendente"
+		var button: Button = _room_labels.get(id)
+		if button == null:
+			button = Button.new()
+			button.focus_mode = Control.FOCUS_NONE
+			H.style_button(button)
+			button.add_theme_font_size_override("font_size", 17)
+			button.pressed.connect(func(): open_room(id))
+			_tags.add_sibling(button)
+			_room_labels[id] = button
+		button.text = "%s\n%s" % [S.room_def(id).name, state]
+		button.tooltip_text = S.room_benefit(id, maxi(1, level))
+		var color: Color = U.GOLD if _next.get("room", "") == id else (U.VIOLET if id == S.DORMITORY and c.night.phase != "none" else U.TEXT)
+		button.add_theme_color_override("font_color", color)
+		var style: StyleBoxFlat = U.panel(0.86, color if color != U.TEXT else Color(U.COPPER, 0.5), 2 if color != U.TEXT else 1)
+		style.content_margin_top = 3
+		style.content_margin_bottom = 3
+		style.content_margin_left = 10
+		style.content_margin_right = 10
+		button.add_theme_stylebox_override("normal", style)
+		button.size = button.get_combined_minimum_size()
 
 
 func open_room(room_id: String) -> void:
@@ -173,6 +316,7 @@ func open_service(service: String) -> void:
 	current = service
 	match service:
 		"report":
+			Tips.show_tip("return")
 			var report: Dictionary = Campaign.state.station.last_return
 			station.show_report(report.get("team", []).filter(func(id): return S.hero(Campaign.state, id) != null and S.hero(Campaign.state, id).alive))
 		"train":
@@ -187,6 +331,9 @@ func open_service(service: String) -> void:
 func close_panel() -> void:
 	current = ""
 	_panel.visible = false
+	_prep_selected = -1
+	if _prep != null:
+		_prep.visible = false
 	station.clear_lineup()
 	_lineup_signature = ""
 	station.focus_overview()
@@ -221,6 +368,12 @@ func open_departure() -> void:
 
 
 func _process(_delta: float) -> void:
+	var positions: Dictionary = station.room_screen_positions() if current == "" and not _map.visible else {}
+	for id in _room_labels:
+		var button: Button = _room_labels[id]
+		button.visible = positions.has(id)
+		if button.visible:
+			button.position = positions[id] - Vector2(button.size.x * 0.5, 0)
 	var showing := current == "report" or current == "departure"
 	_tags.visible = showing
 	if not showing:
@@ -298,6 +451,15 @@ func _act(error: String, success: String = "") -> void:
 func _show(key: String) -> void:
 	for child in _body.get_children():
 		child.queue_free()
+	var c: Dictionary = Campaign.state
+	if key == S.PREPARATION and S.preparation_block(c) == "" and S.room_level(c, S.PREPARATION) >= 1:
+		_panel.visible = false
+		_menu.visible = false
+		_prep_drawer(c)
+		Tips.show_tip("preparation")
+		return
+	if _prep != null:
+		_prep.visible = false
 	_panel.visible = true
 	match key:
 		"report":
@@ -311,7 +473,9 @@ func _show(key: String) -> void:
 		"options":
 			var options := AHOptionsPanel.new()
 			options.width = 620
+			options.allow_new_campaign = true
 			options.closed.connect(close_panel)
+			options.new_campaign_requested.connect(func(): open_service("new_campaign"))
 			_body.add_child(options)
 		_:
 			_room(key)
@@ -587,6 +751,290 @@ func _swap(a: int, b: int) -> void:
 	var keep = _draft.team[a]
 	_draft.team[a] = _draft.team[b]
 	_draft.team[b] = keep
+	refresh()
+
+
+# ---------------------------------------------------------------- Preparação numa tela (a proposta de UX, tela 4)
+
+## A arte de um herói (os recrutas usam a do fundador da mesma classe).
+static func _hero_art(entry: Dictionary) -> Dictionary:
+	var art := AHCombatArena.hero_art_of(entry.id)
+	if art.is_empty():
+		for hero_id in ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]:
+			if hero_id.contains("_%s_" % entry.class_id):
+				art = AHCombatArena.hero_art_of(hero_id)
+	return art.get("idle", {})
+
+
+## A gaveta da Preparação: os quatro cartões no sentido da luta (o fundo à esquerda, a frente à direita), com rosto,
+## papel, vida, as habilidades que funcionam daquela posição e os avisos; clicar em dois troca; os de fora ficam embaixo.
+## À direita, a missão, o foco, a comida e Partir com o nome do destino.
+func _prep_drawer(c: Dictionary) -> void:
+	if _draft.is_empty():
+		_reset_draft()
+	if not S.phase_unlocked(c, _draft.phase):
+		_reset_draft()
+	if _prep == null:
+		_prep = PanelContainer.new()
+		_prep.add_theme_stylebox_override("panel", U.panel(0.94))
+		_prep.position = Vector2(24, 512)
+		_prep.size = Vector2(1872, 548)
+		_tags.add_sibling(_prep)
+	_prep.visible = true
+	for child in _prep.get_children():
+		_prep.remove_child(child)
+		child.queue_free()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 22)
+	_prep.add_child(row)
+
+	var lineup := VBoxContainer.new()
+	lineup.add_theme_constant_override("separation", 10)
+	lineup.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(lineup)
+	var head := HBoxContainer.new()
+	lineup.add_child(head)
+	var back := Button.new()
+	back.text = "‹ Vista geral"
+	back.custom_minimum_size = Vector2(0, 36)
+	H.style_button(back)
+	back.pressed.connect(close_panel)
+	head.add_child(back)
+	var title := U.label("   EQUIPE · CLIQUE EM DOIS PARA TROCAR", 15, U.COPPER, "bold")
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(title)
+	head.add_child(U.label("← fundo · frente →", 16, U.MUTED))
+	var slots := HBoxContainer.new()
+	slots.add_theme_constant_override("separation", 12)
+	lineup.add_child(slots)
+	for rank in [4, 3, 2, 1]:
+		slots.add_child(_prep_slot(c, rank))
+	# Os de fora da equipe: com um cartão escolhido, clicar troca.
+	var bench: Array = S.living(c).filter(func(h): return not _draft.team.has(h.id))
+	if not bench.is_empty():
+		var bench_row := HBoxContainer.new()
+		bench_row.add_theme_constant_override("separation", 8)
+		lineup.add_child(bench_row)
+		bench_row.add_child(U.label("Fora da equipe:", 17, U.MUTED))
+		for entry in bench:
+			var id: String = entry.id
+			var button := Button.new()
+			button.text = "%s · %d/%d" % [entry.display_name, entry.hp, entry.max_hp]
+			button.custom_minimum_size = Vector2(0, 40)
+			H.style_button(button)
+			button.disabled = _prep_selected < 0
+			button.tooltip_text = "Escolha um cartão da equipe e clique aqui para trocar."
+			button.pressed.connect(func(): _prep_bench(id))
+			bench_row.add_child(button)
+	var warning := _team_warning(c)
+	if warning != "":
+		lineup.add_child(U.label(warning, 17, U.GOLD))
+
+	var side := VBoxContainer.new()
+	side.add_theme_constant_override("separation", 10)
+	side.custom_minimum_size = Vector2(440, 0)
+	row.add_child(side)
+	var mission := J.phase(_draft.phase)
+	var place := AHScenarioWorld.display_of(mission.transit) + " e " + AHScenarioWorld.display_of(mission.map) if mission.transit != "" else AHScenarioWorld.display_of(mission.map)
+	var mission_box := _side_box(side, "MISSÃO")
+	mission_box.add_child(U.label(mission.name, 24, U.TEXT, "bold"))
+	mission_box.add_child(U.label("Fase %d · %s · nível %d+ · %s" % [J.PHASES.map(func(p): return p.id).find(mission.id) + 1, J.DIFFICULTY_NAMES[mission.difficulty], mission.level, place], 16, U.MUTED))
+	var map_button := Button.new()
+	map_button.text = "Escolher no mapa"
+	map_button.custom_minimum_size = Vector2(0, 34)
+	H.style_button(map_button)
+	map_button.pressed.connect(func(): _map.open(_draft.phase))
+	mission_box.add_child(map_button)
+	var focus_box := _side_box(side, "FOCO DA ROTA")
+	var chips := HFlowContainer.new()
+	chips.add_theme_constant_override("h_separation", 6)
+	chips.add_theme_constant_override("v_separation", 6)
+	focus_box.add_child(chips)
+	var recommended := S.focus_recommended(c)
+	for focus_id in [""] + S.FOCI.map(func(f): return f.id):
+		if not S.focus_available(c, focus_id):
+			continue
+		var id: String = focus_id
+		var chip := Button.new()
+		chip.text = S.focus_label(id) + (" ★" if id == recommended else "")
+		chip.tooltip_text = (S.focus_reward_text(id) if id != "" else "Sem objetivo extra.") + (" · recomendado" if id == recommended else "")
+		chip.custom_minimum_size = Vector2(0, 34)
+		H.style_button(chip)
+		chip.add_theme_font_size_override("font_size", 17)
+		if _draft.focus == id:
+			chip.add_theme_color_override("font_color", U.GOLD)
+			chip.add_theme_stylebox_override("normal", U.panel(0.92, U.GOLD))
+		chip.pressed.connect(func(): _draft.focus = id; refresh())
+		chips.add_child(chip)
+	var reason := U.label(S.focus_reason(c, _draft.focus), 15, U.MUTED)
+	reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	reason.custom_minimum_size = Vector2(400, 0)
+	focus_box.add_child(reason)
+	var food_box := _side_box(side, "COMIDA")
+	var food_row := HBoxContainer.new()
+	food_row.add_theme_constant_override("separation", 8)
+	food_box.add_child(food_row)
+	var food_label := U.label("%d grátis + %d extras" % [J.FREE_FOOD, _draft.extra], 20, U.TEXT, "bold")
+	food_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	food_row.add_child(food_label)
+	_button("−", func(): _draft.extra = maxi(0, _draft.extra - 1); refresh(), _draft.extra > 0, food_row)
+	_button("+", func(): _draft.extra = mini(J.MAX_FOOD - J.FREE_FOOD, _draft.extra + 1); refresh(),
+		_draft.extra < J.MAX_FOOD - J.FREE_FOOD and (_draft.extra + 1) * S.FOOD_COST <= S.quantity(c, "seeds"), food_row)
+	food_box.add_child(U.label("%d sementes · cura na Mochila e no acampamento" % (_draft.extra * S.FOOD_COST), 15, U.MUTED))
+	var go := Button.new()
+	go.text = "Partir · %s" % mission.name
+	go.custom_minimum_size = Vector2(0, 56)
+	H.style_button(go, U.GOLD)
+	var gold := StyleBoxFlat.new()
+	gold.bg_color = Color("d9ad62")
+	gold.set_corner_radius_all(5)
+	go.add_theme_stylebox_override("normal", gold)
+	go.add_theme_stylebox_override("focus", gold)
+	var hover := gold.duplicate()
+	hover.bg_color = Color("f0cf8a")
+	go.add_theme_stylebox_override("hover", hover)
+	go.add_theme_color_override("font_color", U.INK)
+	go.add_theme_color_override("font_hover_color", U.INK)
+	go.add_theme_font_override("font", U.font("bold"))
+	go.add_theme_font_size_override("font_size", 22)
+	go.pressed.connect(_depart)
+	side.add_child(go)
+
+
+func _side_box(parent: Container, title: String) -> VBoxContainer:
+	var box := PanelContainer.new()
+	var style := U.panel(0.7, Color(U.COPPER, 0.35), 1)
+	box.add_theme_stylebox_override("panel", style)
+	parent.add_child(box)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 5)
+	box.add_child(column)
+	column.add_child(U.label(title, 14, U.COPPER, "bold"))
+	return column
+
+
+## Um cartão da fila: posição, rosto, papel, vida, as habilidades (apagadas as que não saem dali) e o aviso.
+func _prep_slot(c: Dictionary, rank: int) -> Button:
+	var hero_id: String = _draft.team[rank - 1] if rank - 1 < _draft.team.size() else ""
+	var entry = S.hero(c, hero_id)
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(318, 250)
+	H.style_button(button)
+	var chosen := _prep_selected == rank - 1
+	if chosen:
+		button.add_theme_stylebox_override("normal", U.panel(0.95, U.GOLD, 3))
+	button.pressed.connect(func(): _prep_click(rank - 1))
+	var box := VBoxContainer.new()
+	box.set_anchors_preset(Control.PRESET_FULL_RECT)
+	box.offset_left = 12
+	box.offset_top = 10
+	box.offset_right = -12
+	box.offset_bottom = -10
+	box.add_theme_constant_override("separation", 6)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(box)
+	var rank_label := U.label(str(rank), 40, Color(U.GOLD, 0.35), "display")
+	rank_label.position = Vector2(270, 2)
+	button.add_child(rank_label)
+	if entry == null:
+		box.add_child(U.label("Posição vazia", 20, U.MUTED))
+		return button
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 10)
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(top)
+	var art := _hero_art(entry)
+	if not art.is_empty():
+		top.add_child(U.portrait(art, 72, U.GOLD if chosen else Color(1, 1, 1, 0.35)))
+	var names := VBoxContainer.new()
+	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(names)
+	names.add_child(U.label(entry.display_name, 26, U.TEXT, "display"))
+	var hero_class = GameData.row("classes", entry.class_id)
+	names.add_child(U.label(hero_class.get("Role", "") if hero_class else "", 15, U.MUTED))
+	var hp := U.bar(Color(0.8, 0.27, 0.22), 10)
+	hp.max_value = entry.max_hp
+	hp.value = entry.hp
+	box.add_child(hp)
+	box.add_child(U.label("Vida %d/%d" % [entry.hp, entry.max_hp], 16, U.TEXT))
+	var icons := HBoxContainer.new()
+	icons.add_theme_constant_override("separation", 6)
+	icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(icons)
+	var usable := 0
+	var abilities: Array = hero_class.get("AbilityIds", []) if hero_class else []
+	for ability_id in abilities:
+		var ability = GameData.combat.abilities.get(ability_id)
+		var icon := TextureRect.new()
+		var path := "res://art/combat/icons/%s.webp" % ability_id
+		if ResourceLoader.exists(path):
+			icon.texture = load(path)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(52, 52)
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var works: bool = ability != null and ability.OriginRanks.has(rank)
+		if works:
+			usable += 1
+		else:
+			icon.modulate = Color(0.3, 0.3, 0.32)
+		icons.add_child(icon)
+	var note := ""
+	var good := true
+	if S.attacks_from_rank(entry.class_id, rank).is_empty():
+		note = "! Sem ataque desta posição"
+		good = false
+	elif entry.hp < entry.max_hp * 0.5:
+		note = "! Vida baixa: leve comida ou curativos"
+		good = false
+	elif entry.trauma:
+		note = "! Com trauma: começa com instinto alto"
+		good = false
+	else:
+		note = "✓ %d de %d habilidades daqui" % [usable, abilities.size()]
+	var note_label := U.label(note, 16, U.OK if good else U.DANGER, "bold")
+	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note_label.custom_minimum_size = Vector2(290, 0)
+	box.add_child(note_label)
+	if not good:
+		button.add_theme_stylebox_override("normal", U.panel(0.95, U.DANGER if not chosen else U.GOLD, 2 if not chosen else 3))
+	return button
+
+
+## O aviso da equipe inteira: ninguém cura (leve curativos).
+func _team_warning(c: Dictionary) -> String:
+	for hero_id in _draft.team:
+		var entry = S.hero(c, hero_id)
+		if entry == null:
+			continue
+		var hero_class = GameData.row("classes", entry.class_id)
+		for ability_id in (hero_class.get("AbilityIds", []) if hero_class else []):
+			var ability = GameData.combat.abilities.get(ability_id)
+			if ability != null and ability.HealRange.Max > 0:
+				return ""
+	return "Ninguém na equipe cura em combate: leve curativos e comida."
+
+
+func _prep_click(index: int) -> void:
+	if _prep_selected < 0:
+		_prep_selected = index
+	elif _prep_selected == index:
+		_prep_selected = -1
+	else:
+		_swap(_prep_selected, index)
+		_prep_selected = -1
+	refresh()
+
+
+func _prep_bench(hero_id: String) -> void:
+	if _prep_selected < 0:
+		return
+	if _prep_selected < _draft.team.size():
+		_draft.team[_prep_selected] = hero_id
+	else:
+		_draft.team.append(hero_id)
+	_prep_selected = -1
 	refresh()
 
 

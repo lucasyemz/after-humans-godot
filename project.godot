@@ -21,6 +21,7 @@ Campaign="*res://scripts/campaign/campaign_service.gd"
 GameFlow="*res://scripts/flow/game_flow.gd"
 Settings="*res://scripts/core/settings_service.gd"
 Sound="*res://scripts/core/sound_service.gd"
+Tips="*res://scripts/ui/tips_service.gd"
 
 [display]
 

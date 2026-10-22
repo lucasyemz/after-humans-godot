@@ -130,6 +130,7 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 ## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
 func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
 	session = AHCombatSession.create(heroes, enemies, opening, seed_value)
+	Tips.show_tip("combat")
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
 	if speed <= 2.0:
 		speed = float(clampi(int(Campaign.state.get("settings", {}).get("battle_speed", 1)), 1, 2))
@@ -303,6 +304,8 @@ func _play_beat(beat: Dictionary) -> void:
 		_:
 			await _show_events(events)
 	await _settle()
+	if session.state.player_team.any(func(u): return u.instinct >= 100):
+		Tips.show_tip("instinct")
 	# Crise de instinto (como na Unreal): um lance só dela para cada um que entrou em crise e segue de pé.
 	if beat.kind != "crisis":
 		for event in events:

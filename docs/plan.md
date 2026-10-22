@@ -341,6 +341,19 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
     rosto, losangos sobre o que dá para usar, o aviso de interação no próprio objeto, o aviso da patrulha à frente na
     borda e só as teclas do jogo, que somem depois de um tempo andando.
 
+- **Nova HUD, etapa 2 (aprender jogando):**
+  - Dicas da primeira vez (`Tips`): Estação, Preparação, explorar, patrulha, combate, instinto, busca, Mochila, guardião
+    vencido e a volta. Uma vez cada, num cartão que não para o jogo; "Desligar dicas" e "Mostrar as dicas de novo" nas
+    Opções; o que já foi visto fica em `user://tips.cfg`. Nas capturas e nos scripts de teste ficam desligadas e nada é
+    gravado (`AH_TIPS_QA=1` mostra só na memória).
+  - Estação: o cartão "Próximo passo" (`AHStationRules.next_step`, com teste: relatório, noite, trem, cômodo que já dá
+    para recuperar, o que falta para o próximo e a próxima fase) com o botão principal, as pendências, os recursos com
+    ícone e dica e os cômodos com nome e estado clicáveis no próprio corte; a lista de doze botões saiu e a Nova
+    campanha foi para dentro das Opções.
+  - Preparação numa tela: os quatro cartões no sentido da luta (rosto, papel, vida, as habilidades que saem daquela
+    posição, os avisos), troca com dois cliques, os de fora da equipe, o aviso de quem cura, e à direita a missão, o
+    foco, a comida e "Partir · destino".
+
 **Pendências da 5:**
 - Celular: controles de toque para andar e interagir, HUD maior em tela pequena e um pacote mais leve (120 MB pesa em
   dados móveis); falta testar num aparelho de verdade.

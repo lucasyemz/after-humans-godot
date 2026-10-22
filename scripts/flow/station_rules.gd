@@ -818,6 +818,48 @@ static func phase_unlocked(campaign: Dictionary, phase_id: String) -> bool:
 	return false
 
 
+## O que a Estação pede primeiro (o cartão "Próximo passo" da proposta de UX): o relatório da volta, a noite, o trem, um
+## cômodo que já dá para recuperar, o que falta para o próximo e, por fim, a próxima fase. Devolve {title, text, action,
+## button, room}; action: "report", "dormitory", "train", "room" ou "depart".
+static func next_step(campaign: Dictionary) -> Dictionary:
+	var report: Dictionary = campaign.station.get("last_return", {})
+	if not report.is_empty() and not report.get("seen", false):
+		return {"title": "Ver o que a equipe trouxe", "text": "O relatório da última expedição está pronto: o achado, quem voltou e como a Estação passou o ciclo.",
+			"action": "report", "button": "Ver o relatório", "room": ""}
+	if campaign.night.phase != "none":
+		return {"title": "Passar a noite", "text": "A equipe descansa no Dormitório: escolha quem vigia e durma. Quem dorme come e recupera vida e instinto.",
+			"action": "dormitory", "button": "Ir ao Dormitório", "room": DORMITORY}
+	if visit_pending(campaign):
+		return {"title": "Alguém espera na plataforma", "text": "Um candidato chegou de trem. Veja o que ele traz para a Estação e decida se fica.",
+			"action": "train", "button": "Ir à plataforma", "room": ""}
+	var missing := {}
+	for room_id in NEXT_ROOMS:
+		var cost := next_level_cost(campaign, room_id)
+		if cost.is_empty():
+			continue
+		var level := room_level(campaign, room_id)
+		var name: String = ROOM_ARTICLE.get(room_id, "") + room_def(room_id).name
+		if upgrade_block(campaign, room_id) == "":
+			return {"title": "%s %s" % ["Recuperar" if level == 0 else "Melhorar", name], "text": "%s Custa %s." % [room_benefit(room_id, level + 1), cost_text(cost)],
+				"action": "room", "button": "Ver %s" % name, "room": room_id}
+		if missing.is_empty():
+			missing = {"title": "Trazer %s para %s %s" % [cost_text(cost), "reabrir" if level == 0 else "melhorar", name],
+				"text": "%s As jornadas trazem sucata e fragmentos das buscas." % room_benefit(room_id, level + 1), "action": "depart",
+				"button": "Preparar expedição", "room": room_id}
+	if not missing.is_empty():
+		return missing
+	for info in AHJourneyRules.PHASES:
+		if phase_unlocked(campaign, info.id) and not campaign.completed_phases.has(info.id):
+			return {"title": "Partir para %s" % info.name, "text": info.description, "action": "depart", "button": "Preparar expedição", "room": ""}
+	return {"title": "Voltar às ruas", "text": "Todas as fases foram concluídas. Dá para jogar qualquer uma de novo pelo mapa.", "action": "depart",
+		"button": "Preparar expedição", "room": ""}
+
+
+## A ordem em que o próximo passo sugere recuperar os cômodos, e o artigo de cada um no texto.
+const NEXT_ROOMS := [FORGE, RESEARCH, DEPOT]
+const ROOM_ARTICLE := {FORGE: "a ", RESEARCH: "o ", DEPOT: "o "}
+
+
 ## Por que não dá para preparar uma partida agora ("" se dá).
 static func preparation_block(campaign: Dictionary) -> String:
 	if campaign.night.phase != "none":

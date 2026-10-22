@@ -264,6 +264,7 @@ func _ready() -> void:
 	corridor = AHStreetCorridor.new()
 	add_child(corridor)
 	corridor.setup(self, exploration_hud)
+	Tips.show_tip("explore")
 
 
 ## Opção da campanha: sem relâmpagos nem poeira no ar.

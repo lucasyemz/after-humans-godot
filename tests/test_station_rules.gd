@@ -19,7 +19,33 @@ func run(t) -> void:
 	_shelter(t)
 	_defeat_and_migration(t)
 	_loop(t)
+	_next_step(t)
 	_save_round_trip(t)
+
+
+## O próximo passo da Estação: na ordem do que pede atenção (relatório, noite, trem, cômodo, sucata, fase).
+func _next_step(t) -> void:
+	var c := _campaign(9)
+	var first := S.next_step(c)
+	t.equal(first.action, "depart", "campanha nova: partir")
+	t.check(first.title.contains("Forja"), "o primeiro passo é trazer sucata para a Forja")
+	c.inventory.scrap = 10
+	var afford := S.next_step(c)
+	t.equal([afford.action, afford.room], ["room", S.FORGE], "com sucata: recuperar a Forja")
+	c.station.rooms[S.FORGE] = 2
+	c.station.rooms[S.RESEARCH] = 1
+	c.station.rooms[S.DEPOT] = 2
+	t.check(S.next_step(c).title.begins_with("Partir para"), "tudo recuperado: a próxima fase")
+	c.station.train.phase = "waiting"
+	c.station.train.candidate_id = S.DORA
+	var train := S.next_step(c)
+	t.equal(train.action, "train", "o trem vem antes")
+	c.night.phase = "planning"
+	t.equal(S.next_step(c).action, "dormitory", "a noite vem antes do trem")
+	c.station.last_return = {"result": "victory", "seen": false}
+	t.equal(S.next_step(c).action, "report", "o relatório vem antes de tudo")
+	c.station.last_return.seen = true
+	t.equal(S.next_step(c).action, "dormitory", "visto o relatório, a noite")
 
 
 func _campaign(seed_value: int = 5) -> Dictionary:

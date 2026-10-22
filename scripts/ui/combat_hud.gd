@@ -731,6 +731,7 @@ func _open_bag() -> void:
 	if _bag != null:
 		return
 	_hide_tip()
+	Tips.show_tip("bag")
 	Sound.play("res://audio/ui/bag_open.ogg")
 	_bag = PanelContainer.new()
 	_bag.add_theme_stylebox_override("panel", S.panel(0.96))

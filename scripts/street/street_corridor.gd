@@ -420,6 +420,7 @@ func _sight_frame(index: int, delta: float, leader: Vector3) -> bool:
 	var front: AHSpriteCard = guard.cards[0]
 	var strength := _sight_strength(front, leader)
 	if strength > 0.0:
+		Tips.show_tip("patrol")
 		guard.meter = minf(1.0, guard.meter + GAIN_PER_SECOND * strength * delta)
 		guard.unseen = 0.0
 	else:
@@ -549,6 +550,8 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 		action = _retreat
 		where = null
 	hud.show_prompt(text, where)
+	if text.begins_with("E  Vasculhar"):
+		Tips.show_tip("search")
 	_action = action
 	hud.set_markers(_marker_points(campaign, route, leader, where))
 
@@ -667,6 +670,7 @@ func open_inventory() -> void:
 		return
 	Sound.play("res://audio/ui/bag_open.ogg")
 	hud.show_inventory()
+	Tips.show_tip("bag")
 
 
 func _new_campaign() -> void:
@@ -939,6 +943,7 @@ func _on_combat_finished(result: String) -> void:
 			guards[_fight.index].mark.queue_free()
 			guards.erase(_fight.index)
 		if campaign.session.expedition.objective_completed and _fight.boss:
+			Tips.show_tip("boss_down")
 			if street.scenario:
 				hud.toast("O guardião caiu. Vasculhe o que restou ou volte à Estação (E).", 6.0)
 			else:

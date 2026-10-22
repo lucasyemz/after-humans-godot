@@ -5,6 +5,8 @@ class_name AHOptionsPanel
 extends VBoxContainer
 
 signal closed
+## Na Estação, Opções também leva à Nova campanha (que saiu do menu dos cômodos).
+signal new_campaign_requested
 
 const H = preload("res://scripts/ui/combat_hud.gd")
 ## As ações do jogo e o nome delas na tela (as de teste ficam de fora).
@@ -15,6 +17,7 @@ const PAD_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "Sta
 	JOY_BUTTON_DPAD_UP: "↑", JOY_BUTTON_DPAD_DOWN: "↓", JOY_BUTTON_DPAD_LEFT: "←", JOY_BUTTON_DPAD_RIGHT: "→"}
 
 var width := 600.0
+var allow_new_campaign := false
 
 
 func _ready() -> void:
@@ -59,6 +62,17 @@ func _ready() -> void:
 		Campaign.save()
 		Settings.changed.emit())
 
+	_toggle("Dicas da primeira vez", Tips.enabled, func(on): Tips.set_enabled(on))
+	var again := Button.new()
+	again.text = "Mostrar as dicas de novo"
+	again.custom_minimum_size = Vector2(0, 42)
+	H.style_button(again)
+	again.pressed.connect(func():
+		Tips.reset()
+		Tips.set_enabled(true)
+		_rebuild())
+	add_child(again)
+
 	_section("Controles")
 	for spec in CONTROLS:
 		var row := HBoxContainer.new()
@@ -68,6 +82,15 @@ func _ready() -> void:
 		row.add_child(H.make_label(_keys(spec[0]), 18, H.GOLD))
 		add_child(row)
 	add_child(H.make_label("Mouse: clique nos botões e nos alvos da luta.", 16, H.MUTED))
+
+	if allow_new_campaign:
+		_section("Campanha")
+		var fresh := Button.new()
+		fresh.text = "Nova campanha…"
+		fresh.custom_minimum_size = Vector2(0, 44)
+		H.style_button(fresh, AHUiStyle.DANGER)
+		fresh.pressed.connect(func(): new_campaign_requested.emit())
+		add_child(fresh)
 
 	var close := Button.new()
 	close.text = "Fechar"
