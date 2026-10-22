@@ -814,10 +814,12 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 	_tip_box.add_child(body)
 	if not option.usable:
 		_tip_box.add_child(S.label(option.reason, S.MIN_TEXT, Color(1.0, 0.6, 0.5)))
+	# Os termos a explicar, cada um uma vez só: os estados (dos alvos, ao mirar; senão, do herói da vez e dos inimigos) e
+	# os que o texto da habilidade cita.
+	var terms: Array = []
 	if rank > 0:
 		var ids: Array = session.hit_ids(_actor_id, option.id, rank)
 		var hits := PackedStringArray()
-		var status_tips := PackedStringArray()
 		for id in ids:
 			var unit := session.state.find_unit(id)
 			if unit == null:
@@ -826,30 +828,54 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage").Max >= unit.hp:
 				note += " · pode cair"
 			# Os estados do alvo por extenso: no foco, a dica faz o papel da dica do mouse sobre os ícones (#30).
-			var marks := S.statuses(unit)
-			if not marks.is_empty():
-				note += " · " + ", ".join(marks.map(func(e): return e[0]))
-				for entry in marks:
-					status_tips.append(S.status_tip(entry))
+			note += _status_words(unit, terms)
 			hits.append(note)
 		if not hits.is_empty():
-			var who := S.label("Atinge: " + "; ".join(hits), S.MIN_TEXT, S.DANGER if option.enemy_side else S.OK, "bold")
-			who.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			who.custom_minimum_size = Vector2(430, 0)
-			_tip_box.add_child(who)
-		for line in status_tips:
-			var gloss := S.label(line, 16, S.VIOLET)
-			gloss.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			gloss.custom_minimum_size = Vector2(430, 0)
-			_tip_box.add_child(gloss)
-	# Os termos que aparecem no texto, explicados.
+			_tip_line("Atinge: " + "; ".join(hits), S.MIN_TEXT, S.DANGER if option.enemy_side else S.OK, "bold")
+	else:
+		# Sem mirar (o cartão com foco): os estados de quem está na luta, para quem joga no teclado, no controle ou no toque.
+		var actor := session.state.find_unit(_actor_id)
+		var mine := _status_words(actor, terms) if actor != null else ""
+		if mine != "":
+			_tip_line("Você:" + mine.trim_prefix(" ·"), 17, TEXT)
+		var others := PackedStringArray()
+		for enemy in session.state.enemy_team:
+			if enemy.hp > 0:
+				var words := _status_words(enemy, terms)
+				if words != "":
+					others.append(enemy.display_name + ":" + words.trim_prefix(" ·"))
+		if not others.is_empty():
+			_tip_line("; ".join(others), 17, MUTED)
 	for word in S.GLOSSARY:
-		if text.contains(word) or text.to_lower().contains(word.to_lower().substr(0, 6)):
-			var gloss := S.label("%s: %s" % [word, S.GLOSSARY[word]], 16, S.VIOLET)
-			gloss.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			gloss.custom_minimum_size = Vector2(430, 0)
-			_tip_box.add_child(gloss)
+		if not terms.has(word) and (text.contains(word) or text.to_lower().contains(word.to_lower().substr(0, 6))):
+			terms.append(word)
+	var glosses: Array = []
+	for word in terms:
+		glosses.append(_tip_line("%s: %s" % [word, S.GLOSSARY.get(word, "")], 16, S.VIOLET))
+	# A dica cabe entre o alto da tela e a doca: o que não couber das explicações sai, de baixo para cima.
+	var room := _dock_top() - 96.0 - 130.0
+	while not glosses.is_empty() and _tip_box.get_combined_minimum_size().y + 24.0 > room:
+		var last: Control = glosses.pop_back()
+		_tip_box.remove_child(last)
+		last.queue_free()
 	_place_tip(button)
+
+
+## " · Sangra 2, Marcado" (vazio sem estados), e os termos de cada estado entram em terms, uma vez só.
+func _status_words(unit: AHCombat.Unit, terms: Array) -> String:
+	var marks := S.statuses(unit)
+	for entry in marks:
+		if not terms.has(entry[4]):
+			terms.append(entry[4])
+	return "" if marks.is_empty() else " · " + ", ".join(marks.map(func(e): return e[0]))
+
+
+func _tip_line(text: String, size: int, color: Color, kind: String = "body") -> Label:
+	var line := S.label(text, size, color, kind)
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	line.custom_minimum_size = Vector2(430, 0)
+	_tip_box.add_child(line)
+	return line
 
 
 func _place_tip(button: Control) -> void:

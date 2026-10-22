@@ -58,3 +58,47 @@ func run(t) -> void:
 
 	for name in ["attack", "attack_area", "heal", "block", "move", "stunned", "unknown"]:
 		t.check(S.combat_icon("intent-" + name) != null, "a intenção %s tem ícone" % name)
+	_intents(t)
+
+
+## A regra da intenção: ataque num alvo, em área (mais de um, "e"), escolha entre dois ("ou") é ataque comum; cura,
+## bloqueio, mover e atordoado com o ícone de cada um; sem plano, nada.
+func _intents(t) -> void:
+	var c: Dictionary = Campaign.create_initial(3)
+	var session := AHCombatSession.create(c.roster.slice(0, 4), ["robot", "robot"], false, 7)
+	var hud := AHCombatHud.new()
+	hud.session = session
+	var row := HBoxContainer.new()
+	var icon := TextureRect.new()
+	icon.name = "IntentIcon"
+	row.add_child(icon)
+	var label := Label.new()
+	row.add_child(label)
+	var heroes: Array = session.state.player_team.map(func(u): return u.id)
+	var cases := [
+		[{"kind": "attack", "name": "Golpe", "target_ids": [heroes[0]], "sure": true, "either": false}, "intent-attack.svg", true],
+		[{"kind": "attack", "name": "Varredura", "target_ids": [heroes[0], heroes[1]], "sure": true, "either": false}, "intent-attack_area.svg", true],
+		[{"kind": "attack", "name": "Garra", "target_ids": [heroes[0], heroes[1]], "sure": true, "either": true}, "intent-attack.svg", true],
+		[{"kind": "heal", "name": "Reparo", "target_ids": [], "sure": true, "either": false}, "intent-heal.svg", true],
+		[{"kind": "defend", "name": "Escudo", "target_ids": [], "sure": true, "either": false}, "intent-block.svg", true],
+		[{"kind": "move", "name": "Recuar", "target_ids": [], "sure": true, "either": false}, "intent-move.svg", true],
+		[{"kind": "stunned", "name": "Atordoado", "target_ids": [], "sure": true, "either": false}, "intent-stunned.svg", true],
+		[{"kind": "none", "name": "", "target_ids": [], "sure": true, "either": false}, "", false],
+	]
+	for case in cases:
+		hud._show_intent(label, case[0])
+		var path: String = icon.texture.resource_path if icon.texture != null else ""
+		t.check(icon.visible == case[2] and (not case[2] or path.ends_with(case[1])), "intenção %s (%d alvo(s), ou=%s) → %s" % [
+			case[0].kind, case[0].target_ids.size(), case[0].either, case[1] if case[1] != "" else "sem ícone"])
+	hud._show_intent(label, {"kind": "attack", "name": "Golpe", "target_ids": [heroes[0]], "sure": false, "either": false})
+	t.check(label.text.ends_with(" ?"), "plano incerto leva o ?")
+	# Cada termo uma vez só na dica: dois alvos com os mesmos estados explicam Sangra uma vez.
+	var terms: Array = []
+	var unit: AHCombat.Unit = session.state.enemy_team[0]
+	unit.bleed.duration = 2
+	unit.bleed.magnitude = 1
+	hud._status_words(unit, terms)
+	hud._status_words(unit, terms)
+	t.equal(terms, ["Sangra"], "o termo entra uma vez só")
+	row.free()
+	hud.free()
