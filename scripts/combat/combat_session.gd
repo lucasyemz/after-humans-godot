@@ -277,9 +277,11 @@ func _count(actor_id: String, events: Array) -> void:
 	tally[actor.hero_id] = entry
 
 
-## A luta de uma expedição: a Esperança dela (a pressão de combate com ela baixa) e os laços entre os heróis, que as
-## crises mudam e que valem a expedição inteira (Amizade e rivalidade pedem ±3, de luta em luta).
+## A luta de uma expedição: os treinos da Pesquisa (+1 no dano ou na cura da habilidade treinada), a Esperança dela (a
+## pressão de combate com ela baixa) e os laços entre os heróis, que as crises mudam e que valem a expedição inteira
+## (Amizade e rivalidade pedem ±3, de luta em luta).
 func use_expedition(campaign: Dictionary) -> void:
+	context.researched_skills = Array(campaign.get("researched_skills", [])).duplicate()
 	var expedition = campaign.get("session", {}).get("expedition")
 	if expedition == null:
 		return

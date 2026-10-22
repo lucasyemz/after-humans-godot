@@ -126,6 +126,36 @@ func _expedition_context(t, campaign: Dictionary) -> void:
 	var free := AHCombatSession.create(campaign.duplicate(true).roster, PATROLS[0], false, 5)
 	free.use_expedition({"session": {"expedition": null}})
 	t.equal(free.context.hope, 80, "fora de expedição, a Esperança padrão")
+	_researched(t, campaign)
+
+
+## Os treinos da Pesquisa chegam à luta e dão +1 no dano da habilidade treinada (o mínimo e o máximo sobem um).
+func _researched(t, campaign: Dictionary) -> void:
+	var copy: Dictionary = campaign.duplicate(true)
+	AHJourneyRules.start_expedition(copy, "fase_1", 77)
+	copy.researched_skills = ["gato_corte_fase"]
+	var session := AHCombatSession.create(copy.roster, PATROLS[0], false, 5)
+	session.use_expedition(copy)
+	t.equal(session.context.researched_skills, ["gato_corte_fase"], "a luta recebe os treinos da Pesquisa")
+	copy.researched_skills.append("cao_punho_sucata")
+	t.equal(session.context.researched_skills, ["gato_corte_fase"], "a luta guarda uma cópia (a campanha não muda a luta no meio)")
+	# O mesmo golpe, nas mesmas sementes, com e sem o treino: com ele, o dano nunca é menor e chega a mais.
+	var hits := {false: [], true: []}
+	for trained in [false, true]:
+		for seed_value in range(30):
+			var fight := AHCombatSession.create(campaign.duplicate(true).roster, ["robot_fungo"], false, seed_value)
+			fight.context.researched_skills = ["gato_corte_fase"] if trained else []
+			var nick = fight.state.player_team.filter(func(u): return u.hero_id == "hero_gato_nick")[0]
+			var enemy = fight.state.enemy_team[0]
+			enemy.tokens.dodge = 0
+			enemy.tokens.block = 0
+			fight.state.current_turn_unit_id = nick.id
+			var before: int = enemy.hp
+			fight.engine.execute_player_ability(nick.id, "gato_corte_fase", enemy.rank)
+			hits[trained].append(before - fight.state.find_unit(enemy.id).hp)
+	var sum_plain: int = hits[false].reduce(func(a, b): return a + b, 0)
+	var sum_trained: int = hits[true].reduce(func(a, b): return a + b, 0)
+	t.check(sum_trained > sum_plain, "o treino aumenta o dano do Corte de Fase (%d contra %d em 30 golpes)" % [sum_trained, sum_plain])
 
 
 ## O que cada herói fez na luta soma na expedição (o destaque do relatório da volta).

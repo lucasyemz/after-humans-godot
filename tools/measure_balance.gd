@@ -4,8 +4,7 @@
 ## Equipe: os quatro fundadores. --gear diz o que eles levam (relíquias e treinos da Pesquisa):
 ##   none (padrão: como saem da campanha nova) · typical (o progresso suposto de cada fase, em GEAR_TYPICAL) · max (as
 ##   quatro relíquias e os quatro treinos em qualquer fase).
-## A luta do jogo não lê os treinos pesquisados (campaign.researched_skills não chega a context.researched_skills; só a
-## paridade preenche). --wire-research simula essa ligação, para medir o que o treino daria.
+## Os treinos pesquisados valem na luta (use_expedition leva campaign.researched_skills para o contexto, desde 22/10).
 ## Três medidas por fase:
 ## - luta a luta, cada uma numa cópia limpa da expedição (os quatro vivos e de vida cheia): vitórias, rodadas e a vida
 ##   que sobra;
@@ -43,7 +42,6 @@ var seeds := 40
 var policy := "auto"
 var option := "base"
 var gear := "none"
-var wire_research := false
 var _rng := RandomNumberGenerator.new()
 ## Ampolas da Íris usadas fora da luta nas jornadas com cuidados da fase (mostra o efeito do lesscare).
 var _ampoules := 0
@@ -71,8 +69,6 @@ func _run() -> void:
 			option = arg.trim_prefix("--option=")
 		elif arg.begins_with("--gear="):
 			gear = arg.trim_prefix("--gear=")
-		elif arg == "--wire-research":
-			wire_research = true
 	if not POLICIES.has(policy) or not OPTIONS.has(option) or not GEARS.has(gear):
 		push_error("Política (%s), opção (%s) ou gear (%s) desconhecido." % [" | ".join(POLICIES), " | ".join(OPTIONS), " | ".join(GEARS)])
 		quit(1)
@@ -82,8 +78,7 @@ func _run() -> void:
 		team_text = "progresso suposto (relíquias/treinos) " + ", ".join(PHASES.map(func(id): return "%s %d/%d" % [id, GEAR_TYPICAL[id][0], GEAR_TYPICAL[id][1]]))
 	elif gear == "max":
 		team_text = "as 4 relíquias e os 4 treinos"
-	print("política=%s opção=%s gear=%s sementes=%d · %s · treinos %s" % [policy, option, gear, seeds, team_text,
-		"ligados na luta (simulado)" if wire_research else "como o jogo está (sem efeito na luta)"])
+	print("política=%s opção=%s gear=%s sementes=%d · %s" % [policy, option, gear, seeds, team_text])
 	print("fase   | luta      | vitórias | rodadas | vida que sobra | jornada com cuidados: termina · voltam | sem cuidados: termina · voltam")
 	for phase_id in PHASES:
 		_measure(phase_id)
@@ -203,8 +198,6 @@ func _fight(campaign: Dictionary, index: int, seed_value: int) -> Dictionary:
 	var enemies: Array = _apply_option(J.corridor_enemies(expedition, index), expedition.corridor.steps[index].type == "boss")
 	var session = Session.create(heroes, enemies, false, seed_value * 131 + index)
 	session.use_expedition(campaign)
-	if wire_research:
-		session.context.researched_skills = campaign.researched_skills.duplicate()
 	# O sorteio da política fraca depende só da luta: as opções comparam as mesmas escolhas.
 	_rng.seed = seed_value * 131 + index
 	var beats := 0
