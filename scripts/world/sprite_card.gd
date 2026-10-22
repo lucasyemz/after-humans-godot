@@ -4,10 +4,10 @@
 class_name AHSpriteCard
 extends MeshInstance3D
 
-## Altura do corpo em metros (do pé ao topo da cabeça na pose parada).
 ## A camada das placas de personagem (além da 1): o preenchimento da luta nos cenários só pega elas.
 const CHARACTER_LAYER := 1 << 19
 
+## Altura do corpo em metros (do pé ao topo da cabeça na pose parada).
 var body_height := 1.8
 var facing := 1.0
 var _quad := QuadMesh.new()

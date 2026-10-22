@@ -1,7 +1,8 @@
 ## O chão da luta nos cenários (#48): no Depósito Inundado a borda da frente do piso (35 cm) cobria os pés de quem
-## luta, porque a câmera da luta é quase reta. Em cada zona dos seis mapas, com a câmera de perto e de longe, nenhuma
-## peça opaca fica entre a câmera e o pé de qualquer posição; o chão só sobe onde precisa (no Depósito) e os outros
-## cenários ficam iguais.
+## luta, porque a câmera da luta é quase reta. Em cada zona dos seis mapas, com a luta inteira dentro da zona e a câmera
+## de perto e de longe, nenhuma peça opaca fica entre a câmera e o pé das oito posições; o chão só sobe onde precisa (no
+## Depósito) e os outros cenários ficam iguais. (A luta perto da ponta da zona, com posições dentro da parede, é outro
+## assunto: o centro da luta não é limitado à zona.)
 extends RefCounted
 
 const MAPS := ["RiverDock", "RootBridge", "SealedShelter", "TriageGate", "FloodedDepot", "SewerDucts"]
@@ -11,11 +12,11 @@ const Arena := preload("res://scripts/combat/combat_arena.gd")
 
 
 func run(t) -> void:
-	for aspect in [16.0 / 9.0, 4.0 / 3.0, 21.0 / 9.0]:
-		var slope: float = Street.combat_slope_for(aspect)
-		for map in MAPS:
-			var world: AHScenarioWorld = World.new()
-			world.build(map)
+	for map in MAPS:
+		var world: AHScenarioWorld = World.new()
+		world.build(map)
+		for aspect in [16.0 / 9.0, 4.0 / 3.0, 21.0 / 9.0]:
+			var slope: float = Street.combat_slope_for(aspect)
 			for zone_index in world.zones.size():
 				var zone: Dictionary = world.zones[zone_index]
 				var lane: float = (zone.z0 + zone.z1) * 0.5
@@ -28,7 +29,7 @@ func run(t) -> void:
 					t.equal(lift, 0.0, "%s: o chão fica onde está" % name)
 				var covered := _covered(world, zone, lane, lift, aspect)
 				t.check(covered.is_empty(), "%s: os pés das 8 posições aparecem %s" % [name, covered])
-			world.free()
+		world.free()
 	var card := AHSpriteCard.new()
 	t.check(card.layers & AHSpriteCard.CHARACTER_LAYER != 0 and card.layers & 1 != 0, "as placas de personagem ficam na camada do preenchimento da luta")
 	card.free()
