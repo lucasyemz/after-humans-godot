@@ -15,6 +15,7 @@ func run(t) -> void:
 	_return_and_night(t)
 	_civilians(t)
 	_vitals(t)
+	_night_preview(t)
 	_thirst(t)
 	_route_focus(t)
 	_shelter(t)
@@ -358,3 +359,33 @@ func _vitals(t) -> void:
 	var water: Dictionary = S.vitals(c, 4)[1]
 	t.equal(water.warn, S.forecast(c, 4).thirsty, "água avisa quando falta na volta")
 	t.check(water.note.begins_with("! Falta") == water.warn, "a linha da água diz a falta (%s)" % water.note)
+
+
+## A prévia dos cartões do Dormitório é o que a noite faz de verdade: quem come, quanto recupera e o instinto, com um
+## vigia, com comida faltando e com sede.
+func _night_preview(t) -> void:
+	for spec in [[2, "", false], [1, "hero_gato_nick", false], [4, "", true], [0, "hero_cao_bento", false]]:
+		var c: Dictionary = Campaign.create_initial(9)
+		var team: Array = c.roster.slice(0, 4).map(func(h): return h.id)
+		for entry in c.roster:
+			entry.hp = maxi(1, int(entry.max_hp) / 3)
+			entry.instinct = 60
+		c.night.phase = "planning"
+		c.night.number = 1
+		c.night.participants = team
+		c.night.thirsty = spec[2]
+		S.adjust(c, S.SUPPLIES, spec[0] - S.quantity(c, S.SUPPLIES))
+		if spec[1] != "" and team.has(spec[1]):
+			S.set_watch(c, spec[1])
+		var preview := S.night_preview(c)
+		t.equal(preview.needed, team.size() - (1 if c.night.watch_hero_id != "" else 0), "a noite pede um por quem dorme (%s)" % [spec])
+		var before := {}
+		for entry in c.roster:
+			before[entry.id] = [int(entry.hp), int(entry.instinct)]
+		S.resolve_night(c)
+		for row in preview.heroes:
+			var entry = S.hero(c, row.hero_id)
+			var result: Dictionary = c.night.results.filter(func(r): return r.hero_id == row.hero_id)[0]
+			t.check(result.watch == row.watch and result.fed == row.fed, "%s: vigia e comida batem (%s)" % [row.hero_id, spec])
+			t.equal([int(entry.hp) - before[row.hero_id][0], int(entry.instinct) - before[row.hero_id][1]], [row.hp_gain, row.instinct_change],
+				"%s: vida e instinto batem (%s)" % [row.hero_id, spec])

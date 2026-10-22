@@ -378,8 +378,13 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
   - Barra do alto como o cabeçalho do `AHRefugeWidget`: Comida, Água e Energia com o valor e o que acontece na volta
     (falta, acima do Depósito, a noite pendente, salas sem energia), os materiais numa ficha só e a faixa escura atrás
     (`S.vitals`, com teste).
-  - Ainda da Unreal, para depois: os painéis da Forja e do Dormitório em cartões, o metrô Bombardier (CC BY, 260 mil
-    triângulos) no lugar do vagão verde, Ocultar HUD e a navegação por teclado entre os cômodos.
+  - Forja de Relíquias como a da Unreal: a lista com o ícone e o estoque de cada relíquia e, ao lado, a escolhida com o
+    efeito em verde, a descrição, o estoque, a sucata e Fabricar (ou o que falta).
+  - Noite no Dormitório como a da Unreal: um cartão por herói (rosto, vida, instinto, Dormir ou Vigiar e o que a noite
+    rende para ele), os suprimentos pedidos e disponíveis, +1 suprimento e Iniciar descanso. A prévia
+    (`S.night_preview`) tem teste contra o descanso de verdade (com vigia, comida faltando e sede).
+  - Ainda da Unreal, para depois: o metrô Bombardier (CC BY, 260 mil triângulos) no lugar do vagão verde, Ocultar HUD
+    e a navegação por teclado entre os cômodos.
 
 **Pendências da 5:**
 - Celular: ~~controles de toque~~ feitos (`AHTouchControls`: o analógico que aparece onde o dedo encosta na metade

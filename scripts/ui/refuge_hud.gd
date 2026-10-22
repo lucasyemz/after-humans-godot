@@ -38,6 +38,8 @@ var _next := {}
 ## A gaveta da Preparação e o cartão escolhido para trocar (-1: nenhum).
 var _prep: PanelContainer
 var _prep_selected := -1
+## A relíquia escolhida na Forja (a lista à esquerda, o detalhe à direita).
+var _forge_selected := ""
 var _panel: PanelContainer
 var _body: VBoxContainer
 var _feedback: Label
@@ -1290,14 +1292,102 @@ func _depot(c: Dictionary) -> void:
 	_text("Ferramentas: %s" % (", ".join(c.tools) if not c.tools.is_empty() else "nenhuma"))
 
 
+const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
+
+
+## Forja de Relíquias (como a da Unreal): à esquerda as relíquias com o ícone e o estoque; à direita a escolhida, com o
+## efeito, a descrição, o estoque, a sucata e Fabricar (ou o que falta).
 func _forge(c: Dictionary) -> void:
-	_section("Fabricar relíquias (%d sucatas cada)" % S.relic_cost(c))
-	for relic_id in GameData.table("relics"):
+	var ids: Array = GameData.table("relics").keys()
+	if not ids.has(_forge_selected):
+		_forge_selected = ids[0] if not ids.is_empty() else ""
+	_section("Relíquias")
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 14)
+	_body.add_child(columns)
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 8)
+	list.custom_minimum_size = Vector2(250, 0)
+	columns.add_child(list)
+	for relic_id in ids:
 		var relic: Dictionary = GameData.row("relics", relic_id)
 		var id: String = relic_id
-		_text("%s: %s" % [relic.DisplayName, relic.get("Description", "")], 18)
-		_button("Fabricar %s" % relic.DisplayName, func(): _act(S.craft_relic(Campaign.state, id), "%s pronto. Equipe na Sala dos Personagens." % relic.DisplayName),
-			S.quantity(c, "scrap") >= S.relic_cost(c))
+		var chosen := id == _forge_selected
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(250, U.px(72))
+		button.focus_mode = Control.FOCUS_NONE
+		H.style_button(button)
+		if chosen:
+			button.add_theme_stylebox_override("normal", U.panel(0.92, U.GOLD, 2))
+		button.pressed.connect(func():
+			_forge_selected = id
+			_show(current))
+		var row := HBoxContainer.new()
+		row.set_anchors_preset(Control.PRESET_FULL_RECT)
+		row.offset_left = 12
+		row.offset_right = -8
+		row.add_theme_constant_override("separation", 10)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(row)
+		var glyph := _glyph(RELIC_ICONS.get(id, "relic-generic"), 36, U.GOLD if chosen else U.COPPER)
+		glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(glyph)
+		var names := VBoxContainer.new()
+		names.alignment = BoxContainer.ALIGNMENT_CENTER
+		names.add_theme_constant_override("separation", 0)
+		names.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(names)
+		var title := U.label(relic.DisplayName, 18, U.TEXT, "bold")
+		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		title.custom_minimum_size = Vector2(170, 0)
+		names.add_child(title)
+		names.add_child(U.label("Estoque: %d" % c.inventory.relics.count(id), 15, U.MUTED))
+		list.add_child(button)
+	if _forge_selected == "":
+		return
+	var relic: Dictionary = GameData.row("relics", _forge_selected)
+	var detail := PanelContainer.new()
+	detail.add_theme_stylebox_override("panel", U.panel(0.7, Color(U.COPPER, 0.4), 1))
+	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columns.add_child(detail)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	detail.add_child(box)
+	box.add_child(_glyph(RELIC_ICONS.get(_forge_selected, "relic-generic"), 64, U.GOLD))
+	var name_label := U.label(relic.DisplayName, 28, U.TEXT, "bold")
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_label.custom_minimum_size = Vector2(300, 0)
+	box.add_child(name_label)
+	box.add_child(U.label(_relic_effect(relic), 22, U.OK, "bold"))
+	var about := U.label(relic.get("Description", ""), 17, U.MUTED)
+	about.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	about.custom_minimum_size = Vector2(300, 0)
+	box.add_child(about)
+	var cost := S.relic_cost(c)
+	var scrap := S.quantity(c, "scrap")
+	box.add_child(U.label("Em estoque: %d · Sucata: %d" % [c.inventory.relics.count(_forge_selected), scrap], 17, U.TEXT))
+	var id: String = _forge_selected
+	var craft := Button.new()
+	craft.text = "Fabricar · %d sucatas" % cost
+	craft.custom_minimum_size = Vector2(0, 48)
+	craft.disabled = scrap < cost
+	H.style_button(craft, U.GOLD)
+	craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), "%s pronta. Equipe na Sala dos Personagens." % relic.DisplayName))
+	box.add_child(craft)
+	if scrap < cost:
+		box.add_child(U.label("Faltam %d %s" % [cost - scrap, "sucata" if cost - scrap == 1 else "sucatas"], 17, U.DANGER))
+
+
+## O efeito da relíquia em poucas palavras, a partir dos números dela.
+static func _relic_effect(relic: Dictionary) -> String:
+	if int(relic.get("MaxHpBonus", 0)) != 0:
+		return "+%d Vida Máxima" % int(relic.MaxHpBonus)
+	if int(relic.get("SpeedBonus", 0)) != 0:
+		return "+%d Velocidade" % int(relic.SpeedBonus)
+	if int(relic.get("EventInstinctReduction", 0)) != 0:
+		return "−%d Instinto de eventos" % int(relic.EventInstinctReduction)
+	return ""
 
 
 func _research(c: Dictionary) -> void:
@@ -1317,28 +1407,7 @@ func _dormitory(c: Dictionary) -> void:
 	var night: Dictionary = c.night
 	match night.phase:
 		"planning":
-			_section("Noite %d" % night.number)
-			var sleepers: int = night.participants.filter(func(id): return S.hero(c, id) and S.hero(c, id).alive and id != night.watch_hero_id).size()
-			_text("Quem dorme come um suprimento e recupera 35%% da vida e 15 de instinto (sem comida, 15%% e 5). Suprimentos: %d para %d." % [
-				S.quantity(c, S.SUPPLIES), sleepers])
-			if night.thirsty:
-				_text("Faltou água na volta: o descanso rende menos instinto.", 18, Color(1.0, 0.65, 0.5))
-			_section("Vigia")
-			var options: Array = [""] + night.participants
-			for hero_id in options:
-				var entry = S.hero(c, hero_id)
-				if hero_id != "" and (entry == null or not entry.alive):
-					continue
-				var id: String = hero_id
-				var label := "Ninguém de vigia" if id == "" else "%s (Vida %d/%d)" % [entry.display_name, entry.hp, entry.max_hp]
-				var button := _button(("▸ " if night.watch_hero_id == id else "") + label, func(): S.set_watch(Campaign.state, id); station.commit())
-				if night.watch_hero_id == id:
-					button.add_theme_color_override("font_color", H.GOLD)
-			_text("Um vigia não descansa, mas protege os outros dos ruídos da noite.", 17, H.MUTED)
-			_button("Comprar 1 suprimento (%d sementes)" % S.SUPPLY_COST_SEEDS,
-				func(): _act("" if S.buy_supplies(Campaign.state) else "Sementes insuficientes.", "Suprimento comprado."),
-				S.quantity(c, "seeds") >= S.SUPPLY_COST_SEEDS)
-			_button("Dormir", func(): _act("" if S.resolve_night(Campaign.state) else "A noite não pode passar agora."))
+			_night_plan(c)
 		"dawn":
 			_section("Amanhecer")
 			_text(S.night_event_text(c))
@@ -1354,6 +1423,108 @@ func _dormitory(c: Dictionary) -> void:
 					open_service("train"))
 		_:
 			_text("Ninguém precisa descansar agora. Depois de cada expedição, a equipe passa a noite aqui.", 18, H.MUTED)
+
+
+## O planejamento da noite (como o da Unreal): um cartão por herói com rosto, vida e instinto, Dormir ou Vigiar e o que
+## a noite rende para ele; embaixo, quantos suprimentos a noite pede e o botão Iniciar descanso.
+func _night_plan(c: Dictionary) -> void:
+	var night: Dictionary = c.night
+	var preview := S.night_preview(c)
+	var head := HBoxContainer.new()
+	_body.add_child(head)
+	var head_text := VBoxContainer.new()
+	head_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(head_text)
+	head_text.add_child(U.label("NOITE %d" % night.number, 15, U.COPPER, "bold"))
+	var watchers: int = preview.heroes.filter(func(row): return row.watch).size()
+	head_text.add_child(U.label("%d dormindo · %d vigiando" % [preview.heroes.size() - watchers, watchers], 18, U.TEXT, "bold"))
+	var buy := Button.new()
+	buy.text = "+1 suprimento · %d sementes" % S.SUPPLY_COST_SEEDS
+	buy.disabled = S.quantity(c, "seeds") < S.SUPPLY_COST_SEEDS
+	buy.custom_minimum_size = Vector2(0, 42)
+	buy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	H.style_button(buy)
+	buy.pressed.connect(func(): _act("" if S.buy_supplies(Campaign.state) else "Sementes insuficientes.", "Suprimento comprado."))
+	head.add_child(buy)
+	if night.thirsty:
+		_text("Faltou água na volta: o descanso rende menos instinto.", 17, U.DANGER)
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 10)
+	_body.add_child(grid)
+	for row in preview.heroes:
+		grid.add_child(_night_card(c, row, preview.heroes.size() > 1))
+	var short: int = maxi(0, preview.needed - preview.available)
+	_text("Suprimentos: %d %s · %d %s" % [preview.needed, "necessário" if preview.needed == 1 else "necessários", preview.available,
+		"disponível" if preview.available == 1 else "disponíveis"], 18, U.TEXT)
+	if short > 0:
+		_text("Faltam %d: os cartões marcados recuperam menos." % short, 17, U.DANGER)
+	_text("Quem vigia não descansa, mas protege os outros dos ruídos da noite.", 16, U.MUTED)
+	var rest := Button.new()
+	rest.text = "Iniciar descanso"
+	rest.custom_minimum_size = Vector2(0, 54)
+	H.style_button(rest, U.GOLD)
+	rest.add_theme_color_override("font_color", U.GOLD)
+	rest.pressed.connect(func(): _act("" if S.resolve_night(Campaign.state) else "A noite não pode passar agora."))
+	_body.add_child(rest)
+
+
+func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
+	var entry = S.hero(c, row.hero_id)
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", U.panel(0.7, Color(U.COPPER, 0.4) if row.fed or row.watch else Color(U.DANGER, 0.6), 1))
+	card.custom_minimum_size = Vector2(305, 0)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	card.add_child(box)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 8)
+	box.add_child(top)
+	var art := _hero_art(entry)
+	if not art.is_empty():
+		top.add_child(U.portrait(art, 52, Color(1, 1, 1, 0.35)))
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", 2)
+	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(names)
+	names.add_child(U.label(entry.display_name, 20, U.TEXT, "bold"))
+	names.add_child(U.label("Vida %d/%d · Instinto %d" % [entry.hp, entry.max_hp, entry.instinct], 15, U.MUTED))
+	var hp := U.bar(Color(0.8, 0.27, 0.22), 6)
+	hp.max_value = entry.max_hp
+	hp.value = entry.hp
+	names.add_child(hp)
+	var choice := HBoxContainer.new()
+	choice.add_theme_constant_override("separation", 6)
+	box.add_child(choice)
+	var hero_id: String = row.hero_id
+	for spec in [["Dormir", not row.watch], ["Vigiar", row.watch]]:
+		var button := Button.new()
+		button.text = spec[0]
+		button.custom_minimum_size = Vector2(0, 40)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.focus_mode = Control.FOCUS_NONE
+		H.style_button(button)
+		if spec[1]:
+			button.add_theme_stylebox_override("normal", U.panel(0.92, U.GOLD, 2))
+			button.add_theme_color_override("font_color", U.GOLD)
+		var watch: bool = spec[0] == "Vigiar"
+		button.disabled = watch and not can_watch
+		button.pressed.connect(func():
+			if watch != row.watch:
+				S.set_watch(Campaign.state, hero_id if watch else "")
+				station.commit())
+		choice.add_child(button)
+	var outcome := ""
+	if row.watch:
+		outcome = "Vigiando · não descansa e protege dos ruídos"
+	else:
+		outcome = "%s · +%d de vida, %+d de instinto" % ["Alimentado" if row.fed else "Sem alimentação", row.hp_gain, row.instinct_change]
+	var line := U.label(outcome, 15, U.MUTED if row.fed or row.watch else U.DANGER)
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	line.custom_minimum_size = Vector2(280, 0)
+	box.add_child(line)
+	return card
 
 
 # ---------------------------------------------------------------- relatório da volta e trem

@@ -358,7 +358,7 @@ static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
 				f.water_produced, f.water_consumed, f.water_after]},
 		{"id": "power", "label": "ENERGIA", "icon": "lobby-energy", "value": "%d / %d em uso" % [f.power_used, f.power_capacity],
 			"note": ("! %d %s sem energia" % [f.unpowered_rooms.size(), "sala" if f.unpowered_rooms.size() == 1 else "salas"]) if power_short \
-				else "%d livres" % maxi(0, f.power_capacity - f.power_used),
+				else "%d %s" % [maxi(0, f.power_capacity - f.power_used), "livre" if f.power_capacity - f.power_used == 1 else "livres"],
 			"warn": power_short, "tip": "Os cômodos ligados gastam energia; sem ela, param."},
 	]
 
@@ -664,6 +664,31 @@ static func resolve_night(campaign: Dictionary) -> bool:
 		night.event_id = "no_water"
 	night.phase = "dawn"
 	return true
+
+
+## A prévia da noite (os cartões do Dormitório): para cada participante vivo, se vigia, se come e quanto recupera, na
+## mesma ordem e com as mesmas contas de resolve_night. {heroes: [{hero_id, watch, fed, hp_gain, instinct_change}],
+## needed, available}.
+static func night_preview(campaign: Dictionary) -> Dictionary:
+	var night: Dictionary = campaign.night
+	var supplies := quantity(campaign, SUPPLIES)
+	var awake: Array = night.participants.filter(func(id): return hero(campaign, id) != null and hero(campaign, id).alive)
+	var watch_id: String = night.watch_hero_id if awake.size() > 1 and awake.has(night.watch_hero_id) else ""
+	var event_noise: bool = int(night.number) % 2 == 0 and watch_id == ""
+	var out := {"heroes": [], "needed": 0, "available": supplies}
+	for hero_id in awake:
+		var entry = hero(campaign, hero_id)
+		var row := {"hero_id": hero_id, "watch": hero_id == watch_id, "fed": false, "hp_gain": 0, "instinct_change": 0}
+		if not row.watch:
+			out.needed += 1
+			row.fed = supplies > 0
+			supplies -= 1 if row.fed else 0
+			var gain := maxi(1, int(entry.max_hp) * (35 if row.fed else 15) / 100)
+			row.hp_gain = mini(int(entry.max_hp), int(entry.hp) + gain) - int(entry.hp)
+			var change := -(15 if row.fed else 5) + (3 if event_noise else 0) + (THIRST_INSTINCT_PENALTY if night.thirsty else 0)
+			row.instinct_change = clampi(int(entry.instinct) + change, 0, 200) - int(entry.instinct)
+		out.heroes.append(row)
+	return out
 
 
 static func finish_dawn(campaign: Dictionary) -> bool:
