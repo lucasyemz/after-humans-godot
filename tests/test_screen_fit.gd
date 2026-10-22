@@ -34,6 +34,11 @@ func run(context) -> void:
 				_check_screen("%s (texto %d)" % [screen, size])
 				hud.close_panel()
 				await _frames(2)
+			hud.open_map()
+			await _frames(4)
+			_check_screen("mapa de fases (texto %d)" % size)
+			hud._map.visible = false
+			await _frames(2)
 		Settings.set_text_size(0)
 	await _combat_choice()
 	if _tree.current_scene != null:
