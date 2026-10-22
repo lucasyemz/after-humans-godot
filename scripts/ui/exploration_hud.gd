@@ -157,7 +157,7 @@ func _ready() -> void:
 		group.add_theme_constant_override("separation", 5)
 		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		for action in spec[0]:
-			group.add_child(S.key_cap(S.key_name(action)))
+			group.add_child(S.action_cap(action))
 		group.add_child(S.label(spec[1], 17, S.TEXT))
 		_hint.add_child(group)
 	add_child(_hint)
@@ -173,8 +173,8 @@ func _ready() -> void:
 	_finish_button.visible = false
 	_finish_button.pressed.connect(func(): menu_return.emit())
 	add_child(_finish_button)
-	_menu_button = _corner_button("Menu", S.key_name("menu"), Vector2(1716, 974), func(): menu_requested.emit())
-	_corner_button("Mochila", S.key_name("inventory"), Vector2(1524, 974), func(): inventory_requested.emit())
+	_menu_button = _corner_button("Menu", "menu", Vector2(1716, 974), func(): menu_requested.emit())
+	_corner_button("Mochila", "inventory", Vector2(1524, 974), func(): inventory_requested.emit())
 
 	# O aviso também é botão: tocar ou clicar nele usa o que está perto.
 	_prompt = PanelContainer.new()
@@ -202,7 +202,7 @@ func _ready() -> void:
 	add_child(_toast)
 
 
-func _corner_button(text: String, key: String, at: Vector2, action: Callable) -> Button:
+func _corner_button(text: String, key_action: String, at: Vector2, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -210,8 +210,8 @@ func _corner_button(text: String, key: String, at: Vector2, action: Callable) ->
 	button.custom_minimum_size = Vector2(180, 46)
 	H.style_button(button)
 	button.focus_mode = Control.FOCUS_NONE
-	var cap := S.key_cap(key)
-	cap.position = Vector2(180 - 16 - (24 if key.length() == 1 else 44), 9)
+	var cap := S.action_cap(key_action)
+	cap.position = Vector2(180 - 16 - (24 if S.key_name(key_action).length() == 1 else 44), 9)
 	button.add_child(cap)
 	button.pressed.connect(action)
 	add_child(button)
@@ -511,7 +511,23 @@ func set_patrol(where, meter: float, detected: bool) -> void:
 	_patrol_text.add_theme_color_override("font_color", S.DANGER if detected else (S.GOLD if meter > 0.25 else S.MUTED))
 
 
+## Teclado e controle (#5): com um painel aberto (menu, Mochila, evento, escolha, acampamento, resultado), Interagir
+## confirma o botão com foco, além de Enter e do A; Voltar (B, Backspace) fecha o menu, a Mochila e as Opções (os
+## eventos e o resultado pedem uma escolha).
+func _input(event: InputEvent) -> void:
+	if modal_open() and S.press_focused(_modal, event):
+		get_viewport().set_input_as_handled()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if modal_open() and _modal.has_meta("menu") and S.is_back(event) and not event.is_action_pressed("menu"):
+		get_viewport().set_input_as_handled()
+		close_modal()
+
+
 func _process(delta: float) -> void:
+	if modal_open():
+		S.keep_focus(_modal)
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
 		return

@@ -98,13 +98,14 @@ func _ready() -> void:
 
 ## Abre na fase dada (a do rascunho da Preparação) ou na Estação.
 func open(phase_id: String = "") -> void:
+	AHUiStyle.reset_focus(self)
 	selected = phase_id
 	visible = true
 	refresh()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_cancel"):
+	if visible and AHUiStyle.is_back(event):
 		get_viewport().set_input_as_handled()
 		closed.emit()
 

@@ -64,6 +64,15 @@ func _ready() -> void:
 	apply()
 
 
+## O foco das telas só aparece para quem usa teclado ou controle (AHUiStyle.keep_focus).
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey or event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf(event.axis_value) > 0.5) \
+			or event is InputEventAction:
+		AHUiStyle.using_keys = true
+	elif event is InputEventMouseButton or event is InputEventScreenTouch:
+		AHUiStyle.using_keys = false
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("debug_toggle"):
 		set_dev_mode(not dev_mode)
@@ -114,12 +123,14 @@ func set_key(action: String, code: int) -> void:
 	keys[action] = code
 	apply_controls()
 	_store()
+	AHUiStyle.refresh_keys(get_tree().root)
 
 
 func reset_keys() -> void:
 	keys.clear()
 	apply_controls()
 	_store()
+	AHUiStyle.refresh_keys(get_tree().root)
 
 
 ## As cores e o tamanho do texto valem na hora, também nas telas abertas (AHUiStyle.retune).

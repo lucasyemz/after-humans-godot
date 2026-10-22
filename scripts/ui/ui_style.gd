@@ -185,6 +185,98 @@ static func key_name(action: String) -> String:
 	return {KEY_ESCAPE: "Esc"}.get(code, OS.get_keycode_string(code))
 
 
+## A tecla de uma ação desenhada; acompanha as trocas das Opções (refresh_keys).
+static func action_cap(action: String) -> PanelContainer:
+	var cap := key_cap(key_name(action))
+	cap.set_meta("ah_action", action)
+	return cap
+
+
+## Depois de trocar uma tecla nas Opções: as teclas desenhadas das telas abertas mostram a nova.
+static func refresh_keys(root: Node) -> void:
+	for node in root.find_children("*", "PanelContainer", true, false):
+		if node.has_meta("ah_action") and node.get_child_count() > 0 and node.get_child(0) is Label:
+			(node.get_child(0) as Label).text = key_name(String(node.get_meta("ah_action")))
+
+
+## Quem joga está no teclado ou no controle (a última entrada não foi o mouse nem o toque); Settings acompanha.
+static var using_keys := false
+
+
+## Teclado e controle (#5): o foco fica sempre num botão da tela aberta (scope). Se o botão com foco sumiu (a tela foi
+## remontada) ou está fora dela, volta para o botão de mesmo texto (o "+" da Preparação continua no "+") ou para o
+## primeiro da tela. Os HUDs chamam a cada quadro com a tela de cima; é barato quando o foco já está certo.
+static func keep_focus(scope: Control) -> void:
+	if scope == null or not scope.is_visible_in_tree() or not using_keys:
+		return
+	var owner := scope.get_viewport().gui_get_focus_owner()
+	if owner != null and owner.is_visible_in_tree() and scope.is_ancestor_of(owner):
+		if int(scope.get_meta("ah_focus", 0)) != owner.get_instance_id():
+			scope.set_meta("ah_focus", owner.get_instance_id())
+			scope.set_meta("ah_focus_text", (owner as Button).text if owner is Button else "")
+			scope.set_meta("ah_focus_index", focusable(scope).find(owner))
+		return
+	var choices := focusable(scope)
+	if choices.is_empty():
+		return
+	# O de mesmo texto mais perto da posição de antes (os "Vigiar" de cada cartão da noite, por exemplo).
+	var text := String(scope.get_meta("ah_focus_text", ""))
+	var index := int(scope.get_meta("ah_focus_index", 0))
+	var best: Control = null
+	for i in choices.size():
+		if text != "" and choices[i] is Button and (choices[i] as Button).text == text:
+			if best == null or absi(i - index) < absi(choices.find(best) - index):
+				best = choices[i]
+	if best == null:
+		best = choices[clampi(index, 0, choices.size() - 1)]
+	best.grab_focus()
+
+
+## Uma tela nova no mesmo lugar (outro cômodo no painel): o foco começa do primeiro botão.
+static func reset_focus(scope: Control) -> void:
+	for key in ["ah_focus", "ah_focus_text", "ah_focus_index"]:
+		if scope.has_meta(key):
+			scope.remove_meta(key)
+	var owner := scope.get_viewport().gui_get_focus_owner() if scope.is_inside_tree() else null
+	if owner != null and scope.is_ancestor_of(owner):
+		owner.release_focus()
+
+
+## Os controles da tela que recebem foco: visíveis, ativos e com foco ligado, na ordem da árvore.
+static func focusable(scope: Node) -> Array:
+	var out: Array = []
+	for node in scope.find_children("*", "Control", true, false):
+		var control: Control = node
+		if control.focus_mode == Control.FOCUS_NONE or not control.is_visible_in_tree() or control.is_queued_for_deletion():
+			continue
+		if control is BaseButton and (control as BaseButton).disabled:
+			continue
+		if control is BaseButton or control is Range or control is LineEdit:
+			out.append(control)
+	return out
+
+
+## Interagir (E, ou a tecla trocada) confirma o botão com foco, como Enter e o A do controle (ui_accept). Devolve true se
+## apertou. O evento que já é ui_accept fica para a própria interface.
+static func press_focused(scope: Control, event: InputEvent) -> bool:
+	if scope == null or not scope.is_visible_in_tree() or not event.is_action_pressed("interact") or event.is_action("ui_accept"):
+		return false
+	var owner := scope.get_viewport().gui_get_focus_owner()
+	if not (owner is BaseButton) or not scope.is_ancestor_of(owner) or (owner as BaseButton).disabled:
+		return false
+	var button: BaseButton = owner
+	if button.toggle_mode:
+		button.button_pressed = not button.button_pressed
+	else:
+		button.pressed.emit()
+	return true
+
+
+## Voltar: B no controle, Backspace (cancel) ou Esc (ui_cancel).
+static func is_back(event: InputEvent) -> bool:
+	return event.is_action_pressed("cancel") or event.is_action_pressed("ui_cancel")
+
+
 ## A tecla desenhada (a do teclado; o controle mostra a do gamepad).
 static func key_cap(text: String) -> PanelContainer:
 	var box := PanelContainer.new()

@@ -199,7 +199,7 @@ func _build() -> void:
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.text = spec[0]
 		style_button(button)
-		var key := S.key_cap(S.key_name(spec[3]))
+		var key := S.action_cap(spec[3])
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT, Control.PRESET_MODE_MINSIZE, 8)
 		button.pressed.connect(_on_action.bind(spec[1]))
@@ -454,7 +454,23 @@ func status_text(unit: AHCombat.Unit, _short: bool) -> String:
 	return " · ".join(S.statuses(unit).map(func(e): return e[0]))
 
 
+## Teclado e controle (#5): a tela de cima da luta, onde o foco fica e onde Interagir confirma o botão com foco.
+func _focus_scope() -> Control:
+	if _bag != null:
+		return _bag
+	if _result.visible:
+		return _result
+	return _panel if waiting else null
+
+
+func _input(event: InputEvent) -> void:
+	if visible and S.press_focused(_focus_scope(), event):
+		get_viewport().set_input_as_handled()
+
+
 func _process(_delta: float) -> void:
+	if _bag != null or _result.visible or (waiting and _choosing == ""):
+		S.keep_focus(_focus_scope())
 	if not visible or session == null or arena == null:
 		return
 	var camera := get_viewport().get_camera_3d()
@@ -624,7 +640,7 @@ func _build_abilities(take_focus: bool = true) -> void:
 			why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			why.custom_minimum_size = Vector2(170, 0)
 			text_box.add_child(why)
-		var key := S.key_cap(S.key_name("combat_ability_%d" % (index + 1)))
+		var key := S.action_cap("combat_ability_%d" % (index + 1))
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 		button.set_meta("locked", not option.usable)
@@ -935,7 +951,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
 	# A Mochila: I abre na vez de um herói; Esc, Backspace ou I fecham.
-	if _bag != null and (event.is_action_pressed("cancel") or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):
+	if _bag != null and (S.is_back(event) or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):
 		_close_bag()
 		get_viewport().set_input_as_handled()
 		return

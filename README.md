@@ -91,7 +91,11 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - A/D (ou ←/→) andam pela rua; W/S (ou ↑/↓) vão para o fundo e para a frente, inclusive dentro dos becos.
     No gamepad: analógico esquerdo ou direcional.
   - Shift (ou RB) corre.
-  - Na Estação, as setas (ou o direcional) andam entre os cômodos, E abre e F2 oculta a interface. As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo. Com tela de toque aparecem um analógico (andar; até a borda corre) e o botão Usar; Opções > Controles de toque liga sempre ou desliga.
+  - Na Estação, as setas (ou o direcional) andam entre os cômodos, E abre e F2 oculta a interface. Esc (ou Start) leva o
+    foco aos botões da esquerda (Próximo passo, Preparar expedição, Opções).
+  - Em toda tela (mapa de fases, Preparação, cômodos, relatório, noite, trem, Opções, pausa, Mochila, luta) dá para jogar
+    só com o teclado ou o controle: as setas (ou o direcional) andam entre os botões, E, Enter ou A confirma e
+    Backspace, Esc ou B volta. As teclas desenhadas na tela seguem as trocas das Opções. As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo. Com tela de toque aparecem um analógico (andar; até a borda corre) e o botão Usar; Opções > Controles de toque liga sempre ou desliga.
   - F1 liga o modo de desenvolvedor (fica salvo): o contador de quadros e as teclas de teste abaixo (R, T, P, C, K).
   - R liga e desliga a chuva.
   - T troca entre fim de tarde e noite.

@@ -199,7 +199,9 @@ func _ready() -> void:
 
 
 ## Antes dos botões: a interface escondida volta com F2, Esc ou um clique; na vista geral, as setas (ou o direcional)
-## andam entre os cômodos e Interagir abre o escolhido.
+## andam entre os cômodos e Interagir abre o escolhido. Menu (Esc ou Start) leva o foco aos botões da esquerda (Próximo
+## passo, Preparar expedição, Opções...), que as setas percorrem; Voltar devolve aos cômodos. Com um painel ou o mapa
+## aberto, o foco fica nos botões dele e Interagir confirma o botão com foco.
 func _input(event: InputEvent) -> void:
 	if _hud_hidden:
 		var click: bool = event is InputEventMouseButton and event.pressed
@@ -211,7 +213,22 @@ func _input(event: InputEvent) -> void:
 		set_hud_hidden(true)
 		get_viewport().set_input_as_handled()
 		return
-	if current != "" or _map.visible:
+	var scope := focus_scope()
+	if scope != null:
+		if U.press_focused(scope, event):
+			get_viewport().set_input_as_handled()
+		return
+	if _menu_focused():
+		if U.press_focused(self, event):
+			get_viewport().set_input_as_handled()
+		elif U.is_back(event):
+			get_viewport().gui_release_focus()
+			get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed("menu"):
+		U.using_keys = true
+		_next_button.grab_focus()
+		get_viewport().set_input_as_handled()
 		return
 	for spec in [["move_left", Vector2.LEFT], ["move_right", Vector2.RIGHT], ["move_back", Vector2.UP], ["move_front", Vector2.DOWN]]:
 		if event.is_action_pressed(spec[0], true):
@@ -221,6 +238,33 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact") and _key_room != "":
 		open_room(_key_room)
 		get_viewport().set_input_as_handled()
+
+
+func _reset_focus() -> void:
+	for scope in [_panel, _prep, _corner]:
+		if scope != null:
+			U.reset_focus(scope)
+
+
+## A tela de cima, onde o foco do teclado e do controle fica: o mapa de fases, a Preparação ou o painel aberto (com a
+## vista geral e as Opções do canto). Na vista geral, nenhuma (as setas andam entre os cômodos).
+func focus_scope() -> Control:
+	if _map.visible:
+		return _map
+	if current == "":
+		return null
+	if _prep != null and _prep.visible:
+		return _prep
+	if not _panel.visible:
+		return null
+	# Um cômodo só com texto (a Cantina): o foco fica no Vista geral do canto.
+	return _panel if not U.focusable(_panel).is_empty() or not _corner.visible else _corner
+
+
+## O foco está nos botões da esquerda ou do canto (na vista geral).
+func _menu_focused() -> bool:
+	var owner := get_viewport().gui_get_focus_owner()
+	return owner != null and owner.is_visible_in_tree() and (_menu.is_ancestor_of(owner) or _corner.is_ancestor_of(owner))
 
 
 func set_hud_hidden(on: bool) -> void:
@@ -275,12 +319,12 @@ func _build_key_hints() -> void:
 	_key_hints = HBoxContainer.new()
 	_key_hints.add_theme_constant_override("separation", 16)
 	_key_hints.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for spec in [[["move_left", "move_right", "move_back", "move_front"], "cômodos"], [["interact"], "abrir"], [["hide_hud"], "ocultar"]]:
+	for spec in [[["move_left", "move_right", "move_back", "move_front"], "cômodos"], [["interact"], "abrir"], [["menu"], "menu"], [["hide_hud"], "ocultar"]]:
 		var group := HBoxContainer.new()
 		group.add_theme_constant_override("separation", 4)
 		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		for action in spec[0]:
-			group.add_child(U.key_cap(_arrow_name(action)))
+			group.add_child(U.key_cap(_arrow_name(action)) if action.begins_with("move_") else U.action_cap(action))
 		group.add_child(U.label(spec[1], 16, U.MUTED))
 		_key_hints.add_child(group)
 	add_child(_key_hints)
@@ -293,7 +337,7 @@ static func _arrow_name(action: String) -> String:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and current != "" and not _map.visible:
+	if U.is_back(event) and current != "" and not _map.visible:
 		close_panel()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and current == "" and not _map.visible:
@@ -616,6 +660,7 @@ func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
 
 
 func open_room(room_id: String) -> void:
+	_reset_focus()
 	current = room_id
 	if room_id == S.PREPARATION and _draft.is_empty():
 		_reset_draft()
@@ -624,6 +669,7 @@ func open_room(room_id: String) -> void:
 
 
 func open_service(service: String) -> void:
+	_reset_focus()
 	current = service
 	match service:
 		"report":
@@ -649,6 +695,9 @@ func close_panel() -> void:
 	_lineup_signature = ""
 	station.focus_overview()
 	refresh()
+	# De volta à vista geral, as setas voltam a andar entre os cômodos.
+	if get_viewport() != null:
+		get_viewport().gui_release_focus()
 
 
 ## Preparar expedição (AAHHUD::OpenPhaseMap): com algo pendente (a noite, o trem), a Preparação diz o quê; senão, o mapa.
@@ -680,6 +729,7 @@ func open_departure() -> void:
 
 func _process(_delta: float) -> void:
 	_update_room_hover()
+	U.keep_focus(focus_scope())
 	var showing := current == "report" or current == "departure"
 	_tags.visible = showing
 	if not showing:
@@ -1458,7 +1508,6 @@ func _forge(c: Dictionary) -> void:
 		var chosen := id == _forge_selected
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(250, U.px(72))
-		button.focus_mode = Control.FOCUS_NONE
 		H.style_button(button)
 		if chosen:
 			button.add_theme_stylebox_override("normal", U.panel(0.92, U.GOLD, 2))
@@ -1646,7 +1695,6 @@ func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
 		button.text = spec[0]
 		button.custom_minimum_size = Vector2(0, 40)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.focus_mode = Control.FOCUS_NONE
 		H.style_button(button)
 		if spec[1]:
 			button.add_theme_stylebox_override("normal", U.panel(0.92, U.GOLD, 2))
