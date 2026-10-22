@@ -1,4 +1,4 @@
-## A jornada inteira com as cenas de verdade (#3), sem janela: Estação → mapa de fases → Preparação → Rua das Vitrines
+## A jornada inteira com as cenas de verdade (#3), sem janela: título (Continuar) → Estação → mapa de fases → Preparação → Rua das Vitrines
 ## (andar, vasculhar, as lutas no automático, o guardião) → volta → relatório → noite no Dormitório → trem. Aperta os
 ## botões das telas (pelo texto) e manda as ações de input (andar, Interagir), como quem joga; confere a campanha em cada
 ## passo e que nenhuma tela trava (cada espera tem prazo). Usa uma pasta de save própria e devolve a campanha de antes.
@@ -58,7 +58,14 @@ func _play() -> void:
 # ---------------------------------------------------------------- Estação → partida
 
 func _station_to_departure() -> bool:
-	GameFlow.change_to("station", {}, false)
+	# Entra como o jogo abre (#28): a tela de título e o Continuar do save que acabou de ser gravado.
+	GameFlow.start()
+	if not await _until(func(): return _tree.current_scene is AHTitleScreen and not GameFlow.busy, "a tela de título abrir"):
+		return false
+	var title: AHTitleScreen = _tree.current_scene
+	t.check(title.continue_button != null, "com save, o título mostra Continuar")
+	if not await _press(title, "Continuar", "o Continuar do título"):
+		return false
 	if not await _until(func(): return _station() != null and _station().hud != null and not GameFlow.busy, "a Estação abrir"):
 		return false
 	var hud: AHRefugeHud = _station().hud

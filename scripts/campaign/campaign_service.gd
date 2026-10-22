@@ -155,6 +155,11 @@ func has_save() -> bool:
 	return FileAccess.file_exists(primary_path()) or FileAccess.file_exists(backup_path())
 
 
+## Há um save que abre (o principal ou a cópia): o Continuar do título.
+func has_valid_save() -> bool:
+	return read_file(primary_path()) != null or read_file(backup_path()) != null
+
+
 ## Sobre o estado normalizado (inteiros como int), para gravar e conferir a mesma coisa.
 static func _checksum(campaign: Dictionary) -> String:
 	return JSON.stringify(_normalize(campaign), "", true).sha256_text()
