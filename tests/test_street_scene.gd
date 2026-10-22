@@ -36,6 +36,20 @@ func run(t) -> void:
 		var arena: AHCombatArena = street._arena
 		t.check(arena.active and arena.session.state.player_team.any(func(u): return u.hero_id == recruit.hero_id), "o recruta luta")
 		t.check(not arena.hero_art(recruit.hero_id).is_empty(), "a arena acha a arte do recruta")
+		# No Último Fôlego, o recruta (sem a pose de caído) fica de pé, mas escurecido; morto de vez, cinza.
+		var unit = arena.session.state.player_team.filter(func(u): return u.hero_id == recruit.hero_id)[0]
+		var card: AHSpriteCard = arena.cards[unit.id]
+		var hp: int = unit.hp
+		unit.hp = 0
+		unit.deaths_door = true
+		arena.rest_pose(unit)
+		t.equal(card._material.albedo_color, Color(0.72, 0.62, 0.62), "recruta no Último Fôlego: escurecido")
+		unit.deaths_door = false
+		arena.rest_pose(unit)
+		t.equal(card._material.albedo_color, Color(0.55, 0.55, 0.6), "morto de vez: cinza")
+		unit.hp = hp
+		arena.rest_pose(unit)
+		t.equal(card._material.albedo_color, Color.WHITE, "de pé de novo: normal")
 		await _bag(t, tree, arena)
 		tree.unload_current_scene()
 		await tree.process_frame
