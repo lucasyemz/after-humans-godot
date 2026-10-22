@@ -22,6 +22,12 @@ const INDOOR_CAMERA_MARGIN := 3.0
 const LEADER_RADIUS := 0.28
 ## Na luta, os pés ficam esta fração da meia tela abaixo do centro (~y 760 de 1080), acima do painel do HUD.
 const COMBAT_FEET_LINE := 0.4
+## A câmera dos cenários: inclinação (quase reta) e meio campo de visão na horizontal, em graus.
+const SCENARIO_PITCH := 0.5
+const SCENARIO_HALF_FOV := 15.0
+## O preenchimento da luta nos cenários: energia no fim de tarde e quanto soma de noite e na chuva.
+const COMBAT_FILL := 0.3
+const COMBAT_FILL_NIGHT := 0.35
 # Onde o líder pode ir (metros): da rua até o fundo dos becos.
 const STREET_WALK_MIN := Vector3(-2.0, 0.0, -14.4)
 const STREET_WALK_MAX := Vector3(79.0, 0.0, 2.4)
@@ -54,6 +60,10 @@ const RAIN := {
 
 var _forward_plus := false
 var _key_light: OmniLight3D
+## Preenchimento da luta nos cenários (#48): uma luz direcional que só pega os personagens (a camada das placas). As
+## luminárias do mapa deixam pontas da luta na penumbra, e no Compatibility (a web) cada objeto recebe só 8 luzes, o
+## que deixava a luz de leitura de fora; a direcional não conta nesse limite e ilumina as quatro posições por igual.
+var _fill_light: DirectionalLight3D
 ## Passos (#62): um a cada passada de ~75 cm, só fora da luta.
 var _step_distance := 0.37
 ## O balanço do passo de cada herói (WalkBobHeight da Unreal: 3 cm, 3 passos por segundo, só andando).
@@ -100,6 +110,8 @@ var floor_y := 0.0
 var lane_z := 0.45
 var sheltered := false
 var _zone := {}
+## Na luta num cenário, o quanto o chão de quem luta sobe para os pés passarem da borda da frente do piso (#48).
+var combat_lift := 0.0
 var _room_x := 0.0
 var _room_width := 0.0
 var _fog_boost := 1.0
@@ -193,6 +205,14 @@ func _ready() -> void:
 	_key_light.light_energy = 0.0
 	_key_light.shadow_enabled = false
 	add_child(_key_light)
+	_fill_light = DirectionalLight3D.new()
+	_fill_light.light_cull_mask = AHSpriteCard.CHARACTER_LAYER
+	_fill_light.light_color = Color(1.0, 0.9, 0.78)
+	_fill_light.shadow_enabled = false
+	_fill_light.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY
+	_fill_light.rotation_degrees = Vector3(-30.0, 20.0, 0.0)
+	_fill_light.visible = false
+	add_child(_fill_light)
 	_build_camera()
 	_build_post_and_hud()
 	_arena = AHCombatArena.new()
@@ -612,7 +632,7 @@ func _trail_point(distance: float) -> Vector3:
 
 func _ground_height(z: float) -> float:
 	if scenario:
-		return floor_y
+		return floor_y + combat_lift
 	return AHStreetSet.SIDEWALK_TOP_Z * 0.01 if z < AHStreetSet.SIDEWALK_FRONT_Y * 0.01 else 0.0
 
 
@@ -660,9 +680,9 @@ func _update_camera(delta: float) -> void:
 		# Ponte usa a da rua (28 m, 2,7 m). O centro vai até 4 m das pontas da zona (LaneEdgePadding).
 		var bridge: bool = scenario.map_name == "RootBridge"
 		distance = 28.0 if bridge else 19.0
-		pitch = deg_to_rad(0.5)
-		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(15.0)) / get_viewport().get_visible_rect().size.aspect()))
-		var half_view: float = tan(deg_to_rad(15.0)) * distance
+		pitch = deg_to_rad(SCENARIO_PITCH)
+		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(SCENARIO_HALF_FOV)) / get_viewport().get_visible_rect().size.aspect()))
+		var half_view: float = tan(deg_to_rad(SCENARIO_HALF_FOV)) * distance
 		var low: float = _zone.x0 + minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
 		var high: float = _zone.x1 - minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
 		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + (2.7 if bridge else 1.7), lane_z)
@@ -678,13 +698,15 @@ func _update_camera(delta: float) -> void:
 		# tela, acima do painel do HUD, qualquer que seja a distância.
 		var view: Vector2 = _arena.camera_view()
 		distance = view.y
-		target = Vector3(view.x, floor_y + COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch),
+		target = Vector3(view.x, floor_y + combat_lift + COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch),
 			(lane_z - 1.35) if scenario else -0.9)
 	var wanted := target + Vector3(0, sin(pitch) * distance, cos(pitch) * distance)
 	_camera.position = wanted if delta == 0.0 else _camera.position.lerp(wanted, 1.0 - exp(-3.0 * delta))
 	_camera.look_at(Vector3(_camera.position.x, target.y, target.z))
 	var ground := floor_y if scenario else 0.0
-	_key_light.position = Vector3(target.x, ground + 2.6, (lane_z if scenario else 0.45) + 2.2)
+	_key_light.position = Vector3(target.x, ground + combat_lift + 2.6, (lane_z if scenario else 0.45) + 2.2)
+	# Na luta num cenário, o preenchimento acende sobre quem luta (#48).
+	_fill_light.visible = scenario != null and _arena != null and _arena.active
 	_dust.position = Vector3(_camera.position.x, ground + 2.6, -1.0 + (lane_z if scenario else 0.0))
 	_rain.position = Vector3(_camera.position.x + 0.8, ground + 9.0, -1.0 + (lane_z if scenario else 0.0))
 	_splashes.position = Vector3(_camera.position.x, ground + 0.03, -1.0 + (lane_z if scenario else 0.0))
@@ -789,6 +811,7 @@ func _apply_weather() -> void:
 	# Luz de leitura: acende de noite e na chuva, sobre a equipe e a luta.
 	var readable := (1.0 if _mood == "night" else 0.0) + (0.3 if _raining else 0.0)
 	_key_light.light_energy = 0.7 * clampf(readable, 0.0, 1.2)
+	_fill_light.light_energy = COMBAT_FILL + COMBAT_FILL_NIGHT * clampf(readable, 0.0, 1.2)
 	_hud_weather.text = ("Noite" if _mood == "night" else "Fim de tarde") + (" · chuva" if _raining else "")
 	if exploration_hud:
 		exploration_hud.set_weather(_hud_weather.text)
@@ -932,10 +955,26 @@ func capture_paused() -> bool:
 func begin_fight() -> void:
 	_street_hud.visible = false
 	_leader.velocity = Vector3.ZERO
+	combat_lift = 0.0
+	if scenario and not _zone.is_empty():
+		combat_lift = scenario.front_lift(scenario.zones.find(_zone), lane_z - 0.3, combat_slope())
+
+
+## Quanto a linha de visão da câmera da luta nos cenários sobe por metro de profundidade, a partir do pé: a altura da
+## câmera sobre o chão (a linha dos pés e a inclinação de 0,5°) dividida pela distância, no limite de longe (o pior).
+func combat_slope() -> float:
+	return combat_slope_for(get_viewport().get_visible_rect().size.aspect())
+
+
+static func combat_slope_for(aspect: float) -> float:
+	var pitch := deg_to_rad(SCENARIO_PITCH)
+	var fov := 2.0 * atan(tan(deg_to_rad(SCENARIO_HALF_FOV)) / aspect)
+	return COMBAT_FEET_LINE * tan(fov * 0.5) / (cos(pitch) * cos(pitch)) + tan(pitch)
 
 
 func end_fight() -> void:
 	_street_hud.visible = true
+	combat_lift = 0.0
 
 
 ## Quem morreu sai da equipe; os outros voltam a andar do lugar onde terminaram a luta.

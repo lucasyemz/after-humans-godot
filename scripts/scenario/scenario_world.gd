@@ -10,6 +10,9 @@ const LUMENS_PER_ENERGY := 260.0
 ## Brilho dos cards de fundo (unlit, Emissive 0,5 na Unreal, sem adaptação de exposição): calibrado na tela.
 const CARD_BRIGHTNESS := 1.7
 
+## A folga acima da borda da frente ao subir o chão da luta.
+const FRONT_LIFT_MARGIN := 0.06
+
 static var _mesh_cache: Array = []
 
 var map_name := ""
@@ -19,6 +22,8 @@ var zones: Array = []
 ## Os obstáculos na faixa de passeio de cada zona (caixas do mundo): o que é sólido na Unreal, entre o piso e a altura
 ## da equipe, sem fechar a faixa inteira (sempre sobra passagem).
 var obstacles: Array[AABB] = []
+## As peças opacas (caixas do mundo) que podem ficar entre a câmera da luta e os pés de quem luta (#48).
+var walls: Array[AABB] = []
 var side_doors: Array = []
 var props: Array = []
 var _materials: Array = []
@@ -81,6 +86,9 @@ func build(map: String) -> void:
 		if part.get("no_shadow", false) or data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"]:
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(node)
+		if not data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"] \
+				and not data.materials[int(part.materials[0])].get("masked", false):
+			walls.append(node.transform * node.mesh.get_aabb())
 		if part.get("solid", false):
 			_add_obstacle(node.transform * node.mesh.get_aabb())
 		if prop_parts.has(i):
@@ -131,6 +139,24 @@ func open_prop(index: int) -> void:
 	for node: MeshInstance3D in _prop_nodes[index]:
 		for surface in node.mesh.get_surface_count():
 			node.set_surface_override_material(surface, _materials[int(prop.open)])
+
+
+## Quanto o chão da luta sobe na zona para os pés ficarem acima da borda da frente (#48). A câmera da luta é quase
+## reta: a linha de visão até o pé sobe slope metros por metro de profundidade. Uma peça na frente (z maior que feet_z),
+## dentro da zona e mais alta que o piso cobre o pé quando a altura dela passa da linha; o chão sobe o que falta, com
+## uma folga. Sem peça na frente, 0 (os outros cenários ficam iguais).
+func front_lift(zone_index: int, feet_z: float, slope: float) -> float:
+	var zone: Dictionary = zones[zone_index]
+	var lift := 0.0
+	for box in walls:
+		var depth: float = box.position.z - feet_z
+		if depth < 0.3 or box.end.x <= zone.x0 or box.position.x >= zone.x1:
+			continue
+		var above: float = box.end.y - zone.y
+		if above <= 0.01 or box.position.y > zone.y + 3.0:
+			continue
+		lift = maxf(lift, above - slope * depth + FRONT_LIFT_MARGIN)
+	return lift
 
 
 ## A zona (0..n) que contém x, ou -1.

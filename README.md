@@ -62,7 +62,7 @@ tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas 
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
                   precisa do Pillow), unreal_export_scenarios.py (roda na Unreal e exporta os cenários para
                   build/unreal-export) e sync_scenarios.py (converte a exportação), sync_audio.py (trilha e sons, precisa
-                  do soundfile), capture_scenarios.gd (QA dos cenários) e define_input.gd (grava as ações)
+                  do soundfile), capture_scenarios.gd e capture_scenario_fight.gd (QA dos cenários) e define_input.gd (grava as ações)
 ```
 
 `build/` e `.godot/` são gerados e ficam fora do Git.
@@ -142,6 +142,9 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
 - **Captura dos cenários:** `"$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_scenarios.gd -- --out=<pasta>`
   (opcional `--maps=RiverDock,FloodedDepot`). Em cada zona dos seis mapas: fim de tarde e noite com chuva, tempo de quadro,
   equipe e patrulhas no piso e o líder preso à faixa (`PASS`/`FAIL`). Sai com código 1 se algo falhar.
+- **Captura de luta nos cenários:** `"$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_scenario_fight.gd -- --out=<pasta>`
+  (padrão: Depósito e Dutos; `--maps=` escolhe). A equipe contra Broto, Faísca e Pipoco, de dia e de noite, e o
+  `feet.txt` com o pé de cada um na tela e se o cenário o cobre. Sai com código 1 se algum pé ficar coberto.
 - **Exportar:** `"$GODOT" --headless --path . --export-release "Web" build/web/index.html` e
   `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/AfterHumans.exe`. Os export
   templates da 4.7.2 precisam estar instalados.
