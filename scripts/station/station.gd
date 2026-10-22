@@ -79,6 +79,7 @@ var _warning_time := -1.0
 var _candidate: AHSpriteCard
 var _candidate_id := ""
 var _pending_arrival := ""
+var _env: Environment
 
 
 func _ready() -> void:
@@ -885,8 +886,10 @@ func _build_environment() -> void:
 		env.ssao_enabled = Settings.effects().ssao
 		env.ssao_radius = 0.9
 		env.ssao_intensity = 1.4
-		# A oclusão acompanha a qualidade das opções (Settings).
-		Settings.changed.connect(func(): env.ssao_enabled = Settings.effects().ssao)
+		# A oclusão acompanha a qualidade das opções (Settings). Pelo método do nó: a conexão sai junto com a cena (uma
+		# lambda que só usa env não é do nó e ficava conectada a cada visita à Estação).
+		_env = env
+		Settings.changed.connect(_on_settings_changed)
 	var world := WorldEnvironment.new()
 	world.environment = env
 	add_child(world)
@@ -897,6 +900,10 @@ func _build_environment() -> void:
 	fill.light_energy = 0.28
 	fill.shadow_enabled = false
 	add_child(fill)
+
+
+func _on_settings_changed() -> void:
+	_env.ssao_enabled = Settings.effects().ssao
 
 
 func _build_post() -> void:
