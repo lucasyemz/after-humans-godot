@@ -336,7 +336,10 @@ func light(position: Vector3, lumens: float, radius: float, color: Color, shadow
 	lamp.omni_attenuation = 1.4
 	lamp.light_color = color
 	lamp.light_size = 0.04
-	lamp.shadow_enabled = shadows
+	# A sombra das luminárias segue a qualidade das opções (Settings.apply_lamp_shadows, #37).
+	if shadows:
+		lamp.add_to_group(Settings.SHADOW_LAMPS)
+	lamp.shadow_enabled = shadows and Settings.effects().lamp_shadows
 	_add(lamp)
 	return lamp
 

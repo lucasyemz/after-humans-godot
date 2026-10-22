@@ -316,7 +316,10 @@ func _light(light: Dictionary) -> void:
 	lamp.omni_range = float(light.radius)
 	lamp.omni_attenuation = 1.4
 	lamp.light_color = Color(light.color[0], light.color[1], light.color[2])
-	lamp.shadow_enabled = bool(light.shadows) and RenderingServer.get_current_rendering_method() == "forward_plus"
+	var shadows := bool(light.shadows) and RenderingServer.get_current_rendering_method() == "forward_plus"
+	if shadows:
+		lamp.add_to_group(Settings.SHADOW_LAMPS)
+	lamp.shadow_enabled = shadows and Settings.effects().lamp_shadows
 	add_child(lamp)
 
 

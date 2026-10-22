@@ -153,6 +153,11 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
 - **Gravação de um golpe:** `"$GODOT" --path . --resolution 960x540 --fixed-fps 30 -s res://tools/capture_impact.gd -- --out=<pasta>`
   (opcional `--speed=2`). Um PNG por quadro do golpe de um herói num robô, com semente fixa, para comparar o impacto
   (pausa, tremor, clarão) antes e depois.
+- **Desempenho:** `"$GODOT" --path . --resolution 1920x1080 -- --perf=<pasta>` passa pelo título, pela Estação, pela
+  rua, por uma luta e pelos seis cenários, no Baixo e no Alto (`--perf-levels=`, `--perf-only=`), e grava `perf.csv`
+  e `perf.md` com o tempo de quadro, as chamadas de desenho, as primitivas e a memória. A versão web exportada roda o
+  mesmo roteiro no Chromium com `node tools/web_perf.mjs`. As medidas e o que mudou estão em
+  [docs/perf.md](docs/perf.md).
 - **Exportar:** `"$GODOT" --headless --path . --export-release "Web" build/web/index.html` e
   `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/AfterHumans.exe`. Os export
   templates da 4.7.2 precisam estar instalados.

@@ -250,6 +250,7 @@ func _apply_graphics() -> void:
 	_env.volumetric_fog_enabled = _forward_plus and fx.volumetric_fog
 	_env.ssr_enabled = _forward_plus and _raining and fx.ssr
 	_sun.shadow_enabled = fx.shadows
+	Settings.apply_lamp_shadows()
 	_rain.amount_ratio = fx.rain_scale
 	_splashes.amount_ratio = fx.rain_scale
 
@@ -280,6 +281,9 @@ func _collect_set() -> void:
 				continue
 			if node.is_in_group(AHStreetSet.LAMP_GROUP):
 				_lamp_lights.append(node)
+				# Os postes têm sombra no desenho: ela segue a qualidade (#37).
+				if node.shadow_enabled:
+					node.add_to_group(Settings.SHADOW_LAMPS)
 			elif node.is_in_group(AHStreetSet.DOOR_LIGHT_GROUP):
 				_door_lights.append(node)
 			elif node.is_in_group(AHStreetSet.SHAFT_GROUP):
