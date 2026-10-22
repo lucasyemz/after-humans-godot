@@ -68,6 +68,9 @@ func _station() -> void:
 	t.check(_inside(hud._map), "o foco está no mapa de fases")
 	await _send("ui_down")
 	t.check(_inside(hud._map), "↓ no mapa mantém o foco nele")
+	# A lista rola com o foco: ↓ chega até a última fase (Túneis do Eco), visível na tela.
+	if t.check(await _walk_to("Túneis do Eco", 20), "↓ chega na última fase do mapa"):
+		t.check(_visible_in(_focus(), hud._map), "e a lista rolou até ela")
 	await _send("cancel")
 	t.check(not hud._map.visible, "Voltar fecha o mapa")
 	hud.open_map()
@@ -82,6 +85,15 @@ func _station() -> void:
 	for step in ["ui_down", "ui_right", "ui_down", "ui_left", "ui_up"]:
 		await _send(step)
 		t.check(_inside(hud._prep), "a Preparação mantém o foco com %s" % step)
+	t.check(_focus() is Button and (_focus() as Button).text == "", "a Preparação começa num cartão da equipe, não no Vista geral")
+	# O "+" da comida até o máximo: quando ele desliga, o foco fica por perto e o E nunca faz partir.
+	var plus := _find(hud._prep, "+")
+	if t.check(plus != null, "a Preparação tem o + da comida"):
+		plus.grab_focus()
+		for i in 8:
+			await _send("interact")
+			t.check(Campaign.state.session.expedition == null and not GameFlow.busy, "E no + (%d) não parte" % (i + 1))
+			t.check(not (_focus() is Button and (_focus() as Button).text.begins_with("Partir")), "e o foco não cai no Partir")
 	await _send("cancel")
 	t.equal(hud.current, "", "Voltar fecha a Preparação")
 	# As Opções pelo canto: ↓ desce do menu da esquerda até elas; Interagir liga o daltonismo; Voltar fecha.
@@ -95,8 +107,41 @@ func _station() -> void:
 			await _send("interact")
 			t.check(Settings.colorblind, "Interagir liga as cores para daltonismo")
 			Settings.set_colorblind(false)
+		# Trocar uma tecla e desistir com o B do controle: nada muda e as Opções continuam abertas.
+		if await _walk_to("Trocar", 30):
+			var before := Settings.primary_key("interact")
+			var keys_before := Settings.keys.duplicate()
+			await _send("interact")
+			await _joypad(JOY_BUTTON_B)
+			t.equal(hud.current, "options", "B cancela a espera da tecla sem fechar as Opções")
+			var key := InputEventKey.new()
+			key.physical_keycode = KEY_D
+			key.pressed = true
+			Input.parse_input_event(key)
+			await _frames(2)
+			key.pressed = false
+			Input.parse_input_event(key)
+			await _frames(2)
+			t.equal(Settings.keys, keys_before, "depois do B, a próxima tecla não troca nada")
+			t.equal(Settings.primary_key("interact"), before, "Interagir continua na tecla dele")
+		# A lista das Opções rola com o foco: ↓ chega até o Fechar, no fim.
+		if t.check(await _walk_to("Fechar", 80), "↓ chega no Fechar, no fim das Opções"):
+			t.check(_visible_in(_focus(), hud._panel), "e a lista rolou até ele")
 		await _send("cancel")
 		t.equal(hud.current, "", "Voltar fecha as Opções")
+	# A dica da primeira vez: o foco vai para o Entendi e o A fecha a dica, sem mexer no painel de trás.
+	var tips_before: bool = Tips.enabled
+	Tips.enabled = true
+	Tips._seen.erase("preparation")
+	hud.open_room(S.PREPARATION)
+	Tips.show_tip("preparation")
+	await _frames(3)
+	t.check(Tips.showing(), "a dica da Preparação aparece")
+	await _send("ui_accept")
+	t.check(not Tips.showing(), "o A (Enter) fecha a dica")
+	t.equal(hud.current, S.PREPARATION, "e a Preparação continua aberta")
+	Tips.enabled = tips_before
+	await _send("cancel")
 	# A dica das teclas segue a troca nas Opções.
 	Settings.set_key("interact", KEY_J)
 	t.check(_cap_text(hud, "interact") == "J", "a dica de Interagir mostra a tecla nova")
@@ -151,6 +196,10 @@ func _street() -> void:
 	await _send("interact")
 	await _frames(2)
 	t.check(not arena.hud.waiting or arena.hud._choosing != "", "Interagir escolhe a habilidade com foco (%s)" % arena.hud._choosing)
+	if arena.hud._choosing != "":
+		await _send("interact")
+		await _frames(2)
+		t.check(not arena.hud.waiting, "Interagir confirma o alvo com foco")
 	arena.auto_battle = true
 	arena.speed = 20.0
 	for frame in 1200:
@@ -169,6 +218,7 @@ func _return() -> void:
 	c.session.result = "retreat"
 	c.session.screen = "result"
 	tree.current_scene.corridor._show_result()
+	await _frames(2)
 	tree.current_scene.exploration_hud.close_modal()
 	GameFlow.change_to("station", {}, false)
 	if not t.check(await _wait(func(s): return s is AHStation and s.hud != null), "a Estação abriu na volta"):
@@ -202,6 +252,30 @@ func _walk_to(prefix: String, steps: int) -> bool:
 		await _send("ui_down")
 	var owner := _focus()
 	return owner is BaseButton and String(owner.get("text")).begins_with(prefix)
+
+
+## O controle aparece inteiro na área de rolagem dele (a lista rolou até ele).
+func _visible_in(control: Control, panel: Control) -> bool:
+	if control == null:
+		return false
+	var area: Control = panel
+	var node := control.get_parent()
+	while node != null and node != panel:
+		if node is ScrollContainer:
+			area = node
+			break
+		node = node.get_parent()
+	var rect := area.get_global_rect().grow(2.0)
+	return rect.encloses(control.get_global_rect()) and rect.position.y + rect.size.y <= 1082.0
+
+
+func _joypad(button: JoyButton) -> void:
+	for pressed in [true, false]:
+		var event := InputEventJoypadButton.new()
+		event.button_index = button
+		event.pressed = pressed
+		Input.parse_input_event(event)
+		await _frames(2)
 
 
 func _cap_text(root: Node, action: String) -> String:

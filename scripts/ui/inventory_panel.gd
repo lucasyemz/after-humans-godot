@@ -64,7 +64,7 @@ func _build() -> void:
 			grid.add_child(_slot_button(item))
 	row.add_child(_detail())
 	var close := Button.new()
-	close.text = "Fechar (Esc)"
+	close.text = "Fechar (%s)" % AHUiStyle.key_name("menu")
 	close.custom_minimum_size = Vector2(0, 46)
 	H.style_button(close)
 	close.pressed.connect(func(): closed.emit())

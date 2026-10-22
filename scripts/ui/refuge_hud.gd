@@ -177,6 +177,8 @@ func _ready() -> void:
 	_panel.size = Vector2(676, 900)
 	add_child(_panel)
 	var scroll := ScrollContainer.new()
+	# A rolagem acompanha o foco do teclado e do controle (#5).
+	scroll.follow_focus = true
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_panel.add_child(scroll)
 	_body = VBoxContainer.new()
@@ -212,6 +214,9 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("hide_hud") and not _map.visible:
 		set_hud_hidden(true)
 		get_viewport().set_input_as_handled()
+		return
+	# A dica da primeira vez aberta fica com Interagir (ela fecha), sem abrir um cômodo por trás.
+	if Tips.showing() and event.is_action_pressed("interact"):
 		return
 	var scope := focus_scope()
 	if scope != null:
@@ -1191,6 +1196,8 @@ func _prep_drawer(c: Dictionary) -> void:
 	back.text = "‹ Vista geral"
 	back.custom_minimum_size = Vector2(0, 36)
 	H.style_button(back)
+	# No teclado e no controle, Voltar faz o mesmo; o foco começa no primeiro cartão da equipe.
+	back.focus_mode = Control.FOCUS_NONE
 	back.pressed.connect(close_panel)
 	head.add_child(back)
 	var title := U.label("   EQUIPE · CLIQUE EM DOIS PARA TROCAR", 15, U.COPPER, "bold")

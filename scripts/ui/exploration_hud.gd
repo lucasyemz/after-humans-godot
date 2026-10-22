@@ -284,7 +284,7 @@ func refresh(campaign: Dictionary) -> void:
 			" O guardião espera no trecho %d." % boss_step
 	if expedition.objective_completed:
 		_goal_title.text = "✓ Guardião vencido"
-		_goal_text.text = "Fase concluída: volte à Estação com todo o achado (botão ou Esc)."
+		_goal_text.text = "Fase concluída: volte à Estação com todo o achado (botão ou %s)." % S.key_name("menu")
 	# A rota: cada trecho com o ícone do que é (os não alcançados ficam como "?"), ligados como trilho.
 	_clear(_route_row)
 	for index in route.steps.size():
@@ -747,6 +747,8 @@ func show_options() -> void:
 	_modal.set_meta("menu", true)
 	_modal.position.y = 40
 	var scroll := ScrollContainer.new()
+	# A rolagem acompanha o foco do teclado e do controle (#5).
+	scroll.follow_focus = true
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.custom_minimum_size = Vector2(660, 960)
 	box.add_child(scroll)

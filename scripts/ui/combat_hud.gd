@@ -460,6 +460,9 @@ func _focus_scope() -> Control:
 		return _bag
 	if _result.visible:
 		return _result
+	# Escolhendo o alvo: os marcadores ficam no próprio HUD.
+	if _choosing != "":
+		return self
 	return _panel if waiting else null
 
 
@@ -896,7 +899,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 	for i in _markers.size():
 		_markers[i].focus_neighbor_left = _markers[(i - 1 + _markers.size()) % _markers.size()].get_path()
 		_markers[i].focus_neighbor_right = _markers[(i + 1) % _markers.size()].get_path()
-	_description.text = "Escolha o alvo (Backspace ou B volta)."
+	_description.text = "Escolha o alvo (%s ou B volta)." % S.key_name("cancel")
 	if not _markers.is_empty():
 		_markers[0].grab_focus.call_deferred()
 
@@ -970,7 +973,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				if not action.disabled:
 					action.pressed.emit()
 				return
-	if _choosing != "" and event.is_action_pressed("cancel"):
+	if _choosing != "" and S.is_back(event):
 		_clear_markers()
 		_set_enabled(true)
 		_build_abilities()

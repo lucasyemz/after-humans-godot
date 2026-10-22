@@ -663,7 +663,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open_inventory()
 		return
-	if event.is_action_pressed("interact") and not blocking() and _action.is_valid():
+	if event.is_action_pressed("interact") and not blocking() and _action.is_valid() and not Tips.showing():
 		get_viewport().set_input_as_handled()
 		var action := _action
 		_action = Callable()

@@ -204,10 +204,11 @@ static var using_keys := false
 
 
 ## Teclado e controle (#5): o foco fica sempre num botão da tela aberta (scope). Se o botão com foco sumiu (a tela foi
-## remontada) ou está fora dela, volta para o botão de mesmo texto (o "+" da Preparação continua no "+") ou para o
+## remontada), ficou invisível ou está em outra tela, volta para o botão de mesmo texto (o "+" da Preparação continua no "+") ou para o
 ## primeiro da tela. Os HUDs chamam a cada quadro com a tela de cima; é barato quando o foco já está certo.
 static func keep_focus(scope: Control) -> void:
-	if scope == null or not scope.is_visible_in_tree() or not using_keys:
+	# Com a dica da primeira vez aberta, o foco é dela ("Entendi").
+	if scope == null or not scope.is_visible_in_tree() or not using_keys or Tips.showing():
 		return
 	var owner := scope.get_viewport().gui_get_focus_owner()
 	if owner != null and owner.is_visible_in_tree() and scope.is_ancestor_of(owner):
@@ -215,26 +216,34 @@ static func keep_focus(scope: Control) -> void:
 			scope.set_meta("ah_focus", owner.get_instance_id())
 			scope.set_meta("ah_focus_text", (owner as Button).text if owner is Button else "")
 			scope.set_meta("ah_focus_index", focusable(scope).find(owner))
+		scope.set_meta("ah_focus_at", owner.get_global_rect().get_center())
 		return
 	var choices := focusable(scope)
 	if choices.is_empty():
 		return
-	# O de mesmo texto mais perto da posição de antes (os "Vigiar" de cada cartão da noite, por exemplo).
+	# O de mesmo texto mais perto de onde estava (os "Vigiar" de cada cartão da noite); sem ele (o "+" chegou ao máximo e
+	# desligou), o mais perto na tela, na mesma linha primeiro: o foco nunca pula sozinho para o Partir de baixo.
 	var text := String(scope.get_meta("ah_focus_text", ""))
-	var index := int(scope.get_meta("ah_focus_index", 0))
+	var at: Vector2 = scope.get_meta("ah_focus_at", Vector2(-1, -1))
 	var best: Control = null
-	for i in choices.size():
-		if text != "" and choices[i] is Button and (choices[i] as Button).text == text:
-			if best == null or absi(i - index) < absi(choices.find(best) - index):
-				best = choices[i]
-	if best == null:
-		best = choices[clampi(index, 0, choices.size() - 1)]
+	var best_score := INF
+	for control in choices:
+		var center: Vector2 = control.get_global_rect().get_center()
+		var offset := center - at
+		var score := absf(offset.x) + absf(offset.y) * 3.0
+		if text != "" and control is Button and (control as Button).text == text:
+			score -= 100000.0
+		if at.x < 0.0:
+			score = choices.find(control)
+		if score < best_score:
+			best_score = score
+			best = control
 	best.grab_focus()
 
 
 ## Uma tela nova no mesmo lugar (outro cômodo no painel): o foco começa do primeiro botão.
 static func reset_focus(scope: Control) -> void:
-	for key in ["ah_focus", "ah_focus_text", "ah_focus_index"]:
+	for key in ["ah_focus", "ah_focus_text", "ah_focus_index", "ah_focus_at"]:
 		if scope.has_meta(key):
 			scope.remove_meta(key)
 	var owner := scope.get_viewport().gui_get_focus_owner() if scope.is_inside_tree() else null
@@ -259,7 +268,7 @@ static func focusable(scope: Node) -> Array:
 ## Interagir (E, ou a tecla trocada) confirma o botão com foco, como Enter e o A do controle (ui_accept). Devolve true se
 ## apertou. O evento que já é ui_accept fica para a própria interface.
 static func press_focused(scope: Control, event: InputEvent) -> bool:
-	if scope == null or not scope.is_visible_in_tree() or not event.is_action_pressed("interact") or event.is_action("ui_accept"):
+	if scope == null or not scope.is_visible_in_tree() or not event.is_action_pressed("interact") or event.is_action("ui_accept") or Tips.showing():
 		return false
 	var owner := scope.get_viewport().gui_get_focus_owner()
 	if not (owner is BaseButton) or not scope.is_ancestor_of(owner) or (owner as BaseButton).disabled:

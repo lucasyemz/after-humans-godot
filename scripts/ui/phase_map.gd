@@ -83,6 +83,8 @@ func _init() -> void:
 	aside_panel.size = Vector2(584, 1024)
 	add_child(aside_panel)
 	var scroll := ScrollContainer.new()
+	# A rolagem acompanha o foco do teclado e do controle (#5).
+	scroll.follow_focus = true
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	aside_panel.add_child(scroll)
 	_aside = VBoxContainer.new()
