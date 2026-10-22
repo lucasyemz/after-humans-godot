@@ -177,7 +177,9 @@ func _modal_button(text: String, callback: Callable) -> Button:
 
 func _continue() -> void:
 	_leaving = true
-	GameFlow.continue_game()
+	# Se a troca for recusada, o título volta a responder (em vez de ficar parado).
+	if not await GameFlow.continue_game():
+		_leaving = false
 
 
 ## Nova campanha: sem nenhum arquivo de save, começa direto; com arquivo (mesmo um que não abre), pergunta antes.
@@ -208,7 +210,8 @@ func _start_new_campaign() -> void:
 	Campaign.new_game()
 	Campaign.state.settings.merge(settings, true)
 	Campaign.save()
-	GameFlow.change_to("station")
+	if not await GameFlow.change_to("station"):
+		_leaving = false
 
 
 func _open_options() -> void:
