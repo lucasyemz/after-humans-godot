@@ -372,8 +372,12 @@ Cylinder, Prop, Hang, PropPlaced, Light, Sign, WallWithOpenings) em `AHStationBu
     recursos da Estação quebram a linha. Vale nas telas abertas depois da troca. A captura aceita `--text-size=2`.
 
 **Pendências da 5:**
-- Celular: controles de toque para andar e interagir, HUD maior em tela pequena e um pacote mais leve (120 MB pesa em
-  dados móveis); falta testar num aparelho de verdade.
+- Celular: ~~controles de toque~~ feitos (`AHTouchControls`: o analógico que aparece onde o dedo encosta na metade
+  esquerda, até a borda corre; o Usar à direita, aceso quando há o que usar; o aviso de interação aceita toque; a luta,
+  a Estação e os menus já aceitavam o toque como clique; Opções > Controles de toque: Automático, Sempre ou Desligados;
+  `test_touch_controls`; a captura aceita `--touch`) e ~~texto maior~~ (Opções > Tamanho do texto). Falta um pacote
+  mais leve (120 MB pesa em dados móveis) e testar num aparelho de verdade.
+- As teclas desenhadas nos botões e nas dicas seguem as trocas das Opções (`AHUiStyle.key_name`).
 - Passar o checklist de Play com o Lucas.
 
 **Total: 28 a 42 dias de trabalho com agente**, perto da faixa da avaliação (24 a 40). O combate e a rua já estão

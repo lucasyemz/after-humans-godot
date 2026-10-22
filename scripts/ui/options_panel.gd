@@ -94,6 +94,20 @@ func _ready() -> void:
 	add_child(again)
 
 	_section("Controles")
+	var touch := HBoxContainer.new()
+	touch.add_theme_constant_override("separation", 6)
+	add_child(touch)
+	var touch_label := H.make_label("Controles de toque", 19, H.TEXT)
+	touch_label.custom_minimum_size = Vector2(200, 0)
+	touch.add_child(touch_label)
+	for i in Settings.TOUCH_MODES.size():
+		var button := _choice(Settings.TOUCH_MODES[i], i == Settings.touch_controls, touch)
+		button.custom_minimum_size.x = 0
+		var mode := i
+		button.pressed.connect(func():
+			Settings.set_touch_controls(mode)
+			_rebuild())
+	_hint("Analógico à esquerda para andar (até a borda corre) e Usar à direita; o aviso de interação também aceita toque.")
 	_hint("Trocar: clique e aperte a tecla nova (Esc cancela). Se outra ação usava a tecla, as duas trocam.")
 	for spec in CONTROLS:
 		var row := HBoxContainer.new()

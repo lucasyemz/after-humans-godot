@@ -105,6 +105,14 @@ static func chip(text: String, value: String = "", color: Color = GOLD) -> Panel
 	return box
 
 
+## O nome da tecla principal de uma ação (com as trocas das Opções).
+static func key_name(action: String) -> String:
+	var code := Settings.primary_key(action)
+	if code == 0:
+		return "?"
+	return {KEY_ESCAPE: "Esc"}.get(code, OS.get_keycode_string(code))
+
+
 ## A tecla desenhada (a do teclado; o controle mostra a do gamepad).
 static func key_cap(text: String) -> PanelContainer:
 	var box := PanelContainer.new()

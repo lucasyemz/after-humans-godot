@@ -25,6 +25,9 @@ var colorblind := false
 const TEXT_SIZES := ["Normal", "Grande", "Maior"]
 const TEXT_SCALE := [1.0, 1.15, 1.3]
 var text_size := 0
+## Controles de toque na exploração (AHTouchControls): automático (com tela de toque), sempre ou desligados.
+const TOUCH_MODES := ["Automático", "Sempre", "Desligados"]
+var touch_controls := 0
 ## As teclas trocadas nas Opções: a ação e a tecla principal nova (código físico). As outras teclas da ação (as setas,
 ## por exemplo) e os botões do controle continuam.
 var keys := {}
@@ -47,11 +50,14 @@ func _ready() -> void:
 		dev_mode = bool(config.get_value("dev", "enabled", dev_mode))
 		colorblind = bool(config.get_value("accessibility", "colorblind", colorblind))
 		text_size = clampi(int(config.get_value("accessibility", "text_size", text_size)), 0, TEXT_SIZES.size() - 1)
+		touch_controls = clampi(int(config.get_value("controls", "touch", touch_controls)), 0, TOUCH_MODES.size() - 1)
 		keys = config.get_value("controls", "keys", {})
 	# --text-size=N nas capturas: confere as telas com o texto maior (só na memória).
 	for arg in args:
 		if String(arg).begins_with("--text-size="):
 			text_size = clampi(int(String(arg).get_slice("=", 1)), 0, TEXT_SIZES.size() - 1)
+		elif String(arg) == "--touch":
+			touch_controls = 1
 	apply_controls()
 	AHUiStyle.text_scale = TEXT_SCALE[text_size]
 	AHUiStyle.install.call_deferred(get_tree().root)
@@ -129,6 +135,16 @@ func set_text_size(value: int) -> void:
 	_store()
 
 
+func set_touch_controls(value: int) -> void:
+	touch_controls = clampi(value, 0, TOUCH_MODES.size() - 1)
+	_store()
+
+
+## Os controles de toque aparecem agora? (Automático: só com tela de toque.)
+func touch_visible() -> bool:
+	return touch_controls == 1 or (touch_controls == 0 and DisplayServer.is_touchscreen_available())
+
+
 func set_level(value: int) -> void:
 	level = clampi(value, 0, 3)
 	_store()
@@ -156,6 +172,7 @@ func _store() -> void:
 	config.set_value("accessibility", "colorblind", colorblind)
 	config.set_value("accessibility", "text_size", text_size)
 	config.set_value("controls", "keys", keys)
+	config.set_value("controls", "touch", touch_controls)
 	config.save(PATH)
 	apply()
 

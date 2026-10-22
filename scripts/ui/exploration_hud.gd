@@ -152,12 +152,12 @@ func _ready() -> void:
 	_hint = HBoxContainer.new()
 	_hint.add_theme_constant_override("separation", 18)
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for spec in [[["A", "D"], "andar"], [["Shift"], "correr"], [["E"], "interagir"]]:
+	for spec in [[["move_left", "move_right"], "andar"], [["run"], "correr"], [["interact"], "interagir"]]:
 		var group := HBoxContainer.new()
 		group.add_theme_constant_override("separation", 5)
 		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		for key in spec[0]:
-			group.add_child(S.key_cap(key))
+		for action in spec[0]:
+			group.add_child(S.key_cap(S.key_name(action)))
 		group.add_child(S.label(spec[1], 17, S.TEXT))
 		_hint.add_child(group)
 	add_child(_hint)
@@ -173,12 +173,20 @@ func _ready() -> void:
 	_finish_button.visible = false
 	_finish_button.pressed.connect(func(): menu_return.emit())
 	add_child(_finish_button)
-	_menu_button = _corner_button("Menu", "Esc", Vector2(1716, 974), func(): menu_requested.emit())
-	_corner_button("Mochila", "I", Vector2(1524, 974), func(): inventory_requested.emit())
+	_menu_button = _corner_button("Menu", S.key_name("menu"), Vector2(1716, 974), func(): menu_requested.emit())
+	_corner_button("Mochila", S.key_name("inventory"), Vector2(1524, 974), func(): inventory_requested.emit())
 
+	# O aviso também é botão: tocar ou clicar nele usa o que está perto.
 	_prompt = PanelContainer.new()
 	_prompt.add_theme_stylebox_override("panel", S.panel(0.9, S.GOLD))
-	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_prompt.mouse_filter = Control.MOUSE_FILTER_STOP
+	_prompt.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			accept_event()
+			var use := InputEventAction.new()
+			use.action = "interact"
+			use.pressed = true
+			Input.parse_input_event(use))
 	_prompt_label = S.label("", 20, S.TEXT, "bold")
 	_prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_prompt.add_child(_prompt_label)
@@ -417,9 +425,20 @@ func _mate(hero: Dictionary) -> PanelContainer:
 ## O aviso de interação: perto do que se usa (where, no mundo), ou embaixo no meio quando não tem lugar.
 func show_prompt(text: String, where = null) -> void:
 	_prompt.visible = text != ""
-	_prompt_label.text = ("[E]  " + text.substr(3)) if text.begins_with("E  ") else text
+	if text.begins_with("E  "):
+		var key := "Toque" if Settings.touch_visible() else S.key_name("interact")
+		text = "[%s]  %s" % [key, text.substr(3)]
+	_prompt_label.text = text
 	_prompt_world = where
 	_prompt.size = _prompt.get_combined_minimum_size()
+
+
+func has_prompt() -> bool:
+	return _prompt.visible
+
+
+func prompt_rect() -> Rect2:
+	return _prompt.get_global_rect() if _prompt.visible else Rect2()
 
 
 ## O achado de uma busca vira momento: cada item sobe da equipe com o ícone e voa para o achado no alto.
@@ -516,6 +535,7 @@ func _process(delta: float) -> void:
 	if Input.get_vector("move_left", "move_right", "move_back", "move_front").length() > 0.1:
 		_hint_time += delta
 	_hint.modulate.a = clampf(1.0 - (_hint_time - 12.0) / 2.0, 0.0, 1.0)
+	_hint.visible = not Settings.touch_visible()
 	var party_end := _party_box.position.x + _party_box.get_combined_minimum_size().x
 	_hint.position = Vector2(party_end + 28, 1036)
 

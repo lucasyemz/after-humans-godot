@@ -265,6 +265,9 @@ func _ready() -> void:
 	corridor = AHStreetCorridor.new()
 	add_child(corridor)
 	corridor.setup(self, exploration_hud)
+	var touch := AHTouchControls.new()
+	touch.street = self
+	_street_hud.add_child(touch)
 	Tips.show_tip("explore")
 
 

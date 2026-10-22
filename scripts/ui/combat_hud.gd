@@ -199,7 +199,7 @@ func _build() -> void:
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.text = spec[0]
 		style_button(button)
-		var key := S.key_cap(spec[2])
+		var key := S.key_cap(S.key_name(spec[3]))
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT, Control.PRESET_MODE_MINSIZE, 8)
 		button.pressed.connect(_on_action.bind(spec[1]))
@@ -579,7 +579,7 @@ func _build_abilities() -> void:
 			why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			why.custom_minimum_size = Vector2(170, 0)
 			text_box.add_child(why)
-		var key := S.key_cap(str(index + 1))
+		var key := S.key_cap(S.key_name("combat_ability_%d" % (index + 1)))
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 		button.set_meta("locked", not option.usable)
