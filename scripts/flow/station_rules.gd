@@ -158,7 +158,7 @@ static func migrate(campaign: Dictionary) -> void:
 				station[key] = defaults[key]
 	if typeof(campaign.get("night")) != TYPE_DICTIONARY:
 		campaign.night = _night_defaults()
-	for key in ["pending_offers"]:
+	for key in ["pending_offers", "researched_skills"]:
 		if typeof(campaign.get(key)) != TYPE_ARRAY:
 			campaign[key] = []
 	for key in ["completed_expeditions"]:

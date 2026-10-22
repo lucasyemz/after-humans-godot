@@ -561,11 +561,15 @@ func _pips(caption: String, ranks: Array, hero_side: bool, color: Color) -> HBox
 	return row
 
 
-func _number_of(ability: Dictionary) -> Array:
+## O número do cartão e da dica: a faixa de verdade nesta luta (com o treino da Pesquisa, "treinado" ao lado).
+func _number_of(ability_id: String) -> Array:
+	var ability: Dictionary = session.data.abilities[ability_id]
 	if ability.DamageRange.Max > 0:
-		return ["%d–%d" % [ability.DamageRange.Min, ability.DamageRange.Max], "dano", GOLD]
+		var damage := session.effective_range(ability_id, "damage")
+		return ["%d–%d" % [damage.Min, damage.Max], "dano · treinado" if damage.trained else "dano", GOLD]
 	if ability.HealRange.Max > 0:
-		return ["+%d–%d" % [ability.HealRange.Min, ability.HealRange.Max], "cura", S.OK]
+		var heal := session.effective_range(ability_id, "heal")
+		return ["+%d–%d" % [heal.Min, heal.Max], "cura · treinado" if heal.trained else "cura", S.OK]
 	return ["", "", GOLD]
 
 
@@ -615,7 +619,7 @@ func _build_abilities(take_focus: bool = true) -> void:
 		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		name_label.custom_minimum_size = Vector2(170, 0)
 		text_box.add_child(name_label)
-		var number := _number_of(ability)
+		var number := _number_of(option.id)
 		if number[0] != "":
 			var line := HBoxContainer.new()
 			line.add_theme_constant_override("separation", 6)
@@ -712,7 +716,7 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 	var ability: Dictionary = session.data.abilities[option.id]
 	_clear(_tip_box)
 	_tip_box.add_child(S.label(option.name, 26, GOLD, "display"))
-	var number := _number_of(ability)
+	var number := _number_of(option.id)
 	var facts := PackedStringArray()
 	if number[0] != "":
 		facts.append("%s de %s" % [number[0], number[1]])
@@ -738,7 +742,7 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			if unit == null:
 				continue
 			var note := "%s (vida %d)" % [unit.display_name, unit.hp]
-			if not unit.is_player and ability.DamageRange.Max >= unit.hp:
+			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage").Max >= unit.hp:
 				note += " · pode cair"
 			hits.append(note)
 		if not hits.is_empty():

@@ -114,14 +114,26 @@ func ability_options(actor_id: String) -> Array:
 	return options
 
 
-## Texto curto da habilidade: o que faz em números e a descrição de abilities.json.
+## A faixa que a habilidade causa de verdade nesta luta (kind "damage" ou "heal"): a dos dados, +1 nos dois limites se
+## ela foi treinada na Pesquisa (o mesmo bônus do motor). {Min, Max, trained}.
+func effective_range(ability_id: String, kind: String = "damage") -> Dictionary:
+	var ability: Dictionary = data.abilities[ability_id]
+	var base: Dictionary = ability.DamageRange if kind == "damage" else ability.HealRange
+	var trained: bool = base.Max > 0 and context.researched_skills.has(ability_id)
+	var bonus := 1 if trained else 0
+	return {"Min": int(base.Min) + bonus, "Max": int(base.Max) + bonus, "trained": trained}
+
+
+## Texto curto da habilidade: o que faz em números (com o treino da Pesquisa) e a descrição de abilities.json.
 func describe(ability_id: String) -> String:
 	var ability: Dictionary = data.abilities[ability_id]
 	var parts := PackedStringArray()
 	if ability.DamageRange.Max > 0:
-		parts.append("Dano %d–%d" % [ability.DamageRange.Min, ability.DamageRange.Max])
+		var damage := effective_range(ability_id, "damage")
+		parts.append("Dano %d–%d%s" % [damage.Min, damage.Max, " (treinado)" if damage.trained else ""])
 	if ability.HealRange.Max > 0:
-		parts.append("Cura %d–%d" % [ability.HealRange.Min, ability.HealRange.Max])
+		var heal := effective_range(ability_id, "heal")
+		parts.append("Cura %d–%d%s" % [heal.Min, heal.Max, " (treinado)" if heal.trained else ""])
 	if ability.Cooldown > 0:
 		parts.append("Recarga %d" % ability.Cooldown)
 	if ability.UsesMax > 0:
