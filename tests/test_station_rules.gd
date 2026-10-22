@@ -357,8 +357,17 @@ func _vitals(t) -> void:
 	S.adjust(c, S.SUPPLIES, -S.quantity(c, S.SUPPLIES))
 	var empty: Dictionary = S.vitals(c, 4)[0]
 	var short := S.forecast(c, 4)
-	var expected: bool = short.food + short.food_produced - short.food_spoiled < short.food_night_need
+	var expected: bool = short.food + short.food_produced - short.food_civilians - short.food_spoiled < short.food_night_need
 	t.equal(empty.warn, expected, "comida zerada avisa quando a próxima volta não fecha")
+	# Os moradores comem antes da noite: com o Otto e 3 suprimentos, a Cantina (2) dá para ele e sobram 3 para 4.
+	var fed := Campaign.create_initial(5)
+	fed.station.residents = [S.OTTO]
+	fed.station.water = 20
+	S.adjust(fed, S.SUPPLIES, 3 - S.quantity(fed, S.SUPPLIES))
+	var tight := S.forecast(fed, 4)
+	t.check(tight.food_civilians > 0 and tight.food + tight.food_produced - tight.food_civilians < 4, "o Otto come da Cantina (%s)" % tight)
+	t.check(S.vitals(fed, 4)[0].warn, "a falta na volta conta o que os moradores comem")
+	t.equal(S.focus_recommended(fed), S.FOCUS_PROVISIONS, "e o foco recomendado são as provisões")
 	c.night.phase = "planning"
 	c.night.participants = c.roster.slice(0, 3).map(func(h): return h.id)
 	c.night.watch_hero_id = ""

@@ -339,7 +339,7 @@ static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
 			var entry = hero(campaign, hero_id)
 			if entry != null and entry.alive and hero_id != campaign.night.watch_hero_id:
 				sleepers += 1
-	var food_short: bool = sleepers > food if planning else food + f.food_produced - f.food_spoiled < f.food_night_need
+	var food_short: bool = sleepers > food if planning else food + f.food_produced - f.food_civilians - f.food_spoiled < f.food_night_need
 	var food_note := ""
 	if planning:
 		food_note = ("! Faltam %d nesta noite" % (sleepers - food)) if food_short else "Abastecida · demanda %d" % sleepers
@@ -1089,7 +1089,7 @@ static func focus_recommended(campaign: Dictionary, team: int = 4) -> String:
 	var f := forecast(campaign, team)
 	if f.water + f.water_produced < f.water_consumed + team:
 		return FOCUS_WATER
-	if f.food + f.food_produced < f.food_night_need:
+	if f.food + f.food_produced - f.food_civilians < f.food_night_need:
 		return FOCUS_PROVISIONS
 	if _needed_room(campaign)[0] != "":
 		return FOCUS_PARTS
