@@ -179,6 +179,17 @@ func _civilians(t) -> void:
 	t.equal(S.decide_candidate(c, S.OTTO, false), "", "recusa o Otto")
 	t.equal(c.station.candidate_queue, [S.CORA, S.OTTO], "o Otto volta ao fim da fila")
 	S.finish_departure(c)
+	# O jogo fechou com o trem partindo (o save tem "departing"): ao abrir, a partida termina e a Estação fica livre.
+	_trip(c, "retreat", {}, 0, 303)
+	S.resolve_night(c)
+	S.finish_dawn(c)
+	var waiting: String = c.station.train.candidate_id
+	t.equal(S.decide_candidate(c, waiting, true), "", "acolhe quem o trem trouxe")
+	var reopened = Campaign._normalize(JSON.parse_string(JSON.stringify(c)))
+	S.migrate(reopened)
+	t.equal(reopened.station.train.phase, "none", "save com o trem partindo: ao abrir, o trem já foi")
+	t.check(S.is_resident(reopened, waiting) and S.preparation_block(reopened) == "", "o acolhido mora aqui e a partida fica livre")
+	t.equal(reopened.station.train.expedition_id, c.station.train.expedition_id, "a visita continua contada para essa volta")
 	# Otto morando: mais 1 de energia e cômodos 1 sucata mais baratos.
 	var o := _campaign()
 	o.station.residents = [S.OTTO]

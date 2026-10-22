@@ -167,6 +167,9 @@ static func migrate(campaign: Dictionary) -> void:
 		campaign[key] = String(campaign.get(key, ""))
 	if typeof(campaign.inventory.get("items")) != TYPE_DICTIONARY:
 		campaign.inventory.items = {}
+	# "departing" é só a animação do trem saindo (4 s na tela). Um save gravado nesse meio (o jogo fechou) abriria com o
+	# trem partindo para sempre: a Preparação ficava bloqueada e a plataforma sem botão.
+	finish_departure(campaign)
 
 
 static func _station_defaults() -> Dictionary:

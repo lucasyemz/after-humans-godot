@@ -126,6 +126,8 @@ func _ready() -> void:
 func _arrive(campaign: Dictionary) -> void:
 	if campaign.session.get("expedition") != null and campaign.session.get("result", "") != "":
 		S.finish_return(campaign)
+	# A partida do trem que ficou pela metade (a cena saiu antes do fim da animação).
+	S.finish_departure(campaign)
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	S.receive_volunteers(campaign, rng)
