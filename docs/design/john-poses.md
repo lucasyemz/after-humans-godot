@@ -1,6 +1,6 @@
 # Poses de combate dos vilões do John — #44
 
-Entrega para integração pelo Claude. Seis personagens, **26 PNGs RGBA de 1178 × 1335 px**, voltados à direita: `attack1`, `hurt`, `defense`, `death` para todos e `support` para Recreador e Pipoco. Fontes em `art/combat/source/john/`; os nomes com hífen seguem o pedido da issue. A pasta tem `.gdignore`: fontes não são importadas nem exportadas como texturas do jogo.
+Entrega para integração pelo Claude. Seis personagens, **26 PNGs RGBA de 1178 × 1335 px**, voltados à direita: `attack1`, `hurt`, `defense`, `death` para todos e `support` para Recreador e Pipoco. Fontes em `SourceArt/CharacterGallery/JohnCombatPoses20261022/ (na referência Unreal; os originais do PR também na tag codex-pr46-originals) `; os nomes com hífen seguem o pedido da issue. A pasta tem `.gdignore`: fontes não são importadas nem exportadas como texturas do jogo.
 
 ## Referência e decisões
 
@@ -78,7 +78,7 @@ Cada coluna mostra a **mesma tela**, com a mesma redução; não há ajuste indi
 
 Bounds abaixo são apenas a área visível (`alfa > 24`, direita/base exclusivas), **não** áreas para recorte nem novas âncoras. A área de conteúdo é a silhueta; todo o restante é transparente. Não desenhar nome, barra ou seleção dentro da textura.
 
-| Arquivo em `art/combat/source/john/` | Bounds x0,y0,x1,y1 |
+| Arquivo em `SourceArt/CharacterGallery/JohnCombatPoses20261022/ (na referência Unreal; os originais do PR também na tag codex-pr46-originals) ` | Bounds x0,y0,x1,y1 |
 |---|---|
 | `recreador-attack1.png` | 210, 52, 926, 1270 |
 | `recreador-hurt.png` | 189, 127, 944, 1269 |

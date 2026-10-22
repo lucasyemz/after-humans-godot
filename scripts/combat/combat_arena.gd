@@ -96,6 +96,20 @@ static func hero_art_of(hero_id: String) -> Dictionary:
 	return art_entry(_manifest.heroes, hero_id)
 
 
+## A pose do inimigo ao agir: defesa ao defender, apoio na ação em si mesmo e no golpe sem dano num herói (a Buzina do
+## Pipoco, a Risada do Recreador) quando ele tem a pose de apoio; senão, o ataque.
+static func enemy_action_pose(action, art: Dictionary) -> String:
+	if action == null:
+		return "attack1"
+	if action.get("bIsDefend", false):
+		return "defense"
+	if action.get("TargetType", "") == "Self":
+		return "support"
+	if int(action.get("DamageRange", {}).get("Max", 0)) <= 0 and art.get("poses", {}).has("support"):
+		return "support"
+	return "attack1"
+
+
 func enemy_art(enemy_id: String) -> Dictionary:
 	return art.enemies.get(enemy_id, {})
 
@@ -359,15 +373,8 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 	# Preparo: a pose de quem age, já na frente dos outros.
 	if actor.is_player:
 		show_pose(actor, "preparacao", ability_id)
-	elif action != null and action.bIsDefend:
-		show_pose(actor, "defense")
-	elif action != null and action.TargetType == "Self":
-		show_pose(actor, "support")
-	elif action != null and int(action.get("DamageRange", {}).get("Max", 0)) <= 0 and enemy_art(actor.enemy_id).get("poses", {}).has("support"):
-		# Golpe sem dano num herói (a Buzina do Pipoco, a Risada do Recreador): a pose de apoio, quando há.
-		show_pose(actor, "support")
 	else:
-		show_pose(actor, "attack1")
+		show_pose(actor, enemy_action_pose(action, enemy_art(actor.enemy_id)))
 	card.position.z = home.z + FRONT_LIFT
 	var struck := _nearest_struck(actor, card, events)
 	var advance := 0.0 if support else _advance(actor, card, ability_id, hero_action, struck)

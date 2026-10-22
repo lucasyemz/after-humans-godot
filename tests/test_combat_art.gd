@@ -33,6 +33,7 @@ func run(t) -> void:
 			if phases.has("execucao"):
 				_check_measured(t, phases.execucao, ability_id + " execução")
 
+	_john_villains(t, art)
 	for enemy_id in ["robot", "robot_fungo", "vigia_enferrujado"]:
 		var enemy: Dictionary = art.enemies.get(enemy_id, {})
 		if not t.check(not enemy.is_empty(), "arte de %s" % enemy_id):
@@ -72,3 +73,30 @@ func _files(value) -> Array:
 			if value.begins_with("res://"):
 				found.append(value)
 	return found
+
+
+## Os vilões do John (#44, #45): cada pose de luta tem a âncora, a altura e a tela do idle (o pé não pula e a derrota
+## não cresce); a pose do inimigo ao agir; e a placa dos baixinhos sempre acima da cabeça.
+func _john_villains(t, art: Dictionary) -> void:
+	for enemy_id in ["recreador", "pipoco", "enraizado", "broto", "carrasco_industrial", "faisca"]:
+		var enemy: Dictionary = art.enemies.get(enemy_id, {})
+		if not t.check(not enemy.is_empty(), "arte de %s" % enemy_id):
+			continue
+		for pose in ["attack1", "hurt", "defense", "death"]:
+			var entry: Dictionary = enemy.poses.get(pose, {})
+			t.check(not entry.is_empty(), "%s tem a pose %s" % [enemy_id, pose])
+			if not entry.is_empty():
+				t.equal([entry.anchor, entry.body_reference_pixels, entry.canvas], [enemy.idle.anchor, enemy.idle.body_reference_pixels, enemy.idle.canvas],
+					"%s %s: mesma âncora, altura e tela do idle" % [enemy_id, pose])
+	var horn = GameData.row("enemy_actions", "pipoco.buzina_irritante")
+	var laugh = GameData.row("enemy_actions", "recreador.risada_gravada")
+	t.equal(AHCombatArena.enemy_action_pose(horn, art.enemies.pipoco), "support", "a Buzina do Pipoco usa a pose de apoio")
+	t.equal(AHCombatArena.enemy_action_pose(laugh, art.enemies.recreador), "support", "a Risada do Recreador usa a pose de apoio")
+	t.equal(AHCombatArena.enemy_action_pose(GameData.row("enemy_actions", "enraizado.golpe_provisorio"), art.enemies.enraizado), "attack1",
+		"o golpe do Enraizado usa o ataque")
+	t.equal(AHCombatArena.enemy_action_pose(horn, art.enemies.enraizado), "attack1", "sem pose de apoio, o golpe sem dano usa o ataque")
+	var H := preload("res://scripts/ui/combat_hud.gd")
+	for dock in [INF, 700.0, 500.0]:
+		t.equal(H.plate_y(760.0, 650.0, true, 70.0, dock), 650.0 - 70.0 - 8.0, "baixinho: a placa fica acima da cabeça (painel em %s)" % dock)
+	t.equal(H.plate_y(760.0, 400.0, false, 70.0, INF), 770.0, "alto sem o painel: sob os pés")
+	t.equal(H.plate_y(760.0, 400.0, false, 70.0, 700.0), 700.0, "alto com o painel: no limite do painel")

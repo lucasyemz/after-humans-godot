@@ -479,23 +479,40 @@ func _process(_delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
 		return
+	var short_plates: Array[Rect2] = []
 	for unit_id in _unit_bars:
 		var plate: Control = _unit_bars[unit_id]
 		var card: AHSpriteCard = arena.cards.get(unit_id)
 		if card == null or not plate.visible:
 			continue
-		# Sob os pés, sem passar para dentro do painel de baixo.
 		var feet := camera.unproject_position(card.global_position)
-		var y := minf(feet.y + 10, _dock_top() - plate.size.y - 6) if _panel.visible else feet.y + 10
-		# Os baixinhos (os ajudantes do John): se a placa subiria por cima do corpo, ela vai acima da cabeça.
-		if y < feet.y and card.body_height < 0.9:
-			var head := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 1.05, 0))
-			y = head.y - plate.size.y - 8
+		var head := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 1.05, 0))
+		var short := card.body_height < SHORT_HEIGHT
+		var y := plate_y(feet.y, head.y, short, plate.size.y, _dock_top() - plate.size.y - 6 if _panel.visible else INF)
 		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
+		if short:
+			short_plates.append(Rect2(plate.position, plate.size))
 	for marker in _markers + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")
 		var screen := camera.unproject_position(target)
 		marker.position = screen - Vector2(marker.size.x * 0.5, marker.size.y + 24)
+		# O marcador do alvo não cobre a placa de um baixinho (que fica acima da cabeça): sobe para cima dela.
+		for rect in short_plates:
+			if rect.intersects(Rect2(marker.position, marker.size)):
+				marker.position.y = rect.position.y - marker.size.y - 6
+
+
+## Abaixo desta altura (m) o personagem é baixinho (os ajudantes do John, o Rastejante de Cabos): a placa sob os pés
+## subiria por cima do corpo quando encosta no painel de baixo.
+const SHORT_HEIGHT := 0.9
+
+
+## Onde fica a placa (y na tela): o baixinho, sempre acima da cabeça (não pula entre cima e baixo a cada lance); os
+## outros, sob os pés, sem passar do limite do painel de baixo (dock_limit; INF sem o painel).
+static func plate_y(feet_y: float, head_y: float, short: bool, plate_height: float, dock_limit: float) -> float:
+	if short:
+		return head_y - plate_height - 8.0
+	return minf(feet_y + 10.0, dock_limit)
 
 
 # ---------------------------------------------------------------- turno do herói

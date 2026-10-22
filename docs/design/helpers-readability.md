@@ -1,6 +1,6 @@
 # Leitura dos ajudantes nos cenários — #45
 
-**16 variantes PNG RGBA, 1178 × 1335 px**, em `art/combat/source/john/`: os três idles pedidos e as 13 poses dos ajudantes entregues na #44. São fontes para o Claude converter; não substituem nem renomeiam as texturas que o jogo já usa.
+**16 variantes PNG RGBA, 1178 × 1335 px**, em `SourceArt/CharacterGallery/JohnCombatPoses20261022/ (na referência Unreal; os originais do PR também na tag codex-pr46-originals) `: os três idles pedidos e as 13 poses dos ajudantes entregues na #44. São fontes para o Claude converter; não substituem nem renomeiam as texturas que o jogo já usa.
 
 ## Arquivos e integração
 
