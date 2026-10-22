@@ -858,11 +858,12 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 				hero.instinct = clampi(hero.instinct + instinct, 0, 200)
 				break
 	var hurt := ""
-	if int(effects.get("Damage", 0)) > 0:
+	# O herói sorteado leva o dano; sem dano, só empresta o nome ao texto ({Heroi}).
+	if int(effects.get("Damage", 0)) > 0 or String(effects.get("Result", "")).contains("{Heroi}"):
 		var team := _team_alive(campaign)
 		if not team.is_empty():
 			var hero: Dictionary = team[mini(team.size() - 1, floori(random.next() * team.size()))]
-			hero.hp = maxi(1, hero.hp - int(effects.Damage))
+			hero.hp = maxi(1, hero.hp - int(effects.get("Damage", 0)))
 			hurt = hero.display_name
 	grant_tool(campaign, String(effects.get("GrantTool", "")))
 	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "":

@@ -617,7 +617,7 @@ func show_event(campaign: Dictionary) -> void:
 	box.add_child(title)
 	# O que se vasculhou (#7): o evento vem do objeto.
 	if String(event.get("object", "")) != "":
-		box.add_child(H.make_label("Ao vasculhar %s" % String(event.object).to_lower(), 17, H.MUTED))
+		box.add_child(H.make_label("Ao vasculhar: %s" % String(event.object), 17, H.MUTED))
 	var text := H.make_label(event.resolution if event.resolution != "" else row.get("Description", ""), 20, H.TEXT)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(780, 0)

@@ -159,6 +159,32 @@ func _scenario_choice(t) -> void:
 
 ## A opção indisponível diz por quê (RequirementText) e não pode ser escolhida.
 func _requirements(t) -> void:
+	_texts(t)
+	_hero_name(t)
+	_requirements_only(t)
+
+
+## As descrições dos eventos ligados a objeto não falam de outro lugar (asfalto, galho) nem começam como se o objeto
+## fosse outra coisa: as de lugar começam por onde está, ao lado ou atrás do objeto.
+func _texts(t) -> void:
+	for id in ["busca_cano_rompido", "busca_poco_escuro", "busca_sala_esporos"]:
+		var text: String = GameData.row("events", id).Description
+		t.check(not text.contains("asfalto"), "%s: sem asfalto dentro de casa" % id)
+		t.check(text.begins_with("Atrás") or text.begins_with("Ao lado") or text.begins_with("O kit"), "%s: começa pelo objeto vasculhado" % id)
+
+
+## O texto com {Heroi} sempre ganha um nome, com ou sem dano.
+func _hero_name(t) -> void:
+	for seed_value in 20:
+		var c: Dictionary = Campaign.create_initial(8)
+		R.start_expedition(c, "fase_5", 300 + seed_value)
+		c.session.event = {"event_id": "busca_sala_esporos", "from_search": true, "resolution": "", "pending_hard_combat": false}
+		R.choose_event_option(c, "prender_folego", seed_value)
+		t.check(not c.session.event.resolution.contains("{Heroi}") and not c.session.event.resolution.contains("  "),
+			"o herói tem nome no texto (%s)" % c.session.event.resolution.left(60))
+
+
+func _requirements_only(t) -> void:
 	var c: Dictionary = Campaign.create_initial(5)
 	R.start_expedition(c, "fase_1", 99)
 	c.session.event = {"event_id": "busca_choro_porta", "from_search": true, "resolution": "", "pending_hard_combat": false}
@@ -202,7 +228,7 @@ func _scene(t) -> void:
 		await tree.process_frame
 		t.check(Campaign.state.session.event != null, "o objeto com escolha (%s) abre o evento" % entry.name)
 		t.check(street.exploration_hud.modal_open(), "e o painel do evento aparece na hora")
-		var says: bool = street.exploration_hud._modal.find_children("*", "Label", true, false).any(func(l): return l.text == "Ao vasculhar %s" % entry.name.to_lower())
+		var says: bool = street.exploration_hud._modal.find_children("*", "Label", true, false).any(func(l): return l.text == "Ao vasculhar: %s" % entry.name)
 		t.check(says, "o painel diz o que foi vasculhado (%s)" % entry.name)
 		opened = true
 		break
