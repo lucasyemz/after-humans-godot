@@ -74,15 +74,49 @@ func _station(t, tree: SceneTree) -> void:
 	Settings.set_text_size(2)
 	await tree.process_frame
 	t.equal(hud.current, "plan", "o Plano continua aberto depois da troca")
-	t.equal(hud._body.get_child_count(), children, "o painel não foi remontado")
-	t.check(is_instance_valid(title) and title.get_theme_font_size("font_size") > before, "o texto do painel aberto cresceu (%d → %d)" % [before, title.get_theme_font_size("font_size") if is_instance_valid(title) else 0])
+	await tree.process_frame
+	t.equal(hud._body.get_child_count(), children, "o painel refeito tem o mesmo conteúdo")
+	var grown := _first_label(hud._body)
+	t.check(grown != null and grown.get_theme_font_size("font_size") > before, "o texto do painel aberto cresceu (%d → %d)" % [before, grown.get_theme_font_size("font_size") if grown else 0])
 	t.check(hud._resources.position.x + hud._resources.size.x <= 1889.0, "a barra do alto continua dentro da tela")
+	t.check(hud._subtitle.position.y >= hud._title.position.y + hud._title.get_combined_minimum_size().y - 2.0,
+		"o subtítulo continua embaixo do título (%.0f, título até %.0f)" % [hud._subtitle.position.y, hud._title.position.y + hud._title.get_combined_minimum_size().y])
+	await tree.process_frame
+	t.equal(hud.current, "plan", "o Plano continua aberto depois de refeito com o texto novo")
+	# Daltonismo na Estação (o alerta da Comida aparece numa campanha nova): não sobra verde nem vermelho antigo.
+	var old_ok: Color = U.OK
+	var old_danger: Color = U.DANGER
+	Settings.set_colorblind(true)
+	await tree.process_frame
+	await tree.process_frame
+	t.equal(_old_colors(hud, old_ok, old_danger), [], "daltonismo: nenhuma cor antiga na Estação")
+	Settings.set_colorblind(false)
 	hud.open_map()
 	await tree.process_frame
 	Settings.set_text_size(0)
 	await tree.process_frame
 	t.check(hud._map.visible, "o mapa de fases continua aberto")
+	await tree.process_frame
 	t.check(hud._map._progress.position.x > hud._map._header.position.x + hud._map._header.get_minimum_size().x, "a barra de progresso acompanha o cabeçalho")
+	# O mapa aberto no Normal e trocado para o Maior com ele na tela.
+	hud._map.visible = false
+	hud.open_map()
+	await tree.process_frame
+	Settings.set_text_size(2)
+	await tree.process_frame
+	await tree.process_frame
+	var tight := 0
+	var points: Array = [AHPhaseMap.REFUGE_POS] + AHJourneyRules.PHASES.map(func(p): return Vector2(p.map_pos[0], p.map_pos[1]))
+	var scale: Vector2 = AHPhaseMap.MAP_RECT.size / AHPhaseMap.SPACE
+	var nodes: Array = hud._map._nodes.get_children().filter(func(n): return not n.is_queued_for_deletion())
+	for i in mini(nodes.size(), points.size()):
+		var button: Control = nodes[i]
+		var column: Control = button.get_child(0)
+		var center_x: float = button.position.x + button.size.x * 0.5
+		if button.size.x + 0.5 < column.get_combined_minimum_size().x or absf(center_x - points[i].x * scale.x) > 1.0:
+			tight += 1
+	t.equal(tight, 0, "mapa no texto Maior: cada nó fica centrado no ponto da fase e cabe no próprio botão")
+	Settings.set_text_size(0)
 
 
 ## Na rua e na luta: o HUD da exploração e o da luta mudam na hora; a luta continua esperando o mesmo herói.
@@ -98,6 +132,8 @@ func _street(t, tree: SceneTree) -> void:
 	var before := label.get_theme_font_size("font_size")
 	Settings.set_text_size(1)
 	t.check(label.get_theme_font_size("font_size") > before, "o HUD da exploração cresce na hora")
+	# A luta abre no tamanho Normal (as cartas montadas nele) e troca na hora.
+	Settings.set_text_size(0)
 	street.corridor.debug_next_fight()
 	street.corridor._start_fight(c.session.expedition.corridor.index, true)
 	var arena: AHCombatArena = street._arena
@@ -118,6 +154,48 @@ func _street(t, tree: SceneTree) -> void:
 	t.check(arena.hud.waiting and arena.hud._actor_id == actor, "a luta continua esperando o mesmo herói")
 	t.check(arena.hud._bag != null, "a Mochila aberta continua aberta")
 	t.check(arena.hud._panel.position.y + arena.hud._panel.size.y <= 1057.0, "o painel de baixo cabe na tela com o texto Maior")
+	arena.hud._close_bag()
+	Settings.set_text_size(0)
+	await tree.process_frame
+	Settings.set_text_size(2)
+	await tree.process_frame
+	await tree.process_frame
+	var overflow := 0
+	for card in arena.hud._abilities.get_children():
+		if card.is_queued_for_deletion() or card.get_child_count() == 0:
+			continue
+		if card.size.y + 0.5 < (card.get_child(0) as Control).get_combined_minimum_size().y:
+			overflow += 1
+	t.equal(overflow, 0, "luta no texto Maior: o conteúdo de cada carta de habilidade cabe nela")
+	t.check(arena.hud.waiting and arena.hud._actor_id == actor, "e a luta continua esperando o mesmo herói")
+	var ok_cb: Color = U.OK
+	var danger_cb: Color = U.DANGER
+	Settings.set_colorblind(false)
+	await tree.process_frame
+	await tree.process_frame
+	t.equal(_old_colors(arena.hud, ok_cb, danger_cb), [], "sem daltonismo de novo: nenhuma cor do modo daltonismo sobra na luta")
+
+
+## Os nós visíveis que ainda têm o verde ou o vermelho de antes da troca (texto, painel, ícone, retângulo).
+func _old_colors(root: Node, ok: Color, danger: Color) -> Array:
+	var found: Array = []
+	var same := func(c: Color) -> bool: return U._same_rgb(c, ok) or U._same_rgb(c, danger)
+	for node in root.find_children("*", "CanvasItem", true, false):
+		if not node.is_visible_in_tree() or node.is_queued_for_deletion():
+			continue
+		var bad: bool = same.call(node.modulate) or same.call(node.self_modulate)
+		if node is Control:
+			for name in ["font_color"]:
+				bad = bad or (node.has_theme_color_override(name) and same.call(node.get_theme_color(name)))
+			for name in ["panel", "normal", "fill"]:
+				if node.has_theme_stylebox_override(name) and node.get_theme_stylebox(name) is StyleBoxFlat:
+					var box: StyleBoxFlat = node.get_theme_stylebox(name)
+					bad = bad or same.call(box.bg_color) or same.call(box.border_color)
+			if node is ColorRect:
+				bad = bad or same.call(node.color)
+		if bad:
+			found.append(str(node.name))
+	return found
 
 
 func _first_label(root: Node) -> Label:

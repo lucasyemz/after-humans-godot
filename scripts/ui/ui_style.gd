@@ -81,6 +81,10 @@ static func retune(root: Node, from_scale: float, from_ok: Color, from_danger: C
 	var styles := {}
 	var hooks: Array = []
 	for node in [root] + root.find_children("*", "", true, false):
+		# Ícones pintados por modulate (o alerta da barra da Estação, os nós da rota).
+		if node is CanvasItem and not swaps.is_empty():
+			node.modulate = _swap(node.modulate, swaps)
+			node.self_modulate = _swap(node.self_modulate, swaps)
 		if node is Control:
 			var control: Control = node
 			if rescale and control.has_theme_font_size_override("font_size"):
@@ -108,7 +112,13 @@ static func retune(root: Node, from_scale: float, from_ok: Color, from_danger: C
 			hooks.append(node)
 	# Depois do quadro: os tamanhos mínimos só se refazem com as fontes novas aplicadas.
 	for node in hooks:
-		node.restyle.call_deferred()
+		_restyle.call_deferred(node)
+
+
+## A tela pode ter saído no meio (troca de cena): só refaz quem ainda está na árvore.
+static func _restyle(node: Node) -> void:
+	if is_instance_valid(node) and node.is_inside_tree():
+		node.restyle()
 
 
 static func _same_rgb(a: Color, b: Color) -> bool:

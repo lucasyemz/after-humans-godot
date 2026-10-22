@@ -132,10 +132,11 @@ func refresh() -> void:
 	_build_aside(c)
 
 
-## O tamanho do texto mudou nas Opções (AHUiStyle.retune): a barra de progresso acompanha o cabeçalho.
+## O tamanho do texto mudou nas Opções (AHUiStyle.retune).
 func restyle() -> void:
-	_header.size = Vector2(0, 0)
-	_progress.position.x = 40 + _header.get_minimum_size().x + 24
+	# Os nós medem o rótulo para ficar centrados no ponto da fase: refeitos com o texto novo (a fase escolhida fica).
+	if visible:
+		refresh()
 
 
 func _status(c: Dictionary, info: Dictionary) -> String:

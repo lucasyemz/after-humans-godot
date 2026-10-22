@@ -1036,7 +1036,7 @@ func _label(text: String, size: int, at: Vector2) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.position = at
-	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_font_size_override("font_size", AHUiStyle.px(size))
 	label.add_theme_color_override("font_color", Color(0.98, 0.88, 0.66))
 	label.add_theme_color_override("font_outline_color", Color(0.06, 0.04, 0.03))
 	label.add_theme_constant_override("outline_size", 6)

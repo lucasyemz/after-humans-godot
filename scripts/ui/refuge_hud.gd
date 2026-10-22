@@ -305,11 +305,25 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## O tamanho do texto ou as cores mudaram nas Opções (AHUiStyle.retune): o que tem posição calculada pelo tamanho do
 ## texto se ajusta, sem remontar o painel aberto (a rolagem e a seleção ficam).
+## O painel aberto (e a gaveta da Preparação) é refeito com o tamanho novo, na mesma rolagem; o relatório (que anima a
+## chegada do achado, com som) e as Opções (que se refazem sozinhas) ficam como estão.
 func restyle() -> void:
+	_subtitle.position.y = 18 + U.px(48)
 	_resources.size = _resources.get_combined_minimum_size()
 	_resources.position = Vector2(1888 - _resources.size.x, 16)
 	if _hidden_hint != null:
 		_hidden_hint.size = _hidden_hint.get_combined_minimum_size()
+		_hidden_hint.position.x = 960 - _hidden_hint.size.x * 0.5
+	if current == "" or current == "report" or current == "options":
+		return
+	var scroll: ScrollContainer = _panel.get_child(0)
+	var at := scroll.scroll_vertical
+	_show(current)
+	var tree := get_tree()
+	await tree.process_frame
+	await tree.process_frame
+	if is_instance_valid(scroll):
+		scroll.scroll_vertical = at
 
 
 func refresh() -> void:

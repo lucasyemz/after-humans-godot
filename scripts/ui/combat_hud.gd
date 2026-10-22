@@ -661,8 +661,20 @@ func _dock_top() -> float:
 
 
 ## O tamanho do texto ou as cores mudaram nas Opções (AHUiStyle.retune): as fichas e o painel se ajustam ao texto novo.
+## As cartas de habilidade (altura, recuo e ícone pelo tamanho do texto) são refeitas com a mesma carta em foco; os
+## botões de ação crescem junto.
 func restyle() -> void:
 	refresh()
+	for button in _actions.get_children():
+		button.custom_minimum_size.y = S.px(42)
+	if waiting and _choosing == "":
+		var owner := get_viewport().gui_get_focus_owner()
+		var focused: int = _abilities.get_children().find(owner)
+		_build_abilities()
+		if focused >= 0:
+			await get_tree().process_frame
+			if focused < _abilities.get_child_count():
+				(_abilities.get_child(focused) as Control).grab_focus()
 	_fit_dock.call_deferred()
 
 
