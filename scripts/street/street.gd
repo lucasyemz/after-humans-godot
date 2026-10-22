@@ -856,11 +856,11 @@ func _build_party() -> void:
 	var expedition = Campaign.state.get("session", {}).get("expedition")
 	for hero_id in (expedition.team if expedition != null else Campaign.state.get("preferred_formation", [])):
 		var hero = Campaign.hero(hero_id)
-		if hero == null or not hero.get("alive", true) or not _combat_art.heroes.has(hero_id) or party_ids.size() >= 4:
+		if hero == null or not hero.get("alive", true) or AHCombatArena.art_entry(_combat_art.heroes, hero_id).is_empty() or party_ids.size() >= 4:
 			continue
 		var card := AHSpriteCard.new()
 		card.body_height = AHCharacterHeights.find(hero_id)
-		card.show_art(_combat_art.heroes[hero_id].idle)
+		card.show_art(AHCombatArena.art_entry(_combat_art.heroes, hero_id).idle)
 		add_child(card)
 		party_ids.append(hero_id)
 		_heroes.append(card)
@@ -1258,7 +1258,7 @@ func remove_dead_heroes() -> void:
 			_heroes.remove_at(index)
 			party_ids.remove_at(index)
 	for index in _heroes.size():
-		_heroes[index].show_art(_combat_art.heroes[party_ids[index]].idle)
+		_heroes[index].show_art(AHCombatArena.art_entry(_combat_art.heroes, party_ids[index]).idle)
 		_heroes[index].set_tint(Color.WHITE)
 	if not _heroes.is_empty():
 		_place_leader(Vector3(_heroes[0].position.x, 0, _leader.position.z if not _indoor else -0.5))

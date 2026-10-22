@@ -1083,12 +1083,7 @@ func _swap(a: int, b: int) -> void:
 
 ## A arte de um herói (os recrutas usam a do fundador da mesma classe).
 static func _hero_art(entry: Dictionary) -> Dictionary:
-	var art := AHCombatArena.hero_art_of(entry.id)
-	if art.is_empty():
-		for hero_id in ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]:
-			if hero_id.contains("_%s_" % entry.class_id):
-				art = AHCombatArena.hero_art_of(hero_id)
-	return art.get("idle", {})
+	return AHCombatArena.hero_art_of(entry.id).get("idle", {})
 
 
 ## A gaveta da Preparação: os quatro cartões no sentido da luta (o fundo à esquerda, a frente à direita), com rosto,
