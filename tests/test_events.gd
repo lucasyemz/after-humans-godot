@@ -154,7 +154,7 @@ func _scenario_choice(t) -> void:
 		R.assign_scenario_props(c, "SealedShelter", [1, 2, 5, 6, 8, 8], NAMES)
 		t.check(route.choice_props.has(prop) and route.searched_props.has(prop), "reentrar no mapa não sorteia de novo")
 	t.check(with_choice > 10 and with_choice < 50, "cerca de metade dos mapas tem objeto com escolha (%d de 60)" % with_choice)
-	t.check(opened.size() >= 2, "eventos variados na Sala Esquecida (%s)" % opened.keys())
+	t.check(opened.size() >= 2, "eventos variados na Sala Esquecida (%s)" % str(opened.keys()))
 
 
 ## A opção indisponível diz por quê (RequirementText) e não pode ser escolhida.

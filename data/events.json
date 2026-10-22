@@ -205,7 +205,7 @@
   {
     "Name": "busca_barricada",
     "Title": "Barricada Velha",
-    "Description": "Tábuas e placas de metal empilhadas contra uma porta, por alguém que queria manter alguma coisa do lado de dentro, ou do lado de fora.",
+    "Description": "Atrás da carga, tábuas e placas de metal empilhadas contra uma porta, por alguém que queria manter alguma coisa do lado de dentro, ou do lado de fora.",
     "Places": [],
     "Objects": [
       "carga"
