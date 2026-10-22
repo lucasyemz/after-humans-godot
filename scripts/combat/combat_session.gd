@@ -295,7 +295,9 @@ func write_back(campaign: Dictionary) -> void:
 			if hero.id != unit.hero_id:
 				continue
 			var dead: bool = unit.hp <= 0 and not unit.deaths_door
-			hero.hp = maxi(unit.hp, 1 if unit.deaths_door else 0)
+			# A relíquia de vida aumenta o máximo só na luta: fora dela a vida volta ao máximo do herói (senão a noite e a
+			# comida "curavam" para baixo).
+			hero.hp = clampi(unit.hp, 1 if unit.deaths_door else 0, int(hero.max_hp))
 			hero.instinct = unit.instinct
 			hero.trauma = unit.trauma
 			hero.alive = not dead

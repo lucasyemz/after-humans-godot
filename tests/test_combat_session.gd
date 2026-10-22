@@ -93,7 +93,21 @@ func _write_back(t, campaign: Dictionary) -> void:
 	var dead = copy.roster.filter(func(h): return h.id == "hero_gato_nick")[0]
 	t.equal(dead.alive, false, "quem morreu na luta fica com alive = false")
 	t.check(Campaign.is_usable(copy), "a campanha continua utilizável depois da luta")
+	_relic_hp(t, campaign)
 	_expedition_context(t, campaign)
+
+
+## A relíquia de vida aumenta o máximo só na luta: curado até o máximo dela, o herói volta com a vida do máximo dele.
+func _relic_hp(t, campaign: Dictionary) -> void:
+	var copy: Dictionary = campaign.duplicate(true)
+	var hero = copy.roster.filter(func(h): return h.id == "hero_cao_bento")[0]
+	hero.relic_id = "botao_cobre"
+	var session := AHCombatSession.create(copy.roster, PATROLS[0], false, 5)
+	var bento := session.state.find_unit("unit_hero_cao_bento")
+	t.check(bento.max_hp > hero.max_hp, "na luta, a relíquia aumenta a vida máxima (%d > %d)" % [bento.max_hp, hero.max_hp])
+	bento.hp = bento.max_hp
+	session.write_back(copy)
+	t.equal(hero.hp, hero.max_hp, "fora da luta, a vida não passa do máximo do herói")
 
 
 ## A Esperança da expedição entra na luta, e os laços entre os heróis duram a expedição inteira (luta a luta).
