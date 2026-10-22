@@ -110,7 +110,8 @@
     "Front": [
       "enraizado",
       "cao_eco",
-      "carcaca_colonizada"
+      "carcaca_colonizada",
+      "robot"
     ],
     "Ranged": [
       "condutor_raiz"
@@ -125,7 +126,8 @@
     "Front": [
       "robot_fungo",
       "carrasco_industrial",
-      "carcaca_colonizada"
+      "carcaca_colonizada",
+      "robot"
     ],
     "Ranged": [
       "ninho_errante",

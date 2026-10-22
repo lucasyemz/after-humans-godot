@@ -13,6 +13,7 @@ func run(t) -> void:
 	_steps(t)
 	_enemies(t)
 	_john_villains(t)
+	_progression(t)
 	_sites(t)
 	_search(t)
 	_events(t)
@@ -152,6 +153,45 @@ func _john_villains(t) -> void:
 	for enemy_id in john:
 		t.check(art.enemies.has(enemy_id) and ResourceLoader.exists(art.enemies[enemy_id].idle.file), "%s tem a pose parada" % enemy_id)
 		t.check(AHCharacterHeights.HEIGHTS.has(enemy_id), "%s tem altura própria" % enemy_id)
+
+
+## A fase fica mais difícil até o guardião (Lucas, 22/10/2026): a primeira patrulha pesa menos que a última, a
+## patrulha forte (3 ou 4) só vem nas duas últimas antes do guardião, e o Robô volta às fases 2 e 5.
+func _progression(t) -> void:
+	var first_total := 0.0
+	var last_total := 0.0
+	var early_elites := 0
+	var phases := 0
+	var robot := {"fase_2": false, "fase_5": false}
+	for phase_id in ["fase_1", "fase_2", "fase_3", "fase_4", "fase_5"]:
+		for seed_value in 40:
+			var campaign: Dictionary = Campaign.create_initial(seed_value + 1)
+			if not R.start_expedition(campaign, phase_id, seed_value * 104729 + 7):
+				continue
+			var expedition: Dictionary = campaign.session.expedition
+			var route: Dictionary = expedition.corridor
+			var fights: Array = []
+			for index in route.steps.size():
+				if route.steps[index].type == "combat":
+					fights.append(R.corridor_enemies(expedition, index))
+			if fights.size() < 2:
+				continue
+			phases += 1
+			var weight := func(group: Array) -> float:
+				return group.reduce(func(sum, spec): return sum + R.enemy_strength(spec.enemy_id) * spec.max_hp / maxf(1.0, float(GameData.row("enemies", spec.enemy_id).MaxHp)), 0.0)
+			first_total += weight.call(fights[0])
+			last_total += weight.call(fights[-1])
+			for i in fights.size() - 2:
+				if fights[i].size() >= 3 and i < fights.size() - 2 and i == 0:
+					early_elites += 1
+			for group in fights:
+				for spec in group:
+					if robot.has(phase_id) and spec.enemy_id == "robot":
+						robot[phase_id] = true
+	t.check(phases > 150, "%d fases medidas" % phases)
+	t.check(last_total > first_total * 1.5, "a última patrulha pesa mais que a primeira (%.0f contra %.0f)" % [last_total, first_total])
+	t.equal(early_elites, 0, "a primeira patrulha nunca é a forte")
+	t.check(robot.fase_2 and robot.fase_5, "o Robô volta às patrulhas das fases 2 e 5")
 
 
 func _sites(t) -> void:

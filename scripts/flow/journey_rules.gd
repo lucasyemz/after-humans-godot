@@ -233,9 +233,40 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 # ---------------------------------------------------------------- inimigos
 
 ## Formação de um encontro (GenerateEnemyTeam): do perfil do nó, da frente para trás.
+## Quanto um inimigo pesa na luta: a vida e o dano médio do seu golpe mais forte (x3). O Pipoco (sem dano) é o mais
+## leve; o Carrasco e o Coletor, os mais pesados.
+static func enemy_strength(enemy_id: String) -> float:
+	var row = GameData.row("enemies", enemy_id)
+	if row == null:
+		return 0.0
+	var best := 0.0
+	for action_id in row.get("ActionIds", []):
+		var action = GameData.row("enemy_actions", action_id)
+		var damage: Dictionary = action.get("DamageRange", {}) if action != null else {}
+		if int(damage.get("Max", 0)) > 0:
+			best = maxf(best, (float(damage.Min) + float(damage.Max)) * 0.5)
+	return float(row.get("MaxHp", 0)) + best * 3.0
+
+
+## O sorteio de uma vaga com a progressão da fase (progress de 0, a primeira patrulha, a 1, a última antes do
+## guardião): a lista em ordem de força e uma janela de metade dela que anda do mais fraco para o mais forte.
+## Sem progressão (progress < 0, as casas), qualquer um.
+static func _pick_by_progress(pool: Array, progress: float, random: AHCombatRandom) -> String:
+	if pool.is_empty():
+		return ""
+	if progress < 0.0 or pool.size() == 1:
+		return pool[floori(random.next() * pool.size())]
+	var sorted := pool.duplicate()
+	sorted.sort_custom(func(a, b): return enemy_strength(a) < enemy_strength(b) or (enemy_strength(a) == enemy_strength(b) and a < b))
+	var window := maxi(1, ceili(sorted.size() * 0.5))
+	var start := roundi(clampf(progress, 0.0, 1.0) * (sorted.size() - window))
+	return sorted[start + mini(window - 1, floori(random.next() * window))]
+
+
 ## O perfil de patrulha (encounters.json): o da fase (fase_N) ou, numa casa, o da loja (fase_N_mercearia, _oficina,
-## _cinema); sem perfil próprio, o node_1_combat de sempre.
-static func generate_enemy_team(encounter: String, difficulty: int, node_id: String, random: AHCombatRandom, forced_count: int = 0) -> Array:
+## _cinema); sem perfil próprio, o node_1_combat de sempre. progress: onde a patrulha está na fase (ver _pick_by_progress).
+static func generate_enemy_team(encounter: String, difficulty: int, node_id: String, random: AHCombatRandom, forced_count: int = 0,
+		progress: float = -1.0) -> Array:
 	if encounter == "boss":
 		return [
 			{"enemy_id": "porteiro", "unit_id": "enemy_porteiro", "rank": 1},
@@ -252,13 +283,18 @@ static func generate_enemy_team(encounter: String, difficulty: int, node_id: Str
 		formation = ["vigia_enferrujado", "carcaca_colonizada", "robot", "robot_fungo"]
 	elif profile != null:
 		var pick := func(pool: Array) -> String:
-			return "" if pool.is_empty() else pool[floori(random.next() * pool.size())]
+			return _pick_by_progress(pool, progress, random)
 		formation.append(pick.call(profile.get("Front", [])))
-		if count == 4:
-			formation.append(pick.call(["cao_eco", "rastejante_raiz"]))
-		formation.append(pick.call(profile.get("Ranged", [])))
-		if count >= 3:
+		# Na primeira metade da fase, a patrulha de 2 é um da frente com um ajudante (os mais fracos, como o Pipoco e
+		# o Broto); da metade para o fim entra quem ataca de longe.
+		if count == 2 and progress >= 0.0 and progress < 0.5 and not profile.get("Support", []).is_empty():
 			formation.append(pick.call(profile.get("Support", [])))
+		else:
+			if count == 4:
+				formation.append(pick.call(["cao_eco", "rastejante_raiz"]))
+			formation.append(pick.call(profile.get("Ranged", [])))
+			if count >= 3:
+				formation.append(pick.call(profile.get("Support", [])))
 	var units: Array = []
 	for index in formation.size():
 		units.append({"enemy_id": formation[index], "unit_id": "enemy_%s_%d" % [formation[index], index], "rank": index + 1})
@@ -287,9 +323,12 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 			spec.display_name = row.DisplayName + spec.get("suffix", "")
 		return group
 
-	# Patrulhas comuns leves (2, às vezes 3); 1 ou 2 fortes por fase (3 a 4, nunca a primeira); o guardião, 4.
+	# A fase fica mais difícil até o guardião (Lucas, 22/10/2026): as primeiras patrulhas tiram os inimigos mais fracos
+	# de cada vaga e as últimas, os mais fortes; a patrulha forte (3 a 4) é a última antes do guardião e, às vezes, a
+	# penúltima também; o guardião, 4. As outras, 2 e às vezes 3.
 	var count := 2
 	var elite := false
+	var progress := -1.0
 	if boss:
 		count = 4
 	elif house:
@@ -298,10 +337,13 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 		var fight := 0
 		for step in mini(index, route.steps.size()):
 			fight += 1 if route.steps[step].type == "combat" else 0
+		var fights := 0
+		for step in route.steps:
+			fights += 1 if step.type == "combat" else 0
+		progress = float(fight) / float(maxi(1, fights - 1))
 		var phase_random := _rand(route.seed ^ 0x27d4eb2f)
-		var first_elite := 1 + mini(2, floori(phase_random.next() * 3))
-		var second_elite := 1 + mini(2, floori(phase_random.next() * 3)) if phase_random.next() < 0.4 else -1
-		elite = fight == first_elite or fight == second_elite
+		var second_elite := phase_random.next() < 0.4 and fights >= 3
+		elite = fight == fights - 1 or (second_elite and fight == fights - 2)
 		if elite:
 			count = 3 + (1 if random.next() < 0.5 or level >= 5 else 0)
 		else:
@@ -314,7 +356,7 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 		var shop: int = route.sites[site_index].get("shop", -1) if site_index < route.sites.size() else -1
 		if shop >= 0 and shop < SHOP_NAMES.size() and GameData.table("encounters").has("%s_%s" % [route.node_id, SHOP_NAMES[shop]]):
 			profile_id = "%s_%s" % [route.node_id, SHOP_NAMES[shop]]
-	var generated := generate_enemy_team("combat", 1, profile_id, random, maxi(2, count))
+	var generated := generate_enemy_team("combat", 1, profile_id, random, maxi(2, count), progress)
 	var units: Array = []
 	var next_rank := 1
 	for spec in generated:
