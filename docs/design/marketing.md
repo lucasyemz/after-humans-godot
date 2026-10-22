@@ -18,7 +18,7 @@ Nove composições finais em art/marketing/ (JPG qualidade 92, sem subamostragem
 | screenshot_phase_map.jpg |2048×1280 RGB| mesma área interna |
 | screenshot_dormitory_night.jpg |2048×1280 RGB| mesma área interna |
 
-Âncora dos layouts: topo esquerdo(0,0). Sem9-slice. Os cinco screenshots compostos mantêm a captura inteira em escala1:1, sem recortar HUD nem diminuir letras. Os originais 1920×1080 não entraram na main (repetiam a área interna das composições); estão no commit df75478 do branch codex-design, conferidos pelos hashes abaixo, e o roteiro de captura os refaz.
+Âncora dos layouts: topo esquerdo(0,0). Sem9-slice. Os cinco screenshots compostos mantêm a captura inteira em escala1:1, sem recortar HUD nem diminuir letras. Os originais 1920×1080 não entraram na main (repetiam a área interna das composições); estão na tag codex-pr43-originals (commit df75478), conferidos pelos hashes abaixo, e o roteiro de captura os refaz.
 
 ![Horizontal a40%](cover_horizontal_40.jpg)
 ![Vertical a40%](cover_vertical_40.jpg)
