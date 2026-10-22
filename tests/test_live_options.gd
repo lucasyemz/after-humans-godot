@@ -147,9 +147,17 @@ func _street(t, tree: SceneTree) -> void:
 	var plate_label := _first_label(arena.hud._unit_bars.values()[0])
 	var plate_before := plate_label.get_theme_font_size("font_size")
 	arena.hud._on_action("item")
+	await tree.process_frame
+	var bag_focus: Control = arena.hud._bag.find_children("*", "Button", true, false)[0]
+	bag_focus.grab_focus()
 	Settings.set_text_size(2)
 	Settings.set_colorblind(true)
-	await tree.process_frame
+	for frame in 4:
+		await tree.process_frame
+	var owner := tree.root.gui_get_focus_owner()
+	t.check(owner != null and arena.hud._bag != null and arena.hud._bag.is_ancestor_of(owner),
+		"com a Mochila aberta, a troca não tira o foco dela (o Enter não escolhe uma carta por trás)")
+	t.equal(arena.hud._choosing, "", "e nenhuma habilidade fica escolhida")
 	t.check(plate_label.get_theme_font_size("font_size") > plate_before, "as fichas da luta crescem na hora")
 	t.check(arena.hud.waiting and arena.hud._actor_id == actor, "a luta continua esperando o mesmo herói")
 	t.check(arena.hud._bag != null, "a Mochila aberta continua aberta")

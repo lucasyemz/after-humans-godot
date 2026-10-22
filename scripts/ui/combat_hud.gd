@@ -550,7 +550,8 @@ func _number_of(ability: Dictionary) -> Array:
 	return ["", "", GOLD]
 
 
-func _build_abilities() -> void:
+## take_focus: a primeira carta ganha o foco (false quando a Mochila está aberta por cima: o foco fica nela).
+func _build_abilities(take_focus: bool = true) -> void:
 	for child in _abilities.get_children():
 		child.queue_free()
 	_options = session.ability_options(_actor_id)
@@ -646,7 +647,8 @@ func _build_abilities() -> void:
 	_description.text = "Vez de %s: escolha uma habilidade (1–4) ou uma ação." % session.state.find_unit(_actor_id).display_name
 	# O painel se ajusta antes do foco, que posiciona a dica acima dele.
 	_fit_dock.call_deferred()
-	(first if first else _actions.get_child(1)).grab_focus.call_deferred()
+	if take_focus:
+		(first if first else _actions.get_child(1)).grab_focus.call_deferred()
 
 
 ## O painel de baixo cresce para cima quando o texto é maior (a base é 210 px, colada a 24 px da borda).
@@ -670,8 +672,9 @@ func restyle() -> void:
 	if waiting and _choosing == "":
 		var owner := get_viewport().gui_get_focus_owner()
 		var focused: int = _abilities.get_children().find(owner)
-		_build_abilities()
-		if focused >= 0:
+		# Com a Mochila aberta, o foco continua nela (o Enter não escolhe uma carta por trás).
+		_build_abilities(_bag == null)
+		if focused >= 0 and _bag == null:
 			await get_tree().process_frame
 			if focused < _abilities.get_child_count():
 				(_abilities.get_child(focused) as Control).grab_focus()
