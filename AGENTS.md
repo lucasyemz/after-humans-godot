@@ -40,3 +40,12 @@ Cada issue passa por duas personas antes de chegar ao Lucas:
   gravidade).
 - Reprovado, o desenvolvedor corrige e manda de novo para a QA, até aprovar. O comentário da issue registra as rodadas
   (o que a QA achou e como foi corrigido). A QA não altera o código do jogo; o Lucas fecha a issue depois de jogar.
+
+## Ciclo design e QA de design (Codex)
+
+O Codex cuida de UI/UX e design gráfico (imagens, ícones, molduras, propostas de tela), no branch `codex-design`, sem
+mexer em código. Cada entrega passa por duas personas:
+- **Designer** (o Codex): faz a entrega e passa para a QA de design.
+- **QA de design**: avalia com o checklist de [docs/design/qa.md](docs/design/qa.md) e devolve `VEREDITO: APROVADO` ou
+  `VEREDITO: REPROVADO` com os problemas por gravidade. Reprovado, o designer corrige e manda de novo, até aprovar.
+- Aprovado, o PR do `codex-design` para a `main` registra as rodadas; o Claude integra no jogo e a QA dele testa lá.
