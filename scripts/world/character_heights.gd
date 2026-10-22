@@ -15,7 +15,7 @@ const HEIGHTS := {
 	"carcaca_colonizada": REFERENCE * 0.90, "porteiro": 2.35, "robot": REFERENCE * 1.04, "robot_fungo": REFERENCE * 1.04,
 	# Vilões do John (22/10/2026): o Carrasco pesado, o Recreador alto e magro; os ajudantes (Faísca, Pipoco, Broto) na
 	# altura do joelho dos robôs principais, como pede o registro dele.
-	"carrasco_industrial": REFERENCE * 1.15, "recreador": REFERENCE * 1.08, "enraizado": REFERENCE * 1.00,
+	"carrasco_industrial": REFERENCE * 1.10, "recreador": REFERENCE * 1.08, "enraizado": REFERENCE * 1.00,
 	"faisca": REFERENCE * 0.34, "pipoco": REFERENCE * 0.32, "broto": REFERENCE * 0.30,
 }
 

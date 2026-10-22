@@ -87,10 +87,10 @@
       "carrasco_industrial"
     ],
     "Ranged": [
-      "condutor_raiz"
+      "faisca"
     ],
     "Support": [
-      "faisca"
+      "condutor_raiz"
     ]
   },
   {
@@ -99,10 +99,10 @@
       "recreador"
     ],
     "Ranged": [
-      "condutor_raiz"
+      "pipoco"
     ],
     "Support": [
-      "pipoco"
+      "condutor_raiz"
     ]
   },
   {

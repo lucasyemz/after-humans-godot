@@ -142,8 +142,9 @@ func _john_villains(t) -> void:
 			t.check(seen[phase_id].has(enemy_id), "%s aparece na %s" % [enemy_id, phase_id])
 	for phase_id in ["fase_3", "fase_4"]:
 		t.check(john.all(func(id): return not seen[phase_id].has(id)), "a %s continua sem os vilões do John" % phase_id)
-	t.check(by_shop.has("cinema:recreador") or by_shop.has("cinema:pipoco"), "o cinema tem o Recreador ou o Pipoco")
-	t.check(by_shop.has("oficina:carrasco_industrial") or by_shop.has("oficina:faisca"), "a oficina tem o Carrasco ou a Faísca")
+	# Na casa (1 ou 2 inimigos), o mestre vem com o seu ajudante.
+	for key in ["cinema:recreador", "cinema:pipoco", "oficina:carrasco_industrial", "oficina:faisca"]:
+		t.check(by_shop.has(key), "%s aparece na loja" % key.replace(":", ": "))
 	t.check(by_shop.keys().all(func(k): return not k.begins_with("mercearia:") or not john.has(k.split(":")[1])),
 		"a mercearia fica com o Coletor de Sucata, sem vilão do John")
 	t.equal(bosses.keys(), ["porteiro"], "o Porteiro continua o chefe da fase 5")
