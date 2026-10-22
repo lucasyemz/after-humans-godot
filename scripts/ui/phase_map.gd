@@ -293,6 +293,11 @@ func _build_aside(c: Dictionary) -> void:
 		button.add_theme_constant_override("icon_max_width", 22)
 		button.custom_minimum_size = Vector2(0, 62)
 		H.style_button(button)
+		# As duas linhas e o ícone cabem no painel no texto Maior com a margem lateral menor (#29).
+		for state in ["normal", "hover", "pressed", "disabled"]:
+			var style: StyleBox = button.get_theme_stylebox(state)
+			style.content_margin_left = 12
+			style.content_margin_right = 12
 		if phase.id == selected:
 			button.add_theme_color_override("font_color", H.GOLD)
 		elif not open:

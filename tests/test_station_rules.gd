@@ -425,6 +425,15 @@ func _sleepers(t) -> void:
 	S.set_watch(c, team[1])
 	t.check(not AHStation.sleepers(c).has(team[1]) and AHStation.sleepers(c).size() == 3, "o vigia não deita")
 	t.equal(AHStation.sleep_slots().size(), 4, "quatro lugares nos beliches")
+	# O beliche é o card inteiro da entrega #1: quem dorme encosta na linha do colchão de baixo e na do de cima, medidas
+	# na arte (docs/design/bunk.md), em cm pela escala do card.
+	t.check(ResourceLoader.exists("res://art/station/cards/%s.webp" % AHStationBuild.BUNK_CARD), "o card do beliche existe")
+	var unit := AHStationBuild.BUNK_SCALE
+	var slots := AHStation.sleep_slots()
+	var lower_z := (AHStationBuild.BUNK_FLOOR + (AHStationBuild.BUNK_FLOOR_PX - AHStationBuild.BUNK_LOWER_PX) * unit - AHStation.SLEEP_DROP) * 0.01
+	var upper_z := (AHStationBuild.BUNK_FLOOR + (AHStationBuild.BUNK_FLOOR_PX - AHStationBuild.BUNK_UPPER_PX) * unit - AHStation.SLEEP_DROP) * 0.01
+	t.check(absf(slots[0].y - lower_z) < 0.001 and absf(slots[1].y - lower_z) < 0.001, "embaixo, o corpo encosta no lençol de baixo")
+	t.check(absf(slots[2].y - upper_z) < 0.001 and absf(slots[3].y - upper_z) < 0.001, "em cima, no lençol de cima")
 	var poses: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/station_poses.json"))
 	for hero_id in team:
 		var pose: Dictionary = poses.get(hero_id + "_sleep", {})

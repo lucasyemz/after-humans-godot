@@ -115,6 +115,10 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - Na luta: 1 a 4 escolhem a habilidade (ou o clique), depois o alvo; Q move, W defende, I abre a Mochila, F foge
     (no gamepad, setas e Enter/A; Backspace/B volta).
     Mover, Defender e Fugir ficam à direita.
+- **Tela de título:** o jogo abre nela (`scenes/title.tscn`), com Continuar (só com um save que abre), Nova campanha (pergunta
+  antes se há save) e Opções. Captura: `"$GODOT" --path . --resolution 1920x1080 -- --capture-title=<pasta>` tira 8 fotos
+  (sem save e com save, a confirmação e as Opções, no texto Normal e no Maior) e sai; o save das fotos fica na pasta da
+  captura.
 - **Capturas, tempos de quadro e teste de colisão:** `"$GODOT" --path . --resolution 1920x1080 -- --capture=<pasta>`.
   Abre uma janela, tira 9 fotos (dia, noite e chuva), testa o líder andando contra um carro e contra uma fachada (`PASS`
   ou `FAIL`) e joga a jornada: a suspeita da primeira patrulha, a luta (HUD, uma ação, o resultado, a rua depois), a entrada
@@ -142,6 +146,23 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/AfterHumans.exe`. Os export
   templates da 4.7.2 precisam estar instalados.
 - **Servir a web:** `python -m http.server 8060 --directory build/web` e abrir `http://localhost:8060`.
+
+### Testes no GitHub (CI)
+
+`.github/workflows/tests.yml` roda os mesmos testes em cada PR e em cada push na `main`. Ele:
+- baixa a Godot 4.7.2 Linux (com a soma SHA-512 conferida e cache);
+- importa o projeto (com cache da `.godot/`);
+- roda `tests/run_all.gd`.
+
+Falha deixa o PR vermelho. O resumo do job traz o `PASS`/`FAIL` de cada teste com as falhas, e o log completo fica como
+artefato.
+
+No PR, o job **Leveza do PR** (`tools/ci_size_check.sh`) avisa, sem falhar, em dois casos:
+- quando `art/` cresce mais de 5 MB, listando os maiores arquivos. A conta é líquida: o que entra ou cresce menos o que encolhe ou sai;
+- quando entra uma imagem em `docs/` fora de uma pasta com `.gdignore`.
+
+Para conferir antes de abrir o PR: `bash tools/ci_size_check.sh origin/main HEAD`. Ao trocar de versão da Godot, mude
+`GODOT_VERSION`, `GODOT_ZIP` e `GODOT_SHA512` no workflow (a soma está em `SHA512-SUMS.txt` da release).
 
 ## Referência Unreal
 

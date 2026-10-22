@@ -207,6 +207,7 @@ func _ready() -> void:
 	_street_hud.add_child(exploration_hud)
 	if scenario:
 		exploration_hud.place = scenario.display_name
+		exploration_hud.map_id = scenario.map_name
 	exploration_hud.set_weather(_hud_weather.text)
 	corridor = AHStreetCorridor.new()
 	add_child(corridor)
@@ -542,11 +543,12 @@ func _build_party() -> void:
 	var expedition = Campaign.state.get("session", {}).get("expedition")
 	for hero_id in (expedition.team if expedition != null else Campaign.state.get("preferred_formation", [])):
 		var hero = Campaign.hero(hero_id)
-		if hero == null or not hero.get("alive", true) or AHCombatArena.art_entry(_combat_art.heroes, hero_id).is_empty() or party_ids.size() >= 4:
+		var art := {} if hero == null else AHCombatArena.art_entry(_combat_art.heroes, hero_id, String(hero.get("art_variant", "")))
+		if hero == null or not hero.get("alive", true) or art.is_empty() or party_ids.size() >= 4:
 			continue
 		var card := AHSpriteCard.new()
 		card.body_height = AHCharacterHeights.find(hero_id)
-		card.show_art(AHCombatArena.art_entry(_combat_art.heroes, hero_id).idle)
+		card.show_art(art.idle)
 		add_child(card)
 		party_ids.append(hero_id)
 		_heroes.append(card)

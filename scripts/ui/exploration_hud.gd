@@ -22,6 +22,11 @@ const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprime
 
 ## O lugar da jornada (a Rua ou o cenário): muda os textos da volta e do resultado.
 var place := "Rua das Vitrines"
+## O mapa do cenário (AHScenarioWorld.map_name); "" na Rua das Vitrines. Escolhe a ilustração do cartão de evento.
+var map_id := ""
+## As ilustrações dos eventos por mapa (a entrega #22 do Codex, docs/design/events.md): 1200x500, no topo do cartão.
+const EVENT_ART := {"": "street", "ShopfrontStreet": "street", "RiverDock": "river_dock", "RootBridge": "root_bridge",
+	"SealedShelter": "sealed_shelter", "TriageGate": "triage_gate", "FloodedDepot": "flooded_depot", "SewerDucts": "sewer_ducts"}
 var _place_name: Label
 var _place_sub: Label
 var _goal_title: Label
@@ -129,7 +134,7 @@ func _ready() -> void:
 
 	# A patrulha à frente, avisada da borda direita antes de entrar na tela.
 	_patrol = PanelContainer.new()
-	var patrol_style := S.panel(0.88, Color(S.GOLD, 0.6))
+	var patrol_style := S.flat(0.88, Color(S.GOLD, 0.6))
 	patrol_style.corner_radius_top_right = 0
 	patrol_style.corner_radius_bottom_right = 0
 	_patrol.add_theme_stylebox_override("panel", patrol_style)
@@ -365,7 +370,7 @@ func refresh(campaign: Dictionary) -> void:
 
 
 func _chip_style() -> StyleBoxFlat:
-	var style := S.panel(0.86, Color(S.COPPER, 0.45), 1)
+	var style := S.flat(0.86, Color(S.COPPER, 0.45), 1)
 	style.content_margin_left = 10
 	style.content_margin_right = 10
 	style.content_margin_top = 5
@@ -606,13 +611,34 @@ func _button(text: String, callback: Callable, enabled: bool = true) -> Button:
 
 # ---------------------------------------------------------------- evento
 
-## Evento aberto (busca_*): título, descrição e as escolhas (as indisponíveis aparecem com o requisito).
+## A ilustração do cenário em que se está (null se o mapa não tem uma).
+func event_art() -> Texture2D:
+	var path := "res://art/ui/events/%s.webp" % EVENT_ART.get(map_id, "street")
+	return load(path) if ResourceLoader.exists(path) else null
+
+
+## Evento aberto (busca_*): a ilustração do cenário, o título, a descrição e as escolhas (as indisponíveis aparecem com o
+## requisito).
 func show_event(campaign: Dictionary) -> void:
 	var event: Dictionary = campaign.session.event
 	var row = GameData.row("events", event.event_id)
 	if row == null:
 		return
 	var box := _open_modal(820)
+	var art := event_art()
+	if art != null:
+		# 12:5, como a pintura; o texto fica abaixo, nunca por cima.
+		var picture := TextureRect.new()
+		picture.name = "EventArt"
+		picture.texture = art
+		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		picture.custom_minimum_size = Vector2(600, 250)
+		picture.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(picture)
+		# Com a ilustração, o cartão sobe para as escolhas caberem na tela, logo abaixo da barra de trechos.
+		_modal.position.y = 125
 	var title := H.make_label(row.get("Title", ""), 34, H.GOLD)
 	box.add_child(title)
 	# O que se vasculhou (#7): o evento vem do objeto.

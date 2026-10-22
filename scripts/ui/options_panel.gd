@@ -21,6 +21,9 @@ const PAD_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "Sta
 
 var width := 600.0
 var allow_new_campaign := false
+## As opções da campanha (volumes, velocidade, efeitos) vão para o save. No título sem campanha começada ficam só na
+## memória: mexer nas Opções não cria um save nem regrava um que não abre (#28); a campanha nova leva os valores.
+var save_campaign := true
 ## A ação esperando a tecla nova ("" = nenhuma).
 var _waiting := ""
 
@@ -34,8 +37,10 @@ func _ready() -> void:
 		_volume(spec[0], spec[1], float(settings.get(spec[1], 0.6)))
 
 	_section("Gráficos")
-	var levels := HBoxContainer.new()
-	levels.add_theme_constant_override("separation", 6)
+	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
+	var levels := HFlowContainer.new()
+	levels.add_theme_constant_override("h_separation", 6)
+	levels.add_theme_constant_override("v_separation", 6)
 	add_child(levels)
 	for i in Settings.LEVEL_NAMES.size():
 		var button := _choice(Settings.LEVEL_NAMES[i], i == Settings.level, levels)
@@ -49,8 +54,10 @@ func _ready() -> void:
 		_toggle("Sincronia vertical (vsync)", Settings.vsync, func(on): Settings.set_vsync(on))
 
 	_section("Jogo")
-	var speeds := HBoxContainer.new()
-	speeds.add_theme_constant_override("separation", 6)
+	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
+	var speeds := HFlowContainer.new()
+	speeds.add_theme_constant_override("h_separation", 6)
+	speeds.add_theme_constant_override("v_separation", 6)
 	add_child(speeds)
 	var label := H.make_label("Velocidade da batalha", 19, H.TEXT)
 	label.custom_minimum_size = Vector2(260, 0)
@@ -60,19 +67,21 @@ func _ready() -> void:
 		var value: int = speed
 		button.pressed.connect(func():
 			Campaign.state.settings.battle_speed = value
-			Campaign.save()
+			_save()
 			_rebuild())
 	_toggle("Reduzir efeitos do ambiente (relâmpagos e poeira)", bool(settings.get("reduced_environment_effects", false)), func(on):
 		Campaign.state.settings.reduced_environment_effects = on
-		Campaign.save()
+		_save()
 		Settings.changed.emit())
 
 	_toggle("Dicas da primeira vez", Tips.enabled, func(on): Tips.set_enabled(on))
 	_toggle("Cores para daltonismo (azul e laranja)", Settings.colorblind, func(on):
 		Settings.set_colorblind(on)
 		_rebuild())
-	var sizes := HBoxContainer.new()
-	sizes.add_theme_constant_override("separation", 6)
+	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
+	var sizes := HFlowContainer.new()
+	sizes.add_theme_constant_override("h_separation", 6)
+	sizes.add_theme_constant_override("v_separation", 6)
 	add_child(sizes)
 	var size_label := H.make_label("Tamanho do texto", 19, H.TEXT)
 	size_label.custom_minimum_size = Vector2(260, 0)
@@ -94,8 +103,10 @@ func _ready() -> void:
 	add_child(again)
 
 	_section("Controles")
-	var touch := HBoxContainer.new()
-	touch.add_theme_constant_override("separation", 6)
+	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
+	var touch := HFlowContainer.new()
+	touch.add_theme_constant_override("h_separation", 6)
+	touch.add_theme_constant_override("v_separation", 6)
 	add_child(touch)
 	var touch_label := H.make_label("Controles de toque", 19, H.TEXT)
 	touch_label.custom_minimum_size = Vector2(200, 0)
@@ -214,9 +225,9 @@ func _volume(text: String, key: String, value: float) -> void:
 		Campaign.state.settings[key] = v / 100.0
 		number.text = "%d%%" % v
 		Sound.apply_volumes())
-	slider.drag_ended.connect(func(_changed): Campaign.save())
+	slider.drag_ended.connect(func(_changed): _save())
 	# Clique sem arrastar também grava (as setas e o clique na barra não terminam um arrasto).
-	slider.focus_exited.connect(func(): Campaign.save())
+	slider.focus_exited.connect(func(): _save())
 
 
 func _choice(text: String, chosen: bool, parent: Container) -> Button:
@@ -224,6 +235,11 @@ func _choice(text: String, chosen: bool, parent: Container) -> Button:
 	button.text = text
 	button.custom_minimum_size = Vector2(120, 44)
 	H.style_button(button)
+	# As escolhas lado a lado ficam com a margem de antes das molduras: a linha cabe no painel.
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var style: StyleBox = button.get_theme_stylebox(state)
+		style.content_margin_left = 12
+		style.content_margin_right = 12
 	if chosen:
 		button.add_theme_color_override("font_color", H.GOLD)
 		button.text = "▸ " + text
@@ -238,6 +254,8 @@ func _toggle(text: String, on: bool, action: Callable) -> void:
 	check.add_theme_font_size_override("font_size", AHUiStyle.px(19))
 	check.add_theme_color_override("font_color", H.TEXT)
 	check.toggled.connect(func(value): action.call(value))
+	# O foco do teclado e do controle: as cantoneiras (#25), como nos botões.
+	AHFocusCorners.attach(check, AHFocusCorners.new())
 	add_child(check)
 
 
@@ -278,3 +296,8 @@ func _keys(action: String) -> String:
 		elif event is InputEventJoypadButton:
 			names.append("Controle " + PAD_NAMES.get(event.button_index, str(event.button_index)))
 	return " · ".join(names)
+
+
+func _save() -> void:
+	if save_campaign:
+		Campaign.save()

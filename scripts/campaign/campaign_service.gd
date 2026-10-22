@@ -68,6 +68,8 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		"id": id, "class_id": class_id, "display_name": display_name, "alive": true, "hp": max_hp, "max_hp": max_hp,
 		"instinct": 0, "perks": perks, "crisis_outcome": "none", "trauma": false, "trainings": [], "expedition_uses": {},
 		"relic_id": "", "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
+		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
+		"art_variant": "",
 	}
 
 
@@ -153,6 +155,11 @@ func backup_path() -> String:
 
 func has_save() -> bool:
 	return FileAccess.file_exists(primary_path()) or FileAccess.file_exists(backup_path())
+
+
+## Há um save que abre (o principal ou a cópia): o Continuar do título.
+func has_valid_save() -> bool:
+	return read_file(primary_path()) != null or read_file(backup_path()) != null
 
 
 ## Sobre o estado normalizado (inteiros como int), para gravar e conferir a mesma coisa.

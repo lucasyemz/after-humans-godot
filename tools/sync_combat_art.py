@@ -7,6 +7,9 @@
   por enquanto só Bento e Nick). As medidas (âncora no pé e altura do corpo em pixels) vêm dos manifestos de origem.
 - Inimigos das patrulhas da rua: parado e poses (SourceArt/Legacy); a âncora e a altura do corpo são medidas pelo alfa.
 - Ícones das habilidades (SourceArt/ApprovedActionIcons) e os sons do combate (SourceArt/Audio/manifest.json).
+- Recrutas (#32, a entrega #14 do Codex): a variação parada de cada classe, da fonte 2x que já está neste repositório
+  (art/combat/source/recruits); o id é o nome do arquivo (dog_recruit_01) e não um id de herói. Cada parado (fundador
+  ou recruta) leva o retrato recortado da entrega #26 (art/ui/portraits), quando existe.
 
 As imagens viram WebP com metade da resolução (o jogo nunca mostra mais que isso); as medidas no manifesto ficam nos
 pixels originais e o jogo converte pela largura real da textura.
@@ -42,6 +45,14 @@ ENEMIES = {
 # Os outros inimigos das patrulhas e o Porteiro (chefe da fase 5): parado e poses da arte aprovada.
 for _enemy in ("cao_eco", "condutor_raiz", "sussurrador", "rastejante_raiz", "ninho_errante", "carcaca_colonizada", "porteiro"):
     ENEMIES[_enemy] = {"idle": f"public/characters/approved/{_enemy}/{_enemy}-idle.png", "poses": f"public/characters/approved/{_enemy}"}
+# Recrutas: a variação e a classe; a fonte 2x fica no próprio repositório, não na Unreal.
+RECRUITS = {
+    "dog_recruit_01": "cao",
+    "cat_recruit_01": "gato",
+    "frog_recruit_01": "sapo",
+    "owl_recruit_01": "coruja",
+}
+PORTRAITS = PROTO / "art" / "ui" / "portraits"
 # Vilões do John (conceitos de 09/10/2026, idles de SourceArt/CharacterGallery/EnemyHelperIdles20261010): só a pose
 # parada, voltada à direita como os outros. Entram os que a distribuição dele põe num cenário (Lucas, 22/10/2026).
 GALLERY = REPO / "SourceArt" / "CharacterGallery" / "EnemyHelperIdles20261010"
@@ -73,6 +84,24 @@ def measured(image: Image.Image) -> dict:
     return {"anchor": [(left + right) / 2, bottom], "body_reference_pixels": bottom - top, "canvas": [image.width, image.height]}
 
 
+def with_portrait(idle: dict, name: str) -> dict:
+    """Acrescenta ao parado o retrato da entrega #26, se ele existe."""
+    portrait = PORTRAITS / f"{name}.png"
+    if portrait.exists():
+        idle["portrait"] = res(portrait)
+    return idle
+
+
+def recruits() -> dict:
+    out = {}
+    for variant, class_id in RECRUITS.items():
+        src = PROTO / "art" / "combat" / "source" / "recruits" / f"{variant}_idle.png"
+        dst = ART / "recruits" / f"{variant}_idle.webp"
+        image = convert(src, dst)
+        out[variant] = {"class_id": class_id, "idle": with_portrait({"file": res(dst), **measured(image)}, variant)}
+    return out
+
+
 def heroes() -> dict:
     actions = json.loads((REPO / "Data/Presentation/ally-actions.json").read_text(encoding="utf-8"))["actions"]
     sources = json.loads((REPO / "SourceArt/AllyActions/Approved20261013/manifest.json").read_text(encoding="utf-8"))["assets"]
@@ -82,7 +111,8 @@ def heroes() -> dict:
     for hero_id, spec in HEROES.items():
         idle_src = REPO / spec["idle"]
         idle = convert(idle_src, ART / "heroes" / spec["name"].lower() / "idle.webp")
-        entry = {"name": spec["name"], "idle": {"file": res(ART / "heroes" / spec["name"].lower() / "idle.webp"), **measured(idle)},
+        idle_entry = with_portrait({"file": res(ART / "heroes" / spec["name"].lower() / "idle.webp"), **measured(idle)}, spec["name"].lower())
+        entry = {"name": spec["name"], "idle": idle_entry,
                  "actions": {}, "reactions": {}}
         for action in (a for a in actions if a["hero_id"] == hero_id):
             ability = action["ability_id"]
@@ -207,7 +237,8 @@ def audio() -> dict:
 
 def main() -> None:
     manifest = {"schema_version": 1, "scale_note": "Medidas em pixels da imagem original; a textura pode ser menor.",
-                "heroes": heroes(), "enemies": {**enemies(), **gallery_enemies()}, "icons": icons(), "audio": audio()}
+                "heroes": heroes(), "recruits": recruits(), "enemies": {**enemies(), **gallery_enemies()}, "icons": icons(),
+                "audio": audio()}
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
     size = sum(f.stat().st_size for f in ART.rglob("*") if f.is_file()) + sum(f.stat().st_size for f in AUDIO.rglob("*") if f.is_file())

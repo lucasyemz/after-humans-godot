@@ -41,7 +41,7 @@ var _persist := true
 
 func _ready() -> void:
 	var args := Array(OS.get_cmdline_args()) + Array(OS.get_cmdline_user_args())
-	_persist = not (args.has("-s") or args.has("--script") or args.any(func(a): return String(a).begins_with("--capture=")))
+	_persist = not (args.has("-s") or args.has("--script") or args.any(func(a): return String(a).begins_with("--capture=") or String(a).begins_with("--capture-title=")))
 	var config := ConfigFile.new()
 	if _persist and config.load(PATH) == OK:
 		level = clampi(int(config.get_value("graphics", "level", level)), 0, 3)

@@ -102,6 +102,10 @@ static func retune(root: Node, from_scale: float, from_ok: Color, from_danger: C
 							styles[style] = true
 							style.bg_color = _swap(style.bg_color, swaps)
 							style.border_color = _swap(style.border_color, swaps)
+						elif style is AHFocusCorners and not styles.has(style):
+							# O foco na cor de um estado (Recomeçar campanha, pendências) acompanha o daltonismo.
+							styles[style] = true
+							style.color = _swap(style.color, swaps)
 				if control is ColorRect:
 					control.color = _swap(control.color, swaps)
 				if control.material is ShaderMaterial and control.material.get_shader_parameter("ring") != null:
@@ -132,7 +136,66 @@ static func _swap(color: Color, swaps: Array) -> Color:
 	return color
 
 
-static func panel(alpha: float = 0.9, border: Color = Color(COPPER, 0.55), width: int = 2) -> StyleBoxFlat:
+## As molduras de metal do Codex (#20, docs/design/ui-frames.md): 9-slice de 16 px em art/ui/frames/. scale < 1 reduz
+## a peça inteira (as teclas e as fichas pequenas, menores que os 32 px das duas bordas), feita na hora a partir da
+## mesma arte. margins: o conteúdo (esquerda, topo, direita, baixo).
+const FRAMES := "res://art/ui/frames/%s.png"
+const FRAME_SLICE := 16
+static var _frame_textures := {}
+
+
+static func frame_texture(kind: String, scale: float = 1.0) -> Texture2D:
+	var key := "%s@%.2f" % [kind, scale]
+	if not _frame_textures.has(key):
+		var texture: Texture2D = load(FRAMES % kind)
+		if not is_equal_approx(scale, 1.0):
+			var image := texture.get_image()
+			image.decompress()
+			image.resize(maxi(4, roundi(image.get_width() * scale)), maxi(4, roundi(image.get_height() * scale)), Image.INTERPOLATE_LANCZOS)
+			texture = ImageTexture.create_from_image(image)
+		_frame_textures[key] = texture
+	return _frame_textures[key]
+
+
+static func frame(kind: String, alpha: float = 1.0, scale: float = 1.0, margins: Vector4 = Vector4(20, 18, 20, 18)) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = frame_texture(kind, scale)
+	style.set_texture_margin_all(roundf(FRAME_SLICE * scale))
+	style.content_margin_left = margins.x
+	style.content_margin_top = margins.y
+	style.content_margin_right = margins.z
+	style.content_margin_bottom = margins.w
+	style.modulate_color = Color(1, 1, 1, alpha)
+	return style
+
+
+## A moldura de painel para uma borda: cobre (painel_normal) ou dourada (destaque); "" para as outras cores, que dizem
+## um estado (bom, ruim) e continuam desenhadas.
+static func _frame_kind(border: Color) -> String:
+	var hue := Color(border, 1.0)
+	if _near(hue, COPPER):
+		return "panel_normal"
+	if _near(hue, GOLD) or _near(hue, GOLD.darkened(0.2)):
+		return "panel_highlight"
+	return ""
+
+
+static func _near(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) < 0.08
+
+
+## O painel das telas: a moldura de metal quando a borda é a padrão (cobre) ou a de destaque (dourada) e tem 2 px ou
+## mais. As finas (placas e fichas pequenas) e as de estado (bom, ruim) continuam desenhadas (flat), para a cor do
+## estado aparecer e para o 9-slice caber.
+static func panel(alpha: float = 0.9, border: Color = Color(COPPER, 0.55), width: int = 2) -> StyleBox:
+	var kind := _frame_kind(border) if width >= 2 else ""
+	if kind != "":
+		return frame(kind, alpha, 1.0, Vector4(20, 14, 20, 14))
+	return flat(alpha, border, width)
+
+
+## O painel desenhado (o de antes das molduras): cor de estado, borda fina ou cantos próprios.
+static func flat(alpha: float = 0.9, border: Color = Color(COPPER, 0.55), width: int = 2) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(PANEL, alpha)
 	style.border_color = border
@@ -160,12 +223,7 @@ static func label(text: String, size: int = 20, color: Color = TEXT, kind: Strin
 ## Uma ficha: ícone (texto ou símbolo), rótulo e o número em destaque.
 static func chip(text: String, value: String = "", color: Color = GOLD) -> PanelContainer:
 	var box := PanelContainer.new()
-	var style := panel(0.86, Color(COPPER, 0.45), 1)
-	style.content_margin_left = 10
-	style.content_margin_right = 10
-	style.content_margin_top = 4
-	style.content_margin_bottom = 4
-	box.add_theme_stylebox_override("panel", style)
+	box.add_theme_stylebox_override("panel", frame("resource_chip", 0.92, 0.5, Vector4(10, 4, 10, 4)))
 	box.mouse_filter = Control.MOUSE_FILTER_PASS
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
@@ -289,17 +347,7 @@ static func is_back(event: InputEvent) -> bool:
 ## A tecla desenhada (a do teclado; o controle mostra a do gamepad).
 static func key_cap(text: String) -> PanelContainer:
 	var box := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.55)
-	style.border_color = MUTED
-	style.set_border_width_all(1)
-	style.border_width_bottom = 3
-	style.set_corner_radius_all(4)
-	style.content_margin_left = 7
-	style.content_margin_right = 7
-	style.content_margin_top = 1
-	style.content_margin_bottom = 1
-	box.add_theme_stylebox_override("panel", style)
+	box.add_theme_stylebox_override("panel", frame("key_cap", 1.0, 0.5, Vector4(8, 2, 8, 3)))
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var l := label(text, 15, TEXT, "bold")
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -364,6 +412,11 @@ static func face_texture(art: Dictionary) -> Texture2D:
 	var file: String = art.get("file", "")
 	if _portraits.has(file):
 		return _portraits[file]
+	# O retrato recortado da entrega #26 (art/ui/portraits, 256x256, olhos em 144,104), quando o parado tem um.
+	var portrait: String = art.get("portrait", "")
+	if portrait != "" and ResourceLoader.exists(portrait):
+		_portraits[file] = load(portrait)
+		return _portraits[file]
 	var texture: Texture2D = load(file)
 	var image := texture.get_image()
 	if image.is_compressed():
@@ -392,21 +445,46 @@ static func face_texture(art: Dictionary) -> Texture2D:
 
 
 ## As fichas e os efeitos da unidade por extenso, com a cor de bom (azul) ou ruim (vermelho): [texto, bom].
+## Os estados da unidade: [texto curto, bom para quem tem?, ícone (art/ui/icons/status-<ícone>_good|_bad, "" sem ícone),
+## número (fichas ou vezes que faltam; 0 sem número), termo do GLOSSARY]. Bom e ruim são para quem recebe o estado.
 static func statuses(unit: AHCombat.Unit) -> Array:
 	var out: Array = []
 	var t := unit.tokens
-	if t.block > 0: out.append(["Bloqueio %d" % t.block, true])
-	if t.dodge > 0: out.append(["Esquiva %d" % t.dodge, true])
-	if t.guard > 0: out.append(["Guarda", true])
-	if t.vuln > 0: out.append(["Vulnerável %d" % t.vuln, false])
-	if unit.mark_duration > 0: out.append(["Marcado", false])
-	if unit.stun_turns > 0: out.append(["Atordoado", false])
-	if unit.bleed.duration > 0: out.append(["Sangra %d" % unit.bleed.magnitude, false])
-	if unit.blight.duration > 0: out.append(["Contaminado %d" % unit.blight.magnitude, false])
-	if unit.blind: out.append(["Cego", false])
-	if unit.weak: out.append(["Fraco", false])
-	if unit.immobilize_turns > 0: out.append(["Imobilizado", false])
+	if t.block > 0: out.append(["Bloqueio %d" % t.block, true, "block", t.block, "Bloqueio"])
+	if t.dodge > 0: out.append(["Esquiva %d" % t.dodge, true, "dodge", t.dodge, "Esquiva"])
+	if t.guard > 0: out.append(["Guarda", true, "protection", 0, "Guarda"])
+	if t.vuln > 0: out.append(["Vulnerável %d" % t.vuln, false, "vulnerable", t.vuln, "Vulnerável"])
+	if unit.mark_duration > 0: out.append(["Marcado", false, "marked", unit.mark_duration, "Marcado"])
+	if unit.stun_turns > 0: out.append(["Atordoado", false, "stunned", unit.stun_turns, "Atordoado"])
+	if unit.bleed.duration > 0: out.append(["Sangra %d" % unit.bleed.magnitude, false, "bleeding", unit.bleed.duration, "Sangra"])
+	if unit.blight.duration > 0: out.append(["Contaminado %d" % unit.blight.magnitude, false, "poison", unit.blight.duration, "Contaminado"])
+	if unit.blind: out.append(["Cego", false, "", 0, "Cego"])
+	if unit.weak: out.append(["Fraco", false, "", 0, "Fraco"])
+	if unit.immobilize_turns > 0: out.append(["Imobilizado", false, "", unit.immobilize_turns, "Imobilizado"])
 	return out
+
+
+## A dica de um estado (mouse e foco): o nome, o número e a explicação do glossário.
+static func status_tip(entry: Array) -> String:
+	var text: String = entry[0]
+	var count: int = entry[3]
+	var term: String = entry[4]
+	var what := ""
+	match term:
+		"Sangra", "Contaminado":
+			what = "%s por vez · %d %s" % [text.get_slice(" ", 1), count, "vez" if count == 1 else "vezes"]
+		"Bloqueio", "Esquiva", "Vulnerável":
+			what = "%d %s" % [count, "ficha" if count == 1 else "fichas"]
+		_:
+			if count > 0:
+				what = "%d %s" % [count, "vez" if count == 1 else "vezes"]
+	return "%s%s: %s" % [term, (" (%s)" % what) if what != "" else "", GLOSSARY.get(term, "")]
+
+
+## O ícone do estado ou da intenção (os SVG brancos da entrega #18), para tingir com a cor do bom e do ruim.
+static func combat_icon(name: String) -> Texture2D:
+	var path := "res://art/ui/icons/%s.svg" % name
+	return load(path) if ResourceLoader.exists(path) else null
 
 
 ## O que cada termo quer dizer (as dicas do combate e o glossário).

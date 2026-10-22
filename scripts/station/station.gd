@@ -638,6 +638,11 @@ func _tick_train(delta: float) -> void:
 
 # ---------------------------------------------------------------- moradores
 
+## Quem dorme fica 30 cm à frente do beliche; na câmera da Estação isso o sobe uns 10 cm sobre o lençol (medido na
+## captura da noite, #31). Desce o mesmo tanto para o corpo encostar no colchão.
+const SLEEP_DROP := 10.0
+
+
 ## Os quatro lugares dos beliches (m): de baixo à esquerda, de baixo à direita, e os de cima.
 static func sleep_slots() -> Array:
 	var out: Array = []
@@ -645,7 +650,7 @@ static func sleep_slots() -> Array:
 		for x in AHStationBuild.BUNK_X:
 			# Um pouco para a cabeceira (o travesseiro fica à esquerda) e à frente da cama pintada.
 			out.append(AHStationBuilder.vu(Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
-				AHStationBuild.BUNK_FLOOR + tier * AHStationBuild.BUNK_UPPER + AHStationBuild.MATTRESS_TOP)))
+				AHStationBuild.BUNK_FLOOR + tier * AHStationBuild.BUNK_UPPER + AHStationBuild.MATTRESS_TOP - SLEEP_DROP)))
 	return out
 
 
@@ -752,9 +757,9 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 	_update_sleepers()
 
 
-## A arte do herói (recrutas novos usam a do fundador da mesma classe).
+## A arte do herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 func _hero_art(entry) -> Dictionary:
-	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id)
+	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id, String(entry.get("art_variant", "")))
 
 
 func civilian_art(civilian_id: String) -> Dictionary:

@@ -155,14 +155,32 @@ func _release_all() -> void:
 		_send_interact(false)
 
 
+## As peças da entrega #23 do Codex (art/ui/touch/, medidas em docs/design/touch.md): a base e o botão do analógico
+## (normal e ativo, com a marca de correr a 85% do raio) e o Usar (apagado, pronto e pressionado, este com o segundo anel).
+## Em tela de alta densidade (o HUD de 1920 ampliado), as versões _2x. As áreas de toque não mudam com a arte.
+const TOUCH_ART := "res://art/ui/touch/%s%s.png"
+var _art := {}
+
+
+func _texture(name: String) -> Texture2D:
+	var double := get_viewport().get_screen_transform().get_scale().x > 1.25
+	var key := name + ("_2x" if double else "")
+	if not _art.has(key):
+		_art[key] = load(TOUCH_ART % [name, "_2x" if double else ""])
+	return _art[key]
+
+
+func _piece(name: String, center: Vector2, radius: float, alpha: float = 1.0) -> void:
+	draw_texture_rect(_texture(name), Rect2(center - Vector2.ONE * radius, Vector2.ONE * radius * 2.0), false, Color(1, 1, 1, alpha))
+
+
 func _draw() -> void:
 	var active := _stick_finger != -2
-	draw_circle(_stick_origin, STICK_RADIUS, Color(S.INK, 0.35 if active else 0.22))
-	draw_arc(_stick_origin, STICK_RADIUS, 0, TAU, 64, Color(S.COPPER, 0.7 if active else 0.4), 3, true)
-	draw_arc(_stick_origin, STICK_RADIUS * RUN_AT, 0, TAU, 64, Color(S.GOLD, 0.18), 1, true)
+	_piece("stick_base_active" if active else "stick_base_normal", _stick_origin, STICK_RADIUS, 1.0 if active else 0.75)
+	_piece("stick_run_mark", _stick_origin, STICK_RADIUS, 0.8 if active else 0.45)
 	var knob := _stick_origin + _stick_vector * STICK_RADIUS
 	var running := _stick_vector.length() >= RUN_AT
-	draw_circle(knob, 44, Color(S.GOLD if running else S.TEXT, 0.55 if active else 0.3))
+	_piece("stick_knob_active" if running else "stick_knob_normal", knob, 44.0, 1.0 if active else 0.7)
 	if active and running:
 		_text("correr", _stick_origin + Vector2(0, STICK_RADIUS + 30), 20, S.GOLD)
 	elif not active:
@@ -170,8 +188,7 @@ func _draw() -> void:
 
 	var can_use: bool = street.exploration_hud != null and street.exploration_hud.has_prompt()
 	var held := _use_finger != -2
-	draw_circle(USE_CENTER, USE_RADIUS, Color(0.25, 0.18, 0.1, 0.92) if held else Color(S.INK, 0.6 if can_use else 0.3))
-	draw_arc(USE_CENTER, USE_RADIUS, 0, TAU, 64, Color(S.GOLD, 0.95) if can_use else Color(S.MUTED, 0.45), 4 if can_use else 2, true)
+	_piece("use_pressed" if held else ("use_ready" if can_use else "use_inactive"), USE_CENTER, USE_RADIUS, 1.0 if can_use or held else 0.7)
 	_text("Usar", USE_CENTER + Vector2(0, 9), 28, S.GOLD if can_use else Color(S.MUTED, 0.7))
 
 

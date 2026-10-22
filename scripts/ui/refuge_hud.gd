@@ -121,8 +121,9 @@ func _ready() -> void:
 	var gold := StyleBoxFlat.new()
 	gold.bg_color = Color("d9ad62")
 	gold.set_corner_radius_all(5)
-	for state in ["normal", "focus"]:
-		_next_button.add_theme_stylebox_override(state, gold)
+	_next_button.add_theme_stylebox_override("normal", gold)
+	# O foco são as cantoneiras de fora (#25), como nos outros botões.
+	AHFocusCorners.attach(_next_button, AHFocusCorners.new())
 	var gold_hover := gold.duplicate()
 	gold_hover.bg_color = Color("f0cf8a")
 	_next_button.add_theme_stylebox_override("hover", gold_hover)
@@ -492,7 +493,9 @@ func _pending_row(text: String, action: Callable, color: Color) -> Button:
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.custom_minimum_size = Vector2(420, 44)
 	H.style_button(button, color)
-	var style: StyleBoxFlat = button.get_theme_stylebox("normal").duplicate()
+	# A barra de cor à esquerda diz o estado da pendência: o painel desenhado, não a moldura.
+	var style := U.flat(0.92, Color(U.COPPER, 0.5))
+	style.content_margin_left = 20
 	style.border_width_left = 4
 	style.border_color = color
 	button.add_theme_stylebox_override("normal", style)
@@ -1162,9 +1165,9 @@ func _swap(a: int, b: int) -> void:
 
 # ---------------------------------------------------------------- Preparação numa tela (a proposta de UX, tela 4)
 
-## A arte de um herói (os recrutas usam a do fundador da mesma classe).
+## A arte de um herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 static func _hero_art(entry: Dictionary) -> Dictionary:
-	return AHCombatArena.hero_art_of(entry.id).get("idle", {})
+	return AHCombatArena.hero_art_of(entry.id, String(entry.get("art_variant", ""))).get("idle", {})
 
 
 ## A gaveta da Preparação: os quatro cartões no sentido da luta (o fundo à esquerda, a frente à direita), com rosto,
@@ -1180,8 +1183,10 @@ func _prep_drawer(c: Dictionary) -> void:
 		_prep.add_theme_stylebox_override("panel", U.panel(0.94))
 		_prep.position = Vector2(24, 512)
 		_prep.size = Vector2(1872, 548)
+		_prep.minimum_size_changed.connect(_fit_prep)
 		_tags.add_sibling(_prep)
 	_prep.visible = true
+	_fit_prep.call_deferred()
 	for child in _prep.get_children():
 		_prep.remove_child(child)
 		child.queue_free()
@@ -1312,7 +1317,7 @@ func _prep_drawer(c: Dictionary) -> void:
 	gold.bg_color = Color("d9ad62")
 	gold.set_corner_radius_all(5)
 	go.add_theme_stylebox_override("normal", gold)
-	go.add_theme_stylebox_override("focus", gold)
+	AHFocusCorners.attach(go, AHFocusCorners.new())
 	var hover := gold.duplicate()
 	hover.bg_color = Color("f0cf8a")
 	go.add_theme_stylebox_override("hover", hover)
@@ -1323,6 +1328,15 @@ func _prep_drawer(c: Dictionary) -> void:
 	go.pressed.connect(_depart)
 	go.disabled = size_block != ""
 	side.add_child(go)
+
+
+## A gaveta cresce para cima quando o conteúdo pede (texto Grande e Maior, molduras): o Partir nunca sai da tela.
+func _fit_prep() -> void:
+	if _prep == null or not is_instance_valid(_prep):
+		return
+	var height := maxf(548.0, _prep.get_combined_minimum_size().y)
+	_prep.size = Vector2(1872, height)
+	_prep.position.y = maxf(8.0, 1060.0 - height)
 
 
 func _side_box(parent: Container, title: String) -> VBoxContainer:

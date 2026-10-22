@@ -6,6 +6,7 @@ signal scene_changed(scene_id: String)
 
 ## Cenas do jogo pelo id. Cada fase do plano acrescenta as suas (combate, estação, cenários).
 const SCENES := {
+	"title": "res://scenes/title.tscn",
 	"street": "res://scenes/street.tscn",
 	"station": "res://scenes/station.tscn",
 }
@@ -34,13 +35,18 @@ static func scene_path(scene_id: String) -> String:
 	return SCENES.get(scene_id, "")
 
 
-## Primeira cena depois do boot: a rua se a expedição está em andamento; senão a Estação Raiz. O modo de captura da
-## rua (--capture=) monta a própria campanha e sempre abre a rua.
+## Primeira cena depois do boot: a tela de título (#28). O modo de captura da rua (--capture=) monta a própria campanha e
+## abre direto a rua.
 func start() -> void:
 	var capture := Array(OS.get_cmdline_user_args()).any(func(arg): return String(arg).begins_with("--capture="))
+	change_to("street" if capture else "title", {}, false)
+
+
+## Continuar (o título): a rua se a expedição está em andamento; senão a Estação Raiz.
+func continue_game() -> bool:
 	var session: Dictionary = Campaign.state.get("session", {})
 	var in_expedition: bool = session.get("expedition") != null and session.get("result", "") == ""
-	change_to("street" if capture or in_expedition else "station", {}, false)
+	return await change_to("street" if in_expedition else "station")
 
 
 ## Troca para a cena pelo id. Retorna false se o id não existir ou se já houver uma troca em andamento.

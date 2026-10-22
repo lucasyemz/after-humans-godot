@@ -13,6 +13,10 @@ config_version=5
 config/name="After Humans"
 run/main_scene="res://scenes/boot.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+boot_splash/bg_color=Color(0.050980393, 0.0627451, 0.07058824, 1)
+boot_splash/image="res://art/ui/title/splash.png"
+boot_splash/stretch_mode=1
+config/icon="res://art/ui/title/app_icon.png"
 
 [autoload]
 

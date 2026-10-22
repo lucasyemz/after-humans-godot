@@ -167,6 +167,10 @@ static func migrate(campaign: Dictionary) -> void:
 		campaign[key] = String(campaign.get(key, ""))
 	if typeof(campaign.inventory.get("items")) != TYPE_DICTIONARY:
 		campaign.inventory.items = {}
+	# Saves anteriores à arte dos recrutas (#32): o fundador continua com a dele; o recruta ganha a variação da classe.
+	for entry in campaign.get("roster", []):
+		if not entry.has("art_variant"):
+			entry.art_variant = pick_art_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
 	# "departing" é só a animação do trem saindo (4 s na tela). Um save gravado nesse meio (o jogo fechou) abriria com o
 	# trem partindo para sempre: a Preparação ficava bloqueada e a plataforma sem botão.
 	finish_departure(campaign)
@@ -765,8 +769,47 @@ static func recruit(campaign: Dictionary, class_id: String, rng: RandomNumberGen
 		suffix += 1
 	var hero_id := "hero_%s_%d" % [class_id, suffix]
 	var display := given_name if given_name != "" else hero_name(campaign, class_id)
+	var variant := pick_art_variant(campaign, class_id)
 	campaign.roster.append(Campaign.new_hero(hero_id, class_id, display, int(hero_class.BaseMaxHp), Campaign.roll_perks(GameData.table("perks"), rng)))
+	campaign.roster[-1].art_variant = variant
 	return {"error": "", "hero_id": hero_id}
+
+
+# ---------------------------------------------------------------- arte dos recrutas (#32)
+
+const ART_MANIFEST := "res://data/presentation/combat_art.json"
+static var _recruit_art := {}
+
+
+## As variações de arte de uma classe (a seção recruits do manifesto, a entrega #14 do Codex), em ordem.
+static func art_variants(class_id: String) -> Array:
+	if _recruit_art.is_empty():
+		var manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
+		_recruit_art = manifest.get("recruits", {}) if typeof(manifest) == TYPE_DICTIONARY else {}
+	var out: Array = _recruit_art.keys().filter(func(v): return _recruit_art[v].get("class_id", "") == class_id)
+	out.sort()
+	return out
+
+
+## A variação para um recruta novo: a menos usada pelos vivos da mesma classe (empate: a primeira). Não sorteia, para o
+## recrutamento continuar com as mesmas sementes. "" se a classe não tem arte própria (usa a do fundador).
+static func pick_art_variant(campaign: Dictionary, class_id: String) -> String:
+	var variants := art_variants(class_id)
+	if variants.is_empty():
+		return ""
+	var best := ""
+	var best_count := 1 << 30
+	for variant in variants:
+		var count: int = campaign.roster.filter(func(h): return h.get("alive", true) and h.get("art_variant", "") == variant).size()
+		if count < best_count:
+			best = variant
+			best_count = count
+	return best
+
+
+## O recruta (hero_cao_4) e não um fundador (hero_cao_bento): o fim do id é um número.
+static func is_recruit(hero_id: String) -> bool:
+	return hero_id.get_slice("_", 2).is_valid_int()
 
 
 ## Os voluntários a caminho entram no elenco, enquanto houver vaga.
@@ -868,7 +911,8 @@ static func validate_team(campaign: Dictionary, hero_ids: Array, phase_id: Strin
 	return ""
 
 
-## Quem pode ir para a rua: a rua e a luta mostram cada herói com a arte dele (os recrutas, com a do fundador da classe).
+## Quem pode ir para a rua: a rua e a luta mostram cada herói com a arte dele (o recruta, com a variação da classe ou,
+## sem ela, a do fundador).
 ## Uma classe sem arte nenhuma ainda (o rato e o tatu, liberados por eventos) fica na Estação até a arte chegar: antes
 ## ela partia na equipe e sumia da rua e da luta, e a expedição lutava com três.
 static func can_deploy(entry) -> bool:

@@ -74,26 +74,58 @@ func hero_art(hero_id: String) -> Dictionary:
 	return art_entry(art.heroes, hero_id)
 
 
-## A arte de um herói no manifesto: os recrutas (hero_cao_4) usam a do fundador da mesma classe, até terem a própria.
-static func art_entry(heroes: Dictionary, hero_id: String) -> Dictionary:
+## A arte de um herói no manifesto. O recruta (hero_cao_4) usa a variação da classe guardada no save (art_variant, #32):
+## a pose parada e o retrato dela em todas as poses (as poses de ação ainda são só dos fundadores), com o efeito visual
+## das habilidades do fundador. Sem variação (saves antigos sem arte, classe sem recruta desenhado), a do fundador.
+## variant: a do herói, se quem chama já tem a entrada; "" procura na campanha (Campaign.hero).
+static func art_entry(heroes: Dictionary, hero_id: String, variant: String = "") -> Dictionary:
 	if heroes.has(hero_id):
 		return heroes[hero_id]
+	var founder := {}
 	var parts := hero_id.split("_")
 	if parts.size() > 2 and parts[0] == "hero":
-		for founder in heroes:
-			if String(founder).begins_with("hero_%s_" % parts[1]):
-				return heroes[founder]
-	return {}
+		for id in heroes:
+			if String(id).begins_with("hero_%s_" % parts[1]):
+				founder = heroes[id]
+				break
+	if variant == "":
+		var entry = Campaign.hero(hero_id)
+		variant = String(entry.get("art_variant", "")) if entry != null else ""
+	if variant == "" or founder.is_empty():
+		return founder
+	return _variant_entry(founder, variant)
+
+
+static var _variants := {}
+
+
+static func _variant_entry(founder: Dictionary, variant: String) -> Dictionary:
+	var key := "%s|%s" % [founder.get("name", ""), variant]
+	if _variants.has(key):
+		return _variants[key]
+	if _manifest.is_empty():
+		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
+	var art: Dictionary = _manifest.get("recruits", {}).get(variant, {})
+	if art.is_empty():
+		return founder
+	var actions := {}
+	for ability_id in founder.get("actions", {}):
+		var action: Dictionary = founder.actions[ability_id]
+		if action.has("vfx"):
+			actions[ability_id] = {"vfx": action.vfx}
+	var out := {"name": variant, "variant": variant, "idle": art.idle, "actions": actions, "reactions": {}}
+	_variants[key] = out
+	return out
 
 
 static var _manifest := {}
 
 
 ## A arte de um herói fora da luta (os rostos do HUD da exploração), lida uma vez do manifesto.
-static func hero_art_of(hero_id: String) -> Dictionary:
+static func hero_art_of(hero_id: String, variant: String = "") -> Dictionary:
 	if _manifest.is_empty():
 		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
-	return art_entry(_manifest.heroes, hero_id)
+	return art_entry(_manifest.heroes, hero_id, variant)
 
 
 ## A pose do inimigo ao agir: defesa ao defender, apoio na ação em si mesmo e no golpe sem dano num herói (a Buzina do
@@ -146,8 +178,13 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 		card.set_tint(Color.WHITE)
 	else:
 		show_pose(unit, "death")
-		# Morto de vez fica cinza; no Último Fôlego, só caído.
-		card.set_tint(Color(0.55, 0.55, 0.6) if not unit.deaths_door else Color.WHITE)
+		# Morto de vez fica cinza; no Último Fôlego, só caído. Quem não tem a pose de caído (os recrutas, Íris e Véspera)
+		# fica de pé, então o Último Fôlego escurece um pouco o desenho para não parecer inteiro.
+		var has_fallen: bool = not unit.is_player or hero_art(unit.hero_id).get("reactions", {}).has("death")
+		if not unit.deaths_door:
+			card.set_tint(Color(0.55, 0.55, 0.6))
+		else:
+			card.set_tint(Color.WHITE if has_fallen else Color(0.72, 0.62, 0.62))
 
 
 # ---------------------------------------------------------------- início e fim

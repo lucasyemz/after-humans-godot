@@ -940,32 +940,33 @@ func _forge() -> void:
 
 # ---------------------------------------------------------------- Dormitório, Preparação, Pesquisa, Bar e Personagens
 
-## As camas do Dormitório (a cama pintada DM01 com a armação rasa atrás), em beliche: quatro lugares, um por herói da
-## equipe, onde quem dorme deita à noite (AHStation.sleep_slots). Ficam mesmo com o quarto por recuperar.
+## Os beliches do Dormitório: o card inteiro da entrega #1 do Codex (art/station/cards/dormitory_bunk.webp, as linhas
+## medidas em docs/design/bunk.md), uma peça só por beliche. Quatro lugares, um por herói da equipe, onde quem dorme
+## deita à noite (AHStation.sleep_slots). Ficam mesmo com o quarto por recuperar.
 const BUNK_X := [-1010.0, -660.0]
 const BUNK_Y := -665.0
 const BUNK_FLOOR := -520.0
-const BUNK_UPPER := 125.0
-## Onde o corpo encosta no colchão, sobre a base da cama (a linha do lençol na arte da cama).
-const MATTRESS_TOP := 58.0
+const BUNK_CARD := "dormitory_bunk"
+## O card (1024x677) e as linhas medidas nele, em pixels a partir do topo: os dois colchões, o piso e a âncora.
+const BUNK_PX := Vector2(1024.0, 677.0)
+const BUNK_UPPER_PX := 132.17
+const BUNK_LOWER_PX := 451.95
+const BUNK_FLOOR_PX := 653.06
+const BUNK_ANCHOR_X_PX := 511.64
+## A largura na Estação (cm): a armação fica com a largura da cama antiga (255 cm).
+const BUNK_WIDTH := 267.0
+const BUNK_SCALE := BUNK_WIDTH / 1024.0
+## Do colchão de baixo ao de cima, e do piso ao colchão de baixo (onde o corpo encosta), em cm.
+const BUNK_UPPER := (BUNK_LOWER_PX - BUNK_UPPER_PX) * BUNK_SCALE
+const MATTRESS_TOP := (BUNK_FLOOR_PX - BUNK_LOWER_PX) * BUNK_SCALE
 
 
 func _dormitory_bunks() -> void:
-	var f := BUNK_FLOOR
-	var wood := S("wood_table_worn", f, 0, Color(0.58, 0.47, 0.34))
-	var steel := S("green_metal_rust", f, 0, Color(0.5, 0.6, 0.54))
-	var bed_width := 255.0
-	var bed_height := bed_width * 688.0 / 1743.0
+	var height := BUNK_PX.y * BUNK_SCALE
 	for x in BUNK_X:
-		for tier in 2:
-			var base := Vector3(x, BUNK_Y, f + tier * BUNK_UPPER)
-			box(base + Vector3(-115, -80, 27), base + Vector3(115, -5, 32), wood)
-			b.card("Dormitory_BedLinen", base, bed_width, bed_height)
-		# Os pés do beliche, do chão até a cama de cima.
-		for dx in [-118.0, 118.0]:
-			for dy in [-72.0, -8.0]:
-				box(Vector3(x + dx - 3, BUNK_Y + dy - 3, f), Vector3(x + dx + 3, BUNK_Y + dy + 3, f + BUNK_UPPER + 40), steel)
-		box(Vector3(x - 118, BUNK_Y - 8, f + BUNK_UPPER + 36), Vector3(x + 118, BUNK_Y - 2, f + BUNK_UPPER + 40), steel)
+		# A âncora do card (o pé, no centro) fica em x e no piso; a margem transparente de baixo vai para baixo do chão.
+		var base := Vector3(x + (BUNK_PX.x * 0.5 - BUNK_ANCHOR_X_PX) * BUNK_SCALE, BUNK_Y, BUNK_FLOOR - (BUNK_PX.y - BUNK_FLOOR_PX) * BUNK_SCALE)
+		b.card(BUNK_CARD, base, BUNK_WIDTH, height)
 
 
 func _dormitory() -> void:

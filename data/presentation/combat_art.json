@@ -14,7 +14,8 @@
 				"canvas": [
 					1086,
 					1448
-				]
+				],
+				"portrait": "res://art/ui/portraits/bento.png"
 			},
 			"actions": {
 				"cao_punho_sucata": {
@@ -253,7 +254,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"portrait": "res://art/ui/portraits/nick.png"
 			},
 			"actions": {
 				"gato_corte_fase": {
@@ -493,7 +495,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"portrait": "res://art/ui/portraits/iris.png"
 			},
 			"actions": {
 				"sapo_carga_voltaica": {
@@ -708,7 +711,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"portrait": "res://art/ui/portraits/vespera.png"
 			},
 			"actions": {
 				"coruja_disparo_perfurante": {
@@ -913,6 +917,72 @@
 					],
 					"body_reference_pixels": 1272
 				}
+			}
+		}
+	},
+	"recruits": {
+		"dog_recruit_01": {
+			"class_id": "cao",
+			"idle": {
+				"file": "res://art/combat/recruits/dog_recruit_01_idle.webp",
+				"anchor": [
+					542.0,
+					1425
+				],
+				"body_reference_pixels": 1385,
+				"canvas": [
+					1086,
+					1448
+				],
+				"portrait": "res://art/ui/portraits/dog_recruit_01.png"
+			}
+		},
+		"cat_recruit_01": {
+			"class_id": "gato",
+			"idle": {
+				"file": "res://art/combat/recruits/cat_recruit_01_idle.webp",
+				"anchor": [
+					589.5,
+					1312
+				],
+				"body_reference_pixels": 1260,
+				"canvas": [
+					1178,
+					1336
+				],
+				"portrait": "res://art/ui/portraits/cat_recruit_01.png"
+			}
+		},
+		"frog_recruit_01": {
+			"class_id": "sapo",
+			"idle": {
+				"file": "res://art/combat/recruits/frog_recruit_01_idle.webp",
+				"anchor": [
+					588.5,
+					1311
+				],
+				"body_reference_pixels": 1219,
+				"canvas": [
+					1178,
+					1336
+				],
+				"portrait": "res://art/ui/portraits/frog_recruit_01.png"
+			}
+		},
+		"owl_recruit_01": {
+			"class_id": "coruja",
+			"idle": {
+				"file": "res://art/combat/recruits/owl_recruit_01_idle.webp",
+				"anchor": [
+					589.5,
+					1312
+				],
+				"body_reference_pixels": 1272,
+				"canvas": [
+					1178,
+					1336
+				],
+				"portrait": "res://art/ui/portraits/owl_recruit_01.png"
 			}
 		}
 	},
