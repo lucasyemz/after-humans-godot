@@ -290,13 +290,28 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 		instinct.name = "Instinct"
 		box.add_child(instinct)
 	else:
-		# A intenção: o que ele faria se a vez dele fosse agora (engine.enemy_intent); muda conforme a luta.
+		# A intenção: o que ele faria se a vez dele fosse agora (engine.enemy_intent); muda conforme a luta. O ícone da
+		# entrega #18 vem antes do texto.
+		var intent_row := HBoxContainer.new()
+		intent_row.name = "IntentRow"
+		intent_row.add_theme_constant_override("separation", 6)
+		intent_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(intent_row)
+		var intent_icon := TextureRect.new()
+		intent_icon.name = "IntentIcon"
+		intent_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		intent_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		intent_icon.custom_minimum_size = Vector2.ONE * S.px(22)
+		intent_icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		intent_icon.mouse_filter = Control.MOUSE_FILTER_PASS
+		intent_row.add_child(intent_icon)
 		var intent := S.label("", 15, S.ENEMY, "bold")
 		intent.name = "Intent"
 		intent.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		intent.custom_minimum_size = Vector2(228, 0)
+		intent.custom_minimum_size = Vector2(200, 0)
+		intent.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		intent.mouse_filter = Control.MOUSE_FILTER_PASS
-		box.add_child(intent)
+		intent_row.add_child(intent)
 	var status := HFlowContainer.new()
 	status.name = "Status"
 	status.add_theme_constant_override("h_separation", 4)
@@ -316,18 +331,44 @@ static func _clear(node: Node) -> void:
 		child.queue_free()
 
 
-func _status_chip(text: String, good: bool, size: int = 15) -> PanelContainer:
+## Um estado (S.statuses): o ícone da entrega #18 tingido de bom ou ruim (a forma também diz: bom tem cantoneiras retas
+## no topo, ruim tem o topo chanfrado), com o número de fichas ou de vezes; o nome e a explicação ficam na dica do mouse
+## (e na do foco, ao mirar). Sem ícone (Cego, Fraco, Imobilizado, Trauma), a ficha escrita de antes.
+func _status_chip(entry: Array, size: int = 15) -> PanelContainer:
+	var good: bool = entry[1]
+	var icon_name: String = entry[2] if entry.size() > 2 else ""
 	var chip := PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.22, 0.34, 0.55, 0.55) if good else Color(S.DANGER.darkened(0.55), 0.6)
-	style.border_color = Color(S.BLUE, 0.8) if good else Color(S.DANGER, 0.85)
+	style.bg_color = Color(0.0, 0.0, 0.0, 0.45)
+	style.border_color = Color(S.OK if good else S.DANGER, 0.85)
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(3)
-	style.content_margin_left = 5
-	style.content_margin_right = 5
+	style.content_margin_left = 3 if icon_name != "" else 5
+	style.content_margin_right = 4 if icon_name != "" else 5
 	chip.add_theme_stylebox_override("panel", style)
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_child(S.label(text, size, TEXT))
+	chip.mouse_filter = Control.MOUSE_FILTER_PASS
+	chip.tooltip_text = S.status_tip(entry) if entry.size() > 4 else String(entry[0])
+	var texture := S.combat_icon("status-%s_%s" % [icon_name, "good" if good else "bad"]) if icon_name != "" else null
+	if texture == null:
+		chip.add_child(S.label(entry[0], size, TEXT))
+		return chip
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 2)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_child(row)
+	var icon := TextureRect.new()
+	icon.texture = texture
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2.ONE * S.px(size + 7)
+	icon.modulate = S.OK if good else S.DANGER
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.name = "Icon"
+	row.add_child(icon)
+	if int(entry[3]) > 0:
+		var count := S.label(str(entry[3]), size, TEXT, "bold")
+		count.name = "Count"
+		row.add_child(count)
 	return chip
 
 
@@ -350,7 +391,7 @@ func refresh() -> void:
 		if unit.is_player:
 			(box.get_node("Instinct") as ProgressBar).value = unit.instinct
 		elif unit.hp > 0:
-			_show_intent(box.get_node("Intent"), session.engine.enemy_intent(unit.id))
+			_show_intent(box.get_node("IntentRow/Intent"), session.engine.enemy_intent(unit.id))
 		var style: StyleBoxFlat = plate.get_meta("style")
 		style.border_color = GOLD if unit.id == current else Color(S.COPPER, 0.4)
 		style.set_border_width_all(2 if unit.id == current else 1)
@@ -358,7 +399,7 @@ func refresh() -> void:
 		for child in status.get_children():
 			child.queue_free()
 		for entry in S.statuses(unit):
-			status.add_child(_status_chip(entry[0], entry[1]))
+			status.add_child(_status_chip(entry))
 		# A placa encolhe de volta quando a intenção ou os estados ficam mais curtos.
 		plate.reset_size.call_deferred()
 	_refresh_order(current)
@@ -375,27 +416,42 @@ func _show_intent(label: Label, intent: Dictionary) -> void:
 	var names: Array = intent.target_ids.map(func(id): return session.state.find_unit(id).display_name if session.state.find_unit(id) else id)
 	var text := ""
 	var color: Color = S.ENEMY
+	# O ícone da intenção (art/ui/icons/intent-*): ataque, ataque em área (mais de um alvo de uma vez), cura, bloqueio,
+	# mover, atordoado; sem plano claro, a interrogação.
+	var icon := "unknown"
 	match intent.kind:
 		"attack":
-			text = "▶ %s → %s" % [intent.name, (" ou " if intent.either else " e ").join(names)] if not names.is_empty() else "▶ %s" % intent.name
+			text = "%s → %s" % [intent.name, (" ou " if intent.either else " e ").join(names)] if not names.is_empty() else intent.name
+			icon = "attack_area" if names.size() > 1 and not intent.either else "attack"
 		"heal":
-			text = "▶ %s (se cura)" % intent.name
+			text = "%s (se cura)" % intent.name
 			color = S.OK
+			icon = "heal"
 		"defend":
-			text = "▶ %s (bloqueio)" % intent.name
+			text = "%s (bloqueio)" % intent.name
 			color = S.BLUE
+			icon = "block"
 		"move":
-			text = "▶ %s" % intent.name
+			text = intent.name
 			color = S.MUTED
+			icon = "move"
 		"stunned":
 			text = intent.name
 			color = S.MUTED
+			icon = "stunned"
 	if text != "" and not intent.sure and not intent.either:
 		text += " ?"
 	label.text = text
 	label.add_theme_color_override("font_color", color)
-	label.tooltip_text = "Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s." % (
+	var tip := "Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s." % (
 		"" if intent.sure else "; com \"?\", ele está entre dois planos parecidos")
+	label.tooltip_text = tip
+	var icon_rect := label.get_parent().get_node_or_null("IntentIcon") as TextureRect
+	if icon_rect != null:
+		icon_rect.texture = S.combat_icon("intent-" + icon) if text != "" else null
+		icon_rect.modulate = color
+		icon_rect.visible = text != ""
+		icon_rect.tooltip_text = tip
 
 
 ## A ordem da rodada com rostos: quem age agora maior e dourado; quem já agiu sai da fila.
@@ -442,9 +498,9 @@ func _show_hero(actor: AHCombat.Unit) -> void:
 	for child in _hero_status.get_children():
 		child.queue_free()
 	for entry in S.statuses(actor):
-		_hero_status.add_child(_status_chip(entry[0], entry[1], 16))
+		_hero_status.add_child(_status_chip(entry, 16))
 	if actor.trauma:
-		_hero_status.add_child(_status_chip("Trauma", false, 16))
+		_hero_status.add_child(_status_chip(["Trauma", false], 16))
 
 
 ## Fichas e efeitos da unidade em palavras curtas (o registro e os testes usam).
@@ -761,6 +817,7 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 	if rank > 0:
 		var ids: Array = session.hit_ids(_actor_id, option.id, rank)
 		var hits := PackedStringArray()
+		var status_tips := PackedStringArray()
 		for id in ids:
 			var unit := session.state.find_unit(id)
 			if unit == null:
@@ -768,12 +825,23 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			var note := "%s (vida %d)" % [unit.display_name, unit.hp]
 			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage").Max >= unit.hp:
 				note += " · pode cair"
+			# Os estados do alvo por extenso: no foco, a dica faz o papel da dica do mouse sobre os ícones (#30).
+			var marks := S.statuses(unit)
+			if not marks.is_empty():
+				note += " · " + ", ".join(marks.map(func(e): return e[0]))
+				for entry in marks:
+					status_tips.append(S.status_tip(entry))
 			hits.append(note)
 		if not hits.is_empty():
 			var who := S.label("Atinge: " + "; ".join(hits), S.MIN_TEXT, S.DANGER if option.enemy_side else S.OK, "bold")
 			who.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			who.custom_minimum_size = Vector2(430, 0)
 			_tip_box.add_child(who)
+		for line in status_tips:
+			var gloss := S.label(line, 16, S.VIOLET)
+			gloss.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			gloss.custom_minimum_size = Vector2(430, 0)
+			_tip_box.add_child(gloss)
 	# Os termos que aparecem no texto, explicados.
 	for word in S.GLOSSARY:
 		if text.contains(word) or text.to_lower().contains(word.to_lower().substr(0, 6)):

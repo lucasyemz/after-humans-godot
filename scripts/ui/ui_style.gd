@@ -436,21 +436,46 @@ static func face_texture(art: Dictionary) -> Texture2D:
 
 
 ## As fichas e os efeitos da unidade por extenso, com a cor de bom (azul) ou ruim (vermelho): [texto, bom].
+## Os estados da unidade: [texto curto, bom para quem tem?, ícone (art/ui/icons/status-<ícone>_good|_bad, "" sem ícone),
+## número (fichas ou vezes que faltam; 0 sem número), termo do GLOSSARY]. Bom e ruim são para quem recebe o estado.
 static func statuses(unit: AHCombat.Unit) -> Array:
 	var out: Array = []
 	var t := unit.tokens
-	if t.block > 0: out.append(["Bloqueio %d" % t.block, true])
-	if t.dodge > 0: out.append(["Esquiva %d" % t.dodge, true])
-	if t.guard > 0: out.append(["Guarda", true])
-	if t.vuln > 0: out.append(["Vulnerável %d" % t.vuln, false])
-	if unit.mark_duration > 0: out.append(["Marcado", false])
-	if unit.stun_turns > 0: out.append(["Atordoado", false])
-	if unit.bleed.duration > 0: out.append(["Sangra %d" % unit.bleed.magnitude, false])
-	if unit.blight.duration > 0: out.append(["Contaminado %d" % unit.blight.magnitude, false])
-	if unit.blind: out.append(["Cego", false])
-	if unit.weak: out.append(["Fraco", false])
-	if unit.immobilize_turns > 0: out.append(["Imobilizado", false])
+	if t.block > 0: out.append(["Bloqueio %d" % t.block, true, "block", t.block, "Bloqueio"])
+	if t.dodge > 0: out.append(["Esquiva %d" % t.dodge, true, "dodge", t.dodge, "Esquiva"])
+	if t.guard > 0: out.append(["Guarda", true, "protection", 0, "Guarda"])
+	if t.vuln > 0: out.append(["Vulnerável %d" % t.vuln, false, "vulnerable", t.vuln, "Vulnerável"])
+	if unit.mark_duration > 0: out.append(["Marcado", false, "marked", unit.mark_duration, "Marcado"])
+	if unit.stun_turns > 0: out.append(["Atordoado", false, "stunned", unit.stun_turns, "Atordoado"])
+	if unit.bleed.duration > 0: out.append(["Sangra %d" % unit.bleed.magnitude, false, "bleeding", unit.bleed.duration, "Sangra"])
+	if unit.blight.duration > 0: out.append(["Contaminado %d" % unit.blight.magnitude, false, "poison", unit.blight.duration, "Contaminado"])
+	if unit.blind: out.append(["Cego", false, "", 0, "Cego"])
+	if unit.weak: out.append(["Fraco", false, "", 0, "Fraco"])
+	if unit.immobilize_turns > 0: out.append(["Imobilizado", false, "", unit.immobilize_turns, "Imobilizado"])
 	return out
+
+
+## A dica de um estado (mouse e foco): o nome, o número e a explicação do glossário.
+static func status_tip(entry: Array) -> String:
+	var text: String = entry[0]
+	var count: int = entry[3]
+	var term: String = entry[4]
+	var what := ""
+	match term:
+		"Sangra", "Contaminado":
+			what = "%s por vez · %d %s" % [text.get_slice(" ", 1), count, "vez" if count == 1 else "vezes"]
+		"Bloqueio", "Esquiva", "Vulnerável":
+			what = "%d %s" % [count, "ficha" if count == 1 else "fichas"]
+		_:
+			if count > 0:
+				what = "%d %s" % [count, "vez" if count == 1 else "vezes"]
+	return "%s%s: %s" % [term, (" (%s)" % what) if what != "" else "", GLOSSARY.get(term, "")]
+
+
+## O ícone do estado ou da intenção (os SVG brancos da entrega #18), para tingir com a cor do bom e do ruim.
+static func combat_icon(name: String) -> Texture2D:
+	var path := "res://art/ui/icons/%s.svg" % name
+	return load(path) if ResourceLoader.exists(path) else null
 
 
 ## O que cada termo quer dizer (as dicas do combate e o glossário).
