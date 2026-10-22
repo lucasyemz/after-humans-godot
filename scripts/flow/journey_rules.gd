@@ -233,6 +233,8 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 # ---------------------------------------------------------------- inimigos
 
 ## Formação de um encontro (GenerateEnemyTeam): do perfil do nó, da frente para trás.
+## O perfil de patrulha (encounters.json): o da fase (fase_N) ou, numa casa, o da loja (fase_N_mercearia, _oficina,
+## _cinema); sem perfil próprio, o node_1_combat de sempre.
 static func generate_enemy_team(encounter: String, difficulty: int, node_id: String, random: AHCombatRandom, forced_count: int = 0) -> Array:
 	if encounter == "boss":
 		return [
@@ -306,7 +308,13 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 			count = 2 + (1 if fight >= 2 and random.next() < 0.35 else 0)
 
 	# Count é em posições: um inimigo grande ocupa duas; quem não cabe sai do grupo.
-	var generated := generate_enemy_team("combat", 1, route.node_id, random, maxi(2, count))
+	var profile_id: String = route.node_id
+	if house:
+		var site_index := index - HOUSE_ENEMY_INDEX
+		var shop: int = route.sites[site_index].get("shop", -1) if site_index < route.sites.size() else -1
+		if shop >= 0 and shop < SHOP_NAMES.size() and GameData.table("encounters").has("%s_%s" % [route.node_id, SHOP_NAMES[shop]]):
+			profile_id = "%s_%s" % [route.node_id, SHOP_NAMES[shop]]
+	var generated := generate_enemy_team("combat", 1, profile_id, random, maxi(2, count))
 	var units: Array = []
 	var next_rank := 1
 	for spec in generated:

@@ -53,5 +53,88 @@
     "Support": [
       "sussurrador"
     ]
+  },
+  {
+    "Name": "fase_1",
+    "Front": [
+      "robot",
+      "cao_eco",
+      "recreador"
+    ],
+    "Ranged": [
+      "condutor_raiz"
+    ],
+    "Support": [
+      "sussurrador",
+      "pipoco"
+    ]
+  },
+  {
+    "Name": "fase_1_mercearia",
+    "Front": [
+      "carcaca_colonizada"
+    ],
+    "Ranged": [
+      "condutor_raiz"
+    ],
+    "Support": [
+      "sussurrador"
+    ]
+  },
+  {
+    "Name": "fase_1_oficina",
+    "Front": [
+      "carrasco_industrial"
+    ],
+    "Ranged": [
+      "condutor_raiz"
+    ],
+    "Support": [
+      "faisca"
+    ]
+  },
+  {
+    "Name": "fase_1_cinema",
+    "Front": [
+      "recreador"
+    ],
+    "Ranged": [
+      "condutor_raiz"
+    ],
+    "Support": [
+      "pipoco"
+    ]
+  },
+  {
+    "Name": "fase_2",
+    "Front": [
+      "enraizado",
+      "cao_eco",
+      "carcaca_colonizada"
+    ],
+    "Ranged": [
+      "condutor_raiz"
+    ],
+    "Support": [
+      "broto",
+      "sussurrador"
+    ]
+  },
+  {
+    "Name": "fase_5",
+    "Front": [
+      "robot_fungo",
+      "carrasco_industrial",
+      "carcaca_colonizada"
+    ],
+    "Ranged": [
+      "ninho_errante",
+      "condutor_raiz"
+    ],
+    "Support": [
+      "broto",
+      "faisca",
+      "sussurrador"
+    ]
   }
 ]

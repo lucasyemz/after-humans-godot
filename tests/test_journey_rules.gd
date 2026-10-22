@@ -12,6 +12,7 @@ func run(t) -> void:
 	_corridor_shape(t)
 	_steps(t)
 	_enemies(t)
+	_john_villains(t)
 	_sites(t)
 	_search(t)
 	_events(t)
@@ -100,6 +101,56 @@ func _enemies(t) -> void:
 					if not art.enemies.has(spec.enemy_id) and not missing.has(spec.enemy_id):
 						missing.append(spec.enemy_id)
 	t.equal(missing, [], "60 fases: todo inimigo das patrulhas e das casas tem arte")
+
+
+## Os vilões do John entram onde a distribuição dele manda (Lucas, 22/10/2026): Recreador e Pipoco na Rua e no
+## cinema, Carrasco e Faísca na oficina e nos Túneis, Enraizado e Broto na Ponte, Broto nos Túneis. As fases 3 e 4
+## continuam sem eles, e o Porteiro segue como chefe. Cada um tem arte e altura própria.
+func _john_villains(t) -> void:
+	var expected := {
+		"fase_1": ["recreador", "pipoco"],
+		"fase_2": ["enraizado", "broto"],
+		"fase_5": ["carrasco_industrial", "faisca", "broto"],
+	}
+	var john := ["recreador", "pipoco", "enraizado", "broto", "carrasco_industrial", "faisca"]
+	var seen := {}
+	var by_shop := {}
+	var bosses := {}
+	for phase_id in ["fase_1", "fase_2", "fase_3", "fase_4", "fase_5"]:
+		seen[phase_id] = {}
+		for seed_value in 40:
+			var campaign: Dictionary = Campaign.create_initial(seed_value + 1)
+			if not R.start_expedition(campaign, phase_id, seed_value * 7919 + 13):
+				continue
+			var expedition: Dictionary = campaign.session.expedition
+			var route: Dictionary = expedition.corridor
+			for index in route.steps.size():
+				if route.steps[index].type == "combat" or route.steps[index].type == "boss":
+					var group := R.corridor_enemies(expedition, index)
+					if route.steps[index].type == "boss" and route.node_type == "boss":
+						bosses[group[0].enemy_id] = true
+					for spec in group:
+						seen[phase_id][spec.enemy_id] = true
+			if phase_id == "fase_1":
+				R.assign_search_sites(route, DOOR_STEPS, DOOR_SHOPS)
+				for site in route.sites.size():
+					var shop: String = R.SHOP_NAMES[route.sites[site].shop]
+					for spec in R.corridor_enemies(expedition, R.HOUSE_ENEMY_INDEX + site):
+						by_shop[shop + ":" + spec.enemy_id] = true
+	for phase_id in expected:
+		for enemy_id in expected[phase_id]:
+			t.check(seen[phase_id].has(enemy_id), "%s aparece na %s" % [enemy_id, phase_id])
+	for phase_id in ["fase_3", "fase_4"]:
+		t.check(john.all(func(id): return not seen[phase_id].has(id)), "a %s continua sem os vilões do John" % phase_id)
+	t.check(by_shop.has("cinema:recreador") or by_shop.has("cinema:pipoco"), "o cinema tem o Recreador ou o Pipoco")
+	t.check(by_shop.has("oficina:carrasco_industrial") or by_shop.has("oficina:faisca"), "a oficina tem o Carrasco ou a Faísca")
+	t.check(by_shop.keys().all(func(k): return not k.begins_with("mercearia:") or not john.has(k.split(":")[1])),
+		"a mercearia fica com o Coletor de Sucata, sem vilão do John")
+	t.equal(bosses.keys(), ["porteiro"], "o Porteiro continua o chefe da fase 5")
+	var art = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
+	for enemy_id in john:
+		t.check(art.enemies.has(enemy_id) and ResourceLoader.exists(art.enemies[enemy_id].idle.file), "%s tem a pose parada" % enemy_id)
+		t.check(AHCharacterHeights.HEIGHTS.has(enemy_id), "%s tem altura própria" % enemy_id)
 
 
 func _sites(t) -> void:

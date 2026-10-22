@@ -2198,6 +2198,96 @@
 					1335
 				]
 			}
+		},
+		"recreador": {
+			"poses": {},
+			"idle": {
+				"file": "res://art/combat/enemies/recreador/idle.webp",
+				"anchor": [
+					567.5,
+					1272
+				],
+				"body_reference_pixels": 1222,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		},
+		"pipoco": {
+			"poses": {},
+			"idle": {
+				"file": "res://art/combat/enemies/pipoco/idle.webp",
+				"anchor": [
+					533.0,
+					1254
+				],
+				"body_reference_pixels": 1148,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		},
+		"enraizado": {
+			"poses": {},
+			"idle": {
+				"file": "res://art/combat/enemies/enraizado/idle.webp",
+				"anchor": [
+					601.0,
+					1277
+				],
+				"body_reference_pixels": 1261,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		},
+		"broto": {
+			"poses": {},
+			"idle": {
+				"file": "res://art/combat/enemies/broto/idle.webp",
+				"anchor": [
+					580.5,
+					1220
+				],
+				"body_reference_pixels": 1102,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		},
+		"carrasco_industrial": {
+			"poses": {},
+			"idle": {
+				"file": "res://art/combat/enemies/carrasco_industrial/idle.webp",
+				"anchor": [
+					580.5,
+					1279
+				],
+				"body_reference_pixels": 1236,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
+		},
+		"faisca": {
+			"poses": {},
+			"idle": {
+				"file": "res://art/combat/enemies/faisca/idle.webp",
+				"anchor": [
+					570.0,
+					1237
+				],
+				"body_reference_pixels": 747,
+				"canvas": [
+					1178,
+					1335
+				]
+			}
 		}
 	},
 	"icons": {
