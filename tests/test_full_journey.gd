@@ -192,26 +192,30 @@ func _crates_behind(street, route: Dictionary) -> int:
 
 func _search_crates(street, route: Dictionary, index: int) -> bool:
 	var corridor: AHStreetCorridor = street.corridor
-	var food_before: int = Campaign.state.session.expedition.food
-	var loot_before: Dictionary = Campaign.state.session.expedition.loot.duplicate()
-	var bandages_before: int = Campaign.state.inventory.bandages
-	var tools_before: int = Campaign.state.tools.size()
+	var before := _search_snapshot()
 	street._place_leader(Vector3(corridor._step_x(index, 0.45), 0, 0.45))
 	if not await _until(func(): return corridor._action.is_valid(), "o aviso Vasculhar aparecer perto dos caixotes"):
 		return false
 	await _action("interact")
 	if not await _until(func(): return route.props.get(str(index), false), "a busca dos caixotes acontecer"):
 		return false
-	var expedition: Dictionary = Campaign.state.session.expedition
-	t.check(expedition.food != food_before or expedition.loot != loot_before or Campaign.state.session.event != null
-		or Campaign.state.inventory.bandages != bandages_before or Campaign.state.tools.size() != tools_before,
-		"a busca deu algo, abriu um evento ou mudou o achado")
+	t.check(_search_snapshot() != before or Campaign.state.session.event != null,
+		"a busca mudou algo: comida, achado, curativos, ferramentas, esperança, vida ou instinto")
 	t.check(Campaign.read_file(Campaign.primary_path()).session.expedition.corridor.props.get(str(index), false), "a busca ficou gravada")
 	# Repetir a busca não dá nada: o mesmo caixote não abre de novo.
 	t.check(not J.search_prop(Campaign.state, index).ok, "o mesmo caixote não abre duas vezes")
 	if street.exploration_hud.modal_open():
 		return await _answer_modal(street)
 	return true
+
+
+## Tudo o que uma busca pode mudar (os resultados ruins mexem só na vida, no instinto ou na esperança).
+func _search_snapshot() -> Dictionary:
+	var expedition: Dictionary = Campaign.state.session.expedition
+	var team: Array = expedition.team.map(func(id): return Campaign.hero(id))
+	return {"food": expedition.food, "loot": expedition.loot.duplicate(), "bandages": Campaign.state.inventory.bandages,
+		"tools": Campaign.state.tools.size(), "hope": expedition.hope, "hp": team.map(func(h): return h.hp),
+		"instinct": team.map(func(h): return h.instinct)}
 
 
 ## Responde o painel aberto no HUD da exploração (só os botões dele, não o Menu nem a Mochila): a pergunta de risco
