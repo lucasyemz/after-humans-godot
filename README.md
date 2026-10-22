@@ -122,12 +122,18 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   `frames.txt` e sai.
 - **A rua no editor:** `scenes/street_set.tscn` é a Rua das Vitrines montada (chão, prédios, becos, postes, carros, props
   e silhuetas, com a colisão de cada um), e a rua do jogo carrega essa cena. Cada peça é um nó (`Lamp1`, `Building3`,
-  `Car2`, `Prop7`, `Alley4`...) com a placa, a colisão (`Collider`), a luz e o halo dela: mover, girar ou apagar o nó
-  no editor muda o jogo. O que é dinâmico continua em código por cima da cena: o corredor sorteado, as patrulhas, as
-  portas das casas, os caixotes, a fogueira, o clima e a chuva. Para mexer à mão sem perder nada, não rode de novo a
-  ferramenta abaixo; ela é para quando a montagem em código (`scripts/street/street_set.gd`) mudar, e sobrescreve a
-  cena: `"$GODOT" --headless --path . --script res://tools/bake_street.gd -- --force`. Ao mexer na rua, rode a captura
-  (o teste de colisão) acima.
+  `Car2`, `Prop7`, `Alley4`...) com a placa, a colisão (`Collider`), a luz e o halo dela.
+  - Pode mexer à mão (vale no jogo): mover, girar ou apagar postes, luzes de porta, carros, props, becos e silhuetas;
+    mover os prédios no X (`Building1` a `Building7`): a porta da loja, onde se entra, vai junto.
+  - Continua no código (mexer na cena não muda): a frente da calçada e a altura do piso, os limites por onde a equipe
+    anda, o comprimento do corredor (78 m, 10 trechos) e o lado de cada porta. Uma peça girada colide certo, mas o
+    teste de ponto livre ao pôr a equipe (`_blocked`) usa a caixa sem a rotação.
+  - Por cima da cena, em código: o corredor sorteado, as patrulhas, as portas abertas das casas, os caixotes, a fogueira,
+    o clima e a chuva.
+  - Para não perder o que foi mexido à mão, não rode de novo a ferramenta abaixo: ela é para quando a montagem em código
+    (`scripts/street/street_set.gd`) mudar, e sobrescreve a cena:
+    `"$GODOT" --headless --path . --script res://tools/bake_street.gd -- --force`. Ao mexer na rua, rode a captura (o
+    teste de colisão) acima.
 - **Captura dos cenários:** `"$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_scenarios.gd -- --out=<pasta>`
   (opcional `--maps=RiverDock,FloodedDepot`). Em cada zona dos seis mapas: fim de tarde e noite com chuva, tempo de quadro,
   equipe e patrulhas no piso e o líder preso à faixa (`PASS`/`FAIL`). Sai com código 1 se algo falhar.

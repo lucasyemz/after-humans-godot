@@ -1443,49 +1443,49 @@ shader_parameter/mirror = false
 [sub_resource type="QuadMesh" id="QuadMesh_ukw7f"]
 size = Vector2(20.329031, 11.5)
 
-[node name="StreetSet" type="Node3D" unique_id=101506139]
+[node name="StreetSet" type="Node3D" unique_id=1375068798]
 script = ExtResource("1_tork6")
 
-[node name="Ground" type="Node3D" parent="." unique_id=126906828]
+[node name="Ground" type="Node3D" parent="." unique_id=1179890521]
 
-[node name="Asphalt" type="MeshInstance3D" parent="Ground" unique_id=1599620835]
+[node name="Asphalt" type="MeshInstance3D" parent="Ground" unique_id=1216968842]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -0.099999994, 3.75)
 material_override = SubResource("StandardMaterial3D_cb2rc")
 mesh = SubResource("BoxMesh_7uwye")
 
-[node name="Sidewalk" type="MeshInstance3D" parent="Ground" unique_id=41543681]
+[node name="Sidewalk" type="MeshInstance3D" parent="Ground" unique_id=2072001500]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, -0.024999999, -2.55)
 material_override = SubResource("StandardMaterial3D_o7xnd")
 mesh = SubResource("BoxMesh_032u1")
 
-[node name="Lamp1" type="Node3D" parent="." unique_id=1412400430]
+[node name="Lamp1" type="Node3D" parent="." unique_id=1927000515]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.799999, 0.14999999, -2.45)
 
-[node name="Card" type="MeshInstance3D" parent="Lamp1" unique_id=66499326]
+[node name="Card" type="MeshInstance3D" parent="Lamp1" unique_id=401896787]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2499998, 0)
 material_override = SubResource("StandardMaterial3D_isywt")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_yqdkl")
 
-[node name="Collider" type="StaticBody3D" parent="Lamp1" unique_id=1968956309]
+[node name="Collider" type="StaticBody3D" parent="Lamp1" unique_id=1820071715]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52000046, 2.1, 0)
 
-[node name="@CollisionShape3D@30" type="CollisionShape3D" parent="Lamp1/Collider" unique_id=180026809]
+[node name="Shape" type="CollisionShape3D" parent="Lamp1/Collider" unique_id=396680233]
 shape = SubResource("BoxShape3D_75x5a")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Lamp1/Collider" unique_id=1184117589 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Lamp1/Collider" unique_id=573578479 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_xm322")
 
-[node name="Glow" type="MeshInstance3D" parent="Lamp1" unique_id=1662393052]
+[node name="Glow" type="MeshInstance3D" parent="Lamp1" unique_id=1194013205]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.52999973, 3.6999998, 0.06000018)
 material_override = SubResource("ShaderMaterial_21x3x")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_j3hi8")
 
-[node name="Light" type="OmniLight3D" parent="Lamp1" unique_id=1346819634 groups=["street_lamp_light"]]
+[node name="Light" type="OmniLight3D" parent="Lamp1" unique_id=539309947 groups=["street_lamp_light"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.52999973, 3.5499997, 0.3000002)
 light_color = Color(1, 0.8039216, 0.627451, 1)
 light_energy = 1.6
@@ -1495,34 +1495,34 @@ shadow_enabled = true
 omni_range = 7.5
 omni_attenuation = 1.4
 
-[node name="Lamp2" type="Node3D" parent="." unique_id=1739846032]
+[node name="Lamp2" type="Node3D" parent="." unique_id=751612194]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.6, 0.14999999, -2.45)
 
-[node name="Card" type="MeshInstance3D" parent="Lamp2" unique_id=1578284529]
+[node name="Card" type="MeshInstance3D" parent="Lamp2" unique_id=1579993148]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2499998, 0)
 material_override = SubResource("StandardMaterial3D_isywt")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_mew0v")
 
-[node name="Collider" type="StaticBody3D" parent="Lamp2" unique_id=1643287989]
+[node name="Collider" type="StaticBody3D" parent="Lamp2" unique_id=1056757024]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52000046, 2.1, 0)
 
-[node name="@CollisionShape3D@31" type="CollisionShape3D" parent="Lamp2/Collider" unique_id=641950816]
+[node name="Shape" type="CollisionShape3D" parent="Lamp2/Collider" unique_id=1927195082]
 shape = SubResource("BoxShape3D_3ldyr")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Lamp2/Collider" unique_id=1881401507 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Lamp2/Collider" unique_id=1793638664 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_3ho6k")
 
-[node name="Glow" type="MeshInstance3D" parent="Lamp2" unique_id=1784877847]
+[node name="Glow" type="MeshInstance3D" parent="Lamp2" unique_id=1526769064]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5299988, 3.6999998, 0.06000018)
 material_override = SubResource("ShaderMaterial_gswex")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_f01ev")
 
-[node name="Light" type="OmniLight3D" parent="Lamp2" unique_id=1146966113 groups=["street_lamp_light"]]
+[node name="Light" type="OmniLight3D" parent="Lamp2" unique_id=641836823 groups=["street_lamp_light"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5299988, 3.5499997, 0.3000002)
 light_color = Color(1, 0.8039216, 0.627451, 1)
 light_energy = 1.6
@@ -1532,34 +1532,34 @@ shadow_enabled = true
 omni_range = 7.5
 omni_attenuation = 1.4
 
-[node name="Lamp3" type="Node3D" parent="." unique_id=1887544246]
+[node name="Lamp3" type="Node3D" parent="." unique_id=1835340707]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.8, 0.14999999, -2.45)
 
-[node name="Card" type="MeshInstance3D" parent="Lamp3" unique_id=1034028585]
+[node name="Card" type="MeshInstance3D" parent="Lamp3" unique_id=288340810]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2499998, 0)
 material_override = SubResource("StandardMaterial3D_isywt")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_ib746")
 
-[node name="Collider" type="StaticBody3D" parent="Lamp3" unique_id=1642225199]
+[node name="Collider" type="StaticBody3D" parent="Lamp3" unique_id=2052646769]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52000046, 2.1, 0)
 
-[node name="@CollisionShape3D@32" type="CollisionShape3D" parent="Lamp3/Collider" unique_id=1445750312]
+[node name="Shape" type="CollisionShape3D" parent="Lamp3/Collider" unique_id=1514769823]
 shape = SubResource("BoxShape3D_i2f2v")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Lamp3/Collider" unique_id=283275350 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Lamp3/Collider" unique_id=1450145345 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_foecj")
 
-[node name="Glow" type="MeshInstance3D" parent="Lamp3" unique_id=769147819]
+[node name="Glow" type="MeshInstance3D" parent="Lamp3" unique_id=1231842678]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5299988, 3.6999998, 0.06000018)
 material_override = SubResource("ShaderMaterial_bl7hl")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_4co4b")
 
-[node name="Light" type="OmniLight3D" parent="Lamp3" unique_id=1139062211 groups=["street_lamp_light"]]
+[node name="Light" type="OmniLight3D" parent="Lamp3" unique_id=1847621056 groups=["street_lamp_light"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5299988, 3.5499997, 0.3000002)
 light_color = Color(1, 0.8039216, 0.627451, 1)
 light_energy = 1.6
@@ -1569,10 +1569,10 @@ shadow_enabled = true
 omni_range = 7.5
 omni_attenuation = 1.4
 
-[node name="DoorLight1" type="Node3D" parent="." unique_id=126293169]
+[node name="DoorLight1" type="Node3D" parent="." unique_id=2040975188]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 2.8, -1.4)
 
-[node name="Light" type="OmniLight3D" parent="DoorLight1" unique_id=871623129 groups=["street_door_light"]]
+[node name="Light" type="OmniLight3D" parent="DoorLight1" unique_id=1143020560 groups=["street_door_light"]]
 light_color = Color(1, 0.8039216, 0.627451, 1)
 light_energy = 0.6
 light_volumetric_fog_energy = 2.5
@@ -1580,10 +1580,10 @@ light_specular = 0.35
 omni_range = 5.5
 omni_attenuation = 1.4
 
-[node name="DoorLight2" type="Node3D" parent="." unique_id=1608663871]
+[node name="DoorLight2" type="Node3D" parent="." unique_id=1435650682]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.75, 2.6, -1.4)
 
-[node name="Light" type="OmniLight3D" parent="DoorLight2" unique_id=998265067 groups=["street_door_light"]]
+[node name="Light" type="OmniLight3D" parent="DoorLight2" unique_id=1830732562 groups=["street_door_light"]]
 light_color = Color(1, 0.8039216, 0.627451, 1)
 light_energy = 0.6
 light_volumetric_fog_energy = 2.5
@@ -1591,10 +1591,10 @@ light_specular = 0.35
 omni_range = 5.5
 omni_attenuation = 1.4
 
-[node name="DoorLight3" type="Node3D" parent="." unique_id=1159424925]
+[node name="DoorLight3" type="Node3D" parent="." unique_id=589619914]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8, 3, -1.4)
 
-[node name="Light" type="OmniLight3D" parent="DoorLight3" unique_id=1312996485 groups=["street_door_light"]]
+[node name="Light" type="OmniLight3D" parent="DoorLight3" unique_id=1340784026 groups=["street_door_light"]]
 light_color = Color(1, 0.8039216, 0.627451, 1)
 light_energy = 0.6
 light_volumetric_fog_energy = 2.5
@@ -1602,1440 +1602,1440 @@ light_specular = 0.35
 omni_range = 5.5
 omni_attenuation = 1.4
 
-[node name="BrickBlock1" type="Node3D" parent="." unique_id=791570848]
+[node name="BrickBlock1" type="Node3D" parent="." unique_id=221341764]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.849999, 0, -3.3)
 
-[node name="Brick" type="MeshInstance3D" parent="BrickBlock1" unique_id=1353957726]
+[node name="Brick" type="MeshInstance3D" parent="BrickBlock1" unique_id=1611915767]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.8, -5.8499994)
 material_override = SubResource("StandardMaterial3D_v1log")
 mesh = SubResource("BoxMesh_ghxyl")
 
-[node name="Collider" type="StaticBody3D" parent="BrickBlock1" unique_id=1907844032]
+[node name="Collider" type="StaticBody3D" parent="BrickBlock1" unique_id=1053627422]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.8, -5.8499994)
 
-[node name="@CollisionShape3D@33" type="CollisionShape3D" parent="BrickBlock1/Collider" unique_id=59087552]
+[node name="Shape" type="CollisionShape3D" parent="BrickBlock1/Collider" unique_id=1721471110]
 shape = SubResource("BoxShape3D_c4m4a")
 
-[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock1/Collider" unique_id=1919081441 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock1/Collider" unique_id=472459402 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_5hhue")
 
-[node name="Concrete" type="MeshInstance3D" parent="BrickBlock1" unique_id=2047709702]
+[node name="Concrete" type="MeshInstance3D" parent="BrickBlock1" unique_id=382624027]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 7.75, -5.8)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_1wpjf")
 
-[node name="Collider2" type="StaticBody3D" parent="BrickBlock1" unique_id=616818793]
+[node name="Collider2" type="StaticBody3D" parent="BrickBlock1" unique_id=647740640]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 7.75, -5.8)
 
-[node name="@CollisionShape3D@34" type="CollisionShape3D" parent="BrickBlock1/Collider2" unique_id=1908397353]
+[node name="Shape" type="CollisionShape3D" parent="BrickBlock1/Collider2" unique_id=367327350]
 shape = SubResource("BoxShape3D_dmbqn")
 
-[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock1/Collider2" unique_id=540041504 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock1/Collider2" unique_id=1160619373 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_b82q0")
 
-[node name="Building1" type="Node3D" parent="." unique_id=1597172084]
+[node name="Building1" type="Node3D" parent="." unique_id=1035038284]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1999998, 0, -3.3)
 
-[node name="Concrete" type="MeshInstance3D" parent="Building1" unique_id=2089232803]
+[node name="Concrete" type="MeshInstance3D" parent="Building1" unique_id=1988460127]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_pixic")
 
-[node name="Collider" type="StaticBody3D" parent="Building1" unique_id=325247723]
+[node name="Collider" type="StaticBody3D" parent="Building1" unique_id=1389051777]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 
-[node name="@CollisionShape3D@35" type="CollisionShape3D" parent="Building1/Collider" unique_id=1795415296]
+[node name="Shape" type="CollisionShape3D" parent="Building1/Collider" unique_id=1361350621]
 shape = SubResource("BoxShape3D_cjin1")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building1/Collider" unique_id=1625599739 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building1/Collider" unique_id=1827692790 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_0xf3l")
 
-[node name="Concrete2" type="MeshInstance3D" parent="Building1" unique_id=179001468]
+[node name="Concrete2" type="MeshInstance3D" parent="Building1" unique_id=1444514979]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_0fc75")
 
-[node name="Collider2" type="StaticBody3D" parent="Building1" unique_id=1735251622]
+[node name="Collider2" type="StaticBody3D" parent="Building1" unique_id=56387339]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
 
-[node name="@CollisionShape3D@36" type="CollisionShape3D" parent="Building1/Collider2" unique_id=763277491]
+[node name="Shape" type="CollisionShape3D" parent="Building1/Collider2" unique_id=1677585430]
 shape = SubResource("BoxShape3D_he1ir")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building1/Collider2" unique_id=101921189 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building1/Collider2" unique_id=1587411910 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_w1end")
 
-[node name="Card" type="MeshInstance3D" parent="Building1" unique_id=1438073643]
+[node name="Card" type="MeshInstance3D" parent="Building1" unique_id=724321087]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
 material_override = SubResource("StandardMaterial3D_exkli")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_5vspb")
 
-[node name="Card2" type="MeshInstance3D" parent="Building1" unique_id=190691816]
+[node name="Card2" type="MeshInstance3D" parent="Building1" unique_id=1297606286]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_wfrhv")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_rjrll")
 
-[node name="Card3" type="MeshInstance3D" parent="Building1" unique_id=1632562010]
+[node name="Card3" type="MeshInstance3D" parent="Building1" unique_id=1709643675]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_4hn05")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_6flem")
 
-[node name="Card4" type="MeshInstance3D" parent="Building1" unique_id=703834644]
+[node name="Card4" type="MeshInstance3D" parent="Building1" unique_id=993039774]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099998, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_4hn05")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_aydmo")
 
-[node name="Card5" type="MeshInstance3D" parent="Building1" unique_id=1105151403]
+[node name="Card5" type="MeshInstance3D" parent="Building1" unique_id=854571969]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099998, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_wfrhv")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_6of1v")
 
-[node name="Alley1" type="Node3D" parent="." unique_id=629206428]
+[node name="Alley1" type="Node3D" parent="." unique_id=739667205]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0, -3.6)
 
-[node name="Sidewalk" type="MeshInstance3D" parent="Alley1" unique_id=1309157136]
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley1" unique_id=266910258]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3841858e-07, -0.024999999, -5.7000003)
 material_override = SubResource("StandardMaterial3D_o7xnd")
 mesh = SubResource("BoxMesh_vdvqd")
 
-[node name="Brick" type="MeshInstance3D" parent="Alley1" unique_id=673521206]
+[node name="Brick" type="MeshInstance3D" parent="Alley1" unique_id=35146071]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
 material_override = SubResource("StandardMaterial3D_v1log")
 mesh = SubResource("BoxMesh_1ktfv")
 
-[node name="Collider" type="StaticBody3D" parent="Alley1" unique_id=1461071106]
+[node name="Collider" type="StaticBody3D" parent="Alley1" unique_id=1517528855]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
 
-[node name="@CollisionShape3D@37" type="CollisionShape3D" parent="Alley1/Collider" unique_id=1512187583]
+[node name="Shape" type="CollisionShape3D" parent="Alley1/Collider" unique_id=373985213]
 shape = SubResource("BoxShape3D_x5jy0")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider" unique_id=919400112 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider" unique_id=1144316218 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_r0nki")
 
-[node name="Card" type="MeshInstance3D" parent="Alley1" unique_id=1153307459]
+[node name="Card" type="MeshInstance3D" parent="Alley1" unique_id=165479036]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29999995, 0.79999995, -6.9)
 material_override = SubResource("StandardMaterial3D_snkjd")
 mesh = SubResource("QuadMesh_gheqa")
 
-[node name="Collider2" type="StaticBody3D" parent="Alley1" unique_id=702997936]
+[node name="Collider2" type="StaticBody3D" parent="Alley1" unique_id=1758153597]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29999995, 0.79999995, -6.9)
 
-[node name="@CollisionShape3D@38" type="CollisionShape3D" parent="Alley1/Collider2" unique_id=1274006468]
+[node name="Shape" type="CollisionShape3D" parent="Alley1/Collider2" unique_id=4470326]
 shape = SubResource("BoxShape3D_6fxpl")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider2" unique_id=1406194057 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider2" unique_id=1426617250 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_ktx2f")
 
-[node name="Card2" type="MeshInstance3D" parent="Alley1" unique_id=792909998]
+[node name="Card2" type="MeshInstance3D" parent="Alley1" unique_id=1876681282]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8499999, 0.45, -5.2000003)
 material_override = SubResource("StandardMaterial3D_3xvql")
 mesh = SubResource("QuadMesh_vfxhg")
 
-[node name="Collider3" type="StaticBody3D" parent="Alley1" unique_id=50669485]
+[node name="Collider3" type="StaticBody3D" parent="Alley1" unique_id=744649931]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8499999, 0.45, -5.2000003)
 
-[node name="@CollisionShape3D@39" type="CollisionShape3D" parent="Alley1/Collider3" unique_id=1465252673]
+[node name="Shape" type="CollisionShape3D" parent="Alley1/Collider3" unique_id=106553430]
 shape = SubResource("BoxShape3D_scgts")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider3" unique_id=87716165 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley1/Collider3" unique_id=251880054 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_83bnp")
 
-[node name="SunShaft" type="MeshInstance3D" parent="Alley1" unique_id=1335943693 groups=["street_shaft"]]
+[node name="SunShaft" type="MeshInstance3D" parent="Alley1" unique_id=1897255359 groups=["street_shaft"]]
 transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.4000001, 1.3199999, -5.4)
 material_override = SubResource("ShaderMaterial_mww1c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_7hio8")
 
-[node name="Building2" type="Node3D" parent="." unique_id=1426271452]
+[node name="Building2" type="Node3D" parent="." unique_id=41357290]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 0, -3.3)
 
-[node name="Concrete" type="MeshInstance3D" parent="Building2" unique_id=1462132289]
+[node name="Concrete" type="MeshInstance3D" parent="Building2" unique_id=856614417]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.1, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_3jm3y")
 
-[node name="Collider" type="StaticBody3D" parent="Building2" unique_id=1902980783]
+[node name="Collider" type="StaticBody3D" parent="Building2" unique_id=734711772]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.1, -5.8499994)
 
-[node name="@CollisionShape3D@40" type="CollisionShape3D" parent="Building2/Collider" unique_id=481326336]
+[node name="Shape" type="CollisionShape3D" parent="Building2/Collider" unique_id=358383827]
 shape = SubResource("BoxShape3D_nbed8")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building2/Collider" unique_id=474422763 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building2/Collider" unique_id=535220317 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_0m5us")
 
-[node name="Concrete2" type="MeshInstance3D" parent="Building2" unique_id=2038403499]
+[node name="Concrete2" type="MeshInstance3D" parent="Building2" unique_id=1244924723]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 6.325, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_tuxtp")
 
-[node name="Collider2" type="StaticBody3D" parent="Building2" unique_id=1096138626]
+[node name="Collider2" type="StaticBody3D" parent="Building2" unique_id=185342794]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 6.325, -5.8499994)
 
-[node name="@CollisionShape3D@41" type="CollisionShape3D" parent="Building2/Collider2" unique_id=895908634]
+[node name="Shape" type="CollisionShape3D" parent="Building2/Collider2" unique_id=1680927043]
 shape = SubResource("BoxShape3D_dcsk3")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building2/Collider2" unique_id=951304544 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building2/Collider2" unique_id=671747799 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_tyy1n")
 
-[node name="Card" type="MeshInstance3D" parent="Building2" unique_id=1963148324]
+[node name="Card" type="MeshInstance3D" parent="Building2" unique_id=170746556]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
 material_override = SubResource("StandardMaterial3D_32w4d")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_s86oy")
 
-[node name="Card2" type="MeshInstance3D" parent="Building2" unique_id=701736176]
+[node name="Card2" type="MeshInstance3D" parent="Building2" unique_id=2033016476]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_hea6c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_4uqrv")
 
-[node name="Card3" type="MeshInstance3D" parent="Building2" unique_id=1470260996]
+[node name="Card3" type="MeshInstance3D" parent="Building2" unique_id=416051223]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_ob5y3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_y6dv5")
 
-[node name="Card4" type="MeshInstance3D" parent="Building2" unique_id=1311199836]
+[node name="Card4" type="MeshInstance3D" parent="Building2" unique_id=11183433]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099993, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_ob5y3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_vgf18")
 
-[node name="Card5" type="MeshInstance3D" parent="Building2" unique_id=324334256]
+[node name="Card5" type="MeshInstance3D" parent="Building2" unique_id=1972001509]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099993, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_hea6c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_88qc4")
 
-[node name="Alley2" type="Node3D" parent="." unique_id=1430179474]
+[node name="Alley2" type="Node3D" parent="." unique_id=329159417]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.825, 0, -3.6)
 
-[node name="Sidewalk" type="MeshInstance3D" parent="Alley2" unique_id=1201534148]
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley2" unique_id=2128474537]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.024999999, -5.7000003)
 material_override = SubResource("StandardMaterial3D_o7xnd")
 mesh = SubResource("BoxMesh_83vh3")
 
-[node name="Brick" type="MeshInstance3D" parent="Alley2" unique_id=1947365910]
+[node name="Brick" type="MeshInstance3D" parent="Alley2" unique_id=23916181]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.25, -11.549999)
 material_override = SubResource("StandardMaterial3D_v1log")
 mesh = SubResource("BoxMesh_mp2xr")
 
-[node name="Collider" type="StaticBody3D" parent="Alley2" unique_id=794815664]
+[node name="Collider" type="StaticBody3D" parent="Alley2" unique_id=856016748]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.536743e-07, 3.25, -11.549999)
 
-[node name="@CollisionShape3D@42" type="CollisionShape3D" parent="Alley2/Collider" unique_id=552108450]
+[node name="Shape" type="CollisionShape3D" parent="Alley2/Collider" unique_id=411411205]
 shape = SubResource("BoxShape3D_4yk2w")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider" unique_id=429145582 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider" unique_id=856891819 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_c0h3q")
 
-[node name="Card" type="MeshInstance3D" parent="Alley2" unique_id=910293077]
+[node name="Card" type="MeshInstance3D" parent="Alley2" unique_id=1335180467]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6000004, 0.7, -6.2000003)
 material_override = SubResource("StandardMaterial3D_yrvan")
 mesh = SubResource("QuadMesh_g0qwy")
 
-[node name="Collider2" type="StaticBody3D" parent="Alley2" unique_id=547947832]
+[node name="Collider2" type="StaticBody3D" parent="Alley2" unique_id=936270200]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6000004, 0.7, -6.2000003)
 
-[node name="@CollisionShape3D@43" type="CollisionShape3D" parent="Alley2/Collider2" unique_id=770239975]
+[node name="Shape" type="CollisionShape3D" parent="Alley2/Collider2" unique_id=178688430]
 shape = SubResource("BoxShape3D_lr3fg")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider2" unique_id=1432258642 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider2" unique_id=391739641 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_2e35l")
 
-[node name="Card2" type="MeshInstance3D" parent="Alley2" unique_id=1899431020]
+[node name="Card2" type="MeshInstance3D" parent="Alley2" unique_id=1098614725]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6999998, 0.625, -4.6)
 material_override = SubResource("StandardMaterial3D_3jt0h")
 mesh = SubResource("QuadMesh_5aink")
 
-[node name="Collider3" type="StaticBody3D" parent="Alley2" unique_id=1073662888]
+[node name="Collider3" type="StaticBody3D" parent="Alley2" unique_id=436659448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6999998, 0.625, -4.6)
 
-[node name="@CollisionShape3D@44" type="CollisionShape3D" parent="Alley2/Collider3" unique_id=358841922]
+[node name="Shape" type="CollisionShape3D" parent="Alley2/Collider3" unique_id=564102800]
 shape = SubResource("BoxShape3D_ipn3h")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider3" unique_id=10878356 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider3" unique_id=1429701154 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_ws42c")
 
-[node name="Card3" type="MeshInstance3D" parent="Alley2" unique_id=948656497]
+[node name="Card3" type="MeshInstance3D" parent="Alley2" unique_id=1814126224]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39999962, 0.65, -9.4)
 material_override = SubResource("StandardMaterial3D_jchra")
 mesh = SubResource("QuadMesh_jjy45")
 
-[node name="Collider4" type="StaticBody3D" parent="Alley2" unique_id=604612103]
+[node name="Collider4" type="StaticBody3D" parent="Alley2" unique_id=715441094]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39999962, 0.65, -9.4)
 
-[node name="@CollisionShape3D@45" type="CollisionShape3D" parent="Alley2/Collider4" unique_id=892753715]
+[node name="Shape" type="CollisionShape3D" parent="Alley2/Collider4" unique_id=1099628599]
 shape = SubResource("BoxShape3D_3le1y")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider4" unique_id=1299482092 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley2/Collider4" unique_id=1297703917 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_7yifu")
 
-[node name="SunShaft" type="MeshInstance3D" parent="Alley2" unique_id=483652651 groups=["street_shaft"]]
+[node name="SunShaft" type="MeshInstance3D" parent="Alley2" unique_id=1318130252 groups=["street_shaft"]]
 transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.40000057, 1.3199999, -5.4)
 material_override = SubResource("ShaderMaterial_3eupf")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_46kw8")
 
-[node name="Building3" type="Node3D" parent="." unique_id=1737480517]
+[node name="Building3" type="Node3D" parent="." unique_id=1940657212]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.85, 0, -3.3)
 
-[node name="Concrete" type="MeshInstance3D" parent="Building3" unique_id=1875843999]
+[node name="Concrete" type="MeshInstance3D" parent="Building3" unique_id=1881856378]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_fj2gj")
 
-[node name="Collider" type="StaticBody3D" parent="Building3" unique_id=410150936]
+[node name="Collider" type="StaticBody3D" parent="Building3" unique_id=94980012]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 
-[node name="@CollisionShape3D@46" type="CollisionShape3D" parent="Building3/Collider" unique_id=381180820]
+[node name="Shape" type="CollisionShape3D" parent="Building3/Collider" unique_id=1600652241]
 shape = SubResource("BoxShape3D_tva5v")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building3/Collider" unique_id=358695877 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building3/Collider" unique_id=1955959381 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_l8lcc")
 
-[node name="Concrete2" type="MeshInstance3D" parent="Building3" unique_id=94734030]
+[node name="Concrete2" type="MeshInstance3D" parent="Building3" unique_id=1175407581]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9073486e-06, 6.325, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_g5jfu")
 
-[node name="Collider2" type="StaticBody3D" parent="Building3" unique_id=391688086]
+[node name="Collider2" type="StaticBody3D" parent="Building3" unique_id=1516791272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9073486e-06, 6.325, -5.8499994)
 
-[node name="@CollisionShape3D@47" type="CollisionShape3D" parent="Building3/Collider2" unique_id=1096064454]
+[node name="Shape" type="CollisionShape3D" parent="Building3/Collider2" unique_id=2118819136]
 shape = SubResource("BoxShape3D_pcyo4")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building3/Collider2" unique_id=717640112 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building3/Collider2" unique_id=1462992034 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_rhbrx")
 
-[node name="Card" type="MeshInstance3D" parent="Building3" unique_id=1135160559]
+[node name="Card" type="MeshInstance3D" parent="Building3" unique_id=412691728]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
 material_override = SubResource("StandardMaterial3D_1ikjy")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_542p2")
 
-[node name="Card2" type="MeshInstance3D" parent="Building3" unique_id=689984772]
+[node name="Card2" type="MeshInstance3D" parent="Building3" unique_id=991450261]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_wfrhv")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_xkbkb")
 
-[node name="Card3" type="MeshInstance3D" parent="Building3" unique_id=1927843178]
+[node name="Card3" type="MeshInstance3D" parent="Building3" unique_id=1547169613]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_4hn05")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_td028")
 
-[node name="Card4" type="MeshInstance3D" parent="Building3" unique_id=1492289810]
+[node name="Card4" type="MeshInstance3D" parent="Building3" unique_id=545564979]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_4hn05")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_yi5ef")
 
-[node name="Card5" type="MeshInstance3D" parent="Building3" unique_id=75941997]
+[node name="Card5" type="MeshInstance3D" parent="Building3" unique_id=1625359374]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_wfrhv")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_701on")
 
-[node name="Alley3" type="Node3D" parent="." unique_id=1062779968]
+[node name="Alley3" type="Node3D" parent="." unique_id=1690473167]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.824999, 0, -3.6)
 
-[node name="Sidewalk" type="MeshInstance3D" parent="Alley3" unique_id=961273352]
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley3" unique_id=1148176750]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9073486e-06, -0.024999999, -5.7000003)
 material_override = SubResource("StandardMaterial3D_o7xnd")
 mesh = SubResource("BoxMesh_26brc")
 
-[node name="Brick" type="MeshInstance3D" parent="Alley3" unique_id=748589973]
+[node name="Brick" type="MeshInstance3D" parent="Alley3" unique_id=2101091259]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9073486e-06, 3.25, -11.549999)
 material_override = SubResource("StandardMaterial3D_v1log")
 mesh = SubResource("BoxMesh_6dewx")
 
-[node name="Collider" type="StaticBody3D" parent="Alley3" unique_id=1905397350]
+[node name="Collider" type="StaticBody3D" parent="Alley3" unique_id=918786436]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9073486e-06, 3.25, -11.549999)
 
-[node name="@CollisionShape3D@48" type="CollisionShape3D" parent="Alley3/Collider" unique_id=1076623306]
+[node name="Shape" type="CollisionShape3D" parent="Alley3/Collider" unique_id=1485658972]
 shape = SubResource("BoxShape3D_dkb5f")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider" unique_id=1548447977 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider" unique_id=881737536 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_ia1pf")
 
-[node name="Card" type="MeshInstance3D" parent="Alley3" unique_id=1611713689]
+[node name="Card" type="MeshInstance3D" parent="Alley3" unique_id=1160948084]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.69999886, 0.625, -5.4)
 material_override = SubResource("StandardMaterial3D_88fey")
 mesh = SubResource("QuadMesh_qo5kj")
 
-[node name="Collider2" type="StaticBody3D" parent="Alley3" unique_id=28781252]
+[node name="Collider2" type="StaticBody3D" parent="Alley3" unique_id=1081486823]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.69999886, 0.625, -5.4)
 
-[node name="@CollisionShape3D@49" type="CollisionShape3D" parent="Alley3/Collider2" unique_id=1119469308]
+[node name="Shape" type="CollisionShape3D" parent="Alley3/Collider2" unique_id=523287604]
 shape = SubResource("BoxShape3D_vdf7f")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider2" unique_id=1452786879 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider2" unique_id=1482395426 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_n6qqo")
 
-[node name="Card2" type="MeshInstance3D" parent="Alley3" unique_id=2020879102]
+[node name="Card2" type="MeshInstance3D" parent="Alley3" unique_id=231325544]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10000038, 0.625, -5.9999995)
 material_override = SubResource("StandardMaterial3D_yihdp")
 mesh = SubResource("QuadMesh_pepl1")
 
-[node name="Collider3" type="StaticBody3D" parent="Alley3" unique_id=842793729]
+[node name="Collider3" type="StaticBody3D" parent="Alley3" unique_id=1091136692]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10000038, 0.625, -5.9999995)
 
-[node name="@CollisionShape3D@50" type="CollisionShape3D" parent="Alley3/Collider3" unique_id=1215994043]
+[node name="Shape" type="CollisionShape3D" parent="Alley3/Collider3" unique_id=175670227]
 shape = SubResource("BoxShape3D_28hdh")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider3" unique_id=778375846 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider3" unique_id=1628541140 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_rep5h")
 
-[node name="Card3" type="MeshInstance3D" parent="Alley3" unique_id=1443920782]
+[node name="Card3" type="MeshInstance3D" parent="Alley3" unique_id=1317354178]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.375, -4)
 material_override = SubResource("StandardMaterial3D_a86xj")
 mesh = SubResource("QuadMesh_1wjeg")
 
-[node name="Collider4" type="StaticBody3D" parent="Alley3" unique_id=564883724]
+[node name="Collider4" type="StaticBody3D" parent="Alley3" unique_id=2072835222]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.375, -4)
 
-[node name="@CollisionShape3D@51" type="CollisionShape3D" parent="Alley3/Collider4" unique_id=1135318659]
+[node name="Shape" type="CollisionShape3D" parent="Alley3/Collider4" unique_id=1495443829]
 shape = SubResource("BoxShape3D_xfbq8")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider4" unique_id=280872444 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley3/Collider4" unique_id=1232312726 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_si0p7")
 
-[node name="SunShaft" type="MeshInstance3D" parent="Alley3" unique_id=55752297 groups=["street_shaft"]]
+[node name="SunShaft" type="MeshInstance3D" parent="Alley3" unique_id=1352501251 groups=["street_shaft"]]
 transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.39999962, 1.3199999, -5.4)
 material_override = SubResource("ShaderMaterial_nebve")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_7vgst")
 
-[node name="Building4" type="Node3D" parent="." unique_id=202726681]
+[node name="Building4" type="Node3D" parent="." unique_id=1199759372]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.8, 0, -3.3)
 
-[node name="Concrete" type="MeshInstance3D" parent="Building4" unique_id=511397667]
+[node name="Concrete" type="MeshInstance3D" parent="Building4" unique_id=74255283]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_21nnr")
 
-[node name="Collider" type="StaticBody3D" parent="Building4" unique_id=1729680060]
+[node name="Collider" type="StaticBody3D" parent="Building4" unique_id=565718455]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 
-[node name="@CollisionShape3D@52" type="CollisionShape3D" parent="Building4/Collider" unique_id=1568991644]
+[node name="Shape" type="CollisionShape3D" parent="Building4/Collider" unique_id=1268286702]
 shape = SubResource("BoxShape3D_n0pn6")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building4/Collider" unique_id=1453286321 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building4/Collider" unique_id=955652128 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_vqi5v")
 
-[node name="Concrete2" type="MeshInstance3D" parent="Building4" unique_id=1196034845]
+[node name="Concrete2" type="MeshInstance3D" parent="Building4" unique_id=699322343]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_86m71")
 
-[node name="Collider2" type="StaticBody3D" parent="Building4" unique_id=1431552241]
+[node name="Collider2" type="StaticBody3D" parent="Building4" unique_id=1478201496]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
 
-[node name="@CollisionShape3D@53" type="CollisionShape3D" parent="Building4/Collider2" unique_id=2114432222]
+[node name="Shape" type="CollisionShape3D" parent="Building4/Collider2" unique_id=354614553]
 shape = SubResource("BoxShape3D_7c6os")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building4/Collider2" unique_id=1326903727 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building4/Collider2" unique_id=1292230269 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_8xte8")
 
-[node name="Card" type="MeshInstance3D" parent="Building4" unique_id=1658219592]
+[node name="Card" type="MeshInstance3D" parent="Building4" unique_id=183035730]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
 material_override = SubResource("StandardMaterial3D_tc53y")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_r32jb")
 
-[node name="Card2" type="MeshInstance3D" parent="Building4" unique_id=1677833590]
+[node name="Card2" type="MeshInstance3D" parent="Building4" unique_id=1925210757]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_hea6c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_jw0ns")
 
-[node name="Card3" type="MeshInstance3D" parent="Building4" unique_id=1337961033]
+[node name="Card3" type="MeshInstance3D" parent="Building4" unique_id=275966335]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.51, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_ob5y3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_h87t4")
 
-[node name="Card4" type="MeshInstance3D" parent="Building4" unique_id=520340887]
+[node name="Card4" type="MeshInstance3D" parent="Building4" unique_id=420956808]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_ob5y3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_wr4r8")
 
-[node name="Card5" type="MeshInstance3D" parent="Building4" unique_id=1439096318]
+[node name="Card5" type="MeshInstance3D" parent="Building4" unique_id=2086215035]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_hea6c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_10pd5")
 
-[node name="Alley4" type="Node3D" parent="." unique_id=628818568]
+[node name="Alley4" type="Node3D" parent="." unique_id=1618931093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.8, 0, -3.6)
 
-[node name="Sidewalk" type="MeshInstance3D" parent="Alley4" unique_id=1857077611]
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley4" unique_id=729041431]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.024999999, -5.7000003)
 material_override = SubResource("StandardMaterial3D_o7xnd")
 mesh = SubResource("BoxMesh_kwqqo")
 
-[node name="Brick" type="MeshInstance3D" parent="Alley4" unique_id=1948010341]
+[node name="Brick" type="MeshInstance3D" parent="Alley4" unique_id=427148046]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
 material_override = SubResource("StandardMaterial3D_v1log")
 mesh = SubResource("BoxMesh_xu4l5")
 
-[node name="Collider" type="StaticBody3D" parent="Alley4" unique_id=463962059]
+[node name="Collider" type="StaticBody3D" parent="Alley4" unique_id=538485321]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
 
-[node name="@CollisionShape3D@54" type="CollisionShape3D" parent="Alley4/Collider" unique_id=1157900500]
+[node name="Shape" type="CollisionShape3D" parent="Alley4/Collider" unique_id=1520953425]
 shape = SubResource("BoxShape3D_1w2x7")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider" unique_id=210071014 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider" unique_id=870925887 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_kbai0")
 
-[node name="Card" type="MeshInstance3D" parent="Alley4" unique_id=152775538]
+[node name="Card" type="MeshInstance3D" parent="Alley4" unique_id=1997032802]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29999924, 0.79999995, -6.9)
 material_override = SubResource("StandardMaterial3D_snkjd")
 mesh = SubResource("QuadMesh_6g0ow")
 
-[node name="Collider2" type="StaticBody3D" parent="Alley4" unique_id=1504979760]
+[node name="Collider2" type="StaticBody3D" parent="Alley4" unique_id=1009448568]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29999924, 0.79999995, -6.9)
 
-[node name="@CollisionShape3D@55" type="CollisionShape3D" parent="Alley4/Collider2" unique_id=1420844958]
+[node name="Shape" type="CollisionShape3D" parent="Alley4/Collider2" unique_id=1425378268]
 shape = SubResource("BoxShape3D_spur6")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider2" unique_id=624616427 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider2" unique_id=327316664 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_s1hv2")
 
-[node name="Card2" type="MeshInstance3D" parent="Alley4" unique_id=156026085]
+[node name="Card2" type="MeshInstance3D" parent="Alley4" unique_id=1410765918]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8499985, 0.45, -5.2000003)
 material_override = SubResource("StandardMaterial3D_3xvql")
 mesh = SubResource("QuadMesh_h5llp")
 
-[node name="Collider3" type="StaticBody3D" parent="Alley4" unique_id=2106728012]
+[node name="Collider3" type="StaticBody3D" parent="Alley4" unique_id=1602524562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8499985, 0.45, -5.2000003)
 
-[node name="@CollisionShape3D@56" type="CollisionShape3D" parent="Alley4/Collider3" unique_id=1357377884]
+[node name="Shape" type="CollisionShape3D" parent="Alley4/Collider3" unique_id=2074013503]
 shape = SubResource("BoxShape3D_jyle2")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider3" unique_id=489871435 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley4/Collider3" unique_id=79221864 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_5k5ty")
 
-[node name="SunShaft" type="MeshInstance3D" parent="Alley4" unique_id=1724931379 groups=["street_shaft"]]
+[node name="SunShaft" type="MeshInstance3D" parent="Alley4" unique_id=774772303 groups=["street_shaft"]]
 transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.40000153, 1.3199999, -5.4)
 material_override = SubResource("ShaderMaterial_dqxhp")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_qprkk")
 
-[node name="Building5" type="Node3D" parent="." unique_id=1391922022]
+[node name="Building5" type="Node3D" parent="." unique_id=1900776975]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.8, 0, -3.3)
 
-[node name="Concrete" type="MeshInstance3D" parent="Building5" unique_id=1916913602]
+[node name="Concrete" type="MeshInstance3D" parent="Building5" unique_id=1460879656]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_tmb7i")
 
-[node name="Collider" type="StaticBody3D" parent="Building5" unique_id=1017431841]
+[node name="Collider" type="StaticBody3D" parent="Building5" unique_id=1640517575]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 
-[node name="@CollisionShape3D@57" type="CollisionShape3D" parent="Building5/Collider" unique_id=1513591676]
+[node name="Shape" type="CollisionShape3D" parent="Building5/Collider" unique_id=381357901]
 shape = SubResource("BoxShape3D_pqv53")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building5/Collider" unique_id=202371530 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building5/Collider" unique_id=448619920 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_qcnju")
 
-[node name="Concrete2" type="MeshInstance3D" parent="Building5" unique_id=1930037754]
+[node name="Concrete2" type="MeshInstance3D" parent="Building5" unique_id=1405552036]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_mx1if")
 
-[node name="Collider2" type="StaticBody3D" parent="Building5" unique_id=544772122]
+[node name="Collider2" type="StaticBody3D" parent="Building5" unique_id=244651066]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.325, -5.8499994)
 
-[node name="@CollisionShape3D@58" type="CollisionShape3D" parent="Building5/Collider2" unique_id=108746256]
+[node name="Shape" type="CollisionShape3D" parent="Building5/Collider2" unique_id=1086841786]
 shape = SubResource("BoxShape3D_o5nao")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building5/Collider2" unique_id=1509550309 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building5/Collider2" unique_id=23816184 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_m22ts")
 
-[node name="Card" type="MeshInstance3D" parent="Building5" unique_id=845762660]
+[node name="Card" type="MeshInstance3D" parent="Building5" unique_id=1739469469]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
 material_override = SubResource("StandardMaterial3D_goth4")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_s7uvj")
 
-[node name="Card2" type="MeshInstance3D" parent="Building5" unique_id=1882637816]
+[node name="Card2" type="MeshInstance3D" parent="Building5" unique_id=1690874508]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.5099983, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_hea6c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_h1kvx")
 
-[node name="Card3" type="MeshInstance3D" parent="Building5" unique_id=1952002104]
+[node name="Card3" type="MeshInstance3D" parent="Building5" unique_id=171211522]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.5099983, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_ob5y3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_06egw")
 
-[node name="Card4" type="MeshInstance3D" parent="Building5" unique_id=595830543]
+[node name="Card4" type="MeshInstance3D" parent="Building5" unique_id=1215695461]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_ob5y3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_ccvrd")
 
-[node name="Card5" type="MeshInstance3D" parent="Building5" unique_id=413538907]
+[node name="Card5" type="MeshInstance3D" parent="Building5" unique_id=1853892488]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_hea6c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_5huo6")
 
-[node name="Alley5" type="Node3D" parent="." unique_id=1564445449]
+[node name="Alley5" type="Node3D" parent="." unique_id=529921154]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.8, 0, -3.6)
 
-[node name="Sidewalk" type="MeshInstance3D" parent="Alley5" unique_id=1791235454]
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley5" unique_id=403679841]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.024999999, -5.7000003)
 material_override = SubResource("StandardMaterial3D_o7xnd")
 mesh = SubResource("BoxMesh_06cva")
 
-[node name="Brick" type="MeshInstance3D" parent="Alley5" unique_id=1513033428]
+[node name="Brick" type="MeshInstance3D" parent="Alley5" unique_id=246513881]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
 material_override = SubResource("StandardMaterial3D_v1log")
 mesh = SubResource("BoxMesh_7fv6a")
 
-[node name="Collider" type="StaticBody3D" parent="Alley5" unique_id=417300559]
+[node name="Collider" type="StaticBody3D" parent="Alley5" unique_id=1856998280]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
 
-[node name="@CollisionShape3D@59" type="CollisionShape3D" parent="Alley5/Collider" unique_id=1966255885]
+[node name="Shape" type="CollisionShape3D" parent="Alley5/Collider" unique_id=1312222137]
 shape = SubResource("BoxShape3D_ffdru")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider" unique_id=150023269 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider" unique_id=838683632 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_2ilru")
 
-[node name="Card" type="MeshInstance3D" parent="Alley5" unique_id=17820376]
+[node name="Card" type="MeshInstance3D" parent="Alley5" unique_id=1491277082]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5999985, 0.7, -6.2000003)
 material_override = SubResource("StandardMaterial3D_yrvan")
 mesh = SubResource("QuadMesh_8liq7")
 
-[node name="Collider2" type="StaticBody3D" parent="Alley5" unique_id=978423284]
+[node name="Collider2" type="StaticBody3D" parent="Alley5" unique_id=1446099379]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5999985, 0.7, -6.2000003)
 
-[node name="@CollisionShape3D@60" type="CollisionShape3D" parent="Alley5/Collider2" unique_id=1186687198]
+[node name="Shape" type="CollisionShape3D" parent="Alley5/Collider2" unique_id=899818745]
 shape = SubResource("BoxShape3D_copod")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider2" unique_id=918301269 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider2" unique_id=1292787128 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_f4obe")
 
-[node name="Card2" type="MeshInstance3D" parent="Alley5" unique_id=2133980373]
+[node name="Card2" type="MeshInstance3D" parent="Alley5" unique_id=2134991376]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.625, -4.6)
 material_override = SubResource("StandardMaterial3D_3jt0h")
 mesh = SubResource("QuadMesh_yjsl8")
 
-[node name="Collider3" type="StaticBody3D" parent="Alley5" unique_id=1281972670]
+[node name="Collider3" type="StaticBody3D" parent="Alley5" unique_id=1128723912]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.625, -4.6)
 
-[node name="@CollisionShape3D@61" type="CollisionShape3D" parent="Alley5/Collider3" unique_id=1342449275]
+[node name="Shape" type="CollisionShape3D" parent="Alley5/Collider3" unique_id=593030411]
 shape = SubResource("BoxShape3D_a7efe")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider3" unique_id=830691651 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider3" unique_id=235237027 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_ybdd2")
 
-[node name="Card3" type="MeshInstance3D" parent="Alley5" unique_id=961571369]
+[node name="Card3" type="MeshInstance3D" parent="Alley5" unique_id=750536748]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3999977, 0.65, -9.4)
 material_override = SubResource("StandardMaterial3D_jchra")
 mesh = SubResource("QuadMesh_8y70f")
 
-[node name="Collider4" type="StaticBody3D" parent="Alley5" unique_id=1293023717]
+[node name="Collider4" type="StaticBody3D" parent="Alley5" unique_id=575514579]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3999977, 0.65, -9.4)
 
-[node name="@CollisionShape3D@62" type="CollisionShape3D" parent="Alley5/Collider4" unique_id=1054966525]
+[node name="Shape" type="CollisionShape3D" parent="Alley5/Collider4" unique_id=11033289]
 shape = SubResource("BoxShape3D_u2qrm")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider4" unique_id=959250650 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley5/Collider4" unique_id=809249097 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_cewab")
 
-[node name="SunShaft" type="MeshInstance3D" parent="Alley5" unique_id=1665004140 groups=["street_shaft"]]
+[node name="SunShaft" type="MeshInstance3D" parent="Alley5" unique_id=490674402 groups=["street_shaft"]]
 transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.40000153, 1.3199999, -5.4)
 material_override = SubResource("ShaderMaterial_mjg1b")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_xf6bf")
 
-[node name="Building6" type="Node3D" parent="." unique_id=1191739541]
+[node name="Building6" type="Node3D" parent="." unique_id=1830906399]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.8, 0, -3.3)
 
-[node name="Concrete" type="MeshInstance3D" parent="Building6" unique_id=62644349]
+[node name="Concrete" type="MeshInstance3D" parent="Building6" unique_id=2107028067]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_flf6w")
 
-[node name="Collider" type="StaticBody3D" parent="Building6" unique_id=1321514088]
+[node name="Collider" type="StaticBody3D" parent="Building6" unique_id=870848900]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 
-[node name="@CollisionShape3D@63" type="CollisionShape3D" parent="Building6/Collider" unique_id=1861677615]
+[node name="Shape" type="CollisionShape3D" parent="Building6/Collider" unique_id=287150077]
 shape = SubResource("BoxShape3D_ndksc")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building6/Collider" unique_id=1143315995 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building6/Collider" unique_id=948172432 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_uk0on")
 
-[node name="Concrete2" type="MeshInstance3D" parent="Building6" unique_id=1398723151]
+[node name="Concrete2" type="MeshInstance3D" parent="Building6" unique_id=842434637]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8146973e-06, 6.325, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_803e5")
 
-[node name="Collider2" type="StaticBody3D" parent="Building6" unique_id=1092691783]
+[node name="Collider2" type="StaticBody3D" parent="Building6" unique_id=1602232932]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8146973e-06, 6.325, -5.8499994)
 
-[node name="@CollisionShape3D@64" type="CollisionShape3D" parent="Building6/Collider2" unique_id=1282701577]
+[node name="Shape" type="CollisionShape3D" parent="Building6/Collider2" unique_id=1763906153]
 shape = SubResource("BoxShape3D_es4vs")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building6/Collider2" unique_id=1918891230 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building6/Collider2" unique_id=1872634252 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_5wiu8")
 
-[node name="Card" type="MeshInstance3D" parent="Building6" unique_id=712065482]
+[node name="Card" type="MeshInstance3D" parent="Building6" unique_id=35336061]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
 material_override = SubResource("StandardMaterial3D_exkli")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_g1d14")
 
-[node name="Card2" type="MeshInstance3D" parent="Building6" unique_id=215790388]
+[node name="Card2" type="MeshInstance3D" parent="Building6" unique_id=760284350]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.510002, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_wfrhv")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_qablb")
 
-[node name="Card3" type="MeshInstance3D" parent="Building6" unique_id=876442834]
+[node name="Card3" type="MeshInstance3D" parent="Building6" unique_id=900750189]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.510002, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_4hn05")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_ngmpq")
 
-[node name="Card4" type="MeshInstance3D" parent="Building6" unique_id=2106147279]
+[node name="Card4" type="MeshInstance3D" parent="Building6" unique_id=1424087016]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_4hn05")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_crsub")
 
-[node name="Card5" type="MeshInstance3D" parent="Building6" unique_id=243707305]
+[node name="Card5" type="MeshInstance3D" parent="Building6" unique_id=1644588112]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.5099983, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_wfrhv")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_trq4h")
 
-[node name="Alley6" type="Node3D" parent="." unique_id=876446788]
+[node name="Alley6" type="Node3D" parent="." unique_id=1420607239]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.8, 0, -3.6)
 
-[node name="Sidewalk" type="MeshInstance3D" parent="Alley6" unique_id=667512472]
+[node name="Sidewalk" type="MeshInstance3D" parent="Alley6" unique_id=419649825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8146973e-06, -0.024999999, -5.7000003)
 material_override = SubResource("StandardMaterial3D_o7xnd")
 mesh = SubResource("BoxMesh_6wwat")
 
-[node name="Brick" type="MeshInstance3D" parent="Alley6" unique_id=617872608]
+[node name="Brick" type="MeshInstance3D" parent="Alley6" unique_id=407327798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
 material_override = SubResource("StandardMaterial3D_v1log")
 mesh = SubResource("BoxMesh_fk0en")
 
-[node name="Collider" type="StaticBody3D" parent="Alley6" unique_id=1529640879]
+[node name="Collider" type="StaticBody3D" parent="Alley6" unique_id=1199748996]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.25, -11.549999)
 
-[node name="@CollisionShape3D@65" type="CollisionShape3D" parent="Alley6/Collider" unique_id=128606528]
+[node name="Shape" type="CollisionShape3D" parent="Alley6/Collider" unique_id=275800025]
 shape = SubResource("BoxShape3D_ww77v")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider" unique_id=1364307014 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider" unique_id=1845003208 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_8ilnx")
 
-[node name="Card" type="MeshInstance3D" parent="Alley6" unique_id=2055499171]
+[node name="Card" type="MeshInstance3D" parent="Alley6" unique_id=1811290835]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70000076, 0.625, -5.4)
 material_override = SubResource("StandardMaterial3D_88fey")
 mesh = SubResource("QuadMesh_b3f4x")
 
-[node name="Collider2" type="StaticBody3D" parent="Alley6" unique_id=303965041]
+[node name="Collider2" type="StaticBody3D" parent="Alley6" unique_id=175845578]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.70000076, 0.625, -5.4)
 
-[node name="@CollisionShape3D@66" type="CollisionShape3D" parent="Alley6/Collider2" unique_id=2030835875]
+[node name="Shape" type="CollisionShape3D" parent="Alley6/Collider2" unique_id=2135655517]
 shape = SubResource("BoxShape3D_g1mrk")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider2" unique_id=1439406275 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider2" unique_id=1775507979 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_hoofa")
 
-[node name="Card2" type="MeshInstance3D" parent="Alley6" unique_id=48315132]
+[node name="Card2" type="MeshInstance3D" parent="Alley6" unique_id=866165955]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.099998474, 0.625, -5.9999995)
 material_override = SubResource("StandardMaterial3D_yihdp")
 mesh = SubResource("QuadMesh_8v01i")
 
-[node name="Collider3" type="StaticBody3D" parent="Alley6" unique_id=1988604520]
+[node name="Collider3" type="StaticBody3D" parent="Alley6" unique_id=1883596655]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.099998474, 0.625, -5.9999995)
 
-[node name="@CollisionShape3D@67" type="CollisionShape3D" parent="Alley6/Collider3" unique_id=742361060]
+[node name="Shape" type="CollisionShape3D" parent="Alley6/Collider3" unique_id=547865050]
 shape = SubResource("BoxShape3D_bq5wr")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider3" unique_id=1221362619 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider3" unique_id=1218750388 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_gpsys")
 
-[node name="Card3" type="MeshInstance3D" parent="Alley6" unique_id=1321603009]
+[node name="Card3" type="MeshInstance3D" parent="Alley6" unique_id=464828637]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.375, -4)
 material_override = SubResource("StandardMaterial3D_a86xj")
 mesh = SubResource("QuadMesh_77n3e")
 
-[node name="Collider4" type="StaticBody3D" parent="Alley6" unique_id=278898045]
+[node name="Collider4" type="StaticBody3D" parent="Alley6" unique_id=1327026680]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.70000076, 0.375, -4)
 
-[node name="@CollisionShape3D@68" type="CollisionShape3D" parent="Alley6/Collider4" unique_id=1992260153]
+[node name="Shape" type="CollisionShape3D" parent="Alley6/Collider4" unique_id=1468429441]
 shape = SubResource("BoxShape3D_aydhp")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider4" unique_id=1265976255 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Alley6/Collider4" unique_id=356309444 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_3w5ju")
 
-[node name="SunShaft" type="MeshInstance3D" parent="Alley6" unique_id=630805850 groups=["street_shaft"]]
+[node name="SunShaft" type="MeshInstance3D" parent="Alley6" unique_id=1825449444 groups=["street_shaft"]]
 transform = Transform3D(0.9135454, 0.40673664, 0, -0.40673664, 0.9135454, 0, 0, 0, 1, -0.40000153, 1.3199999, -5.4)
 material_override = SubResource("ShaderMaterial_v0jpb")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_fhco6")
 
-[node name="Building7" type="Node3D" parent="." unique_id=273557269]
+[node name="Building7" type="Node3D" parent="." unique_id=1786632972]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.799995, 0, -3.3)
 
-[node name="Concrete" type="MeshInstance3D" parent="Building7" unique_id=324458516]
+[node name="Concrete" type="MeshInstance3D" parent="Building7" unique_id=1038112256]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_fow0p")
 
-[node name="Collider" type="StaticBody3D" parent="Building7" unique_id=1488011518]
+[node name="Collider" type="StaticBody3D" parent="Building7" unique_id=1144496379]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, -5.8499994)
 
-[node name="@CollisionShape3D@69" type="CollisionShape3D" parent="Building7/Collider" unique_id=1530149079]
+[node name="Shape" type="CollisionShape3D" parent="Building7/Collider" unique_id=1029223871]
 shape = SubResource("BoxShape3D_y2mvh")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building7/Collider" unique_id=1824175595 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building7/Collider" unique_id=79691549 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_esav2")
 
-[node name="Concrete2" type="MeshInstance3D" parent="Building7" unique_id=1372855257]
+[node name="Concrete2" type="MeshInstance3D" parent="Building7" unique_id=577621335]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6293945e-06, 6.325, -5.8499994)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_bbcpa")
 
-[node name="Collider2" type="StaticBody3D" parent="Building7" unique_id=1516224288]
+[node name="Collider2" type="StaticBody3D" parent="Building7" unique_id=908723885]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6293945e-06, 6.325, -5.8499994)
 
-[node name="@CollisionShape3D@70" type="CollisionShape3D" parent="Building7/Collider2" unique_id=804275226]
+[node name="Shape" type="CollisionShape3D" parent="Building7/Collider2" unique_id=1257082302]
 shape = SubResource("BoxShape3D_wlkt3")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Building7/Collider2" unique_id=2073377318 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Building7/Collider2" unique_id=510188046 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_6hnio")
 
-[node name="Card" type="MeshInstance3D" parent="Building7" unique_id=1547215894]
+[node name="Card" type="MeshInstance3D" parent="Building7" unique_id=376885197]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1499999, 0.00999999)
 material_override = SubResource("StandardMaterial3D_cqtcn")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_87dla")
 
-[node name="Card2" type="MeshInstance3D" parent="Building7" unique_id=1075240013]
+[node name="Card2" type="MeshInstance3D" parent="Building7" unique_id=112343882]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.5099945, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_hea6c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_ciqgd")
 
-[node name="Card3" type="MeshInstance3D" parent="Building7" unique_id=198057269]
+[node name="Card3" type="MeshInstance3D" parent="Building7" unique_id=1486942090]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -4.5099945, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_ob5y3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_q2wrq")
 
-[node name="Card4" type="MeshInstance3D" parent="Building7" unique_id=1980954220]
+[node name="Card4" type="MeshInstance3D" parent="Building7" unique_id=91065413]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.510002, 3.1499999, -2.9999998)
 material_override = SubResource("StandardMaterial3D_ob5y3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_ebrdt")
 
-[node name="Card5" type="MeshInstance3D" parent="Building7" unique_id=1341250053]
+[node name="Card5" type="MeshInstance3D" parent="Building7" unique_id=237981442]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 4.510002, 3.1499999, -9)
 material_override = SubResource("StandardMaterial3D_hea6c")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_vkks8")
 
-[node name="BrickBlock2" type="Node3D" parent="." unique_id=778126782]
+[node name="BrickBlock2" type="Node3D" parent="." unique_id=1542467637]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82.65, 0, -3.3)
 
-[node name="Brick" type="MeshInstance3D" parent="BrickBlock2" unique_id=1624545325]
+[node name="Brick" type="MeshInstance3D" parent="BrickBlock2" unique_id=628595126]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6293945e-06, 3.8, -5.8499994)
 material_override = SubResource("StandardMaterial3D_v1log")
 mesh = SubResource("BoxMesh_acwtj")
 
-[node name="Collider" type="StaticBody3D" parent="BrickBlock2" unique_id=1717184329]
+[node name="Collider" type="StaticBody3D" parent="BrickBlock2" unique_id=2098512435]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6293945e-06, 3.8, -5.8499994)
 
-[node name="@CollisionShape3D@71" type="CollisionShape3D" parent="BrickBlock2/Collider" unique_id=2026837083]
+[node name="Shape" type="CollisionShape3D" parent="BrickBlock2/Collider" unique_id=1618390021]
 shape = SubResource("BoxShape3D_ng40j")
 
-[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock2/Collider" unique_id=1499205083 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock2/Collider" unique_id=1427336753 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_x4rhq")
 
-[node name="Concrete" type="MeshInstance3D" parent="BrickBlock2" unique_id=1455401572]
+[node name="Concrete" type="MeshInstance3D" parent="BrickBlock2" unique_id=185767764]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6293945e-06, 7.75, -5.8)
 material_override = SubResource("StandardMaterial3D_2ya4w")
 mesh = SubResource("BoxMesh_viso8")
 
-[node name="Collider2" type="StaticBody3D" parent="BrickBlock2" unique_id=1494534370]
+[node name="Collider2" type="StaticBody3D" parent="BrickBlock2" unique_id=1298657342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6293945e-06, 7.75, -5.8)
 
-[node name="@CollisionShape3D@72" type="CollisionShape3D" parent="BrickBlock2/Collider2" unique_id=281623999]
+[node name="Shape" type="CollisionShape3D" parent="BrickBlock2/Collider2" unique_id=39085198]
 shape = SubResource("BoxShape3D_1wnwg")
 
-[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock2/Collider2" unique_id=319206595 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="BrickBlock2/Collider2" unique_id=1763826526 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_yw3so")
 
-[node name="Prop1" type="Node3D" parent="." unique_id=774932077]
+[node name="Prop1" type="Node3D" parent="." unique_id=577435005]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1999999, 0.14999999, -2.85)
 
-[node name="Card" type="MeshInstance3D" parent="Prop1" unique_id=795092380]
+[node name="Card" type="MeshInstance3D" parent="Prop1" unique_id=877351552]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
 material_override = SubResource("StandardMaterial3D_rhx5m")
 mesh = SubResource("QuadMesh_8ulck")
 
-[node name="Collider" type="StaticBody3D" parent="Prop1" unique_id=414350629]
+[node name="Collider" type="StaticBody3D" parent="Prop1" unique_id=921730489]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
 
-[node name="@CollisionShape3D@73" type="CollisionShape3D" parent="Prop1/Collider" unique_id=18919611]
+[node name="Shape" type="CollisionShape3D" parent="Prop1/Collider" unique_id=728433622]
 shape = SubResource("BoxShape3D_ty0sb")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop1/Collider" unique_id=432610904 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop1/Collider" unique_id=1294867640 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_we4am")
 
-[node name="Prop2" type="Node3D" parent="." unique_id=1555489093]
+[node name="Prop2" type="Node3D" parent="." unique_id=1620762469]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 0.14999999, -2.8)
 
-[node name="Card" type="MeshInstance3D" parent="Prop2" unique_id=2132691710]
+[node name="Card" type="MeshInstance3D" parent="Prop2" unique_id=362546306]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
 material_override = SubResource("StandardMaterial3D_kqxe1")
 mesh = SubResource("QuadMesh_6x4x8")
 
-[node name="Collider" type="StaticBody3D" parent="Prop2" unique_id=608755386]
+[node name="Collider" type="StaticBody3D" parent="Prop2" unique_id=295917184]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
 
-[node name="@CollisionShape3D@74" type="CollisionShape3D" parent="Prop2/Collider" unique_id=1651970430]
+[node name="Shape" type="CollisionShape3D" parent="Prop2/Collider" unique_id=86578110]
 shape = SubResource("BoxShape3D_5y41j")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop2/Collider" unique_id=1755075271 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop2/Collider" unique_id=1858441703 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_eq0co")
 
-[node name="Prop3" type="Node3D" parent="." unique_id=51907398]
+[node name="Prop3" type="Node3D" parent="." unique_id=266107697]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.8, 0.14999999, -2.8999999)
 
-[node name="Card" type="MeshInstance3D" parent="Prop3" unique_id=1107307946]
+[node name="Card" type="MeshInstance3D" parent="Prop3" unique_id=1597634078]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 material_override = SubResource("StandardMaterial3D_gol7c")
 mesh = SubResource("QuadMesh_a3wu1")
 
-[node name="Collider" type="StaticBody3D" parent="Prop3" unique_id=1859528513]
+[node name="Collider" type="StaticBody3D" parent="Prop3" unique_id=804783360]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 
-[node name="@CollisionShape3D@75" type="CollisionShape3D" parent="Prop3/Collider" unique_id=237360049]
+[node name="Shape" type="CollisionShape3D" parent="Prop3/Collider" unique_id=161496810]
 shape = SubResource("BoxShape3D_mglml")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop3/Collider" unique_id=1724193180 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop3/Collider" unique_id=1924131526 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_jb1ce")
 
-[node name="Prop4" type="Node3D" parent="." unique_id=1792068105]
+[node name="Prop4" type="Node3D" parent="." unique_id=1387648827]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.4, 0.14999999, -3)
 
-[node name="Card" type="MeshInstance3D" parent="Prop4" unique_id=393969486]
+[node name="Card" type="MeshInstance3D" parent="Prop4" unique_id=960093213]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52500004, 0)
 material_override = SubResource("StandardMaterial3D_mruwk")
 mesh = SubResource("QuadMesh_mk2il")
 
-[node name="Collider" type="StaticBody3D" parent="Prop4" unique_id=469658281]
+[node name="Collider" type="StaticBody3D" parent="Prop4" unique_id=899879774]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52500004, 0)
 
-[node name="@CollisionShape3D@76" type="CollisionShape3D" parent="Prop4/Collider" unique_id=1645709322]
+[node name="Shape" type="CollisionShape3D" parent="Prop4/Collider" unique_id=1938179123]
 shape = SubResource("BoxShape3D_mutjv")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop4/Collider" unique_id=1056292793 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop4/Collider" unique_id=1118614246 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_v6amx")
 
-[node name="Prop5" type="Node3D" parent="." unique_id=423187483]
+[node name="Prop5" type="Node3D" parent="." unique_id=67990892]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.8, 0.14999999, -2.8999999)
 
-[node name="Card" type="MeshInstance3D" parent="Prop5" unique_id=2017619273]
+[node name="Card" type="MeshInstance3D" parent="Prop5" unique_id=46266500]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40000004, 0)
 material_override = SubResource("StandardMaterial3D_o8cb3")
 mesh = SubResource("QuadMesh_2oocq")
 
-[node name="Collider" type="StaticBody3D" parent="Prop5" unique_id=1131983727]
+[node name="Collider" type="StaticBody3D" parent="Prop5" unique_id=1632615575]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40000004, 0)
 
-[node name="@CollisionShape3D@77" type="CollisionShape3D" parent="Prop5/Collider" unique_id=57869075]
+[node name="Shape" type="CollisionShape3D" parent="Prop5/Collider" unique_id=65073537]
 shape = SubResource("BoxShape3D_2c0tj")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop5/Collider" unique_id=610699240 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop5/Collider" unique_id=1917197942 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_pspic")
 
-[node name="Prop6" type="Node3D" parent="." unique_id=870755560]
+[node name="Prop6" type="Node3D" parent="." unique_id=54700005]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 0.14999999, -3)
 
-[node name="Card" type="MeshInstance3D" parent="Prop6" unique_id=558468509]
+[node name="Card" type="MeshInstance3D" parent="Prop6" unique_id=830816679]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47500002, 0)
 material_override = SubResource("StandardMaterial3D_8xbbt")
 mesh = SubResource("QuadMesh_d04ny")
 
-[node name="Collider" type="StaticBody3D" parent="Prop6" unique_id=430962233]
+[node name="Collider" type="StaticBody3D" parent="Prop6" unique_id=332258655]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47500002, 0)
 
-[node name="@CollisionShape3D@78" type="CollisionShape3D" parent="Prop6/Collider" unique_id=457594524]
+[node name="Shape" type="CollisionShape3D" parent="Prop6/Collider" unique_id=81741016]
 shape = SubResource("BoxShape3D_noc8w")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop6/Collider" unique_id=47920815 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop6/Collider" unique_id=1029710336 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_q6sxk")
 
-[node name="Prop7" type="Node3D" parent="." unique_id=196712453]
+[node name="Prop7" type="Node3D" parent="." unique_id=3226400]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.199999, 0.14999999, -2.75)
 
-[node name="Card" type="MeshInstance3D" parent="Prop7" unique_id=1347270221]
+[node name="Card" type="MeshInstance3D" parent="Prop7" unique_id=927686745]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27499998, 0)
 material_override = SubResource("StandardMaterial3D_b1fmc")
 mesh = SubResource("QuadMesh_3ldjj")
 
-[node name="Collider" type="StaticBody3D" parent="Prop7" unique_id=1497696335]
+[node name="Collider" type="StaticBody3D" parent="Prop7" unique_id=676020869]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27499998, 0)
 
-[node name="@CollisionShape3D@79" type="CollisionShape3D" parent="Prop7/Collider" unique_id=1041579171]
+[node name="Shape" type="CollisionShape3D" parent="Prop7/Collider" unique_id=155960029]
 shape = SubResource("BoxShape3D_vxwuy")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop7/Collider" unique_id=906024436 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop7/Collider" unique_id=927874042 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_4pbaj")
 
-[node name="Prop8" type="Node3D" parent="." unique_id=1590249348]
+[node name="Prop8" type="Node3D" parent="." unique_id=891579528]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.6, 0.14999999, -3)
 
-[node name="Card" type="MeshInstance3D" parent="Prop8" unique_id=105346883]
+[node name="Card" type="MeshInstance3D" parent="Prop8" unique_id=1815990859]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40000004, 0)
 material_override = SubResource("StandardMaterial3D_i4rmn")
 mesh = SubResource("QuadMesh_2ofjw")
 
-[node name="Collider" type="StaticBody3D" parent="Prop8" unique_id=525171377]
+[node name="Collider" type="StaticBody3D" parent="Prop8" unique_id=413622411]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.40000004, 0)
 
-[node name="@CollisionShape3D@80" type="CollisionShape3D" parent="Prop8/Collider" unique_id=425699440]
+[node name="Shape" type="CollisionShape3D" parent="Prop8/Collider" unique_id=1936480221]
 shape = SubResource("BoxShape3D_78cg4")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop8/Collider" unique_id=1975909128 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop8/Collider" unique_id=1483307777 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_3qst7")
 
-[node name="Prop9" type="Node3D" parent="." unique_id=18870180]
+[node name="Prop9" type="Node3D" parent="." unique_id=918061075]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.8, 0.14999999, -2.8)
 
-[node name="Card" type="MeshInstance3D" parent="Prop9" unique_id=606754442]
+[node name="Card" type="MeshInstance3D" parent="Prop9" unique_id=15784750]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.425, 0)
 material_override = SubResource("StandardMaterial3D_23tk1")
 mesh = SubResource("QuadMesh_qxbfh")
 
-[node name="Collider" type="StaticBody3D" parent="Prop9" unique_id=261177805]
+[node name="Collider" type="StaticBody3D" parent="Prop9" unique_id=523465519]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.425, 0)
 
-[node name="@CollisionShape3D@81" type="CollisionShape3D" parent="Prop9/Collider" unique_id=296619514]
+[node name="Shape" type="CollisionShape3D" parent="Prop9/Collider" unique_id=1505318763]
 shape = SubResource("BoxShape3D_5l58k")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop9/Collider" unique_id=898289539 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop9/Collider" unique_id=1416292922 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_7f3bn")
 
-[node name="Prop10" type="Node3D" parent="." unique_id=1167939452]
+[node name="Prop10" type="Node3D" parent="." unique_id=1931703235]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.6, 0.14999999, -2.8)
 
-[node name="Card" type="MeshInstance3D" parent="Prop10" unique_id=53261167]
+[node name="Card" type="MeshInstance3D" parent="Prop10" unique_id=1315172337]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
 material_override = SubResource("StandardMaterial3D_ui72f")
 mesh = SubResource("QuadMesh_su1o6")
 
-[node name="Collider" type="StaticBody3D" parent="Prop10" unique_id=1148283239]
+[node name="Collider" type="StaticBody3D" parent="Prop10" unique_id=420393075]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
 
-[node name="@CollisionShape3D@82" type="CollisionShape3D" parent="Prop10/Collider" unique_id=553514141]
+[node name="Shape" type="CollisionShape3D" parent="Prop10/Collider" unique_id=1292473751]
 shape = SubResource("BoxShape3D_7qnmf")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop10/Collider" unique_id=80366081 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop10/Collider" unique_id=1209249007 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_5j784")
 
-[node name="Prop11" type="Node3D" parent="." unique_id=1862267077]
+[node name="Prop11" type="Node3D" parent="." unique_id=2134253176]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.2, 0.14999999, -2.8999999)
 
-[node name="Card" type="MeshInstance3D" parent="Prop11" unique_id=1840738117]
+[node name="Card" type="MeshInstance3D" parent="Prop11" unique_id=920057196]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
 material_override = SubResource("StandardMaterial3D_flofb")
 mesh = SubResource("QuadMesh_dnrqp")
 
-[node name="Collider" type="StaticBody3D" parent="Prop11" unique_id=1999079795]
+[node name="Collider" type="StaticBody3D" parent="Prop11" unique_id=1524900124]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
 
-[node name="@CollisionShape3D@83" type="CollisionShape3D" parent="Prop11/Collider" unique_id=2127238727]
+[node name="Shape" type="CollisionShape3D" parent="Prop11/Collider" unique_id=400701344]
 shape = SubResource("BoxShape3D_73gqb")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop11/Collider" unique_id=1817423431 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop11/Collider" unique_id=1000555505 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_wp46c")
 
-[node name="Prop12" type="Node3D" parent="." unique_id=661818850]
+[node name="Prop12" type="Node3D" parent="." unique_id=2135221985]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.2, 0.14999999, -2.95)
 
-[node name="Card" type="MeshInstance3D" parent="Prop12" unique_id=1940271189]
+[node name="Card" type="MeshInstance3D" parent="Prop12" unique_id=1260507900]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_0rwcj")
 mesh = SubResource("QuadMesh_bqyys")
 
-[node name="Collider" type="StaticBody3D" parent="Prop12" unique_id=1754435253]
+[node name="Collider" type="StaticBody3D" parent="Prop12" unique_id=1461939630]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
-[node name="@CollisionShape3D@84" type="CollisionShape3D" parent="Prop12/Collider" unique_id=874040850]
+[node name="Shape" type="CollisionShape3D" parent="Prop12/Collider" unique_id=1855569830]
 shape = SubResource("BoxShape3D_yess5")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop12/Collider" unique_id=1188008980 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop12/Collider" unique_id=2143427457 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_kkgok")
 
-[node name="Prop13" type="Node3D" parent="." unique_id=1865300047]
+[node name="Prop13" type="Node3D" parent="." unique_id=164173504]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.8, 0.14999999, -2.8999999)
 
-[node name="Card" type="MeshInstance3D" parent="Prop13" unique_id=518952552]
+[node name="Card" type="MeshInstance3D" parent="Prop13" unique_id=2145907341]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
 material_override = SubResource("StandardMaterial3D_0xb7s")
 mesh = SubResource("QuadMesh_ttvtj")
 
-[node name="Collider" type="StaticBody3D" parent="Prop13" unique_id=1302139751]
+[node name="Collider" type="StaticBody3D" parent="Prop13" unique_id=1539674868]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22500001, 0)
 
-[node name="@CollisionShape3D@85" type="CollisionShape3D" parent="Prop13/Collider" unique_id=1364158635]
+[node name="Shape" type="CollisionShape3D" parent="Prop13/Collider" unique_id=1891515593]
 shape = SubResource("BoxShape3D_7unkw")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop13/Collider" unique_id=595872979 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop13/Collider" unique_id=1031129472 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_fa1s2")
 
-[node name="Prop14" type="Node3D" parent="." unique_id=1729050123]
+[node name="Prop14" type="Node3D" parent="." unique_id=453146529]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 71.2, 0.14999999, -2.8999999)
 
-[node name="Card" type="MeshInstance3D" parent="Prop14" unique_id=1369868202]
+[node name="Card" type="MeshInstance3D" parent="Prop14" unique_id=735650069]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 material_override = SubResource("StandardMaterial3D_0mu2d")
 mesh = SubResource("QuadMesh_aian5")
 
-[node name="Collider" type="StaticBody3D" parent="Prop14" unique_id=2073454508]
+[node name="Collider" type="StaticBody3D" parent="Prop14" unique_id=1788250730]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 
-[node name="@CollisionShape3D@86" type="CollisionShape3D" parent="Prop14/Collider" unique_id=1684461689]
+[node name="Shape" type="CollisionShape3D" parent="Prop14/Collider" unique_id=793554936]
 shape = SubResource("BoxShape3D_sheop")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Prop14/Collider" unique_id=1483631391 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Prop14/Collider" unique_id=42558325 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_4h0it")
 
-[node name="Car1" type="Node3D" parent="." unique_id=44809270]
+[node name="Car1" type="Node3D" parent="." unique_id=1485955220]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8181818, 0, -1.1)
 
-[node name="Card" type="MeshInstance3D" parent="Car1" unique_id=233705522]
+[node name="Card" type="MeshInstance3D" parent="Car1" unique_id=1574185367]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 material_override = SubResource("StandardMaterial3D_57p5c")
 mesh = SubResource("QuadMesh_t51bu")
 
-[node name="Collider" type="StaticBody3D" parent="Car1" unique_id=2055612427]
+[node name="Collider" type="StaticBody3D" parent="Car1" unique_id=1320820198]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 
-[node name="@CollisionShape3D@87" type="CollisionShape3D" parent="Car1/Collider" unique_id=449921806]
+[node name="Shape" type="CollisionShape3D" parent="Car1/Collider" unique_id=1834424673]
 shape = SubResource("BoxShape3D_ha81l")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Car1/Collider" unique_id=1365814136 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Car1/Collider" unique_id=210373826 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_nv556")
 
-[node name="Car2" type="Node3D" parent="." unique_id=1990526449]
+[node name="Car2" type="Node3D" parent="." unique_id=606397387]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.044456, 0, -1.1)
 
-[node name="Card" type="MeshInstance3D" parent="Car2" unique_id=1187483769]
+[node name="Card" type="MeshInstance3D" parent="Car2" unique_id=18375714]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 material_override = SubResource("StandardMaterial3D_vavnv")
 mesh = SubResource("QuadMesh_ak2lu")
 
-[node name="Collider" type="StaticBody3D" parent="Car2" unique_id=2074490946]
+[node name="Collider" type="StaticBody3D" parent="Car2" unique_id=468026942]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 
-[node name="@CollisionShape3D@88" type="CollisionShape3D" parent="Car2/Collider" unique_id=276612934]
+[node name="Shape" type="CollisionShape3D" parent="Car2/Collider" unique_id=1252129583]
 shape = SubResource("BoxShape3D_v2y3i")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Car2/Collider" unique_id=932023332 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Car2/Collider" unique_id=751732343 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_a4wnd")
 
-[node name="Car3" type="Node3D" parent="." unique_id=1799162727]
+[node name="Car3" type="Node3D" parent="." unique_id=1825749554]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.181818, 0, -1.1)
 
-[node name="Card" type="MeshInstance3D" parent="Car3" unique_id=1638755277]
+[node name="Card" type="MeshInstance3D" parent="Car3" unique_id=5929331]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 material_override = SubResource("StandardMaterial3D_bn0v2")
 mesh = SubResource("QuadMesh_3yr4n")
 
-[node name="Collider" type="StaticBody3D" parent="Car3" unique_id=2071607710]
+[node name="Collider" type="StaticBody3D" parent="Car3" unique_id=513615479]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 
-[node name="@CollisionShape3D@89" type="CollisionShape3D" parent="Car3/Collider" unique_id=107684918]
+[node name="Shape" type="CollisionShape3D" parent="Car3/Collider" unique_id=509385380]
 shape = SubResource("BoxShape3D_8pipi")
 
-[node name="DebugBox" type="MeshInstance3D" parent="Car3/Collider" unique_id=1400986467 groups=["street_debug_collider"]]
+[node name="DebugBox" type="MeshInstance3D" parent="Car3/Collider" unique_id=41901908 groups=["street_debug_collider"]]
 visible = false
 material_override = SubResource("StandardMaterial3D_5ot7l")
 cast_shadow = 0
 mesh = SubResource("BoxMesh_g2v5l")
 
-[node name="Skyline" type="Node3D" parent="." unique_id=696815455]
+[node name="Skyline" type="Node3D" parent="." unique_id=879920906]
 
-[node name="Silhouette" type="MeshInstance3D" parent="Skyline" unique_id=1045915748 groups=["street_skyline"]]
+[node name="Silhouette" type="MeshInstance3D" parent="Skyline" unique_id=1431398008 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.57738, 8.5, -55)
 material_override = SubResource("ShaderMaterial_81a63")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_geipl")
 
-[node name="Silhouette2" type="MeshInstance3D" parent="Skyline" unique_id=408224327 groups=["street_skyline"]]
+[node name="Silhouette2" type="MeshInstance3D" parent="Skyline" unique_id=327639462 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.78869, 8.5, -55)
 material_override = SubResource("ShaderMaterial_djdty")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_b2ul2")
 
-[node name="Silhouette3" type="MeshInstance3D" parent="Skyline" unique_id=1350877743 groups=["street_skyline"]]
+[node name="Silhouette3" type="MeshInstance3D" parent="Skyline" unique_id=720966332 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -55)
 material_override = SubResource("ShaderMaterial_du3q3")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_8jc8i")
 
-[node name="Silhouette4" type="MeshInstance3D" parent="Skyline" unique_id=1791152558 groups=["street_skyline"]]
+[node name="Silhouette4" type="MeshInstance3D" parent="Skyline" unique_id=86311842 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.78869, 8.5, -55)
 material_override = SubResource("ShaderMaterial_h7vwj")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_f4gx1")
 
-[node name="Silhouette5" type="MeshInstance3D" parent="Skyline" unique_id=1513622530 groups=["street_skyline"]]
+[node name="Silhouette5" type="MeshInstance3D" parent="Skyline" unique_id=1060193906 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.57738, 8.5, -55)
 material_override = SubResource("ShaderMaterial_uux1b")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_6vfw1")
 
-[node name="Silhouette6" type="MeshInstance3D" parent="Skyline" unique_id=1906309390 groups=["street_skyline"]]
+[node name="Silhouette6" type="MeshInstance3D" parent="Skyline" unique_id=1873011689 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.36607, 8.5, -55)
 material_override = SubResource("ShaderMaterial_82ida")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_ug74c")
 
-[node name="Silhouette7" type="MeshInstance3D" parent="Skyline" unique_id=1191159717 groups=["street_skyline"]]
+[node name="Silhouette7" type="MeshInstance3D" parent="Skyline" unique_id=1480447253 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115.15476, 8.5, -55)
 material_override = SubResource("ShaderMaterial_6iieq")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_rf1y0")
 
-[node name="Silhouette8" type="MeshInstance3D" parent="Skyline" unique_id=416810260 groups=["street_skyline"]]
+[node name="Silhouette8" type="MeshInstance3D" parent="Skyline" unique_id=889531039 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.949404, 5.75, -34)
 material_override = SubResource("ShaderMaterial_olpyu")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_2kc45")
 
-[node name="Silhouette9" type="MeshInstance3D" parent="Skyline" unique_id=1146924313 groups=["street_skyline"]]
+[node name="Silhouette9" type="MeshInstance3D" parent="Skyline" unique_id=486906273 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.474702, 5.75, -34)
 material_override = SubResource("ShaderMaterial_5a466")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_sq4gb")
 
-[node name="Silhouette10" type="MeshInstance3D" parent="Skyline" unique_id=1586508203 groups=["street_skyline"]]
+[node name="Silhouette10" type="MeshInstance3D" parent="Skyline" unique_id=431029143 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 5.75, -34)
 material_override = SubResource("ShaderMaterial_nhe1d")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_j2jp4")
 
-[node name="Silhouette11" type="MeshInstance3D" parent="Skyline" unique_id=1364332202 groups=["street_skyline"]]
+[node name="Silhouette11" type="MeshInstance3D" parent="Skyline" unique_id=637405984 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.4747, 5.75, -34)
 material_override = SubResource("ShaderMaterial_16qpb")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_5hm2y")
 
-[node name="Silhouette12" type="MeshInstance3D" parent="Skyline" unique_id=1000457032 groups=["street_skyline"]]
+[node name="Silhouette12" type="MeshInstance3D" parent="Skyline" unique_id=35330425 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.9494, 5.75, -34)
 material_override = SubResource("ShaderMaterial_68mop")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_8icay")
 
-[node name="Silhouette13" type="MeshInstance3D" parent="Skyline" unique_id=337418595 groups=["street_skyline"]]
+[node name="Silhouette13" type="MeshInstance3D" parent="Skyline" unique_id=869467704 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67.4241, 5.75, -34)
 material_override = SubResource("ShaderMaterial_e3g4h")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_pfam6")
 
-[node name="Silhouette14" type="MeshInstance3D" parent="Skyline" unique_id=1960839542 groups=["street_skyline"]]
+[node name="Silhouette14" type="MeshInstance3D" parent="Skyline" unique_id=1531798459 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86.8988, 5.75, -34)
 material_override = SubResource("ShaderMaterial_ar6ku")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_f0cx1")
 
-[node name="Silhouette15" type="MeshInstance3D" parent="Skyline" unique_id=438302203 groups=["street_skyline"]]
+[node name="Silhouette15" type="MeshInstance3D" parent="Skyline" unique_id=481339547 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.37351, 5.75, -34)
 material_override = SubResource("ShaderMaterial_fu67q")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_g6cwp")
 
-[node name="Silhouette16" type="MeshInstance3D" parent="Skyline" unique_id=32303706 groups=["street_skyline"]]
+[node name="Silhouette16" type="MeshInstance3D" parent="Skyline" unique_id=1011702157 groups=["street_skyline"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 125.84821, 5.75, -34)
 material_override = SubResource("ShaderMaterial_2loas")
 cast_shadow = 0

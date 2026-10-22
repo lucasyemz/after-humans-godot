@@ -174,6 +174,8 @@ func _ready() -> void:
 		add_child(_set)
 	_build_atmosphere()
 	_collect_set()
+	# Os materiais do chão vêm da cena (compartilhados): começam secos, como o clima pede.
+	_apply_wet()
 	_build_rain()
 	_build_party()
 	if scenario and ["FloodedDepot", "SewerDucts"].has(scenario.map_name):
@@ -248,7 +250,8 @@ func _build_scenario_colliders() -> void:
 
 
 ## O que a rua mexe depois de montada, achado pelos grupos e pelos metadados gravados na cena: as luzes dos postes e das
-## portas, os feixes de sol, as silhuetas do fundo, os materiais do chão que molham e as caixas da tecla C.
+## portas, os feixes de sol, as silhuetas do fundo, os materiais do chão que molham e as caixas da tecla C. Roda uma vez,
+## no _ready: uma colisão posta em _dynamic depois disso precisa entrar em _debug_colliders à mão (como as das casas).
 func _collect_set() -> void:
 	for root in ([_set] if _set else []) + [_dynamic]:
 		for node in root.find_children("*", "", true, false):
@@ -290,10 +293,16 @@ func door_list() -> Array:
 	var doors: Array = []
 	if scenario:
 		return doors
-	for building in AHStreetSet.FACADE_BUILDINGS:
+	for index in AHStreetSet.FACADE_BUILDINGS.size():
+		var building: Array = AHStreetSet.FACADE_BUILDINGS[index]
 		var overlay: Rect2 = AHStreetSet.DOOR_OVERLAYS[building[1]]
 		var offset: float = (overlay.position.x + overlay.size.x * 0.5 - 768.0) * AHStreetSet.FACADE_WIDTH / 1536.0
-		var x: float = (building[0] + AHStreetSet.FACADE_WIDTH * 0.5 + (-offset if building[2] else offset)) * 0.01
+		# O meio do prédio vem da cena (o nó BuildingN, na ordem de FACADE_BUILDINGS): movido no editor, a porta vai junto.
+		var center: float = (building[0] + AHStreetSet.FACADE_WIDTH * 0.5) * 0.01
+		var node := _set.get_node_or_null("Building%d" % (index + 1)) as Node3D if _set else null
+		if node != null:
+			center = node.global_position.x
+		var x: float = center + (-offset if building[2] else offset) * 0.01
 		if x >= 0.0 and x < CORRIDOR_LENGTH:
 			doors.append({"x": x, "shop": building[1], "mirror": building[2], "step": floori(x / (CORRIDOR_LENGTH / 10.0))})
 	return doors

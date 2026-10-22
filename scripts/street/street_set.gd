@@ -34,7 +34,6 @@ const LAMP_XS := [1480.0, 3860.0, 6280.0]
 const LAMP_Y := -245.0
 const LAMP_HEIGHT := 450.0
 const DOOR_LIGHTS := [Vector3(880, -140, 280), Vector3(2175, -140, 260), Vector3(3280, -140, 300)]
-const FIRE := Vector3(180, 40, 0)
 
 # Peças de caixa: cor (sRGB), rugosidade e textura repetida (cm por repetição). wet: molha na chuva.
 const PIECES := {
@@ -204,6 +203,7 @@ func add_collider(center: Vector3, size: Vector3) -> void:
 	body.name = "Collider"
 	body.position = center
 	var shape := CollisionShape3D.new()
+	shape.name = "Shape"
 	var box := BoxShape3D.new()
 	box.size = size
 	shape.shape = box

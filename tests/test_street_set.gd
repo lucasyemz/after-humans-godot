@@ -29,6 +29,8 @@ func run(t) -> void:
 		# Mexer no poste como no editor: muda a cena gravada (numa cópia) e abre a rua de novo.
 		var copy: Node = packed.instantiate()
 		copy.get_node("Lamp1").position.x += 2.0
+		copy.get_node("Building2").position.x += 3.0
+		var doors_before: Array = street.door_list()
 		var edited := PackedScene.new()
 		edited.pack(copy)
 		copy.free()
@@ -45,6 +47,16 @@ func run(t) -> void:
 			var body: StaticBody3D = moved.find_children("*", "StaticBody3D", true, false)[0]
 			t.check(absf(light.global_position.x - (lamp_x - 0.53 + 2.0)) < 0.01, "a luz do poste foi junto")
 			t.check(absf(body.global_position.x - (lamp_x + 0.52 + 2.0)) < 0.01, "e a colisão também")
+			# O prédio movido 3 m leva a porta da loja (onde se entra) junto; as outras ficam.
+			var doors_after: Array = street.door_list()
+			var moved_doors := 0
+			for i in mini(doors_before.size(), doors_after.size()):
+				var shift: float = doors_after[i].x - doors_before[i].x
+				if absf(shift - 3.0) < 0.001:
+					moved_doors += 1
+				elif absf(shift) > 0.001:
+					moved_doors += 100
+			t.equal(moved_doors, 1, "a porta da mercearia andou 3 m com o prédio, as outras não")
 	if tree.current_scene != null:
 		tree.unload_current_scene()
 	await tree.process_frame
