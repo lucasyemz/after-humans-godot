@@ -1,5 +1,6 @@
 ## A cena da Estação: abrir e fechar não deixa conexões nas opções (Settings.changed), e quem dorme continua no
 ## beliche quando os passeios são refeitos (depois de acolher ou recusar o candidato do trem, com a noite pendente).
+## Partir clicado duas vezes (o segundo clique cai durante o fade da saída) parte uma vez só, sem erro.
 extends RefCounted
 
 const S = preload("res://scripts/flow/station_rules.gd")
@@ -33,6 +34,21 @@ func run(t) -> void:
 		rng.seed = 3
 		station._place_residents(rng)
 		t.equal(asleep.call(), before, "refeitos os passeios, os mesmos continuam dormindo")
+		S.resolve_night(c)
+		S.finish_dawn(c)
+		if S.visit_pending(c):
+			S.decide_candidate(c, c.station.train.candidate_id, false)
+			S.finish_departure(c)
+		t.equal(S.preparation_block(c), "", "a Estação fica livre para partir")
+		station.hud.open_room(S.PREPARATION)
+		station.hud._depart()
+		station.hud._depart()
+		await tree.process_frame
+		t.check(c.session.expedition != null, "Partir clicado duas vezes parte")
+		var id: String = c.session.expedition.id if c.session.expedition != null else ""
+		while GameFlow.busy:
+			await tree.process_frame
+		t.equal(c.session.expedition.id if c.session.expedition != null else "", id, "e parte uma vez só")
 	tree.unload_current_scene()
 	await tree.process_frame
 	for file in DirAccess.get_files_at(Campaign.save_dir):

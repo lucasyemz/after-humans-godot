@@ -1359,6 +1359,9 @@ func _prep_bench(hero_id: String) -> void:
 
 
 func _depart() -> void:
+	# O segundo clique em Partir, durante o fade da saída, já não tem Preparação.
+	if _draft.is_empty() or GameFlow.busy:
+		return
 	var c: Dictionary = Campaign.state
 	var error := S.confirm_departure(c, _draft.team.duplicate(), _draft.extra, randi(), _draft.phase, _draft.focus)
 	if error != "":
