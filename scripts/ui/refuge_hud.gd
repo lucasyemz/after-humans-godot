@@ -1046,16 +1046,19 @@ func _recruit(class_id: String) -> void:
 
 func _reset_draft() -> void:
 	var c: Dictionary = Campaign.state
-	var team: Array = c.preferred_formation.filter(func(id): return S.hero(c, id) != null and S.hero(c, id).alive and S.can_deploy(S.hero(c, id)))
-	for entry in S.living(c):
-		if team.size() < 4 and not team.has(entry.id) and S.can_deploy(entry):
-			team.append(entry.id)
 	# A fase sugerida: a primeira liberada que falta concluir (ou a última, com todas feitas).
 	var next: String = J.PHASES[-1].id
 	for info in J.PHASES:
 		if S.phase_unlocked(c, info.id) and not c.completed_phases.has(info.id):
 			next = info.id
 			break
+	# A equipe da última partida (pode ser menor, #6); quem caiu é reposto até o tamanho dela, no mínimo o da jornada.
+	var limits := J.team_limits(next)
+	var size: int = clampi(maxi(c.preferred_formation.size(), limits.min), 1, limits.max)
+	var team: Array = c.preferred_formation.filter(func(id): return S.hero(c, id) != null and S.hero(c, id).alive and S.can_deploy(S.hero(c, id)))
+	for entry in S.living(c):
+		if team.size() < size and not team.has(entry.id) and S.can_deploy(entry):
+			team.append(entry.id)
 	_draft = {"phase": next, "team": team, "focus": S.focus_recommended(c), "extra": 0}
 
 
@@ -1215,8 +1218,10 @@ func _prep_drawer(c: Dictionary) -> void:
 	var bench: Array = S.living(c).filter(func(h): return not _draft.team.has(h.id))
 	var can_leave: bool = _prep_selected >= 0 and _prep_selected < _draft.team.size() and _draft.team.size() > 1
 	if not bench.is_empty() or can_leave:
-		var bench_row := HBoxContainer.new()
-		bench_row.add_theme_constant_override("separation", 8)
+		# Quebra em linhas: com a equipe pequena e muitos na Estação (e o texto Maior), a gaveta continua na tela.
+		var bench_row := HFlowContainer.new()
+		bench_row.add_theme_constant_override("h_separation", 8)
+		bench_row.add_theme_constant_override("v_separation", 6)
 		lineup.add_child(bench_row)
 		bench_row.add_child(U.label("Fora da equipe:", 17, U.MUTED))
 		for entry in bench:

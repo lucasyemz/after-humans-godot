@@ -66,9 +66,19 @@ func _journey(t, size: int) -> void:
 	route.index = route.sites[camp].step
 	for i in route.index + 1:
 		route.steps[i].resolved = true
-	if J.enter_house(c, camp) and J.start_camp(c):
-		t.check(J.camp_use_food(c, team[0]) or true, "%d: comer no acampamento" % size)
-		t.check(not J.camp_use_food(c, "hero_coruja_vespera") or team.has("hero_coruja_vespera"), "%d: quem ficou na Estação não come no acampamento" % size)
+	route.sites[camp].has_enemy = false
+	t.check(J.enter_house(c, camp), "%d: entra na casa do acampamento" % size)
+	if t.check(J.start_camp(c), "%d: acampa" % size):
+		var hero = S.hero(c, team[0])
+		hero.hp = hero.max_hp - 10
+		hero.instinct = 50
+		var food_before: int = expedition.food
+		var hp_before: int = hero.hp
+		t.check(J.camp_use_food(c, team[0]), "%d: %s come no acampamento" % [size, hero.display_name])
+		t.equal(expedition.food, food_before - 1, "%d: a comida cai 1" % size)
+		t.check(hero.hp > hp_before, "%d: e a vida sobe" % size)
+		if not team.has("hero_coruja_vespera"):
+			t.check(not J.camp_use_food(c, "hero_coruja_vespera"), "%d: quem ficou na Estação não come no acampamento" % size)
 		J.leave_camp(c, 3)
 		J.leave_house(c)
 	# Save e load no meio da expedição.
@@ -85,7 +95,7 @@ func _journey(t, size: int) -> void:
 	S.finish_dawn(c)
 	# A derrota com a equipe pequena: todos caem, ninguém fantasma no memorial.
 	var d: Dictionary = Campaign.create_initial(40 + size)
-	S.confirm_departure(d, team, 0, 200 + size, "fase_1")
+	t.equal(S.confirm_departure(d, team, 0, 200 + size, "fase_1"), "", "%d: parte para a derrota" % size)
 	for hero_id in team:
 		S.hero(d, hero_id).alive = false
 	J.end_combat(d, "defeat", false, "teste")
@@ -123,6 +133,29 @@ func _preparation(t) -> void:
 	var go := _button(hud._prep, "Partir")
 	t.check(go != null and go.disabled, "Túneis do Eco com três: Partir travado")
 	t.check(_label(hud._prep, "pede 4 animais"), "e o motivo na tela")
+	# Texto Maior, doze na Estação e um só na equipe: o banco quebra em linhas e a gaveta cabe na tela.
+	var classes := ["cao", "gato", "sapo", "coruja", "cao", "gato", "sapo", "coruja"]
+	for i in classes.size():
+		S.recruit(Campaign.state, classes[i], RandomNumberGenerator.new(), "Voluntário %d" % (i + 1))
+	t.equal(S.living(Campaign.state).size(), 12, "doze na Estação")
+	Settings.set_text_size(2)
+	hud._draft.phase = "fase_1"
+	hud._draft.team = [FOUNDERS[0]]
+	hud._prep_selected = 0
+	hud.refresh()
+	for frame in 4:
+		await tree.process_frame
+	var right: float = hud._prep.position.x + hud._prep.size.x
+	t.check(right <= 1920.0, "a gaveta cabe na largura da tela (%.0f)" % right)
+	var plus := _button(hud._prep, "+")
+	t.check(plus != null and plus.get_global_rect().end.x <= 1920.0, "o + da comida fica na tela")
+	Settings.set_text_size(0)
+	# A Preparação lembra a equipe pequena da última partida.
+	Campaign.state.preferred_formation = [FOUNDERS[1]]
+	Campaign.state.completed_phases = []
+	hud._draft = {}
+	hud._reset_draft()
+	t.equal(hud._draft.team, [FOUNDERS[1]], "a Preparação começa com a equipe da última partida (um só)")
 	tree.unload_current_scene()
 	await tree.process_frame
 	for file in DirAccess.get_files_at(Campaign.save_dir):
