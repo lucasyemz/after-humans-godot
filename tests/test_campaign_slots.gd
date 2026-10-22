@@ -122,6 +122,19 @@ func _broken_slot() -> void:
 	file.store_string("nada")
 	file.close()
 	t.equal(Campaign.last_slot(), 1, "slots.json estragado volta ao espaço 1")
+	for value in ["null", "[2]", "{}", "\"2\"", "7", "0"]:
+		file = FileAccess.open(Campaign.save_dir.path_join(Campaign.SLOTS_FILE), FileAccess.WRITE)
+		file.store_string("{\"last\": %s}" % value)
+		file.close()
+		t.equal(Campaign.last_slot(), 1, "slots.json com last = %s volta ao espaço 1" % value)
+	# O último espaço estragado com outro bom: o aviso diz qual espaço e onde estão as outras.
+	file = FileAccess.open(Campaign.save_dir.path_join(Campaign.SLOTS_FILE), FileAccess.WRITE)
+	file.store_string("{\"last\": 2}")
+	file.close()
+	Campaign.slot = Campaign.last_slot()
+	Campaign.load_or_new()
+	t.check(Campaign.load_warning.contains("espaço 2") and Campaign.load_warning.contains("Campanhas"), "o aviso diz que só o espaço 2 não abre: %s" % Campaign.load_warning)
+	Campaign.slot = 1
 
 
 ## O tempo jogado anda na Estação e na rua, não no título; vai para o save em segundos inteiros.
@@ -145,6 +158,9 @@ func _play_time() -> void:
 	Campaign.save()
 	t.equal(int(Campaign.read_file(Campaign.slot_path(1)).played_seconds), before + 75, "o save leva os segundos inteiros")
 	t.check(is_equal_approx(snappedf(Campaign._play_seconds, 0.01), 0.6), "e guarda a fração para o próximo")
+	Campaign._play_seconds = 600.0
+	Campaign.new_game_in(2, 2)
+	t.equal(int(Campaign.read_file(Campaign.slot_path(2)).played_seconds), 0, "a campanha nova começa com 0 jogado (o tempo da outra não passa)")
 	t.equal(AHTitleScreen.slot_text(Campaign.slot_summary(1), true).contains("1 min jogados"), true, "o resumo mostra o tempo jogado")
 	t.check(AHTitleScreen.slot_text({"slot": 2, "status": "empty"}, false).contains("vazio"), "o espaço vazio diz vazio")
 

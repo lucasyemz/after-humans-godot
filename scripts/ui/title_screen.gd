@@ -173,6 +173,12 @@ func _open_modal(width: float) -> VBoxContainer:
 	return box
 
 
+## Centraliza a janela pela largura de verdade (no texto Maior ela passa da largura pedida).
+func _center_modal() -> void:
+	if modal_open():
+		_modal.position.x = (get_viewport_rect().size.x - _modal.size.x) * 0.5
+
+
 func _modal_button(text: String, callback: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
@@ -211,12 +217,16 @@ func _open_slots(for_new: bool) -> void:
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.custom_minimum_size = Vector2(0, 84)
 		button.disabled = not for_new and summary.status != "ok"
+		# O espaço que não abre fica fora da navegação por teclado e controle.
+		if button.disabled:
+			button.focus_mode = Control.FOCUS_NONE
 		box.add_child(button)
 		if first == null and not button.disabled:
 			first = button
 	var back := _modal_button("Voltar", close_modal)
 	box.add_child(back)
 	(first if first != null else back).grab_focus.call_deferred()
+	_center_modal.call_deferred()
 
 
 ## A linha de um espaço: o número e, se tem campanha, o ciclo, as fases, o elenco vivo, a data e o tempo jogado.

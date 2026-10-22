@@ -117,7 +117,7 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
     Mover, Defender e Fugir ficam à direita.
 - **Tela de título:** o jogo abre nela (`scenes/title.tscn`), com Continuar (a última campanha usada, só com um save que
   abre), Nova campanha (escolhe um dos três espaços e pergunta antes de sobrescrever um ocupado), Campanhas (abre outro
-  espaço, quando há mais de uma campanha) e Opções. Os espaços ficam em `user://saves`: `campaign.json` (o espaço 1, o
+  espaço, quando há uma campanha que o Continuar não abre) e Opções. Os espaços ficam em `user://saves`: `campaign.json` (o espaço 1, o
   save de antes das vagas), `campaign_2.json`, `campaign_3.json`, cada um com a cópia `.backup`, e `slots.json` com o
   último usado. Captura: `"$GODOT" --path . --resolution 1920x1080 -- --capture-title=<pasta>` tira 10 fotos (sem save e
   com save, os espaços, a confirmação e as Opções, no texto Normal e no Maior) e sai; o save das fotos fica na pasta da

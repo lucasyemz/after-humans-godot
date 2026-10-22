@@ -156,6 +156,8 @@ func new_game(seed_value: int = -1) -> bool:
 	state = create_initial(seed_value)
 	source = "new"
 	load_warning = ""
+	# O tempo jogado desde o último save é da campanha de antes, não da nova.
+	_play_seconds = 0.0
 	changed.emit()
 	return save()
 
@@ -204,7 +206,10 @@ func last_slot() -> int:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(path)) != OK or typeof(json.data) != TYPE_DICTIONARY:
 		return 1
-	var number := int(json.data.get("last", 1))
+	var last = json.data.get("last", 1)
+	if typeof(last) != TYPE_INT and typeof(last) != TYPE_FLOAT:
+		return 1
+	var number := int(last)
 	return number if number >= 1 and number <= SLOT_COUNT else 1
 
 
@@ -362,7 +367,11 @@ func load_or_new() -> String:
 	if campaign == null:
 		campaign = create_initial()
 		source = "new"
-		if has_save():
+		var other := range(1, SLOT_COUNT + 1).filter(func(n): return n != slot and slot_summary(n).status == "ok")
+		if has_save() and not other.is_empty():
+			# Só este espaço falhou: o aviso diz qual e onde estão as outras campanhas.
+			load_warning = "O save do espaço %d não pôde ser aberto (o arquivo foi preservado). As outras campanhas estão em Campanhas." % slot
+		elif has_save():
 			load_warning = "Nenhum salvamento válido foi encontrado. Os dados anteriores foram preservados; um novo jogo só será salvo ao começar."
 	# Saves anteriores às vagas não têm o tempo jogado (#34): começa em 0.
 	if not campaign.has("played_seconds"):
