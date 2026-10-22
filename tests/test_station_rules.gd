@@ -24,6 +24,7 @@ func run(t) -> void:
 	_loop(t)
 	_next_step(t)
 	_save_round_trip(t)
+	_undeployable(t)
 
 
 ## O próximo passo da Estação: na ordem do que pede atenção (relatório, noite, trem, cômodo, sucata, fase).
@@ -429,3 +430,20 @@ func _sleepers(t) -> void:
 		t.check(not pose.is_empty() and ResourceLoader.exists(pose.file), "%s tem a pose de dormir" % hero_id)
 	c.night.phase = "dawn"
 	t.equal(AHStation.sleepers(c), [], "no amanhecer ninguém fica deitado")
+
+
+## Uma classe sem arte de combate ainda (o rato do evento dos túneis) não parte: a rua e a luta não teriam como mostrá-la.
+func _undeployable(t) -> void:
+	var c := _campaign(13)
+	c.unlocked_classes.append("rato")
+	var risco := S.recruit(c, "rato", RandomNumberGenerator.new(), "Risco")
+	t.equal(risco.error, "", "o Risco chega à Estação")
+	var entry = S.hero(c, risco.hero_id)
+	t.check(not S.can_deploy(entry), "o rato ainda não tem arte de combate")
+	t.check(S.can_deploy(S.hero(c, "hero_cao_bento")), "os fundadores têm")
+	var cao := S.recruit(c, "cao", RandomNumberGenerator.new(), "Rex")
+	t.check(S.can_deploy(S.hero(c, cao.hero_id)), "o recruta cão usa a arte do Bento")
+	var team := [risco.hero_id, "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]
+	t.equal(S.confirm_departure(c, team, 0, 4242, "fase_1"), "Risco ainda não tem arte de combate e fica na Estação por enquanto.",
+		"a partida com o Risco é recusada, com o motivo")
+	t.equal(c.session.expedition, null, "e a expedição não começa")

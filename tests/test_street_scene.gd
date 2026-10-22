@@ -14,7 +14,7 @@ func run(t) -> void:
 	var tree: SceneTree = Engine.get_main_loop()
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
-	Campaign.save_dir = "user://test-recruit-party-%d" % Time.get_ticks_usec()
+	Campaign.save_dir = "user://test-street-scene-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(11)
 	var recruit := S.recruit(Campaign.state, "cao", RandomNumberGenerator.new(), "Rex")
 	var team := [recruit.hero_id, "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]

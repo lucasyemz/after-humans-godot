@@ -40,7 +40,14 @@ func run(t) -> void:
 			S.decide_candidate(c, c.station.train.candidate_id, false)
 			S.finish_departure(c)
 		t.equal(S.preparation_block(c), "", "a Estação fica livre para partir")
+		# Um fundador caído e o Risco (sem arte de combate) na Estação: a Preparação escala quem pode ir.
+		c.unlocked_classes.append("rato")
+		var risco: String = S.recruit(c, "rato", RandomNumberGenerator.new(), "Risco").hero_id
+		var rex: String = S.recruit(c, "cao", RandomNumberGenerator.new(), "Rex").hero_id
+		S.hero(c, "hero_cao_bento").alive = false
+		station.hud._draft = {}
 		station.hud.open_room(S.PREPARATION)
+		t.check(not station.hud._draft.team.has(risco) and station.hud._draft.team.has(rex), "a Preparação escala o Rex no lugar do Bento, não o Risco")
 		station.hud._depart()
 		station.hud._depart()
 		await tree.process_frame

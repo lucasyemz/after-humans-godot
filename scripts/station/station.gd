@@ -135,7 +135,6 @@ func _arrive(campaign: Dictionary) -> void:
 	S.receive_volunteers(campaign, rng)
 	Campaign.save()
 	_place_residents(rng)
-	_update_sleepers()
 	if not campaign.station.last_return.is_empty() and not campaign.station.last_return.get("seen", false):
 		hud.open_service("report")
 	elif campaign.night.phase != "none":

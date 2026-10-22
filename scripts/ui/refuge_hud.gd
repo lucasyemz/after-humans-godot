@@ -968,9 +968,9 @@ func _recruit(class_id: String) -> void:
 
 func _reset_draft() -> void:
 	var c: Dictionary = Campaign.state
-	var team: Array = c.preferred_formation.filter(func(id): return S.hero(c, id) != null and S.hero(c, id).alive)
+	var team: Array = c.preferred_formation.filter(func(id): return S.hero(c, id) != null and S.hero(c, id).alive and S.can_deploy(S.hero(c, id)))
 	for entry in S.living(c):
-		if team.size() < 4 and not team.has(entry.id):
+		if team.size() < 4 and not team.has(entry.id) and S.can_deploy(entry):
 			team.append(entry.id)
 	# A fase sugerida: a primeira liberada que falta concluir (ou a última, com todas feitas).
 	var next: String = J.PHASES[-1].id
@@ -1054,7 +1054,7 @@ func _preparation(c: Dictionary) -> void:
 
 func _cycle_slot(rank: int) -> void:
 	var c: Dictionary = Campaign.state
-	var candidates: Array = S.living(c).map(func(h): return h.id)
+	var candidates: Array = S.living(c).filter(func(h): return S.can_deploy(h)).map(func(h): return h.id)
 	var current_id: String = _draft.team[rank] if rank < _draft.team.size() else ""
 	var start := candidates.find(current_id)
 	for step in range(1, candidates.size() + 1):
@@ -1143,8 +1143,10 @@ func _prep_drawer(c: Dictionary) -> void:
 			button.text = "%s · %d/%d" % [entry.display_name, entry.hp, entry.max_hp]
 			button.custom_minimum_size = Vector2(0, 40)
 			H.style_button(button)
-			button.disabled = _prep_selected < 0
-			button.tooltip_text = "Escolha um cartão da equipe e clique aqui para trocar."
+			button.disabled = _prep_selected < 0 or not S.can_deploy(entry)
+			button.tooltip_text = "Escolha um cartão da equipe e clique aqui para trocar." if S.can_deploy(entry) else S.deploy_block(entry)
+			if not S.can_deploy(entry):
+				button.text += " · sem arte de combate"
 			button.pressed.connect(func(): _prep_bench(id))
 			bench_row.add_child(button)
 	var warning := _team_warning(c)

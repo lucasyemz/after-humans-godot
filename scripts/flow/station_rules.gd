@@ -865,6 +865,17 @@ static func validate_team(campaign: Dictionary, hero_ids: Array) -> String:
 	return ""
 
 
+## Quem pode ir para a rua: a rua e a luta mostram cada herói com a arte dele (os recrutas, com a do fundador da classe).
+## Uma classe sem arte nenhuma ainda (o rato e o tatu, liberados por eventos) fica na Estação até a arte chegar: antes
+## ela partia na equipe e sumia da rua e da luta, e a expedição lutava com três.
+static func can_deploy(entry) -> bool:
+	return entry != null and not AHCombatArena.hero_art_of(String(entry.id)).is_empty()
+
+
+static func deploy_block(entry) -> String:
+	return "" if can_deploy(entry) else "%s ainda não tem arte de combate e fica na Estação por enquanto." % entry.display_name
+
+
 ## Os ataques que a classe tem na posição (#95): cada um precisa de um ataque na posição em que parte.
 static func attacks_from_rank(class_id: String, rank: int) -> Array:
 	var out: Array = []
@@ -966,6 +977,8 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 		var entry = hero(campaign, team[rank - 1])
 		if entry == null or not entry.alive:
 			return "Só integrantes vivos podem partir."
+		if not can_deploy(entry):
+			return deploy_block(entry)
 		if attacks_from_rank(entry.class_id, rank).is_empty():
 			return "%s não tem ataque na posição %d." % [entry.display_name, rank]
 	var team_block := validate_team(campaign, team)
