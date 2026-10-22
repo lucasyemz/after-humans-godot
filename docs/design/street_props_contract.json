@@ -1,0 +1,517 @@
+{
+  "schema_note": "Contrato de arte de design; não é dado de produção",
+  "source_folder": "art/street/source/search_props/",
+  "props": {
+    "grocery_cash_counter": {
+      "group": "grocery",
+      "label": "Caixa",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 136.5,
+        "height": 135,
+        "depth": 65
+      },
+      "body_reference_pixels": 645,
+      "moving_region": [
+        123,
+        573,
+        931,
+        941
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        201,
+        315,
+        853,
+        961
+      ],
+      "open_bounds_alpha24": [
+        201,
+        315,
+        853,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "grocery_cash_counter_closed.png",
+        "grocery_cash_counter_open.png"
+      ]
+    },
+    "grocery_refrigerator": {
+      "group": "grocery",
+      "label": "Geladeira",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 97.0,
+        "height": 190,
+        "depth": 70
+      },
+      "body_reference_pixels": 815,
+      "moving_region": [
+        0,
+        259,
+        715,
+        896
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        324,
+        145,
+        740,
+        961
+      ],
+      "open_bounds_alpha24": [
+        59,
+        145,
+        740,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "grocery_refrigerator_closed.png",
+        "grocery_refrigerator_open.png"
+      ]
+    },
+    "grocery_shelving": {
+      "group": "grocery",
+      "label": "Prateleiras",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 115.7,
+        "height": 190,
+        "depth": 45
+      },
+      "body_reference_pixels": 806,
+      "moving_region": [
+        0,
+        299,
+        1024,
+        936
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        266,
+        154,
+        757,
+        960
+      ],
+      "open_bounds_alpha24": [
+        242,
+        154,
+        785,
+        960
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "grocery_shelving_closed.png",
+        "grocery_shelving_open.png"
+      ]
+    },
+    "workshop_workbench": {
+      "group": "workshop",
+      "label": "Bancada",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 134.6,
+        "height": 105,
+        "depth": 75
+      },
+      "body_reference_pixels": 536,
+      "moving_region": [
+        44,
+        607,
+        979,
+        941
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        168,
+        424,
+        855,
+        961
+      ],
+      "open_bounds_alpha24": [
+        168,
+        424,
+        876,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "workshop_workbench_closed.png",
+        "workshop_workbench_open.png"
+      ]
+    },
+    "workshop_engine": {
+      "group": "workshop",
+      "label": "Motor",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 118.4,
+        "height": 105,
+        "depth": 75
+      },
+      "body_reference_pixels": 635,
+      "moving_region": [
+        268,
+        548,
+        776,
+        941
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        153,
+        325,
+        869,
+        961
+      ],
+      "open_bounds_alpha24": [
+        153,
+        325,
+        869,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "workshop_engine_closed.png",
+        "workshop_engine_open.png"
+      ]
+    },
+    "workshop_parts_cabinet": {
+      "group": "workshop",
+      "label": "Armário de peças",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 133.3,
+        "height": 180,
+        "depth": 50
+      },
+      "body_reference_pixels": 805,
+      "moving_region": [
+        0,
+        187,
+        1024,
+        937
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        214,
+        155,
+        810,
+        961
+      ],
+      "open_bounds_alpha24": [
+        60,
+        155,
+        957,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "workshop_parts_cabinet_closed.png",
+        "workshop_parts_cabinet_open.png"
+      ]
+    },
+    "cinema_ticket_booth": {
+      "group": "cinema",
+      "label": "Bilheteria",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 144.0,
+        "height": 190,
+        "depth": 65
+      },
+      "body_reference_pixels": 785,
+      "moving_region": [
+        0,
+        529,
+        1024,
+        941
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        216,
+        175,
+        811,
+        961
+      ],
+      "open_bounds_alpha24": [
+        216,
+        175,
+        811,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "cinema_ticket_booth_closed.png",
+        "cinema_ticket_booth_open.png"
+      ]
+    },
+    "cinema_popcorn_cart": {
+      "group": "cinema",
+      "label": "Carrinho de pipoca",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 129.1,
+        "height": 165,
+        "depth": 65
+      },
+      "body_reference_pixels": 735,
+      "moving_region": [
+        0,
+        387,
+        1004,
+        917
+      ],
+      "protected_regions": [
+        [
+          613,
+          703,
+          774,
+          961
+        ]
+      ],
+      "closed_bounds_alpha24": [
+        199,
+        225,
+        774,
+        961
+      ],
+      "open_bounds_alpha24": [
+        199,
+        225,
+        774,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "cinema_popcorn_cart_closed.png",
+        "cinema_popcorn_cart_open.png"
+      ]
+    },
+    "cinema_stair_cabinet": {
+      "group": "cinema",
+      "label": "Armário sob a escada",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 142.6,
+        "height": 135,
+        "depth": 70
+      },
+      "body_reference_pixels": 642,
+      "moving_region": [
+        0,
+        492,
+        1024,
+        941
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        178,
+        318,
+        856,
+        964
+      ],
+      "open_bounds_alpha24": [
+        180,
+        318,
+        856,
+        964
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "cinema_stair_cabinet_closed.png",
+        "cinema_stair_cabinet_open.png"
+      ]
+    },
+    "street_crates": {
+      "group": "street",
+      "label": "Caixotes",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 103.8,
+        "height": 100,
+        "depth": 60
+      },
+      "body_reference_pixels": 575,
+      "moving_region": [
+        58,
+        0,
+        1013,
+        633
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        237,
+        385,
+        834,
+        961
+      ],
+      "open_bounds_alpha24": [
+        237,
+        169,
+        834,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "street_crates_closed.png",
+        "street_crates_open.png"
+      ]
+    },
+    "street_trash_can": {
+      "group": "street",
+      "label": "Latão",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 70.3,
+        "height": 95,
+        "depth": 60
+      },
+      "body_reference_pixels": 635,
+      "moving_region": [
+        137,
+        0,
+        889,
+        452
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        278,
+        325,
+        748,
+        961
+      ],
+      "open_bounds_alpha24": [
+        278,
+        233,
+        757,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "street_trash_can_closed.png",
+        "street_trash_can_open.png"
+      ]
+    },
+    "street_mailbox": {
+      "group": "street",
+      "label": "Caixa de correio",
+      "canvas": [
+        1024,
+        1024
+      ],
+      "anchor": [
+        512,
+        960
+      ],
+      "dimensions_cm": {
+        "width": 65.6,
+        "height": 125,
+        "depth": 45
+      },
+      "body_reference_pixels": 735,
+      "moving_region": [
+        0,
+        461,
+        782,
+        858
+      ],
+      "protected_regions": [],
+      "closed_bounds_alpha24": [
+        319,
+        225,
+        705,
+        961
+      ],
+      "open_bounds_alpha24": [
+        195,
+        225,
+        705,
+        961
+      ],
+      "fixed_pixels_identical": true,
+      "files": [
+        "street_mailbox_closed.png",
+        "street_mailbox_open.png"
+      ]
+    }
+  }
+}
