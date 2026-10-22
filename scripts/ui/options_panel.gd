@@ -241,6 +241,8 @@ func _toggle(text: String, on: bool, action: Callable) -> void:
 	check.add_theme_font_size_override("font_size", AHUiStyle.px(19))
 	check.add_theme_color_override("font_color", H.TEXT)
 	check.toggled.connect(func(value): action.call(value))
+	# O foco do teclado e do controle: as cantoneiras (#25), como nos botões.
+	AHFocusCorners.attach(check, AHFocusCorners.new())
 	add_child(check)
 
 

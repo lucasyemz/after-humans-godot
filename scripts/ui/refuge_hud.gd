@@ -1182,8 +1182,10 @@ func _prep_drawer(c: Dictionary) -> void:
 		_prep.add_theme_stylebox_override("panel", U.panel(0.94))
 		_prep.position = Vector2(24, 512)
 		_prep.size = Vector2(1872, 548)
+		_prep.minimum_size_changed.connect(_fit_prep)
 		_tags.add_sibling(_prep)
 	_prep.visible = true
+	_fit_prep.call_deferred()
 	for child in _prep.get_children():
 		_prep.remove_child(child)
 		child.queue_free()
@@ -1325,6 +1327,15 @@ func _prep_drawer(c: Dictionary) -> void:
 	go.pressed.connect(_depart)
 	go.disabled = size_block != ""
 	side.add_child(go)
+
+
+## A gaveta cresce para cima quando o conteúdo pede (texto Grande e Maior, molduras): o Partir nunca sai da tela.
+func _fit_prep() -> void:
+	if _prep == null or not is_instance_valid(_prep):
+		return
+	var height := maxf(548.0, _prep.get_combined_minimum_size().y)
+	_prep.size = Vector2(1872, height)
+	_prep.position.y = maxf(8.0, 1060.0 - height)
 
 
 func _side_box(parent: Container, title: String) -> VBoxContainer:

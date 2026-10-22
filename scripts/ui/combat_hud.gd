@@ -85,7 +85,7 @@ static func style_button(button: Button, accent: Color = GOLD, primary: bool = f
 	button.add_theme_stylebox_override("disabled", S.frame("button_disabled", 0.9, 1.0, margins))
 	var focus := AHFocusCorners.new()
 	focus.color = Color(accent, 1.0) if accent != GOLD else TEXT
-	button.add_theme_stylebox_override("focus", focus)
+	AHFocusCorners.attach(button, focus)
 	button.add_theme_color_override("font_color", TEXT)
 	button.add_theme_color_override("font_disabled_color", MUTED.darkened(0.3))
 	button.add_theme_font_size_override("font_size", S.px(20))
@@ -960,8 +960,9 @@ func bag_open() -> bool:
 ## ability_id: a habilidade mirada; apontar uma posição mostra todos que ela atinge dali e a dica com o resultado.
 func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id: String = "") -> void:
 	_clear_markers()
-	_set_enabled(false)
+	# Antes de desligar os cartões: o escolhido ganha a moldura de escolhida (_style_ability lê _choosing).
 	_choosing = ability_id if ability_id != "" else "move"
+	_set_enabled(false)
 	var team: Array = session.state.enemy_team if enemy_side else session.state.player_team
 	for rank in ranks:
 		var unit = AHCombatEngine._find(team, func(u): return session.engine.occupies_rank(u, rank) and AHCombatEngine.alive_any(u))

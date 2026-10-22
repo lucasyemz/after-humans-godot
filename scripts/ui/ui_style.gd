@@ -102,6 +102,10 @@ static func retune(root: Node, from_scale: float, from_ok: Color, from_danger: C
 							styles[style] = true
 							style.bg_color = _swap(style.bg_color, swaps)
 							style.border_color = _swap(style.border_color, swaps)
+						elif style is AHFocusCorners and not styles.has(style):
+							# O foco na cor de um estado (Recomeçar campanha, pendências) acompanha o daltonismo.
+							styles[style] = true
+							style.color = _swap(style.color, swaps)
 				if control is ColorRect:
 					control.color = _swap(control.color, swaps)
 				if control.material is ShaderMaterial and control.material.get_shader_parameter("ring") != null:
