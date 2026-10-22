@@ -63,7 +63,7 @@ func _ready() -> void:
 
 # ---------------------------------------------------------------- peças (usadas também pelas outras telas)
 
-static func panel_style(alpha: float = 0.9) -> StyleBoxFlat:
+static func panel_style(alpha: float = 0.9) -> StyleBox:
 	return S.panel(alpha)
 
 
@@ -75,19 +75,17 @@ static func make_bar(color: Color, height: float) -> ProgressBar:
 	return S.bar(color, height)
 
 
-static func style_button(button: Button, accent: Color = GOLD) -> void:
-	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
-		var style := S.panel(0.92, Color(S.COPPER, 0.5))
-		match state:
-			"hover", "focus":
-				style.border_color = accent
-				style.bg_color = Color(0.16, 0.12, 0.09, 0.95)
-			"pressed":
-				style.bg_color = Color(0.25, 0.18, 0.1, 0.95)
-			"disabled":
-				style.border_color = Color(0.3, 0.28, 0.26)
-				style.bg_color = Color(0.06, 0.06, 0.06, 0.85)
-		button.add_theme_stylebox_override(state, style)
+## O botão do jogo com as molduras do Codex (#20): normal, sobre (hover), pressionado (filete interno), desligado e, para
+## o comando principal, a barra lateral. O foco do teclado e do controle são as cantoneiras de fora (#25), na cor accent.
+static func style_button(button: Button, accent: Color = GOLD, primary: bool = false) -> void:
+	var margins := Vector4(20, 10, 20, 10)
+	button.add_theme_stylebox_override("normal", S.frame("button_primary" if primary else "button_normal", 0.96, 1.0, margins))
+	button.add_theme_stylebox_override("hover", S.frame("button_hover", 0.98, 1.0, margins))
+	button.add_theme_stylebox_override("pressed", S.frame("button_pressed", 0.98, 1.0, margins + Vector4(0, 2, 0, -2)))
+	button.add_theme_stylebox_override("disabled", S.frame("button_disabled", 0.9, 1.0, margins))
+	var focus := AHFocusCorners.new()
+	focus.color = Color(accent, 1.0) if accent != GOLD else TEXT
+	button.add_theme_stylebox_override("focus", focus)
 	button.add_theme_color_override("font_color", TEXT)
 	button.add_theme_color_override("font_disabled_color", MUTED.darkened(0.3))
 	button.add_theme_font_size_override("font_size", S.px(20))
@@ -259,7 +257,7 @@ func _art_of(unit: AHCombat.Unit) -> Dictionary:
 ## A placa sob os pés: nome e vida em número, a barra, o instinto (heróis) e os estados por extenso.
 func _make_plate(unit: AHCombat.Unit) -> Control:
 	var plate := PanelContainer.new()
-	var style := S.panel(0.84, Color(S.COPPER, 0.4), 1)
+	var style := S.flat(0.84, Color(S.COPPER, 0.4), 1)
 	style.content_margin_left = 8
 	style.content_margin_right = 8
 	style.content_margin_top = 4
@@ -534,6 +532,29 @@ func _set_enabled(enabled: bool) -> void:
 	for child in _abilities.get_children() + _actions.get_children():
 		if child is Button:
 			child.disabled = not enabled or child.get_meta("locked", false)
+			if child.has_meta("ability_id"):
+				_style_ability(child)
+
+
+## O cartão de habilidade com as molduras do Codex (#20, #25): normal; escolhida (o canto triangular) enquanto o jogador
+## escolhe o alvo; bloqueada (o corte diagonal, com o motivo escrito no cartão); e, desligada só porque outra foi
+## escolhida, a normal apagada.
+func _style_ability(button: Button) -> void:
+	var margins := Vector4(10, 8, 10, 8)
+	var chosen: bool = _choosing != "" and button.get_meta("ability_id", "") == _choosing
+	button.add_theme_stylebox_override("normal", S.frame("ability_normal", 0.96, 1.0, margins))
+	var hover := S.frame("ability_normal", 1.0, 1.0, margins)
+	hover.modulate_color = Color(1.18, 1.12, 1.0)
+	button.add_theme_stylebox_override("hover", hover)
+	button.add_theme_stylebox_override("pressed", S.frame("ability_selected", 1.0, 1.0, margins))
+	var disabled: StyleBoxTexture
+	if chosen:
+		disabled = S.frame("ability_selected", 1.0, 1.0, margins)
+	elif button.get_meta("locked", false):
+		disabled = S.frame("ability_locked", 0.92, 1.0, margins)
+	else:
+		disabled = S.frame("ability_normal", 0.6, 1.0, margins)
+	button.add_theme_stylebox_override("disabled", disabled)
 
 
 ## As bolinhas de posição: as do herói da direita (frente) para a esquerda, como na tela; as do inimigo da esquerda
@@ -652,7 +673,9 @@ func _build_abilities(take_focus: bool = true) -> void:
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 		button.set_meta("locked", not option.usable)
+		button.set_meta("ability_id", option.id)
 		button.disabled = not option.usable
+		_style_ability(button)
 		button.pressed.connect(_on_ability.bind(option))
 		button.focus_entered.connect(_describe.bind(option, button))
 		button.mouse_entered.connect(_describe.bind(option, button))

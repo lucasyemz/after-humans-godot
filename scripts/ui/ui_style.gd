@@ -132,7 +132,66 @@ static func _swap(color: Color, swaps: Array) -> Color:
 	return color
 
 
-static func panel(alpha: float = 0.9, border: Color = Color(COPPER, 0.55), width: int = 2) -> StyleBoxFlat:
+## As molduras de metal do Codex (#20, docs/design/ui-frames.md): 9-slice de 16 px em art/ui/frames/. scale < 1 reduz
+## a peça inteira (as teclas e as fichas pequenas, menores que os 32 px das duas bordas), feita na hora a partir da
+## mesma arte. margins: o conteúdo (esquerda, topo, direita, baixo).
+const FRAMES := "res://art/ui/frames/%s.png"
+const FRAME_SLICE := 16
+static var _frame_textures := {}
+
+
+static func frame_texture(kind: String, scale: float = 1.0) -> Texture2D:
+	var key := "%s@%.2f" % [kind, scale]
+	if not _frame_textures.has(key):
+		var texture: Texture2D = load(FRAMES % kind)
+		if not is_equal_approx(scale, 1.0):
+			var image := texture.get_image()
+			image.decompress()
+			image.resize(maxi(4, roundi(image.get_width() * scale)), maxi(4, roundi(image.get_height() * scale)), Image.INTERPOLATE_LANCZOS)
+			texture = ImageTexture.create_from_image(image)
+		_frame_textures[key] = texture
+	return _frame_textures[key]
+
+
+static func frame(kind: String, alpha: float = 1.0, scale: float = 1.0, margins: Vector4 = Vector4(20, 18, 20, 18)) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = frame_texture(kind, scale)
+	style.set_texture_margin_all(roundf(FRAME_SLICE * scale))
+	style.content_margin_left = margins.x
+	style.content_margin_top = margins.y
+	style.content_margin_right = margins.z
+	style.content_margin_bottom = margins.w
+	style.modulate_color = Color(1, 1, 1, alpha)
+	return style
+
+
+## A moldura de painel para uma borda: cobre (painel_normal) ou dourada (destaque); "" para as outras cores, que dizem
+## um estado (bom, ruim) e continuam desenhadas.
+static func _frame_kind(border: Color) -> String:
+	var hue := Color(border, 1.0)
+	if _near(hue, COPPER):
+		return "panel_normal"
+	if _near(hue, GOLD) or _near(hue, GOLD.darkened(0.2)):
+		return "panel_highlight"
+	return ""
+
+
+static func _near(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) < 0.08
+
+
+## O painel das telas: a moldura de metal quando a borda é a padrão (cobre) ou a de destaque (dourada) e tem 2 px ou
+## mais. As finas (placas e fichas pequenas) e as de estado (bom, ruim) continuam desenhadas (flat), para a cor do
+## estado aparecer e para o 9-slice caber.
+static func panel(alpha: float = 0.9, border: Color = Color(COPPER, 0.55), width: int = 2) -> StyleBox:
+	var kind := _frame_kind(border) if width >= 2 else ""
+	if kind != "":
+		return frame(kind, alpha, 1.0, Vector4(20, 14, 20, 14))
+	return flat(alpha, border, width)
+
+
+## O painel desenhado (o de antes das molduras): cor de estado, borda fina ou cantos próprios.
+static func flat(alpha: float = 0.9, border: Color = Color(COPPER, 0.55), width: int = 2) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(PANEL, alpha)
 	style.border_color = border
@@ -160,12 +219,7 @@ static func label(text: String, size: int = 20, color: Color = TEXT, kind: Strin
 ## Uma ficha: ícone (texto ou símbolo), rótulo e o número em destaque.
 static func chip(text: String, value: String = "", color: Color = GOLD) -> PanelContainer:
 	var box := PanelContainer.new()
-	var style := panel(0.86, Color(COPPER, 0.45), 1)
-	style.content_margin_left = 10
-	style.content_margin_right = 10
-	style.content_margin_top = 4
-	style.content_margin_bottom = 4
-	box.add_theme_stylebox_override("panel", style)
+	box.add_theme_stylebox_override("panel", frame("resource_chip", 0.92, 0.5, Vector4(10, 4, 10, 4)))
 	box.mouse_filter = Control.MOUSE_FILTER_PASS
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
@@ -289,17 +343,7 @@ static func is_back(event: InputEvent) -> bool:
 ## A tecla desenhada (a do teclado; o controle mostra a do gamepad).
 static func key_cap(text: String) -> PanelContainer:
 	var box := PanelContainer.new()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0, 0, 0, 0.55)
-	style.border_color = MUTED
-	style.set_border_width_all(1)
-	style.border_width_bottom = 3
-	style.set_corner_radius_all(4)
-	style.content_margin_left = 7
-	style.content_margin_right = 7
-	style.content_margin_top = 1
-	style.content_margin_bottom = 1
-	box.add_theme_stylebox_override("panel", style)
+	box.add_theme_stylebox_override("panel", frame("key_cap", 1.0, 0.5, Vector4(8, 2, 8, 3)))
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var l := label(text, 15, TEXT, "bold")
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

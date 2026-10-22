@@ -129,7 +129,7 @@ func _ready() -> void:
 
 	# A patrulha à frente, avisada da borda direita antes de entrar na tela.
 	_patrol = PanelContainer.new()
-	var patrol_style := S.panel(0.88, Color(S.GOLD, 0.6))
+	var patrol_style := S.flat(0.88, Color(S.GOLD, 0.6))
 	patrol_style.corner_radius_top_right = 0
 	patrol_style.corner_radius_bottom_right = 0
 	_patrol.add_theme_stylebox_override("panel", patrol_style)
@@ -365,7 +365,7 @@ func refresh(campaign: Dictionary) -> void:
 
 
 func _chip_style() -> StyleBoxFlat:
-	var style := S.panel(0.86, Color(S.COPPER, 0.45), 1)
+	var style := S.flat(0.86, Color(S.COPPER, 0.45), 1)
 	style.content_margin_left = 10
 	style.content_margin_right = 10
 	style.content_margin_top = 5

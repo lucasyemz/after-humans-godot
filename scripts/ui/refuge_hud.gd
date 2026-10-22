@@ -492,7 +492,9 @@ func _pending_row(text: String, action: Callable, color: Color) -> Button:
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.custom_minimum_size = Vector2(420, 44)
 	H.style_button(button, color)
-	var style: StyleBoxFlat = button.get_theme_stylebox("normal").duplicate()
+	# A barra de cor à esquerda diz o estado da pendência: o painel desenhado, não a moldura.
+	var style := U.flat(0.92, Color(U.COPPER, 0.5))
+	style.content_margin_left = 20
 	style.border_width_left = 4
 	style.border_color = color
 	button.add_theme_stylebox_override("normal", style)

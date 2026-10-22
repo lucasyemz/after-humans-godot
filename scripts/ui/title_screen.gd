@@ -81,19 +81,13 @@ func _build_buttons() -> void:
 func _title_button(text: String, primary: bool, callback: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
-	H.style_button(button)
+	# O principal é o botão com a barra lateral dourada (button_primary); os outros, cobre (a proposta).
+	H.style_button(button, S.GOLD, primary)
 	button.add_theme_font_size_override("font_size", S.px(28))
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	# O principal tem o filete dourado; os outros, cobre (a proposta).
-	for state in ["normal", "disabled"]:
-		var style: StyleBoxFlat = button.get_theme_stylebox(state).duplicate()
-		style.border_color = S.GOLD if primary else Color(S.COPPER, 0.7)
-		style.content_margin_left = 28
-		button.add_theme_stylebox_override(state, style)
-	for state in ["hover", "pressed", "focus"]:
-		var style: StyleBoxFlat = button.get_theme_stylebox(state).duplicate()
-		style.content_margin_left = 28
-		style.set_border_width_all(3)
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var style: StyleBox = button.get_theme_stylebox(state).duplicate()
+		style.content_margin_left = 32
 		button.add_theme_stylebox_override(state, style)
 	button.pressed.connect(func():
 		if _leaving or GameFlow.busy:
