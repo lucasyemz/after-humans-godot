@@ -57,6 +57,7 @@ func run(t) -> void:
 				elif absf(shift) > 0.001:
 					moved_doors += 100
 			t.equal(moved_doors, 1, "a porta da mercearia andou 3 m com o prédio, as outras não")
+	await _saved_house(t, tree, packed)
 	if tree.current_scene != null:
 		tree.unload_current_scene()
 	await tree.process_frame
@@ -77,3 +78,41 @@ func _open(tree: SceneTree):
 			await tree.process_frame
 			return tree.current_scene
 	return null
+
+
+## Um save com uma casa na última porta (a do Building7) e o prédio arrastado para fora do corredor no editor: a rua abre
+## sem erro, com as mesmas portas (o índice salvo continua valendo) e a porta dentro do corredor.
+func _saved_house(t, tree: SceneTree, packed: PackedScene) -> void:
+	var copy: Node = packed.instantiate()
+	copy.get_node("Building7").position.x += 10.0
+	copy.get_node("Building1").position.x += 4.0
+	var edited := PackedScene.new()
+	edited.pack(copy)
+	copy.free()
+	var path := Campaign.save_dir.path_join("street_set_doors.tscn")
+	ResourceSaver.save(edited, path)
+	var base_doors: Array = (await _open(tree)).door_list()
+	Campaign.state = Campaign.create_initial(8)
+	AHJourneyRules.start_expedition(Campaign.state, "fase_1", 2)
+	var route: Dictionary = Campaign.state.session.expedition.corridor
+	AHJourneyRules.assign_search_sites(route, base_doors.map(func(d): return d.step), base_doors.map(func(d): return d.shop))
+	var last: int = base_doors.size() - 1
+	if not route.sites.any(func(s): return s.door == last):
+		route.sites[0].door = last
+		route.sites[0].step = base_doors[last].step
+	AHStreetSet.scene_path = path
+	GameFlow.change_to("street", {}, false)
+	var street = null
+	for frame in 600:
+		await tree.process_frame
+		if not GameFlow.busy and tree.current_scene != null and tree.current_scene.get("corridor") != null:
+			street = tree.current_scene
+			break
+	AHStreetSet.scene_path = AHStreetSet.SCENE
+	if t.check(street != null, "a rua abre com a cena mexida e o save antigo"):
+		for frame in 10:
+			await tree.process_frame
+		var doors: Array = street.door_list()
+		t.equal(doors.size(), base_doors.size(), "as mesmas portas no corredor (o índice salvo continua valendo)")
+		t.equal(doors.map(func(d): return d.shop), base_doors.map(func(d): return d.shop), "cada índice continua sendo a mesma loja")
+		t.check(doors.all(func(d): return d.x >= 0.0 and d.x <= AHStreetSet.ue(7800, 0, 0).x), "as portas ficam dentro do corredor")

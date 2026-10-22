@@ -297,14 +297,17 @@ func door_list() -> Array:
 		var building: Array = AHStreetSet.FACADE_BUILDINGS[index]
 		var overlay: Rect2 = AHStreetSet.DOOR_OVERLAYS[building[1]]
 		var offset: float = (overlay.position.x + overlay.size.x * 0.5 - 768.0) * AHStreetSet.FACADE_WIDTH / 1536.0
-		# O meio do prédio vem da cena (o nó BuildingN, na ordem de FACADE_BUILDINGS): movido no editor, a porta vai junto.
-		var center: float = (building[0] + AHStreetSet.FACADE_WIDTH * 0.5) * 0.01
+		# Quais portas estão no corredor e o trecho de cada uma vêm da montagem original: o save guarda a porta pelo índice
+		# nesta lista, e mexer na cena não pode trocá-lo. O X vem da cena (o nó BuildingN, na ordem de FACADE_BUILDINGS):
+		# movido no editor, a porta onde se entra vai junto, sem sair do corredor.
+		var base: float = (building[0] + AHStreetSet.FACADE_WIDTH * 0.5 + (-offset if building[2] else offset)) * 0.01
+		if base < 0.0 or base >= CORRIDOR_LENGTH:
+			continue
+		var x := base
 		var node := _set.get_node_or_null("Building%d" % (index + 1)) as Node3D if _set else null
 		if node != null:
-			center = node.global_position.x
-		var x: float = center + (-offset if building[2] else offset) * 0.01
-		if x >= 0.0 and x < CORRIDOR_LENGTH:
-			doors.append({"x": x, "shop": building[1], "mirror": building[2], "step": floori(x / (CORRIDOR_LENGTH / 10.0))})
+			x = clampf(base + node.global_position.x - (building[0] + AHStreetSet.FACADE_WIDTH * 0.5) * 0.01, 0.5, CORRIDOR_LENGTH - 0.5)
+		doors.append({"x": x, "shop": building[1], "mirror": building[2], "step": floori(base / (CORRIDOR_LENGTH / 10.0))})
 	return doors
 
 

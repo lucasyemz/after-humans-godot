@@ -124,7 +124,8 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   e silhuetas, com a colisão de cada um), e a rua do jogo carrega essa cena. Cada peça é um nó (`Lamp1`, `Building3`,
   `Car2`, `Prop7`, `Alley4`...) com a placa, a colisão (`Collider`), a luz e o halo dela.
   - Pode mexer à mão (vale no jogo): mover, girar ou apagar postes, luzes de porta, carros, props, becos e silhuetas;
-    mover os prédios no X (`Building1` a `Building7`): a porta da loja, onde se entra, vai junto.
+    mover os prédios no X (`Building1` a `Building7`): a porta da loja, onde se entra, vai junto (sem sair do corredor
+    de 0 a 78 m; quais lojas têm porta e o trecho de cada uma ficam os da montagem, para os saves continuarem valendo).
   - Continua no código (mexer na cena não muda): a frente da calçada e a altura do piso, os limites por onde a equipe
     anda, o comprimento do corredor (78 m, 10 trechos) e o lado de cada porta. Uma peça girada colide certo, mas o
     teste de ponto livre ao pôr a equipe (`_blocked`) usa a caixa sem a rotação.
