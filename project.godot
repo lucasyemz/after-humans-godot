@@ -180,6 +180,11 @@ hide_hud={
 ]
 }
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://data/i18n/en.po")
+locale/fallback="pt_BR"
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=2

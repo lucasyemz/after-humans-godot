@@ -1,0 +1,55 @@
+# Literais das telas convertidas que parecem texto mas não são (#35): nomes de nó, teclas, campos dos dados, arquivos e
+# formatos sem palavra. Um por linha: "arquivo: texto" (escapes do GDScript valem: \n). O teste tests/test_i18n.gd
+# acusa o literal que não está no PO nem aqui.
+title_screen.gd: Slot%d
+title_screen.gd: shot 
+options_panel.gd: A
+options_panel.gd: B
+options_panel.gd: Start
+options_panel.gd: RB
+options_panel.gd: %dx
+options_panel.gd: %d%%
+exploration_hud.gd: %s · %s
+exploration_hud.gd: %d/%d
+exploration_hud.gd: E  
+exploration_hud.gd: [%s]  %s
+exploration_hud.gd: Title
+exploration_hud.gd: Description
+exploration_hud.gd: Choices
+exploration_hud.gd: Text
+exploration_hud.gd:   (%s)
+combat_hud.gd: Q
+combat_hud.gd: W
+combat_hud.gd: I
+combat_hud.gd: F
+combat_hud.gd: Top
+combat_hud.gd: Name
+combat_hud.gd: Hp
+combat_hud.gd: Instinct
+combat_hud.gd: Intent
+combat_hud.gd: Status
+combat_hud.gd: status-%s_%s
+combat_hud.gd: Icon
+combat_hud.gd: Count
+combat_hud.gd: Top/HpText
+combat_hud.gd: IntentRow/Intent
+combat_hud.gd: %s → %s
+combat_hud.gd: %d–%d
+combat_hud.gd: +%d–%d
+combat_hud.gd: combat_ability_%d
+combat_hud.gd: %s: %s
+combat_hud.gd: %s\n%s
+combat_hud.gd: %d/%d
+combat_hud.gd: Description
+refuge_hud.gd: %s: %s · %s%s
+refuge_hud.gd: %s · %s
+refuge_hud.gd: %s · %s · %s
+refuge_hud.gd: %s · %d/%d
+refuge_hud.gd: Role
+refuge_hud.gd: Description
+refuge_hud.gd: +%d %s
+refuge_hud.gd: %s%s
+refuge_hud.gd: %s (%s)%s
+refuge_hud.gd: %s · %s (%s)
+refuge_hud.gd: %d. %s
+refuge_hud.gd: %s %s%s (%s)

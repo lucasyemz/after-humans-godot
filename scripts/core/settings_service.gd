@@ -35,6 +35,11 @@ const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run"
 	"combat_ability_1", "combat_ability_2", "combat_ability_3", "combat_ability_4", "combat_move", "combat_defend", "combat_flee", "hide_hud"]
 
 
+## O idioma das telas (#35): o português é o padrão e o inglês está em teste (data/i18n/en.po; o que falta traduzir
+## aparece em português). A chave de cada texto é o próprio português.
+const LANGUAGES := [["pt_BR", "Português"], ["en", "English (em teste)"]]
+var language := "pt_BR"
+
 ## Nos scripts de teste e nas capturas as opções valem só na memória (nada é gravado na pasta de quem joga).
 var _persist := true
 
@@ -52,13 +57,19 @@ func _ready() -> void:
 		text_size = clampi(int(config.get_value("accessibility", "text_size", text_size)), 0, TEXT_SIZES.size() - 1)
 		touch_controls = clampi(int(config.get_value("controls", "touch", touch_controls)), 0, TOUCH_MODES.size() - 1)
 		keys = config.get_value("controls", "keys", {})
+		language = _known_language(String(config.get_value("interface", "language", language)))
 	# --text-size=N nas capturas: confere as telas com o texto maior (só na memória).
 	for arg in args:
 		if String(arg).begins_with("--text-size="):
 			text_size = clampi(int(String(arg).get_slice("=", 1)), 0, TEXT_SIZES.size() - 1)
 		elif String(arg) == "--touch":
 			touch_controls = 1
+		# --language=en nas capturas: as telas em outro idioma (só na memória).
+		elif String(arg).begins_with("--language="):
+			language = _known_language(String(arg).get_slice("=", 1))
 	apply_controls()
+	# O idioma vem das opções, nunca do sistema (num Windows em inglês o jogo abria em inglês).
+	TranslationServer.set_locale(language)
 	AHUiStyle.text_scale = TEXT_SCALE[text_size]
 	AHUiStyle.install.call_deferred(get_tree().root)
 	apply()
@@ -151,6 +162,22 @@ func set_text_size(value: int) -> void:
 	AHUiStyle.retune(get_tree().root, scale, AHUiStyle.OK, AHUiStyle.DANGER)
 
 
+## Troca o idioma na hora: os textos fixos das telas mudam sozinhos; as telas montadas com texto formatado se refazem
+## ao receber changed (ou ao abrir de novo).
+func set_language(code: String) -> void:
+	language = _known_language(code)
+	TranslationServer.set_locale(language)
+	_store()
+	changed.emit()
+
+
+static func _known_language(code: String) -> String:
+	for entry in LANGUAGES:
+		if entry[0] == code:
+			return code
+	return "pt_BR"
+
+
 func set_touch_controls(value: int) -> void:
 	touch_controls = clampi(value, 0, TOUCH_MODES.size() - 1)
 	_store()
@@ -189,6 +216,7 @@ func _store() -> void:
 	config.set_value("accessibility", "text_size", text_size)
 	config.set_value("controls", "keys", keys)
 	config.set_value("controls", "touch", touch_controls)
+	config.set_value("interface", "language", language)
 	config.save(PATH)
 	apply()
 

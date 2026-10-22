@@ -70,7 +70,7 @@ func _ready() -> void:
 	left.add_theme_constant_override("separation", 8)
 	left.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(left)
-	_place_name = S.label(place, 36, S.TEXT, "display")
+	_place_name = S.label(tr(place), 36, S.TEXT, "display")
 	left.add_child(_place_name)
 	_place_sub = S.label("", S.MIN_TEXT, S.TEXT)
 	left.add_child(_place_sub)
@@ -82,7 +82,7 @@ func _ready() -> void:
 	goal_box.add_theme_constant_override("separation", 3)
 	goal_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	goal.add_child(goal_box)
-	goal_box.add_child(S.label("OBJETIVO DA ROTA", 15, S.COPPER, "bold"))
+	goal_box.add_child(S.label(tr("OBJETIVO DA ROTA"), 15, S.COPPER, "bold"))
 	_goal_title = S.label("", 21, S.TEXT, "bold")
 	goal_box.add_child(_goal_title)
 	_goal_text = S.label("", 17, S.MUTED)
@@ -145,7 +145,7 @@ func _ready() -> void:
 	patrol_box.add_theme_constant_override("separation", 4)
 	patrol_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_patrol.add_child(patrol_box)
-	patrol_box.add_child(S.label("Patrulha à frente  ▶", S.MIN_TEXT, S.TEXT, "bold"))
+	patrol_box.add_child(S.label(tr("Patrulha à frente  ▶"), S.MIN_TEXT, S.TEXT, "bold"))
 	_patrol_bar = S.bar(S.GOLD, 8)
 	_patrol_bar.max_value = 1.0
 	_patrol_bar.custom_minimum_size = Vector2(200, 8)
@@ -169,7 +169,7 @@ func _ready() -> void:
 
 	# Botões sempre à mão (mouse): a Mochila, o menu e, com o guardião vencido, concluir a jornada.
 	_finish_button = Button.new()
-	_finish_button.text = "Concluir jornada · Voltar à Estação"
+	_finish_button.text = tr("Concluir jornada · Voltar à Estação")
 	_finish_button.position = Vector2(1500, 900)
 	_finish_button.custom_minimum_size = Vector2(392, 52)
 	H.style_button(_finish_button)
@@ -178,8 +178,8 @@ func _ready() -> void:
 	_finish_button.visible = false
 	_finish_button.pressed.connect(func(): menu_return.emit())
 	add_child(_finish_button)
-	_menu_button = _corner_button("Menu", "menu", Vector2(1716, 974), func(): menu_requested.emit())
-	_corner_button("Mochila", "inventory", Vector2(1524, 974), func(): inventory_requested.emit())
+	_menu_button = _corner_button(tr("Menu"), "menu", Vector2(1716, 974), func(): menu_requested.emit())
+	_corner_button(tr("Mochila"), "inventory", Vector2(1524, 974), func(): inventory_requested.emit())
 
 	# O aviso também é botão: tocar ou clicar nele usa o que está perto.
 	_prompt = PanelContainer.new()
@@ -249,12 +249,12 @@ func set_weather(text: String) -> void:
 func _refresh_place() -> void:
 	if _place_name == null:
 		return
-	_place_name.text = place
+	_place_name.text = tr(place)
 	var expedition = Campaign.state.get("session", {}).get("expedition")
 	var parts := PackedStringArray()
 	if expedition != null:
 		var info := AHJourneyRules.phase(expedition.phase_id)
-		parts.append("Jornada %d · %s" % [AHJourneyRules.PHASES.find(info) + 1, info.get("name", "")])
+		parts.append(tr("Jornada %d · %s") % [AHJourneyRules.PHASES.find(info) + 1, info.get("name", "")])
 	if _weather != "":
 		parts.append(_weather)
 	_place_sub.text = " · ".join(parts)
@@ -278,18 +278,18 @@ func refresh(campaign: Dictionary) -> void:
 	var focus := AHStationRules.focus_def(expedition.get("focus", ""))
 	var boss_step: int = route.steps.size()
 	if focus.is_empty():
-		_goal_title.text = "Vencer o guardião (trecho %d)" % boss_step
-		_goal_text.text = "Rota básica: o achado das buscas volta com a equipe."
+		_goal_title.text = tr("Vencer o guardião (trecho %d)") % boss_step
+		_goal_text.text = tr("Rota básica: o achado das buscas volta com a equipe.")
 	elif expedition.get("objective_done", false):
-		_goal_title.text = "✓ %s: cumprido" % AHStationRules.focus_label(focus.id)
-		_goal_text.text = "%s, entregue na volta. O guardião espera no trecho %d." % [AHStationRules.focus_reward_text(focus.id), boss_step]
+		_goal_title.text = tr("✓ %s: cumprido") % AHStationRules.focus_label(focus.id)
+		_goal_text.text = tr("%s, entregue na volta. O guardião espera no trecho %d.") % [AHStationRules.focus_reward_text(focus.id), boss_step]
 	else:
 		_goal_title.text = "%s · %s" % [AHStationRules.focus_label(focus.id), AHStationRules.focus_reward_text(focus.id)]
-		_goal_text.text = ("Procure nas casas e nos caixotes." if place == "Rua das Vitrines" else "Procure nos objetos marcados do caminho.") + \
-			" O guardião espera no trecho %d." % boss_step
+		_goal_text.text = (tr("Procure nas casas e nos caixotes.") if place == "Rua das Vitrines" else tr("Procure nos objetos marcados do caminho.")) + \
+			tr(" O guardião espera no trecho %d.") % boss_step
 	if expedition.objective_completed:
-		_goal_title.text = "✓ Guardião vencido"
-		_goal_text.text = "Fase concluída: volte à Estação com todo o achado (botão ou %s)." % S.key_name("menu")
+		_goal_title.text = tr("✓ Guardião vencido")
+		_goal_text.text = tr("Fase concluída: volte à Estação com todo o achado (botão ou %s).") % S.key_name("menu")
 	# A rota: cada trecho com o ícone do que é (os não alcançados ficam como "?"), ligados como trilho.
 	_clear(_route_row)
 	for index in route.steps.size():
@@ -327,10 +327,10 @@ func refresh(campaign: Dictionary) -> void:
 			node.add_child(q)
 		_route_row.add_child(node)
 	var current: Dictionary = route.steps[route.index]
-	var title := "Trecho %d de %d · %s" % [route.index + 1, route.steps.size(), STEP_LABELS.get(current.type, "")]
+	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(current.type, ""))]
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
-		title = "Dentro %s" % ("do cinema" if site.shop == 2 else "da " + AHJourneyRules.SHOP_NAMES[site.shop])
+		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + AHJourneyRules.SHOP_NAMES[site.shop])
 	_route_title.text = title
 	_route_panel.size = _route_panel.get_combined_minimum_size()
 	_route_panel.position = Vector2(960 - _route_panel.size.x * 0.5, 16)
@@ -338,9 +338,9 @@ func refresh(campaign: Dictionary) -> void:
 	# Os recursos: comida, curativos, esperança e o achado, com ícone e dica.
 	_clear(_supplies)
 	var food: int = expedition.food
-	_supplies.add_child(_supply("lobby-food", "Comida", "%d/%d" % [food, AHJourneyRules.MAX_FOOD], "Da expedição: cura (Mochila, I) e o acampamento. O que sobrar não volta.", S.DANGER if food == 0 else S.GOLD))
-	_supplies.add_child(_supply("res-bandages", "Curativos", str(campaign.inventory.bandages), "Do refúgio: +8 de vida. Voltam ao refúgio."))
-	_supplies.add_child(_supply("res-hope", "Esperança", str(expedition.hope), "O ânimo da equipe: alto, a crise de instinto tende à superação; baixo, ao colapso."))
+	_supplies.add_child(_supply("lobby-food", tr("Comida"), "%d/%d" % [food, AHJourneyRules.MAX_FOOD], tr("Da expedição: cura (Mochila, I) e o acampamento. O que sobrar não volta."), S.DANGER if food == 0 else S.GOLD))
+	_supplies.add_child(_supply("res-bandages", tr("Curativos"), str(campaign.inventory.bandages), tr("Do refúgio: +8 de vida. Voltam ao refúgio.")))
+	_supplies.add_child(_supply("res-hope", tr("Esperança"), str(expedition.hope), tr("O ânimo da equipe: alto, a crise de instinto tende à superação; baixo, ao colapso.")))
 	var loot := HBoxContainer.new()
 	loot.add_theme_constant_override("separation", 4)
 	loot.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -349,12 +349,12 @@ func refresh(campaign: Dictionary) -> void:
 		loot.add_child(S.label(str(spec[1]), S.MIN_TEXT, S.TEXT, "bold"))
 	var loot_chip := PanelContainer.new()
 	loot_chip.add_theme_stylebox_override("panel", _chip_style())
-	loot_chip.tooltip_text = "Achado da jornada: sementes, sucata e fragmentos. Tudo chega com a fase concluída; metade, na retirada."
+	loot_chip.tooltip_text = tr("Achado da jornada: sementes, sucata e fragmentos. Tudo chega com a fase concluída; metade, na retirada.")
 	loot_chip.mouse_filter = Control.MOUSE_FILTER_PASS
 	var loot_row := HBoxContainer.new()
 	loot_row.add_theme_constant_override("separation", 6)
 	loot_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	loot_row.add_child(S.label("Achado", S.MIN_TEXT, S.MUTED))
+	loot_row.add_child(S.label(tr("Achado"), S.MIN_TEXT, S.MUTED))
 	loot_row.add_child(loot)
 	loot_chip.add_child(loot_row)
 	_clear(_loot_row)
@@ -436,7 +436,7 @@ func _mate(hero: Dictionary) -> PanelContainer:
 func show_prompt(text: String, where = null) -> void:
 	_prompt.visible = text != ""
 	if text.begins_with("E  "):
-		var key := "Toque" if Settings.touch_visible() else S.key_name("interact")
+		var key := tr("Toque") if Settings.touch_visible() else S.key_name("interact")
 		text = "[%s]  %s" % [key, text.substr(3)]
 	_prompt_label.text = text
 	_prompt_world = where
@@ -512,7 +512,7 @@ func set_markers(points: Array) -> void:
 func set_patrol(where, meter: float, detected: bool) -> void:
 	_patrol_world = where
 	_patrol_bar.value = meter
-	_patrol_text.text = "avistou a equipe!" if detected else ("desconfiada" if meter > 0.25 else "não viu a equipe")
+	_patrol_text.text = tr("avistou a equipe!") if detected else (tr("desconfiada") if meter > 0.25 else tr("não viu a equipe"))
 	_patrol_text.add_theme_color_override("font_color", S.DANGER if detected else (S.GOLD if meter > 0.25 else S.MUTED))
 
 
@@ -639,24 +639,24 @@ func show_event(campaign: Dictionary) -> void:
 		box.add_child(picture)
 		# Com a ilustração, o cartão sobe para as escolhas caberem na tela, logo abaixo da barra de trechos.
 		_modal.position.y = 125
-	var title := H.make_label(row.get("Title", ""), 34, H.GOLD)
+	var title := H.make_label(tr(row.get("Title", "")), 34, H.GOLD)
 	box.add_child(title)
 	# O que se vasculhou (#7): o evento vem do objeto.
 	if String(event.get("object", "")) != "":
-		box.add_child(H.make_label("Ao vasculhar: %s" % String(event.object), 17, H.MUTED))
-	var text := H.make_label(event.resolution if event.resolution != "" else row.get("Description", ""), 20, H.TEXT)
+		box.add_child(H.make_label(tr("Ao vasculhar: %s") % String(event.object), 17, H.MUTED))
+	var text := H.make_label(tr(event.resolution) if event.resolution != "" else tr(row.get("Description", "")), 20, H.TEXT)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(780, 0)
 	box.add_child(text)
 	var first: Button
 	if event.resolution != "":
-		first = _button("Continuar", func(): event_closed.emit())
+		first = _button(tr("Continuar"), func(): event_closed.emit())
 		box.add_child(first)
 	else:
 		for choice in row.get("Choices", []):
 			var available := AHJourneyRules.can_choose(campaign, choice)
-			var label: String = choice.get("Text", "")
-			var requirement: String = choice.get("RequirementText", "")
+			var label: String = tr(choice.get("Text", ""))
+			var requirement: String = tr(choice.get("RequirementText", ""))
 			if requirement != "":
 				label += "  (%s)" % requirement
 			var button := _button(label, func(): event_choice.emit(choice.Id), available)
@@ -672,8 +672,8 @@ func show_event(campaign: Dictionary) -> void:
 ## Painel do acampamento: cada herói com vida e instinto, comer e curativo; levantar acampamento.
 func show_camp(campaign: Dictionary) -> void:
 	var box := _open_modal(860)
-	box.add_child(H.make_label("Acampamento", 34, H.GOLD))
-	var note := H.make_label("A porta fechada e a fogueira acesa. Comer: +10%% de vida e -5 de instinto (comida %d). Curativo: +8 de vida (curativos %d)." % [
+	box.add_child(H.make_label(tr("Acampamento"), 34, H.GOLD))
+	var note := H.make_label(tr("A porta fechada e a fogueira acesa. Comer: +10%% de vida e -5 de instinto (comida %d). Curativo: +8 de vida (curativos %d).") % [
 		AHJourneyRules.food(campaign), campaign.inventory.bandages], 18, H.MUTED)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(820, 0)
@@ -685,20 +685,20 @@ func show_camp(campaign: Dictionary) -> void:
 			continue
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 12)
-		var label := H.make_label("%s · Vida %d/%d · Instinto %d" % [hero.display_name, hero.hp, hero.max_hp, hero.instinct], 20, H.TEXT)
+		var label := H.make_label(tr("%s · Vida %d/%d · Instinto %d") % [hero.display_name, hero.hp, hero.max_hp, hero.instinct], 20, H.TEXT)
 		label.custom_minimum_size = Vector2(420, 0)
 		row.add_child(label)
-		var eat := _button("Comer", func(): camp_food.emit(hero_id),
+		var eat := _button(tr("Comer"), func(): camp_food.emit(hero_id),
 			AHJourneyRules.food(campaign) > 0 and (hero.hp < hero.max_hp or hero.instinct > 0))
 		eat.custom_minimum_size = Vector2(150, 44)
 		row.add_child(eat)
-		var heal := _button("Curativo", func(): camp_bandage.emit(hero_id), campaign.inventory.bandages > 0 and hero.hp < hero.max_hp)
+		var heal := _button(tr("Curativo"), func(): camp_bandage.emit(hero_id), campaign.inventory.bandages > 0 and hero.hp < hero.max_hp)
 		heal.custom_minimum_size = Vector2(150, 44)
 		row.add_child(heal)
 		box.add_child(row)
 		if first == null:
 			first = eat if not eat.disabled else (heal if not heal.disabled else null)
-	var leave := _button("Levantar acampamento", func(): camp_leave.emit())
+	var leave := _button(tr("Levantar acampamento"), func(): camp_leave.emit())
 	box.add_child(leave)
 	(first if first else leave).grab_focus.call_deferred()
 
@@ -710,16 +710,16 @@ func show_camp(campaign: Dictionary) -> void:
 func show_menu(completed: bool, can_return: bool) -> void:
 	var box := _open_modal(620)
 	_modal.set_meta("menu", true)
-	box.add_child(H.make_label("Pausa", 34, H.GOLD))
-	var resume := _button("Continuar", close_modal)
+	box.add_child(H.make_label(tr("Pausa"), 34, H.GOLD))
+	var resume := _button(tr("Continuar"), close_modal)
 	box.add_child(resume)
-	var text := "Voltar à Estação (fase concluída: todo o achado)" if completed else "Voltar à Estação (retirada: metade do achado)"
+	var text := tr("Voltar à Estação (fase concluída: todo o achado)") if completed else tr("Voltar à Estação (retirada: metade do achado)")
 	var back := _button(text, func(): _confirm_return(completed), can_return)
 	box.add_child(back)
 	if not can_return:
-		box.add_child(H.make_label("Termine a luta ou o evento antes de voltar.", 18, H.MUTED))
-	box.add_child(_button("Opções", show_options))
-	box.add_child(_button("Nova campanha", _confirm_new_campaign))
+		box.add_child(H.make_label(tr("Termine a luta ou o evento antes de voltar."), 18, H.MUTED))
+	box.add_child(_button(tr("Opções"), show_options))
+	box.add_child(_button(tr("Nova campanha"), _confirm_new_campaign))
 	resume.grab_focus.call_deferred()
 
 
@@ -756,7 +756,7 @@ func show_choice(title: String, text: String, options: Array) -> void:
 		var hero = Campaign.hero(hero_id)
 		if hero != null and hero.alive:
 			team.add_child(_mate(hero))
-	box.add_child(S.label("Comida %d/%d · Curativos %d · Achado: %d sementes, %d sucata, %d fragmentos" % [expedition.food, AHJourneyRules.MAX_FOOD,
+	box.add_child(S.label(tr("Comida %d/%d · Curativos %d · Achado: %d sementes, %d sucata, %d fragmentos") % [expedition.food, AHJourneyRules.MAX_FOOD,
 		Campaign.state.inventory.bandages, expedition.loot.seeds, expedition.loot.scrap, expedition.loot.fragments], 17, S.MUTED))
 	var first: Button
 	for option in options:
@@ -791,14 +791,14 @@ func show_options() -> void:
 func _confirm_new_campaign() -> void:
 	var box := _open_modal(620)
 	_modal.set_meta("menu", true)
-	box.add_child(H.make_label("Começar uma campanha nova?", 34, H.GOLD))
-	var note := H.make_label("A expedição e todo o progresso salvo são substituídos por uma campanha do zero, na Estação.", 20, H.TEXT)
+	box.add_child(H.make_label(tr("Começar uma campanha nova?"), 34, H.GOLD))
+	var note := H.make_label(tr("A expedição e todo o progresso salvo são substituídos por uma campanha do zero, na Estação."), 20, H.TEXT)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(580, 0)
 	box.add_child(note)
-	var stay := _button("Cancelar", close_modal)
+	var stay := _button(tr("Cancelar"), close_modal)
 	box.add_child(stay)
-	box.add_child(_button("Começar do zero", func():
+	box.add_child(_button(tr("Começar do zero"), func():
 		close_modal()
 		new_campaign.emit()))
 	stay.grab_focus.call_deferred()
@@ -821,14 +821,14 @@ func _confirm_return(completed: bool) -> void:
 		return
 	var box := _open_modal(620)
 	_modal.set_meta("menu", true)
-	box.add_child(H.make_label("Abandonar a expedição?", 34, H.GOLD))
-	var note := H.make_label("A equipe volta pelo trem sem enfrentar o guardião: só metade do achado chega à Estação.", 20, H.TEXT)
+	box.add_child(H.make_label(tr("Abandonar a expedição?"), 34, H.GOLD))
+	var note := H.make_label(tr("A equipe volta pelo trem sem enfrentar o guardião: só metade do achado chega à Estação."), 20, H.TEXT)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(580, 0)
 	box.add_child(note)
-	var stay := _button("Continuar a expedição", close_modal)
+	var stay := _button(tr("Continuar a expedição"), close_modal)
 	box.add_child(stay)
-	box.add_child(_button("Voltar à Estação", func():
+	box.add_child(_button(tr("Voltar à Estação"), func():
 		close_modal()
 		menu_return.emit()))
 	stay.grab_focus.call_deferred()
@@ -839,19 +839,19 @@ func _confirm_return(completed: bool) -> void:
 ## Fim da expedição: o que aconteceu e o que chega ao refúgio. delivered vem de AHJourneyRules.finish_return.
 func show_result(result: String, delivered: Dictionary, campaign: Dictionary, button_text: String) -> void:
 	var box := _open_modal(720)
-	var titles := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fuga", "defeat": "Derrota"}
-	var notes := {"victory": ("A Rua das Vitrines está liberada." if place == "Rua das Vitrines" else "%s: o guardião caiu." % place) + " Todo o achado chega à Estação.",
-		"retreat": "A equipe volta antes do guardião: metade do achado chega à Estação.",
-		"fled": "Na fuga, a equipe larga o que carregava.", "defeat": "A equipe caiu %s. O achado ficou para trás." % ("na rua" if place == "Rua das Vitrines" else "no caminho")}
+	var titles := {"victory": tr("Vitória"), "retreat": tr("Retirada"), "fled": tr("Fuga"), "defeat": tr("Derrota")}
+	var notes := {"victory": (tr("A Rua das Vitrines está liberada.") if place == "Rua das Vitrines" else tr("%s: o guardião caiu.") % tr(place)) + tr(" Todo o achado chega à Estação."),
+		"retreat": tr("A equipe volta antes do guardião: metade do achado chega à Estação."),
+		"fled": tr("Na fuga, a equipe larga o que carregava."), "defeat": tr("A equipe caiu %s. O achado ficou para trás.") % (tr("na rua") if place == "Rua das Vitrines" else tr("no caminho"))}
 	box.add_child(H.make_label(titles.get(result, result), 44, H.GOLD))
 	var note := H.make_label(notes.get(result, ""), 20, H.TEXT)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(680, 0)
 	box.add_child(note)
-	box.add_child(H.make_label("Chegou à Estação: %d sementes · %d sucata · %d fragmentos" % [delivered.get("seeds", 0),
+	box.add_child(H.make_label(tr("Chegou à Estação: %d sementes · %d sucata · %d fragmentos") % [delivered.get("seeds", 0),
 		delivered.get("scrap", 0), delivered.get("fragments", 0)], 20, H.MUTED))
 	var alive: Array = campaign.roster.filter(func(h): return h.alive)
-	box.add_child(H.make_label("Heróis vivos: %d · No memorial: %d" % [alive.size(), campaign.memorial.size()], 18, H.MUTED))
+	box.add_child(H.make_label(tr("Heróis vivos: %d · No memorial: %d") % [alive.size(), campaign.memorial.size()], 18, H.MUTED))
 	var button := _button(button_text, func(): result_continue.emit())
 	box.add_child(button)
 	button.grab_focus.call_deferred()

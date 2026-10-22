@@ -1,0 +1,184 @@
+## Os textos de tela para a tradução (#35), lidos do código e dos dados: a ferramenta tools/i18n_update.gd (que atualiza
+## data/i18n/en.po) e o teste tests/test_i18n.gd usam a mesma leitura.
+##
+## A chave de cada texto é o próprio texto em português (o msgid do PO): em português o jogo mostra a chave, igual a
+## antes; em inglês, a tradução, ou a chave quando ela falta. Nas telas convertidas, todo literal que parece texto de
+## tela tem de estar no PO ou na lista do que não é texto (tools/i18n_ignore.txt); e o texto com %s/%d passa por tr()
+## antes da formatação. Nos dados, os campos de texto das tabelas viram chaves, sem mudar os ids.
+extends RefCounted
+
+const PO := "res://data/i18n/en.po"
+const IGNORE := "res://tools/i18n_ignore.txt"
+## As telas convertidas (a primeira leva: o título, as Opções, o HUD da exploração e da luta e a Estação).
+const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/ui/options_panel.gd", "res://scripts/core/settings_service.gd",
+	"res://scripts/ui/exploration_hud.gd",
+	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/refuge_hud.gd"]
+## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
+const DATA_FIELDS := {
+	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],
+	"enemies": ["DisplayName", "Description"], "enemy-actions": ["DisplayName", "Description"], "events": ["Title", "Description"],
+	"expedition-nodes": ["Title", "Description"], "perks": ["DisplayName", "Description"], "relics": ["DisplayName", "Description"],
+	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
+}
+
+
+## Os literais de uma linha de código (sem o comentário): [[texto, coluna], ...]. O texto vem sem as aspas, com os escapes
+## do GDScript resolvidos (\n, \", \\).
+static func literals(line: String) -> Array:
+	var found: Array = []
+	var i := 0
+	while i < line.length():
+		var c := line[i]
+		if c == "#":
+			break
+		if c == "\"":
+			var start := i
+			var text := ""
+			i += 1
+			while i < line.length() and line[i] != "\"":
+				if line[i] == "\\" and i + 1 < line.length():
+					var next := line[i + 1]
+					text += "\n" if next == "n" else ("\t" if next == "t" else next)
+					i += 2
+					continue
+				text += line[i]
+				i += 1
+			found.append([text, start])
+		i += 1
+	return found
+
+
+## Parece texto de tela: tem letra e não é caminho, id, ação, nome de campo (CamelCase) nem argumento de linha de comando.
+static func looks_like_text(text: String) -> bool:
+	var letters := RegEx.create_from_string("[A-Za-zÀ-ú]")
+	if letters.search(text) == null or text.contains("://") or text.begins_with("--"):
+		return false
+	if RegEx.create_from_string("^[a-z0-9_.:\\-/]*$").search(text) != null:
+		return false
+	if RegEx.create_from_string("^[A-Z][a-z0-9]+([A-Z][A-Za-z0-9]*)+$").search(text) != null:
+		return false
+	if RegEx.create_from_string("^[a-z_]+[A-Z]").search(text) != null:
+		return false
+	return true
+
+
+## Os textos de tela de um script: [{text, line, wrapped}], wrapped quando o literal está logo dentro de tr( ou
+## translate( (o texto formatado precisa disso). Todo literal dentro de tr() conta, mesmo uma palavra minúscula.
+static func screen_texts(path: String) -> Array:
+	var out: Array = []
+	var lines := FileAccess.get_file_as_string(path).split("\n")
+	for number in lines.size():
+		var line: String = lines[number]
+		if line.strip_edges().begins_with("#"):
+			continue
+		for found in literals(line):
+			var text: String = found[0]
+			var before := line.substr(0, found[1]).strip_edges(false, true)
+			var wrapped := before.ends_with("tr(") or before.ends_with("translate(")
+			# O que passa por tr() é texto, mesmo minúsculo ("menu", "água"); fora dele, só o que parece texto.
+			if not wrapped and not looks_like_text(text):
+				continue
+			out.append({"text": text, "line": number + 1, "wrapped": wrapped})
+	return out
+
+
+## Os textos dos dados: [{text, where}] (where = "tabela.id.campo").
+static func data_texts() -> Array:
+	var out: Array = []
+	for table in DATA_FIELDS:
+		var rows = JSON.parse_string(FileAccess.get_file_as_string("res://data/%s.json" % table))
+		var entries: Array = []
+		if typeof(rows) == TYPE_DICTIONARY:
+			for id in rows:
+				entries.append([str(id), rows[id]])
+		elif typeof(rows) == TYPE_ARRAY:
+			for index in rows.size():
+				entries.append([str(index), rows[index]])
+		for entry in entries:
+			if typeof(entry[1]) != TYPE_DICTIONARY:
+				continue
+			for field in DATA_FIELDS[table]:
+				var value = entry[1].get(field)
+				if typeof(value) == TYPE_STRING and String(value).strip_edges() != "":
+					out.append({"text": value, "where": "%s.%s.%s" % [table, entry[0], field]})
+	return out
+
+
+## A lista do que parece texto mas não é (nomes de nó, teclas, unidades): "arquivo: texto" por linha.
+static func ignored() -> Dictionary:
+	var out := {}
+	if not FileAccess.file_exists(IGNORE):
+		return out
+	for line in FileAccess.get_file_as_string(IGNORE).split("\n"):
+		if line.strip_edges() == "" or line.begins_with("#"):
+			continue
+		var cut := line.find(": ")
+		if cut > 0:
+			out[line.substr(0, cut) + ": " + line.substr(cut + 2).c_unescape()] = true
+	return out
+
+
+## O PO lido à mão: {msgid: {str, plural, strs, refs}} na ordem do arquivo (o tradutor e o teste veem o mesmo).
+static func read_po(path: String = PO) -> Dictionary:
+	var entries := {}
+	if not FileAccess.file_exists(path):
+		return entries
+	var current := {}
+	var field := ""
+	var refs: Array = []
+	for raw in FileAccess.get_file_as_string(path).split("\n"):
+		var line := raw.strip_edges()
+		# As obsoletas (#~) também valem: o texto que volta recupera a tradução.
+		if line.begins_with("#~ "):
+			line = line.substr(3)
+		if line.begins_with("#:") or line.begins_with("#."):
+			refs.append(line.substr(2).strip_edges())
+			continue
+		if line.begins_with("msgid "):
+			if current.has("id") and current.id != "":
+				entries[current.id] = current
+			current = {"id": _po_string(line.substr(6)), "str": "", "plural": "", "strs": [], "refs": refs}
+			refs = []
+			field = "id"
+		elif line.begins_with("msgid_plural "):
+			current.plural = _po_string(line.substr(13))
+			field = "plural"
+		elif line.begins_with("msgstr["):
+			current.strs.append(_po_string(line.substr(line.find("]") + 2)))
+			field = "strs"
+		elif line.begins_with("msgstr "):
+			current.str = _po_string(line.substr(7))
+			field = "str"
+		elif line.begins_with("\"") and not current.is_empty():
+			var more := _po_string(line)
+			match field:
+				"id":
+					current.id += more
+				"plural":
+					current.plural += more
+				"str":
+					current.str += more
+				"strs":
+					current.strs[-1] += more
+	if current.has("id") and current.id != "":
+		entries[current.id] = current
+	return entries
+
+
+static func _po_string(quoted: String) -> String:
+	var inner := quoted.strip_edges()
+	if inner.length() >= 2 and inner.begins_with("\"") and inner.ends_with("\""):
+		inner = inner.substr(1, inner.length() - 2)
+	return inner.c_unescape()
+
+
+static func po_quote(text: String) -> String:
+	return "\"" + text.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\t", "\\t") + "\""
+
+
+## Os marcadores de formato (%s, %d, %02d, %%) de um texto, na ordem.
+static func placeholders(text: String) -> Array:
+	var out: Array = []
+	for found in RegEx.create_from_string("%[-0-9.]*[sdfx%]").search_all(text):
+		out.append(found.get_string())
+	return out

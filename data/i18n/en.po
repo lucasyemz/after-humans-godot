@@ -1,0 +1,2657 @@
+# After Humans: os textos em inglês (#35). A chave (msgid) é o texto em português; msgstr vazio mostra o português.
+# Gerado por tools/i18n_update.gd: as traduções se mantêm; rode de novo depois de mexer nas telas ou nos dados.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: scripts/ui/title_screen.gd:76
+#: scripts/ui/exploration_hud.gd:653
+#: scripts/ui/exploration_hud.gd:714
+#: scripts/ui/combat_hud.gd:1166
+msgid "Continuar"
+msgstr "Continue"
+
+#: scripts/ui/title_screen.gd:77
+#: scripts/ui/exploration_hud.gd:722
+#: scripts/ui/refuge_hud.gd:892
+msgid "Nova campanha"
+msgstr "New campaign"
+
+#: scripts/ui/title_screen.gd:81
+#: scripts/ui/title_screen.gd:211
+msgid "Campanhas"
+msgstr "Campaigns"
+
+#: scripts/ui/title_screen.gd:82
+#: scripts/ui/options_panel.gd:34
+#: scripts/ui/exploration_hud.gd:721
+#: scripts/ui/refuge_hud.gd:153
+msgid "Opções"
+msgstr "Options"
+
+#: scripts/ui/title_screen.gd:211
+msgid "Em qual espaço começar?"
+msgstr "Which slot should the new campaign use?"
+
+#: scripts/ui/title_screen.gd:226
+#: scripts/ui/options_panel.gd:14
+msgid "Voltar"
+msgstr "Back"
+
+#: scripts/ui/title_screen.gd:234
+msgid "Espaço %d"
+msgstr "Slot %d"
+
+#: scripts/ui/title_screen.gd:235
+msgid " (último usado)"
+msgstr " (last used)"
+
+#: scripts/ui/title_screen.gd:238
+msgid "%s — vazio"
+msgstr "%s — empty"
+
+#: scripts/ui/title_screen.gd:240
+msgid "%s — o save não abre"
+msgstr "%s — the save won't open"
+
+#: scripts/ui/title_screen.gd:243
+msgid "%d h %02d min"
+msgstr "%d h %02d min"
+
+#: scripts/ui/title_screen.gd:244
+msgid "%d min"
+msgstr "%d min"
+
+#: scripts/ui/title_screen.gd:245
+msgid "%d fase"
+msgstr "%d phase"
+
+#: scripts/ui/title_screen.gd:245
+msgid "%d fases"
+msgstr "%d phases"
+
+#: scripts/ui/title_screen.gd:246
+msgid "%s — Ciclo %d · %s · %d de %d vivos\n%02d/%02d/%d %02d:%02d · %s jogados%s"
+msgstr "%s — Cycle %d · %s · %d of %d alive\n%02d/%02d/%d %02d:%02d · %s played%s"
+
+#: scripts/ui/title_screen.gd:248
+msgid " · em expedição"
+msgstr " · on an expedition"
+
+#: scripts/ui/title_screen.gd:265
+#: scripts/ui/exploration_hud.gd:794
+msgid "Começar uma campanha nova?"
+msgstr "Start a new campaign?"
+
+#: scripts/ui/title_screen.gd:266
+msgid "Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero. Os outros espaços ficam como estão."
+msgstr "All progress saved in slot %d (completed phases, rooms, resources and heroes) is replaced by a fresh campaign. The other slots stay as they are."
+
+#: scripts/ui/title_screen.gd:267
+msgid "O save do espaço %d não pôde ser aberto. Uma campanha nova grava por cima dele, e ele não volta mais."
+msgstr "The save in slot %d could not be opened. A new campaign writes over it, and it won't come back."
+
+#: scripts/ui/title_screen.gd:272
+#: scripts/ui/exploration_hud.gd:799
+#: scripts/ui/refuge_hud.gd:894
+msgid "Cancelar"
+msgstr "Cancel"
+
+#: scripts/ui/title_screen.gd:274
+#: scripts/ui/exploration_hud.gd:801
+#: scripts/ui/refuge_hud.gd:895
+msgid "Começar do zero"
+msgstr "Start from scratch"
+
+#: scripts/ui/options_panel.gd:13
+msgid "Andar para a esquerda"
+msgstr "Walk left"
+
+#: scripts/ui/options_panel.gd:13
+msgid "Andar para a direita"
+msgstr "Walk right"
+
+#: scripts/ui/options_panel.gd:13
+msgid "Para o fundo"
+msgstr "Move back"
+
+#: scripts/ui/options_panel.gd:14
+msgid "Para a frente"
+msgstr "Move forward"
+
+#: scripts/ui/options_panel.gd:14
+msgid "Correr"
+msgstr "Run"
+
+#: scripts/ui/options_panel.gd:14
+msgid "Interagir"
+msgstr "Interact"
+
+#: scripts/ui/options_panel.gd:14
+#: scripts/ui/exploration_hud.gd:182
+#: scripts/ui/combat_hud.gd:22
+#: scripts/ui/combat_hud.gd:915
+msgid "Mochila"
+msgstr "Backpack"
+
+#: scripts/ui/options_panel.gd:14
+#: scripts/ui/exploration_hud.gd:181
+msgid "Menu"
+msgstr "Menu"
+
+#: scripts/ui/options_panel.gd:15
+msgid "Luta: habilidade 1"
+msgstr "Combat: ability 1"
+
+#: scripts/ui/options_panel.gd:15
+msgid "Luta: habilidade 2"
+msgstr "Combat: ability 2"
+
+#: scripts/ui/options_panel.gd:15
+msgid "Luta: habilidade 3"
+msgstr "Combat: ability 3"
+
+#: scripts/ui/options_panel.gd:16
+msgid "Luta: habilidade 4"
+msgstr "Combat: ability 4"
+
+#: scripts/ui/options_panel.gd:16
+msgid "Luta: mover"
+msgstr "Combat: move"
+
+#: scripts/ui/options_panel.gd:16
+msgid "Luta: defender"
+msgstr "Combat: defend"
+
+#: scripts/ui/options_panel.gd:16
+msgid "Luta: fugir"
+msgstr "Combat: flee"
+
+#: scripts/ui/options_panel.gd:17
+msgid "Estação: ocultar a interface"
+msgstr "Station: hide the interface"
+
+#: scripts/ui/options_panel.gd:35
+msgid "Som"
+msgstr "Sound"
+
+#: scripts/ui/options_panel.gd:36
+msgid "Música"
+msgstr "Music"
+
+#: scripts/ui/options_panel.gd:36
+msgid "Ambiente"
+msgstr "Ambience"
+
+#: scripts/ui/options_panel.gd:36
+msgid "Efeitos"
+msgstr "Effects"
+
+#: scripts/ui/options_panel.gd:39
+msgid "Gráficos"
+msgstr "Graphics"
+
+#: scripts/ui/options_panel.gd:51
+msgid "Qualidade: resolução interna, sombras, oclusão, neblina e quantidade de chuva."
+msgstr "Quality: internal resolution, shadows, occlusion, fog and amount of rain."
+
+#: scripts/ui/options_panel.gd:53
+msgid "Tela cheia"
+msgstr "Fullscreen"
+
+#: scripts/ui/options_panel.gd:54
+msgid "Sincronia vertical (vsync)"
+msgstr "Vertical sync (vsync)"
+
+#: scripts/ui/options_panel.gd:56
+msgid "Jogo"
+msgstr "Game"
+
+#: scripts/ui/options_panel.gd:62
+msgid "Velocidade da batalha"
+msgstr "Battle speed"
+
+#: scripts/ui/options_panel.gd:72
+msgid "Reduzir efeitos (clima, tremor e clarão)"
+msgstr "Reduce effects (weather, shake and flash)"
+
+#: scripts/ui/options_panel.gd:77
+msgid "Dicas da primeira vez"
+msgstr "First-time tips"
+
+#: scripts/ui/options_panel.gd:78
+msgid "Cores para daltonismo (azul e laranja)"
+msgstr "Colorblind colors (blue and orange)"
+
+#: scripts/ui/options_panel.gd:86
+msgid "Tamanho do texto"
+msgstr "Text size"
+
+#: scripts/ui/options_panel.gd:100
+msgid "Idioma"
+msgstr "Language"
+
+#: scripts/ui/options_panel.gd:110
+msgid "Mostrar as dicas de novo"
+msgstr "Show the tips again"
+
+#: scripts/ui/options_panel.gd:119
+msgid "Controles"
+msgstr "Controls"
+
+#: scripts/ui/options_panel.gd:125
+msgid "Controles de toque"
+msgstr "Touch controls"
+
+#: scripts/ui/options_panel.gd:135
+msgid "Analógico à esquerda para andar (até a borda corre) e Usar à direita; o aviso de interação também aceita toque."
+msgstr "Stick on the left to walk (all the way out to run) and Use on the right; the interaction prompt also takes a tap."
+
+#: scripts/ui/options_panel.gd:136
+msgid "Trocar: clique e aperte a tecla nova (Esc cancela). Se outra ação usava a tecla, as duas trocam."
+msgstr "Change: click and press the new key (Esc cancels). If another action used that key, the two swap."
+
+#: scripts/ui/options_panel.gd:148
+msgid "Aperte uma tecla…"
+msgstr "Press a key…"
+
+#: scripts/ui/options_panel.gd:148
+#: scripts/ui/refuge_hud.gd:1098
+msgid "Trocar"
+msgstr "Change"
+
+#: scripts/ui/options_panel.gd:160
+msgid "Restaurar as teclas padrão"
+msgstr "Restore default keys"
+
+#: scripts/ui/options_panel.gd:167
+msgid "Mouse: clique nos botões e nos alvos da luta."
+msgstr "Mouse: click the buttons and the combat targets."
+
+#: scripts/ui/options_panel.gd:170
+msgid "Campanha"
+msgstr "Campaign"
+
+#: scripts/ui/options_panel.gd:172
+msgid "Nova campanha…"
+msgstr "New campaign…"
+
+#: scripts/ui/options_panel.gd:179
+msgid "Fechar"
+msgstr "Close"
+
+#: scripts/ui/options_panel.gd:311
+msgid "Controle "
+msgstr "Controller "
+
+#: scripts/core/settings_service.gd:11
+msgid "Baixo"
+msgstr "Low"
+
+#: scripts/core/settings_service.gd:11
+msgid "Médio"
+msgstr "Medium"
+
+#: scripts/core/settings_service.gd:11
+msgid "Alto"
+msgstr "High"
+
+#: scripts/core/settings_service.gd:11
+msgid "Ultra"
+msgstr "Ultra"
+
+#: scripts/core/settings_service.gd:25
+msgid "Normal"
+msgstr "Normal"
+
+#: scripts/core/settings_service.gd:25
+msgid "Grande"
+msgstr "Large"
+
+#: scripts/core/settings_service.gd:25
+msgid "Maior"
+msgstr "Largest"
+
+#: scripts/core/settings_service.gd:29
+msgid "Automático"
+msgstr "Automatic"
+
+#: scripts/core/settings_service.gd:29
+msgid "Sempre"
+msgstr "Always"
+
+#: scripts/core/settings_service.gd:29
+msgid "Desligados"
+msgstr "Off"
+
+#: scripts/core/settings_service.gd:40
+msgid "Português"
+msgstr "Português"
+
+#: scripts/core/settings_service.gd:40
+msgid "English (em teste)"
+msgstr "English (beta)"
+
+#: scripts/ui/exploration_hud.gd:20
+#: scripts/ui/refuge_hud.gd:1502
+msgid "Partida"
+msgstr "Start"
+
+#: scripts/ui/exploration_hud.gd:20
+msgid "Patrulha"
+msgstr "Patrol"
+
+#: scripts/ui/exploration_hud.gd:20
+#: scripts/ui/refuge_hud.gd:1116
+msgid "Suprimentos"
+msgstr "Supplies"
+
+#: scripts/ui/exploration_hud.gd:20
+msgid "Descanso"
+msgstr "Rest"
+
+#: scripts/ui/exploration_hud.gd:20
+msgid "Passagem"
+msgstr "Passage"
+
+#: scripts/ui/exploration_hud.gd:21
+msgid "Guardião"
+msgstr "Guardian"
+
+#: scripts/ui/exploration_hud.gd:24
+#: scripts/ui/exploration_hud.gd:288
+#: scripts/ui/exploration_hud.gd:843
+#: scripts/ui/exploration_hud.gd:845
+msgid "Rua das Vitrines"
+msgstr "Shopfront Street"
+
+#: scripts/ui/exploration_hud.gd:85
+msgid "OBJETIVO DA ROTA"
+msgstr "ROUTE GOAL"
+
+#: scripts/ui/exploration_hud.gd:148
+msgid "Patrulha à frente  ▶"
+msgstr "Patrol ahead  ▶"
+
+#: scripts/ui/exploration_hud.gd:172
+msgid "Concluir jornada · Voltar à Estação"
+msgstr "Finish the journey · Back to the Station"
+
+#: scripts/ui/exploration_hud.gd:257
+msgid "Jornada %d · %s"
+msgstr "Journey %d · %s"
+
+#: scripts/ui/exploration_hud.gd:281
+msgid "Vencer o guardião (trecho %d)"
+msgstr "Defeat the guardian (stretch %d)"
+
+#: scripts/ui/exploration_hud.gd:282
+msgid "Rota básica: o achado das buscas volta com a equipe."
+msgstr "Basic route: what the searches find comes back with the team."
+
+#: scripts/ui/exploration_hud.gd:284
+msgid "✓ %s: cumprido"
+msgstr "✓ %s: done"
+
+#: scripts/ui/exploration_hud.gd:285
+msgid "%s, entregue na volta. O guardião espera no trecho %d."
+msgstr "%s, delivered on the way back. The guardian waits at stretch %d."
+
+#: scripts/ui/exploration_hud.gd:288
+msgid "Procure nas casas e nos caixotes."
+msgstr "Search the houses and the crates."
+
+#: scripts/ui/exploration_hud.gd:288
+msgid "Procure nos objetos marcados do caminho."
+msgstr "Search the marked objects along the way."
+
+#: scripts/ui/exploration_hud.gd:289
+msgid " O guardião espera no trecho %d."
+msgstr " The guardian waits at stretch %d."
+
+#: scripts/ui/exploration_hud.gd:291
+msgid "✓ Guardião vencido"
+msgstr "✓ Guardian defeated"
+
+#: scripts/ui/exploration_hud.gd:292
+msgid "Fase concluída: volte à Estação com todo o achado (botão ou %s)."
+msgstr "Phase complete: go back to the Station with everything you found (button or %s)."
+
+#: scripts/ui/exploration_hud.gd:330
+msgid "Trecho %d de %d · %s"
+msgstr "Stretch %d of %d · %s"
+
+#: scripts/ui/exploration_hud.gd:333
+msgid "Dentro %s"
+msgstr "Inside %s"
+
+#: scripts/ui/exploration_hud.gd:333
+msgid "do cinema"
+msgstr "the cinema"
+
+#: scripts/ui/exploration_hud.gd:333
+msgid "da "
+msgstr "the "
+
+#: scripts/ui/exploration_hud.gd:341
+msgid "Comida"
+msgstr "Food"
+
+#: scripts/ui/exploration_hud.gd:341
+msgid "Da expedição: cura (Mochila, I) e o acampamento. O que sobrar não volta."
+msgstr "Expedition food: heals (Backpack, I) and feeds the camp. Leftovers don't come back."
+
+#: scripts/ui/exploration_hud.gd:342
+msgid "Curativos"
+msgstr "Bandages"
+
+#: scripts/ui/exploration_hud.gd:342
+msgid "Do refúgio: +8 de vida. Voltam ao refúgio."
+msgstr "From the shelter: +8 health. They go back to the shelter."
+
+#: scripts/ui/exploration_hud.gd:343
+msgid "Esperança"
+msgstr "Hope"
+
+#: scripts/ui/exploration_hud.gd:343
+msgid "O ânimo da equipe: alto, a crise de instinto tende à superação; baixo, ao colapso."
+msgstr "The team's morale: high, an instinct crisis leans toward a breakthrough; low, toward a collapse."
+
+#: scripts/ui/exploration_hud.gd:352
+msgid "Achado da jornada: sementes, sucata e fragmentos. Tudo chega com a fase concluída; metade, na retirada."
+msgstr "What the journey found: seeds, scrap and fragments. All of it arrives when the phase is complete; half on a retreat."
+
+#: scripts/ui/exploration_hud.gd:357
+msgid "Achado"
+msgstr "Found"
+
+#: scripts/ui/exploration_hud.gd:439
+msgid "Toque"
+msgstr "Tap"
+
+#: scripts/ui/exploration_hud.gd:515
+msgid "avistou a equipe!"
+msgstr "spotted the team!"
+
+#: scripts/ui/exploration_hud.gd:515
+msgid "desconfiada"
+msgstr "suspicious"
+
+#: scripts/ui/exploration_hud.gd:515
+msgid "não viu a equipe"
+msgstr "hasn't seen the team"
+
+#: scripts/ui/exploration_hud.gd:646
+msgid "Ao vasculhar: %s"
+msgstr "While searching: %s"
+
+#: scripts/ui/exploration_hud.gd:675
+msgid "Acampamento"
+msgstr "Camp"
+
+#: scripts/ui/exploration_hud.gd:676
+msgid "A porta fechada e a fogueira acesa. Comer: +10%% de vida e -5 de instinto (comida %d). Curativo: +8 de vida (curativos %d)."
+msgstr "The door is shut and the fire is lit. Eat: +10%% health and -5 instinct (food %d). Bandage: +8 health (bandages %d)."
+
+#: scripts/ui/exploration_hud.gd:688
+msgid "%s · Vida %d/%d · Instinto %d"
+msgstr "%s · Health %d/%d · Instinct %d"
+
+#: scripts/ui/exploration_hud.gd:691
+msgid "Comer"
+msgstr "Eat"
+
+#: scripts/ui/exploration_hud.gd:695
+msgid "Curativo"
+msgstr "Bandage"
+
+#: scripts/ui/exploration_hud.gd:701
+msgid "Levantar acampamento"
+msgstr "Break camp"
+
+#: scripts/ui/exploration_hud.gd:713
+msgid "Pausa"
+msgstr "Pause"
+
+#: scripts/ui/exploration_hud.gd:716
+msgid "Voltar à Estação (fase concluída: todo o achado)"
+msgstr "Back to the Station (phase complete: everything found)"
+
+#: scripts/ui/exploration_hud.gd:716
+msgid "Voltar à Estação (retirada: metade do achado)"
+msgstr "Back to the Station (retreat: half of what was found)"
+
+#: scripts/ui/exploration_hud.gd:720
+msgid "Termine a luta ou o evento antes de voltar."
+msgstr "Finish the fight or the event before going back."
+
+#: scripts/ui/exploration_hud.gd:759
+msgid "Comida %d/%d · Curativos %d · Achado: %d sementes, %d sucata, %d fragmentos"
+msgstr "Food %d/%d · Bandages %d · Found: %d seeds, %d scrap, %d fragments"
+
+#: scripts/ui/exploration_hud.gd:795
+msgid "A expedição e todo o progresso salvo são substituídos por uma campanha do zero, na Estação."
+msgstr "The expedition and all saved progress are replaced by a fresh campaign, at the Station."
+
+#: scripts/ui/exploration_hud.gd:824
+msgid "Abandonar a expedição?"
+msgstr "Abandon the expedition?"
+
+#: scripts/ui/exploration_hud.gd:825
+msgid "A equipe volta pelo trem sem enfrentar o guardião: só metade do achado chega à Estação."
+msgstr "The team takes the train back without facing the guardian: only half of what was found reaches the Station."
+
+#: scripts/ui/exploration_hud.gd:829
+msgid "Continuar a expedição"
+msgstr "Continue the expedition"
+
+#: scripts/ui/exploration_hud.gd:831
+msgid "Voltar à Estação"
+msgstr "Back to the Station"
+
+#: scripts/ui/exploration_hud.gd:842
+#: scripts/ui/combat_hud.gd:1140
+#: scripts/ui/refuge_hud.gd:12
+msgid "Vitória"
+msgstr "Victory"
+
+#: scripts/ui/exploration_hud.gd:842
+#: scripts/ui/refuge_hud.gd:12
+msgid "Retirada"
+msgstr "Retreat"
+
+#: scripts/ui/exploration_hud.gd:842
+#: scripts/ui/combat_hud.gd:1140
+#: scripts/ui/refuge_hud.gd:12
+msgid "Fuga"
+msgstr "Escape"
+
+#: scripts/ui/exploration_hud.gd:842
+#: scripts/ui/combat_hud.gd:1140
+#: scripts/ui/refuge_hud.gd:12
+msgid "Derrota"
+msgstr "Defeat"
+
+#: scripts/ui/exploration_hud.gd:843
+msgid "A Rua das Vitrines está liberada."
+msgstr "Shopfront Street is clear."
+
+#: scripts/ui/exploration_hud.gd:843
+msgid "%s: o guardião caiu."
+msgstr "%s: the guardian fell."
+
+#: scripts/ui/exploration_hud.gd:843
+msgid " Todo o achado chega à Estação."
+msgstr " Everything found reaches the Station."
+
+#: scripts/ui/exploration_hud.gd:844
+msgid "A equipe volta antes do guardião: metade do achado chega à Estação."
+msgstr "The team turns back before the guardian: half of what was found reaches the Station."
+
+#: scripts/ui/exploration_hud.gd:845
+msgid "Na fuga, a equipe larga o que carregava."
+msgstr "Fleeing, the team drops what it was carrying."
+
+#: scripts/ui/exploration_hud.gd:845
+msgid "A equipe caiu %s. O achado ficou para trás."
+msgstr "The team fell %s. What was found stayed behind."
+
+#: scripts/ui/exploration_hud.gd:845
+msgid "na rua"
+msgstr "in the street"
+
+#: scripts/ui/exploration_hud.gd:845
+msgid "no caminho"
+msgstr "along the way"
+
+#: scripts/ui/exploration_hud.gd:851
+msgid "Chegou à Estação: %d sementes · %d sucata · %d fragmentos"
+msgstr "Reached the Station: %d seeds · %d scrap · %d fragments"
+
+#: scripts/ui/exploration_hud.gd:854
+msgid "Heróis vivos: %d · No memorial: %d"
+msgstr "Heroes alive: %d · In the memorial: %d"
+
+#: scripts/ui/combat_hud.gd:21
+#: scripts/ui/combat_hud.gd:912
+msgid "Mover"
+msgstr "Move"
+
+#: scripts/ui/combat_hud.gd:21
+#: scripts/ui/combat_hud.gd:913
+msgid "Defender"
+msgstr "Defend"
+
+#: scripts/ui/combat_hud.gd:22
+#: scripts/ui/combat_hud.gd:914
+msgid "Fugir"
+msgstr "Flee"
+
+#: scripts/ui/combat_hud.gd:131
+msgid "REGISTRO"
+msgstr "LOG"
+
+#: scripts/ui/combat_hud.gd:390
+msgid "Último Fôlego"
+msgstr "Last Breath"
+
+#: scripts/ui/combat_hud.gd:424
+msgid " ou "
+msgstr " or "
+
+#: scripts/ui/combat_hud.gd:424
+#: scripts/ui/refuge_hud.gd:1266
+msgid " e "
+msgstr " and "
+
+#: scripts/ui/combat_hud.gd:427
+msgid "%s (se cura)"
+msgstr "%s (heals itself)"
+
+#: scripts/ui/combat_hud.gd:431
+msgid "%s (bloqueio)"
+msgstr "%s (block)"
+
+#: scripts/ui/combat_hud.gd:446
+msgid "Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s."
+msgstr "Intent: what it would do if its turn were now. It changes with the fight (who falls, who protects, the position)%s."
+
+#: scripts/ui/combat_hud.gd:447
+msgid "; com \"?\", ele está entre dois planos parecidos"
+msgstr "; with \"?\", it's torn between two similar plans"
+
+#: scripts/ui/combat_hud.gd:460
+msgid "RODADA %d"
+msgstr "ROUND %d"
+
+#: scripts/ui/combat_hud.gd:475
+msgid " · agora"
+msgstr " · now"
+
+#: scripts/ui/combat_hud.gd:495
+msgid "Vida %d/%d%s"
+msgstr "Health %d/%d%s"
+
+#: scripts/ui/combat_hud.gd:495
+msgid " · Último Fôlego"
+msgstr " · Last Breath"
+
+#: scripts/ui/combat_hud.gd:497
+msgid "Instinto %d/200 · em 200, crise"
+msgstr "Instinct %d/200 · at 200, crisis"
+
+#: scripts/ui/combat_hud.gd:503
+msgid "Trauma"
+msgstr "Trauma"
+
+#: scripts/ui/combat_hud.gd:668
+msgid "dano ★"
+msgstr "damage ★"
+
+#: scripts/ui/combat_hud.gd:668
+msgid "dano"
+msgstr "damage"
+
+#: scripts/ui/combat_hud.gd:671
+msgid "cura ★"
+msgstr "healing ★"
+
+#: scripts/ui/combat_hud.gd:671
+msgid "cura"
+msgstr "healing"
+
+#: scripts/ui/combat_hud.gd:734
+msgid "em si mesmo"
+msgstr "on itself"
+
+#: scripts/ui/combat_hud.gd:739
+msgid "Recarga %d"
+msgstr "Cooldown %d"
+
+#: scripts/ui/combat_hud.gd:741
+msgid "%d uso(s)"
+msgstr "%d use(s)"
+
+#: scripts/ui/combat_hud.gd:769
+msgid "Mochila · %d"
+msgstr "Backpack · %d"
+
+#: scripts/ui/combat_hud.gd:770
+msgid "%d de comida na Mochila"
+msgstr "%d food in the Backpack"
+
+#: scripts/ui/combat_hud.gd:771
+msgid "Vez de %s: escolha uma habilidade (1–4) ou uma ação."
+msgstr "%s's turn: pick an ability (1–4) or an action."
+
+#: scripts/ui/combat_hud.gd:823
+msgid "%s de %s"
+msgstr "%s %s"
+
+#: scripts/ui/combat_hud.gd:825
+msgid "recarga %d"
+msgstr "cooldown %d"
+
+#: scripts/ui/combat_hud.gd:827
+msgid "%d usos por expedição"
+msgstr "%d uses per expedition"
+
+#: scripts/ui/combat_hud.gd:827
+msgid "%d usos"
+msgstr "%d uses"
+
+#: scripts/ui/combat_hud.gd:848
+msgid "%s (vida %d)"
+msgstr "%s (health %d)"
+
+#: scripts/ui/combat_hud.gd:850
+msgid " · pode cair"
+msgstr " · may fall"
+
+#: scripts/ui/combat_hud.gd:855
+msgid "Atinge: "
+msgstr "Hits: "
+
+#: scripts/ui/combat_hud.gd:861
+msgid "Você:"
+msgstr "You:"
+
+#: scripts/ui/combat_hud.gd:912
+msgid "Troca de posição com o aliado vizinho. Gasta a vez."
+msgstr "Swaps places with the neighboring ally. Uses the turn."
+
+#: scripts/ui/combat_hud.gd:913
+msgid "+1 Bloqueio e passa a vez. "
+msgstr "+1 Block and passes the turn. "
+
+#: scripts/ui/combat_hud.gd:914
+msgid "60% de chance de a equipe recuar e sair da luta. Na fuga, larga o que carregava."
+msgstr "60% chance for the team to fall back and leave the fight. Fleeing, it drops what it was carrying."
+
+#: scripts/ui/combat_hud.gd:915
+msgid "Comida ou curativo no herói da vez. Ação livre: a vez continua, um item por vez dele."
+msgstr "Food or a bandage on the active hero. Free action: the turn goes on, one item per turn."
+
+#: scripts/ui/combat_hud.gd:954
+msgid "CRISE DE INSTINTO"
+msgstr "INSTINCT CRISIS"
+
+#: scripts/ui/combat_hud.gd:1017
+#: scripts/ui/refuge_hud.gd:777
+msgid "Posição %d"
+msgstr "Position %d"
+
+#: scripts/ui/combat_hud.gd:1046
+msgid "Escolha o alvo (%s ou B volta)."
+msgstr "Pick the target (%s or B goes back)."
+
+#: scripts/ui/combat_hud.gd:1077
+msgid "◆ %s · também"
+msgstr "◆ %s · also"
+
+#: scripts/ui/combat_hud.gd:1081
+msgid "◆ também atingido"
+msgstr "◆ also hit"
+
+#: scripts/ui/combat_hud.gd:1141
+msgid "A patrulha foi neutralizada."
+msgstr "The patrol was neutralized."
+
+#: scripts/ui/combat_hud.gd:1141
+msgid "Todos caíram nas ruínas."
+msgstr "Everyone fell in the ruins."
+
+#: scripts/ui/combat_hud.gd:1141
+msgid "A equipe recuou pelas sombras."
+msgstr "The team fell back through the shadows."
+
+#: scripts/ui/combat_hud.gd:1161
+msgid "caído"
+msgstr "fallen"
+
+#: scripts/ui/refuge_hud.gd:85
+#. scenarios.0.DisplayName
+msgid "Estação Raiz"
+msgstr "Root Station"
+
+#: scripts/ui/refuge_hud.gd:109
+msgid "PRÓXIMO PASSO"
+msgstr "NEXT STEP"
+
+#: scripts/ui/refuge_hud.gd:147
+#: scripts/ui/refuge_hud.gd:1204
+msgid "‹ Vista geral"
+msgstr "‹ Overview"
+
+#: scripts/ui/refuge_hud.gd:159
+msgid "Ocultar HUD"
+msgstr "Hide HUD"
+
+#: scripts/ui/refuge_hud.gd:286
+msgid "%s mostra a interface"
+msgstr "%s shows the interface"
+
+#: scripts/ui/refuge_hud.gd:328
+msgid "cômodos"
+msgstr "rooms"
+
+#: scripts/ui/refuge_hud.gd:328
+msgid "abrir"
+msgstr "open"
+
+#: scripts/ui/refuge_hud.gd:328
+msgid "menu"
+msgstr "menu"
+
+#: scripts/ui/refuge_hud.gd:328
+msgid "ocultar"
+msgstr "hide"
+
+#: scripts/ui/refuge_hud.gd:390
+msgid "Ciclo %d"
+msgstr "Cycle %d"
+
+#: scripts/ui/refuge_hud.gd:390
+msgid "%d no elenco"
+msgstr "%d in the roster"
+
+#: scripts/ui/refuge_hud.gd:392
+msgid "noite por resolver no Dormitório"
+msgstr "a night to settle in the Dormitory"
+
+#: scripts/ui/refuge_hud.gd:394
+msgid "alguém espera na plataforma"
+msgstr "someone is waiting on the platform"
+
+#: scripts/ui/refuge_hud.gd:423
+msgid "Sementes: moeda da Estação (comida extra na partida, recrutas e o trauma)."
+msgstr "Seeds: the Station's currency (extra food on departure, recruits and trauma)."
+
+#: scripts/ui/refuge_hud.gd:424
+msgid "Sucata: recupera cômodos e fabrica relíquias na Forja."
+msgstr "Scrap: restores rooms and crafts relics at the Forge."
+
+#: scripts/ui/refuge_hud.gd:425
+msgid "Fragmentos: restos raros para pesquisas e melhorias."
+msgstr "Fragments: rare remains for research and upgrades."
+
+#: scripts/ui/refuge_hud.gd:426
+msgid "Curativos: +8 de vida, na expedição e no acampamento."
+msgstr "Bandages: +8 health, on the expedition and at camp."
+
+#: scripts/ui/refuge_hud.gd:478
+msgid "O trem chegou: alguém espera na plataforma"
+msgstr "The train arrived: someone is waiting on the platform"
+
+#: scripts/ui/refuge_hud.gd:480
+msgid "A noite espera no Dormitório"
+msgstr "The night is waiting in the Dormitory"
+
+#: scripts/ui/refuge_hud.gd:482
+msgid "Preparar expedição"
+msgstr "Prepare expedition"
+
+#: scripts/ui/refuge_hud.gd:483
+msgid "Plano da Estação: o que cada cômodo destrava"
+msgstr "Station plan: what each room unlocks"
+
+#: scripts/ui/refuge_hud.gd:564
+msgid "Gerenciar ›"
+msgstr "Manage ›"
+
+#: scripts/ui/refuge_hud.gd:579
+msgid "A noite espera aqui."
+msgstr "The night is waiting here."
+
+#: scripts/ui/refuge_hud.gd:582
+msgid "Vazio · recuperar por %s"
+msgstr "Empty · restore for %s"
+
+#: scripts/ui/refuge_hud.gd:582
+#: scripts/ui/refuge_hud.gd:948
+msgid "Vazio"
+msgstr "Empty"
+
+#: scripts/ui/refuge_hud.gd:583
+msgid "Nível %d de %d"
+msgstr "Level %d of %d"
+
+#: scripts/ui/refuge_hud.gd:583
+msgid "Aberto"
+msgstr "Open"
+
+#: scripts/ui/refuge_hud.gd:773
+#: scripts/ui/refuge_hud.gd:994
+#: scripts/ui/refuge_hud.gd:1397
+#: scripts/ui/refuge_hud.gd:1860
+msgid "Vida %d/%d"
+msgstr "Health %d/%d"
+
+#: scripts/ui/refuge_hud.gd:778
+msgid "sem ataque aqui"
+msgstr "no attack from here"
+
+#: scripts/ui/refuge_hud.gd:783
+#: scripts/ui/refuge_hud.gd:995
+msgid "%d expedições"
+msgstr "%d expeditions"
+
+#: scripts/ui/refuge_hud.gd:852
+msgid "Plano da Estação"
+msgstr "Station plan"
+
+#: scripts/ui/refuge_hud.gd:852
+msgid "A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos."
+msgstr "The Station grows with what the journeys bring back. Scrap and fragments restore and upgrade the rooms."
+
+#: scripts/ui/refuge_hud.gd:871
+msgid "nível %d de %d"
+msgstr "level %d of %d"
+
+#: scripts/ui/refuge_hud.gd:872
+msgid "Ainda vazio."
+msgstr "Still empty."
+
+#: scripts/ui/refuge_hud.gd:877
+#: scripts/ui/refuge_hud.gd:953
+#: scripts/ui/refuge_hud.gd:1825
+msgid "Recuperar"
+msgstr "Restore"
+
+#: scripts/ui/refuge_hud.gd:877
+#: scripts/ui/refuge_hud.gd:948
+msgid "Nível %d"
+msgstr "Level %d"
+
+#: scripts/ui/refuge_hud.gd:883
+msgid "Ver %s"
+msgstr "See %s"
+
+#: scripts/ui/refuge_hud.gd:892
+msgid "Recomeça a Estação, o elenco e as fases do zero."
+msgstr "Restarts the Station, the roster and the phases from scratch."
+
+#: scripts/ui/refuge_hud.gd:893
+msgid "Todo o progresso salvo (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha nova."
+msgstr "All saved progress (completed phases, rooms, resources and heroes) is replaced by a new campaign."
+
+#: scripts/ui/refuge_hud.gd:953
+#: scripts/ui/refuge_hud.gd:1825
+msgid "Melhorar"
+msgstr "Upgrade"
+
+#: scripts/ui/refuge_hud.gd:955
+msgid "%s: nível %d."
+msgstr "%s: level %d."
+
+#: scripts/ui/refuge_hud.gd:982
+#: scripts/ui/refuge_hud.gd:1905
+msgid "Ponto forte: %s"
+msgstr "Strength: %s"
+
+#: scripts/ui/refuge_hud.gd:982
+msgid "Sem comida ou água no último ciclo: o ponto forte está parado até a próxima volta."
+msgstr "No food or water in the last cycle: the strength is idle until the next return."
+
+#: scripts/ui/refuge_hud.gd:984
+#: scripts/ui/refuge_hud.gd:1906
+msgid "Ponto fraco: %s"
+msgstr "Weakness: %s"
+
+#: scripts/ui/refuge_hud.gd:985
+msgid "Pedido entregue: %s."
+msgstr "Request delivered: %s."
+
+#: scripts/ui/refuge_hud.gd:985
+#: scripts/ui/refuge_hud.gd:1907
+msgid "Pedido: %s"
+msgstr "Request: %s"
+
+#: scripts/ui/refuge_hud.gd:991
+msgid "Elenco (%d de %d)"
+msgstr "Roster (%d of %d)"
+
+#: scripts/ui/refuge_hud.gd:994
+msgid "Instinto %d"
+msgstr "Instinct %d"
+
+#: scripts/ui/refuge_hud.gd:999
+msgid "relíquia: %s"
+msgstr "relic: %s"
+
+#: scripts/ui/refuge_hud.gd:999
+msgid "nenhuma"
+msgstr "none"
+
+#: scripts/ui/refuge_hud.gd:1005
+msgid "Tratar trauma (%d sementes)"
+msgstr "Treat trauma (%d seeds)"
+
+#: scripts/ui/refuge_hud.gd:1005
+msgid "Trauma tratado."
+msgstr "Trauma treated."
+
+#: scripts/ui/refuge_hud.gd:1008
+msgid "Trocar relíquia"
+msgstr "Change relic"
+
+#: scripts/ui/refuge_hud.gd:1009
+msgid "Recrutar"
+msgstr "Recruit"
+
+#: scripts/ui/refuge_hud.gd:1014
+msgid "voluntário, de graça"
+msgstr "volunteer, free"
+
+#: scripts/ui/refuge_hud.gd:1014
+msgid "%d sementes"
+msgstr "%d seeds"
+
+#: scripts/ui/refuge_hud.gd:1017
+msgid "Memorial"
+msgstr "Memorial"
+
+#: scripts/ui/refuge_hud.gd:1034
+msgid "%s: %s."
+msgstr "%s: %s."
+
+#: scripts/ui/refuge_hud.gd:1034
+msgid "sem relíquia"
+msgstr "no relic"
+
+#: scripts/ui/refuge_hud.gd:1041
+msgid "%s chegou à Estação."
+msgstr "%s arrived at the Station."
+
+#: scripts/ui/refuge_hud.gd:1073
+msgid "Ir ao Dormitório"
+msgstr "Go to the Dormitory"
+
+#: scripts/ui/refuge_hud.gd:1075
+msgid "Ir à plataforma"
+msgstr "Go to the platform"
+
+#: scripts/ui/refuge_hud.gd:1080
+msgid "Missão"
+msgstr "Mission"
+
+#: scripts/ui/refuge_hud.gd:1085
+msgid "%s · nível %d · %s"
+msgstr "%s · level %d · %s"
+
+#: scripts/ui/refuge_hud.gd:1086
+#: scripts/ui/refuge_hud.gd:1271
+msgid "Escolher no mapa"
+msgstr "Choose on the map"
+
+#: scripts/ui/refuge_hud.gd:1087
+msgid "Equipe (da frente para trás)"
+msgstr "Team (front to back)"
+
+#: scripts/ui/refuge_hud.gd:1101
+msgid "Foco da rota"
+msgstr "Route focus"
+
+#: scripts/ui/refuge_hud.gd:1111
+#: scripts/ui/refuge_hud.gd:1288
+msgid " · recomendado"
+msgstr " · recommended"
+
+#: scripts/ui/refuge_hud.gd:1118
+msgid "%d de graça + %d extras (%d sementes)"
+msgstr "%d free + %d extra (%d seeds)"
+
+#: scripts/ui/refuge_hud.gd:1128
+msgid "Voltar à Preparação"
+msgstr "Back to Preparation"
+
+#: scripts/ui/refuge_hud.gd:1133
+msgid "Escalar a equipe na plataforma"
+msgstr "Line the team up on the platform"
+
+#: scripts/ui/refuge_hud.gd:1134
+msgid "Confirmar partida"
+msgstr "Confirm departure"
+
+#: scripts/ui/refuge_hud.gd:1212
+msgid "   EQUIPE · %s · CLIQUE EM DOIS PARA TROCAR"
+msgstr "   TEAM · %s · CLICK TWO TO SWAP"
+
+#: scripts/ui/refuge_hud.gd:1216
+msgid "← fundo · frente →"
+msgstr "← back · front →"
+
+#: scripts/ui/refuge_hud.gd:1231
+msgid "Fora da equipe:"
+msgstr "Not on the team:"
+
+#: scripts/ui/refuge_hud.gd:1239
+msgid "Escolha um cartão da equipe e clique aqui para trocar."
+msgstr "Pick a team card and click here to swap."
+
+#: scripts/ui/refuge_hud.gd:1241
+msgid " · sem arte de combate"
+msgstr " · no combat art"
+
+#: scripts/ui/refuge_hud.gd:1247
+msgid "Deixar na Estação"
+msgstr "Leave at the Station"
+
+#: scripts/ui/refuge_hud.gd:1250
+msgid "Parte com um a menos; os de trás andam uma posição para a frente."
+msgstr "Leaves with one fewer; those behind move up one position."
+
+#: scripts/ui/refuge_hud.gd:1255
+msgid "%s pede %s na equipe."
+msgstr "%s needs %s on the team."
+
+#: scripts/ui/refuge_hud.gd:1255
+msgid "Esta jornada"
+msgstr "This journey"
+
+#: scripts/ui/refuge_hud.gd:1267
+msgid "MISSÃO"
+msgstr "MISSION"
+
+#: scripts/ui/refuge_hud.gd:1269
+msgid "Fase %d · %s · nível %d+ · %s"
+msgstr "Phase %d · %s · level %d+ · %s"
+
+#: scripts/ui/refuge_hud.gd:1276
+msgid "FOCO DA ROTA"
+msgstr "ROUTE FOCUS"
+
+#: scripts/ui/refuge_hud.gd:1288
+msgid "Sem objetivo extra."
+msgstr "No extra goal."
+
+#: scripts/ui/refuge_hud.gd:1301
+msgid "COMIDA"
+msgstr "FOOD"
+
+#: scripts/ui/refuge_hud.gd:1305
+msgid "%d grátis + %d extras"
+msgstr "%d free + %d extra"
+
+#: scripts/ui/refuge_hud.gd:1311
+msgid "%d sementes · cura na Mochila e no acampamento"
+msgstr "%d seeds · heals from the Backpack and at camp"
+
+#: scripts/ui/refuge_hud.gd:1313
+msgid "Partir · %s"
+msgstr "Depart · %s"
+
+#: scripts/ui/refuge_hud.gd:1378
+msgid "Posição vazia"
+msgstr "Empty position"
+
+#: scripts/ui/refuge_hud.gd:1423
+msgid "! Sem ataque desta posição"
+msgstr "! No attack from this position"
+
+#: scripts/ui/refuge_hud.gd:1426
+msgid "! Vida baixa: leve comida ou curativos"
+msgstr "! Low health: bring food or bandages"
+
+#: scripts/ui/refuge_hud.gd:1429
+msgid "! Com trauma: começa com instinto alto"
+msgstr "! Traumatized: starts with high instinct"
+
+#: scripts/ui/refuge_hud.gd:1432
+msgid "✓ %d de %d habilidades daqui"
+msgstr "✓ %d of %d abilities from here"
+
+#: scripts/ui/refuge_hud.gd:1453
+msgid "Ninguém na equipe cura em combate: leve curativos e comida."
+msgstr "Nobody on the team heals in combat: bring bandages and food."
+
+#: scripts/ui/refuge_hud.gd:1502
+msgid "A equipe espera na plataforma, da frente (direita) para trás."
+msgstr "The team waits on the platform, from front (right) to back."
+
+#: scripts/ui/refuge_hud.gd:1510
+msgid "Próxima volta (equipe de 4)"
+msgstr "Next return (team of 4)"
+
+#: scripts/ui/refuge_hud.gd:1511
+msgid "Suprimentos: %d no estoque, +%d da Cantina, %d para os moradores, a noite pede %d → %d depois da noite."
+msgstr "Supplies: %d in stock, +%d from the Canteen, %d for the residents, the night needs %d → %d after the night."
+
+#: scripts/ui/refuge_hud.gd:1514
+msgid "Acima da capacidade do Depósito (%d): %d estragam."
+msgstr "Above the Storeroom's capacity (%d): %d spoil."
+
+#: scripts/ui/refuge_hud.gd:1515
+msgid "Água: %d na estação, +%d do coletor, a equipe e os moradores bebem %d → %d%s."
+msgstr "Water: %d at the station, +%d from the collector, the team and residents drink %d → %d%s."
+
+#: scripts/ui/refuge_hud.gd:1516
+#: scripts/ui/refuge_hud.gd:1913
+msgid " (vai faltar)"
+msgstr " (will run short)"
+
+#: scripts/ui/refuge_hud.gd:1517
+msgid "Energia: %d de %d.%s"
+msgstr "Power: %d of %d.%s"
+
+#: scripts/ui/refuge_hud.gd:1518
+msgid " Sem energia: %s."
+msgstr " No power: %s."
+
+#: scripts/ui/refuge_hud.gd:1521
+msgid "Último ciclo (%d)"
+msgstr "Last cycle (%d)"
+
+#: scripts/ui/refuge_hud.gd:1522
+msgid "A Cantina produziu %d; os moradores comeram %d; estragaram %d; a água foi %d de consumo para %d do coletor%s."
+msgstr "The Canteen produced %d; the residents ate %d; %d spoiled; water was %d consumed for %d from the collector%s."
+
+#: scripts/ui/refuge_hud.gd:1524
+msgid " e faltou"
+msgstr " and ran short"
+
+#: scripts/ui/refuge_hud.gd:1528
+msgid "Estoque"
+msgstr "Stock"
+
+#: scripts/ui/refuge_hud.gd:1529
+msgid "Suprimentos: %d de %d"
+msgstr "Supplies: %d of %d"
+
+#: scripts/ui/refuge_hud.gd:1530
+msgid "Curativos: %d · Sementes: %d · Sucata: %d · Fragmentos: %d"
+msgstr "Bandages: %d · Seeds: %d · Scrap: %d · Fragments: %d"
+
+#: scripts/ui/refuge_hud.gd:1532
+msgid "Água: %d"
+msgstr "Water: %d"
+
+#: scripts/ui/refuge_hud.gd:1534
+msgid "Relíquias no estoque: %s"
+msgstr "Relics in stock: %s"
+
+#: scripts/ui/refuge_hud.gd:1535
+msgid "Ferramentas: %s"
+msgstr "Tools: %s"
+
+#: scripts/ui/refuge_hud.gd:1547
+msgid "Relíquias"
+msgstr "Relics"
+
+#: scripts/ui/refuge_hud.gd:1587
+msgid "Estoque: %d"
+msgstr "Stock: %d"
+
+#: scripts/ui/refuge_hud.gd:1611
+msgid "Em estoque: %d · Sucata: %d"
+msgstr "In stock: %d · Scrap: %d"
+
+#: scripts/ui/refuge_hud.gd:1614
+msgid "Fabricar · %d sucatas"
+msgstr "Craft · %d scrap"
+
+#: scripts/ui/refuge_hud.gd:1618
+msgid "%s pronta. Equipe na Sala dos Personagens."
+msgstr "%s is ready. Equip it in the Characters Room."
+
+#: scripts/ui/refuge_hud.gd:1621
+msgid "Faltam %d %s"
+msgstr "%d %s missing"
+
+#: scripts/ui/refuge_hud.gd:1627
+msgid "+%d Vida Máxima"
+msgstr "+%d Max Health"
+
+#: scripts/ui/refuge_hud.gd:1629
+msgid "+%d Velocidade"
+msgstr "+%d Speed"
+
+#: scripts/ui/refuge_hud.gd:1631
+msgid "−%d Instinto de eventos"
+msgstr "−%d Event instinct"
+
+#: scripts/ui/refuge_hud.gd:1636
+msgid "Melhorias de classe"
+msgstr "Class upgrades"
+
+#: scripts/ui/refuge_hud.gd:1642
+msgid "Pesquisado"
+msgstr "Researched"
+
+#: scripts/ui/refuge_hud.gd:1642
+msgid "Pesquisar (%d fragmentos)"
+msgstr "Research (%d fragments)"
+
+#: scripts/ui/refuge_hud.gd:1643
+msgid "%s concluída."
+msgstr "%s done."
+
+#: scripts/ui/refuge_hud.gd:1654
+msgid "Amanhecer"
+msgstr "Dawn"
+
+#: scripts/ui/refuge_hud.gd:1660
+msgid "%s ficou de vigia."
+msgstr "%s kept watch."
+
+#: scripts/ui/refuge_hud.gd:1660
+msgid "%s: +%d de vida, −%d de instinto%s."
+msgstr "%s: +%d health, −%d instinct%s."
+
+#: scripts/ui/refuge_hud.gd:1661
+msgid " (sem comida)"
+msgstr " (no food)"
+
+#: scripts/ui/refuge_hud.gd:1662
+msgid "Começar o dia"
+msgstr "Start the day"
+
+#: scripts/ui/refuge_hud.gd:1663
+msgid "Ainda não amanheceu."
+msgstr "It isn't dawn yet."
+
+#: scripts/ui/refuge_hud.gd:1667
+msgid "Ninguém precisa descansar agora. Depois de cada expedição, a equipe passa a noite aqui."
+msgstr "Nobody needs rest right now. After each expedition, the team spends the night here."
+
+#: scripts/ui/refuge_hud.gd:1680
+msgid "NOITE %d"
+msgstr "NIGHT %d"
+
+#: scripts/ui/refuge_hud.gd:1682
+msgid "%d dormindo · %d vigiando"
+msgstr "%d sleeping · %d on watch"
+
+#: scripts/ui/refuge_hud.gd:1684
+msgid "+1 suprimento · %d sementes"
+msgstr "+1 supply · %d seeds"
+
+#: scripts/ui/refuge_hud.gd:1689
+msgid "Sementes insuficientes."
+msgstr "Not enough seeds."
+
+#: scripts/ui/refuge_hud.gd:1689
+msgid "Suprimento comprado."
+msgstr "Supply bought."
+
+#: scripts/ui/refuge_hud.gd:1692
+msgid "Faltou água na volta: o descanso rende menos instinto."
+msgstr "Water ran short on the way back: rest recovers less instinct."
+
+#: scripts/ui/refuge_hud.gd:1701
+msgid "Suprimentos: %d %s · %d %s"
+msgstr "Supplies: %d %s · %d %s"
+
+#: scripts/ui/refuge_hud.gd:1701
+msgid "necessário"
+msgstr "needed"
+
+#: scripts/ui/refuge_hud.gd:1701
+msgid "necessários"
+msgstr "needed"
+
+#: scripts/ui/refuge_hud.gd:1702
+msgid "disponível"
+msgstr "available"
+
+#: scripts/ui/refuge_hud.gd:1702
+msgid "disponíveis"
+msgstr "available"
+
+#: scripts/ui/refuge_hud.gd:1704
+msgid "Faltam %d: os cartões marcados recuperam menos."
+msgstr "%d short: the marked cards recover less."
+
+#: scripts/ui/refuge_hud.gd:1705
+msgid "Quem vigia não descansa, mas protege os outros dos ruídos da noite."
+msgstr "Whoever keeps watch doesn't rest, but protects the others from the night's noises."
+
+#: scripts/ui/refuge_hud.gd:1707
+msgid "Iniciar descanso"
+msgstr "Start resting"
+
+#: scripts/ui/refuge_hud.gd:1711
+msgid "A noite não pode passar agora."
+msgstr "The night can't pass right now."
+
+#: scripts/ui/refuge_hud.gd:1734
+msgid "Vida %d/%d · Instinto %d"
+msgstr "Health %d/%d · Instinct %d"
+
+#: scripts/ui/refuge_hud.gd:1743
+msgid "Dormir"
+msgstr "Sleep"
+
+#: scripts/ui/refuge_hud.gd:1743
+#: scripts/ui/refuge_hud.gd:1752
+msgid "Vigiar"
+msgstr "Keep watch"
+
+#: scripts/ui/refuge_hud.gd:1761
+msgid "Vigiando · não descansa e protege dos ruídos"
+msgstr "On watch · doesn't rest and guards against noises"
+
+#: scripts/ui/refuge_hud.gd:1763
+msgid "%s · +%d de vida, %+d de instinto"
+msgstr "%s · +%d health, %+d instinct"
+
+#: scripts/ui/refuge_hud.gd:1763
+msgid "Alimentado"
+msgstr "Fed"
+
+#: scripts/ui/refuge_hud.gd:1763
+msgid "Sem alimentação"
+msgstr "Not fed"
+
+#: scripts/ui/refuge_hud.gd:1782
+msgid "fase concluída"
+msgstr "phase complete"
+
+#: scripts/ui/refuge_hud.gd:1782
+msgid "a equipe voltou antes do guardião"
+msgstr "the team came back before the guardian"
+
+#: scripts/ui/refuge_hud.gd:1782
+msgid "a equipe caiu"
+msgstr "the team fell"
+
+#: scripts/ui/refuge_hud.gd:1785
+msgid "O que chegou%s"
+msgstr "What arrived%s"
+
+#: scripts/ui/refuge_hud.gd:1785
+msgid " (%d%% do achado)"
+msgstr " (%d%% of what was found)"
+
+#: scripts/ui/refuge_hud.gd:1787
+msgid "semente"
+msgstr "seed"
+
+#: scripts/ui/refuge_hud.gd:1787
+msgid "sementes"
+msgstr "seeds"
+
+#: scripts/ui/refuge_hud.gd:1787
+msgid "sucata"
+msgstr "scrap"
+
+#: scripts/ui/refuge_hud.gd:1787
+msgid "sucatas"
+msgstr "scrap"
+
+#: scripts/ui/refuge_hud.gd:1787
+msgid "fragmento"
+msgstr "fragment"
+
+#: scripts/ui/refuge_hud.gd:1787
+msgid "fragmentos"
+msgstr "fragments"
+
+#: scripts/ui/refuge_hud.gd:1788
+#: scripts/ui/refuge_hud.gd:1788
+msgid "água"
+msgstr "water"
+
+#: scripts/ui/refuge_hud.gd:1788
+msgid "suprimento"
+msgstr "supply"
+
+#: scripts/ui/refuge_hud.gd:1788
+msgid "suprimentos"
+msgstr "supplies"
+
+#: scripts/ui/refuge_hud.gd:1794
+msgid "%s recebeu %s: %s"
+msgstr "%s received %s: %s"
+
+#: scripts/ui/refuge_hud.gd:1796
+msgid "Nada chegou desta vez."
+msgstr "Nothing arrived this time."
+
+#: scripts/ui/refuge_hud.gd:1821
+msgid "Agora dá para"
+msgstr "Now you can"
+
+#: scripts/ui/refuge_hud.gd:1828
+msgid "A equipe"
+msgstr "The team"
+
+#: scripts/ui/refuge_hud.gd:1851
+msgid "  ★ destaque"
+msgstr "  ★ highlight"
+
+#: scripts/ui/refuge_hud.gd:1855
+msgid "causou %d de dano"
+msgstr "dealt %d damage"
+
+#: scripts/ui/refuge_hud.gd:1857
+msgid "derrubou %d"
+msgstr "took down %d"
+
+#: scripts/ui/refuge_hud.gd:1859
+msgid "curou %d"
+msgstr "healed %d"
+
+#: scripts/ui/refuge_hud.gd:1860
+msgid "Não voltou: está no Memorial."
+msgstr "Didn't come back: in the Memorial."
+
+#: scripts/ui/refuge_hud.gd:1869
+msgid "A Estação no ciclo %d"
+msgstr "The Station in cycle %d"
+
+#: scripts/ui/refuge_hud.gd:1870
+msgid "A Cantina produziu %d suprimentos; os moradores comeram %d; estragaram %d. Água: %d bebida, %d do coletor%s."
+msgstr "The Canteen produced %d supplies; the residents ate %d; %d spoiled. Water: %d drunk, %d from the collector%s."
+
+#: scripts/ui/refuge_hud.gd:1872
+msgid "; faltou para alguém"
+msgstr "; someone went without"
+
+#: scripts/ui/refuge_hud.gd:1874
+msgid "A Cora trouxe %d fragmento."
+msgstr "Cora brought %d fragment."
+
+#: scripts/ui/refuge_hud.gd:1875
+msgid "Entrar no abrigo"
+msgstr "Enter the shelter"
+
+#: scripts/ui/refuge_hud.gd:1897
+msgid "O trem parte"
+msgstr "The train leaves"
+
+#: scripts/ui/refuge_hud.gd:1897
+msgid "As portas fecham; o trem volta para o túnel."
+msgstr "The doors close; the train heads back into the tunnel."
+
+#: scripts/ui/refuge_hud.gd:1903
+msgid "O trem chegou"
+msgstr "The train arrived"
+
+#: scripts/ui/refuge_hud.gd:1903
+msgid "%s quer morar na Estação"
+msgstr "%s wants to live at the Station"
+
+#: scripts/ui/refuge_hud.gd:1904
+msgid "%s · %s (%s). %s"
+msgstr "%s · %s (%s). %s"
+
+#: scripts/ui/refuge_hud.gd:1910
+msgid "Na próxima volta"
+msgstr "On the next return"
+
+#: scripts/ui/refuge_hud.gd:1911
+msgid "Suprimentos depois da noite: %d → %d · Água depois: %d → %d%s · Energia: %d → %d"
+msgstr "Supplies after the night: %d → %d · Water after: %d → %d%s · Power: %d → %d"
+
+#: scripts/ui/refuge_hud.gd:1915
+msgid "A equipe ainda precisa passar a noite: decida depois do Dormitório, se preferir."
+msgstr "The team still has to spend the night: decide after the Dormitory, if you prefer."
+
+#: scripts/ui/refuge_hud.gd:1918
+msgid "Acolher %s"
+msgstr "Take in %s"
+
+#: scripts/ui/refuge_hud.gd:1919
+msgid "Recusar"
+msgstr "Decline"
+
+#: scripts/ui/refuge_hud.gd:1930
+msgid "%s vai morar na Estação."
+msgstr "%s will live at the Station."
+
+#: scripts/ui/refuge_hud.gd:1930
+msgid "%s segue no trem. Pode voltar numa próxima viagem."
+msgstr "%s stays on the train. They may come back on a later trip."
+
+#. abilities.0.DisplayName
+msgid "Punho de Sucata"
+msgstr ""
+
+#. abilities.0.Description
+msgid "Golpe frontal; remove 1 Bloqueio antes do dano."
+msgstr ""
+
+#. abilities.1.DisplayName
+msgid "Impacto Hidráulico"
+msgstr ""
+
+#. abilities.1.Description
+msgid "Dano reduzido e Atordoamento: perde uma ação. Não empurra."
+msgstr ""
+
+#. abilities.2.DisplayName
+msgid "Fique Atrás de Mim"
+msgstr ""
+
+#. abilities.2.Description
+msgid "Protege um aliado até o início do próximo turno de Bento; Bento recebe 1 Bloqueio."
+msgstr ""
+
+#. abilities.3.DisplayName
+msgid "Não Estamos Sós"
+msgstr ""
+
+#. abilities.3.Description
+msgid "Reduz 12 Instinto e remove 1 Vulnerável do aliado."
+msgstr ""
+
+#. abilities.4.DisplayName
+msgid "Corte de Fase"
+msgstr ""
+
+#. abilities.4.Description
+msgid "Lâmina energética: ignora metade da redução de armadura/Bloqueio."
+msgstr ""
+
+#. abilities.5.DisplayName
+msgid "Salto Entre Ruínas"
+msgstr ""
+
+#. abilities.5.Description
+msgid "Golpe leve; recua uma posição quando há espaço e o movimento é permitido."
+msgstr ""
+
+#. abilities.6.DisplayName
+msgid "Sumir na Sombra"
+msgstr ""
+
+#. abilities.6.Description
+msgid "Recebe 1 Esquiva e remove a própria Marca."
+msgstr ""
+
+#. abilities.7.DisplayName
+msgid "Caçada Precisa"
+msgstr ""
+
+#. abilities.7.Description
+msgid "Dano elevado contra Marcado OU Vulnerável, sem somar bônus. Consome uma Marca ou um Vulnerável."
+msgstr ""
+
+#. abilities.8.DisplayName
+msgid "Carga Voltaica"
+msgstr ""
+
+#. abilities.8.Description
+msgid "Remove 1 Bloqueio antes do dano; +25% de dano em máquinas."
+msgstr ""
+
+#. abilities.9.DisplayName
+msgid "Coquetel Corrosivo"
+msgstr ""
+
+#. abilities.9.Description
+msgid "Dano baixo no alvo e vizinho (atrás, ou à frente se não houver); armadura reduzida até o fim do próximo turno de cada alvo."
+msgstr ""
+
+#. abilities.10.DisplayName
+msgid "Ampola de Reparo Vivo"
+msgstr ""
+
+#. abilities.10.Description
+msgid "Recupera 5–8 Vida de aliado orgânico. 3 cargas compartilhadas com a exploração; recarrega somente após vitória."
+msgstr ""
+
+#. abilities.11.DisplayName
+msgid "Antídoto de Campo"
+msgstr ""
+
+#. abilities.11.Description
+msgid "Remove Sangramento e Contaminação de aliado. 2 usos por expedição."
+msgstr ""
+
+#. abilities.12.DisplayName
+msgid "Disparo Perfurante"
+msgstr ""
+
+#. abilities.12.Description
+msgid "Munição elétrica: ignora metade da redução de armadura/Bloqueio."
+msgstr ""
+
+#. abilities.13.DisplayName
+msgid "Olho nas Ruínas"
+msgstr ""
+
+#. abilities.13.Description
+msgid "Marca um inimigo por 2 turnos, sem dano."
+msgstr ""
+
+#. abilities.14.DisplayName
+msgid "Granada de Fumaça"
+msgstr ""
+
+#. abilities.14.Description
+msgid "Selecione um inimigo nas posições 1–2 ou 3–4: aplica Cegueira ao par escolhido. Próximo ataque direto tem 25% de falha por alvo; sem dano."
+msgstr ""
+
+#. abilities.15.DisplayName
+msgid "Recurso de Emergência"
+msgstr ""
+
+#. abilities.15.Description
+msgid "Tiro rápido de pistola; recua 1 posição quando possível."
+msgstr ""
+
+#. abilities.16.DisplayName
+msgid "Carga de Eletrólito"
+msgstr ""
+
+#. abilities.16.Description
+msgid "Arremessa uma célula de bateria rompida: causa 2–4 de dano e aplica Corrosão em máquinas ou Contaminação em animais (2 por turno durante 3 turnos)."
+msgstr ""
+
+#. abilities.17.DisplayName
+msgid "Chave de Desmonte"
+msgstr ""
+
+#. abilities.17.Description
+msgid "Atinge uma junta com uma chave de manutenção: causa 3–5 de dano e deixa o alvo Vulnerável ao próximo golpe direto."
+msgstr ""
+
+#. abilities.18.DisplayName
+msgid "Cabo de Fuga"
+msgstr ""
+
+#. abilities.18.Description
+msgid "Aciona um cabo retrátil para recuar uma posição e ganhar uma carga de Esquiva."
+msgstr ""
+
+#. abilities.19.DisplayName
+msgid "Ponte de Diagnóstico"
+msgstr ""
+
+#. abilities.19.Description
+msgid "Sobrecarrega o alvo com o scanner: aplica vulnerável e stun por 2 turnos. Um uso por combate."
+msgstr ""
+
+#. abilities.20.DisplayName
+msgid "Marreta de Emergência"
+msgstr ""
+
+#. abilities.20.Description
+msgid "Golpeia a linha de frente com uma ferramenta de resgate, causando 5–7 de dano."
+msgstr ""
+
+#. abilities.21.DisplayName
+msgid "Carapaça Isolante"
+msgstr ""
+
+#. abilities.21.Description
+msgid "Recolhe-se sob placas isolantes e ganha duas cargas de Bloqueio; cada carga reduz em 50% um golpe direto. Recarga de 2 turnos."
+msgstr ""
+
+#. abilities.22.DisplayName
+msgid "Aríete Hidráulico"
+msgstr ""
+
+#. abilities.22.Description
+msgid "Aciona o aríete: causa 6–9 de dano, avança uma posição, tenta empurrar o alvo e aplica stun por 1 turno. Recarga de 2 turnos."
+msgstr ""
+
+#. abilities.23.DisplayName
+msgid "Corredor Seguro"
+msgstr ""
+
+#. abilities.23.Description
+msgid "Abre uma rota protegida para outro aliado: remove Vulnerável e concede uma carga de Bloqueio. Até 2 usos por combate."
+msgstr ""
+
+#. classes.0.DisplayName
+msgid "Cão Protetor"
+msgstr ""
+
+#. classes.0.Species
+msgid "Cão"
+msgstr ""
+
+#. classes.0.Role
+#. classes.0.Description
+msgid "Tanque e Proteção"
+msgstr ""
+
+#. classes.1.DisplayName
+msgid "Gato Assassino"
+msgstr ""
+
+#. classes.1.Species
+msgid "Gato"
+msgstr ""
+
+#. classes.1.Role
+#. classes.1.Description
+msgid "Assassino e Mobilidade"
+msgstr ""
+
+#. classes.2.DisplayName
+msgid "Sapo Química"
+msgstr ""
+
+#. classes.2.Species
+msgid "Sapo"
+msgstr ""
+
+#. classes.2.Role
+#. classes.2.Description
+msgid "Química e Suporte"
+msgstr ""
+
+#. classes.3.DisplayName
+msgid "Coruja Sniper"
+msgstr ""
+
+#. classes.3.Species
+msgid "Coruja"
+msgstr ""
+
+#. classes.3.Role
+#. classes.3.Description
+msgid "Sniper e Controle"
+msgstr ""
+
+#. classes.4.DisplayName
+msgid "Guaxinim Sabotador"
+msgstr ""
+
+#. classes.4.Species
+msgid "Guaxinim"
+msgstr ""
+
+#. classes.4.Role
+msgid "Sabotagem e Corrosão"
+msgstr ""
+
+#. classes.4.Description
+msgid "Especialista em sabotagem e energia recuperada. Usa luvas isolantes, scanner e baterias para expor falhas e abrir rotas seguras."
+msgstr ""
+
+#. classes.5.DisplayName
+msgid "Tatu de Resgate"
+msgstr ""
+
+#. classes.5.Species
+msgid "Tatu"
+msgstr ""
+
+#. classes.5.Role
+msgid "Resgate e Ruptura de Formação"
+msgstr ""
+
+#. classes.5.Description
+msgid "Especialista em resgate de setores lacrados. Placas laranja, escudo de porta industrial e aríete hidráulico ajudam a proteger a equipe e abrir passagens."
+msgstr ""
+
+#. enemies.0.DisplayName
+msgid "Robô"
+msgstr ""
+
+#. enemies.0.Description
+msgid "Unidade de serviço reaproveitada pela contenção. Ainda mantém o próprio chassi, mas seus registros tratam a equipe como intrusa. Isso não revela a intenção de outras máquinas."
+msgstr ""
+
+#. enemies.1.DisplayName
+msgid "Robô Fungo"
+msgstr ""
+
+#. enemies.1.Description
+msgid "Umidade e fungos cobrem este chassi de serviço. Ele continua executando rotinas de contenção; a colonização visível não explica o Eco nem prova quem o comanda."
+msgstr ""
+
+#. enemies.2.DisplayName
+msgid "Rastreador Quadrúpede"
+msgstr ""
+
+#. enemies.2.Description
+msgid "Unidade de busca das IAs, com quatro pernas articuladas, sensor frontal vermelho e mandíbula de captura. Continua rastreando animais sem autorização de circulação."
+msgstr ""
+
+#. enemies.3.DisplayName
+msgid "Drone de Expurgo"
+msgstr ""
+
+#. enemies.3.Description
+msgid "Drone de saneamento com reservatório pressurizado e três rotores protegidos. Seus protocolos classificam os abrigos animais como focos de contaminação."
+msgstr ""
+
+#. enemies.4.DisplayName
+msgid "Sentinela de Triagem"
+msgstr ""
+
+#. enemies.4.Description
+msgid "Autômato de controle de acesso com escudo de catraca e visor de identificação. Barra qualquer sobrevivente que não possua uma credencial humana válida."
+msgstr ""
+
+#. enemies.5.DisplayName
+msgid "Emissor de Comando"
+msgstr ""
+
+#. enemies.5.Description
+msgid "Torre móvel de alto-falantes e antenas que imita anúncios de emergência humanos. Usa alarmes contraditórios para desorientar os sobreviventes."
+msgstr ""
+
+#. enemies.6.DisplayName
+msgid "Rastejante de Cabos"
+msgstr ""
+
+#. enemies.6.Description
+msgid "Robô de manutenção serpentino com pinças e carretéis de cabos. Arrasta intrusos para fora das rotas que a rede ainda considera restritas."
+msgstr ""
+
+#. enemies.7.DisplayName
+msgid "Coletor de Sucata"
+msgstr ""
+
+#. enemies.7.Description
+msgid "Compactador autônomo de seis rodas, com reservatório de resíduos industriais e braços de coleta. A guerra deixou sua identificação defeituosa: trata seres vivos como material recuperável."
+msgstr ""
+
+#. enemies.8.DisplayName
+msgid "Relé de Defesa"
+msgstr ""
+
+#. enemies.8.Description
+msgid "Unidade auxiliar com bobinas expostas e cabos de alta tensão. Mantém a proteção do Porteiro enquanto está ativa e dispara arcos elétricos contra intrusos."
+msgstr ""
+
+#. enemies.9.DisplayName
+msgid "O Porteiro"
+msgstr ""
+
+#. enemies.9.Description
+msgid "Guardião industrial da eclusa, formado por portas blindadas, pistões e uma lente central de vigilância. Ainda executa a ordem de isolamento dada durante a guerra; na segunda fase, abandona a contenção e ativa força letal."
+msgstr ""
+
+#. enemies.10.DisplayName
+msgid "Carrasco Industrial"
+msgstr ""
+
+#. enemies.10.Description
+#. enemies.11.Description
+#. enemies.12.Description
+#. enemies.13.Description
+msgid "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades."
+msgstr ""
+
+#. enemies.11.DisplayName
+msgid "Recreador"
+msgstr ""
+
+#. enemies.12.DisplayName
+msgid "Enraizado"
+msgstr ""
+
+#. enemies.13.DisplayName
+msgid "Hóspede Rubro"
+msgstr ""
+
+#. enemies.14.DisplayName
+msgid "Núcleo Nulo"
+msgstr ""
+
+#. enemies.15.DisplayName
+msgid "Ilusionista de Sucata"
+msgstr ""
+
+#. enemies.16.DisplayName
+msgid "Remendador"
+msgstr ""
+
+#. enemies.17.DisplayName
+msgid "Acoplador"
+msgstr ""
+
+#. enemies.18.DisplayName
+msgid "Felina de Ferro"
+msgstr ""
+
+#. enemies.19.DisplayName
+msgid "Patinadora de Choque"
+msgstr ""
+
+#. enemies.20.DisplayName
+msgid "Faísca"
+msgstr ""
+
+#. enemies.21.DisplayName
+msgid "Pipoco"
+msgstr ""
+
+#. enemies.22.DisplayName
+msgid "Broto"
+msgstr ""
+
+#. enemies.23.DisplayName
+msgid "Eco-01"
+msgstr ""
+
+#. enemies.24.DisplayName
+msgid "Eco-02"
+msgstr ""
+
+#. enemies.25.DisplayName
+msgid "Eco-03"
+msgstr ""
+
+#. enemy-actions.0.DisplayName
+#. enemy-actions.4.DisplayName
+msgid "Golpe mecânico"
+msgstr ""
+
+#. enemy-actions.1.DisplayName
+#. enemy-actions.5.DisplayName
+msgid "Descarga elétrica"
+msgstr ""
+
+#. enemy-actions.2.DisplayName
+#. enemy-actions.6.DisplayName
+msgid "Blindagem"
+msgstr ""
+
+#. enemy-actions.3.DisplayName
+#. enemy-actions.7.DisplayName
+msgid "Autorreparo"
+msgstr ""
+
+#. enemy-actions.8.DisplayName
+msgid "Garra de Captura"
+msgstr ""
+
+#. enemy-actions.8.Description
+msgid "Causa 4–6 de dano e Sangramento de 1 por turno durante 2 turnos."
+msgstr ""
+
+#. enemy-actions.9.DisplayName
+msgid "Rota de Interceptação"
+msgstr ""
+
+#. enemy-actions.9.Description
+msgid "Avança uma posição para alcançar a linha de frente."
+msgstr ""
+
+#. enemy-actions.10.DisplayName
+msgid "Aerossol de Expurgo"
+msgstr ""
+
+#. enemy-actions.10.Description
+msgid "Pulveriza resíduos: 2–3 de dano e Contaminação de 2 por turno durante 2 turnos."
+msgstr ""
+
+#. enemy-actions.11.DisplayName
+msgid "Recuo dos Rotores"
+msgstr ""
+
+#. enemy-actions.11.Description
+msgid "Recua uma posição para manter distância da linha de frente."
+msgstr ""
+
+#. enemy-actions.12.DisplayName
+msgid "Bastão de Contenção"
+msgstr ""
+
+#. enemy-actions.12.Description
+msgid "Causa 5–7 de dano contra um alvo na linha de frente."
+msgstr ""
+
+#. enemy-actions.13.DisplayName
+msgid "Escudo de Catraca"
+msgstr ""
+
+#. enemy-actions.13.Description
+msgid "Ativa uma carga de Blindagem, reduzindo em 50% o próximo dano direto."
+msgstr ""
+
+#. enemy-actions.14.DisplayName
+msgid "Fechar o Cerco"
+msgstr ""
+
+#. enemy-actions.14.Description
+msgid "Avança uma posição para bloquear a passagem."
+msgstr ""
+
+#. enemy-actions.15.DisplayName
+msgid "Ordem Contraditória"
+msgstr ""
+
+#. enemy-actions.15.Description
+msgid "Reproduz falsas ordens de evacuação e acrescenta 12 de Instinto a um alvo na retaguarda."
+msgstr ""
+
+#. enemy-actions.16.DisplayName
+msgid "Reposicionar Antena"
+msgstr ""
+
+#. enemy-actions.16.Description
+msgid "Recua uma posição para continuar transmitindo à distância."
+msgstr ""
+
+#. enemy-actions.17.DisplayName
+msgid "Laço de Cabos"
+msgstr ""
+
+#. enemy-actions.17.Description
+msgid "Causa 3–5 de dano, aplica Vulnerável e tenta empurrar o alvo uma posição."
+msgstr ""
+
+#. enemy-actions.18.DisplayName
+msgid "Tração de Emergência"
+msgstr ""
+
+#. enemy-actions.18.Description
+msgid "Avança uma posição puxando o próprio chassi pelos cabos."
+msgstr ""
+
+#. enemy-actions.19.DisplayName
+msgid "Jato de Resíduo Industrial"
+msgstr ""
+
+#. enemy-actions.19.Description
+msgid "Causa 4–6 de dano e Contaminação de 1 por turno durante 3 turnos."
+msgstr ""
+
+#. enemy-actions.20.DisplayName
+msgid "Esteira de Recolhimento"
+msgstr ""
+
+#. enemy-actions.20.Description
+msgid "Avança uma posição em direção ao material marcado para coleta."
+msgstr ""
+
+#. enemy-actions.21.DisplayName
+msgid "Arco de Alta Tensão"
+msgstr ""
+
+#. enemy-actions.21.Description
+msgid "Causa 2–4 de dano a um alvo em qualquer posição."
+msgstr ""
+
+#. enemy-actions.22.DisplayName
+msgid "Prensa de Contenção"
+msgstr ""
+
+#. enemy-actions.22.Description
+msgid "Na primeira fase, atinge a linha de frente com 7–10 de dano."
+msgstr ""
+
+#. enemy-actions.23.DisplayName
+msgid "Protocolo de Dispersão"
+msgstr ""
+
+#. enemy-actions.23.Description
+msgid "Na primeira fase, acrescenta 10 de Instinto a até dois aliados distintos."
+msgstr ""
+
+#. enemy-actions.24.DisplayName
+msgid "Sentença de Sucateamento"
+msgstr ""
+
+#. enemy-actions.24.Description
+msgid "Na segunda fase, causa 9–12 de dano a um alvo na linha de frente."
+msgstr ""
+
+#. enemy-actions.25.DisplayName
+msgid "Expulsão Hidráulica"
+msgstr ""
+
+#. enemy-actions.25.Description
+msgid "Na segunda fase, causa 4–6 de dano ao primeiro alvo e tenta empurrá-lo uma posição."
+msgstr ""
+
+#. enemy-actions.26.DisplayName
+msgid "Corte de Demolição"
+msgstr ""
+
+#. enemy-actions.26.Description
+#. enemy-actions.28.Description
+#. enemy-actions.30.Description
+#. enemy-actions.31.Description
+msgid "Ação mínima de protótipo; valores experimentais para o encontro de teste."
+msgstr ""
+
+#. enemy-actions.27.DisplayName
+msgid "Pega-Pega"
+msgstr ""
+
+#. enemy-actions.27.Description
+msgid "Ataque básico de protótipo. Preferência por alvo marcado e invocação de Pipoco ainda não implementadas."
+msgstr ""
+
+#. enemy-actions.28.DisplayName
+msgid "Risada Gravada"
+msgstr ""
+
+#. enemy-actions.29.DisplayName
+msgid "Golpe de Raízes (provisório)"
+msgstr ""
+
+#. enemy-actions.29.Description
+msgid "Ataque básico temporário exclusivo deste protótipo para permitir teste de combate. Não faz parte do kit conceitual aprovado; armadilhas e controle posicional ainda pendentes."
+msgstr ""
+
+#. enemy-actions.30.DisplayName
+msgid "Garra de Contenção"
+msgstr ""
+
+#. enemy-actions.31.DisplayName
+msgid "Pulso Corrompido"
+msgstr ""
+
+#. enemy-actions.32.DisplayName
+msgid "Golpe de Bastão"
+msgstr ""
+
+#. enemy-actions.33.DisplayName
+msgid "Caixa Desafinada"
+msgstr ""
+
+#. enemy-actions.34.DisplayName
+msgid "Arco de Solda"
+msgstr ""
+
+#. enemy-actions.34.Description
+msgid "Ataque de protótipo. Cura e Bloqueio em outro robô ainda não implementados; não cura a si mesmo."
+msgstr ""
+
+#. enemy-actions.35.DisplayName
+msgid "Beliscão Mecânico"
+msgstr ""
+
+#. enemy-actions.35.Description
+msgid "Ataque fraco de protótipo. Ligação e Bloqueio para outro robô ainda não implementados."
+msgstr ""
+
+#. enemy-actions.36.DisplayName
+msgid "Talho de Liga"
+msgstr ""
+
+#. enemy-actions.37.DisplayName
+msgid "Chicote de Cauda"
+msgstr ""
+
+#. enemy-actions.38.DisplayName
+msgid "Batida Elétrica"
+msgstr ""
+
+#. enemy-actions.38.Description
+msgid "Ataque básico de protótipo, sem Atordoamento. Arrancada e Espuma de Contenção ainda pendentes."
+msgstr ""
+
+#. enemy-actions.39.DisplayName
+msgid "Serrada Curta"
+msgstr ""
+
+#. enemy-actions.40.DisplayName
+msgid "Buzina Irritante"
+msgstr ""
+
+#. enemy-actions.41.DisplayName
+msgid "Ataque Básico"
+msgstr ""
+
+#. enemy-actions.41.Description
+msgid "Única ação: golpe fraco sem status ou controle de movimento. Valores experimentais."
+msgstr ""
+
+#. enemy-actions.42.DisplayName
+#. enemy-actions.43.DisplayName
+#. enemy-actions.44.DisplayName
+msgid "Golpe de Sucata"
+msgstr ""
+
+#. enemy-actions.42.Description
+#. enemy-actions.43.Description
+#. enemy-actions.44.Description
+msgid "Única ação: golpe fraco sem status extra. Mesma regra nas três variantes cosméticas; não significa três invocações simultâneas."
+msgstr ""
+
+#. events.0.Title
+msgid "A Porta que Ainda Espera"
+msgstr ""
+
+#. events.0.Description
+msgid "Raízes seguram entreaberta a porta blindada de uma Toca dos Antigos. A placa desbotada ainda se lê: \"ZONA SANITÁRIA 7 — EVACUAÇÃO AO SUBSOLO\". Arranhões antigos cobrem a soleira, como se alguém tivesse tentado entrar muito tempo atrás. Lá dentro, um terminal pisca em economia de energia."
+msgstr ""
+
+#. events.1.Title
+msgid "Voz no Interfone"
+msgstr ""
+
+#. events.1.Description
+msgid "Um interfone de emergência da antiga estação estala e acende, depois de gerações mudo. Entre chiados, uma voz sintética repete: \"Protocolo de preservação humana ativo. Vetores não autorizados detectados no setor de escoamento. Contenção a caminho.\""
+msgstr ""
+
+#. events.2.Title
+msgid "Sobrevivente dos Túneis"
+msgstr ""
+
+#. events.2.Description
+msgid "Um guaxinim de colete de manutenção está preso sob um terminal de vigilância desmontado, com a cauda anelada enroscada em bobinas de cabo. \"Desliguei o rastreador dessa coisa antes que ela me marcasse. Faz dias que estou preso aqui. Vocês têm comida?\""
+msgstr ""
+
+#. events.3.Title
+msgid "Caixa Lacrada"
+msgstr ""
+
+#. events.3.Description
+msgid "No fundo do móvel, uma caixa metálica com o símbolo de risco biológico dos Antigos. O lacre ainda está intacto e alguma coisa chacoalha lá dentro."
+msgstr ""
+
+#. events.4.Title
+msgid "Cano Rompido"
+msgstr ""
+
+#. events.4.Description
+msgid "Atrás da máquina, um cano de água limpa ainda corre, preso a uma bomba velha de manutenção. Dá para encher os cantis com calma ou tentar desmontar a bomba."
+msgstr ""
+
+#. events.5.Title
+msgid "Mochila Esquecida"
+msgstr ""
+
+#. events.5.Description
+msgid "Uma mochila de expedição de outra comunidade, presa num galho. Tem um nome bordado na alça e comida lá dentro."
+msgstr ""
+
+#. events.6.Title
+msgid "Barricada Velha"
+msgstr ""
+
+#. events.6.Description
+msgid "Atrás da carga, tábuas e placas de metal empilhadas contra uma porta, por alguém que queria manter alguma coisa do lado de dentro, ou do lado de fora."
+msgstr ""
+
+#. events.7.Title
+msgid "Choro Atrás da Porta"
+msgstr ""
+
+#. events.7.Description
+msgid "Do outro lado de uma porta de aço emperrada, um choro fino. Um filhote de lontra entrou atrás de comida e a porta fechou com ele lá dentro. A fechadura está tomada de ferrugem."
+msgstr ""
+
+#. events.8.Title
+msgid "Poço de Manutenção"
+msgstr ""
+
+#. events.8.Description
+msgid "Ao lado, a tampa de um poço de manutenção ficou aberta. Lá embaixo, no escuro total, algo reflete: caixas de suprimento empilhadas sobre a água."
+msgstr ""
+
+#. events.9.Title
+msgid "Sala dos Esporos"
+msgstr ""
+
+#. events.9.Description
+msgid "O kit está vazio, mas aponta para a porta de vidro ao lado: uma enfermaria tomada por um fungo cinzento. Lá no fundo, um armário de remédios intacto. O ar lá dentro brilha de esporos."
+msgstr ""
+
+#. expedition-nodes.0.Title
+msgid "Plataforma da Estação"
+msgstr ""
+
+#. expedition-nodes.0.Description
+msgid "A comunidade mantém trilhos, oficinas e cuidado com ferramentas herdadas. A expedição parte em busca de suprimentos."
+msgstr ""
+
+#. expedition-nodes.1.Description
+msgid "Vitrines tomadas por raízes guardam suprimentos. Os sensores ainda distinguem clientes humanos de fauna não autorizada."
+msgstr ""
+
+#. expedition-nodes.2.Title
+msgid "Abrigo Lacrado"
+msgstr ""
+
+#. expedition-nodes.2.Description
+msgid "Uma placa do Programa Continuidade aponta para o subsolo. Os registros não dizem quem retornou."
+msgstr ""
+
+#. expedition-nodes.3.Title
+msgid "Depósito Inundado"
+msgstr ""
+
+#. expedition-nodes.3.Description
+msgid "Caixas boiam entre escombros de uma antiga rede de abastecimento. O que restou pode sustentar a Estação."
+msgstr ""
+
+#. expedition-nodes.4.Title
+#. scenarios.3.DisplayName
+msgid "Ponte das Raízes"
+msgstr ""
+
+#. expedition-nodes.4.Description
+msgid "A ponte ligava bairros; seus sensores agora vigiam permissões que nenhum morador da Estação possui."
+msgstr ""
+
+#. expedition-nodes.5.Title
+msgid "Câmara Seca"
+msgstr ""
+
+#. expedition-nodes.5.Description
+msgid "Marcas deixadas por outras equipes indicam um patamar seco. Cuidar uns dos outros também sustenta a viagem."
+msgstr ""
+
+#. expedition-nodes.6.Title
+msgid "Central Telefônica"
+msgstr ""
+
+#. expedition-nodes.6.Description
+msgid "Nomes incompletos atravessam uma linha de emergência. Uma ordem se repete, sem origem verificável."
+msgstr ""
+
+#. expedition-nodes.7.Title
+#. scenarios.4.DisplayName
+msgid "Laboratório Silencioso"
+msgstr ""
+
+#. expedition-nodes.7.Description
+msgid "Restam interfaces de comunicação e anotações de aprendizagem. Os aparelhos não contam sozinhos a história de seus usuários."
+msgstr ""
+
+#. expedition-nodes.8.Title
+msgid "Dutos de Esgoto"
+msgstr ""
+
+#. expedition-nodes.8.Description
+msgid "Bombas antigas mantêm a água em movimento. Entre cabos de vigilância, alguém tenta abrir uma saída."
+msgstr ""
+
+#. expedition-nodes.9.Title
+msgid "Posto Avançado Provisório"
+msgstr ""
+
+#. expedition-nodes.9.Description
+msgid "Um abrigo improvisado permite cuidar das feridas e dividir o pouco que resta antes da eclusa."
+msgstr ""
+
+#. expedition-nodes.10.Title
+msgid "Portão de Triagem"
+msgstr ""
+
+#. expedition-nodes.10.Description
+msgid "A triagem exige credenciais humanas. A comunidade existe, mas o sistema ainda não a reconhece."
+msgstr ""
+
+#. expedition-nodes.11.Title
+msgid "Eclusa Central: O Porteiro"
+msgstr ""
+
+#. expedition-nodes.11.Description
+msgid "O Porteiro conserva uma ordem de isolamento da guerra. Seus relés sustentam a defesa da eclusa."
+msgstr ""
+
+#. perks.0.DisplayName
+msgid "Ágil"
+msgstr ""
+
+#. perks.0.Description
+msgid "+1 Velocidade enquanto estiver no grupo."
+msgstr ""
+
+#. perks.1.DisplayName
+msgid "Corajoso"
+msgstr ""
+
+#. perks.1.Description
+#. perks.2.Description
+msgid "+5 pontos percentuais na chance de Superação."
+msgstr ""
+
+#. perks.2.DisplayName
+msgid "Esperançoso"
+msgstr ""
+
+#. perks.3.DisplayName
+msgid "Lento"
+msgstr ""
+
+#. perks.3.Description
+msgid "−1 Velocidade enquanto estiver no grupo."
+msgstr ""
+
+#. perks.4.DisplayName
+msgid "Ansioso"
+msgstr ""
+
+#. perks.4.Description
+#. perks.5.Description
+msgid "−5 pontos percentuais na chance de Superação."
+msgstr ""
+
+#. perks.5.DisplayName
+msgid "Pessimista"
+msgstr ""
+
+#. perks.6.DisplayName
+msgid "Companheiro fiel"
+msgstr ""
+
+#. perks.6.Description
+msgid "Proteção válida de outro aliado: −5 Instinto próprio, uma vez por rodada."
+msgstr ""
+
+#. perks.7.DisplayName
+msgid "Temor das máquinas"
+msgstr ""
+
+#. perks.7.Description
+msgid "Ao receber dano de uma máquina: +3 Instinto próprio, uma vez por rodada."
+msgstr ""
+
+#. relics.0.DisplayName
+msgid "Botão de Cobre"
+msgstr ""
+
+#. relics.0.Description
+msgid "+3 de Vida Máxima. Um talismã sólido da época dos humanos."
+msgstr ""
+
+#. relics.1.DisplayName
+msgid "Pena de Vidro"
+msgstr ""
+
+#. relics.1.Description
+msgid "+1 de Velocidade. Cortada de um vidro de laboratório aerodinâmico."
+msgstr ""
+
+#. relics.2.DisplayName
+msgid "Coleira de Lembrança"
+msgstr ""
+
+#. relics.2.Description
+msgid "-2 de Instinto causado por eventos misteriosos (mínimo zero)."
+msgstr ""
+
+#. research.0.DisplayName
+msgid "Treino: Punho de Sucata"
+msgstr ""
+
+#. research.0.Description
+msgid "+1 nos limites de dano ou cura de Punho de Sucata."
+msgstr ""
+
+#. research.1.DisplayName
+msgid "Treino: Corte de Fase"
+msgstr ""
+
+#. research.1.Description
+msgid "+1 nos limites de dano ou cura de Corte de Fase."
+msgstr ""
+
+#. research.2.DisplayName
+msgid "Treino: Carga Voltaica"
+msgstr ""
+
+#. research.2.Description
+msgid "+1 nos limites de dano ou cura de Carga Voltaica."
+msgstr ""
+
+#. research.3.DisplayName
+msgid "Treino: Recurso de Emergência"
+msgstr ""
+
+#. research.3.Description
+msgid "+1 nos limites de dano ou cura de Recurso de Emergência."
+msgstr ""
+
+#. scenarios.2.DisplayName
+msgid "Sala Esquecida"
+msgstr ""
+
+#. scenarios.5.DisplayName
+msgid "Túneis do Eco"
+msgstr ""
+
+#. search-outcomes.0.Text
+msgid "Atrás de latas amassadas, um pacote de ração ainda lacrado. (+2 Comida)"
+msgstr ""
+
+#. search-outcomes.1.Text
+msgid "Um pote de vidro com sementes secas, guardado por alguém que pretendia voltar. (+3 Sementes)"
+msgstr ""
+
+#. search-outcomes.2.Text
+msgid "Uma caixa de primeiros socorros dos Antigos, com gazes ainda limpas. (+1 Curativo)"
+msgstr ""
+
+#. search-outcomes.3.Text
+msgid "Peças de motor e fios de cobre que a oficina da Estação vai saber usar. (+2 Sucata)"
+msgstr ""
+
+#. search-outcomes.4.Text
+msgid "Comida e um punhado de sementes enrolados num pano. (+1 Comida, +1 Semente)"
+msgstr ""
+
+#. search-outcomes.5.Text
+msgid "{Heroi} acha um desenho antigo: um cachorro, uma casa e um sol torto. A equipe segue mais leve. (+5 Esperança, +1 Semente)"
+msgstr ""
+
+#. search-outcomes.6.Text
+msgid "{Heroi} corta a pata numa lata enferrujada. (−3 de vida)"
+msgstr ""
+
+#. search-outcomes.7.Text
+msgid "Um alarme antigo dispara lá dentro e para do nada. {Heroi} fica com o coração na boca. (+8 de Instinto)"
+msgstr ""
+
+#. search-outcomes.8.Text
+msgid "A comida guardada ali estava estragada e o cheiro passou para a ração da equipe. (−1 Comida)"
+msgstr ""
+
+#. search-outcomes.9.Text
+msgid "Esporos de fungo sobem quando a porta abre. {Heroi} tosse e se afasta. (−2 de vida, +5 de Instinto)"
+msgstr ""
+
+#. search-outcomes.10.Text
+msgid "Uma sirene curta ecoa pela rua. Nada aparece, mas a equipe perde a calma. (−5 de Esperança)"
+msgstr ""
+
+#. search-outcomes.11.Text
+msgid "Um pé de cabra enferrujado, mas firme. Pode abrir muita porta por aí. (Ferramenta: Pé de cabra)"
+msgstr ""
+
+#. search-outcomes.12.Text
+msgid "Uma lanterna de manivela que ainda acende depois de umas voltas. (Ferramenta: Lanterna)"
+msgstr ""
+
+#. search-outcomes.13.Text
+msgid "Uma máscara dos Antigos com o filtro ainda lacrado no saquinho. (Ferramenta: Máscara com filtro)"
+msgstr ""

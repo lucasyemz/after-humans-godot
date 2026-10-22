@@ -156,6 +156,20 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   templates da 4.7.2 precisam estar instalados.
 - **Servir a web:** `python -m http.server 8060 --directory build/web` e abrir `http://localhost:8060`.
 
+### Textos e tradução
+
+As telas usam o sistema de tradução da Godot com `data/i18n/en.po`. A chave de cada texto é o próprio português, então
+o jogo em português mostra a chave como sempre, e o texto que falta traduzir aparece em português também no inglês.
+- **Idioma:** fica nas Opções (Português, que é o padrão, e English em teste) e é guardado em `user://settings.cfg`.
+  Nas capturas, use `--language=en`.
+- **Telas convertidas:** o título, as Opções, o HUD da exploração e da luta e a Estação. A lista está em
+  `tools/i18n_scan.gd`. Os nomes e as descrições de `data/*.json` também viram chaves, sem mudar os ids.
+- **Ao mexer num texto de tela ou nos dados:** rode `"$GODOT" --headless --path . -s res://tools/i18n_update.gd`. Ele
+  acrescenta os textos novos ao PO, com a tradução vazia, e mantém as que já existem. Depois traduza os `msgstr ""`. O
+  texto com `%s`/`%d` passa por `tr()` antes do `%`.
+- **O que não é texto** (nomes de nó, teclas, formatos sem palavra) vai para `tools/i18n_ignore.txt`.
+- **O teste** `tests/test_i18n.gd` acusa texto de tela fora do PO e tradução que perdeu um marcador.
+
 ### Testes no GitHub (CI)
 
 `.github/workflows/tests.yml` roda os mesmos testes em cada PR e em cada push na `main`. Ele:

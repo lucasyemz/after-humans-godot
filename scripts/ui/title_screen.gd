@@ -73,13 +73,13 @@ func _build_buttons() -> void:
 	continue_button = null
 	load_button = null
 	if can_continue():
-		continue_button = _title_button("Continuar", true, _continue)
-	new_button = _title_button("Nova campanha", continue_button == null, _ask_new_campaign)
+		continue_button = _title_button(tr("Continuar"), true, _continue)
+	new_button = _title_button(tr("Nova campanha"), continue_button == null, _ask_new_campaign)
 	# Campanhas: quando há uma campanha que o Continuar não abre (outro espaço).
 	var ok := range(1, Campaign.SLOT_COUNT + 1).filter(func(n): return Campaign.slot_summary(n).status == "ok").size()
 	if ok > (1 if continue_button != null else 0):
-		load_button = _title_button("Campanhas", false, _open_slots.bind(false))
-	options_button = _title_button("Opções", false, _open_options)
+		load_button = _title_button(tr("Campanhas"), false, _open_slots.bind(false))
+	options_button = _title_button(tr("Opções"), false, _open_options)
 	_note.text = Campaign.load_warning
 	_note.visible = Campaign.load_warning != ""
 	(continue_button if continue_button != null else new_button).grab_focus.call_deferred()
@@ -208,7 +208,7 @@ func _ask_new_campaign() -> void:
 ## só os que têm uma campanha que abre.
 func _open_slots(for_new: bool) -> void:
 	var box := _open_modal(760)
-	box.add_child(H.make_label("Em qual espaço começar?" if for_new else "Campanhas", 34, H.GOLD))
+	box.add_child(H.make_label(tr("Em qual espaço começar?") if for_new else tr("Campanhas"), 34, H.GOLD))
 	var first: Button
 	for number in range(1, Campaign.SLOT_COUNT + 1):
 		var summary := Campaign.slot_summary(number)
@@ -223,7 +223,7 @@ func _open_slots(for_new: bool) -> void:
 		box.add_child(button)
 		if first == null and not button.disabled:
 			first = button
-	var back := _modal_button("Voltar", close_modal)
+	var back := _modal_button(tr("Voltar"), close_modal)
 	box.add_child(back)
 	(first if first != null else back).grab_focus.call_deferred()
 	_center_modal.call_deferred()
@@ -231,18 +231,21 @@ func _open_slots(for_new: bool) -> void:
 
 ## A linha de um espaço: o número e, se tem campanha, o ciclo, as fases, o elenco vivo, a data e o tempo jogado.
 static func slot_text(summary: Dictionary, last: bool) -> String:
-	var head := "Espaço %d%s" % [summary.slot, " (último usado)" if last and summary.status == "ok" else ""]
+	var head: String = TranslationServer.translate("Espaço %d") % summary.slot \
+		+ (TranslationServer.translate(" (último usado)") if last and summary.status == "ok" else "")
 	match summary.status:
 		"empty":
-			return "%s — vazio" % head
+			return TranslationServer.translate("%s — vazio") % head
 		"broken":
-			return "%s — o save não abre" % head
+			return TranslationServer.translate("%s — o save não abre") % head
 	var date := Time.get_datetime_dict_from_unix_time(int(summary.saved_at) + int(Time.get_time_zone_from_system().get("bias", 0)) * 60)
 	var minutes := int(summary.played_seconds) / 60
-	var played := ("%d h %02d min" % [minutes / 60, minutes % 60]) if minutes >= 60 else ("%d min" % minutes)
-	return "%s — Ciclo %d · %d fase%s · %d de %d vivos\n%02d/%02d/%d %02d:%02d · %s jogados%s" % [head, summary.cycle,
-		summary.phases, "" if summary.phases == 1 else "s", summary.alive, summary.roster, date.day, date.month, date.year,
-		date.hour, date.minute, played, " · em expedição" if summary.in_expedition else ""]
+	var played: String = (TranslationServer.translate("%d h %02d min") % [minutes / 60, minutes % 60]) if minutes >= 60 \
+		else (TranslationServer.translate("%d min") % minutes)
+	var phases: String = (TranslationServer.translate("%d fase") if summary.phases == 1 else TranslationServer.translate("%d fases")) % summary.phases
+	return TranslationServer.translate("%s — Ciclo %d · %s · %d de %d vivos\n%02d/%02d/%d %02d:%02d · %s jogados%s") % [head, summary.cycle,
+		phases, summary.alive, summary.roster, date.day, date.month, date.year, date.hour, date.minute, played,
+		TranslationServer.translate(" · em expedição") if summary.in_expedition else ""]
 
 
 func _pick_slot(number: int, for_new: bool) -> void:
@@ -259,16 +262,16 @@ func _pick_slot(number: int, for_new: bool) -> void:
 		return
 	var summary := Campaign.slot_summary(number)
 	var box := _open_modal(680)
-	box.add_child(H.make_label("Começar uma campanha nova?", 34, H.GOLD))
-	var text := ("Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero. Os outros espaços ficam como estão." % number) \
-		if summary.status == "ok" else ("O save do espaço %d não pôde ser aberto. Uma campanha nova grava por cima dele, e ele não volta mais." % number)
+	box.add_child(H.make_label(tr("Começar uma campanha nova?"), 34, H.GOLD))
+	var text := (tr("Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero. Os outros espaços ficam como estão.") % number) \
+		if summary.status == "ok" else (tr("O save do espaço %d não pôde ser aberto. Uma campanha nova grava por cima dele, e ele não volta mais.") % number)
 	var note := H.make_label(text, 22, H.TEXT)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(620, 0)
 	box.add_child(note)
-	var stay := _modal_button("Cancelar", close_modal)
+	var stay := _modal_button(tr("Cancelar"), close_modal)
 	box.add_child(stay)
-	box.add_child(_modal_button("Começar do zero", _start_new_campaign.bind(number)))
+	box.add_child(_modal_button(tr("Começar do zero"), _start_new_campaign.bind(number)))
 	stay.grab_focus.call_deferred()
 
 
