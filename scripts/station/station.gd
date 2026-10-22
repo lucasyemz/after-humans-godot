@@ -749,6 +749,8 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		residents[civilian_id] = card
 		# Civil morador: alterna o idle e a pose de trabalho, parado no posto dele.
 		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
+	# Refeitos os passeios (depois do trem, por exemplo), quem dorme volta para o beliche.
+	_update_sleepers()
 
 
 ## A arte do herói (recrutas novos usam a do fundador da mesma classe).
