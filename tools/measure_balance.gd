@@ -13,6 +13,7 @@
 ## sorteados por luta: uma pessoa jogando mal). Opções (simuladas só aqui):
 ##   base · hp25 (inimigos com +25% de vida) · dmg1 (+1 de dano) · more (+1 inimigo, cópia do da frente, nas patrulhas
 ##   com menos de 4) · lesscare (metade da comida grátis, 1 curativo e a ampola sem recarga na vitória).
+## A coluna da jornada com cuidados mostra também quantas ampolas, em média, a Íris usou fora da luta.
 extends SceneTree
 
 const PHASES := ["fase_1", "fase_2", "fase_3", "fase_4", "fase_5"]
@@ -28,6 +29,8 @@ var seeds := 40
 var policy := "auto"
 var option := "base"
 var _rng := RandomNumberGenerator.new()
+## Ampolas da Íris usadas fora da luta nas jornadas com cuidados da fase (mostra o efeito do lesscare).
+var _ampoules := 0
 ## Carregados na hora de rodar: com -s, o script compila antes dos autoloads (GameData) de que as regras dependem.
 var J
 var Session
@@ -64,6 +67,7 @@ func _run() -> void:
 func _measure(phase_id: String) -> void:
 	var stats := {}
 	var journeys := {true: [0, 0], false: [0, 0]}
+	_ampoules = 0
 	for seed_value in seeds:
 		# Luta a luta: cada uma numa cópia da expedição recém-criada.
 		var base := _new_campaign(seed_value, phase_id)
@@ -101,8 +105,8 @@ func _measure(phase_id: String) -> void:
 		var fights: int = entry.fights
 		var tail := ""
 		if label == "guardião":
-			tail = "%5.0f%% · %.2f de 4                    | %5.0f%% · %.2f de 4" % [100.0 * journeys[true][0] / seeds,
-				float(journeys[true][1]) / seeds, 100.0 * journeys[false][0] / seeds, float(journeys[false][1]) / seeds]
+			tail = "%5.0f%% · %.2f de 4 · %.1f ampolas     | %5.0f%% · %.2f de 4" % [100.0 * journeys[true][0] / seeds,
+				float(journeys[true][1]) / seeds, float(_ampoules) / seeds, 100.0 * journeys[false][0] / seeds, float(journeys[false][1]) / seeds]
 		print("%s | %-9s | %5.0f%%   | %5.1f   | %5.0f%%         | %s" % [phase_id, label, 100.0 * entry.wins / fights,
 			float(entry.rounds) / fights, 100.0 * entry.hp / fights, tail])
 
@@ -130,6 +134,7 @@ func _care(campaign: Dictionary) -> void:
 		var used := false
 		for kind in CARE_ORDER:
 			if Care.quote(campaign, worst.id, kind).available and Care.use(campaign, worst.id, kind) > 0:
+				_ampoules += 1 if kind == "iris_ampoule" else 0
 				used = true
 				break
 		if not used:
@@ -165,9 +170,16 @@ func _fight(campaign: Dictionary, index: int, seed_value: int) -> Dictionary:
 		else:
 			session.enemy_turn()
 		beats += 1
+	# write_back recarrega a ampola da Íris na vitória; em lesscare ela fica com as cargas que sobraram da luta.
+	var kept := {}
+	if option == "lesscare":
+		for unit in session.state.player_team:
+			if unit.remaining_uses.has(Care.AMPOULE):
+				kept[unit.hero_id] = unit.remaining_uses[Care.AMPOULE]
 	session.write_back(campaign)
-	if option != "lesscare":
-		Care.restore_iris_after_victory(campaign, session)
+	for hero in campaign.roster:
+		if kept.has(hero.id) and hero.alive:
+			hero.expedition_uses[Care.AMPOULE] = kept[hero.id]
 	var hp := 0.0
 	var max_hp := 0.0
 	for unit in session.state.player_team:
