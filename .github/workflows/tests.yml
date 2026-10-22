@@ -1,0 +1,94 @@
+# Testes do After Humans em cada PR e em cada push na main (#38): baixa a Godot 4.7.2 (com cache), importa o projeto e
+# roda tests/run_all.gd. Falha deixa o PR vermelho. No PR, um aviso (sem falhar) quando art/ cresce mais de 5 MB ou entra
+# imagem em docs/ fora de uma pasta com .gdignore.
+name: Testes
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: 4.7.2
+  GODOT_ZIP: Godot_v4.7.2-stable_linux.x86_64.zip
+  GODOT_SHA512: 9aa00f7a605200940bce3027a567b782f49bd8e940dd06ae9e987bd65aee1b1467edd56ed84fcdcbdd44354bf613bdbb4e5d2913e925850368e150c59ed54c65
+
+jobs:
+  tests:
+    name: tests/run_all.gd
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache da Godot
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux-x86_64
+
+      - name: Baixar a Godot
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          curl -fsSL -o ~/godot/godot.zip "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/${GODOT_ZIP}"
+          echo "${GODOT_SHA512}  $HOME/godot/godot.zip" | sha512sum -c -
+          unzip -q ~/godot/godot.zip -d ~/godot
+          rm ~/godot/godot.zip
+          mv ~/godot/Godot_v*_linux.x86_64 ~/godot/godot
+
+      # A importação refeita só no que mudou: a Godot confere cada .import contra o arquivo de origem.
+      - name: Cache da importação
+        uses: actions/cache@v4
+        with:
+          path: .godot
+          key: godot-import-${{ env.GODOT_VERSION }}-${{ hashFiles('**/*.import', 'project.godot') }}
+          restore-keys: godot-import-${{ env.GODOT_VERSION }}-
+
+      - name: Importar o projeto
+        run: ~/godot/godot --headless --path . --import
+
+      - name: Rodar os testes
+        run: |
+          set -o pipefail
+          ~/godot/godot --headless --path . --script res://tests/run_all.gd 2>&1 | tee tests.log
+
+      - name: Publicar o resultado
+        if: always()
+        run: |
+          [ -f tests.log ] || exit 0
+          grep -E '^FAIL ' tests.log | sed -E 's/^FAIL (.*)$/::error title=Teste falhou::\1/' || true
+          {
+            echo "## Testes"
+            echo
+            grep -E 'testes passaram' tests.log | tail -n 1 || echo "O runner não chegou ao fim."
+            echo
+            echo '```'
+            grep -E '^(PASS|FAIL) |^    ' tests.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Guardar o log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-log
+          path: tests.log
+          if-no-files-found: ignore
+
+  leveza:
+    name: Leveza do PR
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: art/ e docs/
+        run: bash tools/ci_size_check.sh "$(git merge-base origin/${{ github.base_ref }} HEAD)" HEAD
