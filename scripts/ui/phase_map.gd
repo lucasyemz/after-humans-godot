@@ -132,6 +132,12 @@ func refresh() -> void:
 	_build_aside(c)
 
 
+## O tamanho do texto mudou nas Opções (AHUiStyle.retune): a barra de progresso acompanha o cabeçalho.
+func restyle() -> void:
+	_header.size = Vector2(0, 0)
+	_progress.position.x = 40 + _header.get_minimum_size().x + 24
+
+
 func _status(c: Dictionary, info: Dictionary) -> String:
 	return "Concluída" if c.completed_phases.has(info.id) else ("Disponível" if S.phase_unlocked(c, info.id) else "Bloqueada")
 

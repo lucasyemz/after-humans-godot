@@ -258,6 +258,11 @@ func _refresh_place() -> void:
 # ---------------------------------------------------------------- estado
 
 ## Atualiza o lugar, o objetivo, a rota, os recursos e a equipe a partir da campanha.
+## O tamanho do texto ou as cores mudaram nas Opções (AHUiStyle.retune): a rota e a equipe se reposicionam.
+func restyle() -> void:
+	refresh(Campaign.state)
+
+
 func refresh(campaign: Dictionary) -> void:
 	var expedition = campaign.get("session", {}).get("expedition")
 	if expedition == null:

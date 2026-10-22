@@ -91,6 +91,13 @@ func _build() -> void:
 
 
 ## Mostra a dica se ela ainda não foi vista (e as dicas estão ligadas). Uma de cada vez; as outras esperam a vez.
+## O tamanho do texto mudou nas Opções (AHUiStyle.retune): o cartão aberto acompanha.
+func restyle() -> void:
+	if _card.visible:
+		_card.size = _card.get_combined_minimum_size()
+		_card.position = Vector2(960 - _card.size.x * 0.5, 150)
+
+
 func show_tip(id: String) -> void:
 	if not enabled or _seen.has(id) or not TIPS.has(id) or id == _current or _queue.has(id):
 		return

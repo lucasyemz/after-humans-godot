@@ -60,6 +60,68 @@ static func install(root: Window) -> void:
 	root.theme = theme()
 
 
+const _COLOR_NAMES := ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_disabled_color", "icon_normal_color"]
+const _STYLE_NAMES := ["panel", "normal", "hover", "pressed", "focus", "disabled", "fill", "background"]
+
+
+## As Opções valem na hora (#4): o tamanho do texto e as cores para daltonismo mudam nas telas já abertas sem remontá-las
+## (o painel aberto, a rolagem e a seleção ficam como estão).
+## - Todo tamanho de fonte passa por px(); px é inversível (round(round(s·k)/k) = s para k ≥ 1), então o tamanho de antes
+##   volta ao da base e vai para a escala nova.
+## - As cores de bom e de ruim (OK, DANGER) trocam onde aparecem: texto, painéis, barras, linhas e o aro dos rostos, com
+##   a transparência de cada uso.
+## - Depois, quem tem restyle() (os HUDs) refaz o que calcula na hora (posições pelo tamanho do texto, cores derivadas).
+static func retune(root: Node, from_scale: float, from_ok: Color, from_danger: Color) -> void:
+	var swaps := []
+	if not _same_rgb(from_ok, OK):
+		swaps.append([from_ok, OK])
+	if not _same_rgb(from_danger, DANGER):
+		swaps.append([from_danger, DANGER])
+	var rescale := not is_equal_approx(from_scale, text_scale)
+	var styles := {}
+	var hooks: Array = []
+	for node in [root] + root.find_children("*", "", true, false):
+		if node is Control:
+			var control: Control = node
+			if rescale and control.has_theme_font_size_override("font_size"):
+				var base := int(round(control.get_theme_font_size("font_size") / from_scale))
+				control.add_theme_font_size_override("font_size", px(base))
+			if not swaps.is_empty():
+				for color_name in _COLOR_NAMES:
+					if control.has_theme_color_override(color_name):
+						control.add_theme_color_override(color_name, _swap(control.get_theme_color(color_name), swaps))
+				for style_name in _STYLE_NAMES:
+					if control.has_theme_stylebox_override(style_name):
+						var style := control.get_theme_stylebox(style_name)
+						# A mesma caixa pode servir a vários botões: troca uma vez só.
+						if style is StyleBoxFlat and not styles.has(style):
+							styles[style] = true
+							style.bg_color = _swap(style.bg_color, swaps)
+							style.border_color = _swap(style.border_color, swaps)
+				if control is ColorRect:
+					control.color = _swap(control.color, swaps)
+				if control.material is ShaderMaterial and control.material.get_shader_parameter("ring") != null:
+					control.material.set_shader_parameter("ring", _swap(control.material.get_shader_parameter("ring"), swaps))
+		elif node is Line2D and not swaps.is_empty():
+			node.default_color = _swap(node.default_color, swaps)
+		if node.has_method("restyle"):
+			hooks.append(node)
+	# Depois do quadro: os tamanhos mínimos só se refazem com as fontes novas aplicadas.
+	for node in hooks:
+		node.restyle.call_deferred()
+
+
+static func _same_rgb(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) < 0.004 and absf(a.g - b.g) < 0.004 and absf(a.b - b.b) < 0.004
+
+
+static func _swap(color: Color, swaps: Array) -> Color:
+	for pair in swaps:
+		if _same_rgb(color, pair[0]):
+			return Color(pair[1], color.a)
+	return color
+
+
 static func panel(alpha: float = 0.9, border: Color = Color(COPPER, 0.55), width: int = 2) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(PANEL, alpha)

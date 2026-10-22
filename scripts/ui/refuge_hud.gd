@@ -303,6 +303,15 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 
+## O tamanho do texto ou as cores mudaram nas Opções (AHUiStyle.retune): o que tem posição calculada pelo tamanho do
+## texto se ajusta, sem remontar o painel aberto (a rolagem e a seleção ficam).
+func restyle() -> void:
+	_resources.size = _resources.get_combined_minimum_size()
+	_resources.position = Vector2(1888 - _resources.size.x, 16)
+	if _hidden_hint != null:
+		_hidden_hint.size = _hidden_hint.get_combined_minimum_size()
+
+
 func refresh() -> void:
 	var c: Dictionary = Campaign.state
 	var f := S.forecast(c, 4)

@@ -1,0 +1,127 @@
+## As Opções de acessibilidade valem na hora (#4): trocar o tamanho do texto ou as cores para daltonismo muda as telas
+## abertas (Estação, mapa de fases, exploração, luta e Mochila) sem remontá-las nem perder o painel aberto e a seleção.
+extends RefCounted
+
+const S = preload("res://scripts/flow/station_rules.gd")
+const U = preload("res://scripts/ui/ui_style.gd")
+
+
+func run(t) -> void:
+	_retune(t)
+	var tree: SceneTree = Engine.get_main_loop()
+	var real_dir: String = Campaign.save_dir
+	var real_state: Dictionary = Campaign.state
+	Campaign.save_dir = "user://test-live-options-%d" % Time.get_ticks_usec()
+	Campaign.state = Campaign.create_initial(31)
+	await _station(t, tree)
+	await _street(t, tree)
+	Settings.set_text_size(0)
+	Settings.set_colorblind(false)
+	if tree.current_scene != null:
+		tree.unload_current_scene()
+	await tree.process_frame
+	for file in DirAccess.get_files_at(Campaign.save_dir):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir.path_join(file)))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
+	Campaign.save_dir = real_dir
+	Campaign.state = real_state
+
+
+## Um rótulo e um painel montados antes da troca acompanham os três tamanhos e as cores, ida e volta.
+func _retune(t) -> void:
+	var tree: SceneTree = Engine.get_main_loop()
+	var box := PanelContainer.new()
+	box.add_theme_stylebox_override("panel", U.panel(0.9, Color(U.DANGER, 0.6)))
+	var good := U.label("bom", 20, U.OK)
+	var bad := U.label("ruim", 17, U.DANGER)
+	box.add_child(good)
+	box.add_child(bad)
+	tree.root.add_child(box)
+	for size in [1, 2, 0, 2, 0]:
+		Settings.set_text_size(size)
+		t.equal([good.get_theme_font_size("font_size"), bad.get_theme_font_size("font_size")],
+			[U.px(20), U.px(17)], "texto %s: o rótulo já aberto muda na hora" % Settings.TEXT_SIZES[size])
+	Settings.set_colorblind(true)
+	t.equal(good.get_theme_color("font_color"), U.OK, "daltonismo: o verde do rótulo aberto vira azul")
+	t.equal(bad.get_theme_color("font_color"), U.DANGER, "daltonismo: o vermelho vira laranja")
+	var border: Color = (box.get_theme_stylebox("panel") as StyleBoxFlat).border_color
+	t.check(U._same_rgb(border, U.DANGER) and is_equal_approx(border.a, 0.6), "o filete do painel troca de cor e fica com a transparência")
+	Settings.set_colorblind(false)
+	t.equal(good.get_theme_color("font_color"), Color("86c98f"), "sem daltonismo: volta o verde")
+	box.free()
+
+
+func _wait_scene(tree: SceneTree, check: Callable) -> bool:
+	for frame in 600:
+		await tree.process_frame
+		if not GameFlow.busy and tree.current_scene != null and check.call(tree.current_scene):
+			await tree.process_frame
+			return true
+	return false
+
+
+## Na Estação, com o Plano aberto: o texto do painel cresce, o painel continua aberto e o mapa de fases acompanha.
+func _station(t, tree: SceneTree) -> void:
+	GameFlow.change_to("station", {}, false)
+	if not t.check(await _wait_scene(tree, func(s): return s is AHStation and s.hud != null), "a Estação abriu"):
+		return
+	var hud: AHRefugeHud = tree.current_scene.hud
+	hud.open_service("plan")
+	await tree.process_frame
+	var title := _first_label(hud._body)
+	var before := title.get_theme_font_size("font_size") if title else 0
+	var children := hud._body.get_child_count()
+	Settings.set_text_size(2)
+	await tree.process_frame
+	t.equal(hud.current, "plan", "o Plano continua aberto depois da troca")
+	t.equal(hud._body.get_child_count(), children, "o painel não foi remontado")
+	t.check(is_instance_valid(title) and title.get_theme_font_size("font_size") > before, "o texto do painel aberto cresceu (%d → %d)" % [before, title.get_theme_font_size("font_size") if is_instance_valid(title) else 0])
+	t.check(hud._resources.position.x + hud._resources.size.x <= 1889.0, "a barra do alto continua dentro da tela")
+	hud.open_map()
+	await tree.process_frame
+	Settings.set_text_size(0)
+	await tree.process_frame
+	t.check(hud._map.visible, "o mapa de fases continua aberto")
+	t.check(hud._map._progress.position.x > hud._map._header.position.x + hud._map._header.get_minimum_size().x, "a barra de progresso acompanha o cabeçalho")
+
+
+## Na rua e na luta: o HUD da exploração e o da luta mudam na hora; a luta continua esperando o mesmo herói.
+func _street(t, tree: SceneTree) -> void:
+	var c: Dictionary = Campaign.state
+	t.equal(S.confirm_departure(c, c.preferred_formation.duplicate(), 0, 9090, "fase_1"), "", "parte")
+	GameFlow.change_to("street", {}, false)
+	if not t.check(await _wait_scene(tree, func(s): return s.get("corridor") != null), "a rua abriu"):
+		return
+	var street = tree.current_scene
+	var hud: AHExplorationHud = street.exploration_hud
+	var label := _first_label(hud)
+	var before := label.get_theme_font_size("font_size")
+	Settings.set_text_size(1)
+	t.check(label.get_theme_font_size("font_size") > before, "o HUD da exploração cresce na hora")
+	street.corridor.debug_next_fight()
+	street.corridor._start_fight(c.session.expedition.corridor.index, true)
+	var arena: AHCombatArena = street._arena
+	for frame in 600:
+		if arena.hud.waiting:
+			break
+		await tree.process_frame
+	if not t.check(arena.hud.waiting, "a luta pede o comando"):
+		return
+	var actor: String = arena.hud._actor_id
+	var plate_label := _first_label(arena.hud._unit_bars.values()[0])
+	var plate_before := plate_label.get_theme_font_size("font_size")
+	arena.hud._on_action("item")
+	Settings.set_text_size(2)
+	Settings.set_colorblind(true)
+	await tree.process_frame
+	t.check(plate_label.get_theme_font_size("font_size") > plate_before, "as fichas da luta crescem na hora")
+	t.check(arena.hud.waiting and arena.hud._actor_id == actor, "a luta continua esperando o mesmo herói")
+	t.check(arena.hud._bag != null, "a Mochila aberta continua aberta")
+	t.check(arena.hud._panel.position.y + arena.hud._panel.size.y <= 1057.0, "o painel de baixo cabe na tela com o texto Maior")
+
+
+func _first_label(root: Node) -> Label:
+	for node in root.find_children("*", "Label", true, false):
+		if node.has_theme_font_size_override("font_size") and node.text != "":
+			return node
+	return null

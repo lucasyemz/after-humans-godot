@@ -83,7 +83,6 @@ func _ready() -> void:
 		button.pressed.connect(func():
 			Settings.set_text_size(index)
 			_rebuild())
-	_hint("O texto novo vale nas telas que abrirem depois (a próxima luta, a volta à Estação).")
 	var again := Button.new()
 	again.text = "Mostrar as dicas de novo"
 	again.custom_minimum_size = Vector2(0, 42)

@@ -660,6 +660,12 @@ func _dock_top() -> float:
 	return _panel.position.y
 
 
+## O tamanho do texto ou as cores mudaram nas Opções (AHUiStyle.retune): as fichas e o painel se ajustam ao texto novo.
+func restyle() -> void:
+	refresh()
+	_fit_dock.call_deferred()
+
+
 # ---------------------------------------------------------------- dicas
 
 func _hide_tip() -> void:

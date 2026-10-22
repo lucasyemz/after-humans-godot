@@ -122,17 +122,22 @@ func reset_keys() -> void:
 	_store()
 
 
+## As cores e o tamanho do texto valem na hora, também nas telas abertas (AHUiStyle.retune).
 func set_colorblind(value: bool) -> void:
+	var ok := AHUiStyle.OK
+	var danger := AHUiStyle.DANGER
 	colorblind = value
 	_store()
+	AHUiStyle.retune(get_tree().root, AHUiStyle.text_scale, ok, danger)
 
 
-## Vale nas telas abertas daqui em diante (os HUDs são montados ao entrar na cena).
 func set_text_size(value: int) -> void:
+	var scale: float = AHUiStyle.text_scale
 	text_size = clampi(value, 0, TEXT_SIZES.size() - 1)
 	AHUiStyle.text_scale = TEXT_SCALE[text_size]
 	AHUiStyle.install(get_tree().root)
 	_store()
+	AHUiStyle.retune(get_tree().root, scale, AHUiStyle.OK, AHUiStyle.DANGER)
 
 
 func set_touch_controls(value: int) -> void:
