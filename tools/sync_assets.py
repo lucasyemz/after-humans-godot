@@ -18,6 +18,9 @@ DATA = [
     *sorted((REPO / "Data").glob("*.json")),
     REPO / "Data" / "combat-parity.txt",
 ]
+# Dados que passaram a ser da Godot: não voltam da Unreal (encounters.json tem as patrulhas de cada fase e de cada loja,
+# com os vilões do John, desde 22/10/2026).
+GODOT_OWNED_DATA = {"encounters.json"}
 LEGACY_KITS = sorted((REPO / "Tests" / "Fixtures" / "LegacyKits").glob("*.json"))
 
 WEB_TAG = "alphaweb"
@@ -339,7 +342,8 @@ def copy(src: Path, dst: Path) -> None:
 
 def main() -> None:
     for src in DATA:
-        copy(src, PROTO / "data" / src.name)
+        if src.name not in GODOT_OWNED_DATA:
+            copy(src, PROTO / "data" / src.name)
     for src in LEGACY_KITS:
         copy(src, PROTO / "data" / "legacy_kits" / src.name)
 

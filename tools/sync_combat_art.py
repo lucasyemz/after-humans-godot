@@ -53,6 +53,10 @@ RECRUITS = {
     "owl_recruit_01": "coruja",
 }
 PORTRAITS = PROTO / "art" / "ui" / "portraits"
+# Vilões do John (conceitos de 09/10/2026, idles de SourceArt/CharacterGallery/EnemyHelperIdles20261010): só a pose
+# parada, voltada à direita como os outros. Entram os que a distribuição dele põe num cenário (Lucas, 22/10/2026).
+GALLERY = REPO / "SourceArt" / "CharacterGallery" / "EnemyHelperIdles20261010"
+GALLERY_ENEMIES = ["recreador", "pipoco", "enraizado", "broto", "carrasco_industrial", "faisca"]
 POSES = ["attack1", "attack2", "defense", "hurt", "dodge", "support", "death"]
 AUDIO_CUES = ["BentoAction", "NickAction", "IrisAction", "VesperaAction", "Dodge", "RobotDodge", "RobotHeal", "RobotPunch"]
 
@@ -177,6 +181,21 @@ def enemies() -> dict:
     return out
 
 
+def gallery_enemies() -> dict:
+    """Os vilões do John: a pose parada; a âncora e a altura do corpo vêm do manifesto da galeria (body_alpha_bounds),
+    porque as imagens têm faíscas e sombra soltas fora do corpo."""
+    manifest = {e["id"]: e for e in json.loads((GALLERY / "manifest.json").read_text(encoding="utf-8"))["entries"]}
+    out = {}
+    for enemy_id in GALLERY_ENEMIES:
+        entry = manifest[enemy_id]
+        folder = ART / "enemies" / enemy_id
+        image = convert(GALLERY / entry["file"], folder / "idle.webp")
+        left, top, right, bottom = entry["body_alpha_bounds"]
+        out[enemy_id] = {"poses": {}, "idle": {"file": res(folder / "idle.webp"), "anchor": [(left + right) / 2, bottom],
+                                                "body_reference_pixels": bottom - top, "canvas": [image.width, image.height]}}
+    return out
+
+
 def icons() -> dict:
     out = {}
     for src in sorted((REPO / "SourceArt/ApprovedActionIcons").glob("*.png")):
@@ -206,7 +225,8 @@ def audio() -> dict:
 
 def main() -> None:
     manifest = {"schema_version": 1, "scale_note": "Medidas em pixels da imagem original; a textura pode ser menor.",
-                "heroes": heroes(), "recruits": recruits(), "enemies": enemies(), "icons": icons(), "audio": audio()}
+                "heroes": heroes(), "recruits": recruits(), "enemies": {**enemies(), **gallery_enemies()}, "icons": icons(),
+                "audio": audio()}
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
     size = sum(f.stat().st_size for f in ART.rglob("*") if f.is_file()) + sum(f.stat().st_size for f in AUDIO.rglob("*") if f.is_file())
