@@ -231,7 +231,7 @@ func _assign_scenario_props(campaign: Dictionary) -> void:
 			continue
 		steps.append(step)
 		entries.append({"local": local, "x": float(prop.x), "zone": zone, "step": step, "name": prop.name})
-	var first := R.assign_scenario_props(campaign, street.scenario.map_name, steps)
+	var first := R.assign_scenario_props(campaign, street.scenario.map_name, steps, entries.map(func(e): return e.name))
 	for i in entries.size():
 		entries[i].prop = first + i
 		scenario_props.append(entries[i])

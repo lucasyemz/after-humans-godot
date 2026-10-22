@@ -105,7 +105,8 @@
     "Description": "No fundo do móvel, uma caixa metálica com o símbolo de risco biológico dos Antigos. O lacre ainda está intacto e alguma coisa chacoalha lá dentro.",
     "Places": [],
     "Objects": [
-      "movel"
+      "movel",
+      "armario"
     ],
     "Choices": [
       {
@@ -136,7 +137,9 @@
     "Places": [
       "rua-das-vitrines"
     ],
-    "Objects": [],
+    "Objects": [
+      "maquina"
+    ],
     "Choices": [
       {
         "Id": "encher_cantis",
@@ -168,7 +171,9 @@
       "rua-das-vitrines",
       "ponte-das-raizes"
     ],
-    "Objects": [],
+    "Objects": [
+      "bolsa"
+    ],
     "Choices": [
       {
         "Id": "levar_tudo",
@@ -206,7 +211,9 @@
       "sala-esquecida",
       "laboratorio-silencioso"
     ],
-    "Objects": [],
+    "Objects": [
+      "carga"
+    ],
     "Choices": [
       {
         "Id": "escudos_placas",
@@ -252,7 +259,9 @@
       "laboratorio-silencioso",
       "tuneis-do-eco"
     ],
-    "Objects": [],
+    "Objects": [
+      "armario"
+    ],
     "Choices": [
       {
         "Id": "forcar_pe_de_cabra",
@@ -300,7 +309,9 @@
       "sala-esquecida",
       "tuneis-do-eco"
     ],
-    "Objects": [],
+    "Objects": [
+      "maquina"
+    ],
     "Choices": [
       {
         "Id": "descer_lanterna",
@@ -349,7 +360,9 @@
       "laboratorio-silencioso",
       "tuneis-do-eco"
     ],
-    "Objects": [],
+    "Objects": [
+      "medico"
+    ],
     "Choices": [
       {
         "Id": "entrar_mascara",

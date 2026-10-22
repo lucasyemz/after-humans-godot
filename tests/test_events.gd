@@ -4,6 +4,8 @@
 extends RefCounted
 
 const R = preload("res://scripts/flow/journey_rules.gd")
+## Os props da Sala Esquecida, como a cena informa.
+const NAMES := ["Objeto", "Objeto", "Fichário", "Objeto", "Objeto", "Caixote de baterias"]
 const PLACES := ["rua-das-vitrines", "ponte-das-raizes", "sala-esquecida", "laboratorio-silencioso", "tuneis-do-eco"]
 
 
@@ -15,22 +17,66 @@ func run(t) -> void:
 	await _scene(t)
 
 
+const KINDS := ["movel", "armario", "maquina", "bolsa", "carga", "medico"]
+const MAP_PLACES := {"RiverDock": "ponte-das-raizes", "RootBridge": "ponte-das-raizes", "SealedShelter": "sala-esquecida",
+	"TriageGate": "laboratorio-silencioso", "FloodedDepot": "tuneis-do-eco", "SewerDucts": "tuneis-do-eco"}
+
+
 func _pools(t) -> void:
 	for place in PLACES:
-		t.check(R.event_pool(place, "").size() >= 2, "%s tem pelo menos dois eventos (%s)" % [place, R.event_pool(place, "")])
-	t.check(not R.event_pool("rua-das-vitrines", "").has("busca_sala_esporos"), "a enfermaria de esporos não aparece na rua")
-	t.check(not R.event_pool("sala-esquecida", "").has("busca_cano_rompido"), "o cano sob o asfalto só na rua")
+		var all := {}
+		for kind in KINDS:
+			for id in R.event_pool(place, kind):
+				all[id] = true
+		t.check(all.size() >= 2, "%s tem pelo menos dois eventos (%s)" % [place, all.keys()])
+	t.equal(R.event_pool("rua-das-vitrines", ""), [], "objeto sem tipo (a escada, \"Objeto\") não abre evento")
+	t.check(not R.event_pool("rua-das-vitrines", "medico").has("busca_sala_esporos"), "a enfermaria de esporos não aparece na rua")
+	t.check(not R.event_pool("sala-esquecida", "maquina").has("busca_cano_rompido"), "o cano sob o asfalto só na rua")
 	t.check(R.event_pool("rua-das-vitrines", "movel").has("busca_caixa_sanitaria"), "a caixa no fundo do móvel sai de um móvel")
 	t.check(not R.event_pool("rua-das-vitrines", "bolsa").has("busca_caixa_sanitaria"), "e não de uma mochila")
-	t.equal(R.object_kind("Armário de vestiário"), "movel", "armário é móvel")
-	t.equal(R.object_kind("Mochila de explorador"), "bolsa", "mochila é bolsa")
-	t.equal(R.object_kind("a escada"), "", "a escada não é móvel")
+	for pair in [["Armário de vestiário", "armario"], ["Armário de ferramentas", "armario"], ["Mochila de explorador", "bolsa"],
+			["Caixa de fusíveis", "maquina"], ["Caixa amarrada", "carga"], ["Caixa de mantimentos", "carga"], ["o caixa", "movel"],
+			["Kit de primeiros socorros", "medico"], ["a escada", ""], ["Objeto", ""]]:
+		t.equal(R.object_kind(pair[0]), pair[1], "%s: tipo %s" % [pair[0], pair[1]])
 	for id in GameData.table("events"):
 		if String(id).begins_with("busca_"):
 			var row: Dictionary = GameData.row("events", id)
 			for place in row.get("Places", []):
 				t.check(PLACES.has(place), "%s: lugar conhecido (%s)" % [id, place])
+			t.check(not row.get("Objects", []).is_empty(), "%s: diz em que objetos cabe" % id)
+			for kind in row.get("Objects", []):
+				t.check(KINDS.has(kind), "%s: tipo de objeto conhecido (%s)" % [id, kind])
 			t.check(row.Choices.size() >= 2, "%s: pelo menos duas escolhas" % id)
+	_all_objects(t)
+
+
+## Todo objeto vasculhável do jogo (os props dos cenários e os pontos das casas da rua): o que ele pode abrir combina
+## com o lugar e com o tipo dele; objeto sem evento possível nunca vira objeto com escolha.
+func _all_objects(t) -> void:
+	var pairs := 0
+	var objects: Array = []
+	for map in MAP_PLACES:
+		var data = JSON.parse_string(FileAccess.get_file_as_string("res://data/scenarios/%s.json" % map))
+		for prop in data.props:
+			objects.append([MAP_PLACES[map], String(prop.name)])
+	for shop in R.SPOT_NAMES:
+		for name in shop:
+			objects.append(["rua-das-vitrines", name])
+	for entry in objects:
+		var kind := R.object_kind(entry[1])
+		for id in R.event_pool(entry[0], kind):
+			var row: Dictionary = GameData.row("events", id)
+			var places: Array = row.get("Places", [])
+			t.check((places.is_empty() or places.has(entry[0])) and row.Objects.has(kind), "%s (%s) → %s combina" % [entry[1], entry[0], id])
+			pairs += 1
+	t.check(pairs > 20, "pares objeto → evento conferidos (%d)" % pairs)
+	# Um mapa só com "Objeto" e um caixote: o objeto com escolha cai sempre no caixote (o que tem evento).
+	for seed_value in 30:
+		var c: Dictionary = Campaign.create_initial(6)
+		R.start_expedition(c, "fase_3", 9000 + seed_value)
+		R.assign_scenario_props(c, "SealedShelter", [1, 2, 5], ["Objeto", "Objeto", "Caixote de baterias"])
+		var route: Dictionary = c.session.expedition.corridor
+		t.check(route.choice_props.is_empty() or route.choice_props == [2], "o objeto com escolha nunca é um \"Objeto\" sem evento")
 
 
 ## O ponto com escolha de uma casa da rua: o evento é da rua, salvar e carregar no meio não sorteia de novo, a escolha
@@ -65,11 +111,14 @@ func _house_choice(t) -> void:
 		t.check(not R.search_spot(back, found[0], found[1]).ok, "o ponto não abre de novo depois de carregar")
 		var row: Dictionary = GameData.row("events", result.event)
 		var leave: Dictionary = row.Choices[-1]
+		for choice in row.Choices:
+			if choice.get("Requirement", "") == "" and choice.get("Success", {}).keys() == ["Result"]:
+				leave = choice
 		var before := JSON.stringify(back.session.expedition.loot) + str(back.session.expedition.food) + str(back.inventory)
 		t.check(R.choose_event_option(back, leave.Id, 7), "deixar para lá")
 		t.check(not R.choose_event_option(back, row.Choices[0].Id, 7), "a escolha vale uma vez")
 		t.check(R.finish_event(back) and not R.finish_event(back), "o evento fecha uma vez")
-		if not leave.get("Success", {}).has("FoodDelta") and not leave.get("Success", {}).has("BandagesDelta"):
+		if leave.get("Success", {}).keys() == ["Result"]:
 			t.equal(JSON.stringify(back.session.expedition.loot) + str(back.session.expedition.food) + str(back.inventory), before, "deixar para lá não custa nada")
 		t.check(not R.search_spot(back, found[0], found[1]).ok, "nem depois do evento")
 		return
@@ -84,7 +133,7 @@ func _scenario_choice(t) -> void:
 		var c: Dictionary = Campaign.create_initial(4)
 		R.start_expedition(c, "fase_3", 7000 + seed_value)
 		var route: Dictionary = c.session.expedition.corridor
-		R.assign_scenario_props(c, "SealedShelter", [1, 2, 5, 6, 8, 8])
+		R.assign_scenario_props(c, "SealedShelter", [1, 2, 5, 6, 8, 8], NAMES)
 		if route.choice_props.is_empty():
 			continue
 		with_choice += 1
@@ -93,15 +142,16 @@ func _scenario_choice(t) -> void:
 		for step in route.prop_steps[prop] + 1:
 			route.steps[step].resolved = true
 		route.index = route.prop_steps[prop]
-		var result: Dictionary = R.search_scenario_prop(c, prop, "Fichário")
+		var result: Dictionary = R.search_scenario_prop(c, prop, NAMES[prop])
 		if prop == route.objective_prop:
 			continue
 		t.check(result.ok and result.event != "", "o objeto com escolha abre um evento")
-		t.check(R.event_pool("sala-esquecida", "movel").has(result.event), "o evento é da Sala Esquecida (%s)" % result.event)
+		t.check(R.event_pool("sala-esquecida", R.object_kind(NAMES[prop])).has(result.event), "o evento é da Sala Esquecida e do objeto (%s → %s)" % [NAMES[prop], result.event])
+		t.equal(c.session.event.get("object", ""), NAMES[prop], "o evento guarda o objeto vasculhado")
 		opened[result.event] = true
 		t.check(not R.can_search_scenario_prop(c, prop), "e não abre de novo")
 		# Voltar ao mesmo mapa (reentrar) mantém o objeto e a busca feita.
-		R.assign_scenario_props(c, "SealedShelter", [1, 2, 5, 6, 8, 8])
+		R.assign_scenario_props(c, "SealedShelter", [1, 2, 5, 6, 8, 8], NAMES)
 		t.check(route.choice_props.has(prop) and route.searched_props.has(prop), "reentrar no mapa não sorteia de novo")
 	t.check(with_choice > 10 and with_choice < 50, "cerca de metade dos mapas tem objeto com escolha (%d de 60)" % with_choice)
 	t.check(opened.size() >= 2, "eventos variados na Sala Esquecida (%s)" % opened.keys())
@@ -152,6 +202,8 @@ func _scene(t) -> void:
 		await tree.process_frame
 		t.check(Campaign.state.session.event != null, "o objeto com escolha (%s) abre o evento" % entry.name)
 		t.check(street.exploration_hud.modal_open(), "e o painel do evento aparece na hora")
+		var says: bool = street.exploration_hud._modal.find_children("*", "Label", true, false).any(func(l): return l.text == "Ao vasculhar %s" % entry.name.to_lower())
+		t.check(says, "o painel diz o que foi vasculhado (%s)" % entry.name)
 		opened = true
 		break
 	t.check(opened, "achou um mapa da Sala Esquecida com objeto com escolha")
