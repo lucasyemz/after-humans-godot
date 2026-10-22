@@ -1,6 +1,7 @@
 ## A tela de título (#28, a entrega #19 do Codex: docs/design/title.md): o fundo pintado, o logo e três botões:
-## Continuar (só com save; volta à Estação ou à rua da expedição em andamento), Nova campanha (com confirmação quando
-## há um save a perder) e Opções. Mouse, teclado, controle e toque. Em tela retrato, a composição vertical.
+## Continuar (só com save; volta à Estação ou à rua da expedição em andamento, na última campanha usada), Nova campanha
+## (escolhe um dos três espaços, #34, e pede confirmação para sobrescrever um ocupado), Campanhas (abre outro espaço,
+## quando há mais de uma campanha) e Opções. Mouse, teclado, controle e toque. Em tela retrato, a composição vertical.
 ## Modo de captura: --capture-title=<pasta> tira as fotos (sem save e com save, texto Normal e Maior, Opções e a
 ## confirmação) numa pasta própria e sai.
 class_name AHTitleScreen
@@ -25,6 +26,7 @@ var _leaving := false
 var _opener: Button
 var continue_button: Button
 var new_button: Button
+var load_button: Button
 var options_button: Button
 
 
@@ -69,9 +71,14 @@ func _build_buttons() -> void:
 	for child in _buttons.get_children():
 		child.queue_free()
 	continue_button = null
+	load_button = null
 	if can_continue():
 		continue_button = _title_button("Continuar", true, _continue)
 	new_button = _title_button("Nova campanha", continue_button == null, _ask_new_campaign)
+	# Campanhas: quando há uma campanha que o Continuar não abre (outro espaço).
+	var ok := range(1, Campaign.SLOT_COUNT + 1).filter(func(n): return Campaign.slot_summary(n).status == "ok").size()
+	if ok > (1 if continue_button != null else 0):
+		load_button = _title_button("Campanhas", false, _open_slots.bind(false))
 	options_button = _title_button("Opções", false, _open_options)
 	_note.text = Campaign.load_warning
 	_note.visible = Campaign.load_warning != ""
@@ -115,7 +122,8 @@ func _layout() -> void:
 	for button in _buttons.get_children():
 		(button as Button).custom_minimum_size = spec.button * k
 	_buttons.size = Vector2.ZERO
-	_note.position = origin + (spec.buttons + Vector2(0, 3 * (spec.button.y + spec.gap) + 16)) * k
+	var count := _buttons.get_children().filter(func(c): return not c.is_queued_for_deletion()).size()
+	_note.position = origin + (spec.buttons + Vector2(0, count * (spec.button.y + spec.gap) + 16)) * k
 	_note.size = Vector2(spec.button.x * k, 0)
 
 
@@ -182,32 +190,85 @@ func _continue() -> void:
 		_leaving = false
 
 
-## Nova campanha: sem nenhum arquivo de save, começa direto; com arquivo (mesmo um que não abre), pergunta antes.
+## Nova campanha: sem nenhum save em nenhum espaço, começa direto no espaço 1; senão, escolhe o espaço.
 func _ask_new_campaign() -> void:
-	if not Campaign.has_save():
-		_start_new_campaign()
+	if range(1, Campaign.SLOT_COUNT + 1).all(func(n): return not Campaign.slot_has_save(n)):
+		_start_new_campaign(1)
 		return
+	_open_slots(true)
+
+
+## Os três espaços com o resumo de cada um. Para a campanha nova, todos servem (o ocupado pergunta antes); para abrir,
+## só os que têm uma campanha que abre.
+func _open_slots(for_new: bool) -> void:
+	var box := _open_modal(760)
+	box.add_child(H.make_label("Em qual espaço começar?" if for_new else "Campanhas", 34, H.GOLD))
+	var first: Button
+	for number in range(1, Campaign.SLOT_COUNT + 1):
+		var summary := Campaign.slot_summary(number)
+		var button := _modal_button(slot_text(summary, number == Campaign.slot), _pick_slot.bind(number, for_new))
+		button.name = "Slot%d" % number
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.custom_minimum_size = Vector2(0, 84)
+		button.disabled = not for_new and summary.status != "ok"
+		box.add_child(button)
+		if first == null and not button.disabled:
+			first = button
+	var back := _modal_button("Voltar", close_modal)
+	box.add_child(back)
+	(first if first != null else back).grab_focus.call_deferred()
+
+
+## A linha de um espaço: o número e, se tem campanha, o ciclo, as fases, o elenco vivo, a data e o tempo jogado.
+static func slot_text(summary: Dictionary, last: bool) -> String:
+	var head := "Espaço %d%s" % [summary.slot, " (último usado)" if last and summary.status == "ok" else ""]
+	match summary.status:
+		"empty":
+			return "%s — vazio" % head
+		"broken":
+			return "%s — o save não abre" % head
+	var date := Time.get_datetime_dict_from_unix_time(int(summary.saved_at) + int(Time.get_time_zone_from_system().get("bias", 0)) * 60)
+	var minutes := int(summary.played_seconds) / 60
+	var played := ("%d h %02d min" % [minutes / 60, minutes % 60]) if minutes >= 60 else ("%d min" % minutes)
+	return "%s — Ciclo %d · %d fase%s · %d de %d vivos\n%02d/%02d/%d %02d:%02d · %s jogados%s" % [head, summary.cycle,
+		summary.phases, "" if summary.phases == 1 else "s", summary.alive, summary.roster, date.day, date.month, date.year,
+		date.hour, date.minute, played, " · em expedição" if summary.in_expedition else ""]
+
+
+func _pick_slot(number: int, for_new: bool) -> void:
+	if _leaving or GameFlow.busy:
+		return
+	if not for_new:
+		_leaving = true
+		Campaign.use_slot(number)
+		if not await GameFlow.continue_game():
+			_leaving = false
+		return
+	if not Campaign.slot_has_save(number):
+		_start_new_campaign(number)
+		return
+	var summary := Campaign.slot_summary(number)
 	var box := _open_modal(680)
 	box.add_child(H.make_label("Começar uma campanha nova?", 34, H.GOLD))
-	var text := "Todo o progresso salvo (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero." \
-		if can_continue() else "O save que existe não pôde ser aberto. Uma campanha nova grava por cima dele, e ele não volta mais."
+	var text := ("Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero. Os outros espaços ficam como estão." % number) \
+		if summary.status == "ok" else ("O save do espaço %d não pôde ser aberto. Uma campanha nova grava por cima dele, e ele não volta mais." % number)
 	var note := H.make_label(text, 22, H.TEXT)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(620, 0)
 	box.add_child(note)
 	var stay := _modal_button("Cancelar", close_modal)
 	box.add_child(stay)
-	box.add_child(_modal_button("Começar do zero", _start_new_campaign))
+	box.add_child(_modal_button("Começar do zero", _start_new_campaign.bind(number)))
 	stay.grab_focus.call_deferred()
 
 
-## A campanha nova leva as opções mexidas no título (volumes, velocidade), que até aqui ficaram só na memória.
-func _start_new_campaign() -> void:
+## A campanha nova no espaço leva as opções mexidas no título (volumes, velocidade), que até aqui ficaram só na memória.
+func _start_new_campaign(number: int) -> void:
 	if _leaving or GameFlow.busy:
 		return
 	_leaving = true
 	var settings: Dictionary = Campaign.state.get("settings", {}).duplicate(true)
-	Campaign.new_game()
+	Campaign.new_game_in(number)
 	Campaign.state.settings.merge(settings, true)
 	Campaign.save()
 	if not await GameFlow.change_to("station"):
@@ -240,20 +301,27 @@ func _capture_dir() -> String:
 
 
 ## As fotos da proposta: sem save e com save (um save numa pasta dentro da de captura, nunca a do jogador), no texto
-## Normal e no Maior, e as Opções e a confirmação da Nova campanha.
+## Normal e no Maior, os espaços de campanha (dois ocupados e um vazio), a confirmação da Nova campanha e as Opções.
 func _capture(dir: String) -> void:
 	DirAccess.make_dir_recursive_absolute(dir)
 	Campaign.save_dir = dir.path_join("save")
+	Campaign.slot = 1
 	for size in [0, 2]:
 		Settings.set_text_size(size)
 		var suffix := "" if size == 0 else "-maior"
 		Campaign.state = Campaign.create_initial(7)
 		await _rebuild_for_capture()
 		await _shot(dir, "title-new" + suffix)
-		Campaign.new_game(7)
+		Campaign.new_game_in(2, 8)
+		Campaign.state.completed_phases = ["fase_1"]
+		Campaign.state.played_seconds = 4380
+		Campaign.save()
+		Campaign.new_game_in(1, 7)
 		await _rebuild_for_capture()
 		await _shot(dir, "title-continue" + suffix)
 		_ask_new_campaign()
+		await _shot(dir, "title-slots" + suffix)
+		_pick_slot(1, true)
 		await _shot(dir, "title-confirm" + suffix)
 		close_modal()
 		_open_options()

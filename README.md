@@ -115,9 +115,12 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - Na luta: 1 a 4 escolhem a habilidade (ou o clique), depois o alvo; Q move, W defende, I abre a Mochila, F foge
     (no gamepad, setas e Enter/A; Backspace/B volta).
     Mover, Defender e Fugir ficam à direita.
-- **Tela de título:** o jogo abre nela (`scenes/title.tscn`), com Continuar (só com um save que abre), Nova campanha (pergunta
-  antes se há save) e Opções. Captura: `"$GODOT" --path . --resolution 1920x1080 -- --capture-title=<pasta>` tira 8 fotos
-  (sem save e com save, a confirmação e as Opções, no texto Normal e no Maior) e sai; o save das fotos fica na pasta da
+- **Tela de título:** o jogo abre nela (`scenes/title.tscn`), com Continuar (a última campanha usada, só com um save que
+  abre), Nova campanha (escolhe um dos três espaços e pergunta antes de sobrescrever um ocupado), Campanhas (abre outro
+  espaço, quando há mais de uma campanha) e Opções. Os espaços ficam em `user://saves`: `campaign.json` (o espaço 1, o
+  save de antes das vagas), `campaign_2.json`, `campaign_3.json`, cada um com a cópia `.backup`, e `slots.json` com o
+  último usado. Captura: `"$GODOT" --path . --resolution 1920x1080 -- --capture-title=<pasta>` tira 10 fotos (sem save e
+  com save, os espaços, a confirmação e as Opções, no texto Normal e no Maior) e sai; o save das fotos fica na pasta da
   captura.
 - **Capturas, tempos de quadro e teste de colisão:** `"$GODOT" --path . --resolution 1920x1080 -- --capture=<pasta>`.
   Abre uma janela, tira 9 fotos (dia, noite e chuva), testa o líder andando contra um carro e contra uma fachada (`PASS`

@@ -1,6 +1,7 @@
 ## A tela de título (#28): o jogo abre nela; Continuar só com um save que abre e leva à Estação ou à rua da expedição;
-## Nova campanha pergunta antes quando há save; Opções abre e Voltar fecha; teclado e controle andam pelos botões; o
-## ícone e a splash do projeto. Usa uma pasta de save própria e devolve a campanha de antes.
+## Nova campanha escolhe o espaço (#34) e pergunta antes de sobrescrever um ocupado; Campanhas abre outro espaço;
+## Opções abre e Voltar fecha; teclado e controle andam pelos botões; o ícone e a splash do projeto. Usa uma pasta de
+## save própria e devolve a campanha de antes.
 extends RefCounted
 
 var t
@@ -12,7 +13,9 @@ func run(context) -> void:
 	_tree = Engine.get_main_loop()
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
+	var real_slot: int = Campaign.slot
 	Campaign.save_dir = "user://test-title-%d" % Time.get_ticks_usec()
+	Campaign.slot = 1
 
 	_project()
 	await _options_without_save()
@@ -22,6 +25,7 @@ func run(context) -> void:
 	await _options_and_keys()
 	await _broken_save()
 	await _continue_expedition()
+	await _other_slot()
 
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
@@ -30,6 +34,7 @@ func run(context) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+	Campaign.slot = real_slot
 
 
 func _project() -> void:
@@ -101,7 +106,8 @@ func _with_save() -> void:
 	t.equal(Campaign.state.roster.map(func(h): return h.id), before.roster.map(func(h): return h.id), "Continuar mantém a campanha do save")
 
 
-## Nova campanha com save pergunta antes: Cancelar volta sem mexer; Começar do zero troca a campanha.
+## Nova campanha com save abre os espaços; o ocupado pergunta antes: Cancelar volta sem mexer; Começar do zero troca a
+## campanha daquele espaço.
 func _new_campaign_asks() -> void:
 	Campaign.new_game(13)
 	Campaign.state.inventory.seeds = 777
@@ -111,13 +117,20 @@ func _new_campaign_asks() -> void:
 		return
 	title.new_button.pressed.emit()
 	await _frames(2)
-	t.check(title.modal_open(), "com save, Nova campanha abre a confirmação")
-	t.check(not title._buttons.visible, "os botões do título somem atrás da confirmação")
+	t.check(title.modal_open() and title._modal.find_child("Slot1", true, false) != null, "com save, Nova campanha mostra os espaços")
+	t.check(not title._buttons.visible, "os botões do título somem atrás da janela")
+	var slots: Array = [1, 2, 3].map(func(n): return title._modal.find_child("Slot%d" % n, true, false).text)
+	t.check(slots[0].contains("Ciclo") and slots[1].contains("vazio") and slots[2].contains("vazio"), "o espaço 1 com o resumo e os outros vazios %s" % [slots])
+	_press_name(title._modal, "Slot1")
+	await _frames(2)
+	t.check(title._modal.find_children("*", "Label", true, false).any(func(l): return l.text.contains("espaço 1")), "o espaço ocupado pede confirmação")
 	_press(title._modal, "Cancelar")
 	await _frames(2)
 	t.check(not title.modal_open() and title._buttons.visible, "Cancelar fecha a confirmação")
 	t.equal(int(Campaign.state.inventory.seeds), 777, "Cancelar não mexe na campanha")
 	title.new_button.pressed.emit()
+	await _frames(2)
+	_press_name(title._modal, "Slot1")
 	await _frames(2)
 	_press(title._modal, "Começar do zero")
 	t.check(await _settles_on("Station"), "Começar do zero vai para a Estação")
@@ -182,6 +195,9 @@ func _broken_save() -> void:
 	await _frames(2)
 	title.new_button.pressed.emit()
 	await _frames(2)
+	t.check(title._modal.find_child("Slot1", true, false).text.contains("não abre"), "o espaço com o save estragado diz que não abre")
+	_press_name(title._modal, "Slot1")
+	await _frames(2)
 	t.check(title.modal_open(), "com um save que não abre, Nova campanha pergunta antes")
 	var texts: Array = title._modal.find_children("*", "Label", true, false).map(func(l): return l.text)
 	t.check(texts.any(func(x): return String(x).contains("não pôde ser aberto")), "e diz que o save não abre")
@@ -202,7 +218,42 @@ func _continue_expedition() -> void:
 	t.check(await _settles_on("Street"), "Continuar com a expedição em andamento leva à rua")
 
 
+## Duas campanhas: Campanhas aparece e abre a do outro espaço; um espaço vazio começa sem perguntar.
+func _other_slot() -> void:
+	_clear_saves()
+	Campaign.new_game_in(2, 21)
+	var second: Array = Campaign.state.roster.map(func(h): return h.perks)
+	Campaign.new_game_in(1, 22)
+	var title := await _open_title()
+	if title == null:
+		return
+	t.equal(_texts(title._buttons), ["Continuar", "Nova campanha", "Campanhas", "Opções"], "com duas campanhas, há Campanhas")
+	title.load_button.pressed.emit()
+	await _frames(2)
+	t.check(title._modal.find_child("Slot3", true, false).disabled, "o espaço vazio não abre")
+	t.check(title._modal.find_child("Slot1", true, false).text.contains("último usado"), "o último usado está marcado")
+	_press_name(title._modal, "Slot2")
+	t.check(await _settles_on("Station"), "escolher o espaço 2 vai para a Estação")
+	t.equal(Campaign.slot, 2, "no espaço 2")
+	t.equal(Campaign.state.roster.map(func(h): return h.perks), second, "com a campanha dele")
+	title = await _open_title()
+	if title == null:
+		return
+	title.new_button.pressed.emit()
+	await _frames(2)
+	_press_name(title._modal, "Slot3")
+	t.check(await _settles_on("Station"), "o espaço vazio começa direto")
+	t.check(Campaign.slot == 3 and Campaign.slot_summary(3).status == "ok", "e grava no espaço 3")
+	t.equal(Campaign.slot_summary(2).status, "ok", "o espaço 2 continua lá")
+
+
 # ---------------------------------------------------------------- apoio
+
+func _press_name(scope: Node, name: String) -> void:
+	var button := scope.find_child(name, true, false) as Button
+	if t.check(button != null and not button.disabled, "botão %s" % name):
+		button.pressed.emit()
+
 
 func _open_title() -> AHTitleScreen:
 	GameFlow.start()
