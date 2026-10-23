@@ -36,7 +36,10 @@ const EXIT_X := 1.2
 const ROOMS_X := 300.0
 const ROOM_GAP := 40.0
 const SHOP_ART := ["grocery", "workshop", "cinema"]
-const PROP_ART := ["alley-props-v1.webp", Rect2(828, 119, 282, 360), 105.0, "os caixotes"]
+## Os objetos de busca da rua (#50), alternados pelos trechos de busca, e o nome de cada um no aviso.
+const PROP_NAMES := {"street_crates": "os caixotes", "street_trash_can": "a lixeira", "street_mailbox": "a caixa de correio"}
+## Onde ficam na calçada (cm, eixos da Unreal: y é a profundidade, z a altura).
+const PROP_Y := -285.0
 ## Folga das pontas de cada zona do cenário (ZoneMargin) e o espaço entre os da fila (PartySpacing).
 const ZONE_MARGIN := 0.45
 const PARTY_SPACING := 1.3
@@ -294,19 +297,18 @@ func _spawn_props() -> void:
 	if street.scenario:
 		return
 	var route: Dictionary = Campaign.state.session.expedition.corridor
+	var order := 0
 	for index in route.steps.size():
 		if route.steps[index].type != "loot":
 			continue
-		var card: MeshInstance3D = street._dynamic.add_card(PROP_ART[0], PROP_ART[1], Vector3(_step_x(index, 0.45) * 100.0, -285, AHStreetSet.SIDEWALK_TOP_Z), PROP_ART[2])
-		props[index] = card
-		if route.props.get(str(index), false):
-			_dim(card)
-
-
-func _dim(card: MeshInstance3D) -> void:
-	var material: StandardMaterial3D = card.material_override.duplicate()
-	material.albedo_color = Color(0.45, 0.42, 0.4)
-	card.material_override = material
+		# O mesmo trecho sempre com o mesmo objeto (pela ordem dele entre os trechos de busca), aberto se já foi vasculhado.
+		var prop := AHSearchProp.new().setup(AHSearchProp.street_prop(order), route.props.get(str(index), false))
+		order += 1
+		prop.position = AHStreetSet.ue(_step_x(index, 0.45) * 100.0, PROP_Y, AHStreetSet.SIDEWALK_TOP_Z)
+		street.add_child(prop)
+		props[index] = prop
+		var box := prop.volume()
+		street._dynamic.add_collider(box.get_center(), box.size)
 
 
 ## Portas das casas abertas (e da trancada depois de arrombada) com a pintura da porta aberta.
@@ -529,7 +531,7 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 	for index in props:
 		if absf(_step_x(index, 0.45) - leader.x) < best and index <= route.index and not route.props.get(str(index), false):
 			best = absf(_step_x(index, 0.45) - leader.x)
-			text = "E  Vasculhar %s" % PROP_ART[3]
+			text = "E  Vasculhar %s" % PROP_NAMES[props[index].prop_name]
 			action = _search_prop.bind(index)
 			where = _prop_point(index)
 	if street.scenario:
@@ -578,7 +580,7 @@ func _door_point(site: Dictionary) -> Vector3:
 
 
 func _prop_point(index: int) -> Vector3:
-	return props[index].global_position + Vector3(0, 1.5, 0)
+	return props[index].marker_point()
 
 
 func _scenario_prop_point(entry: Dictionary) -> Vector3:
@@ -620,11 +622,13 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 	var text := ""
 	var action := Callable()
 	var best := 0.9
+	var where = null
 	for i in room.spot_xs.size():
 		var distance := absf(room.spot_xs[i] - leader.x)
 		if distance < best:
 			best = distance
 			var name: String = R.SPOT_NAMES[site.shop][i] if i < 3 else "o canto"
+			where = room.search_props[i].marker_point() if i < room.search_props.size() else null
 			if site.spots[i].searched:
 				text = "%s (já vasculhado)" % name.capitalize()
 				action = Callable()
@@ -638,11 +642,18 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 		elif site.camped:
 			text = "Acampamento já feito nesta fase"
 			action = Callable()
+		where = null
 	if leader.x < room.exit_x:
 		text = "E  Sair para a rua"
 		action = _leave_house
-	hud.show_prompt(text)
-	hud.set_markers([])
+		where = null
+	hud.show_prompt(text, where)
+	# O losango de cada objeto ainda fechado fica sobre ele (#50); o do que está ao alcance vira o do aviso.
+	var points: Array = []
+	for i in mini(room.search_props.size(), site.spots.size()):
+		if not site.spots[i].searched and (where == null or room.search_props[i].marker_point().distance_to(where) > 0.05):
+			points.append(room.search_props[i].marker_point())
+	hud.set_markers(points)
 	hud.set_patrol(null, 0.0, false)
 	_action = action
 
@@ -779,7 +790,7 @@ func _search_prop(index: int) -> void:
 	if result.ok:
 		_search_sound(objective_before, false)
 		_show_gains(stock)
-		_dim(props[index])
+		props[index].set_open(true)
 		Campaign.save()
 		hud.toast(result.text, 5.0)
 		hud.refresh(Campaign.state)
@@ -818,7 +829,7 @@ func _open_room(site_index: int) -> void:
 	room = AHHouseRoom.new()
 	room.debug_material = street._debug_material
 	street.add_child(room)
-	room.build(site.shop, ROOMS_X + site_index * ROOM_GAP, site.spots.size(), site.camp_site)
+	room.build(site.shop, ROOMS_X + site_index * ROOM_GAP, site.spots.size(), site.camp_site, site.spots.map(func(spot): return spot.searched))
 	var showing: bool = not street._debug_colliders.is_empty() and street._debug_colliders[0].visible
 	for debug in room.debug_colliders:
 		debug.visible = showing
@@ -868,6 +879,8 @@ func _search_spot(site_index: int, spot_index: int) -> void:
 	var result := R.search_spot(Campaign.state, site_index, spot_index)
 	if not result.ok:
 		return
+	if spot_index < room.search_props.size():
+		room.search_props[spot_index].set_open(true)
 	_search_sound(objective_before, false)
 	_show_gains(stock)
 	Campaign.save()
