@@ -9,7 +9,7 @@ msgstr ""
 #: scripts/ui/title_screen.gd:78
 #: scripts/ui/exploration_hud.gd:657
 #: scripts/ui/exploration_hud.gd:718
-#: scripts/ui/combat_hud.gd:1199
+#: scripts/ui/combat_hud.gd:1216
 msgid "Continuar"
 msgstr "Continue"
 
@@ -132,7 +132,7 @@ msgstr "Interact"
 #: scripts/ui/options_panel.gd:14
 #: scripts/ui/exploration_hud.gd:182
 #: scripts/ui/combat_hud.gd:22
-#: scripts/ui/combat_hud.gd:944
+#: scripts/ui/combat_hud.gd:961
 msgid "Mochila"
 msgstr "Backpack"
 
@@ -564,7 +564,7 @@ msgid "Voltar à Estação"
 msgstr "Back to the Station"
 
 #: scripts/ui/exploration_hud.gd:846
-#: scripts/ui/combat_hud.gd:1173
+#: scripts/ui/combat_hud.gd:1190
 #: scripts/ui/refuge_hud.gd:15
 msgid "Vitória"
 msgstr "Victory"
@@ -575,13 +575,13 @@ msgid "Retirada"
 msgstr "Retreat"
 
 #: scripts/ui/exploration_hud.gd:846
-#: scripts/ui/combat_hud.gd:1173
+#: scripts/ui/combat_hud.gd:1190
 #: scripts/ui/refuge_hud.gd:15
 msgid "Fuga"
 msgstr "Escape"
 
 #: scripts/ui/exploration_hud.gd:846
-#: scripts/ui/combat_hud.gd:1173
+#: scripts/ui/combat_hud.gd:1190
 #: scripts/ui/refuge_hud.gd:15
 msgid "Derrota"
 msgstr "Defeat"
@@ -627,17 +627,17 @@ msgid "Heróis vivos: %d · No memorial: %d"
 msgstr "Heroes alive: %d · In the memorial: %d"
 
 #: scripts/ui/combat_hud.gd:21
-#: scripts/ui/combat_hud.gd:941
+#: scripts/ui/combat_hud.gd:958
 msgid "Mover"
 msgstr "Move"
 
 #: scripts/ui/combat_hud.gd:21
-#: scripts/ui/combat_hud.gd:942
+#: scripts/ui/combat_hud.gd:959
 msgid "Defender"
 msgstr "Defend"
 
 #: scripts/ui/combat_hud.gd:22
-#: scripts/ui/combat_hud.gd:943
+#: scripts/ui/combat_hud.gd:960
 msgid "Fugir"
 msgstr "Flee"
 
@@ -645,206 +645,206 @@ msgstr "Flee"
 msgid "REGISTRO"
 msgstr "LOG"
 
-#: scripts/ui/combat_hud.gd:390
+#: scripts/ui/combat_hud.gd:392
 msgid "Último Fôlego"
 msgstr "Last Breath"
 
-#: scripts/ui/combat_hud.gd:424
+#: scripts/ui/combat_hud.gd:426
 msgid " ou "
 msgstr " or "
 
-#: scripts/ui/combat_hud.gd:424
+#: scripts/ui/combat_hud.gd:426
 #: scripts/ui/refuge_hud.gd:1290
 msgid " e "
 msgstr " and "
 
-#: scripts/ui/combat_hud.gd:427
+#: scripts/ui/combat_hud.gd:429
 msgid "%s (se cura)"
 msgstr "%s (heals itself)"
 
-#: scripts/ui/combat_hud.gd:431
+#: scripts/ui/combat_hud.gd:433
 msgid "%s (bloqueio)"
 msgstr "%s (block)"
 
-#: scripts/ui/combat_hud.gd:446
+#: scripts/ui/combat_hud.gd:448
 msgid "Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s."
 msgstr "Intent: what it would do if its turn were now. It changes with the fight (who falls, who protects, the position)%s."
 
-#: scripts/ui/combat_hud.gd:447
+#: scripts/ui/combat_hud.gd:449
 msgid "; com \"?\", ele está entre dois planos parecidos"
 msgstr "; with \"?\", it's torn between two similar plans"
 
-#: scripts/ui/combat_hud.gd:460
+#: scripts/ui/combat_hud.gd:462
 msgid "RODADA %d"
 msgstr "ROUND %d"
 
-#: scripts/ui/combat_hud.gd:475
+#: scripts/ui/combat_hud.gd:477
 msgid " · agora"
 msgstr " · now"
 
-#: scripts/ui/combat_hud.gd:495
+#: scripts/ui/combat_hud.gd:498
 msgid "Vida %d/%d%s"
 msgstr "Health %d/%d%s"
 
-#: scripts/ui/combat_hud.gd:495
+#: scripts/ui/combat_hud.gd:498
 msgid " · Último Fôlego"
 msgstr " · Last Breath"
 
-#: scripts/ui/combat_hud.gd:497
+#: scripts/ui/combat_hud.gd:500
 msgid "Instinto %d/200 · em 200, crise"
 msgstr "Instinct %d/200 · at 200, crisis"
 
-#: scripts/ui/combat_hud.gd:503
+#: scripts/ui/combat_hud.gd:506
 msgid "Trauma"
 msgstr "Trauma"
 
-#: scripts/ui/combat_hud.gd:668
+#: scripts/ui/combat_hud.gd:671
 msgid "dano ★"
 msgstr "damage ★"
 
-#: scripts/ui/combat_hud.gd:668
+#: scripts/ui/combat_hud.gd:671
 msgid "dano"
 msgstr "damage"
 
-#: scripts/ui/combat_hud.gd:671
+#: scripts/ui/combat_hud.gd:674
 msgid "cura ★"
 msgstr "healing ★"
 
-#: scripts/ui/combat_hud.gd:671
+#: scripts/ui/combat_hud.gd:674
 msgid "cura"
 msgstr "healing"
 
-#: scripts/ui/combat_hud.gd:732
+#: scripts/ui/combat_hud.gd:735
 msgid "de"
 msgstr "from"
 
-#: scripts/ui/combat_hud.gd:734
+#: scripts/ui/combat_hud.gd:737
 msgid "em si mesmo"
 msgstr "on itself"
 
-#: scripts/ui/combat_hud.gd:736
+#: scripts/ui/combat_hud.gd:739
 msgid "em"
 msgstr "at"
 
-#: scripts/ui/combat_hud.gd:739
+#: scripts/ui/combat_hud.gd:742
 msgid "Recarga %d"
 msgstr "Cooldown %d"
 
-#: scripts/ui/combat_hud.gd:741
+#: scripts/ui/combat_hud.gd:744
 msgid "%d uso(s)"
 msgstr "%d use(s)"
 
-#: scripts/ui/combat_hud.gd:769
+#: scripts/ui/combat_hud.gd:772
 msgid "Mochila · %d"
 msgstr "Backpack · %d"
 
-#: scripts/ui/combat_hud.gd:770
+#: scripts/ui/combat_hud.gd:773
 msgid "%d de comida na Mochila"
 msgstr "%d food in the Backpack"
 
-#: scripts/ui/combat_hud.gd:771
+#: scripts/ui/combat_hud.gd:774
 msgid "Vez de %s: escolha uma habilidade (1–4) ou uma ação."
 msgstr "%s's turn: pick an ability (1–4) or an action."
 
-#: scripts/ui/combat_hud.gd:823
+#: scripts/ui/combat_hud.gd:826
 msgid "%s de %s"
 msgstr "%s %s"
 
-#: scripts/ui/combat_hud.gd:825
+#: scripts/ui/combat_hud.gd:828
 msgid "recarga %d"
 msgstr "cooldown %d"
 
-#: scripts/ui/combat_hud.gd:827
+#: scripts/ui/combat_hud.gd:830
 msgid "%d usos por expedição"
 msgstr "%d uses per expedition"
 
-#: scripts/ui/combat_hud.gd:827
+#: scripts/ui/combat_hud.gd:830
 msgid "%d usos"
 msgstr "%d uses"
 
-#: scripts/ui/combat_hud.gd:849
+#: scripts/ui/combat_hud.gd:852
 msgid "%s (vida %d)"
 msgstr "%s (health %d)"
 
-#: scripts/ui/combat_hud.gd:851
+#: scripts/ui/combat_hud.gd:854
 msgid " · pode cair"
 msgstr " · may fall"
 
-#: scripts/ui/combat_hud.gd:856
+#: scripts/ui/combat_hud.gd:859
 msgid "Atinge: "
 msgstr "Hits: "
 
-#: scripts/ui/combat_hud.gd:862
+#: scripts/ui/combat_hud.gd:865
 msgid "Você:"
 msgstr "You:"
 
-#: scripts/ui/combat_hud.gd:901
-#: scripts/ui/combat_hud.gd:909
-#: scripts/ui/combat_hud.gd:910
+#: scripts/ui/combat_hud.gd:904
+#: scripts/ui/combat_hud.gd:912
+#: scripts/ui/combat_hud.gd:913
 msgid " · Guardião"
 msgstr " · Guardian"
 
-#: scripts/ui/combat_hud.gd:901
-#: scripts/ui/combat_hud.gd:911
-#: scripts/ui/combat_hud.gd:912
+#: scripts/ui/combat_hud.gd:904
+#: scripts/ui/combat_hud.gd:914
+#: scripts/ui/combat_hud.gd:915
 msgid " Alfa"
 msgstr " Alpha"
 
-#: scripts/ui/combat_hud.gd:901
-#: scripts/ui/combat_hud.gd:913
+#: scripts/ui/combat_hud.gd:904
+#: scripts/ui/combat_hud.gd:916
 msgid " Beta"
 msgstr " Beta"
 
-#: scripts/ui/combat_hud.gd:941
+#: scripts/ui/combat_hud.gd:958
 msgid "Troca de posição com o aliado vizinho. Gasta a vez."
 msgstr "Swaps places with the neighboring ally. Uses the turn."
 
-#: scripts/ui/combat_hud.gd:942
+#: scripts/ui/combat_hud.gd:959
 msgid "+1 Bloqueio e passa a vez. "
 msgstr "+1 Block and passes the turn. "
 
-#: scripts/ui/combat_hud.gd:943
+#: scripts/ui/combat_hud.gd:960
 msgid "60% de chance de a equipe recuar e sair da luta. Na fuga, larga o que carregava."
 msgstr "60% chance for the team to fall back and leave the fight. Fleeing, it drops what it was carrying."
 
-#: scripts/ui/combat_hud.gd:944
+#: scripts/ui/combat_hud.gd:961
 msgid "Comida ou curativo no herói da vez. Ação livre: a vez continua, um item por vez dele."
 msgstr "Food or a bandage on the active hero. Free action: the turn goes on, one item per turn."
 
-#: scripts/ui/combat_hud.gd:983
+#: scripts/ui/combat_hud.gd:1000
 msgid "CRISE DE INSTINTO"
 msgstr "INSTINCT CRISIS"
 
-#: scripts/ui/combat_hud.gd:1046
+#: scripts/ui/combat_hud.gd:1063
 #: scripts/ui/refuge_hud.gd:797
 msgid "Posição %d"
 msgstr "Position %d"
 
-#: scripts/ui/combat_hud.gd:1075
+#: scripts/ui/combat_hud.gd:1092
 msgid "Escolha o alvo (%s ou B volta)."
 msgstr "Pick the target (%s or B goes back)."
 
-#: scripts/ui/combat_hud.gd:1106
+#: scripts/ui/combat_hud.gd:1123
 msgid "◆ %s · também"
 msgstr "◆ %s · also"
 
-#: scripts/ui/combat_hud.gd:1110
+#: scripts/ui/combat_hud.gd:1127
 msgid "◆ também atingido"
 msgstr "◆ also hit"
 
-#: scripts/ui/combat_hud.gd:1174
+#: scripts/ui/combat_hud.gd:1191
 msgid "A patrulha foi neutralizada."
 msgstr "The patrol was neutralized."
 
-#: scripts/ui/combat_hud.gd:1174
+#: scripts/ui/combat_hud.gd:1191
 msgid "Todos caíram nas ruínas."
 msgstr "Everyone fell in the ruins."
 
-#: scripts/ui/combat_hud.gd:1174
+#: scripts/ui/combat_hud.gd:1191
 msgid "A equipe recuou pelas sombras."
 msgstr "The team fell back through the shadows."
 
-#: scripts/ui/combat_hud.gd:1194
+#: scripts/ui/combat_hud.gd:1211
 msgid "caído"
 msgstr "fallen"
 

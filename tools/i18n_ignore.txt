@@ -25,6 +25,9 @@ combat_hud.gd: A
 combat_hud.gd: Os
 combat_hud.gd: As
 combat_hud.gd: The
+combat_hud.gd: Guardian
+combat_hud.gd: Alpha
+combat_hud.gd: Beta
 combat_hud.gd: W
 combat_hud.gd: I
 combat_hud.gd: F

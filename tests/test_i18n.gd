@@ -121,6 +121,7 @@ func _switch_live() -> void:
 	t.equal(AHCombatHud.unit_name("Relé de Defesa Alfa"), "Defense Relay Alpha", "o relé do chefe em inglês")
 	t.equal(AHCombatHud.unit_name("Nick"), "Nick", "o nome do herói não muda")
 	t.equal(AHCombatHud.short_name("O Porteiro"), "Gatekeeper", "o nome curto sem o artigo")
+	t.equal(AHCombatHud.short_name("Relé de Defesa Alfa"), "Relay", "em inglês, o substantivo (a última palavra, sem o sufixo)")
 	GameFlow.start()
 	var title: AHTitleScreen = null
 	for frame in 300:

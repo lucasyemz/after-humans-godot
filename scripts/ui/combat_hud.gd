@@ -273,7 +273,9 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 	top.name = "Top"
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(top)
-	var name_label := S.label(unit_name(unit.display_name), 17, TEXT, "bold")
+	var name_label := S.label(_name(unit), 17, TEXT, "bold")
+	# O nome já vem traduzido (o do herói não se traduz: uma Faísca não vira "Spark").
+	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	name_label.name = "Name"
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.clip_text = true
@@ -413,7 +415,7 @@ func refresh() -> void:
 
 ## A linha da intenção na placa do inimigo: a ação e em quem (com "?" quando ele está entre dois planos parecidos).
 func _show_intent(label: Label, intent: Dictionary) -> void:
-	var names: Array = intent.target_ids.map(func(id): return unit_name(session.state.find_unit(id).display_name) if session.state.find_unit(id) else id)
+	var names: Array = intent.target_ids.map(func(id): return _name(session.state.find_unit(id)) if session.state.find_unit(id) else id)
 	var text := ""
 	var color: Color = S.ENEMY
 	# O ícone da intenção (art/ui/icons/intent-*): ataque, ataque em área (mais de um alvo de uma vez), cura, bloqueio,
@@ -472,7 +474,8 @@ func _refresh_order(current: String) -> void:
 		var face := S.portrait(_art_of(unit), 72 if now else 54, ring, 0.07 if now else 0.06)
 		face.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		who.add_child(face)
-		var name_label := S.label(short_name(unit.display_name) + (tr(" · agora") if now else ""), 16 if now else 15, GOLD if now else MUTED, "bold" if now else "body")
+		var name_label := S.label((unit.display_name.split(" ")[0] if unit.is_player else short_name(unit.display_name)) + (tr(" · agora") if now else ""), 16 if now else 15, GOLD if now else MUTED, "bold" if now else "body")
+		name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		who.add_child(name_label)
 		_order.add_child(who)
@@ -846,7 +849,7 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			var unit := session.state.find_unit(id)
 			if unit == null:
 				continue
-			var note := tr("%s (vida %d)") % [unit_name(unit.display_name), unit.hp]
+			var note := tr("%s (vida %d)") % [_name(unit), unit.hp]
 			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage").Max >= unit.hp:
 				note += tr(" · pode cair")
 			# Os estados do alvo por extenso: no foco, a dica faz o papel da dica do mouse sobre os ícones (#30).
@@ -913,12 +916,26 @@ static func _suffix(suffix: String) -> String:
 	return TranslationServer.translate(" Beta")
 
 
-## O nome curto da barra de ordem: a primeira palavra, sem o artigo ("O Porteiro" fica "Porteiro").
+## O nome de quem luta na tela: o do herói como está, o do inimigo traduzido.
+func _name(unit: AHCombat.Unit) -> String:
+	return unit.display_name if unit.is_player else unit_name(unit.display_name)
+
+
+## O nome curto da barra de ordem: o substantivo, sem o artigo. Em português é a primeira palavra ("Relé de Defesa"
+## fica "Relé", "O Porteiro" fica "Porteiro"); em inglês, a última ("Defense Relay" fica "Relay").
 static func short_name(text: String) -> String:
 	var words := unit_name(text).split(" ", false)
 	if words.size() > 1 and ["O", "A", "Os", "As", "The"].has(words[0]):
 		words.remove_at(0)
-	return words[0] if not words.is_empty() else text
+	if words.is_empty():
+		return text
+	# Os sufixos da rota (" · Guardian", " Alpha") não são o substantivo.
+	var english := TranslationServer.get_locale().begins_with("en")
+	if english:
+		while words.size() > 1 and (words[-1] in ["·", "Guardian", "Alpha", "Beta"] or words[-1].is_valid_int()):
+			words.remove_at(words.size() - 1)
+		return words[-1]
+	return words[0]
 
 func _tip_line(text: String, size: int, color: Color, kind: String = "body") -> Label:
 	var line := S.label(text, size, color, kind)
@@ -1047,7 +1064,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 		if unit != null and arena.cards.has(unit.id):
 			var card: AHSpriteCard = arena.cards[unit.id]
 			world = card.global_position + Vector3(0, card.head_height() + 0.2, 0)
-			label = unit_name(unit.display_name)
+			label = _name(unit)
 		else:
 			var probe := AHCombat.Unit.new()
 			probe.is_player = not enemy_side
@@ -1103,7 +1120,7 @@ func _preview_hits(ability_id: String, rank: int) -> void:
 			continue
 		var own: Array = _markers.filter(func(m): return session.engine.occupies_rank(unit, int(m.get_meta("rank"))))
 		if not own.is_empty():
-			own[0].text = tr("◆ %s · também") % unit_name(unit.display_name)
+			own[0].text = tr("◆ %s · também") % _name(unit)
 			own[0].add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
 			continue
 		var card: AHSpriteCard = arena.cards[id]
