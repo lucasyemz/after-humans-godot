@@ -31,35 +31,35 @@ var _waiting := ""
 func _ready() -> void:
 	add_theme_constant_override("separation", 10)
 	var settings: Dictionary = Campaign.state.settings
-	_title("Opções", 32)
-	_section("Som")
+	_title(tr("Opções"), 32)
+	_section(tr("Som"))
 	for spec in [["Música", "music_volume"], ["Ambiente", "ambience_volume"], ["Efeitos", "sfx_volume"]]:
-		_volume(spec[0], spec[1], float(settings.get(spec[1], 0.6)))
+		_volume(tr(spec[0]), spec[1], float(settings.get(spec[1], 0.6)))
 
-	_section("Gráficos")
+	_section(tr("Gráficos"))
 	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
 	var levels := HFlowContainer.new()
 	levels.add_theme_constant_override("h_separation", 6)
 	levels.add_theme_constant_override("v_separation", 6)
 	add_child(levels)
 	for i in Settings.LEVEL_NAMES.size():
-		var button := _choice(Settings.LEVEL_NAMES[i], i == Settings.level, levels)
+		var button := _choice(tr(Settings.LEVEL_NAMES[i]), i == Settings.level, levels)
 		var level := i
 		button.pressed.connect(func():
 			Settings.set_level(level)
 			_rebuild())
-	_hint("Qualidade: resolução interna, sombras, oclusão, neblina e quantidade de chuva.")
+	_hint(tr("Qualidade: resolução interna, sombras, oclusão, neblina e quantidade de chuva."))
 	if not OS.has_feature("web"):
-		_toggle("Tela cheia", Settings.fullscreen, func(on): Settings.set_fullscreen(on))
-		_toggle("Sincronia vertical (vsync)", Settings.vsync, func(on): Settings.set_vsync(on))
+		_toggle(tr("Tela cheia"), Settings.fullscreen, func(on): Settings.set_fullscreen(on))
+		_toggle(tr("Sincronia vertical (vsync)"), Settings.vsync, func(on): Settings.set_vsync(on))
 
-	_section("Jogo")
+	_section(tr("Jogo"))
 	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
 	var speeds := HFlowContainer.new()
 	speeds.add_theme_constant_override("h_separation", 6)
 	speeds.add_theme_constant_override("v_separation", 6)
 	add_child(speeds)
-	var label := H.make_label("Velocidade da batalha", 19, H.TEXT)
+	var label := H.make_label(tr("Velocidade da batalha"), 19, H.TEXT)
 	label.custom_minimum_size = Vector2(260, 0)
 	speeds.add_child(label)
 	for speed in [1, 2]:
@@ -69,13 +69,13 @@ func _ready() -> void:
 			Campaign.state.settings.battle_speed = value
 			_save()
 			_rebuild())
-	_toggle("Reduzir efeitos do ambiente (relâmpagos e poeira)", bool(settings.get("reduced_environment_effects", false)), func(on):
+	_toggle(tr("Reduzir efeitos (clima, tremor e clarão)"), bool(settings.get("reduced_environment_effects", false)), func(on):
 		Campaign.state.settings.reduced_environment_effects = on
 		_save()
 		Settings.changed.emit())
 
-	_toggle("Dicas da primeira vez", Tips.enabled, func(on): Tips.set_enabled(on))
-	_toggle("Cores para daltonismo (azul e laranja)", Settings.colorblind, func(on):
+	_toggle(tr("Dicas da primeira vez"), Tips.enabled, func(on): Tips.set_enabled(on))
+	_toggle(tr("Cores para daltonismo (azul e laranja)"), Settings.colorblind, func(on):
 		Settings.set_colorblind(on)
 		_rebuild())
 	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
@@ -83,17 +83,31 @@ func _ready() -> void:
 	sizes.add_theme_constant_override("h_separation", 6)
 	sizes.add_theme_constant_override("v_separation", 6)
 	add_child(sizes)
-	var size_label := H.make_label("Tamanho do texto", 19, H.TEXT)
+	var size_label := H.make_label(tr("Tamanho do texto"), 19, H.TEXT)
 	size_label.custom_minimum_size = Vector2(260, 0)
 	sizes.add_child(size_label)
 	for i in Settings.TEXT_SIZES.size():
-		var button := _choice(Settings.TEXT_SIZES[i], i == Settings.text_size, sizes)
+		var button := _choice(tr(Settings.TEXT_SIZES[i]), i == Settings.text_size, sizes)
 		var index := i
 		button.pressed.connect(func():
 			Settings.set_text_size(index)
 			_rebuild())
+	# O idioma (#35): o português é o padrão; o inglês está em teste (o que falta traduzir fica em português).
+	var languages := HFlowContainer.new()
+	languages.add_theme_constant_override("h_separation", 6)
+	languages.add_theme_constant_override("v_separation", 6)
+	add_child(languages)
+	var language_label := H.make_label(tr("Idioma"), 19, H.TEXT)
+	language_label.custom_minimum_size = Vector2(260, 0)
+	languages.add_child(language_label)
+	for entry in Settings.LANGUAGES:
+		var button := _choice(tr(entry[1]), Settings.language == entry[0], languages)
+		var code: String = entry[0]
+		button.pressed.connect(func():
+			Settings.set_language(code)
+			_rebuild())
 	var again := Button.new()
-	again.text = "Mostrar as dicas de novo"
+	again.text = tr("Mostrar as dicas de novo")
 	again.custom_minimum_size = Vector2(0, 42)
 	H.style_button(again)
 	again.pressed.connect(func():
@@ -102,28 +116,28 @@ func _ready() -> void:
 		_rebuild())
 	add_child(again)
 
-	_section("Controles")
+	_section(tr("Controles"))
 	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
 	var touch := HFlowContainer.new()
 	touch.add_theme_constant_override("h_separation", 6)
 	touch.add_theme_constant_override("v_separation", 6)
 	add_child(touch)
-	var touch_label := H.make_label("Controles de toque", 19, H.TEXT)
+	var touch_label := H.make_label(tr("Controles de toque"), 19, H.TEXT)
 	touch_label.custom_minimum_size = Vector2(200, 0)
 	touch.add_child(touch_label)
 	for i in Settings.TOUCH_MODES.size():
-		var button := _choice(Settings.TOUCH_MODES[i], i == Settings.touch_controls, touch)
+		var button := _choice(tr(Settings.TOUCH_MODES[i]), i == Settings.touch_controls, touch)
 		button.custom_minimum_size.x = 0
 		var mode := i
 		button.pressed.connect(func():
 			Settings.set_touch_controls(mode)
 			_rebuild())
-	_hint("Analógico à esquerda para andar (até a borda corre) e Usar à direita; o aviso de interação também aceita toque.")
-	_hint("Trocar: clique e aperte a tecla nova (Esc cancela). Se outra ação usava a tecla, as duas trocam.")
+	_hint(tr("Analógico à esquerda para andar (até a borda corre) e Usar à direita; o aviso de interação também aceita toque."))
+	_hint(tr("Trocar: clique e aperte a tecla nova (Esc cancela). Se outra ação usava a tecla, as duas trocam."))
 	for spec in CONTROLS:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
-		var name := H.make_label(spec[1], 18, H.TEXT)
+		var name := H.make_label(tr(spec[1]), 18, H.TEXT)
 		name.custom_minimum_size = Vector2(230, 0)
 		row.add_child(name)
 		var keys_label := H.make_label(_keys(spec[0]), 18, H.GOLD)
@@ -131,7 +145,7 @@ func _ready() -> void:
 		keys_label.clip_text = true
 		row.add_child(keys_label)
 		var change := Button.new()
-		change.text = "Aperte uma tecla…" if _waiting == spec[0] else "Trocar"
+		change.text = tr("Aperte uma tecla…") if _waiting == spec[0] else tr("Trocar")
 		change.custom_minimum_size = Vector2(150, 36)
 		H.style_button(change)
 		if _waiting == spec[0]:
@@ -143,26 +157,26 @@ func _ready() -> void:
 		row.add_child(change)
 		add_child(row)
 	var defaults := Button.new()
-	defaults.text = "Restaurar as teclas padrão"
+	defaults.text = tr("Restaurar as teclas padrão")
 	defaults.custom_minimum_size = Vector2(0, 40)
 	H.style_button(defaults)
 	defaults.pressed.connect(func():
 		Settings.reset_keys()
 		_rebuild())
 	add_child(defaults)
-	_hint("Mouse: clique nos botões e nos alvos da luta.")
+	_hint(tr("Mouse: clique nos botões e nos alvos da luta."))
 
 	if allow_new_campaign:
-		_section("Campanha")
+		_section(tr("Campanha"))
 		var fresh := Button.new()
-		fresh.text = "Nova campanha…"
+		fresh.text = tr("Nova campanha…")
 		fresh.custom_minimum_size = Vector2(0, 44)
 		H.style_button(fresh, AHUiStyle.DANGER)
 		fresh.pressed.connect(func(): new_campaign_requested.emit())
 		add_child(fresh)
 
 	var close := Button.new()
-	close.text = "Fechar"
+	close.text = tr("Fechar")
 	close.custom_minimum_size = Vector2(0, 50)
 	H.style_button(close)
 	close.pressed.connect(func(): closed.emit())
@@ -294,7 +308,7 @@ func _keys(action: String) -> String:
 			var code: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
 			names.append(OS.get_keycode_string(code))
 		elif event is InputEventJoypadButton:
-			names.append("Controle " + PAD_NAMES.get(event.button_index, str(event.button_index)))
+			names.append(tr("Controle ") + PAD_NAMES.get(event.button_index, str(event.button_index)))
 	return " · ".join(names)
 
 

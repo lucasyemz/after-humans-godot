@@ -5,6 +5,9 @@
 class_name AHRefugeHud
 extends Control
 
+## Abrir e fechar um painel (#36).
+const PANEL_OPEN := "res://audio/ui/panel_open.ogg"
+const PANEL_CLOSE := "res://audio/ui/panel_close.ogg"
 const H := preload("res://scripts/ui/combat_hud.gd")
 const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
@@ -13,6 +16,8 @@ const RESULT_NAMES := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fu
 
 var station: AHStation
 var current := ""
+## O quadro em que o painel abriu (o som de fechar não toca se ele fechar nesse mesmo quadro).
+var _opened_frame := -1
 var _title: Label
 var _subtitle: Label
 var _resources: HBoxContainer
@@ -82,7 +87,7 @@ func _ready() -> void:
 	shade.size = Vector2(1920, 150)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(shade)
-	_title = U.label("Estação Raiz", 36, U.GOLD, "display")
+	_title = U.label(tr("Estação Raiz"), 36, U.GOLD, "display")
 	_title.position = Vector2(32, 18)
 	add_child(_title)
 	_subtitle = U.label("", U.MIN_TEXT, U.MUTED)
@@ -106,7 +111,7 @@ func _ready() -> void:
 	var card_box := VBoxContainer.new()
 	card_box.add_theme_constant_override("separation", 8)
 	card.add_child(card_box)
-	card_box.add_child(U.label("PRÓXIMO PASSO", 15, U.COPPER, "bold"))
+	card_box.add_child(U.label(tr("PRÓXIMO PASSO"), 15, U.COPPER, "bold"))
 	_next_title = U.label("", 26, U.TEXT, "bold")
 	_next_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_next_title.custom_minimum_size = Vector2(390, 0)
@@ -144,19 +149,19 @@ func _ready() -> void:
 	_corner.add_theme_constant_override("separation", 8)
 	add_child(_corner)
 	_overview_button = Button.new()
-	_overview_button.text = "‹ Vista geral"
+	_overview_button.text = tr("‹ Vista geral")
 	_overview_button.custom_minimum_size = Vector2(190, 46)
 	H.style_button(_overview_button)
 	_overview_button.pressed.connect(close_panel)
 	_corner.add_child(_overview_button)
 	var options := Button.new()
-	options.text = "Opções"
+	options.text = tr("Opções")
 	options.custom_minimum_size = Vector2(150, 46)
 	H.style_button(options)
 	options.pressed.connect(func(): open_service("options"))
 	_corner.add_child(options)
 	var hide_button := Button.new()
-	hide_button.text = "Ocultar HUD"
+	hide_button.text = tr("Ocultar HUD")
 	hide_button.custom_minimum_size = Vector2(170, 46)
 	H.style_button(hide_button)
 	hide_button.pressed.connect(func(): set_hud_hidden(true))
@@ -283,7 +288,7 @@ func set_hud_hidden(on: bool) -> void:
 			station.focus_overview()
 	if _hidden_hint == null:
 		return
-	_hidden_hint.text = "%s mostra a interface" % U.key_name("hide_hud")
+	_hidden_hint.text = tr("%s mostra a interface") % U.key_name("hide_hud")
 	_hidden_hint.visible = on
 	_hidden_hint.size = _hidden_hint.get_combined_minimum_size()
 	_hidden_hint.position = Vector2(960 - _hidden_hint.size.x * 0.5, 1030)
@@ -325,7 +330,7 @@ func _build_key_hints() -> void:
 	_key_hints = HBoxContainer.new()
 	_key_hints.add_theme_constant_override("separation", 16)
 	_key_hints.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for spec in [[["move_left", "move_right", "move_back", "move_front"], "cômodos"], [["interact"], "abrir"], [["menu"], "menu"], [["hide_hud"], "ocultar"]]:
+	for spec in [[["move_left", "move_right", "move_back", "move_front"], tr("cômodos")], [["interact"], tr("abrir")], [["menu"], tr("menu")], [["hide_hud"], tr("ocultar")]]:
 		var group := HBoxContainer.new()
 		group.add_theme_constant_override("separation", 4)
 		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -387,11 +392,11 @@ func refresh() -> void:
 		_resources.add_child(_vital(vital))
 	_resources.size = _resources.get_combined_minimum_size()
 	_resources.position = Vector2(1888 - _resources.size.x, 16)
-	var status: Array[String] = ["Ciclo %d" % c.station.cycle_number, "%d no elenco" % S.living(c).size()]
+	var status: Array[String] = [tr("Ciclo %d") % c.station.cycle_number, tr("%d no elenco") % S.living(c).size()]
 	if c.night.phase != "none":
-		status.append("noite por resolver no Dormitório")
+		status.append(tr("noite por resolver no Dormitório"))
 	if S.visit_pending(c):
-		status.append("alguém espera na plataforma")
+		status.append(tr("alguém espera na plataforma"))
 	_subtitle.text = " · ".join(status)
 	_build_left(c)
 	if current == "departure" and not _draft.is_empty():
@@ -420,10 +425,10 @@ func _materials_chip(c: Dictionary) -> PanelContainer:
 	row.add_theme_constant_override("separation", 16)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chip.add_child(row)
-	for spec in [["lobby-seed", "seeds", "Sementes: moeda da Estação (comida extra na partida, recrutas e o trauma)."],
-			["lobby-scrap", "scrap", "Sucata: recupera cômodos e fabrica relíquias na Forja."],
-			["lobby-fragment", "fragments", "Fragmentos: restos raros para pesquisas e melhorias."],
-			["res-bandages", "bandages", "Curativos: +8 de vida, na expedição e no acampamento."]]:
+	for spec in [["lobby-seed", "seeds", tr("Sementes: moeda da Estação (comida extra na partida, recrutas e o trauma).")],
+			["lobby-scrap", "scrap", tr("Sucata: recupera cômodos e fabrica relíquias na Forja.")],
+			["lobby-fragment", "fragments", tr("Fragmentos: restos raros para pesquisas e melhorias.")],
+			["res-bandages", "bandages", tr("Curativos: +8 de vida, na expedição e no acampamento.")]]:
 		var item := HBoxContainer.new()
 		item.add_theme_constant_override("separation", 5)
 		item.tooltip_text = spec[2]
@@ -475,12 +480,12 @@ func _build_left(c: Dictionary) -> void:
 		_pending.remove_child(child)
 		child.queue_free()
 	if S.visit_pending(c) and _next.action != "train":
-		_pending.add_child(_pending_row("O trem chegou: alguém espera na plataforma", func(): open_service("train"), U.GOLD))
+		_pending.add_child(_pending_row(tr("O trem chegou: alguém espera na plataforma"), func(): open_service("train"), U.GOLD))
 	if c.night.phase != "none" and _next.action != "dormitory":
-		_pending.add_child(_pending_row("A noite espera no Dormitório", func(): open_room(S.DORMITORY), U.VIOLET))
+		_pending.add_child(_pending_row(tr("A noite espera no Dormitório"), func(): open_room(S.DORMITORY), U.VIOLET))
 	if _next.action != "depart" and S.preparation_block(c) == "":
-		_pending.add_child(_pending_row("Preparar expedição", open_map, U.COPPER))
-	_pending.add_child(_pending_row("Plano da Estação: o que cada cômodo destrava", func(): open_service("plan"), U.MUTED))
+		_pending.add_child(_pending_row(tr("Preparar expedição"), open_map, U.COPPER))
+	_pending.add_child(_pending_row(tr("Plano da Estação: o que cada cômodo destrava"), func(): open_service("plan"), U.MUTED))
 	_menu.visible = current == "" or current == "options"
 	_overview_button.visible = current != ""
 	_corner.visible = current != S.PREPARATION or S.preparation_block(c) != ""
@@ -561,7 +566,7 @@ func _build_room_selection() -> void:
 	_room_card_state.custom_minimum_size = Vector2(270, 0)
 	column.add_child(_room_card_state)
 	var manage := Button.new()
-	manage.text = "Gerenciar ›"
+	manage.text = tr("Gerenciar ›")
 	manage.custom_minimum_size = Vector2(140, 46)
 	manage.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	manage.focus_mode = Control.FOCUS_NONE
@@ -576,11 +581,11 @@ func _build_room_selection() -> void:
 func _room_state(c: Dictionary, id: String) -> String:
 	var level := S.room_level(c, id)
 	if id == S.DORMITORY and c.night.phase != "none":
-		return "A noite espera aqui."
+		return tr("A noite espera aqui.")
 	var cost := S.next_level_cost(c, id)
 	if level < 1:
-		return "Vazio · recuperar por %s" % S.cost_text(cost) if not cost.is_empty() else "Vazio"
-	return "Nível %d de %d" % [level, S.room_def(id).max_level] if S.room_def(id).max_level > 1 else "Aberto"
+		return tr("Vazio · recuperar por %s") % S.cost_text(cost) if not cost.is_empty() else tr("Vazio")
+	return tr("Nível %d de %d") % [level, S.room_def(id).max_level] if S.room_def(id).max_level > 1 else tr("Aberto")
 
 
 func _refresh_room_card() -> void:
@@ -669,6 +674,9 @@ func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
 
 func open_room(room_id: String) -> void:
 	_reset_focus()
+	if current == "" and _opened_frame != Engine.get_process_frames():
+		_opened_frame = Engine.get_process_frames()
+		_sound_open.call_deferred()
 	current = room_id
 	if room_id == S.PREPARATION and _draft.is_empty():
 		_reset_draft()
@@ -678,6 +686,9 @@ func open_room(room_id: String) -> void:
 
 func open_service(service: String) -> void:
 	_reset_focus()
+	if current == "" and _opened_frame != Engine.get_process_frames():
+		_opened_frame = Engine.get_process_frames()
+		_sound_open.call_deferred()
 	current = service
 	match service:
 		"report":
@@ -693,7 +704,16 @@ func open_service(service: String) -> void:
 	refresh()
 
 
+## O som de abrir só se o painel ficou aberto (o relatório vazio e o trem sem candidato fecham no mesmo quadro).
+func _sound_open() -> void:
+	if current != "":
+		Sound.play(PANEL_OPEN)
+
+
 func close_panel() -> void:
+	# O de fechar só se o de abrir tocou: o painel que fecha no mesmo quadro em que abriu não faz som nenhum (#36).
+	if current != "" and Engine.get_process_frames() != _opened_frame:
+		Sound.play(PANEL_CLOSE)
 	current = ""
 	_panel.visible = false
 	_prep_selected = -1
@@ -770,21 +790,21 @@ func _make_tag(hero_id: String) -> Control:
 	box.add_child(column)
 	column.add_child(H.make_label(entry.display_name if entry else hero_id, 20, H.GOLD))
 	if entry:
-		column.add_child(H.make_label("Vida %d/%d" % [entry.hp, entry.max_hp], 16))
+		column.add_child(H.make_label(tr("Vida %d/%d") % [entry.hp, entry.max_hp], 16))
 		if current == "departure":
 			var rank: int = _draft.get("team", []).find(hero_id) + 1
 			var attacks := S.attacks_from_rank(entry.class_id, rank)
-			column.add_child(H.make_label("Posição %d" % rank, 15, H.MUTED))
-			var attack := H.make_label(attacks[0] if not attacks.is_empty() else "sem ataque aqui", 15, H.MUTED if not attacks.is_empty() else Color(1.0, 0.6, 0.5))
+			column.add_child(H.make_label(tr("Posição %d") % rank, 15, H.MUTED))
+			var attack := H.make_label(attacks[0] if not attacks.is_empty() else tr("sem ataque aqui"), 15, H.MUTED if not attacks.is_empty() else Color(1.0, 0.6, 0.5))
 			attack.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			attack.custom_minimum_size = Vector2(150, 0)
 			column.add_child(attack)
 		else:
-			var state: Array[String] = ["%d expedições" % int(entry.get("completed_expeditions", 0))]
+			var state: Array[String] = [tr("%d expedições") % int(entry.get("completed_expeditions", 0))]
 			if entry.trauma:
 				state.append("trauma")
 			elif entry.hp < entry.max_hp * 0.5:
-				state.append("ferido")
+				state.append(tr("ferido"))
 			column.add_child(H.make_label(" · ".join(state), 15, H.MUTED))
 	return box
 
@@ -801,11 +821,14 @@ func toast(text: String, error: bool = false) -> void:
 
 
 ## Aplica uma ação das regras: "" grava e atualiza; senão mostra o motivo.
-func _act(error: String, success: String = "") -> void:
+func _act(error: String, success: String = "", sound: String = "") -> void:
 	if error != "":
 		toast(error, true)
+		Sound.play("res://audio/ui/deny.ogg")
 		return
 	station.commit()
+	if sound != "":
+		Sound.play(sound, 1.0, 1.0, "UI")
 	if success != "":
 		toast(success)
 
@@ -849,7 +872,7 @@ func _show(key: String) -> void:
 
 ## O plano da Estação: cada cômodo com o nível, o que faz, o que o próximo nível destrava e quanto custa.
 func _station_plan(c: Dictionary) -> void:
-	_heading("Plano da Estação", "A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos.")
+	_heading(tr("Plano da Estação"), tr("A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos."))
 	for room in AHStation.ROOMS:
 		var id: String = room.id
 		var room_def := S.room_def(id)
@@ -868,19 +891,19 @@ func _station_plan(c: Dictionary) -> void:
 		var name_label := U.label(room_def.name, 22, U.GOLD if ready else U.TEXT, "bold")
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		head.add_child(name_label)
-		head.add_child(U.label("vazio" if level < 1 else "nível %d de %d" % [level, room_def.max_level], 17, U.MUTED))
-		var now := U.label(S.room_benefit(id, level) if level >= 1 else "Ainda vazio.", 17, U.TEXT)
+		head.add_child(U.label(tr("vazio") if level < 1 else tr("nível %d de %d") % [level, room_def.max_level], 17, U.MUTED))
+		var now := U.label(S.room_benefit(id, level) if level >= 1 else tr("Ainda vazio."), 17, U.TEXT)
 		now.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		now.custom_minimum_size = Vector2(600, 0)
 		column.add_child(now)
 		if not cost.is_empty():
-			var next := U.label("%s: %s · %s%s" % ["Recuperar" if level == 0 else "Nível %d" % (level + 1), S.room_benefit(id, level + 1), S.cost_text(cost),
+			var next := U.label("%s: %s · %s%s" % [tr("Recuperar") if level == 0 else tr("Nível %d") % (level + 1), S.room_benefit(id, level + 1), S.cost_text(cost),
 				"" if block == "" else " · " + block], 16, U.GOLD if ready else U.MUTED)
 			next.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			next.custom_minimum_size = Vector2(600, 0)
 			column.add_child(next)
 		var go := Button.new()
-		go.text = "Ver %s" % room_def.name
+		go.text = tr("Ver %s") % room_def.name
 		go.custom_minimum_size = Vector2(0, 38)
 		H.style_button(go)
 		go.pressed.connect(func(): open_room(id))
@@ -889,10 +912,11 @@ func _station_plan(c: Dictionary) -> void:
 
 ## Começar do zero (com confirmação): o save atual é substituído por uma campanha nova.
 func _new_campaign_view() -> void:
-	_heading("Nova campanha", "Recomeça a Estação, o elenco e as fases do zero.")
-	_text("Todo o progresso salvo (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha nova.", 19, Color(1.0, 0.65, 0.5))
-	_button("Cancelar", close_panel)
-	_button("Começar do zero", func():
+	_heading(tr("Nova campanha"), tr("Recomeça a Estação, o elenco e as fases do zero."))
+	# Diz qual espaço é trocado (#34): os outros ficam como estão.
+	_text(tr("Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha nova. Os outros espaços ficam como estão.") % Campaign.slot, 19, Color(1.0, 0.65, 0.5))
+	_button(tr("Cancelar"), close_panel)
+	_button(tr("Começar do zero"), func():
 		Campaign.new_game()
 		GameFlow.change_to("station"))
 
@@ -945,14 +969,14 @@ func _room(room_id: String) -> void:
 	var c: Dictionary = Campaign.state
 	var level := S.room_level(c, room_id)
 	var room_def := S.room_def(room_id)
-	_heading(room_def.name, ("Nível %d" % level) if level >= 1 else "Vazio")
+	_heading(room_def.name, (tr("Nível %d") % level) if level >= 1 else tr("Vazio"))
 	_text(S.room_benefit(room_id, level))
 	var cost := S.next_level_cost(c, room_id)
 	if not cost.is_empty():
 		var block := S.upgrade_block(c, room_id)
-		var verb := "Recuperar" if level == 0 else "Melhorar"
-		_button("%s (%s)%s" % [verb, S.cost_text(cost), "" if block == "" else " · " + block],
-			func(): _act(S.upgrade_room(Campaign.state, room_id, level), "%s: nível %d." % [room_def.name, level + 1]), block == "")
+		var verb := tr("Recuperar") if level == 0 else tr("Melhorar")
+		_button(tr("%s (%s)%s") % [verb, S.cost_text(cost), "" if block == "" else " · " + block],
+			func(): _act(S.upgrade_room(Campaign.state, room_id, level), tr("%s: nível %d.") % [room_def.name, level + 1]), block == "")
 	for civilian_id in c.station.residents:
 		var who := S.civilian(civilian_id)
 		if who.room == room_id:
@@ -977,44 +1001,44 @@ func _room(room_id: String) -> void:
 
 
 func _civilian_card(c: Dictionary, who: Dictionary) -> void:
-	_section("%s · %s (%s)" % [who.name, who.role, who.species])
+	_section(tr("%s · %s (%s)") % [who.name, who.role, who.species])
 	var working := S.civilian_working(c, who.id)
-	_text(("Ponto forte: %s" % who.benefit) if working else "Sem comida ou água no último ciclo: o ponto forte está parado até a próxima volta.",
+	_text((tr("Ponto forte: %s") % who.benefit) if working else tr("Sem comida ou água no último ciclo: o ponto forte está parado até a próxima volta."),
 		18, H.TEXT if working else Color(1.0, 0.6, 0.5))
-	_text("Ponto fraco: %s" % who.drawback, 18, H.MUTED)
-	_text(("Pedido entregue: %s." % who.request_reward) if S.has_completed_request(c, who.id) else ("Pedido: %s" % who.need), 18, H.MUTED)
+	_text(tr("Ponto fraco: %s") % who.drawback, 18, H.MUTED)
+	_text((tr("Pedido entregue: %s.") % who.request_reward) if S.has_completed_request(c, who.id) else (tr("Pedido: %s") % who.need), 18, H.MUTED)
 
 
 # ---------------------------------------------------------------- Sala dos Personagens
 
 func _characters(c: Dictionary) -> void:
-	_section("Elenco (%d de %d)" % [S.living(c).size(), S.MAX_ROSTER])
+	_section(tr("Elenco (%d de %d)") % [S.living(c).size(), S.MAX_ROSTER])
 	for entry in S.living(c):
 		var hero_class = GameData.row("classes", entry.class_id)
-		var tags: Array[String] = ["Vida %d/%d" % [entry.hp, entry.max_hp], "Instinto %d" % entry.instinct,
-			"%d expedições" % int(entry.get("completed_expeditions", 0))]
+		var tags: Array[String] = [tr("Vida %d/%d") % [entry.hp, entry.max_hp], tr("Instinto %d") % entry.instinct,
+			tr("%d expedições") % int(entry.get("completed_expeditions", 0))]
 		if entry.trauma:
 			tags.append("trauma")
 		var relic = GameData.row("relics", entry.relic_id) if entry.relic_id != "" else null
-		tags.append("relíquia: %s" % (relic.DisplayName if relic else "nenhuma"))
-		_text("%s · %s" % [entry.display_name, hero_class.DisplayName if hero_class else entry.class_id], 20, H.GOLD.lightened(0.3))
+		tags.append(tr("relíquia: %s") % (tr(relic.DisplayName) if relic else tr("nenhuma")))
+		_text("%s · %s" % [entry.display_name, tr(hero_class.DisplayName) if hero_class else entry.class_id], 20, H.GOLD.lightened(0.3))
 		_text(" · ".join(tags), 17, H.MUTED)
 		var row := _row()
 		var hero_id: String = entry.id
 		if entry.trauma:
-			_button("Tratar trauma (%d sementes)" % S.TRAUMA_COST, func(): _act(S.treat_trauma(Campaign.state, hero_id), "Trauma tratado."), true, row)
+			_button(tr("Tratar trauma (%d sementes)") % S.TRAUMA_COST, func(): _act(S.treat_trauma(Campaign.state, hero_id), tr("Trauma tratado.")), true, row)
 		var stock: Array = c.inventory.relics
 		if not stock.is_empty() or entry.relic_id != "":
-			_button("Trocar relíquia", func(): _cycle_relic(hero_id), true, row)
-	_section("Recrutar")
+			_button(tr("Trocar relíquia"), func(): _cycle_relic(hero_id), true, row)
+	_section(tr("Recrutar"))
 	for class_id in c.unlocked_classes:
 		var hero_class = GameData.row("classes", class_id)
 		var free := S.can_recruit_volunteer(c, class_id)
 		var id: String = class_id
-		_button("%s · %s" % [hero_class.DisplayName if hero_class else class_id, "voluntário, de graça" if free else "%d sementes" % S.RECRUIT_COST],
+		_button("%s · %s" % [tr(hero_class.DisplayName) if hero_class else class_id, tr("voluntário, de graça") if free else tr("%d sementes") % S.RECRUIT_COST],
 			func(): _recruit(id), free or S.quantity(c, "seeds") >= S.RECRUIT_COST)
 	if not c.memorial.is_empty():
-		_section("Memorial")
+		_section(tr("Memorial"))
 		for entry in c.memorial:
 			_text("%s · %s · %s" % [entry.display_name, entry.get("mission_name", ""), entry.get("cause", "")], 17, H.MUTED)
 
@@ -1031,14 +1055,14 @@ func _cycle_relic(hero_id: String) -> void:
 	var index := options.find(entry.relic_id)
 	var next: String = options[(index + 1) % options.size()]
 	var relic = GameData.row("relics", next)
-	_act(S.equip_relic(c, hero_id, next), "%s: %s." % [entry.display_name, relic.DisplayName if relic else "sem relíquia"])
+	_act(S.equip_relic(c, hero_id, next), tr("%s: %s.") % [entry.display_name, tr(relic.DisplayName) if relic else tr("sem relíquia")])
 
 
 func _recruit(class_id: String) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	var result := S.recruit(Campaign.state, class_id, rng)
-	_act(result.error, "%s chegou à Estação." % (S.hero(Campaign.state, result.get("hero_id", "")).display_name if result.error == "" else ""))
+	_act(result.error, tr("%s chegou à Estação.") % (S.hero(Campaign.state, result.get("hero_id", "")).display_name if result.error == "" else ""))
 	if result.error == "":
 		var rng2 := RandomNumberGenerator.new()
 		rng2.randomize()
@@ -1070,35 +1094,35 @@ func _preparation(c: Dictionary) -> void:
 	if block != "":
 		_text(block, 20, Color(1.0, 0.65, 0.5))
 		if c.night.phase != "none":
-			_button("Ir ao Dormitório", func(): open_room(S.DORMITORY))
+			_button(tr("Ir ao Dormitório"), func(): open_room(S.DORMITORY))
 		elif S.visit_pending(c):
-			_button("Ir à plataforma", func(): open_service("train"))
+			_button(tr("Ir à plataforma"), func(): open_service("train"))
 		return
 	if _draft.is_empty():
 		_reset_draft()
 	# Missão: o mapa de fases abre por cima; a fase escolhida volta para esta mesma escalação.
-	_section("Missão")
+	_section(tr("Missão"))
 	var mission := J.phase(_draft.phase)
 	if not S.phase_unlocked(c, _draft.phase):
 		_reset_draft()
 		mission = J.phase(_draft.phase)
-	_text("%s · nível %d · %s" % [mission.name, mission.level, J.DIFFICULTY_NAMES[mission.difficulty]], 20, H.GOLD)
-	_button("Escolher no mapa", func(): _map.open(_draft.phase))
-	_section("Equipe (da frente para trás)")
+	_text(tr("%s · nível %d · %s") % [mission.name, mission.level, J.DIFFICULTY_NAMES[mission.difficulty]], 20, H.GOLD)
+	_button(tr("Escolher no mapa"), func(): _map.open(_draft.phase))
+	_section(tr("Equipe (da frente para trás)"))
 	for rank in 4:
 		var hero_id: String = _draft.team[rank] if rank < _draft.team.size() else ""
 		var entry = S.hero(c, hero_id)
 		var row := _row()
-		var label := H.make_label("%d. %s" % [rank + 1, entry.display_name if entry else "—"], 20, H.TEXT)
+		var label := H.make_label(tr("%d. %s") % [rank + 1, entry.display_name if entry else "—"], 20, H.TEXT)
 		label.custom_minimum_size = Vector2(250, 0)
 		row.add_child(label)
 		if entry and S.attacks_from_rank(entry.class_id, rank + 1).is_empty():
 			label.add_theme_color_override("font_color", Color(1.0, 0.6, 0.5))
 		var slot := rank
-		_button("Trocar", func(): _cycle_slot(slot), S.living(c).size() > _draft.team.size() or _draft.team.size() > 1, row)
+		_button(tr("Trocar"), func(): _cycle_slot(slot), S.living(c).size() > _draft.team.size() or _draft.team.size() > 1, row)
 		if rank > 0:
 			_button("↑", func(): _swap(slot, slot - 1), true, row)
-	_section("Foco da rota")
+	_section(tr("Foco da rota"))
 	var recommended := S.focus_recommended(c)
 	for focus_id in [""] + S.FOCI.map(func(f): return f.id):
 		if not S.focus_available(c, focus_id):
@@ -1108,14 +1132,14 @@ func _preparation(c: Dictionary) -> void:
 		if id != "":
 			label += " · " + S.focus_reward_text(id)
 		if id == recommended:
-			label += " · recomendado"
+			label += tr(" · recomendado")
 		var button := _button(("▸ " if _draft.focus == id else "") + label, func(): _draft.focus = id; refresh())
 		if _draft.focus == id:
 			button.add_theme_color_override("font_color", H.GOLD)
 	_text(S.focus_reason(c, _draft.focus), 17, H.MUTED)
-	_section("Suprimentos")
+	_section(tr("Suprimentos"))
 	var row := _row()
-	var food_label := H.make_label("%d de graça + %d extras (%d sementes)" % [J.FREE_FOOD, _draft.extra, _draft.extra * S.FOOD_COST], 19)
+	var food_label := H.make_label(tr("%d de graça + %d extras (%d sementes)") % [J.FREE_FOOD, _draft.extra, _draft.extra * S.FOOD_COST], 19)
 	food_label.custom_minimum_size = Vector2(400, 0)
 	row.add_child(food_label)
 	_button("−", func(): _draft.extra = maxi(0, _draft.extra - 1); refresh(), _draft.extra > 0, row)
@@ -1125,13 +1149,13 @@ func _preparation(c: Dictionary) -> void:
 	spacer.custom_minimum_size = Vector2(0, 8)
 	_body.add_child(spacer)
 	if current == "departure":
-		_button("Voltar à Preparação", func():
+		_button(tr("Voltar à Preparação"), func():
 			station.clear_lineup()
 			_lineup_signature = ""
 			open_room(S.PREPARATION))
 	else:
-		_button("Escalar a equipe na plataforma", open_departure)
-	var depart := _button("Confirmar partida", _depart)
+		_button(tr("Escalar a equipe na plataforma"), open_departure)
+	var depart := _button(tr("Confirmar partida"), _depart)
 	depart.custom_minimum_size = Vector2(0, 56)
 	depart.add_theme_font_size_override("font_size", AHUiStyle.px(24))
 
@@ -1201,7 +1225,7 @@ func _prep_drawer(c: Dictionary) -> void:
 	var head := HBoxContainer.new()
 	lineup.add_child(head)
 	var back := Button.new()
-	back.text = "‹ Vista geral"
+	back.text = tr("‹ Vista geral")
 	back.custom_minimum_size = Vector2(0, 36)
 	H.style_button(back)
 	# No teclado e no controle, Voltar faz o mesmo; o foco começa no primeiro cartão da equipe.
@@ -1209,11 +1233,11 @@ func _prep_drawer(c: Dictionary) -> void:
 	back.pressed.connect(close_panel)
 	head.add_child(back)
 	var limits := J.team_limits(_draft.phase)
-	var title := U.label("   EQUIPE · %s · CLIQUE EM DOIS PARA TROCAR" % S.team_size_text(limits).to_upper(), 15, U.COPPER, "bold")
+	var title := U.label(tr("   EQUIPE · %s · CLIQUE EM DOIS PARA TROCAR") % S.team_size_text(limits).to_upper(), 15, U.COPPER, "bold")
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(title)
-	head.add_child(U.label("← fundo · frente →", 16, U.MUTED))
+	head.add_child(U.label(tr("← fundo · frente →"), 16, U.MUTED))
 	var slots := HBoxContainer.new()
 	slots.add_theme_constant_override("separation", 12)
 	lineup.add_child(slots)
@@ -1228,7 +1252,7 @@ func _prep_drawer(c: Dictionary) -> void:
 		bench_row.add_theme_constant_override("h_separation", 8)
 		bench_row.add_theme_constant_override("v_separation", 6)
 		lineup.add_child(bench_row)
-		bench_row.add_child(U.label("Fora da equipe:", 17, U.MUTED))
+		bench_row.add_child(U.label(tr("Fora da equipe:"), 17, U.MUTED))
 		for entry in bench:
 			var id: String = entry.id
 			var button := Button.new()
@@ -1236,23 +1260,23 @@ func _prep_drawer(c: Dictionary) -> void:
 			button.custom_minimum_size = Vector2(0, 40)
 			H.style_button(button)
 			button.disabled = _prep_selected < 0 or not S.can_deploy(entry)
-			button.tooltip_text = "Escolha um cartão da equipe e clique aqui para trocar." if S.can_deploy(entry) else S.deploy_block(entry)
+			button.tooltip_text = tr("Escolha um cartão da equipe e clique aqui para trocar.") if S.can_deploy(entry) else S.deploy_block(entry)
 			if not S.can_deploy(entry):
-				button.text += " · sem arte de combate"
+				button.text += tr(" · sem arte de combate")
 			button.pressed.connect(func(): _prep_bench(id))
 			bench_row.add_child(button)
 		# Equipe menor (#6): o escolhido fica na Estação e a vaga fica vazia (os de trás andam para a frente).
 		if can_leave:
 			var leave := Button.new()
-			leave.text = "Deixar na Estação"
+			leave.text = tr("Deixar na Estação")
 			leave.custom_minimum_size = Vector2(0, 40)
 			H.style_button(leave)
-			leave.tooltip_text = "Parte com um a menos; os de trás andam uma posição para a frente."
+			leave.tooltip_text = tr("Parte com um a menos; os de trás andam uma posição para a frente.")
 			leave.pressed.connect(_prep_leave)
 			bench_row.add_child(leave)
 	var size_block := ""
 	if _draft.team.size() < limits.min or _draft.team.size() > limits.max:
-		size_block = "%s pede %s na equipe." % [J.phase(_draft.phase).get("name", "Esta jornada"), S.team_size_text(limits)]
+		size_block = tr("%s pede %s na equipe.") % [J.phase(_draft.phase).get("name", tr("Esta jornada")), S.team_size_text(limits)]
 		lineup.add_child(U.label(size_block, 17, U.DANGER, "bold"))
 	var warning := _team_warning(c)
 	if warning != "":
@@ -1263,17 +1287,17 @@ func _prep_drawer(c: Dictionary) -> void:
 	side.custom_minimum_size = Vector2(440, 0)
 	row.add_child(side)
 	var mission := J.phase(_draft.phase)
-	var place := AHScenarioWorld.display_of(mission.transit) + " e " + AHScenarioWorld.display_of(mission.map) if mission.transit != "" else AHScenarioWorld.display_of(mission.map)
-	var mission_box := _side_box(side, "MISSÃO")
+	var place := AHScenarioWorld.display_of(mission.transit) + tr(" e ") + AHScenarioWorld.display_of(mission.map) if mission.transit != "" else AHScenarioWorld.display_of(mission.map)
+	var mission_box := _side_box(side, tr("MISSÃO"))
 	mission_box.add_child(U.label(mission.name, 24, U.TEXT, "bold"))
-	mission_box.add_child(U.label("Fase %d · %s · nível %d+ · %s" % [J.PHASES.map(func(p): return p.id).find(mission.id) + 1, J.DIFFICULTY_NAMES[mission.difficulty], mission.level, place], 16, U.MUTED))
+	mission_box.add_child(U.label(tr("Fase %d · %s · nível %d+ · %s") % [J.PHASES.map(func(p): return p.id).find(mission.id) + 1, J.DIFFICULTY_NAMES[mission.difficulty], mission.level, place], 16, U.MUTED))
 	var map_button := Button.new()
-	map_button.text = "Escolher no mapa"
+	map_button.text = tr("Escolher no mapa")
 	map_button.custom_minimum_size = Vector2(0, 34)
 	H.style_button(map_button)
 	map_button.pressed.connect(func(): _map.open(_draft.phase))
 	mission_box.add_child(map_button)
-	var focus_box := _side_box(side, "FOCO DA ROTA")
+	var focus_box := _side_box(side, tr("FOCO DA ROTA"))
 	var chips := HFlowContainer.new()
 	chips.add_theme_constant_override("h_separation", 6)
 	chips.add_theme_constant_override("v_separation", 6)
@@ -1285,7 +1309,7 @@ func _prep_drawer(c: Dictionary) -> void:
 		var id: String = focus_id
 		var chip := Button.new()
 		chip.text = S.focus_label(id) + (" ★" if id == recommended else "")
-		chip.tooltip_text = (S.focus_reward_text(id) if id != "" else "Sem objetivo extra.") + (" · recomendado" if id == recommended else "")
+		chip.tooltip_text = (S.focus_reward_text(id) if id != "" else tr("Sem objetivo extra.")) + (tr(" · recomendado") if id == recommended else "")
 		chip.custom_minimum_size = Vector2(0, 34)
 		H.style_button(chip)
 		chip.add_theme_font_size_override("font_size", AHUiStyle.px(17))
@@ -1298,19 +1322,19 @@ func _prep_drawer(c: Dictionary) -> void:
 	reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	reason.custom_minimum_size = Vector2(400, 0)
 	focus_box.add_child(reason)
-	var food_box := _side_box(side, "COMIDA")
+	var food_box := _side_box(side, tr("COMIDA"))
 	var food_row := HBoxContainer.new()
 	food_row.add_theme_constant_override("separation", 8)
 	food_box.add_child(food_row)
-	var food_label := U.label("%d grátis + %d extras" % [J.FREE_FOOD, _draft.extra], 20, U.TEXT, "bold")
+	var food_label := U.label(tr("%d grátis + %d extras") % [J.FREE_FOOD, _draft.extra], 20, U.TEXT, "bold")
 	food_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	food_row.add_child(food_label)
 	_button("−", func(): _draft.extra = maxi(0, _draft.extra - 1); refresh(), _draft.extra > 0, food_row)
 	_button("+", func(): _draft.extra = mini(J.MAX_FOOD - J.FREE_FOOD, _draft.extra + 1); refresh(),
 		_draft.extra < J.MAX_FOOD - J.FREE_FOOD and (_draft.extra + 1) * S.FOOD_COST <= S.quantity(c, "seeds"), food_row)
-	food_box.add_child(U.label("%d sementes · cura na Mochila e no acampamento" % (_draft.extra * S.FOOD_COST), 15, U.MUTED))
+	food_box.add_child(U.label(tr("%d sementes · cura na Mochila e no acampamento") % (_draft.extra * S.FOOD_COST), 15, U.MUTED))
 	var go := Button.new()
-	go.text = "Partir · %s" % mission.name
+	go.text = tr("Partir · %s") % mission.name
 	go.custom_minimum_size = Vector2(0, 56)
 	H.style_button(go, U.GOLD)
 	var gold := StyleBoxFlat.new()
@@ -1375,7 +1399,7 @@ func _prep_slot(c: Dictionary, rank: int) -> Button:
 	rank_label.position = Vector2(270, 2)
 	button.add_child(rank_label)
 	if entry == null:
-		box.add_child(U.label("Posição vazia", 20, U.MUTED))
+		box.add_child(U.label(tr("Posição vazia"), 20, U.MUTED))
 		return button
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 10)
@@ -1389,12 +1413,12 @@ func _prep_slot(c: Dictionary, rank: int) -> Button:
 	top.add_child(names)
 	names.add_child(U.label(entry.display_name, 26, U.TEXT, "display"))
 	var hero_class = GameData.row("classes", entry.class_id)
-	names.add_child(U.label(hero_class.get("Role", "") if hero_class else "", 15, U.MUTED))
+	names.add_child(U.label(tr(hero_class.get("Role", "")) if hero_class else "", 15, U.MUTED))
 	var hp := U.bar(Color(0.8, 0.27, 0.22), 10)
 	hp.max_value = entry.max_hp
 	hp.value = entry.hp
 	box.add_child(hp)
-	box.add_child(U.label("Vida %d/%d" % [entry.hp, entry.max_hp], 16, U.TEXT))
+	box.add_child(U.label(tr("Vida %d/%d") % [entry.hp, entry.max_hp], 16, U.TEXT))
 	var icons := HBoxContainer.new()
 	icons.add_theme_constant_override("separation", 6)
 	icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1420,16 +1444,16 @@ func _prep_slot(c: Dictionary, rank: int) -> Button:
 	var note := ""
 	var good := true
 	if S.attacks_from_rank(entry.class_id, rank).is_empty():
-		note = "! Sem ataque desta posição"
+		note = tr("! Sem ataque desta posição")
 		good = false
 	elif entry.hp < entry.max_hp * 0.5:
-		note = "! Vida baixa: leve comida ou curativos"
+		note = tr("! Vida baixa: leve comida ou curativos")
 		good = false
 	elif entry.trauma:
-		note = "! Com trauma: começa com instinto alto"
+		note = tr("! Com trauma: começa com instinto alto")
 		good = false
 	else:
-		note = "✓ %d de %d habilidades daqui" % [usable, abilities.size()]
+		note = tr("✓ %d de %d habilidades daqui") % [usable, abilities.size()]
 	var note_label := U.label(note, 16, U.OK if good else U.DANGER, "bold")
 	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note_label.custom_minimum_size = Vector2(290, 0)
@@ -1450,7 +1474,7 @@ func _team_warning(c: Dictionary) -> String:
 			var ability = GameData.combat.abilities.get(ability_id)
 			if ability != null and ability.HealRange.Max > 0:
 				return ""
-	return "Ninguém na equipe cura em combate: leve curativos e comida."
+	return tr("Ninguém na equipe cura em combate: leve curativos e comida.")
 
 
 func _prep_click(index: int) -> void:
@@ -1499,7 +1523,7 @@ func _depart() -> void:
 
 ## A partida na plataforma: a equipe em fila e o mesmo painel da Preparação (equipe, foco, suprimentos, confirmar).
 func _departure_view() -> void:
-	_heading("Partida", "A equipe espera na plataforma, da frente (direita) para trás.")
+	_heading(tr("Partida"), tr("A equipe espera na plataforma, da frente (direita) para trás."))
 	_preparation(Campaign.state)
 
 
@@ -1507,32 +1531,32 @@ func _departure_view() -> void:
 
 func _canteen(c: Dictionary) -> void:
 	var f := S.forecast(c, 4)
-	_section("Próxima volta (equipe de 4)")
-	_text("Suprimentos: %d no estoque, +%d da Cantina, %d para os moradores, a noite pede %d → %d depois da noite." % [
+	_section(tr("Próxima volta (equipe de 4)"))
+	_text(tr("Suprimentos: %d no estoque, +%d da Cantina, %d para os moradores, a noite pede %d → %d depois da noite.") % [
 		f.food, f.food_produced, f.food_civilians, f.food_night_need, f.food_after_night])
 	if f.food_spoiled > 0:
-		_text("Acima da capacidade do Depósito (%d): %d estragam." % [f.food_capacity, f.food_spoiled], 18, Color(1.0, 0.65, 0.5))
-	_text("Água: %d na estação, +%d do coletor, a equipe e os moradores bebem %d → %d%s." % [
-		f.water, f.water_produced, f.water_consumed, f.water_after, " (vai faltar)" if f.thirsty else ""])
-	_text("Energia: %d de %d.%s" % [f.power_used, f.power_capacity,
-		"" if f.unpowered_rooms.is_empty() else " Sem energia: %s." % ", ".join(f.unpowered_rooms.map(func(id): return S.room_def(id).name))])
+		_text(tr("Acima da capacidade do Depósito (%d): %d estragam.") % [f.food_capacity, f.food_spoiled], 18, Color(1.0, 0.65, 0.5))
+	_text(tr("Água: %d na estação, +%d do coletor, a equipe e os moradores bebem %d → %d%s.") % [
+		f.water, f.water_produced, f.water_consumed, f.water_after, tr(" (vai faltar)") if f.thirsty else ""])
+	_text(tr("Energia: %d de %d.%s") % [f.power_used, f.power_capacity,
+		"" if f.unpowered_rooms.is_empty() else tr(" Sem energia: %s.") % ", ".join(f.unpowered_rooms.map(func(id): return S.room_def(id).name))])
 	if not c.station.last_cycle.is_empty():
 		var cycle: Dictionary = c.station.last_cycle
-		_section("Último ciclo (%d)" % cycle.number)
-		_text("A Cantina produziu %d; os moradores comeram %d; estragaram %d; a água foi %d de consumo para %d do coletor%s." % [
+		_section(tr("Último ciclo (%d)") % cycle.number)
+		_text(tr("A Cantina produziu %d; os moradores comeram %d; estragaram %d; a água foi %d de consumo para %d do coletor%s.") % [
 			cycle.food_produced, cycle.food_civilians, cycle.food_spoiled, cycle.water_consumed, cycle.water_produced,
-			" e faltou" if cycle.thirsty else ""], 18, H.MUTED)
+			tr(" e faltou") if cycle.thirsty else ""], 18, H.MUTED)
 
 
 func _depot(c: Dictionary) -> void:
-	_section("Estoque")
-	_text("Suprimentos: %d de %d" % [S.quantity(c, S.SUPPLIES), S.supply_capacity(c)])
-	_text("Curativos: %d · Sementes: %d · Sucata: %d · Fragmentos: %d" % [S.quantity(c, "bandages"), S.quantity(c, "seeds"),
+	_section(tr("Estoque"))
+	_text(tr("Suprimentos: %d de %d") % [S.quantity(c, S.SUPPLIES), S.supply_capacity(c)])
+	_text(tr("Curativos: %d · Sementes: %d · Sucata: %d · Fragmentos: %d") % [S.quantity(c, "bandages"), S.quantity(c, "seeds"),
 		S.quantity(c, "scrap"), S.quantity(c, "fragments")])
-	_text("Água: %d" % c.station.water)
-	var relics: Array = c.inventory.relics.map(func(id): return GameData.row("relics", id).DisplayName if GameData.row("relics", id) else id)
-	_text("Relíquias no estoque: %s" % (", ".join(relics) if not relics.is_empty() else "nenhuma"))
-	_text("Ferramentas: %s" % (", ".join(c.tools) if not c.tools.is_empty() else "nenhuma"))
+	_text(tr("Água: %d") % c.station.water)
+	var relics: Array = c.inventory.relics.map(func(id): return tr(GameData.row("relics", id).DisplayName) if GameData.row("relics", id) else id)
+	_text(tr("Relíquias no estoque: %s") % (", ".join(relics) if not relics.is_empty() else tr("nenhuma")))
+	_text(tr("Ferramentas: %s") % (", ".join(c.tools) if not c.tools.is_empty() else tr("nenhuma")))
 
 
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
@@ -1544,7 +1568,7 @@ func _forge(c: Dictionary) -> void:
 	var ids: Array = GameData.table("relics").keys()
 	if not ids.has(_forge_selected):
 		_forge_selected = ids[0] if not ids.is_empty() else ""
-	_section("Relíquias")
+	_section(tr("Relíquias"))
 	var columns := HBoxContainer.new()
 	columns.add_theme_constant_override("separation", 14)
 	_body.add_child(columns)
@@ -1580,11 +1604,11 @@ func _forge(c: Dictionary) -> void:
 		names.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(names)
-		var title := U.label(relic.DisplayName, 18, U.TEXT, "bold")
+		var title := U.label(tr(relic.DisplayName), 18, U.TEXT, "bold")
 		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		title.custom_minimum_size = Vector2(170, 0)
 		names.add_child(title)
-		names.add_child(U.label("Estoque: %d" % c.inventory.relics.count(id), 15, U.MUTED))
+		names.add_child(U.label(tr("Estoque: %d") % c.inventory.relics.count(id), 15, U.MUTED))
 		list.add_child(button)
 	if _forge_selected == "":
 		return
@@ -1597,50 +1621,50 @@ func _forge(c: Dictionary) -> void:
 	box.add_theme_constant_override("separation", 8)
 	detail.add_child(box)
 	box.add_child(_glyph(RELIC_ICONS.get(_forge_selected, "relic-generic"), 64, U.GOLD))
-	var name_label := U.label(relic.DisplayName, 28, U.TEXT, "bold")
+	var name_label := U.label(tr(relic.DisplayName), 28, U.TEXT, "bold")
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name_label.custom_minimum_size = Vector2(300, 0)
 	box.add_child(name_label)
 	box.add_child(U.label(_relic_effect(relic), 22, U.OK, "bold"))
-	var about := U.label(relic.get("Description", ""), 17, U.MUTED)
+	var about := U.label(tr(relic.get("Description", "")), 17, U.MUTED)
 	about.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	about.custom_minimum_size = Vector2(300, 0)
 	box.add_child(about)
 	var cost := S.relic_cost(c)
 	var scrap := S.quantity(c, "scrap")
-	box.add_child(U.label("Em estoque: %d · Sucata: %d" % [c.inventory.relics.count(_forge_selected), scrap], 17, U.TEXT))
+	box.add_child(U.label(tr("Em estoque: %d · Sucata: %d") % [c.inventory.relics.count(_forge_selected), scrap], 17, U.TEXT))
 	var id: String = _forge_selected
 	var craft := Button.new()
-	craft.text = "Fabricar · %d sucatas" % cost
+	craft.text = tr("Fabricar · %d sucatas") % cost
 	craft.custom_minimum_size = Vector2(0, 48)
 	craft.disabled = scrap < cost
 	H.style_button(craft, U.GOLD)
-	craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), "%s pronta. Equipe na Sala dos Personagens." % relic.DisplayName))
+	craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), tr("%s pronta. Equipe na Sala dos Personagens.") % tr(relic.DisplayName), "res://audio/ui/forge_confirm.ogg"))
 	box.add_child(craft)
 	if scrap < cost:
-		box.add_child(U.label("Faltam %d %s" % [cost - scrap, "sucata" if cost - scrap == 1 else "sucatas"], 17, U.DANGER))
+		box.add_child(U.label((tr("Faltam %d sucata") if cost - scrap == 1 else tr("Faltam %d sucatas")) % (cost - scrap), 17, U.DANGER))
 
 
 ## O efeito da relíquia em poucas palavras, a partir dos números dela.
 static func _relic_effect(relic: Dictionary) -> String:
 	if int(relic.get("MaxHpBonus", 0)) != 0:
-		return "+%d Vida Máxima" % int(relic.MaxHpBonus)
+		return TranslationServer.translate("+%d Vida Máxima") % int(relic.MaxHpBonus)
 	if int(relic.get("SpeedBonus", 0)) != 0:
-		return "+%d Velocidade" % int(relic.SpeedBonus)
+		return TranslationServer.translate("+%d Velocidade") % int(relic.SpeedBonus)
 	if int(relic.get("EventInstinctReduction", 0)) != 0:
-		return "−%d Instinto de eventos" % int(relic.EventInstinctReduction)
+		return TranslationServer.translate("−%d Instinto de eventos") % int(relic.EventInstinctReduction)
 	return ""
 
 
 func _research(c: Dictionary) -> void:
-	_section("Melhorias de classe")
+	_section(tr("Melhorias de classe"))
 	for research_id in GameData.table("research"):
 		var row: Dictionary = GameData.row("research", research_id)
 		var done: bool = c.researched_skills.has(row.SkillId)
 		var id: String = research_id
-		_text("%s · %s" % [row.DisplayName, row.get("Description", "")], 18, H.MUTED if done else H.TEXT)
-		_button("Pesquisado" if done else "Pesquisar (%d fragmentos)" % int(row.CostFragments),
-			func(): _act(S.research(Campaign.state, id), "%s concluída." % row.DisplayName), not done and S.quantity(c, "fragments") >= int(row.CostFragments))
+		_text("%s · %s" % [tr(row.DisplayName), tr(row.get("Description", ""))], 18, H.MUTED if done else H.TEXT)
+		_button(tr("Pesquisado") if done else tr("Pesquisar (%d fragmentos)") % int(row.CostFragments),
+			func(): _act(S.research(Campaign.state, id), tr("%s concluída.") % tr(row.DisplayName), "res://audio/station/research_beep.ogg"), not done and S.quantity(c, "fragments") >= int(row.CostFragments))
 
 
 # ---------------------------------------------------------------- Dormitório: a noite da volta
@@ -1651,20 +1675,20 @@ func _dormitory(c: Dictionary) -> void:
 		"planning":
 			_night_plan(c)
 		"dawn":
-			_section("Amanhecer")
+			_section(tr("Amanhecer"))
 			_text(S.night_event_text(c))
 			for result in night.results:
 				var entry = S.hero(c, result.hero_id)
 				if entry == null:
 					continue
-				_text(("%s ficou de vigia." % entry.display_name) if result.watch else "%s: +%d de vida, −%d de instinto%s." % [
-					entry.display_name, result.hp_recovered, result.instinct_reduced, "" if result.fed else " (sem comida)"], 18)
-			_button("Começar o dia", func():
-				_act("" if S.finish_dawn(Campaign.state) else "Ainda não amanheceu.")
+				_text((tr("%s ficou de vigia.") % entry.display_name) if result.watch else tr("%s: +%d de vida, −%d de instinto%s.") % [
+					entry.display_name, result.hp_recovered, result.instinct_reduced, "" if result.fed else tr(" (sem comida)")], 18)
+			_button(tr("Começar o dia"), func():
+				_act("" if S.finish_dawn(Campaign.state) else tr("Ainda não amanheceu."))
 				if S.visit_pending(Campaign.state):
 					open_service("train"))
 		_:
-			_text("Ninguém precisa descansar agora. Depois de cada expedição, a equipe passa a noite aqui.", 18, H.MUTED)
+			_text(tr("Ninguém precisa descansar agora. Depois de cada expedição, a equipe passa a noite aqui."), 18, H.MUTED)
 
 
 ## O planejamento da noite (como o da Unreal): um cartão por herói com rosto, vida e instinto, Dormir ou Vigiar e o que
@@ -1677,19 +1701,19 @@ func _night_plan(c: Dictionary) -> void:
 	var head_text := VBoxContainer.new()
 	head_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(head_text)
-	head_text.add_child(U.label("NOITE %d" % night.number, 15, U.COPPER, "bold"))
+	head_text.add_child(U.label(tr("NOITE %d") % night.number, 15, U.COPPER, "bold"))
 	var watchers: int = preview.heroes.filter(func(row): return row.watch).size()
-	head_text.add_child(U.label("%d dormindo · %d vigiando" % [preview.heroes.size() - watchers, watchers], 18, U.TEXT, "bold"))
+	head_text.add_child(U.label(tr("%d dormindo · %d vigiando") % [preview.heroes.size() - watchers, watchers], 18, U.TEXT, "bold"))
 	var buy := Button.new()
-	buy.text = "+1 suprimento · %d sementes" % S.SUPPLY_COST_SEEDS
+	buy.text = tr("+1 suprimento · %d sementes") % S.SUPPLY_COST_SEEDS
 	buy.disabled = S.quantity(c, "seeds") < S.SUPPLY_COST_SEEDS
 	buy.custom_minimum_size = Vector2(0, 42)
 	buy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	H.style_button(buy)
-	buy.pressed.connect(func(): _act("" if S.buy_supplies(Campaign.state) else "Sementes insuficientes.", "Suprimento comprado."))
+	buy.pressed.connect(func(): _act("" if S.buy_supplies(Campaign.state) else tr("Sementes insuficientes."), tr("Suprimento comprado.")))
 	head.add_child(buy)
 	if night.thirsty:
-		_text("Faltou água na volta: o descanso rende menos instinto.", 17, U.DANGER)
+		_text(tr("Faltou água na volta: o descanso rende menos instinto."), 17, U.DANGER)
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 10)
@@ -1698,17 +1722,17 @@ func _night_plan(c: Dictionary) -> void:
 	for row in preview.heroes:
 		grid.add_child(_night_card(c, row, preview.heroes.size() > 1))
 	var short: int = maxi(0, preview.needed - preview.available)
-	_text("Suprimentos: %d %s · %d %s" % [preview.needed, "necessário" if preview.needed == 1 else "necessários", preview.available,
-		"disponível" if preview.available == 1 else "disponíveis"], 18, U.TEXT)
+	_text(tr("Suprimentos: %d %s · %d %s") % [preview.needed, tr("necessário") if preview.needed == 1 else tr("necessários"), preview.available,
+		tr("disponível") if preview.available == 1 else tr("disponíveis")], 18, U.TEXT)
 	if short > 0:
-		_text("Faltam %d: os cartões marcados recuperam menos." % short, 17, U.DANGER)
-	_text("Quem vigia não descansa, mas protege os outros dos ruídos da noite.", 16, U.MUTED)
+		_text(tr("Faltam %d: os cartões marcados recuperam menos.") % short, 17, U.DANGER)
+	_text(tr("Quem vigia não descansa, mas protege os outros dos ruídos da noite."), 16, U.MUTED)
 	var rest := Button.new()
-	rest.text = "Iniciar descanso"
+	rest.text = tr("Iniciar descanso")
 	rest.custom_minimum_size = Vector2(0, 54)
 	H.style_button(rest, U.GOLD)
 	rest.add_theme_color_override("font_color", U.GOLD)
-	rest.pressed.connect(func(): _act("" if S.resolve_night(Campaign.state) else "A noite não pode passar agora."))
+	rest.pressed.connect(func(): _act("" if S.resolve_night(Campaign.state) else tr("A noite não pode passar agora.")))
 	_body.add_child(rest)
 
 
@@ -1731,7 +1755,7 @@ func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
 	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(names)
 	names.add_child(U.label(entry.display_name, 20, U.TEXT, "bold"))
-	names.add_child(U.label("Vida %d/%d · Instinto %d" % [entry.hp, entry.max_hp, entry.instinct], 15, U.MUTED))
+	names.add_child(U.label(tr("Vida %d/%d · Instinto %d") % [entry.hp, entry.max_hp, entry.instinct], 15, U.MUTED))
 	var hp := U.bar(Color(0.8, 0.27, 0.22), 6)
 	hp.max_value = entry.max_hp
 	hp.value = entry.hp
@@ -1742,7 +1766,7 @@ func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
 	var hero_id: String = row.hero_id
 	for spec in [["Dormir", not row.watch], ["Vigiar", row.watch]]:
 		var button := Button.new()
-		button.text = spec[0]
+		button.text = tr(spec[0])
 		button.custom_minimum_size = Vector2(0, 40)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		H.style_button(button)
@@ -1758,9 +1782,9 @@ func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
 		choice.add_child(button)
 	var outcome := ""
 	if row.watch:
-		outcome = "Vigiando · não descansa e protege dos ruídos"
+		outcome = tr("Vigiando · não descansa e protege dos ruídos")
 	else:
-		outcome = "%s · +%d de vida, %+d de instinto" % ["Alimentado" if row.fed else "Sem alimentação", row.hp_gain, row.instinct_change]
+		outcome = tr("%s · +%d de vida, %+d de instinto") % [tr("Alimentado") if row.fed else tr("Sem alimentação"), row.hp_gain, row.instinct_change]
 	var line := U.label(outcome, 15, U.MUTED if row.fed or row.watch else U.DANGER)
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	line.custom_minimum_size = Vector2(280, 0)
@@ -1778,22 +1802,22 @@ func _report() -> void:
 		return
 	var phase := J.phase(report.get("phase_id", ""))
 	var won: bool = report.result == "victory"
-	_body.add_child(U.label(RESULT_NAMES.get(report.result, report.result), 44, U.GOLD if won else (U.MUTED if report.result == "retreat" else U.DANGER), "display"))
-	_text("%s · %s" % [phase.get("name", ""), "fase concluída" if won else ("a equipe voltou antes do guardião" if report.result == "retreat" else "a equipe caiu")], 18, U.MUTED)
+	_body.add_child(U.label(tr(RESULT_NAMES.get(report.result, report.result)), 44, U.GOLD if won else (U.MUTED if report.result == "retreat" else U.DANGER), "display"))
+	_text("%s · %s" % [phase.get("name", ""), tr("fase concluída") if won else (tr("a equipe voltou antes do guardião") if report.result == "retreat" else tr("a equipe caiu"))], 18, U.MUTED)
 	# O que chegou, item a item (cada linha entra um pouco depois da outra).
 	var percent := int(report.get("percent", 0))
-	_section("O que chegou%s" % ("" if percent >= 100 else " (%d%% do achado)" % percent))
+	_section(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent))
 	var items: Array = []
-	for spec in [["lobby-seed", "seeds", "semente", "sementes"], ["lobby-scrap", "scrap", "sucata", "sucatas"], ["lobby-fragment", "fragments", "fragmento", "fragmentos"],
-			["lobby-water", "water", "água", "água"], ["lobby-food", "supplies", "suprimento", "suprimentos"]]:
+	for spec in [["lobby-seed", "seeds", tr("semente"), tr("sementes")], ["lobby-scrap", "scrap", tr("sucata"), tr("sucatas")], ["lobby-fragment", "fragments", tr("fragmento"), tr("fragmentos")],
+			["lobby-water", "water", tr("água"), tr("água")], ["lobby-food", "supplies", tr("suprimento"), tr("suprimentos")]]:
 		var amount := int(report.get(spec[1], 0))
 		if amount > 0:
 			items.append([spec[0], "+%d %s" % [amount, spec[2] if amount == 1 else spec[3]]])
 	if report.get("request", "") != "":
 		var who := S.civilian(report.request)
-		items.append(["item-generic", "%s recebeu %s: %s" % [who.name, who.request_item, who.request_reward]])
+		items.append(["item-generic", tr("%s recebeu %s: %s") % [who.name, who.request_item, who.request_reward]])
 	if items.is_empty():
-		_text("Nada chegou desta vez.", 18, U.MUTED)
+		_text(tr("Nada chegou desta vez."), 18, U.MUTED)
 	for i in items.size():
 		var row := _row()
 		var glyph := TextureRect.new()
@@ -1818,14 +1842,14 @@ func _report() -> void:
 		if not S.next_level_cost(c, room_id).is_empty() and S.upgrade_block(c, room_id) == "":
 			unlocks.append(room_id)
 	if not unlocks.is_empty():
-		_section("Agora dá para")
+		_section(tr("Agora dá para"))
 		for room_id in unlocks:
 			var id: String = room_id
 			var level := S.room_level(c, id)
-			_button("%s %s%s (%s)" % ["Recuperar" if level == 0 else "Melhorar", S.ROOM_ARTICLE.get(id, ""), S.room_def(id).name, S.cost_text(S.next_level_cost(c, id))],
+			_button(tr("%s %s%s (%s)") % [tr("Recuperar") if level == 0 else tr("Melhorar"), S.ROOM_ARTICLE.get(id, ""), S.room_def(id).name, S.cost_text(S.next_level_cost(c, id))],
 				func(): _enter_shelter_then(func(): open_room(id)))
 	# A equipe: quem fez o quê; o destaque ganha a estrela.
-	_section("A equipe")
+	_section(tr("A equipe"))
 	var stats: Dictionary = report.get("stats", {})
 	var best := ""
 	var best_score := 0
@@ -1848,16 +1872,16 @@ func _report() -> void:
 		var info := VBoxContainer.new()
 		info.add_theme_constant_override("separation", 2)
 		row.add_child(info)
-		info.add_child(U.label("%s%s" % [entry.display_name, "  ★ destaque" if hero_id == best else ""], 20, U.GOLD if hero_id == best else U.TEXT, "bold"))
+		info.add_child(U.label("%s%s" % [entry.display_name, tr("  ★ destaque") if hero_id == best else ""], 20, U.GOLD if hero_id == best else U.TEXT, "bold"))
 		var parts := PackedStringArray()
 		var s: Dictionary = stats.get(hero_id, {})
 		if int(s.get("damage", 0)) > 0:
-			parts.append("causou %d de dano" % s.damage)
+			parts.append(tr("causou %d de dano") % s.damage)
 		if int(s.get("downs", 0)) > 0:
-			parts.append("derrubou %d" % s.downs)
+			parts.append(tr("derrubou %d") % s.downs)
 		if int(s.get("healing", 0)) > 0:
-			parts.append("curou %d" % s.healing)
-		var line: String = ("Vida %d/%d" % [entry.hp, entry.max_hp]) if entry.alive else "Não voltou: está no Memorial."
+			parts.append(tr("curou %d") % s.healing)
+		var line: String = (tr("Vida %d/%d") % [entry.hp, entry.max_hp]) if entry.alive else tr("Não voltou: está no Memorial.")
 		if not parts.is_empty():
 			line += " · " + ", ".join(parts)
 		var detail := U.label(line, 17, U.MUTED if entry.alive else U.DANGER)
@@ -1866,13 +1890,13 @@ func _report() -> void:
 		info.add_child(detail)
 	var cycle: Dictionary = report.get("cycle", {})
 	if not cycle.is_empty():
-		_section("A Estação no ciclo %d" % cycle.number)
-		_text("A Cantina produziu %d suprimentos; os moradores comeram %d; estragaram %d. Água: %d bebida, %d do coletor%s." % [
+		_section(tr("A Estação no ciclo %d") % cycle.number)
+		_text(tr("A Cantina produziu %d suprimentos; os moradores comeram %d; estragaram %d. Água: %d bebida, %d do coletor%s.") % [
 			cycle.food_produced, cycle.food_civilians, cycle.food_spoiled, cycle.water_consumed, cycle.water_produced,
-			"; faltou para alguém" if cycle.thirsty else ""], 17, U.MUTED)
+			tr("; faltou para alguém") if cycle.thirsty else ""], 17, U.MUTED)
 		if cycle.fragments_produced > 0:
-			_text("A Cora trouxe %d fragmento." % cycle.fragments_produced, 17, U.MUTED)
-	_button("Entrar no abrigo", func(): _enter_shelter_then(Callable()))
+			_text(tr("A Cora trouxe %d fragmento.") % cycle.fragments_produced, 17, U.MUTED)
+	_button(tr("Entrar no abrigo"), func(): _enter_shelter_then(Callable()))
 
 
 ## Fecha o relatório (visto) e segue: a noite, o trem ou o que foi pedido (then).
@@ -1894,29 +1918,29 @@ func _train() -> void:
 	var c: Dictionary = Campaign.state
 	var train: Dictionary = c.station.train
 	if train.phase == "departing":
-		_heading("O trem parte", "As portas fecham; o trem volta para o túnel.")
+		_heading(tr("O trem parte"), tr("As portas fecham; o trem volta para o túnel."))
 		return
 	if train.phase != "waiting":
 		close_panel()
 		return
 	var who := S.civilian(train.candidate_id)
-	_heading("O trem chegou", "%s quer morar na Estação" % who.name)
-	_text("%s · %s (%s). %s" % [who.name, who.role, who.species, who.trait])
-	_text("Ponto forte: %s" % who.benefit)
-	_text("Ponto fraco: %s" % who.drawback, 19, H.MUTED)
-	_text("Pedido: %s" % who.need, 18, H.MUTED)
+	_heading(tr("O trem chegou"), tr("%s quer morar na Estação") % who.name)
+	_text(tr("%s · %s (%s). %s") % [who.name, who.role, who.species, who.trait])
+	_text(tr("Ponto forte: %s") % who.benefit)
+	_text(tr("Ponto fraco: %s") % who.drawback, 19, H.MUTED)
+	_text(tr("Pedido: %s") % who.need, 18, H.MUTED)
 	var before := S.forecast(c, 4)
 	var after := S.forecast_with(c, who.id, 4)
-	_section("Na próxima volta")
-	_text("Suprimentos depois da noite: %d → %d · Água depois: %d → %d%s · Energia: %d → %d" % [
+	_section(tr("Na próxima volta"))
+	_text(tr("Suprimentos depois da noite: %d → %d · Água depois: %d → %d%s · Energia: %d → %d") % [
 		before.food_after_night, after.food_after_night, before.water_after, after.water_after,
-		" (vai faltar)" if after.thirsty else "", before.power_capacity, after.power_capacity], 18)
+		tr(" (vai faltar)") if after.thirsty else "", before.power_capacity, after.power_capacity], 18)
 	if c.night.phase != "none":
-		_text("A equipe ainda precisa passar a noite: decida depois do Dormitório, se preferir.", 17, H.MUTED)
+		_text(tr("A equipe ainda precisa passar a noite: decida depois do Dormitório, se preferir."), 17, H.MUTED)
 	var row := _row()
 	var id: String = who.id
-	_button("Acolher %s" % who.name, func(): _decide(id, true), true, row)
-	_button("Recusar", func(): _decide(id, false), true, row)
+	_button(tr("Acolher %s") % who.name, func(): _decide(id, true), true, row)
+	_button(tr("Recusar"), func(): _decide(id, false), true, row)
 
 
 func _decide(candidate_id: String, accept: bool) -> void:
@@ -1927,7 +1951,7 @@ func _decide(candidate_id: String, accept: bool) -> void:
 		return
 	var who := S.civilian(candidate_id)
 	station.commit()
-	toast(("%s vai morar na Estação." % who.name) if accept else "%s segue no trem. Pode voltar numa próxima viagem." % who.name)
+	toast((tr("%s vai morar na Estação.") % who.name) if accept else tr("%s segue no trem. Pode voltar numa próxima viagem.") % who.name)
 	# O trem fecha e parte (o recusado vai junto); acolhido, o civil fica e vai para o cômodo dele.
 	station.play_train_departure(not accept)
 	await get_tree().create_timer(4.0).timeout

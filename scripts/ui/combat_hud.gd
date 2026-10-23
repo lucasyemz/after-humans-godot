@@ -128,7 +128,7 @@ func _build() -> void:
 	log_box.add_theme_constant_override("separation", 4)
 	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_log_panel.add_child(log_box)
-	log_box.add_child(S.label("REGISTRO", 15, S.COPPER, "bold"))
+	log_box.add_child(S.label(tr("REGISTRO"), 15, S.COPPER, "bold"))
 	_log = S.label("", S.MIN_TEXT, TEXT)
 	_log.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_log.custom_minimum_size = Vector2(390, 0)
@@ -195,7 +195,7 @@ func _build() -> void:
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(236, S.px(42))
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.text = spec[0]
+		button.text = tr(spec[0])
 		style_button(button)
 		var key := S.action_cap(spec[3])
 		button.add_child(key)
@@ -273,7 +273,9 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 	top.name = "Top"
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(top)
-	var name_label := S.label(unit.display_name, 17, TEXT, "bold")
+	var name_label := S.label(_name(unit), 17, TEXT, "bold")
+	# O nome já vem traduzido (o do herói não se traduz: uma Faísca não vira "Spark").
+	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	name_label.name = "Name"
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.clip_text = true
@@ -387,7 +389,7 @@ func refresh() -> void:
 		var hp: ProgressBar = box.get_node("Hp")
 		hp.max_value = unit.max_hp
 		hp.value = unit.hp
-		(box.get_node("Top/HpText") as Label).text = "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else "Último Fôlego"
+		(box.get_node("Top/HpText") as Label).text = "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else tr("Último Fôlego")
 		if unit.is_player:
 			(box.get_node("Instinct") as ProgressBar).value = unit.instinct
 		elif unit.hp > 0:
@@ -413,7 +415,7 @@ func refresh() -> void:
 
 ## A linha da intenção na placa do inimigo: a ação e em quem (com "?" quando ele está entre dois planos parecidos).
 func _show_intent(label: Label, intent: Dictionary) -> void:
-	var names: Array = intent.target_ids.map(func(id): return session.state.find_unit(id).display_name if session.state.find_unit(id) else id)
+	var names: Array = intent.target_ids.map(func(id): return _name(session.state.find_unit(id)) if session.state.find_unit(id) else id)
 	var text := ""
 	var color: Color = S.ENEMY
 	# O ícone da intenção (art/ui/icons/intent-*): ataque, ataque em área (mais de um alvo de uma vez), cura, bloqueio,
@@ -421,30 +423,30 @@ func _show_intent(label: Label, intent: Dictionary) -> void:
 	var icon := "unknown"
 	match intent.kind:
 		"attack":
-			text = "%s → %s" % [intent.name, (" ou " if intent.either else " e ").join(names)] if not names.is_empty() else intent.name
+			text = "%s → %s" % [tr(intent.name), (tr(" ou ") if intent.either else tr(" e ")).join(names)] if not names.is_empty() else tr(intent.name)
 			icon = "attack_area" if names.size() > 1 and not intent.either else "attack"
 		"heal":
-			text = "%s (se cura)" % intent.name
+			text = tr("%s (se cura)") % tr(intent.name)
 			color = S.OK
 			icon = "heal"
 		"defend":
-			text = "%s (bloqueio)" % intent.name
+			text = tr("%s (bloqueio)") % tr(intent.name)
 			color = S.BLUE
 			icon = "block"
 		"move":
-			text = intent.name
+			text = tr(intent.name)
 			color = S.MUTED
 			icon = "move"
 		"stunned":
-			text = intent.name
+			text = tr(intent.name)
 			color = S.MUTED
 			icon = "stunned"
 	if text != "" and not intent.sure and not intent.either:
 		text += " ?"
 	label.text = text
 	label.add_theme_color_override("font_color", color)
-	var tip := "Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s." % (
-		"" if intent.sure else "; com \"?\", ele está entre dois planos parecidos")
+	var tip := tr("Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s.") % (
+		"" if intent.sure else tr("; com \"?\", ele está entre dois planos parecidos"))
 	label.tooltip_text = tip
 	var icon_rect := label.get_parent().get_node_or_null("IntentIcon") as TextureRect
 	if icon_rect != null:
@@ -457,7 +459,7 @@ func _show_intent(label: Label, intent: Dictionary) -> void:
 ## A ordem da rodada com rostos: quem age agora maior e dourado; quem já agiu sai da fila.
 func _refresh_order(current: String) -> void:
 	_clear(_order)
-	var round_label := S.label("RODADA %d" % session.state.round, 17, S.COPPER, "bold")
+	var round_label := S.label(tr("RODADA %d") % session.state.round, 17, S.COPPER, "bold")
 	round_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_order.add_child(round_label)
 	for item in session.state.initiative_queue:
@@ -472,7 +474,8 @@ func _refresh_order(current: String) -> void:
 		var face := S.portrait(_art_of(unit), 72 if now else 54, ring, 0.07 if now else 0.06)
 		face.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		who.add_child(face)
-		var name_label := S.label(unit.display_name.split(" ")[0] + (" · agora" if now else ""), 16 if now else 15, GOLD if now else MUTED, "bold" if now else "body")
+		var name_label := S.label((unit.display_name.split(" ")[0] if unit.is_player else short_name(unit.display_name)) + (tr(" · agora") if now else ""), 16 if now else 15, GOLD if now else MUTED, "bold" if now else "body")
+		name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		who.add_child(name_label)
 		_order.add_child(who)
@@ -492,15 +495,15 @@ func _show_hero(actor: AHCombat.Unit) -> void:
 	_hero_name.text = actor.display_name
 	_hero_hp.max_value = actor.max_hp
 	_hero_hp.value = actor.hp
-	_hero_hp_text.text = "Vida %d/%d%s" % [actor.hp, actor.max_hp, " · Último Fôlego" if actor.deaths_door else ""]
+	_hero_hp_text.text = tr("Vida %d/%d%s") % [actor.hp, actor.max_hp, tr(" · Último Fôlego") if actor.deaths_door else ""]
 	_hero_instinct.value = actor.instinct
-	_hero_instinct_text.text = "Instinto %d/200 · em 200, crise" % actor.instinct
+	_hero_instinct_text.text = tr("Instinto %d/200 · em 200, crise") % actor.instinct
 	for child in _hero_status.get_children():
 		child.queue_free()
 	for entry in S.statuses(actor):
 		_hero_status.add_child(_status_chip(entry, 16))
 	if actor.trauma:
-		_hero_status.add_child(_status_chip(["Trauma", false], 16))
+		_hero_status.add_child(_status_chip([tr("Trauma"), false], 16))
 
 
 ## Fichas e efeitos da unidade em palavras curtas (o registro e os testes usam).
@@ -665,10 +668,10 @@ func _number_of(ability_id: String) -> Array:
 	var ability: Dictionary = session.data.abilities[ability_id]
 	if ability.DamageRange.Max > 0:
 		var damage := session.effective_range(ability_id, "damage")
-		return ["%d–%d" % [damage.Min, damage.Max], "dano ★" if damage.trained else "dano", GOLD]
+		return ["%d–%d" % [damage.Min, damage.Max], tr("dano ★") if damage.trained else tr("dano"), GOLD]
 	if ability.HealRange.Max > 0:
 		var heal := session.effective_range(ability_id, "heal")
-		return ["+%d–%d" % [heal.Min, heal.Max], "cura ★" if heal.trained else "cura", S.OK]
+		return ["+%d–%d" % [heal.Min, heal.Max], tr("cura ★") if heal.trained else tr("cura"), S.OK]
 	return ["", "", GOLD]
 
 
@@ -714,7 +717,7 @@ func _build_abilities(take_focus: bool = true) -> void:
 		text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		text_box.add_theme_constant_override("separation", 2)
 		box.add_child(text_box)
-		var name_label := S.label(option.name, 18, TEXT if option.usable else MUTED, "bold")
+		var name_label := S.label(tr(option.name), 18, TEXT if option.usable else MUTED, "bold")
 		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		name_label.custom_minimum_size = Vector2(170, 0)
 		text_box.add_child(name_label)
@@ -729,16 +732,16 @@ func _build_abilities(take_focus: bool = true) -> void:
 			line.add_child(unit_label)
 			text_box.add_child(line)
 		if option.usable:
-			text_box.add_child(_pips("de", ability.OriginRanks, true, GOLD))
+			text_box.add_child(_pips(tr("de"), ability.OriginRanks, true, GOLD))
 			if option.self:
-				text_box.add_child(S.label("em si mesmo", 14, MUTED))
+				text_box.add_child(S.label(tr("em si mesmo"), 14, MUTED))
 			else:
-				text_box.add_child(_pips("em", ability.TargetRanks, not option.enemy_side, S.DANGER if option.enemy_side else S.OK))
+				text_box.add_child(_pips(tr("em"), ability.TargetRanks, not option.enemy_side, S.DANGER if option.enemy_side else S.OK))
 			var extra := ""
 			if option.cooldown > 0:
-				extra = "Recarga %d" % option.cooldown
+				extra = tr("Recarga %d") % option.cooldown
 			elif option.uses >= 0:
-				extra = "%d uso(s)" % option.uses
+				extra = tr("%d uso(s)") % option.uses
 			if extra != "":
 				text_box.add_child(S.label(extra, 14, GOLD))
 		else:
@@ -766,9 +769,9 @@ func _build_abilities(take_focus: bool = true) -> void:
 		child.set_meta("locked", locked)
 		child.disabled = locked
 		if kind == "item":
-			child.text = "Mochila · %d" % AHJourneyRules.food(Campaign.state)
-			child.tooltip_text = "%d de comida na Mochila" % AHJourneyRules.food(Campaign.state)
-	_description.text = "Vez de %s: escolha uma habilidade (1–4) ou uma ação." % session.state.find_unit(_actor_id).display_name
+			child.text = tr("Mochila · %d") % AHJourneyRules.food(Campaign.state)
+			child.tooltip_text = tr("%d de comida na Mochila") % AHJourneyRules.food(Campaign.state)
+	_description.text = tr("Vez de %s: escolha uma habilidade (1–4) ou uma ação.") % session.state.find_unit(_actor_id).display_name
 	# O painel se ajusta antes do foco, que posiciona a dica acima dele.
 	_fit_dock.call_deferred()
 	if take_focus:
@@ -816,20 +819,21 @@ func _hide_tip() -> void:
 func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> void:
 	var ability: Dictionary = session.data.abilities[option.id]
 	_clear(_tip_box)
-	_tip_box.add_child(S.label(option.name, 26, GOLD, "display"))
+	_tip_box.add_child(S.label(tr(option.name), 26, GOLD, "display"))
 	var number := _number_of(option.id)
 	var facts := PackedStringArray()
 	if number[0] != "":
-		facts.append("%s de %s" % [number[0], number[1]])
+		facts.append(tr("%s de %s") % [number[0], number[1]])
 	if ability.Cooldown > 0:
-		facts.append("recarga %d" % ability.Cooldown)
+		facts.append(tr("recarga %d") % ability.Cooldown)
 	if ability.UsesMax > 0:
-		facts.append("%d usos por expedição" % ability.UsesMax if ability.bUsesPerExpedition else "%d usos" % ability.UsesMax)
+		facts.append(tr("%d usos por expedição") % ability.UsesMax if ability.bUsesPerExpedition else tr("%d usos") % ability.UsesMax)
 	if not facts.is_empty():
 		_tip_box.add_child(S.label(" · ".join(facts), S.MIN_TEXT, TEXT, "bold"))
 	var row = GameData.row("abilities", option.id)
+	# Os termos do glossário (em português) são procurados no texto original; a tela mostra o traduzido.
 	var text: String = row.get("Description", "") if row != null else ""
-	var body := S.label(text, S.MIN_TEXT, TEXT)
+	var body := S.label(tr(text), S.MIN_TEXT, TEXT)
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.custom_minimum_size = Vector2(430, 0)
 	_tip_box.add_child(body)
@@ -845,26 +849,26 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			var unit := session.state.find_unit(id)
 			if unit == null:
 				continue
-			var note := "%s (vida %d)" % [unit.display_name, unit.hp]
+			var note := tr("%s (vida %d)") % [_name(unit), unit.hp]
 			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage").Max >= unit.hp:
-				note += " · pode cair"
+				note += tr(" · pode cair")
 			# Os estados do alvo por extenso: no foco, a dica faz o papel da dica do mouse sobre os ícones (#30).
 			note += _status_words(unit, terms)
 			hits.append(note)
 		if not hits.is_empty():
-			_tip_line("Atinge: " + "; ".join(hits), S.MIN_TEXT, S.DANGER if option.enemy_side else S.OK, "bold")
+			_tip_line(tr("Atinge: ") + "; ".join(hits), S.MIN_TEXT, S.DANGER if option.enemy_side else S.OK, "bold")
 	else:
 		# Sem mirar (o cartão com foco): os estados de quem está na luta, para quem joga no teclado, no controle ou no toque.
 		var actor := session.state.find_unit(_actor_id)
 		var mine := _status_words(actor, terms) if actor != null else ""
 		if mine != "":
-			_tip_line("Você:" + mine.trim_prefix(" ·"), 17, TEXT)
+			_tip_line(tr("Você:") + mine.trim_prefix(" ·"), 17, TEXT)
 		var others := PackedStringArray()
 		for enemy in session.state.enemy_team:
 			if enemy.hp > 0:
 				var words := _status_words(enemy, terms)
 				if words != "":
-					others.append(enemy.display_name + ":" + words.trim_prefix(" ·"))
+					others.append(unit_name(enemy.display_name) + ":" + words.trim_prefix(" ·"))
 		if not others.is_empty():
 			_tip_line("; ".join(others), 17, MUTED)
 	for word in S.GLOSSARY:
@@ -891,6 +895,48 @@ func _status_words(unit: AHCombat.Unit, terms: Array) -> String:
 	return "" if marks.is_empty() else " · " + ", ".join(marks.map(func(e): return e[0]))
 
 
+## O nome de quem luta na língua do jogo: o do inimigo vem dos dados, às vezes com um sufixo da rota (o guardião da
+## fase, os relés Alfa e Beta do chefe), traduzido em partes (#35). O dos heróis não muda.
+static func unit_name(text: String) -> String:
+	var whole := TranslationServer.translate(text)
+	if whole != text:
+		return whole
+	for suffix in [" · Guardião", " Alfa", " Beta"]:
+		if text.ends_with(suffix):
+			return TranslationServer.translate(text.trim_suffix(suffix)) + _suffix(suffix)
+	return whole
+
+
+static func _suffix(suffix: String) -> String:
+	match suffix:
+		" · Guardião":
+			return TranslationServer.translate(" · Guardião")
+		" Alfa":
+			return TranslationServer.translate(" Alfa")
+	return TranslationServer.translate(" Beta")
+
+
+## O nome de quem luta na tela: o do herói como está, o do inimigo traduzido.
+func _name(unit: AHCombat.Unit) -> String:
+	return unit.display_name if unit.is_player else unit_name(unit.display_name)
+
+
+## O nome curto da barra de ordem: o substantivo, sem o artigo. Em português é a primeira palavra ("Relé de Defesa"
+## fica "Relé", "O Porteiro" fica "Porteiro"); em inglês, a última ("Defense Relay" fica "Relay").
+static func short_name(text: String) -> String:
+	var words := unit_name(text).split(" ", false)
+	if words.size() > 1 and ["O", "A", "Os", "As", "The"].has(words[0]):
+		words.remove_at(0)
+	if words.is_empty():
+		return text
+	# Os sufixos da rota (" · Guardian", " Alpha") não são o substantivo.
+	var english := TranslationServer.get_locale().begins_with("en")
+	if english:
+		while words.size() > 1 and (words[-1] in ["·", "Guardian", "Alpha", "Beta"] or words[-1].is_valid_int()):
+			words.remove_at(words.size() - 1)
+		return words[-1]
+	return words[0]
+
 func _tip_line(text: String, size: int, color: Color, kind: String = "body") -> Label:
 	var line := S.label(text, size, color, kind)
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -909,10 +955,10 @@ func _place_tip(button: Control) -> void:
 
 
 func _describe_action(kind: String) -> void:
-	var texts := {"move": ["Mover", "Troca de posição com o aliado vizinho. Gasta a vez."],
-		"defend": ["Defender", "+1 Bloqueio e passa a vez. " + S.GLOSSARY.Bloqueio],
-		"flee": ["Fugir", "60% de chance de a equipe recuar e sair da luta. Na fuga, larga o que carregava."],
-		"item": ["Mochila", "Comida ou curativo no herói da vez. Ação livre: a vez continua, um item por vez dele."]}
+	var texts := {"move": [tr("Mover"), tr("Troca de posição com o aliado vizinho. Gasta a vez.")],
+		"defend": [tr("Defender"), tr("+1 Bloqueio e passa a vez. ") + S.GLOSSARY.Bloqueio],
+		"flee": [tr("Fugir"), tr("60% de chance de a equipe recuar e sair da luta. Na fuga, larga o que carregava.")],
+		"item": [tr("Mochila"), tr("Comida ou curativo no herói da vez. Ação livre: a vez continua, um item por vez dele.")]}
 	_clear(_tip_box)
 	_tip_box.add_child(S.label(texts[kind][0], 26, GOLD, "display"))
 	var body := S.label(texts[kind][1], S.MIN_TEXT, TEXT)
@@ -951,7 +997,7 @@ func show_crisis(text: String, breakthrough: bool) -> void:
 	_crisis.size = Vector2(1920, 112)
 	_crisis.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_crisis)
-	var title := S.label("CRISE DE INSTINTO", 22, S.VIOLET, "bold")
+	var title := S.label(tr("CRISE DE INSTINTO"), 22, S.VIOLET, "bold")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.position = Vector2(0, 10)
 	title.size = Vector2(1920, 30)
@@ -1014,11 +1060,11 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 	for rank in ranks:
 		var unit = AHCombatEngine._find(team, func(u): return session.engine.occupies_rank(u, rank) and AHCombatEngine.alive_any(u))
 		var world: Vector3
-		var label := "Posição %d" % rank
+		var label := tr("Posição %d") % rank
 		if unit != null and arena.cards.has(unit.id):
 			var card: AHSpriteCard = arena.cards[unit.id]
 			world = card.global_position + Vector3(0, card.head_height() + 0.2, 0)
-			label = unit.display_name
+			label = _name(unit)
 		else:
 			var probe := AHCombat.Unit.new()
 			probe.is_player = not enemy_side
@@ -1043,7 +1089,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 	for i in _markers.size():
 		_markers[i].focus_neighbor_left = _markers[(i - 1 + _markers.size()) % _markers.size()].get_path()
 		_markers[i].focus_neighbor_right = _markers[(i + 1) % _markers.size()].get_path()
-	_description.text = "Escolha o alvo (%s ou B volta)." % S.key_name("cancel")
+	_description.text = tr("Escolha o alvo (%s ou B volta).") % S.key_name("cancel")
 	if not _markers.is_empty():
 		_markers[0].grab_focus.call_deferred()
 
@@ -1074,11 +1120,11 @@ func _preview_hits(ability_id: String, rank: int) -> void:
 			continue
 		var own: Array = _markers.filter(func(m): return session.engine.occupies_rank(unit, int(m.get_meta("rank"))))
 		if not own.is_empty():
-			own[0].text = "◆ %s · também" % unit.display_name
+			own[0].text = tr("◆ %s · também") % _name(unit)
 			own[0].add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
 			continue
 		var card: AHSpriteCard = arena.cards[id]
-		var mark := S.label("◆ também atingido", S.MIN_TEXT, Color(1.0, 0.85, 0.45), "bold")
+		var mark := S.label(tr("◆ também atingido"), S.MIN_TEXT, Color(1.0, 0.85, 0.45), "bold")
 		mark.add_theme_constant_override("outline_size", 8)
 		mark.set_meta("world", card.global_position + Vector3(0, card.head_height() + 0.2, 0))
 		add_child(mark)
@@ -1129,6 +1175,10 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Mostra o fim da luta e espera "Continuar" (no modo automático, segue sozinho).
 func show_result(result: String, automatic: bool) -> void:
 	_panel.visible = false
+	# A vitória e a derrota têm o toque delas (#36); a fuga, não.
+	if result == "victory" or result == "defeat":
+		Sound.play("res://audio/ui/%s.ogg" % result)
+		Sound.duck(9.0, 1.6)
 	_message.text = ""
 	_clear_markers()
 	for child in _result.get_children():
@@ -1137,8 +1187,8 @@ func show_result(result: String, automatic: bool) -> void:
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_theme_constant_override("separation", 14)
 	_result.add_child(box)
-	var titles := {"victory": "Vitória", "defeat": "Derrota", "escaped": "Fuga"}
-	var notes := {"victory": "A patrulha foi neutralizada.", "defeat": "Todos caíram nas ruínas.", "escaped": "A equipe recuou pelas sombras."}
+	var titles := {"victory": tr("Vitória"), "defeat": tr("Derrota"), "escaped": tr("Fuga")}
+	var notes := {"victory": tr("A patrulha foi neutralizada."), "defeat": tr("Todos caíram nas ruínas."), "escaped": tr("A equipe recuou pelas sombras.")}
 	var title := S.label(titles.get(result, result), 48, GOLD if result == "victory" else S.DANGER, "display")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
@@ -1158,12 +1208,12 @@ func show_result(result: String, automatic: bool) -> void:
 		if fallen:
 			face.modulate = Color(0.55, 0.55, 0.6)
 		who.add_child(face)
-		var line := S.label("%s\n%s" % [unit.display_name, "caído" if fallen else "%d/%d" % [unit.hp, unit.max_hp]], 16, MUTED if fallen else TEXT)
+		var line := S.label("%s\n%s" % [unit.display_name, tr("caído") if fallen else "%d/%d" % [unit.hp, unit.max_hp]], 16, MUTED if fallen else TEXT)
 		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		who.add_child(line)
 		team.add_child(who)
 	var button := Button.new()
-	button.text = "Continuar"
+	button.text = tr("Continuar")
 	button.custom_minimum_size = Vector2(240, 52)
 	style_button(button)
 	button.pressed.connect(func(): result_closed.emit())

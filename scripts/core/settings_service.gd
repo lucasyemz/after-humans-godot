@@ -13,6 +13,11 @@ const LEVEL_NAMES := ["Baixo", "Médio", "Alto", "Ultra"]
 const RENDER_SCALE := [0.67, 0.8, 1.0, 1.0]
 ## Gotas de chuva de cada nível (GetRainDensityScale da Unreal).
 const RAIN_SCALE := [0.35, 0.55, 0.8, 1.0]
+## As luminárias desenhadas com sombra (a Estação, os cenários e os postes da rua): a sombra delas segue a qualidade.
+const SHADOW_LAMPS := "shadow_lamps"
+## O limite de LOD de cada nível (Viewport.mesh_lod_threshold, em pixels): os modelos importados já têm LOD; no Baixo e
+## no Médio a troca para o mais simples vem antes (#37).
+const LOD_THRESHOLD := [6.0, 3.0, 1.0, 1.0]
 
 var level := 2
 var fullscreen := false
@@ -35,13 +40,18 @@ const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run"
 	"combat_ability_1", "combat_ability_2", "combat_ability_3", "combat_ability_4", "combat_move", "combat_defend", "combat_flee", "hide_hud"]
 
 
+## O idioma das telas (#35): o português é o padrão e o inglês está em teste (data/i18n/en.po; o que falta traduzir
+## aparece em português). A chave de cada texto é o próprio português.
+const LANGUAGES := [["pt_BR", "Português"], ["en", "English (em teste)"]]
+var language := "pt_BR"
+
 ## Nos scripts de teste e nas capturas as opções valem só na memória (nada é gravado na pasta de quem joga).
 var _persist := true
 
 
 func _ready() -> void:
 	var args := Array(OS.get_cmdline_args()) + Array(OS.get_cmdline_user_args())
-	_persist = not (args.has("-s") or args.has("--script") or args.any(func(a): return String(a).begins_with("--capture=") or String(a).begins_with("--capture-title=")))
+	_persist = not (args.has("-s") or args.has("--script") or args.any(func(a): return String(a).begins_with("--capture=") or String(a).begins_with("--capture-title=") or String(a).begins_with("--perf")))
 	var config := ConfigFile.new()
 	if _persist and config.load(PATH) == OK:
 		level = clampi(int(config.get_value("graphics", "level", level)), 0, 3)
@@ -52,13 +62,20 @@ func _ready() -> void:
 		text_size = clampi(int(config.get_value("accessibility", "text_size", text_size)), 0, TEXT_SIZES.size() - 1)
 		touch_controls = clampi(int(config.get_value("controls", "touch", touch_controls)), 0, TOUCH_MODES.size() - 1)
 		keys = config.get_value("controls", "keys", {})
+		language = _known_language(String(config.get_value("interface", "language", language)))
 	# --text-size=N nas capturas: confere as telas com o texto maior (só na memória).
 	for arg in args:
 		if String(arg).begins_with("--text-size="):
 			text_size = clampi(int(String(arg).get_slice("=", 1)), 0, TEXT_SIZES.size() - 1)
 		elif String(arg) == "--touch":
 			touch_controls = 1
+		# --language=en: as telas em outro idioma. Nas capturas e nos scripts as opções não são gravadas; jogando, a
+		# próxima opção mudada grava o idioma (como --text-size).
+		elif String(arg).begins_with("--language="):
+			language = _known_language(String(arg).get_slice("=", 1))
 	apply_controls()
+	# O idioma vem das opções, nunca do sistema (num Windows em inglês o jogo abria em inglês).
+	TranslationServer.set_locale(language)
 	AHUiStyle.text_scale = TEXT_SCALE[text_size]
 	AHUiStyle.install.call_deferred(get_tree().root)
 	apply()
@@ -151,6 +168,22 @@ func set_text_size(value: int) -> void:
 	AHUiStyle.retune(get_tree().root, scale, AHUiStyle.OK, AHUiStyle.DANGER)
 
 
+## Troca o idioma na hora: os textos fixos das telas mudam sozinhos; as telas montadas com texto formatado se refazem
+## ao receber changed (ou ao abrir de novo).
+func set_language(code: String) -> void:
+	language = _known_language(code)
+	TranslationServer.set_locale(language)
+	_store()
+	changed.emit()
+
+
+static func _known_language(code: String) -> String:
+	for entry in LANGUAGES:
+		if entry[0] == code:
+			return code
+	return "pt_BR"
+
+
 func set_touch_controls(value: int) -> void:
 	touch_controls = clampi(value, 0, TOUCH_MODES.size() - 1)
 	_store()
@@ -189,6 +222,7 @@ func _store() -> void:
 	config.set_value("accessibility", "text_size", text_size)
 	config.set_value("controls", "keys", keys)
 	config.set_value("controls", "touch", touch_controls)
+	config.set_value("interface", "language", language)
 	config.save(PATH)
 	apply()
 
@@ -196,17 +230,33 @@ func _store() -> void:
 ## Janela e resolução interna; os efeitos de cada cena saem de effects() quando ela recebe changed.
 func apply() -> void:
 	var web := OS.has_feature("web")
-	# A captura mede sem vsync e na janela dela; não mexe.
-	var capture := Array(OS.get_cmdline_user_args()).any(func(arg): return String(arg).begins_with("--capture="))
+	# A captura e o roteiro de desempenho (--perf) medem sem vsync e na janela deles; não mexe.
+	var capture := Array(OS.get_cmdline_user_args()).any(func(arg): return String(arg).begins_with("--capture=") or String(arg).begins_with("--perf"))
 	if not web and not capture and DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if vsync else DisplayServer.VSYNC_DISABLED)
 	get_viewport().scaling_3d_scale = RENDER_SCALE[level]
+	get_viewport().mesh_lod_threshold = LOD_THRESHOLD[level]
+	apply_lamp_shadows()
 	AHUiStyle.set_colorblind(colorblind)
 	changed.emit()
 
 
-## O que a cena liga (Forward+ só; o Compatibility da web não tem esses efeitos).
+## O que a cena liga (Forward+ só; o Compatibility da web não tem esses efeitos). As sombras das luminárias (as
+## OmniLight3D com sombra: a cena desenhada de novo seis vezes por luz) só no Alto e no Ultra do Forward+ e no Ultra do
+## Compatibility, o da web (#37: com as 18 da Estação, 5 mil chamadas de desenho por quadro contra 480 sem elas); no
+## resto elas acendem sem sombra. A do sol continua a partir do Médio.
 func effects() -> Dictionary:
-	return {"ssao": level >= 1, "volumetric_fog": level >= 2, "ssr": level >= 2, "rain_scale": RAIN_SCALE[level],
-		"shadows": level >= 1}
+	return effects_for(level, RenderingServer.get_current_rendering_method() == "forward_plus")
+
+
+static func effects_for(quality: int, forward_plus: bool) -> Dictionary:
+	return {"ssao": quality >= 1, "volumetric_fog": quality >= 2, "ssr": quality >= 2, "rain_scale": RAIN_SCALE[quality],
+		"shadows": quality >= 1, "lamp_shadows": quality >= 3 or (quality >= 2 and forward_plus)}
+
+
+## As luminárias que têm sombra no desenho (o grupo SHADOW_LAMPS) seguem a qualidade na hora.
+func apply_lamp_shadows() -> void:
+	var on: bool = effects().lamp_shadows
+	for light in get_tree().get_nodes_in_group(SHADOW_LAMPS):
+		light.shadow_enabled = on

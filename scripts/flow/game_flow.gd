@@ -38,6 +38,10 @@ static func scene_path(scene_id: String) -> String:
 ## Primeira cena depois do boot: a tela de título (#28). O modo de captura da rua (--capture=) monta a própria campanha e
 ## abre direto a rua.
 func start() -> void:
+	# O roteiro de desempenho (--perf, #37) passa pelas cenas sozinho e sai.
+	if AHPerfTour.requested():
+		add_child(AHPerfTour.new())
+		return
 	var capture := Array(OS.get_cmdline_user_args()).any(func(arg): return String(arg).begins_with("--capture="))
 	change_to("street" if capture else "title", {}, false)
 

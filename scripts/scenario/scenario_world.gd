@@ -10,6 +10,11 @@ const LUMENS_PER_ENERGY := 260.0
 ## Brilho dos cards de fundo (unlit, Emissive 0,5 na Unreal, sem adaptação de exposição): calibrado na tela.
 const CARD_BRIGHTNESS := 1.7
 
+## A folga acima da borda da frente ao subir o chão da luta.
+const FRONT_LIFT_MARGIN := 0.06
+## A borda da frente mais alta que ainda conta como piso (acima disso é parede, e a silhueta vale).
+const FRONT_EDGE_MAX := 0.6
+
 static var _mesh_cache: Array = []
 
 var map_name := ""
@@ -19,6 +24,8 @@ var zones: Array = []
 ## Os obstáculos na faixa de passeio de cada zona (caixas do mundo): o que é sólido na Unreal, entre o piso e a altura
 ## da equipe, sem fechar a faixa inteira (sempre sobra passagem).
 var obstacles: Array[AABB] = []
+## As peças opacas (caixas do mundo) que podem ficar entre a câmera da luta e os pés de quem luta (#48).
+var walls: Array[AABB] = []
 var side_doors: Array = []
 var props: Array = []
 var _materials: Array = []
@@ -81,13 +88,17 @@ func build(map: String) -> void:
 		if part.get("no_shadow", false) or data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"]:
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(node)
+		if not data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"] \
+				and not data.materials[int(part.materials[0])].get("masked", false):
+			walls.append(node.transform * node.mesh.get_aabb())
 		if part.get("solid", false):
 			_add_obstacle(node.transform * node.mesh.get_aabb())
 		if prop_parts.has(i):
 			if not _prop_nodes.has(prop_parts[i]):
 				_prop_nodes[prop_parts[i]] = []
 			_prop_nodes[prop_parts[i]].append(node)
-		elif node.mesh.get_surface_count() == 1 and data.materials[int(part.materials[0])].kind != "water":
+		elif node.mesh.get_surface_count() == 1 and data.materials[int(part.materials[0])].kind != "water" \
+				and not _in_front(node.transform * node.mesh.get_aabb()):
 			var key := [int(part.mesh), int(part.materials[0]), node.cast_shadow]
 			if not merge.has(key):
 				merge[key] = []
@@ -131,6 +142,38 @@ func open_prop(index: int) -> void:
 	for node: MeshInstance3D in _prop_nodes[index]:
 		for surface in node.mesh.get_surface_count():
 			node.set_surface_override_material(surface, _materials[int(prop.open)])
+
+
+## Quanto o chão da luta sobe na zona para os pés ficarem acima da borda da frente (#48). A câmera da luta é quase
+## reta: a linha de visão até o pé sobe slope metros por metro de profundidade. Uma peça na frente (z maior que feet_z),
+## dentro da zona e mais alta que o piso cobre o pé quando a altura dela passa da linha; o chão sobe o que falta, com
+## uma folga. Sem peça na frente, 0 (os outros cenários ficam iguais).
+func front_lift(zone_index: int, feet_z: float, slope: float) -> float:
+	var zone: Dictionary = zones[zone_index]
+	var lift := 0.0
+	for box in walls:
+		var depth: float = box.position.z - feet_z
+		if depth < 0.3 or box.end.x <= zone.x0 or box.position.x >= zone.x1:
+			continue
+		var above: float = box.end.y - zone.y
+		if above <= 0.01 or box.position.y > zone.y + 3.0:
+			continue
+		lift = maxf(lift, above - slope * depth + FRONT_LIFT_MARGIN)
+	return lift
+
+
+## A altura (m acima do piso) da borda baixa mais alta na frente da faixa da zona: o que encobre os pés de quem anda
+## (a silhueta não pinta essa faixa, #51). Só as peças baixas (até FRONT_EDGE_MAX) contam; o resto tapa de verdade.
+func front_edge(zone_index: int, feet_z: float) -> float:
+	var zone: Dictionary = zones[zone_index]
+	var edge := 0.0
+	for box in walls:
+		if box.position.z - feet_z < 0.05 or box.end.x <= zone.x0 or box.position.x >= zone.x1:
+			continue
+		var above: float = box.end.y - zone.y
+		if above > 0.0 and above <= FRONT_EDGE_MAX:
+			edge = maxf(edge, above)
+	return edge
 
 
 ## A zona (0..n) que contém x, ou -1.
@@ -260,6 +303,13 @@ func _material(m: Dictionary) -> Material:
 	return material
 
 
+## A peça fica toda na frente da faixa de andar da zona dela: pode tapar a equipe e esmaece sozinha (#51), por isso
+## não se junta às outras.
+func _in_front(box: AABB) -> bool:
+	var zone := zone_at(box.get_center().x)
+	return zone >= 0 and box.position.z > (zones[zone].z0 + zones[zone].z1) * 0.5
+
+
 func _merge(groups: Dictionary) -> void:
 	for key in groups:
 		var parts: Array = groups[key]
@@ -273,6 +323,8 @@ func _merge(groups: Dictionary) -> void:
 		combined.mesh = tool.commit()
 		combined.material_override = parts[0].get_surface_override_material(0)
 		combined.cast_shadow = key[2]
+		# Peças juntadas ficam espalhadas: a caixa delas não diz o que tapa quem (#51).
+		combined.set_meta("merged", true)
 		add_child(combined)
 		for node: MeshInstance3D in parts:
 			node.queue_free()
@@ -290,7 +342,10 @@ func _light(light: Dictionary) -> void:
 	lamp.omni_range = float(light.radius)
 	lamp.omni_attenuation = 1.4
 	lamp.light_color = Color(light.color[0], light.color[1], light.color[2])
-	lamp.shadow_enabled = bool(light.shadows) and RenderingServer.get_current_rendering_method() == "forward_plus"
+	var shadows := bool(light.shadows) and RenderingServer.get_current_rendering_method() == "forward_plus"
+	if shadows:
+		lamp.add_to_group(Settings.SHADOW_LAMPS)
+	lamp.shadow_enabled = shadows and Settings.effects().lamp_shadows
 	add_child(lamp)
 
 

@@ -1,0 +1,206 @@
+{
+	"grocery_cash_counter": {
+		"group": "grocery",
+		"closed": "res://art/street/search_props/grocery_cash_counter_closed.webp",
+		"open": "res://art/street/search_props/grocery_cash_counter_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 322.5,
+		"height_m": 1.35,
+		"width_m": 1.365,
+		"depth_m": 0.65
+	},
+	"grocery_refrigerator": {
+		"group": "grocery",
+		"closed": "res://art/street/search_props/grocery_refrigerator_closed.webp",
+		"open": "res://art/street/search_props/grocery_refrigerator_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 407.5,
+		"height_m": 1.9,
+		"width_m": 0.97,
+		"depth_m": 0.7
+	},
+	"grocery_shelving": {
+		"group": "grocery",
+		"closed": "res://art/street/search_props/grocery_shelving_closed.webp",
+		"open": "res://art/street/search_props/grocery_shelving_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 403.0,
+		"height_m": 1.9,
+		"width_m": 1.157,
+		"depth_m": 0.45
+	},
+	"workshop_workbench": {
+		"group": "workshop",
+		"closed": "res://art/street/search_props/workshop_workbench_closed.webp",
+		"open": "res://art/street/search_props/workshop_workbench_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 268.0,
+		"height_m": 1.05,
+		"width_m": 1.3459999999999999,
+		"depth_m": 0.75
+	},
+	"workshop_engine": {
+		"group": "workshop",
+		"closed": "res://art/street/search_props/workshop_engine_closed.webp",
+		"open": "res://art/street/search_props/workshop_engine_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 317.5,
+		"height_m": 1.05,
+		"width_m": 1.1840000000000002,
+		"depth_m": 0.75
+	},
+	"workshop_parts_cabinet": {
+		"group": "workshop",
+		"closed": "res://art/street/search_props/workshop_parts_cabinet_closed.webp",
+		"open": "res://art/street/search_props/workshop_parts_cabinet_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 402.5,
+		"height_m": 1.8,
+		"width_m": 1.3330000000000002,
+		"depth_m": 0.5
+	},
+	"cinema_ticket_booth": {
+		"group": "cinema",
+		"closed": "res://art/street/search_props/cinema_ticket_booth_closed.webp",
+		"open": "res://art/street/search_props/cinema_ticket_booth_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 392.5,
+		"height_m": 1.9,
+		"width_m": 1.44,
+		"depth_m": 0.65
+	},
+	"cinema_popcorn_cart": {
+		"group": "cinema",
+		"closed": "res://art/street/search_props/cinema_popcorn_cart_closed.webp",
+		"open": "res://art/street/search_props/cinema_popcorn_cart_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 367.5,
+		"height_m": 1.65,
+		"width_m": 1.291,
+		"depth_m": 0.65
+	},
+	"cinema_stair_cabinet": {
+		"group": "cinema",
+		"closed": "res://art/street/search_props/cinema_stair_cabinet_closed.webp",
+		"open": "res://art/street/search_props/cinema_stair_cabinet_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 321.0,
+		"height_m": 1.35,
+		"width_m": 1.426,
+		"depth_m": 0.7
+	},
+	"street_crates": {
+		"group": "street",
+		"closed": "res://art/street/search_props/street_crates_closed.webp",
+		"open": "res://art/street/search_props/street_crates_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 287.5,
+		"height_m": 1.0,
+		"width_m": 1.038,
+		"depth_m": 0.6
+	},
+	"street_trash_can": {
+		"group": "street",
+		"closed": "res://art/street/search_props/street_trash_can_closed.webp",
+		"open": "res://art/street/search_props/street_trash_can_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 317.5,
+		"height_m": 0.95,
+		"width_m": 0.703,
+		"depth_m": 0.6
+	},
+	"street_mailbox": {
+		"group": "street",
+		"closed": "res://art/street/search_props/street_mailbox_closed.webp",
+		"open": "res://art/street/search_props/street_mailbox_open.webp",
+		"canvas": [
+			512,
+			512
+		],
+		"anchor": [
+			256.0,
+			480.0
+		],
+		"body_reference_pixels": 367.5,
+		"height_m": 1.25,
+		"width_m": 0.6559999999999999,
+		"depth_m": 0.45
+	}
+}

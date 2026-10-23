@@ -4,6 +4,15 @@
 class_name AHSpriteCard
 extends MeshInstance3D
 
+## A camada das placas de personagem (além da 1): o preenchimento da luta nos cenários só pega elas.
+const CHARACTER_LAYER := 1 << 19
+## A silhueta de quem está escondido atrás de alguma coisa (#51): um segundo passe só onde a placa está atrás.
+const SILHOUETTE_SHADER := preload("res://shaders/character_silhouette.gdshader")
+## Toda placa de personagem marca o stencil com isto: a silhueta de um não pinta por cima de outro.
+const STENCIL_CHARACTER := 1
+## A altura acima do pé (m) que fica sem silhueta (a borda do piso da frente encobre a sola em alguns cenários).
+const SILHOUETTE_FOOT := 0.12
+
 ## Altura do corpo em metros (do pé ao topo da cabeça na pose parada).
 var body_height := 1.8
 var facing := 1.0
@@ -14,10 +23,14 @@ var _texture: Texture2D
 var _frame := 0
 var _frame_time := 0.0
 var _flash_tween: Tween
+var _silhouette: ShaderMaterial
+## Quanto acima do pé (m) fica sem silhueta: o padrão, ou a borda do piso da frente da zona do cenário (#51).
+var silhouette_foot := SILHOUETTE_FOOT
 
 
 func _init() -> void:
 	mesh = _quad
+	layers = 1 | CHARACTER_LAYER
 	material_override = _material
 	# A placa muda de tamanho e de deslocamento a cada pose e quadro: sem margem, a câmera podia descartá-la como fora
 	# da tela (a sombra continuava aparecendo).
@@ -33,6 +46,10 @@ func _init() -> void:
 	_material.backlight = Color(0.45, 0.45, 0.45)
 	_material.emission_enabled = true
 	_material.emission = Color.BLACK
+	_material.stencil_mode = BaseMaterial3D.STENCIL_MODE_CUSTOM
+	_material.stencil_flags = BaseMaterial3D.STENCIL_FLAG_WRITE
+	_material.stencil_compare = BaseMaterial3D.STENCIL_COMPARE_ALWAYS
+	_material.stencil_reference = STENCIL_CHARACTER
 
 
 ## Mostra uma arte do manifesto: {file, canvas, anchor, body_reference_pixels} e, numa folha, frames e fps.
@@ -40,6 +57,8 @@ func show_art(art: Dictionary) -> void:
 	_art = art
 	_texture = load(art.file)
 	_material.albedo_texture = _texture
+	if _silhouette != null:
+		_silhouette.set_shader_parameter("albedo_tex", _texture)
 	_frame = 0
 	_frame_time = 0.0
 	_layout()
@@ -94,21 +113,57 @@ func _layout() -> void:
 	else:
 		_material.uv1_offset = Vector3(uv_pos.x, uv_pos.y, 0)
 		_material.uv1_scale = Vector3(uv_size.x, uv_size.y, 1)
+	if _silhouette != null:
+		_silhouette.set_shader_parameter("uv_offset", Vector2(_material.uv1_offset.x, _material.uv1_offset.y))
+		_silhouette.set_shader_parameter("uv_scale", Vector2(_material.uv1_scale.x, _material.uv1_scale.y))
+		# O pé e um pouco acima dele (SILHOUETTE_FOOT metros) não ganham silhueta.
+		var foot_px := region.size.y - anchor.y + silhouette_foot / px_to_m
+		_silhouette.set_shader_parameter("foot_cut", clampf(foot_px / region.size.y, 0.0, 0.5))
+
+
+## Liga a silhueta na cor dada (a equipe sempre, os inimigos só na luta) ou desliga com null.
+func set_silhouette(color) -> void:
+	if color == null:
+		_material.next_pass = null
+		return
+	if _silhouette == null:
+		_silhouette = ShaderMaterial.new()
+		_silhouette.shader = SILHOUETTE_SHADER
+		# Depois dos transparentes do cenário: a silhueta fica por cima do que esconde o personagem.
+		_silhouette.render_priority = 1
+	_silhouette.set_shader_parameter("color", color)
+	_silhouette.set_shader_parameter("albedo_tex", _texture)
+	_material.next_pass = _silhouette
+	_layout()
+
+
+func set_silhouette_foot(meters: float) -> void:
+	silhouette_foot = meters
+	_layout()
+
+
+func has_silhouette() -> bool:
+	return _material.next_pass != null
 
 
 ## Pisca numa cor (dano vermelho, cura verde) e volta.
-func flash(color: Color, seconds: float = 0.35) -> void:
+## Pisca na cor e apaga em seconds; com white_seconds, começa com um clarão branco que vira a cor (o acerto, #33).
+func flash(color: Color, seconds: float = 0.35, white_seconds: float = 0.0) -> void:
 	if _flash_tween:
 		_flash_tween.kill()
-	_material.emission = color
+	_material.emission = Color.WHITE if white_seconds > 0.0 else color
 	_material.emission_energy_multiplier = 0.7
 	_flash_tween = create_tween()
+	if white_seconds > 0.0:
+		_flash_tween.tween_property(_material, "emission", color, white_seconds)
 	_flash_tween.tween_property(_material, "emission", Color.BLACK, seconds)
 
 
 ## Mistura por alfa (efeitos com transparência suave) em vez do recorte duro dos personagens.
 func set_blended(blended: bool) -> void:
 	_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if blended else BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	# O efeito não marca o stencil: o retângulo inteiro dele (alfa 0 incluído) abria um buraco na silhueta de trás.
+	_material.stencil_mode = BaseMaterial3D.STENCIL_MODE_DISABLED if blended else BaseMaterial3D.STENCIL_MODE_CUSTOM
 	_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED if blended else BaseMaterial3D.SHADING_MODE_PER_PIXEL
 
 

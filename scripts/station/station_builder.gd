@@ -336,7 +336,10 @@ func light(position: Vector3, lumens: float, radius: float, color: Color, shadow
 	lamp.omni_attenuation = 1.4
 	lamp.light_color = color
 	lamp.light_size = 0.04
-	lamp.shadow_enabled = shadows
+	# A sombra das luminárias segue a qualidade das opções (Settings.apply_lamp_shadows, #37).
+	if shadows:
+		lamp.add_to_group(Settings.SHADOW_LAMPS)
+	lamp.shadow_enabled = shadows and Settings.effects().lamp_shadows
 	_add(lamp)
 	return lamp
 
@@ -407,6 +410,7 @@ func merge_static(keep: Dictionary) -> int:
 		combined.mesh = tool.commit()
 		combined.material_override = key[0]
 		combined.cast_shadow = key[1]
+		combined.set_meta("merged", true)
 		root.add_child(combined)
 		for part: MeshInstance3D in parts:
 			generated.erase(part)

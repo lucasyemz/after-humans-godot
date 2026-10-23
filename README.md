@@ -64,7 +64,9 @@ tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas 
 tools/            sync_assets.py e sync_combat_art.py (trazem dados, arte e sons da referência Unreal; o segundo
                   precisa do Pillow), unreal_export_scenarios.py (roda na Unreal e exporta os cenários para
                   build/unreal-export) e sync_scenarios.py (converte a exportação), sync_audio.py (trilha e sons, precisa
-                  do soundfile), capture_scenarios.gd (QA dos cenários) e define_input.gd (grava as ações)
+                  do soundfile), capture_scenarios.gd e capture_scenario_fight.gd (QA dos cenários),
+                  capture_impact.gd (gravação de um golpe), synth_sounds.py e measure_audio.py (os sons gerados e
+                  a tabela de mixagem em LUFS), i18n_update.gd (o PO da tradução) e define_input.gd (grava as ações)
 ```
 
 `build/` e `.godot/` são gerados e ficam fora do Git.
@@ -117,9 +119,12 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - Na luta: 1 a 4 escolhem a habilidade (ou o clique), depois o alvo; Q move, W defende, I abre a Mochila, F foge
     (no gamepad, setas e Enter/A; Backspace/B volta).
     Mover, Defender e Fugir ficam à direita.
-- **Tela de título:** o jogo abre nela (`scenes/title.tscn`), com Continuar (só com um save que abre), Nova campanha (pergunta
-  antes se há save) e Opções. Captura: `"$GODOT" --path . --resolution 1920x1080 -- --capture-title=<pasta>` tira 8 fotos
-  (sem save e com save, a confirmação e as Opções, no texto Normal e no Maior) e sai; o save das fotos fica na pasta da
+- **Tela de título:** o jogo abre nela (`scenes/title.tscn`), com Continuar (a última campanha usada, só com um save que
+  abre), Nova campanha (escolhe um dos três espaços e pergunta antes de sobrescrever um ocupado), Campanhas (abre outro
+  espaço, quando há uma campanha que o Continuar não abre) e Opções. Os espaços ficam em `user://saves`: `campaign.json` (o espaço 1, o
+  save de antes das vagas), `campaign_2.json`, `campaign_3.json`, cada um com a cópia `.backup`, e `slots.json` com o
+  último usado. Captura: `"$GODOT" --path . --resolution 1920x1080 -- --capture-title=<pasta>` tira 10 fotos (sem save e
+  com save, os espaços, a confirmação e as Opções, no texto Normal e no Maior) e sai; o save das fotos fica na pasta da
   captura.
 - **Capturas, tempos de quadro e teste de colisão:** `"$GODOT" --path . --resolution 1920x1080 -- --capture=<pasta>`.
   Abre uma janela, tira 9 fotos (dia, noite e chuva), testa o líder andando contra um carro e contra uma fachada (`PASS`
@@ -144,10 +149,52 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
 - **Captura dos cenários:** `"$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_scenarios.gd -- --out=<pasta>`
   (opcional `--maps=RiverDock,FloodedDepot`). Em cada zona dos seis mapas: fim de tarde e noite com chuva, tempo de quadro,
   equipe e patrulhas no piso e o líder preso à faixa (`PASS`/`FAIL`). Sai com código 1 se algo falhar.
+- **Captura de luta nos cenários:** `"$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_scenario_fight.gd -- --out=<pasta>`
+  (padrão: Depósito e Dutos; `--maps=` escolhe). A equipe contra Broto, Faísca e Pipoco, de dia e de noite, e o
+  `feet.txt` com o pé de cada um na tela e se o cenário o cobre. Sai com código 1 se algum pé ficar coberto.
+- **Gravação de um golpe:** `"$GODOT" --path . --resolution 960x540 --fixed-fps 30 -s res://tools/capture_impact.gd -- --out=<pasta>`
+  (opcional `--speed=2`). Um PNG por quadro do golpe de um herói num robô, com semente fixa, para comparar o impacto
+  (pausa, tremor, clarão) antes e depois.
+- **Desempenho:** `"$GODOT" --path . --resolution 1920x1080 -- --perf=<pasta>` passa pelo título, pela Estação, pela
+  rua, por uma luta e pelos seis cenários, no Baixo e no Alto (`--perf-levels=`, `--perf-only=`), e grava `perf.csv`
+  e `perf.md` com o tempo de quadro, as chamadas de desenho, as primitivas e a memória. A versão web exportada roda o
+  mesmo roteiro no Chromium com `node tools/web_perf.mjs`. As medidas e o que mudou estão em
+  [docs/perf.md](docs/perf.md).
 - **Exportar:** `"$GODOT" --headless --path . --export-release "Web" build/web/index.html` e
   `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/AfterHumans.exe`. Os export
   templates da 4.7.2 precisam estar instalados.
 - **Servir a web:** `python -m http.server 8060 --directory build/web` e abrir `http://localhost:8060`.
+
+### Versão web
+
+`.github/workflows/web.yml` ("Versão web") roda depois de cada CI verde num push na `main`, ou à mão em Actions. Ele:
+- exporta o preset Web, que é sem threads, então roda em qualquer hospedagem estática, sem os cabeçalhos COOP/COEP;
+- baixa só o modelo da web (~10 MB) de dentro do pacote de modelos da Godot, com `tools/fetch_web_template.py`;
+- abre o build no Chromium e passa pela Estação e por uma luta (`tools/web_perf.mjs`);
+- guarda o build como artefato (`web-build`, 7 dias).
+
+**Publicar no GitHub Pages** deixa o jogo aberto a qualquer um no endereço, então fica desligado até o Lucas decidir. O
+repositório já é público. Para ligar:
+1. Em Settings > Pages, escolha a fonte "GitHub Actions".
+2. Em Settings > Secrets and variables > Actions > Variables, crie `PUBLISH_WEB` = `true`.
+
+O próximo push na `main` publica em `https://lucasyemz.github.io/after-humans-godot/`. Só a `main` publica: um PR, um
+fork ou uma rodada à mão de outro branch nunca vão para o Pages. O pacote tem 127 MB e demora a carregar na primeira
+vez (#12). Se o primeiro deploy recusar o `index.pck` por passar de 100 MB, o pacote precisa diminuir antes.
+
+### Textos e tradução
+
+As telas usam o sistema de tradução da Godot com `data/i18n/en.po`. A chave de cada texto é o próprio português, então
+o jogo em português mostra a chave como sempre, e o texto que falta traduzir aparece em português também no inglês.
+- **Idioma:** fica nas Opções (Português, que é o padrão, e English em teste) e é guardado em `user://settings.cfg`.
+  Nas capturas, use `--language=en`.
+- **Telas convertidas:** o título, as Opções, o HUD da exploração e da luta e a Estação. A lista está em
+  `tools/i18n_scan.gd`. Os nomes e as descrições de `data/*.json` também viram chaves, sem mudar os ids.
+- **Ao mexer num texto de tela ou nos dados:** rode `"$GODOT" --headless --path . -s res://tools/i18n_update.gd`. Ele
+  acrescenta os textos novos ao PO, com a tradução vazia, e mantém as que já existem. Depois traduza os `msgstr ""`. O
+  texto com `%s`/`%d` passa por `tr()` antes do `%`.
+- **O que não é texto** (nomes de nó, teclas, formatos sem palavra) vai para `tools/i18n_ignore.txt`.
+- **O teste** `tests/test_i18n.gd` acusa texto de tela fora do PO e tradução que perdeu um marcador.
 
 ### Testes no GitHub (CI)
 
@@ -165,6 +212,33 @@ No PR, o job **Leveza do PR** (`tools/ci_size_check.sh`) avisa, sem falhar, em d
 
 Para conferir antes de abrir o PR: `bash tools/ci_size_check.sh origin/main HEAD`. Ao trocar de versão da Godot, mude
 `GODOT_VERSION`, `GODOT_ZIP` e `GODOT_SHA512` no workflow (a soma está em `SHA512-SUMS.txt` da release).
+
+## Créditos de áudio
+
+A tabela do que toca em cada momento e a mixagem estão em [docs/audio.md](docs/audio.md).
+
+- **Kenney** ([kenney.nl](https://kenney.nl), CC0): portas, busca e moedas (`rpg-audio`) e passos de concreto e madeira (`impact-sounds`).
+- **OpenGameArt.org:** as trilhas escolhidas pelo Lucas em 20/10/2026.
+  - `explore_1`: "Tragic ambient main menu", de brandon75689 (enviada por HaelDB), CC0 / OGA-BY 3.0 (vale o CC0).
+    https://opengameart.org/content/tragic-ambient-main-menu
+  - `explore_2`: "Soundscape - Dust - Ambient Guitar", Music by Tri-Tachyon (https://soundcloud.com/tri-tachyon/albums),
+    CC-BY 4.0. https://opengameart.org/content/soundscape-dust-ambient-guitar
+  - `explore_3` (a Estação e a exploração): "Contemplation", de bart (https://opengameart.org), CC-BY 3.0.
+    https://opengameart.org/content/contemplation
+  - `explore_root_bridge`: "Soundscape - Find Nothing", Music by Tri-Tachyon (https://soundcloud.com/tri-tachyon/albums),
+    CC-BY 4.0. https://opengameart.org/content/soundscape-find-nothing
+  - `battle`: "Determined Pursuit (epic orchestra loop)", de Emma_MA, CC0.
+    https://opengameart.org/content/determined-pursuit-epic-orchestra-loop
+  - `boss` (`epic_boss_battle_loop.wav`): **origem não confirmada**. A pasta de origem se chama `boss-battle` e a
+    página com esse nome não abre; "Epic Boss Battle", de migfus20 (CC-BY 4.0), tem outro arquivo. Pendente: confirmar a
+    página e a licença ou trocar a faixa.
+- **Feitos no projeto:**
+  - os sons da interface, da Estação, dos ambientes e da chuva, e os passos na água (`SourceArt/Audio/Synth` da Unreal);
+  - os sons de `tools/synth_sounds.py`: sino e freio do trem, painéis, Forja, achado raro, vitória, derrota e crise.
+    São gerados por síntese e são de domínio público (CC0).
+- **Combate:** as ações dos heróis e dos robôs (`audio/combat`) vêm da referência Unreal, por
+  `tools/sync_combat_art.py`; a origem e a licença de cada um não estão registradas lá. Pendente: levantar na pasta da
+  Unreal (`SourceArt/Audio`).
 
 ## Referência Unreal
 

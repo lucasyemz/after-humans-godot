@@ -18,6 +18,9 @@ const HEIGHT := 3.4
 const WALL_HEIGHT := 3.2
 const DOOR_Z := Vector2(-1.4, 0.4)
 const SPOT_FRACTIONS := [0.36, 0.56, 0.74]
+## A frente dos objetos de busca (#50): na frente dos móveis pintados no fundo, atrás de onde a equipe anda (a colisão
+## deles vai daqui até a parede).
+const SEARCH_PROP_Z := -2.2
 const GUARD_FRACTION := 0.66
 const ENTRANCE_FRACTION := 0.3
 ## Item da parede que começa abaixo disto (m) está apoiado no chão e ganha colisão, com esta profundidade a partir da parede.
@@ -35,6 +38,8 @@ var shop := 0
 var debug_colliders: Array[MeshInstance3D] = []
 var debug_material: Material
 var spot_xs: Array[float] = []
+## O objeto de cada ponto de busca (#50), fechado ou aberto.
+var search_props: Array[AHSearchProp] = []
 var guard_x := 0.0
 var entrance_x := 0.0
 var exit_x := 0.0
@@ -44,8 +49,9 @@ var _fire_light: OmniLight3D
 var _lamp: OmniLight3D
 
 
-## Monta a sala com a origem (canto esquerdo do fundo) em origin_x. spots: quantos pontos de busca a casa tem.
-func build(shop_index: int, origin_x: float, spots: int, camp: bool) -> void:
+## Monta a sala com a origem (canto esquerdo do fundo) em origin_x. spots: quantos pontos de busca a casa tem;
+## searched: quais já foram vasculhados (o objeto deles aparece aberto).
+func build(shop_index: int, origin_x: float, spots: int, camp: bool, searched: Array = []) -> void:
 	shop = clampi(shop_index, 0, 2)
 	position = Vector3(origin_x, 0, 0)
 	var art: String = SHOP_ART[shop]
@@ -57,6 +63,7 @@ func build(shop_index: int, origin_x: float, spots: int, camp: bool) -> void:
 			_wall_item(art, item[1], item[2] * 0.01, item[3] * 0.01, item[4] * 0.01)
 	for i in mini(spots, 3):
 		spot_xs.append(origin_x + WIDTH * SPOT_FRACTIONS[i])
+		_search_prop(i, i < searched.size() and searched[i])
 	guard_x = origin_x + WIDTH * GUARD_FRACTION
 	entrance_x = origin_x + WIDTH * ENTRANCE_FRACTION
 	exit_x = origin_x + 1.3
@@ -66,7 +73,9 @@ func build(shop_index: int, origin_x: float, spots: int, camp: bool) -> void:
 	_lamp.light_color = Color(1.0, 0.82, 0.6)
 	_lamp.light_energy = 2.4
 	_lamp.omni_range = 11.0
-	_lamp.shadow_enabled = true
+	# A sombra das luzes da casa segue a qualidade, como a das luminárias (#37).
+	_lamp.add_to_group(Settings.SHADOW_LAMPS)
+	_lamp.shadow_enabled = Settings.effects().lamp_shadows
 	add_child(_lamp)
 	if camp:
 		_campfire()
@@ -103,6 +112,19 @@ func _solid(center: Vector3, size: Vector3) -> void:
 	body.add_child(debug)
 	debug_colliders.append(debug)
 	add_child(body)
+
+
+## O objeto do ponto i, com a frente em SEARCH_PROP_Z. A colisão vai da frente dele até a parede do fundo: a equipe
+## vasculha pela frente e não passa por trás (sumia atrás do objeto).
+func _search_prop(i: int, open: bool) -> void:
+	var prop := AHSearchProp.new().setup(AHSearchProp.shop_prop(shop, i), open)
+	prop.position = Vector3(WIDTH * SPOT_FRACTIONS[i], 0, SEARCH_PROP_Z - float(prop.spec.depth_m) * 0.5)
+	add_child(prop)
+	search_props.append(prop)
+	var box := prop.volume()
+	var back := Vector3(box.position.x, 0, BACK_Z)
+	var front := Vector3(box.end.x, box.size.y, SEARCH_PROP_Z)
+	_solid((back + front) * 0.5, front - back)
 
 
 static func _tone(color: Color) -> StandardMaterial3D:
@@ -221,7 +243,8 @@ func _campfire() -> void:
 	_fire_light.position = Vector3(camp_x - position.x, 0.8, 0.6)
 	_fire_light.light_color = Color(1.0, 0.6, 0.3)
 	_fire_light.omni_range = 6.5
-	_fire_light.shadow_enabled = true
+	_fire_light.add_to_group(Settings.SHADOW_LAMPS)
+	_fire_light.shadow_enabled = Settings.effects().lamp_shadows
 	_fire_light.visible = false
 	add_child(_fire_light)
 

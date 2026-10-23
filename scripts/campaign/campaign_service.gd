@@ -4,6 +4,11 @@
 ## formato, versão e um SHA-256 do estado. A gravação vai primeiro para um .tmp e só depois substitui o arquivo, para uma
 ## queda no meio não estragar o save. Ao abrir: o principal; se ele não servir, a cópia; se nenhum servir, uma campanha
 ## nova, que só é gravada quando o jogo começa (os arquivos antigos ficam como estão).
+##
+## Três espaços de campanha (#34), cada um com o próprio principal e a própria cópia: o 1 é o save de sempre
+## (campaign.json, então o save de antes das vagas já é o espaço 1, sem mover nada) e o 2 e o 3 são campaign_2.json e
+## campaign_3.json. slots.json guarda o último espaço usado, que o Continuar abre. Um espaço estragado não mexe nos
+## outros.
 extends Node
 
 signal changed
@@ -13,12 +18,18 @@ const FORMAT := "after-humans-campaign"
 const VERSION := 1
 const PRIMARY := "campaign.json"
 const BACKUP := "campaign.backup.json"
+const SLOTS_FILE := "slots.json"
+const SLOT_COUNT := 3
+## As cenas em que o tempo jogado conta (o título e a troca de cena, não).
+const PLAY_SCENES := ["station", "street"]
 ## Ordem dos fundadores na formação (FounderFormation na Unreal).
 const FOUNDERS := ["cao", "gato", "sapo", "coruja"]
 const ACCENTS := {"á": "a", "à": "a", "â": "a", "ã": "a", "é": "e", "ê": "e", "í": "i", "ó": "o", "ô": "o", "õ": "o", "ú": "u", "ç": "c"}
 
 ## Pasta dos saves; os testes trocam por uma pasta temporária.
 var save_dir := "user://saves"
+## O espaço de campanha em uso (1 a SLOT_COUNT).
+var slot := 1
 var state := {}
 ## De onde veio o estado atual: "new", "primary" ou "backup".
 var source := "new"
@@ -26,8 +37,67 @@ var source := "new"
 var load_warning := ""
 
 
+## O tempo jogado ainda não somado ao estado (segundos de relógio, sem a escala de tempo).
+var _play_seconds := 0.0
+var _last_tick := 0
+## De quem é esse tempo: o estado e o arquivo do último save ou da última abertura. Só ele ganha o tempo; um estado
+## trocado por fora (os testes, as capturas) não conta nem grava nada no fechamento.
+var _play_state = null
+var _play_path := ""
+## Ao fechar o jogo, grava só o tempo jogado desde o último save no arquivo do espaço (#34). Os testes desligam.
+var save_time_on_quit := true
+var _quit_saved := false
+
+
 func _ready() -> void:
+	slot = last_slot()
 	load_or_new()
+
+
+## O tempo jogado anda só nas cenas de jogo, em segundos de relógio (a pausa do acerto e o teste acelerado não contam).
+func _process(_delta: float) -> void:
+	var now := Time.get_ticks_msec()
+	var step := (now - _last_tick) * 0.001 if _last_tick > 0 else 0.0
+	_last_tick = now
+	var flow := get_node_or_null("/root/GameFlow")
+	if flow != null and PLAY_SCENES.has(flow.current_id) and not flow.busy and not get_tree().paused and is_same(state, _play_state):
+		_play_seconds += minf(step, 1.0)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_EXIT_TREE:
+		save_play_time()
+
+
+## O tempo jogado desde o último save vai para o arquivo do espaço, sem gravar o resto do estado (quem fecha no meio de
+## uma luta volta para onde o último save deixou, como antes; só o relógio não se perde). Uma vez só por execução.
+func save_play_time() -> bool:
+	var whole := floori(_play_seconds)
+	if _quit_saved or not save_time_on_quit or whole <= 0 or not is_same(state, _play_state) or _play_path != primary_path():
+		return false
+	var campaign = read_file(primary_path())
+	if campaign == null:
+		return false
+	_quit_saved = true
+	campaign.played_seconds = int(campaign.get("played_seconds", 0)) + whole
+	state.played_seconds = int(state.get("played_seconds", 0)) + whole
+	_play_seconds -= whole
+	# A data continua a do último save de progresso (a lista dos espaços mostra essa).
+	var text := _envelope(campaign, _saved_at(primary_path()))
+	return _write_atomic(primary_path(), text) and _write_atomic(backup_path(), text)
+
+
+func _own_play_time() -> void:
+	_play_state = state
+	_play_path = primary_path()
+
+
+## Soma ao estado o tempo jogado desde o último save.
+func _flush_play_time() -> void:
+	var whole := floori(_play_seconds)
+	if whole > 0 and not state.is_empty():
+		state.played_seconds = int(state.get("played_seconds", 0)) + whole
+		_play_seconds -= whole
 
 
 # ---------------------------------------------------------------- campanha nova
@@ -94,6 +164,8 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		# Estação (cômodos, civis, economia), noite da volta e fila de voluntários: AHStationRules.init_new_campaign.
 		"station": {},
 		"session": {"screen": "shelter", "expedition": null},
+		# Tempo jogado em segundos (o resumo do espaço de campanha, #34).
+		"played_seconds": 0,
 	}
 	var initial := GameData.table("initial_heroes")
 	for class_id in FOUNDERS:
@@ -119,6 +191,8 @@ func new_game(seed_value: int = -1) -> bool:
 	state = create_initial(seed_value)
 	source = "new"
 	load_warning = ""
+	# O tempo jogado desde o último save é da campanha de antes, não da nova.
+	_play_seconds = 0.0
 	changed.emit()
 	return save()
 
@@ -146,11 +220,88 @@ func hero(hero_id: String):
 # ---------------------------------------------------------------- gravar e abrir
 
 func primary_path() -> String:
-	return save_dir.path_join(PRIMARY)
+	return slot_path(slot)
 
 
 func backup_path() -> String:
-	return save_dir.path_join(BACKUP)
+	return slot_path(slot, true)
+
+
+## O arquivo de um espaço: o 1 é o de sempre (campaign.json); os outros, campaign_<n>.json.
+func slot_path(number: int, backup: bool = false) -> String:
+	var base := (BACKUP if backup else PRIMARY) if number == 1 else ("campaign_%d%s.json" % [number, ".backup" if backup else ""])
+	return save_dir.path_join(base)
+
+
+## O último espaço usado (slots.json); 1 sem o arquivo ou com ele estragado.
+func last_slot() -> int:
+	var path := save_dir.path_join(SLOTS_FILE)
+	if not FileAccess.file_exists(path):
+		return 1
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(path)) != OK or typeof(json.data) != TYPE_DICTIONARY:
+		return 1
+	var last = json.data.get("last", 1)
+	if typeof(last) != TYPE_INT and typeof(last) != TYPE_FLOAT:
+		return 1
+	var number := int(last)
+	return number if number >= 1 and number <= SLOT_COUNT else 1
+
+
+func _remember_slot() -> bool:
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(save_dir))
+	return _write_atomic(save_dir.path_join(SLOTS_FILE), JSON.stringify({"last": slot}))
+
+
+## Há algum arquivo no espaço (mesmo um que não abre): sobrescrever pede confirmação.
+func slot_has_save(number: int) -> bool:
+	return FileAccess.file_exists(slot_path(number)) or FileAccess.file_exists(slot_path(number, true))
+
+
+## O resumo de um espaço para a tela de campanhas: status "empty", "broken" (há arquivo, nenhum abre) ou "ok", com o
+## ciclo, as fases concluídas, o elenco vivo, a data do último save (unix, 0 sem data) e o tempo jogado.
+func slot_summary(number: int) -> Dictionary:
+	var summary := {"slot": number, "status": "empty"}
+	if not slot_has_save(number):
+		return summary
+	var path := slot_path(number)
+	var campaign = read_file(path)
+	if campaign == null:
+		path = slot_path(number, true)
+		campaign = read_file(path)
+	if campaign == null:
+		summary.status = "broken"
+		return summary
+	var roster: Array = campaign.get("roster", [])
+	summary.merge({"status": "ok", "recovered": path == slot_path(number, true),
+		"cycle": int(campaign.get("station", {}).get("cycle_number", 0)),
+		"phases": campaign.get("completed_phases", []).size(),
+		"alive": roster.filter(func(h): return h.get("alive", true)).size(), "roster": roster.size(),
+		"played_seconds": int(campaign.get("played_seconds", 0)), "saved_at": _saved_at(path),
+		"in_expedition": campaign.get("session", {}).get("expedition") != null and campaign.get("session", {}).get("result", "") == ""}, true)
+	return summary
+
+
+## A hora do save: a do envelope (saves novos) ou a do arquivo.
+static func _saved_at(path: String) -> int:
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(path)) == OK and typeof(json.data) == TYPE_DICTIONARY and json.data.has("saved_at"):
+		return int(json.data.saved_at)
+	return int(FileAccess.get_modified_time(path))
+
+
+## Passa a usar o espaço e abre a campanha dele (Continuar de outro espaço). Devolve a origem, como load_or_new.
+func use_slot(number: int) -> String:
+	slot = clampi(number, 1, SLOT_COUNT)
+	_remember_slot()
+	return load_or_new()
+
+
+## Campanha nova no espaço (sobrescreve o que houver nele) e grava. Os outros espaços ficam como estão.
+func new_game_in(number: int, seed_value: int = -1) -> bool:
+	slot = clampi(number, 1, SLOT_COUNT)
+	_remember_slot()
+	return new_game(seed_value)
 
 
 func has_save() -> bool:
@@ -167,8 +318,11 @@ static func _checksum(campaign: Dictionary) -> String:
 	return JSON.stringify(_normalize(campaign), "", true).sha256_text()
 
 
-static func _envelope(campaign: Dictionary) -> String:
-	return JSON.stringify({"format": FORMAT, "version": VERSION, "checksum": _checksum(campaign), "campaign": campaign}, "\t", true)
+## saved_at: a data do save (a lista dos espaços mostra); sem ela, agora.
+static func _envelope(campaign: Dictionary, saved_at: int = -1) -> String:
+	return JSON.stringify({"format": FORMAT, "version": VERSION, "checksum": _checksum(campaign),
+		"saved_at": saved_at if saved_at >= 0 else int(Time.get_unix_time_from_system()),
+		"campaign": campaign}, "\t", true)
 
 
 ## Grava o principal e depois a cópia. Recusa uma campanha inválida sem tocar nos arquivos.
@@ -178,8 +332,11 @@ func save() -> bool:
 		saved.emit(false)
 		return false
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(save_dir))
+	_flush_play_time()
 	var text := _envelope(state)
 	var ok := _write_atomic(primary_path(), text) and _write_atomic(backup_path(), text)
+	if ok:
+		_own_play_time()
 	if not ok:
 		push_error("Falha ao salvar a campanha em %s." % save_dir)
 	saved.emit(ok)
@@ -249,10 +406,20 @@ func load_or_new() -> String:
 	if campaign == null:
 		campaign = create_initial()
 		source = "new"
-		if has_save():
+		var other := range(1, SLOT_COUNT + 1).filter(func(n): return n != slot and slot_summary(n).status == "ok")
+		if has_save() and not other.is_empty():
+			# Só este espaço falhou: o aviso diz qual e onde estão as outras campanhas.
+			load_warning = "O save do espaço %d não pôde ser aberto (o arquivo foi preservado). As outras campanhas estão em Campanhas." % slot
+		elif has_save():
 			load_warning = "Nenhum salvamento válido foi encontrado. Os dados anteriores foram preservados; um novo jogo só será salvo ao começar."
+	# Saves anteriores às vagas não têm o tempo jogado (#34): começa em 0.
+	if not campaign.has("played_seconds"):
+		campaign.played_seconds = 0
+	_play_seconds = 0.0
+	_quit_saved = false
 	# Saves anteriores à Estação ganham os cômodos, a noite e os civis (idempotente).
 	AHStationRules.migrate(campaign)
 	state = campaign
+	_own_play_time()
 	changed.emit()
 	return source

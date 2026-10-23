@@ -10,6 +10,10 @@ const ART_MANIFEST := "res://data/presentation/combat_art.json"
 const HERO_GAP := 1.2
 const ENEMY_GAP := 1.35
 const FRONT_GAP := 1.0
+## O menor encolhimento dos espaços da fila num lugar apertado (abaixo disso os personagens se sobrepõem demais).
+const MIN_GAP_SCALE := 0.6
+## A fila vai até a posição 4 dos dois lados (Mover, Recuar e o empurrão param nela).
+const RANKS := 4
 const HERO_Z := -0.55
 const ENEMY_Z := -0.8
 ## Habilidades a distância (AHArenaBeat::IsRanged): avançam só um passo, sem ir até o alvo.
@@ -29,6 +33,22 @@ const CLOSE_DISTANCE := 0.86
 const FRAME_MARGIN := 0.84
 ## Quem age passa na frente dos outros (BringAttackerToFront): um pouco mais perto da câmera.
 const FRONT_LIFT := 0.35
+## Impacto do acerto (#33): a pausa curta (o tempo quase para; mais longa no crítico), o tremor da câmera em pixels da
+## tela de 1080 (pelo dano em relação à vida do alvo; o crítico treme mais), quanto ele dura e o clarão branco no alvo
+## antes da cor do dano. O número do crítico sai maior. Tudo se divide pela velocidade da luta; o tremor e o clarão
+## saem com "Reduzir efeitos" e o modo automático (QA e captura) pula a pausa.
+const HITSTOP_SECONDS := 0.07
+const HITSTOP_CRIT_SECONDS := 0.09
+const HITSTOP_TIME_SCALE := 0.03
+const SHAKE_MIN_PIXELS := 4.0
+const SHAKE_MAX_PIXELS := 14.0
+const SHAKE_CRIT := 1.4
+const SHAKE_SECONDS := 0.3
+const FLASH_SECONDS := 0.07
+const CRIT_TEXT_SIZE := 88
+## A música abaixa (dB) na crise de instinto e no golpe crítico (#36).
+const CRISIS_DUCK_DB := 9.0
+const CRIT_DUCK_DB := 5.0
 ## Sons das ações dos heróis: classe -> prefixo da deixa (AHCombatAudioRules).
 const HERO_CUES := {"cao": "BentoAction", "gato": "NickAction", "sapo": "IrisAction", "coruja": "VesperaAction"}
 
@@ -39,6 +59,8 @@ var art := {}
 var auto_battle := false
 var speed := 1.0
 var center_x := 0.0
+## O quanto os espaços da fila encolhem para a luta caber no lugar (#52): 1 = os de sempre.
+var gap_scale := 1.0
 var active := false
 var cards := {}
 ## Câmera da luta: o centro e a distância que enquadram todos, e o foco do golpe da vez (close_t 0..1 vai até ele).
@@ -49,6 +71,22 @@ var close_t := 0.0
 var _street: Node3D
 var _audio: Array[AudioStreamPlayer] = []
 var _audio_next := 0
+## O tremor da câmera: a força em pixels, o tempo que falta (s, já na velocidade da luta) e a fase do balanço.
+var _shake_pixels := 0.0
+var _shake_left := 0.0
+var _shake_time := 0.0
+## A escala de tempo de antes da pausa do acerto (para devolver), ou -1 fora dela.
+var _hitstop_scale := -1.0
+
+
+func _process(delta: float) -> void:
+	if _shake_left > 0.0:
+		_shake_left = maxf(0.0, _shake_left - delta * speed)
+		_shake_time += delta * speed
+
+
+func _exit_tree() -> void:
+	_end_hitstop()
 
 
 func setup(street: Node3D) -> void:
@@ -199,11 +237,22 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 	if speed <= 2.0:
 		speed = float(clampi(int(Campaign.state.get("settings", {}).get("battle_speed", 1)), 1, 2))
 	center_x = at_x
+	gap_scale = 1.0
+	if _street != null and _street.has_method("combat_room"):
+		var room: Dictionary = _street.combat_room(at_x)
+		var placed := fit(at_x, room.bounds, room.obstacles)
+		center_x = placed.x
+		gap_scale = placed.y
 	cards.clear()
 	for index in session.state.player_team.size():
 		cards[session.state.player_team[index].id] = hero_cards[index]
 	for index in session.state.enemy_team.size():
 		cards[session.state.enemy_team[index].id] = enemy_cards[index]
+	# Os inimigos ganham a silhueta enquanto a luta dura (#51); a equipe já tem a dela.
+	var occlusion = _street.get("occlusion") if _street != null else null
+	if occlusion != null:
+		for card in enemy_cards:
+			occlusion.track_enemy(card)
 	active = true
 	for unit in session.units():
 		rest_pose(unit)
@@ -242,6 +291,47 @@ func camera_view() -> Vector2:
 	return Vector2(lerpf(view_x, focus_x, CLOSE_FOCUS * close_t), view_distance * lerpf(1.0, CLOSE_DISTANCE, close_t))
 
 
+## Onde a luta cabe (#52): a fila dos heróis à esquerda do centro e a dos inimigos à direita, inteiras dentro de
+## bounds (x mínimo e máximo, já com a folga da borda) e fora dos obstáculos (faixas em x [início, fim] que cruzam a
+## linha da luta). Reserva as RANKS posições de cada lado, não só as ocupadas: quem recua para a posição vazia e o
+## chefe de duas posições (que empurra os outros para a 3 e a 4) continuam dentro. Entre os vãos onde a fila cabe,
+## fica no que deixa o centro mais perto de at_x; se não cabe em nenhum, no maior, com os espaços encolhidos até
+## MIN_GAP_SCALE. Devolve (centro, escala dos espaços).
+static func fit(at_x: float, bounds: Vector2, obstacles: Array) -> Vector2:
+	var left: float = FRONT_GAP + (RANKS - 1) * HERO_GAP
+	var right: float = FRONT_GAP + (RANKS - 1) * ENEMY_GAP
+	var cuts: Array = obstacles.duplicate()
+	cuts.sort_custom(func(a, b): return a.x < b.x)
+	var spans: Array = []
+	var start := bounds.x
+	for cut in cuts:
+		if cut.y <= start or cut.x >= bounds.y:
+			continue
+		if cut.x > start:
+			spans.append(Vector2(start, cut.x))
+		start = maxf(start, cut.y)
+	if start < bounds.y:
+		spans.append(Vector2(start, bounds.y))
+	if spans.is_empty():
+		return Vector2(clampf(at_x, bounds.x, bounds.y), MIN_GAP_SCALE)
+	var best := INF
+	var center := at_x
+	var widest: Vector2 = spans[0]
+	for span: Vector2 in spans:
+		if span.y - span.x > widest.y - widest.x:
+			widest = span
+		if span.y - span.x < left + right:
+			continue
+		var here := clampf(at_x, span.x + left, span.y - right)
+		if absf(here - at_x) < best:
+			best = absf(here - at_x)
+			center = here
+	if best < INF:
+		return Vector2(center, 1.0)
+	var scale := maxf((widest.y - widest.x) / (left + right), MIN_GAP_SCALE)
+	return Vector2(widest.x + left * scale, scale)
+
+
 func slot_position(unit: AHCombat.Unit) -> Vector3:
 	var rank := maxi(unit.rank, 1)
 	# Na rua a luta fica na calçada (HERO_Z, ENEMY_Z); nos cenários, na faixa da zona (um pouco atrás do meio dela).
@@ -251,8 +341,8 @@ func slot_position(unit: AHCombat.Unit) -> Vector3:
 		hero_z = _street.lane_z - 0.3
 		enemy_z = hero_z - 0.25
 	if unit.is_player:
-		return Vector3(center_x - FRONT_GAP - (rank - 1) * HERO_GAP, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
-	return Vector3(center_x + FRONT_GAP + (rank - 1) * ENEMY_GAP, _street.call("_ground_height", enemy_z), enemy_z - 0.03 * rank)
+		return Vector3(center_x - (FRONT_GAP + (rank - 1) * HERO_GAP) * gap_scale, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
+	return Vector3(center_x + (FRONT_GAP + (rank - 1) * ENEMY_GAP) * gap_scale, _street.call("_ground_height", enemy_z), enemy_z - 0.03 * rank)
 
 
 ## Leva cada unidade de pé para a posição dela (depois de trocas, empurrões e mortes).
@@ -318,6 +408,10 @@ func _run() -> void:
 	session.write_back(Campaign.state)
 	await hud.show_result(result, auto_battle)
 	hud.close()
+	var occlusion = _street.get("occlusion") if _street != null else null
+	if occlusion != null:
+		for unit in session.state.enemy_team:
+			occlusion.untrack(cards[unit.id])
 	active = false
 	finished.emit(result)
 
@@ -390,6 +484,9 @@ func _play_crisis(unit: AHCombat.Unit, text: String) -> void:
 	show_pose(unit, "support" if breakthrough else "hurt")
 	card.flash(Color(1.0, 0.85, 0.35) if breakthrough else Color(0.9, 0.2, 0.25), 0.6)
 	hud.show_crisis(text, breakthrough)
+	# A crise tem o som dela e a música abaixa enquanto ela dura (#36).
+	Sound.play("res://audio/combat/crisis.ogg", 0.9)
+	Sound.duck(CRISIS_DUCK_DB, 1.65 / speed)
 	focus_x = card.position.x
 	var tween := create_tween()
 	tween.tween_property(self, "close_t", 1.0, 0.3 / speed)
@@ -497,9 +594,16 @@ func _event_targets(events: Array) -> Array:
 	return ids
 
 
-## Números e reações de cada evento, no alvo.
+## Números e reações de cada evento, no alvo. Num golpe (contact_x), o acerto mais forte dá a pausa e o tremor.
 func _show_events(events: Array, contact_x = null) -> void:
 	var stagger := {}
+	var crits := {}
+	for event in events:
+		# Só o crítico sorteado: a SOBRECARGA DO PORTEIRO (troca de fase) também é CRIT e não é golpe crítico.
+		if event.type == AHCombat.EventType.CRIT and event.critical_roll:
+			crits[event.target_unit_id] = true
+	var strongest := -1.0
+	var crit_hit := false
 	for event in events:
 		var unit := session.state.find_unit(event.target_unit_id)
 		var card: AHSpriteCard = cards.get(event.target_unit_id)
@@ -509,11 +613,14 @@ func _show_events(events: Array, contact_x = null) -> void:
 		stagger[unit.id] = lift + 0.32
 		match event.type:
 			AHCombat.EventType.DAMAGE:
-				_float_text(card, event.text, Color(1.0, 0.35, 0.3), 1.0 + lift, 64)
-				card.flash(Color(1.0, 0.15, 0.1))
-				if unit.hp > 0:
-					show_pose(unit, "hurt")
-				_recoil(card, contact_x, 0.11)
+				var crit: bool = crits.has(unit.id)
+				_float_text(card, event.text, Color(1.0, 0.55, 0.2) if crit else Color(1.0, 0.35, 0.3), 1.0 + lift, CRIT_TEXT_SIZE if crit else 64)
+				card.flash(Color(1.0, 0.15, 0.1), 0.35 / speed, 0.0 if reduced_effects() else FLASH_SECONDS / speed)
+				# Quem cai também sente o golpe (a dor e um empurrão maior) antes da pose de queda, no _settle.
+				show_pose(unit, "hurt")
+				_recoil(card, contact_x, 0.11 if unit.hp > 0 else 0.17)
+				strongest = maxf(strongest, float(event.amount) / maxf(1.0, float(unit.max_hp)) + (1.0 if unit.hp <= 0 else 0.0))
+				crit_hit = crit_hit or crit
 			AHCombat.EventType.HEAL:
 				_float_text(card, event.text, Color(0.45, 1.0, 0.55), 1.0 + lift, 56)
 				card.flash(Color(0.2, 0.9, 0.3))
@@ -539,7 +646,52 @@ func _show_events(events: Array, contact_x = null) -> void:
 				_float_text(card, event.text, Color(0.95, 0.92, 0.85), 0.9 + lift, 38)
 	if not events.is_empty():
 		hud.refresh()
+		if contact_x != null and strongest >= 0.0:
+			_shake(strongest, crit_hit)
+			if crit_hit:
+				Sound.duck(CRIT_DUCK_DB, 0.35 / speed)
+			await _hitstop(HITSTOP_CRIT_SECONDS if crit_hit else HITSTOP_SECONDS)
 		await _wait(0.55)
+
+
+func reduced_effects() -> bool:
+	return bool(Campaign.state.get("settings", {}).get("reduced_environment_effects", false))
+
+
+## O tremor do acerto: de SHAKE_MIN a SHAKE_MAX pixels conforme o dano tira da vida do alvo (meia vida ou a queda dão o
+## máximo), mais forte no crítico.
+func _shake(strength: float, crit: bool) -> void:
+	if reduced_effects():
+		return
+	_shake_pixels = minf(lerpf(SHAKE_MIN_PIXELS, SHAKE_MAX_PIXELS, clampf(strength * 2.0, 0.0, 1.0)) * (SHAKE_CRIT if crit else 1.0),
+		SHAKE_MAX_PIXELS * SHAKE_CRIT)
+	_shake_left = SHAKE_SECONDS
+	_shake_time = 0.0
+
+
+## O deslocamento da câmera agora, em pixels da tela de 1080 (a rua converte para a distância da câmera).
+func camera_shake() -> Vector2:
+	if _shake_left <= 0.0 or reduced_effects():
+		return Vector2.ZERO
+	var fade := _shake_left / SHAKE_SECONDS
+	var amplitude := _shake_pixels * fade * fade
+	return Vector2(sin(_shake_time * 71.0), sin(_shake_time * 97.0 + 1.3)) * amplitude
+
+
+## A pausa do acerto: o tempo quase para (os números, o empurrão e o clarão congelam) e volta.
+func _hitstop(seconds: float) -> void:
+	if auto_battle or _hitstop_scale >= 0.0:
+		return
+	_hitstop_scale = Engine.time_scale
+	Engine.time_scale = _hitstop_scale * HITSTOP_TIME_SCALE
+	await get_tree().create_timer(seconds / speed, true, false, true).timeout
+	_end_hitstop()
+
+
+func _end_hitstop() -> void:
+	if _hitstop_scale >= 0.0:
+		Engine.time_scale = _hitstop_scale
+		_hitstop_scale = -1.0
 
 
 ## Depois do lance: mortos caem (inimigos somem), todos voltam à pose de descanso e às posições.

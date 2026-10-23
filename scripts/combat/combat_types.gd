@@ -15,6 +15,8 @@ class Event:
 	var ability_id := ""
 	var amount := 0
 	var turn_skipped_stun := false
+	## O CRIT do golpe crítico sorteado (não a troca de fase do chefe, que também é CRIT): a tela do impacto (#33).
+	var critical_roll := false
 
 
 class Tokens:

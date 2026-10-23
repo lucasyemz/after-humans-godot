@@ -18,6 +18,29 @@ func run(t) -> void:
 		t.check(station != null, "a Estação abriu (visita %d)" % (visit + 1))
 		counts.append(Settings.changed.get_connections().size())
 	t.check(counts[0] == counts[1] and counts[1] == counts[2], "abrir a Estação de novo não soma conexões nas opções (%s)" % [counts])
+	# O relatório vazio abre e fecha no mesmo quadro: nem o som de abrir nem o de fechar (#36); um painel de verdade tem os dois.
+	var opened = await _open(tree)
+	if opened != null:
+		Campaign.state.station.last_return = {}
+		var before: int = Sound._next_effect
+		opened.hud.open_service("report")
+		await tree.process_frame
+		t.check(opened.hud.current == "" and Sound._next_effect == before, "o relatório vazio não abre nem faz som")
+		opened.hud.open_room(S.PREPARATION)
+		await tree.process_frame
+		t.check(_last_sound() == "res://audio/ui/panel_open.ogg", "um painel de verdade toca o de abrir")
+		opened.hud.close_panel()
+		t.check(_last_sound() == "res://audio/ui/panel_close.ogg", "e o de fechar")
+		# Abrir, fechar e abrir no mesmo quadro: um som de abrir só (QA da #36).
+		await tree.process_frame
+		before = Sound._next_effect
+		opened.hud.open_room(S.PREPARATION)
+		opened.hud.close_panel()
+		opened.hud.open_room(S.PREPARATION)
+		await tree.process_frame
+		t.check(Sound._next_effect == (before + 1) % Sound._effects.size() and _last_sound() == "res://audio/ui/panel_open.ogg",
+			"abrir, fechar e abrir no mesmo quadro toca o de abrir uma vez")
+		opened.hud.close_panel()
 	# A noite pendente: quem dorme deita; refeitos os passeios (o trem), continua deitado.
 	var c: Dictionary = Campaign.state
 	S.confirm_departure(c, c.preferred_formation.duplicate(), 0, 555, "fase_1")
@@ -74,3 +97,8 @@ func _open(tree: SceneTree):
 			await tree.process_frame
 			return scene
 	return null
+
+
+func _last_sound() -> String:
+	var player: AudioStreamPlayer = Sound._effects[(Sound._next_effect - 1 + Sound._effects.size()) % Sound._effects.size()]
+	return player.stream.resource_path if player.stream != null else ""
