@@ -598,17 +598,12 @@ func _build_party() -> void:
 
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
 func _place_leader(at: Vector3, facing: float = 1.0) -> void:
-	# Longe o bastante da ponta para a fila caber atrás dele (na ponta, os seguidores se empilhavam na borda).
-	var span := PARTY_SPACING * maxi(_heroes.size() - 1, 0)
-	if facing > 0.0:
-		at.x = minf(maxf(at.x, walk_min.x + span), walk_max.x)
-	else:
-		at.x = maxf(minf(at.x, walk_max.x - span), walk_min.x)
 	at = _free_spot(at)
 	_leader.position = at
 	_trail.clear()
 	# O rastro (onde os seguidores ficam) não sai da área de andar: na chegada a um cenário eles nasciam atrás da parede
-	# ou da escada (e apareciam em silhueta, #51).
+	# ou da escada (e apareciam em silhueta, #51). Perto da ponta ele fica curto e a fila se aperta nele (_place_party);
+	# o líder fica onde foi posto (mais à frente ele caía no alcance da primeira patrulha).
 	for step in 80:
 		_trail.append((at - Vector3(facing * 0.06 * step, 0, 0)).clamp(walk_min, walk_max))
 	for index in _heroes.size():
@@ -668,9 +663,17 @@ func _ground_height(z: float) -> float:
 func _place_party(delta: float) -> void:
 	if _arena != null and _arena.active:
 		return
+	# A fila cabe no rastro que existe: perto da ponta da área (na chegada) os espaços encolhem e abrem de novo quando
+	# o líder anda.
+	var spacing := PARTY_SPACING
+	if _heroes.size() > 1:
+		var length := 0.0
+		for i in range(1, _trail.size()):
+			length += _trail[i - 1].distance_to(_trail[i])
+		spacing = PARTY_SPACING * clampf(length / (PARTY_SPACING * (_heroes.size() - 1)), 0.15, 1.0)
 	for index in _heroes.size():
 		var card := _heroes[index]
-		var target := _leader.position if index == 0 else _trail_point(PARTY_SPACING * index)
+		var target := _leader.position if index == 0 else _trail_point(spacing * index)
 		# A posição suavizada não inclui o recuo de desenho (0,02 por herói): somado de novo a cada quadro, ele
 		# acumulava até ~0,25 m por herói a 120 fps e levava os últimos para dentro da parede do fundo das lojas.
 		var previous := card.position + Vector3(0, 0, PARTY_DEPTH_STEP * index)

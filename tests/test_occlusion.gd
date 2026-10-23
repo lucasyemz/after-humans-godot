@@ -177,12 +177,19 @@ func _scenario() -> void:
 	t.check(street.scenario != null and street.occlusion._occluders.size() > 20, "o cenário registra o que pode tapar (%d)" % street.occlusion._occluders.size())
 	t.check(street.occlusion._occluders.all(func(o): return is_instance_valid(o.node)), "nenhuma peça juntada fica registrada")
 	# Na chegada, os seguidores ficam na área de andar (antes nasciam atrás da parede e viravam silhuetas).
-	street._place_leader(Vector3(street.walk_min.x + 0.2, street.floor_y, street.lane_z))
+	var start: Vector3 = Vector3(street.walk_min.x + 0.6, street.floor_y, street.lane_z)
+	street._place_leader(start)
 	await _tree.process_frame
+	t.check(absf(street._leader.position.x - start.x) < 0.01, "o líder fica onde foi posto (mais à frente ele caía no alcance da patrulha)")
 	t.check(street._heroes.all(func(c): return c.position.x >= street.walk_min.x - 0.01 and c.position.x <= street.walk_max.x + 0.01),
 		"na ponta da zona, a equipe toda fica dentro da área de andar")
-	var xs: Array = street._heroes.map(func(c): return snappedf(c.position.x, 0.1))
-	t.check(xs.size() == street._heroes.size() and xs.all(func(x): return xs.count(x) == 1), "em fila, sem ninguém empilhado %s" % [xs])
+	var spots: Array = street._heroes.map(func(c): return Vector2(c.position.x, c.position.z))
+	var apart := true
+	for i in spots.size():
+		for j in range(i + 1, spots.size()):
+			if spots[i].distance_to(spots[j]) < 0.15:
+				apart = false
+	t.check(apart, "em fila, sem ninguém empilhado %s" % [spots])
 	# No Depósito a borda do piso da frente é alta: o pé sem silhueta vai até ela.
 	var edge: float = street.scenario.front_edge(street.scenario.zone_at(street._leader.position.x), street.lane_z)
 	t.check(street._heroes.all(func(c): return c.silhouette_foot >= maxf(AHSpriteCard.SILHOUETTE_FOOT, edge)), "o corte do pé cobre a borda da zona (%.2f m)" % edge)
