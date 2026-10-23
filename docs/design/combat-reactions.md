@@ -1,28 +1,48 @@
 # Reações da Íris e da Véspera — #13
 
-> Estado após consulta ao acervo Unreal: proposta para revisão, ainda não liberada para integração das quedas. A aprovação da rodada 2 abaixo foi anterior à descoberta da direção de derrota ajoelhada. Ver a rodada 3 e [a revisão do acervo](unreal-art-review.md).
+Entrega de 23/10/2026: **quedas ajoelhadas e compactas**, conforme [decisão do Lucas](https://github.com/lucasyemz/after-humans-godot/issues/13#issuecomment-6348095794). QA de design: **APROVADO na rodada 2 desta revisão**. Integração e captura final na arena: Claude, #16.
 
-![Dano e queda](reactions_preview.png)
+![Idle, dano e queda, mesma escala física](reactions_kneeling_comparison.jpg)
 
-Quatro poses novas, comparadas aos idles atuais. Dano de frente para direita, corpo recuando; queda de cabeça à esquerda e pés à direita. Sem sangue. Equipamento e cores da Íris/Véspera preservados. Nenhum arquivo existente foi substituído. Esquiva e defesa eram opcionais e não fazem parte desta entrega.
+Prancha de design, não captura do jogo. Escala comum de 340 px/m; pivôs separados por 408 px dentro de cada par (1,20 m), mesma linha de chão. Íris 1,38 m e Véspera 1,66 m, conforme `character_heights.gd`. As cabeças e os equipamentos foram comparados aos idles atuais, sem esticar a queda até a altura de pé.
 
-WebP em art/combat/heroes/<hero>/<pose>.webp; PNG de transferência em art/combat/source/reactions/<hero>/<pose>.png. Os PNG têm canvas2× do WebP, para o pipeline de meia resolução. Isso é ampliação da imagem gerada, não detalhe nativo adicional. Sem9-slice.
+## Arquivos e decisões
 
-| Pose | Canvas WebP | Âncora em px (apoio) | Altura visível px |
-|---|---|---|---|
-| iris/hurt | 589×668 | 294,643 | 575 |
-| vespera/hurt | 589×668 | 294,643 | 626 |
-| iris/death | 627×627 | 313,602 | 179 |
-| vespera/death | 627×627 | 313,602 | 243 |
+Os quatro PNG RGBA estão em [`art/combat/source/reactions/kneeling_20261023/`](../../art/combat/source/reactions/kneeling_20261023/). A pasta tem `.gdignore`: são fontes para o pipeline, sem importação direta no jogo. As duas quedas foram geradas a partir dos idles locais: Íris continua sapo alquimista, com capuz, cilindros e mangueiras; Véspera continua coruja com binóculos, penas dobradas e rifle preso à mochila. Ambas ajoelhadas, olhos fechados, cabeça baixa, mãos próximas ao corpo; sem sangue, cenário, texto ou sombra pintada.
 
-Origem de coordenadas: topo esquerdo; âncora no centro inferior do alfa com corte24/255. Multiplicar medidas por2 no manifesto da fonte; tools/sync_combat_art.py divide a textura pela metade, mantendo referência nas medidas originais. Para queda, a âncora é contato com o piso, não a cabeça. A altura de referência de pé deve continuar vindo do idle; não esticar a pose deitada pela própria altura. Mesmos canvases de dano589×668 e queda627×627 das referências do Nick/Bento.
+As poses de dano reaproveitam a arte da entrega anterior, com limpeza de alfa e registro no canvas/pivô atual. Não são poses novas. Esquiva e defesa eram opcionais e ficam fora deste lote.
 
-Claude: antes de importar, comparar com as fontes legadas da coruja e preservar a direção aprovada de derrota compacta. Não sobrescrever fontes existentes em SourceArt/AllyActions/Reactions20261020. Se as propostas forem aprovadas, registrar fontes novas em uma pasta versionada própria e medir nos manifestos de origem. Não executei a ferramenta porque ela regrava data/presentation/combat_art.json, fora do escopo. Composição de arena e troca de estado ficam para #16.
+Nenhuma fonte do projeto Unreal foi baixada ou alterada. A [revisão do acervo](unreal-art-review.md) registra a evidência textual de Bento/Nick ajoelhados e a existência das reações legadas da coruja. Estas últimas não foram comparadas pixel a pixel; as novas poses usam a identidade do idle Godot atual.
 
-## QA de design
+## Medidas para integração
 
-Rodada1 — VEREDITO: REPROVADO. Alta: o atlas não respeitava rigidamente as colunas; cortar pela metade poderia amputar extremidades. Correção: extração por componente alfa conectado em vez de corte de quadrante, seguida de enquadramento com margem24.
+Origem no topo esquerdo. **Todos os PNG: 1178×1335 px**. Conversão esperada: WebP 589×668 px pelo pipeline de meia resolução; as medidas do manifesto continuam nas coordenadas da fonte. Sem 9-slice, sem margens de conteúdo de UI. Bounding box com máximo exclusivo; âncora na linha imediatamente abaixo do último pixel de apoio.
 
-Rodada2 — VEREDITO: APROVADO. Quatro corpos completos, equipamento coerente com referência, alfa limpo, canvas e âncoras documentados. Sem problemas altos/médios. Observação baixa: escala final em arena e oclusões serão validadas por Claude; a queda usa apoio no piso e não altura de personagem de pé.
+| Arquivo PNG | Âncora fonte x,y | Referência corporal de pé | Bbox alfa x0,y0,x1,y1 | Largura física |
+|---|---|---|---|---|
+| `iris_death.png` | 587,5;1264 | 1208 px | 208;518;967;1264 | 0,867 m |
+| `iris_hurt.png` | 587,5;1264 | 1208 px | 47;114;1128;1264 | 1,235 m |
+| `vespera_death.png` | 451;1297 | 1271 px | 48;456;855;1297 | 1,054 m |
+| `vespera_hurt.png` | 451;1297 | 1271 px | 8;44;1088;1297 | 1,411 m |
 
-Rodada3 — VEREDITO: REPROVADO para integração das quedas. Alta — `iris/death.webp` e `vespera/death.webp`: pose horizontal pode invadir posições vizinhas e diverge da direção compacta ajoelhada documentada nas reações recentes de Bento/Nick na Unreal. Sugestão: revisar a pose de derrota e comparar as fontes antigas da coruja antes de produzir substituições. Os arquivos permanecem propostas isoladas, sem registro no manifesto nem uso no jogo. A issue #13 continua aberta; merge dos arquivos para revisão não representa aprovação de integração. A existência das fontes legadas foi confirmada por caminhos e documentação, sem comparação dos pixels.
+**Âncoras, canvas e referência corporal são exatamente os do idle atual** em `data/presentation/combat_art.json`. Contrato legível por ferramenta: [combat_reactions_contract.json](combat_reactions_contract.json). Não usar a altura visível ajoelhada como referência: isso ampliaria indevidamente a personagem. Os pés/capa têm apoios assimétricos nas reações; a âncora é o pivô estável do ator, não o centro automático de cada bbox.
+
+Para as quedas, o envelope lateral máximo a partir do pivô é 0,434 m na Íris e 0,528 m na Véspera: mesmo entre duas Vésperas há cerca de 0,145 m de folga com pivôs a 1,20 m. As reações de dano têm gestos mais largos, como as anteriores; não representam a silhueta persistente da derrota. Validar ordenação e sobreposição durante o estado transitório na arena.
+
+Claude: registrar estas fontes na tabela do pipeline `tools/sync_combat_art.py`, converter e ligar `hurt`/`death` nos ids existentes `hero_sapo_iris` e `hero_coruja_vespera`. A ferramenta não foi executada nesta entrega porque regrava `data/`. Os WebPs antigos `art/combat/heroes/{iris,vespera}/death.webp` **continuam horizontais e superados: não integrar**. Nenhum arquivo já consumido pelo jogo foi renomeado ou sobrescrito.
+
+## Leitura e QA de design
+
+![Redução real a 40%, fundos claro/escuro e cinza](reactions_kneeling_readability.jpg)
+
+Cada painel foi composto em 1920×1080 e reduzido de verdade a 768×432. Nas duas linhas, dano recua/abre o gesto enquanto queda forma um volume baixo com cabeça caída e pernas recolhidas. A leitura de estado funciona em cinza e nos dois fundos, sem depender de verde contra vermelho. As cores são as dos equipamentos existentes; não há semântica nova de bom/perigo para recolorir. Os testes de ícones de 22/32 px e texto de HUD não se aplicam a estes sprites sem texto.
+
+**Rodada 1 — VEREDITO: REPROVADO.** Alta — `vespera_hurt.png`: centralizar toda a silhueta no pivô do idle colocava a borda esquerda em x=-89, cortando penas. Sugestão: reenquadrar sem reduzir a personagem, preservando canvas e pivô. Corrigido com bbox x=8..1088 e corpo completo. Média — prancha inicial `reactions_kneeling_comparison.jpg`: distância de 240 px entre personagens não representava os 1,20 m de combate e causava sobreposição artificial. Corrigido para 408 px a 340 px/m, ampliando a prancha para 2560×1080.
+
+**Rodada 2 — VEREDITO: APROVADO.** Acabamento baixo encontrado na checagem automatizada: componente de dois pixels no alfa forte da queda da Véspera, removido antes da aprovação final. Conferidos os quatro PNG finais e as duas pranchas contra o checklist de `qa.md`: identidade e acabamento compatíveis com idles, quedas ajoelhadas compactas, escala corporal coerente, canvas/pivôs iguais aos atuais, sem cortes ou componentes alfa soltos relevantes, leitura a 40% e em cinza sobre fundos claro/escuro, nomes e medidas completos. Sem problemas altos ou médios. Observação baixa: a QA de design usa composição estática; a troca de estado, o enquadramento da câmera e a oclusão real serão validados pelo Claude na integração #16.
+
+Validação técnica: Godot 4.7.2, `tests/run_all.gd`: **25/25**, paridade **48/48**, saída 0 (72,3 s). O log ainda contém erros diferidos de `_restyle` e avisos de RIDs/recursos no encerramento; não são um teste da integração destas poses. Nenhuma alteração em `scripts/`, `data/`, `tests/` ou ids.
+
+## Histórico superado
+
+Na entrega anterior, a rodada 1 corrigiu extração do atlas, a rodada 2 aprovou o recorte técnico e a rodada 3 reprovou as quedas horizontais após a consulta ao acervo Unreal. Essa aprovação técnica antiga não libera os WebPs horizontais. A decisão posterior do Lucas é atendida pelos PNG versionados acima. A issue permanece aberta para integração e QA em jogo.
