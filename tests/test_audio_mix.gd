@@ -93,26 +93,41 @@ func _cues_exist() -> void:
 func _duck() -> void:
 	var music := AudioServer.get_bus_index("Music")
 	var before := AudioServer.get_bus_volume_db(music)
+	# Dois quadros curtos antes: o primeiro depois de um trabalho longo (carregar os sons acima) tem um delta de segundos,
+	# e o abaixamento inteiro passaria nele.
+	await _tree.process_frame
+	await _tree.process_frame
 	Sound.duck(9.0, 0.05)
-	await _tree.create_timer(0.3).timeout
-	t.check(AudioServer.get_bus_volume_db(music) < before - 3.0, "a música abaixa (%.1f → %.1f dB)" % [before, AudioServer.get_bus_volume_db(music)])
-	await _tree.create_timer(1.3).timeout
+	# Esperas por condição (com teto), não por um tempo fixo: com a máquina carregada um quadro pode levar muito.
+	await _until(func(): return AudioServer.get_bus_volume_db(music) < before - 8.0, 3.0)
+	t.check(AudioServer.get_bus_volume_db(music) < before - 8.0, "a música abaixa (%.1f → %.1f dB)" % [before, AudioServer.get_bus_volume_db(music)])
+	await _until(func(): return absf(AudioServer.get_bus_volume_db(music) - before) < 0.1, 4.0)
 	t.check(absf(AudioServer.get_bus_volume_db(music) - before) < 0.1, "e volta ao volume das Opções")
 	# Um mais fraco no meio de um mais forte não o corta; depois dele, vale.
-	Sound.duck(9.0, 0.6)
-	await _tree.create_timer(0.2).timeout
+	await _tree.process_frame
+	Sound.duck(9.0, 1.0)
+	await _until(func(): return Sound.duck_db < -8.5, 3.0)
 	Sound.duck(3.0, 0.05)
-	await _tree.create_timer(0.2).timeout
+	await _tree.process_frame
+	await _tree.process_frame
 	t.check(Sound.duck_db < -8.0, "um abaixamento mais fraco não corta o mais forte (%.1f dB)" % Sound.duck_db)
-	await _tree.create_timer(1.5).timeout
+	await _until(func(): return Sound.duck_db > -0.01, 5.0)
 	# Na pausa do acerto (o tempo quase parado) a música abaixa do mesmo jeito.
 	var scale := Engine.time_scale
 	Engine.time_scale = 0.03
+	await _tree.process_frame
 	Sound.duck(5.0, 0.35)
-	await _tree.create_timer(0.25, true, false, true).timeout
+	await _until(func(): return Sound.duck_db < -4.0, 3.0)
 	Engine.time_scale = scale
 	t.check(Sound.duck_db < -4.0, "o abaixamento anda mesmo com o tempo quase parado (%.1f dB)" % Sound.duck_db)
-	await _tree.create_timer(1.5).timeout
+	await _until(func(): return Sound.duck_db > -0.01, 5.0)
+
+
+## Espera a condição, contando o tempo no relógio (sem a escala de tempo), até `limit` segundos.
+func _until(condition: Callable, limit: float) -> void:
+	var end := Time.get_ticks_msec() + int(limit * 1000.0)
+	while not condition.call() and Time.get_ticks_msec() < end:
+		await _tree.process_frame
 
 
 func _audio_files(root: String) -> Array:

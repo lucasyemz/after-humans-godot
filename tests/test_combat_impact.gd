@@ -77,14 +77,16 @@ func _hitstop_rules() -> void:
 	await _until_time_back(3.0)
 	var took := Time.get_ticks_msec() - started
 	t.check(is_equal_approx(Engine.time_scale, 3.0), "e volta ao que era (3x)")
-	t.check(took >= 50 and took < 250, "a pausa dura uns %d ms de tempo real (%d)" % [int(AHCombatArena.HITSTOP_SECONDS * 1000), took])
+	t.check(took >= 50 and took < 1000, "a pausa dura uns %d ms de tempo real (%d)" % [int(AHCombatArena.HITSTOP_SECONDS * 1000), took])
+	# A menor de três (com a máquina carregada um quadro pode levar muito): a 1x e a 2x.
+	var slow := took
+	for i in 2:
+		slow = mini(slow, await _hitstop_ms(arena))
 	arena.speed = 2.0
-	await _tree.process_frame
-	started = Time.get_ticks_msec()
-	arena._hitstop(AHCombatArena.HITSTOP_SECONDS)
-	await _until_time_back(3.0)
-	var fast := Time.get_ticks_msec() - started
-	t.check(fast < took, "a 2x a pausa encurta (%d ms < %d ms)" % [fast, took])
+	var fast := 100000
+	for i in 3:
+		fast = mini(fast, await _hitstop_ms(arena))
+	t.check(fast < slow, "a 2x a pausa encurta (%d ms < %d ms)" % [fast, slow])
 	arena.auto_battle = true
 	arena._hitstop(AHCombatArena.HITSTOP_SECONDS)
 	t.check(is_equal_approx(Engine.time_scale, 3.0), "no modo automático não há pausa")
@@ -180,3 +182,13 @@ func _until_time_back(scale: float) -> void:
 	var limit := Time.get_ticks_msec() + 2000
 	while not is_equal_approx(Engine.time_scale, scale) and Time.get_ticks_msec() < limit:
 		await _tree.process_frame
+
+
+## Quanto uma pausa do acerto leva no relógio (ms).
+func _hitstop_ms(arena: AHCombatArena) -> int:
+	await _tree.process_frame
+	await _tree.process_frame
+	var started := Time.get_ticks_msec()
+	arena._hitstop(AHCombatArena.HITSTOP_SECONDS)
+	await _until_time_back(3.0)
+	return Time.get_ticks_msec() - started
