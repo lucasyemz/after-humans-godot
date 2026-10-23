@@ -2,7 +2,9 @@
 art/street/source/search_props/ viram WebP de 512 x 512 em art/street/search_props/ (metade da resolução, a tela
 inteira: nada é recortado, e a âncora no pé continua no mesmo ponto nos dois estados), e o contrato de cada um vai para
 data/presentation/search_props.json no espaço da textura (âncora, altura de referência e medidas em metros).
-Precisa do Pillow.
+Precisa do Pillow. Os PNGs de origem não estão na main (o PR #53 os deixou na tag codex-pr53-originals): tire-os de lá
+antes, para a pasta de sempre ou outra:
+  git archive codex-pr53-originals art/street/source/search_props | tar -x
   python tools/convert_search_props.py [pasta das fontes] [contrato.json]
 Sem argumentos, lê as fontes de art/street/source/search_props/ e o contrato de docs/design/street_props_contract.json.
 """
