@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "source pixels; top left origin",
+  "integration": "Claude #16; proposal only; preserve idle body_reference_pixels for every state",
+  "poses": [
+    {
+      "hero_id": "hero_sapo_iris",
+      "state": "death",
+      "file": "art/combat/source/reactions/kneeling_20261023/iris_death.png",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "texture_half_size": [
+        589,
+        668
+      ],
+      "anchor": [
+        587.5,
+        1264
+      ],
+      "body_reference_pixels": 1208,
+      "alpha_bbox": [
+        208,
+        518,
+        967,
+        1264
+      ],
+      "height_m": 1.38,
+      "visible_width_m": 0.8671,
+      "nine_slice": null
+    },
+    {
+      "hero_id": "hero_sapo_iris",
+      "state": "hurt",
+      "file": "art/combat/source/reactions/kneeling_20261023/iris_hurt.png",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "texture_half_size": [
+        589,
+        668
+      ],
+      "anchor": [
+        587.5,
+        1264
+      ],
+      "body_reference_pixels": 1208,
+      "alpha_bbox": [
+        47,
+        114,
+        1128,
+        1264
+      ],
+      "height_m": 1.38,
+      "visible_width_m": 1.2349,
+      "nine_slice": null
+    },
+    {
+      "hero_id": "hero_coruja_vespera",
+      "state": "death",
+      "file": "art/combat/source/reactions/kneeling_20261023/vespera_death.png",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "texture_half_size": [
+        589,
+        668
+      ],
+      "anchor": [
+        451.0,
+        1297
+      ],
+      "body_reference_pixels": 1271,
+      "alpha_bbox": [
+        48,
+        456,
+        855,
+        1297
+      ],
+      "height_m": 1.66,
+      "visible_width_m": 1.054,
+      "nine_slice": null
+    },
+    {
+      "hero_id": "hero_coruja_vespera",
+      "state": "hurt",
+      "file": "art/combat/source/reactions/kneeling_20261023/vespera_hurt.png",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "texture_half_size": [
+        589,
+        668
+      ],
+      "anchor": [
+        451.0,
+        1297
+      ],
+      "body_reference_pixels": 1271,
+      "alpha_bbox": [
+        8,
+        44,
+        1088,
+        1297
+      ],
+      "height_m": 1.66,
+      "visible_width_m": 1.4105,
+      "nine_slice": null
+    }
+  ]
+}

@@ -11,3 +11,5 @@ Consulta remota em 22/10/2026 a `lucasyemz/After-Humans`, branch `main`, pela AP
 | Outros personagens e retratos | [Approved static poses](https://github.com/lucasyemz/After-Humans/blob/main/Docs/Art/approved-static-poses.md) documenta 96 PNGs de 11 identidades; CharacterGallery inclui inimigos e auxiliares. | Há material reutilizável. A existência desses personagens não confirma variantes de recrutamento para cão/gato/sapo/coruja. |
 
 As fontes e os PNGs novos deste lote são propostas de design, não substituições automáticas da direção aprovada na Unreal. Os retratos da #26 são recortes dos idles usados neste checkout e continuam sujeitos à escolha final dos recrutas da #14. A integração permanece com Claude na #16, sem alteração de ids.
+
+Atualização em 23/10/2026: Lucas escolheu quedas ajoelhadas na #13. A [entrega revisada](combat-reactions.md) fornece duas quedas compactas a partir dos idles Godot atuais, com canvas, âncora e referência corporal preservados. Esta revisão textual do acervo não foi convertida em uma comparação visual das imagens remotas.
