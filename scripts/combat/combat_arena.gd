@@ -10,6 +10,8 @@ const ART_MANIFEST := "res://data/presentation/combat_art.json"
 const HERO_GAP := 1.2
 const ENEMY_GAP := 1.35
 const FRONT_GAP := 1.0
+## O menor encolhimento dos espaços da fila num lugar apertado (abaixo disso os personagens se sobrepõem demais).
+const MIN_GAP_SCALE := 0.6
 const HERO_Z := -0.55
 const ENEMY_Z := -0.8
 ## Habilidades a distância (AHArenaBeat::IsRanged): avançam só um passo, sem ir até o alvo.
@@ -55,6 +57,8 @@ var art := {}
 var auto_battle := false
 var speed := 1.0
 var center_x := 0.0
+## O quanto os espaços da fila encolhem para a luta caber no lugar (#52): 1 = os de sempre.
+var gap_scale := 1.0
 var active := false
 var cards := {}
 ## Câmera da luta: o centro e a distância que enquadram todos, e o foco do golpe da vez (close_t 0..1 vai até ele).
@@ -231,6 +235,12 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 	if speed <= 2.0:
 		speed = float(clampi(int(Campaign.state.get("settings", {}).get("battle_speed", 1)), 1, 2))
 	center_x = at_x
+	gap_scale = 1.0
+	if _street != null and _street.has_method("combat_room"):
+		var room: Dictionary = _street.combat_room(at_x)
+		var placed := fit(at_x, room.bounds, room.obstacles, session.state.player_team.size(), session.state.enemy_team.size())
+		center_x = placed.x
+		gap_scale = placed.y
 	cards.clear()
 	for index in session.state.player_team.size():
 		cards[session.state.player_team[index].id] = hero_cards[index]
@@ -274,6 +284,43 @@ func camera_view() -> Vector2:
 	return Vector2(lerpf(view_x, focus_x, CLOSE_FOCUS * close_t), view_distance * lerpf(1.0, CLOSE_DISTANCE, close_t))
 
 
+## Onde a luta cabe (#52): a fila dos heróis à esquerda do centro e a dos inimigos à direita, inteiras dentro de
+## bounds (x mínimo e máximo, já com a folga da borda) e fora dos obstáculos (faixas em x [início, fim] que cruzam a
+## linha da luta). Fica o mais perto possível de at_x; se o vão livre for menor que a fila, os espaços encolhem até
+## MIN_GAP_SCALE. Devolve (centro, escala dos espaços).
+static func fit(at_x: float, bounds: Vector2, obstacles: Array, heroes: int, enemies: int) -> Vector2:
+	var left: float = FRONT_GAP + maxi(heroes - 1, 0) * HERO_GAP
+	var right: float = FRONT_GAP + maxi(enemies - 1, 0) * ENEMY_GAP
+	# Os vãos livres entre os obstáculos; a luta fica no que contém o centro pedido ou, sem ele, no maior.
+	var cuts: Array = obstacles.duplicate()
+	cuts.sort_custom(func(a, b): return a.x < b.x)
+	var spans: Array = []
+	var start := bounds.x
+	for cut in cuts:
+		if cut.y <= start or cut.x >= bounds.y:
+			continue
+		if cut.x > start:
+			spans.append(Vector2(start, cut.x))
+		start = maxf(start, cut.y)
+	if start < bounds.y:
+		spans.append(Vector2(start, bounds.y))
+	if spans.is_empty():
+		return Vector2(at_x, 1.0)
+	var room: Vector2 = spans[0]
+	var best := -INF
+	for span: Vector2 in spans:
+		var holds := at_x >= span.x and at_x <= span.y
+		var score := (1000.0 if holds else 0.0) + minf(span.y - span.x, left + right)
+		if score > best:
+			best = score
+			room = span
+	var width := room.y - room.x
+	if width >= left + right:
+		return Vector2(clampf(at_x, room.x + left, room.y - right), 1.0)
+	var scale := maxf(width / (left + right), MIN_GAP_SCALE)
+	return Vector2(room.x + left * scale, scale)
+
+
 func slot_position(unit: AHCombat.Unit) -> Vector3:
 	var rank := maxi(unit.rank, 1)
 	# Na rua a luta fica na calçada (HERO_Z, ENEMY_Z); nos cenários, na faixa da zona (um pouco atrás do meio dela).
@@ -283,8 +330,8 @@ func slot_position(unit: AHCombat.Unit) -> Vector3:
 		hero_z = _street.lane_z - 0.3
 		enemy_z = hero_z - 0.25
 	if unit.is_player:
-		return Vector3(center_x - FRONT_GAP - (rank - 1) * HERO_GAP, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
-	return Vector3(center_x + FRONT_GAP + (rank - 1) * ENEMY_GAP, _street.call("_ground_height", enemy_z), enemy_z - 0.03 * rank)
+		return Vector3(center_x - (FRONT_GAP + (rank - 1) * HERO_GAP) * gap_scale, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
+	return Vector3(center_x + (FRONT_GAP + (rank - 1) * ENEMY_GAP) * gap_scale, _street.call("_ground_height", enemy_z), enemy_z - 0.03 * rank)
 
 
 ## Leva cada unidade de pé para a posição dela (depois de trocas, empurrões e mortes).

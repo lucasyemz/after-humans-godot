@@ -966,6 +966,25 @@ func capture_paused() -> bool:
 
 # ---------------------------------------------------------------- jornada (chamado pelo AHStreetCorridor)
 
+## Onde a luta pode ficar (#52): o lugar em que se anda (a zona do cenário, a sala da casa ou a rua inteira) e, nos
+## cenários, os obstáculos que cruzam a linha da luta (escada, caixote), como faixas em x.
+func combat_room(_at_x: float) -> Dictionary:
+	var obstacles: Array = []
+	if scenario and not _indoor:
+		var z0 := lane_z - 0.3 - 0.25 - 0.2
+		var z1 := lane_z - 0.3 + 0.05
+		for box: AABB in scenario.obstacles:
+			if box.position.z <= z1 and box.end.z >= z0 and box.position.y < floor_y + 1.2:
+				obstacles.append(Vector2(box.position.x - 0.3, box.end.x + 0.3))
+	# O lugar inteiro, não o limite de andar da vez (que para antes da patrulha).
+	var bounds := Vector2(STREET_WALK_MIN.x, STREET_WALK_MAX.x)
+	if _indoor:
+		bounds = Vector2(walk_min.x, walk_max.x)
+	elif scenario and not _zone.is_empty():
+		bounds = Vector2(_zone.x0 + 0.4, _zone.x1 - 0.4)
+	return {"bounds": bounds, "obstacles": obstacles}
+
+
 func begin_fight() -> void:
 	_street_hud.visible = false
 	_leader.velocity = Vector3.ZERO
