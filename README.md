@@ -27,6 +27,8 @@ protótipo da avaliação de migração da Unreal e hoje tem:
 Roda no PC (Forward+) e no navegador (Compatibility). O plano para chegar ao jogo completo está em
 [docs/plan.md](docs/plan.md). Versão: Godot 4.7.2 estável, a versão padrão (GDScript, sem .NET).
 
+
+Para tocar os agentes (Claude da nuvem, Codex) de qualquer máquina, veja [docs/orchestration.md](docs/orchestration.md).
 ## Estrutura
 
 ```
