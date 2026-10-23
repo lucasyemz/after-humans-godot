@@ -273,7 +273,7 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 	top.name = "Top"
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(top)
-	var name_label := S.label(tr(unit.display_name), 17, TEXT, "bold")
+	var name_label := S.label(unit_name(unit.display_name), 17, TEXT, "bold")
 	name_label.name = "Name"
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.clip_text = true
@@ -413,7 +413,7 @@ func refresh() -> void:
 
 ## A linha da intenção na placa do inimigo: a ação e em quem (com "?" quando ele está entre dois planos parecidos).
 func _show_intent(label: Label, intent: Dictionary) -> void:
-	var names: Array = intent.target_ids.map(func(id): return tr(session.state.find_unit(id).display_name) if session.state.find_unit(id) else id)
+	var names: Array = intent.target_ids.map(func(id): return unit_name(session.state.find_unit(id).display_name) if session.state.find_unit(id) else id)
 	var text := ""
 	var color: Color = S.ENEMY
 	# O ícone da intenção (art/ui/icons/intent-*): ataque, ataque em área (mais de um alvo de uma vez), cura, bloqueio,
@@ -472,7 +472,7 @@ func _refresh_order(current: String) -> void:
 		var face := S.portrait(_art_of(unit), 72 if now else 54, ring, 0.07 if now else 0.06)
 		face.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		who.add_child(face)
-		var name_label := S.label(unit.display_name.split(" ")[0] + (tr(" · agora") if now else ""), 16 if now else 15, GOLD if now else MUTED, "bold" if now else "body")
+		var name_label := S.label(short_name(unit.display_name) + (tr(" · agora") if now else ""), 16 if now else 15, GOLD if now else MUTED, "bold" if now else "body")
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		who.add_child(name_label)
 		_order.add_child(who)
@@ -828,8 +828,9 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 	if not facts.is_empty():
 		_tip_box.add_child(S.label(" · ".join(facts), S.MIN_TEXT, TEXT, "bold"))
 	var row = GameData.row("abilities", option.id)
-	var text: String = tr(row.get("Description", "")) if row != null else ""
-	var body := S.label(text, S.MIN_TEXT, TEXT)
+	# Os termos do glossário (em português) são procurados no texto original; a tela mostra o traduzido.
+	var text: String = row.get("Description", "") if row != null else ""
+	var body := S.label(tr(text), S.MIN_TEXT, TEXT)
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.custom_minimum_size = Vector2(430, 0)
 	_tip_box.add_child(body)
@@ -845,7 +846,7 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			var unit := session.state.find_unit(id)
 			if unit == null:
 				continue
-			var note := tr("%s (vida %d)") % [unit.display_name, unit.hp]
+			var note := tr("%s (vida %d)") % [unit_name(unit.display_name), unit.hp]
 			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage").Max >= unit.hp:
 				note += tr(" · pode cair")
 			# Os estados do alvo por extenso: no foco, a dica faz o papel da dica do mouse sobre os ícones (#30).
@@ -864,7 +865,7 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			if enemy.hp > 0:
 				var words := _status_words(enemy, terms)
 				if words != "":
-					others.append(tr(enemy.display_name) + ":" + words.trim_prefix(" ·"))
+					others.append(unit_name(enemy.display_name) + ":" + words.trim_prefix(" ·"))
 		if not others.is_empty():
 			_tip_line("; ".join(others), 17, MUTED)
 	for word in S.GLOSSARY:
@@ -890,6 +891,34 @@ func _status_words(unit: AHCombat.Unit, terms: Array) -> String:
 			terms.append(entry[4])
 	return "" if marks.is_empty() else " · " + ", ".join(marks.map(func(e): return e[0]))
 
+
+## O nome de quem luta na língua do jogo: o do inimigo vem dos dados, às vezes com um sufixo da rota (o guardião da
+## fase, os relés Alfa e Beta do chefe), traduzido em partes (#35). O dos heróis não muda.
+static func unit_name(text: String) -> String:
+	var whole := TranslationServer.translate(text)
+	if whole != text:
+		return whole
+	for suffix in [" · Guardião", " Alfa", " Beta"]:
+		if text.ends_with(suffix):
+			return TranslationServer.translate(text.trim_suffix(suffix)) + _suffix(suffix)
+	return whole
+
+
+static func _suffix(suffix: String) -> String:
+	match suffix:
+		" · Guardião":
+			return TranslationServer.translate(" · Guardião")
+		" Alfa":
+			return TranslationServer.translate(" Alfa")
+	return TranslationServer.translate(" Beta")
+
+
+## O nome curto da barra de ordem: a primeira palavra, sem o artigo ("O Porteiro" fica "Porteiro").
+static func short_name(text: String) -> String:
+	var words := unit_name(text).split(" ", false)
+	if words.size() > 1 and ["O", "A", "Os", "As", "The"].has(words[0]):
+		words.remove_at(0)
+	return words[0] if not words.is_empty() else text
 
 func _tip_line(text: String, size: int, color: Color, kind: String = "body") -> Label:
 	var line := S.label(text, size, color, kind)
@@ -1018,7 +1047,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 		if unit != null and arena.cards.has(unit.id):
 			var card: AHSpriteCard = arena.cards[unit.id]
 			world = card.global_position + Vector3(0, card.head_height() + 0.2, 0)
-			label = tr(unit.display_name)
+			label = unit_name(unit.display_name)
 		else:
 			var probe := AHCombat.Unit.new()
 			probe.is_player = not enemy_side
@@ -1074,7 +1103,7 @@ func _preview_hits(ability_id: String, rank: int) -> void:
 			continue
 		var own: Array = _markers.filter(func(m): return session.engine.occupies_rank(unit, int(m.get_meta("rank"))))
 		if not own.is_empty():
-			own[0].text = tr("◆ %s · também") % unit.display_name
+			own[0].text = tr("◆ %s · também") % unit_name(unit.display_name)
 			own[0].add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
 			continue
 		var card: AHSpriteCard = arena.cards[id]

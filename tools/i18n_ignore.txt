@@ -20,6 +20,11 @@ exploration_hud.gd: Choices
 exploration_hud.gd: Text
 exploration_hud.gd:   (%s)
 combat_hud.gd: Q
+combat_hud.gd: O
+combat_hud.gd: A
+combat_hud.gd: Os
+combat_hud.gd: As
+combat_hud.gd: The
 combat_hud.gd: W
 combat_hud.gd: I
 combat_hud.gd: F

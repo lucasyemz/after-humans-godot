@@ -115,6 +115,12 @@ func _switch_live() -> void:
 	Settings.set_language("en")
 	t.check(TranslationServer.get_locale().begins_with("en"), "o inglês liga")
 	t.equal(TranslationServer.translate("Vez de %s: escolha uma habilidade (1–4) ou uma ação.") % "Nick", "Nick's turn: pick an ability (1–4) or an action.", "o texto formatado sai traduzido")
+	# Os nomes dos inimigos na luta, inclusive com o sufixo da rota (o guardião, os relés do chefe), e o nome curto.
+	t.equal(AHCombatHud.unit_name("Robô"), "Robot", "o nome do inimigo em inglês")
+	t.equal(AHCombatHud.unit_name("Robô · Guardião"), "Robot · Guardian", "o guardião em inglês")
+	t.equal(AHCombatHud.unit_name("Relé de Defesa Alfa"), "Defense Relay Alpha", "o relé do chefe em inglês")
+	t.equal(AHCombatHud.unit_name("Nick"), "Nick", "o nome do herói não muda")
+	t.equal(AHCombatHud.short_name("O Porteiro"), "Gatekeeper", "o nome curto sem o artigo")
 	GameFlow.start()
 	var title: AHTitleScreen = null
 	for frame in 300:
