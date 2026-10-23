@@ -273,7 +273,7 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 	top.name = "Top"
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(top)
-	var name_label := S.label(unit.display_name, 17, TEXT, "bold")
+	var name_label := S.label(tr(unit.display_name), 17, TEXT, "bold")
 	name_label.name = "Name"
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_label.clip_text = true
@@ -413,7 +413,7 @@ func refresh() -> void:
 
 ## A linha da intenção na placa do inimigo: a ação e em quem (com "?" quando ele está entre dois planos parecidos).
 func _show_intent(label: Label, intent: Dictionary) -> void:
-	var names: Array = intent.target_ids.map(func(id): return session.state.find_unit(id).display_name if session.state.find_unit(id) else id)
+	var names: Array = intent.target_ids.map(func(id): return tr(session.state.find_unit(id).display_name) if session.state.find_unit(id) else id)
 	var text := ""
 	var color: Color = S.ENEMY
 	# O ícone da intenção (art/ui/icons/intent-*): ataque, ataque em área (mais de um alvo de uma vez), cura, bloqueio,
@@ -864,7 +864,7 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			if enemy.hp > 0:
 				var words := _status_words(enemy, terms)
 				if words != "":
-					others.append(enemy.display_name + ":" + words.trim_prefix(" ·"))
+					others.append(tr(enemy.display_name) + ":" + words.trim_prefix(" ·"))
 		if not others.is_empty():
 			_tip_line("; ".join(others), 17, MUTED)
 	for word in S.GLOSSARY:
@@ -1018,7 +1018,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 		if unit != null and arena.cards.has(unit.id):
 			var card: AHSpriteCard = arena.cards[unit.id]
 			world = card.global_position + Vector3(0, card.head_height() + 0.2, 0)
-			label = unit.display_name
+			label = tr(unit.display_name)
 		else:
 			var probe := AHCombat.Unit.new()
 			probe.is_player = not enemy_side

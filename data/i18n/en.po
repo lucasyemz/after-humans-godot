@@ -1658,1053 +1658,1053 @@ msgstr "%s stays on the train. They may come back on a later trip."
 
 #. abilities.0.DisplayName
 msgid "Punho de Sucata"
-msgstr ""
+msgstr "Scrap Fist"
 
 #. abilities.0.Description
 msgid "Golpe frontal; remove 1 Bloqueio antes do dano."
-msgstr ""
+msgstr "Frontal strike; removes 1 Block before damage."
 
 #. abilities.1.DisplayName
 msgid "Impacto Hidráulico"
-msgstr ""
+msgstr "Hydraulic Impact"
 
 #. abilities.1.Description
 msgid "Dano reduzido e Atordoamento: perde uma ação. Não empurra."
-msgstr ""
+msgstr "Reduced damage and Stun: loses an action. Does not push."
 
 #. abilities.2.DisplayName
 msgid "Fique Atrás de Mim"
-msgstr ""
+msgstr "Stay Behind Me"
 
 #. abilities.2.Description
 msgid "Protege um aliado até o início do próximo turno de Bento; Bento recebe 1 Bloqueio."
-msgstr ""
+msgstr "Protects an ally until the start of Bento's next turn; Bento gains 1 Block."
 
 #. abilities.3.DisplayName
 msgid "Não Estamos Sós"
-msgstr ""
+msgstr "We Are Not Alone"
 
 #. abilities.3.Description
 msgid "Reduz 12 Instinto e remove 1 Vulnerável do aliado."
-msgstr ""
+msgstr "Reduces 12 Instinct and removes 1 Vulnerable from the ally."
 
 #. abilities.4.DisplayName
 msgid "Corte de Fase"
-msgstr ""
+msgstr "Phase Cut"
 
 #. abilities.4.Description
 msgid "Lâmina energética: ignora metade da redução de armadura/Bloqueio."
-msgstr ""
+msgstr "Energy blade: ignores half of armor/Block reduction."
 
 #. abilities.5.DisplayName
 msgid "Salto Entre Ruínas"
-msgstr ""
+msgstr "Leap Through Ruins"
 
 #. abilities.5.Description
 msgid "Golpe leve; recua uma posição quando há espaço e o movimento é permitido."
-msgstr ""
+msgstr "Light strike; steps back one position when there is room and movement is allowed."
 
 #. abilities.6.DisplayName
 msgid "Sumir na Sombra"
-msgstr ""
+msgstr "Vanish into Shadow"
 
 #. abilities.6.Description
 msgid "Recebe 1 Esquiva e remove a própria Marca."
-msgstr ""
+msgstr "Gains 1 Dodge and removes its own Mark."
 
 #. abilities.7.DisplayName
 msgid "Caçada Precisa"
-msgstr ""
+msgstr "Precise Hunt"
 
 #. abilities.7.Description
 msgid "Dano elevado contra Marcado OU Vulnerável, sem somar bônus. Consome uma Marca ou um Vulnerável."
-msgstr ""
+msgstr "High damage against Marked OR Vulnerable, bonuses do not stack. Consumes one Mark or one Vulnerable."
 
 #. abilities.8.DisplayName
 msgid "Carga Voltaica"
-msgstr ""
+msgstr "Voltaic Charge"
 
 #. abilities.8.Description
 msgid "Remove 1 Bloqueio antes do dano; +25% de dano em máquinas."
-msgstr ""
+msgstr "Removes 1 Block before damage; +25% damage to machines."
 
 #. abilities.9.DisplayName
 msgid "Coquetel Corrosivo"
-msgstr ""
+msgstr "Corrosive Cocktail"
 
 #. abilities.9.Description
 msgid "Dano baixo no alvo e vizinho (atrás, ou à frente se não houver); armadura reduzida até o fim do próximo turno de cada alvo."
-msgstr ""
+msgstr "Low damage to the target and its neighbor (behind, or in front if none); armor reduced until the end of each target's next turn."
 
 #. abilities.10.DisplayName
 msgid "Ampola de Reparo Vivo"
-msgstr ""
+msgstr "Living Repair Vial"
 
 #. abilities.10.Description
 msgid "Recupera 5–8 Vida de aliado orgânico. 3 cargas compartilhadas com a exploração; recarrega somente após vitória."
-msgstr ""
+msgstr "Restores 5–8 Health to an organic ally. 3 charges shared with exploration; recharges only after a victory."
 
 #. abilities.11.DisplayName
 msgid "Antídoto de Campo"
-msgstr ""
+msgstr "Field Antidote"
 
 #. abilities.11.Description
 msgid "Remove Sangramento e Contaminação de aliado. 2 usos por expedição."
-msgstr ""
+msgstr "Removes Bleeding and Contamination from an ally. 2 uses per expedition."
 
 #. abilities.12.DisplayName
 msgid "Disparo Perfurante"
-msgstr ""
+msgstr "Piercing Shot"
 
 #. abilities.12.Description
 msgid "Munição elétrica: ignora metade da redução de armadura/Bloqueio."
-msgstr ""
+msgstr "Electric ammo: ignores half of armor/Block reduction."
 
 #. abilities.13.DisplayName
 msgid "Olho nas Ruínas"
-msgstr ""
+msgstr "Eye on the Ruins"
 
 #. abilities.13.Description
 msgid "Marca um inimigo por 2 turnos, sem dano."
-msgstr ""
+msgstr "Marks an enemy for 2 turns, no damage."
 
 #. abilities.14.DisplayName
 msgid "Granada de Fumaça"
-msgstr ""
+msgstr "Smoke Grenade"
 
 #. abilities.14.Description
 msgid "Selecione um inimigo nas posições 1–2 ou 3–4: aplica Cegueira ao par escolhido. Próximo ataque direto tem 25% de falha por alvo; sem dano."
-msgstr ""
+msgstr "Select an enemy in positions 1–2 or 3–4: applies Blindness to the chosen pair. Next direct attack has a 25% miss chance per target; no damage."
 
 #. abilities.15.DisplayName
 msgid "Recurso de Emergência"
-msgstr ""
+msgstr "Last Resort"
 
 #. abilities.15.Description
 msgid "Tiro rápido de pistola; recua 1 posição quando possível."
-msgstr ""
+msgstr "Quick pistol shot; steps back 1 position when possible."
 
 #. abilities.16.DisplayName
 msgid "Carga de Eletrólito"
-msgstr ""
+msgstr "Electrolyte Charge"
 
 #. abilities.16.Description
 msgid "Arremessa uma célula de bateria rompida: causa 2–4 de dano e aplica Corrosão em máquinas ou Contaminação em animais (2 por turno durante 3 turnos)."
-msgstr ""
+msgstr "Hurls a ruptured battery cell: deals 2–4 damage and applies Corrosion to machines or Contamination to animals (2 per turn for 3 turns)."
 
 #. abilities.17.DisplayName
 msgid "Chave de Desmonte"
-msgstr ""
+msgstr "Disassembly Wrench"
 
 #. abilities.17.Description
 msgid "Atinge uma junta com uma chave de manutenção: causa 3–5 de dano e deixa o alvo Vulnerável ao próximo golpe direto."
-msgstr ""
+msgstr "Hits a joint with a maintenance wrench: deals 3–5 damage and leaves the target Vulnerable to the next direct hit."
 
 #. abilities.18.DisplayName
 msgid "Cabo de Fuga"
-msgstr ""
+msgstr "Escape Cable"
 
 #. abilities.18.Description
 msgid "Aciona um cabo retrátil para recuar uma posição e ganhar uma carga de Esquiva."
-msgstr ""
+msgstr "Fires a retractable cable to step back one position and gain a Dodge charge."
 
 #. abilities.19.DisplayName
 msgid "Ponte de Diagnóstico"
-msgstr ""
+msgstr "Diagnostic Bridge"
 
 #. abilities.19.Description
 msgid "Sobrecarrega o alvo com o scanner: aplica vulnerável e stun por 2 turnos. Um uso por combate."
-msgstr ""
+msgstr "Overloads the target with the scanner: applies Vulnerable and Stun for 2 turns. One use per combat."
 
 #. abilities.20.DisplayName
 msgid "Marreta de Emergência"
-msgstr ""
+msgstr "Emergency Sledgehammer"
 
 #. abilities.20.Description
 msgid "Golpeia a linha de frente com uma ferramenta de resgate, causando 5–7 de dano."
-msgstr ""
+msgstr "Strikes the front line with a rescue tool, dealing 5–7 damage."
 
 #. abilities.21.DisplayName
 msgid "Carapaça Isolante"
-msgstr ""
+msgstr "Insulating Shell"
 
 #. abilities.21.Description
 msgid "Recolhe-se sob placas isolantes e ganha duas cargas de Bloqueio; cada carga reduz em 50% um golpe direto. Recarga de 2 turnos."
-msgstr ""
+msgstr "Curls up under insulating plates and gains two Block charges; each charge reduces a direct hit by 50%. 2-turn cooldown."
 
 #. abilities.22.DisplayName
 msgid "Aríete Hidráulico"
-msgstr ""
+msgstr "Hydraulic Ram"
 
 #. abilities.22.Description
 msgid "Aciona o aríete: causa 6–9 de dano, avança uma posição, tenta empurrar o alvo e aplica stun por 1 turno. Recarga de 2 turnos."
-msgstr ""
+msgstr "Fires the ram: deals 6–9 damage, advances one position, tries to push the target and applies Stun for 1 turn. 2-turn cooldown."
 
 #. abilities.23.DisplayName
 msgid "Corredor Seguro"
-msgstr ""
+msgstr "Safe Corridor"
 
 #. abilities.23.Description
 msgid "Abre uma rota protegida para outro aliado: remove Vulnerável e concede uma carga de Bloqueio. Até 2 usos por combate."
-msgstr ""
+msgstr "Opens a protected route for another ally: removes Vulnerable and grants a Block charge. Up to 2 uses per combat."
 
 #. classes.0.DisplayName
 msgid "Cão Protetor"
-msgstr ""
+msgstr "Guard Dog"
 
 #. classes.0.Species
 msgid "Cão"
-msgstr ""
+msgstr "Dog"
 
 #. classes.0.Role
 #. classes.0.Description
 msgid "Tanque e Proteção"
-msgstr ""
+msgstr "Tank and Protection"
 
 #. classes.1.DisplayName
 msgid "Gato Assassino"
-msgstr ""
+msgstr "Assassin Cat"
 
 #. classes.1.Species
 msgid "Gato"
-msgstr ""
+msgstr "Cat"
 
 #. classes.1.Role
 #. classes.1.Description
 msgid "Assassino e Mobilidade"
-msgstr ""
+msgstr "Assassin and Mobility"
 
 #. classes.2.DisplayName
 msgid "Sapo Química"
-msgstr ""
+msgstr "Chemist Frog"
 
 #. classes.2.Species
 msgid "Sapo"
-msgstr ""
+msgstr "Frog"
 
 #. classes.2.Role
 #. classes.2.Description
 msgid "Química e Suporte"
-msgstr ""
+msgstr "Chemistry and Support"
 
 #. classes.3.DisplayName
 msgid "Coruja Sniper"
-msgstr ""
+msgstr "Sniper Owl"
 
 #. classes.3.Species
 msgid "Coruja"
-msgstr ""
+msgstr "Owl"
 
 #. classes.3.Role
 #. classes.3.Description
 msgid "Sniper e Controle"
-msgstr ""
+msgstr "Sniper and Control"
 
 #. classes.4.DisplayName
 msgid "Guaxinim Sabotador"
-msgstr ""
+msgstr "Saboteur Raccoon"
 
 #. classes.4.Species
 msgid "Guaxinim"
-msgstr ""
+msgstr "Raccoon"
 
 #. classes.4.Role
 msgid "Sabotagem e Corrosão"
-msgstr ""
+msgstr "Sabotage and Corrosion"
 
 #. classes.4.Description
 msgid "Especialista em sabotagem e energia recuperada. Usa luvas isolantes, scanner e baterias para expor falhas e abrir rotas seguras."
-msgstr ""
+msgstr "Specialist in sabotage and salvaged energy. Uses insulated gloves, a scanner and batteries to expose weaknesses and open safe routes."
 
 #. classes.5.DisplayName
 msgid "Tatu de Resgate"
-msgstr ""
+msgstr "Rescue Armadillo"
 
 #. classes.5.Species
 msgid "Tatu"
-msgstr ""
+msgstr "Armadillo"
 
 #. classes.5.Role
 msgid "Resgate e Ruptura de Formação"
-msgstr ""
+msgstr "Rescue and Formation Breaking"
 
 #. classes.5.Description
 msgid "Especialista em resgate de setores lacrados. Placas laranja, escudo de porta industrial e aríete hidráulico ajudam a proteger a equipe e abrir passagens."
-msgstr ""
+msgstr "Specialist in rescuing sealed sectors. Orange plates, an industrial door shield and a hydraulic ram help protect the team and clear passages."
 
 #. enemies.0.DisplayName
 msgid "Robô"
-msgstr ""
+msgstr "Robot"
 
 #. enemies.0.Description
 msgid "Unidade de serviço reaproveitada pela contenção. Ainda mantém o próprio chassi, mas seus registros tratam a equipe como intrusa. Isso não revela a intenção de outras máquinas."
-msgstr ""
+msgstr "Service unit repurposed by containment. It still keeps its own chassis, but its logs treat the team as intruders. This does not reveal the intent of other machines."
 
 #. enemies.1.DisplayName
 msgid "Robô Fungo"
-msgstr ""
+msgstr "Fungus Robot"
 
 #. enemies.1.Description
 msgid "Umidade e fungos cobrem este chassi de serviço. Ele continua executando rotinas de contenção; a colonização visível não explica o Eco nem prova quem o comanda."
-msgstr ""
+msgstr "Moisture and fungus cover this service chassis. It keeps running containment routines; the visible colonization does not explain the Echo or prove who commands it."
 
 #. enemies.2.DisplayName
 msgid "Rastreador Quadrúpede"
-msgstr ""
+msgstr "Quadruped Tracker"
 
 #. enemies.2.Description
 msgid "Unidade de busca das IAs, com quatro pernas articuladas, sensor frontal vermelho e mandíbula de captura. Continua rastreando animais sem autorização de circulação."
-msgstr ""
+msgstr "AI search unit with four articulated legs, a red front sensor and a capture jaw. It keeps tracking animals without movement authorization."
 
 #. enemies.3.DisplayName
 msgid "Drone de Expurgo"
-msgstr ""
+msgstr "Purge Drone"
 
 #. enemies.3.Description
 msgid "Drone de saneamento com reservatório pressurizado e três rotores protegidos. Seus protocolos classificam os abrigos animais como focos de contaminação."
-msgstr ""
+msgstr "Sanitation drone with a pressurized tank and three shielded rotors. Its protocols classify animal shelters as contamination hotspots."
 
 #. enemies.4.DisplayName
 msgid "Sentinela de Triagem"
-msgstr ""
+msgstr "Triage Sentinel"
 
 #. enemies.4.Description
 msgid "Autômato de controle de acesso com escudo de catraca e visor de identificação. Barra qualquer sobrevivente que não possua uma credencial humana válida."
-msgstr ""
+msgstr "Access-control automaton with a turnstile shield and an ID visor. Bars any survivor without a valid human credential."
 
 #. enemies.5.DisplayName
 msgid "Emissor de Comando"
-msgstr ""
+msgstr "Command Emitter"
 
 #. enemies.5.Description
 msgid "Torre móvel de alto-falantes e antenas que imita anúncios de emergência humanos. Usa alarmes contraditórios para desorientar os sobreviventes."
-msgstr ""
+msgstr "Mobile tower of speakers and antennas that imitates human emergency announcements. Uses contradictory alarms to disorient survivors."
 
 #. enemies.6.DisplayName
 msgid "Rastejante de Cabos"
-msgstr ""
+msgstr "Cable Crawler"
 
 #. enemies.6.Description
 msgid "Robô de manutenção serpentino com pinças e carretéis de cabos. Arrasta intrusos para fora das rotas que a rede ainda considera restritas."
-msgstr ""
+msgstr "Serpentine maintenance robot with pincers and cable reels. Drags intruders out of routes the network still considers restricted."
 
 #. enemies.7.DisplayName
 msgid "Coletor de Sucata"
-msgstr ""
+msgstr "Scrap Collector"
 
 #. enemies.7.Description
 msgid "Compactador autônomo de seis rodas, com reservatório de resíduos industriais e braços de coleta. A guerra deixou sua identificação defeituosa: trata seres vivos como material recuperável."
-msgstr ""
+msgstr "Autonomous six-wheeled compactor with an industrial waste tank and collection arms. The war left its identification faulty: it treats living beings as salvageable material."
 
 #. enemies.8.DisplayName
 msgid "Relé de Defesa"
-msgstr ""
+msgstr "Defense Relay"
 
 #. enemies.8.Description
 msgid "Unidade auxiliar com bobinas expostas e cabos de alta tensão. Mantém a proteção do Porteiro enquanto está ativa e dispara arcos elétricos contra intrusos."
-msgstr ""
+msgstr "Auxiliary unit with exposed coils and high-voltage cables. Maintains the Gatekeeper's protection while active and fires electric arcs at intruders."
 
 #. enemies.9.DisplayName
 msgid "O Porteiro"
-msgstr ""
+msgstr "The Gatekeeper"
 
 #. enemies.9.Description
 msgid "Guardião industrial da eclusa, formado por portas blindadas, pistões e uma lente central de vigilância. Ainda executa a ordem de isolamento dada durante a guerra; na segunda fase, abandona a contenção e ativa força letal."
-msgstr ""
+msgstr "Industrial lock guardian made of armored doors, pistons and a central surveillance lens. It still carries out the isolation order given during the war; in the second phase, it abandons containment and activates lethal force."
 
 #. enemies.10.DisplayName
 msgid "Carrasco Industrial"
-msgstr ""
+msgstr "Industrial Executioner"
 
 #. enemies.10.Description
 #. enemies.11.Description
 #. enemies.12.Description
 #. enemies.13.Description
 msgid "Protótipo jogável para teste isolado. Atributos experimentais e kit mínimo; não representa balanceamento final nem substitui as propostas de habilidades."
-msgstr ""
+msgstr "Playable prototype for isolated testing. Experimental attributes and a minimal kit; does not represent final balance nor replace the proposed abilities."
 
 #. enemies.11.DisplayName
 msgid "Recreador"
-msgstr ""
+msgstr "Entertainer"
 
 #. enemies.12.DisplayName
 msgid "Enraizado"
-msgstr ""
+msgstr "Rooted One"
 
 #. enemies.13.DisplayName
 msgid "Hóspede Rubro"
-msgstr ""
+msgstr "Crimson Guest"
 
 #. enemies.14.DisplayName
 msgid "Núcleo Nulo"
-msgstr ""
+msgstr "Null Core"
 
 #. enemies.15.DisplayName
 msgid "Ilusionista de Sucata"
-msgstr ""
+msgstr "Scrap Illusionist"
 
 #. enemies.16.DisplayName
 msgid "Remendador"
-msgstr ""
+msgstr "Patcher"
 
 #. enemies.17.DisplayName
 msgid "Acoplador"
-msgstr ""
+msgstr "Coupler"
 
 #. enemies.18.DisplayName
 msgid "Felina de Ferro"
-msgstr ""
+msgstr "Iron Feline"
 
 #. enemies.19.DisplayName
 msgid "Patinadora de Choque"
-msgstr ""
+msgstr "Shock Skater"
 
 #. enemies.20.DisplayName
 msgid "Faísca"
-msgstr ""
+msgstr "Spark"
 
 #. enemies.21.DisplayName
 msgid "Pipoco"
-msgstr ""
+msgstr "Pop"
 
 #. enemies.22.DisplayName
 msgid "Broto"
-msgstr ""
+msgstr "Sprout"
 
 #. enemies.23.DisplayName
 msgid "Eco-01"
-msgstr ""
+msgstr "Echo-01"
 
 #. enemies.24.DisplayName
 msgid "Eco-02"
-msgstr ""
+msgstr "Echo-02"
 
 #. enemies.25.DisplayName
 msgid "Eco-03"
-msgstr ""
+msgstr "Echo-03"
 
 #. enemy-actions.0.DisplayName
 #. enemy-actions.4.DisplayName
 msgid "Golpe mecânico"
-msgstr ""
+msgstr "Mechanical Strike"
 
 #. enemy-actions.1.DisplayName
 #. enemy-actions.5.DisplayName
 msgid "Descarga elétrica"
-msgstr ""
+msgstr "Electric Discharge"
 
 #. enemy-actions.2.DisplayName
 #. enemy-actions.6.DisplayName
 msgid "Blindagem"
-msgstr ""
+msgstr "Plating"
 
 #. enemy-actions.3.DisplayName
 #. enemy-actions.7.DisplayName
 msgid "Autorreparo"
-msgstr ""
+msgstr "Self-Repair"
 
 #. enemy-actions.8.DisplayName
 msgid "Garra de Captura"
-msgstr ""
+msgstr "Capture Claw"
 
 #. enemy-actions.8.Description
 msgid "Causa 4–6 de dano e Sangramento de 1 por turno durante 2 turnos."
-msgstr ""
+msgstr "Deals 4–6 damage and Bleeding of 1 per turn for 2 turns."
 
 #. enemy-actions.9.DisplayName
 msgid "Rota de Interceptação"
-msgstr ""
+msgstr "Intercept Route"
 
 #. enemy-actions.9.Description
 msgid "Avança uma posição para alcançar a linha de frente."
-msgstr ""
+msgstr "Advances one position to reach the front line."
 
 #. enemy-actions.10.DisplayName
 msgid "Aerossol de Expurgo"
-msgstr ""
+msgstr "Purge Aerosol"
 
 #. enemy-actions.10.Description
 msgid "Pulveriza resíduos: 2–3 de dano e Contaminação de 2 por turno durante 2 turnos."
-msgstr ""
+msgstr "Sprays residue: 2–3 damage and Contamination of 2 per turn for 2 turns."
 
 #. enemy-actions.11.DisplayName
 msgid "Recuo dos Rotores"
-msgstr ""
+msgstr "Rotor Retreat"
 
 #. enemy-actions.11.Description
 msgid "Recua uma posição para manter distância da linha de frente."
-msgstr ""
+msgstr "Steps back one position to keep distance from the front line."
 
 #. enemy-actions.12.DisplayName
 msgid "Bastão de Contenção"
-msgstr ""
+msgstr "Containment Baton"
 
 #. enemy-actions.12.Description
 msgid "Causa 5–7 de dano contra um alvo na linha de frente."
-msgstr ""
+msgstr "Deals 5–7 damage to a target on the front line."
 
 #. enemy-actions.13.DisplayName
 msgid "Escudo de Catraca"
-msgstr ""
+msgstr "Turnstile Shield"
 
 #. enemy-actions.13.Description
 msgid "Ativa uma carga de Blindagem, reduzindo em 50% o próximo dano direto."
-msgstr ""
+msgstr "Activates a Plating charge, reducing the next direct damage by 50%."
 
 #. enemy-actions.14.DisplayName
 msgid "Fechar o Cerco"
-msgstr ""
+msgstr "Close the Net"
 
 #. enemy-actions.14.Description
 msgid "Avança uma posição para bloquear a passagem."
-msgstr ""
+msgstr "Advances one position to block the way."
 
 #. enemy-actions.15.DisplayName
 msgid "Ordem Contraditória"
-msgstr ""
+msgstr "Contradictory Order"
 
 #. enemy-actions.15.Description
 msgid "Reproduz falsas ordens de evacuação e acrescenta 12 de Instinto a um alvo na retaguarda."
-msgstr ""
+msgstr "Plays false evacuation orders and adds 12 Instinct to a target in the back line."
 
 #. enemy-actions.16.DisplayName
 msgid "Reposicionar Antena"
-msgstr ""
+msgstr "Reposition Antenna"
 
 #. enemy-actions.16.Description
 msgid "Recua uma posição para continuar transmitindo à distância."
-msgstr ""
+msgstr "Steps back one position to keep broadcasting from a distance."
 
 #. enemy-actions.17.DisplayName
 msgid "Laço de Cabos"
-msgstr ""
+msgstr "Cable Noose"
 
 #. enemy-actions.17.Description
 msgid "Causa 3–5 de dano, aplica Vulnerável e tenta empurrar o alvo uma posição."
-msgstr ""
+msgstr "Deals 3–5 damage, applies Vulnerable and tries to push the target one position."
 
 #. enemy-actions.18.DisplayName
 msgid "Tração de Emergência"
-msgstr ""
+msgstr "Emergency Traction"
 
 #. enemy-actions.18.Description
 msgid "Avança uma posição puxando o próprio chassi pelos cabos."
-msgstr ""
+msgstr "Advances one position by pulling its own chassis along the cables."
 
 #. enemy-actions.19.DisplayName
 msgid "Jato de Resíduo Industrial"
-msgstr ""
+msgstr "Industrial Residue Jet"
 
 #. enemy-actions.19.Description
 msgid "Causa 4–6 de dano e Contaminação de 1 por turno durante 3 turnos."
-msgstr ""
+msgstr "Deals 4–6 damage and Contamination of 1 per turn for 3 turns."
 
 #. enemy-actions.20.DisplayName
 msgid "Esteira de Recolhimento"
-msgstr ""
+msgstr "Collection Conveyor"
 
 #. enemy-actions.20.Description
 msgid "Avança uma posição em direção ao material marcado para coleta."
-msgstr ""
+msgstr "Advances one position toward the material marked for collection."
 
 #. enemy-actions.21.DisplayName
 msgid "Arco de Alta Tensão"
-msgstr ""
+msgstr "High-Voltage Arc"
 
 #. enemy-actions.21.Description
 msgid "Causa 2–4 de dano a um alvo em qualquer posição."
-msgstr ""
+msgstr "Deals 2–4 damage to a target in any position."
 
 #. enemy-actions.22.DisplayName
 msgid "Prensa de Contenção"
-msgstr ""
+msgstr "Containment Press"
 
 #. enemy-actions.22.Description
 msgid "Na primeira fase, atinge a linha de frente com 7–10 de dano."
-msgstr ""
+msgstr "In the first phase, hits the front line for 7–10 damage."
 
 #. enemy-actions.23.DisplayName
 msgid "Protocolo de Dispersão"
-msgstr ""
+msgstr "Dispersal Protocol"
 
 #. enemy-actions.23.Description
 msgid "Na primeira fase, acrescenta 10 de Instinto a até dois aliados distintos."
-msgstr ""
+msgstr "In the first phase, adds 10 Instinct to up to two different allies."
 
 #. enemy-actions.24.DisplayName
 msgid "Sentença de Sucateamento"
-msgstr ""
+msgstr "Scrapping Sentence"
 
 #. enemy-actions.24.Description
 msgid "Na segunda fase, causa 9–12 de dano a um alvo na linha de frente."
-msgstr ""
+msgstr "In the second phase, deals 9–12 damage to a target on the front line."
 
 #. enemy-actions.25.DisplayName
 msgid "Expulsão Hidráulica"
-msgstr ""
+msgstr "Hydraulic Expulsion"
 
 #. enemy-actions.25.Description
 msgid "Na segunda fase, causa 4–6 de dano ao primeiro alvo e tenta empurrá-lo uma posição."
-msgstr ""
+msgstr "In the second phase, deals 4–6 damage to the first target and tries to push it one position."
 
 #. enemy-actions.26.DisplayName
 msgid "Corte de Demolição"
-msgstr ""
+msgstr "Demolition Cut"
 
 #. enemy-actions.26.Description
 #. enemy-actions.28.Description
 #. enemy-actions.30.Description
 #. enemy-actions.31.Description
 msgid "Ação mínima de protótipo; valores experimentais para o encontro de teste."
-msgstr ""
+msgstr "Minimal prototype action; experimental values for the test encounter."
 
 #. enemy-actions.27.DisplayName
 msgid "Pega-Pega"
-msgstr ""
+msgstr "Tag"
 
 #. enemy-actions.27.Description
 msgid "Ataque básico de protótipo. Preferência por alvo marcado e invocação de Pipoco ainda não implementadas."
-msgstr ""
+msgstr "Basic prototype attack. Preference for a marked target and summoning Pop are not yet implemented."
 
 #. enemy-actions.28.DisplayName
 msgid "Risada Gravada"
-msgstr ""
+msgstr "Recorded Laughter"
 
 #. enemy-actions.29.DisplayName
 msgid "Golpe de Raízes (provisório)"
-msgstr ""
+msgstr "Root Strike (provisional)"
 
 #. enemy-actions.29.Description
 msgid "Ataque básico temporário exclusivo deste protótipo para permitir teste de combate. Não faz parte do kit conceitual aprovado; armadilhas e controle posicional ainda pendentes."
-msgstr ""
+msgstr "Temporary basic attack exclusive to this prototype to allow combat testing. Not part of the approved conceptual kit; traps and positional control still pending."
 
 #. enemy-actions.30.DisplayName
 msgid "Garra de Contenção"
-msgstr ""
+msgstr "Containment Claw"
 
 #. enemy-actions.31.DisplayName
 msgid "Pulso Corrompido"
-msgstr ""
+msgstr "Corrupted Pulse"
 
 #. enemy-actions.32.DisplayName
 msgid "Golpe de Bastão"
-msgstr ""
+msgstr "Baton Strike"
 
 #. enemy-actions.33.DisplayName
 msgid "Caixa Desafinada"
-msgstr ""
+msgstr "Out-of-Tune Box"
 
 #. enemy-actions.34.DisplayName
 msgid "Arco de Solda"
-msgstr ""
+msgstr "Welding Arc"
 
 #. enemy-actions.34.Description
 msgid "Ataque de protótipo. Cura e Bloqueio em outro robô ainda não implementados; não cura a si mesmo."
-msgstr ""
+msgstr "Prototype attack. Healing and Block on another robot not yet implemented; does not heal itself."
 
 #. enemy-actions.35.DisplayName
 msgid "Beliscão Mecânico"
-msgstr ""
+msgstr "Mechanical Pinch"
 
 #. enemy-actions.35.Description
 msgid "Ataque fraco de protótipo. Ligação e Bloqueio para outro robô ainda não implementados."
-msgstr ""
+msgstr "Weak prototype attack. Linking and Block for another robot not yet implemented."
 
 #. enemy-actions.36.DisplayName
 msgid "Talho de Liga"
-msgstr ""
+msgstr "Alloy Slash"
 
 #. enemy-actions.37.DisplayName
 msgid "Chicote de Cauda"
-msgstr ""
+msgstr "Tail Whip"
 
 #. enemy-actions.38.DisplayName
 msgid "Batida Elétrica"
-msgstr ""
+msgstr "Electric Hit"
 
 #. enemy-actions.38.Description
 msgid "Ataque básico de protótipo, sem Atordoamento. Arrancada e Espuma de Contenção ainda pendentes."
-msgstr ""
+msgstr "Basic prototype attack, no Stun. Dash and Containment Foam still pending."
 
 #. enemy-actions.39.DisplayName
 msgid "Serrada Curta"
-msgstr ""
+msgstr "Short Sawing"
 
 #. enemy-actions.40.DisplayName
 msgid "Buzina Irritante"
-msgstr ""
+msgstr "Annoying Horn"
 
 #. enemy-actions.41.DisplayName
 msgid "Ataque Básico"
-msgstr ""
+msgstr "Basic Attack"
 
 #. enemy-actions.41.Description
 msgid "Única ação: golpe fraco sem status ou controle de movimento. Valores experimentais."
-msgstr ""
+msgstr "Only action: weak hit with no status or movement control. Experimental values."
 
 #. enemy-actions.42.DisplayName
 #. enemy-actions.43.DisplayName
 #. enemy-actions.44.DisplayName
 msgid "Golpe de Sucata"
-msgstr ""
+msgstr "Scrap Strike"
 
 #. enemy-actions.42.Description
 #. enemy-actions.43.Description
 #. enemy-actions.44.Description
 msgid "Única ação: golpe fraco sem status extra. Mesma regra nas três variantes cosméticas; não significa três invocações simultâneas."
-msgstr ""
+msgstr "Only action: weak hit with no extra status. Same rule across the three cosmetic variants; does not mean three simultaneous summons."
 
 #. events.0.Title
 msgid "A Porta que Ainda Espera"
-msgstr ""
+msgstr "The Door That Still Waits"
 
 #. events.0.Description
 msgid "Raízes seguram entreaberta a porta blindada de uma Toca dos Antigos. A placa desbotada ainda se lê: \"ZONA SANITÁRIA 7 — EVACUAÇÃO AO SUBSOLO\". Arranhões antigos cobrem a soleira, como se alguém tivesse tentado entrar muito tempo atrás. Lá dentro, um terminal pisca em economia de energia."
-msgstr ""
+msgstr "Roots hold open the armored door of an Ancients' Den. The faded sign still reads: \"SANITARY ZONE 7 — EVACUATION TO BASEMENT\". Old scratches cover the threshold, as if someone had tried to get in a long time ago. Inside, a terminal blinks in power-saving mode."
 
 #. events.1.Title
 msgid "Voz no Interfone"
-msgstr ""
+msgstr "Voice on the Intercom"
 
 #. events.1.Description
 msgid "Um interfone de emergência da antiga estação estala e acende, depois de gerações mudo. Entre chiados, uma voz sintética repete: \"Protocolo de preservação humana ativo. Vetores não autorizados detectados no setor de escoamento. Contenção a caminho.\""
-msgstr ""
+msgstr "An emergency intercom in the old station crackles to life after generations of silence. Through the static, a synthetic voice repeats: \"Human preservation protocol active. Unauthorized vectors detected in the drainage sector. Containment on the way.\""
 
 #. events.2.Title
 msgid "Sobrevivente dos Túneis"
-msgstr ""
+msgstr "Survivor of the Tunnels"
 
 #. events.2.Description
 msgid "Um guaxinim de colete de manutenção está preso sob um terminal de vigilância desmontado, com a cauda anelada enroscada em bobinas de cabo. \"Desliguei o rastreador dessa coisa antes que ela me marcasse. Faz dias que estou preso aqui. Vocês têm comida?\""
-msgstr ""
+msgstr "A raccoon in a maintenance vest is trapped under a dismantled surveillance terminal, its ringed tail tangled in cable coils. \"I shut off this thing's tracker before it could mark me. I've been stuck here for days. Do you have any food?\""
 
 #. events.3.Title
 msgid "Caixa Lacrada"
-msgstr ""
+msgstr "Sealed Box"
 
 #. events.3.Description
 msgid "No fundo do móvel, uma caixa metálica com o símbolo de risco biológico dos Antigos. O lacre ainda está intacto e alguma coisa chacoalha lá dentro."
-msgstr ""
+msgstr "At the back of the cabinet, a metal box with the Ancients' biohazard symbol. The seal is still intact and something rattles inside."
 
 #. events.4.Title
 msgid "Cano Rompido"
-msgstr ""
+msgstr "Broken Pipe"
 
 #. events.4.Description
 msgid "Atrás da máquina, um cano de água limpa ainda corre, preso a uma bomba velha de manutenção. Dá para encher os cantis com calma ou tentar desmontar a bomba."
-msgstr ""
+msgstr "Behind the machine, a clean water pipe still runs, attached to an old maintenance pump. You can calmly fill the canteens or try to dismantle the pump."
 
 #. events.5.Title
 msgid "Mochila Esquecida"
-msgstr ""
+msgstr "Forgotten Backpack"
 
 #. events.5.Description
 msgid "Uma mochila de expedição de outra comunidade, presa num galho. Tem um nome bordado na alça e comida lá dentro."
-msgstr ""
+msgstr "An expedition backpack from another community, caught on a branch. There is a name embroidered on the strap and food inside."
 
 #. events.6.Title
 msgid "Barricada Velha"
-msgstr ""
+msgstr "Old Barricade"
 
 #. events.6.Description
 msgid "Atrás da carga, tábuas e placas de metal empilhadas contra uma porta, por alguém que queria manter alguma coisa do lado de dentro, ou do lado de fora."
-msgstr ""
+msgstr "Behind the cargo, boards and metal plates piled against a door by someone who wanted to keep something inside, or outside."
 
 #. events.7.Title
 msgid "Choro Atrás da Porta"
-msgstr ""
+msgstr "Crying Behind the Door"
 
 #. events.7.Description
 msgid "Do outro lado de uma porta de aço emperrada, um choro fino. Um filhote de lontra entrou atrás de comida e a porta fechou com ele lá dentro. A fechadura está tomada de ferrugem."
-msgstr ""
+msgstr "From the other side of a jammed steel door, a thin cry. An otter pup went in looking for food and the door shut with it inside. The lock is eaten away by rust."
 
 #. events.8.Title
 msgid "Poço de Manutenção"
-msgstr ""
+msgstr "Maintenance Shaft"
 
 #. events.8.Description
 msgid "Ao lado, a tampa de um poço de manutenção ficou aberta. Lá embaixo, no escuro total, algo reflete: caixas de suprimento empilhadas sobre a água."
-msgstr ""
+msgstr "Beside it, a maintenance shaft cover was left open. Down below, in total darkness, something gleams: supply crates stacked above the water."
 
 #. events.9.Title
 msgid "Sala dos Esporos"
-msgstr ""
+msgstr "Spore Room"
 
 #. events.9.Description
 msgid "O kit está vazio, mas aponta para a porta de vidro ao lado: uma enfermaria tomada por um fungo cinzento. Lá no fundo, um armário de remédios intacto. O ar lá dentro brilha de esporos."
-msgstr ""
+msgstr "The kit is empty, but it points to the glass door next to it: an infirmary overrun by a gray fungus. At the back, an intact medicine cabinet. The air inside glimmers with spores."
 
 #. expedition-nodes.0.Title
 msgid "Plataforma da Estação"
-msgstr ""
+msgstr "Station Platform"
 
 #. expedition-nodes.0.Description
 msgid "A comunidade mantém trilhos, oficinas e cuidado com ferramentas herdadas. A expedição parte em busca de suprimentos."
-msgstr ""
+msgstr "The community keeps tracks, workshops and care for inherited tools. The expedition sets out in search of supplies."
 
 #. expedition-nodes.1.Description
 msgid "Vitrines tomadas por raízes guardam suprimentos. Os sensores ainda distinguem clientes humanos de fauna não autorizada."
-msgstr ""
+msgstr "Shopfronts overrun by roots hold supplies. The sensors can still tell human customers from unauthorized fauna."
 
 #. expedition-nodes.2.Title
 msgid "Abrigo Lacrado"
-msgstr ""
+msgstr "Sealed Shelter"
 
 #. expedition-nodes.2.Description
 msgid "Uma placa do Programa Continuidade aponta para o subsolo. Os registros não dizem quem retornou."
-msgstr ""
+msgstr "A Continuity Program sign points underground. The records do not say who came back."
 
 #. expedition-nodes.3.Title
 msgid "Depósito Inundado"
-msgstr ""
+msgstr "Flooded Depot"
 
 #. expedition-nodes.3.Description
 msgid "Caixas boiam entre escombros de uma antiga rede de abastecimento. O que restou pode sustentar a Estação."
-msgstr ""
+msgstr "Crates float among the rubble of an old supply network. What remains may sustain the Station."
 
 #. expedition-nodes.4.Title
 #. scenarios.3.DisplayName
 msgid "Ponte das Raízes"
-msgstr ""
+msgstr "Root Bridge"
 
 #. expedition-nodes.4.Description
 msgid "A ponte ligava bairros; seus sensores agora vigiam permissões que nenhum morador da Estação possui."
-msgstr ""
+msgstr "The bridge once linked neighborhoods; its sensors now watch for permissions no resident of the Station has."
 
 #. expedition-nodes.5.Title
 msgid "Câmara Seca"
-msgstr ""
+msgstr "Dry Chamber"
 
 #. expedition-nodes.5.Description
 msgid "Marcas deixadas por outras equipes indicam um patamar seco. Cuidar uns dos outros também sustenta a viagem."
-msgstr ""
+msgstr "Marks left by other teams point to a dry ledge. Looking after each other also sustains the journey."
 
 #. expedition-nodes.6.Title
 msgid "Central Telefônica"
-msgstr ""
+msgstr "Telephone Exchange"
 
 #. expedition-nodes.6.Description
 msgid "Nomes incompletos atravessam uma linha de emergência. Uma ordem se repete, sem origem verificável."
-msgstr ""
+msgstr "Incomplete names cross an emergency line. An order repeats, with no verifiable origin."
 
 #. expedition-nodes.7.Title
 #. scenarios.4.DisplayName
 msgid "Laboratório Silencioso"
-msgstr ""
+msgstr "Silent Laboratory"
 
 #. expedition-nodes.7.Description
 msgid "Restam interfaces de comunicação e anotações de aprendizagem. Os aparelhos não contam sozinhos a história de seus usuários."
-msgstr ""
+msgstr "Communication interfaces and learning notes remain. The devices alone do not tell the story of their users."
 
 #. expedition-nodes.8.Title
 msgid "Dutos de Esgoto"
-msgstr ""
+msgstr "Sewer Ducts"
 
 #. expedition-nodes.8.Description
 msgid "Bombas antigas mantêm a água em movimento. Entre cabos de vigilância, alguém tenta abrir uma saída."
-msgstr ""
+msgstr "Old pumps keep the water moving. Among surveillance cables, someone is trying to open an exit."
 
 #. expedition-nodes.9.Title
 msgid "Posto Avançado Provisório"
-msgstr ""
+msgstr "Provisional Outpost"
 
 #. expedition-nodes.9.Description
 msgid "Um abrigo improvisado permite cuidar das feridas e dividir o pouco que resta antes da eclusa."
-msgstr ""
+msgstr "An improvised shelter lets you tend wounds and share what little is left before the lock."
 
 #. expedition-nodes.10.Title
 msgid "Portão de Triagem"
-msgstr ""
+msgstr "Triage Gate"
 
 #. expedition-nodes.10.Description
 msgid "A triagem exige credenciais humanas. A comunidade existe, mas o sistema ainda não a reconhece."
-msgstr ""
+msgstr "Triage demands human credentials. The community exists, but the system does not recognize it yet."
 
 #. expedition-nodes.11.Title
 msgid "Eclusa Central: O Porteiro"
-msgstr ""
+msgstr "Central Lock: The Gatekeeper"
 
 #. expedition-nodes.11.Description
 msgid "O Porteiro conserva uma ordem de isolamento da guerra. Seus relés sustentam a defesa da eclusa."
-msgstr ""
+msgstr "The Gatekeeper preserves an isolation order from the war. Its relays sustain the lock's defense."
 
 #. perks.0.DisplayName
 msgid "Ágil"
-msgstr ""
+msgstr "Agile"
 
 #. perks.0.Description
 msgid "+1 Velocidade enquanto estiver no grupo."
-msgstr ""
+msgstr "+1 Speed while in the party."
 
 #. perks.1.DisplayName
 msgid "Corajoso"
-msgstr ""
+msgstr "Brave"
 
 #. perks.1.Description
 #. perks.2.Description
 msgid "+5 pontos percentuais na chance de Superação."
-msgstr ""
+msgstr "+5 percentage points to Breakthrough chance."
 
 #. perks.2.DisplayName
 msgid "Esperançoso"
-msgstr ""
+msgstr "Hopeful"
 
 #. perks.3.DisplayName
 msgid "Lento"
-msgstr ""
+msgstr "Slow"
 
 #. perks.3.Description
 msgid "−1 Velocidade enquanto estiver no grupo."
-msgstr ""
+msgstr "−1 Speed while in the party."
 
 #. perks.4.DisplayName
 msgid "Ansioso"
-msgstr ""
+msgstr "Anxious"
 
 #. perks.4.Description
 #. perks.5.Description
 msgid "−5 pontos percentuais na chance de Superação."
-msgstr ""
+msgstr "−5 percentage points to Breakthrough chance."
 
 #. perks.5.DisplayName
 msgid "Pessimista"
-msgstr ""
+msgstr "Pessimist"
 
 #. perks.6.DisplayName
 msgid "Companheiro fiel"
-msgstr ""
+msgstr "Loyal Companion"
 
 #. perks.6.Description
 msgid "Proteção válida de outro aliado: −5 Instinto próprio, uma vez por rodada."
-msgstr ""
+msgstr "Valid protection of another ally: −5 own Instinct, once per round."
 
 #. perks.7.DisplayName
 msgid "Temor das máquinas"
-msgstr ""
+msgstr "Fear of Machines"
 
 #. perks.7.Description
 msgid "Ao receber dano de uma máquina: +3 Instinto próprio, uma vez por rodada."
-msgstr ""
+msgstr "When taking damage from a machine: +3 own Instinct, once per round."
 
 #. relics.0.DisplayName
 msgid "Botão de Cobre"
-msgstr ""
+msgstr "Copper Button"
 
 #. relics.0.Description
 msgid "+3 de Vida Máxima. Um talismã sólido da época dos humanos."
-msgstr ""
+msgstr "+3 Max Health. A solid talisman from the human era."
 
 #. relics.1.DisplayName
 msgid "Pena de Vidro"
-msgstr ""
+msgstr "Glass Feather"
 
 #. relics.1.Description
 msgid "+1 de Velocidade. Cortada de um vidro de laboratório aerodinâmico."
-msgstr ""
+msgstr "+1 Speed. Cut from an aerodynamic laboratory glass."
 
 #. relics.2.DisplayName
 msgid "Coleira de Lembrança"
-msgstr ""
+msgstr "Memory Collar"
 
 #. relics.2.Description
 msgid "-2 de Instinto causado por eventos misteriosos (mínimo zero)."
-msgstr ""
+msgstr "-2 Instinct caused by mysterious events (minimum zero)."
 
 #. research.0.DisplayName
 msgid "Treino: Punho de Sucata"
-msgstr ""
+msgstr "Training: Scrap Fist"
 
 #. research.0.Description
 msgid "+1 nos limites de dano ou cura de Punho de Sucata."
-msgstr ""
+msgstr "+1 to the damage or healing limits of Scrap Fist."
 
 #. research.1.DisplayName
 msgid "Treino: Corte de Fase"
-msgstr ""
+msgstr "Training: Phase Cut"
 
 #. research.1.Description
 msgid "+1 nos limites de dano ou cura de Corte de Fase."
-msgstr ""
+msgstr "+1 to the damage or healing limits of Phase Cut."
 
 #. research.2.DisplayName
 msgid "Treino: Carga Voltaica"
-msgstr ""
+msgstr "Training: Voltaic Charge"
 
 #. research.2.Description
 msgid "+1 nos limites de dano ou cura de Carga Voltaica."
-msgstr ""
+msgstr "+1 to the damage or healing limits of Voltaic Charge."
 
 #. research.3.DisplayName
 msgid "Treino: Recurso de Emergência"
-msgstr ""
+msgstr "Training: Emergency Resort"
 
 #. research.3.Description
 msgid "+1 nos limites de dano ou cura de Recurso de Emergência."
-msgstr ""
+msgstr "+1 to the damage or healing limits of Emergency Resort."
 
 #. scenarios.2.DisplayName
 msgid "Sala Esquecida"
-msgstr ""
+msgstr "Forgotten Room"
 
 #. scenarios.5.DisplayName
 msgid "Túneis do Eco"
-msgstr ""
+msgstr "Echo Tunnels"
 
 #. search-outcomes.0.Text
 msgid "Atrás de latas amassadas, um pacote de ração ainda lacrado. (+2 Comida)"
-msgstr ""
+msgstr "Behind crushed cans, a still-sealed pack of rations. (+2 Food)"
 
 #. search-outcomes.1.Text
 msgid "Um pote de vidro com sementes secas, guardado por alguém que pretendia voltar. (+3 Sementes)"
-msgstr ""
+msgstr "A glass jar of dry seeds, kept by someone who meant to come back. (+3 Seeds)"
 
 #. search-outcomes.2.Text
 msgid "Uma caixa de primeiros socorros dos Antigos, com gazes ainda limpas. (+1 Curativo)"
-msgstr ""
+msgstr "An Ancients' first aid box, with gauze still clean. (+1 Bandage)"
 
 #. search-outcomes.3.Text
 msgid "Peças de motor e fios de cobre que a oficina da Estação vai saber usar. (+2 Sucata)"
-msgstr ""
+msgstr "Engine parts and copper wire the Station's workshop will know how to use. (+2 Scrap)"
 
 #. search-outcomes.4.Text
 msgid "Comida e um punhado de sementes enrolados num pano. (+1 Comida, +1 Semente)"
-msgstr ""
+msgstr "Food and a handful of seeds wrapped in a cloth. (+1 Food, +1 Seed)"
 
 #. search-outcomes.5.Text
 msgid "{Heroi} acha um desenho antigo: um cachorro, uma casa e um sol torto. A equipe segue mais leve. (+5 Esperança, +1 Semente)"
-msgstr ""
+msgstr "{Heroi} finds an old drawing: a dog, a house and a crooked sun. The team moves on lighter. (+5 Hope, +1 Seed)"
 
 #. search-outcomes.6.Text
 msgid "{Heroi} corta a pata numa lata enferrujada. (−3 de vida)"
-msgstr ""
+msgstr "{Heroi} cuts a paw on a rusty can. (−3 Health)"
 
 #. search-outcomes.7.Text
 msgid "Um alarme antigo dispara lá dentro e para do nada. {Heroi} fica com o coração na boca. (+8 de Instinto)"
-msgstr ""
+msgstr "An old alarm goes off in there and stops out of nowhere. {Heroi}'s heart leaps into their throat. (+8 Instinct)"
 
 #. search-outcomes.8.Text
 msgid "A comida guardada ali estava estragada e o cheiro passou para a ração da equipe. (−1 Comida)"
-msgstr ""
+msgstr "The food stored there had spoiled and the smell got into the team's rations. (−1 Food)"
 
 #. search-outcomes.9.Text
 msgid "Esporos de fungo sobem quando a porta abre. {Heroi} tosse e se afasta. (−2 de vida, +5 de Instinto)"
-msgstr ""
+msgstr "Fungal spores rise when the door opens. {Heroi} coughs and backs away. (−2 Health, +5 Instinct)"
 
 #. search-outcomes.10.Text
 msgid "Uma sirene curta ecoa pela rua. Nada aparece, mas a equipe perde a calma. (−5 de Esperança)"
-msgstr ""
+msgstr "A short siren echoes down the street. Nothing appears, but the team loses its calm. (−5 Hope)"
 
 #. search-outcomes.11.Text
 msgid "Um pé de cabra enferrujado, mas firme. Pode abrir muita porta por aí. (Ferramenta: Pé de cabra)"
-msgstr ""
+msgstr "A rusty but sturdy crowbar. It could open a lot of doors out there. (Tool: Crowbar)"
 
 #. search-outcomes.12.Text
 msgid "Uma lanterna de manivela que ainda acende depois de umas voltas. (Ferramenta: Lanterna)"
-msgstr ""
+msgstr "A hand-crank flashlight that still lights up after a few turns. (Tool: Flashlight)"
 
 #. search-outcomes.13.Text
 msgid "Uma máscara dos Antigos com o filtro ainda lacrado no saquinho. (Ferramenta: Máscara com filtro)"
-msgstr ""
+msgstr "An Ancients' mask with the filter still sealed in its bag. (Tool: Filter Mask)"
 
 #~ msgid "A expedição e todo o progresso salvo são substituídos por uma campanha do zero, na Estação."
 #~ msgstr "The expedition and all saved progress are replaced by a fresh campaign, at the Station."
