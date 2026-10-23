@@ -99,6 +99,14 @@ func _street_and_house() -> void:
 	t.check(not prop.opened, "antes de vasculhar, fechado")
 	_marker_on_top(prop, "na rua")
 	t.check(_collider_at(street, prop.global_position + Vector3(0, 0.3, 0)), "o objeto da rua tem colisão")
+	# A caixa entra na lista da tecla C e do _free_spot (QA da #50), e nenhum objeto fica na frente da porta de uma loja.
+	t.check(loot.all(func(i): return street._blocked(corridor.props[i].volume().get_center())), "o _free_spot vê a colisão dos objetos da rua")
+	var near_door: Array = []
+	for i in loot:
+		for door in corridor.doors:
+			if absf(float(door.x) - corridor.props[i].position.x) < corridor.PROP_DOOR_CLEARANCE - 0.01:
+				near_door.append(i)
+	t.check(near_door.is_empty(), "nenhum objeto da rua na frente de uma porta %s" % [near_door])
 	for i in first:
 		route.steps[i].resolved = true
 	route.index = first
@@ -123,6 +131,10 @@ func _street_and_house() -> void:
 			t.check(absf(spot.global_position.x - room.spot_xs[i]) < 0.01 and not spot.opened, "no lugar do ponto, fechado")
 		if not room.search_props.is_empty():
 			_marker_on_top(room.search_props[0], "na loja %d" % shop)
+		# Sem caminho por trás: entre o objeto e a parede do fundo a equipe não passa (QA da #50).
+		await _tree.physics_frame
+		t.check(room.search_props.all(func(p): return street._blocked(Vector3(p.global_position.x, 0, p.volume().position.z - 0.35))),
+			"na loja %d, ninguém passa por trás dos objetos" % shop)
 		corridor._close_room()
 		await _tree.process_frame
 	site.shop = 0

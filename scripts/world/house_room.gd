@@ -18,7 +18,8 @@ const HEIGHT := 3.4
 const WALL_HEIGHT := 3.2
 const DOOR_Z := Vector2(-1.4, 0.4)
 const SPOT_FRACTIONS := [0.36, 0.56, 0.74]
-## A frente dos objetos de busca (#50): na frente dos móveis pintados no fundo, atrás de onde a equipe anda.
+## A frente dos objetos de busca (#50): na frente dos móveis pintados no fundo, atrás de onde a equipe anda (a colisão
+## deles vai daqui até a parede).
 const SEARCH_PROP_Z := -2.2
 const GUARD_FRACTION := 0.66
 const ENTRANCE_FRACTION := 0.3
@@ -113,14 +114,17 @@ func _solid(center: Vector3, size: Vector3) -> void:
 	add_child(body)
 
 
-## O objeto do ponto i encostado no fundo, com colisão no volume dele (a equipe vasculha da frente).
+## O objeto do ponto i, com a frente em SEARCH_PROP_Z. A colisão vai da frente dele até a parede do fundo: a equipe
+## vasculha pela frente e não passa por trás (sumia atrás do objeto).
 func _search_prop(i: int, open: bool) -> void:
 	var prop := AHSearchProp.new().setup(AHSearchProp.shop_prop(shop, i), open)
 	prop.position = Vector3(WIDTH * SPOT_FRACTIONS[i], 0, SEARCH_PROP_Z - float(prop.spec.depth_m) * 0.5)
 	add_child(prop)
 	search_props.append(prop)
 	var box := prop.volume()
-	_solid(box.get_center(), box.size)
+	var back := Vector3(box.position.x, 0, BACK_Z)
+	var front := Vector3(box.end.x, box.size.y, SEARCH_PROP_Z)
+	_solid((back + front) * 0.5, front - back)
 
 
 static func _tone(color: Color) -> StandardMaterial3D:

@@ -49,25 +49,32 @@ func _run() -> void:
 	corridor._search_prop(first)
 	await create_timer(1.5).timeout
 	await _shot("street-open")
-	# As lojas: a primeira casa, uma vez de cada tipo.
-	var site: Dictionary = route.sites[0]
-	site.locked = false
-	site.has_enemy = false
-	route.index = maxi(route.index, int(site.step))
+	# As lojas: uma de cada tipo (a casa da rota com aquela loja; sem ela, a primeira fazendo de conta que é).
 	for shop in 3:
+		var index := 0
+		for i in route.sites.size():
+			if int(route.sites[i].shop) == shop:
+				index = i
+				break
+		var site: Dictionary = route.sites[index]
 		site.shop = shop
+		site.locked = false
+		site.has_enemy = false
 		for spot in site.spots:
 			spot.searched = false
-		route.current_house = -1
-		J.enter_house(campaign.state, 0)
-		corridor._open_room(0)
+		for i in int(site.step):
+			route.steps[i].resolved = true
+		route.index = maxi(route.index, int(site.step))
+		J.enter_house(campaign.state, index)
+		corridor._open_room(index)
 		var room = corridor.room
 		street._place_leader(Vector3(room.spot_xs[0] - 0.8, 0, street.lane_z))
 		await _shot("shop%d-closed" % shop)
-		corridor._search_spot(0, 0)
+		corridor._search_spot(index, 0)
 		corridor.hud.close_modal()
 		await create_timer(1.5).timeout
 		await _shot("shop%d-open" % shop)
+		J.leave_house(campaign.state)
 		corridor._close_room()
 		street.set_indoor(false)
 		await process_frame

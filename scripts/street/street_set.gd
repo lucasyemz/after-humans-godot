@@ -198,7 +198,7 @@ func add_card(file: String, rect: Rect2, bottom: Vector3, height: float, yaw: fl
 
 
 ## Colisão estática (metros, eixos da Godot), com uma caixa vermelha que a tecla C mostra.
-func add_collider(center: Vector3, size: Vector3) -> void:
+func add_collider(center: Vector3, size: Vector3) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = "Collider"
 	body.position = center
@@ -219,6 +219,7 @@ func add_collider(center: Vector3, size: Vector3) -> void:
 	debug.name = "DebugBox"
 	body.add_child(debug)
 	_target.add_child(body, true)
+	return body
 
 
 

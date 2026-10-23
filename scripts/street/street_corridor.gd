@@ -40,6 +40,8 @@ const SHOP_ART := ["grocery", "workshop", "cinema"]
 const PROP_NAMES := {"street_crates": "os caixotes", "street_trash_can": "a lixeira", "street_mailbox": "a caixa de correio"}
 ## Onde ficam na calçada (cm, eixos da Unreal: y é a profundidade, z a altura).
 const PROP_Y := -285.0
+## Distância mínima (m) entre um objeto de busca da rua e a porta de uma loja.
+const PROP_DOOR_CLEARANCE := 1.6
 ## Folga das pontas de cada zona do cenário (ZoneMargin) e o espaço entre os da fila (PartySpacing).
 const ZONE_MARGIN := 0.45
 const PARTY_SPACING := 1.3
@@ -304,11 +306,20 @@ func _spawn_props() -> void:
 		# O mesmo trecho sempre com o mesmo objeto (pela ordem dele entre os trechos de busca), aberto se já foi vasculhado.
 		var prop := AHSearchProp.new().setup(AHSearchProp.street_prop(order), route.props.get(str(index), false))
 		order += 1
-		prop.position = AHStreetSet.ue(_step_x(index, 0.45) * 100.0, PROP_Y, AHStreetSet.SIDEWALK_TOP_Z)
+		# Longe da porta de uma loja (o objeto na frente dela tapava a porta e os dois avisos disputavam o lugar).
+		var x := _step_x(index, 0.45)
+		for door in doors:
+			if absf(float(door.x) - x) < PROP_DOOR_CLEARANCE:
+				x = float(door.x) + PROP_DOOR_CLEARANCE * (1.0 if x >= float(door.x) else -1.0)
+		prop.position = AHStreetSet.ue(x * 100.0, PROP_Y, AHStreetSet.SIDEWALK_TOP_Z)
 		street.add_child(prop)
 		props[index] = prop
 		var box := prop.volume()
-		street._dynamic.add_collider(box.get_center(), box.size)
+		var body: StaticBody3D = street._dynamic.add_collider(box.get_center(), box.size)
+		# Posta depois de street._collect_set: a caixa entra à mão na lista da tecla C e do _free_spot.
+		var debug: MeshInstance3D = body.get_node("DebugBox")
+		debug.visible = not street._debug_colliders.is_empty() and street._debug_colliders[0].visible
+		street._debug_colliders.append(debug)
 
 
 ## Portas das casas abertas (e da trancada depois de arrombada) com a pintura da porta aberta.
@@ -529,8 +540,8 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 			action = Callable()
 		best = distance
 	for index in props:
-		if absf(_step_x(index, 0.45) - leader.x) < best and index <= route.index and not route.props.get(str(index), false):
-			best = absf(_step_x(index, 0.45) - leader.x)
+		if absf(props[index].position.x - leader.x) < best and index <= route.index and not route.props.get(str(index), false):
+			best = absf(props[index].position.x - leader.x)
 			text = "E  Vasculhar %s" % PROP_NAMES[props[index].prop_name]
 			action = _search_prop.bind(index)
 			where = _prop_point(index)
