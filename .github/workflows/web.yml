@@ -12,9 +12,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Um deploy no Pages não é cancelado no meio; a próxima versão espera.
 concurrency:
   group: web-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   GODOT_VERSION: 4.7.2
@@ -24,7 +25,12 @@ env:
 jobs:
   build:
     name: Exportar a web
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    # Só o CI verde de um push na main deste repositório (não um PR, nem de fork com um branch "main") ou à mão.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -81,10 +87,11 @@ jobs:
       # Baixa. Sem placa é lento (a Estação leva uns 3 minutos): o tempo em ms daqui não vale como medida.
       - name: Abrir no navegador
         run: |
+          set -o pipefail
           npm install --no-save --prefix /tmp/pw playwright@1.56.1
           /tmp/pw/node_modules/.bin/playwright install --with-deps chromium
           cp tools/web_perf.mjs /tmp/pw/web_perf.mjs
-          node /tmp/pw/web_perf.mjs --dir="$PWD/build/web" --only=title,station,street,combat --levels=0 --timeout=2400 | tee web-perf.log
+          node /tmp/pw/web_perf.mjs --dir="$PWD/build/web" --only=title,station,street,combat --levels=0 --expect=4 --timeout=2400 | tee web-perf.log
 
       - name: Guardar o build
         uses: actions/upload-artifact@v4
@@ -95,8 +102,9 @@ jobs:
             web-perf.log
           retention-days: 7
 
+      # Publica só a main (à mão, também só da main).
       - name: Preparar o Pages
-        if: vars.PUBLISH_WEB == 'true'
+        if: vars.PUBLISH_WEB == 'true' && (github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main')
         uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
@@ -104,7 +112,7 @@ jobs:
   deploy:
     name: Publicar no GitHub Pages
     needs: build
-    if: vars.PUBLISH_WEB == 'true'
+    if: vars.PUBLISH_WEB == 'true' && (github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     permissions:
       pages: write

@@ -2,7 +2,9 @@
 // quando não há placa), passa --perf ao jogo e devolve as linhas "PERF ..." do console. Também é a prova de que a web
 // carrega e roda a Estação e uma luta (#39): sai com 1 se o jogo não terminar o roteiro.
 //   "$GODOT" --headless --path . --export-release "Web" build/web/index.html
-//   node tools/web_perf.mjs [--only=station,street,combat] [--levels=0] [--timeout=900] [--verbose] [--shot=foto.png]
+//   node tools/web_perf.mjs [--only=station,street,combat] [--levels=0] [--expect=3] [--timeout=900] [--verbose] [--shot=foto.png]
+// Com --expect=N, sai com 1 se o roteiro não medir N paradas, se uma parada não acontecer ("sem patrulha") ou se a página
+// der erro antes do fim (o erro do áudio da página ao fechar, depois do fim, não conta).
 // Precisa do Playwright (npm i -g playwright) e de um Chromium.
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
@@ -38,24 +40,39 @@ const browser = await chromium.launch({ args: ["--enable-unsafe-swiftshader", "-
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const lines = [];
 let finished = false;
+let stops = -1;
+const problems = [];
 const started = Date.now();
 page.on("console", (message) => {
 	const text = message.text();
 	if (text.startsWith("PERF")) {
 		lines.push(text);
 		console.log(`${((Date.now() - started) / 1000).toFixed(1)}s ${text}`);
-		if (text.startsWith("PERF fim")) finished = true;
+		if (text.startsWith("PERF fim")) {
+			finished = true;
+			stops = Number(text.split(" ")[2]);
+		}
+		if (text.includes("sem patrulha")) problems.push(text);
 	} else if (args.verbose !== undefined || message.type() === "error") {
-		console.log(`console error: ${text}`);
+		console.log(`console ${message.type()}: ${text}`);
+		if (message.type() === "error" && !finished) problems.push(text);
 	}
 });
-page.on("pageerror", (error) => console.log(`page error: ${error.message}`));
+page.on("pageerror", (error) => {
+	console.log(`page error: ${error.message}`);
+	if (!finished) problems.push(error.message);
+});
 await page.goto(url);
 while (!finished && Date.now() - started < timeout) {
 	await page.waitForTimeout(1000);
 }
 if (args.shot) await page.screenshot({ path: args.shot });
-console.log(finished ? `web: roteiro completo em ${((Date.now() - started) / 1000).toFixed(0)} s` : "web: o roteiro não terminou no tempo");
+const expected = args.expect !== undefined ? Number(args.expect) : null;
+const ok = finished && problems.length === 0 && (expected === null || stops === expected);
+if (!finished) console.log("web: o roteiro não terminou no tempo");
+else if (expected !== null && stops !== expected) console.log(`web: o roteiro mediu ${stops} paradas, esperadas ${expected}`);
+for (const problem of problems) console.log(`web: problema antes do fim: ${problem}`);
+if (ok) console.log(`web: roteiro completo em ${((Date.now() - started) / 1000).toFixed(0)} s`);
 await browser.close();
 server.close();
-process.exit(finished ? 0 : 1);
+process.exit(ok ? 0 : 1);

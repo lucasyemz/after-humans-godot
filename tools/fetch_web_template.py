@@ -56,7 +56,8 @@ def entries(url):
                 if offset == 0xFFFFFFFF:
                     offset = values.pop(0)
             q += 4 + length
-        found[name] = (method, csize, offset)
+        crc, = struct.unpack("<I", directory[p + 16:p + 20])
+        found[name] = (method, csize, offset, crc)
         p += 46 + name_len + extra_len + comment_len
     return found
 
@@ -68,12 +69,15 @@ def main():
     target.mkdir(parents=True, exist_ok=True)
     index = entries(url)
     for name in WANTED:
-        method, csize, offset = index[name]
+        method, csize, offset, crc = index[name]
         header = fetch(url, offset, offset + 29)
         name_len, extra_len = struct.unpack("<HH", header[26:30])
         start = offset + 30 + name_len + extra_len
         data = fetch(url, start, start + csize - 1)
         data = zlib.decompress(data, -15) if method == 8 else data
+        # O CRC32 do índice do zip: um download corrompido não fica no cache do CI.
+        if zlib.crc32(data) & 0xFFFFFFFF != crc:
+            sys.exit(f"{name}: CRC32 não confere (download corrompido)")
         (target / Path(name).name).write_bytes(data)
         print(f"{target / Path(name).name}: {len(data)} bytes")
 

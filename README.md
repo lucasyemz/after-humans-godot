@@ -171,12 +171,14 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
 - abre o build no Chromium e passa pela Estação e por uma luta (`tools/web_perf.mjs`);
 - guarda o build como artefato (`web-build`, 7 dias).
 
-**Publicar no GitHub Pages** deixa o endereço público, então fica desligado até o Lucas decidir. Para ligar:
-1. Em Settings > Pages, escolha a fonte "GitHub Actions". Num repositório privado, o Pages pede um plano pago.
+**Publicar no GitHub Pages** deixa o jogo aberto a qualquer um no endereço, então fica desligado até o Lucas decidir. O
+repositório já é público. Para ligar:
+1. Em Settings > Pages, escolha a fonte "GitHub Actions".
 2. Em Settings > Secrets and variables > Actions > Variables, crie `PUBLISH_WEB` = `true`.
 
-O próximo push na `main` publica em `https://lucasyemz.github.io/after-humans-godot/`. O pacote tem 127 MB e
-demora a carregar na primeira vez (#12).
+O próximo push na `main` publica em `https://lucasyemz.github.io/after-humans-godot/`. Só a `main` publica: um PR, um
+fork ou uma rodada à mão de outro branch nunca vão para o Pages. O pacote tem 127 MB e demora a carregar na primeira
+vez (#12). Se o primeiro deploy recusar o `index.pck` por passar de 100 MB, o pacote precisa diminuir antes.
 
 ### Textos e tradução
 
