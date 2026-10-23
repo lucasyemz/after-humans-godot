@@ -19,6 +19,7 @@ func run(context) -> void:
 	Tips.enabled = false
 	await _street()
 	await _scenario()
+	await _depot_edge()
 	await _station()
 	Tips.enabled = tips
 	if _tree.current_scene != null:
@@ -150,6 +151,18 @@ func _street() -> void:
 		"depois da luta, os inimigos perdem a silhueta")
 
 
+## A borda do piso da frente do Depósito (35 cm) é medida, e a dos Dutos também cabe no corte.
+func _depot_edge() -> void:
+	var world := AHScenarioWorld.new()
+	_tree.root.add_child(world)
+	world.build("FloodedDepot")
+	var zone: Dictionary = world.zones[0]
+	var edge := world.front_edge(0, (zone.z0 + zone.z1) * 0.5)
+	t.check(edge > 0.3 and edge <= AHScenarioWorld.FRONT_EDGE_MAX, "a borda do piso da frente do Depósito é medida (%.2f m)" % edge)
+	world.queue_free()
+	await _tree.process_frame
+
+
 ## Num cenário, as peças que o cenário junta numa malha saem da árvore: nenhuma fica registrada (a captura caía).
 func _scenario() -> void:
 	var c: Dictionary = Campaign.create_initial(6)
@@ -168,6 +181,11 @@ func _scenario() -> void:
 	await _tree.process_frame
 	t.check(street._heroes.all(func(c): return c.position.x >= street.walk_min.x - 0.01 and c.position.x <= street.walk_max.x + 0.01),
 		"na ponta da zona, a equipe toda fica dentro da área de andar")
+	var xs: Array = street._heroes.map(func(c): return snappedf(c.position.x, 0.1))
+	t.check(xs.size() == street._heroes.size() and xs.all(func(x): return xs.count(x) == 1), "em fila, sem ninguém empilhado %s" % [xs])
+	# No Depósito a borda do piso da frente é alta: o pé sem silhueta vai até ela.
+	var edge: float = street.scenario.front_edge(street.scenario.zone_at(street._leader.position.x), street.lane_z)
+	t.check(street._heroes.all(func(c): return c.silhouette_foot >= maxf(AHSpriteCard.SILHOUETTE_FOOT, edge)), "o corte do pé cobre a borda da zona (%.2f m)" % edge)
 
 
 func _station() -> void:

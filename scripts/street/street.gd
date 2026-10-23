@@ -315,6 +315,10 @@ func set_scenario_zone(index: int) -> void:
 	var half_depth: float = minf(1.2, (_zone.z1 - _zone.z0 - 1.0) * 0.5)
 	walk_min = Vector3(_zone.x0 + 0.4, floor_y, lane_z - half_depth)
 	walk_max = Vector3(_zone.x1 - 0.4, floor_y, lane_z + half_depth)
+	# A borda do piso da frente encobre os pés: a silhueta não pinta essa faixa (#51).
+	var edge: float = scenario.front_edge(index, lane_z) + 0.04
+	for card in _heroes:
+		card.set_silhouette_foot(maxf(AHSpriteCard.SILHOUETTE_FOOT, edge))
 	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot"].has(scenario.map_name)
 	_apply_weather()
 
@@ -594,6 +598,12 @@ func _build_party() -> void:
 
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
 func _place_leader(at: Vector3, facing: float = 1.0) -> void:
+	# Longe o bastante da ponta para a fila caber atrás dele (na ponta, os seguidores se empilhavam na borda).
+	var span := PARTY_SPACING * maxi(_heroes.size() - 1, 0)
+	if facing > 0.0:
+		at.x = minf(maxf(at.x, walk_min.x + span), walk_max.x)
+	else:
+		at.x = maxf(minf(at.x, walk_max.x - span), walk_min.x)
 	at = _free_spot(at)
 	_leader.position = at
 	_trail.clear()

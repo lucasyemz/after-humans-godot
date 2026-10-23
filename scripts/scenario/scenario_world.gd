@@ -12,6 +12,8 @@ const CARD_BRIGHTNESS := 1.7
 
 ## A folga acima da borda da frente ao subir o chão da luta.
 const FRONT_LIFT_MARGIN := 0.06
+## A borda da frente mais alta que ainda conta como piso (acima disso é parede, e a silhueta vale).
+const FRONT_EDGE_MAX := 0.6
 
 static var _mesh_cache: Array = []
 
@@ -158,6 +160,20 @@ func front_lift(zone_index: int, feet_z: float, slope: float) -> float:
 			continue
 		lift = maxf(lift, above - slope * depth + FRONT_LIFT_MARGIN)
 	return lift
+
+
+## A altura (m acima do piso) da borda baixa mais alta na frente da faixa da zona: o que encobre os pés de quem anda
+## (a silhueta não pinta essa faixa, #51). Só as peças baixas (até FRONT_EDGE_MAX) contam; o resto tapa de verdade.
+func front_edge(zone_index: int, feet_z: float) -> float:
+	var zone: Dictionary = zones[zone_index]
+	var edge := 0.0
+	for box in walls:
+		if box.position.z - feet_z < 0.05 or box.end.x <= zone.x0 or box.position.x >= zone.x1:
+			continue
+		var above: float = box.end.y - zone.y
+		if above > 0.0 and above <= FRONT_EDGE_MAX:
+			edge = maxf(edge, above)
+	return edge
 
 
 ## A zona (0..n) que contém x, ou -1.

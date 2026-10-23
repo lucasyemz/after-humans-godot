@@ -24,6 +24,8 @@ var _frame := 0
 var _frame_time := 0.0
 var _flash_tween: Tween
 var _silhouette: ShaderMaterial
+## Quanto acima do pé (m) fica sem silhueta: o padrão, ou a borda do piso da frente da zona do cenário (#51).
+var silhouette_foot := SILHOUETTE_FOOT
 
 
 func _init() -> void:
@@ -115,7 +117,7 @@ func _layout() -> void:
 		_silhouette.set_shader_parameter("uv_offset", Vector2(_material.uv1_offset.x, _material.uv1_offset.y))
 		_silhouette.set_shader_parameter("uv_scale", Vector2(_material.uv1_scale.x, _material.uv1_scale.y))
 		# O pé e um pouco acima dele (SILHOUETTE_FOOT metros) não ganham silhueta.
-		var foot_px := region.size.y - anchor.y + SILHOUETTE_FOOT / px_to_m
+		var foot_px := region.size.y - anchor.y + silhouette_foot / px_to_m
 		_silhouette.set_shader_parameter("foot_cut", clampf(foot_px / region.size.y, 0.0, 0.5))
 
 
@@ -132,6 +134,11 @@ func set_silhouette(color) -> void:
 	_silhouette.set_shader_parameter("color", color)
 	_silhouette.set_shader_parameter("albedo_tex", _texture)
 	_material.next_pass = _silhouette
+	_layout()
+
+
+func set_silhouette_foot(meters: float) -> void:
+	silhouette_foot = meters
 	_layout()
 
 
