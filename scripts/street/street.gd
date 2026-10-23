@@ -597,8 +597,10 @@ func _place_leader(at: Vector3, facing: float = 1.0) -> void:
 	at = _free_spot(at)
 	_leader.position = at
 	_trail.clear()
+	# O rastro (onde os seguidores ficam) não sai da área de andar: na chegada a um cenário eles nasciam atrás da parede
+	# ou da escada (e apareciam em silhueta, #51).
 	for step in 80:
-		_trail.append(at - Vector3(facing * 0.06 * step, 0, 0))
+		_trail.append((at - Vector3(facing * 0.06 * step, 0, 0)).clamp(walk_min, walk_max))
 	for index in _heroes.size():
 		_set_facing(index, facing)
 	_place_party(0.0)

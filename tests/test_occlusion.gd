@@ -48,6 +48,11 @@ func _card() -> void:
 	card.set_facing(-1.0)
 	var scale: Vector2 = pass_material.get_shader_parameter("uv_scale")
 	t.check(scale.x < 0.0 and is_equal_approx(scale.x, material.uv1_scale.x), "e a mesma região e o mesmo lado")
+	t.check(float(pass_material.get_shader_parameter("foot_cut")) > 0.0, "o pé fica sem silhueta (a borda do piso não vira fantasma)")
+	card.set_blended(true)
+	t.equal(material.stencil_mode, BaseMaterial3D.STENCIL_MODE_DISABLED, "o efeito misturado não marca o stencil (não abre buraco na silhueta)")
+	card.set_blended(false)
+	t.equal(material.stencil_mode, BaseMaterial3D.STENCIL_MODE_CUSTOM, "e volta a marcar")
 	card.set_silhouette(null)
 	t.check(not card.has_silhouette(), "desliga")
 	card.free()
@@ -132,6 +137,17 @@ func _street() -> void:
 		await _tree.process_frame
 	var enemies: Array = arena.session.state.enemy_team.map(func(u): return arena.cards[u.id])
 	t.check(not enemies.is_empty() and enemies.all(func(c): return c.has_silhouette()), "na luta, os inimigos ganham a silhueta")
+	t.check(street.occlusion._occluders.all(func(o): return not AHOcclusion._is_light(o.node)), "brilhos e fachos de luz não esmaecem")
+	# Até o fim da luta: os inimigos perdem a silhueta.
+	arena.auto_battle = true
+	arena.speed = 20.0
+	var end := Time.get_ticks_msec() + 60000
+	while arena.active and Time.get_ticks_msec() < end:
+		if arena.hud.waiting:
+			arena.hud.command_chosen.emit({"kind": "defend"})
+		await _tree.process_frame
+	t.check(street.occlusion._enemy_cards.is_empty() and enemies.all(func(c): return not is_instance_valid(c) or not c.has_silhouette()),
+		"depois da luta, os inimigos perdem a silhueta")
 
 
 ## Num cenário, as peças que o cenário junta numa malha saem da árvore: nenhuma fica registrada (a captura caía).
@@ -147,6 +163,11 @@ func _scenario() -> void:
 	await _tree.process_frame
 	t.check(street.scenario != null and street.occlusion._occluders.size() > 20, "o cenário registra o que pode tapar (%d)" % street.occlusion._occluders.size())
 	t.check(street.occlusion._occluders.all(func(o): return is_instance_valid(o.node)), "nenhuma peça juntada fica registrada")
+	# Na chegada, os seguidores ficam na área de andar (antes nasciam atrás da parede e viravam silhuetas).
+	street._place_leader(Vector3(street.walk_min.x + 0.2, street.floor_y, street.lane_z))
+	await _tree.process_frame
+	t.check(street._heroes.all(func(c): return c.position.x >= street.walk_min.x - 0.01 and c.position.x <= street.walk_max.x + 0.01),
+		"na ponta da zona, a equipe toda fica dentro da área de andar")
 
 
 func _station() -> void:

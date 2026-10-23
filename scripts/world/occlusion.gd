@@ -13,7 +13,7 @@ const FADE_SPEED := 4.0
 ## Os pontos do corpo testados, em fração da altura.
 const BODY_POINTS := [0.15, 0.5, 0.9]
 ## Objetos maiores que isto (m) não entram: o chão, as fachadas inteiras, o céu e os blocos juntados.
-const MAX_WIDTH := 14.0
+const MAX_WIDTH := 12.0
 const MIN_HEIGHT := 0.3
 ## Cor da silhueta da equipe (creme discreto); a dos inimigos é a de perigo da interface (muda com o daltonismo).
 const PARTY_COLOR := Color(0.95, 0.86, 0.62)
@@ -29,7 +29,7 @@ func add_occluder(node: GeometryInstance3D) -> void:
 	# Fora: personagens, partículas, blocos juntados e as caixas de depuração das colisões (tecla C).
 	# e as peças que o cenário acabou de juntar numa malha (estão para sair da árvore).
 	if node is AHSpriteCard or node is GPUParticles3D or node is CPUParticles3D or node.has_meta("merged") \
-			or node.get_parent() is CollisionObject3D or node.is_queued_for_deletion():
+			or node.get_parent() is CollisionObject3D or node.is_queued_for_deletion() or _is_light(node):
 		return
 	var box: AABB = node.global_transform * node.get_aabb()
 	if box.size.x > MAX_WIDTH or box.size.y < MIN_HEIGHT:
@@ -37,6 +37,11 @@ func add_occluder(node: GeometryInstance3D) -> void:
 	var entry := {"node": node, "box": box, "x": box.position.x}
 	# Em ordem pelo começo em X: cada quadro só percorre a faixa entre a câmera e os personagens.
 	_occluders.insert(_occluders.bsearch_custom(entry, func(a, b): return a.x < b.x), entry)
+
+
+## Brilhos, fachos de luz e a fogueira: são luz, não tapam ninguém.
+static func _is_light(node: Node) -> bool:
+	return node.name.contains("Glow") or node.name.contains("Shaft") or node.get_parent().name == "Campfire"
 
 
 ## Registra todo objeto visível de root (e dos filhos), menos os grandes e os personagens.
@@ -59,6 +64,17 @@ func track(card: AHSpriteCard) -> void:
 	if not _cards.has(card):
 		_cards.append(card)
 	card.set_silhouette(PARTY_COLOR)
+
+
+func _ready() -> void:
+	# A cor dos inimigos segue o daltonismo trocado nas Opções no meio da luta.
+	Settings.changed.connect(_recolor, CONNECT_DEFERRED)
+
+
+func _recolor() -> void:
+	for card in _enemy_cards:
+		if is_instance_valid(card):
+			card.set_silhouette(AHUiStyle.DANGER)
 
 
 ## Os inimigos: silhueta só enquanto a luta dura (untrack ao fim).

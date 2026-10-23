@@ -16,6 +16,9 @@ uniform float edge_alpha = 0.85;
 uniform float edge_width = 0.012;
 // O passe chega um pouco mais perto da câmera: a própria placa (e o chão logo atrás do pé) não contam como esconderijo.
 uniform float bias = 0.08;
+// A faixa do pé (fração de baixo da região) fica de fora: a borda do piso da frente encobre a sola em alguns
+// cenários, e a sola em silhueta parecia um defeito.
+uniform float foot_cut = 0.0;
 
 void vertex() {
 	vec3 world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -29,7 +32,7 @@ float alpha_at(vec2 uv) {
 
 void fragment() {
 	float a = alpha_at(UV);
-	if (a < 0.5) {
+	if (a < 0.5 || UV.y > 1.0 - foot_cut) {
 		discard;
 	}
 	// Contorno: algum vizinho fora do corpo.

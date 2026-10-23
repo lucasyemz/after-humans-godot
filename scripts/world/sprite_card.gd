@@ -10,6 +10,8 @@ const CHARACTER_LAYER := 1 << 19
 const SILHOUETTE_SHADER := preload("res://shaders/character_silhouette.gdshader")
 ## Toda placa de personagem marca o stencil com isto: a silhueta de um não pinta por cima de outro.
 const STENCIL_CHARACTER := 1
+## A altura acima do pé (m) que fica sem silhueta (a borda do piso da frente encobre a sola em alguns cenários).
+const SILHOUETTE_FOOT := 0.12
 
 ## Altura do corpo em metros (do pé ao topo da cabeça na pose parada).
 var body_height := 1.8
@@ -112,6 +114,9 @@ func _layout() -> void:
 	if _silhouette != null:
 		_silhouette.set_shader_parameter("uv_offset", Vector2(_material.uv1_offset.x, _material.uv1_offset.y))
 		_silhouette.set_shader_parameter("uv_scale", Vector2(_material.uv1_scale.x, _material.uv1_scale.y))
+		# O pé e um pouco acima dele (SILHOUETTE_FOOT metros) não ganham silhueta.
+		var foot_px := region.size.y - anchor.y + SILHOUETTE_FOOT / px_to_m
+		_silhouette.set_shader_parameter("foot_cut", clampf(foot_px / region.size.y, 0.0, 0.5))
 
 
 ## Liga a silhueta na cor dada (a equipe sempre, os inimigos só na luta) ou desliga com null.
@@ -150,6 +155,8 @@ func flash(color: Color, seconds: float = 0.35, white_seconds: float = 0.0) -> v
 ## Mistura por alfa (efeitos com transparência suave) em vez do recorte duro dos personagens.
 func set_blended(blended: bool) -> void:
 	_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if blended else BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	# O efeito não marca o stencil: o retângulo inteiro dele (alfa 0 incluído) abria um buraco na silhueta de trás.
+	_material.stencil_mode = BaseMaterial3D.STENCIL_MODE_DISABLED if blended else BaseMaterial3D.STENCIL_MODE_CUSTOM
 	_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED if blended else BaseMaterial3D.SHADING_MODE_PER_PIXEL
 
 
