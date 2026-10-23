@@ -3,8 +3,8 @@
 ## as chamadas de desenho, as primitivas, os objetos, a memória de vídeo e a memória do jogo. Serve no desktop (Forward+
 ## e Compatibility) e na web (o mesmo Compatibility), onde não há -s:
 ##   "$GODOT" --path . --resolution 1920x1080 -- --perf=<pasta> [--perf-levels=0,2] [--perf-only=station,street]
-## Escreve <pasta>/perf.csv e perf.md (na web, só imprime as linhas "PERF ..." no console) e sai. A campanha fica numa
-## pasta própria (user://perf-tour), apagada no fim; as opções não são gravadas.
+## Escreve <pasta>/perf.csv e perf.md (na web, só imprime as linhas "PERF ..." no console) e sai. A campanha fica em
+## <pasta>/save (na web, em user://perf-tour), apagada no fim; as opções não são gravadas e o vsync fica desligado.
 class_name AHPerfTour
 extends Node
 
@@ -29,7 +29,7 @@ func _ready() -> void:
 		if String(arg).begins_with("--perf="):
 			out = String(arg).trim_prefix("--perf=")
 		elif String(arg).begins_with("--perf-levels="):
-			levels = Array(String(arg).trim_prefix("--perf-levels=").split(",")).map(func(v): return int(v))
+			levels = Array(String(arg).trim_prefix("--perf-levels=").split(",")).map(func(v): return clampi(int(v), 0, 3))
 		elif String(arg).begins_with("--perf-only="):
 			only = Array(String(arg).trim_prefix("--perf-only=").split(","))
 	_run.call_deferred()
@@ -44,7 +44,8 @@ func _run() -> void:
 	if not OS.has_feature("web"):
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	Tips.enabled = false
-	Campaign.save_dir = "user://perf-tour"
+	# A campanha do roteiro fica na pasta da saída (como as capturas); sem pasta (a web), numa própria, apagada no fim.
+	Campaign.save_dir = out.path_join("save") if out != "" and not OS.has_feature("web") else "user://perf-tour"
 	Campaign.slot = 1
 	print("PERF renderer=%s web=%s" % [RenderingServer.get_current_rendering_method(), OS.has_feature("web")])
 	for level in levels:

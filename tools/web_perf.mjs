@@ -2,7 +2,7 @@
 // quando não há placa), passa --perf ao jogo e devolve as linhas "PERF ..." do console. Também é a prova de que a web
 // carrega e roda a Estação e uma luta (#39): sai com 1 se o jogo não terminar o roteiro.
 //   "$GODOT" --headless --path . --export-release "Web" build/web/index.html
-//   node tools/web_perf.mjs [--only=station,street,combat] [--levels=0] [--timeout=900]
+//   node tools/web_perf.mjs [--only=station,street,combat] [--levels=0] [--timeout=900] [--verbose] [--shot=foto.png]
 // Precisa do Playwright (npm i -g playwright) e de um Chromium.
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
@@ -22,7 +22,7 @@ const server = createServer(async (request, response) => {
 	try {
 		let body = await readFile(path);
 		if (path.endsWith("index.html")) {
-			body = body.toString().replace(/"args":\[\]/, `"args":["--perf","--perf-only=${only}","--perf-levels=${levels}"]`);
+			body = body.toString().replace(/"args":\[\]/, `"args":["--","--perf","--perf-only=${only}","--perf-levels=${levels}"]`);
 		}
 		response.writeHead(200, { "Content-Type": types[extname(path)] ?? "application/octet-stream" });
 		response.end(body);
@@ -45,7 +45,7 @@ page.on("console", (message) => {
 		lines.push(text);
 		console.log(`${((Date.now() - started) / 1000).toFixed(1)}s ${text}`);
 		if (text.startsWith("PERF fim")) finished = true;
-	} else if (message.type() === "error") {
+	} else if (args.verbose !== undefined || message.type() === "error") {
 		console.log(`console error: ${text}`);
 	}
 });
@@ -54,6 +54,7 @@ await page.goto(url);
 while (!finished && Date.now() - started < timeout) {
 	await page.waitForTimeout(1000);
 }
+if (args.shot) await page.screenshot({ path: args.shot });
 console.log(finished ? `web: roteiro completo em ${((Date.now() - started) / 1000).toFixed(0)} s` : "web: o roteiro não terminou no tempo");
 await browser.close();
 server.close();

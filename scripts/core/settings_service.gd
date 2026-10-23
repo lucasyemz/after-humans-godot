@@ -230,8 +230,8 @@ func _store() -> void:
 ## Janela e resolução interna; os efeitos de cada cena saem de effects() quando ela recebe changed.
 func apply() -> void:
 	var web := OS.has_feature("web")
-	# A captura mede sem vsync e na janela dela; não mexe.
-	var capture := Array(OS.get_cmdline_user_args()).any(func(arg): return String(arg).begins_with("--capture="))
+	# A captura e o roteiro de desempenho (--perf) medem sem vsync e na janela deles; não mexe.
+	var capture := Array(OS.get_cmdline_user_args()).any(func(arg): return String(arg).begins_with("--capture=") or String(arg).begins_with("--perf"))
 	if not web and not capture and DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if vsync else DisplayServer.VSYNC_DISABLED)

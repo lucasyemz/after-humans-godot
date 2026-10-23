@@ -66,7 +66,9 @@ func build(shop_index: int, origin_x: float, spots: int, camp: bool) -> void:
 	_lamp.light_color = Color(1.0, 0.82, 0.6)
 	_lamp.light_energy = 2.4
 	_lamp.omni_range = 11.0
-	_lamp.shadow_enabled = true
+	# A sombra das luzes da casa segue a qualidade, como a das luminárias (#37).
+	_lamp.add_to_group(Settings.SHADOW_LAMPS)
+	_lamp.shadow_enabled = Settings.effects().lamp_shadows
 	add_child(_lamp)
 	if camp:
 		_campfire()
@@ -221,7 +223,8 @@ func _campfire() -> void:
 	_fire_light.position = Vector3(camp_x - position.x, 0.8, 0.6)
 	_fire_light.light_color = Color(1.0, 0.6, 0.3)
 	_fire_light.omni_range = 6.5
-	_fire_light.shadow_enabled = true
+	_fire_light.add_to_group(Settings.SHADOW_LAMPS)
+	_fire_light.shadow_enabled = Settings.effects().lamp_shadows
 	_fire_light.visible = false
 	add_child(_fire_light)
 

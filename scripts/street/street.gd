@@ -420,6 +420,9 @@ func _build_atmosphere() -> void:
 	_fire_glow = _dynamic.add_glow(FIRE + Vector3(0, 10, 35), 120.0, Color(1.0, 0.5, 0.18), 2.2)
 	_fire_light = _dynamic.add_light(FIRE + Vector3(0, 40, 70), 2.2, 650.0, true)
 	_fire_light.light_color = Color(1.0, 0.6, 0.3)
+	# A sombra da fogueira segue a qualidade, como a das luminárias (#37).
+	_fire_light.add_to_group(Settings.SHADOW_LAMPS)
+	_fire_light.shadow_enabled = Settings.effects().lamp_shadows
 
 	_embers = CPUParticles3D.new()
 	_embers.amount = 40

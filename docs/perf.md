@@ -24,7 +24,7 @@ qualquer máquina.
 
 ## O que pesava: a sombra das luminárias na Estação
 
-Cada OmniLight3D com sombra desenha a cena de novo seis vezes, uma por face do cubo de sombra. A Estação tem 18 luminárias com sombra.
+Cada OmniLight3D com sombra desenha a cena de novo seis vezes, uma por face do cubo de sombra. A Estação tem 18 luminárias com sombra acesas no Compatibility (20 no grupo, contando as do Forward+). A fogueira da rua e as luzes das casas também seguem a qualidade.
 
 Antes e depois, no Compatibility (o renderizador da web), em 1920×1080:
 
