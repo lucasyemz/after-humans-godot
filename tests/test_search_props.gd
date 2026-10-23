@@ -107,6 +107,13 @@ func _street_and_house() -> void:
 			if absf(float(door.x) - corridor.props[i].position.x) < corridor.PROP_DOOR_CLEARANCE - 0.01:
 				near_door.append(i)
 	t.check(near_door.is_empty(), "nenhum objeto da rua na frente de uma porta %s" % [near_door])
+	var on_painted: Array = []
+	for i in loot:
+		for painted in AHStreetSet.SIDEWALK_PROPS:
+			var half: float = painted[4] * painted[1].size.x / painted[1].size.y * 0.005
+			if absf(painted[2] * 0.01 - corridor.props[i].position.x) < half + 0.6 - 0.01:
+				on_painted.append(i)
+	t.check(on_painted.is_empty(), "nem em cima de um objeto pintado da calçada %s" % [on_painted])
 	for i in first:
 		route.steps[i].resolved = true
 	route.index = first

@@ -200,8 +200,9 @@ func _crates_behind(street, route: Dictionary) -> int:
 func _search_crates(street, route: Dictionary, index: int) -> bool:
 	var corridor: AHStreetCorridor = street.corridor
 	var before := _search_snapshot()
-	street._place_leader(Vector3(corridor._step_x(index, 0.45), 0, 0.45))
-	if not await _until(func(): return corridor._action.is_valid(), "o aviso Vasculhar aparecer perto dos caixotes"):
+	# Onde o objeto está (perto de uma porta ele sai do ponto do trecho), e o aviso tem que ser o da busca, não o da porta.
+	street._place_leader(Vector3(corridor.props[index].position.x, 0, 0.45))
+	if not await _until(func(): return corridor._action.is_valid() and corridor._action.get_method() == "_search_prop", "o aviso Vasculhar aparecer perto dos caixotes"):
 		return false
 	await _action("interact")
 	if not await _until(func(): return route.props.get(str(index), false), "a busca dos caixotes acontecer"):

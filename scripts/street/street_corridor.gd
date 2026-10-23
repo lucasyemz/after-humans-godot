@@ -306,11 +306,7 @@ func _spawn_props() -> void:
 		# O mesmo trecho sempre com o mesmo objeto (pela ordem dele entre os trechos de busca), aberto se já foi vasculhado.
 		var prop := AHSearchProp.new().setup(AHSearchProp.street_prop(order), route.props.get(str(index), false))
 		order += 1
-		# Longe da porta de uma loja (o objeto na frente dela tapava a porta e os dois avisos disputavam o lugar).
-		var x := _step_x(index, 0.45)
-		for door in doors:
-			if absf(float(door.x) - x) < PROP_DOOR_CLEARANCE:
-				x = float(door.x) + PROP_DOOR_CLEARANCE * (1.0 if x >= float(door.x) else -1.0)
+		var x := _prop_x(_step_x(index, 0.45))
 		prop.position = AHStreetSet.ue(x * 100.0, PROP_Y, AHStreetSet.SIDEWALK_TOP_Z)
 		street.add_child(prop)
 		props[index] = prop
@@ -323,6 +319,21 @@ func _spawn_props() -> void:
 
 
 ## Portas das casas abertas (e da trancada depois de arrombada) com a pintura da porta aberta.
+## Onde o objeto de busca da rua fica: o ponto do trecho, ou o mais perto dele que está longe das portas das lojas (o
+## objeto tapava a porta e os dois avisos disputavam o lugar) e dos objetos pintados da calçada.
+func _prop_x(wanted: float) -> float:
+	for step in 13:
+		var x := wanted + 0.5 * ceilf(step / 2.0) * (1.0 if step % 2 == 0 else -1.0)
+		var clear := doors.all(func(door): return absf(float(door.x) - x) >= PROP_DOOR_CLEARANCE)
+		for painted in AHStreetSet.SIDEWALK_PROPS:
+			var half: float = painted[4] * painted[1].size.x / painted[1].size.y * 0.005
+			if absf(painted[2] * 0.01 - x) < half + 0.6:
+				clear = false
+		if clear:
+			return x
+	return wanted
+
+
 func _refresh_doors() -> void:
 	var route: Dictionary = Campaign.state.session.expedition.corridor
 	for i in route.sites.size():
