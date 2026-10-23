@@ -41,6 +41,21 @@ Antes e depois, no Compatibility (o renderizador da web), em 1920×1080:
 Os cenários já tinham as peças fixas juntadas numa malha por material e as luminárias sem sombra no Compatibility, e
 ficaram como estavam.
 
+## Na web
+
+A versão web exportada (preset Web, sem threads) roda o mesmo roteiro no Chromium, com `tools/web_perf.mjs`. Nesta
+máquina sem placa de vídeo o WebGL 2 é feito por software (SwiftShader), então os ms não servem como medida, mas o
+roteiro inteiro abre e passa: título, Estação, rua e luta no Baixo, sem travar.
+
+| Cena (web, Baixo) | Chamadas | Primitivas | Objetos | Memória de vídeo |
+| --- | ---: | ---: | ---: | ---: |
+| Título | 8 | 62 | 31 | 46 MB |
+| Estação | 464 | 153.343 | 1.086 | 376 MB |
+| Rua | 184 | 16.130 | 649 | 220 MB |
+| Luta na rua | 256 | 24.672 | 1.449 | 229 MB |
+
+O workflow da versão web (#39) roda esse roteiro a cada exportação.
+
 ## O que mudou
 
 - **Sombra das luminárias por qualidade** (`Settings.effects().lamp_shadows`):
