@@ -16,6 +16,8 @@ const RESULT_NAMES := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fu
 
 var station: AHStation
 var current := ""
+## O quadro em que o painel abriu (o som de fechar não toca se ele fechar nesse mesmo quadro).
+var _opened_frame := -1
 var _title: Label
 var _subtitle: Label
 var _resources: HBoxContainer
@@ -673,6 +675,7 @@ func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
 func open_room(room_id: String) -> void:
 	_reset_focus()
 	if current == "":
+		_opened_frame = Engine.get_process_frames()
 		_sound_open.call_deferred()
 	current = room_id
 	if room_id == S.PREPARATION and _draft.is_empty():
@@ -684,6 +687,7 @@ func open_room(room_id: String) -> void:
 func open_service(service: String) -> void:
 	_reset_focus()
 	if current == "":
+		_opened_frame = Engine.get_process_frames()
 		_sound_open.call_deferred()
 	current = service
 	match service:
@@ -707,7 +711,8 @@ func _sound_open() -> void:
 
 
 func close_panel() -> void:
-	if current != "":
+	# O de fechar só se o de abrir tocou: o painel que fecha no mesmo quadro em que abriu não faz som nenhum (#36).
+	if current != "" and Engine.get_process_frames() != _opened_frame:
 		Sound.play(PANEL_CLOSE)
 	current = ""
 	_panel.visible = false
