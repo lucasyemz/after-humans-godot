@@ -1,11 +1,14 @@
-## A luta cabe no lugar (#52): a fila dos heróis e a dos inimigos ficam inteiras dentro da zona do cenário (ou da sala da
-## casa, ou da rua) e fora dos obstáculos que cruzam a linha da luta (escada, caixote), para cada trecho de luta de cada
-## mapa, como o corredor a começa (o centro pela patrulha). Num lugar apertado os espaços encolhem, até um mínimo.
+## A luta cabe no lugar (#52): as quatro posições dos heróis e as dos inimigos ficam dentro da zona do cenário (ou da
+## sala da casa, ou da rua) e fora dos obstáculos que cruzam a linha da luta, para cada trecho de luta de cada mapa
+## (o chefe incluído), como o corredor a começa (o centro pela patrulha). Num lugar apertado os espaços encolhem, até um
+## mínimo. Hoje nenhum cenário tem obstáculo na linha da luta: quem segura a fila é o limite da zona.
 extends RefCounted
 
 const MAPS := {"RiverDock": "fase_2", "RootBridge": "fase_2", "SealedShelter": "fase_3", "TriageGate": "fase_4",
 	"FloodedDepot": "fase_5", "SewerDucts": "fase_5", "": "fase_1"}
 const Arena := preload("res://scripts/combat/combat_arena.gd")
+## A última posição que o jogo alcança (combat_session.move_targets e o Recuar dos inimigos param na 4).
+const MAX_RANK := 4
 
 var t
 var _tree: SceneTree
@@ -35,18 +38,24 @@ func run(context) -> void:
 	Campaign.state = real_state
 
 
-## A regra sozinha: com espaço fica onde pediu (ou encosta), apertada encolhe, e um obstáculo divide o lugar.
+## A regra sozinha: com espaço fica onde pediu (ou encosta), apertada encolhe, e um obstáculo divide o lugar. A fila
+## reservada tem sempre as quatro posições de cada lado (quem recua para a vazia, o chefe de duas posições).
 func _fit_rules() -> void:
-	var left: float = Arena.FRONT_GAP + 3 * Arena.HERO_GAP
-	var right: float = Arena.FRONT_GAP + 3 * Arena.ENEMY_GAP
-	t.equal(Arena.fit(10.0, Vector2(0, 30), [], 4, 4), Vector2(10.0, 1.0), "com espaço, a luta fica onde a patrulha está")
-	t.equal(Arena.fit(1.0, Vector2(0, 30), [], 4, 4), Vector2(left, 1.0), "perto da ponta, encosta nela sem passar")
-	t.equal(Arena.fit(29.0, Vector2(0, 30), [], 4, 4), Vector2(30.0 - right, 1.0), "e do outro lado também")
-	var tight := Arena.fit(4.0, Vector2(0, 8), [], 4, 4)
+	var left: float = Arena.FRONT_GAP + (Arena.RANKS - 1) * Arena.HERO_GAP
+	var right: float = Arena.FRONT_GAP + (Arena.RANKS - 1) * Arena.ENEMY_GAP
+	t.equal(Arena.fit(10.0, Vector2(0, 30), []), Vector2(10.0, 1.0), "com espaço, a luta fica onde a patrulha está")
+	t.equal(Arena.fit(1.0, Vector2(0, 30), []), Vector2(left, 1.0), "perto da ponta, encosta nela sem passar")
+	t.equal(Arena.fit(29.0, Vector2(0, 30), []), Vector2(30.0 - right, 1.0), "e do outro lado também")
+	var tight := Arena.fit(4.0, Vector2(0, 8), [])
 	t.check(tight.y < 1.0 and tight.y >= Arena.MIN_GAP_SCALE and is_equal_approx(tight.x - left * tight.y, 0.0), "num lugar apertado os espaços encolhem (%.2f)" % tight.y)
-	var split := Arena.fit(15.0, Vector2(0, 40), [Vector2(10, 12)], 4, 4)
+	var split := Arena.fit(15.0, Vector2(0, 40), [Vector2(10, 12)])
 	t.check(split.x - left >= 12.0 - 0.001, "um obstáculo antes do centro: a fila dos heróis fica depois dele (%.2f)" % (split.x - left))
-	t.equal(Arena.fit(5.0, Vector2(0, 30), [], 2, 1).x, 5.0, "com menos gente, ocupa menos")
+	# Um vão minúsculo com a patrulha dentro perde para um grande onde a fila cabe (QA da #52).
+	var small := Arena.fit(20.0, Vector2(0, 60), [Vector2(17, 18), Vector2(22, 23)])
+	t.check(is_equal_approx(small.y, 1.0) and (small.x - left >= 23.0 - 0.001 or small.x + right <= 17.0 + 0.001), "o vão pequeno da patrulha perde para o que cabe a fila (%.2f)" % small.x)
+	# A patrulha em cima de um obstáculo: o vão que deixa o centro mais perto.
+	var inside := Arena.fit(40.0, Vector2(0, 80), [Vector2(38, 41)])
+	t.check(is_equal_approx(inside.x, 41.0 + left), "a patrulha sobre um obstáculo: o lado mais perto (%.2f)" % inside.x)
 
 
 ## Cada trecho de luta do mapa: o centro como o corredor faz e as oito posições dentro do lugar e fora dos obstáculos.
@@ -85,15 +94,20 @@ func _map(map: String) -> void:
 			street.set_scenario_zone(street.corridor.segments[street.corridor._segment_of(index)].zone)
 		var at_x: float = street.corridor.guards[index].cards[0].position.x - 1.0
 		var room: Dictionary = street.combat_room(at_x)
-		var heroes: int = street.party_ids.size()
-		var enemies: int = street.corridor.guards[index].cards.size()
-		var placed: Vector2 = Arena.fit(at_x, room.bounds, room.obstacles, heroes, enemies)
+		var placed: Vector2 = Arena.fit(at_x, room.bounds, room.obstacles)
 		squeezed = minf(squeezed, placed.y)
+		# As posições pelo próprio slot_position da arena, de 1 a 4 dos dois lados (as que o Mover, o Recuar e o
+		# chefe de duas posições alcançam), não só as ocupadas.
+		var arena: AHCombatArena = street._arena
+		arena.center_x = placed.x
+		arena.gap_scale = placed.y
 		var xs: Array = []
-		for rank in range(1, heroes + 1):
-			xs.append(placed.x - (Arena.FRONT_GAP + (rank - 1) * Arena.HERO_GAP) * placed.y)
-		for rank in range(1, enemies + 1):
-			xs.append(placed.x + (Arena.FRONT_GAP + (rank - 1) * Arena.ENEMY_GAP) * placed.y)
+		for side in [true, false]:
+			for rank in range(1, MAX_RANK + 1):
+				var unit := AHCombat.Unit.new()
+				unit.is_player = side
+				unit.rank = rank
+				xs.append(arena.slot_position(unit).x)
 		for x in xs:
 			var blocked: bool = room.obstacles.any(func(o): return x > o.x and x < o.y)
 			if x < room.bounds.x - 0.001 or x > room.bounds.y + 0.001 or blocked:

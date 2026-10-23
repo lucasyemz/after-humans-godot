@@ -12,6 +12,8 @@ const ENEMY_GAP := 1.35
 const FRONT_GAP := 1.0
 ## O menor encolhimento dos espaços da fila num lugar apertado (abaixo disso os personagens se sobrepõem demais).
 const MIN_GAP_SCALE := 0.6
+## A fila vai até a posição 4 dos dois lados (Mover, Recuar e o empurrão param nela).
+const RANKS := 4
 const HERO_Z := -0.55
 const ENEMY_Z := -0.8
 ## Habilidades a distância (AHArenaBeat::IsRanged): avançam só um passo, sem ir até o alvo.
@@ -238,7 +240,7 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 	gap_scale = 1.0
 	if _street != null and _street.has_method("combat_room"):
 		var room: Dictionary = _street.combat_room(at_x)
-		var placed := fit(at_x, room.bounds, room.obstacles, session.state.player_team.size(), session.state.enemy_team.size())
+		var placed := fit(at_x, room.bounds, room.obstacles)
 		center_x = placed.x
 		gap_scale = placed.y
 	cards.clear()
@@ -286,12 +288,13 @@ func camera_view() -> Vector2:
 
 ## Onde a luta cabe (#52): a fila dos heróis à esquerda do centro e a dos inimigos à direita, inteiras dentro de
 ## bounds (x mínimo e máximo, já com a folga da borda) e fora dos obstáculos (faixas em x [início, fim] que cruzam a
-## linha da luta). Fica o mais perto possível de at_x; se o vão livre for menor que a fila, os espaços encolhem até
+## linha da luta). Reserva as RANKS posições de cada lado, não só as ocupadas: quem recua para a posição vazia e o
+## chefe de duas posições (que empurra os outros para a 3 e a 4) continuam dentro. Entre os vãos onde a fila cabe,
+## fica no que deixa o centro mais perto de at_x; se não cabe em nenhum, no maior, com os espaços encolhidos até
 ## MIN_GAP_SCALE. Devolve (centro, escala dos espaços).
-static func fit(at_x: float, bounds: Vector2, obstacles: Array, heroes: int, enemies: int) -> Vector2:
-	var left: float = FRONT_GAP + maxi(heroes - 1, 0) * HERO_GAP
-	var right: float = FRONT_GAP + maxi(enemies - 1, 0) * ENEMY_GAP
-	# Os vãos livres entre os obstáculos; a luta fica no que contém o centro pedido ou, sem ele, no maior.
+static func fit(at_x: float, bounds: Vector2, obstacles: Array) -> Vector2:
+	var left: float = FRONT_GAP + (RANKS - 1) * HERO_GAP
+	var right: float = FRONT_GAP + (RANKS - 1) * ENEMY_GAP
 	var cuts: Array = obstacles.duplicate()
 	cuts.sort_custom(func(a, b): return a.x < b.x)
 	var spans: Array = []
@@ -305,20 +308,23 @@ static func fit(at_x: float, bounds: Vector2, obstacles: Array, heroes: int, ene
 	if start < bounds.y:
 		spans.append(Vector2(start, bounds.y))
 	if spans.is_empty():
-		return Vector2(at_x, 1.0)
-	var room: Vector2 = spans[0]
-	var best := -INF
+		return Vector2(clampf(at_x, bounds.x, bounds.y), MIN_GAP_SCALE)
+	var best := INF
+	var center := at_x
+	var widest: Vector2 = spans[0]
 	for span: Vector2 in spans:
-		var holds := at_x >= span.x and at_x <= span.y
-		var score := (1000.0 if holds else 0.0) + minf(span.y - span.x, left + right)
-		if score > best:
-			best = score
-			room = span
-	var width := room.y - room.x
-	if width >= left + right:
-		return Vector2(clampf(at_x, room.x + left, room.y - right), 1.0)
-	var scale := maxf(width / (left + right), MIN_GAP_SCALE)
-	return Vector2(room.x + left * scale, scale)
+		if span.y - span.x > widest.y - widest.x:
+			widest = span
+		if span.y - span.x < left + right:
+			continue
+		var here := clampf(at_x, span.x + left, span.y - right)
+		if absf(here - at_x) < best:
+			best = absf(here - at_x)
+			center = here
+	if best < INF:
+		return Vector2(center, 1.0)
+	var scale := maxf((widest.y - widest.x) / (left + right), MIN_GAP_SCALE)
+	return Vector2(widest.x + left * scale, scale)
 
 
 func slot_position(unit: AHCombat.Unit) -> Vector3:

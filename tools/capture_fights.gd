@@ -63,7 +63,7 @@ func _campaign(campaign, map: String) -> Dictionary:
 	return c
 
 
-## Os trechos de luta do mapa, um por zona (o primeiro de cada).
+## Os trechos de luta do mapa, um por zona (o primeiro de cada) e o do chefe.
 func _combat_steps(campaign, map: String) -> Array:
 	var c := _campaign(campaign, map)
 	var route: Dictionary = c.session.expedition.corridor
@@ -86,7 +86,10 @@ func _combat_steps(campaign, map: String) -> Array:
 	var per_zone: Array = []
 	for index in found:
 		var zone: int = street.corridor.segments[street.corridor._segment_of(index)].zone if street.scenario else -1
+		# O chefe sempre (a fila dele vai até a posição 4 mesmo com três unidades).
 		var key := "%d" % zone if map != "Street" else "%d" % index
+		if c.session.expedition.corridor.steps[index].type == "boss":
+			key = "boss"
 		if not zones.has(key):
 			zones[key] = true
 			per_zone.append(index)
