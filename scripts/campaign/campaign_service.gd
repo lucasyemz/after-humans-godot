@@ -40,6 +40,13 @@ var load_warning := ""
 ## O tempo jogado ainda não somado ao estado (segundos de relógio, sem a escala de tempo).
 var _play_seconds := 0.0
 var _last_tick := 0
+## De quem é esse tempo: o estado e o arquivo do último save ou da última abertura. Só ele ganha o tempo; um estado
+## trocado por fora (os testes, as capturas) não conta nem grava nada no fechamento.
+var _play_state = null
+var _play_path := ""
+## Ao fechar o jogo, grava só o tempo jogado desde o último save no arquivo do espaço (#34). Os testes desligam.
+var save_time_on_quit := true
+var _quit_saved := false
 
 
 func _ready() -> void:
@@ -53,8 +60,35 @@ func _process(_delta: float) -> void:
 	var step := (now - _last_tick) * 0.001 if _last_tick > 0 else 0.0
 	_last_tick = now
 	var flow := get_node_or_null("/root/GameFlow")
-	if flow != null and PLAY_SCENES.has(flow.current_id) and not flow.busy and not get_tree().paused:
+	if flow != null and PLAY_SCENES.has(flow.current_id) and not flow.busy and not get_tree().paused and is_same(state, _play_state):
 		_play_seconds += minf(step, 1.0)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_EXIT_TREE:
+		save_play_time()
+
+
+## O tempo jogado desde o último save vai para o arquivo do espaço, sem gravar o resto do estado (quem fecha no meio de
+## uma luta volta para onde o último save deixou, como antes; só o relógio não se perde). Uma vez só por execução.
+func save_play_time() -> bool:
+	var whole := floori(_play_seconds)
+	if _quit_saved or not save_time_on_quit or whole <= 0 or not is_same(state, _play_state) or _play_path != primary_path():
+		return false
+	var campaign = read_file(primary_path())
+	if campaign == null:
+		return false
+	_quit_saved = true
+	campaign.played_seconds = int(campaign.get("played_seconds", 0)) + whole
+	state.played_seconds = int(state.get("played_seconds", 0)) + whole
+	_play_seconds -= whole
+	var text := _envelope(campaign)
+	return _write_atomic(primary_path(), text) and _write_atomic(backup_path(), text)
+
+
+func _own_play_time() -> void:
+	_play_state = state
+	_play_path = primary_path()
 
 
 ## Soma ao estado o tempo jogado desde o último save.
@@ -298,6 +332,8 @@ func save() -> bool:
 	_flush_play_time()
 	var text := _envelope(state)
 	var ok := _write_atomic(primary_path(), text) and _write_atomic(backup_path(), text)
+	if ok:
+		_own_play_time()
 	if not ok:
 		push_error("Falha ao salvar a campanha em %s." % save_dir)
 	saved.emit(ok)
@@ -377,8 +413,10 @@ func load_or_new() -> String:
 	if not campaign.has("played_seconds"):
 		campaign.played_seconds = 0
 	_play_seconds = 0.0
+	_quit_saved = false
 	# Saves anteriores à Estação ganham os cômodos, a noite e os civis (idempotente).
 	AHStationRules.migrate(campaign)
 	state = campaign
+	_own_play_time()
 	changed.emit()
 	return source

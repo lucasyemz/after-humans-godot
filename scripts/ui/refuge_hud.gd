@@ -913,7 +913,8 @@ func _station_plan(c: Dictionary) -> void:
 ## Começar do zero (com confirmação): o save atual é substituído por uma campanha nova.
 func _new_campaign_view() -> void:
 	_heading(tr("Nova campanha"), tr("Recomeça a Estação, o elenco e as fases do zero."))
-	_text(tr("Todo o progresso salvo (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha nova."), 19, Color(1.0, 0.65, 0.5))
+	# Diz qual espaço é trocado (#34): os outros ficam como estão.
+	_text(tr("Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha nova. Os outros espaços ficam como estão.") % Campaign.slot, 19, Color(1.0, 0.65, 0.5))
 	_button(tr("Cancelar"), close_panel)
 	_button(tr("Começar do zero"), func():
 		Campaign.new_game()

@@ -30,6 +30,8 @@ func _initialize() -> void:
 func _run() -> void:
 	# Um quadro para os autoloads terminarem o _ready.
 	await process_frame
+	# Os testes trocam a campanha e a pasta do save: nada vai para o save do jogador ao fechar (#34).
+	root.get_node("Campaign").save_time_on_quit = false
 	var filter := ""
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--filter="):

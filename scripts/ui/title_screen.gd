@@ -19,6 +19,8 @@ var _logo: TextureRect
 var _buttons: VBoxContainer
 var _note: Label
 var _modal: PanelContainer
+## O que o Voltar (Esc, Cancelar) faz na janela aberta; vazio, fecha.
+var _modal_back := Callable()
 var _portrait := false
 ## Saindo do título (Continuar ou campanha nova): a troca de cena está em andamento e a tela não aceita mais nada.
 var _leaving := false
@@ -136,7 +138,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if S.press_focused(scope, event):
 		get_viewport().set_input_as_handled()
 	elif modal_open() and S.is_back(event):
-		close_modal()
+		_go_back()
 		get_viewport().set_input_as_handled()
 
 
@@ -144,6 +146,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func modal_open() -> bool:
 	return _modal != null and is_instance_valid(_modal) and not _modal.is_queued_for_deletion()
+
+
+## Voltar (Esc): a confirmação da campanha nova volta para a lista dos espaços (#34); as outras janelas fecham.
+func _go_back() -> void:
+	if _modal_back.is_valid():
+		_modal_back.call()
+	else:
+		close_modal()
 
 
 func close_modal() -> void:
@@ -164,6 +174,7 @@ func _open_modal(width: float) -> VBoxContainer:
 	else:
 		Sound.play("res://audio/ui/panel_open.ogg")
 	_buttons.visible = false
+	_modal_back = Callable()
 	_modal = PanelContainer.new()
 	_modal.add_theme_stylebox_override("panel", H.panel_style(0.95))
 	_modal.custom_minimum_size = Vector2(width, 0)
@@ -209,7 +220,7 @@ func _ask_new_campaign() -> void:
 
 ## Os três espaços com o resumo de cada um. Para a campanha nova, todos servem (o ocupado pergunta antes); para abrir,
 ## só os que têm uma campanha que abre.
-func _open_slots(for_new: bool) -> void:
+func _open_slots(for_new: bool, focus_slot: int = 0) -> void:
 	var box := _open_modal(760)
 	box.add_child(H.make_label(tr("Em qual espaço começar?") if for_new else tr("Campanhas"), 34, H.GOLD))
 	var first: Button
@@ -224,7 +235,7 @@ func _open_slots(for_new: bool) -> void:
 		if button.disabled:
 			button.focus_mode = Control.FOCUS_NONE
 		box.add_child(button)
-		if first == null and not button.disabled:
+		if (first == null or number == focus_slot) and not button.disabled:
 			first = button
 	var back := _modal_button(tr("Voltar"), close_modal)
 	box.add_child(back)
@@ -272,7 +283,8 @@ func _pick_slot(number: int, for_new: bool) -> void:
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(620, 0)
 	box.add_child(note)
-	var stay := _modal_button(tr("Cancelar"), close_modal)
+	_modal_back = _open_slots.bind(true, number)
+	var stay := _modal_button(tr("Cancelar"), _go_back)
 	box.add_child(stay)
 	box.add_child(_modal_button(tr("Começar do zero"), _start_new_campaign.bind(number)))
 	stay.grab_focus.call_deferred()

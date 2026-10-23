@@ -796,7 +796,7 @@ func _confirm_new_campaign() -> void:
 	var box := _open_modal(620)
 	_modal.set_meta("menu", true)
 	box.add_child(H.make_label(tr("Começar uma campanha nova?"), 34, H.GOLD))
-	var note := H.make_label(tr("A expedição e todo o progresso salvo são substituídos por uma campanha do zero, na Estação."), 20, H.TEXT)
+	var note := H.make_label(tr("A expedição e todo o progresso salvo no espaço %d são substituídos por uma campanha do zero, na Estação. Os outros espaços ficam como estão.") % Campaign.slot, 20, H.TEXT)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.custom_minimum_size = Vector2(580, 0)
 	box.add_child(note)

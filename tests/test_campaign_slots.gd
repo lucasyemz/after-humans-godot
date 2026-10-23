@@ -19,12 +19,57 @@ func run(context) -> void:
 	_migrate_old_save()
 	_broken_slot()
 	_play_time()
+	_play_time_on_quit()
 
 	_clear()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
 	Campaign.slot = real_slot
+
+
+## Ao fechar, o tempo desde o último save vai para o arquivo do espaço (só o tempo, uma vez); um estado trocado por
+## fora (um teste, uma captura) não ganha tempo nem grava nada.
+func _play_time_on_quit() -> void:
+	_clear()
+	Campaign.new_game_in(1, 7)
+	var path: String = Campaign.slot_path(1)
+	var before := int(Campaign.read_file(path).played_seconds)
+	var scene: String = GameFlow.current_id
+	Campaign.save_time_on_quit = true
+	Campaign._quit_saved = false
+	# O estado muda depois do save (a luta pela metade): o fechamento não grava isso, só o tempo.
+	Campaign.state.inventory.bandages = int(Campaign.state.inventory.bandages) + 9
+	Campaign._play_seconds = 130.4
+	t.check(Campaign.save_play_time(), "ao fechar, grava o tempo jogado")
+	var saved = Campaign.read_file(path)
+	t.equal(int(saved.played_seconds), before + 130, "o arquivo do espaço ganha os segundos inteiros")
+	t.equal(int(saved.inventory.bandages), int(Campaign.state.inventory.bandages) - 9, "e só o tempo: o resto fica como no último save")
+	t.equal(int(Campaign.read_file(Campaign.slot_path(1, true)).played_seconds), before + 130, "a cópia também")
+	Campaign._play_seconds = 50.0
+	t.check(not Campaign.save_play_time(), "uma vez só")
+	# Um estado trocado por fora: não conta tempo nem grava.
+	Campaign.load_or_new()
+	var owner: Dictionary = Campaign.state
+	Campaign.state = Campaign.create_initial(3)
+	GameFlow.current_id = "station"
+	Campaign._play_seconds = 0.0
+	Campaign._process(0.0)
+	OS.delay_msec(40)
+	Campaign._process(0.0)
+	t.equal(Campaign._play_seconds, 0.0, "com um estado de fora, o tempo não anda")
+	Campaign._play_seconds = 99.0
+	t.check(not Campaign.save_play_time(), "nem grava no fechamento")
+	t.equal(int(Campaign.read_file(path).played_seconds), before + 130, "o arquivo fica igual")
+	Campaign.state = owner
+	var real_dir: String = Campaign.save_dir
+	Campaign.save_dir = real_dir + "-outra"
+	t.check(not Campaign.save_play_time(), "nem em outra pasta que a do último save")
+	Campaign.save_dir = real_dir
+	Campaign.save_time_on_quit = false
+	t.check(not Campaign.save_play_time(), "e desligado (os testes) não grava")
+	Campaign._play_seconds = 0.0
+	GameFlow.current_id = scene
 
 
 ## Uma campanha em cada espaço; o último usado é o que abre no começo do jogo; Continuar de outro espaço abre o dele.
