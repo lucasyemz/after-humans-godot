@@ -82,7 +82,8 @@ func save_play_time() -> bool:
 	campaign.played_seconds = int(campaign.get("played_seconds", 0)) + whole
 	state.played_seconds = int(state.get("played_seconds", 0)) + whole
 	_play_seconds -= whole
-	var text := _envelope(campaign)
+	# A data continua a do último save de progresso (a lista dos espaços mostra essa).
+	var text := _envelope(campaign, _saved_at(primary_path()))
 	return _write_atomic(primary_path(), text) and _write_atomic(backup_path(), text)
 
 
@@ -317,8 +318,10 @@ static func _checksum(campaign: Dictionary) -> String:
 	return JSON.stringify(_normalize(campaign), "", true).sha256_text()
 
 
-static func _envelope(campaign: Dictionary) -> String:
-	return JSON.stringify({"format": FORMAT, "version": VERSION, "checksum": _checksum(campaign), "saved_at": int(Time.get_unix_time_from_system()),
+## saved_at: a data do save (a lista dos espaços mostra); sem ela, agora.
+static func _envelope(campaign: Dictionary, saved_at: int = -1) -> String:
+	return JSON.stringify({"format": FORMAT, "version": VERSION, "checksum": _checksum(campaign),
+		"saved_at": saved_at if saved_at >= 0 else int(Time.get_unix_time_from_system()),
 		"campaign": campaign}, "\t", true)
 
 

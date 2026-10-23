@@ -674,7 +674,7 @@ func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
 
 func open_room(room_id: String) -> void:
 	_reset_focus()
-	if current == "":
+	if current == "" and _opened_frame != Engine.get_process_frames():
 		_opened_frame = Engine.get_process_frames()
 		_sound_open.call_deferred()
 	current = room_id
@@ -686,7 +686,7 @@ func open_room(room_id: String) -> void:
 
 func open_service(service: String) -> void:
 	_reset_focus()
-	if current == "":
+	if current == "" and _opened_frame != Engine.get_process_frames():
 		_opened_frame = Engine.get_process_frames()
 		_sound_open.call_deferred()
 	current = service

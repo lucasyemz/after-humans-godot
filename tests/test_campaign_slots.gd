@@ -41,7 +41,10 @@ func _play_time_on_quit() -> void:
 	# O estado muda depois do save (a luta pela metade): o fechamento não grava isso, só o tempo.
 	Campaign.state.inventory.bandages = int(Campaign.state.inventory.bandages) + 9
 	Campaign._play_seconds = 130.4
+	var date := int(Campaign.slot_summary(1).saved_at)
+	OS.delay_msec(1100)
 	t.check(Campaign.save_play_time(), "ao fechar, grava o tempo jogado")
+	t.equal(int(Campaign.slot_summary(1).saved_at), date, "a data do espaço continua a do último save de progresso")
 	var saved = Campaign.read_file(path)
 	t.equal(int(saved.played_seconds), before + 130, "o arquivo do espaço ganha os segundos inteiros")
 	t.equal(int(saved.inventory.bandages), int(Campaign.state.inventory.bandages) - 9, "e só o tempo: o resto fica como no último save")
