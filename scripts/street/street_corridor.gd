@@ -318,7 +318,6 @@ func _spawn_props() -> void:
 		street._debug_colliders.append(debug)
 
 
-## Portas das casas abertas (e da trancada depois de arrombada) com a pintura da porta aberta.
 ## Onde o objeto de busca da rua fica: o ponto do trecho, ou o mais perto dele que está longe das portas das lojas (o
 ## objeto tapava a porta e os dois avisos disputavam o lugar) e dos objetos pintados da calçada.
 func _prop_x(wanted: float) -> float:
@@ -334,6 +333,7 @@ func _prop_x(wanted: float) -> float:
 	return wanted
 
 
+## Portas das casas abertas (e da trancada depois de arrombada) com a pintura da porta aberta.
 func _refresh_doors() -> void:
 	var route: Dictionary = Campaign.state.session.expedition.corridor
 	for i in route.sites.size():
