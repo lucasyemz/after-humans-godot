@@ -163,6 +163,21 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   templates da 4.7.2 precisam estar instalados.
 - **Servir a web:** `python -m http.server 8060 --directory build/web` e abrir `http://localhost:8060`.
 
+### Versão web
+
+`.github/workflows/web.yml` ("Versão web") roda depois de cada CI verde num push na `main`, ou à mão em Actions. Ele:
+- exporta o preset Web, que é sem threads, então roda em qualquer hospedagem estática, sem os cabeçalhos COOP/COEP;
+- baixa só o modelo da web (~10 MB) de dentro do pacote de modelos da Godot, com `tools/fetch_web_template.py`;
+- abre o build no Chromium e passa pela Estação e por uma luta (`tools/web_perf.mjs`);
+- guarda o build como artefato (`web-build`, 7 dias).
+
+**Publicar no GitHub Pages** deixa o endereço público, então fica desligado até o Lucas decidir. Para ligar:
+1. Em Settings > Pages, escolha a fonte "GitHub Actions". Num repositório privado, o Pages pede um plano pago.
+2. Em Settings > Secrets and variables > Actions > Variables, crie `PUBLISH_WEB` = `true`.
+
+O próximo push na `main` publica em `https://lucasyemz.github.io/after-humans-godot/`. O pacote tem 127 MB e
+demora a carregar na primeira vez (#12).
+
 ### Textos e tradução
 
 As telas usam o sistema de tradução da Godot com `data/i18n/en.po`. A chave de cada texto é o próprio português, então
