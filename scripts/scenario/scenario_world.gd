@@ -95,7 +95,8 @@ func build(map: String) -> void:
 			if not _prop_nodes.has(prop_parts[i]):
 				_prop_nodes[prop_parts[i]] = []
 			_prop_nodes[prop_parts[i]].append(node)
-		elif node.mesh.get_surface_count() == 1 and data.materials[int(part.materials[0])].kind != "water":
+		elif node.mesh.get_surface_count() == 1 and data.materials[int(part.materials[0])].kind != "water" \
+				and not _in_front(node.transform * node.mesh.get_aabb()):
 			var key := [int(part.mesh), int(part.materials[0]), node.cast_shadow]
 			if not merge.has(key):
 				merge[key] = []
@@ -286,6 +287,13 @@ func _material(m: Dictionary) -> Material:
 	return material
 
 
+## A peça fica toda na frente da faixa de andar da zona dela: pode tapar a equipe e esmaece sozinha (#51), por isso
+## não se junta às outras.
+func _in_front(box: AABB) -> bool:
+	var zone := zone_at(box.get_center().x)
+	return zone >= 0 and box.position.z > (zones[zone].z0 + zones[zone].z1) * 0.5
+
+
 func _merge(groups: Dictionary) -> void:
 	for key in groups:
 		var parts: Array = groups[key]
@@ -299,6 +307,8 @@ func _merge(groups: Dictionary) -> void:
 		combined.mesh = tool.commit()
 		combined.material_override = parts[0].get_surface_override_material(0)
 		combined.cast_shadow = key[2]
+		# Peças juntadas ficam espalhadas: a caixa delas não diz o que tapa quem (#51).
+		combined.set_meta("merged", true)
 		add_child(combined)
 		for node: MeshInstance3D in parts:
 			node.queue_free()

@@ -857,6 +857,7 @@ func _open_room(site_index: int) -> void:
 		debug.visible = showing
 		street._debug_colliders.append(debug)
 	street.set_indoor(true, room.position.x, AHHouseRoom.WIDTH)
+	street.occlusion.scan(room)
 	street._place_leader(Vector3(room.entrance_x, 0, -0.5))
 	_room_time = 0.0
 	room_guards.clear()
@@ -888,6 +889,7 @@ func _close_room() -> void:
 		card.queue_free()
 	room_guards.clear()
 	if room != null:
+		street.occlusion.forget(room)
 		for debug in room.debug_colliders:
 			street._debug_colliders.erase(debug)
 		room.queue_free()

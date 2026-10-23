@@ -410,6 +410,7 @@ func merge_static(keep: Dictionary) -> int:
 		combined.mesh = tool.commit()
 		combined.material_override = key[0]
 		combined.cast_shadow = key[1]
+		combined.set_meta("merged", true)
 		root.add_child(combined)
 		for part: MeshInstance3D in parts:
 			generated.erase(part)

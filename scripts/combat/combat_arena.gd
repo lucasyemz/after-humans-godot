@@ -248,6 +248,11 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 		cards[session.state.player_team[index].id] = hero_cards[index]
 	for index in session.state.enemy_team.size():
 		cards[session.state.enemy_team[index].id] = enemy_cards[index]
+	# Os inimigos ganham a silhueta enquanto a luta dura (#51); a equipe já tem a dela.
+	var occlusion = _street.get("occlusion") if _street != null else null
+	if occlusion != null:
+		for card in enemy_cards:
+			occlusion.track_enemy(card)
 	active = true
 	for unit in session.units():
 		rest_pose(unit)
@@ -403,6 +408,10 @@ func _run() -> void:
 	session.write_back(Campaign.state)
 	await hud.show_result(result, auto_battle)
 	hud.close()
+	var occlusion = _street.get("occlusion") if _street != null else null
+	if occlusion != null:
+		for unit in session.state.enemy_team:
+			occlusion.untrack(cards[unit.id])
 	active = false
 	finished.emit(result)
 

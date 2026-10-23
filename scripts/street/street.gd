@@ -95,6 +95,8 @@ var _leader: CharacterBody3D
 ## Heróis da equipe (a equipe viva da expedição) e as placas deles, na mesma ordem.
 var party_ids: Array = []
 var _heroes: Array[AHSpriteCard] = []
+## A silhueta de quem está escondido e o esmaecimento do que tapa (#51).
+var occlusion: AHOcclusion
 var _combat_art := {}
 var _arena: AHCombatArena
 var corridor: AHStreetCorridor
@@ -190,6 +192,14 @@ func _ready() -> void:
 	_apply_wet()
 	_build_rain()
 	_build_party()
+	occlusion = AHOcclusion.new()
+	occlusion.name = "Occlusion"
+	add_child(occlusion)
+	occlusion.scan(scenario if scenario else _set)
+	# Os objetos da rua que o corredor põe depois (portas, pontos de busca) entram no fim do quadro.
+	occlusion.scan.call_deferred(_dynamic)
+	for card in _heroes:
+		occlusion.track(card)
 	if scenario and ["FloodedDepot", "SewerDucts"].has(scenario.map_name):
 		# Lanterna de mão no Depósito e nos Dutos (a da Unreal: 160 lm, 10 m, presa ao líder, um pouco à frente).
 		var lantern := OmniLight3D.new()

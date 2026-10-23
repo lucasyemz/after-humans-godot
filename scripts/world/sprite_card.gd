@@ -6,6 +6,10 @@ extends MeshInstance3D
 
 ## A camada das placas de personagem (além da 1): o preenchimento da luta nos cenários só pega elas.
 const CHARACTER_LAYER := 1 << 19
+## A silhueta de quem está escondido atrás de alguma coisa (#51): um segundo passe só onde a placa está atrás.
+const SILHOUETTE_SHADER := preload("res://shaders/character_silhouette.gdshader")
+## Toda placa de personagem marca o stencil com isto: a silhueta de um não pinta por cima de outro.
+const STENCIL_CHARACTER := 1
 
 ## Altura do corpo em metros (do pé ao topo da cabeça na pose parada).
 var body_height := 1.8
@@ -17,6 +21,7 @@ var _texture: Texture2D
 var _frame := 0
 var _frame_time := 0.0
 var _flash_tween: Tween
+var _silhouette: ShaderMaterial
 
 
 func _init() -> void:
@@ -37,6 +42,10 @@ func _init() -> void:
 	_material.backlight = Color(0.45, 0.45, 0.45)
 	_material.emission_enabled = true
 	_material.emission = Color.BLACK
+	_material.stencil_mode = BaseMaterial3D.STENCIL_MODE_CUSTOM
+	_material.stencil_flags = BaseMaterial3D.STENCIL_FLAG_WRITE
+	_material.stencil_compare = BaseMaterial3D.STENCIL_COMPARE_ALWAYS
+	_material.stencil_reference = STENCIL_CHARACTER
 
 
 ## Mostra uma arte do manifesto: {file, canvas, anchor, body_reference_pixels} e, numa folha, frames e fps.
@@ -44,6 +53,8 @@ func show_art(art: Dictionary) -> void:
 	_art = art
 	_texture = load(art.file)
 	_material.albedo_texture = _texture
+	if _silhouette != null:
+		_silhouette.set_shader_parameter("albedo_tex", _texture)
 	_frame = 0
 	_frame_time = 0.0
 	_layout()
@@ -98,6 +109,29 @@ func _layout() -> void:
 	else:
 		_material.uv1_offset = Vector3(uv_pos.x, uv_pos.y, 0)
 		_material.uv1_scale = Vector3(uv_size.x, uv_size.y, 1)
+	if _silhouette != null:
+		_silhouette.set_shader_parameter("uv_offset", Vector2(_material.uv1_offset.x, _material.uv1_offset.y))
+		_silhouette.set_shader_parameter("uv_scale", Vector2(_material.uv1_scale.x, _material.uv1_scale.y))
+
+
+## Liga a silhueta na cor dada (a equipe sempre, os inimigos só na luta) ou desliga com null.
+func set_silhouette(color) -> void:
+	if color == null:
+		_material.next_pass = null
+		return
+	if _silhouette == null:
+		_silhouette = ShaderMaterial.new()
+		_silhouette.shader = SILHOUETTE_SHADER
+		# Depois dos transparentes do cenário: a silhueta fica por cima do que esconde o personagem.
+		_silhouette.render_priority = 1
+	_silhouette.set_shader_parameter("color", color)
+	_silhouette.set_shader_parameter("albedo_tex", _texture)
+	_material.next_pass = _silhouette
+	_layout()
+
+
+func has_silhouette() -> bool:
+	return _material.next_pass != null
 
 
 ## Pisca numa cor (dano vermelho, cura verde) e volta.

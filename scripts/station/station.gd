@@ -60,6 +60,7 @@ var on_platform := false
 var lineup: Array = []
 var _build: AHStationBuild
 var _walkers: Array = []
+var occlusion: AHOcclusion
 var _combat_art := {}
 var _civilian_art := {}
 var _poses := {}
@@ -111,6 +112,11 @@ func _ready() -> void:
 		keep[node] = true
 		_wagon_base[node] = node.position
 	builder.merge_static(keep)
+	# A silhueta dos heróis atrás do mobiliário e o esmaecimento do que tapa (#51).
+	occlusion = AHOcclusion.new()
+	occlusion.name = "Occlusion"
+	add_child(occlusion)
+	occlusion.scan(self)
 	_build_camera()
 	_build_post()
 	_build_sound_loops()
@@ -735,6 +741,7 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		card.body_height = AHCharacterHeights.find(entry.id)
 		card.show_art(art.idle)
 		add_child(card)
+		occlusion.track(card)
 		var lane: Array = room.lane
 		var occupants: int = occupancy[room_id]
 		var half: float = (lane[1] - lane[0]) * 0.5
