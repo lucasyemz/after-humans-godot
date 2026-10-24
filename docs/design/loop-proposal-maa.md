@@ -149,15 +149,18 @@ habilidades; o equipamento continua sendo a relíquia.
 - **O triângulo de classes rígido:** o nosso combate já tem posições, máquinas e estados. Um triângulo por cima
   complicaria a leitura que o Lucas pediu para simplificar.
 
-## 4. Ordem sugerida
-1. **P6, P7 e P2 (sem a carga recuperada):** dão sensação de MAA logo, com pouco risco, e entram junto com a HUD nova.
-2. **P3 e P2 completo (carga recuperada):** precisam da decisão do Lucas sobre a curva de nível e os prêmios.
-3. **P1:** junto com o mapa novo (#86, #87), porque as missões moram nos lugares do mapa.
-4. **P5 e P4.**
-5. **P8 e P9.**
+## 4. Ordem e issues
+1. **P6** briefing e debriefing (#88) e **P7** ficha ao apontar (#89): sensação de MAA logo, junto com a HUD nova.
+2. **P3** nível e Treino (#90) e **P2** fim de luta com a carga recuperada (#91).
+3. **P1** missões curtas (#92): junto com o mapa novo (#86, #87), porque as missões moram nos lugares do mapa.
+4. **P5** laços à vista (#93) e **P4** Pesquisa em árvore (#94).
+5. **P9** desafios dos chefes (#95).
 
-## 5. Decisões do Lucas
-- **Missões curtas (P1):** aprovar a ideia e quantas por lugar (sugestão: 3 mais o chefe).
-- **Nível dos heróis (P3):** aprovar e escolher entre uma curva curta (nível máximo 10) e uma longa.
-- **Carga recuperada (P2):** 1 de 6 caixas está bom, ou prefere o prêmio fixo?
-- **Pesquisa por expedições (P4):** aprovar no lugar dos timers reais.
+As telas de todas elas, com o kit (#59), estão pedidas ao Codex na #96.
+
+## 5. Decisões do Lucas (24/10/2026)
+- **Missões curtas (P1):** aprovadas, 3 por lugar mais o chefe.
+- **Nível dos heróis (P3):** aprovado, curva curta até o nível 10.
+- **Carga recuperada (P2):** 1 de 6 caixas.
+- **Pesquisa (P4):** medida em expedições, no lugar dos timers reais.
+- **P8:** retirada. **A exploração** continua como é hoje.

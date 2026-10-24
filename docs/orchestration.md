@@ -88,6 +88,11 @@ vê). Para revisar de novo um PR: em Actions, "Revisão", "Run workflow", com o 
   8. a parte segura da #56.
   - A #60 (componentes) e o resto da #56 esperam o Lucas aprovar a #59 e a #58.
 - **Codex:** #59 (kit de componentes), depois #58 (telas novas montadas com o kit).
+- **O novo laço de jogo** (`docs/design/loop-proposal-maa.md`, aprovado em 24/10), na ordem:
+  - Claude: #88 (briefing), #89 (ficha ao apontar), #90 (nível até 10 e Treino), #91 (fim de luta e carga de 1 em 6),
+    #92 (3 missões curtas mais o chefe, com o mapa #86 e #87), #93 (laços à vista), #94 (Pesquisa por expedições),
+    #95 (desafios dos chefes);
+  - Codex: #96 (as telas de todas elas com o kit).
 - **Regras novas no `AGENTS.md`:** narrativa coerente com `docs/narrative/` e coerência visual, que a QA confere.
 
 ## Onde paramos (24/10/2026)
