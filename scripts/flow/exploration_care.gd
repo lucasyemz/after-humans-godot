@@ -63,14 +63,14 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 	var session: Dictionary = campaign.get("session", {})
 	if session.get("expedition") == null or session.get("result", "") != "" or session.get("event") != null \
 			or session.get("screen") != "corridor":
-		q.reason = "Disponível fora de combate e eventos, durante a exploração."
+		q.reason = TranslationServer.translate("Disponível fora de combate e eventos, durante a exploração.")
 		return q
 	var target = _hero(campaign, hero_id)
 	if target == null or not target.alive or target.hp <= 0 or not session.expedition.team.has(hero_id):
-		q.reason = "Selecione um aliado vivo da expedição."
+		q.reason = TranslationServer.translate("Selecione um aliado vivo da expedição.")
 		return q
 	if target.hp >= target.max_hp:
-		q.reason = "O aliado já está com a vida cheia."
+		q.reason = TranslationServer.translate("O aliado já está com a vida cheia.")
 		return q
 	var missing: int = target.max_hp - target.hp
 	match kind:
@@ -78,28 +78,28 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 			q.heal_min = mini(missing, BANDAGE_HEAL)
 			q.heal_max = q.heal_min
 			if int(campaign.inventory.bandages) <= 0:
-				q.reason = "Sem curativos no estoque."
+				q.reason = TranslationServer.translate("Sem curativos no estoque.")
 				return q
 		IRIS_AMPOULE:
 			var row = _ampoule_row()
 			if iris(campaign) == null or row == null or row.UsesMax <= 0 or row.HealRange.Max <= 0:
-				q.reason = "Um sapo vivo precisa estar na equipe."
+				q.reason = TranslationServer.translate("Um sapo vivo precisa estar na equipe.")
 				return q
 			# Os heróis jogáveis são orgânicos; uma classe fora da tabela não passa.
 			if GameData.row("classes", target.class_id) == null:
-				q.reason = "A ampola trata somente aliados orgânicos."
+				q.reason = TranslationServer.translate("A ampola trata somente aliados orgânicos.")
 				return q
 			var bonus := 1 if campaign.get("researched_skills", []).has(AMPOULE) else 0
 			q.heal_min = mini(missing, row.HealRange.Min + bonus)
 			q.heal_max = mini(missing, row.HealRange.Max + bonus)
 			if q.charges <= 0:
-				q.reason = "Sem cargas. A ampola recarrega após uma vitória."
+				q.reason = TranslationServer.translate("Sem cargas. A ampola recarrega após uma vitória.")
 				return q
 		_:
 			q.heal_min = _meal_heal(kind, target.max_hp, missing)
 			q.heal_max = q.heal_min
 			if AHJourneyRules.food(campaign) < q.food_cost:
-				q.reason = "Comida insuficiente."
+				q.reason = TranslationServer.translate("Comida insuficiente.")
 				return q
 	q.available = true
 	return q
@@ -134,36 +134,36 @@ static func use(campaign: Dictionary, hero_id: String, kind: String) -> int:
 static func combat_quote(campaign: Dictionary, session: AHCombatSession, kind: String) -> Dictionary:
 	var q := _empty(kind)
 	if session == null or session.is_over():
-		q.reason = "Nenhuma luta em andamento."
+		q.reason = TranslationServer.translate("Nenhuma luta em andamento.")
 		return q
 	if kind == IRIS_AMPOULE:
-		q.reason = "Na luta, a ampola é uma habilidade do sapo."
+		q.reason = TranslationServer.translate("Na luta, a ampola é uma habilidade do sapo.")
 		return q
 	var unit := session.current_actor()
 	if unit == null or not unit.is_player or session.processed_turn_key != session.turn_key():
-		q.reason = "Espere a vez de um aliado."
+		q.reason = TranslationServer.translate("Espere a vez de um aliado.")
 		return q
 	if session.item_used_turn_key == session.turn_key():
-		q.reason = "%s já usou um item nesta vez." % unit.display_name
+		q.reason = TranslationServer.translate("%s já usou um item nesta vez.") % unit.display_name
 		return q
 	if unit.hp <= 0:
-		q.reason = "No Limiar da Morte, só uma habilidade de cura salva."
+		q.reason = TranslationServer.translate("No Limiar da Morte, só uma habilidade de cura salva.")
 		return q
 	if unit.hp >= unit.max_hp:
-		q.reason = "%s está com a vida cheia." % unit.display_name
+		q.reason = TranslationServer.translate("%s está com a vida cheia.") % unit.display_name
 		return q
 	var missing := unit.max_hp - unit.hp
 	if kind == BANDAGE:
 		q.heal_min = mini(missing, BANDAGE_HEAL)
 		q.heal_max = q.heal_min
 		if int(campaign.inventory.bandages) <= 0:
-			q.reason = "Sem curativos no estoque."
+			q.reason = TranslationServer.translate("Sem curativos no estoque.")
 			return q
 	else:
 		q.heal_min = _meal_heal(kind, unit.max_hp, missing)
 		q.heal_max = q.heal_min
 		if AHJourneyRules.food(campaign) < q.food_cost:
-			q.reason = "Comida insuficiente."
+			q.reason = TranslationServer.translate("Comida insuficiente.")
 			return q
 	q.available = true
 	return q

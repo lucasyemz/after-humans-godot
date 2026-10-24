@@ -82,8 +82,8 @@ func _build_buttons() -> void:
 	if ok > (1 if continue_button != null else 0):
 		load_button = _title_button(tr("Campanhas"), false, _open_slots.bind(false))
 	options_button = _title_button(tr("Opções"), false, _open_options)
-	_note.text = Campaign.load_warning
-	_note.visible = Campaign.load_warning != ""
+	_note.text = Campaign.warning_text()
+	_note.visible = _note.text != ""
 	(continue_button if continue_button != null else new_button).grab_focus.call_deferred()
 
 

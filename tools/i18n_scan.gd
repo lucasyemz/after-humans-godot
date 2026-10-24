@@ -9,10 +9,18 @@ extends RefCounted
 
 const PO := "res://data/i18n/en.po"
 const IGNORE := "res://tools/i18n_ignore.txt"
-## As telas convertidas (a primeira leva: o título, as Opções, o HUD da exploração e da luta e a Estação).
+## As telas convertidas (a primeira leva: o título, as Opções, o HUD da exploração e da luta e a Estação; a segunda: o mapa
+## de fases, a Mochila, as dicas, as regras da jornada, da Estação e dos cuidados, o registro da luta, a rua, os lugares e
+## os avisos do save).
 const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/ui/options_panel.gd", "res://scripts/core/settings_service.gd",
 	"res://scripts/ui/exploration_hud.gd",
-	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/refuge_hud.gd"]
+	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/refuge_hud.gd",
+	"res://scripts/ui/phase_map.gd", "res://scripts/ui/inventory_panel.gd", "res://scripts/ui/tips_service.gd",
+	"res://scripts/ui/ui_style.gd", "res://scripts/flow/station_rules.gd", "res://scripts/flow/journey_rules.gd",
+	"res://scripts/flow/exploration_care.gd", "res://scripts/combat/combat_engine.gd", "res://scripts/combat/combat_session.gd",
+	"res://scripts/street/street.gd", "res://scripts/street/street_corridor.gd", "res://scripts/scenario/scenario_world.gd",
+	"res://scripts/station/station_build.gd", "res://scripts/campaign/campaign_service.gd",
+	"res://scripts/core/game_data_service.gd", "res://scripts/flow/game_flow.gd", "res://scripts/combat/combat_arena.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
 	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],

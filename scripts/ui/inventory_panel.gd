@@ -43,7 +43,7 @@ func _build() -> void:
 	var head := HBoxContainer.new()
 	add_child(head)
 	head.add_child(H.make_label("Mochila", 32, H.GOLD))
-	var hint := H.make_label("   Na luta: ação livre do herói da vez, um item por vez." if session else "   Cuidados fora da luta: escolha o item e o aliado.", 16, H.MUTED)
+	var hint := H.make_label(tr("   Na luta: ação livre do herói da vez, um item por vez.") if session else tr("   Cuidados fora da luta: escolha o item e o aliado."), 16, H.MUTED)
 	hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(hint)
 	var row := HBoxContainer.new()
@@ -54,7 +54,7 @@ func _build() -> void:
 	grid_box.custom_minimum_size = Vector2(430, 0)
 	row.add_child(grid_box)
 	for group in GROUPS.size():
-		grid_box.add_child(H.make_label(GROUPS[group], 19, H.GOLD.lightened(0.2)))
+		grid_box.add_child(H.make_label(tr(GROUPS[group]), 19, H.GOLD.lightened(0.2)))
 		var grid := GridContainer.new()
 		grid.columns = 3
 		grid.add_theme_constant_override("h_separation", 8)
@@ -64,7 +64,7 @@ func _build() -> void:
 			grid.add_child(_slot_button(item))
 	row.add_child(_detail())
 	var close := Button.new()
-	close.text = "Fechar (%s)" % AHUiStyle.key_name("menu")
+	close.text = tr("Fechar (%s)") % AHUiStyle.key_name("menu")
 	close.custom_minimum_size = Vector2(0, 46)
 	H.style_button(close)
 	close.pressed.connect(func(): closed.emit())
@@ -75,36 +75,36 @@ func _make_slots() -> Array:
 	var campaign: Dictionary = Campaign.state
 	var out: Array = []
 	var food := AHJourneyRules.food(campaign)
-	out.append({"id": "food", "name": "Comida", "icon": "lobby-food", "count": "%d / %d" % [food, AHJourneyRules.MAX_FOOD], "group": 0,
-		"owned": food > 0, "text": "Da expedição: cura fora e dentro da luta. O que sobrar não volta ao refúgio."})
+	out.append({"id": "food", "name": tr("Comida"), "icon": "lobby-food", "count": "%d / %d" % [food, AHJourneyRules.MAX_FOOD], "group": 0,
+		"owned": food > 0, "text": tr("Da expedição: cura fora e dentro da luta. O que sobrar não volta ao refúgio.")})
 	var bandages: int = campaign.inventory.bandages
-	out.append({"id": "bandages", "name": "Curativo", "icon": "res-bandages", "count": str(bandages), "group": 0, "owned": bandages > 0,
-		"text": "Do refúgio: +8 de vida. O que sobrar e o que se achar voltam ao refúgio."})
+	out.append({"id": "bandages", "name": tr("Curativo"), "icon": "res-bandages", "count": str(bandages), "group": 0, "owned": bandages > 0,
+		"text": tr("Do refúgio: +8 de vida. O que sobrar e o que se achar voltam ao refúgio.")})
 	if C.iris(campaign) != null:
 		var charges := C.ampoule_charges(campaign)
-		out.append({"id": "ampoule", "name": "Ampola de Reparo", "icon": "item-ampoule", "count": "%d cargas" % charges, "group": 0,
-			"owned": charges > 0, "text": "Habilidade do sapo: cura um aliado orgânico. Recarrega após uma vitória."})
+		out.append({"id": "ampoule", "name": tr("Ampola de Reparo"), "icon": "item-ampoule", "count": tr("%d cargas") % charges, "group": 0,
+			"owned": charges > 0, "text": tr("Habilidade do sapo: cura um aliado orgânico. Recarrega após uma vitória.")})
 	var tools: Array = KNOWN_TOOLS.duplicate()
 	for tool in campaign.get("tools", []):
 		if not tools.has(tool):
 			tools.append(tool)
 	for tool in tools:
 		var has := AHJourneyRules.has_tool(campaign, tool)
-		out.append({"id": tool, "name": TOOL_NAMES.get(tool, tool.capitalize()), "icon": TOOL_ICONS.get(tool, "tool-generic"), "count": "",
-			"group": 1, "owned": has, "text": "Reutilizável: abre escolhas nos eventos. Não se gasta." if has else "A equipe ainda não tem esta ferramenta."})
+		out.append({"id": tool, "name": tr(TOOL_NAMES.get(tool, tool.capitalize())), "icon": TOOL_ICONS.get(tool, "tool-generic"), "count": "",
+			"group": 1, "owned": has, "text": tr("Reutilizável: abre escolhas nos eventos. Não se gasta.") if has else tr("A equipe ainda não tem esta ferramenta.")})
 	for spec in [["seeds", "Sementes", "lobby-seed", "Moeda do refúgio: comida extra na preparação, pesquisa e obras."],
 			["scrap", "Sucata", "lobby-scrap", "Matéria-prima da Forja."], ["fragments", "Fragmentos", "lobby-fragment", "Restos raros usados nas pesquisas."]]:
-		out.append({"id": spec[0], "name": spec[1], "icon": spec[2], "count": str(int(campaign.inventory.get(spec[0], 0))), "group": 2,
-			"owned": true, "text": spec[3]})
+		out.append({"id": spec[0], "name": tr(spec[1]), "icon": spec[2], "count": str(int(campaign.inventory.get(spec[0], 0))), "group": 2,
+			"owned": true, "text": tr(spec[3])})
 	var relics := {}
 	for relic_id in campaign.inventory.get("relics", []):
 		relics[relic_id] = int(relics.get(relic_id, 0)) + 1
 	for relic_id in relics:
 		var row = GameData.row("relics", relic_id)
-		var name: String = row.get("DisplayName", relic_id) if row else relic_id
-		var text: String = (row.get("Description", "") + " ") if row else ""
+		var name: String = tr(row.get("DisplayName", relic_id)) if row else relic_id
+		var text: String = (tr(row.get("Description", "")) + " ") if row else ""
 		out.append({"id": relic_id, "name": name, "icon": RELIC_ICONS.get(relic_id, "relic-generic"), "count": str(relics[relic_id]),
-			"group": 2, "owned": true, "text": text + "Equipe no Depósito do refúgio."})
+			"group": 2, "owned": true, "text": text + tr("Equipe no Depósito do refúgio.")})
 	return out
 
 
@@ -180,10 +180,10 @@ func _target_row() -> HBoxContainer:
 	var label := ""
 	if session:
 		var unit := session.current_actor()
-		label = "%s · Vida %d/%d" % [unit.display_name, unit.hp, unit.max_hp] if unit else "—"
+		label = tr("%s · Vida %d/%d") % [unit.display_name, unit.hp, unit.max_hp] if unit else "—"
 	else:
 		var hero = Campaign.hero(hero_id)
-		label = "%s · Vida %d/%d" % [hero.display_name, hero.hp, hero.max_hp] if hero else "—"
+		label = tr("%s · Vida %d/%d") % [hero.display_name, hero.hp, hero.max_hp] if hero else "—"
 		var back := Button.new()
 		back.text = "◀"
 		back.custom_minimum_size = Vector2(44, 40)
@@ -208,25 +208,25 @@ func _actions(id: String) -> Array:
 	var kinds: Array = []
 	match id:
 		"food":
-			kinds = [[C.SMALL_MEAL, "Comer pouco"], [C.FULL_MEAL, "Comer bem"]]
+			kinds = [[C.SMALL_MEAL, tr("Comer pouco")], [C.FULL_MEAL, tr("Comer bem")]]
 		"bandages":
-			kinds = [[C.BANDAGE, "Usar curativo"]]
+			kinds = [[C.BANDAGE, tr("Usar curativo")]]
 		"ampoule":
-			kinds = [[C.IRIS_AMPOULE, "Ampola de Reparo"]]
+			kinds = [[C.IRIS_AMPOULE, tr("Ampola de Reparo")]]
 	var out: Array = []
 	for spec in kinds:
 		var kind: String = spec[0]
 		var q: Dictionary = C.combat_quote(Campaign.state, session, kind) if session else C.quote(Campaign.state, hero_id, kind)
 		var cost := ""
 		if q.food_cost > 0:
-			cost = " · %d comida%s" % [q.food_cost, "s" if q.food_cost > 1 else ""]
+			cost = (tr(" · %d comidas") if q.food_cost > 1 else tr(" · %d comida")) % q.food_cost
 		elif q.bandage_cost > 0:
-			cost = " · 1 curativo"
+			cost = tr(" · 1 curativo")
 		else:
-			cost = " · %d cargas" % q.charges
+			cost = tr(" · %d cargas") % q.charges
 		var heal := ""
 		if q.heal_max > 0:
-			heal = " · +%d vida" % q.heal_max if q.heal_min == q.heal_max else " · +%d–%d vida" % [q.heal_min, q.heal_max]
+			heal = tr(" · +%d vida") % q.heal_max if q.heal_min == q.heal_max else tr(" · +%d–%d vida") % [q.heal_min, q.heal_max]
 		out.append({"label": spec[1] + heal + cost, "enabled": q.available, "reason": q.reason, "run": _use.bind(kind)})
 	return out
 
@@ -240,11 +240,11 @@ func _use(kind: String) -> void:
 	if healed > 0:
 		Campaign.save()
 		Sound.play("res://audio/ui/confirm.ogg")
-		feedback = "%s recuperou %d de vida." % [hero.display_name, healed]
+		feedback = tr("%s recuperou %d de vida.") % [hero.display_name, healed]
 		used.emit()
 	else:
 		Sound.play("res://audio/ui/deny.ogg")
-		feedback = "O item não pôde ser usado."
+		feedback = tr("O item não pôde ser usado.")
 	_validate_hero()
 	_build()
 

@@ -105,6 +105,51 @@ func _data_keys(po: Dictionary) -> void:
 
 
 ## Inglês nas Opções: o título e as Opções mudam na hora; de volta ao português, ficam como antes.
+## Traduzido na hora de mostrar, guardado em português (#35): o aviso do save, a causa da morte e o save de uma luta
+## jogada em inglês.
+func _shown_not_saved() -> void:
+	var kind: String = Campaign._warning_kind
+	var slot: int = Campaign._warning_slot
+	Campaign._warning_kind = "backup"
+	t.check(Campaign.warning_text().begins_with("The last save"), "o aviso da cópia de segurança em inglês: %s" % Campaign.warning_text())
+	Campaign._warning_kind = "slot"
+	Campaign._warning_slot = 2
+	t.check(Campaign.warning_text().contains("2") and not Campaign.warning_text().contains("espaço"), "o aviso do espaço, com o número, em inglês: %s" % Campaign.warning_text())
+	Campaign._warning_kind = "none"
+	t.check(Campaign.warning_text() != "" and not Campaign.warning_text().contains("salvamento"), "o aviso sem save em inglês: %s" % Campaign.warning_text())
+	Campaign._warning_kind = ""
+	t.equal(Campaign.warning_text(), "", "sem aviso, nada")
+	Campaign._warning_kind = kind
+	Campaign._warning_slot = slot
+	t.equal(AHCombatEngine.cause_text("Robô (Golpe mecânico)"), "%s (%s)" % [TranslationServer.translate("Robô"), TranslationServer.translate("Golpe mecânico")], "a causa: o inimigo e a ação")
+	t.check(AHCombatEngine.cause_text("Robô · Guardião").ends_with("Guardian"), "a causa com o sufixo da rota")
+	t.equal(AHCombatEngine.cause_text("Sangramento"), TranslationServer.translate("Sangramento"), "a causa por um efeito")
+	t.equal(AHCombatEngine.cause_text("patrulha"), "patrol", "a causa genérica")
+	# Uma luta em inglês até alguém morrer: a causa gravada é a do português (o save não muda com o idioma).
+	var found := false
+	for seed_value in 40:
+		var heroes: Array = Campaign.create_initial(11).roster.duplicate(true)
+		for hero in heroes:
+			hero.hp = 1
+		var session := AHCombatSession.create(heroes, ["vigia_enferrujado", "robot"], false, seed_value)
+		var beats := 0
+		while not session.is_over() and beats < 400:
+			if session.is_player_turn():
+				session.auto_player_turn()
+			else:
+				session.enemy_turn()
+			beats += 1
+		var enemy_names: Array = session.state.enemy_team.map(func(u): return u.display_name)
+		for death in session.state.deaths:
+			found = true
+			var who := String(death.cause).get_slice(" (", 0)
+			# Em português: o nome é o do inimigo na luta (interno, em português) e a causa muda ao ser mostrada em inglês.
+			t.check(enemy_names.has(who) and AHCombatEngine.cause_text(death.cause) != death.cause, "a causa gravada em português: %s" % death.cause)
+		if found:
+			break
+	t.check(found, "uma luta em inglês com uma morte para conferir")
+
+
 func _switch_live() -> void:
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
@@ -122,6 +167,7 @@ func _switch_live() -> void:
 	t.equal(AHCombatHud.unit_name("Nick"), "Nick", "o nome do herói não muda")
 	t.equal(AHCombatHud.short_name("O Porteiro"), "Gatekeeper", "o nome curto sem o artigo")
 	t.equal(AHCombatHud.short_name("Relé de Defesa Alfa"), "Relay", "em inglês, o substantivo (a última palavra, sem o sufixo)")
+	_shown_not_saved()
 	GameFlow.start()
 	var title: AHTitleScreen = null
 	for frame in 300:

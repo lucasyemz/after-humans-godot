@@ -16,6 +16,21 @@ static var OK := Color("86c98f")
 const VIOLET := Color("b7a6f4")
 const ENEMY := Color("d9893d")
 const BLUE := Color("8fb4f0")
+## A escolha de alvo na luta (#57), num lugar só (o kit de componentes da #59 troca aqui): a cor de cada lado (os
+## inimigos no perigo, os aliados no bom, os dois seguindo o daltonismo), o herói da vez no dourado, a força da luz em
+## cada estado e o escurecido de quem não pode ser alvo. A força e a palavra ALVO também dizem quem é, não só a cor.
+const TARGET_VALID := 0.32
+const TARGET_ALSO := 0.5
+const TARGET_POINTED := 0.95
+const TARGET_ACTIVE := 0.45
+const TARGET_DIM := 0.62
+const TARGET_ACTIVE_COLOR := GOLD
+
+
+static func target_color(enemy_side: bool) -> Color:
+	return DANGER if enemy_side else OK
+
+
 static func set_colorblind(on: bool) -> void:
 	OK = Color("56b4e9") if on else Color("86c98f")
 	DANGER = Color("e69f00") if on else Color("e2675b")
@@ -450,17 +465,17 @@ static func face_texture(art: Dictionary) -> Texture2D:
 static func statuses(unit: AHCombat.Unit) -> Array:
 	var out: Array = []
 	var t := unit.tokens
-	if t.block > 0: out.append(["Bloqueio %d" % t.block, true, "block", t.block, "Bloqueio"])
-	if t.dodge > 0: out.append(["Esquiva %d" % t.dodge, true, "dodge", t.dodge, "Esquiva"])
-	if t.guard > 0: out.append(["Guarda", true, "protection", 0, "Guarda"])
-	if t.vuln > 0: out.append(["Vulnerável %d" % t.vuln, false, "vulnerable", t.vuln, "Vulnerável"])
-	if unit.mark_duration > 0: out.append(["Marcado", false, "marked", unit.mark_duration, "Marcado"])
-	if unit.stun_turns > 0: out.append(["Atordoado", false, "stunned", unit.stun_turns, "Atordoado"])
-	if unit.bleed.duration > 0: out.append(["Sangra %d" % unit.bleed.magnitude, false, "bleeding", unit.bleed.duration, "Sangra"])
-	if unit.blight.duration > 0: out.append(["Contaminado %d" % unit.blight.magnitude, false, "poison", unit.blight.duration, "Contaminado"])
-	if unit.blind: out.append(["Cego", false, "", 0, "Cego"])
-	if unit.weak: out.append(["Fraco", false, "", 0, "Fraco"])
-	if unit.immobilize_turns > 0: out.append(["Imobilizado", false, "", unit.immobilize_turns, "Imobilizado"])
+	if t.block > 0: out.append([TranslationServer.translate("Bloqueio %d") % t.block, true, "block", t.block, "Bloqueio"])
+	if t.dodge > 0: out.append([TranslationServer.translate("Esquiva %d") % t.dodge, true, "dodge", t.dodge, "Esquiva"])
+	if t.guard > 0: out.append([TranslationServer.translate("Guarda"), true, "protection", 0, "Guarda"])
+	if t.vuln > 0: out.append([TranslationServer.translate("Vulnerável %d") % t.vuln, false, "vulnerable", t.vuln, "Vulnerável"])
+	if unit.mark_duration > 0: out.append([TranslationServer.translate("Marcado"), false, "marked", unit.mark_duration, "Marcado"])
+	if unit.stun_turns > 0: out.append([TranslationServer.translate("Atordoado"), false, "stunned", unit.stun_turns, "Atordoado"])
+	if unit.bleed.duration > 0: out.append([TranslationServer.translate("Sangra %d") % unit.bleed.magnitude, false, "bleeding", unit.bleed.duration, "Sangra"])
+	if unit.blight.duration > 0: out.append([TranslationServer.translate("Contaminado %d") % unit.blight.magnitude, false, "poison", unit.blight.duration, "Contaminado"])
+	if unit.blind: out.append([TranslationServer.translate("Cego"), false, "", 0, "Cego"])
+	if unit.weak: out.append([TranslationServer.translate("Fraco"), false, "", 0, "Fraco"])
+	if unit.immobilize_turns > 0: out.append([TranslationServer.translate("Imobilizado"), false, "", unit.immobilize_turns, "Imobilizado"])
 	return out
 
 
@@ -472,13 +487,13 @@ static func status_tip(entry: Array) -> String:
 	var what := ""
 	match term:
 		"Sangra", "Contaminado":
-			what = "%s por vez · %d %s" % [text.get_slice(" ", 1), count, "vez" if count == 1 else "vezes"]
+			what = TranslationServer.translate("%s por vez · %d %s") % [text.get_slice(" ", text.get_slice_count(" ") - 1), count, TranslationServer.translate("vez") if count == 1 else TranslationServer.translate("vezes")]
 		"Bloqueio", "Esquiva", "Vulnerável":
-			what = "%d %s" % [count, "ficha" if count == 1 else "fichas"]
+			what = TranslationServer.translate("%d %s") % [count, TranslationServer.translate("ficha") if count == 1 else TranslationServer.translate("fichas")]
 		_:
 			if count > 0:
-				what = "%d %s" % [count, "vez" if count == 1 else "vezes"]
-	return "%s%s: %s" % [term, (" (%s)" % what) if what != "" else "", GLOSSARY.get(term, "")]
+				what = TranslationServer.translate("%d %s") % [count, TranslationServer.translate("vez") if count == 1 else TranslationServer.translate("vezes")]
+	return "%s%s: %s" % [TranslationServer.translate(term), (" (%s)" % what) if what != "" else "", TranslationServer.translate(GLOSSARY.get(term, ""))]
 
 
 ## O ícone do estado ou da intenção (os SVG brancos da entrega #18), para tingir com a cor do bom e do ruim.

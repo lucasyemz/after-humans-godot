@@ -280,19 +280,19 @@ static func upgrade_block(campaign: Dictionary, room_id: String) -> String:
 	var cost := next_level_cost(campaign, room_id)
 	if cost.is_empty():
 		var room := room_def(room_id)
-		return "A recuperação deste cômodo chega numa próxima fase." if not room.is_empty() and room_level(campaign, room_id) < room.max_level \
-			else "Este cômodo já está no nível máximo."
+		return TranslationServer.translate("A recuperação deste cômodo chega numa próxima fase.") if not room.is_empty() and room_level(campaign, room_id) < room.max_level \
+			else TranslationServer.translate("Este cômodo já está no nível máximo.")
 	var scrap := quantity(campaign, "scrap")
 	var fragments := quantity(campaign, "fragments")
 	if scrap < int(cost.get("scrap", 0)) or fragments < int(cost.get("fragments", 0)):
-		return "Faltam %s." % cost_text({"scrap": maxi(0, int(cost.get("scrap", 0)) - scrap), "fragments": maxi(0, int(cost.get("fragments", 0)) - fragments)})
+		return TranslationServer.translate("Faltam %s.") % cost_text({"scrap": maxi(0, int(cost.get("scrap", 0)) - scrap), "fragments": maxi(0, int(cost.get("fragments", 0)) - fragments)})
 	return ""
 
 
 ## Sobe um nível e cobra uma vez. from_level é o nível que o jogador viu: clique repetido não compra o seguinte.
 static func upgrade_room(campaign: Dictionary, room_id: String, from_level: int) -> String:
 	if room_level(campaign, room_id) != from_level:
-		return "Este cômodo já mudou de nível."
+		return TranslationServer.translate("Este cômodo já mudou de nível.")
 	var block := upgrade_block(campaign, room_id)
 	if block != "":
 		return block
@@ -312,10 +312,10 @@ static func cost_text(cost: Dictionary) -> String:
 	var scrap := int(cost.get("scrap", 0))
 	var fragments := int(cost.get("fragments", 0))
 	if scrap > 0:
-		parts.append("%d %s" % [scrap, "sucata" if scrap == 1 else "sucatas"])
+		parts.append("%d %s" % [scrap, TranslationServer.translate("sucata") if scrap == 1 else TranslationServer.translate("sucatas")])
 	if fragments > 0:
-		parts.append("%d %s" % [fragments, "fragmento" if fragments == 1 else "fragmentos"])
-	return "sem custo" if parts.is_empty() else " e ".join(parts)
+		parts.append("%d %s" % [fragments, TranslationServer.translate("fragmento") if fragments == 1 else TranslationServer.translate("fragmentos")])
+	return TranslationServer.translate("sem custo") if parts.is_empty() else TranslationServer.translate(" e ").join(parts)
 
 
 ## O papel de cada cômodo em uma linha (os textos do AHShelterStation da Unreal), para o cartão da seleção.
@@ -346,27 +346,27 @@ static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
 	var food_short: bool = sleepers > food if planning else food + f.food_produced - f.food_civilians - f.food_spoiled < f.food_night_need
 	var food_note := ""
 	if planning:
-		food_note = ("! Faltam %d nesta noite" % (sleepers - food)) if food_short else "Abastecida · demanda %d" % sleepers
+		food_note = (TranslationServer.translate("! Faltam %d nesta noite") % (sleepers - food)) if food_short else TranslationServer.translate("Abastecida · demanda %d") % sleepers
 	elif food > f.food_capacity:
-		food_note = "! %d acima de %d" % [food - f.food_capacity, f.food_capacity]
+		food_note = TranslationServer.translate("! %d acima de %d") % [food - f.food_capacity, f.food_capacity]
 	elif food_short:
-		food_note = "! Falta na volta"
+		food_note = TranslationServer.translate("! Falta na volta")
 	else:
-		food_note = "Próxima volta: %d" % f.food_after_night
+		food_note = TranslationServer.translate("Próxima volta: %d") % f.food_after_night
 	var power_short: bool = not f.unpowered_rooms.is_empty()
 	return [
-		{"id": "food", "label": "COMIDA", "icon": "lobby-food", "value": "%d / %d suprimentos" % [food, f.food_capacity],
+		{"id": "food", "label": TranslationServer.translate("COMIDA"), "icon": "lobby-food", "value": TranslationServer.translate("%d / %d suprimentos") % [food, f.food_capacity],
 			"note": food_note, "warn": food_short or food > f.food_capacity,
-			"tip": "Estoque e capacidade do Depósito. Na próxima volta, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d." % [
+			"tip": TranslationServer.translate("Estoque e capacidade do Depósito. Na próxima volta, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d.") % [
 				f.food_produced, f.food_civilians, f.food_spoiled, f.food_night_need, f.food_after_night]},
-		{"id": "water", "label": "ÁGUA", "icon": "lobby-water", "value": "%d em estoque" % f.water,
-			"note": "! Falta na volta" if f.thirsty else "Próxima volta: %d" % f.water_after, "warn": f.thirsty,
-			"tip": "Na próxima volta, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto." % [
+		{"id": "water", "label": TranslationServer.translate("ÁGUA"), "icon": "lobby-water", "value": TranslationServer.translate("%d em estoque") % f.water,
+			"note": TranslationServer.translate("! Falta na volta") if f.thirsty else TranslationServer.translate("Próxima volta: %d") % f.water_after, "warn": f.thirsty,
+			"tip": TranslationServer.translate("Na próxima volta, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto.") % [
 				f.water_produced, f.water_consumed, f.water_after]},
-		{"id": "power", "label": "ENERGIA", "icon": "lobby-energy", "value": "%d / %d em uso" % [f.power_used, f.power_capacity],
-			"note": ("! %d %s sem energia" % [f.unpowered_rooms.size(), "sala" if f.unpowered_rooms.size() == 1 else "salas"]) if power_short \
-				else "%d %s" % [maxi(0, f.power_capacity - f.power_used), "livre" if f.power_capacity - f.power_used == 1 else "livres"],
-			"warn": power_short, "tip": "Os cômodos ligados gastam energia; sem ela, param."},
+		{"id": "power", "label": TranslationServer.translate("ENERGIA"), "icon": "lobby-energy", "value": TranslationServer.translate("%d / %d em uso") % [f.power_used, f.power_capacity],
+			"note": (TranslationServer.translate("! %d %s sem energia") % [f.unpowered_rooms.size(), TranslationServer.translate("sala") if f.unpowered_rooms.size() == 1 else TranslationServer.translate("salas")]) if power_short \
+				else "%d %s" % [maxi(0, f.power_capacity - f.power_used), TranslationServer.translate("livre") if f.power_capacity - f.power_used == 1 else TranslationServer.translate("livres")],
+			"warn": power_short, "tip": TranslationServer.translate("Os cômodos ligados gastam energia; sem ela, param.")},
 	]
 
 
@@ -375,24 +375,24 @@ static func room_benefit(room_id: String, level: int) -> String:
 	match room_id:
 		FORGE:
 			if level <= 0:
-				return "Oficina vazia. Recuperada, fabrica relíquias e gasta 1 de energia."
-			return "Fabrica relíquias por 3 sucatas. Gasta 1 de energia." if level == 1 else "Bancada melhorada: relíquias por 2 sucatas."
+				return TranslationServer.translate("Oficina vazia. Recuperada, fabrica relíquias e gasta 1 de energia.")
+			return TranslationServer.translate("Fabrica relíquias por 3 sucatas. Gasta 1 de energia.") if level == 1 else TranslationServer.translate("Bancada melhorada: relíquias por 2 sucatas.")
 		RESEARCH:
-			return "Laboratório vazio. Recuperado, libera as melhorias de classe e gasta 1 de energia." if level <= 0 \
-				else "Melhorias de classe com fragmentos. Gasta 1 de energia."
+			return TranslationServer.translate("Laboratório vazio. Recuperado, libera as melhorias de classe e gasta 1 de energia.") if level <= 0 \
+				else TranslationServer.translate("Melhorias de classe com fragmentos. Gasta 1 de energia.")
 		DORMITORY:
-			return "Quarto por recuperar: só os beliches de ferro. A equipe dorme aqui depois de cada volta." if level <= 0 \
-				else "Descanso da comunidade."
+			return TranslationServer.translate("Quarto por recuperar: só os beliches de ferro. A equipe dorme aqui depois de cada volta.") if level <= 0 \
+				else TranslationServer.translate("Descanso da comunidade.")
 		BAR:
-			return "Salão vazio, sem uso por enquanto." if level <= 0 else "Um lugar para conversar e fazer uma pausa."
+			return TranslationServer.translate("Salão vazio, sem uso por enquanto.") if level <= 0 else TranslationServer.translate("Um lugar para conversar e fazer uma pausa.")
 		CANTEEN:
-			return "Com energia, produz 2 suprimentos por expedição."
+			return TranslationServer.translate("Com energia, produz 2 suprimentos por expedição.")
 		DEPOT:
-			return "Guarda até 12 suprimentos; o excesso estraga na volta." if level <= 1 else "Prateleiras extras: guarda até 20."
+			return TranslationServer.translate("Guarda até 12 suprimentos; o excesso estraga na volta.") if level <= 1 else TranslationServer.translate("Prateleiras extras: guarda até 20.")
 		PREPARATION:
-			return "Escolher a fase, a equipe, o foco da rota e os suprimentos da partida."
+			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.")
 		CHARACTERS:
-			return "Elenco, recrutar, tratar trauma, relíquias e o memorial."
+			return TranslationServer.translate("Elenco, recrutar, tratar trauma, relíquias e o memorial.")
 	return ""
 
 
@@ -557,7 +557,7 @@ static func train_on_return(campaign: Dictionary, expedition_id: String) -> bool
 static func decide_candidate(campaign: Dictionary, candidate_id: String, accept: bool) -> String:
 	var station: Dictionary = campaign.station
 	if station.train.phase != "waiting" or station.train.candidate_id != candidate_id or candidate_id == "":
-		return "Ninguém está esperando na plataforma."
+		return TranslationServer.translate("Ninguém está esperando na plataforma.")
 	station.candidate_queue.erase(candidate_id)
 	if accept:
 		if not station.residents.has(candidate_id):
@@ -708,13 +708,13 @@ static func finish_dawn(campaign: Dictionary) -> bool:
 static func night_event_text(campaign: Dictionary) -> String:
 	match campaign.night.event_id:
 		"short_supplies":
-			return "Os suprimentos não bastaram para todos. Quem dormiu sem comida recuperou menos."
+			return TranslationServer.translate("Os suprimentos não bastaram para todos. Quem dormiu sem comida recuperou menos.")
 		"no_water":
-			return "Faltou água para quem voltou. O descanso foi pior: menos Instinto recuperado."
+			return TranslationServer.translate("Faltou água para quem voltou. O descanso foi pior: menos Instinto recuperado.")
 		"distant_noise":
-			return "Ruídos distantes inquietaram os adormecidos: recuperação de Instinto reduzida em 3." if campaign.night.watch_hero_id == "" \
-				else "O vigia verificou os ruídos distantes. Os demais puderam descansar em segurança."
-	return "A noite passou tranquila. O abrigo permaneceu seguro."
+			return TranslationServer.translate("Ruídos distantes inquietaram os adormecidos: recuperação de Instinto reduzida em 3.") if campaign.night.watch_hero_id == "" \
+				else TranslationServer.translate("O vigia verificou os ruídos distantes. Os demais puderam descansar em segurança.")
+	return TranslationServer.translate("A noite passou tranquila. O abrigo permaneceu seguro.")
 
 
 # ================================================================ refúgio: elenco, enfermaria, pesquisa, forja
@@ -756,12 +756,12 @@ static func hero_name(campaign: Dictionary, class_id: String) -> String:
 static func recruit(campaign: Dictionary, class_id: String, rng: RandomNumberGenerator, given_name: String = "") -> Dictionary:
 	var hero_class = GameData.row("classes", class_id)
 	if hero_class == null or not campaign.unlocked_classes.has(class_id):
-		return {"error": "Essa classe ainda não chegou à Estação."}
+		return {"error": TranslationServer.translate("Essa classe ainda não chegou à Estação.")}
 	if living(campaign).size() >= MAX_ROSTER:
-		return {"error": "Limite de 12 animais vivos na Estação Raiz."}
+		return {"error": TranslationServer.translate("Limite de 12 animais vivos na Estação Raiz.")}
 	var free := given_name != "" or can_recruit_volunteer(campaign, class_id)
 	if not free and quantity(campaign, "seeds") < RECRUIT_COST:
-		return {"error": "Sementes insuficientes (custa 10 sementes)."}
+		return {"error": TranslationServer.translate("Sementes insuficientes (custa 10 sementes).")}
 	if not free:
 		adjust(campaign, "seeds", -RECRUIT_COST)
 	var suffix: int = campaign.roster.size()
@@ -826,11 +826,11 @@ static func receive_volunteers(campaign: Dictionary, rng: RandomNumberGenerator)
 static func treat_trauma(campaign: Dictionary, hero_id: String) -> String:
 	var entry = hero(campaign, hero_id)
 	if entry == null or not entry.alive:
-		return "Somente sobreviventes podem ser tratados."
+		return TranslationServer.translate("Somente sobreviventes podem ser tratados.")
 	if not entry.trauma:
-		return "%s não tem trauma." % entry.display_name
+		return TranslationServer.translate("%s não tem trauma.") % entry.display_name
 	if not consume(campaign, "seeds", TRAUMA_COST):
-		return "Sementes insuficientes (custa 5 sementes)."
+		return TranslationServer.translate("Sementes insuficientes (custa 5 sementes).")
 	entry.trauma = false
 	return ""
 
@@ -838,25 +838,25 @@ static func treat_trauma(campaign: Dictionary, hero_id: String) -> String:
 static func research(campaign: Dictionary, research_id: String) -> String:
 	var row = GameData.row("research", research_id)
 	if row == null:
-		return "Pesquisa desconhecida."
+		return TranslationServer.translate("Pesquisa desconhecida.")
 	if not room_available(campaign, RESEARCH):
-		return "Recupere o Centro de Pesquisa para pesquisar."
+		return TranslationServer.translate("Recupere o Centro de Pesquisa para pesquisar.")
 	if campaign.researched_skills.has(row.SkillId):
-		return "Essa melhoria já foi pesquisada."
+		return TranslationServer.translate("Essa melhoria já foi pesquisada.")
 	if not consume(campaign, "fragments", int(row.CostFragments)):
-		return "Fragmentos insuficientes (custa %d)." % int(row.CostFragments)
+		return TranslationServer.translate("Fragmentos insuficientes (custa %d).") % int(row.CostFragments)
 	campaign.researched_skills.append(row.SkillId)
 	return ""
 
 
 static func craft_relic(campaign: Dictionary, relic_id: String) -> String:
 	if GameData.row("relics", relic_id) == null:
-		return "Relíquia desconhecida."
+		return TranslationServer.translate("Relíquia desconhecida.")
 	if not room_available(campaign, FORGE):
-		return "Recupere a Forja para fabricar relíquias."
+		return TranslationServer.translate("Recupere a Forja para fabricar relíquias.")
 	var cost := relic_cost(campaign)
 	if not consume(campaign, "scrap", cost):
-		return "Sucata insuficiente (custa %d sucatas)." % cost
+		return TranslationServer.translate("Sucata insuficiente (custa %d sucatas).") % cost
 	campaign.inventory.relics.append(relic_id)
 	return ""
 
@@ -865,11 +865,11 @@ static func craft_relic(campaign: Dictionary, relic_id: String) -> String:
 static func equip_relic(campaign: Dictionary, hero_id: String, relic_id: String) -> String:
 	var entry = hero(campaign, hero_id)
 	if entry == null or not entry.alive:
-		return "Só animais vivos usam relíquias."
+		return TranslationServer.translate("Só animais vivos usam relíquias.")
 	if entry.relic_id == relic_id:
-		return "Já está equipada."
+		return TranslationServer.translate("Já está equipada.")
 	if relic_id != "" and not campaign.inventory.relics.has(relic_id):
-		return "Essa relíquia não está no estoque."
+		return TranslationServer.translate("Essa relíquia não está no estoque.")
 	if entry.relic_id != "":
 		campaign.inventory.relics.append(entry.relic_id)
 	if relic_id != "":
@@ -899,15 +899,15 @@ static func validate_team(campaign: Dictionary, hero_ids: Array, phase_id: Strin
 	var limits := J.team_limits(phase_id)
 	var size_text := team_size_text(limits)
 	if unique.size() != hero_ids.size() or hero_ids.size() < limits.min or hero_ids.size() > limits.max:
-		return "Esta jornada pede %s vivos na equipe." % size_text
+		return TranslationServer.translate("Esta jornada pede %s vivos na equipe.") % size_text
 	var counts := {}
 	for hero_id in hero_ids:
 		var entry = hero(campaign, hero_id)
 		if entry == null or not entry.alive:
-			return "Esta jornada pede %s vivos na equipe." % size_text
+			return TranslationServer.translate("Esta jornada pede %s vivos na equipe.") % size_text
 		counts[entry.class_id] = int(counts.get(entry.class_id, 0)) + 1
 		if counts[entry.class_id] > MAX_PER_CLASS:
-			return "No máximo dois animais da mesma classe na mesma equipe."
+			return TranslationServer.translate("No máximo dois animais da mesma classe na mesma equipe.")
 	return ""
 
 
@@ -920,16 +920,16 @@ static func can_deploy(entry) -> bool:
 
 
 static func deploy_block(entry) -> String:
-	return "" if can_deploy(entry) else "%s ainda não tem arte de combate e fica na Estação por enquanto." % entry.display_name
+	return "" if can_deploy(entry) else TranslationServer.translate("%s ainda não tem arte de combate e fica na Estação por enquanto.") % entry.display_name
 
 
 ## "1 a 4", "3 ou 4", "4": quantos a jornada aceita, para as telas.
 static func team_size_text(limits: Dictionary) -> String:
 	if limits.min == limits.max:
-		return "%d %s" % [limits.max, "animal" if limits.max == 1 else "animais"]
+		return "%d %s" % [limits.max, TranslationServer.translate("animal") if limits.max == 1 else TranslationServer.translate("animais")]
 	if limits.max - limits.min == 1:
-		return "%d ou %d animais" % [limits.min, limits.max]
-	return "%d a %d animais" % [limits.min, limits.max]
+		return TranslationServer.translate("%d ou %d animais") % [limits.min, limits.max]
+	return TranslationServer.translate("%d a %d animais") % [limits.min, limits.max]
 
 
 ## Os ataques que a classe tem na posição (#95): cada um precisa de um ataque na posição em que parte.
@@ -971,35 +971,35 @@ static func phase_unlocked(campaign: Dictionary, phase_id: String) -> bool:
 static func next_step(campaign: Dictionary) -> Dictionary:
 	var report: Dictionary = campaign.station.get("last_return", {})
 	if not report.is_empty() and not report.get("seen", false):
-		return {"title": "Ver o que a equipe trouxe", "text": "O relatório da última expedição está pronto: o achado, quem voltou e como a Estação passou o ciclo.",
-			"action": "report", "button": "Ver o relatório", "room": ""}
+		return {"title": TranslationServer.translate("Ver o que a equipe trouxe"), "text": TranslationServer.translate("O relatório da última expedição está pronto: o achado, quem voltou e como a Estação passou o ciclo."),
+			"action": "report", "button": TranslationServer.translate("Ver o relatório"), "room": ""}
 	if campaign.night.phase != "none":
-		return {"title": "Passar a noite", "text": "A equipe descansa no Dormitório: escolha quem vigia e durma. Quem dorme come e recupera vida e instinto.",
-			"action": "dormitory", "button": "Ir ao Dormitório", "room": DORMITORY}
+		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe descansa no Dormitório: escolha quem vigia e durma. Quem dorme come e recupera vida e instinto."),
+			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
 	if visit_pending(campaign):
-		return {"title": "Alguém espera na plataforma", "text": "Um candidato chegou de trem. Veja o que ele traz para a Estação e decida se fica.",
-			"action": "train", "button": "Ir à plataforma", "room": ""}
+		return {"title": TranslationServer.translate("Alguém espera na plataforma"), "text": TranslationServer.translate("Um candidato chegou de trem. Veja o que ele traz para a Estação e decida se fica."),
+			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
 	var missing := {}
 	for room_id in NEXT_ROOMS:
 		var cost := next_level_cost(campaign, room_id)
 		if cost.is_empty():
 			continue
 		var level := room_level(campaign, room_id)
-		var name: String = ROOM_ARTICLE.get(room_id, "") + room_def(room_id).name
+		var name: String = TranslationServer.translate(ROOM_ARTICLE.get(room_id, "")) + TranslationServer.translate(room_def(room_id).name)
 		if upgrade_block(campaign, room_id) == "":
-			return {"title": "%s %s" % ["Recuperar" if level == 0 else "Melhorar", name], "text": "%s Custa %s." % [room_benefit(room_id, level + 1), cost_text(cost)],
-				"action": "room", "button": "Ver %s" % name, "room": room_id}
+			return {"title": "%s %s" % [TranslationServer.translate("Recuperar") if level == 0 else TranslationServer.translate("Melhorar"), name], "text": TranslationServer.translate("%s Custa %s.") % [room_benefit(room_id, level + 1), cost_text(cost)],
+				"action": "room", "button": TranslationServer.translate("Ver %s") % name, "room": room_id}
 		if missing.is_empty():
-			missing = {"title": "Trazer %s para %s %s" % [cost_text(cost), "reabrir" if level == 0 else "melhorar", name],
-				"text": "%s As jornadas trazem sucata e fragmentos das buscas." % room_benefit(room_id, level + 1), "action": "depart",
-				"button": "Preparar expedição", "room": room_id}
+			missing = {"title": TranslationServer.translate("Trazer %s para %s %s") % [cost_text(cost), TranslationServer.translate("reabrir") if level == 0 else TranslationServer.translate("melhorar"), name],
+				"text": TranslationServer.translate("%s As jornadas trazem sucata e fragmentos das buscas.") % room_benefit(room_id, level + 1), "action": "depart",
+				"button": TranslationServer.translate("Preparar expedição"), "room": room_id}
 	if not missing.is_empty():
 		return missing
 	for info in AHJourneyRules.PHASES:
 		if phase_unlocked(campaign, info.id) and not campaign.completed_phases.has(info.id):
-			return {"title": "Partir para %s" % info.name, "text": info.description, "action": "depart", "button": "Preparar expedição", "room": ""}
-	return {"title": "Voltar às ruas", "text": "Todas as fases foram concluídas. Dá para jogar qualquer uma de novo pelo mapa.", "action": "depart",
-		"button": "Preparar expedição", "room": ""}
+			return {"title": TranslationServer.translate("Partir para %s") % TranslationServer.translate(info.name), "text": TranslationServer.translate(info.description), "action": "depart", "button": TranslationServer.translate("Preparar expedição"), "room": ""}
+	return {"title": TranslationServer.translate("Voltar às ruas"), "text": TranslationServer.translate("Todas as fases foram concluídas. Dá para jogar qualquer uma de novo pelo mapa."), "action": "depart",
+		"button": TranslationServer.translate("Preparar expedição"), "room": ""}
 
 
 ## A ordem em que o próximo passo sugere recuperar os cômodos, e o artigo de cada um no texto.
@@ -1010,11 +1010,11 @@ const ROOM_ARTICLE := {FORGE: "a ", RESEARCH: "o ", DEPOT: "o "}
 ## Por que não dá para preparar uma partida agora ("" se dá).
 static func preparation_block(campaign: Dictionary) -> String:
 	if campaign.night.phase != "none":
-		return "Conclua a noite no Dormitório antes de partir."
+		return TranslationServer.translate("Conclua a noite no Dormitório antes de partir.")
 	if visit_pending(campaign):
-		return "Há alguém esperando na plataforma: decida antes de partir."
+		return TranslationServer.translate("Há alguém esperando na plataforma: decida antes de partir.")
 	if not in_refuge(campaign):
-		return "A equipe já está numa expedição."
+		return TranslationServer.translate("A equipe já está numa expedição.")
 	return ""
 
 
@@ -1029,32 +1029,32 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 		unique[hero_id] = true
 	var limits := J.team_limits(phase_id)
 	if unique.size() != team.size() or team.size() < limits.min or team.size() > limits.max:
-		return "Esta jornada pede %s diferentes na equipe." % team_size_text(limits)
+		return TranslationServer.translate("Esta jornada pede %s diferentes na equipe.") % team_size_text(limits)
 	for rank in range(1, team.size() + 1):
 		var entry = hero(campaign, team[rank - 1])
 		if entry == null or not entry.alive:
-			return "Só integrantes vivos podem partir."
+			return TranslationServer.translate("Só integrantes vivos podem partir.")
 		if not can_deploy(entry):
 			return deploy_block(entry)
 		if attacks_from_rank(entry.class_id, rank).is_empty():
-			return "%s não tem ataque na posição %d." % [entry.display_name, rank]
+			return TranslationServer.translate("%s não tem ataque na posição %d.") % [entry.display_name, rank]
 	var team_block := validate_team(campaign, team, phase_id)
 	if team_block != "":
 		return team_block
 	if focus != "" and focus_def(focus).is_empty():
-		return "Foco de rota desconhecido."
+		return TranslationServer.translate("Foco de rota desconhecido.")
 	if not focus_available(campaign, focus):
-		return "Esse pedido não está aberto: o morador não está na Estação ou já recebeu o item."
+		return TranslationServer.translate("Esse pedido não está aberto: o morador não está na Estação ou já recebeu o item.")
 	if extra_food < 0 or J.FREE_FOOD + extra_food > J.MAX_FOOD:
-		return "Suprimentos acima do limite."
+		return TranslationServer.translate("Suprimentos acima do limite.")
 	if extra_food * FOOD_COST > quantity(campaign, "seeds"):
-		return "Sementes insuficientes para os suprimentos selecionados."
+		return TranslationServer.translate("Sementes insuficientes para os suprimentos selecionados.")
 	if J.phase(phase_id).is_empty() or not phase_unlocked(campaign, phase_id):
-		return "Essa fase ainda está bloqueada."
+		return TranslationServer.translate("Essa fase ainda está bloqueada.")
 	adjust(campaign, "seeds", -extra_food * FOOD_COST)
 	campaign.preferred_formation = team.duplicate()
 	if not J.start_expedition(campaign, phase_id, seed_value):
-		return "A expedição não pôde começar."
+		return TranslationServer.translate("A expedição não pôde começar.")
 	var expedition: Dictionary = campaign.session.expedition
 	expedition.food = J.FREE_FOOD + extra_food
 	expedition.focus = focus
@@ -1131,8 +1131,8 @@ static func focus_available(campaign: Dictionary, focus_id: String) -> bool:
 static func focus_label(focus_id: String) -> String:
 	var entry := focus_def(focus_id)
 	if not entry.is_empty() and entry.civilian != "":
-		return "Pedido: %s" % civilian(entry.civilian).name
-	return {FOCUS_WATER: "Água", FOCUS_PARTS: "Peças", FOCUS_PROVISIONS: "Provisões"}.get(focus_id, "Rota básica")
+		return TranslationServer.translate("Pedido: %s") % civilian(entry.civilian).name
+	return {FOCUS_WATER: TranslationServer.translate("Água"), FOCUS_PARTS: TranslationServer.translate("Peças"), FOCUS_PROVISIONS: TranslationServer.translate("Provisões")}.get(focus_id, TranslationServer.translate("Rota básica"))
 
 
 static func focus_reward_text(focus_id: String) -> String:
@@ -1140,8 +1140,8 @@ static func focus_reward_text(focus_id: String) -> String:
 	if entry.is_empty():
 		return ""
 	if entry.civilian != "":
-		return civilian(entry.civilian).request_item
-	return {FOCUS_WATER: "+%d água", FOCUS_PARTS: "+%d sucata", FOCUS_PROVISIONS: "+%d suprimentos"}[focus_id] % entry.amount
+		return TranslationServer.translate(civilian(entry.civilian).request_item)
+	return {FOCUS_WATER: TranslationServer.translate("+%d água"), FOCUS_PARTS: TranslationServer.translate("+%d sucata"), FOCUS_PROVISIONS: TranslationServer.translate("+%d suprimentos")}[focus_id] % entry.amount
 
 
 ## Próximo cômodo que a sucata ajudaria a recuperar ou melhorar, e quanta falta.
@@ -1171,22 +1171,22 @@ static func focus_reason(campaign: Dictionary, focus_id: String, team: int = 4) 
 	var entry := focus_def(focus_id)
 	if not entry.is_empty() and entry.civilian != "":
 		var who := civilian(entry.civilian)
-		return "%s: %s Entregue, %s." % [who.name, who.need, who.request_reward]
+		return TranslationServer.translate("%s: %s Entregue, %s.") % [who.name, TranslationServer.translate(who.need), TranslationServer.translate(who.request_reward)]
 	var f := forecast(campaign, team)
 	match focus_id:
 		FOCUS_WATER:
-			return ("Água: %d na estação; a equipe bebe %d na volta e vai faltar." % [f.water, f.water_consumed]) if f.thirsty \
-				else ("Água: %d na estação, %d depois da próxima volta." % [f.water, f.water_after])
+			return (TranslationServer.translate("Água: %d na estação; a equipe bebe %d na volta e vai faltar.") % [f.water, f.water_consumed]) if f.thirsty \
+				else (TranslationServer.translate("Água: %d na estação, %d depois da próxima volta.") % [f.water, f.water_after])
 		FOCUS_PARTS:
 			var need := _needed_room(campaign)
-			return "Sucata para relíquias e melhorias." if need[0] == "" else "Faltam %d sucatas para %s." % [need[1], _room_the(need[0])]
+			return TranslationServer.translate("Sucata para relíquias e melhorias.") if need[0] == "" else TranslationServer.translate("Faltam %d sucatas para %s.") % [need[1], _room_the(need[0])]
 		FOCUS_PROVISIONS:
-			return "Suprimentos: %d de %d; a noite da volta pede %d." % [f.food, f.food_capacity, f.food_night_need]
-	return "Sem objetivo: só o que aparecer nas casas."
+			return TranslationServer.translate("Suprimentos: %d de %d; a noite da volta pede %d.") % [f.food, f.food_capacity, f.food_night_need]
+	return TranslationServer.translate("Sem objetivo: só o que aparecer nas casas.")
 
 
 static func _room_the(room_id: String) -> String:
-	return {FORGE: "a Forja", RESEARCH: "a Pesquisa", DEPOT: "o Depósito"}.get(room_id, "um cômodo")
+	return {FORGE: TranslationServer.translate("a Forja"), RESEARCH: TranslationServer.translate("a Pesquisa"), DEPOT: TranslationServer.translate("o Depósito")}.get(room_id, TranslationServer.translate("um cômodo"))
 
 
 ## Depois do sorteio das três casas: garante uma casa da loja do foco (troca a última porta por uma dessa loja).
@@ -1243,4 +1243,4 @@ static func grant_objective(campaign: Dictionary) -> String:
 	else:
 		var key: String = {FOCUS_WATER: "water", FOCUS_PARTS: "scrap", FOCUS_PROVISIONS: "supplies"}[entry.id]
 		loot[key] = int(loot.get(key, 0)) + entry.amount
-	return " Objetivo cumprido (%s): %s, entregue na volta." % [focus_label(entry.id), focus_reward_text(entry.id)]
+	return TranslationServer.translate(" Objetivo cumprido (%s): %s, entregue na volta.") % [focus_label(entry.id), focus_reward_text(entry.id)]

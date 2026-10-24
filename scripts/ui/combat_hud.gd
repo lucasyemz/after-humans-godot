@@ -39,11 +39,27 @@ var _description: Label
 var _message: Label
 var _log: Label
 var _log_panel: PanelContainer
+var _log_title: Label
+## O registro aberto pela tecla (#56); fechado, só a última linha aparece por LOG_FLASH segundos a cada lance.
+var _log_open := false
+var _quiet_focus := false
+var _log_seen := 0
+var _log_tween: Tween
+const LOG_FLASH := 2.0
 var _tip: PanelContainer
 var _tip_box: VBoxContainer
 var _result: PanelContainer
 var _unit_bars := {}
 var _markers: Array = []
+## A escolha do alvo (#57): o lado, as posições válidas, a habilidade, o escolhido, o clicado uma vez e se o último
+## toque veio do mouse (o primeiro clique escolhe, o segundo usa; o teclado usa o escolhido).
+var _pick_side := true
+var _pick_ranks: Array = []
+var _pick_ability := ""
+var _picked_rank := -1
+var _clicked_rank := -1
+var _via_mouse := false
+var _target_label: Label
 ## A prévia da habilidade mirada: uma marca sobre cada outro atingido (o par da granada, o vizinho do coquetel).
 var _preview_marks: Array = []
 var _actor_id := ""
@@ -128,7 +144,8 @@ func _build() -> void:
 	log_box.add_theme_constant_override("separation", 4)
 	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_log_panel.add_child(log_box)
-	log_box.add_child(S.label(tr("REGISTRO"), 15, S.COPPER, "bold"))
+	_log_title = S.label(tr("REGISTRO"), 15, S.COPPER, "bold")
+	log_box.add_child(_log_title)
 	_log = S.label("", S.MIN_TEXT, TEXT)
 	_log.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_log.custom_minimum_size = Vector2(390, 0)
@@ -201,18 +218,27 @@ func _build() -> void:
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT, Control.PRESET_MODE_MINSIZE, 8)
 		button.pressed.connect(_on_action.bind(spec[1]))
-		button.focus_entered.connect(_describe_action.bind(spec[1]))
+		# A dica só com o mouse em cima ou com o foco do teclado/controle; o foco que a vez põe sozinha não abre (#56).
+		button.focus_entered.connect(func(): if S.using_keys and not _quiet_focus: _describe_action(spec[1]))
 		button.mouse_entered.connect(_describe_action.bind(spec[1]))
 		button.mouse_exited.connect(_hide_tip)
 		button.set_meta("kind", spec[1])
 		_actions.add_child(button)
 
+	# A palavra ALVO acima do alvo apontado (#57).
+	_target_label = S.label(tr("ALVO"), 20, Color.WHITE, "bold")
+	_target_label.add_theme_constant_override("outline_size", 8)
+	_target_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	_target_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_target_label.visible = false
 	_tip = PanelContainer.new()
 	_tip.add_theme_stylebox_override("panel", S.panel(0.96, GOLD.darkened(0.2)))
 	_tip.custom_minimum_size = Vector2(460, 0)
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tip.visible = false
 	add_child(_tip)
+	# Depois da dica: desenhado por cima dela.
+	add_child(_target_label)
 	_tip_box = VBoxContainer.new()
 	_tip_box.add_theme_constant_override("separation", 6)
 	_tip_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -237,7 +263,20 @@ func open(new_session: AHCombatSession) -> void:
 	_unit_bars.clear()
 	for unit in session.units():
 		_unit_bars[unit.id] = _make_plate(unit)
+	_reset_log()
 	refresh()
+
+
+## Luta nova (a arena e o HUD são os mesmos em todas as lutas da rua): o registro começa fechado e vazio, e cada lance
+## dela mostra a própria linha (a contagem da luta anterior escondia as linhas da nova).
+func _reset_log() -> void:
+	if _log_tween:
+		_log_tween.kill()
+	_log_open = false
+	_log_seen = 0
+	_log.text = ""
+	_log_panel.visible = false
+	_log_panel.modulate.a = 1.0
 
 
 func close() -> void:
@@ -405,9 +444,7 @@ func refresh() -> void:
 		# A placa encolhe de volta quando a intenção ou os estados ficam mais curtos.
 		plate.reset_size.call_deferred()
 	_refresh_order(current)
-	var lines := session.state.combat_log
-	_log.text = "\n".join(lines.slice(maxi(0, lines.size() - 3)))
-	_log_panel.visible = not lines.is_empty()
+	_refresh_log()
 	var actor := session.current_actor()
 	if actor != null and actor.is_player:
 		_show_hero(actor)
@@ -530,7 +567,10 @@ func _input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	if _bag != null or _result.visible or (waiting and _choosing == ""):
+		# O foco que o jogo devolve (a Mochila fechada, um botão que sumiu) não abre a dica.
+		_quiet_focus = true
 		S.keep_focus(_focus_scope())
+		_quiet_focus = false
 	if not visible or session == null or arena == null:
 		return
 	var camera := get_viewport().get_camera_3d()
@@ -549,7 +589,25 @@ func _process(_delta: float) -> void:
 		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
 		if short:
 			short_plates.append(Rect2(plate.position, plate.size))
-	for marker in _markers + _preview_marks:
+	for marker in _markers:
+		if marker.has_meta("card"):
+			# O botão do alvo cobre o corpo inteiro na tela (do pé à cabeça, na largura do corpo).
+			var body := _body_rect(camera, marker.get_meta("card"))
+			marker.position = body.position
+			marker.size = body.size
+	if _target_label != null and _target_label.visible and _target_label.has_meta("card"):
+		var pointed: AHSpriteCard = _target_label.get_meta("card")
+		if is_instance_valid(pointed):
+			var top := camera.unproject_position(pointed.global_position + Vector3(0, pointed.head_height() + 0.15, 0))
+			_target_label.position = top - Vector2(_target_label.size.x * 0.5, _target_label.size.y)
+			# Nos baixinhos a placa fica acima da cabeça: o ALVO sobe para cima dela.
+			for rect in short_plates:
+				if rect.intersects(Rect2(_target_label.position, _target_label.size)):
+					_target_label.position.y = rect.position.y - _target_label.size.y - 4
+			# Na mira, a dica da habilidade sai de cima do apontado (ficava sobre o corpo e o ALVO).
+			if _tip.visible:
+				_dodge_tip(_body_rect(camera, pointed).merge(Rect2(_target_label.position, _target_label.size)))
+	for marker in _markers.filter(func(m): return not m.has_meta("card")) + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")
 		var screen := camera.unproject_position(target)
 		marker.position = screen - Vector2(marker.size.x * 0.5, marker.size.y + 24)
@@ -557,6 +615,29 @@ func _process(_delta: float) -> void:
 		for rect in short_plates:
 			if rect.intersects(Rect2(marker.position, marker.size)):
 				marker.position.y = rect.position.y - marker.size.y - 6
+
+
+## O retângulo do corpo de um personagem na tela: do pé à cabeça e com a largura do corpo (a placa tem margem
+## transparente; o clique vale no corpo).
+func _body_rect(camera: Camera3D, card: AHSpriteCard) -> Rect2:
+	var feet := camera.unproject_position(card.global_position)
+	var head := camera.unproject_position(card.global_position + Vector3(0, card.head_height(), 0))
+	var height := maxf(feet.y - head.y, 24.0)
+	var width := maxf(height * BODY_WIDTH, 48.0)
+	return Rect2(Vector2(feet.x - width * 0.5, head.y), Vector2(width, height))
+
+
+## Afasta a dica (na altura de sempre) para o lado em que ela não cobre o apontado.
+func _dodge_tip(avoid: Rect2) -> void:
+	if not Rect2(_tip.position, _tip.size).intersects(avoid):
+		return
+	var left := avoid.position.x - 16 - _tip.size.x
+	var right := avoid.end.x + 16
+	_tip.position.x = left if left >= 16 and (avoid.get_center().x > 960 or right + _tip.size.x > 1904) else clampf(right, 16, 1904 - _tip.size.x)
+
+
+## A largura do corpo, em fração da altura, para a área do clique no alvo.
+const BODY_WIDTH := 0.45
 
 
 ## Abaixo desta altura (m) o personagem é baixinho (os ajudantes do John, o Rastejante de Cabos): a placa sob os pés
@@ -757,7 +838,7 @@ func _build_abilities(take_focus: bool = true) -> void:
 		button.disabled = not option.usable
 		_style_ability(button)
 		button.pressed.connect(_on_ability.bind(option))
-		button.focus_entered.connect(_describe.bind(option, button))
+		button.focus_entered.connect(func(): if S.using_keys and not _quiet_focus: _describe(option, button))
 		button.mouse_entered.connect(_describe.bind(option, button))
 		button.mouse_exited.connect(_hide_tip)
 		_abilities.add_child(button)
@@ -775,7 +856,41 @@ func _build_abilities(take_focus: bool = true) -> void:
 	# O painel se ajusta antes do foco, que posiciona a dica acima dele.
 	_fit_dock.call_deferred()
 	if take_focus:
-		(first if first else _actions.get_child(1)).grab_focus.call_deferred()
+		_focus_quietly.call_deferred(first if first else _actions.get_child(1))
+
+
+## O registro (#56): escondido; a cada lance novo, só a última linha por LOG_FLASH segundos. A tecla do registro abre as
+## últimas linhas e fecha.
+func _refresh_log() -> void:
+	var lines: Array = session.state.combat_log
+	_log_title.text = tr("REGISTRO · %s fecha") % S.key_name("combat_log") if _log_open else tr("REGISTRO · %s abre") % S.key_name("combat_log")
+	if _log_open:
+		_log.text = "\n".join(lines.slice(maxi(0, lines.size() - 6)))
+		_log_panel.visible = not lines.is_empty()
+		_log_panel.modulate.a = 1.0
+		_log_seen = lines.size()
+		return
+	if lines.size() <= _log_seen:
+		return
+	_log_seen = lines.size()
+	_log.text = lines[-1]
+	_log_panel.visible = true
+	_log_panel.modulate.a = 1.0
+	if _log_tween:
+		_log_tween.kill()
+	_log_tween = create_tween()
+	_log_tween.tween_interval(LOG_FLASH)
+	_log_tween.tween_property(_log_panel, "modulate:a", 0.0, 0.4)
+	_log_tween.tween_callback(func(): _log_panel.visible = _log_open)
+
+
+func toggle_log() -> void:
+	_log_open = not _log_open
+	if _log_tween:
+		_log_tween.kill()
+	_log_panel.visible = false
+	_log_seen = 0 if _log_open else session.state.combat_log.size()
+	_refresh_log()
 
 
 ## O painel de baixo cresce para cima quando o texto é maior (a base é 210 px, colada a 24 px da borda).
@@ -783,6 +898,15 @@ func _fit_dock() -> void:
 	var height := maxf(210.0, _panel.get_combined_minimum_size().y)
 	_panel.size = Vector2(1872, height)
 	_panel.position = Vector2(24, 1056.0 - height)
+
+
+## O foco que a vez põe sozinha: sem abrir a dica (ela abre com o mouse em cima ou quando o jogador anda o foco, #56).
+func _focus_quietly(button: Control) -> void:
+	if not is_instance_valid(button) or not button.is_inside_tree():
+		return
+	_quiet_focus = true
+	button.grab_focus()
+	_quiet_focus = false
 
 
 func _dock_top() -> float:
@@ -804,7 +928,7 @@ func restyle() -> void:
 		if focused >= 0 and _bag == null:
 			await get_tree().process_frame
 			if focused < _abilities.get_child_count():
-				(_abilities.get_child(focused) as Control).grab_focus()
+				_focus_quietly(_abilities.get_child(focused))
 	_fit_dock.call_deferred()
 
 
@@ -1050,48 +1174,133 @@ func bag_open() -> bool:
 
 # ---------------------------------------------------------------- alvos
 
-## ability_id: a habilidade mirada; apontar uma posição mostra todos que ela atinge dali e a dica com o resultado.
+## A escolha do alvo (#57, como na Unreal): a área do clique é o corpo inteiro de cada alvo válido (um botão sem fundo do
+## tamanho do corpo na tela), e não mais um botão com o nome. O mouse em cima mostra quem a habilidade atinge dali; o
+## clique escolhe (o ALVO acima e a luz mais forte) e um segundo clique no mesmo usa. O teclado e o controle andam
+## entre os alvos com as setas (o foco escolhe) e Enter ou A usa. Uma posição vazia (mover para lá) tem o botão dela.
+## ability_id: a habilidade mirada (vazio: o Mover).
 func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id: String = "") -> void:
 	_clear_markers()
 	# Antes de desligar os cartões: o escolhido ganha a moldura de escolhida (_style_ability lê _choosing).
 	_choosing = ability_id if ability_id != "" else "move"
 	_set_enabled(false)
+	_pick_side = enemy_side
+	_pick_ranks = ranks.duplicate()
+	_pick_ability = ability_id
+	_picked_rank = -1
+	_clicked_rank = -1
 	var team: Array = session.state.enemy_team if enemy_side else session.state.player_team
 	for rank in ranks:
 		var unit = AHCombatEngine._find(team, func(u): return session.engine.occupies_rank(u, rank) and AHCombatEngine.alive_any(u))
-		var world: Vector3
-		var label := tr("Posição %d") % rank
+		var marker := Button.new()
+		marker.set_meta("rank", rank)
 		if unit != null and arena.cards.has(unit.id):
-			var card: AHSpriteCard = arena.cards[unit.id]
-			world = card.global_position + Vector3(0, card.head_height() + 0.2, 0)
-			label = _name(unit)
+			marker.set_meta("card", arena.cards[unit.id])
+			marker.set_meta("unit_id", unit.id)
+			for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+				marker.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+			marker.tooltip_text = _name(unit)
 		else:
 			var probe := AHCombat.Unit.new()
 			probe.is_player = not enemy_side
 			probe.rank = rank
-			world = arena.slot_position(probe) + Vector3(0, 2.0, 0)
-		var marker := Button.new()
-		marker.text = "▼ " + label
-		marker.custom_minimum_size = Vector2(180, 46)
-		style_button(marker, Color(1.0, 0.85, 0.45))
-		marker.set_meta("world", world)
-		marker.set_meta("rank", rank)
-		marker.set_meta("label", marker.text)
-		if ability_id != "":
-			marker.mouse_entered.connect(_preview_hits.bind(ability_id, rank))
-			marker.focus_entered.connect(_preview_hits.bind(ability_id, rank))
-		marker.pressed.connect(func():
-			_clear_markers()
-			_set_enabled(true)
-			on_pick.call(rank))
+			marker.text = tr("Posição %d") % rank
+			marker.custom_minimum_size = Vector2(180, 46)
+			style_button(marker, Color(1.0, 0.85, 0.45))
+			marker.set_meta("world", arena.slot_position(probe) + Vector3(0, 2.0, 0))
+		marker.mouse_entered.connect(_hover_target.bind(rank))
+		marker.mouse_exited.connect(_hover_target.bind(-1))
+		marker.focus_entered.connect(_select_target.bind(rank))
+		marker.gui_input.connect(_marker_input)
+		marker.pressed.connect(_press_target.bind(rank, on_pick))
 		add_child(marker)
 		_markers.append(marker)
 	for i in _markers.size():
 		_markers[i].focus_neighbor_left = _markers[(i - 1 + _markers.size()) % _markers.size()].get_path()
 		_markers[i].focus_neighbor_right = _markers[(i + 1) % _markers.size()].get_path()
-	_description.text = tr("Escolha o alvo (%s ou B volta).") % S.key_name("cancel")
+	_description.text = tr("Escolha o alvo: clique no personagem e clique de novo para usar (%s usa; %s ou B volta).") % [
+		S.key_name("ui_accept"), S.key_name("cancel")]
+	_paint_targets()
 	if not _markers.is_empty():
+		_via_mouse = false
 		_markers[0].grab_focus.call_deferred()
+
+
+## De onde veio o último toque no alvo: mouse ou toque (o primeiro clique só escolhe) ou teclado e controle.
+func _marker_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton or event is InputEventScreenTouch:
+		_via_mouse = true
+	elif event is InputEventKey or event is InputEventJoypadButton:
+		_via_mouse = false
+
+
+## O clique: o primeiro no personagem escolhe, o segundo no mesmo usa; pelo teclado ou controle, usa o escolhido.
+func _press_target(rank: int, on_pick: Callable) -> void:
+	if _via_mouse and _clicked_rank != rank:
+		_clicked_rank = rank
+		_select_target(rank)
+		return
+	_clear_markers()
+	_set_enabled(true)
+	on_pick.call(rank)
+
+
+## O alvo escolhido (pelo foco ou pelo clique): o ALVO acima dele, a luz mais forte e a dica de quem é atingido.
+func _select_target(rank: int) -> void:
+	if _markers.is_empty():
+		return
+	# Escolhido pelo teclado ou controle, outro alvo: o clique seguinte num alvo só escolhe (não usa sem ver o ALVO nele).
+	if _clicked_rank != rank:
+		_clicked_rank = -1
+	_picked_rank = rank
+	if _pick_ability != "":
+		_preview_hits(_pick_ability, rank)
+	_paint_targets()
+
+
+## O mouse em cima mostra a mira dali; fora, volta ao escolhido.
+func _hover_target(rank: int) -> void:
+	# O botão que sai debaixo do mouse (a escolha acabou) avisa a saída: aí não há mais o que pintar.
+	if _markers.is_empty():
+		return
+	var shown := rank if rank >= 0 else _picked_rank
+	if _pick_ability != "" and shown >= 0:
+		_preview_hits(_pick_ability, shown)
+	_paint_targets(shown)
+
+
+## As luzes de cada personagem na escolha (cores e forças de AHUiStyle): o herói da vez em dourado; os alvos válidos na
+## cor do lado, fraca; os outros atingidos dali, média; o apontado, forte, com o ALVO; quem não pode ser alvo, escurecido.
+func _paint_targets(pointed: int = -2) -> void:
+	if pointed == -2:
+		pointed = _picked_rank
+	var hit: Array = session.hit_ids(_actor_id, _pick_ability, pointed) if _pick_ability != "" and pointed >= 0 else []
+	var color := S.target_color(_pick_side)
+	for unit in session.units():
+		var card: AHSpriteCard = arena.cards.get(unit.id)
+		if card == null or not AHCombatEngine.alive_any(unit):
+			continue
+		if unit.id == _actor_id:
+			# O herói da vez apontado (a cura nele mesmo): o dourado, forte.
+			var self_pointed: bool = unit.is_player != _pick_side and pointed >= 0 and session.engine.occupies_rank(unit, pointed)
+			card.set_highlight(S.TARGET_ACTIVE_COLOR, S.TARGET_POINTED if self_pointed else S.TARGET_ACTIVE)
+		elif unit.is_player != _pick_side and _pick_ranks.any(func(r): return session.engine.occupies_rank(unit, r)):
+			var strength := S.TARGET_VALID
+			if pointed >= 0 and session.engine.occupies_rank(unit, pointed):
+				strength = S.TARGET_POINTED
+			elif hit.has(unit.id):
+				strength = S.TARGET_ALSO
+			card.set_highlight(color, strength)
+		elif hit.has(unit.id):
+			card.set_highlight(color, S.TARGET_ALSO)
+		else:
+			card.set_highlight(Color.BLACK, 0.0, true)
+	# A palavra ALVO acima do apontado (não só a cor diz quem é).
+	_target_label.visible = false
+	for marker in _markers:
+		if pointed >= 0 and int(marker.get_meta("rank")) == pointed and marker.has_meta("card"):
+			_target_label.visible = true
+			_target_label.set_meta("card", marker.get_meta("card"))
 
 
 func _clear_markers() -> void:
@@ -1100,48 +1309,41 @@ func _clear_markers() -> void:
 	_markers.clear()
 	_clear_preview()
 	_choosing = ""
+	_picked_rank = -1
+	_clicked_rank = -1
+	_pick_ranks = []
 	_tip.visible = false
+	if _target_label != null:
+		_target_label.visible = false
+	if session != null and arena != null:
+		for unit in session.units():
+			var card: AHSpriteCard = arena.cards.get(unit.id)
+			if card != null and is_instance_valid(card):
+				card.set_highlight(Color.BLACK, 0.0)
 
 
 ## Quem a habilidade atinge mirando nesta posição (CombatSession.hit_ids, a mesma conta do ataque): a dica mostra todos
-## com a vida e se podem cair; cada outro atingido acende o próprio marcador ou ganha a marca "também atingido".
+## com a vida e se podem cair; a luz de cada um (_paint_targets) mostra quem é atingido.
 func _preview_hits(ability_id: String, rank: int) -> void:
 	_clear_preview()
 	var option: Array = _options.filter(func(o): return o.id == ability_id)
 	if not option.is_empty():
 		var index := _options.find(option[0])
 		_describe(option[0], _abilities.get_child(index) if index < _abilities.get_child_count() else null, rank)
-	var ids: Array = session.hit_ids(_actor_id, ability_id, rank)
-	if ids.size() <= 1:
-		return
-	for id in ids:
-		var unit = session.state.find_unit(id)
-		if unit == null or session.engine.occupies_rank(unit, rank) or not arena.cards.has(id):
-			continue
-		var own: Array = _markers.filter(func(m): return session.engine.occupies_rank(unit, int(m.get_meta("rank"))))
-		if not own.is_empty():
-			own[0].text = tr("◆ %s · também") % _name(unit)
-			own[0].add_theme_color_override("font_color", Color(1.0, 0.85, 0.45))
-			continue
-		var card: AHSpriteCard = arena.cards[id]
-		var mark := S.label(tr("◆ também atingido"), S.MIN_TEXT, Color(1.0, 0.85, 0.45), "bold")
-		mark.add_theme_constant_override("outline_size", 8)
-		mark.set_meta("world", card.global_position + Vector3(0, card.head_height() + 0.2, 0))
-		add_child(mark)
-		_preview_marks.append(mark)
 
 
 func _clear_preview() -> void:
 	for mark in _preview_marks:
 		mark.queue_free()
 	_preview_marks.clear()
-	for marker in _markers:
-		marker.text = marker.get_meta("label")
-		marker.add_theme_color_override("font_color", TEXT)
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
+		return
+	if event.is_action_pressed("combat_log") and session != null:
+		toggle_log()
+		get_viewport().set_input_as_handled()
 		return
 	# A Mochila: I abre na vez de um herói; Esc, Backspace ou I fecham.
 	if _bag != null and (S.is_back(event) or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):

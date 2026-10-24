@@ -419,7 +419,7 @@ func _travel_segment(direction: int) -> void:
 	var to := segment + direction
 	busy = true
 	var area: String = street.scenario.zones[segments[to].zone].name
-	hud.toast("Seguindo em frente…" if area == "passagem" else "Seguindo para: %s…" % area, 2.0)
+	hud.toast(tr("Seguindo em frente…") if area == "passagem" else tr("Seguindo para: %s…") % tr(area), 2.0)
 	await GameFlow.fade(1.0)
 	var part: Dictionary = segments[to]
 	var entry: int = part.first if direction > 0 else part.first + part.steps - 1
@@ -434,7 +434,7 @@ func _travel_map(campaign: Dictionary, next: int) -> void:
 	R.enter_step(campaign, next)
 	Campaign.save()
 	var info := R.phase(campaign.session.expedition.phase_id)
-	hud.toast("Seguindo para: %s…" % AHScenarioWorld.display_of(info.get("map", "")), 2.0)
+	hud.toast(tr("Seguindo para: %s…") % AHScenarioWorld.display_of(info.get("map", "")), 2.0)
 	GameFlow.change_to("street")
 
 
@@ -501,16 +501,16 @@ func _announce(index: int, outcome: String, first_time: bool) -> void:
 			var camp: int = route.sites.map(func(s): return s.camp_site).find(true)
 			var where := ""
 			if camp >= 0:
-				where = " O acampamento fica %s do trecho %d." % [("no cinema" if route.sites[camp].shop == 2 else "na " + R.SHOP_NAMES[route.sites[camp].shop]), route.sites[camp].step + 1]
-			hud.toast("Trecho %d · Descanso. Um lugar quieto.%s" % [index + 1, where], 5.0)
-			_ask_risk("rest", "Um lugar quieto", "A equipe para no descanso.%s Daqui dá para seguir até o guardião ou voltar à Estação com metade do achado." % where)
+				where = tr(" O acampamento fica %s do trecho %d.") % [(tr("no cinema") if route.sites[camp].shop == 2 else tr("na ") + tr(R.SHOP_NAMES[route.sites[camp].shop])), route.sites[camp].step + 1]
+			hud.toast(tr("Trecho %d · Descanso. Um lugar quieto.%s") % [index + 1, where], 5.0)
+			_ask_risk("rest", tr("Um lugar quieto"), tr("A equipe para no descanso.%s Daqui dá para seguir até o guardião ou voltar à Estação com metade do achado.") % where)
 		"combat", "boss":
-			hud.toast("Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro." % [index + 1, label])
+			hud.toast(tr("Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro.") % [index + 1, tr(label)])
 			if outcome == "boss":
-				_ask_risk("boss", "O guardião está à frente", "Vencer o guardião conclui a fase e leva todo o achado. Se a equipe cair, o achado fica para trás; voltar agora leva metade.")
+				_ask_risk("boss", tr("O guardião está à frente"), tr("Vencer o guardião conclui a fase e leva todo o achado. Se a equipe cair, o achado fica para trás; voltar agora leva metade."))
 		_:
 			if first_time:
-				hud.toast("Trecho %d · %s" % [index + 1, label], 2.5)
+				hud.toast(tr("Trecho %d · %s") % [index + 1, tr(label)], 2.5)
 
 
 ## A pergunta de risco, uma vez por jornada em cada ponto: seguir com a equipe como está ou voltar com metade.
@@ -522,8 +522,8 @@ func _ask_risk(key: String, title: String, text: String) -> void:
 	asked.append(key)
 	expedition.asked = asked
 	Campaign.save()
-	hud.show_choice(title, text, [["Seguir em frente", func(): pass],
-		["Voltar à Estação (metade do achado)", _retreat]])
+	hud.show_choice(title, text, [[tr("Seguir em frente"), func(): pass],
+		[tr("Voltar à Estação (metade do achado)"), _retreat]])
 
 
 # ---------------------------------------------------------------- interações
@@ -541,19 +541,19 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 		var shop := R.shop_the(site.shop)
 		where = _door_point(site)
 		if R.can_enter_house(campaign, i):
-			text = "E  Entrar n%s" % shop
+			text = tr("E  Entrar n%s") % shop
 			action = _enter_house.bind(i)
 		elif R.can_force_house(campaign, i):
-			text = "E  Arrombar a porta d%s (o pé de cabra quebra)" % shop
+			text = tr("E  Arrombar a porta d%s (o pé de cabra quebra)") % shop
 			action = _force_house.bind(i)
 		elif site.locked and not site.forced:
-			text = "Porta trancada · Precisa de um pé de cabra para arrombar"
+			text = tr("Porta trancada · Precisa de um pé de cabra para arrombar")
 			action = Callable()
 		best = distance
 	for index in props:
 		if absf(props[index].position.x - leader.x) < best and index <= route.index and not route.props.get(str(index), false):
 			best = absf(props[index].position.x - leader.x)
-			text = "E  Vasculhar %s" % PROP_NAMES[props[index].prop_name]
+			text = tr("E  Vasculhar %s") % tr(PROP_NAMES[props[index].prop_name])
 			action = _search_prop.bind(index)
 			where = _prop_point(index)
 	if street.scenario:
@@ -564,10 +564,10 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 			best = absf(entry.x - leader.x)
 			where = _scenario_prop_point(entry)
 			if route.searched_props.has(entry.prop):
-				text = "%s (já vasculhado)" % entry.name
+				text = tr("%s (já vasculhado)") % tr(entry.name)
 				action = Callable()
 			elif R.can_search_scenario_prop(campaign, entry.prop):
-				text = "E  Vasculhar: %s" % entry.name
+				text = tr("E  Vasculhar: %s") % tr(entry.name)
 				action = _search_scenario_prop.bind(entry)
 		for i in side_rooms.size():
 			var room_entry: Dictionary = side_rooms[i]
@@ -577,20 +577,20 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 			where = _side_door_point(room_entry)
 			var area: String = street.scenario.zones[room_entry.zone].name
 			if R.can_enter_scenario_room(campaign, room_entry.door_step):
-				text = "E  Entrar: %s" % area
+				text = tr("E  Entrar: %s") % tr(area)
 				action = _enter_side_room.bind(i)
 			else:
-				text = "%s · a patrulha guarda a porta" % area
+				text = tr("%s · a patrulha guarda a porta") % tr(area)
 				action = Callable()
 	var exit_x: float = EXIT_X if street.scenario == null else segments[0].x0 + EXIT_X
 	# No cenário, com o guardião vencido, a volta vale de qualquer ponto (RequestExpeditionReturn da Unreal).
 	var done_here: bool = street.scenario != null and campaign.session.expedition.objective_completed and text == ""
 	if done_here or (leader.x < exit_x and segment == 0 and map_first == 0):
-		text = "E  Voltar à Estação (%s)" % ("fase concluída: todo o achado" if campaign.session.expedition.objective_completed else "retirada: metade do achado")
+		text = tr("E  Voltar à Estação (%s)") % (tr("fase concluída: todo o achado") if campaign.session.expedition.objective_completed else tr("retirada: metade do achado"))
 		action = _retreat
 		where = null
 	hud.show_prompt(text, where)
-	if text.begins_with("E  Vasculhar"):
+	if text.begins_with(tr("E  Vasculhar")):
 		Tips.show_tip("search")
 	_action = action
 	hud.set_markers(_marker_points(campaign, route, leader, where))
@@ -637,7 +637,7 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 	var site: Dictionary = route.sites[route.current_house]
 	if site.has_enemy and not site.enemy_defeated and not room_guards.is_empty() and _room_time > AMBUSH_DELAY:
 		# Patrulha dentro da loja: emboscada logo depois de entrar (os inimigos agem primeiro).
-		hud.toast("Emboscada!", 1.5)
+		hud.toast(tr("Emboscada!"), 1.5)
 		_start_fight(R.HOUSE_ENEMY_INDEX + route.current_house, false)
 		return
 	var leader: Vector3 = street._leader.position
@@ -652,21 +652,21 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 			var name: String = R.SPOT_NAMES[site.shop][i] if i < 3 else "o canto"
 			where = room.search_props[i].marker_point() if i < room.search_props.size() else null
 			if site.spots[i].searched:
-				text = "%s (já vasculhado)" % name.capitalize()
+				text = tr("%s (já vasculhado)") % tr(name).capitalize()
 				action = Callable()
 			else:
-				text = "E  Vasculhar %s" % name
+				text = tr("E  Vasculhar %s") % tr(name)
 				action = _search_spot.bind(route.current_house, i)
 	if site.camp_site and absf(room.camp_x - leader.x) < best:
 		if R.can_start_camp(campaign):
-			text = "E  Acampar (fechar a porta e acender a fogueira)"
+			text = tr("E  Acampar (fechar a porta e acender a fogueira)")
 			action = _start_camp
 		elif site.camped:
-			text = "Acampamento já feito nesta fase"
+			text = tr("Acampamento já feito nesta fase")
 			action = Callable()
 		where = null
 	if leader.x < room.exit_x:
-		text = "E  Sair para a rua"
+		text = tr("E  Sair para a rua")
 		action = _leave_house
 		where = null
 	hud.show_prompt(text, where)
@@ -742,7 +742,7 @@ func _search_scenario_prop(entry: Dictionary) -> void:
 		if result.event != "":
 			hud.show_event(Campaign.state)
 		else:
-			hud.toast("%s: %s" % [entry.name, result.text], 5.0)
+			hud.toast("%s: %s" % [tr(entry.name), result.text], 5.0)
 
 
 # ---------------------------------------------------------------- interiores laterais dos cenários
@@ -754,7 +754,7 @@ func _enter_side_room(index: int) -> void:
 	busy = true
 	Campaign.save()
 	Sound.play("res://audio/world/door_open.ogg")
-	hud.toast("Entrando: %s…" % street.scenario.zones[room_entry.zone].name, 1.5)
+	hud.toast(tr("Entrando: %s…") % tr(street.scenario.zones[room_entry.zone].name), 1.5)
 	await GameFlow.fade(1.0)
 	_show_side_room(index)
 	await GameFlow.fade(0.0)
@@ -779,12 +779,12 @@ func _side_room_frame(campaign: Dictionary, route: Dictionary) -> void:
 			continue
 		best = absf(entry.x - leader.x)
 		if route.searched_props.has(entry.prop):
-			text = "%s (já vasculhado)" % entry.name
+			text = tr("%s (já vasculhado)") % tr(entry.name)
 		elif R.can_search_scenario_prop(campaign, entry.prop):
-			text = "E  Vasculhar: %s" % entry.name
+			text = tr("E  Vasculhar: %s") % tr(entry.name)
 			action = _search_scenario_prop.bind(entry)
 	if leader.x < room_entry.x0 + EXIT_X:
-		text = "E  Voltar: %s" % street.scenario.zones[segments[room_entry.door_segment].zone].name
+		text = tr("E  Voltar: %s") % tr(street.scenario.zones[segments[room_entry.door_segment].zone].name)
 		action = _leave_side_room
 	hud.show_prompt(text)
 	hud.set_markers([])
@@ -822,7 +822,7 @@ func _force_house(site_index: int) -> void:
 	if R.force_house(Campaign.state, site_index):
 		Campaign.save()
 		_refresh_doors()
-		hud.toast("O pé de cabra entorta e quebra, mas a porta cede.")
+		hud.toast(tr("O pé de cabra entorta e quebra, mas a porta cede."))
 		hud.refresh(Campaign.state)
 
 
@@ -931,7 +931,7 @@ func _show_gains(before: Dictionary) -> void:
 			["bandages", "res-bandages", "curativo", "curativos"], ["tools", "tool-generic", "ferramenta", "ferramentas"]]:
 		var delta: int = after[spec[0]] - before[spec[0]]
 		if delta > 0:
-			gains.append([spec[1], "+%d %s" % [delta, spec[2] if delta == 1 else spec[3]]])
+			gains.append([spec[1], "+%d %s" % [delta, tr(spec[2]) if delta == 1 else tr(spec[3])]])
 	hud.loot_burst(gains, street._leader.global_position + Vector3(0, 1.9, 0))
 	# O achado raro (fragmento ou ferramenta) tem o brilho dele por cima do som da busca (#36).
 	if after.fragments > before.fragments or after.tools > before.tools:
@@ -984,7 +984,7 @@ func _on_camp_leave() -> void:
 		room.set_camp_lit(false)
 		street.apply_corridor_weather(weather)
 		hud.close_modal()
-		hud.toast("A equipe descansou. Lá fora, o tempo mudou: %s." % street.WEATHER_NAMES.get(weather, weather), 4.0)
+		hud.toast(tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather)), 4.0)
 		hud.refresh(Campaign.state)
 
 
@@ -1005,7 +1005,7 @@ func _start_fight(index: int, advantage: bool) -> void:
 		"cause": fight.enemies[0].display_name if not fight.enemies.is_empty() else "patrulha"}
 	street.begin_fight()
 	if fight.opening:
-		hud.toast("A equipe chegou sem ser vista: age primeiro.", 2.5)
+		hud.toast(tr("A equipe chegou sem ser vista: age primeiro."), 2.5)
 	var heroes: Array = street.party_ids.map(func(id): return Campaign.hero(id))
 	var center: float = (room.guard_x if house else cards[0].position.x) - 1.0
 	street._arena.start(heroes, street._heroes, fight.enemies, cards, center, fight.opening)
@@ -1031,9 +1031,9 @@ func _on_combat_finished(result: String) -> void:
 		if campaign.session.expedition.objective_completed and _fight.boss:
 			Tips.show_tip("boss_down")
 			if street.scenario:
-				hud.toast("O guardião caiu. Vasculhe o que restou ou volte à Estação (E).", 6.0)
+				hud.toast(tr("O guardião caiu. Vasculhe o que restou ou volte à Estação (E)."), 6.0)
 			else:
-				hud.toast("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua.", 6.0)
+				hud.toast(tr("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua."), 6.0)
 	Campaign.save()
 	hud.refresh(campaign)
 
@@ -1068,7 +1068,7 @@ func _show_result() -> void:
 	var result: String = campaign.session.result
 	var delivered := R.finish_return(campaign)
 	Campaign.save()
-	hud.show_result(result, delivered, campaign, "Voltar à Estação")
+	hud.show_result(result, delivered, campaign, tr("Voltar à Estação"))
 
 
 ## A equipe volta pelo trem: o relatório, a noite e o ciclo da Estação ficam lá. Sem nenhum vivo, a Estação recebe

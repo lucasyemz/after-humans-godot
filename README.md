@@ -188,8 +188,13 @@ As telas usam o sistema de tradução da Godot com `data/i18n/en.po`. A chave de
 o jogo em português mostra a chave como sempre, e o texto que falta traduzir aparece em português também no inglês.
 - **Idioma:** fica nas Opções (Português, que é o padrão, e English em teste) e é guardado em `user://settings.cfg`.
   Nas capturas, use `--language=en`.
-- **Telas convertidas:** o título, as Opções, o HUD da exploração e da luta e a Estação. A lista está em
-  `tools/i18n_scan.gd`. Os nomes e as descrições de `data/*.json` também viram chaves, sem mudar os ids.
+- **Telas convertidas:** todas as telas e as regras que montam texto de tela (o título, as Opções, a exploração, a luta
+  e o registro, a Estação, o mapa de fases, a Mochila, as dicas, a rua e os cenários). A lista está em
+  `tools/i18n_scan.gd`. Os nomes e as descrições de `data/*.json` e das fases também viram chaves, sem mudar os ids.
+  Ainda não traduzem: os textos das escolhas dos eventos e os nomes de zonas e props dos cenários.
+- **O save fica em português:** o que é gravado (a causa da morte, o nome da fase no memorial, o objeto do evento)
+  continua em português e é traduzido na hora de mostrar (`AHCombatEngine.cause_text`, `Campaign.warning_text`). Nome
+  de dado dentro de texto montado passa por `tr()` também (`tr("Partir · %s") % tr(mission.name)`).
 - **Ao mexer num texto de tela ou nos dados:** rode `"$GODOT" --headless --path . -s res://tools/i18n_update.gd`. Ele
   acrescenta os textos novos ao PO, com a tradução vazia, e mantém as que já existem. Depois traduza os `msgstr ""`. O
   texto com `%s`/`%d` passa por `tr()` antes do `%`.

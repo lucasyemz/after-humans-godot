@@ -98,13 +98,13 @@ static func can_move_voluntarily(unit: Unit, occupant: Unit = null) -> bool:
 static func attack_status_description(unit: Unit, machine: bool) -> String:
 	var parts := PackedStringArray()
 	if unit.blind:
-		parts.append("%s: %d%% de falhar por alvo no próximo ataque de dano direto." % ["Interferência" if machine else "Cegueira", BLIND_MISS_PERCENT])
+		parts.append(TranslationServer.translate("%s: %d%% de falhar por alvo no próximo ataque de dano direto.") % [TranslationServer.translate("Interferência") if machine else TranslationServer.translate("Cegueira"), BLIND_MISS_PERCENT])
 	if unit.weak:
-		parts.append("Fraqueza: -%d%% de dano no próximo ataque de dano direto (mínimo 1)." % WEAKNESS_REDUCTION_PERCENT)
+		parts.append(TranslationServer.translate("Fraqueza: -%d%% de dano no próximo ataque de dano direto (mínimo 1).") % WEAKNESS_REDUCTION_PERCENT)
 	if unit.blind or unit.weak:
-		parts.append("Consome ao tentar, mesmo se errar; não acumula. Cura, suporte e dano periódico não consomem. Até atacar ou limpar.")
+		parts.append(TranslationServer.translate("Consome ao tentar, mesmo se errar; não acumula. Cura, suporte e dano periódico não consomem. Até atacar ou limpar."))
 	if unit.immobilize_turns > 0:
-		parts.append("Imobilização: %d turno(s) sem trocar de posição, avançar ou recuar por habilidade; pode atacar. Empurrões e fuga coletiva ainda funcionam. Diminui ao fim do próprio turno, inclusive atordoado." % unit.immobilize_turns)
+		parts.append(TranslationServer.translate("Imobilização: %d turno(s) sem trocar de posição, avançar ou recuar por habilidade; pode atacar. Empurrões e fuga coletiva ainda funcionam. Diminui ao fim do próprio turno, inclusive atordoado.") % unit.immobilize_turns)
 	return " ".join(parts)
 
 
@@ -131,6 +131,22 @@ static func _add_event(events: Array, text: String, type: int, target_id: String
 
 func _log(line: String) -> void:
 	state.combat_log.append(line)
+
+
+## O nome da unidade nas mensagens (#35): o do herói como está, o do inimigo traduzido (com o sufixo da rota).
+func _n(unit: Unit) -> String:
+	return unit.display_name if unit.is_player else AHCombatHud.unit_name(unit.display_name)
+
+
+## A causa de uma morte (state.deaths, que vai para o memorial no save) fica em português, como os ids: esta função a
+## traduz na hora de mostrar. "Robô (Golpe mecânico)" traduz as duas partes; um efeito ("Sangramento"), inteiro.
+static func cause_text(cause: String) -> String:
+	var open := cause.rfind(" (")
+	if open > 0 and cause.ends_with(")"):
+		var who := cause.substr(0, open)
+		var what := cause.substr(open + 2, cause.length() - open - 3)
+		return "%s (%s)" % [AHCombatHud.unit_name(who), TranslationServer.translate(what)]
+	return AHCombatHud.unit_name(cause)
 
 
 func _roll_range(min_value: int, max_value: int) -> int:
@@ -223,21 +239,21 @@ func _apply_control_effects(target: Unit, blind: bool, weak: bool, immobilize: i
 	target.weak = target.weak or weak
 	target.immobilize_turns = maxi(target.immobilize_turns, immobilize)
 	if blind:
-		_add_event(events, "Interferência" if is_machine(target) else "Cegueira", EventType.INFO, target.id).outcome = Outcome.BLIND_APPLIED
+		_add_event(events, tr("Interferência") if is_machine(target) else tr("Cegueira"), EventType.INFO, target.id).outcome = Outcome.BLIND_APPLIED
 	if weak:
-		_add_event(events, "Fraqueza", EventType.INFO, target.id)
+		_add_event(events, tr("Fraqueza"), EventType.INFO, target.id)
 	if immobilize > 0:
-		_add_event(events, "Imobilização · %d turnos" % target.immobilize_turns, EventType.INFO, target.id)
+		_add_event(events, tr("Imobilização · %d turnos") % target.immobilize_turns, EventType.INFO, target.id)
 	if blind or weak or immobilize > 0:
-		_log(target.display_name + ": " + attack_status_description(target, is_machine(target)))
+		_log(_n(target) + ": " + attack_status_description(target, is_machine(target)))
 
 
 func _misses_from_blind(attempt: Dictionary, target: Unit, events: Array) -> bool:
 	# Sem sorteio extra quando não há cegueira: as lutas antigas mantêm a sequência.
 	if not attempt.blind or not (random.next() < BLIND_MISS_PERCENT / 100.0):
 		return false
-	_add_event(events, "FALHOU · precisão reduzida", EventType.INFO, target.id)
-	_log("O ataque falhou por cegueira/interferência contra " + target.display_name + ".")
+	_add_event(events, tr("FALHOU · precisão reduzida"), EventType.INFO, target.id)
+	_log(tr("O ataque falhou por cegueira/interferência contra ") + _n(target) + ".")
 	return true
 
 
@@ -341,7 +357,7 @@ static func init_combat(player_units: Array, enemy_units: Array, in_context: AHC
 
 	new_state.player_team = player_units.duplicate()
 	new_state.enemy_team = enemy_units
-	new_state.combat_log.append("Combate iniciado nas ruínas do Bairro Submerso!")
+	new_state.combat_log.append(TranslationServer.translate("Combate iniciado nas ruínas do Bairro Submerso!"))
 	engine._roll_initiative_for_round(opening_ally_first)
 	return new_state
 
@@ -376,7 +392,7 @@ func _roll_initiative_for_round(opening_ally_first: bool = false) -> void:
 			var first = queue[chosen]
 			queue.remove_at(chosen)
 			queue.insert(0, first)
-			_log("Fase inicial: um aliado toma a iniciativa.")
+			_log(tr("Fase inicial: um aliado toma a iniciativa."))
 	state.initiative_queue = queue
 	_advance_to_next_actor()
 
@@ -387,12 +403,12 @@ func _advance_to_next_actor() -> void:
 	if not enemies_alive:
 		state.is_over = true
 		state.victory = true
-		_log("Vitória! A ameaça foi neutralizada.")
+		_log(tr("Vitória! A ameaça foi neutralizada."))
 		return
 	if not players_alive:
 		state.is_over = true
 		state.victory = false
-		_log("Todos os aliados caíram nas ruínas escuras...")
+		_log(tr("Todos os aliados caíram nas ruínas escuras..."))
 		return
 
 	var next = _find(state.initiative_queue, func(item):
@@ -403,7 +419,7 @@ func _advance_to_next_actor() -> void:
 		return _any(state.enemy_team, func(u): return u.id == item.unit_id and u.hp > 0))
 	if next == null:
 		state.round += 1
-		_log("--- Rodada %d ---" % state.round)
+		_log(tr("--- Rodada %d ---") % state.round)
 		_roll_initiative_for_round()
 		return
 
@@ -419,7 +435,7 @@ func _advance_to_next_actor() -> void:
 		var conductors := _any(state.enemy_team, func(u): return u.hp > 0 and u.enemy_id == "condutor_raiz")
 		if conductors and current.hp > 45:
 			current.tokens.block = mini(TOKEN_CAP, current.tokens.block + 1)
-			_log("O Porteiro canalizou energia dos Relés de Defesa e gerou Bloqueio!")
+			_log(tr("O Porteiro canalizou energia dos Relés de Defesa e gerou Bloqueio!"))
 
 
 ## O alvo protegido de cada unidade, por identidade (guarda do turno) ou por posição.
@@ -490,8 +506,8 @@ func _activate_perk(unit: Unit, perk_id: String, out_events: Array) -> void:
 	unit.perk_activations[perk_id] = state.round
 	var value := floori(perk.Value + 0.5)
 	_change_instinct(unit, value, perk.DisplayName)
-	_add_event(out_events, "%s: %s%d Instinto" % [perk.DisplayName, "+" if value > 0 else "", value], EventType.INSTINCT, unit.id)
-	_log("%s · %s: %d Instinto" % [unit.display_name, perk.DisplayName, value])
+	_add_event(out_events, tr("%s: %s%d Instinto") % [tr(perk.DisplayName), "+" if value > 0 else "", value], EventType.INSTINCT, unit.id)
+	_log(tr("%s · %s: %d Instinto") % [_n(unit), tr(perk.DisplayName), value])
 
 
 func _apply_instinct_crisis(unit: Unit, out_events: Array) -> void:
@@ -508,7 +524,7 @@ func _apply_instinct_crisis(unit: Unit, out_events: Array) -> void:
 	var chance := _virtue_chance(unit.perks)
 	unit.crisis_count += 1
 	var collapse := random.next() >= chance
-	_change_instinct(unit, rules.Crisis.Reset - unit.instinct, "Colapso" if collapse else "Superação")
+	_change_instinct(unit, rules.Crisis.Reset - unit.instinct, tr("Colapso") if collapse else tr("Superação"))
 	unit.crisis_outcome = AHCombat.Crisis.COLLAPSE if collapse else AHCombat.Crisis.BREAKTHROUGH
 	if collapse:
 		unit.tokens.vuln = mini(TOKEN_CAP, unit.tokens.vuln + 1)
@@ -521,15 +537,15 @@ func _apply_instinct_crisis(unit: Unit, out_events: Array) -> void:
 		var hp_loss := floori(unit.max_hp * rules.Crisis.HpLoss)
 		if unit.hp > 0:
 			unit.hp = maxi(1, unit.hp - hp_loss)
-		_add_event(out_events, "%s · Colapso: “Não consigo!” · Trauma e Vulnerável" % unit.display_name, EventType.CRISIS, unit.id)
-		_log("[COLAPSO] %s cedeu ao pânico e desespero! (-%d Vida, Trauma adquirido)" % [unit.display_name, hp_loss])
+		_add_event(out_events, tr("%s · Colapso: “Não consigo!” · Trauma e Vulnerável") % _n(unit), EventType.CRISIS, unit.id)
+		_log(tr("[COLAPSO] %s cedeu ao pânico e desespero! (-%d Vida, Trauma adquirido)") % [_n(unit), hp_loss])
 	else:
 		var hp_heal := mini(unit.max_hp - unit.hp, maxi(1, floori(unit.max_hp * rules.Crisis.HpHeal)))
 		unit.hp = mini(unit.max_hp, unit.hp + hp_heal)
 		if unit.deaths_door and unit.hp > 0:
 			unit.deaths_door = false
-		_add_event(out_events, "%s · Superação: “Ainda há esperança!” · Bloqueio" % unit.display_name, EventType.CRISIS, unit.id)
-		_log("[SUPERAÇÃO] A coragem de %s resplandece na escuridão! (+%d Vida)" % [unit.display_name, hp_heal])
+		_add_event(out_events, tr("%s · Superação: “Ainda há esperança!” · Bloqueio") % _n(unit), EventType.CRISIS, unit.id)
+		_log(tr("[SUPERAÇÃO] A coragem de %s resplandece na escuridão! (+%d Vida)") % [_n(unit), hp_heal])
 
 	# Laços da expedição: colapso afasta, superação aproxima (-3 a +3).
 	if unit.hero_id != "":
@@ -555,13 +571,13 @@ func _process_turn_start_dot(unit: Unit, out_events: Array) -> bool:
 			var dot_name := status_name("bleed" if bleed else "blight", is_machine(unit))
 			var damaged_id := unit.id
 			_apply_damage(unit, damage, false, out_events, dot_name)
-			_add_event(out_events, "-%d %s" % [damage, dot_name], EventType.DAMAGE, damaged_id, damage)
+			_add_event(out_events, "-%d %s" % [damage, tr(dot_name)], EventType.DAMAGE, damaged_id, damage)
 			if not _find_unit(damaged_id).is_standing():
 				return false
 	if unit.stun_turns > 0:
 		unit.stun_turns -= 1
-		_add_event(out_events, "Atordoado · turno perdido", EventType.INFO, unit.id).turn_skipped_stun = true
-		_log("%s perdeu o turno por atordoamento (%d restantes)." % [unit.display_name, unit.stun_turns])
+		_add_event(out_events, tr("Atordoado · turno perdido"), EventType.INFO, unit.id).turn_skipped_stun = true
+		_log(tr("%s perdeu o turno por atordoamento (%d restantes).") % [_n(unit), unit.stun_turns])
 		return false
 	return true
 
@@ -580,14 +596,14 @@ func _apply_damage(unit: Unit, raw_damage: int, direct_attack: bool, out_events:
 		if unit.tokens.vuln > 0 and not skip_vulnerability:
 			unit.tokens.vuln -= 1
 			damage = floori(damage * 1.5)
-			_add_event(out_events, "Vulnerável!", EventType.INFO, unit.id)
+			_add_event(out_events, tr("Vulnerável!"), EventType.INFO, unit.id)
 		if unit.tokens.block > 0:
 			unit.tokens.block -= 1
 			if is_machine(unit):
-				_add_event(out_events, "Blindagem consumida", EventType.BLOCK, unit.id)
+				_add_event(out_events, tr("Blindagem consumida"), EventType.BLOCK, unit.id)
 			var reduction := _block_reduction(armor_pierce_percent, unit.armor_break_turns > 0)
 			damage = floori(AHGameData.f32(damage * AHGameData.f32(1.0 - reduction)))
-			_add_event(out_events, "Bloqueio!", EventType.BLOCK, unit.id)
+			_add_event(out_events, tr("Bloqueio!"), EventType.BLOCK, unit.id)
 		damage = maxi(1, damage)
 
 	if unit.is_player:
@@ -599,41 +615,41 @@ func _apply_damage(unit: Unit, raw_damage: int, direct_attack: bool, out_events:
 				unit.blind = false
 				unit.weak = false
 				unit.immobilize_turns = 0
-				_add_event(out_events, "MORTE PERMANENTE!", EventType.DEATH, unit.id)
-				_log("[MORTE] %s sucumbiu ao golpe fatal de %s!" % [unit.display_name, source_label])
+				_add_event(out_events, tr("MORTE PERMANENTE!"), EventType.DEATH, unit.id)
+				_log(tr("[MORTE] %s sucumbiu ao golpe fatal de %s!") % [_n(unit), cause_text(source_label)])
 				if unit.hero_id != "":
 					state.deaths.append({"hero_id": unit.hero_id, "cause": source_label})
 				# Os sobreviventes recebem +20 de instinto uma vez.
 				for ally in state.player_team:
 					if ally.id != unit.id and (ally.hp > 0 or ally.deaths_door):
-						_change_instinct(ally, 20, "Pressão de combate")
+						_change_instinct(ally, 20, tr("Pressão de combate"))
 						_apply_instinct_crisis(ally, out_events)
 				_compact_team_ranks(state.player_team)
 			else:
-				_add_event(out_events, "Sobreviveu ao Último Fôlego!", EventType.INFO, unit.id)
-				_log("%s resistiu à morte por um triz!" % unit.display_name)
+				_add_event(out_events, tr("Sobreviveu ao Último Fôlego!"), EventType.INFO, unit.id)
+				_log(tr("%s resistiu à morte por um triz!") % _n(unit))
 			return
 
 		unit.hp = maxi(0, unit.hp - damage)
 		if unit.hp == 0:
 			unit.deaths_door = true
-			_add_event(out_events, "ÚLTIMO FÔLEGO!", EventType.INFO, unit.id)
-			_log("[ÚLTIMO FÔLEGO] %s está à beira da morte!" % unit.display_name)
+			_add_event(out_events, tr("ÚLTIMO FÔLEGO!"), EventType.INFO, unit.id)
+			_log(tr("[ÚLTIMO FÔLEGO] %s está à beira da morte!") % _n(unit))
 			for ally in state.player_team:
 				if ally.id != unit.id and (ally.hp > 0 or ally.deaths_door):
-					_change_instinct(ally, 8, "Pressão de combate")
+					_change_instinct(ally, 8, tr("Pressão de combate"))
 					_apply_instinct_crisis(ally, out_events)
 			# Amizade (+3): o parceiro ergue a guarda.
 			if unit.hero_id != "":
 				for ally in state.player_team:
 					if ally.hero_id != "" and ally.hero_id != unit.hero_id and context.relationships.get(relationship_key(unit.hero_id, ally.hero_id), 0) >= 3:
 						ally.tokens.block = mini(TOKEN_CAP, ally.tokens.block + 1)
-						_log("[AMIZADE] %s ergueu a guarda para proteger %s!" % [ally.display_name, unit.display_name])
+						_log(tr("[AMIZADE] %s ergueu a guarda para proteger %s!") % [_n(ally), _n(unit)])
 		# Esperança baixa: golpes diretos pesam no instinto.
 		if direct_attack:
 			var hope_instinct := 4 if context.hope == 0 else (2 if context.hope <= 25 else 0)
 			if hope_instinct > 0:
-				_change_instinct(unit, hope_instinct, "Pressão de combate")
+				_change_instinct(unit, hope_instinct, tr("Pressão de combate"))
 				_apply_instinct_crisis(unit, out_events)
 		return
 
@@ -642,30 +658,30 @@ func _apply_damage(unit: Unit, raw_damage: int, direct_attack: bool, out_events:
 	if unit.enemy_id == "porteiro" and unit.hp <= 45 and state.boss_phase == 1:
 		state.boss_phase = 2
 		unit.tokens.block = 0
-		_add_event(out_events, "SOBRECARGA DO PORTEIRO!", EventType.CRIT, unit.id)
-		_log("[SOBRECARGA] Os cabos do Porteiro se romperam em chamas verdes! Seus bloqueios caíram e seu ataque tornou-se brutal!")
+		_add_event(out_events, tr("SOBRECARGA DO PORTEIRO!"), EventType.CRIT, unit.id)
+		_log(tr("[SOBRECARGA] Os cabos do Porteiro se romperam em chamas verdes! Seus bloqueios caíram e seu ataque tornou-se brutal!"))
 	if unit.hp == 0:
 		unit.blind = false
 		unit.weak = false
 		unit.immobilize_turns = 0
-		_add_event(out_events, "Derrotado!", EventType.DEATH, unit.id)
-		_log("%s foi destruído." % unit.display_name)
+		_add_event(out_events, tr("Derrotado!"), EventType.DEATH, unit.id)
+		_log(tr("%s foi destruído.") % _n(unit))
 		_compact_team_ranks(state.enemy_team)
 
 
 func _apply_dot(target: Unit, bleed: bool, inflicted: Dictionary, out_events: Array, enemy_source: bool) -> void:
 	var dot_name := status_name("bleed" if bleed else "blight", is_machine(target))
 	if _resisted_effect(target, true):
-		_add_event(out_events, "Resistiu ao " + dot_name, EventType.INFO, target.id)
+		_add_event(out_events, tr("Resistiu ao ") + tr(dot_name), EventType.INFO, target.id)
 		return
 	var current: AHCombat.Dot = target.bleed if bleed else target.blight
 	current.magnitude = mini(DOT_CAP, current.magnitude + inflicted.Magnitude)
 	current.duration = maxi(current.duration, inflicted.Duration)
 	if enemy_source:
-		_add_event(out_events, "%s +%d" % ["Sangramento" if bleed else "Contaminação", inflicted.Magnitude], EventType.INFO, target.id)
+		_add_event(out_events, "%s +%d" % [tr("Sangramento") if bleed else tr("Contaminação"), inflicted.Magnitude], EventType.INFO, target.id)
 	else:
-		_add_event(out_events, "%s aplicado · %d dano (%dt)" % [dot_name, current.magnitude, current.duration], EventType.INFO, target.id)
-		_log("%s: %s aplicado!" % [target.display_name, dot_name])
+		_add_event(out_events, tr("%s aplicado · %d dano (%dt)") % [tr(dot_name), current.magnitude, current.duration], EventType.INFO, target.id)
+		_log(tr("%s: %s aplicado!") % [_n(target), tr(dot_name)])
 
 
 static func _dot_set(dot: Dictionary) -> bool:
@@ -725,21 +741,21 @@ func execute_move(unit_id: String, target_rank: int) -> AHCombat.ActionResult:
 	var result := AHCombat.ActionResult.new()
 	var unit := _find_unit(unit_id)
 	if unit == null or not (unit.hp > 0 or unit.deaths_door):
-		result.error = "Unidade não encontrada ou derrotada"
+		result.error = tr("Unidade não encontrada ou derrotada")
 		return result
 	if unit.stun_turns != 0:
-		result.error = "Personagem atordoado."
+		result.error = tr("Personagem atordoado.")
 		return result
 	if unit.rank == target_rank or target_rank < 1 or target_rank > 4:
-		result.error = "Selecione outra posição da sua equipe."
+		result.error = tr("Selecione outra posição da sua equipe.")
 		return result
 	var team: Array = state.player_team if unit.is_player else state.enemy_team
 	var adjacent = _find(team, func(u): return occupies_rank(u, target_rank) and (u.hp > 0 or u.deaths_door))
 	if not can_move_voluntarily(unit, adjacent):
-		result.error = "Imobilização impede mover ou trocar de posição; ainda é possível atacar."
+		result.error = tr("Imobilização impede mover ou trocar de posição; ainda é possível atacar.")
 		return result
 	if unit_size(unit) > 1 or (adjacent != null and unit_size(adjacent) > 1):
-		result.error = "Esta unidade grande não pode trocar de posição."
+		result.error = tr("Esta unidade grande não pode trocar de posição.")
 		return result
 	var guard_targets := {}
 	for member in team:
@@ -755,7 +771,7 @@ func execute_move(unit_id: String, target_rank: int) -> AHCombat.ActionResult:
 		member.guard_target_rank = target.rank if target != null else 0
 	var moved_name := unit.display_name
 	_sort_team(team)
-	_log("%s manobrou para a posição %d." % [moved_name, target_rank])
+	_log(tr("%s manobrou para a posição %d.") % [_n(unit), target_rank])
 	end_unit_turn(_find_unit(unit_id))
 	result.success = true
 	return result
@@ -765,13 +781,13 @@ func execute_defend(unit_id: String) -> AHCombat.ActionResult:
 	var result := AHCombat.ActionResult.new()
 	var unit := _find_unit(unit_id)
 	if unit == null:
-		result.error = "Unidade não encontrada"
+		result.error = tr("Unidade não encontrada")
 		return result
 	if unit.stun_turns != 0:
-		result.error = "Personagem atordoado."
+		result.error = tr("Personagem atordoado.")
 		return result
 	unit.tokens.block = mini(TOKEN_CAP, unit.tokens.block + 1)
-	_log("%s assumiu postura defensiva (+1 Bloqueio)." % unit.display_name)
+	_log(tr("%s assumiu postura defensiva (+1 Bloqueio).") % _n(unit))
 	end_unit_turn(unit)
 	result.success = true
 	return result
@@ -781,22 +797,22 @@ func execute_flee(unit_id: String) -> AHCombat.ActionResult:
 	var result := AHCombat.ActionResult.new()
 	var unit := _find_unit(unit_id)
 	if unit == null or not unit.is_player:
-		result.error = "Apenas aliados podem recuar."
+		result.error = tr("Apenas aliados podem recuar.")
 		return result
 	if unit.stun_turns != 0:
-		result.error = "Personagem atordoado."
+		result.error = tr("Personagem atordoado.")
 		return result
 	if _any(state.enemy_team, func(u): return u.enemy_id == "porteiro"):
-		result.error = "Impossível fugir de O Porteiro! As eclusas estão trancadas."
+		result.error = tr("Impossível fugir de O Porteiro! As eclusas estão trancadas.")
 		return result
 	result.success = true
 	if random.next() < 0.6:
 		state.is_over = true
 		state.escaped = true
 		result.escaped = true
-		_log("A equipe conseguiu recuar pelas sombras e romper o combate!")
+		_log(tr("A equipe conseguiu recuar pelas sombras e romper o combate!"))
 		return result
-	_log("Tentativa de fuga falhou! Os inimigos bloquearam a passagem.")
+	_log(tr("Tentativa de fuga falhou! Os inimigos bloquearam a passagem."))
 	end_unit_turn(unit)
 	return result
 
@@ -819,10 +835,10 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 
 	var user := _find_unit(unit_id)
 	if user == null:
-		result.error = "Ator não encontrado"
+		result.error = tr("Ator não encontrado")
 		return result
 	if user.stun_turns != 0:
-		result.error = "Personagem atordoado."
+		result.error = tr("Personagem atordoado.")
 		return result
 	var friendly: Array = state.player_team if user.is_player else state.enemy_team
 	var opposing: Array = state.enemy_team if user.is_player else state.player_team
@@ -830,35 +846,35 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 	var user_class = find_class(user.class_id)
 	var ability = find_ability(ability_id) if user_class != null and user_class.AbilityIds.has(ability_id) else null
 	if ability == null:
-		result.error = "Habilidade não encontrada"
+		result.error = tr("Habilidade não encontrada")
 		return result
 	if not ability.OriginRanks.has(user.rank):
-		result.error = "Habilidade exige outra posição de origem. Posição atual: %d" % user.rank
+		result.error = tr("Habilidade exige outra posição de origem. Posição atual: %d") % user.rank
 		return result
 	if user.cooldowns.get(ability_id, 0) > 0:
-		result.error = "Habilidade em recarga (%d turnos)." % user.cooldowns[ability_id]
+		result.error = tr("Habilidade em recarga (%d turnos).") % user.cooldowns[ability_id]
 		return result
 	var remaining: int = user.remaining_uses.get(ability_id, ability.UsesMax)
 	if ability.UsesMax > 0 and remaining <= 0:
-		result.error = "Limite de usos desta habilidade esgotado."
+		result.error = tr("Limite de usos desta habilidade esgotado.")
 		return result
 
 	var target = _primary_target(user, ability, target_rank, friendly, opposing)
 	if ability.TargetType == "SingleEnemy" or ability.TargetType == "MarkedEnemy":
 		if target == null:
-			result.error = "Não há inimigo na posição selecionada."
+			result.error = tr("Não há inimigo na posição selecionada.")
 			return result
 		if ability.TargetType == "MarkedEnemy" and target.mark_duration <= 0:
-			result.error = "Esta habilidade exige que o alvo esteja MARCADO."
+			result.error = tr("Esta habilidade exige que o alvo esteja MARCADO.")
 			return result
 	if target == null:
-		result.error = "Alvo inválido para esta habilidade."
+		result.error = tr("Alvo inválido para esta habilidade.")
 		return result
 	if ability.TargetType != "Self" and not can_reach(ability.TargetRanks, target):
-		result.error = "Alvo fora de alcance."
+		result.error = tr("Alvo fora de alcance.")
 		return result
 	if (ability.bOrganicOnly and is_machine(target)) or (ability.bRequiresMarkOrVuln and target.mark_duration <= 0 and target.tokens.vuln <= 0):
-		result.error = "Exige aliado orgânico ou inimigo Marcado/Vulnerável, conforme a habilidade."
+		result.error = tr("Exige aliado orgânico ou inimigo Marcado/Vulnerável, conforme a habilidade.")
 		return result
 
 	if ability.UsesMax > 0:
@@ -888,7 +904,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 				target = protector
 				if not protector.guard_for_turn:
 					protector.tokens.guard = maxi(0, protector.tokens.guard - 1)
-				_log("%s interceptou o golpe para proteger seu aliado!" % protector.display_name)
+				_log(tr("%s interceptou o golpe para proteger seu aliado!") % _n(protector))
 
 		if _misses_from_blind(attempt, target, events):
 			continue
@@ -897,8 +913,8 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 		if target.is_player != user.is_player and target.tokens.dodge > 0 and not ability.bTargetPair:
 			target.tokens.dodge -= 1
 			if random.next() < 0.5:
-				_add_event(events, "ESQUIVOU!", EventType.DODGE, target.id)
-				_log("%s esquivou do ataque de %s!" % [target.display_name, user.display_name])
+				_add_event(events, tr("ESQUIVOU!"), EventType.DODGE, target.id)
+				_log(tr("%s esquivou do ataque de %s!") % [_n(target), _n(user)])
 				continue
 
 		var researched: bool = context.researched_skills.has(ability_id)
@@ -909,8 +925,8 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			var rolled := _roll_range(ability.DamageRange.Min + bonus, ability.DamageRange.Max + bonus)
 			if random.next() < CRITICAL_CHANCE:
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)
-				_add_event(events, "CRÍTICO!", EventType.CRIT, target.id).critical_roll = true
-				_log("[CRÍTICO!] %s desferiu um ataque devastador!" % user.display_name)
+				_add_event(events, tr("CRÍTICO!"), EventType.CRIT, target.id).critical_roll = true
+				_log(tr("[CRÍTICO!] %s desferiu um ataque devastador!") % _n(user))
 			rolled = status_damage(rolled, attempt.weak)
 			if is_machine(target):
 				rolled = maxi(1, rolled * ability.MachineDamagePercent / 100)
@@ -926,7 +942,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			target = _find_unit(hit_id)
 			user = _find_unit(unit_id)
 			_add_event(events, "-%d" % rolled, EventType.DAMAGE, target.id, rolled)
-			_log("%s usou %s em %s causando %d de dano." % [user.display_name, ability_name, target.display_name, rolled])
+			_log(tr("%s usou %s em %s causando %d de dano.") % [_n(user), tr(ability_name), _n(target), rolled])
 
 		if has_heal:
 			var heal_bonus := 1 if researched else 0
@@ -934,77 +950,77 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			target.hp = mini(target.max_hp, target.hp + healed)
 			if target.deaths_door and target.hp > 0:
 				target.deaths_door = false
-				_log("%s recuperou o fôlego e saiu de perigo!" % target.display_name)
-			_add_event(events, "+%d Vida" % healed, EventType.HEAL, target.id, healed)
-			_log("%s tratou %s, restaurando %d de Vida." % [user.display_name, target.display_name, healed])
+				_log(tr("%s recuperou o fôlego e saiu de perigo!") % _n(target))
+			_add_event(events, tr("+%d Vida") % healed, EventType.HEAL, target.id, healed)
+			_log(tr("%s tratou %s, restaurando %d de Vida.") % [_n(user), _n(target), healed])
 
 		if ability.InstinctDelta != 0 and not is_machine(target):
 			_change_instinct(target, ability.InstinctDelta, ability_name)
-			var instinct_event := _add_event(events, "%d Instinto" % ability.InstinctDelta, EventType.INSTINCT, target.id)
+			var instinct_event := _add_event(events, tr("%d Instinto") % ability.InstinctDelta, EventType.INSTINCT, target.id)
 			if ability.InstinctDelta < 0:
 				instinct_event.outcome = Outcome.INSTINCT_REDUCED
-			_log("%s acalmou %s (%d Instinto)." % [user.display_name, target.display_name, ability.InstinctDelta])
+			_log(tr("%s acalmou %s (%d Instinto).") % [_n(user), _n(target), ability.InstinctDelta])
 
 		if target.is_standing() and inflicts.ArmorBreakTurns > 0:
 			target.armor_break_turns = maxi(target.armor_break_turns, inflicts.ArmorBreakTurns)
-			_add_event(events, "Armadura reduzida", EventType.INFO, target.id)
+			_add_event(events, tr("Armadura reduzida"), EventType.INFO, target.id)
 		if cleanses.bMark:
 			target.tokens.mark = 0
 			target.mark_duration = 0
 		_apply_control_effects(target, inflicts.bBlind, inflicts.bWeak, inflicts.Immobilize, events)
 		if inflicts.Stun > 0 and alive_any(target):
 			target.stun_turns = maxi(target.stun_turns, inflicts.Stun)
-			_add_event(events, "Atordoado · %d turnos" % target.stun_turns, EventType.INFO, target.id).outcome = Outcome.STUN_APPLIED
+			_add_event(events, tr("Atordoado · %d turnos") % target.stun_turns, EventType.INFO, target.id).outcome = Outcome.STUN_APPLIED
 		if _dot_set(inflicts.Bleed):
 			_apply_dot(target, true, inflicts.Bleed, events, false)
 		if _dot_set(inflicts.Blight):
 			_apply_dot(target, false, inflicts.Blight, events, false)
 		if inflicts.bVuln:
 			target.tokens.vuln = mini(TOKEN_CAP, target.tokens.vuln + 1)
-			_add_event(events, "Vulnerável!", EventType.INFO, target.id)
-			_log("%s ficou Vulnerável!" % target.display_name)
+			_add_event(events, tr("Vulnerável!"), EventType.INFO, target.id)
+			_log(tr("%s ficou Vulnerável!") % _n(target))
 		if inflicts.bMark:
 			target.mark_duration = 2
 			target.tokens.mark = 1
-			_add_event(events, "MARCADO!", EventType.INFO, target.id).outcome = Outcome.MARK_APPLIED
-			_log("%s foi MARCADO por 2 turnos!" % target.display_name)
+			_add_event(events, tr("MARCADO!"), EventType.INFO, target.id).outcome = Outcome.MARK_APPLIED
+			_log(tr("%s foi MARCADO por 2 turnos!") % _n(target))
 		if inflicts.bDodge:
 			target.tokens.dodge = mini(TOKEN_CAP, target.tokens.dodge + 1)
-			_add_event(events, "+1 esquiva", EventType.INFO, target.id).outcome = Outcome.DODGE_GRANTED
+			_add_event(events, tr("+1 esquiva"), EventType.INFO, target.id).outcome = Outcome.DODGE_GRANTED
 		if inflicts.Block > 0:
 			var recipient: Unit = target if ability.TargetType == "SingleOtherAlly" and not ability.bBlockToSelf else user
 			recipient.tokens.block = mini(TOKEN_CAP, recipient.tokens.block + inflicts.Block)
-			_add_event(events, "+%d Bloqueio" % inflicts.Block, EventType.BLOCK, recipient.id).outcome = Outcome.BLOCK_GRANTED
+			_add_event(events, tr("+%d Bloqueio") % inflicts.Block, EventType.BLOCK, recipient.id).outcome = Outcome.BLOCK_GRANTED
 		if inflicts.bGuard:
 			user.guard_target_rank = target.rank
 			user.guard_target_id = target.id
 			user.guard_for_turn = ability.bGuardForTurn
 			user.tokens.guard = 1
-			_add_event(events, "protegido por %s" % user.display_name, EventType.INFO, target.id).outcome = Outcome.GUARD_GRANTED
+			_add_event(events, tr("protegido por %s") % _n(user), EventType.INFO, target.id).outcome = Outcome.GUARD_GRANTED
 			if target.id != user.id:
 				_activate_perk(user, "loyal", events)
-			_log("%s está guardando %s!" % [user.display_name, target.display_name])
+			_log(tr("%s está guardando %s!") % [_n(user), _n(target)])
 
 		if cleanses.bBlind and target.blind:
 			target.blind = false
-			_add_event(events, "Interferência removida" if is_machine(target) else "Cegueira removida", EventType.INFO, target.id)
+			_add_event(events, tr("Interferência removida") if is_machine(target) else tr("Cegueira removida"), EventType.INFO, target.id)
 		if cleanses.bWeak and target.weak:
 			target.weak = false
-			_add_event(events, "Fraqueza removida", EventType.INFO, target.id)
+			_add_event(events, tr("Fraqueza removida"), EventType.INFO, target.id)
 		if cleanses.bImmobilize and target.immobilize_turns > 0:
 			target.immobilize_turns = 0
-			_add_event(events, "Imobilização removida", EventType.INFO, target.id)
+			_add_event(events, tr("Imobilização removida"), EventType.INFO, target.id)
 		if cleanses.bVuln and target.tokens.vuln > 0:
 			target.tokens.vuln = maxi(0, target.tokens.vuln - ability.CleanseVulnCharges) if ability.CleanseVulnCharges > 0 else 0
-			_add_event(events, "Vulnerável Removido", EventType.INFO, target.id).outcome = Outcome.VULNERABILITY_REMOVED
+			_add_event(events, tr("Vulnerável Removido"), EventType.INFO, target.id).outcome = Outcome.VULNERABILITY_REMOVED
 		if cleanses.bDot:
 			var removed_dot: bool = target.bleed.duration > 0 or target.blight.duration > 0
 			target.bleed.clear()
 			target.blight.clear()
-			var dot_event := _add_event(events, "Efeitos Periódicos Curados", EventType.HEAL, target.id)
+			var dot_event := _add_event(events, tr("Efeitos Periódicos Curados"), EventType.HEAL, target.id)
 			if removed_dot:
 				dot_event.outcome = Outcome.DOT_CLEANSED
-			_log("%s foi purificado de toxinas e feridas." % target.display_name)
+			_log(tr("%s foi purificado de toxinas e feridas.") % _n(target))
 		if ability.bConsumesMark and target.mark_duration != 0:
 			target.mark_duration = 0
 			target.tokens.mark = 0
@@ -1020,12 +1036,12 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 					var pushed_id: String = target.id
 					var occupant = _find(team, func(u): return u.id != pushed_id and occupies_rank(u, new_rank) and alive_any(u))
 					if occupant != null and unit_size(occupant) > 1:
-						_log("%s: deslocamento bloqueado por uma unidade grande." % target.display_name)
+						_log(tr("%s: deslocamento bloqueado por uma unidade grande.") % _n(target))
 					elif occupant != null:
 						occupant.rank = target.rank
 						target.rank = new_rank
 						_sort_team(team)
-						_log("%s foi empurrado para a posição %d!" % [target.display_name, new_rank])
+						_log(tr("%s foi empurrado para a posição %d!") % [_n(target), new_rank])
 
 	user = _find_unit(unit_id)
 	if hit_any_target and ability.AdvanceSelf != 0 and can_move_voluntarily(user):
@@ -1040,7 +1056,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 				destination.rank = user.rank
 			user.rank = new_rank
 			_sort_team(team)
-			_log("%s mudou para a posição %d." % [user.display_name, new_rank])
+			_log(tr("%s mudou para a posição %d.") % [_n(user), new_rank])
 
 	end_unit_turn(user, ability_id, ability.Cooldown)
 	result.success = true
@@ -1150,12 +1166,12 @@ func _execute_class_enemy_turn(enemy: Unit, events: Array) -> Array:
 		var swap_partner = choices.swap
 		var partner_id: String = swap_partner.id
 		execute_move(enemy_id, swap_partner.rank)
-		_add_event(events, "Troca de posição", EventType.INFO, enemy_id)
-		_add_event(events, "Troca de posição", EventType.INFO, partner_id)
+		_add_event(events, tr("Troca de posição"), EventType.INFO, enemy_id)
+		_add_event(events, tr("Troca de posição"), EventType.INFO, partner_id)
 		return events
 	if options.is_empty():
 		execute_defend(enemy_id)
-		_add_event(events, "+1 bloqueio", EventType.BLOCK, enemy_id)
+		_add_event(events, tr("+1 bloqueio"), EventType.BLOCK, enemy_id)
 		return events
 	var choice: Dictionary = options[0]
 	var chosen_ability: Dictionary = abilities[choice.index]
@@ -1353,25 +1369,25 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 	var definition = find_enemy(enemy.enemy_id)
 	var action_name: String = action.DisplayName
 	var plan_target_id: String = plan.target.id if plan.target != null else ""
-	_add_event(events, action_name, EventType.INFO, enemy_id, 0, action_short_id)
+	_add_event(events, tr(action_name), EventType.INFO, enemy_id, 0, action_short_id)
 
 	if action.TargetType == "Self" and action.HealRange.Max > 0:
 		var heal_roll: int = action.HealRange.Min + floori(random.next() * (action.HealRange.Max - action.HealRange.Min + 1))
 		var healed := mini(heal_roll, maxi(0, enemy.max_hp - enemy.hp))
 		enemy.hp += healed
 		_add_event(events, "+%d" % healed, EventType.HEAL, enemy_id, healed)
-		_log("%s usou %s e recuperou %d de vida." % [enemy.display_name, action_name, healed])
+		_log(tr("%s usou %s e recuperou %d de vida.") % [_n(enemy), tr(action_name), healed])
 		end_unit_turn(enemy)
 		return events
 	if action.bIsDefend:
 		enemy.tokens.block = mini(TOKEN_CAP, enemy.tokens.block + 1)
-		_add_event(events, "blindagem +1", EventType.INFO, enemy_id)
-		_log("%s assumiu Postura Blindada (+1 Bloqueio)." % enemy.display_name)
+		_add_event(events, tr("blindagem +1"), EventType.INFO, enemy_id)
+		_log(tr("%s assumiu Postura Blindada (+1 Bloqueio).") % _n(enemy))
 		end_unit_turn(enemy)
 		return events
 	if action.Advances > 0:
 		execute_move(enemy_id, maxi(1, enemy.rank - action.Advances))
-		_add_event(events, "Troca de posição", EventType.INFO, enemy_id)
+		_add_event(events, tr("Troca de posição"), EventType.INFO, enemy_id)
 		return events
 	if action.Retreats > 0:
 		execute_move(enemy_id, mini(4, enemy.rank + action.Retreats))
@@ -1394,7 +1410,7 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 		targets.resize(mini(2, targets.size()))
 		for target in targets:
 			target_ids.append(target.id)
-		_log("%s ativou %s, emitindo ruídos ensurdecedores do Eco!" % [enemy.display_name, action_name])
+		_log(tr("%s ativou %s, emitindo ruídos ensurdecedores do Eco!") % [_n(enemy), tr(action_name)])
 	else:
 		target_ids.append(legal_targets[0].id if plan_target_id == "" else plan_target_id)
 	# Uma vez por ação, nunca por alvo. Os ids sobrevivem a mortes e trocas forçadas.
@@ -1411,7 +1427,7 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 			chosen = protector
 			if not protector.guard_for_turn:
 				protector.tokens.guard = maxi(0, protector.tokens.guard - 1)
-			_log("%s interceptou o golpe para salvar o companheiro!" % protector.display_name)
+			_log(tr("%s interceptou o golpe para salvar o companheiro!") % _n(protector))
 		_remember_enemy_target(chosen.id)
 
 		if _misses_from_blind(attempt, chosen, events):
@@ -1419,23 +1435,23 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 		if (not multi or action.DamageRange.Max > 0) and chosen.tokens.dodge > 0:
 			chosen.tokens.dodge -= 1
 			if random.next() < 0.5:
-				_add_event(events, "ESQUIVOU!", EventType.DODGE, chosen.id)
-				_log("%s esquivou com agilidade do ataque de %s!" % [chosen.display_name, enemy.display_name])
+				_add_event(events, tr("ESQUIVOU!"), EventType.DODGE, chosen.id)
+				_log(tr("%s esquivou com agilidade do ataque de %s!") % [_n(chosen), _n(enemy)])
 				continue
 
 		if action.DamageRange.Max > 0:
 			var rolled := _roll_range(action.DamageRange.Min + enemy.damage_bonus, action.DamageRange.Max + enemy.damage_bonus)
 			if random.next() < CRITICAL_CHANCE:
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)
-				_add_event(events, "CRÍTICO INIMIGO!", EventType.CRIT, chosen.id).critical_roll = true
-				_log("[CRÍTICO!] %s desferiu um golpe brutal em %s!" % [enemy.display_name, chosen.display_name])
-				_change_instinct(chosen, 12, "Pressão de combate")
+				_add_event(events, tr("CRÍTICO INIMIGO!"), EventType.CRIT, chosen.id).critical_roll = true
+				_log(tr("[CRÍTICO!] %s desferiu um golpe brutal em %s!") % [_n(enemy), _n(chosen)])
+				_change_instinct(chosen, 12, tr("Pressão de combate"))
 				# Rivalidade (-3): o rival estremece ao ver a falha.
 				if chosen.hero_id != "":
 					for other in state.player_team:
 						if other.hero_id != "" and other.hero_id != chosen.hero_id and context.relationships.get(relationship_key(chosen.hero_id, other.hero_id), 0) <= -3:
-							_change_instinct(other, 5, "Pressão de combate")
-							_log("[RIVALIDADE] %s estremeceu ao ver a falha do rival (+5 Instinto)." % other.display_name)
+							_change_instinct(other, 5, tr("Pressão de combate"))
+							_log(tr("[RIVALIDADE] %s estremeceu ao ver a falha do rival (+5 Instinto).") % _n(other))
 							_apply_instinct_crisis(other, events)
 			rolled = status_damage(rolled, attempt.weak)
 			var hit_id := chosen.id
@@ -1445,25 +1461,25 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 			if definition.Category == "Machine" and alive_any(chosen):
 				_activate_perk(chosen, "machine-fear", events)
 			_apply_instinct_crisis(chosen, events)
-			_log("%s atacou %s causando %d de dano." % [enemy.display_name, chosen.display_name, rolled])
+			_log(tr("%s atacou %s causando %d de dano.") % [_n(enemy), _n(chosen), rolled])
 
 		if action.InstinctAdd != 0:
-			_change_instinct(chosen, action.InstinctAdd, "Pressão de combate")
-			_add_event(events, "+%d Instinto" % action.InstinctAdd, EventType.INSTINCT, chosen.id)
-			_log("%s desferiu terror psicológico em %s (+%d Instinto)." % [enemy.display_name, chosen.display_name, action.InstinctAdd])
+			_change_instinct(chosen, action.InstinctAdd, tr("Pressão de combate"))
+			_add_event(events, tr("+%d Instinto") % action.InstinctAdd, EventType.INSTINCT, chosen.id)
+			_log(tr("%s desferiu terror psicológico em %s (+%d Instinto).") % [_n(enemy), _n(chosen), action.InstinctAdd])
 			_apply_instinct_crisis(chosen, events)
 
 		_apply_control_effects(chosen, inflicts.bBlind, inflicts.bWeak, inflicts.Immobilize, events)
 		if inflicts.Stun > 0 and alive_any(chosen):
 			chosen.stun_turns = maxi(chosen.stun_turns, inflicts.Stun)
-			_add_event(events, "Atordoado · %d turnos" % chosen.stun_turns, EventType.INFO, chosen.id)
+			_add_event(events, tr("Atordoado · %d turnos") % chosen.stun_turns, EventType.INFO, chosen.id)
 		if _dot_set(inflicts.Bleed):
 			_apply_dot(chosen, true, inflicts.Bleed, events, true)
 		if _dot_set(inflicts.Blight):
 			_apply_dot(chosen, false, inflicts.Blight, events, true)
 		if inflicts.bVuln:
 			chosen.tokens.vuln = mini(TOKEN_CAP, chosen.tokens.vuln + 1)
-			_add_event(events, "Vulnerável!", EventType.INFO, chosen.id)
+			_add_event(events, tr("Vulnerável!"), EventType.INFO, chosen.id)
 		if inflicts.Push > 0 and alive_any(chosen):
 			if not (random.next() < 0.2):
 				var new_rank := mini(4, chosen.rank + inflicts.Push)
@@ -1474,7 +1490,7 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 						occupant.rank = chosen.rank
 						chosen.rank = new_rank
 						_sort_team(state.player_team)
-						_log("%s foi arremessado para trás!" % chosen.display_name)
+						_log(tr("%s foi arremessado para trás!") % _n(chosen))
 
 	end_unit_turn(_find_unit(enemy_id))
 	return events

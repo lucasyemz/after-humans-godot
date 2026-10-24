@@ -178,8 +178,8 @@ func _ready() -> void:
 	_finish_button.visible = false
 	_finish_button.pressed.connect(func(): menu_return.emit())
 	add_child(_finish_button)
-	_menu_button = _corner_button(tr("Menu"), "menu", Vector2(1716, 974), func(): menu_requested.emit())
-	_corner_button(tr("Mochila"), "inventory", Vector2(1524, 974), func(): inventory_requested.emit())
+	_menu_button = _corner_button(tr("Menu"), "menu", Vector2(1696, 974), func(): menu_requested.emit())
+	_corner_button(tr("Mochila"), "inventory", Vector2(1484, 974), func(): inventory_requested.emit())
 
 	# O aviso também é botão: tocar ou clicar nele usa o que está perto.
 	_prompt = PanelContainer.new()
@@ -207,16 +207,20 @@ func _ready() -> void:
 	add_child(_toast)
 
 
+const CORNER_WIDTH := 200.0
+
+
 func _corner_button(text: String, key_action: String, at: Vector2, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.position = at
-	button.custom_minimum_size = Vector2(180, 46)
+	# Largura para o nome em inglês no texto Maior ("Backpack" encostava na tecla, #35).
+	button.custom_minimum_size = Vector2(CORNER_WIDTH, 46)
 	H.style_button(button)
 	button.focus_mode = Control.FOCUS_NONE
 	var cap := S.action_cap(key_action)
-	cap.position = Vector2(180 - 16 - (24 if S.key_name(key_action).length() == 1 else 44), 9)
+	cap.position = Vector2(CORNER_WIDTH - 16 - (24 if S.key_name(key_action).length() == 1 else 44), 9)
 	button.add_child(cap)
 	button.pressed.connect(action)
 	add_child(button)
@@ -254,7 +258,7 @@ func _refresh_place() -> void:
 	var parts := PackedStringArray()
 	if expedition != null:
 		var info := AHJourneyRules.phase(expedition.phase_id)
-		parts.append(tr("Jornada %d · %s") % [AHJourneyRules.PHASES.find(info) + 1, info.get("name", "")])
+		parts.append(tr("Jornada %d · %s") % [AHJourneyRules.PHASES.find(info) + 1, tr(info.get("name", ""))])
 	if _weather != "":
 		parts.append(_weather)
 	_place_sub.text = " · ".join(parts)
@@ -330,7 +334,7 @@ func refresh(campaign: Dictionary) -> void:
 	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(current.type, ""))]
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
-		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + AHJourneyRules.SHOP_NAMES[site.shop])
+		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + tr(AHJourneyRules.SHOP_NAMES[site.shop]))
 	_route_title.text = title
 	_route_panel.size = _route_panel.get_combined_minimum_size()
 	_route_panel.position = Vector2(960 - _route_panel.size.x * 0.5, 16)
@@ -557,11 +561,12 @@ func _process(delta: float) -> void:
 	if show_patrol:
 		_patrol.size = _patrol.get_combined_minimum_size()
 		_patrol.position = Vector2(1920 - _patrol.size.x, 470)
-	# A dica das teclas some depois de um tempo andando (volta numa jornada nova).
+	# A dica das teclas é da primeira jornada (#56): some depois de um tempo andando e não volta depois da primeira volta à
+	# Estação.
 	if Input.get_vector("move_left", "move_right", "move_back", "move_front").length() > 0.1:
 		_hint_time += delta
 	_hint.modulate.a = clampf(1.0 - (_hint_time - 12.0) / 2.0, 0.0, 1.0)
-	_hint.visible = not Settings.touch_visible()
+	_hint.visible = not Settings.touch_visible() and first_journey()
 	var party_end := _party_box.position.x + _party_box.get_combined_minimum_size().x
 	_hint.position = Vector2(party_end + 28, 1036)
 
@@ -647,7 +652,7 @@ func show_event(campaign: Dictionary) -> void:
 	box.add_child(title)
 	# O que se vasculhou (#7): o evento vem do objeto.
 	if String(event.get("object", "")) != "":
-		box.add_child(H.make_label(tr("Ao vasculhar: %s") % String(event.object), 17, H.MUTED))
+		box.add_child(H.make_label(tr("Ao vasculhar: %s") % tr(String(event.object)), 17, H.MUTED))
 	var text := H.make_label(tr(event.resolution) if event.resolution != "" else tr(row.get("Description", "")), 20, H.TEXT)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(780, 0)
@@ -772,6 +777,11 @@ func show_choice(title: String, text: String, options: Array) -> void:
 			first = button
 			button.add_theme_color_override("font_color", S.GOLD)
 	first.grab_focus.call_deferred()
+
+
+## A primeira jornada da campanha: nenhuma volta à Estação ainda (o ciclo conta as voltas).
+static func first_journey() -> bool:
+	return int(Campaign.state.get("station", {}).get("cycle_number", 0)) == 0
 
 
 ## As opções por cima da exploração (som, gráficos, jogo, controles); Fechar ou Esc fecha.

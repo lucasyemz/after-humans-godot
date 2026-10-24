@@ -849,7 +849,7 @@ func _apply_weather() -> void:
 	var readable := (1.0 if _mood == "night" else 0.0) + (0.3 if _raining else 0.0)
 	_key_light.light_energy = 0.7 * clampf(readable, 0.0, 1.2)
 	_fill_light.light_energy = COMBAT_FILL + COMBAT_FILL_NIGHT * clampf(readable, 0.0, 1.2)
-	_hud_weather.text = ("Noite" if _mood == "night" else "Fim de tarde") + (" · chuva" if _raining else "")
+	_hud_weather.text = (tr("Noite") if _mood == "night" else tr("Fim de tarde")) + (tr(" · chuva") if _raining else "")
 	if exploration_hud:
 		exploration_hud.set_weather(_hud_weather.text)
 	_update_sun(0.0)

@@ -915,7 +915,7 @@ func _station_plan(c: Dictionary) -> void:
 			next.custom_minimum_size = Vector2(600, 0)
 			column.add_child(next)
 		var go := Button.new()
-		go.text = tr("Ver %s") % room_def.name
+		go.text = tr("Ver %s") % tr(room_def.name)
 		go.custom_minimum_size = Vector2(0, 38)
 		H.style_button(go)
 		go.pressed.connect(func(): open_room(id))
@@ -981,14 +981,14 @@ func _room(room_id: String) -> void:
 	var c: Dictionary = Campaign.state
 	var level := S.room_level(c, room_id)
 	var room_def := S.room_def(room_id)
-	_heading(room_def.name, (tr("Nível %d") % level) if level >= 1 else tr("Vazio"))
+	_heading(tr(room_def.name), (tr("Nível %d") % level) if level >= 1 else tr("Vazio"))
 	_text(S.room_benefit(room_id, level))
 	var cost := S.next_level_cost(c, room_id)
 	if not cost.is_empty():
 		var block := S.upgrade_block(c, room_id)
 		var verb := tr("Recuperar") if level == 0 else tr("Melhorar")
 		_button(tr("%s (%s)%s") % [verb, S.cost_text(cost), "" if block == "" else " · " + block],
-			func(): _act(S.upgrade_room(Campaign.state, room_id, level), tr("%s: nível %d.") % [room_def.name, level + 1]), block == "")
+			func(): _act(S.upgrade_room(Campaign.state, room_id, level), tr("%s: nível %d.") % [tr(room_def.name), level + 1]), block == "")
 	for civilian_id in c.station.residents:
 		var who := S.civilian(civilian_id)
 		if who.room == room_id:
@@ -1013,12 +1013,12 @@ func _room(room_id: String) -> void:
 
 
 func _civilian_card(c: Dictionary, who: Dictionary) -> void:
-	_section(tr("%s · %s (%s)") % [who.name, who.role, who.species])
+	_section(tr("%s · %s (%s)") % [who.name, tr(who.role), tr(who.species)])
 	var working := S.civilian_working(c, who.id)
-	_text((tr("Ponto forte: %s") % who.benefit) if working else tr("Sem comida ou água no último ciclo: o ponto forte está parado até a próxima volta."),
+	_text((tr("Ponto forte: %s") % tr(who.benefit)) if working else tr("Sem comida ou água no último ciclo: o ponto forte está parado até a próxima volta."),
 		18, H.TEXT if working else Color(1.0, 0.6, 0.5))
-	_text(tr("Ponto fraco: %s") % who.drawback, 18, H.MUTED)
-	_text((tr("Pedido entregue: %s.") % who.request_reward) if S.has_completed_request(c, who.id) else (tr("Pedido: %s") % who.need), 18, H.MUTED)
+	_text(tr("Ponto fraco: %s") % tr(who.drawback), 18, H.MUTED)
+	_text((tr("Pedido entregue: %s.") % tr(who.request_reward)) if S.has_completed_request(c, who.id) else (tr("Pedido: %s") % tr(who.need)), 18, H.MUTED)
 
 
 # ---------------------------------------------------------------- Sala dos Personagens
@@ -1052,7 +1052,7 @@ func _characters(c: Dictionary) -> void:
 	if not c.memorial.is_empty():
 		_section(tr("Memorial"))
 		for entry in c.memorial:
-			_text("%s · %s · %s" % [entry.display_name, entry.get("mission_name", ""), entry.get("cause", "")], 17, H.MUTED)
+			_text("%s · %s · %s" % [entry.display_name, tr(entry.get("mission_name", "")), AHCombatEngine.cause_text(entry.get("cause", ""))], 17, H.MUTED)
 
 
 func _cycle_relic(hero_id: String) -> void:
@@ -1118,7 +1118,7 @@ func _preparation(c: Dictionary) -> void:
 	if not S.phase_unlocked(c, _draft.phase):
 		_reset_draft()
 		mission = J.phase(_draft.phase)
-	_text(tr("%s · nível %d · %s") % [mission.name, mission.level, J.DIFFICULTY_NAMES[mission.difficulty]], 20, H.GOLD)
+	_text(tr("%s · nível %d · %s") % [tr(mission.name), mission.level, tr(J.DIFFICULTY_NAMES[mission.difficulty])], 20, H.GOLD)
 	_button(tr("Escolher no mapa"), func(): _map.open(_draft.phase))
 	_section(tr("Equipe (da frente para trás)"))
 	for rank in 4:
@@ -1302,7 +1302,7 @@ func _prep_drawer(c: Dictionary) -> void:
 	var place := AHScenarioWorld.display_of(mission.transit) + tr(" e ") + AHScenarioWorld.display_of(mission.map) if mission.transit != "" else AHScenarioWorld.display_of(mission.map)
 	var mission_box := _side_box(side, tr("MISSÃO"))
 	mission_box.add_child(U.label(mission.name, 24, U.TEXT, "bold"))
-	mission_box.add_child(U.label(tr("Fase %d · %s · nível %d+ · %s") % [J.PHASES.map(func(p): return p.id).find(mission.id) + 1, J.DIFFICULTY_NAMES[mission.difficulty], mission.level, place], 16, U.MUTED))
+	mission_box.add_child(U.label(tr("Fase %d · %s · nível %d+ · %s") % [J.PHASES.map(func(p): return p.id).find(mission.id) + 1, tr(J.DIFFICULTY_NAMES[mission.difficulty]), mission.level, place], 16, U.MUTED))
 	var map_button := Button.new()
 	map_button.text = tr("Escolher no mapa")
 	map_button.custom_minimum_size = Vector2(0, 34)
@@ -1346,7 +1346,7 @@ func _prep_drawer(c: Dictionary) -> void:
 		_draft.extra < J.MAX_FOOD - J.FREE_FOOD and (_draft.extra + 1) * S.FOOD_COST <= S.quantity(c, "seeds"), food_row)
 	food_box.add_child(U.label(tr("%d sementes · cura na Mochila e no acampamento") % (_draft.extra * S.FOOD_COST), 15, U.MUTED))
 	var go := Button.new()
-	go.text = tr("Partir · %s") % mission.name
+	go.text = tr("Partir · %s") % tr(mission.name)
 	go.custom_minimum_size = Vector2(0, 56)
 	H.style_button(go, U.GOLD)
 	var gold := StyleBoxFlat.new()
@@ -1815,7 +1815,7 @@ func _report() -> void:
 	var phase := J.phase(report.get("phase_id", ""))
 	var won: bool = report.result == "victory"
 	_body.add_child(U.label(tr(RESULT_NAMES.get(report.result, report.result)), 44, U.GOLD if won else (U.MUTED if report.result == "retreat" else U.DANGER), "display"))
-	_text("%s · %s" % [phase.get("name", ""), tr("fase concluída") if won else (tr("a equipe voltou antes do guardião") if report.result == "retreat" else tr("a equipe caiu"))], 18, U.MUTED)
+	_text("%s · %s" % [tr(phase.get("name", "")), tr("fase concluída") if won else (tr("a equipe voltou antes do guardião") if report.result == "retreat" else tr("a equipe caiu"))], 18, U.MUTED)
 	# O que chegou, item a item (cada linha entra um pouco depois da outra).
 	var percent := int(report.get("percent", 0))
 	_section(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent))
@@ -1827,7 +1827,7 @@ func _report() -> void:
 			items.append([spec[0], "+%d %s" % [amount, spec[2] if amount == 1 else spec[3]]])
 	if report.get("request", "") != "":
 		var who := S.civilian(report.request)
-		items.append(["item-generic", tr("%s recebeu %s: %s") % [who.name, who.request_item, who.request_reward]])
+		items.append(["item-generic", tr("%s recebeu %s: %s") % [who.name, tr(who.request_item), tr(who.request_reward)]])
 	if items.is_empty():
 		_text(tr("Nada chegou desta vez."), 18, U.MUTED)
 	for i in items.size():
@@ -1858,7 +1858,7 @@ func _report() -> void:
 		for room_id in unlocks:
 			var id: String = room_id
 			var level := S.room_level(c, id)
-			_button(tr("%s %s%s (%s)") % [tr("Recuperar") if level == 0 else tr("Melhorar"), S.ROOM_ARTICLE.get(id, ""), S.room_def(id).name, S.cost_text(S.next_level_cost(c, id))],
+			_button(tr("%s %s%s (%s)") % [tr("Recuperar") if level == 0 else tr("Melhorar"), tr(S.ROOM_ARTICLE.get(id, "")), tr(S.room_def(id).name), S.cost_text(S.next_level_cost(c, id))],
 				func(): _enter_shelter_then(func(): open_room(id)))
 	# A equipe: quem fez o quê; o destaque ganha a estrela.
 	_section(tr("A equipe"))
@@ -1937,10 +1937,10 @@ func _train() -> void:
 		return
 	var who := S.civilian(train.candidate_id)
 	_heading(tr("O trem chegou"), tr("%s quer morar na Estação") % who.name)
-	_text(tr("%s · %s (%s). %s") % [who.name, who.role, who.species, who.trait])
-	_text(tr("Ponto forte: %s") % who.benefit)
-	_text(tr("Ponto fraco: %s") % who.drawback, 19, H.MUTED)
-	_text(tr("Pedido: %s") % who.need, 18, H.MUTED)
+	_text(tr("%s · %s (%s). %s") % [who.name, tr(who.role), tr(who.species), tr(who.trait)])
+	_text(tr("Ponto forte: %s") % tr(who.benefit))
+	_text(tr("Ponto fraco: %s") % tr(who.drawback), 19, H.MUTED)
+	_text(tr("Pedido: %s") % tr(who.need), 18, H.MUTED)
 	var before := S.forecast(c, 4)
 	var after := S.forecast_with(c, who.id, 4)
 	_section(tr("Na próxima volta"))

@@ -37,7 +37,7 @@ var touch_controls := 0
 ## por exemplo) e os botões do controle continuam.
 var keys := {}
 const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run", "interact", "inventory", "cancel", "menu",
-	"combat_ability_1", "combat_ability_2", "combat_ability_3", "combat_ability_4", "combat_move", "combat_defend", "combat_flee", "hide_hud"]
+	"combat_ability_1", "combat_ability_2", "combat_ability_3", "combat_ability_4", "combat_move", "combat_defend", "combat_flee", "combat_log", "hide_hud"]
 
 
 ## O idioma das telas (#35): o português é o padrão e o inglês está em teste (data/i18n/en.po; o que falta traduzir

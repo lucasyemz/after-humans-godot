@@ -375,7 +375,7 @@ func _run() -> void:
 			var actor := session.current_actor()
 			var beat: Dictionary
 			if auto_battle:
-				hud.show_waiting("%s age" % actor.display_name)
+				hud.show_waiting(tr("%s age") % actor.display_name)
 				await _wait(0.25)
 				var auto := session.engine.play_auto_turn(actor.id)
 				session._count(actor.id, auto.events)
@@ -400,7 +400,7 @@ func _run() -> void:
 			await _play_beat(beat)
 		else:
 			var enemy := session.current_actor()
-			hud.show_waiting("Vez de %s" % (enemy.display_name if enemy else "inimigo"))
+			hud.show_waiting(tr("Vez de %s") % (AHCombatHud.unit_name(enemy.display_name) if enemy else tr("inimigo")))
 			await _wait(0.45)
 			await _play_beat(session.enemy_turn())
 	hud.refresh()
@@ -448,11 +448,11 @@ func _play_beat(beat: Dictionary) -> void:
 			if card:
 				if actor and not actor.is_player:
 					show_pose(actor, "defense")
-				_float_text(card, "+1 Bloqueio", Color(0.55, 0.75, 1.0))
+				_float_text(card, tr("+1 Bloqueio"), Color(0.55, 0.75, 1.0))
 				await _wait(0.6)
 		"flee":
 			if card:
-				_float_text(card, "Fuga!" if beat.get("escaped", false) else "Fuga falhou", Color(1, 0.9, 0.6))
+				_float_text(card, tr("Fuga!") if beat.get("escaped", false) else tr("Fuga falhou"), Color(1, 0.9, 0.6))
 				await _wait(0.7)
 		"item":
 			# A pose de usar item (ItemUse) enquanto a cura aparece.

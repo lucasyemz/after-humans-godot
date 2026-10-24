@@ -33,8 +33,12 @@ var slot := 1
 var state := {}
 ## De onde veio o estado atual: "new", "primary" ou "backup".
 var source := "new"
-## Aviso para mostrar ao jogador (cópia recuperada, save inválido).
+## Aviso para mostrar ao jogador (cópia recuperada, save inválido), no idioma de quando o save abriu.
 var load_warning := ""
+## O aviso guardado como tipo ("backup", "slot", "none") e espaço: warning_text() o traduz na hora de mostrar (#35),
+## porque o save abre antes de as Opções ligarem o idioma.
+var _warning_kind := ""
+var _warning_slot := 0
 
 
 ## O tempo jogado ainda não somado ao estado (segundos de relógio, sem a escala de tempo).
@@ -191,6 +195,7 @@ func new_game(seed_value: int = -1) -> bool:
 	state = create_initial(seed_value)
 	source = "new"
 	load_warning = ""
+	_warning_kind = ""
 	# O tempo jogado desde o último save é da campanha de antes, não da nova.
 	_play_seconds = 0.0
 	changed.emit()
@@ -392,9 +397,22 @@ static func _normalize(value):
 	return value
 
 
+## O aviso do último load no idioma atual ("" sem aviso).
+func warning_text() -> String:
+	match _warning_kind:
+		"backup":
+			return tr("O último salvamento não pôde ser aberto. Recuperamos uma cópia de segurança. Ações recentes podem não estar nela.")
+		"slot":
+			return tr("O save do espaço %d não pôde ser aberto (o arquivo foi preservado). As outras campanhas estão em Campanhas.") % _warning_slot
+		"none":
+			return tr("Nenhum salvamento válido foi encontrado. Os dados anteriores foram preservados; um novo jogo só será salvo ao começar.")
+	return ""
+
+
 ## Abre o principal; se não der, a cópia (com aviso); se nenhum servir, uma campanha nova sem gravar.
 func load_or_new() -> String:
 	load_warning = ""
+	_warning_kind = ""
 	var campaign = read_file(primary_path())
 	if campaign != null:
 		source = "primary"
@@ -402,16 +420,20 @@ func load_or_new() -> String:
 		campaign = read_file(backup_path())
 		if campaign != null:
 			source = "backup"
-			load_warning = "O último salvamento não pôde ser aberto. Recuperamos uma cópia de segurança. Ações recentes podem não estar nela."
+			_warning_kind = "backup"
+			load_warning = warning_text()
 	if campaign == null:
 		campaign = create_initial()
 		source = "new"
 		var other := range(1, SLOT_COUNT + 1).filter(func(n): return n != slot and slot_summary(n).status == "ok")
 		if has_save() and not other.is_empty():
 			# Só este espaço falhou: o aviso diz qual e onde estão as outras campanhas.
-			load_warning = "O save do espaço %d não pôde ser aberto (o arquivo foi preservado). As outras campanhas estão em Campanhas." % slot
+			_warning_kind = "slot"
+			_warning_slot = slot
+			load_warning = warning_text()
 		elif has_save():
-			load_warning = "Nenhum salvamento válido foi encontrado. Os dados anteriores foram preservados; um novo jogo só será salvo ao começar."
+			_warning_kind = "none"
+			load_warning = warning_text()
 	# Saves anteriores às vagas não têm o tempo jogado (#34): começa em 0.
 	if not campaign.has("played_seconds"):
 		campaign.played_seconds = 0
