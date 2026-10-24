@@ -127,8 +127,9 @@ static func event_pool(place: String, kind: String) -> Array:
 	return pool
 
 
+## A loja com o artigo, para a tela ("a mercearia"), no idioma do jogo (#35).
 static func shop_the(shop: int) -> String:
-	return ("o " if shop == 2 else "a ") + SHOP_NAMES[clampi(shop, 0, 2)]
+	return (TranslationServer.translate("o ") if shop == 2 else TranslationServer.translate("a ")) + TranslationServer.translate(SHOP_NAMES[clampi(shop, 0, 2)])
 
 
 # ---------------------------------------------------------------- partida e corredor
@@ -683,7 +684,7 @@ static func search_spot(campaign: Dictionary, site_index: int, spot_index: int) 
 	if fixed != null and site.shop == 1 and spot_index == 0 and not has_tool(campaign, CROWBAR):
 		var drop := _rand(route.seed ^ _mul(site.door + 1, 0x9e3779b9))
 		if drop.next() < CROWBAR_DROP_CHANCE and grant_tool(campaign, CROWBAR):
-			text += " Embaixo da bancada, um pé de cabra. (Ferramenta: Pé de cabra)"
+			text += TranslationServer.translate(" Embaixo da bancada, um pé de cabra. (Ferramenta: Pé de cabra)")
 	text += AHStationRules.on_search(campaign, site_index, spot_index)
 	return {"ok": true, "text": text, "event": ""}
 
@@ -698,7 +699,7 @@ static func apply_search_outcome(campaign: Dictionary, random: AHCombatRandom, f
 		if pool.is_empty():
 			adjust(campaign, "food", 1)
 			adjust(campaign, "seeds", 1)
-			return "Suprimentos recolhidos · +1 alimento e +1 semente"
+			return TranslationServer.translate("Suprimentos recolhidos · +1 alimento e +1 semente")
 		outcome = pool[mini(pool.size() - 1, floori(random.next() * pool.size()))]
 	adjust(campaign, "food", int(outcome.get("FoodDelta", 0)))
 	adjust(campaign, "bandages", int(outcome.get("BandagesDelta", 0)))
@@ -714,7 +715,7 @@ static func apply_search_outcome(campaign: Dictionary, random: AHCombatRandom, f
 		grant_tool(campaign, String(outcome.get("GrantTool", "")))
 		if int(outcome.get("Damage", 0)) > 0:
 			hero.hp = maxi(1, hero.hp - int(outcome.Damage))
-	return String(outcome.get("Text", "")).replace("{Heroi}", hero_name)
+	return TranslationServer.translate(String(outcome.get("Text", ""))).replace("{Heroi}", hero_name)
 
 
 ## Vasculhar o objeto de um trecho de suprimentos (uma vez por fase): sorteio da tabela.

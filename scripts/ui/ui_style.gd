@@ -465,17 +465,17 @@ static func face_texture(art: Dictionary) -> Texture2D:
 static func statuses(unit: AHCombat.Unit) -> Array:
 	var out: Array = []
 	var t := unit.tokens
-	if t.block > 0: out.append(["Bloqueio %d" % t.block, true, "block", t.block, "Bloqueio"])
-	if t.dodge > 0: out.append(["Esquiva %d" % t.dodge, true, "dodge", t.dodge, "Esquiva"])
-	if t.guard > 0: out.append(["Guarda", true, "protection", 0, "Guarda"])
-	if t.vuln > 0: out.append(["Vulnerável %d" % t.vuln, false, "vulnerable", t.vuln, "Vulnerável"])
-	if unit.mark_duration > 0: out.append(["Marcado", false, "marked", unit.mark_duration, "Marcado"])
-	if unit.stun_turns > 0: out.append(["Atordoado", false, "stunned", unit.stun_turns, "Atordoado"])
-	if unit.bleed.duration > 0: out.append(["Sangra %d" % unit.bleed.magnitude, false, "bleeding", unit.bleed.duration, "Sangra"])
-	if unit.blight.duration > 0: out.append(["Contaminado %d" % unit.blight.magnitude, false, "poison", unit.blight.duration, "Contaminado"])
-	if unit.blind: out.append(["Cego", false, "", 0, "Cego"])
-	if unit.weak: out.append(["Fraco", false, "", 0, "Fraco"])
-	if unit.immobilize_turns > 0: out.append(["Imobilizado", false, "", unit.immobilize_turns, "Imobilizado"])
+	if t.block > 0: out.append([TranslationServer.translate("Bloqueio %d") % t.block, true, "block", t.block, "Bloqueio"])
+	if t.dodge > 0: out.append([TranslationServer.translate("Esquiva %d") % t.dodge, true, "dodge", t.dodge, "Esquiva"])
+	if t.guard > 0: out.append([TranslationServer.translate("Guarda"), true, "protection", 0, "Guarda"])
+	if t.vuln > 0: out.append([TranslationServer.translate("Vulnerável %d") % t.vuln, false, "vulnerable", t.vuln, "Vulnerável"])
+	if unit.mark_duration > 0: out.append([TranslationServer.translate("Marcado"), false, "marked", unit.mark_duration, "Marcado"])
+	if unit.stun_turns > 0: out.append([TranslationServer.translate("Atordoado"), false, "stunned", unit.stun_turns, "Atordoado"])
+	if unit.bleed.duration > 0: out.append([TranslationServer.translate("Sangra %d") % unit.bleed.magnitude, false, "bleeding", unit.bleed.duration, "Sangra"])
+	if unit.blight.duration > 0: out.append([TranslationServer.translate("Contaminado %d") % unit.blight.magnitude, false, "poison", unit.blight.duration, "Contaminado"])
+	if unit.blind: out.append([TranslationServer.translate("Cego"), false, "", 0, "Cego"])
+	if unit.weak: out.append([TranslationServer.translate("Fraco"), false, "", 0, "Fraco"])
+	if unit.immobilize_turns > 0: out.append([TranslationServer.translate("Imobilizado"), false, "", unit.immobilize_turns, "Imobilizado"])
 	return out
 
 
@@ -487,13 +487,13 @@ static func status_tip(entry: Array) -> String:
 	var what := ""
 	match term:
 		"Sangra", "Contaminado":
-			what = "%s por vez · %d %s" % [text.get_slice(" ", 1), count, "vez" if count == 1 else "vezes"]
+			what = TranslationServer.translate("%s por vez · %d %s") % [text.get_slice(" ", text.get_slice_count(" ") - 1), count, TranslationServer.translate("vez") if count == 1 else TranslationServer.translate("vezes")]
 		"Bloqueio", "Esquiva", "Vulnerável":
-			what = "%d %s" % [count, "ficha" if count == 1 else "fichas"]
+			what = TranslationServer.translate("%d %s") % [count, TranslationServer.translate("ficha") if count == 1 else TranslationServer.translate("fichas")]
 		_:
 			if count > 0:
-				what = "%d %s" % [count, "vez" if count == 1 else "vezes"]
-	return "%s%s: %s" % [term, (" (%s)" % what) if what != "" else "", GLOSSARY.get(term, "")]
+				what = TranslationServer.translate("%d %s") % [count, TranslationServer.translate("vez") if count == 1 else TranslationServer.translate("vezes")]
+	return "%s%s: %s" % [TranslationServer.translate(term), (" (%s)" % what) if what != "" else "", TranslationServer.translate(GLOSSARY.get(term, ""))]
 
 
 ## O ícone do estado ou da intenção (os SVG brancos da entrega #18), para tingir com a cor do bom e do ruim.

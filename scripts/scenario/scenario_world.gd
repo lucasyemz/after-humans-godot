@@ -47,8 +47,9 @@ const SITES := {
 }
 
 
+## O nome do mapa na tela, já no idioma do jogo (#35).
 static func display_of(map: String) -> String:
-	return DISPLAY.get(map, "Rua das Vitrines")
+	return TranslationServer.translate(DISPLAY.get(map, "Rua das Vitrines"))
 
 
 static func exists(map: String) -> bool:

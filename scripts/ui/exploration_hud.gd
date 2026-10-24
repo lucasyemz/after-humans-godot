@@ -330,7 +330,7 @@ func refresh(campaign: Dictionary) -> void:
 	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(current.type, ""))]
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
-		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + AHJourneyRules.SHOP_NAMES[site.shop])
+		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + tr(AHJourneyRules.SHOP_NAMES[site.shop]))
 	_route_title.text = title
 	_route_panel.size = _route_panel.get_combined_minimum_size()
 	_route_panel.position = Vector2(960 - _route_panel.size.x * 0.5, 16)
@@ -647,7 +647,7 @@ func show_event(campaign: Dictionary) -> void:
 	box.add_child(title)
 	# O que se vasculhou (#7): o evento vem do objeto.
 	if String(event.get("object", "")) != "":
-		box.add_child(H.make_label(tr("Ao vasculhar: %s") % String(event.object), 17, H.MUTED))
+		box.add_child(H.make_label(tr("Ao vasculhar: %s") % tr(String(event.object)), 17, H.MUTED))
 	var text := H.make_label(tr(event.resolution) if event.resolution != "" else tr(row.get("Description", "")), 20, H.TEXT)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(780, 0)

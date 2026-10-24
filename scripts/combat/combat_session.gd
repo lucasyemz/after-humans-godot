@@ -97,15 +97,15 @@ func ability_options(actor_id: String) -> Array:
 		var targets := engine.valid_targets(actor_id, ability_id)
 		var reason := ""
 		if actor.stun_turns > 0:
-			reason = "Atordoado"
+			reason = tr("Atordoado")
 		elif not ability.OriginRanks.has(actor.rank):
-			reason = "Usa das posições %s" % ", ".join(ability.OriginRanks.map(func(r): return str(r)))
+			reason = tr("Usa das posições %s") % ", ".join(ability.OriginRanks.map(func(r): return str(r)))
 		elif cooldown > 0:
-			reason = "Recarga: %d turno(s)" % cooldown
+			reason = tr("Recarga: %d turno(s)") % cooldown
 		elif uses == 0:
-			reason = "Sem usos"
+			reason = tr("Sem usos")
 		elif targets.is_empty():
-			reason = "Sem alvo válido"
+			reason = tr("Sem alvo válido")
 		options.append({
 			"id": ability_id, "name": ability.DisplayName, "description": describe(ability_id), "usable": reason == "",
 			"reason": reason, "targets": targets, "enemy_side": ability.TargetType == "SingleEnemy" or ability.TargetType == "MarkedEnemy",
@@ -130,19 +130,18 @@ func describe(ability_id: String) -> String:
 	var parts := PackedStringArray()
 	if ability.DamageRange.Max > 0:
 		var damage := effective_range(ability_id, "damage")
-		parts.append("Dano %d–%d%s" % [damage.Min, damage.Max, " (treinado)" if damage.trained else ""])
+		parts.append(tr("Dano %d–%d%s") % [damage.Min, damage.Max, tr(" (treinado)") if damage.trained else ""])
 	if ability.HealRange.Max > 0:
 		var heal := effective_range(ability_id, "heal")
-		parts.append("Cura %d–%d%s" % [heal.Min, heal.Max, " (treinado)" if heal.trained else ""])
+		parts.append(tr("Cura %d–%d%s") % [heal.Min, heal.Max, tr(" (treinado)") if heal.trained else ""])
 	if ability.Cooldown > 0:
-		parts.append("Recarga %d" % ability.Cooldown)
+		parts.append(tr("Recarga %d") % ability.Cooldown)
 	if ability.UsesMax > 0:
-		parts.append("%d usos" % ability.UsesMax)
+		parts.append(tr("%d usos") % ability.UsesMax)
 	var row = GameData.row("abilities", ability_id)
-	var text: String = row.get("Description", "") if row != null else ""
+	var text: String = tr(row.get("Description", "")) if row != null and row.get("Description", "") != "" else ""
 	var summary := " · ".join(parts)
-	return summary + ("
-" if summary != "" and text != "" else "") + text
+	return summary + ("\n" if summary != "" and text != "" else "") + text
 
 
 ## Posições da própria equipe para onde o herói pode trocar (vizinhas, sem unidade grande nem imobilização).
@@ -197,17 +196,17 @@ func use_item(campaign: Dictionary, kind: String) -> Dictionary:
 		AHJourneyRules.adjust(campaign, "food", -quote.food_cost)
 	actor.hp = mini(actor.max_hp, actor.hp + quote.heal_max)
 	item_used_turn_key = turn_key()
-	var what: String = {AHExplorationCare.BANDAGE: "usou um curativo", AHExplorationCare.SMALL_MEAL: "comeu pouco"}.get(kind, "comeu bem")
+	var what: String = {AHExplorationCare.BANDAGE: tr("usou um curativo"), AHExplorationCare.SMALL_MEAL: tr("comeu pouco")}.get(kind, tr("comeu bem"))
 	var event := AHCombat.Event.new()
 	event.type = AHCombat.EventType.HEAL
 	event.target_unit_id = actor.id
 	event.amount = quote.heal_max
 	event.text = "+%d" % quote.heal_max
-	state.combat_log.append("%s %s: +%d de vida." % [actor.display_name, what, quote.heal_max])
+	state.combat_log.append(tr("%s %s: +%d de vida.") % [actor.display_name, what, quote.heal_max])
 	beat.events = [event]
 	beat.ok = true
 	beat.error = ""
-	beat.text = "%s %s: +%d de vida." % [actor.display_name, what, quote.heal_max]
+	beat.text = tr("%s %s: +%d de vida.") % [actor.display_name, what, quote.heal_max]
 	return beat
 
 

@@ -116,21 +116,21 @@ func refresh() -> void:
 	var c: Dictionary = Campaign.state
 	var completed := J.PHASES.filter(func(p): return c.completed_phases.has(p.id)).size()
 	var living := S.living(c).size()
-	_header.text = "Bairro Submerso · Fases concluídas %d / %d · Equipe: %d %s" % [completed, J.PHASES.size(), living, "vivo" if living == 1 else "vivos"]
+	_header.text = tr("Bairro Submerso · Fases concluídas %d / %d · Equipe: %d %s") % [completed, J.PHASES.size(), living, tr("vivo") if living == 1 else tr("vivos")]
 	_header.size = Vector2(0, 0)
 	_progress.max_value = J.PHASES.size()
 	_progress.value = completed
 	_progress.position.x = 40 + _header.get_minimum_size().x + 24
-	_footer.text = "Estoque da Estação · Sementes %d · Sucata %d · Fragmentos %d" % [S.quantity(c, "seeds"), S.quantity(c, "scrap"), S.quantity(c, "fragments")]
+	_footer.text = tr("Estoque da Estação · Sementes %d · Sucata %d · Fragmentos %d") % [S.quantity(c, "seeds"), S.quantity(c, "scrap"), S.quantity(c, "fragments")]
 	for child in _nodes.get_children():
 		child.queue_free()
-	_add_node("", "Estação Raiz", "node-start", "marker-here", "Refúgio", true, selected == "", true, REFUGE_POS)
+	_add_node("", tr("Estação Raiz"), "node-start", "marker-here", tr("Refúgio"), true, selected == "", true, REFUGE_POS)
 	for i in J.PHASES.size():
 		var info: Dictionary = J.PHASES[i]
 		var done: bool = c.completed_phases.has(info.id)
 		var open: bool = S.phase_unlocked(c, info.id)
 		var marker := "marker-visited" if done else ("marker-available" if open else "")
-		_add_node(info.id, info.name, _icon_of(info), marker, "Fase %d · %s" % [i + 1, _status(c, info)], open, info.id == selected,
+		_add_node(info.id, tr(info.name), _icon_of(info), marker, tr("Fase %d · %s") % [i + 1, _status(c, info)], open, info.id == selected,
 			false, Vector2(info.map_pos[0], info.map_pos[1]))
 	_build_aside(c)
 
@@ -143,7 +143,7 @@ func restyle() -> void:
 
 
 func _status(c: Dictionary, info: Dictionary) -> String:
-	return "Concluída" if c.completed_phases.has(info.id) else ("Disponível" if S.phase_unlocked(c, info.id) else "Bloqueada")
+	return tr("Concluída") if c.completed_phases.has(info.id) else (tr("Disponível") if S.phase_unlocked(c, info.id) else tr("Bloqueada"))
 
 
 func _icon_of(info: Dictionary) -> String:
@@ -263,14 +263,14 @@ func _build_aside(c: Dictionary) -> void:
 		var number := J.PHASES.map(func(p): return p.id).find(info.id) + 1
 		var done: bool = c.completed_phases.has(info.id)
 		var open: bool = S.phase_unlocked(c, info.id)
-		_aside.add_child(H.make_label("FASE %d · DIFICULDADE: %s" % [number, J.DIFFICULTY_NAMES[info.difficulty].to_upper()], 16, H.MUTED))
-		_aside.add_child(H.make_label(info.name, 32, H.GOLD))
-		_aside.add_child(H.make_label("Concluída · dá para jogar de novo" if done else ("Disponível" if open else "Bloqueada · vença a fase anterior"), 18, Color("e8b864") if open else H.MUTED))
+		_aside.add_child(H.make_label(tr("FASE %d · DIFICULDADE: %s") % [number, tr(J.DIFFICULTY_NAMES[info.difficulty]).to_upper()], 16, H.MUTED))
+		_aside.add_child(H.make_label(tr(info.name), 32, H.GOLD))
+		_aside.add_child(H.make_label(tr("Concluída · dá para jogar de novo") if done else (tr("Disponível") if open else tr("Bloqueada · vença a fase anterior")), 18, Color("e8b864") if open else H.MUTED))
 		# A descrição conta a camada da história da fase (#64): bloqueada, ainda não (narrative-design §14.2).
-		_aside.add_child(_wrap(info.description if open else "O que há lá, a equipe só descobre quando chegar.", 19, H.TEXT if open else H.MUTED))
-		var guard := "O Porteiro e seus Relés de Defesa guardam a eclusa." if info.node_type == "boss" else "Um guardião protege a saída; vencê-lo conclui a fase."
-		var place := AHScenarioWorld.display_of(info.transit) + " e " + AHScenarioWorld.display_of(info.map) if info.transit != "" else AHScenarioWorld.display_of(info.map)
-		_aside.add_child(_wrap("Nível recomendado dos personagens: %d ou mais.\nLocal: %s. Travessia de 10 trechos · patrulhas, coisas para vasculhar e descanso. %s" % [info.level, place, guard], 17, H.MUTED))
+		_aside.add_child(_wrap(tr(info.description) if open else tr("O que há lá, a equipe só descobre quando chegar."), 19, H.TEXT if open else H.MUTED))
+		var guard := tr("O Porteiro e seus Relés de Defesa guardam a eclusa.") if info.node_type == "boss" else tr("Um guardião protege a saída; vencê-lo conclui a fase.")
+		var place := AHScenarioWorld.display_of(info.transit) + tr(" e ") + AHScenarioWorld.display_of(info.map) if info.transit != "" else AHScenarioWorld.display_of(info.map)
+		_aside.add_child(_wrap(tr("Nível recomendado dos personagens: %d ou mais.\nLocal: %s. Travessia de 10 trechos · patrulhas, coisas para vasculhar e descanso. %s") % [info.level, place, guard], 17, H.MUTED))
 		if open:
 			var go := Button.new()
 			go.text = "Jogar de novo" if done else "Preparar expedição"
@@ -288,7 +288,7 @@ func _build_aside(c: Dictionary) -> void:
 		var open: bool = S.phase_unlocked(c, phase.id)
 		var button := Button.new()
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.text = "%s\nFase %d · %s · Nível %d+ · %s" % [phase.name, i + 1, J.DIFFICULTY_NAMES[phase.difficulty], phase.level, _status(c, phase)]
+		button.text = tr("%s\nFase %d · %s · Nível %d+ · %s") % [tr(phase.name), i + 1, tr(J.DIFFICULTY_NAMES[phase.difficulty]), phase.level, _status(c, phase)]
 		button.icon = load(ICONS % ("marker-visited" if c.completed_phases.has(phase.id) else _icon_of(phase)))
 		button.expand_icon = false
 		button.add_theme_constant_override("icon_max_width", 22)
