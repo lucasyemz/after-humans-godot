@@ -4,6 +4,8 @@ extends RefCounted
 
 const POSES := ["attack1", "defense", "hurt", "death", "dodge", "support"]
 const CUES := {"cao": "BentoAction", "gato": "NickAction", "sapo": "IrisAction", "coruja": "VesperaAction"}
+## As poses ajoelhadas do Codex (#13).
+const KNEELING := ["hero_sapo_iris", "hero_coruja_vespera"]
 
 
 func run(t) -> void:
@@ -37,6 +39,8 @@ func run(t) -> void:
 			var reaction: Dictionary = hero.get("reactions", {}).get(pose, {})
 			if t.check(not reaction.is_empty(), "%s: pose %s" % [hero_id, pose]):
 				_check_measured(t, reaction, "%s %s" % [hero_id, pose])
+				if KNEELING.has(hero_id):
+					_check_kneeling(t, hero.idle, reaction, "%s %s" % [hero_id, pose])
 
 	_john_villains(t, art)
 	for enemy_id in ["robot", "robot_fungo", "vigia_enferrujado"]:
@@ -56,6 +60,29 @@ func run(t) -> void:
 			t.check(enemy.poses.has(pose), "%s: pose %s" % [enemy_id, pose])
 	for cue in ["Dodge", "RobotDodge", "RobotHeal", "RobotPunch", "UIClick"]:
 		t.check(art.audio.has(cue), "som %s" % cue)
+
+
+## O contrato do Codex (docs/design/combat_reactions_contract.json, "preserve idle body_reference_pixels"): a pose
+## ajoelhada na tela, na âncora e na altura do corpo do parado, para o pé não pular e o corpo não crescer ao trocar.
+## A textura, na metade da tela, com o fim do desenho na linha do pé.
+func _check_kneeling(t, idle: Dictionary, pose: Dictionary, label: String) -> void:
+	t.equal(pose.canvas, idle.canvas, "%s: a tela do parado" % label)
+	t.equal(pose.anchor, idle.anchor, "%s: a âncora do parado" % label)
+	t.equal(pose.body_reference_pixels, idle.body_reference_pixels, "%s: a altura do corpo do parado" % label)
+	var image: Image = (load(pose.file) as Texture2D).get_image()
+	if image.is_compressed():
+		image.decompress()
+	t.check(absi(image.get_width() * 2 - int(pose.canvas[0])) <= 1, "%s: a textura na metade da tela (%d px)" % [label, image.get_width()])
+	var bottom := -1
+	for y in range(image.get_height() - 1, -1, -1):
+		for x in image.get_width():
+			if image.get_pixel(x, y).a > 0.5:
+				bottom = y
+				break
+		if bottom >= 0:
+			break
+	var scale := float(image.get_height()) / float(pose.canvas[1])
+	t.check(absf(bottom + 1 - float(pose.anchor[1]) * scale) <= 2.0, "%s: o fim do desenho na linha do pé (%d, pé em %.1f)" % [label, bottom + 1, float(pose.anchor[1]) * scale])
 
 
 func _check_measured(t, entry: Dictionary, label: String) -> void:

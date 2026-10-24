@@ -76,11 +76,11 @@ def res(path: Path) -> str:
     return "res://" + path.relative_to(PROTO).as_posix()
 
 
-def convert(src: Path, dst: Path, scale: float = SCALE) -> Image.Image:
-    """Grava src em WebP (com alfa) na escala dada e devolve a imagem original."""
+def convert(src: Path, dst: Path, scale: float = SCALE, force: bool = False) -> Image.Image:
+    """Grava src em WebP (com alfa) na escala dada e devolve a imagem original. Sem force, só se src for mais nova."""
     image = Image.open(src).convert("RGBA")
     dst.parent.mkdir(parents=True, exist_ok=True)
-    if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+    if force or not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
         size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
         image.resize(size, Image.LANCZOS).save(dst, "WEBP", quality=90, method=6)
     return image
@@ -150,15 +150,18 @@ def heroes() -> dict:
 
 def codex_reactions(source: Path = CODEX_REACTIONS_SOURCE) -> dict:
     """O dano e a queda ajoelhada da Íris e da Véspera pelo contrato do Codex: a tela, a âncora e a altura do corpo do
-    contrato (iguais às do parado), em WebP na metade. Sem as fontes, nada (o manifesto fica com o que tinha)."""
+    contrato (iguais às do parado), em WebP na metade. Sempre reconverte: as fontes saem do git archive com a data do
+    commit da tag, mais velha que o WebP de um clone novo. Sem as fontes, para com a instrução (a conversão completa
+    reescreve o manifesto do zero e perderia as poses)."""
     if not source.exists():
-        return {}
+        raise SystemExit(f"Faltam as fontes em {source}. Extraia na raiz do projeto com:\n"
+                         "  git archive codex-pr54-originals art/combat/source/reactions | tar -x")
     out = {}
     for pose in json.loads(CODEX_REACTIONS.read_text(encoding="utf-8"))["poses"]:
         src = source / Path(pose["file"]).name
         name = HEROES[pose["hero_id"]]["name"].lower()
         dst = ART / "heroes" / name / f"{pose['state']}.webp"
-        convert(src, dst)
+        convert(src, dst, force=True)
         out.setdefault(pose["hero_id"], {})[pose["state"]] = {"file": res(dst), "canvas": pose["canvas"],
                                                               "anchor": pose["anchor"],
                                                               "body_reference_pixels": pose["body_reference_pixels"]}
