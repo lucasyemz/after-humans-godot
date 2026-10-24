@@ -266,8 +266,9 @@ func _build_aside(c: Dictionary) -> void:
 		_aside.add_child(H.make_label("FASE %d · DIFICULDADE: %s" % [number, J.DIFFICULTY_NAMES[info.difficulty].to_upper()], 16, H.MUTED))
 		_aside.add_child(H.make_label(info.name, 32, H.GOLD))
 		_aside.add_child(H.make_label("Concluída · dá para jogar de novo" if done else ("Disponível" if open else "Bloqueada · vença a fase anterior"), 18, Color("e8b864") if open else H.MUTED))
-		_aside.add_child(_wrap(info.description, 19, H.TEXT))
-		var guard := "O Porteiro e seus Condutores guardam a eclusa." if info.node_type == "boss" else "Um guardião protege a saída; vencê-lo conclui a fase."
+		# A descrição conta a camada da história da fase (#64): bloqueada, ainda não (narrative-design §14.2).
+		_aside.add_child(_wrap(info.description if open else "O que há lá, a equipe só descobre quando chegar.", 19, H.TEXT if open else H.MUTED))
+		var guard := "O Porteiro e seus Relés de Defesa guardam a eclusa." if info.node_type == "boss" else "Um guardião protege a saída; vencê-lo conclui a fase."
 		var place := AHScenarioWorld.display_of(info.transit) + " e " + AHScenarioWorld.display_of(info.map) if info.transit != "" else AHScenarioWorld.display_of(info.map)
 		_aside.add_child(_wrap("Nível recomendado dos personagens: %d ou mais.\nLocal: %s. Travessia de 10 trechos · patrulhas, coisas para vasculhar e descanso. %s" % [info.level, place, guard], 17, H.MUTED))
 		if open:

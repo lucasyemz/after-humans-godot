@@ -68,7 +68,7 @@ const CORA_RESEARCH_POWER := 1
 const REQUEST_BONUS := 1
 const CIVILIANS := [
 	{"id": DORA, "name": "Dora", "species": "Texugo", "role": "Cozinheira", "trait": "Prática, evita desperdício.",
-		"need": "Quer recuperar um caderno de receitas numa cozinha abandonada.",
+		"need": "Quer recuperar um caderno de receitas esquecido numa mercearia abandonada.",
 		"benefit": "Na Cantina com energia, produz mais 2 suprimentos por volta.",
 		"drawback": "Cozinhar gasta água: bebe 2 por volta.",
 		"request_item": "o caderno de receitas", "request_reward": "a Cantina rende mais 1 suprimento por volta",

@@ -29,7 +29,7 @@
     "Layer": 2,
     "Type": "Event",
     "Title": "Abrigo Lacrado",
-    "Description": "Uma placa do Programa Continuidade aponta para o subsolo. Os registros não dizem quem retornou.",
+    "Description": "A placa desbotada aponta para o subsolo: ZONA SANITÁRIA. Os registros falam de quarentena, não de quem saiu.",
     "EventId": "porta_espera",
     "NextNodeIds": [
       "node_3_combat"
@@ -92,7 +92,7 @@
     "Layer": 5,
     "Type": "Combat",
     "Title": "Laboratório Silencioso",
-    "Description": "Restam interfaces de comunicação e anotações de aprendizagem. Os aparelhos não contam sozinhos a história de seus usuários.",
+    "Description": "Restam bancadas, ampolas e relatórios sobre a Peste. Os papéis não contam a mesma história.",
     "NextNodeIds": [
       "node_6_loot"
     ],
@@ -141,7 +141,7 @@
     "Layer": 9,
     "Type": "Boss",
     "Title": "Eclusa Central: O Porteiro",
-    "Description": "O Porteiro conserva uma ordem de isolamento da guerra. Seus relés sustentam a defesa da eclusa.",
+    "Description": "O Porteiro guarda uma ordem de contenção da Peste que ninguém cancelou. Seus relés sustentam a defesa da eclusa.",
     "NextNodeIds": [],
     "bResolved": false,
     "ScenarioId": "tuneis-do-eco"

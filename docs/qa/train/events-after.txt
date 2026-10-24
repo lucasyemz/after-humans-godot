@@ -1,0 +1,63 @@
+  0.00  início (a Estação abre)
+  0.03  som panel_open.ogg
+  0.07  a câmera começa a mover
+  0.93  a câmera para
+  0.97  a câmera começa a mover
+  3.60  trem: warning
+  3.63  som train_arrival.ogg
+  3.63  som train_bell.ogg
+  3.63  a câmera termina a passagem
+  3.63  o sinal começa a piscar
+  3.63  o trem passa ao modo 1
+  3.63  a câmera para
+  5.97  trem: brake
+  6.00  som train_brake.ogg
+  7.56  o trem para
+  7.60  trem: stop
+  7.63  o sinal para de piscar
+  7.86  as portas começam a abrir
+  8.63  trem: doors_open
+  8.63  trem: candidate_out
+  8.67  as portas terminam de abrir
+  8.67  o candidato aparece em x=6.81
+ 11.33  trem: candidate_ready
+ 11.40  a câmera começa a mover
+ 12.36  a câmera para
+ 12.40  a câmera começa a mover
+ 12.43  a câmera para
+ 12.46  a câmera começa a mover
+ 12.53  a câmera para
+ 12.57  a câmera começa a mover
+ 12.60  a câmera para
+ 12.60  trem: camera_on_candidate
+ 12.63  o trem passa ao modo 0
+ 12.63  o painel abre
+ 12.76  a câmera começa a mover
+ 12.80  a câmera para
+ 18.03  o jogador recusa
+ 18.03  trem: boarding
+ 18.07  o trem passa ao modo 3
+ 18.07  o painel fecha
+ 18.07  a câmera começa a mover
+ 19.03  a câmera para
+ 19.07  a câmera começa a mover
+ 19.13  a câmera para
+ 19.23  a câmera começa a mover
+ 19.27  a câmera para
+ 19.43  a câmera começa a mover
+ 19.46  a câmera para
+ 20.73  trem: boarded
+ 20.73  trem: doors_closing
+ 20.76  som train_bell.ogg
+ 20.76  o candidato some
+ 20.76  o trem passa ao modo 2
+ 21.30  trem: doors_closed
+ 21.30  trem: leaving
+ 21.33  som train_departure.ogg
+ 21.33  as portas terminam de fechar
+ 21.36  o trem sai do lugar
+ 23.90  trem: gone
+ 23.93  som panel_close.ogg
+ 23.93  a câmera começa a passagem
+ 23.93  o trem passa ao modo 0
+ 25.16  a câmera começa a mover

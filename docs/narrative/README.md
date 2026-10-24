@@ -8,6 +8,8 @@ cópias são as que valem para o jogo da Godot.
   regra de consistência).
 - [bento-nick-arc.md](bento-nick-arc.md): o arco dos fundadores.
 - [corridor-progression.md](corridor-progression.md): a progressão dos corredores e das fases.
+- [review.md](review.md): a revisão dos textos do jogo contra a lore (#64): o que foi corrigido, as perguntas para o
+  Lucas e os nomes conhecidos.
 
 Todo texto de tela, evento, nome, lugar, item, inimigo e descrição de fase passa pela regra de consistência
 (`narrative-design.md`, seção 14) antes de entrar no jogo.

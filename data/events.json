@@ -73,7 +73,7 @@
         "RequirementAmount": 2,
         "UnavailableIfUnlocked": "rato",
         "Success": {
-          "Result": "O guaxinim guarda uma ração e volta a desmontar o terminal. \"Sou Risco. Ainda tem energia útil nessas máquinas, e eu sei tirar sem acordar ninguém. Encontro vocês na Estação Raiz!\" (Classe Guaxinim Sabotador liberada. Risco vai se juntar ao refúgio.)",
+          "Result": "O guaxinim guarda uma ração e volta a desmontar o terminal. \"Sou Risco. Ainda tem energia útil nessas máquinas, e eu sei tirar sem acordar ninguém. Se a Estação Raiz tiver lugar, me procurem.\" (Classe Guaxinim Sabotador liberada: dá para recrutar um guaxinim na Sala dos Personagens.)",
           "FoodDelta": -2,
           "UnlockClass": "rato",
           "RecruitName": "Risco"

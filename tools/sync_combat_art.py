@@ -10,6 +10,10 @@
 - Recrutas (#32, a entrega #14 do Codex): a variação parada de cada classe, da fonte 2x que já está neste repositório
   (art/combat/source/recruits); o id é o nome do arquivo (dog_recruit_01) e não um id de herói. Cada parado (fundador
   ou recruta) leva o retrato recortado da entrega #26 (art/ui/portraits), quando existe.
+- O dano e a queda ajoelhada da Íris e da Véspera (Codex, #13): pelo contrato docs/design/combat_reactions_contract.json
+  e as fontes da tag codex-pr54-originals. Sem a pasta da Unreal, só esta parte:
+      git archive codex-pr54-originals art/combat/source/reactions | tar -x
+      python tools/sync_combat_art.py --codex-reactions
 
 As imagens viram WebP com metade da resolução (o jogo nunca mostra mais que isso); as medidas no manifesto ficam nos
 pixels originais e o jogo converte pela largura real da textura.
@@ -26,6 +30,10 @@ ART = PROTO / "art" / "combat"
 AUDIO = PROTO / "audio" / "combat"
 MANIFEST = PROTO / "data" / "presentation" / "combat_art.json"
 LEGACY = REPO / "SourceArt" / "Legacy"
+# As quedas ajoelhadas e os danos da Íris e da Véspera (Codex, #13, PR #54): o contrato fica na main; os PNG de origem
+# ficam na tag codex-pr54-originals (git archive codex-pr54-originals art/combat/source/reactions | tar -x).
+CODEX_REACTIONS = PROTO / "docs" / "design" / "combat_reactions_contract.json"
+CODEX_REACTIONS_SOURCE = PROTO / "art" / "combat" / "source" / "reactions" / "kneeling_20261023"
 SCALE = 0.5
 ICON_SIZE = 160
 
@@ -68,11 +76,11 @@ def res(path: Path) -> str:
     return "res://" + path.relative_to(PROTO).as_posix()
 
 
-def convert(src: Path, dst: Path, scale: float = SCALE) -> Image.Image:
-    """Grava src em WebP (com alfa) na escala dada e devolve a imagem original."""
+def convert(src: Path, dst: Path, scale: float = SCALE, force: bool = False) -> Image.Image:
+    """Grava src em WebP (com alfa) na escala dada e devolve a imagem original. Sem force, só se src for mais nova."""
     image = Image.open(src).convert("RGBA")
     dst.parent.mkdir(parents=True, exist_ok=True)
-    if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+    if force or not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
         size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
         image.resize(size, Image.LANCZOS).save(dst, "WEBP", quality=90, method=6)
     return image
@@ -135,8 +143,38 @@ def heroes() -> dict:
             entry["reactions"]["item"] = {"file": res(dst), "canvas": [pose["width"], pose["height"]],
                                           "anchor": [pose["foot_x"], pose["foot_y"]],
                                           "body_reference_pixels": pose["foot_y"] - pose["top"]}
+        entry["reactions"].update(codex_reactions().get(hero_id, {}))
         out[hero_id] = entry
     return out
+
+
+def codex_reactions(source: Path = CODEX_REACTIONS_SOURCE) -> dict:
+    """O dano e a queda ajoelhada da Íris e da Véspera pelo contrato do Codex: a tela, a âncora e a altura do corpo do
+    contrato (iguais às do parado), em WebP na metade. Sempre reconverte: as fontes saem do git archive com a data do
+    commit da tag, mais velha que o WebP de um clone novo. Sem as fontes, para com a instrução (a conversão completa
+    reescreve o manifesto do zero e perderia as poses)."""
+    if not source.exists():
+        raise SystemExit(f"Faltam as fontes em {source}. Extraia na raiz do projeto com:\n"
+                         "  git archive codex-pr54-originals art/combat/source/reactions | tar -x")
+    out = {}
+    for pose in json.loads(CODEX_REACTIONS.read_text(encoding="utf-8"))["poses"]:
+        src = source / Path(pose["file"]).name
+        name = HEROES[pose["hero_id"]]["name"].lower()
+        dst = ART / "heroes" / name / f"{pose['state']}.webp"
+        convert(src, dst, force=True)
+        out.setdefault(pose["hero_id"], {})[pose["state"]] = {"file": res(dst), "canvas": pose["canvas"],
+                                                              "anchor": pose["anchor"],
+                                                              "body_reference_pixels": pose["body_reference_pixels"]}
+    return out
+
+
+def codex_reactions_only(source: Path) -> None:
+    """Sem a pasta da Unreal: só as poses do Codex, no manifesto que já existe."""
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    for hero_id, states in codex_reactions(source).items():
+        manifest["heroes"][hero_id]["reactions"].update(states)
+        print(hero_id, ", ".join(states))
+    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
 
 
 def enemy_pose_files(spec: dict) -> dict:
@@ -247,4 +285,10 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if "--codex-reactions" in sys.argv:
+        # python tools/sync_combat_art.py --codex-reactions [pasta das fontes]
+        rest = sys.argv[sys.argv.index("--codex-reactions") + 1:]
+        codex_reactions_only(Path(rest[0]) if rest else CODEX_REACTIONS_SOURCE)
+    else:
+        main()

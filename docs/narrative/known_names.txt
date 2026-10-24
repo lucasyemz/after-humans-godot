@@ -1,0 +1,70 @@
+# Os nomes que os textos dos dados podem citar (#64). tests/test_narrative_terms.gd confere que todo nome próprio
+# (palavra com maiúscula fora do começo da frase) dos textos de data/ e das fases está aqui ou é o nome de algo definido
+# nos próprios dados (DisplayName, Title, Species, Role). Nome novo de lugar, facção ou personagem entra aqui junto com
+# a seção da lore que o define; se a lore não tem, a pergunta vai para o Lucas numa issue.
+
+# Da lore (docs/narrative/lore.md) e dos documentos de narrativa.
+Peste
+Primeira Contenção
+O Retorno
+Programa de Adaptação
+Protocolo de Contenção
+Protocolo de Preservação Humana
+Sistemas de Segurança
+Sistemas de Pesquisa
+Sistemas Degradados
+Remendadores
+Herdeiros do Eco
+Raiz Livre
+Canídeos
+Felinos
+Roedores
+Povos das Margens
+Antigos
+Criadores
+Galerias
+Casulos de Ferro
+Casa do Remédio
+Casas de Vidro
+Tocas dos Antigos
+Toca dos Antigos
+Segunda Pele
+Arquivos
+Caminhos Mortos
+Estação
+IAs
+Bento
+Nick
+Íris
+Eclusa Central
+Porteiro
+
+# Só no jogo (docs/narrative/review.md, seção 5: decidir se entram na lore).
+Estação Raiz
+Bairro Submerso
+Risco
+Véspera
+Sala dos Personagens
+
+# Termos de regra mostrados na tela (estados, recursos e atributos).
+Bloqueio
+Esperança
+Comida
+Comidas
+Curativo
+Curativos
+Semente
+Sementes
+Fragmento
+Vida Máxima
+Velocidade
+Superação
+Atordoamento
+Cegueira
+Esquiva
+Exposto
+Marca
+Marcado
+Vulnerável
+Cansado
+Espuma

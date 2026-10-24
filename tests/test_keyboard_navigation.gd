@@ -238,6 +238,11 @@ func _return() -> void:
 	if S.visit_pending(c):
 		await _frames(3)
 		t.equal(hud.current, "train", "o trem espera na plataforma")
+		# O painel do trem abre depois da cena (o trem chega, o candidato desce, a câmera nele: #61).
+		var end := Time.get_ticks_msec() + 30000
+		while (hud.station.train_busy() or not hud._panel.visible) and Time.get_ticks_msec() < end:
+			await tree.process_frame
+		await _frames(3)
 		if t.check(await _walk_to("Acolher", 10), "↓ chega em Acolher"):
 			await _send("interact")
 			t.equal(c.station.train.phase, "departing", "Interagir acolhe o candidato")

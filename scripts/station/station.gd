@@ -42,9 +42,16 @@ const WORK_POSES := {"hero_cao_bento": "forge", "hero_gato_nick": "depot", "hero
 const LINE_CENTER_X := 13.8
 const LINE_SPACING := 2.1
 const LINE_Z := -6.4
-## O trem: entra do túnel em 3,2 s, pausa na porta até 4 s; sai fechando e acelerando (TrainSlideEnd, TrainDoorEnd).
-const TRAIN_SLIDE_END := 3.2
-const TRAIN_DOOR_END := 4.0
+## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
+## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
+## o candidato desce e anda; só então a câmera fecha nele. Na saída: o recusado volta ao trem, o sino avisa, as portas
+## fecham em TRAIN_CLOSE s e o trem acelera para o túnel em TRAIN_LEAVE s com o som da partida.
+const TRAIN_WARNING := 0.8
+const TRAIN_STOP := TRAIN_WARNING + 3.2
+const TRAIN_DOOR_START := TRAIN_STOP + 0.25
+const TRAIN_DOOR_END := TRAIN_DOOR_START + 0.8
+const TRAIN_CLOSE := 0.55
+const TRAIN_LEAVE := 2.6
 const TRAIN_OUT := -32.0
 ## Quanto antes de parar o freio começa (s).
 const BRAKE_LEAD := 1.6
@@ -76,12 +83,24 @@ var _contacts: Array = []
 var _wagon_base := {}
 var _wagon_x := 0.0
 var _door_open := 0.0
+## 0 parado, 1 chegando, 2 partindo, 3 o recusado voltando para o trem antes da partida.
 var _train_mode := 0
 var _train_time := 0.0
+## Os passos da cena do trem, na ordem em que acontecem (o teste e a gravação conferem a ordem): warning, brake, stop,
+## doors_open, candidate_out, candidate_ready, camera_on_candidate; boarding, boarded, doors_closing, doors_closed,
+## leaving, gone. O camera_on_candidate vem também quando o painel do trem, reaberto depois da cena, termina de levar a
+## câmera ao candidato; e não vem se o jogador saiu para outro painel no meio (a cena acaba sem a câmera).
+signal train_event(name: String)
 var _warning_time := -1.0
 var _candidate: AHSpriteCard
 var _candidate_id := ""
 var _pending_arrival := ""
+## O som do trem que está tocando (esmaece na parada e quando o trem some, #61).
+var _train_sound: AudioStreamPlayer = null
+## A chegada terminou com o candidato no lugar; falta a câmera fechar nele (só com o painel do trem e na plataforma).
+var _camera_pending := false
+## O painel do trem reaberto depois da cena: a câmera vai ao candidato (pela passagem, se preciso) antes de o painel abrir.
+var _reopen_pending := false
 var _env: Environment
 
 
@@ -194,6 +213,8 @@ func _process(delta: float) -> void:
 		play_train_arrival(_pending_arrival)
 		_pending_arrival = ""
 	_tick_train(delta)
+	if _reopen_pending:
+		_tick_reopen()
 	_walk(delta)
 	if _build.ember_light:
 		# Brasas: variação lenta e pequena (duas senoides fora de fase), sem piscar.
@@ -314,12 +335,24 @@ func focus_platform(instant: bool = false) -> void:
 ## câmera fecha nele de corpo inteiro, à esquerda do painel (FocusTrainCandidate).
 func open_train(candidate_id: String, arrive: bool) -> void:
 	clear_lineup()
-	_go(_platform_key(), true, false)
 	if arrive:
+		_go(_platform_key(), true, false)
 		_pending_arrival = candidate_id
+		# O trem ainda não chegou: fica no túnel, sem ninguém na plataforma (aparecia parado e sumia para chegar).
+		_remove_candidate()
+		_door_open = 0.0
+		_offset_wagon(TRAIN_OUT)
 	else:
+		# A passagem termina no candidato (terminava na plataforma inteira e descartava a chave dele).
 		show_candidate(candidate_id)
-		_set_goal(_candidate_key())
+		_go(_candidate_key(), true, false)
+		_reopen_pending = true
+
+
+## O painel do trem reaberto no meio da cena: a câmera volta para a plataforma (pela passagem, se preciso).
+func follow_train() -> void:
+	clear_lineup()
+	_go(_candidate_key() if _reopen_pending else _platform_key(), true, false)
 
 
 func _candidate_key() -> Dictionary:
@@ -518,30 +551,72 @@ func _set_door_open(amount: float) -> void:
 	_offset_wagon(_wagon_x)
 
 
-## O trem chega do túnel com o candidato: desacelera até parar, pausa na porta e o candidato desce e anda até a
-## plataforma (PlayTrainArrival). O sinal vermelho pisca enquanto ele se aproxima.
+## O trem chega do túnel com o candidato (PlayTrainArrival): o aviso primeiro, depois a entrada freando até parar, as
+## portas e o candidato descendo; a câmera só fecha nele quando ele chega à plataforma.
 func play_train_arrival(candidate_id: String) -> void:
-	Sound.play("res://audio/station/train_arrival.ogg", 0.9)
 	_remove_candidate()
 	_candidate_id = candidate_id
 	_train_mode = 1
 	_train_time = 0.0
 	_warning_time = 0.0
 	_door_open = 0.0
+	_camera_pending = false
 	_offset_wagon(TRAIN_OUT)
+	_train_sound = Sound.play("res://audio/station/train_arrival.ogg", 0.9)
+	Sound.play("res://audio/station/train_bell.ogg", 0.8)
+	train_event.emit("warning")
 
 
-## Fecha e acelera para o túnel; fica fora até a próxima chegada. Recusado, o candidato vai junto (PlayTrainDeparture).
+## Fecha e acelera para o túnel; fica fora até a próxima chegada (PlayTrainDeparture). Recusado, o candidato volta
+## para dentro do trem antes de as portas fecharem.
 func play_train_departure(candidate_leaves: bool) -> void:
-	Sound.play("res://audio/station/train_departure.ogg", 0.9)
-	# O sino avisa que as portas fecham (#36).
-	Sound.play("res://audio/station/train_bell.ogg", 0.7)
 	_warning_time = -1.0
+	_train_time = 0.0
+	_camera_pending = false
+	_reopen_pending = false
+	_offset_wagon(0.0)
+	# A partida à vista: a câmera volta para a plataforma inteira, com o vagão, a porta e o lugar do candidato.
+	if on_platform and not passage_moving():
+		_set_goal(_platform_key())
+	if candidate_leaves and is_instance_valid(_candidate):
+		_train_mode = 3
+		# Ele entra pela porta aberta (o candidato mostrado sem a chegada esperava com o vagão fechado).
+		_set_door_open(1.0)
+		# O candidato mostrado sem a chegada (o painel reaberto depois da cena) não tem passeio: ganha um agora.
+		var own: Array = _walkers.filter(func(w): return w.card == _candidate)
+		var walker: Dictionary = own[0] if not own.is_empty() else {"card": _candidate, "phase": 0.0, "home_z": _candidate.position.z}
+		if own.is_empty():
+			_walkers.append(walker)
+		walker.min = _train_door_x()
+		walker.max = _candidate.position.x
+		walker.target = _train_door_x()
+		walker.wait = 0.0
+		walker.stay = true
+		walker.speed = TRAIN_WALK_SPEED * train_speed()
+		train_event.emit("boarding")
+		return
 	if candidate_leaves:
 		_remove_candidate()
+	_close_and_leave()
+
+
+func _close_and_leave() -> void:
 	_train_mode = 2
 	_train_time = 0.0
-	_offset_wagon(0.0)
+	# O sino avisa que as portas fecham (#36); o som da partida vem quando o trem anda.
+	Sound.play("res://audio/station/train_bell.ogg", 0.7)
+	train_event.emit("doors_closing")
+
+
+## A velocidade da cena do trem: a da luta nas Opções (1x ou 2x).
+func train_speed() -> float:
+	return float(clampi(int(Campaign.state.get("settings", {}).get("battle_speed", 1)), 1, 2))
+
+
+## Onde o candidato entra e sai do vagão (sem o modelo do metrô, 3,3 m antes do lugar dele na plataforma).
+func _train_door_x() -> float:
+	var target := _departure_slot(1)
+	return _build.train_exit_x if not is_nan(_build.train_exit_x) else target.x - 3.3
 
 
 ## A trilha do refúgio (Contemplation, a mesma da exploração) por baixo dos loops da Estação; sem chuva nem ambiente
@@ -568,8 +643,16 @@ func _build_sound_loops() -> void:
 		add_child(player)
 
 
+## Espera um passo da cena do trem (o _decide do HUD espera o "gone").
+func train_event_named(name: String) -> void:
+	while true:
+		var got: String = await train_event
+		if got == name:
+			return
+
+
 func train_busy() -> bool:
-	return _train_mode != 0
+	return _train_mode != 0 or _pending_arrival != "" or _reopen_pending
 
 
 ## O candidato esperando na plataforma, sem a chegada (o jogo foi reaberto com o trem parado).
@@ -608,10 +691,13 @@ func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 
 
 func _tick_train(delta: float) -> void:
+	var step := delta * train_speed()
 	if _warning_time >= 0.0:
-		_warning_time += delta
+		_warning_time += step
 	var approaching := _warning_time >= 0.0
-	var bright := not approaching or fmod(_warning_time, 0.8) < 0.4
+	# O sinal pisca na chegada; com "Reduzir efeitos", fica aceso sem piscar.
+	var reduced: bool = Campaign.state.get("settings", {}).get("reduced_environment_effects", false)
+	var bright := not approaching or reduced or fmod(_warning_time, 0.8) < 0.4
 	if _build.signal_light:
 		_build.signal_light.light_energy = (90.0 if bright else 9.0) / AHStationBuilder.LUMENS_PER_ENERGY
 	if _build.signal_glow:
@@ -619,36 +705,90 @@ func _tick_train(delta: float) -> void:
 	if _train_mode == 0:
 		return
 	var before := _train_time
-	_train_time += delta
-	if _train_mode == 2:
-		# Fecha primeiro; depois acelera para o túnel.
-		_door_open = clampf(1.0 - _train_time / 0.55, 0.0, 1.0)
-		var alpha := clampf((_train_time - 0.55) / 2.6, 0.0, 1.0)
-		_offset_wagon(-36.0 * alpha * alpha)
-		if _train_time >= 3.75:
-			_train_mode = 0
-		return
-	# O freio no fim da chegada e o sino quando o trem para (#36).
-	if before < TRAIN_SLIDE_END - BRAKE_LEAD and _train_time >= TRAIN_SLIDE_END - BRAKE_LEAD:
+	_train_time += step
+	match _train_mode:
+		3:
+			# O recusado anda de volta até a porta e entra; só então o trem fecha.
+			if not is_instance_valid(_candidate) or absf(_candidate.position.x - _train_door_x()) < 0.05:
+				_remove_candidate()
+				train_event.emit("boarded")
+				_close_and_leave()
+		2:
+			# Fecha primeiro; depois acelera para o túnel, com o som da partida.
+			_door_open = clampf(1.0 - _train_time / TRAIN_CLOSE, 0.0, 1.0)
+			if before < TRAIN_CLOSE and _train_time >= TRAIN_CLOSE:
+				train_event.emit("doors_closed")
+				_train_sound = Sound.play("res://audio/station/train_departure.ogg", 0.9)
+				train_event.emit("leaving")
+			var alpha := clampf((_train_time - TRAIN_CLOSE) / TRAIN_LEAVE, 0.0, 1.0)
+			_offset_wagon(-36.0 * alpha * alpha)
+			if _train_time >= TRAIN_CLOSE + TRAIN_LEAVE:
+				_train_mode = 0
+				# O arquivo do som é mais longo que a saída (a 2x, o dobro): some com o trem.
+				Sound.fade_out(_train_sound, 0.8)
+				train_event.emit("gone")
+		1:
+			_tick_arrival(before)
+
+
+func _tick_arrival(before: float) -> void:
+	# O freio antes de parar e a parada.
+	if before < TRAIN_STOP - BRAKE_LEAD and _train_time >= TRAIN_STOP - BRAKE_LEAD:
 		Sound.play("res://audio/station/train_brake.ogg", 0.8)
-	if before < TRAIN_SLIDE_END and _train_time >= TRAIN_SLIDE_END:
-		Sound.play("res://audio/station/train_bell.ogg", 0.8)
-	if _train_time >= TRAIN_SLIDE_END:
-		_warning_time = -1.0
-	var slide := clampf(_train_time / TRAIN_SLIDE_END, 0.0, 1.0)
-	_door_open = clampf((_train_time - TRAIN_SLIDE_END) / (TRAIN_DOOR_END - TRAIN_SLIDE_END), 0.0, 1.0)
+		train_event.emit("brake")
+	var slide := clampf((_train_time - TRAIN_WARNING) / (TRAIN_STOP - TRAIN_WARNING), 0.0, 1.0)
 	_offset_wagon(TRAIN_OUT * (1.0 - slide) * (1.0 - slide))
+	if before < TRAIN_STOP and _train_time >= TRAIN_STOP:
+		_warning_time = -1.0
+		# O ruído do trem rodando acaba quando ele para (o arquivo segue até 5,5 s; a 2x o trem para antes).
+		Sound.fade_out(_train_sound, 0.5)
+		train_event.emit("stop")
+	_door_open = clampf((_train_time - TRAIN_DOOR_START) / (TRAIN_DOOR_END - TRAIN_DOOR_START), 0.0, 1.0)
 	var target := _departure_slot(1)
 	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
-		# Desce pela porta do metrô (sem o modelo, 3,3 m antes do lugar dele) e anda até a plataforma.
-		var door := Vector3(_build.train_exit_x, target.y, target.z) if not is_nan(_build.train_exit_x) else target - Vector3(3.3, 0, 0)
-		var card := _spawn_candidate(door)
+		train_event.emit("doors_open")
+		# Desce pela porta do metrô e anda até a plataforma.
+		var card := _spawn_candidate(Vector3(_train_door_x(), target.y, target.z))
 		if card:
 			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
-				"speed": TRAIN_WALK_SPEED, "stay": true, "home_z": target.z})
-	if _train_time >= TRAIN_DOOR_END and (not is_instance_valid(_candidate) or absf(_candidate.position.x - target.x) < 0.05):
+				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": target.z})
+		train_event.emit("candidate_out")
+	if not _camera_pending and _train_time >= TRAIN_DOOR_END and (not is_instance_valid(_candidate) or absf(_candidate.position.x - target.x) < 0.05):
+		_camera_pending = true
+		train_event.emit("candidate_ready")
+	if _camera_pending:
+		_tick_camera_on_candidate()
+
+
+func _tick_reopen() -> void:
+	if hud != null and hud.current != "train":
+		_reopen_pending = false
+		return
+	if passage_moving():
+		return
+	var key := _candidate_key()
+	if _key.pos.distance_to(key.pos) < 0.05 and absf(_key.fov - key.fov) < 0.3:
+		_reopen_pending = false
+		train_event.emit("camera_on_candidate")
+
+
+## Depois de o candidato chegar ao lugar, a câmera fecha nele e só então a cena acaba (o painel abre). Se o jogador
+## saiu do trem (um cômodo, as Opções), a câmera fica onde ele está e a cena acaba sem ela: o painel do trem, reaberto,
+## vai direto ao candidato.
+func _tick_camera_on_candidate() -> void:
+	if hud != null and hud.current != "train":
+		_camera_pending = false
 		_train_mode = 0
-		_set_goal(_candidate_key())
+		return
+	if not on_platform or passage_moving():
+		return
+	var key := _candidate_key()
+	if _goal != key:
+		_set_goal(key)
+	if _key.pos.distance_to(key.pos) < 0.05 and absf(_key.fov - key.fov) < 0.3:
+		_camera_pending = false
+		_train_mode = 0
+		train_event.emit("camera_on_candidate")
 
 
 # ---------------------------------------------------------------- moradores

@@ -600,8 +600,8 @@
   {
     "Name": "enraizado.golpe_provisorio",
     "EnemyId": "enraizado",
-    "DisplayName": "Golpe de Raízes (provisório)",
-    "Description": "Ataque básico temporário exclusivo deste protótipo para permitir teste de combate. Não faz parte do kit conceitual aprovado; armadilhas e controle posicional ainda pendentes.",
+    "DisplayName": "Golpe de Raízes",
+    "Description": "Açoita a linha de frente com raízes presas ao chassi.",
     "OriginRanks": [
       1,
       2,

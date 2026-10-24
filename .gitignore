@@ -2,3 +2,6 @@
 .godot/
 build/
 *.tmp
+
+# As fontes das poses ajoelhadas (#13), extraídas da tag codex-pr54-originals só para converter.
+art/combat/source/reactions/kneeling_20261023/
