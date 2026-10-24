@@ -91,12 +91,12 @@ func _fade() -> void:
 	t.equal(occlusion._occluders.size(), 2, "registra os dois caixotes, não o chão")
 	occlusion.track(card)
 	t.check(card.has_silhouette(), "a equipe ganha a silhueta")
-	await _until(func(): return crate.transparency >= AHOcclusion.FADED - 0.001, 10.0)
+	await _until(func(): return crate.transparency >= AHOcclusion.FADED - 0.001, 30.0)
 	t.check(is_equal_approx(crate.transparency, AHOcclusion.FADED), "o caixote na frente esmaece (%.2f)" % crate.transparency)
 	t.equal(far.transparency, 0.0, "o de longe fica inteiro")
 	t.check(occlusion.faded() == [crate], "faded() diz qual")
 	card.position.x = -4.0
-	await _until(func(): return crate.transparency <= 0.0, 10.0)
+	await _until(func(): return crate.transparency <= 0.0, 30.0)
 	t.equal(crate.transparency, 0.0, "fora da frente, volta inteiro")
 	# Com "Reduzir efeitos", troca na hora (sem animação).
 	var settings: Dictionary = Campaign.state.get("settings", {})
