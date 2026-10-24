@@ -317,14 +317,24 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	name_label.name = "Name"
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.clip_text = true
+	# Na placa estreita o nome quebra em duas linhas em vez de ser cortado no meio (#63).
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_label.max_lines_visible = 2
 	top.add_child(name_label)
-	var hp_text := S.label("", 17, MUTED)
-	hp_text.name = "HpText"
-	top.add_child(hp_text)
+	# A vida ao lado da barra (não do nome): o nome fica com a largura inteira da placa e não quebra no meio (#63).
+	var hp_row := HBoxContainer.new()
+	hp_row.name = "HpRow"
+	hp_row.add_theme_constant_override("separation", 6)
+	hp_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(hp_row)
 	var hp := S.bar(Color(0.8, 0.27, 0.22) if unit.is_player else S.ENEMY, 9)
 	hp.name = "Hp"
-	box.add_child(hp)
+	hp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	hp_row.add_child(hp)
+	var hp_text := S.label("", 15, MUTED)
+	hp_text.name = "HpText"
+	hp_row.add_child(hp_text)
 	if unit.is_player:
 		var instinct := S.bar(Color(0.6, 0.48, 0.92), 4)
 		instinct.max_value = 200
@@ -349,6 +359,7 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 		var intent := S.label("", 15, S.ENEMY, "bold")
 		intent.name = "Intent"
 		intent.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		intent.max_lines_visible = 3
 		intent.custom_minimum_size = Vector2(200, 0)
 		intent.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		intent.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -425,10 +436,10 @@ func refresh() -> void:
 		var card: AHSpriteCard = arena.cards.get(unit.id)
 		plate.visible = card != null and card.visible and (unit.hp > 0 or unit.is_player)
 		var box := plate.get_child(0)
-		var hp: ProgressBar = box.get_node("Hp")
+		var hp: ProgressBar = box.get_node("HpRow/Hp")
 		hp.max_value = unit.max_hp
 		hp.value = unit.hp
-		(box.get_node("Top/HpText") as Label).text = "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else tr("Último Fôlego")
+		(box.get_node("HpRow/HpText") as Label).text = "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else tr("Último Fôlego")
 		if unit.is_player:
 			(box.get_node("Instinct") as ProgressBar).value = unit.instinct
 		elif unit.hp > 0:
@@ -458,9 +469,16 @@ func _show_intent(label: Label, intent: Dictionary) -> void:
 	# O ícone da intenção (art/ui/icons/intent-*): ataque, ataque em área (mais de um alvo de uma vez), cura, bloqueio,
 	# mover, atordoado; sem plano claro, a interrogação.
 	var icon := "unknown"
+	var targets := ""
 	match intent.kind:
 		"attack":
-			text = "%s → %s" % [tr(intent.name), (tr(" ou ") if intent.either else tr(" e ")).join(names)] if not names.is_empty() else tr(intent.name)
+			targets = (tr(" ou ") if intent.either else tr(" e ")).join(names)
+			# Com três alvos ou mais, a placa diz quantos (a lista inteira ia a 4 ou 5 linhas e cobria o inimigo, #63); os
+			# nomes ficam na dica.
+			if names.size() >= 3:
+				text = (tr("%s → um de %d") if intent.either else tr("%s → %d alvos")) % [tr(intent.name), names.size()]
+			else:
+				text = "%s → %s" % [tr(intent.name), targets] if not names.is_empty() else tr(intent.name)
 			icon = "attack_area" if names.size() > 1 and not intent.either else "attack"
 		"heal":
 			text = tr("%s (se cura)") % tr(intent.name)
@@ -484,6 +502,8 @@ func _show_intent(label: Label, intent: Dictionary) -> void:
 	label.add_theme_color_override("font_color", color)
 	var tip := tr("Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s.") % (
 		"" if intent.sure else tr("; com \"?\", ele está entre dois planos parecidos"))
+	if names.size() >= 3:
+		tip = tr(intent.name) + " → " + targets + "\n" + tip
 	label.tooltip_text = tip
 	var icon_rect := label.get_parent().get_node_or_null("IntentIcon") as TextureRect
 	if icon_rect != null:
@@ -588,12 +608,18 @@ func _process(_delta: float) -> void:
 			# A intenção quebra em mais linhas na placa estreita (a largura mínima dela segurava a placa larga).
 			var intent: Control = plate.find_child("Intent", true, false)
 			if intent != null:
-				intent.custom_minimum_size.x = widths[unit_id] - PLATE_ENEMY + 200.0
+				# A placa menos as margens (8 + 8), o ícone (que cresce com o texto) e o espaço entre eles.
+				intent.custom_minimum_size.x = widths[unit_id] - 16.0 - S.px(22) - 6.0
 			plate.size = Vector2(widths[unit_id], 0)
 		var feet := camera.unproject_position(card.global_position)
 		var head := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 1.05, 0))
 		var short := card.body_height < SHORT_HEIGHT
-		var y := plate_y(feet.y, head.y, short, plate.size.y, _dock_top() - plate.size.y - 6 if _panel.visible else INF)
+		var dock_limit := _dock_top() - plate.size.y - 6 if _panel.visible else INF
+		# A placa que, presa pelo painel de baixo, subiria por mais da metade do corpo vai para cima da cabeça, como a
+		# do baixinho (o Relé de Defesa sumia inteiro atrás da própria placa no texto Maior, #63).
+		if not short and minf(feet.y + 10.0, dock_limit) < feet.y - (feet.y - head.y) * 0.5:
+			short = true
+		var y := plate_y(feet.y, head.y, short, plate.size.y, dock_limit)
 		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
 		if short:
 			short_plates.append(Rect2(plate.position, plate.size))
@@ -637,11 +663,15 @@ func _plate_widths(camera: Camera3D) -> Dictionary:
 			if unit != null and unit.is_player == player and card != null and _unit_bars[unit_id].visible:
 				xs.append([camera.unproject_position(card.global_position).x, unit_id])
 		xs.sort_custom(func(a, b): return a[0] < b[0])
-		var width := PLATE_PLAYER if player else PLATE_ENEMY
-		for i in range(1, xs.size()):
-			width = minf(width, xs[i][0] - xs[i - 1][0] - PLATE_GAP)
-		for entry in xs:
-			out[entry[1]] = maxf(PLATE_MIN, width)
+		# Cada placa com a sua largura: a de sempre, ou o que cabe até o vizinho de cada lado (metade da distância de
+		# cada um), para quem tem espaço não estreitar por causa dos outros.
+		for i in xs.size():
+			var width := PLATE_PLAYER if player else PLATE_ENEMY
+			if i > 0:
+				width = minf(width, xs[i][0] - xs[i - 1][0] - PLATE_GAP)
+			if i < xs.size() - 1:
+				width = minf(width, xs[i + 1][0] - xs[i][0] - PLATE_GAP)
+			out[xs[i][1]] = maxf(PLATE_MIN, width)
 	return out
 
 

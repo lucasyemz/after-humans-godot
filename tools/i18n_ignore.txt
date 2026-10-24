@@ -37,14 +37,14 @@ combat_hud.gd: I
 combat_hud.gd: F
 combat_hud.gd: Top
 combat_hud.gd: Name
-combat_hud.gd: Hp
+combat_hud.gd: HpRow/Hp
 combat_hud.gd: Instinct
 combat_hud.gd: Intent
 combat_hud.gd: Status
 combat_hud.gd: status-%s_%s
 combat_hud.gd: Icon
 combat_hud.gd: Count
-combat_hud.gd: Top/HpText
+combat_hud.gd: HpRow/HpText
 combat_hud.gd: IntentRow/Intent
 combat_hud.gd: %s → %s
 combat_hud.gd: %d–%d
@@ -832,3 +832,4 @@ ui_style.gd: shader_type canvas_item;
 ui_style.gd: vulnerable
 ui_style.gd: width
 *: label
+combat_hud.gd: Hp

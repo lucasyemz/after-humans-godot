@@ -788,8 +788,8 @@ static func first_journey() -> bool:
 func show_options() -> void:
 	var box := _open_modal(700)
 	_modal.set_meta("menu", true)
-	# Abaixo da faixa dos trechos (ficava por cima dela, #63), até a altura da barra da equipe.
-	_modal.position.y = 128
+	# Abaixo da faixa dos trechos (ficava por cima dela, #63), até a altura da barra da equipe; a faixa cresce com o texto.
+	_modal.position.y = maxf(128.0, _route_panel.get_global_rect().end.y + 8.0)
 	var scroll := ScrollContainer.new()
 	# A rolagem acompanha o foco do teclado e do controle (#5).
 	scroll.follow_focus = true

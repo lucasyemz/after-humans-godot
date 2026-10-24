@@ -194,8 +194,10 @@ func _ready() -> void:
 	_panel.visible = false
 
 	_feedback = H.make_label("", 22, H.TEXT)
-	_feedback.position = Vector2(380, 1024)
-	_feedback.size = Vector2(800, 40)
+	# Sobre a cena (não sobre um painel): contorno escuro para ler em cima de qualquer cômodo.
+	_feedback.add_theme_constant_override("outline_size", 8)
+	_feedback.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	_feedback.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_feedback)
 
 	_map = AHPhaseMap.new()
@@ -763,6 +765,8 @@ func open_departure() -> void:
 
 func _process(_delta: float) -> void:
 	_update_room_hover()
+	if _feedback.modulate.a > 0.0 and _feedback.text != "":
+		_place_feedback()
 	U.keep_focus(focus_scope())
 	var showing := current == "report" or current == "departure"
 	_tags.visible = showing
@@ -817,10 +821,7 @@ func _make_tag(hero_id: String) -> Control:
 
 func toast(text: String, error: bool = false) -> void:
 	_feedback.text = text
-	# Ao lado dos botões do canto, na mesma linha (ficava por cima do "Ocultar HUD", #63).
-	if _corner.visible:
-		var corner := _corner.get_global_rect()
-		_feedback.position = Vector2(corner.end.x + 24.0, corner.get_center().y - _feedback.size.y * 0.5)
+	_place_feedback()
 	_feedback.add_theme_color_override("font_color", Color(1.0, 0.55, 0.45) if error else H.GOLD)
 	_feedback.modulate.a = 1.0
 	if _feedback_tween:
@@ -828,6 +829,23 @@ func toast(text: String, error: bool = false) -> void:
 	_feedback_tween = create_tween()
 	_feedback_tween.tween_interval(3.2)
 	_feedback_tween.tween_property(_feedback, "modulate:a", 0.0, 0.6)
+
+
+## O aviso logo abaixo do cabeçalho, no meio da cena à esquerda do painel aberto (#63): embaixo ele caía no "Ocultar
+## HUD", na dica das teclas ou no Partir da Preparação, e o canto muda de tamanho entre a vista geral e o cômodo.
+## Refeito a cada quadro enquanto aparece (o painel abre e fecha por baixo dele).
+func _place_feedback() -> void:
+	var right := _panel.get_global_rect().position.x - 24.0 if _panel.visible else 1920.0
+	var width := minf(FEEDBACK_WIDTH, right - 64.0)
+	_feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_feedback.custom_minimum_size.x = width
+	_feedback.size = Vector2(width, 0)
+	_feedback.position = Vector2((right - width) * 0.5, FEEDBACK_TOP)
+
+
+const FEEDBACK_WIDTH := 900.0
+const FEEDBACK_TOP := 112.0
 
 
 ## Aplica uma ação das regras: "" grava e atualiza; senão mostra o motivo.
