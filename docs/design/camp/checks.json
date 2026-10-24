@@ -364,5 +364,18 @@
       "campfire"
     ],
     "hit_test_rule": "hit visible alpha of character at threshold24; do not let transparent canvas intercept another hero; same click target as combat"
+  },
+  "manifest_comparison": {
+    "command": "python docs/design/camp/check_contract.py",
+    "result": "PASS",
+    "official_payload": "poses[].show_art",
+    "fields_compared": [
+      "canvas",
+      "anchor",
+      "body_reference_pixels"
+    ],
+    "texture_dimensions_compared_to_actual_idle": true,
+    "fails_on_divergence": true,
+    "negative_control_wrong_anchor_rejected": true
   }
 }

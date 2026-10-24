@@ -33,7 +33,28 @@
       "registration_rounding_max_px": 0.5,
       "generated_crop_to_texture_scale": 0.57,
       "original_generated_file": "exec-83d782e2-5cd2-49a3-be5c-e654da0c3ddc.png",
-      "nine_slice": null
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "file": "res://art/camp/dog_recruit_01_seat.webp",
+        "canvas": [
+          1086,
+          1448
+        ],
+        "anchor": [
+          542.0,
+          1425
+        ],
+        "body_reference_pixels": 1385
+      },
+      "diagnostic_fields": [
+        "texture_canvas",
+        "texture_anchor",
+        "texture_body_reference_pixels",
+        "manifest_canvas",
+        "manifest_anchor"
+      ],
+      "source_of_truth": "data/presentation/combat_art.json:recruits.dog_recruit_01.idle"
     },
     {
       "recruit_id": "dog_recruit_01",
@@ -66,7 +87,28 @@
       "registration_rounding_max_px": 0.5,
       "generated_crop_to_texture_scale": 0.554852,
       "original_generated_file": "exec-83d782e2-5cd2-49a3-be5c-e654da0c3ddc.png",
-      "nine_slice": null
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "file": "res://art/camp/dog_recruit_01_sleep.webp",
+        "canvas": [
+          1086,
+          1448
+        ],
+        "anchor": [
+          542.0,
+          1425
+        ],
+        "body_reference_pixels": 1385
+      },
+      "diagnostic_fields": [
+        "texture_canvas",
+        "texture_anchor",
+        "texture_body_reference_pixels",
+        "manifest_canvas",
+        "manifest_anchor"
+      ],
+      "source_of_truth": "data/presentation/combat_art.json:recruits.dog_recruit_01.idle"
     },
     {
       "recruit_id": "cat_recruit_01",
@@ -99,7 +141,28 @@
       "registration_rounding_max_px": 0.5,
       "generated_crop_to_texture_scale": 0.638239,
       "original_generated_file": "exec-bde52b10-4463-409d-8071-55b8c30d35bd.png",
-      "nine_slice": null
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "file": "res://art/camp/cat_recruit_01_seat.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          589.5,
+          1312
+        ],
+        "body_reference_pixels": 1260
+      },
+      "diagnostic_fields": [
+        "texture_canvas",
+        "texture_anchor",
+        "texture_body_reference_pixels",
+        "manifest_canvas",
+        "manifest_anchor"
+      ],
+      "source_of_truth": "data/presentation/combat_art.json:recruits.cat_recruit_01.idle"
     },
     {
       "recruit_id": "cat_recruit_01",
@@ -132,7 +195,28 @@
       "registration_rounding_max_px": 0.5,
       "generated_crop_to_texture_scale": 0.64,
       "original_generated_file": "exec-bde52b10-4463-409d-8071-55b8c30d35bd.png",
-      "nine_slice": null
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "file": "res://art/camp/cat_recruit_01_sleep.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          589.5,
+          1312
+        ],
+        "body_reference_pixels": 1260
+      },
+      "diagnostic_fields": [
+        "texture_canvas",
+        "texture_anchor",
+        "texture_body_reference_pixels",
+        "manifest_canvas",
+        "manifest_anchor"
+      ],
+      "source_of_truth": "data/presentation/combat_art.json:recruits.cat_recruit_01.idle"
     },
     {
       "recruit_id": "frog_recruit_01",
@@ -165,7 +249,28 @@
       "registration_rounding_max_px": 0.5,
       "generated_crop_to_texture_scale": 0.6,
       "original_generated_file": "exec-7cce5753-defa-427a-bdf7-90ce4127ff37.png",
-      "nine_slice": null
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "file": "res://art/camp/frog_recruit_01_seat.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          588.5,
+          1311
+        ],
+        "body_reference_pixels": 1219
+      },
+      "diagnostic_fields": [
+        "texture_canvas",
+        "texture_anchor",
+        "texture_body_reference_pixels",
+        "manifest_canvas",
+        "manifest_anchor"
+      ],
+      "source_of_truth": "data/presentation/combat_art.json:recruits.frog_recruit_01.idle"
     },
     {
       "recruit_id": "frog_recruit_01",
@@ -198,7 +303,28 @@
       "registration_rounding_max_px": 0.5,
       "generated_crop_to_texture_scale": 0.6,
       "original_generated_file": "exec-7cce5753-defa-427a-bdf7-90ce4127ff37.png",
-      "nine_slice": null
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "file": "res://art/camp/frog_recruit_01_sleep.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          588.5,
+          1311
+        ],
+        "body_reference_pixels": 1219
+      },
+      "diagnostic_fields": [
+        "texture_canvas",
+        "texture_anchor",
+        "texture_body_reference_pixels",
+        "manifest_canvas",
+        "manifest_anchor"
+      ],
+      "source_of_truth": "data/presentation/combat_art.json:recruits.frog_recruit_01.idle"
     },
     {
       "recruit_id": "owl_recruit_01",
@@ -231,7 +357,28 @@
       "registration_rounding_max_px": 0.5,
       "generated_crop_to_texture_scale": 0.63,
       "original_generated_file": "exec-8393fa36-e564-4f3f-a5e8-b63b17eceeae.png",
-      "nine_slice": null
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "file": "res://art/camp/owl_recruit_01_seat.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          589.5,
+          1312
+        ],
+        "body_reference_pixels": 1272
+      },
+      "diagnostic_fields": [
+        "texture_canvas",
+        "texture_anchor",
+        "texture_body_reference_pixels",
+        "manifest_canvas",
+        "manifest_anchor"
+      ],
+      "source_of_truth": "data/presentation/combat_art.json:recruits.owl_recruit_01.idle"
     },
     {
       "recruit_id": "owl_recruit_01",
@@ -264,7 +411,28 @@
       "registration_rounding_max_px": 0.5,
       "generated_crop_to_texture_scale": 0.63,
       "original_generated_file": "exec-8393fa36-e564-4f3f-a5e8-b63b17eceeae.png",
-      "nine_slice": null
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "file": "res://art/camp/owl_recruit_01_sleep.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          589.5,
+          1312
+        ],
+        "body_reference_pixels": 1272
+      },
+      "diagnostic_fields": [
+        "texture_canvas",
+        "texture_anchor",
+        "texture_body_reference_pixels",
+        "manifest_canvas",
+        "manifest_anchor"
+      ],
+      "source_of_truth": "data/presentation/combat_art.json:recruits.owl_recruit_01.idle"
     }
   ],
   "effects": [
@@ -525,7 +693,8 @@
     "conversion": "do not halve again or require originals in repository",
     "metadata_mapping": "file + manifest_canvas + manifest_anchor + body_reference_pixels; preserve current recruit variant keys; register rest entries in production presentation data so future sync preserves them",
     "runtime_consumer": "same AHSpriteCard.show_art contract used by existing station poses",
-    "status": "proposal for Claude; no tool/data edit in this design PR"
+    "status": "engineering proposal only; pending validation/implementation by Claude in #77, not an accepted tool change",
+    "runtime_payload": "poses[].show_art"
   },
   "founder_seat_solution": {
     "decision": "use current seat sprites on physical closed crates, not directly on ground; no new founder pose required for this staging",
@@ -598,5 +767,7 @@
       }
     ],
     "integration_note": "Claude must crop/sample visible prop bounds or scale the full sprite equivalently; do not add game ids or resize the founder anatomy"
-  }
+  },
+  "use": "poses[].show_art",
+  "coordinate_policy": "show_art is the only official runtime payload. It preserves ORIGINAL idle canvas/anchor/body_reference exactly; AHSpriteCard scales the already-half-size texture by texture_width/canvas_width, as it does for idle. texture_* and manifest_* are diagnostic evidence only."
 }
