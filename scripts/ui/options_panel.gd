@@ -7,6 +7,7 @@ extends VBoxContainer
 signal closed
 ## Na Estação, Opções também leva à Nova campanha (que saiu do menu dos cômodos).
 signal new_campaign_requested
+signal title_requested
 
 const H = preload("res://scripts/ui/combat_hud.gd")
 ## As ações do jogo e o nome delas na tela (as de teste ficam de fora).
@@ -22,6 +23,8 @@ const PAD_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "Sta
 
 var width := 600.0
 var allow_new_campaign := false
+## Na Estação: o botão de voltar à tela de título (a campanha já está salva; Continuar volta para ela).
+var allow_title := false
 ## As opções da campanha (volumes, velocidade, efeitos) vão para o save. No título sem campanha começada ficam só na
 ## memória: mexer nas Opções não cria um save nem regrava um que não abre (#28); a campanha nova leva os valores.
 var save_campaign := true
@@ -175,6 +178,13 @@ func _ready() -> void:
 		H.style_button(fresh, AHUiStyle.DANGER)
 		fresh.pressed.connect(func(): new_campaign_requested.emit())
 		add_child(fresh)
+	if allow_title:
+		var back := Button.new()
+		back.text = tr("Voltar ao título")
+		back.custom_minimum_size = Vector2(0, 44)
+		H.style_button(back)
+		back.pressed.connect(func(): title_requested.emit())
+		add_child(back)
 
 	var close := Button.new()
 	close.text = tr("Fechar")

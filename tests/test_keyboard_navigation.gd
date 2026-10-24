@@ -225,8 +225,27 @@ func _return() -> void:
 		return
 	var hud: AHRefugeHud = tree.current_scene.hud
 	await _frames(3)
-	t.equal(hud.current, "report", "o relatório abre")
-	for step in [["Entrar no abrigo", S.DORMITORY], ["Iniciar descanso", S.DORMITORY], ["Começar o dia", ""]]:
+	# A volta começa com a chegada de trem (#76): Interagir pula para o relatório.
+	t.equal(hud.current, AHRefugeHud.ARRIVAL, "a volta começa com a chegada de trem")
+	await _send("interact")
+	await _frames(3)
+	t.equal(hud.current, "report", "Interagir pula a chegada e o relatório abre")
+	# O relatório recém-aberto pela chegada ignora pular e voltar por um instante (o segundo toque de quem pula).
+	var guard := Time.get_ticks_msec() + AHRefugeHud.REPORT_GUARD_MS + 50
+	while Time.get_ticks_msec() < guard:
+		await _frames(1)
+	await _send("ui_down")
+	if not t.check(await _walk_to("Entrar no abrigo", 30), "↓ chega em Entrar no abrigo"):
+		return
+	await _send("interact")
+	await _frames(3)
+	t.equal(hud.current, "", "Entrar no abrigo volta à vista geral (a noite espera no Dormitório)")
+	# Menu leva o foco ao Próximo passo (Ir ao Dormitório); Interagir abre o Dormitório.
+	await _send("menu")
+	await _send("interact")
+	await _frames(3)
+	t.equal(hud.current, S.DORMITORY, "Menu e Interagir no Próximo passo abrem o Dormitório")
+	for step in [["Iniciar descanso", S.DORMITORY], ["Começar o dia", ""]]:
 		await _send("ui_down")
 		if not t.check(await _walk_to(step[0], 30), "↓ chega em %s" % step[0]):
 			return

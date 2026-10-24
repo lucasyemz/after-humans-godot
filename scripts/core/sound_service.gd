@@ -111,6 +111,9 @@ func _process(delta: float) -> void:
 		return
 	_refresh = 0.25
 	var scene := get_tree().current_scene
+	# Na passagem, entre a cena que saiu e a que monta (#74), o som da anterior continua (não cai no silêncio).
+	if scene == null and GameFlow.busy:
+		return
 	var want: Dictionary = scene.soundscape() if scene and scene.has_method("soundscape") else {}
 	_switch(0, want.get("music", ""), want.get("music_gain", 0.32))
 	_switch(1, want.get("ambience", ""), want.get("ambience_gain", 0.8))
