@@ -44,9 +44,10 @@ func _init() -> void:
 	_progress.size = Vector2(260, 10)
 	add_child(_progress)
 	var close := Button.new()
-	close.text = "Voltar à Estação"
-	close.custom_minimum_size = Vector2(240, 48)
-	close.position = Vector2(1036, 36)
+	close.text = tr("Voltar à Estação")
+	# Largura para o inglês no texto Maior ("Back to the Station" passava da borda, #35).
+	close.custom_minimum_size = Vector2(280, 48)
+	close.position = Vector2(996, 36)
 	H.style_button(close)
 	close.pressed.connect(func(): closed.emit())
 	add_child(close)

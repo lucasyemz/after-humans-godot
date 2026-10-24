@@ -791,7 +791,6 @@ street_corridor.gd: mark
 street_corridor.gd: meter
 street_corridor.gd: passagem
 street_corridor.gd: patrol
-street_corridor.gd: patrulha
 street_corridor.gd: screen
 street_corridor.gd: search
 street_corridor.gd: specs

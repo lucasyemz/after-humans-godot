@@ -915,7 +915,7 @@ func _station_plan(c: Dictionary) -> void:
 			next.custom_minimum_size = Vector2(600, 0)
 			column.add_child(next)
 		var go := Button.new()
-		go.text = tr("Ver %s") % room_def.name
+		go.text = tr("Ver %s") % tr(room_def.name)
 		go.custom_minimum_size = Vector2(0, 38)
 		H.style_button(go)
 		go.pressed.connect(func(): open_room(id))
@@ -988,7 +988,7 @@ func _room(room_id: String) -> void:
 		var block := S.upgrade_block(c, room_id)
 		var verb := tr("Recuperar") if level == 0 else tr("Melhorar")
 		_button(tr("%s (%s)%s") % [verb, S.cost_text(cost), "" if block == "" else " · " + block],
-			func(): _act(S.upgrade_room(Campaign.state, room_id, level), tr("%s: nível %d.") % [room_def.name, level + 1]), block == "")
+			func(): _act(S.upgrade_room(Campaign.state, room_id, level), tr("%s: nível %d.") % [tr(room_def.name), level + 1]), block == "")
 	for civilian_id in c.station.residents:
 		var who := S.civilian(civilian_id)
 		if who.room == room_id:
@@ -1346,7 +1346,7 @@ func _prep_drawer(c: Dictionary) -> void:
 		_draft.extra < J.MAX_FOOD - J.FREE_FOOD and (_draft.extra + 1) * S.FOOD_COST <= S.quantity(c, "seeds"), food_row)
 	food_box.add_child(U.label(tr("%d sementes · cura na Mochila e no acampamento") % (_draft.extra * S.FOOD_COST), 15, U.MUTED))
 	var go := Button.new()
-	go.text = tr("Partir · %s") % mission.name
+	go.text = tr("Partir · %s") % tr(mission.name)
 	go.custom_minimum_size = Vector2(0, 56)
 	H.style_button(go, U.GOLD)
 	var gold := StyleBoxFlat.new()
@@ -1815,7 +1815,7 @@ func _report() -> void:
 	var phase := J.phase(report.get("phase_id", ""))
 	var won: bool = report.result == "victory"
 	_body.add_child(U.label(tr(RESULT_NAMES.get(report.result, report.result)), 44, U.GOLD if won else (U.MUTED if report.result == "retreat" else U.DANGER), "display"))
-	_text("%s · %s" % [phase.get("name", ""), tr("fase concluída") if won else (tr("a equipe voltou antes do guardião") if report.result == "retreat" else tr("a equipe caiu"))], 18, U.MUTED)
+	_text("%s · %s" % [tr(phase.get("name", "")), tr("fase concluída") if won else (tr("a equipe voltou antes do guardião") if report.result == "retreat" else tr("a equipe caiu"))], 18, U.MUTED)
 	# O que chegou, item a item (cada linha entra um pouco depois da outra).
 	var percent := int(report.get("percent", 0))
 	_section(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent))
@@ -1827,7 +1827,7 @@ func _report() -> void:
 			items.append([spec[0], "+%d %s" % [amount, spec[2] if amount == 1 else spec[3]]])
 	if report.get("request", "") != "":
 		var who := S.civilian(report.request)
-		items.append(["item-generic", tr("%s recebeu %s: %s") % [who.name, who.request_item, who.request_reward]])
+		items.append(["item-generic", tr("%s recebeu %s: %s") % [who.name, tr(who.request_item), tr(who.request_reward)]])
 	if items.is_empty():
 		_text(tr("Nada chegou desta vez."), 18, U.MUTED)
 	for i in items.size():

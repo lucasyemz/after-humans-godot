@@ -178,8 +178,8 @@ func _ready() -> void:
 	_finish_button.visible = false
 	_finish_button.pressed.connect(func(): menu_return.emit())
 	add_child(_finish_button)
-	_menu_button = _corner_button(tr("Menu"), "menu", Vector2(1716, 974), func(): menu_requested.emit())
-	_corner_button(tr("Mochila"), "inventory", Vector2(1524, 974), func(): inventory_requested.emit())
+	_menu_button = _corner_button(tr("Menu"), "menu", Vector2(1696, 974), func(): menu_requested.emit())
+	_corner_button(tr("Mochila"), "inventory", Vector2(1484, 974), func(): inventory_requested.emit())
 
 	# O aviso também é botão: tocar ou clicar nele usa o que está perto.
 	_prompt = PanelContainer.new()
@@ -207,16 +207,20 @@ func _ready() -> void:
 	add_child(_toast)
 
 
+const CORNER_WIDTH := 200.0
+
+
 func _corner_button(text: String, key_action: String, at: Vector2, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.position = at
-	button.custom_minimum_size = Vector2(180, 46)
+	# Largura para o nome em inglês no texto Maior ("Backpack" encostava na tecla, #35).
+	button.custom_minimum_size = Vector2(CORNER_WIDTH, 46)
 	H.style_button(button)
 	button.focus_mode = Control.FOCUS_NONE
 	var cap := S.action_cap(key_action)
-	cap.position = Vector2(180 - 16 - (24 if S.key_name(key_action).length() == 1 else 44), 9)
+	cap.position = Vector2(CORNER_WIDTH - 16 - (24 if S.key_name(key_action).length() == 1 else 44), 9)
 	button.add_child(cap)
 	button.pressed.connect(action)
 	add_child(button)
@@ -254,7 +258,7 @@ func _refresh_place() -> void:
 	var parts := PackedStringArray()
 	if expedition != null:
 		var info := AHJourneyRules.phase(expedition.phase_id)
-		parts.append(tr("Jornada %d · %s") % [AHJourneyRules.PHASES.find(info) + 1, info.get("name", "")])
+		parts.append(tr("Jornada %d · %s") % [AHJourneyRules.PHASES.find(info) + 1, tr(info.get("name", ""))])
 	if _weather != "":
 		parts.append(_weather)
 	_place_sub.text = " · ".join(parts)
