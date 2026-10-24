@@ -299,7 +299,7 @@ func _start_new_campaign(number: int) -> void:
 	Campaign.new_game_in(number)
 	Campaign.state.settings.merge(settings, true)
 	Campaign.save()
-	if not await GameFlow.change_to("station"):
+	if not await GameFlow.travel("station"):
 		_leaving = false
 
 

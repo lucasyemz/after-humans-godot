@@ -433,9 +433,8 @@ func _travel_map(campaign: Dictionary, next: int) -> void:
 	busy = true
 	R.enter_step(campaign, next)
 	Campaign.save()
-	var info := R.phase(campaign.session.expedition.phase_id)
-	hud.toast(tr("Seguindo para: %s…") % AHScenarioWorld.display_of(info.get("map", "")), 2.0)
-	GameFlow.change_to("street")
+	# O cartão da passagem diz para onde a equipe segue (o lugar da fase e o trecho).
+	GameFlow.travel("street")
 
 
 ## Visão e suspeita do guarda do trecho; true se a luta começou.
@@ -724,7 +723,7 @@ func open_inventory() -> void:
 
 func _new_campaign() -> void:
 	Campaign.new_game()
-	GameFlow.change_to("station")
+	GameFlow.travel("station")
 
 
 func _search_scenario_prop(entry: Dictionary) -> void:
@@ -1075,4 +1074,4 @@ func _show_result() -> void:
 ## voluntários de graça (FAHShelterRules::CanRecruitVolunteer), então a campanha continua.
 func _on_result_continue() -> void:
 	hud.close_modal()
-	GameFlow.change_to("station")
+	GameFlow.travel("station")

@@ -901,6 +901,8 @@ func _show(key: String) -> void:
 			options.allow_new_campaign = true
 			options.closed.connect(close_panel)
 			options.new_campaign_requested.connect(func(): open_service("new_campaign"))
+			options.allow_title = true
+			options.title_requested.connect(func(): GameFlow.travel("title"))
 			_body.add_child(options)
 		_:
 			_room(key)
@@ -954,7 +956,7 @@ func _new_campaign_view() -> void:
 	_button(tr("Cancelar"), close_panel)
 	_button(tr("Começar do zero"), func():
 		Campaign.new_game()
-		GameFlow.change_to("station"))
+		GameFlow.travel("station"))
 
 
 func _heading(text: String, subtitle: String = "") -> void:
@@ -1554,7 +1556,7 @@ func _depart() -> void:
 		return
 	_draft = {}
 	Campaign.save()
-	GameFlow.change_to("street")
+	GameFlow.travel("street")
 
 
 ## A partida na plataforma: a equipe em fila e o mesmo painel da Preparação (equipe, foco, suprimentos, confirmar).
