@@ -1,0 +1,408 @@
+{
+  "version": 1,
+  "issue": 59,
+  "reference_commit": "fceda77",
+  "status": "proposal_for_lucas_approval",
+  "base_canvas": [
+    1920,
+    1080
+  ],
+  "grid": 8,
+  "screen_margin": 48,
+  "section_gap": 24,
+  "padding": 24,
+  "frame_slice_ltrb": [
+    16,
+    16,
+    16,
+    16
+  ],
+  "anchor_coordinates": "top-left origin; relative metrics except named projected actor anchor",
+  "palette": {
+    "bg": "#0d1012",
+    "surface": "#12171a",
+    "edge": "#3b3327",
+    "copper": "#c98a4b",
+    "gold": "#e9c47c",
+    "text": "#efe5d1",
+    "muted": "#a69a84",
+    "good": "#86c98f",
+    "danger": "#e2675b",
+    "enemy": "#d9893d",
+    "instinct": "#b7a6f4",
+    "blue": "#8fb4f0"
+  },
+  "colorblind": {
+    "good": "#56b4e9",
+    "danger": "#e69f00",
+    "blue": "#efe5d1"
+  },
+  "contrast_on_surface": {
+    "text": 14.442,
+    "muted": 6.514,
+    "copper": 6.207,
+    "gold": 10.877,
+    "good": 9.255,
+    "danger": 5.438
+  },
+  "type": {
+    "families": {
+      "title": "Cinzel Bold",
+      "body": "Plus Jakarta Sans",
+      "detail": "Plus Jakarta Sans"
+    },
+    "normal": [
+      32,
+      24,
+      18
+    ],
+    "large": [
+      42,
+      31,
+      23
+    ],
+    "intermediate": [
+      37,
+      28,
+      21
+    ],
+    "normal_line_height": [
+      48,
+      40,
+      32
+    ],
+    "large_line_height": [
+      64,
+      48,
+      40
+    ]
+  },
+  "motion_ms": {
+    "hover": 100,
+    "press": 60,
+    "open": 160,
+    "close": 100,
+    "bar": 180,
+    "tooltip_delay_mouse": 250,
+    "toast": 4000,
+    "reduced_motion": 0
+  },
+  "components": {
+    "panel": {
+      "name": "01 / Painel",
+      "metrics": {
+        "lateral_width": 640,
+        "central_width": 960,
+        "default_height": 704,
+        "max_height": 984,
+        "header": 104,
+        "footer": 112,
+        "padding": 24
+      },
+      "applicable_states": [
+        "normal",
+        "alert"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "button": {
+      "name": "02 / Botão",
+      "metrics": {
+        "min_width": 192,
+        "height": 64,
+        "large_height": 80,
+        "icon_only": [
+          64,
+          64
+        ],
+        "large_icon_only": [
+          80,
+          80
+        ],
+        "padding": 24
+      },
+      "applicable_states": [
+        "normal",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "alert"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "card": {
+      "name": "03 / Cartão",
+      "metrics": {
+        "min_width": 320,
+        "horizontal_width": 480,
+        "height": 176,
+        "large_height": 208,
+        "slot": [
+          64,
+          64
+        ],
+        "title_xy": [
+          104,
+          24
+        ],
+        "detail_xy": [
+          24,
+          88
+        ],
+        "state_xy": [
+          24,
+          128
+        ]
+      },
+      "applicable_states": [
+        "normal",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "alert",
+        "selected"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "plate": {
+      "name": "04 / Placa",
+      "metrics": {
+        "width_range": [
+          240,
+          320
+        ],
+        "height": 120,
+        "large_height": 128,
+        "ground_gap": 16,
+        "life_height": 12,
+        "instinct_height": 4,
+        "state_icon": 24,
+        "padding": 24,
+        "name_reserved_normal": 40,
+        "name_reserved_large": 48,
+        "formula_normal": "24+40+8+12+8+4+24=120",
+        "formula_large": "24+48+8+12+8+4+24=128",
+        "name_reserved_intermediate": 48,
+        "intermediate_font": 28,
+        "intermediate_line_height": 40,
+        "intermediate_slot_extra": 8
+      },
+      "applicable_states": [
+        "normal",
+        "hover",
+        "focus",
+        "alert",
+        "selected"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "bar": {
+      "name": "05 / Barras",
+      "metrics": {
+        "min_width": 160,
+        "life_height": 16,
+        "instinct_height": 8,
+        "progress_height": 12
+      },
+      "applicable_states": [
+        "normal",
+        "alert"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "chip": {
+      "name": "06 / Ficha",
+      "metrics": {
+        "min_width": 128,
+        "height": 64,
+        "large_height": 80,
+        "icon": 32,
+        "icon_text_gap": 8
+      },
+      "applicable_states": [
+        "normal",
+        "hover",
+        "focus",
+        "alert"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "tooltip": {
+      "name": "07 / Dica",
+      "metrics": {
+        "width_range": [
+          320,
+          480
+        ],
+        "large_width_range": [
+          480,
+          640
+        ],
+        "max_body_lines": 3,
+        "padding": 24,
+        "trigger_gap": 16
+      },
+      "applicable_states": [
+        "normal",
+        "alert"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "notice": {
+      "name": "08 / Aviso",
+      "metrics": {
+        "toast_width": 448,
+        "toast_min_height": 112,
+        "toast_large_min_height": 144,
+        "banner_height": 80,
+        "banner_large_height": 96,
+        "confirmation_min_size": [
+          736,
+          384
+        ]
+      },
+      "applicable_states": [
+        "normal",
+        "alert"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "sequence": {
+      "name": "09 / Sequência",
+      "metrics": {
+        "node": [
+          64,
+          64
+        ],
+        "large_node": [
+          80,
+          80
+        ],
+        "gap": 16,
+        "max_visible": 8
+      },
+      "applicable_states": [
+        "normal",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "alert",
+        "selected"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "key": {
+      "name": "10 / Tecla",
+      "metrics": {
+        "size": [
+          64,
+          64
+        ],
+        "large_size": [
+          80,
+          80
+        ],
+        "label_gap": 16,
+        "hints_gap": 24
+      },
+      "applicable_states": [
+        "normal",
+        "pressed",
+        "disabled"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "selection": {
+      "name": "11 / Seleção",
+      "metrics": {
+        "focus_gap": 6,
+        "focus_stroke": 3,
+        "focus_arm": 18,
+        "focus_reserved": 16,
+        "selected_diamond": [
+          18,
+          18
+        ],
+        "selected_center_inset": 24,
+        "target_outline": 3
+      },
+      "applicable_states": [
+        "normal",
+        "hover",
+        "focus",
+        "alert",
+        "selected"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    },
+    "tabs": {
+      "name": "12 / Abas e listas",
+      "metrics": {
+        "tab_height": 64,
+        "large_tab_height": 80,
+        "row_min_height": 64,
+        "large_row_min_height": 80,
+        "gap": 8
+      },
+      "applicable_states": [
+        "normal",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "alert",
+        "selected"
+      ],
+      "large": "use large metrics and 130% type; wrap or grow, never shrink",
+      "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
+    }
+  },
+  "assets": "reuse art/ui/frames, icons, portraits; no new runtime art",
+  "integration_issue": 60,
+  "next_design_issue": 58,
+  "information_rule": "Information is text plus icon only; no filled bar or state outline; colorblind information uses TEXT #efe5d1, not BLUE. Instinct remains a thin named bar.",
+  "intermediate_geometry": "Grande uses all Maior component dimensions and reserved slots, with 115% type; no interpolation.",
+  "reproduction": {
+    "Pillow": "13.0.0",
+    "CairoSVG": "2.9.1"
+  },
+  "preview_format": "WebP quality86; originals outside repository"
+}

@@ -1,0 +1,368 @@
+{
+  "result": "PASS",
+  "base_commit": "83e2717",
+  "poses": [
+    {
+      "file": "art/camp/dog_recruit_01_seat.webp",
+      "size": [
+        543,
+        724
+      ],
+      "mode": "RGBA",
+      "bytes": 83966,
+      "sha256": "976a8a4017aaebe46b61445154f7a1019aa367d6315cfd25b0826f5f44e797a3",
+      "same_anchor_as_idle": true,
+      "same_body_reference_as_idle": true,
+      "strong_alpha_components": 1,
+      "touching_canvas_edge": false
+    },
+    {
+      "file": "art/camp/dog_recruit_01_sleep.webp",
+      "size": [
+        543,
+        724
+      ],
+      "mode": "RGBA",
+      "bytes": 64210,
+      "sha256": "8f83a15aa37f6ba2f53cf75a42b32518c1c192391e673e351b12aba3e9a4c173",
+      "same_anchor_as_idle": true,
+      "same_body_reference_as_idle": true,
+      "strong_alpha_components": 1,
+      "touching_canvas_edge": false
+    },
+    {
+      "file": "art/camp/cat_recruit_01_seat.webp",
+      "size": [
+        589,
+        668
+      ],
+      "mode": "RGBA",
+      "bytes": 91838,
+      "sha256": "6ef7a7613d0ef5496865ce8fe126ac09778e22d7467e75a57beced5ba439ceeb",
+      "same_anchor_as_idle": true,
+      "same_body_reference_as_idle": true,
+      "strong_alpha_components": 1,
+      "touching_canvas_edge": false
+    },
+    {
+      "file": "art/camp/cat_recruit_01_sleep.webp",
+      "size": [
+        589,
+        668
+      ],
+      "mode": "RGBA",
+      "bytes": 60076,
+      "sha256": "c9d5db1807da97174bde1c3db1838a14de812728fbdfcd9761eb8432a39d43f0",
+      "same_anchor_as_idle": true,
+      "same_body_reference_as_idle": true,
+      "strong_alpha_components": 1,
+      "touching_canvas_edge": false
+    },
+    {
+      "file": "art/camp/frog_recruit_01_seat.webp",
+      "size": [
+        589,
+        668
+      ],
+      "mode": "RGBA",
+      "bytes": 72162,
+      "sha256": "d66175249ae5a97f76c80e634180de62706635376ef89e1842d1061bbfa9c272",
+      "same_anchor_as_idle": true,
+      "same_body_reference_as_idle": true,
+      "strong_alpha_components": 1,
+      "touching_canvas_edge": false
+    },
+    {
+      "file": "art/camp/frog_recruit_01_sleep.webp",
+      "size": [
+        589,
+        668
+      ],
+      "mode": "RGBA",
+      "bytes": 61176,
+      "sha256": "68b5a4a1f59ddc2caffcf0aa7fb3437cc4950326e3e6a53f159ae14ee9f5a7d7",
+      "same_anchor_as_idle": true,
+      "same_body_reference_as_idle": true,
+      "strong_alpha_components": 1,
+      "touching_canvas_edge": false
+    },
+    {
+      "file": "art/camp/owl_recruit_01_seat.webp",
+      "size": [
+        589,
+        668
+      ],
+      "mode": "RGBA",
+      "bytes": 77514,
+      "sha256": "a3113ad63021926f041da1dfa75fb756db6e856220805e1f0c96ccede63e5c19",
+      "same_anchor_as_idle": true,
+      "same_body_reference_as_idle": true,
+      "strong_alpha_components": 1,
+      "touching_canvas_edge": false
+    },
+    {
+      "file": "art/camp/owl_recruit_01_sleep.webp",
+      "size": [
+        589,
+        668
+      ],
+      "mode": "RGBA",
+      "bytes": 65760,
+      "sha256": "05f9120f74c919c89af5737123bcaa7ec540187e9255cd28a9f52e9416185194",
+      "same_anchor_as_idle": true,
+      "same_body_reference_as_idle": true,
+      "strong_alpha_components": 1,
+      "touching_canvas_edge": false
+    }
+  ],
+  "effects": [
+    {
+      "file": "art/camp/food_morsel.webp",
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA",
+      "bytes": 12588,
+      "sha256": "c7fef46bf0e1ddca782d2e359eb5833512cb453e04b3d5e51c801fd93051b4ec"
+    },
+    {
+      "file": "art/camp/bandage_wrap.webp",
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA",
+      "bytes": 13258,
+      "sha256": "5f0af3cb5fe487ec79a9929f6ad2648b565fc9010cd8354fa7e0668834f583d8"
+    },
+    {
+      "file": "art/camp/iris_ampoule.webp",
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA",
+      "bytes": 13186,
+      "sha256": "2717667c3594af22447aece613fd07a99d10c3d1eb1ed851b9f851cd02d5548f"
+    }
+  ],
+  "previews_max_bytes": 293774,
+  "godot_import": {
+    "engine": "4.7.2",
+    "result": "PASS",
+    "lossless_import": true,
+    "assets": [
+      {
+        "file": "res://art/camp/bandage_wrap.webp",
+        "size": [
+          192,
+          192
+        ]
+      },
+      {
+        "file": "res://art/camp/cat_recruit_01_seat.webp",
+        "size": [
+          589,
+          668
+        ]
+      },
+      {
+        "file": "res://art/camp/cat_recruit_01_sleep.webp",
+        "size": [
+          589,
+          668
+        ]
+      },
+      {
+        "file": "res://art/camp/dog_recruit_01_seat.webp",
+        "size": [
+          543,
+          724
+        ]
+      },
+      {
+        "file": "res://art/camp/dog_recruit_01_sleep.webp",
+        "size": [
+          543,
+          724
+        ]
+      },
+      {
+        "file": "res://art/camp/food_morsel.webp",
+        "size": [
+          192,
+          192
+        ]
+      },
+      {
+        "file": "res://art/camp/frog_recruit_01_seat.webp",
+        "size": [
+          589,
+          668
+        ]
+      },
+      {
+        "file": "res://art/camp/frog_recruit_01_sleep.webp",
+        "size": [
+          589,
+          668
+        ]
+      },
+      {
+        "file": "res://art/camp/iris_ampoule.webp",
+        "size": [
+          192,
+          192
+        ]
+      },
+      {
+        "file": "res://art/camp/owl_recruit_01_seat.webp",
+        "size": [
+          589,
+          668
+        ]
+      },
+      {
+        "file": "res://art/camp/owl_recruit_01_sleep.webp",
+        "size": [
+          589,
+          668
+        ]
+      }
+    ]
+  },
+  "camp_geometry": {
+    "pixels_per_meter": 300,
+    "pairs": [
+      {
+        "a": "dog_recruit_01",
+        "b": "cat_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "dog_recruit_01",
+        "b": "frog_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "dog_recruit_01",
+        "b": "owl_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "cat_recruit_01",
+        "b": "frog_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "cat_recruit_01",
+        "b": "owl_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "frog_recruit_01",
+        "b": "owl_recruit_01",
+        "rectangles_disjoint": true
+      }
+    ],
+    "slots": [
+      {
+        "recruit_example": "dog_recruit_01",
+        "ground_anchor": [
+          300,
+          900
+        ],
+        "mirror_x": false,
+        "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+        "pixels_per_meter": 300,
+        "visible_screen_bbox": [
+          136,
+          612,
+          464,
+          901
+        ],
+        "texture_screen_rect": [
+          98,
+          369,
+          503,
+          908
+        ]
+      },
+      {
+        "recruit_example": "cat_recruit_01",
+        "ground_anchor": [
+          740,
+          1010
+        ],
+        "mirror_x": false,
+        "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+        "pixels_per_meter": 300,
+        "visible_screen_bbox": [
+          534,
+          680,
+          946,
+          1010
+        ],
+        "texture_screen_rect": [
+          529,
+          541,
+          950,
+          1018
+        ]
+      },
+      {
+        "recruit_example": "frog_recruit_01",
+        "ground_anchor": [
+          1180,
+          1010
+        ],
+        "mirror_x": true,
+        "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+        "pixels_per_meter": 300,
+        "visible_screen_bbox": [
+          1004,
+          768,
+          1356,
+          1012
+        ],
+        "texture_screen_rect": [
+          980,
+          565,
+          1380,
+          1019
+        ]
+      },
+      {
+        "recruit_example": "owl_recruit_01",
+        "ground_anchor": [
+          1620,
+          900
+        ],
+        "mirror_x": true,
+        "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+        "pixels_per_meter": 300,
+        "visible_screen_bbox": [
+          1439,
+          597,
+          1803,
+          900
+        ],
+        "texture_screen_rect": [
+          1390,
+          386,
+          1851,
+          909
+        ]
+      }
+    ],
+    "draw_order": [
+      "dog_recruit_01",
+      "owl_recruit_01",
+      "cat_recruit_01",
+      "frog_recruit_01",
+      "campfire"
+    ],
+    "hit_test_rule": "hit visible alpha of character at threshold24; do not let transparent canvas intercept another hero; same click target as combat"
+  }
+}
