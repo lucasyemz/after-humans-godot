@@ -836,12 +836,14 @@ func toast(text: String, error: bool = false) -> void:
 ## Refeito a cada quadro enquanto aparece (o painel abre e fecha por baixo dele).
 func _place_feedback() -> void:
 	var right := _panel.get_global_rect().position.x - 24.0 if _panel.visible else 1920.0
-	var width := minf(FEEDBACK_WIDTH, right - 64.0)
+	# Nem por cima do menu da esquerda (o Próximo passo, na vista geral e nas Opções).
+	var left := _menu.get_global_rect().end.x + 24.0 if _menu.visible else 0.0
+	var width := minf(FEEDBACK_WIDTH, right - left - 32.0)
 	_feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_feedback.custom_minimum_size.x = width
 	_feedback.size = Vector2(width, 0)
-	_feedback.position = Vector2((right - width) * 0.5, FEEDBACK_TOP)
+	_feedback.position = Vector2(left + (right - left - width) * 0.5, FEEDBACK_TOP)
 
 
 const FEEDBACK_WIDTH := 900.0
