@@ -161,6 +161,8 @@ func flash(color: Color, seconds: float = 0.35, white_seconds: float = 0.0) -> v
 	if white_seconds > 0.0:
 		_flash_tween.tween_property(_material, "emission", color, white_seconds)
 	_flash_tween.tween_property(_material, "emission", _highlight, seconds)
+	# O destaque pode ter mudado durante o piscar (a mira abriu no meio): termina no atual.
+	_flash_tween.tween_callback(func(): _material.emission = _highlight)
 
 
 ## Mistura por alfa (efeitos com transparência suave) em vez do recorte duro dos personagens.

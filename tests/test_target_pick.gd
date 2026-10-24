@@ -83,11 +83,18 @@ func _fight() -> void:
 	t.check(_command.is_empty(), "o primeiro clique escolhe sem usar")
 	t.equal(hud._picked_rank, second_rank, "o clicado fica escolhido")
 	t.check(hud._target_label.visible and hud._target_label.get_meta("card") == card, "o ALVO aparece acima dele")
+	await _tree.process_frame
+	var label_rect := Rect2(hud._target_label.position, hud._target_label.size)
+	var plate_now: Control = hud._unit_bars.get(second.get_meta("unit_id"))
+	t.check(plate_now == null or not Rect2(plate_now.global_position, plate_now.size).intersects(label_rect), "o ALVO não cobre a placa dele")
+	t.check(not hud._tip.visible or not Rect2(hud._tip.position, hud._tip.size).intersects(label_rect.merge(hud._body_rect(camera, card))),
+		"a dica não cobre o apontado nem o ALVO")
 	t.check(card.highlight().v > targets[0].get_meta("card").highlight().v, "a luz do apontado é mais forte que a dos outros alvos")
 	await _click(middle)
 	t.check(_command.get("kind", "") == "ability" and _command.get("rank", -1) == second_rank and _command.get("ability_id", "") == option.id,
 		"o segundo clique no mesmo usa a habilidade nele %s" % [_command])
-	t.check(actor.highlight() == Color.BLACK or not hud._markers.is_empty(), "as luzes apagam depois")
+	t.check(hud._markers.is_empty() and actor.highlight() == Color.BLACK and not others.any(func(u): return arena.cards[u.id].dimmed()),
+		"as luzes e o escurecido apagam depois")
 	# O teclado: na vez seguinte, as setas andam entre os alvos e Enter usa.
 	_command = {}
 	for i in 1200:
@@ -109,6 +116,32 @@ func _fight() -> void:
 	t.equal(hud._picked_rank, next_rank, "→ escolhe o próximo")
 	await _press("ui_accept")
 	t.equal(_command.get("rank", -1), next_rank, "Enter usa no escolhido %s" % [_command])
+	# Clique em A, seta para B, clique em A de novo: o ALVO estava em B, então o clique só escolhe A.
+	_command = {}
+	for i in 1200:
+		if hud.waiting and hud._choosing == "":
+			break
+		await _tree.process_frame
+	options = hud._options.filter(func(o): return o.enemy_side and o.targets.size() >= 2 and o.get("enabled", true))
+	if not hud.waiting or options.is_empty():
+		return
+	hud._on_ability(options[0])
+	await _tree.process_frame
+	await _tree.process_frame
+	var a_marker: Button = hud._markers.filter(func(m): return m.has_meta("card"))[0]
+	var a_rank := int(a_marker.get_meta("rank"))
+	var a_card: AHSpriteCard = a_marker.get_meta("card")
+	var at := camera.unproject_position(a_card.global_position + Vector3(0, a_card.body_height * 0.55, 0))
+	await _click(at)
+	await _press("ui_right")
+	t.check(hud._picked_rank != a_rank, "a seta leva o ALVO para outro")
+	await _click(at)
+	t.check(_command.is_empty() and hud._picked_rank == a_rank, "clique, seta e clique de volta só escolhe %s" % [_command])
+	# Esc volta: as luzes, o escurecido e o ALVO apagam.
+	await _press("ui_cancel")
+	t.check(hud._markers.is_empty() and not hud._target_label.visible, "Esc fecha a escolha")
+	t.check(arena.session.units().all(func(u): return not arena.cards.has(u.id) or (arena.cards[u.id].highlight() == Color.BLACK and not arena.cards[u.id].dimmed())),
+		"e apaga as luzes e o escurecido")
 
 
 ## Um clique de verdade, em coordenadas da tela do jogo (a janela sem tela do teste tem outra escala: a posição passa

@@ -222,13 +222,14 @@ func _build() -> void:
 	_target_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
 	_target_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_target_label.visible = false
-	add_child(_target_label)
 	_tip = PanelContainer.new()
 	_tip.add_theme_stylebox_override("panel", S.panel(0.96, GOLD.darkened(0.2)))
 	_tip.custom_minimum_size = Vector2(460, 0)
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tip.visible = false
 	add_child(_tip)
+	# Depois da dica: desenhado por cima dela.
+	add_child(_target_label)
 	_tip_box = VBoxContainer.new()
 	_tip_box.add_theme_constant_override("separation", 6)
 	_tip_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -576,6 +577,13 @@ func _process(_delta: float) -> void:
 		if is_instance_valid(pointed):
 			var top := camera.unproject_position(pointed.global_position + Vector3(0, pointed.head_height() + 0.15, 0))
 			_target_label.position = top - Vector2(_target_label.size.x * 0.5, _target_label.size.y)
+			# Nos baixinhos a placa fica acima da cabeça: o ALVO sobe para cima dela.
+			for rect in short_plates:
+				if rect.intersects(Rect2(_target_label.position, _target_label.size)):
+					_target_label.position.y = rect.position.y - _target_label.size.y - 4
+			# Na mira, a dica da habilidade sai de cima do apontado (ficava sobre o corpo e o ALVO).
+			if _tip.visible:
+				_dodge_tip(_body_rect(camera, pointed).merge(Rect2(_target_label.position, _target_label.size)))
 	for marker in _markers.filter(func(m): return not m.has_meta("card")) + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")
 		var screen := camera.unproject_position(target)
@@ -594,6 +602,15 @@ func _body_rect(camera: Camera3D, card: AHSpriteCard) -> Rect2:
 	var height := maxf(feet.y - head.y, 24.0)
 	var width := maxf(height * BODY_WIDTH, 48.0)
 	return Rect2(Vector2(feet.x - width * 0.5, head.y), Vector2(width, height))
+
+
+## Afasta a dica (na altura de sempre) para o lado em que ela não cobre o apontado.
+func _dodge_tip(avoid: Rect2) -> void:
+	if not Rect2(_tip.position, _tip.size).intersects(avoid):
+		return
+	var left := avoid.position.x - 16 - _tip.size.x
+	var right := avoid.end.x + 16
+	_tip.position.x = left if left >= 16 and (avoid.get_center().x > 960 or right + _tip.size.x > 1904) else clampf(right, 16, 1904 - _tip.size.x)
 
 
 ## A largura do corpo, em fração da altura, para a área do clique no alvo.
@@ -1166,6 +1183,9 @@ func _press_target(rank: int, on_pick: Callable) -> void:
 func _select_target(rank: int) -> void:
 	if _markers.is_empty():
 		return
+	# Escolhido pelo teclado ou controle, outro alvo: o clique seguinte num alvo só escolhe (não usa sem ver o ALVO nele).
+	if _clicked_rank != rank:
+		_clicked_rank = -1
 	_picked_rank = rank
 	if _pick_ability != "":
 		_preview_hits(_pick_ability, rank)
@@ -1195,7 +1215,9 @@ func _paint_targets(pointed: int = -2) -> void:
 		if card == null or not AHCombatEngine.alive_any(unit):
 			continue
 		if unit.id == _actor_id:
-			card.set_highlight(S.TARGET_ACTIVE_COLOR, S.TARGET_ACTIVE)
+			# O herói da vez apontado (a cura nele mesmo): o dourado, forte.
+			var self_pointed: bool = unit.is_player != _pick_side and pointed >= 0 and session.engine.occupies_rank(unit, pointed)
+			card.set_highlight(S.TARGET_ACTIVE_COLOR, S.TARGET_POINTED if self_pointed else S.TARGET_ACTIVE)
 		elif unit.is_player != _pick_side and _pick_ranks.any(func(r): return session.engine.occupies_rank(unit, r)):
 			var strength := S.TARGET_VALID
 			if pointed >= 0 and session.engine.occupies_rank(unit, pointed):
