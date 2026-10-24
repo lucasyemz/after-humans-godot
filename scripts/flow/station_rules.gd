@@ -1107,7 +1107,10 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	# A primeira vitória em cada fase traz o que a equipe viu lá (#64): a camada da escada da fase, uma vez.
 	delivered.story = ""
 	var phase_id: String = expedition.get("phase_id", "")
-	if session.result == "victory" and AHJourneyRules.STORY_REPORTS.has(phase_id) and not campaign.station.story_reports.has(phase_id):
+	# A linha que cita o evento de história (a do interfone) só vem depois de a equipe ter visto o evento: a rota com a
+	# Passagem só na travessia não abre o evento, e a linha fica para a próxima vitória.
+	var story_seen: bool = not AHJourneyRules.STORY_REPORT_AFTER_EVENT.has(phase_id) or campaign.station.story_events.has(phase_id)
+	if session.result == "victory" and story_seen and AHJourneyRules.STORY_REPORTS.has(phase_id) and not campaign.station.story_reports.has(phase_id):
 		campaign.station.story_reports.append(phase_id)
 		delivered.story = AHJourneyRules.STORY_REPORTS[phase_id]
 	# A comida que sobrou vira suprimento e abre a noite; depois o ciclo da Estação e o trem.

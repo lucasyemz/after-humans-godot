@@ -98,6 +98,15 @@ func _report(t) -> void:
 	t.equal(S.confirm_departure(campaign, campaign.preferred_formation.duplicate(), 0, 98, "fase_5", "parts"), "", "a segunda expedição parte")
 	campaign.session.result = "victory"
 	t.equal(S.finish_return(campaign).get("story", "x"), "", "a segunda vitória na fase não repete")
+	# Fase com evento de história: sem o evento visto, a linha (que cita o que ele mostrou) fica para depois.
+	var unseen := _campaign("fase_2")
+	unseen.session.result = "victory"
+	t.equal(S.finish_return(unseen).get("story", "x"), "", "sem o evento da fase visto, a linha fica para depois")
+	t.check(not unseen.station.story_reports.has("fase_2"), "e não é gasta")
+	var seen := _campaign("fase_2")
+	seen.station.story_events.append("fase_2")
+	seen.session.result = "victory"
+	t.equal(S.finish_return(seen).get("story", ""), R.STORY_REPORTS.fase_2, "com o evento visto, a linha vem")
 	var lost := _campaign("fase_1")
 	lost.session.result = "defeat"
 	t.equal(S.finish_return(lost).get("story", "x"), "", "a derrota não traz a linha")

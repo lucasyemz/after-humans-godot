@@ -44,6 +44,8 @@ const DIFFICULTY_NAMES := ["Fácil", "Moderada", "Difícil", "Muito difícil"]
 const STORY_EVENTS := {"fase_2": "voz_interfone", "fase_3": "porta_espera", "fase_5": "sobrevivente_tuneis"}
 ## "O que a equipe viu": a linha do relatório da volta na primeira vitória de cada fase. Nenhuma mostra um humano nem
 ## cita Théo (bento-nick-arc §11): o máximo é a autenticação do fim da fase 5 (lore §25.4).
+## As fases cuja linha cita o que o evento de história mostrou: só depois de ele aparecer.
+const STORY_REPORT_AFTER_EVENT := ["fase_2"]
 const STORY_REPORTS := {
 	"fase_1": "A Estação aguenta mais alguns dias. O que os Antigos deixaram, ninguém aqui sabe fazer de novo.",
 	"fase_2": "Na volta, alguém repete a frase do interfone: \"preservação humana\". Ninguém sabe por que a ponte acordou.",
