@@ -267,7 +267,15 @@ func _return_report() -> bool:
 		return false
 	var hud: AHRefugeHud = _station().hud
 	await _frames(3)
-	t.equal(hud.current, "report", "a volta abre o relatório na plataforma")
+	# A chegada (#76): o trem chega com a equipe, os vivos descem e andam até a fila; depois, o relatório.
+	t.equal(hud.current, AHRefugeHud.ARRIVAL, "a volta começa com a chegada da equipe de trem")
+	t.check(_station().team_arriving(), "o trem chega com a equipe")
+	var alive: Array = Campaign.state.station.last_return.get("team", []).filter(func(id): return Campaign.hero(id) != null and Campaign.hero(id).alive)
+	if not await _until(func(): return _station().lineup.size() == alive.size(), "a equipe descer do trem"):
+		return false
+	if not await _until(func(): return hud.current == "report", "o relatório abrir depois da chegada", 30.0):
+		return false
+	t.equal(_station().lineup.map(func(e): return e.hero_id), alive, "os que voltaram estão na fila do relatório")
 	var report: Dictionary = Campaign.state.station.last_return
 	t.equal(report.get("result", ""), "victory", "o relatório é de vitória")
 	t.equal(report.get("phase_id", ""), "fase_1", "o relatório é da fase 1")
@@ -275,11 +283,19 @@ func _return_report() -> bool:
 	if not await _press(hud, "Entrar no abrigo", "Entrar no abrigo no relatório"):
 		return false
 	t.check(Campaign.state.station.last_return.get("seen", false), "o relatório fica visto")
-	if not await _until(func(): return hud.current == S.DORMITORY, "o Dormitório abrir depois do relatório"):
+	# Depois do relatório, a vista geral: o Próximo passo diz que a equipe precisa dormir, o Dormitório em destaque e
+	# Preparar expedição bloqueado com o motivo (#76).
+	if not await _until(func(): return hud.current == "", "a vista geral depois do relatório"):
 		return false
+	await _frames(3)
+	t.equal(hud._next.get("action", ""), "dormitory", "o Próximo passo leva ao Dormitório")
+	t.check(hud._next_text.text.contains("precisa dormir"), "o Próximo passo diz que a equipe precisa dormir")
+	var blocked: Button = hud.find_child("PrepareBlocked", true, false)
+	t.check(blocked != null and blocked.disabled and blocked.is_visible_in_tree(), "Preparar expedição fica bloqueado")
+	t.check(_has_label(hud, S.preparation_block(Campaign.state)), "com o motivo embaixo")
+	# A câmera volta da plataforma para o abrigo pela passagem; chegando, o Dormitório aparece em destaque.
+	t.check(await _until(func(): return hud._rest_tag.visible, "o Dormitório em destaque", 15.0), "o Dormitório fica em destaque")
 	# Com a noite pendente, Preparar expedição não parte: a Preparação diz o motivo e leva ao Dormitório.
-	hud.close_panel()
-	await _frames(2)
 	hud.open_map()
 	await _frames(2)
 	t.check(not hud._map.visible and hud.current == S.PREPARATION, "com a noite pendente, Preparar expedição abre a Preparação, não o mapa")

@@ -847,3 +847,4 @@ game_flow.gd: After Humans
 refuge_hud.gd: title
 game_flow.gd: subtitle
 game_flow.gd: hold
+refuge_hud.gd: arrival
