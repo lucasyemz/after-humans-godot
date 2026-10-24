@@ -8,6 +8,8 @@ os dados e a arte da Godot:
   art/scenarios/<arquivo>.webp as texturas, em WebP (até 2048 px nos fundos e 1024 nos cards e superfícies)
 
 Rode depois da exportação:  python tools/sync_scenarios.py  (precisa do Pillow)
+Sem a exportação (a pasta da Unreal fora da máquina), só a regra da grade nos JSON já gerados:
+                            python tools/sync_scenarios.py --fix-grid
 
 Eixos: a Unreal é X para a frente (a direita do corte), Y para a direita (o fundo negativo) e Z para cima, em cm; a Godot
 é X, Y para cima e Z para a câmera, em m. Um ponto (x, y, z) da Unreal vira (x, z, y) / 100 (é um espelho: os triângulos
@@ -188,6 +190,32 @@ def convert_material(material):
     return out
 
 
+# ---------------------------------------------------------------- a grade
+
+def fix_grid(out):
+    """A grade padrão da Unreal (WorldGridMaterial, a blocagem sem textura) não fica à vista (#62): a peça visível com
+    ela ganha a superfície de concreto do próprio mapa (o piso e o teto das zonas; a escala vem do mundo, como nas
+    vizinhas) ou, num mapa sem ela, some. Devolve quantas peças mudaram."""
+    materials = out['materials']
+    grid = {i for i, m in enumerate(materials) if m.get('kind') == 'grid'}
+    concrete = next((i for i, m in enumerate(materials) if m.get('kind') == 'surface' and 'concrete' in m.get('albedo', '')), None)
+    if concrete is None:
+        concrete = next((i for i, m in enumerate(materials) if m.get('kind') == 'surface'), None)
+    changed = 0
+    for part in out['parts']:
+        if part.get('hidden') or not any(m in grid for m in part['materials']):
+            continue
+        if concrete is None:
+            # Sumir só tira o desenho: se a peça for sólida, a colisão fica (parede invisível). Avisa para olhar.
+            part['hidden'] = True
+            if part.get('solid'):
+                print(f"  aviso: peça sólida com a grade escondida, sem concreto no mapa (a colisão continua): {part.get('name', part.get('mesh', '?'))}")
+        else:
+            part['materials'] = [concrete if m in grid else m for m in part['materials']]
+        changed += 1
+    return changed
+
+
 # ---------------------------------------------------------------- mapas
 
 def interactive_names():
@@ -267,6 +295,7 @@ def convert_map(name, raw_meshes, mesh_ids, names):
     out = {'map': name, 'display': DISPLAY[name], 'materials': list(materials.values()), 'parts': parts, 'lights': lights,
            'texts': texts, 'zones': zones, 'side_doors': [{'x': d[0] / 100.0, 'zone': d[1]} for d in SIDE_DOORS.get(name, [])],
            'props': sorted(props, key=lambda p: p['x'])}
+    fix_grid(out)
     (DATA / (name + '.json')).write_text(json.dumps(out, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     return out
 
@@ -287,5 +316,15 @@ def main():
     print(f'texturas: {len(texture_files)}')
 
 
+def fix_grid_only():
+    for name in MAPS:
+        path = DATA / (name + '.json')
+        out = json.loads(path.read_text(encoding='utf-8'))
+        changed = fix_grid(out)
+        path.write_text(json.dumps(out, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        print(f'{name}: {changed} peças com a grade')
+
+
 if __name__ == '__main__':
-    main()
+    import sys
+    fix_grid_only() if '--fix-grid' in sys.argv else main()
