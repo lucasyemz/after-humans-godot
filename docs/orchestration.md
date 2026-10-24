@@ -54,18 +54,24 @@ comentário em cada issue e um PR para a main no fim). Leia cada uma com "gh iss
 6. Push na `main`, comentário no PR, e `git push origin main:claude-cloud main:codex-design` só quando o agente não
    estiver no meio de uma rodada.
 
-## Onde paramos (22/10/2026)
+## Onde paramos (23/10/2026)
 
-- **Main:** 7270342, com o PR #47 do Claude da nuvem (CI, título, molduras, ícones, beliche, eventos, toque,
-  recrutas) e o #46 do Codex (poses dos vilões do John). Os três branches iguais à `main`.
-- **Mandar ao Claude da nuvem** quando ele terminar o que está fazendo: issues **#52, #48, #50, #51**, nessa ordem
-  (revisão visual dos cenários, os pés escondidos no Depósito, os props vasculháveis da Rua, a silhueta da Unreal).
-- **Mandar ao Codex:** issue **#49** (props da Rua das Vitrines, fechados e abertos).
+- **Main:** 729e310, com o PR #55 do Claude da nuvem (#52 lutas nos cenários, #50 props de busca, #51 silhueta e as
+  pendências de #33 a #39 e #48) e as entregas do Codex #53 (props, #49) e #54 (quedas ajoelhadas, #13). Os três
+  branches iguais à `main`. Testes: 34 de 34, paridade 48/48.
+- **Originais do Codex fora da main:** tags `codex-pr53-originals` (props) e `codex-pr54-originals` (quedas). As tags
+  são publicadas da máquina do Lucas (a sessão na nuvem não publica tags).
+- **Próximo para o Claude da nuvem:** integrar as quedas ajoelhadas da #13 (converter da tag `codex-pr54-originals`
+  para WebP e ligar hurt e death da Íris e da Véspera) e as telas que faltam em inglês (#35, cerca de 2.000 literais).
+- **Codex:** sem issue pendente.
+- **Para o Lucas no Play:** a #55 pede conferir a luta pequena na ponta de uma zona (até 5,5 m da patrulha), a cerca
+  do Portão de Triagem que esmaece sozinha e o caixa vasculhado da mercearia (pouca diferença do fechado).
 - **Decisões do Lucas em aberto:** #9 (morte permanente), #11 (Bar e Dormitório), #12 (pacote do celular: resolução
-  das texturas), #13 (quedas da Íris e da Véspera: ajoelhada ou deitada), nome final do golpe do Enraizado
-  ("Golpe de Raízes (provisório)"), e o Núcleo Nulo como chefe.
+  das texturas), nome final do golpe do Enraizado ("Golpe de Raízes (provisório)"), o Núcleo Nulo como chefe, e a
+  proposta de o Codex entregar já em WebP, com os originais fora do repositório.
 - **Em espera:** #40 (respiração dos heróis), para o Auto Sprite.
 - **Decidido:** treinos da Pesquisa valem na luta; dificuldade crescente dentro de cada fase (fases 3 e 4 mais duras,
-  mantidas); vilões do John pela distribuição dele, com o Porteiro de chefe e o Robô de volta nas fases 2 e 5.
+  mantidas); vilões do John pela distribuição dele, com o Porteiro de chefe e o Robô de volta nas fases 2 e 5; quedas
+  da Íris e da Véspera ajoelhadas.
 - **Só no Windows:** as fontes das poses do John estão em `SourceArt/CharacterGallery/JohnCombatPoses20261022` na
   pasta da Unreal (e na tag `codex-pr46-originals`); o metrô sai de `tools/unreal_export_metro.py`.
