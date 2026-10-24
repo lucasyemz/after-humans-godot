@@ -397,5 +397,827 @@
         }
       }
     ]
+  },
+  {
+    "Name": "busca_gaveta_caixa",
+    "Title": "Gaveta do Caixa",
+    "Description": "Embaixo do balcão, uma gaveta de metal com um teclado que ainda acende quando alguém chega perto. Ele pede um código que ninguém na Estação conhece. Pelo vão, dá para ver um rolo de gaze e peças miúdas.",
+    "Places": [
+      "rua-das-vitrines"
+    ],
+    "Objects": [
+      "movel"
+    ],
+    "Choices": [
+      {
+        "Id": "forcar_gaveta",
+        "Text": "Forçar a gaveta com o pé de cabra",
+        "RequirementText": "Requer Pé de cabra",
+        "Requirement": "HasTool",
+        "RequirementTool": "pe_de_cabra",
+        "Success": {
+          "Result": "O trinco cede de uma vez e o teclado apaga para sempre. Lá dentro, gaze limpa e um punhado de peças que ninguém sabe fabricar. (+1 Curativo, +2 Sucata)",
+          "BandagesDelta": 1,
+          "ScrapDelta": 2
+        }
+      },
+      {
+        "Id": "quebrar_teclado",
+        "Text": "Quebrar o teclado e puxar pelo vão",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.4,
+        "Success": {
+          "Result": "O vidro estala, a trava solta e a gaveta escorrega para fora. (+2 Sucata)",
+          "ScrapDelta": 2
+        },
+        "Failure": {
+          "Result": "O teclado racha, mas a trava aguenta, e {Heroi} corta a mão nos cacos tentando alcançar o fundo. (−3 de vida, +1 Sucata)",
+          "Damage": 3,
+          "ScrapDelta": 1
+        }
+      },
+      {
+        "Id": "deixar_gaveta",
+        "Text": "Deixar o teclado aceso e seguir",
+        "Success": {
+          "Result": "O teclado continua esperando um código que não vai chegar. A equipe segue."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_latas_estufadas",
+    "Title": "Latas Estufadas",
+    "Description": "No fundo da prateleira, uma fileira de latas com os rótulos dos Antigos. Algumas estão lisas; outras, estufadas como se fossem estourar.",
+    "Places": [
+      "rua-das-vitrines"
+    ],
+    "Objects": [
+      "movel"
+    ],
+    "Choices": [
+      {
+        "Id": "separar_sapo",
+        "Text": "Deixar o sapo separar as boas",
+        "RequirementText": "Requer um sapo vivo na equipe",
+        "Requirement": "ClassInTeam",
+        "RequirementClass": "sapo",
+        "Success": {
+          "Result": "O sapo cheira, sacode e escuta lata por lata antes de decidir. Leva tempo, mas nenhuma das escolhidas está estragada. (+2 Comida)",
+          "FoodDelta": 2
+        }
+      },
+      {
+        "Id": "levar_latas",
+        "Text": "Levar todas e ver depois",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.35,
+        "Success": {
+          "Result": "As estufadas eram só amassadas. Comida para alguns dias. (+3 Comida)",
+          "FoodDelta": 3
+        },
+        "Failure": {
+          "Result": "Uma estufada estoura na mochila e {Heroi} prova antes de perceber o cheiro. Passa mal o resto do trecho. (−3 de vida, +1 Comida)",
+          "Damage": 3,
+          "FoodDelta": 1
+        }
+      },
+      {
+        "Id": "marcar_latas",
+        "Text": "Pegar uma e marcar as outras com giz",
+        "Success": {
+          "Result": "A equipe pega uma lata lisa e risca um X nas estufadas, para quem passar depois não se enganar. (+1 Comida, +5 de Esperança)",
+          "FoodDelta": 1,
+          "HopeDelta": 5
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_gerador_galeria",
+    "Title": "Gerador das Galerias",
+    "Description": "Um gerador pequeno, ligado às vitrines por cabos grossos. A manivela ainda gira. Na parede, um sensor acorda e mostra: CLIENTE NÃO IDENTIFICADO.",
+    "Places": [
+      "rua-das-vitrines"
+    ],
+    "Objects": [
+      "maquina"
+    ],
+    "Choices": [
+      {
+        "Id": "dar_partida",
+        "Text": "Dar partida para ver o que acende",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.5,
+        "Success": {
+          "Result": "O motor tosse e pega. Por um minuto, as vitrines da rua inteira piscam, como se as Galerias abrissem de novo. Ninguém fala nada; todo mundo só olha. (+10 de Esperança)",
+          "HopeDelta": 10
+        },
+        "Failure": {
+          "Result": "O motor engasga e cospe faísca no braço de {Heroi}. O sensor continua repetindo a mesma frase. (−4 de vida)",
+          "Damage": 4
+        }
+      },
+      {
+        "Id": "desmontar_gerador",
+        "Text": "Desmontar e levar as peças",
+        "Success": {
+          "Result": "Bobinas, parafusos e uma correia ainda boa. A Estação sabe consertar o que tem; fabricar, não. (+3 Sucata)",
+          "ScrapDelta": 3
+        }
+      },
+      {
+        "Id": "deixar_gerador",
+        "Text": "Deixar o gerador quieto",
+        "Success": {
+          "Result": "Máquina que acorda chama atenção. A equipe se afasta antes que o sensor decida o que fazer com eles."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_armario_funcionarios",
+    "Title": "Armário dos Funcionários",
+    "Description": "Casacos com crachás pendurados, uma lancheira vazia e, colado na porta, o retrato desbotado de um dos Antigos, sorrindo. O sol apagou o rosto, mas não o sorriso.",
+    "Places": [
+      "rua-das-vitrines"
+    ],
+    "Objects": [
+      "armario"
+    ],
+    "Choices": [
+      {
+        "Id": "rasgar_casacos",
+        "Text": "Rasgar os casacos em tiras",
+        "Success": {
+          "Result": "Pano bom, de um tecido que ninguém sabe tecer. Vira atadura para a viagem inteira. (+2 Curativos)",
+          "BandagesDelta": 2
+        }
+      },
+      {
+        "Id": "levar_retrato",
+        "Text": "Levar o retrato para a Estação",
+        "Success": {
+          "Result": "O retrato vai dobrado no bolso de dentro. Na Estação, alguém vai querer saber quem era. (+1 Fragmento, +5 de Esperança)",
+          "FragmentsDelta": 1,
+          "HopeDelta": 5
+        }
+      },
+      {
+        "Id": "fechar_armario",
+        "Text": "Fechar o armário como estava",
+        "Success": {
+          "Result": "Parece a casa de alguém. A equipe fecha a porta devagar e segue."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_etiqueta_piscando",
+    "Title": "Carga com Etiqueta Acesa",
+    "Description": "A carga é velha, mas a etiqueta presa nela não: uma luz verde pisca e uma voz baixa repete INVENTÁRIO EM AUDITORIA. Há pouco tempo, ninguém conferia nada por aqui.",
+    "Places": [
+      "ponte-das-raizes"
+    ],
+    "Objects": [
+      "carga"
+    ],
+    "Choices": [
+      {
+        "Id": "arrancar_etiqueta",
+        "Text": "Deixar o gato arrancar a etiqueta sem disparar nada",
+        "RequirementText": "Requer um gato vivo na equipe",
+        "Requirement": "ClassInTeam",
+        "RequirementClass": "gato",
+        "Success": {
+          "Result": "O gato estuda a etiqueta, acha o fio certo e corta. A luz apaga sem um bipe. Por dentro, comida, peças e a própria etiqueta, que guarda números. (+2 Comida, +1 Sucata, +1 Fragmento, +{Instinto} de Instinto no gato)",
+          "FoodDelta": 2,
+          "ScrapDelta": 1,
+          "FragmentsDelta": 1,
+          "InstinctDelta": 8
+        }
+      },
+      {
+        "Id": "abrir_carga",
+        "Text": "Abrir de uma vez",
+        "Success": {
+          "Result": "A tampa sai e a etiqueta começa a bipar mais alto. A equipe pega o que dá e corre. O bipe acompanha por um bom pedaço da ponte. (+2 Comida, +1 Sucata, −5 de Esperança)",
+          "FoodDelta": 2,
+          "ScrapDelta": 1,
+          "HopeDelta": -5
+        }
+      },
+      {
+        "Id": "deixar_carga",
+        "Text": "Deixar a carga em auditoria",
+        "Success": {
+          "Result": "Ninguém quer saber quem vai conferir aquela auditoria. A equipe passa longe."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_painel_salvamento",
+    "Title": "Armário de Salvamento",
+    "Description": "Boias, coletes e um kit de socorro. Na porta, um painel que estava apagado há gerações acendeu de novo: EQUIPAMENTO RESERVADO.",
+    "Places": [
+      "ponte-das-raizes"
+    ],
+    "Objects": [
+      "armario"
+    ],
+    "Choices": [
+      {
+        "Id": "pegar_kit",
+        "Text": "Pegar só o kit de socorro",
+        "Success": {
+          "Result": "O painel não reage. O kit ainda tem gaze lacrada. (+2 Curativos)",
+          "BandagesDelta": 2
+        }
+      },
+      {
+        "Id": "desmontar_painel",
+        "Text": "Desmontar o painel que acendeu",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.3,
+        "Success": {
+          "Result": "Por trás da tela, uma placa nova demais para este lugar e fios ainda brilhantes. Alguma coisa religou este painel faz pouco tempo. (+1 Fragmento, +2 Sucata)",
+          "FragmentsDelta": 1,
+          "ScrapDelta": 2
+        },
+        "Failure": {
+          "Result": "O painel dá um choque em {Heroi} antes de soltar da parede. (−4 de vida, +1 Sucata)",
+          "Damage": 4,
+          "ScrapDelta": 1
+        }
+      },
+      {
+        "Id": "deixar_reservado",
+        "Text": "Respeitar o aviso",
+        "Success": {
+          "Result": "Reservado para quem, ninguém sabe dizer. A equipe fecha a porta e o painel apaga sozinho."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_radio_bordo",
+    "Title": "Rádio de Bordo",
+    "Description": "No meio das ferramentas, um rádio de barco ainda pega alguma coisa. Entre os chiados, uma voz sem rosto lê uma lista: permissões revogadas, setores fechados, a ponte entre eles.",
+    "Places": [
+      "ponte-das-raizes"
+    ],
+    "Objects": [
+      "maquina"
+    ],
+    "Choices": [
+      {
+        "Id": "ouvir_coruja",
+        "Text": "Deixar a coruja ouvir até o fim",
+        "RequirementText": "Requer uma coruja viva na equipe",
+        "Requirement": "ClassInTeam",
+        "RequirementClass": "coruja",
+        "Success": {
+          "Result": "A coruja escuta a lista três vezes sem piscar e repete os setores de cabeça. Não sabe o que querem dizer, mas sabe que a lista ficou maior desde a primeira volta. (+1 Fragmento, +{Instinto} de Instinto na coruja)",
+          "FragmentsDelta": 1,
+          "InstinctDelta": 8
+        }
+      },
+      {
+        "Id": "desmontar_radio",
+        "Text": "Desmontar o rádio",
+        "Success": {
+          "Result": "A voz some no meio de uma palavra. Válvulas, um alto-falante bom e fio de cobre. (+3 Sucata)",
+          "ScrapDelta": 3
+        }
+      },
+      {
+        "Id": "desligar_radio",
+        "Text": "Desligar e seguir",
+        "Success": {
+          "Result": "O silêncio volta. Por um tempo, todo mundo anda olhando para os sensores da ponte. (−5 de Esperança)",
+          "HopeDelta": -5
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_bolsa_mapa",
+    "Title": "Bolsa Tomada pelas Raízes",
+    "Description": "As raízes cresceram por dentro de uma bolsa de outra comunidade. Tem sementes num saquinho e um mapa da ponte desenhado à mão, com marcas de carvão novas em cima das antigas: sensores, onde antes não havia nenhum.",
+    "Places": [
+      "ponte-das-raizes"
+    ],
+    "Objects": [
+      "bolsa"
+    ],
+    "Choices": [
+      {
+        "Id": "levar_tudo_bolsa",
+        "Text": "Cortar as raízes e levar tudo",
+        "Success": {
+          "Result": "Sementes e mapa vão para a mochila. Quem desenhou aquilo vai voltar e não vai achar nada. (+3 Sementes, +1 Fragmento, −5 de Esperança)",
+          "SeedsDelta": 3,
+          "FragmentsDelta": 1,
+          "HopeDelta": -5
+        }
+      },
+      {
+        "Id": "copiar_mapa",
+        "Text": "Copiar o mapa e deixar a bolsa",
+        "Success": {
+          "Result": "A equipe copia as marcas novas num pedaço de papel e deixa a bolsa presa onde estava. Outra comunidade também percebeu que a ponte acordou. (+1 Fragmento, +5 de Esperança)",
+          "FragmentsDelta": 1,
+          "HopeDelta": 5
+        }
+      },
+      {
+        "Id": "so_sementes",
+        "Text": "Levar só as sementes",
+        "Success": {
+          "Result": "O mapa fica para quem precisar mais dele. As sementes, a Estação sabe plantar. (+3 Sementes)",
+          "SeedsDelta": 3
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_ficha_linhagem",
+    "Title": "Ficha de Linhagem",
+    "Description": "No fichário, uma ficha com o retrato de um cão de quatro patas, sem roupa e sem ferramenta. Carimbo: RESISTENTE · LINHAGEM 3 · ANÁLISE AUTOMÁTICA.",
+    "Places": [
+      "sala-esquecida"
+    ],
+    "Objects": [
+      "movel"
+    ],
+    "Choices": [
+      {
+        "Id": "mostrar_cao",
+        "Text": "Mostrar a ficha ao cão",
+        "RequirementText": "Requer um cão vivo na equipe",
+        "Requirement": "ClassInTeam",
+        "RequirementClass": "cao",
+        "Success": {
+          "Result": "O cão olha o retrato por muito tempo. \"Ele não tem mãos.\" Dobra a ficha com cuidado e não fala mais nisso. (+1 Fragmento, +{Instinto} de Instinto no cão)",
+          "FragmentsDelta": 1,
+          "InstinctDelta": 10
+        }
+      },
+      {
+        "Id": "levar_ficha",
+        "Text": "Guardar a ficha para a Estação",
+        "Success": {
+          "Result": "Mais um papel dos Antigos para alguém tentar entender. Ninguém tem pressa de olhar de novo. (+1 Fragmento)",
+          "FragmentsDelta": 1
+        }
+      },
+      {
+        "Id": "fechar_fichario",
+        "Text": "Fechar o fichário",
+        "Success": {
+          "Result": "Algumas gavetas a equipe prefere deixar fechadas por enquanto."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_etiquetas_lote",
+    "Title": "Rolo de Etiquetas",
+    "Description": "Uma gaveta cheia de rolos de etiqueta, todas iguais: INCUBAÇÃO · LOTE 12 · SUPERVISÃO AUTOMÁTICA. Algumas palavras ninguém na equipe sabe o que querem dizer.",
+    "Places": [
+      "sala-esquecida"
+    ],
+    "Objects": [
+      "movel"
+    ],
+    "Choices": [
+      {
+        "Id": "sapo_le",
+        "Text": "Pedir ao sapo que leia",
+        "RequirementText": "Requer um sapo vivo na equipe",
+        "Requirement": "ClassInTeam",
+        "RequirementClass": "sapo",
+        "Success": {
+          "Result": "\"Incubação é o que se faz com ovos\", diz o sapo. \"Lote é o que se faz com latas.\" Ele guarda uma etiqueta e fica calado o resto do trecho. (+1 Fragmento, +{Instinto} de Instinto no sapo)",
+          "FragmentsDelta": 1,
+          "InstinctDelta": 8
+        }
+      },
+      {
+        "Id": "usar_rolos",
+        "Text": "Usar os rolos como fita",
+        "Success": {
+          "Result": "Cola boa, que ainda gruda. Serve para fechar ataduras e consertar mochilas. (+2 Curativos)",
+          "BandagesDelta": 2
+        }
+      },
+      {
+        "Id": "deixar_rolos",
+        "Text": "Deixar a gaveta como está",
+        "Success": {
+          "Result": "As palavras ficam na gaveta. A pergunta vai com a equipe."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_baterias_camaras",
+    "Title": "Baterias das Câmaras",
+    "Description": "Um caixote de baterias carregadas, ligadas por cabos que entram na parede. A placa diz: ALIMENTAÇÃO DAS CÂMARAS · NÃO DESLIGAR. Do outro lado da parede, alguma coisa zumbe.",
+    "Places": [
+      "sala-esquecida"
+    ],
+    "Objects": [
+      "carga"
+    ],
+    "Choices": [
+      {
+        "Id": "levar_baterias",
+        "Text": "Levar todas as baterias",
+        "Success": {
+          "Result": "Energia para a Estação por muitos dias. Atrás da parede, o zumbido para. Ninguém quer saber o que ele mantinha. (+3 Sucata, −5 de Esperança)",
+          "ScrapDelta": 3,
+          "HopeDelta": -5
+        }
+      },
+      {
+        "Id": "levar_uma_bateria",
+        "Text": "Levar uma e deixar as câmaras ligadas",
+        "Success": {
+          "Result": "Uma bateria sai, o zumbido continua. Seja o que for, segue do jeito que os Antigos deixaram. (+1 Sucata)",
+          "ScrapDelta": 1
+        }
+      },
+      {
+        "Id": "seguir_cabos",
+        "Text": "Seguir os cabos pela fresta",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.4,
+        "Success": {
+          "Result": "Pela fresta, só uma fileira de tanques vazios e etiquetas como as do fichário. Uma delas vem junto. (+1 Fragmento)",
+          "FragmentsDelta": 1
+        },
+        "Failure": {
+          "Result": "A fresta fecha num estalo de trava e prende o braço de {Heroi} até a equipe forçar de volta. (−4 de vida)",
+          "Damage": 4
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_coleiras_numeradas",
+    "Title": "Caixote de Coleiras",
+    "Description": "Dezenas de coleiras pequenas, cada uma com um número e um sensor. Numa delas, alguém riscou o número com a ponta de uma garra e escreveu por cima um nome que já não dá para ler.",
+    "Places": [
+      "sala-esquecida"
+    ],
+    "Objects": [
+      "carga"
+    ],
+    "Choices": [
+      {
+        "Id": "levar_coleira_nome",
+        "Text": "Levar a coleira com o nome",
+        "Success": {
+          "Result": "Alguém, um dia, quis ser mais que um número. A coleira vai para a Estação. (+1 Fragmento, +5 de Esperança)",
+          "FragmentsDelta": 1,
+          "HopeDelta": 5
+        }
+      },
+      {
+        "Id": "desmontar_sensores",
+        "Text": "Desmontar os sensores",
+        "Success": {
+          "Result": "Peças miúdas e boas. As coleiras ficam espalhadas no chão, sem número que funcione. (+2 Sucata, −5 de Esperança)",
+          "ScrapDelta": 2,
+          "HopeDelta": -5
+        }
+      },
+      {
+        "Id": "fechar_caixote",
+        "Text": "Fechar o caixote",
+        "Success": {
+          "Result": "A tampa volta para o lugar. Ninguém diz o que todo mundo pensou."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_cesto_confiscados",
+    "Title": "Cesto de Confiscados",
+    "Description": "Coisas tiradas dos Antigos na triagem: máscaras, caixas de transporte com grade, uma guia de couro. A etiqueta do cesto diz MATERIAL DE VETOR · INCINERAR. Ninguém incinerou.",
+    "Places": [
+      "laboratorio-silencioso"
+    ],
+    "Objects": [
+      "carga"
+    ],
+    "Choices": [
+      {
+        "Id": "levar_mascara",
+        "Text": "Procurar uma máscara que ainda preste",
+        "Success": {
+          "Result": "Uma das máscaras tem o filtro lacrado. Os Antigos tinham medo de alguma coisa no ar, e tiravam dos outros o que os protegia. (Ferramenta: Máscara com filtro)",
+          "GrantTool": "mascara"
+        }
+      },
+      {
+        "Id": "desmontar_caixas",
+        "Text": "Desmontar as caixas de transporte",
+        "Success": {
+          "Result": "Grade, dobradiças e parafusos. Ninguém pergunta o que era transportado nelas. (+3 Sucata)",
+          "ScrapDelta": 3
+        }
+      },
+      {
+        "Id": "deixar_cesto",
+        "Text": "Deixar o cesto como está",
+        "Success": {
+          "Result": "Se até os Antigos tinham medo daquilo, a equipe não vai ser a primeira a mexer."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_relatorio_partido",
+    "Title": "Relatório Partido ao Meio",
+    "Description": "Metade de um relatório sobre a Peste: diz que a doença começou nos animais portadores e manda isolar todos. A outra metade foi arrancada. Na prateleira de cima do armário, mais papéis.",
+    "Places": [
+      "laboratorio-silencioso"
+    ],
+    "Objects": [
+      "armario"
+    ],
+    "Choices": [
+      {
+        "Id": "procurar_metade",
+        "Text": "Subir e procurar a outra metade",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.4,
+        "Success": {
+          "Result": "A outra metade está lá, molhada. Ela fala de \"amostras de origem\" e para no meio de uma frase que começa com \"não foram\". As duas metades não contam a mesma história. (+2 Fragmento)",
+          "FragmentsDelta": 2
+        },
+        "Failure": {
+          "Result": "A prateleira cede com {Heroi} pendurado e os papéis viram polpa no chão. Só a primeira metade sobra. (−5 de vida, +1 Fragmento)",
+          "Damage": 5,
+          "FragmentsDelta": 1
+        }
+      },
+      {
+        "Id": "levar_metade",
+        "Text": "Levar a metade que está à mão",
+        "Success": {
+          "Result": "A metade que culpa os animais vai para a mochila. Ninguém gosta de carregá-la. (+1 Fragmento)",
+          "FragmentsDelta": 1
+        }
+      },
+      {
+        "Id": "deixar_relatorio",
+        "Text": "Deixar o relatório no armário",
+        "Success": {
+          "Result": "Meio relatório é meia verdade. A equipe fecha o armário."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_ampolas_lacradas",
+    "Title": "Ampolas Lacradas",
+    "Description": "Uma estante de ampolas com o selo da triagem, algumas trincadas. Um pó fino cobre a prateleira de baixo. Entre elas, caixas de remédio ainda fechadas.",
+    "Places": [
+      "laboratorio-silencioso"
+    ],
+    "Objects": [
+      "armario"
+    ],
+    "Choices": [
+      {
+        "Id": "abrir_mascara",
+        "Text": "Pôr a máscara e pegar os remédios",
+        "RequirementText": "Requer Máscara com filtro",
+        "Requirement": "HasTool",
+        "RequirementTool": "mascara",
+        "Success": {
+          "Result": "Com o filtro no rosto, o pó não incomoda. As caixas guardam gaze e uma ficha de análise que ninguém consegue ler inteira. (+2 Curativos, +1 Fragmento)",
+          "BandagesDelta": 2,
+          "FragmentsDelta": 1
+        }
+      },
+      {
+        "Id": "abrir_sem_protecao",
+        "Text": "Prender a respiração e pegar rápido",
+        "RequirementText": "Arriscado",
+        "FailChance": 0.5,
+        "Success": {
+          "Result": "Mão rápida, fôlego curto. As caixas saem sem levantar o pó. (+2 Curativos)",
+          "BandagesDelta": 2
+        },
+        "Failure": {
+          "Result": "Uma ampola cai e o pó sobe. {Heroi} tosse até os olhos lacrimejarem e sai com uma caixa só. (−5 de vida, +1 Curativo)",
+          "Damage": 5,
+          "BandagesDelta": 1
+        }
+      },
+      {
+        "Id": "deixar_lacrado",
+        "Text": "Deixar tudo lacrado",
+        "Success": {
+          "Result": "O que os Antigos lacraram com tanto cuidado, a equipe deixa lacrado."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_placas_triagem",
+    "Title": "Placas da Triagem",
+    "Description": "Uma pilha de placas esquecidas. As de cima dizem ANIMAIS NÃO ENTRAM. A de baixo, mais velha e mais bonita, diz ANIMAIS DE ASSISTÊNCIA BEM-VINDOS.",
+    "Places": [
+      "laboratorio-silencioso"
+    ],
+    "Objects": [
+      "carga"
+    ],
+    "Choices": [
+      {
+        "Id": "levar_placa_antiga",
+        "Text": "Levar a placa mais velha para a Estação",
+        "Success": {
+          "Result": "Antes da Peste, a regra era outra. Alguém na Estação vai querer pendurar aquilo na parede. (+1 Fragmento, +5 de Esperança)",
+          "FragmentsDelta": 1,
+          "HopeDelta": 5
+        }
+      },
+      {
+        "Id": "usar_chapas",
+        "Text": "Usar as placas como chapa",
+        "Success": {
+          "Result": "Metal bom, fácil de cortar. As palavras viram remendo. (+3 Sucata)",
+          "ScrapDelta": 3
+        }
+      },
+      {
+        "Id": "deixar_placas",
+        "Text": "Deixar a pilha como está",
+        "Success": {
+          "Result": "As duas regras ficam juntas no chão, uma em cima da outra."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_filtro_trocado",
+    "Title": "Filtro Recém-Trocado",
+    "Description": "O cartucho do filtro está limpo. O velho foi deixado num saco ao lado, com um carimbo de inspeção, e a graxa da tampa ainda está mole. Isto não foi trocado há gerações.",
+    "Places": [
+      "tuneis-do-eco"
+    ],
+    "Objects": [
+      "maquina"
+    ],
+    "Choices": [
+      {
+        "Id": "levar_filtro",
+        "Text": "Levar o filtro novo para a Estação",
+        "Success": {
+          "Result": "Um filtro bom é água limpa por semanas. Atrás da equipe, a bomba muda de som. Quem quer que cuide dela vai notar. (+2 Sucata, +5 de Esperança)",
+          "ScrapDelta": 2,
+          "HopeDelta": 5
+        }
+      },
+      {
+        "Id": "anotar_carimbo",
+        "Text": "Anotar o carimbo e deixar tudo no lugar",
+        "Success": {
+          "Result": "O número do carimbo é um a mais que o do saco velho. A equipe copia os dois e fecha a tampa como estava. (+1 Fragmento)",
+          "FragmentsDelta": 1
+        }
+      },
+      {
+        "Id": "levar_velho",
+        "Text": "Levar só o filtro velho",
+        "Success": {
+          "Result": "Quem trocou não vai sentir falta do lixo. Ainda dá para aproveitar a carcaça. (+1 Sucata)",
+          "ScrapDelta": 1
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_kit_lacre_novo",
+    "Title": "Kit com Lacre Novo",
+    "Description": "Um kit de socorro com o lacre inteiro e um adesivo de inspeção. Quando a equipe passa o dedo, a tinta do adesivo ainda borra.",
+    "Places": [
+      "tuneis-do-eco"
+    ],
+    "Objects": [
+      "medico"
+    ],
+    "Choices": [
+      {
+        "Id": "abrir_kit",
+        "Text": "Romper o lacre e levar tudo",
+        "Success": {
+          "Result": "Gaze, pomada e talas, tudo novo. O lacre rompido fica no chão, à vista de quem voltar. (+3 Curativos, −5 de Esperança)",
+          "BandagesDelta": 3,
+          "HopeDelta": -5
+        }
+      },
+      {
+        "Id": "levar_metade_kit",
+        "Text": "Levar metade e fechar de novo",
+        "Success": {
+          "Result": "A equipe tira o que precisa e prende a tampa com o próprio lacre, do jeito que dá. (+2 Curativos)",
+          "BandagesDelta": 2
+        }
+      },
+      {
+        "Id": "deixar_kit",
+        "Text": "Deixar o kit como encontrou",
+        "Success": {
+          "Result": "Alguém mantém este kit em ordem. A equipe não tem coragem de desfazer isso. (+5 de Esperança)",
+          "HopeDelta": 5
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_embalagem_aberta",
+    "Title": "Embalagem Aberta",
+    "Description": "Dentro da bolsa, uma embalagem de ração dos Antigos, aberta há pouco tempo: o cheiro ainda está lá. Embaixo dela, mais duas, fechadas.",
+    "Places": [
+      "tuneis-do-eco"
+    ],
+    "Objects": [
+      "bolsa"
+    ],
+    "Choices": [
+      {
+        "Id": "levar_racoes",
+        "Text": "Levar as duas fechadas",
+        "Success": {
+          "Result": "Comida dos Antigos, ainda boa. A equipe come em silêncio, pensando em quem abriu a primeira. (+2 Comida)",
+          "FoodDelta": 2
+        }
+      },
+      {
+        "Id": "guardar_embalagem",
+        "Text": "Guardar a embalagem aberta como prova",
+        "Success": {
+          "Result": "Ninguém na Estação vai acreditar sem ver. A embalagem vai dobrada no fundo da mochila. (+1 Fragmento)",
+          "FragmentsDelta": 1
+        }
+      },
+      {
+        "Id": "deixar_bolsa",
+        "Text": "Deixar a bolsa exatamente como estava",
+        "Success": {
+          "Result": "A equipe fecha o zíper até o mesmo ponto e segue mais rápido do que veio."
+        }
+      }
+    ]
+  },
+  {
+    "Name": "busca_prancheta_manutencao",
+    "Title": "Prancheta de Manutenção",
+    "Description": "Uma prancheta presa à porta do armário, com uma lista de tarefas impressa. Todas estão marcadas. A última marca foi feita à mão, firme, com uma tinta que ainda brilha.",
+    "Places": [
+      "tuneis-do-eco"
+    ],
+    "Objects": [
+      "armario"
+    ],
+    "Choices": [
+      {
+        "Id": "levar_prancheta",
+        "Text": "Levar a prancheta",
+        "Success": {
+          "Result": "A lista vai para a Estação. Ninguém sabe dizer quem marca tarefas num lugar onde não sobrou ninguém. (+1 Fragmento)",
+          "FragmentsDelta": 1
+        }
+      },
+      {
+        "Id": "coruja_vigia_porta",
+        "Text": "Deixar a coruja observar o corredor antes de mexer",
+        "RequirementText": "Requer uma coruja viva na equipe",
+        "Requirement": "ClassInTeam",
+        "RequirementClass": "coruja",
+        "Success": {
+          "Result": "A coruja fica imóvel um bom tempo. Não aparece ninguém, mas ela aponta o pó varrido para os cantos e a lâmpada trocada. A equipe pega as ferramentas sem tocar na prancheta. (+2 Sucata, +1 Fragmento, +{Instinto} de Instinto na coruja)",
+          "ScrapDelta": 2,
+          "FragmentsDelta": 1,
+          "InstinctDelta": 8
+        }
+      },
+      {
+        "Id": "pegar_ferramentas",
+        "Text": "Pegar as ferramentas do armário",
+        "Success": {
+          "Result": "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)",
+          "ScrapDelta": 2
+        }
+      }
+    ]
   }
 ]
