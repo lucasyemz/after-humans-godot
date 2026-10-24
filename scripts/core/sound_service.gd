@@ -167,11 +167,11 @@ func _loop(path: String) -> AudioStream:
 
 
 ## Um efeito solto no canal de efeitos (ou outro), com ganho e altura. Os sons de audio/ui vão para o canal da
-## interface.
-func play(path: String, gain: float = 1.0, pitch: float = 1.0, bus: String = "SFX") -> void:
+## interface. Devolve o tocador (para fade_out), ou null.
+func play(path: String, gain: float = 1.0, pitch: float = 1.0, bus: String = "SFX") -> AudioStreamPlayer:
 	var stream: AudioStream = load(path)
 	if stream == null:
-		return
+		return null
 	var player := _effects[_next_effect]
 	_next_effect = (_next_effect + 1) % _effects.size()
 	player.stream = stream
@@ -179,6 +179,23 @@ func play(path: String, gain: float = 1.0, pitch: float = 1.0, bus: String = "SF
 	player.volume_db = linear_to_db(maxf(gain, 0.001)) + mix_db(path)
 	player.pitch_scale = pitch
 	player.play()
+	return player
+
+
+## Esmaece e para um efeito tocado por play (o som do trem que acaba antes do arquivo, #61). O tocador é reaproveitado:
+## se outro som já o tomou, não mexe nele.
+func fade_out(player: AudioStreamPlayer, seconds: float) -> void:
+	if player == null or not player.playing:
+		return
+	var stream := player.stream
+	var start := player.volume_db
+	var tween := create_tween()
+	tween.tween_method(func(t: float):
+		if player.stream == stream:
+			player.volume_db = lerpf(start, -60.0, t), 0.0, 1.0, seconds)
+	tween.tween_callback(func():
+		if player.stream == stream:
+			player.stop())
 
 
 ## Um passo no piso do lugar (FAHAudio::Footstep): variação ao acaso, altura de 0,94 a 1,06 vezes a do herói que anda

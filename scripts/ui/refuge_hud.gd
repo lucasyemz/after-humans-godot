@@ -266,6 +266,9 @@ func focus_scope() -> Control:
 		return null
 	if _prep != null and _prep.visible:
 		return _prep
+	# Na cena do trem, sem painel: o foco fica no canto (as setas não andam entre os cômodos por trás da cena, #61).
+	if current == "train" and not _panel.visible:
+		return _corner
 	if not _panel.visible:
 		return null
 	# Um cômodo só com texto (a Cantina): o foco fica no Vista geral do canto.
@@ -701,6 +704,9 @@ func open_service(service: String) -> void:
 			if train.phase == "waiting" and not station.train_busy():
 				station.open_train(train.candidate_id, _arrived_candidate != train.candidate_id)
 				_arrived_candidate = train.candidate_id
+			elif station.train_busy():
+				# Reaberto no meio da cena (depois de um cômodo): a câmera volta para a plataforma e segue a cena dali.
+				station.follow_train()
 	refresh()
 
 
@@ -1980,6 +1986,9 @@ func _decide(candidate_id: String, accept: bool) -> void:
 	rng.randomize()
 	station.clear_candidate()
 	station._place_residents(rng)
+	# O jogador abriu outra coisa durante a partida (um cômodo, as Opções): ela fica aberta.
+	if current != "train":
+		return
 	if Campaign.state.night.phase != "none":
 		open_room(S.DORMITORY)
 	else:
