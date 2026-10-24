@@ -9,8 +9,9 @@ const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
 ## A jornada roda acelerada (tweens, timers e a física andam 8 vezes mais rápido).
 const TIME_SCALE := 8.0
-## Prazo de cada espera, em segundos reais: passou disso, a tela travou.
-const TIMEOUT := 30.0
+## Prazo de cada espera, em segundos reais: passou disso, a tela travou. Com folga para a máquina carregada (com várias
+## Godot rodando juntas, a caminhada até a patrulha passava de 30 s e o teste acusava trava).
+const TIMEOUT := 90.0
 const SEED := 20261022
 
 var t
