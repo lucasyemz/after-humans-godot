@@ -54,6 +54,21 @@ comentário em cada issue e um PR para a main no fim). Leia cada uma com "gh iss
 6. Push na `main`, comentário no PR, e `git push origin main:claude-cloud main:codex-design` só quando o agente não
    estiver no meio de uma rodada.
 
+## Fila de trabalho (24/10/2026)
+
+- **Claude da nuvem:**
+  1. #61 (trem fora do tempo);
+  2. #62 (paredes sem textura);
+  3. #57 (alvo pelo personagem inteiro);
+  4. #13 (quedas ajoelhadas);
+  5. #63 (varredura visual);
+  6. #64 (narrativa);
+  7. #35 (inglês);
+  8. a parte segura da #56.
+  - A #60 (componentes) e o resto da #56 esperam o Lucas aprovar a #59 e a #58.
+- **Codex:** #59 (kit de componentes), depois #58 (telas novas montadas com o kit).
+- **Regras novas no `AGENTS.md`:** narrativa coerente com `docs/narrative/` e coerência visual, que a QA confere.
+
 ## Onde paramos (23/10/2026)
 
 - **Main:** 729e310, com o PR #55 do Claude da nuvem (#52 lutas nos cenários, #50 props de busca, #51 silhueta e as
