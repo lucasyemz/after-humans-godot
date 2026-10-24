@@ -62,5 +62,25 @@ Regras do veredito:
 - **AJUSTAR ANTES:** algum problema médio.
 - **PRONTO PARA O MERGE:** só problemas baixos ou nenhum.
 
+## Chamar o Codex (só nos PRs do `codex-design`, com freios)
+
+No fim do comentário, depois de "Para o Lucas decidir", acrescente **uma** destas linhas:
+
+- **Veredito AJUSTAR ANTES e menos de 3 revisões independentes no PR** (conte os comentários anteriores que começam com
+  "## Revisão independente", em `gh pr view <PR> --comments`; este é o número dessa contagem mais um):
+
+  `@codex corrija neste PR, no branch codex-design, só os problemas [alta] e [média] da revisão acima, com a QA de design (docs/design/qa.md) até APROVADO, e comente aqui o que mudou em cada ponto. Rodada automática N de 2.`
+
+- **Veredito AJUSTAR ANTES e já houve 2 rodadas automáticas** (esta seria a 3ª revisão ou mais):
+
+  `Parei de chamar o Codex: duas rodadas automáticas não resolveram. Precisa do Lucas.`
+
+- **Veredito NÃO INTEGRAR:** não chame o Codex. Escreva `Não chamei o Codex: precisa do Lucas olhar a issue antes.`
+- **Veredito PRONTO PARA O MERGE:** não chame ninguém.
+
+Nos PRs do `claude-cloud` nunca chame agente nenhum: a sessão do Claude lê os comentários na próxima rodada.
+
+## Estilo
+
 Seja concreto e curto: cite arquivo e linha, sem elogio vazio, e sem repetir o que o PR já diz. Se o PR é grande demais
 para revisar inteiro dentro do limite de passos, diga o que revisou e o que não revisou.

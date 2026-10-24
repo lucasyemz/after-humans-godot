@@ -69,6 +69,12 @@ claude setup-token
 gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo lucasyemz/after-humans-godot
 ```
 
+**Ciclo automático com o Codex (com freios):** nos PRs do `codex-design` com veredito AJUSTAR ANTES, o revisor termina
+o comentário com um pedido ao `@codex` para corrigir só os problemas altos e médios. São no máximo 2 rodadas automáticas por
+PR; na terceira, ele para e escreve "Precisa do Lucas". NÃO INTEGRAR nunca chama o Codex. Os PRs do `claude-cloud` não
+chamam ninguém. O Codex responde pela integração dele com o GitHub (a da conta do ChatGPT do Lucas, sem API); se ele
+ignorar menções feitas por bot, basta o Lucas responder no PR com "@codex faça o que a revisão pediu".
+
 O primeiro comando gera o token da conta; o segundo pede para colar e guarda como segredo do repositório (ninguém mais
 vê). Para revisar de novo um PR: em Actions, "Revisão", "Run workflow", com o número do PR.
 
