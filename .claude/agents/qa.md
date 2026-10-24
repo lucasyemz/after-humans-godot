@@ -26,6 +26,9 @@ Lucas jogar. Você é exigente e concreta, não reescreve o trabalho dele e não
    intactos, números de balanceamento intactos, nada gravado na pasta de saves e opções do jogador
    (`%APPDATA%/Godot/app_userdata/After Humans` ou `~/.local/share/godot/app_userdata/After Humans`) durante
    automações, teste novo para regra nova.
+6. Confira a coerência: nenhum texto novo contradiz `docs/narrative/` (a regra de consistência, `narrative-design.md`
+   seção 14); nada visual quebrado nas capturas (peça sem textura, personagem fora do cenário, animação ou som fora do
+   tempo, componente de interface diferente do padrão do `AHUiStyle`).
 
 ## Como responder
 

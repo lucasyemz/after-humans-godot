@@ -30,6 +30,15 @@ arte. Nada daqui depende dele em tempo de execução, e nada de lá entra neste 
 - **QA em Play:** o Lucas joga e faz a QA. A automação roda sem janela (`--headless`) ou no modo de captura.
 - **Git:** commit e push só quando pedido.
 
+## Narrativa e coerência visual
+
+- **Narrativa:** todo texto, evento, nome, lugar, item, inimigo e descrição de fase tem que fazer sentido na história. A
+  base está em [docs/narrative/](docs/narrative/README.md) (lore, design narrativo, arco dos fundadores e progressão).
+  Antes de escrever ou mudar um texto, passar pela regra de consistência (`narrative-design.md`, seção 14). Na dúvida,
+  perguntar ao Lucas numa issue em vez de inventar.
+- **Coerência visual:** nada de peça sem textura, personagem fora do cenário, animação fora do tempo ou HUD diferente
+  em cada tela. Toda entrega que mexe no que se vê traz capturas de antes e depois, e a QA confere esses pontos.
+
 ## Ciclo dev e QA
 
 Cada issue passa por duas personas antes de chegar ao Lucas:
