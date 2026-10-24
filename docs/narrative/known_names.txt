@@ -38,13 +38,16 @@ Nick
 Íris
 Eclusa Central
 Porteiro
-
-# Só no jogo (docs/narrative/review.md, seção 5: decidir se entram na lore).
 Estação Raiz
 Bairro Submerso
-Risco
 Véspera
-Sala dos Personagens
+Povos dos Canais
+Aves das Torres
+Núcleo Nulo
+
+# Só no jogo (docs/narrative/review.md, seção 5: decidir se entram na lore).
+Risco
+Alojamento
 
 # Termos de regra mostrados na tela (estados, recursos e atributos).
 Bloqueio

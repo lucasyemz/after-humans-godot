@@ -24,7 +24,7 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/ui/option
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
 	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],
-	"enemies": ["DisplayName", "Description"], "enemy-actions": ["DisplayName", "Description"], "events": ["Title", "Description"],
+	"enemies": ["DisplayName", "Role", "Description"], "enemy-actions": ["DisplayName", "Description"], "events": ["Title", "Description"],
 	"expedition-nodes": ["Title", "Description"], "perks": ["DisplayName", "Description"], "relics": ["DisplayName", "Description"],
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
 }
@@ -117,6 +117,18 @@ static func data_texts() -> Array:
 	for phase in load("res://scripts/flow/journey_rules.gd").PHASES:
 		for field in ["name", "description"]:
 			out.append({"text": phase[field], "where": "phases.%s.%s" % [phase.id, field]})
+	# As escolhas dos eventos: o texto do botão, o requisito e o resultado de cada saída (#64; o resultado vai traduzido
+	# pelo modelo, com {Heroi} e {Instinto} trocados depois).
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/events.json")):
+		for choice in row.get("Choices", []):
+			var where := "events.%s.%s" % [row.get("Name", ""), choice.get("Id", "")]
+			for field in ["Text", "RequirementText"]:
+				if String(choice.get(field, "")).strip_edges() != "":
+					out.append({"text": choice[field], "where": "%s.%s" % [where, field]})
+			for outcome in ["Success", "Failure"]:
+				var result := String(choice.get(outcome, {}).get("Result", ""))
+				if result.strip_edges() != "":
+					out.append({"text": result, "where": "%s.%s" % [where, outcome]})
 	return out
 
 

@@ -109,7 +109,7 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - T troca entre fim de tarde e noite.
   - P liga e desliga o pós-processamento.
   - C mostra as caixas de colisão.
-  - I abre a Mochila (comida, curativo e a ampola da Íris; na luta, no herói da vez).
+  - I abre a Mochila (comida, curativo e a Ampola de Reparo do sapo; na luta, no herói da vez).
   - Esc abre o menu (continuar, opções, voltar à Estação, nova campanha).
   - E interage: entrar ou forçar a porta de uma loja, vasculhar, abrir caixotes, acender a fogueira, voltar à Estação
     pela saída no começo da rua.

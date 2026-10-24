@@ -2,13 +2,13 @@
   {
     "Name": "botao_cobre",
     "DisplayName": "Botão de Cobre",
-    "Description": "+3 de Vida Máxima. Um talismã sólido da época dos humanos.",
+    "Description": "+3 de Vida Máxima. Um talismã sólido do tempo dos Antigos.",
     "MaxHpBonus": 3
   },
   {
     "Name": "pena_vidro",
     "DisplayName": "Pena de Vidro",
-    "Description": "+1 de Velocidade. Cortada de um vidro de laboratório aerodinâmico.",
+    "Description": "+1 de Velocidade. Cortada do vidro de uma Casa de Vidro.",
     "SpeedBonus": 1
   },
   {

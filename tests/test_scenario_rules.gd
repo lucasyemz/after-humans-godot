@@ -19,6 +19,8 @@ func _campaign(phase_id: String, seed_value: int = 777) -> Dictionary:
 	var campaign: Dictionary = Campaign.create_initial(31)
 	campaign.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
 	S.confirm_departure(campaign, campaign.preferred_formation.duplicate(), 0, seed_value, phase_id, "parts")
+	# Os eventos de história já vistos: a Passagem não abre evento no meio das regras dos props (test_story confere).
+	campaign.station.story_events = R.STORY_EVENTS.keys()
 	return campaign
 
 

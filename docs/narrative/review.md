@@ -82,6 +82,46 @@ Program", "from the war", "the Echo", "learning notes") somem com o `i18n_update
 | `station_rules.gd:36` ("Sala dos Personagens") e `:40` ("Bar") | Nome de sala que não pertence ao mundo ("Personagens" é termo de UI). | "Alojamento" (ou "Sala do Elenco"); manter "Bar". | §13 (tom): "O mundo precisa parecer vivido". |
 | `data/relics.json:5,11` | "época dos humanos" e "vidro de laboratório aerodinâmico". | "Um talismã sólido do tempo dos Antigos." e "Cortada do vidro de uma Casa de Vidro." | Vocabulário do novo mundo (§16). "Aerodinâmico" não quer dizer nada para um vidro. É ajuste de tom, por isso fica aqui. |
 
+### Respostas aplicadas (24/10, rodada 2 da #64)
+
+O Lucas pediu para seguir com as propostas desta tabela e, onde não havia, fazer uma para ele revisar. Marcado
+**(proposta do Claude)** o que não estava na revisão.
+
+1. **Íris:** fica sapo. Lore §15.3 sem a Íris; §15.5 nova, Povos dos Canais (anfíbios), com a cultura dela.
+2. **Véspera e Amora:** Véspera entra na lore (§15.6, Aves das Torres). Amora continua na lore e no arco e entra no jogo
+   quando o arco do resgate for jogável **(proposta do Claude)**.
+3. **Classes:** "Gato Batedor" e "Coruja Atiradora" (e os papéis "Batedor e Mobilidade", "Atiradora e Controle"); ids
+   iguais.
+4. **Estação Raiz:** fica; lore §17 explica o nome (as raízes da plataforma) e que não tem ligação com a Raiz Livre.
+5. **Bairro Submerso:** entra na lore §17.
+6. **Fase 4:** o nome fica "Laboratório Silencioso": a descrição já põe o laboratório (a Casa de Vidro) atrás do Portão
+   de Triagem, e trocar o nome mudaria o que os memoriais já gravaram **(proposta do Claude)**.
+7. **Escada × fases:** 1:1, registrado em `narrative-design.md` (seção "No jogo da Godot"); as camadas 6 e 7 ficam
+   para quando o mapa crescer.
+8. **Porteiro:** um dos portões de VIGIA (lore §11, sem citar VIGIA na tela); a vitória sobre ele traz a linha da
+   autenticação humana (item 16).
+9. **Núcleo Nulo:** Sistema Degradado (lore §10.3), com a descrição proposta; "(teste)" saiu do papel.
+10. **Vilões do John:** as descrições propostas; "Carrasco Industrial" virou "Demolidor Industrial" (id igual); o
+    Enraizado ganhou descrição e o golpe virou "Açoite de Raízes".
+11. **Remendador:** "Soldador" na tela (id igual), com descrição **(proposta do Claude)**.
+12. **Inimigos fora dos encontros:** continuam fora da campanha; nada mudou **(proposta do Claude)**.
+13. **Nomes de recruta:** os da tabela; e **(proposta do Claude)** Max→Brasa, Félix→Calha, Jasper→Lampião, e o recruta
+    Faísca→Centelha (Faísca é inimigo). Quem já foi recrutado mantém o nome.
+14. **Filhote de lontra:** **(proposta do Claude)** nem A nem B, para não mexer em números: a escolha virou "Passar o que
+    der pela fresta e seguir", sem promessa, com o mesmo −5 de Esperança.
+15. **Eventos de história:** um por fase na primeira Passagem no mapa da fase (não na travessia), uma vez por campanha
+    (o Sobrevivente dos Túneis volta até o guaxinim ser liberado, para a classe não se perder de vez) (fase 2: Voz no Interfone;
+    3: A Porta que Ainda Espera; 5: Sobrevivente dos Túneis). A "Voz no Interfone" prometia uma luta que o jogo nunca
+    começava: **(proposta do Claude)** "Seguir o sinal" agora leva ao painel de contenção e mostra o visor, sem luta.
+16. **"O que a equipe viu":** a linha no relatório da primeira vitória de cada fase, gravada no save
+    (`station.story_reports`, saves antigos ganham a lista vazia). As linhas das fases 3 e 4 que citavam a Íris
+    ficaram sem nome, porque ela pode não estar na equipe **(proposta do Claude)**.
+17. **"Sala dos Personagens":** "Alojamento" (id igual). A Mochila dizia para equipar a relíquia "no Depósito do
+    refúgio"; é no Alojamento.
+18. **Relíquias:** "do tempo dos Antigos" e "Cortada do vidro de uma Casa de Vidro".
+
+As descrições das fases 1, 2 e 5 e o Próximo passo final ("Os Antigos ainda existem?…") são as da seção 4.
+
 ## 4. Progressão das fases
 
 | Fase | O que a escada pede (`narrative-design.md` §7) | O que os textos do jogo contam hoje | O que falta (proposta concreta) |
@@ -151,8 +191,8 @@ Da lore e dos documentos:
 - Eco — lore.md §29 (descontinuado como eixo; vale só como nome local: Túneis do Eco, Herdeiros do Eco, Eco-0x)
 
 Só no jogo (decidir se entram na lore):
-- Estação Raiz — só no jogo (scenarios.json, tips, station_rules)
-- Bairro Submerso — só no jogo (phase_map.gd, combat_engine.gd)
+- Estação Raiz — lore.md §17
+- Bairro Submerso — lore.md §17
 - Mapa ferroviário — só no jogo (phase_map.gd)
 - Plataforma da Estação — só no jogo (expedition-nodes.json)
 - Rua das Vitrines — só no jogo (PHASES, scenarios.json)
@@ -172,7 +212,7 @@ Só no jogo (decidir se entram na lore):
 - Cantina — só no jogo (station_rules ROOMS)
 - Depósito — só no jogo (sala)
 - Preparação — só no jogo (sala)
-- Sala dos Personagens — só no jogo (sala; tabela 3)
+- Alojamento — só no jogo (sala; era "Sala dos Personagens")
 - Forja — só no jogo (sala)
 - Centro de Pesquisa — só no jogo (sala)
 - Dormitório — só no jogo (sala)
@@ -182,11 +222,11 @@ Só no jogo (decidir se entram na lore):
 - Otto — só no jogo (civil, Castor)
 - Cora — só no jogo (civil, Gambá)
 - Risco — só no jogo (events.json `sobrevivente_tuneis`; NAME_POOLS `rato`)
-- Véspera — só no jogo (initial-heroes.json, coruja)
+- Véspera — lore.md §15.6 (Aves das Torres)
 - Cão Protetor — só no jogo (classe)
-- Gato Assassino — só no jogo (classe; tabela 3)
+- Gato Batedor — só no jogo (classe; era "Gato Assassino")
 - Sapo Química — só no jogo (classe)
-- Coruja Sniper — só no jogo (classe; tabela 3)
+- Coruja Atiradora — só no jogo (classe; era "Coruja Sniper")
 - Guaxinim Sabotador — só no jogo (classe)
 - Tatu de Resgate — só no jogo (classe)
 - Robô — só no jogo (enemies.json)
@@ -199,7 +239,7 @@ Só no jogo (decidir se entram na lore):
 - Coletor de Sucata — só no jogo
 - Relé de Defesa — só no jogo (Alfa e Beta no chefe)
 - Condutores — só no jogo (phase_map.gd; nome velho, sai pela tabela 2)
-- Carrasco Industrial — só no jogo (vilão do John)
+- Demolidor Industrial — só no jogo (vilão do John; era "Carrasco Industrial")
 - Recreador — só no jogo (vilão do John)
 - Enraizado — só no jogo (vilão do John)
 - Pipoco — só no jogo (vilão do John)
@@ -208,7 +248,7 @@ Só no jogo (decidir se entram na lore):
 - Hóspede Rubro — só no jogo (fora dos encontros)
 - Núcleo Nulo — só no jogo (fora dos encontros)
 - Ilusionista de Sucata — só no jogo (fora dos encontros)
-- Remendador — só no jogo (inimigo; choca com "Remendadores", tabela 3)
+- Soldador — só no jogo (inimigo; era "Remendador", que chocava com a facção)
 - Acoplador — só no jogo (fora dos encontros)
 - Felina de Ferro — só no jogo (fora dos encontros)
 - Patinadora de Choque — só no jogo (fora dos encontros)
@@ -222,16 +262,16 @@ Só no jogo (decidir se entram na lore):
 - Pé de cabra — só no jogo (ferramenta)
 - Lanterna — só no jogo (ferramenta)
 - Máscara com filtro — só no jogo (ferramenta; a lore §2.1 cita máscaras e filtros)
-- Ampola da Íris — só no jogo (inventory_panel; vira "Ampola de Reparo" pela tabela 2)
+- Ampola de Reparo — só no jogo (inventory_panel; era "Ampola da Íris")
 - Zonas dos cenários (só no jogo, `tools/sync_scenarios.py` AREAS): Cais, Navio, Galpão, Hall, Estoque, Manutenção, Arquivo, Convivência, Sala técnica, passagem
 
 Nomes de recruta (só no jogo, `station_rules.gd` NAME_POOLS; uma linha por classe, para o teste ler como lista):
-- cao — Bento, Brutus, Argos, Tobias, Balto, Rufus, Lorde, Barão, Max, Trovão, Thor, Snoopy, Fumaça, Pluto, Bóris
-- gato — Nix, Sombra, Salem, Bastet, Maya, Nuvem, Loki, Félix, Chico, Puma, Luna, Zelda, Veludo, Mimi, Jasper
-- sapo — Íris, Minerva, Atena, Garganta, Hórus, Bubo, Estrela, Eco, Vigília, Sábio, Pluma, Penumbra, Gisela, Noctis
+- cao — Bento, Brutus, Argos, Tobias, Balto, Rufus, Lorde, Barão, Brasa, Trovão, Pistão, Farol, Fumaça, Trilho, Bóris
+- gato — Nix, Sombra, Breu, Telha, Maya, Nuvem, Fresta, Calha, Chico, Puma, Luna, Antena, Veludo, Mimi, Lampião
+- sapo — Íris, Lupa, Cisterna, Garganta, Mirante, Bubo, Estrela, Eco, Alerta, Sábio, Pluma, Penumbra, Gisela, Noctis
 - coruja — Véspera, Sereno, Jasmim, Pacato, Rio, Sol, Dengoso, Flora, Paz, Brisa, Lótus, Chico Rei, Pingo, Mel, Cacau
-- rato — Risco, Pólvora, Chispola, Pipeta, Ferrugem, Duto, Pipoca, Veneno, Mola, Faísca, Fuligem, Squeeze, Engrenagem
-- tatu — Casco, Carapaça, Couraça, Fortaleza, Tromba, Pedregulho, Titan, Escudo, Baluarte, Granito, Tanque, Rochedo
+- rato — Risco, Pólvora, Chispola, Pipeta, Ferrugem, Duto, Pipoca, Veneno, Mola, Centelha, Fuligem, Pinça, Engrenagem
+- tatu — Casco, Carapaça, Couraça, Fortaleza, Tromba, Pedregulho, Bigorna, Escudo, Baluarte, Granito, Tanque, Rochedo
 
 Observações para o teste automático: "vigia" (minúsculo, quem vigia a noite) não é o VIGIA, então a comparação deve
 distinguir maiúsculas. O nome do jogo em `project.godot` é "After Humans"; os textos de tela usam "Depois dos Humanos"
