@@ -135,7 +135,28 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "icon_variant": {
+        "issue": 58,
+        "skill_size": [
+          104,
+          104
+        ],
+        "action_size": [
+          136,
+          104
+        ],
+        "skill_art_size": 64,
+        "action_icon_size": 40,
+        "key_font": [
+          18,
+          21,
+          23
+        ],
+        "focus": "existing external corners",
+        "disabled": "existing locked frame plus slash; reason on focus",
+        "new_runtime_art": false
+      }
     },
     "card": {
       "name": "03 / Cartão",
@@ -208,7 +229,38 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "compact_variant": {
+        "issue": 58,
+        "derives_from": "plate",
+        "size": [
+          160,
+          72
+        ],
+        "enemy_width": 208,
+        "padding": 16,
+        "rank_area_width": 32,
+        "rank_font": [
+          18,
+          21,
+          23
+        ],
+        "life_bar_height": 12,
+        "instinct_track_height": 4,
+        "life_origin": [
+          48,
+          24
+        ],
+        "instinct_origin": [
+          48,
+          48
+        ],
+        "hide_name_and_numbers_until_focus": true,
+        "same_size_all_text_profiles": true,
+        "focus": "existing external corners",
+        "selected": "existing diamond; actor body light retained",
+        "new_runtime_art": false
+      }
     },
     "bar": {
       "name": "05 / Barras",
@@ -245,7 +297,19 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "icon_value_variant": {
+        "issue": 58,
+        "height": 64,
+        "icon_size": 32,
+        "body_font": [
+          24,
+          28,
+          31
+        ],
+        "detail_on_focus": true,
+        "same_existing_frame": true
+      }
     },
     "tooltip": {
       "name": "07 / Dica",
@@ -362,6 +426,18 @@
           "refuge": "flag + word"
         },
         "no_runtime_texture_required": true
+      },
+      "portrait_strip_variant": {
+        "issue": 58,
+        "size": [
+          544,
+          96
+        ],
+        "portrait_size": 48,
+        "portrait_step": 56,
+        "maximum_portraits": 6,
+        "current_actor": "diamond plus actor portrait and body light; names on focus",
+        "new_runtime_art": false
       }
     },
     "key": {

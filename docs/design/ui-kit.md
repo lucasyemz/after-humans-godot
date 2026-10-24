@@ -163,3 +163,18 @@ Registro após avaliação com `docs/design/qa.md`, acrescida dos critérios da 
 ## Variante do mapa — #69
 
 A família Sequência recebe etiquetas disponível/bloqueada/concluída/refúgio, compostas com Painel e Seleção, sem textura nova. [Pranchas, medidas, idiomas e QA](map_labels.md). Normal 240×96; Grande/Maior 272×112; 9-slice 16; ícone 24; foco externo 6. Contrato em `components.sequence.map_label_variant`.
+
+## Variantes compactas — #58
+
+A QA da primeira montagem da HUD identificou medidas compactas ainda sem contrato. Antes da montagem corrigida, estas variantes passaram a fazer parte das mesmas famílias, reutilizando todas as texturas, fontes, ícones e estados existentes:
+
+| Família | Variante e medidas |
+|---|---|
+| Placa | 160×72 aliado;208×72 inimigo; padding16; posição18/21/23; vida12, trilha de instinto4; nome e valores no foco; mesma geometria nas três escalas |
+| Botão | ícone de habilidade104×104, arte64; ação136×104, ícone40; tecla18/21/23; motivo de bloqueio no foco |
+| Ficha | altura64, ícone32, valor24/28/31; nome e previsão no foco |
+| Sequência | faixa544×96, até6 retratos48, passo56; atual marcado por losango, retrato e luz no corpo |
+
+[Prancha das variantes](ui-kit/hud_compact.png). O contrato guarda as coordenadas locais. Não é outra HUD ou família visual: é a apresentação resumida dos mesmos componentes, que revela os detalhes ao apontar/focar. Dica mantém largura480 Normal/640 Maior, conforme o kit; o detalhe longo usa18/23 e não cobre o herói atual.
+
+QA das variantes — rodada1: **VEREDITO: APROVADO**. Conferidos Normal/Maior, fontes mínimas, 9-slice16, ícones32/40/64, barras distintas por espessura, foco e escolha separados, geometria sem corte. Cinza e daltonismo continuam apoiados em formas e texto no foco. Sem novos assets de runtime. Esta aprovação antecede a segunda montagem das telas #58.
