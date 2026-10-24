@@ -817,6 +817,10 @@ func _make_tag(hero_id: String) -> Control:
 
 func toast(text: String, error: bool = false) -> void:
 	_feedback.text = text
+	# Ao lado dos botões do canto, na mesma linha (ficava por cima do "Ocultar HUD", #63).
+	if _corner.visible:
+		var corner := _corner.get_global_rect()
+		_feedback.position = Vector2(corner.end.x + 24.0, corner.get_center().y - _feedback.size.y * 0.5)
 	_feedback.add_theme_color_override("font_color", Color(1.0, 0.55, 0.45) if error else H.GOLD)
 	_feedback.modulate.a = 1.0
 	if _feedback_tween:
