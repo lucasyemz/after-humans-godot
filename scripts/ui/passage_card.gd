@@ -21,11 +21,25 @@ var title_delay := 0.0
 var ready_to_skip := false
 ## O jogador pediu para pular (só depois de ready_to_skip).
 var skipped := false
+## O título já está aceso na tela (o GameFlow não fecha o cartão antes disso, nem numa máquina lenta).
+var title_lit := false
+## Pular apertado durante o passeio (antes de a cena seguinte montar, que espera o título): o passeio acaba, o título
+## acende na hora, a cena monta e o cartão fecha assim que ela estiver pronta (#75).
+var skip_requested := false
 
 var _text: VBoxContainer
 var _hint: HBoxContainer
+## A caixa da dica: escura por cima da cena de fundo (o chão claro do vagão), invisível sobre o preto.
+var _hint_box: PanelContainer
 ## A entrada da dica mostrada (teclas ou toque): troca junto quando o jogador troca de entrada com o cartão aberto.
 var _hint_keys := true
+var _band: Control
+## Quando o cartão abriu (pelo relógio, como o tempo mínimo do GameFlow) e se o título já começou a acender.
+var _opened_ms := 0
+var _revealing := false
+var _reveal_tween: Tween
+## O que a dica mostra agora: a de pular (true) ou "Carregando…".
+var _hint_skip := false
 
 
 func _init(card: Dictionary = {}, reduce_motion: bool = false) -> void:
@@ -34,6 +48,8 @@ func _init(card: Dictionary = {}, reduce_motion: bool = false) -> void:
 	backdrop = card.get("backdrop")
 	reduced = reduce_motion
 	title_delay = float(card.get("title_delay", 0.0))
+	# Já na criação: a dica do primeiro quadro conta a carência a partir daqui.
+	_opened_ms = Time.get_ticks_msec()
 	name = "Passage"
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	# O cartão fica com o mouse e o toque (nada por trás recebe o clique).
@@ -80,20 +96,35 @@ func _ready() -> void:
 		sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		sub.custom_minimum_size = Vector2(900, 0)
 		_text.add_child(sub)
+	_hint_box = PanelContainer.new()
+	_hint_box.add_theme_stylebox_override("panel", S.flat(0.72 if backdrop != null else 0.0, Color(S.COPPER, 0.0), 0))
+	_hint_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_hint_box)
 	_hint = HBoxContainer.new()
 	_hint.name = "Hint"
 	_hint.add_theme_constant_override("separation", 10)
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_hint)
+	_hint_box.add_child(_hint)
 	_show_hint()
 	get_viewport().size_changed.connect(_layout)
 	_layout()
-	if not reduced:
+	_band = band
+	if reduced:
+		title_lit = true
+	else:
 		band.modulate.a = 0.0
-		var tween := create_tween().set_parallel()
-		tween.tween_property(band, "modulate:a", 1.0, 0.45).set_delay(title_delay)
-		tween.tween_property(band, "position:y", band.position.y, 0.6).from(band.position.y + RISE).set_delay(title_delay) \
-			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+
+## O título acende (e sobe um pouco) depois de title_delay, contado pelo relógio: numa máquina lenta os quadros chegam
+## com o tempo cortado, e um atraso em tempo de jogo podia passar do tempo do cartão.
+func _reveal() -> void:
+	_revealing = true
+	var tween := create_tween().set_parallel()
+	_reveal_tween = tween
+	tween.tween_property(_band, "modulate:a", 1.0, 0.45)
+	tween.tween_property(_band, "position:y", _band.position.y, 0.6).from(_band.position.y + RISE) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.finished.connect(func(): title_lit = true)
 
 
 func _add_backdrop() -> void:
@@ -120,7 +151,20 @@ func mark_ready() -> void:
 	if ready_to_skip:
 		return
 	ready_to_skip = true
+	if skip_requested:
+		skipped = true
 	_show_hint()
+
+
+## O passeio pulado: o título aceso de uma vez, no lugar.
+func _light_title_now() -> void:
+	if _reveal_tween != null:
+		_reveal_tween.kill()
+	_revealing = true
+	title_lit = true
+	if _band != null:
+		_band.modulate.a = 1.0
+		_layout()
 
 
 func _show_hint() -> void:
@@ -130,7 +174,8 @@ func _show_hint() -> void:
 		_hint.remove_child(child)
 		child.queue_free()
 	_hint_keys = S.using_keys or not Settings.touch_visible()
-	if not ready_to_skip:
+	_hint_skip = _can_skip_now()
+	if not _hint_skip:
 		_hint.add_child(S.label(tr("Carregando…"), 20, S.MUTED))
 	elif not _hint_keys:
 		_hint.add_child(S.label(tr("Toque para pular"), 20, S.MUTED))
@@ -140,8 +185,20 @@ func _show_hint() -> void:
 	_layout.call_deferred()
 
 
+## A dica de pular só aparece quando pular vale: passada a carência, com a cena pronta ou no passeio (a cena de fundo
+## com o título atrasado, em que pular vale desde o começo).
+func _can_skip_now() -> bool:
+	if Time.get_ticks_msec() - _opened_ms < SKIP_GRACE_MS:
+		return false
+	return ready_to_skip or (title_delay > 0.0 and not skip_requested)
+
+
 func _process(_delta: float) -> void:
-	if ready_to_skip and _hint_keys != (S.using_keys or not Settings.touch_visible()):
+	if _hint != null and _hint_skip != _can_skip_now():
+		_show_hint()
+	if not title_lit and not _revealing and Time.get_ticks_msec() - _opened_ms >= title_delay * 1000.0:
+		_reveal()
+	if _hint_skip and _hint_keys != (S.using_keys or not Settings.touch_visible()):
 		_show_hint()
 
 
@@ -151,9 +208,13 @@ func _layout() -> void:
 	var view := get_viewport_rect().size
 	var band: Control = _text.get_parent()
 	band.reset_size()
-	band.position = (view - band.get_combined_minimum_size()) * 0.5
-	_hint.reset_size()
-	_hint.position = view - _hint.get_combined_minimum_size() - Vector2(48, 40)
+	var band_size := band.get_combined_minimum_size()
+	band.position = (view - band_size) * 0.5
+	# Com a cena de fundo (o vagão), o título vai para o chão, embaixo da equipe, em vez de cobri-la.
+	if backdrop != null:
+		band.position.y = minf(view.y * 0.9 - band_size.y * 0.5, view.y - band_size.y - 16.0)
+	_hint_box.reset_size()
+	_hint_box.position = view - _hint_box.get_combined_minimum_size() - Vector2(36, 28)
 
 
 func _input(event: InputEvent) -> void:
@@ -162,8 +223,19 @@ func _input(event: InputEvent) -> void:
 			or event is InputEventScreenTouch or event is InputEventAction):
 		return
 	get_viewport().set_input_as_handled()
-	if ready_to_skip and is_skip(event):
+	if not is_skip(event) or Time.get_ticks_msec() - _opened_ms < SKIP_GRACE_MS:
+		return
+	if ready_to_skip:
 		skipped = true
+	elif title_delay > 0.0 and not skip_requested:
+		# No passeio a cena seguinte já carregou e só espera o título: o pedido vale e encerra o passeio.
+		skip_requested = true
+		_light_title_now()
+
+
+## Logo que o cartão abre, pular ainda não vale: o mesmo Interagir que confirmou a partida, apertado duas vezes, pulava
+## o vagão antes de ele aparecer.
+const SKIP_GRACE_MS := 300
 
 
 ## Interagir (A no controle), Esc ou Start (menu), Voltar (Backspace ou B), um clique ou um toque.

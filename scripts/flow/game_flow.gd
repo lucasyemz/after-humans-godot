@@ -121,7 +121,8 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	# Pelo relógio, desde que o cartão abriu: o quadro que monta a cena trava segundos, mas o delta dele chega cortado
 	# (~0,14 s); somando deltas, o tempo mínimo só começava depois da montagem.
 	var opened := Time.get_ticks_msec()
-	while scene == null or not (passage.skipped or Time.get_ticks_msec() - opened >= hold * 1000.0):
+	# Sem pular, o cartão fica o mínimo e até o título acender (numa máquina lenta, o título atrasado ainda aparece).
+	while scene == null or not (passage.skipped or (Time.get_ticks_msec() - opened >= hold * 1000.0 and passage.title_lit)):
 		await tree.process_frame
 		if packed == null:
 			var status := ResourceLoader.load_threaded_get_status(path)
@@ -130,7 +131,8 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 			elif status != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
 				# O pedido em segundo plano falhou (ou já foi consumido): carrega aqui mesmo.
 				packed = load(path)
-		elif scene == null:
+		elif scene == null and (passage.title_delay <= 0.0 or passage.title_lit):
+			# Com a cena de fundo andando (o vagão, #75), a montagem (um quadro travado) espera o título aceso por cima.
 			# A cena nova monta por baixo do cartão (opaco), parada: não anda nem recebe tecla até o cartão sair. Só
 			# depois de montada dá para pular.
 			scene = packed.instantiate()

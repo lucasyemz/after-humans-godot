@@ -1556,7 +1556,8 @@ func _depart() -> void:
 		return
 	_draft = {}
 	Campaign.save()
-	GameFlow.travel("street")
+	# A partida no vagão (#75): a equipe sentada no metrô a caminho da fase, depois o título dela.
+	GameFlow.travel("street", AHWagonRide.departure_card(c))
 
 
 ## A partida na plataforma: a equipe em fila e o mesmo painel da Preparação (equipe, foco, suprimentos, confirmar).

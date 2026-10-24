@@ -73,6 +73,8 @@ func _card_skip() -> void:
 		_tree.root.add_child(card)
 		await _tree.process_frame
 		await _push(kind)
+		await _wait_ms(AHPassageCard.SKIP_GRACE_MS + 50)
+		await _push(kind)
 		var early := card.skipped
 		card.mark_ready()
 		await _push(kind)
@@ -236,6 +238,12 @@ func _push(kind: String) -> void:
 				events.append(e)
 	for e in events:
 		_tree.root.push_input(e)
+		await _tree.process_frame
+
+
+func _wait_ms(ms: int) -> void:
+	var until := Time.get_ticks_msec() + ms
+	while Time.get_ticks_msec() < until:
 		await _tree.process_frame
 
 
