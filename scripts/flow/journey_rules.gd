@@ -32,11 +32,11 @@ const PHASES := [
 	{"id": "fase_2", "scenario": "ponte-das-raizes", "name": "Ponte das Raízes", "level": 3, "node_type": "combat", "map": "RootBridge", "transit": "RiverDock", "transit_steps": 4, "difficulty": 1, "map_pos": [520, 470],
 		"description": "A ponte ligava bairros; seus sensores agora vigiam permissões que nenhum morador da Estação possui."},
 	{"id": "fase_3", "scenario": "sala-esquecida", "name": "Sala Esquecida", "level": 5, "node_type": "combat", "map": "SealedShelter", "transit": "", "transit_steps": 0, "difficulty": 2, "map_pos": [640, 210],
-		"description": "Uma placa do Programa Continuidade aponta para o subsolo. Os registros não dizem quem retornou."},
+		"description": "Atrás da porta lacrada de uma Toca dos Antigos, um Arquivo de fichas: cães, gatos e outros bichos, medidos e numerados. Ninguém na Estação sabe por que os Antigos nos estudavam."},
 	{"id": "fase_4", "scenario": "laboratorio-silencioso", "name": "Laboratório Silencioso", "level": 7, "node_type": "combat", "map": "TriageGate", "transit": "", "transit_steps": 0, "difficulty": 2, "map_pos": [830, 430],
-		"description": "Restam interfaces de comunicação e anotações de aprendizagem. Os aparelhos não contam sozinhos a história de seus usuários."},
+		"description": "Na Casa de Vidro silenciosa, dois relatórios sobre a Peste não batem: um culpa os animais portadores, o outro para no meio. As máquinas da triagem só conhecem o primeiro."},
 	{"id": "fase_5", "scenario": "tuneis-do-eco", "name": "Túneis do Eco", "level": 9, "node_type": "boss", "map": "SewerDucts", "transit": "FloodedDepot", "transit_steps": 4, "difficulty": 3, "map_pos": [980, 190],
-		"description": "Bombas antigas mantêm a água em movimento. Na eclusa central, o Porteiro conserva uma ordem de isolamento da guerra."},
+		"description": "Bombas antigas mantêm a água em movimento. Na eclusa central, o Porteiro guarda uma ordem de contenção da Peste que ninguém cancelou."},
 ]
 const DIFFICULTY_NAMES := ["Fácil", "Moderada", "Difícil", "Muito difícil"]
 const WEATHERS := {

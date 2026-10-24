@@ -82,8 +82,8 @@ func _make_slots() -> Array:
 		"text": "Do refúgio: +8 de vida. O que sobrar e o que se achar voltam ao refúgio."})
 	if C.iris(campaign) != null:
 		var charges := C.ampoule_charges(campaign)
-		out.append({"id": "ampoule", "name": "Ampola da Íris", "icon": "item-ampoule", "count": "%d cargas" % charges, "group": 0,
-			"owned": charges > 0, "text": "Habilidade da Íris: cura um aliado orgânico. Recarrega após uma vitória."})
+		out.append({"id": "ampoule", "name": "Ampola de Reparo", "icon": "item-ampoule", "count": "%d cargas" % charges, "group": 0,
+			"owned": charges > 0, "text": "Habilidade do sapo: cura um aliado orgânico. Recarrega após uma vitória."})
 	var tools: Array = KNOWN_TOOLS.duplicate()
 	for tool in campaign.get("tools", []):
 		if not tools.has(tool):
@@ -212,7 +212,7 @@ func _actions(id: String) -> Array:
 		"bandages":
 			kinds = [[C.BANDAGE, "Usar curativo"]]
 		"ampoule":
-			kinds = [[C.IRIS_AMPOULE, "Ampola da Íris"]]
+			kinds = [[C.IRIS_AMPOULE, "Ampola de Reparo"]]
 	var out: Array = []
 	for spec in kinds:
 		var kind: String = spec[0]

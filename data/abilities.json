@@ -49,7 +49,7 @@
     "Name": "cao_fique_atras_de_mim",
     "ClassId": "cao",
     "DisplayName": "Fique Atrás de Mim",
-    "Description": "Protege um aliado até o início do próximo turno de Bento; Bento recebe 1 Bloqueio.",
+    "Description": "Protege um aliado até o início do próximo turno do cão; o cão recebe 1 Bloqueio.",
     "OriginRanks": [
       1,
       2,

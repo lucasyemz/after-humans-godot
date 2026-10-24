@@ -83,7 +83,7 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 		IRIS_AMPOULE:
 			var row = _ampoule_row()
 			if iris(campaign) == null or row == null or row.UsesMax <= 0 or row.HealRange.Max <= 0:
-				q.reason = "Íris precisa estar viva e na equipe."
+				q.reason = "Um sapo vivo precisa estar na equipe."
 				return q
 			# Os heróis jogáveis são orgânicos; uma classe fora da tabela não passa.
 			if GameData.row("classes", target.class_id) == null:
@@ -93,7 +93,7 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 			q.heal_min = mini(missing, row.HealRange.Min + bonus)
 			q.heal_max = mini(missing, row.HealRange.Max + bonus)
 			if q.charges <= 0:
-				q.reason = "Sem cargas. Íris recarrega após uma vitória."
+				q.reason = "Sem cargas. A ampola recarrega após uma vitória."
 				return q
 		_:
 			q.heal_min = _meal_heal(kind, target.max_hp, missing)

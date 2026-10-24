@@ -72,7 +72,7 @@ func _exploration(t) -> void:
 	t.equal(C.use(campaign, target.id, C.IRIS_AMPOULE), 0, "um evento aberto bloqueia")
 	campaign.session.event = null
 	t.equal(C.use(campaign, target.id, C.IRIS_AMPOULE), 0, "a quarta carga é recusada")
-	t.equal(C.quote(campaign, target.id, C.IRIS_AMPOULE).reason, "Sem cargas. Íris recarrega após uma vitória.", "e diz por quê")
+	t.equal(C.quote(campaign, target.id, C.IRIS_AMPOULE).reason, "Sem cargas. A ampola recarrega após uma vitória.", "e diz por quê")
 	# Gravar e abrir não devolve a carga gasta.
 	var path := "user://test_exploration_care.json"
 	var file := FileAccess.open(path, FileAccess.WRITE)

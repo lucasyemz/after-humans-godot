@@ -419,7 +419,7 @@ func _advance_to_next_actor() -> void:
 		var conductors := _any(state.enemy_team, func(u): return u.hp > 0 and u.enemy_id == "condutor_raiz")
 		if conductors and current.hp > 45:
 			current.tokens.block = mini(TOKEN_CAP, current.tokens.block + 1)
-			_log("O Porteiro canalizou energia dos Condutores e gerou Bloqueio!")
+			_log("O Porteiro canalizou energia dos Relés de Defesa e gerou Bloqueio!")
 
 
 ## O alvo protegido de cada unidade, por identidade (guarda do turno) ou por posição.
