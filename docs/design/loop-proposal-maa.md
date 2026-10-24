@@ -126,14 +126,21 @@ Por prioridade. Cada item diz o motivo, como fica na nossa história e o que nã
   - os estados com o que fazem.
 - **Por quê:** o MAA esconde quase tudo na tela fixa e mostra ao apontar. É o que a HUD nova (#56, #58) precisa.
 
-### P8. Arma por herói na Forja (depois)
-- **Proposta:** além da relíquia, uma arma ou ferramenta por herói, feita na Forja, com a ficha do item (o que muda nas
-  habilidades). Seria o "equipamento" do MAA, em escala menor.
-- **Depende de:** P3 e do equilíbrio.
+### P8. (retirada)
+Arma por herói na Forja: retirada pelo Lucas em 24/10. Cada personagem já tem a sua arma no próprio desenho e nas
+habilidades; o equipamento continua sendo a relíquia.
 
 ### P9. Desafios dos chefes ("Temporadas", depois)
 - **Proposta:** depois de vencer um chefe, um desafio dele fica disponível no Mapa da Rede, com modificadores (sem
   curativos, inimigos mais fortes, equipe de dois) e estrelas. É o endgame para quem já terminou as cinco fases.
+
+### A exploração continua
+- **A travessia não sai:** a jornada longa de cada lugar continua como é hoje (andar pelos trechos, patrulhas que veem a
+  equipe, buscas, interiores, acampamento, eventos e o guardião no fim), e vira a **missão de história** do lugar.
+- **As missões curtas (P1) também são exploração:** num trecho menor do mesmo mapa, com a mesma equipe andando, as
+  buscas e a patrulha, só que com um objetivo só (salvar, achar, limpar) e duração de 3 a 5 minutos.
+- **O resultado:** o jogador escolhe entre uma saída curta para um objetivo e a travessia inteira para avançar a
+  história. Nada da exploração atual é trocado por menu.
 
 ### O que não trazer
 - **Energia por tempo real, prêmio diário e coleta de aliados por relógio:** feitos para trazer o jogador de volta todo
