@@ -54,6 +54,27 @@ comentário em cada issue e um PR para a main no fim). Leia cada uma com "gh iss
 6. Push na `main`, comentário no PR, e `git push origin main:claude-cloud main:codex-design` só quando o agente não
    estiver no meio de uma rodada.
 
+## Revisor dos PRs (terceiro agente)
+
+O workflow `.github/workflows/review.yml` põe um Claude independente para revisar todo PR para a `main` (aberto, saído
+de rascunho ou atualizado). Ele usa os critérios das duas QAs e do `AGENTS.md` e responde com um veredito no próprio
+PR: PRONTO PARA O MERGE, AJUSTAR ANTES ou NÃO INTEGRAR. Ele só comenta; o merge continua com o Lucas (ou o Claude
+local). As instruções ficam em `.github/review-instructions.md`.
+
+Roda pela assinatura do Lucas, sem chave de API: gasta da cota do plano, como as sessões. Para ligar, uma vez só, num
+terminal com o `claude`:
+
+```bash
+claude setup-token
+gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo lucasyemz/after-humans-godot
+```
+
+O revisor não chama agentes: o Lucas manda as correções manualmente para o Codex e para o Claude da nuvem, a partir
+do comentário da revisão.
+
+O primeiro comando gera o token da conta; o segundo pede para colar e guarda como segredo do repositório (ninguém mais
+vê). Para revisar de novo um PR: em Actions, "Revisão", "Run workflow", com o número do PR.
+
 ## Fila de trabalho (24/10/2026)
 
 - **Claude da nuvem:**
