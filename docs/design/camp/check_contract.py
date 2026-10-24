@@ -1,7 +1,8 @@
-"""QA de documentação da #80. Não altera manifesto, arte, saves ou código."""
+"""QA de documentação das #80/#82. Não altera manifesto, arte, saves ou código."""
 import argparse
 import itertools
 import json
+import hashlib
 from pathlib import Path
 from PIL import Image
 
@@ -13,7 +14,8 @@ contract = json.loads(args.contract.read_text())
 manifest = json.loads((ROOT / "data/presentation/combat_art.json").read_text())
 errors = []
 for pose in contract["poses"]:
-    idle = manifest["recruits"][pose["recruit_id"]]["idle"]
+    collection, actor = ("heroes", pose["hero_id"]) if "hero_id" in pose else ("recruits", pose["recruit_id"])
+    idle = manifest[collection][actor]["idle"]
     official = pose["show_art"]
     for field in ("canvas", "anchor", "body_reference_pixels"):
         if official[field] != idle[field]:
@@ -37,4 +39,16 @@ for a, b in itertools.combinations(contract["camp_slots"], 2):
         errors.append(f"{a['recruit_example']}/{b['recruit_example']}: retângulos sobrepostos")
 if errors:
     raise SystemExit("\n".join(errors))
-print("PASS: 8 payloads oficiais iguais ao idle atual; texturas e 6 pares de retângulos conferidos.")
+for name, layout in contract.get("founder_layouts", {}).items():
+    for a, b in itertools.combinations(layout["slots"], 2):
+        aa, bb = a["texture_screen_rect"], b["texture_screen_rect"]
+        if not (aa[2] <= bb[0] or bb[2] <= aa[0] or aa[3] <= bb[1] or bb[3] <= aa[1]):
+            errors.append(f"{name}: {a['actor_id']}/{b['actor_id']}: retângulos sobrepostos")
+station = json.loads((ROOT / "data/presentation/station_poses.json").read_text())
+for review in contract.get("founder_sleep_review", []):
+    source = station[review["hero_id"] + "_sleep"]
+    if review["show_art"] != source or hashlib.sha256((ROOT / source["file"].removeprefix("res://")).read_bytes()).hexdigest() != review["sha256"]:
+        errors.append(f"{review['hero_id']}: sleep original mudou")
+if errors:
+    raise SystemExit("\n".join(errors))
+print(f"PASS: {len(contract['poses'])} payloads iguais ao idle e 3 composições sem sobreposição.")

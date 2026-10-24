@@ -319,7 +319,50 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "map_label_variant": {
+        "issue": 69,
+        "derived_from": [
+          "panel",
+          "sequence",
+          "selection"
+        ],
+        "normal_size": [
+          240,
+          96
+        ],
+        "large_size": [
+          272,
+          112
+        ],
+        "largest_size": [
+          272,
+          112
+        ],
+        "padding": 16,
+        "icon": 24,
+        "title_offset": [
+          56,
+          16
+        ],
+        "detail_y_normal": 56,
+        "detail_y_large": 64,
+        "anchor": "top center below sequence node; offset8",
+        "states": [
+          "available",
+          "locked",
+          "completed",
+          "refuge"
+        ],
+        "text": "use tr(); title/body and detail type from kit",
+        "shape_cues": {
+          "available": "available marker",
+          "locked": "two diagonal marks + reason",
+          "completed": "check + word",
+          "refuge": "flag + word"
+        },
+        "no_runtime_texture_required": true
+      }
     },
     "key": {
       "name": "10 / Tecla",
