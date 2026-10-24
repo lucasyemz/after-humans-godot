@@ -159,3 +159,7 @@ As reduções são reais, 768×432; verificam hierarquia e reconhecimento, não 
 ## QA de design
 
 Registro após avaliação com `docs/design/qa.md`, acrescida dos critérios da #59. Histórico e validação final em [qa.md](ui-kit/qa.md). A aprovação técnica de design não substitui a aprovação visual do Lucas nem a QA em jogo da implementação #60.
+
+## Variante do mapa — #69
+
+A família Sequência recebe etiquetas disponível/bloqueada/concluída/refúgio, compostas com Painel e Seleção, sem textura nova. [Pranchas, medidas, idiomas e QA](map_labels.md). Normal 240×96; Grande/Maior 272×112; 9-slice 16; ícone 24; foco externo 6. Contrato em `components.sequence.map_label_variant`.
