@@ -829,8 +829,10 @@ station_rules.gd: Lampião
 station_rules.gd: Lupa
 station_rules.gd: Cisterna
 station_rules.gd: Mirante
-station_rules.gd: Sentinela
+station_rules.gd: Alerta
 station_rules.gd: Centelha
 station_rules.gd: Pinça
 station_rules.gd: Bigorna
 refuge_hud.gd: story
+exploration_hud.gd: Requirement
+journey_rules.gd: hero

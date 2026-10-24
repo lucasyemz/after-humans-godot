@@ -29,7 +29,7 @@
   {
     "Name": "voz_interfone",
     "Title": "Voz no Interfone",
-    "Description": "Um interfone de emergência da antiga estação estala e acende, depois de gerações mudo. Entre chiados, uma voz sintética repete: \"Protocolo de preservação humana ativo. Vetores não autorizados detectados no setor de escoamento. Contenção a caminho.\"",
+    "Description": "Um interfone de emergência preso a um poste da ponte estala e acende, depois de gerações mudo. Entre chiados, uma voz sintética repete: \"Protocolo de preservação humana ativo. Vetores não autorizados detectados na travessia. Contenção a caminho.\"",
     "Choices": [
       {
         "Id": "seguir_interfone",
@@ -45,7 +45,7 @@
         "Requirement": "ScrapAtLeast",
         "RequirementAmount": 1,
         "Success": {
-          "Result": "Uma peça de sucata isola só o interfone; as bombas de escoamento continuam funcionando. Sem a voz repetindo a ordem, a equipe volta a respirar (+10 de Esperança, −1 Sucata).",
+          "Result": "Uma peça de sucata isola só o interfone; as luzes da ponte continuam acesas. Sem a voz repetindo a ordem, a equipe volta a respirar (+10 de Esperança, −1 Sucata).",
           "HopeDelta": 10,
           "ScrapDelta": -1
         }
@@ -54,7 +54,7 @@
         "Id": "ignorar_interfone",
         "Text": "Apressar o passo e ignorar a voz",
         "Success": {
-          "Result": "A voz vai ficando para trás enquanto o carrinho avança pela água escura. Ela continua repetindo a mesma ordem para ninguém."
+          "Result": "A voz vai ficando para trás enquanto a equipe atravessa a ponte. Ela continua repetindo a mesma ordem para ninguém."
         }
       }
     ]

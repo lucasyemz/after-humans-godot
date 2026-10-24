@@ -46,7 +46,7 @@ const STORY_EVENTS := {"fase_2": "voz_interfone", "fase_3": "porta_espera", "fas
 ## cita Théo (bento-nick-arc §11): o máximo é a autenticação do fim da fase 5 (lore §25.4).
 const STORY_REPORTS := {
 	"fase_1": "A Estação aguenta mais alguns dias. O que os Antigos deixaram, ninguém aqui sabe fazer de novo.",
-	"fase_2": "Na volta, alguém repete a frase do alto-falante: \"preservação humana\". Ninguém sabe por que a ponte acordou.",
+	"fase_2": "Na volta, alguém repete a frase do interfone: \"preservação humana\". Ninguém sabe por que a ponte acordou.",
 	"fase_3": "As fichas passam de mão em mão no caminho de casa. Algumas palavras ninguém sabe o que querem dizer: \"edição\", \"linhagem\", \"incubação\".",
 	"fase_4": "Os dois relatórios voltam na mochila. \"Um deles está errado, ou os dois estão incompletos.\"",
 	"fase_5": "No painel da eclusa, uma linha nova piscava: AUTENTICAÇÃO HUMANA VÁLIDA · registro recente. Ninguém fala no caminho de casa.",
@@ -241,10 +241,11 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 			return "rest"
 		"passage":
 			step.resolved = true
-			# Na primeira Passagem da fase, o evento de história dela (#64), uma vez por campanha.
-			var story := story_event(campaign)
+			# Na primeira Passagem da fase (no mapa dela, não na travessia), o evento de história (#64).
+			var story := story_event(campaign) if map_for_step(campaign.session.expedition.phase_id, index) == phase(campaign.session.expedition.phase_id).get("map", "") else ""
 			if story != "":
-				campaign.station.story_events.append(campaign.session.expedition.phase_id)
+				if not campaign.station.story_events.has(campaign.session.expedition.phase_id):
+					campaign.station.story_events.append(campaign.session.expedition.phase_id)
 				campaign.session.event = {"event_id": story, "from_search": false, "resolution": "", "pending_hard_combat": false,
 					"object": ""}
 				return "event"
@@ -253,12 +254,21 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 	return ""
 
 
-## O evento de história que a fase ainda deve mostrar ("" se não tem ou já mostrou).
+## O evento de história que a fase ainda deve mostrar ("" se não tem ou já mostrou). Uma vez por campanha; o que libera
+## uma classe (o Sobrevivente dos Túneis libera o guaxinim) volta até a classe ser liberada, para ela não se perder de vez.
 static func story_event(campaign: Dictionary) -> String:
 	var phase_id: String = campaign.session.expedition.get("phase_id", "")
 	var event_id: String = STORY_EVENTS.get(phase_id, "")
-	if event_id == "" or GameData.row("events", event_id) == null or campaign.get("station", {}).get("story_events", []).has(phase_id):
+	var row = GameData.row("events", event_id) if event_id != "" else null
+	if row == null:
 		return ""
+	if campaign.get("station", {}).get("story_events", []).has(phase_id):
+		var locked := false
+		for choice in row.get("Choices", []):
+			var unlock: String = choice.get("Success", {}).get("UnlockClass", "")
+			locked = locked or (unlock != "" and not campaign.unlocked_classes.has(unlock))
+		if not locked:
+			return ""
 	return event_id
 
 
@@ -969,8 +979,21 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 			expedition.corridor.effects.append(effect)
 	var resolution := String(effects.get("Result", "")).replace("{Instinto}", str(instinct)).replace("{Heroi}", hurt)
 	event.resolution = resolution if resolution != "" else String(choice.get("Text", "…"))
+	# O modelo em português e o que entra nele, para a tela traduzir (#35, #64): o save continua em português.
+	event.result_key = String(effects.get("Result", "")) if resolution != "" else String(choice.get("Text", "…"))
+	event.hero = hurt
+	event.instinct = instinct
 	event.pending_hard_combat = bool(effects.get("bHardCombat", false))
 	return true
+
+
+## O resultado do evento na tela, no idioma do jogo: o modelo traduzido com o herói e o instinto dele; um evento de um
+## save anterior (sem o modelo), o texto gravado.
+static func resolution_text(event: Dictionary) -> String:
+	var key := String(event.get("result_key", ""))
+	if key == "":
+		return TranslationServer.translate(String(event.get("resolution", "")))
+	return TranslationServer.translate(key).replace("{Instinto}", str(event.get("instinct", 0))).replace("{Heroi}", String(event.get("hero", "")))
 
 
 ## Fecha o evento resolvido. Do objeto de uma casa, a fase continua.

@@ -26,13 +26,19 @@ func _campaign(phase_id: String) -> Dictionary:
 	return campaign
 
 
-## Anda pelo corredor até a primeira Passagem (vencendo as patrulhas do caminho) e devolve o que a entrada dela deu.
+## Anda pelo corredor até a primeira Passagem no mapa da fase (vencendo as patrulhas do caminho; a da travessia não
+## abre o evento) e devolve o que a entrada dela deu.
 func _walk_to_passage(campaign: Dictionary) -> String:
 	var route: Dictionary = campaign.session.expedition.corridor
+	var phase_id: String = campaign.session.expedition.phase_id
 	for step in range(1, route.steps.size()):
 		route.steps[route.index].resolved = true
 		var outcome: String = R.enter_step(campaign, step)
 		if route.steps[step].type == "passage":
+			if R.map_for_step(phase_id, step) != R.phase(phase_id).get("map", ""):
+				if outcome != "":
+					return "abriu na travessia"
+				continue
 			return outcome
 	return "sem passagem"
 
@@ -50,10 +56,34 @@ func _passage(t, phase_id: String) -> void:
 	var row = GameData.row("events", expected)
 	R.choose_event_option(campaign, row.Choices[-1].Id, 1)
 	t.check(R.finish_event(campaign) and campaign.session.event == null, "%s: o evento fecha e a fase segue" % phase_id)
-	# Na mesma campanha, a próxima expedição da fase não repete.
-	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
-	t.equal(S.confirm_departure(campaign, campaign.preferred_formation.duplicate(), 0, 99, phase_id, "parts"), "", "%s: a segunda expedição parte" % phase_id)
-	t.equal(_walk_to_passage(campaign), "", "%s: a segunda expedição não repete o evento" % phase_id)
+	# O que libera uma classe (o guaxinim) volta enquanto ela não for liberada; os outros não repetem.
+	var unlocks := ""
+	for choice in row.Choices:
+		unlocks = String(choice.get("Success", {}).get("UnlockClass", "")) if unlocks == "" else unlocks
+	_again(campaign, phase_id, 99)
+	if unlocks == "":
+		t.equal(_walk_to_passage(campaign), "", "%s: a segunda expedição não repete o evento" % phase_id)
+		return
+	t.equal(_walk_to_passage(campaign), "event", "%s: recusado, o evento volta (a classe não se perde)" % phase_id)
+	campaign.session.expedition.food = 9
+	R.choose_event_option(campaign, row.Choices[0].Id, 1)
+	R.finish_event(campaign)
+	t.check(campaign.unlocked_classes.has(unlocks), "%s: aceito, a classe é liberada" % phase_id)
+	_again(campaign, phase_id, 98)
+	t.equal(_walk_to_passage(campaign), "", "%s: liberada, o evento não volta" % phase_id)
+
+
+## Uma nova expedição da mesma fase, na mesma campanha.
+## Sorteia até a rota ter uma Passagem no mapa da fase (em algumas, a única fica na travessia).
+func _again(campaign: Dictionary, phase_id: String, seed_value: int) -> void:
+	for attempt in 50:
+		campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
+		campaign.station.train.phase = "none"
+		S.confirm_departure(campaign, campaign.preferred_formation.duplicate(), 0, seed_value + attempt, phase_id, "parts")
+		var steps: Array = campaign.session.expedition.corridor.steps
+		for step in steps.size():
+			if steps[step].type == "passage" and R.map_for_step(phase_id, step) == R.phase(phase_id).get("map", ""):
+				return
 
 
 func _report(t) -> void:

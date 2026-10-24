@@ -1048,7 +1048,12 @@ func debug_next_fight() -> void:
 		return
 	var route: Dictionary = campaign.session.expedition.corridor
 	while route.steps[route.index].resolved and route.index < mini(map_last, route.steps.size() - 1):
-		R.enter_step(campaign, route.index + 1)
+		# A Passagem com o evento de história para ali, com o cartão aberto (o laço não saía com o evento aberto).
+		if R.enter_step(campaign, route.index + 1) == "event":
+			Campaign.save()
+			hud.refresh(campaign)
+			hud.show_event(campaign)
+			return
 	Campaign.save()
 	# Passou do mapa de passagem: viaja para o da fase.
 	if route.steps[route.index].resolved and route.index == map_last and map_last < route.steps.size() - 1:

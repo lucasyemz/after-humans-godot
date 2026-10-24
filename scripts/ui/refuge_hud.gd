@@ -1045,7 +1045,7 @@ func _civilian_card(c: Dictionary, who: Dictionary) -> void:
 	_text((tr("Pedido entregue: %s.") % tr(who.request_reward)) if S.has_completed_request(c, who.id) else (tr("Pedido: %s") % tr(who.need)), 18, H.MUTED)
 
 
-# ---------------------------------------------------------------- Sala dos Personagens
+# ---------------------------------------------------------------- Alojamento (a Sala dos Personagens)
 
 func _characters(c: Dictionary) -> void:
 	_section(tr("Elenco (%d de %d)") % [S.living(c).size(), S.MAX_ROSTER])

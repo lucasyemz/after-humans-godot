@@ -265,7 +265,7 @@
     "Category": "Machine",
     "DisplayName": "Soldador",
     "Role": "Suporte ofensivo",
-    "Description": "Robô de solda de uma oficina dos Antigos. Fecha as próprias rachaduras e as das máquinas ao lado, e solda o que acha pela frente.",
+    "Description": "Robô de solda de uma oficina dos Antigos. Ainda solda o que acha pela frente, inclusive quem se aproxima.",
     "MaxHp": 16,
     "Speed": 2,
     "SpriteKey": "remendador",
