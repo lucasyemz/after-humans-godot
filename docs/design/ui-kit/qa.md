@@ -1,3 +1,7 @@
+# Estado atual: APROVADO na rodada 4
+
+A revisão abaixo preserva o histórico; as pranchas atuais são WebP.
+
 # QA de design — kit único #59
 
 Avaliação com a segunda persona de QA de design, na mesma sessão, após produzir as pranchas; checklist de `../qa.md` e critérios extras da issue. Não é revisão de implementação nem aprovação visual do Lucas.
@@ -37,3 +41,17 @@ Godot4.7.2, base `fceda77`: após importar o checkout atualizado com `--headless
 Captura auxiliar de13 telas atuais por `tools/capture_ui.gd`, em1920×1080, cenário real e campanha isolada em pasta temporária; saída0. Usada como referência da linguagem existente, não como entrega da #58 nem como captura da implementação deste kit. O ambiente sem áudio físico usou driver dummy; houve avisos de recursos no encerramento. Nada gravado no perfil do jogador. Não houve alteração da rua, portanto não foi necessário teste de colisão de rua para este PR de documentação.
 
 Próximo marco: Lucas aprova o PR da #59; depois a #58 compõe telas só com o kit aprovado. Componente ausente numa tela entra primeiro neste contrato e passa por QA antes de ser usado.
+
+## Rodada 3 — VEREDITO: REPROVADO (revisão independente do PR #65)
+
+Média: placa H112 não comportava inset24 e as entrelinhas/barras; informação e bom confundiam dois azuis no daltonismo. Baixa: faltavam regra geométrica do Grande e versões das ferramentas. Referência: comentário do Lucas no PR65 em24/10.
+
+## Rodada 4 — VEREDITO: APROVADO
+
+Conferidos documento, contrato e pranchas regeneradas: placa Normal H120 =24+40+8+12+8+4+24; Grande/Maior H128 =24+48+8+12+8+4+24. No Grande a fonte é115% e a geometria/reserva de slots é integralmente a do Maior. Barras têm12 e4 pixels efetivos, sem diferença de um pixel pelo desenho inclusivo. Inset24 permanece em ambos os perfis.
+
+Informação agora é apenas texto+ícone, nunca uma barra ou contorno de estado; no daltonismo usa TEXT #efe5d1, distinguindo-se do bom #56b4e9. Regra registrada no contrato e exibida em unity_colorblind, unity_large_colorblind e nas versões cinza. Instinto continua barra fina identificada. Placa em três tamanhos comparada em plate_metrics.webp. Pillow13.0.0 e CairoSVG2.9.1 documentados.
+
+48 pranchas finais em WebP, nenhuma acima de300KB; originais fora do repositório. Links atualizados. Sem problema alto/médio restante; navegação real permanece com Claude. Erros _restyle ficam fora desta correção por instrução expressa do Lucas. O registro de34/34 da versão anterior é histórico; a validação desta base será indicada no comentário/PR desta rodada.
+
+Validação desta revisão, base83e2717: **39/39 testes, paridade48/48, saída0 em122,4s**, Godot4.7.2 após importação. Avisos de recursos/RIDs no encerramento continuam documentados no log; sem mudança de código.

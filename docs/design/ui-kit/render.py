@@ -41,7 +41,7 @@ def glyph(name,size,color):
 class Canvas:
  def __init__(self,large=False,cb=False):
   self.im=Image.new('RGB',(1920,1080),P['bg']);self.d=ImageDraw.Draw(self.im);self.large=large;self.cb=cb;self.s=1.3 if large else 1
- def c(self,k):return {'good':'#56b4e9','danger':'#e69f00'}.get(k,P.get(k,k)) if self.cb else P.get(k,k)
+ def c(self,k):return {'good':'#56b4e9','danger':'#e69f00','blue':'#efe5d1'}.get(k,P.get(k,k)) if self.cb else P.get(k,k)
  def text(self,x,y,t,role='body',color='text',width=None):
   size=round({'title':32,'body':24,'detail':18}[role]*self.s);line_height=({'title':64,'body':48,'detail':40} if self.large else {'title':48,'body':40,'detail':32})[role];f=font(size,'title' if role=='title' else 'body');lines=[]
   if width:
@@ -93,7 +93,12 @@ class Canvas:
   elif k=='key':
    self.box(x,y+32,sh,sh,'key_cap');self.text(x+22+off,y+50+off,'E','body',col);self.text(x+sh+16,y+52,'Interagir','detail',col);y+=32;h=sh
   elif k=='plate':
-   hh=128 if self.large else 112;self.box(x,y,w,hh,skin);self.text(x+24,y+16,title or 'Íris','body',col);self.icon(x+w-48,y+18,'intent-attack' if state=='alert' else 'intent-block',24,'danger' if state=='alert' else 'text');self.d.rectangle((x+24,y+sh,x+w-24,y+sh+12),fill=self.c('edge'));self.d.rectangle((x+24,y+sh,x+int(w*.64),y+sh+12),fill=self.c('good'));self.d.rectangle((x+24,y+sh+20,x+int(w*.45),y+sh+24),fill=self.c('instinct'));h=hh
+   hh=128 if self.large else 120; life_y=80 if self.large else 72
+   self.box(x,y,w,hh,skin);self.text(x+24,y+24,title or 'Íris','body',col)
+   self.icon(x+w-48,y+24,'intent-attack' if state=='alert' else 'intent-block',24,'danger' if state=='alert' else 'text')
+   self.d.rectangle((x+24,y+life_y,x+w-24,y+life_y+11),fill=self.c('edge'))
+   self.d.rectangle((x+24,y+life_y,x+int(w*.64),y+life_y+11),fill=self.c('good'))
+   self.d.rectangle((x+24,y+life_y+20,x+int(w*.45),y+life_y+23),fill=self.c('instinct'));h=hh
   elif k=='bar':
    self.text(x,y,'Vida' if state!='alert' else 'Vida baixa','body', 'danger' if state=='alert' else 'text');self.d.rectangle((x,y+56,x+w,y+72),fill=self.c('edge'));self.d.rectangle((x,y+56,x+int(w*(.2 if state=='alert' else .7)),y+72),fill=self.c('danger' if state=='alert' else 'good'));self.text(x,y+100,'Instinto','detail','muted');self.d.rectangle((x,y+140,x+w,y+148),fill=self.c('edge'));self.d.rectangle((x,y+140,x+int(w*.4),y+148),fill=self.c('instinct'))
   elif k=='notice':
@@ -122,7 +127,7 @@ class Canvas:
   if state=='disabled' and k=='card':self.badge(x+w-40,y+h-28,state)
   if state=='disabled' and k=='tabs':self.badge(x+w-40,y+sh-28,state)
   if state=='disabled' and k=='sequence':self.badge(x+step+ns-24,y+32+ns-24,state)
- def save(self,name):self.im.save(OUT/(name+'.png'),optimize=True)
+ def save(self,name):self.im.save(OUT/(name+'.webp'),quality=86,method=6)
 
 def matrices():
  for large,cb,profile in [(False,False,'normal'),(True,False,'large'),(False,True,'colorblind'),(True,True,'large_colorblind')]:
@@ -149,7 +154,7 @@ def unity():
   for i,(name,title,action) in enumerate([('ESTAÇÃO','Forja','Produzir'),('EXPLORAÇÃO','Abrigo','Buscar'),('COMBATE','Habilidade','Usar'),('MAPA','Fase 1','Partir')]):
    x=48+i*464;c.text(x,220,name,'detail','copper');c.box(x,272,432,680);c.text(x+24,300,title,'title');c.text(x+24,370,'Informação da decisão','detail','muted')
    c.comp('card',x+24,424,384,208 if large else 176,title=['Forja','Abrigo','Proteção','Fase 1'][i],detail=['Produção disponível','Pausa segura','Reduz dano','Rota disponível'][i],icon_name=['lobby-scrap','node-rest','intent-block','node-combat'][i]);c.comp('plate',x+24,648,384,title='Íris');c.comp('button',x+24,800,384,title=action)
-  c.footer('Mesmo raio, filete, espaçamento, texto e ações / 4 contextos');c.save(f'unity_{profile}')
+  c.icon(48,976,'node-event',24,'blue');c.text(88,972,'Informação: detalhes no foco','detail','blue');c.footer('Mesmo raio, filete, espaçamento, texto e ações / 4 contextos');c.save(f'unity_{profile}')
 
 def glyphs():
  c=Canvas();c.header('Ícones / reaproveitar o acervo','Amostras rasterizadas a 22 e 32 px, sem reampliar; o jogo aplica a tinta. Retratos não são glifos.')
@@ -222,10 +227,17 @@ def selection():
   c.text(48,864,'Área clicável = personagem inteiro. Prévia mostra todos os atingidos antes de confirmar.','body',width=1800)
   c.footer('Exemplos do componente de seleção / sem alterar regras ou implementar a #57');c.save(f'selection_{profile}')
 
+
+def plate_metrics():
+ c=Canvas();c.header('Placa / conta nos três tamanhos','Inset24 preservado • Grande usa geometria do Maior • Informação neutra com ícone no daltonismo')
+ for i,(label,large,scale,h) in enumerate([('Normal',False,1,120),('Grande',True,1.15,128),('Maior',True,1.3,128)]):
+  x=48+i*608;t=Canvas(large,True);t.s=scale;t.comp('plate',48,48,480,title='Íris');c.im.paste(t.im.crop((32,32,560,240)),(x,320));c.text(x,256,label,'body');c.text(x,600,f'H{h} / inset24 / nome'+('40' if not large else '48'),'body');c.text(x,672,'24 + '+('40' if not large else '48')+' + 8 + 12 + 8 + 4 + 24','detail');c.icon(x,784,'node-event',32,'text');c.text(x+48,788,'Informação','body')
+ c.footer('Informação: só texto + ícone / sem barra ou contorno colorido');c.save('plate_metrics')
+
 if __name__=='__main__':
- matrices();foundations();unity();glyphs();anatomy();variants();feedback();selection()
+ matrices();foundations();unity();glyphs();anatomy();variants();feedback();selection();plate_metrics()
  # Redução real da prova de unidade, não imagem em tamanho cheio com texto menor.
  for profile in ['normal','large','colorblind','large_colorblind']:
-  im=Image.open(OUT/f'unity_{profile}.png');im.resize((768,432),Image.Resampling.LANCZOS).save(OUT/f'unity_{profile}_40.png')
-  ImageOps.grayscale(im).save(OUT/f'unity_{profile}_gray.png')
+  im=Image.open(OUT/f'unity_{profile}.webp');im.resize((768,432),Image.Resampling.LANCZOS).save(OUT/f'unity_{profile}_40.webp',quality=86,method=6)
+  ImageOps.grayscale(im).save(OUT/f'unity_{profile}_gray.webp',quality=86,method=6)
  (OUT/'render_checks.json').write_text(json.dumps({'text_runs':len(CHECKS),'min_font_px':min(t['size'] for t in CHECKS),'outside_canvas':[t for t in CHECKS if t['right']>1920 or t['bottom']>1080]},ensure_ascii=False,indent=2)+'\n')

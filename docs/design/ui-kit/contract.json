@@ -34,7 +34,8 @@
   },
   "colorblind": {
     "good": "#56b4e9",
-    "danger": "#e69f00"
+    "danger": "#e69f00",
+    "blue": "#efe5d1"
   },
   "contrast_on_surface": {
     "text": 14.442,
@@ -104,7 +105,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "button": {
       "name": "02 / Botão",
@@ -132,7 +134,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "card": {
       "name": "03 / Cartão",
@@ -169,7 +172,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "plate": {
       "name": "04 / Placa",
@@ -178,12 +182,17 @@
           240,
           320
         ],
-        "height": 112,
+        "height": 120,
         "large_height": 128,
         "ground_gap": 16,
         "life_height": 12,
         "instinct_height": 4,
-        "state_icon": 24
+        "state_icon": 24,
+        "padding": 24,
+        "name_reserved_normal": 40,
+        "name_reserved_large": 48,
+        "formula_normal": "24+40+8+12+8+4+24=120",
+        "formula_large": "24+48+8+12+8+4+24=128"
       },
       "applicable_states": [
         "normal",
@@ -194,7 +203,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "bar": {
       "name": "05 / Barras",
@@ -210,7 +220,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "chip": {
       "name": "06 / Ficha",
@@ -229,7 +240,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "tooltip": {
       "name": "07 / Dica",
@@ -252,7 +264,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "notice": {
       "name": "08 / Aviso",
@@ -273,7 +286,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "sequence": {
       "name": "09 / Sequência",
@@ -300,7 +314,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "key": {
       "name": "10 / Tecla",
@@ -323,7 +338,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "selection": {
       "name": "11 / Seleção",
@@ -348,7 +364,8 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     },
     "tabs": {
       "name": "12 / Abas e listas",
@@ -370,10 +387,18 @@
       ],
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
-      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices"
+      "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
+      "intermediate": "same geometry as large, 115% type; no interpolation"
     }
   },
   "assets": "reuse art/ui/frames, icons, portraits; no new runtime art",
   "integration_issue": 60,
-  "next_design_issue": 58
+  "next_design_issue": 58,
+  "information_rule": "Information is text plus icon only; no filled bar or state outline; colorblind information uses TEXT #efe5d1, not BLUE. Instinct remains a thin named bar.",
+  "intermediate_geometry": "Grande uses all Maior component dimensions and reserved slots, with 115% type; no interpolation.",
+  "reproduction": {
+    "Pillow": "13.0.0",
+    "CairoSVG": "2.9.1"
+  },
+  "preview_format": "WebP quality86; originals outside repository"
 }
