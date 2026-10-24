@@ -32,6 +32,11 @@ func run(t) -> void:
 				t.check(phases.has(phase), "%s: fase %s" % [ability_id, phase])
 			if phases.has("execucao"):
 				_check_measured(t, phases.execucao, ability_id + " execução")
+		# O dano e a queda dos quatro fundadores (a da Íris e a da Véspera ajoelhadas, #13), no pé do parado.
+		for pose in ["hurt", "death"]:
+			var reaction: Dictionary = hero.get("reactions", {}).get(pose, {})
+			if t.check(not reaction.is_empty(), "%s: pose %s" % [hero_id, pose]):
+				_check_measured(t, reaction, "%s %s" % [hero_id, pose])
 
 	_john_villains(t, art)
 	for enemy_id in ["robot", "robot_fungo", "vigia_enferrujado"]:

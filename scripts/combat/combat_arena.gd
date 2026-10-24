@@ -216,8 +216,8 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 		card.set_tint(Color.WHITE)
 	else:
 		show_pose(unit, "death")
-		# Morto de vez fica cinza; no Último Fôlego, só caído. Quem não tem a pose de caído (os recrutas, Íris e Véspera)
-		# fica de pé, então o Último Fôlego escurece um pouco o desenho para não parecer inteiro.
+		# Morto de vez fica cinza; no Último Fôlego, só caído. Quem não tem a pose de caído (os recrutas) fica de pé,
+		# então o Último Fôlego escurece um pouco o desenho para não parecer inteiro.
 		var has_fallen: bool = not unit.is_player or hero_art(unit.hero_id).get("reactions", {}).has("death")
 		if not unit.deaths_door:
 			card.set_tint(Color(0.55, 0.55, 0.6))

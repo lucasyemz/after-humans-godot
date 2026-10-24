@@ -696,6 +696,30 @@
 						1269
 					],
 					"body_reference_pixels": 1236
+				},
+				"death": {
+					"file": "res://art/combat/heroes/iris/death.webp",
+					"canvas": [
+						1178,
+						1335
+					],
+					"anchor": [
+						587.5,
+						1264
+					],
+					"body_reference_pixels": 1208
+				},
+				"hurt": {
+					"file": "res://art/combat/heroes/iris/hurt.webp",
+					"canvas": [
+						1178,
+						1335
+					],
+					"anchor": [
+						587.5,
+						1264
+					],
+					"body_reference_pixels": 1208
 				}
 			}
 		},
@@ -916,6 +940,30 @@
 						1299
 					],
 					"body_reference_pixels": 1272
+				},
+				"death": {
+					"file": "res://art/combat/heroes/vespera/death.webp",
+					"canvas": [
+						1178,
+						1335
+					],
+					"anchor": [
+						451.0,
+						1297
+					],
+					"body_reference_pixels": 1271
+				},
+				"hurt": {
+					"file": "res://art/combat/heroes/vespera/hurt.webp",
+					"canvas": [
+						1178,
+						1335
+					],
+					"anchor": [
+						451.0,
+						1297
+					],
+					"body_reference_pixels": 1271
 				}
 			}
 		}
