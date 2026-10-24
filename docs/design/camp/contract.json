@@ -420,42 +420,183 @@
     }
   ],
   "scope": "proposal only; integration #77; no manifest mutation",
+  "draw_order": [
+    "dog_recruit_01",
+    "owl_recruit_01",
+    "cat_recruit_01",
+    "frog_recruit_01",
+    "campfire"
+  ],
+  "hit_test_rule": "hit visible alpha of character at threshold24; do not let transparent canvas intercept another hero; same click target as combat",
   "camp_slots": [
     {
       "recruit_example": "dog_recruit_01",
       "ground_anchor": [
-        500,
+        300,
         900
       ],
       "mirror_x": false,
-      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged"
+      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+      "pixels_per_meter": 300,
+      "visible_screen_bbox": [
+        136,
+        612,
+        464,
+        901
+      ],
+      "texture_screen_rect": [
+        98,
+        369,
+        503,
+        908
+      ]
     },
     {
       "recruit_example": "cat_recruit_01",
       "ground_anchor": [
-        660,
+        740,
         1010
       ],
       "mirror_x": false,
-      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged"
+      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+      "pixels_per_meter": 300,
+      "visible_screen_bbox": [
+        534,
+        680,
+        946,
+        1010
+      ],
+      "texture_screen_rect": [
+        529,
+        541,
+        950,
+        1018
+      ]
     },
     {
       "recruit_example": "frog_recruit_01",
       "ground_anchor": [
-        1260,
+        1180,
         1010
       ],
       "mirror_x": true,
-      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged"
+      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+      "pixels_per_meter": 300,
+      "visible_screen_bbox": [
+        1004,
+        768,
+        1356,
+        1012
+      ],
+      "texture_screen_rect": [
+        980,
+        565,
+        1380,
+        1019
+      ]
     },
     {
       "recruit_example": "owl_recruit_01",
       "ground_anchor": [
-        1420,
+        1620,
         900
       ],
       "mirror_x": true,
-      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged"
+      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+      "pixels_per_meter": 300,
+      "visible_screen_bbox": [
+        1439,
+        597,
+        1803,
+        900
+      ],
+      "texture_screen_rect": [
+        1390,
+        386,
+        1851,
+        909
+      ]
     }
-  ]
+  ],
+  "integration_pipeline": {
+    "owner_issue": 77,
+    "tool_to_extend": "tools/sync_combat_art.py",
+    "source_kind": "already_converted_webp",
+    "conversion": "do not halve again or require originals in repository",
+    "metadata_mapping": "file + manifest_canvas + manifest_anchor + body_reference_pixels; preserve current recruit variant keys; register rest entries in production presentation data so future sync preserves them",
+    "runtime_consumer": "same AHSpriteCard.show_art contract used by existing station poses",
+    "status": "proposal for Claude; no tool/data edit in this design PR"
+  },
+  "founder_seat_solution": {
+    "decision": "use current seat sprites on physical closed crates, not directly on ground; no new founder pose required for this staging",
+    "crate_file": "res://art/street/search_props/street_crates_closed.webp",
+    "crate_cropped_alpha_for_preview": true,
+    "supports": [
+      {
+        "hero_id": "hero_cao_bento",
+        "ground": [
+          300,
+          900
+        ],
+        "hip_support": [
+          300,
+          762
+        ],
+        "crate_visible_size": [
+          160,
+          154
+        ],
+        "mirror_x": false
+      },
+      {
+        "hero_id": "hero_gato_nick",
+        "ground": [
+          740,
+          1010
+        ],
+        "hip_support": [
+          740,
+          872
+        ],
+        "crate_visible_size": [
+          160,
+          154
+        ],
+        "mirror_x": false
+      },
+      {
+        "hero_id": "hero_sapo_iris",
+        "ground": [
+          1180,
+          1010
+        ],
+        "hip_support": [
+          1180,
+          872
+        ],
+        "crate_visible_size": [
+          160,
+          154
+        ],
+        "mirror_x": true
+      },
+      {
+        "hero_id": "hero_coruja_vespera",
+        "ground": [
+          1620,
+          900
+        ],
+        "hip_support": [
+          1620,
+          762
+        ],
+        "crate_visible_size": [
+          160,
+          154
+        ],
+        "mirror_x": true
+      }
+    ],
+    "integration_note": "Claude must crop/sample visible prop bounds or scale the full sprite equivalently; do not add game ids or resize the founder anatomy"
+  }
 }

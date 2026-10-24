@@ -147,7 +147,7 @@
       "sha256": "2717667c3594af22447aece613fd07a99d10c3d1eb1ed851b9f851cd02d5548f"
     }
   ],
-  "previews_max_bytes": 294335,
+  "previews_max_bytes": 293774,
   "godot_import": {
     "engine": "4.7.2",
     "result": "PASS",
@@ -231,5 +231,138 @@
         ]
       }
     ]
+  },
+  "camp_geometry": {
+    "pixels_per_meter": 300,
+    "pairs": [
+      {
+        "a": "dog_recruit_01",
+        "b": "cat_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "dog_recruit_01",
+        "b": "frog_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "dog_recruit_01",
+        "b": "owl_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "cat_recruit_01",
+        "b": "frog_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "cat_recruit_01",
+        "b": "owl_recruit_01",
+        "rectangles_disjoint": true
+      },
+      {
+        "a": "frog_recruit_01",
+        "b": "owl_recruit_01",
+        "rectangles_disjoint": true
+      }
+    ],
+    "slots": [
+      {
+        "recruit_example": "dog_recruit_01",
+        "ground_anchor": [
+          300,
+          900
+        ],
+        "mirror_x": false,
+        "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+        "pixels_per_meter": 300,
+        "visible_screen_bbox": [
+          136,
+          612,
+          464,
+          901
+        ],
+        "texture_screen_rect": [
+          98,
+          369,
+          503,
+          908
+        ]
+      },
+      {
+        "recruit_example": "cat_recruit_01",
+        "ground_anchor": [
+          740,
+          1010
+        ],
+        "mirror_x": false,
+        "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+        "pixels_per_meter": 300,
+        "visible_screen_bbox": [
+          534,
+          680,
+          946,
+          1010
+        ],
+        "texture_screen_rect": [
+          529,
+          541,
+          950,
+          1018
+        ]
+      },
+      {
+        "recruit_example": "frog_recruit_01",
+        "ground_anchor": [
+          1180,
+          1010
+        ],
+        "mirror_x": true,
+        "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+        "pixels_per_meter": 300,
+        "visible_screen_bbox": [
+          1004,
+          768,
+          1356,
+          1012
+        ],
+        "texture_screen_rect": [
+          980,
+          565,
+          1380,
+          1019
+        ]
+      },
+      {
+        "recruit_example": "owl_recruit_01",
+        "ground_anchor": [
+          1620,
+          900
+        ],
+        "mirror_x": true,
+        "mirror_anchor_rule": "texture_width - anchor_x; y unchanged",
+        "pixels_per_meter": 300,
+        "visible_screen_bbox": [
+          1439,
+          597,
+          1803,
+          900
+        ],
+        "texture_screen_rect": [
+          1390,
+          386,
+          1851,
+          909
+        ]
+      }
+    ],
+    "draw_order": [
+      "dog_recruit_01",
+      "owl_recruit_01",
+      "cat_recruit_01",
+      "frog_recruit_01",
+      "campfire"
+    ],
+    "hit_test_rule": "hit visible alpha of character at threshold24; do not let transparent canvas intercept another hero; same click target as combat"
   }
 }
