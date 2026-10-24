@@ -847,6 +847,12 @@ func _show(key: String) -> void:
 		return
 	if _prep != null:
 		_prep.visible = false
+	# Durante a cena do trem (o aviso, a chegada, o candidato descendo, a partida), nenhum painel por cima: o do trem
+	# abre quando a câmera fecha no candidato (#61).
+	if key == "train" and station != null and station.train_busy():
+		_panel.visible = false
+		_watch_train()
+		return
 	_panel.visible = true
 	match key:
 		"report":
@@ -1943,6 +1949,17 @@ func _train() -> void:
 	_button(tr("Recusar"), func(): _decide(id, false), true, row)
 
 
+## Reabre o painel do trem quando a cena acaba (a câmera no candidato).
+func _watch_train() -> void:
+	if not station.train_event.is_connected(_on_train_event):
+		station.train_event.connect(_on_train_event)
+
+
+func _on_train_event(name: String) -> void:
+	if name == "camera_on_candidate" and current == "train":
+		refresh()
+
+
 func _decide(candidate_id: String, accept: bool) -> void:
 	var c: Dictionary = Campaign.state
 	var error := S.decide_candidate(c, candidate_id, accept)
@@ -1952,9 +1969,11 @@ func _decide(candidate_id: String, accept: bool) -> void:
 	var who := S.civilian(candidate_id)
 	station.commit()
 	toast((tr("%s vai morar na Estação.") % who.name) if accept else tr("%s segue no trem. Pode voltar numa próxima viagem.") % who.name)
-	# O trem fecha e parte (o recusado vai junto); acolhido, o civil fica e vai para o cômodo dele.
+	# O trem fecha e parte (o recusado volta para ele); acolhido, o civil fica e vai para o cômodo dele. O painel sai da
+	# frente da cena e o resto espera o trem sumir no túnel.
 	station.play_train_departure(not accept)
-	await get_tree().create_timer(4.0).timeout
+	_panel.visible = false
+	await station.train_event_named("gone")
 	S.finish_departure(c)
 	station.commit()
 	var rng := RandomNumberGenerator.new()
