@@ -39,6 +39,13 @@ var _description: Label
 var _message: Label
 var _log: Label
 var _log_panel: PanelContainer
+var _log_title: Label
+## O registro aberto pela tecla (#56); fechado, só a última linha aparece por LOG_FLASH segundos a cada lance.
+var _log_open := false
+var _quiet_focus := false
+var _log_seen := 0
+var _log_tween: Tween
+const LOG_FLASH := 2.0
 var _tip: PanelContainer
 var _tip_box: VBoxContainer
 var _result: PanelContainer
@@ -137,7 +144,8 @@ func _build() -> void:
 	log_box.add_theme_constant_override("separation", 4)
 	log_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_log_panel.add_child(log_box)
-	log_box.add_child(S.label(tr("REGISTRO"), 15, S.COPPER, "bold"))
+	_log_title = S.label(tr("REGISTRO"), 15, S.COPPER, "bold")
+	log_box.add_child(_log_title)
 	_log = S.label("", S.MIN_TEXT, TEXT)
 	_log.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_log.custom_minimum_size = Vector2(390, 0)
@@ -210,7 +218,8 @@ func _build() -> void:
 		button.add_child(key)
 		key.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT, Control.PRESET_MODE_MINSIZE, 8)
 		button.pressed.connect(_on_action.bind(spec[1]))
-		button.focus_entered.connect(_describe_action.bind(spec[1]))
+		# A dica só com o mouse em cima ou com o foco do teclado/controle; o foco que a vez põe sozinha não abre (#56).
+		button.focus_entered.connect(func(): if S.using_keys and not _quiet_focus: _describe_action(spec[1]))
 		button.mouse_entered.connect(_describe_action.bind(spec[1]))
 		button.mouse_exited.connect(_hide_tip)
 		button.set_meta("kind", spec[1])
@@ -422,9 +431,7 @@ func refresh() -> void:
 		# A placa encolhe de volta quando a intenção ou os estados ficam mais curtos.
 		plate.reset_size.call_deferred()
 	_refresh_order(current)
-	var lines := session.state.combat_log
-	_log.text = "\n".join(lines.slice(maxi(0, lines.size() - 3)))
-	_log_panel.visible = not lines.is_empty()
+	_refresh_log()
 	var actor := session.current_actor()
 	if actor != null and actor.is_player:
 		_show_hero(actor)
@@ -815,7 +822,7 @@ func _build_abilities(take_focus: bool = true) -> void:
 		button.disabled = not option.usable
 		_style_ability(button)
 		button.pressed.connect(_on_ability.bind(option))
-		button.focus_entered.connect(_describe.bind(option, button))
+		button.focus_entered.connect(func(): if S.using_keys and not _quiet_focus: _describe(option, button))
 		button.mouse_entered.connect(_describe.bind(option, button))
 		button.mouse_exited.connect(_hide_tip)
 		_abilities.add_child(button)
@@ -833,7 +840,41 @@ func _build_abilities(take_focus: bool = true) -> void:
 	# O painel se ajusta antes do foco, que posiciona a dica acima dele.
 	_fit_dock.call_deferred()
 	if take_focus:
-		(first if first else _actions.get_child(1)).grab_focus.call_deferred()
+		_focus_quietly.call_deferred(first if first else _actions.get_child(1))
+
+
+## O registro (#56): escondido; a cada lance novo, só a última linha por LOG_FLASH segundos. A tecla do registro abre as
+## últimas linhas e fecha.
+func _refresh_log() -> void:
+	var lines: Array = session.state.combat_log
+	_log_title.text = tr("REGISTRO · %s fecha") % S.key_name("combat_log") if _log_open else tr("REGISTRO · %s abre") % S.key_name("combat_log")
+	if _log_open:
+		_log.text = "\n".join(lines.slice(maxi(0, lines.size() - 6)))
+		_log_panel.visible = not lines.is_empty()
+		_log_panel.modulate.a = 1.0
+		_log_seen = lines.size()
+		return
+	if lines.size() <= _log_seen:
+		return
+	_log_seen = lines.size()
+	_log.text = lines[-1]
+	_log_panel.visible = true
+	_log_panel.modulate.a = 1.0
+	if _log_tween:
+		_log_tween.kill()
+	_log_tween = create_tween()
+	_log_tween.tween_interval(LOG_FLASH)
+	_log_tween.tween_property(_log_panel, "modulate:a", 0.0, 0.4)
+	_log_tween.tween_callback(func(): _log_panel.visible = _log_open)
+
+
+func toggle_log() -> void:
+	_log_open = not _log_open
+	if _log_tween:
+		_log_tween.kill()
+	_log_panel.visible = false
+	_log_seen = 0 if _log_open else session.state.combat_log.size()
+	_refresh_log()
 
 
 ## O painel de baixo cresce para cima quando o texto é maior (a base é 210 px, colada a 24 px da borda).
@@ -841,6 +882,15 @@ func _fit_dock() -> void:
 	var height := maxf(210.0, _panel.get_combined_minimum_size().y)
 	_panel.size = Vector2(1872, height)
 	_panel.position = Vector2(24, 1056.0 - height)
+
+
+## O foco que a vez põe sozinha: sem abrir a dica (ela abre com o mouse em cima ou quando o jogador anda o foco, #56).
+func _focus_quietly(button: Control) -> void:
+	if not is_instance_valid(button) or not button.is_inside_tree():
+		return
+	_quiet_focus = true
+	button.grab_focus()
+	_quiet_focus = false
 
 
 func _dock_top() -> float:
@@ -862,7 +912,7 @@ func restyle() -> void:
 		if focused >= 0 and _bag == null:
 			await get_tree().process_frame
 			if focused < _abilities.get_child_count():
-				(_abilities.get_child(focused) as Control).grab_focus()
+				_focus_quietly(_abilities.get_child(focused))
 	_fit_dock.call_deferred()
 
 
@@ -1274,6 +1324,10 @@ func _clear_preview() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
+		return
+	if event.is_action_pressed("combat_log") and session != null:
+		toggle_log()
+		get_viewport().set_input_as_handled()
 		return
 	# A Mochila: I abre na vez de um herói; Esc, Backspace ou I fecham.
 	if _bag != null and (S.is_back(event) or event.is_action_pressed("menu") or event.is_action_pressed("inventory")):

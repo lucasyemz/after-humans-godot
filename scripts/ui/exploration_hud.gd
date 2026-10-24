@@ -561,11 +561,12 @@ func _process(delta: float) -> void:
 	if show_patrol:
 		_patrol.size = _patrol.get_combined_minimum_size()
 		_patrol.position = Vector2(1920 - _patrol.size.x, 470)
-	# A dica das teclas some depois de um tempo andando (volta numa jornada nova).
+	# A dica das teclas é da primeira jornada (#56): some depois de um tempo andando e não volta depois da primeira volta à
+	# Estação.
 	if Input.get_vector("move_left", "move_right", "move_back", "move_front").length() > 0.1:
 		_hint_time += delta
 	_hint.modulate.a = clampf(1.0 - (_hint_time - 12.0) / 2.0, 0.0, 1.0)
-	_hint.visible = not Settings.touch_visible()
+	_hint.visible = not Settings.touch_visible() and first_journey()
 	var party_end := _party_box.position.x + _party_box.get_combined_minimum_size().x
 	_hint.position = Vector2(party_end + 28, 1036)
 
@@ -779,6 +780,11 @@ func show_choice(title: String, text: String, options: Array) -> void:
 
 
 ## As opções por cima da exploração (som, gráficos, jogo, controles); Fechar ou Esc fecha.
+## A primeira jornada da campanha: nenhuma volta à Estação ainda (o ciclo conta as voltas).
+static func first_journey() -> bool:
+	return int(Campaign.state.get("station", {}).get("cycle_number", 0)) == 0
+
+
 func show_options() -> void:
 	var box := _open_modal(700)
 	_modal.set_meta("menu", true)

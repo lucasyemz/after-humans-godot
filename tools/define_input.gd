@@ -25,6 +25,8 @@ const ACTIONS := {
 	"combat_move": {"keys": [KEY_Q], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
 	"combat_defend": {"keys": [KEY_W], "buttons": [JOY_BUTTON_X]},
 	"combat_flee": {"keys": [KEY_F]},
+	# O registro da luta, escondido por padrão (#56): abre e fecha.
+	"combat_log": {"keys": [KEY_L], "buttons": [JOY_BUTTON_RIGHT_STICK]},
 	# Só para teste do protótipo (teclado).
 	"debug_toggle": {"keys": [KEY_F1]},
 	"debug_rain": {"keys": [KEY_R]},
