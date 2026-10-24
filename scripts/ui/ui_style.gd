@@ -16,6 +16,21 @@ static var OK := Color("86c98f")
 const VIOLET := Color("b7a6f4")
 const ENEMY := Color("d9893d")
 const BLUE := Color("8fb4f0")
+## A escolha de alvo na luta (#57), num lugar só (o kit de componentes da #59 troca aqui): a cor de cada lado (os
+## inimigos no perigo, os aliados no bom, os dois seguindo o daltonismo), o herói da vez no dourado, a força da luz em
+## cada estado e o escurecido de quem não pode ser alvo. A força e a palavra ALVO também dizem quem é, não só a cor.
+const TARGET_VALID := 0.32
+const TARGET_ALSO := 0.5
+const TARGET_POINTED := 0.95
+const TARGET_ACTIVE := 0.45
+const TARGET_DIM := 0.62
+const TARGET_ACTIVE_COLOR := GOLD
+
+
+static func target_color(enemy_side: bool) -> Color:
+	return DANGER if enemy_side else OK
+
+
 static func set_colorblind(on: bool) -> void:
 	OK = Color("56b4e9") if on else Color("86c98f")
 	DANGER = Color("e69f00") if on else Color("e2675b")

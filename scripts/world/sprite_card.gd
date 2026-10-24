@@ -24,6 +24,10 @@ var _frame := 0
 var _frame_time := 0.0
 var _flash_tween: Tween
 var _silhouette: ShaderMaterial
+## O destaque da escolha de alvo (#57): a luz na cor do lado, que fica até sair; o piscar do acerto volta para ela.
+var _highlight := Color.BLACK
+var _tint := Color.WHITE
+var _dimmed := false
 ## Quanto acima do pé (m) fica sem silhueta: o padrão, ou a borda do piso da frente da zona do cenário (#51).
 var silhouette_foot := SILHOUETTE_FOOT
 
@@ -156,7 +160,7 @@ func flash(color: Color, seconds: float = 0.35, white_seconds: float = 0.0) -> v
 	_flash_tween = create_tween()
 	if white_seconds > 0.0:
 		_flash_tween.tween_property(_material, "emission", color, white_seconds)
-	_flash_tween.tween_property(_material, "emission", Color.BLACK, seconds)
+	_flash_tween.tween_property(_material, "emission", _highlight, seconds)
 
 
 ## Mistura por alfa (efeitos com transparência suave) em vez do recorte duro dos personagens.
@@ -169,7 +173,33 @@ func set_blended(blended: bool) -> void:
 
 ## Escurece e dessatura (herói caído, inimigo derrotado sumindo).
 func set_tint(color: Color) -> void:
-	_material.albedo_color = color
+	_tint = color
+	_apply_albedo()
+
+
+## O destaque da escolha de alvo (#57): uma luz na cor (strength de 0 a 1; 0 apaga) e, dimmed, o personagem um pouco
+## escurecido (quem não pode ser alvo). As cores e as forças vêm de AHUiStyle.
+func set_highlight(color: Color, strength: float, dimmed: bool = false) -> void:
+	_highlight = color * strength if strength > 0.0 else Color.BLACK
+	_highlight.a = 1.0
+	if _flash_tween == null or not _flash_tween.is_running():
+		_material.emission = _highlight
+		_material.emission_energy_multiplier = 0.7
+	_dimmed = dimmed
+	_apply_albedo()
+
+
+func highlight() -> Color:
+	return _highlight
+
+
+func dimmed() -> bool:
+	return _dimmed
+
+
+func _apply_albedo() -> void:
+	var factor := AHUiStyle.TARGET_DIM if _dimmed else 1.0
+	_material.albedo_color = Color(_tint.r * factor, _tint.g * factor, _tint.b * factor, _tint.a)
 
 
 ## Altura da cabeça acima do pé, em metros (para barras e números).

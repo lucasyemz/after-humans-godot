@@ -123,7 +123,7 @@ refuge_hud.gd: %s%s
 *: item
 *: keys
 *: kind
-*: label
+*: card
 *: language
 *: level
 *: locked
