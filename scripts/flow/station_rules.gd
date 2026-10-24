@@ -33,7 +33,7 @@ const ROOMS := [
 	{"id": CANTEEN, "name": "Cantina", "basic": true, "max_level": 1, "costs": []},
 	{"id": DEPOT, "name": "Depósito", "basic": true, "max_level": 2, "costs": [{}, {"scrap": 5, "fragments": 1}]},
 	{"id": PREPARATION, "name": "Preparação", "basic": true, "max_level": 1, "costs": []},
-	{"id": CHARACTERS, "name": "Sala dos Personagens", "basic": true, "max_level": 1, "costs": []},
+	{"id": CHARACTERS, "name": "Alojamento", "basic": true, "max_level": 1, "costs": []},
 	{"id": FORGE, "name": "Forja", "basic": false, "max_level": 2, "costs": [{"scrap": 4, "fragments": 0}, {"scrap": 6, "fragments": 2}]},
 	{"id": RESEARCH, "name": "Centro de Pesquisa", "basic": false, "max_level": 1, "costs": [{"scrap": 3, "fragments": 2}]},
 	{"id": DORMITORY, "name": "Dormitório", "basic": false, "max_level": 1, "costs": []},
@@ -97,13 +97,14 @@ const TRAUMA_COST := 5
 const MAX_PER_CLASS := 2
 ## Suprimentos comprados na partida, além dos 4 de graça (FoodCost).
 const FOOD_COST := 2
+## Nomes que a comunidade daria (de objetos, lugares e traços; docs/narrative/review.md, #64), não da cultura humana.
 const NAME_POOLS := {
-	"cao": ["Bento", "Brutus", "Argos", "Tobias", "Balto", "Rufus", "Lorde", "Barão", "Max", "Trovão", "Thor", "Snoopy", "Fumaça", "Pluto", "Bóris"],
-	"gato": ["Nix", "Sombra", "Salem", "Bastet", "Maya", "Nuvem", "Loki", "Félix", "Chico", "Puma", "Luna", "Zelda", "Veludo", "Mimi", "Jasper"],
-	"sapo": ["Íris", "Minerva", "Atena", "Garganta", "Hórus", "Bubo", "Estrela", "Eco", "Vigília", "Sábio", "Pluma", "Penumbra", "Gisela", "Noctis"],
+	"cao": ["Bento", "Brutus", "Argos", "Tobias", "Balto", "Rufus", "Lorde", "Barão", "Brasa", "Trovão", "Pistão", "Farol", "Fumaça", "Trilho", "Bóris"],
+	"gato": ["Nix", "Sombra", "Breu", "Telha", "Maya", "Nuvem", "Fresta", "Calha", "Chico", "Puma", "Luna", "Antena", "Veludo", "Mimi", "Lampião"],
+	"sapo": ["Íris", "Lupa", "Cisterna", "Garganta", "Mirante", "Bubo", "Estrela", "Eco", "Alerta", "Sábio", "Pluma", "Penumbra", "Gisela", "Noctis"],
 	"coruja": ["Véspera", "Sereno", "Jasmim", "Pacato", "Rio", "Sol", "Dengoso", "Flora", "Paz", "Brisa", "Lótus", "Chico Rei", "Pingo", "Mel", "Cacau"],
-	"rato": ["Risco", "Pólvora", "Chispola", "Pipeta", "Ferrugem", "Duto", "Pipoca", "Veneno", "Mola", "Faísca", "Fuligem", "Squeeze", "Engrenagem"],
-	"tatu": ["Casco", "Carapaça", "Couraça", "Fortaleza", "Tromba", "Pedregulho", "Titan", "Escudo", "Baluarte", "Granito", "Tanque", "Rochedo"],
+	"rato": ["Risco", "Pólvora", "Chispola", "Pipeta", "Ferrugem", "Duto", "Pipoca", "Veneno", "Mola", "Centelha", "Fuligem", "Pinça", "Engrenagem"],
+	"tatu": ["Casco", "Carapaça", "Couraça", "Fortaleza", "Tromba", "Pedregulho", "Bigorna", "Escudo", "Baluarte", "Granito", "Tanque", "Rochedo"],
 }
 
 # ---------------------------------------------------------------- foco da rota (#73)
@@ -181,6 +182,9 @@ static func _station_defaults() -> Dictionary:
 		"water": INITIAL_WATER, "rooms": {}, "cycle_number": 0, "last_cycle_expedition_id": "", "last_cycle": {},
 		"residents": [], "candidate_queue": [], "hungry_civilians": [], "completed_requests": [],
 		"train": _train_defaults(), "last_return": {},
+		# A escada da história (#64): as fases cujo evento de história já apareceu e as cuja linha "O que a equipe viu"
+		# já saiu no relatório (uma vez por campanha).
+		"story_events": [], "story_reports": [],
 	}
 
 
@@ -998,7 +1002,7 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 	for info in AHJourneyRules.PHASES:
 		if phase_unlocked(campaign, info.id) and not campaign.completed_phases.has(info.id):
 			return {"title": TranslationServer.translate("Partir para %s") % TranslationServer.translate(info.name), "text": TranslationServer.translate(info.description), "action": "depart", "button": TranslationServer.translate("Preparar expedição"), "room": ""}
-	return {"title": TranslationServer.translate("Voltar às ruas"), "text": TranslationServer.translate("Todas as fases foram concluídas. Dá para jogar qualquer uma de novo pelo mapa."), "action": "depart",
+	return {"title": TranslationServer.translate("Voltar às ruas"), "text": TranslationServer.translate("Os Antigos ainda existem? A pergunta voltou com a equipe. Dá para jogar qualquer fase de novo pelo mapa."), "action": "depart",
 		"button": TranslationServer.translate("Preparar expedição"), "room": ""}
 
 
@@ -1100,6 +1104,15 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	if session.result == "victory" and campaign.last_completed_expedition_id != expedition.id:
 		campaign.last_completed_expedition_id = expedition.id
 		campaign.completed_expeditions = int(campaign.completed_expeditions) + 1
+	# A primeira vitória em cada fase traz o que a equipe viu lá (#64): a camada da escada da fase, uma vez.
+	delivered.story = ""
+	var phase_id: String = expedition.get("phase_id", "")
+	# A linha que cita o evento de história (a do interfone) só vem depois de a equipe ter visto o evento: a rota com a
+	# Passagem só na travessia não abre o evento, e a linha fica para a próxima vitória.
+	var story_seen: bool = not AHJourneyRules.STORY_REPORT_AFTER_EVENT.has(phase_id) or campaign.station.story_events.has(phase_id)
+	if session.result == "victory" and story_seen and AHJourneyRules.STORY_REPORTS.has(phase_id) and not campaign.station.story_reports.has(phase_id):
+		campaign.station.story_reports.append(phase_id)
+		delivered.story = AHJourneyRules.STORY_REPORTS[phase_id]
 	# A comida que sobrou vira suprimento e abre a noite; depois o ciclo da Estação e o trem.
 	begin_night(campaign, expedition.id, expedition.team, int(expedition.food))
 	var returning: int = expedition.team.filter(func(id): return hero(campaign, id) != null and hero(campaign, id).alive).size()

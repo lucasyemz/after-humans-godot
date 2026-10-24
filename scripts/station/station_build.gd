@@ -613,7 +613,7 @@ func _room_shell(index: int) -> void:
 	b.cylinder(Vector3((r.x0 + r.x1) * 0.5, ROOM_BACK + 52, r.ceiling - 18), 8, r.x1 - r.x0, Vector3(90, 0, 0), S("metal_plate", 0, 0, Color(0.55, 0.42, 0.32)))
 
 
-## Luz das salas sem montagem própria de luz (Sala dos Personagens, Bar, Pesquisa, Preparação): o pendente gaiola.
+## Luz das salas sem montagem própria de luz (Alojamento, Bar, Pesquisa, Preparação): o pendente gaiola.
 func _placeholder_lighting(index: int) -> void:
 	var r: Dictionary = ROOMS[index]
 	var center_x: float = (r.x0 + r.x1) * 0.5

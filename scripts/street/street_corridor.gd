@@ -399,6 +399,9 @@ func _street_frame(campaign: Dictionary, route: Dictionary, delta: float) -> voi
 			Campaign.save()
 			_announce(next, outcome, not was_resolved)
 			hud.refresh(campaign)
+			# A Passagem com o evento de história da fase (#64): ele abre ali mesmo.
+			if outcome == "event":
+				hud.show_event(campaign)
 	for index in [route.index, route.index + 1]:
 		if guards.has(index) and _segment_of(index) == segment and _sight_frame(index, delta, leader):
 			return
@@ -1045,7 +1048,12 @@ func debug_next_fight() -> void:
 		return
 	var route: Dictionary = campaign.session.expedition.corridor
 	while route.steps[route.index].resolved and route.index < mini(map_last, route.steps.size() - 1):
-		R.enter_step(campaign, route.index + 1)
+		# A Passagem com o evento de história para ali, com o cartão aberto (o laço não saía com o evento aberto).
+		if R.enter_step(campaign, route.index + 1) == "event":
+			Campaign.save()
+			hud.refresh(campaign)
+			hud.show_event(campaign)
+			return
 	Campaign.save()
 	# Passou do mapa de passagem: viaja para o da fase.
 	if route.steps[route.index].resolved and route.index == map_last and map_last < route.steps.size() - 1:

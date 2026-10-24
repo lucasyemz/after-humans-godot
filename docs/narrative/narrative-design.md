@@ -252,6 +252,15 @@ O jogador passa a decidir:
 - qual verdade deve ser revelada às comunidades;
 - quem herdará o direito de decidir o futuro do mundo.
 
+## No jogo da Godot (as 5 fases do mapa)
+
+Cada fase do mapa conta uma camada, na ordem: 1 Rua das Vitrines (Sobrevivência), 2 Ponte das Raízes (O despertar),
+3 Sala Esquecida (Origem), 4 Laboratório Silencioso (Contradição), 5 Túneis do Eco (Presença humana). As fases 6 e 7
+ficam para quando o mapa crescer. Cada camada chega por três caminhos: a descrição da fase (no mapa, só quando ela abre),
+o evento de história na primeira Passagem da fase (2: Voz no Interfone; 3: A Porta que Ainda Espera; 5: Sobrevivente
+dos Túneis) e a linha "O que a equipe viu" no relatório da primeira vitória (`AHJourneyRules.STORY_EVENTS` e
+`STORY_REPORTS`).
+
 ---
 
 # 8. Uso das facções

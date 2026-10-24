@@ -653,7 +653,7 @@ func show_event(campaign: Dictionary) -> void:
 	# O que se vasculhou (#7): o evento vem do objeto.
 	if String(event.get("object", "")) != "":
 		box.add_child(H.make_label(tr("Ao vasculhar: %s") % tr(String(event.object)), 17, H.MUTED))
-	var text := H.make_label(tr(event.resolution) if event.resolution != "" else tr(row.get("Description", "")), 20, H.TEXT)
+	var text := H.make_label(AHJourneyRules.resolution_text(event) if event.resolution != "" else tr(row.get("Description", "")), 20, H.TEXT)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(780, 0)
 	box.add_child(text)
@@ -664,11 +664,18 @@ func show_event(campaign: Dictionary) -> void:
 	else:
 		for choice in row.get("Choices", []):
 			var available := AHJourneyRules.can_choose(campaign, choice)
+			# A escolha de quem já liberou uma classe (trocar com Risco) só aparece quando dá para escolher: desligada, ela
+			# prometia algo que o evento de história, uma vez por campanha, não deixaria acontecer (#64).
+			if not available and choice.get("Requirement", "") == "ClassUnlocked":
+				continue
 			var label: String = tr(choice.get("Text", ""))
 			var requirement: String = tr(choice.get("RequirementText", ""))
 			if requirement != "":
 				label += "  (%s)" % requirement
 			var button := _button(label, func(): event_choice.emit(choice.Id), available)
+			# O texto longo quebra dentro do botão (no texto Maior o cartão saía da tela).
+			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			button.custom_minimum_size.x = 780
 			box.add_child(button)
 			if first == null and available:
 				first = button
