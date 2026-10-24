@@ -788,12 +788,13 @@ static func first_journey() -> bool:
 func show_options() -> void:
 	var box := _open_modal(700)
 	_modal.set_meta("menu", true)
-	_modal.position.y = 40
+	# Abaixo da faixa dos trechos (ficava por cima dela, #63), até a altura da barra da equipe; a faixa cresce com o texto.
+	_modal.position.y = maxf(128.0, _route_panel.get_global_rect().end.y + 8.0)
 	var scroll := ScrollContainer.new()
 	# A rolagem acompanha o foco do teclado e do controle (#5).
 	scroll.follow_focus = true
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size = Vector2(660, 960)
+	scroll.custom_minimum_size = Vector2(660, 840)
 	box.add_child(scroll)
 	var options := AHOptionsPanel.new()
 	options.width = 640

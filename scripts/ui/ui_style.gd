@@ -134,8 +134,9 @@ static func retune(root: Node, from_scale: float, from_ok: Color, from_danger: C
 		_restyle.call_deferred(node)
 
 
-## A tela pode ter saído no meio (troca de cena): só refaz quem ainda está na árvore.
-static func _restyle(node: Node) -> void:
+## A tela pode ter saído no meio (troca de cena): só refaz quem ainda está na árvore. Sem tipo: um nó já liberado não
+## converte para Node e a chamada adiada falhava antes do is_instance_valid.
+static func _restyle(node) -> void:
 	if is_instance_valid(node) and node.is_inside_tree():
 		node.restyle()
 

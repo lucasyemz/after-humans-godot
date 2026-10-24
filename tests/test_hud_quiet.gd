@@ -68,6 +68,18 @@ func _fight() -> void:
 		return
 	await _tree.process_frame
 	await _tree.process_frame
+	# As placas de um mesmo lado não se cobrem (estreitam até caber entre os pés vizinhos, #63).
+	var rects: Array = []
+	for unit_id in hud._unit_bars:
+		var plate: Control = hud._unit_bars[unit_id]
+		if plate.visible:
+			rects.append([hud.session.state.find_unit(unit_id).is_player, Rect2(plate.position, plate.size)])
+	var overlap := false
+	for i in rects.size():
+		for j in range(i + 1, rects.size()):
+			if rects[i][0] == rects[j][0] and rects[i][1].grow(-1).intersects(rects[j][1].grow(-1)):
+				overlap = true
+	t.check(not overlap, "as placas de um lado não se cobrem")
 	# A dica não abre sozinha com o foco que a vez põe, nem para quem joga pelo teclado.
 	t.check(not hud._tip.visible, "a dica não abre sozinha quando a vez começa")
 	var card: Control = hud._abilities.get_child(1)
