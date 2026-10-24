@@ -91,6 +91,26 @@ func _fight() -> void:
 	t.check(hud._log_open and hud._log_panel.visible and hud._log.text.count("\n") >= mini(lines.size(), 6) - 1, "a tecla do registro abre as últimas linhas")
 	await _press("combat_log")
 	t.check(not hud._log_open and not hud._log_panel.visible, "e fecha")
+	# A tecla do registro troca nas Opções como as outras (trocar outra para L não deixa duas ações na mesma tecla).
+	t.check(Settings.REMAPPABLE.has("combat_log") and AHOptionsPanel.CONTROLS.any(func(c): return c[0] == "combat_log"),
+		"o registro está nas teclas das Opções")
+	# A Mochila fechada pelo teclado devolve o foco à carta sem abrir a dica.
+	hud._hide_tip()
+	await _press("inventory")
+	await _press("menu")
+	for i in 3:
+		await _tree.process_frame
+	t.check(hud._bag == null and not hud._tip.visible, "a Mochila fechada não abre a dica")
+	# Luta nova na mesma rua (o HUD é o mesmo): o registro aberto e a contagem da anterior não passam para ela.
+	await _press("combat_log")
+	hud._log.text = "Texto da luta anterior."
+	hud.open(hud.session)
+	var log: Array = hud.session.state.combat_log
+	t.check(not hud._log_open and hud._log_seen == log.size() and hud._log.text == log[-1],
+		"a luta nova começa com o registro fechado, mostrando a linha dela (não a da anterior)")
+	hud.session.state.combat_log.append("Primeiro lance da luta nova.")
+	hud.refresh()
+	t.check(hud._log_panel.visible and hud._log.text == "Primeiro lance da luta nova.", "e o lance dela aparece")
 
 
 func _press(action: String) -> void:

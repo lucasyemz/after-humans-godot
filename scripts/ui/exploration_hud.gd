@@ -779,12 +779,12 @@ func show_choice(title: String, text: String, options: Array) -> void:
 	first.grab_focus.call_deferred()
 
 
-## As opções por cima da exploração (som, gráficos, jogo, controles); Fechar ou Esc fecha.
 ## A primeira jornada da campanha: nenhuma volta à Estação ainda (o ciclo conta as voltas).
 static func first_journey() -> bool:
 	return int(Campaign.state.get("station", {}).get("cycle_number", 0)) == 0
 
 
+## As opções por cima da exploração (som, gráficos, jogo, controles); Fechar ou Esc fecha.
 func show_options() -> void:
 	var box := _open_modal(700)
 	_modal.set_meta("menu", true)

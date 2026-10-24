@@ -14,10 +14,11 @@ const CONTROLS := [["move_left", "Andar para a esquerda"], ["move_right", "Andar
 	["move_front", "Para a frente"], ["run", "Correr"], ["interact", "Interagir"], ["inventory", "Mochila"], ["cancel", "Voltar"], ["menu", "Menu"],
 	["combat_ability_1", "Luta: habilidade 1"], ["combat_ability_2", "Luta: habilidade 2"], ["combat_ability_3", "Luta: habilidade 3"],
 	["combat_ability_4", "Luta: habilidade 4"], ["combat_move", "Luta: mover"], ["combat_defend", "Luta: defender"], ["combat_flee", "Luta: fugir"],
-	["hide_hud", "Estação: ocultar a interface"]]
+	["combat_log", "Luta: registro"], ["hide_hud", "Estação: ocultar a interface"]]
 
 const PAD_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "Start", JOY_BUTTON_RIGHT_SHOULDER: "RB",
-	JOY_BUTTON_DPAD_UP: "↑", JOY_BUTTON_DPAD_DOWN: "↓", JOY_BUTTON_DPAD_LEFT: "←", JOY_BUTTON_DPAD_RIGHT: "→"}
+	JOY_BUTTON_DPAD_UP: "↑", JOY_BUTTON_DPAD_DOWN: "↓", JOY_BUTTON_DPAD_LEFT: "←", JOY_BUTTON_DPAD_RIGHT: "→",
+	JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y", JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_STICK: "R3"}
 
 var width := 600.0
 var allow_new_campaign := false

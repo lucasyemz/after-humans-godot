@@ -263,7 +263,20 @@ func open(new_session: AHCombatSession) -> void:
 	_unit_bars.clear()
 	for unit in session.units():
 		_unit_bars[unit.id] = _make_plate(unit)
+	_reset_log()
 	refresh()
+
+
+## Luta nova (a arena e o HUD são os mesmos em todas as lutas da rua): o registro começa fechado e vazio, e cada lance
+## dela mostra a própria linha (a contagem da luta anterior escondia as linhas da nova).
+func _reset_log() -> void:
+	if _log_tween:
+		_log_tween.kill()
+	_log_open = false
+	_log_seen = 0
+	_log.text = ""
+	_log_panel.visible = false
+	_log_panel.modulate.a = 1.0
 
 
 func close() -> void:
@@ -554,7 +567,10 @@ func _input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	if _bag != null or _result.visible or (waiting and _choosing == ""):
+		# O foco que o jogo devolve (a Mochila fechada, um botão que sumiu) não abre a dica.
+		_quiet_focus = true
 		S.keep_focus(_focus_scope())
+		_quiet_focus = false
 	if not visible or session == null or arena == null:
 		return
 	var camera := get_viewport().get_camera_3d()

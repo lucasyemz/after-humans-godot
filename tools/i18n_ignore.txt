@@ -8,6 +8,10 @@ options_panel.gd: A
 options_panel.gd: B
 options_panel.gd: Start
 options_panel.gd: RB
+options_panel.gd: X
+options_panel.gd: Y
+options_panel.gd: LB
+options_panel.gd: R3
 options_panel.gd: %dx
 options_panel.gd: %d%%
 exploration_hud.gd: %s · %s
