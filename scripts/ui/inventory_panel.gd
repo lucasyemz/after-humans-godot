@@ -104,7 +104,7 @@ func _make_slots() -> Array:
 		var name: String = tr(row.get("DisplayName", relic_id)) if row else relic_id
 		var text: String = (tr(row.get("Description", "")) + " ") if row else ""
 		out.append({"id": relic_id, "name": name, "icon": RELIC_ICONS.get(relic_id, "relic-generic"), "count": str(relics[relic_id]),
-			"group": 2, "owned": true, "text": text + tr("Equipe no Depósito do refúgio.")})
+			"group": 2, "owned": true, "text": text + tr("Equipe no Alojamento.")})
 	return out
 
 

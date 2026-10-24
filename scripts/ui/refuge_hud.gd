@@ -1675,7 +1675,7 @@ func _forge(c: Dictionary) -> void:
 	craft.custom_minimum_size = Vector2(0, 48)
 	craft.disabled = scrap < cost
 	H.style_button(craft, U.GOLD)
-	craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), tr("%s pronta. Equipe na Sala dos Personagens.") % tr(relic.DisplayName), "res://audio/ui/forge_confirm.ogg"))
+	craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), tr("%s pronta. Equipe no Alojamento.") % tr(relic.DisplayName), "res://audio/ui/forge_confirm.ogg"))
 	box.add_child(craft)
 	if scrap < cost:
 		box.add_child(U.label((tr("Faltam %d sucata") if cost - scrap == 1 else tr("Faltam %d sucatas")) % (cost - scrap), 17, U.DANGER))
@@ -1840,6 +1840,10 @@ func _report() -> void:
 	var won: bool = report.result == "victory"
 	_body.add_child(U.label(tr(RESULT_NAMES.get(report.result, report.result)), 44, U.GOLD if won else (U.MUTED if report.result == "retreat" else U.DANGER), "display"))
 	_text("%s · %s" % [tr(phase.get("name", "")), tr("fase concluída") if won else (tr("a equipe voltou antes do guardião") if report.result == "retreat" else tr("a equipe caiu"))], 18, U.MUTED)
+	# A camada da história da fase, na primeira vitória (#64).
+	if String(report.get("story", "")) != "":
+		_section(tr("O que a equipe viu"))
+		_text(tr(report.story), 19, U.TEXT)
 	# O que chegou, item a item (cada linha entra um pouco depois da outra).
 	var percent := int(report.get("percent", 0))
 	_section(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent))

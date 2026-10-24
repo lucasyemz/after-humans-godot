@@ -22,12 +22,12 @@
   },
   {
     "Name": "gato",
-    "DisplayName": "Gato Assassino",
+    "DisplayName": "Gato Batedor",
     "Species": "Gato",
-    "Role": "Assassino e Mobilidade",
+    "Role": "Batedor e Mobilidade",
     "BaseMaxHp": 24,
     "BaseSpeed": 6,
-    "Description": "Assassino e Mobilidade",
+    "Description": "Batedor e Mobilidade",
     "Color": {
       "R": 6,
       "G": 182,
@@ -64,12 +64,12 @@
   },
   {
     "Name": "coruja",
-    "DisplayName": "Coruja Sniper",
+    "DisplayName": "Coruja Atiradora",
     "Species": "Coruja",
-    "Role": "Sniper e Controle",
+    "Role": "Atiradora e Controle",
     "BaseMaxHp": 30,
     "BaseSpeed": 2,
-    "Description": "Sniper e Controle",
+    "Description": "Atiradora e Controle",
     "Color": {
       "R": 168,
       "G": 85,

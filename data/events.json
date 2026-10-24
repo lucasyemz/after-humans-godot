@@ -33,10 +33,9 @@
     "Choices": [
       {
         "Id": "seguir_interfone",
-        "Text": "Seguir o sinal até o setor de escoamento (perigo)",
+        "Text": "Seguir o sinal até o painel de contenção",
         "Success": {
-          "Result": "O sinal leva direto a uma patrulha de contenção. Um visor pisca para a equipe: ORGANISMO ANIMAL · POTENCIAL VETOR BIOLÓGICO · ACESSO NEGADO. Não há como saber o que acordou o interfone, mas vencer o confronto deixa sucata para trás.",
-          "bHardCombat": true
+          "Result": "O sinal termina num painel de contenção. Um visor pisca para a equipe: ORGANISMO ANIMAL · POTENCIAL VETOR BIOLÓGICO · ACESSO NEGADO. A equipe recua antes que algo responda, mas agora sabe o que as máquinas veem nela."
         }
       },
       {
@@ -73,7 +72,7 @@
         "RequirementAmount": 2,
         "UnavailableIfUnlocked": "rato",
         "Success": {
-          "Result": "O guaxinim guarda uma ração e volta a desmontar o terminal. \"Sou Risco. Ainda tem energia útil nessas máquinas, e eu sei tirar sem acordar ninguém. Se a Estação Raiz tiver lugar, me procurem.\" (Classe Guaxinim Sabotador liberada: dá para recrutar um guaxinim na Sala dos Personagens.)",
+          "Result": "O guaxinim guarda uma ração e volta a desmontar o terminal. \"Sou Risco. Ainda tem energia útil nessas máquinas, e eu sei tirar sem acordar ninguém. Se a Estação Raiz tiver lugar, me procurem.\" (Classe Guaxinim Sabotador liberada: dá para recrutar um guaxinim no Alojamento.)",
           "FoodDelta": -2,
           "UnlockClass": "rato",
           "RecruitName": "Risco"
@@ -288,9 +287,9 @@
       },
       {
         "Id": "prometer_voltar",
-        "Text": "Prometer voltar com ferramentas",
+        "Text": "Passar o que der pela fresta e seguir",
         "Success": {
-          "Result": "Ninguém gosta de deixar o choro para trás. A promessa pesa no caminho. (−5 de Esperança)",
+          "Result": "A equipe empurra pela fresta o pouco que dá sem desfalcar a carga e segue. O choro diminui, mas não para. (−5 de Esperança)",
           "HopeDelta": -5
         }
       }

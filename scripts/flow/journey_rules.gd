@@ -28,17 +28,29 @@ const HOUSE_ENEMY_INDEX := 100
 ## posição no mapa de fases (no espaço 1100 x 660) e a descrição vêm da mesma tabela.
 const PHASES := [
 	{"id": "fase_1", "scenario": "rua-das-vitrines", "name": "Rua das Vitrines", "level": 1, "node_type": "combat", "map": "", "transit": "", "transit_steps": 0, "difficulty": 0, "map_pos": [330, 300],
-		"description": "Vitrines tomadas por raízes guardam suprimentos. Os sensores ainda distinguem clientes humanos de fauna não autorizada."},
+		"description": "Vitrines tomadas por raízes ainda guardam comida e peças que a Estação não sabe mais fabricar. Os sensores das Galerias seguem separando clientes dos Antigos de fauna não autorizada."},
 	{"id": "fase_2", "scenario": "ponte-das-raizes", "name": "Ponte das Raízes", "level": 3, "node_type": "combat", "map": "RootBridge", "transit": "RiverDock", "transit_steps": 4, "difficulty": 1, "map_pos": [520, 470],
-		"description": "A ponte ligava bairros; seus sensores agora vigiam permissões que nenhum morador da Estação possui."},
+		"description": "A ponte ligava bairros. Há pouco tempo, seus sensores voltaram a acender e a patrulha dobrou: a passagem livre agora pede permissões que ninguém na Estação possui."},
 	{"id": "fase_3", "scenario": "sala-esquecida", "name": "Sala Esquecida", "level": 5, "node_type": "combat", "map": "SealedShelter", "transit": "", "transit_steps": 0, "difficulty": 2, "map_pos": [640, 210],
 		"description": "Atrás da porta lacrada de uma Toca dos Antigos, um fichário: cães, gatos e outros bichos, medidos e numerados. Ninguém na Estação sabe por que os Antigos os estudavam."},
 	{"id": "fase_4", "scenario": "laboratorio-silencioso", "name": "Laboratório Silencioso", "level": 7, "node_type": "combat", "map": "TriageGate", "transit": "", "transit_steps": 0, "difficulty": 2, "map_pos": [830, 430],
 		"description": "Na Casa de Vidro silenciosa, dois relatórios sobre a Peste não batem: um culpa os animais portadores, o outro para no meio. As máquinas da triagem só conhecem o primeiro."},
 	{"id": "fase_5", "scenario": "tuneis-do-eco", "name": "Túneis do Eco", "level": 9, "node_type": "boss", "map": "SewerDucts", "transit": "FloodedDepot", "transit_steps": 4, "difficulty": 3, "map_pos": [980, 190],
-		"description": "Bombas antigas mantêm a água em movimento. Na eclusa central, o Porteiro guarda uma ordem de contenção da Peste que ninguém cancelou."},
+		"description": "Bombas antigas mantêm a água em movimento, e os filtros foram trocados há pouco tempo, não há gerações. Na eclusa central, o Porteiro guarda uma ordem de contenção que ninguém cancelou."},
 ]
 const DIFFICULTY_NAMES := ["Fácil", "Moderada", "Difícil", "Muito difícil"]
+## A escada da história (docs/narrative/narrative-design.md §7), uma camada por fase: 1 Sobrevivência, 2 O despertar,
+## 3 Origem, 4 Contradição, 5 Presença humana (#64). O evento de história de cada fase abre na primeira Passagem dela.
+const STORY_EVENTS := {"fase_2": "voz_interfone", "fase_3": "porta_espera", "fase_5": "sobrevivente_tuneis"}
+## "O que a equipe viu": a linha do relatório da volta na primeira vitória de cada fase. Nenhuma mostra um humano nem
+## cita Théo (bento-nick-arc §11): o máximo é a autenticação do fim da fase 5 (lore §25.4).
+const STORY_REPORTS := {
+	"fase_1": "A Estação aguenta mais alguns dias. O que os Antigos deixaram, ninguém aqui sabe fazer de novo.",
+	"fase_2": "Na volta, alguém repete a frase do alto-falante: \"preservação humana\". Ninguém sabe por que a ponte acordou.",
+	"fase_3": "As fichas passam de mão em mão no caminho de casa. Algumas palavras ninguém sabe o que querem dizer: \"edição\", \"linhagem\", \"incubação\".",
+	"fase_4": "Os dois relatórios voltam na mochila. \"Um deles está errado, ou os dois estão incompletos.\"",
+	"fase_5": "No painel da eclusa, uma linha nova piscava: AUTENTICAÇÃO HUMANA VÁLIDA · registro recente. Ninguém fala no caminho de casa.",
+}
 const WEATHERS := {
 	"estacao-raiz": ["clear", "clear", "sunset", "mist", "night", "nightRain"],
 	"rua-das-vitrines": ["clear", "sunset", "rain", "rain", "storm", "mist", "fog", "night", "nightRain"],
@@ -227,8 +239,27 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 		"rest":
 			step.resolved = true
 			return "rest"
+		"passage":
+			step.resolved = true
+			# Na primeira Passagem da fase, o evento de história dela (#64), uma vez por campanha.
+			var story := story_event(campaign)
+			if story != "":
+				campaign.station.story_events.append(campaign.session.expedition.phase_id)
+				campaign.session.event = {"event_id": story, "from_search": false, "resolution": "", "pending_hard_combat": false,
+					"object": ""}
+				return "event"
+			return ""
 	step.resolved = true
 	return ""
+
+
+## O evento de história que a fase ainda deve mostrar ("" se não tem ou já mostrou).
+static func story_event(campaign: Dictionary) -> String:
+	var phase_id: String = campaign.session.expedition.get("phase_id", "")
+	var event_id: String = STORY_EVENTS.get(phase_id, "")
+	if event_id == "" or GameData.row("events", event_id) == null or campaign.get("station", {}).get("story_events", []).has(phase_id):
+		return ""
+	return event_id
 
 
 # ---------------------------------------------------------------- inimigos

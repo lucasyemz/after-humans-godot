@@ -399,6 +399,9 @@ func _street_frame(campaign: Dictionary, route: Dictionary, delta: float) -> voi
 			Campaign.save()
 			_announce(next, outcome, not was_resolved)
 			hud.refresh(campaign)
+			# A Passagem com o evento de história da fase (#64): ele abre ali mesmo.
+			if outcome == "event":
+				hud.show_event(campaign)
 	for index in [route.index, route.index + 1]:
 		if guards.has(index) and _segment_of(index) == segment and _sight_frame(index, delta, leader):
 			return

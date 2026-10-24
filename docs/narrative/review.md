@@ -82,6 +82,45 @@ Program", "from the war", "the Echo", "learning notes") somem com o `i18n_update
 | `station_rules.gd:36` ("Sala dos Personagens") e `:40` ("Bar") | Nome de sala que não pertence ao mundo ("Personagens" é termo de UI). | "Alojamento" (ou "Sala do Elenco"); manter "Bar". | §13 (tom): "O mundo precisa parecer vivido". |
 | `data/relics.json:5,11` | "época dos humanos" e "vidro de laboratório aerodinâmico". | "Um talismã sólido do tempo dos Antigos." e "Cortada do vidro de uma Casa de Vidro." | Vocabulário do novo mundo (§16). "Aerodinâmico" não quer dizer nada para um vidro. É ajuste de tom, por isso fica aqui. |
 
+### Respostas aplicadas (24/10, rodada 2 da #64)
+
+O Lucas pediu para seguir com as propostas desta tabela e, onde não havia, fazer uma para ele revisar. Marcado
+**(proposta do Claude)** o que não estava na revisão.
+
+1. **Íris:** fica sapo. Lore §15.3 sem a Íris; §15.5 nova, Povos dos Canais (anfíbios), com a cultura dela.
+2. **Véspera e Amora:** Véspera entra na lore (§15.6, Aves das Torres). Amora continua na lore e no arco e entra no jogo
+   quando o arco do resgate for jogável **(proposta do Claude)**.
+3. **Classes:** "Gato Batedor" e "Coruja Atiradora" (e os papéis "Batedor e Mobilidade", "Atiradora e Controle"); ids
+   iguais.
+4. **Estação Raiz:** fica; lore §17 explica o nome (as raízes da plataforma) e que não tem ligação com a Raiz Livre.
+5. **Bairro Submerso:** entra na lore §17.
+6. **Fase 4:** o nome fica "Laboratório Silencioso": a descrição já põe o laboratório (a Casa de Vidro) atrás do Portão
+   de Triagem, e trocar o nome mudaria o que os memoriais já gravaram **(proposta do Claude)**.
+7. **Escada × fases:** 1:1, registrado em `narrative-design.md` (seção "No jogo da Godot"); as camadas 6 e 7 ficam
+   para quando o mapa crescer.
+8. **Porteiro:** um dos portões de VIGIA (lore §11, sem citar VIGIA na tela); a vitória sobre ele traz a linha da
+   autenticação humana (item 16).
+9. **Núcleo Nulo:** Sistema Degradado (lore §10.3), com a descrição proposta; "(teste)" saiu do papel.
+10. **Vilões do John:** as descrições propostas; "Carrasco Industrial" virou "Demolidor Industrial" (id igual); o
+    Enraizado ganhou descrição e o golpe virou "Açoite de Raízes".
+11. **Remendador:** "Soldador" na tela (id igual), com descrição **(proposta do Claude)**.
+12. **Inimigos fora dos encontros:** continuam fora da campanha; nada mudou **(proposta do Claude)**.
+13. **Nomes de recruta:** os da tabela; e **(proposta do Claude)** Max→Brasa, Félix→Calha, Jasper→Lampião, e o recruta
+    Faísca→Centelha (Faísca é inimigo). Quem já foi recrutado mantém o nome.
+14. **Filhote de lontra:** **(proposta do Claude)** nem A nem B, para não mexer em números: a escolha virou "Passar o que
+    der pela fresta e seguir", sem promessa, com o mesmo −5 de Esperança.
+15. **Eventos de história:** um por fase na primeira Passagem dela, uma vez por campanha (fase 2: Voz no Interfone;
+    3: A Porta que Ainda Espera; 5: Sobrevivente dos Túneis). A "Voz no Interfone" prometia uma luta que o jogo nunca
+    começava: **(proposta do Claude)** "Seguir o sinal" agora leva ao painel de contenção e mostra o visor, sem luta.
+16. **"O que a equipe viu":** a linha no relatório da primeira vitória de cada fase, gravada no save
+    (`station.story_reports`, saves antigos ganham a lista vazia). As linhas das fases 3 e 4 que citavam a Íris
+    ficaram sem nome, porque ela pode não estar na equipe **(proposta do Claude)**.
+17. **"Sala dos Personagens":** "Alojamento" (id igual). A Mochila dizia para equipar a relíquia "no Depósito do
+    refúgio"; é no Alojamento.
+18. **Relíquias:** "do tempo dos Antigos" e "Cortada do vidro de uma Casa de Vidro".
+
+As descrições das fases 1, 2 e 5 e o Próximo passo final ("Os Antigos ainda existem?…") são as da seção 4.
+
 ## 4. Progressão das fases
 
 | Fase | O que a escada pede (`narrative-design.md` §7) | O que os textos do jogo contam hoje | O que falta (proposta concreta) |

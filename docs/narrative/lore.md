@@ -233,7 +233,12 @@ Décadas sem manutenção corromperam bancos de dados e rotinas.
 
 Essas IAs misturam ordens, memórias e protocolos antigos, produzindo comportamentos imprevisíveis.
 
-Algumas repetem rotinas humanas como rituais mecânicos sem compreender por que ainda fazem aquilo.
+Algumas repetem rotinas humanas como rituais mecânicos sem compreender por que ainda fazem aquilo: o Recreador ainda
+anima festas para crianças que não vêm há gerações, e o Demolidor Industrial segue derrubando o que um plano antigo
+mandava derrubar.
+
+O **Núcleo Nulo** é o núcleo de uma central esquecida: mistura ordens de décadas diferentes e transmite todas ao
+mesmo tempo. Não é VIGIA, e não fala por ela.
 
 ---
 
@@ -258,6 +263,10 @@ VIGIA também possui uma limitação fundamental:
 **somente uma autoridade humana válida pode alterar permanentemente determinadas classificações de segurança.**
 
 Isso conecta diretamente a existência dos humanos sobreviventes ao conflito com as máquinas.
+
+O **Porteiro**, que guarda a eclusa central dos Túneis do Eco, é um dos portões de VIGIA: a ordem de contenção que ele
+executa vem dela. Vencê-lo é o primeiro momento em que o jogador vê sinal de uma autenticação humana recente (§25.4),
+sem saber de quem.
 
 ---
 
@@ -391,7 +400,7 @@ Populações de roedores prosperaram em metrôs, galerias técnicas, esgotos e c
 
 Tornaram-se especialistas em rotas subterrâneas, reaproveitamento, filtros, máscaras e engenharia improvisada.
 
-A cultura de Íris valoriza preparação, informação e sobrevivência acima de aparência ou tradição.
+Muitos na Estação aprenderam com eles a manter filtros, máscaras e dutos.
 
 ## 15.4 Povos das Margens
 
@@ -400,6 +409,22 @@ Capivaras e outras comunidades próximas a rios desenvolveram culturas mais comu
 Água, memória oral, medicina e rituais de purificação possuem grande importância.
 
 Amora traz uma visão espiritual do mundo, mas sua espiritualidade nasceu da interpretação animal do passado — não de conhecimento correto sobre a cultura humana.
+
+## 15.5 Povos dos Canais
+
+Sapos e outros anfíbios cresceram entre canais, cisternas e estações de tratamento de água abandonadas.
+
+Química de sobrevivência, preparação e informação são valorizadas acima de aparência ou tradição.
+
+Íris cresceu entre canais e cisternas: mede tudo antes de agir e confia mais numa ampola bem feita do que numa promessa.
+
+## 15.6 Aves das Torres
+
+Corujas e outras aves se abrigaram nas torres, antenas e passarelas altas das cidades alagadas.
+
+Observar antes de opinar, enxergar longe e avisar os outros a tempo são valorizados.
+
+Véspera vem das torres de observação ao redor da Estação: fala pouco, vê primeiro e só dispara quando tem certeza.
 
 Essas tendências são culturais, não regras biológicas.
 
@@ -448,6 +473,12 @@ Mas não conseguem fabricar tudo novamente.
 E as máquinas estão falhando.
 
 Por isso existem expedições.
+
+A comunidade chama sua casa de **Estação Raiz**, pelas raízes que atravessam a plataforma. O nome não tem ligação com
+a Raiz Livre: a Estação é Remendadora (§14.1).
+
+Ao redor dela fica o **Bairro Submerso**: a região alagada da cidade, ligada por trilhos, cais e túneis. É por ele que
+as expedições saem e voltam.
 
 ---
 
