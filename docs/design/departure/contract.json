@@ -1,0 +1,242 @@
+{
+  "issue": 79,
+  "base_commit": "83e2717",
+  "canvas": [
+    1920,
+    1080
+  ],
+  "origin": "top_left",
+  "layer_order": [
+    "tunnel_loop",
+    "carriage_background",
+    "carriage_bench",
+    "heroes",
+    "title_card"
+  ],
+  "window_apertures": [
+    [
+      144,
+      200,
+      600,
+      392
+    ],
+    [
+      736,
+      200,
+      1180,
+      392
+    ],
+    [
+      1328,
+      200,
+      1784,
+      392
+    ]
+  ],
+  "tunnel": {
+    "file": "art/transitions/train/tunnel_loop.webp",
+    "size": [
+      2048,
+      512
+    ],
+    "position": [
+      0,
+      128
+    ],
+    "repeat": "horizontal",
+    "scroll_px_per_second": 96,
+    "period_seconds": 21.333333333333332,
+    "reduced_motion": "freeze offset; no flashing lights"
+  },
+  "background": {
+    "file": "art/transitions/train/carriage_background.webp",
+    "size": [
+      1920,
+      1080
+    ],
+    "position": [
+      0,
+      0
+    ]
+  },
+  "bench": {
+    "file": "art/transitions/train/carriage_bench.webp",
+    "size": [
+      1920,
+      1080
+    ],
+    "position": [
+      0,
+      0
+    ],
+    "visible_bench_origin": [
+      168,
+      600
+    ],
+    "visible_bench_size": [
+      1584,
+      363
+    ]
+  },
+  "seats": [
+    {
+      "slot": 0,
+      "seat_support": [
+        370,
+        790
+      ],
+      "hero_example": "hero_cao_bento",
+      "existing_seat_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+      "source_hip_contact": [
+        240,
+        480
+      ],
+      "source_foot_anchor": [
+        283,
+        710
+      ],
+      "source_body_reference_pixels": 948,
+      "height_m": 1.72,
+      "preview_scale": 0.635021,
+      "sprite_top_left": [
+        218,
+        485
+      ],
+      "projected_foot_anchor": [
+        397.71,
+        935.86
+      ]
+    },
+    {
+      "slot": 1,
+      "seat_support": [
+        762,
+        790
+      ],
+      "hero_example": "hero_gato_nick",
+      "existing_seat_file": "res://art/station/poses/hero_gato_nick_seat.webp",
+      "source_hip_contact": [
+        260,
+        490
+      ],
+      "source_foot_anchor": [
+        302,
+        639
+      ],
+      "source_body_reference_pixels": 804,
+      "height_m": 1.5,
+      "preview_scale": 0.652985,
+      "sprite_top_left": [
+        592,
+        470
+      ],
+      "projected_foot_anchor": [
+        789.2,
+        887.26
+      ]
+    },
+    {
+      "slot": 2,
+      "seat_support": [
+        1158,
+        790
+      ],
+      "hero_example": "hero_sapo_iris",
+      "existing_seat_file": "res://art/station/poses/hero_sapo_iris_seat.webp",
+      "source_hip_contact": [
+        275,
+        490
+      ],
+      "source_foot_anchor": [
+        273,
+        686
+      ],
+      "source_body_reference_pixels": 924,
+      "height_m": 1.38,
+      "preview_scale": 0.522727,
+      "sprite_top_left": [
+        1014,
+        534
+      ],
+      "projected_foot_anchor": [
+        1156.7,
+        892.59
+      ]
+    },
+    {
+      "slot": 3,
+      "seat_support": [
+        1554,
+        790
+      ],
+      "hero_example": "hero_coruja_vespera",
+      "existing_seat_file": "res://art/station/poses/hero_coruja_vespera_seat.webp",
+      "source_hip_contact": [
+        285,
+        500
+      ],
+      "source_foot_anchor": [
+        296,
+        623
+      ],
+      "source_body_reference_pixels": 784,
+      "height_m": 1.66,
+      "preview_scale": 0.741071,
+      "sprite_top_left": [
+        1343,
+        419
+      ],
+      "projected_foot_anchor": [
+        1562.36,
+        880.69
+      ]
+    }
+  ],
+  "title_card": {
+    "file": "art/transitions/passage_title_frame.webp",
+    "size": [
+      960,
+      240
+    ],
+    "anchor": [
+      480,
+      120
+    ],
+    "position": [
+      960,
+      540
+    ],
+    "slice_ltrb": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "title_area": [
+      32,
+      32,
+      928,
+      112
+    ],
+    "subtitle_area": [
+      32,
+      128,
+      928,
+      208
+    ],
+    "normal_type": [
+      32,
+      24
+    ],
+    "large_type": [
+      37,
+      28
+    ],
+    "largest_type": [
+      42,
+      31
+    ]
+  },
+  "originals": "/workspace/generated_images and /workspace/scratch/round79_80; outside repository",
+  "reference_unreal": "#73 not yet delivered; proposed timings, not reproduction"
+}
