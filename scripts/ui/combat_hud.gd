@@ -302,7 +302,7 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 	style.content_margin_top = 4
 	style.content_margin_bottom = 5
 	plate.add_theme_stylebox_override("panel", style)
-	plate.custom_minimum_size = Vector2(176 if unit.is_player else 246, 0)
+	plate.custom_minimum_size = Vector2(PLATE_PLAYER if unit.is_player else PLATE_ENEMY, 0)
 	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 3)
@@ -577,11 +577,19 @@ func _process(_delta: float) -> void:
 	if camera == null:
 		return
 	var short_plates: Array[Rect2] = []
+	var widths := _plate_widths(camera)
 	for unit_id in _unit_bars:
 		var plate: Control = _unit_bars[unit_id]
 		var card: AHSpriteCard = arena.cards.get(unit_id)
 		if card == null or not plate.visible:
 			continue
+		if widths.has(unit_id) and not is_equal_approx(plate.custom_minimum_size.x, widths[unit_id]):
+			plate.custom_minimum_size.x = widths[unit_id]
+			# A intenção quebra em mais linhas na placa estreita (a largura mínima dela segurava a placa larga).
+			var intent: Control = plate.find_child("Intent", true, false)
+			if intent != null:
+				intent.custom_minimum_size.x = widths[unit_id] - PLATE_ENEMY + 200.0
+			plate.size = Vector2(widths[unit_id], 0)
 		var feet := camera.unproject_position(card.global_position)
 		var head := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 1.05, 0))
 		var short := card.body_height < SHORT_HEIGHT
@@ -615,6 +623,32 @@ func _process(_delta: float) -> void:
 		for rect in short_plates:
 			if rect.intersects(Rect2(marker.position, marker.size)):
 				marker.position.y = rect.position.y - marker.size.y - 6
+
+
+## A largura das placas de cada lado: a de sempre (176 dos heróis, 246 dos inimigos), estreitada até caber entre os pés
+## vizinhos (com quatro inimigos a ~200 px um do outro, as placas de 246 px se cobriam: "Fa|ísca", #63).
+func _plate_widths(camera: Camera3D) -> Dictionary:
+	var out := {}
+	for player in [true, false]:
+		var xs: Array = []
+		for unit_id in _unit_bars:
+			var unit = session.state.find_unit(unit_id)
+			var card: AHSpriteCard = arena.cards.get(unit_id)
+			if unit != null and unit.is_player == player and card != null and _unit_bars[unit_id].visible:
+				xs.append([camera.unproject_position(card.global_position).x, unit_id])
+		xs.sort_custom(func(a, b): return a[0] < b[0])
+		var width := PLATE_PLAYER if player else PLATE_ENEMY
+		for i in range(1, xs.size()):
+			width = minf(width, xs[i][0] - xs[i - 1][0] - PLATE_GAP)
+		for entry in xs:
+			out[entry[1]] = maxf(PLATE_MIN, width)
+	return out
+
+
+const PLATE_PLAYER := 176.0
+const PLATE_ENEMY := 246.0
+const PLATE_MIN := 132.0
+const PLATE_GAP := 8.0
 
 
 ## O retângulo do corpo de um personagem na tela: do pé à cabeça e com a largura do corpo (a placa tem margem
