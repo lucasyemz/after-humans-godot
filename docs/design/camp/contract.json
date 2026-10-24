@@ -1,0 +1,461 @@
+{
+  "issue": 80,
+  "base_commit": "83e2717",
+  "poses": [
+    {
+      "recruit_id": "dog_recruit_01",
+      "state": "seat",
+      "file": "art/camp/dog_recruit_01_seat.webp",
+      "texture_canvas": [
+        543,
+        724
+      ],
+      "texture_anchor": [
+        271.0,
+        712.5
+      ],
+      "texture_body_reference_pixels": 692.5,
+      "manifest_canvas": [
+        1086,
+        1448
+      ],
+      "manifest_anchor": [
+        542.0,
+        1425
+      ],
+      "body_reference_pixels": 1385,
+      "alpha_bbox": [
+        53,
+        328,
+        489,
+        713
+      ],
+      "registration_rounding_max_px": 0.5,
+      "generated_crop_to_texture_scale": 0.57,
+      "original_generated_file": "exec-83d782e2-5cd2-49a3-be5c-e654da0c3ddc.png",
+      "nine_slice": null
+    },
+    {
+      "recruit_id": "dog_recruit_01",
+      "state": "sleep",
+      "file": "art/camp/dog_recruit_01_sleep.webp",
+      "texture_canvas": [
+        543,
+        724
+      ],
+      "texture_anchor": [
+        271.0,
+        712.5
+      ],
+      "texture_body_reference_pixels": 692.5,
+      "manifest_canvas": [
+        1086,
+        1448
+      ],
+      "manifest_anchor": [
+        542.0,
+        1425
+      ],
+      "body_reference_pixels": 1385,
+      "alpha_bbox": [
+        8,
+        478,
+        534,
+        712
+      ],
+      "registration_rounding_max_px": 0.5,
+      "generated_crop_to_texture_scale": 0.554852,
+      "original_generated_file": "exec-83d782e2-5cd2-49a3-be5c-e654da0c3ddc.png",
+      "nine_slice": null
+    },
+    {
+      "recruit_id": "cat_recruit_01",
+      "state": "seat",
+      "file": "art/camp/cat_recruit_01_seat.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        294.75,
+        656.0
+      ],
+      "texture_body_reference_pixels": 630.0,
+      "manifest_canvas": [
+        1178,
+        1336
+      ],
+      "manifest_anchor": [
+        589.5,
+        1312
+      ],
+      "body_reference_pixels": 1260,
+      "alpha_bbox": [
+        9,
+        196,
+        581,
+        656
+      ],
+      "registration_rounding_max_px": 0.5,
+      "generated_crop_to_texture_scale": 0.638239,
+      "original_generated_file": "exec-bde52b10-4463-409d-8071-55b8c30d35bd.png",
+      "nine_slice": null
+    },
+    {
+      "recruit_id": "cat_recruit_01",
+      "state": "sleep",
+      "file": "art/camp/cat_recruit_01_sleep.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        294.75,
+        656.0
+      ],
+      "texture_body_reference_pixels": 630.0,
+      "manifest_canvas": [
+        1178,
+        1336
+      ],
+      "manifest_anchor": [
+        589.5,
+        1312
+      ],
+      "body_reference_pixels": 1260,
+      "alpha_bbox": [
+        19,
+        453,
+        570,
+        656
+      ],
+      "registration_rounding_max_px": 0.5,
+      "generated_crop_to_texture_scale": 0.64,
+      "original_generated_file": "exec-bde52b10-4463-409d-8071-55b8c30d35bd.png",
+      "nine_slice": null
+    },
+    {
+      "recruit_id": "frog_recruit_01",
+      "state": "seat",
+      "file": "art/camp/frog_recruit_01_seat.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        294.25,
+        655.5
+      ],
+      "texture_body_reference_pixels": 609.5,
+      "manifest_canvas": [
+        1178,
+        1336
+      ],
+      "manifest_anchor": [
+        588.5,
+        1311
+      ],
+      "body_reference_pixels": 1219,
+      "alpha_bbox": [
+        37,
+        300,
+        551,
+        656
+      ],
+      "registration_rounding_max_px": 0.5,
+      "generated_crop_to_texture_scale": 0.6,
+      "original_generated_file": "exec-7cce5753-defa-427a-bdf7-90ce4127ff37.png",
+      "nine_slice": null
+    },
+    {
+      "recruit_id": "frog_recruit_01",
+      "state": "sleep",
+      "file": "art/camp/frog_recruit_01_sleep.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        294.25,
+        655.5
+      ],
+      "texture_body_reference_pixels": 609.5,
+      "manifest_canvas": [
+        1178,
+        1336
+      ],
+      "manifest_anchor": [
+        588.5,
+        1311
+      ],
+      "body_reference_pixels": 1219,
+      "alpha_bbox": [
+        35,
+        436,
+        553,
+        656
+      ],
+      "registration_rounding_max_px": 0.5,
+      "generated_crop_to_texture_scale": 0.6,
+      "original_generated_file": "exec-7cce5753-defa-427a-bdf7-90ce4127ff37.png",
+      "nine_slice": null
+    },
+    {
+      "recruit_id": "owl_recruit_01",
+      "state": "seat",
+      "file": "art/camp/owl_recruit_01_seat.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        294.75,
+        656.0
+      ],
+      "texture_body_reference_pixels": 636.0,
+      "manifest_canvas": [
+        1178,
+        1336
+      ],
+      "manifest_anchor": [
+        589.5,
+        1312
+      ],
+      "body_reference_pixels": 1272,
+      "alpha_bbox": [
+        64,
+        271,
+        525,
+        656
+      ],
+      "registration_rounding_max_px": 0.5,
+      "generated_crop_to_texture_scale": 0.63,
+      "original_generated_file": "exec-8393fa36-e564-4f3f-a5e8-b63b17eceeae.png",
+      "nine_slice": null
+    },
+    {
+      "recruit_id": "owl_recruit_01",
+      "state": "sleep",
+      "file": "art/camp/owl_recruit_01_sleep.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        294.75,
+        656.0
+      ],
+      "texture_body_reference_pixels": 636.0,
+      "manifest_canvas": [
+        1178,
+        1336
+      ],
+      "manifest_anchor": [
+        589.5,
+        1312
+      ],
+      "body_reference_pixels": 1272,
+      "alpha_bbox": [
+        34,
+        399,
+        555,
+        656
+      ],
+      "registration_rounding_max_px": 0.5,
+      "generated_crop_to_texture_scale": 0.63,
+      "original_generated_file": "exec-8393fa36-e564-4f3f-a5e8-b63b17eceeae.png",
+      "nine_slice": null
+    }
+  ],
+  "effects": [
+    {
+      "file": "art/camp/food_morsel.webp",
+      "size": [
+        192,
+        192
+      ],
+      "anchor": [
+        96,
+        96
+      ],
+      "active_box": [
+        20,
+        20,
+        172,
+        172
+      ],
+      "recommended_screen_size": [
+        64,
+        64
+      ],
+      "duration_ms": 600,
+      "keyframes": [
+        {
+          "time_ms": 0,
+          "alpha": 0,
+          "scale": 0.8,
+          "dy": 0
+        },
+        {
+          "time_ms": 100,
+          "alpha": 1,
+          "scale": 1,
+          "dy": -4
+        },
+        {
+          "time_ms": 400,
+          "alpha": 1,
+          "scale": 1,
+          "dy": -12
+        },
+        {
+          "time_ms": 600,
+          "alpha": 0,
+          "scale": 1,
+          "dy": -20
+        }
+      ],
+      "reduced_motion": "static 400ms, no translation or scaling",
+      "no_gameplay_change": true
+    },
+    {
+      "file": "art/camp/bandage_wrap.webp",
+      "size": [
+        192,
+        192
+      ],
+      "anchor": [
+        96,
+        96
+      ],
+      "active_box": [
+        20,
+        20,
+        172,
+        172
+      ],
+      "recommended_screen_size": [
+        64,
+        64
+      ],
+      "duration_ms": 600,
+      "keyframes": [
+        {
+          "time_ms": 0,
+          "alpha": 0,
+          "scale": 0.8,
+          "dy": 0
+        },
+        {
+          "time_ms": 100,
+          "alpha": 1,
+          "scale": 1,
+          "dy": -4
+        },
+        {
+          "time_ms": 400,
+          "alpha": 1,
+          "scale": 1,
+          "dy": -12
+        },
+        {
+          "time_ms": 600,
+          "alpha": 0,
+          "scale": 1,
+          "dy": -20
+        }
+      ],
+      "reduced_motion": "static 400ms, no translation or scaling",
+      "no_gameplay_change": true
+    },
+    {
+      "file": "art/camp/iris_ampoule.webp",
+      "size": [
+        192,
+        192
+      ],
+      "anchor": [
+        96,
+        96
+      ],
+      "active_box": [
+        20,
+        20,
+        172,
+        172
+      ],
+      "recommended_screen_size": [
+        64,
+        64
+      ],
+      "duration_ms": 600,
+      "keyframes": [
+        {
+          "time_ms": 0,
+          "alpha": 0,
+          "scale": 0.8,
+          "dy": 0
+        },
+        {
+          "time_ms": 100,
+          "alpha": 1,
+          "scale": 1,
+          "dy": -4
+        },
+        {
+          "time_ms": 400,
+          "alpha": 1,
+          "scale": 1,
+          "dy": -12
+        },
+        {
+          "time_ms": 600,
+          "alpha": 0,
+          "scale": 1,
+          "dy": -20
+        }
+      ],
+      "reduced_motion": "static 400ms, no translation or scaling",
+      "no_gameplay_change": true
+    }
+  ],
+  "scope": "proposal only; integration #77; no manifest mutation",
+  "camp_slots": [
+    {
+      "recruit_example": "dog_recruit_01",
+      "ground_anchor": [
+        500,
+        900
+      ],
+      "mirror_x": false,
+      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged"
+    },
+    {
+      "recruit_example": "cat_recruit_01",
+      "ground_anchor": [
+        660,
+        1010
+      ],
+      "mirror_x": false,
+      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged"
+    },
+    {
+      "recruit_example": "frog_recruit_01",
+      "ground_anchor": [
+        1260,
+        1010
+      ],
+      "mirror_x": true,
+      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged"
+    },
+    {
+      "recruit_example": "owl_recruit_01",
+      "ground_anchor": [
+        1420,
+        900
+      ],
+      "mirror_x": true,
+      "mirror_anchor_rule": "texture_width - anchor_x; y unchanged"
+    }
+  ]
+}
