@@ -186,3 +186,4 @@ refuge_hud.gd: %s%s
 *: water
 *: web
 *: world
+refuge_hud.gd: gone

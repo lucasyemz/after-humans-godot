@@ -88,7 +88,8 @@ var _train_mode := 0
 var _train_time := 0.0
 ## Os passos da cena do trem, na ordem em que acontecem (o teste e a gravação conferem a ordem): warning, brake, stop,
 ## doors_open, candidate_out, candidate_ready, camera_on_candidate; boarding, boarded, doors_closing, doors_closed,
-## leaving, gone.
+## leaving, gone. O camera_on_candidate vem também quando o painel do trem, reaberto depois da cena, termina de levar a
+## câmera ao candidato; e não vem se o jogador saiu para outro painel no meio (a cena acaba sem a câmera).
 signal train_event(name: String)
 var _warning_time := -1.0
 var _candidate: AHSpriteCard
@@ -98,6 +99,8 @@ var _pending_arrival := ""
 var _train_sound: AudioStreamPlayer = null
 ## A chegada terminou com o candidato no lugar; falta a câmera fechar nele (só com o painel do trem e na plataforma).
 var _camera_pending := false
+## O painel do trem reaberto depois da cena: a câmera vai ao candidato (pela passagem, se preciso) antes de o painel abrir.
+var _reopen_pending := false
 var _env: Environment
 
 
@@ -210,6 +213,8 @@ func _process(delta: float) -> void:
 		play_train_arrival(_pending_arrival)
 		_pending_arrival = ""
 	_tick_train(delta)
+	if _reopen_pending:
+		_tick_reopen()
 	_walk(delta)
 	if _build.ember_light:
 		# Brasas: variação lenta e pequena (duas senoides fora de fase), sem piscar.
@@ -330,22 +335,24 @@ func focus_platform(instant: bool = false) -> void:
 ## câmera fecha nele de corpo inteiro, à esquerda do painel (FocusTrainCandidate).
 func open_train(candidate_id: String, arrive: bool) -> void:
 	clear_lineup()
-	_go(_platform_key(), true, false)
 	if arrive:
+		_go(_platform_key(), true, false)
 		_pending_arrival = candidate_id
 		# O trem ainda não chegou: fica no túnel, sem ninguém na plataforma (aparecia parado e sumia para chegar).
 		_remove_candidate()
 		_door_open = 0.0
 		_offset_wagon(TRAIN_OUT)
 	else:
+		# A passagem termina no candidato (terminava na plataforma inteira e descartava a chave dele).
 		show_candidate(candidate_id)
-		_set_goal(_candidate_key())
+		_go(_candidate_key(), true, false)
+		_reopen_pending = true
 
 
 ## O painel do trem reaberto no meio da cena: a câmera volta para a plataforma (pela passagem, se preciso).
 func follow_train() -> void:
 	clear_lineup()
-	_go(_platform_key(), true, false)
+	_go(_candidate_key() if _reopen_pending else _platform_key(), true, false)
 
 
 func _candidate_key() -> Dictionary:
@@ -566,6 +573,7 @@ func play_train_departure(candidate_leaves: bool) -> void:
 	_warning_time = -1.0
 	_train_time = 0.0
 	_camera_pending = false
+	_reopen_pending = false
 	_offset_wagon(0.0)
 	# A partida à vista: a câmera volta para a plataforma inteira, com o vagão, a porta e o lugar do candidato.
 	if on_platform and not passage_moving():
@@ -644,7 +652,7 @@ func train_event_named(name: String) -> void:
 
 
 func train_busy() -> bool:
-	return _train_mode != 0 or _pending_arrival != ""
+	return _train_mode != 0 or _pending_arrival != "" or _reopen_pending
 
 
 ## O candidato esperando na plataforma, sem a chegada (o jogo foi reaberto com o trem parado).
@@ -750,6 +758,18 @@ func _tick_arrival(before: float) -> void:
 		train_event.emit("candidate_ready")
 	if _camera_pending:
 		_tick_camera_on_candidate()
+
+
+func _tick_reopen() -> void:
+	if hud != null and hud.current != "train":
+		_reopen_pending = false
+		return
+	if passage_moving():
+		return
+	var key := _candidate_key()
+	if _key.pos.distance_to(key.pos) < 0.05 and absf(_key.fov - key.fov) < 0.3:
+		_reopen_pending = false
+		train_event.emit("camera_on_candidate")
 
 
 ## Depois de o candidato chegar ao lugar, a câmera fecha nele e só então a cena acaba (o painel abre). Se o jogador

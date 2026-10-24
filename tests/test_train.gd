@@ -97,6 +97,8 @@ func _scene(speed: int, reduced: bool) -> void:
 	for i in 3:
 		await _tree.process_frame
 	t.check(station.hud._panel.visible and station.hud.current == "train", "e então o painel do trem abre (%dx)" % speed)
+	if speed == 1:
+		await _reopen(station)
 	# A recusa: o candidato volta ao trem, o sino, as portas e só então o som da partida.
 	_events.clear()
 	sounds.clear()
@@ -126,6 +128,29 @@ func _scene(speed: int, reduced: bool) -> void:
 	t.check(Sound._effects.all(func(p): return not p.playing or not ["train_arrival.ogg", "train_departure.ogg"].has(String(p.stream.resource_path).get_file())),
 		"nenhum som do trem depois que ele some (%dx)" % speed)
 	station.train_event.disconnect(_on_event)
+
+
+## Fechar o trem (a câmera desce ao abrigo) e reabrir: a passagem termina no candidato, e o painel só abre lá.
+func _reopen(station) -> void:
+	station.hud.close_panel()
+	var end := Time.get_ticks_msec() + 60000
+	while (station.passage_moving() or station.on_platform) and Time.get_ticks_msec() < end:
+		await _tree.process_frame
+	await _tree.create_timer(0.5).timeout
+	_events.clear()
+	station.hud.open_service("train")
+	await _tree.process_frame
+	var panel_early := false
+	end = Time.get_ticks_msec() + 60000
+	while not _events.has("camera_on_candidate") and Time.get_ticks_msec() < end:
+		await _tree.process_frame
+		if not _events.has("camera_on_candidate") and station.hud._panel.visible:
+			panel_early = true
+	t.check(_events.has("camera_on_candidate") and station._goal == station._candidate_key(), "reaberto, a câmera volta ao candidato")
+	t.check(not panel_early, "e o painel não abre durante a passagem")
+	await _tree.process_frame
+	await _tree.process_frame
+	t.check(station.hud._panel.visible and not station.train_busy(), "e abre quando ela chega")
 
 
 func _on_screen(station, point: Vector3) -> bool:
