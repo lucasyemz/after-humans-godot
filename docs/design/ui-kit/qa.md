@@ -55,3 +55,5 @@ Informação agora é apenas texto+ícone, nunca uma barra ou contorno de estado
 48 pranchas finais em WebP, nenhuma acima de300KB; originais fora do repositório. Links atualizados. Sem problema alto/médio restante; navegação real permanece com Claude. Erros _restyle ficam fora desta correção por instrução expressa do Lucas. O registro de34/34 da versão anterior é histórico; a validação desta base será indicada no comentário/PR desta rodada.
 
 Validação desta revisão, base83e2717: **39/39 testes, paridade48/48, saída0 em122,4s**, Godot4.7.2 após importação. Avisos de recursos/RIDs no encerramento continuam documentados no log; sem mudança de código.
+
+Acabamento da rodada4 após a nova revisão automática: o gerador agora lê alturas e slots da placa de `contract.json`; reserva48, fonte28 e folga8 do Grande também estão explícitas no JSON. Regeração conferida, sem alteração visual.

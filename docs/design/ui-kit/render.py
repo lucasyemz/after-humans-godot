@@ -9,6 +9,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 import cairosvg
 ROOT=Path(__file__).resolve().parents[3]
 OUT=Path(__file__).resolve().parent
+KIT_CONTRACT=json.loads((OUT/'contract.json').read_text())
+PLATE=KIT_CONTRACT['components']['plate']['metrics']
 P={'bg':'#0d1012','surface':'#12171a','edge':'#3b3327','copper':'#c98a4b','gold':'#e9c47c','text':'#efe5d1','muted':'#a69a84','good':'#86c98f','danger':'#e2675b','enemy':'#d9893d','instinct':'#b7a6f4','blue':'#8fb4f0'}
 STATES=['normal','hover','focus','pressed','disabled','alert','selected']
 LABELS=['Normal','Mouse','Foco','Pressionado','Desligado','Alerta','Escolhido']
@@ -93,7 +95,7 @@ class Canvas:
   elif k=='key':
    self.box(x,y+32,sh,sh,'key_cap');self.text(x+22+off,y+50+off,'E','body',col);self.text(x+sh+16,y+52,'Interagir','detail',col);y+=32;h=sh
   elif k=='plate':
-   hh=128 if self.large else 120; life_y=80 if self.large else 72
+   hh=PLATE['large_height'] if self.large else PLATE['height']; life_y=PLATE['padding']+(PLATE['name_reserved_large'] if self.large else PLATE['name_reserved_normal'])+8
    self.box(x,y,w,hh,skin);self.text(x+24,y+24,title or 'Íris','body',col)
    self.icon(x+w-48,y+24,'intent-attack' if state=='alert' else 'intent-block',24,'danger' if state=='alert' else 'text')
    self.d.rectangle((x+24,y+life_y,x+w-24,y+life_y+11),fill=self.c('edge'))
@@ -230,7 +232,7 @@ def selection():
 
 def plate_metrics():
  c=Canvas();c.header('Placa / conta nos três tamanhos','Inset24 preservado • Grande usa geometria do Maior • Informação neutra com ícone no daltonismo')
- for i,(label,large,scale,h) in enumerate([('Normal',False,1,120),('Grande',True,1.15,128),('Maior',True,1.3,128)]):
+ for i,(label,large,scale,h) in enumerate([('Normal',False,1,PLATE['height']),('Grande',True,1.15,PLATE['large_height']),('Maior',True,1.3,PLATE['large_height'])]):
   x=48+i*608;t=Canvas(large,True);t.s=scale;t.comp('plate',48,48,480,title='Íris');c.im.paste(t.im.crop((32,32,560,240)),(x,320));c.text(x,256,label,'body');c.text(x,600,f'H{h} / inset24 / nome'+('40' if not large else '48'),'body');c.text(x,672,'24 + '+('40' if not large else '48')+' + 8 + 12 + 8 + 4 + 24','detail');c.icon(x,784,'node-event',32,'text');c.text(x+48,788,'Informação','body')
  c.footer('Informação: só texto + ícone / sem barra ou contorno colorido');c.save('plate_metrics')
 

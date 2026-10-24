@@ -192,7 +192,11 @@
         "name_reserved_normal": 40,
         "name_reserved_large": 48,
         "formula_normal": "24+40+8+12+8+4+24=120",
-        "formula_large": "24+48+8+12+8+4+24=128"
+        "formula_large": "24+48+8+12+8+4+24=128",
+        "name_reserved_intermediate": 48,
+        "intermediate_font": 28,
+        "intermediate_line_height": 40,
+        "intermediate_slot_extra": 8
       },
       "applicable_states": [
         "normal",
