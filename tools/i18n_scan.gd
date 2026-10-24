@@ -104,6 +104,11 @@ static func data_texts() -> Array:
 				var value = entry[1].get(field)
 				if typeof(value) == TYPE_STRING and String(value).strip_edges() != "":
 					out.append({"text": value, "where": "%s.%s.%s" % [table, entry[0], field]})
+	# As fases (o mapa e o Próximo passo): o nome e a descrição, da tabela do código (carregada na hora: com -s, o script
+	# compila antes dos autoloads de que as regras dependem).
+	for phase in load("res://scripts/flow/journey_rules.gd").PHASES:
+		for field in ["name", "description"]:
+			out.append({"text": phase[field], "where": "phases.%s.%s" % [phase.id, field]})
 	return out
 
 

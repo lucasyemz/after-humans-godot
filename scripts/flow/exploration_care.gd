@@ -1,5 +1,5 @@
 ## Cuidados com a Mochila (port do FAHExplorationCare e do CombatUseItem da Unreal, #37): comer pouco ou bem (15% ou 35%
-## da vida, 1 ou 3 de comida da expedição), curativo do refúgio (+8) e a Ampola da Íris (a habilidade dela, de 5 a 8,
+## da vida, 1 ou 3 de comida da expedição), curativo do refúgio (+8) e a Ampola de Reparo (a habilidade do sapo, de 5 a 8,
 ## com as cargas da expedição). Fora da luta, num aliado vivo da equipe; na luta, ação livre no herói da vez, um item por
 ## vez dele (a ampola lá é habilidade). quote() diz o que acontece e por que não; use() aplica.
 class_name AHExplorationCare
@@ -137,7 +137,7 @@ static func combat_quote(campaign: Dictionary, session: AHCombatSession, kind: S
 		q.reason = "Nenhuma luta em andamento."
 		return q
 	if kind == IRIS_AMPOULE:
-		q.reason = "Na luta, a ampola é uma habilidade da Íris."
+		q.reason = "Na luta, a ampola é uma habilidade do sapo."
 		return q
 	var unit := session.current_actor()
 	if unit == null or not unit.is_player or session.processed_turn_key != session.turn_key():

@@ -1694,8 +1694,8 @@ msgid "Fique Atrás de Mim"
 msgstr "Stay Behind Me"
 
 #. abilities.2.Description
-msgid "Protege um aliado até o início do próximo turno de Bento; Bento recebe 1 Bloqueio."
-msgstr "Protects an ally until the start of Bento's next turn; Bento gains 1 Block."
+msgid "Protege um aliado até o início do próximo turno do cão; o cão recebe 1 Bloqueio."
+msgstr "Protects an ally until the start of the dog's next turn; the dog gains 1 Block."
 
 #. abilities.3.DisplayName
 msgid "Não Estamos Sós"
@@ -1962,8 +1962,8 @@ msgid "Robô Fungo"
 msgstr "Fungus Robot"
 
 #. enemies.1.Description
-msgid "Umidade e fungos cobrem este chassi de serviço. Ele continua executando rotinas de contenção; a colonização visível não explica o Eco nem prova quem o comanda."
-msgstr "Moisture and fungus cover this service chassis. It keeps running containment routines; the visible colonization does not explain the Echo or prove who commands it."
+msgid "Umidade e fungos cobrem este chassi de serviço. Ele continua executando rotinas de contenção, sem saber que ninguém mais as confere."
+msgstr "Damp and fungus cover this service chassis. It keeps running containment routines, unaware that no one checks them anymore."
 
 #. enemies.2.DisplayName
 msgid "Rastreador Quadrúpede"
@@ -2010,8 +2010,8 @@ msgid "Coletor de Sucata"
 msgstr "Scrap Collector"
 
 #. enemies.7.Description
-msgid "Compactador autônomo de seis rodas, com reservatório de resíduos industriais e braços de coleta. A guerra deixou sua identificação defeituosa: trata seres vivos como material recuperável."
-msgstr "Autonomous six-wheeled compactor with an industrial waste tank and collection arms. The war left its identification faulty: it treats living beings as salvageable material."
+msgid "Compactador autônomo de seis rodas, com reservatório de resíduos industriais e braços de coleta. Décadas sem manutenção corromperam sua identificação: trata seres vivos como material recuperável."
+msgstr "Six-wheeled autonomous compactor, with an industrial waste tank and collection arms. Decades without maintenance corrupted its identification: it treats living beings as salvageable material."
 
 #. enemies.8.DisplayName
 msgid "Relé de Defesa"
@@ -2026,8 +2026,8 @@ msgid "O Porteiro"
 msgstr "The Gatekeeper"
 
 #. enemies.9.Description
-msgid "Guardião industrial da eclusa, formado por portas blindadas, pistões e uma lente central de vigilância. Ainda executa a ordem de isolamento dada durante a guerra; na segunda fase, abandona a contenção e ativa força letal."
-msgstr "Industrial lock guardian made of armored doors, pistons and a central surveillance lens. It still carries out the isolation order given during the war; in the second phase, it abandons containment and activates lethal force."
+msgid "Guardião industrial da eclusa, formado por portas blindadas, pistões e uma lente central de vigilância. Ainda executa a ordem de contenção dada durante a Peste; na segunda fase, abandona a contenção e ativa força letal."
+msgstr "Industrial guardian of the lock, made of armored doors, pistons and a central surveillance lens. It still carries out the containment order given during the Plague; in its second phase, it drops containment and switches to lethal force."
 
 #. enemies.10.DisplayName
 msgid "Carrasco Industrial"
@@ -2288,12 +2288,12 @@ msgid "Risada Gravada"
 msgstr "Recorded Laughter"
 
 #. enemy-actions.29.DisplayName
-msgid "Golpe de Raízes (provisório)"
-msgstr "Root Strike (provisional)"
+msgid "Golpe de Raízes"
+msgstr "Root Strike"
 
 #. enemy-actions.29.Description
-msgid "Ataque básico temporário exclusivo deste protótipo para permitir teste de combate. Não faz parte do kit conceitual aprovado; armadilhas e controle posicional ainda pendentes."
-msgstr "Temporary basic attack exclusive to this prototype to allow combat testing. Not part of the approved conceptual kit; traps and positional control still pending."
+msgid "Açoita a linha de frente com raízes presas ao chassi."
+msgstr "Lashes the front line with roots caught in its chassis."
 
 #. enemy-actions.30.DisplayName
 msgid "Garra de Contenção"
@@ -2460,6 +2460,7 @@ msgid "A comunidade mantém trilhos, oficinas e cuidado com ferramentas herdadas
 msgstr "The community keeps tracks, workshops and care for inherited tools. The expedition sets out in search of supplies."
 
 #. expedition-nodes.1.Description
+#. phases.fase_1.description
 msgid "Vitrines tomadas por raízes guardam suprimentos. Os sensores ainda distinguem clientes humanos de fauna não autorizada."
 msgstr "Shopfronts overrun by roots hold supplies. The sensors can still tell human customers from unauthorized fauna."
 
@@ -2468,8 +2469,8 @@ msgid "Abrigo Lacrado"
 msgstr "Sealed Shelter"
 
 #. expedition-nodes.2.Description
-msgid "Uma placa do Programa Continuidade aponta para o subsolo. Os registros não dizem quem retornou."
-msgstr "A Continuity Program sign points underground. The records do not say who came back."
+msgid "A placa desbotada aponta para o subsolo: ZONA SANITÁRIA. Os registros falam de quarentena, não de quem saiu."
+msgstr "The faded sign points underground: SANITARY ZONE. The records speak of quarantine, not of who left."
 
 #. expedition-nodes.3.Title
 msgid "Depósito Inundado"
@@ -2481,10 +2482,12 @@ msgstr "Crates float among the rubble of an old supply network. What remains may
 
 #. expedition-nodes.4.Title
 #. scenarios.3.DisplayName
+#. phases.fase_2.name
 msgid "Ponte das Raízes"
 msgstr "Root Bridge"
 
 #. expedition-nodes.4.Description
+#. phases.fase_2.description
 msgid "A ponte ligava bairros; seus sensores agora vigiam permissões que nenhum morador da Estação possui."
 msgstr "The bridge once linked neighborhoods; its sensors now watch for permissions no resident of the Station has."
 
@@ -2506,12 +2509,13 @@ msgstr "Incomplete names cross an emergency line. An order repeats, with no veri
 
 #. expedition-nodes.7.Title
 #. scenarios.4.DisplayName
+#. phases.fase_4.name
 msgid "Laboratório Silencioso"
 msgstr "Silent Laboratory"
 
 #. expedition-nodes.7.Description
-msgid "Restam interfaces de comunicação e anotações de aprendizagem. Os aparelhos não contam sozinhos a história de seus usuários."
-msgstr "Communication interfaces and learning notes remain. The devices alone do not tell the story of their users."
+msgid "Restam bancadas, ampolas e relatórios sobre a Peste. Os papéis não contam a mesma história."
+msgstr "Benches, ampoules and reports on the Plague remain. The papers don't tell the same story."
 
 #. expedition-nodes.8.Title
 msgid "Dutos de Esgoto"
@@ -2542,8 +2546,8 @@ msgid "Eclusa Central: O Porteiro"
 msgstr "Central Lock: The Gatekeeper"
 
 #. expedition-nodes.11.Description
-msgid "O Porteiro conserva uma ordem de isolamento da guerra. Seus relés sustentam a defesa da eclusa."
-msgstr "The Gatekeeper preserves an isolation order from the war. Its relays sustain the lock's defense."
+msgid "O Porteiro guarda uma ordem de contenção da Peste que ninguém cancelou. Seus relés sustentam a defesa da eclusa."
+msgstr "The Gatekeeper keeps a Plague containment order that no one ever cancelled. Its relays hold up the lock's defense."
 
 #. perks.0.DisplayName
 msgid "Ágil"
@@ -2660,10 +2664,12 @@ msgid "+1 nos limites de dano ou cura de Recurso de Emergência."
 msgstr "+1 to the damage or healing limits of Last Resort."
 
 #. scenarios.2.DisplayName
+#. phases.fase_3.name
 msgid "Sala Esquecida"
 msgstr "Forgotten Room"
 
 #. scenarios.5.DisplayName
+#. phases.fase_5.name
 msgid "Túneis do Eco"
 msgstr "Echo Tunnels"
 
@@ -2722,6 +2728,45 @@ msgstr "A hand-crank flashlight that still lights up after a few turns. (Tool: F
 #. search-outcomes.13.Text
 msgid "Uma máscara dos Antigos com o filtro ainda lacrado no saquinho. (Ferramenta: Máscara com filtro)"
 msgstr "An Ancients' mask with the filter still sealed in its bag. (Tool: Filter Mask)"
+
+#. phases.fase_3.description
+msgid "Atrás da porta lacrada de uma Toca dos Antigos, um fichário: cães, gatos e outros bichos, medidos e numerados. Ninguém na Estação sabe por que os Antigos os estudavam."
+msgstr "Behind the sealed door of an Ancients' Den, a card file: dogs, cats and other creatures, measured and numbered. No one at the Station knows why the Ancients studied them."
+
+#. phases.fase_4.description
+msgid "Na Casa de Vidro silenciosa, dois relatórios sobre a Peste não batem: um culpa os animais portadores, o outro para no meio. As máquinas da triagem só conhecem o primeiro."
+msgstr "In the silent Glass House, two reports on the Plague don't match: one blames the carrier animals, the other stops halfway. The triage machines only know the first."
+
+#. phases.fase_5.description
+msgid "Bombas antigas mantêm a água em movimento. Na eclusa central, o Porteiro guarda uma ordem de contenção da Peste que ninguém cancelou."
+msgstr "Old pumps keep the water moving. In the central lock, the Gatekeeper keeps a Plague containment order that no one ever cancelled."
+
+#~ msgid "Protege um aliado até o início do próximo turno de Bento; Bento recebe 1 Bloqueio."
+#~ msgstr "Protects an ally until the start of Bento's next turn; Bento gains 1 Block."
+
+#~ msgid "Umidade e fungos cobrem este chassi de serviço. Ele continua executando rotinas de contenção; a colonização visível não explica o Eco nem prova quem o comanda."
+#~ msgstr "Moisture and fungus cover this service chassis. It keeps running containment routines; the visible colonization does not explain the Echo or prove who commands it."
+
+#~ msgid "Compactador autônomo de seis rodas, com reservatório de resíduos industriais e braços de coleta. A guerra deixou sua identificação defeituosa: trata seres vivos como material recuperável."
+#~ msgstr "Autonomous six-wheeled compactor with an industrial waste tank and collection arms. The war left its identification faulty: it treats living beings as salvageable material."
+
+#~ msgid "Guardião industrial da eclusa, formado por portas blindadas, pistões e uma lente central de vigilância. Ainda executa a ordem de isolamento dada durante a guerra; na segunda fase, abandona a contenção e ativa força letal."
+#~ msgstr "Industrial lock guardian made of armored doors, pistons and a central surveillance lens. It still carries out the isolation order given during the war; in the second phase, it abandons containment and activates lethal force."
+
+#~ msgid "Golpe de Raízes (provisório)"
+#~ msgstr "Root Strike (provisional)"
+
+#~ msgid "Ataque básico temporário exclusivo deste protótipo para permitir teste de combate. Não faz parte do kit conceitual aprovado; armadilhas e controle posicional ainda pendentes."
+#~ msgstr "Temporary basic attack exclusive to this prototype to allow combat testing. Not part of the approved conceptual kit; traps and positional control still pending."
+
+#~ msgid "Uma placa do Programa Continuidade aponta para o subsolo. Os registros não dizem quem retornou."
+#~ msgstr "A Continuity Program sign points underground. The records do not say who came back."
+
+#~ msgid "Restam interfaces de comunicação e anotações de aprendizagem. Os aparelhos não contam sozinhos a história de seus usuários."
+#~ msgstr "Communication interfaces and learning notes remain. The devices alone do not tell the story of their users."
+
+#~ msgid "O Porteiro conserva uma ordem de isolamento da guerra. Seus relés sustentam a defesa da eclusa."
+#~ msgstr "The Gatekeeper preserves an isolation order from the war. Its relays sustain the lock's defense."
 
 #~ msgid "A expedição e todo o progresso salvo são substituídos por uma campanha do zero, na Estação."
 #~ msgstr "The expedition and all saved progress are replaced by a fresh campaign, at the Station."
