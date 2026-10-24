@@ -1,0 +1,98 @@
+{
+  "base_commit": "83e2717",
+  "result": "PASS",
+  "assets": [
+    {
+      "file": "art/transitions/passage_title_frame.webp",
+      "size": [
+        960,
+        240
+      ],
+      "mode": "RGBA",
+      "bytes": 230,
+      "sha256": "e41e0b5bfea6022c6f987c8fd2b2f0860c69eb7164e60e2cb6d827eaed986f39"
+    },
+    {
+      "file": "art/transitions/train/tunnel_loop.webp",
+      "size": [
+        2048,
+        256
+      ],
+      "mode": "RGB",
+      "bytes": 447476,
+      "sha256": "dd65a8bcefb1d32255122b3f1292409f86cc1953dbcb9a3f22c7ab253465eb50"
+    },
+    {
+      "file": "art/transitions/train/carriage_background.webp",
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGBA",
+      "bytes": 270776,
+      "sha256": "6abc6c98c0639d2271cba8ceab1892ed88e9611f47cd66de90b991df216be130"
+    },
+    {
+      "file": "art/transitions/train/carriage_bench.webp",
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGBA",
+      "bytes": 198408,
+      "sha256": "df03ba2230d38bfd030e6e52a2b3c9a5eba8fcdea5d9dad1a499c9cc2a928046"
+    }
+  ],
+  "decoded_seam": {
+    "outer_max_delta": 0,
+    "center_max_delta": 0
+  },
+  "window_center_alpha": {
+    "1": 0,
+    "2": 0,
+    "3": 0
+  },
+  "period_seconds": 21.333333333333332,
+  "previews_max_bytes": 264212,
+  "godot_import": {
+    "engine": "4.7.2",
+    "result": "PASS",
+    "lossless_import": true,
+    "assets": [
+      {
+        "file": "res://art/transitions/passage_title_frame.webp",
+        "size": [
+          960,
+          240
+        ]
+      },
+      {
+        "file": "res://art/transitions/train/carriage_background.webp",
+        "size": [
+          1920,
+          1080
+        ],
+        "window_alpha": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "file": "res://art/transitions/train/carriage_bench.webp",
+        "size": [
+          1920,
+          1080
+        ]
+      },
+      {
+        "file": "res://art/transitions/train/tunnel_loop.webp",
+        "repeat_edge_delta": 0.0,
+        "size": [
+          2048,
+          256
+        ]
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 # Partida e cartão de passagem — #79
 
-Proposta de arte para integração pelo Claude nas #74/#75. Base `83e2717`. **QA de design: APROVADO na rodada2.** Não altera o fluxo do jogo nem o metrô3D existente.
+Proposta de arte para integração pelo Claude nas #74/#75. Base `83e2717`. **QA de design: APROVADO na rodada4.** Não altera o fluxo do jogo nem o metrô3D existente.
 
 ![Quatro fundadores sentados](departure/train_team.jpg)
 
@@ -16,14 +16,14 @@ Origem superior esquerda, coordenadas em pixels finais. [Contrato completo](depa
 
 | Arquivo | Resolução | Posição/âncora | Uso |
 |---|---|---|---|
-| `art/transitions/train/tunnel_loop.webp` | 2048×512 | canto superior em(0,128) | Primeiro, atrás de tudo; repetir horizontalmente |
+| `art/transitions/train/tunnel_loop.webp` | 2048×256 | canto superior em(0,160) | Primeiro, atrás de tudo; repetir horizontalmente |
 | `art/transitions/train/carriage_background.webp` | 1920×1080 | (0,0) | Parede/piso; três vãos com alfa0 |
 | `art/transitions/train/carriage_bench.webp` | 1920×1080 | (0,0) | Banco separado, antes das personagens; corpo visível começa em(168,600), mede1584×363 |
 | `art/transitions/passage_title_frame.webp` | 960×240 | centro(480,120), na tela(960,540) | Cartão sem texto, derivado da moldura do kit #59 |
 
-O túnel é opaco (alfa255), os outros assets têm transparência real; não adicionar transparência artificial no túnel que revelaria o vazio. O strip foi montado em ida/espelho para fechar o ciclo: primeira/última coluna e a junção central coincidem exatamente. Isso cria ritmo simétrico de alvenaria, sem salto de luminosidade na emenda. Sugestão96px/s: ciclo21,333s; em `Reduzir efeitos`, congelar o deslocamento e as luzes, sem pulsos. Usar Repeat em X, sem compressão de alfa; o fundo inteiro não se move.
+O túnel é opaco (alfa255), os outros assets têm transparência real; não adicionar transparência artificial no túnel que revelaria o vazio. O strip foi montado em ida/espelho para fechar o ciclo: primeira/última coluna e a junção central coincidem exatamente. O strip final recorta só a faixa visível e usa paleta de256 cores, codificada sem perdas, reduzindo1.321.534 para447.476 bytes (−66%). Isso cria ritmo simétrico de alvenaria, sem salto de luminosidade na emenda. Sugestão96px/s: ciclo21,333s; em `Reduzir efeitos`, congelar o deslocamento e as luzes, sem pulsos. Usar Repeat em X, sem compressão de alfa; o fundo inteiro não se move.
 
-Vãos arredondados (raio24): `(144,200)–(600,392)`, `(736,200)–(1180,392)`, `(1328,200)–(1784,392)`. O túnel ocupa y128..640 e fica totalmente atrás dos vãos. As bordas pintadas escuras são o rebaixo do vidro, não franja clara. Para telas que não sejam16:9, ajustar o conjunto com aspecto preservado e preenchimento escuro, sem esticar as personagens.
+Vãos arredondados (raio24): `(144,200)–(600,392)`, `(736,200)–(1180,392)`, `(1328,200)–(1784,392)`. O túnel ocupa y160..416 e fica totalmente atrás dos vãos. As bordas pintadas escuras são o rebaixo do vidro, não franja clara. Para telas que não sejam16:9, ajustar o conjunto com aspecto preservado e preenchimento escuro, sem esticar as personagens.
 
 ## Assentos e escala
 
@@ -67,3 +67,10 @@ A #73 ainda não entregou `docs/reference/unreal-passages.md` nesta base. Não f
 **Rodada2 — VEREDITO: APROVADO.** Mesma linguagem envelhecida do metrô e das personagens; quatro corpos completos, assentos medidos, escala física do manifesto respeitada; janelas vazadas e bancos separados, ciclo sem corte de borda; cartão sem letras com três tamanhos documentados. Conferidas prévia em cinza e redução real a40%: espécies, lugares e hierarquia continuam distintos sem depender de cor. Sem problemas altos/médios. Observação baixa: rolagem real, pular, carregamento, responsive e encaixe da equipe variável exigem integração/QA do Claude (#74/#75); composição estática não certifica runtime.
 
 Testes da base83e2717: Godot4.7.2,39/39, paridade48/48, saída0; avisos de recursos no encerramento registrados. Esta entrega só acrescenta arte e documentação; não executa o sincronizador nem altera scripts/,data/,tests/ ou ids.
+
+
+**Rodada3 — VEREDITO: REPROVADO (revisão independente do PR).** Média — túnel de1,3MB excessivo para o trecho visto pelo vidro; descrição do PR ainda apontava só o kit, embora já incluísse a #79. Correção: recorte vertical para2048×256, paleta256 sem dithering e WebP sem perdas (447.476bytes), sem alterar a faixa vista pelos vãos; título/escopo do PR atualizados para as três entregas em commits separados. A entrega de arte antes da integração é o fluxo solicitado expressamente nesta rodada e nas #79/#80; não é apresentada como arte já conectada ao jogo.
+
+**Rodada4 — VEREDITO: APROVADO.** Conferidos novamente o loop após decodificação (delta0 nas duas emendas), os três vãos de alfa0, a cobertura vertical y160..416, as dimensões e hashes em [checks.json](departure/checks.json); prévias regeneradas e abaixo de300KB. Sem problema alto/médio. Observação baixa mantida: os pés suspensos das espécies menores fazem parte da proposta de banco alto e estão visíveis para a aprovação do Lucas. Integração permanece com Claude.
+
+Validação final do lote: **39/39**, paridade48/48, saída0 em122,4s. Os15 WebPs novos foram carregados como Texture2D na Godot4.7.2: dimensões corretas, janelas alfa0 e emenda do túnel0 após a importação. Metadados de importação sem perdas e mipmaps incluídos para preservar esses invariantes. Avisos de recursos/RIDs no encerramento permanecem; nenhuma mudança no código para tratá-los.

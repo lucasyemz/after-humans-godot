@@ -37,11 +37,11 @@
     "file": "art/transitions/train/tunnel_loop.webp",
     "size": [
       2048,
-      512
+      256
     ],
     "position": [
       0,
-      128
+      160
     ],
     "repeat": "horizontal",
     "scroll_px_per_second": 96,
