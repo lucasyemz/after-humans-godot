@@ -61,12 +61,10 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 	if kind == IRIS_AMPOULE:
 		q.charges = ampoule_charges(campaign)
 	var session: Dictionary = campaign.get("session", {})
-	# No acampamento, comer e curar são da barra dele (as regras do descanso, outros números): a Mochila só mostra.
-	if session.get("expedition") != null and session.get("screen") == "rest" and session.get("result", "") == "" and session.get("event") == null:
-		q.reason = TranslationServer.translate("No acampamento, use Comer e Curativo na barra de baixo.")
-		return q
+	# No acampamento também (decisão do Lucas, #98): a Mochila e a barra dele gastam a mesma comida da expedição; cada
+	# uma com o seu efeito (a Mochila cura pela refeição, a barra pelo descanso).
 	if session.get("expedition") == null or session.get("result", "") != "" or session.get("event") != null \
-			or session.get("screen") != "corridor":
+			or not ["corridor", "rest"].has(session.get("screen")):
 		q.reason = TranslationServer.translate("Disponível fora de combate e eventos, durante a exploração.")
 		return q
 	var target = _hero(campaign, hero_id)

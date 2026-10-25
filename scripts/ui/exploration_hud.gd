@@ -762,6 +762,9 @@ func show_inventory() -> void:
 	_modal.set_meta("inventory", true)
 	_modal.position.y = 120
 	var bag := AHInventoryPanel.new()
+	# No acampamento, a Mochila abre no herói escolhido na fogueira.
+	if camp_open():
+		bag.hero_id = camp_hud.camp.selected_id()
 	bag.closed.connect(close_modal)
 	bag.used.connect(func(): refresh(Campaign.state))
 	box.add_child(bag)

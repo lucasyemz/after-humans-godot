@@ -91,9 +91,10 @@ pé. À direita, o depois.
 - **`GameFlow.fade(alpha, segundos)` é público.** O fade curto da troca de herói usa ele, em vez de mexer no retângulo
   privado do GameFlow. Um fade novo substitui o que estiver correndo, para os dois não brigarem, e avisa quem esperava
   o antigo (a troca de cena que o aguardava continua).
-- **A Mochila no acampamento só mostra.** Comer e curar continuam na barra do acampamento, que tem as regras e os
-  números do descanso, e a Mochila diz "No acampamento, use Comer e Curativo na barra de baixo.". Liberar os cuidados
-  da Mochila no acampamento seria uma regra nova, com dois jeitos de comer; fica para o Lucas decidir.
+- **A Mochila também serve no acampamento** (decisão do Lucas: "Comer deve consumir o item da mochila", e o jogador
+  pode ter mais de um lugar de onde comer). A Mochila e a barra do acampamento gastam a mesma comida da expedição, e
+  cada uma tem o seu efeito: a Mochila cura pela refeição, e a barra pelo descanso (+10% de vida e −5 de instinto). A
+  Mochila abre no herói escolhido na fogueira e, ao fechar, a barra mostra a comida que sobrou.
 - **Pontos baixos:**
   - o levantar acampamento mantém o `busy` do começo ao fim;
   - a arte do cartão sai por `AHSpriteCard.art()`, e não pelo campo privado.
@@ -106,3 +107,4 @@ pé. À direita, o depois.
   - **Rodada 2 (aprovada):** os casos da rodada 1 e um de fades aninhados, a suíte com 47 de 47. As observações baixas
     também entraram: o fade antigo avisa quem esperava só depois de o novo ser o atual, e o teste diz claramente se o
     Voltar à Estação sumir do menu.
+  - **Depois da decisão do Lucas:** a Mochila passou a funcionar no acampamento (comer e curar por ela), com teste.

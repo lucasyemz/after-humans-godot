@@ -274,14 +274,21 @@ func _menu_in_camp() -> void:
 	t.check(hud._menu_button.visible and hud._bag_button.visible, "no acampamento, o Menu e a Mochila continuam no canto")
 	await _press("inventory")
 	t.check(hud.inventory_shown(), "o I abre a Mochila no acampamento")
-	var quote: Dictionary = AHExplorationCare.quote(Campaign.state, String(Campaign.state.session.expedition.team[0]), AHExplorationCare.SMALL_MEAL)
-	t.check(not quote.available and String(quote.reason).contains("barra de baixo"), "na Mochila, o motivo aponta a barra do acampamento")
+	# Comer pela Mochila no acampamento (decisão do Lucas): gasta a mesma comida da barra, e a barra mostra o que sobrou.
+	var bag: AHInventoryPanel = hud.find_children("*", "AHInventoryPanel", true, false)[0]
+	t.equal(bag.hero_id, corridor.camp.selected_id(), "a Mochila abre no herói escolhido na fogueira")
+	var hurt = Campaign.hero(corridor.camp.selected_id())
+	hurt.hp = maxi(1, int(hurt.max_hp) / 2)
+	var food_before := AHJourneyRules.food(Campaign.state)
+	var healed := AHExplorationCare.use(Campaign.state, hurt.id, AHExplorationCare.SMALL_MEAL)
+	t.check(healed > 0 and AHJourneyRules.food(Campaign.state) == food_before - 1, "comer pela Mochila no acampamento cura e gasta 1 de comida")
 	var before: int = corridor.camp.selected
 	await _press("ui_right")
 	await _frames(3)
 	t.equal(corridor.camp.selected, before, "com a Mochila aberta, a seta não troca o herói do acampamento")
 	await _press("inventory")
 	t.check(not hud.modal_open() and hud.camp_open(), "o I fecha a Mochila e o acampamento continua")
+	t.check(hud.camp_hud.eat_button.text.contains(str(AHJourneyRules.food(Campaign.state))), "e a barra do acampamento mostra a comida que sobrou")
 	await _press("menu")
 	t.check(hud.menu_shown(), "o Esc abre o menu no acampamento")
 	await _press("menu")

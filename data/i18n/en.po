@@ -81,7 +81,7 @@ msgid " · em expedição"
 msgstr " · on an expedition"
 
 #: scripts/ui/title_screen.gd:279
-#: scripts/ui/exploration_hud.gd:832
+#: scripts/ui/exploration_hud.gd:835
 msgid "Começar uma campanha nova?"
 msgstr "Start a new campaign?"
 
@@ -94,13 +94,13 @@ msgid "O save do espaço %d não pôde ser aberto. Uma campanha nova grava por c
 msgstr "The save in slot %d could not be opened. A new campaign writes over it, and it won't come back."
 
 #: scripts/ui/title_screen.gd:287
-#: scripts/ui/exploration_hud.gd:837
+#: scripts/ui/exploration_hud.gd:840
 #: scripts/ui/refuge_hud.gd:1139
 msgid "Cancelar"
 msgstr "Cancel"
 
 #: scripts/ui/title_screen.gd:289
-#: scripts/ui/exploration_hud.gd:839
+#: scripts/ui/exploration_hud.gd:842
 #: scripts/ui/refuge_hud.gd:1140
 msgid "Começar do zero"
 msgstr "Start from scratch"
@@ -479,8 +479,8 @@ msgstr "Guardian"
 
 #: scripts/ui/exploration_hud.gd:24
 #: scripts/ui/exploration_hud.gd:295
-#: scripts/ui/exploration_hud.gd:881
-#: scripts/ui/exploration_hud.gd:883
+#: scripts/ui/exploration_hud.gd:884
+#: scripts/ui/exploration_hud.gd:886
 msgid "Rua das Vitrines"
 msgstr "Shopfront Street"
 
@@ -633,92 +633,92 @@ msgstr "Back to the Station (retreat: half of what was found)"
 msgid "Termine a luta ou o evento antes de voltar."
 msgstr "Finish the fight or the event before going back."
 
-#: scripts/ui/exploration_hud.gd:791
+#: scripts/ui/exploration_hud.gd:794
 msgid "Comida %d/%d · Curativos %d · Achado: %d sementes, %d sucata, %d fragmentos"
 msgstr "Food %d/%d · Bandages %d · Found: %d seeds, %d scrap, %d fragments"
 
-#: scripts/ui/exploration_hud.gd:833
+#: scripts/ui/exploration_hud.gd:836
 msgid "A expedição e todo o progresso salvo no espaço %d são substituídos por uma campanha do zero, na Estação. Os outros espaços ficam como estão."
 msgstr "The expedition and all progress saved in slot %d are replaced by a fresh campaign, at the Station. The other slots stay as they are."
 
-#: scripts/ui/exploration_hud.gd:862
+#: scripts/ui/exploration_hud.gd:865
 msgid "Abandonar a expedição?"
 msgstr "Abandon the expedition?"
 
-#: scripts/ui/exploration_hud.gd:863
+#: scripts/ui/exploration_hud.gd:866
 msgid "A equipe volta pelo trem sem enfrentar o guardião: só metade do achado chega à Estação."
 msgstr "The team takes the train back without facing the guardian: only half of what was found reaches the Station."
 
-#: scripts/ui/exploration_hud.gd:867
+#: scripts/ui/exploration_hud.gd:870
 msgid "Continuar a expedição"
 msgstr "Continue the expedition"
 
-#: scripts/ui/exploration_hud.gd:869
+#: scripts/ui/exploration_hud.gd:872
 #: scripts/ui/phase_map.gd:47
 #: scripts/street/street_corridor.gd:1119
 msgid "Voltar à Estação"
 msgstr "Back to the Station"
 
-#: scripts/ui/exploration_hud.gd:880
+#: scripts/ui/exploration_hud.gd:883
 #: scripts/ui/combat_hud.gd:1590
 #: scripts/ui/refuge_hud.gd:15
 msgid "Vitória"
 msgstr "Victory"
 
-#: scripts/ui/exploration_hud.gd:880
+#: scripts/ui/exploration_hud.gd:883
 #: scripts/ui/refuge_hud.gd:15
 msgid "Retirada"
 msgstr "Retreat"
 
-#: scripts/ui/exploration_hud.gd:880
+#: scripts/ui/exploration_hud.gd:883
 #: scripts/ui/combat_hud.gd:1590
 #: scripts/ui/refuge_hud.gd:15
 msgid "Fuga"
 msgstr "Escape"
 
-#: scripts/ui/exploration_hud.gd:880
+#: scripts/ui/exploration_hud.gd:883
 #: scripts/ui/combat_hud.gd:1590
 #: scripts/ui/refuge_hud.gd:15
 msgid "Derrota"
 msgstr "Defeat"
 
-#: scripts/ui/exploration_hud.gd:881
+#: scripts/ui/exploration_hud.gd:884
 msgid "A Rua das Vitrines está liberada."
 msgstr "Shopfront Street is clear."
 
-#: scripts/ui/exploration_hud.gd:881
+#: scripts/ui/exploration_hud.gd:884
 msgid "%s: o guardião caiu."
 msgstr "%s: the guardian fell."
 
-#: scripts/ui/exploration_hud.gd:881
+#: scripts/ui/exploration_hud.gd:884
 msgid " Todo o achado chega à Estação."
 msgstr " Everything found reaches the Station."
 
-#: scripts/ui/exploration_hud.gd:882
+#: scripts/ui/exploration_hud.gd:885
 msgid "A equipe volta antes do guardião: metade do achado chega à Estação."
 msgstr "The team turns back before the guardian: half of what was found reaches the Station."
 
-#: scripts/ui/exploration_hud.gd:883
+#: scripts/ui/exploration_hud.gd:886
 msgid "Na fuga, a equipe larga o que carregava."
 msgstr "Fleeing, the team drops what it was carrying."
 
-#: scripts/ui/exploration_hud.gd:883
+#: scripts/ui/exploration_hud.gd:886
 msgid "A equipe caiu %s. O achado ficou para trás."
 msgstr "The team fell %s. What was found stayed behind."
 
-#: scripts/ui/exploration_hud.gd:883
+#: scripts/ui/exploration_hud.gd:886
 msgid "na rua"
 msgstr "in the street"
 
-#: scripts/ui/exploration_hud.gd:883
+#: scripts/ui/exploration_hud.gd:886
 msgid "no caminho"
 msgstr "along the way"
 
-#: scripts/ui/exploration_hud.gd:889
+#: scripts/ui/exploration_hud.gd:892
 msgid "Chegou à Estação: %d sementes · %d sucata · %d fragmentos"
 msgstr "Reached the Station: %d seeds · %d scrap · %d fragments"
 
-#: scripts/ui/exploration_hud.gd:892
+#: scripts/ui/exploration_hud.gd:895
 msgid "Heróis vivos: %d · No memorial: %d"
 msgstr "Heroes alive: %d · In the memorial: %d"
 
@@ -3103,65 +3103,61 @@ msgstr " Under the workbench, a crowbar. (Tool: Crowbar)"
 msgid "Suprimentos recolhidos · +1 alimento e +1 semente"
 msgstr "Supplies gathered · +1 food and +1 seed"
 
-#: scripts/flow/exploration_care.gd:66
-msgid "No acampamento, use Comer e Curativo na barra de baixo."
-msgstr "At camp, use Eat and Bandage on the bar below."
-
-#: scripts/flow/exploration_care.gd:70
+#: scripts/flow/exploration_care.gd:68
 msgid "Disponível fora de combate e eventos, durante a exploração."
 msgstr "Available outside combat and events, while exploring."
 
-#: scripts/flow/exploration_care.gd:74
+#: scripts/flow/exploration_care.gd:72
 msgid "Selecione um aliado vivo da expedição."
 msgstr "Select a living ally from the expedition."
 
-#: scripts/flow/exploration_care.gd:77
+#: scripts/flow/exploration_care.gd:75
 msgid "O aliado já está com a vida cheia."
 msgstr "The ally is already at full health."
 
-#: scripts/flow/exploration_care.gd:85
-#: scripts/flow/exploration_care.gd:164
+#: scripts/flow/exploration_care.gd:83
+#: scripts/flow/exploration_care.gd:162
 msgid "Sem curativos no estoque."
 msgstr "No bandages in stock."
 
-#: scripts/flow/exploration_care.gd:90
+#: scripts/flow/exploration_care.gd:88
 msgid "Um sapo vivo precisa estar na equipe."
 msgstr "A living frog must be on the team."
 
-#: scripts/flow/exploration_care.gd:94
+#: scripts/flow/exploration_care.gd:92
 msgid "A ampola trata somente aliados orgânicos."
 msgstr "The vial only treats organic allies."
 
-#: scripts/flow/exploration_care.gd:100
+#: scripts/flow/exploration_care.gd:98
 msgid "Sem cargas. A ampola recarrega após uma vitória."
 msgstr "No charges. The ampoule recharges after a victory."
 
-#: scripts/flow/exploration_care.gd:106
-#: scripts/flow/exploration_care.gd:170
+#: scripts/flow/exploration_care.gd:104
+#: scripts/flow/exploration_care.gd:168
 msgid "Comida insuficiente."
 msgstr "Not enough food."
 
-#: scripts/flow/exploration_care.gd:141
+#: scripts/flow/exploration_care.gd:139
 msgid "Nenhuma luta em andamento."
 msgstr "No fight in progress."
 
-#: scripts/flow/exploration_care.gd:144
+#: scripts/flow/exploration_care.gd:142
 msgid "Na luta, a ampola é uma habilidade do sapo."
 msgstr "In battle, the ampoule is the frog's ability."
 
-#: scripts/flow/exploration_care.gd:148
+#: scripts/flow/exploration_care.gd:146
 msgid "Espere a vez de um aliado."
 msgstr "Wait for an ally's turn."
 
-#: scripts/flow/exploration_care.gd:151
+#: scripts/flow/exploration_care.gd:149
 msgid "%s já usou um item nesta vez."
 msgstr "%s already used an item this turn."
 
-#: scripts/flow/exploration_care.gd:154
+#: scripts/flow/exploration_care.gd:152
 msgid "No Limiar da Morte, só uma habilidade de cura salva."
 msgstr "At Death's Door, only a healing ability saves."
 
-#: scripts/flow/exploration_care.gd:157
+#: scripts/flow/exploration_care.gd:155
 msgid "%s está com a vida cheia."
 msgstr "%s is at full health."
 
@@ -5557,6 +5553,9 @@ msgstr "Leave the room closed"
 #. events.busca_sala_esporos.deixar_sala.Success
 msgid "Nenhum remédio vale respirar aquilo. A equipe passa longe do vidro."
 msgstr "No medicine is worth breathing that. The team keeps well away from the glass."
+
+#~ msgid "No acampamento, use Comer e Curativo na barra de baixo."
+#~ msgstr "At camp, use Eat and Bandage on the bar below."
 
 #~ msgid "A porta fechada e a fogueira acesa. Comer: +10%% de vida e -5 de instinto (comida %d). Curativo: +8 de vida (curativos %d)."
 #~ msgstr "The door is shut and the fire is lit. Eat: +10%% health and -5 instinct (food %d). Bandage: +8 health (bandages %d)."
