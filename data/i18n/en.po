@@ -5567,3 +5567,92 @@ msgstr "No medicine is worth breathing that. The team keeps well away from the g
 
 #~ msgid "Faltam %d %s"
 #~ msgstr "%d %s missing"
+
+#: scripts/ui/character_sheet.gd:16
+msgid "Com 0 de vida, ainda de pé: o próximo golpe tem 50% de chance de derrubar de vez."
+msgstr "At 0 health, still standing: the next blow has a 50% chance to bring them down for good."
+
+#: scripts/ui/character_sheet.gd:17
+msgid "Começa cada jornada com 10 de instinto; trata-se no Alojamento."
+msgstr "Starts every journey with 10 instinct; treated in the Quarters."
+
+#: scripts/ui/character_sheet.gd:58
+msgid "Laço com %s"
+msgstr "Bond with %s"
+
+#: scripts/ui/character_sheet.gd:59
+msgid "Amizade %+d · em +3, quando um cai, o outro ergue a guarda (+1 bloqueio)"
+msgstr "Friendship %+d · at +3, when one falls, the other raises their guard (+1 block)"
+
+#: scripts/ui/character_sheet.gd:60
+msgid "Rivalidade %+d · em −3, a falha de um abala o outro (+5 de instinto)"
+msgstr "Rivalry %+d · at −3, one's failure shakes the other (+5 instinct)"
+
+#: scripts/ui/character_sheet.gd:64
+msgid "Máquina"
+msgstr "Machine"
+
+#: scripts/ui/character_sheet.gd:64
+msgid "Criatura"
+msgstr "Creature"
+
+#: scripts/ui/character_sheet.gd:66
+msgid "guardião do trecho"
+msgstr "guardian of the stretch"
+
+#: scripts/ui/character_sheet.gd:72
+msgid "Resiste a dano por turno"
+msgstr "Resists damage over time"
+
+#: scripts/ui/character_sheet.gd:72
+msgid "%d%% de chance de não sangrar nem contaminar"
+msgstr "%d%% chance to avoid bleeding and contamination"
+
+#: scripts/ui/character_sheet.gd:74
+msgid "Resiste a deslocamento"
+msgstr "Resists displacement"
+
+#: scripts/ui/character_sheet.gd:74
+msgid "%d%% de chance de não ser empurrado nem puxado"
+msgstr "%d%% chance to avoid being pushed or pulled"
+
+#: scripts/ui/character_sheet.gd:118
+msgid "Relíquia: %s"
+msgstr "Relic: %s"
+
+#: scripts/ui/character_sheet.gd:248
+msgid "Velocidade %d · quem é mais rápido age antes na rodada"
+msgstr "Speed %d · the faster act earlier in the round"
+
+#: scripts/ui/character_sheet.gd:249
+msgid "Efeitos passivos"
+msgstr "Passive effects"
+
+#: scripts/ui/character_sheet.gd:249
+msgid "Nenhum"
+msgstr "None"
+
+#: scripts/ui/character_sheet.gd:250
+msgid "Estados"
+msgstr "Conditions"
+
+#: scripts/ui/character_sheet.gd:250
+msgid "Nenhum agora"
+msgstr "None right now"
+
+#: scripts/ui/options_panel.gd:18
+msgid "Luta: examinar"
+msgstr "Combat: examine"
+
+#: scripts/ui/combat_hud.gd:730
+msgid "Examinar: %s/%s passa de um personagem para outro; %s ou %s fecha."
+msgstr "Examine: %s/%s moves between characters; %s or %s closes."
+
+#~ msgid "Amizade %+d"
+#~ msgstr "Friendship %+d"
+
+#~ msgid "Rivalidade %+d"
+#~ msgstr "Rivalry %+d"
+
+#~ msgid "Treino"
+#~ msgstr "Training"

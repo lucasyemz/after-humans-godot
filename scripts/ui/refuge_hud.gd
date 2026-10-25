@@ -35,6 +35,8 @@ var _rest_tag: PanelContainer
 var _after_arrival := false
 ## A caixa do briefing ou do debriefing aberta (#88), ou null.
 var briefing: AHBriefingDialog
+## A ficha do herói ao apontar um cartão da Preparação (#89).
+var sheet: AHCharacterSheet
 ## Até quando (relógio, ms) o relatório recém-aberto pela chegada ignora pular e voltar.
 var _report_guard_ms := 0
 ## Pular apertado na chegada (também antes de ela começar, com o cartão da passagem ainda saindo).
@@ -87,6 +89,8 @@ var _map: AHPhaseMap
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sheet = AHCharacterSheet.new()
+	add_child.call_deferred(sheet)
 	# A faixa escura do alto (como a barra da Unreal): o título e os recursos leem em cima de um cômodo claro.
 	var shade := TextureRect.new()
 	var fade := Gradient.new()
@@ -889,6 +893,8 @@ func _sound_open() -> void:
 
 
 func close_panel() -> void:
+	if sheet != null:
+		sheet.close()
 	# A chegada termina no relatório, nunca no meio: fechar não vale (a fila e os cômodos ficariam pela metade).
 	if current == ARRIVAL:
 		return
@@ -1426,6 +1432,8 @@ func _prep_drawer(c: Dictionary) -> void:
 		_tags.add_sibling(_prep)
 	_prep.visible = true
 	_fit_prep.call_deferred()
+	# Os cartões são refeitos: a ficha do cartão de antes fecha (o mouse ou o foco a abrem de novo).
+	sheet.close()
 	for child in _prep.get_children():
 		_prep.remove_child(child)
 		child.queue_free()
@@ -1479,6 +1487,7 @@ func _prep_drawer(c: Dictionary) -> void:
 			if not S.can_deploy(entry):
 				button.text += tr(" · sem arte de combate")
 			button.pressed.connect(func(): _prep_bench(id))
+			sheet.attach(button, func(): return AHCharacterSheet.from_hero(S.hero(Campaign.state, id)))
 			bench_row.add_child(button)
 		# Equipe menor (#6): o escolhido fica na Estação e a vaga fica vazia (os de trás andam para a frente).
 		if can_leave:
@@ -1616,6 +1625,8 @@ func _prep_slot(c: Dictionary, rank: int) -> Button:
 	if entry == null:
 		box.add_child(U.label(tr("Posição vazia"), 20, U.MUTED))
 		return button
+	# A ficha ao apontar o cartão (#89): os traços, a relíquia e a velocidade, que o cartão não mostra.
+	sheet.attach(button, func(): return AHCharacterSheet.from_hero(S.hero(Campaign.state, hero_id)))
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 10)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
