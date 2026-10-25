@@ -1,6 +1,6 @@
 """Recorta as folhas de ícones geradas (fundo magenta #FF00FF) em WebP com alfa limpo.
 
-Uso: python3 docs/design/hud-station/cut_icons.py <folha_dos_tracos.png> <folha_dos_glifos.png>
+Uso: python3 docs/design/hud-station/cut_icons.py <folha_dos_tracos.png> <folha_dos_glifos.png> [<segunda_folha_de_glifos.png>]
 As folhas brutas ficam fora do Git. Os traços são pintados (cor própria); os glifos saem brancos, de um tom só, para o
 jogo tingir. Sem numpy: só Pillow.
 """
@@ -15,6 +15,10 @@ TRAITS = ["agile", "brave", "hopeful", "loyal", "sluggish", "anxious", "gloomy",
 GLYPHS = ["guardian_defeated", "place_unlocked", "objective_done", "objective_failed", "bed", "station",
           "state_active", "state_light_wound", "state_wounded", "expeditions", "kills", "relic_empty",
           "train", "nav_overview", "nav_facilities", "nav_characters", "nav_research", "nav_hide"]
+# Segunda folha (as outras telas da Estação e as Opções).
+GLYPHS2 = ["room_quarters", "room_canteen", "room_bar", "room_forge", "room_depot", "room_research",
+           "train_arrival", "sleep", "watch", "plan", "next_step", "route",
+           "opt_sound", "opt_graphics", "opt_controls", "opt_language", "alert", "recruit"]
 
 
 def unmix(src: Image.Image) -> Image.Image:
@@ -78,7 +82,25 @@ def clean(im: Image.Image) -> Image.Image:
     return rgb
 
 
-def main(traits_sheet: str, glyph_sheet: str) -> None:
+# Glifos cujo traço na folha veio preto (o pontilhado da rota): usam a silhueta inteira, sem separar o branco do preto.
+SILHOUETTE = {"route"}
+
+
+def glyphs(sheet_path: str, names: list) -> None:
+    sheet = Image.open(sheet_path)
+    for name, cell in zip(names, cells(sheet, 6, 3)):
+        mixed = unmix(cell)
+        lum = mixed.convert("L")
+        if name in SILHOUETTE:
+            alpha = mixed.getchannel("A")
+        else:
+            alpha = ImageChops.multiply(mixed.getchannel("A"), lum.point(lambda v: min(255, max(0, (v - 70) * 255 // 150))))
+        white = Image.new("RGBA", mixed.size, (255, 255, 255, 0))
+        white.putalpha(alpha)
+        clean(fit(white, 64, 0.06)).save(OUT / f"{name}.webp", lossless=True, method=6)
+
+
+def main(traits_sheet: str, glyph_sheet: str, glyph_sheet2: str = "") -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     sheet = Image.open(traits_sheet)
     for name, cell in zip(TRAITS, cells(sheet, 4, 2)):
@@ -103,8 +125,10 @@ def main(traits_sheet: str, glyph_sheet: str) -> None:
         white.putalpha(alpha)
         icon = fit(white, 64, 0.06)
         clean(icon).save(OUT / f"{name}.webp", lossless=True, method=6)
-    print("ícones:", len(TRAITS) + len(GLYPHS))
+    if glyph_sheet2:
+        glyphs(glyph_sheet2, GLYPHS2)
+    print("ícones:", len(TRAITS) + len(GLYPHS) + (len(GLYPHS2) if glyph_sheet2 else 0))
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    main(*sys.argv[1:4])
