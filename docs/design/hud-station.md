@@ -7,6 +7,23 @@ As duas telas da Estação no idioma do kit da luta, o mais perto possível dos 
 As peças reaproveitam `art/ui/kit/combat/`, e as novas estão em `art/ui/kit/station/`. As telas foram montadas sobre
 capturas reais do jogo, só para comparação e aprovação; nenhuma maquete entra no jogo. A integração é da #60 (Claude).
 
+## Decisões do Lucas (25/10/2026)
+
+Aprovado e integrado na `main` com o kit da luta (#97).
+
+- **Estados:**
+  - Em forma: acima de 75% da vida;
+  - Ferimento leve: de 50% a 75%;
+  - Ferimento grave: abaixo de 50%.
+- **Instinto em ferrugem.** O XP continua violeta.
+- **Teclas novas, só nas telas da Estação:** V/LB para VER DETALHES e G/X para PREPARAR EXPEDIÇÃO.
+- **A linha acima do nome:** "Fundador" nos quatro fundadores e "Recruta" nos recrutas, no lugar de "Sobrevivente da
+  Estação".
+- **Para a integração (#60), da revisão do PR #104:**
+  - os ícones de recurso do relatório pintados, como os traços;
+  - na Sala, o fundo do próprio cômodo atrás do herói (sem o trem);
+  - no relatório, a fila alinhada às cartas, sem cortar nenhum herói.
+
 ## As telas
 
 | Tela | Normal | Maior (130%) | Daltonismo | Maior + daltonismo |

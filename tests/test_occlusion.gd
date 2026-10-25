@@ -92,7 +92,8 @@ func _fade() -> void:
 	occlusion.track(card)
 	t.check(card.has_silhouette(), "a equipe ganha a silhueta")
 	await _until(func(): return crate.transparency >= AHOcclusion.FADED - 0.001, 30.0)
-	t.check(is_equal_approx(crate.transparency, AHOcclusion.FADED), "o caixote na frente esmaece (%.2f)" % crate.transparency)
+	# A mesma tolerância da espera: o fade animado pode parar a menos de 0,001 do alvo.
+	t.check(absf(crate.transparency - AHOcclusion.FADED) <= 0.001, "o caixote na frente esmaece (%.3f)" % crate.transparency)
 	t.equal(far.transparency, 0.0, "o de longe fica inteiro")
 	t.check(occlusion.faded() == [crate], "faded() diz qual")
 	card.position.x = -4.0
