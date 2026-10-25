@@ -1,5 +1,65 @@
 # Direção de arte da interface: personalidade
 
+## Alvo aprovado da luta (25/10/2026)
+
+O Lucas refez por cima a versão C do Codex e aprovou o resultado como **o alvo da HUD da luta**:
+
+- **O alvo:** [reference/hud-target-2026-10-25.webp](reference/hud-target-2026-10-25.webp).
+- **A versão do Codex que serviu de base:** [reference/hud-codex-c-2026-10-25.jpg](reference/hud-codex-c-2026-10-25.jpg),
+  igual a `docs/design/hud-c/target.webp` no `codex-design`.
+
+Onde este alvo e o resto da página discordam, **vale o alvo**: metal escuro e cantos chanfrados com detalhe âmbar, em
+vez de latão ornamentado; letra condensada, em vez da serifada. As raízes e a luz ciano continuam, mas com moderação.
+
+### O que muda da versão C para o alvo
+
+| Peça | Versão C (Codex) | Alvo (Lucas) |
+|---|---|---|
+| **Material** | Latão com pontas enroladas, estilo steampunk ornamentado | Aço escuro (grafite) arranhado, com bisel fino, cantos **chanfrados** e **um detalhe âmbar** em dois cantos opostos de cada peça |
+| **Letra** | Serifada em versalete (Cinzel) | **Sem serifa condensada, em caixa alta,** branco-creme (por exemplo, Barlow Condensed SemiBold ou Oswald, ambas OFL) |
+| **Ordem da rodada** | Plaqueta solta e silhuetas redondas escuras, difíceis de ler | Uma faixa só: a plaqueta "RODADA 1", uma linha com um ponto e **retratos quadrados coloridos** (fundo avermelhado nos inimigos). O da vez tem a borda âmbar |
+| **Barras sob os personagens** | Cilindros de latão, inimigos em marrom e o número da posição em cima | Barra chanfrada curta com o número dentro: **ciano nos heróis, vermelho nos inimigos**. Sem o número da posição |
+| **Quem age** | Nada no chão | **Anel âmbar com setas no chão**, sob o herói da vez, e cantos âmbar na barra dele |
+| **Nome do alvo** | Plaqueta ornamentada | Plaqueta escura pequena, com a barra vermelha fina embaixo |
+| **Herói da vez** (embaixo, à esquerda) | Retrato redondo pequeno e peças soltas | **Um painel só:** retrato **quadrado grande e colorido** (cerca de 200 px), o nome, a barra de vida ciano e a barra de instinto escura, encaixados |
+| **Habilidades** (embaixo, no meio) | Ícones apagados, número em círculo embaixo, "Escolha um alvo" longe, à direita | Uma aba pequena "ESCOLHA UM ALVO" em cima. A barra com o ícone, o nome e o alcance ("4-6") numa divisão à direita. Embaixo, **4 quadrados grandes (cerca de 130 px) com ícones vivos.** A selecionada tem moldura âmbar, e o número fica numa aba no canto inferior direito |
+| **Ações** (embaixo, à direita) | Losangos soltos | **Grade 2x2 de botões quadrados chanfrados:** ícone branco de linha, a tecla numa aba no canto e o detalhe âmbar |
+| **Registro** | Plaqueta de latão | A mesma peça chanfrada escura, com a tecla L numa aba |
+
+### Medidas de referência (tela de 1920 x 1080, medidas do alvo)
+
+- **Registro:** x 46–316, y 34–92.
+- **Faixa da rodada:** x 637–1355, y 30–94. Retratos de cerca de 63 px.
+- **Barras sob os personagens:** cerca de 200 x 40 px, com o topo em y ≈ 763.
+- **Painel do herói da vez:** x 63–626, y 836–1045. Retrato de cerca de 207 px.
+- **Habilidades:**
+  - a aba do alvo em y ≈ 822;
+  - a barra do nome em x 685–1303, y 852–901;
+  - os quadrados de cerca de 132 px, em y 913–1039.
+- **Ações:** grade em x 1584–1848, y 847–1047. Botões de cerca de 120 px.
+
+### Cores de referência
+
+| Uso | Cor |
+|---|---|
+| Painel | Grafite `#1b1d20` a `#25282c`, com textura de metal arranhado |
+| Bisel | `#3a3e44` |
+| Detalhe e foco | Âmbar `#f0a020` |
+| Vida dos heróis | Ciano `#2fb6bd`, com a borda clara |
+| Vida dos inimigos | Vermelho `#d23a2e` |
+| Texto | Creme `#efe6d6` |
+
+### Cuidados
+
+- No alvo, a quarta ação (F) tem uma mira, mas **F é Fugir:** usar o ícone de saída da versão C.
+- **Continua valendo:**
+  - o texto Maior;
+  - o daltonismo (a vida dos heróis e a dos inimigos se diferem também pela forma: a aba do herói e o recorte do
+    inimigo);
+  - o teclado, o controle e o toque.
+- **O mesmo idioma vale para as outras telas** (Preparação, fim de luta, ficha, Estação): a mesma chapa chanfrada, o
+  mesmo âmbar e a mesma letra.
+
 Pedido do Lucas (25/10/2026), depois da primeira versão das telas do laço (#96, `docs/design/loop-screens/overview.webp`
 no `codex-design`): "muito básico, com cara de feito por IA; quero personalidade". As referências (packs de UI de
 fantasia sombria, ícones em losango, runas brilhantes, barras de HUD pintadas, molduras de carta) foram mandadas pelo
