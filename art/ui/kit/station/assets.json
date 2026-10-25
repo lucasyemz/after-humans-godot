@@ -1,0 +1,1065 @@
+{
+  "revision": "station_2026_10_25",
+  "direction": "Alvos aprovados da Estação (25/10/2026), no idioma do kit da luta",
+  "source_references": {
+    "report": "docs/design/reference/hud-target-report-2026-10-25.webp",
+    "characters": "docs/design/reference/hud-target-characters-2026-10-25.webp"
+  },
+  "canvas": [
+    1920,
+    1080
+  ],
+  "material": "art/ui/kit/combat/steel_material.webp",
+  "reuses_combat_kit": [
+    "square_portrait",
+    "key_tab",
+    "main_bar",
+    "selected_slot",
+    "steel_material"
+  ],
+  "axis_stretch": "TILE_FIT nas peças grandes (report_band, panel_large); STRETCH nas pequenas",
+  "assets": {
+    "report_band": {
+      "file": "art/ui/kit/station/report_band.webp",
+      "size": [
+        480,
+        216
+      ],
+      "nine_slice_ltrb": [
+        40,
+        40,
+        40,
+        40
+      ],
+      "content_xywh": [
+        20,
+        18,
+        440,
+        180
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Faixa do alto, de ponta a ponta (1848 em 1920). Centro em TILE_FIT. Divisões: band_divider por cima.",
+      "sha256": "bb572c471d3c705757a01937867e387a82014e812f5787f5939d752ee57a0252"
+    },
+    "band_divider": {
+      "file": "art/ui/kit/station/band_divider.webp",
+      "size": [
+        12,
+        176
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        6,
+        0
+      ],
+      "note": "Divisão vertical da faixa; esticar só na altura (176 = faixa 216 - 2x20).",
+      "sha256": "b08e8af067d5f18a3f74a4eb82025b92c36a73532bc1e07a6ad261d415a2ea53"
+    },
+    "result_chip": {
+      "file": "art/ui/kit/station/result_chip.webp",
+      "size": [
+        232,
+        88
+      ],
+      "nine_slice_ltrb": [
+        18,
+        18,
+        18,
+        18
+      ],
+      "content_xywh": [
+        12,
+        10,
+        208,
+        68
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Chip de resultado: ícone 44 à esquerda (x 16) e duas linhas. Objetivo não cumprido: ícone e texto na cor de perigo.",
+      "sha256": "ed5965ecae65f453a3a5b397d839607c24bff5935cde7f360557a93b0347e1a7"
+    },
+    "resource_tile": {
+      "file": "art/ui/kit/station/resource_tile.webp",
+      "size": [
+        112,
+        96
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        8,
+        8,
+        96,
+        80
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Quadrado de recurso recuperado: ícone 56 no meio; número âmbar e nome embaixo, fora da peça.",
+      "sha256": "2effb72eac549c61afc8447c26754c36d8d37d9b3151fbb6e47ebf1363767931"
+    },
+    "hero_card": {
+      "file": "art/ui/kit/station/hero_card.webp",
+      "size": [
+        380,
+        256
+      ],
+      "nine_slice_ltrb": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "content_xywh": [
+        20,
+        18,
+        340,
+        220
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Carta do herói na plataforma. Retrato 92 em square_portrait (kit da luta).",
+      "sha256": "a3108ebf0bd43fcea3a1068fc660d2c25cdb7f8b25b4db4f9c153a41c70d1409"
+    },
+    "card_tab": {
+      "file": "art/ui/kit/station/card_tab.webp",
+      "size": [
+        244,
+        40
+      ],
+      "nine_slice_ltrb": [
+        16,
+        12,
+        16,
+        12
+      ],
+      "content_xywh": [
+        12,
+        6,
+        220,
+        28
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Aba no alto da carta (Melhoria · N frag.): ícone 22 âmbar e texto 22. Encosta no topo da carta (sobrepõe 6 px).",
+      "sha256": "c4bb3dd497506c4729df5e73d66255b91f29e6bb8da20bbd6fabaf0d2ba6c90f"
+    },
+    "status_pill": {
+      "file": "art/ui/kit/station/status_pill.webp",
+      "size": [
+        176,
+        34
+      ],
+      "nine_slice_ltrb": [
+        12,
+        10,
+        12,
+        10
+      ],
+      "content_xywh": [
+        36,
+        4,
+        132,
+        26
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Pílula de estado clara; o jogo tinge com modulate (cores em hud-station.md). Ícone 22 em x 10.",
+      "sha256": "bab9242065f744c30a8a1b210c59681fc09a8838b2f036f135f45b92b5273fc5",
+      "tint": {
+        "active": "#56b468",
+        "light_wound": "#f0a020",
+        "wounded": "#d23a2e",
+        "colorblind": {
+          "active": "#56b4e9",
+          "light_wound": "#f0e442",
+          "wounded": "#d55e00"
+        }
+      }
+    },
+    "bar_fill": {
+      "file": "art/ui/kit/station/bar_fill.webp",
+      "size": [
+        64,
+        16
+      ],
+      "nine_slice_ltrb": [
+        6,
+        4,
+        6,
+        4
+      ],
+      "content_xywh": [
+        0,
+        0,
+        64,
+        16
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Preenchimento de barra (vida, instinto, XP), tingido pelo jogo; o miolo de main_bar (kit da luta) é a calha.",
+      "sha256": "0dea37823d485f163fd32e0bbf43634b148df2fd077ca5a1ee56239a727263e6"
+    },
+    "primary_button": {
+      "file": "art/ui/kit/station/primary_button.webp",
+      "size": [
+        480,
+        72
+      ],
+      "nine_slice_ltrb": [
+        40,
+        22,
+        40,
+        22
+      ],
+      "content_xywh": [
+        36,
+        10,
+        408,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão principal âmbar (ENTRAR NO ABRIGO, PREPARAR EXPEDIÇÃO): ícone 36 escuro, texto escuro #1a1206, a tecla em button_key à direita. Pressionado desloca o desenho 2 px; o alvo de toque não muda.",
+      "sha256": "86b9a316ce68097a78c3f425d4d5108f31be7f9fedf6643b733fba4eddd23e18"
+    },
+    "primary_button_focus": {
+      "file": "art/ui/kit/station/primary_button_focus.webp",
+      "size": [
+        480,
+        72
+      ],
+      "nine_slice_ltrb": [
+        40,
+        22,
+        40,
+        22
+      ],
+      "content_xywh": [
+        36,
+        10,
+        408,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão principal âmbar (ENTRAR NO ABRIGO, PREPARAR EXPEDIÇÃO): ícone 36 escuro, texto escuro #1a1206, a tecla em button_key à direita. Pressionado desloca o desenho 2 px; o alvo de toque não muda.",
+      "sha256": "7db3fd6de4516ad9c23ffd4a5b6a6404a5f9c2fd93014bc53a318651962a2f1a"
+    },
+    "primary_button_pressed": {
+      "file": "art/ui/kit/station/primary_button_pressed.webp",
+      "size": [
+        480,
+        72
+      ],
+      "nine_slice_ltrb": [
+        40,
+        22,
+        40,
+        22
+      ],
+      "content_xywh": [
+        36,
+        10,
+        408,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão principal âmbar (ENTRAR NO ABRIGO, PREPARAR EXPEDIÇÃO): ícone 36 escuro, texto escuro #1a1206, a tecla em button_key à direita. Pressionado desloca o desenho 2 px; o alvo de toque não muda.",
+      "sha256": "114b3c00b78d43365399ca6db353cff29097fc4e109bd578346250041de61969"
+    },
+    "primary_button_disabled": {
+      "file": "art/ui/kit/station/primary_button_disabled.webp",
+      "size": [
+        480,
+        72
+      ],
+      "nine_slice_ltrb": [
+        40,
+        22,
+        40,
+        22
+      ],
+      "content_xywh": [
+        36,
+        10,
+        408,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão principal âmbar (ENTRAR NO ABRIGO, PREPARAR EXPEDIÇÃO): ícone 36 escuro, texto escuro #1a1206, a tecla em button_key à direita. Pressionado desloca o desenho 2 px; o alvo de toque não muda.",
+      "sha256": "28c3843d47d9dc891b98f6a56480bf913f0bdf5625374511a20430983b98e8c9"
+    },
+    "button_key": {
+      "file": "art/ui/kit/station/button_key.webp",
+      "size": [
+        128,
+        44
+      ],
+      "nine_slice_ltrb": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "content_xywh": [
+        8,
+        6,
+        112,
+        32
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A tecla dentro do botão principal (Enter / A), texto 24 creme.",
+      "sha256": "aa51e8d506498de8a5182d76f73540351f085022132029171b942772e2d0f817"
+    },
+    "secondary_button": {
+      "file": "art/ui/kit/station/secondary_button.webp",
+      "size": [
+        240,
+        64
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": [
+        18,
+        10,
+        204,
+        44
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão de aço (VOLTAR, VER DETALHES, X). Foco: focus_frame por cima.",
+      "sha256": "cfb2bf51414e8c2d251295cdc46aa246e81af28b468695b5a5a8b19fad7a35a8"
+    },
+    "focus_frame": {
+      "file": "art/ui/kit/station/focus_frame.webp",
+      "size": [
+        240,
+        64
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Foco do teclado ou controle sobre qualquer chapa: o âmbar inteiro com o núcleo claro.",
+      "sha256": "206973563b92f8fd04f9a148dbadefa17f0a0ac2ebf14fb89d2c657c0ff03948"
+    },
+    "room_plaque": {
+      "file": "art/ui/kit/station/room_plaque.webp",
+      "size": [
+        520,
+        96
+      ],
+      "nine_slice_ltrb": [
+        40,
+        28,
+        40,
+        28
+      ],
+      "content_xywh": [
+        20,
+        12,
+        480,
+        72
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Plaqueta da sala no alto à esquerda: ícone 52, ESTAÇÃO RAIZ 40 e o nome da sala 24.",
+      "sha256": "a9f0f6701942e6060a11cb1595febe25743f1868c8766a0c34773804f38c7002"
+    },
+    "resource_chip": {
+      "file": "art/ui/kit/station/resource_chip.webp",
+      "size": [
+        248,
+        96
+      ],
+      "nine_slice_ltrb": [
+        28,
+        24,
+        28,
+        24
+      ],
+      "content_xywh": [
+        18,
+        12,
+        212,
+        72
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Chip de Comida, Água e Energia: ícone 40, rótulo 20, valor âmbar 28 e a linha de baixo 20.",
+      "sha256": "5be77afef6b00fcb632d2c47d8fcd081c0e5e9e685e729311f4b82c8ba9d73f4"
+    },
+    "icon_button": {
+      "file": "art/ui/kit/station/icon_button.webp",
+      "size": [
+        92,
+        92
+      ],
+      "nine_slice_ltrb": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "content_xywh": [
+        16,
+        16,
+        60,
+        60
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão quadrado (engrenagem 48; X do painel em 52x52).",
+      "sha256": "a4db99fc6e673b9d31f72d7ea80470beef0e4fc93e25d96407948ce549ed4463"
+    },
+    "panel_large": {
+      "file": "art/ui/kit/station/panel_large.webp",
+      "size": [
+        320,
+        320
+      ],
+      "nine_slice_ltrb": [
+        44,
+        44,
+        44,
+        44
+      ],
+      "content_xywh": [
+        24,
+        22,
+        272,
+        276
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Painel grande: a coluna da esquerda e o painel PERSONAGEM. Centro em TILE_FIT.",
+      "sha256": "7be7a4fe5f7de6f16fa136a039e17553ab560ba5d8e5f5b837ef3308f2ad5ba9"
+    },
+    "panel_inset": {
+      "file": "art/ui/kit/station/panel_inset.webp",
+      "size": [
+        240,
+        160
+      ],
+      "nine_slice_ltrb": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "content_xywh": [
+        16,
+        14,
+        208,
+        132
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Caixa embutida do detalhe da habilidade e dos números.",
+      "sha256": "f6bb968070346a51e869e5fa7f6d4e8cdbc8ebfe7aa833fb58a11daa295a0553"
+    },
+    "hero_tab": {
+      "file": "art/ui/kit/station/hero_tab.webp",
+      "size": [
+        116,
+        132
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        6,
+        6,
+        104,
+        120
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Aba do herói: moldura vazada; o retrato 104x92 por baixo e o nome numa faixa escura de 28 embaixo.",
+      "sha256": "65b392b3ea3dd28cdda14f02b4b0ccc0a8cb5496d3ee5c98e07977196d093a59"
+    },
+    "hero_tab_selected": {
+      "file": "art/ui/kit/station/hero_tab_selected.webp",
+      "size": [
+        116,
+        132
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A aba escolhida: o âmbar por cima.",
+      "sha256": "6778d86fc0629aa93cb0e87e81391f7ed54146680beaa02e3fe27cf683a3c757"
+    },
+    "list_row": {
+      "file": "art/ui/kit/station/list_row.webp",
+      "size": [
+        560,
+        60
+      ],
+      "nine_slice_ltrb": [
+        20,
+        16,
+        20,
+        16
+      ],
+      "content_xywh": [
+        10,
+        6,
+        540,
+        48
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Linha da lista (HABILIDADES): ícone 44 da habilidade em square_portrait e o nome 28.",
+      "sha256": "ec0adab19f359fb2f22555d1849fbf46400e13a31e020ec95e680a586b5ab909"
+    },
+    "list_row_selected": {
+      "file": "art/ui/kit/station/list_row_selected.webp",
+      "size": [
+        560,
+        60
+      ],
+      "nine_slice_ltrb": [
+        20,
+        16,
+        20,
+        16
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A linha escolhida: o âmbar por cima de list_row.",
+      "sha256": "7a6ba2129cff15d8d3dff49adb8b7ac74e41e3593d7a98a7fd7f9ab69f98ea69"
+    },
+    "divider": {
+      "file": "art/ui/kit/station/divider.webp",
+      "size": [
+        240,
+        8
+      ],
+      "nine_slice_ltrb": [
+        8,
+        0,
+        8,
+        0
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Divisor horizontal entre seções.",
+      "sha256": "d6ca29730beb8974796fd2742465e6679abdee9239e3142a4b613acbce13d463"
+    },
+    "trait_tile": {
+      "file": "art/ui/kit/station/trait_tile.webp",
+      "size": [
+        88,
+        88
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        8,
+        8,
+        72,
+        72
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Quadrado do traço: ícone pintado 72 (art/ui/kit/station/icons/trait_*.webp).",
+      "sha256": "239f3a5c7d25f7a31ddab7587829c2207a819e109042701c0562cdf0970e3586"
+    },
+    "level_medal": {
+      "file": "art/ui/kit/station/level_medal.webp",
+      "size": [
+        72,
+        72
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        14,
+        14,
+        44,
+        44
+      ],
+      "anchor": [
+        36,
+        36
+      ],
+      "note": "Medalhão do nível: número 34 SemiBold âmbar no centro. Não fatiar.",
+      "sha256": "b6b46fd765e9b2860f8c4ffc31c22486566fd5d950c39c172e28267847282696"
+    },
+    "train_button": {
+      "file": "art/ui/kit/station/train_button.webp",
+      "size": [
+        240,
+        56
+      ],
+      "nine_slice_ltrb": [
+        20,
+        16,
+        20,
+        16
+      ],
+      "content_xywh": [
+        16,
+        8,
+        208,
+        40
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "TREINAR: ícone train 28 âmbar e o custo à direita. Bloqueado: ícone e texto apagados e o motivo ao focar.",
+      "sha256": "6d8048c549d312d83d74c8e447d24156cfcd75b057e79d4512c16ff83079d0e6"
+    },
+    "upgrade_card": {
+      "file": "art/ui/kit/station/upgrade_card.webp",
+      "size": [
+        300,
+        200
+      ],
+      "nine_slice_ltrb": [
+        28,
+        28,
+        28,
+        28
+      ],
+      "content_xywh": [
+        20,
+        18,
+        260,
+        164
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Cartão de uma das duas melhorias do Treino: nome 30, efeito 22, quantas já tem.",
+      "sha256": "589b4caeea51f8f98acee10201f884e8382debb254fb95c9595f4ed32fb79f73"
+    },
+    "upgrade_card_selected": {
+      "file": "art/ui/kit/station/upgrade_card_selected.webp",
+      "size": [
+        300,
+        200
+      ],
+      "nine_slice_ltrb": [
+        28,
+        28,
+        28,
+        28
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "O cartão escolhido (foco ou clique): o âmbar por cima.",
+      "sha256": "c93720eb81d14694670a334f3ba9b3af944a239f04d19a7da6357e4a35aa586d"
+    },
+    "nav_tab": {
+      "file": "art/ui/kit/station/nav_tab.webp",
+      "size": [
+        216,
+        72
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": [
+        16,
+        10,
+        184,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Aba de navegação (VISÃO GERAL, INSTALAÇÕES...): ícone 32 e texto 26.",
+      "sha256": "b8a7a8fba6b2d27a6787a2be14abd94816b0574ed5797235c6f067a72ffcb64c"
+    },
+    "nav_tab_active": {
+      "file": "art/ui/kit/station/nav_tab_active.webp",
+      "size": [
+        216,
+        72
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A aba ativa: o sublinhado âmbar por cima de nav_tab; texto e ícone em âmbar.",
+      "sha256": "57797564237f7782dfcb4f7f022f8717be7c6ed46c520a9692a116759f63c6c8"
+    },
+    "keys_bar": {
+      "file": "art/ui/kit/station/keys_bar.webp",
+      "size": [
+        320,
+        56
+      ],
+      "nine_slice_ltrb": [
+        24,
+        16,
+        24,
+        16
+      ],
+      "content_xywh": [
+        16,
+        8,
+        288,
+        40
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A barra das teclas: key_tab (kit da luta) 36 e o rótulo 22.",
+      "sha256": "cca611119d92b655f883d41e6f2020020c7489a7a8da0c09bc743940af2db30c"
+    }
+  },
+  "trait_ids": {
+    "agile": "trait_agile",
+    "brave": "trait_brave",
+    "hopeful": "trait_hopeful",
+    "loyal": "trait_loyal",
+    "sluggish": "trait_sluggish",
+    "anxious": "trait_anxious",
+    "gloomy": "trait_gloomy",
+    "machine-fear": "trait_machine_fear"
+  },
+  "icons": {
+    "bed": {
+      "file": "art/ui/kit/station/icons/bed.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6993aafeb20c92b51ff0591657b2512a892be873a939ba53d6bc681a878fc810",
+      "kind": "glyph_white_tintable"
+    },
+    "expeditions": {
+      "file": "art/ui/kit/station/icons/expeditions.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "a7755afa0ed1765cd4f366e700312f3e428ee8e4802c230aacd395684de2925f",
+      "kind": "glyph_white_tintable"
+    },
+    "guardian_defeated": {
+      "file": "art/ui/kit/station/icons/guardian_defeated.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "a92265e0443cfd6d2eb94d8ae8f06886331179d7bb3408dd5bbf9298d2fa3b3a",
+      "kind": "glyph_white_tintable"
+    },
+    "kills": {
+      "file": "art/ui/kit/station/icons/kills.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "082b19cac07b0c7203b7cdc98a82d9f4c52caf7c997e57176513f9a5eed65cf8",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_characters": {
+      "file": "art/ui/kit/station/icons/nav_characters.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f27383b74d322e84de525f9b452c98c667e13ebb27b2ab3254b022fe50e91444",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_facilities": {
+      "file": "art/ui/kit/station/icons/nav_facilities.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "77f766d0f627fd72707ba315681c4e5832320aacab7ff6b7654c0c9e8fc361fa",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_hide": {
+      "file": "art/ui/kit/station/icons/nav_hide.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "fb72f23713545133037cdaf66219cd257ab55bf7f31cdc73e8c727b0ca6f4565",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_overview": {
+      "file": "art/ui/kit/station/icons/nav_overview.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "92cee3a106a3e62ab444a4d17206e62423316bf7f2f6118596835b696f663552",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_research": {
+      "file": "art/ui/kit/station/icons/nav_research.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "558c40bc0976adde1dee9bf1f27f043dce5568c680b828fdbff8bf2db9f311b5",
+      "kind": "glyph_white_tintable"
+    },
+    "objective_done": {
+      "file": "art/ui/kit/station/icons/objective_done.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "672b4734a8dc389d418f5949f64aff4a30abeba66df6c0b1153b309454eff6db",
+      "kind": "glyph_white_tintable"
+    },
+    "objective_failed": {
+      "file": "art/ui/kit/station/icons/objective_failed.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "0729372a0a3df1d9cece376164fa1ee4042e600c09cec298fd468cd7bebe39be",
+      "kind": "glyph_white_tintable"
+    },
+    "place_unlocked": {
+      "file": "art/ui/kit/station/icons/place_unlocked.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6929f2d946e895e272efa706996f50c43bdf2bdbcd4898f12f97731e6f2adf3a",
+      "kind": "glyph_white_tintable"
+    },
+    "relic_empty": {
+      "file": "art/ui/kit/station/icons/relic_empty.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "347295f3fa9de76d1ae511bcd3bc7c947b567be2c3d2b94c36c3dd9eee57a8c6",
+      "kind": "glyph_white_tintable"
+    },
+    "state_active": {
+      "file": "art/ui/kit/station/icons/state_active.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "73b3815e52204229f6551891bb71235ccaa1b902cd0752839944eeb59108af0e",
+      "kind": "glyph_white_tintable"
+    },
+    "state_light_wound": {
+      "file": "art/ui/kit/station/icons/state_light_wound.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "da6002d2f40bbe8b025b874f731ca841c31e2857659f78572d9b98612c943f7b",
+      "kind": "glyph_white_tintable"
+    },
+    "state_wounded": {
+      "file": "art/ui/kit/station/icons/state_wounded.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "1e532307cb1d7d42ed19b7f6e0a31f7f2bc580686fb181030c10b075e44a4b32",
+      "kind": "glyph_white_tintable"
+    },
+    "station": {
+      "file": "art/ui/kit/station/icons/station.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "4d546d4b4a067d6d0bf559932d68c17a6976c950fc265c96fa29a406df15b8d0",
+      "kind": "glyph_white_tintable"
+    },
+    "train": {
+      "file": "art/ui/kit/station/icons/train.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "96da6c8a086c196fa46cfcc2b546c0a4ee80fc4aef0096f9885f468e65ed839b",
+      "kind": "glyph_white_tintable"
+    },
+    "trait_agile": {
+      "file": "art/ui/kit/station/icons/trait_agile.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "41767c852e7b8a1f6a12eebb1a59c5a4a3e94c6f298633865515aa3cdd08683c",
+      "kind": "painted"
+    },
+    "trait_anxious": {
+      "file": "art/ui/kit/station/icons/trait_anxious.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "aacc38436dcd77f384ad360d241da82ba54a9df8ae4f25a50bc458eb5e48a305",
+      "kind": "painted"
+    },
+    "trait_brave": {
+      "file": "art/ui/kit/station/icons/trait_brave.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "9e04bd47ba595808ebc13b1840639b9c26dbf60e803cd2dd459ccb53bf6143c6",
+      "kind": "painted"
+    },
+    "trait_gloomy": {
+      "file": "art/ui/kit/station/icons/trait_gloomy.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "41662eeacc60786267726d477a9739acf1d619c77cacf15bf5a90d70924960d7",
+      "kind": "painted"
+    },
+    "trait_hopeful": {
+      "file": "art/ui/kit/station/icons/trait_hopeful.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "dba690c50f13edb401902d9d04a8d1ae1147b0f863b5c8361b3924d46f8e7318",
+      "kind": "painted"
+    },
+    "trait_loyal": {
+      "file": "art/ui/kit/station/icons/trait_loyal.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "1ab70145a16ede458b8412d623f4b38a37c99eace25e8a5c22e2e01c8245bdb9",
+      "kind": "painted"
+    },
+    "trait_machine_fear": {
+      "file": "art/ui/kit/station/icons/trait_machine_fear.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "869e6d37f2b12177e8806bd1a6c298b62f7c2ba6506322d9a5a5dfd9f790b7e1",
+      "kind": "painted"
+    },
+    "trait_sluggish": {
+      "file": "art/ui/kit/station/icons/trait_sluggish.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "f49244c5d67785f02ffe20cfd9aad8ce70bd0a785f18dbdfb53d93c7c3da958b",
+      "kind": "painted"
+    }
+  },
+  "font": {
+    "file": "art/ui/fonts/barlow_condensed_medium.ttf",
+    "emphasis_file": "art/ui/fonts/barlow_condensed_semibold.ttf",
+    "license": "art/ui/fonts/OFL-BarlowCondensed.txt"
+  },
+  "originals": "Folhas de ícones geradas (Nano Banana Pro) fora do Git; o recorte é cut_icons.py"
+}
