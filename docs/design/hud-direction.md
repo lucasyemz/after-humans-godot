@@ -62,6 +62,120 @@ vez de latão ornamentado; letra condensada, em vez da serifada. As raízes e a 
 - **O mesmo idioma vale para as outras telas** (Preparação, fim de luta, ficha, Estação): a mesma chapa chanfrada, o
   mesmo âmbar e a mesma letra.
 
+### Estado (25/10)
+
+O Codex entregou o kit da luta no PR #97 (`codex-design`):
+- as peças em `art/ui/kit/combat/`, com as margens de 9-slice em `assets.json`;
+- as fontes Barlow Condensed (Medium e SemiBold, OFL) em `art/ui/fonts/`;
+- a comparação com o alvo e a QA em `docs/design/hud-target.md`.
+
+O kit de latão (`art/ui/kit/v2/`) fica só como histórico. A integração no jogo é da #60 (Claude).
+
+## Como produzir as peças (qualquer agente com geração de imagem)
+
+A imagem gerada é matéria-prima e referência. O jogo recebe peças limpas, medidas e sem texto.
+
+- **Molduras, chapas, abas e botões:** desenhadas por código (SVG ou Python com Pillow), com o chanfro, o bisel e o
+  detalhe âmbar exatos, nas medidas do alvo e com as margens de 9-slice. A textura de aço vem por cima (veja o próximo
+  item). Assim a borda fica nítida, e todas as peças combinam entre si e com `art/ui/kit/combat/`.
+- **Textura de aço arranhado:** uma imagem gerada, repetível (seamless), em tons neutros. Ou recortada dos alvos do
+  Lucas, que são do projeto.
+- **Ícones pintados** (traços, chips de resultado, recursos):
+  - gerados em folhas por família, com o mesmo prompt de estilo, sobre um fundo chapado magenta (`#FF00FF`);
+  - recortados por código para ter o alfa limpo;
+  - leitura conferida a 32 e a 64 px.
+- **Maquete da tela inteira:** gerada com a captura real do jogo e o alvo como referências, só para comparar e aprovar.
+  Nunca vai para o jogo.
+- **Texto nunca na imagem:** a Godot escreve todo texto com a Barlow Condensed (traduzível e no texto Maior).
+- **A prova de que chegou perto:** cada peça e cada tela lado a lado com o alvo, no Normal, no Maior e no daltonismo.
+
+## Alvos aprovados da Estação (25/10/2026)
+
+O Lucas fez mais dois alvos no mesmo idioma da luta: a mesma chapa, o mesmo âmbar, a mesma letra, e as mesmas cores de
+vida. As peças da luta (`art/ui/kit/combat/`) são a base; o que falta entra como peça nova no mesmo kit.
+
+### Relatório da volta (a chegada na Plataforma 1)
+
+**O alvo:** [reference/hud-target-report-2026-10-25.webp](reference/hud-target-report-2026-10-25.webp).
+
+**Faixa do alto,** de ponta a ponta, uma chapa só com divisões:
+- **À esquerda:**
+  - o ícone da Estação e a linha pequena "ESTAÇÃO RAIZ · RELATÓRIO DA EXPEDIÇÃO";
+  - o nome da fase em letra muito grande (cerca de 70 px em 1920);
+  - "Expedição concluída", com o círculo verde de check.
+- **No meio,** três chips de resultado, cada um com o ícone e duas linhas:
+  - "Guardião derrotado" (escudo com check);
+  - "Ponte das Raízes liberada" (cadeado aberto);
+  - "Objetivo: água não cumprido" (gota com X, em vermelho).
+  - Embaixo, a dica com o ícone da cama: "Descanse no Dormitório antes da próxima expedição."
+- **À direita,** "RECURSOS RECUPERADOS" em quadrados de ícone grandes, com o número em âmbar ("+17") e o nome
+  embaixo.
+
+**Uma carta por herói,** embaixo de cada um na plataforma:
+- **Aba no alto:** "Melhoria · 3 frag.", com o ícone âmbar.
+- **Cabeçalho:** o retrato quadrado, o nome, a espécie e o papel.
+- **O estado numa pílula com ícone:**
+  - verde: Ativo;
+  - âmbar: Levemente ferido;
+  - vermelho: Ferido.
+- **A barra de VIDA:** ciano, e vermelha quando baixa.
+- **Os números:** Expedições e Abates, com os ícones.
+- **A linha da relíquia:** "Sem relíquia" ou o nome dela.
+
+**Embaixo, no meio,** o botão principal âmbar "ENTRAR NO ABRIGO", com a tecla numa aba ("Enter / A").
+
+### Sala dos Personagens
+
+**O alvo:** [reference/hud-target-characters-2026-10-25.webp](reference/hud-target-characters-2026-10-25.webp).
+
+- **Barra do alto:**
+  - à esquerda, a plaqueta com o ícone e "ESTAÇÃO RAIZ / Sala dos Personagens";
+  - à direita, os chips de Comida, Água e Energia, cada um com o ícone, o rótulo, o valor em âmbar e a linha de
+    baixo;
+  - o botão de opções (a engrenagem).
+- **Coluna da esquerda:**
+  - as abas dos heróis em retratos quadrados com o nome (a escolhida com a borda âmbar);
+  - "HABILIDADES": quatro linhas com o ícone e o nome (a escolhida com a borda âmbar);
+  - a caixa do detalhe:
+    - o nome e o dano em âmbar ("Dano 5–8");
+    - as posições de origem e de alvo;
+    - a descrição;
+    - a etiqueta do alvo ("Inimigo").
+- **No meio,** o herói de corpo inteiro na sala, sem moldura.
+- **Painel da direita, "PERSONAGEM",** com o X para fechar:
+  - a linha pequena âmbar "SOBREVIVENTE DA ESTAÇÃO";
+  - o nome grande, a espécie e o papel em âmbar, e o estado em verde ("Estável");
+  - a VIDA com a barra ciano, a VELOCIDADE e o INSTINTO com a barra;
+  - a relíquia e a linha dos números;
+  - "TRAÇOS" em duas colunas:
+    - PONTOS FORTES (verde, com +);
+    - PONTOS FRACOS (vermelho, com −);
+    - cada traço num quadrado de ícone com o nome e o efeito.
+- **Embaixo:**
+  - VOLTAR à esquerda e a barra das teclas no meio;
+  - as abas de navegação: VISÃO GERAL, INSTALAÇÕES, PERSONAGENS (ativa, sublinhada em âmbar), PESQUISA, OCULTAR HUD;
+  - o botão principal âmbar "PREPARAR EXPEDIÇÃO".
+
+### Cuidados nestes dois alvos
+
+- **Os nomes de classe são os do jogo,** não os da imagem: Gato Batedor (e não "Gato Assassino") e Coruja Atiradora
+  (e não "Coruja Sniper"). Os números das imagens são de exemplo.
+- **O relatório de hoje tem mais que o alvo:** "O que a equipe viu" (o texto da história), "O que chegou" e "A Estação
+  no ciclo" (produção e consumo). Nada disso some: entra numa segunda faixa ou num "Ver detalhes" no mesmo idioma.
+- **A Sala dos Personagens precisa também do nível, do XP e do Treino (#90):**
+  - no painel PERSONAGEM, o nível num medalhão e a barra de XP;
+  - o botão "TREINAR";
+  - a escolha de 1 de 2 melhorias, no mesmo idioma.
+- **Ícones novos:**
+  - os oito traços de `data/perks.json`: Ágil, Corajoso, Esperançoso, Companheiro fiel, Lento, Ansioso, Pessimista,
+    Temor das máquinas;
+  - os chips de resultado: guardião, lugar liberado, objetivo cumprido ou não;
+  - as pílulas de estado;
+  - Expedições e Abates.
+  - Os ícones de habilidade e de recurso que já existem continuam.
+- **Continuam valendo** o texto Maior, o daltonismo (a pílula de estado também muda de ícone, não só de cor), o teclado,
+  o controle e o toque.
+
 Pedido do Lucas (25/10/2026), depois da primeira versão das telas do laço (#96, `docs/design/loop-screens/overview.webp`
 no `codex-design`): "muito básico, com cara de feito por IA; quero personalidade". As referências (packs de UI de
 fantasia sombria, ícones em losango, runas brilhantes, barras de HUD pintadas, molduras de carta) foram mandadas pelo
