@@ -71,6 +71,10 @@ O Codex entregou o kit da luta no PR #97 (`codex-design`):
 
 O kit de latão (`art/ui/kit/v2/`) fica só como histórico. A integração no jogo é da #60 (Claude).
 
+O relatório da volta e a Sala dos Personagens (os alvos da Estação, abaixo) estão no branch `design-station`:
+- as peças estão em `art/ui/kit/station/`;
+- as telas, as comparações e as medidas estão em [hud-station.md](hud-station.md).
+
 ## Como produzir as peças (qualquer agente com geração de imagem)
 
 A imagem gerada é matéria-prima e referência. O jogo recebe peças limpas, medidas e sem texto.
