@@ -1,8 +1,10 @@
 # HUD da luta — alvo aprovado de25/10/2026
 
-**Referência atual do kit de combate:** o [alvo do Lucas](reference/hud-target-2026-10-25.webp), conforme o topo de [hud-direction.md](hud-direction.md). Ele substitui a aparência ornamentada da C. Esta entrega mantém sua estrutura sobre uma captura real, com aço grafite chanfrado, detalhe âmbar e Barlow Condensed SemiBold em caixa alta.
+**Referência atual do kit de combate:** o [alvo do Lucas](reference/hud-target-2026-10-25.webp), conforme o topo de [hud-direction.md](hud-direction.md). Ele substitui a aparência ornamentada da C. Esta entrega mantém sua estrutura sobre uma captura real, com aço grafite chanfrado, detalhe âmbar e Barlow Condensed Medium em caixa alta, com SemiBold no nome do herói.
 
 **[Alvo e entrega lado a lado — Normal](hud-target/comparison.webp)** · **[Maior](hud-target/comparison_large.webp)** · **[Daltonismo](hud-target/comparison_colorblind.webp)** · **[Maior+daltonismo](hud-target/comparison_large_colorblind.webp)**
+
+**[Antes e depois deste refinamento](hud-target/detail_before_after.webp)** · **[Detalhes: alvo × antes × refinamento](hud-target/detail_comparison.webp)**
 
 ![Entrega Normal](hud-target/hud.webp)
 
@@ -13,9 +15,9 @@
 | Peça do alvo | Entrega |
 |---|---|
 | Aço escuro arranhado, chanfros e detalhe âmbar | Biséis derivados do próprio alvo, conteúdo removido e miolos de aço preparados separadamente. Sem latão, voltas ornamentais ou medalhões. |
-| Letra condensada, sem serifa e em caixa alta | Barlow Condensed SemiBold, fonte OFL no repositório; toda a tipografia nova usa essa fonte. |
-| Registro com L em aba | Peça chanfrada272×64 no alto à esquerda, com tecla em aba48. |
-| Rodada numa faixa única | Faixa720×72, nome da rodada, linha/ponto e seis retratos quadrados64, coloridos; fundo avermelhado nas máquinas e borda âmbar no ator atual. |
+| Letra condensada, sem serifa e em caixa alta | Barlow Condensed Medium (rótulos) e SemiBold (nome do herói), ambas OFL. |
+| Registro com L em aba | Peça chanfrada272×64 no alto à esquerda, com tecla em aba42. |
+| Rodada numa faixa única | Faixa720×64, nome da rodada, linha/ponto e seis retratos quadrados64, coloridos; fundo avermelhado nas máquinas e borda âmbar no ator atual. |
 | Vida sob as unidades | Barras200×44, ciano nos heróis e vermelho nos inimigos, valor dentro. Sem número da posição. Aba superior nos heróis, recorte na borda dos inimigos. |
 | Ator no chão | Anel âmbar com setas, centrado nos pés de Nick; cantos âmbar na barra dele. |
 | Nome do alvo | Plaqueta pequena, escura, com linha vermelha embaixo. |
@@ -34,12 +36,12 @@ Peças em `art/ui/kit/combat/`. **18 WebP**:17 RGBA e um material RGB repetível
 | `panel.webp` |256×80|24/24/24/24|
 | `register.webp` |272×64|24/20/24/20|
 | `round_strip.webp` |720×72|24/16/24/16|
-| `square_portrait.webp` |72×72|12/12/12/12|
+| `square_portrait.webp` |72×72|8/8/8/8|
 | `hero_panel.webp` |564×212|224/24/24/24; manter altura212 e preservar coluna do retrato|
 | `ability_header.webp` |624×56|20/12/20/12|
 | `target_tab.webp` |336×40|16/12/16/12|
-| `action_button.webp` |128×100|16/16/16/16|
-| `key_tab.webp` |48×48|8/8/8/8|
+| `action_button.webp` |128×100|14/14/14/14|
+| `key_tab.webp` |42×42|6/6/6/6|
 | `ability_slot.webp` |132×132|16/16/16/16|
 | `health_ally.webp`, `health_enemy.webp` |200×44|20/12/20/12|
 | `main_bar.webp` |320×44|12/10/12/10|
@@ -49,11 +51,11 @@ Peças em `art/ui/kit/combat/`. **18 WebP**:17 RGBA e um material RGB repetível
 | `exit.webp` |64×64|Não fatiar: símbolo, âncora32,32|
 | `steel_material.webp` |512×512|Repetir material; não é uma moldura|
 
-Não há nomes, números, retratos ou ícones de habilidade embutidos nessas molduras. Textos, fotografias, preenchimento de Vida e separação da célula4–6 são conteúdo do componente. Os overlays de escolha/ator são camadas separadas, não uma alteração dos dados. Os PNG mestres de material ficam fora do Git; as referências já aprovadas permanecem intactas.
+Não há nomes, números, retratos ou ícones de habilidade embutidos nessas molduras. Textos, fotografias, preenchimento de Vida e separação da célula4–6 são conteúdo do componente. Os overlays de escolha/ator são camadas separadas, não uma alteração dos dados. Os PNG mestres de material e anel ficam fora do Git; as referências já aprovadas permanecem intactas.
 
 ## Fonte e texto Maior
 
-Fonte: [barlow_condensed_semibold.ttf](../../art/ui/fonts/barlow_condensed_semibold.ttf), cerca de106KiB. [Licença SIL OFL1.1](../../art/ui/fonts/OFL-BarlowCondensed.txt), copyright The Barlow Project Authors; origem oficial [Google Fonts](https://github.com/google/fonts/tree/main/ofl/barlowcondensed). O binário da fonte não foi modificado; o texto integral da licença foi preservado, normalizando apenas espaços finais. Família, caminho e SHA estão no manifesto.
+Fontes: [Barlow Condensed Medium](../../art/ui/fonts/barlow_condensed_medium.ttf), para rótulos e valores, e [SemiBold](../../art/ui/fonts/barlow_condensed_semibold.ttf), para o nome do herói. [Licença SIL OFL1.1](../../art/ui/fonts/OFL-BarlowCondensed.txt), copyright The Barlow Project Authors; origem oficial [Google Fonts](https://github.com/google/fonts/tree/main/ofl/barlowcondensed). O binário da fonte não foi modificado; o texto integral da licença foi preservado, normalizando apenas espaços finais. Família, caminho e SHA estão no manifesto.
 
 | Uso | Normal | Maior |
 |---|---|---|
@@ -80,17 +82,17 @@ Base1920×1080. O arquivo aprovado1672×941 é normalizado a essa base **somente
 | Região | Retângulo da entrega (x,y,w,h) |
 |---|---|
 | Registro |46,32,272,64|
-| Rodada |636,30,720,72|
+| Rodada |636,30,720,64|
 | Herói |64,836,564,212; imagem quadrada184 dentro da coluna208|
 | Aba "Escolha um alvo" |856,816,336,40|
 | Barra da habilidade |684,852,624,56; ícone40; divisão direita em x1192|
-| Quatro ícones |688+i×160,916,132,132; conteúdo116, teclas48 na aba inferior direita|
+| Quatro ícones |688+i×160,916,132,132; conteúdo116, teclas42 na aba inferior direita, em x+90,y+90|
 | Grade2×2 |1584+coluna×136,836+linha×112,128,100|
-| Vida sob a unidade |centro projetado−100,764,200,44|
+| Vida sob a unidade |centro projetado−100,760,200,44|
 | Nome do alvo |1280,348,176,56; linha vermelha inferior|
 | Anel |248×64, centro nos pés de Nick; na imagem, máscara oculta a parte atrás das botas|
 
-[Diferenças geométricas para as medidas aproximadas da especificação](hud-target/target_comparison.json): painéis ficam próximos do alvo, sem mudar sua organização. A grade termina em1848,1048; seu topo fica11px acima da medida aproximada. O passo vertical112 permite alvos de toque112 de altura sem sobreposição. A faixa da rodada tem8px adicionais de altura para acomodar os retratos64.
+[Diferenças geométricas para as medidas aproximadas da especificação](hud-target/target_comparison.json): painéis ficam próximos do alvo, sem mudar sua organização. A grade termina em1848,1048; seu topo fica11px acima da medida aproximada. O passo vertical112 permite alvos de toque112 de altura sem sobreposição. A faixa da rodada agora tem64px de altura, como o alvo; imagens60px dentro das células64px.
 
 Na integração: ancorar o rodapé à área segura e escalar uniformemente, sem achatar chanfros. Registro tem alvo272×112; ações128×112; habilidades140×140 incluindo as abas. O retrato abre a inspeção do ator. Os pequenos retratos da ordem são informativos; não criar alvos de toque sobrepostos sobre eles. Não trocar bindings: `combat_log`, `combat_move`, `combat_defend`, `inventory`, `combat_flee`, `combat_ability_1..4`. As teclas mostradas são os defaults atuais, não teclas fixas no código.
 
@@ -138,6 +140,24 @@ Observação baixa na ampliação da matriz: o bisel de Vida perdia leitura junt
 
 ## Reprodução e escopo
 
-`python docs/design/hud-target/build_assets.py` prepara as peças e os dois manifestos idênticos; o material WebP versionado dispensa o mestre PNG externo. `render.py` monta os quatro perfis e as quatro comparações completas. `compare.py` gera a matriz peça por peça; `verify.py` confere9-slice, fonte/OFL, limites, alvos, quatro ícones originais e hashes. Dependências: Pillow, numpy e CairoSVG.
+`python docs/design/hud-target/build_assets.py` prepara as peças e os dois manifestos idênticos; o material WebP versionado dispensa o mestre PNG externo. O anel gerado foi normalizado em `ring_source.webp`, sem texto e com alfa, para reprodução; o mestre PNG permanece fora do Git. O anel gerado foi normalizado em `ring_source.webp`, sem texto e com alfa, para reprodução; o mestre PNG permanece fora do Git. `render.py` monta os quatro perfis e as quatro comparações completas. `compare.py` gera a matriz peça por peça; `verify.py` confere9-slice, fonte/OFL, limites, alvos, quatro ícones originais e hashes. Dependências: Pillow, numpy e CairoSVG.
 
 Entrega de design/arte para integração do Claude na #60; sem alterações próprias em `scripts/`, `data/` ou `tests/`. O merge da `main` foi feito antes do trabalho e trouxe o trabalho do Claude; essas mudanças não são alterações do designer. Não foram refeitas as outras telas da #96 nesta rodada. O novo idioma fica disponível para elas, conforme a direção aprovada.
+
+## Novo ciclo de QA — refinamento dos detalhes (25/10/2026)
+
+Pedido: aproximar ainda mais do alvo, mantendo a HUD aprovada. Foram refinados a espessura da letra, recortes dos rostos, biséis específicos de retratos e ações, teclas42px com chanfro pequeno, textura menos contrastada e cantos de seleção com núcleo claro. A faixa diminuiu de72 para64px. O anel agora tem núcleo quente, halo e setas, com o PNG mestre fora do repositório. Os quatro ícones canônicos do Nick continuam intactos.
+
+### Rodada1 — VEREDITO: REPROVADO
+
+- **Média — `health_ally.webp` e `health_enemy.webp`:** o preenchimento de limpeza enfraqueceu o bisel; a sobreposição do contorno também podia apagar a diferença de silhueta. Sugestão: redesenhar o bisel seguindo o polígono próprio de cada facção e aplicar a máscara de alfa por último. Corrigido: aba superior aliada e corte inferior inimigo preservados em todos os perfis.
+- **Média — `actor_ring.webp`:** a linha vetorial anterior era apagada e uniforme perto do alvo luminoso. Substituída por arte com núcleo claro e bloom âmbar, mantendo a oclusão das botas e o centro projetado do ator.
+- **Baixa — documentação:** medidas antigas de teclas, rodada e margens corrigidas para os manifestos atuais.
+
+### Rodada2 — VEREDITO: APROVADO
+
+Revisão visual na matriz das dez peças e na prancha de detalhes alvo/antes/depois: Registro, rodada, Vida de cada facção, placa do alvo, painel único, barra da habilidade, slots, ações, anel e saída. Conferidos Normal, Maior130%, daltonismo, combinação dos dois, cinza e redução real40%. Textos sem extravasar; contornos e silhuetas preservam a informação sem depender só de cor. Saída legível22/32/48px. Sem lettering nos WebP reutilizáveis, sem alteração dos quatro ícones originais, sem mudança em scripts/data/tests. Nenhum problema alto ou médio pendente na entrega.
+
+A arte canônica dos personagens e a ordem da sessão real continuam diferentes da ilustração do alvo; esta rodada aproxima a construção das peças. A integração e a navegação dentro do jogo seguem com o Claude na #60.
+
+Validação deste refinamento: Godot4.7.2, importação concluída; **46/46 testes em257,438s**, paridade48/48 (3351 passos), saída0. Permanecem avisos/erros de recursos/RID/ObjectDB no encerramento do runner. Auditoria dos quatro perfis,18 WebP, OFL, margens, hashes e limites aprovada; diff --check limpo.

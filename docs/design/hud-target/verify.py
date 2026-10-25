@@ -9,6 +9,8 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 assert (OUT/'assets.json').read_bytes()==(ROOT/'art/ui/kit/combat/assets.json').read_bytes()
 assert sha(ROOT/manifest['source_reference'])==manifest['source_sha256']
 assert sha(ROOT/manifest['font']['file'])==manifest['font']['sha256']
+assert (ROOT/manifest['font']['file']).with_suffix('.ttf.import').exists()
+assert (ROOT/manifest['font']['emphasis_file']).exists()
 assert 'SIL OPEN FONT LICENSE Version 1.1' in (ROOT/manifest['font']['license']).read_text()
 assert len(manifest['assets'])==18 and len(checks['profiles'])==4
 for key,row in manifest['assets'].items():

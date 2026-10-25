@@ -20,13 +20,13 @@ class Board:
  def part(self,key,rect):
   x,y,w,h=map(round,rect);im=self.images[key];sl=ASSETS[key]['nine_slice_ltrb'];im=nine(im,(w,h),sl) if sl else im.resize((w,h),Image.Resampling.LANCZOS);self.im.alpha_composite(im,(x,y));self.pieces.append({'part':key,'rect':[x,y,w,h]})
  def text(self,t,box,size=28,align='left',role='label'):
-  t=t.upper();x,y,w,h=box;n=round(size*self.scale);f=ImageFont.truetype(str(FONT),n);bb=f.getbbox(t,anchor='lt');tw=f.getlength(t);th=bb[3]-bb[1];xx=x+(w-tw)/2 if align=='center' else x;yy=y+(h-th)/2;ImageDraw.Draw(self.im).text((round(xx),round(yy)),t,font=f,fill=self.color['text'],anchor='lt',stroke_width=1,stroke_fill='#101315');self.labels.append({'text':t,'size':n,'role':role,'box':list(box),'rect':[xx,yy,tw,th],'fits':tw<=w and th<=h})
+  t=t.upper();x,y,w,h=box;n=round(size*self.scale);f=ImageFont.truetype(str(ROOT/MAN['font']['emphasis_file']) if role=='hero_name' else str(FONT),n);bb=f.getbbox(t,anchor='lt');tw=f.getlength(t);th=bb[3]-bb[1];xx=x+(w-tw)/2 if align=='center' else x;yy=y+(h-th)/2;ImageDraw.Draw(self.im).text((round(xx),round(yy)),t,font=f,fill=self.color['text'],anchor='lt',stroke_width=0);self.labels.append({'text':t,'size':n,'role':role,'box':list(box),'rect':[xx,yy,tw,th],'fits':tw<=w and th<=h})
  def image(self,p,rect,background=None):
   x,y,w,h=map(round,rect);im=ImageOps.fit(p.convert('RGBA'),(w,h),Image.Resampling.LANCZOS)
   if background:
    b=Image.new('RGBA',im.size,background);b.alpha_composite(im);im=b
   mask=Image.new('L',im.size);ImageDraw.Draw(mask).polygon([(6,0),(w-7,0),(w-1,6),(w-1,h-7),(w-7,h-1),(6,h-1),(0,h-7),(0,6)],fill=255);im.putalpha(Image.fromarray(__import__('numpy').minimum(__import__('numpy').asarray(im.getchannel('A')),__import__('numpy').asarray(mask))));self.im.alpha_composite(im,(x,y))
- def key(self,t,x,y):self.part('key_tab',[x,y,48,48]);self.text(t,[x+5,y+5,38,38],26,'center','binding')
+ def key(self,t,x,y):self.part('key_tab',[x,y,42,42]);self.text(t,[x+4,y+4,34,34],26,'center','binding')
  def line_icon(self,name,rect):
   x,y,w,h=rect
   if name=='exit':im=self.images['exit'].resize((w,h),Image.Resampling.LANCZOS)
@@ -39,28 +39,28 @@ class Board:
   rgb=tuple(int(self.color[role][i:i+2],16) for i in [1,3,5]);im=Image.new('RGBA',(ww,h));d=ImageDraw.Draw(im)
   for yy in range(h):
    factor=.7+.4*(1-abs(yy-h*.32)/(h*.8));d.line((0,yy,ww,yy),fill=tuple(min(255,round(v*factor)) for v in rgb)+(255,))
-  d.line((2,1,max(2,ww-3),1),fill='#b9e5df' if role=='ally' else '#ffb2a0',width=1);mask=Image.new('L',im.size);ImageDraw.Draw(mask).rounded_rectangle((0,0,ww-1,h-1),3,fill=255);im.putalpha(mask);self.im.alpha_composite(im,(x,y))
+  d.line((2,1,max(2,ww-3),1),fill='#b9e5df' if role=='ally' else '#ffb2a0',width=1);mask=Image.new('L',im.size);ImageDraw.Draw(mask).polygon([(2,0),(ww-3,0),(ww-1,2),(ww-1,h-3),(ww-3,h-1),(2,h-1),(0,h-3),(0,2)],fill=255);im.putalpha(mask);self.im.alpha_composite(im,(x,y))
  def portrait(self,u):
-  if u['player']:return Image.open(ROOT/f"art/ui/portraits/{FACE[u['name']]}.png").crop((24,0,244,220))
+  if u['player']:return Image.open(ROOT/f"art/ui/portraits/{FACE[u['name']]}.png").crop((40,0,230,190))
   data=COMBAT['enemies'][u['enemy_id']]['idle'];p=Image.open(ROOT/data['file'].removeprefix('res://')).convert('RGBA');region={'recreador':(360,20,800,460),'sussurrador':(360,160,850,650)}[u['enemy_id']];sx=p.width/data['canvas'][0];sy=p.height/data['canvas'][1];region=tuple(round(n*(sx if i%2==0 else sy)) for i,n in enumerate(region));face=p.crop(region);assert face.getbbox() is not None;return face
  def order(self):
-  self.part('round_strip',[636,30,720,72]);self.text('RODADA 1',[660,39,160,50],30);d=ImageDraw.Draw(self.im);d.line((816,66,858,66),fill=self.color['amber'],width=2);d.polygon([(835,62),(839,66),(835,70),(831,66)],fill=self.color['amber'])
+  self.part('round_strip',[636,30,720,64]);self.part('register',[636,30,184,64]);self.text('RODADA 1',[660,39,160,50],30);d=ImageDraw.Draw(self.im);d.line((816,66,858,66),fill=self.color['amber'],width=2);d.polygon([(835,62),(839,66),(835,70),(831,66)],fill=self.color['amber'])
   ts=[r['text'] for r in META['texts']];idx=next(i for i,t in enumerate(ts) if t.startswith('RODADA'));remaining=META['units'][:];order=[]
   for name in ts[idx+1:idx+7]:
    name=name.split(' · agora')[0];u=next((u for u in remaining if name in u['name']),remaining[0]);remaining.remove(u);order.append(u)
   for i,u in enumerate(order):
-   x=864+i*76;self.image(self.portrait(u),[x+4,38,56,56], '#192026' if u['player'] else '#421b1b');self.part('square_portrait',[x,34,64,64])
+   x=864+i*76;self.image(self.portrait(u),[x+2,32,60,60], '#192026' if u['player'] else '#421b1b');self.part('square_portrait',[x,30,64,64])
    if u['id']==META['actor']:
-    ImageDraw.Draw(self.im).rounded_rectangle((x,34,x+64,98),4,outline=self.color['amber'],width=3)
+    ImageDraw.Draw(self.im).rounded_rectangle((x,30,x+64,94),4,outline=self.color['amber'],width=3)
   self.order_ids=[u['id'] for u in order]
  def world(self):
   actor=next(u for u in META['units'] if u['id']==META['actor']);label=next(t for t in META['texts'] if t['text']==actor['name'] and 700<t['rect'][1]<800);cx=round(label['rect'][0]+label['rect'][2]/2);ring=self.images['actor_ring'].resize((248,64),Image.Resampling.LANCZOS);a=ring.getchannel('A');ImageDraw.Draw(a).rectangle((60,0,204,38),fill=0);ring.putalpha(a);self.im.alpha_composite(ring,(cx-124,724));self.ring={'center':[cx,756],'rect':[cx-124,724,248,64],'occlusion':'boots mask in frozen composition; depth-tested under unit in game'}
   for u in META['units']:
-   label=next(t for t in META['texts'] if t['text']==u['name'] and 650<t['rect'][1]<800);cx=round(label['rect'][0]+label['rect'][2]/2);x=cx-100;y=764;role='ally' if u['player'] else 'enemy';self.part('health_'+role,[x,y,200,44]);self.fill([x+14,y+6,172,10],u['hp']/u['max_hp'],role);self.text(f"{int(u['hp'])}/{int(u['max_hp'])}",[x+14,y+17,172,25],26,'center','hp')
+   label=next(t for t in META['texts'] if t['text']==u['name'] and 650<t['rect'][1]<800);cx=round(label['rect'][0]+label['rect'][2]/2);x=cx-100;y=760;role='ally' if u['player'] else 'enemy';self.part('health_'+role,[x,y,200,44]);self.fill([x+14,y+6,172,10],u['hp']/u['max_hp'],role);self.text(f"{int(u['hp'])}/{int(u['max_hp'])}",[x+14,y+17,172,25],26,'center','hp')
    if u['id']==META['actor']:self.part('active_health',[x,y,200,44])
   self.part('target_tab',[1280,348,176,56]);self.text('RECREADOR',[1292,350,152,37],26,'center');ImageDraw.Draw(self.im).rounded_rectangle((1292,393,1444,397),2,fill=self.color['enemy'])
  def hero(self):
-  self.image(Image.open(ROOT/'art/ui/portraits/nick.png').crop((24,0,244,220)),[76,848,184,184],'#1b1d20');self.part('hero_panel',[64,836,564,212]);self.text('NICK',[296,878,300,48],40)
+  self.image(Image.open(ROOT/'art/ui/portraits/nick.png').crop((48,18,216,186)),[76,848,184,184],'#1b1d20');self.part('hero_panel',[64,836,564,212]);self.text('NICK',[296,878,300,48],40,role='hero_name')
   self.part('main_bar',[292,940,308,40]);self.fill([300,946,292,28],1,'ally');self.text('24/24',[300,944,292,32],32,'center','hp')
   self.part('main_bar',[292,988,308,40]);self.text('0/200',[300,992,292,32],32,'center','instinct')
   self.hits.append({'id':'inspect_actor','rect':[64,836,208,212]})
@@ -73,7 +73,7 @@ class Board:
     gray=ImageOps.grayscale(im).convert('RGBA');gray.putalpha(im.getchannel('A'));im=ImageEnhance.Brightness(gray).enhance(.6)
    self.image(im,[x+8,y+8,116,116]);self.part('ability_slot',[x,y,132,132])
    if i==0:self.part('selected_slot',[x,y,132,132])
-   self.key(str(i+1),x+92,y+92);self.hits.append({'id':a['Name'],'rect':[x,y,140,140],'disabled':not q['usable'],'reason':q['reason']})
+   self.key(str(i+1),x+90,y+90);self.hits.append({'id':a['Name'],'rect':[x,y,140,140],'disabled':not q['usable'],'reason':q['reason']})
  def actions(self):
   for i,(icon,cap,action) in enumerate([('intent-move','Q','combat_move'),('intent-block','W','combat_defend'),('item-generic','I','inventory'),('exit','F','combat_flee')]):
    x=1584+(i%2)*136;y=836+(i//2)*112;self.part('action_button',[x,y,128,100]);self.line_icon(icon,[x+34,y+17,48,48]);self.key(cap,x+78,y+54);self.hits.append({'id':action,'rect':[x,y-6,128,112]})

@@ -4,11 +4,12 @@ sys.dont_write_bytecode=True
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageOps,ImageFilter
 import numpy as np
+TUNING_REVISION="detail_pass_2026_10_25"
 ROOT=Path(__file__).resolve().parents[3];HERE=Path(__file__).resolve().parent;OUT=ROOT/'art/ui/kit/combat';OUT.mkdir(parents=True,exist_ok=True)
 raw=Path('/workspace/generated_images/exec-eabb9cb5-5001-4f3a-a6cd-e5dca7e089af.png');tilepath=OUT/'steel_material.webp'
 if not tilepath.exists():
  im=Image.open(raw).convert('RGB');im=ImageOps.fit(im,(512,512),Image.Resampling.LANCZOS);im.save(tilepath,quality=93,method=6)
-TILE=Image.open(tilepath).convert('RGBA');ROWS={}
+TILE=Image.open(tilepath).convert('RGBA');TILE=Image.blend(TILE,Image.new('RGBA',TILE.size,'#191c1f'),.42);ROWS={}
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def save(name,im,slices=None,content=None,note=''):
  arr=np.array(im.convert('RGBA'));arr[arr[:,:,3]==0]=0;im=Image.fromarray(arr);im.save(OUT/(name+'.webp'),lossless=True,method=6);ROWS[name]={'file':'art/ui/kit/combat/'+name+'.webp','size':list(im.size),'nine_slice_ltrb':slices,'content_xywh':content,'anchor':[0,0],'note':note,'sha256':sha(OUT/(name+'.webp'))}
@@ -41,33 +42,46 @@ def frame(w,h,c=12,amber=True,poly=None,hole=None):
  if hole:
   a=im.getchannel('A');ImageDraw.Draw(a).polygon(hole,fill=0);im.putalpha(a)
  return im
+
+def reference_frame(box,size,inset=7,cut=8,plain=False):
+ im=REF.crop(box).resize(size,Image.Resampling.LANCZOS);w,h=size;mask=Image.new('L',size);d=ImageDraw.Draw(mask);d.polygon([(inset+3,inset),(w-inset-4,inset),(w-inset-1,inset+3),(w-inset-1,h-inset-4),(w-inset-4,h-inset-1),(inset+3,h-inset-1),(inset,h-inset-4),(inset,inset+3)],fill=255)
+ im.paste(Image.new('RGBA',size,'#15181b') if plain else material(size),(0,0),mask);a=Image.new('L',size);ImageDraw.Draw(a).polygon(polygon(w,h,cut),fill=255);im.putalpha(a);return im
 save('panel',frame(256,80),[24,24,24,24],[24,16,208,48])
 save('register',frame(272,64),[24,20,24,20],[24,12,224,40])
 save('round_strip',frame(720,72),[24,16,24,16],[24,8,672,56])
 # Correct interior mask offset; the image is filled by the component.
-im=frame(72,72,8,False);a=im.getchannel('A');ImageDraw.Draw(a).rectangle((7,7,64,64),fill=0);im.putalpha(a);save('square_portrait',im,[12,12,12,12],[8,8,56,56])
+im=reference_frame((752,25,810,83),(72,72),4,5);a=im.getchannel('A');ImageDraw.Draw(a).rectangle((4,4,67,67),fill=0);im.putalpha(a);save('square_portrait',im,[8,8,8,8],[4,4,64,64])
 hero_poly=[(20,0),(188,0),(212,24),(544,24),(563,44),(563,195),(547,211),(16,211),(0,195),(0,20)]
 hero=frame(564,212,16,True,hero_poly);a=hero.getchannel('A');ImageDraw.Draw(a).polygon([(24,12),(180,12),(196,28),(196,196),(16,196),(12,192),(12,24)],fill=0);hero.putalpha(a);d=ImageDraw.Draw(hero);d.line([(20,8),(184,8),(204,28),(204,200),(16,200),(8,192),(8,20),(20,8)],fill='#85847d',width=2)
+d=ImageDraw.Draw(hero);d.line([(528,27),(550,49)],fill='#f0a020',width=5);d.line([(551,189),(541,199)],fill='#f0a020',width=3)
 save('hero_panel',hero,[224,24,24,24],[232,40,308,152],'Keep height212; left224 protects the portrait column. Portrait content184x184 at12,12.')
 save('ability_header',frame(624,56,8),[20,12,20,12],[12,8,600,40])
 save('target_tab',frame(336,40,8),[16,12,16,12],[16,6,304,28])
-save('action_button',frame(128,100,12),[16,16,16,16],[16,12,96,76])
-save('key_tab',frame(48,48,4,False),[8,8,8,8],[8,6,32,36])
-slot=frame(132,132,10,False);a=slot.getchannel('A');ImageDraw.Draw(a).polygon([(16,8),(115,8),(123,16),(123,115),(115,123),(16,123),(8,115),(8,16)],fill=0);slot.putalpha(a);save('ability_slot',slot,[16,16,16,16],[8,8,116,116])
+action=reference_frame((1375,736,1497,825),(128,100),7,10);d=ImageDraw.Draw(action);d.line([(5,20),(18,7)],fill='#f0a020',width=3);d.line([(110,93),(121,82)],fill='#f0a020',width=3);save('action_button',action,[14,14,14,14],[14,12,100,76])
+save('key_tab',reference_frame((1453,784,1486,819),(42,42),5,3,True),[6,6,6,6],[5,4,32,34])
+slot=reference_frame((739,794,863,905),(132,132),8,8);corner=ImageOps.mirror(slot.crop((0,80,52,132)));slot.alpha_composite(corner,(80,80));a=slot.getchannel('A');ImageDraw.Draw(a).polygon([(16,8),(115,8),(123,16),(123,115),(115,123),(16,123),(8,115),(8,16)],fill=0);slot.putalpha(a);save('ability_slot',slot,[16,16,16,16],[8,8,116,116])
 for kind in ['ally','enemy']:
- w,h=200,44
- poly=[(12,4),(22,4),(26,0),(48,0),(52,4),(188,4),(199,15),(199,32),(188,43),(12,43),(0,32),(0,16)] if kind=='ally' else [(12,4),(188,4),(199,15),(199,29),(191,29),(191,36),(184,43),(12,43),(0,32),(0,16)]
- save('health_'+kind,frame(w,h,10,False,poly),[20,12,20,12],[16,6,168,34],'Ally top tab; enemy notch on lower-right. No position number.')
+ box=(173,660,350,699) if kind=='ally' else (1112,660,1280,700)
+ im=reference_frame(box,(200,44),5,10,True)
+ # Neutral steel rim: the health color is entirely a dynamic fill.
+ a=np.array(im);rgb=a[:,:,:3].astype(float);chroma=rgb.max(axis=2)-rgb.min(axis=2);gray=np.uint8(rgb.mean(axis=2));colored=chroma>45
+ for c in range(3):a[:,:,c]=np.where(colored,gray,a[:,:,c])
+ im=Image.fromarray(a)
+ if kind=='ally':
+  d=ImageDraw.Draw(im);d.polygon([(22,4),(26,0),(48,0),(52,4)],fill='#42484c');d.line((22,4,26,0,48,0,52,4),fill='#90928c',width=1)
+ else:
+  alpha=im.getchannel('A');ImageDraw.Draw(alpha).polygon([(190,31),(199,31),(199,43),(183,43)],fill=0);im.putalpha(alpha)
+ d=ImageDraw.Draw(im);rim=([(10,4),(22,4),(26,0),(48,0),(52,4),(189,4),(199,14),(199,33),(189,43),(10,43),(0,33),(0,14)] if kind=='ally' else [(10,0),(189,0),(199,10),(199,30),(181,43),(10,43),(0,33),(0,10)]);d.line(rim+[rim[0]],fill='#363b40',width=5,joint='curve');d.line(rim+[rim[0]],fill='#a4a49c',width=1,joint='curve');mask=Image.new('L',im.size);ImageDraw.Draw(mask).polygon(rim,fill=255);im.putalpha(mask)
+ save('health_'+kind,im,[20,12,20,12],[14,6,172,34],'Reference-specific inset rim; ally top tab / enemy cut. No baked values or fill.')
 save('main_bar',frame(320,44,8,False),[12,10,12,10],[8,6,304,32])
 for name,size,arm in [('selected_slot',(132,132),24),('active_health',(200,44),16)]:
  im=Image.new('RGBA',size);d=ImageDraw.Draw(im);w,h=size
  for x,y,sx,sy in [(3,3,1,1),(w-4,3,-1,1),(3,h-4,1,-1),(w-4,h-4,-1,-1)]:d.line([(x,y+sy*arm),(x,y),(x+sx*arm,y)],fill='#f0a020',width=4)
- halo=im.filter(ImageFilter.GaussianBlur(3));halo=Image.alpha_composite(halo,im);save(name,halo,[28,12 if h==44 else 28,28,12 if h==44 else 28],note='Amber corner selection, separate from base texture.')
-ring=Image.new('RGBA',(256,80));d=ImageDraw.Draw(ring)
-for start in [4,94,184,274]:d.arc((8,10,248,70),start,start+80,fill='#f0a020',width=3)
-for x,y,sign in [(14,40,-1),(242,40,1)]:d.line([(x-sign*8,y-7),(x,y),(x-sign*8,y+7)],fill='#ffcc70',width=3)
-d.line((70,67,80,73,90,67),fill='#fff0bb',width=2);d.line((170,13,180,7,190,13),fill='#fff0bb',width=2);halo=ring.filter(ImageFilter.GaussianBlur(4));halo.putalpha(halo.getchannel('A').point(lambda n:min(255,n*3)));ring=Image.alpha_composite(halo,ring);save('actor_ring',ring,note='Do not9-slice: perspective ellipse, place under feet, depth-tested. Center128,40.');ROWS['actor_ring']['anchor']=[128,40]
+ halo=im.filter(ImageFilter.GaussianBlur(3));halo.putalpha(halo.getchannel('A').point(lambda n:min(255,n*2)));halo=Image.alpha_composite(halo,im);core=ImageDraw.Draw(halo)
+ for x,y,sx,sy in [(3,3,1,1),(w-4,3,-1,1),(3,h-4,1,-1),(w-4,h-4,-1,-1)]:core.line([(x,y+sy*arm),(x,y),(x+sx*arm,y)],fill='#ffe4a1',width=1)
+ save(name,halo,[28,12 if h==44 else 28,28,12 if h==44 else 28],note='Amber corner selection, separate from base texture.')
+ring=Image.open(HERE/'ring_source.webp').convert('RGBA');save('actor_ring',ring,note='Generated amber hot-core ring; no9-slice. Place under feet with depth test. Center128,40.');ROWS['actor_ring']['anchor']=[128,40]
 exit_im=Image.open(ROOT/'art/ui/kit/v2/exit.webp').convert('RGBA');save('exit',exit_im,note='Reused approved exit symbol; F is combat_flee, never a crosshair.');ROWS['exit']['anchor']=[32,32]
 ROWS['steel_material']={'file':str(tilepath.relative_to(ROOT)),'size':[512,512],'nine_slice_ltrb':None,'content_xywh':[0,0,512,512],'anchor':[0,0],'note':'Repeat material; never stretch frame corners.','sha256':sha(tilepath)}
-manifest={'direction':'Approved target2026-10-25; overrides ornamental C','source_reference':'docs/design/reference/hud-target-2026-10-25.webp','source_sha256':sha(ROOT/'docs/design/reference/hud-target-2026-10-25.webp'),'canvas':[1920,1080],'assets':ROWS,'font':{'file':'art/ui/fonts/barlow_condensed_semibold.ttf','license':'art/ui/fonts/OFL-BarlowCondensed.txt','source':'https://github.com/google/fonts/tree/main/ofl/barlowcondensed','sha256':sha(ROOT/'art/ui/fonts/barlow_condensed_semibold.ttf'),'case':'UPPERCASE'},'originals':'Generated material PNG outside repository; no heavy masters committed'}
+manifest={'revision':TUNING_REVISION,'direction':'Approved target2026-10-25; overrides ornamental C','source_reference':'docs/design/reference/hud-target-2026-10-25.webp','source_sha256':sha(ROOT/'docs/design/reference/hud-target-2026-10-25.webp'),'canvas':[1920,1080],'assets':ROWS,'font':{'file':'art/ui/fonts/barlow_condensed_medium.ttf','emphasis_file':'art/ui/fonts/barlow_condensed_semibold.ttf','license':'art/ui/fonts/OFL-BarlowCondensed.txt','source':'https://github.com/google/fonts/tree/main/ofl/barlowcondensed','sha256':sha(ROOT/'art/ui/fonts/barlow_condensed_medium.ttf'),'case':'UPPERCASE'},'originals':'Generated material PNG outside repository; no heavy masters committed'}
 (HERE/'assets.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');(OUT/'assets.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');print('Assets',len(ROWS))

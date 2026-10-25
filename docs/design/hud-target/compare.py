@@ -20,6 +20,21 @@ for side in range(2):
  for j,n in enumerate([22,32,48]):
   im=exit.resize((n,n),Image.Resampling.LANCZOS);t=Image.new('RGBA',im.size,'#efe6d6' if side==0 else '#25282c');t.putalpha(im.getchannel('A'));proof.paste(t,(side*600+48+j*160,64),t);d.text((side*600+48+j*160,160),str(n)+' PX',font=f,fill='#efe6d6' if side==0 else '#25282c')
 proof.save(OUT/'readability.webp',quality=93)
-geometry={'register':{'reference':[46,34,270,58],'delivery':[46,32,272,64]},'round':{'reference':[637,30,718,64],'delivery':[636,30,720,72]},'hero':{'reference':[63,836,563,209],'delivery':[64,836,564,212]},'ability_header':{'reference':[685,852,618,49],'delivery':[684,852,624,56]},'slots':{'reference':[685,913,132,126],'delivery':[688,916,132,132]},'actions':{'reference':[1584,847,264,200],'delivery':[1584,836,264,212],'reason':'128x100 visual buttons;112px vertical pitch allows112-high touch targets without overlap'}}
+geometry={'register':{'reference':[46,34,270,58],'delivery':[46,32,272,64]},'round':{'reference':[637,30,718,64],'delivery':[636,30,720,64]},'hero':{'reference':[63,836,563,209],'delivery':[64,836,564,212]},'ability_header':{'reference':[685,852,618,49],'delivery':[684,852,624,56]},'slots':{'reference':[685,913,132,126],'delivery':[688,916,132,132]},'actions':{'reference':[1584,847,264,200],'delivery':[1584,836,264,212],'reason':'128x100 visual buttons;112px vertical pitch allows112-high touch targets without overlap'}}
 (OUT/'target_comparison.json').write_text(json.dumps({'reference_measures':'hud-direction.md; approximate approved-target boxes','pieces':geometry,'explicit_exceptions':['F uses exit instead of the crosshair in target','Canonical game portraits/body art retained','Initiative and current actor from actual captured session; not duplicated generated portraits']},ensure_ascii=False,indent=2)+'\n')
 print('Piece-by-piece comparison10 rows,4 columns')
+
+# Antes/depois deste refinamento: imagem congelada da entrega anterior.
+import subprocess,io
+before=Image.open(io.BytesIO(subprocess.check_output(['git','show','5106986:docs/design/hud-target/hud.webp'],cwd=ROOT))).convert('RGB');after=images[1]
+im=Image.new('RGB',(3840,1152),'#111519');d=ImageDraw.Draw(im)
+for x,title,picture in [(0,'ANTES /5106986',before),(1920,'REFINAMENTO / DETALHES',after)]:
+ d.text((x+32,20),title,font=f,fill='#efe6d6');im.paste(picture,(x,72))
+im.save(OUT/'detail_before_after.webp',quality=93,method=6)
+boxes=[('BISÉIS / TECLAS / AÇÕES',(1580,832,1852,1058)),('RETRATO / LETRA / BARRAS',(60,832,636,1052)),('VIDA / ANEL / ABA',(640,716,904,812)),('ORDEM / ROSTOS',(636,26,1356,106))]
+im=Image.new('RGB',(1920,1080),'#111519');d=ImageDraw.Draw(im)
+for j,title in enumerate(['ALVO','ANTES','REFINAMENTO']):d.text((j*640+24,16),title,font=f,fill='#efe6d6')
+for i,(title,box) in enumerate(boxes):
+ for j,src in enumerate([ref,before,after]):
+  x=j*640+24;y=64+i*252;d.text((x,y),title,font=f,fill='#efe6d6');picture=ImageOps.contain(src.crop(box),(592,200));im.paste(picture,(x+(592-picture.width)//2,y+40+(200-picture.height)//2))
+im.save(OUT/'detail_comparison.webp',quality=94,method=6)
