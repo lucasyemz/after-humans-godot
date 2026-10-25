@@ -851,3 +851,7 @@ station_rules.gd: Bigorna
 refuge_hud.gd: story
 exploration_hud.gd: Requirement
 journey_rules.gd: hero
+briefing_dialog.gd: Briefing
+briefing_dialog.gd: art
+briefing_dialog.gd: role
+briefing_dialog.gd: %d/%d
