@@ -68,6 +68,8 @@ var active := false
 ## A luta é a do guardião do trecho (a ficha diz, #89; as estrelas dele ficam no save, #91).
 var boss_fight := false
 var cards := {}
+## O anel de quem age, no chão sob os pés (#60).
+var ring: AHActorRing
 ## Câmera da luta: o centro e a distância que enquadram todos, e o foco do golpe da vez (close_t 0..1 vai até ele).
 var view_x := 0.0
 var view_distance := 14.0
@@ -848,3 +850,13 @@ func _play_cue(cue: String) -> void:
 
 func play_click() -> void:
 	Sound.click()
+
+
+## O anel no chão sob quem age (unit_id; "" esconde). Criado na primeira vez, filho da arena (no mundo da luta).
+func show_ring(unit_id: String) -> void:
+	if ring == null:
+		ring = AHActorRing.new()
+		ring.name = "ActorRing"
+		add_child(ring)
+	var card: AHSpriteCard = cards.get(unit_id) if unit_id != "" else null
+	ring.follow(card if active else null)

@@ -14,7 +14,7 @@ const IGNORE := "res://tools/i18n_ignore.txt"
 ## os avisos do save).
 const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/fight_rewards.gd", "res://scripts/ui/cargo_picker.gd", "res://scripts/flow/hero_levels.gd", "res://scripts/ui/briefing_dialog.gd", "res://scripts/ui/character_sheet.gd", "res://scripts/ui/options_panel.gd", "res://scripts/core/settings_service.gd",
 	"res://scripts/ui/exploration_hud.gd", "res://scripts/ui/passage_card.gd", "res://scripts/ui/camp_hud.gd",
-	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/refuge_hud.gd",
+	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/kit/kit.gd", "res://scripts/ui/kit/kit_pill.gd", "res://scripts/ui/kit/kit_key.gd", "res://scripts/ui/kit/kit_bar.gd", "res://scripts/ui/refuge_hud.gd",
 	"res://scripts/ui/phase_map.gd", "res://scripts/ui/inventory_panel.gd", "res://scripts/ui/tips_service.gd",
 	"res://scripts/ui/ui_style.gd", "res://scripts/flow/station_rules.gd", "res://scripts/flow/journey_rules.gd",
 	"res://scripts/flow/exploration_care.gd", "res://scripts/combat/combat_engine.gd", "res://scripts/combat/combat_session.gd",

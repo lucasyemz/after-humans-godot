@@ -129,12 +129,13 @@ func _combat_choice() -> void:
 		return
 	chosen.pressed.emit()
 	await _frames(2)
-	var style = chosen.get_theme_stylebox("disabled")
-	t.check(chosen.disabled and style is StyleBoxTexture and String(style.texture.resource_path).ends_with("ability_selected.png"),
-		"o cartão escolhido mostra a moldura de escolhida")
+	# A escolhida ganha os cantos âmbar do kit (a camada Selected, selected_slot), por cima do slot.
+	var mark: Control = chosen.get_node_or_null("Selected")
+	t.check(chosen.disabled and mark != null and mark.visible and String((mark.get_theme_stylebox("panel") as StyleBoxTexture).texture.resource_path).ends_with("selected_slot.webp"),
+		"a habilidade escolhida mostra os cantos de escolhida")
 	for child in hud._abilities.get_children():
-		if child != chosen and not child.get_meta("locked", false):
-			t.check(not String(child.get_theme_stylebox("disabled").texture.resource_path).ends_with("ability_selected.png"), "os outros não")
+		if child != chosen and child.get_node_or_null("Selected") != null:
+			t.check(not child.get_node("Selected").visible, "as outras não")
 	street._arena.hud._clear_markers()
 
 
