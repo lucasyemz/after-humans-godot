@@ -62,6 +62,8 @@ var center_x := 0.0
 ## O quanto os espaços da fila encolhem para a luta caber no lugar (#52): 1 = os de sempre.
 var gap_scale := 1.0
 var active := false
+## A luta é a do guardião do trecho (a ficha diz, #89).
+var boss_fight := false
 var cards := {}
 ## Câmera da luta: o centro e a distância que enquadram todos, e o foco do golpe da vez (close_t 0..1 vai até ele).
 var view_x := 0.0
@@ -413,6 +415,7 @@ func _run() -> void:
 		for unit in session.state.enemy_team:
 			occlusion.untrack(cards[unit.id])
 	active = false
+	boss_fight = false
 	finished.emit(result)
 
 
