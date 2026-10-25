@@ -293,7 +293,8 @@ func refresh(campaign: Dictionary) -> void:
 			tr(" O guardião espera no trecho %d.") % boss_step
 	if expedition.objective_completed:
 		_goal_title.text = tr("✓ Guardião vencido")
-		_goal_text.text = tr("Fase concluída: volte à Estação com todo o achado (botão ou %s).") % S.key_name("menu")
+		_goal_text.text = tr("Abra um compartimento da carga do guardião antes de voltar.") if AHFightRewards.cargo_pending(campaign) \
+			else tr("Fase concluída: volte à Estação com todo o achado (botão ou %s).") % S.key_name("menu")
 	# A rota: cada trecho com o ícone do que é (os não alcançados ficam como "?"), ligados como trilho.
 	_clear(_route_row)
 	for index in route.steps.size():
@@ -348,12 +349,16 @@ func refresh(campaign: Dictionary) -> void:
 	var loot := HBoxContainer.new()
 	loot.add_theme_constant_override("separation", 4)
 	loot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for spec in [["lobby-seed", expedition.loot.seeds], ["lobby-scrap", expedition.loot.scrap], ["lobby-fragment", expedition.loot.fragments]]:
+	var specs := [["lobby-seed", expedition.loot.seeds], ["lobby-scrap", expedition.loot.scrap], ["lobby-fragment", expedition.loot.fragments]]
+	# Os suprimentos (a carga do guardião, #91) só aparecem quando há algum: o achado de sempre não traz.
+	if int(expedition.loot.get("supplies", 0)) > 0:
+		specs.append(["lobby-food", int(expedition.loot.supplies)])
+	for spec in specs:
 		loot.add_child(_icon(spec[0], 20, S.GOLD))
 		loot.add_child(S.label(str(spec[1]), S.MIN_TEXT, S.TEXT, "bold"))
 	var loot_chip := PanelContainer.new()
 	loot_chip.add_theme_stylebox_override("panel", _chip_style())
-	loot_chip.tooltip_text = tr("Achado da jornada: sementes, sucata e fragmentos. Tudo chega com a fase concluída; metade, na retirada.")
+	loot_chip.tooltip_text = tr("Achado da jornada: sementes, sucata, fragmentos e suprimentos. Tudo chega com a fase concluída; metade, na retirada.")
 	loot_chip.mouse_filter = Control.MOUSE_FILTER_PASS
 	var loot_row := HBoxContainer.new()
 	loot_row.add_theme_constant_override("separation", 6)

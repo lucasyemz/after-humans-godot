@@ -49,18 +49,56 @@ A rua com o guardião vencido: antes, nada; agora, a carga espera a escolha ante
 - `tests/test_full_journey.gd` escolhe a carga depois do guardião e segue até o trem.
 - A suíte inteira, `tests/run_all.gd`, passa.
 
-## Para o Lucas decidir
+## O ajuste de equilíbrio
 
-- **Os números das tabelas novas são uma primeira proposta:** o par de rodadas (4 e 8), os critérios por estrela (2 e
-  4) e o que cada fase guarda na carga. Nenhum número que já existia mudou.
-- **No automático, a tela do fim fecha sozinha em 1,5 s,** como antes. Com as estrelas e o XP, talvez valha segurar
-  mais tempo.
-- **A rota da #87 ainda não existe:** a carga usa a semente da expedição. Quando o mapa novo entrar, ela passa a usar a
-  semente da rota.
-- **Os suprimentos da carga não aparecem no "Achado" do HUD.** Ele só mostra sementes, sucata e fragmentos, então os
-  suprimentos aparecem só no relatório da volta. Dá para pôr os suprimentos no HUD.
-- **Os curativos e a relíquia entram na hora,** como o que vem "do refúgio". Se a equipe cair depois, perde o achado da
-  rota mas fica com eles.
+As sugestões da primeira entrega foram fechadas com um meio-termo. O critério foi recompensar quem joga bem sem
+castigar quem está aprendendo.
+
+**O que a medição mostrou.** A medição usa `tools/measure_balance.gd --stars`, com 40 sementes e os níveis e o gear
+típicos. Com as regras antigas (o par de 4 e 8 rodadas, e 2 critérios para 2 estrelas):
+- o golpe final e o instinto saíam em quase 100% das lutas, então toda vitória já dava 2 estrelas, e a de 1 estrela
+  nunca aparecia;
+- o par fixo não servia: o guardião da fase 5 nunca cabia em 8 rodadas, porque leva cerca de 11;
+- as patrulhas da fase 1 sempre cabiam.
+
+**O que mudou:**
+- **O par de rodadas é de cada fase** (`rounds_fase_N`). Ele fica perto do que 3 em 4 vitórias no automático
+  alcançam:
+
+  | Fase | Patrulha | Guardião |
+  |---|---|---|
+  | 1 | 3 | 5 |
+  | 2 | 3 | 7 |
+  | 3 | 5 | 8 |
+  | 4 | 5 | 8 |
+  | 5 | 5 | 13 |
+
+  Uma fase sem linha (as missões da #92) usa o par geral, de 4 e 8.
+- **As estrelas:** 2 estrelas pedem 3 critérios, e 3 estrelas pedem os 4. Na prática, 3 estrelas são ninguém caído e o
+  par de rodadas; 2 estrelas são um dos dois; e um colapso ou o golpe final do sangramento tiram uma estrela.
+- **No automático, a tela do fim fica 3 s na vitória** (1,5 s na derrota e na fuga), no ritmo da luta, para dar tempo
+  de ler as estrelas e o XP. O Continuar fecha antes.
+- **Os suprimentos entram no "Achado" do HUD** quando há algum. Hoje só a carga do guardião traz suprimentos. A dica
+  também passou a citá-los.
+- **O objetivo com a carga na tela** diz "Abra um compartimento da carga do guardião antes de voltar", em vez de
+  "botão ou Esc".
+- **Os curativos e a relíquia continuam entrando na hora.** O curativo serve na própria rota, e a relíquia é rara (no
+  máximo uma por carga). Se a equipe cair depois, perde só o achado da rota, como já acontece com o resto.
+- **A carga continua sorteada pela semente da expedição.** A #87 vai trocar pela semente da rota.
+
+**O resultado (vitórias que dão 1, 2 e 3 estrelas):**
+
+| Fase | Luta | Automático (1★ · 2★ · 3★) | Jogando mal (1★ · 2★ · 3★) |
+|---|---|---|---|
+| 1 | patrulha | 0 · 11 · 89% | 1 · 32 · 67% |
+| 1 | guardião | 2 · 22 · 75% | 12 · 45 · 42% |
+| 3 | patrulha | 4 · 24 · 72% | 15 · 16 · 69% |
+| 3 | guardião | 10 · 48 · 42% | 51 · 27 · 22% |
+| 5 | patrulha | 8 · 19 · 72% | 23 · 11 · 66% |
+| 5 | guardião | 27 · 73 · 0% | 26 · 63 · 11% |
+
+Ninguém sai do guardião da fase 5 sem uma queda, então as 3 estrelas dele ficam como meta de quem domina a luta. O conteúdo
+da carga não mudou.
 
 ## Rodadas da QA
 
@@ -74,3 +112,5 @@ A rua com o guardião vencido: antes, nada; agora, a carga espera a escolha ante
 2. **Aprovada.** A suíte passou 45 de 45, e os scripts da QA também passaram: concluir antes e durante a revelação,
    reabrir com a carga pendente, fase sem linha na tabela, e guardião no automático com estrelas, save, foco, teclado e
    Esc. Ficou uma observação baixa: com a carga na tela, o painel do objetivo ainda diz "botão ou Esc".
+3. **O ajuste de equilíbrio** (pedido do Lucas: "algo equilibrado nas sugestões"), descrito acima. A suíte passou 45 de
+   45.

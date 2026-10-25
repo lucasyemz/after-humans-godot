@@ -19,6 +19,8 @@
 ##   base · hp25 (inimigos com +25% de vida) · dmg1 (+1 de dano) · more (+1 inimigo, cópia do da frente, nas patrulhas
 ##   com menos de 4) · lesscare (metade da comida grátis, 1 curativo e a ampola sem recarga na vitória).
 ## A coluna da jornada com cuidados mostra também quantas ampolas, em média, a Íris usou fora da luta.
+## --stars (#91) troca a tabela pelas estrelas da luta: a média, quantas lutas vencidas dão 1, 2 e 3 estrelas e quanto
+##   cada critério é cumprido (AHFightRewards.criteria, as mesmas regras da tela do fim).
 extends SceneTree
 
 const PHASES := ["fase_1", "fase_2", "fase_3", "fase_4", "fase_5"]
@@ -49,6 +51,10 @@ var policy := "auto"
 var option := "base"
 var gear := "none"
 var levels := "none"
+var stars := false
+## Por fase e tipo de luta: {wins, stars, by_stars [0, 1, 2, 3], criteria {id: cumpridos}}.
+var _stars := {}
+var _counting := false
 var _rng := RandomNumberGenerator.new()
 ## Ampolas da Íris usadas fora da luta nas jornadas com cuidados da fase (mostra o efeito do lesscare).
 var _ampoules := 0
@@ -78,6 +84,8 @@ func _run() -> void:
 			gear = arg.trim_prefix("--gear=")
 		elif arg.begins_with("--levels="):
 			levels = arg.trim_prefix("--levels=")
+		elif arg == "--stars":
+			stars = true
 	if not POLICIES.has(policy) or not OPTIONS.has(option) or not GEARS.has(gear) or not LEVELS.has(levels):
 		push_error("Política (%s), opção (%s), gear (%s) ou níveis (%s) desconhecido." % [" | ".join(POLICIES), " | ".join(OPTIONS), " | ".join(GEARS), " | ".join(LEVELS)])
 		quit(1)
@@ -90,7 +98,10 @@ func _run() -> void:
 	if levels != "none":
 		team_text += " · níveis " + (", ".join(PHASES.map(func(id): return "%s %d" % [id, LEVELS_TYPICAL[id]])) if levels == "typical" else "10")
 	print("política=%s opção=%s gear=%s níveis=%s sementes=%d · %s" % [policy, option, gear, levels, seeds, team_text])
-	print("fase   | luta      | vitórias | rodadas | vida que sobra | jornada com cuidados: termina · voltam | sem cuidados: termina · voltam")
+	if stars:
+		print("fase   | luta      | vitórias | estrelas | 1★ · 2★ · 3★          | ninguém caiu · rodadas · golpe final · instinto | rodadas das vitórias: 25% · mediana · 75%")
+	else:
+		print("fase   | luta      | vitórias | rodadas | vida que sobra | jornada com cuidados: termina · voltam | sem cuidados: termina · voltam")
 	for phase_id in PHASES:
 		_measure(phase_id)
 	quit()
@@ -109,7 +120,9 @@ func _measure(phase_id: String) -> void:
 			if kind != "combat" and kind != "boss":
 				continue
 			var label := "guardião" if kind == "boss" else "patrulha"
+			_counting = true
 			var outcome := _fight(base.duplicate(true), index, seed_value)
+			_counting = false
 			var entry: Dictionary = stats.get(label, {"fights": 0, "wins": 0, "rounds": 0, "hp": 0.0})
 			entry.fights += 1
 			entry.wins += 1 if outcome.result == "victory" else 0
@@ -130,6 +143,9 @@ func _measure(phase_id: String) -> void:
 					_care(carry)
 			journeys[care][0] += 1 if done else 0
 			journeys[care][1] += carry.roster.filter(func(h): return FOUNDERS.has(h.id) and h.alive).size()
+	if stars:
+		_print_stars(phase_id, stats)
+		return
 	for label in ["patrulha", "guardião"]:
 		var entry: Dictionary = stats.get(label, {})
 		if entry.is_empty():
@@ -237,6 +253,8 @@ func _fight(campaign: Dictionary, index: int, seed_value: int) -> Dictionary:
 		else:
 			session.enemy_turn()
 		beats += 1
+	if stars and session.is_over():
+		_count_stars(String(campaign.session.expedition.phase_id), expedition.corridor.steps[index].type == "boss", session)
 	# write_back recarrega a ampola da Íris na vitória; em lesscare ela fica com as cargas que sobraram da luta.
 	var kept := {}
 	if option == "lesscare":
@@ -289,3 +307,37 @@ func _apply_option(enemies: Array, boss: bool) -> Array:
 				copy.rank = enemies.size() + 1
 				enemies.append(copy)
 	return enemies
+
+
+## As estrelas de uma luta acabada (só a luta a luta conta; a jornada passa pelas mesmas lutas e repetiria).
+func _count_stars(phase_id: String, boss: bool, session) -> void:
+	if not _counting:
+		return
+	var key := "%s:%s" % [phase_id, "guardião" if boss else "patrulha"]
+	var entry: Dictionary = _stars.get(key, {"fights": 0, "wins": 0, "stars": 0, "by_stars": [0, 0, 0, 0], "criteria": {}, "rounds": []})
+	var rewards: Dictionary = load("res://scripts/flow/fight_rewards.gd").criteria(session, boss, phase_id)
+	entry.fights += 1
+	if session.state.victory:
+		entry.wins += 1
+		entry.stars += rewards.stars
+		entry.by_stars[rewards.stars] += 1
+		entry.rounds.append(int(session.state.round))
+		for criterion in rewards.list:
+			entry.criteria[criterion.id] = int(entry.criteria.get(criterion.id, 0)) + (1 if criterion.met else 0)
+	_stars[key] = entry
+
+
+func _print_stars(phase_id: String, _stats: Dictionary) -> void:
+	for label in ["patrulha", "guardião"]:
+		var entry: Dictionary = _stars.get("%s:%s" % [phase_id, label], {})
+		if entry.is_empty() or entry.fights == 0:
+			continue
+		var wins: int = maxi(1, entry.wins)
+		var rate := func(id: String) -> float: return 100.0 * int(entry.criteria.get(id, 0)) / wins
+		var rounds: Array = entry.rounds.duplicate()
+		rounds.sort()
+		var at := func(share: float) -> int: return int(rounds[mini(rounds.size() - 1, int(share * rounds.size()))]) if not rounds.is_empty() else 0
+		print("%s | %-9s | %5.0f%%   | %5.2f    | %3.0f%% · %3.0f%% · %3.0f%%   | %5.0f%% · %5.0f%% · %5.0f%% · %5.0f%% | rodadas %d · %d · %d" % [phase_id, label,
+			100.0 * entry.wins / entry.fights, float(entry.stars) / wins, 100.0 * entry.by_stars[1] / wins,
+			100.0 * entry.by_stars[2] / wins, 100.0 * entry.by_stars[3] / wins, rate.call("no_falls"), rate.call("rounds"),
+			rate.call("final_blow"), rate.call("calm"), at.call(0.25), at.call(0.5), at.call(0.75)])

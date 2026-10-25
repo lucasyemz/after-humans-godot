@@ -1,6 +1,6 @@
 ## O fim da luta que recompensa (#91, a P2 da proposta do laço): as estrelas da luta e a carga recuperada do guardião.
-## - As estrelas: a vitória dá 1; os quatro critérios (ninguém caiu, poucas rodadas, o golpe final de um herói, o
-##   instinto controlado) dão a 2ª e a 3ª (data/fight-stars.json). A melhor nota do guardião de cada fase fica no save
+## - As estrelas: a vitória dá 1; os quatro critérios (ninguém caiu, o par de rodadas da fase, o golpe final de um
+##   herói, o instinto controlado) dão a 2ª (3 deles) e a 3ª (os 4) (data/fight-stars.json). A melhor nota do guardião de cada fase fica no save
 ##   (campaign.mission_stars), para a #92 liberar a próxima missão.
 ## - A carga recuperada: depois do guardião, seis caixas viradas com o que a máquina guardava (data/recovered-cargo.json,
 ##   por fase), sorteadas pela semente da expedição; o jogador escolhe uma e as outras se revelam. A escolha fica no save
@@ -24,11 +24,11 @@ static func icon_of(box: Dictionary) -> String:
 	return ICONS.get(String(box.get("kind", "")), "item-generic")
 
 
-## Os critérios da luta vencida: [{id, met, text}] e as estrelas. boss: a luta do guardião (o par de rodadas é outro).
-static func criteria(session: AHCombatSession, boss: bool) -> Dictionary:
+## Os critérios da luta vencida: [{id, met, text}] e as estrelas. boss: a luta do guardião (o par de rodadas é outro);
+## phase_id: a fase da luta (o par de cada fase; sem linha, o par geral).
+static func criteria(session: AHCombatSession, boss: bool, phase_id: String = "") -> Dictionary:
 	var state: AHCombat.State = session.state
-	var rounds_row = GameData.row("fight_stars", "rounds")
-	var par := int(rounds_row.get("Boss" if boss else "Patrol", 99)) if rounds_row != null else 99
+	var par := rounds_par(phase_id, boss)
 	var fell: bool = state.player_team.any(func(u): return u.hp <= 0)
 	var collapsed: bool = state.player_team.any(func(u): return u.crisis_outcome == AHCombat.Crisis.COLLAPSE)
 	var list := [
@@ -41,10 +41,18 @@ static func criteria(session: AHCombatSession, boss: bool) -> Dictionary:
 	return {"list": list, "met": met, "stars": stars_for(met) if state.victory else 0}
 
 
+## O par de rodadas da luta: o da fase (rounds_<fase>) ou o geral (rounds).
+static func rounds_par(phase_id: String, boss: bool) -> int:
+	var row = GameData.row("fight_stars", "rounds_" + phase_id) if phase_id != "" else null
+	if row == null:
+		row = GameData.row("fight_stars", "rounds")
+	return int(row.get("Boss" if boss else "Patrol", 99)) if row != null else 99
+
+
 ## As estrelas pelo número de critérios cumpridos (a vitória já dá 1).
 static func stars_for(met: int) -> int:
 	var row = GameData.row("fight_stars", "stars")
-	var two := int(row.get("Two", 2)) if row != null else 2
+	var two := int(row.get("Two", 3)) if row != null else 3
 	var three := int(row.get("Three", 4)) if row != null else 4
 	return 3 if met >= three else (2 if met >= two else 1)
 

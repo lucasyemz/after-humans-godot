@@ -1495,7 +1495,7 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Mostra o fim da luta e espera "Continuar" (no modo automático, segue sozinho).
 ## O fim da luta: o título, as estrelas e os critérios (rewards, de AHFightRewards.criteria; a vitória) e cada herói com a
 ## vida e o XP ganho enchendo a barra até o próximo nível (#91). Continuar fecha (o automático fecha sozinho).
-func show_result(result: String, automatic: bool, rewards: Dictionary = {}) -> void:
+func show_result(result: String, automatic: bool, rewards: Dictionary = {}, hold: float = 1.5) -> void:
 	_panel.visible = false
 	# A vitória e a derrota têm o toque delas (#36); a fuga, não.
 	if result == "victory" or result == "defeat":
@@ -1546,6 +1546,6 @@ func show_result(result: String, automatic: bool, rewards: Dictionary = {}) -> v
 	_result.visible = true
 	button.grab_focus.call_deferred()
 	if automatic:
-		get_tree().create_timer(1.5).timeout.connect(func(): result_closed.emit())
+		get_tree().create_timer(hold).timeout.connect(func(): result_closed.emit())
 	await result_closed
 	_result.visible = false

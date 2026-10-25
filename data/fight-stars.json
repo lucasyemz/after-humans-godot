@@ -3,12 +3,42 @@
     "Name": "rounds",
     "Patrol": 4,
     "Boss": 8,
-    "Description": "Poucas rodadas: até este número de rodadas (o par da luta)."
+    "Description": "Poucas rodadas: o par de uma fase sem linha própria (as missões novas)."
+  },
+  {
+    "Name": "rounds_fase_1",
+    "Patrol": 3,
+    "Boss": 5,
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+  },
+  {
+    "Name": "rounds_fase_2",
+    "Patrol": 3,
+    "Boss": 7,
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+  },
+  {
+    "Name": "rounds_fase_3",
+    "Patrol": 5,
+    "Boss": 8,
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+  },
+  {
+    "Name": "rounds_fase_4",
+    "Patrol": 5,
+    "Boss": 8,
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+  },
+  {
+    "Name": "rounds_fase_5",
+    "Patrol": 5,
+    "Boss": 13,
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
   },
   {
     "Name": "stars",
-    "Two": 2,
+    "Two": 3,
     "Three": 4,
-    "Description": "Quantos critérios dão 2 e 3 estrelas (a vitória já dá 1)."
+    "Description": "Quantos critérios dão 2 e 3 estrelas (a vitória já dá 1): o golpe final e o instinto quase sempre saem, então 2 estrelas pedem ninguém caído ou o par de rodadas, e 3 pedem os dois."
   }
 ]

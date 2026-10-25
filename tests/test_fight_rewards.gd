@@ -48,7 +48,10 @@ func _stars() -> void:
 	session.state.player_team[0].hp = 0
 	session.state.round = 9
 	var two := AHFightRewards.criteria(session, false)
-	t.equal([two.met, two.stars], [2, 2], "alguém caiu e a luta foi longa: 2 estrelas")
+	t.equal([two.met, two.stars], [2, 1], "alguém caiu e a luta foi longa: só a estrela da vitória")
+	session.state.round = 2
+	t.equal(AHFightRewards.criteria(session, false).stars, 2, "três critérios (alguém caiu, mas foi rápida): 2 estrelas")
+	session.state.round = 9
 	t.check(not two.list.filter(func(c): return c.id == "no_falls")[0].met, "o critério de ninguém cair, não cumprido")
 	session.last_down_by_hero = false
 	session.state.round = 7
@@ -56,6 +59,13 @@ func _stars() -> void:
 	var one := AHFightRewards.criteria(session, true)
 	t.equal(one.stars, 1, "só um critério: a vitória dá 1 estrela")
 	t.check(one.list.filter(func(c): return c.id == "rounds")[0].met, "o guardião tem um par de rodadas maior (7 rodadas cabem)")
+	# O par de cada fase (data/fight-stars.json): o guardião da fase 5 aguenta mais rodadas que o da fase 1.
+	t.check(AHFightRewards.rounds_par("fase_5", true) > AHFightRewards.rounds_par("fase_1", true), "o par do guardião cresce com a fase")
+	t.equal(AHFightRewards.rounds_par("missao_sem_linha", false), AHFightRewards.rounds_par("", false), "fase sem linha usa o par geral")
+	session.state.round = AHFightRewards.rounds_par("fase_1", true) + 1
+	t.check(not AHFightRewards.criteria(session, true, "fase_1").list.filter(func(c): return c.id == "rounds")[0].met, "passou do par do guardião da fase 1")
+	t.check(AHFightRewards.criteria(session, true, "fase_5").list.filter(func(c): return c.id == "rounds")[0].met, "e cabe no da fase 5")
+	session.state.round = 7
 	session.state.victory = false
 	t.equal(AHFightRewards.criteria(session, false).stars, 0, "a derrota não dá estrela")
 	# O golpe final: o sangramento na vez do inimigo não é golpe de herói.
@@ -174,7 +184,10 @@ func _reopen_with_cargo() -> void:
 	J.start_expedition(c, "fase_1", 9696)
 	c.session.expedition.objective_completed = true
 	Campaign.state = c
-	var boxes: Array = AHFightRewards.cargo(c).boxes.duplicate(true)
+	# A primeira caixa com suprimentos, para conferir o Achado do HUD depois de escolher.
+	c.session.expedition.cargo = {"boxes": AHFightRewards.cargo(c).boxes, "chosen": -1}
+	c.session.expedition.cargo.boxes[0] = {"kind": "supplies", "amount": 3, "relic_id": ""}
+	var boxes: Array = c.session.expedition.cargo.boxes.duplicate(true)
 	Campaign.save()
 	GameFlow.change_to("street", {}, false)
 	for frame in 600:
@@ -189,6 +202,7 @@ func _reopen_with_cargo() -> void:
 	var picker: AHCargoPicker = pickers[0]
 	t.equal(picker.boxes, boxes, "com as mesmas caixas")
 	t.check(street.corridor.blocking(), "e a equipe espera a escolha")
+	t.check(street.exploration_hud._goal_text.text.contains("compartimento"), "o objetivo pede a escolha da carga")
 	var finish: Button = street.exploration_hud._finish_button
 	t.check(not finish.visible, "o Concluir jornada some enquanto a carga espera")
 	finish.pressed.emit()
@@ -208,6 +222,8 @@ func _reopen_with_cargo() -> void:
 	await _frames(3)
 	t.check(not street.corridor.blocking(), "Continuar fecha e a equipe anda")
 	t.check(finish.visible, "e o Concluir jornada volta")
+	t.check(street.exploration_hud._goal_text.text.contains("volte à Estação"), "e o objetivo volta a pedir a volta")
+	t.check(_has_text(street.exploration_hud._loot_row, "3"), "os suprimentos da carga aparecem no Achado")
 
 
 ## Uma luta de verdade até a vitória: a tela do fim mostra as estrelas, os critérios e o XP.
@@ -251,3 +267,10 @@ func _result_screen() -> void:
 func _frames(count: int) -> void:
 	for i in count:
 		await _tree.process_frame
+
+
+func _has_text(node: Node, text: String) -> bool:
+	for label in node.find_children("*", "Label", true, false):
+		if label.text == text:
+			return true
+	return false
