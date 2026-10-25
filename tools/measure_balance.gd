@@ -4,8 +4,11 @@
 ## Equipe: os quatro fundadores. --gear diz o que eles levam (relíquias e treinos da Pesquisa):
 ##   none (padrão: como saem da campanha nova) · typical (o progresso suposto de cada fase, em GEAR_TYPICAL) · max (as
 ##   quatro relíquias e os quatro treinos em qualquer fase).
-## --levels diz o nível dos fundadores (#90): none (padrão: nível 1) · typical (o nível suposto ao entrar em cada fase,
-##   LEVELS_TYPICAL) · max (nível 10). Cada treino escolhe a primeira melhoria que o Alojamento oferece.
+## --levels diz o nível dos fundadores (#90): none (padrão: nível 1) · typical (o nível ao entrar em cada fase jogando as
+##   anteriores uma vez: tirado da curva e do XP médio que as jornadas dão, com as mesmas sementes; muda junto com os
+##   JSON) · fixed (o nível suposto da primeira proposta, LEVELS_FIXED) · max (nível 10). Cada treino escolhe a primeira
+##   melhoria que o Alojamento oferece; as sementes do Treino não limitam aqui.
+##   O XP médio por jornada conta só os fundadores que voltam vivos: na fase em que ninguém volta, sai 0.
 ## Os treinos pesquisados valem na luta (use_expedition leva campaign.researched_skills para o contexto, desde 22/10).
 ## Três medidas por fase:
 ## - luta a luta, cada uma numa cópia limpa da expedição (os quatro vivos e de vida cheia): vitórias, rodadas e a vida
@@ -37,10 +40,10 @@ const TRAINING_ORDER := ["res_cao_punho_sucata", "res_gato_corte_fase", "res_sap
 ## guardiões dão só 4 fragmentos até a fase 5; a Pesquisa (2) mais um treino (3) pedem o quinto, da Cora (+1 por volta
 ## com a Pesquisa ligada) ou do evento que dá fragmento. Para o Lucas ajustar; quem repete fases chega mais perto de max.
 const GEAR_TYPICAL := {"fase_1": [0, 0], "fase_2": [1, 0], "fase_3": [2, 0], "fase_4": [3, 0], "fase_5": [4, 1]}
-const LEVELS := ["none", "typical", "max"]
+const LEVELS := ["none", "typical", "fixed", "max"]
 ## O nível suposto ao entrar em cada fase sem repetir fases (o XP de umas 5 lutas e da jornada por fase, hero-xp.json, e a
 ## curva de hero-levels.json): para o Lucas ajustar com a curva.
-const LEVELS_TYPICAL := {"fase_1": 1, "fase_2": 3, "fase_3": 4, "fase_4": 6, "fase_5": 7}
+const LEVELS_FIXED := {"fase_1": 1, "fase_2": 3, "fase_3": 4, "fase_4": 6, "fase_5": 7}
 const OPTIONS := ["base", "hp25", "dmg1", "more", "lesscare"]
 ## O mais ferido recebe cuidado enquanto estiver abaixo desta fração da vida.
 const CARE_BELOW := 0.7
@@ -55,6 +58,9 @@ var stars := false
 ## Por fase e tipo de luta: {wins, stars, by_stars [0, 1, 2, 3], criteria {id: cumpridos}}.
 var _stars := {}
 var _counting := false
+## O nível típico de cada fase (--levels=typical), tirado da curva; e o XP médio de um fundador na jornada de cada fase.
+var _typical := {}
+var _journey_xp := {}
 var _rng := RandomNumberGenerator.new()
 ## Ampolas da Íris usadas fora da luta nas jornadas com cuidados da fase (mostra o efeito do lesscare).
 var _ampoules := 0
@@ -96,7 +102,12 @@ func _run() -> void:
 	elif gear == "max":
 		team_text = "as 4 relíquias e os 4 treinos"
 	if levels != "none":
-		team_text += " · níveis " + (", ".join(PHASES.map(func(id): return "%s %d" % [id, LEVELS_TYPICAL[id]])) if levels == "typical" else "10")
+		if levels == "typical":
+			_derive_typical()
+		var table: Dictionary = _typical if levels == "typical" else LEVELS_FIXED
+		team_text += " · níveis " + (", ".join(PHASES.map(func(id): return "%s %d" % [id, table[id]])) if levels != "max" else "10")
+		if levels == "typical":
+			team_text += " (XP por jornada: %s)" % ", ".join(PHASES.map(func(id): return "%.0f" % _journey_xp.get(id, 0.0)))
 	print("política=%s opção=%s gear=%s níveis=%s sementes=%d · %s" % [policy, option, gear, levels, seeds, team_text])
 	if stars:
 		print("fase   | luta      | vitórias | estrelas | 1★ · 2★ · 3★          | ninguém caiu · rodadas · golpe final · instinto | rodadas das vitórias: 25% · mediana · 75%")
@@ -159,11 +170,11 @@ func _measure(phase_id: String) -> void:
 			float(entry.rounds) / fights, 100.0 * entry.hp / fights, tail])
 
 
-func _new_campaign(seed_value: int, phase_id: String) -> Dictionary:
+func _new_campaign(seed_value: int, phase_id: String, level: int = 0) -> Dictionary:
 	var campaign: Dictionary = root.get_node("Campaign").create_initial(seed_value)
 	_unlock(campaign)
 	_equip(campaign, phase_id)
-	_level_up(campaign, phase_id)
+	_level_up(campaign, phase_id, level)
 	J.start_expedition(campaign, phase_id, 1000 + seed_value * 7)
 	if option == "lesscare":
 		campaign.session.expedition.food = int(campaign.session.expedition.food) / 2
@@ -210,8 +221,8 @@ func _equip(campaign: Dictionary, phase_id: String) -> void:
 
 
 ## Os fundadores no nível de --levels: cada treino com a primeira melhoria oferecida (o XP e as sementes não contam aqui).
-func _level_up(campaign: Dictionary, phase_id: String) -> void:
-	var target: int = {"none": 1, "typical": LEVELS_TYPICAL[phase_id], "max": 10}[levels]
+func _level_up(campaign: Dictionary, phase_id: String, forced: int = 0) -> void:
+	var target: int = forced if forced > 0 else {"none": 1, "typical": int(_typical.get(phase_id, 1)), "fixed": LEVELS_FIXED[phase_id], "max": 10}[levels]
 	var Levels = load("res://scripts/flow/hero_levels.gd")
 	campaign.inventory.seeds = 9999
 	for hero in campaign.roster:
@@ -341,3 +352,40 @@ func _print_stars(phase_id: String, _stats: Dictionary) -> void:
 			100.0 * entry.wins / entry.fights, float(entry.stars) / wins, 100.0 * entry.by_stars[1] / wins,
 			100.0 * entry.by_stars[2] / wins, 100.0 * entry.by_stars[3] / wins, rate.call("no_falls"), rate.call("rounds"),
 			rate.call("final_blow"), rate.call("calm"), at.call(0.25), at.call(0.5), at.call(0.75)])
+
+
+## O nível típico (--levels=typical): joga as fases em ordem, uma vez cada. Ao entrar numa fase, cada fundador está no
+## nível que o XP acumulado das anteriores paga na curva (hero-levels.json); o XP de uma fase é a média, nas sementes, do
+## que um fundador vivo ganha na jornada com cuidados naquele nível (as lutas e, concluída, a jornada).
+func _derive_typical() -> void:
+	var Levels = load("res://scripts/flow/hero_levels.gd")
+	var total := 0.0
+	for phase_id in PHASES:
+		var level := 1
+		var spent := 0
+		while level < Levels.MAX_LEVEL:
+			var row = root.get_node("GameData").row("hero_levels", "level_%d" % (level + 1))
+			if row == null or spent + int(row.Xp) > total:
+				break
+			spent += int(row.Xp)
+			level += 1
+		_typical[phase_id] = level
+		var gained := 0.0
+		var heroes := 0
+		for seed_value in seeds:
+			var carry := _new_campaign(seed_value, phase_id, level)
+			var steps: Array = carry.session.expedition.corridor.steps
+			var done := true
+			for index in steps.size():
+				if steps[index].type != "combat" and steps[index].type != "boss":
+					continue
+				if _fight(carry, index, seed_value).result != "victory":
+					done = false
+					break
+				_care(carry)
+			for hero in carry.roster:
+				if FOUNDERS.has(hero.id) and hero.alive:
+					gained += Levels.xp(hero) + (int(Levels.rule("journey").get("Xp", 0)) if done else 0)
+					heroes += 1
+		_journey_xp[phase_id] = gained / maxi(1, heroes)
+		total += _journey_xp[phase_id]

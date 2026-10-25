@@ -9,31 +9,31 @@
     "Name": "rounds_fase_1",
     "Patrol": 3,
     "Boss": 5,
-    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, gear típico e o nível típico tirado da curva)."
   },
   {
     "Name": "rounds_fase_2",
     "Patrol": 3,
     "Boss": 7,
-    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, gear típico e o nível típico tirado da curva)."
   },
   {
     "Name": "rounds_fase_3",
     "Patrol": 5,
     "Boss": 8,
-    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, gear típico e o nível típico tirado da curva)."
   },
   {
     "Name": "rounds_fase_4",
     "Patrol": 5,
     "Boss": 8,
-    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, gear típico e o nível típico tirado da curva)."
   },
   {
     "Name": "rounds_fase_5",
     "Patrol": 5,
-    "Boss": 13,
-    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, níveis e gear típicos)."
+    "Boss": 14,
+    "Description": "O par da fase: cerca de 3 em 4 vitórias no automático cabem nele (tools/measure_balance.gd --stars, gear típico e o nível típico tirado da curva)."
   },
   {
     "Name": "stars",

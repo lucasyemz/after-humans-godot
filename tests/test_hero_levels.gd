@@ -62,13 +62,21 @@ func _training() -> void:
 	t.equal(AHHeroLevels.train(c, "hero_cao_bento", "vida"), "", "treina com XP e sementes")
 	t.equal([AHHeroLevels.level(bento), AHHeroLevels.xp(bento), S.quantity(c, "seeds")], [2, 5, seeds - cost.seeds], "nível 2, o XP do nível e as sementes gastos")
 	t.equal(int(bento.max_hp), max_hp + 2, "mais fôlego: +2 de vida máxima")
-	# O limite das melhorias: o gato tem dois passos ligeiros, depois só a mão treinada.
+	# O limite das melhorias: o gato tem um passo ligeiro (data/hero-upgrades.json), depois só a mão treinada.
 	var nick: Dictionary = S.hero(c, "hero_gato_nick")
 	c.inventory.seeds = 999
-	for i in 2:
+	var speed_limit := int(GameData.row("hero_upgrades", "velocidade").MaxStacks)
+	for i in speed_limit:
 		nick.xp = 999
-		AHHeroLevels.train(c, "hero_gato_nick", "velocidade")
-	t.equal(AHHeroLevels.options(nick).map(func(u): return u.Name), ["habilidade_gato", "vida"], "a velocidade tem limite (2): a reserva (mais vida) completa as duas")
+		t.equal(AHHeroLevels.train(c, "hero_gato_nick", "velocidade"), "", "o passo ligeiro %d de %d" % [i + 1, speed_limit])
+	nick.xp = 999
+	t.check(AHHeroLevels.train(c, "hero_gato_nick", "velocidade") != "", "passou do limite (%d): o passo ligeiro é recusado" % speed_limit)
+	t.equal(AHHeroLevels.options(nick).map(func(u): return u.Name), ["habilidade_gato", "vida"], "com a velocidade no limite, a reserva (mais vida) completa as duas")
+	# A ficha da Preparação (#89) mostra a velocidade da luta, com o Passo ligeiro, e as melhorias.
+	var sheet := AHCharacterSheet.from_hero(nick)
+	var in_fight: int = AHCombatSession.create([nick], ["robot"], false, 3).state.player_team[0].speed
+	t.equal(int(sheet.speed), in_fight, "a ficha mostra a mesma velocidade da luta (com o Passo ligeiro)")
+	t.check(sheet.passives.any(func(p): return String(p[0]).begins_with("Passo ligeiro")), "e a melhoria nos passivos")
 	# O limite no 10.
 	for i in 20:
 		nick.xp = 999
@@ -101,6 +109,22 @@ func _combat() -> void:
 	J.start_expedition(c, "fase_1", 3)
 	calm_session.write_back(c)
 	t.equal(int(bento.instinct), 25, "e só na luta: o instinto gravado volta ao de antes")
+	calm_session.write_back(c)
+	t.equal(int(bento.instinct), 25, "gravar de novo não devolve o instinto do Sangue frio em dobro")
+	# O Sangue frio não apaga a crise: quem terminou a luta em crise continua nela; sem crise, o que volta não a provoca.
+	var crisis_session := AHCombatSession.create([bento], ["robot"], false, 3)
+	var top := int(crisis_session.engine.instinct_rules().Max)
+	var crisis_unit: AHCombat.Unit = crisis_session.state.player_team[0]
+	crisis_unit.instinct = top
+	crisis_unit.crisis_outcome = AHCombat.Crisis.COLLAPSE
+	crisis_session.write_back(c)
+	t.equal(int(bento.instinct), top, "terminou a luta em crise: a crise continua (o Sangue frio não a apaga)")
+	bento.instinct = 25
+	var near_session := AHCombatSession.create([bento], ["robot"], false, 3)
+	near_session.state.player_team[0].instinct = top - 5
+	near_session.write_back(c)
+	t.equal(int(bento.instinct), top - 1, "sem crise na luta, o instinto que volta para antes dela")
+	bento.instinct = 25
 	# A tela da luta mostra a faixa com a Mão treinada de quem age.
 	nick.upgrades = ["habilidade_gato", "habilidade_gato"]
 	var shown_session := AHCombatSession.create([nick], ["robot"], false, 3)
@@ -141,6 +165,17 @@ func _xp_from_play() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 92
 	var recruit_id: String = S.recruit(c, "cao", rng, "Teste").hero_id
+	# O recruta pelo id (hero_<classe>_<n>): os fundadores nunca, um recruta de cada classe sempre.
+	var founders: Array = GameData.table("initial_heroes").keys()
+	t.check(not founders.is_empty() and founders.all(func(id): return not AHHeroLevels.is_recruit({"id": id})), "nenhum fundador conta como recruta")
+	var recruits_ok := true
+	for class_id in GameData.table("classes").keys():
+		var fresh: Dictionary = Campaign.create_initial(140)
+		fresh.unlocked_classes = GameData.table("classes").keys()
+		var made: Dictionary = S.recruit(fresh, class_id, rng, "Teste")
+		if not made.has("hero_id") or not AHHeroLevels.is_recruit(S.hero(fresh, made.hero_id)):
+			recruits_ok = false
+	t.check(recruits_ok, "o recruta de cada classe conta como recruta")
 	Campaign.state = c
 	J.start_expedition(c, "fase_1", 92)
 	c.session.expedition.team = ["hero_cao_bento", recruit_id]

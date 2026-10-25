@@ -25,6 +25,8 @@ const ACTIONS := {
 	"combat_move": {"keys": [KEY_Q], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
 	"combat_defend": {"keys": [KEY_W], "buttons": [JOY_BUTTON_X]},
 	"combat_flee": {"keys": [KEY_F]},
+	# Examinar (#89): o foco passa pelos personagens da luta e a ficha de cada um abre (o mouse e o toque apontam direto).
+	"combat_examine": {"keys": [KEY_X], "buttons": [JOY_BUTTON_LEFT_STICK]},
 	# O registro da luta, escondido por padrão (#56): abre e fecha.
 	"combat_log": {"keys": [KEY_L], "buttons": [JOY_BUTTON_RIGHT_STICK]},
 	# Só para teste do protótipo (teclado).

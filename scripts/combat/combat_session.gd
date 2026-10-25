@@ -344,8 +344,16 @@ func write_back(campaign: Dictionary) -> void:
 			# A relíquia de vida aumenta o máximo só na luta: fora dela a vida volta ao máximo do herói (senão a noite e a
 			# comida "curavam" para baixo).
 			hero.hp = clampi(unit.hp, 1 if unit.deaths_door else 0, int(hero.max_hp))
-			# O Sangue frio vale só na luta: o instinto que ele tirou volta, sem chegar à crise.
-			hero.instinct = mini(unit.instinct + int(calm.get(unit.hero_id, 0)), int(engine.instinct_rules().Max) - 1) if int(calm.get(unit.hero_id, 0)) > 0 else unit.instinct
+			# O Sangue frio vale só na luta: o instinto que ele tirou volta. Sem crise na luta, o que volta não leva à crise;
+			# quem terminou a luta em crise (no máximo ou com o desfecho) continua nela.
+			hero.instinct = unit.instinct
+			var back := int(calm.get(unit.hero_id, 0))
+			if back > 0:
+				var top := int(engine.instinct_rules().Max)
+				var in_crisis: bool = unit.instinct >= top or unit.crisis_outcome != AHCombat.Crisis.NONE
+				hero.instinct = mini(unit.instinct + back, top if in_crisis else top - 1)
+				# A luta acabou: a unidade fica com o instinto devolvido, e o calm é limpo abaixo (gravar de novo dá o mesmo).
+				unit.instinct = hero.instinct
 			hero.trauma = unit.trauma
 			hero.alive = not dead
 			hero.expedition_uses = {}
@@ -353,6 +361,8 @@ func write_back(campaign: Dictionary) -> void:
 				var ability = data.abilities.get(ability_id)
 				if ability != null and ability.bUsesPerExpedition:
 					hero.expedition_uses[ability_id] = unit.remaining_uses[ability_id]
+	# Limpo como o tally: o instinto do Sangue frio já voltou para a unidade e o herói, e não volta em dobro.
+	calm.clear()
 	AHExplorationCare.restore_iris_after_victory(campaign, self)
 	# O que cada um fez soma na expedição (o relatório da volta destaca).
 	var expedition = campaign.get("session", {}).get("expedition")

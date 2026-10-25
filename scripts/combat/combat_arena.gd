@@ -65,7 +65,7 @@ var center_x := 0.0
 ## O quanto os espaços da fila encolhem para a luta caber no lugar (#52): 1 = os de sempre.
 var gap_scale := 1.0
 var active := false
-## A luta é a do guardião do trecho (as estrelas dele ficam no save, #91).
+## A luta é a do guardião do trecho (a ficha diz, #89; as estrelas dele ficam no save, #91).
 var boss_fight := false
 var cards := {}
 ## Câmera da luta: o centro e a distância que enquadram todos, e o foco do golpe da vez (close_t 0..1 vai até ele).
@@ -82,12 +82,27 @@ var _shake_left := 0.0
 var _shake_time := 0.0
 ## A escala de tempo de antes da pausa do acerto (para devolver), ou -1 fora dela.
 var _hitstop_scale := -1.0
+## Os efeitos de impacto e os loops de estado no alvo (#84).
+var effects := AHCombatEffects.new()
 
 
 func _process(delta: float) -> void:
 	if _shake_left > 0.0:
 		_shake_left = maxf(0.0, _shake_left - delta * speed)
 		_shake_time += delta * speed
+	# Com a luta decidida (a tela do resultado), os loops não voltam: o _run já os tirou.
+	if active and session != null and not session.is_over():
+		_sync_states()
+
+
+## Os loops dos estados (sangramento, veneno, atordoado, marcado) seguem os estados de cada um; fora da luta, nenhum.
+func _sync_states(clear: bool = false) -> void:
+	var camera := get_viewport().get_camera_3d() if is_inside_tree() else null
+	var reduced := reduced_effects()
+	for unit in session.units():
+		var card: AHSpriteCard = cards.get(unit.id)
+		if card != null:
+			effects.sync_states(card, {} if clear else AHCombatEffects.states_of(unit, _is_machine(unit)), camera, reduced)
 
 
 func _exit_tree() -> void:
@@ -409,6 +424,7 @@ func _run() -> void:
 			await _wait(0.45)
 			await _play_beat(session.enemy_turn())
 	hud.refresh()
+	_sync_states(true)
 	var result := session.result()
 	session.write_back(Campaign.state)
 	# As estrelas da luta (#91); as do guardião ficam no save, por fase.
@@ -546,7 +562,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 			_float_text(card, action.DisplayName, Color(1.0, 0.85, 0.7), 0.9)
 	var impact_start := Time.get_ticks_msec()
 	var life := float(hero_action.get("vfx", {}).get("life_seconds", 0.0)) + 0.05
-	await _show_events(events, contact)
+	await _show_events(events, contact, actor.id)
 	var held := (Time.get_ticks_msec() - impact_start) * 0.001
 	var impact := maxf(IMPACT_SECONDS * (0.8 if support else 1.0), life) / speed
 	if held < impact:
@@ -608,7 +624,8 @@ func _event_targets(events: Array) -> Array:
 
 
 ## Números e reações de cada evento, no alvo. Num golpe (contact_x), o acerto mais forte dá a pausa e o tremor.
-func _show_events(events: Array, contact_x = null) -> void:
+## actor_id: quem age (o dano nele mesmo, como o sangramento no começo da vez, não é golpe).
+func _show_events(events: Array, contact_x = null, actor_id: String = "") -> void:
 	var stagger := {}
 	var crits := {}
 	for event in events:
@@ -617,6 +634,12 @@ func _show_events(events: Array, contact_x = null) -> void:
 			crits[event.target_unit_id] = true
 	var strongest := -1.0
 	var crit_hit := false
+	# O efeito de cada alvo neste lance (#84): um só, o mais forte (AHCombatEffects.stronger).
+	var damaged := {}
+	for event in events:
+		if event.type == AHCombat.EventType.DAMAGE:
+			damaged[event.target_unit_id] = true
+	var shown := {}
 	for event in events:
 		var unit := session.state.find_unit(event.target_unit_id)
 		var card: AHSpriteCard = cards.get(event.target_unit_id)
@@ -657,6 +680,17 @@ func _show_events(events: Array, contact_x = null) -> void:
 				_float_text(card, event.text, Color(0.8, 0.6, 1.0), 0.9 + lift, 40)
 			_:
 				_float_text(card, event.text, Color(0.95, 0.92, 0.85), 0.9 + lift, 38)
+		# O efeito curto no alvo (#84): o acerto e o crítico só num golpe de outro (o sangramento e o veneno da vez não
+		# são golpe); o escudo só quando o bloqueio segura um golpe (o bloqueio ganho por habilidade não).
+		var effect := AHCombatEffects.for_event(event.type, crits.has(unit.id), _is_machine(unit))
+		if AHCombatEffects.HITS.has(effect) and (contact_x == null or unit.id == actor_id):
+			effect = ""
+		if effect == "block" and not damaged.has(unit.id):
+			effect = ""
+		shown[unit.id] = AHCombatEffects.stronger(shown.get(unit.id, ""), effect)
+	for unit_id in shown:
+		if shown[unit_id] != "":
+			effects.play(shown[unit_id], cards[unit_id], get_viewport().get_camera_3d() if is_inside_tree() else null, speed, reduced_effects())
 	if not events.is_empty():
 		hud.refresh()
 		if contact_x != null and strongest >= 0.0:

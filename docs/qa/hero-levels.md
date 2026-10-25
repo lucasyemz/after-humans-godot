@@ -23,17 +23,18 @@ A escolha do Bento entre as duas melhorias do cão, e o Bento no nível 2 com Ma
   - os recrutas ganham 1,5 vez isso.
 
   O relatório da volta mostra o XP de cada um. No nível 10, o XP para de acumular.
-- **O Treino** (no Alojamento, a Sala dos Personagens): com o XP do nível (`data/hero-levels.json`, de 30 a 140) e as
+- **O Treino** (no Alojamento, a Sala dos Personagens): com o XP do nível (`data/hero-levels.json`, de 60 a 300) e as
   sementes (de 1 a 4), o herói sobe um nível e escolhe uma de duas melhorias da espécie (`data/hero-upgrades.json`):
 
   | Melhoria | O que faz | Limite | Espécies |
   |---|---|---|---|
   | Mais fôlego | +2 de vida máxima | 9 | cão, sapo, rato, tatu (e reserva) |
   | Sangue frio | começa cada luta com 10 de instinto a menos (só na luta: depois, o instinto volta) | 4 | cão, sapo, tatu (e reserva) |
-  | Passo ligeiro | +1 de velocidade | 2 | gato, coruja, rato |
-  | Mão treinada | +1 no dano ou na cura da habilidade principal (Corte de Fase, Disparo Perfurante) | 3 | gato, coruja |
+  | Passo ligeiro | +1 de velocidade | 1 | gato, coruja, rato |
+  | Mão treinada | +1 no dano ou na cura da habilidade principal (Corte de Fase, Disparo Perfurante) | 2 | gato, coruja |
 
-  Com uma melhoria da espécie no limite, as de reserva completam as duas, para todos chegarem ao nível 10 escolhendo.
+  Com uma melhoria da espécie no limite, as de reserva completam as duas, para todos chegarem ao nível 10. Quem esgota
+  também o Sangue frio (o cão, o sapo, o tatu e o rato, nos níveis altos) fica só com Mais fôlego.
 - **Na luta,** o nível só soma por cima (`AHHeroLevels.combat_bonus`):
   - a vida fica no máximo do herói;
   - a velocidade e o +1 na habilidade, como o treino da Pesquisa (a faixa na tela da luta já mostra o +1);
@@ -41,29 +42,69 @@ A escolha do Bento entre as duas melhorias do cão, e o Bento no nível 2 com Ma
 
   Um herói de nível 1 é igual ao de antes, e a paridade com a Unreal continua 48/48.
 - **O save** passou para a versão 2, com `level`, `xp` e `upgrades` em cada herói. O save da versão 1 abre migrado:
-  cada herói vivo no nível 1, sem melhorias, com 85 de XP por fase já concluída (o de uma fase jogada), para treinar e
+  cada herói vivo no nível 1, sem melhorias, com 70 de XP por fase já concluída (o piso da média medida de uma jornada), para treinar e
   escolher ele mesmo. O save não diz quando cada um chegou: o recruta recebe o mesmo.
 
-## O equilíbrio (`tools/measure_balance.gd --levels=`, 40 sementes, política auto)
+## O equilíbrio (`tools/measure_balance.gd`, 40 sementes, política auto, sem gear)
 
-O nível suposto ao entrar em cada fase sem repetir fases (`LEVELS_TYPICAL`, pela curva e pelo XP de umas cinco lutas
-e da jornada por fase): fase 1 no 1, fase 2 no 3, fase 3 no 4, fase 4 no 6, fase 5 no 7. Na tabela, o guardião em luta
-avulsa e a jornada com cuidados (termina · voltam):
+**Decisão do Lucas (25/10):** a curva e as melhorias ficam mais conservadoras, com as fases 3 e 4 perto de 50% de
+vitória no nível típico, e não em 78%.
 
-| Fase | Sem nível | Nível típico | Nível 10 |
-|---|---|---|---|
-| 1 | 100% · 100% · 3,75 | 100% · 100% · 3,75 | 100% · 100% · 3,98 |
-| 2 | 100% · 92% · 3,02 | 100% · 98% · 3,45 | 100% · 100% · 3,98 |
-| 3 | 95% · 35% · 0,95 | 100% · 78% · 2,48 | 100% · 100% · 3,75 |
-| 4 | 90% · 30% · 0,72 | 100% · 78% · 2,58 | 100% · 92% · 3,35 |
-| 5 | 12% · 0% · 0,00 | 80% · 10% · 0,15 | 88% · 30% · 0,72 |
+**O nível típico agora sai da curva.** Antes era uma constante fixa da ferramenta (1, 3, 4, 6 e 7). Agora
+`--levels=typical` joga as fases em ordem, uma vez cada. Ao entrar numa fase, cada fundador está no nível que o XP das
+jornadas anteriores paga na curva. O XP é a média medida: cerca de 71 a 76 por fundador por jornada. Assim, o antes e o
+depois são medidos cada um com a sua curva. A constante antiga continua em `--levels=fixed`.
 
-Com o nível típico, as fases 3 e 4 ficam bem mais fáceis, e a fase 5 continua difícil. Os números das tabelas
-(curva, sementes, XP e melhorias) são propostas para o Lucas ajustar; nenhum outro número do jogo mudou.
+**O que mudou:**
+- **A curva** (`hero-levels.json`):
+
+  | | Nível 2 | Nível 3 | Nível 4 | Nível 5 | Nível 6 | Nível 7 | Nível 8 | Nível 9 | Nível 10 |
+  |---|---|---|---|---|---|---|---|---|---|
+  | Antes | 30 | 40 | 50 | 60 | 75 | 90 | 105 | 120 | 140 |
+  | Depois | 60 | 90 | 120 | 150 | 180 | 210 | 240 | 270 | 300 |
+
+  As sementes de cada nível não mudaram.
+- **As melhorias** (`hero-upgrades.json`): o limite do Passo ligeiro caiu de 2 para 1, e o da Mão treinada de 3 para
+  2. A velocidade e o +1 na habilidade principal eram o maior salto de poder por nível.
+- **O XP** (`hero-xp.json`): a migração dá 70 por fase concluída, e não 85. É o piso da média medida de uma jornada
+  (71 a 76), para o save migrado chegar a cada fase no mesmo nível da campanha nova. Com 75, um save com 2 fases
+  receberia 150 e fecharia o nível 3 (60 + 90), e a fase 3 iria para 78%. O XP das lutas e da jornada não mudou.
+
+**Os níveis típicos:**
+
+| Fase | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|
+| Antes | 1 | 3 | 4 | 5 | 6 |
+| Depois | 1 | 2 | 2 | 3 | 4 |
+
+**A jornada com cuidados chega ao fim do guardião** (entre parênteses, quantos dos 4 heróis voltam):
+
+| Fase | Sem nível | Típico, antes | Típico, depois | Nível 10, depois |
+|---|---|---|---|---|
+| 1 | 100% (3,75) | 100% (3,75) | 100% (3,75) | 100% (4,00) |
+| 2 | 92% (3,02) | 98% (3,45) | 95% (3,25) | 100% (4,00) |
+| 3 | 35% (0,95) | 78% (2,48) | **42% (1,23)** | 100% (3,77) |
+| 4 | 30% (0,72) | 75% (2,40) | **52% (1,43)** | 95% (3,48) |
+| 5 | 0% (0,00) | 2% (0,07) | 0% (0,00) | 12% (0,28) |
+
+As fases 3 e 4 ficam em 42% e 52%, com média de 47%. O nível é inteiro: na fase 3, o nível 2 dá 42% e o nível 3 dá
+78%, então não há um meio-termo exato. Quem repete fases, ou tem recrutas (1,5 vez o XP), chega com mais nível. A fase 5
+continua difícil, como já era sem nível. Atenção ao limiar: na fase 3 faltam uns 7 XP para o nível 3, então quem
+fizer um pouco mais de XP que a política automática (ou repetir uma luta) já chega ao degrau de 78%.
+
+## A revisão do PR (lucasyemz/after-humans-godot#102)
+
+- **O Sangue frio não apaga a crise.** Quem terminou a luta em crise (o instinto no máximo, ou com o colapso ou a
+  superação) continua nela depois que o instinto do Sangue frio volta. Sem crise na luta, o que volta para um ponto
+  antes dela, como antes.
+- **O `calm` é limpo junto com o `tally`.** O instinto devolvido passa para a unidade da luta, e gravar a sessão de
+  novo dá o mesmo resultado, sem devolver o Sangue frio em dobro.
+- **Um teste do `is_recruit`:** nenhum fundador conta como recruta, e o recruta de cada classe conta.
+- **A curva e as melhorias ficaram mais conservadoras** (a seção do equilíbrio, acima).
 
 ## Testes
 
-`tests/test_hero_levels.gd` (47 verificações) confere:
+`tests/test_hero_levels.gd` (62 verificações) confere:
 - as tabelas: os níveis 2 a 10 e duas melhorias para cada classe;
 - o Treino:
   - sem XP, não treina;
@@ -89,8 +130,23 @@ A paridade (`test_combat_parity`) continua 48/48.
   - Também de gravidade baixa:
     - a escolha do Treino fecha com o painel;
     - a fuga não dá XP de luta;
-    - a migração dá o XP de uma fase jogada (85) por fase concluída, e não aos mortos;
+    - a migração dá o XP de uma fase jogada (85, na época) por fase concluída, e não aos mortos;
     - a mensagem do herói morto no Treino ficou clara.
 - **Rodada 2 (aprovada):** as correções conferidas com saves v1 reais, o Alojamento com 12 heróis e o texto Maior.
   Ficam de gravidade baixa: o Sangue frio junto com um efeito que leva o instinto a 0 devolve um pouco a mais, e o
   recruta que chegou depois das fases recebe o XP da migração.
+- **Rodada 3, a revisão do PR (reprovada):** achou três problemas médios, todos corrigidos com teste ou captura:
+  - a ficha da Preparação (#89, que veio no merge) ignorava o Passo ligeiro: mostrava 7 de velocidade, e a luta 8. A
+    ficha agora soma o nível e lista as melhorias nos passivos;
+  - a captura do relatório parava na caixa do debriefing (#88). Ela agora passa pela caixa, e as fotos foram refeitas;
+  - com 75 por fase, o save migrado chegava à fase 3 no nível 3 (78%). A migração agora dá 70.
+
+  As observações baixas também entraram: o teste do limite do Passo ligeiro lê o limite da tabela e confere a recusa;
+  e a medição avisa que o XP médio conta só quem volta.
+- **Rodada 4 (aprovada):**
+  - a ficha confere com a luta dentro e fora dela (velocidade 8 e 8);
+  - as capturas do relatório mostram o relatório sem XP e com XP;
+  - a migração de 70 bate com os níveis típicos.
+
+  Fica uma observação baixa: a linha "Sangue frio ×2" mostra a descrição de uma escolha só (10 de instinto), e o total
+  é 20.

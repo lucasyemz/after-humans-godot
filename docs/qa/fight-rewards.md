@@ -23,9 +23,10 @@ A rua com o guardião vencido: antes, nada; agora, a carga espera a escolha ante
 
 - **As estrelas** (`data/fight-stars.json`):
   - a vitória dá 1 estrela, e a derrota e a fuga não dão nenhuma;
-  - os critérios são quatro: ninguém caiu; a luta durou até 4 rodadas (até 8 no guardião); o golpe final foi de um
-    herói (o sangramento na vez do inimigo não conta); o instinto ficou controlado (ninguém em colapso);
-  - 2 critérios cumpridos dão 2 estrelas, e os 4 dão 3 estrelas;
+  - os critérios são quatro: ninguém caiu; a luta coube no par de rodadas da fase (o da patrulha ou o do guardião,
+    na tabela abaixo; sem linha, 4 e 8); o golpe final foi de um herói (o sangramento na vez do inimigo não conta); o
+    instinto ficou controlado (ninguém em colapso);
+  - 3 critérios cumpridos dão 2 estrelas, e os 4 dão 3 estrelas;
   - a melhor nota do guardião de cada fase fica no save (`mission_stars`), para a #92 liberar a próxima missão;
   - o save de antes abre sem estrelas.
 - **A carga recuperada** (`data/recovered-cargo.json`, por fase):
@@ -34,8 +35,8 @@ A rua com o guardião vencido: antes, nada; agora, a carga espera a escolha ante
   - o sorteio usa a semente da expedição. Salvar e voltar mostra as mesmas caixas e não deixa escolher de novo;
   - sementes, sucata, fragmentos e suprimentos entram no achado da rota e chegam na volta, como o resto do achado;
   - os curativos vão na hora para a Mochila, e a relíquia para o Depósito.
-- **O XP na tela do fim:** é o XP da #90 (`xp_gained` da sessão), e mostra "Treino pronto" quando o herói já pode
-  treinar.
+- **O XP na tela do fim:** é o XP da #90 (`xp_gained` da sessão), e mostra "Treino pronto" quando o XP do
+  próximo nível está cheio (o Treino ainda pede as sementes, conferidas no Alojamento).
 
 ## Como testar
 
@@ -71,7 +72,7 @@ típicos. Com as regras antigas (o par de 4 e 8 rodadas, e 2 critérios para 2 e
   | 2 | 3 | 7 |
   | 3 | 5 | 8 |
   | 4 | 5 | 8 |
-  | 5 | 5 | 13 |
+  | 5 | 5 | 14 |
 
   Uma fase sem linha (as missões da #92) usa o par geral, de 4 e 8.
 - **As estrelas:** 2 estrelas pedem 3 critérios, e 3 estrelas pedem os 4. Na prática, 3 estrelas são ninguém caído e o
@@ -86,19 +87,25 @@ típicos. Com as regras antigas (o par de 4 e 8 rodadas, e 2 critérios para 2 e
   máximo uma por carga). Se a equipe cair depois, perde só o achado da rota, como já acontece com o resto.
 - **A carga continua sorteada pela semente da expedição.** A #87 vai trocar pela semente da rota.
 
-**O resultado (vitórias que dão 1, 2 e 3 estrelas):**
+**O resultado (vitórias que dão 1, 2 e 3 estrelas):** medido com o nível típico da curva conservadora da #90 (1, 2,
+2, 3 e 4) e o gear típico, depois do merge da lucasyemz/after-humans-godot#102.
 
 | Fase | Luta | Automático (1★ · 2★ · 3★) | Jogando mal (1★ · 2★ · 3★) |
 |---|---|---|---|
 | 1 | patrulha | 0 · 11 · 89% | 1 · 32 · 67% |
 | 1 | guardião | 2 · 22 · 75% | 12 · 45 · 42% |
-| 3 | patrulha | 4 · 24 · 72% | 15 · 16 · 69% |
-| 3 | guardião | 10 · 48 · 42% | 51 · 27 · 22% |
-| 5 | patrulha | 8 · 19 · 72% | 23 · 11 · 66% |
-| 5 | guardião | 27 · 73 · 0% | 26 · 63 · 11% |
+| 3 | patrulha | 8 · 24 · 68% | 26 · 8 · 65% |
+| 3 | guardião | 25 · 45 · 30% | 65 · 26 · 9% |
+| 4 | guardião | 32 · 32 · 35% | 74 · 22 · 4% |
+| 5 | patrulha | 18 · 15 · 66% | 23 · 7 · 70% |
+| 5 | guardião | 22 · 78 · 0% | 45 · 50 · 5% |
 
-Ninguém sai do guardião da fase 5 sem uma queda, então as 3 estrelas dele ficam como meta de quem domina a luta. O conteúdo
+No automático, ninguém sai do guardião da fase 5 sem uma queda (jogando mal, 5%), então as 3 estrelas dele ficam como meta de quem domina a luta. O conteúdo
 da carga não mudou.
+
+**Depois da curva conservadora da #90.** O nível típico caiu de 1, 3, 4, 6 e 7 para 1, 2, 2, 3 e 4. As lutas ficaram
+um pouco mais longas. O par do guardião da fase 5 passou de 13 para 14: com 13, só 61% das vitórias no automático
+cabiam, e com 14 cabem 78%. O da fase 4 ficou em 8, com 68% (com 9 seriam 92%, mais longe dos 3 em 4).
 
 ## Rodadas da QA
 
@@ -114,3 +121,6 @@ da carga não mudou.
    Esc. Ficou uma observação baixa: com a carga na tela, o painel do objetivo ainda diz "botão ou Esc".
 3. **O ajuste de equilíbrio** (pedido do Lucas: "algo equilibrado nas sugestões"), descrito acima. A suíte passou 45 de
    45.
+4. **Depois do merge da lucasyemz/after-humans-godot#102 (aprovada):** a suíte passou 48 de 48, com a jornada completa
+   (briefing, guardião, carga e debriefing), a tela do fim no texto Normal e no Maior, e a medição das estrelas
+   reproduzida. As observações baixas entraram no doc, e o par do guardião da fase 4 voltou a 8.

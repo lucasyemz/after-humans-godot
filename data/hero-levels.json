@@ -2,55 +2,55 @@
   {
     "Name": "level_2",
     "Level": 2,
-    "Xp": 30,
+    "Xp": 60,
     "Seeds": 1
   },
   {
     "Name": "level_3",
     "Level": 3,
-    "Xp": 40,
+    "Xp": 90,
     "Seeds": 1
   },
   {
     "Name": "level_4",
     "Level": 4,
-    "Xp": 50,
+    "Xp": 120,
     "Seeds": 2
   },
   {
     "Name": "level_5",
     "Level": 5,
-    "Xp": 60,
+    "Xp": 150,
     "Seeds": 2
   },
   {
     "Name": "level_6",
     "Level": 6,
-    "Xp": 75,
+    "Xp": 180,
     "Seeds": 2
   },
   {
     "Name": "level_7",
     "Level": 7,
-    "Xp": 90,
+    "Xp": 210,
     "Seeds": 3
   },
   {
     "Name": "level_8",
     "Level": 8,
-    "Xp": 105,
+    "Xp": 240,
     "Seeds": 3
   },
   {
     "Name": "level_9",
     "Level": 9,
-    "Xp": 120,
+    "Xp": 270,
     "Seeds": 3
   },
   {
     "Name": "level_10",
     "Level": 10,
-    "Xp": 140,
+    "Xp": 300,
     "Seeds": 4
   }
 ]

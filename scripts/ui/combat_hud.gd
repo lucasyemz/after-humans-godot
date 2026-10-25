@@ -23,6 +23,19 @@ const ACTIONS := [["Mover", "move", "Q", "combat_move"], ["Defender", "defend", 
 
 var arena: AHCombatArena
 var session: AHCombatSession
+## A ficha de quem está apontado (#89): o mouse no corpo, o alvo com foco do teclado ou do controle, o toque longo.
+var sheet: AHCharacterSheet
+## O toque segurando um corpo: {unit_id, since (ms)}; {} sem toque.
+var _touch_hold := {}
+## Onde o mouse está (o último movimento, nas coordenadas da tela do jogo).
+var _mouse := Vector2(-1, -1)
+## A ficha abriu pelo toque longo: o soltar dele (o toque e o clique emulado) não escolhe nem usa o alvo.
+var _swallow_release := false
+## Examinar (#89, teclado e controle): os personagens de pé, da esquerda para a direita, e quem tem o foco; [] fora.
+var _examine: Array = []
+var _examine_index := 0
+## A instrução da vez de antes do Examinar (volta ao fechar).
+var _examine_note := ""
 var _order: HBoxContainer
 var _order_panel: PanelContainer
 var _panel: PanelContainer
@@ -75,6 +88,8 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_build()
+	sheet = AHCharacterSheet.new()
+	add_child(sheet)
 
 
 # ---------------------------------------------------------------- peças (usadas também pelas outras telas)
@@ -280,7 +295,10 @@ func _reset_log() -> void:
 
 
 func close() -> void:
+	stop_examine()
 	visible = false
+	sheet.close()
+	_touch_hold = {}
 	_close_bag()
 	_clear_markers()
 	_hide_tip()
@@ -581,6 +599,21 @@ func _focus_scope() -> Control:
 
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		_mouse = event.position
+	if visible and event is InputEventScreenTouch:
+		_touch_hold = {"unit_id": unit_at(event.position), "since": Time.get_ticks_msec()} if event.pressed else {}
+		if event.pressed:
+			_swallow_release = false
+		elif _swallow_release:
+			get_viewport().set_input_as_handled()
+			return
+	if _swallow_release and event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
+		get_viewport().set_input_as_handled()
+		return
+	if visible and _examine_input(event):
+		get_viewport().set_input_as_handled()
+		return
 	if visible and S.press_focused(_focus_scope(), event):
 		get_viewport().set_input_as_handled()
 
@@ -641,6 +674,7 @@ func _process(_delta: float) -> void:
 			# Na mira, a dica da habilidade sai de cima do apontado (ficava sobre o corpo e o ALVO).
 			if _tip.visible:
 				_dodge_tip(_body_rect(camera, pointed).merge(Rect2(_target_label.position, _target_label.size)))
+	_update_sheet(camera)
 	for marker in _markers.filter(func(m): return not m.has_meta("card")) + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")
 		var screen := camera.unproject_position(target)
@@ -649,6 +683,104 @@ func _process(_delta: float) -> void:
 		for rect in short_plates:
 			if rect.intersects(Rect2(marker.position, marker.size)):
 				marker.position.y = rect.position.y - marker.size.y - 6
+
+
+## A ficha (#89): de quem o alvo com foco do teclado ou do controle é, de quem o toque longo segura ou de quem o mouse
+## está em cima (o corpo na tela, ou o botão do alvo na mira). Some quando nada aponta para ninguém.
+func _update_sheet(camera: Camera3D) -> void:
+	var unit_id := ""
+	var focused := get_viewport().gui_get_focus_owner()
+	if S.using_keys and focused != null and _markers.has(focused) and focused.has_meta("unit_id"):
+		unit_id = focused.get_meta("unit_id")
+	elif not _examine.is_empty():
+		unit_id = _examine[_examine_index]
+	elif not _touch_hold.is_empty():
+		if Time.get_ticks_msec() - int(_touch_hold.since) >= int(AHCharacterSheet.LONG_PRESS * 1000.0) and _touch_hold.unit_id != "":
+			unit_id = _touch_hold.unit_id
+			_swallow_release = true
+	elif not sheet.touch_mode:
+		var hovered := get_viewport().gui_get_hovered_control()
+		if hovered != null and _markers.has(hovered) and hovered.has_meta("unit_id"):
+			unit_id = hovered.get_meta("unit_id")
+		elif hovered == null:
+			unit_id = unit_at(_mouse)
+		else:
+			# A placa (a intenção pega o mouse para a dica dela) também é do personagem.
+			for plate_id in _unit_bars:
+				if _unit_bars[plate_id].is_ancestor_of(hovered):
+					unit_id = plate_id
+	var unit := session.state.find_unit(unit_id) if unit_id != "" else null
+	var card: AHSpriteCard = arena.cards.get(unit_id) if unit != null else null
+	if unit == null or card == null or not card.visible or not unit.is_standing() or _bag != null or _result.visible:
+		sheet.close()
+		return
+	sheet.show_info(AHCharacterSheet.from_unit(session, unit, arena.boss_fight and not unit.is_player), _body_rect(camera, card),
+		_dock_top() - 8.0 if _panel.visible else INF)
+
+
+## Examinar (teclado e controle): a ação abre o foco nos personagens de pé (a começar por quem age), as setas passam de
+## um para outro, e a ação de novo ou Voltar fecham. Só na vez de um herói, fora da mira e da Mochila.
+func _examine_input(event: InputEvent) -> bool:
+	if _examine.is_empty():
+		if not event.is_action_pressed("combat_examine") or not waiting or _choosing != "" or _bag != null:
+			return false
+		var standing := session.units().filter(func(u): return u.is_standing() and arena.cards.has(u.id) and arena.cards[u.id].visible)
+		standing.sort_custom(func(a, b): return arena.cards[a.id].global_position.x < arena.cards[b.id].global_position.x)
+		_examine = standing.map(func(u): return u.id)
+		_examine_index = maxi(0, _examine.find(_actor_id))
+		_paint_examine()
+		_examine_note = _description.text
+		_description.text = tr("Examinar: %s/%s passa de um personagem para outro; %s ou %s fecha.") % [
+			S.key_name("move_left"), S.key_name("move_right"), S.key_name("combat_examine"), S.key_name("cancel")]
+		return true
+	if event.is_action_pressed("combat_examine") or S.is_back(event):
+		stop_examine()
+		return true
+	for spec in [[-1, ["move_left", "ui_left"]], [1, ["move_right", "ui_right"]]]:
+		for action in spec[1]:
+			if event.is_action_pressed(action):
+				_examine_index = posmod(_examine_index + spec[0], _examine.size())
+				_paint_examine()
+				return true
+	# Com o foco nos personagens, o resto (as habilidades, Interagir) espera; o mouse e o toque seguem livres.
+	return event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion
+
+
+func stop_examine() -> void:
+	if _examine.is_empty():
+		return
+	_examine = []
+	_paint_examine()
+	_description.text = _examine_note
+
+
+## A luz da escolha em quem está sendo examinado (a mesma do alvo, #57).
+func _paint_examine() -> void:
+	for unit in session.units():
+		var card: AHSpriteCard = arena.cards.get(unit.id)
+		if card != null:
+			var on: bool = not _examine.is_empty() and _examine[_examine_index] == unit.id
+			# A luz de quem age (mais leve que a do alvo apontado: aqui só se olha).
+			card.set_highlight(S.GOLD, S.TARGET_ACTIVE if on else 0.0)
+
+
+## Quem está naquele ponto da tela: o corpo (de pé) que o contém, o do centro mais perto quando dois se encostam; "" se
+## ninguém.
+func unit_at(point: Vector2) -> String:
+	var camera := get_viewport().get_camera_3d() if is_inside_tree() else null
+	if session == null or arena == null or camera == null:
+		return ""
+	var best := ""
+	var best_distance := INF
+	for unit in session.units():
+		var card: AHSpriteCard = arena.cards.get(unit.id)
+		if card == null or not card.visible or not unit.is_standing():
+			continue
+		var rect := _body_rect(camera, card)
+		if rect.has_point(point) and absf(rect.get_center().x - point.x) < best_distance:
+			best_distance = absf(rect.get_center().x - point.x)
+			best = unit.id
+	return best
 
 
 ## A largura das placas de cada lado: a de sempre (176 dos heróis, 246 dos inimigos), estreitada até caber entre os pés
@@ -729,6 +861,7 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	waiting = true
 	var command: Dictionary = await command_chosen
 	waiting = false
+	stop_examine()
 	# A Mochila não é modal: um comando escolhido com ela aberta (Defender, uma habilidade) fecha ela também. Aberta, ela
 	# travava os atalhos dos próximos heróis e passava para a luta seguinte.
 	_close_bag()
@@ -1298,6 +1431,7 @@ func bag_open() -> bool:
 ## entre os alvos com as setas (o foco escolhe) e Enter ou A usa. Uma posição vazia (mover para lá) tem o botão dela.
 ## ability_id: a habilidade mirada (vazio: o Mover).
 func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id: String = "") -> void:
+	stop_examine()
 	_clear_markers()
 	# Antes de desligar os cartões: o escolhido ganha a moldura de escolhida (_style_ability lê _choosing).
 	_choosing = ability_id if ability_id != "" else "move"
@@ -1317,7 +1451,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 			marker.set_meta("unit_id", unit.id)
 			for state in ["normal", "hover", "pressed", "disabled", "focus"]:
 				marker.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-			marker.tooltip_text = _name(unit)
+			# O nome e o resto estão na ficha que abre ao apontar (#89): sem a dica do sistema por cima dela.
 		else:
 			var probe := AHCombat.Unit.new()
 			probe.is_player = not enemy_side

@@ -140,6 +140,9 @@ func _departure(skip: String) -> void:
 	team.append(c.roster[4].id)
 	station.hud._draft = {"phase": "fase_1", "team": team, "focus": "", "extra": 0}
 	station.hud._depart()
+	# O briefing (#88, conferido em test_briefing): pulado, a partida segue.
+	if t.check(station.hud.briefing_open(), "o briefing abre antes da partida"):
+		station.hud.briefing.skip()
 	while GameFlow.passage == null:
 		await _tree.process_frame
 	var card: AHPassageCard = GameFlow.passage
