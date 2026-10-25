@@ -53,6 +53,12 @@ const TRAIN_DOOR_END := TRAIN_DOOR_START + 0.8
 const TRAIN_CLOSE := 0.55
 const TRAIN_LEAVE := 2.6
 const TRAIN_OUT := -32.0
+## A volta da equipe (#76): o intervalo entre quem desce, o passo de quem está ferido e quanto o trem vazio espera.
+const TEAM_STEP_OUT := 0.45
+const WOUNDED_PACE := 0.55
+const EMPTY_WAIT := 1.2
+## A distância mínima (m) de quem desce atrás para quem vai na frente.
+const FOLLOW_GAP := 1.0
 ## Quanto antes de parar o freio começa (s).
 const BRAKE_LEAD := 1.6
 ## A faixa da tela que o HUD deixa livre (na base de 1920): à direita do menu e, com um painel aberto, à esquerda dele.
@@ -60,6 +66,9 @@ const SCREEN_MENU_RIGHT := 380.0
 const SCREEN_PANEL_LEFT := 1200.0
 
 var hud: AHRefugeHud
+## Onde termina, na tela, o menu da esquerda da vista geral (o HUD mede: cresce com o texto Maior e o inglês). A vista
+## geral enquadra a Estação à direita dele, para nenhum cômodo (o Dormitório da ponta) ficar embaixo do menu (#76).
+var menu_right := SCREEN_MENU_RIGHT
 var camera: Camera3D
 var residents := {}
 ## Na plataforma (o relatório, o trem, a partida) ou no abrigo; a passagem secreta liga os dois.
@@ -102,6 +111,10 @@ var _camera_pending := false
 ## O painel do trem reaberto depois da cena: a câmera vai ao candidato (pela passagem, se preciso) antes de o painel abrir.
 var _reopen_pending := false
 var _env: Environment
+## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt}.
+var _arrivals: Array = []
+## O trem da volta fechando e indo embora depois de a equipe descer (não conta como cena do trem ocupada).
+var _team_train_leaving := false
 
 
 func _ready() -> void:
@@ -163,10 +176,12 @@ func _arrive(campaign: Dictionary) -> void:
 	Campaign.save()
 	_place_residents(rng)
 	if not campaign.station.last_return.is_empty() and not campaign.station.last_return.get("seen", false):
-		hud.open_service("report")
+		# A equipe chega de trem e desce; depois, o relatório (#76).
+		hud.play_arrival()
 	elif campaign.night.phase != "none":
+		# A noite pendente: a vista geral com o Dormitório em destaque e a Preparação bloqueada (#76), como depois do
+		# relatório.
 		focus_overview(true)
-		hud.open_room("dormitory")
 	elif S.visit_pending(campaign):
 		hud.open_service("train")
 	else:
@@ -209,7 +224,8 @@ func refresh() -> void:
 
 func _process(delta: float) -> void:
 	_tick_camera(delta)
-	if _pending_arrival != "" and _path.is_empty():
+	# O candidato chega depois de o trem da volta sair de vista (senão o vagão pulava para o túnel).
+	if _pending_arrival != "" and _path.is_empty() and not _team_train_leaving:
 		play_train_arrival(_pending_arrival)
 		_pending_arrival = ""
 	_tick_train(delta)
@@ -302,7 +318,7 @@ func _framed_key(x0: float, x1: float, y: float, left_px: float, right_px: float
 
 
 func _overview_key() -> Dictionary:
-	return _framed_key(LEFT_END - 0.5, CORE_X1 + 0.5, -2.4, SCREEN_MENU_RIGHT, 1900.0, 26.0, -3.0, 0.0)
+	return _framed_key(LEFT_END - 0.5, CORE_X1 + 0.5, -2.4, menu_right, 1900.0, 26.0, -3.0, 0.0)
 
 
 ## A plataforma, o vagão e o fim da linha (PlatformKey da Unreal).
@@ -312,6 +328,18 @@ func _platform_key() -> Dictionary:
 
 func focus_overview(instant: bool = false) -> void:
 	_go(_overview_key(), false, instant)
+
+
+## O menu da esquerda mudou de largura (o HUD chama só na vista geral): a vista geral de agora, ou a do fim da
+## passagem descendo da plataforma, reenquadra.
+func refit_overview() -> void:
+	if on_platform:
+		return
+	if not _path.is_empty():
+		if _path_down:
+			_path[-1] = _overview_key()
+		return
+	_set_goal(_overview_key())
 
 
 ## Com o HUD oculto, a Estação inteira no meio da tela (sem a faixa do menu à esquerda).
@@ -554,6 +582,7 @@ func _set_door_open(amount: float) -> void:
 ## O trem chega do túnel com o candidato (PlayTrainArrival): o aviso primeiro, depois a entrada freando até parar, as
 ## portas e o candidato descendo; a câmera só fecha nele quando ele chega à plataforma.
 func play_train_arrival(candidate_id: String) -> void:
+	_team_train_leaving = false
 	_remove_candidate()
 	_candidate_id = candidate_id
 	_train_mode = 1
@@ -570,6 +599,7 @@ func play_train_arrival(candidate_id: String) -> void:
 ## Fecha e acelera para o túnel; fica fora até a próxima chegada (PlayTrainDeparture). Recusado, o candidato volta
 ## para dentro do trem antes de as portas fecharem.
 func play_train_departure(candidate_leaves: bool) -> void:
+	_team_train_leaving = false
 	_warning_time = -1.0
 	_train_time = 0.0
 	_camera_pending = false
@@ -652,7 +682,126 @@ func train_event_named(name: String) -> void:
 
 
 func train_busy() -> bool:
-	return _train_mode != 0 or _pending_arrival != "" or _reopen_pending
+	# O trem que trouxe a equipe indo embora não segura a cena do candidato: a chegada dele começa do túnel.
+	return (_train_mode != 0 and not _team_train_leaving) or _pending_arrival != "" or _reopen_pending
+
+
+# ---------------------------------------------------------------- a volta da equipe (#76)
+
+## A volta da expedição: o trem chega à plataforma com a equipe, as portas abrem e cada sobrevivente desce e anda até o
+## lugar da fila do relatório (quem está ferido, mais devagar); os mortos não descem. Com todos no lugar, "team_ready"
+## (o HUD abre o relatório) e o trem fecha e vai embora. finish_team_arrival pula para o fim. É só a cena: o save
+## não muda (reaberto no meio, a volta começa de novo).
+func play_team_arrival(hero_ids: Array) -> void:
+	clear_lineup()
+	_remove_candidate()
+	_arrivals.clear()
+	var survivors: Array = hero_ids.filter(func(id): var h = S.hero(Campaign.state, id); return h != null and h.alive)
+	# Os lugares da fila ficam todos à direita da porta: desce primeiro quem vai para o mais longe, para ninguém
+	# atravessar quem já parou (a fila fica na ordem do relatório).
+	for step in survivors.size():
+		var index: int = survivors.size() - 1 - step
+		var entry = S.hero(Campaign.state, survivors[index])
+		var art := _hero_art(entry)
+		if art.is_empty():
+			continue
+		var hurt: bool = int(entry.get("hp", 0)) < int(entry.get("max_hp", 0))
+		_arrivals.append({"hero_id": survivors[index], "art": art.idle, "slot": _line_slot(index, survivors.size()),
+			"delay": step * TEAM_STEP_OUT, "speed": TRAIN_WALK_SPEED * (WOUNDED_PACE if hurt else 1.0), "card": null, "hurt": hurt})
+	on_platform = true
+	_path.clear()
+	_apply_panel(0.0)
+	# A câmera da fila do relatório: a equipe desce pela porta do lado da plataforma (atrás do vagão) e aparece saindo
+	# de trás dele, andando até o lugar (como o candidato, #61).
+	_set_goal(_line_key(maxi(1, survivors.size())), true)
+	_train_mode = 4
+	_train_time = 0.0
+	_warning_time = 0.0
+	_door_open = 0.0
+	_camera_pending = false
+	_offset_wagon(TRAIN_OUT)
+	_train_sound = Sound.play("res://audio/station/train_arrival.ogg", 0.9)
+	Sound.play("res://audio/station/train_bell.ogg", 0.8)
+	train_event.emit("warning")
+
+
+## A chegada em andamento (o HUD espera o "team_ready").
+func team_arriving() -> bool:
+	return _train_mode == 4
+
+
+## Pula a chegada: todos no lugar, o trem já fora e as portas fechadas; o HUD segue para o relatório.
+func finish_team_arrival() -> void:
+	if _train_mode != 4:
+		return
+	for arrival in _arrivals:
+		if arrival.card == null:
+			_spawn_arrival(arrival)
+		arrival.card.position = arrival.slot
+		arrival.card.scale = Vector3.ONE
+		arrival.card.set_facing(1.0)
+	Sound.fade_out(_train_sound, 0.3)
+	_warning_time = -1.0
+	_door_open = 0.0
+	_offset_wagon(TRAIN_OUT)
+	_train_mode = 0
+	train_event.emit("team_ready")
+
+
+func _spawn_arrival(arrival: Dictionary) -> void:
+	var card := AHSpriteCard.new()
+	card.body_height = AHCharacterHeights.find(arrival.hero_id)
+	card.show_art(arrival.art)
+	add_child(card)
+	card.position = Vector3(_train_door_x(), arrival.slot.y, arrival.slot.z)
+	card.set_facing(signf(arrival.slot.x - card.position.x) if absf(arrival.slot.x - card.position.x) > 0.01 else 1.0)
+	arrival.card = card
+	# A sombra de contato anda junto (filha da carta), como a da fila.
+	var contact := _contact(card.position, Vector2(0.9, 0.45))
+	contact.reparent(card)
+	_contacts.append(contact)
+	# Na fila do relatório: some do cômodo enquanto está na plataforma (como _line_card), e a fila libera a carta.
+	lineup.append({"hero_id": arrival.hero_id, "card": card})
+	if residents.has(arrival.hero_id):
+		residents[arrival.hero_id].visible = false
+
+
+func _tick_team_arrival(_before: float, step: float) -> void:
+	if _train_time < TRAIN_DOOR_END:
+		return
+	var time := Time.get_ticks_msec() * 0.001
+	var placed := true
+	# Quem vem atrás não passa de quem vai na frente (o ferido anda mais devagar): fica a um passo dele.
+	var ahead_x := INF
+	for arrival in _arrivals:
+		if arrival.card == null:
+			# Desce quando chega a vez e quem vai na frente já abriu espaço na porta (senão recuaria para o vagão).
+			if _train_time - TRAIN_DOOR_END >= arrival.delay and ahead_x - _train_door_x() >= FOLLOW_GAP:
+				_spawn_arrival(arrival)
+			# Quem ainda não desceu (ou acabou de descer, na porta) segura os de trás.
+			ahead_x = arrival.card.position.x if arrival.card != null else -INF
+			placed = false
+			continue
+		var card: AHSpriteCard = arrival.card
+		var gap: float = arrival.slot.x - card.position.x
+		if absf(gap) < 0.02:
+			card.position.x = arrival.slot.x
+			card.scale = Vector3.ONE
+			card.set_facing(1.0)
+			ahead_x = card.position.x
+			continue
+		placed = false
+		card.position.x = minf(card.position.x + signf(gap) * minf(absf(gap), arrival.speed * step), ahead_x - FOLLOW_GAP)
+		ahead_x = card.position.x
+		# O passo: quem está ferido balança mais devagar.
+		card.scale = Vector3(1, 1.0 + 0.025 * absf(sin(time * (4.5 if arrival.hurt else 7.0))), 1)
+	# Ninguém para descer (todos caíram): as portas abrem e o trem espera um instante vazio.
+	if _arrivals.is_empty() and _train_time < TRAIN_DOOR_END + EMPTY_WAIT:
+		placed = false
+	if placed:
+		train_event.emit("team_ready")
+		_close_and_leave()
+		_team_train_leaving = true
 
 
 ## O candidato esperando na plataforma, sem a chegada (o jogo foi reaberto com o trem parado).
@@ -724,14 +873,36 @@ func _tick_train(delta: float) -> void:
 			_offset_wagon(-36.0 * alpha * alpha)
 			if _train_time >= TRAIN_CLOSE + TRAIN_LEAVE:
 				_train_mode = 0
+				_team_train_leaving = false
 				# O arquivo do som é mais longo que a saída (a 2x, o dobro): some com o trem.
 				Sound.fade_out(_train_sound, 0.8)
 				train_event.emit("gone")
 		1:
 			_tick_arrival(before)
+		4:
+			_tick_slide_in(before)
+			_tick_team_arrival(before, step)
 
 
 func _tick_arrival(before: float) -> void:
+	_tick_slide_in(before)
+	var target := _departure_slot(1)
+	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
+		# Desce pela porta do metrô e anda até a plataforma.
+		var card := _spawn_candidate(Vector3(_train_door_x(), target.y, target.z))
+		if card:
+			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
+				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": target.z})
+		train_event.emit("candidate_out")
+	if not _camera_pending and _train_time >= TRAIN_DOOR_END and (not is_instance_valid(_candidate) or absf(_candidate.position.x - target.x) < 0.05):
+		_camera_pending = true
+		train_event.emit("candidate_ready")
+	if _camera_pending:
+		_tick_camera_on_candidate()
+
+
+## O trem chegando: o freio antes de parar, a parada e as portas abrindo (a chegada do candidato e a da equipe).
+func _tick_slide_in(before: float) -> void:
 	# O freio antes de parar e a parada.
 	if before < TRAIN_STOP - BRAKE_LEAD and _train_time >= TRAIN_STOP - BRAKE_LEAD:
 		Sound.play("res://audio/station/train_brake.ogg", 0.8)
@@ -744,20 +915,8 @@ func _tick_arrival(before: float) -> void:
 		Sound.fade_out(_train_sound, 0.5)
 		train_event.emit("stop")
 	_door_open = clampf((_train_time - TRAIN_DOOR_START) / (TRAIN_DOOR_END - TRAIN_DOOR_START), 0.0, 1.0)
-	var target := _departure_slot(1)
 	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
 		train_event.emit("doors_open")
-		# Desce pela porta do metrô e anda até a plataforma.
-		var card := _spawn_candidate(Vector3(_train_door_x(), target.y, target.z))
-		if card:
-			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
-				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": target.z})
-		train_event.emit("candidate_out")
-	if not _camera_pending and _train_time >= TRAIN_DOOR_END and (not is_instance_valid(_candidate) or absf(_candidate.position.x - target.x) < 0.05):
-		_camera_pending = true
-		train_event.emit("candidate_ready")
-	if _camera_pending:
-		_tick_camera_on_candidate()
 
 
 func _tick_reopen() -> void:

@@ -13,6 +13,9 @@ const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
 const RESULT_NAMES := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fuga", "defeat": "Derrota"}
+## A chegada da equipe de trem na volta (#76), antes do relatório: sem painel, só a dica de pular.
+const ARRIVAL := "arrival"
+const REPORT_GUARD_MS := 500
 
 var station: AHStation
 var current := ""
@@ -27,6 +30,17 @@ var _next_text: Label
 var _next_button: Button
 var _pending: VBoxContainer
 var _corner: HBoxContainer
+var _rest_tag: PanelContainer
+## O relatório abrindo logo depois da chegada (a câmera desliza até a fila).
+var _after_arrival := false
+## Até quando (relógio, ms) o relatório recém-aberto pela chegada ignora pular e voltar.
+var _report_guard_ms := 0
+## Pular apertado na chegada (também antes de ela começar, com o cartão da passagem ainda saindo).
+var _arrival_skip := false
+## A dica de pular a chegada (embaixo à direita).
+var _arrival_hint: PanelContainer
+## O que "Preparar expedição" mostra bloqueado (o motivo: a noite, o trem).
+var _blocked_reason: Label
 var _overview_button: Button
 ## A seleção de cômodo da Unreal: só o cômodo apontado ganha os cantos dourados, o nome e o cartão embaixo à esquerda
 ## (com Gerenciar). O do próximo passo e o Dormitório com a noite pendente ficam com os cantos apagados.
@@ -213,6 +227,26 @@ func _ready() -> void:
 ## passo, Preparar expedição, Opções...), que as setas percorrem; Voltar devolve aos cômodos. Com um painel ou o mapa
 ## aberto, o foco fica nos botões dele e Interagir confirma o botão com foco.
 func _input(event: InputEvent) -> void:
+	# Logo que o relatório abre depois da chegada, o segundo toque do pular (Interagir, Enter, Esc, clique) não conclui
+	# nem fecha o relatório: quem pulou a cena ainda vê o que a equipe trouxe.
+	if Time.get_ticks_msec() < _report_guard_ms and (AHPassageCard.is_skip(event) or U.is_back(event)):
+		get_viewport().set_input_as_handled()
+		return
+	# Na chegada da equipe, nada abre por trás: Interagir, Esc, Voltar, um clique ou um toque pulam para o relatório.
+	if current == ARRIVAL:
+		# A dica da primeira vez aberta por cima fica com o que a fecha (clique, toque, Interagir, Enter) e não pula a
+		# chegada; o resto (Esc, Voltar) não passa para trás.
+		if Tips.showing():
+			if not (event is InputEventMouseButton or event is InputEventScreenTouch or event.is_action("interact") or event.is_action("ui_accept")):
+				get_viewport().set_input_as_handled()
+			return
+		if event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton or event is InputEventScreenTouch \
+				or event is InputEventAction:
+			get_viewport().set_input_as_handled()
+			if AHPassageCard.is_skip(event):
+				_arrival_skip = true
+				station.finish_team_arrival()
+		return
 	if _hud_hidden:
 		var click: bool = event is InputEventMouseButton and event.pressed
 		if event.is_action_pressed("hide_hud") or event.is_action_pressed("menu") or click:
@@ -353,7 +387,8 @@ static func _arrow_name(action: String) -> String:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if U.is_back(event) and current != "" and not _map.visible:
+	# Na chegada não há painel para fechar (Voltar pula a chegada, no _input).
+	if U.is_back(event) and current != "" and current != ARRIVAL and not _map.visible:
 		close_panel()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and current == "" and not _map.visible:
@@ -488,13 +523,95 @@ func _build_left(c: Dictionary) -> void:
 		_pending.add_child(_pending_row(tr("O trem chegou: alguém espera na plataforma"), func(): open_service("train"), U.GOLD))
 	if c.night.phase != "none" and _next.action != "dormitory":
 		_pending.add_child(_pending_row(tr("A noite espera no Dormitório"), func(): open_room(S.DORMITORY), U.VIOLET))
-	if _next.action != "depart" and S.preparation_block(c) == "":
+	var block := S.preparation_block(c)
+	if _next.action != "depart" and block == "":
 		_pending.add_child(_pending_row(tr("Preparar expedição"), open_map, U.COPPER))
+	elif block != "":
+		# Bloqueada (a noite pendente, o trem): o botão fica, apagado, com o motivo embaixo (#76).
+		var blocked := _pending_row(tr("Preparar expedição"), open_map, U.MUTED)
+		blocked.disabled = true
+		blocked.tooltip_text = block
+		blocked.name = "PrepareBlocked"
+		_pending.add_child(blocked)
+		_blocked_reason = U.label(block, 16, U.DANGER)
+		_blocked_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_blocked_reason.custom_minimum_size = Vector2(420, 0)
+		_pending.add_child(_blocked_reason)
 	_pending.add_child(_pending_row(tr("Plano da Estação: o que cada cômodo destrava"), func(): open_service("plan"), U.MUTED))
 	_menu.visible = current == "" or current == "options"
 	_overview_button.visible = current != ""
-	_corner.visible = current != S.PREPARATION or S.preparation_block(c) != ""
+	_corner.visible = current != ARRIVAL and (current != S.PREPARATION or S.preparation_block(c) != "")
+	_fit_overview_to_menu.call_deferred()
+	_show_arrival_hint(current == ARRIVAL)
 	_refresh_room_card()
+
+
+## A vista geral enquadra a Estação à direita do menu da esquerda (que cresce com o texto e o idioma): medido o menu,
+## a câmera ajusta (#76; o Dormitório da ponta ficava embaixo do menu).
+func _fit_overview_to_menu() -> void:
+	if station == null or not _menu.visible:
+		return
+	var right := maxf(AHStation.SCREEN_MENU_RIGHT, _menu.get_global_rect().end.x + 16.0)
+	if absf(right - station.menu_right) < 4.0:
+		return
+	station.menu_right = right
+	if current == "":
+		station.refit_overview()
+
+
+## A dica de pular a chegada: a tecla de Interagir (ou "Toque para pular") embaixo à direita.
+func _show_arrival_hint(show: bool) -> void:
+	if not show:
+		if _arrival_hint != null:
+			_arrival_hint.visible = false
+		return
+	if _arrival_hint == null:
+		_arrival_hint = PanelContainer.new()
+		_arrival_hint.name = "ArrivalHint"
+		_arrival_hint.add_theme_stylebox_override("panel", U.flat(0.72, Color(U.COPPER, 0.0), 0))
+		_arrival_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_arrival_hint)
+	for child in _arrival_hint.get_children():
+		_arrival_hint.remove_child(child)
+		child.queue_free()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_arrival_hint.add_child(row)
+	if Settings.touch_visible() and not U.using_keys:
+		row.add_child(U.label(tr("Toque para pular"), 20, U.MUTED))
+	else:
+		row.add_child(U.action_cap("interact"))
+		row.add_child(U.label(tr("pular"), 20, U.MUTED))
+	_arrival_hint.visible = true
+	_arrival_hint.reset_size()
+	_arrival_hint.position = Vector2(1920, 1080) - _arrival_hint.get_combined_minimum_size() - Vector2(36, 28)
+
+
+## A volta (#76): a equipe chega de trem e desce na plataforma; com todos no lugar (ou pulada), o relatório abre.
+func play_arrival() -> void:
+	_reset_focus()
+	current = ARRIVAL
+	_panel.visible = false
+	var report: Dictionary = Campaign.state.station.last_return
+	_arrival_skip = false
+	refresh()
+	# A chegada (e o som do trem) começa com a Estação na tela, não embaixo do cartão da passagem.
+	while GameFlow.busy and is_inside_tree():
+		await get_tree().process_frame
+	if current != ARRIVAL or not is_inside_tree():
+		return
+	station.play_team_arrival(report.get("team", []))
+	# Pulada ainda embaixo do cartão: vai direto ao fim.
+	if _arrival_skip:
+		station.finish_team_arrival()
+	else:
+		await station.train_event_named("team_ready")
+	if current == ARRIVAL and is_inside_tree():
+		current = ""
+		_after_arrival = true
+		_report_guard_ms = Time.get_ticks_msec() + REPORT_GUARD_MS
+		open_service("report")
 
 
 func _pending_row(text: String, action: Callable, color: Color) -> Button:
@@ -547,6 +664,19 @@ func _build_room_selection() -> void:
 	_room_tag.add_child(_room_tag_label)
 	_room_tag.visible = false
 	_room_marks.add_child(_room_tag)
+	# O Dormitório em destaque com a noite pendente (#76): a etiqueta violeta diz que a equipe precisa dormir.
+	_rest_tag = PanelContainer.new()
+	_rest_tag.name = "RestTag"
+	var rest_style := U.panel(0.92, U.VIOLET, 1)
+	rest_style.content_margin_top = 2
+	rest_style.content_margin_bottom = 2
+	rest_style.content_margin_left = 8
+	rest_style.content_margin_right = 8
+	_rest_tag.add_theme_stylebox_override("panel", rest_style)
+	_rest_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_rest_tag.add_child(U.label(tr("A equipe precisa dormir aqui"), 18, U.TEXT, "bold"))
+	_rest_tag.visible = false
+	_room_marks.add_child(_rest_tag)
 	# O cartão embaixo à esquerda: nome, papel, estado e Gerenciar.
 	_room_card = PanelContainer.new()
 	_room_card.add_theme_stylebox_override("panel", U.panel(0.92, Color(U.GOLD, 0.8), 1))
@@ -636,6 +766,19 @@ func _update_room_hover() -> void:
 		_hover_room = hovered
 		_refresh_room_card()
 	_room_marks.queue_redraw()
+	if overview:
+		_fit_overview_to_menu()
+	# A etiqueta do Dormitório com a noite pendente (fora do desenho: acompanha a vista geral a cada quadro).
+	var rest: bool = Campaign.state.night.phase != "none" and _room_rects.has(S.DORMITORY) and _hover_room != S.DORMITORY
+	_rest_tag.visible = rest
+	if rest:
+		_rest_tag.size = _rest_tag.get_combined_minimum_size()
+		# Acima do cômodo (a etiqueta do cômodo escolhido, o vizinho, fica na borda) e nunca por cima do menu da esquerda.
+		var dorm: Rect2 = _room_rects[S.DORMITORY]
+		var left := dorm.position.x + 10.0
+		if _menu.visible:
+			left = maxf(left, _menu.get_global_rect().end.x + 12.0)
+		_rest_tag.position = Vector2(left, dorm.position.y - _rest_tag.size.y - 6.0)
 	_key_hints.visible = overview and not Settings.touch_visible()
 	if _key_hints.visible:
 		_key_hints.size = _key_hints.get_combined_minimum_size()
@@ -647,6 +790,11 @@ func _draw_room_marks() -> void:
 	if _room_rects.is_empty():
 		return
 	var c: Dictionary = Campaign.state
+	# Com a noite pendente, o Dormitório fica em destaque na vista geral: a luz violeta, os cantos cheios e a etiqueta.
+	if c.night.phase != "none" and _room_rects.has(S.DORMITORY):
+		var dorm: Rect2 = _room_rects[S.DORMITORY]
+		_room_marks.draw_rect(dorm, Color(U.VIOLET, 0.08))
+		_corners(dorm, Color(U.VIOLET, 0.9), 3.0, 26.0)
 	# Os cantos apagados: o cômodo do próximo passo (dourado) e o Dormitório com a noite pendente (violeta).
 	var hints := {}
 	if _next.get("room", "") != "":
@@ -665,6 +813,9 @@ func _draw_room_marks() -> void:
 	_room_tag.size = _room_tag.get_combined_minimum_size()
 	_room_tag.position = rect.position + Vector2(10, -_room_tag.size.y * 0.5)
 	_room_tag.visible = true
+	# Com o texto Maior, a etiqueta do Dormitório pode encostar na do cômodo vizinho apontado: a do apontado fica.
+	if _rest_tag.visible and _rest_tag.get_rect().intersects(_room_tag.get_rect()):
+		_rest_tag.visible = false
 
 
 func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
@@ -699,7 +850,10 @@ func open_service(service: String) -> void:
 		"report":
 			Tips.show_tip("return")
 			var report: Dictionary = Campaign.state.station.last_return
-			station.show_report(report.get("team", []).filter(func(id): return S.hero(Campaign.state, id) != null and S.hero(Campaign.state, id).alive))
+			# Depois da chegada, a câmera desliza da plataforma inteira até a fila (sem corte).
+			station.show_report(report.get("team", []).filter(func(id): return S.hero(Campaign.state, id) != null and S.hero(Campaign.state, id).alive),
+				not _after_arrival)
+			_after_arrival = false
 		"train":
 			# O trem traz o candidato: chega do túnel uma vez por visita; depois ele só espera na plataforma.
 			var train: Dictionary = Campaign.state.station.train
@@ -719,6 +873,9 @@ func _sound_open() -> void:
 
 
 func close_panel() -> void:
+	# A chegada termina no relatório, nunca no meio: fechar não vale (a fila e os cômodos ficariam pela metade).
+	if current == ARRIVAL:
+		return
 	# O de fechar só se o de abrir tocou: o painel que fecha no mesmo quadro em que abriu não faz som nenhum (#36).
 	if current != "" and Engine.get_process_frames() != _opened_frame:
 		Sound.play(PANEL_CLOSE)
@@ -879,6 +1036,10 @@ func _show(key: String) -> void:
 		_prep.visible = false
 	# Durante a cena do trem (o aviso, a chegada, o candidato descendo, a partida), nenhum painel por cima: o do trem
 	# abre quando a câmera fecha no candidato (#61).
+	# Na chegada da equipe (#76), também: o relatório abre quando todos estão na fila.
+	if key == ARRIVAL:
+		_panel.visible = false
+		return
 	if key == "train" and station != null and station.train_busy():
 		_panel.visible = false
 		_watch_train()
@@ -901,6 +1062,8 @@ func _show(key: String) -> void:
 			options.allow_new_campaign = true
 			options.closed.connect(close_panel)
 			options.new_campaign_requested.connect(func(): open_service("new_campaign"))
+			options.allow_title = true
+			options.title_requested.connect(func(): GameFlow.travel("title"))
 			_body.add_child(options)
 		_:
 			_room(key)
@@ -954,7 +1117,7 @@ func _new_campaign_view() -> void:
 	_button(tr("Cancelar"), close_panel)
 	_button(tr("Começar do zero"), func():
 		Campaign.new_game()
-		GameFlow.change_to("station"))
+		GameFlow.travel("station"))
 
 
 func _heading(text: String, subtitle: String = "") -> void:
@@ -1554,7 +1717,8 @@ func _depart() -> void:
 		return
 	_draft = {}
 	Campaign.save()
-	GameFlow.change_to("street")
+	# A partida no vagão (#75): a equipe sentada no metrô a caminho da fase, depois o título dela.
+	GameFlow.travel("street", AHWagonRide.departure_card(c))
 
 
 ## A partida na plataforma: a equipe em fila e o mesmo painel da Preparação (equipe, foco, suprimentos, confirmar).
@@ -1945,7 +2109,9 @@ func _enter_shelter_then(then: Callable) -> void:
 	station.clear_lineup()
 	station.commit()
 	if Campaign.state.night.phase != "none":
-		open_room(S.DORMITORY)
+		# A câmera volta à vista geral: o Próximo passo e o Dormitório em destaque dizem que a equipe precisa dormir,
+		# e Preparar expedição fica bloqueado com o motivo (#76).
+		close_panel()
 	elif S.visit_pending(Campaign.state):
 		open_service("train")
 	elif then.is_valid():

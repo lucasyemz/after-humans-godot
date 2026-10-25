@@ -773,7 +773,6 @@ street_corridor.gd: house
 street_corridor.gd: index
 street_corridor.gd: length
 street_corridor.gd: local
-street_corridor.gd: map
 street_corridor.gd: mark
 street_corridor.gd: meter
 street_corridor.gd: passagem
@@ -816,6 +815,22 @@ ui_style.gd: vulnerable
 ui_style.gd: width
 *: label
 combat_hud.gd: Hp
+passage_card.gd: title
+passage_card.gd: subtitle
+passage_card.gd: backdrop
+passage_card.gd: Passage
+passage_card.gd: Title
+passage_card.gd: Subtitle
+passage_card.gd: Hint
+passage_card.gd: Backdrop
+game_flow.gd: corridor
+game_flow.gd: index
+game_flow.gd: steps
+game_flow.gd: After Humans
+refuge_hud.gd: title
+game_flow.gd: subtitle
+game_flow.gd: hold
+refuge_hud.gd: arrival
 station_rules.gd: Brasa
 station_rules.gd: Pistão
 station_rules.gd: Farol

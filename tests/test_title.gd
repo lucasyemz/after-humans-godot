@@ -277,6 +277,10 @@ func _open_title() -> AHTitleScreen:
 
 
 func _settles_on(scene_name: String) -> bool:
+	# A passagem (#74) segura o cartão por GameFlow.CARD_SECONDS: espera ela acabar antes de contar os quadros.
+	var deadline := Time.get_ticks_msec() + 20000
+	while GameFlow.busy and Time.get_ticks_msec() < deadline:
+		await _tree.process_frame
 	for frame in 300:
 		await _tree.process_frame
 		if not GameFlow.busy and _tree.current_scene != null and _tree.current_scene.name == scene_name and frame > 3:

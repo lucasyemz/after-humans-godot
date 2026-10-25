@@ -978,7 +978,7 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 		return {"title": TranslationServer.translate("Ver o que a equipe trouxe"), "text": TranslationServer.translate("O relatório da última expedição está pronto: o achado, quem voltou e como a Estação passou o ciclo."),
 			"action": "report", "button": TranslationServer.translate("Ver o relatório"), "room": ""}
 	if campaign.night.phase != "none":
-		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe descansa no Dormitório: escolha quem vigia e durma. Quem dorme come e recupera vida e instinto."),
+		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."),
 			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
 	if visit_pending(campaign):
 		return {"title": TranslationServer.translate("Alguém espera na plataforma"), "text": TranslationServer.translate("Um candidato chegou de trem. Veja o que ele traz para a Estação e decida se fica."),
