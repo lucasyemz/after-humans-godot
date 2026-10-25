@@ -1,0 +1,292 @@
+{
+  "issue": 59,
+  "status": "style study awaiting Lucas; not production atlas",
+  "canvas": [
+    1920,
+    1080
+  ],
+  "art_origin": [
+    64,
+    88
+  ],
+  "art_canvas": [
+    1672,
+    940
+  ],
+  "screenshot": "docs/design/loop-screens/before/combat_clean.webp",
+  "screenshot_sha256": "bf735a1e870ba7a874720b90adbc7f76ebbbba4b6ee811291b6f82d1a5d4e6ba",
+  "screenshot_transform": {
+    "brightness": 0.48,
+    "saturation": 0.8,
+    "crop": false,
+    "resize": false
+  },
+  "generated_art": "docs/design/ui-kit/v2/material_study.webp",
+  "generated_art_sha256": "9791b46231979893e5bc33a50aefbc7504d2256517a650e9622dd69f624ac700",
+  "master_original": "outside repository",
+  "fonts": {
+    "title": "Cinzel",
+    "body": "Plus Jakarta Sans",
+    "minimum": 18
+  },
+  "labels": [
+    {
+      "text": "AFTER HUMANS",
+      "x": 64,
+      "y": 24,
+      "size": 32,
+      "right": 332.28125,
+      "bottom": 56
+    },
+    {
+      "text": "KIT V2 / ESTUDO DE MATERIAIS",
+      "x": 420,
+      "y": 30,
+      "size": 24,
+      "right": 765.796875,
+      "bottom": 54
+    },
+    {
+      "text": "#59 · para aprovação",
+      "x": 1669.4453125,
+      "y": 30,
+      "size": 20,
+      "right": 1870.5546875,
+      "bottom": 50
+    },
+    {
+      "text": "BENTO",
+      "x": 263.515625,
+      "y": 124,
+      "size": 30,
+      "right": 374.484375,
+      "bottom": 154
+    },
+    {
+      "text": "1",
+      "x": 155.5703125,
+      "y": 193,
+      "size": 48,
+      "right": 174.4296875,
+      "bottom": 241
+    },
+    {
+      "text": "Cão · Protetor",
+      "x": 243.4765625,
+      "y": 194,
+      "size": 22,
+      "right": 388.5234375,
+      "bottom": 216
+    },
+    {
+      "text": "34 / 34",
+      "x": 263.6953125,
+      "y": 680,
+      "size": 28,
+      "right": 356.3046875,
+      "bottom": 708
+    },
+    {
+      "text": "176 / 200",
+      "x": 248.5703125,
+      "y": 771,
+      "size": 28,
+      "right": 371.4296875,
+      "bottom": 799
+    },
+    {
+      "text": "RELATO",
+      "x": 812.96875,
+      "y": 151,
+      "size": 28,
+      "right": 929.03125,
+      "bottom": 179
+    },
+    {
+      "text": "Madeira sustenta.",
+      "x": 616,
+      "y": 248,
+      "size": 28,
+      "right": 850.6875,
+      "bottom": 276
+    },
+    {
+      "text": "Papel guarda a voz.",
+      "x": 616,
+      "y": 298,
+      "size": 28,
+      "right": 869.375,
+      "bottom": 326
+    },
+    {
+      "text": "Cobre protege a borda.",
+      "x": 616,
+      "y": 348,
+      "size": 28,
+      "right": 930.265625,
+      "bottom": 376
+    },
+    {
+      "text": "Raízes nos cantos, espaço para ler.",
+      "x": 616,
+      "y": 403,
+      "size": 22,
+      "right": 974.65625,
+      "bottom": 425
+    },
+    {
+      "text": "22",
+      "x": 718,
+      "y": 478,
+      "size": 18,
+      "right": 739.59375,
+      "bottom": 496
+    },
+    {
+      "text": "32",
+      "x": 824,
+      "y": 478,
+      "size": 18,
+      "right": 845.765625,
+      "bottom": 496
+    },
+    {
+      "text": "64",
+      "x": 964,
+      "y": 478,
+      "size": 18,
+      "right": 986.09375,
+      "bottom": 496
+    },
+    {
+      "text": "REDE VIGIA",
+      "x": 1373.1484375,
+      "y": 157,
+      "size": 30,
+      "right": 1554.8515625,
+      "bottom": 187
+    },
+    {
+      "text": "Vidro antigo · sinal de máquina",
+      "x": 1307.359375,
+      "y": 223,
+      "size": 22,
+      "right": 1620.640625,
+      "bottom": 245
+    },
+    {
+      "text": "Normal",
+      "x": 615.7421875,
+      "y": 613,
+      "size": 24,
+      "right": 698.2578125,
+      "bottom": 637
+    },
+    {
+      "text": "Foco",
+      "x": 846.3515625,
+      "y": 613,
+      "size": 24,
+      "right": 905.6484375,
+      "bottom": 637
+    },
+    {
+      "text": "Pressionado",
+      "x": 1024.390625,
+      "y": 613,
+      "size": 22,
+      "right": 1155.609375,
+      "bottom": 635
+    },
+    {
+      "text": "Voltar",
+      "x": 692.7109375,
+      "y": 713,
+      "size": 24,
+      "right": 759.2890625,
+      "bottom": 737
+    },
+    {
+      "text": "Indisponível",
+      "x": 959.5390625,
+      "y": 713,
+      "size": 22,
+      "right": 1084.4609375,
+      "bottom": 735
+    },
+    {
+      "text": "VIDA",
+      "x": 843.46875,
+      "y": 792,
+      "size": 24,
+      "right": 906.53125,
+      "bottom": 816
+    },
+    {
+      "text": "INSTINTO",
+      "x": 811.5703125,
+      "y": 862,
+      "size": 24,
+      "right": 938.4296875,
+      "bottom": 886
+    },
+    {
+      "text": "XP",
+      "x": 858.375,
+      "y": 935,
+      "size": 24,
+      "right": 891.625,
+      "bottom": 959
+    },
+    {
+      "text": "E",
+      "x": 1471.046875,
+      "y": 934,
+      "size": 26,
+      "right": 1486.953125,
+      "bottom": 960
+    },
+    {
+      "text": "Q",
+      "x": 1558.5859375,
+      "y": 934,
+      "size": 26,
+      "right": 1581.4140625,
+      "bottom": 960
+    },
+    {
+      "text": "Esc",
+      "x": 1639.6328125,
+      "y": 934,
+      "size": 26,
+      "right": 1684.3671875,
+      "bottom": 960
+    },
+    {
+      "text": "Latão oxidado · madeira · papel · vidro",
+      "x": 64,
+      "y": 1042,
+      "size": 20,
+      "right": 418.3125,
+      "bottom": 1062
+    },
+    {
+      "text": "Prancha de peças; não é uma tela de jogo.",
+      "x": 950,
+      "y": 1042,
+      "size": 20,
+      "right": 1345.84375,
+      "bottom": 1062
+    },
+    {
+      "text": "Captura real",
+      "x": 1752,
+      "y": 1028,
+      "size": 18,
+      "right": 1856.09375,
+      "bottom": 1046
+    }
+  ],
+  "outside": [],
+  "style_board_sha256": "709e9f913df5909922d3440455c02591357d9b8406a8dd7c89798e69d733f0dd"
+}

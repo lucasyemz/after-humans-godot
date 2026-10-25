@@ -1,5 +1,7 @@
 # Kit único de componentes — #59
 
+> **Direção visual em revisão:** a [prancha de estilo v2](ui-kit/v2-style.md) segue a nova [direção do Lucas](hud-direction.md). Aguarda aprovação antes de refazer a #96. O kit abaixo documenta a versão anterior; não usar sua aparência como direção aprovada atual.
+
 **Versão 01, proposta para aprovação do Lucas. QA de design: APROVADO na rodada 4 (revisão do PR #65).** Base de leitura: commit `fceda77`, 24/10/2026. A #58 monta as telas com este kit após a aprovação; a #60 implementa os componentes no jogo. Esta entrega não muda a HUD em execução.
 
 ![Mesmas quatro peças nos quatro contextos](ui-kit/unity_normal.webp)
