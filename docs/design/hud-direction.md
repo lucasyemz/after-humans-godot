@@ -1,5 +1,41 @@
 # Direção de arte da interface: personalidade
 
+## Padrão de componentes: o kit da Awesomic (decisão do Lucas, 25/10/2026)
+
+A HUD tem dois kits de peças:
+- **o da luta, feito pelo Codex:** `art/ui/kit/combat`, com 18 peças;
+- **o da Estação, da exploração e do fluxo, feito pelo agente da Awesomic:** `art/ui/kit/station`, com 45 peças, os
+  estados de cada uma (foco, pressionado, desabilitado, selecionado) e as conferências de `docs/design/hud-kit/lib.mjs`.
+
+O Lucas achou o da Awesomic mais completo, e **ele é o padrão** de toda a HUD, inclusive a luta.
+
+- **Componentes genéricos vêm do kit da Awesomic em todas as telas.** A luta usa os mesmos, e não as versões do Codex:
+
+  | Componente | Peças da Awesomic | Equivalente do Codex que deixa de valer |
+  |---|---|---|
+  | Painel | `panel_large`, `panel_inset` | `panel`, `hero_panel` |
+  | Plaqueta | `room_plaque` | `register` |
+  | Botões | `primary_button` (e os estados), `secondary_button`, `icon_button`, `chip_button` | `action_button` |
+  | Barras | `main_bar` com `bar_fill` tingido (ciano nos heróis, vermelho nos inimigos) | `health_ally`, `health_enemy`, `active_health` |
+  | Abas, chips e listas | `card_tab`, `status_pill`, `cost_chip`, `list_row`, `nav_tab` | — |
+  | Teclas | `keys_bar`, `button_key` | — |
+  | Foco | `focus_frame`, `selected_frame` | — |
+- **As peças da luta que já entraram no kit da Awesomic** (`reuses_combat_kit` no `assets.json`) continuam como estão:
+  `square_portrait`, `key_tab`, `main_bar`, `selected_slot` e `steel_material`.
+- **As peças só de luta sem equivalente** continuam do kit do Codex até ganharem versão no mesmo padrão:
+  - `round_strip` (a ordem da rodada);
+  - `ability_header`, `ability_slot` e `target_tab` (as habilidades);
+  - `actor_ring` (o anel no chão);
+  - a forma do inimigo no daltonismo.
+
+  O agente da Awesomic redesenha essas peças no mesmo padrão e com os mesmos estados, e elas entram no manifesto
+  dele. Depois disso, `art/ui/kit/combat` fica só como histórico, como o kit de latão (`v2`).
+- **No código (#60):** a biblioteca `scripts/ui/kit` expõe **componentes** (Painel, Plaqueta, Botão com os estados,
+  Barra, Chip, Aba, Linha de lista, Tecla, Carta), e não arquivos de arte. Cada componente lê a peça do manifesto da
+  Awesomic. A luta, a Estação, a exploração e o fluxo usam os mesmos componentes. Trocar uma peça muda todas as telas.
+- **Peça nova** entra sempre no manifesto da Awesomic, no mesmo padrão: o chanfro, o bisel, o canto âmbar, o
+  9-slice, os estados e as conferências do `lib.mjs`.
+
 ## Alvo aprovado da luta (25/10/2026)
 
 O Lucas refez por cima a versão C do Codex e aprovou o resultado como **o alvo da HUD da luta**:
