@@ -12,7 +12,7 @@ const IGNORE := "res://tools/i18n_ignore.txt"
 ## As telas convertidas (a primeira leva: o título, as Opções, o HUD da exploração e da luta e a Estação; a segunda: o mapa
 ## de fases, a Mochila, as dicas, as regras da jornada, da Estação e dos cuidados, o registro da luta, a rua, os lugares e
 ## os avisos do save).
-const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/ui/briefing_dialog.gd", "res://scripts/ui/character_sheet.gd", "res://scripts/ui/options_panel.gd", "res://scripts/core/settings_service.gd",
+const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/hero_levels.gd", "res://scripts/ui/briefing_dialog.gd", "res://scripts/ui/character_sheet.gd", "res://scripts/ui/options_panel.gd", "res://scripts/core/settings_service.gd",
 	"res://scripts/ui/exploration_hud.gd", "res://scripts/ui/passage_card.gd",
 	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/refuge_hud.gd",
 	"res://scripts/ui/phase_map.gd", "res://scripts/ui/inventory_panel.gd", "res://scripts/ui/tips_service.gd",
@@ -27,6 +27,7 @@ const DATA_FIELDS := {
 	"enemies": ["DisplayName", "Role", "Description"], "enemy-actions": ["DisplayName", "Description"], "events": ["Title", "Description"],
 	"expedition-nodes": ["Title", "Description"], "perks": ["DisplayName", "Description"], "relics": ["DisplayName", "Description"],
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
+	"hero-upgrades": ["DisplayName", "Description"],
 }
 
 

@@ -2,7 +2,7 @@
 ## ela é), a vida, o instinto, a velocidade, os efeitos passivos (traços, relíquia, laços, treinos) e os estados com o
 ## que cada um faz. Abre com o mouse em cima, o foco do teclado ou do controle e o toque longo; some ao sair. Assim o que
 ## saiu da tela fixa (#56) continua a um apontar de distância. Usa os tokens do AHUiStyle, para trocar pelo kit da #59/#60.
-## O nível (#90) entra aqui quando existir.
+## O nível (#90) entra pela velocidade do Passo ligeiro e pelas melhorias do Treino, listadas nos passivos.
 class_name AHCharacterSheet
 extends PanelContainer
 
@@ -90,6 +90,8 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 		var perk = GameData.row("perks", perk_id)
 		if perk != null and String(perk.get("Unit", "")) == "Speed" and String(perk.get("Target", "self")) == "self":
 			speed += int(perk.get("Value", 0))
+	# O nível (#90): o Passo ligeiro soma na velocidade, como na luta.
+	speed += int(AHHeroLevels.combat_bonus(hero).speed)
 	var out := {"id": String(hero.get("id", "")), "name": String(hero.get("display_name", "")), "kind": _kind(hero_class),
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
 		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))), "states": [], "enemy": false}
@@ -116,6 +118,18 @@ static func _hero_passives(hero, perks: Array, class_id: String) -> Array:
 		var relic = GameData.row("relics", String(hero.get("relic_id", "")))
 		if relic != null:
 			out.append([TranslationServer.translate("Relíquia: %s") % TranslationServer.translate(String(relic.DisplayName)), TranslationServer.translate(String(relic.get("Description", ""))), true])
+	# As melhorias do Treino (#90), uma linha por melhoria com quantas vezes foi escolhida.
+	if hero != null:
+		var counts := {}
+		for upgrade_id in hero.get("upgrades", []):
+			counts[upgrade_id] = int(counts.get(upgrade_id, 0)) + 1
+		for upgrade_id in counts:
+			var upgrade = GameData.row("hero_upgrades", upgrade_id)
+			if upgrade != null:
+				var title := TranslationServer.translate(String(upgrade.DisplayName))
+				if counts[upgrade_id] > 1:
+					title = TranslationServer.translate("%s ×%d") % [title, counts[upgrade_id]]
+				out.append([title, TranslationServer.translate(String(upgrade.get("Description", ""))), true])
 	var learned: Array = Campaign.state.get("researched_skills", []) if Campaign.state is Dictionary else []
 	for research in GameData.table("research").values():
 		if String(research.get("ClassId", "")) == class_id and learned.has(String(research.get("SkillId", ""))):

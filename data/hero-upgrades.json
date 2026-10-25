@@ -1,0 +1,68 @@
+[
+  {
+    "Name": "vida",
+    "DisplayName": "Mais fôlego",
+    "Description": "+2 de vida máxima.",
+    "Stat": "MaxHp",
+    "Value": 2,
+    "MaxStacks": 9,
+    "Classes": [
+      "cao",
+      "sapo",
+      "rato",
+      "tatu"
+    ],
+    "Fallback": true
+  },
+  {
+    "Name": "calma",
+    "DisplayName": "Sangue frio",
+    "Description": "Começa cada luta com 10 de instinto a menos.",
+    "Stat": "Calm",
+    "Value": 10,
+    "MaxStacks": 4,
+    "Classes": [
+      "cao",
+      "sapo",
+      "tatu"
+    ],
+    "Fallback": true
+  },
+  {
+    "Name": "velocidade",
+    "DisplayName": "Passo ligeiro",
+    "Description": "+1 de velocidade.",
+    "Stat": "Speed",
+    "Value": 1,
+    "MaxStacks": 1,
+    "Classes": [
+      "gato",
+      "coruja",
+      "rato"
+    ]
+  },
+  {
+    "Name": "habilidade_gato",
+    "DisplayName": "Mão treinada",
+    "Description": "+1 nos limites de dano ou cura de Corte de Fase.",
+    "Stat": "Ability",
+    "AbilityId": "gato_corte_fase",
+    "Value": 1,
+    "MaxStacks": 2,
+    "Classes": [
+      "gato"
+    ]
+  },
+  {
+    "Name": "habilidade_coruja",
+    "DisplayName": "Mão treinada",
+    "Description": "+1 nos limites de dano ou cura de Disparo Perfurante.",
+    "Stat": "Ability",
+    "AbilityId": "coruja_disparo_perfurante",
+    "Value": 1,
+    "MaxStacks": 2,
+    "Classes": [
+      "coruja"
+    ]
+  }
+]

@@ -16,6 +16,9 @@ var processed_turn_key := ""
 var item_used_turn_key := ""
 ## O que cada herói fez nesta luta (o destaque do relatório da volta): {hero_id: {damage, healing, downs}}.
 var tally := {}
+## O instinto que o Sangue frio tirou de cada herói no começo da luta (#90): volta no write_back, porque o desconto é só
+## da luta. {hero_id: n}.
+var calm := {}
 
 
 ## heroes: heróis da campanha (Campaign.state.roster) na ordem da formação. enemies: da frente para trás, cada um o id
@@ -29,10 +32,14 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 	var players: Array = []
 	for index in heroes.size():
 		var hero: Dictionary = heroes[index]
+		# O nível (#90): a velocidade, o +1 numa habilidade e o instinto a menos no começo da luta (a vida já está no herói).
+		var bonus := AHHeroLevels.combat_bonus(hero)
+		session.calm[hero.id] = mini(int(bonus.calm), int(hero.get("instinct", 0)))
 		players.append(AHCombatEngine.make_hero_unit({
 			"Id": hero.id, "ClassId": hero.class_id, "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
-			"Instinct": hero.get("instinct", 0), "Perks": hero.get("perks", []), "Trauma": hero.get("trauma", false),
+			"Instinct": maxi(0, int(hero.get("instinct", 0)) - int(bonus.calm)), "Perks": hero.get("perks", []), "Trauma": hero.get("trauma", false),
 			"RelicId": hero.get("relic_id", ""), "ExpeditionUses": hero.get("expedition_uses", {}),
+			"SpeedBonus": bonus.speed, "AbilityBonus": bonus.abilities,
 		}, index + 1, session.data))
 	var enemies: Array = []
 	var next_rank := 1
@@ -107,7 +114,7 @@ func ability_options(actor_id: String) -> Array:
 		elif targets.is_empty():
 			reason = tr("Sem alvo válido")
 		options.append({
-			"id": ability_id, "name": ability.DisplayName, "description": describe(ability_id), "usable": reason == "",
+			"id": ability_id, "name": ability.DisplayName, "description": describe(ability_id, actor_id), "usable": reason == "",
 			"reason": reason, "targets": targets, "enemy_side": ability.TargetType == "SingleEnemy" or ability.TargetType == "MarkedEnemy",
 			"self": ability.TargetType == "Self", "cooldown": cooldown, "uses": uses,
 		})
@@ -115,24 +122,31 @@ func ability_options(actor_id: String) -> Array:
 
 
 ## A faixa que a habilidade causa de verdade nesta luta (kind "damage" ou "heal"): a dos dados, +1 nos dois limites se
-## ela foi treinada na Pesquisa (o mesmo bônus do motor). {Min, Max, trained}.
-func effective_range(ability_id: String, kind: String = "damage") -> Dictionary:
+## ela foi treinada na Pesquisa e mais a Mão treinada do nível de quem age (actor_id, #90): o mesmo bônus do motor.
+## {Min, Max, trained}.
+func effective_range(ability_id: String, kind: String = "damage", actor_id: String = "") -> Dictionary:
 	var ability: Dictionary = data.abilities[ability_id]
 	var base: Dictionary = ability.DamageRange if kind == "damage" else ability.HealRange
-	var trained: bool = base.Max > 0 and context.researched_skills.has(ability_id)
-	var bonus := 1 if trained else 0
+	var bonus := 1 if context.researched_skills.has(ability_id) else 0
+	var actor := state.find_unit(actor_id) if actor_id != "" else null
+	if actor != null:
+		bonus += int(actor.ability_bonus.get(ability_id, 0))
+	var trained: bool = base.Max > 0 and bonus > 0
+	if not trained:
+		bonus = 0
 	return {"Min": int(base.Min) + bonus, "Max": int(base.Max) + bonus, "trained": trained}
 
 
-## Texto curto da habilidade: o que faz em números (com o treino da Pesquisa) e a descrição de abilities.json.
-func describe(ability_id: String) -> String:
+## Texto curto da habilidade: o que faz em números (com o treino da Pesquisa e o nível de quem age) e a descrição de
+## abilities.json.
+func describe(ability_id: String, actor_id: String = "") -> String:
 	var ability: Dictionary = data.abilities[ability_id]
 	var parts := PackedStringArray()
 	if ability.DamageRange.Max > 0:
-		var damage := effective_range(ability_id, "damage")
+		var damage := effective_range(ability_id, "damage", actor_id)
 		parts.append(tr("Dano %d–%d%s") % [damage.Min, damage.Max, tr(" (treinado)") if damage.trained else ""])
 	if ability.HealRange.Max > 0:
-		var heal := effective_range(ability_id, "heal")
+		var heal := effective_range(ability_id, "heal", actor_id)
 		parts.append(tr("Cura %d–%d%s") % [heal.Min, heal.Max, tr(" (treinado)") if heal.trained else ""])
 	if ability.Cooldown > 0:
 		parts.append(tr("Recarga %d") % ability.Cooldown)
@@ -270,7 +284,7 @@ func _count(actor_id: String, events: Array) -> void:
 	var actor := state.find_unit(actor_id)
 	if actor == null or not actor.is_player:
 		return
-	var entry: Dictionary = tally.get(actor.hero_id, {"damage": 0, "healing": 0, "downs": 0})
+	var entry: Dictionary = tally.get(actor.hero_id, {"damage": 0, "healing": 0, "downs": 0, "protects": 0})
 	for event in events:
 		var target := state.find_unit(event.target_unit_id)
 		if target == null:
@@ -285,6 +299,9 @@ func _count(actor_id: String, events: Array) -> void:
 			AHCombat.EventType.DEATH:
 				if not target.is_player:
 					entry.downs += 1
+		# Proteger um aliado (#90): a guarda ou o bloqueio dado a outro herói.
+		if target.is_player and target.id != actor.id and (event.outcome == AHCombat.Outcome.GUARD_GRANTED or event.outcome == AHCombat.Outcome.BLOCK_GRANTED):
+			entry.protects = int(entry.get("protects", 0)) + 1
 	tally[actor.hero_id] = entry
 
 
@@ -311,7 +328,16 @@ func write_back(campaign: Dictionary) -> void:
 			# A relíquia de vida aumenta o máximo só na luta: fora dela a vida volta ao máximo do herói (senão a noite e a
 			# comida "curavam" para baixo).
 			hero.hp = clampi(unit.hp, 1 if unit.deaths_door else 0, int(hero.max_hp))
+			# O Sangue frio vale só na luta: o instinto que ele tirou volta. Sem crise na luta, o que volta não leva à crise;
+			# quem terminou a luta em crise (no máximo ou com o desfecho) continua nela.
 			hero.instinct = unit.instinct
+			var back := int(calm.get(unit.hero_id, 0))
+			if back > 0:
+				var top := int(engine.instinct_rules().Max)
+				var in_crisis: bool = unit.instinct >= top or unit.crisis_outcome != AHCombat.Crisis.NONE
+				hero.instinct = mini(unit.instinct + back, top if in_crisis else top - 1)
+				# A luta acabou: a unidade fica com o instinto devolvido, e o calm é limpo abaixo (gravar de novo dá o mesmo).
+				unit.instinct = hero.instinct
 			hero.trauma = unit.trauma
 			hero.alive = not dead
 			hero.expedition_uses = {}
@@ -319,6 +345,8 @@ func write_back(campaign: Dictionary) -> void:
 				var ability = data.abilities.get(ability_id)
 				if ability != null and ability.bUsesPerExpedition:
 					hero.expedition_uses[ability_id] = unit.remaining_uses[ability_id]
+	# Limpo como o tally: o instinto do Sangue frio já voltou para a unidade e o herói, e não volta em dobro.
+	calm.clear()
 	AHExplorationCare.restore_iris_after_victory(campaign, self)
 	# O que cada um fez soma na expedição (o relatório da volta destaca).
 	var expedition = campaign.get("session", {}).get("expedition")
@@ -327,8 +355,17 @@ func write_back(campaign: Dictionary) -> void:
 		var stats: Dictionary = expedition.get("stats", {})
 		for hero_id in tally:
 			var total: Dictionary = stats.get(hero_id, {"damage": 0, "healing": 0, "downs": 0})
-			for key in ["damage", "healing", "downs"]:
-				total[key] = int(total.get(key, 0)) + int(tally[hero_id][key])
+			for key in ["damage", "healing", "downs", "protects"]:
+				total[key] = int(total.get(key, 0)) + int(tally[hero_id].get(key, 0))
 			stats[hero_id] = total
+		# O XP da luta (#90): quem lutou e segue vivo, pelo que fez (o tally), soma no herói e no relatório. A fuga não dá.
+		for unit in (state.player_team if not state.escaped else []):
+			var hero = AHStationRules.hero(campaign, unit.hero_id)
+			if hero == null or not hero.get("alive", true):
+				continue
+			var gained := AHHeroLevels.gain(hero, AHHeroLevels.fight_xp(tally.get(unit.hero_id, {})))
+			var total: Dictionary = stats.get(unit.hero_id, {"damage": 0, "healing": 0, "downs": 0})
+			total.xp = int(total.get("xp", 0)) + gained
+			stats[unit.hero_id] = total
 		expedition.stats = stats
 		tally.clear()
