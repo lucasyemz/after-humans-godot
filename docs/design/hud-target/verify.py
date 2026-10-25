@@ -21,6 +21,9 @@ for p in checks['profiles']:
  assert not p['overflows'];assert Image.open(OUT/p['file']).size==(1920,1080);assert sha(OUT/p['file'])==p['sha256'];assert min(t['size'] for t in p['labels'])>=18;assert p['ring']['center'][0]==768;rx,ry,rw,rh=p['ring']['rect'];assert [rx+rw/2,ry+rh/2]==p['ring']['center']
  for label in p['labels']:
   assert label['text']==label['text'].upper();x,y,w,h=label['rect'];assert x>=0 and y>=0 and x+w<=1920 and y+h<=1080
+ for icon in p['action_icon_centers']:
+  assert max(abs(a-b) for a,b in zip(icon['visible_center'],icon['requested_center']))<=.5,icon
+ assert p['portrait_crop_xyxy']==[40,14,208,182]
  for hit in p['hits']:
   x,y,w,h=hit['rect'];assert w>=112 and h>=112;assert x>=0 and y>=0 and x+w<=1920 and y+h<=1080
  for i,a in enumerate(p['hits']):

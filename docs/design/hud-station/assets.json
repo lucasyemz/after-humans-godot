@@ -808,6 +808,231 @@
       ],
       "note": "A barra das teclas: key_tab (kit da luta) 36 e o rótulo 22.",
       "sha256": "cca611119d92b655f883d41e6f2020020c7489a7a8da0c09bc743940af2db30c"
+    },
+    "selected_frame": {
+      "file": "art/ui/kit/station/selected_frame.webp",
+      "size": [
+        120,
+        60
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Escolha persistente sobre qualquer chapa (opção marcada, cômodo escolhido, aba de foco da rota).",
+      "sha256": "f91d78a972e35c1387be7b3cac3cb7887551d03e2c999a621c9f5a6a1fac88b2"
+    },
+    "chip_button": {
+      "file": "art/ui/kit/station/chip_button.webp",
+      "size": [
+        160,
+        48
+      ],
+      "nine_slice_ltrb": [
+        14,
+        14,
+        14,
+        14
+      ],
+      "content_xywh": [
+        12,
+        6,
+        136,
+        36
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão pequeno de opção (Rota básica, Água, 1x, Baixo...). Marcado: selected_frame por cima e texto âmbar.",
+      "sha256": "a39fed5262a391272a5cd43eb14ae8c54d66b120c0364358097679f9ccc65013"
+    },
+    "cost_chip": {
+      "file": "art/ui/kit/station/cost_chip.webp",
+      "size": [
+        120,
+        40
+      ],
+      "nine_slice_ltrb": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "content_xywh": [
+        8,
+        4,
+        104,
+        32
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Custo ou quantidade: ícone de recurso 24 e o número 22. Falta: número na cor de alerta.",
+      "sha256": "d1209a394c371c59306eabf03ac70e3fd53f8b75fac21bfb9ef650fda667fa7d"
+    },
+    "slider_track": {
+      "file": "art/ui/kit/station/slider_track.webp",
+      "size": [
+        240,
+        20
+      ],
+      "nine_slice_ltrb": [
+        10,
+        6,
+        10,
+        6
+      ],
+      "content_xywh": [
+        4,
+        4,
+        232,
+        12
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Calha do controle deslizante; o preenchimento é bar_fill tingido de âmbar.",
+      "sha256": "a51d8b7e1f5065020df58e6e1a47d06178c82cf2303fe9a31d6ab44c7f47d5c4"
+    },
+    "slider_knob": {
+      "file": "art/ui/kit/station/slider_knob.webp",
+      "size": [
+        28,
+        36
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        14,
+        18
+      ],
+      "note": "Pegador do controle deslizante, centrado no valor.",
+      "sha256": "ecfb99d4c49eb1d19b07425752ca68aa1a4c34b07581f58992b426dcb3407f2b"
+    },
+    "toggle_off": {
+      "file": "art/ui/kit/station/toggle_off.webp",
+      "size": [
+        64,
+        32
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Liga e desliga. Ligado: o pegador âmbar à direita; desligado: aço à esquerda.",
+      "sha256": "48f6a7d002a088b6a3329d5007f3f168b6dcc9145be66772e33646e01e8c90c5"
+    },
+    "toggle_on": {
+      "file": "art/ui/kit/station/toggle_on.webp",
+      "size": [
+        64,
+        32
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Liga e desliga. Ligado: o pegador âmbar à direita; desligado: aço à esquerda.",
+      "sha256": "557b4afab0d633aec70b2c1c79c61315205c1f8d40df285ba80d86493913a1de"
+    },
+    "room_tag": {
+      "file": "art/ui/kit/station/room_tag.webp",
+      "size": [
+        200,
+        52
+      ],
+      "nine_slice_ltrb": [
+        16,
+        12,
+        16,
+        20
+      ],
+      "content_xywh": [
+        12,
+        6,
+        176,
+        30
+      ],
+      "anchor": [
+        100,
+        52
+      ],
+      "note": "Etiqueta do cômodo no corte da Estação, com a ponta para baixo no centro (âncora 100,52). Esticar só na largura.",
+      "sha256": "e5aca84ff76e94319387d0dc230e0dd1c25402043cc2b410d9a5e9e15671ee26"
+    },
+    "touch_ring": {
+      "file": "art/ui/kit/station/touch_ring.webp",
+      "size": [
+        240,
+        240
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        120,
+        120
+      ],
+      "note": "Área do analógico de toque: octógono de aço meio transparente (aparece onde o dedo encosta; até a borda corre). Não fatiar.",
+      "sha256": "ec3f017bdf1aff02d607c89479e33e3aa65f438b5e78eb8822d49335cb7032a0"
+    },
+    "touch_knob": {
+      "file": "art/ui/kit/station/touch_knob.webp",
+      "size": [
+        84,
+        84
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        42,
+        42
+      ],
+      "note": "O pegador do analógico, com a cruz âmbar. Não fatiar.",
+      "sha256": "0262cc681fc8f3d3f5a66395627ada8029909767399317c026d5b996daa32a11"
+    },
+    "touch_button": {
+      "file": "art/ui/kit/station/touch_button.webp",
+      "size": [
+        170,
+        170
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        85,
+        85
+      ],
+      "note": "O botão Usar, apagado (nada por perto). Não fatiar.",
+      "sha256": "45d9bf95b59cca3b4fc3d2480f20f341ad254bfd94d24733320c046cd4eb5841"
+    },
+    "touch_button_active": {
+      "file": "art/ui/kit/station/touch_button_active.webp",
+      "size": [
+        170,
+        170
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        85,
+        85
+      ],
+      "note": "Por cima de touch_button quando há o que usar: o âmbar inteiro com o núcleo claro.",
+      "sha256": "fe3d9b57ee1959ec242ce8d6a44e8d9dce5d9c1ff060b1a76b65010015e3eb07"
     }
   },
   "trait_ids": {
@@ -821,6 +1046,15 @@
     "machine-fear": "trait_machine_fear"
   },
   "icons": {
+    "alert": {
+      "file": "art/ui/kit/station/icons/alert.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "13e335c51538184feb95c5620d95df62a4f681b24736a50b865a2d001c6fad8c",
+      "kind": "glyph_white_tintable"
+    },
     "bed": {
       "file": "art/ui/kit/station/icons/bed.webp",
       "size": [
@@ -902,6 +1136,15 @@
       "sha256": "558c40bc0976adde1dee9bf1f27f043dce5568c680b828fdbff8bf2db9f311b5",
       "kind": "glyph_white_tintable"
     },
+    "next_step": {
+      "file": "art/ui/kit/station/icons/next_step.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "2a133bdaf9834a883f71204afad5baf540c78117316e8620ceef476320071bf4",
+      "kind": "glyph_white_tintable"
+    },
     "objective_done": {
       "file": "art/ui/kit/station/icons/objective_done.webp",
       "size": [
@@ -920,6 +1163,42 @@
       "sha256": "0729372a0a3df1d9cece376164fa1ee4042e600c09cec298fd468cd7bebe39be",
       "kind": "glyph_white_tintable"
     },
+    "opt_controls": {
+      "file": "art/ui/kit/station/icons/opt_controls.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "47044a9247a1263a2ba94fd25537aa560a72d955f83faabc5655d7219af22e26",
+      "kind": "glyph_white_tintable"
+    },
+    "opt_graphics": {
+      "file": "art/ui/kit/station/icons/opt_graphics.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "2bd8b8040d0d79411baf66ee61802a4d587f4e9cfde86baec760afb4143a9f1d",
+      "kind": "glyph_white_tintable"
+    },
+    "opt_language": {
+      "file": "art/ui/kit/station/icons/opt_language.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "7a292b42178d20347f57cdf5f3281b7380c9c3ceb035d2683afeacde0c6d185b",
+      "kind": "glyph_white_tintable"
+    },
+    "opt_sound": {
+      "file": "art/ui/kit/station/icons/opt_sound.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "a1ccabd385658ecc99377e1c3521bfe819256352297a255cd8fc982739b3eac1",
+      "kind": "glyph_white_tintable"
+    },
     "place_unlocked": {
       "file": "art/ui/kit/station/icons/place_unlocked.webp",
       "size": [
@@ -929,6 +1208,24 @@
       "sha256": "6929f2d946e895e272efa706996f50c43bdf2bdbcd4898f12f97731e6f2adf3a",
       "kind": "glyph_white_tintable"
     },
+    "plan": {
+      "file": "art/ui/kit/station/icons/plan.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "093b93818b637e9d371b973cdbbf2102d89f1bac3c906af590d86a737b3d139a",
+      "kind": "glyph_white_tintable"
+    },
+    "recruit": {
+      "file": "art/ui/kit/station/icons/recruit.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "72bc1cc0bb3dbd40abec186065f9c92b5bddd3f2af9cb3187425e885c00e4ce9",
+      "kind": "glyph_white_tintable"
+    },
     "relic_empty": {
       "file": "art/ui/kit/station/icons/relic_empty.webp",
       "size": [
@@ -936,6 +1233,78 @@
         64
       ],
       "sha256": "347295f3fa9de76d1ae511bcd3bc7c947b567be2c3d2b94c36c3dd9eee57a8c6",
+      "kind": "glyph_white_tintable"
+    },
+    "room_bar": {
+      "file": "art/ui/kit/station/icons/room_bar.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "df1bfe4d14ba396dabeb855f63bac46e395ed5a932b8cf39727e75087852a28e",
+      "kind": "glyph_white_tintable"
+    },
+    "room_canteen": {
+      "file": "art/ui/kit/station/icons/room_canteen.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "4226e4e1cef719649d78c1bc3235671f18d78a327ae63d83d4cf6668fe04d551",
+      "kind": "glyph_white_tintable"
+    },
+    "room_depot": {
+      "file": "art/ui/kit/station/icons/room_depot.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "e836d8bcc8fb999c8d2892d8d31f1d26f4e25c6b8b2285df59107574516308eb",
+      "kind": "glyph_white_tintable"
+    },
+    "room_forge": {
+      "file": "art/ui/kit/station/icons/room_forge.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "fe8eca5bb955eaf41e5434037b0a426b402bb7cd7e8c7b2470c4674f174f14d9",
+      "kind": "glyph_white_tintable"
+    },
+    "room_quarters": {
+      "file": "art/ui/kit/station/icons/room_quarters.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f193ce03350fad3a24ee5c5301044b3b9a3342531b6284dbd672010387b48a47",
+      "kind": "glyph_white_tintable"
+    },
+    "room_research": {
+      "file": "art/ui/kit/station/icons/room_research.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "c9a3a7898b27cfaa8c8a2c94f45db61b1b457f8d9c6452c709f8dc0ab4f47b1a",
+      "kind": "glyph_white_tintable"
+    },
+    "route": {
+      "file": "art/ui/kit/station/icons/route.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "1a8a5135c9be198f7c666b9a9898c578c04d17dc244c835e6075db66fa586eb6",
+      "kind": "glyph_white_tintable"
+    },
+    "sleep": {
+      "file": "art/ui/kit/station/icons/sleep.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "d3f135d98bceb4e892d0a36e3e6a15744ddb04915afa2972143e44165bdee9fd",
       "kind": "glyph_white_tintable"
     },
     "state_active": {
@@ -981,6 +1350,15 @@
         64
       ],
       "sha256": "96da6c8a086c196fa46cfcc2b546c0a4ee80fc4aef0096f9885f468e65ed839b",
+      "kind": "glyph_white_tintable"
+    },
+    "train_arrival": {
+      "file": "art/ui/kit/station/icons/train_arrival.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "94ca1fc343bb23392b9cb39949413c8f4efd2fde2ba85b1ee969372aab63e660",
       "kind": "glyph_white_tintable"
     },
     "trait_agile": {
@@ -1054,6 +1432,15 @@
       ],
       "sha256": "f49244c5d67785f02ffe20cfd9aad8ce70bd0a785f18dbdfb53d93c7c3da958b",
       "kind": "painted"
+    },
+    "watch": {
+      "file": "art/ui/kit/station/icons/watch.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "67e00def98654285637c297434e63bd894b43e6d60b5805bece64a09d8f2f063",
+      "kind": "glyph_white_tintable"
     }
   },
   "font": {

@@ -328,6 +328,59 @@ def main():
     save("keys_bar", plate((320, 56), cut=12, rim=4, amber=False, inner="dark", seed=20), [24, 16, 24, 16], [16, 8, 288, 40],
          "A barra das teclas: key_tab (kit da luta) 36 e o rótulo 22.")
 
+    # ---------------------------------------------------------------- lote 1: as outras telas da Estação
+    save("selected_frame", amber_frame((120, 60), cut=10, width=3.0), [16, 16, 16, 16], None,
+         "Escolha persistente sobre qualquer chapa (opção marcada, cômodo escolhido, aba de foco da rota).")
+    save("chip_button", plate((160, 48), cut=8, rim=4, amber=False, inner="dark", seed=21), [14, 14, 14, 14], [12, 6, 136, 36],
+         "Botão pequeno de opção (Rota básica, Água, 1x, Baixo...). Marcado: selected_frame por cima e texto âmbar.")
+    save("cost_chip", plate((120, 40), cut=7, rim=3, amber=False, inner="dark", seed=22), [12, 12, 12, 12], [8, 4, 104, 32],
+         "Custo ou quantidade: ícone de recurso 24 e o número 22. Falta: número na cor de alerta.")
+    track = Image.new("RGBA", (240, 20))
+    track.alpha_composite(plate((240, 20), cut=5, rim=3, amber=False, inner="dark", seed=23))
+    save("slider_track", track, [10, 6, 10, 6], [4, 4, 232, 12], "Calha do controle deslizante; o preenchimento é bar_fill tingido de âmbar.")
+    knob = plate((28, 36), cut=6, rim=3, amber=False, inner="steel", seed=24)
+    knob.alpha_composite(lines((28, 36), [([(14, 10), (14, 26)], (*AMBER, 255), 2.4)]))
+    save("slider_knob", knob, None, None, "Pegador do controle deslizante, centrado no valor.", anchor=(14, 18))
+    for state in ["off", "on"]:
+        t = plate((64, 32), cut=6, rim=3, amber=False, inner="dark", seed=25)
+        x = 6 if state == "off" else 34
+        dot = plate((24, 22), cut=5, rim=2, amber=False, inner="steel", seed=26)
+        # Desligado: o pegador de aço claro (acima de 3:1 contra a calha); ligado: âmbar.
+        face = Image.new("RGBA", (24, 22), (*AMBER, 255) if state == "on" else (156, 158, 154, 255))
+        face.putalpha(mask((24, 22), chamfer(2, 2, 21, 19, 4)))
+        dot.alpha_composite(face)
+        t.alpha_composite(dot, (x, 5))
+        t.alpha_composite(lines((64, 32), [(chamfer(0.8, 0.8, 63.2, 31.2, 6) + [chamfer(0.8, 0.8, 63.2, 31.2, 6)[0]], (150, 150, 144, 230), 1.2)]))
+        save(f"toggle_{state}", t, None, None, "Liga e desliga. Ligado: o pegador âmbar à direita; desligado: aço à esquerda.")
+    tag = Image.new("RGBA", (200, 52))
+    body = plate((200, 42), cut=8, rim=4, amber=True, inner="dark", seed=27, amber_len=8)
+    tag.alpha_composite(body)
+    point = Image.new("RGBA", (200, 52))
+    ImageDraw.Draw(point).polygon([(92, 40), (108, 40), (100, 51)], fill=(*EDGE, 255))
+    ImageDraw.Draw(point).polygon([(94, 40), (106, 40), (100, 48)], fill=(*AMBER, 255))
+    tag.alpha_composite(point)
+    save("room_tag", tag, [16, 12, 16, 20], [12, 6, 176, 30],
+         "Etiqueta do cômodo no corte da Estação, com a ponta para baixo no centro (âncora 100,52). Esticar só na largura.",
+         anchor=(100, 52))
+    # ---------------------------------------------------------------- lote 2: os controles de toque da exploração
+    # Octógonos de aço (a chapa chanfrada do kit, com o aro e a textura), meio transparentes para a cena aparecer.
+    def see_through(im, alpha):
+        a = im.getchannel("A").point(lambda v: v * alpha // 255)
+        im.putalpha(a)
+        return im
+    ring = plate((240, 240), cut=70, rim=7, amber=False, inner=None, seed=41)
+    fill = see_through(tile((240, 240), (14, 16, 18), 0.6), 110)
+    fill.putalpha(Image.composite(fill.getchannel("A"), Image.new("L", (240, 240), 0), mask((240, 240), chamfer(7, 7, 232, 232, 66))))
+    fill.alpha_composite(ring)
+    save("touch_ring", fill, None, None, "Área do analógico de toque: octógono de aço meio transparente (aparece onde o dedo encosta; até a borda corre). Não fatiar.", anchor=(120, 120))
+    knob = plate((84, 84), cut=24, rim=5, amber=False, inner="steel", seed=42)
+    knob.alpha_composite(lines((84, 84), [([(30, 42), (54, 42)], (*AMBER, 255), 2.6), ([(42, 30), (42, 54)], (*AMBER, 255), 2.6)]))
+    save("touch_knob", knob, None, None, "O pegador do analógico, com a cruz âmbar. Não fatiar.", anchor=(42, 42))
+    save("touch_button", see_through(plate((170, 170), cut=50, rim=6, amber=False, inner="dark", seed=43), 225), None, None,
+         "O botão Usar, apagado (nada por perto). Não fatiar.", anchor=(85, 85))
+    save("touch_button_active", amber_frame((170, 170), cut=50, width=3.6), None, None,
+         "Por cima de touch_button quando há o que usar: o âmbar inteiro com o núcleo claro.", anchor=(85, 85))
+
     manifest = {
         "revision": "station_2026_10_25",
         "direction": "Alvos aprovados da Estação (25/10/2026), no idioma do kit da luta",
