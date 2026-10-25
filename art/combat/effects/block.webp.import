@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ddmf8t34y5pvr"
-path="res://.godot/imported/dodge.png-67bba51e0675721c822e794fd288948d.ctex"
+uid="uid://b3hmism84hlog"
+path="res://.godot/imported/block.webp-6e62a159803ccffe4e0138539846f725.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/combat/effects/dodge.png"
-dest_files=["res://.godot/imported/dodge.png-67bba51e0675721c822e794fd288948d.ctex"]
+source_file="res://art/combat/effects/block.webp"
+dest_files=["res://.godot/imported/block.webp-6e62a159803ccffe4e0138539846f725.ctex"]
 
 [params]
 

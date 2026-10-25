@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b61smdsm2aubo"
-path="res://.godot/imported/status_bleeding_robot.png-ccc897674db56beee4906185a82b9249.ctex"
+uid="uid://c20obxfqamsui"
+path="res://.godot/imported/status_poison.webp-4b125ce777eafc6bb1b549cb5649c869.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/combat/effects/status_bleeding_robot.png"
-dest_files=["res://.godot/imported/status_bleeding_robot.png-ccc897674db56beee4906185a82b9249.ctex"]
+source_file="res://art/combat/effects/status_poison.webp"
+dest_files=["res://.godot/imported/status_poison.webp-4b125ce777eafc6bb1b549cb5649c869.ctex"]
 
 [params]
 

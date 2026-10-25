@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c65frnlcbaikv"
-path="res://.godot/imported/status_bleeding_organic.png-b79e51691b5cf320e0323ea798d5901b.ctex"
+uid="uid://2gt1mqyyo3jp"
+path="res://.godot/imported/healing.webp-1b3450b31e01580bb5d66dc876ce0301.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/combat/effects/status_bleeding_organic.png"
-dest_files=["res://.godot/imported/status_bleeding_organic.png-b79e51691b5cf320e0323ea798d5901b.ctex"]
+source_file="res://art/combat/effects/healing.webp"
+dest_files=["res://.godot/imported/healing.webp-1b3450b31e01580bb5d66dc876ce0301.ctex"]
 
 [params]
 

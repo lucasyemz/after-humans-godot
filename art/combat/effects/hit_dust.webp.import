@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c2hvps4wna2ap"
-path="res://.godot/imported/healing.png-917305fd4703035cc4a58961e62ffaa5.ctex"
+uid="uid://dm24enmivch8f"
+path="res://.godot/imported/hit_dust.webp-4cca84b69ab4b51a73f58d86b367889f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/combat/effects/healing.png"
-dest_files=["res://.godot/imported/healing.png-917305fd4703035cc4a58961e62ffaa5.ctex"]
+source_file="res://art/combat/effects/hit_dust.webp"
+dest_files=["res://.godot/imported/hit_dust.webp-4cca84b69ab4b51a73f58d86b367889f.ctex"]
 
 [params]
 
