@@ -5456,8 +5456,8 @@ msgid "Voltamos antes do guardião. Metade do achado chegou; o caminho continua 
 msgstr "We came back before the guardian. Half the haul made it; the road will still be there for the next trip."
 
 #. briefings.fled.debriefing
-msgid "A patrulha fechou o caminho e a gente correu. Largamos a carga para conseguir voltar."
-msgstr "The patrol closed the way and we ran. We dropped the load to make it back."
+msgid "A patrulha fechou o caminho e a gente correu. Largamos o achado para conseguir voltar."
+msgstr "The patrol closed the way and we ran. We dropped what we had found to make it back."
 
 #. briefings.defeat.debriefing
 msgid "Voltaram menos do que saíram. Agora a Estação cuida de quem chegou; a rua pode esperar."
