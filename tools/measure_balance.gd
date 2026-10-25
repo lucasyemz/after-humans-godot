@@ -4,6 +4,8 @@
 ## Equipe: os quatro fundadores. --gear diz o que eles levam (relíquias e treinos da Pesquisa):
 ##   none (padrão: como saem da campanha nova) · typical (o progresso suposto de cada fase, em GEAR_TYPICAL) · max (as
 ##   quatro relíquias e os quatro treinos em qualquer fase).
+## --levels diz o nível dos fundadores (#90): none (padrão: nível 1) · typical (o nível suposto ao entrar em cada fase,
+##   LEVELS_TYPICAL) · max (nível 10). Cada treino escolhe a primeira melhoria que o Alojamento oferece.
 ## Os treinos pesquisados valem na luta (use_expedition leva campaign.researched_skills para o contexto, desde 22/10).
 ## Três medidas por fase:
 ## - luta a luta, cada uma numa cópia limpa da expedição (os quatro vivos e de vida cheia): vitórias, rodadas e a vida
@@ -33,6 +35,10 @@ const TRAINING_ORDER := ["res_cao_punho_sucata", "res_gato_corte_fase", "res_sap
 ## guardiões dão só 4 fragmentos até a fase 5; a Pesquisa (2) mais um treino (3) pedem o quinto, da Cora (+1 por volta
 ## com a Pesquisa ligada) ou do evento que dá fragmento. Para o Lucas ajustar; quem repete fases chega mais perto de max.
 const GEAR_TYPICAL := {"fase_1": [0, 0], "fase_2": [1, 0], "fase_3": [2, 0], "fase_4": [3, 0], "fase_5": [4, 1]}
+const LEVELS := ["none", "typical", "max"]
+## O nível suposto ao entrar em cada fase sem repetir fases (o XP de umas 5 lutas e da jornada por fase, hero-xp.json, e a
+## curva de hero-levels.json): para o Lucas ajustar com a curva.
+const LEVELS_TYPICAL := {"fase_1": 1, "fase_2": 3, "fase_3": 4, "fase_4": 6, "fase_5": 7}
 const OPTIONS := ["base", "hp25", "dmg1", "more", "lesscare"]
 ## O mais ferido recebe cuidado enquanto estiver abaixo desta fração da vida.
 const CARE_BELOW := 0.7
@@ -42,6 +48,7 @@ var seeds := 40
 var policy := "auto"
 var option := "base"
 var gear := "none"
+var levels := "none"
 var _rng := RandomNumberGenerator.new()
 ## Ampolas da Íris usadas fora da luta nas jornadas com cuidados da fase (mostra o efeito do lesscare).
 var _ampoules := 0
@@ -69,8 +76,10 @@ func _run() -> void:
 			option = arg.trim_prefix("--option=")
 		elif arg.begins_with("--gear="):
 			gear = arg.trim_prefix("--gear=")
-	if not POLICIES.has(policy) or not OPTIONS.has(option) or not GEARS.has(gear):
-		push_error("Política (%s), opção (%s) ou gear (%s) desconhecido." % [" | ".join(POLICIES), " | ".join(OPTIONS), " | ".join(GEARS)])
+		elif arg.begins_with("--levels="):
+			levels = arg.trim_prefix("--levels=")
+	if not POLICIES.has(policy) or not OPTIONS.has(option) or not GEARS.has(gear) or not LEVELS.has(levels):
+		push_error("Política (%s), opção (%s), gear (%s) ou níveis (%s) desconhecido." % [" | ".join(POLICIES), " | ".join(OPTIONS), " | ".join(GEARS), " | ".join(LEVELS)])
 		quit(1)
 		return
 	var team_text := "fundadores iniciais, sem relíquias nem treinos"
@@ -78,7 +87,9 @@ func _run() -> void:
 		team_text = "progresso suposto (relíquias/treinos) " + ", ".join(PHASES.map(func(id): return "%s %d/%d" % [id, GEAR_TYPICAL[id][0], GEAR_TYPICAL[id][1]]))
 	elif gear == "max":
 		team_text = "as 4 relíquias e os 4 treinos"
-	print("política=%s opção=%s gear=%s sementes=%d · %s" % [policy, option, gear, seeds, team_text])
+	if levels != "none":
+		team_text += " · níveis " + (", ".join(PHASES.map(func(id): return "%s %d" % [id, LEVELS_TYPICAL[id]])) if levels == "typical" else "10")
+	print("política=%s opção=%s gear=%s níveis=%s sementes=%d · %s" % [policy, option, gear, levels, seeds, team_text])
 	print("fase   | luta      | vitórias | rodadas | vida que sobra | jornada com cuidados: termina · voltam | sem cuidados: termina · voltam")
 	for phase_id in PHASES:
 		_measure(phase_id)
@@ -136,6 +147,7 @@ func _new_campaign(seed_value: int, phase_id: String) -> Dictionary:
 	var campaign: Dictionary = root.get_node("Campaign").create_initial(seed_value)
 	_unlock(campaign)
 	_equip(campaign, phase_id)
+	_level_up(campaign, phase_id)
 	J.start_expedition(campaign, phase_id, 1000 + seed_value * 7)
 	if option == "lesscare":
 		campaign.session.expedition.food = int(campaign.session.expedition.food) / 2
@@ -179,6 +191,21 @@ func _equip(campaign: Dictionary, phase_id: String) -> void:
 		var row = root.get_node("GameData").row("research", TRAINING_ORDER[index])
 		if not campaign.researched_skills.has(row.SkillId):
 			campaign.researched_skills.append(row.SkillId)
+
+
+## Os fundadores no nível de --levels: cada treino com a primeira melhoria oferecida (o XP e as sementes não contam aqui).
+func _level_up(campaign: Dictionary, phase_id: String) -> void:
+	var target: int = {"none": 1, "typical": LEVELS_TYPICAL[phase_id], "max": 10}[levels]
+	var Levels = load("res://scripts/flow/hero_levels.gd")
+	campaign.inventory.seeds = 9999
+	for hero in campaign.roster:
+		while Levels.level(hero) < target:
+			hero.xp = 9999
+			var options: Array = Levels.options(hero)
+			if options.is_empty() or Levels.train(campaign, hero.id, options[0].Name) != "":
+				break
+		hero.xp = 0
+	campaign.inventory.seeds = 30
 
 
 func _unlock(campaign: Dictionary) -> void:

@@ -812,10 +812,10 @@ func _pips(caption: String, ranks: Array, hero_side: bool, color: Color) -> HBox
 func _number_of(ability_id: String) -> Array:
 	var ability: Dictionary = session.data.abilities[ability_id]
 	if ability.DamageRange.Max > 0:
-		var damage := session.effective_range(ability_id, "damage")
+		var damage := session.effective_range(ability_id, "damage", _actor_id)
 		return ["%d–%d" % [damage.Min, damage.Max], tr("dano ★") if damage.trained else tr("dano"), GOLD]
 	if ability.HealRange.Max > 0:
-		var heal := session.effective_range(ability_id, "heal")
+		var heal := session.effective_range(ability_id, "heal", _actor_id)
 		return ["+%d–%d" % [heal.Min, heal.Max], tr("cura ★") if heal.trained else tr("cura"), S.OK]
 	return ["", "", GOLD]
 
@@ -1038,7 +1038,7 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			if unit == null:
 				continue
 			var note := tr("%s (vida %d)") % [_name(unit), unit.hp]
-			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage").Max >= unit.hp:
+			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage", _actor_id).Max >= unit.hp:
 				note += tr(" · pode cair")
 			# Os estados do alvo por extenso: no foco, a dica faz o papel da dica do mouse sobre os ícones (#30).
 			note += _status_words(unit, terms)

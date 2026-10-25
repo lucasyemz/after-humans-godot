@@ -74,6 +74,8 @@ class Unit:
 	var mark_duration := 0
 	var cooldowns := {}
 	var remaining_uses := {}
+	## +n nos limites de dano ou cura de uma habilidade (o nível do herói, #90): {ability_id: n}.
+	var ability_bonus := {}
 	var trauma := false
 	var sprite_key := ""
 

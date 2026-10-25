@@ -33,6 +33,8 @@ var _corner: HBoxContainer
 var _rest_tag: PanelContainer
 ## O relatório abrindo logo depois da chegada (a câmera desliza até a fila).
 var _after_arrival := false
+## O herói escolhendo a melhoria do treino no Alojamento (#90), ou "".
+var _training := ""
 ## Até quando (relógio, ms) o relatório recém-aberto pela chegada ignora pular e voltar.
 var _report_guard_ms := 0
 ## Pular apertado na chegada (também antes de ela começar, com o cartão da passagem ainda saindo).
@@ -873,6 +875,8 @@ func _sound_open() -> void:
 
 
 func close_panel() -> void:
+	# A escolha do Treino (#90) não fica aberta para a próxima vez.
+	_training = ""
 	# A chegada termina no relatório, nunca no meio: fechar não vale (a fila e os cômodos ficariam pela metade).
 	if current == ARRIVAL:
 		return
@@ -1222,8 +1226,9 @@ func _characters(c: Dictionary) -> void:
 		tags.append(tr("relíquia: %s") % (tr(relic.DisplayName) if relic else tr("nenhuma")))
 		_text("%s · %s" % [entry.display_name, tr(hero_class.DisplayName) if hero_class else entry.class_id], 20, H.GOLD.lightened(0.3))
 		_text(" · ".join(tags), 17, H.MUTED)
-		var row := _row()
 		var hero_id: String = entry.id
+		_hero_level(c, entry)
+		var row := _row()
 		if entry.trauma:
 			_button(tr("Tratar trauma (%d sementes)") % S.TRAUMA_COST, func(): _act(S.treat_trauma(Campaign.state, hero_id), tr("Trauma tratado.")), true, row)
 		var stock: Array = c.inventory.relics
@@ -1240,6 +1245,64 @@ func _characters(c: Dictionary) -> void:
 		_section(tr("Memorial"))
 		for entry in c.memorial:
 			_text("%s · %s · %s" % [entry.display_name, tr(entry.get("mission_name", "")), AHCombatEngine.cause_text(entry.get("cause", ""))], 17, H.MUTED)
+
+
+## O nível do herói no Alojamento (#90): o nível, a barra do XP até o próximo, as melhorias escolhidas e o Treino (XP do
+## nível e sementes), que abre a escolha entre as duas melhorias da espécie.
+func _hero_level(c: Dictionary, entry: Dictionary) -> void:
+	var hero_id: String = entry.id
+	var cost := AHHeroLevels.next_cost(entry)
+	var level := AHHeroLevels.level(entry)
+	var line := _row()
+	line.add_child(H.make_label(tr("Nível %d") % level, 18, U.GOLD))
+	if cost.is_empty():
+		line.add_child(H.make_label(tr("· nível máximo"), 17, H.MUTED))
+	else:
+		var bar := U.bar(U.VIOLET, 8)
+		bar.max_value = cost.xp
+		bar.value = mini(AHHeroLevels.xp(entry), cost.xp)
+		bar.custom_minimum_size = Vector2(200, 8)
+		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		line.add_child(bar)
+		line.add_child(H.make_label(tr("XP %d/%d") % [AHHeroLevels.xp(entry), cost.xp], 17, H.MUTED))
+	# As melhorias escolhidas, com quantas vezes cada uma.
+	var counts := {}
+	for upgrade_id in entry.get("upgrades", []):
+		counts[upgrade_id] = int(counts.get(upgrade_id, 0)) + 1
+	var chosen: Array = []
+	for upgrade_id in counts:
+		var upgrade = GameData.row("hero_upgrades", upgrade_id)
+		if upgrade != null:
+			chosen.append("%s ×%d" % [tr(upgrade.DisplayName), counts[upgrade_id]])
+	if not chosen.is_empty():
+		_text(tr("Melhorias: %s") % ", ".join(chosen), 16, H.MUTED)
+	if cost.is_empty():
+		return
+	if _training == hero_id:
+		_text(tr("Treino para o nível %d: escolha uma melhoria.") % (level + 1), 17, U.GOLD)
+		# Uma embaixo da outra: a descrição inteira cabe na largura do painel.
+		for upgrade in AHHeroLevels.options(entry):
+			var id: String = upgrade.Name
+			_button("%s · %s" % [tr(upgrade.DisplayName), tr(upgrade.Description)], func(): _train_hero(hero_id, id))
+		_button(tr("Cancelar"), func():
+			_training = ""
+			refresh())
+		return
+	var block := AHHeroLevels.train_block(c, entry)
+	var price: String = tr("1 semente") if int(cost.seeds) == 1 else tr("%d sementes") % cost.seeds
+	var train := _button(tr("Treinar · nível %d (%s)") % [level + 1, price], func():
+		_training = hero_id
+		refresh(), block == "")
+	train.tooltip_text = block
+
+
+func _train_hero(hero_id: String, upgrade_id: String) -> void:
+	_training = ""
+	var entry = S.hero(Campaign.state, hero_id)
+	var upgrade = GameData.row("hero_upgrades", upgrade_id)
+	var next := AHHeroLevels.level(entry) + 1
+	_act(AHHeroLevels.train(Campaign.state, hero_id, upgrade_id),
+		tr("%s subiu para o nível %d: %s.") % [entry.display_name, next, tr(upgrade.DisplayName) if upgrade else ""], "res://audio/ui/forge_confirm.ogg")
 
 
 func _cycle_relic(hero_id: String) -> void:
@@ -2085,6 +2148,8 @@ func _report() -> void:
 			parts.append(tr("derrubou %d") % s.downs)
 		if int(s.get("healing", 0)) > 0:
 			parts.append(tr("curou %d") % s.healing)
+		if int(s.get("xp", 0)) > 0:
+			parts.append(tr("+%d XP") % s.xp)
 		var line: String = (tr("Vida %d/%d") % [entry.hp, entry.max_hp]) if entry.alive else tr("Não voltou: está no Memorial.")
 		if not parts.is_empty():
 			line += " · " + ", ".join(parts)

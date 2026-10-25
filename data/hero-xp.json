@@ -1,0 +1,44 @@
+[
+  {
+    "Name": "fight",
+    "Xp": 8,
+    "Description": "Cada herói que lutou."
+  },
+  {
+    "Name": "down",
+    "Xp": 3,
+    "Description": "Por inimigo derrubado."
+  },
+  {
+    "Name": "protect",
+    "Xp": 2,
+    "Description": "Por guarda ou bloqueio dado a outro herói."
+  },
+  {
+    "Name": "healing",
+    "Xp": 1,
+    "Per": 5,
+    "Description": "A cada 5 de cura."
+  },
+  {
+    "Name": "damage",
+    "Xp": 1,
+    "Per": 10,
+    "Description": "A cada 10 de dano."
+  },
+  {
+    "Name": "journey",
+    "Xp": 15,
+    "Description": "Cada herói vivo da equipe na jornada concluída."
+  },
+  {
+    "Name": "recruit",
+    "Multiplier": 1.5,
+    "Description": "Os recrutas ganham mais XP que os fundadores."
+  },
+  {
+    "Name": "migration",
+    "Xp": 85,
+    "Description": "No save antigo, o XP por fase já concluída: o de uma fase jogada (umas 5 lutas e a jornada), para treinar."
+  }
+]

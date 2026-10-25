@@ -1102,6 +1102,14 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	for entry in campaign.roster:
 		entry.expedition_uses = {}
 	if session.result == "victory" and campaign.last_completed_expedition_id != expedition.id:
+		# O XP da jornada concluída (#90): cada um da equipe que voltou vivo; o relatório mostra junto com o das lutas.
+		for hero_id in expedition.team:
+			var member = hero(campaign, hero_id)
+			if member != null and member.get("alive", true):
+				var gained := AHHeroLevels.gain(member, int(AHHeroLevels.rule("journey").get("Xp", 0)))
+				var line: Dictionary = delivered.stats.get(hero_id, {"damage": 0, "healing": 0, "downs": 0})
+				line.xp = int(line.get("xp", 0)) + gained
+				delivered.stats[hero_id] = line
 		campaign.last_completed_expedition_id = expedition.id
 		campaign.completed_expeditions = int(campaign.completed_expeditions) + 1
 	# A primeira vitória em cada fase traz o que a equipe viu lá (#64): a camada da escada da fase, uma vez.
