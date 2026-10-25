@@ -48,6 +48,8 @@ const PARTY_SPACING := 1.3
 ## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
 const REACH := 1.1
 
+## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
+const SWITCH_WAIT_MS := 2000
 var street: Node3D
 var hud: AHExplorationHud
 var guards := {}
@@ -1019,8 +1021,9 @@ func _on_camp_leave() -> void:
 		return
 	# O busy fica ligado do começo ao fim: nenhum quadro em que a equipe ande no meio da saída.
 	busy = true
-	# A troca de herói termina antes (os dois fades usam o mesmo preto).
-	while camp.switching():
+	# A troca de herói termina antes (os dois fades usam o mesmo preto); com teto, para nunca prender a saída.
+	var limit := Time.get_ticks_msec() + SWITCH_WAIT_MS
+	while camp.switching() and Time.get_ticks_msec() < limit:
 		await get_tree().process_frame
 	if not R.leave_camp(Campaign.state, randi()):
 		busy = false

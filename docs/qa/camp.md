@@ -95,6 +95,12 @@ pé. À direita, o depois.
   pode ter mais de um lugar de onde comer). A Mochila e a barra do acampamento gastam a mesma comida da expedição, e
   cada uma tem o seu efeito: a Mochila cura pela refeição, e a barra pelo descanso (+10% de vida e −5 de instinto). A
   Mochila abre no herói escolhido na fogueira e, ao fechar, a barra mostra a comida que sobrou.
+- **A ampola da Íris no acampamento** (decisão do Lucas): pode ser usada, e cada uso sai das cargas da próxima luta.
+  Quem usou 1 no acampamento entra na luta com 1 carga a menos, e a recarga depois da vitória continua igual (volta ao
+  máximo). A Mochila do acampamento mostra "3 cargas para a próxima luta" na linha do detalhe, com a explicação. O
+  quadrado e o botão ficam curtos ("3 cargas"), para a Mochila ter a mesma largura do corredor, também no texto Maior.
+
+  ![a ampola na Mochila do acampamento](camp/bag-ampoule.jpg)
 - **Pontos baixos:**
   - o levantar acampamento mantém o `busy` do começo ao fim;
   - a arte do cartão sai por `AHSpriteCard.art()`, e não pelo campo privado.
@@ -108,3 +114,15 @@ pé. À direita, o depois.
     também entraram: o fade antigo avisa quem esperava só depois de o novo ser o atual, e o teste diz claramente se o
     Voltar à Estação sumir do menu.
   - **Depois da decisão do Lucas:** a Mochila passou a funcionar no acampamento (comer e curar por ela), com teste.
+  - **A ampola no acampamento e a revisão:** os testes conferem:
+    - usar a ampola pelo botão da Mochila e as cargas da luta seguinte;
+    - o save do meio do acampamento com a conta;
+    - o zero e a recarga da vitória, que volta ao máximo e não passa dele;
+    - o Comer pouco apertado pelo botão da Mochila, contra `food_before - 1`.
+
+    A espera da troca de herói, ao levantar acampamento, ganhou um teto pelo relógio (`SWITCH_WAIT_MS`, 2 s).
+  - **Rodada 4 (reprovada):** "cargas para a próxima luta" alargava a Mochila do acampamento, que saía da tela no
+    texto Maior. O texto longo foi para a linha do detalhe, que quebra, e um teste confere que a Mochila cabe na
+    tela. O teto da espera passou a contar pelo relógio, e não por quadros.
+  - **Rodada 5 (aprovada):** a Mochila tem a mesma largura no acampamento e no corredor (947 px no texto Normal e
+    1120 px no Maior), e a ampola foi refeita numa luta real: começa com 2 usos e a vitória recarrega para 3.

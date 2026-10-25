@@ -25,6 +25,7 @@ func run(context) -> void:
 	await _reopened()
 	await _menu_in_camp()
 	await _camp_with_cargo()
+	await _ampoule_in_camp()
 	await _fades()
 	Tips.enabled = tips
 	if _tree.current_scene != null:
@@ -280,9 +281,16 @@ func _menu_in_camp() -> void:
 	t.equal(bag.hero_id, corridor.camp.selected_id(), "a Mochila abre no herói escolhido na fogueira")
 	var hurt = Campaign.hero(corridor.camp.selected_id())
 	hurt.hp = maxi(1, int(hurt.max_hp) / 2)
+	var hp_before: int = hurt.hp
 	var food_before := AHJourneyRules.food(Campaign.state)
-	var healed := AHExplorationCare.use(Campaign.state, hurt.id, AHExplorationCare.SMALL_MEAL)
-	t.check(healed > 0 and AHJourneyRules.food(Campaign.state) == food_before - 1, "comer pela Mochila no acampamento cura e gasta 1 de comida")
+	bag._build()
+	await _frames(2)
+	var eat := _button(bag, "Comer pouco")
+	if t.check(eat != null and not eat.disabled, "a Mochila do acampamento tem Comer pouco"):
+		eat.pressed.emit()
+		await _frames(2)
+	t.equal(AHJourneyRules.food(Campaign.state), food_before - 1, "o botão Comer pouco da Mochila gasta 1 de comida")
+	t.check(int(hurt.hp) > hp_before, "e cura o herói escolhido")
 	var before: int = corridor.camp.selected
 	await _press("ui_right")
 	await _frames(3)
@@ -358,6 +366,80 @@ func _camp_with_cargo() -> void:
 		t.check(finish.visible and not finish.get_global_rect().intersects(bar.get_global_rect()), "no texto Maior, o Concluir fica fora da barra do acampamento")
 		t.check(finish.get_global_rect().end.x <= 1920.0, "e dentro da tela")
 	Settings.set_text_size(size_before)
+
+
+## A ampola da Íris no acampamento (decisão do Lucas, #98): cada uso sai das cargas da próxima luta; salvar no meio não
+## perde a conta; não passa do limite (nem abaixo de zero, nem acima do máximo na recarga da vitória).
+func _ampoule_in_camp() -> void:
+	var C = AHExplorationCare
+	var c: Dictionary = Campaign.create_initial(41)
+	J.start_expedition(c, "fase_1", 41)
+	var street = await _street_at_camp(c)
+	if street == null:
+		t.check(false, "a rua com o acampamento para o teste da ampola")
+		return
+	var corridor = street.corridor
+	var hud: AHExplorationHud = street.exploration_hud
+	await corridor._start_camp()
+	await _until(func(): return hud.camp_open() and not corridor.camp.switching(), 5.0)
+	var top := int(GameData.combat.abilities[C.AMPOULE].UsesMax)
+	t.equal(C.ampoule_charges(Campaign.state), top, "a ampola começa cheia (%d cargas)" % top)
+	var hurt = Campaign.hero(corridor.camp.selected_id())
+	hurt.hp = maxi(1, int(hurt.max_hp) / 3)
+	await _press("inventory")
+	var bag: AHInventoryPanel = hud.find_children("*", "AHInventoryPanel", true, false)[0]
+	bag.selected = "ampoule"
+	bag._build()
+	await _frames(2)
+	var use := _button(bag, "Ampola de Reparo")
+	if t.check(use != null and not use.disabled, "a Mochila do acampamento oferece a ampola"):
+		t.check(_has_text(bag, "%d cargas para a próxima luta" % top), "a Mochila diz as cargas para a próxima luta")
+		t.check(not use.text.contains("próxima luta"), "e o botão fica curto: %s" % use.text)
+		use.pressed.emit()
+		await _frames(2)
+	t.equal(C.ampoule_charges(Campaign.state), top - 1, "usar no acampamento gasta 1 carga")
+	# A Mochila do acampamento cabe na tela, como no corredor, também no texto Maior.
+	var size_before: int = Settings.text_size
+	Settings.set_text_size(2)
+	bag._build()
+	await _frames(3)
+	var rect: Rect2 = hud._modal.get_global_rect()
+	t.check(rect.position.x >= 0.0 and rect.end.x <= 1920.0, "no texto Maior, a Mochila do acampamento cabe na tela (%d a %d)" % [rect.position.x, rect.end.x])
+	Settings.set_text_size(size_before)
+	bag._build()
+	await _frames(2)
+	t.check(_has_text(bag, "%d cargas para a próxima luta" % (top - 1)) or _has_text(bag, "1 carga para a próxima luta"), "e a Mochila mostra o que sobra para a próxima luta")
+	# Salvar no meio do acampamento e voltar: a conta continua.
+	var saved = Campaign.read_file(Campaign.primary_path())
+	var iris_saved: Dictionary = {}
+	for hero in saved.roster:
+		if hero.class_id == "sapo":
+			iris_saved = hero
+	t.equal(int(iris_saved.get("expedition_uses", {}).get(C.AMPOULE, -1)), top - 1, "o save do meio do acampamento guarda as cargas")
+	# A próxima luta começa com 1 carga a menos.
+	var iris = C.iris(Campaign.state)
+	var fight := AHCombatSession.create([iris], ["robot"], false, 41)
+	t.equal(int(fight.state.player_team[0].remaining_uses.get(C.AMPOULE, -1)), top - 1, "a luta seguinte começa com 1 carga a menos")
+	# O limite: não passa de zero, e a recarga da vitória volta ao máximo, não acima.
+	for i in top + 2:
+		hurt.hp = 1
+		C.use(Campaign.state, hurt.id, C.IRIS_AMPOULE)
+	t.equal(C.ampoule_charges(Campaign.state), 0, "gastar tudo para no zero")
+	hurt.hp = 1
+	t.check(not C.quote(Campaign.state, hurt.id, C.IRIS_AMPOULE).available and C.use(Campaign.state, hurt.id, C.IRIS_AMPOULE) == 0, "sem carga, a ampola não sai")
+	fight = AHCombatSession.create([iris], ["robot"], false, 42)
+	fight.state.victory = true
+	fight.state.is_over = true
+	C.restore_iris_after_victory(Campaign.state, fight)
+	t.equal(C.ampoule_charges(Campaign.state), top, "a recarga da vitória continua igual: volta ao máximo, não acima")
+	await _press("inventory")
+
+
+func _has_text(root: Node, part: String) -> bool:
+	for node in root.find_children("*", "", true, false):
+		if (node is Label or node is Button) and String(node.text).contains(part):
+			return true
+	return false
 
 
 ## O GameFlow.fade público: um fade novo substitui o que corre (a tela não fica presa no preto).

@@ -84,6 +84,16 @@ func _run() -> void:
 	hud.camp_hud.heal_button.pressed.emit()
 	await _frames(3)
 	await _shot("03-third-heal")
+	# A Mochila no acampamento, na ampola (#98): as cargas que sobram para a próxima luta.
+	if hud.has_method("show_inventory"):
+		hud.show_inventory()
+		await _frames(5)
+		var bags: Array = hud.find_children("*", "AHInventoryPanel", true, false)
+		if not bags.is_empty() and "selected" in bags[0]:
+			bags[0].selected = "ampoule"
+			bags[0]._build()
+			await _frames(10)
+			await _shot("04-bag-ampoule")
 	for file in DirAccess.get_files_at(campaign.save_dir):
 		DirAccess.remove_absolute(campaign.save_dir.path_join(file))
 	DirAccess.remove_absolute(campaign.save_dir)

@@ -952,3 +952,5 @@ character_sheet.gd: Empty
 character_sheet.gd: Row
 character_sheet.gd: part
 combat_hud.gd: since
+inventory_panel.gd: screen
+inventory_panel.gd: detail
