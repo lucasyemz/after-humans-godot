@@ -1131,6 +1131,60 @@ func restyle() -> void:
 
 # ---------------------------------------------------------------- dicas
 
+## As estrelas (1 a 3) e os critérios da luta, cada um com ✓ ou ✗ (a cor e o sinal dizem, para o daltonismo também).
+func _result_stars(box: VBoxContainer, rewards: Dictionary) -> void:
+	var stars := S.label("★".repeat(int(rewards.stars)) + "☆".repeat(3 - int(rewards.stars)), 46, GOLD, "display")
+	stars.name = "Stars"
+	stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(stars)
+	var list := VBoxContainer.new()
+	list.alignment = BoxContainer.ALIGNMENT_CENTER
+	list.add_theme_constant_override("separation", 2)
+	box.add_child(list)
+	for criterion in rewards.list:
+		var line := S.label("%s  %s" % ["✓" if criterion.met else "✗", criterion.text], 18, S.OK if criterion.met else MUTED)
+		line.name = "Criterion"
+		line.set_meta("criterion", criterion.id)
+		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		list.add_child(line)
+
+
+## O XP que o herói ganhou na luta: a barra até o próximo nível enchendo (mais rápida no 2x), "+N XP" e, com o XP do
+## nível cheio, o aviso do Treino no Alojamento.
+func _result_xp(who: VBoxContainer, unit: AHCombat.Unit) -> void:
+	var hero = Campaign.hero(unit.hero_id)
+	if hero == null or session == null:
+		return
+	var gained := int(session.xp_gained.get(unit.hero_id, 0))
+	var cost := AHHeroLevels.next_cost(hero)
+	var level_line := S.label(tr("Nível %d") % AHHeroLevels.level(hero) + (tr("  +%d XP") % gained if gained > 0 else ""), 15, S.VIOLET)
+	level_line.name = "XpGain"
+	level_line.set_meta("xp_gain", gained)
+	level_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	who.add_child(level_line)
+	if cost.is_empty():
+		return
+	var bar := S.bar(S.VIOLET, 6)
+	bar.name = "XpBar"
+	bar.max_value = int(cost.xp)
+	bar.custom_minimum_size = Vector2(110, 6)
+	bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var now := mini(AHHeroLevels.xp(hero), int(cost.xp))
+	bar.value = maxi(0, AHHeroLevels.xp(hero) - gained)
+	who.add_child(bar)
+	if GameFlow.reduced_effects():
+		bar.value = now
+	else:
+		var tween := create_tween()
+		tween.tween_interval(0.3 / maxf(1.0, arena.speed if arena else 1.0))
+		tween.tween_property(bar, "value", now, 0.8 / maxf(1.0, arena.speed if arena else 1.0))
+	if AHHeroLevels.xp(hero) >= int(cost.xp):
+		var ready := S.label(tr("Treino pronto"), 14, GOLD, "bold")
+		ready.name = "TrainingReady"
+		ready.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		who.add_child(ready)
+
+
 func _hide_tip() -> void:
 	if _choosing == "":
 		_tip.visible = false
@@ -1573,7 +1627,9 @@ func _unhandled_input(event: InputEvent) -> void:
 # ---------------------------------------------------------------- resultado
 
 ## Mostra o fim da luta e espera "Continuar" (no modo automático, segue sozinho).
-func show_result(result: String, automatic: bool) -> void:
+## O fim da luta: o título, as estrelas e os critérios (rewards, de AHFightRewards.criteria; a vitória) e cada herói com a
+## vida e o XP ganho enchendo a barra até o próximo nível (#91). Continuar fecha (o automático fecha sozinho).
+func show_result(result: String, automatic: bool, rewards: Dictionary = {}, hold: float = 1.5) -> void:
 	_panel.visible = false
 	# A vitória e a derrota têm o toque delas (#36); a fuga, não.
 	if result == "victory" or result == "defeat":
@@ -1595,6 +1651,8 @@ func show_result(result: String, automatic: bool) -> void:
 	var note := S.label(notes.get(result, ""), 22)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(note)
+	if result == "victory" and not rewards.is_empty():
+		_result_stars(box, rewards)
 	var team := HBoxContainer.new()
 	team.alignment = BoxContainer.ALIGNMENT_CENTER
 	team.add_theme_constant_override("separation", 18)
@@ -1611,6 +1669,7 @@ func show_result(result: String, automatic: bool) -> void:
 		var line := S.label("%s\n%s" % [unit.display_name, tr("caído") if fallen else "%d/%d" % [unit.hp, unit.max_hp]], 16, MUTED if fallen else TEXT)
 		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		who.add_child(line)
+		_result_xp(who, unit)
 		team.add_child(who)
 	var button := Button.new()
 	button.text = tr("Continuar")
@@ -1621,6 +1680,6 @@ func show_result(result: String, automatic: bool) -> void:
 	_result.visible = true
 	button.grab_focus.call_deferred()
 	if automatic:
-		get_tree().create_timer(1.5).timeout.connect(func(): result_closed.emit())
+		get_tree().create_timer(hold).timeout.connect(func(): result_closed.emit())
 	await result_closed
 	_result.visible = false
