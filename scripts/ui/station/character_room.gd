@@ -95,7 +95,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # ---------------------------------------------------------------- o alto
 
 func _top(c: Dictionary) -> void:
-	var plaque := AHKit.panel("room_plaque")
+	var plaque := AHKit.plaque()
 	plaque.name = "Plaque"
 	plaque.position = Vector2(28, 14)
 	plaque.custom_minimum_size = Vector2(520, 96)
@@ -135,7 +135,7 @@ func _top(c: Dictionary) -> void:
 	cog.size = Vector2(52, 52)
 	cog.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	gear.add_child(cog)
-	AHKit.style_button(gear, "icon_button", Vector4(18, 18, 18, 18))
+	AHKit.style_as(gear, "icon", Vector4(18, 18, 18, 18))
 	gear.custom_minimum_size = Vector2(92, 92)
 	gear.position = Vector2(1800, 14)
 	gear.pressed.connect(func(): hud.open_service("options"))
@@ -143,7 +143,7 @@ func _top(c: Dictionary) -> void:
 
 
 func _vital(vital: Dictionary) -> PanelContainer:
-	var chip := AHKit.panel("resource_chip")
+	var chip := AHKit.chip("resource")
 	chip.custom_minimum_size = Vector2(248, 96)
 	chip.tooltip_text = vital.tip
 	chip.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -155,6 +155,10 @@ func _vital(vital: Dictionary) -> PanelContainer:
 	var painted := AHKit.icon("resource_%s" % vital.id)
 	icon.texture = painted if painted != null else load("res://art/ui/icons/%s.svg" % vital.icon)
 	icon.modulate = Color.WHITE if painted != null else (AHKit.alert_text() if vital.warn else AHKit.TEXT)
+	# Faltando, o ícone também vira o alerta (o triângulo): a forma avisa no daltonismo (hud-estacao.md).
+	if vital.warn:
+		icon.texture = AHKit.icon("alert")
+		icon.modulate = AHKit.alert_text()
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.custom_minimum_size = Vector2(40, 40)
@@ -256,7 +260,7 @@ class Figure extends Control:
 # ---------------------------------------------------------------- a coluna da esquerda
 
 func _left(c: Dictionary) -> void:
-	var panel := AHKit.panel("panel_large")
+	var panel := AHKit.panel_box("large")
 	panel.name = "Left"
 	panel.position = LEFT.position
 	panel.size = LEFT.size
@@ -297,7 +301,7 @@ func _hero_tab(entry: Dictionary) -> Button:
 	var tab := Button.new()
 	tab.name = "Tab_%s" % entry.id
 	tab.toggle_mode = false
-	AHKit.style_button(tab, "hero_tab_selected" if entry.id == selected else "hero_tab")
+	AHKit.style_as(tab, "hero_selected" if entry.id == selected else "hero")
 	tab.custom_minimum_size = Vector2(116, 132)
 	tab.clip_contents = true
 	tab.set_meta("hero_id", entry.id)
@@ -330,7 +334,7 @@ func _recruit_button() -> Button:
 	button.name = "Tab_recruit"
 	button.text = ("+ " + tr("Recrutar")).to_upper()
 	button.tooltip_text = tr("Recrutar e Memorial")
-	AHKit.style_button(button, "secondary_button")
+	AHKit.style_as(button, "secondary")
 	button.add_theme_font_override("font", AHKit.font(true))
 	button.add_theme_font_size_override("font_size", AHKit.size("primary"))
 	if selected == RECRUIT:
@@ -367,7 +371,7 @@ func _ability_row(ability_id: String) -> Button:
 	row.expand_icon = true
 	row.add_theme_constant_override("icon_max_width", 44)
 	row.add_theme_constant_override("h_separation", 14)
-	AHKit.style_button(row, "list_row_selected" if ability_id == ability else "list_row")
+	AHKit.style_as(row, "list_selected" if ability_id == ability else "list")
 	row.add_theme_font_override("font", AHKit.font(false))
 	row.add_theme_font_size_override("font_size", AHKit.size("row"))
 	row.custom_minimum_size = Vector2(0, 60)
@@ -382,7 +386,7 @@ func _ability_row(ability_id: String) -> Button:
 ## em quem ela vale.
 func _ability_detail(c: Dictionary, hero: Dictionary, ability_id: String) -> PanelContainer:
 	var data = GameData.row("abilities", ability_id)
-	var inset := AHKit.panel("panel_inset")
+	var inset := AHKit.panel_box("inset")
 	inset.name = "Detail"
 	inset.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var box := VBoxContainer.new()
@@ -425,7 +429,7 @@ func _recruit_list(c: Dictionary, column: VBoxContainer) -> void:
 		var button := Button.new()
 		button.text = "%s · %s" % [tr(hero_class.DisplayName) if hero_class else class_id, tr("voluntário, de graça") if free else tr("%d sementes") % S.RECRUIT_COST]
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		AHKit.style_button(button, "list_row")
+		AHKit.style_as(button, "list")
 		button.add_theme_font_override("font", AHKit.font(false))
 		button.add_theme_font_size_override("font_size", AHKit.size("row"))
 		button.custom_minimum_size = Vector2(0, 60)
@@ -456,7 +460,7 @@ func _divider() -> TextureRect:
 # ---------------------------------------------------------------- o painel PERSONAGEM
 
 func _right(c: Dictionary, hero: Dictionary) -> void:
-	var panel := AHKit.panel("panel_large")
+	var panel := AHKit.panel_box("large")
 	panel.name = "Right"
 	panel.position = RIGHT.position
 	panel.size = RIGHT.size
@@ -479,7 +483,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 	close.name = "Close"
 	close.text = "X"
 	close.tooltip_text = tr("Voltar")
-	AHKit.style_button(close, "icon_button")
+	AHKit.style_as(close, "icon")
 	close.add_theme_font_override("font", AHKit.font(true))
 	close.add_theme_font_size_override("font_size", AHKit.size("tab"))
 	close.custom_minimum_size = Vector2(56, 56)
@@ -506,7 +510,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 		level_box.add_child(AHKit.label(tr("Nível %d · máximo") % AHHeroLevels.level(hero), "small", AHKit.MUTED, false, true))
 	else:
 		level_box.add_child(AHKit.label(tr("Nível %d · XP %d / %d") % [AHHeroLevels.level(hero), AHHeroLevels.xp(hero), cost.xp], "small", AHKit.MUTED, false, true))
-		var xp := AHKitBar.make("main_bar", "xp", mini(AHHeroLevels.xp(hero), cost.xp), cost.xp)
+		var xp := AHKit.bar("xp", mini(AHHeroLevels.xp(hero), cost.xp), cost.xp)
 		xp.name = "Xp"
 		xp.custom_minimum_size = Vector2(170, 22)
 		xp.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -546,7 +550,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 	life.add_child(AHKit.label(tr("Vida"), "row", AHKit.TEXT, true, true))
 	life.add_child(AHKit.label("%d / %d" % [hero.hp, hero.max_hp], "row", AHKit.TEXT, true))
 	column.add_child(life)
-	var life_bar := AHKitBar.make("main_bar", "life", hero.hp, hero.max_hp)
+	var life_bar := AHKit.bar("life", hero.hp, hero.max_hp)
 	life_bar.name = "Life"
 	life_bar.custom_minimum_size = Vector2(0, 28)
 	column.add_child(life_bar)
@@ -555,7 +559,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 	stats.add_child(AHKit.label(tr("Velocidade %d") % _speed(hero), "row", AHKit.TEXT, true, true))
 	stats.add_child(AHKit.label(tr("Instinto %d / %d") % [int(hero.instinct), MAX_INSTINCT], "row", AHKit.TEXT, true, true))
 	column.add_child(stats)
-	var instinct := AHKitBar.make("main_bar", "instinct", int(hero.instinct), MAX_INSTINCT)
+	var instinct := AHKit.bar("instinct", int(hero.instinct), MAX_INSTINCT)
 	instinct.name = "Instinct"
 	instinct.custom_minimum_size = Vector2(0, 28)
 	column.add_child(instinct)
@@ -621,7 +625,7 @@ func _train_button(c: Dictionary, hero: Dictionary) -> Button:
 	button.icon = AHKit.icon("train")
 	button.expand_icon = false
 	button.add_theme_constant_override("icon_max_width", 30)
-	AHKit.style_button(button, "train_button")
+	AHKit.style_as(button, "train")
 	button.add_theme_font_override("font", AHKit.font(true))
 	button.add_theme_font_size_override("font_size", AHKit.size("tab"))
 	button.add_theme_color_override("icon_normal_color", AHKit.AMBER)
@@ -683,7 +687,7 @@ func _relic(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
 func _small_button(text: String) -> Button:
 	var button := Button.new()
 	button.text = text.to_upper()
-	AHKit.style_button(button, "secondary_button")
+	AHKit.style_as(button, "secondary")
 	button.add_theme_font_override("font", AHKit.font(true))
 	button.add_theme_font_size_override("font_size", AHKit.size("text"))
 	button.custom_minimum_size = Vector2(0, 56)
@@ -737,7 +741,7 @@ func _trait(perk: Dictionary, color: Color) -> Control:
 	row.add_theme_constant_override("separation", 12)
 	row.tooltip_text = tr(String(perk.get("Condition", "")))
 	row.mouse_filter = Control.MOUSE_FILTER_PASS
-	var tile := AHKit.panel("trait_tile")
+	var tile := AHKit.chip("trait")
 	tile.custom_minimum_size = Vector2(80, 80)
 	tile.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -778,7 +782,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(dim)
-	var dialog := AHKit.panel("panel_large")
+	var dialog := AHKit.panel_box("large")
 	dialog.name = "Training"
 	dialog.position = DIALOG.position
 	dialog.custom_minimum_size = Vector2(DIALOG.size.x, 0)
@@ -803,7 +807,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	for option in options:
 		var card := Button.new()
 		card.name = "Upgrade_%s" % option.Name
-		AHKit.style_button(card, "upgrade_card_selected" if option.Name == _upgrade else "upgrade_card")
+		AHKit.style_as(card, "upgrade_selected" if option.Name == _upgrade else "upgrade")
 		card.custom_minimum_size = Vector2(296, 200)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var box := VBoxContainer.new()
@@ -838,12 +842,12 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	var cancel := Button.new()
 	cancel.name = "Cancel"
 	cancel.text = tr("Cancelar").to_upper()
-	AHKit.style_button(cancel, "secondary_button")
+	AHKit.style_as(cancel, "secondary")
 	cancel.add_theme_font_override("font", AHKit.font(true))
 	cancel.add_theme_font_size_override("font_size", AHKit.size("primary"))
 	cancel.custom_minimum_size = Vector2(0, 64)
 	cancel.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	var cancel_key := AHKitKey.make("", "%s / B" % AHUiStyle.key_name("menu"), "button_key")
+	var cancel_key := AHKitKey.make("", "%s / B" % AHUiStyle.key_name("menu"), "button")
 	cancel_key.name = "Key"
 	cancel.add_child(cancel_key)
 	cancel.pressed.connect(func():
@@ -878,7 +882,7 @@ func _bottom(c: Dictionary) -> void:
 	back.icon = load("res://art/ui/icons/ui-arrow-left.svg") if ResourceLoader.exists("res://art/ui/icons/ui-arrow-left.svg") else null
 	back.add_theme_constant_override("icon_max_width", 28)
 	back.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	AHKit.style_button(back, "secondary_button")
+	AHKit.style_as(back, "secondary")
 	back.add_theme_font_override("font", AHKit.font(true))
 	back.add_theme_font_size_override("font_size", AHKit.size("primary"))
 	back.custom_minimum_size = Vector2(216, 64)
@@ -890,7 +894,7 @@ func _bottom(c: Dictionary) -> void:
 	recruit.reset_size()
 	recruit.position = Vector2(back.position.x + maxf(216.0, back.get_combined_minimum_size().x) + 12.0, 920)
 	# As teclas, centradas em x 962, acima das abas.
-	var keys := AHKit.panel("keys_bar")
+	var keys := AHKit.panel(AHKit.piece_of("key", "bar"))
 	keys.name = "Keys"
 	keys.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var row := HBoxContainer.new()
@@ -922,7 +926,7 @@ func _bottom(c: Dictionary) -> void:
 		tab.icon = AHKit.icon(spec[1])
 		tab.add_theme_constant_override("icon_max_width", 30)
 		var active: bool = spec[0] == "characters"
-		AHKit.style_button(tab, "nav_tab_active" if active else "nav_tab")
+		AHKit.style_as(tab, "nav_active" if active else "nav")
 		tab.add_theme_font_override("font", AHKit.font(true))
 		tab.add_theme_font_size_override("font_size", AHKit.size("tab"))
 		if active:

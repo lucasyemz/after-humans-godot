@@ -49,39 +49,38 @@ func _run() -> void:
 	grid.position = Vector2(40, 30)
 	grid.add_theme_constant_override("separation", 22)
 	page.add_child(grid)
-	# Painéis.
+	# Os componentes da Awesomic (o padrão, hud-direction.md): Plaqueta, Abas, Chips.
 	var row := _row(grid)
-	for piece in ["register", "panel", "target_tab", "card_tab", "room_plaque"]:
-		var box = Kit.panel(piece)
-		box.add_child(Kit.label(piece, "tab", Kit.TEXT, true, true))
-		row.add_child(box)
-	# Botões e teclas.
+	for spec in [["plaque", Kit.plaque()], ["tab card", Kit.tab("card")], ["chip cost", Kit.chip("cost")], ["chip result", Kit.chip("result")],
+			["Codex: target_tab", Kit.panel("target_tab")]]:
+		spec[1].add_child(Kit.label(spec[0], "tab", Kit.TEXT, true, true))
+		row.add_child(spec[1])
+	# Botões nos estados (o segundo de cada um desligado) e Teclas.
 	row = _row(grid)
-	for piece in ["primary_button", "secondary_button", "train_button", "nav_tab", "action_button"]:
-		var button := Button.new()
-		button.text = piece.to_upper()
-		Kit.style_button(button, piece)
-		row.add_child(button)
+	for kind in ["primary", "secondary", "icon", "chip", "train", "nav", "list"]:
+		row.add_child(Kit.button(kind, kind))
+	var off = Kit.button("off", "secondary")
+	off.disabled = true
+	row.add_child(off)
 	row.add_child(Key.make("combat_move"))
-	row.add_child(Key.make("", "E / A", "button_key"))
+	row.add_child(Key.make("", "E / A", "button"))
 	# Barras.
 	row = _row(grid)
-	for spec in [["health_ally", "hero", 24, 24, "24/24"], ["health_enemy", "enemy", 6, 8, "6/8"], ["main_bar", "hero", 17, 23, "17/23"],
-			["main_bar", "xp", 60, 90, ""], ["main_bar", "instinct", 40, 200, ""], ["main_bar", "state", 8, 24, ""]]:
-		var bar = Bar.make(spec[0], spec[1], spec[2], spec[3], spec[4])
+	for spec in [["hero", 24, 24, "24/24"], ["enemy", 6, 8, "6/8"], ["life", 8, 23, "8/23"], ["xp", 60, 90, ""], ["instinct", 40, 200, ""], ["state", 8, 24, ""]]:
+		var bar = Kit.bar(spec[0], spec[1], spec[2], spec[3])
 		bar.custom_minimum_size.x = 220
 		row.add_child(bar)
 	# Pílulas dos três estados.
 	row = _row(grid)
 	for hp in [34, 17, 8]:
 		row.add_child(Pill.make(hp, 34 if hp == 34 else (23 if hp == 17 else 24)))
-	# Painéis grandes.
+	# Painéis e Cartas.
 	row = _row(grid)
-	for spec in [["hero_card", Vector2(380, 256)], ["panel_large", Vector2(420, 260)], ["report_band", Vector2(700, 216)], ["hero_panel", Vector2(564, 212)]]:
-		var big = Kit.panel(spec[0])
-		big.custom_minimum_size = spec[1]
-		big.add_child(Kit.label(spec[0], "card_name", Kit.TEXT, true, true))
-		row.add_child(big)
+	for spec in [["card hero", Kit.card("hero"), Vector2(380, 256)], ["panel large", Kit.panel_box("large"), Vector2(420, 260)],
+			["panel inset", Kit.panel_box("inset"), Vector2(300, 200)], ["panel band", Kit.panel_box("band"), Vector2(560, 216)]]:
+		spec[1].custom_minimum_size = spec[2]
+		spec[1].add_child(Kit.label(spec[0], "card_name", Kit.TEXT, true, true))
+		row.add_child(spec[1])
 	await process_frame
 	await process_frame
 	await RenderingServer.frame_post_draw

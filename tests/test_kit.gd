@@ -13,6 +13,7 @@ func run(context) -> void:
 	_manifest()
 	_states()
 	_faces()
+	_standard()
 	await _components()
 
 
@@ -24,10 +25,10 @@ func _manifest() -> void:
 			if AHKit.texture(name) == null:
 				missing.append(name)
 	t.equal(missing, [], "toda peça dos dois manifestos carrega")
-	var panel := AHKit.style("hero_panel")
-	t.equal([panel.texture_margin_left, panel.texture_margin_top, panel.texture_margin_right, panel.texture_margin_bottom], [224.0, 24.0, 24.0, 24.0],
-		"o 9-slice vem do assets.json (o painel do herói protege a coluna do retrato)")
-	t.equal([panel.content_margin_left, panel.content_margin_top], [232.0, 40.0], "o recuo do conteúdo vem do content_xywh")
+	var panel := AHKit.style(AHKit.piece_of("panel", "large"))
+	t.equal([panel.texture_margin_left, panel.texture_margin_top, panel.texture_margin_right, panel.texture_margin_bottom], [44.0, 44.0, 44.0, 44.0],
+		"o 9-slice vem do assets.json (o Painel da Awesomic)")
+	t.equal([panel.content_margin_left, panel.content_margin_top], [24.0, 22.0], "o recuo do conteúdo vem do content_xywh")
 	var band := AHKit.style("report_band")
 	t.check(band.axis_stretch_horizontal == StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT, "as peças grandes repetem o aço (TILE_FIT)")
 	t.check(AHKit.style("panel").axis_stretch_horizontal == StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH, "as pequenas esticam")
@@ -52,6 +53,40 @@ func _states() -> void:
 		"os rótulos neutros")
 
 
+## O padrão (decisão do Lucas, hud-direction.md): todo componente lê uma peça da Awesomic (o manifesto de
+## art/ui/kit/station, ou uma que ele reaproveita da luta), e as peças do Codex que deixaram de valer não aparecem no
+## código.
+func _standard() -> void:
+	var station = JSON.parse_string(FileAccess.get_file_as_string(AHKit.MANIFESTS[1]))
+	var allowed: Array = station.assets.keys() + station.get("reuses_combat_kit", [])
+	var outside: Array = []
+	for component in AHKit.COMPONENTS:
+		for kind in AHKit.COMPONENTS[component]:
+			if not allowed.has(AHKit.COMPONENTS[component][kind]):
+				outside.append("%s/%s" % [component, kind])
+	t.equal(outside, [], "todo componente usa uma peça da Awesomic")
+	var pattern := RegEx.create_from_string("AHKit(Bar|Key)?\\.(style|panel|make)\\(\"(%s)\"|AHKit\\.style_button\\([^,]+, \"(%s)\"" % ["|".join(AHKit.RETIRED), "|".join(AHKit.RETIRED)])
+	var found: Array = []
+	for path in _scripts("res://scripts"):
+		if path.ends_with("kit/kit.gd"):
+			continue
+		var lines := FileAccess.get_file_as_string(path).split("\n")
+		for i in lines.size():
+			if pattern.search(lines[i]) != null:
+				found.append("%s:%d" % [path.get_file(), i + 1])
+	t.equal(found, [], "nenhuma peça aposentada do Codex (%s) no código" % ", ".join(AHKit.RETIRED))
+
+
+func _scripts(dir: String) -> Array:
+	var out: Array = []
+	for file in DirAccess.get_files_at(dir):
+		if file.ends_with(".gd"):
+			out.append(dir.path_join(file))
+	for sub in DirAccess.get_directories_at(dir):
+		out.append_array(_scripts(dir.path_join(sub)))
+	return out
+
+
 ## Os retratos quadrados da faixa da rodada não saem vazios (o Rastejante de Cabos, deitado, saía com 1% de pixels).
 func _faces() -> void:
 	var manifest = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
@@ -67,10 +102,10 @@ func _faces() -> void:
 func _components() -> void:
 	var host := Control.new()
 	_tree.root.add_child(host)
-	var bar := AHKitBar.make("health_enemy", "enemy", 6, 8, "6/8")
+	var bar := AHKit.bar("enemy", 6, 8, "6/8")
 	var pill := AHKitPill.make(8, 24)
 	var key := AHKitKey.make("combat_move")
-	var instinct := AHKitBar.make("main_bar", "instinct", 10, 200)
+	var instinct := AHKit.bar("instinct", 10, 200)
 	for node in [bar, pill, key, instinct]:
 		host.add_child(node)
 	await _tree.process_frame

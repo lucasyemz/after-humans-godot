@@ -110,7 +110,7 @@ func restyle() -> void:
 func _band() -> void:
 	var band := Panel.new()
 	band.name = "Band"
-	band.add_theme_stylebox_override("panel", AHKit.style("report_band"))
+	band.add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("panel", "band")))
 	band.position = BAND.position
 	band.size = BAND.size
 	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -277,7 +277,7 @@ func _chips(c: Dictionary, result: String) -> Array:
 
 
 func _result_chip(icon_name: String, text: String, color: Color, width: float = 232.0) -> PanelContainer:
-	var chip := AHKit.panel("result_chip")
+	var chip := AHKit.chip("result")
 	chip.custom_minimum_size = Vector2(width, 88)
 	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var row := HBoxContainer.new()
@@ -308,7 +308,7 @@ func _resource(spec: Array, amount: int, width: float, column: float) -> VBoxCon
 	box.add_theme_constant_override("separation", 0)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.set_meta("resource", spec[2])
-	var tile := AHKit.panel("resource_tile")
+	var tile := AHKit.chip("resource_tile")
 	tile.custom_minimum_size = Vector2(width, 84.0 * width / 104.0)
 	tile.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -340,7 +340,7 @@ func _card(hero_id: String) -> Control:
 	holder.custom_minimum_size = Vector2(CARD_WIDTH, 0)
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	holder.set_meta("hero_id", hero_id)
-	var card := AHKit.panel("hero_card")
+	var card := AHKit.card("hero")
 	card.name = "Card"
 	card.custom_minimum_size = Vector2(CARD_WIDTH, 0)
 	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -406,7 +406,7 @@ func _card(hero_id: String) -> Control:
 	life.add_theme_constant_override("separation", 10)
 	life.add_child(AHKit.label(tr("Vida"), "text", AHKit.MUTED, false, true))
 	life.add_child(AHKit.label("%d / %d" % [hero.hp, hero.max_hp], "text", AHKit.TEXT, true))
-	var bar := AHKitBar.make("main_bar", "life", hero.hp, hero.max_hp)
+	var bar := AHKit.bar("life", hero.hp, hero.max_hp)
 	bar.custom_minimum_size = Vector2(0, 28)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if big:
@@ -449,7 +449,7 @@ func _card(hero_id: String) -> Control:
 	# A aba da melhoria da classe (a Pesquisa): quando há o que pesquisar para ela.
 	var research := _research_for(c, String(hero.class_id))
 	if hero.alive and not research.is_empty():
-		var tab := AHKit.panel("card_tab")
+		var tab := AHKit.tab("card")
 		tab.name = "Tab"
 		tab.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var tab_row := HBoxContainer.new()
@@ -491,7 +491,7 @@ func _research_for(c: Dictionary, class_id: String) -> Dictionary:
 
 func _details_band() -> PanelContainer:
 	var c: Dictionary = Campaign.state
-	var band := AHKit.panel("report_band")
+	var band := AHKit.panel_box("band")
 	band.name = "Details"
 	band.position = DETAILS.position
 	band.custom_minimum_size = DETAILS.size
@@ -532,7 +532,7 @@ func _details_band() -> PanelContainer:
 			var level := S.room_level(c, id)
 			var button := Button.new()
 			button.text = tr("%s %s%s (%s)") % [tr("Recuperar") if level == 0 else tr("Melhorar"), tr(S.ROOM_ARTICLE.get(id, "")), tr(S.room_def(id).name), S.cost_text(S.next_level_cost(c, id))]
-			AHKit.style_button(button, "secondary_button")
+			AHKit.style_as(button, "secondary")
 			button.add_theme_font_size_override("font_size", AHKit.size("text"))
 			button.pressed.connect(func(): room_requested.emit(id))
 			column.add_child(button)
@@ -564,9 +564,9 @@ func _buttons() -> void:
 	_toggle.name = "Details"
 	_toggle.text = tr("Ver a equipe").to_upper() if details else tr("Ver detalhes").to_upper()
 	_toggle.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	AHKit.style_button(_toggle, "secondary_button", Vector4(0, 0, 0, 0))
+	AHKit.style_as(_toggle, "secondary", Vector4(0, 0, 0, 0))
 	_toggle.custom_minimum_size = Vector2(240, 64)
-	var key := AHKitKey.make("", "%s / LB" % AHUiStyle.key_name("report_details"), "button_key")
+	var key := AHKitKey.make("", "%s / LB" % AHUiStyle.key_name("report_details"), "button")
 	key.name = "Key"
 	_toggle.add_child(key)
 	_toggle.pressed.connect(toggle_details)
@@ -585,11 +585,11 @@ static func _primary(text: String, icon_name: String, action: String) -> Button:
 	button.add_theme_color_override("icon_normal_color", Color("1a1408"))
 	button.add_theme_color_override("icon_focus_color", Color("1a1408"))
 	button.add_theme_color_override("icon_hover_color", Color("1a1408"))
-	AHKit.style_button(button, "primary_button", Vector4(10, 0, 0, 0))
+	AHKit.style_as(button, "primary", Vector4(10, 0, 0, 0))
 	for state in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color"]:
 		button.add_theme_color_override(state, Color("1a1408"))
 	button.custom_minimum_size = Vector2(480, 72)
-	var key := AHKitKey.make("", "%s / A" % AHUiStyle.key_name(action), "button_key")
+	var key := AHKitKey.make("", "%s / A" % AHUiStyle.key_name(action), "button")
 	key.name = "Key"
 	button.add_child(key)
 	return button

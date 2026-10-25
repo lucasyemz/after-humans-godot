@@ -30,6 +30,11 @@ const KIT_SLOT_STEP := 160.0
 const KIT_ACTION := Rect2(1584, 836, 128, 100)
 const KIT_ACTION_STEP := Vector2(136, 112)
 const KIT_TARGET_NAME := Vector2(176, 56)
+## A coluna do retrato no painel do herói (o nome e as barras começam aqui) e a altura das barras sob as unidades.
+const HERO_TEXT_LEFT := 222.0
+const PLATE_BAR_HEIGHT := 40.0
+## A intenção das máquinas não sobe acima disto (a faixa da rodada termina em ~106).
+const INTENT_TOP := 112.0
 const KIT_PORTRAIT := 60.0
 const ACTIONS := [["Mover", "move", "Q", "combat_move"], ["Defender", "defend", "W", "combat_defend"],
 	["Mochila", "item", "I", "inventory"], ["Fugir", "flee", "F", "combat_flee"]]
@@ -171,7 +176,8 @@ func _build() -> void:
 	# O Registro com a tecla em aba (no alto à esquerda); o painel das linhas abre embaixo dele.
 	_register = Button.new()
 	_register.name = "Register"
-	AHKit.style_button(_register, "register")
+	# A Plaqueta do kit (a Awesomic), apertável: abre e fecha as linhas.
+	AHKit.style_as(_register, "plaque")
 	_register.position = KIT_REGISTER.position
 	_register.custom_minimum_size = KIT_REGISTER.size
 	_register.size = KIT_REGISTER.size
@@ -179,7 +185,7 @@ func _build() -> void:
 	_register.focus_mode = Control.FOCUS_NONE
 	_register.pressed.connect(toggle_log)
 	add_child(_register)
-	var register_text := AHKit.label(tr("REGISTRO"), "register", TEXT, false, true)
+	var register_text := AHKit.label(tr("REGISTRO"), "plaque", TEXT, false, true)
 	register_text.position = Vector2(24, 0)
 	register_text.size = Vector2(180, KIT_REGISTER.size.y)
 	register_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -188,7 +194,7 @@ func _build() -> void:
 	_register.add_child(register_key)
 	register_key.position = Vector2(KIT_REGISTER.size.x - 58, 11)
 
-	_log_panel = AHKit.panel("panel")
+	_log_panel = AHKit.panel_box("inset")
 	_log_panel.position = Vector2(KIT_REGISTER.position.x, KIT_REGISTER.end.y + 8)
 	_log_panel.custom_minimum_size = Vector2(460, 0)
 	_log_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -213,10 +219,12 @@ func _build() -> void:
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_panel)
 
-	# Um Panel (e não PanelContainer): o retrato fica na coluna da esquerda, fora da área de conteúdo.
+	# O Painel do kit (panel_large), num Panel (e não PanelContainer): o retrato fica numa coluna à esquerda, e o nome e
+	# as barras, na área à direita dele (HERO_TEXT_LEFT).
 	var hero_panel := Panel.new()
 	hero_panel.name = "HeroPanel"
-	var hero_style := AHKit.style("hero_panel")
+	var hero_style := AHKit.style(AHKit.piece_of("panel", "large"))
+	hero_style.content_margin_left = HERO_TEXT_LEFT
 	hero_panel.add_theme_stylebox_override("panel", hero_style)
 	hero_panel.position = KIT_HERO.position - _panel.position
 	hero_panel.size = KIT_HERO.size
@@ -233,19 +241,19 @@ func _build() -> void:
 	_hero_name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	_hero_name.clip_text = true
 	hero_box.add_child(_hero_name)
-	_hero_hp = AHKitBar.make("main_bar", "hero", 1, 1, "", "hero_value")
+	_hero_hp = AHKit.bar("hero", 1, 1, "", "hero_value")
 	_hero_hp.name = "HeroHp"
 	_hero_hp.custom_minimum_size.y = 44
 	hero_box.add_child(_hero_hp)
-	_hero_instinct = AHKitBar.make("main_bar", "instinct", 0, 200, "", "hero_value")
+	_hero_instinct = AHKit.bar("instinct", 0, 200, "", "hero_value")
 	_hero_instinct.name = "HeroInstinct"
 	_hero_instinct.custom_minimum_size.y = 44
 	_hero_instinct.mouse_filter = Control.MOUSE_FILTER_PASS
 	_hero_instinct.tooltip_text = S.GLOSSARY.Instinto
 	hero_box.add_child(_hero_instinct)
-	# O retrato quadrado grande na coluna da esquerda (fora da área de conteúdo, que começa em 232).
+	# O retrato quadrado grande na coluna da esquerda (a área do nome e das barras começa em HERO_TEXT_LEFT).
 	var frame := AHKit.panel("square_portrait")
-	frame.position = Vector2(12, 14)
+	frame.position = Vector2(14, 14)
 	frame.size = Vector2(184, 184)
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hero_panel.add_child(frame)
@@ -323,7 +331,7 @@ func _build() -> void:
 		button.custom_minimum_size = KIT_ACTION.size
 		grow_hit(button, Vector2(128, 112))
 		button.text = ""
-		AHKit.style_button(button, "action_button")
+		AHKit.style_as(button, "icon")
 		var icon := TextureRect.new()
 		icon.texture = _action_icon(spec[1])
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -370,7 +378,7 @@ func _build() -> void:
 	line.offset_left = 14
 	line.offset_right = -14
 	_target_label.add_child(line)
-	_tip = AHKit.panel("panel")
+	_tip = AHKit.panel_box("large")
 	_tip.custom_minimum_size = Vector2(460, 0)
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tip.visible = false
@@ -382,7 +390,7 @@ func _build() -> void:
 	_tip_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tip.add_child(_tip_box)
 
-	_result = AHKit.panel("panel_large")
+	_result = AHKit.panel_box("large")
 	_result.position = Vector2(660, 300)
 	_result.custom_minimum_size = Vector2(600, 0)
 	_result.visible = false
@@ -414,6 +422,8 @@ func open(new_session: AHCombatSession) -> void:
 	visible = true
 	_result.visible = false
 	for bar in _unit_bars.values():
+		if bar.has_meta("intent"):
+			bar.get_meta("intent").queue_free()
 		bar.queue_free()
 	_unit_bars.clear()
 	for unit in session.units():
@@ -445,6 +455,8 @@ func close() -> void:
 	_clear_markers()
 	_hide_tip()
 	for bar in _unit_bars.values():
+		if bar.has_meta("intent"):
+			bar.get_meta("intent").queue_free()
 		bar.queue_free()
 	_unit_bars.clear()
 
@@ -453,9 +465,9 @@ func _art_of(unit: AHCombat.Unit) -> Dictionary:
 	return arena.hero_art(unit.hero_id).get("idle", {}) if unit.is_player else arena.enemy_art(unit.enemy_id).get("idle", {})
 
 
-## A vida sob os pés (hud-target.md): a barra do kit, com a aba no herói e o recorte na máquina (a forma diz o lado,
-## não só a cor), o valor por dentro e, em quem age, os cantos âmbar. Nos inimigos, a intenção numa plaqueta embaixo
-## (o que ele faria se a vez fosse agora); nos dois, os estados por cima.
+## A vida sob os pés (hud-target.md): a Barra do kit, ciano nos heróis e vermelha nas máquinas, com o valor por dentro
+## e, em quem age, a moldura âmbar; os estados por cima dela. Nos inimigos, a intenção (o que ele faria se a vez fosse
+## agora) é uma plaqueta à parte, acima da cabeça (meta "intent"): nunca cobre o corpo.
 func _make_plate(unit: AHCombat.Unit) -> Control:
 	var plate := PanelContainer.new()
 	plate.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
@@ -478,7 +490,10 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 		var intent_panel := AHKit.panel("target_tab")
 		intent_panel.name = "IntentRow"
 		intent_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		box.add_child(intent_panel)
+		intent_panel.custom_minimum_size = Vector2(PLATE_ENEMY, 0)
+		plate.set_meta("intent", intent_panel)
+		add_child(intent_panel)
+		move_child(intent_panel, 0)
 		var intent_row := HBoxContainer.new()
 		intent_row.add_theme_constant_override("separation", 6)
 		intent_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -494,20 +509,19 @@ func _make_plate(unit: AHCombat.Unit) -> Control:
 		var intent := AHKit.label("", "small", S.ENEMY, true)
 		intent.name = "Intent"
 		intent.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		intent.max_lines_visible = 3
 		intent.custom_minimum_size = Vector2(150, 0)
 		intent.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		intent.mouse_filter = Control.MOUSE_FILTER_PASS
 		intent_row.add_child(intent)
 	# A barra por último: ela fica na linha das outras (sob os pés), e o resto da placa sobe por cima.
-	var hp := AHKitBar.make("health_ally" if unit.is_player else "health_enemy", "hero" if unit.is_player else "enemy", unit.hp, unit.max_hp, "", "world")
+	# A Barra do kit: a calha main_bar com o preenchimento ciano nos heróis e vermelho nas máquinas; quem age ganha a
+	# moldura âmbar da escolha (selected_frame) por cima.
+	var hp := AHKit.bar("hero" if unit.is_player else "enemy", unit.hp, unit.max_hp, "", "world")
 	hp.name = "Hp"
+	hp.custom_minimum_size = Vector2(0, PLATE_BAR_HEIGHT)
 	box.add_child(hp)
-	var active := Panel.new()
+	var active := AHKit.selected_overlay()
 	active.name = "Active"
-	active.add_theme_stylebox_override("panel", AHKit.style("active_health"))
-	active.set_anchors_preset(Control.PRESET_FULL_RECT)
-	active.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	active.visible = false
 	hp.add_child(active)
 	add_child(plate)
@@ -575,8 +589,9 @@ func refresh() -> void:
 		hp.set_value(unit.hp, unit.max_hp, "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else tr("Último Fôlego"))
 		(hp.get_node("Active") as Control).visible = unit.id == current
 		if not unit.is_player:
-			var row := box.get_node("IntentRow") as Control
-			row.visible = unit.hp > 0
+			var row := plate.get_meta("intent") as Control
+			row.visible = plate.visible and unit.hp > 0
+			row.reset_size.call_deferred()
 			if unit.hp > 0:
 				_show_intent(row.find_child("Intent", true, false), session.engine.enemy_intent(unit.id))
 		var status: HFlowContainer = box.get_node("Status")
@@ -776,11 +791,13 @@ func _process(_delta: float) -> void:
 		if widths.has(unit_id) and not is_equal_approx(plate.custom_minimum_size.x, widths[unit_id]):
 			plate.custom_minimum_size.x = widths[unit_id]
 			# A intenção quebra em mais linhas na placa estreita (a largura mínima dela segurava a placa larga).
-			var intent: Control = plate.find_child("Intent", true, false)
+			var row := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
+			var intent: Control = row.find_child("Intent", true, false) if row != null else null
 			if intent != null:
 				# A placa menos as margens da plaqueta (as do target_tab), o ícone (que cresce com o texto) e o espaço
 				# entre eles.
-				var row := intent.get_parent().get_parent() as Control
+				row.custom_minimum_size.x = widths[unit_id]
+				row.size = Vector2(widths[unit_id], 0)
 				var box: StyleBox = row.get_theme_stylebox("panel") if row is PanelContainer else null
 				var margins := box.content_margin_left + box.content_margin_right if box != null else 16.0
 				intent.custom_minimum_size.x = maxf(40.0, widths[unit_id] - margins - S.px(22) - 6.0)
@@ -807,6 +824,13 @@ func _process(_delta: float) -> void:
 		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
 		if short:
 			short_plates.append(Rect2(plate.position, plate.size))
+		# A intenção acima da cabeça (acima da placa, no baixinho), sem subir na faixa da rodada.
+		var tag := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
+		if tag != null and tag.visible:
+			var crown := camera.unproject_position(card.global_position + Vector3(0, card.head_height() + 0.15, 0))
+			var bottom := minf(crown.y, plate.position.y - 4.0) if short else crown.y
+			tag.position = Vector2(feet.x - tag.size.x * 0.5, maxf(INTENT_TOP, bottom - tag.size.y))
+			short_plates.append(Rect2(tag.position, tag.size))
 	for marker in _markers:
 		if marker.has_meta("card"):
 			# O botão do alvo cobre o corpo inteiro na tela (do pé à cabeça, na largura do corpo).
@@ -858,7 +882,8 @@ func _update_sheet(camera: Camera3D) -> void:
 		else:
 			# A placa (a intenção pega o mouse para a dica dela) também é do personagem.
 			for plate_id in _unit_bars:
-				if _unit_bars[plate_id].is_ancestor_of(hovered):
+				var tag = (_unit_bars[plate_id].get_meta("intent") if _unit_bars[plate_id].has_meta("intent") else null)
+				if _unit_bars[plate_id].is_ancestor_of(hovered) or (tag != null and (tag == hovered or tag.is_ancestor_of(hovered))):
 					unit_id = plate_id
 	var unit := session.state.find_unit(unit_id) if unit_id != "" else null
 	var card: AHSpriteCard = arena.cards.get(unit_id) if unit != null else null
@@ -1147,7 +1172,7 @@ func _build_abilities(take_focus: bool = true) -> void:
 		elif option.uses >= 0:
 			extra = tr("%d uso(s)") % option.uses
 		if extra != "":
-			var uses := AHKit.panel("key_tab")
+			var uses := AHKit.panel(AHKit.piece_of("key", "tab"))
 			uses.name = "Uses"
 			uses.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			uses.add_child(AHKit.label(extra, "small", AHKit.AMBER, true))
@@ -1298,7 +1323,7 @@ func _result_xp(who: VBoxContainer, unit: AHCombat.Unit) -> void:
 	who.add_child(level_line)
 	if cost.is_empty():
 		return
-	var bar := AHKitBar.make("main_bar", "xp", 0, 1, "")
+	var bar := AHKit.bar("xp", 0, 1, "")
 	bar.name = "XpBar"
 	bar.max_value = int(cost.xp)
 	bar.custom_minimum_size = Vector2(120, 22)
@@ -1545,7 +1570,7 @@ func _open_bag() -> void:
 	Tips.show_tip("bag")
 	Sound.play("res://audio/ui/bag_open.ogg")
 	_bag = PanelContainer.new()
-	_bag.add_theme_stylebox_override("panel", AHKit.style("panel_large"))
+	_bag.add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("panel", "large")))
 	_bag.position = Vector2(510, 140)
 	_bag.custom_minimum_size = Vector2(900, 0)
 	var panel := AHInventoryPanel.new()
@@ -1826,7 +1851,7 @@ func show_result(result: String, automatic: bool, rewards: Dictionary = {}, hold
 	var button := Button.new()
 	button.text = tr("Continuar")
 	button.custom_minimum_size = Vector2(240, 64)
-	AHKit.style_button(button, "secondary_button")
+	AHKit.style_as(button, "secondary")
 	button.pressed.connect(func(): result_closed.emit())
 	box.add_child(button)
 	_result.visible = true

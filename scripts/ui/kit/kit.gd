@@ -1,5 +1,11 @@
-## O kit da HUD (#60): as peças do Codex (art/ui/kit/combat e art/ui/kit/station, aprovadas pelo Lucas na #97 e na
-## #104) viram estilos e componentes, com os tokens num lugar só. As medidas vêm dos assets.json (docs/design/
+## O kit da HUD (#60): os componentes da HUD e os tokens num lugar só.
+## - O padrão é o kit da Awesomic (art/ui/kit/station; decisão do Lucas, docs/design/hud-direction.md, "Padrão de
+##   componentes"), em todas as telas, a luta também. As telas pedem componentes (Painel, Plaqueta, Botão, Barra, Chip,
+##   Aba, Linha de lista, Tecla, Carta, Foco: COMPONENTS), e não arquivos de arte; trocar a peça de um componente muda
+##   todas as telas.
+## - Do kit do Codex (art/ui/kit/combat) ficam só as peças da luta sem equivalente (CODEX_ONLY), até a Awesomic
+##   redesenhá-las, e as que a Awesomic reaproveita (reuses_combat_kit no manifesto dela). As que deixaram de valer
+##   (RETIRED) não são usadas em lugar nenhum (o test_kit confere). As medidas vêm dos assets.json (docs/design/
 ## hud-target.md e hud-station.md): nine_slice_ltrb vai nas texture_margin_* do StyleBoxTexture, o recuo de content_xywh
 ## nas content_margin_*, e as peças grandes repetem o aço (TILE_FIT) em vez de esticar.
 ## - As fontes: Barlow Condensed Medium nos rótulos e SemiBold nos nomes, títulos e números (OFL). Todo tamanho passa
@@ -20,10 +26,28 @@ const FONT_MEDIUM := "res://art/ui/fonts/barlow_condensed_medium.ttf"
 const FONT_SEMIBOLD := "res://art/ui/fonts/barlow_condensed_semibold.ttf"
 const ICONS := "res://art/ui/kit/station/icons/%s.webp"
 
+## Os componentes e as peças da Awesomic de cada variante (hud-direction.md, a tabela do padrão).
+const COMPONENTS := {
+	"panel": {"large": "panel_large", "inset": "panel_inset", "band": "report_band"},
+	"plaque": {"room": "room_plaque"},
+	"button": {"primary": "primary_button", "secondary": "secondary_button", "icon": "icon_button", "chip": "chip_button", "train": "train_button"},
+	"bar": {"main": "main_bar", "fill": "bar_fill"},
+	"chip": {"cost": "cost_chip", "status": "status_pill", "result": "result_chip", "resource": "resource_chip", "resource_tile": "resource_tile", "trait": "trait_tile"},
+	"tab": {"card": "card_tab", "nav": "nav_tab", "nav_active": "nav_tab_active", "hero": "hero_tab", "hero_selected": "hero_tab_selected"},
+	"row": {"list": "list_row", "list_selected": "list_row_selected"},
+	"key": {"tab": "key_tab", "button": "button_key", "bar": "keys_bar"},
+	"card": {"hero": "hero_card", "upgrade": "upgrade_card", "upgrade_selected": "upgrade_card_selected"},
+	"focus": {"focus": "focus_frame", "selected": "selected_frame"},
+}
+## As peças só da luta, do kit do Codex, que ainda não têm versão da Awesomic.
+const CODEX_ONLY := ["round_strip", "ability_header", "ability_slot", "target_tab", "actor_ring", "selected_slot", "exit"]
+## As peças do Codex que deixaram de valer (o equivalente da Awesomic tomou o lugar).
+const RETIRED := ["panel", "hero_panel", "register", "action_button", "health_ally", "health_enemy", "active_health"]
+
 ## Os tamanhos de texto na base de 1080p (o Maior multiplica por 1,3 no px()).
 const SIZE := {
 	# Luta (hud-target.md, "Fonte e texto Maior").
-	"register": 30, "round": 30, "hero_name": 40, "ability_name": 32, "hero_value": 32, "world": 26, "tab": 26,
+	"plaque": 30, "round": 30, "hero_name": 40, "ability_name": 32, "hero_value": 32, "world": 26, "tab": 26,
 	"key": 26, "range": 28,
 	# Estação (hud-station.md).
 	"phase_name": 76, "panel_hero": 52, "panel_title": 40, "card_name": 36, "primary": 30, "row": 27, "text": 23,
@@ -189,7 +213,81 @@ static func crisis_color(breakthrough: bool) -> Color:
 	return AMBER if breakthrough else alert_text()
 
 
-## Um painel com a peça.
+# ---------------------------------------------------------------- componentes
+
+## A peça de um componente na variante pedida (COMPONENTS).
+static func piece_of(component: String, kind: String) -> String:
+	var kinds: Dictionary = COMPONENTS.get(component, {})
+	if not kinds.has(kind):
+		push_error("Componente do kit sem a variante: %s/%s" % [component, kind])
+		return ""
+	return kinds[kind]
+
+
+## Painel: "large" (as chapas grandes, com o aço repetido) ou "inset" (o painel de dentro).
+static func panel_box(kind: String = "large", tint: Color = Color.WHITE) -> PanelContainer:
+	return panel(piece_of("panel", kind), tint)
+
+
+## Plaqueta (o nome da tela, o Registro).
+static func plaque() -> PanelContainer:
+	return panel(piece_of("plaque", "room"))
+
+
+## Botão nos estados do kit: "primary", "secondary", "icon" ou "chip".
+static func button(text: String = "", kind: String = "secondary", pad: Vector4 = Vector4.ZERO) -> Button:
+	var b := Button.new()
+	b.text = text.to_upper() if kind != "chip" else text
+	style_as(b, kind, pad)
+	return b
+
+
+## Aplica o estilo de um componente de botão a um botão que já existe (os de "button", e os de plaqueta, aba e linha
+## de lista que também se apertam: "plaque", "nav", "nav_active", "hero", "hero_selected", "list", "list_selected",
+## "upgrade", "upgrade_selected").
+static func style_as(target: BaseButton, kind: String, pad: Vector4 = Vector4.ZERO) -> void:
+	var piece := ""
+	for component in ["button", "plaque", "tab", "row", "card"]:
+		if COMPONENTS[component].has(kind):
+			piece = COMPONENTS[component][kind]
+			break
+	if kind == "plaque":
+		piece = piece_of("plaque", "room")
+	style_button(target, piece, pad)
+
+
+## Barra: a calha main_bar com o preenchimento tingido ("hero" ciano, "enemy" vermelho, "xp", "instinct", "life",
+## "state"), com o valor por dentro.
+static func bar(color_kind: String, shown: float, top: float, caption: String = "", role: String = "world") -> AHKitBar:
+	return AHKitBar.make(piece_of("bar", "main"), color_kind, shown, top, caption, role)
+
+
+## Chip: "cost", "result" ou "resource" (a pílula do estado de vida é a AHKitPill).
+static func chip(kind: String = "cost") -> PanelContainer:
+	return panel(piece_of("chip", kind))
+
+
+## Aba (não apertável): "card" (a aba sobre a carta), "nav" e as outras de COMPONENTS.tab.
+static func tab(kind: String = "card") -> PanelContainer:
+	return panel(piece_of("tab", kind))
+
+
+## Carta: "hero" (a do relatório) ou "upgrade".
+static func card(kind: String = "hero") -> PanelContainer:
+	return panel(piece_of("card", kind))
+
+
+## A escolha que fica (a opção marcada, quem age): a moldura âmbar sem fundo, por cima da peça.
+static func selected_overlay() -> Panel:
+	var frame := Panel.new()
+	frame.name = "Selected"
+	frame.add_theme_stylebox_override("panel", style(piece_of("focus", "selected")))
+	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return frame
+
+
+## Um painel com a peça (para os componentes e para as peças só da luta, CODEX_ONLY).
 static func panel(piece: String, tint: Color = Color.WHITE) -> PanelContainer:
 	var box := PanelContainer.new()
 	box.add_theme_stylebox_override("panel", style(piece, tint))

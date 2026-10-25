@@ -1,5 +1,5 @@
 ## As placas das máquinas numa luta cheia (quatro inimigos, #60 sobre a #63): no texto Normal e no Maior, a intenção e a
-## barra não cobrem o corpo (no máximo um quinto dele) e as placas de um mesmo lado não se cobrem.
+## barra não cobrem o corpo (a barra e os estados no máximo um quinto dele; a intenção, acima da cabeça, nada) e as placas de um mesmo lado não se cobrem.
 extends RefCounted
 
 var t
@@ -83,6 +83,14 @@ func _check(hud: AHCombatHud, profile: String) -> void:
 		var unit := hud.session.state.find_unit(unit_id)
 		var rect := Rect2(plate.position, plate.size)
 		rects.append([unit.is_player, rect, unit_id])
+		# A intenção, à parte, acima da cabeça.
+		var tag = (plate.get_meta("intent") if plate.has_meta("intent") else null)
+		if tag != null and tag.visible:
+			rects.append([unit.is_player, Rect2(tag.position, tag.size), unit_id + " (intenção)"])
+			var crown: Rect2 = hud._body_rect(camera, card)
+			var hit := Rect2(tag.position, tag.size).intersection(crown)
+			if hit.size.y > crown.size.y * 0.05 + 1.0:
+				covering.append("%s intenção (%.0f%%)" % [unit_id, hit.size.y / crown.size.y * 100.0])
 		var body: Rect2 = hud._body_rect(camera, card)
 		var over := rect.intersection(body)
 		if body.size.y > 0 and over.size.y > body.size.y * 0.2 + 1.0:

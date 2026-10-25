@@ -32,7 +32,7 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	z_index = 20
 	# O aço e a Barlow do kit (#60), como a dica da luta.
-	add_theme_stylebox_override("panel", AHKit.style("panel"))
+	add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("panel", "large")))
 	custom_minimum_size = Vector2(WIDTH, 0)
 
 
@@ -256,7 +256,7 @@ func _build(level: int = 0) -> void:
 	# Os números: a vida, o instinto (heróis) e a velocidade.
 	var numbers := _text(TranslationServer.translate("Vida %d/%d") % [info.hp, info.max_hp], 19, U.TEXT, "Life")
 	box.add_child(numbers)
-	var life := AHKitBar.make("main_bar", "enemy" if info.enemy else "life", int(info.hp), maxi(1, int(info.max_hp)))
+	var life := AHKit.bar("enemy" if info.enemy else "life", int(info.hp), maxi(1, int(info.max_hp)))
 	life.name = "LifeBar"
 	life.custom_minimum_size = Vector2(0, 22)
 	box.add_child(life)

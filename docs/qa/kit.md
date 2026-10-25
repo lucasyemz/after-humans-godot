@@ -1,34 +1,50 @@
 # O kit da HUD no jogo (#60)
 
-A biblioteca de componentes (`scripts/ui/kit/`) com as peças do Codex aprovadas pelo Lucas (#97 e #104), aplicada na
-HUD da luta e nas duas telas da Estação (relatório da volta e Sala dos Personagens). As medidas e os passos são os de
-[hud-target.md](../design/hud-target.md) e [hud-station.md](../design/hud-station.md).
+A biblioteca de componentes (`scripts/ui/kit/`), aplicada na HUD da luta e nas duas telas da Estação (relatório da
+volta e Sala dos Personagens). As medidas e os passos são os de [hud-target.md](../design/hud-target.md) e
+[hud-station.md](../design/hud-station.md).
+
+**O padrão é o kit da Awesomic** (`art/ui/kit/station`), em toda a HUD, a luta também. É a decisão do Lucas em
+[hud-direction.md](../design/hud-direction.md), "Padrão de componentes". Do kit do Codex (`art/ui/kit/combat`) ficam só
+as peças da luta sem equivalente: `round_strip`, `ability_header`, `ability_slot`, `target_tab` e `actor_ring` (com o
+`selected_slot` e o ícone de saída).
 
 ## A biblioteca
 
-- **`AHKit`** (`scripts/ui/kit/kit.gd`):
-  - lê os dois `assets.json` (`art/ui/kit/combat` e `art/ui/kit/station`);
+- **Os componentes** (`AHKit`, `scripts/ui/kit/kit.gd`): as telas pedem componentes, e não arquivos de arte. A tabela
+  `COMPONENTS` liga cada componente às peças da Awesomic, então trocar uma peça muda todas as telas.
+
+  | Componente | Função | Peças da Awesomic |
+  |---|---|---|
+  | Painel | `panel_box("large" \| "inset" \| "band")` | `panel_large`, `panel_inset`, `report_band` |
+  | Plaqueta | `plaque()`, ou `style_as(botão, "plaque")` no Registro | `room_plaque` |
+  | Botão, com os estados | `button(texto, tipo)` e `style_as(botão, tipo)` | `primary_button`, `secondary_button`, `icon_button`, `chip_button`, `train_button` |
+  | Barra | `bar(cor, valor, máximo)` (`AHKitBar`) | `main_bar` e `bar_fill` tingido |
+  | Chip | `chip("cost" \| "result" \| …)` e a pílula `AHKitPill` | `cost_chip`, `result_chip`, `status_pill`… |
+  | Aba | `tab("card")`, `style_as(botão, "nav" \| "hero")` | `card_tab`, `nav_tab`, `hero_tab` |
+  | Linha de lista | `style_as(botão, "list" \| "list_selected")` | `list_row` |
+  | Tecla | `AHKitKey.make(ação, texto, "tab" \| "button")` | `key_tab`, `button_key`, `keys_bar` |
+  | Carta | `card("hero" \| "upgrade")` | `hero_card`, `upgrade_card` |
+  | Foco e escolha | o foco de todo botão, e `selected_overlay()` | `focus_frame`, `selected_frame` |
+- **O resto do `AHKit`:**
   - `style(peça)` monta o StyleBoxTexture: `nine_slice_ltrb` nas `texture_margin_*`, o recuo de `content_xywh` nas
-    `content_margin_*` e `TILE_FIT` nas peças grandes (`report_band`, `panel_large`);
-  - `style_button` dá os quatro estados: normal, foco (a peça `_focus` ou a moldura âmbar), apertado e desligado;
+    `content_margin_*` e `TILE_FIT` nas peças grandes;
   - as fontes são a Barlow Condensed Medium e SemiBold. Os tamanhos de cada uso (`SIZE`) passam pelo
     `AHUiStyle.px()`, então o texto Maior (130%) vale na hora;
   - as cores dos alvos, com as do daltonismo. O Instinto fica em ferrugem e o XP em violeta (decisões do Lucas);
   - os estados de vida (decisão do Lucas): Em forma acima de 75%, Ferimento leve de 50% a 75% e Ferimento grave abaixo
     de 50%.
-- **Componentes:**
-  - `AHKitKey`: a tecla em aba, com o nome da tecla de uma ação, que acompanha as trocas das Opções;
-  - `AHKitBar`: a calha (`main_bar`, ou `health_ally`/`health_enemy`, com a aba e o recorte) e o preenchimento
-    tingido, com o valor por dentro;
-  - `AHKitPill`: a pílula de estado de vida, com o ícone e o rótulo.
-
-  Os três recolorem no `restyle()` quando o daltonismo muda.
+- A Barra, a pílula e a Tecla recolorem no `restyle()` quando o daltonismo muda. A Tecla também acompanha as trocas das
+  Opções.
 - **O anel de quem age** (`scripts/combat/actor_ring.gd`): a peça `actor_ring` num plano deitado no chão, sob os pés,
   com teste de profundidade. O corpo esconde a parte de trás, e a profundidade do plano sai da inclinação da câmera,
   para a elipse ter a proporção do desenho na tela.
 - **Galeria:** `tools/capture_kit.gd` mostra as peças e os componentes sobre o aço.
-- **Teste:** `tests/test_kit.gd` confere o manifesto, as margens, o TILE_FIT, as fontes, o Maior, os limites dos
-  estados, as cores do daltonismo e a tecla.
+- **Teste:** `tests/test_kit.gd` confere:
+  - o manifesto, as margens, o TILE_FIT, as fontes e o Maior;
+  - os limites dos estados, as cores do daltonismo e a tecla;
+  - o padrão: todo componente usa uma peça da Awesomic, e nenhuma peça aposentada do Codex (`RETIRED`: `panel`,
+    `hero_panel`, `register`, `action_button`, `health_*`, `active_health`) aparece no código.
 
 ## A luta
 
@@ -43,25 +59,31 @@ HUD da luta e nas duas telas da Estação (relatório da volta e Sala dos Person
 À esquerda, o alvo aprovado (`docs/design/hud-target/hud*.webp`); à direita, o jogo, com as fotos de
 `tools/capture_combat_kit.gd`. As peças estão nas posições do alvo (na base de 1920x1080):
 
-- **Registro:** no alto à esquerda, com a tecla L em aba. Um clique abre as últimas linhas logo embaixo.
+- **Registro:** a Plaqueta, no alto à esquerda, com a tecla L em aba. Um clique abre as últimas linhas logo embaixo,
+  num Painel de dentro.
 - **Faixa da rodada:** "RODADA n", a linha com o ponto e os retratos quadrados da ordem. As máquinas têm o fundo
   avermelhado, e quem age, a borda âmbar.
-- **Vida sob as unidades:** as barras de 200x44, com a aba no herói e o recorte na máquina. Quem age ganha os cantos
-  âmbar.
+- **Vida sob as unidades:** a Barra (`main_bar`), ciano nos heróis e vermelha nas máquinas, com o número dentro. Quem
+  age ganha a moldura âmbar da escolha (`selected_frame`).
 - **Anel:** sob os pés de quem age, no chão.
 - **Nome do alvo:** a plaqueta escura com a linha na cor do lado, acima do apontado.
-- **Painel do herói:** o retrato quadrado grande, o nome, a vida e o instinto.
+- **Painel do herói:** o Painel grande (`panel_large`), com o retrato quadrado grande, o nome, a vida e o instinto.
 - **Habilidade:** a aba "ESCOLHA UM ALVO" (na vez: "VEZ DE NICK"), a barra com o ícone, o nome e a faixa de dano, e
   os quatro slots com a tecla na aba. A escolhida ganha os cantos âmbar.
-- **Ações:** a grade 2x2, com o ícone branco e a tecla em aba. F é a porta com a seta de saída.
+- **Ações:** a grade 2x2 de Botões de ícone (`icon_button`), com o ícone branco e a tecla em aba. F é a porta com a
+  seta de saída.
 
 ![a vez, a dica e o fim da luta](kit/combat_states.jpg)
 
 A dica, a tela do fim e o registro também passaram para o aço e a Barlow do kit.
 
 **O que ficou diferente do alvo, e por quê:**
-- **A intenção das máquinas continua:** uma plaqueta pequena acima da barra delas ("Pega-Pega → um de 4"). O alvo não a
-  mostra, mas ela é a informação que diz o que a máquina vai fazer. A barra fica na linha das outras.
+- **A intenção das máquinas continua:** uma plaqueta pequena acima da cabeça delas ("Pega-Pega → um de 4"). O alvo não
+  a mostra, mas ela é a informação que diz o que a máquina vai fazer. Ela nunca cobre o corpo, e a barra fica na linha
+  das outras, sob os pés.
+- **A barra da vida não tem mais a aba do herói nem o recorte da máquina** (as `health_*` do Codex): a Barra da
+  Awesomic é a mesma dos dois lados, e a cor diz o lado. No daltonismo, a forma do inimigo segue nas cores (ciano e
+  laranja), até a Awesomic redesenhar as peças só da luta.
 - **A aba diz o que fazer na vez:** "VEZ DE NICK", e na mira "ESCOLHA UM ALVO". A instrução inteira ("escolha uma
   habilidade (1–4) ou uma ação"; "clique no alvo e clique de novo para usar") fica na dica do kit da habilidade e do
   alvo apontado, que abre com o mouse, o foco e o toque.
@@ -151,9 +173,10 @@ A Sala (`scripts/ui/station/character_room.gd`) também é a tela inteira:
 ## Rodadas da QA
 
 1. **A luta, reprovada.**
-   - **Alta:** a intenção das máquinas cobria o corpo delas no Maior (a #63 voltou). Corrigido: passando de um quinto
-     do corpo, a placa inteira vai para cima da cabeça. A largura da intenção desconta as margens da plaqueta. O teste
-     novo `test_plates_crowd` cobre uma luta de quatro máquinas, no Normal e no Maior.
+   - **Alta:** a intenção das máquinas cobria o corpo delas no Maior (a #63 voltou). Corrigido: a intenção é uma
+     plaqueta à parte, acima da cabeça, e a barra fica sob os pés. A placa (os estados e a barra) que cobriria mais de
+     um quinto do corpo também sobe. A largura da intenção desconta as margens da plaqueta. O teste novo
+     `test_plates_crowd` cobre uma luta de quatro máquinas, no Normal e no Maior.
    - **Médias, todas corrigidas:**
      - o tooltip nativo saía junto com a dica do kit;
      - a instrução da aba não chegava ao jogador;
@@ -164,6 +187,10 @@ A Sala (`scripts/ui/station/character_room.gd`) também é a tela inteira:
      - a ficha estava na fonte antiga e cobria o nome do alvo. Agora está no aço e na Barlow, e o nome fica por cima;
      - as áreas de toque eram menores que as do alvo.
    - **Baixas corrigidas:** a crise em ferrugem e o anel saindo já na tela do fim.
+
+2. **Decisão do Lucas, entre as rodadas:** o padrão dos componentes é o kit da Awesomic, também na luta. O Painel, a
+   Plaqueta, os Botões e a Barra da luta passaram para os componentes, e um teste confere que as peças aposentadas
+   do Codex não voltam.
 
 ## Testes
 
