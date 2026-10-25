@@ -338,7 +338,7 @@ func refresh(campaign: Dictionary) -> void:
 	_route_title.text = title
 	_route_panel.size = _route_panel.get_combined_minimum_size()
 	_route_panel.position = Vector2(960 - _route_panel.size.x * 0.5, 16)
-	_finish_button.visible = expedition.objective_completed and session_open(campaign)
+	_finish_button.visible = expedition.objective_completed and session_open(campaign) and not AHFightRewards.cargo_pending(campaign)
 	# Os recursos: comida, curativos, esperança e o achado, com ícone e dica.
 	_clear(_supplies)
 	var food: int = expedition.food
@@ -616,6 +616,18 @@ func _button(text: String, callback: Callable, enabled: bool = true) -> Button:
 	H.style_button(button)
 	button.pressed.connect(callback)
 	return button
+
+
+# ---------------------------------------------------------------- carga recuperada (#91)
+
+## Abre a carga recuperada do guardião no modal: o corredor espera a escolha (chosen) e o Continuar (closed).
+func show_cargo(campaign: Dictionary) -> AHCargoPicker:
+	var box := _open_modal(780)
+	_modal.position.y = 140
+	var picker := AHCargoPicker.build(AHFightRewards.cargo(campaign).boxes)
+	box.add_child(picker)
+	picker.closed.connect(close_modal)
+	return picker
 
 
 # ---------------------------------------------------------------- evento

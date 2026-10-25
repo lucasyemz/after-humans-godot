@@ -116,6 +116,9 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	elif session.screen == "rest" and room != null:
 		room.set_camp_lit(true)
 		hud.show_camp(campaign)
+	elif AHFightRewards.cargo_pending(campaign):
+		# Reaberto com o guardião vencido e a carga ainda fechada: as mesmas caixas de antes.
+		open_cargo.call_deferred()
 
 
 ## Bloqueia o movimento da equipe (painel aberto, transição ou luta).
@@ -829,6 +832,9 @@ func _force_house(site_index: int) -> void:
 
 
 func _retreat() -> void:
+	# Com a carga do guardião na tela, só sai depois de escolher e fechar (a carga não se perde).
+	if busy or AHFightRewards.cargo_pending(Campaign.state):
+		return
 	if R.safe_retreat(Campaign.state):
 		_show_result()
 
@@ -1010,6 +1016,7 @@ func _start_fight(index: int, advantage: bool) -> void:
 		hud.toast(tr("A equipe chegou sem ser vista: age primeiro."), 2.5)
 	var heroes: Array = street.party_ids.map(func(id): return Campaign.hero(id))
 	var center: float = (room.guard_x if house else cards[0].position.x) - 1.0
+	street._arena.boss_fight = bool(fight.boss)
 	street._arena.start(heroes, street._heroes, fight.enemies, cards, center, fight.opening)
 
 
@@ -1031,12 +1038,32 @@ func _on_combat_finished(result: String) -> void:
 			guards[_fight.index].mark.queue_free()
 			guards.erase(_fight.index)
 		if campaign.session.expedition.objective_completed and _fight.boss:
+			# A carga recuperada (#91): seis caixas com o que o guardião guardava; escolhida uma vez.
+			Campaign.save()
+			await open_cargo()
 			Tips.show_tip("boss_down")
 			if street.scenario:
 				hud.toast(tr("O guardião caiu. Vasculhe o que restou ou volte à Estação (E)."), 6.0)
 			else:
 				hud.toast(tr("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua."), 6.0)
 	Campaign.save()
+	hud.refresh(campaign)
+
+
+## A carga recuperada do guardião (#91), se ainda não foi escolhida: as caixas viradas, a escolha e a revelação.
+func open_cargo() -> void:
+	var campaign: Dictionary = Campaign.state
+	if not AHFightRewards.cargo_pending(campaign):
+		return
+	AHFightRewards.cargo(campaign)
+	Campaign.save()
+	busy = true
+	var picker := hud.show_cargo(campaign)
+	await picker.chosen
+	AHFightRewards.choose(campaign, picker.index)
+	Campaign.save()
+	await picker.closed
+	busy = false
 	hud.refresh(campaign)
 
 

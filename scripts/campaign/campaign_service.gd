@@ -164,6 +164,8 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		"unlocked_classes": [],
 		"tools": [],
 		"completed_phases": [],
+		# A melhor nota (1 a 3 estrelas) do guardião de cada fase (#91): {fase: estrelas}.
+		"mission_stars": {},
 		"researched_skills": [],
 		"inventory": {"seeds": 30, "scrap": 0, "fragments": 0, "bandages": 2, "relics": [], "items": {}},
 		"memorial": [],
@@ -386,6 +388,9 @@ static func read_file(path: String):
 	if version == 1 and int(campaign.get("version", -1)) == 1:
 		AHHeroLevels.migrate(campaign)
 		campaign.version = VERSION
+	# As estrelas das fases (#91): o save de antes delas começa sem nenhuma.
+	if not campaign.has("mission_stars"):
+		campaign.mission_stars = {}
 	return campaign if is_usable(campaign) else null
 
 

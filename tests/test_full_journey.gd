@@ -141,6 +141,9 @@ func _journey() -> bool:
 			return false
 		if not await _auto_fight(street):
 			return false
+	# A carga recuperada do guardião (#91): escolhe a primeira caixa e continua.
+	if not await _choose_cargo(street):
+		return false
 	var fought: int = route.steps.filter(func(s): return (s.type == "combat" or s.type == "boss") and s.resolved).size()
 	t.equal(fought, 5, "a jornada venceu as 4 patrulhas e o guardião")
 	t.check(route.steps[9].resolved, "o guardião (trecho 10) ficou vencido")
@@ -241,6 +244,19 @@ func _answer_modal(street) -> bool:
 		(forward[0] if not forward.is_empty() else options[0]).pressed.emit()
 		await _frames(3)
 	return await _until(func(): return not hud.modal_open(), "o painel da exploração fechar")
+
+
+func _choose_cargo(street) -> bool:
+	var find := func(): return street.exploration_hud.find_children("CargoPicker", "AHCargoPicker", true, false)
+	if not await _until(func(): return not find.call().is_empty(), "a carga recuperada abrir"):
+		return false
+	var picker: AHCargoPicker = find.call()[0]
+	picker.buttons[0].pressed.emit()
+	if not await _until(func(): return picker.continue_button.visible, "o Continuar da carga aparecer"):
+		return false
+	picker.continue_button.pressed.emit()
+	await _frames(3)
+	return await _until(func(): return not street.corridor.blocking(), "a carga fechar")
 
 
 # ---------------------------------------------------------------- volta e relatório

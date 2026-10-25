@@ -1,0 +1,14 @@
+[
+  {
+    "Name": "rounds",
+    "Patrol": 4,
+    "Boss": 8,
+    "Description": "Poucas rodadas: até este número de rodadas (o par da luta)."
+  },
+  {
+    "Name": "stars",
+    "Two": 2,
+    "Three": 4,
+    "Description": "Quantos critérios dão 2 e 3 estrelas (a vitória já dá 1)."
+  }
+]

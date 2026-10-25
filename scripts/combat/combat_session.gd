@@ -19,6 +19,11 @@ var tally := {}
 ## O instinto que o Sangue frio tirou de cada herói no começo da luta (#90): volta no write_back, porque o desconto é só
 ## da luta. {hero_id: n}.
 var calm := {}
+## Quem derrubou o último inimigo até agora: um herói (true) ou outra coisa, como o sangramento na vez dele (#91, o
+## critério do golpe final).
+var last_down_by_hero := false
+## O XP que cada herói ganhou nesta luta (o write_back preenche; a tela do fim da luta mostra, #91). {hero_id: n}.
+var xp_gained := {}
 
 
 ## heroes: heróis da campanha (Campaign.state.roster) na ordem da formação. enemies: da frente para trás, cada um o id
@@ -183,6 +188,7 @@ func begin_player_turn() -> Dictionary:
 	var actor := current_actor()
 	var events: Array = []
 	var can_act := engine.process_player_turn_start(events)
+	_watch(events, false)
 	processed_turn_key = turn_key() if can_act else ""
 	return {"source_id": actor.id if actor else "", "kind": "turn_start", "ability_id": "", "events": events, "ok": true, "error": "", "can_act": can_act}
 
@@ -246,6 +252,7 @@ func enemy_turn() -> Dictionary:
 	var actor := current_actor()
 	var actor_id := actor.id if actor else ""
 	var events := engine.execute_enemy_turn()
+	_watch(events, false)
 	var ability_id := ""
 	for event in events:
 		if event.ability_id != "":
@@ -282,6 +289,7 @@ func _beat(actor_id: String, kind: String, ability_id: String, result: AHCombat.
 ## Soma o dano, a cura e quem caiu pelas mãos do herói (só os heróis contam).
 func _count(actor_id: String, events: Array) -> void:
 	var actor := state.find_unit(actor_id)
+	_watch(events, actor != null and actor.is_player)
 	if actor == null or not actor.is_player:
 		return
 	var entry: Dictionary = tally.get(actor.hero_id, {"damage": 0, "healing": 0, "downs": 0, "protects": 0})
@@ -303,6 +311,14 @@ func _count(actor_id: String, events: Array) -> void:
 		if target.is_player and target.id != actor.id and (event.outcome == AHCombat.Outcome.GUARD_GRANTED or event.outcome == AHCombat.Outcome.BLOCK_GRANTED):
 			entry.protects = int(entry.get("protects", 0)) + 1
 	tally[actor.hero_id] = entry
+
+
+## Anota quem derrubou o último inimigo nestes eventos (by_hero: a ação de um herói).
+func _watch(events: Array, by_hero: bool) -> void:
+	for event in events:
+		var target := state.find_unit(event.target_unit_id)
+		if event.type == AHCombat.EventType.DEATH and target != null and not target.is_player:
+			last_down_by_hero = by_hero
 
 
 ## A luta de uma expedição: os treinos da Pesquisa (+1 no dano ou na cura da habilidade treinada), a Esperança dela (a
@@ -354,6 +370,7 @@ func write_back(campaign: Dictionary) -> void:
 			if hero == null or not hero.get("alive", true):
 				continue
 			var gained := AHHeroLevels.gain(hero, AHHeroLevels.fight_xp(tally.get(unit.hero_id, {})))
+			xp_gained[unit.hero_id] = gained
 			var total: Dictionary = stats.get(unit.hero_id, {"damage": 0, "healing": 0, "downs": 0})
 			total.xp = int(total.get("xp", 0)) + gained
 			stats[unit.hero_id] = total

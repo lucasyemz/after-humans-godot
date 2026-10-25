@@ -62,6 +62,8 @@ var center_x := 0.0
 ## O quanto os espaços da fila encolhem para a luta caber no lugar (#52): 1 = os de sempre.
 var gap_scale := 1.0
 var active := false
+## A luta é a do guardião do trecho (as estrelas dele ficam no save, #91).
+var boss_fight := false
 var cards := {}
 ## Câmera da luta: o centro e a distância que enquadram todos, e o foco do golpe da vez (close_t 0..1 vai até ele).
 var view_x := 0.0
@@ -406,13 +408,19 @@ func _run() -> void:
 	hud.refresh()
 	var result := session.result()
 	session.write_back(Campaign.state)
-	await hud.show_result(result, auto_battle)
+	# As estrelas da luta (#91); as do guardião ficam no save, por fase.
+	var rewards := AHFightRewards.criteria(session, boss_fight)
+	var expedition = Campaign.state.get("session", {}).get("expedition")
+	if boss_fight and result == "victory" and expedition != null:
+		AHFightRewards.record_stars(Campaign.state, String(expedition.phase_id), int(rewards.stars))
+	await hud.show_result(result, auto_battle, rewards)
 	hud.close()
 	var occlusion = _street.get("occlusion") if _street != null else null
 	if occlusion != null:
 		for unit in session.state.enemy_team:
 			occlusion.untrack(cards[unit.id])
 	active = false
+	boss_fight = false
 	finished.emit(result)
 
 
