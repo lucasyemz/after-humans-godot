@@ -1,0 +1,522 @@
+{
+  "name": "explore-risk",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4760/@Label@4761",
+      "rect": [
+        32.0,
+        24.0,
+        450.0,
+        64.0
+      ],
+      "text": "Rua das Vitrines"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4760/@Label@4762",
+      "rect": [
+        32.0,
+        96.0,
+        450.0,
+        30.0
+      ],
+      "text": "Jornada 1 · Rua das Vitrines · Noite · chuva"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4760/@PanelContainer@4763/@VBoxContainer@4764/@Label@4765",
+      "rect": [
+        52.0,
+        148.0,
+        410.0,
+        26.0
+      ],
+      "text": "OBJETIVO DA ROTA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4760/@PanelContainer@4763/@VBoxContainer@4764/@Label@4766",
+      "rect": [
+        52.0,
+        177.0,
+        410.0,
+        35.0
+      ],
+      "text": "Vencer o guardião (trecho 10)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4760/@PanelContainer@4763/@VBoxContainer@4764/@Label@4767",
+      "rect": [
+        52.0,
+        215.0,
+        410.0,
+        59.0
+      ],
+      "text": "Rota básica: o achado das buscas volta com a equipe."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@Label@4770",
+      "rect": [
+        750.0,
+        30.0,
+        420.0,
+        32.0
+      ],
+      "text": "Trecho 1 de 10 · Partida"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@HBoxContainer@4771/@PanelContainer@4829/@Label@4828",
+      "rect": [
+        804.0,
+        74.0,
+        28.0,
+        30.0
+      ],
+      "text": "?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@HBoxContainer@4771/@PanelContainer@4832/@Label@4831",
+      "rect": [
+        846.0,
+        74.0,
+        28.0,
+        30.0
+      ],
+      "text": "?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@HBoxContainer@4771/@PanelContainer@4835/@Label@4834",
+      "rect": [
+        888.0,
+        74.0,
+        28.0,
+        30.0
+      ],
+      "text": "?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@HBoxContainer@4771/@PanelContainer@4838/@Label@4837",
+      "rect": [
+        930.0,
+        74.0,
+        28.0,
+        30.0
+      ],
+      "text": "?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@HBoxContainer@4771/@PanelContainer@4841/@Label@4840",
+      "rect": [
+        972.0,
+        74.0,
+        28.0,
+        30.0
+      ],
+      "text": "?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@HBoxContainer@4771/@PanelContainer@4844/@Label@4843",
+      "rect": [
+        1014.0,
+        74.0,
+        28.0,
+        30.0
+      ],
+      "text": "?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@HBoxContainer@4771/@PanelContainer@4847/@Label@4846",
+      "rect": [
+        1056.0,
+        74.0,
+        28.0,
+        30.0
+      ],
+      "text": "?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4768/@VBoxContainer@4769/@HBoxContainer@4771/@PanelContainer@4850/@Label@4849",
+      "rect": [
+        1098.0,
+        74.0,
+        28.0,
+        30.0
+      ],
+      "text": "?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4773/@PanelContainer@4858/@HBoxContainer@4857/@Label@4855",
+      "rect": [
+        1390.0,
+        29.0,
+        87.0,
+        30.0
+      ],
+      "text": "Comida"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4773/@PanelContainer@4858/@HBoxContainer@4857/@Label@4856",
+      "rect": [
+        1483.0,
+        29.0,
+        41.0,
+        30.0
+      ],
+      "text": "4/8"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4773/@PanelContainer@4863/@HBoxContainer@4862/@Label@4860",
+      "rect": [
+        1578.0,
+        29.0,
+        104.0,
+        30.0
+      ],
+      "text": "Curativos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4773/@PanelContainer@4863/@HBoxContainer@4862/@Label@4861",
+      "rect": [
+        1688.0,
+        29.0,
+        14.0,
+        30.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4773/@PanelContainer@4868/@HBoxContainer@4867/@Label@4865",
+      "rect": [
+        1756.0,
+        29.0,
+        116.0,
+        30.0
+      ],
+      "text": "Esperança"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4773/@PanelContainer@4868/@HBoxContainer@4867/@Label@4866",
+      "rect": [
+        1878.0,
+        29.0,
+        31.0,
+        30.0
+      ],
+      "text": "80"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4774/@PanelContainer@4878/@HBoxContainer@4877/@Label@4875",
+      "rect": [
+        1690.0,
+        75.0,
+        85.0,
+        30.0
+      ],
+      "text": "Achado"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4774/@PanelContainer@4878/@HBoxContainer@4877/@HBoxContainer@4876/@Label@4870",
+      "rect": [
+        1805.0,
+        75.0,
+        16.0,
+        30.0
+      ],
+      "text": "0"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4774/@PanelContainer@4878/@HBoxContainer@4877/@HBoxContainer@4876/@Label@4872",
+      "rect": [
+        1849.0,
+        75.0,
+        16.0,
+        30.0
+      ],
+      "text": "0"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@VBoxContainer@4772/@HBoxContainer@4774/@PanelContainer@4878/@HBoxContainer@4877/@HBoxContainer@4876/@Label@4874",
+      "rect": [
+        1893.0,
+        75.0,
+        16.0,
+        30.0
+      ],
+      "text": "0"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4775/@PanelContainer@4886/@HBoxContainer@4879/@VBoxContainer@4881/@HBoxContainer@4882/@Label@4883",
+      "rect": [
+        98.0,
+        1002.0,
+        82.0,
+        30.0
+      ],
+      "text": "Bento"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4775/@PanelContainer@4886/@HBoxContainer@4879/@VBoxContainer@4881/@HBoxContainer@4882/@Label@4884",
+      "rect": [
+        184.0,
+        1003.0,
+        64.0,
+        28.0
+      ],
+      "text": "34/34"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4775/@PanelContainer@4894/@HBoxContainer@4887/@VBoxContainer@4889/@HBoxContainer@4890/@Label@4891",
+      "rect": [
+        338.0,
+        1002.0,
+        83.0,
+        30.0
+      ],
+      "text": "Nick"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4775/@PanelContainer@4894/@HBoxContainer@4887/@VBoxContainer@4889/@HBoxContainer@4890/@Label@4892",
+      "rect": [
+        425.0,
+        1003.0,
+        63.0,
+        28.0
+      ],
+      "text": "24/24"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4775/@PanelContainer@4902/@HBoxContainer@4895/@VBoxContainer@4897/@HBoxContainer@4898/@Label@4899",
+      "rect": [
+        578.0,
+        1002.0,
+        83.0,
+        30.0
+      ],
+      "text": "Íris"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4775/@PanelContainer@4902/@HBoxContainer@4895/@VBoxContainer@4897/@HBoxContainer@4898/@Label@4900",
+      "rect": [
+        665.0,
+        1003.0,
+        63.0,
+        28.0
+      ],
+      "text": "23/23"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4775/@PanelContainer@4910/@HBoxContainer@4903/@VBoxContainer@4905/@HBoxContainer@4906/@Label@4907",
+      "rect": [
+        818.0,
+        1002.0,
+        92.0,
+        30.0
+      ],
+      "text": "Véspera"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4775/@PanelContainer@4910/@HBoxContainer@4903/@VBoxContainer@4905/@HBoxContainer@4906/@Label@4908",
+      "rect": [
+        914.0,
+        1003.0,
+        68.0,
+        28.0
+      ],
+      "text": "30/30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4795/@HBoxContainer@4786/@PanelContainer@4782/@Label@4781",
+      "rect": [
+        1028.0,
+        1038.0,
+        15.0,
+        26.0
+      ],
+      "text": "A"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4795/@HBoxContainer@4786/@PanelContainer@4784/@Label@4783",
+      "rect": [
+        1064.0,
+        1038.0,
+        15.0,
+        26.0
+      ],
+      "text": "D"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4795/@HBoxContainer@4786/@Label@4785",
+      "rect": [
+        1092.0,
+        1037.0,
+        60.0,
+        28.0
+      ],
+      "text": "andar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4795/@HBoxContainer@4790/@PanelContainer@4788/@Label@4787",
+      "rect": [
+        1178.0,
+        1038.0,
+        47.0,
+        26.0
+      ],
+      "text": "Shift"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4795/@HBoxContainer@4790/@Label@4789",
+      "rect": [
+        1238.0,
+        1037.0,
+        63.0,
+        28.0
+      ],
+      "text": "correr"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4795/@HBoxContainer@4794/@PanelContainer@4792/@Label@4791",
+      "rect": [
+        1327.0,
+        1038.0,
+        12.0,
+        26.0
+      ],
+      "text": "E"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@HBoxContainer@4795/@HBoxContainer@4794/@Label@4793",
+      "rect": [
+        1352.0,
+        1037.0,
+        86.0,
+        28.0
+      ],
+      "text": "interagir"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@Button@4799",
+      "rect": [
+        1696.0,
+        974.0,
+        200.0,
+        56.0
+      ],
+      "text": "Menu"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@Button@4799/@PanelContainer@4798/@Label@4797",
+      "rect": [
+        1844.0,
+        985.0,
+        35.0,
+        26.0
+      ],
+      "text": "Esc"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@Button@4802",
+      "rect": [
+        1484.0,
+        974.0,
+        200.0,
+        56.0
+      ],
+      "text": "Mochila"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@Button@4802/@PanelContainer@4801/@Label@4800",
+      "rect": [
+        1652.0,
+        985.0,
+        6.0,
+        26.0
+      ],
+      "text": "I"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4933/@VBoxContainer@4934/@Label@4935",
+      "rect": [
+        670.0,
+        244.0,
+        580.0,
+        56.0
+      ],
+      "text": "Abandonar a expedição?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4933/@VBoxContainer@4934/@Label@4936",
+      "rect": [
+        670.0,
+        312.0,
+        580.0,
+        105.0
+      ],
+      "text": "A equipe volta pelo trem sem enfrentar o guardião: só metade do achado chega à Estação."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4933/@VBoxContainer@4934/@Button@4937",
+      "rect": [
+        670.0,
+        429.0,
+        580.0,
+        56.0
+      ],
+      "text": "Continuar a expedição"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@CanvasLayer@4707/@Control@4759/@PanelContainer@4933/@VBoxContainer@4934/@Button@4938",
+      "rect": [
+        670.0,
+        497.0,
+        580.0,
+        56.0
+      ],
+      "text": "Voltar à Estação"
+    }
+  ]
+}

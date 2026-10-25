@@ -1,0 +1,60 @@
+{
+  "name": "title-slots-empty",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@37/@VBoxContainer@38/@Label@39",
+      "rect": [
+        600.0,
+        134.0,
+        720.0,
+        44.0
+      ],
+      "text": "Em qual espaço começar?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@37/@VBoxContainer@38/Slot1",
+      "rect": [
+        600.0,
+        190.0,
+        720.0,
+        84.0
+      ],
+      "text": "Espaço 1 — vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@37/@VBoxContainer@38/Slot2",
+      "rect": [
+        600.0,
+        286.0,
+        720.0,
+        84.0
+      ],
+      "text": "Espaço 2 — vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@37/@VBoxContainer@38/Slot3",
+      "rect": [
+        600.0,
+        382.0,
+        720.0,
+        84.0
+      ],
+      "text": "Espaço 3 — vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@37/@VBoxContainer@38/@Button@40",
+      "rect": [
+        600.0,
+        478.0,
+        720.0,
+        56.0
+      ],
+      "text": "Voltar"
+    }
+  ]
+}

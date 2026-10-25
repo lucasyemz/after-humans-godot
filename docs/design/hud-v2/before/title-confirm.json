@@ -1,0 +1,49 @@
+{
+  "name": "title-confirm",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@57/@VBoxContainer@58/@Label@59",
+      "rect": [
+        640.0,
+        134.0,
+        640.0,
+        44.0
+      ],
+      "text": "Começar uma campanha nova?"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@57/@VBoxContainer@58/@Label@60",
+      "rect": [
+        640.0,
+        190.0,
+        640.0,
+        90.0
+      ],
+      "text": "Todo o progresso salvo no espaço 1 (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero. Os outros espaços ficam como estão."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@57/@VBoxContainer@58/@Button@61",
+      "rect": [
+        640.0,
+        292.0,
+        640.0,
+        56.0
+      ],
+      "text": "Cancelar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@57/@VBoxContainer@58/@Button@62",
+      "rect": [
+        640.0,
+        360.0,
+        640.0,
+        56.0
+      ],
+      "text": "Começar do zero"
+    }
+  ]
+}

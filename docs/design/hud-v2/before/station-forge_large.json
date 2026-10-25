@@ -1,0 +1,247 @@
+{
+  "name": "station-forge",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1102",
+      "rect": [
+        32.0,
+        18.0,
+        328.0,
+        64.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1103",
+      "rect": [
+        34.0,
+        80.0,
+        217.0,
+        30.0
+      ],
+      "text": "Ciclo 0 · 4 no elenco"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1445/@HBoxContainer@1432/@HBoxContainer@1435/@Label@1434",
+      "rect": [
+        869.0,
+        45.0,
+        33.0,
+        32.0
+      ],
+      "text": "30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1445/@HBoxContainer@1432/@HBoxContainer@1438/@Label@1437",
+      "rect": [
+        945.0,
+        45.0,
+        15.0,
+        32.0
+      ],
+      "text": "9"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1445/@HBoxContainer@1432/@HBoxContainer@1441/@Label@1440",
+      "rect": [
+        1003.0,
+        45.0,
+        15.0,
+        32.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1445/@HBoxContainer@1432/@HBoxContainer@1444/@Label@1443",
+      "rect": [
+        1061.0,
+        45.0,
+        15.0,
+        32.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1451/@VBoxContainer@1447/@Label@1448",
+      "rect": [
+        1152.0,
+        16.0,
+        257.0,
+        26.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1451/@VBoxContainer@1447/@Label@1449",
+      "rect": [
+        1152.0,
+        42.0,
+        257.0,
+        38.0
+      ],
+      "text": "0 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1451/@VBoxContainer@1447/@Label@1450",
+      "rect": [
+        1152.0,
+        80.0,
+        257.0,
+        26.0
+      ],
+      "text": "! Falta na volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1457/@VBoxContainer@1453/@Label@1454",
+      "rect": [
+        1473.0,
+        16.0,
+        190.0,
+        26.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1457/@VBoxContainer@1453/@Label@1455",
+      "rect": [
+        1473.0,
+        42.0,
+        190.0,
+        38.0
+      ],
+      "text": "6 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1457/@VBoxContainer@1453/@Label@1456",
+      "rect": [
+        1473.0,
+        80.0,
+        190.0,
+        26.0
+      ],
+      "text": "Próxima volta: 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1463/@VBoxContainer@1459/@Label@1460",
+      "rect": [
+        1727.0,
+        16.0,
+        161.0,
+        26.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1463/@VBoxContainer@1459/@Label@1461",
+      "rect": [
+        1727.0,
+        42.0,
+        161.0,
+        38.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1463/@VBoxContainer@1459/@Label@1462",
+      "rect": [
+        1727.0,
+        80.0,
+        161.0,
+        26.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1114",
+      "rect": [
+        32.0,
+        1000.0,
+        190.0,
+        56.0
+      ],
+      "text": "‹ Vista geral"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1115",
+      "rect": [
+        230.0,
+        1000.0,
+        150.0,
+        56.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1116",
+      "rect": [
+        388.0,
+        1000.0,
+        199.0,
+        56.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1466",
+      "rect": [
+        1230.0,
+        124.0,
+        636.0,
+        50.0
+      ],
+      "text": "Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1467",
+      "rect": [
+        1230.0,
+        184.0,
+        636.0,
+        30.0
+      ],
+      "text": "Vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1468",
+      "rect": [
+        1230.0,
+        224.0,
+        636.0,
+        67.0
+      ],
+      "text": "Oficina vazia. Recuperada, fabrica relíquias e gasta 1 de energia."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Button@1469",
+      "rect": [
+        1230.0,
+        301.0,
+        636.0,
+        56.0
+      ],
+      "text": "Recuperar (4 sucatas)"
+    }
+  ]
+}

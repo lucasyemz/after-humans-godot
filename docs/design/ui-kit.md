@@ -178,3 +178,5 @@ A QA da primeira montagem da HUD identificou medidas compactas ainda sem contrat
 [Prancha das variantes](ui-kit/hud_compact.png). O contrato guarda as coordenadas locais. Não é outra HUD ou família visual: é a apresentação resumida dos mesmos componentes, que revela os detalhes ao apontar/focar. Dica mantém largura480 Normal/640 Maior, conforme o kit; o detalhe longo usa18/23 e não cobre o herói atual.
 
 QA das variantes — rodada1: **VEREDITO: APROVADO**. Conferidos Normal/Maior, fontes mínimas, 9-slice16, ícones32/40/64, barras distintas por espessura, foco e escolha separados, geometria sem corte. Cinza e daltonismo continuam apoiados em formas e texto no foco. Sem novos assets de runtime. Esta aprovação antecede a segunda montagem das telas #58.
+
+Toque na HUD v2: a revisão usa alvos112×112 e passo128 (44,8px a40%), com a mesma família de botão. [Prancha e QA da HUD](hud-v2/qa.md). O contrato registra essa medida; não usar88px para os controles de toque reduzidos.

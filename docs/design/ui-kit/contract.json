@@ -155,7 +155,12 @@
         ],
         "focus": "existing external corners",
         "disabled": "existing locked frame plus slash; reason on focus",
-        "new_runtime_art": false
+        "new_runtime_art": false,
+        "touch_minimum_size": [
+          112,
+          112
+        ],
+        "at_40_percent_pixels": 44.8
       }
     },
     "card": {

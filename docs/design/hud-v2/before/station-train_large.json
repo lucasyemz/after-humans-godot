@@ -1,0 +1,313 @@
+{
+  "name": "station-train",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1102",
+      "rect": [
+        32.0,
+        18.0,
+        328.0,
+        64.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1103",
+      "rect": [
+        34.0,
+        80.0,
+        548.0,
+        30.0
+      ],
+      "text": "Ciclo 0 · 4 no elenco · alguém espera na plataforma"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@2357/@HBoxContainer@2344/@HBoxContainer@2347/@Label@2346",
+      "rect": [
+        869.0,
+        45.0,
+        33.0,
+        32.0
+      ],
+      "text": "30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@2357/@HBoxContainer@2344/@HBoxContainer@2350/@Label@2349",
+      "rect": [
+        945.0,
+        45.0,
+        15.0,
+        32.0
+      ],
+      "text": "9"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@2357/@HBoxContainer@2344/@HBoxContainer@2353/@Label@2352",
+      "rect": [
+        1003.0,
+        45.0,
+        15.0,
+        32.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@2357/@HBoxContainer@2344/@HBoxContainer@2356/@Label@2355",
+      "rect": [
+        1061.0,
+        45.0,
+        15.0,
+        32.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2363/@VBoxContainer@2359/@Label@2360",
+      "rect": [
+        1152.0,
+        16.0,
+        257.0,
+        26.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2363/@VBoxContainer@2359/@Label@2361",
+      "rect": [
+        1152.0,
+        42.0,
+        257.0,
+        38.0
+      ],
+      "text": "0 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2363/@VBoxContainer@2359/@Label@2362",
+      "rect": [
+        1152.0,
+        80.0,
+        257.0,
+        26.0
+      ],
+      "text": "! Falta na volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2369/@VBoxContainer@2365/@Label@2366",
+      "rect": [
+        1473.0,
+        16.0,
+        190.0,
+        26.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2369/@VBoxContainer@2365/@Label@2367",
+      "rect": [
+        1473.0,
+        42.0,
+        190.0,
+        38.0
+      ],
+      "text": "6 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2369/@VBoxContainer@2365/@Label@2368",
+      "rect": [
+        1473.0,
+        80.0,
+        190.0,
+        26.0
+      ],
+      "text": "Próxima volta: 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2375/@VBoxContainer@2371/@Label@2372",
+      "rect": [
+        1727.0,
+        16.0,
+        161.0,
+        26.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2375/@VBoxContainer@2371/@Label@2373",
+      "rect": [
+        1727.0,
+        42.0,
+        161.0,
+        38.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2375/@VBoxContainer@2371/@Label@2374",
+      "rect": [
+        1727.0,
+        80.0,
+        161.0,
+        26.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1114",
+      "rect": [
+        32.0,
+        1000.0,
+        190.0,
+        56.0
+      ],
+      "text": "‹ Vista geral"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1115",
+      "rect": [
+        230.0,
+        1000.0,
+        150.0,
+        56.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1116",
+      "rect": [
+        388.0,
+        1000.0,
+        199.0,
+        56.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2377",
+      "rect": [
+        1230.0,
+        124.0,
+        636.0,
+        50.0
+      ],
+      "text": "O trem chegou"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2378",
+      "rect": [
+        1230.0,
+        184.0,
+        636.0,
+        30.0
+      ],
+      "text": "Dora quer morar na Estação"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2379",
+      "rect": [
+        1230.0,
+        224.0,
+        636.0,
+        32.0
+      ],
+      "text": "Dora · Cozinheira (Texugo). Prática, evita desperdício."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2380",
+      "rect": [
+        1230.0,
+        266.0,
+        636.0,
+        67.0
+      ],
+      "text": "Ponto forte: Na Cantina com energia, produz mais 2 suprimentos por volta."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2381",
+      "rect": [
+        1230.0,
+        343.0,
+        636.0,
+        32.0
+      ],
+      "text": "Ponto fraco: Cozinhar gasta água: bebe 2 por volta."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2382",
+      "rect": [
+        1230.0,
+        385.0,
+        636.0,
+        63.0
+      ],
+      "text": "Pedido: Quer recuperar um caderno de receitas esquecido numa mercearia abandonada."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2384",
+      "rect": [
+        1230.0,
+        474.0,
+        636.0,
+        38.0
+      ],
+      "text": "Na próxima volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2385",
+      "rect": [
+        1230.0,
+        522.0,
+        636.0,
+        63.0
+      ],
+      "text": "Suprimentos depois da noite: 0 → 0 · Água depois: 4 → 2 · Energia: 3 → 3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@HBoxContainer@2386/@Button@2387",
+      "rect": [
+        1230.0,
+        595.0,
+        204.0,
+        56.0
+      ],
+      "text": "Acolher Dora"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@HBoxContainer@2386/@Button@2388",
+      "rect": [
+        1442.0,
+        595.0,
+        140.0,
+        56.0
+      ],
+      "text": "Recusar"
+    }
+  ]
+}

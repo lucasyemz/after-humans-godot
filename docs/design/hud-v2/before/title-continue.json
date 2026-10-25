@@ -1,0 +1,38 @@
+{
+  "name": "title-continue",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Title/@VBoxContainer@44/@Button@46",
+      "rect": [
+        120.0,
+        500.0,
+        640.0,
+        80.0
+      ],
+      "text": "Continuar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@VBoxContainer@44/@Button@47",
+      "rect": [
+        120.0,
+        604.0,
+        640.0,
+        80.0
+      ],
+      "text": "Nova campanha"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@VBoxContainer@44/@Button@48",
+      "rect": [
+        120.0,
+        708.0,
+        640.0,
+        80.0
+      ],
+      "text": "Opções"
+    }
+  ]
+}
