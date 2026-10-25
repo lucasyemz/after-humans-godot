@@ -12,7 +12,7 @@ const IGNORE := "res://tools/i18n_ignore.txt"
 ## As telas convertidas (a primeira leva: o título, as Opções, o HUD da exploração e da luta e a Estação; a segunda: o mapa
 ## de fases, a Mochila, as dicas, as regras da jornada, da Estação e dos cuidados, o registro da luta, a rua, os lugares e
 ## os avisos do save).
-const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/ui/options_panel.gd", "res://scripts/core/settings_service.gd",
+const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/ui/briefing_dialog.gd", "res://scripts/ui/options_panel.gd", "res://scripts/core/settings_service.gd",
 	"res://scripts/ui/exploration_hud.gd", "res://scripts/ui/passage_card.gd",
 	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/refuge_hud.gd",
 	"res://scripts/ui/phase_map.gd", "res://scripts/ui/inventory_panel.gd", "res://scripts/ui/tips_service.gd",
@@ -117,6 +117,12 @@ static func data_texts() -> Array:
 	for phase in load("res://scripts/flow/journey_rules.gd").PHASES:
 		for field in ["name", "description"]:
 			out.append({"text": phase[field], "where": "phases.%s.%s" % [phase.id, field]})
+	# O briefing e o debriefing (#88): as falas de cada fase, da retirada e da queda.
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/briefings.json")):
+		for index in row.get("Briefing", []).size():
+			out.append({"text": row.Briefing[index].Text, "where": "briefings.%s.%d" % [row.Name, index]})
+		if row.has("Debriefing"):
+			out.append({"text": row.Debriefing.Text, "where": "briefings.%s.debriefing" % row.Name})
 	# As escolhas dos eventos: o texto do botão, o requisito e o resultado de cada saída (#64; o resultado vai traduzido
 	# pelo modelo, com {Heroi} e {Instinto} trocados depois).
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/events.json")):

@@ -13,6 +13,9 @@ var tree: SceneTree
 
 func run(context) -> void:
 	t = context
+	# O briefing e o debriefing (#88) têm o teste deles; aqui, fora do caminho.
+	var briefing: bool = AHBriefing.enabled
+	AHBriefing.enabled = false
 	tree = Engine.get_main_loop()
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
@@ -30,6 +33,7 @@ func run(context) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+	AHBriefing.enabled = briefing
 
 
 func _station() -> void:

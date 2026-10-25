@@ -98,6 +98,16 @@ func _station_to_departure() -> bool:
 	t.equal(hud._draft.get("phase", ""), "fase_1", "a Preparação continua com a fase 1")
 	if not await _press(hud, "Partir", "o botão Partir da Preparação"):
 		return false
+	# O briefing (#88): as falas de quem pede, passadas com Próximo, e Partir na última.
+	if not await _until(func(): return hud.briefing_open(), "o briefing abrir"):
+		return false
+	var lines: int = hud.briefing.lines.size()
+	t.check(lines >= 2 and lines <= 3, "o briefing tem duas ou três falas (%d)" % lines)
+	for i in lines - 1:
+		if not await _press(hud.briefing, "Próximo", "Próximo no briefing"):
+			return false
+	if not await _press(hud.briefing, "Partir", "Partir na última fala do briefing"):
+		return false
 	if not await _until(func(): return _street() != null and _street().corridor != null and not GameFlow.busy, "a rua abrir depois da partida"):
 		return false
 	var expedition = Campaign.state.session.expedition
@@ -272,6 +282,12 @@ func _return_report() -> bool:
 	t.check(_station().team_arriving(), "o trem chega com a equipe")
 	var alive: Array = Campaign.state.station.last_return.get("team", []).filter(func(id): return Campaign.hero(id) != null and Campaign.hero(id).alive)
 	if not await _until(func(): return _station().lineup.size() == alive.size(), "a equipe descer do trem"):
+		return false
+	# O debriefing (#88): uma fala na plataforma antes do relatório.
+	if not await _until(func(): return hud.briefing_open(), "o debriefing abrir depois da chegada", 30.0):
+		return false
+	t.equal(hud.current, AHRefugeHud.ARRIVAL, "o relatório espera o debriefing")
+	if not await _press(hud.briefing, "Ver o relatório", "Ver o relatório no debriefing"):
 		return false
 	if not await _until(func(): return hud.current == "report", "o relatório abrir depois da chegada", 30.0):
 		return false
