@@ -65,109 +65,109 @@
         },
         {
           "text": "34/34",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             910,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            968.96875,
+            971.046875,
             780.0,
-            54.0625,
-            19
+            49.90625,
+            18
           ],
           "fits": true
         },
         {
           "text": "24/24",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             682,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            741.046875,
+            743.125,
             780.0,
-            53.90625,
-            19
+            49.75,
+            18
           ],
           "fits": true
         },
         {
           "text": "23/23",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             456,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            515.609375,
+            517.65625,
             780.0,
-            52.78125,
-            19
+            48.6875,
+            18
           ],
           "fits": true
         },
         {
           "text": "30/30",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             231,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            289.78125,
+            291.875,
             780.0,
-            54.4375,
-            19
+            50.25,
+            18
           ],
           "fits": true
         },
         {
           "text": "8/8",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             1281,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            1351.125,
+            1352.34375,
             780.0,
-            31.75,
-            19
+            29.3125,
+            18
           ],
           "fits": true
         },
         {
           "text": "6/6",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             1531,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            1601.359375,
+            1602.5625,
             780.0,
-            31.28125,
-            19
+            28.875,
+            18
           ],
           "fits": true
         },
@@ -915,7 +915,7 @@
           248,
           64
         ],
-        "occlusion": "boots mask in frozen composition; depth-tested under unit in game"
+        "occlusion": "projected canonical sprite alpha includes boots and tail; floor light excludes body; separate body bounce"
       },
       "order": [
         "unit_hero_gato_nick",
@@ -931,8 +931,61 @@
         "art/combat/icons/gato_sumir_na_sombra.webp": "32e72a10b93fc33f320cebf280efb2318f17f34adacf9e3eef685b519a30868b",
         "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
       },
+      "action_icon_centers": [
+        {
+          "icon": "intent-move",
+          "visible_center": [
+            1648.0,
+            882.5
+          ],
+          "requested_center": [
+            1648.0,
+            882.0
+          ]
+        },
+        {
+          "icon": "intent-block",
+          "visible_center": [
+            1784.5,
+            882.0
+          ],
+          "requested_center": [
+            1784.0,
+            882.0
+          ]
+        },
+        {
+          "icon": "item-generic",
+          "visible_center": [
+            1647.5,
+            994.0
+          ],
+          "requested_center": [
+            1648.0,
+            994.0
+          ]
+        },
+        {
+          "icon": "exit",
+          "visible_center": [
+            1783.5,
+            994.0
+          ],
+          "requested_center": [
+            1784.0,
+            994.0
+          ]
+        }
+      ],
+      "portrait_crop_xyxy": [
+        40,
+        14,
+        208,
+        182
+      ],
+      "lighting": "frozen proof: lower vignette, contact shadow, floor amber bounce, body bounce, full sprite alpha occlusion",
       "overflows": [],
-      "sha256": "9839f5a1fd8f8c5c1573e190cb2c8c2ef3952d046bb9ef1598f89d2d600aa06a"
+      "sha256": "77e8a6e0eb050b6995f6e5500e15d9bd87ba133a41b9006be23e22c00cc9561a"
     },
     {
       "file": "hud_large.webp",
@@ -995,109 +1048,109 @@
         },
         {
           "text": "34/34",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             910,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            960.65625,
-            777.5,
-            70.6875,
-            24
+            963.78125,
+            778.0,
+            64.4375,
+            22
           ],
           "fits": true
         },
         {
           "text": "24/24",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             682,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            732.765625,
-            777.5,
-            70.46875,
-            24
+            735.875,
+            778.0,
+            64.25,
+            22
           ],
           "fits": true
         },
         {
           "text": "23/23",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             456,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            507.5,
-            777.5,
-            69.0,
-            24
+            510.5625,
+            778.0,
+            62.875,
+            22
           ],
           "fits": true
         },
         {
           "text": "30/30",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             231,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            281.40625,
-            777.5,
-            71.1875,
-            24
+            284.5625,
+            778.0,
+            64.875,
+            22
           ],
           "fits": true
         },
         {
           "text": "8/8",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             1281,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            1346.234375,
-            777.5,
-            41.53125,
-            24
+            1348.078125,
+            778.0,
+            37.84375,
+            22
           ],
           "fits": true
         },
         {
           "text": "6/6",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             1531,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            1596.546875,
-            777.5,
-            40.90625,
-            24
+            1598.359375,
+            778.0,
+            37.28125,
+            22
           ],
           "fits": true
         },
@@ -1845,7 +1898,7 @@
           248,
           64
         ],
-        "occlusion": "boots mask in frozen composition; depth-tested under unit in game"
+        "occlusion": "projected canonical sprite alpha includes boots and tail; floor light excludes body; separate body bounce"
       },
       "order": [
         "unit_hero_gato_nick",
@@ -1861,8 +1914,61 @@
         "art/combat/icons/gato_sumir_na_sombra.webp": "32e72a10b93fc33f320cebf280efb2318f17f34adacf9e3eef685b519a30868b",
         "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
       },
+      "action_icon_centers": [
+        {
+          "icon": "intent-move",
+          "visible_center": [
+            1648.0,
+            882.5
+          ],
+          "requested_center": [
+            1648.0,
+            882.0
+          ]
+        },
+        {
+          "icon": "intent-block",
+          "visible_center": [
+            1784.5,
+            882.0
+          ],
+          "requested_center": [
+            1784.0,
+            882.0
+          ]
+        },
+        {
+          "icon": "item-generic",
+          "visible_center": [
+            1647.5,
+            994.0
+          ],
+          "requested_center": [
+            1648.0,
+            994.0
+          ]
+        },
+        {
+          "icon": "exit",
+          "visible_center": [
+            1783.5,
+            994.0
+          ],
+          "requested_center": [
+            1784.0,
+            994.0
+          ]
+        }
+      ],
+      "portrait_crop_xyxy": [
+        40,
+        14,
+        208,
+        182
+      ],
+      "lighting": "frozen proof: lower vignette, contact shadow, floor amber bounce, body bounce, full sprite alpha occlusion",
       "overflows": [],
-      "sha256": "624d5efa9385e667ecd6fbfb6395fa9cd4f4ed3c942727fc71969847314772ac"
+      "sha256": "a95f72f88e7a93c36251b6ab79f9720a9ee400d90805a704e7247259a057e7a4"
     },
     {
       "file": "hud_colorblind.webp",
@@ -1925,109 +2031,109 @@
         },
         {
           "text": "34/34",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             910,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            968.96875,
+            971.046875,
             780.0,
-            54.0625,
-            19
+            49.90625,
+            18
           ],
           "fits": true
         },
         {
           "text": "24/24",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             682,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            741.046875,
+            743.125,
             780.0,
-            53.90625,
-            19
+            49.75,
+            18
           ],
           "fits": true
         },
         {
           "text": "23/23",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             456,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            515.609375,
+            517.65625,
             780.0,
-            52.78125,
-            19
+            48.6875,
+            18
           ],
           "fits": true
         },
         {
           "text": "30/30",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             231,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            289.78125,
+            291.875,
             780.0,
-            54.4375,
-            19
+            50.25,
+            18
           ],
           "fits": true
         },
         {
           "text": "8/8",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             1281,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            1351.125,
+            1352.34375,
             780.0,
-            31.75,
-            19
+            29.3125,
+            18
           ],
           "fits": true
         },
         {
           "text": "6/6",
-          "size": 26,
+          "size": 24,
           "role": "hp",
           "box": [
             1531,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            1601.359375,
+            1602.5625,
             780.0,
-            31.28125,
-            19
+            28.875,
+            18
           ],
           "fits": true
         },
@@ -2775,7 +2881,7 @@
           248,
           64
         ],
-        "occlusion": "boots mask in frozen composition; depth-tested under unit in game"
+        "occlusion": "projected canonical sprite alpha includes boots and tail; floor light excludes body; separate body bounce"
       },
       "order": [
         "unit_hero_gato_nick",
@@ -2791,8 +2897,61 @@
         "art/combat/icons/gato_sumir_na_sombra.webp": "32e72a10b93fc33f320cebf280efb2318f17f34adacf9e3eef685b519a30868b",
         "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
       },
+      "action_icon_centers": [
+        {
+          "icon": "intent-move",
+          "visible_center": [
+            1648.0,
+            882.5
+          ],
+          "requested_center": [
+            1648.0,
+            882.0
+          ]
+        },
+        {
+          "icon": "intent-block",
+          "visible_center": [
+            1784.5,
+            882.0
+          ],
+          "requested_center": [
+            1784.0,
+            882.0
+          ]
+        },
+        {
+          "icon": "item-generic",
+          "visible_center": [
+            1647.5,
+            994.0
+          ],
+          "requested_center": [
+            1648.0,
+            994.0
+          ]
+        },
+        {
+          "icon": "exit",
+          "visible_center": [
+            1783.5,
+            994.0
+          ],
+          "requested_center": [
+            1784.0,
+            994.0
+          ]
+        }
+      ],
+      "portrait_crop_xyxy": [
+        40,
+        14,
+        208,
+        182
+      ],
+      "lighting": "frozen proof: lower vignette, contact shadow, floor amber bounce, body bounce, full sprite alpha occlusion",
       "overflows": [],
-      "sha256": "4d43fc561c9ad7d340ab13b1115db9172e646112f0a6c842808c6a6108815d30"
+      "sha256": "d82a2cfc6a9f4b11cc8ffa33eca5dc754ef270984c67fc9cced7e9eca3e4674b"
     },
     {
       "file": "hud_large_colorblind.webp",
@@ -2855,109 +3014,109 @@
         },
         {
           "text": "34/34",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             910,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            960.65625,
-            777.5,
-            70.6875,
-            24
+            963.78125,
+            778.0,
+            64.4375,
+            22
           ],
           "fits": true
         },
         {
           "text": "24/24",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             682,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            732.765625,
-            777.5,
-            70.46875,
-            24
+            735.875,
+            778.0,
+            64.25,
+            22
           ],
           "fits": true
         },
         {
           "text": "23/23",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             456,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            507.5,
-            777.5,
-            69.0,
-            24
+            510.5625,
+            778.0,
+            62.875,
+            22
           ],
           "fits": true
         },
         {
           "text": "30/30",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             231,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            281.40625,
-            777.5,
-            71.1875,
-            24
+            284.5625,
+            778.0,
+            64.875,
+            22
           ],
           "fits": true
         },
         {
           "text": "8/8",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             1281,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            1346.234375,
-            777.5,
-            41.53125,
-            24
+            1348.078125,
+            778.0,
+            37.84375,
+            22
           ],
           "fits": true
         },
         {
           "text": "6/6",
-          "size": 34,
+          "size": 31,
           "role": "hp",
           "box": [
             1531,
             777,
             172,
-            25
+            24
           ],
           "rect": [
-            1596.546875,
-            777.5,
-            40.90625,
-            24
+            1598.359375,
+            778.0,
+            37.28125,
+            22
           ],
           "fits": true
         },
@@ -3705,7 +3864,7 @@
           248,
           64
         ],
-        "occlusion": "boots mask in frozen composition; depth-tested under unit in game"
+        "occlusion": "projected canonical sprite alpha includes boots and tail; floor light excludes body; separate body bounce"
       },
       "order": [
         "unit_hero_gato_nick",
@@ -3721,8 +3880,61 @@
         "art/combat/icons/gato_sumir_na_sombra.webp": "32e72a10b93fc33f320cebf280efb2318f17f34adacf9e3eef685b519a30868b",
         "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
       },
+      "action_icon_centers": [
+        {
+          "icon": "intent-move",
+          "visible_center": [
+            1648.0,
+            882.5
+          ],
+          "requested_center": [
+            1648.0,
+            882.0
+          ]
+        },
+        {
+          "icon": "intent-block",
+          "visible_center": [
+            1784.5,
+            882.0
+          ],
+          "requested_center": [
+            1784.0,
+            882.0
+          ]
+        },
+        {
+          "icon": "item-generic",
+          "visible_center": [
+            1647.5,
+            994.0
+          ],
+          "requested_center": [
+            1648.0,
+            994.0
+          ]
+        },
+        {
+          "icon": "exit",
+          "visible_center": [
+            1783.5,
+            994.0
+          ],
+          "requested_center": [
+            1784.0,
+            994.0
+          ]
+        }
+      ],
+      "portrait_crop_xyxy": [
+        40,
+        14,
+        208,
+        182
+      ],
+      "lighting": "frozen proof: lower vignette, contact shadow, floor amber bounce, body bounce, full sprite alpha occlusion",
       "overflows": [],
-      "sha256": "dffcb0114848e2de3dc31f7ac20dcbdff7596221ab06ebe9b311f4eb6f14ec56"
+      "sha256": "492a11a86d8dc8ee7a77dee7583cf8ad04d3cc059ad2ebc7a5afa0ace658b49e"
     }
   ]
 }

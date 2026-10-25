@@ -26,9 +26,9 @@ print('Piece-by-piece comparison10 rows,4 columns')
 
 # Antes/depois deste refinamento: imagem congelada da entrega anterior.
 import subprocess,io
-before=Image.open(io.BytesIO(subprocess.check_output(['git','show','5106986:docs/design/hud-target/hud.webp'],cwd=ROOT))).convert('RGB');after=images[1]
+before=Image.open(io.BytesIO(subprocess.check_output(['git','show','2ce2f7a:docs/design/hud-target/hud.webp'],cwd=ROOT))).convert('RGB');after=images[1]
 im=Image.new('RGB',(3840,1152),'#111519');d=ImageDraw.Draw(im)
-for x,title,picture in [(0,'ANTES /5106986',before),(1920,'REFINAMENTO / DETALHES',after)]:
+for x,title,picture in [(0,'ANTES /2ce2f7a',before),(1920,'REFINAMENTO / DETALHES',after)]:
  d.text((x+32,20),title,font=f,fill='#efe6d6');im.paste(picture,(x,72))
 im.save(OUT/'detail_before_after.webp',quality=93,method=6)
 boxes=[('BISÉIS / TECLAS / AÇÕES',(1580,832,1852,1058)),('RETRATO / LETRA / BARRAS',(60,832,636,1052)),('VIDA / ANEL / ABA',(640,716,904,812)),('ORDEM / ROSTOS',(636,26,1356,106))]
@@ -38,3 +38,17 @@ for i,(title,box) in enumerate(boxes):
  for j,src in enumerate([ref,before,after]):
   x=j*640+24;y=64+i*252;d.text((x,y),title,font=f,fill='#efe6d6');picture=ImageOps.contain(src.crop(box),(592,200));im.paste(picture,(x+(592-picture.width)//2,y+40+(200-picture.height)//2))
 im.save(OUT/'detail_comparison.webp',quality=94,method=6)
+# Prova dos pontos reclamados: luz no piso/cauda, enquadramento e centros visíveis.
+proof=Image.new('RGB',(1920,1100),'#111519');d=ImageDraw.Draw(proof)
+for x,title in [(24,'ANTES /2CE2F7A'),(984,'AGORA / GUIAS DE ENQUADRAMENTO')]:d.text((x,16),title,font=f,fill='#efe6d6')
+for row,(title,box) in enumerate([('LUZ DO PISO / OCLUSÃO DA CAUDA',(620,640,930,812)),('CABEÇA CENTRALIZADA / MESMA ESCALA',(64,836,272,1048)),('CENTROS DOS SÍMBOLOS / ALFA RECORTADO',(1580,832,1852,1058))]):
+ for col,src in enumerate([before,after]):
+  p=src.crop(box).convert('RGB');draw=ImageDraw.Draw(p)
+  if col==1 and row==1:
+   cx,cy=168-box[0],940-box[1];draw.line((cx-10,cy,cx+10,cy),fill='#f0a020',width=1);draw.line((cx,cy-10,cx,cy+10),fill='#f0a020',width=1)
+  if col==1 and row==2:
+   for base_x in [1584,1720]:
+    for base_y in [836,948]:
+     cx,cy=base_x+64-box[0],base_y+46-box[1];draw.line((cx-7,cy,cx+7,cy),fill='#f0a020');draw.line((cx,cy-7,cx,cy+7),fill='#f0a020')
+  p=ImageOps.contain(p,(900,280));x=col*960+24;y=70+row*340;d.text((x,y),title,font=f,fill='#efe6d6');proof.paste(p,(x+(900-p.width)//2,y+42+(280-p.height)//2))
+proof.save(OUT/'light_alignment.webp',quality=94,method=6)

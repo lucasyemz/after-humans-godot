@@ -1,5 +1,5 @@
 {
-  "revision": "detail_pass_2026_10_25",
+  "revision": "light_volume_alignment_2026_10_25",
   "direction": "Approved target2026-10-25; overrides ornamental C",
   "source_reference": "docs/design/reference/hud-target-2026-10-25.webp",
   "source_sha256": "8060bc637f5af10340f30b15ab7d7ac5e1d8dab3bf90366f8f995f894481b124",
@@ -272,7 +272,7 @@
       ],
       "content_xywh": [
         14,
-        6,
+        5,
         172,
         34
       ],
@@ -280,8 +280,8 @@
         0,
         0
       ],
-      "note": "Reference-specific inset rim; ally top tab / enemy cut. No baked values or fill.",
-      "sha256": "245a7aee4e635a5f53d0ff7d15331151f37e3e0c0dfcbedc9600bf1b8641054c"
+      "note": "Deep recessed steel bevel; cyan/red track is dynamic. Ally tab and enemy cut preserve non-color distinction.",
+      "sha256": "0d0284917c83665012c26d974ed6ea8b7a3793922e63c40bca64003a262447b2"
     },
     "health_enemy": {
       "file": "art/ui/kit/combat/health_enemy.webp",
@@ -297,7 +297,7 @@
       ],
       "content_xywh": [
         14,
-        6,
+        5,
         172,
         34
       ],
@@ -305,8 +305,8 @@
         0,
         0
       ],
-      "note": "Reference-specific inset rim; ally top tab / enemy cut. No baked values or fill.",
-      "sha256": "d43c2b9927cd1d828bacbed936612813e5be9c519530e6212ada28edfc220add"
+      "note": "Deep recessed steel bevel; cyan/red track is dynamic. Ally tab and enemy cut preserve non-color distinction.",
+      "sha256": "88a32bc98074bb97661ecf66f62836600dd91e5a903564642bbc196048e8707a"
     },
     "main_bar": {
       "file": "art/ui/kit/combat/main_bar.webp",
@@ -351,7 +351,7 @@
         0
       ],
       "note": "Amber corner selection, separate from base texture.",
-      "sha256": "c9a439f45aa02ab35531b65588a6c7c9f300d0e220a90ed7efe5c694e0682409"
+      "sha256": "7d5f50e9cdcea9cc535594c480539b549bab68bac3e1e4bd61f90b12136bd84e"
     },
     "active_health": {
       "file": "art/ui/kit/combat/active_health.webp",
@@ -371,7 +371,7 @@
         0
       ],
       "note": "Amber corner selection, separate from base texture.",
-      "sha256": "42ef28782d07563405e3110d905135c1ca574569cb85055308ba5f608bb18f3d"
+      "sha256": "baf0305e9b559dcb5b2faea54892f808ec30ea1480f30ab4bf62ca94ff301a11"
     },
     "actor_ring": {
       "file": "art/ui/kit/combat/actor_ring.webp",
