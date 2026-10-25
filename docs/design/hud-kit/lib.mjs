@@ -182,7 +182,7 @@ export const section = (title, icon = "") => `<div class="row" style="gap:10px;m
 
 // ------------------------------------------------------------------ captura e conferência
 // Tipos de alvo que não são toque (informação ou caixas de conferência): ficam fora da régua de 56 px.
-const NOT_TOUCH = new Set(["keys", "hero-body", "card-tab", "details", "chip", "hero", "slot-info"]);
+const NOT_TOUCH = new Set(["keys", "hero-body", "card-tab", "details", "chip", "hero", "slot-info", "panel"]);
 
 export async function run(screens, out) {
   fs.rmSync(out, { recursive: true, force: true });
@@ -263,8 +263,9 @@ export async function run(screens, out) {
             parent = parent.parentElement;
           }
         }
-        // Texto em cima de uma peça que pede espaço (medalhões, retratos marcados com data-avoid).
-        const avoid = [...document.querySelectorAll("[data-avoid]")].map((el) => [el, el.getBoundingClientRect()]);
+        // Texto em cima de uma peça que pede espaço (medalhões marcados com data-avoid) ou embaixo de um painel do meio
+        // (data-hit="panel") que não é o dele.
+        const avoid = [...document.querySelectorAll("[data-avoid],[data-hit='panel']")].map((el) => [el, el.getBoundingClientRect()]);
         const covered = [...document.querySelectorAll(".tx,.wrap")].filter((el) => avoid.some(([a, ar]) => {
           if (a.contains(el)) return false;
           const r = el.getBoundingClientRect();

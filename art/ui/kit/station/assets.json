@@ -973,6 +973,66 @@
       ],
       "note": "Etiqueta do cômodo no corte da Estação, com a ponta para baixo no centro (âncora 100,52). Esticar só na largura.",
       "sha256": "e5aca84ff76e94319387d0dc230e0dd1c25402043cc2b410d9a5e9e15671ee26"
+    },
+    "touch_ring": {
+      "file": "art/ui/kit/station/touch_ring.webp",
+      "size": [
+        240,
+        240
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        120,
+        120
+      ],
+      "note": "Área do analógico de toque: octógono de aço meio transparente (aparece onde o dedo encosta; até a borda corre). Não fatiar.",
+      "sha256": "ec3f017bdf1aff02d607c89479e33e3aa65f438b5e78eb8822d49335cb7032a0"
+    },
+    "touch_knob": {
+      "file": "art/ui/kit/station/touch_knob.webp",
+      "size": [
+        84,
+        84
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        42,
+        42
+      ],
+      "note": "O pegador do analógico, com a cruz âmbar. Não fatiar.",
+      "sha256": "0262cc681fc8f3d3f5a66395627ada8029909767399317c026d5b996daa32a11"
+    },
+    "touch_button": {
+      "file": "art/ui/kit/station/touch_button.webp",
+      "size": [
+        170,
+        170
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        85,
+        85
+      ],
+      "note": "O botão Usar, apagado (nada por perto). Não fatiar.",
+      "sha256": "45d9bf95b59cca3b4fc3d2480f20f341ad254bfd94d24733320c046cd4eb5841"
+    },
+    "touch_button_active": {
+      "file": "art/ui/kit/station/touch_button_active.webp",
+      "size": [
+        170,
+        170
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        85,
+        85
+      ],
+      "note": "Por cima de touch_button quando há o que usar: o âmbar inteiro com o núcleo claro.",
+      "sha256": "fe3d9b57ee1959ec242ce8d6a44e8d9dce5d9c1ff060b1a76b65010015e3eb07"
     }
   },
   "trait_ids": {

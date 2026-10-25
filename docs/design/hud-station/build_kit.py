@@ -362,6 +362,25 @@ def main():
     save("room_tag", tag, [16, 12, 16, 20], [12, 6, 176, 30],
          "Etiqueta do cômodo no corte da Estação, com a ponta para baixo no centro (âncora 100,52). Esticar só na largura.",
          anchor=(100, 52))
+    # ---------------------------------------------------------------- lote 2: os controles de toque da exploração
+    # Octógonos de aço (a chapa chanfrada do kit, com o aro e a textura), meio transparentes para a cena aparecer.
+    def see_through(im, alpha):
+        a = im.getchannel("A").point(lambda v: v * alpha // 255)
+        im.putalpha(a)
+        return im
+    ring = plate((240, 240), cut=70, rim=7, amber=False, inner=None, seed=41)
+    fill = see_through(tile((240, 240), (14, 16, 18), 0.6), 110)
+    fill.putalpha(Image.composite(fill.getchannel("A"), Image.new("L", (240, 240), 0), mask((240, 240), chamfer(7, 7, 232, 232, 66))))
+    fill.alpha_composite(ring)
+    save("touch_ring", fill, None, None, "Área do analógico de toque: octógono de aço meio transparente (aparece onde o dedo encosta; até a borda corre). Não fatiar.", anchor=(120, 120))
+    knob = plate((84, 84), cut=24, rim=5, amber=False, inner="steel", seed=42)
+    knob.alpha_composite(lines((84, 84), [([(30, 42), (54, 42)], (*AMBER, 255), 2.6), ([(42, 30), (42, 54)], (*AMBER, 255), 2.6)]))
+    save("touch_knob", knob, None, None, "O pegador do analógico, com a cruz âmbar. Não fatiar.", anchor=(42, 42))
+    save("touch_button", see_through(plate((170, 170), cut=50, rim=6, amber=False, inner="dark", seed=43), 225), None, None,
+         "O botão Usar, apagado (nada por perto). Não fatiar.", anchor=(85, 85))
+    save("touch_button_active", amber_frame((170, 170), cut=50, width=3.6), None, None,
+         "Por cima de touch_button quando há o que usar: o âmbar inteiro com o núcleo claro.", anchor=(85, 85))
+
     manifest = {
         "revision": "station_2026_10_25",
         "direction": "Alvos aprovados da Estação (25/10/2026), no idioma do kit da luta",
