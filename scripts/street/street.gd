@@ -663,6 +663,9 @@ func _ground_height(z: float) -> float:
 func _place_party(delta: float) -> void:
 	if _arena != null and _arena.active:
 		return
+	# No acampamento (#77), cada um fica no seu lugar em volta da fogueira.
+	if corridor != null and corridor.camp != null and corridor.camp.active:
+		return
 	# A fila cabe no rastro que existe: perto da ponta da área (na chegada) os espaços encolhem e abrem de novo quando
 	# o líder anda.
 	var spacing := PARTY_SPACING
@@ -725,6 +728,10 @@ func _update_camera(delta: float) -> void:
 		target = Vector3(clampf(leader.x, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN), 1.6, -1.2)
 		pitch = deg_to_rad(4.0)
 		distance = 11.0
+		# No acampamento (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
+		if corridor != null and corridor.camp != null and corridor.camp.active:
+			target = Vector3(corridor.camp.focus_x, AHCampScene.FOCUS_HEIGHT, -0.2)
+			distance = AHCampScene.FOCUS_DISTANCE
 	if _arena != null and _arena.active:
 		# Na luta, a arena enquadra todos e se aproxima do golpe. A altura do alvo põe os pés sempre na mesma linha da
 		# tela, acima do painel do HUD, qualquer que seja a distância.

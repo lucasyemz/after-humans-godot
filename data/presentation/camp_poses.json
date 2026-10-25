@@ -1,0 +1,311 @@
+{
+  "source": "docs/design/camp/contract.json (tools/build_camp_poses.py)",
+  "heroes": {
+    "hero_cao_bento": {
+      "seat": {
+        "file": "res://art/camp/bento_seat_floor.webp",
+        "canvas": [
+          1086,
+          1448
+        ],
+        "anchor": [
+          473.0,
+          1429
+        ],
+        "body_reference_pixels": 1419,
+        "visible": [
+          46.0,
+          494.0,
+          900.0,
+          1426.0
+        ]
+      },
+      "sleep": {
+        "file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          445,
+          336
+        ],
+        "body_reference_pixels": 863,
+        "visible": [
+          13.0,
+          108.0,
+          877.0,
+          336.0
+        ]
+      }
+    },
+    "hero_coruja_vespera": {
+      "seat": {
+        "file": "res://art/camp/vespera_seat_floor.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          451.0,
+          1297
+        ],
+        "body_reference_pixels": 1271,
+        "visible": [
+          18.0,
+          462.0,
+          1040.0,
+          1296.0
+        ]
+      },
+      "sleep": {
+        "file": "res://art/station/poses/hero_coruja_vespera_sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          447,
+          410
+        ],
+        "body_reference_pixels": 837,
+        "visible": [
+          28.0,
+          71.0,
+          866.0,
+          410.0
+        ]
+      }
+    },
+    "hero_gato_nick": {
+      "seat": {
+        "file": "res://art/camp/nick_seat_floor.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          488.5,
+          1286
+        ],
+        "body_reference_pixels": 1255,
+        "visible": [
+          18.0,
+          520.0,
+          958.0,
+          1284.0
+        ]
+      },
+      "sleep": {
+        "file": "res://art/station/poses/hero_gato_nick_sleep.webp",
+        "canvas": [
+          892,
+          441
+        ],
+        "anchor": [
+          446,
+          366
+        ],
+        "body_reference_pixels": 862,
+        "visible": [
+          15.0,
+          128.0,
+          879.0,
+          367.0
+        ]
+      }
+    },
+    "hero_sapo_iris": {
+      "seat": {
+        "file": "res://art/camp/iris_seat_floor.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          587.5,
+          1264
+        ],
+        "body_reference_pixels": 1208,
+        "visible": [
+          66.0,
+          504.0,
+          1108.0,
+          1262.0
+        ]
+      },
+      "sleep": {
+        "file": "res://art/station/poses/hero_sapo_iris_sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          444,
+          369
+        ],
+        "body_reference_pixels": 854,
+        "visible": [
+          17.0,
+          86.0,
+          872.0,
+          369.0
+        ]
+      }
+    }
+  },
+  "recruits": {
+    "cat_recruit_01": {
+      "seat": {
+        "file": "res://art/camp/cat_recruit_01_seat.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          589.5,
+          1312
+        ],
+        "body_reference_pixels": 1260,
+        "visible": [
+          20.0,
+          396.0,
+          1160.0,
+          1308.0
+        ]
+      },
+      "sleep": {
+        "file": "res://art/camp/cat_recruit_01_sleep.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          589.5,
+          1312
+        ],
+        "body_reference_pixels": 1260,
+        "visible": [
+          42.0,
+          910.0,
+          1136.0,
+          1308.0
+        ]
+      }
+    },
+    "dog_recruit_01": {
+      "seat": {
+        "file": "res://art/camp/dog_recruit_01_seat.webp",
+        "canvas": [
+          1086,
+          1448
+        ],
+        "anchor": [
+          542.0,
+          1425
+        ],
+        "body_reference_pixels": 1385,
+        "visible": [
+          108.0,
+          660.0,
+          976.0,
+          1422.0
+        ]
+      },
+      "sleep": {
+        "file": "res://art/camp/dog_recruit_01_sleep.webp",
+        "canvas": [
+          1086,
+          1448
+        ],
+        "anchor": [
+          542.0,
+          1425
+        ],
+        "body_reference_pixels": 1385,
+        "visible": [
+          16.0,
+          958.0,
+          1064.0,
+          1422.0
+        ]
+      }
+    },
+    "frog_recruit_01": {
+      "seat": {
+        "file": "res://art/camp/frog_recruit_01_seat.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          588.5,
+          1311
+        ],
+        "body_reference_pixels": 1219,
+        "visible": [
+          78.0,
+          604.0,
+          1100.0,
+          1308.0
+        ]
+      },
+      "sleep": {
+        "file": "res://art/camp/frog_recruit_01_sleep.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          588.5,
+          1311
+        ],
+        "body_reference_pixels": 1219,
+        "visible": [
+          72.0,
+          874.0,
+          1104.0,
+          1308.0
+        ]
+      }
+    },
+    "owl_recruit_01": {
+      "seat": {
+        "file": "res://art/camp/owl_recruit_01_seat.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          589.5,
+          1312
+        ],
+        "body_reference_pixels": 1272,
+        "visible": [
+          130.0,
+          546.0,
+          1046.0,
+          1308.0
+        ]
+      },
+      "sleep": {
+        "file": "res://art/camp/owl_recruit_01_sleep.webp",
+        "canvas": [
+          1178,
+          1336
+        ],
+        "anchor": [
+          589.5,
+          1312
+        ],
+        "body_reference_pixels": 1272,
+        "visible": [
+          70.0,
+          802.0,
+          1106.0,
+          1308.0
+        ]
+      }
+    }
+  }
+}

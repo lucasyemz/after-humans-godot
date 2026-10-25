@@ -13,7 +13,7 @@ const IGNORE := "res://tools/i18n_ignore.txt"
 ## de fases, a Mochila, as dicas, as regras da jornada, da Estação e dos cuidados, o registro da luta, a rua, os lugares e
 ## os avisos do save).
 const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/ui/options_panel.gd", "res://scripts/core/settings_service.gd",
-	"res://scripts/ui/exploration_hud.gd", "res://scripts/ui/passage_card.gd",
+	"res://scripts/ui/exploration_hud.gd", "res://scripts/ui/passage_card.gd", "res://scripts/ui/camp_hud.gd",
 	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/refuge_hud.gd",
 	"res://scripts/ui/phase_map.gd", "res://scripts/ui/inventory_panel.gd", "res://scripts/ui/tips_service.gd",
 	"res://scripts/ui/ui_style.gd", "res://scripts/flow/station_rules.gd", "res://scripts/flow/journey_rules.gd",

@@ -851,3 +851,14 @@ station_rules.gd: Bigorna
 refuge_hud.gd: story
 exploration_hud.gd: Requirement
 journey_rules.gd: hero
+street_corridor.gd: bandage
+camp_hud.gd: Name
+camp_hud.gd: Life
+camp_hud.gd: Instinct
+camp_hud.gd: Body_
+camp_hud.gd: %s %d/%d
+camp_hud.gd: visible
+camp_hud.gd: food
+camp_hud.gd: Effect
+camp_hud.gd: +%d
+camp_hud.gd: Gain

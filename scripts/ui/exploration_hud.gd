@@ -43,7 +43,10 @@ var _prompt_world = null
 var _toast: Label
 var _toast_tween: Tween
 var _modal: PanelContainer
+## O HUD do acampamento aberto (#77), null fora dele.
+var camp_hud: AHCampHud
 var _menu_button: Button
+var _bag_button: Button
 var _finish_button: Button
 var _markers: Array[Control] = []
 var _marker_points: Array = []
@@ -179,7 +182,7 @@ func _ready() -> void:
 	_finish_button.pressed.connect(func(): menu_return.emit())
 	add_child(_finish_button)
 	_menu_button = _corner_button(tr("Menu"), "menu", Vector2(1696, 974), func(): menu_requested.emit())
-	_corner_button(tr("Mochila"), "inventory", Vector2(1484, 974), func(): inventory_requested.emit())
+	_bag_button = _corner_button(tr("Mochila"), "inventory", Vector2(1484, 974), func(): inventory_requested.emit())
 
 	# O aviso também é botão: tocar ou clicar nele usa o que está perto.
 	_prompt = PanelContainer.new()
@@ -491,6 +494,9 @@ func loot_burst(gains: Array, where: Vector3) -> void:
 
 ## Os losangos sobre o que dá para usar por perto (o corredor manda a cada quadro).
 func set_markers(points: Array) -> void:
+	if camp_open():
+		# No acampamento, sem as marcas dos objetos da sala (a escolha ali é o herói).
+		points = []
 	_marker_points = points
 	while _markers.size() < points.size():
 		var dia := Panel.new()
@@ -566,7 +572,7 @@ func _process(delta: float) -> void:
 	if Input.get_vector("move_left", "move_right", "move_back", "move_front").length() > 0.1:
 		_hint_time += delta
 	_hint.modulate.a = clampf(1.0 - (_hint_time - 12.0) / 2.0, 0.0, 1.0)
-	_hint.visible = not Settings.touch_visible() and first_journey()
+	_hint.visible = not Settings.touch_visible() and first_journey() and not camp_open()
 	var party_end := _party_box.position.x + _party_box.get_combined_minimum_size().x
 	_hint.position = Vector2(party_end + 28, 1036)
 
@@ -685,38 +691,45 @@ func show_event(campaign: Dictionary) -> void:
 
 # ---------------------------------------------------------------- acampamento
 
-## Painel do acampamento: cada herói com vida e instinto, comer e curativo; levantar acampamento.
-func show_camp(campaign: Dictionary) -> void:
-	var box := _open_modal(860)
-	box.add_child(H.make_label(tr("Acampamento"), 34, H.GOLD))
-	var note := H.make_label(tr("A porta fechada e a fogueira acesa. Comer: +10%% de vida e -5 de instinto (comida %d). Curativo: +8 de vida (curativos %d).") % [
-		AHJourneyRules.food(campaign), campaign.inventory.bandages], 18, H.MUTED)
-	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	note.custom_minimum_size = Vector2(820, 0)
-	box.add_child(note)
-	var first: Button
-	for hero_id in campaign.session.expedition.team:
-		var hero = Campaign.hero(hero_id)
-		if hero == null or not hero.alive:
-			continue
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 12)
-		var label := H.make_label(tr("%s · Vida %d/%d · Instinto %d") % [hero.display_name, hero.hp, hero.max_hp, hero.instinct], 20, H.TEXT)
-		label.custom_minimum_size = Vector2(420, 0)
-		row.add_child(label)
-		var eat := _button(tr("Comer"), func(): camp_food.emit(hero_id),
-			AHJourneyRules.food(campaign) > 0 and (hero.hp < hero.max_hp or hero.instinct > 0))
-		eat.custom_minimum_size = Vector2(150, 44)
-		row.add_child(eat)
-		var heal := _button(tr("Curativo"), func(): camp_bandage.emit(hero_id), campaign.inventory.bandages > 0 and hero.hp < hero.max_hp)
-		heal.custom_minimum_size = Vector2(150, 44)
-		row.add_child(heal)
-		box.add_child(row)
-		if first == null:
-			first = eat if not eat.disabled else (heal if not heal.disabled else null)
-	var leave := _button(tr("Levantar acampamento"), func(): camp_leave.emit())
-	box.add_child(leave)
-	(first if first else leave).grab_focus.call_deferred()
+## O acampamento encenado (#77): o HUD do acampamento (AHCampHud) sobre a equipe em volta da fogueira (AHCampScene).
+## Chamado de novo depois de cada comida e curativo, só atualiza.
+func show_camp(_campaign: Dictionary, camp: AHCampScene) -> void:
+	close_modal()
+	if camp_open():
+		camp_hud.refresh()
+		return
+	camp_hud = AHCampHud.new(camp)
+	camp_hud.food.connect(func(id): camp_food.emit(id))
+	camp_hud.bandage.connect(func(id): camp_bandage.emit(id))
+	camp_hud.leave.connect(func(): camp_leave.emit())
+	add_child(camp_hud)
+	# Embaixo, a barra do acampamento no lugar da fila da equipe e dos botões do canto (que não servem no acampamento).
+	_set_camp_layout(true)
+
+
+func hide_camp() -> void:
+	if camp_open():
+		camp_hud.queue_free()
+	camp_hud = null
+	_set_camp_layout(false)
+
+
+func _set_camp_layout(camping: bool) -> void:
+	for node in [_party_box, _menu_button, _bag_button]:
+		if node != null:
+			node.visible = not camping
+	if camping:
+		set_markers([])
+
+
+func camp_open() -> bool:
+	return camp_hud != null and is_instance_valid(camp_hud) and not camp_hud.is_queued_for_deletion()
+
+
+## A resposta de comer ou curar no herói (o número verde, o efeito e o som).
+func camp_respond(hero_id: String, kind: String, life_gain: int, instinct_change: int) -> void:
+	if camp_open():
+		camp_hud.respond(hero_id, kind, life_gain, instinct_change)
 
 
 # ---------------------------------------------------------------- menu
