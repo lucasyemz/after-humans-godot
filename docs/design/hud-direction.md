@@ -69,6 +69,24 @@ O Codex entregou o kit da luta no PR #97 (`codex-design`):
 
 O kit de latão (`art/ui/kit/v2/`) fica só como histórico. A integração no jogo é da #60 (Claude).
 
+## Como produzir as peças (qualquer agente com geração de imagem)
+
+A imagem gerada é matéria-prima e referência. O jogo recebe peças limpas, medidas e sem texto.
+
+- **Molduras, chapas, abas e botões:** desenhadas por código (SVG ou Python com Pillow), com o chanfro, o bisel e o
+  detalhe âmbar exatos, nas medidas do alvo e com as margens de 9-slice. A textura de aço vem por cima (veja o próximo
+  item). Assim a borda fica nítida, e todas as peças combinam entre si e com `art/ui/kit/combat/`.
+- **Textura de aço arranhado:** uma imagem gerada, repetível (seamless), em tons neutros. Ou recortada dos alvos do
+  Lucas, que são do projeto.
+- **Ícones pintados** (traços, chips de resultado, recursos):
+  - gerados em folhas por família, com o mesmo prompt de estilo, sobre um fundo chapado magenta (`#FF00FF`);
+  - recortados por código para ter o alfa limpo;
+  - leitura conferida a 32 e a 64 px.
+- **Maquete da tela inteira:** gerada com a captura real do jogo e o alvo como referências, só para comparar e aprovar.
+  Nunca vai para o jogo.
+- **Texto nunca na imagem:** a Godot escreve todo texto com a Barlow Condensed (traduzível e no texto Maior).
+- **A prova de que chegou perto:** cada peça e cada tela lado a lado com o alvo, no Normal, no Maior e no daltonismo.
+
 ## Alvos aprovados da Estação (25/10/2026)
 
 O Lucas fez mais dois alvos no mesmo idioma da luta: a mesma chapa, o mesmo âmbar, a mesma letra, e as mesmas cores de
