@@ -82,8 +82,13 @@ func _make_slots() -> Array:
 		"text": tr("Do refúgio: +8 de vida. O que sobrar e o que se achar voltam ao refúgio.")})
 	if C.iris(campaign) != null:
 		var charges := C.ampoule_charges(campaign)
+		# No acampamento (decisão do Lucas, #98), o que se usa sai das cargas da próxima luta: a Mochila diz isso.
+		var text := tr("Habilidade do sapo: cura um aliado orgânico. Recarrega após uma vitória.")
+		if _camping():
+			text += " " + tr("No acampamento, cada uso sai das cargas da próxima luta.")
+		# O quadrado e o botão ficam curtos ("3 cargas", a Mochila não alarga); a linha do detalhe diz a próxima luta.
 		out.append({"id": "ampoule", "name": tr("Ampola de Reparo"), "icon": "item-ampoule", "count": tr("%d cargas") % charges, "group": 0,
-			"owned": charges > 0, "text": tr("Habilidade do sapo: cura um aliado orgânico. Recarrega após uma vitória.")})
+			"owned": charges > 0, "text": text, "detail": _charges_text(charges)})
 	var tools: Array = KNOWN_TOOLS.duplicate()
 	for tool in campaign.get("tools", []):
 		if not tools.has(tool):
@@ -144,7 +149,10 @@ func _detail() -> VBoxContainer:
 	var item: Dictionary = _slots.filter(func(s): return s.id == selected)[0]
 	box.add_child(H.make_label(item.name, 28, H.GOLD))
 	if item.count != "":
-		box.add_child(H.make_label(item.count, 19, H.TEXT))
+		var count := H.make_label(item.get("detail", item.count), 19, H.TEXT)
+		count.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		count.custom_minimum_size = Vector2(400, 0)
+		box.add_child(count)
 	var text := H.make_label(item.text, 17, H.MUTED)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(400, 0)
@@ -281,3 +289,14 @@ func cycle_hero(direction: int) -> void:
 	hero_id = team[(maxi(0, team.find(hero_id)) + direction + team.size()) % team.size()]
 	feedback = ""
 	_build()
+
+
+## Fora da luta, no acampamento: a Mochila mostra a ampola como as cargas que sobram para a próxima luta.
+func _camping() -> bool:
+	return session == null and String(Campaign.state.get("session", {}).get("screen", "")) == "rest"
+
+
+func _charges_text(charges: int) -> String:
+	if _camping():
+		return tr("%d cargas para a próxima luta") % charges if charges != 1 else tr("1 carga para a próxima luta")
+	return tr("%d cargas") % charges
