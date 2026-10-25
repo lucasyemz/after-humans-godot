@@ -1,5 +1,7 @@
 # Kit v2 — prancha de estilo para aprovação
 
+**[Ver agora as três variações de HUD em uso](../hud-variations.md)** — A ornamentada, B gráfica, C compacta; aguardam escolha do Lucas.
+
 **Etapa de direção de arte da #59. Aguarda aprovação do Lucas.** Segue [hud-direction.md](../hud-direction.md), incorporado de `origin/main` antes do desenho. As telas da #96 não foram refeitas nesta etapa.
 
 A proposta trata a interface como objetos feitos pelos sobreviventes: cobre e latão oxidados, ferragens rebitadas, madeira escura, papel gasto e vidro antigo. Cada material tem um papel; cada peça tem uma silhueta. O retrato ocupa a carta, as contagens ficam em medalhões, e a luz tem origem no mundo.
