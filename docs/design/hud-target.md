@@ -53,7 +53,7 @@ Não há nomes, números, retratos ou ícones de habilidade embutidos nessas mol
 
 ## Fonte e texto Maior
 
-Fonte: [barlow_condensed_semibold.ttf](../../art/ui/fonts/barlow_condensed_semibold.ttf), cerca de106KiB. [Licença SIL OFL1.1](../../art/ui/fonts/OFL-BarlowCondensed.txt), copyright The Barlow Project Authors; origem oficial [Google Fonts](https://github.com/google/fonts/tree/main/ofl/barlowcondensed). Não foi modificada a fonte ou sua licença. Família, caminho e SHA estão no manifesto.
+Fonte: [barlow_condensed_semibold.ttf](../../art/ui/fonts/barlow_condensed_semibold.ttf), cerca de106KiB. [Licença SIL OFL1.1](../../art/ui/fonts/OFL-BarlowCondensed.txt), copyright The Barlow Project Authors; origem oficial [Google Fonts](https://github.com/google/fonts/tree/main/ofl/barlowcondensed). O binário da fonte não foi modificado; o texto integral da licença foi preservado, normalizando apenas espaços finais. Família, caminho e SHA estão no manifesto.
 
 | Uso | Normal | Maior |
 |---|---|---|
