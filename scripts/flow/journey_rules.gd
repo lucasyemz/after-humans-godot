@@ -1036,14 +1036,23 @@ static func _camp_hero(campaign: Dictionary, hero_id: String):
 	return null
 
 
+## Quanto o comer do acampamento tira de instinto (a barra e a Mochila, decisão do Lucas, #98).
+const CAMP_MEAL_INSTINCT := 5
+
+
+## A cura do comer do acampamento: +10% da vida, mínimo 1.
+static func camp_meal_heal(max_hp: int) -> int:
+	return maxi(1, max_hp / 10)
+
+
 ## Comer no acampamento: +10% da vida (mínimo 1) e -5 de instinto; gasta uma comida.
 static func camp_use_food(campaign: Dictionary, hero_id: String) -> bool:
 	var hero = _camp_hero(campaign, hero_id)
 	if hero == null or food(campaign) <= 0 or (hero.hp >= hero.max_hp and hero.instinct <= 0):
 		return false
 	adjust(campaign, "food", -1)
-	hero.hp = mini(hero.max_hp, hero.hp + maxi(1, hero.max_hp / 10))
-	hero.instinct = clampi(hero.instinct - 5, 0, 200)
+	hero.hp = mini(hero.max_hp, hero.hp + camp_meal_heal(hero.max_hp))
+	hero.instinct = clampi(hero.instinct - CAMP_MEAL_INSTINCT, 0, 200)
 	return true
 
 

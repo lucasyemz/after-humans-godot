@@ -2235,6 +2235,9 @@ msgstr " · %d food"
 msgid " · %d comida"
 msgstr " · %d food"
 
+msgid " · %d instinto"
+msgstr " · %d instinct"
+
 #: scripts/ui/inventory_panel.gd:232
 msgid " · 1 curativo"
 msgstr " · 1 bandage"
@@ -2254,6 +2257,9 @@ msgstr " · +%d–%d health"
 #: scripts/ui/inventory_panel.gd:251
 msgid "%s recuperou %d de vida."
 msgstr "%s recovered %d health."
+
+msgid "%s se acalmou: %d de instinto."
+msgstr "%s calmed down: %d instinct."
 
 #: scripts/ui/inventory_panel.gd:255
 msgid "O item não pôde ser usado."

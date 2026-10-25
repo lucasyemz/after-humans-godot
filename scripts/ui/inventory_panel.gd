@@ -235,6 +235,8 @@ func _actions(id: String) -> Array:
 		var heal := ""
 		if q.heal_max > 0:
 			heal = tr(" · +%d vida") % q.heal_max if q.heal_min == q.heal_max else tr(" · +%d–%d vida") % [q.heal_min, q.heal_max]
+		if q.get("instinct", 0) < 0:
+			heal += tr(" · %d instinto") % q.instinct
 		out.append({"label": spec[1] + heal + cost, "enabled": q.available, "reason": q.reason, "run": _use.bind(kind)})
 	return out
 
@@ -244,11 +246,13 @@ func _use(kind: String) -> void:
 		combat_item.emit(kind)
 		return
 	var hero = Campaign.hero(hero_id)
+	var q := C.quote(Campaign.state, hero_id, kind)
 	var healed := C.use(Campaign.state, hero_id, kind)
-	if healed > 0:
+	if healed > 0 or (q.available and q.instinct < 0):
 		Campaign.save()
 		Sound.play("res://audio/ui/confirm.ogg")
-		feedback = tr("%s recuperou %d de vida.") % [hero.display_name, healed]
+		feedback = tr("%s recuperou %d de vida.") % [hero.display_name, healed] if healed > 0 \
+			else tr("%s se acalmou: %d de instinto.") % [hero.display_name, q.instinct]
 		used.emit()
 	else:
 		Sound.play("res://audio/ui/deny.ogg")

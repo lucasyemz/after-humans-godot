@@ -281,6 +281,7 @@ func _menu_in_camp() -> void:
 	t.equal(bag.hero_id, corridor.camp.selected_id(), "a Mochila abre no herói escolhido na fogueira")
 	var hurt = Campaign.hero(corridor.camp.selected_id())
 	hurt.hp = maxi(1, int(hurt.max_hp) / 2)
+	hurt.instinct = 40
 	var hp_before: int = hurt.hp
 	var food_before := AHJourneyRules.food(Campaign.state)
 	bag._build()
@@ -290,7 +291,9 @@ func _menu_in_camp() -> void:
 		eat.pressed.emit()
 		await _frames(2)
 	t.equal(AHJourneyRules.food(Campaign.state), food_before - 1, "o botão Comer pouco da Mochila gasta 1 de comida")
-	t.check(int(hurt.hp) > hp_before, "e cura o herói escolhido")
+	# O mesmo efeito da barra do acampamento (decisão do Lucas): +10% da vida e -5 de instinto.
+	t.equal(int(hurt.hp), hp_before + AHJourneyRules.camp_meal_heal(int(hurt.max_hp)), "e cura o mesmo que a barra (+10%)")
+	t.equal(int(hurt.instinct), 40 - AHJourneyRules.CAMP_MEAL_INSTINCT, "e tira o mesmo instinto que a barra (-5)")
 	var before: int = corridor.camp.selected
 	await _press("ui_right")
 	await _frames(3)
