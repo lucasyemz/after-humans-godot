@@ -1,0 +1,517 @@
+{
+  "source": "docs/design/combat-effects.md (tools/build_combat_effects.py)",
+  "effects": {
+    "hit_metal": {
+      "file": "res://art/combat/effects/hit_metal.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ],
+        [
+          1024,
+          0,
+          256,
+          256
+        ],
+        [
+          1280,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 12,
+      "loop": false
+    },
+    "hit_dust": {
+      "file": "res://art/combat/effects/hit_dust.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        208
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ],
+        [
+          1024,
+          0,
+          256,
+          256
+        ],
+        [
+          1280,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 12,
+      "loop": false
+    },
+    "critical": {
+      "file": "res://art/combat/effects/critical.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ],
+        [
+          1024,
+          0,
+          256,
+          256
+        ],
+        [
+          1280,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 12,
+      "loop": false
+    },
+    "healing": {
+      "file": "res://art/combat/effects/healing.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ],
+        [
+          1024,
+          0,
+          256,
+          256
+        ],
+        [
+          1280,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 12,
+      "loop": false
+    },
+    "block": {
+      "file": "res://art/combat/effects/block.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ],
+        [
+          1024,
+          0,
+          256,
+          256
+        ],
+        [
+          1280,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 12,
+      "loop": false
+    },
+    "dodge": {
+      "file": "res://art/combat/effects/dodge.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        192
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ],
+        [
+          1024,
+          0,
+          256,
+          256
+        ],
+        [
+          1280,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 12,
+      "loop": false
+    },
+    "status_bleeding_organic": {
+      "file": "res://art/combat/effects/status_bleeding_organic.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 4,
+      "loop": true
+    },
+    "status_bleeding_robot": {
+      "file": "res://art/combat/effects/status_bleeding_robot.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 4,
+      "loop": true
+    },
+    "status_poison": {
+      "file": "res://art/combat/effects/status_poison.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 4,
+      "loop": true
+    },
+    "status_stunned": {
+      "file": "res://art/combat/effects/status_stunned.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 4,
+      "loop": true
+    },
+    "status_marked": {
+      "file": "res://art/combat/effects/status_marked.webp",
+      "canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "body_reference_pixels": 256,
+      "frames": [
+        [
+          0,
+          0,
+          256,
+          256
+        ],
+        [
+          256,
+          0,
+          256,
+          256
+        ],
+        [
+          512,
+          0,
+          256,
+          256
+        ],
+        [
+          768,
+          0,
+          256,
+          256
+        ]
+      ],
+      "fps": 4,
+      "loop": true
+    }
+  }
+}
