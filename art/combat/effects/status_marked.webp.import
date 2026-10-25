@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c6rjxhffhdsgf"
-path="res://.godot/imported/status_marked.png-e93a2d95b9dd34d925953ca281ad770b.ctex"
+uid="uid://t321amk0niok"
+path="res://.godot/imported/status_marked.webp-feb9819db7f83cd380902aa55b393af6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/combat/effects/status_marked.png"
-dest_files=["res://.godot/imported/status_marked.png-e93a2d95b9dd34d925953ca281ad770b.ctex"]
+source_file="res://art/combat/effects/status_marked.webp"
+dest_files=["res://.godot/imported/status_marked.webp-feb9819db7f83cd380902aa55b393af6.ctex"]
 
 [params]
 

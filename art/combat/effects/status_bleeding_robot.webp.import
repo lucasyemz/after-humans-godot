@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ew7ep7qq2a6o"
-path="res://.godot/imported/critical.png-c9170f4e031a893f8164874872873b6c.ctex"
+uid="uid://ds3pn6ogh8g8l"
+path="res://.godot/imported/status_bleeding_robot.webp-c66312aa62a6f4d9299f4bc6487b49e9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/combat/effects/critical.png"
-dest_files=["res://.godot/imported/critical.png-c9170f4e031a893f8164874872873b6c.ctex"]
+source_file="res://art/combat/effects/status_bleeding_robot.webp"
+dest_files=["res://.godot/imported/status_bleeding_robot.webp-c66312aa62a6f4d9299f4bc6487b49e9.ctex"]
 
 [params]
 

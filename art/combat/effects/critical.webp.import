@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2f6rbbr8hcw6"
-path="res://.godot/imported/hit_metal.png-129a43082293e8525ba7dba75d343281.ctex"
+uid="uid://cufk08j1mg8o3"
+path="res://.godot/imported/critical.webp-d07def8d4c7576b918d0cb11643fac80.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/combat/effects/hit_metal.png"
-dest_files=["res://.godot/imported/hit_metal.png-129a43082293e8525ba7dba75d343281.ctex"]
+source_file="res://art/combat/effects/critical.webp"
+dest_files=["res://.godot/imported/critical.webp-d07def8d4c7576b918d0cb11643fac80.ctex"]
 
 [params]
 
