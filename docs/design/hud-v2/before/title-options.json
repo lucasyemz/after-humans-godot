@@ -1,0 +1,346 @@
+{
+  "name": "title-options",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@Label@69",
+      "rect": [
+        620.0,
+        134.0,
+        672.0,
+        42.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@Label@71",
+      "rect": [
+        620.0,
+        200.0,
+        672.0,
+        28.0
+      ],
+      "text": "Som"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HBoxContainer@72/@Label@73",
+      "rect": [
+        620.0,
+        241.0,
+        150.0,
+        25.0
+      ],
+      "text": "Música"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HBoxContainer@72/@Label@75",
+      "rect": [
+        1194.0,
+        241.0,
+        70.0,
+        25.0
+      ],
+      "text": "60%"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HBoxContainer@76/@Label@77",
+      "rect": [
+        620.0,
+        283.0,
+        150.0,
+        25.0
+      ],
+      "text": "Ambiente"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HBoxContainer@76/@Label@79",
+      "rect": [
+        1194.0,
+        283.0,
+        70.0,
+        25.0
+      ],
+      "text": "60%"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HBoxContainer@80/@Label@81",
+      "rect": [
+        620.0,
+        325.0,
+        150.0,
+        25.0
+      ],
+      "text": "Efeitos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HBoxContainer@80/@Label@83",
+      "rect": [
+        1194.0,
+        325.0,
+        70.0,
+        25.0
+      ],
+      "text": "60%"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@Label@85",
+      "rect": [
+        620.0,
+        378.0,
+        672.0,
+        28.0
+      ],
+      "text": "Gráficos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@86/@Button@87",
+      "rect": [
+        620.0,
+        416.0,
+        120.0,
+        46.0
+      ],
+      "text": "Baixo"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@86/@Button@88",
+      "rect": [
+        746.0,
+        416.0,
+        120.0,
+        46.0
+      ],
+      "text": "Médio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@86/@Button@89",
+      "rect": [
+        872.0,
+        416.0,
+        120.0,
+        46.0
+      ],
+      "text": "▸ Alto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@86/@Button@90",
+      "rect": [
+        998.0,
+        416.0,
+        120.0,
+        46.0
+      ],
+      "text": "Ultra"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@Label@91",
+      "rect": [
+        620.0,
+        472.0,
+        672.0,
+        21.0
+      ],
+      "text": "Qualidade: resolução interna, sombras, oclusão, neblina e quantidade de chuva."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@CheckButton@92",
+      "rect": [
+        620.0,
+        503.0,
+        672.0,
+        33.0
+      ],
+      "text": "Tela cheia"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@CheckButton@93",
+      "rect": [
+        620.0,
+        546.0,
+        672.0,
+        33.0
+      ],
+      "text": "Sincronia vertical (vsync)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@Label@95",
+      "rect": [
+        620.0,
+        603.0,
+        672.0,
+        28.0
+      ],
+      "text": "Jogo"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@96/@Label@97",
+      "rect": [
+        620.0,
+        651.0,
+        260.0,
+        25.0
+      ],
+      "text": "Velocidade da batalha"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@96/@Button@98",
+      "rect": [
+        886.0,
+        641.0,
+        120.0,
+        46.0
+      ],
+      "text": "▸ 1x"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@96/@Button@99",
+      "rect": [
+        1012.0,
+        641.0,
+        120.0,
+        46.0
+      ],
+      "text": "2x"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@CheckButton@100",
+      "rect": [
+        620.0,
+        697.0,
+        672.0,
+        33.0
+      ],
+      "text": "Reduzir efeitos (clima, tremor e clarão)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@CheckButton@101",
+      "rect": [
+        620.0,
+        740.0,
+        672.0,
+        33.0
+      ],
+      "text": "Dicas da primeira vez"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@CheckButton@102",
+      "rect": [
+        620.0,
+        783.0,
+        672.0,
+        33.0
+      ],
+      "text": "Cores para daltonismo (azul e laranja)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@103/@Label@104",
+      "rect": [
+        620.0,
+        836.0,
+        260.0,
+        25.0
+      ],
+      "text": "Tamanho do texto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@103/@Button@105",
+      "rect": [
+        886.0,
+        826.0,
+        120.0,
+        46.0
+      ],
+      "text": "▸ Normal"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@103/@Button@106",
+      "rect": [
+        1012.0,
+        826.0,
+        120.0,
+        46.0
+      ],
+      "text": "Grande"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@103/@Button@107",
+      "rect": [
+        1138.0,
+        826.0,
+        120.0,
+        46.0
+      ],
+      "text": "Maior"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@108/@Label@109",
+      "rect": [
+        620.0,
+        892.0,
+        260.0,
+        25.0
+      ],
+      "text": "Idioma"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@108/@Button@110",
+      "rect": [
+        886.0,
+        882.0,
+        137.0,
+        46.0
+      ],
+      "text": "▸ Português"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@HFlowContainer@108/@Button@111",
+      "rect": [
+        1029.0,
+        882.0,
+        191.0,
+        46.0
+      ],
+      "text": "English (em teste)"
+    },
+    {
+      "clipped": true,
+      "path": "/root/Title/@PanelContainer@63/@VBoxContainer@64/@ScrollContainer@67/@VBoxContainer@68/@Button@112",
+      "rect": [
+        620.0,
+        938.0,
+        672.0,
+        46.0
+      ],
+      "text": "Mostrar as dicas de novo"
+    }
+  ]
+}

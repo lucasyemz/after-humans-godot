@@ -1,0 +1,436 @@
+{
+  "revision": "detail_pass_2026_10_25",
+  "direction": "Approved target2026-10-25; overrides ornamental C",
+  "source_reference": "docs/design/reference/hud-target-2026-10-25.webp",
+  "source_sha256": "8060bc637f5af10340f30b15ab7d7ac5e1d8dab3bf90366f8f995f894481b124",
+  "canvas": [
+    1920,
+    1080
+  ],
+  "assets": {
+    "panel": {
+      "file": "art/ui/kit/combat/panel.webp",
+      "size": [
+        256,
+        80
+      ],
+      "nine_slice_ltrb": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "content_xywh": [
+        24,
+        16,
+        208,
+        48
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "1cb90e03e411cbf0592f55fe34709077e5a8a503ecfcda3f1bcaf068982f0e92"
+    },
+    "register": {
+      "file": "art/ui/kit/combat/register.webp",
+      "size": [
+        272,
+        64
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": [
+        24,
+        12,
+        224,
+        40
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "276eef963993d3dffbcbbc38450fe424decdc9b94e633700869e31ab79e5aec6"
+    },
+    "round_strip": {
+      "file": "art/ui/kit/combat/round_strip.webp",
+      "size": [
+        720,
+        72
+      ],
+      "nine_slice_ltrb": [
+        24,
+        16,
+        24,
+        16
+      ],
+      "content_xywh": [
+        24,
+        8,
+        672,
+        56
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "0814d80a03075b834001a27c0529463dee99ee0bd56788e7c7e04a8f91bf2026"
+    },
+    "square_portrait": {
+      "file": "art/ui/kit/combat/square_portrait.webp",
+      "size": [
+        72,
+        72
+      ],
+      "nine_slice_ltrb": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "content_xywh": [
+        4,
+        4,
+        64,
+        64
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "50916709131dfb1e8f55c3ec9336e13f9c3994ad4521ac27d79cd1940b48af1f"
+    },
+    "hero_panel": {
+      "file": "art/ui/kit/combat/hero_panel.webp",
+      "size": [
+        564,
+        212
+      ],
+      "nine_slice_ltrb": [
+        224,
+        24,
+        24,
+        24
+      ],
+      "content_xywh": [
+        232,
+        40,
+        308,
+        152
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Keep height212; left224 protects the portrait column. Portrait content184x184 at12,12.",
+      "sha256": "e14b07317703d9757f8151f14aa9db1cd7dcdf8ccd2931e6964c09bb82543cc8"
+    },
+    "ability_header": {
+      "file": "art/ui/kit/combat/ability_header.webp",
+      "size": [
+        624,
+        56
+      ],
+      "nine_slice_ltrb": [
+        20,
+        12,
+        20,
+        12
+      ],
+      "content_xywh": [
+        12,
+        8,
+        600,
+        40
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "cb73b2811262f6e5f452f32d05ddbb42e48dd38875f0b9a19757ca611156154a"
+    },
+    "target_tab": {
+      "file": "art/ui/kit/combat/target_tab.webp",
+      "size": [
+        336,
+        40
+      ],
+      "nine_slice_ltrb": [
+        16,
+        12,
+        16,
+        12
+      ],
+      "content_xywh": [
+        16,
+        6,
+        304,
+        28
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "5f61cce31f659e4736e7703346bb2daaa8da6ed4641445a31888bc8e7a828d60"
+    },
+    "action_button": {
+      "file": "art/ui/kit/combat/action_button.webp",
+      "size": [
+        128,
+        100
+      ],
+      "nine_slice_ltrb": [
+        14,
+        14,
+        14,
+        14
+      ],
+      "content_xywh": [
+        14,
+        12,
+        100,
+        76
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "109389b958318f5a8a5a397c475896968d305ec3319c9613b485a95d2ef58635"
+    },
+    "key_tab": {
+      "file": "art/ui/kit/combat/key_tab.webp",
+      "size": [
+        42,
+        42
+      ],
+      "nine_slice_ltrb": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "content_xywh": [
+        5,
+        4,
+        32,
+        34
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "c71ffb17e8d7bc29821166f86a1d038932dc7626b82bd9f7965e8bef2b0d0943"
+    },
+    "ability_slot": {
+      "file": "art/ui/kit/combat/ability_slot.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        8,
+        8,
+        116,
+        116
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "fc73845356ddd4c62cad2e1262b93f1d47ab40d7dc66d5bf535f370f701fe882"
+    },
+    "health_ally": {
+      "file": "art/ui/kit/combat/health_ally.webp",
+      "size": [
+        200,
+        44
+      ],
+      "nine_slice_ltrb": [
+        20,
+        12,
+        20,
+        12
+      ],
+      "content_xywh": [
+        14,
+        6,
+        172,
+        34
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Reference-specific inset rim; ally top tab / enemy cut. No baked values or fill.",
+      "sha256": "245a7aee4e635a5f53d0ff7d15331151f37e3e0c0dfcbedc9600bf1b8641054c"
+    },
+    "health_enemy": {
+      "file": "art/ui/kit/combat/health_enemy.webp",
+      "size": [
+        200,
+        44
+      ],
+      "nine_slice_ltrb": [
+        20,
+        12,
+        20,
+        12
+      ],
+      "content_xywh": [
+        14,
+        6,
+        172,
+        34
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Reference-specific inset rim; ally top tab / enemy cut. No baked values or fill.",
+      "sha256": "d43c2b9927cd1d828bacbed936612813e5be9c519530e6212ada28edfc220add"
+    },
+    "main_bar": {
+      "file": "art/ui/kit/combat/main_bar.webp",
+      "size": [
+        320,
+        44
+      ],
+      "nine_slice_ltrb": [
+        12,
+        10,
+        12,
+        10
+      ],
+      "content_xywh": [
+        8,
+        6,
+        304,
+        32
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "1868fbd72e26982414e4b8e9c4380ef15a199ce117651f41a4d1c68697cf4c73"
+    },
+    "selected_slot": {
+      "file": "art/ui/kit/combat/selected_slot.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        28,
+        28,
+        28,
+        28
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Amber corner selection, separate from base texture.",
+      "sha256": "c9a439f45aa02ab35531b65588a6c7c9f300d0e220a90ed7efe5c694e0682409"
+    },
+    "active_health": {
+      "file": "art/ui/kit/combat/active_health.webp",
+      "size": [
+        200,
+        44
+      ],
+      "nine_slice_ltrb": [
+        28,
+        12,
+        28,
+        12
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Amber corner selection, separate from base texture.",
+      "sha256": "42ef28782d07563405e3110d905135c1ca574569cb85055308ba5f608bb18f3d"
+    },
+    "actor_ring": {
+      "file": "art/ui/kit/combat/actor_ring.webp",
+      "size": [
+        256,
+        80
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        128,
+        40
+      ],
+      "note": "Generated amber hot-core ring; no9-slice. Place under feet with depth test. Center128,40.",
+      "sha256": "4c29024afc4060f0f197bfd0b51f91a9d994649ffe97f341aaacaf7bed1793af"
+    },
+    "exit": {
+      "file": "art/ui/kit/combat/exit.webp",
+      "size": [
+        64,
+        64
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        32,
+        32
+      ],
+      "note": "Reused approved exit symbol; F is combat_flee, never a crosshair.",
+      "sha256": "3f778031eb43739712b7c4c3b95372142054a062630209c2b5cd4c31056ef8a4"
+    },
+    "steel_material": {
+      "file": "art/ui/kit/combat/steel_material.webp",
+      "size": [
+        512,
+        512
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Repeat material; never stretch frame corners.",
+      "sha256": "4bb9a29414319aa78ac1d0ea848d895e9271573694da2746fa2203158fd7d224"
+    }
+  },
+  "font": {
+    "file": "art/ui/fonts/barlow_condensed_medium.ttf",
+    "emphasis_file": "art/ui/fonts/barlow_condensed_semibold.ttf",
+    "license": "art/ui/fonts/OFL-BarlowCondensed.txt",
+    "source": "https://github.com/google/fonts/tree/main/ofl/barlowcondensed",
+    "sha256": "262bd143292ce479ee0cd09a42b47ab173fca8e9c6eb5ed0b5c8a845bc371d17",
+    "case": "UPPERCASE"
+  },
+  "originals": "Generated material PNG outside repository; no heavy masters committed"
+}

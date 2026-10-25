@@ -1,0 +1,3728 @@
+{
+  "source": "docs/design/loop-screens/before/combat_clean.webp",
+  "source_sha256": "bf735a1e870ba7a874720b90adbc7f76ebbbba4b6ee811291b6f82d1a5d4e6ba",
+  "reference": "docs/design/reference/hud-target-2026-10-25.webp",
+  "reference_sha256": "8060bc637f5af10340f30b15ab7d7ac5e1d8dab3bf90366f8f995f894481b124",
+  "profiles": [
+    {
+      "file": "hud.webp",
+      "large": false,
+      "colorblind": false,
+      "labels": [
+        {
+          "text": "REGISTRO",
+          "size": 30,
+          "role": "label",
+          "box": [
+            86,
+            42,
+            162,
+            44
+          ],
+          "rect": [
+            86,
+            53.0,
+            99.921875,
+            22
+          ],
+          "fits": true
+        },
+        {
+          "text": "L",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            258,
+            44,
+            34,
+            34
+          ],
+          "rect": [
+            269.7109375,
+            51.5,
+            10.578125,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "RODADA 1",
+          "size": 30,
+          "role": "label",
+          "box": [
+            660,
+            39,
+            160,
+            50
+          ],
+          "rect": [
+            660,
+            53.0,
+            94.46875,
+            22
+          ],
+          "fits": true
+        },
+        {
+          "text": "34/34",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            910,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            968.96875,
+            780.0,
+            54.0625,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "24/24",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            682,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            741.046875,
+            780.0,
+            53.90625,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "23/23",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            456,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            515.609375,
+            780.0,
+            52.78125,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "30/30",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            231,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            289.78125,
+            780.0,
+            54.4375,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "8/8",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            1281,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            1351.125,
+            780.0,
+            31.75,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "6/6",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            1531,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            1601.359375,
+            780.0,
+            31.28125,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "RECREADOR",
+          "size": 26,
+          "role": "label",
+          "box": [
+            1292,
+            350,
+            152,
+            37
+          ],
+          "rect": [
+            1315.171875,
+            359.0,
+            105.65625,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "NICK",
+          "size": 40,
+          "role": "hero_name",
+          "box": [
+            296,
+            878,
+            300,
+            48
+          ],
+          "rect": [
+            296,
+            888.0,
+            66.59375,
+            28
+          ],
+          "fits": true
+        },
+        {
+          "text": "24/24",
+          "size": 32,
+          "role": "hp",
+          "box": [
+            300,
+            944,
+            292,
+            32
+          ],
+          "rect": [
+            412.8359375,
+            948.5,
+            66.328125,
+            23
+          ],
+          "fits": true
+        },
+        {
+          "text": "0/200",
+          "size": 32,
+          "role": "instinct",
+          "box": [
+            300,
+            992,
+            292,
+            32
+          ],
+          "rect": [
+            412.109375,
+            996.5,
+            67.78125,
+            23
+          ],
+          "fits": true
+        },
+        {
+          "text": "ESCOLHA UM ALVO",
+          "size": 26,
+          "role": "label",
+          "box": [
+            872,
+            820,
+            304,
+            30
+          ],
+          "rect": [
+            872,
+            825.5,
+            162.4375,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "CORTE DE FASE",
+          "size": 32,
+          "role": "label",
+          "box": [
+            754,
+            858,
+            420,
+            44
+          ],
+          "rect": [
+            754,
+            868.5,
+            165.703125,
+            23
+          ],
+          "fits": true
+        },
+        {
+          "text": "4–6",
+          "size": 28,
+          "role": "range",
+          "box": [
+            1204,
+            858,
+            88,
+            44
+          ],
+          "rect": [
+            1230.7109375,
+            870.0,
+            34.578125,
+            20
+          ],
+          "fits": true
+        },
+        {
+          "text": "1",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            782,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            795.5390625,
+            1017.5,
+            6.921875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "2",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            942,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            953.6015625,
+            1017.5,
+            10.796875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "3",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1102,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            1113.5625,
+            1017.5,
+            10.875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "4",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1262,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            1273.28125,
+            1017.5,
+            11.4375,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "Q",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1666,
+            894,
+            34,
+            34
+          ],
+          "rect": [
+            1677.1484375,
+            900.0,
+            11.703125,
+            22
+          ],
+          "fits": true
+        },
+        {
+          "text": "W",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1802,
+            894,
+            34,
+            34
+          ],
+          "rect": [
+            1810.6015625,
+            901.5,
+            16.796875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "I",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1666,
+            1006,
+            34,
+            34
+          ],
+          "rect": [
+            1680.140625,
+            1013.5,
+            5.71875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "F",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1802,
+            1006,
+            34,
+            34
+          ],
+          "rect": [
+            1813.671875,
+            1013.5,
+            10.65625,
+            19
+          ],
+          "fits": true
+        }
+      ],
+      "pieces": [
+        {
+          "part": "register",
+          "rect": [
+            46,
+            32,
+            272,
+            64
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            254,
+            40,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "round_strip",
+          "rect": [
+            636,
+            30,
+            720,
+            64
+          ]
+        },
+        {
+          "part": "register",
+          "rect": [
+            636,
+            30,
+            184,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            864,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            940,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1016,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1092,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1168,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1244,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            896,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            668,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "active_health",
+          "rect": [
+            668,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            442,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            217,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_enemy",
+          "rect": [
+            1267,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_enemy",
+          "rect": [
+            1517,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "target_tab",
+          "rect": [
+            1280,
+            348,
+            176,
+            56
+          ]
+        },
+        {
+          "part": "hero_panel",
+          "rect": [
+            64,
+            836,
+            564,
+            212
+          ]
+        },
+        {
+          "part": "main_bar",
+          "rect": [
+            292,
+            940,
+            308,
+            40
+          ]
+        },
+        {
+          "part": "main_bar",
+          "rect": [
+            292,
+            988,
+            308,
+            40
+          ]
+        },
+        {
+          "part": "target_tab",
+          "rect": [
+            856,
+            816,
+            336,
+            40
+          ]
+        },
+        {
+          "part": "ability_header",
+          "rect": [
+            684,
+            852,
+            624,
+            56
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            688,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "selected_slot",
+          "rect": [
+            688,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            778,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            848,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            938,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            1008,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1098,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            1168,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1258,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1584,
+            836,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1662,
+            890,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1720,
+            836,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1798,
+            890,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1584,
+            948,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1662,
+            1002,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1720,
+            948,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1798,
+            1002,
+            42,
+            42
+          ]
+        }
+      ],
+      "hits": [
+        {
+          "id": "combat_log",
+          "rect": [
+            46,
+            24,
+            272,
+            112
+          ]
+        },
+        {
+          "id": "inspect_actor",
+          "rect": [
+            64,
+            836,
+            208,
+            212
+          ]
+        },
+        {
+          "id": "gato_corte_fase",
+          "rect": [
+            688,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_salto_entre_ruinas",
+          "rect": [
+            848,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_sumir_na_sombra",
+          "rect": [
+            1008,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_cacada_precisa",
+          "rect": [
+            1168,
+            916,
+            140,
+            140
+          ],
+          "disabled": true,
+          "reason": "Sem alvo válido"
+        },
+        {
+          "id": "combat_move",
+          "rect": [
+            1584,
+            830,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "combat_defend",
+          "rect": [
+            1720,
+            830,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "inventory",
+          "rect": [
+            1584,
+            942,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "combat_flee",
+          "rect": [
+            1720,
+            942,
+            128,
+            112
+          ]
+        }
+      ],
+      "ring": {
+        "center": [
+          768,
+          756
+        ],
+        "rect": [
+          644,
+          724,
+          248,
+          64
+        ],
+        "occlusion": "boots mask in frozen composition; depth-tested under unit in game"
+      },
+      "order": [
+        "unit_hero_gato_nick",
+        "unit_hero_sapo_iris",
+        "corridor_1117577169_2_1_sussurrador",
+        "unit_hero_cao_bento",
+        "unit_hero_coruja_vespera",
+        "corridor_1117577169_2_0_recreador"
+      ],
+      "unchanged_ability_art": {
+        "art/combat/icons/gato_corte_fase.webp": "d196b0aedda8fb4ef1596b25c830c41ec338a493a596a6f4de34e368d947d5d7",
+        "art/combat/icons/gato_salto_entre_ruinas.webp": "8a23b785022982be97f9876b0facf40f0cd29a8f8ca28bdcc939383b51758238",
+        "art/combat/icons/gato_sumir_na_sombra.webp": "32e72a10b93fc33f320cebf280efb2318f17f34adacf9e3eef685b519a30868b",
+        "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
+      },
+      "overflows": [],
+      "sha256": "9839f5a1fd8f8c5c1573e190cb2c8c2ef3952d046bb9ef1598f89d2d600aa06a"
+    },
+    {
+      "file": "hud_large.webp",
+      "large": true,
+      "colorblind": false,
+      "labels": [
+        {
+          "text": "REGISTRO",
+          "size": 39,
+          "role": "label",
+          "box": [
+            86,
+            42,
+            162,
+            44
+          ],
+          "rect": [
+            86,
+            50.5,
+            129.921875,
+            27
+          ],
+          "fits": true
+        },
+        {
+          "text": "L",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            258,
+            44,
+            34,
+            34
+          ],
+          "rect": [
+            268.078125,
+            49.0,
+            13.84375,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "RODADA 1",
+          "size": 39,
+          "role": "label",
+          "box": [
+            660,
+            39,
+            160,
+            50
+          ],
+          "rect": [
+            660,
+            50.5,
+            122.828125,
+            27
+          ],
+          "fits": true
+        },
+        {
+          "text": "34/34",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            910,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            960.65625,
+            777.5,
+            70.6875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "24/24",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            682,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            732.765625,
+            777.5,
+            70.46875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "23/23",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            456,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            507.5,
+            777.5,
+            69.0,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "30/30",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            231,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            281.40625,
+            777.5,
+            71.1875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "8/8",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            1281,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            1346.234375,
+            777.5,
+            41.53125,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "6/6",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            1531,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            1596.546875,
+            777.5,
+            40.90625,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "RECREADOR",
+          "size": 34,
+          "role": "label",
+          "box": [
+            1292,
+            350,
+            152,
+            37
+          ],
+          "rect": [
+            1298.9140625,
+            356.5,
+            138.171875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "NICK",
+          "size": 52,
+          "role": "hero_name",
+          "box": [
+            296,
+            878,
+            300,
+            48
+          ],
+          "rect": [
+            296,
+            884.0,
+            86.5625,
+            36
+          ],
+          "fits": true
+        },
+        {
+          "text": "24/24",
+          "size": 42,
+          "role": "hp",
+          "box": [
+            300,
+            944,
+            292,
+            32
+          ],
+          "rect": [
+            402.453125,
+            945.0,
+            87.09375,
+            30
+          ],
+          "fits": true
+        },
+        {
+          "text": "0/200",
+          "size": 42,
+          "role": "instinct",
+          "box": [
+            300,
+            992,
+            292,
+            32
+          ],
+          "rect": [
+            401.484375,
+            993.0,
+            89.03125,
+            30
+          ],
+          "fits": true
+        },
+        {
+          "text": "ESCOLHA UM ALVO",
+          "size": 34,
+          "role": "label",
+          "box": [
+            872,
+            820,
+            304,
+            30
+          ],
+          "rect": [
+            872,
+            823.0,
+            212.40625,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "CORTE DE FASE",
+          "size": 42,
+          "role": "label",
+          "box": [
+            754,
+            858,
+            420,
+            44
+          ],
+          "rect": [
+            754,
+            865.0,
+            217.453125,
+            30
+          ],
+          "fits": true
+        },
+        {
+          "text": "4–6",
+          "size": 36,
+          "role": "range",
+          "box": [
+            1204,
+            858,
+            88,
+            44
+          ],
+          "rect": [
+            1225.765625,
+            867.0,
+            44.46875,
+            26
+          ],
+          "fits": true
+        },
+        {
+          "text": "1",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            782,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            794.4765625,
+            1015.0,
+            9.046875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "2",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            942,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            951.9453125,
+            1015.0,
+            14.109375,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "3",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1102,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            1111.890625,
+            1015.0,
+            14.21875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "4",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1262,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            1271.5234375,
+            1015.0,
+            14.953125,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "Q",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1666,
+            894,
+            34,
+            34
+          ],
+          "rect": [
+            1675.3515625,
+            897.0,
+            15.296875,
+            28
+          ],
+          "fits": true
+        },
+        {
+          "text": "W",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1802,
+            894,
+            34,
+            34
+          ],
+          "rect": [
+            1808.015625,
+            899.0,
+            21.96875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "I",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1666,
+            1006,
+            34,
+            34
+          ],
+          "rect": [
+            1679.2578125,
+            1011.0,
+            7.484375,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "F",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1802,
+            1006,
+            34,
+            34
+          ],
+          "rect": [
+            1812.03125,
+            1011.0,
+            13.9375,
+            24
+          ],
+          "fits": true
+        }
+      ],
+      "pieces": [
+        {
+          "part": "register",
+          "rect": [
+            46,
+            32,
+            272,
+            64
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            254,
+            40,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "round_strip",
+          "rect": [
+            636,
+            30,
+            720,
+            64
+          ]
+        },
+        {
+          "part": "register",
+          "rect": [
+            636,
+            30,
+            184,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            864,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            940,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1016,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1092,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1168,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1244,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            896,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            668,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "active_health",
+          "rect": [
+            668,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            442,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            217,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_enemy",
+          "rect": [
+            1267,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_enemy",
+          "rect": [
+            1517,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "target_tab",
+          "rect": [
+            1280,
+            348,
+            176,
+            56
+          ]
+        },
+        {
+          "part": "hero_panel",
+          "rect": [
+            64,
+            836,
+            564,
+            212
+          ]
+        },
+        {
+          "part": "main_bar",
+          "rect": [
+            292,
+            940,
+            308,
+            40
+          ]
+        },
+        {
+          "part": "main_bar",
+          "rect": [
+            292,
+            988,
+            308,
+            40
+          ]
+        },
+        {
+          "part": "target_tab",
+          "rect": [
+            856,
+            816,
+            336,
+            40
+          ]
+        },
+        {
+          "part": "ability_header",
+          "rect": [
+            684,
+            852,
+            624,
+            56
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            688,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "selected_slot",
+          "rect": [
+            688,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            778,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            848,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            938,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            1008,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1098,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            1168,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1258,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1584,
+            836,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1662,
+            890,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1720,
+            836,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1798,
+            890,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1584,
+            948,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1662,
+            1002,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1720,
+            948,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1798,
+            1002,
+            42,
+            42
+          ]
+        }
+      ],
+      "hits": [
+        {
+          "id": "combat_log",
+          "rect": [
+            46,
+            24,
+            272,
+            112
+          ]
+        },
+        {
+          "id": "inspect_actor",
+          "rect": [
+            64,
+            836,
+            208,
+            212
+          ]
+        },
+        {
+          "id": "gato_corte_fase",
+          "rect": [
+            688,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_salto_entre_ruinas",
+          "rect": [
+            848,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_sumir_na_sombra",
+          "rect": [
+            1008,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_cacada_precisa",
+          "rect": [
+            1168,
+            916,
+            140,
+            140
+          ],
+          "disabled": true,
+          "reason": "Sem alvo válido"
+        },
+        {
+          "id": "combat_move",
+          "rect": [
+            1584,
+            830,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "combat_defend",
+          "rect": [
+            1720,
+            830,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "inventory",
+          "rect": [
+            1584,
+            942,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "combat_flee",
+          "rect": [
+            1720,
+            942,
+            128,
+            112
+          ]
+        }
+      ],
+      "ring": {
+        "center": [
+          768,
+          756
+        ],
+        "rect": [
+          644,
+          724,
+          248,
+          64
+        ],
+        "occlusion": "boots mask in frozen composition; depth-tested under unit in game"
+      },
+      "order": [
+        "unit_hero_gato_nick",
+        "unit_hero_sapo_iris",
+        "corridor_1117577169_2_1_sussurrador",
+        "unit_hero_cao_bento",
+        "unit_hero_coruja_vespera",
+        "corridor_1117577169_2_0_recreador"
+      ],
+      "unchanged_ability_art": {
+        "art/combat/icons/gato_corte_fase.webp": "d196b0aedda8fb4ef1596b25c830c41ec338a493a596a6f4de34e368d947d5d7",
+        "art/combat/icons/gato_salto_entre_ruinas.webp": "8a23b785022982be97f9876b0facf40f0cd29a8f8ca28bdcc939383b51758238",
+        "art/combat/icons/gato_sumir_na_sombra.webp": "32e72a10b93fc33f320cebf280efb2318f17f34adacf9e3eef685b519a30868b",
+        "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
+      },
+      "overflows": [],
+      "sha256": "624d5efa9385e667ecd6fbfb6395fa9cd4f4ed3c942727fc71969847314772ac"
+    },
+    {
+      "file": "hud_colorblind.webp",
+      "large": false,
+      "colorblind": true,
+      "labels": [
+        {
+          "text": "REGISTRO",
+          "size": 30,
+          "role": "label",
+          "box": [
+            86,
+            42,
+            162,
+            44
+          ],
+          "rect": [
+            86,
+            53.0,
+            99.921875,
+            22
+          ],
+          "fits": true
+        },
+        {
+          "text": "L",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            258,
+            44,
+            34,
+            34
+          ],
+          "rect": [
+            269.7109375,
+            51.5,
+            10.578125,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "RODADA 1",
+          "size": 30,
+          "role": "label",
+          "box": [
+            660,
+            39,
+            160,
+            50
+          ],
+          "rect": [
+            660,
+            53.0,
+            94.46875,
+            22
+          ],
+          "fits": true
+        },
+        {
+          "text": "34/34",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            910,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            968.96875,
+            780.0,
+            54.0625,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "24/24",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            682,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            741.046875,
+            780.0,
+            53.90625,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "23/23",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            456,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            515.609375,
+            780.0,
+            52.78125,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "30/30",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            231,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            289.78125,
+            780.0,
+            54.4375,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "8/8",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            1281,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            1351.125,
+            780.0,
+            31.75,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "6/6",
+          "size": 26,
+          "role": "hp",
+          "box": [
+            1531,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            1601.359375,
+            780.0,
+            31.28125,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "RECREADOR",
+          "size": 26,
+          "role": "label",
+          "box": [
+            1292,
+            350,
+            152,
+            37
+          ],
+          "rect": [
+            1315.171875,
+            359.0,
+            105.65625,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "NICK",
+          "size": 40,
+          "role": "hero_name",
+          "box": [
+            296,
+            878,
+            300,
+            48
+          ],
+          "rect": [
+            296,
+            888.0,
+            66.59375,
+            28
+          ],
+          "fits": true
+        },
+        {
+          "text": "24/24",
+          "size": 32,
+          "role": "hp",
+          "box": [
+            300,
+            944,
+            292,
+            32
+          ],
+          "rect": [
+            412.8359375,
+            948.5,
+            66.328125,
+            23
+          ],
+          "fits": true
+        },
+        {
+          "text": "0/200",
+          "size": 32,
+          "role": "instinct",
+          "box": [
+            300,
+            992,
+            292,
+            32
+          ],
+          "rect": [
+            412.109375,
+            996.5,
+            67.78125,
+            23
+          ],
+          "fits": true
+        },
+        {
+          "text": "ESCOLHA UM ALVO",
+          "size": 26,
+          "role": "label",
+          "box": [
+            872,
+            820,
+            304,
+            30
+          ],
+          "rect": [
+            872,
+            825.5,
+            162.4375,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "CORTE DE FASE",
+          "size": 32,
+          "role": "label",
+          "box": [
+            754,
+            858,
+            420,
+            44
+          ],
+          "rect": [
+            754,
+            868.5,
+            165.703125,
+            23
+          ],
+          "fits": true
+        },
+        {
+          "text": "4–6",
+          "size": 28,
+          "role": "range",
+          "box": [
+            1204,
+            858,
+            88,
+            44
+          ],
+          "rect": [
+            1230.7109375,
+            870.0,
+            34.578125,
+            20
+          ],
+          "fits": true
+        },
+        {
+          "text": "1",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            782,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            795.5390625,
+            1017.5,
+            6.921875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "2",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            942,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            953.6015625,
+            1017.5,
+            10.796875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "3",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1102,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            1113.5625,
+            1017.5,
+            10.875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "4",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1262,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            1273.28125,
+            1017.5,
+            11.4375,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "Q",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1666,
+            894,
+            34,
+            34
+          ],
+          "rect": [
+            1677.1484375,
+            900.0,
+            11.703125,
+            22
+          ],
+          "fits": true
+        },
+        {
+          "text": "W",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1802,
+            894,
+            34,
+            34
+          ],
+          "rect": [
+            1810.6015625,
+            901.5,
+            16.796875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "I",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1666,
+            1006,
+            34,
+            34
+          ],
+          "rect": [
+            1680.140625,
+            1013.5,
+            5.71875,
+            19
+          ],
+          "fits": true
+        },
+        {
+          "text": "F",
+          "size": 26,
+          "role": "binding",
+          "box": [
+            1802,
+            1006,
+            34,
+            34
+          ],
+          "rect": [
+            1813.671875,
+            1013.5,
+            10.65625,
+            19
+          ],
+          "fits": true
+        }
+      ],
+      "pieces": [
+        {
+          "part": "register",
+          "rect": [
+            46,
+            32,
+            272,
+            64
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            254,
+            40,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "round_strip",
+          "rect": [
+            636,
+            30,
+            720,
+            64
+          ]
+        },
+        {
+          "part": "register",
+          "rect": [
+            636,
+            30,
+            184,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            864,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            940,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1016,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1092,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1168,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1244,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            896,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            668,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "active_health",
+          "rect": [
+            668,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            442,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            217,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_enemy",
+          "rect": [
+            1267,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_enemy",
+          "rect": [
+            1517,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "target_tab",
+          "rect": [
+            1280,
+            348,
+            176,
+            56
+          ]
+        },
+        {
+          "part": "hero_panel",
+          "rect": [
+            64,
+            836,
+            564,
+            212
+          ]
+        },
+        {
+          "part": "main_bar",
+          "rect": [
+            292,
+            940,
+            308,
+            40
+          ]
+        },
+        {
+          "part": "main_bar",
+          "rect": [
+            292,
+            988,
+            308,
+            40
+          ]
+        },
+        {
+          "part": "target_tab",
+          "rect": [
+            856,
+            816,
+            336,
+            40
+          ]
+        },
+        {
+          "part": "ability_header",
+          "rect": [
+            684,
+            852,
+            624,
+            56
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            688,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "selected_slot",
+          "rect": [
+            688,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            778,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            848,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            938,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            1008,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1098,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            1168,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1258,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1584,
+            836,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1662,
+            890,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1720,
+            836,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1798,
+            890,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1584,
+            948,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1662,
+            1002,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1720,
+            948,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1798,
+            1002,
+            42,
+            42
+          ]
+        }
+      ],
+      "hits": [
+        {
+          "id": "combat_log",
+          "rect": [
+            46,
+            24,
+            272,
+            112
+          ]
+        },
+        {
+          "id": "inspect_actor",
+          "rect": [
+            64,
+            836,
+            208,
+            212
+          ]
+        },
+        {
+          "id": "gato_corte_fase",
+          "rect": [
+            688,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_salto_entre_ruinas",
+          "rect": [
+            848,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_sumir_na_sombra",
+          "rect": [
+            1008,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_cacada_precisa",
+          "rect": [
+            1168,
+            916,
+            140,
+            140
+          ],
+          "disabled": true,
+          "reason": "Sem alvo válido"
+        },
+        {
+          "id": "combat_move",
+          "rect": [
+            1584,
+            830,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "combat_defend",
+          "rect": [
+            1720,
+            830,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "inventory",
+          "rect": [
+            1584,
+            942,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "combat_flee",
+          "rect": [
+            1720,
+            942,
+            128,
+            112
+          ]
+        }
+      ],
+      "ring": {
+        "center": [
+          768,
+          756
+        ],
+        "rect": [
+          644,
+          724,
+          248,
+          64
+        ],
+        "occlusion": "boots mask in frozen composition; depth-tested under unit in game"
+      },
+      "order": [
+        "unit_hero_gato_nick",
+        "unit_hero_sapo_iris",
+        "corridor_1117577169_2_1_sussurrador",
+        "unit_hero_cao_bento",
+        "unit_hero_coruja_vespera",
+        "corridor_1117577169_2_0_recreador"
+      ],
+      "unchanged_ability_art": {
+        "art/combat/icons/gato_corte_fase.webp": "d196b0aedda8fb4ef1596b25c830c41ec338a493a596a6f4de34e368d947d5d7",
+        "art/combat/icons/gato_salto_entre_ruinas.webp": "8a23b785022982be97f9876b0facf40f0cd29a8f8ca28bdcc939383b51758238",
+        "art/combat/icons/gato_sumir_na_sombra.webp": "32e72a10b93fc33f320cebf280efb2318f17f34adacf9e3eef685b519a30868b",
+        "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
+      },
+      "overflows": [],
+      "sha256": "4d43fc561c9ad7d340ab13b1115db9172e646112f0a6c842808c6a6108815d30"
+    },
+    {
+      "file": "hud_large_colorblind.webp",
+      "large": true,
+      "colorblind": true,
+      "labels": [
+        {
+          "text": "REGISTRO",
+          "size": 39,
+          "role": "label",
+          "box": [
+            86,
+            42,
+            162,
+            44
+          ],
+          "rect": [
+            86,
+            50.5,
+            129.921875,
+            27
+          ],
+          "fits": true
+        },
+        {
+          "text": "L",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            258,
+            44,
+            34,
+            34
+          ],
+          "rect": [
+            268.078125,
+            49.0,
+            13.84375,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "RODADA 1",
+          "size": 39,
+          "role": "label",
+          "box": [
+            660,
+            39,
+            160,
+            50
+          ],
+          "rect": [
+            660,
+            50.5,
+            122.828125,
+            27
+          ],
+          "fits": true
+        },
+        {
+          "text": "34/34",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            910,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            960.65625,
+            777.5,
+            70.6875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "24/24",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            682,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            732.765625,
+            777.5,
+            70.46875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "23/23",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            456,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            507.5,
+            777.5,
+            69.0,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "30/30",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            231,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            281.40625,
+            777.5,
+            71.1875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "8/8",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            1281,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            1346.234375,
+            777.5,
+            41.53125,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "6/6",
+          "size": 34,
+          "role": "hp",
+          "box": [
+            1531,
+            777,
+            172,
+            25
+          ],
+          "rect": [
+            1596.546875,
+            777.5,
+            40.90625,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "RECREADOR",
+          "size": 34,
+          "role": "label",
+          "box": [
+            1292,
+            350,
+            152,
+            37
+          ],
+          "rect": [
+            1298.9140625,
+            356.5,
+            138.171875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "NICK",
+          "size": 52,
+          "role": "hero_name",
+          "box": [
+            296,
+            878,
+            300,
+            48
+          ],
+          "rect": [
+            296,
+            884.0,
+            86.5625,
+            36
+          ],
+          "fits": true
+        },
+        {
+          "text": "24/24",
+          "size": 42,
+          "role": "hp",
+          "box": [
+            300,
+            944,
+            292,
+            32
+          ],
+          "rect": [
+            402.453125,
+            945.0,
+            87.09375,
+            30
+          ],
+          "fits": true
+        },
+        {
+          "text": "0/200",
+          "size": 42,
+          "role": "instinct",
+          "box": [
+            300,
+            992,
+            292,
+            32
+          ],
+          "rect": [
+            401.484375,
+            993.0,
+            89.03125,
+            30
+          ],
+          "fits": true
+        },
+        {
+          "text": "ESCOLHA UM ALVO",
+          "size": 34,
+          "role": "label",
+          "box": [
+            872,
+            820,
+            304,
+            30
+          ],
+          "rect": [
+            872,
+            823.0,
+            212.40625,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "CORTE DE FASE",
+          "size": 42,
+          "role": "label",
+          "box": [
+            754,
+            858,
+            420,
+            44
+          ],
+          "rect": [
+            754,
+            865.0,
+            217.453125,
+            30
+          ],
+          "fits": true
+        },
+        {
+          "text": "4–6",
+          "size": 36,
+          "role": "range",
+          "box": [
+            1204,
+            858,
+            88,
+            44
+          ],
+          "rect": [
+            1225.765625,
+            867.0,
+            44.46875,
+            26
+          ],
+          "fits": true
+        },
+        {
+          "text": "1",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            782,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            794.4765625,
+            1015.0,
+            9.046875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "2",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            942,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            951.9453125,
+            1015.0,
+            14.109375,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "3",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1102,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            1111.890625,
+            1015.0,
+            14.21875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "4",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1262,
+            1010,
+            34,
+            34
+          ],
+          "rect": [
+            1271.5234375,
+            1015.0,
+            14.953125,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "Q",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1666,
+            894,
+            34,
+            34
+          ],
+          "rect": [
+            1675.3515625,
+            897.0,
+            15.296875,
+            28
+          ],
+          "fits": true
+        },
+        {
+          "text": "W",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1802,
+            894,
+            34,
+            34
+          ],
+          "rect": [
+            1808.015625,
+            899.0,
+            21.96875,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "I",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1666,
+            1006,
+            34,
+            34
+          ],
+          "rect": [
+            1679.2578125,
+            1011.0,
+            7.484375,
+            24
+          ],
+          "fits": true
+        },
+        {
+          "text": "F",
+          "size": 34,
+          "role": "binding",
+          "box": [
+            1802,
+            1006,
+            34,
+            34
+          ],
+          "rect": [
+            1812.03125,
+            1011.0,
+            13.9375,
+            24
+          ],
+          "fits": true
+        }
+      ],
+      "pieces": [
+        {
+          "part": "register",
+          "rect": [
+            46,
+            32,
+            272,
+            64
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            254,
+            40,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "round_strip",
+          "rect": [
+            636,
+            30,
+            720,
+            64
+          ]
+        },
+        {
+          "part": "register",
+          "rect": [
+            636,
+            30,
+            184,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            864,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            940,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1016,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1092,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1168,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "square_portrait",
+          "rect": [
+            1244,
+            30,
+            64,
+            64
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            896,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            668,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "active_health",
+          "rect": [
+            668,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            442,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_ally",
+          "rect": [
+            217,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_enemy",
+          "rect": [
+            1267,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "health_enemy",
+          "rect": [
+            1517,
+            760,
+            200,
+            44
+          ]
+        },
+        {
+          "part": "target_tab",
+          "rect": [
+            1280,
+            348,
+            176,
+            56
+          ]
+        },
+        {
+          "part": "hero_panel",
+          "rect": [
+            64,
+            836,
+            564,
+            212
+          ]
+        },
+        {
+          "part": "main_bar",
+          "rect": [
+            292,
+            940,
+            308,
+            40
+          ]
+        },
+        {
+          "part": "main_bar",
+          "rect": [
+            292,
+            988,
+            308,
+            40
+          ]
+        },
+        {
+          "part": "target_tab",
+          "rect": [
+            856,
+            816,
+            336,
+            40
+          ]
+        },
+        {
+          "part": "ability_header",
+          "rect": [
+            684,
+            852,
+            624,
+            56
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            688,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "selected_slot",
+          "rect": [
+            688,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            778,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            848,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            938,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            1008,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1098,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "ability_slot",
+          "rect": [
+            1168,
+            916,
+            132,
+            132
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1258,
+            1006,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1584,
+            836,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1662,
+            890,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1720,
+            836,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1798,
+            890,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1584,
+            948,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1662,
+            1002,
+            42,
+            42
+          ]
+        },
+        {
+          "part": "action_button",
+          "rect": [
+            1720,
+            948,
+            128,
+            100
+          ]
+        },
+        {
+          "part": "key_tab",
+          "rect": [
+            1798,
+            1002,
+            42,
+            42
+          ]
+        }
+      ],
+      "hits": [
+        {
+          "id": "combat_log",
+          "rect": [
+            46,
+            24,
+            272,
+            112
+          ]
+        },
+        {
+          "id": "inspect_actor",
+          "rect": [
+            64,
+            836,
+            208,
+            212
+          ]
+        },
+        {
+          "id": "gato_corte_fase",
+          "rect": [
+            688,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_salto_entre_ruinas",
+          "rect": [
+            848,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_sumir_na_sombra",
+          "rect": [
+            1008,
+            916,
+            140,
+            140
+          ],
+          "disabled": false,
+          "reason": ""
+        },
+        {
+          "id": "gato_cacada_precisa",
+          "rect": [
+            1168,
+            916,
+            140,
+            140
+          ],
+          "disabled": true,
+          "reason": "Sem alvo válido"
+        },
+        {
+          "id": "combat_move",
+          "rect": [
+            1584,
+            830,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "combat_defend",
+          "rect": [
+            1720,
+            830,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "inventory",
+          "rect": [
+            1584,
+            942,
+            128,
+            112
+          ]
+        },
+        {
+          "id": "combat_flee",
+          "rect": [
+            1720,
+            942,
+            128,
+            112
+          ]
+        }
+      ],
+      "ring": {
+        "center": [
+          768,
+          756
+        ],
+        "rect": [
+          644,
+          724,
+          248,
+          64
+        ],
+        "occlusion": "boots mask in frozen composition; depth-tested under unit in game"
+      },
+      "order": [
+        "unit_hero_gato_nick",
+        "unit_hero_sapo_iris",
+        "corridor_1117577169_2_1_sussurrador",
+        "unit_hero_cao_bento",
+        "unit_hero_coruja_vespera",
+        "corridor_1117577169_2_0_recreador"
+      ],
+      "unchanged_ability_art": {
+        "art/combat/icons/gato_corte_fase.webp": "d196b0aedda8fb4ef1596b25c830c41ec338a493a596a6f4de34e368d947d5d7",
+        "art/combat/icons/gato_salto_entre_ruinas.webp": "8a23b785022982be97f9876b0facf40f0cd29a8f8ca28bdcc939383b51758238",
+        "art/combat/icons/gato_sumir_na_sombra.webp": "32e72a10b93fc33f320cebf280efb2318f17f34adacf9e3eef685b519a30868b",
+        "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
+      },
+      "overflows": [],
+      "sha256": "dffcb0114848e2de3dc31f7ac20dcbdff7596221ab06ebe9b311f4eb6f14ec56"
+    }
+  ]
+}

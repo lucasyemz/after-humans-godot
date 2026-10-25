@@ -1,0 +1,32 @@
+{
+  "verdict": "APROVADO for design delivery; integration still required",
+  "reference_unchanged": true,
+  "runtime_webp": 18,
+  "runtime_bytes": 313842,
+  "profiles": 4,
+  "label_overflows": 0,
+  "overlapping_input_targets": 0,
+  "uppercase_condensed_ofl_font": true,
+  "nick_icons_unchanged": true,
+  "f_is_exit": true,
+  "sha256": {
+    "comparison.webp": "10b50cd19e43b24107e69ca6138434cfed52eeb234f4f598ddb0523dd13ea6b7",
+    "comparison_colorblind.webp": "22b2c37e619aa9c481ea554dfaac9762b7d28263da4e2214f2d3bcc3257a4b85",
+    "comparison_large.webp": "2cd2c89737d306090ec6c9c18a274db92b6c4eed743886d8830e18672d1a54c3",
+    "comparison_large_colorblind.webp": "9098468015edf8db04ef58f4d054a9873a48a651985b7f38c1999ac5508565c4",
+    "detail_before_after.webp": "2870fd5f61be03ce80ff926b4c7b0cfd327a1dd2613ec241553f7bfc960c299f",
+    "detail_comparison.webp": "e7d27f6ab4c7cbc04b6af1329e90610b0075a34428e3f1fcda48a244a8575f35",
+    "hud.webp": "9839f5a1fd8f8c5c1573e190cb2c8c2ef3952d046bb9ef1598f89d2d600aa06a",
+    "hud_40.webp": "0845dc3942ed78a64f67a88fb0dfdd167d2d21b155353080478d7f1ca7b94b65",
+    "hud_colorblind.webp": "4d43fc561c9ad7d340ab13b1115db9172e646112f0a6c842808c6a6108815d30",
+    "hud_colorblind_40.webp": "1e150e4b1e7c470d47c68e167ed1c34898eb48b930c4ef4046aabcdfd91ce723",
+    "hud_gray.webp": "78d5bacc6c1fe00704ac41ba01f4b3093237cd07f0f144a804adf01abe602311",
+    "hud_large.webp": "624d5efa9385e667ecd6fbfb6395fa9cd4f4ed3c942727fc71969847314772ac",
+    "hud_large_40.webp": "90546e47addf2aeaa0f483feb73f686e7d8287dae69e187a0355abc396e42008",
+    "hud_large_colorblind.webp": "dffcb0114848e2de3dc31f7ac20dcbdff7596221ab06ebe9b311f4eb6f14ec56",
+    "hud_large_colorblind_40.webp": "2a68fca946fd3ecb084d69374c20aec80836a028515636e3acfc812c8acd7ce6",
+    "piece_comparison.webp": "9f2766caf6902563e568452b66d99e49bc6b5d209bc32f8bee0b92f3850ee7d1",
+    "readability.webp": "8453f93c6030eeb6953284960ac4352363ccadc6550e92fce49408da067d3176",
+    "ring_source.webp": "4c29024afc4060f0f197bfd0b51f91a9d994649ffe97f341aaacaf7bed1793af"
+  }
+}

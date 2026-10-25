@@ -1,0 +1,459 @@
+{
+  "version": 2,
+  "issue": 59,
+  "direction": "C — Latão noturno, chosen by Lucas on 2026-10-25",
+  "scope": "combat HUD design and assets; no game implementation; Nick ability art unchanged",
+  "canvas": [
+    1920,
+    1080
+  ],
+  "text_safe_margin": 32,
+  "decorative_bottom_margin": 24,
+  "horizontal_margin": 48,
+  "profiles": {
+    "normal": {
+      "title": 32,
+      "body": 24,
+      "detail": 18
+    },
+    "large": {
+      "title": 42,
+      "body": 31,
+      "detail": 23
+    },
+    "large_geometry": {
+      "skill": 112,
+      "actor_portrait": 128,
+      "keycap": 48
+    },
+    "normal_geometry": {
+      "skill": 104,
+      "actor_portrait": 112,
+      "keycap": 40
+    },
+    "action_keycap_both_profiles": 40,
+    "esc_keycap": [
+      56,
+      64
+    ]
+  },
+  "fonts": {
+    "title_and_names": "Cinzel",
+    "body": "Plus Jakarta Sans"
+  },
+  "palette": {
+    "panel": "#0d1012",
+    "text": "#efe5d1",
+    "muted": "#a69a84",
+    "team": "#77ddd4",
+    "machine": "#e7aa55",
+    "instinct": "#b7a6f4",
+    "good": "#86c98f",
+    "danger": "#e2675b"
+  },
+  "colorblind": {
+    "team": "#56b4e9",
+    "machine": "#e69f00",
+    "good": "#56b4e9",
+    "danger": "#e69f00",
+    "preserve": "portraits, positions, diamond selection, corner focus and explicit reason"
+  },
+  "assets": {
+    "plate": {
+      "file": "art/ui/kit/v2/plate.webp",
+      "size": [
+        256,
+        64
+      ],
+      "slice_ltrb": [
+        32,
+        16,
+        32,
+        16
+      ],
+      "content": [
+        32,
+        16,
+        192,
+        32
+      ],
+      "sha256": "05aee567fc80690578bbfdcead600765c777306b9ec86e78b13586152d5179dc"
+    },
+    "primary": {
+      "file": "art/ui/kit/v2/primary.webp",
+      "size": [
+        256,
+        64
+      ],
+      "slice_ltrb": [
+        32,
+        16,
+        32,
+        16
+      ],
+      "content": [
+        32,
+        16,
+        192,
+        32
+      ],
+      "sha256": "7d44b080e04d8830834f90a6b061878afca04d9f92b8254aeb743141e8aee731"
+    },
+    "secondary": {
+      "file": "art/ui/kit/v2/secondary.webp",
+      "size": [
+        256,
+        64
+      ],
+      "slice_ltrb": [
+        32,
+        16,
+        32,
+        16
+      ],
+      "content": [
+        32,
+        16,
+        192,
+        32
+      ],
+      "sha256": "a6795a2fd8957f1a9e3eb1fa3aea53b1dbfb7fb6b901f5fbe5040fd79a07169a"
+    },
+    "slot": {
+      "file": "art/ui/kit/v2/slot.webp",
+      "size": [
+        112,
+        112
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        80,
+        80
+      ],
+      "sha256": "dee0a809b7cab87a1c1baca32cfd55d0ccb392014eecd0a6d98ba3748b4493b5"
+    },
+    "portrait": {
+      "file": "art/ui/kit/v2/portrait.webp",
+      "size": [
+        128,
+        128
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        96,
+        96
+      ],
+      "sha256": "1e961bebede917ac53a4f8e6f063235e851097c56e40f0ec428eb57e1ee04e46"
+    },
+    "action": {
+      "file": "art/ui/kit/v2/action.webp",
+      "size": [
+        88,
+        88
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        56,
+        56
+      ],
+      "sha256": "35f87fea73d4dbe7498736e34fa0021e2dbb7d0bd3469d601c7b7c97a1daf766"
+    },
+    "key": {
+      "file": "art/ui/kit/v2/key.webp",
+      "size": [
+        48,
+        48
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "sha256": "cf4ac09a6b2d09479b2c846b7f5e1e20c675a98b6e7d6d1facc1657496d40380"
+    },
+    "divider": {
+      "file": "art/ui/kit/v2/divider.webp",
+      "size": [
+        320,
+        56
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        288,
+        24
+      ],
+      "sha256": "0b56061678af105266097c8fc0de6254a7bfb4e419552a52af6ad98c8e35ab61"
+    },
+    "bar_frame": {
+      "file": "art/ui/kit/v2/bar_frame.webp",
+      "size": [
+        256,
+        48
+      ],
+      "slice_ltrb": [
+        32,
+        16,
+        32,
+        14
+      ],
+      "content": [
+        32,
+        16,
+        192,
+        18
+      ],
+      "sha256": "bea641223e13b69820ad2dce26730b691a6f9a51b865940854ead1cea5286b66"
+    },
+    "bar_glass": {
+      "file": "art/ui/kit/v2/bar_glass.webp",
+      "size": [
+        192,
+        18
+      ],
+      "slice_ltrb": null,
+      "content": [
+        0,
+        0,
+        192,
+        18
+      ],
+      "sha256": "516ebb8e4fa68f784077817c22b10af4a85d0461665839267b00935c2b374eb7"
+    },
+    "panel": {
+      "file": "art/ui/kit/v2/panel.webp",
+      "size": [
+        256,
+        160
+      ],
+      "slice_ltrb": [
+        32,
+        32,
+        32,
+        48
+      ],
+      "content": [
+        32,
+        32,
+        192,
+        80
+      ],
+      "sha256": "04fdb35ec5932e082c26e6206bf1594e58060ec59eab1f2ca640b5b4d5f125dc"
+    },
+    "panel_material": {
+      "file": "art/ui/kit/v2/panel_material.webp",
+      "size": [
+        64,
+        64
+      ],
+      "slice_ltrb": null,
+      "content": null,
+      "sha256": "68b3b01e94e815067495a28c4c1faca4cbc244c0db12a54b64fc51b083d7c2cc"
+    },
+    "exit": {
+      "file": "art/ui/kit/v2/exit.webp",
+      "size": [
+        64,
+        64
+      ],
+      "slice_ltrb": null,
+      "content": [
+        4,
+        4,
+        56,
+        56
+      ],
+      "sha256": "3f778031eb43739712b7c4c3b95372142054a062630209c2b5cd4c31056ef8a4"
+    }
+  },
+  "layout": {
+    "actor_name": [
+      192,
+      848,
+      272,
+      56
+    ],
+    "actor_hp": [
+      184,
+      912,
+      288,
+      56
+    ],
+    "actor_instinct": [
+      184,
+      976,
+      288,
+      56
+    ],
+    "skills": {
+      "x": 520,
+      "step": 128,
+      "y_normal": 912,
+      "y_large": 904,
+      "keys_top": 1008,
+      "minimum_hit_width": 112,
+      "hit_height": "extend to1056 including keycap"
+    },
+    "selected_name": [
+      512,
+      840,
+      448,
+      56
+    ],
+    "damage_medal": [
+      976,
+      836,
+      80,
+      80
+    ],
+    "action_centers": [
+      [
+        1672,
+        856
+      ],
+      [
+        1792,
+        856
+      ],
+      [
+        1672,
+        976
+      ],
+      [
+        1792,
+        976
+      ]
+    ],
+    "action_hit_size": [
+      112,
+      112
+    ],
+    "action_visual_size": [
+      80,
+      88
+    ],
+    "action_keycap_position": "center+16,+16;40x40",
+    "initiative": {
+      "right": 48,
+      "top": 32,
+      "face_size": [
+        56,
+        64
+      ],
+      "step": [
+        72,
+        80
+      ],
+      "max": 8,
+      "round_plaque": [
+        224,
+        56
+      ],
+      "read_only": true
+    },
+    "world_hp": {
+      "y": 776,
+      "height": 56,
+      "width": 176,
+      "crowded_hero_width": 160,
+      "boss_width": 224,
+      "x": "center projected from unit/card foot; documented samples use source control center",
+      "position_badge": "40x40, y748;72x40 for multi-slot boss"
+    },
+    "tooltip": {
+      "origin": [
+        48,
+        160
+      ],
+      "width": 560,
+      "padding": 32,
+      "bottom_roots_reserve": 48,
+      "height": "ceil8(88 + wrapped body line heights +12 between paragraphs +64)"
+    },
+    "bar": {
+      "track_ltrb": "32,16,width-32,height-14",
+      "fill": "actual current/max clamped0..1",
+      "glass": "bar_glass over fill, frame over glass",
+      "zero": "empty, no colored fill",
+      "warning": "warm only near real crisis threshold + word/shape"
+    },
+    "log": {
+      "button": [
+        48,
+        32,
+        272,
+        64
+      ],
+      "hit": [
+        48,
+        32,
+        272,
+        112
+      ],
+      "action": "combat_log",
+      "tooltip": [
+        "left",
+        48,
+        "top",
+        160
+      ],
+      "max_history_height": 480,
+      "overflow": "scroll",
+      "closed_feedback": "show latest real event briefly; preserve history; no fixed full-width band"
+    }
+  },
+  "states": {
+    "hover": "temporary copper corner cue; no activation",
+    "focus": "segmented cyan corners, blue in colorblind",
+    "pressed": "offset visual2px, hit rect unchanged",
+    "disabled": "dim + double slash + engine reason; inspectable via focus wrapper, not activatable",
+    "selected": "persistent gold diamond, independent of focus",
+    "target": "machine corner marks on projected body + target name",
+    "alert": "triangle + word; dangerous color with accessible equivalent"
+  },
+  "session_sources": {
+    "abilities": "AHCombatSession.ability_options(actor_id): usable, reason, targets, cooldown, uses",
+    "effective_damage": "AHCombatSession.effective_range; use current research, not only base table",
+    "actor": "session.current_actor()",
+    "units": "session.units(); hp/max_hp, rank, FormationSize, instinct",
+    "flee": "session.can_flee(); unavailable against porteiro",
+    "move": "session.move_targets(actor_id)",
+    "finite_uses": "uses>=0; facet counter from portrait region50,0,28,28; hide for-1",
+    "cooldown": "remaining turns in number medallion; reason from session, not a guessed timer"
+  },
+  "input_actions": {
+    "Q": "combat_move",
+    "W": "combat_defend",
+    "I": "inventory",
+    "F": "combat_flee",
+    "1..4": "combat_ability_1..4",
+    "labels": "resolve actual current binding; these letters are screenshot defaults",
+    "L": "combat_log"
+  },
+  "interaction": {
+    "hover_delay_ms": 250,
+    "keyboard_focus": "immediate description; activation only by confirm",
+    "disabled_focus": "wrapper can explain disabled control without activating it",
+    "touch": "minimum112px targets; shortcuts are visual parts of the same target, never separate small buttons",
+    "initiative": "informative; inspect actor/world cards, no overlapping tiny touch controls",
+    "cancel": "clear targeting before leaving combat; no implicit flee",
+    "log": "toggle real combat history; retain existing new-event feedback; Escape closes expanded log before clearing targeting"
+  },
+  "motion": {
+    "focus_ms": 100,
+    "press_ms": 80,
+    "tooltip_ms": 120,
+    "reduce_effects": "no pulsing, no zoom, immediate state + static shape; no change of rules",
+    "log_peek_ms": 2500
+  },
+  "integration": "Claude; preserve existing commands and ids; do not adopt reserved Nick glyph studies"
+}

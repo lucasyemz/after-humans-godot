@@ -1,0 +1,60 @@
+{
+  "name": "title-slots",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@49/@VBoxContainer@50/@Label@51",
+      "rect": [
+        600.0,
+        134.0,
+        720.0,
+        44.0
+      ],
+      "text": "Campanhas"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@49/@VBoxContainer@50/Slot1",
+      "rect": [
+        600.0,
+        190.0,
+        720.0,
+        84.0
+      ],
+      "text": "Espaço 1 (último usado) — Ciclo 0 · 0 fases · 4 de 4 vivos\n24/10/2026 13:55 · 0 min jogados"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@49/@VBoxContainer@50/Slot2",
+      "rect": [
+        600.0,
+        286.0,
+        720.0,
+        84.0
+      ],
+      "text": "Espaço 2 — vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@49/@VBoxContainer@50/Slot3",
+      "rect": [
+        600.0,
+        382.0,
+        720.0,
+        84.0
+      ],
+      "text": "Espaço 3 — vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Title/@PanelContainer@49/@VBoxContainer@50/@Button@52",
+      "rect": [
+        600.0,
+        478.0,
+        720.0,
+        56.0
+      ],
+      "text": "Voltar"
+    }
+  ]
+}

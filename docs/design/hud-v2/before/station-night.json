@@ -1,0 +1,522 @@
+{
+  "name": "station-night",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@Label@3487",
+      "rect": [
+        32.0,
+        18.0,
+        251.0,
+        50.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@Label@3488",
+      "rect": [
+        34.0,
+        66.0,
+        704.0,
+        23.0
+      ],
+      "text": "Ciclo 1 · 4 no elenco · noite por resolver no Dormitório · alguém espera na plataforma"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@PanelContainer@3893/@HBoxContainer@3880/@HBoxContainer@3883/@Label@3882",
+      "rect": [
+        1028.0,
+        37.0,
+        24.0,
+        25.0
+      ],
+      "text": "36"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@PanelContainer@3893/@HBoxContainer@3880/@HBoxContainer@3886/@Label@3885",
+      "rect": [
+        1095.0,
+        37.0,
+        19.0,
+        25.0
+      ],
+      "text": "12"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@PanelContainer@3893/@HBoxContainer@3880/@HBoxContainer@3889/@Label@3888",
+      "rect": [
+        1157.0,
+        37.0,
+        13.0,
+        25.0
+      ],
+      "text": "4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@PanelContainer@3893/@HBoxContainer@3880/@HBoxContainer@3892/@Label@3891",
+      "rect": [
+        1213.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3899/@VBoxContainer@3895/@Label@3896",
+      "rect": [
+        1301.0,
+        16.0,
+        192.0,
+        20.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3899/@VBoxContainer@3895/@Label@3897",
+      "rect": [
+        1301.0,
+        36.0,
+        192.0,
+        28.0
+      ],
+      "text": "6 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3899/@VBoxContainer@3895/@Label@3898",
+      "rect": [
+        1301.0,
+        64.0,
+        192.0,
+        20.0
+      ],
+      "text": "Abastecida · demanda 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3905/@VBoxContainer@3901/@Label@3902",
+      "rect": [
+        1557.0,
+        16.0,
+        145.0,
+        20.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3905/@VBoxContainer@3901/@Label@3903",
+      "rect": [
+        1557.0,
+        36.0,
+        145.0,
+        28.0
+      ],
+      "text": "4 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3905/@VBoxContainer@3901/@Label@3904",
+      "rect": [
+        1557.0,
+        64.0,
+        145.0,
+        20.0
+      ],
+      "text": "Próxima volta: 2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3911/@VBoxContainer@3907/@Label@3908",
+      "rect": [
+        1766.0,
+        16.0,
+        122.0,
+        20.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3911/@VBoxContainer@3907/@Label@3909",
+      "rect": [
+        1766.0,
+        36.0,
+        122.0,
+        28.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3489/@HBoxContainer@3911/@VBoxContainer@3907/@Label@3910",
+      "rect": [
+        1766.0,
+        64.0,
+        122.0,
+        20.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3498/@Button@3499",
+      "rect": [
+        32.0,
+        1000.0,
+        190.0,
+        48.0
+      ],
+      "text": "‹ Vista geral"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3498/@Button@3500",
+      "rect": [
+        230.0,
+        1000.0,
+        150.0,
+        48.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@HBoxContainer@3498/@Button@3501",
+      "rect": [
+        388.0,
+        1000.0,
+        170.0,
+        48.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@Label@3914",
+      "rect": [
+        1230.0,
+        124.0,
+        636.0,
+        39.0
+      ],
+      "text": "Dormitório"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@Label@3915",
+      "rect": [
+        1230.0,
+        173.0,
+        636.0,
+        23.0
+      ],
+      "text": "Vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@Label@3916",
+      "rect": [
+        1230.0,
+        206.0,
+        636.0,
+        53.0
+      ],
+      "text": "Quarto por recuperar: só os beliches de ferro. A equipe dorme aqui depois de cada volta."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@HBoxContainer@3917/@VBoxContainer@3918/@Label@3919",
+      "rect": [
+        1230.0,
+        269.0,
+        325.0,
+        20.0
+      ],
+      "text": "NOITE 1"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@HBoxContainer@3917/@VBoxContainer@3918/@Label@3920",
+      "rect": [
+        1230.0,
+        293.0,
+        325.0,
+        23.0
+      ],
+      "text": "4 dormindo · 0 vigiando"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@HBoxContainer@3917/@Button@3921",
+      "rect": [
+        1559.0,
+        269.0,
+        307.0,
+        48.0
+      ],
+      "text": "+1 suprimento · 2 sementes"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3934/@VBoxContainer@3923/@HBoxContainer@3924/@VBoxContainer@3926/@Label@3927",
+      "rect": [
+        1304.0,
+        337.0,
+        220.0,
+        26.0
+      ],
+      "text": "Bento"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3934/@VBoxContainer@3923/@HBoxContainer@3924/@VBoxContainer@3926/@Label@3928",
+      "rect": [
+        1304.0,
+        365.0,
+        220.0,
+        20.0
+      ],
+      "text": "Vida 34/34 · Instinto 0"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3934/@VBoxContainer@3923/@HBoxContainer@3930/@Button@3931",
+      "rect": [
+        1244.0,
+        399.0,
+        137.0,
+        56.0
+      ],
+      "text": "Dormir"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3934/@VBoxContainer@3923/@HBoxContainer@3930/@Button@3932",
+      "rect": [
+        1387.0,
+        399.0,
+        137.0,
+        56.0
+      ],
+      "text": "Vigiar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3934/@VBoxContainer@3923/@Label@3933",
+      "rect": [
+        1244.0,
+        461.0,
+        280.0,
+        20.0
+      ],
+      "text": "Alimentado · +0 de vida, +0 de instinto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3946/@VBoxContainer@3935/@HBoxContainer@3936/@VBoxContainer@3938/@Label@3939",
+      "rect": [
+        1622.0,
+        337.0,
+        220.0,
+        26.0
+      ],
+      "text": "Nick"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3946/@VBoxContainer@3935/@HBoxContainer@3936/@VBoxContainer@3938/@Label@3940",
+      "rect": [
+        1622.0,
+        365.0,
+        220.0,
+        20.0
+      ],
+      "text": "Vida 8/24 · Instinto 0"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3946/@VBoxContainer@3935/@HBoxContainer@3942/@Button@3943",
+      "rect": [
+        1562.0,
+        399.0,
+        137.0,
+        56.0
+      ],
+      "text": "Dormir"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3946/@VBoxContainer@3935/@HBoxContainer@3942/@Button@3944",
+      "rect": [
+        1705.0,
+        399.0,
+        137.0,
+        56.0
+      ],
+      "text": "Vigiar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3946/@VBoxContainer@3935/@Label@3945",
+      "rect": [
+        1562.0,
+        461.0,
+        280.0,
+        20.0
+      ],
+      "text": "Alimentado · +8 de vida, +0 de instinto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3958/@VBoxContainer@3947/@HBoxContainer@3948/@VBoxContainer@3950/@Label@3951",
+      "rect": [
+        1304.0,
+        511.0,
+        220.0,
+        26.0
+      ],
+      "text": "Íris"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3958/@VBoxContainer@3947/@HBoxContainer@3948/@VBoxContainer@3950/@Label@3952",
+      "rect": [
+        1304.0,
+        539.0,
+        220.0,
+        20.0
+      ],
+      "text": "Vida 23/23 · Instinto 0"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3958/@VBoxContainer@3947/@HBoxContainer@3954/@Button@3955",
+      "rect": [
+        1244.0,
+        573.0,
+        137.0,
+        56.0
+      ],
+      "text": "Dormir"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3958/@VBoxContainer@3947/@HBoxContainer@3954/@Button@3956",
+      "rect": [
+        1387.0,
+        573.0,
+        137.0,
+        56.0
+      ],
+      "text": "Vigiar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3958/@VBoxContainer@3947/@Label@3957",
+      "rect": [
+        1244.0,
+        635.0,
+        280.0,
+        20.0
+      ],
+      "text": "Alimentado · +0 de vida, +0 de instinto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3970/@VBoxContainer@3959/@HBoxContainer@3960/@VBoxContainer@3962/@Label@3963",
+      "rect": [
+        1622.0,
+        511.0,
+        220.0,
+        26.0
+      ],
+      "text": "Véspera"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3970/@VBoxContainer@3959/@HBoxContainer@3960/@VBoxContainer@3962/@Label@3964",
+      "rect": [
+        1622.0,
+        539.0,
+        220.0,
+        20.0
+      ],
+      "text": "Vida 30/30 · Instinto 0"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3970/@VBoxContainer@3959/@HBoxContainer@3966/@Button@3967",
+      "rect": [
+        1562.0,
+        573.0,
+        137.0,
+        56.0
+      ],
+      "text": "Dormir"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3970/@VBoxContainer@3959/@HBoxContainer@3966/@Button@3968",
+      "rect": [
+        1705.0,
+        573.0,
+        137.0,
+        56.0
+      ],
+      "text": "Vigiar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@GridContainer@3922/@PanelContainer@3970/@VBoxContainer@3959/@Label@3969",
+      "rect": [
+        1562.0,
+        635.0,
+        280.0,
+        20.0
+      ],
+      "text": "Alimentado · +0 de vida, +0 de instinto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@Label@3971",
+      "rect": [
+        1230.0,
+        675.0,
+        636.0,
+        23.0
+      ],
+      "text": "Suprimentos: 4 necessários · 6 disponíveis"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@Label@3972",
+      "rect": [
+        1230.0,
+        708.0,
+        636.0,
+        21.0
+      ],
+      "text": "Quem vigia não descansa, mas protege os outros dos ruídos da noite."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@3485/@Control@3484/@PanelContainer@3536/@ScrollContainer@3539/@VBoxContainer@3540/@Button@3973",
+      "rect": [
+        1230.0,
+        739.0,
+        636.0,
+        54.0
+      ],
+      "text": "Iniciar descanso"
+    }
+  ]
+}

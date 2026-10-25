@@ -1,0 +1,245 @@
+{
+	"phases": {
+		"fase_1": {
+			"guardians": [
+				{
+					"damage_bonus": 1,
+					"display_name": "Robô · Guardião",
+					"enemy_id": "robot",
+					"hp": 21,
+					"max_hp": 21,
+					"rank": 1,
+					"unit_id": "corridor_1117577169_9_0_robot"
+				},
+				{
+					"damage_bonus": 1,
+					"display_name": "Rastreador Quadrúpede",
+					"enemy_id": "cao_eco",
+					"hp": 9,
+					"max_hp": 9,
+					"rank": 2,
+					"unit_id": "corridor_1117577169_9_1_cao_eco"
+				},
+				{
+					"damage_bonus": 1,
+					"display_name": "Relé de Defesa",
+					"enemy_id": "condutor_raiz",
+					"hp": 8,
+					"max_hp": 8,
+					"rank": 3,
+					"unit_id": "corridor_1117577169_9_2_condutor_raiz"
+				},
+				{
+					"damage_bonus": 1,
+					"display_name": "Emissor de Comando",
+					"enemy_id": "sussurrador",
+					"hp": 8,
+					"max_hp": 8,
+					"rank": 4,
+					"unit_id": "corridor_1117577169_9_3_sussurrador"
+				}
+			],
+			"patrol_enemy_counts": {
+				"condutor_raiz": 2,
+				"pipoco": 2,
+				"recreador": 2,
+				"robot": 2,
+				"sussurrador": 1
+			},
+			"search_sites": 0,
+			"weather": "nightRain"
+		},
+		"fase_2": {
+			"guardians": [
+				{
+					"damage_bonus": 1,
+					"display_name": "Coletor de Sucata · Guardião",
+					"enemy_id": "carcaca_colonizada",
+					"hp": 28,
+					"max_hp": 28,
+					"rank": 1,
+					"unit_id": "corridor_1117577170_9_0_carcaca_colonizada"
+				},
+				{
+					"damage_bonus": 1,
+					"display_name": "Rastejante de Cabos",
+					"enemy_id": "rastejante_raiz",
+					"hp": 11,
+					"max_hp": 11,
+					"rank": 2,
+					"unit_id": "corridor_1117577170_9_1_rastejante_raiz"
+				},
+				{
+					"damage_bonus": 1,
+					"display_name": "Relé de Defesa",
+					"enemy_id": "condutor_raiz",
+					"hp": 10,
+					"max_hp": 10,
+					"rank": 3,
+					"unit_id": "corridor_1117577170_9_2_condutor_raiz"
+				},
+				{
+					"damage_bonus": 1,
+					"display_name": "Broto",
+					"enemy_id": "broto",
+					"hp": 4,
+					"max_hp": 4,
+					"rank": 4,
+					"unit_id": "corridor_1117577170_9_3_broto"
+				}
+			],
+			"patrol_enemy_counts": {
+				"broto": 2,
+				"carcaca_colonizada": 1,
+				"condutor_raiz": 2,
+				"enraizado": 3,
+				"sussurrador": 2
+			},
+			"search_sites": 0,
+			"weather": "nightRain"
+		},
+		"fase_3": {
+			"guardians": [
+				{
+					"damage_bonus": 2,
+					"display_name": "Sentinela de Triagem · Guardião",
+					"enemy_id": "vigia_enferrujado",
+					"hp": 31,
+					"max_hp": 31,
+					"rank": 1,
+					"unit_id": "corridor_1117577171_9_0_vigia_enferrujado"
+				},
+				{
+					"damage_bonus": 2,
+					"display_name": "Rastreador Quadrúpede",
+					"enemy_id": "cao_eco",
+					"hp": 14,
+					"max_hp": 14,
+					"rank": 2,
+					"unit_id": "corridor_1117577171_9_1_cao_eco"
+				},
+				{
+					"damage_bonus": 2,
+					"display_name": "Drone de Expurgo",
+					"enemy_id": "ninho_errante",
+					"hp": 12,
+					"max_hp": 12,
+					"rank": 3,
+					"unit_id": "corridor_1117577171_9_2_ninho_errante"
+				},
+				{
+					"damage_bonus": 2,
+					"display_name": "Emissor de Comando",
+					"enemy_id": "sussurrador",
+					"hp": 11,
+					"max_hp": 11,
+					"rank": 4,
+					"unit_id": "corridor_1117577171_9_3_sussurrador"
+				}
+			],
+			"patrol_enemy_counts": {
+				"cao_eco": 5,
+				"ninho_errante": 2,
+				"sussurrador": 4,
+				"vigia_enferrujado": 1
+			},
+			"search_sites": 0,
+			"weather": "sunset"
+		},
+		"fase_4": {
+			"guardians": [
+				{
+					"damage_bonus": 2,
+					"display_name": "Robô Fungo · Guardião",
+					"enemy_id": "robot_fungo",
+					"hp": 36,
+					"max_hp": 36,
+					"rank": 1,
+					"unit_id": "corridor_1117577172_9_0_robot_fungo"
+				},
+				{
+					"damage_bonus": 2,
+					"display_name": "Rastejante de Cabos",
+					"enemy_id": "rastejante_raiz",
+					"hp": 15,
+					"max_hp": 15,
+					"rank": 2,
+					"unit_id": "corridor_1117577172_9_1_rastejante_raiz"
+				},
+				{
+					"damage_bonus": 2,
+					"display_name": "Drone de Expurgo",
+					"enemy_id": "ninho_errante",
+					"hp": 14,
+					"max_hp": 14,
+					"rank": 3,
+					"unit_id": "corridor_1117577172_9_2_ninho_errante"
+				},
+				{
+					"damage_bonus": 2,
+					"display_name": "Emissor de Comando",
+					"enemy_id": "sussurrador",
+					"hp": 13,
+					"max_hp": 13,
+					"rank": 4,
+					"unit_id": "corridor_1117577172_9_3_sussurrador"
+				}
+			],
+			"patrol_enemy_counts": {
+				"cao_eco": 1,
+				"carcaca_colonizada": 1,
+				"condutor_raiz": 2,
+				"robot": 3,
+				"sussurrador": 3
+			},
+			"search_sites": 0,
+			"weather": "night"
+		},
+		"fase_5": {
+			"guardians": [
+				{
+					"damage_bonus": 2,
+					"display_name": "O Porteiro",
+					"enemy_id": "porteiro",
+					"hp": 90,
+					"max_hp": 90,
+					"rank": 1,
+					"unit_id": "corridor_1117577173_9_0_porteiro"
+				},
+				{
+					"damage_bonus": 2,
+					"display_name": "Relé de Defesa Alfa",
+					"enemy_id": "condutor_raiz",
+					"hp": 16,
+					"max_hp": 16,
+					"rank": 3,
+					"suffix": " Alfa",
+					"unit_id": "corridor_1117577173_9_1_condutor_raiz"
+				},
+				{
+					"damage_bonus": 2,
+					"display_name": "Relé de Defesa Beta",
+					"enemy_id": "condutor_raiz",
+					"hp": 16,
+					"max_hp": 16,
+					"rank": 4,
+					"suffix": " Beta",
+					"unit_id": "corridor_1117577173_9_2_condutor_raiz"
+				}
+			],
+			"patrol_enemy_counts": {
+				"broto": 2,
+				"carcaca_colonizada": 1,
+				"carrasco_industrial": 1,
+				"condutor_raiz": 1,
+				"ninho_errante": 1,
+				"rastejante_raiz": 1,
+				"robot_fungo": 2,
+				"sussurrador": 1
+			},
+			"search_sites": 0,
+			"weather": "night"
+		}
+	},
+	"seed": 4242
+}

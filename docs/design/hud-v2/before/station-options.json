@@ -1,0 +1,599 @@
+{
+  "name": "station-options",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1102",
+      "rect": [
+        32.0,
+        18.0,
+        251.0,
+        50.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1103",
+      "rect": [
+        34.0,
+        66.0,
+        172.0,
+        23.0
+      ],
+      "text": "Ciclo 0 · 4 no elenco"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1517/@HBoxContainer@1504/@HBoxContainer@1507/@Label@1506",
+      "rect": [
+        1032.0,
+        37.0,
+        26.0,
+        25.0
+      ],
+      "text": "30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1517/@HBoxContainer@1504/@HBoxContainer@1510/@Label@1509",
+      "rect": [
+        1101.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "9"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1517/@HBoxContainer@1504/@HBoxContainer@1513/@Label@1512",
+      "rect": [
+        1156.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1517/@HBoxContainer@1504/@HBoxContainer@1516/@Label@1515",
+      "rect": [
+        1211.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1523/@VBoxContainer@1519/@Label@1520",
+      "rect": [
+        1299.0,
+        16.0,
+        195.0,
+        20.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1523/@VBoxContainer@1519/@Label@1521",
+      "rect": [
+        1299.0,
+        36.0,
+        195.0,
+        28.0
+      ],
+      "text": "0 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1523/@VBoxContainer@1519/@Label@1522",
+      "rect": [
+        1299.0,
+        64.0,
+        195.0,
+        20.0
+      ],
+      "text": "! Falta na volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1529/@VBoxContainer@1525/@Label@1526",
+      "rect": [
+        1558.0,
+        16.0,
+        144.0,
+        20.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1529/@VBoxContainer@1525/@Label@1527",
+      "rect": [
+        1558.0,
+        36.0,
+        144.0,
+        28.0
+      ],
+      "text": "6 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1529/@VBoxContainer@1525/@Label@1528",
+      "rect": [
+        1558.0,
+        64.0,
+        144.0,
+        20.0
+      ],
+      "text": "Próxima volta: 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1535/@VBoxContainer@1531/@Label@1532",
+      "rect": [
+        1766.0,
+        16.0,
+        122.0,
+        20.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1535/@VBoxContainer@1531/@Label@1533",
+      "rect": [
+        1766.0,
+        36.0,
+        122.0,
+        28.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1535/@VBoxContainer@1531/@Label@1534",
+      "rect": [
+        1766.0,
+        64.0,
+        122.0,
+        20.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1108",
+      "rect": [
+        52.0,
+        126.0,
+        446.0,
+        20.0
+      ],
+      "text": "PRÓXIMO PASSO"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1109",
+      "rect": [
+        52.0,
+        154.0,
+        446.0,
+        33.0
+      ],
+      "text": "Recuperar a Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1110",
+      "rect": [
+        52.0,
+        195.0,
+        446.0,
+        47.0
+      ],
+      "text": "Fabrica relíquias por 3 sucatas. Gasta 1 de energia. Custa 4 sucatas."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Button@1111",
+      "rect": [
+        52.0,
+        250.0,
+        446.0,
+        54.0
+      ],
+      "text": "Ver a Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@VBoxContainer@1112/@Button@1536",
+      "rect": [
+        32.0,
+        328.0,
+        486.0,
+        48.0
+      ],
+      "text": "Preparar expedição"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@VBoxContainer@1112/@Button@1537",
+      "rect": [
+        32.0,
+        382.0,
+        486.0,
+        48.0
+      ],
+      "text": "Plano da Estação: o que cada cômodo destrava"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1114",
+      "rect": [
+        32.0,
+        1000.0,
+        190.0,
+        48.0
+      ],
+      "text": "‹ Vista geral"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1115",
+      "rect": [
+        230.0,
+        1000.0,
+        150.0,
+        48.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1116",
+      "rect": [
+        388.0,
+        1000.0,
+        170.0,
+        48.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@Label@1539",
+      "rect": [
+        1230.0,
+        124.0,
+        628.0,
+        42.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@Label@1541",
+      "rect": [
+        1230.0,
+        190.0,
+        628.0,
+        28.0
+      ],
+      "text": "Som"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HBoxContainer@1542/@Label@1543",
+      "rect": [
+        1230.0,
+        231.0,
+        150.0,
+        25.0
+      ],
+      "text": "Música"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HBoxContainer@1542/@Label@1545",
+      "rect": [
+        1764.0,
+        231.0,
+        70.0,
+        25.0
+      ],
+      "text": "60%"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HBoxContainer@1546/@Label@1547",
+      "rect": [
+        1230.0,
+        273.0,
+        150.0,
+        25.0
+      ],
+      "text": "Ambiente"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HBoxContainer@1546/@Label@1549",
+      "rect": [
+        1764.0,
+        273.0,
+        70.0,
+        25.0
+      ],
+      "text": "60%"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HBoxContainer@1550/@Label@1551",
+      "rect": [
+        1230.0,
+        315.0,
+        150.0,
+        25.0
+      ],
+      "text": "Efeitos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HBoxContainer@1550/@Label@1553",
+      "rect": [
+        1764.0,
+        315.0,
+        70.0,
+        25.0
+      ],
+      "text": "60%"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@Label@1555",
+      "rect": [
+        1230.0,
+        368.0,
+        628.0,
+        28.0
+      ],
+      "text": "Gráficos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1556/@Button@1557",
+      "rect": [
+        1230.0,
+        406.0,
+        120.0,
+        48.0
+      ],
+      "text": "Baixo"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1556/@Button@1558",
+      "rect": [
+        1356.0,
+        406.0,
+        120.0,
+        48.0
+      ],
+      "text": "Médio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1556/@Button@1559",
+      "rect": [
+        1482.0,
+        406.0,
+        120.0,
+        48.0
+      ],
+      "text": "▸ Alto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1556/@Button@1560",
+      "rect": [
+        1608.0,
+        406.0,
+        120.0,
+        48.0
+      ],
+      "text": "Ultra"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@Label@1561",
+      "rect": [
+        1230.0,
+        464.0,
+        628.0,
+        21.0
+      ],
+      "text": "Qualidade: resolução interna, sombras, oclusão, neblina e quantidade de chuva."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@CheckButton@1562",
+      "rect": [
+        1230.0,
+        495.0,
+        628.0,
+        35.0
+      ],
+      "text": "Tela cheia"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@CheckButton@1563",
+      "rect": [
+        1230.0,
+        540.0,
+        628.0,
+        35.0
+      ],
+      "text": "Sincronia vertical (vsync)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@Label@1565",
+      "rect": [
+        1230.0,
+        599.0,
+        628.0,
+        28.0
+      ],
+      "text": "Jogo"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1566/@Label@1567",
+      "rect": [
+        1230.0,
+        648.0,
+        260.0,
+        25.0
+      ],
+      "text": "Velocidade da batalha"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1566/@Button@1568",
+      "rect": [
+        1496.0,
+        637.0,
+        120.0,
+        48.0
+      ],
+      "text": "▸ 1x"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1566/@Button@1569",
+      "rect": [
+        1622.0,
+        637.0,
+        120.0,
+        48.0
+      ],
+      "text": "2x"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@CheckButton@1570",
+      "rect": [
+        1230.0,
+        695.0,
+        628.0,
+        35.0
+      ],
+      "text": "Reduzir efeitos (clima, tremor e clarão)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@CheckButton@1571",
+      "rect": [
+        1230.0,
+        740.0,
+        628.0,
+        35.0
+      ],
+      "text": "Dicas da primeira vez"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@CheckButton@1572",
+      "rect": [
+        1230.0,
+        785.0,
+        628.0,
+        35.0
+      ],
+      "text": "Cores para daltonismo (azul e laranja)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1573/@Label@1574",
+      "rect": [
+        1230.0,
+        841.0,
+        260.0,
+        25.0
+      ],
+      "text": "Tamanho do texto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1573/@Button@1575",
+      "rect": [
+        1496.0,
+        830.0,
+        120.0,
+        48.0
+      ],
+      "text": "▸ Normal"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1573/@Button@1576",
+      "rect": [
+        1622.0,
+        830.0,
+        120.0,
+        48.0
+      ],
+      "text": "Grande"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1573/@Button@1577",
+      "rect": [
+        1230.0,
+        884.0,
+        120.0,
+        48.0
+      ],
+      "text": "Maior"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1578/@Label@1579",
+      "rect": [
+        1230.0,
+        953.0,
+        260.0,
+        25.0
+      ],
+      "text": "Idioma"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1578/@Button@1580",
+      "rect": [
+        1496.0,
+        942.0,
+        139.0,
+        48.0
+      ],
+      "text": "▸ Português"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@VBoxContainer@1538/@HFlowContainer@1578/@Button@1581",
+      "rect": [
+        1641.0,
+        942.0,
+        195.0,
+        48.0
+      ],
+      "text": "English (em teste)"
+    }
+  ]
+}

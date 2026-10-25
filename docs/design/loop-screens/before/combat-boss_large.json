@@ -1,0 +1,813 @@
+{
+	"actor": "unit_hero_sapo_iris",
+	"name": "combat-boss",
+	"texts": [
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@371/@VBoxContainer@370/Top/Name",
+			"rect": [
+				1708.3056640625,
+				413.793518066406,
+				178.0,
+				59.0
+			],
+			"text": "Relé de Defesa Beta"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@371/@VBoxContainer@370/HpRow/HpText",
+			"rect": [
+				1839.3056640625,
+				475.793518066406,
+				47.0,
+				26.0
+			],
+			"text": "16/16"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@371/@VBoxContainer@370/IntentRow/Intent",
+			"rect": [
+				1743.3056640625,
+				504.793518066406,
+				143.0,
+				84.0
+			],
+			"text": "Arco de Alta Tensão → um de 4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@369/@VBoxContainer@368/Top/Name",
+			"rect": [
+				1506.5673828125,
+				413.919799804688,
+				178.0,
+				59.0
+			],
+			"text": "Relé de Defesa Alfa"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@369/@VBoxContainer@368/HpRow/HpText",
+			"rect": [
+				1637.5673828125,
+				475.919799804688,
+				47.0,
+				26.0
+			],
+			"text": "16/16"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@369/@VBoxContainer@368/IntentRow/Intent",
+			"rect": [
+				1541.5673828125,
+				504.919799804688,
+				143.0,
+				84.0
+			],
+			"text": "Arco de Alta Tensão → um de 4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@367/@VBoxContainer@366/Top/Name",
+			"rect": [
+				1073.06433105469,
+				628.0,
+				235.0,
+				28.0
+			],
+			"text": "O Porteiro"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@367/@VBoxContainer@366/HpRow/HpText",
+			"rect": [
+				1246.06433105469,
+				659.0,
+				62.0,
+				26.0
+			],
+			"text": "90/90"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@367/@VBoxContainer@366/IntentRow/Intent",
+			"rect": [
+				1108.06433105469,
+				688.0,
+				200.0,
+				84.0
+			],
+			"text": "Prensa de Contenção → Bento ou Nick"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@365/@VBoxContainer@364/Top/Name",
+			"rect": [
+				264.392944335938,
+				708.0,
+				157.0,
+				28.0
+			],
+			"text": "Véspera"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@365/@VBoxContainer@364/HpRow/HpText",
+			"rect": [
+				358.392944335938,
+				739.0,
+				63.0,
+				26.0
+			],
+			"text": "30/30"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@363/@VBoxContainer@362/Top/Name",
+			"rect": [
+				445.777160644531,
+				708.0,
+				157.0,
+				28.0
+			],
+			"text": "Íris"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@363/@VBoxContainer@362/HpRow/HpText",
+			"rect": [
+				545.777160644531,
+				739.0,
+				57.0,
+				26.0
+			],
+			"text": "23/23"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@361/@VBoxContainer@360/Top/Name",
+			"rect": [
+				627.392333984375,
+				708.0,
+				157.0,
+				28.0
+			],
+			"text": "Nick"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@361/@VBoxContainer@360/HpRow/HpText",
+			"rect": [
+				726.392333984375,
+				739.0,
+				58.0,
+				26.0
+			],
+			"text": "24/24"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@359/@VBoxContainer@358/Top/Name",
+			"rect": [
+				809.470092773438,
+				708.0,
+				158.0,
+				28.0
+			],
+			"text": "Bento"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@359/@VBoxContainer@358/HpRow/HpText",
+			"rect": [
+				908.470092773438,
+				739.0,
+				59.0,
+				26.0
+			],
+			"text": "34/34"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@167/@HBoxContainer@168/@Label@394",
+			"rect": [
+				622.5,
+				54.0,
+				109.0,
+				28.0
+			],
+			"text": "RODADA 1"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@167/@HBoxContainer@168/@VBoxContainer@397/@Label@396",
+			"rect": [
+				743.5,
+				92.0,
+				105.0,
+				27.0
+			],
+			"text": "Íris · agora"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@167/@HBoxContainer@168/@VBoxContainer@400/@Label@399",
+			"rect": [
+				860.5,
+				74.0,
+				54.0,
+				26.0
+			],
+			"text": "Nick"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@167/@HBoxContainer@168/@VBoxContainer@403/@Label@402",
+			"rect": [
+				926.5,
+				74.0,
+				79.0,
+				26.0
+			],
+			"text": "Véspera"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@167/@HBoxContainer@168/@VBoxContainer@406/@Label@405",
+			"rect": [
+				1017.5,
+				74.0,
+				77.0,
+				26.0
+			],
+			"text": "Porteiro"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@167/@HBoxContainer@168/@VBoxContainer@409/@Label@408",
+			"rect": [
+				1106.5,
+				74.0,
+				59.0,
+				26.0
+			],
+			"text": "Bento"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@167/@HBoxContainer@168/@VBoxContainer@412/@Label@411",
+			"rect": [
+				1177.5,
+				74.0,
+				54.0,
+				26.0
+			],
+			"text": "Relé"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@167/@HBoxContainer@168/@VBoxContainer@415/@Label@414",
+			"rect": [
+				1243.5,
+				74.0,
+				54.0,
+				26.0
+			],
+			"text": "Relé"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@170/@VBoxContainer@171/@Label@172",
+			"rect": [
+				1488.0,
+				142.0,
+				392.0,
+				26.0
+			],
+			"text": "REGISTRO · L abre"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@170/@VBoxContainer@171/@Label@173",
+			"rect": [
+				1488.0,
+				172.0,
+				392.0,
+				63.0
+			],
+			"text": "Combate iniciado nas ruínas do Bairro Submerso!"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@HBoxContainer@176/@VBoxContainer@178/@Label@179",
+			"rect": [
+				162.0,
+				800.0,
+				242.0,
+				54.0
+			],
+			"text": "Íris"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@HBoxContainer@176/@VBoxContainer@178/@Label@180",
+			"rect": [
+				162.0,
+				858.0,
+				242.0,
+				30.0
+			],
+			"text": "Vida 23/23"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@HBoxContainer@176/@VBoxContainer@178/@Label@182",
+			"rect": [
+				162.0,
+				910.0,
+				242.0,
+				57.0
+			],
+			"text": "Instinto 0/200 · em 200, crise"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@Label@186",
+			"rect": [
+				422.0,
+				800.0,
+				1214.0,
+				30.0
+			],
+			"text": "Vez de Íris: escolha uma habilidade (1–4) ou uma ação."
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@437/@HBoxContainer@416/@VBoxContainer@418/@Label@419",
+			"rect": [
+				500.0,
+				844.0,
+				184.0,
+				30.0
+			],
+			"text": "Carga Voltaica"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@437/@HBoxContainer@416/@VBoxContainer@418/@HBoxContainer@422/@Label@420",
+			"rect": [
+				500.0,
+				876.0,
+				58.0,
+				40.0
+			],
+			"text": "4–7"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@437/@HBoxContainer@416/@VBoxContainer@418/@HBoxContainer@422/@Label@421",
+			"rect": [
+				564.0,
+				890.0,
+				50.0,
+				26.0
+			],
+			"text": "dano"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@437/@HBoxContainer@416/@VBoxContainer@418/@HBoxContainer@428/@Label@423",
+			"rect": [
+				500.0,
+				918.0,
+				24.0,
+				23.0
+			],
+			"text": "de"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@437/@HBoxContainer@416/@VBoxContainer@418/@HBoxContainer@434/@Label@429",
+			"rect": [
+				500.0,
+				943.0,
+				28.0,
+				23.0
+			],
+			"text": "em"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@437/@PanelContainer@436/@Label@435",
+			"rect": [
+				710.0,
+				844.0,
+				9.0,
+				26.0
+			],
+			"text": "1"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@459/@HBoxContainer@438/@VBoxContainer@440/@Label@441",
+			"rect": [
+				806.0,
+				844.0,
+				184.0,
+				63.0
+			],
+			"text": "Coquetel Corrosivo"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@459/@HBoxContainer@438/@VBoxContainer@440/@HBoxContainer@444/@Label@442",
+			"rect": [
+				806.0,
+				909.0,
+				59.0,
+				40.0
+			],
+			"text": "2–4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@459/@HBoxContainer@438/@VBoxContainer@440/@HBoxContainer@444/@Label@443",
+			"rect": [
+				871.0,
+				923.0,
+				50.0,
+				26.0
+			],
+			"text": "dano"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@459/@HBoxContainer@438/@VBoxContainer@440/@HBoxContainer@450/@Label@445",
+			"rect": [
+				806.0,
+				951.0,
+				24.0,
+				23.0
+			],
+			"text": "de"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@459/@HBoxContainer@438/@VBoxContainer@440/@HBoxContainer@456/@Label@451",
+			"rect": [
+				806.0,
+				976.0,
+				28.0,
+				23.0
+			],
+			"text": "em"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@459/@PanelContainer@458/@Label@457",
+			"rect": [
+				1016.0,
+				844.0,
+				12.0,
+				26.0
+			],
+			"text": "2"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@482/@HBoxContainer@460/@VBoxContainer@462/@Label@463",
+			"rect": [
+				1112.0,
+				844.0,
+				184.0,
+				63.0
+			],
+			"text": "Ampola de Reparo Vivo"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@482/@HBoxContainer@460/@VBoxContainer@462/@HBoxContainer@466/@Label@464",
+			"rect": [
+				1112.0,
+				909.0,
+				79.0,
+				40.0
+			],
+			"text": "+5–8"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@482/@HBoxContainer@460/@VBoxContainer@462/@HBoxContainer@466/@Label@465",
+			"rect": [
+				1197.0,
+				923.0,
+				42.0,
+				26.0
+			],
+			"text": "cura"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@482/@HBoxContainer@460/@VBoxContainer@462/@HBoxContainer@472/@Label@467",
+			"rect": [
+				1112.0,
+				951.0,
+				24.0,
+				23.0
+			],
+			"text": "de"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@482/@HBoxContainer@460/@VBoxContainer@462/@HBoxContainer@478/@Label@473",
+			"rect": [
+				1112.0,
+				976.0,
+				28.0,
+				23.0
+			],
+			"text": "em"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@482/@HBoxContainer@460/@VBoxContainer@462/@Label@479",
+			"rect": [
+				1112.0,
+				1001.0,
+				184.0,
+				23.0
+			],
+			"text": "3 uso(s)"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@482/@PanelContainer@481/@Label@480",
+			"rect": [
+				1322.0,
+				844.0,
+				13.0,
+				26.0
+			],
+			"text": "3"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@502/@HBoxContainer@483/@VBoxContainer@485/@Label@486",
+			"rect": [
+				1418.0,
+				844.0,
+				184.0,
+				63.0
+			],
+			"text": "Antídoto de Campo"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@502/@HBoxContainer@483/@VBoxContainer@485/@HBoxContainer@492/@Label@487",
+			"rect": [
+				1418.0,
+				909.0,
+				24.0,
+				23.0
+			],
+			"text": "de"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@502/@HBoxContainer@483/@VBoxContainer@485/@HBoxContainer@498/@Label@493",
+			"rect": [
+				1418.0,
+				934.0,
+				28.0,
+				23.0
+			],
+			"text": "em"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@502/@HBoxContainer@483/@VBoxContainer@485/@Label@499",
+			"rect": [
+				1418.0,
+				959.0,
+				184.0,
+				23.0
+			],
+			"text": "2 uso(s)"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@185/@HBoxContainer@187/@Button@502/@PanelContainer@501/@Label@500",
+			"rect": [
+				1628.0,
+				844.0,
+				14.0,
+				26.0
+			],
+			"text": "4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@188/@Button@191",
+			"rect": [
+				1654.0,
+				800.0,
+				236.0,
+				56.0
+			],
+			"text": "Mover"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@188/@Button@191/@PanelContainer@190/@Label@189",
+			"rect": [
+				1877.0,
+				818.5,
+				18.0,
+				26.0
+			],
+			"text": "Q"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@188/@Button@194",
+			"rect": [
+				1654.0,
+				862.0,
+				236.0,
+				56.0
+			],
+			"text": "Defender"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@188/@Button@194/@PanelContainer@193/@Label@192",
+			"rect": [
+				1874.0,
+				880.5,
+				21.0,
+				26.0
+			],
+			"text": "W"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@188/@Button@197",
+			"rect": [
+				1654.0,
+				924.0,
+				236.0,
+				56.0
+			],
+			"text": "Mochila · 4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@188/@Button@197/@PanelContainer@196/@Label@195",
+			"rect": [
+				1885.0,
+				942.5,
+				6.0,
+				26.0
+			],
+			"text": "I"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@188/@Button@200",
+			"rect": [
+				1654.0,
+				986.0,
+				236.0,
+				56.0
+			],
+			"text": "Fugir"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@158/@CanvasLayer@166/@Control@165/@PanelContainer@174/@HBoxContainer@175/@VBoxContainer@188/@Button@200/@PanelContainer@199/@Label@198",
+			"rect": [
+				1881.0,
+				1004.5,
+				12.0,
+				26.0
+			],
+			"text": "F"
+		}
+	],
+	"units": [
+		{
+			"block": 0,
+			"class_id": "cao",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 34,
+			"id": "unit_hero_cao_bento",
+			"instinct": 0,
+			"max_hp": 34,
+			"name": "Bento",
+			"player": true,
+			"rank": 1,
+			"speed": 2,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "gato",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 24,
+			"id": "unit_hero_gato_nick",
+			"instinct": 0,
+			"max_hp": 24,
+			"name": "Nick",
+			"player": true,
+			"rank": 2,
+			"speed": 6,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "sapo",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 23,
+			"id": "unit_hero_sapo_iris",
+			"instinct": 0,
+			"max_hp": 23,
+			"name": "Íris",
+			"player": true,
+			"rank": 3,
+			"speed": 5,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "coruja",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 30,
+			"id": "unit_hero_coruja_vespera",
+			"instinct": 0,
+			"max_hp": 30,
+			"name": "Véspera",
+			"player": true,
+			"rank": 4,
+			"speed": 3,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "",
+			"dodge": 0,
+			"enemy_id": "porteiro",
+			"guard": 0,
+			"hp": 90,
+			"id": "corridor_1117577173_9_0_porteiro",
+			"instinct": 0,
+			"max_hp": 90,
+			"name": "O Porteiro",
+			"player": false,
+			"rank": 1,
+			"speed": 2,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "",
+			"dodge": 0,
+			"enemy_id": "condutor_raiz",
+			"guard": 0,
+			"hp": 16,
+			"id": "corridor_1117577173_9_1_condutor_raiz",
+			"instinct": 0,
+			"max_hp": 16,
+			"name": "Relé de Defesa Alfa",
+			"player": false,
+			"rank": 3,
+			"speed": 2,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "",
+			"dodge": 0,
+			"enemy_id": "condutor_raiz",
+			"guard": 0,
+			"hp": 16,
+			"id": "corridor_1117577173_9_2_condutor_raiz",
+			"instinct": 0,
+			"max_hp": 16,
+			"name": "Relé de Defesa Beta",
+			"player": false,
+			"rank": 4,
+			"speed": 2,
+			"stun": 0
+		}
+	]
+}

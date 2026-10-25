@@ -1,0 +1,434 @@
+{
+  "name": "station",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1102",
+      "rect": [
+        32.0,
+        18.0,
+        251.0,
+        50.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1103",
+      "rect": [
+        34.0,
+        66.0,
+        172.0,
+        23.0
+      ],
+      "text": "Ciclo 0 · 4 no elenco"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1190/@HBoxContainer@1177/@HBoxContainer@1180/@Label@1179",
+      "rect": [
+        1032.0,
+        37.0,
+        26.0,
+        25.0
+      ],
+      "text": "30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1190/@HBoxContainer@1177/@HBoxContainer@1183/@Label@1182",
+      "rect": [
+        1101.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "9"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1190/@HBoxContainer@1177/@HBoxContainer@1186/@Label@1185",
+      "rect": [
+        1156.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1190/@HBoxContainer@1177/@HBoxContainer@1189/@Label@1188",
+      "rect": [
+        1211.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1196/@VBoxContainer@1192/@Label@1193",
+      "rect": [
+        1299.0,
+        16.0,
+        195.0,
+        20.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1196/@VBoxContainer@1192/@Label@1194",
+      "rect": [
+        1299.0,
+        36.0,
+        195.0,
+        28.0
+      ],
+      "text": "0 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1196/@VBoxContainer@1192/@Label@1195",
+      "rect": [
+        1299.0,
+        64.0,
+        195.0,
+        20.0
+      ],
+      "text": "! Falta na volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1202/@VBoxContainer@1198/@Label@1199",
+      "rect": [
+        1558.0,
+        16.0,
+        144.0,
+        20.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1202/@VBoxContainer@1198/@Label@1200",
+      "rect": [
+        1558.0,
+        36.0,
+        144.0,
+        28.0
+      ],
+      "text": "6 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1202/@VBoxContainer@1198/@Label@1201",
+      "rect": [
+        1558.0,
+        64.0,
+        144.0,
+        20.0
+      ],
+      "text": "Próxima volta: 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1208/@VBoxContainer@1204/@Label@1205",
+      "rect": [
+        1766.0,
+        16.0,
+        122.0,
+        20.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1208/@VBoxContainer@1204/@Label@1206",
+      "rect": [
+        1766.0,
+        36.0,
+        122.0,
+        28.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1208/@VBoxContainer@1204/@Label@1207",
+      "rect": [
+        1766.0,
+        64.0,
+        122.0,
+        20.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1108",
+      "rect": [
+        52.0,
+        126.0,
+        446.0,
+        20.0
+      ],
+      "text": "PRÓXIMO PASSO"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1109",
+      "rect": [
+        52.0,
+        154.0,
+        446.0,
+        33.0
+      ],
+      "text": "Recuperar a Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1110",
+      "rect": [
+        52.0,
+        195.0,
+        446.0,
+        47.0
+      ],
+      "text": "Fabrica relíquias por 3 sucatas. Gasta 1 de energia. Custa 4 sucatas."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Button@1111",
+      "rect": [
+        52.0,
+        250.0,
+        446.0,
+        54.0
+      ],
+      "text": "Ver a Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@VBoxContainer@1112/@Button@1209",
+      "rect": [
+        32.0,
+        328.0,
+        486.0,
+        48.0
+      ],
+      "text": "Preparar expedição"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@VBoxContainer@1112/@Button@1210",
+      "rect": [
+        32.0,
+        382.0,
+        486.0,
+        48.0
+      ],
+      "text": "Plano da Estação: o que cada cômodo destrava"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1115",
+      "rect": [
+        32.0,
+        1000.0,
+        150.0,
+        48.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1116",
+      "rect": [
+        190.0,
+        1000.0,
+        170.0,
+        48.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1118/@PanelContainer@1120/@Label@1119",
+      "rect": [
+        823.893493652344,
+        515.353332519531,
+        108.0,
+        25.0
+      ],
+      "text": "Alojamento"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1121/@HBoxContainer@1122/@VBoxContainer@1123/@Label@1124",
+      "rect": [
+        46.0,
+        877.0,
+        277.0,
+        31.0
+      ],
+      "text": "Alojamento"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1121/@HBoxContainer@1122/@VBoxContainer@1123/@Label@1125",
+      "rect": [
+        46.0,
+        910.0,
+        277.0,
+        47.0
+      ],
+      "text": "Conhecer e acompanhar os moradores do abrigo."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1121/@HBoxContainer@1122/@VBoxContainer@1123/@Label@1126",
+      "rect": [
+        46.0,
+        959.0,
+        277.0,
+        21.0
+      ],
+      "text": "Aberto"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1121/@HBoxContainer@1122/@Button@1127",
+      "rect": [
+        337.0,
+        904.0,
+        147.0,
+        48.0
+      ],
+      "text": "Gerenciar ›"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1137/@PanelContainer@1129/@Label@1128",
+      "rect": [
+        720.0,
+        1032.0,
+        13.0,
+        20.0
+      ],
+      "text": "←"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1137/@PanelContainer@1131/@Label@1130",
+      "rect": [
+        753.0,
+        1032.0,
+        13.0,
+        20.0
+      ],
+      "text": "→"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1137/@PanelContainer@1133/@Label@1132",
+      "rect": [
+        786.0,
+        1032.0,
+        11.0,
+        20.0
+      ],
+      "text": "↑"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1137/@PanelContainer@1135/@Label@1134",
+      "rect": [
+        817.0,
+        1032.0,
+        11.0,
+        20.0
+      ],
+      "text": "↓"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1137/@Label@1136",
+      "rect": [
+        840.0,
+        1032.0,
+        75.0,
+        21.0
+      ],
+      "text": "cômodos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1141/@PanelContainer@1139/@Label@1138",
+      "rect": [
+        939.0,
+        1032.0,
+        9.0,
+        20.0
+      ],
+      "text": "E"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1141/@Label@1140",
+      "rect": [
+        960.0,
+        1032.0,
+        35.0,
+        21.0
+      ],
+      "text": "abrir"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1145/@PanelContainer@1143/@Label@1142",
+      "rect": [
+        1019.0,
+        1032.0,
+        26.0,
+        20.0
+      ],
+      "text": "Esc"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1145/@Label@1144",
+      "rect": [
+        1057.0,
+        1032.0,
+        43.0,
+        21.0
+      ],
+      "text": "menu"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1149/@PanelContainer@1147/@Label@1146",
+      "rect": [
+        1124.0,
+        1032.0,
+        18.0,
+        20.0
+      ],
+      "text": "F2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1150/@HBoxContainer@1149/@Label@1148",
+      "rect": [
+        1154.0,
+        1032.0,
+        54.0,
+        21.0
+      ],
+      "text": "ocultar"
+    }
+  ]
+}

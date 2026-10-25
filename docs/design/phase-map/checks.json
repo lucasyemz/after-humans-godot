@@ -1,0 +1,659 @@
+{
+  "issue": 86,
+  "runtime_webp": [
+    {
+      "file": "art/ui/map/network/bridge_available.webp",
+      "size": [
+        423,
+        282
+      ],
+      "mode": "RGBA",
+      "bytes": 45090,
+      "sha256": "bdd08086dc272f92eaa01dd052de15dd276730440bd08a67266df7340bdac1de"
+    },
+    {
+      "file": "art/ui/map/network/bridge_completed.webp",
+      "size": [
+        423,
+        282
+      ],
+      "mode": "RGBA",
+      "bytes": 45636,
+      "sha256": "a137f1231a65a2d26668046349478a4cbcfd319d2cfc6e779c14efe2f1668290"
+    },
+    {
+      "file": "art/ui/map/network/bridge_locked.webp",
+      "size": [
+        423,
+        282
+      ],
+      "mode": "RGBA",
+      "bytes": 43972,
+      "sha256": "c23326690ab1143cb1268abd653e935e0df75db6a92b58df9ee2c80752b4058e"
+    },
+    {
+      "file": "art/ui/map/network/bridge_selected.webp",
+      "size": [
+        423,
+        284
+      ],
+      "mode": "RGBA",
+      "bytes": 44658,
+      "sha256": "bfa1a0580a9d59063b80f7a88fb4341b6bad99329db5880c2d7f4fa2b8837a53"
+    },
+    {
+      "file": "art/ui/map/network/depot_available.webp",
+      "size": [
+        329,
+        218
+      ],
+      "mode": "RGBA",
+      "bytes": 39512,
+      "sha256": "a5b2282e14fa77265de07ca192eb01443b88c38db39d5ddbd52996f9281f2d33"
+    },
+    {
+      "file": "art/ui/map/network/depot_completed.webp",
+      "size": [
+        329,
+        218
+      ],
+      "mode": "RGBA",
+      "bytes": 39830,
+      "sha256": "ab0a98218427305cf5722760187dc2910a4023ec3fdcea79bc6116fbca84f655"
+    },
+    {
+      "file": "art/ui/map/network/depot_locked.webp",
+      "size": [
+        329,
+        218
+      ],
+      "mode": "RGBA",
+      "bytes": 37990,
+      "sha256": "c1f1d42b091471cdac7c1048382f5ae3b8c2e881162e7512f8f1bb7d6819fb9c"
+    },
+    {
+      "file": "art/ui/map/network/depot_selected.webp",
+      "size": [
+        329,
+        220
+      ],
+      "mode": "RGBA",
+      "bytes": 38972,
+      "sha256": "c055381078eaf0198e7688abc38782ada4eb42c00d85e5715ec2938b792cda08"
+    },
+    {
+      "file": "art/ui/map/network/lab_available.webp",
+      "size": [
+        319,
+        275
+      ],
+      "mode": "RGBA",
+      "bytes": 47060,
+      "sha256": "3fb22870b094870ac377a8a0d16121ed5e6994406ed5803806ba5cd64fad5cf0"
+    },
+    {
+      "file": "art/ui/map/network/lab_completed.webp",
+      "size": [
+        319,
+        275
+      ],
+      "mode": "RGBA",
+      "bytes": 47578,
+      "sha256": "435ca2b14e0b4b960a62c4b36b116ffbadfd7e56ef77af07194a6ead10d9c83b"
+    },
+    {
+      "file": "art/ui/map/network/lab_locked.webp",
+      "size": [
+        319,
+        275
+      ],
+      "mode": "RGBA",
+      "bytes": 47078,
+      "sha256": "267279de6f04f5cbf4351ed115d7f986005870c0c48a07e51357efc5e56022c9"
+    },
+    {
+      "file": "art/ui/map/network/lab_selected.webp",
+      "size": [
+        319,
+        277
+      ],
+      "mode": "RGBA",
+      "bytes": 46338,
+      "sha256": "d86ed53659655b3a3282c56971be3b8033b000e13ca5102dc355ce69c8931466"
+    },
+    {
+      "file": "art/ui/map/network/lock_32.webp",
+      "size": [
+        32,
+        32
+      ],
+      "mode": "RGBA",
+      "bytes": 106,
+      "sha256": "61ffe4493500082323b1468a67be85ae05854d5c0d23301fe0f6d442f5981e2b"
+    },
+    {
+      "file": "art/ui/map/network/marker_boss_known.webp",
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA",
+      "bytes": 264,
+      "sha256": "74ce47873e6096df35f3df40a95d88acd2af0249c5b2a31a7938a7f148b37729"
+    },
+    {
+      "file": "art/ui/map/network/marker_boss_partial.webp",
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA",
+      "bytes": 540,
+      "sha256": "a3d482e38aa3588e28ecc37b9d277f47e6306a7a54a859ad164c8c60af8df363"
+    },
+    {
+      "file": "art/ui/map/network/marker_boss_unknown.webp",
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA",
+      "bytes": 532,
+      "sha256": "63f9568d412ef7c2303094ddde35fc5fb192feb1d9718518016d948fb582662b"
+    },
+    {
+      "file": "art/ui/map/network/marker_enemies_known.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 188,
+      "sha256": "6180673ad6c17faa53ff58a5a33d663013236fdb8d5ba10508173b18621bbb8f"
+    },
+    {
+      "file": "art/ui/map/network/marker_enemies_partial.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 462,
+      "sha256": "f888af92199a9a4d95e2fafe8db0bc9dd3b10a9e9a508596ea27e5dbe308e9fb"
+    },
+    {
+      "file": "art/ui/map/network/marker_enemies_unknown.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 462,
+      "sha256": "bbaabc665303326fd88d4d20cb03bd8fff1ec972082bef504c51cbd4cb59e7df"
+    },
+    {
+      "file": "art/ui/map/network/marker_story_known.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 516,
+      "sha256": "f575b2ba917148dd09c70500764f0ac999070565af4a33efbad57e63cdb5d3d9"
+    },
+    {
+      "file": "art/ui/map/network/marker_story_none.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 196,
+      "sha256": "25ccc5e4be1a86a5e270784668e8d8b855ee9e4767cf62993624324c936f2bcd"
+    },
+    {
+      "file": "art/ui/map/network/marker_story_partial.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 462,
+      "sha256": "f888af92199a9a4d95e2fafe8db0bc9dd3b10a9e9a508596ea27e5dbe308e9fb"
+    },
+    {
+      "file": "art/ui/map/network/marker_story_unknown.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 462,
+      "sha256": "bbaabc665303326fd88d4d20cb03bd8fff1ec972082bef504c51cbd4cb59e7df"
+    },
+    {
+      "file": "art/ui/map/network/marker_supplies_known.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 484,
+      "sha256": "06a04e4b6405838195a62d8f21597a0ae2ac693670bd5860b547d38764871b20"
+    },
+    {
+      "file": "art/ui/map/network/marker_supplies_partial.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 462,
+      "sha256": "f888af92199a9a4d95e2fafe8db0bc9dd3b10a9e9a508596ea27e5dbe308e9fb"
+    },
+    {
+      "file": "art/ui/map/network/marker_supplies_unknown.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 462,
+      "sha256": "bbaabc665303326fd88d4d20cb03bd8fff1ec972082bef504c51cbd4cb59e7df"
+    },
+    {
+      "file": "art/ui/map/network/network_map.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGB",
+      "bytes": 404920,
+      "sha256": "8535c666418d86ad473dc8b6a4421dc2e33829a3c6ec82b6a6baa386d0d5cc64"
+    },
+    {
+      "file": "art/ui/map/network/portrait_broto.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4818,
+      "sha256": "bc7f42009a6b6619cc9c9b5caf2c521cb238509dd2b083e9c3901bcbd1847a0b"
+    },
+    {
+      "file": "art/ui/map/network/portrait_cao_eco.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4078,
+      "sha256": "fe7d7e1ab10821cfe5e674011b65e303afda3e589ae91aa6273ea81741ebaf55"
+    },
+    {
+      "file": "art/ui/map/network/portrait_carcaca_colonizada.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4160,
+      "sha256": "6af678061efa4629cd23ba346f4831c8e0bc120262dfd7a144cc09cac318ee23"
+    },
+    {
+      "file": "art/ui/map/network/portrait_carrasco_industrial.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4948,
+      "sha256": "9323bef77da5ed25545a3ea49b2d56a7b6cc6b5c0de54bd7e6031ea7b645f0b5"
+    },
+    {
+      "file": "art/ui/map/network/portrait_condutor_raiz.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4312,
+      "sha256": "94c56b44c6be5a031c8b1a008d0fa6f3cce0c7367b3af34bb1143dcd634f5bce"
+    },
+    {
+      "file": "art/ui/map/network/portrait_enraizado.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4034,
+      "sha256": "12dfa556946c55e70c5e87ec0306d04b8fa9be9331ec6e2724fd4b1f9d543404"
+    },
+    {
+      "file": "art/ui/map/network/portrait_faisca.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 5052,
+      "sha256": "f6381cbb274d919550b63152d452f7368b9b85a7f63345fa3d53a5460d494a3f"
+    },
+    {
+      "file": "art/ui/map/network/portrait_ninho_errante.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4642,
+      "sha256": "c351501b99b3275e0ba8b9f9ecdb3b1af3a42f28a0729767492957be2a426b87"
+    },
+    {
+      "file": "art/ui/map/network/portrait_pipoco.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 3686,
+      "sha256": "b6f6effb96ee85b0649daae4bf92dd668e87fdc218559c99448f7eb46a068639"
+    },
+    {
+      "file": "art/ui/map/network/portrait_porteiro.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4028,
+      "sha256": "6e0a135b2e495aa7f31cf76894e18ddf1baa51f88823c475cd4b1a40d29d75f4"
+    },
+    {
+      "file": "art/ui/map/network/portrait_rastejante_raiz.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 3214,
+      "sha256": "ee63cf00859fdaa2859a8197c3eae737cc72f942920c02c548731812f4ae3c21"
+    },
+    {
+      "file": "art/ui/map/network/portrait_recreador.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 3886,
+      "sha256": "31c17fec4886a73d0dba18bf4ff891cac8c23a8eb65158036aab1581493f1335"
+    },
+    {
+      "file": "art/ui/map/network/portrait_robot.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 2848,
+      "sha256": "869561cfa14561f969d0ef7d3634321cc7228be0bbded39d53f706eef4b3dc50"
+    },
+    {
+      "file": "art/ui/map/network/portrait_robot_fungo.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 4506,
+      "sha256": "0eccc7078dc2324c9c5439a8de715fbc38feb7ebf041e0a06b76303d936a97ab"
+    },
+    {
+      "file": "art/ui/map/network/portrait_sussurrador.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 2118,
+      "sha256": "2205cc811c0696402616efae6a2f7165f5e27c00b622f20b50c890ca554057c8"
+    },
+    {
+      "file": "art/ui/map/network/portrait_vigia_enferrujado.webp",
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA",
+      "bytes": 3628,
+      "sha256": "505001f4ad5c90fffa59ce1cf9a493a4eed5a21e9a48222b49258f5b219ab293"
+    },
+    {
+      "file": "art/ui/map/network/refuge_available.webp",
+      "size": [
+        357,
+        248
+      ],
+      "mode": "RGBA",
+      "bytes": 47952,
+      "sha256": "ea9279de6e310dd4764a6fa80157475bf9554a52fd7af914c723e28a18fc7e6b"
+    },
+    {
+      "file": "art/ui/map/network/refuge_completed.webp",
+      "size": [
+        357,
+        248
+      ],
+      "mode": "RGBA",
+      "bytes": 48434,
+      "sha256": "d06fb7c8e4e7a1287d46056f0b25abc936a902a7217c68d06b0da0e4a561eb3e"
+    },
+    {
+      "file": "art/ui/map/network/refuge_locked.webp",
+      "size": [
+        357,
+        248
+      ],
+      "mode": "RGBA",
+      "bytes": 47022,
+      "sha256": "9fa3769779632058048d285209ddada98869f972ab0734c3b33489538b26ebf3"
+    },
+    {
+      "file": "art/ui/map/network/refuge_selected.webp",
+      "size": [
+        357,
+        250
+      ],
+      "mode": "RGBA",
+      "bytes": 47346,
+      "sha256": "192a10efb31a9ffd99ff1d0db6706d91aaaa4fa0a779aacea2d5ab026f4df942"
+    },
+    {
+      "file": "art/ui/map/network/route_bridge_remaining.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 426,
+      "sha256": "6220348e89fbd79f5b894c07f9971658bda0ad34aa696ecbd667d8d88e75cb91"
+    },
+    {
+      "file": "art/ui/map/network/route_bridge_traversed.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 494,
+      "sha256": "2f9fc0b8e6299c0fe2abe3dfb83a3f854e2a706a88bc3f172fef23cdb95aba4c"
+    },
+    {
+      "file": "art/ui/map/network/route_depot_remaining.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 718,
+      "sha256": "745cc9800753d2ee2478f842f74d5e0cf9e223d57671837dcb8c93e86b59f368"
+    },
+    {
+      "file": "art/ui/map/network/route_depot_traversed.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 730,
+      "sha256": "8a68489397a095d1853c31487855e42653e33c1bc62597f89f05b2132b8517a7"
+    },
+    {
+      "file": "art/ui/map/network/route_lab_remaining.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 716,
+      "sha256": "a5840050e23a0ccd0ba8887b33bbf3cd798ed08a5188868a21f75f5f674fd146"
+    },
+    {
+      "file": "art/ui/map/network/route_lab_traversed.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 840,
+      "sha256": "6b059bd5904efa61bd94ae6534c506988e51facbb1ec2e61932e0b2f0f11feaf"
+    },
+    {
+      "file": "art/ui/map/network/route_shelter_remaining.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 442,
+      "sha256": "2a272f154c99eda8223b655e6f8eef7f62fae4fc03d65512ef2ab945bc99ce12"
+    },
+    {
+      "file": "art/ui/map/network/route_shelter_traversed.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 440,
+      "sha256": "e3a70fa67c0c5000c6045b47186a6caef6914faedb8b0663bf8e0568447d1f82"
+    },
+    {
+      "file": "art/ui/map/network/route_shop_remaining.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 276,
+      "sha256": "14bfd4c386bcc9fbc6b0a1033dbcc56e35bdcbbda8c62ba9c6d311b1bd0aa1f5"
+    },
+    {
+      "file": "art/ui/map/network/route_shop_traversed.webp",
+      "size": [
+        1120,
+        630
+      ],
+      "mode": "RGBA",
+      "bytes": 240,
+      "sha256": "0e73cd85db2477d0299b816443ce01eb2fc64b945dbdcb9567cd524a9f7c5a49"
+    },
+    {
+      "file": "art/ui/map/network/shelter_available.webp",
+      "size": [
+        258,
+        166
+      ],
+      "mode": "RGBA",
+      "bytes": 22188,
+      "sha256": "e5a087ac7c8b528df8878e94df211d0a9d8907df4c312bb31111b7603739a62b"
+    },
+    {
+      "file": "art/ui/map/network/shelter_completed.webp",
+      "size": [
+        258,
+        166
+      ],
+      "mode": "RGBA",
+      "bytes": 22588,
+      "sha256": "be9cd309ecedd93495ad79cd042045ac13aa194e4fa85ae08e79679c47dec6e3"
+    },
+    {
+      "file": "art/ui/map/network/shelter_locked.webp",
+      "size": [
+        258,
+        166
+      ],
+      "mode": "RGBA",
+      "bytes": 21758,
+      "sha256": "c8c07f91b8a32219c08bbe7f012aafd557d6c94a3be2f23b56b0f99be56fb7bd"
+    },
+    {
+      "file": "art/ui/map/network/shelter_selected.webp",
+      "size": [
+        258,
+        168
+      ],
+      "mode": "RGBA",
+      "bytes": 21784,
+      "sha256": "44f375b66cc1eef985fbe14cb4fbf4a4b0934b4267120d8b518e8c9c250b9c67"
+    },
+    {
+      "file": "art/ui/map/network/shop_available.webp",
+      "size": [
+        358,
+        216
+      ],
+      "mode": "RGBA",
+      "bytes": 37332,
+      "sha256": "509ca9d1df52fd1b3a549049c8559c32e3effc3c0fb0494866791a9e9bf51024"
+    },
+    {
+      "file": "art/ui/map/network/shop_completed.webp",
+      "size": [
+        358,
+        216
+      ],
+      "mode": "RGBA",
+      "bytes": 37888,
+      "sha256": "e034626e14b89e9ec266fb1e99205308b027c9b81ee2c26647f6d43421d2634d"
+    },
+    {
+      "file": "art/ui/map/network/shop_locked.webp",
+      "size": [
+        358,
+        216
+      ],
+      "mode": "RGBA",
+      "bytes": 37032,
+      "sha256": "43497c33949116e46e5ac1b883a73c0f95ade6739a7dd8f7638acc6ad45cd503"
+    },
+    {
+      "file": "art/ui/map/network/shop_selected.webp",
+      "size": [
+        358,
+        218
+      ],
+      "mode": "RGBA",
+      "bytes": 36860,
+      "sha256": "d1e082f6e17c84faac6b1b9b56c3747e0f25ec4030070ca37867e704ea9ec091"
+    }
+  ],
+  "regions": 6,
+  "states_per_region": 4,
+  "proposals": 16,
+  "issues": []
+}

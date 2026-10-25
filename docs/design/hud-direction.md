@@ -11,6 +11,8 @@ O Lucas refez por cima a versão C do Codex e aprovou o resultado como **o alvo 
 Onde este alvo e o resto da página discordam, **vale o alvo**: metal escuro e cantos chanfrados com detalhe âmbar, em
 vez de latão ornamentado; letra condensada, em vez da serifada. As raízes e a luz ciano continuam, mas com moderação.
 
+**Entrega e QA contra o alvo:** [hud-target.md](hud-target.md), com comparações nos quatro perfis e o kit WebP/9-slice.
+
 ### O que muda da versão C para o alvo
 
 | Peça | Versão C (Codex) | Alvo (Lucas) |
@@ -68,6 +70,10 @@ O Codex entregou o kit da luta no PR #97 (`codex-design`):
 - a comparação com o alvo e a QA em `docs/design/hud-target.md`.
 
 O kit de latão (`art/ui/kit/v2/`) fica só como histórico. A integração no jogo é da #60 (Claude).
+
+O relatório da volta e a Sala dos Personagens (os alvos da Estação, abaixo) estão no branch `design-station`:
+- as peças estão em `art/ui/kit/station/`;
+- as telas, as comparações e as medidas estão em [hud-station.md](hud-station.md).
 
 ## Como produzir as peças (qualquer agente com geração de imagem)
 
@@ -266,3 +272,11 @@ VIGIA, raízes que tomaram tudo e a Estação Raiz como casa. A interface é **f
   Lucas aprovar. Só depois as telas.
 - **Legível:** texto no mínimo do `AHUiStyle`, contraste, texto Maior e daltonismo continuam valendo. O ornamento nunca
   fica em cima do texto.
+
+## Decisão do Lucas — 25/10/2026
+
+- **Direção escolhida: C — Latão noturno**, a terceira das [variações de HUD](hud-variations.md): distribuição compacta, ornamento contido e espaço para a cena. Consolidar a HUD a partir dela; isto não aprova uma integração já implementada ou todas as telas da #96.
+- **Ícones do Nick:** Lucas gostou e pediu para guardar como possibilidade futura. Preservar os estudos e as imagens atuais, incluindo os ícones ilustrados visíveis na C e os glifos alternativos da B; não interpretar a preferência como autorização para substituir os ícones usados pelo jogo. A seleção final do conjunto fica para uma tarefa futura.
+- **Foco atual: somente a HUD.** Não expandir agora para redesenho ou integração de habilidades/ícones. A bandeira de Fugir/Retirar foi identificada como pouco clara; revisar a clareza desse controle dentro do trabalho da HUD.
+
+A consolidação da HUD de combate, peças e medidas está em [hud-c.md](hud-c.md). Essa é a referência atual de implementação da HUD C; as variações e a prancha inicial continuam como histórico.

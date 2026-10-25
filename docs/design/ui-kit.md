@@ -1,5 +1,7 @@
 # Kit único de componentes — #59
 
+> **Referência atual do combate:** [alvo aprovado de aço chanfrado](hud-target.md), com fonte condensada OFL e [peças/margens](hud-target/assets.json). Substitui a aparência de latão da C. O kit v1 abaixo fica como histórico.
+
 **Versão 01, proposta para aprovação do Lucas. QA de design: APROVADO na rodada 4 (revisão do PR #65).** Base de leitura: commit `fceda77`, 24/10/2026. A #58 monta as telas com este kit após a aprovação; a #60 implementa os componentes no jogo. Esta entrega não muda a HUD em execução.
 
 ![Mesmas quatro peças nos quatro contextos](ui-kit/unity_normal.webp)
@@ -163,3 +165,26 @@ Registro após avaliação com `docs/design/qa.md`, acrescida dos critérios da 
 ## Variante do mapa — #69
 
 A família Sequência recebe etiquetas disponível/bloqueada/concluída/refúgio, compostas com Painel e Seleção, sem textura nova. [Pranchas, medidas, idiomas e QA](map_labels.md). Normal 240×96; Grande/Maior 272×112; 9-slice 16; ícone 24; foco externo 6. Contrato em `components.sequence.map_label_variant`.
+
+## Variantes compactas — #58
+
+A QA da primeira montagem da HUD identificou medidas compactas ainda sem contrato. Antes da montagem corrigida, estas variantes passaram a fazer parte das mesmas famílias, reutilizando todas as texturas, fontes, ícones e estados existentes:
+
+| Família | Variante e medidas |
+|---|---|
+| Placa | 160×72 aliado;208×72 inimigo; padding16; posição18/21/23; vida12, trilha de instinto4; nome e valores no foco; mesma geometria nas três escalas |
+| Botão | ícone de habilidade104×104, arte64; ação136×104, ícone40; tecla18/21/23; motivo de bloqueio no foco |
+| Ficha | altura64, ícone32, valor24/28/31; nome e previsão no foco |
+| Sequência | faixa544×96, até6 retratos48, passo56; atual marcado por losango, retrato e luz no corpo |
+
+[Prancha das variantes](ui-kit/hud_compact.png). O contrato guarda as coordenadas locais. Não é outra HUD ou família visual: é a apresentação resumida dos mesmos componentes, que revela os detalhes ao apontar/focar. Dica mantém largura480 Normal/640 Maior, conforme o kit; o detalhe longo usa18/23 e não cobre o herói atual.
+
+QA das variantes — rodada1: **VEREDITO: APROVADO**. Conferidos Normal/Maior, fontes mínimas, 9-slice16, ícones32/40/64, barras distintas por espessura, foco e escolha separados, geometria sem corte. Cinza e daltonismo continuam apoiados em formas e texto no foco. Sem novos assets de runtime. Esta aprovação antecede a segunda montagem das telas #58.
+
+Toque na HUD v2: a revisão usa alvos112×112 e passo128 (44,8px a40%), com a mesma família de botão. [Prancha e QA da HUD](hud-v2/qa.md). O contrato registra essa medida; não usar88px para os controles de toque reduzidos.
+
+## Composições do laço — #96
+
+Antes das telas, foram registradas as variantes nas famílias existentes: cartão de carga320×272/296, arte224×192 com âncora112,184; cartão de melhoria432×240/272; sequência de3 estrelas32, passo48, com rótulo numérico; ligações de Pesquisa entre cartões320×176/208 (208/240 com título quebrado); iniciativa até8 retratos na faixa656×96. Não há moldura nova. Painel, barras, fichas, aviso, seleção e foco continuam os mesmos.
+
+[Prancha dos componentes](loop-screens/components.webp). QA dos componentes: **VEREDITO: APROVADO**, Normal/Maior, caixas alinhadas, estrelas cheias/vazias distintas sem cor, conteúdo e seleção dentro da moldura. Os números novos mostrados na prancha são exemplos de layout, não uma tabela de progressão. As telas da #96 são montadas depois desta validação.
