@@ -1,0 +1,9 @@
+{
+	"critical_seed": 4771,
+	"friend_block": 1,
+	"friend_threshold": 3,
+	"friend_trigger": "Bento entered deaths door by real _apply_damage",
+	"nick_instinct_after": 5,
+	"rival_threshold": -3,
+	"rival_trigger": "real enemy critical hit by _execute_enemy_plan"
+}

@@ -1,0 +1,247 @@
+{
+	"name": "station-research",
+	"texts": [
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@Label@1095",
+			"rect": [
+				32.0,
+				18.0,
+				328.0,
+				64.0
+			],
+			"text": "Estação Raiz"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@Label@1096",
+			"rect": [
+				34.0,
+				80.0,
+				217.0,
+				30.0
+			],
+			"text": "Ciclo 0 · 4 no elenco"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@PanelContainer@1310/@HBoxContainer@1297/@HBoxContainer@1300/@Label@1299",
+			"rect": [
+				869.0,
+				45.0,
+				33.0,
+				32.0
+			],
+			"text": "30"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@PanelContainer@1310/@HBoxContainer@1297/@HBoxContainer@1303/@Label@1302",
+			"rect": [
+				945.0,
+				45.0,
+				15.0,
+				32.0
+			],
+			"text": "9"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@PanelContainer@1310/@HBoxContainer@1297/@HBoxContainer@1306/@Label@1305",
+			"rect": [
+				1003.0,
+				45.0,
+				15.0,
+				32.0
+			],
+			"text": "3"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@PanelContainer@1310/@HBoxContainer@1297/@HBoxContainer@1309/@Label@1308",
+			"rect": [
+				1061.0,
+				45.0,
+				15.0,
+				32.0
+			],
+			"text": "2"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1316/@VBoxContainer@1312/@Label@1313",
+			"rect": [
+				1152.0,
+				16.0,
+				257.0,
+				26.0
+			],
+			"text": "COMIDA"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1316/@VBoxContainer@1312/@Label@1314",
+			"rect": [
+				1152.0,
+				42.0,
+				257.0,
+				38.0
+			],
+			"text": "0 / 12 suprimentos"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1316/@VBoxContainer@1312/@Label@1315",
+			"rect": [
+				1152.0,
+				80.0,
+				257.0,
+				26.0
+			],
+			"text": "! Falta na volta"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1322/@VBoxContainer@1318/@Label@1319",
+			"rect": [
+				1473.0,
+				16.0,
+				190.0,
+				26.0
+			],
+			"text": "ÁGUA"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1322/@VBoxContainer@1318/@Label@1320",
+			"rect": [
+				1473.0,
+				42.0,
+				190.0,
+				38.0
+			],
+			"text": "6 em estoque"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1322/@VBoxContainer@1318/@Label@1321",
+			"rect": [
+				1473.0,
+				80.0,
+				190.0,
+				26.0
+			],
+			"text": "Próxima volta: 4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1328/@VBoxContainer@1324/@Label@1325",
+			"rect": [
+				1727.0,
+				16.0,
+				161.0,
+				26.0
+			],
+			"text": "ENERGIA"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1328/@VBoxContainer@1324/@Label@1326",
+			"rect": [
+				1727.0,
+				42.0,
+				161.0,
+				38.0
+			],
+			"text": "1 / 3 em uso"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1328/@VBoxContainer@1324/@Label@1327",
+			"rect": [
+				1727.0,
+				80.0,
+				161.0,
+				26.0
+			],
+			"text": "2 livres"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1106/@Button@1107",
+			"rect": [
+				32.0,
+				1000.0,
+				190.0,
+				56.0
+			],
+			"text": "‹ Vista geral"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1106/@Button@1108",
+			"rect": [
+				230.0,
+				1000.0,
+				150.0,
+				56.0
+			],
+			"text": "Opções"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1106/@Button@1109",
+			"rect": [
+				388.0,
+				1000.0,
+				199.0,
+				56.0
+			],
+			"text": "Ocultar HUD"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1145/@ScrollContainer@1148/@VBoxContainer@1149/@Label@1331",
+			"rect": [
+				1230.0,
+				124.0,
+				636.0,
+				50.0
+			],
+			"text": "Centro de Pesquisa"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1145/@ScrollContainer@1148/@VBoxContainer@1149/@Label@1332",
+			"rect": [
+				1230.0,
+				184.0,
+				636.0,
+				30.0
+			],
+			"text": "Vazio"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1145/@ScrollContainer@1148/@VBoxContainer@1149/@Label@1333",
+			"rect": [
+				1230.0,
+				224.0,
+				636.0,
+				67.0
+			],
+			"text": "Laboratório vazio. Recuperado, libera as melhorias de classe e gasta 1 de energia."
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1145/@ScrollContainer@1148/@VBoxContainer@1149/@Button@1334",
+			"rect": [
+				1230.0,
+				301.0,
+				636.0,
+				56.0
+			],
+			"text": "Recuperar (3 sucatas e 2 fragmentos)"
+		}
+	]
+}

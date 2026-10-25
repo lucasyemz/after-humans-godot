@@ -1,0 +1,599 @@
+{
+	"name": "station-preparation",
+	"texts": [
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@Label@1095",
+			"rect": [
+				32.0,
+				18.0,
+				328.0,
+				64.0
+			],
+			"text": "Estação Raiz"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@Label@1096",
+			"rect": [
+				34.0,
+				80.0,
+				217.0,
+				30.0
+			],
+			"text": "Ciclo 0 · 4 no elenco"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@PanelContainer@1382/@HBoxContainer@1369/@HBoxContainer@1372/@Label@1371",
+			"rect": [
+				869.0,
+				45.0,
+				33.0,
+				32.0
+			],
+			"text": "30"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@PanelContainer@1382/@HBoxContainer@1369/@HBoxContainer@1375/@Label@1374",
+			"rect": [
+				945.0,
+				45.0,
+				15.0,
+				32.0
+			],
+			"text": "9"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@PanelContainer@1382/@HBoxContainer@1369/@HBoxContainer@1378/@Label@1377",
+			"rect": [
+				1003.0,
+				45.0,
+				15.0,
+				32.0
+			],
+			"text": "3"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@PanelContainer@1382/@HBoxContainer@1369/@HBoxContainer@1381/@Label@1380",
+			"rect": [
+				1061.0,
+				45.0,
+				15.0,
+				32.0
+			],
+			"text": "2"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1388/@VBoxContainer@1384/@Label@1385",
+			"rect": [
+				1152.0,
+				16.0,
+				257.0,
+				26.0
+			],
+			"text": "COMIDA"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1388/@VBoxContainer@1384/@Label@1386",
+			"rect": [
+				1152.0,
+				42.0,
+				257.0,
+				38.0
+			],
+			"text": "0 / 12 suprimentos"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1388/@VBoxContainer@1384/@Label@1387",
+			"rect": [
+				1152.0,
+				80.0,
+				257.0,
+				26.0
+			],
+			"text": "! Falta na volta"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1394/@VBoxContainer@1390/@Label@1391",
+			"rect": [
+				1473.0,
+				16.0,
+				190.0,
+				26.0
+			],
+			"text": "ÁGUA"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1394/@VBoxContainer@1390/@Label@1392",
+			"rect": [
+				1473.0,
+				42.0,
+				190.0,
+				38.0
+			],
+			"text": "6 em estoque"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1394/@VBoxContainer@1390/@Label@1393",
+			"rect": [
+				1473.0,
+				80.0,
+				190.0,
+				26.0
+			],
+			"text": "Próxima volta: 4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1400/@VBoxContainer@1396/@Label@1397",
+			"rect": [
+				1727.0,
+				16.0,
+				161.0,
+				26.0
+			],
+			"text": "ENERGIA"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1400/@VBoxContainer@1396/@Label@1398",
+			"rect": [
+				1727.0,
+				42.0,
+				161.0,
+				38.0
+			],
+			"text": "1 / 3 em uso"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@HBoxContainer@1097/@HBoxContainer@1400/@VBoxContainer@1396/@Label@1399",
+			"rect": [
+				1727.0,
+				80.0,
+				161.0,
+				26.0
+			],
+			"text": "2 livres"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1406/@Button@1407",
+			"rect": [
+				44.0,
+				449.0,
+				187.0,
+				56.0
+			],
+			"text": "‹ Vista geral"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1406/@Label@1408",
+			"rect": [
+				235.0,
+				464.0,
+				951.0,
+				26.0
+			],
+			"text": "   EQUIPE · 1 A 4 ANIMAIS · CLIQUE EM DOIS PARA TROCAR"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1406/@Label@1409",
+			"rect": [
+				1190.0,
+				463.0,
+				178.0,
+				28.0
+			],
+			"text": "← fundo · frente →"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1426/@VBoxContainer@1411/@HBoxContainer@1413/@VBoxContainer@1415/@Label@1416",
+			"rect": [
+				138.0,
+				525.0,
+				192.0,
+				47.0
+			],
+			"text": "Véspera"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1426/@VBoxContainer@1411/@HBoxContainer@1413/@VBoxContainer@1415/@Label@1417",
+			"rect": [
+				138.0,
+				576.0,
+				192.0,
+				26.0
+			],
+			"text": "Atiradora e Controle"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1426/@VBoxContainer@1411/@Label@1419",
+			"rect": [
+				56.0,
+				624.0,
+				294.0,
+				27.0
+			],
+			"text": "Vida 30/30"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1426/@VBoxContainer@1411/@Label@1425",
+			"rect": [
+				56.0,
+				715.0,
+				294.0,
+				27.0
+			],
+			"text": "✓ 3 de 4 habilidades daqui"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1426/@Label@1412",
+			"rect": [
+				314.0,
+				517.0,
+				32.0,
+				71.0
+			],
+			"text": "4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1442/@VBoxContainer@1427/@HBoxContainer@1429/@VBoxContainer@1431/@Label@1432",
+			"rect": [
+				468.0,
+				525.0,
+				176.0,
+				47.0
+			],
+			"text": "Íris"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1442/@VBoxContainer@1427/@HBoxContainer@1429/@VBoxContainer@1431/@Label@1433",
+			"rect": [
+				468.0,
+				576.0,
+				176.0,
+				26.0
+			],
+			"text": "Química e Suporte"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1442/@VBoxContainer@1427/@Label@1435",
+			"rect": [
+				386.0,
+				624.0,
+				294.0,
+				27.0
+			],
+			"text": "Vida 23/23"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1442/@VBoxContainer@1427/@Label@1441",
+			"rect": [
+				386.0,
+				715.0,
+				294.0,
+				27.0
+			],
+			"text": "✓ 4 de 4 habilidades daqui"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1442/@Label@1428",
+			"rect": [
+				644.0,
+				517.0,
+				29.0,
+				71.0
+			],
+			"text": "3"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1458/@VBoxContainer@1443/@HBoxContainer@1445/@VBoxContainer@1447/@Label@1448",
+			"rect": [
+				798.0,
+				525.0,
+				205.0,
+				47.0
+			],
+			"text": "Nick"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1458/@VBoxContainer@1443/@HBoxContainer@1445/@VBoxContainer@1447/@Label@1449",
+			"rect": [
+				798.0,
+				576.0,
+				205.0,
+				26.0
+			],
+			"text": "Batedor e Mobilidade"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1458/@VBoxContainer@1443/@Label@1451",
+			"rect": [
+				716.0,
+				624.0,
+				294.0,
+				27.0
+			],
+			"text": "Vida 24/24"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1458/@VBoxContainer@1443/@Label@1457",
+			"rect": [
+				716.0,
+				715.0,
+				294.0,
+				27.0
+			],
+			"text": "✓ 4 de 4 habilidades daqui"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1458/@Label@1444",
+			"rect": [
+				974.0,
+				517.0,
+				32.0,
+				71.0
+			],
+			"text": "2"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1474/@VBoxContainer@1459/@HBoxContainer@1461/@VBoxContainer@1463/@Label@1464",
+			"rect": [
+				1128.0,
+				525.0,
+				177.0,
+				47.0
+			],
+			"text": "Bento"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1474/@VBoxContainer@1459/@HBoxContainer@1461/@VBoxContainer@1463/@Label@1465",
+			"rect": [
+				1128.0,
+				576.0,
+				177.0,
+				26.0
+			],
+			"text": "Tanque e Proteção"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1474/@VBoxContainer@1459/@Label@1467",
+			"rect": [
+				1046.0,
+				624.0,
+				294.0,
+				27.0
+			],
+			"text": "Vida 34/34"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1474/@VBoxContainer@1459/@Label@1473",
+			"rect": [
+				1046.0,
+				715.0,
+				294.0,
+				27.0
+			],
+			"text": "✓ 4 de 4 habilidades daqui"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1405/@HBoxContainer@1410/@Button@1474/@Label@1460",
+			"rect": [
+				1304.0,
+				517.0,
+				20.0,
+				71.0
+			],
+			"text": "1"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1476/@VBoxContainer@1477/@Label@1478",
+			"rect": [
+				1404.0,
+				459.0,
+				458.0,
+				23.0
+			],
+			"text": "MISSÃO"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1476/@VBoxContainer@1477/@Label@1479",
+			"rect": [
+				1404.0,
+				487.0,
+				458.0,
+				40.0
+			],
+			"text": "Rua das Vitrines"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1476/@VBoxContainer@1477/@Label@1480",
+			"rect": [
+				1404.0,
+				532.0,
+				458.0,
+				27.0
+			],
+			"text": "Fase 1 · Fácil · nível 1+ · Rua das Vitrines"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1476/@VBoxContainer@1477/@Button@1481",
+			"rect": [
+				1404.0,
+				564.0,
+				458.0,
+				56.0
+			],
+			"text": "Escolher no mapa"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1482/@VBoxContainer@1483/@Label@1484",
+			"rect": [
+				1404.0,
+				650.0,
+				458.0,
+				23.0
+			],
+			"text": "FOCO DA ROTA"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1482/@VBoxContainer@1483/@HFlowContainer@1485/@Button@1486",
+			"rect": [
+				1404.0,
+				678.0,
+				162.0,
+				51.0
+			],
+			"text": "Rota básica"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1482/@VBoxContainer@1483/@HFlowContainer@1485/@Button@1487",
+			"rect": [
+				1572.0,
+				678.0,
+				93.0,
+				51.0
+			],
+			"text": "Água"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1482/@VBoxContainer@1483/@HFlowContainer@1485/@Button@1488",
+			"rect": [
+				1671.0,
+				678.0,
+				101.0,
+				51.0
+			],
+			"text": "Peças"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1482/@VBoxContainer@1483/@HFlowContainer@1485/@Button@1489",
+			"rect": [
+				1404.0,
+				735.0,
+				168.0,
+				59.0
+			],
+			"text": "Provisões ★"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1482/@VBoxContainer@1483/@Label@1490",
+			"rect": [
+				1404.0,
+				799.0,
+				458.0,
+				26.0
+			],
+			"text": "Suprimentos: 0 de 12; a noite da volta pede 4."
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1491/@VBoxContainer@1492/@Label@1493",
+			"rect": [
+				1404.0,
+				855.0,
+				458.0,
+				23.0
+			],
+			"text": "COMIDA"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1491/@VBoxContainer@1492/@HBoxContainer@1494/@Label@1495",
+			"rect": [
+				1404.0,
+				894.0,
+				330.0,
+				33.0
+			],
+			"text": "4 grátis + 0 extras"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1491/@VBoxContainer@1492/@HBoxContainer@1494/@Button@1496",
+			"rect": [
+				1742.0,
+				883.0,
+				56.0,
+				56.0
+			],
+			"text": "−"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1491/@VBoxContainer@1492/@HBoxContainer@1494/@Button@1497",
+			"rect": [
+				1806.0,
+				883.0,
+				56.0,
+				56.0
+			],
+			"text": "+"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@PanelContainer@1491/@VBoxContainer@1492/@Label@1498",
+			"rect": [
+				1404.0,
+				944.0,
+				458.0,
+				26.0
+			],
+			"text": "0 sementes · cura na Mochila e no acampamento"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Station/@CanvasLayer@1093/@Control@1092/@PanelContainer@1403/@HBoxContainer@1404/@VBoxContainer@1475/@Button@1499",
+			"rect": [
+				1390.0,
+				990.0,
+				486.0,
+				56.0
+			],
+			"text": "Partir · Rua das Vitrines"
+		}
+	]
+}

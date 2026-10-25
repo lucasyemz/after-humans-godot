@@ -1,0 +1,434 @@
+{
+	"actor": "unit_hero_gato_nick",
+	"name": "combat-result",
+	"texts": [
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1929/@VBoxContainer@1928/Top/Name",
+			"rect": [
+				1503.55676269531,
+				765.912353515625,
+				229.0,
+				22.0
+			],
+			"text": "Emissor de Comando"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1929/@VBoxContainer@1928/HpRow/HpText",
+			"rect": [
+				1707.55676269531,
+				790.912353515625,
+				25.0,
+				20.0
+			],
+			"text": "6/6"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1929/@VBoxContainer@1928/IntentRow/Intent",
+			"rect": [
+				1531.55676269531,
+				813.912353515625,
+				201.0,
+				43.0
+			],
+			"text": "Ordem Contraditória → um de 3"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1927/@VBoxContainer@1926/Top/Name",
+			"rect": [
+				1250.99182128906,
+				767.59912109375,
+				229.0,
+				22.0
+			],
+			"text": "Recreador"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1927/@VBoxContainer@1926/HpRow/HpText",
+			"rect": [
+				1453.99182128906,
+				792.59912109375,
+				26.0,
+				20.0
+			],
+			"text": "8/8"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1927/@VBoxContainer@1926/IntentRow/Intent",
+			"rect": [
+				1278.99182128906,
+				816.59912109375,
+				201.0,
+				20.0
+			],
+			"text": "Pega-Pega → um de 4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1925/@VBoxContainer@1924/Top/Name",
+			"rect": [
+				223.102386474609,
+				776.731384277344,
+				160.0,
+				22.0
+			],
+			"text": "Véspera"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1925/@VBoxContainer@1924/HpRow/HpText",
+			"rect": [
+				336.102386474609,
+				801.731384277344,
+				47.0,
+				20.0
+			],
+			"text": "30/30"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1923/@VBoxContainer@1922/Top/Name",
+			"rect": [
+				450.839233398438,
+				778.469665527344,
+				160.0,
+				22.0
+			],
+			"text": "Íris"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1923/@VBoxContainer@1922/HpRow/HpText",
+			"rect": [
+				567.839233398438,
+				803.469665527344,
+				43.0,
+				20.0
+			],
+			"text": "23/23"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1921/@VBoxContainer@1920/Top/Name",
+			"rect": [
+				679.669860839844,
+				780.21630859375,
+				160.0,
+				22.0
+			],
+			"text": "Nick"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1921/@VBoxContainer@1920/HpRow/HpText",
+			"rect": [
+				795.669860839844,
+				805.21630859375,
+				44.0,
+				20.0
+			],
+			"text": "24/24"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1919/@VBoxContainer@1918/Top/Name",
+			"rect": [
+				909.602783203125,
+				781.971374511719,
+				160.0,
+				22.0
+			],
+			"text": "Bento"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1919/@VBoxContainer@1918/HpRow/HpText",
+			"rect": [
+				1025.60278320312,
+				806.971374511719,
+				44.0,
+				20.0
+			],
+			"text": "34/34"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@Label@1949",
+			"rect": [
+				685.5,
+				54.0,
+				85.0,
+				22.0
+			],
+			"text": "RODADA 1"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1952/@Label@1951",
+			"rect": [
+				782.5,
+				92.0,
+				93.0,
+				21.0
+			],
+			"text": "Nick · agora"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1955/@Label@1954",
+			"rect": [
+				887.5,
+				74.0,
+				54.0,
+				20.0
+			],
+			"text": "Íris"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1958/@Label@1957",
+			"rect": [
+				953.5,
+				74.0,
+				57.0,
+				20.0
+			],
+			"text": "Emissor"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1961/@Label@1960",
+			"rect": [
+				1022.5,
+				74.0,
+				54.0,
+				20.0
+			],
+			"text": "Bento"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1964/@Label@1963",
+			"rect": [
+				1088.5,
+				74.0,
+				59.0,
+				20.0
+			],
+			"text": "Véspera"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1967/@Label@1966",
+			"rect": [
+				1159.5,
+				74.0,
+				75.0,
+				20.0
+			],
+			"text": "Recreador"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1641/@VBoxContainer@1642/@Label@1643",
+			"rect": [
+				1488.0,
+				142.0,
+				392.0,
+				20.0
+			],
+			"text": "REGISTRO · L abre"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1641/@VBoxContainer@1642/@Label@1644",
+			"rect": [
+				1488.0,
+				166.0,
+				392.0,
+				23.0
+			],
+			"text": "Fase inicial: um aliado toma a iniciativa."
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1675/@VBoxContainer@2037/@Label@2038",
+			"rect": [
+				680.0,
+				314.0,
+				560.0,
+				65.0
+			],
+			"text": "Vitória"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1675/@VBoxContainer@2037/@Label@2039",
+			"rect": [
+				680.0,
+				393.0,
+				560.0,
+				28.0
+			],
+			"text": "A patrulha foi neutralizada."
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1675/@VBoxContainer@2037/@HBoxContainer@2040/@VBoxContainer@2043/@Label@2042",
+			"rect": [
+				805.0,
+				503.0,
+				64.0,
+				45.0
+			],
+			"text": "Bento\n34/34"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1675/@VBoxContainer@2037/@HBoxContainer@2040/@VBoxContainer@2046/@Label@2045",
+			"rect": [
+				887.0,
+				503.0,
+				64.0,
+				45.0
+			],
+			"text": "Nick\n24/24"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1675/@VBoxContainer@2037/@HBoxContainer@2040/@VBoxContainer@2049/@Label@2048",
+			"rect": [
+				969.0,
+				503.0,
+				64.0,
+				45.0
+			],
+			"text": "Íris\n23/23"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1675/@VBoxContainer@2037/@HBoxContainer@2040/@VBoxContainer@2052/@Label@2051",
+			"rect": [
+				1051.0,
+				503.0,
+				64.0,
+				45.0
+			],
+			"text": "Véspera\n30/30"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1675/@VBoxContainer@2037/@Button@2053",
+			"rect": [
+				680.0,
+				562.0,
+				560.0,
+				52.0
+			],
+			"text": "Continuar"
+		}
+	],
+	"units": [
+		{
+			"block": 0,
+			"class_id": "cao",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 34,
+			"id": "unit_hero_cao_bento",
+			"instinct": 0,
+			"max_hp": 34,
+			"name": "Bento",
+			"player": true,
+			"rank": 1,
+			"speed": 2,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "gato",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 24,
+			"id": "unit_hero_gato_nick",
+			"instinct": 0,
+			"max_hp": 24,
+			"name": "Nick",
+			"player": true,
+			"rank": 2,
+			"speed": 6,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "sapo",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 23,
+			"id": "unit_hero_sapo_iris",
+			"instinct": 0,
+			"max_hp": 23,
+			"name": "Íris",
+			"player": true,
+			"rank": 3,
+			"speed": 5,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "coruja",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 30,
+			"id": "unit_hero_coruja_vespera",
+			"instinct": 0,
+			"max_hp": 30,
+			"name": "Véspera",
+			"player": true,
+			"rank": 4,
+			"speed": 3,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "",
+			"dodge": 0,
+			"enemy_id": "recreador",
+			"guard": 0,
+			"hp": 8,
+			"id": "corridor_1117577169_2_0_recreador",
+			"instinct": 0,
+			"max_hp": 8,
+			"name": "Recreador",
+			"player": false,
+			"rank": 1,
+			"speed": 3,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "",
+			"dodge": 0,
+			"enemy_id": "sussurrador",
+			"guard": 0,
+			"hp": 6,
+			"id": "corridor_1117577169_2_1_sussurrador",
+			"instinct": 0,
+			"max_hp": 6,
+			"name": "Emissor de Comando",
+			"player": false,
+			"rank": 2,
+			"speed": 3,
+			"stun": 0
+		}
+	]
+}
