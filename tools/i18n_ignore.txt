@@ -904,6 +904,17 @@ combat_hud.gd: Criterion
 combat_hud.gd: criterion
 combat_hud.gd: value
 fight_rewards.gd: Items
+street_corridor.gd: bandage
+camp_hud.gd: Name
+camp_hud.gd: Life
+camp_hud.gd: Instinct
+camp_hud.gd: Body_
+camp_hud.gd: %s %d/%d
+camp_hud.gd: visible
+camp_hud.gd: food
+camp_hud.gd: Effect
+camp_hud.gd: +%d
+camp_hud.gd: Gain
 briefing_dialog.gd: Briefing
 briefing_dialog.gd: art
 briefing_dialog.gd: role

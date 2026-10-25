@@ -124,3 +124,11 @@ cabiam, e com 14 cabem 78%. O da fase 4 ficou em 8, com 68% (com 9 seriam 92%, m
 4. **Depois do merge da lucasyemz/after-humans-godot#102 (aprovada):** a suíte passou 48 de 48, com a jornada completa
    (briefing, guardião, carga e debriefing), a tela do fim no texto Normal e no Maior, e a medição das estrelas
    reproduzida. As observações baixas entraram no doc, e o par do guardião da fase 4 voltou a 8.
+5. **Com o lucasyemz/after-humans-godot#98 (o acampamento encenado):**
+   - **Rodada 1 (reprovada):** um save reaberto no acampamento com o guardião vencido e a carga por escolher prendia
+     a equipe. Agora a carga abre ao levantar acampamento, com teste.
+   - **Rodada 2 (reprovada):** o Concluir jornada, preso pela direita para caber no texto Maior, cobria a ponta da
+     barra do acampamento. Agora ele sobe para cima da barra enquanto o acampamento está aberto e volta ao levantar,
+     com teste no texto Maior.
+   - **Rodada 3 (aprovada),** a suíte com 49 de 49. Ficou uma observação baixa: no texto Maior, a placa da Íris
+     encosta uns 5 px no canto do Concluir, conforme a sala.

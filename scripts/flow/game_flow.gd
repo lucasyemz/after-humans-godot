@@ -22,6 +22,7 @@ var busy := false
 var passage: AHPassageCard
 var _layer: CanvasLayer
 var _fade: ColorRect
+var _fade_tween: Tween
 
 
 func _ready() -> void:
@@ -186,14 +187,26 @@ func redirect(scene_id: String) -> void:
 
 
 ## Escurece (1) ou clareia (0) a tela, para transições dentro da mesma cena (entrar numa casa).
-func fade(alpha: float) -> void:
-	await _fade_to(alpha)
+## O preto da tela inteira até alpha (0 transparente, 1 preto) em seconds. Um fade só por vez: o novo substitui o que
+## estiver correndo (dois tweens no mesmo retângulo deixariam a tela presa no preto).
+func fade(alpha: float, seconds: float = FADE_SECONDS) -> void:
+	await _fade_to(alpha, seconds)
 
 
-func _fade_to(alpha: float) -> void:
+func _fade_to(alpha: float, seconds: float = FADE_SECONDS) -> void:
+	# O fade que estava correndo para e avisa quem esperava por ele (kill não emite finished: a troca de cena que o
+	# aguardava ficaria presa com o busy ligado).
+	var old := _fade_tween
 	_fade.visible = true
 	var tween := create_tween()
-	tween.tween_property(_fade, "modulate:a", alpha, FADE_SECONDS)
+	_fade_tween = tween
+	tween.tween_property(_fade, "modulate:a", alpha, seconds)
+	# Avisa depois de o novo ser o atual: quem acorda e emenda outro fade substitui este, sem dois tweens juntos.
+	if old != null and old.is_valid():
+		old.kill()
+		old.finished.emit()
 	await tween.finished
+	if _fade_tween != tween:
+		return
 	# Transparente, o retângulo ainda custaria uma passada na tela inteira.
 	_fade.visible = alpha > 0.0
