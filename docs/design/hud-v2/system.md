@@ -88,3 +88,5 @@ Mover troca com aliado vizinho e gasta a vez. Defender dá1 Bloqueio e passa a v
 ## Evolução da base durante o trabalho
 
 O PR83, com #82 e #69, foi mesclado durante a rodada. Esta entrega da #58 segue em PR próprio. A base Git foi sincronizada com main4f5e811 e validada com43/43 testes. As capturas conservam seus commits de origem; ver [QA e cobertura](qa.md). As telas novas do laço pedidas na #96 são uma entrega posterior.
+
+[Quais perfis são iguais de propósito e por quê](colorblind-equivalence.md). As216 propostas PNG são as imagens pedidas na #58; os originais de captura sem compressão ficam fora do Git. As novas entregas #86/#96 usam WebP.

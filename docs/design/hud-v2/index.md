@@ -762,3 +762,5 @@ Três espaços vazios, sem campanha falsa para ornamentar a tela. A mesma geomet
 | Maior | [JPG](before/title-slots-empty_large.jpg) | 5 → 8 | 3 → 3 |
 
 [Cinza](title-slots-empty_gray.webp) · [Normal completo](title-slots-empty.png) · [Maior completo](title-slots-empty_large.png) · medidas na [folha do sistema](system.md).
+
+[Quais perfis são iguais de propósito e por quê](colorblind-equivalence.md). As216 propostas PNG são as imagens pedidas na #58; os originais de captura sem compressão ficam fora do Git. As novas entregas #86/#96 usam WebP.

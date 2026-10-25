@@ -42,3 +42,5 @@ Evidência geométrica, glifos, dimensões, cobertura e hashes das pranchas: [ch
 Godot4.7.2, após sincronizar com `main`4f5e811: **43/43 testes**, paridade **48/48**, saída0,240,2s. Persistem avisos de recursos/ObjectDB/RID no encerramento; nenhum código foi alterado para tratá-los. A rodada anterior, na base das capturas, também passou40/40 e48/48.
 
 As imagens congelam a interface da basebc81822, com as capturas adicionais de mira/achado eme0c15e9; só documentação mudou entre esses dois commits. A sincronização posterior incorporou o PR85 e a proposta de laço do jogo à base Git, sem reescrever as capturas históricas. Os cartões de passagem e as novas telas do laço não são apresentados aqui como se tivessem sido capturados nesta série; suas entregas continuam nas issues próprias. A integração deve manter essas melhorias ao aplicar a HUD. A cobertura desta entrega é a lista da #58 e seus estados documentados, não as futuras telas da #96.
+
+[Quais perfis são iguais de propósito e por quê](colorblind-equivalence.md). As216 propostas PNG são as imagens pedidas na #58; os originais de captura sem compressão ficam fora do Git. As novas entregas #86/#96 usam WebP.
