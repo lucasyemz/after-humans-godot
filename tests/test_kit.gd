@@ -12,6 +12,7 @@ func run(context) -> void:
 	_tree = Engine.get_main_loop()
 	_manifest()
 	_states()
+	_faces()
 	await _components()
 
 
@@ -49,6 +50,18 @@ func _states() -> void:
 	t.equal(AHKit.health_state(0, 24).id, "heavy", "caído: Ferimento grave")
 	t.equal([AHKit.health_state(34, 34).label, AHKit.health_state(17, 23).label, AHKit.health_state(8, 24).label], ["Em forma", "Ferimento leve", "Ferimento grave"],
 		"os rótulos neutros")
+
+
+## Os retratos quadrados da faixa da rodada não saem vazios (o Rastejante de Cabos, deitado, saía com 1% de pixels).
+func _faces() -> void:
+	var manifest = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
+	var empty: Array = []
+	for group in ["heroes", "enemies"]:
+		for id in manifest[group]:
+			var art: Dictionary = manifest[group][id].get("idle", {})
+			if not art.is_empty() and AHUiStyle.opaque_share(AHUiStyle.face_texture(art).get_image()) < AHUiStyle.FACE_MIN_OPAQUE:
+				empty.append(id)
+	t.equal(empty, [], "nenhum retrato da ordem sai vazio (heróis e máquinas)")
 
 
 func _components() -> void:

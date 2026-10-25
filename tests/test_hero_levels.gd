@@ -268,18 +268,23 @@ func _lodging() -> void:
 	var hud: AHRefugeHud = _tree.current_scene.hud
 	hud.open_room(S.CHARACTERS)
 	await _frames(3)
-	t.check(_label(hud, "Nível 1") and _label(hud, "XP %d/%d" % [bento.xp, bento.xp]), "o Alojamento mostra o nível e o XP")
-	var train := _button(hud, "Treinar · nível 2")
+	t.check(_label(hud, "Nível 1 · XP %d / %d" % [bento.xp, bento.xp]), "a Sala dos Personagens mostra o nível e o XP")
+	var train := _button(hud, "Treinar")
 	if not t.check(train != null and not train.disabled, "o Treino do Bento está aberto"):
 		return
 	train.pressed.emit()
 	await _frames(2)
-	var choice := _button(hud, "Mais fôlego")
-	t.check(choice != null and _button(hud, "Sangue frio") != null, "a escolha entre as duas melhorias")
+	var choice := hud.find_child("Upgrade_vida", true, false) as Button
+	t.check(choice != null and hud.find_child("Upgrade_calma", true, false) != null, "a escolha entre as duas melhorias")
 	choice.pressed.emit()
 	await _frames(2)
+	var confirm := hud.find_child("Confirm", true, false) as Button
+	if not t.check(confirm != null and confirm.is_visible_in_tree(), "o Treino confirma a escolhida"):
+		return
+	confirm.pressed.emit()
+	await _frames(2)
 	t.equal(AHHeroLevels.level(S.hero(Campaign.state, "hero_cao_bento")), 2, "escolhida, o Bento sobe para o nível 2")
-	t.check(_label(hud, "Nível 2") and _label(hud, "Mais fôlego ×1"), "e o Alojamento mostra o nível novo e a melhoria")
+	t.check(_label(hud, "Nível 2") and _label(hud, "Mais fôlego ×1"), "e a Sala mostra o nível novo e a melhoria")
 
 
 func _label(root: Node, part: String) -> bool:
@@ -288,7 +293,7 @@ func _label(root: Node, part: String) -> bool:
 
 func _button(root: Node, prefix: String) -> Button:
 	for button in root.find_children("*", "Button", true, false):
-		if not button.is_queued_for_deletion() and button.is_visible_in_tree() and button.text.begins_with(prefix):
+		if not button.is_queued_for_deletion() and button.is_visible_in_tree() and button.text.to_lower().begins_with(prefix.to_lower()):
 			return button
 	return null
 

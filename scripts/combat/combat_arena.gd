@@ -210,6 +210,13 @@ func icon_path(ability_id: String) -> String:
 	return art.icons.get(ability_id, "")
 
 
+## O ícone de uma habilidade fora da luta (a Sala dos Personagens, #60).
+static func icon_of(ability_id: String) -> String:
+	if _manifest.is_empty():
+		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
+	return _manifest.get("icons", {}).get(ability_id, "")
+
+
 ## Pose de um personagem pelo nome: idle, hurt, death, attack1, defense, dodge, support ou uma fase de ação.
 func show_pose(unit: AHCombat.Unit, pose: String, ability_id: String = "") -> void:
 	var card: AHSpriteCard = cards.get(unit.id)

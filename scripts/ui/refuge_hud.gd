@@ -12,7 +12,6 @@ const H := preload("res://scripts/ui/combat_hud.gd")
 const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
-const RESULT_NAMES := {"victory": "Vitória", "retreat": "Retirada", "fled": "Fuga", "defeat": "Derrota"}
 ## A chegada da equipe de trem na volta (#76), antes do relatório: sem painel, só a dica de pular.
 const ARRIVAL := "arrival"
 const REPORT_GUARD_MS := 500
@@ -80,6 +79,12 @@ var _feedback_tween: Tween
 var _draft := {}
 ## Cartões sob cada um da fila na plataforma (relatório e partida), pelo id do herói.
 var _tags: Control
+## O relatório da volta no kit (#60): a tela inteira por cima da fila, no lugar do painel.
+var _report_screen: AHStationReport
+## A Sala dos Personagens no kit (#60): a tela inteira, com o cômodo ao fundo.
+var _room_screen: AHCharacterRoom
+## O que some com o relatório aberto (o título, os recursos e a faixa escura do alto): a tela do kit tem os seus.
+var _chrome: Array = []
 var _tag_nodes := {}
 var _lineup_signature := ""
 ## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
@@ -109,6 +114,7 @@ func _ready() -> void:
 	shade.size = Vector2(1920, 150)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(shade)
+	_chrome.append(shade)
 	_title = U.label(tr("Estação Raiz"), 36, U.GOLD, "display")
 	_title.position = Vector2(32, 18)
 	add_child(_title)
@@ -120,6 +126,7 @@ func _ready() -> void:
 	_resources.add_theme_constant_override("separation", 22)
 	_resources.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_resources)
+	_chrome.append_array([_title, _subtitle, _resources])
 
 	# À esquerda: o próximo passo com o botão principal e as pendências (a lista de doze botões saiu).
 	_menu = VBoxContainer.new()
@@ -271,6 +278,16 @@ func _input(event: InputEvent) -> void:
 	# A dica da primeira vez aberta fica com Interagir (ela fecha), sem abrir um cômodo por trás.
 	if Tips.showing() and event.is_action_pressed("interact"):
 		return
+	# Preparar expedição (G/X, só nas telas da Estação, #60): na vista geral e na Sala dos Personagens.
+	if event.is_action_pressed("station_prepare") and not _map.visible and (current == "" or current == S.CHARACTERS):
+		get_viewport().set_input_as_handled()
+		var block := S.preparation_block(Campaign.state)
+		if block != "":
+			toast(block, true)
+			Sound.play("res://audio/ui/deny.ogg")
+		else:
+			open_map()
+		return
 	var scope := focus_scope()
 	if scope != null:
 		if U.press_focused(scope, event):
@@ -316,6 +333,10 @@ func focus_scope() -> Control:
 		return null
 	if _prep != null and _prep.visible:
 		return _prep
+	if current == "report" and is_instance_valid(_report_screen):
+		return _report_screen
+	if current == S.CHARACTERS and is_instance_valid(_room_screen):
+		return _room_screen
 	# Na cena do trem, sem painel: o foco fica no canto (as setas não andam entre os cômodos por trás da cena, #61).
 	if current == "train" and not _panel.visible:
 		return _corner
@@ -554,7 +575,10 @@ func _build_left(c: Dictionary) -> void:
 	_pending.add_child(_pending_row(tr("Plano da Estação: o que cada cômodo destrava"), func(): open_service("plan"), U.MUTED))
 	_menu.visible = current == "" or current == "options"
 	_overview_button.visible = current != ""
-	_corner.visible = current != ARRIVAL and (current != S.PREPARATION or S.preparation_block(c) != "")
+	var kit_screen := current == "report" or current == S.CHARACTERS
+	_corner.visible = current != ARRIVAL and not kit_screen and (current != S.PREPARATION or S.preparation_block(c) != "")
+	for node in _chrome:
+		node.visible = not kit_screen
 	_fit_overview_to_menu.call_deferred()
 	_show_arrival_hint(current == ARRIVAL and not briefing_open())
 	_refresh_room_card()
@@ -907,6 +931,8 @@ func close_panel() -> void:
 		Sound.play(PANEL_CLOSE)
 	current = ""
 	_panel.visible = false
+	_close_report_screen()
+	_close_room_screen()
 	_prep_selected = -1
 	if _prep != null:
 		_prep.visible = false
@@ -951,7 +977,10 @@ func _process(_delta: float) -> void:
 	if _feedback.modulate.a > 0.0 and _feedback.text != "":
 		_place_feedback()
 	U.keep_focus(focus_scope())
-	var showing := current == "report" or current == "departure"
+	# No relatório, as cartas do kit ficam embaixo e cada um da fila fica de pé sobre a sua (#60).
+	if current == "report" and is_instance_valid(_report_screen):
+		station.align_lineup(_report_screen.card_centers())
+	var showing := current == "departure"
 	_tags.visible = showing
 	if not showing:
 		return
@@ -1070,10 +1099,18 @@ func _show(key: String) -> void:
 		_panel.visible = false
 		_watch_train()
 		return
+	if key == "report":
+		_panel.visible = false
+		_report()
+		return
+	_close_report_screen()
+	if key == S.CHARACTERS:
+		_panel.visible = false
+		_character_room()
+		return
+	_close_room_screen()
 	_panel.visible = true
 	match key:
-		"report":
-			_report()
 		"train":
 			_train()
 		"departure":
@@ -1209,8 +1246,6 @@ func _room(room_id: String) -> void:
 	if level < 1 and room_id != S.DORMITORY:
 		return
 	match room_id:
-		S.CHARACTERS:
-			_characters(c)
 		S.PREPARATION:
 			_preparation(c)
 		S.CANTEEN:
@@ -1235,88 +1270,6 @@ func _civilian_card(c: Dictionary, who: Dictionary) -> void:
 
 
 # ---------------------------------------------------------------- Alojamento (a Sala dos Personagens)
-
-func _characters(c: Dictionary) -> void:
-	_section(tr("Elenco (%d de %d)") % [S.living(c).size(), S.MAX_ROSTER])
-	for entry in S.living(c):
-		var hero_class = GameData.row("classes", entry.class_id)
-		var tags: Array[String] = [tr("Vida %d/%d") % [entry.hp, entry.max_hp], tr("Instinto %d") % entry.instinct,
-			tr("%d expedições") % int(entry.get("completed_expeditions", 0))]
-		if entry.trauma:
-			tags.append("trauma")
-		var relic = GameData.row("relics", entry.relic_id) if entry.relic_id != "" else null
-		tags.append(tr("relíquia: %s") % (tr(relic.DisplayName) if relic else tr("nenhuma")))
-		_text("%s · %s" % [entry.display_name, tr(hero_class.DisplayName) if hero_class else entry.class_id], 20, H.GOLD.lightened(0.3))
-		_text(" · ".join(tags), 17, H.MUTED)
-		var hero_id: String = entry.id
-		_hero_level(c, entry)
-		var row := _row()
-		if entry.trauma:
-			_button(tr("Tratar trauma (%d sementes)") % S.TRAUMA_COST, func(): _act(S.treat_trauma(Campaign.state, hero_id), tr("Trauma tratado.")), true, row)
-		var stock: Array = c.inventory.relics
-		if not stock.is_empty() or entry.relic_id != "":
-			_button(tr("Trocar relíquia"), func(): _cycle_relic(hero_id), true, row)
-	_section(tr("Recrutar"))
-	for class_id in c.unlocked_classes:
-		var hero_class = GameData.row("classes", class_id)
-		var free := S.can_recruit_volunteer(c, class_id)
-		var id: String = class_id
-		_button("%s · %s" % [tr(hero_class.DisplayName) if hero_class else class_id, tr("voluntário, de graça") if free else tr("%d sementes") % S.RECRUIT_COST],
-			func(): _recruit(id), free or S.quantity(c, "seeds") >= S.RECRUIT_COST)
-	if not c.memorial.is_empty():
-		_section(tr("Memorial"))
-		for entry in c.memorial:
-			_text("%s · %s · %s" % [entry.display_name, tr(entry.get("mission_name", "")), AHCombatEngine.cause_text(entry.get("cause", ""))], 17, H.MUTED)
-
-
-## O nível do herói no Alojamento (#90): o nível, a barra do XP até o próximo, as melhorias escolhidas e o Treino (XP do
-## nível e sementes), que abre a escolha entre as duas melhorias da espécie.
-func _hero_level(c: Dictionary, entry: Dictionary) -> void:
-	var hero_id: String = entry.id
-	var cost := AHHeroLevels.next_cost(entry)
-	var level := AHHeroLevels.level(entry)
-	var line := _row()
-	line.add_child(H.make_label(tr("Nível %d") % level, 18, U.GOLD))
-	if cost.is_empty():
-		line.add_child(H.make_label(tr("· nível máximo"), 17, H.MUTED))
-	else:
-		var bar := U.bar(U.VIOLET, 8)
-		bar.max_value = cost.xp
-		bar.value = mini(AHHeroLevels.xp(entry), cost.xp)
-		bar.custom_minimum_size = Vector2(200, 8)
-		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		line.add_child(bar)
-		line.add_child(H.make_label(tr("XP %d/%d") % [AHHeroLevels.xp(entry), cost.xp], 17, H.MUTED))
-	# As melhorias escolhidas, com quantas vezes cada uma.
-	var counts := {}
-	for upgrade_id in entry.get("upgrades", []):
-		counts[upgrade_id] = int(counts.get(upgrade_id, 0)) + 1
-	var chosen: Array = []
-	for upgrade_id in counts:
-		var upgrade = GameData.row("hero_upgrades", upgrade_id)
-		if upgrade != null:
-			chosen.append("%s ×%d" % [tr(upgrade.DisplayName), counts[upgrade_id]])
-	if not chosen.is_empty():
-		_text(tr("Melhorias: %s") % ", ".join(chosen), 16, H.MUTED)
-	if cost.is_empty():
-		return
-	if _training == hero_id:
-		_text(tr("Treino para o nível %d: escolha uma melhoria.") % (level + 1), 17, U.GOLD)
-		# Uma embaixo da outra: a descrição inteira cabe na largura do painel.
-		for upgrade in AHHeroLevels.options(entry):
-			var id: String = upgrade.Name
-			_button("%s · %s" % [tr(upgrade.DisplayName), tr(upgrade.Description)], func(): _train_hero(hero_id, id))
-		_button(tr("Cancelar"), func():
-			_training = ""
-			refresh())
-		return
-	var block := AHHeroLevels.train_block(c, entry)
-	var price: String = tr("1 semente") if int(cost.seeds) == 1 else tr("%d sementes") % cost.seeds
-	var train := _button(tr("Treinar · nível %d (%s)") % [level + 1, price], func():
-		_training = hero_id
-		refresh(), block == "")
-	train.tooltip_text = block
-
 
 func _train_hero(hero_id: String, upgrade_id: String) -> void:
 	_training = ""
@@ -2104,114 +2057,43 @@ func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
 # ---------------------------------------------------------------- relatório da volta e trem
 
 func _report() -> void:
-	var c: Dictionary = Campaign.state
-	var report: Dictionary = c.station.last_return
+	var report: Dictionary = Campaign.state.station.last_return
 	if report.is_empty():
 		close_panel()
 		return
-	var phase := J.phase(report.get("phase_id", ""))
-	var won: bool = report.result == "victory"
-	_body.add_child(U.label(tr(RESULT_NAMES.get(report.result, report.result)), 44, U.GOLD if won else (U.MUTED if report.result == "retreat" else U.DANGER), "display"))
-	_text("%s · %s" % [tr(phase.get("name", "")), tr("fase concluída") if won else (tr("a equipe voltou antes do guardião") if report.result == "retreat" else tr("a equipe caiu"))], 18, U.MUTED)
-	# A camada da história da fase, na primeira vitória (#64).
-	if String(report.get("story", "")) != "":
-		_section(tr("O que a equipe viu"))
-		_text(tr(report.story), 19, U.TEXT)
-	# O que chegou, item a item (cada linha entra um pouco depois da outra).
-	var percent := int(report.get("percent", 0))
-	_section(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent))
-	var items: Array = []
-	for spec in [["lobby-seed", "seeds", tr("semente"), tr("sementes")], ["lobby-scrap", "scrap", tr("sucata"), tr("sucatas")], ["lobby-fragment", "fragments", tr("fragmento"), tr("fragmentos")],
-			["lobby-water", "water", tr("água"), tr("água")], ["lobby-food", "supplies", tr("suprimento"), tr("suprimentos")]]:
-		var amount := int(report.get(spec[1], 0))
-		if amount > 0:
-			items.append([spec[0], "+%d %s" % [amount, spec[2] if amount == 1 else spec[3]]])
-	if report.get("request", "") != "":
-		var who := S.civilian(report.request)
-		items.append(["item-generic", tr("%s recebeu %s: %s") % [who.name, tr(who.request_item), tr(who.request_reward)]])
-	if items.is_empty():
-		_text(tr("Nada chegou desta vez."), 18, U.MUTED)
-	for i in items.size():
-		var row := _row()
-		var glyph := TextureRect.new()
-		glyph.texture = load("res://art/ui/icons/%s.svg" % items[i][0])
-		glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		glyph.custom_minimum_size = Vector2(30, 30)
-		glyph.modulate = U.GOLD
-		row.add_child(glyph)
-		var line := U.label(items[i][1], 22, U.TEXT, "bold")
-		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.custom_minimum_size = Vector2(560, 0)
-		row.add_child(line)
-		row.modulate.a = 0.0
-		var tween := create_tween()
-		tween.tween_interval(0.25 + 0.22 * i)
-		tween.tween_property(row, "modulate:a", 1.0, 0.25)
-		tween.tween_callback(func(): Sound.play("res://audio/world/find_coins.ogg", 0.35, 1.0 + 0.06 * i))
-	# O que isso destrava na Estação agora.
-	var unlocks: Array = []
-	for room_id in S.NEXT_ROOMS:
-		if not S.next_level_cost(c, room_id).is_empty() and S.upgrade_block(c, room_id) == "":
-			unlocks.append(room_id)
-	if not unlocks.is_empty():
-		_section(tr("Agora dá para"))
-		for room_id in unlocks:
-			var id: String = room_id
-			var level := S.room_level(c, id)
-			_button(tr("%s %s%s (%s)") % [tr("Recuperar") if level == 0 else tr("Melhorar"), tr(S.ROOM_ARTICLE.get(id, "")), tr(S.room_def(id).name), S.cost_text(S.next_level_cost(c, id))],
-				func(): _enter_shelter_then(func(): open_room(id)))
-	# A equipe: quem fez o quê; o destaque ganha a estrela.
-	_section(tr("A equipe"))
-	var stats: Dictionary = report.get("stats", {})
-	var best := ""
-	var best_score := 0
-	for hero_id in stats:
-		var score: int = int(stats[hero_id].get("damage", 0)) + int(stats[hero_id].get("healing", 0)) * 2 + int(stats[hero_id].get("downs", 0)) * 5
-		if score > best_score:
-			best_score = score
-			best = hero_id
-	for hero_id in report.team:
-		var entry = S.hero(c, hero_id)
-		if entry == null:
-			continue
-		var row := _row()
-		var art := _hero_art(entry)
-		if not art.is_empty():
-			var face := U.portrait(art, 56, U.GOLD if hero_id == best else (U.DANGER if not entry.alive else Color(1, 1, 1, 0.35)))
-			if not entry.alive:
-				face.modulate = Color(0.55, 0.55, 0.6)
-			row.add_child(face)
-		var info := VBoxContainer.new()
-		info.add_theme_constant_override("separation", 2)
-		row.add_child(info)
-		info.add_child(U.label("%s%s" % [entry.display_name, tr("  ★ destaque") if hero_id == best else ""], 20, U.GOLD if hero_id == best else U.TEXT, "bold"))
-		var parts := PackedStringArray()
-		var s: Dictionary = stats.get(hero_id, {})
-		if int(s.get("damage", 0)) > 0:
-			parts.append(tr("causou %d de dano") % s.damage)
-		if int(s.get("downs", 0)) > 0:
-			parts.append(tr("derrubou %d") % s.downs)
-		if int(s.get("healing", 0)) > 0:
-			parts.append(tr("curou %d") % s.healing)
-		if int(s.get("xp", 0)) > 0:
-			parts.append(tr("+%d XP") % s.xp)
-		var line: String = (tr("Vida %d/%d") % [entry.hp, entry.max_hp]) if entry.alive else tr("Não voltou: está no Memorial.")
-		if not parts.is_empty():
-			line += " · " + ", ".join(parts)
-		var detail := U.label(line, 17, U.MUTED if entry.alive else U.DANGER)
-		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		detail.custom_minimum_size = Vector2(540, 0)
-		info.add_child(detail)
-	var cycle: Dictionary = report.get("cycle", {})
-	if not cycle.is_empty():
-		_section(tr("A Estação no ciclo %d") % cycle.number)
-		_text(tr("A Cantina produziu %d suprimentos; os moradores comeram %d; estragaram %d. Água: %d bebida, %d do coletor%s.") % [
-			cycle.food_produced, cycle.food_civilians, cycle.food_spoiled, cycle.water_consumed, cycle.water_produced,
-			tr("; faltou para alguém") if cycle.thirsty else ""], 17, U.MUTED)
-		if cycle.fragments_produced > 0:
-			_text(tr("A Cora trouxe %d fragmento.") % cycle.fragments_produced, 17, U.MUTED)
-	_button(tr("Entrar no abrigo"), func(): _enter_shelter_then(Callable()))
+	# O refresh passa por aqui a cada mudança: a tela fica a mesma (com os detalhes abertos ou não).
+	if is_instance_valid(_report_screen):
+		return
+	_report_screen = AHStationReport.make(report)
+	_report_screen.enter_shelter.connect(func(): _enter_shelter_then(Callable()))
+	_report_screen.room_requested.connect(func(id: String): _enter_shelter_then(func(): open_room(id)))
+	add_child(_report_screen)
+	move_child(_report_screen, _panel.get_index())
+
+
+## A Sala dos Personagens: aberta uma vez e refeita a cada refresh (depois de treinar, trocar a relíquia, recrutar).
+func _character_room() -> void:
+	if is_instance_valid(_room_screen):
+		_room_screen.rebuild()
+		return
+	_room_screen = AHCharacterRoom.make(self)
+	add_child(_room_screen)
+	move_child(_room_screen, _panel.get_index())
+	station.focus_room_stage(S.CHARACTERS, AHCharacterRoom.LEFT.end.x, AHCharacterRoom.RIGHT.position.x)
+	station.hide_room_residents(S.CHARACTERS, true)
+
+
+func _close_room_screen() -> void:
+	if is_instance_valid(_room_screen):
+		_room_screen.queue_free()
+		station.hide_room_residents(S.CHARACTERS, false)
+	_room_screen = null
+
+
+func _close_report_screen() -> void:
+	if is_instance_valid(_report_screen):
+		_report_screen.queue_free()
+	_report_screen = null
 
 
 ## Fecha o relatório (visto) e segue: a noite, o trem ou o que foi pedido (then).

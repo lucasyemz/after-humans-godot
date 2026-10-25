@@ -275,11 +275,11 @@ func _return() -> void:
 func _walk_to(prefix: String, steps: int) -> bool:
 	for i in steps:
 		var owner := _focus()
-		if owner is BaseButton and String(owner.get("text")).begins_with(prefix):
+		if owner is BaseButton and String(owner.get("text")).to_lower().begins_with(prefix.to_lower()):
 			return true
 		await _send("ui_down")
 	var owner := _focus()
-	return owner is BaseButton and String(owner.get("text")).begins_with(prefix)
+	return owner is BaseButton and String(owner.get("text")).to_lower().begins_with(prefix.to_lower())
 
 
 ## O controle aparece inteiro na área de rolagem dele (a lista rolou até ele).

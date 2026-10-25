@@ -62,7 +62,7 @@ func _run() -> void:
 			await _shot(mark[1])
 	# Concluir o relatório e ver para onde a volta leva.
 	for button in current_scene.find_children("*", "Button", true, false):
-		if button.text == TranslationServer.translate("Entrar no abrigo") and button.is_visible_in_tree():
+		if button.text.to_lower() == TranslationServer.translate("Entrar no abrigo").to_lower() and button.is_visible_in_tree():
 			button.pressed.emit()
 			break
 	var closed := Time.get_ticks_msec()

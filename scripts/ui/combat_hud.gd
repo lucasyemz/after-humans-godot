@@ -175,6 +175,7 @@ func _build() -> void:
 	_register.position = KIT_REGISTER.position
 	_register.custom_minimum_size = KIT_REGISTER.size
 	_register.size = KIT_REGISTER.size
+	grow_hit(_register, Vector2(272, 112))
 	_register.focus_mode = Control.FOCUS_NONE
 	_register.pressed.connect(toggle_log)
 	add_child(_register)
@@ -320,8 +321,8 @@ func _build() -> void:
 	for spec in ACTIONS:
 		var button := Button.new()
 		button.custom_minimum_size = KIT_ACTION.size
+		grow_hit(button, Vector2(128, 112))
 		button.text = ""
-		button.tooltip_text = tr(spec[0])
 		AHKit.style_button(button, "action_button")
 		var icon := TextureRect.new()
 		icon.texture = _action_icon(spec[1])
@@ -353,6 +354,8 @@ func _build() -> void:
 
 	# O nome do alvo apontado (#57): a plaqueta escura com a linha na cor dos inimigos embaixo.
 	_target_label = AHKit.label("", "world", TEXT, true, true)
+	# Por cima da ficha do Examinar (z 20): o nome do apontado não some atrás dela.
+	_target_label.z_index = 21
 	_target_label.add_theme_stylebox_override("normal", AHKit.style("target_tab"))
 	_target_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_target_label.custom_minimum_size = KIT_TARGET_NAME
@@ -775,8 +778,12 @@ func _process(_delta: float) -> void:
 			# A intenção quebra em mais linhas na placa estreita (a largura mínima dela segurava a placa larga).
 			var intent: Control = plate.find_child("Intent", true, false)
 			if intent != null:
-				# A placa menos as margens (8 + 8), o ícone (que cresce com o texto) e o espaço entre eles.
-				intent.custom_minimum_size.x = widths[unit_id] - 16.0 - S.px(22) - 6.0
+				# A placa menos as margens da plaqueta (as do target_tab), o ícone (que cresce com o texto) e o espaço
+				# entre eles.
+				var row := intent.get_parent().get_parent() as Control
+				var box: StyleBox = row.get_theme_stylebox("panel") if row is PanelContainer else null
+				var margins := box.content_margin_left + box.content_margin_right if box != null else 16.0
+				intent.custom_minimum_size.x = maxf(40.0, widths[unit_id] - margins - S.px(22) - 6.0)
 			plate.size = Vector2(widths[unit_id], 0)
 		var feet := camera.unproject_position(card.global_position)
 		var head := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 1.05, 0))
@@ -787,6 +794,10 @@ func _process(_delta: float) -> void:
 		# A placa que, presa pelo painel de baixo, subiria por mais da metade do corpo vai para cima da cabeça, como a
 		# do baixinho (o Relé de Defesa sumia inteiro atrás da própria placa no texto Maior, #63).
 		if not short and minf(feet.y + 10.0, dock_limit) < feet.y - (feet.y - head.y) * 0.5:
+			short = true
+		# A intenção e os estados, por cima da barra, também não cobrem o corpo: passando de um quinto da altura dele, a
+		# placa inteira vai para cima da cabeça (a #63 no kit, com as plaquetas de três linhas do Maior).
+		if not short and plate.size.y - bar_height > (feet.y - head.y) * 0.2:
 			short = true
 		var y := plate_y(feet.y, head.y, short, plate.size.y, dock_limit)
 		if not short:
@@ -870,8 +881,8 @@ func _examine_input(event: InputEvent) -> bool:
 		_examine_index = maxi(0, _examine.find(_actor_id))
 		_paint_examine()
 		_examine_note = _description.text
-		_description.text = tr("Examinar: %s/%s passa de um personagem para outro; %s ou %s fecha.") % [
-			S.key_name("move_left"), S.key_name("move_right"), S.key_name("combat_examine"), S.key_name("cancel")]
+		# Curta, na largura da barra da habilidade: as teclas de passar e a de fechar.
+		_description.text = tr("Examinar · %s/%s · %s fecha") % [S.key_name("move_left"), S.key_name("move_right"), S.key_name("combat_examine")]
 		return true
 	if event.is_action_pressed("combat_examine") or S.is_back(event):
 		stop_examine()
@@ -983,6 +994,19 @@ const SHORT_HEIGHT := 0.9
 
 ## Onde fica a placa (y na tela): o baixinho, sempre acima da cabeça (não pula entre cima e baixo a cada lance); os
 ## outros, sob os pés, sem passar do limite do painel de baixo (dock_limit; INF sem o painel).
+## A área de toque maior que o desenho (hud-target.md: Registro 272x112, ações 128x112, habilidades 140x140): uma
+## camada invisível em volta do botão, que passa o toque e o clique para ele.
+static func grow_hit(button: Control, target: Vector2) -> void:
+	var hit := Control.new()
+	hit.name = "Hit"
+	hit.mouse_filter = Control.MOUSE_FILTER_PASS
+	hit.show_behind_parent = true
+	var drawn: Vector2 = button.custom_minimum_size
+	hit.position = -(target - drawn).max(Vector2.ZERO) * 0.5
+	hit.size = drawn.max(target)
+	button.add_child(hit)
+
+
 static func plate_y(feet_y: float, head_y: float, short: bool, plate_height: float, dock_limit: float) -> float:
 	if short:
 		return head_y - plate_height - 8.0
@@ -1095,6 +1119,7 @@ func _build_abilities(take_focus: bool = true) -> void:
 		var option: Dictionary = _options[index]
 		var button := Button.new()
 		button.custom_minimum_size = KIT_SLOT.size
+		grow_hit(button, Vector2(140, 140))
 		button.text = ""
 		button.clip_contents = false
 		var icon := TextureRect.new()
@@ -1133,7 +1158,6 @@ func _build_abilities(take_focus: bool = true) -> void:
 		key.position = Vector2(90, 90)
 		button.set_meta("locked", not option.usable)
 		button.set_meta("ability_id", option.id)
-		button.tooltip_text = tr(option.name) if option.usable else "%s: %s" % [tr(option.name), option.reason]
 		button.disabled = not option.usable
 		_style_ability(button)
 		button.pressed.connect(_on_ability.bind(option))
@@ -1158,11 +1182,9 @@ func _build_abilities(take_focus: bool = true) -> void:
 		child.disabled = locked
 		if kind == "item":
 			(child.get_node("Count") as Label).text = str(AHJourneyRules.food(Campaign.state))
-			child.tooltip_text = tr("Mochila · %d") % AHJourneyRules.food(Campaign.state) + "\n" + tr("%d de comida na Mochila") % AHJourneyRules.food(Campaign.state)
-	# Na aba, curto como no alvo; o que fazer fica na dica dela.
+	# Na aba, curto como no alvo; o que fazer fica na dica das habilidades (_describe).
 	var actor_name: String = session.state.find_unit(_actor_id).display_name
 	_description.text = tr("Vez de %s") % actor_name
-	_target_tab.tooltip_text = tr("Vez de %s: escolha uma habilidade (1–4) ou uma ação.") % actor_name
 	_place_tab.call_deferred()
 	if take_focus:
 		_focus_quietly.call_deferred(first if first else _actions.get_child(1))
@@ -1324,8 +1346,13 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.custom_minimum_size = Vector2(430, 0)
 	_tip_box.add_child(body)
+	# O alcance: de que posições sai e quais alcança (as bolinhas dos cartões antigos, em texto).
+	var reach := tr("Sai das posições %s") % " · ".join(ability.get("OriginRanks", []).map(func(r): return str(int(r))))
+	if String(ability.get("TargetType", "")) != "Self":
+		reach += tr(" · alcança %s") % " · ".join(ability.get("TargetRanks", []).map(func(r): return str(int(r))))
+	_tip_line(reach, S.MIN_TEXT, S.MUTED)
 	if not option.usable:
-		_tip_box.add_child(_kit_label(option.reason, S.MIN_TEXT, Color(1.0, 0.6, 0.5)))
+		_tip_box.add_child(_kit_label(option.reason, S.MIN_TEXT, AHKit.alert_text()))
 	# Os termos a explicar, cada um uma vez só: os estados (dos alvos, ao mirar; senão, do herói da vez e dos inimigos) e
 	# os que o texto da habilidade cita.
 	var terms: Array = []
@@ -1358,6 +1385,11 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 					others.append(unit_name(enemy.display_name) + ":" + words.trim_prefix(" ·"))
 		if not others.is_empty():
 			_tip_line("; ".join(others), 17, MUTED)
+	# O que fazer (a instrução que a aba curta não diz): na mira, como usar; na vez, como escolher.
+	if _choosing != "":
+		_tip_line(tr("Clique no alvo e clique de novo para usar (%s usa; %s ou B volta).") % [S.key_name("ui_accept"), S.key_name("cancel")], S.MIN_TEXT, AHKit.AMBER)
+	elif waiting:
+		_tip_line(tr("Escolha uma habilidade (%s–%s) ou uma ação.") % [S.key_name("combat_ability_1"), S.key_name("combat_ability_4")], S.MIN_TEXT, AHKit.AMBER)
 	for word in S.GLOSSARY:
 		if not terms.has(word) and (text.contains(word) or text.to_lower().contains(word.to_lower().substr(0, 6))):
 			terms.append(word)
@@ -1484,7 +1516,8 @@ func show_crisis(text: String, breakthrough: bool) -> void:
 	_crisis.size = Vector2(1920, 112)
 	_crisis.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_crisis)
-	var title := _kit_label(tr("CRISE DE INSTINTO"), 22, S.VIOLET, "bold")
+	# Na ferrugem do Instinto (decisão do Lucas), clareada para ler sobre o aço.
+	var title := _kit_label(tr("CRISE DE INSTINTO"), 22, AHKit.INSTINCT.lightened(0.3), "bold")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.position = Vector2(0, 10)
 	title.size = Vector2(1920, 30)
@@ -1582,10 +1615,8 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 	for i in _markers.size():
 		_markers[i].focus_neighbor_left = _markers[(i - 1 + _markers.size()) % _markers.size()].get_path()
 		_markers[i].focus_neighbor_right = _markers[(i + 1) % _markers.size()].get_path()
-	# A aba diz como no alvo ("Escolha um alvo"); o como fica na dica dela.
+	# A aba diz como no alvo ("Escolha um alvo"); o como fica na dica do alvo apontado (_describe).
 	_description.text = tr("Escolha um alvo")
-	_target_tab.tooltip_text = tr("Escolha o alvo: clique no personagem e clique de novo para usar (%s usa; %s ou B volta).") % [
-		S.key_name("ui_accept"), S.key_name("cancel")]
 	_paint_targets()
 	if not _markers.is_empty():
 		_via_mouse = false
@@ -1749,6 +1780,9 @@ func _unhandled_input(event: InputEvent) -> void:
 ## vida e o XP ganho enchendo a barra até o próximo nível (#91). Continuar fecha (o automático fecha sozinho).
 func show_result(result: String, automatic: bool, rewards: Dictionary = {}, hold: float = 1.5) -> void:
 	_panel.visible = false
+	# A luta acabou: ninguém mais age, o anel sai do chão já na tela do fim.
+	if arena != null:
+		arena.show_ring("")
 	# A vitória e a derrota têm o toque delas (#36); a fuga, não.
 	if result == "victory" or result == "defeat":
 		Sound.play("res://audio/ui/%s.ogg" % result)

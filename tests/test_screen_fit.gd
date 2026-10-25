@@ -73,6 +73,10 @@ func _check_screen(name: String) -> void:
 		if button.focus_mode == Control.FOCUS_NONE or button.disabled:
 			continue
 		var style := button.get_theme_stylebox("focus")
+		# O foco do kit (#60) é a moldura âmbar (focus_frame, ou a peça _focus do botão principal); o resto, as cantoneiras.
+		var kit_focus: bool = style is StyleBoxTexture and (style as StyleBoxTexture).texture != null and (style as StyleBoxTexture).texture.resource_path.contains("focus")
+		if kit_focus:
+			continue
 		if not style is AHFocusCorners:
 			plain.append(button.text if button is Button else button.name)
 		else:
@@ -81,7 +85,7 @@ func _check_screen(name: String) -> void:
 				cut.append(button.text if button is Button else button.name)
 	t.check(off.is_empty(), "%s: nenhum botão fora da tela %s" % [name, off])
 	t.check(cut.is_empty(), "%s: foco que a lista cortaria vai para dentro %s" % [name, cut])
-	t.check(plain.is_empty(), "%s: todo botão com foco mostra as cantoneiras %s" % [name, plain])
+	t.check(plain.is_empty(), "%s: todo botão com foco mostra as cantoneiras ou a moldura do kit %s" % [name, plain])
 
 
 func _in_scroll(control: Control) -> bool:

@@ -1,6 +1,7 @@
 ## A barra do kit (#60): a calha (main_bar, ou health_ally e health_enemy, com a aba e o recorte de cada lado) e o
 ## preenchimento bar_fill tingido, com o valor por dentro. kind diz a cor: "hero" (vida dos heróis), "enemy" (vida das
-## máquinas), "xp" (violeta), "instinct" (ferrugem, decisão do Lucas) ou "state" (a cor do estado de vida). As cores
+## máquinas), "xp" (violeta), "instinct" (ferrugem, decisão do Lucas), "state" (a cor do estado de vida) ou "life" (a
+## vida dos heróis nas telas da Estação: ciano, e no vermelho do ferimento grave). As cores
 ## do daltonismo valem na hora (restyle).
 class_name AHKitBar
 extends Control
@@ -64,6 +65,9 @@ func fill_color() -> Color:
 			return AHKit.INSTINCT
 		"state":
 			return AHKit.health_state(int(value), int(max_value)).color
+		"life":
+			var state := AHKit.health_state(int(value), int(max_value))
+			return state.color if state.id == "heavy" else AHKit.hero_hp()
 	return AHKit.hero_hp()
 
 
