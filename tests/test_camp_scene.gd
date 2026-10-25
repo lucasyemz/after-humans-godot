@@ -23,6 +23,8 @@ func run(context) -> void:
 	_manifest()
 	await _camp()
 	await _reopened()
+	await _menu_in_camp()
+	await _fades()
 	Tips.enabled = tips
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
@@ -254,6 +256,70 @@ func _reopened() -> void:
 	street = _tree.current_scene
 	await _frames(3)
 	t.check(street != null and street.corridor.camp.active and street.exploration_hud.camp_open(), "reaberto, o acampamento já montado")
+
+
+## O menu e a Mochila dentro do acampamento (#98): o Esc e o I abrem, as setas não trocam o herói por baixo deles, e
+## voltar à Estação pelo menu fecha a fogueira antes do resultado.
+func _menu_in_camp() -> void:
+	var c: Dictionary = Campaign.create_initial(31)
+	J.start_expedition(c, "fase_1", 31)
+	var street = await _street_at_camp(c)
+	if street == null:
+		t.check(false, "a rua com o acampamento para o teste do menu")
+		return
+	var corridor = street.corridor
+	var hud: AHExplorationHud = street.exploration_hud
+	await corridor._start_camp()
+	await _until(func(): return hud.camp_open() and not corridor.camp.switching(), 5.0)
+	t.check(hud._menu_button.visible and hud._bag_button.visible, "no acampamento, o Menu e a Mochila continuam no canto")
+	await _press("inventory")
+	t.check(hud.inventory_shown(), "o I abre a Mochila no acampamento")
+	var quote: Dictionary = AHExplorationCare.quote(Campaign.state, String(Campaign.state.session.expedition.team[0]), AHExplorationCare.SMALL_MEAL)
+	t.check(not quote.available and String(quote.reason).contains("barra de baixo"), "na Mochila, o motivo aponta a barra do acampamento")
+	var before: int = corridor.camp.selected
+	await _press("ui_right")
+	await _frames(3)
+	t.equal(corridor.camp.selected, before, "com a Mochila aberta, a seta não troca o herói do acampamento")
+	await _press("inventory")
+	t.check(not hud.modal_open() and hud.camp_open(), "o I fecha a Mochila e o acampamento continua")
+	await _press("menu")
+	t.check(hud.menu_shown(), "o Esc abre o menu no acampamento")
+	await _press("menu")
+	t.check(not hud.modal_open() and corridor.camp.active, "e fecha de novo, sem levantar acampamento")
+	await _press("menu")
+	var back := _button(hud, "Voltar à Estação")
+	t.check(back != null, "o menu do acampamento tem o Voltar à Estação")
+	if back != null:
+		back.pressed.emit()
+		await _frames(2)
+		var confirm := _button(hud, "Voltar à Estação")
+		if confirm != null and hud.modal_open():
+			confirm.pressed.emit()
+	var closed := await _until(func(): return not corridor.camp.active and Campaign.state.session.screen == "result", 8.0)
+	t.check(closed, "voltar à Estação de dentro do acampamento fecha a fogueira e mostra o resultado")
+	t.check(not hud.camp_open(), "sem a barra do acampamento por baixo do resultado")
+
+
+## O GameFlow.fade público: um fade novo substitui o que corre (a tela não fica presa no preto).
+func _fades() -> void:
+	var rect: ColorRect = GameFlow._fade
+	var resumed := [false]
+	var first := func():
+		await GameFlow.fade(1.0, 0.5)
+		resumed[0] = true
+	first.call()
+	await _frames(2)
+	await GameFlow.fade(0.0, 0.05)
+	await _frames(40)
+	t.check(rect.modulate.a < 0.01 and not rect.visible, "dois fades seguidos terminam no último (transparente)")
+	t.check(resumed[0], "e quem esperava o primeiro fade continua (a troca de cena não fica presa)")
+
+
+func _button(root: Node, prefix: String) -> Button:
+	for button in root.find_children("*", "Button", true, false):
+		if not button.is_queued_for_deletion() and button.is_visible_in_tree() and button.text.begins_with(prefix):
+			return button
+	return null
 
 
 func _has(root: Node, node_name: String) -> bool:

@@ -1,0 +1,205 @@
+[
+  {
+    "Name": "fase_1",
+    "Briefing": [
+      {
+        "Speakers": [
+          "civil_dora",
+          "hero_cao_bento"
+        ],
+        "Text": "A despensa da Estação dura poucos dias. Na Rua das Vitrines ainda há prateleiras que ninguém esvaziou."
+      },
+      {
+        "Speakers": [
+          "hero_sapo_iris"
+        ],
+        "Text": "Os sensores das Galerias continuam ligados. Eles separam quem pode entrar de quem não pode, e nós não podemos."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Então a gente entra pelos fundos. Comida e peças, e volta antes do escuro."
+      }
+    ],
+    "Debriefing": {
+      "Speakers": [
+        "civil_dora",
+        "hero_cao_bento"
+      ],
+      "Text": "A despensa volta a ter o que guardar. E do outro lado do rio, dizem que os sensores da Ponte das Raízes voltaram a acender."
+    }
+  },
+  {
+    "Name": "fase_2",
+    "Briefing": [
+      {
+        "Speakers": [
+          "hero_coruja_vespera"
+        ],
+        "Text": "Da torre, contei as patrulhas da ponte. Antes eram duas. Agora são quatro, e não param."
+      },
+      {
+        "Speakers": [
+          "civil_otto",
+          "hero_sapo_iris"
+        ],
+        "Text": "Os sensores da ponte acenderam sozinhos. Ninguém daqui religou nada."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Do outro lado ficam bairros que a Estação perdeu de vista. A gente atravessa e volta inteiro."
+      }
+    ],
+    "Debriefing": {
+      "Speakers": [
+        "hero_sapo_iris"
+      ],
+      "Text": "A ponte pedia uma permissão que ninguém aqui tem. Até descobrir quem ela espera, prefiro não chamar de defeito."
+    }
+  },
+  {
+    "Name": "fase_3",
+    "Briefing": [
+      {
+        "Speakers": [
+          "civil_cora",
+          "hero_cao_bento",
+          "hero_sapo_iris"
+        ],
+        "Text": "Há uma Toca dos Antigos lacrada depois da ponte. Quero saber o que guardavam com tanto cuidado."
+      },
+      {
+        "Speakers": [
+          "hero_sapo_iris"
+        ],
+        "Text": "Se houver papéis, tragam inteiros. Uma página solta vira boato; o fichário inteiro vira prova."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Porta lacrada é porta que alguém quis fechar. Eu vou na frente."
+      }
+    ],
+    "Debriefing": {
+      "Speakers": [
+        "civil_cora",
+        "hero_sapo_iris"
+      ],
+      "Text": "Cães, gatos e outros bichos, medidos e numerados. Ainda não sei por quê. Antes de alguém tirar conclusões, eu vou ler tudo."
+    }
+  },
+  {
+    "Name": "fase_4",
+    "Briefing": [
+      {
+        "Speakers": [
+          "civil_cora",
+          "hero_sapo_iris"
+        ],
+        "Text": "As fichas citam uma Casa de Vidro. Se alguém registrou a Peste, os papéis devem estar lá."
+      },
+      {
+        "Speakers": [
+          "hero_coruja_vespera"
+        ],
+        "Text": "Vi luz lá dentro. Fria, sem fogo. Nada se mexe, mas alguma coisa está ligada."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "As máquinas da triagem não deixam ninguém passar. Ninguém se separa do grupo."
+      }
+    ],
+    "Debriefing": {
+      "Speakers": [
+        "hero_sapo_iris"
+      ],
+      "Text": "Dois relatórios, duas versões da Peste. Até eu saber qual está errado, nenhum dos dois sai da minha mochila."
+    }
+  },
+  {
+    "Name": "fase_5",
+    "Briefing": [
+      {
+        "Speakers": [
+          "civil_otto",
+          "hero_sapo_iris"
+        ],
+        "Text": "A água dos túneis corre. Bomba parada não move água; parece que alguém troca aqueles filtros."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Túnel tem saída dos dois lados. Quero saber onde fica cada uma antes de entrar."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Na eclusa central tem uma máquina grande guardando a passagem. Ninguém volta sem os outros."
+      }
+    ],
+    "Debriefing": {
+      "Speakers": [
+        "hero_sapo_iris"
+      ],
+      "Text": "Eu vi o painel. Antes de alguém dizer o que aquilo significa, quero ler de novo, com calma."
+    }
+  },
+  {
+    "Name": "retreat",
+    "Debriefing": {
+      "Speakers": [
+        "hero_cao_bento",
+        "hero_sapo_iris",
+        "hero_gato_nick",
+        "hero_coruja_vespera"
+      ],
+      "Text": "Voltamos antes do guardião. Metade do achado chegou; o caminho continua lá para a próxima saída."
+    }
+  },
+  {
+    "Name": "fled",
+    "Debriefing": {
+      "Speakers": [
+        "hero_cao_bento",
+        "hero_gato_nick",
+        "hero_sapo_iris",
+        "hero_coruja_vespera"
+      ],
+      "Text": "A patrulha fechou o caminho e a gente correu. Largamos a carga para conseguir voltar."
+    }
+  },
+  {
+    "Name": "defeat",
+    "Debriefing": {
+      "Speakers": [
+        "hero_cao_bento",
+        "hero_gato_nick",
+        "hero_sapo_iris",
+        "hero_coruja_vespera",
+        "civil_dora",
+        "civil_otto",
+        "civil_cora"
+      ],
+      "Text": "Voltaram menos do que saíram. Agora a Estação cuida de quem chegou; a rua pode esperar."
+    }
+  },
+  {
+    "Name": "defeat_none",
+    "Debriefing": {
+      "Speakers": [
+        "civil_dora",
+        "civil_otto",
+        "civil_cora"
+      ],
+      "Text": "Ninguém desceu do trem. Na Estação, alguém deixa a luz da plataforma acesa."
+    }
+  }
+]

@@ -713,7 +713,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## O menu da exploração (Esc ou o botão): continuar, voltar à Estação ou começar uma campanha nova.
 func open_menu() -> void:
-	if busy or street._arena.active or hud.modal_open() or camp.active:
+	# No acampamento também (#98): voltar à Estação e as Opções não podem esperar o levantar acampamento.
+	if busy or street._arena.active or hud.modal_open() or camp.switching():
 		return
 	var session: Dictionary = Campaign.state.session
 	if not AHExplorationHud.session_open(Campaign.state):
@@ -723,7 +724,7 @@ func open_menu() -> void:
 
 ## A Mochila da exploração (I ou o botão): fora de luta, evento e resultado.
 func open_inventory() -> void:
-	if busy or street._arena.active or hud.modal_open() or camp.active or not AHExplorationHud.session_open(Campaign.state):
+	if busy or street._arena.active or hud.modal_open() or camp.switching() or not AHExplorationHud.session_open(Campaign.state):
 		return
 	Sound.play("res://audio/ui/bag_open.ogg")
 	hud.show_inventory()
@@ -835,8 +836,16 @@ func _force_house(site_index: int) -> void:
 
 
 func _retreat() -> void:
-	if R.safe_retreat(Campaign.state):
-		_show_result()
+	if not R.safe_retreat(Campaign.state):
+		return
+	# Voltar à Estação de dentro do acampamento: a cena da fogueira fecha antes do resultado.
+	if camp.active:
+		busy = true
+		hud.hide_camp()
+		await camp.end()
+		room.set_camp_lit(false)
+		busy = false
+	_show_result()
 
 
 # ---------------------------------------------------------------- casas
@@ -1002,16 +1011,16 @@ func _camp_care(hero_id: String, kind: String) -> void:
 func _on_camp_leave() -> void:
 	if busy:
 		return
+	# O busy fica ligado do começo ao fim: nenhum quadro em que a equipe ande no meio da saída.
 	busy = true
 	# A troca de herói termina antes (os dois fades usam o mesmo preto).
 	while camp.switching():
 		await get_tree().process_frame
-	busy = false
 	if not R.leave_camp(Campaign.state, randi()):
+		busy = false
 		return
 	var weather: String = Campaign.state.session.expedition.corridor.weather
 	Campaign.save()
-	busy = true
 	hud.hide_camp()
 	await camp.end()
 	room.set_camp_lit(false)
@@ -1041,6 +1050,7 @@ func _start_fight(index: int, advantage: bool) -> void:
 		hud.toast(tr("A equipe chegou sem ser vista: age primeiro."), 2.5)
 	var heroes: Array = street.party_ids.map(func(id): return Campaign.hero(id))
 	var center: float = (room.guard_x if house else cards[0].position.x) - 1.0
+	street._arena.boss_fight = bool(fight.boss)
 	street._arena.start(heroes, street._heroes, fight.enemies, cards, center, fight.opening)
 
 

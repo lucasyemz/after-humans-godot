@@ -78,3 +78,31 @@ pé. À direita, o depois.
 - **Rodada 2 (aprovada):** as quatro correções conferidas com o controle, o analógico, o levantar no meio da troca e as
   placas. Ficam de gravidade baixa: um piscar a mais ao levantar no meio da troca, W/S não andam entre os botões, a dica
   mostra as teclas do teclado com o controle, e com três heróis o lugar da direita fica vazio.
+
+## Revisão do PR (lucasyemz/after-humans-godot#98)
+
+![a barra do acampamento ao lado da Mochila e do Menu](camp/corner-buttons.jpg)
+
+- **O Esc e a Mochila funcionam no acampamento.** O Esc abre o menu, para voltar à Estação ou mudar as Opções sem
+  levantar acampamento. O I e o botão abrem a Mochila. Os dois abrem por cima da fogueira, e as setas não trocam o
+  herói enquanto estão abertos. Ao fechar, a barra do acampamento volta atualizada e com o foco.
+- **A barra fica centrada sem passar dos botões do canto,** e o Menu e a Mochila continuam visíveis.
+- **Voltar à Estação pelo menu, dentro do acampamento,** fecha a cena da fogueira antes do resultado.
+- **`GameFlow.fade(alpha, segundos)` é público.** O fade curto da troca de herói usa ele, em vez de mexer no retângulo
+  privado do GameFlow. Um fade novo substitui o que estiver correndo, para os dois não brigarem, e avisa quem esperava
+  o antigo (a troca de cena que o aguardava continua).
+- **A Mochila no acampamento só mostra.** Comer e curar continuam na barra do acampamento, que tem as regras e os
+  números do descanso, e a Mochila diz "No acampamento, use Comer e Curativo na barra de baixo.". Liberar os cuidados
+  da Mochila no acampamento seria uma regra nova, com dois jeitos de comer; fica para o Lucas decidir.
+- **Pontos baixos:**
+  - o levantar acampamento mantém o `busy` do começo ao fim;
+  - a arte do cartão sai por `AHSpriteCard.art()`, e não pelo campo privado.
+- **Testes:** `tests/test_camp_scene.gd` cobre a Mochila e o Esc no acampamento, as setas com o painel aberto, a volta
+  à Estação de dentro do acampamento e dois fades seguidos.
+- **QA da revisão:**
+  - **Rodada 1 (reprovada):** o fade substituído deixava parado quem o aguardava, com risco de o `GameFlow.busy` ficar
+    preso; e a Mochila no acampamento mostrava tudo apagado com o motivo errado ("fora de combate e eventos"). Os dois
+    foram corrigidos, com teste. O teste também volta à Estação pelos botões do menu e da confirmação.
+  - **Rodada 2 (aprovada):** os casos da rodada 1 e um de fades aninhados, a suíte com 47 de 47. As observações baixas
+    também entraram: o fade antigo avisa quem esperava só depois de o novo ser o atual, e o teste diz claramente se o
+    Voltar à Estação sumir do menu.

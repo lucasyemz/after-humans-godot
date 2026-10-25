@@ -122,7 +122,7 @@ func _arrange(team: Array) -> void:
 		var hero_id: String = alive[i][0]
 		var card: AHSpriteCard = alive[i][1]
 		var hero: Dictionary = alive[i][2]
-		_before[hero_id] = {"art": card._art, "facing": card.facing}
+		_before[hero_id] = {"art": card.art(), "facing": card.facing}
 		var slot: int = order[i]
 		var offset: Vector3 = SLOTS[slot]
 		var pose := pose_for(hero)
@@ -145,7 +145,7 @@ func select(index: int, fade: bool = true) -> void:
 	var with_fade: bool = fade and not GameFlow.reduced_effects()
 	if with_fade:
 		_switching = true
-		await _quick_fade(1.0)
+		await GameFlow.fade(1.0, SWITCH_FADE)
 	selected = index
 	# O escolhido com a luz da escolha (a mesma do alvo na luta, #57); os outros sem ela.
 	for i in members.size():
@@ -158,7 +158,7 @@ func select(index: int, fade: bool = true) -> void:
 		_street._update_camera(0.0)
 	selected_changed.emit(selected)
 	if with_fade:
-		await _quick_fade(0.0)
+		await GameFlow.fade(0.0, SWITCH_FADE)
 		_switching = false
 
 
@@ -184,12 +184,3 @@ func member_card(hero_id: String) -> AHSpriteCard:
 func switching() -> bool:
 	return _switching
 
-
-## O fade curto entre os heróis: o mesmo preto do GameFlow, mais rápido.
-func _quick_fade(alpha: float) -> void:
-	var rect: ColorRect = GameFlow._fade
-	rect.visible = true
-	var tween := create_tween()
-	tween.tween_property(rect, "modulate:a", alpha, SWITCH_FADE)
-	await tween.finished
-	rect.visible = alpha > 0.0

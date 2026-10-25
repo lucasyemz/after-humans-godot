@@ -595,6 +595,10 @@ func close_modal() -> void:
 	if modal_open():
 		_modal.queue_free()
 		Sound.play("res://audio/ui/panel_close.ogg")
+		# Fechou o menu ou a Mochila no acampamento: a barra dele volta com o que mudou (a comida, os curativos).
+		if camp_open():
+			camp_hud.refresh()
+			camp_hud.focus_bar.call_deferred()
 	_modal = null
 
 
@@ -703,7 +707,7 @@ func show_camp(_campaign: Dictionary, camp: AHCampScene) -> void:
 	camp_hud.bandage.connect(func(id): camp_bandage.emit(id))
 	camp_hud.leave.connect(func(): camp_leave.emit())
 	add_child(camp_hud)
-	# Embaixo, a barra do acampamento no lugar da fila da equipe e dos botões do canto (que não servem no acampamento).
+	# Embaixo, a barra do acampamento no lugar da fila da equipe; o Menu e a Mochila continuam no canto.
 	_set_camp_layout(true)
 
 
@@ -715,9 +719,8 @@ func hide_camp() -> void:
 
 
 func _set_camp_layout(camping: bool) -> void:
-	for node in [_party_box, _menu_button, _bag_button]:
-		if node != null:
-			node.visible = not camping
+	if _party_box != null:
+		_party_box.visible = not camping
 	if camping:
 		set_markers([])
 

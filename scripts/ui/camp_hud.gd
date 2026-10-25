@@ -22,6 +22,9 @@ signal food(hero_id: String)
 signal bandage(hero_id: String)
 signal leave
 
+## A largura dos botões do canto (Mochila e Menu, do exploration_hud) mais a folga até a barra.
+const CORNER_BUTTONS := 452.0
+
 var camp: AHCampScene
 var _plates := {}
 var _bodies := {}
@@ -52,7 +55,13 @@ func _ready() -> void:
 		_add_member(member.hero_id)
 	camp.selected_changed.connect(func(_i): refresh())
 	refresh()
-	(eat_button if not eat_button.disabled else (heal_button if not heal_button.disabled else leave_button)).grab_focus.call_deferred()
+	focus_bar.call_deferred()
+
+
+## O foco na barra: Comer, senão Curativo, senão Levantar.
+func focus_bar() -> void:
+	if is_inside_tree():
+		(eat_button if not eat_button.disabled else (heal_button if not heal_button.disabled else leave_button)).grab_focus()
 
 
 func _build_bar() -> void:
@@ -198,7 +207,9 @@ func _process(_delta: float) -> void:
 		return
 	var view := get_viewport_rect().size
 	_bar.reset_size()
-	_bar.position = Vector2((view.x - _bar.size.x) * 0.5, view.y - _bar.size.y - 24)
+	# Centrada, mas sem passar dos botões do canto (a Mochila e o Menu continuam no acampamento, #98).
+	var x := minf((view.x - _bar.size.x) * 0.5, view.x - CORNER_BUTTONS - _bar.size.x)
+	_bar.position = Vector2(maxf(24.0, x), view.y - _bar.size.y - 24)
 	var clicks := click_rects(camera)
 	for member in camp.members:
 		var card: AHSpriteCard = member.card
@@ -220,7 +231,7 @@ func _process(_delta: float) -> void:
 ## O corpo na tela: a caixa do alfa visível da pose (camp_poses.json, "visible"), e não o canvas inteiro (o da pose
 ## sentada tem o vazio de cima do idle); sem ela, do pé ao topo da placa.
 static func body_rect(camera: Camera3D, card: AHSpriteCard) -> Rect2:
-	var art: Dictionary = card._art
+	var art: Dictionary = card.art()
 	var corners: Array = []
 	if art.has("visible"):
 		var px_to_m: float = card.body_height / float(art.body_reference_pixels)
@@ -270,6 +281,10 @@ func click_rects(camera: Camera3D) -> Dictionary:
 ## toque: o analógico só troca de novo depois de voltar ao centro, e segurar a tecla não gira a roda.
 func _input(event: InputEvent) -> void:
 	if not camp.active or not is_visible_in_tree():
+		return
+	# Com o menu ou a Mochila abertos por cima, as teclas são deles.
+	var parent := get_parent()
+	if parent != null and parent.has_method("modal_open") and parent.modal_open():
 		return
 	if S.press_focused(self, event):
 		get_viewport().set_input_as_handled()
