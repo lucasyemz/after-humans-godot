@@ -95,7 +95,8 @@ coisas. O `test_departure` e o `test_station_scene` pulam o briefing.
     - a fala da fase 5 não afirma a manutenção como fato ("parece que alguém troca aqueles filtros").
 - **Rodada 2 (reprovada):** a fala da fuga dizia que o achado chegou, e na fuga nada chega (o relatório mostra 0%).
   Agora é "A patrulha fechou o caminho e a gente correu. Largamos a carga para conseguir voltar.", e o teste confere
-  que a fala não promete achado.
+  que a fala não promete achado. Depois, com a carga do guardião (#91), "carga" passou a ter outro sentido no jogo, e o
+  Lucas decidiu trocar a palavra: hoje a fala é "Largamos o achado para conseguir voltar."
 - **Rodada 3 (aprovada):** a fala da fuga conferida contra a regra (o relatório com 0%), e as rodadas anteriores sem
   regressão. Ficam para o Lucas: o briefing a cada saída (a fala da fase 1 cita a ponte mesmo depois de vencida), o
   Mapa da Rede como quem fala e a fala "defeat", de reserva (hoje a queda é sempre sem ninguém de volta).
