@@ -8,6 +8,8 @@
 
 ![Entrega Normal](hud-target/hud.webp)
 
+**[Luz, retrato e alinhamento — antes/depois](hud-target/light_alignment.webp)**
+
 **[QA visual: dez peças lado a lado nos perfis](hud-target/piece_comparison.webp)** · [Tela Maior+daltonismo](hud-target/hud_large_colorblind.webp) · [Margens/âncoras do kit](hud-target/assets.json) · [Verificação](hud-target/verification.json).
 
 ## Estrutura reproduzida
@@ -18,7 +20,7 @@
 | Letra condensada, sem serifa e em caixa alta | Barlow Condensed Medium (rótulos) e SemiBold (nome do herói), ambas OFL. |
 | Registro com L em aba | Peça chanfrada272×64 no alto à esquerda, com tecla em aba42. |
 | Rodada numa faixa única | Faixa720×64, nome da rodada, linha/ponto e seis retratos quadrados64, coloridos; fundo avermelhado nas máquinas e borda âmbar no ator atual. |
-| Vida sob as unidades | Barras200×44, ciano nos heróis e vermelho nos inimigos, valor dentro. Sem número da posição. Aba superior nos heróis, recorte na borda dos inimigos. |
+| Vida sob as unidades | Barras200×44, ciano nos heróis e vermelho nos inimigos, valor dentro e bisel espesso com rebaixo. Sem número da posição. Aba superior nos heróis, recorte na borda dos inimigos. |
 | Ator no chão | Anel âmbar com setas, centrado nos pés de Nick; cantos âmbar na barra dele. |
 | Nome do alvo | Plaqueta pequena, escura, com linha vermelha embaixo. |
 | Painel único do herói | Uma silhueta conectada564×212 com retrato quadrado grande, nome, Vida e Instinto encaixados. Não são peças soltas. |
@@ -62,7 +64,8 @@ Fontes: [Barlow Condensed Medium](../../art/ui/fonts/barlow_condensed_medium.ttf
 | Registro e rodada |30|39|
 | Nome do herói |40|52|
 | Nome da habilidade e números do painel principal |32|42|
-| Barras no mundo, aba do alvo, nome do inimigo e teclas |26|34|
+| Barras no mundo |24|31|
+| Aba do alvo, nome do inimigo e teclas |26|34|
 | Campo4–6 |28|36|
 
 Maior usa130%, sem encolher texto ou cortar letras. As caixas de valores do herói têm32 de altura para comportar a fonte42. As posições e a estrutura permanecem iguais nos quatro perfis. [checks.json](hud-target/checks.json) guarda cada caixa de texto e seu resultado medido. O texto do alvo é condensado, não Cinzel nem a Jakarta da versão anterior.
@@ -90,7 +93,7 @@ Base1920×1080. O arquivo aprovado1672×941 é normalizado a essa base **somente
 | Grade2×2 |1584+coluna×136,836+linha×112,128,100|
 | Vida sob a unidade |centro projetado−100,760,200,44|
 | Nome do alvo |1280,348,176,56; linha vermelha inferior|
-| Anel |248×64, centro nos pés de Nick; na imagem, máscara oculta a parte atrás das botas|
+| Anel |248×64, centro nos pés de Nick; na imagem, máscara alfa oculta partes atrás do corpo, botas e cauda|
 
 [Diferenças geométricas para as medidas aproximadas da especificação](hud-target/target_comparison.json): painéis ficam próximos do alvo, sem mudar sua organização. A grade termina em1848,1048; seu topo fica11px acima da medida aproximada. O passo vertical112 permite alvos de toque112 de altura sem sobreposição. A faixa da rodada agora tem64px de altura, como o alvo; imagens60px dentro das células64px.
 
@@ -98,7 +101,7 @@ Na integração: ancorar o rodapé à área segura e escalar uniformemente, sem 
 
 Teclado e controle mantêm os bindings existentes e navegação por foco; apontar ou focar não confirma uma ação. A seleção persistente usa cantos âmbar grossos; foco de navegação acrescenta um contorno interno claro, independente da seleção. Pressionado desloca somente o desenho2px, sem mover o hitbox. Bloqueados continuam explicáveis por wrapper de foco, sem disparar o comando; os motivos vêm da sessão. Reduzir efeitos mantém anel e marcas estáticos, sem pulso. Em toque, a aba com a tecla faz parte do controle maior, e a descrição não pode depender só de hover. Usos/recarga aparecem em pequenas abas do mesmo idioma quando existirem; não mostrar contador0 para usos ilimitados. Reutilizar as inspeções e o Registro já existentes, sem perder seu conteúdo.
 
-O anel deve ser um decal/plano **sob** a unidade, com oclusão/depth test e acompanhamento do ator real. A máscara de botas serve só à composição congelada. Não pintar o anel sobre os pés. A mesma informação aparece na barra e no retrato da rodada.
+O anel deve ser um decal/plano **sob** a unidade, com oclusão/depth test e acompanhamento do ator real. A máscara acompanha o alfa do sprite completo, incluindo botas e cauda, na composição congelada. Não pintar o anel sobre os pés. A mesma informação aparece na barra e no retrato da rodada.
 
 ## Conteúdo dinâmico e diferenças deliberadas
 
@@ -140,7 +143,7 @@ Observação baixa na ampliação da matriz: o bisel de Vida perdia leitura junt
 
 ## Reprodução e escopo
 
-`python docs/design/hud-target/build_assets.py` prepara as peças e os dois manifestos idênticos; o material WebP versionado dispensa o mestre PNG externo. O anel gerado foi normalizado em `ring_source.webp`, sem texto e com alfa, para reprodução; o mestre PNG permanece fora do Git. O anel gerado foi normalizado em `ring_source.webp`, sem texto e com alfa, para reprodução; o mestre PNG permanece fora do Git. `render.py` monta os quatro perfis e as quatro comparações completas. `compare.py` gera a matriz peça por peça; `verify.py` confere9-slice, fonte/OFL, limites, alvos, quatro ícones originais e hashes. Dependências: Pillow, numpy e CairoSVG.
+`python docs/design/hud-target/build_assets.py` prepara as peças e os dois manifestos idênticos; o material WebP versionado dispensa o mestre PNG externo. A base sem texto da Vida está em `health_source.webp`; o anel gerado foi normalizado em `ring_source.webp`, sem texto e com alfa, para reprodução; o mestre PNG permanece fora do Git. A base sem texto da Vida está em `health_source.webp`; o anel gerado foi normalizado em `ring_source.webp`, sem texto e com alfa, para reprodução; o mestre PNG permanece fora do Git. `render.py` monta os quatro perfis e as quatro comparações completas. `compare.py` gera a matriz peça por peça; `verify.py` confere9-slice, fonte/OFL, limites, alvos, quatro ícones originais e hashes. Dependências: Pillow, numpy e CairoSVG.
 
 Entrega de design/arte para integração do Claude na #60; sem alterações próprias em `scripts/`, `data/` ou `tests/`. O merge da `main` foi feito antes do trabalho e trouxe o trabalho do Claude; essas mudanças não são alterações do designer. Não foram refeitas as outras telas da #96 nesta rodada. O novo idioma fica disponível para elas, conforme a direção aprovada.
 
@@ -161,3 +164,45 @@ Revisão visual na matriz das dez peças e na prancha de detalhes alvo/antes/dep
 A arte canônica dos personagens e a ordem da sessão real continuam diferentes da ilustração do alvo; esta rodada aproxima a construção das peças. A integração e a navegação dentro do jogo seguem com o Claude na #60.
 
 Validação deste refinamento: Godot4.7.2, importação concluída; **46/46 testes em257,438s**, paridade48/48 (3351 passos), saída0. Permanecem avisos/erros de recursos/RID/ObjectDB no encerramento do runner. Auditoria dos quatro perfis,18 WebP, OFL, margens, hashes e limites aprovada; diff --check limpo.
+
+## Cor, volume, enquadramento e luz — revisão solicitada
+
+[Comparação alvo × antes × agora](hud-target/detail_comparison.webp) · [Antes/depois completo](hud-target/detail_before_after.webp) · [Detalhes de luz e alinhamento](hud-target/light_alignment.webp). O antes desta revisão é o commit2ce2f7a.
+
+### O que faz as cores parecerem mais vivas
+
+A referência tem separação maior entre o fundo preto-azulado das peças e os reflexos claros dos biséis. O piso junto da HUD é menos claro, o preenchimento ciano tem uma faixa clara superior e uma base mais escura, e o âmbar tem núcleo claro, halo e luz de retorno no chão. São diferenças de contraste, material e iluminação local; aumentar saturação global também estouraria os tijolos e as luzes. Os retratos e corpos canônicos têm ainda pintura diferente da ilustração do alvo, diferença que não deve ser corrigida recolorindo os arquivos originais.
+
+Amostrando apenas o preenchimento ciano em recortes correspondentes, o antes já tinha mediana aproximada RGB53,176,183 e saturação HSV0,741, contra RGB43,156,156 e0,718 na referência. A impressão de menor vivacidade não era falta de saturação desse preenchimento. As amostras são locais, com compressão e iluminação diferentes, e não descrevem a imagem inteira. A medição e os recortes estão no JSON de análise.
+
+Os [valores regionais de luminância](hud-target/color_analysis.json) são apenas descritivos: a referência já tem HUD, a captura limpa não, e os desenhos diferem. Eles não permitem atribuir uma porcentagem de saturação ao jogo. A revisão aplica uma sombra inferior gradual de até24% somente entre y796 e1080, preservando os detalhes e as cores do cenário acima. O preenchimento ganha reflexo superior e sombra na base; a moldura da Vida recupera material e volume, em vez de apenas uma linha fina.
+
+### Medidas atualizadas
+
+- **Vida no mundo:** canvas200×44 e9-slice20/12/20/12 mantidos; conteúdo útil14,5,172,34; faixa dinâmica172×12 em x+14,y+5. Valor24px Normal/31px Maior, em x+14,y+17,172×24. O valor continua acima de18px na base. Ciano/vermelho ou azul/laranja; aba aliada e corte inimigo preservados. Os cantos do ator agora acompanham o chanfro.
+- **Retrato de Nick:** mantém184×184 em76,848. Recorte no original256×256: **40,14–208,182**, sem esticar nem alterar o arquivo. Centro óptico da cabeça usado como referência:124,98, mapeado próximo de168,940. O enquadramento continua fechado, com o rosto no centro do quadrado.
+- **Ícones das ações:** alfa recortado antes de encaixar numa área44×44 em x+42,y+24. Centro óptico64,46 dentro do botão128×100; ligeiramente acima do centro geométrico para compensar a aba de tecla inferior. Mesmo centro para os quatro símbolos, sem depender das margens transparentes do SVG/WebP. As teclas continuam42×42 em x+78,y+54. Centros medidos em `checks.json`.
+
+### Ordem das camadas do anel e luz de retorno
+
+1. Sombra de contato estreita sob os pés, com queda suave.
+2. Luz âmbar difusa no piso: elipse centrada em768,756, raios visuais142×34; intensidade máxima de composição28%, excluindo o alfa do personagem.
+3. Anel248×64 em644,724, com núcleo claro e halo. Oclusão pelo alfa do sprite inteiro; retirado o corte retangular que ignorava a cauda.
+4. Personagem acima do anel. Luz de retorno quente, localizada nas botas, pernas e cauda próximas ao piso; máximo23% na prova, sem pintar os pixels do sprite original.
+5. Barras e HUD por cima da cena.
+
+A composição congelada usa o sprite canônico projetado264×300 em659,467 para obter a máscara; são medidas desta captura. **Na implementação, usar a projeção real da câmera, depth test e materiais que recebam iluminação.** Um WebP emissivo sozinho não ilumina o mapa ou o personagem: é preciso uma luz local/recepção de luz equivalente, com alcance curto e sem pulso quando reduzir efeitos estiver ativo. Não usar a máscara congelada ou as intensidades em pixels como regra do combate. A prova é uma direção visual para o Claude na #60, não uma captura de iluminação dinâmica já implementada.
+
+### QA deste ciclo
+
+**Rodada1 — VEREDITO: REPROVADO.** Média: Vida com bisel muito fino e cantos de seleção quadrados; ícones alinhados pelo canvas e margens desiguais; máscara retangular do anel ignorava cauda e não demonstrava retorno de luz. Corrigidos com nova base sem texto, chanfros, recorte pelo alfa e composição em camadas. Média: primeiro deslocamento do retrato desceu demais a cabeça; recorte ajustado pelo centro óptico sem mudar a escala.
+
+**Rodada2 — VEREDITO: APROVADO.** Conferidos os quatro perfis, cinza,40%, matriz peça a peça e prova de alinhamento. Vida recupera bisel e rebaixo, mantém diferenças de forma no daltonismo; retrato mantém escala e centraliza a cabeça; os quatro símbolos usam o mesmo centro óptico; anel tem oclusão completa e luz quente localizada na prova. Nenhuma alteração nos ícones originais do Nick, ids, scripts, data ou tests. A iluminação dinâmica e a oclusão em movimento ficam para a QA da integração.
+
+## Validação desta revisão e pendência para integração
+
+Auditoria de design aprovada:18 WebP, quatro perfis,9-slice/OFL/hashes, limites, centros dos símbolos, ícones canônicos e diff --check. Godot4.7.2 importou os arquivos. Duas execuções normais completas ficaram em **45/46** (257,167s e256,475s): somente `test_occlusion`, na verificação “o caixote na frente esmaece (0.60)”. A paridade passou48/48 (3351 passos). O teste de oclusão passou isoladamente,33 verificações em7,309s.
+
+A espera em tests/test_occlusion.gd aceita `crate.transparency >= FADED - 0.001`, mas a asserção seguinte usa `is_equal_approx` com tolerância mais estrita. Ela pode prosseguir antes de alcançar o valor final. Diagnósticos com relógio fixo e limite de quadros afetaram testes de tempo real/jornada e foram interrompidos; não contam como validação aprovada. Persistem avisos/erros de recursos/RID/ObjectDB ao encerrar o runner.
+
+**Pendência de teste registrada para o Claude; a bateria completa não ficou verde nesta revisão.** Scripts/data/tests não foram alterados, conforme o escopo autorizado, e o kit de combate desta proposta ainda não é carregado pelos scripts do jogo. O veredito APROVADO acima é da entrega de design, não da integração ou do runner completo.

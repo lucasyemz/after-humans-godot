@@ -1,0 +1,47 @@
+{
+  "reference": {
+    "bottom_region_luminance_p10_p50_p90": [
+      0.027,
+      0.071,
+      0.313
+    ]
+  },
+  "real_capture": {
+    "bottom_region_luminance_p10_p50_p90": [
+      0.12,
+      0.179,
+      0.264
+    ]
+  },
+  "caution": "Regional luminance is descriptive only: reference contains its HUD and changed illustrations; source is a clean capture. Do not infer a saturation correction from these values.",
+  "reference_cyan_track": {
+    "median_rgb": [
+      43,
+      156,
+      156
+    ],
+    "median_saturation": 0.718,
+    "median_value": 0.616,
+    "pixel_count": 1982
+  },
+  "before_cyan_track": {
+    "median_rgb": [
+      53,
+      176,
+      183
+    ],
+    "median_saturation": 0.741,
+    "median_value": 0.718,
+    "pixel_count": 1708
+  },
+  "after_cyan_track": {
+    "median_rgb": [
+      50,
+      174,
+      178
+    ],
+    "median_saturation": 0.706,
+    "median_value": 0.698,
+    "pixel_count": 2052
+  }
+}

@@ -4,7 +4,7 @@ sys.dont_write_bytecode=True
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageOps,ImageFilter
 import numpy as np
-TUNING_REVISION="detail_pass_2026_10_25"
+TUNING_REVISION="light_volume_alignment_2026_10_25"
 ROOT=Path(__file__).resolve().parents[3];HERE=Path(__file__).resolve().parent;OUT=ROOT/'art/ui/kit/combat';OUT.mkdir(parents=True,exist_ok=True)
 raw=Path('/workspace/generated_images/exec-eabb9cb5-5001-4f3a-a6cd-e5dca7e089af.png');tilepath=OUT/'steel_material.webp'
 if not tilepath.exists():
@@ -61,24 +61,18 @@ action=reference_frame((1375,736,1497,825),(128,100),7,10);d=ImageDraw.Draw(acti
 save('key_tab',reference_frame((1453,784,1486,819),(42,42),5,3,True),[6,6,6,6],[5,4,32,34])
 slot=reference_frame((739,794,863,905),(132,132),8,8);corner=ImageOps.mirror(slot.crop((0,80,52,132)));slot.alpha_composite(corner,(80,80));a=slot.getchannel('A');ImageDraw.Draw(a).polygon([(16,8),(115,8),(123,16),(123,115),(115,123),(16,123),(8,115),(8,16)],fill=0);slot.putalpha(a);save('ability_slot',slot,[16,16,16,16],[8,8,116,116])
 for kind in ['ally','enemy']:
- box=(173,660,350,699) if kind=='ally' else (1112,660,1280,700)
- im=reference_frame(box,(200,44),5,10,True)
- # Neutral steel rim: the health color is entirely a dynamic fill.
- a=np.array(im);rgb=a[:,:,:3].astype(float);chroma=rgb.max(axis=2)-rgb.min(axis=2);gray=np.uint8(rgb.mean(axis=2));colored=chroma>45
- for c in range(3):a[:,:,c]=np.where(colored,gray,a[:,:,c])
- im=Image.fromarray(a)
+ im=Image.open(HERE/'health_source.webp').convert('RGBA')
  if kind=='ally':
-  d=ImageDraw.Draw(im);d.polygon([(22,4),(26,0),(48,0),(52,4)],fill='#42484c');d.line((22,4,26,0,48,0,52,4),fill='#90928c',width=1)
+  d=ImageDraw.Draw(im);d.polygon([(23,3),(27,0),(48,0),(52,3)],fill='#565e62');d.line((27,0,48,0),fill='#a2aaa8',width=1)
  else:
-  alpha=im.getchannel('A');ImageDraw.Draw(alpha).polygon([(190,31),(199,31),(199,43),(183,43)],fill=0);im.putalpha(alpha)
- d=ImageDraw.Draw(im);rim=([(10,4),(22,4),(26,0),(48,0),(52,4),(189,4),(199,14),(199,33),(189,43),(10,43),(0,33),(0,14)] if kind=='ally' else [(10,0),(189,0),(199,10),(199,30),(181,43),(10,43),(0,33),(0,10)]);d.line(rim+[rim[0]],fill='#363b40',width=5,joint='curve');d.line(rim+[rim[0]],fill='#a4a49c',width=1,joint='curve');mask=Image.new('L',im.size);ImageDraw.Draw(mask).polygon(rim,fill=255);im.putalpha(mask)
- save('health_'+kind,im,[20,12,20,12],[14,6,172,34],'Reference-specific inset rim; ally top tab / enemy cut. No baked values or fill.')
+  alpha=im.getchannel('A');ImageDraw.Draw(alpha).polygon([(189,33),(199,29),(199,43),(181,43)],fill=0);im.putalpha(alpha)
+ save('health_'+kind,im,[20,12,20,12],[14,5,172,34],'Deep recessed steel bevel; cyan/red track is dynamic. Ally tab and enemy cut preserve non-color distinction.')
 save('main_bar',frame(320,44,8,False),[12,10,12,10],[8,6,304,32])
 for name,size,arm in [('selected_slot',(132,132),24),('active_health',(200,44),16)]:
  im=Image.new('RGBA',size);d=ImageDraw.Draw(im);w,h=size
- for x,y,sx,sy in [(3,3,1,1),(w-4,3,-1,1),(3,h-4,1,-1),(w-4,h-4,-1,-1)]:d.line([(x,y+sy*arm),(x,y),(x+sx*arm,y)],fill='#f0a020',width=4)
+ for x,y,sx,sy in [(3,3,1,1),(w-4,3,-1,1),(3,h-4,1,-1),(w-4,h-4,-1,-1)]:d.line([(x,y+sy*arm),(x,y+sy*7),(x+sx*7,y),(x+sx*arm,y)],fill='#f0a020',width=3)
  halo=im.filter(ImageFilter.GaussianBlur(3));halo.putalpha(halo.getchannel('A').point(lambda n:min(255,n*2)));halo=Image.alpha_composite(halo,im);core=ImageDraw.Draw(halo)
- for x,y,sx,sy in [(3,3,1,1),(w-4,3,-1,1),(3,h-4,1,-1),(w-4,h-4,-1,-1)]:core.line([(x,y+sy*arm),(x,y),(x+sx*arm,y)],fill='#ffe4a1',width=1)
+ for x,y,sx,sy in [(3,3,1,1),(w-4,3,-1,1),(3,h-4,1,-1),(w-4,h-4,-1,-1)]:core.line([(x,y+sy*arm),(x,y+sy*7),(x+sx*7,y),(x+sx*arm,y)],fill='#ffe4a1',width=1)
  save(name,halo,[28,12 if h==44 else 28,28,12 if h==44 else 28],note='Amber corner selection, separate from base texture.')
 ring=Image.open(HERE/'ring_source.webp').convert('RGBA');save('actor_ring',ring,note='Generated amber hot-core ring; no9-slice. Place under feet with depth test. Center128,40.');ROWS['actor_ring']['anchor']=[128,40]
 exit_im=Image.open(ROOT/'art/ui/kit/v2/exit.webp').convert('RGBA');save('exit',exit_im,note='Reused approved exit symbol; F is combat_flee, never a crosshair.');ROWS['exit']['anchor']=[32,32]
