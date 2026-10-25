@@ -105,17 +105,29 @@ func _finishes() -> void:
 	t.check(not seen.loaded_before_ready, "não dá para pular antes de a cena estar carregada")
 
 
+## Pular encerra o cartão. Sem relógio: o cartão desta passagem tem uma hora de mínimo (card.hold, que vale com cena de
+## fundo, como no vagão), então só o pulo o tira da tela. Medir o tempo dependia da máquina, porque a carga da cena
+## entrava na conta.
 func _skips() -> void:
-	var started := Time.get_ticks_msec()
-	GameFlow.travel("title")
-	while GameFlow.passage == null or not GameFlow.passage.ready_to_skip:
+	var card := GameFlow.card_for("title")
+	card.backdrop = Node3D.new()
+	card.hold = 3600.0
+	GameFlow.travel("title", card)
+	# Os tetos (30 s) só evitam travar a bateria se o pulo quebrar; não medem velocidade.
+	var limit := Time.get_ticks_msec() + 30000
+	while (GameFlow.passage == null or not GameFlow.passage.ready_to_skip) and Time.get_ticks_msec() < limit:
 		await _tree.process_frame
-	await _push("interact")
-	while GameFlow.busy:
-		await _tree.process_frame
-	var elapsed := (Time.get_ticks_msec() - started) / 1000.0
-	t.check(_tree.current_scene is AHTitleScreen, "pulada, a passagem abre o título")
-	t.check(elapsed < GameFlow.CARD_SECONDS + GameFlow.FADE_SECONDS * 2, "e termina antes do tempo do cartão (%.2f s)" % elapsed)
+	t.check(GameFlow.passage != null and GameFlow.passage.ready_to_skip, "a passagem fica pronta para pular")
+	# Nos primeiros SKIP_GRACE_MS o cartão ignora o pulo (de propósito); aperta de novo até ele aceitar, como o jogador.
+	limit = Time.get_ticks_msec() + 30000
+	while GameFlow.busy and Time.get_ticks_msec() < limit:
+		var card_now: AHPassageCard = GameFlow.passage
+		if card_now != null and not card_now.skipped:
+			await _push("interact")
+		else:
+			await _tree.process_frame
+	t.check(not GameFlow.busy, "pulada, a passagem termina sem esperar o mínimo do cartão (uma hora)")
+	t.check(_tree.current_scene is AHTitleScreen, "e abre o título")
 
 
 ## "Reduzir efeitos": o título parado e sem a cena de fundo; sem ele, a cena de fundo num SubViewport.
