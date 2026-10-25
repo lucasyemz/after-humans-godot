@@ -1,0 +1,434 @@
+{
+  "direction": "Approved target2026-10-25; overrides ornamental C",
+  "source_reference": "docs/design/reference/hud-target-2026-10-25.webp",
+  "source_sha256": "8060bc637f5af10340f30b15ab7d7ac5e1d8dab3bf90366f8f995f894481b124",
+  "canvas": [
+    1920,
+    1080
+  ],
+  "assets": {
+    "panel": {
+      "file": "art/ui/kit/combat/panel.webp",
+      "size": [
+        256,
+        80
+      ],
+      "nine_slice_ltrb": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "content_xywh": [
+        24,
+        16,
+        208,
+        48
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "a86c1677582bd1445c3a460e0cac47902619fd03e0521cfd3e9874cf492c81dd"
+    },
+    "register": {
+      "file": "art/ui/kit/combat/register.webp",
+      "size": [
+        272,
+        64
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": [
+        24,
+        12,
+        224,
+        40
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "88baeb758e86cbcf54e14f72efcba2e65f5e74008882b483d4fde76ea0172a1f"
+    },
+    "round_strip": {
+      "file": "art/ui/kit/combat/round_strip.webp",
+      "size": [
+        720,
+        72
+      ],
+      "nine_slice_ltrb": [
+        24,
+        16,
+        24,
+        16
+      ],
+      "content_xywh": [
+        24,
+        8,
+        672,
+        56
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "be378b7503978c8521db3713082e674b6e415f1cf5560593ed2f905fc7564b21"
+    },
+    "square_portrait": {
+      "file": "art/ui/kit/combat/square_portrait.webp",
+      "size": [
+        72,
+        72
+      ],
+      "nine_slice_ltrb": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "content_xywh": [
+        8,
+        8,
+        56,
+        56
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "1501deb17497d05dba1c784b29a91bd529d66ca9d5678a0f0a2b42e098cb91b3"
+    },
+    "hero_panel": {
+      "file": "art/ui/kit/combat/hero_panel.webp",
+      "size": [
+        564,
+        212
+      ],
+      "nine_slice_ltrb": [
+        224,
+        24,
+        24,
+        24
+      ],
+      "content_xywh": [
+        232,
+        40,
+        308,
+        152
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Keep height212; left224 protects the portrait column. Portrait content184x184 at12,12.",
+      "sha256": "946591df94b1549b5bd5413921ba634863ccaf077cbd08e0630f0dcaaaccf27d"
+    },
+    "ability_header": {
+      "file": "art/ui/kit/combat/ability_header.webp",
+      "size": [
+        624,
+        56
+      ],
+      "nine_slice_ltrb": [
+        20,
+        12,
+        20,
+        12
+      ],
+      "content_xywh": [
+        12,
+        8,
+        600,
+        40
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "13d1baafe8a80860088fe4c7c5049ddf5febaf034372825b69467476ed2c07e5"
+    },
+    "target_tab": {
+      "file": "art/ui/kit/combat/target_tab.webp",
+      "size": [
+        336,
+        40
+      ],
+      "nine_slice_ltrb": [
+        16,
+        12,
+        16,
+        12
+      ],
+      "content_xywh": [
+        16,
+        6,
+        304,
+        28
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "638e9d839a754e9d84fd46c34b25bec1cd123183af5880e293a39ca8bbfa7018"
+    },
+    "action_button": {
+      "file": "art/ui/kit/combat/action_button.webp",
+      "size": [
+        128,
+        100
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        16,
+        12,
+        96,
+        76
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "1f0f3f08dd3815176e5c04bf47266fc688421610fc38ff22d942484dcd28d29c"
+    },
+    "key_tab": {
+      "file": "art/ui/kit/combat/key_tab.webp",
+      "size": [
+        48,
+        48
+      ],
+      "nine_slice_ltrb": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "content_xywh": [
+        8,
+        6,
+        32,
+        36
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "e511ac7f007e3a6b0b458e385d2ecd39ce5aca155eb570cb88a51fc1bc1c972c"
+    },
+    "ability_slot": {
+      "file": "art/ui/kit/combat/ability_slot.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        8,
+        8,
+        116,
+        116
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "dd66182fcd3e01f9537468fd8843819bfd3a605f51630de92c1e0d5527fbcfa7"
+    },
+    "health_ally": {
+      "file": "art/ui/kit/combat/health_ally.webp",
+      "size": [
+        200,
+        44
+      ],
+      "nine_slice_ltrb": [
+        20,
+        12,
+        20,
+        12
+      ],
+      "content_xywh": [
+        16,
+        6,
+        168,
+        34
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Ally top tab; enemy notch on lower-right. No position number.",
+      "sha256": "a8e2d698b6cbbd4aa45be988aabcd94963efda97ee627e524a7a231fef28b1f0"
+    },
+    "health_enemy": {
+      "file": "art/ui/kit/combat/health_enemy.webp",
+      "size": [
+        200,
+        44
+      ],
+      "nine_slice_ltrb": [
+        20,
+        12,
+        20,
+        12
+      ],
+      "content_xywh": [
+        16,
+        6,
+        168,
+        34
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Ally top tab; enemy notch on lower-right. No position number.",
+      "sha256": "4ae1727b1e2d45bfba1bc132cc932da43968eaed03ead3c8b949452929479519"
+    },
+    "main_bar": {
+      "file": "art/ui/kit/combat/main_bar.webp",
+      "size": [
+        320,
+        44
+      ],
+      "nine_slice_ltrb": [
+        12,
+        10,
+        12,
+        10
+      ],
+      "content_xywh": [
+        8,
+        6,
+        304,
+        32
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "",
+      "sha256": "db3569e1f259e0f330ae1f25bf05c6acfbd8eb17d22064efaa530fffe6baf9ed"
+    },
+    "selected_slot": {
+      "file": "art/ui/kit/combat/selected_slot.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        28,
+        28,
+        28,
+        28
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Amber corner selection, separate from base texture.",
+      "sha256": "b9e7e658917111560b13498cfcac47c280728d0696994109ee13b10d48dbdeb0"
+    },
+    "active_health": {
+      "file": "art/ui/kit/combat/active_health.webp",
+      "size": [
+        200,
+        44
+      ],
+      "nine_slice_ltrb": [
+        28,
+        12,
+        28,
+        12
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Amber corner selection, separate from base texture.",
+      "sha256": "45a3afd575b000bf4e2a0d393a8be2565a7e90d5a39f6c87d44781913be819d9"
+    },
+    "actor_ring": {
+      "file": "art/ui/kit/combat/actor_ring.webp",
+      "size": [
+        256,
+        80
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        128,
+        40
+      ],
+      "note": "Do not9-slice: perspective ellipse, place under feet, depth-tested. Center128,40.",
+      "sha256": "ba17ba25d6e4166e9a758f6b97090ae88101d47bab10f70871d3d3b39c052635"
+    },
+    "exit": {
+      "file": "art/ui/kit/combat/exit.webp",
+      "size": [
+        64,
+        64
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        32,
+        32
+      ],
+      "note": "Reused approved exit symbol; F is combat_flee, never a crosshair.",
+      "sha256": "3f778031eb43739712b7c4c3b95372142054a062630209c2b5cd4c31056ef8a4"
+    },
+    "steel_material": {
+      "file": "art/ui/kit/combat/steel_material.webp",
+      "size": [
+        512,
+        512
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Repeat material; never stretch frame corners.",
+      "sha256": "4bb9a29414319aa78ac1d0ea848d895e9271573694da2746fa2203158fd7d224"
+    }
+  },
+  "font": {
+    "file": "art/ui/fonts/barlow_condensed_semibold.ttf",
+    "license": "art/ui/fonts/OFL-BarlowCondensed.txt",
+    "source": "https://github.com/google/fonts/tree/main/ofl/barlowcondensed",
+    "sha256": "7b619d14bc2327509a9ef32b0890f709626f7ecc9ff61191c2a4314c5499d2d9",
+    "case": "UPPERCASE"
+  },
+  "originals": "Generated material PNG outside repository; no heavy masters committed"
+}

@@ -11,6 +11,8 @@ O Lucas refez por cima a versão C do Codex e aprovou o resultado como **o alvo 
 Onde este alvo e o resto da página discordam, **vale o alvo**: metal escuro e cantos chanfrados com detalhe âmbar, em
 vez de latão ornamentado; letra condensada, em vez da serifada. As raízes e a luz ciano continuam, mas com moderação.
 
+**Entrega e QA contra o alvo:** [hud-target.md](hud-target.md), com comparações nos quatro perfis e o kit WebP/9-slice.
+
 ### O que muda da versão C para o alvo
 
 | Peça | Versão C (Codex) | Alvo (Lucas) |

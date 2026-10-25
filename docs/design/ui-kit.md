@@ -1,6 +1,6 @@
 # Kit único de componentes — #59
 
-> **Direção escolhida e consolidada:** [HUD C — Latão noturno](hud-c.md), com [contrato e peças](hud-c/contract.json). Foco desta entrega somente no combate; ícones do Nick guardados para o futuro. O kit abaixo documenta a versão anterior, não a aparência escolhida agora.
+> **Referência atual do combate:** [alvo aprovado de aço chanfrado](hud-target.md), com fonte condensada OFL e [peças/margens](hud-target/assets.json). Substitui a aparência de latão da C. O kit v1 abaixo fica como histórico.
 
 **Versão 01, proposta para aprovação do Lucas. QA de design: APROVADO na rodada 4 (revisão do PR #65).** Base de leitura: commit `fceda77`, 24/10/2026. A #58 monta as telas com este kit após a aprovação; a #60 implementa os componentes no jogo. Esta entrega não muda a HUD em execução.
 

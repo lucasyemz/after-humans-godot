@@ -1,5 +1,7 @@
 # HUD C consolidada — Latão noturno
 
+> **Histórico, anterior ao alvo aprovado:** a [entrega atual](hud-target.md) segue a revisão de aço chanfrado e letra condensada do Lucas. Não usar estas peças ornamentadas na nova integração.
+
 Lucas escolheu a terceira HUD em25/10/2026 e pediu foco somente na HUD. Esta entrega consolida o desenho de combate, as peças, os estados e as medidas para integração do Claude. **Os ícones do Nick permanecem os usados pelo jogo; os estudos alternativos ficam guardados.** Nenhuma tela nova do laço foi refeita nesta rodada. O Registro da luta foi preservado em um botão compacto, sem painel permanente.
 
 ![Normal e Maior; mira, fuga e chefe](hud-c/overview.webp)

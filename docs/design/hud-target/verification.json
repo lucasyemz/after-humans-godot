@@ -1,0 +1,29 @@
+{
+  "verdict": "APROVADO for design delivery; integration still required",
+  "reference_unchanged": true,
+  "runtime_webp": 18,
+  "runtime_bytes": 328350,
+  "profiles": 4,
+  "label_overflows": 0,
+  "overlapping_input_targets": 0,
+  "uppercase_condensed_ofl_font": true,
+  "nick_icons_unchanged": true,
+  "f_is_exit": true,
+  "sha256": {
+    "comparison.webp": "e24d67d1ec81974d7258de6c9c7698874beff8d17b923fb1d93ceb65e3e065c4",
+    "comparison_colorblind.webp": "9c83c7f5f54f735b11108d3160bbf60dab62f8f9e0e7f05a2daaa04a3a83d187",
+    "comparison_large.webp": "0109fe8cc892af4313ac0e7ae969a6cf437675e972d5f6b45976aa5462d9c01b",
+    "comparison_large_colorblind.webp": "b1a6d18b7ef77404e26408e81b7f0fd46e59ee9c84614f8448369e93ca411ec1",
+    "hud.webp": "fecda86676b3a9135b8f9a3fd3c2505bd50f380514e296c6f74d96646374cc9a",
+    "hud_40.webp": "852a32742e0da0fedae0765853e6eae2cdb95e4055e679ce512971734ec78d9c",
+    "hud_colorblind.webp": "aa56b5998daa4ea7b86648e04784384e5070dd06c39e04c74131be97312e9795",
+    "hud_colorblind_40.webp": "24f9ba23adbf7d8a2e08b0cfdeab3342ca4c0fccd79a4e0420bb9d849925b091",
+    "hud_gray.webp": "2661bcb5991f26707dcc9ec6e308af6ad3e2f962b06590c31a2361c04303ccae",
+    "hud_large.webp": "0091e654acc4979168532677d67fcc3ce190fe70aba1ffb09e93456e26f6018f",
+    "hud_large_40.webp": "6e1ef50ab69f97c28509296a808e76d85f37cdaace5c600478136e754118a6bd",
+    "hud_large_colorblind.webp": "05421c7d7bccb94344891775c42bbad53f3bc7fd424ac0761685054c93078ea9",
+    "hud_large_colorblind_40.webp": "1c0c45e8731de06d4bd9652c2b90ad36b6189264367ee9adbaf7735b8791f42d",
+    "piece_comparison.webp": "ae2404f6ff170d27699c443899d0ea2070a26c4f28f55f7d6f5189e48b1a93a2",
+    "readability.webp": "8453f93c6030eeb6953284960ac4352363ccadc6550e92fce49408da067d3176"
+  }
+}
