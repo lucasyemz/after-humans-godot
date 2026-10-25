@@ -1,6 +1,6 @@
 # Kit único de componentes — #59
 
-> **Direção visual em revisão:** há [três alternativas de HUD para escolha](hud-variations.md). a [prancha de estilo v2](ui-kit/v2-style.md) segue a nova [direção do Lucas](hud-direction.md). Aguarda aprovação antes de refazer a #96. O kit abaixo documenta a versão anterior; não usar sua aparência como direção aprovada atual.
+> **Direção escolhida e consolidada:** [HUD C — Latão noturno](hud-c.md), com [contrato e peças](hud-c/contract.json). Foco desta entrega somente no combate; ícones do Nick guardados para o futuro. O kit abaixo documenta a versão anterior, não a aparência escolhida agora.
 
 **Versão 01, proposta para aprovação do Lucas. QA de design: APROVADO na rodada 4 (revisão do PR #65).** Base de leitura: commit `fceda77`, 24/10/2026. A #58 monta as telas com este kit após a aprovação; a #60 implementa os componentes no jogo. Esta entrega não muda a HUD em execução.
 

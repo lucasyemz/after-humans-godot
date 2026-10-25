@@ -1,6 +1,8 @@
-# Kit v2 — prancha de estilo para aprovação
+# Kit v2 — prancha inicial de estilo (histórico)
 
-**[Ver agora as três variações de HUD em uso](../hud-variations.md)** — A ornamentada, B gráfica, C compacta; aguardam escolha do Lucas.
+**[HUD C consolidada](../hud-c.md)** é a referência atual de combate.
+
+**[Ver agora as três variações de HUD em uso](../hud-variations.md)** — A ornamentada, B gráfica, C compacta. Lucas escolheu **C**; foco atual somente na HUD, com os ícones do Nick reservados para o futuro.
 
 **Etapa de direção de arte da #59. Aguarda aprovação do Lucas.** Segue [hud-direction.md](../hud-direction.md), incorporado de `origin/main` antes do desenho. As telas da #96 não foram refeitas nesta etapa.
 

@@ -92,3 +92,11 @@ VIGIA, raízes que tomaram tudo e a Estação Raiz como casa. A interface é **f
   Lucas aprovar. Só depois as telas.
 - **Legível:** texto no mínimo do `AHUiStyle`, contraste, texto Maior e daltonismo continuam valendo. O ornamento nunca
   fica em cima do texto.
+
+## Decisão do Lucas — 25/10/2026
+
+- **Direção escolhida: C — Latão noturno**, a terceira das [variações de HUD](hud-variations.md): distribuição compacta, ornamento contido e espaço para a cena. Consolidar a HUD a partir dela; isto não aprova uma integração já implementada ou todas as telas da #96.
+- **Ícones do Nick:** Lucas gostou e pediu para guardar como possibilidade futura. Preservar os estudos e as imagens atuais, incluindo os ícones ilustrados visíveis na C e os glifos alternativos da B; não interpretar a preferência como autorização para substituir os ícones usados pelo jogo. A seleção final do conjunto fica para uma tarefa futura.
+- **Foco atual: somente a HUD.** Não expandir agora para redesenho ou integração de habilidades/ícones. A bandeira de Fugir/Retirar foi identificada como pouco clara; revisar a clareza desse controle dentro do trabalho da HUD.
+
+A consolidação da HUD de combate, peças e medidas está em [hud-c.md](hud-c.md). Essa é a referência atual de implementação da HUD C; as variações e a prancha inicial continuam como histórico.

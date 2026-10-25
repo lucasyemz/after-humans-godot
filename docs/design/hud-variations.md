@@ -1,6 +1,6 @@
 # Três variações de HUD — escolha de direção
 
-Estudos pedidos pelo Lucas depois da prancha do kit v2. **Nenhuma opção está aprovada para integração.** Estas são três composições de combate para comparar a linguagem em uso; as demais telas da #96 continuam aguardando a escolha.
+Estudos pedidos pelo Lucas depois da prancha do kit v2. **Direção visual escolhida pelo Lucas: C — Latão noturno (25/10/2026).** A aprovação da direção não significa que a interface já esteja integrada. Estas são três composições de combate para comparar a linguagem em uso; o foco atual é consolidar somente a HUD. Os ícones do Nick ficam preservados como possibilidade futura.
 
 **[Comparar A, B e C em tamanho completo](hud-variations/comparison.webp)**
 
@@ -11,6 +11,8 @@ Estudos pedidos pelo Lucas depois da prancha do kit v2. **Nenhuma opção está 
 | [A — Raízes gravadas](hud-variations/hud_a.webp) | Cobre fino, linhas duplas, raízes gravadas e pequenos pontos de luz. A mais ornamentada. | Carta vertical de Nick; iniciativa central no alto; habilidades quadradas, ações agrupadas à direita. |
 | [B — Marcas da Estação](hud-variations/hud_b.webp) | Bordas angulares, losangos e glifos coloridos em silhueta. A mais gráfica. | Iniciativa vertical na esquerda; retrato separado das barras; quatro habilidades em losango, com as centrais mais altas. |
 | [C — Latão noturno](hud-variations/hud_c.webp) | Latão contido, superfície escura, encaixes pequenos e pouco ornamento. A mais discreta. | Iniciativa no alto à direita; identidade e habilidades compactas embaixo; ações em quatro pequenos losangos. |
+
+**[Consolidação da C: peças, estados e medidas](hud-c.md)**. As imagens abaixo preservam os estudos de escolha.
 
 ## A — Raízes gravadas
 
@@ -49,7 +51,7 @@ Iniciativa: Nick → Íris → Emissor → Bento → Véspera → Recreador, con
 
 ## Medidas dos estudos
 
-Base1920×1080. Tipografia existente: Plus Jakarta Sans no corpo e Cinzel nnomes, turno e habilidade em foco; mínimo18, nomes/captions20–24. [Composição com coordenadas, recortes e hashes](hud-variations/composition.json). São medidas das propostas para escolha, não o contrato final do kit.
+Base1920×1080. Tipografia existente: Plus Jakarta Sans no corpo e Cinzel nos nomes, turno e habilidade em foco; mínimo18, nomes/captions20–24. [Composição com coordenadas, recortes e hashes](hud-variations/composition.json). São medidas das propostas para escolha, não o contrato final do kit.
 
 | Peça | A | B | C |
 |---|---|---|---|
@@ -85,7 +87,7 @@ QA conforme [checklist](qa.md), com o alcance de **comparação de direção vis
 
 Revisadas as três em1920×1080, a40% e em cinza: formas, hierarquia, espaço da cena, contraste, retratos/ícones existentes e glifos novos. Na prova em fundo claro, os glifos recebem tinta escura da mesma família para manter contraste; em jogo aparecem sobre os encaixes escuros. Ciano/âmbar são acompanhados por lados, retratos e marcas; os quatro glifos de B se distinguem por silhueta. Textos e números dentro do canvas, mínimo18; nada de código de jogo ou ids alterados. Carta de A já não invade a placa da Véspera. Sem problema alto ou médio pendente no alcance dos estudos.
 
-A redução mostra a hierarquia, as habilidades e o alvo; texto de detalhe não foi declarado adequado para jogar em um celular a40%. A escolha precisará passar pela etapa própria de toque/texto Maior antes de produção. As três continuam **aguardando a decisão visual do Lucas**; esta QA não escolhe uma delas nem aprova a #96 completa.
+A redução mostra a hierarquia, as habilidades e o alvo; texto de detalhe não foi declarado adequado para jogar em um celular a40%. A escolha precisará passar pela etapa própria de toque/texto Maior antes de produção. Após esta QA, **Lucas escolheu C**. A revisão técnica não aprova a #96 completa.
 
 Godot4.7.2: **43/43 testes**, **48/48 lutas de paridade** (3351 passos), saída0 em234,112s. Permanecem avisos de recursos/RID/ObjectDB no encerramento. Só `docs/`, sem alteração em `scripts/`, `data/`, `tests/` ou artes de runtime. Referências privadas e PNG mestres fora do Git; entrega em WebP e `docs/.gdignore` preservado.
 
@@ -93,4 +95,4 @@ Godot4.7.2: **43/43 testes**, **48/48 lutas de paridade** (3351 passos), saída0
 
 `python docs/design/hud-variations/compose.py` (Pillow, numpy e CairoSVG) refaz os três HUDs usando os estudos WebP e os assets já versionados. O mestre PNG externo não é necessário. `skin_a/b/c.webp` e `skill_glyphs.webp` são estudos de composição, **não um atlas para integrar**. O manifesto registra origem do frame e coordenadas das peças; as molduras são originais e não recortes das referências do Lucas.
 
-A decisão pode ser A, B ou C, ou uma combinação explícita — por exemplo, molduras de A com glifos de B e distribuição de C. Só então consolidar o kit e remontar as telas do laço. As caixas da carga já aprovadas permanecem.
+Lucas escolheu **C — Latão noturno**. Consolidar somente a HUD nesta direção. Guardar os ícones do Nick como opção futura, sem substituir ou integrar conjuntos agora; A/B e seus estudos permanecem como referência. As caixas da carga já aprovadas permanecem.

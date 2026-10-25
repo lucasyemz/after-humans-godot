@@ -1,0 +1,147 @@
+{
+	"combat": {
+		"actor": "unit_hero_gato_nick",
+		"can_flee": true,
+		"move_targets": [
+			1,
+			3
+		],
+		"options": [
+			{
+				"cooldown": 0,
+				"description": "Dano 4–6\nLâmina energética: ignora metade da redução de armadura/Bloqueio.",
+				"enemy_side": true,
+				"id": "gato_corte_fase",
+				"name": "Corte de Fase",
+				"reason": "",
+				"self": false,
+				"targets": [
+					1,
+					2
+				],
+				"usable": true,
+				"uses": -1
+			},
+			{
+				"cooldown": 0,
+				"description": "Dano 2–4\nGolpe leve; recua uma posição quando há espaço e o movimento é permitido.",
+				"enemy_side": true,
+				"id": "gato_salto_entre_ruinas",
+				"name": "Salto Entre Ruínas",
+				"reason": "",
+				"self": false,
+				"targets": [
+					1,
+					2
+				],
+				"usable": true,
+				"uses": -1
+			},
+			{
+				"cooldown": 0,
+				"description": "Recebe 1 Esquiva e remove a própria Marca.",
+				"enemy_side": false,
+				"id": "gato_sumir_na_sombra",
+				"name": "Sumir na Sombra",
+				"reason": "",
+				"self": true,
+				"targets": [
+					2
+				],
+				"usable": true,
+				"uses": -1
+			},
+			{
+				"cooldown": 0,
+				"description": "Dano 7–10 · Recarga 2\nDano elevado contra Marcado OU Vulnerável, sem somar bônus. Consome uma Marca ou um Vulnerável.",
+				"enemy_side": true,
+				"id": "gato_cacada_precisa",
+				"name": "Caçada Precisa",
+				"reason": "Sem alvo válido",
+				"self": false,
+				"targets": [],
+				"usable": false,
+				"uses": -1
+			}
+		],
+		"source": "AHCombatSession reconstructed from captured DTOs + initial roster6"
+	},
+	"combat-boss": {
+		"actor": "unit_hero_sapo_iris",
+		"can_flee": false,
+		"move_targets": [
+			2,
+			4
+		],
+		"options": [
+			{
+				"cooldown": 0,
+				"description": "Dano 4–7\nRemove 1 Bloqueio antes do dano; +25% de dano em máquinas.",
+				"enemy_side": true,
+				"id": "sapo_carga_voltaica",
+				"name": "Carga Voltaica",
+				"reason": "",
+				"self": false,
+				"targets": [
+					2,
+					3,
+					4
+				],
+				"usable": true,
+				"uses": -1
+			},
+			{
+				"cooldown": 0,
+				"description": "Dano 2–4 · Recarga 2\nDano baixo no alvo e vizinho (atrás, ou à frente se não houver); armadura reduzida até o fim do próximo turno de cada alvo.",
+				"enemy_side": true,
+				"id": "sapo_coquetel_corrosivo",
+				"name": "Coquetel Corrosivo",
+				"reason": "",
+				"self": false,
+				"targets": [
+					1,
+					2,
+					3,
+					4
+				],
+				"usable": true,
+				"uses": -1
+			},
+			{
+				"cooldown": 0,
+				"description": "Cura 5–8 · 3 usos\nRecupera 5–8 Vida de aliado orgânico. 3 cargas compartilhadas com a exploração; recarrega somente após vitória.",
+				"enemy_side": false,
+				"id": "sapo_ampola_reparo_vivo",
+				"name": "Ampola de Reparo Vivo",
+				"reason": "",
+				"self": false,
+				"targets": [
+					1,
+					2,
+					3,
+					4
+				],
+				"usable": true,
+				"uses": 3
+			},
+			{
+				"cooldown": 0,
+				"description": "2 usos\nRemove Sangramento e Contaminação de aliado. 2 usos por expedição.",
+				"enemy_side": false,
+				"id": "sapo_antidoto_campo",
+				"name": "Antídoto de Campo",
+				"reason": "",
+				"self": false,
+				"targets": [
+					1,
+					2,
+					3,
+					4
+				],
+				"usable": true,
+				"uses": 2
+			}
+		],
+		"source": "AHCombatSession reconstructed from captured DTOs + initial roster6"
+	}
+}

@@ -1,6 +1,6 @@
 # Telas do novo laço — #96
 
-> **Histórico — versão1.** O Lucas pediu revisão da linguagem visual em25/10/2026. Esta versão não deve orientar a integração visual. Primeiro aprovar a [prancha do kit v2](ui-kit/v2-style.md); depois refazer estas telas. A QA registrada abaixo se refere à entrega anterior.
+> **Histórico — versão1.** Lucas escolheu a direção C. A [HUD de combate consolidada](hud-c.md) é a referência atual para o Claude. Estas telas do laço não foram refeitas nesta rodada; aguardam tarefa própria. A QA abaixo se refere à entrega anterior.
 
 Propostas de UI para aprovação do Lucas; integração nas issues #88–#94 pelo Claude. Montadas com o [kit #59](ui-kit.md), depois do [Mapa da Rede #86](phase-map.md). Não implementam progressão, recompensas ou pesquisa no jogo.
 
