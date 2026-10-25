@@ -1010,6 +1010,7 @@ func _start_fight(index: int, advantage: bool) -> void:
 		hud.toast(tr("A equipe chegou sem ser vista: age primeiro."), 2.5)
 	var heroes: Array = street.party_ids.map(func(id): return Campaign.hero(id))
 	var center: float = (room.guard_x if house else cards[0].position.x) - 1.0
+	street._arena.boss_fight = bool(fight.boss)
 	street._arena.start(heroes, street._heroes, fight.enemies, cards, center, fight.opening)
 
 

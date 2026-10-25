@@ -1,6 +1,6 @@
 ## A cena da Estação: abrir e fechar não deixa conexões nas opções (Settings.changed), e quem dorme continua no
 ## beliche quando os passeios são refeitos (depois de acolher ou recusar o candidato do trem, com a noite pendente).
-## Partir clicado duas vezes (o segundo clique cai durante o fade da saída) parte uma vez só, sem erro.
+## Partir clicado duas vezes (o segundo clique cai durante o briefing ou o fade da saída) parte uma vez só, sem erro.
 extends RefCounted
 
 const S = preload("res://scripts/flow/station_rules.gd")
@@ -73,6 +73,11 @@ func run(t) -> void:
 		t.check(not station.hud._draft.team.has(risco) and station.hud._draft.team.has(rex), "a Preparação escala o Rex no lugar do Bento, não o Risco")
 		station.hud._depart()
 		station.hud._depart()
+		await tree.process_frame
+		# O briefing (#88) abre uma vez só; pulado, a equipe parte.
+		t.equal(tree.root.find_children("Briefing", "AHBriefingDialog", true, false).size(), 1, "Partir clicado duas vezes abre um briefing só")
+		if station.hud.briefing_open():
+			station.hud.briefing.skip()
 		await tree.process_frame
 		t.check(c.session.expedition != null, "Partir clicado duas vezes parte")
 		var id: String = c.session.expedition.id if c.session.expedition != null else ""

@@ -34,7 +34,7 @@
     "Description": "+1 de velocidade.",
     "Stat": "Speed",
     "Value": 1,
-    "MaxStacks": 2,
+    "MaxStacks": 1,
     "Classes": [
       "gato",
       "coruja",
@@ -48,7 +48,7 @@
     "Stat": "Ability",
     "AbilityId": "gato_corte_fase",
     "Value": 1,
-    "MaxStacks": 3,
+    "MaxStacks": 2,
     "Classes": [
       "gato"
     ]
@@ -60,7 +60,7 @@
     "Stat": "Ability",
     "AbilityId": "coruja_disparo_perfurante",
     "Value": 1,
-    "MaxStacks": 3,
+    "MaxStacks": 2,
     "Classes": [
       "coruja"
     ]

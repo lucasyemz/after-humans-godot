@@ -35,6 +35,10 @@ var _rest_tag: PanelContainer
 var _after_arrival := false
 ## O herói escolhendo a melhoria do treino no Alojamento (#90), ou "".
 var _training := ""
+## A caixa do briefing ou do debriefing aberta (#88), ou null.
+var briefing: AHBriefingDialog
+## A ficha do herói ao apontar um cartão da Preparação (#89).
+var sheet: AHCharacterSheet
 ## Até quando (relógio, ms) o relatório recém-aberto pela chegada ignora pular e voltar.
 var _report_guard_ms := 0
 ## Pular apertado na chegada (também antes de ela começar, com o cartão da passagem ainda saindo).
@@ -87,6 +91,8 @@ var _map: AHPhaseMap
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sheet = AHCharacterSheet.new()
+	add_child.call_deferred(sheet)
 	# A faixa escura do alto (como a barra da Unreal): o título e os recursos leem em cima de um cômodo claro.
 	var shade := TextureRect.new()
 	var fade := Gradient.new()
@@ -229,6 +235,9 @@ func _ready() -> void:
 ## passo, Preparar expedição, Opções...), que as setas percorrem; Voltar devolve aos cômodos. Com um painel ou o mapa
 ## aberto, o foco fica nos botões dele e Interagir confirma o botão com foco.
 func _input(event: InputEvent) -> void:
+	# Com o briefing aberto (#88), a caixa dele fica com o teclado, o controle, o clique e o toque.
+	if briefing_open():
+		return
 	# Logo que o relatório abre depois da chegada, o segundo toque do pular (Interagir, Enter, Esc, clique) não conclui
 	# nem fecha o relatório: quem pulou a cena ainda vê o que a equipe trouxe.
 	if Time.get_ticks_msec() < _report_guard_ms and (AHPassageCard.is_skip(event) or U.is_back(event)):
@@ -298,6 +307,9 @@ func _reset_focus() -> void:
 ## A tela de cima, onde o foco do teclado e do controle fica: o mapa de fases, a Preparação ou o painel aberto (com a
 ## vista geral e as Opções do canto). Na vista geral, nenhuma (as setas andam entre os cômodos).
 func focus_scope() -> Control:
+	# O briefing (#88) cuida do foco dele.
+	if briefing_open():
+		return null
 	if _map.visible:
 		return _map
 	if current == "":
@@ -544,7 +556,7 @@ func _build_left(c: Dictionary) -> void:
 	_overview_button.visible = current != ""
 	_corner.visible = current != ARRIVAL and (current != S.PREPARATION or S.preparation_block(c) != "")
 	_fit_overview_to_menu.call_deferred()
-	_show_arrival_hint(current == ARRIVAL)
+	_show_arrival_hint(current == ARRIVAL and not briefing_open())
 	_refresh_room_card()
 
 
@@ -609,6 +621,14 @@ func play_arrival() -> void:
 		station.finish_team_arrival()
 	else:
 		await station.train_event_named("team_ready")
+	# O debriefing (#88): na plataforma, uma fala sobre o que se conseguiu e o que muda; depois, o relatório.
+	var lines := AHBriefing.debriefing(Campaign.state, report) if current == ARRIVAL else []
+	if not lines.is_empty() and is_inside_tree():
+		# A dica de pular a chegada sai: a caixa tem os botões dela.
+		_show_arrival_hint(false)
+		briefing = AHBriefingDialog.open(self, lines, tr("Ver o relatório"))
+		await briefing.finished
+		briefing = null
 	if current == ARRIVAL and is_inside_tree():
 		current = ""
 		_after_arrival = true
@@ -877,6 +897,8 @@ func _sound_open() -> void:
 func close_panel() -> void:
 	# A escolha do Treino (#90) não fica aberta para a próxima vez.
 	_training = ""
+	if sheet != null:
+		sheet.close()
 	# A chegada termina no relatório, nunca no meio: fechar não vale (a fila e os cômodos ficariam pela metade).
 	if current == ARRIVAL:
 		return
@@ -1473,6 +1495,8 @@ func _prep_drawer(c: Dictionary) -> void:
 		_tags.add_sibling(_prep)
 	_prep.visible = true
 	_fit_prep.call_deferred()
+	# Os cartões são refeitos: a ficha do cartão de antes fecha (o mouse ou o foco a abrem de novo).
+	sheet.close()
 	for child in _prep.get_children():
 		_prep.remove_child(child)
 		child.queue_free()
@@ -1526,6 +1550,7 @@ func _prep_drawer(c: Dictionary) -> void:
 			if not S.can_deploy(entry):
 				button.text += tr(" · sem arte de combate")
 			button.pressed.connect(func(): _prep_bench(id))
+			sheet.attach(button, func(): return AHCharacterSheet.from_hero(S.hero(Campaign.state, id)))
 			bench_row.add_child(button)
 		# Equipe menor (#6): o escolhido fica na Estação e a vaga fica vazia (os de trás andam para a frente).
 		if can_leave:
@@ -1663,6 +1688,8 @@ func _prep_slot(c: Dictionary, rank: int) -> Button:
 	if entry == null:
 		box.add_child(U.label(tr("Posição vazia"), 20, U.MUTED))
 		return button
+	# A ficha ao apontar o cartão (#89): os traços, a relíquia e a velocidade, que o cartão não mostra.
+	sheet.attach(button, func(): return AHCharacterSheet.from_hero(S.hero(Campaign.state, hero_id)))
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 10)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1770,11 +1797,26 @@ func _prep_bench(hero_id: String) -> void:
 
 
 func _depart() -> void:
-	# O segundo clique em Partir, durante o fade da saída, já não tem Preparação.
-	if _draft.is_empty() or GameFlow.busy:
+	# O segundo clique em Partir, durante o fade da saída ou com o briefing aberto, já não parte de novo.
+	if _draft.is_empty() or GameFlow.busy or briefing_open():
 		return
 	var c: Dictionary = Campaign.state
-	var error := S.confirm_departure(c, _draft.team.duplicate(), _draft.extra, randi(), _draft.phase, _draft.focus)
+	# A partida conferida numa cópia (nada muda ainda): o briefing só abre para uma saída que vale.
+	var error := S.confirm_departure(c.duplicate(true), _draft.team.duplicate(), _draft.extra, 0, _draft.phase, _draft.focus)
+	if error != "":
+		toast(error, true)
+		return
+	# O briefing (#88): quem pede fala antes de a equipe embarcar; pular também parte, Voltar fica na Preparação.
+	var lines := AHBriefing.departure(c, _draft.phase, _draft.team)
+	if not lines.is_empty():
+		briefing = AHBriefingDialog.open(self, lines, tr("Partir"))
+		briefing.cancel_on_back = true
+		await briefing.finished
+		var cancelled := briefing.cancelled
+		briefing = null
+		if cancelled or not is_inside_tree() or _draft.is_empty() or GameFlow.busy:
+			return
+	error = S.confirm_departure(c, _draft.team.duplicate(), _draft.extra, randi(), _draft.phase, _draft.focus)
 	if error != "":
 		toast(error, true)
 		return
@@ -1782,6 +1824,10 @@ func _depart() -> void:
 	Campaign.save()
 	# A partida no vagão (#75): a equipe sentada no metrô a caminho da fase, depois o título dela.
 	GameFlow.travel("street", AHWagonRide.departure_card(c))
+
+
+func briefing_open() -> bool:
+	return briefing != null and is_instance_valid(briefing)
 
 
 ## A partida na plataforma: a equipe em fila e o mesmo painel da Preparação (equipe, foco, suprimentos, confirmar).

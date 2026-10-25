@@ -38,7 +38,7 @@
   },
   {
     "Name": "migration",
-    "Xp": 85,
-    "Description": "No save antigo, o XP por fase já concluída: o de uma fase jogada (umas 5 lutas e a jornada), para treinar."
+    "Xp": 70,
+    "Description": "No save antigo, o XP por fase já concluída: o piso da média medida de uma jornada (71 a 76), para o save migrado chegar a cada fase no mesmo nível da campanha nova."
   }
 ]

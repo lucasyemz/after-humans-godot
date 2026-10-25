@@ -31,8 +31,8 @@ func _run() -> void:
 	var bento: Dictionary = S.hero(c, "hero_cao_bento")
 	# Na versão sem o nível, os campos não existem e não mudam nada (a vida da Íris fica a de sempre).
 	var leveled := bento.has("level")
-	bento["xp"] = 34
-	S.hero(c, "hero_gato_nick")["xp"] = 18
+	bento["xp"] = 64
+	S.hero(c, "hero_gato_nick")["xp"] = 33
 	var iris: Dictionary = S.hero(c, "hero_sapo_iris")
 	iris["level"] = 4
 	iris["xp"] = 22
@@ -70,9 +70,15 @@ func _run() -> void:
 	await _settle(flow)
 	var station = current_scene
 	station.finish_team_arrival()
-	for i in 600:
+	# O debriefing (#88) vem antes do relatório: a captura passa por ele como o jogador.
+	for i in 900:
 		if station.hud.current == "report":
 			break
+		var skip = _button(station.hud, "Ver o relatório")
+		if skip == null:
+			skip = _button(station.hud, "Pular")
+		if skip != null:
+			skip.pressed.emit()
 		await process_frame
 	await _frames(40)
 	await _shot("04-report")
