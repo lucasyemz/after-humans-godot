@@ -132,6 +132,10 @@ Auditoria:18 WebP nas dimensões declaradas, margens9-slice válidas, fonte OFL 
 
 **Godot4.7.2 na base atualizada da main:** importação concluída,46/46 testes em256,681s, paridade48/48 (3351 passos), saída0. Persistem avisos de recursos/RID/ObjectDB no encerramento. Não são falhas do verificador de design.
 
+### Rodada4 — VEREDITO: APROVADO
+
+Observação baixa na ampliação da matriz: o bisel de Vida perdia leitura junto ao piso escuro. Reforçado o contorno metálico seguindo o polígono da aba e do recorte, sem mudar medidas, cores, conteúdo ou9-slice. Matriz e quatro perfis regenerados; alfas, importação e auditoria estática conferidos novamente. Continua sem problema alto ou médio pendente.
+
 ## Reprodução e escopo
 
 `python docs/design/hud-target/build_assets.py` prepara as peças e os dois manifestos idênticos; o material WebP versionado dispensa o mestre PNG externo. `render.py` monta os quatro perfis e as quatro comparações completas. `compare.py` gera a matriz peça por peça; `verify.py` confere9-slice, fonte/OFL, limites, alvos, quatro ícones originais e hashes. Dependências: Pillow, numpy e CairoSVG.

@@ -36,6 +36,8 @@ def frame(w,h,c=12,amber=True,poly=None,hole=None):
   for ch in range(3):a[:,:,ch]=np.where(warm,gray,a[:,:,ch])
   im=Image.fromarray(a)
  mask=Image.new('L',(w,h));ImageDraw.Draw(mask).polygon(poly or polygon(w,h,min(c,12)),fill=255);im.putalpha(mask)
+ if poly and h==44:
+  draw=ImageDraw.Draw(im);draw.line(poly+[poly[0]],fill='#4b5056',width=5,joint='curve');draw.line(poly+[poly[0]],fill='#a4a49c',width=1,joint='curve');im.putalpha(mask)
  if hole:
   a=im.getchannel('A');ImageDraw.Draw(a).polygon(hole,fill=0);im.putalpha(a)
  return im

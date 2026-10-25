@@ -280,7 +280,7 @@
         0
       ],
       "note": "Ally top tab; enemy notch on lower-right. No position number.",
-      "sha256": "a8e2d698b6cbbd4aa45be988aabcd94963efda97ee627e524a7a231fef28b1f0"
+      "sha256": "56e4c84a26a6219f372885ea1335bdd196c3f96a54dae251166a09a8ed48ea88"
     },
     "health_enemy": {
       "file": "art/ui/kit/combat/health_enemy.webp",
@@ -305,7 +305,7 @@
         0
       ],
       "note": "Ally top tab; enemy notch on lower-right. No position number.",
-      "sha256": "4ae1727b1e2d45bfba1bc132cc932da43968eaed03ead3c8b949452929479519"
+      "sha256": "901a5a2cf4f7a2551724f8fbfe8a97c4bf5a18eadfe09dd4d2f5b72b06dc67b8"
     },
     "main_bar": {
       "file": "art/ui/kit/combat/main_bar.webp",

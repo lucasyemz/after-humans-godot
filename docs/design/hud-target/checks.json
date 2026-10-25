@@ -923,7 +923,7 @@
         "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
       },
       "overflows": [],
-      "sha256": "fecda86676b3a9135b8f9a3fd3c2505bd50f380514e296c6f74d96646374cc9a"
+      "sha256": "a478a2963b81458c6a9b4d5835aea9e3df80fbbf36579558e75c2b6830a2abdb"
     },
     {
       "file": "hud_large.webp",
@@ -1844,7 +1844,7 @@
         "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
       },
       "overflows": [],
-      "sha256": "0091e654acc4979168532677d67fcc3ce190fe70aba1ffb09e93456e26f6018f"
+      "sha256": "8f4d0ec956583572475e8bccfb15ac3af8ef2d4c5d09f9a98dc5af586cf8f332"
     },
     {
       "file": "hud_colorblind.webp",
@@ -2765,7 +2765,7 @@
         "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
       },
       "overflows": [],
-      "sha256": "aa56b5998daa4ea7b86648e04784384e5070dd06c39e04c74131be97312e9795"
+      "sha256": "1dd43705e4eecfbc53322f0fffced786f9963f1e6c4b745fcd90fceb7a27f9fd"
     },
     {
       "file": "hud_large_colorblind.webp",
@@ -3686,7 +3686,7 @@
         "art/combat/icons/gato_cacada_precisa.webp": "edb52b361683cfeebab04ec1e620e79e1c8e6fa58aa68e1cdfca3b046099c7aa"
       },
       "overflows": [],
-      "sha256": "05421c7d7bccb94344891775c42bbad53f3bc7fd424ac0761685054c93078ea9"
+      "sha256": "575279c07d502cce60973eeb4f89f186422e995f2977641ae0ff81a7ec1a5de7"
     }
   ]
 }
