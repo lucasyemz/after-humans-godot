@@ -8,7 +8,8 @@ de vídeo, então a Forja de nível 1 é uma montagem na mesma câmera, com o qu
 - quem trabalha: o Brasa (o recruta cão, art/combat/recruits/dog_recruit_01_idle.webp) junto da bancada e o Otto
   (art/civilians/civil_otto.webp) mais à frente, na altura dos heróis dos cômodos vizinhos (cerca de 100 px).
 
-Uso: python3 -B docs/design/hud-casa/build_forge.py   (grava before/station-forge-workers_clean.webp)
+Uso: python3 -B docs/design/hud-casa/build_forge.py   (depois do build_room.py; grava before/station-forge-workers_clean.webp e
+     before/station_day5_clean.webp, a Visão geral do Dia 5 com a Enfermaria e a Forja acesa)
 """
 import sys
 from pathlib import Path
@@ -77,7 +78,13 @@ def main() -> None:
     at(otto, 930 - otto.width / 2, 640 - otto.height)
     im.alpha_composite(room, (x0, y0))
     im.convert("RGB").save(OUT / "station-forge-workers_clean.webp", quality=88, method=6)
-    print("forja", room.size)
+    # A Visão geral do Dia 5 (a de build_room.py, com a Enfermaria) com a Forja de nível 1 acesa: o mesmo cômodo,
+    # reduzido de 0,713 para 0,3 px por cm, de x 1160 a 1460 e do teto do subsolo 2 (y 652) ao piso da Forja.
+    day = Image.open(OUT / "station_infirmary_clean.webp").convert("RGBA")
+    small = room.resize((round(room.width * 0.3 / 0.713), round(room.height * 0.3 / 0.713)), Image.Resampling.LANCZOS)
+    day.alpha_composite(small, (1160, 652))
+    day.convert("RGB").save(OUT / "station_day5_clean.webp", quality=88, method=6)
+    print("forja", room.size, "na Visão geral", small.size)
 
 
 if __name__ == "__main__":

@@ -94,7 +94,9 @@ As telas contam uma história só, com os números de `data/` onde eles existem:
   Dormitório. O Nick volta com Ferimento grave (9/24).
 - **Dia 5, depois da noite:** a Visão geral, IR AO MAPA, o Mapa e a plataforma. Falta um dia: "Íris volta amanhã".
   O Nick recuperou 8 de vida no Dormitório (35% da vida máxima, `station_rules.gd`) e está com Ferimento leve (17/24).
-  A noite comeu 4 suprimentos e a Cantina rendeu 2: a Comida passa de 8 para 6.
+  A Comida segue a conta de `AHStationRules.forecast`: 8, mais 4 da Cantina e da Dora, menos 4 que os civis comem
+  (Dora 1, Otto 2, Cora 1) e 4 da noite: passa de 8 para 4. A Forja de nível 1 aparece acesa no corte, com o Brasa e
+  o Otto.
 - **Vida e velocidade:** o sapo tem 23 de vida e 4 de velocidade (a Íris, Ágil, tem 5; a Lupa, Lenta, 3); o cão tem 34
   (o Brasa, recruta, nasce com a vida da classe). O XP segue `hero-levels.json`.
 - **Sucatas:** a próxima obra é a Forja no nível 2 (6 sucatas e 2 fragmentos). O Brasa e o Otto tiram 1 cada (6 → 4);
@@ -188,7 +190,8 @@ uma montagem feita só com a captura do jogo e a arte que o jogo já usa:
 - [build_forge.py](hud-casa/build_forge.py): a Forja de nível 1 (a captura é a Forja vazia), acesa como o pendente do
   `_forge` acende, com a bancada (`Forge_Workbay`) e a prateleira de ferramentas na escala da parede do fundo, os
   lingotes e a caixa de ferramentas no chão, e o Brasa e o Otto. Os armários baixos e a bigorna são caixas 3D e ficam
-  para a cena;
+  para a cena. A mesma Forja, reduzida, vai para a Visão geral do Dia 5 (`station_day5_clean.webp`, sobre a de
+  `build_room.py`);
 - [build_platform.py](hud-casa/build_platform.py): a plataforma da chegada sem a Íris, com o Brasa no lugar dela, e
   sem ninguém, com o trem à esquerda (o Bento, o Nick e a Véspera saem com a parede, o pilar e o banco do lado; o
   caixote que a Véspera tapava sai junto), vazia e com o Sereno.
@@ -224,6 +227,9 @@ Duas mudanças que valem para as próximas maquetes (as telas já aprovadas não
 - **Os ícones pela ordem do jogo:** desde a #125 e a #135, o jogo usa, pelo nome antigo do ícone, o recurso pintado
   (sem tinta), depois o glifo do kit com o mesmo nome e só então o SVG antigo (`AHKit.painted` e `AHKit.legacy_icon`).
   O `glyph()` do `lib.mjs` faz o mesmo: as telas deste lote já mostram os recursos pintados.
+- **Os lotes anteriores:** como as telas aprovadas deles não foram geradas de novo, o "Como refazer" de cada um não sai
+  mais byte a byte com o `lib.mjs` de agora. Para refazer um deles igual, use o `lib.mjs` do commit dele
+  (`git show <commit>:docs/design/hud-kit/lib.mjs`).
 - **A borda da área que rola:** quando o painel rola, os últimos 44 px somem num esmaecido (no `_scrolled`, os
   primeiros): a linha pela metade não lê como texto cortado, e o esmaecido diz que há mais.
 
@@ -232,6 +238,8 @@ Duas mudanças que valem para as próximas maquetes (as telas já aprovadas não
 - **A Enfermaria:** um cômodo novo em `AHStationRules.ROOMS` e em `station_build.gd`, no subsolo 2 de x −1240 a −640,
   com a rocha de −1800 a −1240; paredes, lambri, piso e luz do Centro de Pesquisa; os cards com as larguras da tabela
   (`b.card`), o leito com a pose de dormir de quem está nele.
+- **A queda na luta:** no Último Fôlego, quem não tem a pose de caída (a Íris, os recrutas) fica de pé na arena, e só a
+  barra diz "Caído". Vale pedir a pose de caída desses heróis, ou apagar o desenho de quem caiu.
 - **O estado:** `status_pill` ganha o estado `recovering` (tinta de perigo, o glifo `state_recovering`, o texto
   "Em recuperação"), nas duas tintas (normal e daltonismo).
 - **Os dias:** "Volta em N dias" conta voltas (cada expedição é um dia, como o "Dia 5" da barra). Os números da
@@ -253,8 +261,9 @@ móveis), `casa-glyphs-sheet.png` (os doze glifos), `casa-glyphs-sheet-3.png` (o
 Da raiz do repositório:
 1. `python3 -B docs/design/hud-casa/cut_art.py <infirmary-props-sheet-2.png> <casa-glyphs-sheet.png> <casa-glyphs-sheet-3.png>`:
    os cards e os glifos.
-2. `python3 -B docs/design/hud-casa/build_room.py`, `python3 -B docs/design/hud-casa/build_forge.py` e
-   `python3 -B docs/design/hud-casa/build_platform.py`: as montagens de `before/`.
+2. `python3 -B docs/design/hud-casa/build_room.py`, `python3 -B docs/design/hud-casa/build_forge.py` (nesta ordem: a
+   Visão geral do Dia 5 sai da do `build_room.py`) e `python3 -B docs/design/hud-casa/build_platform.py`: as montagens
+   de `before/`.
 3. A luta com a Íris caída (precisa de uma tela; no Linux sem tela, `xvfb-run`):
    `xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path . --rendering-driver opengl3 --resolution 1920x1080 -s res://docs/design/hud-casa/capture.gd -- --out=<pasta>`.
    Ela grava `fight_fallen.png` (sem a HUD) e `fight_fallen.json` em `<pasta>`; o PNG vai para `before/` convertido em
@@ -299,3 +308,13 @@ do pedido. Antes desta rodada, o branch foi refeito sobre a `main` com a #125 e 
   a luta não sai igual a cada vez.
 - A prancha dos glifos a 22 e 32 px.
 - A próxima obra é a Forja no nível 2 (o Bar não tem custo em `station_rules.gd`), no painel e no relatório.
+
+### Rodada 2: APROVADO
+
+As seis correções Médias conferidas nas telas e nos números; "Como refazer" reproduz byte a byte (as montagens, as
+telas e as provas); o escopo e os manifestos conferem. Observações baixas, aplicadas depois do veredito:
+- a Comida do Dia 5 seguia uma conta incompleta (6/12): agora 4/12, pela conta de `AHStationRules.forecast` (os civis
+  também comem);
+- a Forja aparecia apagada na Visão geral do Dia 5: agora acesa, com o Brasa e o Otto (`station_day5_clean.webp`);
+- a próxima obra da Forja diz também os 2 fragmentos;
+- "Para integrar" ganhou a nota da pose de caída, e "O kit das maquetes", a dos lotes anteriores.

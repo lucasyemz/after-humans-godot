@@ -72,9 +72,10 @@ function overview({ main = TO_MAP, nextBody = null, mark = true, focus = false }
     `<div class="row" style="gap:12px">${glyph("room_infirmary", 36, "var(--amber)")}<span class="tx f32 semi up">Enfermaria</span>${roomTag("Nível 1", "var(--good)")}</div>` +
     `<span class="wrap f22">Os leitos de quem caiu. Volta mais rápido daqui do que do Dormitório.</span>` + secondary("Gerenciar", { hit: "manage", height: 60, extra: "width:100%" }));
   // O Dia 5, o dia seguinte ao da volta (Dia 4: o relatório, o painel da Enfermaria e a Sala, com "Volta em 2 dias"):
-  // passou uma noite, falta um dia, e a Íris volta amanhã. A noite comeu 4 suprimentos e a Cantina rendeu 2 (8 → 6).
-  // Sem cômodo escolhido (a tela do IR AO MAPA), sem o cartão do cômodo.
-  return MINE("station_infirmary") + topBar({ subtitle: "Dia 5 · Visão geral", food: ["6 / 12 suprimentos", "Abastecida · demanda 4", false] }) +
+  // passou uma noite, falta um dia, e a Íris volta amanhã. A Comida segue a conta de AHStationRules.forecast: 8, mais 4
+  // da Cantina e da Dora, menos 4 que os civis comem e 4 da noite (8 → 4). A Forja de nível 1 acesa, com o Brasa e o
+  // Otto (build_forge.py). Sem cômodo escolhido (a tela do IR AO MAPA), sem o cartão do cômodo.
+  return MINE("station_day5") + topBar({ subtitle: "Dia 5 · Visão geral", food: ["4 / 12 suprimentos", "Abastecida · demanda 4", false] }) +
     (mark ? roomMark(434, 650, 196, 106, "room_infirmary", "Enfermaria") : "") +
     `<div class="abs col" style="left:28px;top:132px;gap:12px">${next(body)}</div>` +
     (mark ? `<div class="abs" style="left:28px;bottom:calc(14px + 72px*var(--k) + 14px)">${card}</div>` : "") +
@@ -282,7 +283,7 @@ function forgeWorkers() {
     worker("brasa", "Brasa", "Herói · Cão Protetor", "−1 sucata na próxima obra ou relíquia.", "Cão rende mais na Forja: o desconto dobra a cada duas voltas.") +
     worker("otto", "Otto", "Ajudante · Castor, técnico", "−1 sucata nas obras (o efeito dele, como hoje). Herói e ajudante somam.") +
     `<div data-hit="add">` + nine("secondary_button", { cls: "row", extra: "min-height:calc(60px*var(--k));gap:10px;justify-content:center" }, `${glyph("job_forge", 26, "var(--amber)")}<span class="tx f24 semi up">Pôr alguém</span><span class="tx f20 muted">1 lugar livre</span>`) + `</div>` +
-    divider() + section("Na próxima volta") + `<div class="row" style="gap:10px;justify-content:space-between"><span class="tx f22">Próxima obra (Forja, nível 2)</span>${cost("lobby-scrap.svg", "6 → 4 sucatas")}</div>` +
+    divider() + section("Na próxima volta") + `<div class="row" style="gap:10px;justify-content:space-between"><span class="wrap f22" style="flex:1;min-width:0">Próxima obra (Forja, nível 2, e 2 fragmentos)</span>${cost("lobby-scrap.svg", "6 → 4 sucatas")}</div>` +
     `<div class="row" style="gap:10px;justify-content:space-between"><span class="tx f22">Relíquia</span>${cost("lobby-scrap.svg", "3 → 2 sucatas")}</div>`;
   return MINE("station-forge-workers") + topBar({ subtitle: "Forja" }) + roomPanel({ icon: "room_forge", title: "Forja", tag: roomTag("Nível 1", "var(--good)"), body }) + bottom({ active: 1, main: TO_MAP });
 }
