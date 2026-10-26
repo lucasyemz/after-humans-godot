@@ -1,23 +1,27 @@
-## O acampamento encenado (#77): a equipe em volta da fogueira da casa, sentada no chão (os fundadores com as poses da
-## #82, os recrutas com as da #80) ou deitada (quem chegou com até um quarto da vida), e a câmera no herói escolhido. Um
+## O acampamento encenado (#77; na estrutura da Unreal na #109, docs/design/hud-ajustes.md): a equipe numa fileira de
+## lado, com a fogueira no meio, sentada no chão (os fundadores com as poses da #82, os recrutas com as da #80) ou
+## deitada (quem chegou com até um quarto da vida), e a câmera parada na fogueira. Um
 ## fade leva a equipe às posições e outro a devolve à fila; passar de um herói para outro é um fade curto (como na
 ## Unreal). As regras de comer e curar não mudam (AHJourneyRules.camp_use_food / camp_use_bandage): aqui é só a cena.
 class_name AHCampScene
 extends Node
 
 const POSES := "res://data/presentation/camp_poses.json"
-## Os lugares em volta da fogueira (m, a partir dela): dois atrás, nas pontas, e dois na frente, dos lados do fogo
-## (o desenho da #82: fundo Bento e Véspera, frente Nick e Íris). Os da direita olham para a esquerda, para o fogo.
-const SLOTS := [Vector3(-2.8, 0, -0.9), Vector3(-1.0, 0, 0.65), Vector3(1.0, 0, 0.65), Vector3(2.8, 0, -0.9)]
-## Com menos gente, os lugares usados (os da frente primeiro).
-const SLOT_ORDER := {1: [1], 2: [1, 2], 3: [0, 1, 2], 4: [0, 1, 2, 3]}
+## Os lugares, numa fileira a partir da fogueira (m), todos na mesma linha do chão, como a luta: a ordem da cena é a da
+## formação de trás para a frente (Véspera, Íris | fogo | Nick, Bento). Os da direita olham para a esquerda, para o fogo.
+const SLOTS := [Vector3(-3.3, 0, 0.2), Vector3(-1.55, 0, 0.2), Vector3(1.55, 0, 0.2), Vector3(3.3, 0, 0.2)]
+## Com menos gente, os lugares de dentro primeiro (a formação da posição 1 fica sempre à direita do fogo).
+const SLOT_ORDER := {1: [2], 2: [2, 1], 3: [2, 1, 0], 4: [3, 2, 1, 0]}
 ## Deita quem está com até esta fração da vida.
 const LIE_DOWN_AT := 0.25
+## Deitado, o corpo é mais largo que sentado: nos lugares da ponta, ele chega este tanto para dentro (m), para não sair do
+## quadro da câmera parada na fogueira.
+const LIE_INSET := 0.45
 ## O fade entre um herói e outro (s, cada metade) e o de entrar e sair do acampamento.
 const SWITCH_FADE := 0.12
-## A câmera: a roda inteira no quadro, puxada um pouco para o escolhido (a fração do caminho até ele); a distância e a
-## altura do alvo (m).
-const FOCUS_PULL := 0.2
+## A câmera: parada na fogueira (ninguém sai do quadro); o escolhido se marca pela luz da escolha e pela carta. A
+## distância e a altura do alvo (m).
+const FOCUS_PULL := 0.0
 const FOCUS_DISTANCE := 10.5
 const FOCUS_HEIGHT := 0.75
 ## O intervalo mínimo entre duas trocas de herói (s), com ou sem o fade: um toque no analógico troca um só.
@@ -77,7 +81,9 @@ func begin(room: AHHouseRoom, team: Array, instant: bool = false) -> void:
 		await GameFlow.fade(1.0)
 	_arrange(team)
 	active = true
-	select(0, false)
+	# Começa no primeiro da formação (o da direita do fogo).
+	var leader: int = members.map(func(m): return m.hero_id).find(team[0] if not team.is_empty() else "")
+	select(maxi(0, leader), false)
 	if not instant:
 		await GameFlow.fade(0.0)
 
@@ -129,10 +135,13 @@ func _arrange(team: Array) -> void:
 		if not pose.is_empty() and not pose.art.is_empty():
 			card.show_art(pose.art)
 		card.scale = Vector3.ONE
-		card.position = Vector3(_room.camp_x + offset.x, 0, offset.z + 0.35)
+		var inset: float = LIE_INSET * signf(offset.x) if pose.get("kind", "") == "sleep" and (slot == 0 or slot == SLOTS.size() - 1) else 0.0
+		card.position = Vector3(_room.camp_x + offset.x - inset, 0, offset.z + 0.35)
 		card.set_facing(-1.0 if offset.x > 0.0 else 1.0)
 		card.visible = true
 		members.append({"hero_id": hero_id, "card": card, "slot": slot, "pose": pose.get("kind", "stand")})
+	# Na ordem da cena, da esquerda para a direita: as setas e as cartas andam como se vê.
+	members.sort_custom(func(a, b): return a.card.position.x < b.card.position.x)
 
 
 ## Escolhe o herói (o índice em members). fade: o fade curto entre as posições (sem Reduzir efeitos, que corta direto).

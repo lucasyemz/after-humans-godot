@@ -7,7 +7,7 @@ class_name AHCharacterSheet
 extends PanelContainer
 
 const U = preload("res://scripts/ui/ui_style.gd")
-const WIDTH := 380.0
+const WIDTH := 520.0
 ## O toque longo que abre a ficha (s).
 const LONG_PRESS := 0.45
 ## A folga entre a ficha e o que ela descreve (px).
@@ -46,6 +46,9 @@ static func from_unit(session: AHCombatSession, unit: AHCombat.Unit, boss: bool 
 		out.kind = _kind(hero_class)
 		var hero = Campaign.hero(unit.hero_id)
 		out.passives = _hero_passives(hero, unit.perks, unit.class_id)
+		out.art = AHCombatArena.hero_art_of(unit.hero_id, String(hero.get("art_variant", "")) if hero != null else "").get("idle", {})
+		if hero != null:
+			out.level = AHHeroLevels.level(hero)
 		# Os laços desta jornada com quem está na luta (amizade ou rivalidade).
 		var context = session.context if session != null else null
 		if context != null:
@@ -95,7 +98,9 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 	speed += int(AHHeroLevels.combat_bonus(hero).speed)
 	var out := {"id": String(hero.get("id", "")), "name": String(hero.get("display_name", "")), "kind": _kind(hero_class),
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
-		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))), "states": [], "enemy": false}
+		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))), "states": [], "enemy": false,
+		"level": AHHeroLevels.level(hero),
+		"art": AHCombatArena.hero_art_of(String(hero.get("id", "")), String(hero.get("art_variant", ""))).get("idle", {})}
 	if hero.get("trauma", false):
 		out.states.append([TranslationServer.translate("Trauma"), TranslationServer.translate(TRAUMA), false])
 	return out
@@ -209,7 +214,7 @@ func show_info(new_info: Dictionary, around: Rect2, bottom: float = INF) -> void
 		info = new_info
 		# Muitos estados ou o texto Maior: a ficha encolhe (sem a descrição e as explicações dos passivos, depois sem as
 		# dos estados) para caber entre o alto da tela e o painel de baixo.
-		for level in 4:
+		for level in 5:
 			_build(level)
 			reset_size()
 			if size.y <= room:
@@ -234,7 +239,8 @@ func showing(id: String = "") -> bool:
 
 
 ## level: 0 inteira; 1 sem a descrição e as explicações dos passivos; 2 também sem as explicações dos estados; 3 os nomes
-## de cada seção numa linha só (bons e ruins separados, cada um na sua cor).
+## de cada seção numa linha só (bons e ruins separados, cada um na sua cor); 4 o mínimo: o nome menor, sem o retrato, a
+## espécie e as barras, com a vida e o instinto numa linha.
 func _build(level: int = 0) -> void:
 	for child in get_children():
 		remove_child(child)
@@ -243,52 +249,134 @@ func _build(level: int = 0) -> void:
 	box.add_theme_constant_override("separation", 6)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(box)
-	var title := AHKit.label(String(info.name), "card_name", AHKit.enemy_hp() if info.enemy else AHKit.AMBER, true, true)
+	# O alto: o retrato (de quem tem), o nome em caixa alta, a espécie e o papel em âmbar e o medalhão do nível.
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 12)
+	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(head)
+	if not info.get("art", {}).is_empty() and level < 4:
+		var face := AHKit.portrait(U.face_texture(info.art), 64)
+		face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		head.add_child(face)
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", 0)
+	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head.add_child(names)
+	var title := AHKit.label(String(info.name), "card_name" if level < 4 else "row", AHKit.enemy_hp() if info.enemy else AHKit.TEXT, true, true)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	title.custom_minimum_size = Vector2(WIDTH - 48, 0)
+	# A largura do alto sem o retrato e o medalhão (sem ela, o rótulo que quebra pedia uma palavra por linha).
+	title.custom_minimum_size = Vector2(WIDTH - 200, 0)
 	title.name = "Name"
 	title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	box.add_child(title)
-	if String(info.get("kind", "")) != "":
-		box.add_child(_text(String(info.kind), 17, U.MUTED, "Kind"))
+	names.add_child(title)
+	if String(info.get("kind", "")) != "" and level < 4:
+		var kind := _text(String(info.kind), "small", AHKit.AMBER, "Kind")
+		kind.custom_minimum_size.x = WIDTH - 200
+		names.add_child(kind)
+	if int(info.get("level", 0)) > 0:
+		head.add_child(_level_medal(int(info.level)))
 	if String(info.get("description", "")) != "" and level < 1:
-		box.add_child(_text(String(info.description), 16, U.TEXT, "Description"))
-	# Os números: a vida, o instinto (heróis) e a velocidade.
-	var numbers := _text(TranslationServer.translate("Vida %d/%d") % [info.hp, info.max_hp], 19, U.TEXT, "Life")
+		box.add_child(_text(String(info.description), "small", AHKit.TEXT, "Description"))
+	# Os números: a vida e o instinto (heróis) em barras, e a velocidade com o que ela faz.
+	var numbers := _text(TranslationServer.translate("Vida %d/%d") % [info.hp, info.max_hp], "text", AHKit.TEXT, "Life", true)
 	box.add_child(numbers)
-	var life := AHKit.bar("enemy" if info.enemy else "life", int(info.hp), maxi(1, int(info.max_hp)))
+	if level >= 4:
+		numbers.text += "   " + (TranslationServer.translate("Instinto %d/200") % info.instinct if int(info.instinct) >= 0 else "")
+		_speed_row(box, level)
+		_section(box, TranslationServer.translate("Efeitos passivos"), info.passives, TranslationServer.translate("Nenhum"), false, true)
+		_section(box, TranslationServer.translate("Estados"), info.states, TranslationServer.translate("Nenhum agora"), false, true)
+		return
+	var life := AHKit.bar("enemy" if info.enemy else "hero", int(info.hp), maxi(1, int(info.max_hp)), "", "small")
 	life.name = "LifeBar"
 	life.custom_minimum_size = Vector2(0, 22)
 	box.add_child(life)
 	if int(info.instinct) >= 0:
-		box.add_child(_text(TranslationServer.translate("Instinto %d/200 · em 200, crise") % info.instinct, 17, AHKit.INSTINCT.lightened(0.25), "Instinct"))
-	box.add_child(_text(TranslationServer.translate("Velocidade %d · quem é mais rápido age antes na rodada") % info.speed, 17, U.TEXT, "Speed"))
+		box.add_child(_text(TranslationServer.translate("Instinto %d/200 · em 200, crise") % info.instinct, "small", AHKit.TEXT, "Instinct", true))
+		var instinct := AHKit.bar("instinct", int(info.instinct), 200, "", "small")
+		instinct.name = "InstinctBar"
+		instinct.custom_minimum_size = Vector2(0, 12)
+		box.add_child(instinct)
+	_speed_row(box, level)
 	_section(box, TranslationServer.translate("Efeitos passivos"), info.passives, TranslationServer.translate("Nenhum"), level < 1, level >= 3)
 	_section(box, TranslationServer.translate("Estados"), info.states, TranslationServer.translate("Nenhum agora"), level < 2, level >= 3)
 
 
+## A velocidade com o que ela faz (no mínimo, só o número).
+func _speed_row(box: VBoxContainer, level: int) -> void:
+	if level >= 4:
+		box.add_child(_text(TranslationServer.translate("Velocidade %d") % info.speed, "small", AHKit.TEXT, "Speed", true))
+		return
+	var speed := HBoxContainer.new()
+	speed.add_theme_constant_override("separation", 8)
+	speed.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(speed)
+	var clock := AHKit.glyph("trait_agile", 22, AHKit.TEXT)
+	clock.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	speed.add_child(clock)
+	var speed_text := _text(TranslationServer.translate("Velocidade %d · quem é mais rápido age antes na rodada") % info.speed, "small", AHKit.TEXT, "Speed", true)
+	speed_text.custom_minimum_size.x = WIDTH - 78
+	speed.add_child(speed_text)
+
+
+## O medalhão do nível com "Nível" embaixo (para não se confundir com o da posição na Preparação).
+func _level_medal(value: int) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 0)
+	column.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var medal := AHKit.panel(AHKit.piece_of("medal", "level"))
+	medal.name = "Level"
+	medal.custom_minimum_size = Vector2(46, 46)
+	medal.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	medal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var number := AHKit.label(str(value), "text", AHKit.AMBER, true)
+	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	medal.add_child(number)
+	column.add_child(medal)
+	var caption := AHKit.label(TranslationServer.translate("Nível"), "small", AHKit.MUTED, false, true)
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(caption)
+	return column
+
+
 func _section(box: VBoxContainer, heading: String, rows: Array, empty: String, tips: bool = true, joined: bool = false) -> void:
-	# Os títulos em cinza: o cobre ficava perto do laranja de ruim no daltonismo.
-	box.add_child(_text(heading.to_upper(), 14, U.MUTED, "Heading", "bold"))
+	box.add_child(_text(heading, "text", AHKit.AMBER, "Heading", true, true))
 	if rows.is_empty():
-		box.add_child(_text(empty, 16, U.MUTED, "Empty"))
+		box.add_child(_text(empty, "small", AHKit.MUTED, "Empty"))
 		return
 	if joined:
 		for good in [true, false]:
 			var names: Array = rows.filter(func(r): return r[2] == good).map(func(r): return String(r[0]))
 			if not names.is_empty():
-				box.add_child(_text(" · ".join(names), 16, U.OK if good else U.DANGER, "Row", "bold"))
+				box.add_child(_text(" · ".join(names), "small", U.OK if good else U.DANGER, "Row", true))
 		return
 	for row in rows:
-		# A cor diz bom ou ruim (verde e vermelho, ou azul e laranja no daltonismo); o texto diz o que é.
-		var line := _text(String(row[0]), 17, U.OK if row[2] else U.DANGER, "Row", "bold")
+		# A cor diz bom ou ruim (verde e vermelho, ou azul e laranja no daltonismo); o quadradinho (+ ou −) e o texto
+		# dizem o que é.
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 8)
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(line)
+		var tone: Color = U.OK if row[2] else U.DANGER
+		var mark := AHKit.chip("cost")
+		mark.custom_minimum_size = Vector2(22, 22)
+		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var sign := AHKit.label("+" if row[2] else "−", "small", tone, true)
+		sign.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		mark.add_child(sign)
+		line.add_child(mark)
+		var label := _text(String(row[0]), "small", tone, "Row", true)
+		label.custom_minimum_size.x = WIDTH - 82
+		line.add_child(label)
 		if tips and String(row[1]) != "":
-			box.add_child(_text(String(row[1]), 15, U.MUTED, "RowTip"))
+			box.add_child(_text(String(row[1]), "small", AHKit.MUTED, "RowTip"))
 
 
-func _text(text: String, size: int, color: Color, node_name: String, kind: String = "body") -> Label:
-	var label := AHKit.label_px(text, size, color, kind)
+func _text(text: String, role: String, color: Color, node_name: String, emphasis: bool = false, upper: bool = false) -> Label:
+	var label := AHKit.label(text, role, color, emphasis, upper)
 	label.name = node_name
 	# O nome repetido (as linhas) vira outro na árvore; a parte fica na meta.
 	label.set_meta("part", node_name)

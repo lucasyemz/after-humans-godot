@@ -470,6 +470,25 @@ static func start_corridor_combat(campaign: Dictionary, party_advantage: bool) -
 	return {"enemies": corridor_enemies(expedition, index), "opening": party_advantage, "boss": boss}
 
 
+## O que uma luta vencida põe no achado (o que end_combat soma), sem mudar nada: o popup do fim da luta mostra antes de
+## a luta fechar (#109). Só o guardião dá recursos: os da luta e, na primeira vez, os da fase concluída.
+static func combat_loot(campaign: Dictionary, result: String, boss: bool) -> Dictionary:
+	var out := {"seeds": 0, "scrap": 0, "fragments": 0}
+	var expedition = campaign.get("session", {}).get("expedition")
+	if result != "victory" or not boss or expedition == null or int(expedition.corridor.get("current_house", -1)) >= 0:
+		return out
+	# A vitória em que o último golpe também derruba o último da equipe: end_combat conta como derrota, sem achado.
+	if not campaign.roster.any(func(h): return expedition.team.has(h.id) and h.alive):
+		return out
+	out.seeds += 6
+	out.scrap += 1
+	if not expedition.get("objective_completed", false):
+		out.seeds += 10
+		out.scrap += 2
+		out.fragments += 1
+	return out
+
+
 ## Fim de uma luta do corredor (EndCombat). result: "victory", "defeat" ou "escaped". As mortes vão para o memorial.
 static func end_combat(campaign: Dictionary, result: String, boss: bool, cause: String = "") -> void:
 	var session: Dictionary = campaign.session
@@ -950,19 +969,28 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 	var failed: bool = float(choice.get("FailChance", 0.0)) > 0.0 and random.next() < float(choice.FailChance)
 	var effects: Dictionary = choice.get("Failure", {}) if failed else choice.get("Success", {})
 	var expedition: Dictionary = session.expedition
+	# O que mudou de fato (com os limites), para os chips do resultado (#106): [{kind, amount, hero}].
+	var changes: Array = []
+	var hope_before: int = expedition.hope
 	expedition.hope = clampi(expedition.hope + int(effects.get("HopeDelta", 0)), 0, 100)
-	adjust(campaign, "food", int(effects.get("FoodDelta", 0)))
-	adjust(campaign, "bandages", int(effects.get("BandagesDelta", 0)))
-	adjust(campaign, "scrap", int(effects.get("ScrapDelta", 0)))
-	adjust(campaign, "fragments", int(effects.get("FragmentsDelta", 0)))
-	adjust(campaign, "seeds", int(effects.get("SeedsDelta", 0)))
+	if expedition.hope != hope_before:
+		changes.append({"kind": "hope", "amount": expedition.hope - hope_before, "hero": ""})
+	for spec in [["FoodDelta", "food"], ["BandagesDelta", "bandages"], ["ScrapDelta", "scrap"], ["FragmentsDelta", "fragments"], ["SeedsDelta", "seeds"]]:
+		var moved := adjust(campaign, spec[1], int(effects.get(spec[0], 0)))
+		if moved != 0:
+			changes.append({"kind": spec[1], "amount": moved, "hero": ""})
 	var instinct := 0
 	if int(effects.get("InstinctDelta", 0)) != 0 and choice.get("Requirement", "") == "ClassInTeam":
 		for hero in _team_alive(campaign):
 			if hero.class_id == choice.get("RequirementClass", ""):
 				var relic = GameData.row("relics", hero.get("relic_id", ""))
 				instinct = maxi(0, int(effects.InstinctDelta) - (int(relic.get("EventInstinctReduction", 0)) if relic != null else 0))
+				var instinct_before: int = hero.instinct
 				hero.instinct = clampi(hero.instinct + instinct, 0, 200)
+				# O texto ({Instinto}) e o chip dizem a mudança de fato (no limite de 200, menos que a dos dados).
+				instinct = hero.instinct - instinct_before
+				if hero.instinct != instinct_before:
+					changes.append({"kind": "instinct", "amount": hero.instinct - instinct_before, "hero": hero.display_name})
 				break
 	var hurt := ""
 	# O herói sorteado leva o dano; sem dano, só empresta o nome ao texto ({Heroi}).
@@ -970,8 +998,11 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 		var team := _team_alive(campaign)
 		if not team.is_empty():
 			var hero: Dictionary = team[mini(team.size() - 1, floori(random.next() * team.size()))]
+			var hp_before: int = hero.hp
 			hero.hp = maxi(1, hero.hp - int(effects.get("Damage", 0)))
 			hurt = hero.display_name
+			if hero.hp != hp_before:
+				changes.push_front({"kind": "life", "amount": hero.hp - hp_before, "hero": hurt})
 	grant_tool(campaign, String(effects.get("GrantTool", "")))
 	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "":
 		lose_tool(campaign, choice.RequirementTool)
@@ -988,6 +1019,8 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 	event.hero = hurt
 	event.instinct = instinct
 	event.pending_hard_combat = bool(effects.get("bHardCombat", false))
+	# Opcional no save: um evento salvo antes não tem a lista, e o resultado mostra só o texto.
+	event.changes = changes
 	return true
 
 
@@ -1045,6 +1078,20 @@ const CAMP_MEAL_INSTINCT := 5
 ## A cura do comer do acampamento: +10% da vida, mínimo 1.
 static func camp_meal_heal(max_hp: int) -> int:
 	return maxi(1, max_hp / 10)
+
+
+## O que um cuidado faria no herói, sem gastar nada (#109): {hp, instinct, effect}. "food" é a Ração (+10% da vida e −5
+## de instinto; sem efeito só com a vida cheia e o instinto em 0), "bandage" o Curativo (+8; sem efeito com a vida
+## cheia). O estoque não entra: a tela diz à parte quando ele acabou. As mesmas contas de camp_use_food e
+## camp_use_bandage.
+static func camp_preview(campaign: Dictionary, hero_id: String, kind: String) -> Dictionary:
+	var hero = _camp_hero(campaign, hero_id)
+	if hero == null:
+		return {"hp": 0, "instinct": 0, "effect": false}
+	if kind == "food":
+		return {"hp": mini(hero.max_hp, hero.hp + camp_meal_heal(hero.max_hp)), "instinct": clampi(hero.instinct - CAMP_MEAL_INSTINCT, 0, 200),
+			"effect": not (hero.hp >= hero.max_hp and hero.instinct <= 0)}
+	return {"hp": mini(hero.max_hp, hero.hp + 8), "instinct": int(hero.instinct), "effect": hero.hp < hero.max_hp}
 
 
 ## Comer no acampamento: +10% da vida (mínimo 1) e -5 de instinto; gasta uma comida.

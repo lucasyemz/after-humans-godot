@@ -11,7 +11,6 @@ signal combat_item(kind: String)
 ## Na exploração: um cuidado mudou a vida ou o estoque (o HUD se atualiza).
 signal used
 
-const H = preload("res://scripts/ui/combat_hud.gd")
 const C = preload("res://scripts/flow/exploration_care.gd")
 const ICONS := "res://art/ui/icons/%s.svg"
 const KNOWN_TOOLS := ["pe_de_cabra", "lanterna", "mascara"]
@@ -19,6 +18,9 @@ const TOOL_NAMES := {"pe_de_cabra": "Pé de cabra", "lanterna": "Lanterna", "mas
 const TOOL_ICONS := {"pe_de_cabra": "tool-crowbar", "lanterna": "tool-flashlight", "mascara": "tool-mask"}
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 const GROUPS := ["Suprimentos", "Ferramentas", "Recursos e relíquias"]
+## O lado do quadrado de um item e a largura do detalhe.
+const SLOT := 112.0
+const DETAIL := 520.0
 
 ## Na luta, a sessão da arena (o herói da vez); fora dela, null.
 var session: AHCombatSession
@@ -36,39 +38,73 @@ func _ready() -> void:
 
 func _build() -> void:
 	for child in get_children():
+		remove_child(child)
 		child.queue_free()
 	_slots = _make_slots()
 	if not _slots.any(func(s): return s.id == selected):
 		selected = _slots[0].id
+	# O título: o ícone, MOCHILA, a dica e FECHAR com a tecla do Menu.
 	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 14)
 	add_child(head)
-	head.add_child(H.make_label("Mochila", 32, H.GOLD))
-	var hint := H.make_label(tr("   Na luta: ação livre do herói da vez, um item por vez.") if session else tr("   Cuidados fora da luta: escolha o item e o aliado."), 16, H.MUTED)
+	head.add_child(_icon("room_depot", 40, AHKit.AMBER))
+	head.add_child(AHKit.label(tr("Mochila"), "panel_title", AHKit.TEXT, true, true))
+	var hint := AHKit.label(tr("Na luta: ação livre do herói da vez, um item por vez.") if session else tr("Cuidados fora da luta: escolha o item e o aliado."), "small", AHKit.MUTED)
 	hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	head.add_child(hint)
+	var close := AHKit.button(tr("Fechar"), "secondary")
+	close.name = "Close"
+	close.custom_minimum_size = Vector2(0, 56)
+	close.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var key := AHKitKey.make("", tr("%s / B") % AHUiStyle.key_name("menu"), "button")
+	key.name = "Key"
+	close.add_child(key)
+	close.pressed.connect(func(): closed.emit())
+	head.add_child(close)
+	close.resized.connect(func():
+		key.reset_size()
+		key.position = Vector2(close.size.x - key.size.x - 12.0, (close.size.y - key.size.y) * 0.5))
+	for state in ["normal", "hover", "pressed", "focus", "disabled", "hover_pressed"]:
+		if close.has_theme_stylebox_override(state):
+			close.get_theme_stylebox(state).content_margin_right = key.get_combined_minimum_size().x + 28.0
+	var rule := ColorRect.new()
+	rule.color = Color(AHKit.MUTED, 0.35)
+	rule.custom_minimum_size = Vector2(0, 2)
+	add_child(rule)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 20)
+	row.add_theme_constant_override("separation", 24)
 	add_child(row)
+	# À esquerda, os quadrados por grupo; à direita, o detalhe do escolhido.
 	var grid_box := VBoxContainer.new()
-	grid_box.add_theme_constant_override("separation", 8)
-	grid_box.custom_minimum_size = Vector2(430, 0)
+	grid_box.add_theme_constant_override("separation", 10)
 	row.add_child(grid_box)
 	for group in GROUPS.size():
-		grid_box.add_child(H.make_label(tr(GROUPS[group]), 19, H.GOLD.lightened(0.2)))
+		grid_box.add_child(AHKit.label(tr(GROUPS[group]), "row", AHKit.AMBER, true, true))
 		var grid := GridContainer.new()
 		grid.columns = 3
-		grid.add_theme_constant_override("h_separation", 8)
-		grid.add_theme_constant_override("v_separation", 8)
+		grid.add_theme_constant_override("h_separation", 12)
+		grid.add_theme_constant_override("v_separation", 10)
 		grid_box.add_child(grid)
 		for item in _slots.filter(func(s): return s.group == group):
 			grid.add_child(_slot_button(item))
-	row.add_child(_detail())
-	var close := Button.new()
-	close.text = tr("Fechar (%s)") % AHUiStyle.key_name("menu")
-	close.custom_minimum_size = Vector2(0, 46)
-	H.style_button(close)
-	close.pressed.connect(func(): closed.emit())
-	add_child(close)
+	var detail := _detail()
+	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(detail)
+
+
+## Um ícone do kit (ou dos ícones antigos, que o kit ainda não tem).
+func _icon(name: String, side: float, tint: Color) -> TextureRect:
+	var rect := TextureRect.new()
+	rect.texture = AHKit.icon(name) if ResourceLoader.exists(AHKit.ICONS % name) else load(ICONS % name)
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.custom_minimum_size = Vector2(side, side)
+	rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	rect.modulate = tint
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return rect
 
 
 func _make_slots() -> Array:
@@ -113,27 +149,44 @@ func _make_slots() -> Array:
 	return out
 
 
+## Um item: o quadrado de recurso com o ícone (o escolhido com a moldura âmbar) e, embaixo, o nome e a quantidade. O
+## que a equipe não tem fica no tom apagado, sem transparência. O botão é o quadrado; o nome quebra na largura dele.
 func _slot_button(item: Dictionary) -> Button:
 	var button := Button.new()
-	button.custom_minimum_size = Vector2(138, 92)
-	button.text = "\n\n%s%s" % [item.name, ("\n" + item.count) if item.count != "" else ""]
-	button.add_theme_font_size_override("font_size", AHUiStyle.px(15))
-	H.style_button(button, H.GOLD if item.id == selected else Color(0.86, 0.69, 0.4))
-	button.add_theme_font_size_override("font_size", AHUiStyle.px(15))
-	if item.id == selected:
-		button.add_theme_color_override("font_color", H.GOLD)
-	elif not item.owned:
-		button.add_theme_color_override("font_color", H.MUTED.darkened(0.2))
-	var icon := TextureRect.new()
-	icon.texture = load(ICONS % item.icon)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.custom_minimum_size = Vector2(30, 30)
-	icon.position = Vector2(54, 8)
-	icon.size = Vector2(30, 30)
-	icon.modulate = Color(0.96, 0.84, 0.6) if item.owned else Color(0.5, 0.48, 0.44)
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	button.add_child(icon)
+	button.name = "Slot_%s" % item.id
+	AHKit.style_button(button, AHKit.piece_of("chip", "resource_tile"))
+	button.custom_minimum_size = Vector2(SLOT, 0)
+	button.tooltip_text = item.name
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 4)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(column)
+	var tile := AHKit.panel(AHKit.piece_of("chip", "resource_tile"))
+	tile.custom_minimum_size = Vector2(SLOT, 80)
+	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(tile)
+	var chosen: bool = item.id == selected
+	var tone: Color = AHKit.AMBER if chosen else (AHKit.TEXT if item.owned else AHKit.MUTED)
+	var glyph := _icon(item.icon, 40, tone)
+	glyph.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	tile.add_child(glyph)
+	if chosen:
+		tile.add_child(AHKit.selected_overlay())
+	var name := AHKit.label(item.name, "small", AHKit.TEXT if item.owned else AHKit.MUTED)
+	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name.custom_minimum_size = Vector2(SLOT, 0)
+	column.add_child(name)
+	if item.count != "":
+		var count := AHKit.label(item.count, "row", AHKit.AMBER if item.owned else AHKit.MUTED, true)
+		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		column.add_child(count)
+	# O fundo da peça fica no quadrado de dentro; o botão só leva o foco (os cantos âmbar).
+	for state in ["normal", "hover", "pressed", "disabled", "hover_pressed"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	var grow := func(): button.custom_minimum_size.y = column.get_combined_minimum_size().y
+	column.minimum_size_changed.connect(grow)
+	grow.call()
 	var id: String = item.id
 	button.pressed.connect(func():
 		selected = id
@@ -145,71 +198,110 @@ func _slot_button(item: Dictionary) -> Button:
 func _detail() -> VBoxContainer:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 10)
-	box.custom_minimum_size = Vector2(400, 0)
+	box.custom_minimum_size = Vector2(DETAIL, 0)
 	var item: Dictionary = _slots.filter(func(s): return s.id == selected)[0]
-	box.add_child(H.make_label(item.name, 28, H.GOLD))
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 12)
+	box.add_child(head)
+	head.add_child(_icon(item.icon, 36, AHKit.AMBER))
+	head.add_child(AHKit.label(item.name, "card_name", AHKit.TEXT, true))
 	if item.count != "":
-		var count := H.make_label(item.get("detail", item.count), 19, H.TEXT)
-		count.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		count.custom_minimum_size = Vector2(400, 0)
-		box.add_child(count)
-	var text := H.make_label(item.text, 17, H.MUTED)
+		var chip := AHKit.chip("cost")
+		chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		chip.add_child(AHKit.label(item.get("detail", item.count), "small", AHKit.AMBER, true))
+		head.add_child(chip)
+	var text := AHKit.label(item.text, "text", AHKit.MUTED)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text.custom_minimum_size = Vector2(400, 0)
+	text.custom_minimum_size = Vector2(DETAIL, 0)
 	box.add_child(text)
 	var actions := _actions(item.id)
 	if not actions.is_empty():
 		box.add_child(_target_row())
+	var reasons: Array = []
 	for action in actions:
 		var button := Button.new()
 		button.text = action.label
 		button.disabled = not action.enabled
-		button.custom_minimum_size = Vector2(0, 46)
-		H.style_button(button)
+		AHKit.style_as(button, "list", Vector4(56, 0, 16, 0))
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.custom_minimum_size = Vector2(0, 56)
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.add_theme_font_size_override("font_size", AHKit.size("row"))
+		button.add_theme_color_override("font_color", AHKit.TEXT)
+		button.add_theme_color_override("font_disabled_color", AHKit.MUTED)
+		var glyph := _icon(item.icon, 26, AHKit.TEXT if action.enabled else AHKit.MUTED)
+		glyph.size = Vector2(26, 26)
+		button.add_child(glyph)
+		button.resized.connect(func(): glyph.position = Vector2(18, (button.size.y - 26.0) * 0.5))
 		button.pressed.connect(action.run)
 		box.add_child(button)
-		if not action.enabled and action.reason != "":
-			var why := H.make_label(action.reason, 16, Color(1.0, 0.62, 0.5))
-			why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			why.custom_minimum_size = Vector2(400, 0)
-			box.add_child(why)
+		if not action.enabled and action.reason != "" and not reasons.has(action.reason):
+			reasons.append(action.reason)
+	# O motivo de não dar, uma vez só embaixo das ações ("O aliado já está com a vida cheia.").
+	for reason in reasons:
+		box.add_child(_note(reason, "state_active", AHKit.MUTED))
 	if feedback != "":
-		var said := H.make_label(feedback, 18, Color(0.55, 1.0, 0.6))
-		said.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		said.custom_minimum_size = Vector2(400, 0)
-		box.add_child(said)
+		box.add_child(_note(feedback, "state_active", AHKit.good()))
 	return box
 
 
-## Em quem o cuidado vai: na exploração troca o aliado (◀ ▶); na luta, o herói da vez.
-func _target_row() -> HBoxContainer:
+## Uma linha curta com o ícone (o motivo de não dar, o que o cuidado fez).
+func _note(text: String, icon_name: String, color: Color) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
-	var label := ""
-	if session:
-		var unit := session.current_actor()
-		label = tr("%s · Vida %d/%d") % [unit.display_name, unit.hp, unit.max_hp] if unit else "—"
-	else:
-		var hero = Campaign.hero(hero_id)
-		label = tr("%s · Vida %d/%d") % [hero.display_name, hero.hp, hero.max_hp] if hero else "—"
-		var back := Button.new()
-		back.text = "◀"
-		back.custom_minimum_size = Vector2(44, 40)
-		H.style_button(back)
-		back.pressed.connect(func(): cycle_hero(-1))
-		row.add_child(back)
-	var name := H.make_label(label, 19, H.TEXT)
-	name.custom_minimum_size = Vector2(290, 0)
-	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	row.add_child(name)
-	if session == null:
-		var next := Button.new()
-		next.text = "▶"
-		next.custom_minimum_size = Vector2(44, 40)
-		H.style_button(next)
-		next.pressed.connect(func(): cycle_hero(1))
-		row.add_child(next)
+	row.add_child(_icon(icon_name, 22, color))
+	var label := AHKit.label(text, "small", color)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(label)
 	return row
+
+
+## Em quem o cuidado vai: na exploração troca o aliado (as setas); na luta, o herói da vez. O retrato, o nome e a vida.
+func _target_row() -> PanelContainer:
+	var panel := AHKit.panel_box("inset")
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	panel.add_child(row)
+	var unit = session.current_actor() if session else Campaign.hero(hero_id)
+	if session == null:
+		row.add_child(_arrow(true, func(): cycle_hero(-1)))
+	var middle := HBoxContainer.new()
+	middle.alignment = BoxContainer.ALIGNMENT_CENTER
+	middle.add_theme_constant_override("separation", 12)
+	middle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(middle)
+	if unit != null:
+		var hero_id_of: String = unit.hero_id if session else unit.id
+		var hero = Campaign.hero(hero_id_of)
+		var art: Dictionary = AHCombatArena.hero_art_of(hero_id_of, String(hero.get("art_variant", "")) if hero else "").get("idle", {})
+		middle.add_child(AHKit.portrait(AHUiStyle.face_texture(art), 48))
+		var names := VBoxContainer.new()
+		names.add_theme_constant_override("separation", -2)
+		names.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		middle.add_child(names)
+		names.add_child(AHKit.label(unit.display_name, "row", AHKit.TEXT, true))
+		names.add_child(AHKit.label(tr("Vida %d/%d") % [unit.hp, unit.max_hp], "small", AHKit.MUTED))
+	else:
+		middle.add_child(AHKit.label("—", "row", AHKit.MUTED))
+	if session == null:
+		row.add_child(_arrow(false, func(): cycle_hero(1)))
+	return panel
+
+
+## Uma seta de trocar o aliado: o botão de ícone com a seta (a da esquerda é a da direita espelhada).
+func _arrow(back: bool, action: Callable) -> Button:
+	var button := Button.new()
+	button.name = "Previous" if back else "Next"
+	AHKit.style_as(button, "icon")
+	button.custom_minimum_size = Vector2(56, 56)
+	var arrow := _icon("ui-arrow-right", 28, AHKit.TEXT)
+	arrow.flip_h = back
+	arrow.size = Vector2(28, 28)
+	arrow.position = Vector2(14, 14)
+	button.add_child(arrow)
+	button.pressed.connect(action)
+	return button
 
 
 func _actions(id: String) -> Array:

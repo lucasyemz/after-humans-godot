@@ -8,6 +8,8 @@ extends Control
 const S = preload("res://scripts/ui/ui_style.gd")
 ## Quanto o título sobe ao aparecer (sem movimento com "Reduzir efeitos").
 const RISE := 18.0
+## O losango da divisa (o do mapa).
+const DIAMOND := preload("res://art/ui/icons/marker-available.svg")
 
 var title := ""
 var subtitle := ""
@@ -58,7 +60,7 @@ func _init(card: Dictionary = {}, reduce_motion: bool = false) -> void:
 
 func _ready() -> void:
 	var ink := ColorRect.new()
-	ink.color = S.INK
+	ink.color = AHKit.STEEL
 	ink.set_anchors_preset(Control.PRESET_FULL_RECT)
 	ink.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(ink)
@@ -68,9 +70,9 @@ func _ready() -> void:
 		backdrop.free()
 		backdrop = null
 		title_delay = 0.0
-	# Uma faixa escura atrás do texto: o título lê em cima de qualquer fundo.
-	var band := PanelContainer.new()
-	band.add_theme_stylebox_override("panel", S.flat(0.72 if backdrop != null else 0.0, Color(S.COPPER, 0.0), 0))
+	# A chapa do kit atrás do texto: o título lê em cima de qualquer fundo.
+	var band := AHKit.panel_box("large")
+	band.custom_minimum_size = Vector2(810, 0)
 	band.set_anchors_preset(Control.PRESET_CENTER)
 	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(band)
@@ -79,25 +81,41 @@ func _ready() -> void:
 	_text.add_theme_constant_override("separation", 14)
 	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	band.add_child(_text)
-	var heading := S.label(title, 60, S.GOLD, "display")
+	var heading := AHKit.label(title, "panel_hero", AHKit.TEXT, true, true)
 	heading.name = "Title"
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_text.add_child(heading)
-	var line := ColorRect.new()
-	line.color = Color(S.COPPER, 0.8)
-	line.custom_minimum_size = Vector2(260, 2)
-	line.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_text.add_child(line)
+	# A divisa com o losango âmbar no meio.
+	var divider := HBoxContainer.new()
+	divider.alignment = BoxContainer.ALIGNMENT_CENTER
+	divider.add_theme_constant_override("separation", 10)
+	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_text.add_child(divider)
+	for side in 3:
+		if side == 1:
+			var diamond := TextureRect.new()
+			diamond.texture = DIAMOND
+			diamond.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			diamond.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			diamond.custom_minimum_size = Vector2(14, 14)
+			diamond.modulate = AHKit.AMBER
+			diamond.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			divider.add_child(diamond)
+			continue
+		var line := ColorRect.new()
+		line.color = AHKit.MUTED
+		line.custom_minimum_size = Vector2(300, 1)
+		line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		divider.add_child(line)
 	if subtitle != "":
-		var sub := S.label(subtitle, 26, S.TEXT)
+		var sub := AHKit.label(subtitle, "row", AHKit.TEXT)
 		sub.name = "Subtitle"
 		sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		sub.custom_minimum_size = Vector2(900, 0)
 		_text.add_child(sub)
-	_hint_box = PanelContainer.new()
-	_hint_box.add_theme_stylebox_override("panel", S.flat(0.72 if backdrop != null else 0.0, Color(S.COPPER, 0.0), 0))
+	_hint_box = AHKit.panel(AHKit.piece_of("key", "bar"))
 	_hint_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_hint_box)
 	_hint = HBoxContainer.new()
@@ -176,12 +194,12 @@ func _show_hint() -> void:
 	_hint_keys = S.using_keys or not Settings.touch_visible()
 	_hint_skip = _can_skip_now()
 	if not _hint_skip:
-		_hint.add_child(S.label(tr("Carregando…"), 20, S.MUTED))
+		_hint.add_child(AHKit.label(tr("Carregando…"), "text", AHKit.MUTED))
 	elif not _hint_keys:
-		_hint.add_child(S.label(tr("Toque para pular"), 20, S.MUTED))
+		_hint.add_child(AHKit.label(tr("Toque para pular"), "text", AHKit.TEXT))
 	else:
-		_hint.add_child(S.action_cap("interact"))
-		_hint.add_child(S.label(tr("pular"), 20, S.MUTED))
+		_hint.add_child(AHKitKey.make("interact"))
+		_hint.add_child(AHKit.label(tr("Pular"), "text", AHKit.TEXT))
 	_layout.call_deferred()
 
 
@@ -210,9 +228,9 @@ func _layout() -> void:
 	band.reset_size()
 	var band_size := band.get_combined_minimum_size()
 	band.position = (view - band_size) * 0.5
-	# Com a cena de fundo (o vagão), o título vai para o chão, embaixo da equipe, em vez de cobri-la.
+	# Com a cena de fundo (o vagão), o título vai para o chão, à frente das pernas da equipe, em vez de cobrir os rostos.
 	if backdrop != null:
-		band.position.y = minf(view.y * 0.9 - band_size.y * 0.5, view.y - band_size.y - 16.0)
+		band.position.y = minf(view.y * 0.77 - band_size.y * 0.5, view.y - band_size.y - 16.0)
 	_hint_box.reset_size()
 	_hint_box.position = view - _hint_box.get_combined_minimum_size() - Vector2(36, 28)
 

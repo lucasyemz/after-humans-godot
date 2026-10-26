@@ -58,14 +58,16 @@ func _station() -> void:
 	t.check(_inside(hud.focus_scope()) and hud.focus_scope() != null, "o foco está no painel do cômodo (ou no Vista geral, se ele só tem texto)")
 	await _send("cancel")
 	t.equal(hud.current, "", "Voltar fecha o cômodo")
-	# Preparar expedição pelo menu: o mapa, a fase, a Preparação e Voltar.
+	# Só com as setas: Menu e ↓ descem da coluna da esquerda até o botão principal; Voltar devolve aos cômodos.
 	await _send("menu")
-	var guard := 0
-	while _focus() != null and not (_focus() as Button).text.begins_with("Preparar expedição") and guard < 8:
-		await _send("ui_down")
-		guard += 1
-	if not t.check(_focus() != null and (_focus() as Button).text.begins_with("Preparar expedição"), "↓ chega em Preparar expedição"):
+	t.check(await _walk_to("Preparar expedição", 12), "↓ desce da coluna da esquerda até PREPARAR EXPEDIÇÃO")
+	await _send("cancel")
+	t.equal(_focus(), null, "e Voltar devolve as setas aos cômodos")
+	# Preparar expedição pelo botão principal (o foco nele, como o mouse): o mapa, a fase, a Preparação e Voltar.
+	var prepare: Button = hud.find_child("Prepare", true, false)
+	if not t.check(prepare != null and prepare.text.begins_with("PREPARAR EXPEDIÇÃO"), "o botão principal é PREPARAR EXPEDIÇÃO"):
 		return
+	prepare.grab_focus()
 	await _send("interact")
 	t.check(hud._map.visible, "Interagir (E) abre o mapa de fases")
 	await _frames(2)
@@ -100,9 +102,10 @@ func _station() -> void:
 			t.check(not (_focus() is Button and (_focus() as Button).text.begins_with("Partir")), "e o foco não cai no Partir")
 	await _send("cancel")
 	t.equal(hud.current, "", "Voltar fecha a Preparação")
-	# As Opções pelo canto: ↓ desce do menu da esquerda até elas; Interagir liga o daltonismo; Voltar fecha.
-	await _send("menu")
-	if await _walk_to("Opções", 12):
+	# As Opções pela engrenagem do alto; Interagir liga o daltonismo; Voltar fecha.
+	var gear: Button = hud.find_child("Options", true, false)
+	if t.check(gear != null, "a engrenagem das Opções no alto"):
+		gear.grab_focus()
 		await _send("interact")
 		t.equal(hud.current, "options", "Interagir abre as Opções")
 		await _frames(2)
@@ -149,6 +152,9 @@ func _station() -> void:
 	# A dica das teclas segue a troca nas Opções.
 	Settings.set_key("interact", KEY_J)
 	t.check(_cap_text(hud, "interact") == "J", "a dica de Interagir mostra a tecla nova")
+	# O botão principal também: a tecla nova com o X do controle, na hora (com as Opções abertas por cima).
+	Settings.set_key("station_prepare", KEY_H)
+	t.equal(_cap_text(hud, "station_prepare"), "H / X", "PREPARAR EXPEDIÇÃO mostra a tecla nova com o X do controle")
 	Settings.reset_keys()
 	t.check(_cap_text(hud, "interact") == U.key_name("interact"), "e volta com Restaurar")
 
@@ -162,13 +168,13 @@ func _street() -> void:
 	var hud: AHExplorationHud = tree.current_scene.exploration_hud
 	await _frames(3)
 	await _send("menu")
-	t.check(hud.menu_shown(), "Menu abre a pausa")
+	t.check(hud.menu_shown(), "Menu abre o Menu da expedição")
 	await _frames(2)
-	t.check(_inside(hud._modal) and (_focus() as Button).text == "Continuar", "o foco começa em Continuar")
-	await _send("ui_down")
-	t.check(_inside(hud._modal) and (_focus() as Button).text != "Continuar", "↓ anda na pausa")
+	t.check(_inside(hud._modal) and _focus().name == "Resume", "o foco começa em Fechar")
+	await _send("ui_up")
+	t.check(_inside(hud._modal) and _focus().name != "Resume", "↑ anda no Menu da expedição")
 	await _send("cancel")
-	t.check(not hud.modal_open(), "Voltar (B) fecha a pausa")
+	t.check(not hud.modal_open(), "Voltar (B) fecha o Menu da expedição")
 	await _send("inventory")
 	t.check(hud.inventory_shown(), "a Mochila abre")
 	await _frames(2)
@@ -178,7 +184,7 @@ func _street() -> void:
 	await _send("menu")
 	await _frames(2)
 	await _send("interact")
-	t.check(not hud.modal_open(), "Interagir (E) confirma Continuar")
+	t.check(not hud.modal_open(), "Interagir (E) confirma Fechar")
 	# Na luta: a Mochila abre com o foco nela e Voltar fecha; Interagir confirma a habilidade com foco.
 	var street = tree.current_scene
 	street.corridor.debug_next_fight()

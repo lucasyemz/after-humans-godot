@@ -121,14 +121,14 @@ func _dialog() -> void:
 	t.equal(dialog._text.text, lines[0].text, "abre na primeira fala")
 	t.equal(dialog._name.text, "Bento", "com o nome de quem fala")
 	t.check(dialog._face.get_child_count() == 1, "e o retrato")
-	t.equal(dialog.next_button.text, "Próximo", "o botão Próximo")
+	t.equal(dialog.next_button.text, "PRÓXIMO", "o botão Próximo")
 	dialog.next_button.pressed.emit()
 	t.equal(dialog._text.text, lines[1].text, "Próximo passa à segunda fala")
 	# Interagir (E, o A do controle) passa; logo que abre, a carência segura o toque de antes.
 	await _wait_guard(dialog)
 	await _press("interact")
 	t.equal(dialog.index, 2, "Interagir passa à terceira fala")
-	t.equal(dialog.next_button.text, "Partir", "na última, o botão de quem chamou")
+	t.equal(dialog.next_button.text, "PARTIR", "na última, o botão de quem chamou")
 	t.check(not dialog.skip_button.visible, "e sem Pular")
 	dialog.next_button.pressed.emit()
 	await _frames(1)
@@ -257,7 +257,11 @@ func _station() -> void:
 	if not t.check(hud.briefing_open(), "depois da chegada, o debriefing"):
 		return
 	t.equal(hud.current, AHRefugeHud.ARRIVAL, "o relatório espera o debriefing")
-	t.equal(hud.briefing.next_button.text, "Ver o relatório", "com Ver o relatório")
+	t.equal(hud.briefing.next_button.text, "VER O RELATÓRIO", "com Ver o relatório")
+	# A caixa cobre a tela inteira (o HUD da Estação é um Control sem tamanho): o véu escurece e segura o clique.
+	var view: Vector2 = hud.briefing.get_viewport_rect().size
+	t.check(hud.briefing.get_global_rect().size.is_equal_approx(view) and hud.briefing.mouse_filter == Control.MOUSE_FILTER_STOP,
+		"o briefing cobre a tela (%s)" % hud.briefing.get_global_rect())
 	hud.briefing.next_button.pressed.emit()
 	for i in 300:
 		if hud.current == "report":

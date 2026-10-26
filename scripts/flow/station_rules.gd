@@ -971,7 +971,8 @@ static func phase_unlocked(campaign: Dictionary, phase_id: String) -> bool:
 
 ## O que a Estação pede primeiro (o cartão "Próximo passo" da proposta de UX): o relatório da volta, a noite, o trem, um
 ## cômodo que já dá para recuperar, o que falta para o próximo e, por fim, a próxima fase. Devolve {title, text, action,
-## button, room}; action: "report", "dormitory", "train", "room" ou "depart".
+## button, room} e, no cômodo que já dá para recuperar, benefit (o que ele passa a fazer) e cost (os chips do cartão);
+## action: "report", "dormitory", "train", "room" ou "depart".
 static func next_step(campaign: Dictionary) -> Dictionary:
 	var report: Dictionary = campaign.station.get("last_return", {})
 	if not report.is_empty() and not report.get("seen", false):
@@ -992,7 +993,7 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 		var name: String = TranslationServer.translate(ROOM_ARTICLE.get(room_id, "")) + TranslationServer.translate(room_def(room_id).name)
 		if upgrade_block(campaign, room_id) == "":
 			return {"title": "%s %s" % [TranslationServer.translate("Recuperar") if level == 0 else TranslationServer.translate("Melhorar"), name], "text": TranslationServer.translate("%s Custa %s.") % [room_benefit(room_id, level + 1), cost_text(cost)],
-				"action": "room", "button": TranslationServer.translate("Ver %s") % name, "room": room_id}
+				"action": "room", "button": TranslationServer.translate("Ver %s") % name, "room": room_id, "benefit": room_benefit(room_id, level + 1), "cost": cost}
 		if missing.is_empty():
 			missing = {"title": TranslationServer.translate("Trazer %s para %s %s") % [cost_text(cost), TranslationServer.translate("reabrir") if level == 0 else TranslationServer.translate("melhorar"), name],
 				"text": TranslationServer.translate("%s As jornadas trazem sucata e fragmentos das buscas.") % room_benefit(room_id, level + 1), "action": "depart",

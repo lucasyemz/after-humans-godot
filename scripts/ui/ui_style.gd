@@ -270,7 +270,9 @@ static func action_cap(action: String) -> PanelContainer:
 static func refresh_keys(root: Node) -> void:
 	for node in root.find_children("*", "PanelContainer", true, false):
 		if node.has_meta("ah_action") and node.get_child_count() > 0 and node.get_child(0) is Label:
-			(node.get_child(0) as Label).text = key_name(String(node.get_meta("ah_action")))
+			# Com ah_format, a tecla vai dentro do texto ("%s / X", o G do botão principal com o X do controle).
+			var shown := key_name(String(node.get_meta("ah_action")))
+			(node.get_child(0) as Label).text = String(node.get_meta("ah_format")) % shown if node.has_meta("ah_format") else shown
 
 
 ## Quem joga está no teclado ou no controle (a última entrada não foi o mouse nem o toque); Settings acompanha.
@@ -449,6 +451,9 @@ static func face_texture(art: Dictionary) -> Texture2D:
 	if portrait != "" and ResourceLoader.exists(portrait):
 		_portraits[file] = load(portrait)
 		return _portraits[file]
+	# Sem a arte do parado (um herói sem ficha de combate), sem rosto.
+	if file == "" or not ResourceLoader.exists(file):
+		return null
 	var texture: Texture2D = load(file)
 	var image := texture.get_image()
 	if image.is_compressed():

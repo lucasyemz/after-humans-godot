@@ -361,7 +361,7 @@ func _card(hero_id: String) -> Control:
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	face.clip_contents = true
 	if not hero.alive:
-		face.modulate = Color(0.5, 0.5, 0.55)
+		face.modulate = AHKit.FALLEN
 	frame.add_child(face)
 	top.add_child(frame)
 	var names := VBoxContainer.new()
@@ -587,12 +587,12 @@ static func _primary(text: String, icon_name: String, action: String) -> Button:
 	button.add_theme_constant_override("icon_max_width", 34)
 	# O ícone afastado do título (no Maior, encostava).
 	button.add_theme_constant_override("h_separation", 14)
-	button.add_theme_color_override("icon_normal_color", Color("1a1408"))
-	button.add_theme_color_override("icon_focus_color", Color("1a1408"))
-	button.add_theme_color_override("icon_hover_color", Color("1a1408"))
+	button.add_theme_color_override("icon_normal_color", AHKit.ON_AMBER)
+	button.add_theme_color_override("icon_focus_color", AHKit.ON_AMBER)
+	button.add_theme_color_override("icon_hover_color", AHKit.ON_AMBER)
 	AHKit.style_as(button, "primary", Vector4(10, 0, 0, 0))
 	for state in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color"]:
-		button.add_theme_color_override(state, Color("1a1408"))
+		button.add_theme_color_override(state, AHKit.ON_AMBER)
 	button.custom_minimum_size = Vector2(480, 72)
 	var key := AHKitKey.make("", "%s / A" % AHUiStyle.key_name(action), "button")
 	key.name = "Key"

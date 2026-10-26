@@ -118,6 +118,8 @@ func _camp() -> void:
 	var camp: AHCampScene = corridor.camp
 	t.check(camp.active and hud.camp_open() and Campaign.state.session.screen == "rest", "acampar abre a cena e o HUD do acampamento")
 	t.check(corridor.blocking(), "no acampamento, a equipe não anda")
+	t.check(not hud._plaque.is_visible_in_tree() and not hud._goal.is_visible_in_tree(),
+		"no acampamento, sem a plaqueta do lugar e o cartão do objetivo (só ACAMPAMENTO no alto)")
 	t.equal(camp.members.size(), team.size(), "a equipe inteira em volta da fogueira")
 	var room: AHHouseRoom = corridor.room
 	for member in camp.members:
@@ -126,7 +128,7 @@ func _camp() -> void:
 		var lie: bool = hero.hp <= hero.max_hp * AHCampScene.LIE_DOWN_AT
 		t.check(card._art.file.contains("_sleep") if lie else card._art.file.contains("_seat_floor"),
 			"%s %s (%s)" % [hero.display_name, "deitado" if lie else "sentado no chão", card._art.file.get_file()])
-		t.check(absf(card.position.x - room.camp_x) <= 2.9, "%s perto da fogueira" % hero.display_name)
+		t.check(absf(card.position.x - room.camp_x) <= 3.4, "%s perto da fogueira" % hero.display_name)
 		t.check(card.facing == (-1.0 if card.position.x > room.camp_x else 1.0), "%s virado para o fogo" % hero.display_name)
 	# As áreas do clique (o corpo inteiro na tela) não se sobrepõem.
 	await _frames(3)
@@ -138,13 +140,22 @@ func _camp() -> void:
 			if rects[i].grow(-2).intersects(rects[j].grow(-2)):
 				apart = false
 	t.check(apart, "os corpos na tela não se sobrepõem (o clique é de um só): %s" % [rects])
-	# A câmera no escolhido; as setas trocam de herói (com o fade curto entre as posições).
-	t.equal(camp.selected, 0, "começa no primeiro da equipe")
-	t.check(is_equal_approx(camp.focus_x, lerpf(room.camp_x, camp.members[0].card.position.x, AHCampScene.FOCUS_PULL)), "a câmera puxada para o escolhido")
+	# A fileira da Unreal (#109): todos na mesma linha do chão, na ordem da cena (da esquerda para a direita), com a
+	# câmera parada na fogueira; as setas trocam de herói (com o fade curto entre as posições).
+	var xs: Array = camp.members.map(func(m): return m.card.position.x)
+	var sorted_xs := xs.duplicate()
+	sorted_xs.sort()
+	t.equal(xs, sorted_xs, "as cartas e as setas na ordem da cena (da esquerda para a direita)")
+	t.check(camp.members.all(func(m): return is_equal_approx(m.card.position.z, camp.members[0].card.position.z)), "todos na mesma linha do chão")
+	var leader: int = camp.members.map(func(m): return m.hero_id).find(team[0])
+	t.equal(camp.selected, leader, "começa no primeiro da formação")
+	t.check(is_equal_approx(camp.focus_x, room.camp_x), "a câmera parada na fogueira")
+	camp.select(0, false)
+	await _frames(2)
 	await _press("move_right")
 	await _until(func(): return not camp.switching(), 3.0)
 	t.equal(camp.selected, 1, "a seta para a direita passa para o próximo")
-	t.check(is_equal_approx(camp.focus_x, lerpf(room.camp_x, camp.members[1].card.position.x, AHCampScene.FOCUS_PULL)), "e a câmera vai junto")
+	t.check(is_equal_approx(camp.focus_x, room.camp_x), "e a câmera não sai da fogueira")
 	await _press("ui_left")
 	await _until(func(): return not camp.switching(), 3.0)
 	t.equal(camp.selected, 0, "e a da esquerda volta")
@@ -166,8 +177,21 @@ func _camp() -> void:
 		await _tree.process_frame
 	t.equal(camp.selected, posmod(before_stick + 1, camp.members.size()), "um toque no analógico troca um herói só")
 	Campaign.state.settings.reduced_environment_effects = false
-	# A placa de cada um com a vida e o instinto.
-	t.check(camp.members.all(func(m): return hud.camp_hud._plates[m.hero_id].find_child("Instinct", true, false) != null), "a placa de cada um com a barra do instinto")
+	# A conferência dos corpos (hud-ajustes.md): o painel de baixo não cobre ninguém, no Normal e no Maior.
+	var size_before: int = Settings.text_size
+	for size in [0, 2]:
+		Settings.set_text_size(size)
+		await _frames(4)
+		var panel: Rect2 = hud.camp_hud._bar.get_global_rect()
+		var covered: Array = camp.members.filter(func(m): return AHCampHud.body_rect(camera, m.card).grow(-2).intersects(panel)).map(func(m): return m.hero_id)
+		t.equal(covered, [], "o painel do acampamento não cobre nenhum corpo (texto %d)" % size)
+		var outside: Array = camp.members.filter(func(m): return not Rect2(0, 0, 1920, 1080).encloses(AHCampHud.body_rect(camera, m.card))).map(func(m): return m.hero_id)
+		t.equal(outside, [], "e ninguém sai da tela, nem quem está deitado no lugar de fora (texto %d)" % size)
+	Settings.set_text_size(size_before)
+	await _frames(2)
+	# A carta de cada um, no painel de baixo, com a vida e a barra.
+	t.check(camp.members.all(func(m): return hud.camp_hud._cards.has(m.hero_id) and hud.camp_hud._cards[m.hero_id].find_child("Bar", true, false) != null), "a carta de cada um com a vida")
+	await _preview_rules(hud.camp_hud, camp)
 	# Comer: as regras de sempre e a resposta no herói.
 	camp.select(0, false)
 	await _frames(2)
@@ -300,14 +324,15 @@ func _menu_in_camp() -> void:
 	t.equal(corridor.camp.selected, before, "com a Mochila aberta, a seta não troca o herói do acampamento")
 	await _press("inventory")
 	t.check(not hud.modal_open() and hud.camp_open(), "o I fecha a Mochila e o acampamento continua")
-	t.check(hud.camp_hud.eat_button.text.contains(str(AHJourneyRules.food(Campaign.state))), "e a barra do acampamento mostra a comida que sobrou")
+	t.equal((hud.camp_hud.eat_button.find_child("Stock", true, false) as Label).text, "x%d" % AHJourneyRules.food(Campaign.state), "e a Ração mostra a comida que sobrou")
 	await _press("menu")
 	t.check(hud.menu_shown(), "o Esc abre o menu no acampamento")
 	await _press("menu")
 	t.check(not hud.modal_open() and corridor.camp.active, "e fecha de novo, sem levantar acampamento")
 	await _press("menu")
-	var back := _button(hud, "Voltar à Estação")
-	t.check(back != null, "o menu do acampamento tem o Voltar à Estação")
+	await _frames(2)
+	var back: Button = hud._modal.find_child("Return", true, false) if hud.modal_open() else null
+	t.check(back != null and not back.disabled, "o menu do acampamento tem o Voltar à Estação, liberado")
 	if back != null:
 		back.pressed.emit()
 		await _frames(2)
@@ -462,9 +487,76 @@ func _fades() -> void:
 
 func _button(root: Node, prefix: String) -> Button:
 	for button in root.find_children("*", "Button", true, false):
-		if not button.is_queued_for_deletion() and button.is_visible_in_tree() and button.text.begins_with(prefix):
+		if not button.is_queued_for_deletion() and button.is_visible_in_tree() and button.text.to_upper().begins_with(prefix.to_upper()):
 			return button
 	return null
+
+
+## A vida prevista e a regra da Ração (#109): com o foco num cuidado, a carta mostra a vida de depois sem gastar nada; a
+## Ração com a vida cheia continua ativa enquanto o instinto está acima de 0 (só baixa o instinto) e fica sem efeito com
+## o instinto em 0; o Curativo, com a vida cheia, fica sem efeito.
+func _preview_rules(hud: AHCampHud, camp: AHCampScene) -> void:
+	camp.select(0, false)
+	await _frames(2)
+	var hero = Campaign.hero(camp.selected_id())
+	hero.hp = int(hero.max_hp) - 6
+	hero.instinct = 30
+	var food0 := J.food(Campaign.state)
+	var bandages0: int = Campaign.state.inventory.bandages
+	var preview := J.camp_preview(Campaign.state, hero.id, "food")
+	hud.refresh()
+	hud.eat_button.grab_focus()
+	await _frames(2)
+	var card: Button = hud._cards[hero.id]
+	var bar: AHKitBar = card.find_child("Bar", true, false)
+	t.equal(int(bar.preview), int(preview.hp), "com o foco na Ração, a barra mostra a vida prevista (%d)" % preview.hp)
+	t.check((card.find_child("Life", true, false) as RichTextLabel).get_parsed_text().contains("%d / %d" % [preview.hp, hero.max_hp]), "e o número, de agora para a prevista")
+	t.equal([hero.hp, J.food(Campaign.state)], [int(hero.max_hp) - 6, food0], "sem gastar nada")
+	hud.heal_button.grab_focus()
+	await _frames(2)
+	t.equal(int(bar.preview), mini(int(hero.max_hp), int(hero.hp) + 8), "no Curativo, a prévia de +8")
+	t.equal(Campaign.state.inventory.bandages, bandages0, "e o curativo também não é gasto")
+	# Sem estoque, a carta não promete vida: a linha diz que acabou, e a barra e o número ficam como estão.
+	var expedition: Dictionary = Campaign.state.session.expedition
+	var stock := [expedition.food, Campaign.state.inventory.bandages]
+	hud.leave_button.grab_focus()
+	await _frames(1)
+	expedition.food = 0
+	Campaign.state.inventory.bandages = 0
+	for kind in ["food", "bandage"]:
+		hud._preview(kind)
+		t.equal(int(bar.preview), -1, "sem %s no estoque, a barra não mostra a prévia" % kind)
+		t.check(not (card.find_child("Life", true, false) as RichTextLabel).get_parsed_text().contains("→"), "nem o número da vida prevista (%s)" % kind)
+		t.check(hud._status.get_parsed_text().ends_with("acabou.") or hud._status.get_parsed_text().ends_with("acabaram."), "e a linha diz que acabou (%s)" % kind)
+	hud._preview("")
+	expedition.food = stock[0]
+	Campaign.state.inventory.bandages = stock[1]
+	hud.refresh()
+	# A prévia bate com o que o cuidado faz.
+	J.camp_use_food(Campaign.state, hero.id)
+	t.equal([hero.hp, hero.instinct], [preview.hp, preview.instinct], "a Ração faz o que a prévia mostrou")
+	# A vida cheia com instinto: a Ração continua ativa (só baixa o instinto), o Curativo fica sem efeito.
+	hero.hp = int(hero.max_hp)
+	hero.instinct = 15
+	hud.refresh()
+	await _frames(1)
+	t.check(not hud.eat_button.disabled and not (hud.eat_button.get_node("Veil") as Control).visible, "vida cheia e instinto 15: a Ração continua ativa")
+	t.check(hud.heal_button.disabled and (hud.heal_button.get_node("Veil") as Control).visible, "e o Curativo fica sem efeito, com o véu")
+	t.check(hud._status.get_parsed_text().contains("só baixa o instinto"), "a linha de estado diz que a Ração só baixa o instinto")
+	hud._preview("bandage")
+	t.check(hud._status.get_parsed_text().ends_with("está com a vida cheia."), "com o mouse no Curativo, a linha diz só que a vida está cheia")
+	hud._preview("")
+	var eaten := J.camp_use_food(Campaign.state, hero.id)
+	t.check(eaten and hero.hp == int(hero.max_hp) and hero.instinct == 10, "e ela baixa o instinto sem passar da vida cheia")
+	# Vida cheia e instinto em 0: nenhum cuidado faz efeito.
+	hero.instinct = 0
+	hud.refresh()
+	await _frames(1)
+	t.check(hud.eat_button.disabled and (hud.eat_button.get_node("Veil") as Control).visible, "vida cheia e instinto 0: a Ração fica sem efeito")
+	t.check(hud._status.get_parsed_text().contains("nenhum cuidado faz efeito"), "e a linha de estado diz por quê")
+	t.check(not J.camp_use_food(Campaign.state, hero.id), "e a regra também não gasta a comida")
+	hero.hp = int(hero.max_hp) - 3
+	hud.refresh()
 
 
 func _has(root: Node, node_name: String) -> bool:

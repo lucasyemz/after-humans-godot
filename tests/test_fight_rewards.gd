@@ -255,13 +255,23 @@ func _result_screen() -> void:
 	while arena.active and Time.get_ticks_msec() < limit:
 		await _tree.process_frame
 		if arena.hud._result.visible and seen.is_empty():
-			seen = {"stars": arena.hud._result.find_child("Stars", true, false), "criteria": arena.hud._result.find_children("*", "Label", true, false).filter(func(l): return l.has_meta("criterion")).size(),
-				"xp": arena.hud._result.find_children("*", "Label", true, false).filter(func(l): return l.has_meta("xp_gain")).size(), "victory": arena.session.state.victory}
-	if t.check(not seen.is_empty(), "a tela do fim da luta abre"):
+			var xp = arena.hud._result.find_child("Xp", true, false)
+			seen = {"stars": arena.hud._result.find_child("Stars", true, false), "xp": xp.get_meta("xp", {}) if xp != null else {},
+				"buttons": arena.hud._result.find_children("*", "BaseButton", true, false).size(), "victory": arena.session.state.victory,
+				"text": xp.text if xp != null else "", "team": arena.session.state.player_team.map(func(u): return u.display_name)}
+	if t.check(not seen.is_empty(), "o popup do fim da luta abre"):
 		if seen.victory:
-			t.check(seen.stars != null and seen.stars.text.contains("★"), "com as estrelas")
-			t.equal(seen.criteria, 4, "e os quatro critérios")
-		t.check(seen.xp >= 1, "e o XP de cada herói")
+			t.check(seen.stars != null and seen.stars.get_child_count() == 3 and int(seen.stars.get_meta("stars")) >= 1, "com as três estrelas (as cheias e as vazias)")
+		t.check(not seen.victory or seen.xp.size() >= 1, "e o XP de cada herói, numa linha")
+		if seen.victory and seen.xp.size() >= 2:
+			# Na ordem da cena: da esquerda (o fundo da formação) para a direita (a frente).
+			var at: Array = seen.team.filter(func(n): return seen.text.contains(n)).map(func(n): return seen.text.find(n))
+			var expected: Array = at.duplicate()
+			expected.sort()
+			expected.reverse()
+			t.equal(at, expected, "o XP vem na ordem da cena, da esquerda para a direita")
+		t.equal(seen.buttons, 0, "sem botão: qualquer tecla fecha")
+	t.check(not seen.get("victory", false) or not arena.active, "e a vitória fecha sozinha, sem nenhum toque")
 
 
 func _frames(count: int) -> void:

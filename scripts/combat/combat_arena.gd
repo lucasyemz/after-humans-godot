@@ -58,9 +58,6 @@ var art := {}
 ## Joga os dois lados sozinho (QA e captura). speed acelera as esperas.
 var auto_battle := false
 var speed := 1.0
-## Quanto a tela do fim fica aberta no automático (s, no ritmo 1x): a de antes e a da vitória com as estrelas e o XP.
-const RESULT_HOLD := 1.5
-const RESULT_HOLD_REWARDS := 3.0
 var center_x := 0.0
 ## O quanto os espaços da fila encolhem para a luta caber no lugar (#52): 1 = os de sempre.
 var gap_scale := 1.0
@@ -441,9 +438,8 @@ func _run() -> void:
 	var rewards := AHFightRewards.criteria(session, boss_fight, String(expedition.phase_id) if expedition != null else "")
 	if boss_fight and result == "victory" and expedition != null:
 		AHFightRewards.record_stars(Campaign.state, String(expedition.phase_id), int(rewards.stars))
-	# No automático, a tela fecha sozinha: com as estrelas e o XP, fica mais tempo para ler (no ritmo da luta).
-	var hold := (RESULT_HOLD_REWARDS if result == "victory" else RESULT_HOLD) / speed
-	await hud.show_result(result, auto_battle, rewards, hold)
+	# O popup do fim (#109): a vitória e a fuga fecham sozinhas (no ritmo da luta), a derrota espera um toque.
+	await hud.show_result(result, auto_battle, rewards)
 	hud.close()
 	var occlusion = _street.get("occlusion") if _street != null else null
 	if occlusion != null:

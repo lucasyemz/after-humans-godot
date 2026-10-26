@@ -57,6 +57,10 @@ func _depart(name: String, picks: Array, phase: String, with_arrival: bool, redu
 	var team: Array = picks.map(func(i): return c.roster[i].id)
 	station.hud._draft = {"phase": phase, "team": team, "focus": "", "extra": 0}
 	station.hud._depart()
+	# O briefing da saída (#88) abre antes da passagem: Pular parte.
+	await process_frame
+	if station.hud.get("briefing") != null and is_instance_valid(station.hud.briefing):
+		station.hud.briefing.skip()
 	await _wait(func(): return flow.passage != null and flow._fade.modulate.a <= 0.01)
 	if not reduced:
 		# Pelo relógio (a passagem conta pelo relógio; sem GPU, poucos quadros por segundo).

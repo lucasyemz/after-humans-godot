@@ -17,12 +17,10 @@ options_panel.gd: %d%%
 exploration_hud.gd: %s · %s
 exploration_hud.gd: %d/%d
 exploration_hud.gd: E  
-exploration_hud.gd: [%s]  %s
 exploration_hud.gd: Title
 exploration_hud.gd: Description
 exploration_hud.gd: Choices
 exploration_hud.gd: Text
-exploration_hud.gd:   (%s)
 combat_hud.gd: Q
 combat_hud.gd: O
 combat_hud.gd: A
@@ -45,11 +43,8 @@ combat_hud.gd: %d–%d
 combat_hud.gd: +%d–%d
 combat_hud.gd: combat_ability_%d
 combat_hud.gd: %s: %s
-combat_hud.gd: %s\n%s
 combat_hud.gd: %d/%d
 combat_hud.gd: Description
-refuge_hud.gd: %s: %s · %s%s
-refuge_hud.gd: %s · %s
 refuge_hud.gd: %s · %d/%d
 refuge_hud.gd: Role
 refuge_hud.gd: UI
@@ -354,7 +349,6 @@ game_flow.gd: GameFlow: cena desconhecida ou troca em andamento (%s).
 game_flow.gd: title
 inventory_panel.gd: %d / %d
 inventory_panel.gd: Description
-inventory_panel.gd: \n\n%s%s
 inventory_panel.gd: ampoule
 inventory_panel.gd: count
 inventory_panel.gd: food
@@ -887,17 +881,12 @@ fight_rewards.gd: seed
 cargo_picker.gd: Box%d
 cargo_picker.gd: revealed
 combat_hud.gd: Stars
-combat_hud.gd: %s  %s
-combat_hud.gd: Criterion
-combat_hud.gd: criterion
 combat_hud.gd: value
 fight_rewards.gd: Items
 street_corridor.gd: bandage
 camp_hud.gd: Name
 camp_hud.gd: Life
-camp_hud.gd: Instinct
 camp_hud.gd: Body_
-camp_hud.gd: %s %d/%d
 camp_hud.gd: visible
 camp_hud.gd: food
 camp_hud.gd: Effect
@@ -987,7 +976,6 @@ kit_bar.gd: size
 kit_bar.gd: enemy
 kit_bar.gd: state
 character_room.gd: life
-character_sheet.gd: life
 kit_bar.gd: life
 station_report.gd: life
 combat_hud.gd: Hit
@@ -1037,10 +1025,6 @@ character_room.gd: overview
 character_room.gd: facilities
 character_room.gd: characters
 character_room.gd: hide
-character_room.gd: Plaque
-character_room.gd: Vitals
-character_room.gd: Options
-character_room.gd: resource_%s
 character_room.gd: Hero
 character_room.gd: file
 character_room.gd: frames
@@ -1081,13 +1065,7 @@ character_room.gd: Cancel
 character_room.gd: Esc / B
 character_room.gd: Esc
 character_room.gd: Confirm
-character_room.gd: Back
-character_room.gd: Keys
-character_room.gd: Nav
-character_room.gd: Nav_%s
 character_room.gd: Prepare
-character_room.gd: %s / X
-character_room.gd: Reason
 combat_arena.gd: icons
 character_room.gd: text
 *: large
@@ -1117,3 +1095,190 @@ character_room.gd: text
 *: alert
 kit.gd: Componente do kit sem a variante: %s/%s
 kit.gd: Selected
+*: small
+*: text
+*: divider
+*: sleep
+*: bandage
+*: route
+*: row
+*: life
+*: corners
+*: amount
+*: stars
+*: star
+*: state
+*: amber
+*: track
+*: preview
+*: role
+*: hp
+*: effect
+exploration_hud.gd: X
+exploration_hud.gd: Close
+exploration_hud.gd: Return
+exploration_hud.gd: Glyph
+exploration_hud.gd: Options
+exploration_hud.gd: Resume
+exploration_hud.gd: Key
+exploration_hud.gd: Sub
+camp_hud.gd: Plaque
+camp_hud.gd: Cards
+camp_hud.gd: Status
+camp_hud.gd: Keys
+camp_hud.gd: Continue
+camp_hud.gd: Care_
+camp_hud.gd: Icon
+camp_hud.gd: Title
+camp_hud.gd: Stock
+camp_hud.gd: Card_
+camp_hud.gd: Chosen
+camp_hud.gd: Veil
+camp_hud.gd: Key
+combat_hud.gd: Loot
+combat_hud.gd: Xp
+combat_hud.gd: Outcome
+combat_hud.gd: Cargo
+combat_hud.gd: Timer
+combat_hud.gd: Hint
+kit.gd: [lb]
+kit.gd: Veil
+*: slider
+*: knob
+*: on
+*: toggle
+*: off
+*: tag
+*: medal
+*: bed
+*: expeditions
+*: food
+*: power
+*: overview
+*: facilities
+*: characters
+*: hide
+*: benefit
+*: basic
+*: watch
+*: recruit
+*: grabber
+options_panel.gd: Key_%s
+options_panel.gd: Toggle
+kit.gd: Portrait
+refuge_hud.gd: Frame
+refuge_hud.gd: Left
+refuge_hud.gd: Header
+refuge_hud.gd: Title
+refuge_hud.gd: State
+refuge_hud.gd: X
+refuge_hud.gd: Close
+refuge_hud.gd: Scroll
+refuge_hud.gd: Body
+refuge_hud.gd: Footer
+refuge_hud.gd: Esc
+refuge_hud.gd: Pending
+refuge_hud.gd: Pending_%s
+refuge_hud.gd: Name
+refuge_hud.gd: Manage
+refuge_hud.gd: Text
+refuge_hud.gd: Cost
+refuge_hud.gd: Cost_%s
+refuge_hud.gd: Key
+refuge_hud.gd: Plan_%s
+refuge_hud.gd: %s: %s
+refuge_hud.gd: See_%s
+refuge_hud.gd: Upgrade
+refuge_hud.gd: Preparation
+refuge_hud.gd: Focus_%s
+refuge_hud.gd: [b][color=#%s]%s[/color][/b] %s
+refuge_hud.gd: [lb]
+refuge_hud.gd: Slot%d
+refuge_hud.gd: Supplies
+refuge_hud.gd: Water
+refuge_hud.gd: Power
+refuge_hud.gd: Stock
+refuge_hud.gd: Relic_%s
+refuge_hud.gd: Craft
+refuge_hud.gd: %s · %d
+refuge_hud.gd: Research_%s
+refuge_hud.gd: Research
+refuge_hud.gd: Night_%s
+refuge_hud.gd: Refuse
+refuge_hud.gd: %d / %d
+*: class
+*: radar
+*: title
+*: subtitle
+*: resources
+refuge_hud.gd: Branch
+refuge_hud.gd: Requires
+refuge_hud.gd: Expeditions
+refuge_hud.gd: Locked
+station_frame.gd: Plaque
+station_frame.gd: Title
+station_frame.gd: Subtitle
+station_frame.gd: Options
+station_frame.gd: Resources
+station_frame.gd: Materials
+station_frame.gd: Material_%s
+station_frame.gd: Vital_%s
+station_frame.gd: resource_%s
+station_frame.gd: Alert
+station_frame.gd: Back
+station_frame.gd: Arrow
+station_frame.gd: Keys
+station_frame.gd: Nav
+station_frame.gd: Nav_%s
+station_frame.gd: Prepare
+station_frame.gd: Key
+station_frame.gd: %s / X
+station_frame.gd: Reason
+exploration_hud.gd: Place
+exploration_hud.gd: Goal
+exploration_hud.gd: Corridor
+exploration_hud.gd: Supplies
+exploration_hud.gd: Party
+exploration_hud.gd: Patrol
+exploration_hud.gd: Hint
+exploration_hud.gd: Bag
+exploration_hud.gd: Finish
+exploration_hud.gd: Prompt
+exploration_hud.gd: Toast
+exploration_hud.gd: Loot
+exploration_hud.gd: Mate_%s
+exploration_hud.gd: Gain
+exploration_hud.gd: enemy
+exploration_hud.gd: Panel
+exploration_hud.gd: hope
+exploration_hud.gd: changes
+exploration_hud.gd: Changes
+exploration_hud.gd: Continue
+exploration_hud.gd: Choice_%s
+exploration_hud.gd: Abandon
+exploration_hud.gd: %+d
+exploration_hud.gd: E / A
+exploration_hud.gd: choose
+exploration_hud.gd: continue
+inventory_panel.gd: Close
+inventory_panel.gd: Key
+inventory_panel.gd: Slot_%s
+inventory_panel.gd: Previous
+inventory_panel.gd: Next
+title_screen.gd: Warning
+title_screen.gd: Keys
+title_screen.gd: Key
+title_screen.gd: Glyph
+title_screen.gd: Window
+title_screen.gd: Head
+title_screen.gd: Back
+title_screen.gd: X
+title_screen.gd: Close
+briefing_dialog.gd: %d/%s/%s
+briefing_dialog.gd: Key
+character_sheet.gd: art
+character_sheet.gd: Level
+title_screen.gd: Esc
+title_screen.gd: Esc / B
+title_screen.gd: slot
+briefing_dialog.gd: Esc
