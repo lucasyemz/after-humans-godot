@@ -221,7 +221,12 @@ A Sala (`scripts/ui/station/character_room.gd`) também é a tela inteira:
    - **Baixas, corrigidas:**
      - a volta à Sala vazava pelo "Ver …" do Plano: abrir outra tela limpa a volta;
      - no Normal, a barra da Sala largava "F2 Ocultar": a tecla de Voltar é o Esc, curto, e os quatro pares cabem.
-4. **Decisão do Lucas, antes da rodada 3:** o padrão dos componentes é o kit da Awesomic, também na luta. O Painel, a
+4. **Rodada 4, aprovada.** As quatro correções da rodada 3 se confirmaram, e a regressão das rodadas 1 a 3 passou.
+   Ficam duas notas baixas:
+   - no Maior, a barra da Sala larga "F2 Ocultar" (a aba OCULTAR HUD continua embaixo);
+   - na luta cheia, a ficha pode cobrir a intenção do vizinho do apontado. O apontado, o nome dele e a intenção dele
+     ficam livres.
+5. **Decisão do Lucas, antes da rodada 3:** o padrão dos componentes é o kit da Awesomic, também na luta. O Painel, a
    Plaqueta, os Botões e a Barra da luta passaram para os componentes, e um teste confere que as peças aposentadas
    do Codex não voltam.
 
