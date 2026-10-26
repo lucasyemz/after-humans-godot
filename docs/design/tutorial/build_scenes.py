@@ -15,8 +15,8 @@ ART = ROOT / "art/scenarios"
 OUT = Path(__file__).resolve().parent
 W, H, PPM, FLOOR = 1920, 1080, 130, 820
 # Largura em metros de cada peça (a altura sai da proporção do arquivo); a tabela da página repete estes números.
-SIZES = {"T_TU01": 8.2, "T_TU02": 2.0, "T_TU03": 8.2, "T_TU04": 4.0, "T_TU05": 3.0, "T_TU06": 2.3, "T_TU07": 1.4,
-         "T_TU08": 0.75, "T_TU08_Lit": 0.75, "T_TU09": 3.2, "T_TU10": 10.0, "T_TUX01_Security_Door": 2.4,
+SIZES = {"T_TU01": 8.2, "T_TU02": 2.0, "T_TU03": 8.2, "T_TU04": 4.0, "T_TU05": 3.0, "T_TU06": 3.54, "T_TU07": 1.4,
+         "T_TU08": 0.3, "T_TU08_Lit": 0.3, "T_TU09": 4.5, "T_TU10": 10.0, "T_TUX01_Security_Door": 2.4,
          "T_TUX01_Security_Door_Open": 2.4, "T_TUX02_Maintenance_Locker": 1.45, "T_TUX02_Maintenance_Locker_Open": 1.45,
          "T_TUX03_Door_Panel": 0.62, "T_TUX03_Door_Panel_Open": 0.62}
 HEROES = {"bento": 1.75, "nick": 1.6}
@@ -35,18 +35,23 @@ def hero(name: str) -> Image.Image:
     return im.resize((round(im.width * h / im.height), h), Image.Resampling.LANCZOS)
 
 
-def base(wall: str) -> Image.Image:
+def floor_band(im: Image.Image, name: str) -> None:
+    """O piso na faixa de andar, repetido, um pouco mais escuro que a parede."""
+    floor = piece(name)
+    band = Image.new("RGBA", (W, H - FLOOR))
+    for x in range(0, W, floor.width):
+        band.alpha_composite(floor.crop((0, 0, floor.width, min(floor.height, H - FLOOR))), (x, 0))
+    im.alpha_composite(ImageEnhance.Brightness(band).enhance(0.7), (0, FLOOR))
+
+
+def base(wall: str, floor_name: str = "T_TU02") -> Image.Image:
     """A parede do fundo repetida (do piso até 4,6 m), o teto escuro e o piso molhado na faixa de andar."""
     im = Image.new("RGBA", (W, H), (14, 15, 17, 255))
     tile = piece(wall)
     top = FLOOR - tile.height
     for x in range(-tile.width // 3, W, tile.width):
         im.alpha_composite(tile, (x, top))
-    floor = piece("T_TU02")
-    band = Image.new("RGBA", (W, H - FLOOR))
-    for x in range(0, W, floor.width):
-        band.alpha_composite(floor.crop((0, 0, floor.width, H - FLOOR)), (x, 0))
-    im.alpha_composite(ImageEnhance.Brightness(band).enhance(0.7), (0, FLOOR))
+    floor_band(im, floor_name)
     # A sombra no pé da parede e o teto sem detalhe.
     d = ImageDraw.Draw(im)
     for i in range(24):
@@ -120,19 +125,17 @@ def nick_route() -> Image.Image:
 
 
 def platform() -> Image.Image:
-    """4. A plataforma no fim: a parede de azulejo da estação esquecida, a borda da plataforma e o trem parado com a
-    luz fria por dentro, as portas abertas para o embarque."""
-    im = base("T_TU03")
-    # O trem fica no fosso dos trilhos, atrás da borda da plataforma (a borda tapa as rodas); a equipe anda na frente.
+    """4. A plataforma no fim: a parede de azulejo da estação esquecida, o trem parado no fosso dos trilhos, com a luz
+    fria por dentro e as portas abertas, e a equipe sobre a plataforma. O piso da plataforma (T_TU09) tem a faixa
+    amarela na beira do lado do trem; a queda para os trilhos não aparece (fica do lado do trem), e o piso tapa as rodas:
+    o chão do vagão fica na altura da plataforma, para embarcar."""
+    im = base("T_TU03", "T_TU09")
     train = piece("T_TU10")
-    at(im, train, 1150, FLOOR + 20)
-    # A borda: o miolo reto da laje (sem as quinas chanfradas das pontas), repetido sem emenda.
-    edge = piece("T_TU09")
-    edge = edge.crop((round(edge.width * 0.12), 0, round(edge.width * 0.88), edge.height))
-    for x in range(0, W + edge.width, edge.width - 2):
-        im.alpha_composite(edge, (x, FLOOR + 60 - edge.height))
-    at(im, hero("bento"), 600, FLOOR + 150)
-    at(im, hero("nick"), 820, FLOOR + 150)
+    # O chão do vagão (o pé das portas, a 72% da altura do card) na linha do piso.
+    at(im, train, 1150, FLOOR + round(train.height * 0.28))
+    floor_band(im, "T_TU09")
+    at(im, hero("bento"), 600, FLOOR + 60)
+    at(im, hero("nick"), 820, FLOOR + 60)
     spots = [(1150, 560, 520, (190, 215, 255), 0.85), (300, 300, 380, (255, 70, 50), 0.4)]
     return light(im, spots, 0.4, (40, 60, 90))
 
@@ -162,9 +165,9 @@ def doors() -> Image.Image:
 # A prancha da arte: cada peça com o nome, a medida em metros e o uso, sobre o aço escuro (as recortadas sobre um
 # xadrez claro e escuro, para ver o alfa).
 USES = {"T_TU01": "Parede do corredor (repete na horizontal)", "T_TU02": "Piso molhado (repete)", "T_TU03": "Parede da plataforma (repete)",
-        "T_TU04": "Grades da cela", "T_TU05": "Raízes no piso", "T_TU06": "Escada até a grade do teto (rota do Nick)",
+        "T_TU04": "Grades da cela", "T_TU05": "Raízes no piso", "T_TU06": "Escada até o alçapão no teto (rota do Nick)",
         "T_TU07": "Duto com a grade arrancada (rota do Nick)", "T_TU08": "Lâmpada de emergência apagada", "T_TU08_Lit": "A mesma, acesa (pisca)",
-        "T_TU09": "Borda da plataforma", "T_TU10": "O vagão (luz fria por dentro)", "T_TUX01_Security_Door": "Porta de segurança fechada",
+        "T_TU09": "Piso da plataforma, a faixa amarela na beira (repete)", "T_TU10": "O vagão (luz fria por dentro)", "T_TUX01_Security_Door": "Porta de segurança fechada",
         "T_TUX01_Security_Door_Open": "Porta de segurança aberta", "T_TUX02_Maintenance_Locker": "Armário (busca), fechado",
         "T_TUX02_Maintenance_Locker_Open": "Armário (busca), aberto", "T_TUX03_Door_Panel": "Painel das portas", "T_TUX03_Door_Panel_Open": "Painel acionado"}
 

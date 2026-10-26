@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/T_TU08.webp-4519d28336b58feae5f20683d6145f82.
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.85
+compress/lossy_quality=0.75
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

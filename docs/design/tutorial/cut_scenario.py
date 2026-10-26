@@ -1,14 +1,13 @@
 """Recorta a arte do mapa do tutorial (#147) das folhas geradas no Nano Banana Pro (fora do Git, em images/tutorial/ do
 projeto na Awesomic) para art/scenarios/, no contrato dos cenários de hoje (tools/sync_scenarios.py): T_<código>.webp,
-WebP qualidade 88, até 1024 px no lado maior (o vagão vai a 2048, como os fundos grandes), opaco sem alfa e recortado
-com alfa (os cards "masked"). Os pares de busca e de porta (T_TUX*) saem com o mesmo tamanho, recortados pela mesma
+WebP qualidade 88, até 1024 px no lado maior, opaco sem alfa e recortado com alfa (os cards "masked"). Os pares de busca e de porta (T_TUX*) saem com o mesmo tamanho, recortados pela mesma
 caixa, como os _Open de hoje.
 
 Uso: python3 -B docs/design/tutorial/cut_scenario.py <pasta images/tutorial>
 """
 import sys
 from pathlib import Path
-from PIL import Image, ImageChops, ImageDraw, ImageFilter
+from PIL import Image, ImageChops, ImageFilter
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[3]
@@ -17,10 +16,12 @@ from cut_icons import unmix, despill_edges  # noqa: E402
 
 OUT = ROOT / "art/scenarios"
 # As superfícies opacas (paredes e piso): a imagem inteira, reduzida.
-SURFACES = {"T_TU01": ("tu-wall-corridor.png", 1024), "T_TU02": ("tu-floor.png", 1024), "T_TU03": ("tu-wall-platform.png", 1024)}
-# Os elementos recortados, um por imagem (a folha 3x2, tu-props-sheet.png, foi a referência deles); a lâmpada sai da
-# folha, na célula 5 (ela é pequena na cena).
-PROPS = {"T_TU04": "tu-bars.png", "T_TU05": "tu-roots.png", "T_TU06": "tu-ladder.png", "T_TU07": "tu-duct.png", "T_TU09": "tu-platform-edge.png"}
+SURFACES = {"T_TU01": ("tu-wall-corridor.png", 1024), "T_TU02": ("tu-floor.png", 1024), "T_TU03": ("tu-wall-platform.png", 1024),
+            "T_TU09": ("tu-platform-floor.png", 1024)}
+# Os elementos recortados, um por imagem (a folha 3x2, tu-props-sheet.png, foi a referência deles); a lâmpada sai
+# recortada da própria folha (ela é pequena na cena). A escada é a segunda versão (tu-ladder-2.png: de lado, até o
+# alçapão no teto).
+PROPS = {"T_TU04": "tu-bars.png", "T_TU05": "tu-roots.png", "T_TU06": "tu-ladder-2.png", "T_TU07": "tu-duct.png"}
 # Os interativos: o fechado e o aberto (o aberto é uma edição do fechado, no mesmo quadro).
 PAIRS = {"T_TUX01_Security_Door": "tu-door", "T_TUX02_Maintenance_Locker": "tu-locker", "T_TUX03_Door_Panel": "tu-panel"}
 
@@ -40,6 +41,9 @@ def clean(im: Image.Image) -> Image.Image:
             r, g, b, a = px[x, y]
             if a == 0:
                 px[x, y] = (0, 0, 0, 0)
+            elif a < 250 and g > max(r, b):
+                # A borda puxando para o verde (a sobra de quando o magenta sai): o verde não passa do maior dos outros.
+                px[x, y] = (r, max(r, b), b, a)
             elif min(r, b) - g > 12:
                 # Concreto e metal com um véu rosado (o reflexo do fundo na pintura): viram cinza, um pouco quente.
                 v = (r * 3 + g * 6 + b) // 10
@@ -63,28 +67,18 @@ def save(im: Image.Image, name: str) -> None:
     print(name, im.size, im.mode)
 
 
-def lit_lamp(lamp: Image.Image) -> tuple:
-    """A lâmpada de emergência acesa (para piscar, como o _Open troca o material): o vidro vermelho mais claro e um
-    halo vermelho em volta. As duas saem no mesmo quadro, com a margem do halo."""
-    pad = round(max(lamp.size) * 0.6)
-    off = Image.new("RGBA", (lamp.width + 2 * pad, lamp.height + 2 * pad))
-    off.alpha_composite(lamp, (pad, pad))
-    on = off.copy()
+def lit_lamp(lamp: Image.Image) -> Image.Image:
+    """A lâmpada de emergência acesa (para piscar, como o _Open troca o material): só o vidro vermelho mais claro, no
+    mesmo quadro da apagada. O brilho em volta é a luz pontual da cena: o jogo corta o alfa em 0,333 nos cenários, e um
+    halo em degradê viraria um disco chapado."""
+    on = lamp.copy()
     px = on.load()
     for y in range(on.height):
         for x in range(on.width):
             r, g, b, a = px[x, y]
             if a and r > g + 50 and r > b + 50:
                 px[x, y] = (min(255, int(r * 1.35) + 40), min(255, int(g * 1.1) + 25), min(255, int(b * 1.1) + 18), a)
-    halo = Image.new("RGBA", on.size)
-    cx, cy = on.width // 2, pad + round(lamp.height * 0.55)
-    rad = round(max(lamp.size) * 0.55)
-    d = ImageDraw.Draw(halo)
-    d.ellipse((cx - rad, cy - rad, cx + rad, cy + rad), fill=(255, 60, 40, 150))
-    halo = halo.filter(ImageFilter.GaussianBlur(rad * 0.4))
-    out = halo
-    out.alpha_composite(on)
-    return off, out
+    return on
 
 
 def main(src: str) -> None:
@@ -97,11 +91,11 @@ def main(src: str) -> None:
         save(shrink(im.crop(bbox(im)), 1024), name)
     # A lâmpada na folha 3x2 (1264 x 848), pela caixa medida: a célula pega uma ponta da plataforma ao lado.
     lamp = cut(Image.open(src / "tu-props-sheet.png").crop((468, 505, 640, 760)))
-    off, on = lit_lamp(lamp.crop(bbox(lamp)))
-    save(off, "T_TU08")
-    save(on, "T_TU08_Lit")
+    lamp = lamp.crop(bbox(lamp))
+    save(lamp, "T_TU08")
+    save(lit_lamp(lamp), "T_TU08_Lit")
     train = cut(Image.open(src / "tu-train-sheet-2.png"))
-    save(shrink(train.crop(bbox(train)), 2048), "T_TU10")
+    save(shrink(train.crop(bbox(train)), 1024), "T_TU10")
     for name, stem in PAIRS.items():
         c, o = cut(Image.open(src / f"{stem}-closed.png")), cut(Image.open(src / f"{stem}-open.png"))
         box = ImageChops.lighter(c.getchannel("A"), o.getchannel("A")).point(lambda v: 255 if v > 8 else 0).getbbox()

@@ -22,9 +22,9 @@ const STEPS = 6;
 const spot = (x, y, w, h, dim = 0.55) => `<div class="abs" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;box-shadow:0 0 0 4000px rgba(5,6,7,${dim})">${over("focus_frame")}</div>`;
 // A dica do tutorial: curta, com o passo ("3 de 6"), o que fazer, a tecla e a seta para o destaque. Fica fora do que
 // está em destaque; a seta aponta para ele.
-function tip({ x, y, width = 560, step, title, text, keys, arrow = "down", arrowAt = 0.5 }) {
+function tip({ x, y, width = 560, step, title, text, keys, arrow = null, arrowAt = 0.5 }) {
   const rot = { down: 90, up: -90, left: 180, right: 0 }[arrow];
-  const pointer = `<div class="abs row" style="${arrow === "down" ? `left:calc(${arrowAt * 100}% - 22px);bottom:-46px` : arrow === "up" ? `left:calc(${arrowAt * 100}% - 22px);top:-46px` : arrow === "left" ? "left:-46px;top:calc(50% - 22px)" : "right:-46px;top:calc(50% - 22px)"};width:44px;height:44px;justify-content:center">` +
+  const pointer = arrow === null ? "" : `<div class="abs row" style="${arrow === "down" ? `left:calc(${arrowAt * 100}% - 22px);bottom:-46px` : arrow === "up" ? `left:calc(${arrowAt * 100}% - 22px);top:-46px` : arrow === "left" ? "left:-46px;top:calc(50% - 22px)" : "right:-46px;top:calc(50% - 22px)"};width:44px;height:44px;justify-content:center">` +
     glyph("ui-arrow-right.svg", 40, "var(--amber)", `transform:rotate(${rot}deg)`) + `</div>`;
   return `<div class="abs" data-hit="panel" style="left:${x}px;top:${y}px">` + nine("panel_large", { repeat: "round", cls: "col", extra: `width:${width}px;gap:8px` },
     `<div class="row" style="gap:10px;justify-content:space-between"><div class="row" style="gap:10px">${glyph("next_step", 26, "var(--amber)")}<span class="tx f20 semi up amber kicker">Tutorial</span></div>` +
@@ -39,7 +39,7 @@ function tip({ x, y, width = 560, step, title, text, keys, arrow = "down", arrow
 // divisa com o losango âmbar e a linha de baixo; o aviso de pular no canto. Por enquanto só texto, com o fade de hoje.
 const STEEL = `<div class="abs" style="inset:0;background:#1b1d20 url(${BASE}/art/ui/kit/combat/steel_material.webp);background-blend-mode:multiply"></div>`;
 const CARDS = [
-  ["Antes da Estação", "As máquinas dos Antigos ainda cumprem ordens que ninguém deu."],
+  ["Antes da Estação", "As máquinas dos Antigos ainda cumprem ordens que ninguém cancelou."],
   ["Bento", "Saiu atrás de suprimentos. Uma área antiga entrou em contenção e baixou as portas com ele lá dentro."],
   ["Nick", "Viajava sozinho. Viu uma saída que as máquinas não vigiam, e voltou."],
   ["A plataforma", "No fim do corredor, um trem ainda espera."],
@@ -49,7 +49,7 @@ function plate(i, bottom) {
   return `<div class="abs" data-hit="panel" style="left:50%;transform:translateX(-50%);${bottom}">` + nine("panel_large", { repeat: "round", cls: "col", extra: "min-width:820px;max-width:1000px;gap:10px;align-items:center;padding:6px 0" },
     `<span class="tx semi up" style="font-size:calc(56px*var(--k));line-height:1.12">${title}</span>` +
     `<div class="row" style="gap:12px">${img("art/ui/kit/station/divider.webp", "width:180px;height:8px")}<i style="width:10px;height:10px;background:var(--amber);transform:rotate(45deg)"></i>${img("art/ui/kit/station/divider.webp", "width:180px;height:8px")}</div>` +
-    `<span class="wrap f30 muted" style="text-align:center;max-width:900px">${sub}</span>`) + `</div>`;
+    `<span class="wrap f30" style="text-align:center;max-width:900px">${sub}</span>`) + `</div>`;
 }
 // O passo da abertura (quatro pontos, o de agora em âmbar) e o pular, como no cartão de passagem.
 const dots = (i) => `<div class="abs row" style="left:50%;transform:translateX(-50%);bottom:40px;gap:12px">` +
@@ -67,19 +67,21 @@ const openingFrame = () => STEEL +
 const TWO = [["bento", "Bento", 34, 34], ["nick", "Nick", 24, 24]];
 // A rua da abertura (a Rua das Vitrines até o mapa do tutorial chegar): o passo 1, andar. O destaque é a dupla.
 const tutorialExplore = () => OWN("explore_two") +
-  // O nome do lugar é a proposta da #147 (Galeria de Contenção); o corredor curto da abertura tem quatro trechos (as
-  // três lutas e a busca), todos à vista.
-  frame({ place: "Galeria de Contenção", sub: "Abertura · Noite · chuva", title: "Trecho 1 de 4 · Partida", team: TWO,
-    route: [["start", "now"], ["combat", "known"], ["loot", "known"], ["combat", "known"]],
+  // O nome do lugar é a proposta da #147 (Corredor de Contenção); o corredor curto da abertura tem cinco trechos (a
+  // partida, as três lutas e a busca entre a primeira e a segunda), todos à vista. O mapa é um subsolo: sem clima.
+  frame({ place: "Corredor de Contenção", sub: "Abertura", title: "Trecho 1 de 5 · Partida", team: TWO,
+    route: [["start", "now"], ["combat", "known"], ["loot", "known"], ["combat", "known"], ["combat", "known"]],
     goal: { kicker: "Objetivo", title: "Chegar à plataforma", text: "O trem no fim do corredor é a saída.", done: false } }) +
   spot(740, 700, 320, 290, 0.5) +
   tip({ x: 1110, y: 560, width: 560, step: 1, title: "Ande até o fim do corredor", text: "O Bento e o Nick andam juntos. As portas fecham atrás de vocês: a saída é para a frente.", keys: [["A|D", "Andar"], ["Shift", "Correr"]], arrow: "left" });
+// Os passos da luta: a dica fica no alto à esquerda, acima das cabeças (a faixa livre sob o REGISTRO), sem seta: o
+// destaque mostra onde apertar.
 // A luta da abertura: o passo 3, escolher a habilidade, e o passo 4, escolher o alvo.
 useCapture("docs/design/tutorial/before/fight_two_hud");
-const tutorialCombat = (p) => combat(p, { bg: "docs/design/tutorial/before/fight_two", withRing: false, target: false,
-  extra: spot(680, 848, 632, 204, 0.5) + tip({ x: 690, y: 236, width: 600, step: 3, title: "Escolha uma habilidade", text: "Cada herói tem quatro. O número no canto é a tecla; a barra de cima diz o nome e o dano.", keys: [["1|2|3|4", "Habilidade"]], arrow: "down" }) });
+const tutorialCombat = (p) => combat(p, { bg: "docs/design/tutorial/before/fight_two", withRing: false, target: false, aim: false,
+  extra: spot(678, 806, 636, 248, 0.5) + tip({ x: 28, y: 108, width: 600, step: 2, title: "Escolha uma habilidade", text: "É a vez do Nick. Cada herói tem quatro; o número no canto é a tecla.", keys: [["1|2|3|4", "Habilidade"]] }) });
 const tutorialTarget = (p) => combat(p, { bg: "docs/design/tutorial/before/fight_two", withRing: false, target: false,
-  extra: spot(1040, 320, 260, 490, 0.5) + tip({ x: 380, y: 236, width: 600, step: 4, title: "Escolha o alvo", text: "Corte de Fase alcança o Recreador. Aperte de novo, ou clique nele, para atacar.", keys: [["Setas", "Trocar o alvo"], ["E", "Atacar"]], arrow: "right" }) });
+  extra: spot(1040, 320, 258, 492, 0.5) + tip({ x: 28, y: 108, width: 600, step: 3, title: "Escolha o alvo", text: "Corte de Fase alcança o Recreador. Aperte E, ou clique nele, para atacar.", keys: [["Setas", "Trocar o alvo"], ["E", "Atacar"]] }) });
 
 // ------------------------------------------------------------------ 3. a visita guiada da Estação
 // A primeira vez na Estação: a tela escurecida, a moldura no que se mostra, a fala do Bento com o retrato e o passo,
@@ -87,7 +89,10 @@ const tutorialTarget = (p) => combat(p, { bg: "docs/design/tutorial/before/fight
 function speech({ step, total, text, x = 560, y = 760, last = false }) {
   return `<div class="abs" data-hit="panel" style="left:${x}px;top:${y}px">` + nine("panel_large", { repeat: "round", cls: "row", extra: "width:860px;gap:18px;align-items:flex-start" },
     `${square("art/ui/portraits/bento.png", 120)}<div class="col" style="flex:1;min-width:0;gap:8px">` +
-    `<div class="row" style="gap:10px;justify-content:space-between"><span class="tx f30 semi amber">Bento</span><span class="tx f22 semi">${step} de ${total}</span></div>` +
+    // O passo como no briefing aprovado: os losangos (o de agora em âmbar) e "2/5".
+    `<div class="row" style="gap:10px;justify-content:space-between"><span class="tx f30 semi amber">Bento</span><div class="row" style="gap:8px">` +
+    Array.from({ length: total }, (_, j) => `<i style="width:10px;height:10px;transform:rotate(45deg);background:${j + 1 === step ? "var(--amber)" : "#4a4e55"}"></i>`).join("") +
+    `<span class="tx f22 semi" style="margin-left:4px">${step}/${total}</span></div></div>` +
     `<span class="wrap f24">${text}</span>` +
     `<div class="row" style="gap:12px;justify-content:flex-end;flex-wrap:wrap">${secondary("Pular visita", { keyLabel: "Esc", hit: "skip", height: 60 })}` +
     `<div style="min-width:240px">${primary(last ? "Começar" : "Próximo", { keyLabel: "E / A", hit: "next", height: 60, size: "f26" })}</div></div></div>`) + `</div>`;
@@ -96,9 +101,13 @@ function speech({ step, total, text, x = 560, y = 760, last = false }) {
 // tx e wrap viram tx-u e wrap-u, com o mesmo estilo), como a confirmação da plataforma do lote 7.
 const UNDER_CSS = `<style>.tx-u{white-space:nowrap;line-height:1.14}.wrap-u{white-space:normal;line-height:1.18}.pill .tx-u{position:relative;font-size:calc(22px*var(--k));font-weight:600}</style>`;
 const still = (html) => UNDER_CSS + html.replace(/ data-hit="[^"]*"/g, "").replace(/ data-avoid="1"/g, "").replace(/class="(tx|wrap)( |")/g, 'class="$1-u$2');
-const tourRoom = () => still(overview({ subtitle: "Ciclo 0 · 4 no elenco" })) + spot(440, 522, 364, 110, 0.62) +
+const tourRoom = () => still(overview({ subtitle: "Ciclo 0 · 4 no elenco", bare: true })) + spot(440, 522, 364, 110, 0.62) +
   speech({ step: 2, total: 5, y: 700, text: "Aqui é o Dormitório. Depois de cada volta, a equipe dorme: quem dorme come e recupera vida e instinto. Alguém pode vigiar." });
-const tourEnd = () => still(overview({ subtitle: "Ciclo 0 · 4 no elenco" })) + spot(1406, 990, 492, 86, 0.62) +
+// No último passo, o destaque é o próprio PREPARAR EXPEDIÇÃO (uma cópia parada por cima, com a moldura do tamanho dele
+// em cada perfil).
+const lit = (inner, style) => `<div class="abs" style="${style}">${still(inner)}<div style="position:absolute;inset:-6px;box-shadow:0 0 0 4000px rgba(5,6,7,.62)">${over("focus_frame")}</div></div>`;
+const tourEnd = () => still(overview({ subtitle: "Ciclo 0 · 4 no elenco", bare: true })) +
+  lit(primary("Preparar expedição", { icon: "expeditions", keyLabel: "G / X" }), "right:28px;bottom:14px;min-width:480px") +
   speech({ step: 5, total: 5, x: 980, y: 640, last: true, text: "Quando estiver pronto, prepare a próxima expedição. A equipe sai de trem daqui, como a gente chegou." });
 
 // ------------------------------------------------------------------ 4. a campanha nova com Pular tutorial

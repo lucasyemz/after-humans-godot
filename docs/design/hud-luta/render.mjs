@@ -81,8 +81,9 @@ const register = () => `<div class="abs" data-hit="log" style="left:46px;top:32p
     `<span class="tx l1 f30 up">Registro</span>` + nine("key_tab", { pad: [2, 2, 2, 2], cls: "row", extra: "width:42px;height:42px;justify-content:center" }, `<span class="tx l1 f26 semi">L</span>`)) + `</div>`;
 
 // A ordem da rodada: a faixa round_strip, o nome no bolso e os retratos a partir de x 244 da peça.
-const order = (p) => `<div class="abs" style="left:636px;top:30px">` +
-  nine("round_strip", { cls: "row", extra: "width:720px;height:64px;gap:0" },
+// Com menos de seis na ordem (o tutorial tem quatro), a faixa encolhe junto, centrada no mesmo lugar.
+const order = (p) => `<div class="abs" style="left:${ORDER.length < 6 ? 996 - (226 + ORDER.length * 68 + 30) / 2 : 636}px;top:30px">` +
+  nine("round_strip", { cls: "row", extra: `width:${ORDER.length < 6 ? 226 + ORDER.length * 68 + 30 : 720}px;height:64px;gap:0` },
     `<span class="tx l1 f30 up" style="width:178px;text-align:center;flex:none">Rodada 1</span><i style="width:48px;flex:none"></i>` +
     `<div class="row" style="gap:8px">${ORDER.map((u) => cell(u, 60, u.id === META.actor, p.cb)).join("")}</div>`) + `</div>`;
 
@@ -137,11 +138,13 @@ const hero = (large) => {
 const RANGE = "4–6";
 const rangeOf = (o) => o.range === undefined ? RANGE : o.range;
 const ICON = (id) => `art/combat/icons/${id}.webp`;
-function abilities(large, { selected = 0, focus = -1, pressed = -1 } = {}) {
+// Do tutorial: aim = false é a vez de quem age, antes de escolher a habilidade (a aba diz "Vez de <nome>", nenhuma
+// escolhida; a barra mostra a do foco do teclado, a primeira, como _show_header faz ao começar a vez).
+function abilities(large, { selected = 0, focus = -1, pressed = -1, aim = true } = {}) {
   const opt = QUOTES.options;
-  const sel = opt[selected];
+  const sel = opt[selected < 0 ? 0 : selected];
   const tab = `<div class="abs" style="left:856px;top:816px">` +
-    nine("target_tab", { cls: "row", extra: `width:336px;height:${large ? 44 : 40}px;padding-left:6px` }, `<span class="tx l1 f26 up">Escolha um alvo</span>`) + `</div>`;
+    nine("target_tab", { cls: "row", extra: `width:336px;height:${large ? 44 : 40}px;padding-left:6px` }, `<span class="tx l1 f26 up">${aim ? "Escolha um alvo" : `Vez de ${ACTOR.name}`}</span>`) + `</div>`;
   const head = `<div class="abs" style="left:684px;top:852px">` +
     nine("ability_header", { cls: "row", extra: "width:624px;height:56px;gap:0" },
       `<div style="width:42px;height:42px;flex:none;margin-left:2px;background:url(${BASE}/${ICON(sel.id)}) center/cover;clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px)"></div>` +
@@ -176,10 +179,10 @@ const BG = (name = "combat") => img(name.includes("/") ? `${name}_clean.webp` : 
 
 // Opções do lote 6 (hud-laco): o fundo da captura, sem o anel (a máscara dele é a do sprite de Nick) e sem o nome do
 // alvo, e o que vai por cima (extra).
-export const combat = (p, { bg = "combat", withRing = true, target = true, extra = "" } = {}) => {
+export const combat = (p, { bg = "combat", withRing = true, target = true, extra = "", aim = true } = {}) => {
   const large = p.k > 1;
   return EXTRA(p) + BG(bg) + (withRing ? ring() : "") + UNITS.map((u) => worldBar(u, large, p.cb)).join("") + (target ? targetName() : "") +
-    register() + order(p) + hero(large) + abilities(large) + actions() + extra;
+    register() + order(p) + hero(large) + abilities(large, aim ? {} : { selected: -1, aim: false }) + actions() + extra;
 };
 
 // ------------------------------------------------------------------ a prancha dos estados

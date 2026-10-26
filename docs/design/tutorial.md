@@ -22,10 +22,12 @@ e a luz fria acesa por dentro. Nada de humano, nada de nome de sistema: as máqu
 automática, como pede a escada de revelações (`narrative-design.md`, §7 e §14).
 
 **O nome (para o Lucas escolher):**
-- **Galeria de Contenção** (a recomendação): diz o que o lugar é e conversa com o "protocolo de contenção" do arco;
-- Subsolo Lacrado.
+- **Corredor de Contenção** (a recomendação): diz o que o lugar é, conversa com o "protocolo de contenção" do arco e não
+  colide com nenhum nome do mundo;
+- Subsolo de Contenção.
 
-As telas do tutorial já usam "Galeria de Contenção".
+"Galeria" ficou de fora porque as Galerias, na lore (§16), são o shopping; "Lacrado", porque o Abrigo Lacrado já existe.
+As telas do tutorial usam "Corredor de Contenção".
 
 ### As zonas
 
@@ -37,8 +39,8 @@ Claude montar o `data/scenarios/<Mapa>.json`.
 |---|---|---|
 | 1. O corredor de contenção | [zone_corridor](tutorial/zone_corridor.webp) · [apagada](tutorial/zone_corridor_dark.webp) | A parede com a faixa de perigo, as lâmpadas vermelhas (acesas e no meio do pisca), as raízes no piso e a porta de segurança aberta à frente |
 | 2. A sala com grades | [zone_cells](tutorial/zone_cells.webp) | Duas celas no fundo, o armário de manutenção (a busca) e o painel das portas |
-| 3. A rota do Nick | [zone_nick_route](tutorial/zone_nick_route.webp) | A porta baixada atrás da equipe, o duto com a grade arrancada e a escada até a grade aberta no teto |
-| 4. A plataforma | [zone_platform](tutorial/zone_platform.webp) | A parede de azulejo da estação esquecida, o vagão no fosso dos trilhos, atrás da borda, com as portas abertas |
+| 3. A rota do Nick | [zone_nick_route](tutorial/zone_nick_route.webp) | A porta baixada atrás da equipe, o duto com a grade arrancada e a escada até o alçapão aberto no teto |
+| 4. A plataforma | [zone_platform](tutorial/zone_platform.webp) | A parede de azulejo da estação esquecida e o vagão no fosso dos trilhos, com as portas abertas e o chão na altura da plataforma; a equipe anda sobre a plataforma, com a faixa amarela na beira do lado do trem |
 | As portas fechando | [zone_doors](tutorial/zone_doors.webp) | A mesma porta aberta, descendo e fechada, com o painel acionado |
 
 ![O corredor de contenção](tutorial/zone_corridor.webp)
@@ -48,8 +50,9 @@ Claude montar o `data/scenarios/<Mapa>.json`.
 ### A arte
 
 Em `art/scenarios/`, no contrato de `tools/sync_scenarios.py`: `T_<código>.webp`, WebP com qualidade 88, até 1024 px no
-lado maior (o vagão vai a 1552, como os fundos grandes). As superfícies são opacas e os recortados têm alfa (os cards
-`masked`). O prefixo do mapa é **TU**. Os interativos (`T_TUX*`) vêm em par, fechado e `_Open`, do mesmo tamanho e
+lado maior, e a importação da Godot como a dos outros cenários (`lossy_quality` 0,75). As superfícies são opacas e os
+recortados têm alfa (os cards `masked`: o jogo corta o alfa em 0,333, então nada depende de transparência parcial; a
+borda dos recortados foi limpa da sobra verde do magenta). O prefixo do mapa é **TU**. Os interativos (`T_TUX*`) vêm em par, fechado e `_Open`, do mesmo tamanho e
 recortados pela mesma caixa, como os de hoje.
 
 ![A prancha da arte](tutorial/art_sheet.webp)
@@ -61,21 +64,22 @@ recortados pela mesma caixa, como os de hoje.
 | `T_TU03` | 8,2 × 4,58 | 1024 × 572 | opaco, repete na horizontal | A parede de azulejo da plataforma |
 | `T_TU04` | 4 × 2,23 | 1024 × 572 | recortado | As grades da cela (atrás delas, o fundo escuro da cela) |
 | `T_TU05` | 3 × 1,95 | 1024 × 667 | recortado | As raízes no piso |
-| `T_TU06` | 2,3 × 4,51 | 522 × 1024 | recortado | A escada até a grade aberta no teto |
+| `T_TU06` | 3,54 × 4,6 | 788 × 1024 | recortado | A escada de lado, até o alçapão aberto na laje do teto (vista de baixo) |
 | `T_TU07` | 1,4 × 1,55 | 868 × 958 | recortado | O duto com a grade arrancada |
-| `T_TU08`, `T_TU08_Lit` | 0,75 × 0,88 | 415 × 488 | recortado | A lâmpada de emergência apagada e acesa (o halo vermelho vai no card aceso) |
-| `T_TU09` | 3,2 × 1,17 | 1024 × 375 | recortado | A borda da plataforma, com a faixa amarela |
-| `T_TU10` | 10 × 4,03 | 1552 × 625 | recortado | O vagão, com a luz fria por dentro e as portas abertas |
+| `T_TU08`, `T_TU08_Lit` | 0,3 × 0,45 | 149 × 222 | recortado | A lâmpada de emergência apagada e acesa (só o vidro clareia; o brilho em volta é a luz da cena) |
+| `T_TU09` | 4,5 × 1,9 | 1024 × 434 | opaco, repete na horizontal | O piso da plataforma, com a faixa amarela na beira do lado do trem |
+| `T_TU10` | 10 × 4,03 | 1024 × 412 | recortado | O vagão, com a luz fria por dentro e as portas abertas |
 | `T_TUX01_Security_Door` (+ `_Open`) | 2,4 × 2,95 | 834 × 1024 | interativo | A porta de segurança: baixada, ou erguida com a luz verde |
 | `T_TUX02_Maintenance_Locker` (+ `_Open`) | 1,45 × 1,88 | 788 × 1024 | interativo (busca) | O armário de manutenção: fechado, ou aberto com curativos, a caixa de ferramentas e uma ração |
 | `T_TUX03_Door_Panel` (+ `_Open`) | 0,62 × 0,98 | 645 × 1024 | interativo | O painel das portas: a alavanca em cima, ou embaixo com duas luzes vermelhas |
 
-São 17 arquivos, 1,9 MB no total.
+São 17 arquivos. As portas de segurança ficam na parede do fundo, de frente: funcionam como as portas laterais de hoje
+(passagem de uma zona para outra), não como um bloqueio que atravessa o corredor.
 
 ### A luz
 
-- **A emergência:** uma luz pontual vermelha em cada lâmpada (proposta: cor [1, 0,28, 0,2], 900 lumens, raio de 6 m), e
-  o card troca `T_TU08` por `T_TU08_Lit` no mesmo ritmo da luz. O pisca sugerido: 0,6 s acesa e 0,4 s quase apagada (a 25%),
+- **A emergência:** uma luz pontual vermelha em cada lâmpada (proposta: cor [1, 0,28, 0,2], 900 lumens, raio de 6 m), que
+  faz o brilho em volta, e o card troca `T_TU08` por `T_TU08_Lit` no mesmo ritmo da luz. O pisca sugerido: 0,6 s acesa e 0,4 s quase apagada (a 25%),
   fora de fase entre lâmpadas vizinhas. Com "Reduzir efeitos", fica acesa sem piscar. Ver
   [zone_corridor](tutorial/zone_corridor.webp) e [zone_corridor_dark](tutorial/zone_corridor_dark.webp).
 - **O trem:** a luz fria por dentro do vagão (já pintada no card) e duas luzes pontuais azuladas
@@ -84,7 +88,7 @@ São 17 arquivos, 1,9 MB no total.
 
 ### Para integrar (é do Claude, na #147)
 
-- **O cenário novo:** proposta de mapa `ContainmentGallery` (nome de tela "Galeria de Contenção", se o Lucas aprovar),
+- **O cenário novo:** proposta de mapa `ContainmentCorridor` (nome de tela "Corredor de Contenção", se o Lucas aprovar),
   com a entrada em `MAPS` e `DISPLAY` de `tools/sync_scenarios.py` e de `scenario_world.gd`, e o prefixo TU.
 - **As medidas** são as da tabela; a escala e a ordem das prévias valem para a montagem.
 - **Os interativos:** a porta (`TUX01`) troca para o `_Open` quando abre e volta ao fechado quando a equipe passa (as
@@ -92,6 +96,8 @@ São 17 arquivos, 1,9 MB no total.
   portas.
 - **A rota do Nick:** a escada (`TU06`) e o duto (`TU07`) marcam a passagem; a cena decide se a equipe passa por cima ou
   por dentro.
+- **A plataforma:** o piso `TU09` na faixa de andar, com a faixa amarela do lado do trem; o vagão fica no fosso, com o
+  chão na altura da plataforma (o piso tapa as rodas).
 
 ## 2. As telas do tutorial (#146)
 
@@ -118,44 +124,55 @@ cortado ou fora da peça, sem alvo sobreposto ou menor que 56 px, com o menor te
 A abertura joga só com o Bento e o Nick (#144). [capture.gd](tutorial/capture.gd) captura a Rua das Vitrines com essa
 equipe, que é o trecho que a #144 usa até o mapa do tutorial ficar pronto: a rua no começo e a primeira luta (contra o
 Recreador e o Emissor de Comando), as duas com a interface escondida. Saiu de noite e com chuva, como o jogo sorteou. A
-Estação e o título usam as capturas de `hud-v2/before`.
+HUD da exploração já mostra o que vale no mapa do tutorial (o nome do lugar, sem clima, que é um subsolo); o fundo é o
+da rua provisória. A Estação e o título usam as capturas de `hud-v2/before`.
 
 ### O que cada tela mostra
 
 - **Os cartões da abertura:** no idioma do cartão de passagem (`passage_card.gd`): o aço escuro, a chapa do kit com o
-  título grande, a divisa com o losango âmbar e a linha de baixo. Embaixo, os quatro passos da abertura (o de agora em
-  âmbar) e, no canto, E Avançar e Esc Pular abertura. Por enquanto só texto, com o fade de hoje.
+  título grande (56 px), a divisa com o losango âmbar e a linha de baixo (30 px, na cor do texto, como no jogo). Embaixo,
+  os quatro passos da abertura em losangos (o de agora em âmbar) e, no canto, E Avançar e Esc Pular abertura. Por
+  enquanto só texto, com o fade de hoje.
 - **O lugar da tirinha:** o quadro 16:9 no alto (1120 × 630 px, na moldura do kit) e a chapa do texto embaixo. Até a
   tirinha existir, o quadro mostra a prévia do corredor de contenção, na medida dela.
 - **Os textos da abertura (para o Lucas aprovar):**
-  1. "Antes da Estação": "As máquinas dos Antigos ainda cumprem ordens que ninguém deu."
+  1. "Antes da Estação": "As máquinas dos Antigos ainda cumprem ordens que ninguém cancelou." (lore §9)
   2. "Bento": "Saiu atrás de suprimentos. Uma área antiga entrou em contenção e baixou as portas com ele lá dentro."
   3. "Nick": "Viajava sozinho. Viu uma saída que as máquinas não vigiam, e voltou."
   4. "A plataforma": "No fim do corredor, um trem ainda espera."
 
   Passam pela regra de consistência (§14): não revelam nada além da fase 1 (máquinas antigas, contenção), não nomeiam
-  sistema nem humanos e seguem o arco do Bento e do Nick.
-- **A dica do tutorial:** uma chapa curta do kit, com "Tutorial", o passo ("1 de 6"), o que fazer, a explicação de uma
-  linha e as teclas; a seta âmbar aponta para o destaque. O destaque é a moldura de foco do kit em volta do que se deve
-  apertar, com o resto da tela escurecido. A dica fica fora do destaque.
-  - **Na exploração (1 de 6):** "Ande até o fim do corredor", com A/D e Shift, e o destaque na dupla. A plaqueta já diz
-    "Galeria de Contenção", e o corredor curto da abertura tem quatro trechos (as três lutas e a busca).
-  - **Na luta (3 de 6):** "Escolha uma habilidade", com as teclas 1 a 4, e o destaque nas quatro habilidades.
-  - **Na luta (4 de 6):** "Escolha o alvo", com as setas e E, e o destaque no Recreador.
-  - Os seis passos propostos: 1 andar, 2 interagir (a busca), 3 a habilidade, 4 o alvo, 5 defender e a Mochila, 6 o
-    trem.
-- **A visita guiada da Estação:** a primeira vez na Estação. A tela escurecida, a moldura no cômodo (ou no botão), e a
-  fala do Bento com o retrato, o passo ("2 de 5"), PULAR VISITA (Esc) e PRÓXIMO (E). Quem guia é o Bento: é o Nick que
-  chega à Estação pela primeira vez. No último passo, o destaque vai para PREPARAR EXPEDIÇÃO, e o botão vira COMEÇAR.
-  A Estação de baixo fica parada (sem alvos) enquanto a visita está aberta.
+  sistema nem humanos e seguem o arco do Bento e do Nick. **Para o Lucas decidir:** no arco (§3), o Bento fica lá
+  dentro por causa da Íris e da Amora; a #144 simplificou a abertura para os dois, e o cartão do Bento também.
+- **A dica do tutorial:** uma chapa do kit (`panel_large`, 560 a 600 px de largura), com "Tutorial", o passo
+  ("1 de 6"), o que fazer (30 px), a explicação de uma linha (22 px) e as teclas (`key`); na exploração, uma seta âmbar
+  de 40 px aponta para o destaque. O destaque é a moldura de foco do kit (`focus_frame`) em volta do que se deve
+  apertar, com o resto da tela escurecido (a 50%). A dica fica fora do destaque e das cabeças.
+  - **O corredor da abertura:** cinco trechos, todos à vista: a partida, a primeira luta, a busca, a segunda e a terceira
+    luta. A plaqueta diz "Corredor de Contenção · Abertura".
+  - **Na exploração (1 de 6):** "Ande até o fim do corredor", com A/D e Shift, e o destaque na dupla.
+  - **Na luta (2 de 6):** "Escolha uma habilidade", com as teclas 1 a 4; a HUD na vez do Nick ("Vez de Nick", nenhuma
+    escolhida) e o destaque na aba e nas quatro habilidades. A dica fica no alto à esquerda, acima das cabeças.
+  - **Na luta (3 de 6):** "Escolha o alvo", com as setas e E; a HUD na mira ("Escolha um alvo") e o destaque no
+    Recreador.
+  - Os seis passos, na ordem do corredor: 1 andar, 2 a habilidade e 3 o alvo (a primeira luta), 4 interagir (a busca),
+    5 defender e a Mochila (a segunda luta), 6 o trem.
+- **A visita guiada da Estação:** a primeira vez na Estação. A tela escurecida (a 62%), a moldura no cômodo (ou no
+  botão), e a fala do Bento (`panel_large` de 860 px, retrato de 120 px), com o passo em losangos e "2/5", como o
+  briefing aprovado, PULAR VISITA (Esc) e PRÓXIMO (E). Quem guia é o Bento: é o Nick que chega à Estação pela primeira
+  vez. No último passo, o destaque vai para PREPARAR EXPEDIÇÃO, na medida do botão em cada perfil, e o botão da fala vira
+  COMEÇAR. A Estação de baixo fica parada (sem alvos), sem cômodo escolhido nem os cartões da esquerda.
 - **A campanha nova:** depois de escolher o espaço (e confirmar, se ele já tem campanha), a escolha entre começar pela
-  abertura (o padrão, recomendado) e Pular tutorial, cada uma com o que ela faz. Pular começa na Estação com os quatro
-  fundadores, como hoje.
+  abertura (o padrão, recomendado) e Pular tutorial, cada uma numa linha (`list_row`, a escolhida com `selected_frame`)
+  com o que ela faz. Pular começa na Estação com os quatro fundadores, como hoje.
 
 ### Para integrar (é do Claude, nas #144 e #145)
 
 - **A dica** é um componente só (a chapa, o passo, as teclas, a seta e o destaque); cada passo diz o alvo do destaque.
-  Ela não pausa a luta, e some quando o jogador faz o que ela pede.
+  Ela não tem "Entendi": não pausa a luta e some quando o jogador faz o que ela pede.
+- **As dicas de primeira vez** (`tips_service.gd`) ficam desligadas durante a abertura e a visita, para não aparecerem
+  junto com a do tutorial; os ids que o tutorial cobre ("explore", "combat", "search", "bag" e "station") contam como
+  vistos. Pulando o tutorial, elas seguem como hoje.
 - **O destaque** recorta o escuro em volta do alvo; a dica e a fala ficam fora dele.
 - **A visita** usa o mesmo destaque, com a fala no lugar da dica; Esc pula.
 - **Os cartões da abertura** reaproveitam o `passage_card.gd`, com os quatro passos e o pular.
@@ -163,9 +180,11 @@ Estação e o título usam as capturas de `hud-v2/before`.
 ## Como refazer
 
 As imagens brutas ficam fora do Git, em `images/tutorial/` do projeto na Awesomic: as superfícies (`tu-wall-corridor`,
-`tu-floor`, `tu-wall-platform`), a folha dos recortados (`tu-props-sheet`, a referência) e cada peça em separado
-(`tu-bars`, `tu-roots`, `tu-ladder`, `tu-duct`, `tu-platform-edge`), o vagão (`tu-train-sheet-2`, com o interior
-pintado) e os pares fechado e aberto (`tu-door-*`, `tu-locker-*`, `tu-panel-*`; o aberto é uma edição do fechado). As
+`tu-floor`, `tu-wall-platform`, `tu-platform-floor`), a folha dos recortados (`tu-props-sheet`: a referência das peças
+e a fonte da lâmpada), cada peça em separado (`tu-bars`, `tu-roots`, `tu-ladder-2`, `tu-duct`), o vagão
+(`tu-train-sheet-2`, com o interior pintado) e os pares fechado e aberto (`tu-door-*`, `tu-locker-*`, `tu-panel-*`; o
+aberto é uma edição do fechado). `tu-ladder` e `tu-platform-edge` foram a primeira versão (a escada e a borda na
+perspectiva errada para a câmera lateral). As
 referências de estilo foram texturas de hoje (`T_DE*`, `T_PT*`, `T_AL*`).
 
 Da raiz do repositório:
@@ -180,9 +199,37 @@ Da raiz do repositório:
 4. `python3 -m http.server 8765 --bind 127.0.0.1` e, noutro terminal, `node docs/design/tutorial/render.mjs http://127.0.0.1:8765`.
 5. `python3 -B docs/design/tutorial/compose.py`: as reduções, o cinza, o antes e depois e o `checks.json`.
 
-**Fora desta pasta:** `hud-luta/render.mjs` aceita o caminho de um DTO e de um fundo (o nome com "/") e monta a faixa da
-rodada com menos de seis unidades. A luta do lote de hoje sai igual.
+**Fora desta pasta** (as telas desses lotes saem iguais):
+- `hud-luta/render.mjs` aceita o caminho de um DTO e de um fundo (o nome com "/"), encolhe a faixa da rodada com menos
+  de seis unidades e mostra a vez de quem age antes da mira (`aim: false`: a aba "Vez de <nome>");
+- `hud-estacao/render.mjs`: `overview({ bare: true })` tira o cômodo escolhido e os cartões da esquerda.
 
 ## QA de design
 
 As rodadas seguem [qa.md](qa.md) e ficam registradas abaixo e no PR.
+
+### Rodada 1: REPROVADO
+
+Aprovados na rodada: o escopo, o contrato e a reprodução byte a byte da arte, o estilo (sem texto nas imagens), a luta
+da hud-luta igual e a cobertura das duas issues.
+
+**Alta, corrigido:** o halo da lâmpada acesa virava um disco chapado (o jogo corta o alfa em 0,333). O card aceso só
+clareia o vidro, no mesmo quadro do apagado; o brilho em volta é a luz pontual da cena.
+
+**Média, corrigidos:**
+- A franja verde nas bordas dos recortados: o recorte limita o verde ao maior dos outros canais nas bordas.
+- A escada e a borda da plataforma na perspectiva errada: a escada refeita de lado, até o alçapão no teto; a borda virou
+  o piso da plataforma (opaco), com a faixa amarela do lado do trem, e a prévia monta o vagão com o chão na altura da
+  plataforma.
+- A visita contradizia a fala: a Estação de baixo sem cômodo escolhido nem os cartões da esquerda.
+- O destaque fora do alvo no Maior: no fim da visita, a moldura é do tamanho do botão em cada perfil; na luta, o destaque
+  pega a aba e a barra.
+- O passo da habilidade: a HUD na vez do Nick ("Vez de Nick"), e as dicas da luta no alto à esquerda, acima das cabeças.
+- A rota e os passos: cinco trechos (três lutas e a busca) e os seis passos na ordem do corredor.
+- A narrativa: "ordens que ninguém cancelou" (lore §9), e o nome proposto é Corredor de Contenção (Galeria e Lacrado
+  colidiam com nomes do mundo).
+- As dicas de primeira vez: desligadas durante a abertura e a visita (nota de integração).
+
+**Baixa, corrigidos:** a plaqueta sem clima; o vagão em 1024 px; a importação com `lossy_quality` 0,75; as medidas das
+peças na página; o passo da visita em losangos; o subtítulo do cartão na cor do texto; a faixa da rodada encolhendo com
+quatro; "Como refazer" (a lâmpada sai da folha); as portas como passagem de zona; a Íris e a Amora levadas ao Lucas.
