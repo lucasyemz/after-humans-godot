@@ -1342,6 +1342,46 @@
         "colorblind": "#a9d8f5"
       },
       "axis_stretch_horizontal": "TILE"
+    },
+    "cargo_hatch": {
+      "file": "art/ui/kit/station/cargo_hatch.webp",
+      "size": [
+        200,
+        168
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        22,
+        20,
+        155,
+        127
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Compartimento lacrado da carga do guardião (#91), 200x168, sem fatiar. Escolha: selected_frame por cima; foco: focus_frame.",
+      "sha256": "cbd42e9f198e30eca24f7124d6301cba787bd2782e85fc6f9c583496dbfc2997"
+    },
+    "cargo_hatch_open": {
+      "file": "art/ui/kit/station/cargo_hatch_open.webp",
+      "size": [
+        200,
+        168
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        22,
+        48,
+        155,
+        99
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "O compartimento aberto: o ícone do que havia (48) no meio do vão e o texto embaixo, fora da peça. Os outros cinco abrem apagados (o texto no tom apagado); o escolhido fica com selected_frame e o texto em âmbar.",
+      "sha256": "fc7c7be913229e8319c7b7f496b978e86327a97cca2e96324e9f61ece20df4e8"
     }
   },
   "trait_ids": {
@@ -1371,6 +1411,24 @@
         64
       ],
       "sha256": "6993aafeb20c92b51ff0591657b2512a892be873a939ba53d6bc681a878fc810",
+      "kind": "glyph_white_tintable"
+    },
+    "bond_friend": {
+      "file": "art/ui/kit/station/icons/bond_friend.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6a735b8c9d77ac157408d42ca6ec05d399244c81425525dc5251611886ca8fbc",
+      "kind": "glyph_white_tintable"
+    },
+    "bond_rival": {
+      "file": "art/ui/kit/station/icons/bond_rival.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "201b91c075ca278057145552ca840984b4904518ff598796a990a91857d6a68d",
       "kind": "glyph_white_tintable"
     },
     "expeditions": {

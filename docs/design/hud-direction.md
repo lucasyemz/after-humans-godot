@@ -4,9 +4,9 @@
 
 A HUD tem dois kits de peças:
 - **o da luta, feito pelo Codex:** `art/ui/kit/combat`, com 18 peças;
-- **o da Estação, da exploração e do fluxo, feito pelo agente da Awesomic:** `art/ui/kit/station`, com 58 peças (45
-  antes do lote 4, 57 antes do lote 5), os estados de cada uma (foco, pressionado, desabilitado, selecionado) e as conferências de
-  `docs/design/hud-kit/lib.mjs`.
+- **o da Estação, da exploração e do fluxo, feito pelo agente da Awesomic:** `art/ui/kit/station`, com 60 peças (45
+  antes do lote 4, 57 antes do lote 5, 58 antes do lote 6), os estados de cada uma (foco, pressionado, desabilitado,
+  selecionado) e as conferências de `docs/design/hud-kit/lib.mjs`.
 
 O Lucas achou o da Awesomic mais completo, e **ele é o padrão** de toda a HUD, inclusive a luta.
 

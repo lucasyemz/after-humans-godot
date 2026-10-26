@@ -5,31 +5,46 @@
 // Uso (da raiz do repositório, com python3 -m http.server 8765 servindo a raiz):
 //   node docs/design/hud-luta/render.mjs http://127.0.0.1:8765
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 import { setBase, BASE, KIT, nine, over, img, glyph, divider, run } from "../hud-kit/lib.mjs";
 
 setBase(process.argv[2] || "http://127.0.0.1:8765");
 const OUT = process.argv[3] || "docs/design/hud-luta/.render";
-const META = JSON.parse(fs.readFileSync("docs/design/loop-screens/before/combat.json", "utf8"));
-const QUOTES = JSON.parse(fs.readFileSync("docs/design/hud-c/session_quotes.json", "utf8")).combat;
-
+// A captura de base (os DTOs de loop-screens/before/<nome>.json): a luta do alvo é "combat"; o lote 6 (hud-laco) usa as
+// dos laços. useCapture troca a captura; as partes da tela leem META, UNITS, ACTOR e ORDER daqui.
+let META, QUOTES, UNITS, ACTOR, ORDER;
 // O centro de cada unidade na captura: o meio da plaquinha do nome que o jogo desenha sob ela (como no render.py do alvo).
 const center = (u) => {
   const t = META.texts.find((t) => t.text === u.name && t.rect[1] > 650 && t.rect[1] < 800);
   return Math.round(t.rect[0] + t.rect[2] / 2);
 };
-const UNITS = META.units.map((u) => ({ ...u, cx: center(u) }));
-const ACTOR = UNITS.find((u) => u.id === META.actor);
-// A ordem da rodada como a captura mostra (RODADA 1, Nick · agora, Íris, Emissor, Bento, Véspera, Recreador).
-const ORDER = (() => {
-  const ts = META.texts.map((t) => t.text);
-  const i = ts.findIndex((t) => t.startsWith("RODADA"));
-  const left = [...UNITS];
-  return ts.slice(i + 1, i + 7).map((n) => {
-    const u = left.find((u) => u.name.includes(n.split(" · ")[0]));
-    left.splice(left.indexOf(u), 1);
-    return u;
-  });
-})();
+export function useCapture(name = "combat") {
+  META = JSON.parse(fs.readFileSync(`docs/design/loop-screens/before/${name}.json`, "utf8"));
+  QUOTES = name === "combat" ? JSON.parse(fs.readFileSync("docs/design/hud-c/session_quotes.json", "utf8")).combat : quotesFrom(META);
+  UNITS = META.units.map((u) => ({ ...u, cx: center(u) }));
+  ACTOR = UNITS.find((u) => u.id === META.actor);
+  // A ordem da rodada como a captura mostra (RODADA 1, Nick · agora, Íris, Emissor, Bento, Véspera, Recreador).
+  ORDER = (() => {
+    const ts = META.texts.map((t) => t.text);
+    const i = ts.findIndex((t) => t.startsWith("RODADA"));
+    const left = [...UNITS];
+    return ts.slice(i + 1, i + 7).map((n) => {
+      const u = left.find((u) => u.name.includes(n.split(" · ")[0]));
+      left.splice(left.indexOf(u), 1);
+      return u;
+    });
+  })();
+}
+// Sem as cotações da sessão (as capturas dos laços), as habilidades de quem age saem de data/abilities.json, na ordem da
+// classe: dá para usar quando a posição de agora está entre as de origem, e o alcance é o texto que a captura mostra.
+function quotesFrom(meta) {
+  const actor = meta.units.find((u) => u.id === meta.actor);
+  const ts = meta.texts.map((t) => t.text);
+  const rows = JSON.parse(fs.readFileSync("data/abilities.json", "utf8")).filter((a) => a.ClassId === actor.class_id);
+  return { options: rows.map((a) => ({ id: a.Name, name: a.DisplayName, usable: a.OriginRanks.includes(actor.rank),
+    range: /^\d+–\d+$/.test(ts[ts.indexOf(a.DisplayName) + 1] || "") ? ts[ts.indexOf(a.DisplayName) + 1] : "", description: a.Description })) };
+}
+useCapture();
 const FACE = { Bento: "bento", Nick: "nick", "Íris": "iris", "Véspera": "vespera" };
 // Os rostos: o retrato dos heróis e, nas máquinas, o recorte do sprite (coordenadas do canvas 1178 convertidas para a
 // textura de 589, como no render.py do alvo).
@@ -105,7 +120,7 @@ const hero = (large) => {
   return `<div class="abs" style="left:64px;top:836px">` +
     nine("panel_large", { pad: [14, 22, 14, 14], cls: "row", extra: "width:564px;height:212px;gap:22px;align-items:center" },
       `<div data-hit="hero-inspect" style="position:relative;width:184px;height:184px;flex:none">` +
-      `<div style="position:absolute;inset:4px;background:#1b1d20 url(${BASE}/art/ui/portraits/nick.png) no-repeat;background-size:${256 * 176 / 168}px auto;background-position:${-40 * 176 / 168}px ${-14 * 176 / 168}px"></div>` +
+      `<div style="position:absolute;inset:4px;background:#1b1d20 url(${BASE}/art/ui/portraits/${FACE[ACTOR.name]}.png) no-repeat;background-size:${256 * 176 / 168}px auto;background-position:${-40 * 176 / 168}px ${-14 * 176 / 168}px"></div>` +
       nine("hero_tab", { extra: "position:absolute;inset:0" }) + `</div>` +
       `<div class="col" style="gap:${large ? 6 : 10}px;flex:1;min-width:0">` +
       `<span class="tx l1 f40 semi up" style="margin-bottom:${large ? 0 : 4}px">${ACTOR.name}</span>` +
@@ -114,6 +129,7 @@ const hero = (large) => {
 
 // As habilidades: a aba ESCOLHA UM ALVO, a barra com o ícone, o nome e o dano, e os quatro quadrados.
 const RANGE = "4–6";
+const rangeOf = (o) => o.range === undefined ? RANGE : o.range;
 const ICON = (id) => `art/combat/icons/${id}.webp`;
 function abilities(large, { selected = 0, focus = -1, pressed = -1 } = {}) {
   const opt = QUOTES.options;
@@ -124,7 +140,7 @@ function abilities(large, { selected = 0, focus = -1, pressed = -1 } = {}) {
     nine("ability_header", { cls: "row", extra: "width:624px;height:56px;gap:0" },
       `<div style="width:42px;height:42px;flex:none;margin-left:2px;background:url(${BASE}/${ICON(sel.id)}) center/cover;clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px)"></div>` +
       `<span class="tx l1 f32 up" style="margin-left:14px;flex:1;min-width:0">${sel.name}</span>` +
-      `<span class="tx l1 f28" style="width:104px;text-align:center;flex:none">${RANGE}</span>`) + `</div>`;
+      `<span class="tx l1 f28" style="width:104px;text-align:center;flex:none">${rangeOf(sel)}</span>`) + `</div>`;
   const slots = opt.map((o, i) => {
     const x = 688 + i * 160, y = 916;
     const state = !o.usable ? "ability_slot_disabled" : i === pressed ? "ability_slot_pressed" : "ability_slot";
@@ -149,13 +165,15 @@ const actions = () => ACTIONS.map(([icon, cap], i) => {
 }).join("");
 
 const EXTRA = (p) => `<style>:root{--enemy:${p.cb ? "var(--danger-fill)" : "#d23a2e"}}.l1{line-height:1.1}</style>`;
-const BG = () => img("docs/design/loop-screens/before/combat_clean.webp", "position:absolute;inset:0;width:1920px;height:1080px") +
+const BG = (name = "combat") => img(`docs/design/loop-screens/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px") +
   `<div class="abs" style="left:0;top:796px;width:1920px;height:284px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.24))"></div>`;
 
-const combat = (p) => {
+// Opções do lote 6 (hud-laco): o fundo da captura, sem o anel (a máscara dele é a do sprite de Nick) e sem o nome do
+// alvo, e o que vai por cima (extra).
+export const combat = (p, { bg = "combat", withRing = true, target = true, extra = "" } = {}) => {
   const large = p.k > 1;
-  return EXTRA(p) + BG() + ring() + UNITS.map((u) => worldBar(u, large, p.cb)).join("") + targetName() +
-    register() + order(p) + hero(large) + abilities(large) + actions();
+  return EXTRA(p) + BG(bg) + (withRing ? ring() : "") + UNITS.map((u) => worldBar(u, large, p.cb)).join("") + (target ? targetName() : "") +
+    register() + order(p) + hero(large) + abilities(large) + actions() + extra;
 };
 
 // ------------------------------------------------------------------ a prancha dos estados
@@ -208,4 +226,5 @@ function states(p) {
     `<div class="row" style="gap:60px;align-items:flex-start">${strip}${ringBox}</div>` + bars + `</div>`;
 }
 
-await run({ combat, states }, OUT);
+// Importado (o lote 6), este arquivo não gera nada.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) await run({ combat: (p) => combat(p), states }, OUT);

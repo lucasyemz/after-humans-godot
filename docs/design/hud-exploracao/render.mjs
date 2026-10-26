@@ -51,6 +51,8 @@ export function frame({ place = "Rua das Vitrines", sub = "Jornada 1 · Fim de t
         .map(([i, l, v]) => `<div class="row" style="gap:8px">${glyph(i, 30)}<div class="col"><span class="tx f20 up muted">${l}</span><span class="tx f26 semi amber">${v}</span></div></div>`).join("")) +
     nine("cost_chip", { cls: "row", extra: "gap:14px;min-height:44px" },
       `<span class="tx f20 up muted">Achado</span>` + [["lobby-seed.svg", found[0]], ["lobby-scrap.svg", found[1]], ["lobby-fragment.svg", found[2]]]
+        // Os suprimentos (a carga do guardião, #91) só aparecem quando há algum, como no jogo.
+        .concat(found[3] ? [["lobby-food.svg", found[3]]] : [])
         .map(([i, v]) => `<div class="row" style="gap:6px">${glyph(i, 24)}<span class="tx f22 semi">${v}</span></div>`).join("")) + `</div>`;
   const plates = `<div class="abs row" style="left:28px;bottom:14px;gap:8px">` + team.map(([hero, name, hp, max]) =>
     `<div data-hit="hero">` + nine("panel", { cls: "row", extra: "min-width:226px;min-height:80px;gap:10px" },
