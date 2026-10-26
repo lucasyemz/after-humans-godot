@@ -152,8 +152,10 @@ A Sala (`scripts/ui/station/character_room.gd`) também é a tela inteira:
   - a relíquia (com Trocar), o trauma (com Tratar), os contadores e os traços pintados com o + e o −.
 - **Embaixo:** VOLTAR, + RECRUTAR (o recrutamento e o Memorial, que estavam no painel antigo), as teclas, as abas da
   Estação e PREPARAR EXPEDIÇÃO (G/X). Bloqueado, o motivo fica dentro do botão.
-- **O fundo é o próprio cômodo** (ajuste da revisão do #104): a câmera enquadra o Alojamento entre os dois painéis, sem
-  a plataforma nem o trem. Os moradores do cômodo somem enquanto a Sala está aberta.
+- **O fundo é o próprio cômodo** (ajuste da revisão do #104): a câmera fecha na altura do Alojamento (do teto ao piso,
+  entre a plaqueta e o pé do herói), sem a plataforma e o trem em cima nem o andar de baixo. Todos os moradores somem
+  enquanto a Sala está aberta, para ninguém aparecer no vão entre os painéis.
+- **As Opções (a engrenagem) e o Plano (INSTALAÇÕES)** abertos da Sala voltam para ela ao fechar.
 - **TREINAR** abre o diálogo com as duas melhorias da espécie. A escolhida ganha a moldura âmbar; TREINAR confirma e
   CANCELAR volta.
 
@@ -168,7 +170,8 @@ A Sala (`scripts/ui/station/character_room.gd`) também é a tela inteira:
 - **Abates** é a conta da carreira (`kills_count`, que existia no herói sem ser contado). A volta agora soma nela as
   máquinas derrubadas. Os saves antigos começam do zero.
 - **+ RECRUTAR** fica ao lado de VOLTAR: as quatro abas dos heróis enchem a coluna, como no alvo.
-- **O fundo da Sala é mais aberto que o do alvo:** a câmera mostra o Alojamento inteiro numa faixa atrás do herói.
+- **A barra das teclas diz a tecla de Voltar** (`cancel`: Backspace no teclado padrão; o Esc também volta). No Maior, ela
+  fica entre os dois painéis.
 
 ## Rodadas da QA
 
@@ -188,7 +191,29 @@ A Sala (`scripts/ui/station/character_room.gd`) também é a tela inteira:
      - as áreas de toque eram menores que as do alvo.
    - **Baixas corrigidas:** a crise em ferrugem e o anel saindo já na tela do fim.
 
-2. **Decisão do Lucas, entre as rodadas:** o padrão dos componentes é o kit da Awesomic, também na luta. O Painel, a
+2. **A Estação (e a regressão da luta), reprovada.** A regressão da rodada 1 passou.
+   - **Médias, corrigidas:**
+     - O fundo da Sala mostrava o trem, a plataforma e moradores de outros andares. A câmera agora fecha na altura do
+       cômodo, e todos os moradores somem. Havia também um defeito antigo: a passagem, ao terminar, voltava à chave de
+       antes e desfazia o enquadramento pedido no meio dela.
+     - A carta do herói caído estourava a largura no Maior: o texto agora quebra a linha.
+     - G abria o mapa por cima do Treino: com o diálogo aberto, G não faz nada.
+     - As Opções e o Plano abertos da Sala não voltavam para ela: agora voltam.
+     - Faltavam testes das regras novas. Entrou `tests/test_station_kit.gd`, que cobre:
+       - o foco e o objetivo no relatório;
+       - a fase liberada só na primeira vitória, e não na última fase nem num save antigo;
+       - os abates somados uma vez;
+       - a fila sobre as cartas, a menos de 20 px;
+       - V e G no relatório e no Treino;
+       - as Opções voltando à Sala;
+       - os moradores escondidos.
+   - **Baixas, corrigidas:**
+     - a barra das teclas e o Cancelar do Treino mostram a tecla de Voltar;
+     - as folgas no Maior;
+     - o ícone afastado do título nos botões principais;
+     - o caído sem a ★.
+   - **Baixa, fica como está:** VOLTAR e o X não são alcançados só com as setas na Sala. O Esc e o B fazem as duas coisas.
+3. **Decisão do Lucas, entre as rodadas:** o padrão dos componentes é o kit da Awesomic, também na luta. O Painel, a
    Plaqueta, os Botões e a Barra da luta passaram para os componentes, e um teste confere que as peças aposentadas
    do Codex não voltam.
 

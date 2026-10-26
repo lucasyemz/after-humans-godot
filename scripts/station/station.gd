@@ -48,6 +48,9 @@ const REPORT_FEET_Y := 634.0
 ## Na fila do relatório, um pouco mais afastados que na partida: a câmera recua e os heróis cabem entre a faixa do alto
 ## (que cresce no texto Maior) e as abas das cartas.
 const REPORT_SPACING := 2.6
+## A Sala dos Personagens no kit (#60): o teto e o piso do cômodo na tela.
+const STAGE_TOP := 112.0
+const STAGE_FLOOR := 900.0
 ## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
 ## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
 ## o candidato desce e anda; só então a câmera fecha nele. Na saída: o recusado volta ao trem, o sino avisa, as portas
@@ -77,8 +80,8 @@ var hud: AHRefugeHud
 var menu_right := SCREEN_MENU_RIGHT
 var camera: Camera3D
 var residents := {}
-## O cômodo com os moradores escondidos por uma tela do kit ("" nenhum).
-var _hidden_room := ""
+## Os moradores escondidos por uma tela do kit (hide_residents).
+var _residents_hidden := false
 ## Na plataforma (o relatório, o trem, a partida) ou no abrigo; a passagem secreta liga os dois.
 var on_platform := false
 var lineup: Array = []
@@ -279,6 +282,9 @@ static func _lerp_key(a: Dictionary, b: Dictionary, t: float) -> Dictionary:
 
 func _set_goal(key: Dictionary, instant: bool = false) -> void:
 	_goal = key
+	# No meio da passagem, a chave nova vira o fim do caminho (senão a passagem, ao terminar, voltava à de antes).
+	if not _path.is_empty() and not instant:
+		_path[-1] = key
 	if instant:
 		_key = key
 		_apply_key(_key)
@@ -362,23 +368,34 @@ func focus_room(room_id: String, instant: bool = false) -> void:
 	_go(_framed_key(room.x0 - 0.3, room.x1 + 0.3, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
 
 
-## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): o fundo do próprio cômodo atrás
-## do herói, sem a plataforma nem o trem.
+## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): a câmera fecha na altura do
+## cômodo (do teto em STAGE_TOP ao piso em STAGE_FLOOR, na tela), então o fundo atrás do herói é só o próprio cômodo,
+## sem a plataforma e o trem em cima nem o andar de baixo.
 func focus_room_stage(room_id: String, left_px: float, right_px: float, instant: bool = false) -> void:
 	var room := room_def(room_id)
 	if room.is_empty():
 		return
-	_go(_framed_key(room.x0 + 0.6, room.x1 - 0.6, room.floor + 1.55, left_px, right_px, 26.0, -3.0, 0.0), false, instant)
+	var fov := 26.0
+	var pitch := -3.0
+	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
+	var depth: float = focal * (room.ceiling - room.floor) / (STAGE_FLOOR - STAGE_TOP)
+	var drop := atan((STAGE_FLOOR - 540.0) / focal) + deg_to_rad(-pitch)
+	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * depth / focal
+	_go({"pos": Vector3(x, room.floor + depth * tan(drop), depth), "fov": fov, "pitch": pitch}, false, instant)
 
 
-## Os moradores (heróis e civis) do cômodo somem enquanto uma tela do kit cobre o cômodo (nenhuma lasca de alguém na
-## borda de um painel).
-func hide_room_residents(room_id: String, hidden: bool) -> void:
-	for walker in _walkers:
-		var home: String = walker.get("room", S.civilian(walker.get("civilian", "")).get("room", "") if walker.has("civilian") else "")
-		if home == room_id and is_instance_valid(walker.card):
-			walker.card.visible = not hidden
-	_hidden_room = room_id if hidden else ""
+## A câmera chegou aonde ia (sem caminho pela passagem e perto da chave).
+func camera_settled() -> bool:
+	return _path.is_empty() and not _goal.is_empty() and _key.pos.distance_to(_goal.pos) < 0.02
+
+
+## Todos os moradores (heróis e civis) somem enquanto uma tela do kit cobre a Estação: nenhum aparece no vão entre os
+## painéis nem numa lasca na borda deles.
+func hide_residents(hidden: bool) -> void:
+	_residents_hidden = hidden
+	for card in residents.values():
+		if is_instance_valid(card):
+			card.visible = not hidden
 
 
 ## A plataforma onde o trem para e o candidato espera.
@@ -562,7 +579,7 @@ func clear_lineup() -> void:
 		if is_instance_valid(entry.card):
 			entry.card.queue_free()
 		if residents.has(entry.hero_id):
-			residents[entry.hero_id].visible = true
+			residents[entry.hero_id].visible = not _residents_hidden
 	lineup.clear()
 	for contact in _contacts:
 		if is_instance_valid(contact):
@@ -1130,8 +1147,8 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
 	# Refeitos os passeios (depois do trem, por exemplo), quem dorme volta para o beliche.
 	_update_sleepers()
-	if _hidden_room != "":
-		hide_room_residents(_hidden_room, true)
+	if _residents_hidden:
+		hide_residents(true)
 
 
 ## A arte do herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).

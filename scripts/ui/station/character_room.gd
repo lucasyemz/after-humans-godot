@@ -138,7 +138,7 @@ func _top(c: Dictionary) -> void:
 	AHKit.style_as(gear, "icon", Vector4(18, 18, 18, 18))
 	gear.custom_minimum_size = Vector2(92, 92)
 	gear.position = Vector2(1800, 14)
-	gear.pressed.connect(func(): hud.open_service("options"))
+	gear.pressed.connect(func(): hud.open_from_room("options"))
 	add_child(gear)
 
 
@@ -847,7 +847,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	cancel.add_theme_font_size_override("font_size", AHKit.size("primary"))
 	cancel.custom_minimum_size = Vector2(0, 64)
 	cancel.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	var cancel_key := AHKitKey.make("", "%s / B" % AHUiStyle.key_name("menu"), "button")
+	var cancel_key := AHKitKey.make("", "%s / B" % AHUiStyle.key_name("cancel"), "button")
 	cancel_key.name = "Key"
 	cancel.add_child(cancel_key)
 	cancel.pressed.connect(func():
@@ -900,7 +900,7 @@ func _bottom(c: Dictionary) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	keys.add_child(row)
-	for spec in [[tr("Setas"), tr("Navegar")], [AHUiStyle.key_name("interact"), tr("Selecionar")], [AHUiStyle.key_name("menu"), tr("Voltar")],
+	for spec in [[tr("Setas"), tr("Navegar")], [AHUiStyle.key_name("interact"), tr("Selecionar")], [AHUiStyle.key_name("cancel"), tr("Voltar")],
 			[AHUiStyle.key_name("hide_hud"), tr("Ocultar")]]:
 		var key := AHKitKey.make("", spec[0])
 		row.add_child(key)
@@ -909,9 +909,18 @@ func _bottom(c: Dictionary) -> void:
 		gap.custom_minimum_size = Vector2(8, 0)
 		row.add_child(gap)
 	add_child(keys)
+	# Entre os dois painéis: o que não cabe (no Maior, com uma tecla de nome longo) sai do fim, par a par; Ocultar e
+	# Voltar também estão nas abas e no VOLTAR.
+	var room := RIGHT.position.x - LEFT.end.x - 24.0
+	while keys.get_combined_minimum_size().x > room and row.get_child_count() > 3:
+		for i in 3:
+			var last := row.get_child(row.get_child_count() - 1)
+			row.remove_child(last)
+			last.queue_free()
 	keys.reset_size()
 	keys.size = keys.get_combined_minimum_size()
-	keys.position = Vector2(962 - keys.size.x * 0.5, 928)
+	# Centrada em x 962, sem encostar nos painéis.
+	keys.position = Vector2(clampf(962 - keys.size.x * 0.5, LEFT.end.x + 12.0, maxf(LEFT.end.x + 12.0, RIGHT.position.x - 12.0 - keys.size.x)), 928)
 	keys.visible = not Settings.touch_visible()
 	# As abas da Estação.
 	var tabs := HBoxContainer.new()
@@ -978,7 +987,7 @@ func _nav(id: String) -> void:
 		"overview":
 			hud.close_panel()
 		"facilities":
-			hud.open_service("plan")
+			hud.open_from_room("plan")
 		"research":
 			hud.open_room(S.RESEARCH)
 		"hide":

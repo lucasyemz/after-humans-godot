@@ -163,7 +163,7 @@ func _band() -> void:
 	right_width += 8.0 * maxi(0, shown.size() - 1)
 	var heading := AHKit.label(tr("Recursos recuperados"), "text", AHKit.MUTED, false, true)
 	right_width = maxf(right_width, maxf(240.0, heading.get_minimum_size().x))
-	var right_x := BAND.size.x - 20.0 - right_width
+	var right_x := BAND.size.x - 30.0 - right_width
 	# No meio: os chips e a dica da noite.
 	var middle := VBoxContainer.new()
 	middle.add_theme_constant_override("separation", 14)
@@ -376,7 +376,7 @@ func _card(hero_id: String) -> Control:
 	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	name_row.add_child(name_label)
 	# O destaque da volta (quem mais fez: dano, cura em dobro e quedas valendo cinco) ganha a estrela âmbar.
-	if hero_id == _best():
+	if hero_id == _best() and hero.alive:
 		var star := AHKit.label("★", "card_name", AHKit.AMBER, true)
 		star.name = "Best"
 		star.tooltip_text = tr("Destaque da expedição")
@@ -398,7 +398,10 @@ func _card(hero_id: String) -> Control:
 		var pill := AHKitPill.make(int(hero.hp), int(hero.max_hp))
 		state_row.add_child(pill)
 	else:
-		names.add_child(AHKit.label(tr("Não voltou: está no Memorial."), "text", AHKit.alert_text()))
+		var gone := AHKit.label(tr("Não voltou: está no Memorial."), "text", AHKit.alert_text())
+		gone.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		gone.custom_minimum_size = Vector2(180, 0)
+		names.add_child(gone)
 	# A vida: no texto Maior, o número vai na linha da barra (a carta não cresce para cima da fila).
 	var big := AHUiStyle.text_scale > 1.2
 	var life_row := HBoxContainer.new() if big else null
@@ -582,6 +585,8 @@ static func _primary(text: String, icon_name: String, action: String) -> Button:
 	button.icon = AHKit.icon(icon_name)
 	button.expand_icon = false
 	button.add_theme_constant_override("icon_max_width", 34)
+	# O ícone afastado do título (no Maior, encostava).
+	button.add_theme_constant_override("h_separation", 14)
 	button.add_theme_color_override("icon_normal_color", Color("1a1408"))
 	button.add_theme_color_override("icon_focus_color", Color("1a1408"))
 	button.add_theme_color_override("icon_hover_color", Color("1a1408"))

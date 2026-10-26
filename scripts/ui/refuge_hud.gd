@@ -83,6 +83,8 @@ var _tags: Control
 var _report_screen: AHStationReport
 ## A Sala dos Personagens no kit (#60): a tela inteira, com o cômodo ao fundo.
 var _room_screen: AHCharacterRoom
+## A tela do kit de onde as Opções ou o Plano foram abertos (a Sala): fechar volta para ela.
+var _back_to := ""
 ## O que some com o relatório aberto (o título, os recursos e a faixa escura do alto): a tela do kit tem os seus.
 var _chrome: Array = []
 var _tag_nodes := {}
@@ -279,7 +281,8 @@ func _input(event: InputEvent) -> void:
 	if Tips.showing() and event.is_action_pressed("interact"):
 		return
 	# Preparar expedição (G/X, só nas telas da Estação, #60): na vista geral e na Sala dos Personagens.
-	if event.is_action_pressed("station_prepare") and not _map.visible and (current == "" or current == S.CHARACTERS):
+	var training: bool = is_instance_valid(_room_screen) and _room_screen.training
+	if event.is_action_pressed("station_prepare") and not _map.visible and not training and (current == "" or current == S.CHARACTERS):
 		get_viewport().set_input_as_handled()
 		var block := S.preparation_block(Campaign.state)
 		if block != "":
@@ -933,6 +936,11 @@ func close_panel() -> void:
 	_panel.visible = false
 	_close_report_screen()
 	_close_room_screen()
+	var back := _back_to
+	_back_to = ""
+	if back != "":
+		open_room(back)
+		return
 	_prep_selected = -1
 	if _prep != null:
 		_prep.visible = false
@@ -2080,13 +2088,19 @@ func _character_room() -> void:
 	add_child(_room_screen)
 	move_child(_room_screen, _panel.get_index())
 	station.focus_room_stage(S.CHARACTERS, AHCharacterRoom.LEFT.end.x, AHCharacterRoom.RIGHT.position.x)
-	station.hide_room_residents(S.CHARACTERS, true)
+	station.hide_residents(true)
+
+
+## Abre as Opções ou o Plano a partir da Sala: fechar volta para a Sala.
+func open_from_room(service: String) -> void:
+	open_service(service)
+	_back_to = S.CHARACTERS
 
 
 func _close_room_screen() -> void:
 	if is_instance_valid(_room_screen):
 		_room_screen.queue_free()
-		station.hide_room_residents(S.CHARACTERS, false)
+		station.hide_residents(false)
 	_room_screen = null
 
 

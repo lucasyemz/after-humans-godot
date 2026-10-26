@@ -78,7 +78,10 @@ func _run() -> void:
 	bento.xp = 90
 	c.inventory.seeds = maxi(5, int(c.inventory.get("seeds", 0)))
 	station.hud.open_room(S.CHARACTERS)
-	await _frames(150)
+	# A foto com a câmera já no cômodo (ela vem pela passagem).
+	await _frames(10)
+	await _until(func(): return station.camera_settled())
+	await _frames(20)
 	await _shot("3-characters")
 	station.hud._room_screen.training = true
 	station.hud._room_screen.rebuild()
