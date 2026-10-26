@@ -1826,6 +1826,87 @@
       ],
       "sha256": "67e00def98654285637c297434e63bd894b43e6d60b5805bece64a09d8f2f063",
       "kind": "glyph_white_tintable"
+    },
+    "resource_seeds": {
+      "file": "art/ui/kit/station/icons/resource_seeds.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "b50f33a7116bab7800ed4f469db6a005b1d91bee24e274a7011fdefd0ddf52b9",
+      "kind": "painted"
+    },
+    "resource_scrap": {
+      "file": "art/ui/kit/station/icons/resource_scrap.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "ff70513f57c168ff78fb0a42a785271b38f72a42374c9d13b25dd89a29b7c632",
+      "kind": "painted"
+    },
+    "resource_fragments": {
+      "file": "art/ui/kit/station/icons/resource_fragments.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "1e7228dc3fd733ae3817d0350c052a1e333b7720c1df819c4ef4a5c43a6771c2",
+      "kind": "painted"
+    },
+    "resource_food": {
+      "file": "art/ui/kit/station/icons/resource_food.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "bd3da2e174aea1f75acd7299b5c421bf08a041421fe0024ba3907e84eb25b843",
+      "kind": "painted"
+    },
+    "resource_supplies": {
+      "file": "art/ui/kit/station/icons/resource_supplies.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "bd3da2e174aea1f75acd7299b5c421bf08a041421fe0024ba3907e84eb25b843",
+      "kind": "painted"
+    },
+    "resource_water": {
+      "file": "art/ui/kit/station/icons/resource_water.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "c2e6c0b508ee35e033cad6121943cb0fb2713f5e609a30fe546049e411a2eb2f",
+      "kind": "painted"
+    },
+    "resource_bandages": {
+      "file": "art/ui/kit/station/icons/resource_bandages.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "c65e9bc6b3e83617917d5ecfebec2af903145f91ae16b9791c1eaeb26c7a0d4b",
+      "kind": "painted"
+    },
+    "resource_hope": {
+      "file": "art/ui/kit/station/icons/resource_hope.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "38fee2d0429bcbba4f59b521b2d7ea8cdf73da57a637dd9c4d571e94e17b592d",
+      "kind": "painted"
+    },
+    "resource_power": {
+      "file": "art/ui/kit/station/icons/resource_power.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "b986439c42289d33a3f2ea450b598a12e64aa8ee5ab8f064b813660381dc093a",
+      "kind": "painted"
     }
   },
   "font": {
