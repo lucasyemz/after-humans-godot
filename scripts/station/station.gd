@@ -33,6 +33,8 @@ const SHARE_ROOM_CHANCE := 0.3
 ## Passeio (a Unreal anda a 120 cm/s); quem desce do trem anda a 3 m/s.
 const WALK_SPEED := 1.2
 const TRAIN_WALK_SPEED := 3.0
+## Distância mínima entre quem para na mesma faixa: ninguém para em cima do outro.
+const STOP_GAP := 1.1
 ## Banco atrás da mesa da Cantina: os dois lugares e a profundidade (CanteenSeats, CanteenSeatY).
 const CANTEEN_SEATS := [17.6, 19.4]
 const CANTEEN_SEAT_Z := -5.94
@@ -1145,6 +1147,16 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		residents[civilian_id] = card
 		# Civil morador: alterna o idle e a pose de trabalho, parado no posto dele.
 		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
+	# Ninguém começa em cima de outro (o morador fica no meio do cômodo, e o herói sorteado podia cair nele).
+	for walker in _walkers:
+		if walker.has("civilian") or not walker.has("hero_id"):
+			continue
+		var card: AHSpriteCard = walker.card
+		for attempt in 8:
+			if not _crowded(walker, card.position.x):
+				break
+			card.position.x = rng.randf_range(walker.min, walker.max)
+		walker.target = card.position.x
 	# Refeitos os passeios (depois do trem, por exemplo), quem dorme volta para o beliche.
 	_update_sleepers()
 	if _residents_hidden:
@@ -1196,11 +1208,18 @@ func _walk(delta: float) -> void:
 						card.show_art(walker.idle)
 						card.position.z = walker.home_z
 						walker.pause = randf_range(4.0, 10.0)
+						# De volta à faixa, colado em alguém (o morador do cômodo): sai andando em vez de esperar ali.
+						if _crowded(walker, card.position.x):
+							walker.wait = 0.0
+							_choose_target(walker)
 					continue
 				walker.pause -= delta
+				# O posto do meio da faixa é de um só: com alguém trabalhando nele, espera a vez.
+				if walker.pause <= 0.0 and walker.wait > 0.0 and _post_taken(walker):
+					walker.pause = randf_range(3.0, 6.0)
 				if walker.pause <= 0.0 and walker.wait > 0.0:
 					card.show_art(_poses[walker.hero_id + "_work"])
-					card.position = Vector3((walker.min + walker.max) * 0.5, walker.floor, -5.6)
+					card.position = Vector3(_work_post(walker), walker.floor, -5.6)
 					card.set_facing(1.0)
 					card.scale = Vector3.ONE
 					walker.working = randf_range(12.0, 26.0)
@@ -1221,6 +1240,12 @@ func _walk(delta: float) -> void:
 			if walker.get("seat", -1) >= 0:
 				_sit_down(walker)
 				continue
+			# Chegou perto demais de alguém parado (que parou ali enquanto ele andava): segue para outro ponto.
+			if _crowded(walker, card.position.x) and not walker.get("rerouted", false):
+				walker.rerouted = true
+				_choose_target(walker)
+				continue
+			walker.rerouted = false
 			walker.wait = randf_range(2.5, 7.0)
 			continue
 		card.set_facing(signf(gap))
@@ -1230,8 +1255,13 @@ func _walk(delta: float) -> void:
 
 func _choose_target(walker: Dictionary) -> void:
 	var card: AHSpriteCard = walker.card
-	# Pelo menos 1 m de caminhada; perto de uma ponta, vai para a outra.
+	# Pelo menos 1 m de caminhada e longe de quem está parado ou indo parar na mesma faixa; perto de uma ponta, vai
+	# para a outra.
 	var target := randf_range(walker.min, walker.max)
+	for attempt in 8:
+		if absf(target - card.position.x) >= 1.0 and not _crowded(walker, target):
+			break
+		target = randf_range(walker.min, walker.max)
 	if absf(target - card.position.x) < 1.0:
 		target = walker.min if card.position.x > (walker.min + walker.max) * 0.5 else walker.max
 	# Na Cantina, às vezes vai sentar no banco livre atrás da mesa (só os fundadores têm a pose sentada).
@@ -1243,6 +1273,40 @@ func _choose_target(walker: Dictionary) -> void:
 				target = CANTEEN_SEATS[seat]
 				break
 	walker.target = target
+
+
+## Há alguém parado (ou indo parar) a menos de STOP_GAP de x, na mesma faixa (o mesmo andar e a mesma profundidade).
+func _crowded(walker: Dictionary, x: float) -> bool:
+	var card: AHSpriteCard = walker.card
+	for other in _walkers:
+		if other == walker or not is_instance_valid(other.card) or not other.card.visible:
+			continue
+		var them: AHSpriteCard = other.card
+		if absf(them.position.y - card.position.y) > 0.5 or absf(them.position.z - card.position.z) > 1.5:
+			continue
+		var moving: bool = not other.has("civilian") and other.get("wait", 0.0) <= 0.0 and other.get("sitting", 0.0) <= 0.0
+		var spot: float = float(other.get("target", them.position.x)) if moving else them.position.x
+		if absf(spot - x) < STOP_GAP or absf(them.position.x - x) < STOP_GAP:
+			return true
+	return false
+
+
+## O posto de trabalho: o meio da faixa ou, com alguém ali (o morador do cômodo fica no meio), ao lado.
+func _work_post(walker: Dictionary) -> float:
+	var middle: float = (walker.min + walker.max) * 0.5
+	for offset in [0.0, STOP_GAP + 0.4, -(STOP_GAP + 0.4)]:
+		var x: float = clampf(middle + offset, walker.min, walker.max)
+		if not _crowded(walker, x):
+			return x
+	return middle
+
+
+## Alguém já trabalha no posto do meio da faixa deste cômodo.
+func _post_taken(walker: Dictionary) -> bool:
+	for other in _walkers:
+		if other != walker and other.get("room", "") == walker.get("room", "") and other.get("working", 0.0) > 0.0:
+			return true
+	return false
 
 
 func _sit_down(walker: Dictionary) -> void:
