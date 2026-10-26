@@ -1280,6 +1280,21 @@ title_screen.gd: Esc
 title_screen.gd: Esc / B
 title_screen.gd: slot
 briefing_dialog.gd: Esc
+exploration_hud.gd: exposto
+exploration_hud.gd: cansado
+exploration_hud.gd: preparado
+exploration_hud.gd: tool
+exploration_hud.gd: id
+journey_rules.gd: exposto
+journey_rules.gd: vuln
+journey_rules.gd: once
+journey_rules.gd: cansado
+journey_rules.gd: speed
+journey_rules.gd: preparado
+journey_rules.gd: tool
+combat_session.gd: speed
+combat_session.gd: vuln
+journey_rules.gd: log
 phase_map.gd: enemies
 phase_map.gd: story
 phase_map.gd: Plaque

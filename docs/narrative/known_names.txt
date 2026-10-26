@@ -59,6 +59,7 @@ Curativos
 Semente
 Sementes
 Fragmento
+Fragmentos
 Vida Máxima
 Velocidade
 Superação

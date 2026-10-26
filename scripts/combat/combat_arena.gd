@@ -263,7 +263,9 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 ## Começa a luta: hero_cards e enemy_cards já estão na cena (na ordem da formação). enemies: ids ou os inimigos já
 ## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
 func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
-	session = AHCombatSession.create(heroes, enemies, opening, seed_value)
+	# Os efeitos de fase dos eventos (#78): valem nesta luta; o de uma luta só (Exposto) se gasta aqui.
+	session = AHCombatSession.create(heroes, enemies, opening, seed_value, 80, AHJourneyRules.phase_effects(Campaign.state))
+	AHJourneyRules.spend_fight_effects(Campaign.state)
 	session.use_expedition(Campaign.state)
 	Tips.show_tip("combat")
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.

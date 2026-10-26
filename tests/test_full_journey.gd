@@ -147,8 +147,19 @@ func _journey() -> bool:
 			continue
 		street.corridor.debug_next_fight()
 		await _frames(2)
+		# Os efeitos de fase dos eventos (#78) na primeira luta: Exposto vale só nela, Preparado até o fim da fase.
+		var first_fight: bool = route.steps.filter(func(s): return (s.type == "combat" or s.type == "boss") and s.resolved).is_empty()
+		if first_fight:
+			route.effects = ["exposto", "preparado"]
 		if not await _walk_into_fight(street):
 			return false
+		if first_fight:
+			var lines := Array(street._arena.session.state.combat_log)
+			t.check(lines.has("Exposto: a equipe começa Vulnerável.") and lines.has("Preparado: a equipe começa com 1 Bloqueio."), "a luta da rua começa com os efeitos de fase")
+			t.equal(route.effects, ["preparado"], "o Exposto se gasta na luta; o Preparado fica para a fase")
+			# O resto da jornada sem efeitos, como antes: o teste confere o fluxo, e o Preparado mudaria o sorteio das lutas
+			# (o debriefing da fase 1 cala se o Bento não volta).
+			route.effects = []
 		if not await _auto_fight(street):
 			return false
 	# A carga recuperada do guardião (#91): escolhe a primeira caixa e continua.

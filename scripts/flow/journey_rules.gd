@@ -39,6 +39,15 @@ const PHASES := [
 		"description": "Bombas antigas mantêm a água em movimento, e os filtros foram trocados há pouco tempo, não há gerações. Na eclusa central, o Porteiro guarda uma ordem de contenção que ninguém cancelou."},
 ]
 const DIFFICULTY_NAMES := ["Fácil", "Moderada", "Difícil", "Muito difícil"]
+## Os efeitos de fase dos eventos (corridor.effects) na luta (#78, decisão do Lucas: a luta aplica): cada herói começa a
+## luta com os marcadores (vuln, block) e a velocidade a mais ou a menos (speed). once: vale só na próxima luta (sai da
+## lista quando ela começa); sem once, até o fim da fase. good: bom para a equipe (o chip do resultado). text: o chip;
+## log: a linha do Registro, já dentro da luta.
+const PHASE_EFFECTS := {
+	"exposto": {"vuln": 1, "once": true, "good": false, "text": "Exposto: próxima luta Vulnerável", "log": "Exposto: a equipe começa Vulnerável."},
+	"cansado": {"speed": -1, "good": false, "text": "Cansado: -1 de velocidade até o fim da fase", "log": "Cansado: a equipe tem -1 de velocidade."},
+	"preparado": {"block": 1, "good": true, "text": "Preparado: 1 Bloqueio no começo das lutas", "log": "Preparado: a equipe começa com 1 Bloqueio."},
+}
 ## A escada da história (docs/narrative/narrative-design.md §7), uma camada por fase: 1 Sobrevivência, 2 O despertar,
 ## 3 Origem, 4 Contradição, 5 Presença humana (#64). O evento de história de cada fase abre na primeira Passagem dela.
 const STORY_EVENTS := {"fase_2": "voz_interfone", "fase_3": "porta_espera", "fase_5": "sobrevivente_tuneis"}
@@ -600,6 +609,25 @@ static func lose_tool(campaign: Dictionary, tool: String) -> void:
 	campaign.tools.erase(tool)
 
 
+## Os efeitos de fase que valem na próxima luta da expedição (os ids de PHASE_EFFECTS em corridor.effects).
+static func phase_effects(campaign: Dictionary) -> Array:
+	var expedition = campaign.get("session", {}).get("expedition")
+	if expedition == null:
+		return []
+	return Array(expedition.get("corridor", {}).get("effects", [])).filter(func(id): return PHASE_EFFECTS.has(id))
+
+
+## A luta começou: os efeitos de uma luta só (Exposto) saem da lista; os da fase ficam.
+static func spend_fight_effects(campaign: Dictionary) -> void:
+	var expedition = campaign.get("session", {}).get("expedition")
+	if expedition == null or not expedition.has("corridor"):
+		return
+	var effects: Array = expedition.corridor.get("effects", [])
+	for id in effects.duplicate():
+		if bool(PHASE_EFFECTS.get(id, {}).get("once", false)):
+			effects.erase(id)
+
+
 static func _team_alive(campaign: Dictionary) -> Array:
 	var team: Array = campaign.session.expedition.team
 	var out: Array = []
@@ -1003,15 +1031,20 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 			hurt = hero.display_name
 			if hero.hp != hp_before:
 				changes.push_front({"kind": "life", "amount": hero.hp - hp_before, "hero": hurt})
-	grant_tool(campaign, String(effects.get("GrantTool", "")))
-	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "":
+	if grant_tool(campaign, String(effects.get("GrantTool", ""))):
+		changes.append({"kind": "tool", "amount": 1, "hero": "", "id": String(effects.GrantTool)})
+	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "" and has_tool(campaign, choice.RequirementTool):
 		lose_tool(campaign, choice.RequirementTool)
+		changes.append({"kind": "tool", "amount": -1, "hero": "", "id": String(choice.RequirementTool)})
 	var unlock: String = effects.get("UnlockClass", "")
 	if unlock != "" and not campaign.unlocked_classes.has(unlock):
 		campaign.unlocked_classes.append(unlock)
 	for effect in effects.get("PhaseEffects", []):
 		if not expedition.corridor.effects.has(effect):
 			expedition.corridor.effects.append(effect)
+		# O chip diz o efeito, mesmo se ele já valia (o texto do resultado o promete de novo).
+		if PHASE_EFFECTS.has(effect):
+			changes.append({"kind": "effect", "amount": 1 if PHASE_EFFECTS[effect].good else -1, "hero": "", "id": String(effect)})
 	var resolution := String(effects.get("Result", "")).replace("{Instinto}", str(instinct)).replace("{Heroi}", hurt)
 	event.resolution = resolution if resolution != "" else String(choice.get("Text", "…"))
 	# O modelo em português e o que entra nele, para a tela traduzir (#35, #64): o save continua em português.
