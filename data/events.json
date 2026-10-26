@@ -956,7 +956,7 @@
         "RequirementText": "Arriscado",
         "FailChance": 0.4,
         "Success": {
-          "Result": "A outra metade está lá, molhada. Ela fala de \"amostras de origem\" e para no meio de uma frase que começa com \"não foram\". As duas metades não contam a mesma história. (+2 Fragmento)",
+          "Result": "A outra metade está lá, molhada. Ela fala de \"amostras de origem\" e para no meio de uma frase que começa com \"não foram\". As duas metades não contam a mesma história. (+2 Fragmentos)",
           "FragmentsDelta": 2
         },
         "Failure": {

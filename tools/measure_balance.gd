@@ -22,6 +22,8 @@
 ##   base · hp25 (inimigos com +25% de vida) · dmg1 (+1 de dano) · more (+1 inimigo, cópia do da frente, nas patrulhas
 ##   com menos de 4) · lesscare (metade da comida grátis, 1 curativo e a ampola sem recarga na vitória).
 ## A coluna da jornada com cuidados mostra também quantas ampolas, em média, a Íris usou fora da luta.
+## --effects=exposto,cansado,preparado (#78) põe os efeitos de fase dos eventos na expedição, como o jogo: na medida luta a
+##   luta, cada luta começa com eles; na jornada, o Exposto vale só na primeira luta e os outros até o fim. Sem a opção, nenhum.
 ## --stars (#91) troca a tabela pelas estrelas da luta: a média, quantas lutas vencidas dão 1, 2 e 3 estrelas e quanto
 ##   cada critério é cumprido (AHFightRewards.criteria, as mesmas regras da tela do fim).
 extends SceneTree
@@ -55,6 +57,7 @@ var option := "base"
 var gear := "none"
 var levels := "none"
 var stars := false
+var effects: Array = []
 ## Por fase e tipo de luta: {wins, stars, by_stars [0, 1, 2, 3], criteria {id: cumpridos}}.
 var _stars := {}
 var _counting := false
@@ -92,6 +95,8 @@ func _run() -> void:
 			levels = arg.trim_prefix("--levels=")
 		elif arg == "--stars":
 			stars = true
+		elif arg.begins_with("--effects="):
+			effects = Array(arg.trim_prefix("--effects=").split(",", false))
 	if not POLICIES.has(policy) or not OPTIONS.has(option) or not GEARS.has(gear) or not LEVELS.has(levels):
 		push_error("Política (%s), opção (%s), gear (%s) ou níveis (%s) desconhecido." % [" | ".join(POLICIES), " | ".join(OPTIONS), " | ".join(GEARS), " | ".join(LEVELS)])
 		quit(1)
@@ -108,6 +113,13 @@ func _run() -> void:
 		team_text += " · níveis " + (", ".join(PHASES.map(func(id): return "%s %d" % [id, table[id]])) if levels != "max" else "10")
 		if levels == "typical":
 			team_text += " (XP por jornada: %s)" % ", ".join(PHASES.map(func(id): return "%.0f" % _journey_xp.get(id, 0.0)))
+	for id in effects:
+		if not J.PHASE_EFFECTS.has(id):
+			push_error("Efeito desconhecido: %s (%s)." % [id, " | ".join(J.PHASE_EFFECTS.keys())])
+			quit(1)
+			return
+	if not effects.is_empty():
+		team_text += " · efeitos " + ", ".join(effects)
 	print("política=%s opção=%s gear=%s níveis=%s sementes=%d · %s" % [policy, option, gear, levels, seeds, team_text])
 	if stars:
 		print("fase   | luta      | vitórias | estrelas | 1★ · 2★ · 3★          | ninguém caiu · rodadas · golpe final · instinto | rodadas das vitórias: 25% · mediana · 75%")
@@ -176,6 +188,7 @@ func _new_campaign(seed_value: int, phase_id: String, level: int = 0) -> Diction
 	_equip(campaign, phase_id)
 	_level_up(campaign, phase_id, level)
 	J.start_expedition(campaign, phase_id, 1000 + seed_value * 7)
+	campaign.session.expedition.corridor.effects = effects.duplicate()
 	if option == "lesscare":
 		campaign.session.expedition.food = int(campaign.session.expedition.food) / 2
 		campaign.inventory.bandages = mini(1, int(campaign.inventory.bandages))
@@ -250,7 +263,8 @@ func _fight(campaign: Dictionary, index: int, seed_value: int) -> Dictionary:
 	if heroes.is_empty():
 		return {"result": "defeat", "rounds": 0, "hp_left": 0.0}
 	var enemies: Array = _apply_option(J.corridor_enemies(expedition, index), expedition.corridor.steps[index].type == "boss")
-	var session = Session.create(heroes, enemies, false, seed_value * 131 + index)
+	var session = Session.create(heroes, enemies, false, seed_value * 131 + index, 80, J.phase_effects(campaign))
+	J.spend_fight_effects(campaign)
 	session.use_expedition(campaign)
 	# O sorteio da política fraca depende só da luta: as opções comparam as mesmas escolhas.
 	_rng.seed = seed_value * 131 + index

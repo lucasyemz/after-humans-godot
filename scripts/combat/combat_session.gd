@@ -28,13 +28,21 @@ var xp_gained := {}
 
 ## heroes: heróis da campanha (Campaign.state.roster) na ordem da formação. enemies: da frente para trás, cada um o id
 ## do inimigo ou já montado pelo corredor ({enemy_id, unit_id, rank, hp, max_hp, damage_bonus, display_name}).
-static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed_value: int = -1, hope: int = 80) -> AHCombatSession:
+## phase_effects: os efeitos de fase da expedição (AHJourneyRules.phase_effects, #78): a velocidade entra antes da
+## iniciativa e os marcadores (Vulnerável, Bloqueio) já estão nos heróis quando a luta começa.
+static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed_value: int = -1, hope: int = 80,
+		phase_effects: Array = []) -> AHCombatSession:
 	var session := AHCombatSession.new()
 	session.data = GameData.combat
 	session.random = AHCombatRandom.new(seed_value if seed_value >= 0 else randi())
 	session.context = AHCombat.Context.new()
 	session.context.hope = hope
 	var players: Array = []
+	var marks := {"speed": 0, "vuln": 0, "block": 0}
+	for id in phase_effects:
+		var effect: Dictionary = AHJourneyRules.PHASE_EFFECTS.get(id, {})
+		for key in marks:
+			marks[key] += int(effect.get(key, 0))
 	for index in heroes.size():
 		var hero: Dictionary = heroes[index]
 		# O nível (#90): a velocidade, o +1 numa habilidade e o instinto a menos no começo da luta (a vida já está no herói).
@@ -44,8 +52,11 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 			"Id": hero.id, "ClassId": hero.class_id, "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
 			"Instinct": maxi(0, int(hero.get("instinct", 0)) - int(bonus.calm)), "Perks": hero.get("perks", []), "Trauma": hero.get("trauma", false),
 			"RelicId": hero.get("relic_id", ""), "ExpeditionUses": hero.get("expedition_uses", {}),
-			"SpeedBonus": bonus.speed, "AbilityBonus": bonus.abilities,
+			"SpeedBonus": int(bonus.speed) + marks.speed, "AbilityBonus": bonus.abilities,
 		}, index + 1, session.data))
+		var unit: Unit = players[-1]
+		unit.tokens.vuln = mini(AHCombatEngine.TOKEN_CAP, marks.vuln)
+		unit.tokens.block = mini(AHCombatEngine.TOKEN_CAP, marks.block)
 	var enemies: Array = []
 	var next_rank := 1
 	for index in enemies_in.size():
@@ -64,6 +75,9 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 		next_rank += row.FormationSize if row != null and row.FormationSize > 0 else 1
 	session.state = AHCombatEngine.init_combat(players, enemies, session.context, session.data, session.random, opening)
 	session.engine = AHCombatEngine.new(session.state, session.context, session.data, session.random)
+	for id in phase_effects:
+		if AHJourneyRules.PHASE_EFFECTS.has(id):
+			session.state.combat_log.append(TranslationServer.translate(AHJourneyRules.PHASE_EFFECTS[id].log))
 	return session
 
 

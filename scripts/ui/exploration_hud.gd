@@ -876,14 +876,32 @@ func event_art() -> Texture2D:
 	return load(path) if ResourceLoader.exists(path) else null
 
 
+## O marcador que o efeito de fase dá na luta (#78).
+const EFFECT_ICONS := {"exposto": "status-vulnerable_bad", "cansado": "intent-move", "preparado": "status-block_good"}
 ## Os ícones das mudanças do resultado do evento (journey_rules, event.changes).
 const CHANGE_ICONS := {"life": "intent-heal", "hope": "res-hope", "food": "lobby-food", "bandages": "res-bandages",
 	"scrap": "lobby-scrap", "fragments": "lobby-fragment", "seeds": "lobby-seed", "instinct": "intent-unknown"}
 
 
-## O texto de uma mudança do evento ("+2 Comida", "-6 de vida").
-func _change_text(kind: String, amount: int) -> String:
+## O ícone do chip: o da ferramenta, o do marcador do efeito de fase ou o do recurso.
+func _change_icon(change: Dictionary) -> String:
+	match String(change.kind):
+		"tool":
+			return AHInventoryPanel.TOOL_ICONS.get(String(change.get("id", "")), "tool-generic")
+		"effect":
+			return EFFECT_ICONS.get(String(change.get("id", "")), "intent-unknown")
+	return CHANGE_ICONS.get(String(change.kind), "intent-unknown")
+
+
+## O texto de uma mudança do evento ("+2 Comida", "-6 de vida", "+ Máscara com filtro", "Exposto: …"). id: a ferramenta
+## ou o efeito de fase.
+func _change_text(kind: String, amount: int, id: String = "") -> String:
 	match kind:
+		"tool":
+			var tool := tr(AHInventoryPanel.TOOL_NAMES.get(id, id.capitalize()))
+			return (tr("+ %s") if amount > 0 else tr("- %s")) % tool
+		"effect":
+			return tr(String(AHJourneyRules.PHASE_EFFECTS.get(id, {}).get("text", id)))
 		"life": return tr("%+d de vida") % amount
 		"hope": return tr("%+d de Esperança") % amount
 		"food": return tr("%+d Comida") % amount
@@ -940,12 +958,12 @@ func show_event(campaign: Dictionary) -> void:
 			box.add_child(flow)
 			for change in changes:
 				var amount := int(change.amount)
-				var text := _change_text(String(change.kind), amount)
+				var text := _change_text(String(change.kind), amount, String(change.get("id", "")))
 				if String(change.get("hero", "")) != "":
 					text += " · " + String(change.hero)
-				# O instinto que sobe é perda; o resto, quando baixa.
+				# O instinto que sobe é perda; o resto, quando baixa (a ferramenta perdida e o efeito ruim também).
 				var loss := amount > 0 if change.kind == "instinct" else amount < 0
-				flow.add_child(_change_chip(CHANGE_ICONS.get(String(change.kind), "intent-unknown"), text, AHKit.alert_text() if loss else AHKit.good()))
+				flow.add_child(_change_chip(_change_icon(change), text, AHKit.alert_text() if loss else AHKit.good()))
 		_modal.set_meta("continue", true)
 		first = _primary(tr("Continuar"), "", tr("%s / A") % S.key_name("interact"), func(): event_closed.emit())
 		first.name = "Continue"
