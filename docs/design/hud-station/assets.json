@@ -1312,6 +1312,36 @@
       ],
       "note": "O X do inimigo no canto de baixo à direita do retrato da ordem da rodada, nos perfis com daltonismo (o fundo vermelho das máquinas some no cinza). Não fatiar.",
       "sha256": "067c45452009056c72e225645798e6722c3fcefa9870aae0b950b4150ed1c971"
+    },
+    "bar_preview": {
+      "file": "art/ui/kit/station/bar_preview.webp",
+      "size": [
+        64,
+        16
+      ],
+      "nine_slice_ltrb": [
+        0,
+        4,
+        0,
+        4
+      ],
+      "content_xywh": [
+        0,
+        0,
+        64,
+        16
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A vida prevista (acampamento, com o foco num cuidado): por cima do bar_fill, do fim da vida de agora até a prevista, tingida de verde claro (#a6e3ae; azul claro #a9d8f5 no daltonismo). Riscas: forma, além da cor. Na largura, TILE (axis_stretch_horizontal), com a altura da barra: as riscas mantêm o passo de 8 px.",
+      "sha256": "54a8500771ccca9eb450c709a81f9bbab8561863c1a5e0433d37f9fe4894bc31",
+      "tint": {
+        "normal": "#a6e3ae",
+        "colorblind": "#a9d8f5"
+      },
+      "axis_stretch_horizontal": "TILE"
     }
   },
   "trait_ids": {
@@ -1584,6 +1614,24 @@
         64
       ],
       "sha256": "d3f135d98bceb4e892d0a36e3e6a15744ddb04915afa2972143e44165bdee9fd",
+      "kind": "glyph_white_tintable"
+    },
+    "star": {
+      "file": "art/ui/kit/station/icons/star.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6303277c0fd4da83d43aecebfd368ff7bf9e61a162d51ff9fe605f5fdf2eabbb",
+      "kind": "glyph_white_tintable"
+    },
+    "star_empty": {
+      "file": "art/ui/kit/station/icons/star_empty.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "bce3158ccc6ef5a60360f4f05d4fda2b2811ce1364b894471823e23113743ddf",
       "kind": "glyph_white_tintable"
     },
     "state_active": {
