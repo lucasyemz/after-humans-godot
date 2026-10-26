@@ -46,7 +46,7 @@ const DIFFICULTY_NAMES := ["Fácil", "Moderada", "Difícil", "Muito difícil"]
 const PHASE_EFFECTS := {
 	"exposto": {"vuln": 1, "once": true, "good": false, "text": "Exposto: próxima luta Vulnerável", "log": "Exposto: a equipe começa Vulnerável."},
 	"cansado": {"speed": -1, "good": false, "text": "Cansado: -1 de velocidade até o fim da fase", "log": "Cansado: a equipe tem -1 de velocidade."},
-	"preparado": {"block": 1, "good": true, "text": "Preparado: 1 Bloqueio no começo das lutas", "log": "Preparado: a equipe começa com 1 Bloqueio."},
+	"preparado": {"block": 1, "once": true, "good": true, "text": "Preparado: 1 Bloqueio na próxima luta", "log": "Preparado: a equipe começa com 1 Bloqueio."},
 }
 ## A escada da história (docs/narrative/narrative-design.md §7), uma camada por fase: 1 Sobrevivência, 2 O despertar,
 ## 3 Origem, 4 Contradição, 5 Presença humana (#64). O evento de história de cada fase abre na primeira Passagem dela.
@@ -617,7 +617,7 @@ static func phase_effects(campaign: Dictionary) -> Array:
 	return Array(expedition.get("corridor", {}).get("effects", [])).filter(func(id): return PHASE_EFFECTS.has(id))
 
 
-## A luta começou: os efeitos de uma luta só (Exposto) saem da lista; os da fase ficam.
+## A luta começou: os efeitos de uma luta só (Exposto e Preparado) saem da lista; os da fase (Cansado) ficam.
 static func spend_fight_effects(campaign: Dictionary) -> void:
 	var expedition = campaign.get("session", {}).get("expedition")
 	if expedition == null or not expedition.has("corridor"):

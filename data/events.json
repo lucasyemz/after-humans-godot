@@ -215,7 +215,7 @@
         "Text": "Carregar as placas como escudo",
         "RequirementText": "Bom e ruim até o fim da fase",
         "Success": {
-          "Result": "As placas aguentam pancada, mas pesam nas costas a cada passo. (Preparado e Cansado até o fim da fase: a equipe começa as lutas com 1 Bloqueio e tem −1 de velocidade)",
+          "Result": "As placas aguentam pancada, mas pesam nas costas a cada passo. (Preparado na próxima luta: a equipe começa com 1 Bloqueio. Cansado até o fim da fase: −1 de velocidade)",
           "PhaseEffects": [
             "preparado",
             "cansado"

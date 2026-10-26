@@ -1,6 +1,6 @@
 ## Os efeitos de fase dos eventos na luta (#78, decisão do Lucas: a luta aplica corridor.effects). Exposto: a próxima
 ## luta começa com cada herói Vulnerável, e o efeito sai da lista quando ela começa. Cansado: −1 de velocidade nas lutas
-## até o fim da fase. Preparado: 1 Bloqueio no começo de cada luta da fase. O resultado do evento diz o efeito num chip.
+## até o fim da fase. Preparado: 1 Bloqueio no começo da próxima luta (decisão do Lucas no #136). O resultado do evento diz o efeito num chip.
 extends RefCounted
 
 const R = preload("res://scripts/flow/journey_rules.gd")
@@ -66,7 +66,7 @@ func _combat() -> void:
 		"sem efeito, o registro não fala dele")
 
 
-## A luta começou: o Exposto (uma luta só) sai; Cansado e Preparado ficam até o fim da fase. Expedição nova, lista vazia.
+## A luta começou: o Exposto e o Preparado (uma luta só) saem; o Cansado fica até o fim da fase. Expedição nova, lista vazia.
 func _spend() -> void:
 	var c: Dictionary = Campaign.create_initial(5)
 	R.start_expedition(c, "fase_1", 78)
@@ -74,9 +74,9 @@ func _spend() -> void:
 	c.session.expedition.corridor.effects = ["exposto", "cansado", "preparado", "desconhecido"]
 	t.equal(R.phase_effects(c), ["exposto", "cansado", "preparado"], "a luta lê só os efeitos com regra")
 	R.spend_fight_effects(c)
-	t.equal(c.session.expedition.corridor.effects, ["cansado", "preparado", "desconhecido"], "o Exposto se gasta na luta")
+	t.equal(c.session.expedition.corridor.effects, ["cansado", "desconhecido"], "o Exposto e o Preparado se gastam na luta")
 	R.spend_fight_effects(c)
-	t.equal(R.phase_effects(c), ["cansado", "preparado"], "os da fase ficam de luta em luta")
+	t.equal(R.phase_effects(c), ["cansado"], "o Cansado fica de luta em luta")
 	R.start_expedition(c, "fase_1", 79)
 	t.equal(R.phase_effects(c), [], "a fase seguinte começa sem eles")
 	t.equal(R.phase_effects({}), [], "sem expedição, nenhum")

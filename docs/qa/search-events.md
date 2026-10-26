@@ -110,3 +110,16 @@ A QA conferiu:
 - **O Cansado não tem ícone na luta,** só a linha no Registro. Fica para o Lucas, junto com a medição.
 - **O Exposto se gasta mesmo quando a equipe foge,** como diz "próxima luta".
 - **Os 4 avisos "Lambda capture … was freed" do `test_train`** também aparecem na `main`: não vêm desta entrega.
+
+## Decisão do Lucas: o Preparado vale só na próxima luta (26/10)
+O Preparado passou a valer como o Exposto: uma luta só (`"once": true` em `PHASE_EFFECTS`). O texto da Barricada Velha
+foi ajustado, e os testes também. Medição de novo, com `--seeds=40 --gear=typical --levels=typical`:
+
+| Fase | Jornada antes | Preparado até o fim da fase (PR) | Preparado numa luta | Preparado numa luta + Cansado |
+|---|---|---|---|---|
+| 3 | 58% | 78% | 65% | 55% |
+| 4 | 58% | 65% | 53% | 45% |
+| 5 | 0% | 12% | 3% | 0% |
+
+A coluna "luta a luta" do guardião continua em 80% a 88% com o Preparado, porque ali a medida põe o efeito na própria
+luta do guardião. No jogo, isso só acontece se a equipe pegar a Barricada Velha logo antes dele.

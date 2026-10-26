@@ -3765,8 +3765,8 @@ msgid "Cansado: a equipe tem -1 de velocidade."
 msgstr "Tired: the team has -1 speed."
 
 #: scripts/flow/journey_rules.gd:49
-msgid "Preparado: 1 Bloqueio no começo das lutas"
-msgstr "Prepared: 1 Block at the start of fights"
+msgid "Preparado: 1 Bloqueio na próxima luta"
+msgstr "Prepared: 1 Block in the next fight"
 
 #: scripts/flow/journey_rules.gd:49
 msgid "Preparado: a equipe começa com 1 Bloqueio."
@@ -6373,8 +6373,8 @@ msgid "Carregar as placas como escudo"
 msgstr "Carry the plates as a shield"
 
 #. events.busca_barricada.escudos_placas.Success
-msgid "As placas aguentam pancada, mas pesam nas costas a cada passo. (Preparado e Cansado até o fim da fase: a equipe começa as lutas com 1 Bloqueio e tem −1 de velocidade)"
-msgstr "The plates take a beating, but they weigh on everyone's back with every step. (Prepared and Tired until the end of the phase: the team starts fights with 1 Block and has −1 speed)"
+msgid "As placas aguentam pancada, mas pesam nas costas a cada passo. (Preparado na próxima luta: a equipe começa com 1 Bloqueio. Cansado até o fim da fase: −1 de velocidade)"
+msgstr "The plates take a beating, but they weigh on everyone's back with every step. (Prepared for the next fight: the team starts with 1 Block. Tired until the end of the phase: −1 speed)"
 
 #. events.busca_barricada.arrombar_porta.Text
 msgid "Arrombar a porta"
