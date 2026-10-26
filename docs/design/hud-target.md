@@ -74,7 +74,7 @@ Maior usa130%, sem encolher texto ou cortar letras. As caixas de valores do her�
 
 Normal: aço `#1b1d20`–`#25282c`, bisel grafite, detalhe/foco `#f0a020`, Vida dos heróis `#2fb6bd`, Vida das máquinas `#d23a2e`, texto `#efe6d6`. O material preserva os riscos e o desgaste dos biséis, sem ouro limpo ou cobre ornamental.
 
-Daltonismo: heróis `#56b4e9`, inimigos `#e69f00`; a linha do nome do alvo acompanha a cor inimiga. A forma também muda: **aba no herói e recorte no inimigo**, preservados em cinza, além do lado, do corpo e do valor. O anel e as marcas de turno continuam âmbar; não dependem da cor da Vida para identificar quem age. As artes originais não são recoloridas.
+Daltonismo: heróis `#56b4e9`, inimigos no vermelhão `#d55e00` (decisão do Lucas, 25/10: o laranja `#e69f00` se confundia com o âmbar do foco); a linha do nome do alvo acompanha a cor inimiga. A forma também muda: **aba no herói e recorte no inimigo**, preservados em cinza, além do lado, do corpo e do valor. O anel e as marcas de turno continuam âmbar; não dependem da cor da Vida para identificar quem age. As artes originais não são recoloridas.
 
 Há [prova de saída em22/32/48 sobre claro/escuro](hud-target/readability.webp), [cinza](hud-target/hud_gray.webp) e versões `_40.webp` dos quatro perfis (768×432). São provas do desenho; navegação, safe area e toque precisam da QA na implementação.
 

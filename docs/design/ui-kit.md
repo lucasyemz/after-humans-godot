@@ -28,7 +28,7 @@ Estação, exploração, combate e mapa usam **o mesmo painel, cartão, placa e 
 | Texto secundário | `#a69a84` | igual | Detalhe e explicação; também no desligado |
 | Destaque | `#e9c47c` | igual | Uma ação principal no contexto ativo; destaque passa ao alvo durante a mira |
 | Bom/vida | `#86c98f` | `#56b4e9` | Barra/benefício + forma de estado e nome acessível |
-| Perigo | `#e2675b` | `#e69f00` | Triângulo/efeito negativo + consequência escrita |
+| Perigo | `#e2675b` | `#d55e00` | Triângulo/efeito negativo + consequência escrita |
 | Inimigo | `#d9893d` | igual | Identidade da facção, não substitui perigo ou mira |
 | Instinto | `#b7a6f4` | igual | Segunda barra fina, identificada na dica |
 | Informação | `#8fb4f0` | `#efe5d1` | Apenas texto acompanhado de ícone; nunca barra, preenchimento ou contorno de estado |
