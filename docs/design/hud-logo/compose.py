@@ -1,10 +1,10 @@
 """As propostas de logo sobre a tela do título do jogo (before/title_clean.webp, a captura sem a logo).
 
 Uso: python3 docs/design/hud-logo/compose.py
-Para cada proposta: title_<id>.webp (a tela 1920x1080 com a logo grande), title_<id>_40.webp (a tela a 40%, o celular),
+Para a proposta: title_<id>.webp (a tela 1920x1080 com a logo grande), title_<id>_40.webp (a tela a 40%, o celular),
 small_<id>.webp (a logo pequena: 320 e 200 px de largura sobre três trechos da arte e sobre o painel), o _gray
 dessas duas; portrait_<id>.webp (o retrato 1080x1920 a 50%, só o fundo e a logo: a Godot não abre em pé no xvfb, então
-sem os botões); e choices.webp, as três e a de hoje lado a lado.
+sem os botões); e choices.webp, a de hoje e a proposta lado a lado.
 
 A logo grande ocupa a caixa da logo de hoje (x 65, y 160, 880x241, a de title_screen.gd), alinhada à esquerda em x 100
 (a borda dos botões) e com a altura inteira da caixa; quando a logo fica mais larga que 845 px, a largura manda.
@@ -19,8 +19,9 @@ FONT = str(ROOT / "art/ui/fonts/barlow_condensed_medium.ttf")
 PANEL = (13, 16, 18)
 TEXT = (239, 230, 214)
 MUTED = (169, 162, 148)
-PROPOSALS = [("roots", "A · Raízes"), ("scrap", "B · Sucata e VIGIA"), ("sign", "C · Placa da cidade alagada")]
+PROPOSALS = [("stone", "Pedra tomada pelo mato")]
 LEFT = 100
+MAX_H = 210
 
 
 def save(im: Image.Image, name: str, gray: bool = True) -> None:
@@ -31,7 +32,9 @@ def save(im: Image.Image, name: str, gray: bool = True) -> None:
 
 def place(bg: Image.Image, logo: Image.Image, box: list) -> tuple:
     x, y, w, h = box
-    scale = min(h / logo.height, (x + w - LEFT) / logo.width)
+    # A logo em duas linhas a 241 px de altura chegava a 28 px dos botões (a de hoje deixa 88): fica com 210.
+    h_max = min(h, MAX_H)
+    scale = min(h_max / logo.height, (x + w - LEFT) / logo.width)
     size = (round(logo.width * scale), round(logo.height * scale))
     scaled = logo.resize(size, Image.Resampling.LANCZOS)
     top = round(y + (h - size[1]) / 2)
@@ -89,10 +92,10 @@ def main() -> None:
         shots.append((label, screen))
     f = ImageFont.truetype(FONT, 30)
     w, h = 960, 540
-    board = Image.new("RGBA", (w * 2 + 60, (h + 60) * 2 + 20), PANEL + (255,))
+    board = Image.new("RGBA", (w * len(shots) + 20 * (len(shots) + 1), h + 84), PANEL + (255,))
     d = ImageDraw.Draw(board)
     for i, (label, shot) in enumerate(shots):
-        x, y = 20 + (i % 2) * (w + 20), 20 + (i // 2) * (h + 60)
+        x, y = 20 + i * (w + 20), 20
         d.text((x, y), label, font=f, fill=TEXT)
         board.alpha_composite(shot.resize((w, h), Image.Resampling.LANCZOS), (x, y + 44))
     save(board, "choices", False)
