@@ -185,6 +185,13 @@ static func hero_art_of(hero_id: String, variant: String = "") -> Dictionary:
 	return art_entry(_manifest.heroes, hero_id, variant)
 
 
+## A arte de um inimigo fora da luta (o rosto no Mapa da Rede, #87), do mesmo manifesto.
+static func enemy_art_of(sprite_key: String) -> Dictionary:
+	if _manifest.is_empty():
+		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
+	return _manifest.get("enemies", {}).get(sprite_key, {})
+
+
 ## A pose do inimigo ao agir: defesa ao defender, apoio na ação em si mesmo e no golpe sem dano num herói (a Buzina do
 ## Pipoco, a Risada do Recreador) quando ele tem a pose de apoio; senão, o ataque.
 static func enemy_action_pose(action, art: Dictionary) -> String:

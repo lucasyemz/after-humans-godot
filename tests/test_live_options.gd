@@ -99,7 +99,7 @@ func _station(t, tree: SceneTree) -> void:
 	await tree.process_frame
 	t.check(hud._map.visible, "o mapa de fases continua aberto")
 	await tree.process_frame
-	t.check(hud._map._progress.position.x > hud._map._header.position.x + hud._map._header.get_minimum_size().x, "a barra de progresso acompanha o cabeçalho")
+	t.check(hud._map._header.get_global_rect().end.x <= hud._map.get_node("Plaque").get_global_rect().end.x + 1.0, "o cabeçalho cabe na plaqueta")
 	# O mapa aberto no Normal e trocado para o Maior com ele na tela.
 	hud._map.visible = false
 	hud.open_map()
@@ -108,16 +108,16 @@ func _station(t, tree: SceneTree) -> void:
 	await tree.process_frame
 	await tree.process_frame
 	var tight := 0
-	var points: Array = [AHPhaseMap.REFUGE_POS] + AHJourneyRules.PHASES.map(func(p): return Vector2(p.map_pos[0], p.map_pos[1]))
-	var scale: Vector2 = AHPhaseMap.MAP_RECT.size / AHPhaseMap.SPACE
-	var nodes: Array = hud._map._nodes.get_children().filter(func(n): return not n.is_queued_for_deletion())
-	for i in mini(nodes.size(), points.size()):
-		var button: Control = nodes[i]
-		var column: Control = button.get_child(0)
-		var center_x: float = button.position.x + button.size.x * 0.5
-		if button.size.x + 0.5 < column.get_combined_minimum_size().x or absf(center_x - points[i].x * scale.x) > 1.0:
+	for region in hud._map._regions:
+		var id: String = region.phase_id if region.phase_id != null else "refuge"
+		var button: Control = hud._map._labels.get_node_or_null("Place_%s" % id)
+		if button == null:
 			tight += 1
-	t.equal(tight, 0, "mapa no texto Maior: cada nó fica centrado no ponto da fase e cabe no próprio botão")
+			continue
+		var center_x: float = button.position.x + button.size.x * 0.5
+		if button.size.x + 0.5 < button.get_combined_minimum_size().x or absf(center_x - float(region.anchor[0])) > 1.0:
+			tight += 1
+	t.equal(tight, 0, "mapa no texto Maior: cada rótulo fica centrado no lugar e cabe no próprio botão")
 	Settings.set_text_size(0)
 
 

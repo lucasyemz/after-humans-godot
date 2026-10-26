@@ -78,7 +78,7 @@ func _station_to_departure() -> bool:
 	if not await _until(func(): return map.visible, "o mapa de fases abrir"):
 		return false
 	# Escolhe a fase 1 na lista do mapa e prepara a expedição dela.
-	if not await _press(map, "Rua das Vitrines", "a fase 1 na lista do mapa"):
+	if not await _press(map, "Fase 1", "a fase 1 no mapa"):
 		return false
 	t.equal(map.selected, "fase_1", "a fase 1 fica escolhida no mapa")
 	if not await _press(map, "Preparar expedição", "Preparar expedição no painel da fase"):
@@ -383,7 +383,7 @@ func _final_checks() -> void:
 	# O mapa de fases mostra a fase 1 concluída.
 	hud.open_map()
 	await _frames(2)
-	if await _press(hud._map, "Rua das Vitrines", "a fase 1 na lista do mapa"):
+	if await _press(hud._map, "Fase 1", "a fase 1 no mapa"):
 		t.check(_has_label(hud._map, "Concluída"), "o mapa mostra a fase 1 concluída")
 	hud._map.visible = false
 

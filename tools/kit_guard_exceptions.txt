@@ -1,3 +1,2 @@
 # As telas que ainda desenham fora do kit (tests/test_kit_guard.gd) e quantas ocorrências têm. A lista só encolhe: a
 # cada tela migrada, baixe o número ou tire a linha.
-scripts/ui/phase_map.gd: 51

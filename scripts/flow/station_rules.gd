@@ -374,8 +374,17 @@ static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
 	]
 
 
-## O que o cômodo faz no nível dado (texto da tela).
+## O que o cômodo faz no nível dado (texto da tela). A Pesquisa, o Depósito melhorado e a Forja também dizem o que leem
+## no Mapa da Rede (#87): o Plano e o Próximo passo mostram o motivo de recuperar.
 static func room_benefit(room_id: String, level: int) -> String:
+	var text := _room_benefit(room_id, level)
+	# O nível que passa a ler: o Depósito melhorado (2); a Pesquisa e a Forja recuperadas (1, e só ele: melhorar a Forja
+	# não lê mais).
+	var reads := level == (2 if room_id == DEPOT else 1) and [RESEARCH, DEPOT, FORGE].has(room_id)
+	return text + " " + AHNetworkRadar.room_reading(room_id) if reads else text
+
+
+static func _room_benefit(room_id: String, level: int) -> String:
 	match room_id:
 		FORGE:
 			if level <= 0:

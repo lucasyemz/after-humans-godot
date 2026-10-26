@@ -1025,7 +1025,7 @@ func open_map() -> void:
 		return
 	if _draft.is_empty():
 		_reset_draft()
-	_map.open(_draft.phase)
+	_map.open(_draft.phase, _draft.get("focus", ""))
 
 
 func _on_phase_chosen(phase_id: String) -> void:
@@ -1628,7 +1628,7 @@ func _preparation(c: Dictionary) -> void:
 		_reset_draft()
 		mission = J.phase(_draft.phase)
 	_text(tr("%s · nível %d · %s") % [tr(mission.name), mission.level, tr(J.DIFFICULTY_NAMES[mission.difficulty])], AHKit.AMBER)
-	_button(tr("Escolher no mapa"), func(): _map.open(_draft.phase))
+	_button(tr("Escolher no mapa"), func(): _map.open(_draft.phase, _draft.get("focus", "")))
 	_section(tr("Equipe (da frente para trás)"))
 	for rank in 4:
 		var hero_id: String = _draft.team[rank] if rank < _draft.team.size() else ""
@@ -1832,7 +1832,7 @@ func _prep_drawer(c: Dictionary) -> void:
 	map_button.icon = load("res://art/ui/icons/marker-here.svg")
 	map_button.add_theme_constant_override("icon_max_width", 26)
 	map_button.custom_minimum_size = Vector2(0, 60)
-	map_button.pressed.connect(func(): _map.open(_draft.phase))
+	map_button.pressed.connect(func(): _map.open(_draft.phase, _draft.get("focus", "")))
 	mission_box.add_child(map_button)
 	var focus_box := _side_box(side, tr("Foco da rota"))
 	var chips := HFlowContainer.new()
@@ -2098,10 +2098,13 @@ func _depart() -> void:
 		briefing = null
 		if cancelled or not is_inside_tree() or _draft.is_empty() or GameFlow.busy:
 			return
-	error = S.confirm_departure(c, _draft.team.duplicate(), _draft.extra, randi(), _draft.phase, _draft.focus)
+	# A rota é a que o Mapa da Rede leu (#87): a semente fixada da fase; depois da partida, a fase ganha outra.
+	var phase_id: String = _draft.phase
+	error = S.confirm_departure(c, _draft.team.duplicate(), _draft.extra, AHNetworkRadar.route_seed(c, phase_id), phase_id, _draft.focus)
 	if error != "":
 		toast(error, true)
 		return
+	AHNetworkRadar.spend_seed(c, phase_id)
 	_draft = {}
 	Campaign.save()
 	# A partida no vagão (#75): a equipe sentada no metrô a caminho da fase, depois o título dela.
