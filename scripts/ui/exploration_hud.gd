@@ -57,6 +57,13 @@ var _patrol_bar: ProgressBar
 var _patrol_text: Label
 var _patrol_world = null
 var _hint: HBoxContainer
+## O Menu da expedição (#109): a largura, o centro (à direita do cartão do objetivo) e o pé (acima das cabeças).
+const MENU_WIDTH := 660.0
+const MENU_CENTER_X := 862.0
+const MENU_BOTTOM := 720.0
+## Os botões do canto (Mochila e Menu): embaixo na rua, no alto no acampamento.
+const CORNER_Y := 974.0
+const CAMP_CORNER_Y := 14.0
 var _hint_time := 0.0
 var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
@@ -183,8 +190,8 @@ func _ready() -> void:
 	_finish_button.visible = false
 	_finish_button.pressed.connect(func(): menu_return.emit())
 	add_child(_finish_button)
-	_menu_button = _corner_button(tr("Menu"), "menu", Vector2(1696, 974), func(): menu_requested.emit())
-	_bag_button = _corner_button(tr("Mochila"), "inventory", Vector2(1484, 974), func(): inventory_requested.emit())
+	_menu_button = _corner_button(tr("Menu"), "menu", Vector2(1696, CORNER_Y), func(): menu_requested.emit())
+	_bag_button = _corner_button(tr("Mochila"), "inventory", Vector2(1484, CORNER_Y), func(): inventory_requested.emit())
 
 	# O aviso também é botão: tocar ou clicar nele usa o que está perto.
 	_prompt = PanelContainer.new()
@@ -741,8 +748,14 @@ func hide_camp() -> void:
 
 
 func _set_camp_layout(camping: bool) -> void:
-	if _party_box != null:
-		_party_box.visible = not camping
+	# No acampamento (#109), a moldura da rua sai: o lugar, o objetivo, o corredor, os suprimentos e a equipe. A Mochila
+	# e o Menu vão para o alto à direita (o painel do acampamento ocupa o pé da tela).
+	for node in [_party_box, _route_panel, _place_name.get_parent() if _place_name != null else null, _supplies.get_parent() if _supplies != null else null]:
+		if node != null:
+			node.visible = not camping
+	for button in [_bag_button, _menu_button]:
+		if button != null:
+			button.position.y = CAMP_CORNER_Y if camping else CORNER_Y
 	if camping:
 		set_markers([])
 
@@ -762,19 +775,118 @@ func camp_respond(hero_id: String, kind: String, life_gain: int, instinct_change
 ## Esc na exploração: continuar ou voltar à Estação. Antes do guardião a volta é uma retirada (metade do achado) e
 ## pergunta antes, como o Retornar da Unreal ("Abandonar a expedição?").
 func show_menu(completed: bool, can_return: bool) -> void:
-	var box := _open_modal(620)
+	# O Menu da expedição (#109, docs/design/hud-ajustes.md; decisão do Lucas: fica o menu), no Painel do kit: à direita
+	# do cartão do objetivo, com o pé acima das cabeças da equipe; cresce para cima no texto Maior.
+	var box := _open_modal(MENU_WIDTH)
 	_modal.set_meta("menu", true)
-	box.add_child(H.make_label(tr("Pausa"), 34, H.GOLD))
-	var resume := _button(tr("Continuar"), close_modal)
-	box.add_child(resume)
-	var text := tr("Voltar à Estação (fase concluída: todo o achado)") if completed else tr("Voltar à Estação (retirada: metade do achado)")
-	var back := _button(text, func(): _confirm_return(completed), can_return)
-	box.add_child(back)
+	_modal.add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("panel", "large")))
+	_modal.name = "ExpeditionMenu"
+	box.add_theme_constant_override("separation", 12)
+	var head := HBoxContainer.new()
+	box.add_child(head)
+	var titles := VBoxContainer.new()
+	titles.add_theme_constant_override("separation", 0)
+	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(titles)
+	titles.add_child(AHKit.label(tr("Menu da expedição"), "small", AHKit.AMBER, true, true))
+	var expedition = Campaign.state.get("session", {}).get("expedition")
+	if expedition != null:
+		titles.add_child(AHKit.label(tr(String(AHJourneyRules.phase(expedition.phase_id).get("name", ""))), "panel_title", AHKit.TEXT, true, true))
+		var route: Dictionary = expedition.corridor
+		if not route.steps.is_empty():
+			var step: Dictionary = route.steps[clampi(route.index, 0, route.steps.size() - 1)]
+			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(step.type, ""))], "text", AHKit.MUTED))
+	var close := AHKit.button("X", "icon")
+	close.name = "Close"
+	close.tooltip_text = tr("Fechar")
+	close.custom_minimum_size = Vector2(56, 56)
+	close.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	close.pressed.connect(close_modal)
+	head.add_child(close)
+	var line := TextureRect.new()
+	line.texture = AHKit.texture("divider")
+	line.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	line.stretch_mode = TextureRect.STRETCH_SCALE
+	line.custom_minimum_size = Vector2(0, 8)
+	box.add_child(line)
+	# Voltar à Estação com o custo numa sublinha (não quebra o botão no Maior); no meio da luta ou do evento, apagado.
+	var sub := (tr("Fase concluída: todo o achado") if completed else tr("Retirada: metade do achado")) if can_return else tr("Termine a luta ou o evento antes de voltar.")
+	var back := _menu_entry(tr("Voltar à Estação"), "station", func(): _confirm_return(completed), sub)
+	back.name = "Return"
+	back.disabled = not can_return
 	if not can_return:
-		box.add_child(H.make_label(tr("Termine a luta ou o evento antes de voltar."), 18, H.MUTED))
-	box.add_child(_button(tr("Opções"), show_options))
-	box.add_child(_button(tr("Nova campanha"), _confirm_new_campaign))
+		# Apagado no tom (sem transparência), como os cuidados sem efeito do acampamento.
+		(back.find_child("Title", true, false) as Label).add_theme_color_override("font_color", AHKit.MUTED)
+		(back.find_child("Glyph", true, false) as Control).modulate = AHKit.MUTED
+	box.add_child(back)
+	var options := _menu_entry(tr("Opções"), "res://art/ui/icons/lobby-settings.svg", show_options)
+	options.name = "Options"
+	box.add_child(options)
+	var restart := _menu_entry(tr("Nova campanha"), "alert", _confirm_new_campaign, "", AHKit.alert_text())
+	restart.name = "NewCampaign"
+	box.add_child(restart)
+	var resume := AHStationReport._primary(tr("Fechar"), "", "menu")
+	resume.name = "Resume"
+	resume.icon = null
+	resume.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# A tecla do Menu (a das Opções, se o jogador trocou) e o B do controle.
+	var resume_key: Control = resume.get_node("Key")
+	resume_key.remove_meta("ah_action")
+	(resume_key.get_child(0) as Label).text = tr("%s / B") % AHUiStyle.key_name("menu")
+	resume.custom_minimum_size = Vector2(0, 64)
+	resume.pressed.connect(close_modal)
+	# A tecla no fim do botão, que estica na largura do painel: ela acompanha o tamanho dele.
+	resume.resized.connect(func():
+		var key: Control = resume.get_node("Key")
+		key.reset_size()
+		key.position = Vector2(resume.size.x - key.size.x - 52.0, (resume.size.y - key.size.y) * 0.5))
+	box.add_child(resume)
+	_place_menu.call_deferred()
 	resume.grab_focus.call_deferred()
+
+
+## O pé do Menu acima das cabeças (MENU_BOTTOM), centrado à direita do cartão do objetivo (MENU_CENTER_X).
+func _place_menu() -> void:
+	if not modal_open() or not _modal.has_meta("menu") or _modal.name != "ExpeditionMenu":
+		return
+	_modal.reset_size()
+	_modal.size = _modal.get_combined_minimum_size()
+	_modal.position = Vector2(MENU_CENTER_X - _modal.size.x * 0.5, maxf(16.0, MENU_BOTTOM - _modal.size.y))
+
+
+
+## Um botão do Menu: o ícone, o título e, se houver, a sublinha menor; tone tinge o título (a Nova campanha em alerta).
+func _menu_entry(text: String, icon_name: String, callback: Callable, sub: String = "", tone: Color = AHKit.TEXT) -> Button:
+	var button := AHKit.button("", "secondary")
+	button.custom_minimum_size = Vector2(0, 64)
+	button.pressed.connect(callback)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	row.set_anchors_preset(Control.PRESET_FULL_RECT)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(row)
+	var glyph := AHKit.glyph(icon_name, AHUiStyle.px(28), tone)
+	if icon_name.begins_with("res://"):
+		glyph.texture = load(icon_name)
+	glyph.name = "Glyph"
+	row.add_child(glyph)
+	var words := VBoxContainer.new()
+	words.alignment = BoxContainer.ALIGNMENT_CENTER
+	words.add_theme_constant_override("separation", -4)
+	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(words)
+	var title := AHKit.label(text, "primary", tone, true, true)
+	title.name = "Title"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	words.add_child(title)
+	if sub != "":
+		var note := AHKit.label(sub, "small", AHKit.MUTED)
+		note.name = "Sub"
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		words.add_child(note)
+		button.custom_minimum_size.y = maxf(64.0, title.get_minimum_size().y + note.get_minimum_size().y + 28.0)
+	return button
 
 
 ## A Mochila por cima da exploração (cuidados no aliado, ferramentas, recursos); Fechar, Esc ou I fecha.

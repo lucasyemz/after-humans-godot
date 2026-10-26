@@ -22,6 +22,8 @@ const U := preload("res://scripts/ui/ui_style.gd")
 const MANIFESTS := ["res://art/ui/kit/combat/assets.json", "res://art/ui/kit/station/assets.json"]
 ## As peças grandes: o centro repete o aço (hud-station.md, "Como usar na Godot").
 const TILED := ["report_band", "panel_large"]
+## As que repetem só na largura (as riscas da vida prevista mantêm o passo em qualquer largura).
+const TILED_WIDE := ["bar_preview"]
 const FONT_MEDIUM := "res://art/ui/fonts/barlow_condensed_medium.ttf"
 const FONT_SEMIBOLD := "res://art/ui/fonts/barlow_condensed_semibold.ttf"
 const ICONS := "res://art/ui/kit/station/icons/%s.webp"
@@ -31,13 +33,13 @@ const COMPONENTS := {
 	"panel": {"large": "panel_large", "inset": "panel_inset", "band": "report_band"},
 	"plaque": {"room": "room_plaque"},
 	"button": {"primary": "primary_button", "secondary": "secondary_button", "icon": "icon_button", "chip": "chip_button", "train": "train_button"},
-	"bar": {"main": "main_bar", "fill": "bar_fill"},
+	"bar": {"main": "main_bar", "fill": "bar_fill", "preview": "bar_preview", "track": "slider_track"},
 	"chip": {"cost": "cost_chip", "status": "status_pill", "result": "result_chip", "resource": "resource_chip", "resource_tile": "resource_tile", "trait": "trait_tile"},
 	"tab": {"card": "card_tab", "nav": "nav_tab", "nav_active": "nav_tab_active", "hero": "hero_tab", "hero_selected": "hero_tab_selected"},
 	"row": {"list": "list_row", "list_selected": "list_row_selected"},
 	"key": {"tab": "key_tab", "button": "button_key", "bar": "keys_bar"},
 	"card": {"hero": "hero_card", "upgrade": "upgrade_card", "upgrade_selected": "upgrade_card_selected"},
-	"focus": {"focus": "focus_frame", "selected": "selected_frame"},
+	"focus": {"focus": "focus_frame", "selected": "selected_frame", "corners": "selected_corners"},
 }
 ## As peças só da luta, do kit do Codex, que ainda não têm versão da Awesomic.
 const CODEX_ONLY := ["round_strip", "ability_header", "ability_slot", "target_tab", "actor_ring", "selected_slot", "exit"]
@@ -69,6 +71,10 @@ const _LIGHT_WOUND := [Color("f0a020"), Color("f0e442")]
 const _HEAVY_WOUND := [Color("d23a2e"), Color("d55e00")]
 const _ALERT_TEXT := [Color("e2584a"), Color("e8743a")]
 const _GOOD := [Color("6cc77c"), Color("56b4e9")]
+## A vida prevista (bar_preview, #109): verde clara; azul clara no daltonismo.
+const _PREVIEW := [Color("a6e3ae"), Color("a9d8f5")]
+## O véu dos cuidados sem efeito (as riscas da bar_preview, escuras).
+const VEIL := Color(0.04, 0.04, 0.05, 0.62)
 
 ## Os limites dos estados (fração da vida máxima).
 const HEALTHY_ABOVE := 0.75
@@ -93,6 +99,10 @@ static func enemy_hp() -> Color:
 
 static func alert_text() -> Color:
 	return _ALERT_TEXT[_cb()]
+
+
+static func preview_color() -> Color:
+	return _PREVIEW[_cb()]
 
 
 static func good() -> Color:
@@ -149,6 +159,8 @@ static func style(piece: String, tint: Color = Color.WHITE, pad: Vector4 = Vecto
 		box.content_margin_top = content[1] + pad.y
 		box.content_margin_right = size[0] - content[0] - content[2] + pad.z
 		box.content_margin_bottom = size[1] - content[1] - content[3] + pad.w
+	if TILED_WIDE.has(piece):
+		box.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
 	if TILED.has(piece):
 		box.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
 		box.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
@@ -285,6 +297,42 @@ static func selected_overlay() -> Panel:
 	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return frame
+
+
+## O véu de uma peça sem efeito (a habilidade sem uso, o cuidado que não serve): as riscas escuras por cima da chapa,
+## sem transparência no texto (o texto fica no tom apagado).
+static func veil() -> Panel:
+	var cover := Panel.new()
+	cover.name = "Veil"
+	var box := style(piece_of("bar", "preview"), VEIL)
+	box.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
+	box.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
+	cover.add_theme_stylebox_override("panel", box)
+	cover.set_anchors_preset(Control.PRESET_FULL_RECT)
+	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return cover
+
+
+## Um texto com a seta (→) desenhada: a Barlow Condensed não tem o caractere, então ele vira o ícone da seta, do tamanho
+## do texto (hud-estacao.md, "A seta").
+static func arrow_label(text: String, role: String = "text", color: Color = TEXT, emphasis: bool = false) -> RichTextLabel:
+	var rich := RichTextLabel.new()
+	rich.bbcode_enabled = true
+	rich.fit_content = true
+	rich.scroll_active = false
+	rich.autowrap_mode = TextServer.AUTOWRAP_OFF
+	rich.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rich.add_theme_font_override("normal_font", font(emphasis))
+	rich.add_theme_font_size_override("normal_font_size", size(role))
+	rich.add_theme_color_override("default_color", color)
+	set_arrow_text(rich, text)
+	return rich
+
+
+static func set_arrow_text(rich: RichTextLabel, text: String) -> void:
+	var side := int(size(rich.get_meta("role", "text")) * 0.8) if rich.has_meta("role") else int(rich.get_theme_font_size("normal_font_size") * 0.8)
+	var arrow := "[img=%dx%d color=#%s]res://art/ui/icons/ui-arrow-right.svg[/img]" % [side, side, AMBER.to_html(false)]
+	rich.text = text.replace("[", "[lb]").replace("→", arrow)
 
 
 ## Um painel com a peça (para os componentes e para as peças só da luta, CODEX_ONLY).

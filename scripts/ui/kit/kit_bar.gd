@@ -17,6 +17,11 @@ var max_value := 1.0:
 		max_value = maxf(1.0, v)
 		queue_redraw()
 var text := ""
+## A vida prevista (#109; -1 sem prévia): a peça bar_preview, com riscas, do fim do valor de agora até ela.
+var preview := -1.0:
+	set(v):
+		preview = v
+		queue_redraw()
 var text_role := "world"
 var _label: Label
 
@@ -64,6 +69,8 @@ func fill_color() -> Color:
 			return AHKit.INSTINCT
 		"state":
 			return AHKit.health_state(int(value), int(max_value)).color
+		"amber":
+			return AHKit.AMBER
 		"life":
 			var state := AHKit.health_state(int(value), int(max_value))
 			return state.color if state.id == "heavy" else AHKit.hero_hp()
@@ -90,3 +97,8 @@ func _draw() -> void:
 		var fill := AHKit.style("bar_fill", fill_color())
 		var width := maxf(fill.texture_margin_left + fill.texture_margin_right, band.size.x * share)
 		draw_style_box(fill, Rect2(band.position, Vector2(width, band.size.y)))
+	if preview > value:
+		var start := band.size.x * share
+		var stop := band.size.x * clampf(preview / max_value, 0.0, 1.0)
+		if stop - start >= 1.0:
+			draw_style_box(AHKit.style(AHKit.piece_of("bar", "preview"), AHKit.preview_color()), Rect2(band.position + Vector2(start, 0), Vector2(stop - start, band.size.y)))

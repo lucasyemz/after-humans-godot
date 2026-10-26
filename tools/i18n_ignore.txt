@@ -45,7 +45,6 @@ combat_hud.gd: %d–%d
 combat_hud.gd: +%d–%d
 combat_hud.gd: combat_ability_%d
 combat_hud.gd: %s: %s
-combat_hud.gd: %s\n%s
 combat_hud.gd: %d/%d
 combat_hud.gd: Description
 refuge_hud.gd: %s: %s · %s%s
@@ -887,17 +886,12 @@ fight_rewards.gd: seed
 cargo_picker.gd: Box%d
 cargo_picker.gd: revealed
 combat_hud.gd: Stars
-combat_hud.gd: %s  %s
-combat_hud.gd: Criterion
-combat_hud.gd: criterion
 combat_hud.gd: value
 fight_rewards.gd: Items
 street_corridor.gd: bandage
 camp_hud.gd: Name
 camp_hud.gd: Life
-camp_hud.gd: Instinct
 camp_hud.gd: Body_
-camp_hud.gd: %s %d/%d
 camp_hud.gd: visible
 camp_hud.gd: food
 camp_hud.gd: Effect
@@ -1117,3 +1111,51 @@ character_room.gd: text
 *: alert
 kit.gd: Componente do kit sem a variante: %s/%s
 kit.gd: Selected
+*: small
+*: text
+*: divider
+*: sleep
+*: bandage
+*: route
+*: row
+*: life
+*: corners
+*: amount
+*: stars
+*: star
+*: state
+*: amber
+*: track
+*: preview
+*: role
+*: hp
+*: effect
+exploration_hud.gd: X
+exploration_hud.gd: Close
+exploration_hud.gd: Return
+exploration_hud.gd: Glyph
+exploration_hud.gd: Options
+exploration_hud.gd: Resume
+exploration_hud.gd: Key
+exploration_hud.gd: Sub
+camp_hud.gd: Plaque
+camp_hud.gd: Cards
+camp_hud.gd: Status
+camp_hud.gd: Keys
+camp_hud.gd: Continue
+camp_hud.gd: Care_
+camp_hud.gd: Icon
+camp_hud.gd: Title
+camp_hud.gd: Stock
+camp_hud.gd: Card_
+camp_hud.gd: Chosen
+camp_hud.gd: Veil
+camp_hud.gd: Key
+combat_hud.gd: Loot
+combat_hud.gd: Xp
+combat_hud.gd: Outcome
+combat_hud.gd: Cargo
+combat_hud.gd: Timer
+combat_hud.gd: Hint
+kit.gd: [lb]
+kit.gd: Veil

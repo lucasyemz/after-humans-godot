@@ -470,6 +470,22 @@ static func start_corridor_combat(campaign: Dictionary, party_advantage: bool) -
 	return {"enemies": corridor_enemies(expedition, index), "opening": party_advantage, "boss": boss}
 
 
+## O que uma luta vencida põe no achado (o que end_combat soma), sem mudar nada: o popup do fim da luta mostra antes de
+## a luta fechar (#109). Só o guardião dá recursos: os da luta e, na primeira vez, os da fase concluída.
+static func combat_loot(campaign: Dictionary, result: String, boss: bool) -> Dictionary:
+	var out := {"seeds": 0, "scrap": 0, "fragments": 0}
+	var expedition = campaign.get("session", {}).get("expedition")
+	if result != "victory" or not boss or expedition == null or int(expedition.corridor.get("current_house", -1)) >= 0:
+		return out
+	out.seeds += 6
+	out.scrap += 1
+	if not expedition.get("objective_completed", false):
+		out.seeds += 10
+		out.scrap += 2
+		out.fragments += 1
+	return out
+
+
 ## Fim de uma luta do corredor (EndCombat). result: "victory", "defeat" ou "escaped". As mortes vão para o memorial.
 static func end_combat(campaign: Dictionary, result: String, boss: bool, cause: String = "") -> void:
 	var session: Dictionary = campaign.session
@@ -1045,6 +1061,20 @@ const CAMP_MEAL_INSTINCT := 5
 ## A cura do comer do acampamento: +10% da vida, mínimo 1.
 static func camp_meal_heal(max_hp: int) -> int:
 	return maxi(1, max_hp / 10)
+
+
+## O que um cuidado faria no herói, sem gastar nada (#109): {hp, instinct, effect}. "food" é a Ração (+10% da vida e −5
+## de instinto; sem efeito só com a vida cheia e o instinto em 0), "bandage" o Curativo (+8; sem efeito com a vida
+## cheia). O estoque não entra: a tela diz à parte quando ele acabou. As mesmas contas de camp_use_food e
+## camp_use_bandage.
+static func camp_preview(campaign: Dictionary, hero_id: String, kind: String) -> Dictionary:
+	var hero = _camp_hero(campaign, hero_id)
+	if hero == null:
+		return {"hp": 0, "instinct": 0, "effect": false}
+	if kind == "food":
+		return {"hp": mini(hero.max_hp, hero.hp + camp_meal_heal(hero.max_hp)), "instinct": clampi(hero.instinct - CAMP_MEAL_INSTINCT, 0, 200),
+			"effect": not (hero.hp >= hero.max_hp and hero.instinct <= 0)}
+	return {"hp": mini(hero.max_hp, hero.hp + 8), "instinct": int(hero.instinct), "effect": hero.hp < hero.max_hp}
 
 
 ## Comer no acampamento: +10% da vida (mínimo 1) e -5 de instinto; gasta uma comida.

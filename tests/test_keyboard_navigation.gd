@@ -162,13 +162,13 @@ func _street() -> void:
 	var hud: AHExplorationHud = tree.current_scene.exploration_hud
 	await _frames(3)
 	await _send("menu")
-	t.check(hud.menu_shown(), "Menu abre a pausa")
+	t.check(hud.menu_shown(), "Menu abre o Menu da expedição")
 	await _frames(2)
-	t.check(_inside(hud._modal) and (_focus() as Button).text == "Continuar", "o foco começa em Continuar")
-	await _send("ui_down")
-	t.check(_inside(hud._modal) and (_focus() as Button).text != "Continuar", "↓ anda na pausa")
+	t.check(_inside(hud._modal) and _focus().name == "Resume", "o foco começa em Fechar")
+	await _send("ui_up")
+	t.check(_inside(hud._modal) and _focus().name != "Resume", "↑ anda no Menu da expedição")
 	await _send("cancel")
-	t.check(not hud.modal_open(), "Voltar (B) fecha a pausa")
+	t.check(not hud.modal_open(), "Voltar (B) fecha o Menu da expedição")
 	await _send("inventory")
 	t.check(hud.inventory_shown(), "a Mochila abre")
 	await _frames(2)
@@ -178,7 +178,7 @@ func _street() -> void:
 	await _send("menu")
 	await _frames(2)
 	await _send("interact")
-	t.check(not hud.modal_open(), "Interagir (E) confirma Continuar")
+	t.check(not hud.modal_open(), "Interagir (E) confirma Fechar")
 	# Na luta: a Mochila abre com o foco nela e Voltar fecha; Interagir confirma a habilidade com foco.
 	var street = tree.current_scene
 	street.corridor.debug_next_fight()

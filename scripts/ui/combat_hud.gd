@@ -35,6 +35,15 @@ const HERO_TEXT_LEFT := 222.0
 const PLATE_BAR_HEIGHT := 40.0
 ## A intenção das máquinas não sobe acima disto (a faixa da rodada termina em ~106).
 const INTENT_TOP := 112.0
+## O popup do fim da luta (#109): no alto, no lugar da faixa da rodada; fecha sozinho em POPUP_HOLD s (metade no 2x).
+const POPUP_TOP := 24.0
+const POPUP_WIDTH := 640.0
+## O popup alarga com o texto até aqui (o XP de quatro nomes longos no Maior) antes de quebrar a linha: cada linha a
+## mais desce sobre as cabeças da equipe.
+const POPUP_MAX_WIDTH := 900.0
+const POPUP_HOLD := 2.5
+## O toque que fecha o popup só vale depois disto (ms): a tecla que acabou a luta não o fecha no mesmo instante.
+const POPUP_GUARD_MS := 250
 const KIT_PORTRAIT := 60.0
 const ACTIONS := [["Mover", "move", "Q", "combat_move"], ["Defender", "defend", "W", "combat_defend"],
 	["Mochila", "item", "I", "inventory"], ["Fugir", "flee", "F", "combat_flee"]]
@@ -85,6 +94,9 @@ const LOG_FLASH := 2.0
 var _tip: PanelContainer
 var _tip_box: VBoxContainer
 var _result: PanelContainer
+## Quando o popup do fim abriu (ms) e se ele espera um toque (a derrota).
+var _result_opened := 0
+var _result_waits := false
 var _unit_bars := {}
 var _markers: Array = []
 ## A escolha do alvo (#57): o lado, as posições válidas, a habilidade, o escolhido, o clicado uma vez e se o último
@@ -391,8 +403,10 @@ func _build() -> void:
 	_tip.add_child(_tip_box)
 
 	_result = AHKit.panel_box("large")
-	_result.position = Vector2(660, 300)
-	_result.custom_minimum_size = Vector2(600, 0)
+	_result.name = "ResultPopup"
+	_result.position = Vector2(960.0 - POPUP_WIDTH * 0.5, POPUP_TOP)
+	_result.custom_minimum_size = Vector2(POPUP_WIDTH, 0)
+	_result.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_result.visible = false
 	add_child(_result)
 	_restyle_kit()
@@ -750,6 +764,9 @@ func _focus_scope() -> Control:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_mouse = event.position
+	if visible and _close_popup_input(event):
+		get_viewport().set_input_as_handled()
+		return
 	if visible and event is InputEventScreenTouch:
 		_touch_hold = {"unit_id": unit_at(event.position), "since": Time.get_ticks_msec()} if event.pressed else {}
 		if event.pressed:
@@ -826,6 +843,9 @@ func _process(_delta: float) -> void:
 			short_plates.append(Rect2(plate.position, plate.size))
 		# A intenção acima da cabeça (acima da placa, no baixinho), sem subir na faixa da rodada.
 		var tag := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
+		# Com o popup do fim aberto, as intenções saem (a luta acabou, e elas subiriam por trás dele).
+		if tag != null and _result.visible:
+			tag.visible = false
 		if tag != null and tag.visible:
 			var crown := camera.unproject_position(card.global_position + Vector3(0, card.head_height() + 0.15, 0))
 			var bottom := minf(crown.y, plate.position.y - 4.0) if short else crown.y
@@ -1300,58 +1320,130 @@ func restyle() -> void:
 
 # ---------------------------------------------------------------- dicas
 
-## As estrelas (1 a 3) e os critérios da luta, cada um com ✓ ou ✗ (a cor e o sinal dizem, para o daltonismo também).
-func _result_stars(box: VBoxContainer, rewards: Dictionary) -> void:
-	var stars := _kit_label("★".repeat(int(rewards.stars)) + "☆".repeat(3 - int(rewards.stars)), 46, GOLD, "display")
-	stars.name = "Stars"
-	stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(stars)
-	var list := VBoxContainer.new()
-	list.alignment = BoxContainer.ALIGNMENT_CENTER
-	list.add_theme_constant_override("separation", 2)
-	box.add_child(list)
-	for criterion in rewards.list:
-		var line := _kit_label("%s  %s" % ["✓" if criterion.met else "✗", criterion.text], 18, S.OK if criterion.met else MUTED)
-		line.name = "Criterion"
-		line.set_meta("criterion", criterion.id)
-		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		list.add_child(line)
+func _popup_divider() -> TextureRect:
+	var line := TextureRect.new()
+	line.texture = AHKit.texture("divider")
+	line.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	line.stretch_mode = TextureRect.STRETCH_SCALE
+	line.custom_minimum_size = Vector2(0, 8)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return line
 
 
-## O XP que o herói ganhou na luta: a barra até o próximo nível enchendo (mais rápida no 2x), "+N XP" e, com o XP do
-## nível cheio, o aviso do Treino no Alojamento.
-func _result_xp(who: VBoxContainer, unit: AHCombat.Unit) -> void:
-	var hero = Campaign.hero(unit.hero_id)
-	if hero == null or session == null:
-		return
-	var gained := int(session.xp_gained.get(unit.hero_id, 0))
-	var cost := AHHeroLevels.next_cost(hero)
-	var level_line := _kit_label(tr("Nível %d") % AHHeroLevels.level(hero) + (tr("  +%d XP") % gained if gained > 0 else ""), 15, S.VIOLET)
-	level_line.name = "XpGain"
-	level_line.set_meta("xp_gain", gained)
-	level_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	who.add_child(level_line)
-	if cost.is_empty():
-		return
-	var bar := AHKit.bar("xp", 0, 1, "")
-	bar.name = "XpBar"
-	bar.max_value = int(cost.xp)
-	bar.custom_minimum_size = Vector2(120, 22)
-	bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var now := mini(AHHeroLevels.xp(hero), int(cost.xp))
-	bar.value = maxi(0, AHHeroLevels.xp(hero) - gained)
-	who.add_child(bar)
-	if GameFlow.reduced_effects():
-		bar.value = now
+## Os recursos no popup: os da luta vencida (AHJourneyRules.combat_loot, o guardião), ou o achado que a fuga e a derrota
+## deixaram para trás, na cor de alerta.
+func _popup_loot(box: VBoxContainer, result: String) -> void:
+	var campaign: Dictionary = Campaign.state
+	var amounts := {}
+	var lost := result != "victory"
+	if lost:
+		var expedition = campaign.get("session", {}).get("expedition")
+		var loot: Dictionary = expedition.get("loot", {}) if expedition != null else {}
+		for key in ["seeds", "scrap", "fragments"]:
+			amounts[key] = int(loot.get(key, 0))
 	else:
-		var tween := create_tween()
-		tween.tween_interval(0.3 / maxf(1.0, arena.speed if arena else 1.0))
-		tween.tween_property(bar, "value", now, 0.8 / maxf(1.0, arena.speed if arena else 1.0))
-	if AHHeroLevels.xp(hero) >= int(cost.xp):
-		var ready := _kit_label(tr("Treino pronto"), 14, GOLD, "bold")
-		ready.name = "TrainingReady"
-		ready.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		who.add_child(ready)
+		amounts = AHJourneyRules.combat_loot(campaign, result, arena != null and arena.boss_fight)
+	var shown: Array = ["seeds", "scrap", "fragments"].filter(func(k): return int(amounts.get(k, 0)) > 0)
+	# A frase do que se perdeu só quando havia o que perder (a derrota diz sempre como a equipe caiu).
+	if lost and (not shown.is_empty() or result == "defeat"):
+		var note := AHKit.label(tr("A equipe recuou pelas sombras e largou o que carregava.") if result == "escaped" else tr("Todos caíram nas ruínas. O achado ficou para trás."), "text", TEXT)
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		note.custom_minimum_size = Vector2(POPUP_WIDTH - 80.0, 0)
+		box.add_child(note)
+	if shown.is_empty():
+		if not lost:
+			var none := AHKit.label(tr("Nenhum recurso nesta luta"), "text", MUTED)
+			none.name = "NoLoot"
+			none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			box.add_child(none)
+		return
+	var chips := HBoxContainer.new()
+	chips.name = "Loot"
+	chips.alignment = BoxContainer.ALIGNMENT_CENTER
+	chips.add_theme_constant_override("separation", 10)
+	box.add_child(chips)
+	var icons := {"seeds": "lobby-seed", "scrap": "lobby-scrap", "fragments": "lobby-fragment"}
+	for key in shown:
+		var chip := AHKit.chip("cost")
+		chip.set_meta("resource", key)
+		chip.set_meta("amount", int(amounts[key]))
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		chip.add_child(row)
+		var icon := TextureRect.new()
+		icon.texture = load("res://art/ui/icons/%s.svg" % icons[key])
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(24, 24)
+		icon.modulate = AHKit.alert_text() if lost else AHKit.AMBER
+		row.add_child(icon)
+		row.add_child(AHKit.label((tr("−%d") if lost else tr("+%d")) % int(amounts[key]), "row", AHKit.alert_text() if lost else AHKit.AMBER, true))
+		chips.add_child(chip)
+
+
+## O XP da luta numa linha, o de cada herói na ordem da cena (a soma enganava: o nível pede o XP de cada um), e quem
+## fechou o XP do nível ("Treino pronto", que sobe no Alojamento).
+func _popup_xp(box: VBoxContainer, result: String) -> void:
+	if session == null or result != "victory":
+		return
+	var parts := PackedStringArray()
+	var gains := {}
+	var ready: Array = []
+	# Na ordem da cena, da esquerda para a direita: a equipe vem da frente (à direita) para trás.
+	var scene_order: Array = session.state.player_team.duplicate()
+	scene_order.reverse()
+	for unit in scene_order:
+		var gained := int(session.xp_gained.get(unit.hero_id, 0))
+		var hero = Campaign.hero(unit.hero_id)
+		if gained > 0:
+			parts.append(tr("%s +%d") % [unit.display_name, gained])
+			gains[unit.hero_id] = gained
+		if hero != null:
+			var cost := AHHeroLevels.next_cost(hero)
+			if not cost.is_empty() and AHHeroLevels.xp(hero) >= int(cost.xp):
+				ready.append(String(hero.display_name))
+	if not parts.is_empty():
+		var xp := AHKit.label(tr("XP: %s") % " · ".join(parts), "text", AHKit.XP, true)
+		xp.name = "Xp"
+		xp.set_meta("xp", gains)
+		xp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		xp.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		xp.custom_minimum_size = Vector2(_line_width(xp), 0)
+		box.add_child(xp)
+	# Quem fechou o XP do nível, todos numa linha só (a equipe ganha XP junta): o popup não desce sobre as cabeças.
+	if not ready.is_empty():
+		var row := HBoxContainer.new()
+		row.name = "TrainingReady"
+		row.alignment = BoxContainer.ALIGNMENT_CENTER
+		row.add_theme_constant_override("separation", 8)
+		row.add_child(AHKit.glyph("train", AHUiStyle.px(22), AHKit.AMBER))
+		# Até dois, os nomes; mais que isso, quantos (a linha não alarga o popup sobre as cabeças; quem é cada um fica no
+		# Alojamento, onde o Treino acontece).
+		var who: String = ", ".join(PackedStringArray(ready)) if ready.size() <= 2 else tr("%d heróis") % ready.size()
+		row.add_child(AHKit.label(tr("%s: Treino pronto") % who, "text", AHKit.AMBER, true))
+		box.add_child(row)
+
+
+## A largura de uma linha do popup sem quebrar, até o máximo (POPUP_MAX_WIDTH menos as margens); a fonte e o tamanho
+## são os do rótulo, já com o tamanho de texto das Opções.
+func _line_width(label: Label) -> float:
+	var font := label.get_theme_font("font")
+	var size := label.get_theme_font_size("font_size")
+	var text := label.text.to_upper() if label.uppercase else label.text
+	return minf(ceilf(font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x) + 8.0, POPUP_MAX_WIDTH - 80.0)
+
+
+## Qualquer tecla, clique ou toque fecha o popup do fim (depois de um instante, para a tecla que acabou a luta não
+## fechá-lo junto); a derrota também fecha assim, mas não sozinha.
+func _close_popup_input(event: InputEvent) -> bool:
+	if not _result.visible or Time.get_ticks_msec() - _result_opened < POPUP_GUARD_MS:
+		return false
+	var press: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE]) \
+		or (event is InputEventScreenTouch and event.pressed) or (event is InputEventJoypadButton and event.pressed)
+	if press:
+		result_closed.emit()
+	return press
 
 
 func _hide_tip() -> void:
@@ -1813,60 +1905,90 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Mostra o fim da luta e espera "Continuar" (no modo automático, segue sozinho).
 ## O fim da luta: o título, as estrelas e os critérios (rewards, de AHFightRewards.criteria; a vitória) e cada herói com a
 ## vida e o XP ganho enchendo a barra até o próximo nível (#91). Continuar fecha (o automático fecha sozinho).
-func show_result(result: String, automatic: bool, rewards: Dictionary = {}, hold: float = 1.5) -> void:
+## O popup curto do fim da luta (#109, docs/design/hud-ajustes.md): um Painel pequeno no alto, no lugar da faixa da
+## rodada, longe da equipe; sem botão. "BATALHA FINALIZADA", o resultado (a vitória com as estrelas), os recursos da
+## luta em chips (ou "Nenhum recurso nesta luta"), o XP de cada herói numa linha, quem ficou com o Treino pronto e, no
+## guardião, que a carga abre em seguida. A fuga e a derrota mostram o achado que se perdeu, na cor de alerta.
+## Decisão do Lucas: a vitória e a fuga fecham sozinhas (POPUP_HOLD, metade no 2x) ou com qualquer tecla, clique ou
+## toque; a derrota espera um toque, menos na luta automática (automatic), que não tem quem toque.
+func show_result(result: String, automatic: bool = false, rewards: Dictionary = {}, hold: float = POPUP_HOLD) -> void:
 	_panel.visible = false
-	# A luta acabou: ninguém mais age, o anel sai do chão já na tela do fim.
+	# A luta acabou: ninguém mais age, o anel sai do chão já na tela do fim, e a faixa da rodada dá lugar ao popup.
 	if arena != null:
 		arena.show_ring("")
+	_order_panel.visible = false
 	# A vitória e a derrota têm o toque delas (#36); a fuga, não.
 	if result == "victory" or result == "defeat":
 		Sound.play("res://audio/ui/%s.ogg" % result)
 		Sound.duck(9.0, 1.6)
 	_message.text = ""
 	_clear_markers()
-	for child in _result.get_children():
-		child.queue_free()
+	_clear(_result)
 	var box := VBoxContainer.new()
-	box.alignment = BoxContainer.ALIGNMENT_CENTER
-	box.add_theme_constant_override("separation", 14)
+	box.add_theme_constant_override("separation", 4)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_result.add_child(box)
-	var titles := {"victory": tr("Vitória"), "defeat": tr("Derrota"), "escaped": tr("Fuga")}
-	var notes := {"victory": tr("A patrulha foi neutralizada."), "defeat": tr("Todos caíram nas ruínas."), "escaped": tr("A equipe recuou pelas sombras.")}
-	var title := _kit_label(titles.get(result, result), 48, GOLD if result == "victory" else S.DANGER, "display")
+	var title := AHKit.label(tr("Batalha finalizada"), "panel_title", TEXT, true, true)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
-	var note := _kit_label(notes.get(result, ""), 22)
-	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(note)
+	var line := HBoxContainer.new()
+	line.name = "Outcome"
+	line.alignment = BoxContainer.ALIGNMENT_CENTER
+	line.add_theme_constant_override("separation", 6)
+	box.add_child(line)
+	var names := {"victory": tr("Vitória"), "defeat": tr("Derrota"), "escaped": tr("Fuga")}
+	var tone: Color = AHKit.AMBER if result == "victory" else (AHKit.alert_text() if result == "defeat" else TEXT)
+	line.add_child(AHKit.label(names.get(result, result), "card_name", tone, true, true))
 	if result == "victory" and not rewards.is_empty():
-		_result_stars(box, rewards)
-	var team := HBoxContainer.new()
-	team.alignment = BoxContainer.ALIGNMENT_CENTER
-	team.add_theme_constant_override("separation", 18)
-	box.add_child(team)
-	for unit in session.state.player_team:
-		var who := VBoxContainer.new()
-		who.add_theme_constant_override("separation", 4)
-		var fallen: bool = unit.hp <= 0
-		var face := S.portrait(_art_of(unit), 64, S.DANGER if fallen else Color(1, 1, 1, 0.35))
-		face.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		if fallen:
-			face.modulate = Color(0.55, 0.55, 0.6)
-		who.add_child(face)
-		var line := _kit_label("%s\n%s" % [unit.display_name, tr("caído") if fallen else "%d/%d" % [unit.hp, unit.max_hp]], 16, MUTED if fallen else TEXT)
-		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		who.add_child(line)
-		_result_xp(who, unit)
-		team.add_child(who)
-	var button := Button.new()
-	button.text = tr("Continuar")
-	button.custom_minimum_size = Vector2(240, 64)
-	AHKit.style_as(button, "secondary")
-	button.pressed.connect(func(): result_closed.emit())
-	box.add_child(button)
+		var stars := HBoxContainer.new()
+		stars.name = "Stars"
+		stars.set_meta("stars", int(rewards.stars))
+		stars.add_theme_constant_override("separation", 2)
+		stars.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		for i in 3:
+			stars.add_child(AHKit.glyph("star" if i < int(rewards.stars) else "star_empty", AHUiStyle.px(28), AHKit.AMBER if i < int(rewards.stars) else MUTED))
+		line.add_child(stars)
+	box.add_child(_popup_divider())
+	_popup_loot(box, result)
+	_popup_xp(box, result)
+	if result == "victory" and arena != null and arena.boss_fight:
+		var cargo := AHKit.label(tr("A carga do guardião abre em seguida"), "text", AHKit.AMBER)
+		cargo.name = "Cargo"
+		cargo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(cargo)
+	var waits := result == "defeat" and not automatic
+	# A linha do tempo já separa o pé; sem ela (a derrota), o divisor.
+	if waits:
+		box.add_child(_popup_divider())
+	var timer: AHKitBar = null
+	if not waits:
+		timer = AHKit.bar("state", 1, 1)
+		timer.name = "Timer"
+		timer.kind = "amber"
+		timer.piece = AHKit.piece_of("bar", "track")
+		timer.custom_minimum_size = Vector2(316, 14)
+		timer.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		box.add_child(timer)
+	var hint := AHKit.label(tr("Qualquer tecla ou toque para continuar") if waits else tr("Fecha sozinho · qualquer tecla fecha antes"), "small", MUTED)
+	hint.name = "Hint"
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(hint)
+	_result.reset_size()
+	_result.size = _result.get_combined_minimum_size()
+	_result.position = Vector2(960.0 - _result.size.x * 0.5, POPUP_TOP)
 	_result.visible = true
-	button.grab_focus.call_deferred()
-	if automatic:
-		get_tree().create_timer(hold).timeout.connect(func(): result_closed.emit())
+	_result_opened = Time.get_ticks_msec()
+	_result_waits = waits
+	if not waits:
+		var seconds := hold / maxf(1.0, arena.speed if arena != null else 1.0)
+		# Com Reduzir efeitos, a linha fica parada, mas o popup fecha sozinho no mesmo tempo.
+		if not GameFlow.reduced_effects():
+			var tween := create_tween()
+			tween.tween_property(timer, "value", 0.0, seconds)
+		var closing := _result_opened
+		get_tree().create_timer(seconds).timeout.connect(func():
+			if _result.visible and _result_opened == closing:
+				result_closed.emit())
 	await result_closed
 	_result.visible = false
+	_order_panel.visible = true
