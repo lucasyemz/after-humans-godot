@@ -1,0 +1,121 @@
+{
+  "loot_after": {
+    "fragments": 0,
+    "scrap": 2,
+    "seeds": 4
+  },
+  "loot_before": {
+    "fragments": 0,
+    "scrap": 2,
+    "seeds": 4
+  },
+  "result": "victory",
+  "rewards": {
+    "list": [
+      {
+        "id": "no_falls",
+        "met": false,
+        "text": "Ninguém caiu"
+      },
+      {
+        "id": "rounds",
+        "met": true,
+        "text": "Em até 3 rodadas (3)"
+      },
+      {
+        "id": "final_blow",
+        "met": true,
+        "text": "O golpe final foi de um herói"
+      },
+      {
+        "id": "calm",
+        "met": true,
+        "text": "Instinto controlado (sem colapso)"
+      }
+    ],
+    "met": 3,
+    "stars": 2
+  },
+  "session_result": "",
+  "units": [
+    {
+      "body": [],
+      "feet": [
+        -1.0,
+        -1.0
+      ],
+      "hero_id": "hero_sapo_iris",
+      "hp": 0,
+      "level": 1,
+      "max_hp": 23,
+      "name": "Íris",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 0,
+      "xp_gained": 0
+    },
+    {
+      "body": [
+        916.959777832031,
+        697.653991699219,
+        108.242858886719,
+        226.965148925781
+      ],
+      "feet": [
+        960.0,
+        924.619140625
+      ],
+      "hero_id": "hero_cao_bento",
+      "hp": 34,
+      "level": 1,
+      "max_hp": 34,
+      "name": "Bento",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 10,
+      "xp_gained": 10
+    },
+    {
+      "body": [
+        602.6787109375,
+        701.231079101562,
+        132.470458984375,
+        221.387878417969
+      ],
+      "feet": [
+        648.121826171875,
+        922.618957519531
+      ],
+      "hero_id": "hero_coruja_vespera",
+      "hp": 30,
+      "level": 1,
+      "max_hp": 30,
+      "name": "Véspera",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 8,
+      "xp_gained": 8
+    },
+    {
+      "body": [
+        759.123840332031,
+        722.910461425781,
+        118.407348632812,
+        200.707458496094
+      ],
+      "feet": [
+        803.883850097656,
+        923.617919921875
+      ],
+      "hero_id": "hero_gato_nick",
+      "hp": 24,
+      "level": 1,
+      "max_hp": 24,
+      "name": "Nick",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 11,
+      "xp_gained": 11
+    }
+  ]
+}
