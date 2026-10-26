@@ -51,8 +51,7 @@ func _build() -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
-	_card = PanelContainer.new()
-	_card.add_theme_stylebox_override("panel", AHUiStyle.panel(0.95, AHUiStyle.GOLD))
+	_card = AHKit.panel_box("large")
 	_card.custom_minimum_size = Vector2(600, 0)
 	_card.visible = false
 	root.add_child(_card)
@@ -62,10 +61,10 @@ func _build() -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 10)
 	box.add_child(head)
-	head.add_child(AHUiStyle.label("DICA", 15, AHUiStyle.COPPER, "bold"))
-	_title = AHUiStyle.label("", 24, AHUiStyle.GOLD, "display")
+	head.add_child(AHKit.label(tr("DICA"), "small", AHKit.AMBER, true, true))
+	_title = AHKit.label("", "card_name", AHKit.TEXT, true)
 	head.add_child(_title)
-	_text = AHUiStyle.label("", AHUiStyle.MIN_TEXT, AHUiStyle.TEXT)
+	_text = AHKit.label("", "text", AHKit.TEXT)
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text.custom_minimum_size = Vector2(570, 0)
 	box.add_child(_text)
@@ -73,19 +72,16 @@ func _build() -> void:
 	row.add_theme_constant_override("separation", 10)
 	row.alignment = BoxContainer.ALIGNMENT_END
 	box.add_child(row)
-	var off := Button.new()
-	off.text = "Desligar dicas"
-	off.custom_minimum_size = Vector2(170, 40)
-	AHCombatHud.style_button(off)
-	off.add_theme_color_override("font_color", AHUiStyle.MUTED)
+	var off := AHKit.button(tr("Desligar dicas"), "secondary")
+	off.custom_minimum_size = Vector2(200, 52)
+	off.add_theme_color_override("font_color", AHKit.MUTED)
 	off.focus_mode = Control.FOCUS_NONE
 	off.pressed.connect(func(): set_enabled(false))
 	row.add_child(off)
-	var ok := Button.new()
-	ok.text = "Entendi"
-	ok.custom_minimum_size = Vector2(150, 40)
-	AHCombatHud.style_button(ok)
-	ok.add_theme_color_override("font_color", AHUiStyle.GOLD)
+	var ok := AHKit.button(tr("Entendi"), "primary")
+	ok.custom_minimum_size = Vector2(200, 52)
+	for state in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color"]:
+		ok.add_theme_color_override(state, AHKit.ON_AMBER)
 	ok.pressed.connect(dismiss)
 	row.add_child(ok)
 	_ok = ok

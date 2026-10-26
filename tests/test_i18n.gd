@@ -177,7 +177,7 @@ func _switch_live() -> void:
 			break
 	if t.check(title != null, "o título abre"):
 		await _tree.process_frame
-		t.equal(title.new_button.text, "New campaign", "o título em inglês")
+		t.equal(title.new_button.text, "NEW CAMPAIGN", "o título em inglês")
 		title.options_button.pressed.emit()
 		await _tree.process_frame
 		var texts: Array = title._modal.find_children("*", "Label", true, false).map(func(l): return l.text)
@@ -188,7 +188,7 @@ func _switch_live() -> void:
 		Settings.set_language("pt_BR")
 		title._build_buttons()
 		await _tree.process_frame
-		t.equal(title.new_button.text, "Nova campanha", "de volta ao português")
+		t.equal(title.new_button.text, "NOVA CAMPANHA", "de volta ao português")
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
 	await _tree.process_frame

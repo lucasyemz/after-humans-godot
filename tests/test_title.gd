@@ -67,7 +67,7 @@ func _options_without_save() -> void:
 	t.check(not Campaign.has_save(), "as Opções do título sem campanha não gravam save")
 	title.close_modal()
 	await _frames(2)
-	t.equal(_texts(title._buttons), ["Nova campanha", "Opções"], "depois das Opções, ainda sem Continuar")
+	t.equal(_texts(title._buttons), ["nova campanha", "opções"], "depois das Opções, ainda sem Continuar")
 	title.new_button.pressed.emit()
 	await _frames(2)
 	t.check(not title.modal_open(), "sem save, Nova campanha não pergunta")
@@ -85,7 +85,7 @@ func _without_save() -> void:
 	if title == null:
 		return
 	t.check(title.continue_button == null, "sem save, não há Continuar")
-	t.equal(_texts(title._buttons), ["Nova campanha", "Opções"], "sem save: Nova campanha e Opções")
+	t.equal(_texts(title._buttons), ["nova campanha", "opções"], "sem save: Nova campanha e Opções")
 	title.new_button.pressed.emit()
 	t.check(await _settles_on("Station"), "Nova campanha sem save vai direto para a Estação")
 	t.check(Campaign.has_valid_save(), "e grava a campanha nova")
@@ -100,7 +100,7 @@ func _with_save() -> void:
 		return
 	t.check(title.continue_button != null, "com save, há Continuar")
 	t.check(title.get_viewport().gui_get_focus_owner() == title.continue_button, "o foco começa no Continuar")
-	t.equal(_texts(title._buttons), ["Continuar", "Nova campanha", "Opções"], "com save: Continuar, Nova campanha e Opções")
+	t.equal(_texts(title._buttons), ["continuar", "nova campanha", "opções"], "com save: Continuar, Nova campanha e Opções")
 	title.continue_button.pressed.emit()
 	t.check(await _settles_on("Station"), "Continuar leva à Estação")
 	t.equal(Campaign.state.roster.map(func(h): return h.id), before.roster.map(func(h): return h.id), "Continuar mantém a campanha do save")
@@ -198,6 +198,20 @@ func _broken_save() -> void:
 	if title == null:
 		return
 	t.check(title.continue_button == null, "save estragado não mostra Continuar")
+	# O aviso (#107): a chapa com o texto logo abaixo dos botões, inteira na tela e acima da barra das teclas.
+	Campaign._warning_kind = "slot"
+	Campaign._warning_slot = 2
+	title._build_buttons()
+	title._layout()
+	await _frames(4)
+	if t.check(Campaign.warning_text() != "", "o aviso de um espaço que não abriu"):
+		var note: Rect2 = title._note.get_global_rect()
+		var text: Rect2 = title._note_label.get_global_rect()
+		var view: Vector2 = title.get_viewport_rect().size
+		t.check(title._note.visible and note.encloses(text) and note.end.y <= title._keys.get_global_rect().position.y and note.end.y <= view.y,
+			"o aviso cabe na tela, com o texto dentro da chapa (%s, %s)" % [note, text])
+	Campaign._warning_kind = ""
+	title._build_buttons()
 	title.options_button.pressed.emit()
 	await _frames(2)
 	_press(title._modal, "2x")
@@ -239,7 +253,7 @@ func _other_slot() -> void:
 	var title := await _open_title()
 	if title == null:
 		return
-	t.equal(_texts(title._buttons), ["Continuar", "Nova campanha", "Campanhas", "Opções"], "com duas campanhas, há Campanhas")
+	t.equal(_texts(title._buttons), ["continuar", "nova campanha", "campanhas", "opções"], "com duas campanhas, há Campanhas")
 	title.load_button.pressed.emit()
 	await _frames(2)
 	t.check(title._modal.find_child("Slot3", true, false).disabled, "o espaço vazio não abre")
@@ -289,12 +303,13 @@ func _settles_on(scene_name: String) -> bool:
 
 
 func _texts(box: Node) -> Array:
-	return box.get_children().filter(func(c): return c is Button and not c.is_queued_for_deletion()).map(func(c): return c.text)
+	# Os botões do kit ficam em caixa alta; a comparação é sem caixa.
+	return box.get_children().filter(func(c): return c is Button and not c.is_queued_for_deletion()).map(func(c): return c.text.to_lower())
 
 
 func _press(scope: Node, text: String) -> void:
 	for button in scope.find_children("*", "Button", true, false):
-		if button.text == text:
+		if button.text.to_lower() == text.to_lower():
 			button.pressed.emit()
 			return
 	t.check(false, "botão %s" % text)

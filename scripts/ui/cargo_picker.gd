@@ -5,8 +5,6 @@
 class_name AHCargoPicker
 extends VBoxContainer
 
-const U = preload("res://scripts/ui/ui_style.gd")
-const H = preload("res://scripts/ui/combat_hud.gd")
 const COLUMNS := 3
 ## O intervalo entre uma caixa revelada e a próxima (s).
 const REVEAL_STEP := 0.25
@@ -29,8 +27,8 @@ static func build(cargo_boxes: Array) -> AHCargoPicker:
 func _ready() -> void:
 	name = "CargoPicker"
 	add_theme_constant_override("separation", 12)
-	add_child(U.label(tr("Carga recuperada"), 34, U.GOLD, "display"))
-	var story := U.label(tr("O guardião guardava compartimentos lacrados. Só dá tempo de abrir um antes de a carcaça ceder; o resto, a equipe vê pelas frestas."), 19, U.TEXT)
+	add_child(AHKit.label(tr("Carga recuperada"), "panel_title", AHKit.TEXT, true, true))
+	var story := AHKit.label(tr("O guardião guardava compartimentos lacrados. Só dá tempo de abrir um antes de a carcaça ceder; o resto, a equipe vê pelas frestas."), "text", AHKit.TEXT)
 	story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	story.custom_minimum_size = Vector2(720, 0)
 	add_child(story)
@@ -49,15 +47,20 @@ func _ready() -> void:
 		button.expand_icon = false
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		H.style_button(button)
+		AHKit.style_button(button, AHKit.piece_of("chip", "resource_tile"), Vector4(10, 10, 10, 10))
+		button.add_theme_font_override("font", AHKit.font(true))
+		button.add_theme_font_size_override("font_size", AHKit.size("text"))
+		button.add_theme_color_override("font_color", AHKit.TEXT)
+		button.add_theme_color_override("icon_normal_color", AHKit.AMBER)
 		button.pressed.connect(_choose.bind(i))
 		grid.add_child(button)
 		buttons.append(button)
-	continue_button = Button.new()
-	continue_button.text = tr("Continuar")
-	continue_button.custom_minimum_size = Vector2(240, 48)
+	continue_button = AHStationReport._primary(tr("Continuar"), "", "interact")
+	continue_button.icon = null
+	continue_button.custom_minimum_size = Vector2(320, 60)
+	continue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	continue_button.add_theme_font_size_override("font_size", AHKit.size("row"))
 	continue_button.visible = false
-	H.style_button(continue_button, U.GOLD, true)
 	continue_button.pressed.connect(func(): closed.emit())
 	add_child(continue_button)
 	if not buttons.is_empty():
@@ -82,6 +85,7 @@ func _choose(chosen_index: int) -> void:
 			await get_tree().create_timer(REVEAL_STEP).timeout
 		_reveal(i, false)
 	continue_button.visible = true
+	AHStationReport.fit_key(continue_button, 52.0)
 	continue_button.grab_focus()
 
 
@@ -93,12 +97,14 @@ func _reveal(i: int, mine: bool) -> void:
 	button.icon = _icon(AHFightRewards.icon_of(box))
 	button.set_meta("revealed", true)
 	if mine:
-		button.add_theme_stylebox_override("disabled", U.panel(0.95, U.GOLD, 3))
-		button.add_theme_color_override("font_disabled_color", U.GOLD)
+		# A escolhida: a moldura âmbar da seleção por cima e o texto em âmbar.
+		button.add_child(AHKit.selected_overlay())
+		button.add_theme_color_override("font_disabled_color", AHKit.AMBER)
+		button.add_theme_color_override("icon_disabled_color", AHKit.AMBER)
 	else:
-		# As outras: legíveis, mas apagadas (o texto em cinza claro, o ícone mais fraco).
-		button.add_theme_color_override("font_disabled_color", U.TEXT.darkened(0.25))
-		button.add_theme_color_override("icon_disabled_color", Color(1, 1, 1, 0.55))
+		# As outras: legíveis, mas apagadas, no tom apagado sem transparência.
+		button.add_theme_color_override("font_disabled_color", AHKit.MUTED)
+		button.add_theme_color_override("icon_disabled_color", AHKit.MUTED)
 
 
 func _icon(icon_name: String) -> Texture2D:

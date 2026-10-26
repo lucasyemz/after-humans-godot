@@ -976,7 +976,6 @@ kit_bar.gd: size
 kit_bar.gd: enemy
 kit_bar.gd: state
 character_room.gd: life
-character_sheet.gd: life
 kit_bar.gd: life
 station_report.gd: life
 combat_hud.gd: Hit
@@ -1266,3 +1265,20 @@ inventory_panel.gd: Key
 inventory_panel.gd: Slot_%s
 inventory_panel.gd: Previous
 inventory_panel.gd: Next
+title_screen.gd: Warning
+title_screen.gd: Keys
+title_screen.gd: Key
+title_screen.gd: Glyph
+title_screen.gd: Window
+title_screen.gd: Head
+title_screen.gd: Back
+title_screen.gd: X
+title_screen.gd: Close
+briefing_dialog.gd: %d/%s/%s
+briefing_dialog.gd: Key
+character_sheet.gd: art
+character_sheet.gd: Level
+title_screen.gd: Esc
+title_screen.gd: Esc / B
+title_screen.gd: slot
+briefing_dialog.gd: Esc
