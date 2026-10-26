@@ -1153,10 +1153,17 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		if walker.has("civilian") or not walker.has("hero_id"):
 			continue
 		var card: AHSpriteCard = walker.card
-		for attempt in 8:
-			if not _crowded(walker, card.position.x):
-				break
-			card.position.x = rng.randf_range(walker.min, walker.max)
+		if _crowded(walker, card.position.x):
+			# O ponto mais folgado entre vários sorteados (numa faixa estreita, o primeiro livre podia não sair).
+			var best := _clearance(walker, card.position.x)
+			var spot := card.position.x
+			for attempt in 16:
+				var x := rng.randf_range(walker.min, walker.max)
+				var room_left := _clearance(walker, x)
+				if room_left > best:
+					best = room_left
+					spot = x
+			card.position.x = spot
 		walker.target = card.position.x
 	# Refeitos os passeios (depois do trem, por exemplo), quem dorme volta para o beliche.
 	_update_sleepers()
@@ -1242,11 +1249,11 @@ func _walk(delta: float) -> void:
 				_sit_down(walker)
 				continue
 			# Chegou perto demais de alguém parado (que parou ali enquanto ele andava): segue para outro ponto.
-			if _crowded(walker, card.position.x) and not walker.get("rerouted", false):
-				walker.rerouted = true
+			if _crowded(walker, card.position.x) and walker.get("rerouted", 0) < 3:
+				walker.rerouted = walker.get("rerouted", 0) + 1
 				_choose_target(walker)
 				continue
-			walker.rerouted = false
+			walker.rerouted = 0
 			walker.wait = randf_range(2.5, 7.0)
 			continue
 		card.set_facing(signf(gap))
@@ -1258,11 +1265,18 @@ func _choose_target(walker: Dictionary) -> void:
 	var card: AHSpriteCard = walker.card
 	# Pelo menos 1 m de caminhada e longe de quem está parado ou indo parar na mesma faixa; perto de uma ponta, vai
 	# para a outra.
+	# Entre vários pontos sorteados, o mais folgado (numa faixa estreita, como a da Preparação, o primeiro livre podia
+	# nem existir entre poucos sorteios).
 	var target := randf_range(walker.min, walker.max)
-	for attempt in 8:
-		if absf(target - card.position.x) >= 1.0 and not _crowded(walker, target):
-			break
-		target = randf_range(walker.min, walker.max)
+	var best := -1.0
+	for attempt in 16:
+		var x := randf_range(walker.min, walker.max)
+		if absf(x - card.position.x) < 1.0:
+			continue
+		var room_left := minf(_clearance(walker, x), STOP_GAP * 2.0)
+		if room_left > best:
+			best = room_left
+			target = x
 	if absf(target - card.position.x) < 1.0:
 		target = walker.min if card.position.x > (walker.min + walker.max) * 0.5 else walker.max
 	# Na Cantina, às vezes vai sentar no banco livre atrás da mesa (só os fundadores têm a pose sentada).
@@ -1278,7 +1292,13 @@ func _choose_target(walker: Dictionary) -> void:
 
 ## Há alguém parado (ou indo parar) a menos de STOP_GAP de x, na mesma faixa (o mesmo andar e a mesma profundidade).
 func _crowded(walker: Dictionary, x: float) -> bool:
+	return _clearance(walker, x) < STOP_GAP
+
+
+## A distância de x até o mais perto de quem está parado (ou indo parar) na mesma faixa.
+func _clearance(walker: Dictionary, x: float) -> float:
 	var card: AHSpriteCard = walker.card
+	var nearest := INF
 	for other in _walkers:
 		if other == walker or not is_instance_valid(other.card) or not other.card.visible:
 			continue
@@ -1287,9 +1307,8 @@ func _crowded(walker: Dictionary, x: float) -> bool:
 			continue
 		var moving: bool = not other.has("civilian") and other.get("wait", 0.0) <= 0.0 and other.get("sitting", 0.0) <= 0.0
 		var spot: float = float(other.get("target", them.position.x)) if moving else them.position.x
-		if absf(spot - x) < STOP_GAP or absf(them.position.x - x) < STOP_GAP:
-			return true
-	return false
+		nearest = minf(nearest, minf(absf(spot - x), absf(them.position.x - x)))
+	return nearest
 
 
 ## O posto de trabalho: o meio da faixa ou, com alguém ali (o morador do cômodo fica no meio), ao lado.
@@ -1325,6 +1344,10 @@ func _stand_up(walker: Dictionary) -> void:
 	card.show_art(walker.idle)
 	card.position.z = walker.home_z
 	walker.wait = randf_range(2.0, 5.0)
+	# Levantou na frente de alguém que parou ali enquanto estava sentado: sai andando.
+	if _crowded(walker, card.position.x):
+		walker.wait = 0.0
+		_choose_target(walker)
 
 
 # ---------------------------------------------------------------- ambiente
