@@ -1051,8 +1051,25 @@ func _start_fight(index: int, advantage: bool) -> void:
 	var fight := R.start_corridor_combat(Campaign.state, advantage)
 	if fight.is_empty():
 		return
+	# A barra de Admin (#130): a luta contra o inimigo escolhido, com os cartões dele (o tamanho e o desenho certos).
+	var chosen: String = Admin.next_enemy
+	fight.enemies = Admin.override_enemies(fight.enemies)
 	var house := index >= R.HOUSE_ENEMY_INDEX
 	var cards: Array = room_guards if house else guards[index].cards
+	if chosen != "" and not fight.enemies.is_empty() and fight.enemies[0].enemy_id == chosen:
+		var swapped: Array = []
+		for i in fight.enemies.size():
+			var old: AHSpriteCard = cards[mini(i, cards.size() - 1)]
+			var card := _enemy_card(chosen)
+			card.position = old.position
+			swapped.append(card)
+		for old in cards:
+			old.queue_free()
+		cards = swapped
+		if house:
+			room_guards = swapped
+		else:
+			guards[index].cards = swapped
 	if not house:
 		guards[index].mark.visible = false
 	_fight = {"index": index, "boss": fight.boss, "house": house, "cards": cards,
@@ -1113,11 +1130,12 @@ func open_cargo() -> void:
 	hud.refresh(campaign)
 
 
-## K (teste): anda pelos trechos já liberados até a próxima patrulha e para na frente dela.
-func debug_next_fight() -> void:
+## K (teste): anda pelos trechos já liberados até a próxima patrulha e para na frente dela. Devolve se andou (false: fora
+## do corredor, numa casa ou ocupado).
+func debug_next_fight() -> bool:
 	var campaign: Dictionary = Campaign.state
 	if not R.in_corridor(campaign) or room != null or side_room >= 0 or busy:
-		return
+		return false
 	var route: Dictionary = campaign.session.expedition.corridor
 	while route.steps[route.index].resolved and route.index < mini(map_last, route.steps.size() - 1):
 		# A Passagem com o evento de história para ali, com o cartão aberto (o laço não saía com o evento aberto).
@@ -1125,12 +1143,12 @@ func debug_next_fight() -> void:
 			Campaign.save()
 			hud.refresh(campaign)
 			hud.show_event(campaign)
-			return
+			return true
 	Campaign.save()
 	# Passou do mapa de passagem: viaja para o da fase.
 	if route.steps[route.index].resolved and route.index == map_last and map_last < route.steps.size() - 1:
 		_travel_map(campaign, map_last + 1)
-		return
+		return true
 	if guards.has(route.index):
 		var front: AHSpriteCard = guards[route.index].cards[0]
 		var to := _segment_of(route.index)
@@ -1139,6 +1157,8 @@ func debug_next_fight() -> void:
 		else:
 			street._place_leader(Vector3(front.position.x - CONTACT - 2.5, street.floor_y if street.scenario else 0.0, street.lane_z if street.scenario else 0.45))
 	hud.refresh(campaign)
+	# Sem patrulha à frente (tudo vencido), não houve aonde ir.
+	return guards.has(route.index)
 
 
 # ---------------------------------------------------------------- resultado

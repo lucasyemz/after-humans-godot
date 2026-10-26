@@ -271,6 +271,9 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
 	if speed <= 2.0:
 		speed = float(clampi(int(Campaign.state.get("settings", {}).get("battle_speed", 1)), 1, 2))
+		# A barra de Admin (#130) pode pôr a luta em 4x.
+		if Admin.battle_speed > 0.0 and Admin.allowed():
+			speed = Admin.battle_speed
 	center_x = at_x
 	gap_scale = 1.0
 	if _street != null and _street.has_method("combat_room"):
@@ -471,7 +474,8 @@ func _execute(actor_id: String, command: Dictionary) -> Dictionary:
 
 
 func _wait(seconds: float) -> void:
-	await get_tree().create_timer(seconds / speed).timeout
+	# A espera para com o jogo pausado (a barra de Admin, #130): o inimigo não age por trás dela.
+	await get_tree().create_timer(seconds / speed, false).timeout
 
 
 # ---------------------------------------------------------------- lances
@@ -580,7 +584,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 	var held := (Time.get_ticks_msec() - impact_start) * 0.001
 	var impact := maxf(IMPACT_SECONDS * (0.8 if support else 1.0), life) / speed
 	if held < impact:
-		await get_tree().create_timer(impact - held).timeout
+		await get_tree().create_timer(impact - held, false).timeout
 	# Volta: todos ao descanso e a câmera abre de novo.
 	show_pose(actor, "idle")
 	var back := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -745,7 +749,7 @@ func _hitstop(seconds: float) -> void:
 		return
 	_hitstop_scale = Engine.time_scale
 	Engine.time_scale = _hitstop_scale * HITSTOP_TIME_SCALE
-	await get_tree().create_timer(seconds / speed, true, false, true).timeout
+	await get_tree().create_timer(seconds / speed, false, false, true).timeout
 	_end_hitstop()
 
 

@@ -1988,7 +1988,7 @@ func show_result(result: String, automatic: bool = false, rewards: Dictionary = 
 			var tween := create_tween()
 			tween.tween_property(timer, "value", 0.0, seconds)
 		var closing := _result_opened
-		get_tree().create_timer(seconds).timeout.connect(func():
+		get_tree().create_timer(seconds, false).timeout.connect(func():
 			if _result.visible and _result_opened == closing:
 				result_closed.emit())
 	await result_closed

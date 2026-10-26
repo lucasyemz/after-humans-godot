@@ -273,7 +273,8 @@ func ue_key(x: float, y: float, z: float, horizontal_fov: float, pitch: float) -
 func _apply_key(key: Dictionary) -> void:
 	camera.position = key.pos
 	camera.rotation = Vector3(deg_to_rad(key.pitch), 0, 0)
-	camera.fov = key.fov
+	# A câmera da barra de Admin (#130): o campo de visão mais fechado ou mais aberto.
+	camera.fov = clampf(key.fov * Admin.zoom("station"), 5.0, 120.0)
 
 
 static func _lerp_key(a: Dictionary, b: Dictionary, t: float) -> Dictionary:

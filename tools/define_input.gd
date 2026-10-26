@@ -32,8 +32,9 @@ const ACTIONS := {
 	"combat_examine": {"keys": [KEY_X], "buttons": [JOY_BUTTON_LEFT_STICK]},
 	# O registro da luta, escondido por padrão (#56): abre e fecha.
 	"combat_log": {"keys": [KEY_L], "buttons": [JOY_BUTTON_RIGHT_STICK]},
-	# Só para teste do protótipo (teclado).
-	"debug_toggle": {"keys": [KEY_F1]},
+	# A barra de Admin para testes (#130): só na build de teste ou com --admin.
+	"admin_toggle": {"keys": [KEY_F1]},
+	# As teclas de teste antigas da rua (a barra de Admin as liga em Ajustes).
 	"debug_rain": {"keys": [KEY_R]},
 	"debug_time": {"keys": [KEY_T]},
 	"debug_post": {"keys": [KEY_P]},
