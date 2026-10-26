@@ -58,7 +58,7 @@ static func top(parent: Control, campaign: Dictionary, subtitle: String, on_opti
 	gear.name = "Options"
 	gear.tooltip_text = TranslationServer.translate("Opções")
 	var cog := TextureRect.new()
-	cog.texture = load("res://art/ui/icons/lobby-settings.svg")
+	cog.texture = AHKit.legacy_icon("lobby-settings")
 	cog.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	cog.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	cog.modulate = AHKit.TEXT
@@ -102,12 +102,14 @@ static func materials(campaign: Dictionary) -> PanelContainer:
 		item.tooltip_text = TranslationServer.translate(spec[2])
 		item.mouse_filter = Control.MOUSE_FILTER_PASS
 		var icon := TextureRect.new()
-		icon.texture = load("res://art/ui/icons/%s.svg" % spec[0])
+		# Os materiais pintados (#125), como Comida, Água e Energia ao lado: a barra num estilo só.
+		var painted := AHKit.painted(spec[0])
+		icon.texture = painted if painted != null else AHKit.legacy_icon(spec[0])
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.custom_minimum_size = Vector2(30, 30)
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		icon.modulate = AHKit.TEXT
+		icon.modulate = Color.WHITE if painted != null else AHKit.TEXT
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		item.add_child(icon)
 		item.add_child(AHKit.label(str(S.quantity(campaign, spec[1])), "row", AHKit.TEXT, true))
@@ -128,7 +130,7 @@ static func vital_chip(vital: Dictionary) -> PanelContainer:
 	chip.add_child(row)
 	var icon := TextureRect.new()
 	var painted := AHKit.icon("resource_%s" % vital.id)
-	icon.texture = painted if painted != null else load("res://art/ui/icons/%s.svg" % vital.icon)
+	icon.texture = painted if painted != null else AHKit.legacy_icon(vital.icon)
 	icon.modulate = Color.WHITE if painted != null else AHKit.TEXT
 	# Faltando, o ícone também vira o alerta (o triângulo): a forma avisa no daltonismo (hud-estacao.md).
 	if vital.warn:
@@ -160,7 +162,7 @@ static func back_button(parent: Control, action: Callable) -> Button:
 	# A seta para trás: a da direita espelhada (não há a da esquerda nos ícones).
 	var arrow := TextureRect.new()
 	arrow.name = "Arrow"
-	arrow.texture = load("res://art/ui/icons/ui-arrow-right.svg")
+	arrow.texture = AHKit.legacy_icon("ui-arrow-right")
 	arrow.flip_h = true
 	arrow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	arrow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

@@ -418,10 +418,10 @@ func _action_icon(kind: String) -> Texture2D:
 		"flee":
 			return AHKit.texture("exit")
 		"move":
-			return load("res://art/ui/icons/ui-arrow-right.svg")
+			return AHKit.legacy_icon("ui-arrow-right")
 		"defend":
-			return load("res://art/ui/icons/intent-block.svg")
-	return load("res://art/ui/icons/item-generic.svg")
+			return AHKit.legacy_icon("intent-block")
+	return AHKit.legacy_icon("item-generic")
 
 
 ## As cores do kit que dependem do daltonismo (a linha do nome do alvo acompanha a cor das máquinas).
@@ -1372,7 +1372,7 @@ func _popup_loot(box: VBoxContainer, result: String) -> void:
 		row.add_theme_constant_override("separation", 6)
 		chip.add_child(row)
 		var icon := TextureRect.new()
-		icon.texture = load("res://art/ui/icons/%s.svg" % icons[key])
+		icon.texture = AHKit.legacy_icon(icons[key])
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.custom_minimum_size = Vector2(24, 24)

@@ -1,0 +1,548 @@
+{
+ "note": "Mapa da Rede (#86, #87): a pintura, as áreas de cada lugar (âncora e polígono do clique, em pixels da pintura), as camadas de cada estado e as rotas. Copiado de docs/design/phase-map/contract.json.",
+ "canvas": [
+  1120,
+  630
+ ],
+ "background": "art/ui/map/network/network_map.webp",
+ "regions": [
+  {
+   "key": "refuge",
+   "phase_id": null,
+   "name": "Estação Raiz",
+   "anchor": [
+    200,
+    405
+   ],
+   "hit_polygon": [
+    [
+     20,
+     300
+    ],
+    [
+     110,
+     284
+    ],
+    [
+     255,
+     317
+    ],
+    [
+     369,
+     377
+    ],
+    [
+     350,
+     469
+    ],
+    [
+     208,
+     531
+    ],
+    [
+     15,
+     450
+    ]
+   ],
+   "states": {
+    "available": {
+     "file": "art/ui/map/network/refuge_available.webp",
+     "origin": [
+      14,
+      284
+     ],
+     "size": [
+      357,
+      248
+     ]
+    },
+    "selected": {
+     "file": "art/ui/map/network/refuge_selected.webp",
+     "origin": [
+      14,
+      283
+     ],
+     "size": [
+      357,
+      250
+     ]
+    },
+    "completed": {
+     "file": "art/ui/map/network/refuge_completed.webp",
+     "origin": [
+      14,
+      284
+     ],
+     "size": [
+      357,
+      248
+     ]
+    },
+    "locked": {
+     "file": "art/ui/map/network/refuge_locked.webp",
+     "origin": [
+      14,
+      284
+     ],
+     "size": [
+      357,
+      248
+     ]
+    }
+   }
+  },
+  {
+   "key": "shop",
+   "phase_id": "fase_1",
+   "name": "Rua das Vitrines",
+   "anchor": [
+    325,
+    215
+   ],
+   "hit_polygon": [
+    [
+     145,
+     150
+    ],
+    [
+     290,
+     100
+    ],
+    [
+     470,
+     180
+    ],
+    [
+     500,
+     245
+    ],
+    [
+     385,
+     315
+    ],
+    [
+     155,
+     242
+    ]
+   ],
+   "states": {
+    "available": {
+     "file": "art/ui/map/network/shop_available.webp",
+     "origin": [
+      144,
+      100
+     ],
+     "size": [
+      358,
+      216
+     ]
+    },
+    "selected": {
+     "file": "art/ui/map/network/shop_selected.webp",
+     "origin": [
+      144,
+      99
+     ],
+     "size": [
+      358,
+      218
+     ]
+    },
+    "completed": {
+     "file": "art/ui/map/network/shop_completed.webp",
+     "origin": [
+      144,
+      100
+     ],
+     "size": [
+      358,
+      216
+     ]
+    },
+    "locked": {
+     "file": "art/ui/map/network/shop_locked.webp",
+     "origin": [
+      144,
+      100
+     ],
+     "size": [
+      358,
+      216
+     ]
+    }
+   }
+  },
+  {
+   "key": "bridge",
+   "phase_id": "fase_2",
+   "name": "Ponte das Raízes e Cais do Rio",
+   "anchor": [
+    615,
+    430
+   ],
+   "hit_polygon": [
+    [
+     365,
+     308
+    ],
+    [
+     455,
+     320
+    ],
+    [
+     725,
+     449
+    ],
+    [
+     785,
+     504
+    ],
+    [
+     730,
+     589
+    ],
+    [
+     608,
+     567
+    ],
+    [
+     529,
+     506
+    ],
+    [
+     367,
+     420
+    ]
+   ],
+   "states": {
+    "available": {
+     "file": "art/ui/map/network/bridge_available.webp",
+     "origin": [
+      364,
+      308
+     ],
+     "size": [
+      423,
+      282
+     ]
+    },
+    "selected": {
+     "file": "art/ui/map/network/bridge_selected.webp",
+     "origin": [
+      364,
+      307
+     ],
+     "size": [
+      423,
+      284
+     ]
+    },
+    "completed": {
+     "file": "art/ui/map/network/bridge_completed.webp",
+     "origin": [
+      364,
+      308
+     ],
+     "size": [
+      423,
+      282
+     ]
+    },
+    "locked": {
+     "file": "art/ui/map/network/bridge_locked.webp",
+     "origin": [
+      364,
+      308
+     ],
+     "size": [
+      423,
+      282
+     ]
+    }
+   }
+  },
+  {
+   "key": "shelter",
+   "phase_id": "fase_3",
+   "name": "Sala Esquecida / Abrigo Lacrado",
+   "anchor": [
+    620,
+    145
+   ],
+   "hit_polygon": [
+    [
+     493,
+     95
+    ],
+    [
+     600,
+     69
+    ],
+    [
+     738,
+     119
+    ],
+    [
+     748,
+     173
+    ],
+    [
+     660,
+     234
+    ],
+    [
+     526,
+     196
+    ]
+   ],
+   "states": {
+    "available": {
+     "file": "art/ui/map/network/shelter_available.webp",
+     "origin": [
+      492,
+      69
+     ],
+     "size": [
+      258,
+      166
+     ]
+    },
+    "selected": {
+     "file": "art/ui/map/network/shelter_selected.webp",
+     "origin": [
+      492,
+      68
+     ],
+     "size": [
+      258,
+      168
+     ]
+    },
+    "completed": {
+     "file": "art/ui/map/network/shelter_completed.webp",
+     "origin": [
+      492,
+      69
+     ],
+     "size": [
+      258,
+      166
+     ]
+    },
+    "locked": {
+     "file": "art/ui/map/network/shelter_locked.webp",
+     "origin": [
+      492,
+      69
+     ],
+     "size": [
+      258,
+      166
+     ]
+    }
+   }
+  },
+  {
+   "key": "lab",
+   "phase_id": "fase_4",
+   "name": "Laboratório Silencioso / Portão de Triagem",
+   "anchor": [
+    960,
+    385
+   ],
+   "hit_polygon": [
+    [
+     791,
+     280
+    ],
+    [
+     870,
+     251
+    ],
+    [
+     1107,
+     330
+    ],
+    [
+     1100,
+     452
+    ],
+    [
+     973,
+     525
+    ],
+    [
+     794,
+     430
+    ]
+   ],
+   "states": {
+    "available": {
+     "file": "art/ui/map/network/lab_available.webp",
+     "origin": [
+      790,
+      251
+     ],
+     "size": [
+      319,
+      275
+     ]
+    },
+    "selected": {
+     "file": "art/ui/map/network/lab_selected.webp",
+     "origin": [
+      790,
+      250
+     ],
+     "size": [
+      319,
+      277
+     ]
+    },
+    "completed": {
+     "file": "art/ui/map/network/lab_completed.webp",
+     "origin": [
+      790,
+      251
+     ],
+     "size": [
+      319,
+      275
+     ]
+    },
+    "locked": {
+     "file": "art/ui/map/network/lab_locked.webp",
+     "origin": [
+      790,
+      251
+     ],
+     "size": [
+      319,
+      275
+     ]
+    }
+   }
+  },
+  {
+   "key": "depot",
+   "phase_id": "fase_5",
+   "name": "Túneis do Eco e Depósito Inundado",
+   "anchor": [
+    990,
+    145
+   ],
+   "hit_polygon": [
+    [
+     791,
+     79
+    ],
+    [
+     940,
+     46
+    ],
+    [
+     1113,
+     106
+    ],
+    [
+     1118,
+     213
+    ],
+    [
+     993,
+     263
+    ],
+    [
+     817,
+     198
+    ]
+   ],
+   "states": {
+    "available": {
+     "file": "art/ui/map/network/depot_available.webp",
+     "origin": [
+      790,
+      46
+     ],
+     "size": [
+      329,
+      218
+     ]
+    },
+    "selected": {
+     "file": "art/ui/map/network/depot_selected.webp",
+     "origin": [
+      790,
+      45
+     ],
+     "size": [
+      329,
+      220
+     ]
+    },
+    "completed": {
+     "file": "art/ui/map/network/depot_completed.webp",
+     "origin": [
+      790,
+      46
+     ],
+     "size": [
+      329,
+      218
+     ]
+    },
+    "locked": {
+     "file": "art/ui/map/network/depot_locked.webp",
+     "origin": [
+      790,
+      46
+     ],
+     "size": [
+      329,
+      218
+     ]
+    }
+   }
+  }
+ ],
+ "routes": {
+  "shop": {
+   "remaining": "art/ui/map/network/route_shop_remaining.webp",
+   "traversed": "art/ui/map/network/route_shop_traversed.webp"
+  },
+  "bridge": {
+   "remaining": "art/ui/map/network/route_bridge_remaining.webp",
+   "traversed": "art/ui/map/network/route_bridge_traversed.webp"
+  },
+  "shelter": {
+   "remaining": "art/ui/map/network/route_shelter_remaining.webp",
+   "traversed": "art/ui/map/network/route_shelter_traversed.webp"
+  },
+  "lab": {
+   "remaining": "art/ui/map/network/route_lab_remaining.webp",
+   "traversed": "art/ui/map/network/route_lab_traversed.webp"
+  },
+  "depot": {
+   "remaining": "art/ui/map/network/route_depot_remaining.webp",
+   "traversed": "art/ui/map/network/route_depot_traversed.webp"
+  }
+ },
+ "portraits": {
+  "robot": "art/ui/map/network/portrait_robot.webp",
+  "robot_fungo": "art/ui/map/network/portrait_robot_fungo.webp",
+  "vigia_enferrujado": "art/ui/map/network/portrait_vigia_enferrujado.webp",
+  "cao_eco": "art/ui/map/network/portrait_cao_eco.webp",
+  "condutor_raiz": "art/ui/map/network/portrait_condutor_raiz.webp",
+  "sussurrador": "art/ui/map/network/portrait_sussurrador.webp",
+  "rastejante_raiz": "art/ui/map/network/portrait_rastejante_raiz.webp",
+  "ninho_errante": "art/ui/map/network/portrait_ninho_errante.webp",
+  "carcaca_colonizada": "art/ui/map/network/portrait_carcaca_colonizada.webp",
+  "porteiro": "art/ui/map/network/portrait_porteiro.webp",
+  "recreador": "art/ui/map/network/portrait_recreador.webp",
+  "pipoco": "art/ui/map/network/portrait_pipoco.webp",
+  "enraizado": "art/ui/map/network/portrait_enraizado.webp",
+  "broto": "art/ui/map/network/portrait_broto.webp",
+  "carrasco_industrial": "art/ui/map/network/portrait_carrasco_industrial.webp",
+  "faisca": "art/ui/map/network/portrait_faisca.webp"
+ }
+}

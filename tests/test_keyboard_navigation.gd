@@ -74,8 +74,8 @@ func _station() -> void:
 	t.check(_inside(hud._map), "o foco está no mapa de fases")
 	await _send("ui_down")
 	t.check(_inside(hud._map), "↓ no mapa mantém o foco nele")
-	# A lista rola com o foco: ↓ chega até a última fase (Túneis do Eco), visível na tela.
-	if t.check(await _walk_to("Túneis do Eco", 20), "↓ chega na última fase do mapa"):
+	# As setas andam pelos lugares do mapa: ↓ chega até a última fase (Fase 5, os Túneis do Eco), visível na tela.
+	if t.check(await _walk_to("Fase 5", 20), "↓ chega na última fase do mapa"):
 		t.check(_visible_in(_focus(), hud._map), "e a lista rolou até ela")
 	await _send("cancel")
 	t.check(not hud._map.visible, "Voltar fecha o mapa")

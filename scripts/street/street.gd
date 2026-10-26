@@ -332,21 +332,32 @@ func door_list() -> Array:
 	var doors: Array = []
 	if scenario:
 		return doors
+	for spec in door_specs():
+		var index: int = spec.building
+		var building: Array = AHStreetSet.FACADE_BUILDINGS[index]
+		# O X vem da cena (o nó BuildingN, na ordem de FACADE_BUILDINGS): movido no editor, a porta onde se entra vai junto,
+		# sem sair do corredor.
+		var x: float = spec.base
+		var node := _set.get_node_or_null("Building%d" % (index + 1)) as Node3D if _set else null
+		if node != null:
+			x = clampf(spec.base + node.global_position.x - (building[0] + AHStreetSet.FACADE_WIDTH * 0.5) * 0.01, 0.5, CORRIDOR_LENGTH - 0.5)
+		doors.append({"x": x, "shop": spec.shop, "mirror": spec.mirror, "step": spec.step})
+	return doors
+
+
+## As portas do corredor pela montagem original, sem a cena (o radar do Mapa da Rede lê as casas com elas, #87): quais
+## estão no corredor e o trecho de cada uma. O save guarda a porta pelo índice nesta lista, e mexer na cena não pode
+## trocá-lo. {building, base, shop, mirror, step}.
+static func door_specs() -> Array:
+	var doors: Array = []
 	for index in AHStreetSet.FACADE_BUILDINGS.size():
 		var building: Array = AHStreetSet.FACADE_BUILDINGS[index]
 		var overlay: Rect2 = AHStreetSet.DOOR_OVERLAYS[building[1]]
 		var offset: float = (overlay.position.x + overlay.size.x * 0.5 - 768.0) * AHStreetSet.FACADE_WIDTH / 1536.0
-		# Quais portas estão no corredor e o trecho de cada uma vêm da montagem original: o save guarda a porta pelo índice
-		# nesta lista, e mexer na cena não pode trocá-lo. O X vem da cena (o nó BuildingN, na ordem de FACADE_BUILDINGS):
-		# movido no editor, a porta onde se entra vai junto, sem sair do corredor.
 		var base: float = (building[0] + AHStreetSet.FACADE_WIDTH * 0.5 + (-offset if building[2] else offset)) * 0.01
 		if base < 0.0 or base >= CORRIDOR_LENGTH:
 			continue
-		var x := base
-		var node := _set.get_node_or_null("Building%d" % (index + 1)) as Node3D if _set else null
-		if node != null:
-			x = clampf(base + node.global_position.x - (building[0] + AHStreetSet.FACADE_WIDTH * 0.5) * 0.01, 0.5, CORRIDOR_LENGTH - 0.5)
-		doors.append({"x": x, "shop": building[1], "mirror": building[2], "step": floori(base / (CORRIDOR_LENGTH / 10.0))})
+		doors.append({"building": index, "base": base, "shop": building[1], "mirror": building[2], "step": floori(base / (CORRIDOR_LENGTH / 10.0))})
 	return doors
 
 

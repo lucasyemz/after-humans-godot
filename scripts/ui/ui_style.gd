@@ -533,8 +533,7 @@ static func status_tip(entry: Array) -> String:
 
 ## O ícone do estado ou da intenção (os SVG brancos da entrega #18), para tingir com a cor do bom e do ruim.
 static func combat_icon(name: String) -> Texture2D:
-	var path := "res://art/ui/icons/%s.svg" % name
-	return load(path) if ResourceLoader.exists(path) else null
+	return AHKit.legacy_icon(name)
 
 
 ## O que cada termo quer dizer (as dicas do combate e o glossário).

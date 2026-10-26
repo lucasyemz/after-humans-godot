@@ -12,7 +12,6 @@ signal combat_item(kind: String)
 signal used
 
 const C = preload("res://scripts/flow/exploration_care.gd")
-const ICONS := "res://art/ui/icons/%s.svg"
 const KNOWN_TOOLS := ["pe_de_cabra", "lanterna", "mascara"]
 const TOOL_NAMES := {"pe_de_cabra": "Pé de cabra", "lanterna": "Lanterna", "mascara": "Máscara com filtro"}
 const TOOL_ICONS := {"pe_de_cabra": "tool-crowbar", "lanterna": "tool-flashlight", "mascara": "tool-mask"}
@@ -97,7 +96,7 @@ func _build() -> void:
 ## Um ícone do kit (ou dos ícones antigos, que o kit ainda não tem).
 func _icon(name: String, side: float, tint: Color) -> TextureRect:
 	var rect := TextureRect.new()
-	rect.texture = AHKit.icon(name) if ResourceLoader.exists(AHKit.ICONS % name) else load(ICONS % name)
+	rect.texture = AHKit.legacy_icon(name)
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rect.custom_minimum_size = Vector2(side, side)

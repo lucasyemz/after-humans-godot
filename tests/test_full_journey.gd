@@ -78,7 +78,7 @@ func _station_to_departure() -> bool:
 	if not await _until(func(): return map.visible, "o mapa de fases abrir"):
 		return false
 	# Escolhe a fase 1 na lista do mapa e prepara a expedição dela.
-	if not await _press(map, "Rua das Vitrines", "a fase 1 na lista do mapa"):
+	if not await _press(map, "Fase 1", "a fase 1 no mapa"):
 		return false
 	t.equal(map.selected, "fase_1", "a fase 1 fica escolhida no mapa")
 	if not await _press(map, "Preparar expedição", "Preparar expedição no painel da fase"):
@@ -157,6 +157,9 @@ func _journey() -> bool:
 			var lines := Array(street._arena.session.state.combat_log)
 			t.check(lines.has("Exposto: a equipe começa Vulnerável.") and lines.has("Preparado: a equipe começa com 1 Bloqueio."), "a luta da rua começa com os efeitos de fase")
 			t.equal(route.effects, ["preparado"], "o Exposto se gasta na luta; o Preparado fica para a fase")
+			# O resto da jornada sem efeitos, como antes: o teste confere o fluxo, e o Preparado mudaria o sorteio das lutas
+			# (o debriefing da fase 1 cala se o Bento não volta).
+			route.effects = []
 		if not await _auto_fight(street):
 			return false
 	# A carga recuperada do guardião (#91): escolhe a primeira caixa e continua.
@@ -391,7 +394,7 @@ func _final_checks() -> void:
 	# O mapa de fases mostra a fase 1 concluída.
 	hud.open_map()
 	await _frames(2)
-	if await _press(hud._map, "Rua das Vitrines", "a fase 1 na lista do mapa"):
+	if await _press(hud._map, "Fase 1", "a fase 1 no mapa"):
 		t.check(_has_label(hud._map, "Concluída"), "o mapa mostra a fase 1 concluída")
 	hud._map.visible = false
 
