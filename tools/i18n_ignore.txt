@@ -701,7 +701,7 @@ street.gd: Compatibility
 street.gd: Dynamic
 street.gd: FAIL
 street.gd: Forward+
-street.gd: Modo de desenvolvedor (F1)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões
+street.gd: Teclas de teste (Admin)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões
 street.gd: Occlusion
 street.gd: PASS
 street.gd: Rua: %s não existe; montando em código (rode tools/bake_street.gd).
@@ -1364,3 +1364,4 @@ combat_hud.gd: Row
 combat_hud.gd: part
 combat_hud.gd: Empty
 combat_hud.gd: id
+street.gd: fight

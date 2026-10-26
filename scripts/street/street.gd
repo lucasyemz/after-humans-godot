@@ -750,6 +750,8 @@ func _update_camera(delta: float) -> void:
 		distance = view.y
 		target = Vector3(view.x, floor_y + combat_lift + COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch),
 			(lane_z - 1.35) if scenario else -0.9)
+	# A câmera da barra de Admin (#130): mais perto ou mais longe, na exploração e na luta.
+	distance *= Admin.zoom("fight" if _arena != null and _arena.active else "explore")
 	# O tremor do acerto (#33): desloca a vista sem mover a câmera (a suavização não o arrasta), em pixels da tela.
 	var shake: Vector2 = _arena.camera_shake() if _arena != null and _arena.active else Vector2.ZERO
 	var meters_per_pixel := 2.0 * tan(deg_to_rad(_camera.fov * 0.5)) * distance / 1080.0
@@ -792,9 +794,10 @@ func _build_post_and_hud() -> void:
 	hud.add_child(_dev_overlay)
 	_hud_stats = _label("", 18, Vector2(1380, 1000))
 	_dev_overlay.add_child(_hud_stats)
-	_dev_overlay.add_child(_label("Modo de desenvolvedor (F1)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1046)))
-	_dev_overlay.visible = Settings.dev_mode or _capture_dir != ""
-	Settings.changed.connect(func(): _dev_overlay.visible = Settings.dev_mode or _capture_dir != "")
+	_dev_overlay.add_child(_label("Teclas de teste (Admin)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1046)))
+	# Só na build de teste (#130): na do jogador, o modo gravado de antes não liga nada.
+	_dev_overlay.visible = (Settings.dev_mode and Admin.allowed()) or _capture_dir != ""
+	Settings.changed.connect(func(): _dev_overlay.visible = (Settings.dev_mode and Admin.allowed()) or _capture_dir != "")
 
 
 func _label(text: String, size: int, at: Vector2) -> Label:
@@ -928,8 +931,8 @@ func _update_fire(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
 		return
-	# As teclas de teste só valem no modo de desenvolvedor (F1).
-	if not Settings.dev_mode:
+	# As teclas de teste só valem com elas ligadas na barra de Admin, e só na build de teste (#130).
+	if not Settings.dev_mode or not Admin.allowed():
 		return
 	if event.is_action_pressed("debug_time"):
 		_mood = "night" if _mood == "golden" else "golden"

@@ -91,12 +91,6 @@ func _input(event: InputEvent) -> void:
 		AHUiStyle.using_keys = false
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("debug_toggle"):
-		set_dev_mode(not dev_mode)
-		get_viewport().set_input_as_handled()
-
-
 func set_dev_mode(value: bool) -> void:
 	dev_mode = value
 	_store()
