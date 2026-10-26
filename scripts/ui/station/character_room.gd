@@ -847,7 +847,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	cancel.add_theme_font_size_override("font_size", AHKit.size("primary"))
 	cancel.custom_minimum_size = Vector2(0, 64)
 	cancel.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	var cancel_key := AHKitKey.make("", "%s / B" % AHUiStyle.key_name("cancel"), "button")
+	var cancel_key := AHKitKey.make("", "Esc / B", "button")
 	cancel_key.name = "Key"
 	cancel.add_child(cancel_key)
 	cancel.pressed.connect(func():
@@ -900,7 +900,8 @@ func _bottom(c: Dictionary) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	keys.add_child(row)
-	for spec in [[tr("Setas"), tr("Navegar")], [AHUiStyle.key_name("interact"), tr("Selecionar")], [AHUiStyle.key_name("cancel"), tr("Voltar")],
+	# Voltar mostra o Esc (ui_cancel, que volta sempre, com qualquer troca nas Opções; o nome de Backspace não cabia).
+	for spec in [[tr("Setas"), tr("Navegar")], [AHUiStyle.key_name("interact"), tr("Selecionar")], ["Esc", tr("Voltar")],
 			[AHUiStyle.key_name("hide_hud"), tr("Ocultar")]]:
 		var key := AHKitKey.make("", spec[0])
 		row.add_child(key)

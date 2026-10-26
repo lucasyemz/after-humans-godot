@@ -170,8 +170,9 @@ A Sala (`scripts/ui/station/character_room.gd`) também é a tela inteira:
 - **Abates** é a conta da carreira (`kills_count`, que existia no herói sem ser contado). A volta agora soma nela as
   máquinas derrubadas. Os saves antigos começam do zero.
 - **+ RECRUTAR** fica ao lado de VOLTAR: as quatro abas dos heróis enchem a coluna, como no alvo.
-- **A barra das teclas diz a tecla de Voltar** (`cancel`: Backspace no teclado padrão; o Esc também volta). No Maior, ela
-  fica entre os dois painéis.
+- **A barra das teclas diz "Esc Voltar":** o Esc volta sempre, com qualquer troca nas Opções (o nome de Backspace não
+  cabia). Ela fica entre os dois painéis; no Maior, os pares do fim que não cabem saem (Ocultar e Voltar também estão
+  nas abas e no VOLTAR).
 
 ## Rodadas da QA
 
@@ -213,7 +214,14 @@ A Sala (`scripts/ui/station/character_room.gd`) também é a tela inteira:
      - o ícone afastado do título nos botões principais;
      - o caído sem a ★.
    - **Baixa, fica como está:** VOLTAR e o X não são alcançados só com as setas na Sala. O Esc e o B fazem as duas coisas.
-3. **Decisão do Lucas, entre as rodadas:** o padrão dos componentes é o kit da Awesomic, também na luta. O Painel, a
+3. **A luta nos componentes e a Estação, reprovada.** As correções da rodada 2 se confirmaram.
+   - **Médias, corrigidas:**
+     - na mira, o nome do alvo cobria a ficha: a ficha agora fica ao lado do corpo, do nome e da intenção do apontado;
+     - a ação bloqueada parecia apertável no `icon_button`: o ícone apaga, como nas habilidades.
+   - **Baixas, corrigidas:**
+     - a volta à Sala vazava pelo "Ver …" do Plano: abrir outra tela limpa a volta;
+     - no Normal, a barra da Sala largava "F2 Ocultar": a tecla de Voltar é o Esc, curto, e os quatro pares cabem.
+4. **Decisão do Lucas, antes da rodada 3:** o padrão dos componentes é o kit da Awesomic, também na luta. O Painel, a
    Plaqueta, os Botões e a Barra da luta passaram para os componentes, e um teste confere que as peças aposentadas
    do Codex não voltam.
 

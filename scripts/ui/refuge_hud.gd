@@ -878,6 +878,8 @@ func _corners(rect: Rect2, color: Color, width: float, arm: float) -> void:
 
 
 func open_room(room_id: String) -> void:
+	# Outra tela pedida (o "Ver …" do Plano): a volta à Sala que abriu o Plano não vale mais.
+	_back_to = ""
 	_reset_focus()
 	if current == "" and _opened_frame != Engine.get_process_frames():
 		_opened_frame = Engine.get_process_frames()
@@ -890,6 +892,7 @@ func open_room(room_id: String) -> void:
 
 
 func open_service(service: String) -> void:
+	_back_to = ""
 	_reset_focus()
 	if current == "" and _opened_frame != Engine.get_process_frames():
 		_opened_frame = Engine.get_process_frames()

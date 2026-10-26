@@ -890,7 +890,15 @@ func _update_sheet(camera: Camera3D) -> void:
 	if unit == null or card == null or not card.visible or not unit.is_standing() or _bag != null or _result.visible:
 		sheet.close()
 		return
-	sheet.show_info(AHCharacterSheet.from_unit(session, unit, arena.boss_fight and not unit.is_player), _body_rect(camera, card),
+	# A ficha fica ao lado do corpo, do nome do apontado (o ALVO) e da intenção dele: nada disso fica embaixo dela.
+	var around := _body_rect(camera, card)
+	if _target_label != null and _target_label.visible and _target_label.has_meta("card") and _target_label.get_meta("card") == card:
+		around = around.merge(Rect2(_target_label.position, _target_label.size))
+	var plate: Control = _unit_bars.get(unit_id)
+	var tag: Control = plate.get_meta("intent") if plate != null and plate.has_meta("intent") else null
+	if tag != null and tag.visible:
+		around = around.merge(Rect2(tag.position, tag.size))
+	sheet.show_info(AHCharacterSheet.from_unit(session, unit, arena.boss_fight and not unit.is_player), around,
 		_dock_top() - 8.0 if _panel.visible else INF)
 
 
@@ -1205,6 +1213,8 @@ func _build_abilities(take_focus: bool = true) -> void:
 		var locked: bool = (kind == "move" and session.move_targets(_actor_id).is_empty()) or (kind == "flee" and not session.can_flee())
 		child.set_meta("locked", locked)
 		child.disabled = locked
+		# Bloqueada, a ação também apaga o ícone (como as habilidades): a peça escura quase não muda no desligado.
+		(child.get_node("Icon") as Control).modulate = Color(0.42, 0.42, 0.42) if locked else Color.WHITE
 		if kind == "item":
 			(child.get_node("Count") as Label).text = str(AHJourneyRules.food(Campaign.state))
 	# Na aba, curto como no alvo; o que fazer fica na dica das habilidades (_describe).

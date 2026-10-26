@@ -1078,7 +1078,8 @@ character_room.gd: Condition
 character_room.gd: Training
 character_room.gd: Upgrade_%s
 character_room.gd: Cancel
-character_room.gd: %s / B
+character_room.gd: Esc / B
+character_room.gd: Esc
 character_room.gd: Confirm
 character_room.gd: Back
 character_room.gd: Keys
