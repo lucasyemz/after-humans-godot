@@ -54,7 +54,7 @@ menor que 56 px; nenhuma peça cortada pelo painel; nenhum texto por cima de med
 ## 1. A inspeção da luta (#128)
 
 - **INSPECIONAR** é um botão alto à esquerda da grade das ações (Mover, Defender, Mochila, Fugir), da altura das duas
-  linhas, com o glifo da lupa, o rótulo e a tecla. A tecla é a do Examinar de hoje (`combat_examine`, X e L3 no
+  linhas (160 × 212 em x 1408, y 836), com o glifo da lupa, o rótulo e a tecla. A tecla é a do Examinar de hoje (`combat_examine`, X e L3 no
   controle): é a mesma ideia, agora como botão. Ligado, ganha a moldura âmbar.
 - **O mouse em cima** de um personagem só marca quem ele é: a moldura de foco na barra da vida e, nas máquinas, o nome
   na aba vermelha. A ficha não abre.
@@ -65,10 +65,14 @@ menor que 56 px; nenhuma peça cortada pelo painel; nenhum texto por cima de med
   - a velocidade e o que ela faz; a posição (heróis) ou a intenção, sem o alvo (máquinas);
   - à direita, os passivos e os estados, cada um com o que faz (os textos de `character_sheet.gd` e do glossário de
     `ui_style.gd`). Nas máquinas, a descrição vem primeiro. O que não cabe rola.
-  - A aba de cima diz como trocar e sair: "Inspecionar · Setas trocam · X ou Esc sai".
+  - A aba de cima diz como trocar e sair: "Inspecionar · Setas trocam · X ou Esc sai". Ela fica em y 816, sobre a
+    borda do painel (como ESCOLHA UM ALVO hoje), e a coluna da direita começa abaixo dela.
+  - As medidas: o painel tem 1328 × 212 em x 64, y 836, também no Maior (o que não cabe à direita rola).
   - Os estados mostrados são exemplo (a captura é a rodada 1, sem estados): o Recreador "Marcado".
 - **A intenção da máquina,** sobre a cabeça, mostra o tipo (o ícone de hoje: ataque, área, bloqueio, cura, movimento,
-  atordoado) e o nome da ação: "Pega-Pega", "Ordem Contraditória". Sai o "→ um de 4".
+  atordoado) e o nome da ação: "Pega-Pega", "Ordem Contraditória". Sai o "→ um de 4" (o "antes" é a captura do jogo
+  com a HUD de hoje). A cor é a de hoje (`_show_intent`): o ataque na cor do inimigo; a cura em verde e o bloqueio em
+  azul.
 - **O popup de fim de luta** (o do lote 5, [hud-ajustes.md](hud-ajustes.md)) ganha o X no canto, e a barra do tempo
   conta 5 s ("Fecha em 4 s · qualquer tecla fecha antes"). Com o mouse em cima ou o foco nele, a barra para, fica
   cinza e diz por quê ("Parado: o mouse está em cima · qualquer tecla fecha"). Na derrota, continua esperando o toque.
@@ -86,12 +90,15 @@ Ferramenta de teste: simples e densa, mas no idioma do kit.
 - **As abas:**
   - **Mapas:** o título, a Estação e o Mapa da Rede; cada fase com os mapas dela (a travessia e o trecho), o trecho 1 e
     o guardião; ir com a equipe de agora ou a inicial.
-  - **Clima:** a hora (fim de tarde, noite) e a chuva, que eram o T e o R da rua; só agora ou a jornada inteira.
+  - **Clima:** a hora (fim de tarde, noite) e o tempo (seco, chuva, tempestade), que eram o T e o R da rua; só agora
+    ou a jornada inteira.
   - **Ajustes:** a câmera da exploração, da Estação e da luta; a velocidade da luta; o pós-processamento e as colisões
     (o P e o C da rua); a qualidade.
   - **Recursos:** um por linha, com o que se tem e −1, +1, +5, +10.
-  - **Heróis:** cada herói com o estado, curar, cair ou tirar da recuperação (#118), +50 XP e +1 nível (#90);
-    recrutar na hora e quem chega no próximo trem (#122).
+  - **Heróis:** cada herói com o estado, curar, cair ou tirar da recuperação (#118), +50 XP e +1 nível (#90); curar a
+    equipe; recrutar na hora e quem chega no próximo trem (#122).
+- **Os fundos:** a Estação do Dia 5 do lote 7 (os números de Recursos e os estados de Heróis são os desse dia), a rua e
+  a luta.
   - **Testes de combate:** a próxima patrulha (o K da rua), a luta contra um inimigo escolhido, forçar Superação e
     Colapso, +50 de Instinto, curar a equipe, vencer, perder e fugir.
   - **Cenas e Jornada:** finalizar e resetar a fase, liberar todas, pular a noite e o amanhecer, abrir cada evento e o
@@ -104,19 +111,25 @@ falta. É a informação do Plano, no lugar.
 - **O que já dá para recuperar** fica aceso: o ícone do cômodo em âmbar, a moldura âmbar e o custo com o que se tem
   ("Forja · 4 sucatas · tem 9").
 - **O que ainda não dá** fica apagado, com o cadeado e o motivo: "Enfermaria · Faltam 2 fragmentos", "Bar · Numa
-  próxima fase" (o `upgrade_block` de hoje).
+  próxima fase", "Dormitório · Numa próxima fase" (o `upgrade_block` de hoje). O Dormitório começa no nível 0 ("Quarto
+  por recuperar"), e a equipe dorme nos beliches assim mesmo.
 - **Os recuperados** ficam sem placa.
-- **Com o foco numa placa** (setas ou mouse), a moldura de foco e o cartão do cômodo embaixo, à esquerda: o que ele
-  destrava, o custo em chips (o que falta em alerta) e RECUPERAR travado com o motivo.
-- É um dia antes da volta do lote 7 (o Dia 2): a Forja e a Enfermaria ainda vazias, o Próximo passo "Recuperar a
-  Forja". O custo de recuperar a Enfermaria (4 sucatas e 2 fragmentos) é proposta; o resto é o de `station_rules.gd`.
+- **Com o foco numa placa** (setas ou mouse), a moldura de foco e, no lugar do Próximo passo (no alto à esquerda, longe
+  das placas), o cartão do cômodo: o que ele destrava, o custo em chips (o que falta em alerta) e RECUPERAR travado com
+  o motivo.
+- É o Dia 2, dois dias antes da volta do lote 7: a Forja e a Enfermaria ainda vazias, o Próximo passo "Recuperar a
+  Forja" com o texto e os chips de `next_step`. O custo de recuperar a Enfermaria (4 sucatas e 2 fragmentos) é
+  proposta; o resto é o de `station_rules.gd`.
 
 ## 4. A noite e o amanhecer (#132)
 
-- **O cartão "Noite 4":** ao INICIAR DESCANSO, a Estação escurece (as luzes dos cômodos se apagam; a do Dormitório e a
-  da Enfermaria ficam baixas) e o cartão mostra a noite, quem dorme, quem vigia e quem está na Enfermaria, a barra do
-  tempo passando e PULAR (Esc / B). Sem a HUD. Com "Reduzir efeitos", só o cartão.
-- **O painel "Amanhecer · Dia 5",** no lugar do painel do cômodo:
+- **O cartão "Noite 4"** (600 px de largura, no alto, no meio): ao INICIAR DESCANSO, a Estação escurece (as luzes dos
+  cômodos se apagam; a do Dormitório e a da Enfermaria ficam baixas) e o cartão mostra a noite, quem dorme, quem vigia
+  e quem está na Enfermaria, a barra do tempo passando e PULAR (Esc / B). Sem a HUD. Com "Reduzir efeitos", só o
+  cartão. No corte, o Bento e o Nick deitados nos beliches (a pose de dormir), a Véspera de pé no Depósito, de vigia, e
+  a Íris no leito da Enfermaria. A Lupa e o Brasa também dormem, mas os recrutas não têm pose de dormir: ficam fora do
+  corte na montagem.
+- **O painel "Amanhecer · Dia 5",** no lugar e na medida do painel do cômodo (596 de largura, à direita):
   - **o que a noite fez:** a Comida (8 → 4, pela conta do jogo), quem descansou e quanto (o Nick +8 de vida, −15 de
     instinto), quem vigiou e a Enfermaria (a Íris volta amanhã);
   - **durante a noite:** o evento, com o ícone, o título e o que mudou;
@@ -137,7 +150,11 @@ falta. É a informação do Plano, no lugar.
 | Um morador conversa | `night_talk` | Uma fala curta da Dora, do Otto ou da Cora |
 | Herói com trauma não dorme | `alert` | O instinto dele não baixa |
 
-Os textos dos eventos passam pela regra de consistência de `docs/narrative/` na integração.
+Hoje, o `resolve_night` já tem quatro resultados: `quiet` (a noite calma), `distant_noise` (um barulho ao longe, nas
+noites pares: seria o da Noite 4), `short_supplies` e `no_water`. Na proposta, o sorteio pela semente substitui a regra
+das noites pares (o barulho vira uma das linhas da tabela), e a falta de comida e de água deixa de ser evento: vira o
+"O que a noite fez" do painel, que já mostra a comida e a água. Os textos dos eventos passam pela regra de consistência
+de `docs/narrative/` na integração.
 
 ## 5. A troca de formação na exploração (#129)
 
@@ -145,8 +162,8 @@ Os textos dos eventos passam pela regra de consistência de `docs/narrative/` na
   Ligada, ganha a moldura âmbar. Só fora da luta e dos eventos.
 - **As plaquinhas em modo de troca:** o medalhão da posição em cada uma (1 é a frente), a faixa "Formação · da frente
   para trás · escolha dois para trocar", o foco do teclado; o mesmo número sobre a cabeça de cada herói na rua.
-- **Um escolhido:** a moldura âmbar e a marca da troca no canto; a faixa diz o que acontece ("E troca o Nick com a
-  Íris"). Clicar no segundo troca os dois; vale para a próxima luta e para a fila na rua.
+- **Um escolhido:** a moldura âmbar e a marca da troca no canto; a faixa diz o que acontece ("E troca Nick e Íris de
+  lugar", sem artigo: os heróis não têm gênero nos dados). Clicar no segundo troca os dois; vale para a próxima luta e para a fila na rua.
 - A barra das teclas: Setas escolhem, E troca, Esc fecha.
 
 ## Ícones novos
@@ -178,8 +195,10 @@ A cena 3D da Estação não abre no xvfb sem placa de vídeo. [build_bg.py](hud-
 capturas do jogo:
 - `station_markers_clean.webp`: a Visão geral com a Enfermaria vazia (as paredes do Centro de Pesquisa, sem móveis, na
   penumbra, como o cômodo vazio fica no jogo) e o Bar na penumbra;
-- `station_night_clean.webp`: a Visão geral do Dia 5 do lote 7 à noite (a captura a 0,3, puxada para o azul), com só o
-  Dormitório e a Enfermaria acesos, baixos.
+- `station_markers_clean.webp` também deixa o Dormitório na penumbra (nível 0, com os beliches);
+- `station_night_clean.webp`: a Visão geral do lote 7 com a Enfermaria, à noite (a captura a 0,3, puxada para o azul),
+  com só o Dormitório e a Enfermaria acesos, baixos; quem estava de pé no Dormitório sai (o trecho do outro beliche), o
+  Bento e o Nick deitam nos beliches, e a Preparação fica no escuro (quem estava lá, a Íris e o Bento, não aparece).
 
 As telas da luta usam as capturas limpas de `loop-screens/before/` e `hud-ajustes/before/`; a exploração, a de
 `hud-v2/before/`; o amanhecer, a Visão geral do Dia 5 do lote 7 (`hud-casa/before/station_day5_clean.webp`).
@@ -201,7 +220,7 @@ As telas da luta usam as capturas limpas de `loop-screens/before/` e `hud-ajuste
 - **#131:** as placas leem `AHStationRules.next_level_cost` e `upgrade_block`; o foco nelas segue as setas, como os
   cômodos.
 - **#132:** a tabela dos eventos vai para `data/night-events.json`; o painel do amanhecer lê o resultado de
-  `resolve_night`.
+  `resolve_night`. Os recrutas precisam da pose de dormir para deitar nos beliches.
 - **#129:** a ação nova de formação em `tools/define_input.gd` (trocável nas Opções); a troca usa
   `AHStationRules.set_formation` na expedição.
 
@@ -222,3 +241,25 @@ A pasta `.render/` é temporária e fica fora do Git.
 ## QA de design
 
 As rodadas seguem [qa.md](qa.md) e ficam registradas abaixo e no PR.
+
+### Rodada 1: REPROVADO
+
+Aprovados na rodada: a cobertura da #134, o escopo, os glifos, a reprodução byte a byte, as telas da hud-luta e da
+hud-casa saindo iguais e a coerência com o jogo e com a história do lote 7.
+
+**Alta, corrigido:** no Maior, o cartão do foco cobria a própria placa da Enfermaria. O cartão agora toma o lugar do
+Próximo passo, no alto à esquerda, e a coluna da esquerda é `data-hit="panel"` (a conferência passa a valer).
+
+**Média, corrigidos:**
+- A aba da inspeção cobria a primeira linha da coluna da direita: a coluna começa abaixo da aba.
+- O Dormitório aparecia recuperado no Dia 2: na penumbra, com a placa "Numa próxima fase".
+- O fundo da noite contradizia o cartão: o Bento e o Nick deitados nos beliches, a Forja apagada e vazia, a Preparação
+  no escuro; o cartão diz quem aparece ("O Bento e o Nick dormem no Dormitório, a Véspera vigia no Depósito…").
+
+**Baixa, corrigidos:**
+- O Próximo passo do Dia 2 com o texto de `next_step`.
+- A página: o Dia 2 é dois dias antes da volta; as medidas novas.
+- A intenção na cor de hoje; o "antes" da intenção é a captura do jogo, com o "→ um de 4".
+- A tabela dos eventos diz como ela convive com o `resolve_night` de hoje.
+- O Admin: os fundos e os números do Dia 5; a tempestade no Clima; curar a equipe em Heróis.
+- A faixa da formação sem artigo.
