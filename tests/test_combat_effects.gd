@@ -134,7 +134,10 @@ func _in_street() -> void:
 	t.check(node.global_position.y > enemy_card.global_position.y + enemy_card.body_height * 0.3, "no tronco do alvo")
 	var camera := street.get_viewport().get_camera_3d()
 	var px: float = node.body_height / AHCombatEffects.meters(1080.0, enemy_card, camera) * 1080.0
-	t.check(absf(px - AHCombatEffects.SCREEN_PX.critical) < 2.0, "com o tamanho do documento na tela (%.0f px)" % px)
+	var size: Dictionary = arena.effects.layout("critical")
+	t.check(is_equal_approx(node.body_height, maxf(enemy_card.body_height * float(size.body), AHCombatEffects.meters(float(size.min_px), enemy_card, camera))),
+		"no tamanho de data/presentation (%.0f px: a fração do corpo, sem passar abaixo do mínimo)" % px)
+	t.check(px >= float(size.min_px) - 1.0, "e pelo menos o mínimo na tela")
 	await _until(func(): return _effects(enemy_card).is_empty() and _effects(hero_card).is_empty(), 2.0)
 	# Um efeito por alvo: o golpe bloqueado (a blindagem consumida e o bloqueio) mostra só o escudo.
 	arena._show_events([_event(E.BLOCK, other.id, 0), _event(E.BLOCK, other.id, 0), _event(E.DAMAGE, other.id, 1)], hit)

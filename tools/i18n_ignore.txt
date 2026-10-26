@@ -38,7 +38,6 @@ combat_hud.gd: Status
 combat_hud.gd: status-%s_%s
 combat_hud.gd: Icon
 combat_hud.gd: Count
-combat_hud.gd: %s → %s
 combat_hud.gd: %d–%d
 combat_hud.gd: +%d–%d
 combat_hud.gd: combat_ability_%d
@@ -879,7 +878,6 @@ fight_rewards.gd: seed
 cargo_picker.gd: Box%d
 cargo_picker.gd: revealed
 combat_hud.gd: Stars
-combat_hud.gd: value
 fight_rewards.gd: Items
 street_corridor.gd: bandage
 camp_hud.gd: Name
@@ -926,7 +924,6 @@ character_sheet.gd: Heading
 character_sheet.gd: Empty
 character_sheet.gd: Row
 character_sheet.gd: part
-combat_hud.gd: since
 inventory_panel.gd: screen
 inventory_panel.gd: detail
 combat_hud.gd: Register
@@ -1351,3 +1348,19 @@ network_radar.gd: known
 network_radar.gd: partial
 phase_map.gd: Footer
 camp_hud.gd: painted
+combat_hud.gd: Inspect
+combat_hud.gd: Key
+combat_hud.gd: X
+combat_hud.gd: Passives
+combat_hud.gd: States
+combat_hud.gd: Identity
+combat_hud.gd: art
+combat_hud.gd: Name
+combat_hud.gd: Kind
+combat_hud.gd: Life
+combat_hud.gd: Instinct
+combat_hud.gd: Speed
+combat_hud.gd: Row
+combat_hud.gd: part
+combat_hud.gd: Empty
+combat_hud.gd: id

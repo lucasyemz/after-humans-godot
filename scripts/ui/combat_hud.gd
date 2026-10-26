@@ -30,18 +30,23 @@ const KIT_SLOT_STEP := 160.0
 const KIT_ACTION := Rect2(1584, 836, 128, 100)
 const KIT_ACTION_STEP := Vector2(136, 112)
 const KIT_TARGET_NAME := Vector2(176, 56)
+## A inspeção (#128): o botão INSPECIONAR entre as habilidades e as ações, e o painel que, ligado, cobre o do herói da vez
+## e as habilidades com os detalhes de quem está apontado.
+const KIT_INSPECT := Rect2(1316, 984, 260, 64)
+const KIT_INSPECT_PANEL := Rect2(64, 836, 1252, 212)
 ## A coluna do retrato no painel do herói (o nome e as barras começam aqui) e a altura das barras sob as unidades.
 const HERO_TEXT_LEFT := 222.0
 const PLATE_BAR_HEIGHT := 40.0
 ## A intenção das máquinas não sobe acima disto (a faixa da rodada termina em ~106).
 const INTENT_TOP := 112.0
-## O popup do fim da luta (#109): no alto, no lugar da faixa da rodada; fecha sozinho em POPUP_HOLD s (metade no 2x).
+## O popup do fim da luta (#109): no alto, no lugar da faixa da rodada. Fecha sozinho em POPUP_HOLD s de verdade (#128:
+## dá para ler; a velocidade da batalha não encurta), e o tempo para enquanto o mouse está em cima dele.
 const POPUP_TOP := 24.0
 const POPUP_WIDTH := 640.0
 ## O popup alarga com o texto até aqui (o XP de quatro nomes longos no Maior) antes de quebrar a linha: cada linha a
 ## mais desce sobre as cabeças da equipe.
 const POPUP_MAX_WIDTH := 900.0
-const POPUP_HOLD := 2.5
+const POPUP_HOLD := 5.0
 ## O toque que fecha o popup só vale depois disto (ms): a tecla que acabou a luta não o fecha no mesmo instante.
 const POPUP_GUARD_MS := 250
 const KIT_PORTRAIT := 60.0
@@ -50,19 +55,24 @@ const ACTIONS := [["Mover", "move", "Q", "combat_move"], ["Defender", "defend", 
 
 var arena: AHCombatArena
 var session: AHCombatSession
-## A ficha de quem está apontado (#89): o mouse no corpo, o alvo com foco do teclado ou do controle, o toque longo.
+## A ficha (#89): na luta fica fechada (#128); continua aqui pelo touch_mode (o último apontar foi um toque).
 var sheet: AHCharacterSheet
-## O toque segurando um corpo: {unit_id, since (ms)}; {} sem toque.
-var _touch_hold := {}
 ## Onde o mouse está (o último movimento, nas coordenadas da tela do jogo).
 var _mouse := Vector2(-1, -1)
-## A ficha abriu pelo toque longo: o soltar dele (o toque e o clique emulado) não escolhe nem usa o alvo.
-var _swallow_release := false
-## Examinar (#89, teclado e controle): os personagens de pé, da esquerda para a direita, e quem tem o foco; [] fora.
+## A inspeção (#128, antes o Examinar da #89): os personagens de pé, da esquerda para a direita, e quem está escolhido.
 var _examine: Array = []
 var _examine_index := 0
 ## A instrução da vez de antes do Examinar (volta ao fechar).
 var _examine_note := ""
+## A inspeção ligada (#128): o painel de baixo mostra quem o mouse aponta ou quem foi escolhido (_examine).
+var _inspect_on := false
+var _inspect_button: Button
+var _inspect_panel: PanelContainer
+## O id e a ficha que o painel mostra agora (para não remontar a cada quadro).
+var _inspect_info := {}
+## O mouse em cima (#128): o nome na plaqueta sobre quem é apontado e a luz leve nele.
+var _hover_label: Label
+var _hovered := ""
 var _order: HBoxContainer
 var _order_panel: PanelContainer
 var _panel: Control
@@ -97,6 +107,12 @@ var _result: PanelContainer
 ## Quando o popup do fim abriu (ms) e se ele espera um toque (a derrota).
 var _result_opened := 0
 var _result_waits := false
+## O tempo que falta para o popup fechar sozinho (s) e o total; < 0: não fecha sozinho (a derrota).
+var _result_left := -1.0
+var _result_total := 1.0
+var _result_timer: AHKitBar
+## O X do popup (#128): por cima do canto dele, para não somar altura (o popup não desce sobre a equipe).
+var _result_close: Button
 var _unit_bars := {}
 var _markers: Array = []
 ## A escolha do alvo (#57): o lado, as posições válidas, a habilidade, o escolhido, o clicado uma vez e se o último
@@ -338,6 +354,35 @@ func _build() -> void:
 	_actions.add_theme_constant_override("v_separation", int(KIT_ACTION_STEP.y - KIT_ACTION.size.y))
 	_actions.position = KIT_ACTION.position - _panel.position
 	_panel.add_child(_actions)
+
+	# A inspeção (#128): o botão com a tecla (combat_examine, trocável nas Opções) e o painel que ela abre.
+	_inspect_button = AHKit.button(tr("Inspecionar"), "secondary")
+	_inspect_button.name = "Inspect"
+	_inspect_button.position = KIT_INSPECT.position - _panel.position
+	_inspect_button.custom_minimum_size = KIT_INSPECT.size
+	_inspect_button.size = KIT_INSPECT.size
+	_inspect_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_inspect_button.focus_mode = Control.FOCUS_NONE
+	_inspect_button.set_meta("click", true)
+	_inspect_button.pressed.connect(func():
+		Sound.click()
+		toggle_inspect())
+	_panel.add_child(_inspect_button)
+	var inspect_key := AHKitKey.make("combat_examine")
+	inspect_key.name = "Key"
+	_inspect_button.add_child(inspect_key)
+	_fit_inspect()
+	_inspect_panel = AHKit.panel_box("large")
+	_inspect_panel.name = "InspectPanel"
+	_inspect_panel.position = KIT_INSPECT_PANEL.position - _panel.position
+	_inspect_panel.custom_minimum_size = KIT_INSPECT_PANEL.size
+	_inspect_panel.size = KIT_INSPECT_PANEL.size
+	_inspect_panel.clip_contents = true
+	_inspect_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	_inspect_panel.visible = false
+	_panel.add_child(_inspect_panel)
+	# O painel cobre as habilidades; a aba da vez (o que fazer, e com a inspeção, o que a fecha) fica por cima dele.
+	_panel.move_child(_target_tab, -1)
 	for spec in ACTIONS:
 		var button := Button.new()
 		button.custom_minimum_size = KIT_ACTION.size
@@ -397,6 +442,17 @@ func _build() -> void:
 	add_child(_tip)
 	# Depois da dica: desenhado por cima dela.
 	add_child(_target_label)
+	# O nome de quem o mouse aponta (#128): a mesma plaqueta do alvo, sem a linha da cor do lado.
+	_hover_label = AHKit.label("", "world", TEXT, true, true)
+	_hover_label.name = "HoverName"
+	_hover_label.z_index = 21
+	_hover_label.add_theme_stylebox_override("normal", AHKit.style("target_tab"))
+	_hover_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hover_label.custom_minimum_size = KIT_TARGET_NAME
+	_hover_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hover_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_hover_label.visible = false
+	add_child(_hover_label)
 	_tip_box = VBoxContainer.new()
 	_tip_box.add_theme_constant_override("separation", 6)
 	_tip_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -409,6 +465,18 @@ func _build() -> void:
 	_result.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_result.visible = false
 	add_child(_result)
+	_result_close = AHKit.button("X", "icon")
+	_result_close.name = "ResultClose"
+	_result_close.custom_minimum_size = Vector2(44, 44)
+	_result_close.size = Vector2(44, 44)
+	_result_close.focus_mode = Control.FOCUS_NONE
+	_result_close.tooltip_text = tr("Fechar")
+	_result_close.visible = false
+	_result_close.pressed.connect(func():
+		if _result.visible:
+			_result.visible = false
+			result_closed.emit())
+	add_child(_result_close)
 	_restyle_kit()
 
 
@@ -464,7 +532,6 @@ func close() -> void:
 	if arena != null:
 		arena.show_ring("")
 	sheet.close()
-	_touch_hold = {}
 	_close_bag()
 	_clear_markers()
 	_hide_tip()
@@ -623,25 +690,18 @@ func refresh() -> void:
 		_show_hero(actor)
 
 
-## A linha da intenção na placa do inimigo: a ação e em quem (com "?" quando ele está entre dois planos parecidos).
+## A linha da intenção na placa do inimigo: o que ele vai fazer, sem dizer em quem (#128, decisão do Lucas); "?" quando
+## ele está entre dois planos parecidos.
 func _show_intent(label: Label, intent: Dictionary) -> void:
-	var names: Array = intent.target_ids.map(func(id): return _name(session.state.find_unit(id)) if session.state.find_unit(id) else id)
 	var text := ""
 	var color: Color = S.ENEMY
 	# O ícone da intenção (art/ui/icons/intent-*): ataque, ataque em área (mais de um alvo de uma vez), cura, bloqueio,
 	# mover, atordoado; sem plano claro, a interrogação.
 	var icon := "unknown"
-	var targets := ""
 	match intent.kind:
 		"attack":
-			targets = (tr(" ou ") if intent.either else tr(" e ")).join(names)
-			# Com três alvos ou mais, a placa diz quantos (a lista inteira ia a 4 ou 5 linhas e cobria o inimigo, #63); os
-			# nomes ficam na dica.
-			if names.size() >= 3:
-				text = (tr("%s → um de %d") if intent.either else tr("%s → %d alvos")) % [tr(intent.name), names.size()]
-			else:
-				text = "%s → %s" % [tr(intent.name), targets] if not names.is_empty() else tr(intent.name)
-			icon = "attack_area" if names.size() > 1 and not intent.either else "attack"
+			text = tr(intent.name)
+			icon = "attack_area" if intent.target_ids.size() > 1 and not intent.either else "attack"
 		"heal":
 			text = tr("%s (se cura)") % tr(intent.name)
 			color = S.OK
@@ -664,8 +724,6 @@ func _show_intent(label: Label, intent: Dictionary) -> void:
 	label.add_theme_color_override("font_color", color)
 	var tip := tr("Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s.") % (
 		"" if intent.sure else tr("; com \"?\", ele está entre dois planos parecidos"))
-	if names.size() >= 3:
-		tip = tr(intent.name) + " → " + targets + "\n" + tip
 	label.tooltip_text = tip
 	var icon_rect := label.get_parent().get_node_or_null("IntentIcon") as TextureRect
 	if icon_rect != null:
@@ -767,16 +825,6 @@ func _input(event: InputEvent) -> void:
 	if visible and _close_popup_input(event):
 		get_viewport().set_input_as_handled()
 		return
-	if visible and event is InputEventScreenTouch:
-		_touch_hold = {"unit_id": unit_at(event.position), "since": Time.get_ticks_msec()} if event.pressed else {}
-		if event.pressed:
-			_swallow_release = false
-		elif _swallow_release:
-			get_viewport().set_input_as_handled()
-			return
-	if _swallow_release and event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
-		get_viewport().set_input_as_handled()
-		return
 	if visible and _examine_input(event):
 		get_viewport().set_input_as_handled()
 		return
@@ -785,6 +833,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	_tick_result(_delta)
 	if _bag != null or _result.visible or (waiting and _choosing == ""):
 		# O foco que o jogo devolve (a Mochila fechada, um botão que sumiu) não abre a dica.
 		_quiet_focus = true
@@ -870,6 +919,9 @@ func _process(_delta: float) -> void:
 			if _tip.visible:
 				_dodge_tip(_body_rect(camera, pointed).merge(Rect2(_target_label.position, _target_label.size)))
 	_update_sheet(camera)
+	_update_hover(camera)
+	# INSPECIONAR só aperta quando liga ou desliga de verdade (na vez de um herói, fora da mira e da Mochila).
+	_inspect_button.disabled = not _inspect_on and (not waiting or _choosing != "" or _bag != null)
 	for marker in _markers.filter(func(m): return not m.has_meta("card")) + _preview_marks:
 		var target: Vector3 = marker.get_meta("world")
 		var screen := camera.unproject_position(target)
@@ -880,63 +932,85 @@ func _process(_delta: float) -> void:
 				marker.position.y = rect.position.y - marker.size.y - 6
 
 
-## A ficha (#89): de quem o alvo com foco do teclado ou do controle é, de quem o toque longo segura ou de quem o mouse
-## está em cima (o corpo na tela, ou o botão do alvo na mira). Some quando nada aponta para ninguém.
-func _update_sheet(camera: Camera3D) -> void:
-	var unit_id := ""
-	var focused := get_viewport().gui_get_focus_owner()
-	if S.using_keys and focused != null and _markers.has(focused) and focused.has_meta("unit_id"):
-		unit_id = focused.get_meta("unit_id")
-	elif not _examine.is_empty():
-		unit_id = _examine[_examine_index]
-	elif not _touch_hold.is_empty():
-		if Time.get_ticks_msec() - int(_touch_hold.since) >= int(AHCharacterSheet.LONG_PRESS * 1000.0) and _touch_hold.unit_id != "":
-			unit_id = _touch_hold.unit_id
-			_swallow_release = true
-	elif not sheet.touch_mode:
-		var hovered := get_viewport().gui_get_hovered_control()
-		if hovered != null and _markers.has(hovered) and hovered.has_meta("unit_id"):
-			unit_id = hovered.get_meta("unit_id")
-		elif hovered == null:
-			unit_id = unit_at(_mouse)
-		else:
-			# A placa (a intenção pega o mouse para a dica dela) também é do personagem.
-			for plate_id in _unit_bars:
-				var tag = (_unit_bars[plate_id].get_meta("intent") if _unit_bars[plate_id].has_meta("intent") else null)
-				if _unit_bars[plate_id].is_ancestor_of(hovered) or (tag != null and (tag == hovered or tag.is_ancestor_of(hovered))):
-					unit_id = plate_id
-	var unit := session.state.find_unit(unit_id) if unit_id != "" else null
-	var card: AHSpriteCard = arena.cards.get(unit_id) if unit != null else null
-	if unit == null or card == null or not card.visible or not unit.is_standing() or _bag != null or _result.visible:
-		sheet.close()
+## A ficha que abria ao apontar saiu da luta (#128, decisão do Lucas: era informação demais de uma vez); o mouse em cima
+## só marca quem é, pela placa. Com a inspeção ligada, o painel de baixo mostra quem o mouse aponta ou, sem ninguém
+## apontado, quem foi escolhido (clique, setas).
+func _update_sheet(_camera: Camera3D) -> void:
+	sheet.close()
+	if not _inspect_on:
 		return
-	# A ficha fica ao lado do corpo, do nome do apontado (o ALVO) e da intenção dele: nada disso fica embaixo dela.
-	var around := _body_rect(camera, card)
-	if _target_label != null and _target_label.visible and _target_label.has_meta("card") and _target_label.get_meta("card") == card:
-		around = around.merge(Rect2(_target_label.position, _target_label.size))
-	var plate: Control = _unit_bars.get(unit_id)
-	var tag: Control = plate.get_meta("intent") if plate != null and plate.has_meta("intent") else null
-	if tag != null and tag.visible:
-		around = around.merge(Rect2(tag.position, tag.size))
-	sheet.show_info(AHCharacterSheet.from_unit(session, unit, arena.boss_fight and not unit.is_player), around,
-		_dock_top() - 8.0 if _panel.visible else INF)
+	var unit_id := _pointed_unit()
+	if unit_id == "" and not _examine.is_empty():
+		unit_id = _examine[_examine_index]
+	var unit := session.state.find_unit(unit_id) if unit_id != "" else null
+	if unit == null:
+		return
+	var shown := String(_inspect_info.get("id", ""))
+	if unit_id != shown:
+		# A luz segue quem o painel mostra (o apontado ou o escolhido).
+		for other in session.units():
+			var other_card: AHSpriteCard = arena.cards.get(other.id)
+			if other_card != null:
+				other_card.set_highlight(S.GOLD, S.TARGET_ACTIVE if other.id == unit_id else 0.0)
+	var info := AHCharacterSheet.from_unit(session, unit, arena.boss_fight and not unit.is_player)
+	if info != _inspect_info:
+		_inspect_info = info
+		_fill_inspect(info)
 
 
-## Examinar (teclado e controle): a ação abre o foco nos personagens de pé (a começar por quem age), as setas passam de
-## um para outro, e a ação de novo ou Voltar fecham. Só na vez de um herói, fora da mira e da Mochila.
+## O mouse em cima (#128): sem a inspeção e fora da mira, o nome de quem é apontado numa plaqueta acima da cabeça e a
+## luz leve no corpo; com a inspeção, a luz segue quem o painel mostra.
+func _update_hover(camera: Camera3D) -> void:
+	var unit_id := ""
+	if not _inspect_on and _markers.is_empty() and _bag == null and not _result.visible:
+		unit_id = _pointed_unit()
+	var unit := session.state.find_unit(unit_id) if unit_id != "" and session != null else null
+	var card: AHSpriteCard = arena.cards.get(unit_id) if unit != null else null
+	if card == null or not unit.is_standing():
+		unit_id = ""
+	if unit_id != _hovered:
+		var before: AHSpriteCard = arena.cards.get(_hovered) if _hovered != "" else null
+		if before != null and is_instance_valid(before) and _markers.is_empty() and not _inspect_on:
+			before.set_highlight(S.GOLD, 0.0)
+		_hovered = unit_id
+		if card != null:
+			card.set_highlight(S.GOLD, S.TARGET_VALID)
+			_hover_label.text = unit_name(unit.display_name)
+	_hover_label.visible = card != null
+	if card != null:
+		_hover_label.reset_size()
+		var top := camera.unproject_position(card.global_position + Vector3(0, card.head_height() + 0.15, 0))
+		_hover_label.position = top - Vector2(_hover_label.size.x * 0.5, _hover_label.size.y)
+		var plate: Control = _unit_bars.get(unit_id)
+		var tag: Control = plate.get_meta("intent") if plate != null and plate.has_meta("intent") else null
+		if tag != null and tag.visible and Rect2(tag.position, tag.size).intersects(Rect2(_hover_label.position, _hover_label.size)):
+			_hover_label.position.y = tag.position.y - _hover_label.size.y - 4
+
+
+## Quem o mouse aponta: o corpo na tela, a placa (a intenção pega o mouse para a dica dela) ou o botão do alvo na mira.
+func _pointed_unit() -> String:
+	if sheet.touch_mode:
+		return ""
+	var hovered := get_viewport().gui_get_hovered_control()
+	if hovered != null and _markers.has(hovered) and hovered.has_meta("unit_id"):
+		return hovered.get_meta("unit_id")
+	if hovered == null:
+		return unit_at(_mouse)
+	for plate_id in _unit_bars:
+		var tag = (_unit_bars[plate_id].get_meta("intent") if _unit_bars[plate_id].has_meta("intent") else null)
+		if _unit_bars[plate_id].is_ancestor_of(hovered) or (tag != null and (tag == hovered or tag.is_ancestor_of(hovered))):
+			return plate_id
+	return ""
+
+
+## A inspeção (teclado, controle, o botão): liga com quem age escolhido; as setas e o clique no corpo escolhem outro; a
+## tecla de novo, o botão ou Voltar desligam. Só na vez de um herói, fora da mira e da Mochila.
 func _examine_input(event: InputEvent) -> bool:
-	if _examine.is_empty():
-		if not event.is_action_pressed("combat_examine") or not waiting or _choosing != "" or _bag != null:
+	if not _inspect_on:
+		if not event.is_action_pressed("combat_examine"):
 			return false
-		var standing := session.units().filter(func(u): return u.is_standing() and arena.cards.has(u.id) and arena.cards[u.id].visible)
-		standing.sort_custom(func(a, b): return arena.cards[a.id].global_position.x < arena.cards[b.id].global_position.x)
-		_examine = standing.map(func(u): return u.id)
-		_examine_index = maxi(0, _examine.find(_actor_id))
-		_paint_examine()
-		_examine_note = _description.text
-		# Curta, na largura da barra da habilidade: as teclas de passar e a de fechar.
-		_description.text = tr("Examinar · %s/%s · %s fecha") % [S.key_name("move_left"), S.key_name("move_right"), S.key_name("combat_examine")]
-		return true
+		toggle_inspect()
+		return _inspect_on
 	if event.is_action_pressed("combat_examine") or S.is_back(event):
 		stop_examine()
 		return true
@@ -946,19 +1020,82 @@ func _examine_input(event: InputEvent) -> bool:
 				_examine_index = posmod(_examine_index + spec[0], _examine.size())
 				_paint_examine()
 				return true
-	# Com o foco nos personagens, o resto (as habilidades, Interagir) espera; o mouse e o toque seguem livres.
+	# O clique (ou o toque) num corpo escolhe quem o painel mostra.
+	var click: bool = (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed)
+	if click:
+		var unit_id := unit_at(event.position)
+		if _examine.has(unit_id):
+			_examine_index = _examine.find(unit_id)
+			_paint_examine()
+			return true
+	# Com a inspeção ligada, o resto (as habilidades, Interagir) espera; o mouse e o toque seguem livres.
 	return event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion
 
 
-func stop_examine() -> void:
+## Liga ou desliga a inspeção (#128).
+func toggle_inspect() -> void:
+	if _inspect_on:
+		stop_examine()
+		return
+	if not waiting or _choosing != "" or _bag != null or session == null:
+		return
+	var standing := session.units().filter(func(u): return u.is_standing() and arena.cards.has(u.id) and arena.cards[u.id].visible)
+	standing.sort_custom(func(a, b): return arena.cards[a.id].global_position.x < arena.cards[b.id].global_position.x)
+	_examine = standing.map(func(u): return u.id)
 	if _examine.is_empty():
 		return
+	_examine_index = maxi(0, _examine.find(_actor_id))
+	_inspect_on = true
+	_inspect_info = {}
+	_hide_tip()
+	_inspect_panel.visible = true
+	_inspect_button.add_child(AHKit.selected_overlay())
+	_paint_examine()
+	_examine_note = _description.text
+	# Curta, na largura da aba: o que escolhe e o que fecha.
+	_description.text = tr("Inspecionar · %s/%s ou clique · %s fecha") % [S.key_name("move_left"), S.key_name("move_right"), S.key_name("combat_examine")]
+	_place_tab()
+
+
+func stop_examine() -> void:
+	if not _inspect_on:
+		return
+	_inspect_on = false
 	_examine = []
+	_inspect_info = {}
+	_inspect_panel.visible = false
+	var overlay := _inspect_button.get_node_or_null("Selected")
+	if overlay != null:
+		_inspect_button.remove_child(overlay)
+		overlay.queue_free()
 	_paint_examine()
 	_description.text = _examine_note
+	_place_tab()
 
 
-## A luz da escolha em quem está sendo examinado (a mesma do alvo, #57).
+## O botão INSPECIONAR com a tecla no fim e o texto terminando antes dela; preso pela direita (cresce para a esquerda no
+## texto Maior, sem entrar nas ações).
+func _fit_inspect() -> void:
+	# A letra das abas da luta (o vão entre as habilidades e as ações é estreito para a dos botões da Estação).
+	_inspect_button.add_theme_font_size_override("font_size", AHKit.size("tab"))
+	AHStationReport.fit_key(_inspect_button, 10.0)
+	# No texto Maior, a letra encolhe o que falta para caber no vão (sem encostar na quarta habilidade).
+	var room := KIT_INSPECT.size.x
+	if _inspect_button.size.x > room:
+		var font := _inspect_button.get_theme_font_size("font_size")
+		var text_width := _inspect_button.size.x - _inspect_button.get_theme_stylebox("normal").get_minimum_size().x
+		var fit := (text_width - (_inspect_button.size.x - room)) / maxf(1.0, text_width)
+		_inspect_button.add_theme_font_size_override("font_size", maxi(AHKit.size("small"), int(font * fit)))
+		AHStationReport.fit_key(_inspect_button, 10.0)
+	_inspect_button.position.x = KIT_INSPECT.end.x - _inspect_button.size.x - _panel.position.x
+
+
+## A inspeção ligada (#128).
+func inspecting() -> bool:
+	return _inspect_on
+
+
+## A luz da escolha em quem está sendo inspecionado (a mesma do alvo, #57).
 func _paint_examine() -> void:
 	for unit in session.units():
 		var card: AHSpriteCard = arena.cards.get(unit.id)
@@ -966,6 +1103,138 @@ func _paint_examine() -> void:
 			var on: bool = not _examine.is_empty() and _examine[_examine_index] == unit.id
 			# A luz de quem age (mais leve que a do alvo apontado: aqui só se olha).
 			card.set_highlight(S.GOLD, S.TARGET_ACTIVE if on else 0.0)
+
+
+## O painel da inspeção (#128): à esquerda o retrato, o nome, a espécie e o papel (ou a máquina), a vida, o instinto e a
+## velocidade; no meio os efeitos passivos; à direita os estados, cada um com o que faz. Sem caber (muitos estados, o
+## texto Maior), as explicações saem, primeiro as dos passivos, depois as dos estados; por fim, os nomes numa linha.
+func _fill_inspect(info: Dictionary) -> void:
+	var margins: Vector2 = _inspect_panel.get_theme_stylebox("panel").get_minimum_size()
+	var inner := KIT_INSPECT_PANEL.size - margins
+	for level in 5:
+		_clear(_inspect_panel)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 18)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_inspect_panel.add_child(row)
+		var identity := _inspect_identity(info, level)
+		row.add_child(identity)
+		# As duas colunas dividem o resto pelo que cada uma tem (a dos estados vazia fica estreita).
+		var columns := inner.x - identity.custom_minimum_size.x - 36.0 - 4.0
+		var share := float(maxi(1, info.passives.size())) / float(maxi(1, info.passives.size()) + maxi(1, info.states.size()))
+		var passives := clampf(columns * share, 220.0, columns - 220.0)
+		row.add_child(_inspect_list(tr("Efeitos passivos"), info.passives, tr("Nenhum"), level < 1, level >= 3, passives, "Passives"))
+		row.add_child(_inspect_list(tr("Estados"), info.states, tr("Nenhum agora"), level < 2, level >= 3, columns - passives, "States"))
+		var need := _inspect_panel.get_combined_minimum_size()
+		if need.x <= KIT_INSPECT_PANEL.size.x + 0.5 and need.y <= KIT_INSPECT_PANEL.size.y + 0.5:
+			break
+	# O painel fica no espaço dele (sem crescer sobre o botão nem abaixo da HUD); o que sobrar no último nível é cortado.
+	_inspect_panel.size = KIT_INSPECT_PANEL.size
+
+
+func _inspect_identity(info: Dictionary, level: int = 0) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.name = "Identity"
+	column.custom_minimum_size.x = 400 if level < 4 else 340
+	column.add_theme_constant_override("separation", 4)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 10)
+	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(head)
+	if not info.get("art", {}).is_empty():
+		var face := AHKit.portrait(S.face_texture(info.art), 56)
+		face.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		head.add_child(face)
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", 0)
+	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head.add_child(names)
+	var title := AHKit.label(String(info.name), "row", AHKit.enemy_hp() if info.enemy else TEXT, true, true)
+	title.name = "Name"
+	title.clip_text = true
+	title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	names.add_child(title)
+	var kind := String(info.get("kind", ""))
+	if int(info.get("level", 0)) > 0:
+		kind += (" · " if kind != "" else "") + tr("Nível %d") % int(info.level)
+	if kind != "":
+		var kind_label := AHKit.label(kind, "small", AHKit.AMBER)
+		kind_label.name = "Kind"
+		kind_label.clip_text = true
+		names.add_child(kind_label)
+	var life := AHKit.bar("enemy" if info.enemy else "hero", int(info.hp), maxi(1, int(info.max_hp)), tr("Vida %d/%d") % [info.hp, info.max_hp], "small")
+	life.name = "Life"
+	life.custom_minimum_size = Vector2(0, 24)
+	column.add_child(life)
+	if int(info.instinct) >= 0:
+		var instinct := AHKit.bar("instinct", int(info.instinct), 200, tr("Instinto %d/200") % info.instinct, "small")
+		instinct.name = "Instinct"
+		instinct.custom_minimum_size = Vector2(0, 20)
+		column.add_child(instinct)
+	var speed := AHKit.label(tr("Velocidade %d · quem é mais rápido age antes") % info.speed if level < 1 else tr("Velocidade %d") % info.speed, "small", TEXT)
+	speed.name = "Speed"
+	speed.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	speed.custom_minimum_size.x = column.custom_minimum_size.x
+	column.add_child(speed)
+	return column
+
+
+## Uma coluna da inspeção: o título em âmbar e cada linha na cor de bom ou ruim (com + ou −), com o que faz embaixo.
+func _inspect_list(heading: String, rows: Array, empty: String, tips: bool, joined: bool, width: float, node_name: String) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.name = node_name
+	column.custom_minimum_size.x = width
+	column.add_theme_constant_override("separation", 2)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(AHKit.label(heading, "small", AHKit.AMBER, true, true))
+	var add := func(text: String, color: Color, part: String):
+		var label := AHKit.label(text, "small", color, part == "Row")
+		label.set_meta("part", part)
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.custom_minimum_size.x = width
+		label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		column.add_child(label)
+	if rows.is_empty():
+		add.call(empty, MUTED, "Empty")
+		return column
+	if joined:
+		for good in [true, false]:
+			# O + ou − em cada nome (a cor sozinha não basta no daltonismo).
+			var names: Array = rows.filter(func(r): return r[2] == good).map(func(r): return ("+ " if good else "− ") + String(r[0]))
+			if not names.is_empty():
+				add.call(" · ".join(names), S.OK if good else S.DANGER, "Row")
+		return column
+	for row in rows:
+		if not tips or String(row[1]) == "":
+			add.call(("+ " if row[2] else "− ") + String(row[0]), S.OK if row[2] else S.DANGER, "Row")
+			continue
+		# O nome na cor de bom ou ruim e, ao lado, o que faz (a linha só quebra quando a explicação é longa).
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 8)
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		column.add_child(line)
+		var name_label := AHKit.label(("+ " if row[2] else "− ") + String(row[0]), "small", S.OK if row[2] else S.DANGER, true)
+		name_label.set_meta("part", "Row")
+		name_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		line.add_child(name_label)
+		var room := width - name_label.get_minimum_size().x - 8.0
+		var tip := AHKit.label(String(row[1]), "small", MUTED)
+		tip.set_meta("part", "RowTip")
+		tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		tip.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		if room >= width * 0.45:
+			tip.custom_minimum_size.x = room
+			line.add_child(tip)
+		else:
+			# O nome longo ocupa a coluna: a explicação desce para a linha de baixo, na largura toda.
+			name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			name_label.custom_minimum_size.x = width
+			tip.custom_minimum_size.x = width
+			column.add_child(tip)
+	return column
 
 
 ## Quem está naquele ponto da tela: o corpo (de pé) que o contém, o do centro mais perto quando dois se encostam; "" se
@@ -1306,6 +1575,9 @@ func _dock_top() -> float:
 func restyle() -> void:
 	refresh()
 	_restyle_kit()
+	_fit_inspect()
+	# O painel da inspeção remonta no tamanho novo.
+	_inspect_info = {}
 	if waiting and _choosing == "":
 		var owner := get_viewport().gui_get_focus_owner()
 		var focused: int = _abilities.get_children().find(owner)
@@ -1436,6 +1708,32 @@ func _line_width(label: Label) -> float:
 
 ## Qualquer tecla, clique ou toque fecha o popup do fim (depois de um instante, para a tecla que acabou a luta não
 ## fechá-lo junto); a derrota também fecha assim, mas não sozinha.
+## A contagem do popup do fim (#128): para enquanto o mouse (ou o foco) está nele; no zero, fecha. Com Reduzir efeitos, a
+## linha fica parada, mas o popup fecha no mesmo tempo.
+func _tick_result(delta: float) -> void:
+	if _result_left < 0.0 or not _result.visible:
+		return
+	if result_held():
+		return
+	_result_left = maxf(0.0, _result_left - delta)
+	if _result_timer != null and not GameFlow.reduced_effects():
+		_result_timer.value = _result_left / _result_total
+	if _result_left <= 0.0:
+		_result_left = -1.0
+		_result.visible = false
+		result_closed.emit()
+
+
+## O popup segura a contagem: o mouse em cima dele ou o foco num botão dele.
+func result_held() -> bool:
+	if not _result.visible:
+		return false
+	var focus := get_viewport().gui_get_focus_owner() if is_inside_tree() else null
+	# No toque, o último ponto do mouse emulado não segura (o dedo não fica em cima).
+	var pointed: bool = not sheet.touch_mode and _result.get_global_rect().has_point(_mouse)
+	return pointed or (focus != null and _result.is_ancestor_of(focus))
+
+
 func _close_popup_input(event: InputEvent) -> bool:
 	if not _result.visible or Time.get_ticks_msec() - _result_opened < POPUP_GUARD_MS:
 		return false
@@ -1670,6 +1968,7 @@ func hide_crisis() -> void:
 func _open_bag() -> void:
 	if _bag != null:
 		return
+	stop_examine()
 	_hide_tip()
 	Tips.show_tip("bag")
 	Sound.play("res://audio/ui/bag_open.ogg")
@@ -1971,7 +2270,8 @@ func show_result(result: String, automatic: bool = false, rewards: Dictionary = 
 		timer.custom_minimum_size = Vector2(316, 14)
 		timer.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		box.add_child(timer)
-	var hint := AHKit.label(tr("Qualquer tecla ou toque para continuar") if waits else tr("Fecha sozinho · qualquer tecla fecha antes"), "small", MUTED)
+	var hint := AHKit.label(tr("Qualquer tecla ou toque para continuar") if waits else (tr("Fecha sozinho · toque para fechar antes") if sheet.touch_mode
+		else tr("Fecha sozinho · o mouse em cima segura · qualquer tecla fecha")), "small", MUTED)
 	hint.name = "Hint"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(hint)
@@ -1981,16 +2281,22 @@ func show_result(result: String, automatic: bool = false, rewards: Dictionary = 
 	_result.visible = true
 	_result_opened = Time.get_ticks_msec()
 	_result_waits = waits
+	# Quadrado em qualquer tamanho de texto (no Maior, a letra o esticava para cima).
+	var side := maxf(44.0, maxf(_result_close.get_combined_minimum_size().x, _result_close.get_combined_minimum_size().y))
+	_result_close.custom_minimum_size = Vector2(side, side)
+	_result_close.size = Vector2(side, side)
+	_result_close.position = _result.position + Vector2(_result.size.x - side - 10, 10)
+	_result_close.visible = true
+	_result_timer = timer
+	_result_left = -1.0
 	if not waits:
-		var seconds := hold / maxf(1.0, arena.speed if arena != null else 1.0)
-		# Com Reduzir efeitos, a linha fica parada, mas o popup fecha sozinho no mesmo tempo.
-		if not GameFlow.reduced_effects():
-			var tween := create_tween()
-			tween.tween_property(timer, "value", 0.0, seconds)
-		var closing := _result_opened
-		get_tree().create_timer(seconds).timeout.connect(func():
-			if _result.visible and _result_opened == closing:
-				result_closed.emit())
+		# O tempo de verdade (1x e 2x dão o mesmo); só a QA, acelerada além do 2x, encurta. A contagem anda em _process e
+		# para com o mouse em cima.
+		var speed: float = arena.speed if arena != null else 1.0
+		_result_left = hold / speed if speed > 2.0 else hold
+		_result_total = maxf(0.01, _result_left)
 	await result_closed
+	_result_left = -1.0
+	_result_close.visible = false
 	_result.visible = false
 	_order_panel.visible = true
