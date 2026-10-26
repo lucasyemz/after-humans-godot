@@ -1,0 +1,13 @@
+{
+	"source": "#128: o tamanho e o ponto de cada efeito no corpo, para ajustar contra a Unreal sem mexer no código",
+	"about": "body: a altura do quadro (256 px) em frações da altura do corpo de quem recebe; min_px: o mínimo na tela de 1080 (o robô baixinho e longe não some); at: onde a âncora do efeito fica no corpo, em frações da altura a partir do pé. status vale para os loops de estado.",
+	"effects": {
+		"hit_metal": {"body": 0.85, "min_px": 150, "at": 0.55},
+		"hit_dust": {"body": 0.7, "min_px": 150, "at": 0.25},
+		"critical": {"body": 1.0, "min_px": 170, "at": 0.55},
+		"healing": {"body": 0.95, "min_px": 140, "at": 0.5},
+		"block": {"body": 0.8, "min_px": 130, "at": 0.55},
+		"dodge": {"body": 0.75, "min_px": 120, "at": 0.02},
+		"status": {"body": 0.6, "min_px": 150, "at": 0.5}
+	}
+}
