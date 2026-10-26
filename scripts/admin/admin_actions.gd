@@ -142,7 +142,11 @@ static func run(id: String) -> String:
 	if id.begins_with("enemy_"):
 		Admin.next_enemy = id.trim_prefix("enemy_")
 		var enemy_name := TranslationServer.translate(String(GameData.row("enemies", Admin.next_enemy).DisplayName))
-		if not scene.corridor.debug_next_fight():
+		# Só vale se parou na frente de uma patrulha: parando num evento da Passagem (ou viajando de mapa), o inimigo
+		# escolhido não fica armado para uma luta que o jogador não pediu.
+		var stopped: bool = scene.corridor.debug_next_fight()
+		var route: Dictionary = c.session.expedition.corridor if c.session.get("expedition") != null else {}
+		if not stopped or c.session.get("event") != null or route.is_empty() or not scene.corridor.guards.has(int(route.index)):
 			Admin.next_enemy = ""
 			return ""
 		return TranslationServer.translate("A próxima patrulha vem com %s") % enemy_name
