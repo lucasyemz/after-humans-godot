@@ -1395,6 +1395,294 @@
     "machine-fear": "trait_machine_fear"
   },
   "icons": {
+    "intent-attack": {
+      "file": "art/ui/kit/station/icons/intent-attack.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "365f0c26eefdeb3452e20efaa4428162812263d7ba5f7c06b29f316f92d57f48",
+      "kind": "glyph_white_tintable"
+    },
+    "intent-attack_area": {
+      "file": "art/ui/kit/station/icons/intent-attack_area.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "b28bf5ea89a233bfebd9bbb60f41923eac44c6a29eba9a17c9dd4e1197983f8b",
+      "kind": "glyph_white_tintable"
+    },
+    "intent-block": {
+      "file": "art/ui/kit/station/icons/intent-block.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "c8734b29337caee293215b9fd69b30775d428e8c6436f0ca5da0297499b794a6",
+      "kind": "glyph_white_tintable"
+    },
+    "intent-heal": {
+      "file": "art/ui/kit/station/icons/intent-heal.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "754de9ae7ca58429dc7cdc51bb29d9861b144b522a4b68e4d88bba3e0c7a095c",
+      "kind": "glyph_white_tintable"
+    },
+    "intent-move": {
+      "file": "art/ui/kit/station/icons/intent-move.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "4b20d1fec26d3ae36f93086d220de572be3ec8908935b9be44ef3d1c13eaaf70",
+      "kind": "glyph_white_tintable"
+    },
+    "intent-stunned": {
+      "file": "art/ui/kit/station/icons/intent-stunned.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "4013f8e26d9e652bd80542685aa60e3dc98a8c8e3e8e69d6cd8ab98e8cada81b",
+      "kind": "glyph_white_tintable"
+    },
+    "intent-unknown": {
+      "file": "art/ui/kit/station/icons/intent-unknown.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "ce44df5eddf08535016f4fbcc26a5a6f0a1a2dbf576282ed6f00157d37e2a794",
+      "kind": "glyph_white_tintable"
+    },
+    "marker-available": {
+      "file": "art/ui/kit/station/icons/marker-available.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "8a23d2adc1ad23c82e27b5baf824460a09d578dfb57ed1eb0c2950f556d75fe0",
+      "kind": "glyph_white_tintable"
+    },
+    "marker-here": {
+      "file": "art/ui/kit/station/icons/marker-here.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "8c78ee189c810c38020fa1f82bd4751e43bc1c4ba6259ce50b6e80cad36e2ec0",
+      "kind": "glyph_white_tintable"
+    },
+    "marker-visited": {
+      "file": "art/ui/kit/station/icons/marker-visited.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "a373003e78e2e0f2e3776fd6bc2f7c987ba4cd8c9b65262e87866fd91f1b8037",
+      "kind": "glyph_white_tintable"
+    },
+    "node-boss": {
+      "file": "art/ui/kit/station/icons/node-boss.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "fe48112f04b619765bc2b66a0b108fc862325f2dca221df820b8303765d4e141",
+      "kind": "glyph_white_tintable"
+    },
+    "node-combat": {
+      "file": "art/ui/kit/station/icons/node-combat.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "c96c13196388d43d202609b12adf683672e859607ab7dbccba96c5f9893eeaf6",
+      "kind": "glyph_white_tintable"
+    },
+    "node-event": {
+      "file": "art/ui/kit/station/icons/node-event.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6250be2a8b713ff5ac7deb6282ff1107054419ea0dec6925c2887d96bca19c5d",
+      "kind": "glyph_white_tintable"
+    },
+    "node-loot": {
+      "file": "art/ui/kit/station/icons/node-loot.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "d178ec8e78ec7bf47d3b18424b49c143d1701247806f81f6e00fe3b08348e468",
+      "kind": "glyph_white_tintable"
+    },
+    "node-rest": {
+      "file": "art/ui/kit/station/icons/node-rest.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "af5e4e06ab8f20b0d5be17fc024b54607ee4dd277aa3b17d7bdc620cb3f79632",
+      "kind": "glyph_white_tintable"
+    },
+    "node-start": {
+      "file": "art/ui/kit/station/icons/node-start.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6c5ffbe50ccfbc7038776b7e6a5eaf05aaf84fcdbda1ffdafc4dba45962126a1",
+      "kind": "glyph_white_tintable"
+    },
+    "status-bleeding_bad": {
+      "file": "art/ui/kit/station/icons/status-bleeding_bad.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "d5a744c60d6e1790c98b1a56354e430fa99482e69d2512335ff49f11b4e195fe",
+      "kind": "glyph_white_tintable"
+    },
+    "status-bleeding_good": {
+      "file": "art/ui/kit/station/icons/status-bleeding_good.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "8b1472f60ab20560997ea63fb1fa341c7191216aeae3690baae3c1eef0519ebe",
+      "kind": "glyph_white_tintable"
+    },
+    "status-block_bad": {
+      "file": "art/ui/kit/station/icons/status-block_bad.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "0c21dcac5eaae4e39781f48ff891321f832baccabfbbf103312044ac4e66571e",
+      "kind": "glyph_white_tintable"
+    },
+    "status-block_good": {
+      "file": "art/ui/kit/station/icons/status-block_good.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "cf31a356562ff02c84a89e081e2daca119f17530ecb18789361fe6ffb5fd592f",
+      "kind": "glyph_white_tintable"
+    },
+    "status-dodge_bad": {
+      "file": "art/ui/kit/station/icons/status-dodge_bad.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "79ed3fa0356024256128a427b3bd6307fd0492bc9332ef0174ba25fa340a17f7",
+      "kind": "glyph_white_tintable"
+    },
+    "status-dodge_good": {
+      "file": "art/ui/kit/station/icons/status-dodge_good.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "0c7504ac32bce8e8ea51c74904cb12cc68b631178c20c57c3130b16f405496fd",
+      "kind": "glyph_white_tintable"
+    },
+    "status-marked_bad": {
+      "file": "art/ui/kit/station/icons/status-marked_bad.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "47fa7ecbcadb8f781f00038f333ffde0d5ddf5e1ad390264ec54fa8395434620",
+      "kind": "glyph_white_tintable"
+    },
+    "status-marked_good": {
+      "file": "art/ui/kit/station/icons/status-marked_good.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "077a606242c39aafabfd510e2e1070799865cf48efe30eea3be1b3b8cce2d89c",
+      "kind": "glyph_white_tintable"
+    },
+    "status-poison_bad": {
+      "file": "art/ui/kit/station/icons/status-poison_bad.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "5109dcc03a182bdffcffbc0e107efad8c337403a2085b10511ae0d6c66537ff2",
+      "kind": "glyph_white_tintable"
+    },
+    "status-poison_good": {
+      "file": "art/ui/kit/station/icons/status-poison_good.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f740f5470422c46bcf7ba6a7daa41bf4948436145368ce44963c4e86cf8439cb",
+      "kind": "glyph_white_tintable"
+    },
+    "status-protection_bad": {
+      "file": "art/ui/kit/station/icons/status-protection_bad.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "1e38b7c124c8924ba8cd62b5cfd3245e7ef5d755eb6a5b362c713f829895c970",
+      "kind": "glyph_white_tintable"
+    },
+    "status-protection_good": {
+      "file": "art/ui/kit/station/icons/status-protection_good.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "b4bf2f2ef3d2f2244d2c8c113c24631540f410fd2cb1c277e64057decfe2c386",
+      "kind": "glyph_white_tintable"
+    },
+    "status-stunned_bad": {
+      "file": "art/ui/kit/station/icons/status-stunned_bad.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "d548ccbad1b331705ad4861b1baa3a5293ecd9b4754e27c880e6417b0ea421b4",
+      "kind": "glyph_white_tintable"
+    },
+    "status-stunned_good": {
+      "file": "art/ui/kit/station/icons/status-stunned_good.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f262be9a35d8b7545afbff01364383bb8f376680106075fcd6af751afaa4daad",
+      "kind": "glyph_white_tintable"
+    },
+    "status-vulnerable_bad": {
+      "file": "art/ui/kit/station/icons/status-vulnerable_bad.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "8e356ee2d7c01de110ff8ac50049c8a58fb6ae751fb9332ad4cf12944b25bc1c",
+      "kind": "glyph_white_tintable"
+    },
+    "status-vulnerable_good": {
+      "file": "art/ui/kit/station/icons/status-vulnerable_good.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f3e1af119d4d9f2b2ca89a4ac1ea5ab2271c069f34d50c72aaabac016b39c6f0",
+      "kind": "glyph_white_tintable"
+    },
     "alert": {
       "file": "art/ui/kit/station/icons/alert.webp",
       "size": [
