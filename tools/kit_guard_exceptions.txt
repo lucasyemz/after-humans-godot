@@ -1,0 +1,12 @@
+# As telas que ainda desenham fora do kit (tests/test_kit_guard.gd) e quantas ocorrências têm. A lista só encolhe: a
+# cada tela migrada, baixe o número ou tire a linha.
+scripts/ui/briefing_dialog.gd: 8
+scripts/ui/cargo_picker.gd: 6
+scripts/ui/character_sheet.gd: 10
+scripts/ui/exploration_hud.gd: 32
+scripts/ui/inventory_panel.gd: 21
+scripts/ui/passage_card.gd: 5
+scripts/ui/phase_map.gd: 51
+scripts/ui/tips_service.gd: 3
+scripts/ui/title_screen.gd: 8
+scripts/ui/touch_controls.gd: 5

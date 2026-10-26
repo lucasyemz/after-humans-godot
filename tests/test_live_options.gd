@@ -79,8 +79,10 @@ func _station(t, tree: SceneTree) -> void:
 	var grown := _first_label(hud._body)
 	t.check(grown != null and grown.get_theme_font_size("font_size") > before, "o texto do painel aberto cresceu (%d → %d)" % [before, grown.get_theme_font_size("font_size") if grown else 0])
 	t.check(hud._resources.position.x + hud._resources.size.x <= 1889.0, "a barra do alto continua dentro da tela")
-	t.check(hud._subtitle.position.y >= hud._title.position.y + hud._title.get_combined_minimum_size().y - 2.0,
-		"o subtítulo continua embaixo do título (%.0f, título até %.0f)" % [hud._subtitle.position.y, hud._title.position.y + hud._title.get_combined_minimum_size().y])
+	# Na plaqueta, o nome da tela fica embaixo de "ESTAÇÃO RAIZ" (as linhas se encostam de propósito, -4).
+	var title_rect: Rect2 = hud._title.get_global_rect()
+	t.check(hud._subtitle.get_global_rect().position.y >= title_rect.position.y + title_rect.size.y * 0.7,
+		"o subtítulo continua embaixo do título (%.0f, título até %.0f)" % [hud._subtitle.get_global_rect().position.y, title_rect.end.y])
 	await tree.process_frame
 	t.equal(hud.current, "plan", "o Plano continua aberto depois de refeito com o texto novo")
 	# Daltonismo na Estação (o alerta da Comida aparece numa campanha nova): não sobra verde nem vermelho antigo.

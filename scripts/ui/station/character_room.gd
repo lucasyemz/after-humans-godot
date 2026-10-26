@@ -15,9 +15,6 @@ const RIGHT := Rect2(1296, 132, 596, 844)
 const DIALOG := Rect2(620, 250, 680, 0)
 const RECRUIT := "+recruit"
 const MAX_INSTINCT := 200
-## As abas de baixo: o id, o ícone e o nome.
-const NAV := [["overview", "nav_overview", "Visão geral"], ["facilities", "nav_facilities", "Instalações"], ["characters", "nav_characters", "Personagens"],
-	["research", "nav_research", "Pesquisa"], ["hide", "nav_hide", "Ocultar HUD"]]
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 const TARGETS := {"SingleEnemy": "Inimigo", "SingleAlly": "Aliado", "SingleOtherAlly": "Outro aliado", "Self": "Si mesmo"}
 
@@ -95,84 +92,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # ---------------------------------------------------------------- o alto
 
 func _top(c: Dictionary) -> void:
-	var plaque := AHKit.plaque()
-	plaque.name = "Plaque"
-	plaque.position = Vector2(28, 14)
-	plaque.custom_minimum_size = Vector2(520, 96)
-	plaque.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(plaque)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 16)
-	plaque.add_child(row)
-	var glyph := AHKit.glyph("station", 52, AHKit.TEXT)
-	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(glyph)
-	var names := VBoxContainer.new()
-	names.add_theme_constant_override("separation", -4)
-	names.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(names)
-	names.add_child(AHKit.label(tr("Estação Raiz"), "panel_title", AHKit.TEXT, true, true))
-	names.add_child(AHKit.label(tr("Sala dos Personagens"), "text", AHKit.MUTED))
-	# Comida, Água e Energia, alinhados à direita até a engrenagem.
-	var chips := HBoxContainer.new()
-	chips.name = "Vitals"
-	chips.add_theme_constant_override("separation", 10)
-	add_child(chips)
-	for vital in S.vitals(c, 4):
-		chips.add_child(_vital(vital))
-	chips.reset_size()
-	chips.size = chips.get_combined_minimum_size()
-	chips.position = Vector2(1790 - chips.size.x, 14)
-	var gear := Button.new()
-	gear.name = "Options"
-	gear.tooltip_text = tr("Opções")
-	var cog := TextureRect.new()
-	cog.texture = load("res://art/ui/icons/lobby-settings.svg")
-	cog.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	cog.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	cog.modulate = AHKit.TEXT
-	cog.position = Vector2(20, 20)
-	cog.size = Vector2(52, 52)
-	cog.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	gear.add_child(cog)
-	AHKit.style_as(gear, "icon", Vector4(18, 18, 18, 18))
-	gear.custom_minimum_size = Vector2(92, 92)
-	gear.position = Vector2(1800, 14)
-	gear.pressed.connect(func(): hud.open_from_room("options"))
-	add_child(gear)
-
-
-func _vital(vital: Dictionary) -> PanelContainer:
-	var chip := AHKit.chip("resource")
-	chip.custom_minimum_size = Vector2(248, 96)
-	chip.tooltip_text = vital.tip
-	chip.mouse_filter = Control.MOUSE_FILTER_PASS
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_child(row)
-	var icon := TextureRect.new()
-	var painted := AHKit.icon("resource_%s" % vital.id)
-	icon.texture = painted if painted != null else load("res://art/ui/icons/%s.svg" % vital.icon)
-	icon.modulate = Color.WHITE if painted != null else (AHKit.alert_text() if vital.warn else AHKit.TEXT)
-	# Faltando, o ícone também vira o alerta (o triângulo): a forma avisa no daltonismo (hud-estacao.md).
-	if vital.warn:
-		icon.texture = AHKit.icon("alert")
-		icon.modulate = AHKit.alert_text()
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.custom_minimum_size = Vector2(40, 40)
-	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(icon)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", -2)
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(column)
-	column.add_child(AHKit.label(vital.label, "small", AHKit.MUTED, false, true))
-	column.add_child(AHKit.label(vital.value, "row", AHKit.alert_text() if vital.warn else AHKit.AMBER, true))
-	column.add_child(AHKit.label(vital.note.trim_prefix("! "), "small", AHKit.alert_text() if vital.warn else AHKit.MUTED))
-	return chip
+	AHStationFrame.top(self, c, tr("Sala dos Personagens"), func(): hud.open_from_room("options"))
 
 
 # ---------------------------------------------------------------- o herói no meio
@@ -182,8 +102,8 @@ func _vital(vital: Dictionary) -> PanelContainer:
 func _stage(hero: Dictionary) -> void:
 	var shade := TextureRect.new()
 	var gradient := Gradient.new()
-	gradient.set_color(0, Color(0, 0, 0, 0.55))
-	gradient.set_color(1, Color(0, 0, 0, 0))
+	gradient.set_color(0, Color(AHKit.SHADE, 0.55))
+	gradient.set_color(1, Color(AHKit.SHADE, 0.0))
 	var texture := GradientTexture2D.new()
 	texture.gradient = gradient
 	texture.fill = GradientTexture2D.FILL_RADIAL
@@ -196,8 +116,8 @@ func _stage(hero: Dictionary) -> void:
 	add_child(shade)
 	var ground := TextureRect.new()
 	var ground_gradient := Gradient.new()
-	ground_gradient.set_color(0, Color(0, 0, 0, 0.6))
-	ground_gradient.set_color(1, Color(0, 0, 0, 0))
+	ground_gradient.set_color(0, Color(AHKit.SHADE, 0.6))
+	ground_gradient.set_color(1, Color(AHKit.SHADE, 0.0))
 	var ground_texture := GradientTexture2D.new()
 	ground_texture.gradient = ground_gradient
 	ground_texture.fill = GradientTexture2D.FILL_RADIAL
@@ -598,7 +518,7 @@ func _medal(level: int) -> Control:
 	medal.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	medal.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var number := AHKit.label(str(level), "panel_hero", AHKit.AMBER, true)
-	number.add_theme_font_size_override("font_size", AHUiStyle.px(34))
+	number.add_theme_font_size_override("font_size", AHKit.size("card_name"))
 	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	number.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -714,11 +634,7 @@ func _traits(hero: Dictionary, column: VBoxContainer) -> void:
 		var sign := AHKit.label("+" if positive else "−", "text", AHKit.STEEL, true)
 		sign.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		sign.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		var square := PanelContainer.new()
-		var fill := StyleBoxFlat.new()
-		fill.bg_color = color
-		fill.set_corner_radius_all(2)
-		square.add_theme_stylebox_override("panel", fill)
+		var square := AHKit.panel(AHKit.piece_of("chip", "cost"), color)
 		square.custom_minimum_size = Vector2(24, 24)
 		square.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		square.add_child(sign)
@@ -778,7 +694,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	if _upgrade == "" or not options.any(func(o): return o.Name == _upgrade):
 		_upgrade = options[0].Name
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.35)
+	dim.color = Color(AHKit.SHADE, 0.35)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(dim)
@@ -876,111 +792,16 @@ func _fit_keys(buttons: Array) -> void:
 # ---------------------------------------------------------------- embaixo
 
 func _bottom(c: Dictionary) -> void:
-	var back := Button.new()
-	back.name = "Back"
-	back.text = tr("Voltar").to_upper()
-	back.icon = load("res://art/ui/icons/ui-arrow-left.svg") if ResourceLoader.exists("res://art/ui/icons/ui-arrow-left.svg") else null
-	back.add_theme_constant_override("icon_max_width", 28)
-	back.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	AHKit.style_as(back, "secondary")
-	back.add_theme_font_override("font", AHKit.font(true))
-	back.add_theme_font_size_override("font_size", AHKit.size("primary"))
-	back.custom_minimum_size = Vector2(216, 64)
-	back.position = Vector2(28, 920)
-	back.pressed.connect(func(): hud.close_panel())
-	add_child(back)
+	var back := AHStationFrame.back_button(self, func(): hud.close_panel())
 	var recruit := _recruit_button()
 	add_child(recruit)
 	recruit.reset_size()
-	recruit.position = Vector2(back.position.x + maxf(216.0, back.get_combined_minimum_size().x) + 12.0, 920)
-	# As teclas, centradas em x 962, acima das abas.
-	var keys := AHKit.panel(AHKit.piece_of("key", "bar"))
-	keys.name = "Keys"
-	keys.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	keys.add_child(row)
-	# Voltar mostra o Esc (ui_cancel, que volta sempre, com qualquer troca nas Opções; o nome de Backspace não cabia).
-	for spec in [[tr("Setas"), tr("Navegar")], [AHUiStyle.key_name("interact"), tr("Selecionar")], ["Esc", tr("Voltar")],
-			[AHUiStyle.key_name("hide_hud"), tr("Ocultar")]]:
-		var key := AHKitKey.make("", spec[0])
-		row.add_child(key)
-		row.add_child(AHKit.label(spec[1], "text", AHKit.TEXT))
-		var gap := Control.new()
-		gap.custom_minimum_size = Vector2(8, 0)
-		row.add_child(gap)
-	add_child(keys)
-	# Entre os dois painéis: o que não cabe (no Maior, com uma tecla de nome longo) sai do fim, par a par; Ocultar e
-	# Voltar também estão nas abas e no VOLTAR.
-	var room := RIGHT.position.x - LEFT.end.x - 24.0
-	while keys.get_combined_minimum_size().x > room and row.get_child_count() > 3:
-		for i in 3:
-			var last := row.get_child(row.get_child_count() - 1)
-			row.remove_child(last)
-			last.queue_free()
-	keys.reset_size()
-	keys.size = keys.get_combined_minimum_size()
-	# Centrada em x 962, sem encostar nos painéis.
-	keys.position = Vector2(clampf(962 - keys.size.x * 0.5, LEFT.end.x + 12.0, maxf(LEFT.end.x + 12.0, RIGHT.position.x - 12.0 - keys.size.x)), 928)
-	keys.visible = not Settings.touch_visible()
-	# As abas da Estação.
-	var tabs := HBoxContainer.new()
-	tabs.name = "Nav"
-	tabs.add_theme_constant_override("separation", 6)
-	tabs.position = Vector2(28, 994)
-	add_child(tabs)
-	for spec in NAV:
-		var tab := Button.new()
-		tab.name = "Nav_%s" % spec[0]
-		tab.text = tr(spec[2]).to_upper()
-		tab.icon = AHKit.icon(spec[1])
-		tab.add_theme_constant_override("icon_max_width", 30)
-		var active: bool = spec[0] == "characters"
-		AHKit.style_as(tab, "nav_active" if active else "nav")
-		tab.add_theme_font_override("font", AHKit.font(true))
-		tab.add_theme_font_size_override("font_size", AHKit.size("tab"))
-		if active:
-			for state in ["font_color", "font_hover_color", "font_focus_color"]:
-				tab.add_theme_color_override(state, AHKit.AMBER)
-			tab.add_theme_color_override("icon_normal_color", AHKit.AMBER)
-		tab.custom_minimum_size = Vector2(0, 72)
-		var id: String = spec[0]
-		tab.pressed.connect(func(): _nav(id))
-		tabs.add_child(tab)
-	# PREPARAR EXPEDIÇÃO: o botão principal; bloqueado, apagado e com o motivo dentro.
-	var block := S.preparation_block(c)
-	var prepare := AHStationReport._primary(tr("Preparar expedição"), "station", "station_prepare")
-	prepare.name = "Prepare"
-	if block != "":
-		# O motivo vai dentro do botão, embaixo do título: o botão cresce para baixo do título.
-		for state in ["normal", "hover", "pressed", "focus", "disabled", "hover_pressed"]:
-			if prepare.has_theme_stylebox_override(state):
-				prepare.get_theme_stylebox(state).content_margin_bottom += AHUiStyle.px(26)
-	(prepare.get_node("Key").get_child(0) as Label).text = "%s / X" % AHUiStyle.key_name("station_prepare")
-	prepare.disabled = block != ""
-	if block != "":
-		prepare.tooltip_text = block
-		var reason := AHKit.label(block, "small", AHKit.TEXT)
-		reason.name = "Reason"
-		reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		reason.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		reason.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-		reason.offset_left = 40
-		reason.offset_right = -40
-		reason.offset_top = -AHUiStyle.px(26) - 16
-		reason.offset_bottom = -14
-		prepare.add_child(reason)
-		for state in ["font_disabled_color"]:
-			prepare.add_theme_color_override(state, AHKit.TEXT)
-	prepare.pressed.connect(func(): hud.open_map())
-	add_child(prepare)
-	AHStationReport.fit_key(prepare, 52.0)
-	prepare.position = Vector2(1888 - prepare.size.x, 1066 - prepare.size.y)
-	if block != "":
-		# Bloqueado, a tecla fica na linha do título, acima do motivo.
-		var key: Control = prepare.get_node("Key")
-		var title_band: float = prepare.size.y - AHUiStyle.px(26) - 14.0
-		key.position.y = (title_band - key.size.y) * 0.5 + 4.0
+	recruit.position = Vector2(back.position.x + maxf(216.0, back.get_combined_minimum_size().x) + 12.0, AHStationFrame.BACK_Y)
+	# As teclas entre os dois painéis (Voltar mostra o Esc: ui_cancel volta sempre, com qualquer troca nas Opções).
+	AHStationFrame.keys(self, [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["Esc", tr("Voltar")],
+		["hide_hud", tr("Ocultar")]], 962.0, LEFT.end.x + 12.0, RIGHT.position.x - 12.0)
+	AHStationFrame.tabs(self, "characters", _nav)
+	AHStationFrame.prepare(self, tr("Preparar expedição"), "station", S.preparation_block(c), func(): hud.open_map())
 
 
 func _nav(id: String) -> void:

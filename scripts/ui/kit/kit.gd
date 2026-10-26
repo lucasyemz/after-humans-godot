@@ -40,6 +40,10 @@ const COMPONENTS := {
 	"key": {"tab": "key_tab", "button": "button_key", "bar": "keys_bar"},
 	"card": {"hero": "hero_card", "upgrade": "upgrade_card", "upgrade_selected": "upgrade_card_selected"},
 	"focus": {"focus": "focus_frame", "selected": "selected_frame", "corners": "selected_corners"},
+	"slider": {"track": "slider_track", "knob": "slider_knob"},
+	"toggle": {"off": "toggle_off", "on": "toggle_on"},
+	"tag": {"room": "room_tag"},
+	"medal": {"level": "level_medal"},
 }
 ## As peças só da luta, do kit do Codex, que ainda não têm versão da Awesomic.
 const CODEX_ONLY := ["round_strip", "ability_header", "ability_slot", "target_tab", "actor_ring", "selected_slot", "exit"]
@@ -64,6 +68,22 @@ const TEXT := Color("efe6d6")
 const MUTED := Color("a9a294")
 const XP := Color("b7a6f4")
 const INSTINCT := Color("c07a3c")
+## O escuro por baixo (as faixas, o escurecido atrás do herói, a sombra no chão): Color(AHKit.SHADE, alfa).
+const SHADE := Color.BLACK
+## O texto e os ícones em cima do âmbar (o botão principal).
+const ON_AMBER := Color("1a1408")
+## O fundo quase preto das faixas da luta.
+const INK := Color(0.055, 0.066, 0.074, 0.9)
+## O ícone travado (a habilidade que ainda não abriu) e o desligado (a que não serve agora).
+const LOCKED := Color(0.42, 0.42, 0.42)
+const DISABLED_ICON := Color(0.72, 0.72, 0.72)
+## O rosto de quem caiu (o relatório da volta) e o marcador claro da luta (o alvo apontado).
+const FALLEN := Color(0.5, 0.5, 0.55)
+const AMBER_LIGHT := Color(1.0, 0.85, 0.45)
+## O que não vale daqui (a habilidade que não sai da posição): o ícone escurecido.
+const DIM := Color(0.3, 0.3, 0.32)
+## A noite pendente no Dormitório (a luz e os cantos do cômodo na vista geral).
+const NIGHT := Color("b7a6f4")
 const _HERO_HP := [Color("2fb6bd"), Color("56b4e9")]
 const _ENEMY_HP := [Color("d23a2e"), Color("e69f00")]
 const _HEALTHY := [Color("56b468"), Color("56b4e9")]
@@ -333,6 +353,25 @@ static func set_arrow_text(rich: RichTextLabel, text: String) -> void:
 	var side := int(size(rich.get_meta("role", "text")) * 0.8) if rich.has_meta("role") else int(rich.get_theme_font_size("normal_font_size") * 0.8)
 	var arrow := "[img=%dx%d color=#%s]res://art/ui/icons/ui-arrow-right.svg[/img]" % [side, side, AMBER.to_html(false)]
 	rich.text = text.replace("[", "[lb]").replace("→", arrow)
+
+
+## O retrato quadrado (o rosto do herói ou do civil na moldura square_portrait), do lado pedido.
+static func portrait(texture: Texture2D, side: float, dim: bool = false) -> PanelContainer:
+	var frame := panel("square_portrait")
+	frame.name = "Portrait"
+	frame.custom_minimum_size = Vector2(side, side)
+	frame.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var face := TextureRect.new()
+	face.texture = texture
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	face.clip_contents = true
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if dim:
+		face.modulate = DIM
+	frame.add_child(face)
+	return frame
 
 
 ## Um painel com a peça (para os componentes e para as peças só da luta, CODEX_ONLY).

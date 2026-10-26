@@ -222,7 +222,7 @@ func _preparation() -> void:
 	var hud: AHRefugeHud = _tree.current_scene.hud
 	hud.open_room(S.PREPARATION)
 	await _frames(5)
-	var cards: Array = hud._prep.find_children("*", "Button", true, false).filter(func(b): return b.custom_minimum_size == Vector2(318, 250))
+	var cards: Array = hud._prep.find_children("*", "Button", true, false).filter(func(b): return String(b.name).begins_with("Slot"))
 	if not t.check(cards.size() == 4, "os quatro cartões da Preparação"):
 		return
 	var card: Button = cards[0]

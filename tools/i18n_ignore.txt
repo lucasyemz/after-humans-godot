@@ -47,8 +47,6 @@ combat_hud.gd: combat_ability_%d
 combat_hud.gd: %s: %s
 combat_hud.gd: %d/%d
 combat_hud.gd: Description
-refuge_hud.gd: %s: %s · %s%s
-refuge_hud.gd: %s · %s
 refuge_hud.gd: %s · %d/%d
 refuge_hud.gd: Role
 refuge_hud.gd: UI
@@ -1031,10 +1029,6 @@ character_room.gd: overview
 character_room.gd: facilities
 character_room.gd: characters
 character_room.gd: hide
-character_room.gd: Plaque
-character_room.gd: Vitals
-character_room.gd: Options
-character_room.gd: resource_%s
 character_room.gd: Hero
 character_room.gd: file
 character_room.gd: frames
@@ -1075,13 +1069,7 @@ character_room.gd: Cancel
 character_room.gd: Esc / B
 character_room.gd: Esc
 character_room.gd: Confirm
-character_room.gd: Back
-character_room.gd: Keys
-character_room.gd: Nav
-character_room.gd: Nav_%s
 character_room.gd: Prepare
-character_room.gd: %s / X
-character_room.gd: Reason
 combat_arena.gd: icons
 character_room.gd: text
 *: large
@@ -1159,3 +1147,94 @@ combat_hud.gd: Timer
 combat_hud.gd: Hint
 kit.gd: [lb]
 kit.gd: Veil
+*: slider
+*: knob
+*: on
+*: toggle
+*: off
+*: tag
+*: medal
+*: bed
+*: expeditions
+*: food
+*: power
+*: overview
+*: facilities
+*: characters
+*: hide
+*: benefit
+*: basic
+*: watch
+*: recruit
+*: grabber
+options_panel.gd: Key_%s
+options_panel.gd: Toggle
+kit.gd: Portrait
+refuge_hud.gd: Frame
+refuge_hud.gd: Left
+refuge_hud.gd: Header
+refuge_hud.gd: Title
+refuge_hud.gd: State
+refuge_hud.gd: X
+refuge_hud.gd: Close
+refuge_hud.gd: Scroll
+refuge_hud.gd: Body
+refuge_hud.gd: Footer
+refuge_hud.gd: Esc
+refuge_hud.gd: Pending
+refuge_hud.gd: Pending_%s
+refuge_hud.gd: Name
+refuge_hud.gd: Manage
+refuge_hud.gd: Text
+refuge_hud.gd: Cost
+refuge_hud.gd: Cost_%s
+refuge_hud.gd: Key
+refuge_hud.gd: Plan_%s
+refuge_hud.gd: %s: %s
+refuge_hud.gd: See_%s
+refuge_hud.gd: Upgrade
+refuge_hud.gd: Preparation
+refuge_hud.gd: Focus_%s
+refuge_hud.gd: [b][color=#%s]%s[/color][/b] %s
+refuge_hud.gd: [lb]
+refuge_hud.gd: Slot%d
+refuge_hud.gd: Supplies
+refuge_hud.gd: Water
+refuge_hud.gd: Power
+refuge_hud.gd: Stock
+refuge_hud.gd: Relic_%s
+refuge_hud.gd: Craft
+refuge_hud.gd: %s · %d
+refuge_hud.gd: Research_%s
+refuge_hud.gd: Research
+refuge_hud.gd: Night_%s
+refuge_hud.gd: Refuse
+refuge_hud.gd: %d / %d
+*: class
+*: radar
+*: title
+*: subtitle
+*: resources
+refuge_hud.gd: Branch
+refuge_hud.gd: Requires
+refuge_hud.gd: Expeditions
+refuge_hud.gd: Locked
+station_frame.gd: Plaque
+station_frame.gd: Title
+station_frame.gd: Subtitle
+station_frame.gd: Options
+station_frame.gd: Resources
+station_frame.gd: Materials
+station_frame.gd: Material_%s
+station_frame.gd: Vital_%s
+station_frame.gd: resource_%s
+station_frame.gd: Alert
+station_frame.gd: Back
+station_frame.gd: Arrow
+station_frame.gd: Keys
+station_frame.gd: Nav
+station_frame.gd: Nav_%s
+station_frame.gd: Prepare
+station_frame.gd: Key
+station_frame.gd: %s / X
+station_frame.gd: Reason

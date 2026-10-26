@@ -13,7 +13,7 @@ signal result_closed
 
 const S = preload("res://scripts/ui/ui_style.gd")
 const GOLD := S.GOLD
-const INK := Color(0.055, 0.066, 0.074, 0.9)
+const INK := AHKit.INK
 const TEXT := S.TEXT
 const MUTED := S.MUTED
 ## Onde fica o rodapé da vez (a vida sob os pés não passa daqui): o topo da aba "Escolha um alvo", menos a folga.
@@ -315,7 +315,7 @@ func _build() -> void:
 	_ability_name.clip_text = true
 	header_row.add_child(_ability_name)
 	var divider := ColorRect.new()
-	divider.color = Color(0, 0, 0, 0.55)
+	divider.color = Color(AHKit.SHADE, 0.55)
 	divider.custom_minimum_size = Vector2(2, 40)
 	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	header_row.add_child(divider)
@@ -1121,7 +1121,7 @@ func _style_ability(button: Button) -> void:
 		selected.visible = chosen
 	var icon := button.get_node_or_null("Icon") as Control
 	if icon != null:
-		icon.modulate = Color(0.42, 0.42, 0.42) if button.get_meta("locked", false) else (Color(0.72, 0.72, 0.72) if button.disabled and not chosen else Color.WHITE)
+		icon.modulate = AHKit.LOCKED if button.get_meta("locked", false) else (AHKit.DISABLED_ICON if button.disabled and not chosen else Color.WHITE)
 
 
 ## A barra da habilidade: o ícone, o nome e a faixa de verdade nesta luta (o campo à direita da divisão).
@@ -1234,7 +1234,7 @@ func _build_abilities(take_focus: bool = true) -> void:
 		child.set_meta("locked", locked)
 		child.disabled = locked
 		# Bloqueada, a ação também apaga o ícone (como as habilidades): a peça escura quase não muda no desligado.
-		(child.get_node("Icon") as Control).modulate = Color(0.42, 0.42, 0.42) if locked else Color.WHITE
+		(child.get_node("Icon") as Control).modulate = AHKit.LOCKED if locked else Color.WHITE
 		if kind == "item":
 			(child.get_node("Count") as Label).text = str(AHJourneyRules.food(Campaign.state))
 	# Na aba, curto como no alvo; o que fazer fica na dica das habilidades (_describe).
@@ -1457,7 +1457,7 @@ func _hide_tip() -> void:
 func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> void:
 	var ability: Dictionary = session.data.abilities[option.id]
 	_clear(_tip_box)
-	_tip_box.add_child(_kit_label(tr(option.name), 26, GOLD, "display"))
+	_tip_box.add_child(AHKit.label(tr(option.name), "range", GOLD, true, true))
 	var number := _number_of(option.id)
 	var facts := PackedStringArray()
 	if number[0] != "":
@@ -1608,7 +1608,7 @@ func _describe_action(kind: String) -> void:
 		"flee": [tr("Fugir"), tr("60% de chance de a equipe recuar e sair da luta. Na fuga, larga o que carregava.")],
 		"item": [tr("Mochila"), tr("Comida ou curativo no herói da vez. Ação livre: a vez continua, um item por vez dele.")]}
 	_clear(_tip_box)
-	_tip_box.add_child(_kit_label(texts[kind][0], 26, GOLD, "display"))
+	_tip_box.add_child(AHKit.label(texts[kind][0], "range", GOLD, true, true))
 	var body := _kit_label(texts[kind][1], S.MIN_TEXT, TEXT)
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.custom_minimum_size = Vector2(430, 0)
@@ -1640,18 +1640,18 @@ func _on_action(kind: String) -> void:
 func show_crisis(text: String, breakthrough: bool) -> void:
 	hide_crisis()
 	_crisis = ColorRect.new()
-	_crisis.color = Color(0, 0, 0, 0.55)
+	_crisis.color = Color(AHKit.SHADE, 0.55)
 	_crisis.position = Vector2(0, 182)
 	_crisis.size = Vector2(1920, 112)
 	_crisis.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_crisis)
 	# Na ferrugem do Instinto (decisão do Lucas), clareada para ler sobre o aço.
-	var title := _kit_label(tr("CRISE DE INSTINTO"), 22, AHKit.INSTINCT.lightened(0.3), "bold")
+	var title := AHKit.label(tr("CRISE DE INSTINTO"), "text", AHKit.INSTINCT.lightened(0.3), true)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.position = Vector2(0, 10)
 	title.size = Vector2(1920, 30)
 	_crisis.add_child(title)
-	var result := _kit_label(text, 40, AHKit.crisis_color(breakthrough), "display")
+	var result := AHKit.label(text, "hero_name", AHKit.crisis_color(breakthrough), true, true)
 	result.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	result.position = Vector2(0, 42)
 	result.size = Vector2(1920, 60)
@@ -1732,7 +1732,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 			probe.rank = rank
 			marker.text = tr("Posição %d") % rank
 			marker.custom_minimum_size = Vector2(180, 46)
-			style_button(marker, Color(1.0, 0.85, 0.45))
+			style_button(marker, AHKit.AMBER_LIGHT)
 			marker.set_meta("world", arena.slot_position(probe) + Vector3(0, 2.0, 0))
 		marker.mouse_entered.connect(_hover_target.bind(rank))
 		marker.mouse_exited.connect(_hover_target.bind(-1))

@@ -7,7 +7,7 @@ const GAP := 6.0
 const WIDTH := 3.0
 const ARM := 18.0
 
-var color := Color("efe5d1")
+var color := AHKit.TEXT
 ## Por dentro do controle, quando uma lista com rolagem (ou outro pai que recorta) cortaria as de fora.
 var inside := false
 

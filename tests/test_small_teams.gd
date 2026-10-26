@@ -130,8 +130,8 @@ func _preparation(t) -> void:
 	hud._draft.phase = "fase_5"
 	hud.refresh()
 	await tree.process_frame
-	var go := _button(hud._prep, "Partir")
-	t.check(go != null and go.disabled, "Túneis do Eco com três: Partir travado")
+	var go: Button = hud.find_child("PrepareBlocked", true, false)
+	t.check(go != null and go.disabled and go.text.begins_with("PARTIR"), "Túneis do Eco com três: Partir travado")
 	t.check(_label(hud._prep, "pede 4 animais"), "e o motivo na tela")
 	# Texto Maior, doze na Estação e um só na equipe: o banco quebra em linhas e a gaveta cabe na tela.
 	var classes := ["cao", "gato", "sapo", "coruja", "cao", "gato", "sapo", "coruja"]
