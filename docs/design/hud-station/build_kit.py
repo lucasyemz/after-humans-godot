@@ -482,6 +482,48 @@ def combat_pieces():
          "das máquinas some no cinza). Não fatiar.", anchor=(22, 22))
 
 
+def star_icon(filled=True, size=64):
+    """A estrela das notas (1 a 3): glifo branco de um tom, tingido pelo jogo. A vazia é o contorno, para a nota se ler
+    também no cinza e no daltonismo (forma, não só cor)."""
+    k = S
+    cx, cy, ro, ri = size * k / 2, size * k * 0.53, size * k * 0.47, size * k * 0.19
+    pts = [(cx + (ro if i % 2 == 0 else ri) * math.sin(i * math.pi / 5), cy - (ro if i % 2 == 0 else ri) * math.cos(i * math.pi / 5)) for i in range(10)]
+    big = Image.new("L", (size * k, size * k), 0)
+    d = ImageDraw.Draw(big)
+    if filled:
+        d.polygon(pts, fill=255)
+    else:
+        d.line(pts + [pts[0], pts[1]], fill=255, width=round(5 * k), joint="curve")
+    im = Image.new("RGBA", (size, size), (255, 255, 255, 0))
+    im.putalpha(big.resize((size, size), Image.Resampling.LANCZOS))
+    return im
+
+
+def adjust_pieces():
+    """Lote 5 (#109): a vida prevista do acampamento e as estrelas do popup de fim de luta."""
+    # Sem o chanfro dos lados: a peça continua o bar_fill e se repete na largura (TILE), para as riscas manterem o passo
+    # em qualquer tamanho (a prévia da Ração tem cerca de 20 px; a de um curativo, 50).
+    stripes = fill_tintable((64, 16))
+    stripes.putalpha(Image.new("L", (64, 16), 255))
+    # Riscas diagonais de 4 px, a cada 8: a vida prevista se separa da vida de agora também pela forma (cinza e daltonismo).
+    a = stripes.getchannel("A")
+    band = Image.new("L", (64, 16), 0)
+    d = ImageDraw.Draw(band)
+    for x in range(-16, 80, 8):
+        d.polygon([(x, 16), (x + 4, 16), (x + 20, 0), (x + 16, 0)], fill=255)
+    stripes.putalpha(Image.composite(a, a.point(lambda v: v * 150 // 255), band))
+    save("bar_preview", stripes, [0, 4, 0, 4], [0, 0, 64, 16],
+         "A vida prevista (acampamento, com o foco num cuidado): por cima do bar_fill, do fim da vida de agora até a "
+         "prevista, tingida de verde claro (#a6e3ae; azul claro #a9d8f5 no daltonismo). Riscas: forma, além da cor. "
+         "Na largura, TILE (axis_stretch_horizontal), com a altura da barra: as riscas mantêm o passo de 8 px.",
+         tint={"normal": "#a6e3ae", "colorblind": "#a9d8f5"})
+    ROWS["bar_preview"]["axis_stretch_horizontal"] = "TILE"
+    (OUT / "icons").mkdir(exist_ok=True)
+    for name, filled in [("star", True), ("star_empty", False)]:
+        icon = star_icon(filled)
+        icon.save(OUT / "icons" / f"{name}.webp", lossless=True, method=6)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     # ---------------------------------------------------------------- relatório da volta
@@ -609,6 +651,8 @@ def main():
     # Redesenho, no mesmo padrão, das peças de art/ui/kit/combat que não tinham equivalente: as medidas e a estrutura do
     # alvo aprovado (docs/design/hud-target.md); o desenho, os estados e as conferências deste kit.
     combat_pieces()
+    # ---------------------------------------------------------------- lote 5: os ajustes da #109 (acampamento, fim de luta)
+    adjust_pieces()
 
     manifest = {
         "revision": "station_2026_10_25",

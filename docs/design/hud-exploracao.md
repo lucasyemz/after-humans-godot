@@ -44,10 +44,10 @@ e aprovar e não entram no jogo. A integração é da #60.
 | Resultado do evento | [event_result](hud-exploracao/event_result.webp) | [large](hud-exploracao/event_result_large.webp) | [colorblind](hud-exploracao/event_result_colorblind.webp) | [comparar](hud-exploracao/before_after_event_result.webp) |
 | Evento de cenário | [scenario_event](hud-exploracao/scenario_event.webp) | [large](hud-exploracao/scenario_event_large.webp) | [colorblind](hud-exploracao/scenario_event_colorblind.webp) | [comparar](hud-exploracao/before_after_scenario_event.webp) |
 | Mochila | [inventory](hud-exploracao/inventory.webp) | [large](hud-exploracao/inventory_large.webp) | [colorblind](hud-exploracao/inventory_colorblind.webp) | [comparar](hud-exploracao/before_after_inventory.webp) |
-| Acampamento | [camp](hud-exploracao/camp.webp) | [large](hud-exploracao/camp_large.webp) | [colorblind](hud-exploracao/camp_colorblind.webp) | [comparar](hud-exploracao/before_after_camp.webp) |
+| Acampamento (substituído na #109) | [camp](hud-ajustes/camp.webp) | [large](hud-ajustes/camp_large.webp) | [colorblind](hud-ajustes/camp_colorblind.webp) | [com a Unreal](hud-ajustes/camp_unreal.webp) |
 | Abandonar a expedição | [risk](hud-exploracao/risk.webp) | [large](hud-exploracao/risk_large.webp) | [colorblind](hud-exploracao/risk_colorblind.webp) | [comparar](hud-exploracao/before_after_risk.webp) |
 | Diante do guardião | [boss_choice](hud-exploracao/boss_choice.webp) | [large](hud-exploracao/boss_choice_large.webp) | [colorblind](hud-exploracao/boss_choice_colorblind.webp) | [comparar](hud-exploracao/before_after_boss_choice.webp) |
-| Pausa (Esc) | [pause](hud-exploracao/pause.webp) | [large](hud-exploracao/pause_large.webp) | [colorblind](hud-exploracao/pause_colorblind.webp) | [comparar](hud-exploracao/before_after_pause.webp) |
+| Menu da expedição (Esc, no lugar da Pausa, #109) | [menu](hud-ajustes/menu.webp) | [large](hud-ajustes/menu_large.webp) | [colorblind](hud-ajustes/menu_colorblind.webp) | [comparar](hud-ajustes/before_after_menu.webp) |
 | Guardião vencido | [boss_done](hud-exploracao/boss_done.webp) | [large](hud-exploracao/boss_done_large.webp) | [colorblind](hud-exploracao/boss_done_colorblind.webp) | [comparar](hud-exploracao/before_after_boss_done.webp) |
 | Toque, nada por perto | [touch](hud-exploracao/touch.webp) | [large](hud-exploracao/touch_large.webp) | [colorblind](hud-exploracao/touch_colorblind.webp) | [comparar](hud-exploracao/before_after_touch.webp) |
 | Toque, perto do caixa | [touch_active](hud-exploracao/touch_active.webp) | [large](hud-exploracao/touch_active_large.webp) | [colorblind](hud-exploracao/touch_active_colorblind.webp) | [comparar](hud-exploracao/before_after_touch_active.webp) |
@@ -60,7 +60,8 @@ Cada tela também tem:
 - a redução a 40%;
 - o cinza.
 
-[checks.json](hud-exploracao/checks.json) passa nas 64 telas (16 telas, 4 perfis), com as mesmas checagens do lote 1
+O acampamento e o Menu da expedição saíram desta pasta na #109 e estão em [hud-ajustes.md](hud-ajustes.md), com as
+conferências deles. [checks.json](hud-exploracao/checks.json) passa nas 56 telas daqui (14 telas, 4 perfis), com as mesmas checagens do lote 1
 e o painel do meio contado como área (para não cobrir a barra das teclas):
 - texto dentro da área de conteúdo de cada peça;
 - peça cortada;
@@ -97,11 +98,8 @@ e o painel do meio contado como área (para não cobrir a barra das teclas):
   - à direita, o detalhe: o nome, a descrição e o aliado com as setas;
   - as ações apagadas, no tom apagado sem transparência, e o motivo ("O aliado já está com a vida cheia.");
   - FECHAR (Esc / B).
-- **Acampamento:**
-  - o que comer e o curativo fazem, em chips ("· 4 comidas", "· 2 curativos");
-  - uma linha por herói, com a vida e COMER e CURATIVO (apagados com a vida cheia, e o motivo embaixo);
-  - LEVANTAR ACAMPAMENTO.
-  - O acampamento encenado do PR #98 usa o HUD da luta para escolher o herói. Esta tela é o painel das ações.
+- **Acampamento:** substituído pela estrutura da Unreal (#109): a cena de lado e um painel só na faixa de baixo, com as
+  cartas, os dois cuidados e CONTINUAR. Está em [hud-ajustes.md](hud-ajustes.md).
 - **Abandonar a expedição:** o triângulo, a pergunta e a consequência. CONTINUAR é o botão âmbar e fica na tecla de
   voltar (Esc / B); VOLTAR À ESTAÇÃO é de aço, sem tecla, para não sair sem querer.
 - **Diante do guardião** (`street_corridor.gd`, `_ask_risk`):
@@ -109,14 +107,10 @@ e o painel do meio contado como área (para não cobrir a barra das teclas):
   - a equipe como está;
   - os suprimentos e o achado em chips;
   - SEGUIR EM FRENTE (âmbar) e VOLTAR À ESTAÇÃO (METADE DO ACHADO), de aço.
-- **Pausa** (Esc, `show_menu`):
-  - CONTINUAR (âmbar, na tecla de voltar);
-  - VOLTAR À ESTAÇÃO com o texto da retirada (no meio de uma luta ou evento, ela fica apagada com "Termine a luta ou o
-    evento antes de voltar.");
-  - OPÇÕES;
-  - NOVA CAMPANHA em alerta.
+- **Menu da expedição** (Esc, `show_menu`): no lugar da "Pausa" desde a #109, com o lugar e o trecho no título e FECHAR
+  no lugar de CONTINUAR. Está em [hud-ajustes.md](hud-ajustes.md), com a variante sem menu.
 - **Guardião vencido:** o cartão vira OBJETIVO CUMPRIDO com o check verde, todos os trechos resolvidos, e entra o botão
-  CONCLUIR JORNADA · VOLTAR À ESTAÇÃO, sem tecla: o Esc é do MENU, e a volta também sai pela Pausa.
+  CONCLUIR JORNADA · VOLTAR À ESTAÇÃO, sem tecla: o Esc é do MENU, e a volta também sai pelo Menu da expedição.
 - **Toque:**
   - o analógico: a área e o pegador com a cruz âmbar, octógonos de aço meio transparentes, e "Andar" embaixo;
   - o Usar, apagado sem nada por perto (como na captura) e com o âmbar por cima perto do caixa;
@@ -160,8 +154,7 @@ node docs/design/hud-exploracao/render.mjs http://127.0.0.1:8765
 python3 docs/design/hud-kit/compose.py docs/design/hud-exploracao explore=$B/explore.jpg patrol=$B/explore-patrol.jpg \
   interior=$B/explore-interior.jpg search=$B/explore-search.jpg loot=$B/explore-loot.jpg event=$B/explore-event.jpg \
   event_result=$B/explore-event.jpg scenario_event=$B/scenario-event.jpg inventory=$B/explore-inventory.jpg \
-  camp=$B/explore-camp.jpg risk=$B/explore-risk.jpg boss_choice=$B/explore-risk.jpg pause=$B/explore-options.jpg \
-  boss_done=$B/explore.jpg touch=$B/explore-touch.jpg touch_active=$B/explore-touch.jpg
+  risk=$B/explore-risk.jpg boss_choice=$B/explore-risk.jpg boss_done=$B/explore.jpg touch=$B/explore-touch.jpg touch_active=$B/explore-touch.jpg
 ```
 
 ## QA de design
@@ -212,6 +205,6 @@ As rodadas seguem [qa.md](qa.md) e ficam registradas abaixo e no PR.
 As 64 telas estão ok, sem texto coberto, e o corredor é o mesmo da jornada inteira. O escopo foi conferido.
 
 Observações baixas, para a integração:
-- Com o guardião vencido, o texto do jogo diz "(botão ou Esc)". O caminho pelo Esc é Esc, Pausa, "Voltar à Estação
+- Com o guardião vencido, o texto do jogo diz "(botão ou Esc)". O caminho pelo Esc é Esc, Menu da expedição (antes, a Pausa), "Voltar à Estação
   (fase concluída: todo o achado)"; se quiser, ajuste o texto ao integrar.
 - No toque, a chapinha "Andar" fica presa ao anel e passa por cima do cenário.

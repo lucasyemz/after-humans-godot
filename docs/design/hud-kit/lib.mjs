@@ -228,6 +228,9 @@ export async function run(screens, out) {
         const overlaps = [];
         for (let i = 0; i < hits.length; i++) for (let j = i + 1; j < hits.length; j++) {
           if (els[i].contains(els[j]) || els[j].contains(els[i])) continue;
+          // O corpo dos heróis na cena (data-hit="hero-body", medido na captura): conta contra painéis e botões, não
+          // contra outro corpo (na cena, um herói pode passar por trás do outro).
+          if (hits[i].kind === "hero-body" && hits[j].kind === "hero-body") continue;
           const a = hits[i].rect, b = hits[j].rect;
           // Dentro de uma caixa que rola, o que está abaixo da dobra não conta como sobreposto ao que está fora dela.
           const sa = els[i].closest("[data-scroll]"), sb = els[j].closest("[data-scroll]");

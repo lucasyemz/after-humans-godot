@@ -3,28 +3,29 @@
 // scripts/ui/exploration_hud.gd, scripts/street/street_corridor.gd, scripts/ui/inventory_panel.gd e data/events.json.
 // Uso (da raiz do repositório, com python3 -m http.server 8765 servindo a raiz):
 //   node docs/design/hud-exploracao/render.mjs http://127.0.0.1:8765
+import { pathToFileURL } from "node:url";
 import {
   setBase, KIT, nine, over, img, glyph, key, bar, portrait, divider, cost, chip, secondary, primary, section, run,
 } from "../hud-kit/lib.mjs";
 
 setBase(process.argv[2] || "http://127.0.0.1:8765");
 const OUT = process.argv[3] || "docs/design/hud-exploracao/.render";
-const BG = (name) => img(`docs/design/hud-v2/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px");
-const TEAM = [["bento", "Bento", 34, 34], ["nick", "Nick", 24, 24], ["iris", "Íris", 23, 23], ["vespera", "Véspera", 30, 30]];
-const WALK = [["A|D", "Andar"], ["Shift", "Correr"], ["E", "Interagir"]];
-const MODAL = [["Setas", "Navegar"], ["E", "Escolher"], ["Esc", "Fechar"]];
+export const BG = (name) => img(`docs/design/hud-v2/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px");
+export const TEAM = [["bento", "Bento", 34, 34], ["nick", "Nick", 24, 24], ["iris", "Íris", 23, 23], ["vespera", "Véspera", 30, 30]];
+export const WALK = [["A|D", "Andar"], ["Shift", "Correr"], ["E", "Interagir"]];
+export const MODAL = [["Setas", "Navegar"], ["E", "Escolher"], ["Esc", "Fechar"]];
 const ICON = { start: "node-start.svg", combat: "node-combat.svg", loot: "node-loot.svg", rest: "node-rest.svg", passage: "node-event.svg", boss: "node-boss.svg", inside: "room_depot" };
 // O corredor de exemplo (exploration_hud.gd): [tipo, estado]. "done" resolvido, "now" o de agora, "known" conhecido,
 // "unknown" ainda não alcançado; o guardião é sempre conhecido.
 // Um corredor só para a jornada inteira: os tipos dos dez trechos e, para cada tela, até onde a equipe chegou.
-const JOURNEY = ["start", "loot", "combat", "rest", "loot", "combat", "passage", "loot", "rest", "boss"];
-const at = (now, known = [], inside = false) => JOURNEY.map((type, i) => i < now ? [type, "done"] : i === now ? [inside ? "inside" : type, "now"]
+export const JOURNEY = ["start", "loot", "combat", "rest", "loot", "combat", "passage", "loot", "rest", "boss"];
+export const at = (now, known = [], inside = false) => JOURNEY.map((type, i) => i < now ? [type, "done"] : i === now ? [inside ? "inside" : type, "now"]
   : type === "boss" || known.includes(i) ? [type, "known"] : ["", "unknown"]);
-const START = at(0), INSIDE = at(1, [], true), MIDWAY = at(2, [3]);
+export const START = at(0), INSIDE = at(1, [], true), MIDWAY = at(2, [3]);
 
 // ------------------------------------------------------------------ a moldura da exploração
-function frame({ place = "Rua das Vitrines", sub = "Jornada 1 · Fim de tarde", title = "Trecho 1 de 10 · Partida", route = START, food = "4/8",
-  found = ["0", "0", "0"], hope = "80", keys = WALK, touch = false, goal = null, team = TEAM } = {}) {
+export function frame({ place = "Rua das Vitrines", sub = "Jornada 1 · Fim de tarde", title = "Trecho 1 de 10 · Partida", route = START, food = "4/8",
+  found = ["0", "0", "0"], hope = "80", keys = WALK, touch = false, goal = null, team = TEAM, buttons = null } = {}) {
   const g = goal || { kicker: "Objetivo da rota", title: "Vencer o guardião (trecho 10)", text: "Rota básica: o achado das buscas volta com a equipe.", done: false };
   const plaque = `<div class="abs col" style="left:28px;top:14px;gap:10px">` +
     nine("room_plaque", { cls: "row", extra: "min-width:440px;min-height:96px;gap:16px" },
@@ -57,18 +58,19 @@ function frame({ place = "Rua das Vitrines", sub = "Jornada 1 · Fim de tarde", 
   // A barra das teclas: andar, correr e interagir na rua; com um painel aberto, as teclas do painel. No toque, nenhuma.
   const keyBar = touch ? "" : `<div class="abs" data-hit="keys" style="right:28px;bottom:calc(14px + 64px*var(--k) + 10px)">` + nine("keys_bar", { cls: "row", extra: "gap:18px;height:calc(56px*var(--k));justify-content:center" },
     keys.map(([k, t]) => `<div class="row" style="gap:6px">${k.split("|").map((x) => key(x)).join("")}<span class="tx f22">${t}</span></div>`).join("")) + `</div>`;
-  const buttons = `<div class="abs row" style="right:28px;bottom:14px;gap:10px">${secondary("Mochila", { icon: "expeditions", keyLabel: touch ? "" : "I", hit: "bag", height: 64 })}${secondary("Menu", { icon: "lobby-settings.svg", keyLabel: touch ? "" : "Esc", hit: "menu", height: 64 })}</div>`;
-  return plaque + strip + supplies + plates + keyBar + buttons;
+  // buttons: os botões do canto no lugar de MOCHILA e MENU (a variante sem o Menu da expedição, #109).
+  const corner = `<div class="abs row" style="right:28px;bottom:14px;gap:10px">${buttons || secondary("Mochila", { icon: "expeditions", keyLabel: touch ? "" : "I", hit: "bag", height: 64 }) + secondary("Menu", { icon: "lobby-settings.svg", keyLabel: touch ? "" : "Esc", hit: "menu", height: 64 })}</div>`;
+  return plaque + strip + supplies + plates + keyBar + corner;
 }
 
 // O aviso de interação sobre o objeto: a etiqueta com a ponta para baixo e a tecla (aceita toque).
-const prompt = (x, y, k, text, done = false) => `<div class="abs" data-hit="prompt" style="left:${x}px;top:calc(${y}px - 60px*var(--k));transform:translateX(-50%)">` +
+export const prompt = (x, y, k, text, done = false) => `<div class="abs" data-hit="prompt" style="left:${x}px;top:calc(${y}px - 60px*var(--k));transform:translateX(-50%)">` +
   nine("room_tag", { cls: "row", extra: `height:calc(60px*var(--k));gap:10px;justify-content:center;${done ? "opacity:.85" : ""}` },
     `${k ? key(k) : glyph(done ? "state_active" : "next_step", 22, done ? "var(--muted)" : "var(--amber)")}<span class="tx f24 ${done ? "muted" : "semi"}">${text}</span>`) + `</div>`;
 // Um painel no meio da tela (evento, Mochila, acampamento, pausa, escolha de risco): começa depois do cartão do objetivo.
-const modal = (width, top, body, left = null) => `<div class="abs" style="left:${left !== null ? left + "px" : `calc(28px + 440px + 24px + (1920px - 28px - 440px - 24px - 28px - ${width}px)/2)`};top:${top}px" data-hit="panel">` +
+export const modal = (width, top, body, left = null) => `<div class="abs" style="left:${left !== null ? left + "px" : `calc(28px + 440px + 24px + (1920px - 28px - 440px - 24px - 28px - ${width}px)/2)`};top:${top}px" data-hit="panel">` +
   nine("panel_large", { repeat: "round", cls: "col", extra: `width:${width}px;gap:12px` }, body) + `</div>`;
-const heading = (icon, color, text, sub = "") => `<div class="row" style="gap:14px;flex-wrap:wrap">${glyph(icon, 40, color)}<span class="tx f40 semi up">${text}</span>${sub ? `<span class="tx f22 muted">${sub}</span>` : ""}</div>`;
+export const heading = (icon, color, text, sub = "") => `<div class="row" style="gap:14px;flex-wrap:wrap">${glyph(icon, 40, color)}<span class="tx f40 semi up">${text}</span>${sub ? `<span class="tx f22 muted">${sub}</span>` : ""}</div>`;
 
 // ------------------------------------------------------------------ as telas
 function explore() { return BG("explore") + frame(); }
@@ -139,17 +141,6 @@ function inventory() {
     `<div class="row" style="justify-content:space-between;gap:12px"><div class="row" style="gap:14px;flex-wrap:wrap;flex:1;min-width:0">${glyph("expeditions", 40, "var(--amber)")}<span class="tx f40 semi up">Mochila</span><span class="wrap f22 muted">Cuidados fora da luta: escolha o item e o aliado.</span></div>` +
     secondary("Fechar", { keyLabel: "Esc / B", hit: "close", height: 56 }) + `</div>${divider()}<div class="row" style="gap:24px;align-items:flex-start"><div class="col" style="gap:8px;flex:none">${grid}</div>${detail}</div>`, 500);
 }
-function camp() {
-  const row = ([hero, name, hp, max]) => nine("panel_inset", { cls: "row", extra: "gap:14px;flex:none" },
-    `${portrait(hero, 48)}<div class="col" style="gap:4px;flex:1;min-width:0"><div class="row" style="gap:12px;flex-wrap:wrap"><span class="tx f26 semi">${name}</span><span class="tx f20 muted">Vida ${hp}/${max} · Instinto 0</span></div>${bar("100%", 18, hp / max, "var(--ally)")}</div>` +
-    `<div class="row" style="gap:8px">${["Comer|lobby-food.svg|eat", "Curativo|res-bandages.svg|bandage"].map((x) => { const [t, i, h] = x.split("|");
-      return `<div data-hit="${h}">${nine("chip_button", { cls: "row", extra: "gap:8px;min-height:calc(56px*var(--k));justify-content:center" }, `${glyph(i, 24, "#8a8478")}<span class="tx f24 muted">${t}</span>`)}</div>`; }).join("")}</div>`);
-  return BG("explore-camp") + frame({ sub: "Jornada 1 · Noite · chuva", keys: MODAL }) + modal(880, 130,
-    heading("node-rest.svg", "var(--amber)", "Acampamento", "A porta fechada e a fogueira acesa.") +
-    `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("lobby-food.svg", "Comer: +10% de vida, −5 de instinto · 4 comidas")}${cost("res-bandages.svg", "Curativo: +8 de vida · 2 curativos")}</div>` +
-    TEAM.map(row).join("") + `<div class="row" style="gap:8px">${glyph("state_active", 22, "var(--muted)")}<span class="wrap f20 muted">Todos estão com a vida cheia.</span></div>` +
-    primary("Levantar acampamento", { icon: "route", keyLabel: "E / A", hit: "leave", height: 64, size: "f26" }), 500);
-}
 function risk() {
   return BG("explore-risk") + frame({ sub: "Jornada 1 · Noite · chuva", keys: MODAL }) + modal(760, 280,
     heading("alert", "var(--danger)", "Abandonar a expedição?") +
@@ -167,15 +158,6 @@ function bossChoice() {
       `<div class="row" style="gap:10px;flex-wrap:wrap">${TEAM.map(mate).join("")}</div>` +
       `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("lobby-food.svg", "Comida 3/8")}${cost("res-bandages.svg", "Curativos 2")}${cost("lobby-seed.svg", "6 sementes")}${cost("lobby-scrap.svg", "3 sucata")}${cost("lobby-fragment.svg", "1 fragmento")}</div>` +
       `<div class="row" style="gap:12px;flex-wrap:wrap">${primary("Seguir em frente", { keyLabel: "E / A", hit: "go", height: 64, size: "f26", extra: "flex:1 1 300px" })}${secondary("Voltar à Estação (metade do achado)", { icon: "train_arrival", hit: "back", height: 64, extra: "flex:1 1 360px" })}</div>`);
-}
-// A Pausa do Esc (show_menu): antes do guardião a volta é uma retirada; no meio de uma luta ou evento ela fica fechada com o motivo.
-function pause() {
-  return BG("explore-options") + frame({ keys: MODAL }) + modal(660, 230,
-    heading("lobby-settings.svg", "var(--amber)", "Pausa") +
-    primary("Continuar", { keyLabel: "Esc / B", hit: "resume", height: 64, size: "f26" }) +
-    `<div data-hit="return">${nine("secondary_button", { cls: "row", extra: "min-height:calc(64px*var(--k));gap:10px;justify-content:center" }, `${glyph("train_arrival", 26)}<span class="wrap f26 semi up" style="text-align:center">Voltar à Estação (retirada: metade do achado)</span>`)}</div>` +
-    secondary("Opções", { icon: "lobby-settings.svg", hit: "options", height: 60, extra: "width:100%" }) +
-    `<div data-hit="new-campaign">${nine("secondary_button", { cls: "row", extra: "min-height:calc(60px*var(--k));gap:10px;justify-content:center" }, `${glyph("alert", 24, "var(--danger)")}<span class="tx f26 semi up danger">Nova campanha</span>`)}</div>`);
 }
 // O guardião vencido: o objetivo cumprido no cartão (com o check, não só a cor) e o botão de concluir a jornada.
 function bossDone() {
@@ -195,9 +177,13 @@ function touch(active) {
     (active ? prompt(1130, 528, "", "Vasculhar o caixa") : "");
 }
 
-await run({
-  explore: () => explore(), patrol: () => patrol(), interior: () => interior(), search: () => search(), loot: () => loot(),
-  event: () => eventStreet(), event_result: () => eventResult(), scenario_event: () => eventScenario(), inventory: () => inventory(),
-  camp: () => camp(), risk: () => risk(), boss_choice: () => bossChoice(), pause: () => pause(), boss_done: () => bossDone(),
-  touch: () => touch(false), touch_active: () => touch(true),
-}, OUT);
+// O acampamento e a Pausa saíram deste lote: o acampamento na estrutura da Unreal e o Menu da expedição estão em
+// docs/design/hud-ajustes/ (#109), que importa a moldura daqui. Importado, este arquivo não gera nada.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await run({
+    explore: () => explore(), patrol: () => patrol(), interior: () => interior(), search: () => search(), loot: () => loot(),
+    event: () => eventStreet(), event_result: () => eventResult(), scenario_event: () => eventScenario(), inventory: () => inventory(),
+    risk: () => risk(), boss_choice: () => bossChoice(), boss_done: () => bossDone(),
+    touch: () => touch(false), touch_active: () => touch(true),
+  }, OUT);
+}
