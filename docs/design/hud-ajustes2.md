@@ -62,7 +62,7 @@ menor que 56 px; nenhuma peça cortada pelo painel; nenhum texto por cima de med
   **e** das habilidades (a vez continua de quem age; ao desligar, o painel volta):
   - o retrato (nas máquinas, o recorte do sprite), o nome, o nível, a espécie e o papel (nas máquinas, "Máquina" e o
     papel de `enemies.json`), a vida e o instinto;
-  - a velocidade e o que ela faz; a posição (heróis) ou a intenção, sem o alvo (máquinas);
+  - a velocidade (no herói, com o que ela faz); a posição (heróis) ou a intenção, sem o alvo (máquinas);
   - à direita, os passivos e os estados, cada um com o que faz (os textos de `character_sheet.gd` e do glossário de
     `ui_style.gd`). Nas máquinas, a descrição vem primeiro. O que não cabe rola.
   - A aba de cima diz como trocar e sair: "Inspecionar · Setas trocam · X ou Esc sai". Ela fica em y 816, sobre a
@@ -71,8 +71,8 @@ menor que 56 px; nenhuma peça cortada pelo painel; nenhum texto por cima de med
   - Os estados mostrados são exemplo (a captura é a rodada 1, sem estados): o Recreador "Marcado".
 - **A intenção da máquina,** sobre a cabeça, mostra o tipo (o ícone de hoje: ataque, área, bloqueio, cura, movimento,
   atordoado) e o nome da ação: "Pega-Pega", "Ordem Contraditória". Sai o "→ um de 4" (o "antes" é a captura do jogo
-  com a HUD de hoje). A cor é a de hoje (`_show_intent`): o ataque na cor do inimigo; a cura em verde e o bloqueio em
-  azul.
+  com a HUD de hoje). A cor é a de hoje (`_show_intent`, `S.ENEMY`, o laranja #d9893d): o ataque na cor do inimigo; a cura em
+  verde e o bloqueio em azul.
 - **O popup de fim de luta** (o do lote 5, [hud-ajustes.md](hud-ajustes.md)) ganha o X no canto, e a barra do tempo
   conta 5 s ("Fecha em 4 s · qualquer tecla fecha antes"). Com o mouse em cima ou o foco nele, a barra para, fica
   cinza e diz por quê ("Parado: o mouse está em cima · qualquer tecla fecha"). Na derrota, continua esperando o toque.
@@ -130,7 +130,7 @@ falta. É a informação do Plano, no lugar.
   a Íris no leito da Enfermaria. A Lupa e o Brasa também dormem, mas os recrutas não têm pose de dormir: ficam fora do
   corte na montagem.
 - **O painel "Amanhecer · Dia 5",** no lugar e na medida do painel do cômodo (596 de largura, à direita):
-  - **o que a noite fez:** a Comida (8 → 4, pela conta do jogo), quem descansou e quanto (o Nick +8 de vida, −15 de
+  - **o que a noite fez:** a Comida (8 → 4, a conta do lote 7), quem descansou e quanto (o Nick +8 de vida, −15 de
     instinto), quem vigiou e a Enfermaria (a Íris volta amanhã);
   - **durante a noite:** o evento, com o ícone, o título e o que mudou;
   - **o Próximo passo;**
@@ -219,6 +219,8 @@ As telas da luta usam as capturas limpas de `loop-screens/before/` e `hud-ajuste
   de desenvolvimento ou com `--admin`.
 - **#131:** as placas leem `AHStationRules.next_level_cost` e `upgrade_block`; o foco nelas segue as setas, como os
   cômodos.
+- **#132:** a conta da comida da noite (8 → 4 aqui e no lote 7) usa 4 para a noite; pelo `resolve_night`, só quem
+  voltou e dorme come (2, ou 3 com a Íris na Enfermaria). Acertar os dois lotes juntos na integração.
 - **#132:** a tabela dos eventos vai para `data/night-events.json`; o painel do amanhecer lê o resultado de
   `resolve_night`. Os recrutas precisam da pose de dormir para deitar nos beliches.
 - **#129:** a ação nova de formação em `tools/define_input.gd` (trocável nas Opções); a troca usa
@@ -263,3 +265,12 @@ Próximo passo, no alto à esquerda, e a coluna da esquerda é `data-hit="panel"
 - A tabela dos eventos diz como ela convive com o `resolve_night` de hoje.
 - O Admin: os fundos e os números do Dia 5; a tempestade no Clima; curar a equipe em Heróis.
 - A faixa da formação sem artigo.
+
+### Rodada 2: APROVADO
+
+As correções da rodada 1 conferidas nas telas e no código; as telas e as montagens reproduzem byte a byte; 76 de 76.
+Observações baixas, aplicadas depois do veredito:
+- a intenção no laranja de hoje (`S.ENEMY`), e não no vermelho claro do nome;
+- a coluna do meio da inspeção alinhada no alto, abaixo da aba; na máquina, sem a explicação da velocidade (que o
+  herói já mostra), para a intenção caber no Maior;
+- a conta da comida da noite (8 → 4, do lote 7) fica anotada em "Para integrar", para acertar os dois lotes juntos.

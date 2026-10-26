@@ -44,7 +44,7 @@ const inspectButton = (on) => `<div class="abs" data-hit="action" style="left:14
 // A intenção sobre a cabeça da máquina: o tipo (o ícone de hoje) e o nome da ação, sem o alvo (sai o "→ Nick"). Na cor
 // de hoje (_show_intent): o ataque na cor do inimigo (a cura em verde e o bloqueio em azul, quando for o caso).
 const intentPlate = (cx, top, icon, text, w) => `<div class="abs col" style="left:${cx - w / 2}px;top:${top}px;width:${w}px">` +
-  nine("target_tab", { cls: "row", extra: `width:${w}px;min-height:calc(48px*var(--k));gap:10px;justify-content:center` }, `${glyph(icon, 26, "var(--enemy-text)")}<span class="tx l1 f24" style="color:var(--enemy-text)">${text}</span>`) +
+  nine("target_tab", { cls: "row", extra: `width:${w}px;min-height:calc(48px*var(--k));gap:10px;justify-content:center` }, `${glyph(icon, 26, "var(--intent)")}<span class="tx l1 f24" style="color:var(--intent)">${text}</span>`) +
   `<div style="height:5px;background:var(--enemy);box-shadow:0 0 6px rgba(0,0,0,.6)"></div></div>`;
 const INTENTS = () => intentPlate(CX["Recreador"], 290, "intent-attack", "Pega-Pega", 220) + intentPlate(CX["Emissor de Comando"], 476, "intent-attack", "Ordem Contraditória", 300);
 // Quem o mouse aponta: só o nome e a vida (a moldura de foco na barra da vida), sem abrir a ficha.
@@ -77,8 +77,8 @@ function inspectPanel(p, who) {
   const mid = hero
     ? `<span class="tx f26 semi up">Velocidade 2</span><span class="wrap f20 muted">Quem é mais rápido age antes na rodada.</span>` +
       `<span class="tx f22">Posição 1 · frente</span>`
-    : `<span class="tx f26 semi up">Velocidade 3</span><span class="wrap f20 muted">Quem é mais rápido age antes na rodada.</span>` +
-      `<div class="row" style="gap:8px">${glyph("intent-attack", 24)}<span class="wrap f22">Intenção: Pega-Pega, 3–4 de dano</span></div>`;
+    : `<span class="tx f26 semi up">Velocidade 3</span><span class="tx f20 semi up amber kicker" style="margin-top:4px">Intenção</span>` +
+      `<div class="row" style="gap:8px">${glyph("intent-attack", 24, "var(--intent)")}<span class="wrap f22">Pega-Pega, 3–4 de dano</span></div>`;
   const right = hero
     ? `<span class="tx f20 semi up amber kicker">Efeitos passivos</span>` +
       effect("Corajoso", "+5 pontos percentuais na chance de Superação.", true) +
@@ -98,10 +98,11 @@ function inspectPanel(p, who) {
   return `<div class="abs" data-hit="panel" style="left:64px;top:836px">` + tab +
     nine("panel_large", { pad: [14, 22, 14, 14], cls: "row", extra: `width:1328px;height:212px;gap:22px;align-items:center` },
       portrait + `<div class="col" style="gap:${large ? 4 : 8}px;width:370px;flex:none">${id}</div>` +
-      `<div class="col" style="gap:6px;width:250px;flex:none;align-self:stretch;justify-content:center">${mid}</div>` +
+      `<div class="col" style="gap:6px;width:250px;flex:none;align-self:stretch;justify-content:flex-start;padding-top:calc(10px + 2px*(var(--k) - 1)/0.3)">${mid}</div>` +
       `<div class="col" data-scroll="1" style="gap:4px;flex:1;min-width:0;align-self:stretch;overflow:hidden;padding:calc(16px + 8px*(var(--k) - 1)/0.3) 14px 0 0">${right}</div>`) + `</div>`;
 }
-const ENEMY_TEXT = `<style>:root{--enemy-text:#f0a49a}</style>`;
+// O nome da máquina na inspeção num vermelho claro (legível sobre o aço); a intenção na cor de hoje (S.ENEMY, #d9893d).
+const ENEMY_TEXT = `<style>:root{--enemy-text:#f0a49a;--intent:#d9893d}</style>`;
 // A intenção sem o alvo, e o mouse apontando o Recreador (só o nome e a vida; a ficha não abre).
 const fightIntent = (p) => ENEMY_TEXT + combat(p, { target: true, extra: INTENTS() + pointed("Recreador", p.k > 1) + inspectButton(false) });
 const fightInspect = (who) => (p) => ENEMY_TEXT + combat(p, { target: who !== "bento", extra: INTENTS() + pointed(who === "bento" ? "Bento" : "Recreador", p.k > 1) + inspectButton(true), bottom: inspectPanel(p, who) });
