@@ -477,6 +477,9 @@ static func combat_loot(campaign: Dictionary, result: String, boss: bool) -> Dic
 	var expedition = campaign.get("session", {}).get("expedition")
 	if result != "victory" or not boss or expedition == null or int(expedition.corridor.get("current_house", -1)) >= 0:
 		return out
+	# A vitória em que o último golpe também derruba o último da equipe: end_combat conta como derrota, sem achado.
+	if not campaign.roster.any(func(h): return expedition.team.has(h.id) and h.alive):
+		return out
 	out.seeds += 6
 	out.scrap += 1
 	if not expedition.get("objective_completed", false):

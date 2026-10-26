@@ -1442,6 +1442,8 @@ func _close_popup_input(event: InputEvent) -> bool:
 	var press: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE]) \
 		or (event is InputEventScreenTouch and event.pressed) or (event is InputEventJoypadButton and event.pressed)
 	if press:
+		# Fechado antes de avisar: duas teclas no mesmo quadro não avisam duas vezes.
+		_result.visible = false
 		result_closed.emit()
 	return press
 

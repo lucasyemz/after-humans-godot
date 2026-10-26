@@ -45,6 +45,12 @@ func _loot_rule() -> void:
 	t.equal([int(loot.seeds) - before[0], int(loot.scrap) - before[1], int(loot.fragments) - before[2]], [preview.seeds, preview.scrap, preview.fragments],
 		"o popup mostra o mesmo que o guardião soma (%d sementes, %d sucata, %d fragmento)" % [preview.seeds, preview.scrap, preview.fragments])
 	t.equal(AHJourneyRules.combat_loot(c, "defeat", true).seeds, 0, "a derrota não dá recurso")
+	# O último golpe que vence e também derruba o último da equipe: end_combat conta como derrota, e o popup não promete.
+	var fallen: Dictionary = Campaign.create_initial(4)
+	AHJourneyRules.start_expedition(fallen, "fase_1", 4)
+	for hero in fallen.roster:
+		hero.alive = false
+	t.equal(AHJourneyRules.combat_loot(fallen, "victory", true), {"seeds": 0, "scrap": 0, "fragments": 0}, "vitória sem ninguém de pé: nenhum recurso")
 
 
 func _popup() -> void:
@@ -92,9 +98,15 @@ func _popup() -> void:
 	await _frames(2)
 	t.check(hud._result.find_child("Loot", true, false) != null, "a fuga mostra o achado que se perdeu")
 	await _tree.create_timer(0.4).timeout
+	var count := [0]
+	var tally := func(): count[0] += 1
+	hud.result_closed.connect(tally)
 	_key(KEY_SPACE)
+	_key(KEY_ENTER)
 	await _frames(2)
 	t.check(closed[0], "qualquer tecla fecha antes")
+	t.equal(count[0], 1, "e duas teclas no mesmo quadro fecham uma vez só")
+	hud.result_closed.disconnect(tally)
 	# Derrota: espera um toque.
 	closed[0] = false
 	hud.show_result("defeat", false, {})
