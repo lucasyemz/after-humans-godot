@@ -1,0 +1,280 @@
+{
+  "name": "station-canteen",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1102",
+      "rect": [
+        32.0,
+        18.0,
+        251.0,
+        50.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1103",
+      "rect": [
+        34.0,
+        66.0,
+        172.0,
+        23.0
+      ],
+      "text": "Ciclo 0 · 4 no elenco"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1953/@HBoxContainer@1940/@HBoxContainer@1943/@Label@1942",
+      "rect": [
+        1032.0,
+        37.0,
+        26.0,
+        25.0
+      ],
+      "text": "30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1953/@HBoxContainer@1940/@HBoxContainer@1946/@Label@1945",
+      "rect": [
+        1101.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "9"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1953/@HBoxContainer@1940/@HBoxContainer@1949/@Label@1948",
+      "rect": [
+        1156.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1953/@HBoxContainer@1940/@HBoxContainer@1952/@Label@1951",
+      "rect": [
+        1211.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1959/@VBoxContainer@1955/@Label@1956",
+      "rect": [
+        1299.0,
+        16.0,
+        195.0,
+        20.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1959/@VBoxContainer@1955/@Label@1957",
+      "rect": [
+        1299.0,
+        36.0,
+        195.0,
+        28.0
+      ],
+      "text": "0 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1959/@VBoxContainer@1955/@Label@1958",
+      "rect": [
+        1299.0,
+        64.0,
+        195.0,
+        20.0
+      ],
+      "text": "! Falta na volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1965/@VBoxContainer@1961/@Label@1962",
+      "rect": [
+        1558.0,
+        16.0,
+        144.0,
+        20.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1965/@VBoxContainer@1961/@Label@1963",
+      "rect": [
+        1558.0,
+        36.0,
+        144.0,
+        28.0
+      ],
+      "text": "6 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1965/@VBoxContainer@1961/@Label@1964",
+      "rect": [
+        1558.0,
+        64.0,
+        144.0,
+        20.0
+      ],
+      "text": "Próxima volta: 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1971/@VBoxContainer@1967/@Label@1968",
+      "rect": [
+        1766.0,
+        16.0,
+        122.0,
+        20.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1971/@VBoxContainer@1967/@Label@1969",
+      "rect": [
+        1766.0,
+        36.0,
+        122.0,
+        28.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1971/@VBoxContainer@1967/@Label@1970",
+      "rect": [
+        1766.0,
+        64.0,
+        122.0,
+        20.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1114",
+      "rect": [
+        32.0,
+        1000.0,
+        190.0,
+        48.0
+      ],
+      "text": "‹ Vista geral"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1115",
+      "rect": [
+        230.0,
+        1000.0,
+        150.0,
+        48.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1116",
+      "rect": [
+        388.0,
+        1000.0,
+        170.0,
+        48.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1974",
+      "rect": [
+        1230.0,
+        124.0,
+        636.0,
+        39.0
+      ],
+      "text": "Cantina"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1975",
+      "rect": [
+        1230.0,
+        173.0,
+        636.0,
+        23.0
+      ],
+      "text": "Nível 1"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1976",
+      "rect": [
+        1230.0,
+        206.0,
+        636.0,
+        25.0
+      ],
+      "text": "Com energia, produz 2 suprimentos por expedição."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1978",
+      "rect": [
+        1230.0,
+        257.0,
+        636.0,
+        28.0
+      ],
+      "text": "Próxima volta (equipe de 4)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1979",
+      "rect": [
+        1230.0,
+        295.0,
+        636.0,
+        53.0
+      ],
+      "text": "Suprimentos: 0 no estoque, +2 da Cantina, 0 para os moradores, a noite pede 4 → 0 depois da noite."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1980",
+      "rect": [
+        1230.0,
+        358.0,
+        636.0,
+        53.0
+      ],
+      "text": "Água: 6 na estação, +2 do coletor, a equipe e os moradores bebem 4 → 4."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1981",
+      "rect": [
+        1230.0,
+        421.0,
+        636.0,
+        25.0
+      ],
+      "text": "Energia: 1 de 3."
+    }
+  ]
+}

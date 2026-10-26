@@ -270,7 +270,9 @@ static func action_cap(action: String) -> PanelContainer:
 static func refresh_keys(root: Node) -> void:
 	for node in root.find_children("*", "PanelContainer", true, false):
 		if node.has_meta("ah_action") and node.get_child_count() > 0 and node.get_child(0) is Label:
-			(node.get_child(0) as Label).text = key_name(String(node.get_meta("ah_action")))
+			# Com ah_format, a tecla vai dentro do texto ("%s / X", o G do botão principal com o X do controle).
+			var shown := key_name(String(node.get_meta("ah_action")))
+			(node.get_child(0) as Label).text = String(node.get_meta("ah_format")) % shown if node.has_meta("ah_format") else shown
 
 
 ## Quem joga está no teclado ou no controle (a última entrada não foi o mouse nem o toque); Settings acompanha.
@@ -424,6 +426,22 @@ static func set_ring(rect: TextureRect, ring: Color) -> void:
 		rect.material.set_shader_parameter("ring", ring)
 
 
+## O retrato que sai com menos que isso de pixels opacos está vazio (o recorte caiu fora do corpo).
+const FACE_MIN_OPAQUE := 0.08
+
+
+## A parte opaca de uma imagem (0 a 1), amostrada numa grade de 32x32.
+static func opaque_share(image: Image) -> float:
+	if image.get_width() == 0 or image.get_height() == 0:
+		return 0.0
+	var hits := 0
+	for gy in 32:
+		for gx in 32:
+			if image.get_pixel(mini(image.get_width() - 1, gx * image.get_width() / 32), mini(image.get_height() - 1, gy * image.get_height() / 32)).a > 0.5:
+				hits += 1
+	return hits / 1024.0
+
+
 static func face_texture(art: Dictionary) -> Texture2D:
 	var file: String = art.get("file", "")
 	if _portraits.has(file):
@@ -433,6 +451,9 @@ static func face_texture(art: Dictionary) -> Texture2D:
 	if portrait != "" and ResourceLoader.exists(portrait):
 		_portraits[file] = load(portrait)
 		return _portraits[file]
+	# Sem a arte do parado (um herói sem ficha de combate), sem rosto.
+	if file == "" or not ResourceLoader.exists(file):
+		return null
 	var texture: Texture2D = load(file)
 	var image := texture.get_image()
 	if image.is_compressed():
@@ -454,6 +475,19 @@ static func face_texture(art: Dictionary) -> Texture2D:
 	var region := Rect2(origin + Vector2(anchor.x - side * 0.5, top) * scale, Vector2(side, side) * scale)
 	region = region.intersection(Rect2(Vector2.ZERO, image.get_size()))
 	var face := image.get_region(Rect2i(region))
+	# As artes deitadas (o Rastejante de Cabos) não têm a cabeça no terço de cima: o recorte quase vazio vira o
+	# quadrado em volta do corpo inteiro (a parte opaca do quadro).
+	if opaque_share(face) < FACE_MIN_OPAQUE:
+		var frame := image.get_region(Rect2i(Rect2(origin, canvas * scale).intersection(Rect2(Vector2.ZERO, image.get_size()))))
+		var used := frame.get_used_rect()
+		if used.size.x > 0 and used.size.y > 0:
+			var side_px := maxi(used.size.x, used.size.y)
+			var square := Rect2i(used.get_center() - Vector2i(side_px, side_px) / 2, Vector2i(side_px, side_px))
+			var padded := Image.create(side_px, side_px, false, Image.FORMAT_RGBA8)
+			var converted := frame.duplicate() as Image
+			converted.convert(Image.FORMAT_RGBA8)
+			padded.blit_rect(converted, square, Vector2i.ZERO)
+			face = padded
 	face.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 	var out := ImageTexture.create_from_image(face)
 	_portraits[file] = out

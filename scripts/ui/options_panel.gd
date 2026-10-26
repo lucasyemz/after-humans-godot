@@ -1,20 +1,25 @@
-## Opções (o conteúdo; quem abre põe num painel): volumes de música, ambiente e efeitos, a velocidade da batalha e os
-## efeitos do ambiente (na campanha, FAHCampaignSettings), a qualidade gráfica, a tela cheia e o vsync (nesta máquina,
-## Settings) e os controles. Tudo vale na hora; os volumes salvam a campanha ao soltar o controle.
+## Opções no kit (o conteúdo; quem abre põe num painel; docs/design/hud-estacao.md, "Opções"): volumes de música,
+## ambiente e efeitos, a velocidade da batalha e os efeitos do ambiente (na campanha, FAHCampaignSettings), a qualidade
+## gráfica, a tela cheia e o vsync (nesta máquina, Settings) e os controles. Tudo vale na hora; os volumes salvam a
+## campanha ao soltar o controle. As seções de hoje numa lista que rola, sem abas:
+## - os controles deslizantes com o valor em âmbar;
+## - liga e desliga com o rótulo "Ligado" ou "Desligado" ao lado (a cor sozinha não basta), a linha inteira é o alvo;
+## - as opções em grupo, com a marcada em âmbar e a moldura da escolha.
 class_name AHOptionsPanel
 extends VBoxContainer
 
 signal closed
 ## Na Estação, Opções também leva à Nova campanha (que saiu do menu dos cômodos).
 signal new_campaign_requested
+signal title_requested
 
-const H = preload("res://scripts/ui/combat_hud.gd")
 ## As ações do jogo e o nome delas na tela (as de teste ficam de fora).
 const CONTROLS := [["move_left", "Andar para a esquerda"], ["move_right", "Andar para a direita"], ["move_back", "Para o fundo"],
 	["move_front", "Para a frente"], ["run", "Correr"], ["interact", "Interagir"], ["inventory", "Mochila"], ["cancel", "Voltar"], ["menu", "Menu"],
 	["combat_ability_1", "Luta: habilidade 1"], ["combat_ability_2", "Luta: habilidade 2"], ["combat_ability_3", "Luta: habilidade 3"],
 	["combat_ability_4", "Luta: habilidade 4"], ["combat_move", "Luta: mover"], ["combat_defend", "Luta: defender"], ["combat_flee", "Luta: fugir"],
-	["combat_log", "Luta: registro"], ["hide_hud", "Estação: ocultar a interface"]]
+	["combat_examine", "Luta: examinar"], ["combat_log", "Luta: registro"], ["hide_hud", "Estação: ocultar a interface"],
+	["report_details", "Estação: detalhes do relatório"], ["station_prepare", "Estação: preparar expedição"]]
 
 const PAD_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "Start", JOY_BUTTON_RIGHT_SHOULDER: "RB",
 	JOY_BUTTON_DPAD_UP: "↑", JOY_BUTTON_DPAD_DOWN: "↓", JOY_BUTTON_DPAD_LEFT: "←", JOY_BUTTON_DPAD_RIGHT: "→",
@@ -22,6 +27,10 @@ const PAD_NAMES := {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "Sta
 
 var width := 600.0
 var allow_new_campaign := false
+## Na Estação: o botão de voltar à tela de título (a campanha já está salva; Continuar volta para ela).
+var allow_title := false
+## O título "OPÇÕES" no alto (a Estação já tem o do painel).
+var show_title := true
 ## As opções da campanha (volumes, velocidade, efeitos) vão para o save. No título sem campanha começada ficam só na
 ## memória: mexer nas Opções não cria um save nem regrava um que não abre (#28); a campanha nova leva os valores.
 var save_campaign := true
@@ -30,23 +39,19 @@ var _waiting := ""
 
 
 func _ready() -> void:
-	add_theme_constant_override("separation", 10)
+	add_theme_constant_override("separation", 12)
 	var settings: Dictionary = Campaign.state.settings
-	_title(tr("Opções"), 32)
-	_section(tr("Som"))
+	if show_title:
+		add_child(AHKit.label(tr("Opções"), "panel_title", AHKit.TEXT, true, true))
+	_section(tr("Som"), "opt_sound")
 	for spec in [["Música", "music_volume"], ["Ambiente", "ambience_volume"], ["Efeitos", "sfx_volume"]]:
 		_volume(tr(spec[0]), spec[1], float(settings.get(spec[1], 0.6)))
 
-	_section(tr("Gráficos"))
-	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
-	var levels := HFlowContainer.new()
-	levels.add_theme_constant_override("h_separation", 6)
-	levels.add_theme_constant_override("v_separation", 6)
-	add_child(levels)
+	_section(tr("Gráficos"), "opt_graphics")
+	var levels := _group(tr("Qualidade"))
 	for i in Settings.LEVEL_NAMES.size():
-		var button := _choice(tr(Settings.LEVEL_NAMES[i]), i == Settings.level, levels)
 		var level := i
-		button.pressed.connect(func():
+		_choice(tr(Settings.LEVEL_NAMES[i]), i == Settings.level, levels).pressed.connect(func():
 			Settings.set_level(level)
 			_rebuild())
 	_hint(tr("Qualidade: resolução interna, sombras, oclusão, neblina e quantidade de chuva."))
@@ -54,19 +59,11 @@ func _ready() -> void:
 		_toggle(tr("Tela cheia"), Settings.fullscreen, func(on): Settings.set_fullscreen(on))
 		_toggle(tr("Sincronia vertical (vsync)"), Settings.vsync, func(on): Settings.set_vsync(on))
 
-	_section(tr("Jogo"))
-	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
-	var speeds := HFlowContainer.new()
-	speeds.add_theme_constant_override("h_separation", 6)
-	speeds.add_theme_constant_override("v_separation", 6)
-	add_child(speeds)
-	var label := H.make_label(tr("Velocidade da batalha"), 19, H.TEXT)
-	label.custom_minimum_size = Vector2(260, 0)
-	speeds.add_child(label)
+	_section(tr("Jogo"), "nav_characters")
+	var speeds := _group(tr("Velocidade da batalha"))
 	for speed in [1, 2]:
-		var button := _choice("%dx" % speed, int(settings.get("battle_speed", 1)) == speed, speeds)
 		var value: int = speed
-		button.pressed.connect(func():
+		_choice("%dx" % speed, int(settings.get("battle_speed", 1)) == speed, speeds).pressed.connect(func():
 			Campaign.state.settings.battle_speed = value
 			_save()
 			_rebuild())
@@ -74,114 +71,78 @@ func _ready() -> void:
 		Campaign.state.settings.reduced_environment_effects = on
 		_save()
 		Settings.changed.emit())
-
 	_toggle(tr("Dicas da primeira vez"), Tips.enabled, func(on): Tips.set_enabled(on))
 	_toggle(tr("Cores para daltonismo (azul e laranja)"), Settings.colorblind, func(on):
 		Settings.set_colorblind(on)
 		_rebuild())
-	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
-	var sizes := HFlowContainer.new()
-	sizes.add_theme_constant_override("h_separation", 6)
-	sizes.add_theme_constant_override("v_separation", 6)
-	add_child(sizes)
-	var size_label := H.make_label(tr("Tamanho do texto"), 19, H.TEXT)
-	size_label.custom_minimum_size = Vector2(260, 0)
-	sizes.add_child(size_label)
+	var sizes := _group(tr("Tamanho do texto"))
 	for i in Settings.TEXT_SIZES.size():
-		var button := _choice(tr(Settings.TEXT_SIZES[i]), i == Settings.text_size, sizes)
 		var index := i
-		button.pressed.connect(func():
+		_choice(tr(Settings.TEXT_SIZES[i]), i == Settings.text_size, sizes).pressed.connect(func():
 			Settings.set_text_size(index)
 			_rebuild())
 	# O idioma (#35): o português é o padrão; o inglês está em teste (o que falta traduzir fica em português).
-	var languages := HFlowContainer.new()
-	languages.add_theme_constant_override("h_separation", 6)
-	languages.add_theme_constant_override("v_separation", 6)
-	add_child(languages)
-	var language_label := H.make_label(tr("Idioma"), 19, H.TEXT)
-	language_label.custom_minimum_size = Vector2(260, 0)
-	languages.add_child(language_label)
+	var languages := _group(tr("Idioma"), "opt_language")
 	for entry in Settings.LANGUAGES:
-		var button := _choice(tr(entry[1]), Settings.language == entry[0], languages)
 		var code: String = entry[0]
-		button.pressed.connect(func():
+		_choice(tr(entry[1]), Settings.language == entry[0], languages).pressed.connect(func():
 			Settings.set_language(code)
 			_rebuild())
-	var again := Button.new()
-	again.text = tr("Mostrar as dicas de novo")
-	again.custom_minimum_size = Vector2(0, 42)
-	H.style_button(again)
-	again.pressed.connect(func():
+	_wide_button(tr("Mostrar as dicas de novo"), func():
 		Tips.reset()
 		Tips.set_enabled(true)
 		_rebuild())
-	add_child(again)
 
-	_section(tr("Controles"))
-	# Quebra a linha quando o texto maior não cabe na largura do painel (#29).
-	var touch := HFlowContainer.new()
-	touch.add_theme_constant_override("h_separation", 6)
-	touch.add_theme_constant_override("v_separation", 6)
-	add_child(touch)
-	var touch_label := H.make_label(tr("Controles de toque"), 19, H.TEXT)
-	touch_label.custom_minimum_size = Vector2(200, 0)
-	touch.add_child(touch_label)
+	_section(tr("Controles"), "opt_controls")
+	var touch := _group(tr("Controles de toque"))
 	for i in Settings.TOUCH_MODES.size():
-		var button := _choice(tr(Settings.TOUCH_MODES[i]), i == Settings.touch_controls, touch)
-		button.custom_minimum_size.x = 0
 		var mode := i
-		button.pressed.connect(func():
+		_choice(tr(Settings.TOUCH_MODES[i]), i == Settings.touch_controls, touch).pressed.connect(func():
 			Settings.set_touch_controls(mode)
 			_rebuild())
 	_hint(tr("Analógico à esquerda para andar (até a borda corre) e Usar à direita; o aviso de interação também aceita toque."))
 	_hint(tr("Trocar: clique e aperte a tecla nova (Esc cancela). Se outra ação usava a tecla, as duas trocam."))
 	for spec in CONTROLS:
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		var name := H.make_label(tr(spec[1]), 18, H.TEXT)
-		name.custom_minimum_size = Vector2(230, 0)
+		row.name = "Key_%s" % spec[0]
+		row.add_theme_constant_override("separation", 10)
+		var name := AHKit.label(tr(spec[1]), "text", AHKit.TEXT)
+		name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name.custom_minimum_size = Vector2(width * 0.4, 0)
+		name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(name)
-		var keys_label := H.make_label(_keys(spec[0]), 18, H.GOLD)
+		var keys_label := AHKit.label(_keys(spec[0]), "small", AHKit.AMBER, true)
 		keys_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		keys_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		keys_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		keys_label.clip_text = true
 		row.add_child(keys_label)
-		var change := Button.new()
-		change.text = tr("Aperte uma tecla…") if _waiting == spec[0] else tr("Trocar")
-		change.custom_minimum_size = Vector2(150, 36)
-		H.style_button(change)
+		var change := AHKit.button(tr("Aperte uma tecla…") if _waiting == spec[0] else tr("Trocar"), "chip")
+		_chip_font(change)
+		change.custom_minimum_size = Vector2(120, 56)
 		if _waiting == spec[0]:
-			change.add_theme_color_override("font_color", H.GOLD)
+			change.add_theme_color_override("font_color", AHKit.AMBER)
+			change.add_child(AHKit.selected_overlay())
 		var action: String = spec[0]
 		change.pressed.connect(func():
 			_waiting = action
 			_rebuild())
 		row.add_child(change)
 		add_child(row)
-	var defaults := Button.new()
-	defaults.text = tr("Restaurar as teclas padrão")
-	defaults.custom_minimum_size = Vector2(0, 40)
-	H.style_button(defaults)
-	defaults.pressed.connect(func():
+	_wide_button(tr("Restaurar as teclas padrão"), func():
 		Settings.reset_keys()
 		_rebuild())
-	add_child(defaults)
 	_hint(tr("Mouse: clique nos botões e nos alvos da luta."))
 
+	if allow_new_campaign or allow_title:
+		_section(tr("Campanha"), "station")
+	if allow_title:
+		_wide_button(tr("Voltar ao título"), func(): title_requested.emit())
 	if allow_new_campaign:
-		_section(tr("Campanha"))
-		var fresh := Button.new()
-		fresh.text = tr("Nova campanha…")
-		fresh.custom_minimum_size = Vector2(0, 44)
-		H.style_button(fresh, AHUiStyle.DANGER)
-		fresh.pressed.connect(func(): new_campaign_requested.emit())
-		add_child(fresh)
-
-	var close := Button.new()
-	close.text = tr("Fechar")
-	close.custom_minimum_size = Vector2(0, 50)
-	H.style_button(close)
-	close.pressed.connect(func(): closed.emit())
-	add_child(close)
+		var fresh := _wide_button(tr("Nova campanha…"), func(): new_campaign_requested.emit())
+		for state in ["font_color", "font_hover_color", "font_focus_color"]:
+			fresh.add_theme_color_override(state, AHKit.alert_text())
+	_wide_button(tr("Fechar"), func(): closed.emit())
 
 
 func _rebuild() -> void:
@@ -193,48 +154,61 @@ func _rebuild() -> void:
 		node = node.get_parent()
 	var at := scroll.scroll_vertical if scroll else 0
 	for child in get_children():
+		remove_child(child)
 		child.queue_free()
 	_ready()
 	if scroll:
 		scroll.set_deferred("scroll_vertical", at)
 
 
-func _title(text: String, size: int) -> void:
-	add_child(H.make_label(text, size, H.GOLD))
-
-
 ## A explicação em cinza embaixo de uma opção (quebra a linha com o texto maior).
 func _hint(text: String) -> void:
-	var hint := H.make_label(text, 16, H.MUTED)
+	var hint := AHKit.label(text, "small", AHKit.MUTED)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.custom_minimum_size = Vector2(width - 40, 0)
+	hint.custom_minimum_size = Vector2(width - 20, 0)
 	add_child(hint)
 
 
-func _section(text: String) -> void:
-	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 4)
-	add_child(spacer)
-	add_child(H.make_label(text, 22, H.GOLD.lightened(0.2)))
+## O título de uma seção: o ícone e o nome em âmbar, em caixa alta.
+func _section(text: String, icon_name: String) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	add_child(row)
+	var glyph := AHKit.glyph(icon_name, 28, AHKit.AMBER)
+	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(glyph)
+	row.add_child(AHKit.label(text, "row", AHKit.AMBER, true, true))
 
 
+## O controle deslizante do kit: a calha, o preenchimento âmbar, o pegador no valor e o número em âmbar.
 func _volume(text: String, key: String, value: float) -> void:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
+	row.add_theme_constant_override("separation", 14)
 	add_child(row)
-	var label := H.make_label(text, 19, H.TEXT)
-	label.custom_minimum_size = Vector2(150, 0)
+	var label := AHKit.label(text, "text", AHKit.TEXT)
+	label.custom_minimum_size = Vector2(width * 0.3, 0)
+	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(label)
 	var slider := HSlider.new()
 	slider.min_value = 0
 	slider.max_value = 100
 	slider.step = 5
 	slider.value = round(value * 100.0)
-	slider.custom_minimum_size = Vector2(width - 260, 32)
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	slider.custom_minimum_size = Vector2(0, 56)
+	slider.add_theme_stylebox_override("slider", AHKit.style(AHKit.piece_of("slider", "track")))
+	var fill := AHKit.style(AHKit.piece_of("bar", "fill"), AHKit.AMBER)
+	slider.add_theme_stylebox_override("grabber_area", fill)
+	slider.add_theme_stylebox_override("grabber_area_highlight", fill)
+	var knob := AHKit.texture(AHKit.piece_of("slider", "knob"))
+	for state in ["grabber", "grabber_highlight", "grabber_disabled"]:
+		slider.add_theme_icon_override(state, knob)
 	row.add_child(slider)
-	var number := H.make_label("%d%%" % slider.value, 19, H.MUTED)
-	number.custom_minimum_size = Vector2(70, 0)
+	var number := AHKit.label("%d%%" % slider.value, "row", AHKit.AMBER, true)
+	number.custom_minimum_size = Vector2(76, 0)
+	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	number.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(number)
 	slider.value_changed.connect(func(v):
 		Campaign.state.settings[key] = v / 100.0
@@ -245,33 +219,82 @@ func _volume(text: String, key: String, value: float) -> void:
 	slider.focus_exited.connect(func(): _save())
 
 
+## Um grupo de opções: o nome numa linha e as escolhas embaixo, quebrando a linha quando o texto maior não cabe (#29).
+func _group(text: String, icon_name: String = "") -> HFlowContainer:
+	var label := AHKit.label(text, "text", AHKit.TEXT)
+	add_child(label)
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 8)
+	flow.add_theme_constant_override("v_separation", 8)
+	add_child(flow)
+	return flow
+
+
 func _choice(text: String, chosen: bool, parent: Container) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = Vector2(120, 44)
-	H.style_button(button)
-	# As escolhas lado a lado ficam com a margem de antes das molduras: a linha cabe no painel.
-	for state in ["normal", "hover", "pressed", "disabled"]:
-		var style: StyleBox = button.get_theme_stylebox(state)
-		style.content_margin_left = 12
-		style.content_margin_right = 12
+	var button := AHKit.button(text, "chip")
+	_chip_font(button)
+	button.custom_minimum_size = Vector2(64, 56)
 	if chosen:
-		button.add_theme_color_override("font_color", H.GOLD)
-		button.text = "▸ " + text
+		for state in ["font_color", "font_hover_color", "font_focus_color"]:
+			button.add_theme_color_override(state, AHKit.AMBER)
+		button.add_child(AHKit.selected_overlay())
 	parent.add_child(button)
 	return button
 
 
+## O texto dos botões pequenos do kit (as opções, Trocar) no tamanho dos rótulos.
+static func _chip_font(button: Button) -> void:
+	button.add_theme_font_override("font", AHKit.font(true))
+	button.add_theme_font_size_override("font_size", AHKit.size("row"))
+
+
+func _wide_button(text: String, action: Callable) -> Button:
+	var button := AHKit.button(text, "secondary")
+	button.text = text
+	button.custom_minimum_size = Vector2(0, 60)
+	button.add_theme_font_size_override("font_size", AHKit.size("row"))
+	button.pressed.connect(action)
+	add_child(button)
+	return button
+
+
+## Liga e desliga: a linha inteira é o alvo (56 de altura); à direita, "Ligado" ou "Desligado" e o pegador (desligado,
+## de aço claro à esquerda; ligado, âmbar à direita).
 func _toggle(text: String, on: bool, action: Callable) -> void:
-	var check := CheckButton.new()
-	check.text = text
-	check.button_pressed = on
-	check.add_theme_font_size_override("font_size", AHUiStyle.px(19))
-	check.add_theme_color_override("font_color", H.TEXT)
-	check.toggled.connect(func(value): action.call(value))
-	# O foco do teclado e do controle: as cantoneiras (#25), como nos botões.
-	AHFocusCorners.attach(check, AHFocusCorners.new())
-	add_child(check)
+	var button := Button.new()
+	button.name = "Toggle"
+	button.text = text
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.custom_minimum_size = Vector2(0, 56)
+	AHKit.style_as(button, "list", Vector4(-2, 0, 170, 0))
+	button.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+	button.add_theme_font_override("font", AHKit.font(false))
+	button.add_theme_font_size_override("font_size", AHKit.size("text"))
+	button.set_meta("on", on)
+	var state := HBoxContainer.new()
+	state.add_theme_constant_override("separation", 12)
+	state.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
+	state.offset_left = -170
+	state.offset_right = -6
+	state.alignment = BoxContainer.ALIGNMENT_END
+	state.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(state)
+	var word := AHKit.label(tr("Ligado") if on else tr("Desligado"), "small", AHKit.AMBER if on else AHKit.MUTED, on)
+	word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	state.add_child(word)
+	var knob := TextureRect.new()
+	knob.texture = AHKit.texture(AHKit.piece_of("toggle", "on" if on else "off"))
+	knob.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	knob.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	knob.custom_minimum_size = Vector2(64, 32)
+	knob.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	knob.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	state.add_child(knob)
+	button.pressed.connect(func():
+		action.call(not on)
+		if is_inside_tree():
+			_rebuild())
+	add_child(button)
 
 
 ## Esperando a tecla nova: a primeira tecla apertada vira a principal da ação (Esc cancela). No controle, B (Voltar)

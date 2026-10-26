@@ -1,0 +1,85 @@
+{
+  "issue": 96,
+  "new_values_are_layout_fixtures_not_balance": true,
+  "source_commit": "af3513b",
+  "source_seed": 6,
+  "xp_before": [
+    80,
+    40,
+    60,
+    30
+  ],
+  "xp_gain": [
+    20,
+    20,
+    20,
+    20
+  ],
+  "xp_required": 100,
+  "hero_level": 1,
+  "maximum_level": 10,
+  "training_seed_cost": 4,
+  "training_choices": [
+    {
+      "label": "Vida máxima",
+      "delta": 2,
+      "stat": "max_hp"
+    },
+    {
+      "label": "Instinto",
+      "delta": 10,
+      "stat": "instinct_threshold"
+    }
+  ],
+  "mission_unlock_stars": 3,
+  "boss_unlock_stars": 6,
+  "research_duration_expeditions": 2,
+  "cargo_selected_index": 2,
+  "cargo_rewards": [
+    {
+      "icon": "lobby-seed",
+      "label": "8 sementes"
+    },
+    {
+      "icon": "lobby-scrap",
+      "label": "2 sucatas"
+    },
+    {
+      "icon": "lobby-fragment",
+      "label": "1 fragmento"
+    },
+    {
+      "icon": "lobby-food",
+      "label": "1 comida"
+    },
+    {
+      "icon": "res-bandages",
+      "label": "1 curativo"
+    },
+    {
+      "icon": "relic-copper-button",
+      "label": "Botão de Cobre"
+    }
+  ],
+  "implementation_sources": [
+    "#88",
+    "#89",
+    "#90",
+    "#91",
+    "#92",
+    "#93",
+    "#94"
+  ],
+  "existing_rule_bonds": {
+    "friend": {
+      "threshold": 3,
+      "trigger": "ally at deaths door",
+      "effect": "partner receives 1 block"
+    },
+    "rival": {
+      "threshold": -3,
+      "trigger": "rival suffers enemy critical hit",
+      "effect": "other hero receives 5 instinct"
+    }
+  }
+}

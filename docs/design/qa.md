@@ -24,7 +24,7 @@ e concreta, e devolve um veredito.
 
 **Leitura**
 - Ícones legíveis a 22 px e a 32 px sobre o painel escuro (testar reduzindo de verdade, não só olhando grande).
-- Nada depende só de verde contra vermelho: conferir com as cores do modo daltonismo (bom `#56b4e9`, perigo `#e69f00`)
+- Nada depende só de verde contra vermelho: conferir com as cores do modo daltonismo (bom `#56b4e9`, perigo no vermelhão `#d55e00`)
   e em tons de cinza.
 - Contraste do texto sobre molduras e fundos (texto de tela nunca abaixo de 18 px na base 1920x1080).
 - Funciona num celular (a tela inteira reduzida a 40% ainda se entende).

@@ -1,0 +1,1837 @@
+{
+  "revision": "station_2026_10_25",
+  "direction": "Alvos aprovados da Estação (25/10/2026), no idioma do kit da luta",
+  "source_references": {
+    "report": "docs/design/reference/hud-target-report-2026-10-25.webp",
+    "characters": "docs/design/reference/hud-target-characters-2026-10-25.webp"
+  },
+  "canvas": [
+    1920,
+    1080
+  ],
+  "material": "art/ui/kit/combat/steel_material.webp",
+  "reuses_combat_kit": [
+    "square_portrait",
+    "key_tab",
+    "main_bar",
+    "selected_slot",
+    "steel_material"
+  ],
+  "replaces_combat_kit": {
+    "panel": "panel_large / panel_inset",
+    "hero_panel": "panel_large + square_portrait",
+    "register": "room_plaque",
+    "action_button": "icon_button + key_tab",
+    "health_ally": "main_bar + bar_fill (+ ally_mark no daltonismo)",
+    "health_enemy": "main_bar + bar_fill (+ enemy_mark no daltonismo)",
+    "active_health": "selected_corners",
+    "round_strip": "round_strip (+ enemy_badge no daltonismo)",
+    "ability_header": "ability_header",
+    "ability_slot": "ability_slot, ability_slot_pressed, ability_slot_disabled",
+    "target_tab": "target_tab",
+    "actor_ring": "actor_ring"
+  },
+  "axis_stretch": "TILE_FIT nas peças grandes (report_band, panel_large); STRETCH nas pequenas",
+  "assets": {
+    "report_band": {
+      "file": "art/ui/kit/station/report_band.webp",
+      "size": [
+        480,
+        216
+      ],
+      "nine_slice_ltrb": [
+        40,
+        40,
+        40,
+        40
+      ],
+      "content_xywh": [
+        20,
+        18,
+        440,
+        180
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Faixa do alto, de ponta a ponta (1848 em 1920). Centro em TILE_FIT. Divisões: band_divider por cima.",
+      "sha256": "bb572c471d3c705757a01937867e387a82014e812f5787f5939d752ee57a0252"
+    },
+    "band_divider": {
+      "file": "art/ui/kit/station/band_divider.webp",
+      "size": [
+        12,
+        176
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        6,
+        0
+      ],
+      "note": "Divisão vertical da faixa; esticar só na altura (176 = faixa 216 - 2x20).",
+      "sha256": "b08e8af067d5f18a3f74a4eb82025b92c36a73532bc1e07a6ad261d415a2ea53"
+    },
+    "result_chip": {
+      "file": "art/ui/kit/station/result_chip.webp",
+      "size": [
+        232,
+        88
+      ],
+      "nine_slice_ltrb": [
+        18,
+        18,
+        18,
+        18
+      ],
+      "content_xywh": [
+        12,
+        10,
+        208,
+        68
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Chip de resultado: ícone 44 à esquerda (x 16) e duas linhas. Objetivo não cumprido: ícone e texto na cor de perigo.",
+      "sha256": "ed5965ecae65f453a3a5b397d839607c24bff5935cde7f360557a93b0347e1a7"
+    },
+    "resource_tile": {
+      "file": "art/ui/kit/station/resource_tile.webp",
+      "size": [
+        112,
+        96
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        8,
+        8,
+        96,
+        80
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Quadrado de recurso recuperado: ícone 56 no meio; número âmbar e nome embaixo, fora da peça.",
+      "sha256": "2effb72eac549c61afc8447c26754c36d8d37d9b3151fbb6e47ebf1363767931"
+    },
+    "hero_card": {
+      "file": "art/ui/kit/station/hero_card.webp",
+      "size": [
+        380,
+        256
+      ],
+      "nine_slice_ltrb": [
+        32,
+        32,
+        32,
+        32
+      ],
+      "content_xywh": [
+        20,
+        18,
+        340,
+        220
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Carta do herói na plataforma. Retrato 92 em square_portrait (kit da luta).",
+      "sha256": "a3108ebf0bd43fcea3a1068fc660d2c25cdb7f8b25b4db4f9c153a41c70d1409"
+    },
+    "card_tab": {
+      "file": "art/ui/kit/station/card_tab.webp",
+      "size": [
+        244,
+        40
+      ],
+      "nine_slice_ltrb": [
+        16,
+        12,
+        16,
+        12
+      ],
+      "content_xywh": [
+        12,
+        6,
+        220,
+        28
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Aba no alto da carta (Melhoria · N frag.): ícone 22 âmbar e texto 22. Encosta no topo da carta (sobrepõe 6 px).",
+      "sha256": "c4bb3dd497506c4729df5e73d66255b91f29e6bb8da20bbd6fabaf0d2ba6c90f"
+    },
+    "status_pill": {
+      "file": "art/ui/kit/station/status_pill.webp",
+      "size": [
+        176,
+        34
+      ],
+      "nine_slice_ltrb": [
+        12,
+        10,
+        12,
+        10
+      ],
+      "content_xywh": [
+        36,
+        4,
+        132,
+        26
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Pílula de estado clara; o jogo tinge com modulate (cores em hud-station.md). Ícone 22 em x 10.",
+      "sha256": "bab9242065f744c30a8a1b210c59681fc09a8838b2f036f135f45b92b5273fc5",
+      "tint": {
+        "active": "#56b468",
+        "light_wound": "#f0a020",
+        "wounded": "#d23a2e",
+        "colorblind": {
+          "active": "#56b4e9",
+          "light_wound": "#f0e442",
+          "wounded": "#d55e00"
+        }
+      }
+    },
+    "bar_fill": {
+      "file": "art/ui/kit/station/bar_fill.webp",
+      "size": [
+        64,
+        16
+      ],
+      "nine_slice_ltrb": [
+        6,
+        4,
+        6,
+        4
+      ],
+      "content_xywh": [
+        0,
+        0,
+        64,
+        16
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Preenchimento de barra (vida, instinto, XP), tingido pelo jogo; o miolo de main_bar (kit da luta) é a calha.",
+      "sha256": "0dea37823d485f163fd32e0bbf43634b148df2fd077ca5a1ee56239a727263e6"
+    },
+    "primary_button": {
+      "file": "art/ui/kit/station/primary_button.webp",
+      "size": [
+        480,
+        72
+      ],
+      "nine_slice_ltrb": [
+        40,
+        22,
+        40,
+        22
+      ],
+      "content_xywh": [
+        36,
+        10,
+        408,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão principal âmbar (ENTRAR NO ABRIGO, PREPARAR EXPEDIÇÃO): ícone 36 escuro, texto escuro #1a1206, a tecla em button_key à direita. Pressionado desloca o desenho 2 px; o alvo de toque não muda.",
+      "sha256": "86b9a316ce68097a78c3f425d4d5108f31be7f9fedf6643b733fba4eddd23e18"
+    },
+    "primary_button_focus": {
+      "file": "art/ui/kit/station/primary_button_focus.webp",
+      "size": [
+        480,
+        72
+      ],
+      "nine_slice_ltrb": [
+        40,
+        22,
+        40,
+        22
+      ],
+      "content_xywh": [
+        36,
+        10,
+        408,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão principal âmbar (ENTRAR NO ABRIGO, PREPARAR EXPEDIÇÃO): ícone 36 escuro, texto escuro #1a1206, a tecla em button_key à direita. Pressionado desloca o desenho 2 px; o alvo de toque não muda.",
+      "sha256": "7db3fd6de4516ad9c23ffd4a5b6a6404a5f9c2fd93014bc53a318651962a2f1a"
+    },
+    "primary_button_pressed": {
+      "file": "art/ui/kit/station/primary_button_pressed.webp",
+      "size": [
+        480,
+        72
+      ],
+      "nine_slice_ltrb": [
+        40,
+        22,
+        40,
+        22
+      ],
+      "content_xywh": [
+        36,
+        10,
+        408,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão principal âmbar (ENTRAR NO ABRIGO, PREPARAR EXPEDIÇÃO): ícone 36 escuro, texto escuro #1a1206, a tecla em button_key à direita. Pressionado desloca o desenho 2 px; o alvo de toque não muda.",
+      "sha256": "114b3c00b78d43365399ca6db353cff29097fc4e109bd578346250041de61969"
+    },
+    "primary_button_disabled": {
+      "file": "art/ui/kit/station/primary_button_disabled.webp",
+      "size": [
+        480,
+        72
+      ],
+      "nine_slice_ltrb": [
+        40,
+        22,
+        40,
+        22
+      ],
+      "content_xywh": [
+        36,
+        10,
+        408,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão principal âmbar (ENTRAR NO ABRIGO, PREPARAR EXPEDIÇÃO): ícone 36 escuro, texto escuro #1a1206, a tecla em button_key à direita. Pressionado desloca o desenho 2 px; o alvo de toque não muda.",
+      "sha256": "28c3843d47d9dc891b98f6a56480bf913f0bdf5625374511a20430983b98e8c9"
+    },
+    "button_key": {
+      "file": "art/ui/kit/station/button_key.webp",
+      "size": [
+        128,
+        44
+      ],
+      "nine_slice_ltrb": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "content_xywh": [
+        8,
+        6,
+        112,
+        32
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A tecla dentro do botão principal (Enter / A), texto 24 creme.",
+      "sha256": "aa51e8d506498de8a5182d76f73540351f085022132029171b942772e2d0f817"
+    },
+    "secondary_button": {
+      "file": "art/ui/kit/station/secondary_button.webp",
+      "size": [
+        240,
+        64
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": [
+        18,
+        10,
+        204,
+        44
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão de aço (VOLTAR, VER DETALHES, X). Foco: focus_frame por cima.",
+      "sha256": "cfb2bf51414e8c2d251295cdc46aa246e81af28b468695b5a5a8b19fad7a35a8"
+    },
+    "focus_frame": {
+      "file": "art/ui/kit/station/focus_frame.webp",
+      "size": [
+        240,
+        64
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Foco do teclado ou controle sobre qualquer chapa: o âmbar inteiro com o núcleo claro.",
+      "sha256": "206973563b92f8fd04f9a148dbadefa17f0a0ac2ebf14fb89d2c657c0ff03948"
+    },
+    "room_plaque": {
+      "file": "art/ui/kit/station/room_plaque.webp",
+      "size": [
+        520,
+        96
+      ],
+      "nine_slice_ltrb": [
+        40,
+        28,
+        40,
+        28
+      ],
+      "content_xywh": [
+        20,
+        12,
+        480,
+        72
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Plaqueta da sala no alto à esquerda: ícone 52, ESTAÇÃO RAIZ 40 e o nome da sala 24.",
+      "sha256": "a9f0f6701942e6060a11cb1595febe25743f1868c8766a0c34773804f38c7002"
+    },
+    "resource_chip": {
+      "file": "art/ui/kit/station/resource_chip.webp",
+      "size": [
+        248,
+        96
+      ],
+      "nine_slice_ltrb": [
+        28,
+        24,
+        28,
+        24
+      ],
+      "content_xywh": [
+        18,
+        12,
+        212,
+        72
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Chip de Comida, Água e Energia: ícone 40, rótulo 20, valor âmbar 28 e a linha de baixo 20.",
+      "sha256": "5be77afef6b00fcb632d2c47d8fcd081c0e5e9e685e729311f4b82c8ba9d73f4"
+    },
+    "icon_button": {
+      "file": "art/ui/kit/station/icon_button.webp",
+      "size": [
+        92,
+        92
+      ],
+      "nine_slice_ltrb": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "content_xywh": [
+        16,
+        16,
+        60,
+        60
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão quadrado (engrenagem 48; X do painel em 52x52).",
+      "sha256": "a4db99fc6e673b9d31f72d7ea80470beef0e4fc93e25d96407948ce549ed4463"
+    },
+    "panel_large": {
+      "file": "art/ui/kit/station/panel_large.webp",
+      "size": [
+        320,
+        320
+      ],
+      "nine_slice_ltrb": [
+        44,
+        44,
+        44,
+        44
+      ],
+      "content_xywh": [
+        24,
+        22,
+        272,
+        276
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Painel grande: a coluna da esquerda e o painel PERSONAGEM. Centro em TILE_FIT.",
+      "sha256": "7be7a4fe5f7de6f16fa136a039e17553ab560ba5d8e5f5b837ef3308f2ad5ba9"
+    },
+    "panel_inset": {
+      "file": "art/ui/kit/station/panel_inset.webp",
+      "size": [
+        240,
+        160
+      ],
+      "nine_slice_ltrb": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "content_xywh": [
+        16,
+        14,
+        208,
+        132
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Caixa embutida do detalhe da habilidade e dos números.",
+      "sha256": "f6bb968070346a51e869e5fa7f6d4e8cdbc8ebfe7aa833fb58a11daa295a0553"
+    },
+    "hero_tab": {
+      "file": "art/ui/kit/station/hero_tab.webp",
+      "size": [
+        116,
+        132
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        6,
+        6,
+        104,
+        120
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Aba do herói: moldura vazada; o retrato 104x92 por baixo e o nome numa faixa escura de 28 embaixo.",
+      "sha256": "65b392b3ea3dd28cdda14f02b4b0ccc0a8cb5496d3ee5c98e07977196d093a59"
+    },
+    "hero_tab_selected": {
+      "file": "art/ui/kit/station/hero_tab_selected.webp",
+      "size": [
+        116,
+        132
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A aba escolhida: o âmbar por cima.",
+      "sha256": "6778d86fc0629aa93cb0e87e81391f7ed54146680beaa02e3fe27cf683a3c757"
+    },
+    "list_row": {
+      "file": "art/ui/kit/station/list_row.webp",
+      "size": [
+        560,
+        60
+      ],
+      "nine_slice_ltrb": [
+        20,
+        16,
+        20,
+        16
+      ],
+      "content_xywh": [
+        10,
+        6,
+        540,
+        48
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Linha da lista (HABILIDADES): ícone 44 da habilidade em square_portrait e o nome 28.",
+      "sha256": "ec0adab19f359fb2f22555d1849fbf46400e13a31e020ec95e680a586b5ab909"
+    },
+    "list_row_selected": {
+      "file": "art/ui/kit/station/list_row_selected.webp",
+      "size": [
+        560,
+        60
+      ],
+      "nine_slice_ltrb": [
+        20,
+        16,
+        20,
+        16
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A linha escolhida: o âmbar por cima de list_row.",
+      "sha256": "7a6ba2129cff15d8d3dff49adb8b7ac74e41e3593d7a98a7fd7f9ab69f98ea69"
+    },
+    "divider": {
+      "file": "art/ui/kit/station/divider.webp",
+      "size": [
+        240,
+        8
+      ],
+      "nine_slice_ltrb": [
+        8,
+        0,
+        8,
+        0
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Divisor horizontal entre seções.",
+      "sha256": "d6ca29730beb8974796fd2742465e6679abdee9239e3142a4b613acbce13d463"
+    },
+    "trait_tile": {
+      "file": "art/ui/kit/station/trait_tile.webp",
+      "size": [
+        88,
+        88
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": [
+        8,
+        8,
+        72,
+        72
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Quadrado do traço: ícone pintado 72 (art/ui/kit/station/icons/trait_*.webp).",
+      "sha256": "239f3a5c7d25f7a31ddab7587829c2207a819e109042701c0562cdf0970e3586"
+    },
+    "level_medal": {
+      "file": "art/ui/kit/station/level_medal.webp",
+      "size": [
+        72,
+        72
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        14,
+        14,
+        44,
+        44
+      ],
+      "anchor": [
+        36,
+        36
+      ],
+      "note": "Medalhão do nível: número 34 SemiBold âmbar no centro. Não fatiar.",
+      "sha256": "b6b46fd765e9b2860f8c4ffc31c22486566fd5d950c39c172e28267847282696"
+    },
+    "train_button": {
+      "file": "art/ui/kit/station/train_button.webp",
+      "size": [
+        240,
+        56
+      ],
+      "nine_slice_ltrb": [
+        20,
+        16,
+        20,
+        16
+      ],
+      "content_xywh": [
+        16,
+        8,
+        208,
+        40
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "TREINAR: ícone train 28 âmbar e o custo à direita. Bloqueado: ícone e texto apagados e o motivo ao focar.",
+      "sha256": "6d8048c549d312d83d74c8e447d24156cfcd75b057e79d4512c16ff83079d0e6"
+    },
+    "upgrade_card": {
+      "file": "art/ui/kit/station/upgrade_card.webp",
+      "size": [
+        300,
+        200
+      ],
+      "nine_slice_ltrb": [
+        28,
+        28,
+        28,
+        28
+      ],
+      "content_xywh": [
+        20,
+        18,
+        260,
+        164
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Cartão de uma das duas melhorias do Treino: nome 30, efeito 22, quantas já tem.",
+      "sha256": "589b4caeea51f8f98acee10201f884e8382debb254fb95c9595f4ed32fb79f73"
+    },
+    "upgrade_card_selected": {
+      "file": "art/ui/kit/station/upgrade_card_selected.webp",
+      "size": [
+        300,
+        200
+      ],
+      "nine_slice_ltrb": [
+        28,
+        28,
+        28,
+        28
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "O cartão escolhido (foco ou clique): o âmbar por cima.",
+      "sha256": "c93720eb81d14694670a334f3ba9b3af944a239f04d19a7da6357e4a35aa586d"
+    },
+    "nav_tab": {
+      "file": "art/ui/kit/station/nav_tab.webp",
+      "size": [
+        216,
+        72
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": [
+        16,
+        10,
+        184,
+        52
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Aba de navegação (VISÃO GERAL, INSTALAÇÕES...): ícone 32 e texto 26.",
+      "sha256": "b8a7a8fba6b2d27a6787a2be14abd94816b0574ed5797235c6f067a72ffcb64c"
+    },
+    "nav_tab_active": {
+      "file": "art/ui/kit/station/nav_tab_active.webp",
+      "size": [
+        216,
+        72
+      ],
+      "nine_slice_ltrb": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A aba ativa: o sublinhado âmbar por cima de nav_tab; texto e ícone em âmbar.",
+      "sha256": "57797564237f7782dfcb4f7f022f8717be7c6ed46c520a9692a116759f63c6c8"
+    },
+    "keys_bar": {
+      "file": "art/ui/kit/station/keys_bar.webp",
+      "size": [
+        320,
+        56
+      ],
+      "nine_slice_ltrb": [
+        24,
+        16,
+        24,
+        16
+      ],
+      "content_xywh": [
+        16,
+        8,
+        288,
+        40
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A barra das teclas: key_tab (kit da luta) 36 e o rótulo 22.",
+      "sha256": "cca611119d92b655f883d41e6f2020020c7489a7a8da0c09bc743940af2db30c"
+    },
+    "selected_frame": {
+      "file": "art/ui/kit/station/selected_frame.webp",
+      "size": [
+        120,
+        60
+      ],
+      "nine_slice_ltrb": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Escolha persistente sobre qualquer chapa (opção marcada, cômodo escolhido, aba de foco da rota).",
+      "sha256": "f91d78a972e35c1387be7b3cac3cb7887551d03e2c999a621c9f5a6a1fac88b2"
+    },
+    "chip_button": {
+      "file": "art/ui/kit/station/chip_button.webp",
+      "size": [
+        160,
+        48
+      ],
+      "nine_slice_ltrb": [
+        14,
+        14,
+        14,
+        14
+      ],
+      "content_xywh": [
+        12,
+        6,
+        136,
+        36
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Botão pequeno de opção (Rota básica, Água, 1x, Baixo...). Marcado: selected_frame por cima e texto âmbar.",
+      "sha256": "a39fed5262a391272a5cd43eb14ae8c54d66b120c0364358097679f9ccc65013"
+    },
+    "cost_chip": {
+      "file": "art/ui/kit/station/cost_chip.webp",
+      "size": [
+        120,
+        40
+      ],
+      "nine_slice_ltrb": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "content_xywh": [
+        8,
+        4,
+        104,
+        32
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Custo ou quantidade: ícone de recurso 24 e o número 22. Falta: número na cor de alerta.",
+      "sha256": "d1209a394c371c59306eabf03ac70e3fd53f8b75fac21bfb9ef650fda667fa7d"
+    },
+    "slider_track": {
+      "file": "art/ui/kit/station/slider_track.webp",
+      "size": [
+        240,
+        20
+      ],
+      "nine_slice_ltrb": [
+        10,
+        6,
+        10,
+        6
+      ],
+      "content_xywh": [
+        4,
+        4,
+        232,
+        12
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Calha do controle deslizante; o preenchimento é bar_fill tingido de âmbar.",
+      "sha256": "a51d8b7e1f5065020df58e6e1a47d06178c82cf2303fe9a31d6ab44c7f47d5c4"
+    },
+    "slider_knob": {
+      "file": "art/ui/kit/station/slider_knob.webp",
+      "size": [
+        28,
+        36
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        14,
+        18
+      ],
+      "note": "Pegador do controle deslizante, centrado no valor.",
+      "sha256": "ecfb99d4c49eb1d19b07425752ca68aa1a4c34b07581f58992b426dcb3407f2b"
+    },
+    "toggle_off": {
+      "file": "art/ui/kit/station/toggle_off.webp",
+      "size": [
+        64,
+        32
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Liga e desliga. Ligado: o pegador âmbar à direita; desligado: aço à esquerda.",
+      "sha256": "48f6a7d002a088b6a3329d5007f3f168b6dcc9145be66772e33646e01e8c90c5"
+    },
+    "toggle_on": {
+      "file": "art/ui/kit/station/toggle_on.webp",
+      "size": [
+        64,
+        32
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Liga e desliga. Ligado: o pegador âmbar à direita; desligado: aço à esquerda.",
+      "sha256": "557b4afab0d633aec70b2c1c79c61315205c1f8d40df285ba80d86493913a1de"
+    },
+    "room_tag": {
+      "file": "art/ui/kit/station/room_tag.webp",
+      "size": [
+        200,
+        52
+      ],
+      "nine_slice_ltrb": [
+        16,
+        12,
+        16,
+        20
+      ],
+      "content_xywh": [
+        12,
+        6,
+        176,
+        30
+      ],
+      "anchor": [
+        100,
+        52
+      ],
+      "note": "Etiqueta do cômodo no corte da Estação, com a ponta para baixo no centro (âncora 100,52). Esticar só na largura.",
+      "sha256": "e5aca84ff76e94319387d0dc230e0dd1c25402043cc2b410d9a5e9e15671ee26"
+    },
+    "touch_ring": {
+      "file": "art/ui/kit/station/touch_ring.webp",
+      "size": [
+        240,
+        240
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        120,
+        120
+      ],
+      "note": "Área do analógico de toque: octógono de aço meio transparente (aparece onde o dedo encosta; até a borda corre). Não fatiar.",
+      "sha256": "ec3f017bdf1aff02d607c89479e33e3aa65f438b5e78eb8822d49335cb7032a0"
+    },
+    "touch_knob": {
+      "file": "art/ui/kit/station/touch_knob.webp",
+      "size": [
+        84,
+        84
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        42,
+        42
+      ],
+      "note": "O pegador do analógico, com a cruz âmbar. Não fatiar.",
+      "sha256": "0262cc681fc8f3d3f5a66395627ada8029909767399317c026d5b996daa32a11"
+    },
+    "touch_button": {
+      "file": "art/ui/kit/station/touch_button.webp",
+      "size": [
+        170,
+        170
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        85,
+        85
+      ],
+      "note": "O botão Usar, apagado (nada por perto). Não fatiar.",
+      "sha256": "45d9bf95b59cca3b4fc3d2480f20f341ad254bfd94d24733320c046cd4eb5841"
+    },
+    "touch_button_active": {
+      "file": "art/ui/kit/station/touch_button_active.webp",
+      "size": [
+        170,
+        170
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        85,
+        85
+      ],
+      "note": "Por cima de touch_button quando há o que usar: o âmbar inteiro com o núcleo claro.",
+      "sha256": "fe3d9b57ee1959ec242ce8d6a44e8d9dce5d9c1ff060b1a76b65010015e3eb07"
+    },
+    "corridor_strip": {
+      "file": "art/ui/kit/station/corridor_strip.webp",
+      "size": [
+        720,
+        72
+      ],
+      "nine_slice_ltrb": [
+        24,
+        16,
+        24,
+        16
+      ],
+      "content_xywh": [
+        24,
+        8,
+        672,
+        56
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "O corredor da exploração (o nome do trecho em cima e as dez casas): a faixa lisa, sem o bolso do nome da ordem da rodada. Centro em TILE_FIT. Mesmas medidas da faixa do Codex que o corredor usava.",
+      "sha256": "9cdb2cf89e3fd42644b45a168b53cef9f3b2d0bc8be868bebc62fbe5fb09ba10"
+    },
+    "round_strip": {
+      "file": "art/ui/kit/station/round_strip.webp",
+      "size": [
+        720,
+        64
+      ],
+      "nine_slice_ltrb": [
+        244,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": [
+        18,
+        2,
+        688,
+        60
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A ordem da rodada (720x64 em x 636, y 30): o nome RODADA 1 (30, Maior 39) no bolso escuro (desenho de x 6 a 202, texto de 18 a 196), o elo âmbar desenhado em x 212-240 e, a partir de x 244, os retratos em square_portrait 60 com passo 68 (fundo #192026 nos heróis, #421b1b nas máquinas). Quem age: selected_frame por cima do retrato. Quem já agiu sai da fila. Esticar só o miolo.",
+      "sha256": "17d24416ad9a37b6a724b8c419370f484502811bd9cc21e8f0074cea3fb9bcd5"
+    },
+    "ability_header": {
+      "file": "art/ui/kit/station/ability_header.webp",
+      "size": [
+        624,
+        56
+      ],
+      "nine_slice_ltrb": [
+        60,
+        16,
+        124,
+        16
+      ],
+      "content_xywh": [
+        8,
+        6,
+        608,
+        44
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A barra da habilidade (624x56): ícone 40 no bolso de x 9-49, o nome (32, Maior 42) de x 64 e a casa do dano à direita (4–6, 28, Maior 36) no bolso de x 512-618. As duas pontas ficam fora do esticar.",
+      "sha256": "8c7f46035b052ecbadfd4ae404f2de7d4ef141038604ac943e1324c47831dd96"
+    },
+    "target_tab": {
+      "file": "art/ui/kit/station/target_tab.webp",
+      "size": [
+        336,
+        40
+      ],
+      "nine_slice_ltrb": [
+        16,
+        12,
+        16,
+        4
+      ],
+      "content_xywh": [
+        14,
+        4,
+        308,
+        36
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A aba ESCOLHA UM ALVO (26, Maior 34) em cima da barra da habilidade, encostada nela (a base é reta). Habilidade sem alvo: o texto do motivo na cor de perigo, na mesma aba.",
+      "sha256": "9e4f6e3c7d55f2aad57bfb286983ecae56b740677cd00f6436543be473c9473a"
+    },
+    "ability_slot": {
+      "file": "art/ui/kit/station/ability_slot.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "content_xywh": [
+        8,
+        8,
+        116,
+        116
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "O quadrado da habilidade (132x132, passo 160): o ícone pintado 116 por baixo, a tecla em key_tab 42 em x+90, y+90. Escolhida: selected_corners; foco: focus_frame. Usos e recarga: cost_chip no canto de cima.",
+      "sha256": "001b740ca4ad86f232eefc7a7ca4e453939c53a8602b91b92a3d7297f2e51ebf"
+    },
+    "ability_slot_pressed": {
+      "file": "art/ui/kit/station/ability_slot_pressed.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "content_xywh": [
+        8,
+        8,
+        116,
+        116
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Pressionado: aro escuro e sombra por dentro; o ícone desce 2 px e o alvo de toque não muda.",
+      "sha256": "34462f423392335305b3e8f1c62d25fe1ee32989977844159684e7a43b6c3a23"
+    },
+    "ability_slot_disabled": {
+      "file": "art/ui/kit/station/ability_slot_disabled.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "content_xywh": [
+        8,
+        8,
+        116,
+        116
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Sem uso: aro apagado sem âmbar, véu escuro por dentro e faixa diagonal de riscas (lê-se sobre qualquer ícone). O ícone fica cinza, a key_tab apaga (opacidade 0,55) e o motivo da sessão aparece no foco.",
+      "sha256": "ad9936f5a9612b2ab9c3ab9f7e4c68a163e8adc1e9b537b5fccdc4e0e4174d0f"
+    },
+    "selected_corners": {
+      "file": "art/ui/kit/station/selected_corners.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        24,
+        22,
+        24,
+        22
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A escolha persistente em cantoneiras âmbar (a habilidade escolhida e a barra de 44 de quem age). O foco de navegação (focus_frame) é outra camada e pode somar.",
+      "sha256": "ee0cea0fc830e06c80369245abfd44af6f82d672db47ef88d0ce02c5b63648b9"
+    },
+    "actor_ring": {
+      "file": "art/ui/kit/station/actor_ring.webp",
+      "size": [
+        256,
+        80
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        128,
+        40
+      ],
+      "note": "O anel no chão de quem age (256x80 sem escala, centro nos pés: x do ator, y 748 na captura). Decalque sob a unidade, com depth test. Reduzir efeitos: sem pulso. Não fatiar.",
+      "sha256": "b532cfab8ea2f5c0613e697bfb5f943b96b22284d69e4da3bbef9fbbee607d0b"
+    },
+    "ally_mark": {
+      "file": "art/ui/kit/station/ally_mark.webp",
+      "size": [
+        28,
+        56
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        0,
+        12,
+        28,
+        44
+      ],
+      "anchor": [
+        0,
+        12
+      ],
+      "note": "A forma do herói: tampa de aço na ponta esquerda da barra de vida no mundo (main_bar 200x44; no Maior, 200x46 e a tampa escala por igual, 46/44), com a aba que sobe 12 px e a divisa para cima. Entra no daltonismo, quando a cor sozinha não basta. Âncora: o canto da barra.",
+      "sha256": "42567476770d8922170a4518d6c80028697a7788ad7d48391dc6d544a520ff5a"
+    },
+    "enemy_mark": {
+      "file": "art/ui/kit/station/enemy_mark.webp",
+      "size": [
+        28,
+        56
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        0,
+        0,
+        28,
+        44
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A forma do inimigo: tampa de aço na ponta esquerda da barra, com o X e dois dentes que descem 12 px. Entra nos perfis com daltonismo, quando a cor sozinha não basta. Âncora: o canto da barra.",
+      "sha256": "1557ded6fc2b1d74ce2d4234f95a10bd63f6081058ad78a1468b0a125c7069a0"
+    },
+    "enemy_badge": {
+      "file": "art/ui/kit/station/enemy_badge.webp",
+      "size": [
+        22,
+        22
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        22,
+        22
+      ],
+      "note": "O X do inimigo no canto de baixo à direita do retrato da ordem da rodada, nos perfis com daltonismo (o fundo vermelho das máquinas some no cinza). Não fatiar.",
+      "sha256": "067c45452009056c72e225645798e6722c3fcefa9870aae0b950b4150ed1c971"
+    },
+    "bar_preview": {
+      "file": "art/ui/kit/station/bar_preview.webp",
+      "size": [
+        64,
+        16
+      ],
+      "nine_slice_ltrb": [
+        0,
+        4,
+        0,
+        4
+      ],
+      "content_xywh": [
+        0,
+        0,
+        64,
+        16
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A vida prevista (acampamento, com o foco num cuidado): por cima do bar_fill, do fim da vida de agora até a prevista, tingida de verde claro (#a6e3ae; azul claro #a9d8f5 no daltonismo). Riscas: forma, além da cor. Na largura, TILE (axis_stretch_horizontal), com a altura da barra: as riscas mantêm o passo de 8 px.",
+      "sha256": "54a8500771ccca9eb450c709a81f9bbab8561863c1a5e0433d37f9fe4894bc31",
+      "tint": {
+        "normal": "#a6e3ae",
+        "colorblind": "#a9d8f5"
+      },
+      "axis_stretch_horizontal": "TILE"
+    },
+    "cargo_hatch": {
+      "file": "art/ui/kit/station/cargo_hatch.webp",
+      "size": [
+        200,
+        168
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        22,
+        20,
+        155,
+        127
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Compartimento lacrado da carga do guardião (#91), 200x168, sem fatiar. Escolha: selected_frame por cima; foco: focus_frame.",
+      "sha256": "cbd42e9f198e30eca24f7124d6301cba787bd2782e85fc6f9c583496dbfc2997"
+    },
+    "cargo_hatch_open": {
+      "file": "art/ui/kit/station/cargo_hatch_open.webp",
+      "size": [
+        200,
+        168
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        22,
+        48,
+        155,
+        99
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "O compartimento aberto: o ícone do que havia (48) no meio do vão e o texto embaixo, fora da peça. Os outros cinco abrem apagados (o texto no tom apagado); o escolhido fica com selected_frame e o texto em âmbar.",
+      "sha256": "fc7c7be913229e8319c7b7f496b978e86327a97cca2e96324e9f61ece20df4e8"
+    }
+  },
+  "trait_ids": {
+    "agile": "trait_agile",
+    "brave": "trait_brave",
+    "hopeful": "trait_hopeful",
+    "loyal": "trait_loyal",
+    "sluggish": "trait_sluggish",
+    "anxious": "trait_anxious",
+    "gloomy": "trait_gloomy",
+    "machine-fear": "trait_machine_fear"
+  },
+  "icons": {
+    "alert": {
+      "file": "art/ui/kit/station/icons/alert.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "13e335c51538184feb95c5620d95df62a4f681b24736a50b865a2d001c6fad8c",
+      "kind": "glyph_white_tintable"
+    },
+    "bed": {
+      "file": "art/ui/kit/station/icons/bed.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6993aafeb20c92b51ff0591657b2512a892be873a939ba53d6bc681a878fc810",
+      "kind": "glyph_white_tintable"
+    },
+    "bond_friend": {
+      "file": "art/ui/kit/station/icons/bond_friend.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6a735b8c9d77ac157408d42ca6ec05d399244c81425525dc5251611886ca8fbc",
+      "kind": "glyph_white_tintable"
+    },
+    "bond_rival": {
+      "file": "art/ui/kit/station/icons/bond_rival.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "201b91c075ca278057145552ca840984b4904518ff598796a990a91857d6a68d",
+      "kind": "glyph_white_tintable"
+    },
+    "expeditions": {
+      "file": "art/ui/kit/station/icons/expeditions.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "a7755afa0ed1765cd4f366e700312f3e428ee8e4802c230aacd395684de2925f",
+      "kind": "glyph_white_tintable"
+    },
+    "guardian_defeated": {
+      "file": "art/ui/kit/station/icons/guardian_defeated.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "a92265e0443cfd6d2eb94d8ae8f06886331179d7bb3408dd5bbf9298d2fa3b3a",
+      "kind": "glyph_white_tintable"
+    },
+    "kills": {
+      "file": "art/ui/kit/station/icons/kills.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "082b19cac07b0c7203b7cdc98a82d9f4c52caf7c997e57176513f9a5eed65cf8",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_characters": {
+      "file": "art/ui/kit/station/icons/nav_characters.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f27383b74d322e84de525f9b452c98c667e13ebb27b2ab3254b022fe50e91444",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_facilities": {
+      "file": "art/ui/kit/station/icons/nav_facilities.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "77f766d0f627fd72707ba315681c4e5832320aacab7ff6b7654c0c9e8fc361fa",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_hide": {
+      "file": "art/ui/kit/station/icons/nav_hide.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "fb72f23713545133037cdaf66219cd257ab55bf7f31cdc73e8c727b0ca6f4565",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_overview": {
+      "file": "art/ui/kit/station/icons/nav_overview.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "92cee3a106a3e62ab444a4d17206e62423316bf7f2f6118596835b696f663552",
+      "kind": "glyph_white_tintable"
+    },
+    "nav_research": {
+      "file": "art/ui/kit/station/icons/nav_research.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "558c40bc0976adde1dee9bf1f27f043dce5568c680b828fdbff8bf2db9f311b5",
+      "kind": "glyph_white_tintable"
+    },
+    "next_step": {
+      "file": "art/ui/kit/station/icons/next_step.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "2a133bdaf9834a883f71204afad5baf540c78117316e8620ceef476320071bf4",
+      "kind": "glyph_white_tintable"
+    },
+    "objective_done": {
+      "file": "art/ui/kit/station/icons/objective_done.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "672b4734a8dc389d418f5949f64aff4a30abeba66df6c0b1153b309454eff6db",
+      "kind": "glyph_white_tintable"
+    },
+    "objective_failed": {
+      "file": "art/ui/kit/station/icons/objective_failed.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "0729372a0a3df1d9cece376164fa1ee4042e600c09cec298fd468cd7bebe39be",
+      "kind": "glyph_white_tintable"
+    },
+    "opt_controls": {
+      "file": "art/ui/kit/station/icons/opt_controls.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "47044a9247a1263a2ba94fd25537aa560a72d955f83faabc5655d7219af22e26",
+      "kind": "glyph_white_tintable"
+    },
+    "opt_graphics": {
+      "file": "art/ui/kit/station/icons/opt_graphics.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "2bd8b8040d0d79411baf66ee61802a4d587f4e9cfde86baec760afb4143a9f1d",
+      "kind": "glyph_white_tintable"
+    },
+    "opt_language": {
+      "file": "art/ui/kit/station/icons/opt_language.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "7a292b42178d20347f57cdf5f3281b7380c9c3ceb035d2683afeacde0c6d185b",
+      "kind": "glyph_white_tintable"
+    },
+    "opt_sound": {
+      "file": "art/ui/kit/station/icons/opt_sound.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "a1ccabd385658ecc99377e1c3521bfe819256352297a255cd8fc982739b3eac1",
+      "kind": "glyph_white_tintable"
+    },
+    "place_unlocked": {
+      "file": "art/ui/kit/station/icons/place_unlocked.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6929f2d946e895e272efa706996f50c43bdf2bdbcd4898f12f97731e6f2adf3a",
+      "kind": "glyph_white_tintable"
+    },
+    "plan": {
+      "file": "art/ui/kit/station/icons/plan.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "093b93818b637e9d371b973cdbbf2102d89f1bac3c906af590d86a737b3d139a",
+      "kind": "glyph_white_tintable"
+    },
+    "recruit": {
+      "file": "art/ui/kit/station/icons/recruit.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "72bc1cc0bb3dbd40abec186065f9c92b5bddd3f2af9cb3187425e885c00e4ce9",
+      "kind": "glyph_white_tintable"
+    },
+    "relic_empty": {
+      "file": "art/ui/kit/station/icons/relic_empty.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "347295f3fa9de76d1ae511bcd3bc7c947b567be2c3d2b94c36c3dd9eee57a8c6",
+      "kind": "glyph_white_tintable"
+    },
+    "room_bar": {
+      "file": "art/ui/kit/station/icons/room_bar.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "df1bfe4d14ba396dabeb855f63bac46e395ed5a932b8cf39727e75087852a28e",
+      "kind": "glyph_white_tintable"
+    },
+    "room_canteen": {
+      "file": "art/ui/kit/station/icons/room_canteen.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "4226e4e1cef719649d78c1bc3235671f18d78a327ae63d83d4cf6668fe04d551",
+      "kind": "glyph_white_tintable"
+    },
+    "room_depot": {
+      "file": "art/ui/kit/station/icons/room_depot.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "e836d8bcc8fb999c8d2892d8d31f1d26f4e25c6b8b2285df59107574516308eb",
+      "kind": "glyph_white_tintable"
+    },
+    "room_forge": {
+      "file": "art/ui/kit/station/icons/room_forge.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "fe8eca5bb955eaf41e5434037b0a426b402bb7cd7e8c7b2470c4674f174f14d9",
+      "kind": "glyph_white_tintable"
+    },
+    "room_quarters": {
+      "file": "art/ui/kit/station/icons/room_quarters.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f193ce03350fad3a24ee5c5301044b3b9a3342531b6284dbd672010387b48a47",
+      "kind": "glyph_white_tintable"
+    },
+    "room_research": {
+      "file": "art/ui/kit/station/icons/room_research.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "c9a3a7898b27cfaa8c8a2c94f45db61b1b457f8d9c6452c709f8dc0ab4f47b1a",
+      "kind": "glyph_white_tintable"
+    },
+    "route": {
+      "file": "art/ui/kit/station/icons/route.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "1a8a5135c9be198f7c666b9a9898c578c04d17dc244c835e6075db66fa586eb6",
+      "kind": "glyph_white_tintable"
+    },
+    "sleep": {
+      "file": "art/ui/kit/station/icons/sleep.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "d3f135d98bceb4e892d0a36e3e6a15744ddb04915afa2972143e44165bdee9fd",
+      "kind": "glyph_white_tintable"
+    },
+    "star": {
+      "file": "art/ui/kit/station/icons/star.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6303277c0fd4da83d43aecebfd368ff7bf9e61a162d51ff9fe605f5fdf2eabbb",
+      "kind": "glyph_white_tintable"
+    },
+    "star_empty": {
+      "file": "art/ui/kit/station/icons/star_empty.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "bce3158ccc6ef5a60360f4f05d4fda2b2811ce1364b894471823e23113743ddf",
+      "kind": "glyph_white_tintable"
+    },
+    "state_active": {
+      "file": "art/ui/kit/station/icons/state_active.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "73b3815e52204229f6551891bb71235ccaa1b902cd0752839944eeb59108af0e",
+      "kind": "glyph_white_tintable"
+    },
+    "state_light_wound": {
+      "file": "art/ui/kit/station/icons/state_light_wound.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "da6002d2f40bbe8b025b874f731ca841c31e2857659f78572d9b98612c943f7b",
+      "kind": "glyph_white_tintable"
+    },
+    "state_wounded": {
+      "file": "art/ui/kit/station/icons/state_wounded.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "1e532307cb1d7d42ed19b7f6e0a31f7f2bc580686fb181030c10b075e44a4b32",
+      "kind": "glyph_white_tintable"
+    },
+    "station": {
+      "file": "art/ui/kit/station/icons/station.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "4d546d4b4a067d6d0bf559932d68c17a6976c950fc265c96fa29a406df15b8d0",
+      "kind": "glyph_white_tintable"
+    },
+    "train": {
+      "file": "art/ui/kit/station/icons/train.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "96da6c8a086c196fa46cfcc2b546c0a4ee80fc4aef0096f9885f468e65ed839b",
+      "kind": "glyph_white_tintable"
+    },
+    "train_arrival": {
+      "file": "art/ui/kit/station/icons/train_arrival.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "94ca1fc343bb23392b9cb39949413c8f4efd2fde2ba85b1ee969372aab63e660",
+      "kind": "glyph_white_tintable"
+    },
+    "trait_agile": {
+      "file": "art/ui/kit/station/icons/trait_agile.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "41767c852e7b8a1f6a12eebb1a59c5a4a3e94c6f298633865515aa3cdd08683c",
+      "kind": "painted"
+    },
+    "trait_anxious": {
+      "file": "art/ui/kit/station/icons/trait_anxious.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "aacc38436dcd77f384ad360d241da82ba54a9df8ae4f25a50bc458eb5e48a305",
+      "kind": "painted"
+    },
+    "trait_brave": {
+      "file": "art/ui/kit/station/icons/trait_brave.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "9e04bd47ba595808ebc13b1840639b9c26dbf60e803cd2dd459ccb53bf6143c6",
+      "kind": "painted"
+    },
+    "trait_gloomy": {
+      "file": "art/ui/kit/station/icons/trait_gloomy.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "41662eeacc60786267726d477a9739acf1d619c77cacf15bf5a90d70924960d7",
+      "kind": "painted"
+    },
+    "trait_hopeful": {
+      "file": "art/ui/kit/station/icons/trait_hopeful.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "dba690c50f13edb401902d9d04a8d1ae1147b0f863b5c8361b3924d46f8e7318",
+      "kind": "painted"
+    },
+    "trait_loyal": {
+      "file": "art/ui/kit/station/icons/trait_loyal.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "1ab70145a16ede458b8412d623f4b38a37c99eace25e8a5c22e2e01c8245bdb9",
+      "kind": "painted"
+    },
+    "trait_machine_fear": {
+      "file": "art/ui/kit/station/icons/trait_machine_fear.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "869e6d37f2b12177e8806bd1a6c298b62f7c2ba6506322d9a5a5dfd9f790b7e1",
+      "kind": "painted"
+    },
+    "trait_sluggish": {
+      "file": "art/ui/kit/station/icons/trait_sluggish.webp",
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "f49244c5d67785f02ffe20cfd9aad8ce70bd0a785f18dbdfb53d93c7c3da958b",
+      "kind": "painted"
+    },
+    "watch": {
+      "file": "art/ui/kit/station/icons/watch.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "67e00def98654285637c297434e63bd894b43e6d60b5805bece64a09d8f2f063",
+      "kind": "glyph_white_tintable"
+    }
+  },
+  "font": {
+    "file": "art/ui/fonts/barlow_condensed_medium.ttf",
+    "emphasis_file": "art/ui/fonts/barlow_condensed_semibold.ttf",
+    "license": "art/ui/fonts/OFL-BarlowCondensed.txt"
+  },
+  "originals": "Folhas de ícones geradas (Nano Banana Pro) fora do Git; o recorte é cut_icons.py"
+}

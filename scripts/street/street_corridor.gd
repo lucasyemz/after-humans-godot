@@ -48,6 +48,8 @@ const PARTY_SPACING := 1.3
 ## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
 const REACH := 1.1
 
+## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
+const SWITCH_WAIT_MS := 2000
 var street: Node3D
 var hud: AHExplorationHud
 var guards := {}
@@ -56,6 +58,8 @@ var props := {}
 var room: AHHouseRoom
 var room_guards: Array = []
 var busy := false
+## O acampamento encenado (#77): a equipe em volta da fogueira enquanto ele estiver ativo.
+var camp: AHCampScene
 var _room_time := 0.0
 var _fight := {}
 var _action := Callable()
@@ -75,10 +79,12 @@ var scenario_props: Array = []
 func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	street = owner_street
 	hud = exploration_hud
+	camp = AHCampScene.new(street)
+	add_child(camp)
 	hud.event_choice.connect(_on_event_choice)
 	hud.event_closed.connect(_on_event_closed)
-	hud.camp_food.connect(func(id): _camp_care(R.camp_use_food(Campaign.state, id)))
-	hud.camp_bandage.connect(func(id): _camp_care(R.camp_use_bandage(Campaign.state, id)))
+	hud.camp_food.connect(func(id): _camp_care(id, "food"))
+	hud.camp_bandage.connect(func(id): _camp_care(id, "bandage"))
 	hud.camp_leave.connect(_on_camp_leave)
 	hud.result_continue.connect(_on_result_continue)
 	hud.menu_return.connect(_retreat)
@@ -114,13 +120,18 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	elif session.event != null:
 		hud.show_event(campaign)
 	elif session.screen == "rest" and room != null:
+		# Reaberto no meio do acampamento: a equipe já em volta da fogueira, sem o fade.
 		room.set_camp_lit(true)
-		hud.show_camp(campaign)
+		camp.begin(room, session.expedition.team, true)
+		hud.show_camp(campaign, camp)
+	elif AHFightRewards.cargo_pending(campaign):
+		# Reaberto com o guardião vencido e a carga ainda fechada: as mesmas caixas de antes.
+		open_cargo.call_deferred()
 
 
 ## Bloqueia o movimento da equipe (painel aberto, transição ou luta).
 func blocking() -> bool:
-	return busy or hud.modal_open() or street._arena.active
+	return busy or hud.modal_open() or street._arena.active or camp.active
 
 
 func _step_x(index: int, fraction: float) -> float:
@@ -436,9 +447,8 @@ func _travel_map(campaign: Dictionary, next: int) -> void:
 	busy = true
 	R.enter_step(campaign, next)
 	Campaign.save()
-	var info := R.phase(campaign.session.expedition.phase_id)
-	hud.toast(tr("Seguindo para: %s…") % AHScenarioWorld.display_of(info.get("map", "")), 2.0)
-	GameFlow.change_to("street")
+	# O cartão da passagem diz para onde a equipe segue (o lugar da fase e o trecho).
+	GameFlow.travel("street")
 
 
 ## Visão e suspeita do guarda do trecho; true se a luta começou.
@@ -708,7 +718,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## O menu da exploração (Esc ou o botão): continuar, voltar à Estação ou começar uma campanha nova.
 func open_menu() -> void:
-	if busy or street._arena.active or hud.modal_open():
+	# No acampamento também (#98): voltar à Estação e as Opções não podem esperar o levantar acampamento.
+	if busy or street._arena.active or hud.modal_open() or camp.switching():
 		return
 	var session: Dictionary = Campaign.state.session
 	if not AHExplorationHud.session_open(Campaign.state):
@@ -718,7 +729,7 @@ func open_menu() -> void:
 
 ## A Mochila da exploração (I ou o botão): fora de luta, evento e resultado.
 func open_inventory() -> void:
-	if busy or street._arena.active or hud.modal_open() or not AHExplorationHud.session_open(Campaign.state):
+	if busy or street._arena.active or hud.modal_open() or camp.switching() or not AHExplorationHud.session_open(Campaign.state):
 		return
 	Sound.play("res://audio/ui/bag_open.ogg")
 	hud.show_inventory()
@@ -727,7 +738,7 @@ func open_inventory() -> void:
 
 func _new_campaign() -> void:
 	Campaign.new_game()
-	GameFlow.change_to("station")
+	GameFlow.travel("station")
 
 
 func _search_scenario_prop(entry: Dictionary) -> void:
@@ -830,8 +841,19 @@ func _force_house(site_index: int) -> void:
 
 
 func _retreat() -> void:
-	if R.safe_retreat(Campaign.state):
-		_show_result()
+	# Com a carga do guardião na tela, só sai depois de escolher e fechar (a carga não se perde).
+	if busy or AHFightRewards.cargo_pending(Campaign.state):
+		return
+	if not R.safe_retreat(Campaign.state):
+		return
+	# Voltar à Estação de dentro do acampamento: a cena da fogueira fecha antes do resultado.
+	if camp.active:
+		busy = true
+		hud.hide_camp()
+		await camp.end()
+		room.set_camp_lit(false)
+		busy = false
+	_show_result()
 
 
 # ---------------------------------------------------------------- casas
@@ -966,29 +988,58 @@ func _on_event_closed() -> void:
 	hud.refresh(Campaign.state)
 
 
+## Acampar (#77): a fogueira acende e um fade leva a equipe às posições de descanso em volta dela.
 func _start_camp() -> void:
-	if R.start_camp(Campaign.state):
-		Campaign.save()
-		room.set_camp_lit(true)
-		hud.show_camp(Campaign.state)
+	if not R.start_camp(Campaign.state):
+		return
+	Campaign.save()
+	busy = true
+	room.set_camp_lit(true)
+	await camp.begin(room, Campaign.state.session.expedition.team)
+	busy = false
+	hud.show_camp(Campaign.state, camp)
 
 
-func _camp_care(ok: bool) -> void:
+## Comer ou curar o herói escolhido: as regras de sempre; a cena responde com o que a vida e o instinto mudaram.
+func _camp_care(hero_id: String, kind: String) -> void:
+	var hero = Campaign.hero(hero_id)
+	if hero == null or camp.switching():
+		return
+	var hp_before: int = hero.hp
+	var instinct_before: int = hero.instinct
+	var ok := R.camp_use_food(Campaign.state, hero_id) if kind == "food" else R.camp_use_bandage(Campaign.state, hero_id)
 	if ok:
 		Campaign.save()
-	hud.show_camp(Campaign.state)
+		hud.camp_respond(hero_id, kind, hero.hp - hp_before, hero.instinct - instinct_before)
+	hud.show_camp(Campaign.state, camp)
 	hud.refresh(Campaign.state)
 
 
+## Levantar acampamento: um fade devolve a equipe à fila; lá fora, o tempo mudou.
 func _on_camp_leave() -> void:
-	if R.leave_camp(Campaign.state, randi()):
-		var weather: String = Campaign.state.session.expedition.corridor.weather
-		Campaign.save()
-		room.set_camp_lit(false)
-		street.apply_corridor_weather(weather)
-		hud.close_modal()
-		hud.toast(tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather)), 4.0)
-		hud.refresh(Campaign.state)
+	if busy:
+		return
+	# O busy fica ligado do começo ao fim: nenhum quadro em que a equipe ande no meio da saída.
+	busy = true
+	# A troca de herói termina antes (os dois fades usam o mesmo preto); com teto, para nunca prender a saída.
+	var limit := Time.get_ticks_msec() + SWITCH_WAIT_MS
+	while camp.switching() and Time.get_ticks_msec() < limit:
+		await get_tree().process_frame
+	if not R.leave_camp(Campaign.state, randi()):
+		busy = false
+		return
+	var weather: String = Campaign.state.session.expedition.corridor.weather
+	Campaign.save()
+	hud.hide_camp()
+	await camp.end()
+	room.set_camp_lit(false)
+	street.apply_corridor_weather(weather)
+	busy = false
+	hud.toast(tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather)), 4.0)
+	hud.refresh(Campaign.state)
+	# Reaberto no acampamento com o guardião vencido e a carga ainda fechada: as caixas abrem ao levantar acampamento.
+	if AHFightRewards.cargo_pending(Campaign.state):
+		await open_cargo()
 
 
 # ---------------------------------------------------------------- lutas
@@ -1011,6 +1062,7 @@ func _start_fight(index: int, advantage: bool) -> void:
 		hud.toast(tr("A equipe chegou sem ser vista: age primeiro."), 2.5)
 	var heroes: Array = street.party_ids.map(func(id): return Campaign.hero(id))
 	var center: float = (room.guard_x if house else cards[0].position.x) - 1.0
+	street._arena.boss_fight = bool(fight.boss)
 	street._arena.start(heroes, street._heroes, fight.enemies, cards, center, fight.opening)
 
 
@@ -1032,12 +1084,32 @@ func _on_combat_finished(result: String) -> void:
 			guards[_fight.index].mark.queue_free()
 			guards.erase(_fight.index)
 		if campaign.session.expedition.objective_completed and _fight.boss:
+			# A carga recuperada (#91): seis caixas com o que o guardião guardava; escolhida uma vez.
+			Campaign.save()
+			await open_cargo()
 			Tips.show_tip("boss_down")
 			if street.scenario:
-				hud.toast(tr("O guardião caiu. Vasculhe o que restou ou volte à Estação (E)."), 6.0)
+				hud.toast(tr("O guardião caiu. Vasculhe o que restou ou volte à Estação pelo Menu (%s).") % AHUiStyle.key_name("menu"), 6.0)
 			else:
 				hud.toast(tr("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua."), 6.0)
 	Campaign.save()
+	hud.refresh(campaign)
+
+
+## A carga recuperada do guardião (#91), se ainda não foi escolhida: as caixas viradas, a escolha e a revelação.
+func open_cargo() -> void:
+	var campaign: Dictionary = Campaign.state
+	if not AHFightRewards.cargo_pending(campaign):
+		return
+	AHFightRewards.cargo(campaign)
+	Campaign.save()
+	busy = true
+	var picker := hud.show_cargo(campaign)
+	await picker.chosen
+	AHFightRewards.choose(campaign, picker.index)
+	Campaign.save()
+	await picker.closed
+	busy = false
 	hud.refresh(campaign)
 
 
@@ -1083,4 +1155,4 @@ func _show_result() -> void:
 ## voluntários de graça (FAHShelterRules::CanRecruitVolunteer), então a campanha continua.
 func _on_result_continue() -> void:
 	hud.close_modal()
-	GameFlow.change_to("station")
+	GameFlow.travel("station")

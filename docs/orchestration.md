@@ -88,26 +88,36 @@ vê). Para revisar de novo um PR: em Actions, "Revisão", "Run workflow", com o 
   8. a parte segura da #56.
   - A #60 (componentes) e o resto da #56 esperam o Lucas aprovar a #59 e a #58.
 - **Codex:** #59 (kit de componentes), depois #58 (telas novas montadas com o kit).
+- **O novo laço de jogo** (`docs/design/loop-proposal-maa.md`, aprovado em 24/10), na ordem:
+  - Claude: #88 (briefing), #89 (ficha ao apontar), #90 (nível até 10 e Treino), #91 (fim de luta e carga de 1 em 6),
+    #92 (3 missões curtas mais o chefe, com o mapa #86 e #87), #93 (laços à vista), #94 (Pesquisa por expedições),
+    #95 (desafios dos chefes);
+  - Codex: #96 (as telas de todas elas com o kit).
 - **Regras novas no `AGENTS.md`:** narrativa coerente com `docs/narrative/` e coerência visual, que a QA confere.
 
-## Onde paramos (23/10/2026)
+## Onde paramos (24/10/2026)
 
-- **Main:** 729e310, com o PR #55 do Claude da nuvem (#52 lutas nos cenários, #50 props de busca, #51 silhueta e as
-  pendências de #33 a #39 e #48) e as entregas do Codex #53 (props, #49) e #54 (quedas ajoelhadas, #13). Os três
-  branches iguais à `main`. Testes: 34 de 34, paridade 48/48.
-- **Originais do Codex fora da main:** tags `codex-pr53-originals` (props) e `codex-pr54-originals` (quedas). As tags
-  são publicadas da máquina do Lucas (a sessão na nuvem não publica tags).
-- **Próximo para o Claude da nuvem:** integrar as quedas ajoelhadas da #13 (converter da tag `codex-pr54-originals`
-  para WebP e ligar hurt e death da Íris e da Véspera) e as telas que faltam em inglês (#35, cerca de 2.000 literais).
-- **Codex:** sem issue pendente.
-- **Para o Lucas no Play:** a #55 pede conferir a luta pequena na ponta de uma zona (até 5,5 m da patrulha), a cerca
-  do Portão de Triagem que esmaece sozinha e o caixa vasculhado da mercearia (pouca diferença do fechado).
-- **Decisões do Lucas em aberto:** #9 (morte permanente), #11 (Bar e Dormitório), #12 (pacote do celular: resolução
-  das texturas), nome final do golpe do Enraizado ("Golpe de Raízes (provisório)"), o Núcleo Nulo como chefe, e a
-  proposta de o Codex entregar já em WebP, com os originais fora do repositório.
+- **Main:** com os PRs #67, #68, #71 e #81 do Claude da nuvem (trem, paredes, quedas ajoelhadas, narrativa, alvo pelo
+  corpo, inglês, HUD enxuto em parte, varredura visual e a história nas fases 2, 3 e 5) e os do Codex #65 (kit da
+  interface #59, vagão e cartão de passagem #79, descanso dos recrutas #80) e #83 (fundadores sentados no chão #82,
+  etiquetas do mapa #69). Testes: 40 de 40, paridade 48/48. `claude-cloud` e `codex-design` iguais à `main`.
+- **Issues:** as concluídas foram fechadas em 24/10 a pedido do Lucas (49). Ficaram 24 abertas.
+- **Em andamento, não mexer sem olhar antes:**
+  - `claude-cloud-passagens`: fluxo A do Claude da nuvem, issues #74 (passagem com título), #75 (partida no vagão) e
+    #76 (volta à Estação). Depois vem a #77 (acampamento), que já tem a arte das #80 e #82.
+  - `claude-cloud-eventos`: fluxo B, a #78. Os 20 eventos de busca (4 por fase) estão no branch e esperam a aprovação
+    do Lucas na issue, junto com a decisão (A) ou (B) sobre os efeitos de fase que não funcionam.
+- **A fazer:** #84 (efeitos de impacto e de estados da #41 na luta, a arte já está em `art/combat/effects/`), #72
+  (pendências da revisão dos PRs #67, #68 e #71), #70, #66 (segunda parte), #35 (zonas e props em inglês), e a HUD:
+  #58 (Codex, telas com o kit), #60 (Claude, biblioteca do kit) e o resto da #56.
+- **No PC com a Unreal:** a #73 (referência das passagens, do acampamento e da chegada) é do Claude local.
+- **Decisões do Lucas em aberto:** #59 (aprovar o kit), #9 (morte permanente), #11 (Bar e Dormitório), #12 (pacote
+  do celular), #78 (textos e efeitos de fase), o cartão de título da passagem (simples ou com mais presença) e as
+  propostas do Claude em `docs/narrative/review.md` (nomes de recruta, descrições dos inimigos).
 - **Em espera:** #40 (respiração dos heróis), para o Auto Sprite.
-- **Decidido:** treinos da Pesquisa valem na luta; dificuldade crescente dentro de cada fase (fases 3 e 4 mais duras,
-  mantidas); vilões do John pela distribuição dele, com o Porteiro de chefe e o Robô de volta nas fases 2 e 5; quedas
-  da Íris e da Véspera ajoelhadas.
+- **Formato da arte:** o Codex entrega em WebP, na resolução de uso, com os originais fora do repositório.
+- **Decidido:** treinos da Pesquisa valem na luta; dificuldade crescente dentro de cada fase; vilões do John pela
+  distribuição dele; quedas da Íris e da Véspera ajoelhadas; o acampamento é dos fundadores, sentados no chão; todas as
+  cenas de passagem podem ser puladas; o acampamento funciona como o HUD da luta; 4 eventos de busca por mapa.
 - **Só no Windows:** as fontes das poses do John estão em `SourceArt/CharacterGallery/JohnCombatPoses20261022` na
   pasta da Unreal (e na tag `codex-pr46-originals`); o metrô sai de `tools/unreal_export_metro.py`.

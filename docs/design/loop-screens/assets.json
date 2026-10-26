@@ -1,0 +1,72 @@
+{
+  "issue": 96,
+  "cargo": {
+    "closed": {
+      "source": "art/street/search_props/street_crates_closed.webp",
+      "source_sha256": "e62df431efb170f39aa0528109a8bdf9a0ad306e23ae5ac534ed851753c78462",
+      "source_bbox": [
+        116,
+        190,
+        420,
+        483
+      ],
+      "source_anchor": [
+        268.0,
+        483
+      ],
+      "uniform_scale": 0.4389027431421446,
+      "post_shift_y": 0,
+      "file": "art/ui/loop/cargo_closed.webp",
+      "canvas": [
+        224,
+        192
+      ],
+      "anchor": [
+        112,
+        184
+      ],
+      "alpha_bbox": [
+        45,
+        55,
+        179,
+        184
+      ]
+    },
+    "open": {
+      "source": "art/street/search_props/street_crates_open.webp",
+      "source_sha256": "210ef07f9031356b35134b6a5a7665362c88b8bff7556ae6e4e748e73586e2a6",
+      "source_bbox": [
+        116,
+        82,
+        420,
+        483
+      ],
+      "source_anchor": [
+        268.0,
+        483
+      ],
+      "uniform_scale": 0.4389027431421446,
+      "post_shift_y": 0,
+      "file": "art/ui/loop/cargo_open.webp",
+      "canvas": [
+        224,
+        192
+      ],
+      "anchor": [
+        112,
+        184
+      ],
+      "alpha_bbox": [
+        45,
+        8,
+        179,
+        184
+      ]
+    }
+  },
+  "star_canvas": [
+    32,
+    32
+  ],
+  "source_art_unchanged": true
+}

@@ -1,0 +1,33 @@
+{
+  "status": "APROVADO for comparison studies; awaiting Lucas",
+  "variants": 3,
+  "canvas": [
+    1920,
+    1080
+  ],
+  "minimum_font": 18,
+  "text_outside_canvas": 0,
+  "same_capture": true,
+  "same_actor": "Nick",
+  "same_ability": "gato_corte_fase",
+  "source_capture_commit": "f9fe25a",
+  "game_code_changed": false,
+  "files": {
+    "comparison.webp": "5f6f3e87abf9841201e84ac5ee9d958c7540cbf0b3b2e600329bd7b360faa4f1",
+    "glyph_readability.webp": "42a61d1adcef9267578323428c9c1014b3d119ce08cfee1be60fc5b8efa83b35",
+    "hud_a.webp": "f58c7900c8ce918ea39fbcfbe06ba84c71774d9492aeb10fa6bb70d3f2530f36",
+    "hud_a_40.webp": "d08bf6e16e5041a452ba61c3e2daa8586d79039ee4859ebf9758315e333944e9",
+    "hud_a_gray.webp": "dd1f42f629afbbad4c86fa4e7fc88d7765d904abfe0f10ab7d6f3d85170ef891",
+    "hud_b.webp": "98c414b4f4602fd246200f66197d65de3f5da32453872c62f116b47eb4cab348",
+    "hud_b_40.webp": "8a1b81833b5128c60173c9c7bee9f09311889b1bf4211dbd0f8e03716787a7bb",
+    "hud_b_gray.webp": "7aca08248908dc2319a9e0ff1392f34bf26fdc0cc4201f2134ff81f443af4363",
+    "hud_c.webp": "9b93b5987b19ab58025cbd3e8eda5e09a3cbfd2b0fb61522b13ba1bf43633c38",
+    "hud_c_40.webp": "7d8538cc08ab8aabad0338efa65e707e6dfd73301cb4606a69442b3560c70d84",
+    "hud_c_gray.webp": "1a15aec59fa03e3adcf26c4af3ab6fad98a508db69d314fce3ae6ff7ea44a9a2",
+    "overview.webp": "e1cec675379f5ada7606b2b5e6312b9e00b933666dd223e4f3a9e5aa6c10d1ee",
+    "skill_glyphs.webp": "cf1c51f278d0616b0447bddee8976b0d7696751cf907c1e8b8a2c9bf1987e1f4",
+    "skin_a.webp": "25a6ccc92afed7501d1ad7202e4454c12e1773ba0e1cb0e8248911ef0489a4c5",
+    "skin_b.webp": "f1be151e5783fbf37775e9a641eb360ed6d649aa0100a8b237b13e0007b21918",
+    "skin_c.webp": "536a283f848f29229424bc83e851c20e93bb32c48ccf67ae6ff08516f23db2a2"
+  }
+}

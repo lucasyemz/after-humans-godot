@@ -1,5 +1,5 @@
 ## Cuidados com a Mochila (port do FAHExplorationCare e do CombatUseItem da Unreal, #37): comer pouco ou bem (15% ou 35%
-## da vida, 1 ou 3 de comida da expedição), curativo do refúgio (+8) e a Ampola de Reparo (a habilidade do sapo, de 5 a 8,
+## da vida, 1 ou 3 de comida da expedição; no acampamento, comer pouco é o da barra: +10% e -5 de instinto), curativo do refúgio (+8) e a Ampola de Reparo (a habilidade do sapo, de 5 a 8,
 ## com as cargas da expedição). Fora da luta, num aliado vivo da equipe; na luta, ação livre no herói da vez, um item por
 ## vez dele (a ampola lá é habilidade). quote() diz o que acontece e por que não; use() aplica.
 class_name AHExplorationCare
@@ -16,7 +16,7 @@ const BANDAGE_HEAL := 8
 static func _empty(kind: String) -> Dictionary:
 	return {"available": false, "reason": "", "heal_min": 0, "heal_max": 0,
 		"food_cost": 1 if kind == SMALL_MEAL else (3 if kind == FULL_MEAL else 0), "bandage_cost": 1 if kind == BANDAGE else 0,
-		"charges": 0}
+		"charges": 0, "instinct": 0}
 
 
 static func _hero(campaign: Dictionary, hero_id: String):
@@ -61,15 +61,21 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 	if kind == IRIS_AMPOULE:
 		q.charges = ampoule_charges(campaign)
 	var session: Dictionary = campaign.get("session", {})
+	# No acampamento também (decisão do Lucas, #98): a Mochila e a barra dele gastam a mesma comida da expedição, e o
+	# comer pouco ali é o mesmo da barra (+10% de vida e -5 de instinto).
 	if session.get("expedition") == null or session.get("result", "") != "" or session.get("event") != null \
-			or session.get("screen") != "corridor":
+			or not ["corridor", "rest"].has(session.get("screen")):
 		q.reason = TranslationServer.translate("Disponível fora de combate e eventos, durante a exploração.")
 		return q
 	var target = _hero(campaign, hero_id)
 	if target == null or not target.alive or target.hp <= 0 or not session.expedition.team.has(hero_id):
 		q.reason = TranslationServer.translate("Selecione um aliado vivo da expedição.")
 		return q
-	if target.hp >= target.max_hp:
+	var camp_meal: bool = kind == SMALL_MEAL and session.get("screen") == "rest"
+	if camp_meal:
+		q.instinct = -mini(AHJourneyRules.CAMP_MEAL_INSTINCT, int(target.instinct))
+	# Como na barra, com a vida cheia o comer do acampamento ainda vale se baixar o instinto.
+	if target.hp >= target.max_hp and q.instinct == 0:
 		q.reason = TranslationServer.translate("O aliado já está com a vida cheia.")
 		return q
 	var missing: int = target.max_hp - target.hp
@@ -96,7 +102,7 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 				q.reason = TranslationServer.translate("Sem cargas. A ampola recarrega após uma vitória.")
 				return q
 		_:
-			q.heal_min = _meal_heal(kind, target.max_hp, missing)
+			q.heal_min = mini(missing, AHJourneyRules.camp_meal_heal(target.max_hp)) if camp_meal else _meal_heal(kind, target.max_hp, missing)
 			q.heal_max = q.heal_min
 			if AHJourneyRules.food(campaign) < q.food_cost:
 				q.reason = TranslationServer.translate("Comida insuficiente.")
@@ -125,6 +131,7 @@ static func use(campaign: Dictionary, hero_id: String, kind: String) -> int:
 			AHJourneyRules.adjust(campaign, "bandages", -1)
 		_:
 			AHJourneyRules.adjust(campaign, "food", -q.food_cost)
+			target.instinct = clampi(int(target.instinct) + q.instinct, 0, 200)
 	var before: int = target.hp
 	target.hp = mini(target.max_hp, target.hp + heal)
 	return target.hp - before

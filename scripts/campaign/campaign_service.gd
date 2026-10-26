@@ -15,7 +15,8 @@ signal changed
 signal saved(ok: bool)
 
 const FORMAT := "after-humans-campaign"
-const VERSION := 1
+## 2 (#90): o nível dos heróis (level, xp, upgrades). O save da versão 1 abre migrado (AHHeroLevels.migrate).
+const VERSION := 2
 const PRIMARY := "campaign.json"
 const BACKUP := "campaign.backup.json"
 const SLOTS_FILE := "slots.json"
@@ -144,6 +145,8 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		"relic_id": "", "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
 		"art_variant": "",
+		# O nível (#90): o XP desde o último treino e as melhorias escolhidas (AHHeroLevels).
+		"level": 1, "xp": 0, "upgrades": [],
 	}
 
 
@@ -161,6 +164,8 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		"unlocked_classes": [],
 		"tools": [],
 		"completed_phases": [],
+		# A melhor nota (1 a 3 estrelas) do guardião de cada fase (#91): {fase: estrelas}.
+		"mission_stars": {},
 		"researched_skills": [],
 		"inventory": {"seeds": 30, "scrap": 0, "fragments": 0, "bandages": 2, "relics": [], "items": {}},
 		"memorial": [],
@@ -372,13 +377,20 @@ static func read_file(path: String):
 	var envelope = json.data
 	if typeof(envelope) != TYPE_DICTIONARY or envelope.get("format", "") != FORMAT:
 		return null
-	# Quando o formato mudar, a migração das versões antigas entra aqui (como Migrate na Unreal).
-	if int(envelope.get("version", -1)) != VERSION:
+	# A migração das versões antigas (como Migrate na Unreal): a 1 ganha o nível dos heróis (#90).
+	var version := int(envelope.get("version", -1))
+	if version < 1 or version > VERSION:
 		return null
 	var campaign = envelope.get("campaign")
 	if typeof(campaign) != TYPE_DICTIONARY or envelope.get("checksum", "") != _checksum(campaign):
 		return null
 	campaign = _normalize(campaign)
+	if version == 1 and int(campaign.get("version", -1)) == 1:
+		AHHeroLevels.migrate(campaign)
+		campaign.version = VERSION
+	# As estrelas das fases (#91): o save de antes delas começa sem nenhuma.
+	if not campaign.has("mission_stars"):
+		campaign.mission_stars = {}
 	return campaign if is_usable(campaign) else null
 
 

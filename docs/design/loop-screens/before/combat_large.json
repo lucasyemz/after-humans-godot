@@ -1,0 +1,753 @@
+{
+	"actor": "unit_hero_sapo_iris",
+	"name": "combat",
+	"texts": [
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1929/@VBoxContainer@1928/Top/Name",
+			"rect": [
+				1503.51123046875,
+				301.038146972656,
+				227.0,
+				28.0
+			],
+			"text": "Emissor de Comando"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1929/@VBoxContainer@1928/HpRow/HpText",
+			"rect": [
+				1697.51123046875,
+				332.038146972656,
+				33.0,
+				26.0
+			],
+			"text": "6/6"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1929/@VBoxContainer@1928/IntentRow/Intent",
+			"rect": [
+				1538.51123046875,
+				361.038146972656,
+				192.0,
+				84.0
+			],
+			"text": "Ordem Contraditória → um de 3"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1927/@VBoxContainer@1926/Top/Name",
+			"rect": [
+				1253.5029296875,
+				657.0,
+				227.0,
+				28.0
+			],
+			"text": "Recreador"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1927/@VBoxContainer@1926/HpRow/HpText",
+			"rect": [
+				1446.5029296875,
+				688.0,
+				34.0,
+				26.0
+			],
+			"text": "8/8"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1927/@VBoxContainer@1926/IntentRow/Intent",
+			"rect": [
+				1288.5029296875,
+				717.0,
+				192.0,
+				55.0
+			],
+			"text": "Pega-Pega → um de 4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1925/@VBoxContainer@1924/Top/Name",
+			"rect": [
+				235.540222167969,
+				708.0,
+				160.0,
+				28.0
+			],
+			"text": "Véspera"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1925/@VBoxContainer@1924/HpRow/HpText",
+			"rect": [
+				332.540222167969,
+				739.0,
+				63.0,
+				26.0
+			],
+			"text": "30/30"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1923/@VBoxContainer@1922/Top/Name",
+			"rect": [
+				460.962768554688,
+				708.0,
+				160.0,
+				28.0
+			],
+			"text": "Íris"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1923/@VBoxContainer@1922/HpRow/HpText",
+			"rect": [
+				563.962768554688,
+				739.0,
+				57.0,
+				26.0
+			],
+			"text": "23/23"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1921/@VBoxContainer@1920/Top/Name",
+			"rect": [
+				687.456237792969,
+				708.0,
+				160.0,
+				28.0
+			],
+			"text": "Nick"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1921/@VBoxContainer@1920/HpRow/HpText",
+			"rect": [
+				789.456237792969,
+				739.0,
+				58.0,
+				26.0
+			],
+			"text": "24/24"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1919/@VBoxContainer@1918/Top/Name",
+			"rect": [
+				915.028930664062,
+				708.0,
+				160.0,
+				28.0
+			],
+			"text": "Bento"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1919/@VBoxContainer@1918/HpRow/HpText",
+			"rect": [
+				1016.02893066406,
+				739.0,
+				59.0,
+				26.0
+			],
+			"text": "34/34"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@Label@1949",
+			"rect": [
+				632.5,
+				54.0,
+				109.0,
+				28.0
+			],
+			"text": "RODADA 1"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1952/@Label@1951",
+			"rect": [
+				753.5,
+				92.0,
+				105.0,
+				27.0
+			],
+			"text": "Íris · agora"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1955/@Label@1954",
+			"rect": [
+				870.5,
+				74.0,
+				79.0,
+				26.0
+			],
+			"text": "Véspera"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1958/@Label@1957",
+			"rect": [
+				961.5,
+				74.0,
+				54.0,
+				26.0
+			],
+			"text": "Nick"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1961/@Label@1960",
+			"rect": [
+				1027.5,
+				74.0,
+				76.0,
+				26.0
+			],
+			"text": "Emissor"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1964/@Label@1963",
+			"rect": [
+				1115.5,
+				74.0,
+				101.0,
+				26.0
+			],
+			"text": "Recreador"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1638/@HBoxContainer@1639/@VBoxContainer@1967/@Label@1966",
+			"rect": [
+				1228.5,
+				74.0,
+				59.0,
+				26.0
+			],
+			"text": "Bento"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1641/@VBoxContainer@1642/@Label@1643",
+			"rect": [
+				1488.0,
+				142.0,
+				392.0,
+				26.0
+			],
+			"text": "REGISTRO · L abre"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1641/@VBoxContainer@1642/@Label@1644",
+			"rect": [
+				1488.0,
+				172.0,
+				392.0,
+				63.0
+			],
+			"text": "Fase inicial: um aliado toma a iniciativa."
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@HBoxContainer@1647/@VBoxContainer@1649/@Label@1650",
+			"rect": [
+				162.0,
+				800.0,
+				242.0,
+				54.0
+			],
+			"text": "Íris"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@HBoxContainer@1647/@VBoxContainer@1649/@Label@1651",
+			"rect": [
+				162.0,
+				858.0,
+				242.0,
+				30.0
+			],
+			"text": "Vida 23/23"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@HBoxContainer@1647/@VBoxContainer@1649/@Label@1653",
+			"rect": [
+				162.0,
+				910.0,
+				242.0,
+				57.0
+			],
+			"text": "Instinto 0/200 · em 200, crise"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@Label@1657",
+			"rect": [
+				422.0,
+				800.0,
+				1214.0,
+				30.0
+			],
+			"text": "Vez de Íris: escolha uma habilidade (1–4) ou uma ação."
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@1989/@HBoxContainer@1968/@VBoxContainer@1970/@Label@1971",
+			"rect": [
+				500.0,
+				844.0,
+				184.0,
+				30.0
+			],
+			"text": "Carga Voltaica"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@1989/@HBoxContainer@1968/@VBoxContainer@1970/@HBoxContainer@1974/@Label@1972",
+			"rect": [
+				500.0,
+				876.0,
+				58.0,
+				40.0
+			],
+			"text": "4–7"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@1989/@HBoxContainer@1968/@VBoxContainer@1970/@HBoxContainer@1974/@Label@1973",
+			"rect": [
+				564.0,
+				890.0,
+				50.0,
+				26.0
+			],
+			"text": "dano"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@1989/@HBoxContainer@1968/@VBoxContainer@1970/@HBoxContainer@1980/@Label@1975",
+			"rect": [
+				500.0,
+				918.0,
+				24.0,
+				23.0
+			],
+			"text": "de"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@1989/@HBoxContainer@1968/@VBoxContainer@1970/@HBoxContainer@1986/@Label@1981",
+			"rect": [
+				500.0,
+				943.0,
+				28.0,
+				23.0
+			],
+			"text": "em"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@1989/@PanelContainer@1988/@Label@1987",
+			"rect": [
+				710.0,
+				844.0,
+				9.0,
+				26.0
+			],
+			"text": "1"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2011/@HBoxContainer@1990/@VBoxContainer@1992/@Label@1993",
+			"rect": [
+				806.0,
+				844.0,
+				184.0,
+				63.0
+			],
+			"text": "Coquetel Corrosivo"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2011/@HBoxContainer@1990/@VBoxContainer@1992/@HBoxContainer@1996/@Label@1994",
+			"rect": [
+				806.0,
+				909.0,
+				59.0,
+				40.0
+			],
+			"text": "2–4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2011/@HBoxContainer@1990/@VBoxContainer@1992/@HBoxContainer@1996/@Label@1995",
+			"rect": [
+				871.0,
+				923.0,
+				50.0,
+				26.0
+			],
+			"text": "dano"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2011/@HBoxContainer@1990/@VBoxContainer@1992/@HBoxContainer@2002/@Label@1997",
+			"rect": [
+				806.0,
+				951.0,
+				24.0,
+				23.0
+			],
+			"text": "de"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2011/@HBoxContainer@1990/@VBoxContainer@1992/@HBoxContainer@2008/@Label@2003",
+			"rect": [
+				806.0,
+				976.0,
+				28.0,
+				23.0
+			],
+			"text": "em"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2011/@PanelContainer@2010/@Label@2009",
+			"rect": [
+				1016.0,
+				844.0,
+				12.0,
+				26.0
+			],
+			"text": "2"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2034/@HBoxContainer@2012/@VBoxContainer@2014/@Label@2015",
+			"rect": [
+				1112.0,
+				844.0,
+				184.0,
+				63.0
+			],
+			"text": "Ampola de Reparo Vivo"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2034/@HBoxContainer@2012/@VBoxContainer@2014/@HBoxContainer@2018/@Label@2016",
+			"rect": [
+				1112.0,
+				909.0,
+				79.0,
+				40.0
+			],
+			"text": "+5–8"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2034/@HBoxContainer@2012/@VBoxContainer@2014/@HBoxContainer@2018/@Label@2017",
+			"rect": [
+				1197.0,
+				923.0,
+				42.0,
+				26.0
+			],
+			"text": "cura"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2034/@HBoxContainer@2012/@VBoxContainer@2014/@HBoxContainer@2024/@Label@2019",
+			"rect": [
+				1112.0,
+				951.0,
+				24.0,
+				23.0
+			],
+			"text": "de"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2034/@HBoxContainer@2012/@VBoxContainer@2014/@HBoxContainer@2030/@Label@2025",
+			"rect": [
+				1112.0,
+				976.0,
+				28.0,
+				23.0
+			],
+			"text": "em"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2034/@HBoxContainer@2012/@VBoxContainer@2014/@Label@2031",
+			"rect": [
+				1112.0,
+				1001.0,
+				184.0,
+				23.0
+			],
+			"text": "3 uso(s)"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2034/@PanelContainer@2033/@Label@2032",
+			"rect": [
+				1322.0,
+				844.0,
+				13.0,
+				26.0
+			],
+			"text": "3"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2054/@HBoxContainer@2035/@VBoxContainer@2037/@Label@2038",
+			"rect": [
+				1418.0,
+				844.0,
+				184.0,
+				63.0
+			],
+			"text": "Antídoto de Campo"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2054/@HBoxContainer@2035/@VBoxContainer@2037/@HBoxContainer@2044/@Label@2039",
+			"rect": [
+				1418.0,
+				909.0,
+				24.0,
+				23.0
+			],
+			"text": "de"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2054/@HBoxContainer@2035/@VBoxContainer@2037/@HBoxContainer@2050/@Label@2045",
+			"rect": [
+				1418.0,
+				934.0,
+				28.0,
+				23.0
+			],
+			"text": "em"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2054/@HBoxContainer@2035/@VBoxContainer@2037/@Label@2051",
+			"rect": [
+				1418.0,
+				959.0,
+				184.0,
+				23.0
+			],
+			"text": "2 uso(s)"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1656/@HBoxContainer@1658/@Button@2054/@PanelContainer@2053/@Label@2052",
+			"rect": [
+				1628.0,
+				844.0,
+				14.0,
+				26.0
+			],
+			"text": "4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1659/@Button@1662",
+			"rect": [
+				1654.0,
+				800.0,
+				236.0,
+				56.0
+			],
+			"text": "Mover"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1659/@Button@1662/@PanelContainer@1661/@Label@1660",
+			"rect": [
+				1877.0,
+				818.5,
+				18.0,
+				26.0
+			],
+			"text": "Q"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1659/@Button@1665",
+			"rect": [
+				1654.0,
+				862.0,
+				236.0,
+				56.0
+			],
+			"text": "Defender"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1659/@Button@1665/@PanelContainer@1664/@Label@1663",
+			"rect": [
+				1874.0,
+				880.5,
+				21.0,
+				26.0
+			],
+			"text": "W"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1659/@Button@1668",
+			"rect": [
+				1654.0,
+				924.0,
+				236.0,
+				56.0
+			],
+			"text": "Mochila · 4"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1659/@Button@1668/@PanelContainer@1667/@Label@1666",
+			"rect": [
+				1885.0,
+				942.5,
+				6.0,
+				26.0
+			],
+			"text": "I"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1659/@Button@1671",
+			"rect": [
+				1654.0,
+				986.0,
+				236.0,
+				56.0
+			],
+			"text": "Fugir"
+		},
+		{
+			"clipped": false,
+			"path": "/root/Street/@Node3D@1629/@CanvasLayer@1637/@Control@1636/@PanelContainer@1645/@HBoxContainer@1646/@VBoxContainer@1659/@Button@1671/@PanelContainer@1670/@Label@1669",
+			"rect": [
+				1881.0,
+				1004.5,
+				12.0,
+				26.0
+			],
+			"text": "F"
+		}
+	],
+	"units": [
+		{
+			"block": 0,
+			"class_id": "cao",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 34,
+			"id": "unit_hero_cao_bento",
+			"instinct": 0,
+			"max_hp": 34,
+			"name": "Bento",
+			"player": true,
+			"rank": 1,
+			"speed": 2,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "gato",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 24,
+			"id": "unit_hero_gato_nick",
+			"instinct": 0,
+			"max_hp": 24,
+			"name": "Nick",
+			"player": true,
+			"rank": 2,
+			"speed": 6,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "sapo",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 23,
+			"id": "unit_hero_sapo_iris",
+			"instinct": 0,
+			"max_hp": 23,
+			"name": "Íris",
+			"player": true,
+			"rank": 3,
+			"speed": 5,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "coruja",
+			"dodge": 0,
+			"enemy_id": "",
+			"guard": 0,
+			"hp": 30,
+			"id": "unit_hero_coruja_vespera",
+			"instinct": 0,
+			"max_hp": 30,
+			"name": "Véspera",
+			"player": true,
+			"rank": 4,
+			"speed": 3,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "",
+			"dodge": 0,
+			"enemy_id": "recreador",
+			"guard": 0,
+			"hp": 8,
+			"id": "corridor_1117577169_2_0_recreador",
+			"instinct": 0,
+			"max_hp": 8,
+			"name": "Recreador",
+			"player": false,
+			"rank": 1,
+			"speed": 3,
+			"stun": 0
+		},
+		{
+			"block": 0,
+			"class_id": "",
+			"dodge": 0,
+			"enemy_id": "sussurrador",
+			"guard": 0,
+			"hp": 6,
+			"id": "corridor_1117577169_2_1_sussurrador",
+			"instinct": 0,
+			"max_hp": 6,
+			"name": "Emissor de Comando",
+			"player": false,
+			"rank": 2,
+			"speed": 3,
+			"stun": 0
+		}
+	]
+}

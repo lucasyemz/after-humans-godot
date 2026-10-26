@@ -17,6 +17,9 @@ const ACTIONS := {
 	"inventory": {"keys": [KEY_I], "buttons": [JOY_BUTTON_Y]},
 	# Estação: esconde a interface para olhar o corte limpo (o Ocultar HUD da Unreal).
 	"hide_hud": {"keys": [KEY_F2], "buttons": [JOY_BUTTON_BACK]},
+	# Estação (#60): os detalhes do relatório da volta e Preparar expedição (só nas telas da Estação).
+	"report_details": {"keys": [KEY_V], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
+	"station_prepare": {"keys": [KEY_G], "buttons": [JOY_BUTTON_X]},
 	# Combate: as quatro habilidades e as ações (Mochila é a mesma tecla da exploração).
 	"combat_ability_1": {"keys": [KEY_1]},
 	"combat_ability_2": {"keys": [KEY_2]},
@@ -25,6 +28,8 @@ const ACTIONS := {
 	"combat_move": {"keys": [KEY_Q], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
 	"combat_defend": {"keys": [KEY_W], "buttons": [JOY_BUTTON_X]},
 	"combat_flee": {"keys": [KEY_F]},
+	# Examinar (#89): o foco passa pelos personagens da luta e a ficha de cada um abre (o mouse e o toque apontam direto).
+	"combat_examine": {"keys": [KEY_X], "buttons": [JOY_BUTTON_LEFT_STICK]},
 	# O registro da luta, escondido por padrão (#56): abre e fecha.
 	"combat_log": {"keys": [KEY_L], "buttons": [JOY_BUTTON_RIGHT_STICK]},
 	# Só para teste do protótipo (teclado).

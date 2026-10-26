@@ -1,0 +1,168 @@
+{
+  "normal": {
+    "station-preparation": {
+      "before": "before/station-preparation.jpg",
+      "background": "before/station-preparation_clean.webp",
+      "metadata": "before/station-preparation.json",
+      "capture_png_sha256": "b4429159c19a99bcdb021344bb35375e280b98ef0564331d7fc0c72760a0a134",
+      "clean_png_sha256": "9f86cdaaaab7b3aec9ce4ad3c2dce0ab6f4e4fdf49dabb1604e13b75555e1bb1",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "station-research": {
+      "before": "before/station-research.jpg",
+      "background": "before/station-research_clean.webp",
+      "metadata": "before/station-research.json",
+      "capture_png_sha256": "d8255653be658d6a3aa32a75518d0754d016ab892180ce8ebdfabd3d8c5ff5e1",
+      "clean_png_sha256": "bf938c912e97845c7d46e3ad3871df5676e403b3afa9d4652888be0b49efd05c",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "combat-result": {
+      "before": "before/combat-result.jpg",
+      "background": "before/combat-result_clean.webp",
+      "metadata": "before/combat-result.json",
+      "capture_png_sha256": "bcb42eb2894b96695a8bbcb7016f00083e202b65df45193085beadeb3425f971",
+      "clean_png_sha256": "22e9cc0c7c2309c184c98d4d4ee8e85af79f58b9de263a657620449c01da6a9b",
+      "commit": "f9fe25a",
+      "staged": true
+    },
+    "combat": {
+      "before": "before/combat.jpg",
+      "background": "before/combat_clean.webp",
+      "metadata": "before/combat.json",
+      "capture_png_sha256": "f06564cba39c4c8eb482aa93185813eac0aec42b0267797d5aadb5752ec3e723",
+      "clean_png_sha256": "7d5f9963fff100aa296f9bb76f90195eba2d17c71eeaf28a4c23e68cb8d4cb4e",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "station-map": {
+      "before": "before/station-map.jpg",
+      "background": "before/station-map_clean.webp",
+      "metadata": "before/station-map.json",
+      "capture_png_sha256": "31be3f319f667d59fcd30fa65e1fe7d87829029c9d2e46f9b4ff5104eaed5897",
+      "clean_png_sha256": "c26eef5b3f056c44947e5c96ac2ce279f721937032e218d8dc8447711b570d2f",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "station-characters": {
+      "before": "before/station-characters.jpg",
+      "background": "before/station-characters_clean.webp",
+      "metadata": "before/station-characters.json",
+      "capture_png_sha256": "75822b8e6a191f8feea85341d3d2a46b5d4020be3a42395dc9d0ad87c885125b",
+      "clean_png_sha256": "de1097908319bf8ff3b97df3228e718a9e8974b012c278a0e83c4ec7b6f2dcf2",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "combat-boss": {
+      "before": "before/combat-boss.jpg",
+      "background": "before/combat-boss_clean.webp",
+      "metadata": "before/combat-boss.json",
+      "capture_png_sha256": "7f7881a669bf9ab4b15e5055aad25f487c25c8ac255dbaf9af0cd0a355346f37",
+      "clean_png_sha256": "fb79b2cae1afa15e6203edd10efc9ac7011e159fd1fdde90bae92787af728029",
+      "commit": "af3513b",
+      "staged": true
+    },
+    "combat-bond-rival": {
+      "before": "before/combat-bond-rival.jpg",
+      "background": "before/combat-bond-rival_clean.webp",
+      "metadata": "before/combat-bond-rival.json",
+      "capture_png_sha256": "f4589a550ab082163c010b816a52913cd7695b9ff20732ca1022fe6be0a7685f",
+      "clean_png_sha256": "c5e174f245c2292af1f09016f0b3b1cd764d00e60704b2fe4c0ca4813d4489cb",
+      "commit": "af3513b",
+      "staged": true
+    },
+    "combat-bond-friend": {
+      "before": "before/combat-bond-friend.jpg",
+      "background": "before/combat-bond-friend_clean.webp",
+      "metadata": "before/combat-bond-friend.json",
+      "capture_png_sha256": "6b63bec8fb57444ababcdd1f6d8ea844f3ae8969d29b02e29860bd475c373e1e",
+      "clean_png_sha256": "55bedf867145e9f318467ab9116c6033f96cdc5097392b3aa94b82abcd8bbd6c",
+      "commit": "af3513b",
+      "staged": true
+    }
+  },
+  "large": {
+    "station-preparation": {
+      "before": "before/station-preparation_large.jpg",
+      "background": "before/station-preparation_large_clean.webp",
+      "metadata": "before/station-preparation_large.json",
+      "capture_png_sha256": "0b21768c65c15f4b5f86c35eff8f6b82aebcf5429ca7c5f7099404315a70fa3d",
+      "clean_png_sha256": "027c2f3129c6ca9907a289d661651ccb8a009e592a717fb0216676cf3f7b016f",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "station-research": {
+      "before": "before/station-research_large.jpg",
+      "background": "before/station-research_large_clean.webp",
+      "metadata": "before/station-research_large.json",
+      "capture_png_sha256": "0e3a367d81fa351fc0b27f96bc53caa60c4c560dc87deefd5f1d929fe2d22fad",
+      "clean_png_sha256": "0ebc16679fe05db21f11a8a7897759af49d3a3556bad168b2413bc8cf2c0e9ec",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "combat-result": {
+      "before": "before/combat-result_large.jpg",
+      "background": "before/combat-result_large_clean.webp",
+      "metadata": "before/combat-result_large.json",
+      "capture_png_sha256": "52ef23e99a2113fa345429b1f47489c97d5730032b1056f299914f4b456e4eef",
+      "clean_png_sha256": "88e299f2a5420f42f3e9c5e46a2c56df4f668b87f66a75c2d05f5272df7467f4",
+      "commit": "f9fe25a",
+      "staged": true
+    },
+    "combat": {
+      "before": "before/combat_large.jpg",
+      "background": "before/combat_large_clean.webp",
+      "metadata": "before/combat_large.json",
+      "capture_png_sha256": "9c45e995b13cb69eac78cfd337776309e8a41bb76b9a77c2d215931289ce78e5",
+      "clean_png_sha256": "b54b950c7dae91c62e93187bbdf15be71adc65dd8526cc05cf1df5ccfe01e5ce",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "station-map": {
+      "before": "before/station-map_large.jpg",
+      "background": "before/station-map_large_clean.webp",
+      "metadata": "before/station-map_large.json",
+      "capture_png_sha256": "7af8755c9fa1e08c1289ee93395cc3dd518fd4c05a5c6328b1c8678592eb9b91",
+      "clean_png_sha256": "c1e0e52cd5d61549c8fe813a61948582cad5f41873f332da729eabe600edbb94",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "station-characters": {
+      "before": "before/station-characters_large.jpg",
+      "background": "before/station-characters_large_clean.webp",
+      "metadata": "before/station-characters_large.json",
+      "capture_png_sha256": "4a1926a63da8aa238cb1169f93d3557ea11aa89b126da151f3e80b9930e7556e",
+      "clean_png_sha256": "3d58602efecaf7cf6b41308044755b026ac11b9c96b6ad6680bbf04a92fb0065",
+      "commit": "f9fe25a",
+      "staged": false
+    },
+    "combat-boss": {
+      "before": "before/combat-boss_large.jpg",
+      "background": "before/combat-boss_large_clean.webp",
+      "metadata": "before/combat-boss_large.json",
+      "capture_png_sha256": "a5879e680fde75897bd2622d40b4c9ad3311cd33d931b9bf6e2d93eff954fe16",
+      "clean_png_sha256": "1a84afeffa6a2a5ab0f3a06e9a21b03e2e996b1dddc521c623ff4d6a443e1b94",
+      "commit": "af3513b",
+      "staged": true
+    },
+    "combat-bond-rival": {
+      "before": "before/combat-bond-rival_large.jpg",
+      "background": "before/combat-bond-rival_large_clean.webp",
+      "metadata": "before/combat-bond-rival_large.json",
+      "capture_png_sha256": "407b3d0afbb8cbed798a1ecd2a11ad0dba0a3ca0c96fde6890d4bda8dbb2fd92",
+      "clean_png_sha256": "66a41414647f2192d68b22b40467797b0720eb8d68d202576535fe54f7d15658",
+      "commit": "af3513b",
+      "staged": true
+    },
+    "combat-bond-friend": {
+      "before": "before/combat-bond-friend_large.jpg",
+      "background": "before/combat-bond-friend_large_clean.webp",
+      "metadata": "before/combat-bond-friend_large.json",
+      "capture_png_sha256": "26cfdb8e7ad5465a35657eb01d4d08f63914f902b6f2f0fe2134a88bd0e2b08c",
+      "clean_png_sha256": "ddbed42011d72a8b65a305cda8f2affdf3ff1e3c5a867b3c4cd90284c1407aa5",
+      "commit": "af3513b",
+      "staged": true
+    }
+  }
+}

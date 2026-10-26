@@ -971,14 +971,15 @@ static func phase_unlocked(campaign: Dictionary, phase_id: String) -> bool:
 
 ## O que a Estação pede primeiro (o cartão "Próximo passo" da proposta de UX): o relatório da volta, a noite, o trem, um
 ## cômodo que já dá para recuperar, o que falta para o próximo e, por fim, a próxima fase. Devolve {title, text, action,
-## button, room}; action: "report", "dormitory", "train", "room" ou "depart".
+## button, room} e, no cômodo que já dá para recuperar, benefit (o que ele passa a fazer) e cost (os chips do cartão);
+## action: "report", "dormitory", "train", "room" ou "depart".
 static func next_step(campaign: Dictionary) -> Dictionary:
 	var report: Dictionary = campaign.station.get("last_return", {})
 	if not report.is_empty() and not report.get("seen", false):
 		return {"title": TranslationServer.translate("Ver o que a equipe trouxe"), "text": TranslationServer.translate("O relatório da última expedição está pronto: o achado, quem voltou e como a Estação passou o ciclo."),
 			"action": "report", "button": TranslationServer.translate("Ver o relatório"), "room": ""}
 	if campaign.night.phase != "none":
-		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe descansa no Dormitório: escolha quem vigia e durma. Quem dorme come e recupera vida e instinto."),
+		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."),
 			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
 	if visit_pending(campaign):
 		return {"title": TranslationServer.translate("Alguém espera na plataforma"), "text": TranslationServer.translate("Um candidato chegou de trem. Veja o que ele traz para a Estação e decida se fica."),
@@ -992,7 +993,7 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 		var name: String = TranslationServer.translate(ROOM_ARTICLE.get(room_id, "")) + TranslationServer.translate(room_def(room_id).name)
 		if upgrade_block(campaign, room_id) == "":
 			return {"title": "%s %s" % [TranslationServer.translate("Recuperar") if level == 0 else TranslationServer.translate("Melhorar"), name], "text": TranslationServer.translate("%s Custa %s.") % [room_benefit(room_id, level + 1), cost_text(cost)],
-				"action": "room", "button": TranslationServer.translate("Ver %s") % name, "room": room_id}
+				"action": "room", "button": TranslationServer.translate("Ver %s") % name, "room": room_id, "benefit": room_benefit(room_id, level + 1), "cost": cost}
 		if missing.is_empty():
 			missing = {"title": TranslationServer.translate("Trazer %s para %s %s") % [cost_text(cost), TranslationServer.translate("reabrir") if level == 0 else TranslationServer.translate("melhorar"), name],
 				"text": TranslationServer.translate("%s As jornadas trazem sucata e fragmentos das buscas.") % room_benefit(room_id, level + 1), "action": "depart",
@@ -1088,7 +1089,13 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 		"seeds": floori(loot.get("seeds", 0) * factor), "scrap": floori(loot.get("scrap", 0) * factor),
 		"fragments": floori(loot.get("fragments", 0) * factor), "water": floori(loot.get("water", 0) * factor),
 		"supplies": floori(loot.get("supplies", 0) * factor), "request": "", "team": expedition.team.duplicate(),
-		"food_left": maxi(0, int(expedition.food)), "stats": expedition.get("stats", {}).duplicate(true)}
+		"food_left": maxi(0, int(expedition.food)), "stats": expedition.get("stats", {}).duplicate(true),
+		"focus": String(expedition.get("focus", "")), "objective_done": bool(expedition.get("objective_done", false)), "unlocked_phase": ""}
+	# A fase seguinte liberada pela primeira vitória (as expedições salvas antes do #60 não têm a marca: sem o chip).
+	if session.result == "victory" and expedition.get("first_clear", false):
+		for i in AHJourneyRules.PHASES.size() - 1:
+			if AHJourneyRules.PHASES[i].id == expedition.phase_id:
+				delivered.unlocked_phase = AHJourneyRules.PHASES[i + 1].id
 	adjust(campaign, "seeds", delivered.seeds)
 	adjust(campaign, "scrap", delivered.scrap)
 	adjust(campaign, "fragments", delivered.fragments)
@@ -1101,7 +1108,17 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 		delivered.request = request
 	for entry in campaign.roster:
 		entry.expedition_uses = {}
+		# Os abates da carreira (o campo já existia no herói, sem conta): as máquinas derrubadas nesta jornada (#60).
+		entry.kills_count = int(entry.get("kills_count", 0)) + int(delivered.stats.get(entry.id, {}).get("downs", 0))
 	if session.result == "victory" and campaign.last_completed_expedition_id != expedition.id:
+		# O XP da jornada concluída (#90): cada um da equipe que voltou vivo; o relatório mostra junto com o das lutas.
+		for hero_id in expedition.team:
+			var member = hero(campaign, hero_id)
+			if member != null and member.get("alive", true):
+				var gained := AHHeroLevels.gain(member, int(AHHeroLevels.rule("journey").get("Xp", 0)))
+				var line: Dictionary = delivered.stats.get(hero_id, {"damage": 0, "healing": 0, "downs": 0})
+				line.xp = int(line.get("xp", 0)) + gained
+				delivered.stats[hero_id] = line
 		campaign.last_completed_expedition_id = expedition.id
 		campaign.completed_expeditions = int(campaign.completed_expeditions) + 1
 	# A primeira vitória em cada fase traz o que a equipe viu lá (#64): a camada da escada da fase, uma vez.

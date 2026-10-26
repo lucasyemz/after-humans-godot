@@ -1,0 +1,544 @@
+{
+  "name": "station-map",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1102",
+      "rect": [
+        32.0,
+        18.0,
+        251.0,
+        50.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1103",
+      "rect": [
+        34.0,
+        66.0,
+        172.0,
+        23.0
+      ],
+      "text": "Ciclo 0 · 4 no elenco"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1848/@HBoxContainer@1835/@HBoxContainer@1838/@Label@1837",
+      "rect": [
+        1032.0,
+        37.0,
+        26.0,
+        25.0
+      ],
+      "text": "30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1848/@HBoxContainer@1835/@HBoxContainer@1841/@Label@1840",
+      "rect": [
+        1101.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "9"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1848/@HBoxContainer@1835/@HBoxContainer@1844/@Label@1843",
+      "rect": [
+        1156.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1848/@HBoxContainer@1835/@HBoxContainer@1847/@Label@1846",
+      "rect": [
+        1211.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1854/@VBoxContainer@1850/@Label@1851",
+      "rect": [
+        1299.0,
+        16.0,
+        195.0,
+        20.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1854/@VBoxContainer@1850/@Label@1852",
+      "rect": [
+        1299.0,
+        36.0,
+        195.0,
+        28.0
+      ],
+      "text": "0 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1854/@VBoxContainer@1850/@Label@1853",
+      "rect": [
+        1299.0,
+        64.0,
+        195.0,
+        20.0
+      ],
+      "text": "! Falta na volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1860/@VBoxContainer@1856/@Label@1857",
+      "rect": [
+        1558.0,
+        16.0,
+        144.0,
+        20.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1860/@VBoxContainer@1856/@Label@1858",
+      "rect": [
+        1558.0,
+        36.0,
+        144.0,
+        28.0
+      ],
+      "text": "6 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1860/@VBoxContainer@1856/@Label@1859",
+      "rect": [
+        1558.0,
+        64.0,
+        144.0,
+        20.0
+      ],
+      "text": "Próxima volta: 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1866/@VBoxContainer@1862/@Label@1863",
+      "rect": [
+        1766.0,
+        16.0,
+        122.0,
+        20.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1866/@VBoxContainer@1862/@Label@1864",
+      "rect": [
+        1766.0,
+        36.0,
+        122.0,
+        28.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1866/@VBoxContainer@1862/@Label@1865",
+      "rect": [
+        1766.0,
+        64.0,
+        122.0,
+        20.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1108",
+      "rect": [
+        52.0,
+        126.0,
+        446.0,
+        20.0
+      ],
+      "text": "PRÓXIMO PASSO"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1109",
+      "rect": [
+        52.0,
+        154.0,
+        446.0,
+        33.0
+      ],
+      "text": "Recuperar a Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Label@1110",
+      "rect": [
+        52.0,
+        195.0,
+        446.0,
+        47.0
+      ],
+      "text": "Fabrica relíquias por 3 sucatas. Gasta 1 de energia. Custa 4 sucatas."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@PanelContainer@1106/@VBoxContainer@1107/@Button@1111",
+      "rect": [
+        52.0,
+        250.0,
+        446.0,
+        54.0
+      ],
+      "text": "Ver a Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@VBoxContainer@1112/@Button@1867",
+      "rect": [
+        32.0,
+        328.0,
+        486.0,
+        48.0
+      ],
+      "text": "Preparar expedição"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@VBoxContainer@1105/@VBoxContainer@1112/@Button@1868",
+      "rect": [
+        32.0,
+        382.0,
+        486.0,
+        48.0
+      ],
+      "text": "Plano da Estação: o que cada cômodo destrava"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1115",
+      "rect": [
+        32.0,
+        1000.0,
+        150.0,
+        48.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1116",
+      "rect": [
+        190.0,
+        1000.0,
+        170.0,
+        48.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Label@1158",
+      "rect": [
+        40.0,
+        28.0,
+        260.0,
+        44.0
+      ],
+      "text": "Mapa ferroviário"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Label@1159",
+      "rect": [
+        40.0,
+        76.0,
+        506.0,
+        25.0
+      ],
+      "text": "Bairro Submerso · Fases concluídas 0 / 5 · Equipe: 4 vivos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Button@1161",
+      "rect": [
+        996.0,
+        36.0,
+        280.0,
+        48.0
+      ],
+      "text": "Voltar à Estação"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1879/@VBoxContainer@1869/@PanelContainer@1876/@Label@1875",
+      "rect": [
+        142.818176269531,
+        698.090942382812,
+        102.0,
+        22.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1879/@VBoxContainer@1869/@PanelContainer@1878/@Label@1877",
+      "rect": [
+        164.818176269531,
+        727.090942382812,
+        57.0,
+        20.0
+      ],
+      "text": "Refúgio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1890/@VBoxContainer@1880/@PanelContainer@1887/@Label@1886",
+      "rect": [
+        345.0,
+        495.181823730469,
+        126.0,
+        22.0
+      ],
+      "text": "Rua das Vitrines"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1890/@VBoxContainer@1880/@PanelContainer@1889/@Label@1888",
+      "rect": [
+        345.0,
+        524.181823730469,
+        126.0,
+        20.0
+      ],
+      "text": "Fase 1 · Disponível"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1899/@VBoxContainer@1891/@PanelContainer@1896/@Label@1895",
+      "rect": [
+        554.681823730469,
+        686.818176269531,
+        135.0,
+        22.0
+      ],
+      "text": "Ponte das Raízes"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1899/@VBoxContainer@1891/@PanelContainer@1898/@Label@1897",
+      "rect": [
+        554.681823730469,
+        715.818176269531,
+        134.0,
+        20.0
+      ],
+      "text": "Fase 2 · Bloqueada"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1908/@VBoxContainer@1900/@PanelContainer@1905/@Label@1904",
+      "rect": [
+        695.454528808594,
+        393.727294921875,
+        123.0,
+        22.0
+      ],
+      "text": "Sala Esquecida"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1908/@VBoxContainer@1900/@PanelContainer@1907/@Label@1906",
+      "rect": [
+        690.454528808594,
+        422.727294921875,
+        134.0,
+        20.0
+      ],
+      "text": "Fase 3 · Bloqueada"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1917/@VBoxContainer@1909/@PanelContainer@1914/@Label@1913",
+      "rect": [
+        880.636352539062,
+        641.727294921875,
+        182.0,
+        22.0
+      ],
+      "text": "Laboratório Silencioso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1917/@VBoxContainer@1909/@PanelContainer@1916/@Label@1915",
+      "rect": [
+        904.636352539062,
+        670.727294921875,
+        134.0,
+        20.0
+      ],
+      "text": "Fase 4 · Bloqueada"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1926/@VBoxContainer@1918/@PanelContainer@1923/@Label@1922",
+      "rect": [
+        1084.72729492188,
+        371.181823730469,
+        111.0,
+        22.0
+      ],
+      "text": "Túneis do Eco"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Control@1162/@Control@1165/@Button@1926/@VBoxContainer@1918/@PanelContainer@1925/@Label@1924",
+      "rect": [
+        1073.72729492188,
+        400.181823730469,
+        134.0,
+        20.0
+      ],
+      "text": "Fase 5 · Bloqueada"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@Label@1166",
+      "rect": [
+        40.0,
+        882.0,
+        567.0,
+        26.0
+      ],
+      "text": "Estoque da Estação · Sementes 30 · Sucata 9 · Fragmentos 3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Label@1928",
+      "rect": [
+        1320.0,
+        352.0,
+        560.0,
+        21.0
+      ],
+      "text": "FASE 1 · DIFICULDADE: FÁCIL"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Label@1929",
+      "rect": [
+        1320.0,
+        383.0,
+        560.0,
+        42.0
+      ],
+      "text": "Rua das Vitrines"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Label@1930",
+      "rect": [
+        1320.0,
+        435.0,
+        560.0,
+        23.0
+      ],
+      "text": "Disponível"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Label@1931",
+      "rect": [
+        1320.0,
+        468.0,
+        560.0,
+        109.0
+      ],
+      "text": "Vitrines tomadas por raízes ainda guardam comida e peças que a Estação não sabe mais fabricar. Os sensores das Galerias seguem separando clientes dos Antigos de fauna não autorizada."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Label@1932",
+      "rect": [
+        1320.0,
+        587.0,
+        560.0,
+        97.0
+      ],
+      "text": "Nível recomendado dos personagens: 1 ou mais.\nLocal: Rua das Vitrines. Travessia de 10 trechos · patrulhas, coisas para vasculhar e descanso. Um guardião protege a saída; vencê-lo conclui a fase."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Button@1933",
+      "rect": [
+        1320.0,
+        694.0,
+        560.0,
+        54.0
+      ],
+      "text": "Preparar expedição"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Label@1934",
+      "rect": [
+        1320.0,
+        758.0,
+        560.0,
+        28.0
+      ],
+      "text": "Fases"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Button@1935",
+      "rect": [
+        1320.0,
+        796.0,
+        560.0,
+        76.0
+      ],
+      "text": "Rua das Vitrines\nFase 1 · Fácil · Nível 1+ · Disponível"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Button@1936",
+      "rect": [
+        1320.0,
+        882.0,
+        560.0,
+        76.0
+      ],
+      "text": "Ponte das Raízes\nFase 2 · Moderada · Nível 3+ · Bloqueada"
+    },
+    {
+      "clipped": true,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Control@1172/@PanelContainer@1167/@ScrollContainer@1170/@VBoxContainer@1171/@Button@1937",
+      "rect": [
+        1320.0,
+        968.0,
+        560.0,
+        76.0
+      ],
+      "text": "Sala Esquecida\nFase 3 · Difícil · Nível 5+ · Bloqueada"
+    }
+  ]
+}

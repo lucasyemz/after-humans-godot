@@ -294,6 +294,8 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 	unit.deaths_door = hero.Hp <= 0
 	unit.sprite_key = hero.ClassId
 	unit.remaining_uses = hero.get("ExpeditionUses", {}).duplicate()
+	# O nível do herói (#90): +1 numa habilidade (como o treino da Pesquisa) e a velocidade; sem nível, nada muda.
+	unit.ability_bonus = hero.get("AbilityBonus", {}).duplicate()
 
 	var hero_class = game_data.classes.get(hero.ClassId)
 	var relic = game_data.relics.get(hero.get("RelicId", ""))
@@ -307,7 +309,8 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 		if perk != null:
 			perk_speed += perk.Speed
 	unit.max_hp = mini(200, hero.MaxHp + (relic.MaxHpBonus if relic != null else 0))
-	unit.speed = (hero_class.BaseSpeed if hero_class != null and hero_class.BaseSpeed != 0 else 2) + (relic.SpeedBonus if relic != null else 0) + perk_speed
+	unit.speed = (hero_class.BaseSpeed if hero_class != null and hero_class.BaseSpeed != 0 else 2) + (relic.SpeedBonus if relic != null else 0) + perk_speed \
+		+ int(hero.get("SpeedBonus", 0))
 	return unit
 
 
@@ -921,7 +924,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 		var ability_name: String = ability.DisplayName
 		hit_any_target = true
 		if has_damage:
-			var bonus := 1 if researched else 0
+			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0))
 			var rolled := _roll_range(ability.DamageRange.Min + bonus, ability.DamageRange.Max + bonus)
 			if random.next() < CRITICAL_CHANCE:
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)
@@ -945,7 +948,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			_log(tr("%s usou %s em %s causando %d de dano.") % [_n(user), tr(ability_name), _n(target), rolled])
 
 		if has_heal:
-			var heal_bonus := 1 if researched else 0
+			var heal_bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0))
 			var healed := mini(target.max_hp - target.hp, _roll_range(ability.HealRange.Min + heal_bonus, ability.HealRange.Max + heal_bonus))
 			target.hp = mini(target.max_hp, target.hp + healed)
 			if target.deaths_door and target.hp > 0:

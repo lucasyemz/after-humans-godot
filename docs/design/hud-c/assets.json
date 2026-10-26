@@ -1,0 +1,222 @@
+{
+  "source": "docs/design/hud-variations/skin_c.webp",
+  "source_sha256": "536a283f848f29229424bc83e851c20e93bb32c48ccf67ae6ff08516f23db2a2",
+  "originals": "outside repository",
+  "assets": {
+    "plate": {
+      "file": "art/ui/kit/v2/plate.webp",
+      "size": [
+        256,
+        64
+      ],
+      "slice_ltrb": [
+        32,
+        16,
+        32,
+        16
+      ],
+      "content": [
+        32,
+        16,
+        192,
+        32
+      ],
+      "sha256": "05aee567fc80690578bbfdcead600765c777306b9ec86e78b13586152d5179dc"
+    },
+    "primary": {
+      "file": "art/ui/kit/v2/primary.webp",
+      "size": [
+        256,
+        64
+      ],
+      "slice_ltrb": [
+        32,
+        16,
+        32,
+        16
+      ],
+      "content": [
+        32,
+        16,
+        192,
+        32
+      ],
+      "sha256": "7d44b080e04d8830834f90a6b061878afca04d9f92b8254aeb743141e8aee731"
+    },
+    "secondary": {
+      "file": "art/ui/kit/v2/secondary.webp",
+      "size": [
+        256,
+        64
+      ],
+      "slice_ltrb": [
+        32,
+        16,
+        32,
+        16
+      ],
+      "content": [
+        32,
+        16,
+        192,
+        32
+      ],
+      "sha256": "a6795a2fd8957f1a9e3eb1fa3aea53b1dbfb7fb6b901f5fbe5040fd79a07169a"
+    },
+    "slot": {
+      "file": "art/ui/kit/v2/slot.webp",
+      "size": [
+        112,
+        112
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        80,
+        80
+      ],
+      "sha256": "dee0a809b7cab87a1c1baca32cfd55d0ccb392014eecd0a6d98ba3748b4493b5"
+    },
+    "portrait": {
+      "file": "art/ui/kit/v2/portrait.webp",
+      "size": [
+        128,
+        128
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        96,
+        96
+      ],
+      "sha256": "1e961bebede917ac53a4f8e6f063235e851097c56e40f0ec428eb57e1ee04e46"
+    },
+    "action": {
+      "file": "art/ui/kit/v2/action.webp",
+      "size": [
+        88,
+        88
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        56,
+        56
+      ],
+      "sha256": "35f87fea73d4dbe7498736e34fa0021e2dbb7d0bd3469d601c7b7c97a1daf766"
+    },
+    "key": {
+      "file": "art/ui/kit/v2/key.webp",
+      "size": [
+        48,
+        48
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "sha256": "cf4ac09a6b2d09479b2c846b7f5e1e20c675a98b6e7d6d1facc1657496d40380"
+    },
+    "divider": {
+      "file": "art/ui/kit/v2/divider.webp",
+      "size": [
+        320,
+        56
+      ],
+      "slice_ltrb": null,
+      "content": [
+        16,
+        16,
+        288,
+        24
+      ],
+      "sha256": "0b56061678af105266097c8fc0de6254a7bfb4e419552a52af6ad98c8e35ab61"
+    },
+    "bar_frame": {
+      "file": "art/ui/kit/v2/bar_frame.webp",
+      "size": [
+        256,
+        48
+      ],
+      "slice_ltrb": [
+        32,
+        16,
+        32,
+        14
+      ],
+      "content": [
+        32,
+        16,
+        192,
+        18
+      ],
+      "sha256": "bea641223e13b69820ad2dce26730b691a6f9a51b865940854ead1cea5286b66"
+    },
+    "bar_glass": {
+      "file": "art/ui/kit/v2/bar_glass.webp",
+      "size": [
+        192,
+        18
+      ],
+      "slice_ltrb": null,
+      "content": [
+        0,
+        0,
+        192,
+        18
+      ],
+      "sha256": "516ebb8e4fa68f784077817c22b10af4a85d0461665839267b00935c2b374eb7"
+    },
+    "panel": {
+      "file": "art/ui/kit/v2/panel.webp",
+      "size": [
+        256,
+        160
+      ],
+      "slice_ltrb": [
+        32,
+        32,
+        32,
+        48
+      ],
+      "content": [
+        32,
+        32,
+        192,
+        80
+      ],
+      "sha256": "04fdb35ec5932e082c26e6206bf1594e58060ec59eab1f2ca640b5b4d5f125dc"
+    },
+    "panel_material": {
+      "file": "art/ui/kit/v2/panel_material.webp",
+      "size": [
+        64,
+        64
+      ],
+      "slice_ltrb": null,
+      "content": null,
+      "sha256": "68b3b01e94e815067495a28c4c1faca4cbc244c0db12a54b64fc51b083d7c2cc"
+    },
+    "exit": {
+      "file": "art/ui/kit/v2/exit.webp",
+      "size": [
+        64,
+        64
+      ],
+      "slice_ltrb": null,
+      "content": [
+        4,
+        4,
+        56,
+        56
+      ],
+      "sha256": "3f778031eb43739712b7c4c3b95372142054a062630209c2b5cd4c31056ef8a4"
+    }
+  }
+}

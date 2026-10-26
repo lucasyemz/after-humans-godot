@@ -1,0 +1,467 @@
+{
+  "issue": 82,
+  "base_commit": "e2afa4a",
+  "result": "PASS",
+  "engine": {
+    "engine": "4.7.2",
+    "poses": [
+      {
+        "hero_id": "hero_cao_bento",
+        "same_offset_as_idle": true,
+        "same_quad_as_idle": true,
+        "texture_size": [
+          543,
+          724
+        ],
+        "world_center_offset": [
+          0.0848484858870506,
+          0.854545474052429,
+          0.0
+        ],
+        "world_quad_size": [
+          1.31636369228363,
+          1.75515151023865
+        ]
+      },
+      {
+        "hero_id": "hero_gato_nick",
+        "same_offset_as_idle": true,
+        "same_quad_as_idle": true,
+        "texture_size": [
+          589,
+          668
+        ],
+        "world_center_offset": [
+          0.120119519531727,
+          0.739243030548096,
+          0.0
+        ],
+        "world_quad_size": [
+          1.4079681634903,
+          1.5956175327301
+        ]
+      },
+      {
+        "hero_id": "hero_sapo_iris",
+        "same_offset_as_idle": true,
+        "same_quad_as_idle": true,
+        "texture_size": [
+          589,
+          668
+        ],
+        "world_center_offset": [
+          0.00171357626095414,
+          0.681432127952576,
+          0.0
+        ],
+        "world_quad_size": [
+          1.34572851657867,
+          1.52508282661438
+        ]
+      },
+      {
+        "hero_id": "hero_coruja_vespera",
+        "same_offset_as_idle": true,
+        "same_quad_as_idle": true,
+        "texture_size": [
+          589,
+          668
+        ],
+        "world_center_offset": [
+          0.180236041545868,
+          0.822163701057434,
+          0.0
+        ],
+        "world_quad_size": [
+          1.53853666782379,
+          1.74358773231506
+        ]
+      }
+    ],
+    "result": "PASS"
+  },
+  "assets": [
+    {
+      "file": "art/camp/bento_seat_floor.webp",
+      "bytes": 81844,
+      "sha256": "1c2d607419b95d3586e52b33510b1f0fa58cd4b7d7242735769a26789740b548",
+      "canvas": [
+        543,
+        724
+      ],
+      "alpha_bbox": [
+        22,
+        246,
+        451,
+        714
+      ],
+      "strong_alpha_components": 1,
+      "touching_border": false,
+      "same_original_idle_metrics": true
+    },
+    {
+      "file": "art/camp/nick_seat_floor.webp",
+      "bytes": 60224,
+      "sha256": "bcd2e5d03dd5caa8df9361b7ddff75232f950a6a1210d8d23013b9a072dcd0f4",
+      "canvas": [
+        589,
+        668
+      ],
+      "alpha_bbox": [
+        8,
+        259,
+        480,
+        643
+      ],
+      "strong_alpha_components": 1,
+      "touching_border": false,
+      "same_original_idle_metrics": true
+    },
+    {
+      "file": "art/camp/iris_seat_floor.webp",
+      "bytes": 86514,
+      "sha256": "5cc1ff6ab8a2407dad8351ded414109b949f014a2eaf24ec9d90584990653f12",
+      "canvas": [
+        589,
+        668
+      ],
+      "alpha_bbox": [
+        32,
+        251,
+        555,
+        632
+      ],
+      "strong_alpha_components": 1,
+      "touching_border": false,
+      "same_original_idle_metrics": true
+    },
+    {
+      "file": "art/camp/vespera_seat_floor.webp",
+      "bytes": 89780,
+      "sha256": "f7e6a6c6313b2c12e8eeaca7876cb7b393db372b1acb5b170de009a403a5307d",
+      "canvas": [
+        589,
+        668
+      ],
+      "alpha_bbox": [
+        8,
+        230,
+        521,
+        649
+      ],
+      "strong_alpha_components": 1,
+      "touching_border": false,
+      "same_original_idle_metrics": true
+    }
+  ],
+  "layouts": {
+    "founders": {
+      "pixels_per_meter": 260,
+      "pairs": [
+        {
+          "a": "hero_cao_bento",
+          "b": "hero_coruja_vespera",
+          "disjoint": true
+        },
+        {
+          "a": "hero_cao_bento",
+          "b": "hero_gato_nick",
+          "disjoint": true
+        },
+        {
+          "a": "hero_cao_bento",
+          "b": "hero_sapo_iris",
+          "disjoint": true
+        },
+        {
+          "a": "hero_coruja_vespera",
+          "b": "hero_gato_nick",
+          "disjoint": true
+        },
+        {
+          "a": "hero_coruja_vespera",
+          "b": "hero_sapo_iris",
+          "disjoint": true
+        },
+        {
+          "a": "hero_gato_nick",
+          "b": "hero_sapo_iris",
+          "disjoint": true
+        }
+      ]
+    },
+    "mixed": {
+      "pixels_per_meter": 260,
+      "pairs": [
+        {
+          "a": "hero_cao_bento",
+          "b": "owl_recruit_01",
+          "disjoint": true
+        },
+        {
+          "a": "hero_cao_bento",
+          "b": "cat_recruit_01",
+          "disjoint": true
+        },
+        {
+          "a": "hero_cao_bento",
+          "b": "hero_sapo_iris",
+          "disjoint": true
+        },
+        {
+          "a": "owl_recruit_01",
+          "b": "cat_recruit_01",
+          "disjoint": true
+        },
+        {
+          "a": "owl_recruit_01",
+          "b": "hero_sapo_iris",
+          "disjoint": true
+        },
+        {
+          "a": "cat_recruit_01",
+          "b": "hero_sapo_iris",
+          "disjoint": true
+        }
+      ]
+    }
+  },
+  "sleep_reused_unchanged": [
+    {
+      "hero_id": "hero_cao_bento",
+      "show_art": {
+        "file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          445,
+          336
+        ],
+        "body_reference_pixels": 863
+      },
+      "decision": "reuse_unchanged",
+      "sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2"
+    },
+    {
+      "hero_id": "hero_gato_nick",
+      "show_art": {
+        "file": "res://art/station/poses/hero_gato_nick_sleep.webp",
+        "canvas": [
+          892,
+          441
+        ],
+        "anchor": [
+          446,
+          366
+        ],
+        "body_reference_pixels": 862
+      },
+      "decision": "reuse_unchanged",
+      "sha256": "d974d4131d5ccd7f278af044d4b967da38ae6caac764ab36a8b1bf218b4ac010"
+    },
+    {
+      "hero_id": "hero_sapo_iris",
+      "show_art": {
+        "file": "res://art/station/poses/hero_sapo_iris_sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          444,
+          369
+        ],
+        "body_reference_pixels": 854
+      },
+      "decision": "reuse_unchanged",
+      "sha256": "964932294edb16d70219455c1e2b0e20f62b15e156034957d36a19b304585aeb"
+    },
+    {
+      "hero_id": "hero_coruja_vespera",
+      "show_art": {
+        "file": "res://art/station/poses/hero_coruja_vespera_sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          447,
+          410
+        ],
+        "body_reference_pixels": 837
+      },
+      "decision": "reuse_unchanged",
+      "sha256": "4afd526ac19aa311b1573c2e6583938bd63723ed96b45576dc5499d6bd201f64"
+    }
+  ],
+  "superseded_crates": true,
+  "previews": [
+    {
+      "file": "docs/design/camp/founder_floor_effects.jpg",
+      "bytes": 278509,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/founder_floor_effects_40.jpg",
+      "bytes": 79089,
+      "size": [
+        768,
+        432
+      ]
+    },
+    {
+      "file": "docs/design/camp/founder_floor_effects_gray.jpg",
+      "bytes": 264423,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/founder_scale_bento_nick.jpg",
+      "bytes": 115793,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/founder_scale_iris_vespera.jpg",
+      "bytes": 134279,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/founder_sleep_floor_review.jpg",
+      "bytes": 79752,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/founders_floor_before_after.jpg",
+      "bytes": 249268,
+      "size": [
+        1920,
+        624
+      ]
+    },
+    {
+      "file": "docs/design/camp/founders_floor_street.jpg",
+      "bytes": 263885,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/founders_floor_street_40.jpg",
+      "bytes": 101321,
+      "size": [
+        768,
+        432
+      ]
+    },
+    {
+      "file": "docs/design/camp/founders_floor_street_gray.jpg",
+      "bytes": 280000,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/founders_floor_tunnel.jpg",
+      "bytes": 286433,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/founders_floor_tunnel_40.jpg",
+      "bytes": 83490,
+      "size": [
+        768,
+        432
+      ]
+    },
+    {
+      "file": "docs/design/camp/founders_floor_tunnel_gray.jpg",
+      "bytes": 268914,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/mixed_floor_street.jpg",
+      "bytes": 267655,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/mixed_floor_street_40.jpg",
+      "bytes": 102281,
+      "size": [
+        768,
+        432
+      ]
+    },
+    {
+      "file": "docs/design/camp/mixed_floor_street_gray.jpg",
+      "bytes": 284132,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/mixed_floor_tunnel.jpg",
+      "bytes": 290783,
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "file": "docs/design/camp/mixed_floor_tunnel_40.jpg",
+      "bytes": 84380,
+      "size": [
+        768,
+        432
+      ]
+    },
+    {
+      "file": "docs/design/camp/mixed_floor_tunnel_gray.jpg",
+      "bytes": 272880,
+      "size": [
+        1920,
+        1080
+      ]
+    }
+  ],
+  "negative_control_founder_anchor_rejected": true,
+  "tests": {
+    "engine": "4.7.2",
+    "passed": 40,
+    "total": 40,
+    "parity": [
+      48,
+      48
+    ],
+    "exit_code": 0,
+    "elapsed_ms": 118324,
+    "shutdown_resource_warnings": true
+  }
+}

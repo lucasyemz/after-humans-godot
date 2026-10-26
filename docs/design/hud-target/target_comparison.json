@@ -1,0 +1,95 @@
+{
+  "reference_measures": "hud-direction.md; approximate approved-target boxes",
+  "pieces": {
+    "register": {
+      "reference": [
+        46,
+        34,
+        270,
+        58
+      ],
+      "delivery": [
+        46,
+        32,
+        272,
+        64
+      ]
+    },
+    "round": {
+      "reference": [
+        637,
+        30,
+        718,
+        64
+      ],
+      "delivery": [
+        636,
+        30,
+        720,
+        64
+      ]
+    },
+    "hero": {
+      "reference": [
+        63,
+        836,
+        563,
+        209
+      ],
+      "delivery": [
+        64,
+        836,
+        564,
+        212
+      ]
+    },
+    "ability_header": {
+      "reference": [
+        685,
+        852,
+        618,
+        49
+      ],
+      "delivery": [
+        684,
+        852,
+        624,
+        56
+      ]
+    },
+    "slots": {
+      "reference": [
+        685,
+        913,
+        132,
+        126
+      ],
+      "delivery": [
+        688,
+        916,
+        132,
+        132
+      ]
+    },
+    "actions": {
+      "reference": [
+        1584,
+        847,
+        264,
+        200
+      ],
+      "delivery": [
+        1584,
+        836,
+        264,
+        212
+      ],
+      "reason": "128x100 visual buttons;112px vertical pitch allows112-high touch targets without overlap"
+    }
+  },
+  "explicit_exceptions": [
+    "F uses exit instead of the crosshair in target",
+    "Canonical game portraits/body art retained",
+    "Initiative and current actor from actual captured session; not duplicated generated portraits"
+  ]
+}

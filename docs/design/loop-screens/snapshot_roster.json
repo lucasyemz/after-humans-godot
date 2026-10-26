@@ -1,0 +1,92 @@
+[
+	{
+		"alive": true,
+		"art_variant": "",
+		"class_id": "cao",
+		"completed_expeditions": 0,
+		"crisis_outcome": "none",
+		"display_name": "Bento",
+		"expedition_uses": {},
+		"expeditions_count": 0,
+		"hp": 34,
+		"id": "hero_cao_bento",
+		"instinct": 0,
+		"kills_count": 0,
+		"max_hp": 34,
+		"perks": [
+			"loyal",
+			"machine-fear",
+			"gloomy"
+		],
+		"relic_id": "",
+		"trainings": [],
+		"trauma": false
+	},
+	{
+		"alive": true,
+		"art_variant": "",
+		"class_id": "gato",
+		"completed_expeditions": 0,
+		"crisis_outcome": "none",
+		"display_name": "Nick",
+		"expedition_uses": {},
+		"expeditions_count": 0,
+		"hp": 24,
+		"id": "hero_gato_nick",
+		"instinct": 0,
+		"kills_count": 0,
+		"max_hp": 24,
+		"perks": [
+			"brave",
+			"machine-fear"
+		],
+		"relic_id": "",
+		"trainings": [],
+		"trauma": false
+	},
+	{
+		"alive": true,
+		"art_variant": "",
+		"class_id": "sapo",
+		"completed_expeditions": 0,
+		"crisis_outcome": "none",
+		"display_name": "Íris",
+		"expedition_uses": {},
+		"expeditions_count": 0,
+		"hp": 23,
+		"id": "hero_sapo_iris",
+		"instinct": 0,
+		"kills_count": 0,
+		"max_hp": 23,
+		"perks": [
+			"agile",
+			"gloomy",
+			"machine-fear"
+		],
+		"relic_id": "",
+		"trainings": [],
+		"trauma": false
+	},
+	{
+		"alive": true,
+		"art_variant": "",
+		"class_id": "coruja",
+		"completed_expeditions": 0,
+		"crisis_outcome": "none",
+		"display_name": "Véspera",
+		"expedition_uses": {},
+		"expeditions_count": 0,
+		"hp": 30,
+		"id": "hero_coruja_vespera",
+		"instinct": 0,
+		"kills_count": 0,
+		"max_hp": 30,
+		"perks": [
+			"agile",
+			"gloomy"
+		],
+		"relic_id": "",
+		"trainings": [],
+		"trauma": false
+	}
+]

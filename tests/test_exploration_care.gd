@@ -8,7 +8,28 @@ const C = preload("res://scripts/flow/exploration_care.gd")
 
 func run(t) -> void:
 	_exploration(t)
+	_camp(t)
 	_combat(t)
+
+
+## No acampamento, comer pouco pela Mochila é o mesmo da barra (decisão do Lucas, #98): +10% da vida e -5 de instinto.
+func _camp(t) -> void:
+	var campaign := _campaign(56)
+	campaign.session.screen = "rest"
+	campaign.session.expedition.food = 4
+	var target: Dictionary = campaign.roster[0]
+	var max_hp: int = target.max_hp
+	var q := C.quote(campaign, target.id, C.SMALL_MEAL)
+	t.equal(q.heal_min, R.camp_meal_heal(max_hp), "no acampamento a Mochila cota os 10% da barra")
+	t.equal(q.instinct, -R.CAMP_MEAL_INSTINCT, "e os -5 de instinto")
+	C.use(campaign, target.id, C.SMALL_MEAL)
+	t.equal(target.hp, 1 + R.camp_meal_heal(max_hp), "cura 10% da vida")
+	t.equal(target.instinct, 30 - R.CAMP_MEAL_INSTINCT, "tira 5 de instinto")
+	target.hp = max_hp
+	t.check(C.quote(campaign, target.id, C.SMALL_MEAL).available, "com a vida cheia, ainda come para baixar o instinto, como na barra")
+	target.instinct = 0
+	t.check(not C.quote(campaign, target.id, C.SMALL_MEAL).available, "com a vida cheia e sem instinto, não gasta comida")
+	t.equal(C.quote(campaign, target.id, C.FULL_MEAL).instinct, 0, "comer bem não muda no acampamento")
 
 
 func _campaign(seed_value: int) -> Dictionary:

@@ -1,0 +1,313 @@
+{
+  "name": "station-depot",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1102",
+      "rect": [
+        32.0,
+        18.0,
+        251.0,
+        50.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1103",
+      "rect": [
+        34.0,
+        66.0,
+        172.0,
+        23.0
+      ],
+      "text": "Ciclo 0 · 4 no elenco"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@2029/@HBoxContainer@2016/@HBoxContainer@2019/@Label@2018",
+      "rect": [
+        1032.0,
+        37.0,
+        26.0,
+        25.0
+      ],
+      "text": "30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@2029/@HBoxContainer@2016/@HBoxContainer@2022/@Label@2021",
+      "rect": [
+        1101.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "9"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@2029/@HBoxContainer@2016/@HBoxContainer@2025/@Label@2024",
+      "rect": [
+        1156.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@2029/@HBoxContainer@2016/@HBoxContainer@2028/@Label@2027",
+      "rect": [
+        1211.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2035/@VBoxContainer@2031/@Label@2032",
+      "rect": [
+        1299.0,
+        16.0,
+        195.0,
+        20.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2035/@VBoxContainer@2031/@Label@2033",
+      "rect": [
+        1299.0,
+        36.0,
+        195.0,
+        28.0
+      ],
+      "text": "0 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2035/@VBoxContainer@2031/@Label@2034",
+      "rect": [
+        1299.0,
+        64.0,
+        195.0,
+        20.0
+      ],
+      "text": "! Falta na volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2041/@VBoxContainer@2037/@Label@2038",
+      "rect": [
+        1558.0,
+        16.0,
+        144.0,
+        20.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2041/@VBoxContainer@2037/@Label@2039",
+      "rect": [
+        1558.0,
+        36.0,
+        144.0,
+        28.0
+      ],
+      "text": "6 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2041/@VBoxContainer@2037/@Label@2040",
+      "rect": [
+        1558.0,
+        64.0,
+        144.0,
+        20.0
+      ],
+      "text": "Próxima volta: 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2047/@VBoxContainer@2043/@Label@2044",
+      "rect": [
+        1766.0,
+        16.0,
+        122.0,
+        20.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2047/@VBoxContainer@2043/@Label@2045",
+      "rect": [
+        1766.0,
+        36.0,
+        122.0,
+        28.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@2047/@VBoxContainer@2043/@Label@2046",
+      "rect": [
+        1766.0,
+        64.0,
+        122.0,
+        20.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1114",
+      "rect": [
+        32.0,
+        1000.0,
+        190.0,
+        48.0
+      ],
+      "text": "‹ Vista geral"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1115",
+      "rect": [
+        230.0,
+        1000.0,
+        150.0,
+        48.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1116",
+      "rect": [
+        388.0,
+        1000.0,
+        170.0,
+        48.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2050",
+      "rect": [
+        1230.0,
+        124.0,
+        636.0,
+        39.0
+      ],
+      "text": "Depósito"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2051",
+      "rect": [
+        1230.0,
+        173.0,
+        636.0,
+        23.0
+      ],
+      "text": "Nível 1"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2052",
+      "rect": [
+        1230.0,
+        206.0,
+        636.0,
+        25.0
+      ],
+      "text": "Guarda até 12 suprimentos; o excesso estraga na volta."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Button@2053",
+      "rect": [
+        1230.0,
+        241.0,
+        636.0,
+        48.0
+      ],
+      "text": "Melhorar (5 sucatas e 1 fragmento)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2055",
+      "rect": [
+        1230.0,
+        315.0,
+        636.0,
+        28.0
+      ],
+      "text": "Estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2056",
+      "rect": [
+        1230.0,
+        353.0,
+        636.0,
+        25.0
+      ],
+      "text": "Suprimentos: 0 de 12"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2057",
+      "rect": [
+        1230.0,
+        388.0,
+        636.0,
+        25.0
+      ],
+      "text": "Curativos: 2 · Sementes: 30 · Sucata: 9 · Fragmentos: 3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2058",
+      "rect": [
+        1230.0,
+        423.0,
+        636.0,
+        25.0
+      ],
+      "text": "Água: 6"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2059",
+      "rect": [
+        1230.0,
+        458.0,
+        636.0,
+        25.0
+      ],
+      "text": "Relíquias no estoque: nenhuma"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@2060",
+      "rect": [
+        1230.0,
+        493.0,
+        636.0,
+        25.0
+      ],
+      "text": "Ferramentas: nenhuma"
+    }
+  ]
+}

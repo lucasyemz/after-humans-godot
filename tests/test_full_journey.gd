@@ -98,6 +98,16 @@ func _station_to_departure() -> bool:
 	t.equal(hud._draft.get("phase", ""), "fase_1", "a Preparação continua com a fase 1")
 	if not await _press(hud, "Partir", "o botão Partir da Preparação"):
 		return false
+	# O briefing (#88): as falas de quem pede, passadas com Próximo, e Partir na última.
+	if not await _until(func(): return hud.briefing_open(), "o briefing abrir"):
+		return false
+	var lines: int = hud.briefing.lines.size()
+	t.check(lines >= 2 and lines <= 3, "o briefing tem duas ou três falas (%d)" % lines)
+	for i in lines - 1:
+		if not await _press(hud.briefing, "Próximo", "Próximo no briefing"):
+			return false
+	if not await _press(hud.briefing, "Partir", "Partir na última fala do briefing"):
+		return false
 	if not await _until(func(): return _street() != null and _street().corridor != null and not GameFlow.busy, "a rua abrir depois da partida"):
 		return false
 	var expedition = Campaign.state.session.expedition
@@ -141,6 +151,9 @@ func _journey() -> bool:
 			return false
 		if not await _auto_fight(street):
 			return false
+	# A carga recuperada do guardião (#91): escolhe a primeira caixa e continua.
+	if not await _choose_cargo(street):
+		return false
 	var fought: int = route.steps.filter(func(s): return (s.type == "combat" or s.type == "boss") and s.resolved).size()
 	t.equal(fought, 5, "a jornada venceu as 4 patrulhas e o guardião")
 	t.check(route.steps[9].resolved, "o guardião (trecho 10) ficou vencido")
@@ -243,6 +256,19 @@ func _answer_modal(street) -> bool:
 	return await _until(func(): return not hud.modal_open(), "o painel da exploração fechar")
 
 
+func _choose_cargo(street) -> bool:
+	var find := func(): return street.exploration_hud.find_children("CargoPicker", "AHCargoPicker", true, false)
+	if not await _until(func(): return not find.call().is_empty(), "a carga recuperada abrir"):
+		return false
+	var picker: AHCargoPicker = find.call()[0]
+	picker.buttons[0].pressed.emit()
+	if not await _until(func(): return picker.continue_button.visible, "o Continuar da carga aparecer"):
+		return false
+	picker.continue_button.pressed.emit()
+	await _frames(3)
+	return await _until(func(): return not street.corridor.blocking(), "a carga fechar")
+
+
 # ---------------------------------------------------------------- volta e relatório
 
 func _return_report() -> bool:
@@ -259,7 +285,7 @@ func _return_report() -> bool:
 	t.equal(Campaign.state.session.expedition, null, "a volta fechou a expedição")
 	var delivered: Dictionary = Campaign.state.station.last_return
 	t.check(int(delivered.get("seeds", 0)) > 0, "a vitória entrega sementes (%d)" % int(delivered.get("seeds", 0)))
-	t.check(_has_label(street.exploration_hud, "Chegou à Estação: %d sementes" % int(delivered.get("seeds", 0))), "o resultado mostra o achado")
+	t.check(_has_label(street.exploration_hud, "Chegou à Estação") and _has_label(street.exploration_hud, "%d sementes" % int(delivered.get("seeds", 0))), "o resultado mostra o achado")
 	t.check(Campaign.state.completed_phases.has("fase_1"), "a fase 1 ficou concluída")
 	if not await _press(street.exploration_hud, "Voltar à Estação", "Voltar à Estação no resultado"):
 		return false
@@ -267,7 +293,21 @@ func _return_report() -> bool:
 		return false
 	var hud: AHRefugeHud = _station().hud
 	await _frames(3)
-	t.equal(hud.current, "report", "a volta abre o relatório na plataforma")
+	# A chegada (#76): o trem chega com a equipe, os vivos descem e andam até a fila; depois, o relatório.
+	t.equal(hud.current, AHRefugeHud.ARRIVAL, "a volta começa com a chegada da equipe de trem")
+	t.check(_station().team_arriving(), "o trem chega com a equipe")
+	var alive: Array = Campaign.state.station.last_return.get("team", []).filter(func(id): return Campaign.hero(id) != null and Campaign.hero(id).alive)
+	if not await _until(func(): return _station().lineup.size() == alive.size(), "a equipe descer do trem"):
+		return false
+	# O debriefing (#88): uma fala na plataforma antes do relatório.
+	if not await _until(func(): return hud.briefing_open(), "o debriefing abrir depois da chegada", 30.0):
+		return false
+	t.equal(hud.current, AHRefugeHud.ARRIVAL, "o relatório espera o debriefing")
+	if not await _press(hud.briefing, "Ver o relatório", "Ver o relatório no debriefing"):
+		return false
+	if not await _until(func(): return hud.current == "report", "o relatório abrir depois da chegada", 30.0):
+		return false
+	t.equal(_station().lineup.map(func(e): return e.hero_id), alive, "os que voltaram estão na fila do relatório")
 	var report: Dictionary = Campaign.state.station.last_return
 	t.equal(report.get("result", ""), "victory", "o relatório é de vitória")
 	t.equal(report.get("phase_id", ""), "fase_1", "o relatório é da fase 1")
@@ -275,11 +315,19 @@ func _return_report() -> bool:
 	if not await _press(hud, "Entrar no abrigo", "Entrar no abrigo no relatório"):
 		return false
 	t.check(Campaign.state.station.last_return.get("seen", false), "o relatório fica visto")
-	if not await _until(func(): return hud.current == S.DORMITORY, "o Dormitório abrir depois do relatório"):
+	# Depois do relatório, a vista geral: o Próximo passo diz que a equipe precisa dormir, o Dormitório em destaque e
+	# Preparar expedição bloqueado com o motivo (#76).
+	if not await _until(func(): return hud.current == "", "a vista geral depois do relatório"):
 		return false
+	await _frames(3)
+	t.equal(hud._next.get("action", ""), "dormitory", "o Próximo passo leva ao Dormitório")
+	t.check(hud._next_text.text.contains("precisa dormir"), "o Próximo passo diz que a equipe precisa dormir")
+	var blocked: Button = hud.find_child("PrepareBlocked", true, false)
+	t.check(blocked != null and blocked.disabled and blocked.is_visible_in_tree(), "Preparar expedição fica bloqueado")
+	t.check(_has_label(hud, S.preparation_block(Campaign.state)), "com o motivo embaixo")
+	# A câmera volta da plataforma para o abrigo pela passagem; chegando, o Dormitório aparece em destaque.
+	t.check(await _until(func(): return hud._rest_tag.visible, "o Dormitório em destaque", 15.0), "o Dormitório fica em destaque")
 	# Com a noite pendente, Preparar expedição não parte: a Preparação diz o motivo e leva ao Dormitório.
-	hud.close_panel()
-	await _frames(2)
 	hud.open_map()
 	await _frames(2)
 	t.check(not hud._map.visible and hud.current == S.PREPARATION, "com a noite pendente, Preparar expedição abre a Preparação, não o mapa")
@@ -387,7 +435,7 @@ func _press(root: Node, prefix: String, what: String) -> bool:
 	var target: Array = []
 	var found: bool = await _until(func():
 		for button in _buttons(root):
-			if button.is_visible_in_tree() and not button.disabled and button.text.begins_with(prefix):
+			if button.is_visible_in_tree() and not button.disabled and button.text.to_lower().begins_with(prefix.to_lower()):
 				target.append(button)
 				return true
 		return false, what)

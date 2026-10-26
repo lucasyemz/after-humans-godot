@@ -1,0 +1,709 @@
+{
+  "name": "combat-area-target",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@354/@VBoxContainer@353/Top/Name",
+      "rect": [
+        1504.1220703125,
+        628.0,
+        230.0,
+        28.0
+      ],
+      "text": "Emissor de Comando"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@354/@VBoxContainer@353/HpRow/HpText",
+      "rect": [
+        1701.1220703125,
+        659.0,
+        33.0,
+        26.0
+      ],
+      "text": "6/6"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@354/@VBoxContainer@353/IntentRow/Intent",
+      "rect": [
+        1539.1220703125,
+        688.0,
+        195.0,
+        84.0
+      ],
+      "text": "Ordem Contraditória → um de 3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@352/@VBoxContainer@351/Top/Name",
+      "rect": [
+        1249.28405761719,
+        657.0,
+        230.0,
+        28.0
+      ],
+      "text": "Recreador"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@352/@VBoxContainer@351/HpRow/HpText",
+      "rect": [
+        1445.28405761719,
+        688.0,
+        34.0,
+        26.0
+      ],
+      "text": "8/8"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@352/@VBoxContainer@351/IntentRow/Intent",
+      "rect": [
+        1284.28405761719,
+        717.0,
+        195.0,
+        55.0
+      ],
+      "text": "Pega-Pega → um de 3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@350/@VBoxContainer@349/Top/Name",
+      "rect": [
+        212.177062988281,
+        708.0,
+        160.0,
+        28.0
+      ],
+      "text": "Véspera"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@350/@VBoxContainer@349/HpRow/HpText",
+      "rect": [
+        309.177062988281,
+        739.0,
+        63.0,
+        26.0
+      ],
+      "text": "30/30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@348/@VBoxContainer@347/Top/Name",
+      "rect": [
+        441.972412109375,
+        708.0,
+        160.0,
+        28.0
+      ],
+      "text": "Íris"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@348/@VBoxContainer@347/HpRow/HpText",
+      "rect": [
+        544.972412109375,
+        739.0,
+        57.0,
+        26.0
+      ],
+      "text": "23/23"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@346/@VBoxContainer@345/Top/Name",
+      "rect": [
+        672.8818359375,
+        677.0,
+        160.0,
+        28.0
+      ],
+      "text": "Nick"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@346/@VBoxContainer@345/HpRow/HpText",
+      "rect": [
+        774.8818359375,
+        708.0,
+        58.0,
+        26.0
+      ],
+      "text": "24/24"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@346/@VBoxContainer@345/Status/@PanelContainer@498/@HBoxContainer@497/Count",
+      "rect": [
+        706.8818359375,
+        746.0,
+        9.0,
+        26.0
+      ],
+      "text": "1"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@344/@VBoxContainer@343/Top/Name",
+      "rect": [
+        904.914306640625,
+        708.0,
+        160.0,
+        28.0
+      ],
+      "text": "Bento"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@344/@VBoxContainer@343/HpRow/HpText",
+      "rect": [
+        1005.91430664062,
+        739.0,
+        59.0,
+        26.0
+      ],
+      "text": "34/34"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@63/@HBoxContainer@64/@Label@499",
+      "rect": [
+        665.5,
+        54.0,
+        109.0,
+        28.0
+      ],
+      "text": "RODADA 1"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@63/@HBoxContainer@64/@VBoxContainer@502/@Label@501",
+      "rect": [
+        786.5,
+        92.0,
+        105.0,
+        27.0
+      ],
+      "text": "Íris · agora"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@63/@HBoxContainer@64/@VBoxContainer@505/@Label@504",
+      "rect": [
+        903.5,
+        74.0,
+        76.0,
+        26.0
+      ],
+      "text": "Emissor"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@63/@HBoxContainer@64/@VBoxContainer@508/@Label@507",
+      "rect": [
+        991.5,
+        74.0,
+        59.0,
+        26.0
+      ],
+      "text": "Bento"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@63/@HBoxContainer@64/@VBoxContainer@511/@Label@510",
+      "rect": [
+        1062.5,
+        74.0,
+        101.0,
+        26.0
+      ],
+      "text": "Recreador"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@63/@HBoxContainer@64/@VBoxContainer@514/@Label@513",
+      "rect": [
+        1175.5,
+        74.0,
+        79.0,
+        26.0
+      ],
+      "text": "Véspera"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@66/@VBoxContainer@67/@Label@68",
+      "rect": [
+        1488.0,
+        142.0,
+        392.0,
+        26.0
+      ],
+      "text": "REGISTRO · L abre"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@66/@VBoxContainer@67/@Label@69",
+      "rect": [
+        1488.0,
+        172.0,
+        392.0,
+        63.0
+      ],
+      "text": "Nick assumiu postura defensiva (+1 Bloqueio)."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@HBoxContainer@72/@VBoxContainer@74/@Label@75",
+      "rect": [
+        162.0,
+        800.0,
+        242.0,
+        54.0
+      ],
+      "text": "Íris"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@HBoxContainer@72/@VBoxContainer@74/@Label@76",
+      "rect": [
+        162.0,
+        858.0,
+        242.0,
+        30.0
+      ],
+      "text": "Vida 23/23"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@HBoxContainer@72/@VBoxContainer@74/@Label@78",
+      "rect": [
+        162.0,
+        910.0,
+        242.0,
+        57.0
+      ],
+      "text": "Instinto 0/200 · em 200, crise"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@Label@82",
+      "rect": [
+        422.0,
+        800.0,
+        1214.0,
+        30.0
+      ],
+      "text": "Escolha o alvo: clique no personagem e clique de novo para usar (Enter usa; Backspace ou B volta)."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@536/@HBoxContainer@515/@VBoxContainer@517/@Label@518",
+      "rect": [
+        500.0,
+        844.0,
+        184.0,
+        30.0
+      ],
+      "text": "Carga Voltaica"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@536/@HBoxContainer@515/@VBoxContainer@517/@HBoxContainer@521/@Label@519",
+      "rect": [
+        500.0,
+        876.0,
+        58.0,
+        40.0
+      ],
+      "text": "4–7"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@536/@HBoxContainer@515/@VBoxContainer@517/@HBoxContainer@521/@Label@520",
+      "rect": [
+        564.0,
+        890.0,
+        50.0,
+        26.0
+      ],
+      "text": "dano"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@536/@HBoxContainer@515/@VBoxContainer@517/@HBoxContainer@527/@Label@522",
+      "rect": [
+        500.0,
+        918.0,
+        24.0,
+        23.0
+      ],
+      "text": "de"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@536/@HBoxContainer@515/@VBoxContainer@517/@HBoxContainer@533/@Label@528",
+      "rect": [
+        500.0,
+        943.0,
+        28.0,
+        23.0
+      ],
+      "text": "em"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@536/@PanelContainer@535/@Label@534",
+      "rect": [
+        710.0,
+        844.0,
+        9.0,
+        26.0
+      ],
+      "text": "1"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@558/@HBoxContainer@537/@VBoxContainer@539/@Label@540",
+      "rect": [
+        806.0,
+        844.0,
+        184.0,
+        63.0
+      ],
+      "text": "Coquetel Corrosivo"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@558/@HBoxContainer@537/@VBoxContainer@539/@HBoxContainer@543/@Label@541",
+      "rect": [
+        806.0,
+        909.0,
+        59.0,
+        40.0
+      ],
+      "text": "2–4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@558/@HBoxContainer@537/@VBoxContainer@539/@HBoxContainer@543/@Label@542",
+      "rect": [
+        871.0,
+        923.0,
+        50.0,
+        26.0
+      ],
+      "text": "dano"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@558/@HBoxContainer@537/@VBoxContainer@539/@HBoxContainer@549/@Label@544",
+      "rect": [
+        806.0,
+        951.0,
+        24.0,
+        23.0
+      ],
+      "text": "de"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@558/@HBoxContainer@537/@VBoxContainer@539/@HBoxContainer@555/@Label@550",
+      "rect": [
+        806.0,
+        976.0,
+        28.0,
+        23.0
+      ],
+      "text": "em"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@558/@PanelContainer@557/@Label@556",
+      "rect": [
+        1016.0,
+        844.0,
+        12.0,
+        26.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@581/@HBoxContainer@559/@VBoxContainer@561/@Label@562",
+      "rect": [
+        1112.0,
+        844.0,
+        184.0,
+        63.0
+      ],
+      "text": "Ampola de Reparo Vivo"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@581/@HBoxContainer@559/@VBoxContainer@561/@HBoxContainer@565/@Label@563",
+      "rect": [
+        1112.0,
+        909.0,
+        79.0,
+        40.0
+      ],
+      "text": "+5–8"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@581/@HBoxContainer@559/@VBoxContainer@561/@HBoxContainer@565/@Label@564",
+      "rect": [
+        1197.0,
+        923.0,
+        42.0,
+        26.0
+      ],
+      "text": "cura"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@581/@HBoxContainer@559/@VBoxContainer@561/@HBoxContainer@571/@Label@566",
+      "rect": [
+        1112.0,
+        951.0,
+        24.0,
+        23.0
+      ],
+      "text": "de"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@581/@HBoxContainer@559/@VBoxContainer@561/@HBoxContainer@577/@Label@572",
+      "rect": [
+        1112.0,
+        976.0,
+        28.0,
+        23.0
+      ],
+      "text": "em"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@581/@HBoxContainer@559/@VBoxContainer@561/@Label@578",
+      "rect": [
+        1112.0,
+        1001.0,
+        184.0,
+        23.0
+      ],
+      "text": "3 uso(s)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@581/@PanelContainer@580/@Label@579",
+      "rect": [
+        1322.0,
+        844.0,
+        13.0,
+        26.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@601/@HBoxContainer@582/@VBoxContainer@584/@Label@585",
+      "rect": [
+        1418.0,
+        844.0,
+        184.0,
+        63.0
+      ],
+      "text": "Antídoto de Campo"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@601/@HBoxContainer@582/@VBoxContainer@584/@HBoxContainer@591/@Label@586",
+      "rect": [
+        1418.0,
+        909.0,
+        24.0,
+        23.0
+      ],
+      "text": "de"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@601/@HBoxContainer@582/@VBoxContainer@584/@HBoxContainer@597/@Label@592",
+      "rect": [
+        1418.0,
+        934.0,
+        28.0,
+        23.0
+      ],
+      "text": "em"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@601/@HBoxContainer@582/@VBoxContainer@584/@Label@598",
+      "rect": [
+        1418.0,
+        959.0,
+        184.0,
+        23.0
+      ],
+      "text": "2 uso(s)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@81/@HBoxContainer@83/@Button@601/@PanelContainer@600/@Label@599",
+      "rect": [
+        1628.0,
+        844.0,
+        14.0,
+        26.0
+      ],
+      "text": "4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@84/@Button@87",
+      "rect": [
+        1654.0,
+        800.0,
+        236.0,
+        56.0
+      ],
+      "text": "Mover"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@84/@Button@87/@PanelContainer@86/@Label@85",
+      "rect": [
+        1877.0,
+        818.5,
+        18.0,
+        26.0
+      ],
+      "text": "Q"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@84/@Button@90",
+      "rect": [
+        1654.0,
+        862.0,
+        236.0,
+        56.0
+      ],
+      "text": "Defender"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@84/@Button@90/@PanelContainer@89/@Label@88",
+      "rect": [
+        1874.0,
+        880.5,
+        21.0,
+        26.0
+      ],
+      "text": "W"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@84/@Button@93",
+      "rect": [
+        1654.0,
+        924.0,
+        236.0,
+        56.0
+      ],
+      "text": "Mochila · 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@84/@Button@93/@PanelContainer@92/@Label@91",
+      "rect": [
+        1885.0,
+        942.5,
+        6.0,
+        26.0
+      ],
+      "text": "I"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@84/@Button@96",
+      "rect": [
+        1654.0,
+        986.0,
+        236.0,
+        56.0
+      ],
+      "text": "Fugir"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@70/@HBoxContainer@71/@VBoxContainer@84/@Button@96/@PanelContainer@95/@Label@94",
+      "rect": [
+        1881.0,
+        1004.5,
+        12.0,
+        26.0
+      ],
+      "text": "F"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@97/@VBoxContainer@99/@Label@608",
+      "rect": [
+        661.0,
+        389.0,
+        430.0,
+        47.0
+      ],
+      "text": "Coquetel Corrosivo"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@97/@VBoxContainer@99/@Label@609",
+      "rect": [
+        661.0,
+        442.0,
+        430.0,
+        30.0
+      ],
+      "text": "2–4 de dano · recarga 2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@97/@VBoxContainer@99/@Label@610",
+      "rect": [
+        661.0,
+        478.0,
+        430.0,
+        129.0
+      ],
+      "text": "Dano baixo no alvo e vizinho (atrás, ou à frente se não houver); armadura reduzida até o fim do próximo turno de cada alvo."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@PanelContainer@97/@VBoxContainer@99/@Label@611",
+      "rect": [
+        661.0,
+        613.0,
+        430.0,
+        63.0
+      ],
+      "text": "Atinge: Recreador (vida 8); Emissor de Comando (vida 6)"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Street/@Node3D@54/@CanvasLayer@62/@Control@61/@Label@98",
+      "rect": [
+        1342.99743652344,
+        343.683715820312,
+        71.0,
+        33.0
+      ],
+      "text": "ALVO"
+    }
+  ]
+}

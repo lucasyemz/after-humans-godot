@@ -27,6 +27,9 @@ arte. Nada daqui depende dele em tempo de execução, e nada de lá entra neste 
 - **Estrutura do código:** os autoloads `GameData` (tabelas), `Campaign` (estado e save) e `GameFlow` (troca de cenas)
   são o ponto de entrada de cada sistema. Cena nova entra pelo id em `GameFlow.SCENES`, e as teclas entram como ações em
   `tools/define_input.gd`, sem tecla fixa no código.
+- **Padrão da HUD:** as telas usam os componentes do kit (`scripts/ui/kit`, a arte em `art/ui/kit/station`). Fora dele,
+  nada de `StyleBoxFlat`, cor ou tamanho de texto soltos: o `tests/test_kit_guard.gd` trava, e as telas que faltam
+  migrar ficam em `tools/kit_guard_exceptions.txt`, uma lista que só encolhe.
 - **QA em Play:** o Lucas joga e faz a QA. A automação roda sem janela (`--headless`) ou no modo de captura.
 - **Git:** commit e push só quando pedido.
 

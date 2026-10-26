@@ -135,7 +135,33 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "icon_variant": {
+        "issue": 58,
+        "skill_size": [
+          104,
+          104
+        ],
+        "action_size": [
+          136,
+          104
+        ],
+        "skill_art_size": 64,
+        "action_icon_size": 40,
+        "key_font": [
+          18,
+          21,
+          23
+        ],
+        "focus": "existing external corners",
+        "disabled": "existing locked frame plus slash; reason on focus",
+        "new_runtime_art": false,
+        "touch_minimum_size": [
+          112,
+          112
+        ],
+        "at_40_percent_pixels": 44.8
+      }
     },
     "card": {
       "name": "03 / Cartão",
@@ -173,7 +199,41 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "cargo_choice_variant": {
+        "issue": 96,
+        "width": 320,
+        "height_normal": 272,
+        "height_large": 296,
+        "art_canvas": [
+          224,
+          192
+        ],
+        "art_origin": [
+          48,
+          16
+        ],
+        "art_anchor": [
+          112,
+          184
+        ],
+        "caption_y": [
+          232,
+          256
+        ],
+        "closed_unknown": "never show reward before choice",
+        "revealed": "selected uses diamond and text confirmation; others disabled with slash",
+        "source_frames": "existing card and selection families"
+      },
+      "training_choice_variant": {
+        "issue": 96,
+        "width": 432,
+        "height_normal": 240,
+        "height_large": 272,
+        "padding": 24,
+        "confirm_separate": true,
+        "source_frames": "existing card and selection families"
+      }
     },
     "plate": {
       "name": "04 / Placa",
@@ -208,7 +268,38 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "compact_variant": {
+        "issue": 58,
+        "derives_from": "plate",
+        "size": [
+          160,
+          72
+        ],
+        "enemy_width": 208,
+        "padding": 16,
+        "rank_area_width": 32,
+        "rank_font": [
+          18,
+          21,
+          23
+        ],
+        "life_bar_height": 12,
+        "instinct_track_height": 4,
+        "life_origin": [
+          48,
+          24
+        ],
+        "instinct_origin": [
+          48,
+          48
+        ],
+        "hide_name_and_numbers_until_focus": true,
+        "same_size_all_text_profiles": true,
+        "focus": "existing external corners",
+        "selected": "existing diamond; actor body light retained",
+        "new_runtime_art": false
+      }
     },
     "bar": {
       "name": "05 / Barras",
@@ -245,7 +336,19 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "icon_value_variant": {
+        "issue": 58,
+        "height": 64,
+        "icon_size": 32,
+        "body_font": [
+          24,
+          28,
+          31
+        ],
+        "detail_on_focus": true,
+        "same_existing_frame": true
+      }
     },
     "tooltip": {
       "name": "07 / Dica",
@@ -319,7 +422,100 @@
       "large": "use large metrics and 130% type; wrap or grow, never shrink",
       "colorblind": "swap good/danger, preserve icons and shape; no semantic change",
       "state_precedence": "disabled blocks activation; focus overlays; pressed transient; selected persists only for choices",
-      "intermediate": "same geometry as large, 115% type; no interpolation"
+      "intermediate": "same geometry as large, 115% type; no interpolation",
+      "map_label_variant": {
+        "issue": 69,
+        "derived_from": [
+          "panel",
+          "sequence",
+          "selection"
+        ],
+        "normal_size": [
+          240,
+          96
+        ],
+        "large_size": [
+          272,
+          112
+        ],
+        "largest_size": [
+          272,
+          112
+        ],
+        "padding": 16,
+        "icon": 24,
+        "title_offset": [
+          56,
+          16
+        ],
+        "detail_y_normal": 56,
+        "detail_y_large": 64,
+        "anchor": "top center below sequence node; offset8",
+        "states": [
+          "available",
+          "locked",
+          "completed",
+          "refuge"
+        ],
+        "text": "use tr(); title/body and detail type from kit",
+        "shape_cues": {
+          "available": "available marker",
+          "locked": "two diagonal marks + reason",
+          "completed": "check + word",
+          "refuge": "flag + word"
+        },
+        "no_runtime_texture_required": true
+      },
+      "portrait_strip_variant": {
+        "issue": 58,
+        "size": [
+          544,
+          96
+        ],
+        "portrait_size": 48,
+        "portrait_step": 56,
+        "maximum_portraits": 8,
+        "current_actor": "diamond plus actor portrait and body light; names on focus",
+        "new_runtime_art": false,
+        "expanded_size": [
+          656,
+          96
+        ],
+        "expanded_origin": [
+          632,
+          32
+        ],
+        "expanded_first_portrait": [
+          824,
+          52
+        ]
+      },
+      "rating_variant": {
+        "issue": 96,
+        "stars": 3,
+        "icon_size": 32,
+        "step": 48,
+        "filled_and_outline": true,
+        "also_show_numeric_label": true,
+        "compact_icon_size": 24
+      },
+      "research_link_variant": {
+        "issue": 96,
+        "branches": [
+          "Classe",
+          "Estação",
+          "Radar"
+        ],
+        "node_card_width": 320,
+        "node_height_normal": 176,
+        "node_height_large": 208,
+        "locked_line": "dashed2 plus lock and prerequisite text",
+        "met_line": "solid3 plus check",
+        "one_research_at_a_time": true,
+        "vertical_scroll": "root categories stay visible; detail and cost remain fixed",
+        "wrapped_node_height_normal": 208,
+        "wrapped_node_height_large": 240
+      }
     },
     "key": {
       "name": "10 / Tecla",

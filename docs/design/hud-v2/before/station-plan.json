@@ -1,0 +1,489 @@
+{
+  "name": "station-plan",
+  "texts": [
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1102",
+      "rect": [
+        32.0,
+        18.0,
+        251.0,
+        50.0
+      ],
+      "text": "Estação Raiz"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@Label@1103",
+      "rect": [
+        34.0,
+        66.0,
+        172.0,
+        23.0
+      ],
+      "text": "Ciclo 0 · 4 no elenco"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1225/@HBoxContainer@1212/@HBoxContainer@1215/@Label@1214",
+      "rect": [
+        1032.0,
+        37.0,
+        26.0,
+        25.0
+      ],
+      "text": "30"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1225/@HBoxContainer@1212/@HBoxContainer@1218/@Label@1217",
+      "rect": [
+        1101.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "9"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1225/@HBoxContainer@1212/@HBoxContainer@1221/@Label@1220",
+      "rect": [
+        1156.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "3"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@PanelContainer@1225/@HBoxContainer@1212/@HBoxContainer@1224/@Label@1223",
+      "rect": [
+        1211.0,
+        37.0,
+        12.0,
+        25.0
+      ],
+      "text": "2"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1231/@VBoxContainer@1227/@Label@1228",
+      "rect": [
+        1299.0,
+        16.0,
+        195.0,
+        20.0
+      ],
+      "text": "COMIDA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1231/@VBoxContainer@1227/@Label@1229",
+      "rect": [
+        1299.0,
+        36.0,
+        195.0,
+        28.0
+      ],
+      "text": "0 / 12 suprimentos"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1231/@VBoxContainer@1227/@Label@1230",
+      "rect": [
+        1299.0,
+        64.0,
+        195.0,
+        20.0
+      ],
+      "text": "! Falta na volta"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1237/@VBoxContainer@1233/@Label@1234",
+      "rect": [
+        1558.0,
+        16.0,
+        144.0,
+        20.0
+      ],
+      "text": "ÁGUA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1237/@VBoxContainer@1233/@Label@1235",
+      "rect": [
+        1558.0,
+        36.0,
+        144.0,
+        28.0
+      ],
+      "text": "6 em estoque"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1237/@VBoxContainer@1233/@Label@1236",
+      "rect": [
+        1558.0,
+        64.0,
+        144.0,
+        20.0
+      ],
+      "text": "Próxima volta: 4"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1243/@VBoxContainer@1239/@Label@1240",
+      "rect": [
+        1766.0,
+        16.0,
+        122.0,
+        20.0
+      ],
+      "text": "ENERGIA"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1243/@VBoxContainer@1239/@Label@1241",
+      "rect": [
+        1766.0,
+        36.0,
+        122.0,
+        28.0
+      ],
+      "text": "1 / 3 em uso"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1104/@HBoxContainer@1243/@VBoxContainer@1239/@Label@1242",
+      "rect": [
+        1766.0,
+        64.0,
+        122.0,
+        20.0
+      ],
+      "text": "2 livres"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1114",
+      "rect": [
+        32.0,
+        1000.0,
+        190.0,
+        48.0
+      ],
+      "text": "‹ Vista geral"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1115",
+      "rect": [
+        230.0,
+        1000.0,
+        150.0,
+        48.0
+      ],
+      "text": "Opções"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@HBoxContainer@1113/@Button@1116",
+      "rect": [
+        388.0,
+        1000.0,
+        170.0,
+        48.0
+      ],
+      "text": "Ocultar HUD"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1246",
+      "rect": [
+        1230.0,
+        124.0,
+        640.0,
+        39.0
+      ],
+      "text": "Plano da Estação"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@Label@1247",
+      "rect": [
+        1230.0,
+        173.0,
+        640.0,
+        49.0
+      ],
+      "text": "A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1248/@VBoxContainer@1249/@HBoxContainer@1250/@Label@1251",
+      "rect": [
+        1244.0,
+        242.0,
+        528.0,
+        28.0
+      ],
+      "text": "Alojamento"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1248/@VBoxContainer@1249/@HBoxContainer@1250/@Label@1252",
+      "rect": [
+        1776.0,
+        245.0,
+        80.0,
+        22.0
+      ],
+      "text": "nível 1 de 1"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1248/@VBoxContainer@1249/@Label@1253",
+      "rect": [
+        1244.0,
+        274.0,
+        612.0,
+        22.0
+      ],
+      "text": "Elenco, recrutar, tratar trauma, relíquias e o memorial."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1248/@VBoxContainer@1249/@Button@1254",
+      "rect": [
+        1244.0,
+        300.0,
+        612.0,
+        48.0
+      ],
+      "text": "Ver Alojamento"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1255/@VBoxContainer@1256/@HBoxContainer@1257/@Label@1258",
+      "rect": [
+        1244.0,
+        378.0,
+        528.0,
+        28.0
+      ],
+      "text": "Cantina"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1255/@VBoxContainer@1256/@HBoxContainer@1257/@Label@1259",
+      "rect": [
+        1776.0,
+        381.0,
+        80.0,
+        22.0
+      ],
+      "text": "nível 1 de 1"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1255/@VBoxContainer@1256/@Label@1260",
+      "rect": [
+        1244.0,
+        410.0,
+        612.0,
+        22.0
+      ],
+      "text": "Com energia, produz 2 suprimentos por expedição."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1255/@VBoxContainer@1256/@Button@1261",
+      "rect": [
+        1244.0,
+        436.0,
+        612.0,
+        48.0
+      ],
+      "text": "Ver Cantina"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1262/@VBoxContainer@1263/@HBoxContainer@1264/@Label@1265",
+      "rect": [
+        1244.0,
+        514.0,
+        567.0,
+        28.0
+      ],
+      "text": "Bar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1262/@VBoxContainer@1263/@HBoxContainer@1264/@Label@1266",
+      "rect": [
+        1815.0,
+        517.0,
+        41.0,
+        22.0
+      ],
+      "text": "vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1262/@VBoxContainer@1263/@Label@1267",
+      "rect": [
+        1244.0,
+        546.0,
+        612.0,
+        22.0
+      ],
+      "text": "Ainda vazio."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1262/@VBoxContainer@1263/@Button@1268",
+      "rect": [
+        1244.0,
+        572.0,
+        612.0,
+        48.0
+      ],
+      "text": "Ver Bar"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1269/@VBoxContainer@1270/@HBoxContainer@1271/@Label@1272",
+      "rect": [
+        1244.0,
+        650.0,
+        567.0,
+        28.0
+      ],
+      "text": "Dormitório"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1269/@VBoxContainer@1270/@HBoxContainer@1271/@Label@1273",
+      "rect": [
+        1815.0,
+        653.0,
+        41.0,
+        22.0
+      ],
+      "text": "vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1269/@VBoxContainer@1270/@Label@1274",
+      "rect": [
+        1244.0,
+        682.0,
+        612.0,
+        22.0
+      ],
+      "text": "Ainda vazio."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1269/@VBoxContainer@1270/@Button@1275",
+      "rect": [
+        1244.0,
+        708.0,
+        612.0,
+        48.0
+      ],
+      "text": "Ver Dormitório"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1276/@VBoxContainer@1277/@HBoxContainer@1278/@Label@1279",
+      "rect": [
+        1250.0,
+        790.0,
+        555.0,
+        28.0
+      ],
+      "text": "Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1276/@VBoxContainer@1277/@HBoxContainer@1278/@Label@1280",
+      "rect": [
+        1809.0,
+        793.0,
+        41.0,
+        22.0
+      ],
+      "text": "vazio"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1276/@VBoxContainer@1277/@Label@1281",
+      "rect": [
+        1250.0,
+        822.0,
+        600.0,
+        22.0
+      ],
+      "text": "Ainda vazio."
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1276/@VBoxContainer@1277/@Label@1282",
+      "rect": [
+        1250.0,
+        848.0,
+        600.0,
+        21.0
+      ],
+      "text": "Recuperar: Fabrica relíquias por 3 sucatas. Gasta 1 de energia. · 4 sucatas"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1276/@VBoxContainer@1277/@Button@1283",
+      "rect": [
+        1250.0,
+        873.0,
+        600.0,
+        48.0
+      ],
+      "text": "Ver Forja"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1284/@VBoxContainer@1285/@HBoxContainer@1286/@Label@1287",
+      "rect": [
+        1250.0,
+        959.0,
+        512.0,
+        28.0
+      ],
+      "text": "Depósito"
+    },
+    {
+      "clipped": false,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1284/@VBoxContainer@1285/@HBoxContainer@1286/@Label@1288",
+      "rect": [
+        1766.0,
+        962.0,
+        84.0,
+        22.0
+      ],
+      "text": "nível 1 de 2"
+    },
+    {
+      "clipped": true,
+      "path": "/root/Station/@CanvasLayer@1100/@Control@1099/@PanelContainer@1151/@ScrollContainer@1154/@VBoxContainer@1155/@PanelContainer@1284/@VBoxContainer@1285/@Label@1289",
+      "rect": [
+        1250.0,
+        991.0,
+        600.0,
+        22.0
+      ],
+      "text": "Guarda até 12 suprimentos; o excesso estraga na volta."
+    }
+  ]
+}

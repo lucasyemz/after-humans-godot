@@ -1,0 +1,14 @@
+[
+  {
+    "profile": "normal",
+    "commit": "f9fe25a",
+    "source_png_sha256": "31be3f319f667d59fcd30fa65e1fe7d87829029c9d2e46f9b4ff5104eaed5897",
+    "clean_png_sha256": "c26eef5b3f056c44947e5c96ac2ce279f721937032e218d8dc8447711b570d2f"
+  },
+  {
+    "profile": "large",
+    "commit": "f9fe25a",
+    "source_png_sha256": "7af8755c9fa1e08c1289ee93395cc3dd518fd4c05a5c6328b1c8678592eb9b91",
+    "clean_png_sha256": "c1e0e52cd5d61549c8fe813a61948582cad5f41873f332da729eabe600edbb94"
+  }
+]

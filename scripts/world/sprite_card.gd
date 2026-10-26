@@ -207,3 +207,8 @@ func _apply_albedo() -> void:
 ## Altura da cabeça acima do pé, em metros (para barras e números).
 func head_height() -> float:
 	return body_height * 1.05
+
+
+## A arte que o cartão mostra agora (a entrada de combat_art.json, com os quadros e a âncora).
+func art() -> Dictionary:
+	return _art

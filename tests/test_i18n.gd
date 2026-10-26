@@ -29,7 +29,7 @@ func _portuguese_default() -> void:
 	t.check(load(Scan.PO) is Translation, "o en.po abre como tradução")
 	Settings.set_language("pt_BR")
 	t.check(TranslationServer.get_locale().begins_with("pt"), "o jogo abre em português")
-	for text in ["Continuar", "Nova campanha", "Vez de %s: escolha uma habilidade (1–4) ou uma ação."]:
+	for text in ["Continuar", "Nova campanha", "Escolha uma habilidade (%s–%s) ou uma ação."]:
 		t.equal(TranslationServer.translate(text), text, "em português, '%s' fica igual" % text)
 	t.equal(Settings._known_language("fr"), "pt_BR", "idioma desconhecido volta ao português")
 	# O leitor acha a palavra solta minúscula e os marcadores com sinal.
@@ -159,7 +159,7 @@ func _switch_live() -> void:
 	Campaign.state = Campaign.create_initial(5)
 	Settings.set_language("en")
 	t.check(TranslationServer.get_locale().begins_with("en"), "o inglês liga")
-	t.equal(TranslationServer.translate("Vez de %s: escolha uma habilidade (1–4) ou uma ação.") % "Nick", "Nick's turn: pick an ability (1–4) or an action.", "o texto formatado sai traduzido")
+	t.equal(TranslationServer.translate("Escolha uma habilidade (%s–%s) ou uma ação.") % ["1", "4"], "Choose an ability (1–4) or an action.", "o texto formatado sai traduzido")
 	# Os nomes dos inimigos na luta, inclusive com o sufixo da rota (o guardião, os relés do chefe), e o nome curto.
 	t.equal(AHCombatHud.unit_name("Robô"), "Robot", "o nome do inimigo em inglês")
 	t.equal(AHCombatHud.unit_name("Robô · Guardião"), "Robot · Guardian", "o guardião em inglês")
@@ -177,7 +177,7 @@ func _switch_live() -> void:
 			break
 	if t.check(title != null, "o título abre"):
 		await _tree.process_frame
-		t.equal(title.new_button.text, "New campaign", "o título em inglês")
+		t.equal(title.new_button.text, "NEW CAMPAIGN", "o título em inglês")
 		title.options_button.pressed.emit()
 		await _tree.process_frame
 		var texts: Array = title._modal.find_children("*", "Label", true, false).map(func(l): return l.text)
@@ -188,7 +188,7 @@ func _switch_live() -> void:
 		Settings.set_language("pt_BR")
 		title._build_buttons()
 		await _tree.process_frame
-		t.equal(title.new_button.text, "Nova campanha", "de volta ao português")
+		t.equal(title.new_button.text, "NOVA CAMPANHA", "de volta ao português")
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
 	await _tree.process_frame

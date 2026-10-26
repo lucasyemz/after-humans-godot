@@ -55,12 +55,9 @@ func run(t) -> void:
 	Input.flush_buffered_events()
 	t.check(not Input.is_action_pressed("interact"), "soltar o Usar solta interact")
 	touch._release_all()
-	# As peças da entrega #23: todas carregam, e a arte não muda as áreas de toque.
-	for name in ["stick_base_normal", "stick_base_active", "stick_knob_normal", "stick_knob_active", "stick_run_mark", "use_inactive", "use_ready", "use_pressed"]:
-		var texture: Texture2D = touch._texture(name)
-		t.check(texture != null, "a peça %s carrega" % name)
-		for suffix in ["", "_2x"]:
-			t.check(ResourceLoader.exists(AHTouchControls.TOUCH_ART % [name, suffix]), "%s%s existe" % [name, suffix])
+	# As peças do kit (hud-exploracao.md): todas carregam, e a arte não muda as áreas de toque.
+	for name in ["touch_ring", "touch_knob", "touch_button", "touch_button_active"]:
+		t.check(AHKit.texture(name) != null, "a peça %s carrega" % name)
 	t.equal([AHTouchControls.STICK_RADIUS, AHTouchControls.USE_RADIUS, AHTouchControls.STICK_HOME, AHTouchControls.USE_CENTER],
 		[110.0, 78.0, Vector2(230, 800), Vector2(1790, 800)], "os raios e os centros da proposta")
 	street.queue_free()
