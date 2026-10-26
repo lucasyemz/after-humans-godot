@@ -39,8 +39,9 @@ def floor_band(im: Image.Image, name: str) -> None:
     """O piso na faixa de andar, repetido, um pouco mais escuro que a parede."""
     floor = piece(name)
     band = Image.new("RGBA", (W, H - FLOOR))
-    for x in range(0, W, floor.width):
-        band.alpha_composite(floor.crop((0, 0, floor.width, min(floor.height, H - FLOOR))), (x, 0))
+    for y in range(0, H - FLOOR, floor.height):
+        for x in range(0, W, floor.width):
+            band.alpha_composite(floor.crop((0, 0, floor.width, min(floor.height, H - FLOOR - y))), (x, y))
     im.alpha_composite(ImageEnhance.Brightness(band).enhance(0.7), (0, FLOOR))
 
 

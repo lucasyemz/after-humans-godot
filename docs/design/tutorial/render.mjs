@@ -87,7 +87,8 @@ const tutorialTarget = (p) => combat(p, { bg: "docs/design/tutorial/before/fight
 // A primeira vez na Estação: a tela escurecida, a moldura no que se mostra, a fala do Bento com o retrato e o passo,
 // PRÓXIMO e PULAR VISITA. Quem guia é o Bento: o Nick chega à Estação pela primeira vez.
 function speech({ step, total, text, x = 560, y = 760, last = false }) {
-  return `<div class="abs" data-hit="panel" style="left:${x}px;top:${y}px">` + nine("panel_large", { repeat: "round", cls: "row", extra: "width:860px;gap:18px;align-items:flex-start" },
+  // No Maior a fala sobe 24 px, para não encostar na barra de baixo.
+  return `<div class="abs" data-hit="panel" style="left:${x}px;top:calc(${y}px - 24px*(var(--k) - 1)/0.3)">` + nine("panel_large", { repeat: "round", cls: "row", extra: "width:860px;gap:18px;align-items:flex-start" },
     `${square("art/ui/portraits/bento.png", 120)}<div class="col" style="flex:1;min-width:0;gap:8px">` +
     // O passo como no briefing aprovado: os losangos (o de agora em âmbar) e "2/5".
     `<div class="row" style="gap:10px;justify-content:space-between"><span class="tx f30 semi amber">Bento</span><div class="row" style="gap:8px">` +

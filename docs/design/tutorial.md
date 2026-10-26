@@ -233,3 +233,12 @@ clareia o vidro, no mesmo quadro do apagado; o brilho em volta é a luz pontual 
 **Baixa, corrigidos:** a plaqueta sem clima; o vagão em 1024 px; a importação com `lossy_quality` 0,75; as medidas das
 peças na página; o passo da visita em losangos; o subtítulo do cartão na cor do texto; a faixa da rodada encolhendo com
 quatro; "Como refazer" (a lâmpada sai da folha); as portas como passagem de zona; a Íris e a Amora levadas ao Lucas.
+
+### Rodada 2: APROVADO
+
+As correções da rodada 1 conferidas; a arte, as prévias e as telas reproduzem; as telas da hud-luta e da hud-estacao
+saem iguais. Observações baixas:
+- a fala da visita subia pouco no Maior e encostava na barra de baixo: agora sobe 24 px (aplicado depois do veredito);
+- a prévia da plataforma empilhava dois pisos: a faixa de andar inteira usa o `T_TU09` (aplicado);
+- o clareado do `T_TU08_Lit` deixa manchas no vidro, que não aparecem no tamanho de uso (cerca de 40 px): se a lâmpada
+  for vista de perto, clarear o vidro por uma máscara da área dele.
