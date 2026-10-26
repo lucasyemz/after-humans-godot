@@ -1,5 +1,7 @@
 # Telas do novo laço — #96
 
+> **Versão atual: [hud-laco.md](hud-laco.md)** (a carga, as missões, a Pesquisa, os laços e os desafios, no kit da Awesomic).
+>
 > **Histórico — versão1.** Lucas escolheu a direção C. A [HUD de combate consolidada](hud-c.md) é a referência atual para o Claude. Estas telas do laço não foram refeitas nesta rodada; aguardam tarefa própria. A QA abaixo se refere à entrega anterior.
 
 Propostas de UI para aprovação do Lucas; integração nas issues #88–#94 pelo Claude. Montadas com o [kit #59](ui-kit.md), depois do [Mapa da Rede #86](phase-map.md). Não implementam progressão, recompensas ou pesquisa no jogo.

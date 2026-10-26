@@ -524,6 +524,93 @@ def adjust_pieces():
         icon.save(OUT / "icons" / f"{name}.webp", lossless=True, method=6)
 
 
+def stroke_icon(strokes, size=64, width=6):
+    """Glifo branco de um tom desenhado em linhas (strokes: listas de pontos na grade de 64), tingido pelo jogo."""
+    k = S
+    big = Image.new("L", (size * k, size * k), 0)
+    d = ImageDraw.Draw(big)
+    for kind, pts in strokes:
+        sp = [(x * k, y * k) for x, y in pts]
+        if kind == "line":
+            d.line(sp, fill=255, width=round(width * k), joint="curve")
+            for x, y in (sp[0], sp[-1]):
+                r = width * k / 2
+                d.ellipse((x - r, y - r, x + r, y + r), fill=255)
+        elif kind == "ring":
+            (cx, cy), (r, _) = sp[0], sp[1]
+            d.ellipse((cx - r, cy - r, cx + r, cy + r), outline=255, width=round(width * k))
+        elif kind == "poly":
+            d.polygon(sp, fill=255)
+    im = Image.new("RGBA", (size, size), (255, 255, 255, 0))
+    im.putalpha(big.resize((size, size), Image.Resampling.LANCZOS))
+    return im
+
+
+def cargo_hatch(opened=False, size=(200, 168)):
+    """O compartimento da carga do guardião (#91): a escotilha de aço lacrada, com rebites, duas cintas e o lacre âmbar
+    no meio. Aberta: o vão escuro e a tampa erguida no alto; o jogo desenha o que havia no vão."""
+    w, h = size
+    im = plate(size, cut=16, rim=7, amber=False, inner="dark" if opened else "steel", seed=51)
+    x0, y0, x1, y1 = 22, 20, w - 23, h - 21
+    door = chamfer(x0, y0, x1, y1, 8)
+    if opened:
+        # O vão: mais escuro no alto (a tampa faz sombra) e a tampa erguida, vista de quina, presa às dobradiças.
+        pit = Image.new("RGBA", size)
+        pd = ImageDraw.Draw(pit)
+        for y in range(y0, y1):
+            k = (y - y0) / max(1, y1 - y0)
+            pd.line((x0, y, x1, y), fill=(4, 5, 6, round(235 - 120 * k)))
+        pit.putalpha(Image.composite(pit.getchannel("A"), Image.new("L", size, 0), mask(size, door)))
+        im.alpha_composite(pit)
+        lid_poly = [(x0 - 4, y0 - 2), (x1 + 4, y0 - 2), (x1 - 14, y0 + 26), (x0 + 14, y0 + 26)]
+        lid = tile(size, (70, 74, 78), 0.38)
+        lid.putalpha(mask(size, lid_poly))
+        im.alpha_composite(lid)
+        im.alpha_composite(lines(size, [(lid_poly + [lid_poly[0]], (*EDGE, 255), 1.6),
+                                        ([(x0 + 16, y0 + 23), (x1 - 16, y0 + 23)], (150, 150, 142, 220), 1.2),
+                                        ([(x0 + 30, y0 + 6), (x0 + 30, y0 + 18)], (*EDGE, 255), 1.4), ([(x1 - 30, y0 + 6), (x1 - 30, y0 + 18)], (*EDGE, 255), 1.4),
+                                        (door + [door[0]], (*EDGE, 255), 2.0)]))
+        return im
+    face = tile(size, (32, 35, 38), 0.42)
+    face.putalpha(mask(size, door))
+    im.alpha_composite(face)
+    strokes = [(door + [door[0]], (*EDGE, 255), 2.0),
+               ([(x + (1.4 if x < w / 2 else -1.4), y + (1.4 if y < h / 2 else -1.4)) for x, y in door] + [door[0]], (*BEVEL, 255), 1.0)]
+    # As duas cintas.
+    for y in (y0 + (y1 - y0) * 0.28, y0 + (y1 - y0) * 0.72):
+        strokes += [([(x0 + 4, y - 4), (x1 - 4, y - 4)], (*EDGE, 255), 1.4), ([(x0 + 4, y + 4), (x1 - 4, y + 4)], (*EDGE, 255), 1.4),
+                    ([(x0 + 4, y - 3), (x1 - 4, y - 3)], (120, 122, 118, 160), 0.8)]
+    im.alpha_composite(lines(size, strokes))
+    rivets = Image.new("RGBA", size)
+    rd = ImageDraw.Draw(rivets)
+    for x, y in [(x0 + 9, y0 + 9), (x1 - 9, y0 + 9), (x0 + 9, y1 - 9), (x1 - 9, y1 - 9)]:
+        rd.ellipse((x - 3.5, y - 3.5, x + 3.5, y + 3.5), fill=(150, 150, 142, 255), outline=(*EDGE, 255))
+    im.alpha_composite(rivets)
+    # O lacre: o octógono âmbar no meio, por cima das cintas.
+    cx, cy, r = w / 2, (y0 + y1) / 2, 15
+    seal = chamfer(cx - r, cy - r, cx + r, cy + r, 6)
+    disc = Image.new("RGBA", size, (*AMBER, 255))
+    disc.putalpha(mask(size, seal))
+    im.alpha_composite(disc)
+    inner_seal = chamfer(cx - r + 5, cy - r + 5, cx + r - 5, cy + r - 5, 3)
+    im.alpha_composite(lines(size, [(seal + [seal[0]], (*EDGE, 255), 1.6), (inner_seal + [inner_seal[0]], (90, 58, 12, 255), 1.4)]))
+    return im
+
+
+def loop_pieces():
+    """Lote 6 (#96): a carga recuperada do guardião e os laços entre heróis."""
+    save("cargo_hatch", cargo_hatch(False), None, [22, 20, 155, 127],
+         "Compartimento lacrado da carga do guardião (#91), 200x168, sem fatiar. Escolha: selected_frame por cima; foco: focus_frame.")
+    save("cargo_hatch_open", cargo_hatch(True), None, [22, 48, 155, 99],
+         "O compartimento aberto: o ícone do que havia (48) no meio do vão e o texto embaixo, fora da peça. Os outros cinco "
+         "abrem apagados (o texto no tom apagado); o escolhido fica com selected_frame e o texto em âmbar.")
+    (OUT / "icons").mkdir(exist_ok=True)
+    # Amizade: dois elos encaixados. Rivalidade: duas pontas, uma contra a outra, com a fenda no meio (forma, não só cor).
+    stroke_icon([("ring", [(24, 32), (14, 0)]), ("ring", [(40, 32), (14, 0)])], width=6).save(OUT / "icons" / "bond_friend.webp", lossless=True, method=6)
+    stroke_icon([("line", [(8, 18), (24, 32), (8, 46)]), ("line", [(56, 18), (40, 32), (56, 46)]),
+                 ("line", [(32, 10), (29, 24), (35, 40), (32, 54)])], width=6).save(OUT / "icons" / "bond_rival.webp", lossless=True, method=6)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     # ---------------------------------------------------------------- relatório da volta
@@ -653,6 +740,8 @@ def main():
     combat_pieces()
     # ---------------------------------------------------------------- lote 5: os ajustes da #109 (acampamento, fim de luta)
     adjust_pieces()
+    # ---------------------------------------------------------------- lote 6: o laço (#96: a carga, os laços)
+    loop_pieces()
 
     manifest = {
         "revision": "station_2026_10_25",

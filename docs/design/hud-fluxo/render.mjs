@@ -5,6 +5,7 @@
 // Uso (da raiz do repositório, com python3 -m http.server 8765 servindo a raiz):
 //   node docs/design/hud-fluxo/render.mjs http://127.0.0.1:8765
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 import {
   setBase, BASE, nine, over, img, glyph, key, bar, portrait, square, badge, divider, cost, chip, secondary, primary, toggle, slider,
   section, roomPanel, topBar, run,
@@ -81,7 +82,7 @@ function titleOptions() {
 // o papel (só os civis têm), a fala, a contagem (losangos e "1/3") e os botões. No briefing da saída, o Esc volta à
 // Preparação (cancel_on_back) e PULAR parte; no debriefing, o Esc pula.
 const CIVIL = JSON.parse(fs.readFileSync("data/presentation/civilians.json", "utf8"));
-const civilFace = (id, size) => { const c = CIVIL[id], [u0, v0, u1] = c.portrait_uv, [w, h] = c.canvas; return face(c.file.replace("res://", ""), size, [u0 * w, v0 * h, (u1 - u0) * w], w); };
+export const civilFace = (id, size) => { const c = CIVIL[id], [u0, v0, u1] = c.portrait_uv, [w, h] = c.canvas; return face(c.file.replace("res://", ""), size, [u0 * w, v0 * h, (u1 - u0) * w], w); };
 function speech({ who, name, role = "", text, step, total, last, back, keys = null }) {
   const dots = Array.from({ length: total }, (_, i) => `<i style="width:calc(14px*var(--k));height:calc(14px*var(--k));transform:rotate(45deg);background:${i < step ? "var(--amber)" : "#3a3e44"};border:1px solid #0a0b0c;flex:none"></i>`).join("");
   return `<div class="abs col" data-hit="panel" style="left:50%;transform:translateX(-50%);top:calc(1080px - 14px - 72px*var(--k) - 10px - 64px*var(--k) - 40px - 300px*var(--k));gap:10px;align-items:center">` +
@@ -148,7 +149,7 @@ function sheet(p) {
 const X0 = 60, Y0 = 196;
 const tint = (file, [ox, oy], [w, h], color, extra = "") => `<i style="position:absolute;left:${X0 + ox}px;top:${Y0 + oy}px;width:${w}px;height:${h}px;background:${color};-webkit-mask-image:url(${BASE}/${file});-webkit-mask-size:100% 100%;${extra}"></i>`;
 const COLOR = { available: "var(--ally)", completed: "var(--good)", selected: "var(--amber)", locked: "#8a8478" };
-const PHASES = {
+export const PHASES = {
   // Chefe e inimigo mais comum do radar_snapshot.json do Codex (guardians[0] e a maior contagem de patrulha), como no render.py dele.
   shop: { n: 1, name: "Rua das Vitrines", level: 1, diff: "Fácil", boss: "Robô", portrait: "portrait_robot", enemies: "Relé de Defesa", enemyFace: "portrait_condutor_raiz", supplies: "Visto na última volta", weather: "Noite · chuva",
     text: "Vitrines tomadas por raízes ainda guardam comida e peças que a Estação não sabe mais fabricar. Os sensores das Galerias seguem separando clientes dos Antigos de fauna não autorizada." },
@@ -156,7 +157,9 @@ const PHASES = {
     text: "A ponte ligava bairros. Há pouco tempo, seus sensores voltaram a acender e a patrulha dobrou: a passagem livre agora pede permissões que ninguém na Estação possui." },
   shelter: { n: 3, name: "Sala Esquecida", level: 5, diff: "Difícil" },
 };
-function networkMap({ selected = "bridge" } = {}) {
+// panel: o painel da direita no lugar do da fase ({ icon, title, body, footer }; o lote 6, hud-laco: as missões do lugar e
+// os desafios dos chefes); extra: o que vai por cima.
+export function networkMap({ selected = "bridge", panel = null, extra = "" } = {}) {
   const state = { refuge: "available", shop: "completed", bridge: "available", shelter: "locked", lab: "locked", depot: "locked" };
   state[selected] = state[selected] === "locked" ? "locked" : "selected";
   const reading = { shop: "known", bridge: "partial", shelter: "unknown", lab: "unknown", depot: "unknown" };
@@ -215,12 +218,13 @@ function networkMap({ selected = "bridge" } = {}) {
     `<div class="abs" style="left:28px;top:14px">` + nine("room_plaque", { cls: "row", extra: "min-width:520px;min-height:96px;gap:16px" },
       `${glyph("route", 52)}<div class="col"><span class="tx f40 semi up">Mapa da Rede</span><span class="tx f24 muted">Bairro Submerso · Fases concluídas 1 / 5 · Equipe: 4 vivos</span></div>`) + `</div>` +
     frame + img("art/ui/map/network/network_map.webp", `position:absolute;left:${X0}px;top:${Y0}px;width:1120px;height:630px`) + layers + MAP.regions.map(markers).join("") + MAP.regions.map(label).join("") + legend +
-    roomPanel({ icon: st === "locked" ? "alert" : "next_step", title: ph.name, body, footer, left: 1236, width: 656, top: 126 }) +
+    roomPanel({ icon: st === "locked" ? "alert" : "next_step", title: ph.name, body, footer, left: 1236, width: 656, top: 126, ...(panel || {}) }) +
     `<div class="abs" style="left:28px;bottom:14px">` + secondary("Voltar à Estação", { icon: "ui-arrow-right.svg", iconStyle: "transform:scaleX(-1)", keyLabel: "Esc / B", hit: "back", height: 64 }) + `</div>` +
-    keysBar([["Setas", "Lugar"], ["E", "Escolher"]], "left:440px;bottom:18px");
+    keysBar([["Setas", "Lugar"], ["E", "Escolher"]], "left:440px;bottom:18px") + extra;
 }
 
-await run({
+// Importado (o lote 6, hud-laco), este arquivo não gera nada.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) await run({
   title: () => title(), title_warning: () => title({ campaigns: true }), slots: () => slots(), slots_new: () => slots({ fresh: true }), confirm: () => confirm(),
   title_options: () => titleOptions(), briefing: (p) => briefing(p), briefing_last: (p) => briefingHero(p), debriefing: () => debriefing(),
   passage: () => passage(), passage_station: () => passage({ station: true, touch: true }), sheet: (p) => sheet(p),

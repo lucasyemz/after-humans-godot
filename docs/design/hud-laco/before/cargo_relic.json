@@ -1,0 +1,75 @@
+{
+  "bodies": [
+    [
+      914.863647460938,
+      729.544982910156,
+      113.444946289062,
+      237.077331542969
+    ],
+    [
+      749.377197265625,
+      755.908020019531,
+      124.230407714844,
+      209.615478515625
+    ],
+    [
+      569.071655273438,
+      767.958984375,
+      121.818115234375,
+      196.468322753906
+    ],
+    [
+      419.064208984375,
+      732.365600585938,
+      142.523315429688,
+      230.968200683594
+    ]
+  ],
+  "boxes": [
+    {
+      "amount": 1,
+      "icon": "res-bandages",
+      "kind": "bandages",
+      "relic_id": "",
+      "text": "+1 curativo"
+    },
+    {
+      "amount": 3,
+      "icon": "lobby-seed",
+      "kind": "seeds",
+      "relic_id": "",
+      "text": "+3 sementes"
+    },
+    {
+      "amount": 2,
+      "icon": "lobby-food",
+      "kind": "supplies",
+      "relic_id": "",
+      "text": "+2 suprimentos"
+    },
+    {
+      "amount": 1,
+      "icon": "relic-copper-button",
+      "kind": "relic",
+      "relic_id": "botao_cobre",
+      "text": "Relíquia: Botão de Cobre"
+    },
+    {
+      "amount": 1,
+      "icon": "res-bandages",
+      "kind": "bandages",
+      "relic_id": "",
+      "text": "+1 curativo"
+    },
+    {
+      "amount": 3,
+      "icon": "lobby-seed",
+      "kind": "seeds",
+      "relic_id": "",
+      "text": "+3 sementes"
+    }
+  ],
+  "chosen": 3,
+  "phase": "fase_1",
+  "seed": 9697
+}

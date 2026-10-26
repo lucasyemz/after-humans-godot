@@ -2,6 +2,7 @@
 // Fundos: as capturas limpas do jogo em docs/design/hud-v2/before/; textos e números: os dessas capturas (os .json).
 // Uso (da raiz do repositório, com python3 -m http.server 8765 servindo a raiz):
 //   node docs/design/hud-estacao/render.mjs http://127.0.0.1:8765
+import { pathToFileURL } from "node:url";
 import {
   setBase, nine, over, img, glyph, key, bar, portrait, square, pill, badge, divider, cost, chip, secondary, primary, train,
   toggle, slider, medal, topBar, bottom, roomPanel, roomTag, section, arrow, run,
@@ -9,7 +10,7 @@ import {
 
 setBase(process.argv[2] || "http://127.0.0.1:8765");
 const OUT = process.argv[3] || "docs/design/hud-estacao/.render";
-const BG = (name) => img(`docs/design/hud-v2/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px");
+export const BG = (name) => img(`docs/design/hud-v2/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px");
 const LOCKED = { label: "Preparar expedição", icon: "expeditions", keyLabel: "G / X", locked: true, reason: "Conclua a noite no Dormitório antes de partir." };
 const inset = (body, extra = "") => nine("panel_inset", { cls: "col", extra: `gap:8px;flex:none;${extra}` }, body);
 const line = (icon, text, cls = "", size = 22) => `<div class="row" style="gap:10px;align-items:flex-start">${icon ? glyph(icon, 26, cls === "danger" ? "var(--danger)" : "var(--text)", "margin-top:2px") : ""}<span class="wrap f${size} ${cls}">${text}</span></div>`;
@@ -24,12 +25,14 @@ const pending = (rows) => nine("panel_large", { repeat: "round", cls: "col", ext
   rows.map(([icon, text, hit]) => `<div data-hit="${hit}">` + nine("list_row", { cls: "row", extra: "gap:12px;min-height:56px" }, `${glyph(icon, 28, "var(--amber)")}<span class="wrap f22">${text}</span>`) + `</div>`).join(""));
 
 // ------------------------------------------------------------------ 1. Visão geral
-function overview() {
+// next: o miolo do Próximo passo no lugar de "Recuperar a Forja" (o lote 6, hud-laco: a Pesquisa concluída); extra: o
+// que vai por cima da tela.
+export function overview({ next: nextBody = null, extra = "", subtitle = "Ciclo 0 · 4 no elenco" } = {}) {
   const next = nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:10px" },
     `<div class="row" style="gap:10px">${glyph("next_step", 28, "var(--amber)")}<span class="tx f22 semi amber kicker">Próximo passo</span></div>` +
-    `<span class="tx f36 semi">Recuperar a Forja</span><span class="wrap f22">Fabrica relíquias por 3 sucatas. Gasta 1 de energia.</span>` +
+    (nextBody || `<span class="tx f36 semi">Recuperar a Forja</span><span class="wrap f22">Fabrica relíquias por 3 sucatas. Gasta 1 de energia.</span>` +
     `<div class="row" style="gap:10px">${cost("lobby-scrap.svg", "4 sucatas · tem 9")}</div>` +
-    primary("Ver a Forja", { icon: "room_forge", hit: "next", height: 60, size: "f26" }));
+    primary("Ver a Forja", { icon: "room_forge", hit: "next", height: 60, size: "f26" })));
   const plan = twoLine("plan", "Plano da Estação", "o que cada cômodo destrava", "plan", 500);
   // O cômodo escolhido no corte: cantos âmbar em volta e a etiqueta com a ponta para baixo.
   const room = `<div class="abs" style="left:804px;top:523px;width:246px;height:106px">${nine("selected_slot", { extra: "position:absolute;inset:0" })}</div>` +
@@ -38,21 +41,23 @@ function overview() {
   const card = nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:8px" },
     `<div class="row" style="gap:12px">${glyph("room_quarters", 36, "var(--amber)")}<span class="tx f32 semi up">Alojamento</span>${roomTag("Aberto", "var(--good)")}</div>` +
     `<span class="wrap f22">Conhecer e acompanhar os moradores do abrigo.</span>` + secondary("Gerenciar", { hit: "manage", height: 60, extra: "width:100%" }));
-  return BG("station") + topBar({ subtitle: "Ciclo 0 · 4 no elenco" }) + room +
+  return BG("station") + topBar({ subtitle }) + room +
     `<div class="abs col" style="left:28px;top:132px;gap:12px">${next}${plan}</div>` +
     `<div class="abs" style="left:28px;bottom:calc(14px + 72px*var(--k) + 14px)">${card}</div>` +
-    bottom({ active: 0, back: false, keysAt: 840, keys: [["Setas", "Cômodos"], ["E", "Abrir"], ["Esc", "Menu"], ["F2", "Ocultar"]] });
+    bottom({ active: 0, back: false, keysAt: 840, keys: [["Setas", "Cômodos"], ["E", "Abrir"], ["Esc", "Menu"], ["F2", "Ocultar"]] }) + extra;
 }
 
 // ------------------------------------------------------------------ 2. Preparação
-const TEAM = [
+export const TEAM = [
   ["vespera", "Véspera", "Atiradora e Controle", 30, 30, 4, ["coruja_disparo_perfurante", "coruja_granada_fumaca", "coruja_olho_nas_ruinas", "coruja_recurso_emergencia"], 3],
   ["iris", "Íris", "Química e Suporte", 23, 23, 3, ["sapo_carga_voltaica", "sapo_coquetel_corrosivo", "sapo_antidoto_campo", "sapo_ampola_reparo_vivo"], 4],
   ["nick", "Nick", "Batedor e Mobilidade", 24, 24, 2, ["gato_corte_fase", "gato_salto_entre_ruinas", "gato_sumir_na_sombra", "gato_cacada_precisa"], 4],
   ["bento", "Bento", "Tanque e Proteção", 34, 34, 1, ["cao_punho_sucata", "cao_impacto_hidraulico", "cao_fique_atras_de_mim", "cao_nao_estamos_sos"], 4],
 ];
 const square56 = (hit, text) => `<div data-hit="${hit}">${nine("icon_button", { pad: [4, 4, 4, 4], extra: "width:calc(56px*var(--k));height:calc(56px*var(--k));display:flex;align-items:center;justify-content:center" }, `<span class="tx f30 semi">${text}</span>`)}</div>`;
-function preparation() {
+// cardExtra(hero): o que a carta ganha embaixo (o lote 6: a marca do laço); below: o que entra embaixo das cartas, na
+// coluna da equipe (o lote 6: os laços da equipe).
+export function preparation({ cardExtra = () => "", below = "" } = {}) {
   // O medalhão da posição fica no canto do retrato, e o nome tem a largura toda da carta.
   const card = ([hero, name, role, hp, max, pos, abilities, usable]) =>
     `<div data-hit="slot" style="flex:none">` + nine("hero_card", { repeat: "round", cls: "col", extra: "width:300px;gap:8px" },
@@ -60,9 +65,9 @@ function preparation() {
       `<div class="col" style="flex:1;min-width:0"><span class="tx f30 semi up">${name}</span><span class="wrap f20 muted">${role}</span></div></div>` +
       `<div class="row" style="gap:10px"><span class="tx f20 muted up">Vida</span><span class="tx f22">${hp} / ${max}</span></div>${bar("100%", 22, hp / max, "var(--ally)")}` +
       `<div class="row" style="gap:6px">${abilities.map((a, i) => square(`art/combat/icons/${a}.webp`, 54, i >= usable ? "opacity:.35;filter:grayscale(1)" : "")).join("")}</div>` +
-      `<div class="row" style="gap:8px">${glyph("state_active", 22, "var(--good)")}<span class="tx f20 good">${usable} de 4 habilidades daqui</span></div>`) + `</div>`;
+      `<div class="row" style="gap:8px">${glyph("state_active", 22, "var(--good)")}<span class="tx f20 good">${usable} de 4 habilidades daqui</span></div>` + cardExtra(hero)) + `</div>`;
   const team = `<div class="col" style="gap:10px;flex:none"><div class="row" style="gap:18px"><span class="tx f24 semi up amber kicker">Equipe · 1 a 4 animais</span><span class="tx f20 muted">Clique em dois para trocar</span>` +
-    `<div class="row" style="gap:6px;margin-left:auto">${glyph("ui-arrow-right.svg", 18, "var(--muted)", "transform:scaleX(-1)")}<span class="tx f20 muted">fundo · frente</span>${glyph("ui-arrow-right.svg", 18, "var(--muted)")}</div></div><div class="row" style="gap:14px;align-items:flex-start">${TEAM.map(card).join("")}</div></div>`;
+    `<div class="row" style="gap:6px;margin-left:auto">${glyph("ui-arrow-right.svg", 18, "var(--muted)", "transform:scaleX(-1)")}<span class="tx f20 muted">fundo · frente</span>${glyph("ui-arrow-right.svg", 18, "var(--muted)")}</div></div><div class="row" style="gap:14px;align-items:flex-start">${TEAM.map(card).join("")}</div>${below}</div>`;
   // A escolha (moldura âmbar) e a recomendação (o selo com o pino) são coisas diferentes, como a ★ do jogo.
   const side = `<div class="col" style="gap:12px;width:500px;flex:none">` +
     inset(`<span class="tx f20 semi up amber kicker">Missão</span><div class="row" style="gap:12px">${glyph("route", 40)}<div class="col"><span class="tx f30 semi">Rua das Vitrines</span><span class="tx f20 muted">Fase 1 · Fácil · nível 1+</span></div></div>` +
@@ -204,7 +209,8 @@ function options() {
   return BG("station-options") + topBar({ subtitle: "Ciclo 0 · 4 no elenco" }) + roomPanel({ icon: "lobby-settings.svg", title: "Opções", body }) + bottom({ active: 0, back: true, keys: [["Setas", "Navegar"], ["E", "Mudar"], ["Esc", "Fechar"]] });
 }
 
-await run({
+// Importado (o lote 6, hud-laco), este arquivo não gera nada.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) await run({
   overview: () => overview(), preparation: () => preparation(), forge: () => forge(), research: () => research(),
   night: () => night(), dormitory: () => dormitory(), train: () => trainArrival(), plan: () => plan(),
   canteen: () => canteen(), depot: () => depot(), bar: () => barRoom(), options: () => options(),
