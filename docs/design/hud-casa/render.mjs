@@ -9,6 +9,7 @@
 // Uso (da raiz do repositório, com python3 -m http.server 8765 --bind 127.0.0.1 servindo a raiz):
 //   node docs/design/hud-casa/render.mjs http://127.0.0.1:8765
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 import {
   setBase, BASE, KIT, nine, over, img, glyph, key, bar, portrait, square, pill, badge, divider, cost, chip, secondary, primary,
   train, medal, bottom, roomPanel, roomTag, section, run,
@@ -18,26 +19,26 @@ import { networkMap } from "../hud-fluxo/render.mjs";
 setBase(process.argv[2] || "http://127.0.0.1:8765");
 const OUT = process.argv[3] || "docs/design/hud-casa/.render";
 const V2 = (name) => img(`docs/design/hud-v2/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px");
-const MINE = (name) => img(`docs/design/hud-casa/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px");
-const inset = (body, extra = "") => nine("panel_inset", { cls: "col", extra: `gap:8px;flex:none;${extra}` }, body);
-const line = (icon, color, text, cls = "f22") => `<div class="row" style="gap:10px;align-items:flex-start">${glyph(icon, 24, color, "margin-top:2px")}<span class="wrap ${cls}" style="flex:1;min-width:0">${text}</span></div>`;
-const bodies = (list) => list.map(([x, y, w, h]) => `<div class="abs" data-hit="hero-body" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>`).join("");
-const PORTRAIT = { bento: "bento", nick: "nick", iris: "iris", vespera: "vespera", lupa: "frog_recruit_01", brasa: "dog_recruit_01", sereno: "owl_recruit_01" };
-const face = (hero, size, style = "") => square(`art/ui/portraits/${PORTRAIT[hero]}.png`, size, style);
+export const MINE = (name) => img(`docs/design/hud-casa/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px");
+export const inset = (body, extra = "") => nine("panel_inset", { cls: "col", extra: `gap:8px;flex:none;${extra}` }, body);
+export const line = (icon, color, text, cls = "f22") => `<div class="row" style="gap:10px;align-items:flex-start">${glyph(icon, 24, color, "margin-top:2px")}<span class="wrap ${cls}" style="flex:1;min-width:0">${text}</span></div>`;
+export const bodies = (list) => list.map(([x, y, w, h]) => `<div class="abs" data-hit="hero-body" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>`).join("");
+export const PORTRAIT = { bento: "bento", nick: "nick", iris: "iris", vespera: "vespera", lupa: "frog_recruit_01", brasa: "dog_recruit_01", sereno: "owl_recruit_01" };
+export const face = (hero, size, style = "") => square(`art/ui/portraits/${PORTRAIT[hero]}.png`, size, style);
 // O estado novo nas cartas: a pílula do kit (status_pill), na cor do perigo, com o glifo da recuperação. Neutro de
 // gênero, como os outros estados ("Em forma", "Ferimento leve"): os heróis não têm gênero nos dados.
-const recovering = () => `<div class="pill">${img(KIT.status_pill.file, "position:absolute;inset:0;width:100%;height:100%")}` +
+export const recovering = () => `<div class="pill">${img(KIT.status_pill.file, "position:absolute;inset:0;width:100%;height:100%")}` +
   `<div class="tint" style="background:var(--danger-fill);-webkit-mask-image:url(${BASE}/${KIT.status_pill.file})"></div>` +
   `${glyph("state_recovering", 22, "#fff6ee", "position:relative")}<span class="tx" style="color:#fff6ee">Em recuperação</span></div>`;
 // O véu das cartas de quem não pode sair: o mesmo da habilidade sem uso (riscas escuras), com o texto no tom cheio.
 const veil = `<i style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(6,7,8,.55) 0 10px,rgba(6,7,8,.42) 10px 20px);pointer-events:none"></i>`;
 // O botão principal da Estação na saída nova (#123): IR AO MAPA, no lugar de PREPARAR EXPEDIÇÃO.
-const TO_MAP = { label: "Ir ao mapa", icon: "route", keyLabel: "G / X" };
+export const TO_MAP = { label: "Ir ao mapa", icon: "route", keyLabel: "G / X" };
 
 // ------------------------------------------------------------------ a barra do alto com os limites (#119)
 // O topBar do kit, com a ficha dos limites antes dos materiais: "Heróis 6 de 8" e "Ajudantes 3 de 4" (o Alojamento e o
 // Dormitório sobem os dois), com o ícone de cada um.
-function topBar({ subtitle = "", heroes = "6 de 8", helpers = "3 de 4", full = false, food = ["8 / 12 suprimentos", "Abastecida · demanda 4", false] } = {}) {
+export function topBar({ subtitle = "", heroes = "6 de 8", helpers = "3 de 4", full = false, food = ["8 / 12 suprimentos", "Abastecida · demanda 4", false], stock = ["30", "9", "3", "2"] } = {}) {
   const res = (icon, label, value, sub, warn) =>
     nine("resource_chip", { cls: "row", extra: "min-width:220px;min-height:96px;gap:12px" },
       `${glyph(warn ? "alert" : icon, 40, warn ? "var(--danger)" : "var(--text)")}<div class="col" style="gap:1px"><span class="tx f20 up muted">${label}</span>` +
@@ -46,7 +47,7 @@ function topBar({ subtitle = "", heroes = "6 de 8", helpers = "3 de 4", full = f
     `<div class="row" style="gap:8px">${glyph("nav_characters", 26)}<span class="tx f22">Heróis</span><span class="tx f24 semi ${full ? "danger" : "amber"}">${heroes}</span></div>` +
     `<div class="row" style="gap:8px">${glyph("helpers", 26)}<span class="tx f22">Ajudantes</span><span class="tx f24 semi amber">${helpers}</span></div>`);
   const mats = nine("resource_chip", { cls: "row", extra: "min-height:96px;gap:14px" },
-    [["lobby-seed.svg", "30"], ["lobby-scrap.svg", "9"], ["lobby-fragment.svg", "3"], ["res-bandages.svg", "2"]]
+    [["lobby-seed.svg", stock[0]], ["lobby-scrap.svg", stock[1]], ["lobby-fragment.svg", stock[2]], ["res-bandages.svg", stock[3]]]
       .map(([i, n]) => `<div class="row" style="gap:6px">${glyph(i, 28)}<span class="tx f26 semi">${n}</span></div>`).join(""));
   return `<div class="abs" style="left:28px;top:14px">` +
     nine("room_plaque", { cls: "row", extra: "min-width:400px;min-height:96px;gap:16px" },
@@ -59,9 +60,9 @@ function topBar({ subtitle = "", heroes = "6 de 8", helpers = "3 de 4", full = f
 // ------------------------------------------------------------------ 1. a Enfermaria (#121)
 // O cômodo escolhido no corte: cantos âmbar e a etiqueta (como o Alojamento na Visão geral). Na câmera do cômodo, a
 // Enfermaria fica de x 54 a 420; na Visão geral, de x 440 a 620 (build_room.py).
-const roomMark = (x, y, w, h, icon, label) => `<div class="abs" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">${nine("selected_slot", { extra: "position:absolute;inset:0" })}</div>` +
+export const roomMark = (x, y, w, h, icon, label) => `<div class="abs" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">${nine("selected_slot", { extra: "position:absolute;inset:0" })}</div>` +
   `<div class="abs" style="left:${x + w / 2}px;top:calc(${y}px - 52px*var(--k));transform:translateX(-50%)">` + nine("room_tag", { cls: "row", extra: "min-width:200px;height:calc(52px*var(--k));justify-content:center;gap:8px" }, `${glyph(icon, 22, "var(--amber)")}<span class="tx f22 semi">${label}</span>`) + `</div>`;
-const next = (body) => nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:10px" },
+export const next = (body) => nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:10px" },
   `<div class="row" style="gap:10px">${glyph("next_step", 28, "var(--amber)")}<span class="tx f22 semi amber kicker">Próximo passo</span></div>${body}`);
 // A Visão geral com a Enfermaria no subsolo 2 e o aviso "Íris volta amanhã"; main: o botão principal (o IR AO MAPA da #123).
 function overview({ main = TO_MAP, nextBody = null, mark = true, focus = false } = {}) {
@@ -430,7 +431,8 @@ function platform(p, { confirm = false } = {}) {
   return (confirm ? `<style>.tx-u{white-space:nowrap;line-height:1.14}.wrap-u{white-space:normal;line-height:1.18}.pill .tx-u{position:relative;font-size:calc(22px*var(--k));font-weight:600}</style>` + veiled : under) + modal;
 }
 
-await run({
+// Importado (o lote 8, hud-ajustes2), este arquivo não gera nada.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) await run({
   infirmary_overview: () => overview(),
   infirmary: () => infirmary(),
   report_fallen: (p) => report(p),

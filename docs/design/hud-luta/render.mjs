@@ -169,11 +169,12 @@ const BG = (name = "combat") => img(`docs/design/loop-screens/before/${name}_cle
   `<div class="abs" style="left:0;top:796px;width:1920px;height:284px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.24))"></div>`;
 
 // Opções do lote 6 (hud-laco): o fundo da captura, sem o anel (a máscara dele é a do sprite de Nick) e sem o nome do
-// alvo, e o que vai por cima (extra).
-export const combat = (p, { bg = "combat", withRing = true, target = true, extra = "" } = {}) => {
+// alvo, e o que vai por cima (extra). Do lote 8 (hud-ajustes2): bottom troca o painel do herói da vez e as habilidades
+// (a inspeção mostra os detalhes ali).
+export const combat = (p, { bg = "combat", withRing = true, target = true, extra = "", bottom = null } = {}) => {
   const large = p.k > 1;
   return EXTRA(p) + BG(bg) + (withRing ? ring() : "") + UNITS.map((u) => worldBar(u, large, p.cb)).join("") + (target ? targetName() : "") +
-    register() + order(p) + hero(large) + abilities(large) + actions() + extra;
+    register() + order(p) + (bottom === null ? hero(large) + abilities(large) : bottom) + actions() + extra;
 };
 
 // ------------------------------------------------------------------ a prancha dos estados
