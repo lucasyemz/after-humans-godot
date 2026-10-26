@@ -134,9 +134,10 @@ e o painel do meio contado como área (para não cobrir a barra das teclas):
 **Reaproveitadas:**
 - do kit da Estação: `room_plaque`, `panel_large`, `resource_chip`, `cost_chip`, `room_tag`, `list_row`,
   `resource_tile`, `selected_frame`, `chip_button`, `keys_bar`, `secondary_button`, `primary_button`, `panel_inset`,
-  `icon_button`;
-- do kit da luta: `round_strip` (o corredor), `panel` (as plaquinhas da equipe) e `square_portrait` (as casas, os
-  retratos e a moldura da ilustração).
+  `icon_button` e, desde o lote 4 ([hud-luta.md](hud-luta.md)), `corridor_strip` (o corredor, que antes usava o
+  `round_strip` do Codex);
+- do kit da luta: `panel` (as plaquinhas da equipe) e `square_portrait` (as casas, os retratos e a moldura da
+  ilustração).
 
 **Ícones:**
 - os que o jogo já tem: `node-start`, `node-boss`, `node-rest`, `res-hope`, `res-bandages`, `tool-*`, `item-ampoule`;

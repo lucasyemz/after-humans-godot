@@ -17,6 +17,20 @@
     "selected_slot",
     "steel_material"
   ],
+  "replaces_combat_kit": {
+    "panel": "panel_large / panel_inset",
+    "hero_panel": "panel_large + square_portrait",
+    "register": "room_plaque",
+    "action_button": "icon_button + key_tab",
+    "health_ally": "main_bar + bar_fill (+ ally_mark no daltonismo)",
+    "health_enemy": "main_bar + bar_fill (+ enemy_mark no daltonismo)",
+    "active_health": "selected_corners",
+    "round_strip": "round_strip (+ enemy_badge no daltonismo)",
+    "ability_header": "ability_header",
+    "ability_slot": "ability_slot, ability_slot_pressed, ability_slot_disabled",
+    "target_tab": "target_tab",
+    "actor_ring": "actor_ring"
+  },
   "axis_stretch": "TILE_FIT nas peças grandes (report_band, panel_large); STRETCH nas pequenas",
   "assets": {
     "report_band": {
@@ -1033,6 +1047,271 @@
       ],
       "note": "Por cima de touch_button quando há o que usar: o âmbar inteiro com o núcleo claro.",
       "sha256": "fe3d9b57ee1959ec242ce8d6a44e8d9dce5d9c1ff060b1a76b65010015e3eb07"
+    },
+    "corridor_strip": {
+      "file": "art/ui/kit/station/corridor_strip.webp",
+      "size": [
+        720,
+        72
+      ],
+      "nine_slice_ltrb": [
+        24,
+        16,
+        24,
+        16
+      ],
+      "content_xywh": [
+        24,
+        8,
+        672,
+        56
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "O corredor da exploração (o nome do trecho em cima e as dez casas): a faixa lisa, sem o bolso do nome da ordem da rodada. Centro em TILE_FIT. Mesmas medidas da faixa do Codex que o corredor usava.",
+      "sha256": "9cdb2cf89e3fd42644b45a168b53cef9f3b2d0bc8be868bebc62fbe5fb09ba10"
+    },
+    "round_strip": {
+      "file": "art/ui/kit/station/round_strip.webp",
+      "size": [
+        720,
+        64
+      ],
+      "nine_slice_ltrb": [
+        244,
+        20,
+        24,
+        20
+      ],
+      "content_xywh": [
+        18,
+        2,
+        688,
+        60
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A ordem da rodada (720x64 em x 636, y 30): o nome RODADA 1 (30, Maior 39) no bolso escuro (desenho de x 6 a 202, texto de 18 a 196), o elo âmbar desenhado em x 212-240 e, a partir de x 244, os retratos em square_portrait 60 com passo 68 (fundo #192026 nos heróis, #421b1b nas máquinas). Quem age: selected_frame por cima do retrato. Quem já agiu sai da fila. Esticar só o miolo.",
+      "sha256": "17d24416ad9a37b6a724b8c419370f484502811bd9cc21e8f0074cea3fb9bcd5"
+    },
+    "ability_header": {
+      "file": "art/ui/kit/station/ability_header.webp",
+      "size": [
+        624,
+        56
+      ],
+      "nine_slice_ltrb": [
+        60,
+        16,
+        124,
+        16
+      ],
+      "content_xywh": [
+        8,
+        6,
+        608,
+        44
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A barra da habilidade (624x56): ícone 40 no bolso de x 9-49, o nome (32, Maior 42) de x 64 e a casa do dano à direita (4–6, 28, Maior 36) no bolso de x 512-618. As duas pontas ficam fora do esticar.",
+      "sha256": "8c7f46035b052ecbadfd4ae404f2de7d4ef141038604ac943e1324c47831dd96"
+    },
+    "target_tab": {
+      "file": "art/ui/kit/station/target_tab.webp",
+      "size": [
+        336,
+        40
+      ],
+      "nine_slice_ltrb": [
+        16,
+        12,
+        16,
+        4
+      ],
+      "content_xywh": [
+        14,
+        4,
+        308,
+        36
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A aba ESCOLHA UM ALVO (26, Maior 34) em cima da barra da habilidade, encostada nela (a base é reta). Habilidade sem alvo: o texto do motivo na cor de perigo, na mesma aba.",
+      "sha256": "9e4f6e3c7d55f2aad57bfb286983ecae56b740677cd00f6436543be473c9473a"
+    },
+    "ability_slot": {
+      "file": "art/ui/kit/station/ability_slot.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "content_xywh": [
+        8,
+        8,
+        116,
+        116
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "O quadrado da habilidade (132x132, passo 160): o ícone pintado 116 por baixo, a tecla em key_tab 42 em x+90, y+90. Escolhida: selected_corners; foco: focus_frame. Usos e recarga: cost_chip no canto de cima.",
+      "sha256": "001b740ca4ad86f232eefc7a7ca4e453939c53a8602b91b92a3d7297f2e51ebf"
+    },
+    "ability_slot_pressed": {
+      "file": "art/ui/kit/station/ability_slot_pressed.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "content_xywh": [
+        8,
+        8,
+        116,
+        116
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Pressionado: aro escuro e sombra por dentro; o ícone desce 2 px e o alvo de toque não muda.",
+      "sha256": "34462f423392335305b3e8f1c62d25fe1ee32989977844159684e7a43b6c3a23"
+    },
+    "ability_slot_disabled": {
+      "file": "art/ui/kit/station/ability_slot_disabled.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "content_xywh": [
+        8,
+        8,
+        116,
+        116
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Sem uso: aro apagado sem âmbar, véu escuro por dentro e faixa diagonal de riscas (lê-se sobre qualquer ícone). O ícone fica cinza, a key_tab apaga (opacidade 0,55) e o motivo da sessão aparece no foco.",
+      "sha256": "ad9936f5a9612b2ab9c3ab9f7e4c68a163e8adc1e9b537b5fccdc4e0e4174d0f"
+    },
+    "selected_corners": {
+      "file": "art/ui/kit/station/selected_corners.webp",
+      "size": [
+        132,
+        132
+      ],
+      "nine_slice_ltrb": [
+        24,
+        22,
+        24,
+        22
+      ],
+      "content_xywh": null,
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A escolha persistente em cantoneiras âmbar (a habilidade escolhida e a barra de 44 de quem age). O foco de navegação (focus_frame) é outra camada e pode somar.",
+      "sha256": "ee0cea0fc830e06c80369245abfd44af6f82d672db47ef88d0ce02c5b63648b9"
+    },
+    "actor_ring": {
+      "file": "art/ui/kit/station/actor_ring.webp",
+      "size": [
+        256,
+        80
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        128,
+        40
+      ],
+      "note": "O anel no chão de quem age (256x80 sem escala, centro nos pés: x do ator, y 748 na captura). Decalque sob a unidade, com depth test. Reduzir efeitos: sem pulso. Não fatiar.",
+      "sha256": "b532cfab8ea2f5c0613e697bfb5f943b96b22284d69e4da3bbef9fbbee607d0b"
+    },
+    "ally_mark": {
+      "file": "art/ui/kit/station/ally_mark.webp",
+      "size": [
+        28,
+        56
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        0,
+        12,
+        28,
+        44
+      ],
+      "anchor": [
+        0,
+        12
+      ],
+      "note": "A forma do herói: tampa de aço na ponta esquerda da barra de vida no mundo (main_bar 200x44; no Maior, 200x46 e a tampa escala por igual, 46/44), com a aba que sobe 12 px e a divisa para cima. Entra no daltonismo, quando a cor sozinha não basta. Âncora: o canto da barra.",
+      "sha256": "42567476770d8922170a4518d6c80028697a7788ad7d48391dc6d544a520ff5a"
+    },
+    "enemy_mark": {
+      "file": "art/ui/kit/station/enemy_mark.webp",
+      "size": [
+        28,
+        56
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        0,
+        0,
+        28,
+        44
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "A forma do inimigo: tampa de aço na ponta esquerda da barra, com o X e dois dentes que descem 12 px. Entra nos perfis com daltonismo, quando a cor sozinha não basta. Âncora: o canto da barra.",
+      "sha256": "1557ded6fc2b1d74ce2d4234f95a10bd63f6081058ad78a1468b0a125c7069a0"
+    },
+    "enemy_badge": {
+      "file": "art/ui/kit/station/enemy_badge.webp",
+      "size": [
+        22,
+        22
+      ],
+      "nine_slice_ltrb": null,
+      "content_xywh": null,
+      "anchor": [
+        22,
+        22
+      ],
+      "note": "O X do inimigo no canto de baixo à direita do retrato da ordem da rodada, nos perfis com daltonismo (o fundo vermelho das máquinas some no cinza). Não fatiar.",
+      "sha256": "067c45452009056c72e225645798e6722c3fcefa9870aae0b950b4150ed1c971"
     }
   },
   "trait_ids": {

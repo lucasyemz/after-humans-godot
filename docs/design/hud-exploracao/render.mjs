@@ -42,7 +42,7 @@ function frame({ place = "Rua das Vitrines", sub = "Jornada 1 · Fim de tarde", 
       (state === "done" ? `<div style="position:absolute;right:-3px;bottom:2px;width:18px;height:18px;border-radius:2px;background:#101214">${glyph("state_active", 18, "var(--good)")}</div>` : "") +
       (state === "now" ? over("selected_frame") : "") + `</div>`;
   }).join("");
-  const strip = `<div class="abs" style="left:50%;transform:translateX(-50%);top:14px">` + nine("round_strip", { repeat: "round", cls: "col", extra: "gap:6px;align-items:center" },
+  const strip = `<div class="abs" style="left:50%;transform:translateX(-50%);top:14px">` + nine("corridor_strip", { repeat: "round", cls: "col", extra: "gap:6px;align-items:center" },
     `<span class="tx f22 semi up">${title}</span><div class="row" style="gap:0">${cells}</div>`) + `</div>`;
   const supplies = `<div class="abs col" style="right:28px;top:14px;gap:8px;align-items:flex-end">` +
     nine("resource_chip", { cls: "row", extra: "gap:18px;min-height:72px" },

@@ -8,6 +8,7 @@ Uso: python3 docs/design/hud-station/build_kit.py    (só Pillow)
 """
 import hashlib
 import json
+import math
 import random
 import sys
 from pathlib import Path
@@ -79,15 +80,25 @@ def wear(im, region, seed, amount=0.05):
     im.alpha_composite(layer)
 
 
-def plate(size, cut=12, rim=6, amber=True, inner="steel", seed=1, amber_len=None):
+def tab_poly(x0, y0, x1, y1, c):
+    """A aba: chanfro só nos cantos de cima; embaixo ela encosta reta na peça de baixo."""
+    return [(x0, y1), (x0, y0 + c), (x0 + c, y0), (x1 - c, y0), (x1, y0 + c), (x1, y1)]
+
+
+def plate(size, cut=12, rim=6, amber=True, inner="steel", seed=1, amber_len=None, shape="octagon"):
     """A chapa chanfrada: aro de aço com bisel, miolo de aço mais escuro e o âmbar nos cantos superior esquerdo e inferior
-    direito. inner: "steel", "dark" (caixa de texto embutida) ou None (moldura vazada, o conteúdo aparece por baixo)."""
+    direito. inner: "steel", "dark" (caixa de texto embutida) ou None (moldura vazada, o conteúdo aparece por baixo).
+    shape "tab": chanfro só em cima (a aba que encosta numa barra); o âmbar vai para os dois cantos de cima."""
     w, h = size
     top = 0
-    outer = chamfer(0, top, w - 1, h - 1, cut)
     ri = rim
     ic = max(3, round(cut - ri * 0.41))
-    inner_poly = chamfer(ri, top + ri, w - 1 - ri, h - 1 - ri, ic)
+    if shape == "tab":
+        outer = tab_poly(0, top, w - 1, h - 1, cut)
+        inner_poly = tab_poly(ri, top + ri, w - 1 - ri, h - 1 - ri, ic)
+    else:
+        outer = chamfer(0, top, w - 1, h - 1, cut)
+        inner_poly = chamfer(ri, top + ri, w - 1 - ri, h - 1 - ri, ic)
     outer_m = mask(size, outer)
     inner_m = mask(size, inner_poly)
     rim_m = Image.composite(Image.new("L", size, 0), outer_m, inner_m)
@@ -124,6 +135,8 @@ def plate(size, cut=12, rim=6, amber=True, inner="steel", seed=1, amber_len=None
         o = ri * 0.5 + 1.5
         a1 = [(o + 1, top + cut + o - 1 + n * 0.0), (cut + o - 1, top + o + 1)]
         a2 = [(w - 1 - cut - o + 1, h - 1 - o - 1), (w - 1 - o - 1, h - 1 - cut - o + 1)]
+        if shape == "tab":
+            a2 = [(w - 1 - cut - o + 1, top + o + 1), (w - 1 - o - 1, top + cut + o - 1)]
         glow = lines(size, [(a1, (*AMBER, 255), 3.4), (a2, (*AMBER, 255), 3.4)]).filter(ImageFilter.GaussianBlur(1.6))
         im.alpha_composite(glow)
         im.alpha_composite(lines(size, [(a1, (*AMBER, 255), 2.6), (a2, (*AMBER, 255), 2.6), (a1, (*AMBER_HOT, 200), 0.8), (a2, (*AMBER_HOT, 200), 0.8)]))
@@ -257,6 +270,217 @@ def save(name, im, slices=None, content=None, note="", anchor=(0, 0), tint=None)
         row["tint"] = tint
     ROWS[name] = row
 
+def round_strip(size=(720, 64)):
+    """A ordem da rodada numa faixa só: o bolso escuro do nome (RODADA 1) à esquerda, o sulco, o elo âmbar com o ponto e,
+    daí em diante, a calha dos retratos. O bolso e o elo ficam dentro da margem esquerda do 9-slice."""
+    w, h = size
+    im = plate(size, cut=14, rim=5, seed=51, amber_len=14)
+    pocket = plate((196, h - 12), cut=10, rim=3, amber=False, inner="dark", seed=52)
+    im.alpha_composite(pocket, (6, 6))
+    im.alpha_composite(groove((12, h - 12)), (200, 6))
+    y = h / 2
+    link = lines(size, [([(212, y), (240, y)], (*AMBER, 255), 2.2)])
+    im.alpha_composite(link.filter(ImageFilter.GaussianBlur(1.4)))
+    im.alpha_composite(link)
+    im.alpha_composite(mask_fill(size, [(226, y - 5), (231, y), (226, y + 5), (221, y)], AMBER))
+    return im
+
+
+def mask_fill(size, poly, color, alpha=255):
+    layer = Image.new("RGBA", size, (*color, 0))
+    layer.putalpha(mask(size, poly).point(lambda v: v * alpha // 255))
+    return layer
+
+
+def ability_header(size=(624, 56)):
+    """A barra da habilidade: o bolso do ícone à esquerda, o nome no meio e, depois do sulco, a casa do dano (4–6)."""
+    w, h = size
+    im = plate(size, cut=12, rim=5, seed=53, amber_len=12)
+    im.alpha_composite(plate((48, 46), cut=8, rim=3, amber=False, inner="dark", seed=54), (5, 5))
+    im.alpha_composite(groove((12, h - 10)), (w - 122, 5))
+    im.alpha_composite(plate((106, 46), cut=8, rim=3, amber=False, inner="dark", seed=55), (w - 112, 5))
+    return im
+
+
+def ability_slot(state="normal", size=(132, 132)):
+    """O quadrado da habilidade: moldura vazada (o ícone pintado aparece por baixo, 116 px), com um bolso no canto de
+    baixo à direita para a tecla. Pressionado: aro mais escuro e sombra por dentro (o ícone desce 2 px no jogo).
+    Desabilitado: aro apagado e riscas nos cantos (o ícone fica cinza no jogo e o motivo aparece no foco)."""
+    w, h = size
+    im = plate(size, cut=12, rim=7, amber=state != "disabled", inner=None, seed=56 if state == "normal" else 57, amber_len=12)
+    if state == "pressed":
+        shade = Image.new("RGBA", size, (0, 0, 0, 0))
+        inner = mask(size, chamfer(7, 7, w - 8, h - 8, 8))
+        sh = Image.new("L", size, 0)
+        ImageDraw.Draw(sh).rectangle((7, 7, w - 8, 20), fill=150)
+        sh = sh.filter(ImageFilter.GaussianBlur(5))
+        shade.putalpha(Image.composite(sh, Image.new("L", size, 0), inner))
+        dark = Image.new("RGBA", size, (0, 0, 0, 120))
+        dark.putalpha(Image.composite(Image.new("L", size, 120), Image.new("L", size, 0), mask(size, chamfer(0, 0, w - 1, h - 1, 12))))
+        im.alpha_composite(dark)
+        im.alpha_composite(shade)
+    if state == "disabled":
+        a = im.getchannel("A")
+        gray = im.convert("L").point(lambda v: round(v * 0.7)).convert("RGBA")
+        gray.putalpha(a)
+        im = gray
+        # O véu escuro por dentro (o ícone aparece apagado mesmo quando já é cinza) e a faixa diagonal de riscas.
+        veil = Image.new("RGBA", size, (10, 11, 12, 0))
+        veil.putalpha(mask(size, chamfer(7, 7, w - 8, h - 8, 8)).point(lambda v: v * 150 // 255))
+        im.alpha_composite(veil)
+        band = Image.new("L", size, 0)
+        bd = ImageDraw.Draw(band)
+        for i in range(-24, 25, 8):
+            bd.line([(i + 4, h + 4), (w + 4 + i, -4 + 0)], fill=255, width=3)
+        bandmask = Image.new("L", size, 0)
+        ImageDraw.Draw(bandmask).polygon([(0, h - 1 - 40), (w - 1 - 40, 0), (w - 1, 0), (w - 1, 40), (40, h - 1), (0, h - 1)], fill=255)
+        stripes = Image.new("RGBA", size, (176, 170, 156, 0))
+        stripes.putalpha(Image.composite(band, Image.new("L", size, 0), Image.composite(bandmask, Image.new("L", size, 0), mask(size, chamfer(7, 7, w - 8, h - 8, 8)))).point(lambda v: v * 120 // 255))
+        im.alpha_composite(stripes)
+    return im
+
+
+def selected_corners(size=(132, 132), cut=10, arm=22):
+    """A escolha persistente nos cantos (habilidade escolhida, barra de quem age): cantoneiras âmbar grossas que seguem o
+    chanfro, com o núcleo claro e um fio âmbar fino ligando tudo. O foco de navegação (focus_frame) vai por cima."""
+    w, h = size
+    o = 2.5
+    corners = []
+    for sx, sy in [(1, 1), (-1, 1), (1, -1), (-1, -1)]:
+        x0 = o if sx > 0 else w - 1 - o
+        y0 = o if sy > 0 else h - 1 - o
+        corners.append([(x0, y0 + sy * arm), (x0, y0 + sy * cut), (x0 + sx * cut, y0), (x0 + sx * arm, y0)])
+    thick = lines(size, [(c, (*AMBER, 255), 5.0) for c in corners])
+    out = Image.new("RGBA", size)
+    glow = thick.filter(ImageFilter.GaussianBlur(3))
+    glow.putalpha(glow.getchannel("A").point(lambda v: min(255, v * 2)))
+    out.alpha_composite(glow)
+    ring = chamfer(o, o, w - 1 - o, h - 1 - o, cut)
+    out.alpha_composite(lines(size, [(ring + [ring[0]], (*AMBER, 200), 1.4)]))
+    out.alpha_composite(thick)
+    out.alpha_composite(lines(size, [(c, (*AMBER_HOT, 230), 1.4) for c in corners]))
+    return out
+
+
+def actor_ring(size=(256, 80)):
+    """O anel no chão de quem age: um octógono chanfrado (o mesmo chanfro do kit) visto em perspectiva, âmbar com o núcleo
+    claro e o halo, as divisas ‹ › apontando para fora nos lados e a marca na frente. Sem fatiar; âncora no centro (os pés)."""
+    w, h = size
+    cx, cy = w / 2, h / 2
+    rx, ry = 98, 24
+
+    def octo(rx, ry):
+        pts = []
+        for i in range(8):
+            a = math.radians(i * 45)
+            pts.append((cx + rx * 1.04 * math.cos(a), cy + ry * 1.04 * math.sin(a)))
+        return pts
+    ring = octo(rx, ry)
+    inner = octo(rx - 10, ry - 4)
+    out = Image.new("RGBA", size)
+    floor = Image.new("RGBA", size, (*AMBER, 0))
+    floor.putalpha(mask(size, ring).point(lambda v: v * 22 // 255).filter(ImageFilter.GaussianBlur(6)))
+    out.alpha_composite(floor)
+    main = lines(size, [(ring + [ring[0]], (*AMBER, 255), 3.2), (inner + [inner[0]], (*AMBER, 90), 1.0)])
+    halo = main.filter(ImageFilter.GaussianBlur(5))
+    halo.putalpha(halo.getchannel("A").point(lambda v: min(255, v * 3)))
+    bloom = main.filter(ImageFilter.GaussianBlur(9))
+    bloom.putalpha(bloom.getchannel("A").point(lambda v: min(255, v * 2)))
+    out.alpha_composite(bloom)
+    out.alpha_composite(halo)
+    out.alpha_composite(main)
+    chev = []
+    for sgn in (-1, 1):
+        x = cx + sgn * (rx * 1.04 + 10)
+        chev.append(([(x - sgn * 4, cy - 8), (x + sgn * 6, cy), (x - sgn * 4, cy + 8)], (*AMBER, 255), 3.0))
+        chev.append(([(x - sgn * 12, cy - 6), (x - sgn * 3, cy), (x - sgn * 12, cy + 6)], (*AMBER, 200), 2.0))
+    front = [(cx - 9, cy + ry * 1.04 + 1), (cx, cy + ry * 1.04 + 7), (cx + 9, cy + ry * 1.04 + 1)]
+    chev.append((front, (*AMBER, 255), 2.6))
+    c = lines(size, chev)
+    out.alpha_composite(c.filter(ImageFilter.GaussianBlur(2)))
+    out.alpha_composite(c)
+    out.alpha_composite(lines(size, [(ring + [ring[0]], (*AMBER_HOT, 255), 2.0)] + [(pts, (*AMBER_HOT, 220), 1.0) for pts, _, _ in chev]))
+    return out
+
+
+def faction_mark(side, size=(28, 56)):
+    """A forma que diz o lado sem depender da cor (daltonismo e cinza): uma tampa de aço na ponta esquerda da barra.
+    Herói: a aba que sobe 12 px acima da barra. Inimigo: dois dentes que descem 12 px abaixo dela."""
+    w, h = size
+    bar_top = 12 if side == "ally" else 0
+    bar_bottom = bar_top + 44
+    if side == "ally":
+        poly = [(0, bar_top + 8), (4, bar_top + 4), (4, 4), (8, 0), (w - 5, 0), (w - 1, 4), (w - 1, bar_bottom - 1), (8, bar_bottom - 1), (0, bar_bottom - 9)]
+    else:
+        poly = [(0, 8), (8, 0), (w - 1, 0), (w - 1, bar_bottom - 1), (w - 2, bar_bottom - 1), (w - 8, h - 1), (w - 14, bar_bottom - 1),
+                (w - 15, bar_bottom - 1), (w - 21, h - 1), (w - 27, bar_bottom - 1), (8, bar_bottom - 1), (0, bar_bottom - 9)]
+    m = mask(size, poly)
+    im = Image.new("RGBA", size)
+    im.paste(tile(size, (58, 48, 40), 0.42), (0, 0), m)
+    shade = Image.new("RGBA", size)
+    sd = ImageDraw.Draw(shade)
+    for y in range(h):
+        k = y / max(1, h - 1)
+        sd.line((0, y, w, y), fill=(255, 255, 255, int(40 * (1 - k))) if k < 0.5 else (0, 0, 0, int(70 * (k - 0.5))))
+    im.alpha_composite(Image.composite(shade, Image.new("RGBA", size), m))
+    wear(im, m, 61 if side == "ally" else 62, amount=0.015)
+    # A marca gravada: a divisa para cima (herói) ou o X (inimigo), clara, legível também em cinza.
+    mid = (bar_top + bar_bottom) / 2
+    if side == "ally":
+        mark = [([(7, mid + 4), (14, mid - 4), (21, mid + 4)], (225, 220, 205, 255), 2.8)]
+    else:
+        mark = [([(8, mid - 6), (20, mid + 6)], (225, 220, 205, 255), 2.8), ([(20, mid - 6), (8, mid + 6)], (225, 220, 205, 255), 2.8)]
+    im.alpha_composite(lines(size, [(poly + [poly[0]], (*EDGE, 255), 1.8),
+                                    ([(x + (1 if x < w / 2 else -1), y + (1 if y < h / 2 else -1)) for x, y in poly[:5]], (168, 164, 152, 190), 1.1)] + mark))
+    im.putalpha(Image.composite(im.getchannel("A"), Image.new("L", size, 0), m))
+    return im
+
+
+def combat_pieces():
+    save("corridor_strip", plate((720, 72), cut=14, rim=5, seed=64, amber_len=14), [24, 16, 24, 16], [24, 8, 672, 56],
+         "O corredor da exploração (o nome do trecho em cima e as dez casas): a faixa lisa, sem o bolso do nome da ordem da "
+         "rodada. Centro em TILE_FIT. Mesmas medidas da faixa do Codex que o corredor usava.")
+    save("round_strip", round_strip(), [244, 20, 24, 20], [18, 2, 688, 60],
+         "A ordem da rodada (720x64 em x 636, y 30): o nome RODADA 1 (30, Maior 39) no bolso escuro (desenho de x 6 a 202, texto de 18 a 196), o elo âmbar "
+         "desenhado em x 212-240 e, a partir de x 244, os retratos em square_portrait 60 com passo 68 (fundo #192026 nos heróis, "
+         "#421b1b nas máquinas). Quem age: selected_frame por cima do retrato. Quem já agiu sai da fila. Esticar só o miolo.")
+    save("ability_header", ability_header(), [60, 16, 124, 16], [8, 6, 608, 44],
+         "A barra da habilidade (624x56): ícone 40 no bolso de x 9-49, o nome (32, Maior 42) de x 64 e a casa do dano à direita "
+         "(4–6, 28, Maior 36) no bolso de x 512-618. As duas pontas ficam fora do esticar.")
+    save("target_tab", plate((336, 40), cut=10, rim=4, amber=True, inner="dark", seed=58, amber_len=10, shape="tab"),
+         [16, 12, 16, 4], [14, 4, 308, 36],
+         "A aba ESCOLHA UM ALVO (26, Maior 34) em cima da barra da habilidade, encostada nela (a base é reta). Habilidade sem "
+         "alvo: o texto do motivo na cor de perigo, na mesma aba.")
+    slot_notes = {
+        "normal": "O quadrado da habilidade (132x132, passo 160): o ícone pintado 116 por baixo, a tecla em key_tab 42 em x+90, "
+                  "y+90. Escolhida: selected_corners; foco: focus_frame. Usos e recarga: cost_chip no canto de cima.",
+        "pressed": "Pressionado: aro escuro e sombra por dentro; o ícone desce 2 px e o alvo de toque não muda.",
+        "disabled": "Sem uso: aro apagado sem âmbar, véu escuro por dentro e faixa diagonal de riscas (lê-se sobre qualquer "
+                    "ícone). O ícone fica cinza, a key_tab apaga (opacidade 0,55) e o motivo da sessão aparece no foco.",
+    }
+    for state in ["normal", "pressed", "disabled"]:
+        suffix = "" if state == "normal" else f"_{state}"
+        save(f"ability_slot{suffix}", ability_slot(state), [20, 20, 20, 20], [8, 8, 116, 116], slot_notes[state])
+    save("selected_corners", selected_corners(), [24, 22, 24, 22], None,
+         "A escolha persistente em cantoneiras âmbar (a habilidade escolhida e a barra de 44 de quem age). O foco de navegação "
+         "(focus_frame) é outra camada e pode somar.")
+    save("actor_ring", actor_ring(), None, None,
+         "O anel no chão de quem age (256x80 sem escala, centro nos pés: x do ator, y 748 na captura). Decalque sob a unidade, com depth test. Reduzir efeitos: "
+         "sem pulso. Não fatiar.", anchor=(128, 40))
+    save("ally_mark", faction_mark("ally"), None, [0, 12, 28, 44],
+         "A forma do herói: tampa de aço na ponta esquerda da barra de vida no mundo (main_bar 200x44; no Maior, 200x46 e a tampa "
+         "escala por igual, 46/44), com a aba que sobe 12 px "
+         "e a divisa para cima. Entra no daltonismo, quando a cor sozinha não basta. Âncora: o canto da barra.",
+         anchor=(0, 12))
+    save("enemy_mark", faction_mark("enemy"), None, [0, 0, 28, 44],
+         "A forma do inimigo: tampa de aço na ponta esquerda da barra, com o X e dois dentes que descem 12 px. Entra nos "
+         "perfis com daltonismo, quando a cor sozinha não basta. Âncora: o canto da barra.", anchor=(0, 0))
+    badge = plate((22, 22), cut=5, rim=2, amber=False, inner="dark", seed=63)
+    badge.alpha_composite(lines((22, 22), [([(7, 7), (15, 15)], (225, 220, 205, 255), 2.4), ([(15, 7), (7, 15)], (225, 220, 205, 255), 2.4)]))
+    save("enemy_badge", badge, None, None,
+         "O X do inimigo no canto de baixo à direita do retrato da ordem da rodada, nos perfis com daltonismo (o fundo vermelho "
+         "das máquinas some no cinza). Não fatiar.", anchor=(22, 22))
+
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
@@ -381,6 +605,11 @@ def main():
     save("touch_button_active", amber_frame((170, 170), cut=50, width=3.6), None, None,
          "Por cima de touch_button quando há o que usar: o âmbar inteiro com o núcleo claro.", anchor=(85, 85))
 
+    # ---------------------------------------------------------------- lote 4: as peças só de luta (decisão do Lucas, 25/10)
+    # Redesenho, no mesmo padrão, das peças de art/ui/kit/combat que não tinham equivalente: as medidas e a estrutura do
+    # alvo aprovado (docs/design/hud-target.md); o desenho, os estados e as conferências deste kit.
+    combat_pieces()
+
     manifest = {
         "revision": "station_2026_10_25",
         "direction": "Alvos aprovados da Estação (25/10/2026), no idioma do kit da luta",
@@ -391,6 +620,15 @@ def main():
         "canvas": [1920, 1080],
         "material": "art/ui/kit/combat/steel_material.webp",
         "reuses_combat_kit": ["square_portrait", "key_tab", "main_bar", "selected_slot", "steel_material"],
+        # A luta no padrão deste kit (decisão do Lucas, 25/10; docs/design/hud-luta.md): a peça do Codex e o que a substitui.
+        "replaces_combat_kit": {
+            "panel": "panel_large / panel_inset", "hero_panel": "panel_large + square_portrait", "register": "room_plaque",
+            "action_button": "icon_button + key_tab", "health_ally": "main_bar + bar_fill (+ ally_mark no daltonismo)",
+            "health_enemy": "main_bar + bar_fill (+ enemy_mark no daltonismo)", "active_health": "selected_corners",
+            "round_strip": "round_strip (+ enemy_badge no daltonismo)", "ability_header": "ability_header",
+            "ability_slot": "ability_slot, ability_slot_pressed, ability_slot_disabled", "target_tab": "target_tab",
+            "actor_ring": "actor_ring",
+        },
         "axis_stretch": "TILE_FIT nas peças grandes (report_band, panel_large); STRETCH nas pequenas",
         "assets": ROWS,
         "trait_ids": {"agile": "trait_agile", "brave": "trait_brave", "hopeful": "trait_hopeful", "loyal": "trait_loyal",

@@ -4,8 +4,9 @@
 
 A HUD tem dois kits de peças:
 - **o da luta, feito pelo Codex:** `art/ui/kit/combat`, com 18 peças;
-- **o da Estação, da exploração e do fluxo, feito pelo agente da Awesomic:** `art/ui/kit/station`, com 45 peças, os
-  estados de cada uma (foco, pressionado, desabilitado, selecionado) e as conferências de `docs/design/hud-kit/lib.mjs`.
+- **o da Estação, da exploração e do fluxo, feito pelo agente da Awesomic:** `art/ui/kit/station`, com 57 peças (45
+  antes do lote 4), os estados de cada uma (foco, pressionado, desabilitado, selecionado) e as conferências de
+  `docs/design/hud-kit/lib.mjs`.
 
 O Lucas achou o da Awesomic mais completo, e **ele é o padrão** de toda a HUD, inclusive a luta.
 
@@ -30,6 +31,9 @@ O Lucas achou o da Awesomic mais completo, e **ele é o padrão** de toda a HUD,
 
   O agente da Awesomic redesenha essas peças no mesmo padrão e com os mesmos estados, e elas entram no manifesto
   dele. Depois disso, `art/ui/kit/combat` fica só como histórico, como o kit de latão (`v2`).
+
+  **Estado:** redesenhadas no lote 4, [hud-luta.md](hud-luta.md), com a tela da luta montada só com o kit, lado a lado
+  com o alvo. O manifesto da Awesomic diz, em `replaces_combat_kit`, o que substitui cada peça do Codex.
 - **No código (#60):** a biblioteca `scripts/ui/kit` expõe **componentes** (Painel, Plaqueta, Botão com os estados,
   Barra, Chip, Aba, Linha de lista, Tecla, Carta), e não arquivos de arte. Cada componente lê a peça do manifesto da
   Awesomic. A luta, a Estação, a exploração e o fluxo usam os mesmos componentes. Trocar uma peça muda todas as telas.
