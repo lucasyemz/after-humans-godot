@@ -571,7 +571,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 			for target_id in (targets if not targets.is_empty() else [actor.id]):
 				_spawn_vfx(actor, ability_id, target_id)
 	else:
-		_play_enemy_cue(actor, action)
+		_play_enemy_cue(actor, ability_id, action)
 		if action != null:
 			_float_text(card, action.DisplayName, Color(1.0, 0.85, 0.7), 0.9)
 	var impact_start := Time.get_ticks_msec()
@@ -831,6 +831,10 @@ func _is_machine(unit: AHCombat.Unit) -> bool:
 
 # ---------------------------------------------------------------- sons
 
+## Os sons das ações dos inimigos: audio/combat/enemies/<inimigo>/<ação>.wav.
+const ENEMY_CUES := "res://audio/combat/enemies/%s/%s.wav"
+
+
 func _hero_cue(actor: AHCombat.Unit, ability_id: String) -> String:
 	var prefix: String = HERO_CUES.get(actor.class_id, "")
 	var hero_class = session.data.classes.get(actor.class_id)
@@ -840,7 +844,13 @@ func _hero_cue(actor: AHCombat.Unit, ability_id: String) -> String:
 	return "%s%d" % [prefix, index + 1] if index >= 0 else ""
 
 
-func _play_enemy_cue(actor: AHCombat.Unit, action) -> void:
+## O som da ação do inimigo: cada habilidade tem o dela (tools/synth_enemy_sounds.py, ligado ao que a arte mostra). Sem
+## arquivo, o soco ou a cura de robô de antes.
+func _play_enemy_cue(actor: AHCombat.Unit, ability_id: String, action) -> void:
+	var path := ENEMY_CUES % [actor.enemy_id, ability_id]
+	if ResourceLoader.exists(path):
+		_play_path(path)
+		return
 	if action == null or not _is_machine(actor):
 		return
 	if action.TargetType == "Self":
@@ -851,7 +861,10 @@ func _play_enemy_cue(actor: AHCombat.Unit, action) -> void:
 
 
 func _play_cue(cue: String) -> void:
-	var path: String = art.audio.get(cue, "")
+	_play_path(art.audio.get(cue, ""))
+
+
+func _play_path(path: String) -> void:
 	if path == "" or speed > 2.0:
 		return
 	var player := _audio[_audio_next]
