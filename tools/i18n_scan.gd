@@ -16,7 +16,7 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/ui/exploration_hud.gd", "res://scripts/ui/passage_card.gd", "res://scripts/ui/camp_hud.gd",
 	"res://scripts/ui/combat_hud.gd", "res://scripts/ui/kit/kit.gd", "res://scripts/ui/kit/kit_pill.gd", "res://scripts/ui/kit/kit_key.gd", "res://scripts/ui/kit/kit_bar.gd", "res://scripts/ui/refuge_hud.gd",
 	"res://scripts/ui/station/station_report.gd", "res://scripts/ui/station/character_room.gd", "res://scripts/ui/station/station_frame.gd",
-	"res://scripts/ui/phase_map.gd", "res://scripts/ui/inventory_panel.gd", "res://scripts/ui/tips_service.gd",
+	"res://scripts/ui/phase_map.gd", "res://scripts/flow/network_radar.gd", "res://scripts/ui/inventory_panel.gd", "res://scripts/ui/tips_service.gd",
 	"res://scripts/ui/ui_style.gd", "res://scripts/flow/station_rules.gd", "res://scripts/flow/journey_rules.gd",
 	"res://scripts/flow/exploration_care.gd", "res://scripts/combat/combat_engine.gd", "res://scripts/combat/combat_session.gd",
 	"res://scripts/street/street.gd", "res://scripts/street/street_corridor.gd", "res://scripts/scenario/scenario_world.gd",
