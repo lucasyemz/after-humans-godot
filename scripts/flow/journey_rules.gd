@@ -510,6 +510,8 @@ static func finish_corridor(campaign: Dictionary) -> bool:
 	expedition.objective_completed = true
 	if not campaign.completed_phases.has(expedition.phase_id):
 		campaign.completed_phases.append(expedition.phase_id)
+		# A primeira vitória na fase: o relatório da volta mostra a fase seguinte liberada (#60).
+		expedition.first_clear = true
 	for hero in campaign.roster:
 		if expedition.team.has(hero.id) and hero.alive:
 			hero.completed_expeditions = hero.get("completed_expeditions", 0) + 1

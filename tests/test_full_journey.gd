@@ -435,7 +435,7 @@ func _press(root: Node, prefix: String, what: String) -> bool:
 	var target: Array = []
 	var found: bool = await _until(func():
 		for button in _buttons(root):
-			if button.is_visible_in_tree() and not button.disabled and button.text.begins_with(prefix):
+			if button.is_visible_in_tree() and not button.disabled and button.text.to_lower().begins_with(prefix.to_lower()):
 				target.append(button)
 				return true
 		return false, what)

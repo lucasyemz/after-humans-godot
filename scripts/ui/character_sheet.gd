@@ -31,7 +31,8 @@ func _init() -> void:
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	z_index = 20
-	add_theme_stylebox_override("panel", U.panel(1.0, U.GOLD, 2))
+	# O aço e a Barlow do kit (#60), como a dica da luta.
+	add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("panel", "large")))
 	custom_minimum_size = Vector2(WIDTH, 0)
 
 
@@ -242,7 +243,9 @@ func _build(level: int = 0) -> void:
 	box.add_theme_constant_override("separation", 6)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(box)
-	var title := U.label(String(info.name), 26, U.ENEMY if info.enemy else U.GOLD, "display")
+	var title := AHKit.label(String(info.name), "card_name", AHKit.enemy_hp() if info.enemy else AHKit.AMBER, true, true)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.custom_minimum_size = Vector2(WIDTH - 48, 0)
 	title.name = "Name"
 	title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	box.add_child(title)
@@ -253,12 +256,12 @@ func _build(level: int = 0) -> void:
 	# Os números: a vida, o instinto (heróis) e a velocidade.
 	var numbers := _text(TranslationServer.translate("Vida %d/%d") % [info.hp, info.max_hp], 19, U.TEXT, "Life")
 	box.add_child(numbers)
-	var life := U.bar(U.ENEMY if info.enemy else Color(0.8, 0.27, 0.22), 8)
-	life.max_value = maxi(1, int(info.max_hp))
-	life.value = int(info.hp)
+	var life := AHKit.bar("enemy" if info.enemy else "life", int(info.hp), maxi(1, int(info.max_hp)))
+	life.name = "LifeBar"
+	life.custom_minimum_size = Vector2(0, 22)
 	box.add_child(life)
 	if int(info.instinct) >= 0:
-		box.add_child(_text(TranslationServer.translate("Instinto %d/200 · em 200, crise") % info.instinct, 17, U.VIOLET, "Instinct"))
+		box.add_child(_text(TranslationServer.translate("Instinto %d/200 · em 200, crise") % info.instinct, 17, AHKit.INSTINCT.lightened(0.25), "Instinct"))
 	box.add_child(_text(TranslationServer.translate("Velocidade %d · quem é mais rápido age antes na rodada") % info.speed, 17, U.TEXT, "Speed"))
 	_section(box, TranslationServer.translate("Efeitos passivos"), info.passives, TranslationServer.translate("Nenhum"), level < 1, level >= 3)
 	_section(box, TranslationServer.translate("Estados"), info.states, TranslationServer.translate("Nenhum agora"), level < 2, level >= 3)
@@ -285,12 +288,12 @@ func _section(box: VBoxContainer, heading: String, rows: Array, empty: String, t
 
 
 func _text(text: String, size: int, color: Color, node_name: String, kind: String = "body") -> Label:
-	var label := U.label(text, size, color, kind)
+	var label := AHKit.label_px(text, size, color, kind)
 	label.name = node_name
 	# O nome repetido (as linhas) vira outro na árvore; a parte fica na meta.
 	label.set_meta("part", node_name)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.custom_minimum_size = Vector2(WIDTH - 32, 0)
+	label.custom_minimum_size = Vector2(WIDTH - 48, 0)
 	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label

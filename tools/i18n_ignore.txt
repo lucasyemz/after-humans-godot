@@ -35,17 +35,11 @@ combat_hud.gd: Beta
 combat_hud.gd: W
 combat_hud.gd: I
 combat_hud.gd: F
-combat_hud.gd: Top
-combat_hud.gd: Name
-combat_hud.gd: HpRow/Hp
-combat_hud.gd: Instinct
 combat_hud.gd: Intent
 combat_hud.gd: Status
 combat_hud.gd: status-%s_%s
 combat_hud.gd: Icon
 combat_hud.gd: Count
-combat_hud.gd: HpRow/HpText
-combat_hud.gd: IntentRow/Intent
 combat_hud.gd: %s → %s
 combat_hud.gd: %d–%d
 combat_hud.gd: +%d–%d
@@ -56,13 +50,10 @@ combat_hud.gd: %d/%d
 combat_hud.gd: Description
 refuge_hud.gd: %s: %s · %s%s
 refuge_hud.gd: %s · %s
-refuge_hud.gd: %s · %s · %s
 refuge_hud.gd: %s · %d/%d
 refuge_hud.gd: Role
 refuge_hud.gd: UI
 refuge_hud.gd: Description
-refuge_hud.gd: +%d %s
-refuge_hud.gd: %s%s
 *: abilities
 *: ability
 *: accessibility
@@ -176,7 +167,6 @@ refuge_hud.gd: %s%s
 *: stats
 *: street
 *: stunned
-*: style
 *: supplies
 *: team
 *: touch
@@ -848,7 +838,6 @@ station_rules.gd: Alerta
 station_rules.gd: Centelha
 station_rules.gd: Pinça
 station_rules.gd: Bigorna
-refuge_hud.gd: story
 exploration_hud.gd: Requirement
 journey_rules.gd: hero
 station_rules.gd: xp
@@ -870,7 +859,6 @@ hero_levels.gd: Calm
 hero_levels.gd: Ability
 hero_levels.gd: migration
 hero_levels.gd: roster
-refuge_hud.gd: %s ×%d
 combat_session.gd: alive
 hero_levels.gd: alive
 station_rules.gd: Xp
@@ -954,3 +942,178 @@ character_sheet.gd: part
 combat_hud.gd: since
 inventory_panel.gd: screen
 inventory_panel.gd: detail
+combat_hud.gd: Register
+combat_hud.gd: small
+combat_hud.gd: text
+combat_hud.gd: Dock
+combat_hud.gd: hero
+combat_hud.gd: tab
+combat_hud.gd: range
+combat_hud.gd: Abilities
+combat_hud.gd: Actions
+combat_hud.gd: Line
+combat_hud.gd: exit
+combat_hud.gd: enemy
+combat_hud.gd: Active
+combat_hud.gd: round
+combat_hud.gd: Now
+combat_hud.gd: %d/200
+combat_hud.gd: Selected
+combat_hud.gd: Uses
+kit.gd: register
+kit.gd: round
+kit.gd: tab
+kit.gd: key
+kit.gd: range
+kit.gd: primary
+kit.gd: row
+kit.gd: text
+kit.gd: small
+kit.gd: id
+kit.gd: healthy
+kit.gd: icon
+kit.gd: color
+kit.gd: light
+kit.gd: heavy
+kit.gd: assets
+kit_pill.gd: small
+kit_pill.gd: text
+kit_pill.gd: light
+kit_pill.gd: state
+kit_key.gd: size
+kit_key.gd: key
+kit_bar.gd: hero
+kit_bar.gd: size
+kit_bar.gd: enemy
+kit_bar.gd: state
+character_room.gd: life
+character_sheet.gd: life
+kit_bar.gd: life
+station_report.gd: life
+combat_hud.gd: Hit
+character_room.gd: Self
+combat_hud.gd: Self
+kit_bar.gd: heavy
+station_report.gd: Cards
+station_report.gd: Band
+station_report.gd: text
+station_report.gd: Phase
+station_report.gd: Result
+character_room.gd: small
+station_report.gd: small
+station_report.gd: Chips
+station_report.gd: bed
+station_report.gd: Resources
+character_room.gd: divider
+station_report.gd: divider
+station_report.gd: icon
+station_report.gd: color
+station_report.gd: night
+station_report.gd: resource
+station_report.gd: +%d
+station_report.gd: Card
+station_report.gd: Best
+character_room.gd: Xp
+station_report.gd: Xp
+character_room.gd: %d / %d
+station_report.gd: %d / %d
+character_room.gd: expeditions
+station_report.gd: expeditions
+character_room.gd: kills
+station_report.gd: kills
+station_report.gd: Tab
+station_report.gd: Details
+station_report.gd: story
+station_report.gd: +%d %s
+character_room.gd: row
+station_report.gd: row
+station_report.gd: Enter
+station_report.gd: %s / LB
+character_room.gd: Key
+station_report.gd: Key
+station_report.gd: %s / A
+character_room.gd: +recruit
+character_room.gd: overview
+character_room.gd: facilities
+character_room.gd: characters
+character_room.gd: hide
+character_room.gd: Plaque
+character_room.gd: Vitals
+character_room.gd: Options
+character_room.gd: resource_%s
+character_room.gd: Hero
+character_room.gd: file
+character_room.gd: frames
+character_room.gd: fps
+character_room.gd: Left
+character_room.gd: Heroes
+character_room.gd: Tab_%s
+character_room.gd: tab
+character_room.gd: Tab_recruit
+character_room.gd: primary
+character_room.gd: UI
+character_room.gd: recruit
+character_room.gd: Ability_%s
+character_room.gd: Detail
+character_room.gd: Max
+character_room.gd: %s · %s
+character_room.gd: %s · %s · %s
+character_room.gd: Right
+character_room.gd: Close
+character_room.gd: X
+character_room.gd: Name
+character_room.gd: Upgrades
+character_room.gd: Life
+character_room.gd: Instinct
+character_room.gd: Medal
+character_room.gd: Train
+character_room.gd: %s  %s
+character_room.gd: perks
+character_room.gd: Speed
+character_room.gd: speed
+character_room.gd: Description
+character_room.gd: Relic
+character_room.gd: Traits
+character_room.gd: Condition
+character_room.gd: Training
+character_room.gd: Upgrade_%s
+character_room.gd: Cancel
+character_room.gd: Esc / B
+character_room.gd: Esc
+character_room.gd: Confirm
+character_room.gd: Back
+character_room.gd: Keys
+character_room.gd: Nav
+character_room.gd: Nav_%s
+character_room.gd: Prepare
+character_room.gd: %s / X
+character_room.gd: Reason
+combat_arena.gd: icons
+character_room.gd: text
+*: large
+*: plaque
+*: inset
+*: icon
+*: intent
+*: key
+*: secondary
+*: band
+*: bar
+*: main
+*: fill
+*: chip
+*: cost
+*: status
+*: resource
+*: trait
+*: nav
+*: hero
+*: list
+*: upgrade
+*: selected
+*: exit
+*: tab
+*: primary
+*: alert
+kit.gd: Componente do kit sem a variante: %s/%s
+kit.gd: Selected

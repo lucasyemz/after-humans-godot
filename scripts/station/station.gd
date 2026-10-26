@@ -42,6 +42,15 @@ const WORK_POSES := {"hero_cao_bento": "forge", "hero_gato_nick": "depot", "hero
 const LINE_CENTER_X := 13.8
 const LINE_SPACING := 2.1
 const LINE_Z := -6.4
+## O relatório no kit (#60): os centros das cartas dos heróis a 416 px um do outro, e os pés da fila logo acima delas.
+const REPORT_CARD_STEP := 416.0
+const REPORT_FEET_Y := 634.0
+## Na fila do relatório, um pouco mais afastados que na partida: a câmera recua e os heróis cabem entre a faixa do alto
+## (que cresce no texto Maior) e as abas das cartas.
+const REPORT_SPACING := 2.6
+## A Sala dos Personagens no kit (#60): o teto e o piso do cômodo na tela.
+const STAGE_TOP := 112.0
+const STAGE_FLOOR := 900.0
 ## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
 ## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
 ## o candidato desce e anda; só então a câmera fecha nele. Na saída: o recusado volta ao trem, o sino avisa, as portas
@@ -71,6 +80,8 @@ var hud: AHRefugeHud
 var menu_right := SCREEN_MENU_RIGHT
 var camera: Camera3D
 var residents := {}
+## Os moradores escondidos por uma tela do kit (hide_residents).
+var _residents_hidden := false
 ## Na plataforma (o relatório, o trem, a partida) ou no abrigo; a passagem secreta liga os dois.
 var on_platform := false
 var lineup: Array = []
@@ -271,6 +282,9 @@ static func _lerp_key(a: Dictionary, b: Dictionary, t: float) -> Dictionary:
 
 func _set_goal(key: Dictionary, instant: bool = false) -> void:
 	_goal = key
+	# No meio da passagem, a chave nova vira o fim do caminho (senão a passagem, ao terminar, voltava à de antes).
+	if not _path.is_empty() and not instant:
+		_path[-1] = key
 	if instant:
 		_key = key
 		_apply_key(_key)
@@ -352,6 +366,36 @@ func focus_room(room_id: String, instant: bool = false) -> void:
 	if room.is_empty():
 		return
 	_go(_framed_key(room.x0 - 0.3, room.x1 + 0.3, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
+
+
+## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): a câmera fecha na altura do
+## cômodo (do teto em STAGE_TOP ao piso em STAGE_FLOOR, na tela), então o fundo atrás do herói é só o próprio cômodo,
+## sem a plataforma e o trem em cima nem o andar de baixo.
+func focus_room_stage(room_id: String, left_px: float, right_px: float, instant: bool = false) -> void:
+	var room := room_def(room_id)
+	if room.is_empty():
+		return
+	var fov := 26.0
+	var pitch := -3.0
+	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
+	var depth: float = focal * (room.ceiling - room.floor) / (STAGE_FLOOR - STAGE_TOP)
+	var drop := atan((STAGE_FLOOR - 540.0) / focal) + deg_to_rad(-pitch)
+	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * depth / focal
+	_go({"pos": Vector3(x, room.floor + depth * tan(drop), depth), "fov": fov, "pitch": pitch}, false, instant)
+
+
+## A câmera chegou aonde ia (sem caminho pela passagem e perto da chave).
+func camera_settled() -> bool:
+	return _path.is_empty() and not _goal.is_empty() and _key.pos.distance_to(_goal.pos) < 0.02
+
+
+## Todos os moradores (heróis e civis) somem enquanto uma tela do kit cobre a Estação: nenhum aparece no vão entre os
+## painéis nem numa lasca na borda deles.
+func hide_residents(hidden: bool) -> void:
+	_residents_hidden = hidden
+	for card in residents.values():
+		if is_instance_valid(card):
+			card.visible = not hidden
 
 
 ## A plataforma onde o trem para e o candidato espera.
@@ -462,11 +506,43 @@ func _departure_slot(position: int) -> Vector3:
 func show_report(hero_ids: Array, instant: bool = true) -> void:
 	clear_lineup()
 	for index in hero_ids.size():
-		_line_card(hero_ids[index], _line_slot(index, hero_ids.size()))
+		_line_card(hero_ids[index], Vector3(LINE_CENTER_X + (index - (maxi(1, hero_ids.size()) - 1) * 0.5) * REPORT_SPACING, 0, LINE_Z))
 	on_platform = true
 	_path.clear()
 	_apply_panel(0.0)
-	_set_goal(_line_key(hero_ids.size()), instant)
+	_set_goal(_report_key(), instant)
+
+
+## A câmera do relatório no kit (#60): a fila na tela inteira, com cada um de pé sobre a sua carta (os centros das
+## cartas ficam a REPORT_CARD_STEP px um do outro, e os da fila a REPORT_SPACING m: a distância sai daí) e os pés em
+## REPORT_FEET_Y, logo acima das cartas.
+func _report_key() -> Dictionary:
+	var fov := 40.0
+	var pitch := -3.0
+	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
+	var depth := focal / (REPORT_CARD_STEP / REPORT_SPACING)
+	var drop := atan((REPORT_FEET_Y - 540.0) / focal) + deg_to_rad(-pitch)
+	return {"pos": Vector3(LINE_CENTER_X, depth * tan(drop), LINE_Z + depth), "fov": fov, "pitch": pitch}
+
+
+## Cada um da fila vai para cima do centro da sua carta (centers: o x na tela de cada herói; o HUD diz onde), pela chave do relatório
+## (aonde a câmera chega, e não onde ela está no caminho: ninguém desliza enquanto ela anda). O ponto da tela na
+## altura dos pés, levado à linha da fila. Assim nenhuma carta corta um herói, em qualquer largura da janela.
+func align_lineup(centers: Dictionary) -> void:
+	if _goal.is_empty():
+		return
+	var screen := get_viewport().get_visible_rect().size
+	var focal: float = screen.y * 0.5 / tan(deg_to_rad(float(_goal.fov) * 0.5))
+	var tilt := deg_to_rad(-float(_goal.pitch))
+	var along: float = (_goal.pos.z - LINE_Z) * cos(tilt) + _goal.pos.y * sin(tilt)
+	for i in lineup.size():
+		var entry: Dictionary = lineup[i]
+		if not is_instance_valid(entry.card) or not centers.has(entry.hero_id):
+			continue
+		var x: float = _goal.pos.x + (float(centers[entry.hero_id]) - screen.x * 0.5) * along / focal
+		entry.card.position.x = x
+		if is_instance_valid(entry.get("contact")):
+			entry.contact.position.x = x
 
 
 ## A partida: a equipe em fila (posição 1 à direita) com o contato no chão; do abrigo, sobe pela passagem (ShowDeparture).
@@ -490,8 +566,9 @@ func _line_card(hero_id: String, feet: Vector3) -> void:
 	add_child(card)
 	card.position = feet
 	card.set_facing(1.0)
-	lineup.append({"hero_id": hero_id, "card": card})
-	_contacts.append(_contact(feet, Vector2(0.9, 0.45)))
+	var contact := _contact(feet, Vector2(0.9, 0.45))
+	lineup.append({"hero_id": hero_id, "card": card, "contact": contact})
+	_contacts.append(contact)
 	# Quem está na fila não aparece ao mesmo tempo no seu cômodo.
 	if residents.has(hero_id):
 		residents[hero_id].visible = false
@@ -502,7 +579,7 @@ func clear_lineup() -> void:
 		if is_instance_valid(entry.card):
 			entry.card.queue_free()
 		if residents.has(entry.hero_id):
-			residents[entry.hero_id].visible = true
+			residents[entry.hero_id].visible = not _residents_hidden
 	lineup.clear()
 	for contact in _contacts:
 		if is_instance_valid(contact):
@@ -1070,6 +1147,8 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
 	# Refeitos os passeios (depois do trem, por exemplo), quem dorme volta para o beliche.
 	_update_sleepers()
+	if _residents_hidden:
+		hide_residents(true)
 
 
 ## A arte do herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).

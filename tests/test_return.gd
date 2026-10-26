@@ -152,7 +152,7 @@ func _skip(kind: String) -> void:
 	await _frames(3)
 	t.check(hud.current == "report" and not station.team_arriving(), "%s pula a chegada e abre o relatório" % kind)
 	t.equal(station.lineup.size(), 4, "com a equipe inteira na fila (%s)" % kind)
-	t.check(hud.find_children("*", "Button", true, false).any(func(b): return b.text == tr("Entrar no abrigo") and b.is_visible_in_tree()),
+	t.check(hud.find_children("*", "Button", true, false).any(func(b): return b.text.to_lower() == tr("Entrar no abrigo").to_lower() and b.is_visible_in_tree()),
 		"o relatório completo, com Entrar no abrigo (%s)" % kind)
 
 

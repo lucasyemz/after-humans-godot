@@ -1088,7 +1088,13 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 		"seeds": floori(loot.get("seeds", 0) * factor), "scrap": floori(loot.get("scrap", 0) * factor),
 		"fragments": floori(loot.get("fragments", 0) * factor), "water": floori(loot.get("water", 0) * factor),
 		"supplies": floori(loot.get("supplies", 0) * factor), "request": "", "team": expedition.team.duplicate(),
-		"food_left": maxi(0, int(expedition.food)), "stats": expedition.get("stats", {}).duplicate(true)}
+		"food_left": maxi(0, int(expedition.food)), "stats": expedition.get("stats", {}).duplicate(true),
+		"focus": String(expedition.get("focus", "")), "objective_done": bool(expedition.get("objective_done", false)), "unlocked_phase": ""}
+	# A fase seguinte liberada pela primeira vitória (as expedições salvas antes do #60 não têm a marca: sem o chip).
+	if session.result == "victory" and expedition.get("first_clear", false):
+		for i in AHJourneyRules.PHASES.size() - 1:
+			if AHJourneyRules.PHASES[i].id == expedition.phase_id:
+				delivered.unlocked_phase = AHJourneyRules.PHASES[i + 1].id
 	adjust(campaign, "seeds", delivered.seeds)
 	adjust(campaign, "scrap", delivered.scrap)
 	adjust(campaign, "fragments", delivered.fragments)
@@ -1101,6 +1107,8 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 		delivered.request = request
 	for entry in campaign.roster:
 		entry.expedition_uses = {}
+		# Os abates da carreira (o campo já existia no herói, sem conta): as máquinas derrubadas nesta jornada (#60).
+		entry.kills_count = int(entry.get("kills_count", 0)) + int(delivered.stats.get(entry.id, {}).get("downs", 0))
 	if session.result == "victory" and campaign.last_completed_expedition_id != expedition.id:
 		# O XP da jornada concluída (#90): cada um da equipe que voltou vivo; o relatório mostra junto com o das lutas.
 		for hero_id in expedition.team:
