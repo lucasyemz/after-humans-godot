@@ -193,6 +193,26 @@ static func icon(name: String) -> Texture2D:
 	return load(path) if ResourceLoader.exists(path) else null
 
 
+## Os recursos pintados (#125), pelo nome antigo do ícone (art/ui/icons). Pintado não se tinge.
+const PAINTED := {"lobby-seed": "resource_seeds", "lobby-scrap": "resource_scrap", "lobby-fragment": "resource_fragments",
+	"lobby-food": "resource_food", "lobby-water": "resource_water", "lobby-energy": "resource_power",
+	"res-bandages": "resource_bandages", "res-hope": "resource_hope"}
+
+
+## O recurso pintado do nome antigo, ou null.
+static func painted(name: String) -> Texture2D:
+	return icon(PAINTED[name]) if PAINTED.has(name) else null
+
+
+## Um ícone pelo nome antigo, para tingir: o glifo do kit (#135, mesmo nome) ou, sem ele, o SVG de art/ui/icons.
+static func legacy_icon(name: String) -> Texture2D:
+	var glyph_icon := icon(name)
+	if glyph_icon != null:
+		return glyph_icon
+	var path := "res://art/ui/icons/%s.svg" % name
+	return load(path) if ResourceLoader.exists(path) else null
+
+
 static func font(emphasis: bool = false) -> Font:
 	var path := FONT_SEMIBOLD if emphasis else FONT_MEDIUM
 	if not _fonts.has(path):
@@ -384,7 +404,7 @@ static func panel(piece: String, tint: Color = Color.WHITE) -> PanelContainer:
 ## Um ícone do kit tingido (os glifos brancos de um tom) ou como é (os pintados).
 static func glyph(name: String, side: float, tint: Color = Color.WHITE) -> TextureRect:
 	var rect := TextureRect.new()
-	rect.texture = icon(name)
+	rect.texture = legacy_icon(name)
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rect.custom_minimum_size = Vector2(side, side)

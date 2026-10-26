@@ -1335,3 +1335,4 @@ network_radar.gd: some
 network_radar.gd: known
 network_radar.gd: partial
 phase_map.gd: Footer
+camp_hud.gd: painted

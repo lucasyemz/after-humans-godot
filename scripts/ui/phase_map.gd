@@ -16,7 +16,6 @@ const R = preload("res://scripts/flow/network_radar.gd")
 const STREET = preload("res://scripts/street/street.gd")
 const CONTRACT := "res://data/presentation/network_map.json"
 const NETWORK := "res://art/ui/map/network/%s.webp"
-const ICONS := "res://art/ui/icons/%s.svg"
 ## Onde a pintura (1120 x 630, sem escala) fica na tela, a moldura do mapa e o painel da fase.
 const PAINT_POS := Vector2(60, 196)
 const MAP_PANEL := Rect2(36, 130, 1164, 820)
@@ -424,7 +423,7 @@ static func portrait_of(enemy_id: String) -> Texture2D:
 func _icon_texture(name: String) -> Texture2D:
 	if name == "lock":
 		return load(NETWORK % "lock_32")
-	return AHKit.icon(name) if ResourceLoader.exists(AHKit.ICONS % name) else load(ICONS % name)
+	return AHKit.legacy_icon(name)
 
 
 func _mark_icon(name: String, side: float, tint: Color) -> TextureRect:

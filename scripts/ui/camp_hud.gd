@@ -125,8 +125,8 @@ func _build_bar() -> void:
 	var cares := HBoxContainer.new()
 	cares.add_theme_constant_override("separation", 16)
 	right.add_child(cares)
-	eat_button = _care("food", tr("Ração"), tr("+10% vida · −5 instinto"), "res://art/ui/icons/lobby-food.svg", func(): food.emit(camp.selected_id()))
-	heal_button = _care("bandage", tr("Curativo"), tr("+8 vida"), "res://art/ui/icons/res-bandages.svg", func(): bandage.emit(camp.selected_id()))
+	eat_button = _care("food", tr("Ração"), tr("+10% vida · −5 instinto"), "lobby-food", func(): food.emit(camp.selected_id()))
+	heal_button = _care("bandage", tr("Curativo"), tr("+8 vida"), "res-bandages", func(): bandage.emit(camp.selected_id()))
 	cares.add_child(eat_button)
 	cares.add_child(heal_button)
 	column.add_child(_divider())
@@ -176,7 +176,7 @@ func _divider() -> TextureRect:
 
 
 ## Um cuidado grande: o ícone, o nome, o efeito e o estoque ("x4"); o foco e o mouse mostram a vida prevista.
-func _care(kind: String, title: String, effect: String, icon_path: String, action: Callable) -> Button:
+func _care(kind: String, title: String, effect: String, icon_name: String, action: Callable) -> Button:
 	var button := AHKit.button("", "secondary")
 	button.name = "Care_" + kind
 	button.custom_minimum_size = Vector2(0, CARE_HEIGHT)
@@ -195,7 +195,10 @@ func _care(kind: String, title: String, effect: String, icon_path: String, actio
 	button.add_child(row)
 	var icon := TextureRect.new()
 	icon.name = "Icon"
-	icon.texture = load(icon_path)
+	# A Ração e o Curativo pintados (#125), com as cores deles; sem eles, o glifo tingido.
+	var painted := AHKit.painted(icon_name)
+	icon.texture = painted if painted != null else AHKit.legacy_icon(icon_name)
+	icon.set_meta("painted", painted != null)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.custom_minimum_size = Vector2(AHUiStyle.px(38), AHUiStyle.px(38))
@@ -402,7 +405,11 @@ func _style_care(button: Button, stock: int, effect: bool) -> void:
 	(button.find_child("Stock", true, false) as Label).text = tr("x%d") % stock
 	(button.find_child("Stock", true, false) as Label).add_theme_color_override("font_color", AHKit.MUTED if off else AHKit.AMBER)
 	(button.find_child("Title", true, false) as Label).add_theme_color_override("font_color", AHKit.MUTED if off else AHKit.TEXT)
-	(button.find_child("Icon", true, false) as Control).modulate = AHKit.MUTED if off else AHKit.TEXT
+	var icon := button.find_child("Icon", true, false) as Control
+	if icon.get_meta("painted", false):
+		icon.modulate = AHKit.DIM if off else Color.WHITE
+	else:
+		icon.modulate = AHKit.MUTED if off else AHKit.TEXT
 	(button.get_node("Veil") as Control).visible = off
 
 

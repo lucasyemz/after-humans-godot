@@ -576,7 +576,7 @@ func _relic(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
 	var relic = GameData.row("relics", String(hero.get("relic_id", ""))) if String(hero.get("relic_id", "")) != "" else null
 	if relic != null:
 		var icon := TextureRect.new()
-		icon.texture = load("res://art/ui/icons/%s.svg" % RELIC_ICONS.get(String(hero.relic_id), "relic-generic"))
+		icon.texture = AHKit.legacy_icon(RELIC_ICONS.get(String(hero.relic_id), "relic-generic"))
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.custom_minimum_size = Vector2(36, 36)

@@ -9,7 +9,6 @@ const S = preload("res://scripts/ui/ui_style.gd")
 ## Quanto o título sobe ao aparecer (sem movimento com "Reduzir efeitos").
 const RISE := 18.0
 ## O losango da divisa (o do mapa).
-const DIAMOND := preload("res://art/ui/icons/marker-available.svg")
 
 var title := ""
 var subtitle := ""
@@ -94,7 +93,7 @@ func _ready() -> void:
 	for side in 3:
 		if side == 1:
 			var diamond := TextureRect.new()
-			diamond.texture = DIAMOND
+			diamond.texture = AHKit.legacy_icon("marker-available")
 			diamond.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			diamond.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			diamond.custom_minimum_size = Vector2(14, 14)

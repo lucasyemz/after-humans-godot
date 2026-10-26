@@ -93,7 +93,6 @@ var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
 const STEP_ICONS := {"start": "node-start", "combat": "node-combat", "loot": "node-loot", "rest": "node-rest",
 	"passage": "node-event", "boss": "node-boss"}
-const ICONS := "res://art/ui/icons/%s.svg"
 ## A casa do corredor (o lado do quadrado) e o elo entre duas.
 const CELL := 46.0
 const LINK := 12.0
@@ -227,7 +226,7 @@ func _ready() -> void:
 	_hint = _keys_bar([[["move_left", "move_right"], tr("Andar")], [["run"], tr("Correr")], [["interact"], tr("Interagir")]])
 	_hint.name = "Hint"
 	_set_panel_keys("choose")
-	_menu_button = _corner_button(tr("Menu"), "res://art/ui/icons/lobby-settings.svg", "menu", func(): menu_requested.emit())
+	_menu_button = _corner_button(tr("Menu"), "lobby-settings", "menu", func(): menu_requested.emit())
 	_menu_button.name = "Menu"
 	_bag_button = _corner_button(tr("Mochila"), "room_depot", "inventory", func(): inventory_requested.emit())
 	_bag_button.name = "Bag"
@@ -331,7 +330,7 @@ func _keys_bar(groups: Array) -> PanelContainer:
 ## Um botão do canto (MOCHILA, MENU): o ícone, o nome e a tecla dentro (sem a tecla no toque).
 func _corner_button(text: String, icon_name: String, key_action: String, action: Callable) -> Button:
 	var button := AHKit.button(text, "secondary", Vector4(4, 0, 0, 0))
-	button.icon = load(icon_name) if icon_name.begins_with("res://") else AHKit.icon(icon_name)
+	button.icon = load(icon_name) if icon_name.begins_with("res://") else AHKit.legacy_icon(icon_name)
 	button.add_theme_constant_override("icon_max_width", 30)
 	button.add_theme_constant_override("h_separation", 10)
 	button.add_theme_font_size_override("font_size", AHKit.size("row"))
@@ -368,12 +367,14 @@ func _place_corner() -> void:
 
 func _icon(name: String, size: float, tint: Color = Color.WHITE) -> TextureRect:
 	var rect := TextureRect.new()
-	rect.texture = AHKit.icon(name) if ResourceLoader.exists(AHKit.ICONS % name) else load(ICONS % name)
+	# O recurso pintado (#125) fica com as cores dele; o resto é glifo para tingir.
+	var painted := AHKit.painted(name)
+	rect.texture = painted if painted != null else AHKit.legacy_icon(name)
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rect.custom_minimum_size = Vector2(size, size)
 	rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	rect.modulate = tint
+	rect.modulate = Color.WHITE if painted != null else tint
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return rect
 
@@ -442,7 +443,7 @@ func refresh(campaign: Dictionary) -> void:
 	# Cumprido: OBJETIVO CUMPRIDO com o check verde (a forma também diz).
 	_goal_head.text = tr("Objetivo cumprido") if done else tr("Objetivo da rota")
 	_goal_head.add_theme_color_override("font_color", AHKit.good() if done else AHKit.AMBER)
-	_goal_icon.texture = AHKit.icon("objective_done") if done else load(ICONS % "marker-here")
+	_goal_icon.texture = AHKit.icon("objective_done") if done else AHKit.legacy_icon("marker-here")
 	_goal_icon.modulate = AHKit.good() if done else AHKit.AMBER
 	_goal.reset_size()
 	# O corredor: cada casa com o tipo (as não alcançadas, "?"), ligadas por elos; a de agora com a moldura âmbar.
@@ -1122,7 +1123,7 @@ func show_menu(completed: bool, can_return: bool) -> void:
 		(back.find_child("Title", true, false) as Label).add_theme_color_override("font_color", AHKit.MUTED)
 		(back.find_child("Glyph", true, false) as Control).modulate = AHKit.MUTED
 	box.add_child(back)
-	var options := _menu_entry(tr("Opções"), "res://art/ui/icons/lobby-settings.svg", show_options)
+	var options := _menu_entry(tr("Opções"), "lobby-settings", show_options)
 	options.name = "Options"
 	box.add_child(options)
 	var restart := _menu_entry(tr("Nova campanha"), "alert", _confirm_new_campaign, "", AHKit.alert_text())

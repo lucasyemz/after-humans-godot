@@ -108,5 +108,4 @@ func _reveal(i: int, mine: bool) -> void:
 
 
 func _icon(icon_name: String) -> Texture2D:
-	var path := "res://art/ui/icons/%s.svg" % icon_name
-	return load(path) if ResourceLoader.exists(path) else null
+	return AHKit.legacy_icon(icon_name)

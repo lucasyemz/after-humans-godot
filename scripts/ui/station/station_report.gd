@@ -314,7 +314,7 @@ func _resource(spec: Array, amount: int, width: float, column: float) -> VBoxCon
 	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var painted := AHKit.icon(spec[0])
 	var icon := TextureRect.new()
-	icon.texture = painted if painted != null else load("res://art/ui/icons/%s.svg" % spec[1])
+	icon.texture = painted if painted != null else AHKit.legacy_icon(spec[1])
 	icon.modulate = Color.WHITE if painted != null else AHKit.TEXT
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -438,7 +438,7 @@ func _card(hero_id: String) -> Control:
 	var relic = GameData.row("relics", String(hero.get("relic_id", "")))
 	if relic != null:
 		var relic_icon := TextureRect.new()
-		relic_icon.texture = load("res://art/ui/icons/%s.svg" % RELIC_ICONS.get(String(hero.relic_id), "relic-generic"))
+		relic_icon.texture = AHKit.legacy_icon(RELIC_ICONS.get(String(hero.relic_id), "relic-generic"))
 		relic_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		relic_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		relic_icon.custom_minimum_size = Vector2(26, 26)

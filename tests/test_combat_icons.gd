@@ -88,7 +88,7 @@ func _intents(t) -> void:
 	for case in cases:
 		hud._show_intent(label, case[0])
 		var path: String = icon.texture.resource_path if icon.texture != null else ""
-		t.check(icon.visible == case[2] and (not case[2] or path.ends_with(case[1])), "intenção %s (%d alvo(s), ou=%s) → %s" % [
+		t.check(icon.visible == case[2] and (not case[2] or path.get_file().get_basename() == case[1].get_basename()), "intenção %s (%d alvo(s), ou=%s) → %s" % [
 			case[0].kind, case[0].target_ids.size(), case[0].either, case[1] if case[1] != "" else "sem ícone"])
 	hud._show_intent(label, {"kind": "attack", "name": "Golpe", "target_ids": [heroes[0]], "sure": false, "either": false})
 	t.check(label.text.ends_with(" ?"), "plano incerto leva o ?")

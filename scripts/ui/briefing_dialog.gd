@@ -7,7 +7,6 @@ extends Control
 const U = preload("res://scripts/ui/ui_style.gd")
 const PORTRAIT := 150.0
 ## O losango da contagem das falas (o do mapa).
-const DOT := preload("res://art/ui/icons/marker-available.svg")
 ## Logo que a caixa abre, o toque que pulou a cena de antes (a chegada, um clique duplo em Partir) não passa a fala.
 const GUARD_MS := 300
 
@@ -225,7 +224,7 @@ func _show() -> void:
 		child.queue_free()
 	for i in lines.size():
 		var dot := TextureRect.new()
-		dot.texture = DOT
+		dot.texture = AHKit.legacy_icon("marker-available")
 		dot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		dot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		dot.custom_minimum_size = Vector2.ONE * float(AHKit.size("small"))

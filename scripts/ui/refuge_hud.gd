@@ -1145,8 +1145,8 @@ func _wrapped(text: String, role: String, color: Color, emphasis: bool, width: f
 ## Um ícone do kit (art/ui/kit/station/icons) ou, sem ele, o svg de art/ui/icons.
 func _icon(name: String, side: float, tint: Color) -> TextureRect:
 	var rect := AHKit.glyph(name, side, tint)
-	if rect.texture == null and ResourceLoader.exists("res://art/ui/icons/%s.svg" % name):
-		rect.texture = load("res://art/ui/icons/%s.svg" % name)
+	if rect.texture == null:
+		rect.texture = AHKit.legacy_icon(name)
 	rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	return rect
 
@@ -1254,8 +1254,8 @@ func _inset(parent: Container = null) -> VBoxContainer:
 ## O cabeçalho do painel: o ícone, o nome e o estado (vazio, sem chip).
 func _header(icon_name: String, title: String, state: String = "", tone: Color = AHKit.MUTED) -> void:
 	_panel_icon.texture = AHKit.icon(icon_name)
-	if _panel_icon.texture == null and ResourceLoader.exists("res://art/ui/icons/%s.svg" % icon_name):
-		_panel_icon.texture = load("res://art/ui/icons/%s.svg" % icon_name)
+	if _panel_icon.texture == null:
+		_panel_icon.texture = AHKit.legacy_icon(icon_name)
 	_panel_icon.modulate = AHKit.AMBER
 	_panel_title.text = title
 	_panel_state.visible = state != ""
@@ -1348,7 +1348,7 @@ func _show(key: String) -> void:
 			_station_plan(c)
 		"options":
 			_header("opt_controls", tr("Opções"))
-			_panel_icon.texture = load("res://art/ui/icons/lobby-settings.svg")
+			_panel_icon.texture = AHKit.legacy_icon("lobby-settings")
 			var options := AHOptionsPanel.new()
 			options.width = int(BODY_WIDTH)
 			options.allow_new_campaign = true
@@ -1829,7 +1829,7 @@ func _prep_drawer(c: Dictionary) -> void:
 		mission.level], "text", AHKit.MUTED, false, 380.0))
 	var map_button := AHKit.button(tr("Escolher no mapa"), "secondary")
 	map_button.text = tr("Escolher no mapa")
-	map_button.icon = load("res://art/ui/icons/marker-here.svg")
+	map_button.icon = AHKit.legacy_icon("marker-here")
 	map_button.add_theme_constant_override("icon_max_width", 26)
 	map_button.custom_minimum_size = Vector2(0, 60)
 	map_button.pressed.connect(func(): _map.open(_draft.phase, _draft.get("focus", "")))
@@ -1848,7 +1848,7 @@ func _prep_drawer(c: Dictionary) -> void:
 		var chip := _chip_button(S.focus_label(id))
 		chip.name = "Focus_%s" % (id if id != "" else "basic")
 		if focus_icons.has(id):
-			chip.icon = load("res://art/ui/icons/%s.svg" % focus_icons[id])
+			chip.icon = AHKit.legacy_icon(focus_icons[id])
 			chip.add_theme_constant_override("icon_max_width", 24)
 		chip.tooltip_text = (S.focus_reward_text(id) if id != "" else tr("Sem objetivo extra.")) + (tr(" · recomendado") if id == recommended else "")
 		chip.custom_minimum_size = Vector2(0, 56)
@@ -2283,7 +2283,7 @@ func _forge(c: Dictionary, level: int) -> void:
 			continue
 		var craft := _chip_button(tr("Fabricar"))
 		craft.name = "Craft"
-		craft.icon = load("res://art/ui/icons/lobby-scrap.svg")
+		craft.icon = AHKit.legacy_icon("lobby-scrap")
 		craft.add_theme_constant_override("icon_max_width", 22)
 		craft.text = "%s · %d" % [tr("Fabricar"), cost]
 		craft.custom_minimum_size = Vector2(0, 56)
@@ -2359,7 +2359,7 @@ func _research_row(c: Dictionary, level: int, id: String, table: Dictionary) -> 
 		return
 	var go := _chip_button(tr("Pesquisar"))
 	go.name = "Research"
-	go.icon = load("res://art/ui/icons/lobby-fragment.svg")
+	go.icon = AHKit.legacy_icon("lobby-fragment")
 	go.add_theme_constant_override("icon_max_width", 22)
 	go.text = tr("%s · %d") % [tr("Pesquisar"), price] + (tr(" + %d sucata") % scrap if scrap > 0 else "")
 	go.custom_minimum_size = Vector2(0, 56)
@@ -2413,7 +2413,7 @@ func _night_plan(c: Dictionary) -> void:
 	counts.add_child(_status_chip(tr("%d dormindo · %d vigiando") % [preview.heroes.size() - watchers, watchers], AHKit.TEXT))
 	var buy := _chip_button(tr("+1 suprimento · %d sementes") % S.SUPPLY_COST_SEEDS)
 	buy.name = "BuySupply"
-	buy.icon = load("res://art/ui/icons/lobby-food.svg")
+	buy.icon = AHKit.legacy_icon("lobby-food")
 	buy.add_theme_constant_override("icon_max_width", 24)
 	buy.disabled = S.quantity(c, "seeds") < S.SUPPLY_COST_SEEDS
 	buy.custom_minimum_size = Vector2(0, 56)
