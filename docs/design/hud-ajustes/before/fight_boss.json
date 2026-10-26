@@ -1,0 +1,126 @@
+{
+  "loot_after": {
+    "fragments": 0,
+    "scrap": 2,
+    "seeds": 4
+  },
+  "loot_before": {
+    "fragments": 0,
+    "scrap": 2,
+    "seeds": 4
+  },
+  "result": "victory",
+  "rewards": {
+    "list": [
+      {
+        "id": "no_falls",
+        "met": true,
+        "text": "Ninguém caiu"
+      },
+      {
+        "id": "rounds",
+        "met": true,
+        "text": "Em até 5 rodadas (4)"
+      },
+      {
+        "id": "final_blow",
+        "met": true,
+        "text": "O golpe final foi de um herói"
+      },
+      {
+        "id": "calm",
+        "met": true,
+        "text": "Instinto controlado (sem colapso)"
+      }
+    ],
+    "met": 4,
+    "stars": 3
+  },
+  "session_result": "",
+  "units": [
+    {
+      "body": [
+        734.694702148438,
+        517.236511230469,
+        121.289001464844,
+        249.803466796875
+      ],
+      "feet": [
+        785.401489257812,
+        767.039978027344
+      ],
+      "hero_id": "hero_cao_bento",
+      "hp": 30,
+      "level": 1,
+      "max_hp": 34,
+      "name": "Bento",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 11,
+      "xp_gained": 11
+    },
+    {
+      "body": [
+        542.622680664062,
+        558.622497558594,
+        126.419616699219,
+        207.08544921875
+      ],
+      "feet": [
+        609.504760742188,
+        765.707946777344
+      ],
+      "hero_id": "hero_sapo_iris",
+      "hp": 23,
+      "level": 1,
+      "max_hp": 23,
+      "name": "Íris",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 14,
+      "xp_gained": 14
+    },
+    {
+      "body": [
+        378.327423095703,
+        544.061218261719,
+        135.447235107422,
+        220.319580078125
+      ],
+      "feet": [
+        434.25390625,
+        764.380798339844
+      ],
+      "hero_id": "hero_gato_nick",
+      "hp": 24,
+      "level": 1,
+      "max_hp": 24,
+      "name": "Nick",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 12,
+      "xp_gained": 12
+    },
+    {
+      "body": [
+        201.82502746582,
+        520.1689453125,
+        151.72428894043,
+        242.8896484375
+      ],
+      "feet": [
+        259.647552490234,
+        763.05859375
+      ],
+      "hero_id": "hero_coruja_vespera",
+      "hp": 13,
+      "level": 1,
+      "max_hp": 30,
+      "name": "Véspera",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 15,
+      "xp_gained": 15
+    }
+  ]
+}
