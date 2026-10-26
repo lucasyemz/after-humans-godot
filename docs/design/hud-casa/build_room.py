@@ -57,14 +57,16 @@ def room_layer(research: Image.Image) -> Image.Image:
     layer.paste(door, (w - door.width - 10, 478 - TOP))
     # Os móveis: o armário de remédios no canto, os dois leitos e o soro entre eles. O biombo, o lavatório e o carrinho
     # ficam para o nível 2 (os leitos 3 e 4), com o cômodo mais cheio.
+    # As larguras (cm) dão a altura pela proporção do card: o armário com 150 cm e o soro com 171, perto dos heróis (cerca
+    # de 150 cm nesta câmera); o leito com 79.
     bed = card("Infirmary_Bed", 172)
-    put(layer, card("Infirmary_Cabinet", 92), 54)
-    put(layer, bed, 116)
-    put(layer, card("Infirmary_Drip", 40), 116 + bed.width - 4)
-    put(layer, bed, 116 + bed.width + 16)
-    x_bed = 116
+    x_bed = 136
+    put(layer, card("Infirmary_Cabinet", 124), 54)
+    put(layer, bed, x_bed)
+    put(layer, card("Infirmary_Drip", 55), x_bed + bed.width - 4)
+    put(layer, bed, x_bed + bed.width + 16)
     # A Íris em recuperação no primeiro leito: a pose de dormir, com a cabeça no travesseiro (à esquerda) e o corpo no
-    # colchão (a linha medida no card: 24 px de 220, a 81 cm do piso).
+    # colchão (a linha medida no card: 30 px de 220 abaixo do alto, a cerca de 68 cm do piso).
     pose = Image.open(POSES / "hero_sapo_iris_sleep.webp").convert("RGBA")
     pw = round(bed.width * 0.92)
     pose = pose.resize((pw, round(pose.height * pw / pose.width)), Image.Resampling.LANCZOS)

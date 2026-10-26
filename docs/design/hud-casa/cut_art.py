@@ -4,8 +4,11 @@
 - 12 glifos brancos de um tom (art/ui/kit/station/icons/), no recorte dos glifos do kit, com alfa reto (RGB 255 onde
   há alfa) e sem grão.
 
-Uso: python3 -B docs/design/hud-casa/cut_art.py <folha_dos_moveis.png> <folha_dos_glifos.png>
-     (as do lote: images/hud-casa/infirmary-props-sheet-2.png e images/hud-casa/casa-glyphs-sheet.png)
+Uso: python3 -B docs/design/hud-casa/cut_art.py <folha_dos_moveis.png> <folha_dos_glifos.png> <folha_refeita.png>
+     (as do lote: images/hud-casa/infirmary-props-sheet-2.png, images/hud-casa/casa-glyphs-sheet.png e
+     images/hud-casa/casa-glyphs-sheet-3.png)
+A folha refeita (2x1) traz de novo o Caído e o Amanhecer: na primeira, as pernas da maca e o horizonte eram traço preto, e
+o recorte (o alfa vem da luminância) os perdia. Na nova, tudo é traço branco grosso.
 """
 import sys
 from pathlib import Path
@@ -25,6 +28,8 @@ PROPS = {"Infirmary_Bed": (6, 8, 498, 426), "Infirmary_Cabinet": (550, 8, 894, 4
 GLYPHS = ["state_fallen", "state_recovering", "job_research", "job_forge",
           "job_canteen", "job_dormitory", "job_infirmary", "room_infirmary",
           "inspect", "helpers", "formation_swap", "dawn"]
+# A folha refeita, 2x1, na ordem; as células perdem 24 px de cada lado (a folha veio com a linha da grade em rosa claro).
+REDONE = ["state_fallen", "dawn"]
 
 
 def main_body(im: Image.Image) -> Image.Image:
@@ -79,7 +84,7 @@ def glyph(cell: Image.Image) -> Image.Image:
     return out
 
 
-def main(props_sheet: str, glyph_sheet: str) -> None:
+def main(props_sheet: str, glyph_sheet: str, redone_sheet: str) -> None:
     sheet = Image.open(props_sheet)
     for name, box in PROPS.items():
         im = card(sheet.crop(box))
@@ -87,8 +92,10 @@ def main(props_sheet: str, glyph_sheet: str) -> None:
         print(name, im.size)
     for name, cell in zip(GLYPHS, cells(Image.open(glyph_sheet), 4, 3)):
         glyph(cell).save(ICONS / f"{name}.webp", lossless=True, exact=True, method=6)
-    print("glifos:", len(GLYPHS))
+    for name, cell in zip(REDONE, cells(Image.open(redone_sheet), 2, 1)):
+        glyph(cell.crop((24, 24, cell.width - 24, cell.height - 24))).save(ICONS / f"{name}.webp", lossless=True, exact=True, method=6)
+    print("glifos:", len(GLYPHS), "· refeitos:", ", ".join(REDONE))
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], sys.argv[3])

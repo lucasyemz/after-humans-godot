@@ -7,7 +7,6 @@
 extends SceneTree
 
 var out := ""
-var only_today := false
 var campaign
 var flow
 var J
@@ -39,14 +38,6 @@ func _run() -> void:
 func _fight(name: String, seed: int, opts: Dictionary) -> bool:
 	var c: Dictionary = campaign.create_initial(seed % 97)
 	J.start_expedition(c, "fase_1", seed)
-	if opts.get("boss", false):
-		var route: Dictionary = c.session.expedition.corridor
-		for i in route.steps.size() - 1:
-			route.steps[i].resolved = true
-		route.index = route.steps.size() - 1
-	if opts.has("xp"):
-		# O Bento perto do nível 2 (60 XP): com o XP desta luta, o Treino fica pronto.
-		c.roster[0].xp = int(opts.xp)
 	c.session.expedition.loot.seeds = 4
 	c.session.expedition.loot.scrap = 2
 	c.session.expedition.loot.fragments = 0
@@ -56,12 +47,9 @@ func _fight(name: String, seed: int, opts: Dictionary) -> bool:
 	await _settle()
 	var street = current_scene
 	var loot_before: Dictionary = c.session.expedition.loot.duplicate()
-	if opts.get("boss", false):
-		street.corridor._start_fight(c.session.expedition.corridor.index, true)
-	else:
-		street.corridor.debug_next_fight()
-		await _frames(10)
-		street.corridor._start_fight(c.session.expedition.corridor.index, true)
+	street.corridor.debug_next_fight()
+	await _frames(10)
+	street.corridor._start_fight(c.session.expedition.corridor.index, true)
 	var arena = street._arena
 	for i in 900:
 		if arena.hud != null and arena.hud.waiting:
@@ -72,31 +60,9 @@ func _fight(name: String, seed: int, opts: Dictionary) -> bool:
 		for unit in arena.session.state.player_team:
 			if unit.hero_id == opts.fallen:
 				unit.hp = 1
-	if opts.get("defeat", false):
-		# A derrota: a equipe com 1 de vida, só se defendendo, até cair (as regras da luta não mudam).
-		arena.speed = 8.0
-		for unit in arena.session.state.player_team:
-			unit.hp = 1
-		var turns := 0
-		while arena.active and not arena.hud._result.visible and turns < 6000:
-			if arena.hud.waiting:
-				arena.hud.command_chosen.emit({"kind": "defend"})
-			turns += 1
-			await process_frame
-	elif opts.get("flee", false):
-		# Fugir até dar certo (60% por tentativa); no automático depois da primeira, se falhar.
-		arena.speed = 8.0
-		arena.hud.command_chosen.emit({"kind": "flee"})
-		var tries := 0
-		while arena.active and not arena.hud._result.visible and tries < 4000:
-			if arena.hud.waiting:
-				arena.hud.command_chosen.emit({"kind": "flee"})
-			tries += 1
-			await process_frame
-	else:
-		arena.auto_battle = true
-		arena.speed = 8.0
-		arena.hud.command_chosen.emit({"kind": "defend"})
+	arena.auto_battle = true
+	arena.speed = 8.0
+	arena.hud.command_chosen.emit({"kind": "defend"})
 	var limit := Time.get_ticks_msec() + 180000
 	while arena.active and not arena.hud._result.visible and Time.get_ticks_msec() < limit:
 		# Com a luta decidida, sai do automático: a tela do fim espera, e a foto sai com calma.
@@ -104,16 +70,14 @@ func _fight(name: String, seed: int, opts: Dictionary) -> bool:
 			arena.auto_battle = false
 		await process_frame
 	await _frames(2)
+	# A luta corre no automático e não sai igual a cada vez: a semente que derruba a Íris pode mudar de uma corrida para
+	# outra. No Último Fôlego, quem caiu fica na arena (a Íris não tem a pose de caída, então fica de pé).
 	var down: Array = arena.session.state.player_team.filter(func(u): return u.hero_id == opts.get("fallen", "") and u.hp <= 0)
 	if opts.has("fallen") and (arena.session.result() != "victory" or down.is_empty()):
 		print("sem queda nesta semente: ", arena.session.result())
 		arena.hud.result_closed.emit()
 		await _frames(30)
 		return false
-	if only_today:
-		# O antes: a tela do fim de luta de hoje (combat_hud.gd, show_result), com a HUD.
-		await _frames(20)
-		await _shot("today_result")
 	# A foto limpa do fim da luta, com quem ficou de pé no lugar (a HUD escondida).
 	_hide_ui()
 	await _frames(3)
@@ -136,7 +100,7 @@ func _fight(name: String, seed: int, opts: Dictionary) -> bool:
 			"xp": HL.xp(hero) if hero != null else 0, "next_xp": int(HL.next_cost(hero).get("xp", 0)) if hero != null else 0,
 			"training_ready": hero != null and not HL.next_cost(hero).is_empty() and HL.xp(hero) >= int(HL.next_cost(hero).xp)})
 	var exp = campaign.state.session.get("expedition", {})
-	var rewards = FR.criteria(session, bool(opts.get("boss", false)), "fase_1")
+	var rewards = FR.criteria(session, false, "fase_1")
 	_write(name, {"result": session.result(), "rewards": rewards, "units": units, "loot_before": loot_before,
 		"loot_after": exp.get("loot", {}) if exp is Dictionary else {}, "session_result": campaign.state.session.get("result", "")})
 	_show_ui()
@@ -159,22 +123,6 @@ func _ui_nodes() -> Array:
 		if not (control.get_parent() is Control):
 			nodes.append(control)
 	return nodes
-
-
-## Os antes de hoje: a "Pausa" do Esc na rua (exploration_hud.gd, show_menu), com a HUD.
-func _today() -> void:
-	var c: Dictionary = campaign.create_initial(6)
-	J.start_expedition(c, "fase_1", 4242)
-	campaign.state = c
-	campaign.save()
-	flow.change_to("street", {}, false)
-	await _settle()
-	var street = current_scene
-	street.exploration_hud.show_menu(false, true)
-	await _frames(20)
-	await _shot("today_pause")
-	street.exploration_hud.close_modal()
-	await _frames(5)
 
 
 func _hide_ui() -> void:

@@ -20,7 +20,7 @@
       {
         "id": "rounds",
         "met": true,
-        "text": "Em até 3 rodadas (3)"
+        "text": "Em até 3 rodadas (2)"
       },
       {
         "id": "final_blow",
@@ -38,22 +38,6 @@
   },
   "session_result": "",
   "units": [
-    {
-      "body": [],
-      "feet": [
-        -1.0,
-        -1.0
-      ],
-      "hero_id": "hero_sapo_iris",
-      "hp": 0,
-      "level": 1,
-      "max_hp": 23,
-      "name": "Íris",
-      "next_xp": 60,
-      "training_ready": false,
-      "xp": 0,
-      "xp_gained": 0
-    },
     {
       "body": [
         916.959777832031,
@@ -77,27 +61,6 @@
     },
     {
       "body": [
-        602.6787109375,
-        701.231079101562,
-        132.470458984375,
-        221.387878417969
-      ],
-      "feet": [
-        648.121826171875,
-        922.618957519531
-      ],
-      "hero_id": "hero_coruja_vespera",
-      "hp": 30,
-      "level": 1,
-      "max_hp": 30,
-      "name": "Véspera",
-      "next_xp": 60,
-      "training_ready": false,
-      "xp": 8,
-      "xp_gained": 8
-    },
-    {
-      "body": [
         759.123840332031,
         722.910461425781,
         118.407348632812,
@@ -114,8 +77,50 @@
       "name": "Nick",
       "next_xp": 60,
       "training_ready": false,
+      "xp": 12,
+      "xp_gained": 12
+    },
+    {
+      "body": [
+        587.120239257812,
+        734.480773925781,
+        115.977783203125,
+        188.13818359375
+      ],
+      "feet": [
+        648.121643066406,
+        922.618957519531
+      ],
+      "hero_id": "hero_sapo_iris",
+      "hp": 0,
+      "level": 1,
+      "max_hp": 23,
+      "name": "Íris",
+      "next_xp": 60,
+      "training_ready": false,
       "xp": 11,
       "xp_gained": 11
+    },
+    {
+      "body": [
+        444.086364746094,
+        700.469665527344,
+        135.554809570312,
+        221.152587890625
+      ],
+      "feet": [
+        492.712554931641,
+        921.622253417969
+      ],
+      "hero_id": "hero_coruja_vespera",
+      "hp": 30,
+      "level": 1,
+      "max_hp": 30,
+      "name": "Véspera",
+      "next_xp": 60,
+      "training_ready": false,
+      "xp": 8,
+      "xp_gained": 8
     }
   ]
 }

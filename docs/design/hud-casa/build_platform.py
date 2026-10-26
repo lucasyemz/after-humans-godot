@@ -3,8 +3,8 @@
   da plataforma (a metade esquerda do outro banco, espelhada; o banco é simétrico);
 - platform_team_clean.webp: o mesmo, com o Brasa (o recruta cão, art/combat/recruits/dog_recruit_01_idle.webp) de pé
   no lugar dela, na altura dos outros;
-- platform_recruit_clean.webp e platform_nobody_clean.webp: a plataforma do trem (hud-v2/before/station-train_clean.webp)
-  sem a Dora; com um recruta (a coruja, owl_recruit_01_idle.webp) esperando, e vazia.
+- platform_train_clean.webp e platform_train_recruit_clean.webp: o trem na plataforma, sem ninguém (a volta vazia), e
+  com quem chegou (o Sereno, a coruja recruta, owl_recruit_01_idle.webp) entre o trem e o banco.
 
 Uso: python3 -B docs/design/hud-casa/build_platform.py
 """
@@ -51,23 +51,28 @@ def main() -> None:
     im, pos = sprite("art/combat/recruits/dog_recruit_01_idle.webp", 914, 646, 172)
     team.alpha_composite(im, pos)
     team.convert("RGB").save(OUT / "platform_team_clean.webp", quality=88, method=6)
-    # A plataforma do trem sem a Dora (de x 455 a 730, do alto da cabeça, y 290, aos pés, 885): a parede e o piso vêm do
-    # bloco logo à esquerda, na mesma altura (o piso tem perspectiva só na vertical). O banco por trás dela (de x 410 a
-    # 820): as tábuas do meio (y 549 a 706) repetem a coluna de x 752, entre as pontas que ficaram à vista.
-    train = Image.open(BEFORE / "station-train_clean.webp").convert("RGBA")
-    source = train.copy()
-    train.paste(source.crop((130, 290, 405, 772)), (455, 290))
-    train.paste(source.crop((130, 772, 405, 890)), (455, 772))
-    slat = source.crop((752, 549, 758, 706))
-    for x in range(455, 730, 6):
-        train.paste(slat, (x, 549))
-    # A ponta da colher da Dora, que passava do pé direito do banco.
-    train.paste(source.crop((830, 740, 846, 772)), (814, 740))
-    train.convert("RGB").save(OUT / "platform_nobody_clean.webp", quality=88, method=6)
-    recruit = train.copy()
-    im, pos = sprite("art/combat/recruits/owl_recruit_01_idle.webp", 590, 884, 560)
-    recruit.alpha_composite(im, pos)
-    recruit.convert("RGB").save(OUT / "platform_recruit_clean.webp", quality=88, method=6)
+    # O trem na plataforma, sem ninguém (#122: quem chega desce do trem): a plataforma da chegada sem a equipe, com o trem
+    # à esquerda. O Bento (x 425 a 530) sai com a parede logo à esquerda dele (x 400). O Nick (x 645 a 748) estava na
+    # frente da ponta do banco, do pilar e da parede: o pilar repete o trecho dele logo acima da cabeça do Nick (é concreto
+    # liso na vertical), a parede vem de x 755 e a ponta do banco é a metade esquerda dele, espelhada. A Véspera (x 1077 a
+    # 1190) sai com a parede de x 1200, e o caixote que ela tapava pela metade (x 1055 a 1115) sai junto.
+    empty = arrival.copy()
+    erase(empty, (425, 455, 530, 648), 400)
+    erase(empty, (705, 488, 750, 648), 755)
+    erase(empty, (620, 488, 666, 557), 596)
+    pillar = arrival.crop((665, 456, 705, 488))
+    for y in range(488, 648, pillar.height):
+        empty.paste(pillar.crop((0, 0, pillar.width, min(pillar.height, 648 - y))), (665, y))
+    erase(empty, (607, 557, 666, 648), 596)
+    empty.paste(ImageOps.mirror(arrival.crop((542, 557, 607, 646))), (607, 557))
+    erase(empty, (1050, 465, 1196, 648), 1200)
+    empty.convert("RGB").save(OUT / "platform_train_clean.webp", quality=88, method=6)
+    # Quem chegou: o Sereno (a coruja recruta) de pé entre o trem e o banco, na linha dos pés da equipe (y 646) e na
+    # altura da Véspera (170 px, uma coruja como ela).
+    arrived = empty.copy()
+    im, pos = sprite("art/combat/recruits/owl_recruit_01_idle.webp", 470, 646, 170)
+    arrived.alpha_composite(im, pos)
+    arrived.convert("RGB").save(OUT / "platform_train_recruit_clean.webp", quality=88, method=6)
     print("ok")
 
 
