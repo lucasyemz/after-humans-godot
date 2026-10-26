@@ -18,8 +18,9 @@ const center = (u) => {
   const t = META.texts.find((t) => t.text === u.name && t.rect[1] > 650 && t.rect[1] < 800);
   return Math.round(t.rect[0] + t.rect[2] / 2);
 };
+// Um nome com "/" é o caminho do DTO sem o .json (o lote do tutorial: docs/design/tutorial/before/fight_two_hud).
 export function useCapture(name = "combat") {
-  META = JSON.parse(fs.readFileSync(`docs/design/loop-screens/before/${name}.json`, "utf8"));
+  META = JSON.parse(fs.readFileSync(name.includes("/") ? `${name}.json` : `docs/design/loop-screens/before/${name}.json`, "utf8"));
   QUOTES = name === "combat" ? JSON.parse(fs.readFileSync("docs/design/hud-c/session_quotes.json", "utf8")).combat : quotesFrom(META);
   UNITS = META.units.map((u) => ({ ...u, cx: center(u) }));
   ACTOR = UNITS.find((u) => u.id === META.actor);
@@ -28,11 +29,16 @@ export function useCapture(name = "combat") {
     const ts = META.texts.map((t) => t.text);
     const i = ts.findIndex((t) => t.startsWith("RODADA"));
     const left = [...UNITS];
-    return ts.slice(i + 1, i + 7).map((n) => {
+    // Até seis nomes depois de "RODADA"; com menos unidades (o tutorial tem quatro), para no primeiro texto que não é
+    // de ninguém.
+    const out = [];
+    for (const n of ts.slice(i + 1, i + 7)) {
       const u = left.find((u) => u.name.includes(n.split(" · ")[0]));
+      if (!u) break;
       left.splice(left.indexOf(u), 1);
-      return u;
-    });
+      out.push(u);
+    }
+    return out;
   })();
 }
 // Sem as cotações da sessão (as capturas dos laços), as habilidades de quem age saem de data/abilities.json, na ordem da
@@ -165,7 +171,7 @@ const actions = () => ACTIONS.map(([icon, cap], i) => {
 }).join("");
 
 const EXTRA = (p) => `<style>:root{--enemy:${p.cb ? "var(--danger-fill)" : "#d23a2e"}}.l1{line-height:1.1}</style>`;
-const BG = (name = "combat") => img(`docs/design/loop-screens/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px") +
+const BG = (name = "combat") => img(name.includes("/") ? `${name}_clean.webp` : `docs/design/loop-screens/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px") +
   `<div class="abs" style="left:0;top:796px;width:1920px;height:284px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.24))"></div>`;
 
 // Opções do lote 6 (hud-laco): o fundo da captura, sem o anel (a máscara dele é a do sprite de Nick) e sem o nome do

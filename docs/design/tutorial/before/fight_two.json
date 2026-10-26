@@ -1,0 +1,122 @@
+{
+ "actor": "unit_hero_gato_nick",
+ "options": [
+  {
+   "id": "gato_corte_fase",
+   "name": "Corte de Fase",
+   "usable": true
+  },
+  {
+   "id": "gato_salto_entre_ruinas",
+   "name": "Salto Entre Ruínas",
+   "usable": true
+  },
+  {
+   "id": "gato_sumir_na_sombra",
+   "name": "Sumir na Sombra",
+   "usable": true
+  },
+  {
+   "id": "gato_cacada_precisa",
+   "name": "Caçada Precisa",
+   "usable": false
+  }
+ ],
+ "order": [
+  "unit_hero_gato_nick",
+  "corridor_1117577169_2_0_recreador",
+  "corridor_1117577169_2_1_sussurrador",
+  "unit_hero_cao_bento"
+ ],
+ "round": 1,
+ "units": [
+  {
+   "body": [
+    619.82373046875,
+    367.025787353516,
+    199.313659667969,
+    407.268707275391
+   ],
+   "class_id": "cao",
+   "enemy_id": "",
+   "feet": [
+    705.598022460938,
+    774.294494628906
+   ],
+   "hp": 34,
+   "id": "unit_hero_cao_bento",
+   "instinct": 0,
+   "max_hp": 34,
+   "name": "Bento",
+   "player": true,
+   "rank": 1,
+   "speed": 2
+  },
+  {
+   "body": [
+    331.61767578125,
+    413.287841796875,
+    219.592102050781,
+    358.84130859375
+   ],
+   "class_id": "gato",
+   "enemy_id": "",
+   "feet": [
+    423.199584960938,
+    772.129150390625
+   ],
+   "hp": 24,
+   "id": "unit_hero_gato_nick",
+   "instinct": 0,
+   "max_hp": 24,
+   "name": "Nick",
+   "player": true,
+   "rank": 2,
+   "speed": 7
+  },
+  {
+   "body": [
+    1051.60559082031,
+    332.288146972656,
+    233.126831054688,
+    424.34521484375
+   ],
+   "class_id": "",
+   "enemy_id": "recreador",
+   "feet": [
+    1173.63220214844,
+    756.633361816406
+   ],
+   "hp": 8,
+   "id": "corridor_1117577169_2_0_recreador",
+   "instinct": 0,
+   "max_hp": 8,
+   "name": "Recreador",
+   "player": false,
+   "rank": 1,
+   "speed": 3
+  },
+  {
+   "body": [
+    1393.87292480469,
+    387.349792480469,
+    208.839233398438,
+    367.221313476562
+   ],
+   "class_id": "",
+   "enemy_id": "sussurrador",
+   "feet": [
+    1483.89135742188,
+    754.571105957031
+   ],
+   "hp": 6,
+   "id": "corridor_1117577169_2_1_sussurrador",
+   "instinct": 0,
+   "max_hp": 6,
+   "name": "Emissor de Comando",
+   "player": false,
+   "rank": 2,
+   "speed": 3
+  }
+ ]
+}

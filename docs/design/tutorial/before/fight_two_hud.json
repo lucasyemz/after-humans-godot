@@ -1,0 +1,225 @@
+{
+ "actor": "unit_hero_gato_nick",
+ "name": "fight_two",
+ "texts": [
+  {
+   "text": "Bento",
+   "rect": [
+    625.598022460938,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "Nick",
+   "rect": [
+    343.199584960938,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "Recreador",
+   "rect": [
+    1093.63220214844,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "Emissor de Comando",
+   "rect": [
+    1403.89135742188,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "RODADA 1",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Nick · agora",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Recreador",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Emissor",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Bento",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Corte de Fase",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "4–6",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Salto Entre Ruínas",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "2–4",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Sumir na Sombra",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Caçada Precisa",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "7–10",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ ],
+ "units": [
+  {
+   "block": 0,
+   "class_id": "cao",
+   "dodge": 0,
+   "enemy_id": "",
+   "guard": 0,
+   "hp": 34,
+   "id": "unit_hero_cao_bento",
+   "instinct": 0,
+   "max_hp": 34,
+   "name": "Bento",
+   "player": true,
+   "rank": 1,
+   "speed": 2,
+   "stun": 0
+  },
+  {
+   "block": 0,
+   "class_id": "gato",
+   "dodge": 0,
+   "enemy_id": "",
+   "guard": 0,
+   "hp": 24,
+   "id": "unit_hero_gato_nick",
+   "instinct": 0,
+   "max_hp": 24,
+   "name": "Nick",
+   "player": true,
+   "rank": 2,
+   "speed": 7,
+   "stun": 0
+  },
+  {
+   "block": 0,
+   "class_id": "",
+   "dodge": 0,
+   "enemy_id": "recreador",
+   "guard": 0,
+   "hp": 8,
+   "id": "corridor_1117577169_2_0_recreador",
+   "instinct": 0,
+   "max_hp": 8,
+   "name": "Recreador",
+   "player": false,
+   "rank": 1,
+   "speed": 3,
+   "stun": 0
+  },
+  {
+   "block": 0,
+   "class_id": "",
+   "dodge": 0,
+   "enemy_id": "sussurrador",
+   "guard": 0,
+   "hp": 6,
+   "id": "corridor_1117577169_2_1_sussurrador",
+   "instinct": 0,
+   "max_hp": 6,
+   "name": "Emissor de Comando",
+   "player": false,
+   "rank": 2,
+   "speed": 3,
+   "stun": 0
+  }
+ ]
+}
