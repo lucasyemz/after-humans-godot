@@ -969,19 +969,28 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 	var failed: bool = float(choice.get("FailChance", 0.0)) > 0.0 and random.next() < float(choice.FailChance)
 	var effects: Dictionary = choice.get("Failure", {}) if failed else choice.get("Success", {})
 	var expedition: Dictionary = session.expedition
+	# O que mudou de fato (com os limites), para os chips do resultado (#106): [{kind, amount, hero}].
+	var changes: Array = []
+	var hope_before: int = expedition.hope
 	expedition.hope = clampi(expedition.hope + int(effects.get("HopeDelta", 0)), 0, 100)
-	adjust(campaign, "food", int(effects.get("FoodDelta", 0)))
-	adjust(campaign, "bandages", int(effects.get("BandagesDelta", 0)))
-	adjust(campaign, "scrap", int(effects.get("ScrapDelta", 0)))
-	adjust(campaign, "fragments", int(effects.get("FragmentsDelta", 0)))
-	adjust(campaign, "seeds", int(effects.get("SeedsDelta", 0)))
+	if expedition.hope != hope_before:
+		changes.append({"kind": "hope", "amount": expedition.hope - hope_before, "hero": ""})
+	for spec in [["FoodDelta", "food"], ["BandagesDelta", "bandages"], ["ScrapDelta", "scrap"], ["FragmentsDelta", "fragments"], ["SeedsDelta", "seeds"]]:
+		var moved := adjust(campaign, spec[1], int(effects.get(spec[0], 0)))
+		if moved != 0:
+			changes.append({"kind": spec[1], "amount": moved, "hero": ""})
 	var instinct := 0
 	if int(effects.get("InstinctDelta", 0)) != 0 and choice.get("Requirement", "") == "ClassInTeam":
 		for hero in _team_alive(campaign):
 			if hero.class_id == choice.get("RequirementClass", ""):
 				var relic = GameData.row("relics", hero.get("relic_id", ""))
 				instinct = maxi(0, int(effects.InstinctDelta) - (int(relic.get("EventInstinctReduction", 0)) if relic != null else 0))
+				var instinct_before: int = hero.instinct
 				hero.instinct = clampi(hero.instinct + instinct, 0, 200)
+				# O texto ({Instinto}) e o chip dizem a mudança de fato (no limite de 200, menos que a dos dados).
+				instinct = hero.instinct - instinct_before
+				if hero.instinct != instinct_before:
+					changes.append({"kind": "instinct", "amount": hero.instinct - instinct_before, "hero": hero.display_name})
 				break
 	var hurt := ""
 	# O herói sorteado leva o dano; sem dano, só empresta o nome ao texto ({Heroi}).
@@ -989,8 +998,11 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 		var team := _team_alive(campaign)
 		if not team.is_empty():
 			var hero: Dictionary = team[mini(team.size() - 1, floori(random.next() * team.size()))]
+			var hp_before: int = hero.hp
 			hero.hp = maxi(1, hero.hp - int(effects.get("Damage", 0)))
 			hurt = hero.display_name
+			if hero.hp != hp_before:
+				changes.push_front({"kind": "life", "amount": hero.hp - hp_before, "hero": hurt})
 	grant_tool(campaign, String(effects.get("GrantTool", "")))
 	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "":
 		lose_tool(campaign, choice.RequirementTool)
@@ -1007,6 +1019,8 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 	event.hero = hurt
 	event.instinct = instinct
 	event.pending_hard_combat = bool(effects.get("bHardCombat", false))
+	# Opcional no save: um evento salvo antes não tem a lista, e o resultado mostra só o texto.
+	event.changes = changes
 	return true
 
 

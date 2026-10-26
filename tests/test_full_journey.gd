@@ -285,7 +285,7 @@ func _return_report() -> bool:
 	t.equal(Campaign.state.session.expedition, null, "a volta fechou a expedição")
 	var delivered: Dictionary = Campaign.state.station.last_return
 	t.check(int(delivered.get("seeds", 0)) > 0, "a vitória entrega sementes (%d)" % int(delivered.get("seeds", 0)))
-	t.check(_has_label(street.exploration_hud, "Chegou à Estação: %d sementes" % int(delivered.get("seeds", 0))), "o resultado mostra o achado")
+	t.check(_has_label(street.exploration_hud, "Chegou à Estação") and _has_label(street.exploration_hud, "%d sementes" % int(delivered.get("seeds", 0))), "o resultado mostra o achado")
 	t.check(Campaign.state.completed_phases.has("fase_1"), "a fase 1 ficou concluída")
 	if not await _press(street.exploration_hud, "Voltar à Estação", "Voltar à Estação no resultado"):
 		return false

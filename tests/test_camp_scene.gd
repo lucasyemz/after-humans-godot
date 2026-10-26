@@ -118,6 +118,8 @@ func _camp() -> void:
 	var camp: AHCampScene = corridor.camp
 	t.check(camp.active and hud.camp_open() and Campaign.state.session.screen == "rest", "acampar abre a cena e o HUD do acampamento")
 	t.check(corridor.blocking(), "no acampamento, a equipe não anda")
+	t.check(not hud._plaque.is_visible_in_tree() and not hud._goal.is_visible_in_tree(),
+		"no acampamento, sem a plaqueta do lugar e o cartão do objetivo (só ACAMPAMENTO no alto)")
 	t.equal(camp.members.size(), team.size(), "a equipe inteira em volta da fogueira")
 	var room: AHHouseRoom = corridor.room
 	for member in camp.members:
@@ -485,7 +487,7 @@ func _fades() -> void:
 
 func _button(root: Node, prefix: String) -> Button:
 	for button in root.find_children("*", "Button", true, false):
-		if not button.is_queued_for_deletion() and button.is_visible_in_tree() and button.text.begins_with(prefix):
+		if not button.is_queued_for_deletion() and button.is_visible_in_tree() and button.text.to_upper().begins_with(prefix.to_upper()):
 			return button
 	return null
 

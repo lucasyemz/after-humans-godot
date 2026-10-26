@@ -15,6 +15,7 @@ func run(t) -> void:
 	_scenario_choice(t)
 	_requirements(t)
 	_event_art(t)
+	_changes(t)
 	await _scene(t)
 
 
@@ -231,6 +232,35 @@ func _scene(t) -> void:
 		t.check(street.exploration_hud.modal_open(), "e o painel do evento aparece na hora")
 		var says: bool = street.exploration_hud._modal.find_children("*", "Label", true, false).any(func(l): return l.text == "Ao vasculhar: %s" % entry.name)
 		t.check(says, "o painel diz o que foi vasculhado (%s)" % entry.name)
+		# A barra das teclas do evento aberto: sem o Fechar (o evento pede uma escolha).
+		await tree.process_frame
+		t.equal(street.exploration_hud._panel_keys_kind, "choose", "no evento, a barra não promete Fechar")
+		# Resolvido: o que mudou em chips; um evento de um save antigo (sem a lista) mostra só o texto.
+		var event: Dictionary = Campaign.state.session.event
+		var choice: Dictionary = GameData.row("events", event.event_id).Choices.filter(func(o): return R.can_choose(Campaign.state, o))[0]
+		R.choose_event_option(Campaign.state, choice.Id, 5)
+		street.exploration_hud.show_event(Campaign.state)
+		await tree.process_frame
+		var chips: Node = street.exploration_hud._modal.find_child("Changes", true, false)
+		t.equal(chips.get_child_count() if chips else 0, event.changes.size(), "um chip por mudança (%s)" % [event.changes])
+		t.check(street.exploration_hud._modal.find_child("Continue", true, false) != null, "e o CONTINUAR")
+		await tree.process_frame
+		t.equal(street.exploration_hud._panel_keys_kind, "continue", "no resultado, a barra só tem Interagir Continuar")
+		# A Mochila: a barra fecha pela tecla do Menu, e segue a troca nas Opções.
+		street.exploration_hud.show_inventory()
+		Settings.set_key("menu", KEY_P)
+		await tree.process_frame
+		var keys: Control = street.exploration_hud._panel_keys
+		var says_p: bool = keys.find_children("*", "Label", true, false).any(func(l): return l.text == "P")
+		t.check(street.exploration_hud._panel_keys_kind == "menu" and says_p, "na Mochila, a barra diz Fechar na tecla do Menu (trocada para P)")
+		Settings.reset_keys()
+		street.exploration_hud.show_event(Campaign.state)
+		await tree.process_frame
+		event.erase("changes")
+		street.exploration_hud.show_event(Campaign.state)
+		await tree.process_frame
+		t.check(street.exploration_hud._modal.find_child("Changes", true, false) == null and street.exploration_hud._modal.find_child("Continue", true, false) != null,
+			"o evento salvo antes da lista abre sem os chips")
 		opened = true
 		break
 	t.check(opened, "achou um mapa da Sala Esquecida com objeto com escolha")
@@ -242,6 +272,59 @@ func _scene(t) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## O que mudou no resultado (#106, os chips): em todos os eventos e escolhas, com sucesso e falha (as sementes), a
+## lista event.changes é a diferença de fato no estado (os limites contam: a comida não passa de 8, a Esperança de 100,
+## a vida não cai abaixo de 1).
+func _changes(t) -> void:
+	var checked := 0
+	var wrong: Array = []
+	for event_id in GameData.table("events"):
+		var row = GameData.row("events", event_id)
+		for choice in row.get("Choices", []):
+			for seed_value in [11, 12, 13, 14]:
+				var c: Dictionary = Campaign.create_initial(4)
+				R.start_expedition(c, "fase_1", 90)
+				c.session.expedition.hope = 97
+				c.session.expedition.food = 7
+				c.session.event = {"event_id": event_id, "from_search": true, "resolution": "", "pending_hard_combat": false, "object": ""}
+				if not R.can_choose(c, choice):
+					continue
+				var before := _snapshot(c)
+				if not R.choose_event_option(c, choice.Id, seed_value):
+					continue
+				var after := _snapshot(c)
+				var said := {}
+				for change in c.session.event.get("changes", []):
+					said[change.kind] = int(said.get(change.kind, 0)) + int(change.amount)
+				for kind in after:
+					var moved: int = after[kind] - before[kind]
+					if int(said.get(kind, 0)) != moved:
+						wrong.append("%s/%s (semente %d): %s mudou %d, a lista diz %d" % [event_id, choice.Id, seed_value, kind, moved, int(said.get(kind, 0))])
+				checked += 1
+	t.check(checked > 40, "as escolhas dos eventos conferidas (%d)" % checked)
+	t.equal(wrong.slice(0, 5), [], "a lista do que mudou é a diferença de fato no estado")
+
+
+func _snapshot(c: Dictionary) -> Dictionary:
+	var e: Dictionary = c.session.expedition
+	var life := 0
+	var instinct := 0
+	for hero_id in e.team:
+		life += _hp(c, hero_id)
+		for hero in c.roster:
+			if hero.id == hero_id:
+				instinct += int(hero.instinct)
+	return {"hope": e.hope, "food": e.food, "bandages": c.inventory.bandages, "scrap": e.loot.scrap, "fragments": e.loot.fragments,
+		"seeds": e.loot.seeds, "life": life, "instinct": instinct}
+
+
+func _hp(c: Dictionary, hero_id: String) -> int:
+	for hero in c.roster:
+		if hero.id == hero_id:
+			return int(hero.hp)
+	return 0
 
 
 ## A ilustração do cenário no topo do cartão de evento (#31, a entrega #22): uma por mapa, e a da rua sem cenário.

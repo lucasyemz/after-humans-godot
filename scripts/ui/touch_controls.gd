@@ -7,7 +7,6 @@
 class_name AHTouchControls
 extends Control
 
-const S = preload("res://scripts/ui/ui_style.gd")
 ## Onde o analógico pode começar: a metade esquerda, entre o HUD do alto e a equipe embaixo.
 const STICK_ZONE := Rect2(0, 300, 900, 680)
 const STICK_HOME := Vector2(230, 800)
@@ -22,13 +21,17 @@ var _stick_finger := -2
 var _stick_origin := STICK_HOME
 var _stick_vector := Vector2.ZERO
 var _use_finger := -2
-var _font: Font
+var _use_icon: TextureRect
 
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_font = S.font("bold")
+	# O ícone do Usar (a bússola do kit), por cima do octógono.
+	_use_icon = AHKit.glyph("next_step", 40)
+	_use_icon.position = USE_CENTER + Vector2(-20, -50)
+	_use_icon.size = Vector2(40, 40)
+	add_child(_use_icon)
 
 
 func _process(_delta: float) -> void:
@@ -155,46 +158,54 @@ func _release_all() -> void:
 		_send_interact(false)
 
 
-## As peças da entrega #23 do Codex (art/ui/touch/, medidas em docs/design/touch.md): a base e o botão do analógico
-## (normal e ativo, com a marca de correr a 85% do raio) e o Usar (apagado, pronto e pressionado, este com o segundo anel).
-## Em tela de alta densidade (o HUD de 1920 ampliado), as versões _2x. As áreas de toque não mudam com a arte.
-const TOUCH_ART := "res://art/ui/touch/%s%s.png"
-var _art := {}
-
-
-func _texture(name: String) -> Texture2D:
-	var double := get_viewport().get_screen_transform().get_scale().x > 1.25
-	var key := name + ("_2x" if double else "")
-	if not _art.has(key):
-		_art[key] = load(TOUCH_ART % [name, "_2x" if double else ""])
-	return _art[key]
+## As peças do kit (art/ui/kit/station, hud-exploracao.md): o analógico é o octógono de aço meio transparente com o
+## pegador da cruz âmbar; o Usar, o octógono apagado e, quando há o que usar, o âmbar por cima. As áreas de toque não
+## mudam com a arte.
+const RING := 120.0
+const KNOB := 42.0
+const BUTTON := 85.0
 
 
 func _piece(name: String, center: Vector2, radius: float, alpha: float = 1.0) -> void:
-	draw_texture_rect(_texture(name), Rect2(center - Vector2.ONE * radius, Vector2.ONE * radius * 2.0), false, Color(1, 1, 1, alpha))
+	var tint := Color.WHITE
+	tint.a = alpha
+	draw_texture_rect(AHKit.texture(name), Rect2(center - Vector2.ONE * radius, Vector2.ONE * radius * 2.0), false, tint)
 
 
 func _draw() -> void:
 	var active := _stick_finger != -2
-	_piece("stick_base_active" if active else "stick_base_normal", _stick_origin, STICK_RADIUS, 1.0 if active else 0.75)
-	_piece("stick_run_mark", _stick_origin, STICK_RADIUS, 0.8 if active else 0.45)
+	_piece("touch_ring", _stick_origin, RING, 1.0 if active else 0.8)
 	var knob := _stick_origin + _stick_vector * STICK_RADIUS
 	var running := _stick_vector.length() >= RUN_AT
-	_piece("stick_knob_active" if running else "stick_knob_normal", knob, 44.0, 1.0 if active else 0.7)
+	_piece("touch_knob", knob, KNOB, 1.0 if active else 0.85)
 	if active and running:
-		_text("correr", _stick_origin + Vector2(0, STICK_RADIUS + 30), 20, S.GOLD)
+		_tag(tr("Correr"), _stick_origin + Vector2(0, RING + 24), AHKit.AMBER)
 	elif not active:
-		_text("andar", _stick_origin + Vector2(0, STICK_RADIUS + 30), 20, Color(S.TEXT, 0.6))
+		_tag(tr("Andar"), _stick_origin + Vector2(0, RING + 24), AHKit.TEXT)
 
 	var can_use: bool = street.exploration_hud != null and street.exploration_hud.has_prompt()
 	var held := _use_finger != -2
-	_piece("use_pressed" if held else ("use_ready" if can_use else "use_inactive"), USE_CENTER, USE_RADIUS, 1.0 if can_use or held else 0.7)
-	_text("Usar", USE_CENTER + Vector2(0, 9), 28, S.GOLD if can_use else Color(S.MUTED, 0.7))
+	_piece("touch_button", USE_CENTER, BUTTON, 1.0 if can_use or held else 0.8)
+	if can_use or held:
+		_piece("touch_button_active", USE_CENTER, BUTTON * (0.94 if held else 1.0))
+	var tone: Color = AHKit.AMBER if can_use else AHKit.MUTED
+	_use_icon.modulate = tone
+	_text(tr("Usar").to_upper(), USE_CENTER + Vector2(0, 26), AHKit.size("card_name"), AHKit.TEXT if can_use else AHKit.MUTED)
 
 
-func _text(text: String, center: Vector2, font_size: int, color: Color) -> void:
-	var px := S.px(font_size)
-	var width := _font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
-	var at := center - Vector2(width * 0.5, 0)
-	draw_string_outline(_font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, px, 6, Color(0.03, 0.025, 0.02))
-	draw_string(_font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, px, color)
+## O nome embaixo do analógico, numa etiqueta pequena (a tecla do kit).
+func _tag(text: String, center: Vector2, color: Color) -> void:
+	var font := AHKit.font()
+	var px := AHKit.size("small")
+	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
+	var box := Rect2(center - Vector2(width * 0.5 + 10, px * 0.5 + 8), Vector2(width + 20, px + 16))
+	draw_style_box(AHKit.style(AHKit.piece_of("key", "tab")), box)
+	_text(text, center + Vector2(0, px * 0.35), px, color)
+
+
+func _text(text: String, at_center: Vector2, px: int, color: Color) -> void:
+	var font := AHKit.font(true)
+	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
+	var at := at_center - Vector2(width * 0.5, 0)
+	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, px, 6, AHKit.INK)
+	draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, px, color)

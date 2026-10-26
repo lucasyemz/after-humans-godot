@@ -17,12 +17,10 @@ options_panel.gd: %d%%
 exploration_hud.gd: %s · %s
 exploration_hud.gd: %d/%d
 exploration_hud.gd: E  
-exploration_hud.gd: [%s]  %s
 exploration_hud.gd: Title
 exploration_hud.gd: Description
 exploration_hud.gd: Choices
 exploration_hud.gd: Text
-exploration_hud.gd:   (%s)
 combat_hud.gd: Q
 combat_hud.gd: O
 combat_hud.gd: A
@@ -351,7 +349,6 @@ game_flow.gd: GameFlow: cena desconhecida ou troca em andamento (%s).
 game_flow.gd: title
 inventory_panel.gd: %d / %d
 inventory_panel.gd: Description
-inventory_panel.gd: \n\n%s%s
 inventory_panel.gd: ampoule
 inventory_panel.gd: count
 inventory_panel.gd: food
@@ -1238,3 +1235,34 @@ station_frame.gd: Prepare
 station_frame.gd: Key
 station_frame.gd: %s / X
 station_frame.gd: Reason
+exploration_hud.gd: Place
+exploration_hud.gd: Goal
+exploration_hud.gd: Corridor
+exploration_hud.gd: Supplies
+exploration_hud.gd: Party
+exploration_hud.gd: Patrol
+exploration_hud.gd: Hint
+exploration_hud.gd: Bag
+exploration_hud.gd: Finish
+exploration_hud.gd: Prompt
+exploration_hud.gd: Toast
+exploration_hud.gd: Loot
+exploration_hud.gd: Mate_%s
+exploration_hud.gd: Gain
+exploration_hud.gd: enemy
+exploration_hud.gd: Panel
+exploration_hud.gd: hope
+exploration_hud.gd: changes
+exploration_hud.gd: Changes
+exploration_hud.gd: Continue
+exploration_hud.gd: Choice_%s
+exploration_hud.gd: Abandon
+exploration_hud.gd: %+d
+exploration_hud.gd: E / A
+exploration_hud.gd: choose
+exploration_hud.gd: continue
+inventory_panel.gd: Close
+inventory_panel.gd: Key
+inventory_panel.gd: Slot_%s
+inventory_panel.gd: Previous
+inventory_panel.gd: Next

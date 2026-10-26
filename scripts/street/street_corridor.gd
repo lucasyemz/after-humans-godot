@@ -1089,7 +1089,7 @@ func _on_combat_finished(result: String) -> void:
 			await open_cargo()
 			Tips.show_tip("boss_down")
 			if street.scenario:
-				hud.toast(tr("O guardião caiu. Vasculhe o que restou ou volte à Estação (E)."), 6.0)
+				hud.toast(tr("O guardião caiu. Vasculhe o que restou ou volte à Estação pelo Menu (%s).") % AHUiStyle.key_name("menu"), 6.0)
 			else:
 				hud.toast(tr("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua."), 6.0)
 	Campaign.save()

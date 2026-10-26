@@ -451,6 +451,9 @@ static func face_texture(art: Dictionary) -> Texture2D:
 	if portrait != "" and ResourceLoader.exists(portrait):
 		_portraits[file] = load(portrait)
 		return _portraits[file]
+	# Sem a arte do parado (um herói sem ficha de combate), sem rosto.
+	if file == "" or not ResourceLoader.exists(file):
+		return null
 	var texture: Texture2D = load(file)
 	var image := texture.get_image()
 	if image.is_compressed():
