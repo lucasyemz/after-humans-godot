@@ -82,6 +82,9 @@ func _ready() -> void:
 	var capture := _capture_dir()
 	if capture != "":
 		_capture.call_deferred(capture)
+	# Nova campanha confirmada na Estação ou na rua (#144): a mesma escolha do título, no espaço de agora.
+	elif int(GameFlow.params.get("new_campaign", 0)) > 0:
+		_ask_after_travel(int(GameFlow.params.new_campaign))
 
 
 ## Continuar só aparece com um save que abre (o principal ou a cópia); sem ele, Nova campanha é o botão principal.
@@ -548,6 +551,14 @@ func _start_new_campaign(number: int) -> void:
 	box.add_child(back)
 	opening.grab_focus.call_deferred()
 	_center_modal.call_deferred()
+
+
+## A escolha da campanha nova pedida de fora do título: espera a passagem terminar (a janela não abre embaixo do cartão).
+func _ask_after_travel(number: int) -> void:
+	while GameFlow.busy and is_inside_tree():
+		await get_tree().process_frame
+	if is_inside_tree():
+		_start_new_campaign(number)
 
 
 ## Uma escolha da campanha nova: a linha do kit (a escolhida com a moldura), o nome e o que ela faz embaixo. O texto do

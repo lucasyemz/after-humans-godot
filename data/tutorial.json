@@ -112,8 +112,6 @@
         "Title": "Escolha o alvo",
         "Text": "Os alvos possíveis acendem. A barra sobre cada um é a vida; a ordem da rodada fica no alto.",
         "Keys": [
-          "ui_left",
-          "ui_right",
           "interact"
         ],
         "Blocking": true
@@ -145,7 +143,7 @@
       {
         "Id": "position",
         "Title": "Posição e defesa",
-        "Text": "A frente fica à direita. O Rastejante empurra quem acerta; Mover troca de lugar com o vizinho e Defender dá Bloqueio. A ordem da rodada fica no alto, e o instinto (a barra roxa) no painel.",
+        "Text": "A frente fica à direita. O Rastejante empurra quem acerta; Mover troca de lugar com o vizinho e Defender dá Bloqueio. A ordem da rodada fica no alto, e o instinto na barra de baixo de cada herói.",
         "Keys": [
           "combat_move",
           "combat_defend"
@@ -154,7 +152,7 @@
       {
         "Id": "item",
         "Title": "Estados e a Mochila na luta",
-        "Text": "O Rastreador faz sangrar: o sangramento tira vida no começo de cada vez. O Robô se blinda: cada Bloqueio corta o próximo golpe. Um curativo da Mochila cura sem gastar a vez.",
+        "Text": "O Drone de Expurgo contamina: a contaminação tira vida no começo de cada vez. Um curativo da Mochila cura sem gastar a vez.",
         "Keys": [
           "inventory"
         ]

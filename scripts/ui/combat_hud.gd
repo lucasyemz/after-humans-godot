@@ -11,7 +11,7 @@ extends Control
 signal command_chosen(command: Dictionary)
 signal result_closed
 ## Os momentos da vez que o tutorial (#144) acompanha: "turn" (a vez de um herói, {actor}), "target" (a mira de uma
-## habilidade ou do Mover, {ability}), "command" (o comando escolhido) e "bag" (a Mochila aberta).
+## habilidade ou do Mover, {ability}), "cancel" (a mira desfeita), "command" (o comando escolhido) e "bag" (a Mochila).
 signal tutorial_moment(kind: String, data: Dictionary)
 
 const S = preload("res://scripts/ui/ui_style.gd")
@@ -2257,6 +2257,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _choosing != "" and S.is_back(event):
 		_clear_markers()
 		_set_enabled(true)
+		tutorial_moment.emit("cancel", {})
 		_build_abilities()
 		get_viewport().set_input_as_handled()
 

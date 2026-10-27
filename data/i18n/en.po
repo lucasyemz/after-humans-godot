@@ -6,187 +6,187 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: scripts/ui/title_screen.gd:98
+#: scripts/ui/title_screen.gd:101
 #: scripts/ui/cargo_picker.gd:58
 #: scripts/ui/exploration_hud.gd:299
 #: scripts/ui/exploration_hud.gd:974
 msgid "Continuar"
 msgstr "Continue"
 
-#: scripts/ui/title_screen.gd:101
+#: scripts/ui/title_screen.gd:104
 #: scripts/ui/exploration_hud.gd:1153
 #: scripts/ui/refuge_hud.gd:1418
 msgid "Nova campanha"
 msgstr "New campaign"
 
-#: scripts/ui/title_screen.gd:105
-#: scripts/ui/title_screen.gd:387
+#: scripts/ui/title_screen.gd:108
+#: scripts/ui/title_screen.gd:390
 msgid "Campanhas"
 msgstr "Campaigns"
 
-#: scripts/ui/title_screen.gd:106
-#: scripts/ui/title_screen.gd:605
+#: scripts/ui/title_screen.gd:109
+#: scripts/ui/title_screen.gd:608
 #: scripts/ui/options_panel.gd:45
 #: scripts/ui/exploration_hud.gd:1150
 msgid "Opções"
 msgstr "Options"
 
-#: scripts/ui/title_screen.gd:109
-#: scripts/ui/title_screen.gd:275
-#: scripts/ui/title_screen.gd:316
-#: scripts/ui/title_screen.gd:629
+#: scripts/ui/title_screen.gd:112
+#: scripts/ui/title_screen.gd:278
+#: scripts/ui/title_screen.gd:319
+#: scripts/ui/title_screen.gd:632
 msgid "Setas"
 msgstr "Arrows"
 
-#: scripts/ui/title_screen.gd:109
-#: scripts/ui/title_screen.gd:275
-#: scripts/ui/title_screen.gd:316
-#: scripts/ui/title_screen.gd:629
+#: scripts/ui/title_screen.gd:112
+#: scripts/ui/title_screen.gd:278
+#: scripts/ui/title_screen.gd:319
+#: scripts/ui/title_screen.gd:632
 msgid "Navegar"
 msgstr "Navigate"
 
-#: scripts/ui/title_screen.gd:109
-#: scripts/ui/title_screen.gd:275
-#: scripts/ui/title_screen.gd:316
+#: scripts/ui/title_screen.gd:112
+#: scripts/ui/title_screen.gd:278
+#: scripts/ui/title_screen.gd:319
 msgid "Confirmar"
 msgstr "Confirm"
 
-#: scripts/ui/title_screen.gd:122
-#: scripts/ui/title_screen.gd:344
+#: scripts/ui/title_screen.gd:125
+#: scripts/ui/title_screen.gd:347
 #: scripts/ui/exploration_hud.gd:620
 #: scripts/ui/exploration_hud.gd:974
 msgid "%s / A"
 msgstr "%s / A"
 
-#: scripts/ui/title_screen.gd:172
-#: scripts/ui/title_screen.gd:443
-#: scripts/ui/title_screen.gd:465
+#: scripts/ui/title_screen.gd:175
+#: scripts/ui/title_screen.gd:446
+#: scripts/ui/title_screen.gd:468
 msgid "Espaço %d"
 msgstr "Slot %d"
 
-#: scripts/ui/title_screen.gd:174
+#: scripts/ui/title_screen.gd:177
 #: scripts/flow/game_flow.gd:71
 msgid "Ciclo %d"
 msgstr "Cycle %d"
 
-#: scripts/ui/title_screen.gd:174
-#: scripts/ui/title_screen.gd:476
+#: scripts/ui/title_screen.gd:177
+#: scripts/ui/title_screen.gd:479
 msgid "%d fase"
 msgstr "%d phase"
 
-#: scripts/ui/title_screen.gd:174
-#: scripts/ui/title_screen.gd:476
+#: scripts/ui/title_screen.gd:177
+#: scripts/ui/title_screen.gd:479
 msgid "%d fases"
 msgstr "%d phases"
 
-#: scripts/ui/title_screen.gd:175
+#: scripts/ui/title_screen.gd:178
 msgid "%d de %d prontos"
 msgstr "%d of %d ready"
 
-#: scripts/ui/title_screen.gd:316
-#: scripts/ui/title_screen.gd:400
-#: scripts/ui/title_screen.gd:545
+#: scripts/ui/title_screen.gd:319
+#: scripts/ui/title_screen.gd:403
+#: scripts/ui/title_screen.gd:548
 #: scripts/ui/options_panel.gd:18
 msgid "Voltar"
 msgstr "Back"
 
-#: scripts/ui/title_screen.gd:387
+#: scripts/ui/title_screen.gd:390
 msgid "Em qual espaço começar?"
 msgstr "Which slot should the new campaign use?"
 
-#: scripts/ui/title_screen.gd:447
+#: scripts/ui/title_screen.gd:450
 #: scripts/ui/refuge_hud.gd:810
 msgid "Vazio"
 msgstr "Empty"
 
-#: scripts/ui/title_screen.gd:449
+#: scripts/ui/title_screen.gd:452
 msgid "O save não abre"
 msgstr "The save does not open"
 
-#: scripts/ui/title_screen.gd:455
+#: scripts/ui/title_screen.gd:458
 msgid "último usado"
 msgstr "last used"
 
-#: scripts/ui/title_screen.gd:466
+#: scripts/ui/title_screen.gd:469
 msgid " (último usado)"
 msgstr " (last used)"
 
-#: scripts/ui/title_screen.gd:469
+#: scripts/ui/title_screen.gd:472
 msgid "%s — vazio"
 msgstr "%s — empty"
 
-#: scripts/ui/title_screen.gd:471
+#: scripts/ui/title_screen.gd:474
 msgid "%s — o save não abre"
 msgstr "%s — the save won't open"
 
-#: scripts/ui/title_screen.gd:474
+#: scripts/ui/title_screen.gd:477
 msgid "%d h %02d min"
 msgstr "%d h %02d min"
 
-#: scripts/ui/title_screen.gd:475
+#: scripts/ui/title_screen.gd:478
 msgid "%d min"
 msgstr "%d min"
 
-#: scripts/ui/title_screen.gd:477
+#: scripts/ui/title_screen.gd:480
 msgid "%s — Ciclo %d · %s · %d de %d prontos\n%02d/%02d/%d %02d:%02d · %s jogados%s"
 msgstr "%s — Cycle %d · %s · %d of %d ready\n%02d/%02d/%d %02d:%02d · %s played%s"
 
-#: scripts/ui/title_screen.gd:479
+#: scripts/ui/title_screen.gd:482
 msgid " · em expedição"
 msgstr " · on an expedition"
 
-#: scripts/ui/title_screen.gd:495
+#: scripts/ui/title_screen.gd:498
 #: scripts/ui/exploration_hud.gd:1317
 msgid "Começar uma campanha nova?"
 msgstr "Start a new campaign?"
 
-#: scripts/ui/title_screen.gd:496
+#: scripts/ui/title_screen.gd:499
 msgid "Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recursos e heróis) é substituído por uma campanha do zero. Os outros espaços ficam como estão."
 msgstr "All progress saved in slot %d (completed phases, rooms, resources and heroes) is replaced by a fresh campaign. The other slots stay as they are."
 
-#: scripts/ui/title_screen.gd:497
+#: scripts/ui/title_screen.gd:500
 msgid "O save do espaço %d não pôde ser aberto. Uma campanha nova grava por cima dele, e ele não volta mais."
 msgstr "The save in slot %d could not be opened. A new campaign writes over it, and it won't come back."
 
-#: scripts/ui/title_screen.gd:507
+#: scripts/ui/title_screen.gd:510
 #: scripts/ui/exploration_hud.gd:1319
 #: scripts/ui/refuge_hud.gd:1423
 #: scripts/ui/station/character_room.gd:774
 msgid "Cancelar"
 msgstr "Cancel"
 
-#: scripts/ui/title_screen.gd:516
+#: scripts/ui/title_screen.gd:519
 #: scripts/ui/exploration_hud.gd:1321
 #: scripts/ui/refuge_hud.gd:1424
 msgid "Começar do zero"
 msgstr "Start from scratch"
 
-#: scripts/ui/title_screen.gd:531
+#: scripts/ui/title_screen.gd:534
 msgid "Como começar?"
 msgstr "How to start?"
 
-#: scripts/ui/title_screen.gd:535
+#: scripts/ui/title_screen.gd:538
 msgid "Começar pela abertura (recomendado)"
 msgstr "Start with the opening (recommended)"
 
-#: scripts/ui/title_screen.gd:536
+#: scripts/ui/title_screen.gd:539
 msgid "A fuga do Bento e do Nick pelo Corredor de Contenção: três lutas curtas que ensinam a jogar."
 msgstr "Bento and Nick's escape through the Containment Corridor: three short fights that teach you how to play."
 
-#: scripts/ui/title_screen.gd:540
+#: scripts/ui/title_screen.gd:543
 msgid "Pular tutorial"
 msgstr "Skip tutorial"
 
-#: scripts/ui/title_screen.gd:541
+#: scripts/ui/title_screen.gd:544
 msgid "Começa direto na Estação Raiz, como depois da abertura e com a mesma recompensa."
 msgstr "Starts right at Root Station, as after the opening and with the same reward."
 
-#: scripts/ui/title_screen.gd:629
+#: scripts/ui/title_screen.gd:632
 #: scripts/ui/refuge_hud.gd:522
 msgid "Mudar"
 msgstr "Change"
 
-#: scripts/ui/title_screen.gd:629
+#: scripts/ui/title_screen.gd:632
 #: scripts/ui/options_panel.gd:145
 #: scripts/ui/exploration_hud.gd:303
 #: scripts/ui/exploration_hud.gd:1128
@@ -1023,7 +1023,7 @@ msgid "Continuar a expedição"
 msgstr "Continue the expedition"
 
 #: scripts/ui/exploration_hud.gd:1373
-#: scripts/ui/combat_hud.gd:2300
+#: scripts/ui/combat_hud.gd:2301
 msgid "Vitória"
 msgstr "Victory"
 
@@ -1032,12 +1032,12 @@ msgid "Retirada"
 msgstr "Retreat"
 
 #: scripts/ui/exploration_hud.gd:1373
-#: scripts/ui/combat_hud.gd:2300
+#: scripts/ui/combat_hud.gd:2301
 msgid "Fuga"
 msgstr "Escape"
 
 #: scripts/ui/exploration_hud.gd:1373
-#: scripts/ui/combat_hud.gd:2300
+#: scripts/ui/combat_hud.gd:2301
 msgid "Derrota"
 msgstr "Defeat"
 
@@ -1443,23 +1443,23 @@ msgstr "Choose a target"
 msgid "ALVO"
 msgstr "TARGET"
 
-#: scripts/ui/combat_hud.gd:2292
+#: scripts/ui/combat_hud.gd:2293
 msgid "Batalha finalizada"
 msgstr "Battle over"
 
-#: scripts/ui/combat_hud.gd:2317
+#: scripts/ui/combat_hud.gd:2318
 msgid "A carga do guardião abre em seguida"
 msgstr "The guardian's cargo opens next"
 
-#: scripts/ui/combat_hud.gd:2334
+#: scripts/ui/combat_hud.gd:2335
 msgid "Qualquer tecla ou toque para continuar"
 msgstr "Any key or tap to continue"
 
-#: scripts/ui/combat_hud.gd:2334
+#: scripts/ui/combat_hud.gd:2335
 msgid "Fecha sozinho · toque para fechar antes"
 msgstr "Closes on its own · tap to close sooner"
 
-#: scripts/ui/combat_hud.gd:2335
+#: scripts/ui/combat_hud.gd:2336
 msgid "Fecha sozinho · o mouse em cima segura · qualquer tecla fecha"
 msgstr "Closes on its own · hovering holds it · any key closes"
 
@@ -5060,11 +5060,11 @@ msgstr "Escaped!"
 msgid "Fuga falhou"
 msgstr "Escape failed"
 
-#: scripts/ui/tutorial_hint.gd:71
+#: scripts/ui/tutorial_hint.gd:75
 msgid "Tutorial"
 msgstr "Tutorial"
 
-#: scripts/ui/tutorial_hint.gd:91
+#: scripts/ui/tutorial_hint.gd:95
 msgid "%d de %d"
 msgstr "%d of %d"
 
@@ -6501,20 +6501,20 @@ msgid "Essa porta não abre mais. As máquinas fecharam o corredor inteiro, e vo
 msgstr "That door won't open anymore. The machines sealed the whole corridor, and you're stuck on the inside."
 
 #. briefings.tutorial_nick.1
-msgid "Então tem que haver outro caminho. Eu não saio daqui sem um."
-msgstr "Then there has to be another way. I'm not leaving here without one."
+msgid "Tem gente na Estação esperando por estes suprimentos. Eu não volto de mãos vazias: tem que haver outro caminho."
+msgstr "People at the Station are waiting for these supplies. I'm not going back empty-handed: there has to be another way."
 
 #. briefings.tutorial_nick.2
 msgid "Tem. Pelo duto, depois a escada até o alçapão. Eu ia seguir viagem... Anda, antes que eu mude de ideia."
 msgstr "There is. Through the duct, then the ladder up to the hatch. I was going to move on... Come on, before I change my mind."
 
 #. briefings.tutorial.debriefing.0
-msgid "Você ia acabar preso lá embaixo junto com as máquinas."
-msgstr "You would have ended up trapped down there with the machines."
+msgid "Você ia ficar preso lá embaixo por causa de uma mochila de comida."
+msgstr "You were going to get trapped down there over a backpack of food."
 
 #. briefings.tutorial.debriefing.1
-msgid "Talvez. Fica? Aqui tem comida, cama e porta que abre por dentro."
-msgstr "Maybe. Stay? There is food here, a bed and doors that open from the inside."
+msgid "Por quem está esperando por ela. Fica? Aqui tem comida, cama e porta que abre por dentro."
+msgstr "For the people waiting for it. Stay? There is food here, a bed and doors that open from the inside."
 
 #. briefings.tutorial.debriefing.2
 msgid "Só por uma noite."
@@ -6731,16 +6731,16 @@ msgid "Posição e defesa"
 msgstr "Position and defense"
 
 #. tutorial.hints.position.Text
-msgid "A frente fica à direita. O Rastejante empurra quem acerta; Mover troca de lugar com o vizinho e Defender dá Bloqueio. A ordem da rodada fica no alto, e o instinto (a barra roxa) no painel."
-msgstr "The front is on the right. The Crawler pushes whoever it hits; Move swaps places with the neighbor and Defend gives Block. The round order is at the top, and instinct (the purple bar) is on the panel."
+msgid "A frente fica à direita. O Rastejante empurra quem acerta; Mover troca de lugar com o vizinho e Defender dá Bloqueio. A ordem da rodada fica no alto, e o instinto na barra de baixo de cada herói."
+msgstr "The front is on the right. The Crawler pushes whoever it hits; Move swaps places with the neighbor and Defend gives Block. The round order is at the top, and instinct is on each hero's lower bar."
 
 #. tutorial.hints.item.Title
 msgid "Estados e a Mochila na luta"
 msgstr "Statuses and the Backpack in a fight"
 
 #. tutorial.hints.item.Text
-msgid "O Rastreador faz sangrar: o sangramento tira vida no começo de cada vez. O Robô se blinda: cada Bloqueio corta o próximo golpe. Um curativo da Mochila cura sem gastar a vez."
-msgstr "The Tracker causes bleeding: bleeding takes health at the start of each turn. The Robot armors up: each Block cuts the next hit. A bandage from the Backpack heals without spending the turn."
+msgid "O Drone de Expurgo contamina: a contaminação tira vida no começo de cada vez. Um curativo da Mochila cura sem gastar a vez."
+msgstr "The Purge Drone contaminates: contamination takes health at the start of each turn. A bandage from the Backpack heals without spending the turn."
 
 #. tutorial.hints.train.Title
 msgid "Embarque no trem"

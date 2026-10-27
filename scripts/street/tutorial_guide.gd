@@ -68,7 +68,6 @@ func complete(id: String) -> void:
 		tutorial.done = list
 	if hint.step_id == id:
 		hint.hide_hint()
-	street._arena.hud.tutorial_locks = []
 
 
 ## Os momentos da exploração (o corredor chama): "searched", "bag", "fight_start", "fight_end", "platform", "board".
@@ -109,6 +108,9 @@ func _explore() -> void:
 
 
 func _process(_delta: float) -> void:
+	# Com uma janela aberta (o Menu, as Opções, a Mochila, a conversa), a dica sai da frente e volta ao fechar.
+	hint.visible = not corridor.hud.modal_open() and corridor.hud.find_child("Briefing", true, false) == null
+	hint.set_avoid(_heads())
 	if street._arena.active:
 		_combat_focus()
 		return
@@ -122,10 +124,14 @@ func _process(_delta: float) -> void:
 			var button: Control = corridor.hud.get("_bag_button")
 			hint.set_focus(button.get_global_rect() if button != null and button.is_visible_in_tree() else Rect2())
 		"search", "train":
+			# O objeto inteiro (a marca fica em cima dele): o retângulo desce do ponto da marca até o chão.
 			var point = corridor._action_point()
-			hint.set_focus(_world_rect(point, Vector2(150, 150)) if point != null else Rect2())
+			hint.set_focus(_world_rect(point - Vector3(0, 0.9, 0), Vector2(170, 230)) if point != null else Rect2())
 		"patrol":
-			hint.set_focus(Rect2())
+			# A patrulha à frente: o primeiro da patrulha do trecho.
+			var route: Dictionary = Campaign.state.session.expedition.corridor
+			var guard = corridor.guards.get(route.index, corridor.guards.get(route.index + 1))
+			hint.set_focus(_world_rect(guard.cards[0].global_position + Vector3(0, 0.9, 0), Vector2(200, 300)) if guard != null else Rect2())
 		_:
 			pass
 	if hint.step_id == "" and not corridor.blocking():
@@ -137,7 +143,7 @@ func _watch_world() -> void:
 	var route: Dictionary = Campaign.state.session.expedition.corridor
 	if not done("search") and corridor._action.is_valid() and corridor._action.get_method() == "_search_scenario_prop":
 		show("search")
-	elif done("bag") and not done("patrol") and route.index >= 3 and (corridor.guards.has(route.index) or corridor.guards.has(route.index + 1)):
+	elif not done("patrol") and route.index >= 3 and (corridor.guards.has(route.index) or corridor.guards.has(route.index + 1)):
 		show("patrol")
 
 
@@ -150,7 +156,7 @@ func _on_combat(kind: String, data: Dictionary) -> void:
 			if _fight_step == 1 and not done("ability"):
 				# A primeira escolha trava: só as habilidades (as ações voltam quando ela é feita).
 				hud.tutorial_locks = ["move", "defend", "item", "flee"]
-				hud._build_abilities()
+				hud._build_abilities(false)
 				show("ability", "left")
 			elif _fight_step == 4 and not done("position"):
 				show("position", "left")
@@ -160,7 +166,16 @@ func _on_combat(kind: String, data: Dictionary) -> void:
 			if hint.step_id == "ability":
 				complete("ability")
 				show("target", "left")
+		"cancel":
+			# Desfeita a mira na primeira escolha: volta à dica da habilidade, com as ações ainda travadas.
+			if hint.step_id == "target":
+				var list: Array = Campaign.state.tutorial.get("done", [])
+				list.erase("ability")
+				hint.hide_hint()
+				show("ability", "left")
 		"command":
+			# O comando de verdade solta as ações da primeira escolha.
+			hud.tutorial_locks = []
 			if hint.step_id == "target":
 				complete("target")
 			elif hint.step_id == "position":
@@ -180,6 +195,20 @@ func _combat_focus() -> void:
 			hint.set_focus(hud.tutorial_rect("actions"))
 		"item":
 			hint.set_focus(hud.tutorial_rect("item"))
+
+
+## As cabeças de quem está na tela (a equipe e, na luta, os inimigos): a dica não as cobre.
+func _heads() -> Array:
+	var cards: Array = street._heroes.duplicate()
+	if street._arena.active:
+		cards = street._arena.cards.values()
+	var out: Array = []
+	for card in cards:
+		if is_instance_valid(card) and card.visible:
+			var rect := _world_rect(card.global_position + Vector3(0, card.head_height() * 0.75, 0), Vector2(220, 260))
+			if rect.has_area():
+				out.append(rect)
+	return out
 
 
 ## O retângulo na tela (1920 x 1080) em volta de um ponto do mundo.
