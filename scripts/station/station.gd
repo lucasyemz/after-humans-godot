@@ -1464,11 +1464,9 @@ func _build_post() -> void:
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var post := ShaderMaterial.new()
 	post.shader = preload("res://shaders/post_emberfall.gdshader")
-	# No refúgio o corte inteiro precisa ler: foco largo e pouco desfoque, só a cor e a vinheta do Emberfall.
-	post.set_shader_parameter("focus_center", 0.5)
-	post.set_shader_parameter("focus_width", 0.8)
-	post.set_shader_parameter("max_blur", 3.0)
-	post.set_shader_parameter("vignette", 0.45)
+	# O perfil de ambiência da Estação (#153): no refúgio o corte inteiro precisa ler, então foco largo e pouco
+	# desfoque, só a cor e a vinheta do Emberfall.
+	AHAmbience.apply_post(post, AHAmbience.profile("Station"), Settings.level)
 	rect.material = post
 	layer.add_child(rect)
 	add_child(layer)
