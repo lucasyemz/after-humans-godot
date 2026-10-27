@@ -50,7 +50,17 @@
       "broto",
       "faisca",
       "pipoco"
-    ]
+    ],
+    "Boost": {
+      "broto": {
+        "Damage": 4,
+        "Speed": 3
+      },
+      "faisca": {
+        "Damage": 4,
+        "Speed": 3
+      }
+    }
   },
   {
     "Name": "fight_2",
@@ -68,7 +78,12 @@
     "Enemies": [
       "faisca",
       "ninho_errante"
-    ]
+    ],
+    "Boost": {
+      "ninho_errante": {
+        "Speed": 8
+      }
+    }
   },
   {
     "Name": "reward",

@@ -47,7 +47,7 @@ func _capture_map(campaign, map: String) -> void:
 	c.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
 	# Carregado na hora: um script de -s não enxerga as classes globais antes dos autoloads.
 	if spec[0] == "tutorial":
-		# O mapa do tutorial (#147): a jornada do Bento, com o Nick já na equipe (as fotos mostram a dupla).
+		# O mapa do tutorial (#147): a jornada do Bento, com o Nick já na equipe (as fotos mostram a equipe de quatro).
 		var tutorial = load("res://scripts/flow/tutorial_rules.gd")
 		tutorial.start_journey(c)
 		c.session.expedition.team.append("hero_gato_nick")
