@@ -289,6 +289,11 @@ func _chips(c: Dictionary, result: String) -> Array:
 			out.append({"icon": "state_wounded", "text": tr("%s caiu: em recuperação") % hero.display_name, "color": AHKit.alert_text()})
 	elif fell.size() > 1:
 		out.append({"icon": "state_wounded", "text": tr("%d caíram: em recuperação") % fell.size(), "color": AHKit.alert_text()})
+	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
+	if report.has("train"):
+		var arrived := String(report.train)
+		out.append({"icon": "train_arrival", "text": tr("Chegou alguém no trem: %s") % arrived if arrived != "" else tr("O trem veio vazio"),
+			"color": AHKit.AMBER if arrived != "" else AHKit.MUTED})
 	return out
 
 
