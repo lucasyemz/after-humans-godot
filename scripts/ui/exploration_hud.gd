@@ -1061,14 +1061,16 @@ func hide_tool_notice() -> void:
 	_tool_notice = null
 
 
-## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
-## A chapa do aviso no tamanho do texto, centrada embaixo do objetivo.
+## A chapa do aviso no tamanho do texto, centrada embaixo do objetivo (fora da árvore, a chamada adiada não mede nada).
 func _fit_toast() -> void:
+	if not is_inside_tree():
+		return
 	_toast.reset_size()
 	_toast.size = _toast.get_combined_minimum_size()
 	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
 
 
+## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
 func toast(text: String, seconds: float = 3.5) -> void:
 	if _toast_tween:
 		_toast_tween.kill()
