@@ -14,6 +14,8 @@ const FIRE := Vector3(180, 40, 0)
 const CORRIDOR_LENGTH := 78.0
 ## Quanto do sol fica sob teto (#175), sem sombra: só para a equipe não sumir no escuro.
 const COVERED_SUN := 0.3
+## Numa zona coberta, quanto o quadro mostra além da ponta (m): a equipe inteira na tela, e lá as colunas da ponta.
+const COVERED_EDGE_REACH := 1.5
 const WEATHER_NAMES := {"clear": "céu limpo", "sunset": "fim de tarde", "rain": "chuva", "storm": "tempestade", "mist": "névoa",
 	"fog": "neblina", "night": "noite", "nightRain": "noite de chuva"}
 const PARTY_SPACING := 1.15
@@ -341,6 +343,8 @@ func set_scenario_zone(index: int) -> void:
 	for card in _heroes:
 		card.set_silhouette_foot(maxf(AHSpriteCard.SILHOUETTE_FOOT, edge))
 	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot"].has(scenario.map_name)
+	if sheltered:
+		scenario.close_zone_ends(index)
 	_apply_weather()
 
 
@@ -840,9 +844,10 @@ func _update_camera(delta: float) -> void:
 		pitch = deg_to_rad(SCENARIO_PITCH)
 		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(SCENARIO_HALF_FOV)) / get_viewport().get_visible_rect().size.aspect()))
 		var half_view: float = tan(deg_to_rad(SCENARIO_HALF_FOV)) * distance
-		# Numa zona coberta (#175) a borda do quadro para na parede do lado: os 4 m além da ponta mostravam o vazio por
-		# fora da sala.
-		var reach: float = half_view if sheltered else half_view - 4.0
+		# Numa zona coberta (#175) a borda do quadro vai só um pouco além da ponta, onde ficam as colunas que fecham a
+		# zona (AHScenarioWorld.close_zone_ends): os 4 m mostravam o vazio por fora da sala, e sem folga o líder saía
+		# cortado na borda.
+		var reach: float = half_view - (COVERED_EDGE_REACH if sheltered else 4.0)
 		var low: float = _zone.x0 + minf(reach, (_zone.x1 - _zone.x0) * 0.5)
 		var high: float = _zone.x1 - minf(reach, (_zone.x1 - _zone.x0) * 0.5)
 		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + float(view_spec.height), lane_z)

@@ -25,18 +25,20 @@ cenários (nas duas pontas e no meio), no fim de tarde e de noite:
   mundo, para não esticar na profundidade.
 - **A porta das lojas:** do lado de fora fica um pedaço da rua: o asfalto, o muro de tijolo em frente e o do lado, e o
   beiral. Pelo vão se vê a rua, não o céu.
-- **As pontas das zonas cobertas:** a borda do quadro para na parede do lado. Ao ar livre a câmera segue como na
-  Unreal, com os 4 m de folga.
+- **As pontas das zonas cobertas:** o quadro vai só 1,5 m além da ponta (`COVERED_EDGE_REACH`), o bastante para a
+  equipe ficar inteira na tela, e essa faixa é fechada por uma coluna de cada lado, na frente da faixa, com a arte da
+  parede do lado do mapa (`AHScenarioWorld.close_zone_ends`). Ao ar livre a câmera segue como na Unreal, com os 4 m de
+  folga.
 - **O relâmpago:** sob teto, o clarão não tinge mais a sala de azul.
 - **Os cenários:** as paredes do lado já tinham textura de concreto, e pareciam lisas por causa do sol. Ficam como
   estão.
 
 ## Testes
 
-- `tests/test_interiors.gd` (novo, 21 verificações):
+- `tests/test_interiors.gd` (novo, 29 verificações):
   - as paredes do lado das três lojas com a arte da loja, e a rua do lado de fora da porta;
-  - no Cais do Rio, o sol com sombra no cais e fraco e sem sombra nos dois galpões, com a câmera parando na parede do
-    lado;
+  - no Cais do Rio, o sol com sombra no cais e fraco e sem sombra nos dois galpões; nas duas pontas de cada galpão, o
+    líder a mais de 0,8 m da borda do quadro, o quadro só até as colunas e as duas colunas montadas;
   - na rua, o sol com sombra;
   - na loja, o sol sem sombra e a 30%, mesmo depois de trocar a qualidade;
   - de volta à rua, o sol inteiro.
@@ -62,3 +64,6 @@ cenários (nas duas pontas e no meio), no fim de tarde e de noite:
   - o Cais do Rio no teste.
 
   As capturas saem no Compatibility, por software (xvfb).
+- **Rodada 2: REPROVADO.** A porta, o relâmpago e o teste do Cais ficaram certos (`run_all` 75/75). A câmera parando
+  exatamente na parede cortava o líder ao meio na borda do quadro quando ele chegava à ponta da zona. Correção: 1,5 m
+  de folga e as colunas da ponta, com a arte da parede do mapa; o teste confere a distância do líder à borda.

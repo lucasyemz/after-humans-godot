@@ -1508,3 +1508,6 @@ street.gd: dust
 street.gd: leaves
 refuge_hud.gd: %s:%s
 refuge_hud.gd: id
+scenario_world.gd: ZoneEnd_%d_%s
+scenario_world.gd: left
+scenario_world.gd: right

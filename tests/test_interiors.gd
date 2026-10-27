@@ -80,12 +80,17 @@ func _street_sun(t, tree: SceneTree) -> void:
 			street.set_scenario_zone(zone)
 			t.check(not street._sun.shadow_enabled and is_equal_approx(street._sun.light_energy, dock_energy * street.COVERED_SUN),
 				"no galpão %d o sol fica fraco e sem sombra" % zone)
-			# A câmera na ponta do galpão para com a borda do quadro na parede do lado.
-			street._place_leader(Vector3(float(street._zone.x0) + 0.5, street.floor_y, street.lane_z))
-			street._update_camera(0.0)
-			t.check(street._camera.position.x - half_view >= float(street._zone.x0) - 0.01,
-				"no galpão %d a câmera não mostra o lado de fora da ponta (%.2f, parede em %.2f)" % [zone,
-				street._camera.position.x - half_view, street._zone.x0])
+			# Nas pontas do galpão: o líder longe da borda do quadro, e o quadro só até as colunas que fecham a ponta.
+			for end in [[street.walk_min.x, -1.0], [street.walk_max.x, 1.0]]:
+				street._place_leader(Vector3(float(end[0]), street.floor_y, street.lane_z), float(end[1]))
+				street._update_camera(0.0)
+				var edge: float = street._camera.position.x + float(end[1]) * half_view
+				var wall: float = float(street._zone.x0) if end[1] < 0.0 else float(street._zone.x1)
+				t.check(absf(edge - float(end[0])) >= 0.8, "no galpão %d o líder na ponta fica inteiro no quadro (%.2f m da borda)" % [
+					zone, absf(edge - float(end[0]))])
+				t.check(absf(edge - wall) <= AHScenarioWorld.END_CAP_WIDTH, "e o quadro para nas colunas da ponta (%.2f m além)" % absf(edge - wall))
+			t.equal(street.scenario.find_children("ZoneEnd_%d_*" % zone, "MeshInstance3D", false, false).size(), 2,
+				"o galpão %d com as duas colunas das pontas" % zone)
 		tree.unload_current_scene()
 		await tree.process_frame
 	var dir := ProjectSettings.globalize_path(Campaign.save_dir)
