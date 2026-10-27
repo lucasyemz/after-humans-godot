@@ -516,6 +516,11 @@ func _build_frame(c: Dictionary) -> void:
 		_prepare = AHStationFrame.prepare(_frame, tr("Preparar expedição"), "station", S.preparation_block(c), open_map)
 	AHStationFrame.tabs(_frame, _active_tab(), _nav)
 	var pairs: Array
+	if current == "" and tour != null:
+		# Na visita, as setas e o Menu não passam: Interagir segue e Voltar pula.
+		pairs = [["interact", tr("Seguir")], ["Esc", tr("Pular visita")]]
+		AHStationFrame.keys(_frame, pairs, LEFT.end.x + 300.0, LEFT.end.x + 32.0, _prepare.position.x - 24.0)
+		return
 	if current == "":
 		pairs = [[tr("Setas"), tr("Cômodos")], ["interact", tr("Abrir")], ["menu", tr("Menu")], ["hide_hud", tr("Ocultar")]]
 		AHStationFrame.keys(_frame, pairs, LEFT.end.x + 300.0, LEFT.end.x + 32.0, _prepare.position.x - 24.0)
@@ -874,7 +879,10 @@ func _update_room_hover() -> void:
 	var mouse := get_viewport().get_mouse_position()
 	if mouse.distance_to(_last_mouse) > 2.0:
 		_key_room = ""
-	if overview and _key_room != "" and _room_rects.has(_key_room):
+	if tour != null:
+		# Na visita, só o destaque dela: sem a moldura e o cartão do cômodo debaixo do mouse ou do teclado.
+		hovered = ""
+	elif overview and _key_room != "" and _room_rects.has(_key_room):
 		hovered = _key_room
 	elif overview:
 		var over := get_viewport().gui_get_hovered_control()
@@ -1041,8 +1049,11 @@ func _maybe_tour() -> void:
 	if not report.is_empty() and not report.get("seen", false):
 		return
 	tour = AHStationTour.new(self)
-	tour.finished.connect(func(): tour = null)
+	tour.finished.connect(func():
+		tour = null
+		refresh())
 	add_child(tour)
+	refresh()
 
 
 func _tour_moment(what: String) -> void:

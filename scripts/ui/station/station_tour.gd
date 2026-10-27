@@ -178,8 +178,8 @@ func _process(_delta: float) -> void:
 	# A seleção de cômodo da Estação (a moldura do teclado) não disputa com o destaque da visita.
 	hud.clear_room_selection()
 	var rect: Rect2 = hud.tour_rect(_target())
-	# Logo depois da chegada a câmera ainda vem da plataforma: a fala espera a vista em corte (o destaque) aparecer.
-	_box.visible = rect.has_area() or not String(current().get("Target", "")).begins_with("overview")
+	# Logo depois da chegada a câmera ainda vem da plataforma: a fala já aparece (e diz por que a tela espera), e o
+	# destaque entra quando a vista em corte chega.
 	_hint.show_frame(rect, true, waiting_for() != "next")
 	_place()
 
