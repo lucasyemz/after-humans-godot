@@ -103,6 +103,8 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	hud.menu_return.connect(_retreat)
 	hud.menu_requested.connect(open_menu)
 	hud.inventory_requested.connect(open_inventory)
+	hud.formation_requested.connect(open_formation)
+	hud.formation_swap.connect(_swap_formation)
 	hud.new_campaign.connect(_new_campaign)
 	street._arena.finished.connect(_on_combat_finished)
 	doors = street.door_list()
@@ -149,7 +151,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 
 ## Bloqueia o movimento da equipe (painel aberto, transição ou luta).
 func blocking() -> bool:
-	return busy or hud.modal_open() or street._arena.active or camp.active
+	return busy or hud.modal_open() or street._arena.active or camp.active or hud.formation_open()
 
 
 func _step_x(index: int, fraction: float) -> float:
@@ -884,6 +886,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open_inventory()
 		return
+	# A formação só pega a tecla quando abre ou fecha de fato: na luta, o X do controle é o Defender (#129).
+	if event.is_action_pressed("formation") and not street._arena.active and (hud.formation_open() or can_open_formation()):
+		get_viewport().set_input_as_handled()
+		open_formation()
+		return
 	if event.is_action_pressed("interact") and not blocking() and _action.is_valid() and not Tips.showing():
 		get_viewport().set_input_as_handled()
 		var action := _action
@@ -891,11 +898,39 @@ func _unhandled_input(event: InputEvent) -> void:
 		action.call()
 
 
+## A formação (#129): fora da luta, dos eventos, do acampamento e de um painel aberto, com dois ou mais de pé.
+func can_open_formation() -> bool:
+	# Com uma dica aberta, a tecla é dela (como o Interagir).
+	if busy or street._arena.active or hud.modal_open() or camp.active or Tips.showing() or not R.in_corridor(Campaign.state):
+		return false
+	return street.party_ids.size() >= 2
+
+
+func open_formation() -> void:
+	if hud.formation_open():
+		hud.close_formation()
+	elif can_open_formation():
+		hud.formation_cards = street._heroes
+		hud.open_formation()
+	elif street.party_ids.size() < 2 and not busy and not street._arena.active:
+		hud.toast(tr("Com um herói só, não há ordem para trocar."), 2.5)
+
+
+func _swap_formation(a: String, b: String) -> void:
+	if not R.swap_team(Campaign.state, a, b):
+		return
+	street.swap_party(a, b)
+	Campaign.save()
+	hud.refresh(Campaign.state)
+
+
 ## O menu da exploração (Esc ou o botão): continuar, voltar à Estação ou começar uma campanha nova.
 func open_menu() -> void:
 	# No acampamento também (#98): voltar à Estação e as Opções não podem esperar o levantar acampamento.
 	if busy or street._arena.active or hud.modal_open() or camp.switching():
 		return
+	# Com a formação aberta (o clique no MENU), ela fecha antes.
+	hud.close_formation()
 	var session: Dictionary = Campaign.state.session
 	if not AHExplorationHud.session_open(Campaign.state):
 		return
@@ -906,6 +941,7 @@ func open_menu() -> void:
 func open_inventory() -> void:
 	if busy or street._arena.active or hud.modal_open() or camp.switching() or not AHExplorationHud.session_open(Campaign.state):
 		return
+	hud.close_formation()
 	Sound.play("res://audio/ui/bag_open.ogg")
 	hud.show_inventory()
 	Tips.show_tip("bag")

@@ -202,19 +202,16 @@ func _street() -> void:
 	var ranks: Array = Admin.override_enemies([{"enemy_id": "robot", "unit_id": "a", "rank": 1, "display_name": "Robô"},
 		{"enemy_id": "robot", "unit_id": "b", "rank": 2, "display_name": "Robô"}, {"enemy_id": "robot", "unit_id": "c", "rank": 3, "display_name": "Robô"}]).map(func(u): return u.rank)
 	t.equal(ranks, [1, 3], "o inimigo grande ocupa duas posições, sem sobrepor")
-	# Na build do jogador, as teclas antigas não valem, nem com o modo gravado de antes.
-	var dev: bool = Settings.dev_mode
+	# As teclas de teste antigas da rua saíram (#129): o que elas faziam está na barra, e R não liga mais a chuva.
 	Admin.close()
-	Settings.dev_mode = true
-	Admin.player_build = true
 	var rain: bool = street._raining
 	await _key(KEY_R)
-	t.check(street._raining == rain, "na build do jogador, R não liga a chuva")
-	Admin.player_build = false
-	await _key(KEY_R)
-	t.check(street._raining != rain, "e na de teste, com as teclas ligadas, liga")
-	await _key(KEY_R)
-	Settings.dev_mode = dev
+	t.check(street._raining == rain, "R não liga a chuva")
+	if street.exploration_hud.formation_open():
+		street.exploration_hud.close_formation()
+	var old: Array = InputMap.get_actions().filter(func(a): return String(a).begins_with("debug_"))
+	t.equal(old, [], "nenhuma ação debug_* antiga sobra")
+	t.check(not "dev_mode" in Settings, "nem o modo de desenvolvedor antigo")
 	await _toggle()
 	panel = Admin.panel
 	# A luta contra o inimigo escolhido: a próxima patrulha vem toda com ele.
