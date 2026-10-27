@@ -28,7 +28,13 @@ func run(context) -> void:
 	Engine.time_scale = TIME_SCALE
 	# As lutas e as buscas sorteiam pelo randi() global: com a semente fixa, a jornada sai sempre igual.
 	seed(SEED)
+	# O trem da volta (#122) é sorteado: aqui ele traz sempre o próximo civil da fila (o test_train_recruits sorteia).
+	var train_rule: Dictionary = GameData.table("recruitment").get("train", {})
+	var train_before := train_rule.duplicate()
+	train_rule.Chance = 100
+	train_rule.CivilianShare = 100
 	await _play()
+	train_rule.merge(train_before, true)
 	randomize()
 	Engine.time_scale = real_scale
 	_release_all()

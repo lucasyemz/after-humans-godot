@@ -1265,6 +1265,7 @@ func close_panel() -> void:
 		return
 	_close_departure()
 	station.clear_lineup()
+	_restore_candidate()
 	station.focus_overview()
 	refresh()
 	# De volta à vista geral, as setas voltam a andar entre os cômodos.
@@ -1292,6 +1293,11 @@ func open_map() -> void:
 
 ## PREPARAR NESTE LUGAR: a equipe sobe para a plataforma com o lugar escolhido.
 func _on_phase_chosen(phase_id: String) -> void:
+	# O trem chegando à plataforma (#122): a equipe espera ele parar (senão quem desce cai no meio da fila).
+	if station.train_busy():
+		toast(tr("O trem está chegando à plataforma: espere ele parar."), true)
+		Sound.play("res://audio/ui/deny.ogg")
+		return
 	_map.visible = false
 	_map_from_platform = false
 	if _draft.is_empty():
@@ -1324,6 +1330,8 @@ func back_to_map() -> void:
 ## A equipe do rascunho em fila na Plataforma 1, cada um sobre a sua carta (a câmera sobe pela passagem), com o lugar,
 ## o foco, a comida e INICIAR EXPEDIÇÃO (#123).
 func open_departure() -> void:
+	if station.train_busy():
+		return
 	if _draft.is_empty():
 		_reset_draft()
 	# Quem saiu do elenco desde o rascunho não fica na fila (quem não pode ir fica, com o motivo na tela).
@@ -1332,9 +1340,19 @@ func open_departure() -> void:
 	_close_report_screen()
 	_close_room_screen()
 	_panel.visible = false
+	# Quem espera no trem sai da plataforma enquanto a equipe se monta ali (volta ao abrir o trem de novo).
+	station.clear_candidate()
 	current = "departure"
 	station.show_departure(AHStationReport.scene_order(_draft.team))
 	refresh()
+
+
+## Quem espera no trem volta para a plataforma depois que a equipe saiu dela (a partida o tira do quadro), se a chegada
+## dele já tocou.
+func _restore_candidate() -> void:
+	var train: Dictionary = Campaign.state.station.train
+	if train.phase == "waiting" and _arrived_candidate == train.candidate_id and not station.train_busy():
+		station.show_candidate(train.candidate_id)
 
 
 ## O briefing (#88) abre quando a equipe chega na plataforma, antes da confirmação: uma vez por lugar escolhido. Espera a
@@ -1848,17 +1866,6 @@ func _cycle_relic(hero_id: String) -> void:
 	var next: String = options[(index + 1) % options.size()]
 	var relic = GameData.row("relics", next)
 	_act(S.equip_relic(c, hero_id, next), tr("%s: %s.") % [entry.display_name, tr(relic.DisplayName) if relic else tr("sem relíquia")])
-
-
-func _recruit(class_id: String) -> void:
-	var rng := RandomNumberGenerator.new()
-	rng.randomize()
-	var result := S.recruit(Campaign.state, class_id, rng)
-	_act(result.error, tr("%s chegou à Estação.") % (S.hero(Campaign.state, result.get("hero_id", "")).display_name if result.error == "" else ""))
-	if result.error == "":
-		var rng2 := RandomNumberGenerator.new()
-		rng2.randomize()
-		station._place_residents(rng2)
 
 
 # ---------------------------------------------------------------- Preparação
@@ -2458,6 +2465,9 @@ func _train() -> void:
 	if train.phase != "waiting":
 		close_panel()
 		return
+	if not S.train_recruit(c).is_empty():
+		_train_recruit(c)
+		return
 	var who := S.civilian(train.candidate_id)
 	_header("train_arrival", tr("O trem chegou"))
 	var head := HBoxContainer.new()
@@ -2510,6 +2520,57 @@ func _train() -> void:
 	_footer.add_child(refuse)
 
 
+## Um animal no trem (#122): o rosto, a classe, de onde veio, os traços, o que pede e o motivo quando não dá para ficar.
+func _train_recruit(c: Dictionary) -> void:
+	var train: Dictionary = c.station.train
+	var recruit: Dictionary = train.recruit
+	var hero_class = GameData.row("classes", recruit.class_id)
+	_header("train_arrival", tr("O trem chegou"))
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 16)
+	_body.add_child(head)
+	head.add_child(AHKit.portrait(U.face_texture(AHCombatArena.hero_art_of(train.candidate_id, String(recruit.art_variant)).get("idle", {})), 116))
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", 2)
+	head.add_child(names)
+	names.add_child(_wrapped(tr("%s quer entrar na Estação") % recruit.display_name, "small", AHKit.AMBER, true, 380.0))
+	(names.get_child(-1) as Label).uppercase = true
+	var name_label := AHKit.label(String(recruit.display_name), "card_name", AHKit.TEXT, true)
+	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	names.add_child(name_label)
+	if hero_class != null:
+		names.add_child(_wrapped(tr("%s · %s") % [tr(hero_class.DisplayName), tr(hero_class.Role)], "row", AHKit.AMBER, false, 380.0))
+	if String(recruit.get("origin", "")) != "":
+		names.add_child(_wrapped(tr(String(recruit.origin)), "text", AHKit.MUTED, false, 380.0))
+	# O que pede e o motivo de não poder ficar antes dos traços: no texto Maior, à vista sem rolar.
+	var price := S.recruit_price(c, recruit.class_id)
+	_trait_box("", tr("Pedido"), tr("Nada: a Estação ainda não fecha uma equipe de quatro.") if price == 0 else tr("%d sementes (a Estação tem %d).") % [price, S.quantity(c, "seeds")], AHKit.AMBER)
+	var block := S.recruit_block(c)
+	if block != "":
+		_text(block, AHKit.alert_text())
+	for perk_id in recruit.get("perks", []):
+		var perk = GameData.row("perks", perk_id)
+		if perk == null:
+			continue
+		var good: bool = perk.get("bPositive", true)
+		_trait_box("+" if good else "−", tr(perk.DisplayName), tr(perk.Description), AHKit.good() if good else AHKit.alert_text())
+	_text(tr("Quem a Estação recusa vai embora no trem e não volta. Quem a equipe deixa sem resposta ao partir, também."), AHKit.MUTED, "small")
+	var id: String = train.candidate_id
+	var accept := _footer_primary(tr("Acolher %s") % recruit.display_name, "recruit", func(): _decide(id, true))
+	accept.disabled = block != ""
+	var refuse := AHKit.button(tr("Recusar"), "secondary")
+	refuse.name = "Refuse"
+	refuse.custom_minimum_size = Vector2(BODY_WIDTH, 60)
+	refuse.pressed.connect(func(): _decide(id, false))
+	_footer.add_child(refuse)
+	# Travado, Acolher fica sem a tecla, e Recusar sai do foco do teclado e do controle: a tecla de Acolher (que o
+	# foco levaria a Recusar) nunca manda embora sem querer. Recusar continua no clique e no toque; Esc fecha o painel.
+	if accept.disabled:
+		accept.get_node("Key").visible = false
+		refuse.focus_mode = Control.FOCUS_NONE
+		_panel_focus = null
+
+
 ## Uma caixa do trem: o quadradinho de + ou − (ou o ícone do pedido), o título na cor e o texto.
 func _trait_box(sign: String, title: String, text: String, color: Color) -> void:
 	var box := _inset()
@@ -2542,13 +2603,17 @@ func _on_train_event(name: String) -> void:
 
 func _decide(candidate_id: String, accept: bool) -> void:
 	var c: Dictionary = Campaign.state
+	var recruit := S.train_recruit(c)
 	var error := S.decide_candidate(c, candidate_id, accept)
 	if error != "":
 		toast(error, true)
 		return
-	var who := S.civilian(candidate_id)
 	station.commit()
-	toast((tr("%s vai morar na Estação.") % who.name) if accept else tr("%s segue no trem. Pode voltar numa próxima viagem.") % who.name)
+	if not recruit.is_empty():
+		toast((tr("%s entra para a Estação.") % recruit.display_name) if accept else tr("%s segue no trem.") % recruit.display_name)
+	else:
+		var who := S.civilian(candidate_id)
+		toast((tr("%s vai morar na Estação.") % who.name) if accept else tr("%s segue no trem. Pode voltar numa próxima viagem.") % who.name)
 	# O trem fecha e parte (o recusado volta para ele); acolhido, o civil fica e vai para o cômodo dele. O painel sai da
 	# frente da cena e o resto espera o trem sumir no túnel.
 	station.play_train_departure(not accept)

@@ -1013,7 +1013,6 @@ station_report.gd: %s / LB
 character_room.gd: Key
 station_report.gd: Key
 station_report.gd: %s / A
-character_room.gd: +recruit
 character_room.gd: overview
 character_room.gd: facilities
 character_room.gd: characters
@@ -1026,10 +1025,8 @@ character_room.gd: Left
 character_room.gd: Heroes
 character_room.gd: Tab_%s
 character_room.gd: tab
-character_room.gd: Tab_recruit
 character_room.gd: primary
 character_room.gd: UI
-character_room.gd: recruit
 character_room.gd: Ability_%s
 character_room.gd: Detail
 character_room.gd: Max
@@ -1424,3 +1421,11 @@ departure_screen.gd: Go
 departure_screen.gd: %s · %s
 departure_screen.gd: %d. %s
 departure_screen.gd: %s / X
+refuge_hud.gd: origin
+refuge_hud.gd: perks
+character_room.gd: Roster
+station_rules.gd: recruitment
+station_rules.gd: Chance
+station_rules.gd: hero_%s_0
+station_rules.gd: %s:train
+station_rules.gd: origin

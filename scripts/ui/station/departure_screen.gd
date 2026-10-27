@@ -177,6 +177,10 @@ func _band() -> void:
 	place.add_child(_wrap(tr("Equipe: %s") % S.team_size_text(J.team_limits(draft.phase)), "text", AHKit.TEXT, 440.0))
 	# O aviso da equipe inteira (ninguém cura); o que trava a partida fica dentro de INICIAR EXPEDIÇÃO.
 	var warning := team_warning(c)
+	# Quem espera no trem (#122) vai embora com ele se a equipe partir antes de decidir.
+	var waiting_name := S.train_candidate_name(c)
+	if waiting_name != "":
+		warning = tr("%s espera no trem: se a equipe partir, vai embora.") % waiting_name + ("\n" + warning if warning != "" else "")
 	if warning != "":
 		var note := HBoxContainer.new()
 		note.name = "Warning"

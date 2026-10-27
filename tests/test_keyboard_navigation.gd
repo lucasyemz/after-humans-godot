@@ -21,6 +21,11 @@ func run(context) -> void:
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-keyboard-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(41)
+	# O trem da volta (#122) é sorteado: aqui ele traz sempre o próximo civil da fila (o test_train_recruits sorteia).
+	var train_rule: Dictionary = GameData.table("recruitment").get("train", {})
+	var train_before := train_rule.duplicate()
+	train_rule.Chance = 100
+	train_rule.CivilianShare = 100
 	await _station()
 	await _street()
 	await _return()
@@ -34,6 +39,7 @@ func run(context) -> void:
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
 	AHBriefing.enabled = briefing
+	train_rule.merge(train_before, true)
 
 
 func _station() -> void:
