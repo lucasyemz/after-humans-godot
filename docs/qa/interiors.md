@@ -35,10 +35,12 @@ cenários (nas duas pontas e no meio), no fim de tarde e de noite:
 
 ## Testes
 
-- `tests/test_interiors.gd` (novo, 29 verificações):
-  - as paredes do lado das três lojas com a arte da loja, e a rua do lado de fora da porta;
-  - no Cais do Rio, o sol com sombra no cais e fraco e sem sombra nos dois galpões; nas duas pontas de cada galpão, o
-    líder a mais de 0,8 m da borda do quadro, o quadro só até as colunas e as duas colunas montadas;
+- `tests/test_interiors.gd` (novo, 115 verificações):
+  - as paredes do lado das três lojas com a arte da loja; lá fora, o asfalto e os dois muros de tijolo (pela arte), sem
+    encostar em nenhuma outra peça da cena com a sala aberta de verdade; os materiais montados uma vez só;
+  - nas zonas cobertas dos quatro mapas (os galpões do Cais, o Abrigo, o Depósito e os Dutos): o sol sem sombra (e
+    fraco, comparado ao cais aberto) e, nas duas pontas de cada zona, o líder a mais de 0,8 m da borda do quadro, os
+    cantos de cima e de baixo do quadro batendo na coluna da ponta e a coluna sem atravessar peça do mapa;
   - na rua, o sol com sombra;
   - na loja, o sol sem sombra e a 30%, mesmo depois de trocar a qualidade;
   - de volta à rua, o sol inteiro.
@@ -67,3 +69,6 @@ cenários (nas duas pontas e no meio), no fim de tarde e de noite:
 - **Rodada 2: REPROVADO.** A porta, o relâmpago e o teste do Cais ficaram certos (`run_all` 75/75). A câmera parando
   exatamente na parede cortava o líder ao meio na borda do quadro quando ele chegava à ponta da zona. Correção: 1,5 m
   de folga e as colunas da ponta, com a arte da parede do mapa; o teste confere a distância do líder à borda.
+- **Revisão do PR: AJUSTAR ANTES.** As colunas só estavam provadas no Cais e na largura. O teste passou a cobrir os
+  quatro mapas cobertos, o topo e a base do quadro e o cruzamento com as peças do mapa; a porta pela arte do asfalto e
+  do tijolo; a rua de fora sem encostar em outra peça; e os materiais da loja num cache.

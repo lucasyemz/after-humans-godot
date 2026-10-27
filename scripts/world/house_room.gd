@@ -38,6 +38,10 @@ const WALL_ITEMS := [
 	[2, 0, 177, 40, 190], [2, 5, 387, 30, 245], [2, 3, 569, 120, 42], [2, 1, 741, 40, 190], [2, 2, 950, 180, 62], [2, 4, 1132, 180, 62],
 ]
 
+## Os materiais da rua de fora e das paredes do lado, montados uma vez só (abrir outra loja reaproveita), pelo
+## arquivo da rua ou pela arte da loja.
+static var _surfaces := {}
+
 var shop := 0
 ## Caixas de colisão visíveis com C (a rua junta estas às dela enquanto a sala está aberta).
 var debug_colliders: Array[MeshInstance3D] = []
@@ -150,6 +154,8 @@ func _doorstep() -> void:
 
 
 static func _street_surface(file: String) -> StandardMaterial3D:
+	if _surfaces.has(file):
+		return _surfaces[file]
 	var material := StandardMaterial3D.new()
 	material.albedo_texture = load("res://art/street/" + file)
 	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
@@ -157,12 +163,15 @@ static func _street_surface(file: String) -> StandardMaterial3D:
 	material.uv1_world_triplanar = true
 	material.uv1_scale = Vector3.ONE / 2.5
 	material.roughness = 0.95
+	_surfaces[file] = material
 	return material
 
 
 ## As paredes do lado com a mesma arte do fundo, mais escura (ficam de quina para a luz), em vez do reboco liso (#175).
 ## A textura vai pelo mundo (triplanar), na altura da parede, para o desenho não esticar na profundidade.
 static func _side_wall(art: String) -> StandardMaterial3D:
+	if _surfaces.has(art):
+		return _surfaces[art]
 	var texture: Texture2D = load(ART + art + "-walltile-seamless.webp")
 	var material := StandardMaterial3D.new()
 	material.albedo_texture = texture
@@ -172,6 +181,7 @@ static func _side_wall(art: String) -> StandardMaterial3D:
 	material.uv1_world_triplanar = true
 	material.uv1_scale = Vector3.ONE / WALL_HEIGHT
 	material.roughness = 0.95
+	_surfaces[art] = material
 	return material
 
 
