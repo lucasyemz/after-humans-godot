@@ -15,7 +15,8 @@ ajudar, três lutas curtas, a busca, o trem e a chegada à Estação com a recom
   Corredor de Contenção com o Bento, a Íris e a Véspera (`StartTeam`).
 - **Os trechos:** a partida, a luta 1, o Nick, a luta 2, a busca, a luta 3 e o trem. O Nick entra no encontro
   (`JoinTeam`), numa conversa com retrato (a caixa do briefing, #88). A busca dá 1 curativo, 1 comida e o fôlego: quem
-  está ferido recupera 35% da vida máxima (`Search.Heal`), com a linha "A equipe recupera o fôlego.".
+  está ferido recupera 35% da vida máxima (`Search.Heal`), com a linha "A equipe recupera o fôlego.". Quem passa pelo
+  armário sem vasculhar recebe o mesmo fôlego, com a mesma linha, ao chegar à zona da luta do Drone; ele vem uma vez só.
 - **As dicas do tutorial** (`AHTutorialGuide` e `AHTutorialHint`, no kit): nove passos de `data/tutorial.json`, uma de
   cada vez, cada uma com o destaque e as teclas:
   - andar; a habilidade e o alvo na luta 1 (a primeira escolha trava as outras ações e escurece o resto); a patrulha
