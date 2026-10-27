@@ -15,6 +15,10 @@
 class_name AHStreetCorridor
 extends Node
 
+## A altura das marcas (m sobre o piso, #142): a das portas (a saída para a Estação, a de volta dos interiores e a das
+## casas) e a da fogueira apagada da casa do acampamento.
+const MARKER_DOOR_HEIGHT := 2.4
+const MARKER_CAMP_HEIGHT := 0.95
 const R = preload("res://scripts/flow/journey_rules.gd")
 const STEP_LENGTH := 7.8
 const MIN_X := 0.0
@@ -603,7 +607,8 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 	if done_here or (leader.x < exit_x and segment == 0 and map_first == 0):
 		text = tr("E  Voltar à Estação (%s)") % (tr("fase concluída: todo o achado") if campaign.session.expedition.objective_completed else tr("retirada: metade do achado"))
 		action = _retreat
-		where = null
+		# Com o guardião vencido no cenário, a volta vale de qualquer ponto: o aviso fica embaixo, sem lugar.
+		where = null if done_here and leader.x >= exit_x else _exit_point()
 	hud.show_prompt(text, where)
 	if text.begins_with(tr("E  Vasculhar")):
 		Tips.show_tip("search")
@@ -621,7 +626,7 @@ func _prop_point(index: int) -> Vector3:
 
 
 func _scenario_prop_point(entry: Dictionary) -> Vector3:
-	return Vector3(entry.x, street.floor_y + 1.9, street.lane_z - 0.7)
+	return street.scenario.prop_marker_point(int(entry.local))
 
 
 func _side_door_point(room_entry: Dictionary) -> Vector3:
@@ -639,13 +644,39 @@ func _marker_points(campaign: Dictionary, route: Dictionary, leader: Vector3, ac
 		if index <= route.index and not route.props.get(str(index), false):
 			points.append(_prop_point(index))
 	if street.scenario:
+		# O que já dá para usar na zona tem a marca (a mesma regra da tecla, R.step_open): antes ela só aparecia ao pisar
+		# no trecho do objeto (#142).
 		for entry in scenario_props:
-			if entry.zone == segments[segment].zone and R.can_search_scenario_prop(campaign, entry.prop):
+			if entry.zone == segments[segment].zone and R.step_open(route, int(entry.step)) and not route.searched_props.has(entry.prop):
 				points.append(_scenario_prop_point(entry))
 		for room_entry in side_rooms:
-			if room_entry.door_segment == segment and R.can_enter_scenario_room(campaign, room_entry.door_step):
+			if room_entry.door_segment == segment and R.step_open(route, int(room_entry.door_step)) and int(route.get("current_room", -1)) == -1:
 				points.append(_side_door_point(room_entry))
+	# A saída para a Estação, no começo do corredor (#142): a marca dela também, como a dos outros pontos de uso.
+	if segments.is_empty() or (segment == 0 and map_first == 0):
+		points.append(_exit_point())
 	return points.filter(func(p): return absf(p.x - leader.x) < 14.0 and (active == null or p.distance_to(active) > 0.05))
+
+
+## A porta de volta de um interior lateral (a marca e o aviso).
+func _side_exit_point(room_entry: Dictionary) -> Vector3:
+	return Vector3(room_entry.x0 + EXIT_X * 0.5, street.floor_y + MARKER_DOOR_HEIGHT, street.lane_z - 0.6)
+
+
+## A fogueira apagada da casa do acampamento e a porta de saída da casa (as marcas e o aviso, #142).
+func _camp_point() -> Vector3:
+	return Vector3(room.camp_x, MARKER_CAMP_HEIGHT, 0.35)
+
+
+func _house_exit_point() -> Vector3:
+	return Vector3(room.exit_x - 0.6, MARKER_DOOR_HEIGHT, -0.5)
+
+
+## Onde fica a marca da volta à Estação: o começo da rua ou da primeira zona do mapa.
+func _exit_point() -> Vector3:
+	if street.scenario == null or segments.is_empty():
+		return Vector3(EXIT_X * 0.5, MARKER_DOOR_HEIGHT, -0.2)
+	return Vector3(segments[0].x0 + EXIT_X * 0.5, street.floor_y + MARKER_DOOR_HEIGHT, street.lane_z - 0.6)
 
 
 func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
@@ -676,21 +707,26 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 		if R.can_start_camp(campaign):
 			text = tr("E  Acampar (fechar a porta e acender a fogueira)")
 			action = _start_camp
+			where = _camp_point()
 		elif site.camped:
 			text = tr("Acampamento já feito nesta fase")
 			action = Callable()
-		where = null
+			where = _camp_point()
 	if leader.x < room.exit_x:
 		text = tr("E  Sair para a rua")
 		action = _leave_house
-		where = null
+		where = _house_exit_point()
 	hud.show_prompt(text, where)
 	# O losango de cada objeto ainda fechado fica sobre ele (#50); o do que está ao alcance vira o do aviso.
 	var points: Array = []
 	for i in mini(room.search_props.size(), site.spots.size()):
 		if not site.spots[i].searched and (where == null or room.search_props[i].marker_point().distance_to(where) > 0.05):
 			points.append(room.search_props[i].marker_point())
-	hud.set_markers(points)
+	# A fogueira do acampamento e a porta de saída também têm a marca (#142); a da vez é a do aviso.
+	if site.camp_site and R.can_start_camp(campaign):
+		points.append(_camp_point())
+	points.append(_house_exit_point())
+	hud.set_markers(points.filter(func(p): return where == null or p.distance_to(where) > 0.05))
 	hud.set_patrol(null, 0.0, false)
 	_action = action
 
@@ -824,20 +860,33 @@ func _side_room_frame(campaign: Dictionary, route: Dictionary) -> void:
 	var text := ""
 	var action := Callable()
 	var best := REACH
+	var where = null
 	for entry in scenario_props:
 		if entry.zone != room_entry.zone or absf(entry.x - leader.x) >= best:
 			continue
-		best = absf(entry.x - leader.x)
 		if route.searched_props.has(entry.prop):
 			text = tr("%s (já vasculhado)") % tr(entry.name)
+			action = Callable()
 		elif R.can_search_scenario_prop(campaign, entry.prop):
 			text = tr("E  Vasculhar: %s") % tr(entry.name)
 			action = _search_scenario_prop.bind(entry)
+		else:
+			continue
+		# O aviso fica sobre o mesmo objeto que a tecla vai vasculhar (o mais perto).
+		best = absf(entry.x - leader.x)
+		where = _scenario_prop_point(entry)
+	var exit := _side_exit_point(room_entry)
 	if leader.x < room_entry.x0 + EXIT_X:
 		text = tr("E  Voltar: %s") % tr(street.scenario.zones[segments[room_entry.door_segment].zone].name)
 		action = _leave_side_room
-	hud.show_prompt(text)
-	hud.set_markers([])
+		where = exit
+	hud.show_prompt(text, where)
+	# As marcas do interior (#142): os props ainda por vasculhar e a porta de volta, como no corredor.
+	var points: Array = [exit]
+	for entry in scenario_props:
+		if entry.zone == room_entry.zone and R.can_search_scenario_prop(campaign, entry.prop):
+			points.append(_scenario_prop_point(entry))
+	hud.set_markers(points.filter(func(p): return where == null or p.distance_to(where) > 0.05))
 	hud.set_patrol(null, 0.0, false)
 	_action = action
 
