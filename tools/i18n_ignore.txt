@@ -77,7 +77,6 @@ refuge_hud.gd: Description
 *: depart
 *: departing
 *: departure
-*: dev
 *: disabled
 *: display
 *: dormitory
@@ -699,7 +698,6 @@ street.gd: Compatibility
 street.gd: Dynamic
 street.gd: FAIL
 street.gd: Forward+
-street.gd: Teclas de teste (Admin)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões
 street.gd: Occlusion
 street.gd: PASS
 street.gd: Rua: %s não existe; montando em código (rode tools/bake_street.gd).
@@ -1382,6 +1380,34 @@ station_rules.gd: rest_%d
 station_rules.gd: recovered
 station_build.gd: infirmary
 station_build.gd: infirmary@2
+*: formation
+*: distance
+*: height
+*: indoor
+*: scenario
+exploration_hud.gd: Rank
+exploration_hud.gd: Cursor
+exploration_hud.gd: Formation
+exploration_hud.gd: On
+exploration_hud.gd: Label
+exploration_hud.gd: Head
+scenario_world.gd: DoorwayView_%d
+scenario_world.gd: DoorwayLight_%d
+scenario_world.gd: mid
+scenario_world.gd: deep
+scenario_world.gd: horizon
+scenario_world.gd: flow
+scenario_world.gd: sparkle
+scenario_world.gd: waterline
+scenario_world.gd: detail
+scenario_world.gd: painted
+scenario_world.gd: shade
+scenario_world.gd: Layered_%s
+scenario_world.gd: doorways
+scenario_world.gd: golden
+scenario_world.gd: night
+scenario_world.gd: zone
+scenario_world.gd: %s: a água pintada guarda %d linhas e %d pontos de espuma; o resto some (%d e %d no mapa).
 inventory_panel.gd: New
 *: leave
 refuge_hud.gd: closed

@@ -22,6 +22,9 @@ signal menu_return
 signal menu_requested
 signal inventory_requested
 signal new_campaign
+## A formação (#129): o botão FORMAÇÃO pediu para abrir; dois heróis escolhidos trocam de lugar.
+signal formation_requested
+signal formation_swap(a: String, b: String)
 
 const S = preload("res://scripts/ui/ui_style.gd")
 const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprimentos", "rest": "Descanso", "passage": "Passagem",
@@ -71,6 +74,23 @@ var _modal: PanelContainer
 var camp_hud: AHCampHud
 var _menu_button: Button
 var _bag_button: Button
+var _formation_button: Button
+## A formação aberta nas plaquinhas da equipe (#129): a ordem mostrada, o herói do cursor e o escolhido (-1: nenhum).
+var _formation := false
+var _formation_ids: Array = []
+var _formation_cursor := 0
+var _formation_pick := -1
+var _formation_head: PanelContainer
+var _formation_keys: Control
+## As placas da equipe na rua, na ordem da fila (o corredor passa): o número da posição sobre a cabeça de cada um.
+var formation_cards: Array = []
+var _formation_heads: Array[Control] = []
+## A moldura do cursor e do escolhido, por fora da plaquinha (px), e o espaço entre as plaquinhas com a formação aberta.
+const FORMATION_FRAME := 7.0
+const FORMATION_GAP := 22
+## O analógico: um empurrão anda uma casa (o intervalo mínimo entre dois passos do cursor, ms).
+const FORMATION_STEP_MS := 220
+var _formation_moved_at := -1000
 var _finish_button: Button
 var _markers: Array[Control] = []
 var _marker_points: Array = []
@@ -236,6 +256,8 @@ func _ready() -> void:
 	_menu_button.name = "Menu"
 	_bag_button = _corner_button(tr("Mochila"), "room_depot", "inventory", func(): inventory_requested.emit())
 	_bag_button.name = "Bag"
+	_formation_button = _corner_button(tr("Formação"), "nav_characters", "formation", func(): formation_requested.emit())
+	_formation_button.name = "Formation"
 	_bag_new = AHInventoryPanel.new_tag()
 	_bag_new.position.y = -14.0
 	_bag_new.visible = false
@@ -359,9 +381,14 @@ func _corner_button(text: String, icon_name: String, key_action: String, action:
 func _place_corner() -> void:
 	var touch := Settings.touch_visible()
 	var right := 1892.0
-	for button in [_menu_button, _bag_button]:
+	for button in [_menu_button, _bag_button, _formation_button]:
 		if button == null:
 			continue
+		# A formação não vale no acampamento: o botão sai de lá (a fogueira tem a ordem dela).
+		if button == _formation_button:
+			button.visible = not camp_open()
+			if not button.visible:
+				continue
 		var key: Control = button.get_node("Key")
 		key.visible = not touch
 		AHStationReport.fit_key(button, 14.0)
@@ -521,15 +548,19 @@ func refresh(campaign: Dictionary) -> void:
 	right.reset_size()
 	right.size = right.get_combined_minimum_size()
 	right.position = Vector2(1892.0 - right.size.x, 14)
-	# A equipe: as plaquinhas com o retrato, o nome, a vida e a barra (e o instinto quando sobe).
-	_clear(_party_box)
-	for hero_id in expedition.team:
-		var hero = Campaign.hero(hero_id)
-		if hero == null or not hero.alive:
-			continue
-		_party_box.add_child(_mate(hero))
-	_party_box.reset_size()
-	_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
+	# A equipe: as plaquinhas com o retrato, o nome, a vida e a barra (e o instinto quando sobe); com a formação aberta,
+	# as da formação.
+	if _formation:
+		_show_formation()
+	else:
+		_clear(_party_box)
+		for hero_id in expedition.team:
+			var hero = Campaign.hero(hero_id)
+			if hero == null or not hero.alive:
+				continue
+			_party_box.add_child(_mate(hero))
+		_party_box.reset_size()
+		_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
 	_place_corner()
 
 
@@ -612,6 +643,182 @@ func _mate(hero: Dictionary) -> PanelContainer:
 		instinct.tooltip_text = S.GLOSSARY.Instinto
 		info.add_child(instinct)
 	return box
+
+
+## A formação (#129) nas plaquinhas de baixo: a posição de cada um (1 vai na frente), o cursor e o escolhido; clicar em
+## dois (ou as setas e Interagir) troca os dois. A tecla da formação, Voltar ou o Menu fecham.
+func open_formation() -> void:
+	var expedition = Campaign.state.get("session", {}).get("expedition")
+	if _formation or expedition == null:
+		return
+	_formation = true
+	_formation_cursor = 0
+	_formation_pick = -1
+	_party_box.add_theme_constant_override("separation", FORMATION_GAP)
+	Sound.play("res://audio/ui/panel_open.ogg")
+	_show_formation()
+
+
+func close_formation() -> void:
+	if not _formation:
+		return
+	_formation = false
+	_formation_pick = -1
+	_party_box.add_theme_constant_override("separation", 10)
+	for node in [_formation_head, _formation_keys, _formation_button.get_node_or_null("On")] + _formation_heads:
+		if node != null and is_instance_valid(node):
+			node.queue_free()
+	_formation_head = null
+	_formation_keys = null
+	_formation_heads.clear()
+	Sound.play("res://audio/ui/panel_close.ogg")
+	refresh(Campaign.state)
+
+
+func formation_open() -> bool:
+	return _formation
+
+
+func _show_formation() -> void:
+	var expedition: Dictionary = Campaign.state.session.expedition
+	_formation_ids = Array(expedition.team).filter(func(id):
+		var hero = Campaign.hero(id)
+		return hero != null and hero.alive)
+	_formation_cursor = clampi(_formation_cursor, 0, maxi(0, _formation_ids.size() - 1))
+	_clear(_party_box)
+	for i in _formation_ids.size():
+		var mate := _mate(Campaign.hero(_formation_ids[i]))
+		mate.mouse_filter = Control.MOUSE_FILTER_STOP
+		mate.gui_input.connect(_formation_click.bind(i))
+		# Por cima da plaquinha (o PanelContainer estica os filhos: o que fica solto vai num Control comum).
+		var holder := Control.new()
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.set_anchors_preset(Control.PRESET_FULL_RECT)
+		mate.add_child(holder)
+		# O medalhão da posição no canto de cima (1 vai na frente), como na Preparação: pequeno e meio para fora, sem
+		# tapar o retrato.
+		var rank := _rank_medal(i + 1, 26.0)
+		rank.name = "Rank"
+		rank.position = Vector2(-12, -14)
+		holder.add_child(rank)
+		if i == _formation_pick:
+			# O escolhido: o nome em âmbar, além da moldura.
+			for label in mate.find_children("", "Label", true, false):
+				if label.text == Campaign.hero(_formation_ids[i]).display_name:
+					label.add_theme_color_override("font_color", AHKit.AMBER)
+		# As molduras do escolhido e do cursor por fora da plaquinha: não tapam o nome nem a vida.
+		if i == _formation_pick:
+			holder.add_child(_outside(AHKit.selected_overlay()))
+		if i == _formation_cursor:
+			var frame := Panel.new()
+			frame.name = "Cursor"
+			frame.add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("focus", "focus")))
+			frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			holder.add_child(_outside(frame))
+		_party_box.add_child(mate)
+	_party_box.reset_size()
+	_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
+	# Em cima das plaquinhas, a faixa: FORMAÇÃO e o que a tecla faz agora ("E troca Nick e Íris de lugar").
+	if _formation_head == null:
+		_formation_head = AHKit.plaque()
+		_formation_head.name = "FormationHead"
+		_formation_head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_formation_head)
+	_clear(_formation_head)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_formation_head.add_child(row)
+	row.add_child(_icon("nav_characters", 26, AHKit.AMBER))
+	row.add_child(AHKit.label(tr("Formação"), "row", AHKit.AMBER, true, true))
+	var line: String = tr("da frente para trás · escolha dois para trocar")
+	if _formation_pick >= 0 and _formation_pick != _formation_cursor:
+		var names := [Campaign.hero(_formation_ids[_formation_pick]).display_name, Campaign.hero(_formation_ids[_formation_cursor]).display_name]
+		# No toque não há tecla: o toque no segundo troca.
+		line = tr("Troca %s e %s de lugar") % names if Settings.touch_visible() else tr("%s troca %s e %s de lugar") % ([S.key_name("interact")] + names)
+	elif _formation_pick >= 0:
+		line = tr("Trocar %s com quem? Escolha o outro") % Campaign.hero(_formation_ids[_formation_pick]).display_name
+	row.add_child(AHKit.label(line, "text", AHKit.TEXT))
+	_formation_head.reset_size()
+	_formation_head.size = _formation_head.get_combined_minimum_size()
+	_formation_head.position = Vector2(28, _party_box.position.y - _formation_head.size.y - 22)
+	if _formation_keys == null:
+		_formation_keys = _keys_bar([[[tr("Setas")], tr("Escolher")], [["interact"], tr("Trocar")], [["menu"], tr("Fechar")]])
+		_formation_keys.name = "FormationKeys"
+	# O botão FORMAÇÃO aceso enquanto ela está aberta.
+	if _formation_button.get_node_or_null("On") == null:
+		var lit := AHKit.selected_overlay()
+		lit.name = "On"
+		_formation_button.add_child(lit)
+	# O número de cada um sobre a cabeça, na rua.
+	while _formation_heads.size() < formation_cards.size():
+		var medal := _rank_medal(_formation_heads.size() + 1, 40.0)
+		medal.name = "Head" + str(_formation_heads.size() + 1)
+		add_child(medal)
+		_formation_heads.append(medal)
+
+
+## Uma moldura em volta da plaquinha, FORMATION_FRAME px por fora.
+func _outside(frame: Control) -> Control:
+	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	frame.offset_left = -FORMATION_FRAME
+	frame.offset_top = -FORMATION_FRAME
+	frame.offset_right = FORMATION_FRAME
+	frame.offset_bottom = FORMATION_FRAME
+	return frame
+
+
+## O medalhão da posição (o mesmo da Preparação): o número em âmbar no medalhão do kit.
+func _rank_medal(rank: int, side: float) -> Control:
+	var medal := AHKit.panel(AHKit.piece_of("medal", "level"))
+	medal.custom_minimum_size = Vector2(side, side)
+	medal.size = Vector2(side, side)
+	medal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var number := AHKit.label(str(rank), "small", AHKit.AMBER, true)
+	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	medal.add_child(number)
+	return medal
+
+
+func _formation_click(event: InputEvent, index: int) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_formation_cursor = index
+		_formation_choose()
+
+
+## Interagir (ou o clique): o primeiro escolhe; o segundo troca os dois; o mesmo de novo desfaz a escolha.
+func _formation_choose() -> void:
+	if _formation_pick < 0:
+		_formation_pick = _formation_cursor
+		Sound.play("res://audio/ui/confirm.ogg")
+	elif _formation_pick == _formation_cursor:
+		_formation_pick = -1
+	else:
+		var a: String = _formation_ids[_formation_pick]
+		var b: String = _formation_ids[_formation_cursor]
+		_formation_pick = -1
+		formation_swap.emit(a, b)
+	_show_formation()
+
+
+func _formation_input(event: InputEvent) -> void:
+	if not (event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion or event is InputEventAction):
+		return
+	if event.is_action_pressed("formation") or S.is_back(event) or event.is_action_pressed("menu"):
+		close_formation()
+	elif event.is_action_pressed("move_left") or event.is_action_pressed("ui_left") or event.is_action_pressed("move_right") \
+			or event.is_action_pressed("ui_right"):
+		var now := Time.get_ticks_msec()
+		if now - _formation_moved_at >= FORMATION_STEP_MS or not event is InputEventJoypadMotion:
+			_formation_moved_at = now
+			var step := -1 if event.is_action_pressed("move_left") or event.is_action_pressed("ui_left") else 1
+			_formation_cursor = posmod(_formation_cursor + step, maxi(1, _formation_ids.size()))
+			_show_formation()
+	elif event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
+		_formation_choose()
+	# Com a formação aberta, nenhuma tecla passa para a rua (andar, Mochila, Interagir).
+	get_viewport().set_input_as_handled()
 
 
 ## O aviso de interação: perto do que se usa (where, no mundo), ou embaixo no meio quando não tem lugar. "E  Vasculhar"
@@ -707,6 +914,9 @@ func set_patrol(where, meter: float, detected: bool) -> void:
 ## confirma o botão com foco, além de Enter e do A; Voltar (B, Backspace) fecha o menu, a Mochila e as Opções (os
 ## eventos e o resultado pedem uma escolha).
 func _input(event: InputEvent) -> void:
+	if _formation:
+		_formation_input(event)
+		return
 	if modal_open() and S.press_focused(_modal, event):
 		get_viewport().set_input_as_handled()
 	# O aviso da ferramenta sai com qualquer tecla, clique ou toque (sem engolir: andar continua andando).
@@ -734,6 +944,13 @@ func _process(delta: float) -> void:
 		return
 	var view := get_viewport_rect().size
 	var to_hud := Vector2(1920.0 / view.x, 1080.0 / view.y)
+	for i in _formation_heads.size():
+		var card = formation_cards[i] if i < formation_cards.size() else null
+		var shown: bool = card != null and is_instance_valid(card)
+		_formation_heads[i].visible = shown
+		if shown:
+			var head: Vector3 = card.global_position + Vector3(0, card.body_height + 0.35, 0)
+			_formation_heads[i].position = camera.unproject_position(head) * to_hud - _formation_heads[i].size * 0.5
 	for i in _marker_points.size():
 		var point: Vector3 = _marker_points[i]
 		var screen := camera.unproject_position(point) * to_hud
@@ -766,10 +983,12 @@ func _process(delta: float) -> void:
 	if modal_open():
 		_set_panel_keys("menu" if _modal.has_meta("menu") else ("continue" if _modal.has_meta("continue") else "choose"))
 	_hint.modulate.a = clampf(1.0 - (_hint_time - 12.0) / 2.0, 0.0, 1.0)
-	_hint.visible = not touch and first_journey() and not camp_open() and not modal_open()
+	_hint.visible = not touch and first_journey() and not camp_open() and not modal_open() and not _formation
 	_panel_keys.visible = not touch and modal_open() and not camp_open()
-	for bar in [_hint, _panel_keys]:
-		if bar.visible:
+	if _formation_keys != null and is_instance_valid(_formation_keys):
+		_formation_keys.visible = not touch
+	for bar in [_hint, _panel_keys, _formation_keys]:
+		if bar != null and is_instance_valid(bar) and bar.visible:
 			bar.reset_size()
 			bar.size = bar.get_combined_minimum_size()
 			bar.position = Vector2(1892 - bar.size.x, KEYS_Y)
@@ -1156,6 +1375,9 @@ func _set_camp_layout(camping: bool) -> void:
 	for button in [_bag_button, _menu_button]:
 		if button != null:
 			button.position.y = CAMP_CORNER_Y if camping else CORNER_Y
+	# A formação não vale no acampamento (a fogueira tem a ordem dela).
+	if _formation_button != null:
+		_formation_button.visible = not camping
 	if camping:
 		set_markers([])
 
