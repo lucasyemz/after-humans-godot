@@ -1409,3 +1409,4 @@ scenario_world.gd: sparkle
 scenario_world.gd: waterline
 scenario_world.gd: detail
 scenario_world.gd: painted
+scenario_world.gd: %s: a água pintada guarda %d linhas e %d pontos de espuma; o resto some (%d e %d no mapa).
