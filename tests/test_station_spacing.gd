@@ -43,6 +43,28 @@ func run(t) -> void:
 					working[w.get("room", "")] = true
 	t.check(worst >= station.STOP_GAP - 0.05, "ninguém parado a menos de %.1f m de outro na mesma faixa (o mais perto: %.2f m)" % [station.STOP_GAP, worst])
 	t.check(not both_working, "um herói de cada vez no posto do meio de cada cômodo")
+	# Uma faixa lotada de propósito (mais gente do que lugares a STOP_GAP): ninguém anda para sempre, todos param em
+	# algum momento.
+	var crowd: Array = station._walkers.filter(func(w): return w.has("hero_id") and not w.get("sleeping", false) and not w.get("work", false))
+	var lane: Dictionary = crowd[0]
+	for w in crowd:
+		w.room = lane.room
+		w.min = lane.min
+		w.max = minf(lane.max, lane.min + 2.0)
+		w.floor = lane.floor
+		w.home_z = lane.home_z
+		w.wait = 0.0
+		w.sitting = 0.0
+		w.seat = -1
+		w.card.position = Vector3(w.min, w.floor, w.home_z)
+		station._choose_target(w)
+	var stopped := {}
+	for step in 1200:
+		station._walk(0.1)
+		for w in crowd:
+			if w.get("wait", 0.0) > 0.0:
+				stopped[w.hero_id] = true
+	t.check(stopped.size() == crowd.size(), "numa faixa de 2 m com %d heróis, todos acabam parando (%d pararam)" % [crowd.size(), stopped.size()])
 	_restore(real_dir, real_state)
 
 

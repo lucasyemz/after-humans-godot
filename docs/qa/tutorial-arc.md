@@ -7,7 +7,15 @@ volta para ajudar e mostra a rota alternativa. A troca da Véspera pela Amora fi
 `docs/narrative/review.md`.
 
 Continuam como o Lucas já tinha decidido: o cartão "Você precisa escapar.", o nome "Corredor de Contenção", as lutas
-dentro do mapa e a saída pelo trem. O mapa não mudou (o do PR #173 entra depois, se o Lucas aprovar).
+dentro do mapa e a saída pelo trem. O mapa é o do PR #173, aprovado pelo Lucas (`docs/qa/tutorial-map.md`).
+
+## A ordem dos trechos (nova)
+
+- **Antes:** a partida, a luta 1, o Nick, a busca, a luta 2, a luta 3 e o trem.
+- **Agora:** a partida, a luta 1, o Nick, **a luta 2, a busca**, a luta 3 e o trem. No mapa do #173 o armário e o painel
+  ficam no fim da sala das celas, então a luta 2 vem antes deles. As dicas seguem: a da patrulha logo depois do Nick, a
+  das posições na luta 2, a da busca e a da Mochila depois dela, a do item na luta 3. Cada luta abre a dica dela pelo
+  nome (`fight_1`, `fight_2`, `fight_3`), não mais pelo número do trecho.
 
 ## A equipe
 
@@ -57,6 +65,7 @@ e o caminho da proposta A em `AHTutorial.complete`; os quatro fundadores voltam 
 
 ## Testes
 
-- `test_tutorial` (61), `test_tutorial_map` (79), `test_title`, `test_briefing`, `test_station_tour` e `test_i18n`
-  com a equipe nova (três no começo, o Nick entra no encontro, quatro falas no encontro, cinco no debriefing).
+- `test_tutorial` (61), `test_tutorial_map` (96), `test_title`, `test_briefing`, `test_station_tour` e `test_i18n`
+  com a equipe nova (três no começo, o Nick entra no encontro, quatro falas no encontro, cinco no debriefing) e a
+  ordem nova (a patrulha depois do Nick, a luta 2 com o recuo, a busca, o save e a luta 3).
 - `tests/run_all.gd` inteiro na 145.

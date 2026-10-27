@@ -204,8 +204,8 @@ func _dialog() -> void:
 	await _frames(1)
 
 
-## Na Estação: o Partir da Preparação abre o briefing e só parte depois dele; a chegada mostra o debriefing antes do
-## relatório.
+## Na Estação: o briefing abre quando a equipe chega na plataforma (#123), antes da confirmação, uma vez por lugar; a
+## chegada mostra o debriefing antes do relatório.
 func _station() -> void:
 	Campaign.state = Campaign.create_initial(88)
 	Campaign.save()
@@ -217,26 +217,41 @@ func _station() -> void:
 	var hud: AHRefugeHud = station.hud
 	var team: Array = Campaign.state.roster.slice(0, 4).map(func(h): return h.id)
 	hud._draft = {"phase": "fase_1", "team": team, "focus": "", "extra": 0}
-	# Voltar no briefing fica na Preparação, sem partir.
-	hud._depart()
+	hud.open_departure()
 	await _frames(2)
-	if t.check(hud.briefing_open(), "Partir abre o briefing"):
+	t.check(not hud.briefing_open(), "o briefing espera a equipe chegar na plataforma")
+	var deadline := Time.get_ticks_msec() + 20000
+	while not hud.briefing_open() and Time.get_ticks_msec() < deadline:
+		await _tree.process_frame
+	if t.check(hud.briefing_open(), "a equipe chegou na plataforma: o briefing abre"):
+		t.check(station.camera_settled() and station.lineup.size() == 4, "com os quatro em fila e a câmera parada")
+		t.equal(hud.briefing.lines.size(), AHBriefing.departure(Campaign.state, "fase_1", team).size(), "as falas da partida da fase 1")
+		hud.briefing.index = hud.briefing.lines.size() - 1
+		hud.briefing._show()
+		t.equal(hud.briefing.next_button.text, "CONTINUAR", "a última fala segue com Continuar")
+		# Voltar no briefing fica na plataforma, sem partir e sem voltar ao mapa.
 		await _wait_guard(hud.briefing)
 		await _press("ui_cancel")
 		await _frames(3)
-		t.check(not hud.briefing_open() and Campaign.state.session.expedition == null and not hud._draft.is_empty(), "Voltar no briefing fica na Preparação, sem partir")
+		t.check(not hud.briefing_open() and hud.current == "departure" and not hud._map.visible and Campaign.state.session.expedition == null,
+			"Voltar no briefing fica na plataforma, sem partir")
+	# Voltar ao mapa e o mesmo lugar de novo: o briefing não repete.
+	hud.back_to_map()
+	hud._on_phase_chosen("fase_1")
+	for i in 30:
+		await _tree.process_frame
+	t.check(not hud.briefing_open(), "o mesmo lugar de novo não repete o briefing")
+	# A confirmação parte; o segundo Iniciar não parte de novo.
+	hud._departure.press_start()
+	t.check(hud._departure.confirm_open(), "Iniciar abre a confirmação")
+	hud._departure.press_start()
 	hud._depart()
-	await _frames(2)
-	t.check(hud.briefing_open(), "Partir de novo abre o briefing")
-	t.equal(Campaign.state.session.expedition, null, "a expedição ainda não começou")
-	hud._depart()
-	t.equal(_tree.root.find_children("Briefing", "AHBriefingDialog", true, false).size(), 1, "o segundo Partir não abre outro")
-	hud.briefing.skip()
+	t.equal(_tree.root.find_children("Briefing", "AHBriefingDialog", true, false).size(), 0, "a partida não abre outro briefing")
 	for i in 600:
 		if GameFlow.passage != null or GameFlow.current_id == "street":
 			break
 		await _tree.process_frame
-	t.check(Campaign.state.session.expedition != null and Campaign.state.session.expedition.phase_id == "fase_1", "pulado, a equipe parte para a fase 1")
+	t.check(Campaign.state.session.expedition != null and Campaign.state.session.expedition.phase_id == "fase_1", "confirmada, a equipe parte para a fase 1")
 	await _settle()
 	# A volta: a vitória da fase 1, a chegada e o debriefing antes do relatório.
 	var c: Dictionary = Campaign.state

@@ -20,6 +20,8 @@ func run(t) -> void:
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-recruit-art-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(21)
+	# O Alojamento ampliado (#119): cabem os recrutas.
+	Campaign.state.station.rooms[S.CHARACTERS] = 4
 	var c: Dictionary = Campaign.state
 	c.inventory.seeds = 200
 	var rng := RandomNumberGenerator.new()

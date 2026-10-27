@@ -95,19 +95,20 @@ func _screens() -> void:
 			t.check(tab != null and tab.text == TranslationServer.translate("Visão geral").to_upper() and tab.text != "VISÃO GERAL",
 				"em inglês, as abas traduzidas (%s)" % (tab.text if tab else "?"))
 	TranslationServer.set_locale("pt")
-	# Os cartões da Preparação, no Maior: o conteúdo inteiro dentro do cartão.
+	# As cartas da partida na plataforma (#123), no Maior: o conteúdo inteiro dentro da carta.
 	Campaign.state.night.phase = "none"
 	Campaign.state.station.train = {"phase": "none", "candidate_id": "", "expedition_id": "teste", "accepted": false}
 	Settings.set_text_size(2)
-	hud.open_room(S.PREPARATION)
+	hud.open_departure()
+	hud._briefed = hud._draft.phase
 	await _frames(4)
-	var slots: Array = hud._prep.find_children("Slot*", "Button", true, false)
-	t.equal(slots.size(), 4, "os quatro cartões da Preparação")
+	var slots: Array = hud._departure.find_children("Slot*", "Button", true, false)
+	t.equal(slots.size(), 4, "as quatro cartas da plataforma")
 	for slot in slots:
 		var inside := true
 		for label in slot.find_children("*", "Label", true, false):
 			inside = inside and slot.get_global_rect().grow(1.0).encloses(label.get_global_rect())
-		t.check(inside, "%s: o conteúdo dentro do cartão no Maior" % slot.name)
+		t.check(inside, "%s: o conteúdo dentro da carta no Maior" % slot.name)
 	hud.close_panel()
 
 
