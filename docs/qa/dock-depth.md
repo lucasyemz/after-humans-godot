@@ -21,7 +21,7 @@
   - a porta de dentro mostra o lado de fora (o céu e a água pintada da #140), com a luz de fora entrando
     (`doorways` no mapa, `door_view.gdshader`). Ela não escurece com o interior: é o lado de fora, com a hora e a chuva
     de lá (mais clara que a sala no fim de tarde, azul e com os riscos da chuva de noite), e a luz que entra acompanha;
-  - do lado de dentro, a equipe para longe o bastante da porta para a fila inteira deixá-la à vista;
+  - do lado de dentro, a equipe para a uns 4,9 m da porta, com a porta inteira no quadro e longe dos objetos de busca;
   - ao sair, a equipe anda até a porta de dentro, passa por ela e sai da mesma porta do Cais para a faixa de andar.
 - Só os interiores com a porta de dentro no mapa (os dois do Cais) entram andando. Os outros (o Depósito) entram e
   saem como antes, com o escuro e a equipe já na sala.
@@ -47,14 +47,14 @@ chuva: [o Armazém](dock-depth/warehouse-weather.jpg) e [o Navio](dock-depth/shi
 ## Testes
 
 - `tests/run_all.gd`: todos verdes, com a paridade 48/48.
-- `tests/test_dock_depth.gd` (novo, 50 verificações):
+- `tests/test_dock_depth.gd` (novo, 52 verificações):
   - as camadas sem pedaço dobrado e em mais de uma profundidade;
   - a colisão: os volumes novos (os pedaços em camadas e as caixas do recuo) ficam atrás da faixa de andar e do passo
     para a porta, e o passo não cai numa caixa. Empurrado para o fundo na frente do Armazém e do Navio, o líder para na
     faixa, antes deles;
   - as portas de dentro, com a hora, a chuva e a luz de fora mesmo com a equipe dentro;
   - a entrada e a saída andando dos dois interiores do Cais: a equipe vai até a porta, sai da porta de dentro, para
-    ao lado dela e volta para a mesma porta do Cais, na faixa de andar;
+    ao lado dela, longe dos objetos de busca, e volta para a mesma porta do Cais, na faixa de andar;
   - os três interiores do Depósito, que não têm porta de dentro, entram e saem do jeito antigo, sem andar para o
     fundo.
 - `tools/capture_141.gd`: as capturas acima (também roda na main de antes).
@@ -68,6 +68,12 @@ chuva: [o Armazém](dock-depth/warehouse-weather.jpg) e [o Navio](dock-depth/shi
   - no Depósito, a equipe saía da parede;
   - faltava o teste de colisão dos volumes novos.
   Tudo corrigido como descrito acima.
+- **Rodada 2, reprovada:**
+  - o `test_i18n` falhava com as palavras internas novas: elas entraram no `i18n_ignore`;
+  - no fim de tarde, a porta mostrava um céu de meio-dia: agora pega o tom pêssego do cais;
+  - a equipe parava em cima do baú do Navio, com a porta quase fora do quadro: agora para a 4,9 m do começo da sala
+    (a câmera de dentro mostra a porta inteira) e recua para a porta até sair do alcance dos objetos de busca; o
+    teste confere.
 
 ## Para o Lucas
 
