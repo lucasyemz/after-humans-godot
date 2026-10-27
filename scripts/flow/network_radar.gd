@@ -119,6 +119,9 @@ static func story_ahead(campaign: Dictionary, phase_id: String, route: Dictionar
 static func state_of(campaign: Dictionary, phase_id: String, part: String) -> String:
 	if campaign.get("completed_phases", []).has(phase_id):
 		return "known"
+	# O vigia avistou o lugar numa noite (#132): o guardião e os inimigos ficam lidos.
+	if (part == "boss" or part == "enemies") and campaign.get("station", {}).get("sightings", []).has(phase_id) and S.phase_unlocked(campaign, phase_id):
+		return "known"
 	var room: String = READERS[part]
 	if S.room_level(campaign, room) < int(READER_LEVEL.get(room, 1)):
 		return "unknown"

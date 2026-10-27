@@ -138,6 +138,8 @@ func _preparation(t) -> void:
 	t.check(_label(hud._departure, "pede 4 animais"), "e o motivo na tela")
 	# Texto Maior, doze na Estação e um só na equipe: a lista da Estação quebra em linhas e cabe acima dos botões.
 	var classes := ["cao", "gato", "sapo", "coruja", "cao", "gato", "sapo", "coruja"]
+	# O Alojamento no nível máximo (#119): cabem doze.
+	Campaign.state.station.rooms[S.CHARACTERS] = 4
 	for i in classes.size():
 		S.recruit(Campaign.state, classes[i], RandomNumberGenerator.new(), "Voluntário %d" % (i + 1))
 	t.equal(S.living(Campaign.state).size(), 12, "doze na Estação")
