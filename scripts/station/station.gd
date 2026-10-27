@@ -36,6 +36,8 @@ const WALK_SPEED := 1.2
 const TRAIN_WALK_SPEED := 3.0
 ## Distância mínima entre quem para na mesma faixa: ninguém para em cima do outro.
 const STOP_GAP := 1.1
+## Quantas vezes quem chega num ponto cheio procura outro antes de parar mesmo assim (a faixa sem lugar nenhum).
+const REROUTE_LIMIT := 12
 ## Banco atrás da mesa da Cantina: os dois lugares e a profundidade (CanteenSeats, CanteenSeatY).
 const CANTEEN_SEATS := [17.6, 19.4]
 const CANTEEN_SEAT_Z := -5.94
@@ -1462,12 +1464,13 @@ func _walk(delta: float) -> void:
 			if walker.get("seat", -1) >= 0:
 				_sit_down(walker)
 				continue
-			# Chegou perto demais de alguém parado (que parou ali enquanto ele andava): segue para outro ponto, sem
-			# limite de tentativas. Numa faixa estreita ou cheia (a Preparação, a Forja com o Otto), os poucos sorteios
-			# podiam não achar lugar em três voltas, e ele parava colado mesmo assim.
-			if _crowded(walker, card.position.x):
-				_choose_target(walker)
+			# Chegou perto demais de alguém parado (que parou ali enquanto ele andava): segue para outro ponto. Numa
+			# faixa estreita ou cheia (a Preparação, a Forja com o Otto), três voltas não bastavam para achar lugar; o
+			# teto alto só vale para uma faixa sem lugar nenhum, onde andar para sempre seria pior que parar perto.
+			if _crowded(walker, card.position.x) and walker.get("rerouted", 0) < REROUTE_LIMIT:
+				_choose_target(walker, true)
 				continue
+			walker.rerouted = 0
 			walker.wait = randf_range(2.5, 7.0)
 			continue
 		card.set_facing(signf(gap))
@@ -1475,7 +1478,10 @@ func _walk(delta: float) -> void:
 		card.scale = Vector3(1, 1.0 + 0.025 * absf(sin(time * 7.0 + walker.phase)), 1)
 
 
-func _choose_target(walker: Dictionary) -> void:
+## retry: a busca de outro lugar de quem chegou num ponto cheio (conta para o REROUTE_LIMIT); qualquer outro passeio
+## começa a contagem do zero.
+func _choose_target(walker: Dictionary, retry: bool = false) -> void:
+	walker.rerouted = walker.get("rerouted", 0) + 1 if retry else 0
 	var card: AHSpriteCard = walker.card
 	# Pelo menos 1 m de caminhada e longe de quem está parado ou indo parar na mesma faixa; perto de uma ponta, vai
 	# para a outra.
