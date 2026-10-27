@@ -510,6 +510,11 @@ func _travel_segment(direction: int) -> void:
 	var door_behind: bool = street.scenario != null and not street.scenario.doors_of(segments[to].zone, "entry").is_empty()
 	if tutorial() and direction > 0 and door_behind:
 		Sound.play("res://audio/world/security_door.ogg")
+	# Passou pelo armário sem vasculhar: o fôlego vem ao chegar à zona da luta do Drone (uma vez só).
+	if direction > 0 and AHTutorial.breath_on_arrival(Campaign.state, part.first, part.steps):
+		Campaign.save()
+		hud.refresh(Campaign.state)
+		hud.toast(tr("A equipe recupera o fôlego."), 3.5)
 
 
 ## Fim do mapa de passagem: a equipe entra no primeiro trecho do mapa da fase e viaja para ele (só de ida).
