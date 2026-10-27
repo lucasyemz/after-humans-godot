@@ -143,3 +143,22 @@ chega a 1 em 1 de 40 lutas 2 e em 0 ou 1 de 40 lutas 3.
 | Onde | Antes | Agora (português) | Inglês |
 |---|---|---|---|
 | A busca do armário (o aviso do achado) | Armário de manutenção: +1 curativo, +1 comida | Armário de manutenção: +1 curativo, +1 comida. A equipe recupera o fôlego. | … The team catches its breath. |
+
+## A rodada 3 da QA do arco
+
+A QA aprovou a correção da silhueta e da vida acumulada da rodada 2, e achou mais isto:
+
+| O que a QA achou | Como ficou |
+|---|---|
+| O aviso da busca, que traz "A equipe recupera o fôlego.", ficava coberto pela dica "Abra a Mochila" durante os 5 s (captura 10) | A dica desvia do aviso do alto enquanto ele está na tela (`tutorial_guide.gd`, no `avoid`, como já fazia com o aviso da tecla). O `test_tutorial` confere que a chapa não cruza o aviso |
+| O fôlego dependia da busca opcional: sem ela, a luta 3 voltava a deixar alguém com 1 de vida (79 de 200 na automática) | O fôlego vem uma vez só por jornada: na busca do armário ou, para quem passou sem vasculhar, ao chegar à zona da luta do Drone (`AHTutorial.breath_on_arrival`), com a mesma linha. O `test_tutorial_balance` alterna os dois caminhos e confere que ele não vem duas vezes |
+| Com a busca vazia, o aviso começava com ". A equipe…" | O texto do fôlego não traz mais o ponto: a linha entra sozinha ou depois do achado |
+
+O teste fixo (40 sementes, metade com a busca e metade sem):
+
+- **Luta 1:** tira 14% da vida na ingênua e 15% na automática.
+- **Contaminação na luta 3:** 40 de 40.
+- **Vida 1 na luta 2:** 1 de 40.
+- **Vida 1 na luta 3:** 0 de 40 na ingênua e 1 de 40 na automática.
+
+Sem frase nova: quem não vasculhou lê a mesma "A equipe recupera o fôlego." ao chegar à luta do Drone.
