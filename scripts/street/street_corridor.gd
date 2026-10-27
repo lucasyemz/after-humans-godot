@@ -50,9 +50,10 @@ const PARTY_SPACING := 1.3
 ## leva cada meio passo (s).
 const DOOR_WALK_DEPTH := 2.0
 ## Onde a equipe para na sala (m do começo dela): sem a porta de dentro, logo na entrada; com ela (o vão de 1,5 m a
-## partir de x0 + 0,15), longe o bastante para a fila inteira (uns 4 m) passar da porta e deixá-la à vista.
+## partir de x0 + 0,15), o bastante para a fila (uns 3,5 m) quase sair da frente da porta, com a câmera de dentro (que
+## mostra uns 4 m para cada lado e não passa de x0 + 3) ainda pegando a porta inteira, e longe dos objetos de busca.
 const ROOM_STOP := 1.6
-const ROOM_STOP_DOORWAY := 5.8
+const ROOM_STOP_DOORWAY := 4.9
 const DOOR_WALK_SECONDS := 0.6
 const REACH := 1.1
 
@@ -825,7 +826,7 @@ func _enter_side_room(index: int) -> void:
 	_show_side_room(index, true)
 	await GameFlow.fade(0.0)
 	# Do lado de dentro, sai da porta (à esquerda, no fundo) para a sala, e para ao lado dela: a porta fica à vista.
-	await street.walk_leader(Vector3(room_entry.x0 + ROOM_STOP_DOORWAY, street.floor_y, street.lane_z), DOOR_WALK_SECONDS * 2.5)
+	await street.walk_leader(Vector3(room_entry.x0 + _room_stop(room_entry), street.floor_y, street.lane_z), DOOR_WALK_SECONDS * 2.5)
 	busy = false
 
 
@@ -840,9 +841,15 @@ func _show_side_room(index: int, at_door: bool = false) -> void:
 		street._place_leader(Vector3(room_entry.x0 + _room_stop(room_entry), street.floor_y, street.lane_z))
 
 
-## Onde a equipe fica na sala: ao lado da porta de dentro, quando o mapa tem uma (#141), para não tapá-la.
+## Onde a equipe fica na sala: ao lado da porta de dentro, quando o mapa tem uma (#141), para não tapá-la; recua para a
+## porta até sair do alcance dos objetos de busca (o líder em cima de um baú o tapava e já abria o aviso).
 func _room_stop(room_entry: Dictionary) -> float:
-	return ROOM_STOP_DOORWAY if street.scenario.has_doorway(room_entry.zone) else ROOM_STOP
+	if not street.scenario.has_doorway(room_entry.zone):
+		return ROOM_STOP
+	var stop := ROOM_STOP_DOORWAY
+	while stop > ROOM_STOP + 1.0 and scenario_props.any(func(p): return p.zone == room_entry.zone and absf(float(p.x) - (float(room_entry.x0) + stop)) < REACH + 0.2):
+		stop -= 0.1
+	return stop
 
 
 func _side_room_frame(campaign: Dictionary, route: Dictionary) -> void:

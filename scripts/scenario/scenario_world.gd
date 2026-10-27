@@ -44,7 +44,9 @@ var doorway_zones: Array[int] = []
 const DOOR_LIGHT := {"golden": [Color(1.0, 0.8, 0.58), 1.7], "night": [Color(0.55, 0.65, 0.92), 0.8]}
 const DOOR_RAIN_LIGHT := 0.7
 ## Fora é mais claro que a sala: a vista da porta brilha um pouco acima da cor do clima.
-const DOOR_VIEW_BRIGHTNESS := {"golden": 1.35, "night": 0.75}
+const DOOR_VIEW_BRIGHTNESS := {"golden": 1.25, "night": 0.75}
+## A cor da hora de fora na vista: o céu do mapa é de dia, e o fim de tarde lá fora é pêssego (a mesma luz do cais).
+const DOOR_VIEW_TINT := {"golden": Color(1.0, 0.76, 0.58), "night": Color(0.55, 0.6, 0.75)}
 var _blockouts: Array[ShaderMaterial] = []
 
 
@@ -166,7 +168,7 @@ func set_weather(wet: float, tint: Color, covered: bool = false) -> void:
 ## O lado de fora pelas portas de dentro (#141): a hora (golden ou night) e a chuva de fora, mesmo com a equipe dentro.
 func set_doorways(mood: String, raining: bool) -> void:
 	var key := mood if DOOR_LIGHT.has(mood) else "golden"
-	var tint := Color(1, 1, 1) if key == "golden" else Color(0.55, 0.6, 0.75)
+	var tint: Color = DOOR_VIEW_TINT[key]
 	for material in _door_views:
 		material.set_shader_parameter("weather", Vector4(tint.r, tint.g, tint.b, 1.0))
 		material.set_shader_parameter("wet", 1.0 if raining else 0.0)

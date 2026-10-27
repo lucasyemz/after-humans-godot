@@ -1414,3 +1414,6 @@ scenario_world.gd: painted
 scenario_world.gd: shade
 scenario_world.gd: Layered_%s
 scenario_world.gd: doorways
+scenario_world.gd: golden
+scenario_world.gd: night
+scenario_world.gd: zone

@@ -163,7 +163,7 @@ func _weather(street) -> void:
 		var weather: Vector4 = view.get_shader_parameter("weather")
 		seen[mood[0]] = [weather, float(view.get_shader_parameter("brightness")), float(view.get_shader_parameter("wet")),
 			(lights[0] as OmniLight3D).light_energy]
-	t.check(seen.golden[0].x >= 0.99 and seen.golden[1] > 1.0, "no fim de tarde, a porta é mais clara que a sala (sem o escuro do interior)")
+	t.check(seen.golden[1] > 1.0 and seen.golden[0].x > seen.golden[0].z, "no fim de tarde, a porta é mais clara que a sala e quente como o cais")
 	t.check(seen.night[0].x < seen.golden[0].x and seen.night[2] > 0.0, "na noite com chuva, a porta escurece e mostra a chuva")
 	t.check(seen.night[3] < seen.golden[3], "e a luz de fora acompanha a hora")
 	street._mood = "golden"
@@ -192,11 +192,14 @@ func _rooms(street, doorway: bool) -> void:
 			await _tree.process_frame
 			if corridor.side_room < 0:
 				deepest = minf(deepest, street._leader.position.z - street.lane_z)
-		var stop := AHStreetCorridor.ROOM_STOP_DOORWAY if doorway else AHStreetCorridor.ROOM_STOP
+		var stop: float = corridor._room_stop(entry)
 		if doorway:
 			t.check(deepest < -1.0, "%s: a equipe anda até a porta do Cais antes de entrar (%.1f m para o fundo)" % [name, -deepest])
 		else:
 			t.check(deepest > -LANE - 0.01, "%s: sem a porta de dentro, ninguém anda para o fundo (%.1f m)" % [name, -deepest])
+		if doorway:
+			var near: Array = corridor.scenario_props.filter(func(p): return p.zone == entry.zone and absf(float(p.x) - (float(entry.x0) + stop)) < AHStreetCorridor.REACH)
+			t.equal(near.map(func(p): return p.name), [], "%s: a parada fica longe dos objetos de busca" % name)
 		t.check(corridor.side_room == room and absf(street._leader.position.x - (float(entry.x0) + stop)) < 0.2,
 			"%s: e fica na sala, %s" % [name, "ao lado da porta de dentro" if doorway else "na entrada"])
 		corridor._leave_side_room()
