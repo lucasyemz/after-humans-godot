@@ -97,6 +97,19 @@ func _recovery() -> void:
 			"%s: deixado, %d dias; carregado, %d (recovery.json)" % [where, full[0].days, part[0].days])
 		t.check(part[0].carried and not full[0].carried, "%s: o resumo sabe quem foi carregado" % where)
 		t.check(part[0].days < full[0].days or full[0].days == 1, "%s: levantar encurta a recuperação" % where)
+	# Sem a regra carried no recovery.json (um dado antigo), o fator é 1: o carregado chega com os dias inteiros.
+	var rules: Dictionary = GameData.table("recovery")
+	var kept = rules.get("carried")
+	rules.erase("carried")
+	var plain2 := _campaign(1796)
+	var lifted2 := _campaign(1796)
+	var id2: String = plain2.session.expedition.team[0]
+	_fell(plain2, id2)
+	_fell(lifted2, id2)
+	t.equal(S.admit_fallen(lifted2, [id2], [id2])[0].days, S.admit_fallen(plain2, [id2])[0].days,
+		"sem a regra carried, o carregado chega com os dias inteiros (fator 1)")
+	if kept != null:
+		rules["carried"] = kept
 
 
 ## A volta: finish_return entrega os caídos com o carregado marcado e os dias de cada um.
@@ -217,6 +230,13 @@ func _scene() -> void:
 	entry.map = "OutroMapa"
 	t.check(corridor._downed_here().is_empty(), "o caído de outro mapa não conta como ao alcance")
 	entry.map = corridor._map_id()
+	# O corpo de uma luta dentro de uma casa só aparece com a equipe dentro dela (a sala só existe aberta).
+	entry.house = 0
+	corridor._spawn_bodies()
+	t.check(not corridor.bodies.has(hero_id), "o caído de uma casa não aparece na rua")
+	entry.house = -1
+	corridor._spawn_bodies()
+	body = corridor.bodies.get(hero_id)
 	# O líder chega perto: o aviso pede para levantar, e E levanta.
 	street._leader.position.x = body.position.x + 0.3
 	await _frames(4)

@@ -1216,6 +1216,7 @@ func _open_room(site_index: int) -> void:
 			var card := _enemy_card(specs[i].enemy_id)
 			card.position = Vector3(room.guard_x + i * 1.35, 0, -0.8 - 0.03 * i)
 			room_guards.append(card)
+	_spawn_bodies()
 
 
 func _leave_house() -> void:
@@ -1227,6 +1228,7 @@ func _leave_house() -> void:
 		Campaign.save()
 		Sound.play("res://audio/world/door_close.ogg")
 		_close_room()
+		_spawn_bodies()
 		street._place_leader(Vector3(doors[site.door].x, 0, 0.45))
 	await GameFlow.fade(0.0)
 	busy = false
@@ -1482,13 +1484,15 @@ func _map_id() -> String:
 	return String(street.scenario.map_name) if street.scenario else "street"
 
 
-## Os corpos dos caídos deste mapa, deitados onde caíram (os levantados saem).
+## Os corpos dos caídos deste mapa (e, numa casa, os dela), deitados onde caíram (os levantados saem).
 func _spawn_bodies() -> void:
 	for card in bodies.values():
 		card.queue_free()
 	bodies.clear()
+	var inside := int(Campaign.state.session.expedition.corridor.current_house)
 	for entry in R.downed_left(Campaign.state):
-		if String(entry.map) != _map_id():
+		# Do mapa de agora; o da casa só com a equipe dentro dela (a sala só existe aberta).
+		if String(entry.map) != _map_id() or (int(entry.get("house", -1)) >= 0 and int(entry.house) != inside):
 			continue
 		var hero = Campaign.hero(entry.hero_id)
 		var art := AHCombatArena.art_entry(street._combat_art.heroes, entry.hero_id, String(hero.get("art_variant", "")) if hero != null else "")

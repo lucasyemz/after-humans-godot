@@ -104,6 +104,18 @@ A QA refez cada caso com scripts próprios:
 - Abandonar pelo Menu com caído no chão faz duas perguntas seguidas ("Abandonar a expedição?" e o lembrete).
 - Segurar a seta depois de "Ficar" leva de volta à borda, e a pergunta vem de novo.
 
+### Revisão do PR
+
+**Baixas, corrigidas:**
+- O campo `house` do caído agora é usado. O corpo de uma luta dentro de casa só aparece com a equipe dentro dela.
+  Antes, ele ficava nas coordenadas da sala, fora da vista, mas o campo não servia para nada.
+- Um teste novo cobre o `recovery.json` sem a regra `carried`: o fator é 1, e o carregado chega com os dias inteiros.
+- O aviso do guardião junto com o do caído cabe na caixa no Maior. A conferência achou um bug de antes, no `toast`: o
+  primeiro aviso que quebra linha saía com milhares de px de altura, porque o rótulo ainda não tinha largura e media
+  uma palavra por linha. Agora a chapa mede de novo depois do layout.
+
+**Ficam para o Lucas:** o fator 0,5, o texto do cânone e o visual do carregado.
+
 ## Para o Lucas
 
 - O `Factor` de 0,5 é uma proposta. Hoje ele vale na chegada. O carregado que chega ao Dormitório (2 dias) e ganha um

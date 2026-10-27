@@ -1062,6 +1062,13 @@ func hide_tool_notice() -> void:
 
 
 ## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
+## A chapa do aviso no tamanho do texto, centrada embaixo do objetivo.
+func _fit_toast() -> void:
+	_toast.reset_size()
+	_toast.size = _toast.get_combined_minimum_size()
+	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+
+
 func toast(text: String, seconds: float = 3.5) -> void:
 	if _toast_tween:
 		_toast_tween.kill()
@@ -1071,9 +1078,10 @@ func toast(text: String, seconds: float = 3.5) -> void:
 	# Quebra só o que passa de 900 (com a quebra ligada, o rótulo curto pedia a altura de uma palavra por linha).
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if width >= 900.0 else TextServer.AUTOWRAP_OFF
 	_toast_label.custom_minimum_size = Vector2(width, 0)
-	_toast.reset_size()
-	_toast.size = _toast.get_combined_minimum_size()
-	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+	_fit_toast()
+	# O rótulo que quebra mede a altura pela largura de agora: no primeiro aviso longo, ele ainda tinha 0 e media uma
+	# palavra por linha (a caixa saía com milhares de px e o texto fora da tela). Depois do layout, mede de novo.
+	_fit_toast.call_deferred()
 	_toast.modulate.a = 1.0
 	_toast_tween = create_tween()
 	_toast_tween.tween_interval(seconds)
