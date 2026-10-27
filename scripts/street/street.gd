@@ -12,6 +12,8 @@ extends Node3D
 const FIRE := Vector3(180, 40, 0)
 # O corredor de 10 trechos começa em X 0 e tem 78 m (AHStreetCorridor).
 const CORRIDOR_LENGTH := 78.0
+## Quanto do sol fica sob teto (#175), sem sombra: só para a equipe não sumir no escuro.
+const COVERED_SUN := 0.3
 const WEATHER_NAMES := {"clear": "céu limpo", "sunset": "fim de tarde", "rain": "chuva", "storm": "tempestade", "mist": "névoa",
 	"fog": "neblina", "night": "noite", "nightRain": "noite de chuva"}
 const PARTY_SPACING := 1.15
@@ -278,7 +280,7 @@ func _apply_graphics() -> void:
 	_env.ssao_enabled = _forward_plus and fx.ssao
 	_env.volumetric_fog_enabled = _forward_plus and fx.volumetric_fog
 	_env.ssr_enabled = _forward_plus and _raining and fx.ssr
-	_sun.shadow_enabled = fx.shadows
+	_sun.shadow_enabled = fx.shadows and not (_indoor or sheltered)
 	Settings.apply_lamp_shadows()
 	_rain.amount_ratio = fx.rain_scale
 	_splashes.amount_ratio = fx.rain_scale
@@ -1007,6 +1009,8 @@ func _apply_weather() -> void:
 	_hud_weather.text = (tr("Noite") if _mood == "night" else tr("Fim de tarde")) + (tr(" · chuva") if _raining else "")
 	if exploration_hud:
 		exploration_hud.set_weather(_hud_weather.text)
+	# A sombra do sol só ao ar livre (#175): sob teto ele é a luz fraca de _update_sun.
+	_sun.shadow_enabled = Settings.effects().shadows and not covered
 	_update_sun(0.0)
 
 
@@ -1021,7 +1025,11 @@ func _update_sun(delta: float) -> void:
 			_flash = 1.0
 	_flash = maxf(0.0, _flash - delta * 3.5)
 	var flicker := _flash * (0.6 + 0.4 * sin(_flash * 40.0))
-	_sun.light_energy = w.sun_energy * direct_scale + flicker * 3.0
+	# Sob teto (a sala de uma loja ou a zona coberta de um cenário) o sol não entra (#175): fica só uma luz fraca e sem
+	# sombra, na direção dele, que mantém a equipe legível sem os raios diagonais pela frente aberta nem o clarão na
+	# parede do lado.
+	var covered := _indoor or sheltered
+	_sun.light_energy = w.sun_energy * direct_scale * COVERED_SUN if covered else w.sun_energy * direct_scale + flicker * 3.0
 	_sun.light_color = w.sun_color.lerp(Color(0.75, 0.82, 1.0), clampf(flicker, 0.0, 1.0))
 
 

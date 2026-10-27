@@ -16,6 +16,8 @@ const SIDE_MARGIN := 0.65
 const BACK_MARGIN := 0.75
 const HEIGHT := 3.4
 const WALL_HEIGHT := 3.2
+## O tom das paredes do lado sobre a arte da parede do fundo.
+const SIDE_WALL_SHADE := Color(0.62, 0.58, 0.55)
 const DOOR_Z := Vector2(-1.4, 0.4)
 const SPOT_FRACTIONS := [0.36, 0.56, 0.74]
 ## A frente dos objetos de busca (#50): na frente dos móveis pintados no fundo, atrás de onde a equipe anda (a colisão
@@ -132,6 +134,21 @@ func _search_prop(i: int, open: bool) -> void:
 	_solid((back + front) * 0.5, front - back)
 
 
+## As paredes do lado com a mesma arte do fundo, mais escura (ficam de quina para a luz), em vez do reboco liso (#175).
+## A textura vai pelo mundo (triplanar), na altura da parede, para o desenho não esticar na profundidade.
+static func _side_wall(art: String) -> StandardMaterial3D:
+	var texture: Texture2D = load(ART + art + "-walltile-seamless.webp")
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = texture
+	material.albedo_color = SIDE_WALL_SHADE
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	material.uv1_triplanar = true
+	material.uv1_world_triplanar = true
+	material.uv1_scale = Vector3.ONE / WALL_HEIGHT
+	material.roughness = 0.95
+	return material
+
+
 static func _tone(color: Color) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
@@ -191,7 +208,7 @@ func _back_wall(art: String) -> void:
 
 
 func _walls() -> void:
-	var plaster := _tone(Color(0.24, 0.19, 0.15))
+	var plaster := _side_wall(SHOP_ART[shop])
 	# Esquerda: a fachada vista de dentro, com o vão da porta na linha da equipe.
 	_box(Vector3(-0.3, 0, BACK_Z - 0.3), Vector3(0, HEIGHT, DOOR_Z.x), plaster, true)
 	_box(Vector3(-0.3, 0, DOOR_Z.y), Vector3(0, HEIGHT, FRONT_Z), plaster, true)
