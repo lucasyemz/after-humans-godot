@@ -63,6 +63,8 @@ var props := {}
 var room: AHHouseRoom
 var room_guards: Array = []
 var busy := false
+## O encontro com o Nick já rodou nesta cena (a guarda do _meet_nick).
+var _nick_met := false
 ## O acampamento encenado (#77): a equipe em volta da fogueira enquanto ele estiver ativo.
 var camp: AHCampScene
 var _room_time := 0.0
@@ -729,10 +731,6 @@ func _meet_nick() -> void:
 	_refresh_security_doors(true)
 
 
-## O encontro com o Nick já rodou nesta cena (a guarda do _meet_nick).
-var _nick_met := false
-
-
 ## Recuou de uma luta do tutorial: a equipe volta inteira um pouco antes da patrulha, que retoma o posto.
 func _restart_fight() -> void:
 	street.end_fight()
@@ -786,6 +784,10 @@ func _board_train() -> void:
 	Sound.play("res://audio/station/train_bell.ogg")
 	var team: Array = Campaign.state.session.expedition.team.duplicate()
 	var prize := AHTutorial.complete(Campaign.state)
+	# complete() recusa fora da jornada do tutorial (devolve {}): nada a embarcar.
+	if prize.is_empty():
+		busy = false
+		return
 	Tips.mark_seen(AHTutorial.COVERED_TIPS)
 	Campaign.save()
 	var gains: Array = []
