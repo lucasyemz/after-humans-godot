@@ -1,0 +1,32 @@
+{
+  "about": "A câmera de cinema de cada lugar (#153, docs/design/ambience.md): a cor (grading do pós: saturation, contrast, tint_amount, shadows_tint e highlights_tint, em [r, g, b] somados), a névoa (fog_density e volumetric multiplicam a do clima; fog_height é a altura em que ela começa a rarear, em m, e fog_height_density o quanto), o glow (glow_threshold e glow_intensity, que multiplica o do renderer), o desfoque de profundidade (a faixa nítida da tela: focus_center e focus_width, em fração da altura, e max_blur em px numa tela de 1080), a vinheta, o grão, a aberração e o ar (dust, leaves e embers: quanto da poeira, das folhas e das fagulhas da fogueira da rua, 0 a 1; as folhas param na chuva; steam: os respiros de vapor, [x, y, z] no mundo). O default vale para quem não tem perfil; cada lugar troca só o que muda. A barra de Admin (aba Ambiência) muda ao vivo e copia o perfil.",
+  "default": {
+    "saturation": 1.12, "contrast": 1.05, "tint_amount": 0.45,
+    "shadows_tint": [-0.04, 0.05, 0.15], "highlights_tint": [0.06, 0.03, -0.02],
+    "chromatic_aberration": 0.0015, "vignette": 0.55, "grain": 0.03,
+    "focus_center": 0.62, "focus_width": 0.30, "max_blur": 11.0,
+    "glow_threshold": 0.95, "glow_intensity": 1.0,
+    "fog_density": 1.0, "fog_height": 6.0, "fog_height_density": 0.0, "volumetric": 1.0,
+    "dust": 1.0, "leaves": 0.0, "embers": 1.0, "steam": []
+  },
+  "ShopfrontStreet": {
+    "saturation": 1.08, "contrast": 1.1, "tint_amount": 0.6,
+    "shadows_tint": [-0.06, 0.06, 0.16], "highlights_tint": [0.09, 0.04, -0.03],
+    "vignette": 0.62, "grain": 0.045,
+    "focus_center": 0.64, "focus_width": 0.34, "max_blur": 12.0,
+    "glow_threshold": 0.85, "glow_intensity": 1.2,
+    "fog_density": 1.1, "fog_height": 1.0, "fog_height_density": 0.05, "volumetric": 1.3,
+    "dust": 1.0, "leaves": 0.6,
+    "steam": [[18.5, 0.2, -3.2], [52.0, 0.2, -3.4]]
+  },
+  "RiverDock": {"shadows_tint": [-0.05, 0.05, 0.14], "highlights_tint": [0.08, 0.04, -0.02], "fog_density": 1.1},
+  "RootBridge": {"shadows_tint": [-0.04, 0.06, 0.1], "fog_density": 1.15, "leaves": 0.4},
+  "SealedShelter": {"saturation": 1.04, "vignette": 0.6},
+  "TriageGate": {"shadows_tint": [-0.05, 0.04, 0.16], "vignette": 0.6},
+  "FloodedDepot": {"saturation": 1.05, "shadows_tint": [-0.06, 0.05, 0.12], "fog_density": 1.2},
+  "SewerDucts": {"saturation": 1.0, "shadows_tint": [-0.06, 0.07, 0.04], "vignette": 0.65},
+  "Station": {"saturation": 1.12, "contrast": 1.05, "tint_amount": 0.45, "shadows_tint": [-0.04, 0.05, 0.15],
+    "highlights_tint": [0.06, 0.03, -0.02], "chromatic_aberration": 0.0015, "grain": 0.03,
+    "focus_center": 0.5, "focus_width": 0.8, "max_blur": 3.0, "vignette": 0.45, "glow_threshold": 1.0,
+    "glow_intensity": 1.0}
+}

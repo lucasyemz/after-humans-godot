@@ -61,7 +61,15 @@ func card_centers() -> Dictionary:
 
 func _team() -> Array:
 	var c: Dictionary = Campaign.state
-	return report.get("team", []).filter(func(id): return S.hero(c, id) != null)
+	return scene_order(report.get("team", []).filter(func(id): return S.hero(c, id) != null))
+
+
+## A equipe na ordem da cena (#131): a formação que o jogador deixou, com a posição 1 (a frente) à direita e a 4 à
+## esquerda, como na Preparação e na luta. team vem da frente para trás.
+static func scene_order(team: Array) -> Array:
+	var out := team.duplicate()
+	out.reverse()
+	return out
 
 
 func _build() -> void:
@@ -281,6 +289,11 @@ func _chips(c: Dictionary, result: String) -> Array:
 			out.append({"icon": "state_wounded", "text": tr("%s caiu: em recuperação") % hero.display_name, "color": AHKit.alert_text()})
 	elif fell.size() > 1:
 		out.append({"icon": "state_wounded", "text": tr("%d caíram: em recuperação") % fell.size(), "color": AHKit.alert_text()})
+	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
+	if report.has("train"):
+		var arrived := String(report.train)
+		out.append({"icon": "train_arrival", "text": tr("Chegou alguém no trem: %s") % arrived if arrived != "" else tr("O trem veio vazio"),
+			"color": AHKit.AMBER if arrived != "" else AHKit.MUTED})
 	return out
 
 

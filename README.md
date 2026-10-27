@@ -100,23 +100,21 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
     No gamepad: analógico esquerdo ou direcional.
   - Shift (ou RB) corre.
   - Na Estação, as setas (ou o direcional) andam entre os cômodos, E abre e F2 oculta a interface. Esc (ou Start) leva o
-    foco aos botões da esquerda (Próximo passo, Preparar expedição, Opções).
-  - Em toda tela (mapa de fases, Preparação, cômodos, relatório, noite, trem, Opções, pausa, Mochila, luta) dá para jogar
+    foco aos botões da esquerda (Próximo passo, Ir ao mapa, Opções).
+  - Em toda tela (mapa de fases, plataforma da partida, cômodos, relatório, noite, trem, Opções, pausa, Mochila, luta) dá para jogar
     só com o teclado ou o controle: as setas (ou o direcional) andam entre os botões, E, Enter ou A confirma e
     Backspace, Esc ou B volta. As teclas desenhadas na tela seguem as trocas das Opções. As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo. Com tela de toque aparecem um analógico (andar; até a borda corre) e o botão Usar; Opções > Controles de toque liga sempre ou desliga.
-  - F1 abre a barra de Admin, só na build de teste ou com `--admin` (#130). Em Ajustes, ela liga as teclas de teste da
-    rua abaixo (R, T, P, C, K) e o contador de quadros.
-  - R liga e desliga a chuva.
-  - T troca entre fim de tarde e noite.
-  - P liga e desliga o pós-processamento.
-  - C mostra as caixas de colisão.
+  - F1 abre a barra de Admin, só na build de teste ou com `--admin` (#130): a chuva e o dia e a noite em Clima; o
+    pós-processamento, as caixas de colisão e o contador de quadros em Ajustes; a próxima patrulha em Testes de combate.
+  - R (ou X) abre a Formação (#129): clique em dois heróis (ou as setas e E) para trocá-los de lugar na fila e na próxima
+    luta.
   - I abre a Mochila (comida, curativo e a Ampola de Reparo do sapo; na luta, no herói da vez).
   - Esc abre o menu (continuar, opções, voltar à Estação, nova campanha).
   - E interage: entrar ou forçar a porta de uma loja, vasculhar, abrir caixotes, acender a fogueira, voltar à Estação
     pela saída no começo da rua.
-  - K leva a equipe até a próxima patrulha.
   - Na Estação: o cartão "Próximo passo" diz o que fazer; os cômodos abrem clicando no nome deles no corte; Esc volta à
-    vista geral. Preparar expedição abre o mapa de fases e depois a Preparação, onde se monta a equipe e se parte.
+    vista geral. Ir ao mapa abre o Mapa da Rede; Preparar neste lugar sobe a equipe para a Plataforma 1, onde se monta
+    a equipe, o foco e a comida, e Iniciar expedição (G) confirma a partida. Esc volta um passo (#123).
   - Na luta: 1 a 4 escolhem a habilidade (ou o clique), depois o alvo; Q move, W defende, I abre a Mochila, F foge
     (no gamepad, setas e Enter/A; Backspace/B volta).
     Mover, Defender e Fugir ficam à direita.
