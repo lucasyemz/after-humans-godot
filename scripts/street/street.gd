@@ -973,7 +973,7 @@ func _apply_weather() -> void:
 	# As fontes de luz prática: a luz da cena só no Forward+ e da Média para cima (no Compatibility, o chão já tem as 8
 	# luzes que cada malha pega); no resto, o halo e a poça desenhados.
 	for source in _practical:
-		source.refresh(_mood == "night", _forward_plus and Settings.level >= 1, _reduced_effects(), not _indoor)
+		source.refresh(_mood == "night", _raining, _forward_plus and Settings.level >= 1, _reduced_effects(), not _indoor)
 	for steam in _steam:
 		steam.emitting = not covered and not _reduced_effects()
 		_set_amount(steam, STEAM_AMOUNT, 1.0 if Settings.level > 0 else AHAmbience.LOW_PARTICLES)

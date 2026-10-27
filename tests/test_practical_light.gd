@@ -4,7 +4,8 @@
 ## - cada fonte com o card aceso, o halo, a poça e a luz, fora da faixa de andar;
 ## - a qualidade manda: sem a luz da cena (Compatibility ou Baixo), só o halo e a poça, mais fortes; com ela, a poça
 ##   desenhada enfraquece e a sombra segue o lamp_shadows;
-## - de noite as fontes são a luz principal; o drone só passa de noite; com "Reduzir efeitos", nada tremula.
+## - de noite e na chuva as fontes são a luz principal; o drone só passa de noite; com "Reduzir efeitos", nada tremula
+##   nem passa (a emergência acesa, o drone escondido); só o tambor faz sombra de luz.
 extends RefCounted
 
 const J := preload("res://scripts/flow/journey_rules.gd")
@@ -77,7 +78,10 @@ func _street() -> void:
 				"%s: no beco, com colisão" % source.kind)
 		else:
 			t.check(source.global_position.y > 2.0, "%s: no alto da parede" % source.kind)
-		t.check(source.light.is_in_group(Settings.SHADOW_LAMPS), "%s: a sombra segue o lamp_shadows" % source.kind)
+		# Só a fonte principal (o tambor) faz sombra de luz; as outras, nunca.
+		var casts: bool = AHPracticalLight.KINDS[source.kind].get("light_shadow", false)
+		t.check(source.light.is_in_group(Settings.SHADOW_LAMPS) == casts and (casts or not source.light.shadow_enabled),
+			"%s: %s" % [source.kind, "a sombra segue o lamp_shadows" if casts else "sem sombra de luz"])
 	var barrel: AHPracticalLight = sources.filter(func(s): return s.kind == "barrel")[0]
 	t.check(barrel.fire != null and barrel.embers != null, "o tambor tem o fogo e as fagulhas")
 	var drone: AHPracticalLight = sources.filter(func(s): return s.kind == "drone")[0]
@@ -91,18 +95,29 @@ func _street() -> void:
 	await _tree.process_frame
 	t.equal(barrel.light.visible, street._forward_plus and real_level >= 1, "a luz da cena só no Forward+, da Média para cima")
 	# Com a luz da cena (Forward+, da Média para cima).
-	barrel.refresh(true, true, false)
+	barrel.refresh(true, false, true, false)
 	t.check(barrel.light.visible and _pool(barrel) < AHPracticalLight.POOL_ALONE, "com a luz da cena, a poça desenhada enfraquece")
 	var night_energy: float = barrel.light.light_energy / barrel._flicker
-	barrel.refresh(false, true, false)
+	barrel.refresh(false, false, true, false)
 	t.check(barrel.light.light_energy / barrel._flicker < night_energy, "no fim de tarde, a fonte é mais fraca que de noite")
-	drone.refresh(false, true, false)
+	var golden_energy: float = barrel.light.light_energy / barrel._flicker
+	barrel.refresh(false, true, true, false)
+	t.check(barrel.light.light_energy / barrel._flicker > golden_energy * 1.5, "na chuva, as fontes viram a luz principal")
+	drone.refresh(false, false, true, false)
 	t.check(not drone.visible, "o drone não passa de dia")
-	drone.refresh(true, true, false)
+	drone.refresh(true, false, true, false)
 	t.check(drone.visible, "e passa de noite")
-	barrel.refresh(true, true, true)
+	var emergency: AHPracticalLight = sources.filter(func(s): return s.kind == "emergency")[0]
+	emergency._time = AHPracticalLight.PULSE_ON + 0.1
+	emergency._process(0.0)
+	emergency.refresh(true, false, true, true)
+	t.equal(emergency._flicker, 1.0, "Reduzir efeitos: a emergência fica acesa, não presa no pulso fraco")
+	drone.refresh(true, false, true, true)
+	t.check(not drone.visible, "e o drone não passa")
+	emergency.refresh(true, false, true, false)
+	barrel.refresh(true, false, true, true)
 	t.check(not barrel.embers.emitting, "Reduzir efeitos: sem fagulhas")
-	barrel.refresh(true, true, false, false)
+	barrel.refresh(true, false, true, false, false)
 	t.check(not barrel.visible and not barrel.light.visible, "num interior, a fonte some")
 	# A rua devolve o estado dela.
 	street._mood = "night"

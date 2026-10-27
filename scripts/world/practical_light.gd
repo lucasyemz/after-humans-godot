@@ -14,7 +14,7 @@ extends Node3D
 ## de docs/design/luz-pratica.md.
 const KINDS := {
 	"barrel": {"art": "T_LP03", "height": 0.92, "light": Vector2(115.0 / 232.0, 107.0 / 398.0), "color": Color(1.0, 0.5, 0.2),
-		"pool": 3.2, "energy": 2.4, "range": 6.5, "fire": true, "shadow": true, "solid": true},
+		"pool": 2.4, "energy": 2.4, "range": 6.5, "fire": true, "shadow": true, "light_shadow": true, "solid": true},
 	"lantern": {"art": "T_LP02", "height": 0.42, "light": Vector2(91.0 / 185.0, 257.0 / 406.0), "color": Color(1.0, 0.62, 0.3),
 		"pool": 1.6, "energy": 0.9, "range": 3.2, "shadow": true, "solid": true},
 	"emergency": {"art": "T_LP06", "height": 0.34, "light": Vector2(88.0 / 207.0, 118.0 / 279.0), "color": Color(1.0, 0.22, 0.15),
@@ -25,8 +25,10 @@ const DRONE_COLOR := Color(0.7, 0.95, 1.0)
 const FIRE_SEAT := 95.0 / 398.0
 const FIRE_WIDTH := 0.85
 const FIRE_FPS := 8.0
-## A força no fim de tarde (o sol ainda manda) e de noite (as fontes são a luz principal).
+## A força no fim de tarde (o sol ainda manda), no fim de tarde com chuva (o céu fechado: as fontes quase mandam) e de
+## noite (as fontes são a luz principal).
 const GOLDEN := 0.45
+const RAIN := 0.85
 ## O halo e a poça desenhados: a força com a luz da cena acesa (ela faz a poça de verdade) e sem ela.
 const POOL_WITH_LIGHT := 0.3
 const POOL_ALONE := 0.85
@@ -50,6 +52,7 @@ var fire: MeshInstance3D
 var embers: CPUParticles3D
 var _fire_frames: Array[Texture2D] = []
 var _night := true
+var _raining := false
 var _lights_on := true
 var _reduced := false
 var _time := 0.0
@@ -104,8 +107,13 @@ func _build_source(data: Dictionary) -> void:
 	omni.omni_attenuation = 1.4
 	omni.light_volumetric_fog_energy = 3.0
 	omni.light_specular = 0.4
-	omni.add_to_group(Settings.SHADOW_LAMPS)
-	omni.shadow_enabled = Settings.effects().lamp_shadows
+	# Só a fonte principal (o tambor) faz sombra de luz, pelo lamp_shadows: cada sombra de OmniLight desenha a cena seis
+	# vezes. As outras ficam sem.
+	if data.get("light_shadow", false):
+		omni.add_to_group(Settings.SHADOW_LAMPS)
+		omni.shadow_enabled = Settings.effects().lamp_shadows
+	else:
+		omni.shadow_enabled = false
 	add_child(omni)
 	light = omni
 	if data.get("fire", false):
@@ -202,14 +210,18 @@ func _embers(at: Vector3, color: Color) -> CPUParticles3D:
 	return particles
 
 
-## A hora e a qualidade: night (as fontes viram a luz principal), lights_on (a luz da cena: Forward+ e da Média para
+## A hora, a chuva e a qualidade: night e raining (as fontes viram a luz principal de noite e na chuva), lights_on (a luz da cena: Forward+ e da Média para
 ## cima), reduced (Reduzir efeitos: nada tremula nem se mexe) e shown (fora, num interior, a fonte some).
-func refresh(night: bool, lights_on: bool, reduced: bool, shown: bool = true) -> void:
+func refresh(night: bool, raining: bool, lights_on: bool, reduced: bool, shown: bool = true) -> void:
 	_night = night
+	_raining = raining
 	_lights_on = lights_on and shown
 	_reduced = reduced
-	# O drone só passa de noite.
-	visible = shown and (night or kind != "drone")
+	if reduced:
+		# Parada e acesa: o fogo e a emergência na força cheia, o tempo parado.
+		_flicker = 1.0
+	# O drone só passa de noite, e com "Reduzir efeitos" não passa.
+	visible = shown and (kind != "drone" or (night and not reduced))
 	if embers != null:
 		embers.emitting = not reduced
 	_apply()
@@ -244,7 +256,7 @@ func _drone_step() -> void:
 
 
 func _apply() -> void:
-	var mood := 1.0 if _night else GOLDEN
+	var mood := 1.0 if _night else (RAIN if _raining else GOLDEN)
 	var power := mood * _flicker
 	if kind == "drone":
 		light.visible = _lights_on and halo.visible
