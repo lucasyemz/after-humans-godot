@@ -693,12 +693,20 @@ func _refresh_security_doors(sound: bool = false) -> void:
 
 ## O encontro com o Nick (o tutorial): ele entra na equipe e o trecho fica resolvido.
 func _meet_nick() -> void:
+	# A reabertura chama pelo call_deferred e o quadro da rua pode chamar de novo no mesmo trecho: só uma vez por cena.
+	if _nick_met:
+		return
+	_nick_met = true
 	var joined: Array = AHTutorial.join(Campaign.state)
 	for hero_id in joined:
 		street.add_hero(hero_id, Vector3(street._leader.position.x + 2.2, street.floor_y, street.lane_z - 0.6))
 	Campaign.save()
 	hud.refresh(Campaign.state)
 	_refresh_security_doors(true)
+
+
+## O encontro com o Nick já rodou nesta cena (a guarda do _meet_nick).
+var _nick_met := false
 
 
 ## A plataforma: o trem chega (o som e o vagão entrando no fosso) e para com as portas abertas.

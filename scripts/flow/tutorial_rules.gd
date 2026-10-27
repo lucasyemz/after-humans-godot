@@ -86,6 +86,8 @@ static func enemies_at(expedition: Dictionary, step: int) -> Array:
 	for unit in ids.size():
 		var row = GameData.row("enemies", ids[unit])
 		if row == null:
+			# Um id que não existe em enemies.json deixaria a luta mais curta sem aviso (test_tutorial_map confere os dados).
+			push_error("Tutorial: inimigo %s da luta do trecho %d não existe em enemies.json." % [ids[unit], step])
 			continue
 		out.append({"enemy_id": ids[unit], "unit_id": "tutorial_%d_%d_%s" % [step, unit, ids[unit]], "rank": unit + 1,
 			"max_hp": int(row.MaxHp), "hp": int(row.MaxHp), "damage_bonus": 0, "display_name": row.DisplayName})
@@ -138,9 +140,14 @@ static func resolve_step(campaign: Dictionary, kind: String) -> bool:
 	return true
 
 
-## O embarque: a jornada termina e a campanha volta à Estação, com a equipe inteira (vida cheia, instinto zerado).
+## O embarque: a jornada termina e a campanha volta à Estação, com a equipe do tutorial inteira (vida cheia, instinto
+## zerado). Só quem foi ao tutorial: o resto do elenco fica como está.
 static func finish(campaign: Dictionary) -> void:
+	var expedition = campaign.get("session", {}).get("expedition")
+	var team: Array = expedition.get("team", []) if expedition != null else []
 	for hero in campaign.get("roster", []):
+		if not team.has(hero.id):
+			continue
 		hero.hp = int(hero.max_hp)
 		hero.instinct = 0
 		hero.trauma = false
