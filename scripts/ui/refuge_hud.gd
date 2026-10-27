@@ -1,10 +1,11 @@
 ## HUD da Estação Raiz no kit (#60, docs/design/hud-estacao.md): a moldura das telas da Estação (AHStationFrame: a
-## plaqueta e os recursos no alto, VOLTAR, as teclas, as abas e PREPARAR EXPEDIÇÃO embaixo), a coluna da esquerda (o
+## plaqueta e os recursos no alto, VOLTAR, as teclas, as abas e IR AO MAPA embaixo), a coluna da esquerda (o
 ## PRÓXIMO PASSO, o Plano da Estação e as PENDÊNCIAS) e, à direita, o painel do cômodo (o ícone, o nome, o estado num
 ## chip, o X e o conteúdo, que rola no texto Maior), no lugar do painel PERSONAGEM da Sala. Cada cômodo só preenche o
 ## conteúdo: a Forja, a Pesquisa, o Depósito, a Cantina, o Bar, o Dormitório (a noite e o amanhecer), o trem com um
-## candidato, o Plano e as Opções; a Preparação é a gaveta de baixo, com PARTIR no botão principal. O relatório da volta
-## e a Sala dos Personagens são telas inteiras do kit (AHStationReport, AHCharacterRoom). Tudo chama as regras de
+## candidato, o Plano e as Opções. A saída é em três passos (#123): IR AO MAPA, o lugar no Mapa da Rede e a equipe na
+## plataforma (AHDepartureScreen). O relatório da volta, a partida e a Sala dos Personagens são telas inteiras do kit
+## (AHStationReport, AHDepartureScreen, AHCharacterRoom). Tudo chama as regras de
 ## AHStationRules e grava pela Estação (station.commit()).
 class_name AHRefugeHud
 extends Control
@@ -102,9 +103,6 @@ var _last_mouse := Vector2(-1, -1)
 var _hud_hidden := false
 var _hidden_hint: Label
 var _next := {}
-## A gaveta da Preparação e o cartão escolhido para trocar (-1: nenhum).
-var _prep: PanelContainer
-var _prep_selected := -1
 ## O painel do cômodo: o cabeçalho (ícone, nome, estado e X), o conteúdo que rola e o pé fixo (as ações da noite e do
 ## trem).
 var _panel: PanelContainer
@@ -123,19 +121,24 @@ var _feedback: Label
 var _feedback_tween: Tween
 ## Rascunho da Preparação: fase, equipe (da frente para trás), foco e suprimentos extras.
 var _draft := {}
-## Cartões sob cada um da fila na plataforma (a partida), pelo id do herói.
-var _tags: Control
+## A partida na plataforma (#123): a equipe sobre as cartas, o lugar, o foco, a comida e INICIAR EXPEDIÇÃO.
+var _departure: AHDepartureScreen
+## A fase cujo briefing (#88) já abriu na plataforma (a volta do mapa para o mesmo lugar não repete).
+var _briefed := ""
+## As falas que o briefing da plataforma mostrou (a assinatura de quem falou o quê), ou null sem briefing mostrado. Se a
+## equipe final, na confirmação, faz outras falas (entrou alguém que fala), o briefing abre de novo antes de partir.
+var _briefed_lines = null
+## O mapa aberto pelo VOLTAR AO MAPA da plataforma: fechá-lo volta para a vista geral (a câmera desce).
+var _map_from_platform := false
 ## O relatório da volta no kit (#60): a tela inteira por cima da fila, no lugar do painel.
 var _report_screen: AHStationReport
 ## A Sala dos Personagens no kit (#60): a tela inteira, com o cômodo ao fundo.
 var _room_screen: AHCharacterRoom
 ## A tela do kit de onde as Opções ou o Plano foram abertos (a Sala): fechar volta para ela.
 var _back_to := ""
-var _tag_nodes := {}
-var _lineup_signature := ""
 ## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
 var _arrived_candidate := ""
-## Mapa de fases: Preparar expedição abre por cima de tudo; a fase escolhida vai para a Preparação.
+## Mapa da Rede: IR AO MAPA abre por cima de tudo; o lugar escolhido vai para a plataforma (#123).
 var _map: AHPhaseMap
 
 
@@ -157,10 +160,6 @@ func _ready() -> void:
 	_menu.custom_minimum_size = Vector2(LEFT.size.x, 0)
 	_menu.add_theme_constant_override("separation", 16)
 	add_child(_menu)
-	_tags = Control.new()
-	_tags.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_tags.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_tags)
 	_build_room_selection()
 	_hidden_hint = AHKit.label("", "row", AHKit.TEXT, true)
 	_hidden_hint.visible = false
@@ -174,7 +173,7 @@ func _ready() -> void:
 	_map = AHPhaseMap.new()
 	_map.visible = false
 	_map.phase_chosen.connect(_on_phase_chosen)
-	_map.closed.connect(func(): _map.visible = false)
+	_map.closed.connect(_on_map_closed)
 	add_child(_map)
 	Tips.show_tip.call_deferred("station")
 
@@ -298,13 +297,15 @@ func _input(event: InputEvent) -> void:
 	# A dica da primeira vez aberta fica com Interagir (ela fecha), sem abrir um cômodo por trás.
 	if Tips.showing() and event.is_action_pressed("interact"):
 		return
-	# O botão principal (G/X, só nas telas da Estação, #60): PARTIR na Preparação; nas outras, PREPARAR EXPEDIÇÃO.
+	# O botão principal (G/X, só nas telas da Estação, #60): INICIAR EXPEDIÇÃO na plataforma; nas outras, IR AO MAPA.
 	var training: bool = is_instance_valid(_room_screen) and _room_screen.training
 	if event.is_action_pressed("station_prepare") and not _map.visible and not training and current != "report":
 		get_viewport().set_input_as_handled()
-		if _prep != null and _prep.visible:
-			if is_instance_valid(_prepare) and not _prepare.disabled:
-				_depart()
+		if current == "departure":
+			if GameFlow.busy:
+				return
+			if is_instance_valid(_departure) and _departure.block() == "" and not _departure.waiting:
+				_departure.press_start()
 			else:
 				Sound.play("res://audio/ui/deny.ogg")
 			return
@@ -356,7 +357,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _reset_focus() -> void:
-	for scope in [_panel, _prep, _corner]:
+	for scope in [_panel, _corner]:
 		if scope != null:
 			U.reset_focus(scope)
 
@@ -371,8 +372,8 @@ func focus_scope() -> Control:
 		return _map
 	if current == "":
 		return null
-	if _prep != null and _prep.visible:
-		return _prep
+	if current == "departure" and is_instance_valid(_departure):
+		return _departure.focus_root()
 	if current == "report" and is_instance_valid(_report_screen):
 		return _report_screen
 	if current == S.CHARACTERS and is_instance_valid(_room_screen):
@@ -444,7 +445,17 @@ func _step_room(direction: Vector2) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Na chegada não há painel para fechar (Voltar pula a chegada, no _input).
-	if U.is_back(event) and current == "report" and not _map.visible:
+	if U.is_back(event) and current == "departure" and not _map.visible:
+		# Na plataforma (#123), Voltar fecha a confirmação; sem ela, volta ao mapa com a escolha. Na partida (o fade para
+		# o vagão), nada.
+		if GameFlow.busy:
+			pass
+		elif is_instance_valid(_departure) and _departure.confirm_open():
+			_departure.close_confirm()
+		else:
+			back_to_map()
+		get_viewport().set_input_as_handled()
+	elif U.is_back(event) and current == "report" and not _map.visible:
 		# Voltar no relatório conclui como Entrar no abrigo (#131): a fila sai andando, e o relatório fica visto.
 		_enter_shelter_then(Callable())
 		get_viewport().set_input_as_handled()
@@ -490,15 +501,6 @@ func refresh() -> void:
 	var c: Dictionary = Campaign.state
 	_build_frame(c)
 	_build_left(c)
-	if current == "departure" and not _draft.is_empty():
-		# A fila acompanha a equipe do rascunho (trocas e mudanças de ordem).
-		var signature := ",".join(_draft.team)
-		if signature != _lineup_signature:
-			_lineup_signature = signature
-			station.show_departure(_draft.team)
-			for tag in _tag_nodes.values():
-				tag.queue_free()
-			_tag_nodes.clear()
 	if current != "":
 		_show(current)
 	_fit_panel.call_deferred()
@@ -540,7 +542,7 @@ func _build_frame(c: Dictionary) -> void:
 		child.queue_free()
 	_prepare = null
 	# O relatório e a Sala têm a moldura deles; a chegada fica sem nada por cima.
-	var kit_screen := current == "report" or current == S.CHARACTERS
+	var kit_screen := current == "report" or current == S.CHARACTERS or current == "departure"
 	_frame.visible = not kit_screen and current != ARRIVAL
 	if not _frame.visible:
 		return
@@ -548,14 +550,8 @@ func _build_frame(c: Dictionary) -> void:
 	_title = top.title
 	_subtitle = top.subtitle
 	_resources = top.resources
-	var drawer := current == S.PREPARATION and S.preparation_block(c) == ""
-	if drawer:
-		if _draft.is_empty() or not S.phase_unlocked(c, _draft.get("phase", "")):
-			_reset_draft()
-		var mission := J.phase(_draft.phase)
-		_prepare = AHStationFrame.prepare(_frame, tr("Partir · %s") % tr(mission.name), "station", _size_block(), _depart)
-	else:
-		_prepare = AHStationFrame.prepare(_frame, tr("Preparar expedição"), "station", S.preparation_block(c), open_map)
+	# IR AO MAPA (#123): o lugar no Mapa da Rede, depois a equipe na plataforma.
+	_prepare = AHStationFrame.prepare(_frame, tr("Ir ao mapa"), "station", S.preparation_block(c), open_map)
 	AHStationFrame.tabs(_frame, _active_tab(), _nav)
 	var pairs: Array
 	if current == "":
@@ -570,7 +566,7 @@ func _build_frame(c: Dictionary) -> void:
 		pairs = [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["station_room_next", tr("Ao lado")], ["Esc", tr("Voltar")], ["hide_hud", tr("Ocultar")]]
 	else:
 		pairs = [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["Esc", tr("Voltar")], ["hide_hud", tr("Ocultar")]]
-	AHStationFrame.keys(_frame, pairs, 962.0, 268.0, (RIGHT.position.x if _panel.visible or current != S.PREPARATION else 1400.0) - 24.0)
+	AHStationFrame.keys(_frame, pairs, 962.0, 268.0, RIGHT.position.x - 24.0)
 
 
 ## As abas de baixo: a vista geral, as instalações (o Plano), os personagens (a Sala), a pesquisa e ocultar.
@@ -599,8 +595,8 @@ func _build_left(c: Dictionary) -> void:
 		child.queue_free()
 	_next_button = null
 	var overview := current == ""
-	var kit_screen := current == "report" or current == S.CHARACTERS
-	_menu.visible = not kit_screen and current != ARRIVAL and current != "options" and not (_prep != null and _prep.visible)
+	var kit_screen := current == "report" or current == S.CHARACTERS or current == "departure"
+	_menu.visible = not kit_screen and current != ARRIVAL and current != "options"
 	if overview:
 		_menu.add_child(_next_card(c))
 		_menu.add_child(_plan_card())
@@ -816,7 +812,7 @@ func _build_room_selection() -> void:
 	_room_marks.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_room_marks.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_room_marks.draw.connect(_draw_room_marks)
-	_tags.add_sibling(_room_marks)
+	_menu.add_sibling(_room_marks)
 	# A etiqueta do cômodo apontado, com a ponta para baixo, em cima dele.
 	_room_tag = AHKit.panel(AHKit.piece_of("tag", "room"))
 	_room_tag.name = "RoomTag"
@@ -1213,8 +1209,6 @@ func open_room(room_id: String) -> void:
 		_opened_frame = Engine.get_process_frames()
 		_sound_open.call_deferred()
 	current = room_id
-	if room_id == S.PREPARATION and _draft.is_empty():
-		_reset_draft()
 	station.focus_room(room_id)
 	refresh()
 
@@ -1272,11 +1266,8 @@ func close_panel() -> void:
 	if back != "":
 		open_room(back)
 		return
-	_prep_selected = -1
-	if _prep != null:
-		_prep.visible = false
+	_close_departure()
 	station.clear_lineup()
-	_lineup_signature = ""
 	station.focus_overview()
 	refresh()
 	# De volta à vista geral, as setas voltam a andar entre os cômodos.
@@ -1284,7 +1275,8 @@ func close_panel() -> void:
 		get_viewport().gui_release_focus()
 
 
-## Preparar expedição (AAHHUD::OpenPhaseMap): com algo pendente (a noite, o trem), a Preparação diz o quê; senão, o mapa.
+## IR AO MAPA (AAHHUD::OpenPhaseMap; #123): com algo pendente (a noite, o trem), a Preparação diz o quê; senão, o Mapa
+## da Rede.
 func open_map() -> void:
 	if S.preparation_block(Campaign.state) != "":
 		open_room(S.PREPARATION)
@@ -1293,26 +1285,79 @@ func open_map() -> void:
 	# corpo inteiro ficava por cima do mapa (#131).
 	if is_instance_valid(_room_screen) or is_instance_valid(_report_screen):
 		close_panel()
+	if current == "departure":
+		back_to_map()
+		return
 	if _draft.is_empty():
 		_reset_draft()
 	_map.open(_draft.phase, _draft.get("focus", ""))
 
 
+## PREPARAR NESTE LUGAR: a equipe sobe para a plataforma com o lugar escolhido.
 func _on_phase_chosen(phase_id: String) -> void:
 	_map.visible = false
+	_map_from_platform = false
 	if _draft.is_empty():
 		_reset_draft()
 	_draft.phase = phase_id
-	open_room(S.PREPARATION)
+	open_departure()
 
 
-## A equipe da Preparação em fila na plataforma, esperando a partida (a câmera sobe pela passagem).
+## Fechar o mapa (VOLTAR À ESTAÇÃO, Esc): aberto pela plataforma, a câmera desce para a vista geral.
+func _on_map_closed() -> void:
+	_map.visible = false
+	if _map_from_platform:
+		_map_from_platform = false
+		close_panel()
+
+
+## VOLTAR AO MAPA na plataforma: o mapa abre no mesmo lugar, com a equipe, o foco e a comida guardados no rascunho.
+func back_to_map() -> void:
+	# Durante o briefing ou a partida (o fade para o vagão, com o rascunho já gasto), nada volta.
+	if briefing_open() or GameFlow.busy or _draft.is_empty():
+		return
+	_close_departure()
+	station.clear_lineup()
+	current = ""
+	_map_from_platform = true
+	refresh()
+	_map.open(_draft.phase, _draft.get("focus", ""))
+
+
+## A equipe do rascunho em fila na Plataforma 1, cada um sobre a sua carta (a câmera sobe pela passagem), com o lugar,
+## o foco, a comida e INICIAR EXPEDIÇÃO (#123).
 func open_departure() -> void:
 	if _draft.is_empty():
 		_reset_draft()
+	# Quem saiu do elenco desde o rascunho não fica na fila (quem não pode ir fica, com o motivo na tela).
+	_draft.team = _draft.team.filter(func(id): return S.hero(Campaign.state, id) != null)
+	_reset_focus()
+	_close_report_screen()
+	_close_room_screen()
+	_panel.visible = false
 	current = "departure"
-	_lineup_signature = ""
+	station.show_departure(AHStationReport.scene_order(_draft.team))
 	refresh()
+
+
+## O briefing (#88) abre quando a equipe chega na plataforma, antes da confirmação: uma vez por lugar escolhido. Espera a
+## interface à vista (F2 na subida) e a dica da primeira vez fechada: um de cada vez.
+func _brief_on_platform() -> void:
+	if _briefed == _draft.get("phase", "") or briefing_open() or GameFlow.busy or not station.camera_settled() or station.passage_moving() \
+			or _hud_hidden or Tips.showing():
+		return
+	_briefed = _draft.phase
+	var lines := AHBriefing.departure(Campaign.state, _draft.phase, _draft.team)
+	_briefed_lines = _lines_signature(lines)
+	if lines.is_empty():
+		return
+	briefing = AHBriefingDialog.open(self, lines, tr("Continuar"))
+	await briefing.finished
+	briefing = null
+
+
+static func _lines_signature(lines: Array) -> String:
+	return "\n".join(lines.map(func(l): return "%s:%s" % [l.speaker.get("id", ""), l.text]))
 
 
 func _process(delta: float) -> void:
@@ -1324,45 +1369,12 @@ func _process(delta: float) -> void:
 	# No relatório, as cartas do kit ficam embaixo e cada um da fila fica de pé sobre a sua (#60).
 	if current == "report" and is_instance_valid(_report_screen):
 		station.align_lineup(_report_screen.card_centers())
-	var showing := current == "departure"
-	_tags.visible = showing
-	if not showing:
-		return
-	var seen := {}
-	for entry in station.lineup_screen_positions():
-		seen[entry.hero_id] = true
-		if not _tag_nodes.has(entry.hero_id):
-			_tag_nodes[entry.hero_id] = _make_tag(entry.hero_id)
-			_tags.add_child(_tag_nodes[entry.hero_id])
-		var tag: Control = _tag_nodes[entry.hero_id]
-		tag.position = entry.at + Vector2(-tag.size.x * 0.5, 14)
-	for hero_id in _tag_nodes.keys():
-		if not seen.has(hero_id):
-			_tag_nodes[hero_id].queue_free()
-			_tag_nodes.erase(hero_id)
-
-
-## O cartão sob cada um da fila na partida: o nome, a vida, a posição e o ataque dali.
-func _make_tag(hero_id: String) -> Control:
-	var entry = S.hero(Campaign.state, hero_id)
-	var box := AHKit.panel_box("inset")
-	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# Do tamanho do espaço de cada um na fila (2,1 m): os cartões não se sobrepõem.
-	box.custom_minimum_size = Vector2(190, 0)
-	box.size = Vector2(190, 0)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 2)
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(column)
-	column.add_child(AHKit.label(entry.display_name if entry else hero_id, "row", AHKit.AMBER, true))
-	if entry:
-		column.add_child(AHKit.label(tr("Vida %d/%d") % [entry.hp, entry.max_hp], "small", AHKit.TEXT))
-		var rank: int = _draft.get("team", []).find(hero_id) + 1
-		var attacks := S.attacks_from_rank(entry.class_id, rank)
-		column.add_child(AHKit.label(tr("Posição %d") % rank, "small", AHKit.MUTED))
-		column.add_child(_wrapped(attacks[0] if not attacks.is_empty() else tr("sem ataque aqui"), "small",
-			AHKit.MUTED if not attacks.is_empty() else AHKit.alert_text(), false, 160.0))
-	return box
+	# Na partida, também: cada um da fila de pé sobre a sua carta (#123); chegando, o briefing.
+	if current == "departure" and is_instance_valid(_departure):
+		station.align_lineup(_departure.card_centers())
+		_brief_on_platform()
+		# A confirmação só depois da chegada e do briefing deste lugar.
+		_departure.waiting = _briefed != _draft.get("phase", "") or briefing_open()
 
 
 func toast(text: String, error: bool = false) -> void:
@@ -1574,14 +1586,12 @@ func _show(key: String) -> void:
 		child.queue_free()
 	_panel_focus = null
 	var c: Dictionary = Campaign.state
-	if key == S.PREPARATION and S.preparation_block(c) == "" and S.room_level(c, S.PREPARATION) >= 1:
+	if key == "departure":
 		_panel.visible = false
-		_menu.visible = false
-		_prep_drawer(c)
+		_departure_view()
 		Tips.show_tip("preparation")
 		return
-	if _prep != null:
-		_prep.visible = false
+	_close_departure()
 	# Durante a cena do trem (o aviso, a chegada, o candidato descendo, a partida), nenhum painel por cima: o do trem
 	# abre quando a câmera fecha no candidato (#61).
 	# Na chegada da equipe (#76), também: o relatório abre quando todos estão na fila.
@@ -1611,8 +1621,6 @@ func _show(key: String) -> void:
 	match key:
 		"train":
 			_train()
-		"departure":
-			_departure_view()
 		"new_campaign":
 			_new_campaign_view()
 		"plan":
@@ -1881,8 +1889,8 @@ func _reset_draft() -> void:
 	_draft = {"phase": next, "team": team, "focus": S.focus_recommended(c), "extra": 0}
 
 
-## A Preparação sem a gaveta: bloqueada (a noite, o trem), ela diz o quê e leva até lá; na partida pela plataforma, a
-## missão, a equipe, o foco e a comida, numa coluna.
+## O cômodo da Preparação (#123): a equipe se monta na plataforma, depois do lugar escolhido no Mapa da Rede. Bloqueada
+## (a noite, o trem), ela diz o quê e leva até lá.
 func _preparation(c: Dictionary) -> void:
 	var block := S.preparation_block(c)
 	if block != "":
@@ -1892,493 +1900,36 @@ func _preparation(c: Dictionary) -> void:
 		elif S.visit_pending(c):
 			_button(tr("Ir à plataforma"), func(): open_service("train"))
 		return
-	if _draft.is_empty():
-		_reset_draft()
-	# Missão: o mapa de fases abre por cima; a fase escolhida volta para esta mesma escalação.
-	_section(tr("Missão"), "route")
-	var mission := J.phase(_draft.phase)
-	if not S.phase_unlocked(c, _draft.phase):
-		_reset_draft()
-		mission = J.phase(_draft.phase)
-	_text(tr("%s · nível %d · %s") % [tr(mission.name), mission.level, tr(J.DIFFICULTY_NAMES[mission.difficulty])], AHKit.AMBER)
-	_button(tr("Escolher no mapa"), func(): _map.open(_draft.phase, _draft.get("focus", "")))
-	_section(tr("Equipe (da frente para trás)"))
-	for rank in 4:
-		var hero_id: String = _draft.team[rank] if rank < _draft.team.size() else ""
-		var entry = S.hero(c, hero_id)
-		var row := _row()
-		var label := AHKit.label(tr("%d. %s") % [rank + 1, entry.display_name if entry else "—"], "row", AHKit.TEXT, true)
-		label.custom_minimum_size = Vector2(250, 0)
-		label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(label)
-		if entry and S.attacks_from_rank(entry.class_id, rank + 1).is_empty():
-			label.add_theme_color_override("font_color", AHKit.alert_text())
-		var slot := rank
-		var swap := _button(tr("Trocar"), func(): _cycle_slot(slot), S.living(c).size() > _draft.team.size() or _draft.team.size() > 1, row)
-		swap.custom_minimum_size = Vector2(120, 56)
-		if rank > 0:
-			_button("↑", func(): _swap(slot, slot - 1), true, row)
-	_section(tr("Foco da rota"))
-	var recommended := S.focus_recommended(c)
-	for focus_id in [""] + S.FOCI.map(func(f): return f.id):
-		if not S.focus_available(c, focus_id):
-			continue
-		var id: String = focus_id
-		var label := S.focus_label(id)
-		if id != "":
-			label += " · " + S.focus_reward_text(id)
-		if id == recommended:
-			label += tr(" · recomendado")
-		var button := _button(label, func(): _draft.focus = id; refresh())
-		if _draft.focus == id:
-			button.add_theme_color_override("font_color", AHKit.AMBER)
-			button.add_child(AHKit.selected_overlay())
-	_text(S.focus_reason(c, _draft.focus), AHKit.MUTED, "small")
-	_section(tr("Suprimentos"))
-	var row := _row()
-	var food_label := AHKit.label(tr("%d de graça + %d extras (%d sementes)") % [J.FREE_FOOD, _draft.extra, _draft.extra * S.FOOD_COST], "text", AHKit.TEXT)
-	food_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	food_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(food_label)
-	_button("−", func(): _draft.extra = maxi(0, _draft.extra - 1); refresh(), _draft.extra > 0, row)
-	_button("+", func(): _draft.extra = mini(J.MAX_FOOD - J.FREE_FOOD, _draft.extra + 1); refresh(),
-		_draft.extra < J.MAX_FOOD - J.FREE_FOOD and (_draft.extra + 1) * S.FOOD_COST <= S.quantity(c, "seeds"), row)
-	if current == "departure":
-		_button(tr("Voltar à Preparação"), func():
-			station.clear_lineup()
-			_lineup_signature = ""
-			open_room(S.PREPARATION))
-	else:
-		_button(tr("Escalar a equipe na plataforma"), open_departure)
-	_footer_primary(tr("Confirmar partida"), "station", _depart)
+	_text(tr("Escolha o lugar no Mapa da Rede; a equipe se monta na Plataforma 1, ao lado do trem."), AHKit.TEXT)
+	_footer_primary(tr("Ir ao mapa"), "station", open_map)
 
-
-func _cycle_slot(rank: int) -> void:
-	var c: Dictionary = Campaign.state
-	var candidates: Array = S.living(c).filter(func(h): return S.can_deploy(h)).map(func(h): return h.id)
-	var current_id: String = _draft.team[rank] if rank < _draft.team.size() else ""
-	var start := candidates.find(current_id)
-	for step in range(1, candidates.size() + 1):
-		var candidate: String = candidates[(start + step) % candidates.size()]
-		if not _draft.team.has(candidate):
-			if rank < _draft.team.size():
-				_draft.team[rank] = candidate
-			else:
-				_draft.team.append(candidate)
-			refresh()
-			return
-	# Todos já estão na equipe: troca de lugar com o próximo.
-	_swap(rank, (rank + 1) % _draft.team.size())
-
-
-func _swap(a: int, b: int) -> void:
-	if a >= _draft.team.size() or b >= _draft.team.size():
-		return
-	var keep = _draft.team[a]
-	_draft.team[a] = _draft.team[b]
-	_draft.team[b] = keep
-	refresh()
-
-
-# ---------------------------------------------------------------- Preparação numa tela (a proposta de UX, tela 4)
 
 ## A arte de um herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 static func _hero_art(entry: Dictionary) -> Dictionary:
 	return AHCombatArena.hero_art_of(entry.id, String(entry.get("art_variant", ""))).get("idle", {})
 
 
-## O que trava a partida pelo tamanho da equipe (a fase pede de N a M animais), ou "".
-func _size_block() -> String:
-	if _draft.is_empty():
-		return ""
-	var limits := J.team_limits(_draft.phase)
-	if _draft.team.size() < limits.min or _draft.team.size() > limits.max:
-		return tr("%s pede %s na equipe.") % [J.phase(_draft.phase).get("name", tr("Esta jornada")), S.team_size_text(limits)]
-	return ""
-
-
-## A gaveta da Preparação: os quatro cartões no sentido da luta (o fundo à esquerda, a frente à direita), com o
-## medalhão da posição, o rosto, o papel, a vida, as habilidades que funcionam daquela posição e os avisos; clicar em
-## dois troca; os de fora ficam embaixo. À direita, a Missão, o Foco da rota e a Comida; PARTIR é o botão principal.
-func _prep_drawer(c: Dictionary) -> void:
-	if _draft.is_empty():
-		_reset_draft()
-	if not S.phase_unlocked(c, _draft.phase):
-		_reset_draft()
-	if _prep == null:
-		_prep = AHKit.panel_box("large")
-		_prep.name = "Preparation"
-		_prep.minimum_size_changed.connect(_fit_prep)
-		_tags.add_sibling(_prep)
-	_prep.visible = true
-	_fit_prep.call_deferred()
-	# Os cartões são refeitos: a ficha do cartão de antes fecha (o mouse ou o foco a abrem de novo).
-	sheet.close()
-	for child in _prep.get_children():
-		_prep.remove_child(child)
-		child.queue_free()
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 22)
-	_prep.add_child(row)
-
-	var lineup := VBoxContainer.new()
-	lineup.add_theme_constant_override("separation", 12)
-	lineup.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(lineup)
-	var head := HBoxContainer.new()
-	head.add_theme_constant_override("separation", 16)
-	lineup.add_child(head)
-	var limits := J.team_limits(_draft.phase)
-	var title := AHKit.label(tr("Equipe · %s") % S.team_size_text(limits), "row", AHKit.AMBER, true, true)
-	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	head.add_child(title)
-	var hint := AHKit.label(tr("Clique em dois para trocar"), "text", AHKit.MUTED)
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	head.add_child(hint)
-	# O sentido da luta: o fundo à esquerda, a frente à direita (as setas são ícones: a Barlow não tem o caractere).
-	var back_arrow := _icon("ui-arrow-right", 22, AHKit.MUTED)
-	back_arrow.flip_h = true
-	head.add_child(back_arrow)
-	head.add_child(AHKit.label(tr("fundo · frente"), "text", AHKit.MUTED))
-	head.add_child(_icon("ui-arrow-right", 22, AHKit.MUTED))
-	var slots := HBoxContainer.new()
-	slots.add_theme_constant_override("separation", 14)
-	lineup.add_child(slots)
-	for rank in [4, 3, 2, 1]:
-		slots.add_child(_prep_slot(c, rank))
-	# Os de fora da equipe: com um cartão escolhido, clicar troca.
-	var bench: Array = S.living(c).filter(func(h): return not _draft.team.has(h.id))
-	var can_leave: bool = _prep_selected >= 0 and _prep_selected < _draft.team.size() and _draft.team.size() > 1
-	if not bench.is_empty() or can_leave:
-		# Quebra em linhas: com a equipe pequena e muitos na Estação (e o texto Maior), a gaveta continua na tela.
-		var bench_row := HFlowContainer.new()
-		bench_row.add_theme_constant_override("h_separation", 8)
-		bench_row.add_theme_constant_override("v_separation", 8)
-		lineup.add_child(bench_row)
-		var label := AHKit.label(tr("Fora da equipe:"), "text", AHKit.MUTED)
-		label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		bench_row.add_child(label)
-		for entry in bench:
-			var id: String = entry.id
-			var button := _chip_button("%s · %d/%d" % [entry.display_name, entry.hp, entry.max_hp])
-			button.custom_minimum_size = Vector2(0, 56)
-			button.disabled = _prep_selected < 0 or not S.can_deploy(entry)
-			button.tooltip_text = tr("Escolha um cartão da equipe e clique aqui para trocar.") if S.can_deploy(entry) else S.deploy_block(entry)
-			if S.recovering(entry):
-				button.text += " · " + S.return_text(S.recovery_days(entry))
-				button.add_theme_color_override("font_disabled_color", AHKit.alert_text())
-			elif not S.can_deploy(entry):
-				button.text += tr(" · sem arte de combate")
-			button.pressed.connect(func(): _prep_bench(id))
-			sheet.attach(button, func(): return AHCharacterSheet.from_hero(S.hero(Campaign.state, id)))
-			bench_row.add_child(button)
-		# Equipe menor (#6): o escolhido fica na Estação e a vaga fica vazia (os de trás andam para a frente).
-		if can_leave:
-			var leave := _chip_button(tr("Deixar na Estação"))
-			leave.custom_minimum_size = Vector2(0, 56)
-			leave.tooltip_text = tr("Parte com um a menos; os de trás andam uma posição para a frente.")
-			leave.pressed.connect(_prep_leave)
-			bench_row.add_child(leave)
-	var size_block := _size_block()
-	if size_block != "":
-		lineup.add_child(_alert_line(size_block))
-	var warning := _team_warning(c)
-	if warning != "":
-		lineup.add_child(_alert_line(warning, AHKit.AMBER))
-
-	var side := VBoxContainer.new()
-	side.add_theme_constant_override("separation", 12)
-	side.custom_minimum_size = Vector2(490, 0)
-	row.add_child(side)
-	var mission := J.phase(_draft.phase)
-	var mission_box := _side_box(side, tr("Missão"))
-	var mission_row := HBoxContainer.new()
-	mission_row.add_theme_constant_override("separation", 12)
-	mission_box.add_child(mission_row)
-	mission_row.add_child(_icon("route", 40, AHKit.TEXT))
-	var mission_names := VBoxContainer.new()
-	mission_names.add_theme_constant_override("separation", -2)
-	mission_row.add_child(mission_names)
-	mission_names.add_child(AHKit.label(tr(mission.name), "card_name", AHKit.TEXT, true))
-	mission_names.add_child(_wrapped(tr("Fase %d · %s · nível %d+") % [J.PHASES.map(func(p): return p.id).find(mission.id) + 1, tr(J.DIFFICULTY_NAMES[mission.difficulty]),
-		mission.level], "text", AHKit.MUTED, false, 380.0))
-	var map_button := AHKit.button(tr("Escolher no mapa"), "secondary")
-	map_button.text = tr("Escolher no mapa")
-	map_button.icon = AHKit.legacy_icon("marker-here")
-	map_button.add_theme_constant_override("icon_max_width", 26)
-	map_button.custom_minimum_size = Vector2(0, 60)
-	map_button.pressed.connect(func(): _map.open(_draft.phase, _draft.get("focus", "")))
-	mission_box.add_child(map_button)
-	var focus_box := _side_box(side, tr("Foco da rota"))
-	var chips := HFlowContainer.new()
-	chips.add_theme_constant_override("h_separation", 8)
-	chips.add_theme_constant_override("v_separation", 8)
-	focus_box.add_child(chips)
-	var recommended := S.focus_recommended(c)
-	var focus_icons := {S.FOCUS_WATER: "lobby-water", S.FOCUS_PARTS: "lobby-scrap", S.FOCUS_PROVISIONS: "lobby-food"}
-	for focus_id in [""] + S.FOCI.map(func(f): return f.id):
-		if not S.focus_available(c, focus_id):
-			continue
-		var id: String = focus_id
-		var chip := _chip_button(S.focus_label(id))
-		chip.name = "Focus_%s" % (id if id != "" else "basic")
-		if focus_icons.has(id):
-			chip.icon = AHKit.legacy_icon(focus_icons[id])
-			chip.add_theme_constant_override("icon_max_width", 24)
-		chip.tooltip_text = (S.focus_reward_text(id) if id != "" else tr("Sem objetivo extra.")) + (tr(" · recomendado") if id == recommended else "")
-		chip.custom_minimum_size = Vector2(0, 56)
-		if _draft.focus == id:
-			for state in ["font_color", "font_hover_color", "font_focus_color"]:
-				chip.add_theme_color_override(state, AHKit.AMBER)
-			chip.add_child(AHKit.selected_overlay())
-		chip.pressed.connect(func(): _draft.focus = id; refresh())
-		chips.add_child(chip)
-	# A recomendada numa linha à parte, com o pino: a escolha e a recomendação não se confundem.
-	var advice := HBoxContainer.new()
-	advice.add_theme_constant_override("separation", 10)
-	focus_box.add_child(advice)
-	advice.add_child(_icon("marker-here", 24, AHKit.AMBER))
-	var reason := RichTextLabel.new()
-	reason.bbcode_enabled = true
-	reason.fit_content = true
-	reason.scroll_active = false
-	reason.custom_minimum_size = Vector2(420, 0)
-	reason.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	reason.add_theme_font_override("normal_font", AHKit.font())
-	reason.add_theme_font_override("bold_font", AHKit.font(true))
-	reason.add_theme_font_size_override("normal_font_size", AHKit.size("small"))
-	reason.add_theme_font_size_override("bold_font_size", AHKit.size("small"))
-	reason.add_theme_color_override("default_color", AHKit.TEXT)
-	reason.text = "[b][color=#%s]%s[/color][/b] %s" % [AHKit.AMBER.to_html(false), tr("Recomendado: %s.") % S.focus_label(recommended),
-		S.focus_reason(c, recommended).replace("[", "[lb]")]
-	advice.add_child(reason)
-	var food_box := _side_box(side, tr("Comida"))
-	var food_row := HBoxContainer.new()
-	food_row.add_theme_constant_override("separation", 10)
-	food_box.add_child(food_row)
-	var food_label := AHKit.label(tr("%d grátis + %d extras") % [J.FREE_FOOD, _draft.extra], "card_name", AHKit.TEXT, true)
-	food_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	food_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	food_row.add_child(food_label)
-	_button("−", func(): _draft.extra = maxi(0, _draft.extra - 1); refresh(), _draft.extra > 0, food_row)
-	_button("+", func(): _draft.extra = mini(J.MAX_FOOD - J.FREE_FOOD, _draft.extra + 1); refresh(),
-		_draft.extra < J.MAX_FOOD - J.FREE_FOOD and (_draft.extra + 1) * S.FOOD_COST <= S.quantity(c, "seeds"), food_row)
-	food_box.add_child(AHKit.label(tr("%d sementes · cura na Mochila e no acampamento") % (_draft.extra * S.FOOD_COST), "small", AHKit.MUTED))
-
-
-## Um aviso numa linha, com o ícone de alerta (a forma avisa também no daltonismo).
-func _alert_line(text: String, color: Color = AHKit.alert_text()) -> HBoxContainer:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	row.add_child(AHKit.glyph("alert", 26, color))
-	row.add_child(AHKit.label(text, "text", color, true))
-	return row
-
-
-## A gaveta termina acima de VOLTAR e cresce para cima quando o conteúdo pede (texto Maior, banco cheio).
-func _fit_prep() -> void:
-	if _prep == null or not is_instance_valid(_prep):
-		return
-	var bottom := AHStationFrame.BACK_Y - 14.0
-	var height := maxf(560.0, _prep.get_combined_minimum_size().y)
-	_prep.size = Vector2(1864, height)
-	_prep.position = Vector2(28, maxf(8.0, bottom - height))
-
-
-func _side_box(parent: Container, title: String) -> VBoxContainer:
-	var column := _inset(parent)
-	column.add_theme_constant_override("separation", 10)
-	column.add_child(AHKit.label(title, "text", AHKit.AMBER, true, true))
-	return column
-
-
-## Um cartão da fila: o medalhão da posição, o rosto, o papel, a vida, as habilidades (apagadas as que não saem dali) e
-## o aviso.
-func _prep_slot(c: Dictionary, rank: int) -> Button:
-	var hero_id: String = _draft.team[rank - 1] if rank - 1 < _draft.team.size() else ""
-	var entry = S.hero(c, hero_id)
-	var button := Button.new()
-	button.name = "Slot%d" % rank
-	AHKit.style_as(button, "upgrade")
-	button.custom_minimum_size = Vector2(300, 262)
-	var chosen := _prep_selected == rank - 1
-	button.pressed.connect(func(): _prep_click(rank - 1))
-	var box := VBoxContainer.new()
-	box.set_anchors_preset(Control.PRESET_FULL_RECT)
-	box.offset_left = 18
-	box.offset_top = 14
-	box.offset_right = -18
-	box.offset_bottom = -12
-	box.add_theme_constant_override("separation", 8)
-	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	button.add_child(box)
-	if chosen:
-		button.add_child(AHKit.selected_overlay())
-	if entry == null:
-		# No meio do cartão: no canto, a medalha da posição cobria o começo do texto.
-		var empty := AHKit.label(tr("Posição vazia"), "row", AHKit.MUTED)
-		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		box.add_child(empty)
-		button.add_child(_rank_medal(rank))
-		return button
-	# A ficha ao apontar o cartão (#89): os traços, a relíquia e a velocidade, que o cartão não mostra.
-	sheet.attach(button, func(): return AHCharacterSheet.from_hero(S.hero(Campaign.state, hero_id)))
-	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 12)
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(top)
-	top.add_child(AHKit.portrait(U.face_texture(_hero_art(entry)), 76))
-	var names := VBoxContainer.new()
-	names.add_theme_constant_override("separation", -2)
-	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.add_child(names)
-	var name_label := AHKit.label(entry.display_name, "card_name", AHKit.TEXT, true, true)
-	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	names.add_child(name_label)
-	var hero_class = GameData.row("classes", entry.class_id)
-	names.add_child(_wrapped(tr(hero_class.get("Role", "")) if hero_class else "", "small", AHKit.MUTED, false, 160.0))
-	var life := HBoxContainer.new()
-	life.add_theme_constant_override("separation", 10)
-	life.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(life)
-	life.add_child(AHKit.label(tr("Vida"), "small", AHKit.MUTED, false, true))
-	life.add_child(AHKit.label("%d / %d" % [entry.hp, entry.max_hp], "row", AHKit.TEXT, true))
-	var bar := AHKit.bar("hero", entry.hp, entry.max_hp, "", "small")
-	bar.custom_minimum_size = Vector2(0, 22)
-	box.add_child(bar)
-	var icons := HBoxContainer.new()
-	icons.add_theme_constant_override("separation", 8)
-	icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(icons)
-	var usable := 0
-	var abilities: Array = hero_class.get("AbilityIds", []) if hero_class else []
-	for ability_id in abilities:
-		var ability = GameData.combat.abilities.get(ability_id)
-		var icon := TextureRect.new()
-		var path := "res://art/combat/icons/%s.webp" % ability_id
-		if ResourceLoader.exists(path):
-			icon.texture = load(path)
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2(52, 52)
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var works: bool = ability != null and ability.OriginRanks.has(rank)
-		if works:
-			usable += 1
-		else:
-			icon.modulate = AHKit.DIM
-		icons.add_child(icon)
-	var note := ""
-	var good := true
-	if S.attacks_from_rank(entry.class_id, rank).is_empty():
-		note = tr("Sem ataque desta posição")
-		good = false
-	elif entry.hp < entry.max_hp * 0.5:
-		note = tr("Vida baixa: leve comida ou curativos")
-		good = false
-	elif entry.trauma:
-		note = tr("Com trauma: começa com instinto alto")
-		good = false
-	else:
-		note = tr("%d de %d habilidades daqui") % [usable, abilities.size()]
-	var note_row := HBoxContainer.new()
-	note_row.add_theme_constant_override("separation", 8)
-	note_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(note_row)
-	var tone: Color = AHKit.good() if good else AHKit.alert_text()
-	note_row.add_child(AHKit.glyph("state_active" if good else "alert", 24, tone))
-	var note_label := _wrapped(note, "small", tone, true, 230.0)
-	note_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	note_row.add_child(note_label)
-	button.add_child(_rank_medal(rank))
-	# O cartão cresce com o conteúdo (o Maior): o aviso de baixo fica dentro dele e clicar ali escolhe o cartão.
-	var grow := func(): button.custom_minimum_size.y = maxf(262.0, box.get_combined_minimum_size().y + 26.0)
-	box.minimum_size_changed.connect(grow)
-	grow.call()
-	return button
-
-
-## O medalhão da posição no canto do retrato.
-func _rank_medal(rank: int) -> Control:
-	var medal := AHKit.panel(AHKit.piece_of("medal", "level"))
-	medal.custom_minimum_size = Vector2(46, 46)
-	medal.size = Vector2(46, 46)
-	medal.position = Vector2(4, 4)
-	medal.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var number := AHKit.label(str(rank), "text", AHKit.AMBER, true)
-	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	medal.add_child(number)
-	return medal
-
-
-## O aviso da equipe inteira: ninguém cura (leve curativos).
-func _team_warning(c: Dictionary) -> String:
-	for hero_id in _draft.team:
-		var entry = S.hero(c, hero_id)
-		if entry == null:
-			continue
-		var hero_class = GameData.row("classes", entry.class_id)
-		for ability_id in (hero_class.get("AbilityIds", []) if hero_class else []):
-			var ability = GameData.combat.abilities.get(ability_id)
-			if ability != null and ability.HealRange.Max > 0:
-				return ""
-	return tr("Ninguém na equipe cura em combate: leve curativos e comida.")
-
-
-func _prep_click(index: int) -> void:
-	if _prep_selected < 0:
-		_prep_selected = index
-	elif _prep_selected == index:
-		_prep_selected = -1
-	else:
-		_swap(_prep_selected, index)
-		_prep_selected = -1
-	refresh()
-
-
-func _prep_leave() -> void:
-	if _prep_selected < 0 or _prep_selected >= _draft.team.size() or _draft.team.size() <= 1:
-		return
-	_draft.team.remove_at(_prep_selected)
-	_prep_selected = -1
-	refresh()
-
-
-func _prep_bench(hero_id: String) -> void:
-	if _prep_selected < 0:
-		return
-	if _prep_selected < _draft.team.size():
-		_draft.team[_prep_selected] = hero_id
-	else:
-		_draft.team.append(hero_id)
-	_prep_selected = -1
-	refresh()
-
-
 func _depart() -> void:
-	# O segundo clique em Partir, durante o fade da saída ou com o briefing aberto, já não parte de novo.
+	# O segundo clique em Iniciar, durante o fade da saída ou com o briefing aberto, já não parte de novo.
 	if _draft.is_empty() or GameFlow.busy or briefing_open():
 		return
 	var c: Dictionary = Campaign.state
-	# A partida conferida numa cópia (nada muda ainda): o briefing só abre para uma saída que vale.
+	# A partida conferida numa cópia (nada muda ainda): a semente da rota só é gasta numa saída que vale.
 	var error := S.confirm_departure(c.duplicate(true), _draft.team.duplicate(), _draft.extra, 0, _draft.phase, _draft.focus)
 	if error != "":
 		toast(error, true)
 		return
-	# O briefing (#88): quem pede fala antes de a equipe embarcar; pular também parte, Voltar fica na Preparação.
-	var lines := AHBriefing.departure(c, _draft.phase, _draft.team)
-	if not lines.is_empty():
-		briefing = AHBriefingDialog.open(self, lines, tr("Partir"))
-		briefing.cancel_on_back = true
-		await briefing.finished
-		var cancelled := briefing.cancelled
-		briefing = null
-		if cancelled or not is_inside_tree() or _draft.is_empty() or GameFlow.busy:
-			return
+	# A equipe mudou depois do briefing da chegada e as falas são outras (entrou quem fala): o briefing da equipe final
+	# abre antes de partir.
+	if _briefed_lines != null:
+		var lines := AHBriefing.departure(c, _draft.phase, _draft.team)
+		if not lines.is_empty() and _lines_signature(lines) != _briefed_lines:
+			_briefed_lines = _lines_signature(lines)
+			briefing = AHBriefingDialog.open(self, lines, tr("Partir"))
+			await briefing.finished
+			briefing = null
+			if _draft.is_empty() or GameFlow.busy:
+				return
 	# A rota é a que o Mapa da Rede leu (#87): a semente fixada da fase; depois da partida, a fase ganha outra.
 	var phase_id: String = _draft.phase
 	error = S.confirm_departure(c, _draft.team.duplicate(), _draft.extra, AHNetworkRadar.route_seed(c, phase_id), phase_id, _draft.focus)
@@ -2387,6 +1938,8 @@ func _depart() -> void:
 		return
 	AHNetworkRadar.spend_seed(c, phase_id)
 	_draft = {}
+	_briefed = ""
+	_briefed_lines = null
 	Campaign.save()
 	# A partida no vagão (#75): a equipe sentada no metrô a caminho da fase, depois o título dela.
 	GameFlow.travel("street", AHWagonRide.departure_card(c))
@@ -2396,10 +1949,26 @@ func briefing_open() -> bool:
 	return briefing != null and is_instance_valid(briefing)
 
 
-## A partida na plataforma: a equipe em fila e o mesmo painel da Preparação (equipe, foco, suprimentos, confirmar).
+## A partida na plataforma (#123): a tela do kit por cima da fila; aberta uma vez e refeita a cada refresh.
 func _departure_view() -> void:
-	_heading(tr("Partida"), tr("A equipe espera na plataforma, da frente (direita) para trás."))
-	_preparation(Campaign.state)
+	# O rascunho recriado (outro lugar escolhido): a tela guarda o dela, então é refeita com o novo.
+	if is_instance_valid(_departure) and not is_same(_departure.draft, _draft):
+		_close_departure()
+	if is_instance_valid(_departure):
+		_departure.rebuild()
+		return
+	_departure = AHDepartureScreen.make(_draft, sheet)
+	_departure.back_requested.connect(back_to_map)
+	_departure.start_confirmed.connect(_depart)
+	_departure.team_changed.connect(func(): station.show_departure(_departure.scene_team()))
+	add_child(_departure)
+	move_child(_departure, _panel.get_index())
+
+
+func _close_departure() -> void:
+	if is_instance_valid(_departure):
+		_departure.queue_free()
+	_departure = null
 
 
 # ---------------------------------------------------------------- Cantina, Depósito, Forja, Pesquisa
@@ -2890,7 +2459,7 @@ func _enter_shelter_then(then: Callable) -> void:
 	station.commit()
 	if Campaign.state.night.phase != "none":
 		# A câmera volta à vista geral: o Próximo passo e o Dormitório em destaque dizem que a equipe precisa dormir,
-		# e Preparar expedição fica bloqueado com o motivo (#76).
+		# e Ir ao mapa fica bloqueado com o motivo (#76).
 		close_panel()
 	elif S.visit_pending(Campaign.state):
 		open_service("train")

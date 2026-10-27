@@ -1047,14 +1047,14 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 		if missing.is_empty():
 			missing = {"title": TranslationServer.translate("Trazer %s para %s %s") % [cost_text(cost), TranslationServer.translate("reabrir") if level == 0 else TranslationServer.translate("melhorar"), name],
 				"text": TranslationServer.translate("%s As jornadas trazem sucata e fragmentos das buscas.") % room_benefit(room_id, level + 1), "action": "depart",
-				"button": TranslationServer.translate("Preparar expedição"), "room": room_id}
+				"button": TranslationServer.translate("Ir ao mapa"), "room": room_id}
 	if not missing.is_empty():
 		return missing
 	for info in AHJourneyRules.PHASES:
 		if phase_unlocked(campaign, info.id) and not campaign.completed_phases.has(info.id):
-			return {"title": TranslationServer.translate("Partir para %s") % TranslationServer.translate(info.name), "text": TranslationServer.translate(info.description), "action": "depart", "button": TranslationServer.translate("Preparar expedição"), "room": ""}
+			return {"title": TranslationServer.translate("Partir para %s") % TranslationServer.translate(info.name), "text": TranslationServer.translate(info.description), "action": "depart", "button": TranslationServer.translate("Ir ao mapa"), "room": ""}
 	return {"title": TranslationServer.translate("Voltar às ruas"), "text": TranslationServer.translate("Os Antigos ainda existem? A pergunta voltou com a equipe. Dá para jogar qualquer fase de novo pelo mapa."), "action": "depart",
-		"button": TranslationServer.translate("Preparar expedição"), "room": ""}
+		"button": TranslationServer.translate("Ir ao mapa"), "room": ""}
 
 
 # ================================================================ recuperação dos caídos (#118, #121)

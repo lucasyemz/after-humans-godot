@@ -4,7 +4,7 @@
 ## - No meio: o herói de corpo inteiro (a pose idle), sobre a sombra e um escurecido.
 ## - À direita: o painel PERSONAGEM (Fundador ou Recruta, o nível e o XP, o Treino, a vida, a velocidade e o instinto, a
 ##   relíquia, os contadores e os traços).
-## - Embaixo: VOLTAR, as teclas, as abas da Estação e PREPARAR EXPEDIÇÃO (G/X, a ação station_prepare).
+## - Embaixo: VOLTAR, as teclas, as abas da Estação e IR AO MAPA (G/X, a ação station_prepare).
 ## O Treino abre o diálogo com as duas melhorias. As ações passam pelo HUD da Estação (hud), que mostra o aviso e salva.
 class_name AHCharacterRoom
 extends Control
@@ -62,7 +62,7 @@ func rebuild() -> void:
 	if selected != RECRUIT:
 		_right(c, S.hero(c, selected))
 	_bottom(c)
-	# O painel PERSONAGEM termina acima de PREPARAR EXPEDIÇÃO (que cresce com o motivo do bloqueio e no Maior).
+	# O painel PERSONAGEM termina acima de IR AO MAPA (que cresce com o motivo do bloqueio e no Maior).
 	var right := get_node_or_null("Right") as Control
 	var prepare := get_node_or_null("Prepare") as Control
 	if right != null and prepare != null:
@@ -816,7 +816,7 @@ func _bottom(c: Dictionary) -> void:
 	AHStationFrame.keys(self, [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["Esc", tr("Voltar")],
 		["station_room_next", tr("Ao lado")], ["hide_hud", tr("Ocultar")]], 962.0, LEFT.end.x + 12.0, RIGHT.position.x - 12.0)
 	AHStationFrame.tabs(self, "characters", _nav)
-	AHStationFrame.prepare(self, tr("Preparar expedição"), "station", S.preparation_block(c), func(): hud.open_map())
+	AHStationFrame.prepare(self, tr("Ir ao mapa"), "station", S.preparation_block(c), func(): hud.open_map())
 
 
 func _nav(id: String) -> void:
