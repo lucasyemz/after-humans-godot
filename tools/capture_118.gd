@@ -97,7 +97,10 @@ func _run() -> void:
 	await _shot("characters")
 	hud._close_room_screen()
 	await _frames(20)
-	hud.open_room(S.PREPARATION)
+	hud.open_departure()
+	hud._briefed = hud._draft.phase
+	while not station.camera_settled():
+		await process_frame
 	await _frames(40)
 	await _shot("preparation")
 	if only.is_empty() or only.has("popup"):

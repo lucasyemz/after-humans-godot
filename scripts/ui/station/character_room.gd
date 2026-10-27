@@ -4,7 +4,7 @@
 ## - No meio: o herói de corpo inteiro (a pose idle), sobre a sombra e um escurecido.
 ## - À direita: o painel PERSONAGEM (Fundador ou Recruta, o nível e o XP, o Treino, a vida, a velocidade e o instinto, a
 ##   relíquia, os contadores e os traços).
-## - Embaixo: VOLTAR, as teclas, as abas da Estação e PREPARAR EXPEDIÇÃO (G/X, a ação station_prepare).
+## - Embaixo: VOLTAR, as teclas, as abas da Estação e IR AO MAPA (G/X, a ação station_prepare).
 ## O Treino abre o diálogo com as duas melhorias. As ações passam pelo HUD da Estação (hud), que mostra o aviso e salva.
 class_name AHCharacterRoom
 extends Control
@@ -13,7 +13,6 @@ const S := preload("res://scripts/flow/station_rules.gd")
 const LEFT := Rect2(28, 132, 600, 772)
 const RIGHT := Rect2(1296, 132, 596, 844)
 const DIALOG := Rect2(620, 250, 680, 0)
-const RECRUIT := "+recruit"
 const MAX_INSTINCT := 200
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 const TARGETS := {"SingleEnemy": "Inimigo", "SingleAlly": "Aliado", "SingleOtherAlly": "Outro aliado", "Self": "Si mesmo"}
@@ -52,23 +51,27 @@ func rebuild() -> void:
 		child.queue_free()
 	var c: Dictionary = Campaign.state
 	var living: Array = S.living(c)
-	if selected != RECRUIT and (selected == "" or S.hero(c, selected) == null or not S.hero(c, selected).alive):
-		selected = living[0].id if not living.is_empty() else RECRUIT
+	if selected == "" or S.hero(c, selected) == null or not S.hero(c, selected).alive:
+		# Sem ninguém no elenco (um save antigo, de antes da #118, com todos mortos), não há herói para mostrar.
+		selected = living[0].id if not living.is_empty() else ""
+	var hero = S.hero(c, selected) if selected != "" else null
+	if hero == null:
+		training = false
 	_first_focus = null
 	_top(c)
-	if selected != RECRUIT:
-		_stage(S.hero(c, selected))
+	if hero != null:
+		_stage(hero)
 	_left(c)
-	if selected != RECRUIT:
-		_right(c, S.hero(c, selected))
+	if hero != null:
+		_right(c, hero)
 	_bottom(c)
-	# O painel PERSONAGEM termina acima de PREPARAR EXPEDIÇÃO (que cresce com o motivo do bloqueio e no Maior).
+	# O painel PERSONAGEM termina acima de IR AO MAPA (que cresce com o motivo do bloqueio e no Maior).
 	var right := get_node_or_null("Right") as Control
 	var prepare := get_node_or_null("Prepare") as Control
 	if right != null and prepare != null:
 		right.size.y = minf(RIGHT.size.y, prepare.position.y - 12.0 - RIGHT.position.y)
 		right.custom_minimum_size.y = right.size.y
-	if training and selected != RECRUIT:
+	if training:
 		_training_dialog(c, S.hero(c, selected))
 	var again := get_node_or_null(focus_path) if not focus_path.is_empty() else null
 	var target: Control = again if again is Control and (again as Control).focus_mode != Control.FOCUS_NONE else _first_focus
@@ -201,11 +204,16 @@ func _left(c: Dictionary) -> void:
 	column.add_child(tabs)
 	for entry in S.living(c):
 		tabs.add_child(_hero_tab(entry))
+	_roster_line(c, column)
 	column.add_child(_divider())
-	if selected == RECRUIT:
-		_recruit_list(c, column)
+	var hero = S.hero(c, selected) if selected != "" else null
+	if hero == null:
+		var empty := AHKit.label(tr("Ninguém no Alojamento agora. Quem chegar no trem aparece aqui."), "text", AHKit.TEXT)
+		empty.name = "EmptyRoster"
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		empty.custom_minimum_size = Vector2(300, 0)
+		column.add_child(empty)
 		return
-	var hero = S.hero(c, selected)
 	column.add_child(AHKit.label(tr("Habilidades"), "panel_title", AHKit.TEXT, true, true))
 	var hero_class = GameData.row("classes", String(hero.class_id))
 	var ids: Array = hero_class.get("AbilityIds", []) if hero_class != null else []
@@ -259,25 +267,6 @@ func _hero_tab(entry: Dictionary) -> Button:
 	return tab
 
 
-## Recrutar: o botão ao lado de VOLTAR (as quatro abas dos heróis enchem a coluna, como no alvo).
-func _recruit_button() -> Button:
-	var button := Button.new()
-	button.name = "Tab_recruit"
-	button.text = ("+ " + tr("Recrutar")).to_upper()
-	button.tooltip_text = tr("Recrutar")
-	AHKit.style_as(button, "secondary")
-	button.add_theme_font_override("font", AHKit.font(true))
-	button.add_theme_font_size_override("font_size", AHKit.size("primary"))
-	if selected == RECRUIT:
-		for state in ["font_color", "font_hover_color", "font_focus_color"]:
-			button.add_theme_color_override(state, AHKit.AMBER)
-	button.custom_minimum_size = Vector2(216, 64)
-	button.pressed.connect(func(): _select(RECRUIT))
-	if selected == RECRUIT:
-		_first_focus = button
-	return button
-
-
 func _select(hero_id: String) -> void:
 	if hero_id == selected:
 		return
@@ -286,7 +275,7 @@ func _select(hero_id: String) -> void:
 	ability = ""
 	training = false
 	rebuild()
-	var tab := find_child("Tab_%s" % ("recruit" if hero_id == RECRUIT else hero_id), true, false) as Control
+	var tab := find_child("Tab_%s" % hero_id, true, false) as Control
 	if tab != null:
 		tab.grab_focus.call_deferred()
 
@@ -349,24 +338,21 @@ func _ability_detail(c: Dictionary, hero: Dictionary, ability_id: String) -> Pan
 	return inset
 
 
-## Recrutar (as classes liberadas, de graça com o voluntário). O Memorial saiu com o #118: ninguém morre.
-func _recruit_list(c: Dictionary, column: VBoxContainer) -> void:
-	column.add_child(AHKit.label(tr("Recrutar"), "panel_title", AHKit.TEXT, true, true))
-	column.add_child(AHKit.label(tr("Elenco: %d de %d") % [S.living(c).size(), S.MAX_ROSTER], "text", AHKit.MUTED))
-	for class_id in c.unlocked_classes:
-		var hero_class = GameData.row("classes", class_id)
-		var free := S.can_recruit_volunteer(c, class_id)
-		var id: String = class_id
-		var button := Button.new()
-		button.text = "%s · %s" % [tr(hero_class.DisplayName) if hero_class else class_id, tr("voluntário, de graça") if free else tr("%d sementes") % S.RECRUIT_COST]
-		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		AHKit.style_as(button, "list")
-		button.add_theme_font_override("font", AHKit.font(false))
-		button.add_theme_font_size_override("font_size", AHKit.size("row"))
-		button.custom_minimum_size = Vector2(0, 60)
-		button.disabled = not (free or S.quantity(c, "seeds") >= S.RECRUIT_COST)
-		button.pressed.connect(func(): hud._recruit(id))
-		column.add_child(button)
+## O elenco e como os novos chegam (#122: de trem, na volta das expedições; o + RECRUTAR saiu). Com alguém esperando
+## na plataforma, o caminho até lá.
+func _roster_line(c: Dictionary, column: VBoxContainer) -> void:
+	var note := AHKit.label(tr("Elenco: %d de %d · os novos chegam de trem, na volta das expedições") % [S.living(c).size(), S.MAX_ROSTER], "text", AHKit.MUTED)
+	note.name = "Roster"
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(300, 0)
+	column.add_child(note)
+	var waiting := S.train_candidate_name(c)
+	if waiting != "":
+		var go := AHKit.button(tr("%s espera na plataforma") % waiting, "secondary")
+		go.name = "ToTrain"
+		go.custom_minimum_size = Vector2(0, 60)
+		go.pressed.connect(func(): hud.open_service("train"))
+		column.add_child(go)
 
 
 func _divider() -> TextureRect:
@@ -806,17 +792,13 @@ func _fit_keys(buttons: Array) -> void:
 # ---------------------------------------------------------------- embaixo
 
 func _bottom(c: Dictionary) -> void:
-	var back := AHStationFrame.back_button(self, func(): hud.close_panel())
-	var recruit := _recruit_button()
-	add_child(recruit)
-	recruit.reset_size()
-	recruit.position = Vector2(back.position.x + maxf(216.0, back.get_combined_minimum_size().x) + 12.0, AHStationFrame.BACK_Y)
+	AHStationFrame.back_button(self, func(): hud.close_panel())
 	# As teclas entre os dois painéis (Voltar mostra o Esc: ui_cancel volta sempre, com qualquer troca nas Opções).
 	# O cômodo ao lado (#131): o Dormitório e o Bar, sem voltar à vista geral.
 	AHStationFrame.keys(self, [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["Esc", tr("Voltar")],
 		["station_room_next", tr("Ao lado")], ["hide_hud", tr("Ocultar")]], 962.0, LEFT.end.x + 12.0, RIGHT.position.x - 12.0)
 	AHStationFrame.tabs(self, "characters", _nav)
-	AHStationFrame.prepare(self, tr("Preparar expedição"), "station", S.preparation_block(c), func(): hud.open_map())
+	AHStationFrame.prepare(self, tr("Ir ao mapa"), "station", S.preparation_block(c), func(): hud.open_map())
 
 
 func _nav(id: String) -> void:
