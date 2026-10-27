@@ -32,8 +32,8 @@ roteiro no código da `main`: o Nick cai na patrulha e some da rua, e nada avisa
   texto da ação de interagir e o ponto do marcador. Ele serve também para o herói preso da #188 (Claude 2).
 - **O resumo da volta** separa as listas, cada nome com os dias:
   - "A equipe carregou: Nick (volta em 2 dias)";
-  - "Foram para a Enfermaria: …" (com leito);
-  - "Foram para o Dormitório, em recuperação: …" (sem leito).
+  - "Foi para a Enfermaria: …" (com leito; "Foram", com mais de um);
+  - "Foi para o Dormitório, em recuperação: …" (sem leito).
 - **O save:** os caídos ficam em `expedition.downed` (o mapa, a posição e a casa) e os levantados em
   `expedition.carried`. Salvar e abrir no meio da exploração mantém os dois. O save antigo, sem esses campos, abre como
   antes: quem já tinha caído não vira corpo (só quem cai numa luta depois da atualização) e volta com a recuperação
