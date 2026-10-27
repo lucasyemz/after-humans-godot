@@ -8,7 +8,16 @@ extends RefCounted
 const J = preload("res://scripts/flow/journey_rules.gd")
 const S = preload("res://scripts/flow/station_rules.gd")
 
-const TABS := ["Mapas", "Clima", "Ajustes", "Recursos", "Heróis", "Combate", "Jornada"]
+const TABS := ["Mapas", "Clima", "Ajustes", "Ambiência", "Recursos", "Heróis", "Combate", "Jornada"]
+## A aba Ambiência (#153): cada campo do perfil do lugar com o passo de cada toque.
+const AMBIENCE_STEPS := [["saturation", 0.04, "Saturação"], ["contrast", 0.04, "Contraste"], ["tint_amount", 0.05, "Força da cor"],
+	["warmth", 0.01, "Calor das luzes"], ["vignette", 0.05, "Vinheta"], ["grain", 0.01, "Grão"], ["max_blur", 1.0, "Desfoque"],
+	["focus_width", 0.04, "Faixa nítida"], ["glow_intensity", 0.1, "Glow"], ["glow_threshold", 0.05, "Limiar do glow"],
+	["fog_density", 0.1, "Névoa"], ["fog_height_density", 0.02, "Névoa no chão"],
+	["volumetric", 0.1, "Névoa volumétrica"], ["dust", 0.1, "Poeira"], ["leaves", 0.1, "Folhas"],
+	["embers", 0.1, "Fagulhas da fogueira"]]
+## Os campos que são uma fração da partícula (0 a 1): o Admin não passa de 1.
+const AMBIENCE_FRACTIONS := ["dust", "leaves", "embers"]
 ## Os tempos da rua (journey_rules.WEATHERS) com o nome na tela.
 const WEATHER_NAMES := {"clear": "Céu limpo", "sunset": "Pôr do sol", "mist": "Névoa", "night": "Noite",
 	"rain": "Chuva", "storm": "Tempestade", "nightRain": "Noite com chuva"}
@@ -42,6 +51,14 @@ static func all() -> Array:
 	for quality in 4:
 		out.append(_a("quality_%d" % quality, "Ajustes", "Qualidade: %s%s" % [["Baixa", "Média", "Alta", "Ultra"][quality], " (agora)" if Settings.level == quality else ""], "any", false))
 	out.append(_a("old_keys", "Ajustes", "Teclas de teste da rua (R T P C K)", "any", false))
+	var place := _ambience_place()
+	var now := AHAmbience.profile(place) if place != "" else {}
+	for spec in AMBIENCE_STEPS:
+		var value: float = float(now.get(spec[0], 0.0)) if spec[0] != "warmth" else float(Array(now.get("highlights_tint", [0, 0, 0]))[0])
+		out.append(_a("amb_%s_up" % spec[0], "Ambiência", "%s: mais (agora %.2f)" % [spec[2], value], "street", false))
+		out.append(_a("amb_%s_down" % spec[0], "Ambiência", "%s: menos" % spec[2], "street", false))
+	out.append(_a("amb_copy", "Ambiência", "Copiar o perfil (para mandar os números)", "street", false))
+	out.append(_a("amb_reset", "Ambiência", "Voltar ao perfil do arquivo", "street", false))
 	for spec in [["seeds", 20, "Sementes"], ["scrap", 10, "Sucata"], ["fragments", 5, "Fragmentos"], ["bandages", 5, "Curativos"],
 			["food", 4, "Comida da jornada"], ["water", 5, "Água da Estação"]]:
 		out.append(_a("add_%s" % spec[0], "Recursos", "+%d %s" % [spec[1], spec[2]], "campaign", true))
@@ -129,6 +146,8 @@ static func run(id: String) -> String:
 		return TranslationServer.translate("Tempo: %s") % TranslationServer.translate(WEATHER_NAMES[weather])
 	if id.begins_with("zoom_"):
 		return _zoom(id.trim_prefix("zoom_"))
+	if id.begins_with("amb_"):
+		return _ambience(scene, id.trim_prefix("amb_"))
 	if id.begins_with("speed_"):
 		var speed := int(id.trim_prefix("speed_"))
 		Admin.battle_speed = float(speed)
@@ -303,6 +322,53 @@ static func _map(target: String) -> String:
 	Campaign.save()
 	GameFlow.change_to("street")
 	return TranslationServer.translate("Indo para %s") % TranslationServer.translate(String(J.phase(phase_id).name))
+
+
+## O lugar aberto (o id do perfil de ambiência), ou "" fora da jornada.
+static func _ambience_place() -> String:
+	var tree := Engine.get_main_loop() as SceneTree
+	var scene := tree.current_scene if tree != null else null
+	return scene.ambience_id() if scene != null and scene.has_method("ambience_id") else ""
+
+
+## A ambiência ao vivo (#153): o campo sobe ou desce um passo por cima do perfil do lugar; copiar põe o perfil na área
+## de transferência; voltar desfaz o que a barra mudou.
+static func _ambience(scene: Node, spec: String) -> String:
+	var place: String = scene.ambience_id()
+	if spec == "copy":
+		var text := AHAmbience.profile_text(place)
+		DisplayServer.clipboard_set(text)
+		return TranslationServer.translate("Perfil copiado: %s") % text
+	if spec == "reset":
+		Admin.ambience.erase(place)
+		scene.apply_ambience()
+		return TranslationServer.translate("Ambiência do arquivo")
+	var field := spec.rsplit("_", true, 1)[0]
+	var up := spec.ends_with("_up")
+	var specs: Array = AMBIENCE_STEPS.filter(func(s): return s[0] == field)
+	if specs.is_empty():
+		return TranslationServer.translate("Campo de ambiência desconhecido: %s") % field
+	var entry: Array = specs[0]
+	var step: float = float(entry[1]) * (1.0 if up else -1.0)
+	var now := AHAmbience.profile(place)
+	var override: Dictionary = Admin.ambience.get(place, {})
+	if field == "warmth":
+		# Mais calor: as luzes mais laranja e as sombras mais frias (o contraste quente contra frio).
+		var high: Array = Array(now.highlights_tint).duplicate()
+		var low: Array = Array(now.shadows_tint).duplicate()
+		high[0] = snappedf(float(high[0]) + step, 0.001)
+		high[2] = snappedf(float(high[2]) - step, 0.001)
+		low[2] = snappedf(float(low[2]) + step, 0.001)
+		override.highlights_tint = high
+		override.shadows_tint = low
+	else:
+		override[field] = maxf(0.0, snappedf(float(now.get(field, 0.0)) + step, 0.001))
+		if AMBIENCE_FRACTIONS.has(field):
+			override[field] = minf(override[field], 1.0)
+	Admin.ambience[place] = override
+	scene.apply_ambience()
+	# O nome do campo como na aba (o rótulo em português), não o técnico.
+	return "%s: %s" % [TranslationServer.translate(String(entry[2])), str(override.get(field, override.get("highlights_tint")))]
 
 
 static func _zoom(spec: String) -> String:
