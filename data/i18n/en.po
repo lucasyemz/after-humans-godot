@@ -151,7 +151,7 @@ msgstr "The save in slot %d could not be opened. A new campaign writes over it, 
 #: scripts/ui/title_screen.gd:507
 #: scripts/ui/exploration_hud.gd:1313
 #: scripts/ui/refuge_hud.gd:1706
-#: scripts/ui/station/character_room.gd:747
+#: scripts/ui/station/character_room.gd:760
 msgid "Cancelar"
 msgstr "Cancel"
 
@@ -240,7 +240,7 @@ msgstr "+1 bandage"
 
 #: scripts/flow/fight_rewards.gd:137
 #: scripts/ui/character_sheet.gd:126
-#: scripts/ui/station/character_room.gd:581
+#: scripts/ui/station/character_room.gd:594
 msgid "Relíquia: %s"
 msgstr "Relic: %s"
 
@@ -364,7 +364,7 @@ msgid "Trauma"
 msgstr "Trauma"
 
 #: scripts/ui/character_sheet.gd:137
-#: scripts/ui/station/character_room.gd:427
+#: scripts/ui/station/character_room.gd:440
 msgid "%s ×%d"
 msgstr "%s ×%d"
 
@@ -389,7 +389,7 @@ msgstr "Passive effects"
 #: scripts/ui/character_sheet.gd:287
 #: scripts/ui/character_sheet.gd:301
 #: scripts/ui/combat_hud.gd:1126
-#: scripts/ui/station/character_room.gd:639
+#: scripts/ui/station/character_room.gd:652
 msgid "Nenhum"
 msgstr "None"
 
@@ -412,7 +412,7 @@ msgstr "Instinct %d/200 · at 200, crisis"
 
 #: scripts/ui/character_sheet.gd:308
 #: scripts/ui/combat_hud.gd:1176
-#: scripts/ui/station/character_room.gd:454
+#: scripts/ui/station/character_room.gd:467
 msgid "Velocidade %d"
 msgstr "Speed %d"
 
@@ -609,7 +609,7 @@ msgid "Aperte uma tecla…"
 msgstr "Press a key…"
 
 #: scripts/ui/options_panel.gd:121
-#: scripts/ui/station/character_room.gd:587
+#: scripts/ui/station/character_room.gd:600
 msgid "Trocar"
 msgstr "Change"
 
@@ -957,7 +957,7 @@ msgstr "Bandages %d"
 #: scripts/ui/exploration_hud.gd:1255
 #: scripts/ui/exploration_hud.gd:1378
 #: scripts/ui/refuge_hud.gd:1483
-#: scripts/ui/station/character_room.gd:530
+#: scripts/ui/station/character_room.gd:543
 msgid "%d sementes"
 msgstr "%d seeds"
 
@@ -1459,7 +1459,7 @@ msgstr "Platform 1"
 
 #: scripts/ui/refuge_hud.gd:551
 #: scripts/ui/refuge_hud.gd:1903
-#: scripts/ui/station/character_room.gd:788
+#: scripts/ui/station/character_room.gd:801
 #: scripts/flow/station_rules.gd:1160
 msgid "Ir ao mapa"
 msgstr "Go to map"
@@ -1489,12 +1489,12 @@ msgstr "Camera"
 
 #: scripts/ui/refuge_hud.gd:563
 #: scripts/ui/refuge_hud.gd:565
-#: scripts/ui/station/character_room.gd:785
+#: scripts/ui/station/character_room.gd:798
 msgid "Selecionar"
 msgstr "Select"
 
 #: scripts/ui/refuge_hud.gd:563
-#: scripts/ui/station/character_room.gd:786
+#: scripts/ui/station/character_room.gd:799
 msgid "Ao lado"
 msgstr "Next room"
 
@@ -2236,7 +2236,7 @@ msgid "+%d XP"
 msgstr "+%d XP"
 
 #: scripts/ui/station/station_report.gd:430
-#: scripts/ui/station/character_room.gd:445
+#: scripts/ui/station/character_room.gd:458
 msgid "Vida"
 msgstr "Life"
 
@@ -2249,7 +2249,7 @@ msgid "Abates"
 msgstr "Kills"
 
 #: scripts/ui/station/station_report.gd:470
-#: scripts/ui/station/character_room.gd:581
+#: scripts/ui/station/character_room.gd:594
 msgid "Sem relíquia"
 msgstr "No relic"
 
@@ -2503,142 +2503,146 @@ msgstr "Another ally"
 msgid "Si mesmo"
 msgstr "Self"
 
-#: scripts/ui/station/character_room.gd:92
+#: scripts/ui/station/character_room.gd:98
 msgid "Sala dos Personagens"
 msgstr "Characters Room"
 
-#: scripts/ui/station/character_room.gd:204
+#: scripts/ui/station/character_room.gd:211
+msgid "Ninguém no Alojamento agora. Quem chegar no trem aparece aqui."
+msgstr "No one in the Quarters right now. Whoever arrives on the train shows up here."
+
+#: scripts/ui/station/character_room.gd:217
 msgid "Habilidades"
 msgstr "Abilities"
 
-#: scripts/ui/station/character_room.gd:240
+#: scripts/ui/station/character_room.gd:253
 msgid "%d d"
 msgstr "%d d"
 
-#: scripts/ui/station/character_room.gd:310
+#: scripts/ui/station/character_room.gd:323
 msgid "Dano %d–%d"
 msgstr "Damage %d–%d"
 
-#: scripts/ui/station/character_room.gd:312
+#: scripts/ui/station/character_room.gd:325
 msgid "Cura %d–%d"
 msgstr "Healing %d–%d"
 
-#: scripts/ui/station/character_room.gd:315
+#: scripts/ui/station/character_room.gd:328
 msgid "Origem: posições %s"
 msgstr "From: positions %s"
 
-#: scripts/ui/station/character_room.gd:317
+#: scripts/ui/station/character_room.gd:330
 msgid "Alvo: posições %s"
 msgstr "Target: positions %s"
 
-#: scripts/ui/station/character_room.gd:331
+#: scripts/ui/station/character_room.gd:344
 msgid "Elenco: %d de %d · os novos chegam de trem, na volta das expedições"
 msgstr "Roster: %d of %d · newcomers arrive by train, when expeditions return"
 
-#: scripts/ui/station/character_room.gd:338
+#: scripts/ui/station/character_room.gd:351
 msgid "%s espera na plataforma"
 msgstr "%s waits on the platform"
 
-#: scripts/ui/station/character_room.gd:374
+#: scripts/ui/station/character_room.gd:387
 msgid "Personagem"
 msgstr "Character"
 
-#: scripts/ui/station/character_room.gd:389
+#: scripts/ui/station/character_room.gd:402
 msgid "Recruta"
 msgstr "Recruit"
 
-#: scripts/ui/station/character_room.gd:389
+#: scripts/ui/station/character_room.gd:402
 msgid "Fundador"
 msgstr "Founder"
 
-#: scripts/ui/station/character_room.gd:405
+#: scripts/ui/station/character_room.gd:418
 msgid "Nível %d · máximo"
 msgstr "Level %d · max"
 
-#: scripts/ui/station/character_room.gd:407
+#: scripts/ui/station/character_room.gd:420
 msgid "Nível %d · XP %d / %d"
 msgstr "Level %d · XP %d / %d"
 
-#: scripts/ui/station/character_room.gd:429
+#: scripts/ui/station/character_room.gd:442
 msgid "Melhorias: %s"
 msgstr "Upgrades: %s"
 
-#: scripts/ui/station/character_room.gd:455
+#: scripts/ui/station/character_room.gd:468
 msgid "Instinto %d / %d"
 msgstr "Instinct %d / %d"
 
-#: scripts/ui/station/character_room.gd:469
+#: scripts/ui/station/character_room.gd:482
 #: scripts/flow/station_rules.gd:1146
 msgid "Ver a Enfermaria"
 msgstr "See the Infirmary"
 
-#: scripts/ui/station/character_room.gd:478
+#: scripts/ui/station/character_room.gd:491
 msgid "Trauma da última crise"
 msgstr "Trauma from the last crisis"
 
-#: scripts/ui/station/character_room.gd:481
+#: scripts/ui/station/character_room.gd:494
 msgid "Tratar (%d sementes)"
 msgstr "Treat (%d seeds)"
 
-#: scripts/ui/station/character_room.gd:483
+#: scripts/ui/station/character_room.gd:496
 msgid "Trauma tratado."
 msgstr "Trauma treated."
 
-#: scripts/ui/station/character_room.gd:489
+#: scripts/ui/station/character_room.gd:502
 msgid "Expedições %d"
 msgstr "Expeditions %d"
 
-#: scripts/ui/station/character_room.gd:494
+#: scripts/ui/station/character_room.gd:507
 msgid "Abates %d"
 msgstr "Kills %d"
 
-#: scripts/ui/station/character_room.gd:524
+#: scripts/ui/station/character_room.gd:537
 msgid "nível máximo"
 msgstr "max level"
 
-#: scripts/ui/station/character_room.gd:526
+#: scripts/ui/station/character_room.gd:539
 msgid "faltam %d XP"
 msgstr "%d XP short"
 
-#: scripts/ui/station/character_room.gd:528
+#: scripts/ui/station/character_room.gd:541
 msgid "faltam sementes"
 msgstr "not enough seeds"
 
-#: scripts/ui/station/character_room.gd:530
-#: scripts/ui/station/character_room.gd:702
+#: scripts/ui/station/character_room.gd:543
+#: scripts/ui/station/character_room.gd:715
 msgid "1 semente"
 msgstr "1 seed"
 
-#: scripts/ui/station/character_room.gd:531
-#: scripts/ui/station/character_room.gd:760
+#: scripts/ui/station/character_room.gd:544
+#: scripts/ui/station/character_room.gd:773
 msgid "Treinar"
 msgstr "Train"
 
-#: scripts/ui/station/character_room.gd:582
+#: scripts/ui/station/character_room.gd:595
 msgid "Equipe uma relíquia ao preparar a expedição."
 msgstr "Equip a relic when preparing the expedition."
 
-#: scripts/ui/station/character_room.gd:608
+#: scripts/ui/station/character_room.gd:621
 msgid "Traços"
 msgstr "Traits"
 
-#: scripts/ui/station/character_room.gd:629
+#: scripts/ui/station/character_room.gd:642
 msgid "Pontos fortes"
 msgstr "Strengths"
 
-#: scripts/ui/station/character_room.gd:629
+#: scripts/ui/station/character_room.gd:642
 msgid "Pontos fracos"
 msgstr "Weaknesses"
 
-#: scripts/ui/station/character_room.gd:699
+#: scripts/ui/station/character_room.gd:712
 msgid "Treino · nível %d"
 msgstr "Training · level %d"
 
-#: scripts/ui/station/character_room.gd:702
+#: scripts/ui/station/character_room.gd:715
 msgid "Escolha uma melhoria. O treino gasta o XP do nível e %s."
 msgstr "Choose an upgrade. Training spends the level's XP and %s."
 
-#: scripts/ui/station/character_room.gd:730
+#: scripts/ui/station/character_room.gd:743
 msgid "Já tem: %d"
 msgstr "Already has: %d"
 
