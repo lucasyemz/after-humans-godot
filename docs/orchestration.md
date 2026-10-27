@@ -5,11 +5,32 @@ nuvem. O Claude local (esta conversa, ou uma nova) revisa e integra os PRs.
 
 ## Quem faz o quê
 
+### As quatro frentes (desde 26/10/2026)
+
+Cada frente tem a sua etiqueta nas issues. Ninguém pega issue de outra frente, para dois agentes nunca mexerem no mesmo
+arquivo ao mesmo tempo.
+
+| Agente | Etiqueta | Branches | Frente |
+|---|---|---|---|
+| **Claude 1** (nuvem) | `claude-1` | `claude-cloud-<issue>` | **Estação e regras:** ninguém morre e Enfermaria (#118, #121), a Estação (#131), a preparação (#123), o trem dos recrutas (#122), limites e postos (#119), a noite (#132), o som do trem (#133), as skins (#138) |
+| **Claude 2** (nuvem) | `claude-2` | `claude2-<issue>` | **Exploração, mapas, tutorial e ambiência:** o tutorial (#144, #145, #147), a exploração (#129, #143, #142), a água e o Cais (#140, #141), a ambiência (#153, #154) |
+| **Awesomic 1** | `awesomic-1` | `design-<assunto>` | **Design da Estação, da HUD e das skins:** a Enfermaria e a Estação nova (#120, #124, PR #139), os ajustes depois de jogar (#134, PR #148), as skins do Bento (#137) |
+| **Awesomic 2** | `awesomic-2` | `design2-<assunto>` | **Design de cenários, tutorial e ambiência:** o mapa do tutorial e as telas (#146, #147, PR #152), a arte da luz prática (#154), as camadas dos mapas (fase 3 de `docs/design/ambience.md`), as camadas do Armazém e do Navio (#141), se o Claude 2 pedir |
+| Claude local | — | `main` | Revisa e junta os PRs, roda os testes no Windows, faz o build e escreve as issues e as mensagens |
+
+**Regras entre as frentes:**
+- um PR por issue, para a `main`, com a `main` trazida para o branch antes de abrir o PR;
+- os arquivos de todos (`data/i18n/en.po`, `tools/i18n_ignore.txt`, `data/presentation/*.json`, o kit) dão conflito: o
+  Claude local resolve na junção;
+- uma issue nova entra na frente da área dela. Na dúvida, o Lucas decide.
+
+### Os papéis
+
 | Agente | Branch | Faz | Ciclo |
 |---|---|---|---|
-| Claude da nuvem | `claude-cloud` | código, regras, integração, testes (issues `[Claude]`) | dev → QA (`.claude/agents/qa.md`) até APROVADO |
-| Codex | `codex-design` | imagens e propostas de tela (issues `[Codex]`) | designer → QA de design (`docs/design/qa.md`) |
-| Claude local | `main` | revisa, faz o merge, integra a arte do Codex e atualiza os branches | QA local antes do push |
+| Claude da nuvem (1 e 2) | os da frente | código, regras, integração, testes (issues `[Claude]`) | dev → QA (`.claude/agents/qa.md`) até APROVADO |
+| Codex e Awesomic (1 e 2) | os da frente | imagens e propostas de tela (issues `[Codex]`, `[Design]`) | designer → QA de design (`docs/design/qa.md`) |
+| Claude local | `main` | revisa, faz o merge, integra a arte e atualiza os branches | QA local antes do push |
 
 Issues: `[Agente] Área: descrição`, etiquetas `agent:claude` ou `agent:codex` e o tipo; as de decisão do Lucas levam
 `question`. Só o Lucas fecha uma issue, depois de jogar.
