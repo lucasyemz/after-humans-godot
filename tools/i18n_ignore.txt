@@ -1438,3 +1438,6 @@ station_rules.gd: recovered
 station_build.gd: infirmary
 station_build.gd: infirmary@2
 tutorial_guide.gd: Briefing
+station_report.gd: tutorial
+station_report.gd: bandages
+station_report.gd: tool
