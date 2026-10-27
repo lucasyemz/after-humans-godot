@@ -1369,6 +1369,16 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	return command
 
 
+## Liga as travas do tutorial nas ações que já estão na tela (sem remontar as habilidades: o foco adiado delas fica).
+func apply_tutorial_locks() -> void:
+	for child in _actions.get_children():
+		var kind: String = child.get_meta("kind", "")
+		if tutorial_locks.has(kind):
+			child.set_meta("locked", true)
+			child.disabled = true
+			(child.get_node("Icon") as Control).modulate = AHKit.LOCKED
+
+
 ## O que o tutorial destaca (na tela de 1920 x 1080): "abilities" (as quatro habilidades), "actions" (Mover e Defender),
 ## "item" (a Mochila) ou "targets" (os alvos acesos). Vazio quando não está na tela.
 func tutorial_rect(kind: String) -> Rect2:

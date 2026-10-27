@@ -110,7 +110,12 @@ func _explore() -> void:
 func _process(_delta: float) -> void:
 	# Com uma janela aberta (o Menu, as Opções, a Mochila, a conversa), a dica sai da frente e volta ao fechar.
 	hint.visible = not corridor.hud.modal_open() and corridor.hud.find_child("Briefing", true, false) == null
-	hint.set_avoid(_heads())
+	var avoid := _heads()
+	# O aviso da tecla (Embarcar, Vasculhar) também fica à vista.
+	var prompt: Control = corridor.hud.get("_prompt")
+	if prompt != null and prompt.visible:
+		avoid.append(prompt.get_global_rect())
+	hint.set_avoid(avoid)
 	if street._arena.active:
 		_combat_focus()
 		return
@@ -124,6 +129,10 @@ func _process(_delta: float) -> void:
 			var button: Control = corridor.hud.get("_bag_button")
 			hint.set_focus(button.get_global_rect() if button != null and button.is_visible_in_tree() else Rect2())
 		"search", "train":
+			# Passou do armário sem vasculhar: a dica sai (e a da patrulha pode vir na hora).
+			if hint.step_id == "search" and not (corridor._action.is_valid() and corridor._action.get_method() == "_search_scenario_prop"):
+				hint.hide_hint()
+				return
 			# O objeto inteiro (a marca fica em cima dele): o retângulo desce do ponto da marca até o chão.
 			var point = corridor._action_point()
 			hint.set_focus(_world_rect(point - Vector3(0, 0.9, 0), Vector2(170, 230)) if point != null else Rect2())
@@ -156,7 +165,7 @@ func _on_combat(kind: String, data: Dictionary) -> void:
 			if _fight_step == 1 and not done("ability"):
 				# A primeira escolha trava: só as habilidades (as ações voltam quando ela é feita).
 				hud.tutorial_locks = ["move", "defend", "item", "flee"]
-				hud._build_abilities(false)
+				hud.apply_tutorial_locks()
 				show("ability", "left")
 			elif _fight_step == 4 and not done("position"):
 				show("position", "left")
