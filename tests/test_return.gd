@@ -210,10 +210,12 @@ func _nobody_back() -> void:
 	var team: Array = c.station.last_return.team
 	c = _returned([], team)
 	var station := await _open(c)
-	if not t.check(station != null, "a Estação abre sem sobreviventes"):
+	if not t.check(station != null, "a Estação abre com a equipe toda caída"):
 		return
-	t.check(await _until(func(): return station.hud.current == "report", 20.0), "sem ninguém vivo, o trem chega vazio e o relatório abre")
-	t.equal(station.lineup.size(), 0, "ninguém desce")
+	t.check(await _until(func(): return station.hud.current == "report", 30.0), "com a equipe toda caída, o relatório abre")
+	# Ninguém morre (#118): a equipe caída desce do trem, devagar, e vai para a recuperação.
+	t.equal(station.lineup.size(), team.size(), "quem caiu desce do trem")
+	t.check(station._arrivals.all(func(a): return a.hurt), "e desce no passo de ferido")
 
 
 ## O jogo fecha no meio da chegada: o save tem o relatório não visto; reaberto, a chegada começa de novo.

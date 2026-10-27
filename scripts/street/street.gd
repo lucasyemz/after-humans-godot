@@ -1074,7 +1074,7 @@ func end_fight() -> void:
 	combat_lift = 0.0
 
 
-## Quem morreu sai da equipe; os outros voltam a andar do lugar onde terminaram a luta.
+## Quem caiu sai da equipe até a volta (#118); os outros voltam a andar do lugar onde terminaram a luta.
 func remove_dead_heroes() -> void:
 	for index in range(party_ids.size() - 1, -1, -1):
 		var hero = Campaign.hero(party_ids[index])

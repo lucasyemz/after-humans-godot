@@ -5,7 +5,7 @@ nuvem. O Claude local (esta conversa, ou uma nova) revisa e integra os PRs.
 
 ## Quem faz o quê
 
-### As quatro frentes (desde 26/10/2026)
+### As frentes (desde 26/10/2026; a Awesomic 2 saiu em 27/10)
 
 Cada frente tem a sua etiqueta nas issues. Ninguém pega issue de outra frente, para dois agentes nunca mexerem no mesmo
 arquivo ao mesmo tempo.
@@ -14,15 +14,64 @@ arquivo ao mesmo tempo.
 |---|---|---|---|
 | **Claude 1** (nuvem) | `claude-1` | `claude-cloud-<issue>` | **Estação e regras:** ninguém morre e Enfermaria (#118, #121), a Estação (#131), a preparação (#123), o trem dos recrutas (#122), limites e postos (#119), a noite (#132), o som do trem (#133), as skins (#138) |
 | **Claude 2** (nuvem) | `claude-2` | `claude2-<issue>` | **Exploração, mapas, tutorial e ambiência:** o tutorial (#144, #145, #147), a exploração (#129, #143, #142), a água e o Cais (#140, #141), a ambiência (#153, #154) |
-| **Awesomic 1** | `awesomic-1` | `design-<assunto>` | **Design da Estação, da HUD e das skins:** a Enfermaria e a Estação nova (#120, #124, PR #139), os ajustes depois de jogar (#134, PR #148), as skins do Bento (#137) |
-| **Awesomic 2** | `awesomic-2` | `design2-<assunto>` | **Design de cenários, tutorial e ambiência:** o mapa do tutorial e as telas (#146, #147, PR #152), a arte da luz prática (#154), as camadas dos mapas (fase 3 de `docs/design/ambience.md`), as camadas do Armazém e do Navio (#141), se o Claude 2 pedir |
+| **Awesomic 1** | `awesomic-1` | `design-<assunto>` | **Todo o design:** a Estação, a HUD e as skins (#120, #124, PR #139; #134, PR #148; #137) e, desde 27/10, os cenários, o tutorial e a ambiência que eram da Awesomic 2 (#146, a arte da #147, da #154 e as camadas da #141, se o Claude 2 pedir) |
 | Claude local | — | `main` | Revisa e junta os PRs, roda os testes no Windows, faz o build e escreve as issues e as mensagens |
 
 **Regras entre as frentes:**
 - um PR por issue, para a `main`, com a `main` trazida para o branch antes de abrir o PR;
+- uma branch nova por issue, saída da `main`; quando o PR entra, a branch é apagada (o GitHub apaga sozinho com
+  "Automatically delete head branches" ligado; quem juntar confere) e ninguém volta a usá-la;
 - os arquivos de todos (`data/i18n/en.po`, `tools/i18n_ignore.txt`, `data/presentation/*.json`, o kit) dão conflito: o
   Claude local resolve na junção;
-- uma issue nova entra na frente da área dela. Na dúvida, o Lucas decide.
+- uma issue nova entra na frente da área dela. Na dúvida, o Lucas decide;
+- a arte de cenário e de luz se prova na captura do jogo em Forward+, que só o Orquestrador PC (com placa de vídeo) tira:
+  a nuvem e a Awesomic não têm placa de vídeo, e montagem 2D não vale como prova.
+
+### Os dois orquestradores (desde 26/10/2026)
+
+| Orquestrador | Onde | Faz |
+|---|---|---|
+| **Claude Orquestrador Nuvem** | claude.ai/code, pelo celular | conversa com o Lucas quando ele não está no PC; escreve issues e mensagens; revisa PRs; junta os PRs simples |
+| **Claude Orquestrador PC** | o Claude local no Windows | o teste definitivo: junta os PRs que mexem no jogo, roda os testes e as capturas na Godot do Windows, faz o build, cuida da referência da Unreal (que só existe nesse PC) e dos saves do Lucas |
+
+**Quem junta o quê:**
+Desde 27/10/2026 o da nuvem junta sozinho, na ronda automática (abaixo), com o CI verde e o revisor em PRONTO PARA O MERGE:
+- **os PRs de documentos;**
+- **os PRs de código que não mudam o que se vê** (Claude 1 e Claude 2), com um comentário no PR avisando que falta o teste
+  no Windows. O do PC faz esse teste depois, na `main`.
+
+**O que muda o que se vê nunca entra sozinho** (decisão do Lucas, 27/10, depois do #156): arte em `art/`, cenários, telas,
+HUD, luz e animação, seja PR de design ou de código. O revisor lê o diff, mas não vê se fica bonito no mapa. O da nuvem
+resume o PR para o Lucas com as capturas do jogo e espera o ok dele no PR ou na conversa.
+
+**Para os dois não juntarem ao mesmo tempo:** antes de juntar, comentar no PR "Integrando (Orquestrador Nuvem)" ou "Integrando (Orquestrador PC)". Se o outro já comentou, não mexer.
+
+**O que os dois fazem igual:**
+- as issues no formato `[Agente] Área: descrição`, com a frente certa (`claude-1`, `claude-2`, `awesomic-1`);
+- os textos em português;
+- as decisões do Lucas registradas na issue ou no PR;
+- nunca escrever `@codex` ou `@claude` em comentários.
+
+### A ronda automática do Orquestrador Nuvem (desde 27/10/2026)
+
+Uma tarefa agendada acorda o Orquestrador Nuvem de hora em hora (e os eventos dos PRs também o acordam). Em cada ronda:
+
+1. **Lê os PRs abertos para a `main`:** o CI, o comentário do revisor, o escopo (os arquivos), os conflitos e os
+   comentários do Lucas.
+2. **Junta** quando tudo bate: CI verde, revisor em PRONTO PARA O MERGE, sem conflito, sem pedido do Lucas em aberto no
+   PR, sem a etiqueta `descartar` e sem "Integrando (Orquestrador PC)". O que muda o que se vê espera o ok do Lucas. Antes, comenta "Integrando (Orquestrador Nuvem)"; nos de código, avisa que
+   falta o teste no Windows. A branch é apagada depois do merge.
+3. **Devolve para o agente** quando o PR pede ajuste: o revisor em AJUSTAR ANTES, o CI vermelho ou um pedido do Lucas.
+   O Claude 1 e o Claude 2 recebem a mensagem direto na sessão deles; o Awesomic 1 e o 2 recebem pela issue e pelo
+   Lucas, até eles poderem ler o GitHub sozinhos.
+4. **Passa a próxima tarefa** a um agente parado: a próxima issue aberta da etiqueta dele, na ordem da tabela das
+   frentes. Só issues que o Lucas pediu; nada fora delas.
+5. **Pergunta ao Lucas** e não junta quando: o revisor diz NÃO INTEGRAR; o PR traz uma escolha entre alternativas, uma
+   regra nova ou um texto da história que o Lucas ainda não aprovou; o PR sai da issue dele; ou dois PRs se contradizem.
+   Os números de balanceamento que o PR marca como proposta podem entrar, e a pergunta vai para o Lucas.
+
+O que a ronda nunca faz: criar issue ou tarefa por conta própria, mudar o escopo de uma issue, mexer no código do jogo,
+fechar issue sem o PR dela na `main`.
 
 ### Os papéis
 
@@ -72,8 +121,8 @@ comentário em cada issue e um PR para a main no fim). Leia cada uma com "gh iss
    título, se mexeu).
 4. Arte pesada do Codex: guardar o original numa tag (`codex-prN-originals`), deixar na `main` só o que o jogo usa.
 5. Passar pela QA (agente `qa`) quando o merge pede código novo; corrigir até APROVADO.
-6. Push na `main`, comentário no PR, e `git push origin main:claude-cloud main:codex-design` só quando o agente não
-   estiver no meio de uma rodada.
+6. Push na `main`, comentário no PR e a branch do PR apagada. As branches fixas antigas (`claude-cloud`,
+   `codex-design`) não existem mais: cada issue nova sai da `main` numa branch própria.
 
 ## Revisor dos PRs (terceiro agente)
 

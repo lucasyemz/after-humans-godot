@@ -93,14 +93,16 @@ func _journey(t, size: int) -> void:
 	t.check(S.resolve_night(c), "%d: a noite passa" % size)
 	t.equal(c.night.results.size(), size, "%d: um resultado da noite por herói" % size)
 	S.finish_dawn(c)
-	# A derrota com a equipe pequena: todos caem, ninguém fantasma no memorial.
+	# A derrota com a equipe pequena: todos caem e voltam Caídos (#118), ninguém fica no memorial.
 	var d: Dictionary = Campaign.create_initial(40 + size)
 	t.equal(S.confirm_departure(d, team, 0, 200 + size, "fase_1"), "", "%d: parte para a derrota" % size)
 	for hero_id in team:
 		S.hero(d, hero_id).alive = false
 	J.end_combat(d, "defeat", false, "teste")
 	t.equal(d.session.result, "defeat", "%d: a derrota fecha a expedição" % size)
-	t.equal(d.memorial.size(), size, "%d: o memorial tem só quem foi" % size)
+	S.finish_return(d)
+	t.equal(d.memorial.size(), 0, "%d: ninguém vai para o memorial" % size)
+	t.equal(S.fallen(d).map(func(h): return h.id), team, "%d: quem foi volta Caído, e só quem foi" % size)
 
 
 ## Na Preparação: escolher um cartão e "Deixar na Estação" parte com um a menos; a fase que pede mais avisa e trava o
