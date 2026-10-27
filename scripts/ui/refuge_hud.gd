@@ -125,6 +125,9 @@ var _draft := {}
 var _departure: AHDepartureScreen
 ## A fase cujo briefing (#88) já abriu na plataforma (a volta do mapa para o mesmo lugar não repete).
 var _briefed := ""
+## As falas que o briefing da plataforma mostrou (a assinatura de quem falou o quê), ou null sem briefing mostrado. Se a
+## equipe final, na confirmação, faz outras falas (entrou alguém que fala), o briefing abre de novo antes de partir.
+var _briefed_lines = null
 ## O mapa aberto pelo VOLTAR AO MAPA da plataforma: fechá-lo volta para a vista geral (a câmera desce).
 var _map_from_platform := false
 ## O relatório da volta no kit (#60): a tela inteira por cima da fila, no lugar do painel.
@@ -1363,11 +1366,16 @@ func _brief_on_platform() -> void:
 		return
 	_briefed = _draft.phase
 	var lines := AHBriefing.departure(Campaign.state, _draft.phase, _draft.team)
+	_briefed_lines = _lines_signature(lines)
 	if lines.is_empty():
 		return
 	briefing = AHBriefingDialog.open(self, lines, tr("Continuar"))
 	await briefing.finished
 	briefing = null
+
+
+static func _lines_signature(lines: Array) -> String:
+	return "\n".join(lines.map(func(l): return "%s:%s" % [l.speaker.get("id", ""), l.text]))
 
 
 func _process(delta: float) -> void:
@@ -1918,6 +1926,17 @@ func _depart() -> void:
 	if error != "":
 		toast(error, true)
 		return
+	# A equipe mudou depois do briefing da chegada e as falas são outras (entrou quem fala): o briefing da equipe final
+	# abre antes de partir.
+	if _briefed_lines != null:
+		var lines := AHBriefing.departure(c, _draft.phase, _draft.team)
+		if not lines.is_empty() and _lines_signature(lines) != _briefed_lines:
+			_briefed_lines = _lines_signature(lines)
+			briefing = AHBriefingDialog.open(self, lines, tr("Partir"))
+			await briefing.finished
+			briefing = null
+			if _draft.is_empty() or GameFlow.busy:
+				return
 	# A rota é a que o Mapa da Rede leu (#87): a semente fixada da fase; depois da partida, a fase ganha outra.
 	var phase_id: String = _draft.phase
 	error = S.confirm_departure(c, _draft.team.duplicate(), _draft.extra, AHNetworkRadar.route_seed(c, phase_id), phase_id, _draft.focus)
@@ -1927,6 +1946,7 @@ func _depart() -> void:
 	AHNetworkRadar.spend_seed(c, phase_id)
 	_draft = {}
 	_briefed = ""
+	_briefed_lines = null
 	Campaign.save()
 	# A partida no vagão (#75): a equipe sentada no metrô a caminho da fase, depois o título dela.
 	GameFlow.travel("street", AHWagonRide.departure_card(c))
@@ -1938,6 +1958,9 @@ func briefing_open() -> bool:
 
 ## A partida na plataforma (#123): a tela do kit por cima da fila; aberta uma vez e refeita a cada refresh.
 func _departure_view() -> void:
+	# O rascunho recriado (outro lugar escolhido): a tela guarda o dela, então é refeita com o novo.
+	if is_instance_valid(_departure) and not is_same(_departure.draft, _draft):
+		_close_departure()
 	if is_instance_valid(_departure):
 		_departure.rebuild()
 		return

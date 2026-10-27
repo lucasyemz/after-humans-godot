@@ -1435,3 +1435,5 @@ street.gd: Steam
 street.gd: Leaves
 street.gd: dust
 street.gd: leaves
+refuge_hud.gd: %s:%s
+refuge_hud.gd: id
