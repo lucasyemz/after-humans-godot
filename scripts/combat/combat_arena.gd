@@ -148,6 +148,12 @@ static func art_entry(heroes: Dictionary, hero_id: String, variant: String = "")
 	if variant == "":
 		var entry = Campaign.hero(hero_id)
 		variant = String(entry.get("art_variant", "")) if entry != null else ""
+	# Classe sem fundador (o Guaxinim e o Tatu, #187): a arte é a do recruta dela, mesmo sem variação guardada.
+	if founder.is_empty() and parts.size() > 2 and parts[0] == "hero":
+		if variant == "":
+			var variants := AHStationRules.art_variants(parts[1])
+			variant = variants[0] if not variants.is_empty() else ""
+		return {} if variant == "" else _variant_entry(founder, variant)
 	if variant == "" or founder.is_empty():
 		return founder
 	return _variant_entry(founder, variant)
@@ -170,7 +176,10 @@ static func _variant_entry(founder: Dictionary, variant: String) -> Dictionary:
 		var action: Dictionary = founder.actions[ability_id]
 		if action.has("vfx"):
 			actions[ability_id] = {"vfx": action.vfx}
-	var out := {"name": variant, "variant": variant, "idle": art.idle, "actions": actions, "reactions": {}}
+	# As poses próprias do recruta, quando ele tem (o Guaxinim e o Tatu, #187: um golpe por habilidade e as reações).
+	for ability_id in art.get("actions", {}):
+		actions[ability_id] = actions.get(ability_id, {}).merged(art.actions[ability_id])
+	var out := {"name": variant, "variant": variant, "idle": art.idle, "actions": actions, "reactions": art.get("reactions", {})}
 	_variants[key] = out
 	return out
 
@@ -571,7 +580,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 	if actor.is_player:
 		show_pose(actor, "execucao", ability_id)
 		_play_cue(_hero_cue(actor, ability_id))
-		if not hero_action.is_empty():
+		if hero_action.has("vfx"):
 			for target_id in (targets if not targets.is_empty() else [actor.id]):
 				_spawn_vfx(actor, ability_id, target_id)
 	else:

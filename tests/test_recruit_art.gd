@@ -16,6 +16,29 @@ func run(t) -> void:
 			t.check(ResourceLoader.exists(idle.file) and ResourceLoader.exists(idle.portrait), "%s: o parado e o retrato existem" % variant)
 			t.check(float(idle.body_reference_pixels) > 0 and idle.anchor.size() == 2, "%s: âncora e altura medidas" % variant)
 
+	# O Guaxinim e o Tatu (#187): sem fundador, a arte é a do recruta, com um golpe por habilidade, as reações e os
+	# ícones; e o trem passa a trazê-los quando a classe está liberada.
+	for class_id in ["rato", "tatu"]:
+		var variants := S.art_variants(class_id)
+		if not t.check(variants.size() == 1, "%s: um recruta desenhado" % class_id):
+			continue
+		var entry := AHCombatArena.art_entry(manifest.heroes, "hero_%s_5" % class_id, variants[0])
+		t.equal(entry.get("variant", ""), variants[0], "%s: a arte do recruta, sem fundador" % class_id)
+		t.equal(AHCombatArena.art_entry(manifest.heroes, "hero_%s_0" % class_id, "").get("variant", ""), variants[0],
+			"%s: sem variação guardada, a da classe" % class_id)
+		var abilities: Array = GameData.row("classes", class_id).AbilityIds
+		var poses_ok := ResourceLoader.exists(entry.idle.file) and float(entry.idle.body_reference_pixels) > 0
+		for ability_id in abilities:
+			var execute: Dictionary = entry.actions.get(ability_id, {}).get("execucao", {})
+			poses_ok = poses_ok and ResourceLoader.exists(execute.get("file", "")) and execute.anchor == entry.idle.anchor
+			t.check(ResourceLoader.exists(manifest.icons.get(ability_id, "")), "%s: o ícone de %s" % [class_id, ability_id])
+		for pose in ["hurt", "death", "dodge", "defense"]:
+			var reaction: Dictionary = entry.reactions.get(pose, {})
+			poses_ok = poses_ok and ResourceLoader.exists(reaction.get("file", "")) and reaction.body_reference_pixels == entry.idle.body_reference_pixels
+		t.check(poses_ok, "%s: o golpe de cada habilidade e as reações, com o pé e a altura do parado" % class_id)
+		t.check(AHCharacterHeights.HEIGHTS.has(class_id), "%s: altura própria" % class_id)
+		t.check(S.train_classes({"unlocked_classes": ["cao", class_id]}).has(class_id), "%s: o trem pode trazê-lo" % class_id)
+
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-recruit-art-%d" % Time.get_ticks_usec()
