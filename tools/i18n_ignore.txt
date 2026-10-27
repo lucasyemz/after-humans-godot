@@ -1410,6 +1410,8 @@ scenario_world.gd: waterline
 scenario_world.gd: detail
 scenario_world.gd: painted
 scenario_world.gd: %s: a água pintada guarda %d linhas e %d pontos de espuma; o resto some (%d e %d no mapa).
+inventory_panel.gd: New
+*: leave
 refuge_hud.gd: closed
 refuge_hud.gd: note
 refuge_hud.gd: ready
