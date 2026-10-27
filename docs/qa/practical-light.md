@@ -83,6 +83,9 @@ volumétrica) só aparece no Forward+: a medição no beco do tambor fica para o
     fogo do tambor que aparece entre as etiquetas de uma luta no mesmo beco, a falta de fonte fria no fim de tarde (a
     emergência é vermelha; o drone só passa de noite) e a medição no Forward+. Mudar as fontes pela barra de Admin não
     vale ao vivo (o perfil remonta só o pós, o glow, a névoa e as partículas): as fontes se afinam no JSON.
+- **Rodada 2, aprovada:** a suíte deu 65 de 65, com a paridade 48/48. Os scripts da QA conferiram a poça inteira (pela
+  diferença de imagem), a força na chuva, "Reduzir efeitos" no meio do pulso, as sombras no Ultra, a colisão real no
+  beco, o interior e a troca de cena sem vazamento.
 
 ## Para o Lucas e o Orquestrador
 
