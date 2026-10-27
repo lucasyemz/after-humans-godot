@@ -58,9 +58,33 @@ func _data() -> void:
 	t.equal(AHJourneyRules.phase(AHTutorial.PHASE_ID).map, AHTutorial.MAP, "a fase do tutorial joga no Corredor de Contenção")
 	t.check(not FileAccess.get_file_as_string("res://data/presentation/network_map.json").contains(AHTutorial.MAP), "o mapa fora do Mapa da Rede")
 	t.equal(AHJourneyRules.step_range(AHTutorial.PHASE_ID, false), [0, 7], "os sete trechos no mapa")
+	# Cada inimigo das lutas do tutorial existe em enemies.json (senão a luta ficaria mais curta sem aviso).
+	for row_name in GameData.table("tutorial"):
+		if String(row_name).begins_with("fight_"):
+			var ids: Array = GameData.row("tutorial", row_name).get("Enemies", [])
+			t.check(not ids.is_empty() and ids.all(func(id): return GameData.row("enemies", id) != null),
+				"%s: os inimigos existem em enemies.json (%s)" % [row_name, ids])
+	_finish_heals_team()
 	# O pisca: 0,6 s acesa e 0,4 s quase apagada, na fase de cada lâmpada.
 	t.check(AHScenarioWorld.blink_lit(0.1, 0.0) and not AHScenarioWorld.blink_lit(0.7, 0.0) and AHScenarioWorld.blink_lit(0.7, 0.5),
 		"a lâmpada acende 0,6 s e apaga 0,4 s, fora de fase da vizinha")
+
+
+## O embarque cura só a equipe que foi ao tutorial; o resto do elenco fica como está.
+func _finish_heals_team() -> void:
+	var c := Campaign.create_initial(5)
+	var hurt: Array = []
+	for hero in c.roster:
+		hero.hp = 1
+		hero.instinct = 30
+		hurt.append(hero.id)
+	var team: Array = hurt.slice(0, 2)
+	c.session = {"screen": "street", "result": "", "expedition": {"team": team}, "event": null}
+	AHTutorial.finish(c)
+	t.check(c.roster.filter(func(h): return team.has(h.id)).all(func(h): return h.hp == int(h.max_hp) and h.instinct == 0),
+		"o embarque cura a equipe do tutorial")
+	t.check(c.roster.filter(func(h): return not team.has(h.id)).all(func(h): return h.hp == 1 and h.instinct == 30),
+		"e não mexe no resto do elenco")
 
 
 func _journey() -> void:
