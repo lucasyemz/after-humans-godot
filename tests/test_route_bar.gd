@@ -20,8 +20,8 @@ func run(context) -> void:
 	boss.resolved = true
 	cell = hud._route_cell(boss, true, true, route)
 	t.check(_tint(cell).is_equal_approx(AHKit.good()), "o guardião vencido fica verde")
-	t.check(_has_check(cell) and cell.get_child(cell.get_child_count() - 1).size == Vector2(16, 16),
-		"e com o check por cima da moldura de agora, mesmo sendo o trecho de agora")
+	t.check(_is_check(cell.get_child(cell.get_child_count() - 1)),
+		"e com o check por cima da moldura de agora (o último filho), mesmo sendo o trecho de agora")
 	t.equal(hud._step_label(boss), hud.tr("Guardião vencido"), "o título diz que acabou")
 	cell.free()
 	# Os outros trechos: o resolvido de agora segue sem check (a moldura de agora já marca), o de antes com check.
@@ -40,6 +40,10 @@ func _tint(cell: Control) -> Color:
 	return (cell.get_child(0) as TextureRect).modulate
 
 
-## O check fica no canto da casa, com 16 px.
+## O check é o glifo "state_active" do kit.
 func _has_check(cell: Control) -> bool:
-	return cell.get_children().any(func(c): return c is TextureRect and c.size == Vector2(16, 16))
+	return cell.get_children().any(_is_check)
+
+
+func _is_check(node: Node) -> bool:
+	return node is TextureRect and node.texture == AHKit.legacy_icon("state_active")

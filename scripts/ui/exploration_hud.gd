@@ -565,7 +565,7 @@ func refresh(campaign: Dictionary) -> void:
 
 
 ## Uma casa do corredor: o quadrado do retrato com o ícone do tipo; a de agora com a moldura âmbar, a resolvida com o
-## tipo em verde e o check no canto, o guardião em alerta e a não alcançada com "?".
+## tipo em verde e o check por cima do ícone, o guardião em alerta e a não alcançada com "?".
 func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) -> Control:
 	var cell := AHKit.panel("square_portrait")
 	cell.custom_minimum_size = Vector2(CELL, CELL)
@@ -589,10 +589,8 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 	# O check do resolvido; no trecho de agora só o do guardião vencido, que é o último e fica "agora" para sempre. Vem
 	# depois da moldura de agora, por cima dela.
 	if step.resolved and (not now or boss):
-		var check := AHKit.glyph("state_active", 16, AHKit.good())
-		check.size = Vector2(16, 16)
-		check.position = Vector2(CELL - 18, -2)
-		cell.add_child(check)
+		# A casa é um PanelContainer: o check estica e fica centrado sobre o ícone, como nas outras resolvidas.
+		cell.add_child(AHKit.glyph("state_active", 16, AHKit.good()))
 	return cell
 
 

@@ -1,6 +1,6 @@
 # A casa do guardião concluída na barra de trechos (#180)
 
-![Antes (em cima) e depois (no meio): o trecho 10 de 10 com o guardião vencido](route-bar/before_after.png)
+![Antes (em cima) e depois (embaixo): o trecho 10 de 10 com o guardião vencido](route-bar/before_after.png)
 
 ## O que muda
 
@@ -19,3 +19,11 @@
   - vencido, fica verde, com o check por cima da moldura de agora e o título "Guardião vencido";
   - um trecho comum resolvido segue como antes.
 - `tools/capture_180.gd`: a Rua no trecho do guardião antes e depois da vitória; também roda na `main` de antes.
+
+## QA
+
+- **Rodada 1: APROVADO.** Conferido na vitória real da fase 1 (barra, título, "Concluir jornada" e Menu), no estado
+  vencido carregado do save nas fases 2 a 5, na retirada no trecho 9 e na fuga, com o texto Maior, as cores para
+  daltonismo, o toque e o inglês. Três observações baixas, corrigidas: o teste procura o check pela textura (dentro da
+  casa ele estica e fica centrado sobre o ícone, então o tamanho e a posição de canto eram código morto e saíram); a
+  imagem perdeu a faixa da ordem de turnos; e o `capture_180.gd.uid` entrou no Git.
