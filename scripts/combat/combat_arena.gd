@@ -132,8 +132,9 @@ func hero_art(hero_id: String) -> Dictionary:
 
 
 ## A arte de um herói no manifesto. O recruta (hero_cao_4) usa a variação da classe guardada no save (art_variant, #32):
-## a pose parada e o retrato dela em todas as poses (as poses de ação ainda são só dos fundadores), com o efeito visual
-## das habilidades do fundador. Sem variação (saves antigos sem arte, classe sem recruta desenhado), a do fundador.
+## a pose parada e o retrato dela, as poses próprias quando a variação tem (o Guaxinim e o Tatu, #187) e o efeito visual
+## das habilidades do fundador. Sem variação (saves antigos sem arte, classe sem recruta desenhado), a do fundador; a
+## classe sem fundador (o rato e o tatu) usa o recruta desenhado dela.
 ## variant: a do herói, se quem chama já tem a entrada; "" procura na campanha (Campaign.hero).
 static func art_entry(heroes: Dictionary, hero_id: String, variant: String = "") -> Dictionary:
 	if heroes.has(hero_id):
