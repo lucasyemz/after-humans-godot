@@ -47,7 +47,7 @@ chuva: [o Armazém](dock-depth/warehouse-weather.jpg) e [o Navio](dock-depth/shi
 ## Testes
 
 - `tests/run_all.gd`: todos verdes, com a paridade 48/48.
-- `tests/test_dock_depth.gd` (novo, 57 verificações):
+- `tests/test_dock_depth.gd` (novo, 59 verificações):
   - as camadas sem pedaço dobrado e em mais de uma profundidade;
   - a colisão: os volumes novos (os pedaços em camadas e as caixas do recuo) ficam atrás da faixa de andar e do passo
     para a porta, e o passo não cai numa caixa. Empurrado para o fundo na frente do Armazém e do Navio, o líder para na

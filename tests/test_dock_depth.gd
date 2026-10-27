@@ -202,6 +202,7 @@ func _weather(street) -> void:
 func _rooms(street, doorway: bool) -> void:
 	var scenario: AHScenarioWorld = street.scenario
 	var corridor: AHStreetCorridor = street.corridor
+	var walked := []
 	for room in corridor.side_rooms.size():
 		var entry: Dictionary = corridor.side_rooms[room]
 		var name: String = scenario.zones[entry.zone].name
@@ -233,3 +234,23 @@ func _rooms(street, doorway: bool) -> void:
 			await _tree.process_frame
 		t.check(corridor.side_room < 0 and absf(street._leader.position.x - float(entry.door_x)) < 0.3, "%s: a volta deixa a equipe na mesma porta" % name)
 		t.check(absf(street._leader.position.z - street.lane_z) < 0.5, "%s: na faixa de andar" % name)
+		walked.append(name)
+	if doorway:
+		# Os dois interiores do Cais, o Navio e o Galpão, foram percorridos (entrar, parar, voltar).
+		t.check(walked.has("Navio") and walked.has("Galpão"), "o Navio e o Galpão percorridos (%s)" % ", ".join(walked))
+		_stop_floor(corridor)
+
+
+## O _room_stop no limite de baixo: com um objeto de busca em toda a sala, ele recua até ROOM_STOP + 1 e para ali (sem
+## laço sem fim), e sem a porta de dentro fica no ROOM_STOP.
+func _stop_floor(corridor: AHStreetCorridor) -> void:
+	var entry: Dictionary = corridor.side_rooms[0]
+	var real: Array = corridor.scenario_props
+	var fake := []
+	for i in 80:
+		fake.append({"zone": entry.zone, "x": float(entry.x0) + i * 0.1, "name": "teste"})
+	corridor.scenario_props = fake
+	var stop: float = corridor._room_stop(entry)
+	corridor.scenario_props = real
+	var floor_stop: float = AHStreetCorridor.ROOM_STOP + 1.0
+	t.check(stop <= floor_stop + 0.001 and stop > floor_stop - 0.11, "com objetos em toda a sala, a parada fica no piso (%.2f m)" % stop)
