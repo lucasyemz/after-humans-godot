@@ -40,6 +40,18 @@ const WATER_COVERED := 0.3
 ## O que a água pintada guarda de espuma (os arrays do water_painted.gdshader).
 const MAX_FOAM_POINTS := 16
 const MAX_FOAM_LINES := 4
+## As portas de dentro dos interiores (#141): a vista de fora (o material) e a luz que entra, por zona. Não escurecem com
+## o interior: são o lado de fora, com a hora e a chuva de lá (set_doorways).
+var _door_views: Array[ShaderMaterial] = []
+var _door_lights: Array[OmniLight3D] = []
+var doorway_zones: Array[int] = []
+## A luz de fora pela porta: a cor e a força no fim de tarde e na noite; a chuva tira um pouco e acinzenta.
+const DOOR_LIGHT := {"golden": [Color(1.0, 0.8, 0.58), 1.7], "night": [Color(0.55, 0.65, 0.92), 0.8]}
+const DOOR_RAIN_LIGHT := 0.7
+## Fora é mais claro que a sala: a vista da porta brilha um pouco acima da cor do clima.
+const DOOR_VIEW_BRIGHTNESS := {"golden": 1.25, "night": 0.75}
+## A cor da hora de fora na vista: o céu do mapa é de dia, e o fim de tarde lá fora é pêssego (a mesma luz do cais).
+const DOOR_VIEW_TINT := {"golden": Color(1.0, 0.76, 0.58), "night": Color(0.55, 0.6, 0.75)}
 var _blockouts: Array[ShaderMaterial] = []
 
 
@@ -117,6 +129,10 @@ func build(map: String) -> void:
 		_light(light)
 	for text in data.texts:
 		_text(text)
+	for doorway in data.get("doorways", []):
+		_doorway(doorway)
+	for layered in data.get("layered_cards", []):
+		_layered_card(layered)
 
 
 ## As cores da água pintada (#140) que o mapa troca (surface, mid, deep, ripple e foam, em [r, g, b]) e o passo
@@ -137,7 +153,7 @@ func _water_pace(material: ShaderMaterial) -> void:
 
 ## A opção "Reduzir efeitos" mudou: a água pintada acompanha.
 func refresh_water_pace() -> void:
-	for material in _waters:
+	for material in _waters + _door_views:
 		_water_pace(material)
 
 
@@ -152,6 +168,25 @@ func set_weather(wet: float, tint: Color, covered: bool = false) -> void:
 			material.set_shader_parameter("weather", Vector4(tint.r * WATER_COVERED, tint.g * WATER_COVERED, tint.b * WATER_COVERED, 1.0))
 	for material in _blockouts:
 		material.set_shader_parameter("wet", wet)
+
+
+## O lado de fora pelas portas de dentro (#141): a hora (golden ou night) e a chuva de fora, mesmo com a equipe dentro.
+func set_doorways(mood: String, raining: bool) -> void:
+	var key := mood if DOOR_LIGHT.has(mood) else "golden"
+	var tint: Color = DOOR_VIEW_TINT[key]
+	for material in _door_views:
+		material.set_shader_parameter("weather", Vector4(tint.r, tint.g, tint.b, 1.0))
+		material.set_shader_parameter("wet", 1.0 if raining else 0.0)
+		material.set_shader_parameter("brightness", DOOR_VIEW_BRIGHTNESS[key])
+	var light: Array = DOOR_LIGHT[key]
+	for lamp in _door_lights:
+		lamp.light_color = (light[0] as Color).lerp(Color(0.62, 0.66, 0.72), 0.5 if raining else 0.0)
+		lamp.light_energy = float(light[1]) * (DOOR_RAIN_LIGHT if raining else 1.0)
+
+
+## A porta de dentro da zona (o spec do mapa) ou um vazio: o interior sem ela entra do jeito antigo, sem a passagem.
+func has_doorway(zone: int) -> bool:
+	return doorway_zones.has(zone)
 
 
 ## Guarda a caixa se ela atrapalha a passagem em alguma zona: dentro da zona, na altura da equipe, na faixa de passeio
@@ -415,6 +450,92 @@ func _merge(groups: Dictionary) -> void:
 		add_child(combined)
 		for node: MeshInstance3D in parts:
 			node.queue_free()
+
+
+## Uma fachada pintada em camadas (#141): os pedaços da mesma pintura ([u0, v0, u1, v1] e o z de cada um, com a posição
+## e o tamanho já corrigidos pela perspectiva; shade escurece o pedaço, a silhueta de trás que dá a espessura) numa malha
+## só, com um material só, iluminada como a arte do mapa. Numa malha só, a fachada inteira recebe as mesmas luzes (no
+## Compatibility, cada malha pega no máximo 8) e as emendas não mudam de cor.
+func _layered_card(spec: Dictionary) -> void:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	surface.set_normal(Vector3(0, 0, 1))
+	for piece in spec.pieces:
+		var c := Vector3(float(piece.x), float(piece.y), float(piece.z))
+		var half := Vector2(float(piece.w), float(piece.h)) * 0.5
+		var r: Array = piece.rect
+		var corners := [[Vector3(-half.x, half.y, 0), Vector2(r[0], r[1])], [Vector3(half.x, half.y, 0), Vector2(r[2], r[1])],
+			[Vector3(half.x, -half.y, 0), Vector2(r[2], r[3])], [Vector3(-half.x, -half.y, 0), Vector2(r[0], r[3])]]
+		var shade := float(piece.get("shade", 1.0))
+		for i in [0, 1, 2, 0, 2, 3]:
+			surface.set_color(Color(shade, shade, shade))
+			surface.set_uv(corners[i][1])
+			surface.add_vertex(c + corners[i][0])
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = _tex(String(spec.albedo))
+	material.vertex_color_use_as_albedo = true
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	material.roughness = 0.9
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	material.alpha_scissor_threshold = 0.333
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var node := MeshInstance3D.new()
+	node.name = "Layered_%s" % String(spec.get("name", "card"))
+	node.mesh = surface.commit()
+	node.material_override = material
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(node)
+
+
+## A porta de um interior lateral por dentro (#141): o batente escuro e, por ela, um pedaço do lado de fora (o céu e a
+## água pintada do mapa, door_view.gdshader), com a luz de fora entrando. spec: x, y (o piso), z (a parede de trás),
+## w e h (o vão), sky (a textura do céu).
+func _doorway(spec: Dictionary) -> void:
+	var x := float(spec.x)
+	var y := float(spec.get("y", 0.0))
+	var z := float(spec.z)
+	var w := float(spec.get("w", 1.5))
+	var h := float(spec.get("h", 2.4))
+	var view := ShaderMaterial.new()
+	view.shader = preload("res://shaders/door_view.gdshader")
+	var sky := _tex(String(spec.get("sky", "")))
+	if sky:
+		view.set_shader_parameter("sky_tex", sky)
+	_water_colors(view, spec)
+	_water_pace(view)
+	_door_views.append(view)
+	doorway_zones.append(int(spec.get("zone", -1)))
+	var quad := QuadMesh.new()
+	quad.size = Vector2(w, h)
+	var outside := MeshInstance3D.new()
+	outside.name = "DoorwayView_%d" % roundi(x * 10.0)
+	outside.mesh = quad
+	outside.material_override = view
+	outside.position = Vector3(x, y + h * 0.5, z)
+	outside.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(outside)
+	var frame := StandardMaterial3D.new()
+	frame.albedo_color = Color(0.16, 0.13, 0.11)
+	frame.roughness = 0.85
+	for piece in [[Vector3(x - w * 0.5 - 0.1, y + h * 0.5, z + 0.08), Vector3(0.2, h, 0.25)],
+			[Vector3(x + w * 0.5 + 0.1, y + h * 0.5, z + 0.08), Vector3(0.2, h, 0.25)],
+			[Vector3(x, y + h + 0.1, z + 0.08), Vector3(w + 0.4, 0.2, 0.25)]]:
+		var box := BoxMesh.new()
+		box.size = piece[1]
+		var node := MeshInstance3D.new()
+		node.mesh = box
+		node.material_override = frame
+		node.position = piece[0]
+		add_child(node)
+	var light := OmniLight3D.new()
+	light.name = "DoorwayLight_%d" % roundi(x * 10.0)
+	light.light_color = DOOR_LIGHT.golden[0]
+	light.light_energy = DOOR_LIGHT.golden[1]
+	light.omni_range = 4.5
+	light.position = Vector3(x + 0.3, y + h * 0.7, z + 1.0)
+	add_child(light)
+	_door_lights.append(light)
+	set_doorways("golden", false)
 
 
 func _light(light: Dictionary) -> void:
