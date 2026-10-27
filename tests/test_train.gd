@@ -45,7 +45,7 @@ func _scene(speed: int, reduced: bool) -> void:
 	var c: Dictionary = Campaign.create_initial(11)
 	c.settings.battle_speed = speed
 	c.settings.reduced_environment_effects = reduced
-	AHStationRules.train_on_return(c, "test-train-%d" % speed)
+	AHStationRules.train_on_return(c, "test-train-%d" % speed, "civilian")
 	var candidate: String = c.station.train.candidate_id
 	Campaign.state = c
 	Campaign.save()

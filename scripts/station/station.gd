@@ -634,14 +634,13 @@ func align_lineup(centers: Dictionary) -> void:
 			entry.contact.position.x = x
 
 
-## A partida: a equipe em fila (posição 1 à direita) com o contato no chão; do abrigo, sobe pela passagem (ShowDeparture).
-func show_departure(front_to_back: Array) -> void:
-	var first := lineup.is_empty()
+## A partida (#123): a equipe em fila na Plataforma 1, na câmera do relatório, cada um de pé sobre a sua carta
+## (align_lineup); do abrigo, a câmera sobe pela passagem. hero_ids vem na ordem da cena (a posição 1 à direita).
+func show_departure(hero_ids: Array) -> void:
 	clear_lineup()
-	for position in mini(4, front_to_back.size()):
-		_line_card(front_to_back[position], _departure_slot(position))
-	if first:
-		_go(_line_key(4), true, false)
+	for index in hero_ids.size():
+		_line_card(hero_ids[index], Vector3(LINE_CENTER_X + (index - (maxi(1, hero_ids.size()) - 1) * 0.5) * REPORT_SPACING, 0, LINE_Z))
+	_go(_report_key(), true, false)
 
 
 func _line_card(hero_id: String, feet: Vector3) -> void:
@@ -1060,6 +1059,10 @@ func _remove_candidate() -> void:
 
 func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	var art: Dictionary = _civilian_art.get(_candidate_id, {})
+	# O animal do trem (#122): a arte de luta da classe, na variação dele.
+	var recruit: Dictionary = S.train_recruit(Campaign.state)
+	if art.is_empty() and not recruit.is_empty() and Campaign.state.station.train.candidate_id == _candidate_id:
+		art = AHCombatArena.hero_art_of(_candidate_id, String(recruit.art_variant)).get("idle", {})
 	if art.is_empty():
 		return null
 	_candidate = AHSpriteCard.new()

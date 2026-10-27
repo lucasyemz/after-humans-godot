@@ -139,10 +139,8 @@ func _departure(skip: String) -> void:
 	var team: Array = c.roster.slice(0, 3).map(func(h): return h.id)
 	team.append(c.roster[4].id)
 	station.hud._draft = {"phase": "fase_1", "team": team, "focus": "", "extra": 0}
+	# O briefing (#88) abre na chegada à plataforma (test_briefing); a confirmação parte direto.
 	station.hud._depart()
-	# O briefing (#88, conferido em test_briefing): pulado, a partida segue.
-	if t.check(station.hud.briefing_open(), "o briefing abre antes da partida"):
-		station.hud.briefing.skip()
 	while GameFlow.passage == null:
 		await _tree.process_frame
 	var card: AHPassageCard = GameFlow.passage
