@@ -229,6 +229,21 @@ static func in_corridor(campaign: Dictionary) -> bool:
 		and session.get("event") == null
 
 
+## A formação na exploração (#129): troca dois heróis de lugar na ordem da equipe, fora da luta, dos eventos e do
+## acampamento. A ordem vale para a fila da rua e para a próxima luta (as posições 1 a 4) e fica no save da expedição.
+static func swap_team(campaign: Dictionary, a: String, b: String) -> bool:
+	if not in_corridor(campaign) or a == b:
+		return false
+	var team: Array = campaign.session.expedition.team
+	var i := team.find(a)
+	var k := team.find(b)
+	if i < 0 or k < 0:
+		return false
+	team[i] = b
+	team[k] = a
+	return true
+
+
 ## Entrar num trecho vizinho (EnterCorridorStep). Devolve "combat", "boss", "rest" ou "" (nada a fazer).
 static func enter_step(campaign: Dictionary, index: int) -> String:
 	if not in_corridor(campaign):
@@ -599,11 +614,21 @@ static func grant_tool(campaign: Dictionary, tool: String) -> bool:
 	if tool == "" or has_tool(campaign, tool):
 		return false
 	campaign.tools.append(tool)
+	# A novidade (#143): o aviso na exploração e o selo NOVO na Mochila até ela abrir.
+	for key in ["new_tools", "tool_notices"]:
+		var list: Array = campaign.get(key, [])
+		if not list.has(tool):
+			list.append(tool)
+		campaign[key] = list
 	return true
 
 
 static func lose_tool(campaign: Dictionary, tool: String) -> void:
 	campaign.tools.erase(tool)
+	# Perdida antes de a Mochila abrir, ela deixa de ser novidade (#143).
+	for key in ["new_tools", "tool_notices"]:
+		if campaign.has(key):
+			campaign[key].erase(tool)
 
 
 ## Os efeitos de fase que valem na próxima luta da expedição (os ids de PHASE_EFFECTS em corridor.effects).
@@ -901,6 +926,12 @@ static func _guarded(route: Dictionary, step: int) -> bool:
 		and (route.steps[step].type == "combat" or route.steps[step].type == "boss")
 
 
+## O trecho já está aberto para usar o que tem nele (vasculhar um objeto, entrar num interior): a equipe chegou até ele
+## e não há patrulha de pé guardando. A marca de interação (#142) e a tecla usam a mesma regra.
+static func step_open(route: Dictionary, step: int) -> bool:
+	return route.index >= step and not _guarded(route, step)
+
+
 static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
 	if not in_corridor(campaign):
 		return false
@@ -908,7 +939,7 @@ static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
 	_scenario_fields(route)
 	if prop < 0 or prop >= route.prop_steps.size() or route.searched_props.has(prop) or route.current_house != -1:
 		return false
-	return route.index >= route.prop_steps[prop] and not _guarded(route, route.prop_steps[prop])
+	return step_open(route, route.prop_steps[prop])
 
 
 ## Vasculha o prop (SearchScenarioProp): a tabela das casas (1 em 3 ruim) e o objetivo da rota. Devolve {ok, text}.
@@ -939,7 +970,7 @@ static func can_enter_scenario_room(campaign: Dictionary, door_step: int) -> boo
 		return false
 	var route: Dictionary = corridor(campaign)
 	_scenario_fields(route)
-	return route.current_house == -1 and int(route.current_room) == -1 and route.index >= door_step and not _guarded(route, door_step)
+	return route.current_house == -1 and int(route.current_room) == -1 and step_open(route, door_step)
 
 
 static func enter_scenario_room(campaign: Dictionary, zone: int, door_step: int) -> bool:
@@ -1082,12 +1113,46 @@ static func can_start_camp(campaign: Dictionary) -> bool:
 	if route.current_house < 0 or route.current_house >= route.sites.size():
 		return false
 	var site: Dictionary = route.sites[route.current_house]
-	return site.camp_site and not site.camped and (not site.has_enemy or site.enemy_defeated)
+	return site.camp_site and not camped(route) and (not site.has_enemy or site.enemy_defeated)
 
 
 static func start_camp(campaign: Dictionary) -> bool:
 	if not can_start_camp(campaign):
 		return false
+	campaign.session.screen = "rest"
+	return true
+
+
+## Um acampamento por fase: o da casa ou o da parada de descanso (#143), o que vier primeiro.
+static func camped(route: Dictionary) -> bool:
+	return bool(route.get("stop_camped", false)) or route.sites.any(func(s): return s.camped)
+
+
+## A casa do acampamento na mesma parada de descanso (o trecho dela), aberta e sem patrulha de pé; -1 se não houver.
+## Aí as duas viram uma parada só: Acampar aqui entra nela.
+static func stop_camp_house(campaign: Dictionary) -> int:
+	var route: Dictionary = corridor(campaign)
+	for i in route.sites.size():
+		var site: Dictionary = route.sites[i]
+		if site.camp_site and site.step == route.index and (not site.locked or site.forced) and (not site.has_enemy or site.enemy_defeated):
+			return i
+	return -1
+
+
+## Acampar na parada de descanso (#143): só no trecho de descanso em que a equipe está, uma vez por fase.
+static func can_camp_at_stop(campaign: Dictionary) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	return route.current_house == -1 and route.steps[route.index].type == "rest" and not camped(route)
+
+
+## Acende a fogueira na parada (x: a fogueira; leave: onde a fila recomeça). A volta ao jogo no meio do acampamento a
+## refaz no mesmo lugar.
+static func start_stop_camp(campaign: Dictionary, x: float, leave: float) -> bool:
+	if not can_camp_at_stop(campaign):
+		return false
+	corridor(campaign).stop_camp = {"step": corridor(campaign).index, "x": x, "leave": leave}
 	campaign.session.screen = "rest"
 	return true
 
@@ -1153,6 +1218,9 @@ static func leave_camp(campaign: Dictionary, seed_value: int) -> bool:
 	var route: Dictionary = expedition.corridor
 	if route.current_house >= 0:
 		route.sites[route.current_house].camped = true
+	if route.has("stop_camp"):
+		route.erase("stop_camp")
+		route.stop_camped = true
 	var options: Array = WEATHERS.get(expedition.scenario_id, WEATHERS["rua-das-vitrines"]).filter(func(w): return w != route.weather)
 	var random := _rand(seed_value)
 	route.weather = options[clampi(floori(random.next() * options.size()), 0, options.size() - 1)]

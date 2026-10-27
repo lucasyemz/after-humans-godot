@@ -1,0 +1,146 @@
+{
+ "actor": "unit_hero_cao_bento",
+ "options": [
+  {
+   "id": "cao_punho_sucata",
+   "name": "Punho de Sucata",
+   "usable": true
+  },
+  {
+   "id": "cao_impacto_hidraulico",
+   "name": "Impacto Hidráulico",
+   "usable": true
+  },
+  {
+   "id": "cao_fique_atras_de_mim",
+   "name": "Fique Atrás de Mim",
+   "usable": true
+  },
+  {
+   "id": "cao_nao_estamos_sos",
+   "name": "Não Estamos Sós",
+   "usable": true
+  }
+ ],
+ "order": [
+  "unit_hero_cao_bento",
+  "corridor_2885921763_2_0_cao_eco",
+  "unit_hero_coruja_vespera",
+  "unit_hero_sapo_iris",
+  "corridor_2885921763_2_1_sussurrador"
+ ],
+ "round": 1,
+ "units": [
+  {
+   "body": [
+    767.612060546875,
+    337.076354980469,
+    199.166137695312,
+    436.534484863281
+   ],
+   "class_id": "cao",
+   "enemy_id": "",
+   "feet": [
+    845.92333984375,
+    773.61083984375
+   ],
+   "hp": 34,
+   "id": "unit_hero_cao_bento",
+   "instinct": 0,
+   "max_hp": 34,
+   "name": "Bento",
+   "player": true,
+   "rank": 1,
+   "speed": 2
+  },
+  {
+   "body": [
+    457.076904296875,
+    409.969116210938,
+    203.416564941406,
+    363.084228515625
+   ],
+   "class_id": "sapo",
+   "enemy_id": "",
+   "feet": [
+    558.576721191406,
+    773.053344726562
+   ],
+   "hp": 23,
+   "id": "unit_hero_sapo_iris",
+   "instinct": 0,
+   "max_hp": 23,
+   "name": "Íris",
+   "player": true,
+   "rank": 2,
+   "speed": 4
+  },
+  {
+   "body": [
+    201.081390380859,
+    347.385864257812,
+    232.350555419922,
+    425.112243652344
+   ],
+   "class_id": "coruja",
+   "enemy_id": "",
+   "feet": [
+    272.437194824219,
+    772.498107910156
+   ],
+   "hp": 30,
+   "id": "unit_hero_coruja_vespera",
+   "instinct": 0,
+   "max_hp": 30,
+   "name": "Véspera",
+   "player": true,
+   "rank": 3,
+   "speed": 2
+  },
+  {
+   "body": [
+    1196.70703125,
+    380.684967041016,
+    259.124145507812,
+    388.350494384766
+   ],
+   "class_id": "",
+   "enemy_id": "cao_eco",
+   "feet": [
+    1319.91931152344,
+    769.035461425781
+   ],
+   "hp": 10,
+   "id": "corridor_2885921763_2_0_cao_eco",
+   "instinct": 0,
+   "max_hp": 10,
+   "name": "Rastreador Quadrúpede",
+   "player": false,
+   "rank": 1,
+   "speed": 4
+  },
+  {
+   "body": [
+    1525.78698730469,
+    371.100250244141,
+    238.817749023438,
+    397.396820068359
+   ],
+   "class_id": "",
+   "enemy_id": "sussurrador",
+   "feet": [
+    1637.13293457031,
+    768.4970703125
+   ],
+   "hp": 8,
+   "id": "corridor_2885921763_2_1_sussurrador",
+   "instinct": 0,
+   "max_hp": 8,
+   "name": "Emissor de Comando",
+   "player": false,
+   "rank": 2,
+   "speed": 3
+  }
+ ],
+ "zone": 0
+}

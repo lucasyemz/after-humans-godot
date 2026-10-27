@@ -263,7 +263,7 @@ func _click(point: Vector2) -> void:
 		await _frames(2)
 
 
-## Na Preparação: o mouse, o foco e o toque longo no cartão.
+## Na plataforma (#123): o mouse, o foco e o toque longo na carta.
 func _preparation() -> void:
 	Campaign.state = Campaign.create_initial(89)
 	Campaign.save()
@@ -273,10 +273,11 @@ func _preparation() -> void:
 		if not GameFlow.busy and GameFlow.passage == null and _tree.current_scene != null and _tree.current_scene.name == "Station" and frame > 3:
 			break
 	var hud: AHRefugeHud = _tree.current_scene.hud
-	hud.open_room(S.PREPARATION)
+	hud.open_departure()
+	hud._briefed = hud._draft.phase
 	await _frames(5)
-	var cards: Array = hud._prep.find_children("*", "Button", true, false).filter(func(b): return String(b.name).begins_with("Slot"))
-	if not t.check(cards.size() == 4, "os quatro cartões da Preparação"):
+	var cards: Array = hud._departure.find_children("*", "Button", true, false).filter(func(b): return String(b.name).begins_with("Slot"))
+	if not t.check(cards.size() == 4, "as quatro cartas da plataforma"):
 		return
 	var card: Button = cards[0]
 	var hero_id: String = hud._draft.team[3]
@@ -295,7 +296,7 @@ func _preparation() -> void:
 	await _frames(1)
 	t.check(not hud.sheet.showing(), "o foco que sai fecha")
 	# O toque longo pela tela: abre segurando e, ao soltar, não escolhe o cartão.
-	var selected: int = hud._prep_selected
+	var selected: int = hud._departure.selected
 	var team: Array = hud._draft.team.duplicate()
 	var center: Vector2 = card.get_global_rect().get_center()
 	await _touch(center, true)
@@ -305,7 +306,7 @@ func _preparation() -> void:
 	await _emulated_release(center)
 	await _frames(2)
 	t.check(not hud.sheet.showing(), "soltar fecha")
-	t.equal([hud._prep_selected, hud._draft.team], [selected, team], "e o toque longo não escolhe nem troca o cartão")
+	t.equal([hud._departure.selected, hud._draft.team], [selected, team], "e o toque longo não escolhe nem troca a carta")
 
 
 ## O mouse até o ponto (nas coordenadas da tela do jogo); emulated: o mouse que a Godot cria do toque.

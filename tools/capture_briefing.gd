@@ -42,21 +42,23 @@ func _run() -> void:
 	await _settle(flow)
 	var hud = current_scene.hud
 	var team: Array = c.roster.slice(0, 4).map(func(h): return h.id)
-	hud.open_room(S.PREPARATION)
-	await _frames(20)
+	# A equipe sobe para a plataforma (#123): o briefing abre quando ela chega.
 	hud._draft = {"phase": phase, "team": team, "focus": "", "extra": 0}
-	hud.refresh()
-	await _frames(10)
-	await _shot("00-preparation")
-	hud._depart()
+	hud.open_departure()
+	var deadline := Time.get_ticks_msec() + 60000
+	while not hud.briefing_open() and Time.get_ticks_msec() < deadline:
+		await process_frame
 	await _frames(20)
-	if hud.get("briefing") != null and hud.briefing_open():
+	if hud.briefing_open():
 		for i in hud.briefing.lines.size():
 			await _shot("01-briefing-%d" % (i + 1))
 			if i + 1 < hud.briefing.lines.size():
 				hud.briefing.next_button.pressed.emit()
 				await _frames(6)
 		hud.briefing.next_button.pressed.emit()
+	await _frames(10)
+	await _shot("00-preparation")
+	hud._depart()
 	await _settle(flow)
 	await _frames(30)
 	await _shot("02-street")
