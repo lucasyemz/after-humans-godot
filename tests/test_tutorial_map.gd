@@ -126,7 +126,7 @@ func _journey() -> void:
 	corridor.debug_next_fight()
 	await _frames(2)
 	t.equal(Campaign.state.session.expedition.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "o Nick entra na equipe")
-	t.equal(street.party_ids, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "e anda com os três")
+	t.equal(street.party_ids, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "e a equipe anda com os quatro")
 	t.equal(corridor.segment, 1, "a sala das celas")
 	# Sem volta: andar para a esquerda até a ponta não leva de volta ao corredor.
 	street._place_leader(Vector3(corridor.segments[1].x0 + 0.3, street.floor_y, street.lane_z))

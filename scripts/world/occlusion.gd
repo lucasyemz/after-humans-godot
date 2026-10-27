@@ -8,6 +8,10 @@ extends Node
 
 ## Transparência do objeto que tapa alguém (0 = inteiro, 1 = some).
 const FADED := 0.6
+## O primeiro plano (os cards perto da câmera, com a meta "foreground" do cenário): escuro e largo na tela, quase some
+## quando tapa alguém, e o teste vê também os lados do corpo (FRONT_SIDES, em m), não só o meio.
+const FOREGROUND_FADED := 0.9
+const FRONT_SIDES := [-0.3, 0.3]
 ## Quanto a transparência anda por segundo (vai e volta em ~0,15 s); com "Reduzir efeitos", troca na hora.
 const FADE_SPEED := 4.0
 ## Os pontos do corpo testados, em fração da altura.
@@ -34,7 +38,7 @@ func add_occluder(node: GeometryInstance3D) -> void:
 	var box: AABB = node.global_transform * node.get_aabb()
 	if box.size.x > MAX_WIDTH or box.size.y < MIN_HEIGHT:
 		return
-	var entry := {"node": node, "box": box, "x": box.position.x}
+	var entry := {"node": node, "box": box, "x": box.position.x, "front": node.has_meta("foreground")}
 	# Em ordem pelo começo em X: cada quadro só percorre a faixa entre a câmera e os personagens.
 	_occluders.insert(_occluders.bsearch_custom(entry, func(a, b): return a.x < b.x), entry)
 
@@ -104,6 +108,7 @@ func _process(delta: float) -> void:
 	_cards = _cards.filter(func(c): return is_instance_valid(c))
 	_enemy_cards = _enemy_cards.filter(func(c): return is_instance_valid(c))
 	var points: Array[Vector3] = []
+	var sides: Array[Vector3] = []
 	var low := eye.x
 	var high := eye.x
 	for list in [_cards, _enemy_cards]:
@@ -113,8 +118,10 @@ func _process(delta: float) -> void:
 			for f in BODY_POINTS:
 				var p: Vector3 = card.global_position + Vector3(0, card.body_height * f, 0)
 				points.append(p)
-				low = minf(low, p.x)
-				high = maxf(high, p.x)
+				for side in FRONT_SIDES:
+					sides.append(p + Vector3(side, 0, 0))
+				low = minf(low, p.x + FRONT_SIDES[0])
+				high = maxf(high, p.x + FRONT_SIDES[-1])
 	var hit := {}
 	if not points.is_empty():
 		var first := _occluders.bsearch_custom({"x": low - MAX_WIDTH}, func(a, b): return a.x < b.x)
@@ -125,9 +132,9 @@ func _process(delta: float) -> void:
 				break
 			if box.end.x < low or not is_instance_valid(o.node):
 				continue
-			for p in points:
+			for p in points + sides if o.front else points:
 				if not box.has_point(p) and box.intersects_segment(eye, p):
-					hit[o.node] = true
+					hit[o.node] = FOREGROUND_FADED if o.front else FADED
 					break
 	var step := 1.0 if _reduced() else FADE_SPEED * delta
 	for node in hit:
@@ -137,7 +144,7 @@ func _process(delta: float) -> void:
 		if not is_instance_valid(node):
 			_fade.erase(node)
 			continue
-		var value: float = move_toward(_fade[node], FADED if hit.has(node) else 0.0, step)
+		var value: float = move_toward(_fade[node], hit.get(node, 0.0), step)
 		node.transparency = value
 		if value <= 0.0 and not hit.has(node):
 			_fade.erase(node)

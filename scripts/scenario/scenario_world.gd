@@ -16,6 +16,8 @@ const CARD_BRIGHTNESS := 1.7
 const FRONT_LIFT_MARGIN := 0.06
 ## A borda da frente mais alta que ainda conta como piso (acima disso é parede, e a silhueta vale).
 const FRONT_EDGE_MAX := 0.6
+## O primeiro plano começa a tantos metros além da borda da frente da zona (os objetos no pé da faixa ficam de fora).
+const FOREGROUND_GAP := 2.0
 
 static var _mesh_cache: Array = []
 
@@ -141,6 +143,9 @@ func build(map: String) -> void:
 			_group(String(part.node)).add_child(node)
 			continue
 		add_child(node)
+		# O primeiro plano, entre a faixa e a câmera: o AHOcclusion quase o apaga quando tapa alguém.
+		if _foreground(node.transform * node.mesh.get_aabb()):
+			node.set_meta("foreground", true)
 		if not data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"] \
 				and not data.materials[int(part.materials[0])].get("masked", false):
 			walls.append(node.transform * node.mesh.get_aabb())
@@ -568,6 +573,12 @@ func _material(m: Dictionary) -> Material:
 func _in_front(box: AABB) -> bool:
 	var zone := zone_at(box.get_center().x)
 	return zone >= 0 and box.position.z > (zones[zone].z0 + zones[zone].z1) * 0.5
+
+
+## Bem à frente da faixa (FOREGROUND_GAP além da borda da zona): os canos e cabos do primeiro plano.
+func _foreground(box: AABB) -> bool:
+	var zone := zone_at(box.get_center().x)
+	return zone >= 0 and box.position.z > float(zones[zone].z1) + FOREGROUND_GAP
 
 
 func _merge(groups: Dictionary) -> void:

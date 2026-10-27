@@ -466,7 +466,7 @@ func refresh(campaign: Dictionary) -> void:
 	if expedition.phase_id == AHTutorial.PHASE_ID:
 		# A abertura: fugir até o trem da plataforma.
 		_goal_title.text = tr("Chegar ao trem (trecho %d)") % boss_step
-		_goal_text.text = tr("As portas da contenção baixam atrás da equipe. A saída é a plataforma.")
+		_goal_text.text = tr("A porta da contenção baixa atrás da equipe. A saída é a plataforma.")
 	elif focus.is_empty():
 		_goal_title.text = tr("Vencer o guardião (trecho %d)") % boss_step
 		_goal_text.text = tr("Rota básica: o achado das buscas volta com a equipe.")

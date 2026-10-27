@@ -4,7 +4,8 @@
 ## Name) e mexe no estado da campanha, como o AHJourneyRules.
 ##   journey: o mapa, o lugar dos eventos, o clima, os trechos (Steps, um por tipo), quantos trechos ficam em cada zona
 ##            do mapa (ZoneSteps), quem começa (StartTeam), quem chega no meio (JoinTeam) e o que a busca rende (Search)
-##   fight_N: as lutas fixas (o trecho, os inimigos da frente para trás e o que cada uma ensina)
+##   fight_N: as lutas fixas (o trecho, os inimigos da frente para trás, o que cada uma ensina e o reforço só do
+##            tutorial, Boost: por inimigo, Damage e Speed a mais)
 ## A fase do tutorial não está em AHJourneyRules.PHASES: não aparece no Mapa da Rede nem no "Jogar de novo".
 class_name AHTutorial
 extends RefCounted
@@ -90,8 +91,12 @@ static func enemies_at(expedition: Dictionary, step: int) -> Array:
 			# Um id que não existe em enemies.json deixaria a luta mais curta sem aviso (test_tutorial_map confere os dados).
 			push_error("Tutorial: inimigo %s da luta do trecho %d não existe em enemies.json." % [ids[unit], step])
 			continue
+		# O reforço só do tutorial (Boost, por inimigo): mais dano para a vida mexer na primeira luta e mais velocidade
+		# para quem precisa agir antes de cair (o Drone que contamina); enemies.json fica como está.
+		var boost: Dictionary = fight.get("Boost", {}).get(ids[unit], {})
 		out.append({"enemy_id": ids[unit], "unit_id": "tutorial_%d_%d_%s" % [step, unit, ids[unit]], "rank": unit + 1,
-			"max_hp": int(row.MaxHp), "hp": int(row.MaxHp), "damage_bonus": 0, "display_name": row.DisplayName})
+			"max_hp": int(row.MaxHp), "hp": int(row.MaxHp), "damage_bonus": int(boost.get("Damage", 0)),
+			"speed_bonus": int(boost.get("Speed", 0)), "display_name": row.DisplayName})
 	return out
 
 
