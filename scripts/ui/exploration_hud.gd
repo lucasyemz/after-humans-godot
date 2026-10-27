@@ -399,7 +399,8 @@ func _refresh_place() -> void:
 	var parts := PackedStringArray()
 	if expedition != null:
 		var info := AHJourneyRules.phase(expedition.phase_id)
-		parts.append(tr("Jornada %d") % (AHJourneyRules.PHASES.find(info) + 1))
+		# O tutorial (#144) não é uma jornada da campanha: é a abertura.
+		parts.append(tr("Abertura") if expedition.phase_id == AHTutorial.PHASE_ID else tr("Jornada %d") % (AHJourneyRules.PHASES.find(info) + 1))
 	if _weather != "":
 		parts.append(_weather)
 	_place_sub.text = " · ".join(parts)
@@ -423,7 +424,11 @@ func refresh(campaign: Dictionary) -> void:
 	var focus := AHStationRules.focus_def(expedition.get("focus", ""))
 	var boss_step: int = route.steps.size()
 	var done := false
-	if focus.is_empty():
+	if expedition.phase_id == AHTutorial.PHASE_ID:
+		# A abertura: fugir até o trem da plataforma.
+		_goal_title.text = tr("Chegar ao trem (trecho %d)") % boss_step
+		_goal_text.text = tr("As portas da contenção baixam atrás da equipe. A saída é a plataforma.")
+	elif focus.is_empty():
 		_goal_title.text = tr("Vencer o guardião (trecho %d)") % boss_step
 		_goal_text.text = tr("Rota básica: o achado das buscas volta com a equipe.")
 	elif expedition.get("objective_done", false):
@@ -1096,7 +1101,7 @@ func camp_respond(hero_id: String, kind: String, life_gain: int, instinct_change
 
 ## Esc na exploração: continuar ou voltar à Estação. Antes do guardião a volta é uma retirada (metade do achado) e
 ## pergunta antes, como o Retornar da Unreal ("Abandonar a expedição?").
-func show_menu(completed: bool, can_return: bool) -> void:
+func show_menu(completed: bool, can_return: bool, blocked_note: String = "") -> void:
 	# O Menu da expedição (#109, docs/design/hud-ajustes.md; decisão do Lucas: fica o menu), no Painel do kit: à direita
 	# do cartão do objetivo, com o pé acima das cabeças da equipe; cresce para cima no texto Maior.
 	var box := _open_modal(MENU_WIDTH)
@@ -1132,7 +1137,8 @@ func show_menu(completed: bool, can_return: bool) -> void:
 	line.custom_minimum_size = Vector2(0, 8)
 	box.add_child(line)
 	# Voltar à Estação com o custo numa sublinha (não quebra o botão no Maior); no meio da luta ou do evento, apagado.
-	var sub := (tr("Fase concluída: todo o achado") if completed else tr("Retirada: metade do achado")) if can_return else tr("Termine a luta ou o evento antes de voltar.")
+	var sub := (tr("Fase concluída: todo o achado") if completed else tr("Retirada: metade do achado")) if can_return \
+		else (blocked_note if blocked_note != "" else tr("Termine a luta ou o evento antes de voltar."))
 	var back := _menu_entry(tr("Voltar à Estação"), "station", func(): _confirm_return(completed), sub)
 	back.name = "Return"
 	back.disabled = not can_return

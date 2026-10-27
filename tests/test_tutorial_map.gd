@@ -22,6 +22,8 @@ func run(context) -> void:
 	var real_tips: bool = Tips.enabled
 	var real_briefing: bool = AHBriefing.enabled
 	Tips.enabled = false
+	# A conversa do Nick é da #144 (test_tutorial): aqui ele entra direto.
+	AHBriefing.enabled = false
 	Campaign.save_dir = "user://test-tutorial-map-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(5)
 	await _journey()

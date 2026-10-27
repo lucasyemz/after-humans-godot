@@ -201,5 +201,51 @@
       ],
       "Text": "Ninguém desceu do trem. Na Estação, alguém deixa a luz da plataforma acesa."
     }
+  },
+  {
+    "Name": "tutorial_nick",
+    "Briefing": [
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Essa porta não abre mais. As máquinas fecharam o corredor inteiro, e você ficou do lado de dentro."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Então tem que haver outro caminho. Eu não saio daqui sem um."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Tem. Pelo duto, depois a escada até o alçapão. Eu ia seguir viagem... Anda, antes que eu mude de ideia."
+      }
+    ]
+  },
+  {
+    "Name": "tutorial",
+    "Debriefing": [
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Você ia acabar preso lá embaixo junto com as máquinas."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Talvez. Fica? Aqui tem comida, cama e porta que abre por dentro."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Só por uma noite."
+      }
+    ]
   }
 ]

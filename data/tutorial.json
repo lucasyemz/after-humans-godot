@@ -1,31 +1,174 @@
 [
   {
+    "Name": "opening",
+    "Cards": [
+      {
+        "Title": "Você precisa escapar.",
+        "Subtitle": "",
+        "Image": ""
+      }
+    ]
+  },
+  {
     "Name": "journey",
     "Map": "ContainmentCorridor",
     "Place": "corredor-de-contencao",
     "Weather": "night",
-    "Steps": ["start", "combat", "nick", "loot", "combat", "combat", "train"],
-    "ZoneSteps": [2, 3, 1, 1],
-    "StartTeam": ["hero_cao_bento"],
-    "JoinTeam": ["hero_gato_nick"],
-    "Search": {"bandages": 1, "food": 1}
+    "Steps": [
+      "start",
+      "combat",
+      "nick",
+      "loot",
+      "combat",
+      "combat",
+      "train"
+    ],
+    "ZoneSteps": [
+      2,
+      3,
+      1,
+      1
+    ],
+    "StartTeam": [
+      "hero_cao_bento"
+    ],
+    "JoinTeam": [
+      "hero_gato_nick"
+    ],
+    "Search": {
+      "bandages": 1,
+      "food": 1
+    }
   },
   {
     "Name": "fight_1",
     "Step": 1,
     "Lesson": "O Bento sozinho: escolher a habilidade, escolher o alvo, a vez de cada um e a vida.",
-    "Enemies": ["broto"]
+    "Enemies": [
+      "broto"
+    ]
   },
   {
     "Name": "fight_2",
     "Step": 4,
     "Lesson": "O Nick chega: as posições, mover, defender, a ordem da rodada e o instinto.",
-    "Enemies": ["faisca", "pipoco"]
+    "Enemies": [
+      "faisca",
+      "pipoco"
+    ]
   },
   {
     "Name": "fight_3",
     "Step": 5,
     "Lesson": "Os estados (o sangramento e o bloqueio) e um item da Mochila na luta.",
-    "Enemies": ["cao_eco", "broto"]
+    "Enemies": [
+      "cao_eco",
+      "broto"
+    ]
+  },
+  {
+    "Name": "reward",
+    "Seeds": 10,
+    "Bandages": 1,
+    "Tool": "pe_de_cabra"
+  },
+  {
+    "Name": "station",
+    "Roster": "B",
+    "Proposals": {
+      "A": "Só o Bento e o Nick; a Íris e a Véspera chegam nas primeiras saídas, pelo trem (#122).",
+      "B": "Os quatro fundadores, como hoje."
+    },
+    "Waiting": [
+      "hero_sapo_iris",
+      "hero_coruja_vespera"
+    ]
+  },
+  {
+    "Name": "hints",
+    "Steps": [
+      {
+        "Id": "walk",
+        "Title": "Ande até o fim do corredor",
+        "Text": "A equipe segue o líder. Segure Correr para ir mais rápido.",
+        "Keys": [
+          "move_left",
+          "move_right",
+          "run"
+        ]
+      },
+      {
+        "Id": "ability",
+        "Title": "Escolha uma habilidade",
+        "Text": "Na vez do herói, cada habilidade diz de que posições sai e quais alcança. O Broto é fraco: ataque.",
+        "Keys": [
+          "combat_ability_1",
+          "combat_ability_2",
+          "combat_ability_3",
+          "combat_ability_4"
+        ],
+        "Blocking": true
+      },
+      {
+        "Id": "target",
+        "Title": "Escolha o alvo",
+        "Text": "Os alvos possíveis acendem. A barra sobre cada um é a vida; a ordem da rodada fica no alto.",
+        "Keys": [
+          "ui_left",
+          "ui_right",
+          "interact"
+        ],
+        "Blocking": true
+      },
+      {
+        "Id": "search",
+        "Title": "Vasculhe o armário",
+        "Text": "O losango dourado marca o que dá para usar. Chegue perto e aperte Interagir.",
+        "Keys": [
+          "interact"
+        ]
+      },
+      {
+        "Id": "bag",
+        "Title": "Abra a Mochila",
+        "Text": "Comida e curativos curam fora da luta. Na luta, usar um item não gasta a vez.",
+        "Keys": [
+          "inventory"
+        ]
+      },
+      {
+        "Id": "patrol",
+        "Title": "Chegue sem ser visto",
+        "Text": "A patrulha olha à frente. Se ela não vir a equipe até o encontro, vocês agem primeiro.",
+        "Keys": [
+          "move_right"
+        ]
+      },
+      {
+        "Id": "position",
+        "Title": "Posição e defesa",
+        "Text": "A frente fica à direita. Mover troca de lugar com o vizinho; Defender dá Bloqueio. A ordem da rodada e o instinto (a barra roxa) ficam no painel.",
+        "Keys": [
+          "combat_move",
+          "combat_defend"
+        ]
+      },
+      {
+        "Id": "item",
+        "Title": "Estados e a Mochila na luta",
+        "Text": "O Rastreador faz sangrar: o sangramento tira vida no começo de cada vez. Um curativo da Mochila cura sem gastar a vez.",
+        "Keys": [
+          "inventory"
+        ]
+      },
+      {
+        "Id": "train",
+        "Title": "Embarque no trem",
+        "Text": "O vagão leva a equipe à Estação Raiz.",
+        "Keys": [
+          "interact"
+        ]
+      }
+    ]
   }
 ]

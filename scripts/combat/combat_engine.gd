@@ -633,7 +633,7 @@ func _apply_damage(unit: Unit, raw_damage: int, direct_attack: bool, out_events:
 				_log(tr("%s resistiu à morte por um triz!") % _n(unit))
 			return
 
-		unit.hp = maxi(0, unit.hp - damage)
+		unit.hp = maxi(context.min_hero_hp, unit.hp - damage)
 		if unit.hp == 0:
 			unit.deaths_door = true
 			_add_event(out_events, tr("ÚLTIMO FÔLEGO!"), EventType.INFO, unit.id)

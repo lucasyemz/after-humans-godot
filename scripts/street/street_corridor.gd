@@ -50,6 +50,8 @@ const REACH := 1.1
 ## O embarque no trem do tutorial: a que distância (m) da porta do vagão e quanto o trem leva para parar.
 const BOARD_REACH := 2.5
 const TRAIN_ARRIVAL_SECONDS := 4.0
+## Quanto a recompensa fica à vista antes de o vagão partir.
+const REWARD_SECONDS := 2.5
 
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
 const SWITCH_WAIT_MS := 2000
@@ -77,6 +79,9 @@ var side_rooms: Array = []
 var side_room := -1
 ## Props do cenário: {prop (índice no corredor), local (no mapa), x, zone, step}.
 var scenario_props: Array = []
+## O guia das dicas do tutorial (#144; null fora dele) e onde fica o que o aviso de agora usa (null: sem lugar).
+var guide: AHTutorialGuide
+var _action_where = null
 
 
 func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
@@ -118,6 +123,9 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 		_enter_segment(_segment_of(route.index), _step_x(route.index, ARRIVAL_SPOT))
 	hud.refresh(campaign)
 	var session: Dictionary = campaign.session
+	if tutorial():
+		guide = AHTutorialGuide.new(self)
+		add_child(guide)
 	# Reaberto no meio do tutorial: o encontro ou a chegada do trem que ficou pela metade continua.
 	var here: Dictionary = route.steps[route.index]
 	if tutorial() and not here.resolved and session.result == "" and session.event == null:
@@ -635,6 +643,7 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 	if text.begins_with(tr("E  Vasculhar")):
 		Tips.show_tip("search")
 	_action = action
+	_action_where = where
 	hud.set_markers(_marker_points(campaign, route, leader, where))
 
 
@@ -650,10 +659,16 @@ func _tutorial_action(campaign: Dictionary, route: Dictionary, leader: Vector3, 
 	if text.begins_with(tr("E  Vasculhar")):
 		Tips.show_tip("search")
 	_action = action
+	_action_where = where
 	var points := _marker_points(campaign, route, leader, where)
 	if boarding != null and where != boarding and absf(boarding.x - leader.x) < 14.0:
 		points.append(boarding)
 	hud.set_markers(points)
+
+
+## Onde fica o que o aviso de agora usa (o armário, a porta do vagão), ou null.
+func _action_point():
+	return _action_where
 
 
 ## A porta do vagão onde se embarca (a marca), ou null fora da plataforma ou com o trem ainda chegando.
@@ -685,14 +700,54 @@ func _refresh_security_doors(sound: bool = false) -> void:
 		street.scenario.set_door(index, done)
 
 
-## O encontro com o Nick (o tutorial): ele entra na equipe e o trecho fica resolvido.
+## O encontro com o Nick (o tutorial): ele aparece adiante, a conversa curta com o retrato (a caixa do briefing, #88) e
+## ele entra na equipe; o trecho fica resolvido. Fechar o jogo no meio da conversa repete o encontro.
 func _meet_nick() -> void:
-	var joined: Array = AHTutorial.join(Campaign.state)
-	for hero_id in joined:
+	if busy:
+		return
+	busy = true
+	var team: Array = Campaign.state.session.expedition.team.duplicate()
+	var arriving: Array = AHTutorial.journey().get("JoinTeam", []).filter(func(id): return not team.has(id))
+	for hero_id in arriving:
 		street.add_hero(hero_id, Vector3(street._leader.position.x + 2.2, street.floor_y, street.lane_z - 0.6))
+	var lines := AHBriefing.departure(Campaign.state, "tutorial_nick", team + arriving)
+	if not lines.is_empty() and street._capture_dir == "":
+		var dialog := AHBriefingDialog.open(hud, lines, tr("Seguir"))
+		await dialog.finished
+	AHTutorial.join(Campaign.state)
 	Campaign.save()
+	busy = false
 	hud.refresh(Campaign.state)
 	_refresh_security_doors(true)
+
+
+## Recuou de uma luta do tutorial: a equipe volta inteira um pouco antes da patrulha, que retoma o posto.
+func _restart_fight() -> void:
+	street.end_fight()
+	var index: int = _fight.get("index", -1)
+	for hero_id in Campaign.state.session.expedition.team:
+		var hero = Campaign.hero(hero_id)
+		if hero != null:
+			hero.hp = int(hero.max_hp)
+			hero.alive = true
+	if guards.has(index):
+		var guard: Dictionary = guards[index]
+		for i in guard.cards.size():
+			var card: AHSpriteCard = guard.cards[i]
+			card.position = _guard_position(index, i)
+			card.show_art(street._combat_art.enemies[guard.specs[i].enemy_id].idle)
+			card.set_facing(-1.0)
+			card.set_tint(Color.WHITE)
+			card.visible = true
+		guard.meter = 0.0
+		guard.detected = false
+		street._place_leader(Vector3(_step_x(index, 0.05), street.floor_y, street.lane_z))
+	street.remove_dead_heroes()
+	if guide != null:
+		guide.event("fight_end")
+	Campaign.save()
+	hud.refresh(Campaign.state)
+	hud.toast(tr("A equipe recua e se recompõe. A patrulha continua no caminho: tente de novo."), 4.0)
 
 
 ## A plataforma: o trem chega (o som e o vagão entrando no fosso) e para com as portas abertas.
@@ -704,17 +759,38 @@ func _reach_platform() -> void:
 	Campaign.save()
 	busy = false
 	hud.refresh(Campaign.state)
+	if guide != null:
+		guide.event("platform")
 
 
-## O embarque: a jornada do tutorial termina e o vagão leva a equipe à Estação.
+## O embarque: a recompensa da fuga à vista (o que se ganhou voa para o alto, #143), e o vagão leva a equipe à Estação,
+## que abre com a chegada, o debriefing do Bento e do Nick e o relatório.
 func _board_train() -> void:
 	if busy:
 		return
 	busy = true
+	if guide != null:
+		guide.event("board")
 	Sound.play("res://audio/station/train_bell.ogg")
-	AHTutorial.finish(Campaign.state)
+	var team: Array = Campaign.state.session.expedition.team.duplicate()
+	var prize := AHTutorial.complete(Campaign.state)
+	Tips.mark_seen(AHTutorial.COVERED_TIPS)
 	Campaign.save()
-	GameFlow.travel("station")
+	var gains: Array = []
+	if int(prize.seeds) > 0:
+		gains.append(["lobby-seed", "+%d %s" % [prize.seeds, tr("sementes")]])
+	if int(prize.bandages) > 0:
+		gains.append(["res-bandages", "+%d %s" % [prize.bandages, tr("curativo") if int(prize.bandages) == 1 else tr("curativos")]])
+	if prize.tool != "":
+		gains.append([AHInventoryPanel.TOOL_ICONS.get(prize.tool, "tool-generic"), tr(AHInventoryPanel.TOOL_NAMES.get(prize.tool, prize.tool))])
+	hud.loot_burst(gains, street._leader.global_position + Vector3(0, 1.9, 0))
+	hud.toast(tr("Recompensa da fuga: %s.") % ", ".join(gains.map(func(g): return g[1])), REWARD_SECONDS)
+	await get_tree().create_timer(REWARD_SECONDS if street._capture_dir == "" else 0.1).timeout
+	var card: Dictionary = GameFlow.card_for("station")
+	card.backdrop = AHWagonRide.new(team)
+	card.title_delay = AHWagonRide.RIDE_SECONDS
+	card.hold = AHWagonRide.RIDE_SECONDS + GameFlow.CARD_SECONDS
+	GameFlow.travel("station", card)
 
 
 ## Onde fica, no mundo, a marca de cada coisa usável: a porta da loja, os caixotes, os props e as portas dos cenários.
@@ -832,6 +908,10 @@ func open_menu() -> void:
 	var session: Dictionary = Campaign.state.session
 	if not AHExplorationHud.session_open(Campaign.state):
 		return
+	if tutorial():
+		# Na abertura a volta é o trem: o menu fica com as Opções e a campanha nova.
+		hud.show_menu(false, false, tr("Na abertura, a saída é o trem da plataforma."))
+		return
 	hud.show_menu(session.expedition.objective_completed, session.get("event") == null and ["corridor", "rest"].has(session.get("screen")))
 
 
@@ -842,6 +922,8 @@ func open_inventory() -> void:
 	Sound.play("res://audio/ui/bag_open.ogg")
 	hud.show_inventory()
 	Tips.show_tip("bag")
+	if guide != null:
+		guide.event("bag")
 
 
 func _new_campaign() -> void:
@@ -858,6 +940,8 @@ func _search_scenario_prop(entry: Dictionary) -> void:
 		_search_sound(objective_before, int(street.scenario.props[entry.local].open) >= 0)
 		_show_gains(stock)
 		street.scenario.open_prop(entry.local)
+		if guide != null:
+			guide.event("searched")
 		Campaign.save()
 		hud.refresh(Campaign.state)
 		# O objeto com escolha abre o evento ali mesmo (#7).
@@ -1183,6 +1267,8 @@ func _start_fight(index: int, advantage: bool) -> void:
 	_fight = {"index": index, "boss": fight.boss, "house": house, "cards": cards,
 		"cause": fight.enemies[0].display_name if not fight.enemies.is_empty() else "patrulha"}
 	street.begin_fight()
+	if guide != null:
+		guide.event("fight_start")
 	if fight.opening:
 		hud.toast(tr("A equipe chegou sem ser vista: age primeiro."), 2.5)
 	var heroes: Array = street.party_ids.map(func(id): return Campaign.hero(id))
@@ -1193,6 +1279,10 @@ func _start_fight(index: int, advantage: bool) -> void:
 
 func _on_combat_finished(result: String) -> void:
 	var campaign: Dictionary = Campaign.state
+	# No tutorial ninguém cai e não há fuga que encerre a jornada: quem recua tenta a mesma luta de novo.
+	if tutorial() and result != "victory":
+		_restart_fight()
+		return
 	R.end_combat(campaign, result, _fight.get("boss", false), "%s (%s)" % [_fight.get("cause", ""), R.phase(campaign.session.expedition.phase_id).get("name", "")])
 	street.end_fight()
 	street.remove_dead_heroes()
@@ -1209,6 +1299,8 @@ func _on_combat_finished(result: String) -> void:
 			guards[_fight.index].mark.queue_free()
 			guards.erase(_fight.index)
 		_refresh_security_doors(true)
+		if guide != null:
+			guide.event("fight_end")
 		if campaign.session.expedition.objective_completed and _fight.boss:
 			# A carga recuperada (#91): seis caixas com o que o guardião guardava; escolhida uma vez.
 			Campaign.save()
@@ -1256,6 +1348,7 @@ func debug_next_fight() -> bool:
 			return true
 		# O encontro do tutorial resolve ali (o Nick entra); o trem para a caminhada.
 		if outcome == "nick":
+			_enter_segment(_segment_of(route.index), _step_x(route.index, ARRIVAL_SPOT))
 			_meet_nick()
 		elif outcome == "train":
 			Campaign.save()
