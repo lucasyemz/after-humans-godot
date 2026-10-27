@@ -58,6 +58,12 @@ var _prompt_check: TextureRect
 var _prompt_touch: TextureRect
 var _prompt_world = null
 var _toast: PanelContainer
+## O aviso da ferramenta nova (#143): o ícone grande, o nome e o que ela faz; some sozinho ou com uma tecla.
+var _tool_notice: PanelContainer
+var _tool_tween: Tween
+const TOOL_NOTICE_SECONDS := 5.0
+## O selo NOVO no botão MOCHILA, até ela abrir.
+var _bag_new: Control
 var _toast_label: Label
 var _toast_tween: Tween
 var _modal: PanelContainer
@@ -230,6 +236,10 @@ func _ready() -> void:
 	_menu_button.name = "Menu"
 	_bag_button = _corner_button(tr("Mochila"), "room_depot", "inventory", func(): inventory_requested.emit())
 	_bag_button.name = "Bag"
+	_bag_new = AHInventoryPanel.new_tag()
+	_bag_new.position.y = -14.0
+	_bag_new.visible = false
+	_bag_button.add_child(_bag_new)
 	_place_corner.call_deferred()
 
 	# Concluir jornada (o guardião vencido): o botão âmbar, sem tecla (o Esc é do MENU, e a volta também sai pelo Menu).
@@ -417,6 +427,8 @@ func refresh(campaign: Dictionary) -> void:
 	var expedition = campaign.get("session", {}).get("expedition")
 	if expedition == null:
 		return
+	if _bag_new != null:
+		_bag_new.visible = not Array(campaign.get("new_tools", [])).is_empty()
 	_refresh_place()
 	var route: Dictionary = expedition.corridor
 	# O objetivo: o foco escolhido na Preparação e o guardião no fim.
@@ -697,6 +709,10 @@ func set_patrol(where, meter: float, detected: bool) -> void:
 func _input(event: InputEvent) -> void:
 	if modal_open() and S.press_focused(_modal, event):
 		get_viewport().set_input_as_handled()
+	# O aviso da ferramenta sai com qualquer tecla, clique ou toque (sem engolir: andar continua andando).
+	if tool_notice_shown() and (event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton
+			or event is InputEventScreenTouch) and event.is_pressed():
+		hide_tool_notice()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -708,6 +724,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if modal_open():
 		S.keep_focus(_modal)
+	# A ferramenta que chegou (a busca, o evento): o aviso, uma de cada vez, sem painel aberto por cima e fora do
+	# acampamento (o HUD dele ocupa a tela; o aviso espera a equipe levantar).
+	var notices: Array = Campaign.state.get("tool_notices", [])
+	if not notices.is_empty() and not modal_open() and not camp_open() and not tool_notice_shown() and is_visible_in_tree():
+		show_tool_notice(String(notices.pop_front()))
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
 		return
@@ -755,6 +776,63 @@ func _process(delta: float) -> void:
 	# Um painel alto (a Mochila no Maior) desce até a barra: ela sai, em vez de ficar por baixo dele.
 	if _panel_keys.visible and _modal.get_global_rect().intersects(_panel_keys.get_global_rect()):
 		_panel_keys.visible = false
+
+
+## O aviso da ferramenta nova (#143), no meio do alto, abaixo do corredor: o ícone grande, FERRAMENTA NOVA, o nome, o
+## que ela faz e onde ela fica. Some em TOOL_NOTICE_SECONDS ou com uma tecla.
+func show_tool_notice(tool: String) -> void:
+	hide_tool_notice()
+	_tool_notice = AHKit.panel_box("large")
+	_tool_notice.name = "ToolNotice"
+	_tool_notice.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_tool_notice)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 22)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tool_notice.add_child(row)
+	var tile := AHKit.panel(AHKit.piece_of("chip", "resource_tile"))
+	tile.custom_minimum_size = Vector2(120, 120)
+	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var glyph := AHKit.glyph(AHInventoryPanel.TOOL_ICONS.get(tool, "tool-generic"), 84, AHKit.AMBER)
+	glyph.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	tile.add_child(glyph)
+	row.add_child(tile)
+	var words := VBoxContainer.new()
+	words.add_theme_constant_override("separation", 6)
+	words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(words)
+	words.add_child(AHKit.label(tr("Ferramenta nova"), "small", AHKit.AMBER, true, true))
+	words.add_child(AHKit.label(tr(AHInventoryPanel.TOOL_NAMES.get(tool, tool.capitalize())), "panel_title", AHKit.TEXT, true))
+	var text := AHKit.label(AHInventoryPanel.tool_text(tool), "text", AHKit.TEXT)
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.custom_minimum_size = Vector2(560, 0)
+	words.add_child(text)
+	# A tecla só fora do toque (no toque, a Mochila é o botão).
+	var where := tr("Fica na Mochila.") if Settings.touch_visible() else tr("Fica na Mochila (%s).") % S.key_name("inventory")
+	words.add_child(AHKit.label(where, "small", AHKit.MUTED))
+	_tool_notice.reset_size()
+	_tool_notice.size = _tool_notice.get_combined_minimum_size()
+	_tool_notice.position = Vector2(960 - _tool_notice.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+	Sound.play("res://audio/ui/confirm.ogg")
+	_tool_tween = create_tween()
+	_tool_tween.tween_interval(TOOL_NOTICE_SECONDS)
+	_tool_tween.tween_property(_tool_notice, "modulate:a", 0.0, 0.5)
+	_tool_tween.tween_callback(hide_tool_notice)
+
+
+func tool_notice_shown() -> bool:
+	return _tool_notice != null and is_instance_valid(_tool_notice)
+
+
+func hide_tool_notice() -> void:
+	if _tool_tween:
+		_tool_tween.kill()
+		_tool_tween = null
+	if tool_notice_shown():
+		_tool_notice.queue_free()
+	_tool_notice = null
 
 
 ## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
@@ -1219,6 +1297,12 @@ func show_inventory() -> void:
 	_modal.set_meta("inventory", true)
 	_modal.position = Vector2(500, 132)
 	var bag := AHInventoryPanel.new()
+	# A novidade (#143): as ferramentas novas abrem destacadas, e o selo do botão sai.
+	bag.fresh = Array(Campaign.state.get("new_tools", [])).duplicate()
+	Campaign.state.new_tools = []
+	hide_tool_notice()
+	if _bag_new != null:
+		_bag_new.visible = false
 	# No acampamento, a Mochila abre no herói escolhido na fogueira.
 	if camp_open():
 		bag.hero_id = camp_hud.camp.selected_id()
