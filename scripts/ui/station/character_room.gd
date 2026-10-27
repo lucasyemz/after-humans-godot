@@ -1,6 +1,6 @@
 ## A Sala dos Personagens no kit (#60, docs/design/hud-station.md): a tela inteira, com o cômodo ao fundo.
 ## - No alto: a plaqueta da Estação, Comida, Água e Energia, e a engrenagem (as Opções).
-## - À esquerda: as abas dos heróis (e a de recrutar, com o Memorial), as HABILIDADES e o detalhe da escolhida.
+## - À esquerda: as abas dos heróis (e a de recrutar), as HABILIDADES e o detalhe da escolhida.
 ## - No meio: o herói de corpo inteiro (a pose idle), sobre a sombra e um escurecido.
 ## - À direita: o painel PERSONAGEM (Fundador ou Recruta, o nível e o XP, o Treino, a vida, a velocidade e o instinto, a
 ##   relíquia, os contadores e os traços).
@@ -233,6 +233,17 @@ func _hero_tab(entry: Dictionary) -> Button:
 	face.size = Vector2(104, 92)
 	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tab.add_child(face)
+	# Em recuperação (#118): o retrato apagado, o ícone de Caído e os dias no canto.
+	if S.recovering(entry):
+		face.modulate = AHKit.FALLEN
+		var badge := HBoxContainer.new()
+		badge.name = "Recovering"
+		badge.add_theme_constant_override("separation", 2)
+		badge.position = Vector2(8, 6)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		badge.add_child(AHKit.glyph("state_wounded", 26, AHKit.alert_text()))
+		badge.add_child(AHKit.label(tr("%d d") % S.recovery_days(entry), "small", AHKit.alert_text(), true))
+		tab.add_child(badge)
 	var name := AHKit.label(String(entry.display_name), "small" if AHUiStyle.text_scale > 1.2 else "tab", AHKit.AMBER if entry.id == selected else AHKit.TEXT)
 	name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -240,7 +251,7 @@ func _hero_tab(entry: Dictionary) -> Button:
 	name.position = Vector2(4, 98)
 	name.size = Vector2(108, 30)
 	tab.add_child(name)
-	tab.tooltip_text = String(entry.display_name)
+	tab.tooltip_text = String(entry.display_name) if not S.recovering(entry) else S.recovery_block(entry)
 	var id: String = entry.id
 	tab.pressed.connect(func(): _select(id))
 	if entry.id == selected:
@@ -248,12 +259,12 @@ func _hero_tab(entry: Dictionary) -> Button:
 	return tab
 
 
-## Recrutar e o Memorial: o botão ao lado de VOLTAR (as quatro abas dos heróis enchem a coluna, como no alvo).
+## Recrutar: o botão ao lado de VOLTAR (as quatro abas dos heróis enchem a coluna, como no alvo).
 func _recruit_button() -> Button:
 	var button := Button.new()
 	button.name = "Tab_recruit"
 	button.text = ("+ " + tr("Recrutar")).to_upper()
-	button.tooltip_text = tr("Recrutar e Memorial")
+	button.tooltip_text = tr("Recrutar")
 	AHKit.style_as(button, "secondary")
 	button.add_theme_font_override("font", AHKit.font(true))
 	button.add_theme_font_size_override("font_size", AHKit.size("primary"))
@@ -338,7 +349,7 @@ func _ability_detail(c: Dictionary, hero: Dictionary, ability_id: String) -> Pan
 	return inset
 
 
-## Recrutar (as classes liberadas, de graça com o voluntário) e o Memorial.
+## Recrutar (as classes liberadas, de graça com o voluntário). O Memorial saiu com o #118: ninguém morre.
 func _recruit_list(c: Dictionary, column: VBoxContainer) -> void:
 	column.add_child(AHKit.label(tr("Recrutar"), "panel_title", AHKit.TEXT, true, true))
 	column.add_child(AHKit.label(tr("Elenco: %d de %d") % [S.living(c).size(), S.MAX_ROSTER], "text", AHKit.MUTED))
@@ -356,15 +367,6 @@ func _recruit_list(c: Dictionary, column: VBoxContainer) -> void:
 		button.disabled = not (free or S.quantity(c, "seeds") >= S.RECRUIT_COST)
 		button.pressed.connect(func(): hud._recruit(id))
 		column.add_child(button)
-	if c.memorial.is_empty():
-		return
-	column.add_child(_divider())
-	column.add_child(AHKit.label(tr("Memorial"), "panel_title", AHKit.TEXT, true, true))
-	for entry in c.memorial:
-		var line := AHKit.label("%s · %s · %s" % [entry.display_name, tr(entry.get("mission_name", "")), AHCombatEngine.cause_text(entry.get("cause", ""))], "text", AHKit.MUTED)
-		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.custom_minimum_size = Vector2(500, 0)
-		column.add_child(line)
 
 
 func _divider() -> TextureRect:
@@ -484,6 +486,18 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 	instinct.custom_minimum_size = Vector2(0, 28)
 	column.add_child(instinct)
 	column.add_child(_divider())
+	if S.recovering(hero):
+		var down := AHStationReport.fallen_line(hero)
+		down.name = "Recovery"
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		down.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(down)
+		var care := _small_button(tr("Ver a Enfermaria"))
+		care.pressed.connect(func(): hud.open_room(S.INFIRMARY))
+		row.add_child(care)
+		column.add_child(row)
+		column.add_child(_divider())
 	_relic(c, hero, column)
 	if hero.get("trauma", false):
 		var trauma := HBoxContainer.new()
