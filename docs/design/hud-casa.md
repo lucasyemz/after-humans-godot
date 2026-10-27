@@ -1,7 +1,7 @@
 # A Estação nova: Enfermaria, Caído, postos, trem e plataforma (26/10/2026)
 
 O lote 7, as issues #120 e #124 juntas, porque as telas se cruzam:
-- **Ninguém morre (#118):** o estado Caído / Em recuperação nas cartas do relatório, na Sala dos Personagens e na
+- **Ninguém morre (#118):** o estado Caído nas cartas do relatório, na Sala dos Personagens e na
   Preparação, e "Íris caiu" no popup de fim de luta;
 - **limites e postos (#119):** "Heróis 6 de 8" e "Ajudantes 3 de 4", o campo Posto na Sala, "Quem trabalha aqui" no
   painel do cômodo e o rendimento no relatório da volta;
@@ -19,41 +19,45 @@ os valores de verdade entram em `data/` na integração.
 
 ## A Enfermaria na Estação
 
-![O cômodo na câmera do cômodo](hud-casa/infirmary.webp)
+![A Enfermaria no nível 1, na câmera do cômodo (captura da Godot)](hud-casa/infirmary_room_1.webp)
+![A Enfermaria no nível 2](hud-casa/infirmary_room_2.webp)
 
-**Onde fica (proposta):** no **subsolo 2, de x −1240 a −640** (600 cm, a largura do Depósito), embaixo da metade esquerda
-do Dormitório e encostada no Centro de Pesquisa, à esquerda dele. Hoje esse trecho é rocha
-(`station_build.gd`, a caixa de x −1800 a −640 no subsolo 2): a rocha passa a ir só até −1240. Os motivos:
-- quem cai desce do trem, atravessa o corredor e chega ao leito sem passar pelos cômodos de trabalho;
-- fica embaixo de quem dorme e ao lado de quem pesquisa, que é a vizinhança do cuidado (o Dormitório também ajuda a
-  recuperar; veja os postos);
-- usa o mesmo piso e teto do subsolo 2 (`B2_FLOOR −940`, `B2_CEILING −620`) e não mexe em nenhum cômodo de hoje.
+### Os ajustes do Lucas (26/10)
 
-**A linguagem:** as paredes, o lambri de azulejo branco, o piso pintado e a luz fria (`COOL`) são os do Centro de
-Pesquisa (`painted_plaster_wall`, `long_white_tiles`, `concrete_floor_painted`): a Enfermaria é a parte limpa do
-subsolo. A porta fica no fundo, à direita, atrás do segundo leito. Os móveis são cards pintados novos, de frente, como os
-dos outros cômodos (`art/station/cards/`), feitos de sucata: estrado de cano, colchão remendado, porta de armário velha.
+| O que o Lucas pediu | Como ficou |
+|---|---|
+| Os objetos colados na parede do fundo | Os móveis ficam nos planos do Dormitório: os leitos da frente na linha dos beliches (y −665, 2,35 m à frente da parede do fundo, ROOM_BACK −900), os do fundo, o armário, o lavatório e o biombo a y −780 a −840. Entre eles e a parede fica o chão, como nos outros cômodos |
+| A Enfermaria do tamanho do Dormitório | 12 m, de x −1840 a −640 no subsolo 2 (a escolha do Lucas de 27/10): ela começa onde já está no jogo, embaixo do Dormitório, e avança 6 m na rocha da esquerda. A Pesquisa não muda. A rocha das pontas vai até −2400, e a Visão geral passa a enquadrar a Estação a partir de −18,4 m |
+| Nível 1: 2 leitos em uso e 2 esperando; nível 2: os 4 | No nível 1, dois leitos em uso com o soro entre eles, e dois que esperam a melhoria: um quebrado (sem colchão, a frente arrancada, a perna amarrada) e um coberto com a lona, com a caixa e o cobertor em cima (cards novos). No nível 2, os quatro em uso, com o biombo, o lavatório, o carrinho, um segundo soro e um segundo pendente |
+| Mais gente: os caídos, quem cuida e alguém de pé | A Íris caída no leito (a pose de dormir), a Lupa no posto de quem cuida (#119), junto do soro, e o Bento de pé à frente do segundo leito. No nível 2, o Nick caído também, para mostrar mais leitos em uso |
+| Refazer as telas da Enfermaria | A Visão geral e o painel, sobre as capturas novas; o painel mostra os leitos 3 e 4 esperando a melhoria |
 
-| Card | Largura proposta | Uso |
+**As capturas são da Godot sem placa de vídeo:** a máquina da Awesomic não tem GPU. A Estação roda no Compatibility
+(OpenGL 3 por software, em Xvfb) a 1920 × 1080, cada quadro em mais de um minuto. Por isso as fotos usam o mínimo de
+quadros; o Forward+ (Alto e Ultra) e o Baixo numa máquina com placa de vídeo ficam com o Orquestrador PC.
+
+**Como a captura monta o cômodo:** até a integração, o cômodo novo existe só como protótipo.
+[infirmary_proto.py](hud-casa/infirmary_proto.py) lê `station_build.gd` e `station.gd` do repositório, aplica as
+mudanças (o lugar, a rocha, os móveis, os leitos de quem deita, a faixa de passeio, a ponta esquerda da Visão geral e a
+regra "só no nível 1") e grava um pacote. [capture_infirmary.gd](hud-casa/capture_infirmary.gd) carrega o pacote por
+cima do projeto e fotografa a Estação de verdade. Nada em `scripts/` muda.
+
+**A linguagem:** as paredes, o lambri de azulejo branco, o piso e a luz fria (`COOL`) são os que o jogo já usa na
+Enfermaria (os do Centro de Pesquisa): a parte limpa do subsolo. A porta do fundo fica atrás do primeiro leito. Os
+móveis são cards pintados, de frente, como os dos outros cômodos (`art/station/cards/`), feitos de sucata.
+
+| Card | Largura no cômodo | Uso |
 |---|---|---|
-| `Infirmary_Bed` (477×220) | 172 cm (79 de altura) | O leito. O colchão fica a 30 px de 220 abaixo do alto do card (cerca de 68 cm do piso): é onde a pose de dormir deita |
+| `Infirmary_Bed` (477×220) | 172 cm (79 de altura) | O leito. O colchão fica a 68 cm do piso: é onde a pose de dormir deita |
+| `Infirmary_Bed_Broken` (502×242) | 181 cm | O leito quebrado, só no nível 1 (novo) |
+| `Infirmary_Bed_Covered` (505×261) | 182 cm | O leito coberto com a lona, só no nível 1 (novo) |
 | `Infirmary_Cabinet` (328×398) | 124 cm (150 de altura) | O armário de remédios, no canto esquerdo |
-| `Infirmary_Drip` (129×402) | 55 cm (171 de altura) | O suporte do soro, entre os leitos, acima da cabeça de quem está de pé (os heróis têm cerca de 150 cm nesta câmera) |
-| `Infirmary_Screen` (422×377) | 170 cm (152 de altura) | O biombo de lata e lona (nível 2) |
-| `Infirmary_Washstand` (265×339) | 70 cm (90 de altura) | O lavatório com o galão (nível 2) |
-| `Infirmary_Trolley` (327×378) | 80 cm (92 de altura) | O carrinho de supermercado com o material (nível 2) |
+| `Infirmary_Drip` (129×402) | 55 cm (171 de altura) | O soro, entre os leitos (o segundo no nível 2) |
+| `Infirmary_Screen` (422×377) | 150 cm | O biombo de lata e lona (nível 2) |
+| `Infirmary_Washstand` (265×339) | 70 cm | O lavatório com o galão (nível 2) |
+| `Infirmary_Trolley` (327×378) | 80 cm | O carrinho de supermercado com o material (nível 2) |
 
 ![Os cards da Enfermaria](hud-casa/cards.webp)
-
-- **Nível 1:** o armário, dois leitos e o soro entre eles (a montagem das telas, [infirmary_layer](hud-casa/before/infirmary_layer.webp)).
-- **Nível 2:** quatro leitos em duas fileiras (dois encostados na parede do fundo, dois mais à frente: 4 × 172 cm não
-  cabem lado a lado nos 600 cm), com o biombo entre as fileiras, o lavatório e o carrinho no lugar do armário.
-- **Quem se recupera deita no leito** com a pose de dormir que já existe (`art/station/poses/*_sleep.webp`), como no
-  Dormitório.
-
-Na Visão geral, o cômodo novo fica de x 440 a 620 da tela; na câmera do cômodo (a mesma do Centro de Pesquisa), de x 54
-a 420. A cena 3D da Estação não abre no xvfb sem placa de vídeo, então as telas usam uma montagem
-([build_room.py](hud-casa/build_room.py)) feita com recortes da própria captura do Centro de Pesquisa e os cards novos.
 
 ## As telas
 
@@ -63,7 +67,7 @@ a 420. A cena 3D da Estação não abre no xvfb sem placa de vídeo, então as t
 | O painel da Enfermaria | [infirmary](hud-casa/infirmary.webp) | [large](hud-casa/infirmary_large.webp) | [colorblind](hud-casa/infirmary_colorblind.webp) | [large_colorblind](hud-casa/infirmary_large_colorblind.webp) | (tela nova) |
 | Relatório: a Íris caiu | [report_fallen](hud-casa/report_fallen.webp) | [large](hud-casa/report_fallen_large.webp) | [colorblind](hud-casa/report_fallen_colorblind.webp) | [large_colorblind](hud-casa/report_fallen_large_colorblind.webp) | [comparar](hud-casa/before_after_report_fallen.webp) |
 | Relatório: os detalhes e o que os postos renderam | [report_posts](hud-casa/report_posts.webp) | [large](hud-casa/report_posts_large.webp) | [colorblind](hud-casa/report_posts_colorblind.webp) | [large_colorblind](hud-casa/report_posts_large_colorblind.webp) | [comparar](hud-casa/before_after_report_posts.webp) |
-| Sala: a Íris em recuperação | [characters_fallen](hud-casa/characters_fallen.webp) | [large](hud-casa/characters_fallen_large.webp) | [colorblind](hud-casa/characters_fallen_colorblind.webp) | [large_colorblind](hud-casa/characters_fallen_large_colorblind.webp) | [comparar](hud-casa/before_after_characters_fallen.webp) |
+| Sala: a Íris caída | [characters_fallen](hud-casa/characters_fallen.webp) | [large](hud-casa/characters_fallen_large.webp) | [colorblind](hud-casa/characters_fallen_colorblind.webp) | [large_colorblind](hud-casa/characters_fallen_large_colorblind.webp) | [comparar](hud-casa/before_after_characters_fallen.webp) |
 | Sala: o campo Posto | [characters_post](hud-casa/characters_post.webp) | [large](hud-casa/characters_post_large.webp) | [colorblind](hud-casa/characters_post_colorblind.webp) | [large_colorblind](hud-casa/characters_post_large_colorblind.webp) | (como a anterior) |
 | Forja: quem trabalha aqui | [room_workers](hud-casa/room_workers.webp) | [large](hud-casa/room_workers_large.webp) | [colorblind](hud-casa/room_workers_colorblind.webp) | [large_colorblind](hud-casa/room_workers_large_colorblind.webp) | [comparar](hud-casa/before_after_room_workers.webp) |
 | Fim de luta: "Íris caiu" | [fight_fallen](hud-casa/fight_fallen.webp) | [large](hud-casa/fight_fallen_large.webp) | [colorblind](hud-casa/fight_fallen_colorblind.webp) | [large_colorblind](hud-casa/fight_fallen_large_colorblind.webp) | [comparar](hud-casa/before_after_fight_fallen.webp) |
@@ -90,8 +94,8 @@ hud-station, hud-fluxo e hud-ajustes).
 
 As telas contam uma história só, com os números de `data/` onde eles existem:
 - **Dia 4, a volta:** o fim de luta, o relatório, o painel da Enfermaria, a Sala, a Forja e o trem. A Íris caiu no
-  trecho 4 e volta em 2 dias: a Enfermaria leva 3, e a Lupa, no posto, tira 1. Sem a Enfermaria, seriam 4 no
-  Dormitório. O Nick volta com Ferimento grave (9/24).
+  trecho 4 e volta amanhã: os dias de `data/recovery.json` são 2 no leito da Enfermaria (3 no Dormitório, sem leito),
+  e a Lupa, no posto, tira 1. Um dia é uma volta de expedição: a noite não conta. O Nick volta com Ferimento grave (9/24).
 - **Dia 5, depois da noite:** a Visão geral, IR AO MAPA, o Mapa e a plataforma. Falta um dia: "Íris volta amanhã".
   O Nick recuperou 8 de vida no Dormitório (35% da vida máxima, `station_rules.gd`) e está com Ferimento leve (17/24).
   A Comida segue a conta de `AHStationRules.forecast`: 8, mais 4 da Cantina e da Dora, menos 4 que os civis comem
@@ -101,8 +105,9 @@ As telas contam uma história só, com os números de `data/` onde eles existem:
   (o Brasa, recruta, nasce com a vida da classe). O XP segue `hero-levels.json`.
 - **Sucatas:** a próxima obra é a Forja no nível 2 (6 sucatas e 2 fragmentos). O Brasa e o Otto tiram 1 cada (6 → 4);
   a relíquia só tem o desconto do Brasa (3 → 2), porque o do Otto vale só para obras. Se o Brasa sai na expedição, a
-  obra passa de 4 para 5. O custo de MELHORAR na Enfermaria (6 sucatas) já vem com o desconto, como o
-  `next_level_cost` de hoje faz com o do Otto.
+  obra passa de 4 para 5. O custo da Enfermaria é o de `data/recovery.json` (a regra de 27/10): recuperar,
+  4 sucatas e 1 fragmento; MELHORAR para o nível 2, 6 sucatas e 2 fragmentos, como o painel mostra. O desconto dos
+  postos da Forja vale para a próxima obra, que é a Forja.
 - **Traços:** os de `perks.json`, nunca dois incompatíveis no mesmo herói (o Sereno é Corajoso e Lento).
 
 ## O que cada tela mostra
@@ -112,17 +117,20 @@ As telas contam uma história só, com os números de `data/` onde eles existem:
   ("Os leitos de quem caiu", Nível 1, GERENCIAR). O Próximo passo é **"Íris volta amanhã"**, com o retrato dela e VER A
   ENFERMARIA.
 - **O painel:**
-  - o que o cômodo é, "Leitos 1 de 2" e o que acontece sem ele ("Sem a Enfermaria: 4 dias no Dormitório");
-  - um bloco por leito ocupado: o retrato, o nome, a classe, a pílula **Em recuperação** com **"Volta em 2 dias"** ao
+  - o que o cômodo é, "Leitos 1 de 2 em uso" e o que acontece sem ele ("Sem a Enfermaria: 3 dias no Dormitório");
+  - um bloco por leito ocupado: o retrato, o nome, a classe, a pílula **Caído** com **"Volta amanhã"** ao
     lado (a informação principal, no alto do bloco), a vida, o que ele tem ("Caiu na Rua das Vitrines, na luta do
     trecho 4."), o curativo com o que se tem e USAR CURATIVO ("menos 1 dia");
   - o leito livre ("Quem cair na próxima expedição vem para cá.");
+  - os leitos 3 e 4, que esperam a melhoria (um quebrado e um coberto com a lona, como no cômodo);
   - quem cuida, o posto: a Lupa, com o que rende e TROCAR;
   - no pé, fixos: o custo e MELHORAR ("nível 2: 4 leitos").
-- **O cômodo:** a Íris deitada no primeiro leito, com a pose de dormir que já existe.
+- **O cômodo:** a Enfermaria de 12 m, na captura do jogo: a Íris deitada no primeiro leito (a pose de dormir que já
+  existe), a Lupa no posto junto do soro, o Bento de pé na cabeceira dela, e os leitos 3 e 4 esperando a melhoria.
 
-**Caído e em recuperação (#118)**
-- **O estado:** uma pílula nova do kit, na cor do perigo, com o glifo da recuperação. O texto é **"Em recuperação"**,
+**Caído (#118)**
+- **O estado:** uma pílula nova do kit, na cor do perigo, com o glifo da recuperação. O texto é **"Caído"**, o mesmo para
+  todos (a regra de 27/10),
   neutro de gênero, como "Em forma" e "Ferimento leve" (os heróis não têm gênero nos dados). "Caído" é o nome do
   estado e o ícone do evento (alguém deitado na maca), usado em "Íris caiu".
 - **Fim de luta:** o popup do lote 5 ([hud-ajustes.md](hud-ajustes.md)) sobre a luta de verdade em que a Íris caiu
@@ -136,7 +144,7 @@ As telas contam uma história só, com os números de `data/` onde eles existem:
   hoje (o nível e o XP, a classe, a vida, a velocidade e o instinto, a relíquia, as expedições e os abates, os traços),
   mais a pílula, "Volta em 2 dias" e o motivo; TREINAR sai enquanto ela está no leito, e o Posto diz "Sem posto
   enquanto se recupera". O corpo dela aparece apagado e curvado na sombra.
-- **Preparação:** na coluna "Fica na Estação", apagada, com "Em recuperação · volta amanhã · não pode sair" e sem
+- **Preparação:** na coluna "Fica na Estação", apagada, com "Caído · volta amanhã · não pode sair" e sem
   Trocar.
 
 **Limites e postos (#119)**
@@ -182,19 +190,22 @@ As telas contam uma história só, com os números de `data/` onde eles existem:
 - **Confirmação:** "Iniciar expedição?" com o lugar, a equipe na ordem, o foco, a comida e o que muda nos postos; VOLTAR
   e INICIAR EXPEDIÇÃO. A tela de baixo fica sob o véu.
 
-## As montagens de before/
+## Os fundos de before/
 
-A cena 3D da Estação não abre no xvfb sem placa de vídeo. Onde a tela pede um estado que nenhuma captura tem, o fundo é
-uma montagem feita só com a captura do jogo e a arte que o jogo já usa:
-- [build_room.py](hud-casa/build_room.py): a Enfermaria no corte (acima);
-- [build_forge.py](hud-casa/build_forge.py): a Forja de nível 1 (a captura é a Forja vazia), acesa como o pendente do
-  `_forge` acende, com a bancada (`Forge_Workbay`) e a prateleira de ferramentas na escala da parede do fundo, os
-  lingotes e a caixa de ferramentas no chão, e o Brasa e o Otto. Os armários baixos e a bigorna são caixas 3D e ficam
-  para a cena. A mesma Forja, reduzida, vai para a Visão geral do Dia 5 (`station_day5_clean.webp`, sobre a de
-  `build_room.py`);
-- [build_platform.py](hud-casa/build_platform.py): a plataforma da chegada sem a Íris, com o Brasa no lugar dela, e
-  sem ninguém, com o trem à esquerda (o Bento, o Nick e a Véspera saem com a parede, o pilar e o banco do lado; o
-  caixote que a Véspera tapava sai junto), vazia e com o Sereno.
+As telas da Estação com a Enfermaria e a Forja de nível 1 estão sobre capturas da Godot
+([capture_infirmary.gd](hud-casa/capture_infirmary.gd), levadas para `before/` por
+[prepare_infirmary.py](hud-casa/prepare_infirmary.py)):
+- `station-infirmary_clean.webp`: a câmera do cômodo da Enfermaria no nível 1 (o painel);
+- `station_day5_clean.webp`: a Visão geral na câmera da HUD, com a Enfermaria de 12 m e a Forja de nível 1 acesa (a
+  Visão geral, IR AO MAPA e as telas do Dia 5);
+- `station-forge-workers_clean.webp`: a câmera da Forja de nível 1, com o Brasa junto da bancada e o Otto no posto dele
+  ("Quem trabalha aqui").
+
+As montagens que o PR tinha para a Enfermaria e para a Forja (`build_room.py` e `build_forge.py`) saíram: a cena 3D
+da Estação abre sem placa de vídeo, só que devagar (mais de um minuto por quadro).
+[build_platform.py](hud-casa/build_platform.py) continua: a plataforma da chegada sem a Íris, com o Brasa no lugar
+dela, e sem ninguém, com o trem à esquerda. Ela só tira e põe gente sobre a captura; o cenário e a luz são os da
+captura.
 
 ## Ícones novos
 
@@ -210,7 +221,7 @@ os perdia.
 | Ícone | Uso |
 |---|---|
 | `state_fallen` | Caído: alguém deitado na maca de pernas em X ("Íris caiu", "Quem caiu") |
-| `state_recovering` | Em recuperação: o coração com o curativo (a pílula, a aba da Sala, "Volta em N dias") |
+| `state_recovering` | Caído: o coração com o curativo (a pílula, a aba da Sala, "Volta em N dias") |
 | `job_research`, `job_forge`, `job_canteen`, `job_dormitory`, `job_infirmary` | Um por posto: o livro com a lupa, a bigorna, a panela, o travesseiro com a lua e as mãos com o coração |
 | `room_infirmary` | O cômodo Enfermaria (a etiqueta no corte, o painel, o Próximo passo) |
 | `helpers` | Ajudantes (o avental), no limite da barra do alto |
@@ -235,15 +246,23 @@ Duas mudanças que valem para as próximas maquetes (as telas já aprovadas não
 
 ## Para integrar (é do Claude)
 
-- **A Enfermaria:** um cômodo novo em `AHStationRules.ROOMS` e em `station_build.gd`, no subsolo 2 de x −1240 a −640,
-  com a rocha de −1800 a −1240; paredes, lambri, piso e luz do Centro de Pesquisa; os cards com as larguras da tabela
-  (`b.card`), o leito com a pose de dormir de quem está nele.
+- **A Enfermaria:** o protótipo em [infirmary_proto.py](hud-casa/infirmary_proto.py) diz o que muda em
+  `station_build.gd` e `station.gd`:
+  - o cômodo de x −1840 a −640, a rocha das pontas até −2400 e `LEFT_END` em −18,4 m;
+  - os móveis em `INFIRMARY_PIECES`, com as marcas de nível, e os leitos de quem deita em `INFIRMARY_BEDS`, com o colchão
+    a 68 cm;
+  - a regra nova de visibilidade "infirmary@=1", para a peça que só aparece no nível 1;
+  - os dois pendentes de luz.
+
+  Quem está no posto (#119) fica de pé junto do soro. A Visão geral fica um pouco menor, porque a Estação ganhou 6 m à
+  esquerda no subsolo 2.
 - **A queda na luta:** no Último Fôlego, quem não tem a pose de caída (a Íris, os recrutas) fica de pé na arena, e só a
   barra diz "Caído". Vale pedir a pose de caída desses heróis, ou apagar o desenho de quem caiu.
 - **O estado:** `status_pill` ganha o estado `recovering` (tinta de perigo, o glifo `state_recovering`, o texto
-  "Em recuperação"), nas duas tintas (normal e daltonismo).
-- **Os dias:** "Volta em N dias" conta voltas (cada expedição é um dia, como o "Dia 5" da barra). Os números da
-  proposta: 3 dias na Enfermaria, 4 no Dormitório; o curativo tira um dia e o posto Enfermaria tira outro.
+  "Caído"), nas duas tintas (normal e daltonismo).
+- **Os dias:** "Volta em N dias" conta voltas (cada expedição é um dia, como o "Dia 5" da barra). Os números são os
+  de `data/recovery.json`: 2 dias no leito da Enfermaria, 3 no Dormitório; o curativo tira um dia e o posto da
+  Enfermaria (#119) tira outro.
 - **Os limites:** a ficha "Heróis N de M · Ajudantes N de M" vai na barra do alto de todas as telas da Estação; o
   Alojamento hoje tem `max_level 1`, e o segundo nível (10 lugares) é proposta da #119.
 - **Os postos:** o rendimento por espécie e traço fica em `data/` (a Sala mostra o texto que vem de lá).
@@ -255,15 +274,19 @@ Duas mudanças que valem para as próximas maquetes (as telas já aprovadas não
 ## Como refazer
 
 As imagens brutas ficam fora do Git, em `images/hud-casa/` do projeto na Awesomic: `infirmary-props-sheet-2.png` (os seis
-móveis), `casa-glyphs-sheet.png` (os doze glifos), `casa-glyphs-sheet-3.png` (o Caído e o Amanhecer refeitos) e
+móveis), `casa-glyphs-sheet.png` (os doze glifos), `casa-glyphs-sheet-3.png` (o Caído e o Amanhecer refeitos), `infirmary-bed-broken-covered-2.png` (os leitos que esperam a
+melhoria) e
 `ref-cards.png` (a referência dos cards de hoje que foi junto no pedido ao Nano Banana Pro).
 
 Da raiz do repositório:
-1. `python3 -B docs/design/hud-casa/cut_art.py <infirmary-props-sheet-2.png> <casa-glyphs-sheet.png> <casa-glyphs-sheet-3.png>`:
-   os cards e os glifos.
-2. `python3 -B docs/design/hud-casa/build_room.py`, `python3 -B docs/design/hud-casa/build_forge.py` (nesta ordem: a
-   Visão geral do Dia 5 sai da do `build_room.py`) e `python3 -B docs/design/hud-casa/build_platform.py`: as montagens
-   de `before/`.
+1. `python3 -B docs/design/hud-casa/cut_art.py <infirmary-props-sheet-2.png> <casa-glyphs-sheet.png> <casa-glyphs-sheet-3.png> <infirmary-bed-broken-covered-2.png>`:
+   os cards e os glifos (a quarta folha é a dos leitos que esperam a melhoria, uma edição do `Infirmary_Bed`).
+2. A Estação na Godot (precisa de uma tela; no Linux sem tela, Xvfb; sem placa de vídeo, a captura leva perto de uma
+   hora): `python3 -B docs/design/hud-casa/infirmary_proto.py <pasta>/proto.zip` e
+   `"$GODOT" --path . --rendering-driver opengl3 --resolution 1920x1080 -s res://docs/design/hud-casa/capture_infirmary.gd -- --out=<pasta> --pack=<pasta>/proto.zip --views=room,clean,hud,forge`.
+   Depois, `python3 -B docs/design/hud-casa/prepare_infirmary.py <pasta> <montagem antiga.webp>` (a montagem antiga
+   sai de `git show 05a6b3c:docs/design/hud-casa/before/station-infirmary_clean.webp`). Por fim,
+   `python3 -B docs/design/hud-casa/build_platform.py`: as montagens da plataforma.
 3. A luta com a Íris caída (precisa de uma tela; no Linux sem tela, `xvfb-run`):
    `xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path . --rendering-driver opengl3 --resolution 1920x1080 -s res://docs/design/hud-casa/capture.gd -- --out=<pasta>`.
    Ela grava `fight_fallen.png` (sem a HUD) e `fight_fallen.json` em `<pasta>`; o PNG vai para `before/` convertido em

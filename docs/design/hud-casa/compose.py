@@ -1,6 +1,7 @@
 """As provas do lote 7: o compose.py do kit (docs/design/hud-kit/compose.py), com o "antes" certo. O antes aqui é a tela
 aprovada do lote anterior que o jogo segue hoje (hud-estacao, hud-station, hud-fluxo e hud-ajustes, já integradas na
-main pelas #114 a #117), não uma captura da Godot: a cena 3D da Estação não abre no xvfb sem placa de vídeo.
+main pelas #114 a #117). As capturas da Godot da Enfermaria nova ficam no antes e depois próprio dela
+(infirmary_before_after.webp, de prepare_infirmary.py).
 
 Uso (da raiz do repositório): python3 -B docs/design/hud-casa/compose.py
 """
