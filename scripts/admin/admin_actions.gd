@@ -345,7 +345,11 @@ static func _ambience(scene: Node, spec: String) -> String:
 		return TranslationServer.translate("Ambiência do arquivo")
 	var field := spec.rsplit("_", true, 1)[0]
 	var up := spec.ends_with("_up")
-	var step: float = AMBIENCE_STEPS.filter(func(s): return s[0] == field)[0][1] * (1.0 if up else -1.0)
+	var specs: Array = AMBIENCE_STEPS.filter(func(s): return s[0] == field)
+	if specs.is_empty():
+		return TranslationServer.translate("Campo de ambiência desconhecido: %s") % field
+	var entry: Array = specs[0]
+	var step: float = float(entry[1]) * (1.0 if up else -1.0)
 	var now := AHAmbience.profile(place)
 	var override: Dictionary = Admin.ambience.get(place, {})
 	if field == "warmth":
@@ -363,7 +367,8 @@ static func _ambience(scene: Node, spec: String) -> String:
 			override[field] = minf(override[field], 1.0)
 	Admin.ambience[place] = override
 	scene.apply_ambience()
-	return "%s: %s" % [field, str(override.get(field, override.get("highlights_tint")))]
+	# O nome do campo como na aba (o rótulo em português), não o técnico.
+	return "%s: %s" % [TranslationServer.translate(String(entry[2])), str(override.get(field, override.get("highlights_tint")))]
 
 
 static func _zoom(spec: String) -> String:

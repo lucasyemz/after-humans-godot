@@ -17,7 +17,12 @@ static var _data := {}
 
 static func data() -> Dictionary:
 	if _data.is_empty():
-		_data = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		if parsed is Dictionary:
+			_data = parsed
+		else:
+			# Um JSON quebrado não derruba a rua: sem perfil, fica o pós e a névoa de antes.
+			push_error("%s: JSON inválido" % PATH)
 	return _data
 
 

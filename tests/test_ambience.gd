@@ -47,6 +47,8 @@ func _data() -> void:
 		t.check(data.has(id), "%s tem perfil" % id)
 		var extra: Array = Array(data.get(id, {}).keys()).filter(func(k): return not fields.has(k))
 		t.equal(extra, [], "%s: só campos do perfil" % id)
+	t.check(["saturation", "contrast", "tint_amount", "shadows_tint", "highlights_tint", "grain"].all(func(k): return data.Station.has(k)),
+		"a Estação tem a cor dela no perfil (mudar o default não a muda)")
 	var street := AHAmbience.profile("ShopfrontStreet")
 	t.check(float(street.grain) > float(data.default.grain) and Array(street.steam).size() > 0, "a Rua troca o que muda (o grão, o vapor)")
 	t.equal(AHAmbience.profile("NaoExiste").saturation, data.default.saturation, "um lugar sem perfil fica com o default")
@@ -86,7 +88,7 @@ func _street() -> void:
 	t.check(float(street._post.get_shader_parameter("max_blur")) > 0.0, "no Ultra, com o desfoque")
 	# A barra de Admin, ao vivo.
 	var before := float(street._post.get_shader_parameter("saturation"))
-	AHAdminActions.run("amb_saturation_up")
+	t.check(AHAdminActions.run("amb_saturation_up").begins_with("Saturação"), "o Admin responde com o nome do campo na aba")
 	t.check(float(street._post.get_shader_parameter("saturation")) > before, "o Admin sobe a saturação na hora")
 	var warm_before: float = Vector3(street._post.get_shader_parameter("highlights_tint")).x
 	AHAdminActions.run("amb_warmth_up")
@@ -127,6 +129,7 @@ func _street() -> void:
 		AHAdminActions.run("amb_leaves_up")
 	t.check(float(AHAmbience.profile("ShopfrontStreet").leaves) <= 1.0, "e as frações não passam de 1")
 	AHAdminActions.run("amb_reset")
+	t.check(AHAdminActions._ambience(street, "naoexiste_up").contains("naoexiste"), "um campo que não existe responde com erro, sem quebrar")
 	var amb_actions: Array = AHAdminActions.all().filter(func(a): return a.tab == "Ambiência")
 	t.check(amb_actions.size() >= 20 and amb_actions.all(func(a): return AHAdminActions.blocked(a) == ""), "a aba Ambiência vale na jornada")
 
