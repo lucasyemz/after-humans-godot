@@ -278,6 +278,12 @@ func _return() -> void:
 		await _frames(3)
 		if step[1] != "":
 			t.equal(hud.current, step[1], "%s leva ao %s" % [step[0], step[1]])
+		# A cena da noite (#132): Interagir pula para o amanhecer.
+		if step[0] == "Iniciar descanso":
+			t.check(hud.night_scene_open(), "Iniciar descanso abre a cena da noite")
+			await _send("interact")
+			await _frames(3)
+			t.check(not hud.night_scene_open() and _focus() is BaseButton, "Interagir pula a noite, e o foco fica no amanhecer")
 	t.equal(c.night.phase, "none", "a noite passou só com o teclado")
 	if S.visit_pending(c):
 		await _frames(3)

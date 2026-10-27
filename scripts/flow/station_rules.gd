@@ -201,7 +201,7 @@ static func _station_defaults() -> Dictionary:
 
 
 static func _night_defaults() -> Dictionary:
-	return {"phase": "none", "number": 0, "expedition_id": "", "participants": [], "watch_hero_id": "", "event_id": "",
+	return {"phase": "none", "number": 0, "expedition_id": "", "participants": [], "watch_hero_id": "", "event_id": "", "event": {}, "conditions": [],
 		"results": [], "supplies_consumed": 0, "thirsty": false}
 
 
@@ -777,8 +777,9 @@ static func buy_supplies(campaign: Dictionary, amount: int = 1) -> bool:
 	return true
 
 
-## A noite: quem dorme come um suprimento e recupera vida e instinto; o vigia fica acordado. O evento sai do número.
-static func resolve_night(campaign: Dictionary) -> bool:
+## A noite: quem dorme come um suprimento e recupera vida e instinto; o vigia fica acordado. O evento da noite (#132)
+## sai de data/night-events.json, sorteado pela semente da expedição; force (os testes) escolhe um.
+static func resolve_night(campaign: Dictionary, force: String = "") -> bool:
 	var night: Dictionary = campaign.night
 	if not in_refuge(campaign) or night.phase != "planning":
 		return false
@@ -786,10 +787,9 @@ static func resolve_night(campaign: Dictionary) -> bool:
 	var watch = hero(campaign, night.watch_hero_id)
 	if awake.size() <= 1 or watch == null or not watch.alive or watch.hp <= 0 or not night.participants.has(night.watch_hero_id):
 		night.watch_hero_id = ""
-	night.event_id = "distant_noise" if int(night.number) % 2 == 0 else "quiet"
-	var sleepers: int = awake.filter(func(id): return id != night.watch_hero_id).size()
-	if quantity(campaign, SUPPLIES) < sleepers:
-		night.event_id = "short_supplies"
+	var event := _draw_night_event(campaign, awake, force)
+	night.event = event
+	night.event_id = String(event.id)
 	night.results = []
 	night.supplies_consumed = 0
 	var hungry := false
@@ -805,18 +805,116 @@ static func resolve_night(campaign: Dictionary) -> bool:
 			var before_hp: int = entry.hp
 			var before_instinct: int = entry.instinct
 			entry.hp = mini(entry.max_hp, entry.hp + maxi(1, entry.max_hp * (35 if result.fed else 15) / 100))
-			var noise := 3 if night.event_id == "distant_noise" and night.watch_hero_id == "" else 0
+			var noise := int(event.get("amount", 0)) if event.id == "distant_noise" and not event.get("prevented", false) else 0
 			var thirst := THIRST_INSTINCT_PENALTY if night.thirsty else 0
 			entry.instinct = clampi(entry.instinct - (15 if result.fed else 5) + noise + thirst, 0, 200)
+			# Quem não dormiu pelo trauma (#132) não baixa o instinto.
+			if event.id == "sleepless" and String(event.get("hero_id", "")) == hero_id:
+				entry.instinct = before_instinct
 			result.hp_recovered = entry.hp - before_hp
 			result.instinct_reduced = before_instinct - entry.instinct
 		night.results.append(result)
+	# As condições da noite ficam à parte do evento: a fome e a sede.
+	night.conditions = []
 	if hungry:
-		night.event_id = "short_supplies"
-	elif night.thirsty:
-		night.event_id = "no_water"
+		night.conditions.append("short_supplies")
+	if night.thirsty:
+		night.conditions.append("no_water")
+	_apply_night_event(campaign, event)
 	night.phase = "dawn"
 	return true
+
+
+## Uma linha de data/night-events.json.
+static func night_row(name: String) -> Dictionary:
+	var row = GameData.row("night_events", name)
+	return row if row != null else {}
+
+
+## O sorteio do evento da noite (#132): os eventos com peso e com o que pedem (o vigia, um morador, alguém com trauma
+## dormindo); com vigia, os ruins pesam menos. {id, amount, hero_id, civilian_id, phase_id, prevented, protected}.
+static func _draw_night_event(campaign: Dictionary, awake: Array, force: String = "") -> Dictionary:
+	var night: Dictionary = campaign.night
+	var watch := String(night.watch_hero_id)
+	var sleepers: Array = awake.filter(func(id): return id != watch)
+	var troubled: Array = sleepers.filter(func(id): return bool(hero(campaign, id).get("trauma", false)))
+	var sighting := _next_sighting(campaign)
+	var factor := float(night_row("watch").get("WatchFactor", 50)) / 100.0
+	var options: Array = []
+	for row in GameData.table("night_events").values():
+		if not row.has("Weight"):
+			continue
+		match String(row.get("Requires", "")):
+			"watch":
+				if watch == "" or sighting == "":
+					continue
+			"resident":
+				if campaign.station.residents.is_empty():
+					continue
+			"trauma":
+				if troubled.is_empty():
+					continue
+		var weight := float(row.Weight) * (factor if bool(row.get("Bad", false)) and watch != "" else 1.0)
+		options.append([String(row.Name), weight])
+	options.sort_custom(func(a, b): return a[0] < b[0])
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("%s:night" % night.expedition_id)
+	var total := 0.0
+	for option in options:
+		total += option[1]
+	var roll := rng.randf() * total
+	var id := "quiet"
+	for option in options:
+		roll -= option[1]
+		if roll < 0.0:
+			id = option[0]
+			break
+	if force != "":
+		id = force
+	var row := night_row(id)
+	var event := {"id": id, "amount": int(row.get("Amount", 0)), "hero_id": "", "civilian_id": "", "phase_id": "",
+		"prevented": bool(row.get("Bad", false)) and watch != "" and row.has("TextWatched"), "protected": false}
+	match id:
+		"watcher_sees":
+			event.hero_id = watch
+			event.phase_id = sighting
+		"resident_talk":
+			var residents: Array = campaign.station.residents.duplicate()
+			residents.sort()
+			event.civilian_id = residents[rng.randi() % residents.size()] if not residents.is_empty() else ""
+		"sleepless":
+			event.hero_id = troubled[rng.randi() % troubled.size()] if not troubled.is_empty() else ""
+		"pests":
+			event.protected = room_level(campaign, DEPOT) >= 2
+	return event
+
+
+## O lugar que o vigia pode avistar: o próximo liberado e não concluído, ainda sem o guardião lido.
+static func _next_sighting(campaign: Dictionary) -> String:
+	for info in J.PHASES:
+		if phase_unlocked(campaign, info.id) and not campaign.completed_phases.has(info.id) and not campaign.station.get("sightings", []).has(info.id) \
+				and AHNetworkRadar.state_of(campaign, info.id, "boss") != "known":
+			return info.id
+	return ""
+
+
+## O efeito do evento na Estação (o instinto fica no laço de resolve_night).
+static func _apply_night_event(campaign: Dictionary, event: Dictionary) -> void:
+	if event.get("prevented", false):
+		return
+	match String(event.id):
+		"leak":
+			campaign.station.water = maxi(0, int(campaign.station.water) - int(event.amount))
+		"pests":
+			if not event.protected:
+				event.amount = -adjust(campaign, SUPPLIES, -int(event.amount))
+		"platform_noise":
+			campaign.station.train_dry = int(campaign.station.get("train_dry", 0)) + 1
+		"watcher_sees":
+			if event.phase_id != "":
+				if not campaign.station.has("sightings"):
+					campaign.station.sightings = []
+				campaign.station.sightings.append(event.phase_id)
 
 
 ## A prévia da noite (os cartões do Dormitório): para cada participante vivo, se vigia, se come e quanto recupera, na
@@ -827,7 +925,6 @@ static func night_preview(campaign: Dictionary) -> Dictionary:
 	var supplies := quantity(campaign, SUPPLIES)
 	var awake: Array = night.participants.filter(func(id): return hero(campaign, id) != null and hero(campaign, id).alive)
 	var watch_id: String = night.watch_hero_id if awake.size() > 1 and awake.has(night.watch_hero_id) else ""
-	var event_noise: bool = int(night.number) % 2 == 0 and watch_id == ""
 	var out := {"heroes": [], "needed": 0, "available": supplies}
 	for hero_id in awake:
 		var entry = hero(campaign, hero_id)
@@ -838,7 +935,7 @@ static func night_preview(campaign: Dictionary) -> Dictionary:
 			supplies -= 1 if row.fed else 0
 			var gain := maxi(1, int(entry.max_hp) * (35 if row.fed else 15) / 100)
 			row.hp_gain = mini(int(entry.max_hp), int(entry.hp) + gain) - int(entry.hp)
-			var change := -(15 if row.fed else 5) + (3 if event_noise else 0) + (THIRST_INSTINCT_PENALTY if night.thirsty else 0)
+			var change := -(15 if row.fed else 5) + (THIRST_INSTINCT_PENALTY if night.thirsty else 0)
 			row.instinct_change = clampi(int(entry.instinct) + change, 0, 200) - int(entry.instinct)
 		out.heroes.append(row)
 	return out
@@ -851,7 +948,29 @@ static func finish_dawn(campaign: Dictionary) -> bool:
 	return true
 
 
+## O que a noite contou (#132): o texto do evento sorteado, com quem e quanto.
 static func night_event_text(campaign: Dictionary) -> String:
+	var event: Dictionary = campaign.night.get("event", {})
+	if not event.is_empty():
+		var row := night_row(String(event.id))
+		var text := TranslationServer.translate(String(row.get("Text", "")))
+		if event.get("prevented", false):
+			return TranslationServer.translate(String(row.get("TextWatched", "")))
+		match String(event.id):
+			"distant_noise", "leak":
+				return text % int(event.amount)
+			"pests":
+				return TranslationServer.translate(String(row.get("TextProtected", ""))) if event.protected else text % int(event.amount)
+			"watcher_sees":
+				var watcher = hero(campaign, String(event.hero_id))
+				return text % [watcher.display_name if watcher != null else "", TranslationServer.translate(String(J.phase(String(event.phase_id)).get("name", "")))]
+			"sleepless":
+				var troubled = hero(campaign, String(event.hero_id))
+				return text % (troubled.display_name if troubled != null else "")
+			"resident_talk":
+				return TranslationServer.translate(String(night_row("talk_%s" % String(event.civilian_id).trim_prefix("civil_")).get("Text", "")))
+		return text
+	# Saves de antes do #132: o evento antigo.
 	match campaign.night.event_id:
 		"short_supplies":
 			return TranslationServer.translate("Os suprimentos não bastaram para todos. Quem dormiu sem comida recuperou menos.")
@@ -861,6 +980,24 @@ static func night_event_text(campaign: Dictionary) -> String:
 			return TranslationServer.translate("Ruídos distantes inquietaram os adormecidos: recuperação de Instinto reduzida em 3.") if campaign.night.watch_hero_id == "" \
 				else TranslationServer.translate("O vigia verificou os ruídos distantes. Os demais puderam descansar em segurança.")
 	return TranslationServer.translate("A noite passou tranquila. O abrigo permaneceu seguro.")
+
+
+## As condições da noite (a fome, a sede), à parte do evento.
+static func night_conditions_text(campaign: Dictionary) -> Array:
+	var out: Array = []
+	for condition in campaign.night.get("conditions", []):
+		match String(condition):
+			"short_supplies":
+				out.append(TranslationServer.translate("Os suprimentos não bastaram para todos. Quem dormiu sem comida recuperou menos."))
+			"no_water":
+				out.append(TranslationServer.translate("Faltou água para quem voltou. O descanso foi pior: menos Instinto recuperado."))
+	return out
+
+
+## O evento da noite é ruim e aconteceu (não foi evitado pelo vigia nem pelo Depósito)?
+static func night_event_bad(campaign: Dictionary) -> bool:
+	var event: Dictionary = campaign.night.get("event", {})
+	return not event.is_empty() and bool(night_row(String(event.id)).get("Bad", false)) and not event.get("prevented", false) and not event.get("protected", false)
 
 
 # ================================================================ refúgio: elenco, enfermaria, pesquisa, forja

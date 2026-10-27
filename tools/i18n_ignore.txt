@@ -1448,3 +1448,23 @@ station_rules.gd: Unit
 campaign_service.gd: post
 refuge_hud.gd: %s · %s
 character_room.gd: %s · +%d
+refuge_hud.gd: Card
+refuge_hud.gd: Clock
+network_radar.gd: sightings
+station_rules.gd: sightings
+station_rules.gd: conditions
+station_rules.gd: prevented
+station_rules.gd: sleepless
+station_rules.gd: Weight
+station_rules.gd: Requires
+station_rules.gd: resident
+station_rules.gd: Bad
+station_rules.gd: %s:night
+station_rules.gd: Amount
+station_rules.gd: protected
+station_rules.gd: pests
+station_rules.gd: known
+station_rules.gd: leak
+station_rules.gd: Text
+station_rules.gd: talk_%s
+refuge_hud.gd: %s: %s%s.

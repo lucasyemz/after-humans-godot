@@ -1,0 +1,71 @@
+[
+  {
+    "Name": "watch",
+    "WatchFactor": 50,
+    "Description": "Proposta (#132): com alguém de vigia, o peso de cada evento ruim cai para esta porcentagem."
+  },
+  {
+    "Name": "quiet",
+    "Weight": 30,
+    "Text": "A noite passou tranquila. O abrigo permaneceu seguro.",
+    "Description": "Proposta (#132): nada acontece."
+  },
+  {
+    "Name": "distant_noise",
+    "Weight": 14,
+    "Bad": true,
+    "Amount": 3,
+    "Text": "Ruídos distantes inquietaram quem dormia: o instinto baixou %d a menos.",
+    "TextWatched": "O vigia verificou os ruídos distantes. Os outros puderam descansar em segurança.",
+    "Description": "Proposta (#132): quem dorme baixa Amount de instinto a menos. Com vigia, nada acontece."
+  },
+  {
+    "Name": "platform_noise",
+    "Weight": 10,
+    "Text": "Um barulho na plataforma de madrugada: alguém passou pelos trilhos. O próximo trem deve trazer gente.",
+    "Description": "Proposta (#132): a chance do próximo trem sobe um passo (como uma volta vazia, #122)."
+  },
+  {
+    "Name": "leak",
+    "Weight": 12,
+    "Bad": true,
+    "Amount": 2,
+    "Text": "Uma goteira no Depósito: %d de água se perderam.",
+    "TextWatched": "O vigia ouviu uma goteira e pôs um balde embaixo: a água ficou.",
+    "Description": "Proposta (#132): a água da Estação cai Amount. Com vigia, nada se perde."
+  },
+  {
+    "Name": "pests",
+    "Weight": 12,
+    "Bad": true,
+    "Amount": 2,
+    "Text": "Baratas acharam a despensa: %d suprimentos se perderam.",
+    "TextWatched": "O vigia espantou as baratas da despensa antes do estrago.",
+    "TextProtected": "Baratas rondaram a despensa, mas as prateleiras novas do Depósito seguraram tudo.",
+    "Description": "Proposta (#132): os suprimentos caem Amount. O Depósito no nível 2 protege; com vigia, nada se perde. (O pedido dizia \"um rato\"; na lore, os roedores são povos, então a praga virou baratas.)"
+  },
+  {
+    "Name": "watcher_sees",
+    "Weight": 10,
+    "Requires": "watch",
+    "Text": "%s viu luzes se mexendo longe, no rumo do próximo lugar (%s). O Mapa da Rede agora lê o guardião e os inimigos de lá.",
+    "Description": "Proposta (#132): só com vigia. O próximo lugar liberado e não concluído fica lido no radar (o guardião e os inimigos)."
+  },
+  {
+    "Name": "resident_talk",
+    "Weight": 10,
+    "Requires": "resident",
+    "Description": "Proposta (#132): um morador conversa (a fala sai das linhas talk_*). Sem efeito."
+  },
+  {"Name": "talk_dora", "Civilian": "dora", "Text": "A Dora ficou acordada separando sementes: \"Quem guarda hoje come amanhã. Quem desperdiça, explica para a fome.\""},
+  {"Name": "talk_otto", "Civilian": "otto", "Text": "O Otto passou a noite ouvindo o gerador: \"Quando ele muda de tom, eu acordo antes dele parar.\""},
+  {"Name": "talk_cora", "Civilian": "cora", "Text": "A Cora comparou anotações até tarde: \"Cada fragmento conta um pedaço. Juntos, começam a fazer sentido.\""},
+  {
+    "Name": "sleepless",
+    "Weight": 8,
+    "Bad": true,
+    "Requires": "trauma",
+    "Text": "%s não conseguiu dormir: a última crise voltou à noite, e o instinto não baixou.",
+    "Description": "Proposta (#132): só com alguém com trauma dormindo. O instinto dele não baixa nesta noite."
+  }
+]
