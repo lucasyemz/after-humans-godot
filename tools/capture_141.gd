@@ -1,8 +1,8 @@
 ## QA por captura da #141 (o Armazém e o Navio do Cais em camadas e as portas dos interiores), pela cena de verdade:
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_141.gd -- --out=<pasta>
 ## Campanha própria na pasta da saída. Roda também na main de antes. Para o Armazém e o Navio: a equipe à esquerda e à
-## direita da fachada (a profundidade aparece na troca de ângulo), no fim de tarde e na noite com chuva; depois a
-## sequência de entrar e sair de cada interior.
+## direita da fachada (a profundidade aparece na troca de ângulo), no fim de tarde e na noite, cada um seco e com chuva;
+## depois a sequência de entrar e sair de cada interior, com a porta de dentro também na noite com chuva.
 extends SceneTree
 
 const FACADES := [["warehouse", 14.0, 2], ["ship", 44.6, 1]]
@@ -51,8 +51,8 @@ func _initialize() -> void:
 	var corridor = street.corridor
 	route.index = route.steps.size() - 2
 	for facade in FACADES:
-		for mood in [["golden", false], ["night", true]]:
-			street._mood = mood[0]
+		for mood in [["golden", false], ["golden-rain", true], ["night", false], ["night-rain", true]]:
+			street._mood = String(mood[0]).trim_suffix("-rain")
 			street._raining = mood[1]
 			street._apply_weather()
 			for side in [["left", -5.0], ["right", 5.0]]:
@@ -81,6 +81,15 @@ func _initialize() -> void:
 		await _until(func(): return not corridor.busy)
 		await _wait(0.8)
 		await _shot("%s-inside" % facade[0])
+		# A porta de dentro mostra a hora e a chuva de fora.
+		street._mood = "night"
+		street._raining = true
+		street._apply_weather()
+		await _wait(0.8)
+		await _shot("%s-inside-night-rain" % facade[0])
+		street._mood = "golden"
+		street._raining = false
+		street._apply_weather()
 		corridor._leave_side_room()
 		for i in range(1, 5):
 			await _wait(0.55)

@@ -75,7 +75,8 @@ def piece(part, rect, z, shade=1.0):
 
 def box(center, size, material):
     return {"mesh": 0, "materials": [material], "origin": [round(v, 4) for v in center],
-            "basis": [size[0], 0.0, 0.0, 0.0, size[1], 0.0, 0.0, 0.0, size[2]], "solid": True, "layer": LAYER}
+            "basis": [size[0], 0.0, 0.0, 0.0, size[1], 0.0, 0.0, 0.0, size[2]], "solid": True, "no_shadow": True,
+            "layer": LAYER}
 
 
 def main():

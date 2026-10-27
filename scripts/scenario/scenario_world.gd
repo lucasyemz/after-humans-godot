@@ -35,6 +35,16 @@ var _cards: Array[ShaderMaterial] = []
 ## A água pintada (#140): a do chão e a do fundo pintado; "Reduzir efeitos" a deixa mais lenta e sem piscar.
 var _waters: Array[ShaderMaterial] = []
 const WATER_COVERED := 0.3
+## As portas de dentro dos interiores (#141): a vista de fora (o material) e a luz que entra, por zona. Não escurecem com
+## o interior: são o lado de fora, com a hora e a chuva de lá (set_doorways).
+var _door_views: Array[ShaderMaterial] = []
+var _door_lights: Array[OmniLight3D] = []
+var doorway_zones: Array[int] = []
+## A luz de fora pela porta: a cor e a força no fim de tarde e na noite; a chuva tira um pouco e acinzenta.
+const DOOR_LIGHT := {"golden": [Color(1.0, 0.8, 0.58), 1.7], "night": [Color(0.55, 0.65, 0.92), 0.8]}
+const DOOR_RAIN_LIGHT := 0.7
+## Fora é mais claro que a sala: a vista da porta brilha um pouco acima da cor do clima.
+const DOOR_VIEW_BRIGHTNESS := {"golden": 1.35, "night": 0.75}
 var _blockouts: Array[ShaderMaterial] = []
 
 
@@ -136,7 +146,7 @@ func _water_pace(material: ShaderMaterial) -> void:
 
 ## A opção "Reduzir efeitos" mudou: a água pintada acompanha.
 func refresh_water_pace() -> void:
-	for material in _waters:
+	for material in _waters + _door_views:
 		_water_pace(material)
 
 
@@ -151,6 +161,25 @@ func set_weather(wet: float, tint: Color, covered: bool = false) -> void:
 			material.set_shader_parameter("weather", Vector4(tint.r * WATER_COVERED, tint.g * WATER_COVERED, tint.b * WATER_COVERED, 1.0))
 	for material in _blockouts:
 		material.set_shader_parameter("wet", wet)
+
+
+## O lado de fora pelas portas de dentro (#141): a hora (golden ou night) e a chuva de fora, mesmo com a equipe dentro.
+func set_doorways(mood: String, raining: bool) -> void:
+	var key := mood if DOOR_LIGHT.has(mood) else "golden"
+	var tint := Color(1, 1, 1) if key == "golden" else Color(0.55, 0.6, 0.75)
+	for material in _door_views:
+		material.set_shader_parameter("weather", Vector4(tint.r, tint.g, tint.b, 1.0))
+		material.set_shader_parameter("wet", 1.0 if raining else 0.0)
+		material.set_shader_parameter("brightness", DOOR_VIEW_BRIGHTNESS[key])
+	var light: Array = DOOR_LIGHT[key]
+	for lamp in _door_lights:
+		lamp.light_color = (light[0] as Color).lerp(Color(0.62, 0.66, 0.72), 0.5 if raining else 0.0)
+		lamp.light_energy = float(light[1]) * (DOOR_RAIN_LIGHT if raining else 1.0)
+
+
+## A porta de dentro da zona (o spec do mapa) ou um vazio: o interior sem ela entra do jeito antigo, sem a passagem.
+func has_doorway(zone: int) -> bool:
+	return doorway_zones.has(zone)
 
 
 ## Guarda a caixa se ela atrapalha a passagem em alguma zona: dentro da zona, na altura da equipe, na faixa de passeio
@@ -446,8 +475,9 @@ func _doorway(spec: Dictionary) -> void:
 	if sky:
 		view.set_shader_parameter("sky_tex", sky)
 	_water_colors(view, spec)
-	_waters.append(view)
-	_cards.append(view)
+	_water_pace(view)
+	_door_views.append(view)
+	doorway_zones.append(int(spec.get("zone", -1)))
 	var quad := QuadMesh.new()
 	quad.size = Vector2(w, h)
 	var outside := MeshInstance3D.new()
@@ -472,11 +502,13 @@ func _doorway(spec: Dictionary) -> void:
 		add_child(node)
 	var light := OmniLight3D.new()
 	light.name = "DoorwayLight_%d" % roundi(x * 10.0)
-	light.light_color = Color(0.7, 0.8, 0.95)
-	light.light_energy = 1.1
+	light.light_color = DOOR_LIGHT.golden[0]
+	light.light_energy = DOOR_LIGHT.golden[1]
 	light.omni_range = 4.5
 	light.position = Vector3(x + 0.3, y + h * 0.7, z + 1.0)
 	add_child(light)
+	_door_lights.append(light)
+	set_doorways("golden", false)
 
 
 func _light(light: Dictionary) -> void:
