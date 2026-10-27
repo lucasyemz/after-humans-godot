@@ -150,6 +150,8 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		# Ninguém morre (#118): os dias que faltam na recuperação (0: pronto), se está num leito da Enfermaria e o ciclo
 		# do último curativo.
 		"recovery_days": 0, "recovery_bed": false, "recovery_treated": -1,
+		# O posto na Estação enquanto a equipe está fora (#119): o cômodo, ou "".
+		"post": "",
 	}
 
 

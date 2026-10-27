@@ -50,7 +50,7 @@ static func all() -> Array:
 	out.append(_a("colliders_toggle", "Ajustes", "Mostrar as colisões", "street", false))
 	for quality in 4:
 		out.append(_a("quality_%d" % quality, "Ajustes", "Qualidade: %s%s" % [["Baixa", "Média", "Alta", "Ultra"][quality], " (agora)" if Settings.level == quality else ""], "any", false))
-	out.append(_a("old_keys", "Ajustes", "Teclas de teste da rua (R T P C K)", "any", false))
+	out.append(_a("stats_toggle", "Ajustes", "Contador de quadros", "street", false))
 	var place := _ambience_place()
 	var now := AHAmbience.profile(place) if place != "" else {}
 	for spec in AMBIENCE_STEPS:
@@ -195,9 +195,9 @@ static func run(id: String) -> String:
 			for debug in scene._debug_colliders:
 				debug.visible = not debug.visible
 			return TranslationServer.translate("Colisões trocadas")
-		"old_keys":
-			Settings.set_dev_mode(not Settings.dev_mode)
-			return TranslationServer.translate("Teclas de teste ligadas") if Settings.dev_mode else TranslationServer.translate("Teclas de teste desligadas")
+		"stats_toggle":
+			scene._hud_stats.visible = not scene._hud_stats.visible
+			return TranslationServer.translate("Contador de quadros ligado") if scene._hud_stats.visible else TranslationServer.translate("Contador de quadros desligado")
 		"heal_team":
 			for hero in c.roster:
 				if hero.get("alive", true):
@@ -415,7 +415,7 @@ static func _recruit() -> String:
 	var c: Dictionary = Campaign.state
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
-	if S.living(c).size() >= S.MAX_ROSTER:
+	if S.heroes_full(c):
 		return ""
 	for class_id in c.get("unlocked_classes", []):
 		var hero := S.recruit(c, class_id, rng, S.hero_name(c, class_id))

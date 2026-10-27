@@ -40,6 +40,8 @@ func run(context) -> void:
 ## Uma campanha com os quatro fundadores e dois recrutas (um cão e um gato).
 func _campaign() -> Dictionary:
 	var c: Dictionary = Campaign.create_initial(31)
+	# O Alojamento ampliado (#119): cabem os recrutas.
+	c.station.rooms[AHStationRules.CHARACTERS] = 4
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 31
 	for class_id in ["cao", "gato", "cao", "gato"]:

@@ -22,8 +22,6 @@ const LOD_THRESHOLD := [6.0, 3.0, 1.0, 1.0]
 var level := 2
 var fullscreen := false
 var vsync := true
-## Modo de desenvolvedor (F1): as teclas de teste (K, R, T, P, C) e o contador de quadros. Fica fora da tela do jogador.
-var dev_mode := false
 ## Cores para daltonismo: azul e laranja no lugar de verde e vermelho (AHUiStyle.set_colorblind).
 var colorblind := false
 ## O tamanho do texto das telas (AHUiStyle.text_scale): as telas ficam na base de 1920x1080 e só as letras crescem.
@@ -36,7 +34,7 @@ var touch_controls := 0
 ## As teclas trocadas nas Opções: a ação e a tecla principal nova (código físico). As outras teclas da ação (as setas,
 ## por exemplo) e os botões do controle continuam.
 var keys := {}
-const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run", "interact", "inventory", "cancel", "menu",
+const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run", "interact", "inventory", "formation", "cancel", "menu",
 	"combat_ability_1", "combat_ability_2", "combat_ability_3", "combat_ability_4", "combat_move", "combat_defend", "combat_flee", "combat_examine", "combat_log", "hide_hud",
 	"report_details", "station_prepare", "station_room_prev", "station_room_next"]
 
@@ -58,7 +56,6 @@ func _ready() -> void:
 		level = clampi(int(config.get_value("graphics", "level", level)), 0, 3)
 		fullscreen = bool(config.get_value("graphics", "fullscreen", fullscreen))
 		vsync = bool(config.get_value("graphics", "vsync", vsync))
-		dev_mode = bool(config.get_value("dev", "enabled", dev_mode))
 		colorblind = bool(config.get_value("accessibility", "colorblind", colorblind))
 		text_size = clampi(int(config.get_value("accessibility", "text_size", text_size)), 0, TEXT_SIZES.size() - 1)
 		touch_controls = clampi(int(config.get_value("controls", "touch", touch_controls)), 0, TOUCH_MODES.size() - 1)
@@ -91,31 +88,44 @@ func _input(event: InputEvent) -> void:
 		AHUiStyle.using_keys = false
 
 
-func set_dev_mode(value: bool) -> void:
-	dev_mode = value
-	_store()
-
-
 ## As teclas padrão (as de tools/define_input.gd, no project.godot) com as trocas por cima.
 func apply_controls() -> void:
 	InputMap.load_from_project_settings()
+	var defaults := {}
+	for action in REMAPPABLE:
+		defaults[action] = primary_key(action)
 	for action in keys:
-		if not InputMap.has_action(action):
+		if InputMap.has_action(action):
+			_put_key(action, int(keys[action]))
+	# Uma ação que ficou na tecla de fábrica, quando outra ação já foi trocada para ela num save antigo (a formação no R,
+	# #129, com o R salvo em outra): ela fica com a tecla de fábrica da outra, a mesma troca do set_key, sem conflito.
+	for action in REMAPPABLE:
+		if keys.has(action) or not InputMap.has_action(action):
 			continue
-		# A tecla nova entra no lugar da primeira (a ordem diz qual é a principal).
-		var events := InputMap.action_get_events(action)
-		var key := InputEventKey.new()
-		key.physical_keycode = int(keys[action])
-		var replaced := false
-		for i in events.size():
-			if events[i] is InputEventKey and not replaced:
-				events[i] = key
-				replaced = true
-		if not replaced:
-			events.push_front(key)
-		InputMap.action_erase_events(action)
-		for event in events:
-			InputMap.action_add_event(action, event)
+		var code := primary_key(action)
+		for other in keys:
+			if other != action and int(keys[other]) == code and code != 0:
+				var free := int(defaults.get(other, 0))
+				if free != 0 and not REMAPPABLE.any(func(a): return a != action and primary_key(a) == free):
+					_put_key(action, free)
+				break
+
+
+## A tecla nova entra no lugar da primeira (a ordem diz qual é a principal).
+func _put_key(action: String, code: int) -> void:
+	var events := InputMap.action_get_events(action)
+	var key := InputEventKey.new()
+	key.physical_keycode = code
+	var replaced := false
+	for i in events.size():
+		if events[i] is InputEventKey and not replaced:
+			events[i] = key
+			replaced = true
+	if not replaced:
+		events.push_front(key)
+	InputMap.action_erase_events(action)
+	for event in events:
+		InputMap.action_add_event(action, event)
 
 
 ## A tecla principal da ação agora (código físico; 0 se não houver).
@@ -212,7 +222,6 @@ func _store() -> void:
 	config.set_value("graphics", "level", level)
 	config.set_value("graphics", "fullscreen", fullscreen)
 	config.set_value("graphics", "vsync", vsync)
-	config.set_value("dev", "enabled", dev_mode)
 	config.set_value("accessibility", "colorblind", colorblind)
 	config.set_value("accessibility", "text_size", text_size)
 	config.set_value("controls", "keys", keys)

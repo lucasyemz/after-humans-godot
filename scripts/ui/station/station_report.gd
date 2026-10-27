@@ -289,6 +289,10 @@ func _chips(c: Dictionary, result: String) -> Array:
 			out.append({"icon": "state_wounded", "text": tr("%s caiu: em recuperação") % hero.display_name, "color": AHKit.alert_text()})
 	elif fell.size() > 1:
 		out.append({"icon": "state_wounded", "text": tr("%d caíram: em recuperação") % fell.size(), "color": AHKit.alert_text()})
+	# Os postos de quem ficou na Estação (#119): o que renderam juntos.
+	var posts: Array = report.get("posts", []).filter(func(p): return int(p.get("amount", 0)) > 0)
+	if not posts.is_empty():
+		out.append({"icon": "room_quarters", "text": tr("Postos: %s") % ", ".join(posts.map(func(p): return post_line(p))), "color": AHKit.TEXT})
 	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
 	if report.has("train"):
 		var arrived := String(report.train)
@@ -484,6 +488,21 @@ func _card(hero_id: String) -> Control:
 		tab.position = Vector2(28, -38)
 	holder.custom_minimum_size.y = card.get_combined_minimum_size().y
 	return holder
+
+
+## O que um posto rendeu, curto: "+2 fragmentos", "1 dia a menos".
+static func post_line(entry: Dictionary) -> String:
+	var amount := int(entry.get("amount", 0))
+	match String(S.job_rule(String(entry.get("room", ""))).get("Unit", "")):
+		"fragments":
+			return TranslationServer.translate("+%d fragmento") % amount if amount == 1 else TranslationServer.translate("+%d fragmentos") % amount
+		"scrap":
+			return TranslationServer.translate("+%d sucata") % amount if amount == 1 else TranslationServer.translate("+%d sucatas") % amount
+		"supplies":
+			return TranslationServer.translate("+%d suprimento") % amount if amount == 1 else TranslationServer.translate("+%d suprimentos") % amount
+		"days":
+			return TranslationServer.translate("%d caído mais perto de voltar") % amount if amount == 1 else TranslationServer.translate("%d caídos mais perto de voltar") % amount
+	return ""
 
 
 ## Caiu nesta expedição (o relatório guarda quem chegou Caído).

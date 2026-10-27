@@ -49,12 +49,21 @@ const PROP_DOOR_CLEARANCE := 1.6
 ## Folga das pontas de cada zona do cenário (ZoneMargin) e o espaço entre os da fila (PartySpacing).
 const ZONE_MARGIN := 0.45
 const PARTY_SPACING := 1.3
-## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
+## A passagem pelas portas dos interiores laterais (#141): quanto a equipe anda para o fundo até a porta (m) e quanto
+## leva cada meio passo (s).
+const DOOR_WALK_DEPTH := 2.0
+## Onde a equipe para na sala (m do começo dela): sem a porta de dentro, logo na entrada; com ela (o vão de 1,5 m a
+## partir de x0 + 0,15), o bastante para a fila (uns 3,5 m) quase sair da frente da porta, com a câmera de dentro (que
+## mostra uns 4 m para cada lado e não passa de x0 + 3) ainda pegando a porta inteira, e longe dos objetos de busca.
+const ROOM_STOP := 1.6
+const ROOM_STOP_DOORWAY := 4.9
+const DOOR_WALK_SECONDS := 0.6
 ## A folga entre a parada de descanso e a próxima patrulha (m): a fogueira e o ponto de levantar ficam antes dela (#143).
 const STOP_CAMP_MARGIN := 1.5
 ## A folga entre a ponta da fileira do acampamento e uma patrulha de pé (m): mais perto que isso, ela some enquanto a
 ## fogueira está acesa.
 const STOP_CAMP_GUARD_GAP := 1.5
+## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
 const REACH := 1.1
 
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
@@ -103,6 +112,8 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	hud.menu_return.connect(_retreat)
 	hud.menu_requested.connect(open_menu)
 	hud.inventory_requested.connect(open_inventory)
+	hud.formation_requested.connect(open_formation)
+	hud.formation_swap.connect(_swap_formation)
 	hud.new_campaign.connect(_new_campaign)
 	street._arena.finished.connect(_on_combat_finished)
 	doors = street.door_list()
@@ -149,7 +160,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 
 ## Bloqueia o movimento da equipe (painel aberto, transição ou luta).
 func blocking() -> bool:
-	return busy or hud.modal_open() or street._arena.active or camp.active
+	return busy or hud.modal_open() or street._arena.active or camp.active or hud.formation_open()
 
 
 func _step_x(index: int, fraction: float) -> float:
@@ -884,6 +895,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open_inventory()
 		return
+	# A formação só pega a tecla quando abre ou fecha de fato: na luta, o X do controle é o Defender (#129).
+	if event.is_action_pressed("formation") and not street._arena.active and (hud.formation_open() or can_open_formation()):
+		get_viewport().set_input_as_handled()
+		open_formation()
+		return
 	if event.is_action_pressed("interact") and not blocking() and _action.is_valid() and not Tips.showing():
 		get_viewport().set_input_as_handled()
 		var action := _action
@@ -891,11 +907,39 @@ func _unhandled_input(event: InputEvent) -> void:
 		action.call()
 
 
+## A formação (#129): fora da luta, dos eventos, do acampamento e de um painel aberto, com dois ou mais de pé.
+func can_open_formation() -> bool:
+	# Com uma dica aberta, a tecla é dela (como o Interagir).
+	if busy or street._arena.active or hud.modal_open() or camp.active or Tips.showing() or not R.in_corridor(Campaign.state):
+		return false
+	return street.party_ids.size() >= 2
+
+
+func open_formation() -> void:
+	if hud.formation_open():
+		hud.close_formation()
+	elif can_open_formation():
+		hud.formation_cards = street._heroes
+		hud.open_formation()
+	elif street.party_ids.size() < 2 and not busy and not street._arena.active:
+		hud.toast(tr("Com um herói só, não há ordem para trocar."), 2.5)
+
+
+func _swap_formation(a: String, b: String) -> void:
+	if not R.swap_team(Campaign.state, a, b):
+		return
+	street.swap_party(a, b)
+	Campaign.save()
+	hud.refresh(Campaign.state)
+
+
 ## O menu da exploração (Esc ou o botão): continuar, voltar à Estação ou começar uma campanha nova.
 func open_menu() -> void:
 	# No acampamento também (#98): voltar à Estação e as Opções não podem esperar o levantar acampamento.
 	if busy or street._arena.active or hud.modal_open() or camp.switching():
 		return
+	# Com a formação aberta (o clique no MENU), ela fecha antes.
+	hud.close_formation()
 	var session: Dictionary = Campaign.state.session
 	if not AHExplorationHud.session_open(Campaign.state):
 		return
@@ -906,6 +950,7 @@ func open_menu() -> void:
 func open_inventory() -> void:
 	if busy or street._arena.active or hud.modal_open() or camp.switching() or not AHExplorationHud.session_open(Campaign.state):
 		return
+	hud.close_formation()
 	Sound.play("res://audio/ui/bag_open.ogg")
 	hud.show_inventory()
 	Tips.show_tip("bag")
@@ -944,17 +989,45 @@ func _enter_side_room(index: int) -> void:
 	Campaign.save()
 	Sound.play("res://audio/world/door_open.ogg")
 	hud.toast(tr("Entrando: %s…") % tr(street.scenario.zones[room_entry.zone].name), 1.5)
+	# Sem a porta de dentro no mapa (o Depósito), a entrada antiga: o escuro e a equipe já na sala.
+	if not street.scenario.has_doorway(room_entry.zone):
+		await GameFlow.fade(1.0)
+		_show_side_room(index)
+		await GameFlow.fade(0.0)
+		busy = false
+		return
+	# A equipe vai até a porta e passa por ela (#141): para o fundo, na frente da porta, e o escuro começa no meio do passo.
+	if not await street.walk_leader(Vector3(room_entry.door_x, street.floor_y, street.lane_z - DOOR_WALK_DEPTH), DOOR_WALK_SECONDS):
+		return
 	await GameFlow.fade(1.0)
-	_show_side_room(index)
+	_show_side_room(index, true)
 	await GameFlow.fade(0.0)
+	# Do lado de dentro, sai da porta (à esquerda, no fundo) para a sala, e para ao lado dela: a porta fica à vista.
+	if not await street.walk_leader(Vector3(room_entry.x0 + _room_stop(room_entry), street.floor_y, street.lane_z), DOOR_WALK_SECONDS * 2.5):
+		return
 	busy = false
 
 
-func _show_side_room(index: int) -> void:
+## at_door: a equipe aparece na porta de dentro (a entrada andando, #141); senão, já na sala (o jogo reaberto).
+func _show_side_room(index: int, at_door: bool = false) -> void:
 	side_room = index
 	var room_entry: Dictionary = side_rooms[index]
 	street.set_scenario_zone(room_entry.zone)
-	street._place_leader(Vector3(room_entry.x0 + 1.6, street.floor_y, street.lane_z))
+	if at_door:
+		street._place_leader(Vector3(room_entry.x0 + 0.5, street.floor_y, street.lane_z - DOOR_WALK_DEPTH * 0.5), 1.0)
+	else:
+		street._place_leader(Vector3(room_entry.x0 + _room_stop(room_entry), street.floor_y, street.lane_z))
+
+
+## Onde a equipe fica na sala: ao lado da porta de dentro, quando o mapa tem uma (#141), para não tapá-la; recua para a
+## porta até sair do alcance dos objetos de busca (o líder em cima de um baú o tapava e já abria o aviso).
+func _room_stop(room_entry: Dictionary) -> float:
+	if not street.scenario.has_doorway(room_entry.zone):
+		return ROOM_STOP
+	var stop := ROOM_STOP_DOORWAY
+	while stop > ROOM_STOP + 1.0 and scenario_props.any(func(p): return p.zone == room_entry.zone and absf(float(p.x) - (float(room_entry.x0) + stop)) < REACH + 0.2):
+		stop -= 0.1
+	return stop
 
 
 func _side_room_frame(campaign: Dictionary, route: Dictionary) -> void:
@@ -1000,10 +1073,23 @@ func _leave_side_room() -> void:
 		return
 	busy = true
 	Campaign.save()
+	if not street.scenario.has_doorway(room_entry.zone):
+		Sound.play("res://audio/world/door_close.ogg")
+		await GameFlow.fade(1.0)
+		_enter_segment(room_entry.door_segment, room_entry.door_x)
+		await GameFlow.fade(0.0)
+		busy = false
+		return
+	# A equipe anda até a porta de dentro e passa por ela; lá fora, sai da mesma porta do Cais para a frente (#141).
+	if not await street.walk_leader(Vector3(room_entry.x0 + 0.3, street.floor_y, street.lane_z - DOOR_WALK_DEPTH * 0.5), DOOR_WALK_SECONDS):
+		return
 	Sound.play("res://audio/world/door_close.ogg")
 	await GameFlow.fade(1.0)
 	_enter_segment(room_entry.door_segment, room_entry.door_x)
+	street._place_leader(Vector3(room_entry.door_x, street.floor_y, street.lane_z - DOOR_WALK_DEPTH), 1.0)
 	await GameFlow.fade(0.0)
+	if not await street.walk_leader(Vector3(room_entry.door_x, street.floor_y, street.lane_z + 0.3), DOOR_WALK_SECONDS):
+		return
 	busy = false
 
 
@@ -1374,4 +1460,4 @@ func _show_result() -> void:
 ## voluntários de graça (FAHShelterRules::CanRecruitVolunteer), então a campanha continua.
 func _on_result_continue() -> void:
 	hud.close_modal()
-	GameFlow.travel("station")
+	GameFlow.travel("station", AHWagonRide.return_card())

@@ -19,8 +19,9 @@ func run(t) -> void:
 		var events := InputMap.action_get_events(action)
 		t.check(events.any(func(e): return e is InputEventKey), "%s tem tecla" % action)
 		t.check(events.any(func(e): return e is InputEventJoypadButton or e is InputEventJoypadMotion), "%s tem gamepad" % action)
-	for action in ["debug_rain", "debug_time", "debug_post", "debug_colliders"]:
-		t.check(InputMap.has_action(action), "ação de teste %s existe" % action)
+	# As teclas de teste antigas da rua saíram (#129): o que elas faziam está na barra de Admin (F1).
+	for action in ["debug_rain", "debug_time", "debug_post", "debug_colliders", "debug_combat"]:
+		t.check(not InputMap.has_action(action), "a ação de teste antiga %s saiu" % action)
 
 
 ## Trocar teclas (Opções): a tecla nova vira a principal, as outras continuam, e quem já usava a tecla troca com ela.

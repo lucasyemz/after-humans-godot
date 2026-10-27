@@ -181,6 +181,11 @@ func _band() -> void:
 	var waiting_name := S.train_candidate_name(c)
 	if waiting_name != "":
 		warning = tr("%s espera no trem: se a equipe partir, vai embora.") % waiting_name + ("\n" + warning if warning != "" else "")
+	# Quem parte deixa o posto na Estação (#119).
+	for hero_id in draft.team:
+		var member = S.hero(c, hero_id)
+		if member != null and S.post_of(member) != "":
+			warning = tr("%s deixa o posto %s para partir.") % [member.display_name, S.room_in(S.post_of(member))] + ("\n" + warning if warning != "" else "")
 	if warning != "":
 		var note := HBoxContainer.new()
 		note.name = "Warning"

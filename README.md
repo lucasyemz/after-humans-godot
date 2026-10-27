@@ -104,17 +104,14 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - Em toda tela (mapa de fases, plataforma da partida, cômodos, relatório, noite, trem, Opções, pausa, Mochila, luta) dá para jogar
     só com o teclado ou o controle: as setas (ou o direcional) andam entre os botões, E, Enter ou A confirma e
     Backspace, Esc ou B volta. As teclas desenhadas na tela seguem as trocas das Opções. As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo. Com tela de toque aparecem um analógico (andar; até a borda corre) e o botão Usar; Opções > Controles de toque liga sempre ou desliga.
-  - F1 abre a barra de Admin, só na build de teste ou com `--admin` (#130). Em Ajustes, ela liga as teclas de teste da
-    rua abaixo (R, T, P, C, K) e o contador de quadros.
-  - R liga e desliga a chuva.
-  - T troca entre fim de tarde e noite.
-  - P liga e desliga o pós-processamento.
-  - C mostra as caixas de colisão.
+  - F1 abre a barra de Admin, só na build de teste ou com `--admin` (#130): a chuva e o dia e a noite em Clima; o
+    pós-processamento, as caixas de colisão e o contador de quadros em Ajustes; a próxima patrulha em Testes de combate.
+  - R (ou X) abre a Formação (#129): clique em dois heróis (ou as setas e E) para trocá-los de lugar na fila e na próxima
+    luta.
   - I abre a Mochila (comida, curativo e a Ampola de Reparo do sapo; na luta, no herói da vez).
   - Esc abre o menu (continuar, opções, voltar à Estação, nova campanha).
   - E interage: entrar ou forçar a porta de uma loja, vasculhar, abrir caixotes, acender a fogueira, voltar à Estação
     pela saída no começo da rua.
-  - K leva a equipe até a próxima patrulha.
   - Na Estação: o cartão "Próximo passo" diz o que fazer; os cômodos abrem clicando no nome deles no corte; Esc volta à
     vista geral. Ir ao mapa abre o Mapa da Rede; Preparar neste lugar sobe a equipe para a Plataforma 1, onde se monta
     a equipe, o foco e a comida, e Iniciar expedição (G) confirma a partida. Esc volta um passo (#123).
@@ -241,7 +238,8 @@ A tabela do que toca em cada momento e a mixagem estão em [docs/audio.md](docs/
     página e a licença ou trocar a faixa.
 - **Feitos no projeto:**
   - os sons da interface, da Estação, dos ambientes e da chuva, e os passos na água (`SourceArt/Audio/Synth` da Unreal);
-  - os sons de `tools/synth_sounds.py`: sino e freio do trem, painéis, Forja, achado raro, vitória, derrota e crise.
+  - os sons de `tools/synth_sounds.py`: sino, freio e o trem andando (o laço da passagem do vagão), painéis, Forja,
+    achado raro, vitória, derrota e crise.
     São gerados por síntese e são de domínio público (CC0).
 - **Combate:** as ações dos heróis e dos robôs (`audio/combat`) vêm da referência Unreal, por
   `tools/sync_combat_art.py`; a origem e a licença de cada um não estão registradas lá. Pendente: levantar na pasta da

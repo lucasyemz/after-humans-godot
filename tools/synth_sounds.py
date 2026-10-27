@@ -1,5 +1,6 @@
 """Gera por síntese os sons que faltavam no jogo (#36): o sino e o freio do trem, abrir e fechar os painéis, a confirmação
-da Forja, o achado raro da busca, a vitória e a derrota e a crise de instinto. Feitos aqui, do zero (osciladores e ruído),
+da Forja, o achado raro da busca, a vitória e a derrota e a crise de instinto; e o trem andando na passagem do vagão
+(#133), um laço sem emenda. Feitos aqui, do zero (osciladores e ruído),
 são de domínio público (CC0) e não dependem da referência Unreal. Cada um sai em OGG Vorbis em audio/ (mono, 44,1 kHz),
 com o pico em -3 dBFS; o volume de cada um no jogo fica nas chamadas e na tabela de mixagem
 (tools/measure_audio.py). Precisa do numpy e do ffmpeg (com libvorbis):
@@ -136,6 +137,42 @@ def crisis():
     return boom * 1.2 + swell * 0.5 + whine
 
 
+## O trem andando (#133): o "ta-dum" das rodas nas emendas dos trilhos (dois truques por vagão, a cada 1,25 s), o ronco
+## grave do motor, que sobe e desce devagar, e o chiado das rodas. RIDE_SECONDS fecha um número inteiro de batidas e de
+## ondas do ronco; o rabo do ruído entra misturado no começo, então o laço emenda sem estalo.
+RIDE_SECONDS = 5.0
+RIDE_BEAT = 1.25
+
+
+def rail_click(seconds=0.18):
+    t = time(seconds)
+    knock = bandpass(RNG.standard_normal(t.size), 500.0, 2800.0) * np.exp(-t * 38.0)
+    thump = np.sin(2 * np.pi * 72.0 * t) * np.exp(-t * 22.0)
+    return knock * 0.9 + thump * 0.8
+
+
+def train_ride():
+    size = int(RIDE_SECONDS * RATE)
+    tail = int(0.6 * RATE)
+    total = (size + tail) / RATE
+    t = np.arange(size + tail) / RATE
+    out = np.zeros_like(t)
+    beat = 0.0
+    while beat < total:
+        for offset, gain in ((0.0, 1.0), (0.11, 0.8), (0.46, 0.85), (0.57, 0.7)):
+            place(out, rail_click() * gain, beat + offset)
+        beat += RIDE_BEAT
+    swell = 0.75 + 0.25 * np.sin(2 * np.pi * t / RIDE_SECONDS)
+    motor = (np.sin(2 * np.pi * 46.0 * t) + 0.45 * np.sin(2 * np.pi * 92.0 * t) + 0.2 * np.sin(2 * np.pi * 138.0 * t)) * 0.35
+    rumble = lowpass(RNG.standard_normal(t.size), 160.0) * 3.0
+    hiss = bandpass(RNG.standard_normal(t.size), 400.0, 1800.0) * 0.25
+    out += (motor + rumble) * swell + hiss
+    loop = out[:size].copy()
+    ramp = np.linspace(0.0, 1.0, tail)
+    loop[:tail] = loop[:tail] * ramp + out[size:size + tail] * (1.0 - ramp)
+    return loop
+
+
 SOUNDS = {
     "station/train_bell": train_bell,
     "station/train_brake": train_brake,
@@ -146,14 +183,19 @@ SOUNDS = {
     "ui/victory": victory,
     "ui/defeat": defeat,
     "combat/crisis": crisis,
+    "station/train_ride": train_ride,
 }
+## Os laços: sem a saída suave do fim (o fim emenda com o começo).
+LOOPED = {"station/train_ride"}
 
 
 def write(stem, signal):
-    # 25 ms de saída suave: nenhum som termina com sinal ainda tocando (o "tum" no fim da crise).
-    fade = int(0.025 * RATE)
     signal = signal.copy()
-    signal[-fade:] *= np.linspace(1.0, 0.0, fade)
+    # 25 ms de saída suave: nenhum som termina com sinal ainda tocando (o "tum" no fim da crise). O laço não: o fim
+    # emenda com o começo.
+    if stem not in LOOPED:
+        fade = int(0.025 * RATE)
+        signal[-fade:] *= np.linspace(1.0, 0.0, fade)
     peak = np.max(np.abs(signal))
     signal = signal / peak * (10 ** (-3.0 / 20.0)) if peak > 0 else signal
     target = AUDIO / f"{stem}.ogg"
