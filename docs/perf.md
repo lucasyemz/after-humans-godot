@@ -95,6 +95,7 @@ servem como medida aqui; as chamadas, as primitivas e os objetos servem.
 | Luta na rua | Baixo | 178 | 180 | 8.112 | 8.114 | 376 | 369 |
 | Luta na rua | Ultra | 320 | 328 | 78.558 | 79.094 | 489 | 524 |
 
-As folhas e os dois respiros de vapor custam uma chamada cada; as primitivas sobem pouco (as folhas e o vapor são
-quads). O desfoque de profundidade e a névoa volumétrica, que são o custo de verdade, não aparecem nessas colunas: o
+Na rua, as folhas e os dois respiros de vapor custam uma chamada cada, e as primitivas sobem pouco (as folhas e o
+vapor são quads). Na luta, a diferença maior (35 objetos e 8 chamadas no Ultra) vem em parte da luta sorteada em cada
+rodada, que não é a mesma nas duas medidas. O desfoque de profundidade e a névoa volumétrica, que são o custo de verdade, não aparecem nessas colunas: o
 tempo de quadro no Forward+, no Baixo e no Ultra, fica para o PC do Orquestrador, com o mesmo comando.
