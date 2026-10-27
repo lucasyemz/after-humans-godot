@@ -347,7 +347,7 @@ func use_expedition(campaign: Dictionary) -> void:
 	context.relationships = Dictionary(expedition.get("relationships", {})).duplicate()
 
 
-## Grava na campanha a vida, o instinto e o trauma de cada herói; quem morreu fica com alive = false. Na vitória, a Íris
+## Grava na campanha a vida, o instinto e o trauma de cada herói; quem caiu fica com alive = false até o fim da expedição (#118: volta Caído, não morre). Na vitória, a Íris
 ## recarrega a ampola.
 func write_back(campaign: Dictionary) -> void:
 	for unit in state.player_team:

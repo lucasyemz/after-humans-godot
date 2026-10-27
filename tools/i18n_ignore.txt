@@ -1036,7 +1036,6 @@ character_room.gd: Ability_%s
 character_room.gd: Detail
 character_room.gd: Max
 character_room.gd: %s · %s
-character_room.gd: %s · %s · %s
 character_room.gd: Right
 character_room.gd: Close
 character_room.gd: X
@@ -1365,3 +1364,31 @@ combat_hud.gd: part
 combat_hud.gd: Empty
 combat_hud.gd: id
 street.gd: fight
+exploration_hud.gd: fallen
+combat_hud.gd: Fallen
+combat_hud.gd: names
+refuge_hud.gd: Fallen_%s
+refuge_hud.gd: Days
+refuge_hud.gd: Treat
+station_report.gd: fallen
+station_report.gd: Fallen
+station_report.gd: days
+station_report.gd: recovered
+character_room.gd: Recovering
+character_room.gd: Recovery
+station_rules.gd: infirmary
+station_rules.gd: infirmary_level_%d
+station_rules.gd: recovery
+station_rules.gd: Scrap
+station_rules.gd: Fragments
+station_rules.gd: Days
+station_rules.gd: memorial
+station_rules.gd: Beds
+station_rules.gd: fallen
+station_rules.gd: Hp
+station_rules.gd: days
+station_rules.gd: Cost
+station_rules.gd: rest_%d
+station_rules.gd: recovered
+station_build.gd: infirmary
+station_build.gd: infirmary@2

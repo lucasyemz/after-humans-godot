@@ -49,13 +49,16 @@ static func all() -> Array:
 	out.append(_a("xp_team", "Heróis", "+100 de XP em todos", "campaign", true))
 	out.append(_a("level_team", "Heróis", "Todos sobem um nível", "campaign", true))
 	out.append(_a("recruit_now", "Heróis", "Recrutar agora", "campaign", true))
-	out.append(_a("revive_all", "Heróis", "Trazer de volta quem morreu", "campaign", true))
+	# Ninguém morre (#118): os caídos voltam Caídos e se recuperam na Enfermaria (#121).
+	out.append(_a("recover_all", "Heróis", "Recuperar os caídos agora", "campaign", true))
+	out.append(_a("fall_one", "Heróis", "Derrubar um herói (volta Caído)", "station", true))
+	out.append(_a("pass_day", "Heróis", "Passar um dia na Estação (a recuperação anda)", "station", true))
 	out.append(_a("next_patrol", "Combate", "Próxima patrulha", "explore", true))
 	out.append(_a("breakthrough", "Combate", "Forçar Superação em quem age", "fight", false))
 	out.append(_a("collapse", "Combate", "Forçar Colapso em quem age", "fight", false))
 	out.append(_a("instinct_50", "Combate", "+50 de Instinto em quem age", "fight", false))
 	out.append(_a("fight_win", "Combate", "Vencer a luta", "fight", true))
-	out.append(_a("fight_lose", "Combate", "Perder a luta (quem lutou cai de vez)", "fight", true))
+	out.append(_a("fight_lose", "Combate", "Perder a luta (quem lutou volta Caído)", "fight", true))
 	out.append(_a("fight_flee", "Combate", "Fugir da luta", "fight", true))
 	for enemy_id in _enemy_ids():
 		out.append(_a("enemy_%s" % enemy_id, "Combate", "Lutar contra %s" % TranslationServer.translate(String(GameData.row("enemies", enemy_id).DisplayName)), "explore", true))
@@ -195,15 +198,25 @@ static func run(id: String) -> String:
 			return _saved(TranslationServer.translate("%d herói(s) prontos para subir de nível no Alojamento") % raised)
 		"recruit_now":
 			return _recruit()
-		"revive_all":
-			var back := 0
-			for hero in c.roster:
-				if not hero.get("alive", true):
-					hero.alive = true
-					hero.hp = int(hero.max_hp)
-					back += 1
-			c.memorial = []
-			return _saved(TranslationServer.translate("%d herói(s) de volta") % back)
+		"recover_all":
+			var back: int = S.fallen(c).size()
+			for hero in S.fallen(c):
+				S._recover(hero)
+			_commit(scene)
+			return _saved(TranslationServer.translate("%d herói(s) de volta ao Alojamento") % back)
+		"fall_one":
+			var ready: Array = S.ready_heroes(c)
+			if ready.is_empty():
+				return ""
+			var hero: Dictionary = ready[0]
+			S.admit_fallen(c, [hero.id])
+			_commit(scene)
+			return _saved(TranslationServer.translate("%s caiu: %s") % [hero.display_name, S.return_text(S.recovery_days(hero)).to_lower()])
+		"pass_day":
+			S.run_cycle(c, "admin_%d" % (int(c.station.cycle_number) + 1), 0)
+			var recovered: Array = S.tick_recovery(c)
+			_commit(scene)
+			return _saved(TranslationServer.translate("Um dia passou (ciclo %d); %d se recuperaram") % [int(c.station.cycle_number), recovered.size()])
 		"next_patrol":
 			return TranslationServer.translate("Indo para a próxima patrulha") if scene.corridor.debug_next_fight() else ""
 		"breakthrough", "collapse":
@@ -250,6 +263,12 @@ static func _saved(text: String) -> String:
 	return text
 
 
+## Na Estação, a cena acompanha (os caídos deitam ou levantam, o HUD muda).
+static func _commit(scene: Node) -> void:
+	if scene is AHStation:
+		scene.refresh()
+
+
 static func _refresh_station(scene: Node) -> void:
 	if scene is AHStation and scene.hud != null:
 		scene.hud.refresh()
@@ -263,6 +282,10 @@ static func _map(target: String) -> String:
 	# A cena troca com o jogo andando (a barra pausada seguraria a nova).
 	Admin.close()
 	if target == "station":
+		# Quem caiu na expedição largada volta Caído (#118), como numa volta.
+		var expedition = c.get("session", {}).get("expedition")
+		if expedition != null:
+			S.admit_fallen(c, expedition.team.filter(func(id): return S.hero(c, id) != null and not S.hero(c, id).alive))
 		c.session = {"expedition": null, "event": null, "screen": "", "result": ""}
 		Campaign.save()
 		GameFlow.change_to("station")
