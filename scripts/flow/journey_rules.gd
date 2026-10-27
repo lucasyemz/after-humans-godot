@@ -610,6 +610,10 @@ static func grant_tool(campaign: Dictionary, tool: String) -> bool:
 
 static func lose_tool(campaign: Dictionary, tool: String) -> void:
 	campaign.tools.erase(tool)
+	# Perdida antes de a Mochila abrir, ela deixa de ser novidade (#143).
+	for key in ["new_tools", "tool_notices"]:
+		if campaign.has(key):
+			campaign[key].erase(tool)
 
 
 ## Os efeitos de fase que valem na próxima luta da expedição (os ids de PHASE_EFFECTS em corridor.effects).
@@ -1122,11 +1126,12 @@ static func can_camp_at_stop(campaign: Dictionary) -> bool:
 	return route.current_house == -1 and route.steps[route.index].type == "rest" and not camped(route)
 
 
-## Acende a fogueira na parada (x: onde, na rua). A volta ao jogo no meio do acampamento a refaz no mesmo lugar.
-static func start_stop_camp(campaign: Dictionary, x: float) -> bool:
+## Acende a fogueira na parada (x: a fogueira; leave: onde a fila recomeça). A volta ao jogo no meio do acampamento a
+## refaz no mesmo lugar.
+static func start_stop_camp(campaign: Dictionary, x: float, leave: float) -> bool:
 	if not can_camp_at_stop(campaign):
 		return false
-	corridor(campaign).stop_camp = {"step": corridor(campaign).index, "x": x}
+	corridor(campaign).stop_camp = {"step": corridor(campaign).index, "x": x, "leave": leave}
 	campaign.session.screen = "rest"
 	return true
 

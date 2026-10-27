@@ -709,8 +709,9 @@ func set_patrol(where, meter: float, detected: bool) -> void:
 func _input(event: InputEvent) -> void:
 	if modal_open() and S.press_focused(_modal, event):
 		get_viewport().set_input_as_handled()
-	# O aviso da ferramenta sai com qualquer tecla (sem engolir a tecla: andar continua andando).
-	if tool_notice_shown() and (event is InputEventKey or event is InputEventJoypadButton) and event.is_pressed():
+	# O aviso da ferramenta sai com qualquer tecla, clique ou toque (sem engolir: andar continua andando).
+	if tool_notice_shown() and (event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton
+			or event is InputEventScreenTouch) and event.is_pressed():
 		hide_tool_notice()
 
 
@@ -807,7 +808,9 @@ func show_tool_notice(tool: String) -> void:
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(560, 0)
 	words.add_child(text)
-	words.add_child(AHKit.label(tr("Fica na Mochila (%s). Não se gasta.") % S.key_name("inventory"), "small", AHKit.MUTED))
+	# A tecla só fora do toque (no toque, a Mochila é o botão).
+	var where := tr("Fica na Mochila.") if Settings.touch_visible() else tr("Fica na Mochila (%s).") % S.key_name("inventory")
+	words.add_child(AHKit.label(where, "small", AHKit.MUTED))
 	_tool_notice.reset_size()
 	_tool_notice.size = _tool_notice.get_combined_minimum_size()
 	_tool_notice.position = Vector2(960 - _tool_notice.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))

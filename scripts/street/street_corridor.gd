@@ -46,6 +46,8 @@ const PROP_DOOR_CLEARANCE := 1.6
 const ZONE_MARGIN := 0.45
 const PARTY_SPACING := 1.3
 ## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
+## A folga entre a parada de descanso e a próxima patrulha (m): a fogueira e o ponto de levantar ficam antes dela (#143).
+const STOP_CAMP_MARGIN := 1.5
 const REACH := 1.1
 
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
@@ -128,7 +130,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 		hud.show_camp(campaign, camp)
 	elif session.screen == "rest" and route.has("stop_camp"):
 		# Reaberto no meio do acampamento da parada: a fogueira no mesmo lugar.
-		_light_stop_camp(float(route.stop_camp.x))
+		_light_stop_camp(route.stop_camp)
 		camp.begin(stop_camp, session.expedition.team, true)
 		hud.show_camp(campaign, camp)
 	elif AHFightRewards.cargo_pending(campaign):
@@ -580,26 +582,59 @@ func _camp_at_stop() -> void:
 		await _enter_house(house)
 		_start_camp()
 		return
-	if not R.start_stop_camp(Campaign.state, street._leader.position.x):
+	var place := _stop_camp_place(street._leader.position.x)
+	if not R.start_stop_camp(Campaign.state, place.x, place.y):
 		return
 	Campaign.save()
 	busy = true
 	await GameFlow.fade(1.0)
-	_light_stop_camp(float(Campaign.state.session.expedition.corridor.stop_camp.x))
+	hud.set_patrol(null, 0.0, false)
+	_light_stop_camp(Campaign.state.session.expedition.corridor.stop_camp)
 	await camp.begin(stop_camp, Campaign.state.session.expedition.team, true)
 	await GameFlow.fade(0.0)
 	busy = false
 	hud.show_camp(Campaign.state, camp)
 
 
-func _light_stop_camp(x: float) -> void:
+func _light_stop_camp(place: Dictionary) -> void:
 	if stop_camp != null:
 		stop_camp.queue_free()
 	stop_camp = AHStreetCamp.new()
 	street.add_child(stop_camp)
-	stop_camp.build(x, street.floor_y if street.scenario else street._ground_height(street.lane_z), street.lane_z,
-		street.walk_min.x, street.walk_max.x)
+	var x := float(place.x)
+	stop_camp.build(x, float(place.get("leave", x + AHCampScene.LEAVE_OFFSET)),
+		street.floor_y if street.scenario else street._ground_height(street.lane_z), street.lane_z)
 	stop_camp.set_camp_lit(true)
+
+
+## Onde acender a fogueira da parada (#143): a fileira (AHStreetCamp.HALF_ROW para cada lado) e o ponto de levantar ficam
+## para trás do fim do trecho de descanso (antes da próxima patrulha), dentro da área de andar e fora dos obstáculos do
+## cenário (a jaula, as caixas). Nos trechos curtos dos cenários, a fileira recua para os trechos já vencidos.
+## Devolve (fogueira, levantar).
+func _stop_camp_place(near: float) -> Vector2:
+	var route: Dictionary = Campaign.state.session.expedition.corridor
+	var low: float = street.walk_min.x + AHStreetCamp.HALF_ROW
+	var high: float = minf(_step_x(route.index, 1.0) - STOP_CAMP_MARGIN, street.walk_max.x) - AHCampScene.LEAVE_OFFSET
+	var x := clampf(near, low, maxf(low, high))
+	# Recua até a fileira ficar fora dos obstáculos (meio metro por vez), sem passar da ponta de trás.
+	while x > low and _row_blocked(x):
+		x -= 0.5
+	x = maxf(x, low)
+	var leave := minf(x + AHCampScene.LEAVE_OFFSET, minf(_step_x(route.index, 1.0) - STOP_CAMP_MARGIN, street.walk_max.x))
+	# Sem lugar à direita da fogueira antes da patrulha, a fila recomeça à esquerda dela, no trecho já vencido.
+	if leave < x + 1.0:
+		leave = maxf(street.walk_min.x + 0.5, x - AHCampScene.LEAVE_OFFSET)
+	return Vector2(x, leave)
+
+
+func _row_blocked(x: float) -> bool:
+	if street.scenario == null:
+		return false
+	for box: AABB in street.scenario.obstacles:
+		if box.end.x > x - AHStreetCamp.HALF_ROW and box.position.x < x + AHStreetCamp.HALF_ROW \
+				and box.position.y < street.floor_y + 1.2 and box.end.z > street.lane_z - 1.0 and box.position.z < street.lane_z + 1.0:
+			return true
+	return false
 
 
 ## A pergunta de risco, uma vez por jornada em cada ponto: seguir com a equipe como está ou voltar com metade.
@@ -927,7 +962,11 @@ func _retreat() -> void:
 		busy = true
 		hud.hide_camp()
 		await camp.end()
-		room.set_camp_lit(false)
+		if room != null:
+			room.set_camp_lit(false)
+		if stop_camp != null:
+			stop_camp.queue_free()
+			stop_camp = null
 		busy = false
 	_show_result()
 

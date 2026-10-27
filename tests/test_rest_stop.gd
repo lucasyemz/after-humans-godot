@@ -28,6 +28,9 @@ func run(context) -> void:
 	await _combat_pose()
 	await _stop("fase_1", 31)
 	await _stop("fase_2", 32)
+	await _retreat_in_camp()
+	for spec in [["fase_3", 31], ["fase_3", 32], ["fase_4", 31], ["fase_5", 31], ["fase_5", 35]]:
+		await _short(spec[0], spec[1])
 	Tips.enabled = tips
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
@@ -51,6 +54,10 @@ func _rules() -> void:
 	t.equal(c.tool_notices.size(), 1, "nem repete o aviso")
 	for tool in AHInventoryPanel.KNOWN_TOOLS:
 		t.check(AHInventoryPanel.TOOL_TEXTS.has(tool), "%s diz o que faz" % tool)
+	t.check(not AHInventoryPanel.tool_text("pe_de_cabra").contains("Não se gasta"), "o pé de cabra, que quebra, não diz que não se gasta")
+	J.grant_tool(c, "pe_de_cabra")
+	J.lose_tool(c, "pe_de_cabra")
+	t.check(not c.new_tools.has("pe_de_cabra") and not c.tool_notices.has("pe_de_cabra"), "perdida antes da Mochila, a ferramenta deixa de ser nova")
 
 
 ## A rua da fase 1, aberta com a campanha c.
@@ -209,6 +216,76 @@ func _stop(phase_id: String, seed_value: int) -> void:
 	t.check(not corridor.camp.active and corridor.stop_camp == null and Campaign.state.session.screen == "corridor", "%s: levantar apaga a fogueira" % phase_id)
 	t.check(J.camped(Campaign.state.session.expedition.corridor), "%s: e conta como o acampamento da fase" % phase_id)
 	t.check(not J.can_camp_at_stop(Campaign.state), "%s: a parada não acampa de novo" % phase_id)
+
+
+## Chega à parada de descanso da fase (no ponto fraction do trecho) e responde Acampar aqui. Devolve a rua com o
+## acampamento aberto (ou null).
+func _camp_at(phase_id: String, seed_value: int, fraction: float):
+	var c := Campaign.create_initial(seed_value)
+	c.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
+	J.start_expedition(c, phase_id, seed_value)
+	var route: Dictionary = c.session.expedition.corridor
+	var rest: int = route.steps.map(func(s): return s.type).find("rest")
+	if rest <= 0:
+		return null
+	for i in rest:
+		route.steps[i].resolved = true
+	route.index = rest - 1
+	var street = await _open(c)
+	if street == null:
+		return null
+	for site in route.sites:
+		if site.step == rest:
+			site.camp_site = false
+	var corridor: AHStreetCorridor = street.corridor
+	corridor._enter_segment(corridor._segment_of(rest), corridor._step_x(rest, fraction))
+	corridor._announce(rest, J.enter_step(Campaign.state, rest), true)
+	await _frames(3)
+	var hud: AHExplorationHud = street.exploration_hud
+	if not hud.modal_open():
+		return null
+	_buttons(hud._modal)[0].pressed.emit()
+	if not await _until(func(): return corridor.camp.active and hud.camp_open(), 6.0):
+		return null
+	return street
+
+
+## Voltar à Estação pelo Menu com o acampamento da parada aberto: a fogueira apaga e o resultado da retirada abre.
+func _retreat_in_camp() -> void:
+	var street = await _camp_at("fase_1", 31, 0.5)
+	if not t.check(street != null, "acampado na parada da rua"):
+		return
+	var corridor: AHStreetCorridor = street.corridor
+	var hud: AHExplorationHud = street.exploration_hud
+	hud.menu_return.emit()
+	t.check(await _until(func(): return hud.modal_open() and not corridor.busy, 6.0), "Voltar pelo Menu no acampamento abre o resultado")
+	t.check(corridor.stop_camp == null and not corridor.camp.active, "e a fogueira da parada apaga")
+
+
+## Nos cenários de trechos curtos (o Abrigo, a Triagem, o Depósito), chegando no começo do descanso: a fileira e o
+## ponto de levantar ficam antes da próxima patrulha, e levantar não começa luta nem troca de mapa sozinho.
+func _short(phase_id: String, seed_value: int) -> void:
+	var street = await _camp_at(phase_id, seed_value, 0.02)
+	if not t.check(street != null, "%s/%d: acampado na parada" % [phase_id, seed_value]):
+		return
+	var corridor: AHStreetCorridor = street.corridor
+	var route: Dictionary = Campaign.state.session.expedition.corridor
+	var rest: int = route.index
+	var map_name: String = street.scenario.map_name if street.scenario else "street"
+	var end := corridor._step_x(rest, 1.0)
+	var fire: AHStreetCamp = corridor.stop_camp
+	t.check(fire.camp_x + AHStreetCamp.HALF_ROW <= end + 0.01 or fire.camp_x <= street.walk_min.x + AHStreetCamp.HALF_ROW + 0.01,
+		"%s/%d: a fileira fica no trecho de descanso ou atrás dele (fogueira %.1f, fim %.1f)" % [phase_id, seed_value, fire.camp_x, end])
+	t.check(fire.leave_x <= end - AHStreetCorridor.STOP_CAMP_MARGIN + 0.01, "%s/%d: o ponto de levantar fica antes da próxima patrulha" % [phase_id, seed_value])
+	t.check(not corridor._row_blocked(fire.camp_x) or fire.camp_x <= street.walk_min.x + AHStreetCamp.HALF_ROW + 0.01,
+		"%s/%d: a fileira fora dos obstáculos do cenário" % [phase_id, seed_value])
+	var fire_x := fire.camp_x
+	var leave_x := fire.leave_x
+	await corridor._on_camp_leave()
+	await _frames(120)
+	t.check(not street._arena.active, "%s/%d: levantar não começa luta sozinho" % [phase_id, seed_value])
+	t.check(is_instance_valid(street) and street == _tree.current_scene and (street.scenario.map_name if street.scenario else "street") == map_name
+		and route.index <= rest and route.steps[rest + 1].resolved == false, "%s/%d: nem passa para o trecho da patrulha ou troca de mapa" % [phase_id, seed_value])
 
 
 func _team_hp() -> int:

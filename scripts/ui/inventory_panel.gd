@@ -110,6 +110,10 @@ static func new_tag() -> PanelContainer:
 	tag.add_child(AHKit.label(TranslationServer.translate("Novo").to_upper(), "small", AHKit.AMBER, true))
 	tag.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 2)
 	tag.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	# Meio para fora da borda de cima: no texto Maior ele não cobre o ícone.
+	var height := tag.get_combined_minimum_size().y
+	tag.offset_top = -height * 0.55
+	tag.offset_bottom = tag.offset_top + height
 	return tag
 
 
@@ -151,7 +155,7 @@ func _make_slots() -> Array:
 	for tool in tools:
 		var has := AHJourneyRules.has_tool(campaign, tool)
 		out.append({"id": tool, "name": tr(TOOL_NAMES.get(tool, tool.capitalize())), "icon": TOOL_ICONS.get(tool, "tool-generic"), "count": "",
-			"group": 1, "owned": has, "text": (tool_text(tool) + " " + tr("Não se gasta.")) if has else tr("A equipe ainda não tem esta ferramenta.")})
+			"group": 1, "owned": has, "text": tool_text(tool) if has else tr("A equipe ainda não tem esta ferramenta.")})
 	for spec in [["seeds", "Sementes", "lobby-seed", "Moeda do refúgio: comida extra na preparação, pesquisa e obras."],
 			["scrap", "Sucata", "lobby-scrap", "Matéria-prima da Forja."], ["fragments", "Fragmentos", "lobby-fragment", "Restos raros usados nas pesquisas."]]:
 		out.append({"id": spec[0], "name": tr(spec[1]), "icon": spec[2], "count": str(int(campaign.inventory.get(spec[0], 0))), "group": 2,

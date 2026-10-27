@@ -8,6 +8,8 @@ extends Node3D
 const HALF_ROW := 4.0
 
 var camp_x := 0.0
+## Onde o líder fica ao levantar (dentro do trecho de descanso, antes da próxima patrulha).
+var leave_x := 0.0
 var floor_y := 0.0
 ## A linha da fogueira: a equipe senta um pouco à frente dela (AHCampScene.SLOTS).
 var camp_z := 0.0
@@ -17,10 +19,12 @@ var _fire_material: ShaderMaterial
 var _fire_light: OmniLight3D
 
 
-## x: onde a equipe parou (cabe a fileira entre low e high, as pontas da área de andar); y: o piso; z: a faixa de andar.
-func build(x: float, y: float, z: float, low: float, high: float) -> void:
+## x: a fogueira (o corredor escolhe, AHStreetCorridor._stop_camp_place); leave: onde a fila recomeça; y: o piso; z: a
+## faixa de andar.
+func build(x: float, leave: float, y: float, z: float) -> void:
 	name = "StopCamp"
-	camp_x = clampf(x, low + HALF_ROW, maxf(low + HALF_ROW, high - HALF_ROW))
+	camp_x = x
+	leave_x = leave
 	floor_y = y
 	camp_z = z - 0.35
 	leave_z = z

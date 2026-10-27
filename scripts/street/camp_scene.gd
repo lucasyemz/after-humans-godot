@@ -118,7 +118,9 @@ func end(instant: bool = false) -> void:
 	active = false
 	if _street != null and _room != null:
 		# A fila recomeça à direita da fogueira, virada para a porta de saída, sem ninguém em cima do fogo.
-		_street._place_leader(Vector3(minf(_room.camp_x + LEAVE_OFFSET, _street.walk_max.x), _room.floor_y, _room.leave_z), 1.0)
+		# Na parada de descanso (#143), o ponto de levantar vem dela: dentro do trecho, antes da próxima patrulha.
+		var leave_x: float = float(_room.leave_x) if "leave_x" in _room else minf(_room.camp_x + LEAVE_OFFSET, _street.walk_max.x)
+		_street._place_leader(Vector3(leave_x, _room.floor_y, _room.leave_z), 1.0)
 	if not instant:
 		await GameFlow.fade(0.0)
 
