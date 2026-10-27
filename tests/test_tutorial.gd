@@ -157,6 +157,16 @@ func _journey() -> void:
 	arena.hud._on_ability(option)
 	await _frames(2)
 	t.equal(guide.hint.step_id, "target", "escolhida a habilidade, a dica do alvo")
+	# Voltar da mira: a dica volta à habilidade e as ações continuam travadas.
+	var back := InputEventAction.new()
+	back.action = "ui_cancel"
+	back.pressed = true
+	arena.hud._unhandled_input(back)
+	await _frames(2)
+	t.equal(guide.hint.step_id, "ability", "desfeita a mira, a dica volta à habilidade")
+	t.check(arena.hud._actions.get_children().all(func(b): return b.disabled), "com as ações ainda travadas")
+	arena.hud._on_ability(option)
+	await _frames(2)
 	arena.hud._via_mouse = false
 	arena.hud._markers[0].pressed.emit()
 	await _frames(2)
@@ -202,6 +212,12 @@ func _journey() -> void:
 	t.check(guide != null and guide.done("search") and guide.hint.step_id != "walk", "e as dicas já vistas não voltam")
 	# A segunda patrulha à frente: a dica de chegar sem ser visto.
 	t.check(await _until(func(): return guide.hint.step_id == "patrol", "a dica da patrulha", 8.0), "a patrulha da segunda luta abre a dica dela")
+	corridor.open_menu()
+	await _frames(3)
+	t.check(not guide.hint.visible, "com o Menu aberto, a dica sai da frente")
+	street.exploration_hud.close_modal()
+	await _frames(3)
+	t.check(guide.hint.visible, "e volta ao fechar")
 	# A segunda luta: recuar recomeça a mesma luta, com a equipe inteira.
 	corridor.debug_next_fight()
 	await _frames(2)
@@ -246,6 +262,10 @@ func _journey() -> void:
 	t.equal(int(Campaign.state.inventory.seeds), seeds + int(AHTutorial.reward().seeds), "com a recompensa")
 	t.check(Tips.seen("combat") and Tips.seen("search"), "as dicas que a abertura ensinou contam como vistas")
 	t.check(Campaign.state.roster.all(func(h): return h.alive and h.hp == h.max_hp), "todos inteiros na chegada")
+	# Nova campanha confirmada fora do título (a Estação, a rua): a mesma escolha da abertura.
+	GameFlow.travel("title", {}, {"new_campaign": Campaign.slot})
+	if await _until(func(): return _tree.current_scene is AHTitleScreen and not GameFlow.busy and _tree.current_scene.modal_open(), "o título com a escolha"):
+		t.check(_tree.current_scene._modal.find_child("Opening", true, false) != null, "Nova campanha na Estação pergunta como começar")
 
 
 ## Ninguém caiu na luta (a vida parou em 1).

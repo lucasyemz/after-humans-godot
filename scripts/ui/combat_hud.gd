@@ -11,7 +11,7 @@ extends Control
 signal command_chosen(command: Dictionary)
 signal result_closed
 ## Os momentos da vez que o tutorial (#144) acompanha: "turn" (a vez de um herói, {actor}), "target" (a mira de uma
-## habilidade ou do Mover, {ability}), "command" (o comando escolhido) e "bag" (a Mochila aberta).
+## habilidade ou do Mover, {ability}), "cancel" (a mira desfeita), "command" (o comando escolhido) e "bag" (a Mochila).
 signal tutorial_moment(kind: String, data: Dictionary)
 
 const S = preload("res://scripts/ui/ui_style.gd")
@@ -1369,6 +1369,16 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	return command
 
 
+## Liga as travas do tutorial nas ações que já estão na tela (sem remontar as habilidades: o foco adiado delas fica).
+func apply_tutorial_locks() -> void:
+	for child in _actions.get_children():
+		var kind: String = child.get_meta("kind", "")
+		if tutorial_locks.has(kind):
+			child.set_meta("locked", true)
+			child.disabled = true
+			(child.get_node("Icon") as Control).modulate = AHKit.LOCKED
+
+
 ## O que o tutorial destaca (na tela de 1920 x 1080): "abilities" (as quatro habilidades), "actions" (Mover e Defender),
 ## "item" (a Mochila) ou "targets" (os alvos acesos). Vazio quando não está na tela.
 func tutorial_rect(kind: String) -> Rect2:
@@ -1682,6 +1692,34 @@ func _popup_loot(box: VBoxContainer, result: String) -> void:
 		row.add_child(icon)
 		row.add_child(AHKit.label((tr("−%d") if lost else tr("+%d")) % int(amounts[key]), "row", AHKit.alert_text() if lost else AHKit.AMBER, true))
 		chips.add_child(chip)
+
+
+## Quem caiu nesta luta (#118), em vermelho e com o ícone: "Íris caiu". Ninguém morre: volta à Estação em recuperação.
+func _popup_fallen(box: VBoxContainer) -> void:
+	if session == null:
+		return
+	var names := PackedStringArray()
+	for unit in session.state.player_team:
+		if unit.hp <= 0 and not unit.deaths_door:
+			names.append(String(unit.display_name))
+	if names.is_empty():
+		return
+	var row := HBoxContainer.new()
+	row.name = "Fallen"
+	row.set_meta("names", Array(names))
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 8)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(AHKit.glyph("state_wounded", AHUiStyle.px(26), AHKit.alert_text()))
+	var who := names[0] if names.size() == 1 else tr("%s e %s") % [", ".join(names.slice(0, names.size() - 1)), names[names.size() - 1]]
+	var label := AHKit.label((tr("%s caiu") if names.size() == 1 else tr("%s caíram")) % who, "row", AHKit.alert_text(), true)
+	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	row.add_child(label)
+	box.add_child(row)
+	var note := AHKit.label(tr("Volta à Estação para se recuperar.") if names.size() == 1 else tr("Voltam à Estação para se recuperar."), "small", MUTED)
+	note.name = "FallenNote"
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(note)
 
 
 ## O XP da luta numa linha, o de cada herói na ordem da cena (a soma enganava: o nível pede o XP de cada um), e quem
@@ -2229,6 +2267,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _choosing != "" and S.is_back(event):
 		_clear_markers()
 		_set_enabled(true)
+		tutorial_moment.emit("cancel", {})
 		_build_abilities()
 		get_viewport().set_input_as_handled()
 
@@ -2282,6 +2321,7 @@ func show_result(result: String, automatic: bool = false, rewards: Dictionary = 
 			stars.add_child(AHKit.glyph("star" if i < int(rewards.stars) else "star_empty", AHUiStyle.px(28), AHKit.AMBER if i < int(rewards.stars) else MUTED))
 		line.add_child(stars)
 	box.add_child(_popup_divider())
+	_popup_fallen(box)
 	_popup_loot(box, result)
 	_popup_xp(box, result)
 	if result == "victory" and arena != null and arena.boss_fight:

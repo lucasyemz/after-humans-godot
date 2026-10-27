@@ -933,8 +933,8 @@ func open_inventory() -> void:
 
 
 func _new_campaign() -> void:
-	Campaign.new_game()
-	GameFlow.travel("station")
+	# A campanha nova passa pela escolha do título (#144): a abertura ou Pular tutorial, no mesmo espaço.
+	GameFlow.travel("title", {}, {"new_campaign": Campaign.slot})
 
 
 func _search_scenario_prop(entry: Dictionary) -> void:

@@ -25,7 +25,7 @@ const RIGHT := Rect2(1296, 132, 596, 844)
 const BODY_WIDTH := 530.0
 ## O ícone do kit de cada cômodo e de cada tela de serviço.
 const ROOM_ICONS := {S.CHARACTERS: "room_quarters", S.CANTEEN: "room_canteen", S.BAR: "room_bar", S.DORMITORY: "bed", S.FORGE: "room_forge",
-	S.DEPOT: "room_depot", S.RESEARCH: "room_research", S.PREPARATION: "expeditions", "plan": "plan", "train": "train_arrival",
+	S.DEPOT: "room_depot", S.RESEARCH: "room_research", S.INFIRMARY: "intent-heal", S.PREPARATION: "expeditions", "plan": "plan", "train": "train_arrival",
 	"new_campaign": "alert", "departure": "expeditions"}
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 ## Os ícones dos recursos nos chips de custo e no estoque.
@@ -564,6 +564,12 @@ func _build_left(c: Dictionary) -> void:
 		pending.append([tr("O trem chegou: alguém espera na plataforma"), "train_arrival", func(): open_service("train")])
 	if c.night.phase != "none" and current != S.DORMITORY and not (overview and _next.action == "dormitory"):
 		pending.append([tr("A noite espera no Dormitório"), "sleep", func(): open_room(S.DORMITORY)])
+	# Quem volta da recuperação no próximo dia (#121): "Íris volta amanhã".
+	if current != S.INFIRMARY:
+		for entry in S.fallen(c):
+			if S.recovery_days(entry) == 1:
+				var name: String = entry.display_name
+				pending.append([tr("%s volta amanhã") % name, "bed", func(): open_room(S.INFIRMARY)])
 	_pending = null
 	if not pending.is_empty():
 		_menu.add_child(_pending_card(pending))
@@ -752,7 +758,7 @@ func _run_next() -> void:
 			open_room(S.DORMITORY)
 		"train":
 			open_service("train")
-		"room":
+		"room", "rest":
 			open_room(_next.room)
 		_:
 			open_map()
@@ -1475,8 +1481,8 @@ func _new_campaign_view() -> void:
 		AHKit.alert_text())
 	_button(tr("Cancelar"), close_panel)
 	var go := _button(tr("Começar do zero"), func():
-		Campaign.new_game()
-		GameFlow.travel("station"))
+		# A campanha nova passa pela escolha do título (#144): a abertura ou Pular tutorial, no mesmo espaço.
+		GameFlow.travel("title", {}, {"new_campaign": Campaign.slot}))
 	go.add_theme_color_override("font_color", AHKit.alert_text())
 
 
@@ -1584,6 +1590,8 @@ func _room(room_id: String) -> void:
 			_research(c, level)
 		S.DORMITORY:
 			_dormitory(c)
+		S.INFIRMARY:
+			_infirmary(c, level)
 
 
 func _civilian_card(c: Dictionary, who: Dictionary) -> void:
@@ -1851,7 +1859,10 @@ func _prep_drawer(c: Dictionary) -> void:
 			button.custom_minimum_size = Vector2(0, 56)
 			button.disabled = _prep_selected < 0 or not S.can_deploy(entry)
 			button.tooltip_text = tr("Escolha um cartão da equipe e clique aqui para trocar.") if S.can_deploy(entry) else S.deploy_block(entry)
-			if not S.can_deploy(entry):
+			if S.recovering(entry):
+				button.text += " · " + S.return_text(S.recovery_days(entry))
+				button.add_theme_color_override("font_disabled_color", AHKit.alert_text())
+			elif not S.can_deploy(entry):
 				button.text += tr(" · sem arte de combate")
 			button.pressed.connect(func(): _prep_bench(id))
 			sheet.attach(button, func(): return AHCharacterSheet.from_hero(S.hero(Campaign.state, id)))
@@ -1999,7 +2010,12 @@ func _prep_slot(c: Dictionary, rank: int) -> Button:
 	if chosen:
 		button.add_child(AHKit.selected_overlay())
 	if entry == null:
-		box.add_child(AHKit.label(tr("Posição vazia"), "row", AHKit.MUTED))
+		# No meio do cartão: no canto, a medalha da posição cobria o começo do texto.
+		var empty := AHKit.label(tr("Posição vazia"), "row", AHKit.MUTED)
+		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		box.add_child(empty)
 		button.add_child(_rank_medal(rank))
 		return button
 	# A ficha ao apontar o cartão (#89): os traços, a relíquia e a velocidade, que o cartão não mostra.
@@ -2456,6 +2472,73 @@ func _dormitory(c: Dictionary) -> void:
 			row.add_child(_icon("sleep", 40, AHKit.MUTED))
 			row.add_child(_wrapped(tr("Ninguém precisa descansar agora. Depois de cada expedição, a equipe passa a noite aqui."), "small", AHKit.TEXT, false,
 				BODY_WIDTH - 90.0))
+
+
+## A Enfermaria (#121): os leitos, cada caído com a vida, onde se recupera e quando volta, o curativo no leito e, quando
+## ninguém pode partir, esperar um dia.
+func _infirmary(c: Dictionary, level: int) -> void:
+	var fallen := S.fallen(c)
+	var beds := S.infirmary_beds(c)
+	if level >= 1:
+		_section(tr("Leitos: %d de %d ocupados") % [fallen.filter(func(h): return S.in_bed(h)).size(), beds], "bed")
+	if fallen.is_empty():
+		var empty := _inset()
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 14)
+		empty.add_child(row)
+		row.add_child(_icon("bed", 40, AHKit.MUTED))
+		var empty_text := tr("Ninguém em recuperação. Quem cair numa expedição volta para cá antes de lutar de novo.") if level >= 1 \
+			else tr("Ninguém em recuperação. Sem a Enfermaria, quem cair numa expedição se recupera no Dormitório.")
+		row.add_child(_wrapped(empty_text, "small", AHKit.TEXT, false, BODY_WIDTH - 90.0))
+		return
+	if level < 1:
+		_text(tr("Sem a Enfermaria, quem caiu se recupera devagar no Dormitório."), AHKit.MUTED, "small")
+	for entry in fallen:
+		_body.add_child(_fallen_card(c, entry))
+	if S.rest_block(c) == "":
+		_text(tr("Ninguém pode partir agora. Passar um dia na Estação gasta e produz como uma volta, e cada caído fica um dia mais perto."), AHKit.TEXT, "small")
+		_footer_primary(tr("Esperar um dia"), "sleep", func(): _act(S.rest_day(Campaign.state), tr("Um dia passou na Estação.")))
+
+
+func _fallen_card(c: Dictionary, entry: Dictionary) -> Control:
+	var card := AHKit.panel(AHKit.piece_of("row", "list"))
+	card.name = "Fallen_%s" % entry.id
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	card.add_child(box)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 12)
+	box.add_child(top)
+	var face := AHKit.portrait(U.face_texture(_hero_art(entry)), 56)
+	face.modulate = AHKit.FALLEN
+	top.add_child(face)
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", -2)
+	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	names.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(names)
+	names.add_child(_wrapped(entry.display_name, "row", AHKit.TEXT, true, 0.0))
+	names.add_child(_wrapped(tr("Vida %d/%d · %s") % [entry.hp, entry.max_hp, tr("no leito") if S.in_bed(entry) else tr("no Dormitório")], "small", AHKit.MUTED, false, 0.0))
+	var days := AHKit.label(S.return_text(S.recovery_days(entry)), "row", AHKit.alert_text(), true)
+	days.name = "Days"
+	days.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(days)
+	var hero_id: String = entry.id
+	var block := S.treat_block(c, hero_id)
+	var bandage := S.recovery_rule("bandage")
+	var days_off := int(bandage.get("Days", 1))
+	var treat := _chip_button((tr("Curativo · −%d dia") if days_off == 1 else tr("Curativo · −%d dias")) % days_off)
+	treat.name = "Treat"
+	treat.icon = AHKit.icon("resource_bandages")
+	treat.add_theme_constant_override("icon_max_width", 24)
+	treat.custom_minimum_size = Vector2(0, 56)
+	treat.disabled = block != ""
+	treat.tooltip_text = block if block != "" else tr("Gasta %d curativo(s) (tem %d).") % [int(bandage.get("Cost", 1)), S.quantity(c, "bandages")]
+	treat.pressed.connect(func(): _act(S.treat_fallen(Campaign.state, hero_id), tr("Curativo aplicado.")))
+	box.add_child(treat)
+	if block != "":
+		box.add_child(_wrapped(block, "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
+	return card
 
 
 ## O planejamento da noite (como o da Unreal): a contagem, o custo do suprimento extra, uma linha por herói com rosto,

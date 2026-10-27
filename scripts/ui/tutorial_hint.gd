@@ -8,6 +8,8 @@ extends Control
 const WIDTH := 600.0
 ## Os lugares da chapa: no alto, no meio (a exploração, abaixo da rota) ou à esquerda (a luta, acima das cabeças).
 const PLACES := {"top": Vector2(660, 116), "left": Vector2(40, 116)}
+## Os outros lugares, em ordem, quando o pedido cobriria uma cabeça ou o destaque (avoid).
+const FALLBACKS := [Vector2(660, 116), Vector2(40, 116), Vector2(1280, 116), Vector2(40, 470), Vector2(1280, 470)]
 const ARROW := 40.0
 ## A folga da moldura em volta do alvo.
 const FRAME_PAD := 10.0
@@ -25,6 +27,8 @@ var _arrow: TextureRect
 var _shades: Array[ColorRect] = []
 var _dim := false
 var _place := "top"
+## O que a chapa não pode cobrir (as cabeças de quem está na tela), na tela de 1920 x 1080.
+var avoid: Array = []
 
 
 func _init() -> void:
@@ -93,6 +97,8 @@ func show_step(step: Dictionary, number: int, total: int, place: String = "top")
 	_text.text = tr(String(step.get("Text", "")))
 	for child in _keys.get_children():
 		child.queue_free()
+	# No toque não há teclas para mostrar (como no acampamento).
+	_keys.visible = not (Settings.touch_visible() and not AHUiStyle.using_keys)
 	for action in step.get("Keys", []):
 		_keys.add_child(AHKitKey.make(String(action)))
 	_dim = bool(step.get("Blocking", false))
@@ -138,6 +144,13 @@ func set_focus(rect: Rect2) -> void:
 	_layout()
 
 
+## O que a chapa não pode cobrir; refaz o lugar dela.
+func set_avoid(rects: Array) -> void:
+	avoid = rects
+	if showing():
+		_layout()
+
+
 func _layout() -> void:
 	var has_focus := showing() and focus_rect.has_area()
 	var hole := focus_rect.grow(FRAME_PAD)
@@ -150,6 +163,7 @@ func _layout() -> void:
 		_shades[i].visible = has_focus and _dim
 		_shades[i].position = bands[i].position
 		_shades[i].size = bands[i].size.max(Vector2.ZERO)
+	_place_plate(hole if has_focus else Rect2())
 	if not has_focus:
 		return
 	_frame.position = hole.position
@@ -165,6 +179,20 @@ func _layout() -> void:
 	else:
 		_arrow.rotation_degrees = 0.0
 		_arrow.position = Vector2(hole.position.x - ARROW - 6.0, hole.get_center().y - ARROW * 0.5)
-	# A chapa nunca cobre o alvo: se cobriria, desce para baixo dele (ou sobe acima).
-	if _plate.visible and plate.intersects(hole):
-		_plate.position.y = hole.end.y + 24.0 if hole.end.y + 24.0 + plate.size.y < view.y - 200.0 else maxf(20.0, hole.position.y - plate.size.y - 24.0)
+
+
+## A chapa no lugar pedido ou, se ele cobre o destaque ou uma cabeça (avoid), no primeiro dos outros que fica livre.
+func _place_plate(hole: Rect2) -> void:
+	if not _plate.visible:
+		return
+	var size := _plate.size
+	var blocked := avoid.duplicate()
+	if hole.has_area():
+		blocked.append(hole)
+	var wanted: Vector2 = PLACES.get(_place, PLACES.top)
+	for spot in [wanted] + FALLBACKS:
+		var rect := Rect2(spot, size)
+		if not blocked.any(func(r): return r.intersects(rect)):
+			_plate.position = spot
+			return
+	_plate.position = wanted

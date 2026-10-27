@@ -1384,8 +1384,10 @@ func show_result(result: String, delivered: Dictionary, campaign: Dictionary, bu
 	chips.add_child(_change_chip("lobby-seed", tr("%d sementes") % delivered.get("seeds", 0), AHKit.TEXT))
 	chips.add_child(_change_chip("lobby-scrap", tr("%d sucata") % delivered.get("scrap", 0), AHKit.TEXT))
 	chips.add_child(_change_chip("lobby-fragment", tr("%d fragmentos") % delivered.get("fragments", 0), AHKit.TEXT))
-	var alive: Array = campaign.roster.filter(func(h): return h.alive)
-	box.add_child(AHKit.label(tr("Heróis vivos: %d · No memorial: %d") % [alive.size(), campaign.memorial.size()], "text", AHKit.MUTED))
+	# Ninguém morre (#118): quem caiu volta em recuperação.
+	var fell: Array = delivered.get("fallen", []).map(func(e): var h = AHStationRules.hero(campaign, String(e.hero_id)); return String(h.display_name) if h != null else "")
+	box.add_child(AHKit.label(tr("Toda a equipe voltou de pé.") if fell.is_empty() else (tr("Volta em recuperação: %s") if fell.size() == 1 else tr("Voltam em recuperação: %s")) % ", ".join(fell),
+		"text", AHKit.MUTED if fell.is_empty() else AHKit.alert_text()))
 	var button := _primary(button_text, "station", tr("%s / A") % S.key_name("interact"), func(): result_continue.emit())
 	box.add_child(button)
 	button.grab_focus.call_deferred()

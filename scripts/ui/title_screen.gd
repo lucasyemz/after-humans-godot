@@ -82,6 +82,9 @@ func _ready() -> void:
 	var capture := _capture_dir()
 	if capture != "":
 		_capture.call_deferred(capture)
+	# Nova campanha confirmada na Estação ou na rua (#144): a mesma escolha do título, no espaço de agora.
+	elif int(GameFlow.params.get("new_campaign", 0)) > 0:
+		_ask_after_travel(int(GameFlow.params.new_campaign))
 
 
 ## Continuar só aparece com um save que abre (o principal ou a cópia); sem ele, Nova campanha é o botão principal.
@@ -172,7 +175,7 @@ func _slot_chip(summary: Dictionary) -> PanelContainer:
 	var line := tr("Espaço %d") % summary.slot
 	if summary.status == "ok":
 		line += " · " + tr("Ciclo %d") % summary.cycle + " · " + ((tr("%d fase") if summary.phases == 1 else tr("%d fases")) % summary.phases) \
-			+ " · " + tr("%d de %d vivos") % [summary.alive, summary.roster]
+			+ " · " + tr("%d de %d prontos") % [summary.alive, summary.roster]
 	row.add_child(AHKit.label(line, "small", AHKit.TEXT))
 	return chip
 
@@ -474,7 +477,7 @@ static func slot_text(summary: Dictionary, last: bool) -> String:
 	var played: String = (TranslationServer.translate("%d h %02d min") % [minutes / 60, minutes % 60]) if minutes >= 60 \
 		else (TranslationServer.translate("%d min") % minutes)
 	var phases: String = (TranslationServer.translate("%d fase") if summary.phases == 1 else TranslationServer.translate("%d fases")) % summary.phases
-	return TranslationServer.translate("%s — Ciclo %d · %s · %d de %d vivos\n%02d/%02d/%d %02d:%02d · %s jogados%s") % [head, summary.cycle,
+	return TranslationServer.translate("%s — Ciclo %d · %s · %d de %d prontos\n%02d/%02d/%d %02d:%02d · %s jogados%s") % [head, summary.cycle,
 		phases, summary.alive, summary.roster, date.day, date.month, date.year, date.hour, date.minute, played,
 		TranslationServer.translate(" · em expedição") if summary.in_expedition else ""]
 
@@ -548,6 +551,14 @@ func _start_new_campaign(number: int) -> void:
 	box.add_child(back)
 	opening.grab_focus.call_deferred()
 	_center_modal.call_deferred()
+
+
+## A escolha da campanha nova pedida de fora do título: espera a passagem terminar (a janela não abre embaixo do cartão).
+func _ask_after_travel(number: int) -> void:
+	while GameFlow.busy and is_inside_tree():
+		await get_tree().process_frame
+	if is_inside_tree():
+		_start_new_campaign(number)
 
 
 ## Uma escolha da campanha nova: a linha do kit (a escolhida com a moldura), o nome e o que ela faz embaixo. O texto do
