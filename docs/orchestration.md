@@ -20,6 +20,8 @@ arquivo ao mesmo tempo.
 
 **Regras entre as frentes:**
 - um PR por issue, para a `main`, com a `main` trazida para o branch antes de abrir o PR;
+- uma branch nova por issue, saída da `main`; quando o PR entra, a branch é apagada (o GitHub apaga sozinho com
+  "Automatically delete head branches" ligado; quem juntar confere) e ninguém volta a usá-la;
 - os arquivos de todos (`data/i18n/en.po`, `tools/i18n_ignore.txt`, `data/presentation/*.json`, o kit) dão conflito: o
   Claude local resolve na junção;
 - uma issue nova entra na frente da área dela. Na dúvida, o Lucas decide.
@@ -91,8 +93,8 @@ comentário em cada issue e um PR para a main no fim). Leia cada uma com "gh iss
    título, se mexeu).
 4. Arte pesada do Codex: guardar o original numa tag (`codex-prN-originals`), deixar na `main` só o que o jogo usa.
 5. Passar pela QA (agente `qa`) quando o merge pede código novo; corrigir até APROVADO.
-6. Push na `main`, comentário no PR, e `git push origin main:claude-cloud main:codex-design` só quando o agente não
-   estiver no meio de uma rodada.
+6. Push na `main`, comentário no PR e a branch do PR apagada. As branches fixas antigas (`claude-cloud`,
+   `codex-design`) não existem mais: cada issue nova sai da `main` numa branch própria.
 
 ## Revisor dos PRs (terceiro agente)
 
