@@ -44,6 +44,11 @@ var guard_x := 0.0
 var entrance_x := 0.0
 var exit_x := 0.0
 var camp_x := 0.0
+## O que a cena do acampamento usa de um cômodo (como a fogueira da parada, AHStreetCamp): o piso, a linha da fogueira
+## e onde a fila recomeça ao levantar.
+var floor_y := 0.0
+var camp_z := 0.0
+var leave_z := 1.1
 var _fire_material: ShaderMaterial
 var _fire_light: OmniLight3D
 var _lamp: OmniLight3D
