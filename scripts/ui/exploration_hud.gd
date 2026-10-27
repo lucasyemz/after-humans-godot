@@ -76,6 +76,9 @@ var _formation_cursor := 0
 var _formation_pick := -1
 var _formation_head: PanelContainer
 var _formation_keys: Control
+## As placas da equipe na rua, na ordem da fila (o corredor passa): o número da posição sobre a cabeça de cada um.
+var formation_cards: Array = []
+var _formation_heads: Array[Control] = []
 var _finish_button: Button
 var _markers: Array[Control] = []
 var _marker_points: Array = []
@@ -642,11 +645,12 @@ func close_formation() -> void:
 		return
 	_formation = false
 	_formation_pick = -1
-	for node in [_formation_head, _formation_keys]:
+	for node in [_formation_head, _formation_keys, _formation_button.get_node_or_null("On")] + _formation_heads:
 		if node != null and is_instance_valid(node):
 			node.queue_free()
 	_formation_head = null
 	_formation_keys = null
+	_formation_heads.clear()
 	Sound.play("res://audio/ui/panel_close.ogg")
 	refresh(Campaign.state)
 
@@ -671,13 +675,16 @@ func _show_formation() -> void:
 		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		holder.set_anchors_preset(Control.PRESET_FULL_RECT)
 		mate.add_child(holder)
-		# A posição na luta, no canto de cima: 1 vai na frente.
-		var rank := AHKit.chip("cost")
+		# O medalhão da posição no canto de cima (1 vai na frente), como na Preparação.
+		var rank := _rank_medal(i + 1, 34.0)
 		rank.name = "Rank"
-		rank.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		rank.add_child(AHKit.label(str(i + 1), "small", AHKit.AMBER, true))
-		rank.position = Vector2(-8, -20)
+		rank.position = Vector2(-6, -12)
 		holder.add_child(rank)
+		if i == _formation_pick:
+			# O escolhido: o nome em âmbar, além da moldura.
+			for label in mate.find_children("", "Label", true, false):
+				if label.text == Campaign.hero(_formation_ids[i]).display_name:
+					label.add_theme_color_override("font_color", AHKit.AMBER)
 		if i == _formation_pick:
 			holder.add_child(AHKit.selected_overlay())
 		if i == _formation_cursor:
@@ -690,28 +697,56 @@ func _show_formation() -> void:
 		_party_box.add_child(mate)
 	_party_box.reset_size()
 	_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
-	# Em cima das plaquinhas: o que fazer, e quem está escolhido.
+	# Em cima das plaquinhas, a faixa: FORMAÇÃO e o que a tecla faz agora ("E troca Nick e Íris de lugar").
 	if _formation_head == null:
 		_formation_head = AHKit.plaque()
 		_formation_head.name = "FormationHead"
 		_formation_head.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(_formation_head)
 	_clear(_formation_head)
-	var words := VBoxContainer.new()
-	words.add_theme_constant_override("separation", 2)
-	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_formation_head.add_child(words)
-	words.add_child(AHKit.label(tr("Formação"), "row", AHKit.AMBER, true, true))
-	var line: String = tr("Escolha dois heróis para trocar de lugar. A posição 1 vai na frente, na fila e na próxima luta.")
-	if _formation_pick >= 0:
-		line = tr("%s escolhido: agora quem troca de lugar com ele.") % Campaign.hero(_formation_ids[_formation_pick]).display_name
-	words.add_child(AHKit.label(line, "text", AHKit.TEXT))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_formation_head.add_child(row)
+	row.add_child(_icon("nav_characters", 26, AHKit.AMBER))
+	row.add_child(AHKit.label(tr("Formação"), "row", AHKit.AMBER, true, true))
+	var line: String = tr("da frente para trás · escolha dois para trocar")
+	if _formation_pick >= 0 and _formation_pick != _formation_cursor:
+		line = tr("%s troca %s e %s de lugar") % [S.key_name("interact"), Campaign.hero(_formation_ids[_formation_pick]).display_name,
+			Campaign.hero(_formation_ids[_formation_cursor]).display_name]
+	elif _formation_pick >= 0:
+		line = tr("Trocar %s com quem? Escolha o outro") % Campaign.hero(_formation_ids[_formation_pick]).display_name
+	row.add_child(AHKit.label(line, "text", AHKit.TEXT))
 	_formation_head.reset_size()
 	_formation_head.size = _formation_head.get_combined_minimum_size()
-	_formation_head.position = Vector2(28, _party_box.position.y - _formation_head.size.y - 26)
+	_formation_head.position = Vector2(28, _party_box.position.y - _formation_head.size.y - 22)
 	if _formation_keys == null:
-		_formation_keys = _keys_bar([[[tr("Setas")], tr("Escolher")], [["interact"], tr("Trocar")], [["formation"], tr("Fechar")]])
+		_formation_keys = _keys_bar([[[tr("Setas")], tr("Escolher")], [["interact"], tr("Trocar")], [["menu"], tr("Fechar")]])
 		_formation_keys.name = "FormationKeys"
+	# O botão FORMAÇÃO aceso enquanto ela está aberta.
+	if _formation_button.get_node_or_null("On") == null:
+		var lit := AHKit.selected_overlay()
+		lit.name = "On"
+		_formation_button.add_child(lit)
+	# O número de cada um sobre a cabeça, na rua.
+	while _formation_heads.size() < formation_cards.size():
+		var medal := _rank_medal(_formation_heads.size() + 1, 40.0)
+		medal.name = "Head" + str(_formation_heads.size() + 1)
+		add_child(medal)
+		_formation_heads.append(medal)
+
+
+## O medalhão da posição (o mesmo da Preparação): o número em âmbar no medalhão do kit.
+func _rank_medal(rank: int, side: float) -> Control:
+	var medal := AHKit.panel(AHKit.piece_of("medal", "level"))
+	medal.custom_minimum_size = Vector2(side, side)
+	medal.size = Vector2(side, side)
+	medal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var number := AHKit.label(str(rank), "small", AHKit.AMBER, true)
+	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	medal.add_child(number)
+	return medal
 
 
 func _formation_click(event: InputEvent, index: int) -> void:
@@ -866,6 +901,13 @@ func _process(delta: float) -> void:
 		return
 	var view := get_viewport_rect().size
 	var to_hud := Vector2(1920.0 / view.x, 1080.0 / view.y)
+	for i in _formation_heads.size():
+		var card = formation_cards[i] if i < formation_cards.size() else null
+		var shown: bool = card != null and is_instance_valid(card)
+		_formation_heads[i].visible = shown
+		if shown:
+			var head: Vector3 = card.global_position + Vector3(0, card.body_height + 0.35, 0)
+			_formation_heads[i].position = camera.unproject_position(head) * to_hud - _formation_heads[i].size * 0.5
 	for i in _marker_points.size():
 		var point: Vector3 = _marker_points[i]
 		var screen := camera.unproject_position(point) * to_hud

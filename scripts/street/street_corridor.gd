@@ -733,6 +733,7 @@ func open_formation() -> void:
 	if hud.formation_open():
 		hud.close_formation()
 	elif can_open_formation():
+		hud.formation_cards = street._heroes
 		hud.open_formation()
 
 

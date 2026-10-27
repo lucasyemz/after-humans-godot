@@ -92,7 +92,7 @@ func _formation() -> void:
 		return
 	await _wait(1.0)
 	var hud = street.exploration_hud
-	hud.open_formation()
+	street.corridor.open_formation()
 	hud._formation_pick = 0
 	hud._formation_cursor = 2
 	hud._show_formation()
