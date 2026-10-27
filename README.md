@@ -238,7 +238,8 @@ A tabela do que toca em cada momento e a mixagem estão em [docs/audio.md](docs/
     página e a licença ou trocar a faixa.
 - **Feitos no projeto:**
   - os sons da interface, da Estação, dos ambientes e da chuva, e os passos na água (`SourceArt/Audio/Synth` da Unreal);
-  - os sons de `tools/synth_sounds.py`: sino e freio do trem, painéis, Forja, achado raro, vitória, derrota e crise.
+  - os sons de `tools/synth_sounds.py`: sino, freio e o trem andando (o laço da passagem do vagão), painéis, Forja,
+    achado raro, vitória, derrota e crise.
     São gerados por síntese e são de domínio público (CC0).
 - **Combate:** as ações dos heróis e dos robôs (`audio/combat`) vêm da referência Unreal, por
   `tools/sync_combat_art.py`; a origem e a licença de cada um não estão registradas lá. Pendente: levantar na pasta da
