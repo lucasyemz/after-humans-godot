@@ -264,6 +264,13 @@ func _input(event: InputEvent) -> void:
 	# Com o briefing aberto (#88), a caixa dele fica com o teclado, o controle, o clique e o toque.
 	if briefing_open():
 		return
+	# A noite passando (#132): Interagir, Esc, Voltar, um clique ou um toque pulam para o amanhecer.
+	if night_scene_open():
+		if event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton or event is InputEventScreenTouch or event is InputEventAction:
+			get_viewport().set_input_as_handled()
+			if AHPassageCard.is_skip(event) or U.is_back(event):
+				_finish_night()
+		return
 	# Logo que o relatório abre depois da chegada, o segundo toque do pular (Interagir, Enter, Esc, clique) não conclui
 	# nem fecha o relatório: quem pulou a cena ainda vê o que a equipe trouxe.
 	if Time.get_ticks_msec() < _report_guard_ms and (AHPassageCard.is_skip(event) or U.is_back(event)):
@@ -503,6 +510,9 @@ func refresh() -> void:
 	_build_left(c)
 	if current != "":
 		_show(current)
+	# A cena da noite (#132) por cima: o amanhecer só aparece quando ela acaba.
+	if night_scene_open():
+		_panel.visible = false
 	_fit_panel.call_deferred()
 
 
@@ -2274,14 +2284,7 @@ func _dormitory(c: Dictionary) -> void:
 		"planning":
 			_night_plan(c)
 		"dawn":
-			_section(tr("Amanhecer"), "sleep")
-			_text(S.night_event_text(c))
-			for result in night.results:
-				var entry = S.hero(c, result.hero_id)
-				if entry == null:
-					continue
-				_text((tr("%s ficou de vigia.") % entry.display_name) if result.watch else tr("%s: +%d de vida, −%d de instinto%s.") % [
-					entry.display_name, result.hp_recovered, result.instinct_reduced, "" if result.fed else tr(" (sem comida)")], AHKit.TEXT, "small")
+			_dawn(c)
 			_footer_primary(tr("Começar o dia"), "next_step", func():
 				_act("" if S.finish_dawn(Campaign.state) else tr("Ainda não amanheceu."))
 				if S.visit_pending(Campaign.state):
@@ -2294,6 +2297,158 @@ func _dormitory(c: Dictionary) -> void:
 			row.add_child(_icon("sleep", 40, AHKit.MUTED))
 			row.add_child(_wrapped(tr("Ninguém precisa descansar agora. Depois de cada expedição, a equipe passa a noite aqui."), "small", AHKit.TEXT, false,
 				BODY_WIDTH - 90.0))
+
+
+## O resumo do amanhecer (#132): o evento da noite, o que a noite gastou, quem descansou, a Enfermaria e o próximo passo.
+func _dawn(c: Dictionary) -> void:
+	var night: Dictionary = c.night
+	_section(tr("Amanhecer · Dia %d") % int(night.number), "sleep")
+	# O evento da noite, num quadro: o ruim em alerta (o ícone avisa também no daltonismo).
+	var event := _inset()
+	event.get_parent().name = "NightEvent"
+	var bad := S.night_event_bad(c)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 10)
+	event.add_child(head)
+	head.add_child(AHKit.glyph("alert" if bad else "sleep", 28, AHKit.alert_text() if bad else AHKit.AMBER))
+	head.add_child(AHKit.label(tr("A noite"), "text", AHKit.alert_text() if bad else AHKit.AMBER, true, true))
+	var told := _wrapped(S.night_event_text(c), "text", AHKit.TEXT, false, BODY_WIDTH - 40.0)
+	told.name = "EventText"
+	event.add_child(told)
+	for line in S.night_conditions_text(c):
+		event.add_child(_wrapped(line, "small", AHKit.alert_text(), false, BODY_WIDTH - 40.0))
+	# O que a noite gastou e o que sobrou.
+	var eaten := int(night.supplies_consumed)
+	var left := S.quantity(c, S.SUPPLIES)
+	_icon_line("lobby-food", "%s · %s" % [tr("1 suprimento comido") if eaten == 1 else tr("%d suprimentos comidos") % eaten,
+		tr("resta 1") if left == 1 else tr("restam %d") % left])
+	_icon_line("lobby-water", tr("Água: %d na Estação") % int(c.station.water))
+	# Quem descansou e quanto o instinto baixou.
+	for result in night.results:
+		var entry = S.hero(c, result.hero_id)
+		if entry == null:
+			continue
+		_text(_rest_line(entry, result), AHKit.TEXT, "small")
+	# A Enfermaria (#121): quem está mais perto de voltar.
+	for entry in S.fallen(c):
+		_icon_line("bed", "%s · %s" % [entry.display_name, S.return_text(S.recovery_days(entry))])
+	# O passo depois do amanhecer (o de agora é o próprio amanhecer).
+	var after: Dictionary = c.duplicate(true)
+	after.night.phase = "none"
+	_text(tr("Depois: %s") % S.next_step(after).get("title", ""), AHKit.MUTED, "small")
+
+
+## Como cada um passou a noite: o vigia, ou o que o sono recuperou (só o que mudou).
+func _rest_line(entry: Dictionary, result: Dictionary) -> String:
+	if result.watch:
+		return tr("%s ficou de vigia.") % entry.display_name
+	var parts: Array = []
+	if int(result.hp_recovered) > 0:
+		parts.append(tr("+%d de vida") % int(result.hp_recovered))
+	if int(result.instinct_reduced) > 0:
+		parts.append(tr("−%d de instinto") % int(result.instinct_reduced))
+	var hungry := "" if result.fed else tr(" (sem comida)")
+	# Quem o trauma não deixou dormir (#132): recupera a vida, mas não o instinto.
+	var event: Dictionary = Campaign.state.night.get("event", {})
+	if String(event.get("id", "")) == "sleepless" and String(event.get("hero_id", "")) == String(entry.id):
+		if int(result.hp_recovered) > 0:
+			return tr("%s não pegou no sono: +%d de vida%s.") % [entry.display_name, int(result.hp_recovered), hungry]
+		return tr("%s não pegou no sono%s.") % [entry.display_name, hungry]
+	if parts.is_empty():
+		return tr("%s dormiu, sem nada a recuperar%s.") % [entry.display_name, hungry]
+	return "%s: %s%s." % [entry.display_name, ", ".join(parts), hungry]
+
+
+## A noite passando (#132), ao INICIAR DESCANSO: a Estação escurece, o cartão "Noite N" com o tempo correndo, e a luz
+## da manhã volta. Interagir, Esc ou um clique pulam; com "Reduzir efeitos", só o cartão. A regra já resolveu a noite
+## antes da cena (o save no meio abre no amanhecer).
+var _night_scene: Control
+var _night_tween: Tween
+
+
+func night_scene_open() -> bool:
+	return is_instance_valid(_night_scene)
+
+
+func _start_night() -> void:
+	if not S.resolve_night(Campaign.state):
+		toast(tr("A noite não pode passar agora."), true)
+		Sound.play("res://audio/ui/deny.ogg")
+		return
+	# Quem dormiu fica deitado e o vigia de pé até a manhã (a regra já resolveu a noite).
+	AHStation.night_scene = true
+	station.commit()
+	_panel.visible = false
+	var reduced := bool(Campaign.state.settings.get("reduced_environment_effects", false))
+	_night_scene = Control.new()
+	_night_scene.name = "NightScene"
+	_night_scene.position = Vector2.ZERO
+	_night_scene.size = Vector2(1920, 1080)
+	_night_scene.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_night_scene)
+	# A sombra da noite: as luzes dos cômodos sozinhas mal escurecem as paredes, e as dicas de baixo não valem na cena.
+	var shade := ColorRect.new()
+	shade.name = "Shade"
+	shade.color = AHKit.VEIL
+	shade.size = _night_scene.size
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shade.modulate.a = 0.0
+	_night_scene.add_child(shade)
+	var box := AHKit.panel_box("large")
+	box.name = "Card"
+	_night_scene.add_child(box)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 12)
+	box.add_child(column)
+	var title := AHKit.label(tr("Noite %d") % int(Campaign.state.night.number), "phase_name", AHKit.TEXT, true, true)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+	var watched := String(Campaign.state.night.watch_hero_id) != ""
+	var line := AHKit.label(tr("A Estação dorme. O vigia escuta os trilhos.") if watched else tr("A Estação dorme. Ninguém vigia esta noite."), "text", AHKit.MUTED)
+	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(line)
+	var clock := AHKit.bar("hero", 0, 100)
+	clock.name = "Clock"
+	clock.custom_minimum_size = Vector2(520, 18)
+	column.add_child(clock)
+	var skip := AHKit.label(tr("%s / A: pular a noite") % U.key_name("interact"), "small", AHKit.MUTED)
+	skip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(skip)
+	box.reset_size()
+	box.size = box.get_combined_minimum_size()
+	# Embaixo, acima das teclas: o Dormitório, com quem dorme, fica à vista.
+	box.position = Vector2((1920.0 - box.size.x) * 0.5, 910.0 - box.size.y)
+	box.modulate.a = 0.0
+	_night_tween = create_tween()
+	if not reduced:
+		_night_tween.tween_method(station.set_night_dim, 1.0, 0.15, 0.9)
+		_night_tween.parallel().tween_property(shade, "modulate:a", 1.0, 0.9)
+	_night_tween.tween_property(box, "modulate:a", 1.0, 0.35)
+	_night_tween.tween_method(func(v: float): clock.set_value(v, 100.0), 0.0, 100.0, 2.0)
+	_night_tween.tween_property(box, "modulate:a", 0.0, 0.35)
+	if not reduced:
+		_night_tween.tween_method(station.set_night_dim, 0.15, 1.0, 0.9)
+		_night_tween.parallel().tween_property(shade, "modulate:a", 0.0, 0.9)
+	_night_tween.finished.connect(_finish_night)
+
+
+## Fim da noite (ou pulada): a luz volta e o amanhecer abre.
+func _finish_night() -> void:
+	if not night_scene_open():
+		return
+	# Quem martela Interagir (para pular, ou logo que a cena acaba) não começa o dia sem ver o amanhecer (a mesma trava
+	# da chegada).
+	_report_guard_ms = Time.get_ticks_msec() + REPORT_GUARD_MS
+	if _night_tween != null and _night_tween.is_valid():
+		_night_tween.kill()
+	_night_tween = null
+	station.set_night_dim(1.0)
+	station.set_night_scene(false)
+	if is_instance_valid(_night_scene):
+		_night_scene.queue_free()
+	_night_scene = null
+	if current == S.DORMITORY:
+		refresh()
 
 
 ## A Enfermaria (#121): os leitos, cada caído com a vida, onde se recupera e quando volta, o curativo no leito e, quando
@@ -2398,8 +2553,8 @@ func _night_plan(c: Dictionary) -> void:
 		tr("disponível") if preview.available == 1 else tr("disponíveis")], "text", AHKit.TEXT, true))
 	if short > 0:
 		_footer.add_child(_wrapped(tr("Faltam %d: os cartões marcados recuperam menos.") % short, "small", AHKit.alert_text(), false, BODY_WIDTH))
-	_footer.add_child(_wrapped(tr("Quem vigia não descansa, mas protege os outros dos ruídos da noite."), "small", AHKit.MUTED, false, BODY_WIDTH))
-	_footer_primary(tr("Iniciar descanso"), "sleep", func(): _act("" if S.resolve_night(Campaign.state) else tr("A noite não pode passar agora.")))
+	_footer.add_child(_wrapped(tr("Quem vigia não descansa, mas evita as perdas da noite (os ruídos, a goteira, as baratas)."), "small", AHKit.MUTED, false, BODY_WIDTH))
+	_footer_primary(tr("Iniciar descanso"), "sleep", _start_night)
 
 
 func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
@@ -2442,7 +2597,7 @@ func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
 		top.add_child(button)
 	var outcome := ""
 	if row.watch:
-		outcome = tr("Vigiando · não descansa e protege dos ruídos")
+		outcome = tr("Vigiando · não descansa e evita as perdas")
 	else:
 		outcome = tr("%s · +%d de vida, %+d de instinto") % [tr("Alimentado") if row.fed else tr("Sem alimentação"), row.hp_gain, row.instinct_change]
 	box.add_child(_wrapped(outcome, "small", AHKit.TEXT if row.fed or row.watch else AHKit.alert_text(), false, BODY_WIDTH - 40.0))

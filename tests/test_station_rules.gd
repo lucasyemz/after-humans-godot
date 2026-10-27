@@ -217,7 +217,7 @@ func _thirst(t) -> void:
 	S.resolve_night(dry)
 	var sleeper = S.hero(dry, "hero_gato_nick")
 	t.equal(sleeper.instinct, 50 - 15 + S.THIRST_INSTINCT_PENALTY, "com sede, 10 de instinto a menos recuperados")
-	t.equal(dry.night.event_id, "no_water", "o relato explica a sede")
+	t.check(dry.night.conditions.has("no_water") and S.night_conditions_text(dry)[-1].contains("água"), "o relato explica a sede")
 
 
 func _route_focus(t) -> void:

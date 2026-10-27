@@ -158,6 +158,7 @@ var _team_train_leaving := false
 
 
 func _ready() -> void:
+	night_scene = false
 	var campaign: Dictionary = Campaign.state
 	# Quem abre a Estação no meio de uma expedição (o jogo fechou na rua) volta para a rua.
 	var session: Dictionary = campaign.get("session", {})
@@ -228,6 +229,21 @@ func _arrive(campaign: Dictionary) -> void:
 		focus_overview(true)
 
 
+## A noite passando (#132): as luzes dos cômodos caem até este fator e voltam de manhã.
+var night_dim := 1.0
+
+
+func set_night_dim(value: float) -> void:
+	night_dim = clampf(value, 0.0, 1.0)
+	var running := S.running_rooms(Campaign.state)
+	for room_id in _build.room_lights:
+		var light: OmniLight3D = _build.room_lights[room_id]
+		if not light.has_meta("energy"):
+			light.set_meta("energy", light.light_energy)
+		var powered: bool = not [S.CANTEEN, S.RESEARCH, S.FORGE].has(room_id) or running.has(room_id)
+		light.light_energy = float(light.get_meta("energy")) * ((1.0 if powered else 0.4) if S.room_level(Campaign.state, room_id) >= 1 else 0.3) * night_dim
+
+
 ## Grava a campanha e atualiza tudo o que mostra o estado (HUD, luzes com energia, mobiliário, estoque, moradores).
 func commit() -> void:
 	Campaign.save()
@@ -244,7 +260,7 @@ func refresh() -> void:
 		var level := S.room_level(campaign, room_id)
 		# Cômodo vazio fica na penumbra; sem energia, a luz cai (as salas que gastam energia).
 		var powered: bool = not [S.CANTEEN, S.RESEARCH, S.FORGE].has(room_id) or running.has(room_id)
-		light.light_energy = float(light.get_meta("energy")) * ((1.0 if powered else 0.4) if level >= 1 else 0.3)
+		light.light_energy = float(light.get_meta("energy")) * ((1.0 if powered else 0.4) if level >= 1 else 0.3) * night_dim
 	# O mobiliário some nos cômodos vazios (nível 0: Forja, Pesquisa, Bar e Dormitório numa jornada nova).
 	for room_id in _build.dressing:
 		# "infirmary@2": a peça que só aparece no nível 2.
@@ -1233,11 +1249,28 @@ static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	return slots[slot] if index >= 0 and slot >= taken else Vector3.INF
 
 
-## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview).
+## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview). Durante a
+## cena da noite (#132), a regra já resolveu a noite, e quem dormiu continua deitado até a luz da manhã voltar.
 static func sleepers(campaign: Dictionary) -> Array:
+	if night_scene and campaign.night.phase == "dawn":
+		return campaign.night.results.filter(func(row): return not row.watch).map(func(row): return row.hero_id)
 	if campaign.night.phase != "planning":
 		return []
 	return S.night_preview(campaign).heroes.filter(func(row): return not row.watch).map(func(row): return row.hero_id)
+
+
+## A cena da noite está passando (#132): quem dormiu fica deitado, e o vigia, de pé no Dormitório.
+static var night_scene := false
+
+
+func set_night_scene(on: bool) -> void:
+	night_scene = on
+	_update_sleepers()
+
+
+## A cena não sobrevive à Estação (a troca de cena no meio da noite): quem dormiu não fica deitado por engano.
+func _exit_tree() -> void:
+	night_scene = false
 
 
 ## À noite, quem dorme deita no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica de pé no Dormitório. Com a
@@ -1246,7 +1279,7 @@ func _update_sleepers() -> void:
 	var campaign: Dictionary = Campaign.state
 	var asleep := sleepers(campaign)
 	var slots := sleep_slots()
-	var watch: String = campaign.night.watch_hero_id if campaign.night.phase == "planning" else ""
+	var watch: String = campaign.night.watch_hero_id if campaign.night.phase == "planning" or (night_scene and campaign.night.phase == "dawn") else ""
 	var dorm := room_def(S.DORMITORY)
 	var replace := false
 	for walker in _walkers:
