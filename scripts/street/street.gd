@@ -830,10 +830,17 @@ func _update_camera(delta: float) -> void:
 			EXPLORE_CAMERA.indoor.height, -1.2)
 		pitch = deg_to_rad(4.0)
 		distance = EXPLORE_CAMERA.indoor.distance
-		# No acampamento (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
-		if corridor != null and corridor.camp != null and corridor.camp.active:
+		# No acampamento da casa (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
+		if corridor != null and corridor.camp != null and corridor.camp.active and not corridor.camp.at_stop():
 			target = Vector3(corridor.camp.focus_x, AHCampScene.FOCUS_HEIGHT, -0.2)
 			distance = AHCampScene.FOCUS_DISTANCE
+	# Na parada de descanso (#143), a fogueira fica na rua ou no cenário: a câmera fica parada nela, baixa, e recua o
+	# bastante para a fileira inteira caber (nos cenários a lente é mais fechada, 30° na horizontal).
+	if corridor != null and corridor.camp != null and corridor.camp.active and corridor.camp.at_stop():
+		target = corridor.camp.focus_point()
+		pitch = deg_to_rad(4.0)
+		var half_h := atan(tan(deg_to_rad(_camera.fov * 0.5)) * get_viewport().get_visible_rect().size.aspect())
+		distance = maxf(AHCampScene.FOCUS_DISTANCE, AHCampScene.ROW_HALF_WIDTH / tan(half_h))
 	if _arena != null and _arena.active:
 		# Na luta, a arena enquadra todos e se aproxima do golpe. A altura do alvo põe os pés sempre na mesma linha da
 		# tela, acima do painel do HUD, qualquer que seja a distância.

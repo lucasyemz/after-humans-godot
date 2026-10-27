@@ -1402,6 +1402,8 @@ exploration_hud.gd: Formation
 exploration_hud.gd: On
 exploration_hud.gd: Label
 exploration_hud.gd: Head
+inventory_panel.gd: New
+*: leave
 refuge_hud.gd: closed
 refuge_hud.gd: note
 refuge_hud.gd: ready
