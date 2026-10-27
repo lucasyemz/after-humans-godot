@@ -80,3 +80,21 @@ O workflow da versão web (#39) roda esse roteiro a cada exportação.
   - as 18 sombras: deixar com sombra só a luminária do cômodo em foco;
   - os props de 23 mil triângulos (a luminária de gaiola aparece 7 vezes): trocar pela versão de 512 px ou juntar as cópias num MultiMesh.
 - **Web:** o pacote tem 127 MB (`index.pck`) e demora a baixar. É o assunto da #12 (pacote mais leve).
+
+## A câmera de cinema por lugar (#153)
+
+O perfil de ambiência (`data/presentation/ambience.json`) muda o grading, o glow, a névoa e as partículas, e no Baixo
+tira o desfoque de profundidade e deixa 35% das partículas. As medidas abaixo são do `--perf` na nuvem (Compatibility
+em software, `--perf-only=street,combat`, no Baixo e no Ultra), comparando a `main` (be4f6a1) com a #153. Os ms não
+servem como medida aqui; as chamadas, as primitivas e os objetos servem.
+
+| Cena | Qualidade | Chamadas main | Chamadas #153 | Primitivas main | Primitivas #153 | Objetos main | Objetos #153 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Rua | Baixo | 196 | 197 | 8.642 | 8.650 | 633 | 633 |
+| Rua | Ultra | 295 | 296 | 71.924 | 72.268 | 723 | 724 |
+| Luta na rua | Baixo | 178 | 180 | 8.112 | 8.114 | 376 | 369 |
+| Luta na rua | Ultra | 320 | 328 | 78.558 | 79.094 | 489 | 524 |
+
+As folhas e os dois respiros de vapor custam uma chamada cada; as primitivas sobem pouco (as folhas e o vapor são
+quads). O desfoque de profundidade e a névoa volumétrica, que são o custo de verdade, não aparecem nessas colunas: o
+tempo de quadro no Forward+, no Baixo e no Ultra, fica para o PC do Orquestrador, com o mesmo comando.

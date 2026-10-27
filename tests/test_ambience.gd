@@ -2,7 +2,9 @@
 ## - o perfil carrega de data/: o default, um por mapa e o da Estação, e cada lugar só troca o que muda;
 ## - a Rua das Vitrines (o piloto) abre com o perfil dela no pós, no glow e na névoa, com as folhas e o vapor;
 ## - a qualidade manda: no Baixo, sem o desfoque de profundidade e com pouca partícula;
-## - a barra de Admin muda o perfil ao vivo, copia o perfil e volta ao do arquivo.
+## - as folhas, o vapor e as fagulhas: menos no Baixo; param na chuva (as folhas), com "Reduzir efeitos" e no coberto;
+## - a barra de Admin muda o perfil ao vivo, copia o perfil e volta ao do arquivo;
+## - a Estação reaplica o pós dela quando a qualidade muda.
 extends RefCounted
 
 const J := preload("res://scripts/flow/journey_rules.gd")
@@ -23,6 +25,7 @@ func run(context) -> void:
 	Campaign.save_dir = "user://test-ambience-%d" % Time.get_ticks_usec()
 	_data()
 	await _street()
+	await _station()
 	Settings.set_level(real_level)
 	Settings._persist = real_persist
 	Admin.ambience = {}
@@ -92,5 +95,60 @@ func _street() -> void:
 	t.check(copied.contains("ShopfrontStreet") and copied.contains("highlights_tint"), "copiar o perfil traz os números mudados")
 	AHAdminActions.run("amb_reset")
 	t.check(is_equal_approx(float(street._post.get_shader_parameter("saturation")), before), "voltar ao perfil do arquivo")
+	# As partículas na cena: as folhas, o vapor e as fagulhas pela qualidade, e quando param.
+	var full_leaves := roundi(street.LEAVES_AMOUNT * float(p.leaves))
+	t.equal([street._leaves.amount, street._steam.map(func(v): return v.amount), street._embers.amount],
+		[full_leaves, [street.STEAM_AMOUNT, street.STEAM_AMOUNT], street.EMBERS_AMOUNT], "no Ultra, as folhas do perfil, o vapor e as fagulhas inteiros")
+	Settings.set_level(0)
+	await _tree.process_frame
+	var low := roundi(street.STEAM_AMOUNT * AHAmbience.LOW_PARTICLES)
+	t.check(street._leaves.amount < full_leaves and street._steam.all(func(v): return v.amount == low)
+		and street._embers.amount < street.EMBERS_AMOUNT, "no Baixo, menos folhas, vapor e fagulhas")
+	Settings.set_level(3)
+	await _tree.process_frame
+	street._mood = "golden"
+	street._raining = true
+	street._apply_weather()
+	t.check(not street._leaves.emitting, "na chuva, as folhas param")
+	street._raining = false
+	Campaign.state.settings.reduced_environment_effects = true
+	street._apply_weather()
+	t.check(not street._leaves.emitting and street._steam.all(func(v): return not v.emitting), "Reduzir efeitos: sem folhas e sem vapor")
+	Campaign.state.settings.reduced_environment_effects = false
+	street._indoor = true
+	street._apply_weather()
+	t.check(not street._leaves.emitting and street._steam.all(func(v): return not v.emitting), "num lugar coberto, sem folhas e sem vapor")
+	street._indoor = false
+	street._apply_weather()
+	t.check(street._leaves.emitting and street._steam.all(func(v): return v.emitting), "e de volta à rua, com elas")
+	AHAdminActions.run("amb_embers_down")
+	t.check(street._embers.amount < street.EMBERS_AMOUNT, "o Admin muda as fagulhas da fogueira")
+	for i in 20:
+		AHAdminActions.run("amb_leaves_up")
+	t.check(float(AHAmbience.profile("ShopfrontStreet").leaves) <= 1.0, "e as frações não passam de 1")
+	AHAdminActions.run("amb_reset")
 	var amb_actions: Array = AHAdminActions.all().filter(func(a): return a.tab == "Ambiência")
 	t.check(amb_actions.size() >= 20 and amb_actions.all(func(a): return AHAdminActions.blocked(a) == ""), "a aba Ambiência vale na jornada")
+
+
+## A Estação: o pós do perfil dela, reaplicado quando a qualidade muda (no Baixo, sem o desfoque).
+func _station() -> void:
+	Campaign.state = Campaign.create_initial(60)
+	Campaign.save()
+	GameFlow.change_to("station", {}, false)
+	var station = null
+	for frame in 600:
+		await _tree.process_frame
+		if not GameFlow.busy and _tree.current_scene is AHStation and _tree.current_scene._post != null and frame > 3:
+			station = _tree.current_scene
+			break
+	if not t.check(station != null, "a Estação abre (%s)" % _tree.current_scene):
+		return
+	var p := AHAmbience.profile("Station")
+	t.check(is_equal_approx(float(station._post.get_shader_parameter("max_blur")), float(p.max_blur)), "a Estação com o perfil dela (%s, nível %d)" % [station._post.get_shader_parameter("max_blur"), Settings.level])
+	Settings.set_level(0)
+	await _tree.process_frame
+	t.equal(float(station._post.get_shader_parameter("max_blur")), 0.0, "no Baixo, a Estação perde o desfoque na hora")
+	Settings.set_level(3)
+	await _tree.process_frame
+	t.check(float(station._post.get_shader_parameter("max_blur")) > 0.0, "e o recupera no Ultra")

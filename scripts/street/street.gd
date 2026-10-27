@@ -96,6 +96,7 @@ var _leaves: CPUParticles3D
 const DUST_AMOUNT := 220
 const LEAVES_AMOUNT := 26
 const STEAM_AMOUNT := 14
+const EMBERS_AMOUNT := 40
 var _steam: Array[CPUParticles3D] = []
 
 var _leader: CharacterBody3D
@@ -527,7 +528,7 @@ func _build_atmosphere() -> void:
 	_fire_light.shadow_enabled = Settings.effects().lamp_shadows
 
 	_embers = CPUParticles3D.new()
-	_embers.amount = 40
+	_embers.amount = EMBERS_AMOUNT
 	_embers.lifetime = 2.6
 	_embers.position = ue(FIRE.x, FIRE.y + 10, FIRE.z + 30)
 	_embers.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
@@ -945,9 +946,13 @@ func _apply_weather() -> void:
 	_dust.emitting = not _raining and not covered and not _reduced_effects()
 	_dust.visible = not covered
 	_set_amount(_dust, DUST_AMOUNT, AHAmbience.particles(ambience, "dust", Settings.level))
+	# As fagulhas da fogueira da rua (quanto do perfil e da qualidade).
+	if _embers != null:
+		_set_amount(_embers, EMBERS_AMOUNT, AHAmbience.particles(ambience, "embers", Settings.level))
 	if _leaves != null:
 		var leaves := AHAmbience.particles(ambience, "leaves", Settings.level)
-		_leaves.emitting = leaves > 0.0 and not covered and not _reduced_effects()
+		# As folhas secas param na chuva (molhadas, não voam), como a poeira.
+		_leaves.emitting = leaves > 0.0 and not _raining and not covered and not _reduced_effects()
 		_leaves.visible = _leaves.emitting
 		_set_amount(_leaves, LEAVES_AMOUNT, leaves)
 	for steam in _steam:

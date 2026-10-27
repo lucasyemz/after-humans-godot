@@ -14,7 +14,10 @@ const AMBIENCE_STEPS := [["saturation", 0.04, "Saturação"], ["contrast", 0.04,
 	["warmth", 0.01, "Calor das luzes"], ["vignette", 0.05, "Vinheta"], ["grain", 0.01, "Grão"], ["max_blur", 1.0, "Desfoque"],
 	["focus_width", 0.04, "Faixa nítida"], ["glow_intensity", 0.1, "Glow"], ["glow_threshold", 0.05, "Limiar do glow"],
 	["fog_density", 0.1, "Névoa"], ["fog_height_density", 0.02, "Névoa no chão"],
-	["volumetric", 0.1, "Névoa volumétrica"], ["dust", 0.1, "Poeira"], ["leaves", 0.1, "Folhas"]]
+	["volumetric", 0.1, "Névoa volumétrica"], ["dust", 0.1, "Poeira"], ["leaves", 0.1, "Folhas"],
+	["embers", 0.1, "Fagulhas da fogueira"]]
+## Os campos que são uma fração da partícula (0 a 1): o Admin não passa de 1.
+const AMBIENCE_FRACTIONS := ["dust", "leaves", "embers"]
 ## Os tempos da rua (journey_rules.WEATHERS) com o nome na tela.
 const WEATHER_NAMES := {"clear": "Céu limpo", "sunset": "Pôr do sol", "mist": "Névoa", "night": "Noite",
 	"rain": "Chuva", "storm": "Tempestade", "nightRain": "Noite com chuva"}
@@ -356,6 +359,8 @@ static func _ambience(scene: Node, spec: String) -> String:
 		override.shadows_tint = low
 	else:
 		override[field] = maxf(0.0, snappedf(float(now.get(field, 0.0)) + step, 0.001))
+		if AMBIENCE_FRACTIONS.has(field):
+			override[field] = minf(override[field], 1.0)
 	Admin.ambience[place] = override
 	scene.apply_ambience()
 	return "%s: %s" % [field, str(override.get(field, override.get("highlights_tint")))]

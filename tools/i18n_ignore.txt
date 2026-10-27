@@ -1393,6 +1393,7 @@ station_rules.gd: recovered
 station_build.gd: infirmary
 station_build.gd: infirmary@2
 street.gd: steam
+street.gd: embers
 street.gd: Steam
 street.gd: Leaves
 street.gd: dust

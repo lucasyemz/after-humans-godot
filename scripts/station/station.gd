@@ -125,6 +125,8 @@ var _camera_pending := false
 ## O painel do trem reaberto depois da cena: a câmera vai ao candidato (pela passagem, se preciso) antes de o painel abrir.
 var _reopen_pending := false
 var _env: Environment
+## O pós da Estação (o perfil de ambiência, reaplicado quando a qualidade muda).
+var _post: ShaderMaterial
 ## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt}.
 var _arrivals: Array = []
 ## O trem da volta fechando e indo embora depois de a equipe descer (não conta como cena do trem ocupada).
@@ -1429,6 +1431,8 @@ func _build_environment() -> void:
 	env.glow_strength = 0.9
 	env.glow_hdr_threshold = 1.0
 	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	# O glow do perfil de ambiência da Estação (#153).
+	AHAmbience.apply_env(env, AHAmbience.profile("Station"), env.glow_intensity)
 	env.adjustment_enabled = true
 	env.adjustment_contrast = 1.06
 	env.adjustment_saturation = 1.04
@@ -1436,10 +1440,10 @@ func _build_environment() -> void:
 		env.ssao_enabled = Settings.effects().ssao
 		env.ssao_radius = 0.9
 		env.ssao_intensity = 1.4
-		# A oclusão acompanha a qualidade das opções (Settings). Pelo método do nó: a conexão sai junto com a cena (uma
-		# lambda que só usa env não é do nó e ficava conectada a cada visita à Estação).
-		_env = env
-		Settings.changed.connect(_on_settings_changed)
+	# A oclusão e o pós acompanham a qualidade das opções (Settings). Pelo método do nó: a conexão sai junto com a cena
+	# (uma lambda que só usa env não é do nó e ficava conectada a cada visita à Estação).
+	_env = env
+	Settings.changed.connect(_on_settings_changed)
 	var world := WorldEnvironment.new()
 	world.environment = env
 	add_child(world)
@@ -1453,7 +1457,11 @@ func _build_environment() -> void:
 
 
 func _on_settings_changed() -> void:
-	_env.ssao_enabled = Settings.effects().ssao
+	if RenderingServer.get_current_rendering_method() == "forward_plus":
+		_env.ssao_enabled = Settings.effects().ssao
+	# O pós com a qualidade nova (no Baixo, sem o desfoque), ao vivo como na rua.
+	if _post != null:
+		AHAmbience.apply_post(_post, AHAmbience.profile("Station"), Settings.level)
 
 
 func _build_post() -> void:
@@ -1467,6 +1475,7 @@ func _build_post() -> void:
 	# O perfil de ambiência da Estação (#153): no refúgio o corte inteiro precisa ler, então foco largo e pouco
 	# desfoque, só a cor e a vinheta do Emberfall.
 	AHAmbience.apply_post(post, AHAmbience.profile("Station"), Settings.level)
+	_post = post
 	rect.material = post
 	layer.add_child(rect)
 	add_child(layer)
