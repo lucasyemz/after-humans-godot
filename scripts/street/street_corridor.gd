@@ -46,6 +46,10 @@ const PROP_DOOR_CLEARANCE := 1.6
 const ZONE_MARGIN := 0.45
 const PARTY_SPACING := 1.3
 ## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
+## A passagem pelas portas dos interiores laterais (#141): quanto a equipe anda para o fundo até a porta (m) e quanto
+## leva cada meio passo (s).
+const DOOR_WALK_DEPTH := 2.0
+const DOOR_WALK_SECONDS := 0.6
 const REACH := 1.1
 
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
@@ -804,17 +808,25 @@ func _enter_side_room(index: int) -> void:
 	Campaign.save()
 	Sound.play("res://audio/world/door_open.ogg")
 	hud.toast(tr("Entrando: %s…") % tr(street.scenario.zones[room_entry.zone].name), 1.5)
+	# A equipe vai até a porta e passa por ela (#141): para o fundo, na frente da porta, e o escuro começa no meio do passo.
+	await street.walk_leader(Vector3(room_entry.door_x, street.floor_y, street.lane_z - DOOR_WALK_DEPTH), DOOR_WALK_SECONDS)
 	await GameFlow.fade(1.0)
-	_show_side_room(index)
+	_show_side_room(index, true)
 	await GameFlow.fade(0.0)
+	# Do lado de dentro, sai da porta (à esquerda, no fundo) para a sala.
+	await street.walk_leader(Vector3(room_entry.x0 + 1.6, street.floor_y, street.lane_z), DOOR_WALK_SECONDS)
 	busy = false
 
 
-func _show_side_room(index: int) -> void:
+## at_door: a equipe aparece na porta de dentro (a entrada andando, #141); senão, já na sala (o jogo reaberto).
+func _show_side_room(index: int, at_door: bool = false) -> void:
 	side_room = index
 	var room_entry: Dictionary = side_rooms[index]
 	street.set_scenario_zone(room_entry.zone)
-	street._place_leader(Vector3(room_entry.x0 + 1.6, street.floor_y, street.lane_z))
+	if at_door:
+		street._place_leader(Vector3(room_entry.x0 + 0.5, street.floor_y, street.lane_z - DOOR_WALK_DEPTH * 0.5), 1.0)
+	else:
+		street._place_leader(Vector3(room_entry.x0 + 1.6, street.floor_y, street.lane_z))
 
 
 func _side_room_frame(campaign: Dictionary, route: Dictionary) -> void:
@@ -847,10 +859,14 @@ func _leave_side_room() -> void:
 		return
 	busy = true
 	Campaign.save()
+	# A equipe anda até a porta de dentro e passa por ela; lá fora, sai da mesma porta do Cais para a frente (#141).
+	await street.walk_leader(Vector3(room_entry.x0 + 0.3, street.floor_y, street.lane_z - DOOR_WALK_DEPTH * 0.5), DOOR_WALK_SECONDS)
 	Sound.play("res://audio/world/door_close.ogg")
 	await GameFlow.fade(1.0)
 	_enter_segment(room_entry.door_segment, room_entry.door_x)
+	street._place_leader(Vector3(room_entry.door_x, street.floor_y, street.lane_z - DOOR_WALK_DEPTH), 1.0)
 	await GameFlow.fade(0.0)
+	await street.walk_leader(Vector3(room_entry.door_x, street.floor_y, street.lane_z + 0.3), DOOR_WALK_SECONDS)
 	busy = false
 
 
