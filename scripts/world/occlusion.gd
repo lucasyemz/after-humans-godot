@@ -8,8 +8,9 @@ extends Node
 
 ## Transparência do objeto que tapa alguém (0 = inteiro, 1 = some).
 const FADED := 0.6
-## O primeiro plano (os cards perto da câmera, com a meta "foreground" do cenário): escuro e largo na tela, quase some
-## quando tapa alguém, e o teste vê também os lados do corpo (FRONT_SIDES, em m), não só o meio.
+## O primeiro plano (os cards perto da câmera, com a meta "foreground" do cenário): escuro e largo na tela, esmaece até
+## FOREGROUND_FADED e então sai de vez (esmaecido, ele ainda escreve a profundidade, e a silhueta de quem está atrás
+## pintava o corpo inteiro); o teste vê também os lados do corpo (FRONT_SIDES, em m), não só o meio.
 const FOREGROUND_FADED := 0.9
 const FRONT_SIDES := [-0.3, 0.3]
 ## Quanto a transparência anda por segundo (vai e volta em ~0,15 s); com "Reduzir efeitos", troca na hora.
@@ -146,6 +147,8 @@ func _process(delta: float) -> void:
 			continue
 		var value: float = move_toward(_fade[node], hit.get(node, 0.0), step)
 		node.transparency = value
+		if node.has_meta("foreground"):
+			node.visible = value < FOREGROUND_FADED
 		if value <= 0.0 and not hit.has(node):
 			_fade.erase(node)
 		else:

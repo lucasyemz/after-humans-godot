@@ -118,7 +118,13 @@ func _fade() -> void:
 	occlusion.add_occluder(pipe)
 	await _tree.process_frame
 	await _tree.process_frame
-	t.check(is_equal_approx(pipe.transparency, AHOcclusion.FOREGROUND_FADED), "o primeiro plano na frente quase some (%.2f)" % pipe.transparency)
+	t.check(is_equal_approx(pipe.transparency, AHOcclusion.FOREGROUND_FADED) and not pipe.visible, "o primeiro plano na frente esmaece e sai (%.2f)" % pipe.transparency)
+	pipe.position.x = -6.0
+	occlusion.forget(pipe)
+	occlusion.add_occluder(pipe)
+	await _tree.process_frame
+	await _tree.process_frame
+	t.check(pipe.visible and pipe.transparency == 0.0, "fora da frente, volta")
 	settings.reduced_environment_effects = reduced
 	occlusion.untrack(card)
 	t.check(not card.has_silhouette(), "quem sai da lista perde a silhueta")
