@@ -30,7 +30,9 @@
       1
     ],
     "StartTeam": [
-      "hero_cao_bento"
+      "hero_cao_bento",
+      "hero_sapo_iris",
+      "hero_coruja_vespera"
     ],
     "JoinTeam": [
       "hero_gato_nick"
@@ -43,24 +45,28 @@
   {
     "Name": "fight_1",
     "Step": 1,
-    "Lesson": "O Bento sozinho: escolher a habilidade, escolher o alvo, a vez de cada um e a vida.",
+    "Lesson": "O Bento, a Íris e a Véspera contra três pequenos (o Broto, a Faísca e o Pipoco): escolher a habilidade, escolher o alvo, a vez de cada um e a vida.",
     "Enemies": [
-      "broto"
+      "broto",
+      "faisca",
+      "pipoco"
     ]
   },
   {
     "Name": "fight_2",
     "Step": 4,
-    "Lesson": "O Nick chega: as posições (o Rastejante empurra), mover, defender, a ordem da rodada e o instinto.",
+    "Lesson": "Com o Nick na equipe: as posições (o Rastejante empurra), mover, defender, a ordem da rodada e o instinto.",
     "Enemies": [
-      "rastejante_raiz"
+      "rastejante_raiz",
+      "broto"
     ]
   },
   {
     "Name": "fight_3",
     "Step": 5,
-    "Lesson": "Os estados (a contaminação do Drone de Expurgo) e um item da Mochila na luta.",
+    "Lesson": "Os estados (a contaminação do Drone de Expurgo, protegido atrás da Faísca) e um item da Mochila na luta.",
     "Enemies": [
+      "faisca",
       "ninho_errante"
     ]
   },
