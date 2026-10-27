@@ -121,7 +121,8 @@ func _order() -> void:
 	for size in [0, 2]:
 		Settings.set_text_size(size)
 		var profile := "Maior" if size == 2 else "Normal"
-		for count in [real.size(), 14, 30]:
+		# Até 20 (acima das 13 da maior luta), dentro da margem; com 30, só dentro da tela, com a ponta livre.
+		for count in [real.size(), 14, 20, 30]:
 			queue.clear()
 			queue.append_array(real)
 			while queue.size() < count:
@@ -148,7 +149,9 @@ func _check_strip(hud: AHCombatHud, label: String) -> void:
 		t.check(false, "%s: a fila tem retratos" % label)
 		return
 	var last: Rect2 = faces[-1].get_global_rect()
-	t.check(rect.position.x >= 0.0 and rect.end.x <= 1920.0, "%s: a faixa cabe na tela (%.0f a %.0f)" % [label, rect.position.x, rect.end.x])
+	var edge: float = hud.ORDER_EDGE if faces.size() <= 20 else 0.0
+	t.check(rect.position.x >= edge - 0.5 and rect.end.x <= 1920.0 - edge + 0.5,
+		"%s: a faixa cabe %s (%.0f a %.0f)" % [label, "dentro da margem" if edge > 0.0 else "na tela", rect.position.x, rect.end.x])
 	t.check(last.end.x <= rect.end.x - cap + 0.5, "%s: o último retrato termina antes da ponta (%.0f, a ponta em %.0f)" % [label, last.end.x, rect.end.x - cap])
 	t.check(faces.all(func(cell): return cell.size.x >= hud.ORDER_MIN_PORTRAIT - 0.5 and absf(cell.size.x - cell.size.y) < 1.0),
 		"%s: os retratos ficam quadrados e legíveis (%.0f px)" % [label, faces[-1].size.x])

@@ -41,9 +41,9 @@ Antes (o recorte automático): [sheet_before.jpg](faces/sheet_before.jpg).
 - **A faixa da ordem:**
   - a área de conteúdo da peça `round_strip` entrava 10 px na ponta da direita, e o último retrato cobria o fecho. A
     faixa ganha uma folga no fim, e a ponta aparece inteira;
-  - com mais retratos do que cabem, eles encolhem até 36 px, sempre quadrados, e a faixa fica dentro da tela até cerca
-    de 20 unidades. A maior luta de `encounters.json` tem 13 (9 máquinas e 4 heróis). Acima de 25 (nenhuma luta chega
-    lá), a faixa passa da margem.
+  - com mais retratos do que cabem, eles encolhem até 36 px, sempre quadrados; no menor retrato, o espaço entre eles
+    também encolhe. A faixa fica dentro da margem de 24 px até 20 unidades (a maior luta de `encounters.json` tem 13:
+    9 máquinas e 4 heróis). Com 30, nenhuma luta chega lá, e o teste só confere que ela cabe na tela com a ponta livre.
   - O jogo escala a tela da base de 1920×1080 (`canvas_items`), então 1280×720 e 2560×1440 têm a mesma geometria.
 
 ## Capturas
@@ -78,6 +78,14 @@ A QA rodou o `run_all` (76/76, com a paridade 48/48). Depois:
 - Corrigido na doc: a faixa cabe até cerca de 20 unidades, acima das 13 da maior luta; com 26 ou mais, passa da
   margem.
 - Fora desta entrega: erros "Lambda capture … was freed" no log, perto do `test_train`.
+
+### Revisão do PR
+
+**Baixas, corrigidas:**
+- O espaço entre os retratos não encolhia. No menor retrato, ele encolhe agora também (até 2 px).
+- Os caches das caixas e dos moradores ganham a marca de "carregado" e conferem o tipo do JSON (um arquivo inválido
+  não quebra).
+- O teste confere a margem até 20 unidades.
 
 ## Para o Lucas
 

@@ -50,6 +50,7 @@ static var _portraits := {}
 ## A caixa da cara de quem não tem retrato (#193), pelo arquivo da pose parada: [x, y, lado] em pixels do canvas.
 const FACE_BOXES := "res://data/presentation/face_boxes.json"
 static var _face_boxes := {}
+static var _face_boxes_loaded := false
 static var _circle: Shader
 
 
@@ -440,9 +441,12 @@ static func face_box(art: Dictionary) -> Array:
 		var side := maxf(rect.size.x, rect.size.y)
 		var center := rect.get_center()
 		return [center.x - side * 0.5, maxf(0.0, center.y - side * 0.5), side]
-	if _face_boxes.is_empty():
+	if not _face_boxes_loaded:
+		_face_boxes_loaded = true
 		var boxes = JSON.parse_string(FileAccess.get_file_as_string(FACE_BOXES)) if FileAccess.file_exists(FACE_BOXES) else {}
-		for enemy_id in boxes.get("enemies", {}):
+		if typeof(boxes) != TYPE_DICTIONARY or typeof(boxes.get("enemies")) != TYPE_DICTIONARY:
+			boxes = {"enemies": {}}
+		for enemy_id in boxes.enemies:
 			var idle: Dictionary = AHCombatArena.enemy_art_of(enemy_id).get("idle", {})
 			if idle.has("file"):
 				_face_boxes[idle.file] = boxes.enemies[enemy_id]
