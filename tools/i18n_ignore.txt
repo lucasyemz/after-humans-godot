@@ -1382,6 +1382,8 @@ station_rules.gd: rest_%d
 station_rules.gd: recovered
 station_build.gd: infirmary
 station_build.gd: infirmary@2
+inventory_panel.gd: New
+*: leave
 refuge_hud.gd: closed
 refuge_hud.gd: note
 refuge_hud.gd: ready
@@ -1478,3 +1480,5 @@ street.gd: Steam
 street.gd: Leaves
 street.gd: dust
 street.gd: leaves
+refuge_hud.gd: %s:%s
+refuge_hud.gd: id

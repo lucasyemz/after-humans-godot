@@ -17,7 +17,7 @@ No Maior e no daltonismo: [screens.jpg](hero-jobs/screens.jpg). As fotos saem de
   - Quem está em recuperação conta.
   - Com a casa cheia, o animal do trem (#122) não entra ("O Alojamento está cheio (6 de 6 heróis): não há lugar para
     Sereno agora."), e a Admin também não recruta.
-- **Ajudantes (os civis), pelo Dormitório:** 3, 4 e 6 nos níveis 0, 1 e 2 (`limit_helpers`). O Dormitório ainda não se
+- **Ajudantes (os civis), pelo Dormitório:** 3 e 4 nos níveis 0 e 1 (`limit_helpers`; o Dormitório não passa do nível 1). O Dormitório ainda não se
   recupera, então hoje o limite é 3, o mesmo número dos civis da fila. Sem lugar, o trem não traz civil, e acolher fica
   barrado.
 - **Onde aparece:**

@@ -149,6 +149,12 @@ func _platform(station) -> void:
 	await _frames(3)
 	var screen: AHDepartureScreen = hud._departure
 	t.equal(hud._draft.team, FOUNDERS, "a equipe da última partida, sem o caído nem o Risco")
+	# O rascunho recriado com a tela aberta: ela é refeita com o novo (a revisão do #161).
+	hud._draft = hud._draft.duplicate(true)
+	hud.refresh()
+	await _frames(2)
+	t.check(is_instance_valid(hud._departure) and is_same(hud._departure.draft, hud._draft), "com o rascunho recriado, a tela da partida lê o novo")
+	screen = hud._departure
 	var slots: Array = screen.find_children("Slot*", "Button", true, false)
 	t.equal(slots.map(func(b): return String(b.name)), ["Slot4", "Slot3", "Slot2", "Slot1"], "as quatro cartas, da posição 4 (esquerda) à 1 (direita)")
 	var centers := screen.card_centers()
@@ -312,7 +318,17 @@ func _depart(station) -> void:
 	t.check(_label(confirm, "1. Bento") and _label(confirm, "4. Íris"), "a equipe na ordem")
 	t.check(_label(confirm, "1 extras"), "e a comida")
 	t.equal(Campaign.state.session.expedition, null, "a confirmação ainda não parte")
+	# O briefing da chegada foi com o Risco no lugar da Íris; a Íris entrou depois e tem fala na fase 1: a confirmação
+	# abre o briefing da equipe final antes de partir (a revisão do #161).
+	var risco: String = S.living(Campaign.state).filter(func(h): return h.display_name == "Risco")[0].id
+	var arrived: Array = FOUNDERS.slice(0, 3) + [risco]
+	hud._briefed_lines = AHRefugeHud._lines_signature(AHBriefing.departure(Campaign.state, "fase_1", arrived))
 	(confirm.find_child("Go", true, false) as Button).pressed.emit()
+	await _frames(2)
+	t.check(hud.briefing_open() and hud.briefing.lines.any(func(l): return l.speaker.id == "hero_sapo_iris"), "quem entrou depois do briefing fala antes da partida (a Íris)")
+	t.equal(Campaign.state.session.expedition, null, "o briefing da equipe final vem antes da partida")
+	if hud.briefing_open():
+		hud.briefing.skip()
 	# Voltar no fade da partida: nada volta (o rascunho já foi gasto).
 	await _frames(1)
 	_press_back()
