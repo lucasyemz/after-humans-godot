@@ -1,5 +1,27 @@
 # A luz prática: o kit de fontes de luz e as luzes das máquinas (27/10/2026)
 
+> **Revisão do Lucas (27/10/2026): não aprovado.** A montagem na Rua ficou feia e várias peças não fazem sentido. Nada
+> desta página vale até ser integrado e conferido dentro do mapa, na captura do jogo. O registro está na #154.
+>
+> - **Descartadas e tiradas da `main`:**
+>   - `T_LP01`, a gambiarra colorida: lê como enfeite de Natal;
+>   - `T_LP05`, o letreiro: está em três quartos, e a Rua é vista de frente;
+>   - `T_LP07` e `T_LP_Beam`, o drone e o cone: a perspectiva está errada;
+>   - `T_LP08` e `T_LP09`, o robô e o sensor: o contorno preto grosso destoa das fachadas;
+>   - a montagem 2D da Rua (`street_night_*` e `street_mock.py`), que não serve como prova.
+>
+>   As linhas delas abaixo ficam só como registro. As pranchas `kit_sheet*` ainda as mostram.
+> - **Só como ponto de partida:** o tambor e o fogo (`T_LP03`, `T_LP03_Fire_0` a `_3`), a emergência (`T_LP06`), o
+>   lampião e a luminária (`T_LP02`, `T_LP04`), se couberem, os halos e a poça (`T_LP_Pool`), e a seção "Para integrar"
+>   (o halo somado, o pisca e o Baixo). Tudo será refeito no estilo pintado das fachadas, sem contorno.
+> - **Como refazer:**
+>   - poucas fontes por cena, com um ponto de luz principal e contraste quente contra frio;
+>   - névoa com raios de luz, reflexo no chão molhado e luz que toca a parede e o chão;
+>   - ajustar dentro do mapa, numa máquina com placa de vídeo (Forward+), e validar com o Lucas na captura do jogo
+>     antes de aprovar.
+>
+>   As referências do REPLACED que o Lucas mandou não entram no repositório.
+
 A arte da fase 2 de [ambience.md](ambience.md), pedida na #154: cada fonte de luz é um objeto do cenário, **apagado e
 aceso, com o halo**. A montagem no jogo (as luzes, o pisca, o piloto na Rua das Vitrines e a medição de desempenho) é do
 Claude 2, na #154.
