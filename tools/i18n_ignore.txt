@@ -1418,3 +1418,18 @@ scenario_world.gd: golden
 scenario_world.gd: night
 scenario_world.gd: zone
 scenario_world.gd: %s: a água pintada guarda %d linhas e %d pontos de espuma; o resto some (%d e %d no mapa).
+refuge_hud.gd: closed
+refuge_hud.gd: note
+refuge_hud.gd: ready
+refuge_hud.gd: short
+refuge_hud.gd: %s|%s|%s|%s
+refuge_hud.gd: signature
+refuge_hud.gd: Lock_%s
+refuge_hud.gd: lock
+refuge_hud.gd: %s|%s
+street.gd: steam
+street.gd: embers
+street.gd: Steam
+street.gd: Leaves
+street.gd: dust
+street.gd: leaves

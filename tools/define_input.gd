@@ -20,6 +20,12 @@ const ACTIONS := {
 	# Estação (#60): os detalhes do relatório da volta e Preparar expedição (só nas telas da Estação).
 	"report_details": {"keys": [KEY_V], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
 	"station_prepare": {"keys": [KEY_G], "buttons": [JOY_BUTTON_X]},
+	# A Estação (#131): a vista geral anda para os lados (o analógico direito; o mouse na borda ou arrastando) e, com um
+	# cômodo aberto, o vizinho do mesmo andar.
+	"station_pan_left": {"axes": [[JOY_AXIS_RIGHT_X, -1.0]]},
+	"station_pan_right": {"axes": [[JOY_AXIS_RIGHT_X, 1.0]]},
+	"station_room_prev": {"keys": [KEY_PAGEUP], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
+	"station_room_next": {"keys": [KEY_PAGEDOWN], "buttons": [JOY_BUTTON_RIGHT_SHOULDER]},
 	# Combate: as quatro habilidades e as ações (Mochila é a mesma tecla da exploração).
 	"combat_ability_1": {"keys": [KEY_1]},
 	"combat_ability_2": {"keys": [KEY_2]},

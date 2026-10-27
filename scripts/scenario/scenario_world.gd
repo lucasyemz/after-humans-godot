@@ -7,6 +7,8 @@ extends Node3D
 const MESHES := "res://data/scenarios/meshes.json"
 ## A Unreal mede a luz em lúmens; a mesma escala da Estação.
 const LUMENS_PER_ENERGY := 260.0
+## A folga da marca de interação acima do desenho do prop (m).
+const MARKER_LIFT := 0.35
 ## Brilho dos cards de fundo (unlit, Emissive 0,5 na Unreal, sem adaptação de exposição): calibrado na tela.
 const CARD_BRIGHTNESS := 1.7
 
@@ -200,6 +202,23 @@ func _add_obstacle(box: AABB) -> void:
 			continue
 		obstacles.append(clipped)
 		return
+
+
+## O ponto da marca de interação do prop (#142): o meio de cima do desenho dele, um palmo acima, como o marker_point
+## dos objetos de busca da Rua. Sem peça montada (o prop só com o x), na altura de uma cômoda na faixa da zona.
+func prop_marker_point(index: int) -> Vector3:
+	var box := AABB()
+	var first := true
+	for node: MeshInstance3D in _prop_nodes.get(index, []):
+		var part := node.global_transform * node.mesh.get_aabb() if node.is_inside_tree() else node.transform * node.mesh.get_aabb()
+		# A primeira peça começa a caixa (uma carta de fundo é plana: sem volume, mas conta).
+		box = part if first else box.merge(part)
+		first = false
+	if first:
+		var zone := zone_at(float(props[index].x))
+		var y: float = zones[zone].y if zone >= 0 else 0.0
+		return Vector3(float(props[index].x), y + 1.9, -0.7)
+	return Vector3(box.get_center().x, box.end.y + MARKER_LIFT, box.end.z)
 
 
 ## O prop vasculhado mostra a versão aberta (o material _Open da Unreal).
