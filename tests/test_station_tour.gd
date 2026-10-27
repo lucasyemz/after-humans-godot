@@ -2,7 +2,8 @@
 ## - abre só na primeira vez, depois da abertura (#144) e do relatório dela; quem pula o tutorial não a vê;
 ## - cada passo espera a ação certa (o PRÓXIMO, abrir o cômodo, abrir a Sala, fechar o painel), que Interagir também faz;
 ## - o destaque está na parte certa da tela;
-## - fechar o jogo no meio retoma do passo; pular encerra e não volta;
+## - fechar o jogo no meio retoma do passo; pular encerra e não volta (pelo Enter com o foco no Pular, também);
+## - sem passos nos dados, a visita acaba ali; a fala cabe na tela em qualquer tamanho e com o texto Maior;
 ## - no fim a Estação responde de novo (nenhum passo a deixa travada) e a abertura termina.
 extends RefCounted
 
@@ -21,6 +22,7 @@ func run(context) -> void:
 	await _walk()
 	await _resume_close()
 	await _skip()
+	await _place_sizes()
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
 	await _tree.process_frame
@@ -41,6 +43,14 @@ func _rules() -> void:
 	t.check(AHStationTour.pending(played), "depois da abertura jogada, a visita espera")
 	t.check(AHTutorial.suppresses_tips(played), "com as dicas de primeira vez da Estação caladas")
 	t.check(not AHStationTour.pending(Campaign.create_initial(43)), "um save sem a marca (de antes do tutorial) não abre a visita")
+	# Sem passos nos dados, a visita acaba ali e a campanha não fica presa em "station" (com as dicas caladas).
+	var tour_row: Dictionary = GameData.row("tutorial", "station_tour")
+	var real_steps: Array = tour_row.Steps
+	tour_row.Steps = []
+	var empty := _after_opening(47)
+	t.check(not AHStationTour.pending(empty) and AHTutorial.stage(empty) == "done" and not AHTutorial.suppresses_tips(empty),
+		"sem passos nos dados, a visita termina e as dicas voltam")
+	tour_row.Steps = real_steps
 
 
 ## A campanha no ponto da chegada da abertura, com o relatório já visto.
@@ -69,6 +79,7 @@ func _walk() -> void:
 	for i in 3:
 		t.equal(tour.waiting_for(), "next", "o passo %s segue pelo Próximo" % ids[i])
 		t.check(hud.tour_rect(String(AHTutorial.tour_steps()[i].Target)).has_area(), "o destaque do passo %s está na tela" % ids[i])
+		t.check(_box_inside(tour), "a fala do passo %s cabe na tela" % ids[i])
 		await _action("interact")
 	t.equal(tour.index, 3, "três passos vistos")
 	# Fechar no meio: o save retoma do mesmo passo.
@@ -143,13 +154,50 @@ func _skip() -> void:
 	var station = await _open()
 	if not t.check(station != null and station.hud.tour != null, "a visita abre"):
 		return
-	station.hud.tour._skip.pressed.emit()
-	await _frames(2)
-	t.check(station.hud.tour == null and AHTutorial.stage(Campaign.state) == "done", "Pular visita encerra")
+	# Pelo teclado: o foco no PULAR VISITA e o Enter (ui_accept) pulam, e não seguem para o próximo passo.
+	var tour: AHStationTour = station.hud.tour
+	tour._skip.grab_focus()
+	await _frames(1)
+	for pressed in [true, false]:
+		var key := InputEventKey.new()
+		key.keycode = KEY_ENTER
+		key.physical_keycode = KEY_ENTER
+		key.pressed = pressed
+		Input.parse_input_event(key)
+		await _frames(2)
+	t.check(station.hud.tour == null and AHTutorial.stage(Campaign.state) == "done", "Pular visita (Enter com o foco nele) encerra")
 	var saved = Campaign.read_file(Campaign.primary_path())
 	t.check(saved != null and AHTutorial.stage(saved) == "done", "e grava")
 	station = await _open()
 	t.check(station != null and station.hud.tour == null, "e não volta")
+
+
+## A fala cabe na tela da visita, e cabe também com o texto Maior numa tela menor que 1920 × 1080.
+func _place_sizes() -> void:
+	var real_size: int = Settings.text_size
+	var real_persist: bool = Settings._persist
+	Settings._persist = false
+	Settings.set_text_size(Settings.TEXT_SIZES.size() - 1)
+	Campaign.state = _after_opening(48)
+	Campaign.save()
+	var station = await _open()
+	if t.check(station != null and station.hud.tour != null, "a visita abre com o texto Maior"):
+		var tour: AHStationTour = station.hud.tour
+		await _frames(3)
+		t.check(_box_inside(tour), "com o texto Maior, a fala cabe na tela")
+		tour.size = Vector2(1280, 720)
+		tour._place()
+		t.check(_box_inside(tour), "e numa tela de 1280 × 720 (%s)" % Rect2(tour._box.position, tour._box.size))
+		tour.size = Vector2(2560, 1440)
+		tour._place()
+		t.check(_box_inside(tour) and tour._box.position.x + tour._box.size.x * 0.5 > 1000.0, "e numa de 2560 × 1440, sem ficar presa no canto de 1920")
+	Settings.set_text_size(real_size)
+	Settings._persist = real_persist
+
+
+func _box_inside(tour: AHStationTour) -> bool:
+	var screen: Vector2 = tour.size if tour.size.x > 0.0 and tour.size.y > 0.0 else tour.get_viewport_rect().size
+	return Rect2(Vector2.ZERO, screen).grow(1.0).encloses(Rect2(tour._box.position, tour._box.size))
 
 
 func _open():

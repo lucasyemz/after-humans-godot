@@ -41,8 +41,15 @@ func _init(owner_hud: Control) -> void:
 
 
 ## A visita começa (ou continua) se a campanha está no ponto dela.
+## Sem passos nos dados (station_tour.Steps vazio), a visita acaba ali: a campanha não fica presa em "station" (com as
+## dicas da Estação caladas).
 static func pending(campaign: Dictionary) -> bool:
-	return AHTutorial.stage(campaign) == "station" and not AHTutorial.tour_steps().is_empty()
+	if AHTutorial.stage(campaign) != "station":
+		return false
+	if AHTutorial.tour_steps().is_empty():
+		AHTutorial.end_tour(campaign)
+		return false
+	return true
 
 
 func _ready() -> void:
@@ -188,14 +195,17 @@ func _process(_delta: float) -> void:
 ## (o painel alto), no que cobre menos.
 func _place() -> void:
 	_box.reset_size()
-	var size := _box.get_combined_minimum_size()
+	var box := _box.get_combined_minimum_size()
 	var rect := _hint.focus_rect.grow(24.0)
-	var spots := [Vector2(960.0 - size.x * 0.5, 1080.0 - 150.0 - size.y), Vector2(960.0 - size.x * 0.5, 130.0),
-		Vector2(28.0, 540.0 - size.y * 0.5), Vector2(1892.0 - size.x, 540.0 - size.y * 0.5), Vector2(28.0, 1080.0 - 150.0 - size.y)]
+	# A tela de verdade (a visita ocupa a tela inteira), não 1920 × 1080 fixo: a fala cabe em qualquer tamanho.
+	var screen: Vector2 = size if size.x > 0.0 and size.y > 0.0 else get_viewport_rect().size
+	var spots := [Vector2((screen.x - box.x) * 0.5, screen.y - 150.0 - box.y), Vector2((screen.x - box.x) * 0.5, 130.0),
+		Vector2(28.0, (screen.y - box.y) * 0.5), Vector2(screen.x - 28.0 - box.x, (screen.y - box.y) * 0.5),
+		Vector2(28.0, screen.y - 150.0 - box.y)]
 	var best: Vector2 = spots[0]
 	var least := INF
 	for spot: Vector2 in spots:
-		var overlap := Rect2(spot, size).intersection(rect).get_area() if rect.has_area() else 0.0
+		var overlap := Rect2(spot, box).intersection(rect).get_area() if rect.has_area() else 0.0
 		if overlap < least:
 			least = overlap
 			best = spot
@@ -247,6 +257,10 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		# Com a fala ainda esperando a câmera, nada segue.
 		if not _box.visible:
+			return
+		# Com o foco no PULAR VISITA (o teclado ou o controle chegaram nele), confirmar pula, como o clique.
+		if _skip.is_visible_in_tree() and get_viewport().gui_get_focus_owner() == _skip:
+			skip()
 			return
 		if wait == "next":
 			advance()
