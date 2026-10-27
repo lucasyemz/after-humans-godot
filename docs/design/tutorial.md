@@ -27,7 +27,7 @@ um cenário que já existe, na mesma câmera, com a mesma equipe e no mesmo pont
 | O chão em perspectiva até a parede, com poças e sujeira, e a base da parede encostada nele | O piso é um plano só, da parede até a frente da câmera, visto em perspectiva pelo motor. A pintura é vista de cima (concreto em placas, poças, lama, a faixa amarela gasta, ralo, raízes nas juntas) e cai inteira em cada zona, com a sujeira e a água do pé da parede encostadas nela. A parede desce 20 cm abaixo do piso (a base pintada com sujeira e linha d'água), e uma faixa de água parada corre no pé dela. O piso é úmido (a superfície da Estação com a umidade): as lâmpadas fazem a poça de luz nele |
 | A câmera e a escala da exploração (heróis maiores, parede mais baixa, o alto no escuro) | As zonas têm a medida do Abrigo Lacrado (10 m de largura, 4,8 de fundo); a parede tem 4,3 m, com o terço de cima indo para o preto, e o teto fica no escuro. Os heróis saem do mesmo tamanho que nos outros cenários (ver os lado a lado) |
 | Planos em profundidade | Pilares de concreto na frente da parede, com as lâmpadas neles; objetos no chão no pé da parede (caixas, tambores, carrinho, rolo de cabo, raízes, grade solta) e alguns na frente da faixa; o primeiro plano a 8 m da câmera (a faixa fica a 19 m), que passa rápido na frente dela: canos no alto, cabos pendurados e um cano quebrado, um pouco escurecidos e com o desfoque e o alfa macio na pintura (o card em alpha blend, para o desfoque aparecer inteiro, é do código; nas capturas ele já está assim); e as aberturas da parede (a passagem do corredor, as duas celas, a porta da rota do Nick, o túnel da plataforma) recortadas no alfa, com uma caixa funda de verdade atrás e uma luz fraca perto da boca, que some no escuro |
-| A luz: poças vermelhas no chão e na parede, névoa baixa, reflexo na água, a luz fria do vagão no fim | Cada lâmpada é o card aceso e duas luzes vermelhas curtas: uma na parede (a poça na parede e no pilar) e uma baixa, na faixa de andar (a poça no chão); entre uma e outra, o escuro. A água do pé da parede e do fosso brilha com elas. A névoa rente ao chão e o ambiente baixo são do código (protótipo na captura, abaixo). O vagão é o card com o interior aceso e três luzes frias nas portas, que pintam a plataforma de azul e puxam o olho para a saída |
+| A luz: poças vermelhas no chão e na parede, névoa baixa, reflexo na água, a luz fria do vagão no fim | Cada lâmpada é o card aceso e duas luzes vermelhas curtas, com sombra: uma sai da própria lâmpada, rente à parede (o cone que desce pela parede e pelo pilar), e uma logo abaixo e à frente dela (a poça no pé da parede, entrando na faixa); entre uma e outra, o escuro. A sombra delas encosta no chão os objetos, os inimigos e a equipe. A água do pé da parede e do fosso brilha com elas. A névoa rente ao chão e o ambiente baixo são do código (protótipo na captura, abaixo). O vagão é o card com o interior aceso e três luzes frias nas portas, que pintam a plataforma de azul e puxam o olho para a saída |
 | A parede sem repetição | Uma parede pintada por zona, sem repetir: painel solto com a fiação, duto que dobra, canos que entram no chão, placas sem texto, manchas de umidade, o buraco com raízes e água, a caixa elétrica, a faixa de perigo interrompida e raspada |
 | As lutas dentro do mapa | A luta do tutorial é no corredor de contenção, com a patrulha da zona 1 (a captura da luta e as telas da dica de luta foram refeitas sobre ela) |
 | A saída é o trem | A última zona é a plataforma: a porta aberta da direita do vagão fica no fim da zona, sob uma luz fria; a equipe anda até ela e embarca ([zone_platform_exit](tutorial/zone_platform_exit.webp)). O resto do vagão entra no escuro do túnel |
@@ -123,9 +123,10 @@ das capturas):
 1. **O ambiente do lugar:** no Corredor de Contenção, o ambiente vem de uma cor neutra (`AMBIENT_SOURCE_COLOR`,
    0,36/0,34/0,33, energia 0,3), não do céu da noite (que puxava a névoa para o roxo), e a exposição 5% abaixo. A
    neblina da Environment fica rala (0,006), na cor 0,16/0,08/0,07.
-2. **A névoa baixa:** três véus por zona, rente ao chão (a 2 m atrás do meio da faixa, a 0,7 m e a 3,2 m na frente; 1 m,
-   0,8 m e 0,7 m de altura), transparentes e iluminados (`MIST_SHADER`: o ruído correndo devagar em X e sumindo para
-   cima). Ficam vermelhos perto das lâmpadas e somem no escuro. No Forward+, a neblina volumétrica com altura baixa faz
+2. **A névoa baixa:** dois véus por zona, rente ao chão (1,2 m atrás do meio da faixa e 1,4 m na frente; 0,7 m e
+   0,6 m de altura, opacidade 0,2 e 0,18), transparentes e iluminados (`MIST_SHADER`: o ruído correndo devagar em X e
+   sumindo para cima e na base). Fracos de propósito: mais fortes, clareavam a base dos objetos e eles pareciam soltos
+   do chão. Ficam vermelhos perto das lâmpadas e somem no escuro. No Forward+, a neblina volumétrica com altura baixa faz
    o mesmo; com "Reduzir efeitos", os véus ficam parados.
 3. **O pisca:** cada lâmpada é um card e duas luzes (a da parede e a do chão). O pisca sugerido: 0,6 s acesa e 0,4 s a
    25%, fora de fase entre lâmpadas vizinhas; o card troca `T_TU08_Lit` por `T_TU08` no mesmo ritmo. Com "Reduzir
@@ -137,10 +138,13 @@ das capturas):
    que fica ali) mostra "E Embarcar"; o embarque fecha o tutorial e leva à Estação (a #144 decide a passagem).
 6. **As portas:** a da rota do Nick (`TUX01`) começa erguida (`_Open`) quando a equipe chega e baixa atrás dela, com o
    painel (`TUX03`) acionado na sala das celas; o armário (`TUX02`) é uma busca ("Armário de manutenção").
-7. **A luta:** a primeira luta é na zona 1, com a patrulha dela (as capturas usaram a rota de uma fase de hoje; a do
+7. **As sombras das lâmpadas:** as luzes marcadas com sombra no JSON (as vermelhas e, na plataforma, a da porta do meio
+   do vagão e a do embarque) precisam projetar sombra também no Compatibility (hoje `scenario_world.gd` só liga no Forward+): sem ela, no escuro do corredor, os objetos e os
+   inimigos parecem flutuar. As capturas já mostram com a sombra ligada.
+8. **A luta:** a primeira luta é na zona 1, com a patrulha dela (as capturas usaram a rota de uma fase de hoje; a do
    tutorial tem cinco trechos, ver a seção 2). Na luta, as máquinas recebem a luz de preenchimento neutra da arena,
    contra a cena vermelha: vale tingir o preenchimento com a cor do lugar.
-8. **O primeiro plano:** os cards das peças a 8 m da câmera (`T_TU20` a `T_TU22`) em alpha blend, para o desfoque
+9. **O primeiro plano:** os cards das peças a 8 m da câmera (`T_TU20` a `T_TU22`) em alpha blend, para o desfoque
    pintado aparecer (no corte em 0,333 de hoje, a silhueta fica dura). Eles já esmaecem quando tapam a equipe (#51).
 
 ## 2. As telas do tutorial (#146)
@@ -336,3 +340,23 @@ abertura ("Você precisa escapar.") é a decisão do Lucas de 26/10, feita no me
 
 O painel das portas iluminado (os três interativos são `art`, fechados e abertos), as capturas e o lado a lado das
 celas refeitos, as telas com 32 de 32 nas conferências. As observações baixas da rodada 4 ficam registradas acima.
+
+### Depois da aprovação: o encaixe no cenário (pedido do Lucas, 27/10)
+
+O Lucas viu que as luzes não encaixavam e que os objetos e os inimigos pareciam voar. As causas e o que mudou:
+- **Ninguém projetava sombra:** no escuro do corredor, sem o sol, nada encostava no chão. As luzes vermelhas, e na
+  plataforma a luz fria da porta do meio e a do embarque, agora projetam sombra (nas capturas; no jogo, a nota 7 do código), e os objetos, os inimigos e a equipe
+  ganham a sombra no chão e na parede.
+- **A luz não saía das lâmpadas:** a luz da parede saiu da frente da lâmpada para a própria lâmpada, rente à parede
+  (o cone desce dela), e a poça do chão foi para logo abaixo e à frente dela, no pé da parede. A luz do primeiro plano
+  ficou mais fraca e alta, sem a poça solta na frente.
+- **A névoa clareava a base de tudo:** os véus ficaram mais baixos e fracos.
+- **No corredor, as poças se juntavam:** as lâmpadas ficam mais perto ali, e o raio menor deixa o escuro entre elas.
+
+A QA conferiu na rodada 6 (REPROVADO: a plataforma ainda sem sombra; corrigido) e na rodada 7 (registrada abaixo).
+
+### Rodada 7: APROVADO
+
+A sombra de contato em todas as zonas, inclusive na plataforma (a equipe projeta sombra no embarque), e o escuro de volta
+entre as poças do corredor; nada regrediu. Observação baixa: na plataforma, as máquinas longe da porta do meio quase não
+têm sombra (só as duas luzes da direita projetam), além das observações anteriores.

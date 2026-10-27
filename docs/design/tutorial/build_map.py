@@ -111,13 +111,15 @@ RED = [1.0, 0.28, 0.2]
 COLD = [0.75, 0.85, 1.0]
 
 
-def red_lamp(x, z=-2.5, y=2.95, lumens=380.0, radius=5.6):
+def red_lamp(x, z=-2.5, y=2.95, lumens=210.0, radius=4.4):
     """A lâmpada de emergência: o card aceso e a luz vermelha logo à frente e abaixo dele, curta, para a poça de luz no
     chão e na parede (entre uma e outra, o escuro). O pisca é do código (#147)."""
     plate(x, y - 0.22, z + 0.04, 0.3, 0.45, card("T_TU08_Lit", 1.0))
-    light([x, y - 0.45, z + 0.65], RED, lumens, radius, shadows=True)
-    # A poça no chão: uma luz baixa e curta na frente, na faixa de andar (a mesma lâmpada; pisca junto).
-    light([x, 0.8, z + 3.2], RED, lumens * 0.55, 3.8)
+    # A luz sai da própria lâmpada, rente à parede: o cone na parede começa nela e cai para baixo e para os lados.
+    light([x, y - 0.3, z + 0.35], RED, lumens, radius, shadows=True)
+    # A poça no chão, logo abaixo e à frente da lâmpada (no pé da parede, entrando na faixa): a mesma lâmpada, pisca junto.
+    # Com sombra, ela projeta para a frente a sombra de contato dos objetos e de quem passa.
+    light([x, 1.4, z + 1.3], RED, lumens * 0.5, 3.6, shadows=True)
 
 
 def recess(x0, x1, bottom, top, depth=3.0, glow=0.0, wall_z=-2.6):
@@ -193,10 +195,10 @@ def interactive(code, name, loot, x, width, height, z=-2.05, bottom=0.0):
 FRONT_Z = 11.0  # o primeiro plano: 8 m da câmera (a faixa fica a 19 m), passa rápido na frente dela
 
 
-def front_light(x, color=None, lumens=320.0):
+def front_light(x, color=None, lumens=150.0):
     """A luz que recorta o primeiro plano: uma lâmpada fora do quadro, entre a câmera e as peças (no vermelho das
     outras; na plataforma, fria). Clareia também a frente do piso."""
-    light([x, 2.4, FRONT_Z + 1.6], color or RED, lumens, 4.6)
+    light([x, 3.0, FRONT_Z + 1.4], color or RED, lumens, 3.0)
 
 
 def foreground(x, code, width, height, bottom, z=FRONT_Z):
@@ -222,9 +224,10 @@ def main() -> None:
     wall(x0, x1, "T_TU01", holes=[(0.771, 0.892, 0.318, 0.952)], recess_glow=220.0, depth=4.5)
     end_block(x0, -1)
     end_block(x1, 1)
+    # As lâmpadas do corredor ficam mais perto umas das outras: o raio menor deixa o escuro entre as poças.
     for px in (2.45, 6.05):
-        red_lamp(px, z=pillar(px), y=2.85)
-    red_lamp(8.38, y=3.2, lumens=260.0, radius=4.4)
+        red_lamp(px, z=pillar(px), y=2.85, radius=3.4)
+    red_lamp(8.38, y=3.2, lumens=150.0, radius=3.2)
     prop_card("T_TU15", 0.8, 0.95, 0.86, z=-2.15)
     prop_card("T_TU14", 3.7, 1.45, 1.1, z=-2.05)
     prop_card("T_TU19", 5.2, 0.8, 0.56, z=-1.75)
@@ -305,9 +308,10 @@ def main() -> None:
     # 81% da pintura) fica no fim da zona (x1 - 0,6): é ali o embarque; o fim do vagão entra no escuro do túnel.
     train = x1 - 0.6 - (0.725 - 0.5) * 10.0
     plate(train, -1.0, -3.9, 10.0, 4.03, card("T_TU10", 0.75))
+    # A luz das portas (a da porta aberta do embarque com sombra, que encosta no chão quem passa) e a do embarque.
     for f in (0.27, 0.5, 0.725):
-        light([train + (f - 0.5) * 10.0, 1.2, -3.1], COLD, 420.0, 6.5)
-    light([x1 - 0.6, 1.1, -1.2], COLD, 340.0, 5.0)
+        light([train + (f - 0.5) * 10.0, 1.2, -3.1], COLD, 420.0, 6.5, shadows=f == 0.5)
+    light([x1 - 0.6, 1.4, -1.6], COLD, 340.0, 5.0, shadows=True)
     red_lamp(x0 + 0.9, z=-6.3, y=2.6)
     light([x0 + 0.9, 1.7, -2.2], RED, 200.0, 4.5)
     prop_card("T_TU14", x0 + 1.4, 1.3, 1.0, z=-2.15)

@@ -21,6 +21,7 @@ var out := ""
 var ref := ""
 var fight := false
 var zones := true
+var only_zone := -1
 var campaign
 var flow
 var _host_bytes := PackedByteArray()
@@ -38,6 +39,8 @@ func _run() -> void:
 			ref = arg.trim_prefix("--ref=")
 		elif arg == "--fight":
 			fight = true
+		elif arg.begins_with("--zone="):
+			only_zone = int(arg.trim_prefix("--zone="))
 		elif arg == "--only-fight":
 			fight = true
 			zones = false
@@ -72,6 +75,8 @@ func _run() -> void:
 	var tag := ref if ref != "" else "TU"
 	street.corridor.busy = true
 	for zone_index in (street.scenario.zones.size() if zones else 0):
+		if only_zone >= 0 and zone_index != only_zone:
+			continue
 		street.set_scenario_zone(zone_index)
 		var zone: Dictionary = street.scenario.zones[zone_index]
 		street._place_leader(Vector3(zone.x0 + 5.6, street.floor_y, street.lane_z))
@@ -99,6 +104,9 @@ func _run() -> void:
 			await _frames(3)
 			await _shot("%s-exit" % tag)
 			_show_ui()
+			for index in street.corridor.guards:
+				for card in street.corridor.guards[index].cards:
+					card.visible = true
 	street.corridor.busy = false
 	if fight:
 		await _fight(street)
@@ -152,7 +160,7 @@ func _mist(street) -> void:
 	shader.code = MIST_SHADER
 	for zone in street.scenario.zones:
 		var lane: float = (zone.z0 + zone.z1) * 0.5
-		for layer in [[-1.6, 1.1, 0.5], [1.2, 0.9, 0.36]]:
+		for layer in [[-1.2, 0.7, 0.2], [1.4, 0.6, 0.18]]:
 			var quad := MeshInstance3D.new()
 			var mesh := QuadMesh.new()
 			mesh.size = Vector2(zone.x1 - zone.x0 + 3.0, layer[1])
@@ -168,6 +176,13 @@ func _mist(street) -> void:
 
 func _proto(street) -> void:
 	_mist(street)
+	# As sombras das luzes marcadas com sombra no mapa (no Forward+ o jogo já liga; aqui, no Compatibility, a captura
+	# liga): é o que encosta os objetos, os inimigos e a equipe no chão.
+	var marked: Array = street.scenario.data.lights.filter(func(l): return l.type == "point" and l.shadows)
+	for lamp in street.scenario.find_children("*", "OmniLight3D", true, false):
+		for l in marked:
+			if lamp.position.distance_to(Vector3(l.origin[0], l.origin[1], l.origin[2])) < 0.01:
+				lamp.shadow_enabled = true
 	for node in street.scenario.find_children("*", "MeshInstance3D", true, false):
 		var material = node.get_surface_override_material(0)
 		if node.global_position.z > -0.5 and material is StandardMaterial3D and material.albedo_texture != null \
