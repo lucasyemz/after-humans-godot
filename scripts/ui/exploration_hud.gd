@@ -92,7 +92,7 @@ var _hint_time := 0.0
 var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
 const STEP_ICONS := {"start": "node-start", "combat": "node-combat", "loot": "node-loot", "rest": "node-rest",
-	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "node-start"}
+	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "node-boss"}
 ## A casa do corredor (o lado do quadrado) e o elo entre duas.
 const CELL := 46.0
 const LINK := 12.0
@@ -399,9 +399,9 @@ func _refresh_place() -> void:
 	var parts := PackedStringArray()
 	if expedition != null:
 		var info := AHJourneyRules.phase(expedition.phase_id)
-		# O tutorial (#144) não é uma jornada da campanha: é a abertura.
+		# O tutorial (#144) não é uma jornada da campanha: é a abertura, num subsolo (sem clima).
 		parts.append(tr("Abertura") if expedition.phase_id == AHTutorial.PHASE_ID else tr("Jornada %d") % (AHJourneyRules.PHASES.find(info) + 1))
-	if _weather != "":
+	if _weather != "" and (expedition == null or expedition.phase_id != AHTutorial.PHASE_ID):
 		parts.append(_weather)
 	_place_sub.text = " · ".join(parts)
 

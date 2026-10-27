@@ -129,6 +129,15 @@ static func data_texts() -> Array:
 				out.append({"text": row.Debriefing[index].Text, "where": "briefings.%s.debriefing.%d" % [row.Name, index]})
 		elif row.has("Debriefing"):
 			out.append({"text": row.Debriefing.Text, "where": "briefings.%s.debriefing" % row.Name})
+	# Os cenários (#147): o nome de cada zona (o "Seguindo para:" da troca de zona) e de cada prop vasculhável.
+	for file in DirAccess.get_files_at("res://data/scenarios"):
+		if not file.ends_with(".json") or file == "meshes.json":
+			continue
+		var map: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/scenarios/" + file))
+		for zone in map.get("zones", []):
+			out.append({"text": zone.name, "where": "scenarios.%s.zones" % file.get_basename()})
+		for prop in map.get("props", []):
+			out.append({"text": prop.name, "where": "scenarios.%s.props" % file.get_basename()})
 	# O tutorial (#144): os cartões da abertura e as dicas de cada passo.
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/tutorial.json")):
 		for index in row.get("Cards", []).size():

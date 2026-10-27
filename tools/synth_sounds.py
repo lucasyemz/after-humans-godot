@@ -149,6 +149,18 @@ def security_door():
     return hiss + slide + hit + clank
 
 
+def security_door_open():
+    """A porta de segurança subindo (a zona vencida, #147): o chiado hidráulico e o motor que sobe, sem a batida."""
+    rng = np.random.default_rng(1470)
+    t = time(1.3)
+    hiss = bandpass(rng.standard_normal(t.size), 1500.0, 6000.0) * np.clip(t / 0.05, 0, 1) * np.clip((0.4 - t) / 0.2, 0, 1) * 0.3
+    motor = np.sin(2 * np.pi * (70.0 + 60.0 * t) * t) * np.clip(t / 0.15, 0, 1) * np.clip((1.3 - t) / 0.35, 0, 1) * 0.45
+    whine = np.sin(2 * np.pi * (300.0 + 180.0 * t) * t) * np.clip(t / 0.3, 0, 1) * np.clip((1.3 - t) / 0.4, 0, 1) * 0.12
+    stop_t = np.clip(t - 1.05, 0, None)
+    stop = (t >= 1.05) * bandpass(rng.standard_normal(t.size), 300.0, 2500.0) * np.exp(-stop_t * 30.0) * 0.5
+    return hiss + motor + whine + stop
+
+
 def containment_loop():
     """O ambiente do Corredor de Contenção (#147): o zumbido da casa de máquinas e, ao fundo, o alarme da contenção
     (dois tons que sobem e descem a cada 4 s). 16 s que emendam: tudo tem período que divide a duração."""
@@ -179,6 +191,7 @@ SOUNDS = {
     "ui/defeat": defeat,
     "combat/crisis": crisis,
     "world/security_door": security_door,
+    "world/security_door_open": security_door_open,
     "ambience/ContainmentCorridor": containment_loop,
 }
 

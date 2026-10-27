@@ -51,19 +51,19 @@
   {
     "Name": "fight_2",
     "Step": 4,
-    "Lesson": "O Nick chega: as posições, mover, defender, a ordem da rodada e o instinto.",
+    "Lesson": "O Nick chega: as posições (o Rastejante empurra), mover, defender, a ordem da rodada e o instinto.",
     "Enemies": [
-      "faisca",
-      "pipoco"
+      "rastejante_raiz",
+      "broto"
     ]
   },
   {
     "Name": "fight_3",
     "Step": 5,
-    "Lesson": "Os estados (o sangramento e o bloqueio) e um item da Mochila na luta.",
+    "Lesson": "Os estados (o sangramento do Rastreador e a blindagem do Robô) e um item da Mochila na luta.",
     "Enemies": [
       "cao_eco",
-      "broto"
+      "robot"
     ]
   },
   {
@@ -147,7 +147,7 @@
       {
         "Id": "position",
         "Title": "Posição e defesa",
-        "Text": "A frente fica à direita. Mover troca de lugar com o vizinho; Defender dá Bloqueio. A ordem da rodada e o instinto (a barra roxa) ficam no painel.",
+        "Text": "A frente fica à direita. O Rastejante empurra quem acerta; Mover troca de lugar com o vizinho e Defender dá Bloqueio. A ordem da rodada fica no alto, e o instinto (a barra roxa) no painel.",
         "Keys": [
           "combat_move",
           "combat_defend"
@@ -156,7 +156,7 @@
       {
         "Id": "item",
         "Title": "Estados e a Mochila na luta",
-        "Text": "O Rastreador faz sangrar: o sangramento tira vida no começo de cada vez. Um curativo da Mochila cura sem gastar a vez.",
+        "Text": "O Rastreador faz sangrar: o sangramento tira vida no começo de cada vez. O Robô se blinda: cada Bloqueio corta o próximo golpe. Um curativo da Mochila cura sem gastar a vez.",
         "Keys": [
           "inventory"
         ]

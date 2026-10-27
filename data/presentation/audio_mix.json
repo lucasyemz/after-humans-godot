@@ -671,6 +671,12 @@
 			"lufs": -20.6,
 			"gain_db": 0.6,
 			"normalized": true
+		},
+		"res://audio/world/security_door_open.ogg": {
+			"category": "sfx",
+			"lufs": -12.5,
+			"gain_db": -7.5,
+			"normalized": true
 		}
 	}
 }

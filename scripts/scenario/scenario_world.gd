@@ -170,13 +170,22 @@ static func blink_lit(time: float, phase: float) -> bool:
 	return fposmod(time / BLINK_PERIOD + phase, 1.0) < BLINK_ON / BLINK_PERIOD
 
 
+## O vagão parado na plataforma (true) ou ainda fora dela, escondido (false), até arrive_train.
+func park_train(here: bool) -> void:
+	var metro := get_node_or_null("Metro") as Node3D
+	if metro != null:
+		metro.visible = here
+
+
 ## O trem do tutorial chega: o vagão entra no fosso pela direita e para no lugar (seconds com a freada no fim).
 func arrive_train(seconds: float) -> void:
 	var metro := get_node_or_null("Metro") as Node3D
 	if metro == null or seconds <= 0.0:
+		park_train(true)
 		return
 	var home := metro.position
 	metro.position = home + Vector3(TRAIN_RUN, 0, 0)
+	metro.visible = true
 	var tween := create_tween()
 	tween.tween_property(metro, "position", home, seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	await tween.finished

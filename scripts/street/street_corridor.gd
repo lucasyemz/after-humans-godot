@@ -114,6 +114,10 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	street.apply_corridor_weather(route.weather)
 	_spawn_guards()
 	_spawn_props()
+	# O trem do tutorial só aparece quando chega (com o trecho dele resolvido, já parado na plataforma).
+	if street.scenario and not street.scenario.train.is_empty():
+		var last: Dictionary = route.steps[route.steps.size() - 1]
+		street.scenario.park_train(last.type == "train" and last.resolved)
 	_refresh_doors()
 	if route.current_house >= 0:
 		_open_room(route.current_house)
@@ -694,9 +698,11 @@ func _refresh_security_doors(sound: bool = false) -> void:
 		done = done and route.steps[step].resolved
 	for index in street.scenario.doors_of(part.zone, "entry"):
 		street.scenario.set_door(index, false)
+	# O painel da sala das celas: a alavanca embaixo, depois que as portas baixaram atrás da equipe.
+	street.scenario.set_panel_down(part.zone >= int(street.scenario.door_panel.get("zone", 0)))
 	for index in street.scenario.doors_of(part.zone, "exit"):
 		if sound and done and not street.scenario.door_open(index):
-			Sound.play("res://audio/world/door_open.ogg")
+			Sound.play("res://audio/world/security_door_open.ogg")
 		street.scenario.set_door(index, done)
 
 
@@ -1033,6 +1039,9 @@ func _force_house(site_index: int) -> void:
 
 
 func _retreat() -> void:
+	# No tutorial não há retirada: a saída é o trem.
+	if tutorial():
+		return
 	# Com a carga do guardião na tela, só sai depois de escolher e fechar (a carga não se perde).
 	if busy or AHFightRewards.cargo_pending(Campaign.state):
 		return
