@@ -157,6 +157,11 @@ func _fade(channel: Dictionary, player: AudioStreamPlayer, db: float, seconds: f
 	channel.tween.tween_property(player, "volume_db", db, seconds)
 
 
+## O arquivo em laço (o mesmo stream das cenas), para quem toca o próprio laço (o trem da passagem, #133).
+func looped(path: String) -> AudioStream:
+	return _loop(path)
+
+
 func _loop(path: String) -> AudioStream:
 	if not _streams.has(path):
 		var stream: AudioStream = load(path)

@@ -18,8 +18,8 @@ TABLE = PROTO / "data/presentation/audio_mix.json"
 TARGETS = {"music": -18.0, "ambience": -26.0, "sfx": -20.0, "ui": -24.0}
 ## Os sons de tools/synth_sounds.py (vão ao alvo da categoria deles).
 SYNTH = {"station/train_bell", "station/train_brake", "ui/panel_open", "ui/panel_close", "ui/forge_confirm",
-         "world/find_rare", "ui/victory", "ui/defeat", "combat/crisis"}
-LOOPS = {"station/hum_loop", "station/bar_fan_loop", "station/depot_tube_loop"}
+         "world/find_rare", "ui/victory", "ui/defeat", "combat/crisis", "station/train_ride"}
+LOOPS = {"station/hum_loop", "station/bar_fan_loop", "station/depot_tube_loop", "station/train_ride"}
 
 
 def category(stem):

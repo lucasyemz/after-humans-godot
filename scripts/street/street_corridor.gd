@@ -1460,4 +1460,4 @@ func _show_result() -> void:
 ## voluntários de graça (FAHShelterRules::CanRecruitVolunteer), então a campanha continua.
 func _on_result_continue() -> void:
 	hud.close_modal()
-	GameFlow.travel("station")
+	GameFlow.travel("station", AHWagonRide.return_card())

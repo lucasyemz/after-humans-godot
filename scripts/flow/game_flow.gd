@@ -132,7 +132,7 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 			elif status != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
 				# O pedido em segundo plano falhou (ou já foi consumido): carrega aqui mesmo.
 				packed = load(path)
-		elif scene == null and (passage.title_delay <= 0.0 or passage.title_lit):
+		elif scene == null and (passage.title_delay <= 0.0 or passage.title_lit) and passage.sound_settled():
 			# Com a cena de fundo andando (o vagão, #75), a montagem (um quadro travado) espera o título aceso por cima.
 			# A cena nova monta por baixo do cartão (opaco), parada: não anda nem recebe tecla até o cartão sair. Só
 			# depois de montada dá para pular.
@@ -143,6 +143,8 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 			tree.current_scene = scene
 			await tree.process_frame
 			passage.mark_ready()
+	# O som da passagem (#133) sai junto com o cartão; pulada, num fade curto e sem o som da chegada.
+	passage.end_sound(AHPassageCard.SOUND_SKIP_FADE if passage.skipped else FADE_SECONDS, not passage.skipped)
 	await _fade_to(1.0)
 	passage.queue_free()
 	passage = null
