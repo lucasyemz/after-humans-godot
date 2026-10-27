@@ -1,5 +1,5 @@
 ## O equilíbrio das lutas do tutorial (#144), pela simulação das três em sequência como no jogo (a vida passa de uma
-## para a outra; entre a segunda e a terceira, só o fôlego da busca, AHTutorial.catch_breath; as regras de
+## para a outra; entre a segunda e a terceira, só o fôlego, da busca ou da chegada à zona do Drone; as regras de
 ## AHTutorial.prepare_fight), com sementes fixas e duas políticas: a ingênua (a primeira habilidade no primeiro alvo,
 ## como quem aperta o que vê) e a automática da paridade (com a abertura em metade das lutas 2 e 3).
 ## - a primeira luta é uma lição de verdade: a equipe de três perde de 10% a 25% da vida somada, em média, na ingênua;
@@ -16,6 +16,7 @@ var t
 
 func run(context) -> void:
 	t = context
+	_breath_once()
 	for policy in ["naive", "auto"]:
 		var damage: Array = []
 		var team_hp: Array = []
@@ -29,8 +30,13 @@ func run(context) -> void:
 			for step in [1, 3, 5]:
 				if step == 3:
 					AHTutorial.join(c)
+				# O fôlego antes do Drone: em metade das corridas pela busca do armário, na outra metade ao chegar à zona da
+				# luta (quem passou sem vasculhar).
 				if step == 5:
-					AHTutorial.catch_breath(c)
+					if run % 4 < 2:
+						AHTutorial.catch_breath(c)
+					else:
+						t.check(AHTutorial.breath_on_arrival(c, 5, 1) or _team_full(c), "sem a busca, o fôlego vem ao chegar à luta do Drone")
 				var heroes: Array = expedition.team.map(func(id): return AHStationRules.hero(c, id))
 				var opening: bool = policy == "auto" and step != 1 and run % 2 == 0
 				var session := AHCombatSession.create(heroes, AHJourneyRules.corridor_enemies(expedition, step), opening, 9000 + run * 7 + step, 80)
@@ -72,6 +78,31 @@ func run(context) -> void:
 
 
 ## A vez do herói: a ingênua usa a primeira habilidade de ataque no primeiro alvo (ou defende); a automática é a da paridade.
+## O fôlego vem uma vez só: depois da busca, a chegada não cura de novo; sem a busca, a chegada cura; e só na zona da
+## luta do Drone.
+func _breath_once() -> void:
+	var c: Dictionary = Campaign.create_initial(77)
+	AHTutorial.begin(c, 77)
+	var hero = AHStationRules.hero(c, c.session.expedition.team[0])
+	hero.hp = 2
+	t.check(not AHTutorial.breath_on_arrival(c, 2, 3), "a chegada à zona do Nick não dá fôlego")
+	t.check(AHTutorial.catch_breath(c) and int(hero.hp) > 2, "a busca dá o fôlego")
+	hero.hp = 2
+	t.check(not AHTutorial.breath_on_arrival(c, 5, 1) and int(hero.hp) == 2, "depois da busca, a chegada à luta do Drone não cura de novo")
+	c = Campaign.create_initial(78)
+	AHTutorial.begin(c, 78)
+	hero = AHStationRules.hero(c, c.session.expedition.team[0])
+	hero.hp = 2
+	t.check(AHTutorial.breath_on_arrival(c, 5, 1) and int(hero.hp) > 2, "sem a busca, a chegada à luta do Drone dá o fôlego")
+	t.check(not AHTutorial.catch_breath(c), "e a busca depois não dá outro")
+
+
+func _team_full(c: Dictionary) -> bool:
+	return c.session.expedition.team.all(func(id):
+		var hero = AHStationRules.hero(c, id)
+		return int(hero.hp) >= int(hero.max_hp))
+
+
 func _play(session: AHCombatSession, policy: String) -> void:
 	if policy == "auto":
 		session.auto_player_turn()

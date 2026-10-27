@@ -115,6 +115,10 @@ func _process(_delta: float) -> void:
 	var prompt: Control = corridor.hud.get("_prompt")
 	if prompt != null and prompt.visible:
 		avoid.append(prompt.get_global_rect())
+	# E o aviso do alto enquanto está na tela (o achado da busca e o fôlego): a dica que abre junto não o cobre.
+	var toast: Control = corridor.hud.get("_toast")
+	if toast != null and toast.modulate.a > 0.01:
+		avoid.append(toast.get_global_rect())
 	hint.set_avoid(avoid)
 	if street._arena.active:
 		_combat_focus()

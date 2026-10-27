@@ -248,6 +248,15 @@ func _journey() -> void:
 		t.equal(int(hurt.hp), expected, "a busca devolve o fôlego: o ferido sobe 35% da vida máxima")
 		t.check(team.all(func(h): return int(h.hp) <= int(h.max_hp)), "e ninguém passa da vida máxima")
 		t.equal(guide.hint.step_id, "bag", "vasculhado, a dica da Mochila")
+		# O aviso da busca (com o fôlego) fica à vista: a dica da Mochila abre longe dele.
+		var toast: Control = street.exploration_hud.get("_toast")
+		var plate := Rect2(guide.hint._plate.position, guide.hint._plate.size)
+		var said: String = street.exploration_hud._toast_label.text
+		t.check(said.contains(TranslationServer.translate("A equipe recupera o fôlego.")),
+			"o aviso da busca diz que a equipe recupera o fôlego")
+		t.check(toast.modulate.a > 0.5 and not plate.intersects(toast.get_global_rect()),
+			"a dica da Mochila não cobre o aviso da busca (%s, %s)" % [plate, toast.get_global_rect()])
+		t.check(not said.contains(": ."), "o aviso não começa com ponto solto (%s)" % said)
 		corridor.open_inventory()
 		await _frames(2)
 		t.check(guide.done("bag"), "aberta a Mochila, a dica cumprida")
