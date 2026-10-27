@@ -49,7 +49,8 @@ para isso" do Nick é o "Estou só passando" do arco (§5).
 
 ## As lutas
 
-A vida dos heróis continua parando em 1 no tutorial (`min_hero_hp`). Só inimigos que já existem, sem mexer em
+A vida dos heróis continua parando em 1 no tutorial (`min_hero_hp`), mas só como rede: a busca entre a luta 2 e a 3
+devolve o fôlego (rodada 2 da QA, abaixo). Só inimigos que já existem, sem mexer em
 `enemies.json`, e com arte de combate (os Ecos de Sucata não têm). O reforço da rodada 1 da QA (abaixo) fica só no
 tutorial.
 
@@ -112,3 +113,33 @@ aparece em 40 de 40 nas duas.
 | Objetivo da rota | As portas da contenção baixam atrás da equipe. A saída é a plataforma. | A porta da contenção baixa atrás da equipe. A saída é a plataforma. |
 
 As dicas não mudaram: "Os inimigos daqui são pequenos: ataque." continua valendo com o reforço.
+
+## A rodada 2 da QA do arco
+
+| O que a QA achou | Como ficou |
+|---|---|
+| Nas lutas 2 e 3, o entulho do pé da faixa (`T_TU05` nas Celas e na Rota do Nick, a 0,9 m da borda da zona) pintava metade da Íris e as pernas do Nick de silhueta | O mapa marca o entulho no chão à frente da faixa como primeiro plano (`foreground` em `ContainmentCorridor.json`, posto por `tools/build_containment_corridor.py`, também no `T_TU17` do Corredor): some quando tapa alguém, na luta também. Os outros mapas não mudam (`test_tutorial_map` confere). Capturas 08 e 11 refeitas, com os heróis inteiros |
+| Com a luta 1 mais forte, as lutas 2 e 3 levavam alguém à vida 1 com frequência (137 de 200 percursos na automática, na luta 3), e o teste contava `hp < 1`, impossível com o piso | A luta 2 tira 2 do golpe do Rastejante e a 3 tira 1 do Drone (`Boost`; nenhum golpe fica com menos de 1 de dano, `test_tutorial_map` confere), e a busca entre a luta 2 e a 3 dá o fôlego: quem está ferido recupera 35% da vida máxima (`Search.Heal`, `AHTutorial.catch_breath`). O teste conta quem chega a 1 nas lutas 2 e 3 e trava em 10% |
+
+### As lutas, medidas de novo
+
+A mesma simulação, agora como no jogo (as três lutas encadeadas, com o fôlego da busca antes da 3; a automática com a
+abertura em metade das lutas 2 e 3; 200 percursos por política). "Chegou a 1" é quantos percursos tiveram alguém na
+vida 1.
+
+| | Ingênua, rodada 2 | Ingênua, agora | Automática, rodada 2 | Automática, agora | Fraca, rodada 2 | Fraca, agora |
+|---|---|---|---|---|---|---|
+| Luta 1: vida perdida (média) | 13% | 13% | 16% | 16% | 32% | 32% |
+| Luta 2: chegou a 1 | 4 de 200 | 1 de 200 | 60 de 200 | 12 de 200 (6%) | 35 de 200 | 17 de 200 |
+| Luta 3: chegou a 1 | 13 de 200 | 0 de 200 | 137 de 200 | 6 de 200 (3%) | 107 de 200 | 0 de 200 |
+| Luta 3: contaminou | 200 de 200 | 200 de 200 | 200 de 200 | 200 de 200 | 200 de 200 | 200 de 200 |
+| Vitórias nas três lutas | 600 de 600 | 600 de 600 | 600 de 600 | 600 de 600 | 600 de 600 | 600 de 600 |
+
+No teste fixo (40 sementes): a luta 1 tira 14% na ingênua e 15% na automática; a contaminação aparece em 40 de 40; alguém
+chega a 1 em 1 de 40 lutas 2 e em 0 ou 1 de 40 lutas 3.
+
+### O texto novo desta rodada
+
+| Onde | Antes | Agora (português) | Inglês |
+|---|---|---|---|
+| A busca do armário (o aviso do achado) | Armário de manutenção: +1 curativo, +1 comida | Armário de manutenção: +1 curativo, +1 comida. A equipe recupera o fôlego. | … The team catches its breath. |
