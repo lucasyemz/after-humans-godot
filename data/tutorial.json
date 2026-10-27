@@ -50,10 +50,10 @@
   {
     "Name": "fight_3",
     "Step": 5,
-    "Lesson": "Os estados (o sangramento do Rastreador e a blindagem do Robô) e um item da Mochila na luta.",
+    "Lesson": "Os estados (o sangramento do Rastreador) e um item da Mochila na luta.",
     "Enemies": [
       "cao_eco",
-      "robot"
+      "broto"
     ]
   }
 ]
