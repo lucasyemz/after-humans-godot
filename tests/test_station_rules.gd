@@ -286,6 +286,8 @@ func _shelter(t) -> void:
 	t.equal(S.equip_relic(c, "hero_cao_bento", ""), "", "tira")
 	t.check(c.inventory.relics == ["botao_cobre"], "voltou ao estoque")
 	c.inventory.seeds = 10
+	# O Alojamento ampliado (#119): cabem os recrutas do teste.
+	c.station.rooms[S.CHARACTERS] = 4
 	S.recruit(c, "cao", rng)
 	var dogs: Array = c.roster.filter(func(h): return h.class_id == "cao").map(func(h): return h.id)
 	t.check(S.validate_team(c, [dogs[0], dogs[1], dogs[2], "hero_gato_nick"]) != "", "três cães não partem juntos")

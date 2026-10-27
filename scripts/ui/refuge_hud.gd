@@ -512,7 +512,8 @@ func refresh() -> void:
 func _screen_name(c: Dictionary) -> String:
 	match current:
 		"", "options", "new_campaign":
-			return tr("Ciclo %d · %d no elenco") % [c.station.cycle_number, S.living(c).size()]
+			# Os limites da Estação (#119): heróis pelo Alojamento, ajudantes pelo Dormitório.
+			return tr("Ciclo %d · %s") % [c.station.cycle_number, S.limits_text(c)]
 		"plan":
 			return tr("Plano da Estação")
 		"train":
@@ -855,7 +856,7 @@ func _room_state(c: Dictionary, id: String) -> String:
 	var top: int = S.room_def(id).max_level
 	if top > 1:
 		return tr("Nível %d de %d") % [level, top]
-	return tr("Aberto") if id == S.CHARACTERS or id == S.PREPARATION else tr("Nível %d") % level
+	return tr("Aberto") if id == S.PREPARATION else tr("Nível %d") % level
 
 
 func _refresh_room_card() -> void:
@@ -1824,6 +1825,45 @@ func _room(room_id: String) -> void:
 			_dormitory(c)
 		S.INFIRMARY:
 			_infirmary(c, level)
+	# Quem trabalha aqui (#119), depois do conteúdo do cômodo (as relíquias da Forja ficam no alto).
+	if S.job_rooms(c).has(room_id):
+		_body.add_child(_divider())
+		_workers(c, room_id)
+
+
+## Quem trabalha aqui (#119): o herói no posto do cômodo, o que ele faz e rende a cada volta, e quem pode ficar no lugar.
+func _workers(c: Dictionary, room_id: String) -> void:
+	var box := _inset()
+	box.get_parent().name = "Workers"
+	var rule := S.job_rule(room_id)
+	box.add_child(AHKit.label(tr("Quem trabalha aqui"), "text", AHKit.AMBER, true, true))
+	var who = S.worker(c, room_id)
+	if who != null:
+		box.add_child(_wrapped("%s · %s" % [who.display_name, S.yield_text(room_id, S.post_yield(who, room_id))], "row", AHKit.TEXT, true, BODY_WIDTH - 40.0))
+		box.add_child(_wrapped(tr(String(rule.get("Text", ""))), "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
+	else:
+		box.add_child(_wrapped(tr("Ninguém. Quem fica na Estação durante a expedição pode trabalhar aqui."), "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
+	var chips := HFlowContainer.new()
+	chips.add_theme_constant_override("h_separation", 8)
+	chips.add_theme_constant_override("v_separation", 8)
+	box.add_child(chips)
+	for entry in S.living(c).filter(func(h): return not S.recovering(h)):
+		var id: String = entry.id
+		var chip := _chip_button("%s · +%d" % [entry.display_name, S.post_yield(entry, room_id)])
+		chip.name = "Worker_%s" % id
+		chip.custom_minimum_size = Vector2(0, 52)
+		var elsewhere := S.post_of(entry)
+		chip.tooltip_text = S.yield_text(room_id, S.post_yield(entry, room_id)) + ((tr(" · sai %s") % S.room_from(elsewhere)) if elsewhere != "" and elsewhere != room_id else "")
+		if who != null and who.id == id:
+			for state in ["font_color", "font_hover_color", "font_focus_color"]:
+				chip.add_theme_color_override(state, AHKit.AMBER)
+			chip.add_child(AHKit.selected_overlay())
+			chip.pressed.connect(func(): _act(S.set_post(Campaign.state, id, "")))
+		else:
+			chip.pressed.connect(func(): _act(S.set_post(Campaign.state, id, room_id)))
+		sheet.attach(chip, func(): return AHCharacterSheet.from_hero(S.hero(Campaign.state, id)))
+		chips.add_child(chip)
+	_body.add_child(_divider())
 
 
 func _civilian_card(c: Dictionary, who: Dictionary) -> void:
