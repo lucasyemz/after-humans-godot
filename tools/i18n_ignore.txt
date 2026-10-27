@@ -482,6 +482,7 @@ scenario_world.gd: haze
 scenario_world.gd: hidden
 scenario_world.gd: masked
 scenario_world.gd: merged
+scenario_world.gd: node
 scenario_world.gd: prop
 scenario_world.gd: ripple
 scenario_world.gd: roughness

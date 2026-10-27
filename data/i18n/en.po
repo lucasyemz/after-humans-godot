@@ -4817,15 +4817,15 @@ msgstr "night"
 msgid "noite de chuva"
 msgstr "rainy night"
 
-#: scripts/street/street.gd:1025
+#: scripts/street/street.gd:1044
 msgid "Noite"
 msgstr "Night"
 
-#: scripts/street/street.gd:1025
+#: scripts/street/street.gd:1044
 msgid "Fim de tarde"
 msgstr "Late afternoon"
 
-#: scripts/street/street.gd:1025
+#: scripts/street/street.gd:1044
 msgid " · chuva"
 msgstr " · rain"
 
@@ -6637,12 +6637,12 @@ msgid "Ninguém desceu do trem. Na Estação, alguém deixa a luz da plataforma 
 msgstr "Nobody stepped off the train. At the Station, someone leaves the platform light on."
 
 #. scenarios.ContainmentCorridor.zones
-msgid "Corredor de contenção"
-msgstr "Containment corridor"
+msgid "Corredor"
+msgstr "Corridor"
 
 #. scenarios.ContainmentCorridor.zones
-msgid "Sala das celas"
-msgstr "Cell room"
+msgid "Celas"
+msgstr "Cells"
 
 #. scenarios.ContainmentCorridor.zones
 msgid "Rota do Nick"
@@ -7580,6 +7580,12 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "Corredor de contenção"
+#~ msgstr "Containment corridor"
+
+#~ msgid "Sala das celas"
+#~ msgstr "Cell room"
 
 #~ msgid "%s chegou à Estação."
 #~ msgstr "%s arrived at the Station."

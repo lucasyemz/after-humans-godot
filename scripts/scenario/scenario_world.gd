@@ -136,6 +136,10 @@ func build(map: String) -> void:
 			node.set_surface_override_material(surface, _materials[index])
 		if part.get("no_shadow", false) or data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"]:
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		# Uma peça de um nó (o vagão do tutorial, "Metro"): fica nele, fora da junção, para andar junto (arrive_train).
+		if part.has("node"):
+			_group(String(part.node)).add_child(node)
+			continue
 		add_child(node)
 		if not data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"] \
 				and not data.materials[int(part.materials[0])].get("masked", false):
@@ -690,7 +694,20 @@ func _light(light: Dictionary) -> void:
 	if shadows:
 		lamp.add_to_group(Settings.SHADOW_LAMPS)
 	lamp.shadow_enabled = shadows and Settings.effects().lamp_shadows
-	add_child(lamp)
+	if light.has("node"):
+		_group(String(light.node)).add_child(lamp)
+	else:
+		add_child(lamp)
+
+
+## O nó de um grupo de peças e luzes do mapa (criado na primeira vez), na origem: o que fica nele anda junto.
+func _group(group_name: String) -> Node3D:
+	var holder := get_node_or_null(group_name) as Node3D
+	if holder == null:
+		holder = Node3D.new()
+		holder.name = group_name
+		add_child(holder)
+	return holder
 
 
 func _text(text: Dictionary) -> void:

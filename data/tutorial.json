@@ -8,8 +8,8 @@
       "start",
       "combat",
       "nick",
-      "loot",
       "combat",
+      "loot",
       "combat",
       "train"
     ],
@@ -44,7 +44,7 @@
   },
   {
     "Name": "fight_2",
-    "Step": 4,
+    "Step": 3,
     "Lesson": "Com o Nick na equipe: as posições (o Rastejante empurra), mover, defender, a ordem da rodada e o instinto.",
     "Enemies": [
       "rastejante_raiz",
