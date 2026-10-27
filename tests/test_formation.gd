@@ -143,7 +143,7 @@ func _camera(phase_id: String) -> void:
 		return
 	await _frames(30)
 	var camera: Camera3D = street.get_viewport().get_camera_3d()
-	var key := "street" if street.scenario == null else ("bridge" if street.scenario.map_name == "RootBridge" else "scenario")
+	var key := "street" if street.scenario == null else "scenario"
 	var spec: Dictionary = street.EXPLORE_CAMERA[key]
 	var to_leader := camera.global_position.distance_to(street._leader.global_position)
 	t.check(to_leader < float(spec.distance) + 3.0, "%s: a câmera a uns %.1f m da equipe (antes, 18,5 ou 19)" % [phase_id, to_leader])

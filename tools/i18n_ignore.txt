@@ -1393,7 +1393,6 @@ station_build.gd: infirmary@2
 *: formation
 *: distance
 *: height
-*: bridge
 *: indoor
 *: scenario
 exploration_hud.gd: Rank
@@ -1402,3 +1401,11 @@ exploration_hud.gd: Formation
 exploration_hud.gd: On
 exploration_hud.gd: Label
 exploration_hud.gd: Head
+*: mid
+*: deep
+*: horizon
+*: flow
+*: sparkle
+*: waterline
+*: detail
+*: painted

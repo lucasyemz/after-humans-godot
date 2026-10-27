@@ -26,12 +26,12 @@ const COMBAT_FEET_LINE := 0.4
 const SCENARIO_PITCH := 0.5
 const SCENARIO_HALF_FOV := 15.0
 ## A câmera da exploração (#129), num lugar só: a distância até a equipe e a altura do alvo sobre o piso (m), na rua,
-## nos cenários (a Ponte, mais aberta, à parte) e dentro das lojas. Uns 17% mais perto que antes (18,5, 19, 28 e 11 m);
-## o alvo desce junto, para os pés ficarem acima das plaquinhas da equipe. A barra de Admin ainda aproxima ou afasta.
+## nos cenários e dentro das lojas. Uns 17% mais perto que antes (18,5, 19 e 11 m); o alvo desce junto, para os pés
+## ficarem acima das plaquinhas da equipe. A Ponte das Raízes (antes 28 m e 2,7 m) usa a dos outros cenários (#140).
+## A barra de Admin ainda aproxima ou afasta.
 const EXPLORE_CAMERA := {
 	"street": {"distance": 15.4, "height": 1.7},
 	"scenario": {"distance": 15.8, "height": 1.45},
-	"bridge": {"distance": 23.3, "height": 2.3},
 	"indoor": {"distance": 9.2, "height": 1.45},
 }
 ## O preenchimento da luta nos cenários: energia no fim de tarde e quanto soma de noite e na chuva.
@@ -239,7 +239,9 @@ func _ready() -> void:
 	_apply_graphics()
 	Settings.changed.connect(func():
 		_apply_graphics()
-		_apply_weather())
+		_apply_weather()
+		if scenario:
+			scenario.refresh_water_pace())
 	_apply_weather()
 	exploration_hud = AHExplorationHud.new()
 	_street_hud.add_child(exploration_hud)
@@ -733,8 +735,7 @@ func _update_camera(delta: float) -> void:
 	if scenario and not _zone.is_empty():
 		# A câmera da prévia da Unreal: 19 m de distância, 1,7 m acima do piso, quase reta (0,5°), 30° na horizontal; a
 		# Ponte usa a da rua (28 m, 2,7 m). O centro vai até 4 m das pontas da zona (LaneEdgePadding).
-		var bridge: bool = scenario.map_name == "RootBridge"
-		view_spec = EXPLORE_CAMERA.bridge if bridge else EXPLORE_CAMERA.scenario
+		view_spec = EXPLORE_CAMERA.scenario
 		distance = view_spec.distance
 		pitch = deg_to_rad(SCENARIO_PITCH)
 		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(SCENARIO_HALF_FOV)) / get_viewport().get_visible_rect().size.aspect()))
