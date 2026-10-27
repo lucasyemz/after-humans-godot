@@ -61,6 +61,8 @@ var props := {}
 var room: AHHouseRoom
 var room_guards: Array = []
 var busy := false
+## O encontro com o Nick já rodou nesta cena (a guarda do _meet_nick).
+var _nick_met := false
 ## O acampamento encenado (#77): a equipe em volta da fogueira enquanto ele estiver ativo.
 var camp: AHCampScene
 var _room_time := 0.0
@@ -703,10 +705,6 @@ func _meet_nick() -> void:
 	Campaign.save()
 	hud.refresh(Campaign.state)
 	_refresh_security_doors(true)
-
-
-## O encontro com o Nick já rodou nesta cena (a guarda do _meet_nick).
-var _nick_met := false
 
 
 ## A plataforma: o trem chega (o som e o vagão entrando no fosso) e para com as portas abertas.
