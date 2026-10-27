@@ -31,6 +31,7 @@ func run(context) -> void:
 	await _double_skip()
 	await _nobody_back()
 	await _reopen_mid_arrival()
+	await _esc_report()
 	await _rest_unlocks()
 	Tips.enabled = tips
 	if _tree.current_scene != null:
@@ -112,7 +113,32 @@ func _walk_and_wounded() -> void:
 		pace[arrival.hero_id] = arrival.speed
 	t.check(pace[heroes[1]] < pace[heroes[0]], "quem está ferido anda mais devagar (%.2f contra %.2f m/s)" % [pace[heroes[1]], pace[heroes[0]]])
 	t.check(await _until(func(): return hud.current == "report", 30.0), "sem pular, o relatório abre com todos na fila")
-	t.equal(station.lineup.map(func(e): return e.hero_id), alive, "a fila do relatório é a de quem desceu")
+	# A fila na ordem da formação (#131): a posição 1 (a frente) à direita, como na Preparação e na luta.
+	t.equal(station.lineup.map(func(e): return e.hero_id), AHStationReport.scene_order(alive), "a fila do relatório é a de quem desceu, na ordem da formação")
+	var xs: Array = station.lineup.map(func(e): return e.card.position.x)
+	t.check(xs[xs.size() - 1] == xs.max() and station.lineup[-1].hero_id == heroes[0], "a posição 1 fica à direita (%s)" % [xs])
+	var cards: Dictionary = hud._report_screen.card_centers() if is_instance_valid(hud._report_screen) else {}
+	t.check(not cards.is_empty() and cards[heroes[0]] > cards[heroes[1]], "e a carta dela também")
+	# Concluído o relatório, a fila sai andando (#131): ninguém aparece no cômodo antes de sair da câmera.
+	var leaving_ids: Array = station.lineup.map(func(e): return e.hero_id)
+	hud._enter_shelter_then(Callable())
+	await _frames(2)
+	t.check(station.lineup_leaving() and station.lineup.is_empty(), "a fila sai andando, em vez de sumir")
+	t.check(leaving_ids.all(func(id): return not station.residents.has(id) or not station.residents[id].visible), "quem está saindo ainda não aparece no cômodo")
+	var first: Dictionary = station._leaving[0]
+	t.equal(first.hero_id, heroes[0], "a frente sai primeiro")
+	var start_x: float = first.card.position.x
+	await _frames(20)
+	t.check(not is_instance_valid(first.card) or first.card.position.x > start_x, "andando para a direita, para a porta")
+	# A Sala aberta e fechada no meio da saída não traz ninguém para o cômodo antes da hora.
+	hud.open_room(S.CHARACTERS)
+	await _frames(3)
+	hud.close_panel()
+	await _frames(3)
+	var early: Array = station._leaving.map(func(e): return e.hero_id).filter(func(id): return station.residents.has(id) and station.residents[id].visible)
+	t.equal(early, [], "fechando a Sala no meio da saída, quem anda na plataforma não aparece no cômodo")
+	t.check(await _until(func(): return not station.lineup_leaving(), 20.0), "e todos saem da plataforma")
+	t.check(leaving_ids.all(func(id): return not station.residents.has(id) or station.residents[id].visible), "fora da câmera, cada um volta ao seu cômodo")
 
 
 func _descending(values: Array) -> bool:
@@ -200,6 +226,7 @@ func _tip_open() -> void:
 	Tips.enabled = false
 	t.check(await _until(func(): return hud.current == "report", 30.0), "e o relatório abre")
 	hud._enter_shelter_then(Callable())
+	await _until(func(): return not station.lineup_leaving(), 20.0)
 	await _frames(3)
 	var hidden: Array = station.residents.keys().filter(func(id): return not station.residents[id].visible)
 	t.equal(hidden, [], "ninguém some dos cômodos")
@@ -234,6 +261,24 @@ func _reopen_mid_arrival() -> void:
 	t.check(await _until(func(): return station.hud.current == "report", 30.0), "e chega ao relatório (a Estação não trava)")
 
 
+## Voltar (Esc) no relatório conclui como Entrar no abrigo (#131): a fila sai andando e o relatório fica visto.
+func _esc_report() -> void:
+	var station := await _open(_returned())
+	if station == null:
+		return
+	var hud: AHRefugeHud = station.hud
+	station.finish_team_arrival()
+	await _until(func(): return hud.current == "report", 5.0)
+	await _until(func(): return false, AHRefugeHud.REPORT_GUARD_MS / 1000.0 + 0.1)
+	var back := InputEventAction.new()
+	back.action = "ui_cancel"
+	back.pressed = true
+	hud._unhandled_input(back)
+	await _frames(2)
+	t.check(Campaign.state.station.last_return.get("seen", false), "Voltar no relatório deixa o relatório visto")
+	t.check(station.lineup_leaving() and station.lineup.is_empty(), "e a fila sai andando, em vez de sumir")
+
+
 ## Depois do relatório: a vista geral, Preparar expedição bloqueado com o motivo; passada a noite, liberado.
 func _rest_unlocks() -> void:
 	var station := await _open(_returned())
@@ -243,7 +288,8 @@ func _rest_unlocks() -> void:
 	station.finish_team_arrival()
 	await _until(func(): return hud.current == "report", 5.0)
 	hud._enter_shelter_then(Callable())
-	await _frames(3)
+	# A fila sai andando (#131) e só então a câmera desce à vista geral.
+	await _until(func(): return not station.on_platform, 10.0)
 	t.equal(hud.current, "", "concluído o relatório, a vista geral")
 	var blocked: Button = hud.find_child("PrepareBlocked", true, false)
 	t.check(blocked != null and blocked.disabled, "Preparar expedição bloqueado com a noite pendente")
@@ -254,7 +300,7 @@ func _rest_unlocks() -> void:
 	for size in [0, 2]:
 		Settings.set_text_size(size)
 		hud.refresh()
-		await _until(func(): return hud._rest_tag.visible and not station.passage_moving(), 15.0)
+		await _until(func(): return hud._rest_tag.visible and not station.on_platform and not station.passage_moving() and station.camera_settled(), 15.0)
 		await _frames(30)
 		var menu: Rect2 = hud._menu.get_global_rect()
 		var tag: Rect2 = hud._rest_tag.get_global_rect()
