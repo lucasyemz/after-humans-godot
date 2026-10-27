@@ -44,7 +44,8 @@ func _map(i: int) -> void:
 	c.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
 	S.confirm_departure(c, c.preferred_formation.duplicate(), 0, 4242, spec[1], "")
 	var route: Dictionary = c.session.expedition.corridor
-	for step in int(spec[2]):
+	# Os trechos vencidos (nenhuma patrulha encostada na equipe na chegada), menos o guardião.
+	for step in route.steps.size() - 1:
 		route.steps[step].resolved = true
 	route.index = int(spec[2])
 	campaign.state = c

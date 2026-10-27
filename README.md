@@ -104,8 +104,8 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - Em toda tela (mapa de fases, Preparação, cômodos, relatório, noite, trem, Opções, pausa, Mochila, luta) dá para jogar
     só com o teclado ou o controle: as setas (ou o direcional) andam entre os botões, E, Enter ou A confirma e
     Backspace, Esc ou B volta. As teclas desenhadas na tela seguem as trocas das Opções. As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo. Com tela de toque aparecem um analógico (andar; até a borda corre) e o botão Usar; Opções > Controles de toque liga sempre ou desliga.
-  - F1 abre a barra de Admin, só na build de teste ou com `--admin` (#130). Em Ajustes ficam a chuva, o dia e a noite, o
-    pós-processamento, as caixas de colisão, o contador de quadros e a próxima patrulha.
+  - F1 abre a barra de Admin, só na build de teste ou com `--admin` (#130): a chuva e o dia e a noite em Clima; o
+    pós-processamento, as caixas de colisão e o contador de quadros em Ajustes; a próxima patrulha em Testes de combate.
   - R (ou X) abre a Formação (#129): clique em dois heróis (ou as setas e E) para trocá-los de lugar na fila e na próxima
     luta.
   - I abre a Mochila (comida, curativo e a Ampola de Reparo do sapo; na luta, no herói da vez).

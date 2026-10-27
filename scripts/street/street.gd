@@ -747,7 +747,9 @@ func _update_camera(delta: float) -> void:
 		# Dentro da loja, a câmera desce para ficar abaixo do forro e enquadra a sala.
 		# Vai até perto das paredes do lado (elas tapam o que fica fora da sala): na frente da sala a câmera vê só ~3,5 m
 		# para cada lado, e com a folga maior a equipe saía do quadro nas pontas.
-		target = Vector3(clampf(leader.x, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN),
+		# Com a câmera mais perto (#129), o centro fica entre o líder e o último da fila: a equipe inteira no quadro.
+		var middle: float = leader.x if _heroes.is_empty() else (leader.x + _heroes[-1].position.x) * 0.5
+		target = Vector3(clampf(middle, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN),
 			EXPLORE_CAMERA.indoor.height, -1.2)
 		pitch = deg_to_rad(4.0)
 		distance = EXPLORE_CAMERA.indoor.distance

@@ -24,6 +24,7 @@ func run(context) -> void:
 	await _formation()
 	await _camera("fase_1")
 	await _camera("fase_2")
+	await _camera("fase_1", true)
 	Tips.enabled = tips
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
@@ -117,6 +118,15 @@ func _formation() -> void:
 	t.check(not corridor.can_open_formation(), "na luta, a formação não abre")
 	await _action("formation")
 	t.check(not hud.formation_open(), "nem pela tecla")
+	# O X do controle é também o Defender: na luta, ele defende (a formação não come o botão).
+	if arena.hud.waiting:
+		for pressed in [true, false]:
+			var pad := InputEventJoypadButton.new()
+			pad.button_index = JOY_BUTTON_X
+			pad.pressed = pressed
+			Input.parse_input_event(pad)
+			await _frames(2)
+		t.check(await _until(func(): return not arena.hud.waiting, 3.0), "na luta, o X do controle defende")
 	for unit in arena.session.state.enemy_team:
 		unit.hp = 1
 	arena.auto_battle = true
@@ -131,19 +141,38 @@ func _formation() -> void:
 	hud.show_inventory()
 	t.check(not corridor.can_open_formation(), "com a Mochila aberta, não")
 	hud.close_modal()
+	# O clique em MOCHILA ou MENU com a formação aberta fecha a formação antes de abrir o painel.
+	for button in [hud._bag_button, hud._menu_button]:
+		await _action("formation")
+		t.check(hud.formation_open(), "a formação abre de novo")
+		button.pressed.emit()
+		await _frames(3)
+		t.check(not hud.formation_open() and hud.modal_open(), "o clique em %s fecha a formação e abre o painel" % button.name)
+		hud.close_modal()
+		await _frames(2)
 
 
 ## A câmera da exploração: os valores num lugar só, a equipe inteira na tela e os pés acima das plaquinhas.
-func _camera(phase_id: String) -> void:
+func _camera(phase_id: String, house: bool = false) -> void:
 	var c := Campaign.create_initial(52)
 	c.completed_phases = ["fase_1"]
 	J.start_expedition(c, phase_id, 52)
 	var street = await _open(c)
 	if not t.check(street != null, "%s abre" % phase_id):
 		return
+	if house:
+		# Dentro da primeira loja aberta, na entrada (a fila ainda atrás do líder, perto da parede).
+		var route: Dictionary = Campaign.state.session.expedition.corridor
+		var site: int = route.sites.map(func(s): return not s.locked).find(true)
+		route.index = int(route.sites[site].step)
+		for i in route.index:
+			route.steps[i].resolved = true
+		route.sites[site].has_enemy = false
+		await street.corridor._enter_house(site)
+		phase_id += " (dentro da loja)"
 	await _frames(30)
 	var camera: Camera3D = street.get_viewport().get_camera_3d()
-	var key := "street" if street.scenario == null else "scenario"
+	var key := "indoor" if house else ("street" if street.scenario == null else "scenario")
 	var spec: Dictionary = street.EXPLORE_CAMERA[key]
 	var to_leader := camera.global_position.distance_to(street._leader.global_position)
 	t.check(to_leader < float(spec.distance) + 3.0, "%s: a câmera a uns %.1f m da equipe (antes, 18,5 ou 19)" % [phase_id, to_leader])
