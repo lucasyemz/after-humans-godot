@@ -109,6 +109,10 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	street.apply_corridor_weather(route.weather)
 	_spawn_guards()
 	_spawn_props()
+	# O trem do tutorial só aparece quando chega (com o trecho dele resolvido, já parado na plataforma).
+	if street.scenario and not street.scenario.train.is_empty():
+		var last: Dictionary = route.steps[route.steps.size() - 1]
+		street.scenario.park_train(last.type == "train" and last.resolved)
 	_refresh_doors()
 	if route.current_house >= 0:
 		_open_room(route.current_house)
@@ -679,9 +683,11 @@ func _refresh_security_doors(sound: bool = false) -> void:
 		done = done and route.steps[step].resolved
 	for index in street.scenario.doors_of(part.zone, "entry"):
 		street.scenario.set_door(index, false)
+	# O painel da sala das celas: a alavanca embaixo, depois que as portas baixaram atrás da equipe.
+	street.scenario.set_panel_down(part.zone >= int(street.scenario.door_panel.get("zone", 0)))
 	for index in street.scenario.doors_of(part.zone, "exit"):
 		if sound and done and not street.scenario.door_open(index):
-			Sound.play("res://audio/world/door_open.ogg")
+			Sound.play("res://audio/world/security_door_open.ogg")
 		street.scenario.set_door(index, done)
 
 
@@ -712,9 +718,15 @@ func _board_train() -> void:
 		return
 	busy = true
 	Sound.play("res://audio/station/train_bell.ogg")
+	var team: Array = Campaign.state.session.expedition.team.duplicate()
 	AHTutorial.finish(Campaign.state)
 	Campaign.save()
-	GameFlow.travel("station")
+	# A passagem do vagão (#75): a equipe sentada no metrô até o título da Estação.
+	var card: Dictionary = GameFlow.card_for("station")
+	card.backdrop = AHWagonRide.new(team)
+	card.title_delay = AHWagonRide.RIDE_SECONDS
+	card.hold = AHWagonRide.RIDE_SECONDS + GameFlow.CARD_SECONDS
+	GameFlow.travel("station", card)
 
 
 ## Onde fica, no mundo, a marca de cada coisa usável: a porta da loja, os caixotes, os props e as portas dos cenários.
@@ -831,6 +843,10 @@ func open_menu() -> void:
 		return
 	var session: Dictionary = Campaign.state.session
 	if not AHExplorationHud.session_open(Campaign.state):
+		return
+	if tutorial():
+		# Na abertura a volta é o trem: o menu fica com as Opções e a campanha nova.
+		hud.show_menu(false, false, tr("Na abertura, a saída é o trem da plataforma."))
 		return
 	hud.show_menu(session.expedition.objective_completed, session.get("event") == null and ["corridor", "rest"].has(session.get("screen")))
 
@@ -949,6 +965,9 @@ func _force_house(site_index: int) -> void:
 
 
 func _retreat() -> void:
+	# No tutorial não há retirada: a saída é o trem.
+	if tutorial():
+		return
 	# Com a carga do guardião na tela, só sai depois de escolher e fechar (a carga não se perde).
 	if busy or AHFightRewards.cargo_pending(Campaign.state):
 		return
@@ -1256,6 +1275,7 @@ func debug_next_fight() -> bool:
 			return true
 		# O encontro do tutorial resolve ali (o Nick entra); o trem para a caminhada.
 		if outcome == "nick":
+			_enter_segment(_segment_of(route.index), _step_x(route.index, ARRIVAL_SPOT))
 			_meet_nick()
 		elif outcome == "train":
 			Campaign.save()

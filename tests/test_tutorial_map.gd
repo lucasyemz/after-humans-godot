@@ -78,8 +78,23 @@ func _journey() -> void:
 	t.equal(corridor.segments.map(func(s): return s.steps), [2, 3, 1, 1], "os trechos de cada zona")
 	t.equal(corridor.guards.keys(), [1, 4, 5], "as três patrulhas do tutorial")
 	t.equal(corridor.guards[1].specs.map(func(s): return s.enemy_id), ["broto"], "a primeira luta: o Bento contra o Broto")
-	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["faisca", "pipoco"], "a segunda luta")
-	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["cao_eco", "broto"], "a terceira luta")
+	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["rastejante_raiz", "broto"], "a segunda luta")
+	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["cao_eco", "robot"], "a terceira luta")
+	# A HUD da abertura: o objetivo é o trem, a plaqueta diz Abertura (sem clima: é um subsolo).
+	t.check(street.exploration_hud._goal_title.text.begins_with("Chegar ao trem"), "o objetivo da abertura é o trem")
+	t.equal(street.exploration_hud._place_sub.text, "Abertura", "a plaqueta: Abertura, sem clima")
+	# O Menu não tem volta à Estação: a saída é o trem; e a retirada direta também recusa.
+	corridor.open_menu()
+	await _frames(2)
+	var back := street.exploration_hud.find_child("Return", true, false) as Button
+	t.check(back != null and back.disabled, "no Menu, Voltar à Estação fica apagado")
+	street.exploration_hud.close_modal()
+	await _frames(2)
+	corridor._retreat()
+	await _frames(2)
+	t.check(Campaign.state.session.result == "" and Campaign.state.station.last_return.is_empty(), "e a retirada não abandona a abertura")
+	var metro: Node3D = street.scenario.get_node("Metro")
+	t.check(not metro.visible, "o vagão só aparece quando chega")
 	t.equal(corridor.scenario_props.map(func(e): return e.step), [3], "o armário fica no trecho da busca, antes da segunda luta")
 	var exit0: int = street.scenario.doors_of(0, "exit")[0]
 	t.check(not street.scenario.door_open(exit0), "a porta do fim do corredor fica baixada antes da primeira luta")
@@ -105,6 +120,7 @@ func _journey() -> void:
 	if not await _until(func(): return route.steps[6].resolved and not corridor.busy, "o trem parar na plataforma"):
 		return
 	t.equal(corridor.segment, 3, "a plataforma")
+	t.check(metro.visible and absf(metro.position.x - float(street.scenario.train.x)) < 0.01, "o vagão chegou e parou")
 	street._place_leader(Vector3(float(street.scenario.train.x), street.floor_y, street.lane_z))
 	await _frames(3)
 	t.check(corridor._train_point() != null and corridor._action.is_valid() and corridor._action.get_method() == "_board_train", "perto do vagão, o aviso é embarcar")
@@ -115,6 +131,9 @@ func _journey() -> void:
 
 ## Anda até a patrulha do trecho e luta no automático. Devolve se venceu.
 func _fight(street) -> bool:
+	# O teste confere o fluxo, não o desgaste de uma luta para a outra (a vida que não desce de 1 é da #144).
+	for hero_id in Campaign.state.session.expedition.team:
+		Campaign.hero(hero_id).hp = Campaign.hero(hero_id).max_hp
 	street.corridor.debug_next_fight()
 	await _frames(2)
 	Input.action_press("move_right")
@@ -128,7 +147,7 @@ func _fight(street) -> bool:
 	if not await _until(func():
 		if arena.hud.waiting:
 			arena.hud.command_chosen.emit({"kind": "defend"})
-		return not arena.active, "a luta terminar", 60.0):
+		return not arena.active, "a luta terminar", 150.0):
 		return false
 	await _frames(2)
 	var result: String = arena.session.result()

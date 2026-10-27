@@ -200,7 +200,7 @@ func _ready() -> void:
 	occlusion.scan.call_deferred(_dynamic)
 	for card in _heroes:
 		occlusion.track(card)
-	if scenario and ["FloodedDepot", "SewerDucts"].has(scenario.map_name):
+	if scenario and ["FloodedDepot", "SewerDucts", "ContainmentCorridor"].has(scenario.map_name):
 		# Lanterna de mão no Depósito e nos Dutos (a da Unreal: 160 lm, 10 m, presa ao líder, um pouco à frente).
 		var lantern := OmniLight3D.new()
 		lantern.position = Vector3(0, 0.8, 0.5)

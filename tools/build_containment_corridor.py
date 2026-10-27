@@ -116,10 +116,10 @@ def build():
     m = Map()
     final_walls = has('T_TU01')
     wall = m.material('wall', {'kind': 'art', 'two_sided': True, 'masked': False, 'albedo': art('T_TU01')} if final_walls
-                      else surface('T_SH_rough_concrete_base_color', 'T_SH_rough_concrete_normal', [0.24, 0.23, 0.22], 160.0))
+                      else surface('T_SH_rough_concrete_base_color', 'T_SH_rough_concrete_normal', [0.34, 0.32, 0.3], 160.0))
     concrete = m.material('concrete', surface('T_SH_rough_concrete_base_color', 'T_SH_rough_concrete_normal', [0.16, 0.15, 0.15], 160.0))
     floor = m.material('floor', surface('T_TU02', '', [0.42, 0.42, 0.42], 200.0, 0.8) if has('T_TU02')
-                       else surface('T_SH_rough_concrete_base_color', 'T_SH_rough_concrete_normal', [0.2, 0.19, 0.18], 123.0, 0.8))
+                       else surface('T_SH_rough_concrete_base_color', 'T_SH_rough_concrete_normal', [0.28, 0.27, 0.25], 123.0, 0.8))
     platform_floor = m.material('platform_floor', {'kind': 'art', 'two_sided': True, 'masked': False, 'albedo': art('T_TU09')} if has('T_TU09')
                                 else surface('T_SH_metal_plate_base_color', 'T_SH_metal_plate_normal', [0.32, 0.31, 0.28], 150.0))
     tile_wall = m.material('tile_wall', {'kind': 'art', 'two_sided': True, 'masked': False, 'albedo': art('T_TU03')} if has('T_TU03')
@@ -140,7 +140,14 @@ def build():
                           'tint': RED + [1.0]})
     barrier = m.material('barrier', cutout('T_PT09'))
 
+    def own(material, zone):
+        """O material só desta zona: a junção das peças (scenario_world._merge) fica por zona, e cada malha junta recebe
+        as luzes da zona dela (no Compatibility, cada objeto pega no máximo 8 luzes; o mapa inteiro numa malha ficava
+        escuro longe das primeiras)."""
+        return m.material('%d-%d' % (material, ZONES.index(zone)), dict(m.materials[material]))
+
     def room(zone, back_material, depth_back=BACK_Z, with_floor=True):
+        floor_here, concrete_here, back_here = own(floor, zone), own(concrete, zone), own(back_material, zone)
         x0, x1 = zone['x0'], zone['x1']
         length = x1 - x0
         middle = (x0 + x1) * 0.5
@@ -149,19 +156,19 @@ def build():
         deep = front - back
         center_z = (front + back) * 0.5
         if with_floor:
-            m.box(floor, [middle, -0.2, center_z], [length + 0.8, 0.4, deep])
-        m.box(concrete, [middle, HEIGHT + 0.2, center_z], [length + 0.8, 0.4, deep], solid=False)
-        m.box(concrete, [x0 - 0.2, HEIGHT * 0.5, center_z], [0.4, HEIGHT, deep])
-        m.box(concrete, [x1 + 0.2, HEIGHT * 0.5, center_z], [0.4, HEIGHT, deep])
+            m.box(floor_here, [middle, -0.2, center_z], [length + 0.8, 0.4, deep])
+        m.box(concrete_here, [middle, HEIGHT + 0.2, center_z], [length + 0.8, 0.4, deep], solid=False)
+        m.box(concrete_here, [x0 - 0.2, HEIGHT * 0.5, center_z], [0.4, HEIGHT, deep])
+        m.box(concrete_here, [x1 + 0.2, HEIGHT * 0.5, center_z], [0.4, HEIGHT, deep])
         if final_walls and back_material == wall:
             # A parede pintada (8,2 x 4,58 m) se repete na horizontal, cortada pelo pé-direito.
             x = x0
             while x < x1:
                 width = min(8.2, x1 - x)
-                m.box(wall, [x + width * 0.5, 2.29, depth_back - 0.2], [width, 4.58, 0.4])
+                m.box(back_here, [x + width * 0.5, 2.29, depth_back - 0.2], [width, 4.58, 0.4])
                 x += 8.2
         else:
-            m.box(back_material, [middle, HEIGHT * 0.5, depth_back - 0.2], [length + 0.4, HEIGHT, 0.4])
+            m.box(back_here, [middle, HEIGHT * 0.5, depth_back - 0.2], [length + 0.4, HEIGHT, 0.4])
 
     # As paredes grossas entre as zonas (o que a câmera vê além das pontas).
     for left, right in zip(ZONES, ZONES[1:]):
@@ -171,13 +178,23 @@ def build():
     for zone in ZONES[:3]:
         room(zone, wall)
 
+    # A caixa fechada do subsolo: além das pontas, acima do teto e atrás de tudo, só concreto (a câmera nunca vê céu).
+    span = (ZONES[0]['x0'] - 30.0, ZONES[-1]['x1'] + 30.0)
+    m.box(concrete, [(span[0] + span[1]) * 0.5, HEIGHT + 6.0, (PLATFORM_WALL_Z + LANE[1]) * 0.5 - 0.2],
+          [span[1] - span[0], 11.6, LANE[1] - PLATFORM_WALL_Z + 0.4], solid=False, shadow=False)
+    m.box(concrete, [(span[0] + span[1]) * 0.5, 2.0, PLATFORM_WALL_Z - 0.6], [span[1] - span[0], 24.0, 0.8], solid=False, shadow=False)
+    m.box(concrete, [(span[0] + ZONES[0]['x0'] - 0.4) * 0.5, 2.0, (PLATFORM_WALL_Z + LANE[1]) * 0.5],
+          [ZONES[0]['x0'] - 0.4 - span[0], 24.0, LANE[1] - PLATFORM_WALL_Z + 0.8], solid=False, shadow=False)
+    m.box(concrete, [(ZONES[-1]['x1'] + 0.4 + span[1]) * 0.5, 2.0, (PLATFORM_WALL_Z + LANE[1]) * 0.5],
+          [span[1] - ZONES[-1]['x1'] - 0.4, 24.0, LANE[1] - PLATFORM_WALL_Z + 0.8], solid=False, shadow=False)
+
     # A plataforma: o piso de andar na frente, o fosso (mais baixo) e a parede de azulejo no fundo.
     p = ZONES[3]
     room(p, tile_wall, PLATFORM_WALL_Z, with_floor=False)
     length = p['x1'] - p['x0']
     middle = (p['x0'] + p['x1']) * 0.5
-    m.box(platform_floor, [middle, -0.2, (LANE[0] + LANE[1] + 0.8) * 0.5], [length + 0.8, 0.4, LANE[1] - LANE[0] + 0.8])
-    m.box(concrete, [middle, -1.4, (PIT_Z[0] + PIT_Z[1]) * 0.5], [length + 0.8, 0.4, PIT_Z[1] - PIT_Z[0]], solid=False)
+    m.box(own(platform_floor, p), [middle, -0.2, (LANE[0] + LANE[1] + 0.8) * 0.5], [length + 0.8, 0.4, LANE[1] - LANE[0] + 0.8])
+    m.box(own(concrete, p), [middle, -1.4, (PIT_Z[0] + PIT_Z[1]) * 0.5], [length + 0.8, 0.4, PIT_Z[1] - PIT_Z[0]], solid=False)
 
     def door_at(x, zone_index, role):
         part = m.card(door, [x, 1.475 + 0.02, BACK_Z + 0.04], 2.4, 2.95)
@@ -196,6 +213,14 @@ def build():
         phase = round((index * 0.37) % 1.0, 3)
         m.parts[part]['blink'] = {'phase': phase, 'off': lamp_off}
         m.light([x, 2.7, BACK_Z + 0.9], RED, 900.0, 6.0, shadows=index % 3 == 0, blink={'phase': phase})
+
+    # A luz de serviço que sobrou: fraca e fria, no teto de cada zona, para o piso e as paredes lerem entre as lâmpadas
+    # vermelhas (o "ambiente baixo" da página: a contenção é escura, mas o caminho se vê).
+    for zone in ZONES:
+        x = zone['x0'] + 3.0
+        while x < zone['x1'] - 1.0:
+            m.light([x, HEIGHT - 0.4, 0.2], [0.78, 0.82, 0.9], 420.0, 9.0)
+            x += 6.0
 
     # Zona 0: as raízes entrando pelas frestas e a barreira de perigo.
     m.card(roots, [6.0, 0.4, BACK_Z + 0.35], 2.4, 0.8)
