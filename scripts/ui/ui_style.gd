@@ -47,6 +47,9 @@ static func px(size: int) -> int:
 
 static var _fonts := {}
 static var _portraits := {}
+## A caixa da cara de quem não tem retrato (#193), pelo arquivo da pose parada: [x, y, lado] em pixels do canvas.
+const FACE_BOXES := "res://data/presentation/face_boxes.json"
+static var _face_boxes := {}
 static var _circle: Shader
 
 
@@ -426,6 +429,26 @@ static func set_ring(rect: TextureRect, ring: Color) -> void:
 		rect.material.set_shader_parameter("ring", ring)
 
 
+## A caixa da cara da pose (#193): [x, y, lado] em pixels do canvas (no quadro, nas folhas), ou [] sem ela. Vem de
+## data/presentation/face_boxes.json (os inimigos, pelo id da arte) ou da portrait_uv do morador (civilians.json): o
+## retângulo do rosto vira o quadrado do lado maior, no mesmo centro.
+static func face_box(art: Dictionary) -> Array:
+	if art.has("portrait_uv"):
+		var uv: Array = art.portrait_uv
+		var canvas := Vector2(art.canvas[0], art.canvas[1])
+		var rect := Rect2(Vector2(uv[0], uv[1]) * canvas, Vector2(float(uv[2]) - float(uv[0]), float(uv[3]) - float(uv[1])) * canvas)
+		var side := maxf(rect.size.x, rect.size.y)
+		var center := rect.get_center()
+		return [center.x - side * 0.5, maxf(0.0, center.y - side * 0.5), side]
+	if _face_boxes.is_empty():
+		var boxes = JSON.parse_string(FileAccess.get_file_as_string(FACE_BOXES)) if FileAccess.file_exists(FACE_BOXES) else {}
+		for enemy_id in boxes.get("enemies", {}):
+			var idle: Dictionary = AHCombatArena.enemy_art_of(enemy_id).get("idle", {})
+			if idle.has("file"):
+				_face_boxes[idle.file] = boxes.enemies[enemy_id]
+	return _face_boxes.get(String(art.get("file", "")), [])
+
+
 ## O retrato que sai com menos que isso de pixels opacos está vazio (o recorte caiu fora do corpo).
 const FACE_MIN_OPAQUE := 0.08
 
@@ -469,15 +492,21 @@ static func face_texture(art: Dictionary) -> Texture2D:
 		scale = float(image.get_width()) / canvas.x
 	var body: float = float(art.body_reference_pixels)
 	var anchor := Vector2(art.anchor[0], art.anchor[1])
-	# A cabeça: o terço de cima do corpo, um quadrado centrado no pé (as artes de perfil ficam bem com isso).
-	var side := body * 0.42
-	var top := anchor.y - body - side * 0.12
-	var region := Rect2(origin + Vector2(anchor.x - side * 0.5, top) * scale, Vector2(side, side) * scale)
+	var box := face_box(art)
+	var region: Rect2
+	if not box.is_empty():
+		# A caixa da cara nos dados (data/presentation/face_boxes.json; nos moradores, a portrait_uv de civilians.json).
+		region = Rect2(origin + Vector2(box[0], box[1]) * scale, Vector2(box[2], box[2]) * scale)
+	else:
+		# Sem caixa, a reserva: o terço de cima do corpo, um quadrado centrado no pé (as artes de perfil ficam bem).
+		var side := body * 0.42
+		var top := anchor.y - body - side * 0.12
+		region = Rect2(origin + Vector2(anchor.x - side * 0.5, top) * scale, Vector2(side, side) * scale)
 	region = region.intersection(Rect2(Vector2.ZERO, image.get_size()))
 	var face := image.get_region(Rect2i(region))
-	# As artes deitadas (o Rastejante de Cabos) não têm a cabeça no terço de cima: o recorte quase vazio vira o
-	# quadrado em volta do corpo inteiro (a parte opaca do quadro).
-	if opaque_share(face) < FACE_MIN_OPAQUE:
+	# As artes deitadas sem caixa não têm a cabeça no terço de cima: o recorte quase vazio vira o quadrado em volta do
+	# corpo inteiro (a parte opaca do quadro).
+	if box.is_empty() and opaque_share(face) < FACE_MIN_OPAQUE:
 		var frame := image.get_region(Rect2i(Rect2(origin, canvas * scale).intersection(Rect2(Vector2.ZERO, image.get_size()))))
 		var used := frame.get_used_rect()
 		if used.size.x > 0 and used.size.y > 0:
