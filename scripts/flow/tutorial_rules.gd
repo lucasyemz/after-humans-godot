@@ -1,4 +1,5 @@
-## O tutorial da abertura (#144) no Corredor de Contenção (#147): a jornada curta do Bento e do Nick até o trem, como
+## O tutorial da abertura (#144) no Corredor de Contenção (#147): a jornada curta do Bento, da Íris e da Véspera até o
+## trem, com o Nick, que chega no aperto (docs/narrative/bento-nick-arc.md §3 e §26), como
 ## uma expedição de fase "tutorial" que a rua joga com o mesmo corredor. Sem cena: lê data/tutorial.json (as linhas pelo
 ## Name) e mexe no estado da campanha, como o AHJourneyRules.
 ##   journey: o mapa, o lugar dos eventos, o clima, os trechos (Steps, um por tipo), quantos trechos ficam em cada zona

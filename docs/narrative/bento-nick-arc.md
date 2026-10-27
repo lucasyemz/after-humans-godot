@@ -116,6 +116,10 @@ Seu problema não é realmente:
 
 # 3. O primeiro encontro
 
+> **No jogo hoje (decisão do Lucas, 27/10):** a abertura jogável (o tutorial) segue esta cena com a **Véspera no lugar
+> da Amora**, que ainda não está no jogo. A Amora entra depois, com arte própria (`review.md`, "Decisão do Lucas
+> (27/10)").
+
 Bento sai da Estação em uma missão de abastecimento acompanhado de **Íris e Amora**.
 
 O objetivo é simples: encontrar recursos importantes para a comunidade.
@@ -809,7 +813,7 @@ Nenhum dos dois comenta.
 
 ## Ato 1 — A Expedição
 
-Bento, Íris e Amora saem em busca de recursos.
+Bento, Íris e Amora saem em busca de recursos (no tutorial de hoje, a Véspera no lugar da Amora).
 
 Nick observa o grupo de longe.
 
