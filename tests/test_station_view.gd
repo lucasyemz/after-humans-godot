@@ -105,6 +105,14 @@ func _pan(station) -> void:
 	t.equal(station.pan, station.PAN_RANGE.x, "e para a esquerda também")
 	station.set_pan(0.0)
 	await _settle(station)
+	# A borda da tela só empurra depois de o mouse ficar nela um instante (quem passa a caminho do menu não arrasta a vista).
+	hud._edge_time = 0.0
+	t.equal(hud.edge_push(2.0, 1920.0, 0.2), 0.0, "o mouse acabou de encostar na borda: a câmera não anda")
+	t.equal(hud.edge_push(2.0, 1920.0, 0.2), -1.0, "parado na borda, anda para a esquerda")
+	t.equal(hud.edge_push(400.0, 1920.0, 0.2), 0.0, "saindo da borda, para")
+	t.equal(hud.edge_push(1918.0, 1920.0, 0.1), 0.0, "e a outra borda também espera")
+	t.equal(hud.edge_push(1918.0, 1920.0, 0.3), 1.0, "antes de andar para a direita")
+	hud._edge_time = 0.0
 	# Arrastar com o mouse anda a câmera e não abre o cômodo.
 	var rect: Rect2 = hud._room_rects.get(S.CANTEEN, Rect2())
 	var from := rect.get_center()

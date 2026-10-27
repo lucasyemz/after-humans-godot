@@ -28,6 +28,9 @@ const BODY_WIDTH := 530.0
 ## o clique virar arraste (px).
 const PAN_SPEED := 14.0
 const PAN_EDGE := 6.0
+## O mouse precisa ficar este tempo (s) encostado na borda antes de a câmera andar: quem passa por ela a caminho do menu
+## não arrasta a vista.
+const PAN_EDGE_DWELL := 0.35
 const DRAG_START := 12.0
 const ROOM_ICONS := {S.CHARACTERS: "room_quarters", S.CANTEEN: "room_canteen", S.BAR: "room_bar", S.DORMITORY: "bed", S.FORGE: "room_forge",
 	S.DEPOT: "room_depot", S.RESEARCH: "room_research", S.INFIRMARY: "intent-heal", S.PREPARATION: "expeditions", "plan": "plan", "train": "train_arrival",
@@ -85,6 +88,8 @@ var _card_without_lock := false
 var _drag_from := Vector2.INF
 var _drag_pan := 0.0
 var _dragged := false
+## Há quanto tempo (s) o mouse está encostado na borda da tela.
+var _edge_time := 0.0
 var _room_tag_icon: TextureRect
 var _room_tag_label: Label
 var _room_card: PanelContainer
@@ -1056,14 +1061,25 @@ func _pan_overview(delta: float) -> void:
 		return
 	var push := Input.get_axis("station_pan_left", "station_pan_right")
 	var mouse := get_viewport().get_mouse_position()
-	var width := get_viewport().get_visible_rect().size.x
-	if get_viewport().get_visible_rect().has_point(mouse) and DisplayServer.window_is_focused():
-		if mouse.x <= PAN_EDGE:
-			push = -1.0
-		elif mouse.x >= width - PAN_EDGE:
-			push = 1.0
+	var inside: bool = get_viewport().get_visible_rect().has_point(mouse) and DisplayServer.window_is_focused()
+	var edge := edge_push(mouse.x if inside else -INF, get_viewport().get_visible_rect().size.x, delta)
+	if edge != 0.0:
+		push = edge
 	if absf(push) > 0.01:
 		station.set_pan(station.pan + push * PAN_SPEED * delta)
+
+
+## O empurrão da borda (-1, 0 ou 1): o mouse encostado na borda (x; -INF fora da janela) há pelo menos
+## PAN_EDGE_DWELL segundos.
+func edge_push(x: float, width: float, delta: float) -> float:
+	var edge := 0.0
+	if x != -INF:
+		if x <= PAN_EDGE:
+			edge = -1.0
+		elif x >= width - PAN_EDGE:
+			edge = 1.0
+	_edge_time = _edge_time + delta if edge != 0.0 else 0.0
+	return edge if _edge_time >= PAN_EDGE_DWELL else 0.0
 
 
 ## O cartão cresce para cima: com o texto Maior, as linhas do cômodo por recuperar subiam por cima da coluna do menu

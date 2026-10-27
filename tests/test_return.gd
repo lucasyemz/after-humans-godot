@@ -277,6 +277,11 @@ func _esc_report() -> void:
 	await _frames(2)
 	t.check(Campaign.state.station.last_return.get("seen", false), "Voltar no relatório deixa o relatório visto")
 	t.check(station.lineup_leaving() and station.lineup.is_empty(), "e a fila sai andando, em vez de sumir")
+	# Uma chegada nova no meio da saída: quem saía sai de vez, sem carta velha junto da fila nova.
+	var old: Array = station._leaving.map(func(e): return e.card)
+	station.play_team_arrival(Campaign.state.station.last_return.team)
+	t.check(not station.lineup_leaving() and old.all(func(card): return not is_instance_valid(card) or card.is_queued_for_deletion()), "uma chegada nova no meio da saída tira a fila velha")
+	station.finish_team_arrival()
 
 
 ## Depois do relatório: a vista geral, Preparar expedição bloqueado com o motivo; passada a noite, liberado.

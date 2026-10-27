@@ -919,6 +919,10 @@ func train_busy() -> bool:
 ## não muda (reaberto no meio, a volta começa de novo).
 func play_team_arrival(hero_ids: Array) -> void:
 	clear_lineup()
+	# Quem ainda saía da plataforma de uma volta anterior (#131) sai de vez: a carta velha não fica na fila nova.
+	for entry in _leaving.duplicate():
+		_release_leaving(entry)
+	_held_go = []
 	_remove_candidate()
 	_arrivals.clear()
 	# Na ordem da formação, a posição 1 à direita (#131).
