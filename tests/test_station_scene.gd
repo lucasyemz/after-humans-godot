@@ -68,6 +68,14 @@ func run(t) -> void:
 		var risco: String = S.recruit(c, "rato", RandomNumberGenerator.new(), "Risco").hero_id
 		var rex: String = S.recruit(c, "cao", RandomNumberGenerator.new(), "Rex").hero_id
 		S.hero(c, "hero_cao_bento").alive = false
+		# A equipe só sobe para a plataforma com o trem parado (#122).
+		var end := Time.get_ticks_msec() + 30000
+		while station.train_busy() and Time.get_ticks_msec() < end:
+			await tree.process_frame
+		# O debriefing da volta (#88) abriu na espera: fechado, como o jogador faria.
+		if station.hud.briefing_open():
+			station.hud.briefing.skip()
+			await tree.process_frame
 		station.hud._draft = {}
 		station.hud.open_departure()
 		station.hud._briefed = station.hud._draft.phase

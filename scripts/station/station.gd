@@ -1059,6 +1059,10 @@ func _remove_candidate() -> void:
 
 func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	var art: Dictionary = _civilian_art.get(_candidate_id, {})
+	# O animal do trem (#122): a arte de luta da classe, na variação dele.
+	var recruit: Dictionary = S.train_recruit(Campaign.state)
+	if art.is_empty() and not recruit.is_empty() and Campaign.state.station.train.candidate_id == _candidate_id:
+		art = AHCombatArena.hero_art_of(_candidate_id, String(recruit.art_variant)).get("idle", {})
 	if art.is_empty():
 		return null
 	_candidate = AHSpriteCard.new()
