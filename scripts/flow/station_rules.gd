@@ -1265,7 +1265,7 @@ static func abandon_to_refuge(campaign: Dictionary) -> bool:
 			continue
 		entry.hp = entry.max_hp
 		entry.instinct = 0
-	admit_fallen(campaign, fell)
+	admit_fallen(campaign, fell, expedition.get("carried", []) if expedition != null else [])
 	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
 	return true
 
@@ -1392,7 +1392,9 @@ static func _fill_beds(campaign: Dictionary) -> void:
 
 ## Os caídos de uma expedição chegam à Estação: vivos, com a vida baixa e os dias de recuperação. Devolve
 ## [{hero_id, days, bed}] para o relatório.
-static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
+## carried (#179): os que a equipe levantou e carregou; chegam com uma parte dos dias (recovery.json, carried: Factor, para
+## cima, no mínimo 1), na cama ou no Dormitório.
+static func admit_fallen(campaign: Dictionary, hero_ids: Array, carried: Array = []) -> Array:
 	var rule := recovery_rule("fallen")
 	for hero_id in hero_ids:
 		var entry = hero(campaign, hero_id)
@@ -1406,11 +1408,16 @@ static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
 		entry.post = ""
 		entry.recovery_treated = -1
 	_fill_beds(campaign)
+	var factor := float(recovery_rule("carried").get("Factor", 1.0))
 	var out: Array = []
 	for hero_id in hero_ids:
 		var entry = hero(campaign, hero_id)
-		if entry != null:
-			out.append({"hero_id": hero_id, "days": recovery_days(entry), "bed": in_bed(entry)})
+		if entry == null:
+			continue
+		var lifted := carried.has(hero_id)
+		if lifted:
+			entry.recovery_days = maxi(1, ceili(recovery_days(entry) * factor))
+		out.append({"hero_id": hero_id, "days": recovery_days(entry), "bed": in_bed(entry), "carried": lifted})
 	return out
 
 
@@ -1659,7 +1666,8 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	delivered.posts = run_posts(campaign, expedition.team)
 	for post in delivered.posts:
 		delivered.recovered.append_array(post.recovered)
-	delivered.fallen = admit_fallen(campaign, expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive))
+	delivered.fallen = admit_fallen(campaign, expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive),
+		expedition.get("carried", []))
 	delivered.cycle = campaign.station.last_cycle.duplicate()
 	# O trem da volta (#122): quem chegou, ou ninguém; o relatório diz.
 	delivered.train = train_candidate_name(campaign) if train_on_return(campaign, expedition.id) else ""

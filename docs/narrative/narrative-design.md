@@ -365,8 +365,10 @@ Formas de retorno:
 
 Evitar escolhas que parecem importantes mas nunca reaparecem.
 
-**Ninguém morre (#118):** quem cai numa luta não morre. A equipe o carrega de volta, e ele se recupera na Estação, na
-Enfermaria (o antigo posto de primeiros socorros, #121) ou no Dormitório. A queda pesa pelo tempo fora e pelo achado
+**Ninguém morre (#118):** quem cai numa luta não morre. Ele fica no chão, no lugar da luta, e a equipe o leva de volta
+para a Estação, onde se recupera na Enfermaria (o antigo posto de primeiros socorros, #121) ou no Dormitório. Levantado
+na hora, segue carregado pela equipe (sem lutar) e chega menos ferido, com menos dias de recuperação. Deixado no chão,
+só é recolhido na saída, mais ferido, e chega com a recuperação inteira (#179). A queda pesa pelo tempo fora e pelo achado
 perdido, não pela perda do personagem. Não há memorial, e nenhum texto deve tratar uma queda como morte.
 
 ---
