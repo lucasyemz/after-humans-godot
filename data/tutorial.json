@@ -29,7 +29,8 @@
     ],
     "Search": {
       "bandages": 1,
-      "food": 1
+      "food": 1,
+      "Heal": 0.35
     }
   },
   {
@@ -59,7 +60,12 @@
     "Enemies": [
       "rastejante_raiz",
       "broto"
-    ]
+    ],
+    "Boost": {
+      "rastejante_raiz": {
+        "Damage": -2
+      }
+    }
   },
   {
     "Name": "fight_3",
@@ -71,7 +77,8 @@
     ],
     "Boost": {
       "ninho_errante": {
-        "Speed": 8
+        "Speed": 8,
+        "Damage": -1
       }
     }
   }

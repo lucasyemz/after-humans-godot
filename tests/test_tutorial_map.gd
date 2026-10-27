@@ -47,6 +47,17 @@ func _data() -> void:
 	t.equal(data.props.map(func(p): return p.name), ["Armário de manutenção"], "a busca do tutorial é o armário de manutenção")
 	t.check(not data.door_panel.is_empty() and int(data.train.zone) == 3, "o painel das portas e o trem na plataforma")
 	t.check(data.lights.filter(func(l): return l.has("blink")).size() >= 6, "as lâmpadas de emergência piscam")
+	# O entulho do pé da faixa (entre a borda da zona e a câmera) é primeiro plano: some quando tapa alguém, na luta
+	# também, em vez de pintar a silhueta do herói (a QA do tutorial, rodada 2). Os outros mapas não marcam peça.
+	var front: Array = []
+	for part in data.parts:
+		for zone in data.zones:
+			if float(part.origin[0]) >= float(zone.x0) and float(part.origin[0]) <= float(zone.x1) \
+					and float(part.origin[2]) > float(zone.z1) and data.materials[int(part.materials[0])].kind == "art":
+				front.append(part)
+	t.check(front.size() >= 3 and front.all(func(p): return p.get("foreground", false)), "o entulho à frente da faixa é primeiro plano (%d peças)" % front.size())
+	for other in ["RiverDock", "RootBridge", "SealedShelter", "TriageGate", "FloodedDepot", "SewerDucts"]:
+		t.check(not FileAccess.get_file_as_string("res://data/scenarios/%s.json" % other).contains("\"foreground\""), "%s sem peça marcada de primeiro plano" % other)
 	# Toda peça tem textura (a coerência visual): só a lâmpada acesa é luz pura.
 	for material in data.materials:
 		if material.kind in ["art", "card", "surface", "blockout"]:
@@ -62,6 +73,14 @@ func _data() -> void:
 			var ids: Array = GameData.row("tutorial", row_name).get("Enemies", [])
 			t.check(not ids.is_empty() and ids.all(func(id): return GameData.row("enemies", id) != null),
 				"%s: os inimigos existem em enemies.json (%s)" % [row_name, ids])
+			# O Boost pode tirar dano (a luta 2 e o Drone), mas nunca deixa um golpe sem dano ou curando.
+			var boost: Dictionary = GameData.row("tutorial", row_name).get("Boost", {})
+			for id in boost:
+				var damage := int(boost[id].get("Damage", 0))
+				for action_id in GameData.row("enemies", id).ActionIds:
+					var range = GameData.row("enemy_actions", action_id).get("DamageRange")
+					if range != null and int(range.Max) > 0:
+						t.check(int(range.Min) + damage >= 1, "%s: o Boost de %s deixa %s com dano 1 ou mais" % [row_name, id, action_id])
 	_finish_heals_team()
 	# O pisca: 0,6 s acesa e 0,4 s quase apagada, na fase de cada lâmpada.
 	t.check(AHScenarioWorld.blink_lit(0.1, 0.0) and not AHScenarioWorld.blink_lit(0.7, 0.0) and AHScenarioWorld.blink_lit(0.7, 0.5),
@@ -137,7 +156,7 @@ func _journey() -> void:
 	await _fight(street)
 	t.equal(corridor.segment, 2, "a rota do Nick")
 	t.check(not street.scenario.door_open(route_door), "a porta de segurança baixou atrás da equipe")
-	t.check(route.steps.filter(func(s): return s.type == "combat" and s.resolved).size() == 3, "as três lutas vencidas em sequência, sem cura entre elas")
+	t.check(route.steps.filter(func(s): return s.type == "combat" and s.resolved).size() == 3, "as três lutas vencidas em sequência, sem a busca (e o fôlego dela) no meio")
 	t.check(Campaign.state.roster.filter(func(h): return Campaign.state.session.expedition.team.has(h.id)).all(func(h): return h.alive), "e ninguém cai")
 	# A plataforma: o trem chega e para; o embarque leva à Estação.
 	corridor.debug_next_fight()
