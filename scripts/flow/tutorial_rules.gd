@@ -3,9 +3,10 @@
 ## uma expedição de fase "tutorial" que a rua joga com o mesmo corredor. Sem cena: lê data/tutorial.json (as linhas pelo
 ## Name) e mexe no estado da campanha, como o AHJourneyRules.
 ##   journey: o mapa, o lugar dos eventos, o clima, os trechos (Steps, um por tipo), quantos trechos ficam em cada zona
-##            do mapa (ZoneSteps), quem começa (StartTeam), quem chega no meio (JoinTeam) e o que a busca rende (Search)
+##            do mapa (ZoneSteps), quem começa (StartTeam), quem chega no meio (JoinTeam) e o que a busca rende (Search,
+##            com Heal: a fração da vida máxima que a equipe recupera)
 ##   fight_N: as lutas fixas (o trecho, os inimigos da frente para trás, o que cada uma ensina e o reforço só do
-##            tutorial, Boost: por inimigo, Damage e Speed a mais)
+##            tutorial, Boost: por inimigo, Damage e Speed a mais ou a menos; o dano mínimo de cada ação fica em 1 ou mais)
 ## A fase do tutorial não está em AHJourneyRules.PHASES: não aparece no Mapa da Rede nem no "Jogar de novo".
 class_name AHTutorial
 extends RefCounted
@@ -116,6 +117,20 @@ static func search(campaign: Dictionary) -> String:
 			if got > 0:
 				parts.append("+%d %s" % [got, TranslationServer.translate(spec[1] if got == 1 else spec[2])])
 	return ", ".join(parts)
+
+
+## O fôlego da busca (Search.Heal, a fração da vida máxima): entre a segunda e a terceira luta a equipe se recompõe, e o
+## piso de vida 1 das lutas do tutorial fica só como rede, não como o que segura a luta do Drone. Devolve se alguém curou.
+static func catch_breath(campaign: Dictionary) -> bool:
+	var heal := float(journey().get("Search", {}).get("Heal", 0.0))
+	var healed := false
+	for hero_id in campaign.session.expedition.team:
+		var hero = AHStationRules.hero(campaign, hero_id)
+		if heal <= 0.0 or hero == null or int(hero.hp) >= int(hero.max_hp):
+			continue
+		hero.hp = mini(int(hero.max_hp), int(hero.hp) + ceili(float(hero.max_hp) * heal))
+		healed = true
+	return healed
 
 
 ## O Nick (JoinTeam) entra na equipe e o encontro fica resolvido. Devolve quem entrou.

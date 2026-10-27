@@ -143,8 +143,9 @@ func build(map: String) -> void:
 			_group(String(part.node)).add_child(node)
 			continue
 		add_child(node)
-		# O primeiro plano, entre a faixa e a câmera: o AHOcclusion quase o apaga quando tapa alguém.
-		if _foreground(node.transform * node.mesh.get_aabb()):
+		# O primeiro plano, entre a faixa e a câmera: o AHOcclusion quase o apaga quando tapa alguém. O mapa pode marcar
+		# uma peça mais perto da faixa (foreground, o entulho do pé da faixa do tutorial).
+		if part.get("foreground", false) or _foreground(node.transform * node.mesh.get_aabb()):
 			node.set_meta("foreground", true)
 		if not data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"] \
 				and not data.materials[int(part.materials[0])].get("masked", false):
