@@ -48,6 +48,9 @@ const PARTY_SPACING := 1.3
 ## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
 ## A folga entre a parada de descanso e a próxima patrulha (m): a fogueira e o ponto de levantar ficam antes dela (#143).
 const STOP_CAMP_MARGIN := 1.5
+## A folga entre a ponta da fileira do acampamento e uma patrulha de pé (m): mais perto que isso, ela some enquanto a
+## fogueira está acesa.
+const STOP_CAMP_GUARD_GAP := 1.5
 const REACH := 1.1
 
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
@@ -60,6 +63,8 @@ var props := {}
 var room: AHHouseRoom
 ## A fogueira da parada de descanso (#143), enquanto a equipe acampa nela.
 var stop_camp: AHStreetCamp
+## As patrulhas escondidas enquanto a fogueira da parada está acesa (nos trechos curtos, a fileira chega perto delas).
+var _camp_hidden: Array[Node3D] = []
 var room_guards: Array = []
 var busy := false
 ## O acampamento encenado (#77): a equipe em volta da fogueira enquanto ele estiver ativo.
@@ -605,6 +610,29 @@ func _light_stop_camp(place: Dictionary) -> void:
 	stop_camp.build(x, float(place.get("leave", x + AHCampScene.LEAVE_OFFSET)),
 		street.floor_y if street.scenario else street._ground_height(street.lane_z), street.lane_z)
 	stop_camp.set_camp_lit(true)
+	_hide_guards_near(stop_camp.camp_x)
+
+
+## Nos trechos curtos dos cenários (o Abrigo, o Depósito), a fileira não cabe antes da próxima patrulha: quem está de pé
+## perto da fogueira some enquanto ela está acesa (ninguém de pé no meio do acampamento) e volta ao apagar.
+func _hide_guards_near(x: float) -> void:
+	_show_hidden_guards()
+	var reach: float = AHStreetCamp.HALF_ROW + STOP_CAMP_GUARD_GAP
+	for index in guards:
+		var guard: Dictionary = guards[index]
+		if not guard.cards.any(func(card): return is_instance_valid(card) and card.visible and absf(card.global_position.x - x) < reach):
+			continue
+		for node in guard.cards + [guard.mark]:
+			if is_instance_valid(node) and node.visible:
+				node.visible = false
+				_camp_hidden.append(node)
+
+
+func _show_hidden_guards() -> void:
+	for node in _camp_hidden:
+		if is_instance_valid(node):
+			node.visible = true
+	_camp_hidden.clear()
 
 
 ## Onde acender a fogueira da parada (#143): a fileira (AHStreetCamp.HALF_ROW para cada lado) e o ponto de levantar ficam
@@ -967,6 +995,7 @@ func _retreat() -> void:
 		if stop_camp != null:
 			stop_camp.queue_free()
 			stop_camp = null
+			_show_hidden_guards()
 		busy = false
 	_show_result()
 
@@ -1153,6 +1182,7 @@ func _on_camp_leave() -> void:
 	if stop_camp != null:
 		stop_camp.queue_free()
 		stop_camp = null
+		_show_hidden_guards()
 	street.apply_corridor_weather(weather)
 	busy = false
 	hud.toast(tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather)), 4.0)

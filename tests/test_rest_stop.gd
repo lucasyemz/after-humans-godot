@@ -29,7 +29,7 @@ func run(context) -> void:
 	await _stop("fase_1", 31)
 	await _stop("fase_2", 32)
 	await _retreat_in_camp()
-	for spec in [["fase_3", 31], ["fase_3", 32], ["fase_4", 31], ["fase_5", 31], ["fase_5", 35]]:
+	for spec in [["fase_3", 31], ["fase_3", 32], ["fase_3", 34], ["fase_4", 31], ["fase_5", 31], ["fase_5", 35], ["fase_5", 37]]:
 		await _short(spec[0], spec[1])
 	Tips.enabled = tips
 	if _tree.current_scene != null:
@@ -274,16 +274,26 @@ func _short(phase_id: String, seed_value: int) -> void:
 	var map_name: String = street.scenario.map_name if street.scenario else "street"
 	var end := corridor._step_x(rest, 1.0)
 	var fire: AHStreetCamp = corridor.stop_camp
-	t.check(fire.camp_x + AHStreetCamp.HALF_ROW <= end + 0.01 or fire.camp_x <= street.walk_min.x + AHStreetCamp.HALF_ROW + 0.01,
-		"%s/%d: a fileira fica no trecho de descanso ou atrás dele (fogueira %.1f, fim %.1f)" % [phase_id, seed_value, fire.camp_x, end])
+	# Nenhuma patrulha de pé a menos de 1,5 m de quem está sentado (nos trechos curtos, as de perto somem).
+	var close := []
+	for index in corridor.guards:
+		for card in corridor.guards[index].cards:
+			if not is_instance_valid(card) or not card.is_visible_in_tree():
+				continue
+			for member in corridor.camp.members:
+				if absf(card.global_position.x - member.card.global_position.x) < AHStreetCorridor.STOP_CAMP_GUARD_GAP:
+					close.append(snappedf(card.global_position.x, 0.01))
+	t.equal(close, [], "%s/%d: nenhuma patrulha de pé no meio do acampamento (fogueira %.1f, fim %.1f)" % [phase_id, seed_value, fire.camp_x, end])
 	t.check(fire.leave_x <= end - AHStreetCorridor.STOP_CAMP_MARGIN + 0.01, "%s/%d: o ponto de levantar fica antes da próxima patrulha" % [phase_id, seed_value])
 	t.check(not corridor._row_blocked(fire.camp_x) or fire.camp_x <= street.walk_min.x + AHStreetCamp.HALF_ROW + 0.01,
-		"%s/%d: a fileira fora dos obstáculos do cenário" % [phase_id, seed_value])
+		"%s/%d: a fileira fora dos obstáculos do cenário (ou na ponta de trás da zona)" % [phase_id, seed_value])
 	var fire_x := fire.camp_x
 	var leave_x := fire.leave_x
 	await corridor._on_camp_leave()
 	await _frames(120)
 	t.check(not street._arena.active, "%s/%d: levantar não começa luta sozinho" % [phase_id, seed_value])
+	t.check(corridor._camp_hidden.is_empty() and corridor.guards.values().all(func(g): return g.cards.all(func(c): return not is_instance_valid(c) or c.visible)),
+		"%s/%d: as patrulhas escondidas voltam ao apagar a fogueira" % [phase_id, seed_value])
 	t.check(is_instance_valid(street) and street == _tree.current_scene and (street.scenario.map_name if street.scenario else "street") == map_name
 		and route.index <= rest and route.steps[rest + 1].resolved == false, "%s/%d: nem passa para o trecho da patrulha ou troca de mapa" % [phase_id, seed_value])
 
