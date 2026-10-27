@@ -100,8 +100,8 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
     No gamepad: analógico esquerdo ou direcional.
   - Shift (ou RB) corre.
   - Na Estação, as setas (ou o direcional) andam entre os cômodos, E abre e F2 oculta a interface. Esc (ou Start) leva o
-    foco aos botões da esquerda (Próximo passo, Preparar expedição, Opções).
-  - Em toda tela (mapa de fases, Preparação, cômodos, relatório, noite, trem, Opções, pausa, Mochila, luta) dá para jogar
+    foco aos botões da esquerda (Próximo passo, Ir ao mapa, Opções).
+  - Em toda tela (mapa de fases, plataforma da partida, cômodos, relatório, noite, trem, Opções, pausa, Mochila, luta) dá para jogar
     só com o teclado ou o controle: as setas (ou o direcional) andam entre os botões, E, Enter ou A confirma e
     Backspace, Esc ou B volta. As teclas desenhadas na tela seguem as trocas das Opções. As teclas dá para trocar em Opções > Controles (salvo nesta máquina). O tamanho do texto fica em Opções > Jogo. Com tela de toque aparecem um analógico (andar; até a borda corre) e o botão Usar; Opções > Controles de toque liga sempre ou desliga.
   - F1 abre a barra de Admin, só na build de teste ou com `--admin` (#130). Em Ajustes, ela liga as teclas de teste da
@@ -116,7 +116,8 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
     pela saída no começo da rua.
   - K leva a equipe até a próxima patrulha.
   - Na Estação: o cartão "Próximo passo" diz o que fazer; os cômodos abrem clicando no nome deles no corte; Esc volta à
-    vista geral. Preparar expedição abre o mapa de fases e depois a Preparação, onde se monta a equipe e se parte.
+    vista geral. Ir ao mapa abre o Mapa da Rede; Preparar neste lugar sobe a equipe para a Plataforma 1, onde se monta
+    a equipe, o foco e a comida, e Iniciar expedição (G) confirma a partida. Esc volta um passo (#123).
   - Na luta: 1 a 4 escolhem a habilidade (ou o clique), depois o alvo; Q move, W defende, I abre a Mochila, F foge
     (no gamepad, setas e Enter/A; Backspace/B volta).
     Mover, Defender e Fugir ficam à direita.
