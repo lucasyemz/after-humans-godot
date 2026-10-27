@@ -1457,12 +1457,12 @@ func _walk(delta: float) -> void:
 			if walker.get("seat", -1) >= 0:
 				_sit_down(walker)
 				continue
-			# Chegou perto demais de alguém parado (que parou ali enquanto ele andava): segue para outro ponto.
-			if _crowded(walker, card.position.x) and walker.get("rerouted", 0) < 3:
-				walker.rerouted = walker.get("rerouted", 0) + 1
+			# Chegou perto demais de alguém parado (que parou ali enquanto ele andava): segue para outro ponto, sem
+			# limite de tentativas. Numa faixa estreita ou cheia (a Preparação, a Forja com o Otto), os poucos sorteios
+			# podiam não achar lugar em três voltas, e ele parava colado mesmo assim.
+			if _crowded(walker, card.position.x):
 				_choose_target(walker)
 				continue
-			walker.rerouted = 0
 			walker.wait = randf_range(2.5, 7.0)
 			continue
 		card.set_facing(signf(gap))
