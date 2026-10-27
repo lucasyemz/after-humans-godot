@@ -363,7 +363,9 @@ static func _ambience(scene: Node, spec: String) -> String:
 			override[field] = minf(override[field], 1.0)
 	Admin.ambience[place] = override
 	scene.apply_ambience()
-	return "%s: %s" % [field, str(override.get(field, override.get("highlights_tint")))]
+	# O nome do campo como na aba (o rótulo em português), não o técnico.
+	var label: String = AMBIENCE_STEPS.filter(func(s): return s[0] == field)[0][2]
+	return "%s: %s" % [TranslationServer.translate(label), str(override.get(field, override.get("highlights_tint")))]
 
 
 static func _zoom(spec: String) -> String:
