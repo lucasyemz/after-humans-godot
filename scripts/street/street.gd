@@ -624,6 +624,9 @@ func walk_leader(target: Vector3, seconds: float) -> void:
 	var time := 0.0
 	while time < seconds:
 		await get_tree().process_frame
+		# A cena pode sair no meio do passo (voltar à Estação, o fim da jornada): nada de mexer num líder liberado.
+		if not is_instance_valid(_leader) or not is_inside_tree():
+			return
 		time += get_process_delta_time()
 		_leader.position = start.lerp(target, clampf(time / seconds, 0.0, 1.0))
 		if _trail.is_empty() or _leader.position.distance_to(_trail[0]) > 0.05:

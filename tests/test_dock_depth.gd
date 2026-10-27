@@ -61,6 +61,14 @@ func _data() -> void:
 	t.equal(Array(data.get("layered_cards", [])).map(func(l): return l.name), ["warehouse", "ship"], "o Armazém e o Navio em camadas")
 	var boxes: Array = data.parts.filter(func(p): return p.get("layer") == "141" and p.mesh == 0)
 	t.check(boxes.size() == 4 and boxes.all(func(p): return p.get("no_shadow", false)), "as caixas do recuo não fazem sombra no vão")
+	# Todo volume gerado (o do Armazém hoje, e o do Navio quando a arte da #164 trouxer o casco em planos) fica atrás da
+	# faixa de andar: o fundo dela (lane - 1,2 m) menos o raio do líder.
+	var zone0: Dictionary = data.zones[0]
+	var lane_back: float = (float(zone0.z0) + float(zone0.z1)) * 0.5 - 1.2 - 0.28
+	var in_lane: Array = data.parts.filter(func(p): return p.get("layer") == "141" and float(p.origin[2]) + absf(float(p.basis[8])) * 0.5 > lane_back)
+	for layered in data.get("layered_cards", []):
+		in_lane.append_array(Array(layered.pieces).filter(func(piece): return float(piece.z) > lane_back))
+	t.equal(in_lane.size(), 0, "nenhum volume nem pedaço gerado (Armazém ou Navio) dentro da faixa de andar")
 	t.equal(Array(data.get("doorways", [])).size(), 2, "as portas de dentro dos dois interiores")
 	t.equal(Array(JSON.parse_string(FileAccess.get_file_as_string("res://data/scenarios/FloodedDepot.json")).get("doorways", [])).size(), 0,
 		"o Depósito não tem porta de dentro")
@@ -110,8 +118,24 @@ func _volumes_behind(street) -> void:
 	t.check(deepest - street.LEADER_RADIUS > front, "os volumes novos (até z %.2f) ficam atrás da faixa de andar (%.2f)" % [front, deepest])
 	var door_step: float = street.lane_z - AHStreetCorridor.DOOR_WALK_DEPTH
 	t.check(door_step - street.LEADER_RADIUS > front, "e atrás do passo para a porta (%.2f)" % door_step)
-	for entry in street.corridor.side_rooms:
-		t.check(not street._blocked(Vector3(float(entry.door_x), street.floor_y, door_step)), "o passo para a porta em x %.1f não cai numa caixa" % float(entry.door_x))
+	# O walk_leader anda sem a colisão (a porta fica fora da área de andar): os caminhos dele, por fora e por dentro, não
+	# podem cruzar nenhuma caixa de colisão.
+	var corridor: AHStreetCorridor = street.corridor
+	for entry in corridor.side_rooms:
+		var x0 := float(entry.x0)
+		var stop: float = corridor._room_stop(entry)
+		var paths := {
+			"o passo para a porta do Cais": [Vector3(float(entry.door_x), street.floor_y, street.lane_z), Vector3(float(entry.door_x), street.floor_y, door_step)],
+			"a saída da porta de dentro": [Vector3(x0 + 0.5, street.floor_y, street.lane_z - AHStreetCorridor.DOOR_WALK_DEPTH * 0.5), Vector3(x0 + stop, street.floor_y, street.lane_z)],
+			"a volta para a porta de dentro": [Vector3(x0 + stop, street.floor_y, street.lane_z), Vector3(x0 + 0.3, street.floor_y, street.lane_z - AHStreetCorridor.DOOR_WALK_DEPTH * 0.5)],
+		}
+		for label in paths:
+			var hits := []
+			for i in 21:
+				var spot: Vector3 = paths[label][0].lerp(paths[label][1], i / 20.0)
+				if street._blocked(spot):
+					hits.append("%.1f, %.1f" % [spot.x, spot.z])
+			t.equal(hits, [], "x %.1f, %s: sem caixa no caminho" % [float(entry.door_x), label])
 
 
 ## Empurra o líder para o fundo na frente de cada fachada: ele para na faixa, sem entrar num volume.

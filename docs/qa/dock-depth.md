@@ -47,7 +47,7 @@ chuva: [o Armazém](dock-depth/warehouse-weather.jpg) e [o Navio](dock-depth/shi
 ## Testes
 
 - `tests/run_all.gd`: todos verdes, com a paridade 48/48.
-- `tests/test_dock_depth.gd` (novo, 52 verificações):
+- `tests/test_dock_depth.gd` (novo, 57 verificações):
   - as camadas sem pedaço dobrado e em mais de uma profundidade;
   - a colisão: os volumes novos (os pedaços em camadas e as caixas do recuo) ficam atrás da faixa de andar e do passo
     para a porta, e o passo não cai numa caixa. Empurrado para o fundo na frente do Armazém e do Navio, o líder para na
@@ -59,6 +59,11 @@ chuva: [o Armazém](dock-depth/warehouse-weather.jpg) e [o Navio](dock-depth/shi
     fundo.
 - `tools/capture_141.gd`: as capturas acima (também roda na main de antes).
 - O modo de captura da rua, com o teste de colisão, passa.
+- **A colisão do Navio:** hoje o Navio não ganhou volume novo (é a pintura inteira com a silhueta atrás, as duas atrás
+  da faixa), então não há caixa dele para testar. O `test_dock_depth` confere todo volume e todo pedaço gerado pelo
+  `build_riverdock_depth.py` (o do Armazém e o do Navio, quando a arte da #164 trouxer o casco em planos) atrás da faixa
+  de andar, e os caminhos do `walk_leader` (o passo para a porta do Cais, a saída da porta de dentro e a volta) sem
+  nenhuma caixa de colisão no meio.
 
 ## Rodadas da QA
 
