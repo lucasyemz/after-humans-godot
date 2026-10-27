@@ -739,12 +739,15 @@ func _update_camera(delta: float) -> void:
 		target = Vector3(clampf(leader.x, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN), 1.6, -1.2)
 		pitch = deg_to_rad(4.0)
 		distance = 11.0
-	# No acampamento (#77), a câmera fica parada na fogueira, mais perto e mais baixa (todos sentados no chão); na
-	# parada de descanso (#143), a fogueira fica na rua ou no cenário.
-	if corridor != null and corridor.camp != null and corridor.camp.active:
+		# No acampamento da casa (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
+		if corridor != null and corridor.camp != null and corridor.camp.active and not corridor.camp.at_stop():
+			target = Vector3(corridor.camp.focus_x, AHCampScene.FOCUS_HEIGHT, -0.2)
+			distance = AHCampScene.FOCUS_DISTANCE
+	# Na parada de descanso (#143), a fogueira fica na rua ou no cenário: a câmera fica parada nela, baixa, e recua o
+	# bastante para a fileira inteira caber (nos cenários a lente é mais fechada, 30° na horizontal).
+	if corridor != null and corridor.camp != null and corridor.camp.active and corridor.camp.at_stop():
 		target = corridor.camp.focus_point()
 		pitch = deg_to_rad(4.0)
-		# A fileira inteira no quadro: nos cenários a lente é mais fechada (30° na horizontal), e a câmera recua.
 		var half_h := atan(tan(deg_to_rad(_camera.fov * 0.5)) * get_viewport().get_visible_rect().size.aspect())
 		distance = maxf(AHCampScene.FOCUS_DISTANCE, AHCampScene.ROW_HALF_WIDTH / tan(half_h))
 	if _arena != null and _arena.active:

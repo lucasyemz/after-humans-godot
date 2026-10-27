@@ -196,6 +196,11 @@ func _stop(phase_id: String, seed_value: int) -> void:
 		var r := AHCampHud.body_rect(camera, member.card)
 		on_screen = on_screen and Rect2(0, 0, 1920, 1080).encloses(r)
 	t.check(on_screen, "%s: a câmera enquadra a equipe toda" % phase_id)
+	# Uma ferramenta que chega com a fogueira acesa: o aviso espera a equipe levantar (o HUD do acampamento ocupa a tela).
+	Campaign.state["tool_notices"] = Campaign.state.get("tool_notices", []) + ["lanterna"]
+	await _frames(20)
+	t.check(not hud.tool_notice_shown() and Campaign.state.tool_notices.has("lanterna"), "%s: no acampamento, o aviso da ferramenta espera" % phase_id)
+	Campaign.state.tool_notices.erase("lanterna")
 	# A pose de cuidar no acampamento.
 	var hurt_id: String = team[0]
 	var card: AHSpriteCard = camp.member_card(hurt_id)
@@ -287,6 +292,25 @@ func _short(phase_id: String, seed_value: int) -> void:
 	t.check(fire.leave_x <= end - AHStreetCorridor.STOP_CAMP_MARGIN + 0.01, "%s/%d: o ponto de levantar fica antes da próxima patrulha" % [phase_id, seed_value])
 	t.check(not corridor._row_blocked(fire.camp_x) or fire.camp_x <= street.walk_min.x + AHStreetCamp.HALF_ROW + 0.01,
 		"%s/%d: a fileira fora dos obstáculos do cenário (ou na ponta de trás da zona)" % [phase_id, seed_value])
+	# A patrulha escondida não vê a equipe sentada: com a fogueira acesa, a visão das patrulhas fica parada, mesmo com
+	# uma delas posta ao lado da fileira.
+	var watcher = -1
+	for index in corridor.guards:
+		if corridor.guards[index].cards.any(func(c): return is_instance_valid(c)):
+			watcher = index
+			break
+	if watcher >= 0:
+		var guard: Dictionary = corridor.guards[watcher]
+		var saved: Array = guard.cards.map(func(c): return c.global_position if is_instance_valid(c) else Vector3.ZERO)
+		for card in guard.cards:
+			if is_instance_valid(card):
+				card.global_position = Vector3(fire.camp_x + 1.0, card.global_position.y, card.global_position.z)
+		await _frames(180)
+		t.check(float(guard.meter) == 0.0 and not guard.detected and not street._arena.active,
+			"%s/%d: com a fogueira acesa, a patrulha perto não vê a equipe (%.2f)" % [phase_id, seed_value, float(guard.meter)])
+		for i in guard.cards.size():
+			if is_instance_valid(guard.cards[i]):
+				guard.cards[i].global_position = saved[i]
 	var fire_x := fire.camp_x
 	var leave_x := fire.leave_x
 	await corridor._on_camp_leave()

@@ -77,6 +77,11 @@ func pose_for(hero: Dictionary) -> Dictionary:
 
 
 ## A altura e a linha do foco da câmera (o piso e a fogueira do lugar).
+## A fogueira é a da parada de descanso (#143, AHStreetCamp), e não a da casa do acampamento.
+func at_stop() -> bool:
+	return _room is AHStreetCamp
+
+
 func focus_point() -> Vector3:
 	return Vector3(focus_x, (_room.floor_y if _room != null else 0.0) + FOCUS_HEIGHT, (_room.camp_z if _room != null else 0.0) - 0.2)
 

@@ -724,9 +724,10 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if modal_open():
 		S.keep_focus(_modal)
-	# A ferramenta que chegou (a busca, o evento): o aviso, uma de cada vez, sem painel aberto por cima.
+	# A ferramenta que chegou (a busca, o evento): o aviso, uma de cada vez, sem painel aberto por cima e fora do
+	# acampamento (o HUD dele ocupa a tela; o aviso espera a equipe levantar).
 	var notices: Array = Campaign.state.get("tool_notices", [])
-	if not notices.is_empty() and not modal_open() and not tool_notice_shown() and is_visible_in_tree():
+	if not notices.is_empty() and not modal_open() and not camp_open() and not tool_notice_shown() and is_visible_in_tree():
 		show_tool_notice(String(notices.pop_front()))
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:

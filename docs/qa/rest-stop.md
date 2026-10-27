@@ -17,7 +17,8 @@
   - a pergunta tem três escolhas: Acampar aqui, Seguir em frente e Voltar à Estação (metade do achado);
   - o texto diz a vida da equipe, o instinto mais alto (e de quem) e a comida;
   - Acampar aqui acende a fogueira onde a equipe parou (na rua e nos cenários, que não têm casa), com a mesma cena e
-    o mesmo HUD do acampamento; o jogo reaberto no meio volta à fogueira;
+    o mesmo HUD do acampamento; a câmera recua o bastante para a fileira inteira caber (a da casa do acampamento fica
+  como era); o jogo reaberto no meio volta à fogueira;
   - se a casa do acampamento fica na mesma parada, as duas viram uma só: Acampar aqui entra nela;
   - um acampamento por fase: depois de acampar na parada, a casa não acampa de novo, e vice-versa;
   - a fogueira e o ponto de levantar ficam antes da próxima patrulha (`STOP_CAMP_MARGIN`) e fora dos obstáculos do
@@ -30,11 +31,12 @@
 ## Testes
 
 - `tests/run_all.gd`: 64 de 64, com a paridade 48/48.
-- `tests/test_rest_stop.gd` (novo, 123 verificações): o aviso e o selo NOVO; a Mochila com a ferramenta nova; a pose
+- `tests/test_rest_stop.gd` (novo, 130 verificações): o aviso e o selo NOVO; a Mochila com a ferramenta nova; a pose
   no curativo da luta e do acampamento; a parada com as três escolhas e o estado da equipe na Rua das Vitrines e no
   Cais; acampar ali, a câmera com a equipe toda, o jogo reaberto no meio, levantar e não acampar de novo; Voltar pelo
   Menu com o acampamento aberto; o Abrigo, a Triagem e o Depósito chegando no começo do descanso (a fileira antes da
-  patrulha, levantar sem luta nem troca de mapa); a ferramenta perdida antes da Mochila.
+  patrulha, levantar sem luta nem troca de mapa); a ferramenta perdida antes da Mochila; com a fogueira acesa, uma
+  patrulha posta ao lado da fileira não vê a equipe e o aviso de ferramenta espera a equipe levantar.
 - `tests/test_full_journey.gd` passa (ele segue em frente na parada).
 - `tools/capture_143.gd`: as capturas, também na main de antes.
 
