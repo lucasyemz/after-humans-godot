@@ -14,7 +14,8 @@ ajudar, três lutas curtas, a busca, o trem e a chegada à Estação com a recom
 - **A abertura:** o cartão "Você precisa escapar." (o quadro da tirinha fica em `data/tutorial.json`, `opening`) e o
   Corredor de Contenção com o Bento, a Íris e a Véspera (`StartTeam`).
 - **Os trechos:** a partida, a luta 1, o Nick, a luta 2, a busca, a luta 3 e o trem. O Nick entra no encontro
-  (`JoinTeam`), numa conversa com retrato (a caixa do briefing, #88).
+  (`JoinTeam`), numa conversa com retrato (a caixa do briefing, #88). A busca dá 1 curativo, 1 comida e o fôlego: quem
+  está ferido recupera 35% da vida máxima (`Search.Heal`), com a linha "A equipe recupera o fôlego.".
 - **As dicas do tutorial** (`AHTutorialGuide` e `AHTutorialHint`, no kit): nove passos de `data/tutorial.json`, uma de
   cada vez, cada uma com o destaque e as teclas:
   - andar; a habilidade e o alvo na luta 1 (a primeira escolha trava as outras ações e escurece o resto); a patrulha
@@ -51,10 +52,12 @@ ajudar, três lutas curtas, a busca, o trem e a chegada à Estação com a recom
 - `tests/run_all.gd` inteiro, com a paridade 48/48.
 - `tests/test_tutorial.gd`: pular dá o mesmo estado de jogar; `complete()` fora da jornada recusa; a vida mínima; o
   título até o cartão e o mapa; a jornada pela cena de verdade (cada dica, as travas, Voltar na mira, a dica sob o
-  Menu, o Nick, a luta 2, a busca e a Mochila, o save no meio e o Continuar, a fuga que recomeça, as três lutas sem
+  Menu, o Nick, a luta 2, a busca (e o fôlego dela) e a Mochila, o save no meio e o Continuar, a fuga que recomeça, as três lutas sem
   ninguém cair, o trem, a recompensa e a chegada); a Nova campanha da Estação pelo título.
-- `tests/test_tutorial_balance.gd`: as três lutas em sequência, com sementes fixas, na política ingênua e na
-  automática (os números em `docs/qa/tutorial-arc.md`).
+- `tests/test_tutorial_balance.gd`: as três lutas em sequência, como no jogo (a vida passa de uma para a outra, com o
+  fôlego da busca antes da 3), com sementes fixas, na política ingênua e na automática; trava a luta 1 entre 10% e
+  25%, a contaminação em 90% ou mais e a vida 1 nas lutas 2 e 3 em no máximo 10% (os números em
+  `docs/qa/tutorial-arc.md`).
 - `test_title`: a janela "Como começar?" nas campanhas novas.
 
 ## QA

@@ -237,8 +237,15 @@ func _journey() -> void:
 	var entry: Dictionary = corridor.scenario_props[0]
 	street._place_leader(Vector3(entry.x, street.floor_y, street.lane_z))
 	if await _until(func(): return guide.hint.step_id == "search", "a dica da busca"):
+		# O fôlego da busca: quem está ferido recupera 35% da vida máxima (Search.Heal), sem passar da máxima.
+		var team: Array = Campaign.state.session.expedition.team.map(func(id): return AHStationRules.hero(Campaign.state, id))
+		var hurt = team[0]
+		hurt.hp = 2
+		var expected := mini(int(hurt.max_hp), 2 + ceili(float(hurt.max_hp) * 0.35))
 		corridor._action.call()
 		await _frames(2)
+		t.equal(int(hurt.hp), expected, "a busca devolve o fôlego: o ferido sobe 35% da vida máxima")
+		t.check(team.all(func(h): return int(h.hp) <= int(h.max_hp)), "e ninguém passa da vida máxima")
 		t.equal(guide.hint.step_id, "bag", "vasculhado, a dica da Mochila")
 		corridor.open_inventory()
 		await _frames(2)
