@@ -79,6 +79,12 @@ func _skip_equals_play() -> void:
 	var lines := AHBriefing.debriefing(played, report)
 	t.equal(lines.map(func(l): return l.speaker.id), ["hero_gato_nick", "hero_cao_bento", "hero_gato_nick"], "o debriefing da chegada é dos dois")
 	t.equal(lines[-1].text, "Só por uma noite.", "e termina com \"Só por uma noite.\"")
+	# O relatório da chegada: sem guardião, com o curativo e a ferramenta à vista (#144).
+	var screen := AHStationReport.new()
+	screen.report = report
+	var chips: Array = screen._chips(played, "victory").map(func(c): return c.icon)
+	t.check(not chips.has("guardian_defeated") and chips.has("res-bandages") and chips.has("tool-crowbar"), "o relatório da abertura diz a fuga, o curativo e a ferramenta, sem guardião")
+	screen.free()
 	# Um save de antes do tutorial (sem a marca) já passou dele.
 	var old := Campaign.create_initial(32)
 	t.equal(AHTutorial.stage(old), "done", "save sem a marca: tutorial já passado")

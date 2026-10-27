@@ -261,6 +261,15 @@ func _outcome(result: String) -> Dictionary:
 ## (cumprido, ou não, com a cor de perigo).
 func _chips(c: Dictionary, result: String) -> Array:
 	var out: Array = []
+	if report.get("tutorial", false):
+		# A chegada da abertura (#144): não há guardião; o que a fuga trouxe além das sementes (o curativo, a ferramenta).
+		out.append({"icon": "objective_done", "text": tr("A fuga até o trem"), "color": AHKit.TEXT})
+		if int(report.get("bandages", 0)) > 0:
+			out.append({"icon": "res-bandages", "text": tr("+%d curativo") % report.bandages if int(report.bandages) == 1 else tr("+%d curativos") % report.bandages, "color": AHKit.TEXT})
+		var tool := String(report.get("tool", ""))
+		if tool != "":
+			out.append({"icon": AHInventoryPanel.TOOL_ICONS.get(tool, "tool-generic"), "text": tr(AHInventoryPanel.TOOL_NAMES.get(tool, tool)), "color": AHKit.TEXT})
+		return out
 	if result == "victory":
 		out.append({"icon": "guardian_defeated", "text": tr("Guardião derrotado"), "color": AHKit.TEXT})
 	var unlocked := String(report.get("unlocked_phase", ""))

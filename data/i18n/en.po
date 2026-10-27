@@ -251,6 +251,7 @@ msgid "+1 suprimento"
 msgstr "+1 supply"
 
 #: scripts/flow/fight_rewards.gd:134
+#: scripts/ui/station/station_report.gd:268
 msgid "+%d curativos"
 msgstr "+%d bandages"
 
@@ -1592,7 +1593,7 @@ msgstr "Still empty."
 
 #: scripts/ui/refuge_hud.gd:1463
 #: scripts/ui/refuge_hud.gd:1559
-#: scripts/ui/station/station_report.gd:575
+#: scripts/ui/station/station_report.gd:584
 #: scripts/flow/station_rules.gd:1045
 msgid "Recuperar"
 msgstr "Restore"
@@ -1615,7 +1616,7 @@ msgid "Todo o progresso salvo no espaço %d (fases concluídas, cômodos, recurs
 msgstr "All progress saved in slot %d (completed phases, rooms, resources and heroes) is replaced by a new campaign. The other slots stay as they are."
 
 #: scripts/ui/refuge_hud.gd:1559
-#: scripts/ui/station/station_report.gd:575
+#: scripts/ui/station/station_report.gd:584
 #: scripts/flow/station_rules.gd:1045
 msgid "Melhorar"
 msgstr "Upgrade"
@@ -1792,7 +1793,7 @@ msgid "Posição vazia"
 msgstr "Empty position"
 
 #: scripts/ui/refuge_hud.gd:2041
-#: scripts/ui/station/station_report.gd:417
+#: scripts/ui/station/station_report.gd:426
 #: scripts/ui/station/character_room.gd:472
 msgid "Vida"
 msgstr "Life"
@@ -2283,12 +2284,12 @@ msgid "Suprimento"
 msgstr "Supply"
 
 #: scripts/ui/station/station_report.gd:91
-#: scripts/ui/station/station_report.gd:622
+#: scripts/ui/station/station_report.gd:631
 msgid "Ver a equipe"
 msgstr "See the team"
 
 #: scripts/ui/station/station_report.gd:91
-#: scripts/ui/station/station_report.gd:622
+#: scripts/ui/station/station_report.gd:631
 msgid "Ver detalhes"
 msgstr "See details"
 
@@ -2301,7 +2302,7 @@ msgid "Recursos recuperados"
 msgstr "Resources recovered"
 
 #: scripts/ui/station/station_report.gd:214
-#: scripts/ui/station/station_report.gd:553
+#: scripts/ui/station/station_report.gd:562
 msgid "Nada chegou desta vez."
 msgstr "Nothing arrived this time."
 
@@ -2317,136 +2318,144 @@ msgstr "Escape: nothing came back"
 msgid "A equipe caiu"
 msgstr "The team fell"
 
-#: scripts/ui/station/station_report.gd:265
+#: scripts/ui/station/station_report.gd:266
+msgid "A fuga até o trem"
+msgstr "The escape to the train"
+
+#: scripts/ui/station/station_report.gd:268
+msgid "+%d curativo"
+msgstr "+%d bandage"
+
+#: scripts/ui/station/station_report.gd:274
 msgid "Guardião derrotado"
 msgstr "Guardian defeated"
 
-#: scripts/ui/station/station_report.gd:268
+#: scripts/ui/station/station_report.gd:277
 msgid "%s liberada"
 msgstr "%s unlocked"
 
-#: scripts/ui/station/station_report.gd:274
+#: scripts/ui/station/station_report.gd:283
 msgid "Objetivo: %s cumprido"
 msgstr "Objective: %s done"
 
-#: scripts/ui/station/station_report.gd:274
+#: scripts/ui/station/station_report.gd:283
 msgid "Objetivo: %s não cumprido"
 msgstr "Objective: %s not done"
 
-#: scripts/ui/station/station_report.gd:281
+#: scripts/ui/station/station_report.gd:290
 msgid "%s caiu: em recuperação"
 msgstr "%s fell: recovering"
 
-#: scripts/ui/station/station_report.gd:283
+#: scripts/ui/station/station_report.gd:292
 msgid "%d caíram: em recuperação"
 msgstr "%d fell: recovering"
 
-#: scripts/ui/station/station_report.gd:307
+#: scripts/ui/station/station_report.gd:316
 msgid "Descanse no Dormitório antes da próxima expedição."
 msgstr "Rest in the Dormitory before the next expedition."
 
-#: scripts/ui/station/station_report.gd:392
+#: scripts/ui/station/station_report.gd:401
 msgid "Destaque da expedição"
 msgstr "Expedition highlight"
 
-#: scripts/ui/station/station_report.gd:397
+#: scripts/ui/station/station_report.gd:406
 msgid "+%d XP"
 msgstr "+%d XP"
 
-#: scripts/ui/station/station_report.gd:434
+#: scripts/ui/station/station_report.gd:443
 msgid "Expedições"
 msgstr "Expeditions"
 
-#: scripts/ui/station/station_report.gd:440
+#: scripts/ui/station/station_report.gd:449
 msgid "Abates"
 msgstr "Kills"
 
-#: scripts/ui/station/station_report.gd:457
+#: scripts/ui/station/station_report.gd:466
 #: scripts/ui/station/character_room.gd:608
 msgid "Sem relíquia"
 msgstr "No relic"
 
-#: scripts/ui/station/station_report.gd:468
+#: scripts/ui/station/station_report.gd:477
 msgid "Melhoria · %d frag."
 msgstr "Upgrade · %d frag."
 
-#: scripts/ui/station/station_report.gd:493
+#: scripts/ui/station/station_report.gd:502
 msgid "Caído"
 msgstr "Fallen"
 
-#: scripts/ui/station/station_report.gd:493
+#: scripts/ui/station/station_report.gd:502
 msgid "Caído · recuperado"
 msgstr "Fallen · recovered"
 
-#: scripts/ui/station/station_report.gd:500
+#: scripts/ui/station/station_report.gd:509
 msgid "Em recuperação na Enfermaria"
 msgstr "Recovering in the Infirmary"
 
-#: scripts/ui/station/station_report.gd:500
+#: scripts/ui/station/station_report.gd:509
 msgid "Em recuperação no Dormitório"
 msgstr "Recovering in the Dormitory"
 
-#: scripts/ui/station/station_report.gd:542
+#: scripts/ui/station/station_report.gd:551
 msgid "O que a equipe viu"
 msgstr "What the team saw"
 
-#: scripts/ui/station/station_report.gd:551
+#: scripts/ui/station/station_report.gd:560
 msgid "%s recebeu %s: %s"
 msgstr "%s received %s: %s"
 
-#: scripts/ui/station/station_report.gd:554
+#: scripts/ui/station/station_report.gd:563
 msgid "O que chegou%s"
 msgstr "What arrived%s"
 
-#: scripts/ui/station/station_report.gd:554
+#: scripts/ui/station/station_report.gd:563
 msgid " (%d%% do achado)"
 msgstr " (%d%% of what was found)"
 
-#: scripts/ui/station/station_report.gd:557
+#: scripts/ui/station/station_report.gd:566
 msgid "A Cantina produziu %d suprimentos; os moradores comeram %d; estragaram %d. Água: %d bebida, %d do coletor%s."
 msgstr "The Canteen produced %d supplies; the residents ate %d; %d spoiled. Water: %d drunk, %d from the collector%s."
 
-#: scripts/ui/station/station_report.gd:558
+#: scripts/ui/station/station_report.gd:567
 msgid "; faltou para alguém"
 msgstr "; someone went without"
 
-#: scripts/ui/station/station_report.gd:560
+#: scripts/ui/station/station_report.gd:569
 msgid "A Cora trouxe %d fragmento."
 msgstr "Cora brought %d fragment."
 
-#: scripts/ui/station/station_report.gd:561
+#: scripts/ui/station/station_report.gd:570
 msgid "A Estação no ciclo %d"
 msgstr "The Station in cycle %d"
 
-#: scripts/ui/station/station_report.gd:564
+#: scripts/ui/station/station_report.gd:573
 msgid "Recuperação"
 msgstr "Recovery"
 
-#: scripts/ui/station/station_report.gd:570
+#: scripts/ui/station/station_report.gd:579
 msgid "Agora dá para"
 msgstr "Now you can"
 
-#: scripts/ui/station/station_report.gd:575
+#: scripts/ui/station/station_report.gd:584
 msgid "%s %s%s (%s)"
 msgstr "%s %s%s (%s)"
 
-#: scripts/ui/station/station_report.gd:591
+#: scripts/ui/station/station_report.gd:600
 msgid "a Enfermaria"
 msgstr "the Infirmary"
 
-#: scripts/ui/station/station_report.gd:591
+#: scripts/ui/station/station_report.gd:600
 msgid "o Dormitório, sem leito livre"
 msgstr "the Dormitory, with no free bed"
 
-#: scripts/ui/station/station_report.gd:592
+#: scripts/ui/station/station_report.gd:601
 msgid "%s foi para %s: %s."
 msgstr "%s went to %s: %s."
 
-#: scripts/ui/station/station_report.gd:596
+#: scripts/ui/station/station_report.gd:605
 msgid "%s se recuperou e voltou ao Alojamento."
 msgstr "%s recovered and is back in the Quarters."
 
-#: scripts/ui/station/station_report.gd:616
+#: scripts/ui/station/station_report.gd:625
 msgid "Entrar no abrigo"
 msgstr "Enter the shelter"
 
