@@ -35,6 +35,9 @@ var _cards: Array[ShaderMaterial] = []
 ## A água pintada (#140): a do chão e a do fundo pintado; "Reduzir efeitos" a deixa mais lenta e sem piscar.
 var _waters: Array[ShaderMaterial] = []
 const WATER_COVERED := 0.3
+## O que a água pintada guarda de espuma (os arrays do water_painted.gdshader).
+const MAX_FOAM_POINTS := 16
+const MAX_FOAM_LINES := 4
 ## As portas de dentro dos interiores (#141): a vista de fora (o material) e a luz que entra, por zona. Não escurecem com
 ## o interior: são o lado de fora, com a hora e a chuva de lá (set_doorways).
 var _door_views: Array[ShaderMaterial] = []
@@ -340,19 +343,22 @@ func _material(m: Dictionary) -> Material:
 				material.set_shader_parameter("front_z", float(m.get("front_z", 0.0)))
 				material.set_shader_parameter("depth_scale", float(m.get("depth_scale", 18.0)))
 				var lines: Array = m.get("foam_lines", [])
+				var points: Array = m.get("foam_points", [])
+				if lines.size() > MAX_FOAM_LINES or points.size() > MAX_FOAM_POINTS:
+					push_warning("%s: a água pintada guarda %d linhas e %d pontos de espuma; o resto some (%d e %d no mapa)." % [
+						map_name, MAX_FOAM_LINES, MAX_FOAM_POINTS, lines.size(), points.size()])
 				var packed := Vector4(-9999, -9999, -9999, -9999)
-				for i in mini(4, lines.size()):
+				for i in mini(MAX_FOAM_LINES, lines.size()):
 					packed[i] = float(lines[i])
 				material.set_shader_parameter("foam_lines", packed)
 				material.set_shader_parameter("line_foam_width", float(m.get("line_foam_width", 0.9)))
-				var points: Array = m.get("foam_points", [])
 				var list: Array[Vector4] = []
-				for point in points.slice(0, 16):
+				for point in points.slice(0, MAX_FOAM_POINTS):
 					list.append(Vector4(float(point[0]), float(point[1]), float(point[2]), 0.0))
-				while list.size() < 16:
+				while list.size() < MAX_FOAM_POINTS:
 					list.append(Vector4.ZERO)
 				material.set_shader_parameter("foam_points", list)
-				material.set_shader_parameter("foam_count", mini(16, points.size()))
+				material.set_shader_parameter("foam_count", mini(MAX_FOAM_POINTS, points.size()))
 				_water_colors(material, m)
 				_waters.append(material)
 				_cards.append(material)

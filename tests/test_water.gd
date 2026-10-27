@@ -38,6 +38,10 @@ func run(context) -> void:
 func _data() -> void:
 	for map in ["RiverDock", "RootBridge"]:
 		var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/scenarios/%s.json" % map))
+		# O shader guarda até 16 pontos e 4 linhas de espuma (o que passar disso some, com um aviso).
+		for material in data.materials.filter(func(m): return m.get("painted", false)):
+			t.check(Array(material.get("foam_points", [])).size() <= AHScenarioWorld.MAX_FOAM_POINTS
+				and Array(material.get("foam_lines", [])).size() <= AHScenarioWorld.MAX_FOAM_LINES, "%s: a espuma cabe no shader" % map)
 		var water: Array = data.materials.filter(func(m): return m.kind == "water")
 		t.check(not water.is_empty() and water.all(func(m): return m.get("painted", false)), "%s: a água pintada" % map)
 		t.check(water.all(func(m): return not Array(m.get("foam_points", [])).is_empty()), "%s: a espuma nas estacas e nos pilares" % map)
@@ -91,6 +95,19 @@ func _map(map: String, index: int):
 		t.check(scenario._waters.all(func(m): return is_equal_approx(Vector4(m.get_shader_parameter("weather")).x, 1.0)), "%s: fora, volta" % map)
 		t.check(scenario._waters.all(func(m): return float(m.get_shader_parameter("flow")) == 1.0 and float(m.get_shader_parameter("sparkle")) == 1.0),
 			"%s: desligado, volta" % map)
+		# O caminho de verdade: a equipe entra num interior lateral do mapa (a zona coberta, street.gd passa covered) e sai.
+		var corridor: AHStreetCorridor = street.corridor
+		if map == "RiverDock" and t.check(not corridor.side_rooms.is_empty(), "o Cais tem interior lateral"):
+			street._mood = "golden"
+			street._raining = false
+			corridor._show_side_room(0)
+			await _tree.process_frame
+			t.check(street.sheltered and scenario._waters.all(func(m): return Vector4(m.get_shader_parameter("weather")).x < 0.5),
+				"no interior do Cais, a água vista pela porta escurece")
+			corridor._enter_segment(0, float(corridor.segments[0].x0) + 4.0)
+			await _tree.process_frame
+			t.check(not street.sheltered and scenario._waters.all(func(m): return is_equal_approx(Vector4(m.get_shader_parameter("weather")).x, 1.0)),
+				"de volta ao Cais, a água volta")
 	var camera: Camera3D = street.get_viewport().get_camera_3d()
 	var leader: Vector3 = street._leader.global_position
 	return Vector2(camera.global_position.distance_to(leader), camera.global_position.y - leader.y)

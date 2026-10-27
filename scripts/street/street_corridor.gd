@@ -734,7 +734,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## A formação (#129): fora da luta, dos eventos, do acampamento e de um painel aberto, com dois ou mais de pé.
 func can_open_formation() -> bool:
-	if busy or street._arena.active or hud.modal_open() or camp.active or not R.in_corridor(Campaign.state):
+	# Com uma dica aberta, a tecla é dela (como o Interagir).
+	if busy or street._arena.active or hud.modal_open() or camp.active or Tips.showing() or not R.in_corridor(Campaign.state):
 		return false
 	return street.party_ids.size() >= 2
 

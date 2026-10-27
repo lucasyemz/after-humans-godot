@@ -1417,3 +1417,4 @@ scenario_world.gd: doorways
 scenario_world.gd: golden
 scenario_world.gd: night
 scenario_world.gd: zone
+scenario_world.gd: %s: a água pintada guarda %d linhas e %d pontos de espuma; o resto some (%d e %d no mapa).
