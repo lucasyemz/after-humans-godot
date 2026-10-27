@@ -901,6 +901,12 @@ static func _guarded(route: Dictionary, step: int) -> bool:
 		and (route.steps[step].type == "combat" or route.steps[step].type == "boss")
 
 
+## O trecho já está aberto para usar o que tem nele (vasculhar um objeto, entrar num interior): a equipe chegou até ele
+## e não há patrulha de pé guardando. A marca de interação (#142) e a tecla usam a mesma regra.
+static func step_open(route: Dictionary, step: int) -> bool:
+	return route.index >= step and not _guarded(route, step)
+
+
 static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
 	if not in_corridor(campaign):
 		return false
@@ -908,7 +914,7 @@ static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
 	_scenario_fields(route)
 	if prop < 0 or prop >= route.prop_steps.size() or route.searched_props.has(prop) or route.current_house != -1:
 		return false
-	return route.index >= route.prop_steps[prop] and not _guarded(route, route.prop_steps[prop])
+	return step_open(route, route.prop_steps[prop])
 
 
 ## Vasculha o prop (SearchScenarioProp): a tabela das casas (1 em 3 ruim) e o objetivo da rota. Devolve {ok, text}.
@@ -939,7 +945,7 @@ static func can_enter_scenario_room(campaign: Dictionary, door_step: int) -> boo
 		return false
 	var route: Dictionary = corridor(campaign)
 	_scenario_fields(route)
-	return route.current_house == -1 and int(route.current_room) == -1 and route.index >= door_step and not _guarded(route, door_step)
+	return route.current_house == -1 and int(route.current_room) == -1 and step_open(route, door_step)
 
 
 static func enter_scenario_room(campaign: Dictionary, zone: int, door_step: int) -> bool:
