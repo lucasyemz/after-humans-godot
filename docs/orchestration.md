@@ -24,6 +24,25 @@ arquivo ao mesmo tempo.
   Claude local resolve na junção;
 - uma issue nova entra na frente da área dela. Na dúvida, o Lucas decide.
 
+### Os dois orquestradores (desde 26/10/2026)
+
+| Orquestrador | Onde | Faz |
+|---|---|---|
+| **Claude Orquestrador Nuvem** | claude.ai/code, pelo celular | conversa com o Lucas quando ele não está no PC; escreve issues e mensagens; revisa PRs; junta os PRs simples |
+| **Claude Orquestrador PC** | o Claude local no Windows | o teste definitivo: junta os PRs que mexem no jogo, roda os testes e as capturas na Godot do Windows, faz o build, cuida da referência da Unreal (que só existe nesse PC) e dos saves do Lucas |
+
+**Quem junta o quê:**
+- **o da nuvem junta** só os PRs de arte e documentos (design, sem `scripts/`, `data/` nem `tests/`) com o CI verde e a aprovação do Lucas;
+- **os PRs de código** (Claude 1 e Claude 2) ficam para o do PC, que roda a bateria inteira no Windows antes. Se o Lucas pedir ao da nuvem para juntar um PR de código, ele junta com o CI verde e avisa num comentário que falta o teste no Windows.
+
+**Para os dois não juntarem ao mesmo tempo:** antes de juntar, comentar no PR "Integrando (Orquestrador Nuvem)" ou "Integrando (Orquestrador PC)". Se o outro já comentou, não mexer.
+
+**O que os dois fazem igual:**
+- as issues no formato `[Agente] Área: descrição`, com a frente certa (`claude-1`, `claude-2`, `awesomic-1`, `awesomic-2`);
+- os textos em português;
+- as decisões do Lucas registradas na issue ou no PR;
+- nunca escrever `@codex` ou `@claude` em comentários.
+
 ### Os papéis
 
 | Agente | Branch | Faz | Ciclo |
