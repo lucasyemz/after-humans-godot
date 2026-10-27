@@ -118,6 +118,8 @@ var _lineup_signature := ""
 var _arrived_candidate := ""
 ## Mapa de fases: Preparar expedição abre por cima de tudo; a fase escolhida vai para a Preparação.
 var _map: AHPhaseMap
+## A visita guiada da primeira vez (#145), aberta por cima da Estação, ou null.
+var tour: AHStationTour
 
 
 func _ready() -> void:
@@ -158,6 +160,7 @@ func _ready() -> void:
 	_map.closed.connect(func(): _map.visible = false)
 	add_child(_map)
 	Tips.show_tip.call_deferred("station")
+	_maybe_tour.call_deferred()
 
 
 ## O painel do cômodo: a chapa grande no lugar do painel PERSONAGEM, com o cabeçalho, o divisor, o conteúdo que rola e o
@@ -951,6 +954,7 @@ func open_room(room_id: String) -> void:
 		_reset_draft()
 	station.focus_room(room_id)
 	refresh()
+	_tour_moment("room:" + room_id)
 
 
 func open_service(service: String) -> void:
@@ -1016,6 +1020,61 @@ func close_panel() -> void:
 	# De volta à vista geral, as setas voltam a andar entre os cômodos.
 	if get_viewport() != null:
 		get_viewport().gui_release_focus()
+	_tour_moment("close")
+	# Fechado o relatório da chegada da abertura, começa a visita guiada (#145).
+	_maybe_tour()
+
+
+# ---------------------------------------------------------------- a visita guiada (#145)
+
+## A visita abre na vista geral, com a chegada e o relatório da abertura já vistos.
+func _maybe_tour() -> void:
+	if tour != null or current != "" or briefing_open() or not is_inside_tree() or not AHStationTour.pending(Campaign.state):
+		return
+	var report: Dictionary = Campaign.state.station.get("last_return", {})
+	if not report.is_empty() and not report.get("seen", false):
+		return
+	tour = AHStationTour.new(self)
+	tour.finished.connect(func(): tour = null)
+	add_child(tour)
+
+
+func _tour_moment(what: String) -> void:
+	if tour != null:
+		tour.moment(what)
+
+
+## O que a visita destaca, na tela de 1920 x 1080 (vazio se não está à vista).
+func tour_rect(target: String) -> Rect2:
+	match target:
+		"overview":
+			var all := Rect2()
+			for rect: Rect2 in station.room_screen_rects().values():
+				all = rect if not all.has_area() else all.merge(rect)
+			return all
+		"resources":
+			return _resources.get_global_rect() if is_instance_valid(_resources) and _resources.is_visible_in_tree() else Rect2()
+		"next_step":
+			var card := _menu.get_node_or_null("NextStep") as Control
+			return card.get_global_rect() if card != null and card.is_visible_in_tree() else Rect2()
+		"panel":
+			if is_instance_valid(_room_screen):
+				return _room_screen.get_global_rect()
+			return _panel.get_global_rect() if _panel.visible else Rect2()
+		"characters", "prepare":
+			var node := _frame.find_child("Nav_characters" if target == "characters" else "Prepare*", true, false) as Control
+			return node.get_global_rect() if node != null and node.is_visible_in_tree() else Rect2()
+	if target.begins_with("room:") and current == "":
+		return station.room_screen_rects().get(target.substr(5), Rect2())
+	return Rect2()
+
+
+## A ação que a visita espera, pelo teclado ou pelo controle (Interagir): abrir o cômodo ou fechar o painel.
+func tour_act(wait: String) -> void:
+	if wait.begins_with("room:") and current == "":
+		open_room(wait.substr(5))
+	elif wait == "close" and current != "":
+		close_panel()
 
 
 ## Preparar expedição (AAHHUD::OpenPhaseMap): com algo pendente (a noite, o trem), a Preparação diz o quê; senão, o mapa.

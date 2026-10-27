@@ -170,5 +170,77 @@
         ]
       }
     ]
+  },
+  {
+    "Name": "station_tour",
+    "Steps": [
+      {
+        "Id": "overview",
+        "Speaker": "hero_cao_bento",
+        "Target": "overview",
+        "Wait": "next",
+        "Text": "Esta é a Estação Raiz: a estação de metrô dos Antigos onde a gente vive. Cada cômodo é uma parte da casa; os escuros ainda estão por recuperar."
+      },
+      {
+        "Id": "resources",
+        "Speaker": "hero_cao_bento",
+        "Target": "resources",
+        "Wait": "next",
+        "Text": "Aqui em cima ficam a comida, a água e a energia da Estação, e os materiais que a gente traz. Cada volta enche um pouco; cada noite gasta um pouco."
+      },
+      {
+        "Id": "next_step",
+        "Speaker": "hero_cao_bento",
+        "Target": "next_step",
+        "Wait": "next",
+        "Text": "Na dúvida, olhe o Próximo passo: ele diz o que a Estação mais precisa agora."
+      },
+      {
+        "Id": "room",
+        "Speaker": "hero_cao_bento",
+        "Target": "room:next",
+        "Wait": "room:next",
+        "Do": "Abra o cômodo destacado",
+        "Text": "Este cômodo está parado. Abra para ver o que ele faz e o que custa pôr de pé de novo."
+      },
+      {
+        "Id": "room_panel",
+        "Speaker": "hero_cao_bento",
+        "Target": "panel",
+        "Wait": "close",
+        "Do": "Feche o painel",
+        "Text": "O painel diz o que o cômodo dá à Estação e o custo em materiais. Com o que faltar, a próxima saída traz."
+      },
+      {
+        "Id": "characters",
+        "Speaker": "hero_gato_nick",
+        "Target": "characters",
+        "Wait": "room:characters",
+        "Do": "Abra a Sala dos Personagens",
+        "Text": "E onde ficam as fichas da equipe? Na Sala dos Personagens."
+      },
+      {
+        "Id": "characters_inside",
+        "Speaker": "hero_gato_nick",
+        "Target": "panel",
+        "Wait": "close",
+        "Do": "Feche a Sala",
+        "Text": "Cada luta dá experiência. Com o nível, o Treino libera uma melhoria. Não que eu pretenda ficar para isso."
+      },
+      {
+        "Id": "dormitory",
+        "Speaker": "hero_cao_bento",
+        "Target": "room:dormitory",
+        "Wait": "next",
+        "Text": "O Dormitório: depois de cada volta a equipe dorme ali, come e recupera vida e instinto antes de sair de novo."
+      },
+      {
+        "Id": "depart",
+        "Speaker": "hero_cao_bento",
+        "Target": "prepare",
+        "Wait": "next",
+        "Text": "Quando estiverem prontos, Preparar expedição abre o mapa: escolha o lugar, monte a equipe e parta."
+      }
+    ]
   }
 ]

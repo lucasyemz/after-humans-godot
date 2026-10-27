@@ -104,6 +104,18 @@ func show_step(step: Dictionary, number: int, total: int, place: String = "top")
 	_layout()
 
 
+## Só o destaque, sem a chapa (a visita da Estação, #145, tem a fala dela): a moldura em rect e, com dim, o resto
+## escurecido. block: o escuro segura o mouse (só o destaque recebe o clique).
+func show_frame(rect: Rect2, dim: bool, block: bool) -> void:
+	step_id = "frame"
+	_plate.visible = false
+	_dim = dim
+	for shade in _shades:
+		shade.mouse_filter = Control.MOUSE_FILTER_STOP if block else Control.MOUSE_FILTER_IGNORE
+	focus_rect = rect
+	_layout()
+
+
 func hide_hint() -> void:
 	step_id = ""
 	focus_rect = Rect2()
@@ -143,7 +155,7 @@ func _layout() -> void:
 	_frame.position = hole.position
 	_frame.size = hole.size
 	# A seta fica do lado da moldura que olha para a chapa (acima dela, ou à esquerda) e aponta para o alvo.
-	var plate := Rect2(_plate.position, _plate.size)
+	var plate := Rect2(_plate.position, _plate.size) if _plate.visible else Rect2(Vector2(960, 0), Vector2.ZERO)
 	if hole.position.y > plate.end.y + ARROW:
 		_arrow.rotation_degrees = 90.0
 		_arrow.position = Vector2(hole.get_center().x - ARROW * 0.5, hole.position.y - ARROW - 6.0)
@@ -154,5 +166,5 @@ func _layout() -> void:
 		_arrow.rotation_degrees = 0.0
 		_arrow.position = Vector2(hole.position.x - ARROW - 6.0, hole.get_center().y - ARROW * 0.5)
 	# A chapa nunca cobre o alvo: se cobriria, desce para baixo dele (ou sobe acima).
-	if plate.intersects(hole):
+	if _plate.visible and plate.intersects(hole):
 		_plate.position.y = hole.end.y + 24.0 if hole.end.y + 24.0 + plate.size.y < view.y - 200.0 else maxf(20.0, hole.position.y - plate.size.y - 24.0)

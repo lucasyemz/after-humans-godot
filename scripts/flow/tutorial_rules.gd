@@ -165,10 +165,22 @@ static func begin(campaign: Dictionary, seed_value: int = 20261026) -> bool:
 	return true
 
 
-## Pular tutorial: a campanha fica como depois dele (a mesma recompensa, o mesmo elenco), com o relatório já visto.
+## Pular tutorial: a campanha fica como depois dele (a mesma recompensa, o mesmo elenco), com o relatório já visto e
+## sem a visita da Estação (#145): quem pula já jogou.
 static func skip(campaign: Dictionary) -> void:
 	complete(campaign)
 	campaign.station.last_return.seen = true
+	end_tour(campaign)
+
+
+## Os passos da visita guiada da Estação (#145).
+static func tour_steps() -> Array:
+	return row("station_tour").get("Steps", [])
+
+
+## A visita terminou (ou foi pulada): a abertura acabou de vez.
+static func end_tour(campaign: Dictionary) -> void:
+	campaign.tutorial = {"stage": "done"}
 
 
 ## O fim do tutorial (o embarque, ou o Pular): a equipe inteira e descansada, os heróis como saíram (as lutas do
@@ -235,5 +247,9 @@ static func hint_index(id: String) -> int:
 const COVERED_TIPS := ["explore", "combat", "search", "bag", "patrol", "instinct"]
 
 
+## As dicas que a visita da Estação ensina (contam como vistas no fim dela).
+const TOUR_TIPS := ["station", "return", "preparation"]
+
+
 static func suppresses_tips(campaign: Dictionary) -> bool:
-	return stage(campaign) == "journey"
+	return stage(campaign) == "journey" or stage(campaign) == "station"
