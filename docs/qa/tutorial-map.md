@@ -30,7 +30,7 @@ arte passou para a Awesomic 1, no mesmo contrato `T_TU*`). O fluxo do tutorial
 - A fase "tutorial" (`AHTutorial`, `data/tutorial.json`) joga pelo corredor de sempre, mas fica fora de
   `AHJourneyRules.PHASES`: não aparece no Mapa da Rede nem no "Jogar de novo".
 - Sete trechos: a partida, a luta 1 (o Broto), o encontro com o Nick, a busca, a luta 2 (o Rastejante de Cabos, que
-  empurra) e a luta 3 (o Drone de Expurgo, que contamina) e o trem. Em 40 sorteios seguidos, sem cura entre as lutas,
+  empurra), a luta 3 (o Drone de Expurgo, que contamina) e o trem. Em 40 sorteios seguidos, sem cura entre as lutas,
   ninguém cai.
 - A porta do fim de cada zona só abre com a zona vencida. A de trás baixa quando a equipe passa, e não há volta.
 - O vagão chega quando a equipe entra na plataforma. O embarque leva à Estação pela passagem do vagão (#75).
