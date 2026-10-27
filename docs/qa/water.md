@@ -55,6 +55,7 @@ O movimento, em 4 quadros a 0,4 s (recortes da água): no Ultra, [o Cais](water/
 | Rodada | Veredito | O que a QA achou | Como ficou |
 |---|---|---|---|
 | 1 | REPROVADO | **Alta:** o fundo da Ponte seguia a pintura com o reflexo realista, só tremida. **Médias:** a espuma ficava onde a câmera não alcança (embaixo do piso, na frente); a água sem luz brilhava no interior do Cais. **Baixas:** a sequência só no Ultra, os curingas no `i18n_ignore`, a água preta de noite, o relâmpago | O fundo virou a água pintada; a espuma foi para onde a água aparece; a água escurece nos interiores; a sequência no Baixo e os recortes; os curingas só no `scenario_world.gd` |
+| 2 | APROVADO | Baixas: a linha dura no primeiro degrau de cor; o teste da água no interior; a Ponte quase lisa no fim de tarde; faixas leves da margem no topo da água da Ponte | O degrau ganhou uma borda curta e o teste entrou; as outras duas ficam para o Lucas ver (um ajuste de `detail`, `ripple_color` e `shore` no material da Ponte) |
 
 ## Para o Lucas
 

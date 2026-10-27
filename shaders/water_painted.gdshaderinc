@@ -49,7 +49,9 @@ vec3 painted_water(vec2 p, float foam, out float glint) {
 	float t = TIME * flow;
 	// As faixas: a distância, com uma ondulação larga, em quatro degraus.
 	float depth = clamp(p.y / depth_scale + (wp_noise(vec2(p.x * 0.08 + t * 0.03, p.y * 0.25)) - 0.5) * 0.25, 0.0, 1.0);
-	float band = floor(depth * 4.0) / 3.0;
+	// Os degraus com uma borda curta (não uma linha dura de costura).
+	float steps = depth * 4.0;
+	float band = (floor(steps) + smoothstep(0.85, 1.0, fract(steps))) / 3.0;
 	vec3 color = band < 0.5 ? mix(surface_color, mid_color, band * 2.0) : mix(mid_color, deep_color, band * 2.0 - 1.0);
 	// As ondinhas, mais finas e mais apagadas para o fundo.
 	float strokes = wp_strokes(p, t, mix(2.2, 1.0, detail)) * mix(0.55, 1.0, detail) * (1.0 - depth * 0.6);

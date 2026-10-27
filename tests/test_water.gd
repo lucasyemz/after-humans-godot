@@ -1,7 +1,7 @@
 ## A água pintada do Cais e da Ponte das Raízes (#140):
 ## - o Cais e a Ponte usam a água pintada (water_painted.gdshader), com a margem, as estacas e os pilares na espuma;
 ## - o panorama da Ponte troca a água parada da pintura pela viva (scenario_card_water.gdshader), abaixo da linha d'água;
-## - "Reduzir efeitos" deixa a água mais lenta e sem piscar, e volta ao desligar;
+## - "Reduzir efeitos" deixa a água mais lenta e sem piscar, e volta ao desligar; num interior, a água escurece;
 ## - a câmera da Ponte é a dos outros cenários (EXPLORE_CAMERA.scenario): a mesma distância e a mesma altura.
 extends RefCounted
 
@@ -84,6 +84,11 @@ func _map(map: String, index: int):
 			"%s: com Reduzir efeitos, a água anda devagar e não pisca" % map)
 		Campaign.state.settings.reduced_environment_effects = false
 		Settings.changed.emit()
+		# Num interior, a água pintada (sem luz própria) escurece; fora, volta.
+		scenario.set_weather(0.0, Color(1, 1, 1), true)
+		t.check(scenario._waters.all(func(m): return Vector4(m.get_shader_parameter("weather")).x < 0.5), "%s: num interior, a água escurece" % map)
+		scenario.set_weather(0.0, Color(1, 1, 1), false)
+		t.check(scenario._waters.all(func(m): return is_equal_approx(Vector4(m.get_shader_parameter("weather")).x, 1.0)), "%s: fora, volta" % map)
 		t.check(scenario._waters.all(func(m): return float(m.get_shader_parameter("flow")) == 1.0 and float(m.get_shader_parameter("sparkle")) == 1.0),
 			"%s: desligado, volta" % map)
 	var camera: Camera3D = street.get_viewport().get_camera_3d()
