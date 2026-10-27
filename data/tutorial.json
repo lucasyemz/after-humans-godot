@@ -209,11 +209,11 @@
       },
       {
         "Id": "characters",
-        "Speaker": "hero_gato_nick",
+        "Speaker": "hero_cao_bento",
         "Target": "characters",
         "Wait": "room:characters",
         "Do": "Abra a Sala dos Personagens",
-        "Text": "E onde ficam as fichas da equipe? Na Sala dos Personagens."
+        "Text": "As fichas da equipe ficam na Sala dos Personagens. Abra lá."
       },
       {
         "Id": "characters_inside",
@@ -234,8 +234,9 @@
         "Id": "depart",
         "Speaker": "hero_cao_bento",
         "Target": "prepare",
-        "Wait": "next",
-        "Text": "Quando estiverem prontos, Preparar expedição abre o mapa: escolha o lugar, monte a equipe e parta."
+        "Wait": "map",
+        "Text": "Quando estiverem prontos, Preparar expedição abre o mapa: escolha o lugar, monte a equipe e parta. Abra para ver.",
+        "Do": "Abra Preparar expedição"
       }
     ]
   }

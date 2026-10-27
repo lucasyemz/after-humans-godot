@@ -19,6 +19,7 @@ func run(context) -> void:
 	Campaign.save_dir = "user://test-station-tour-%d" % Time.get_ticks_usec()
 	_rules()
 	await _walk()
+	await _resume_close()
 	await _skip()
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
@@ -103,10 +104,12 @@ func _walk() -> void:
 	await _frames(3)
 	t.equal(tour.index, 7, "fechada a Sala, o Dormitório")
 	await _action("interact")
-	t.equal(tour._next.text, tr("Começar").to_upper(), "o último passo começa o jogo")
+	t.equal(tour.waiting_for(), "map", "o último passo pede Preparar expedição")
 	await _action("interact")
 	await _frames(2)
-	t.check(hud.tour == null and AHTutorial.stage(Campaign.state) == "done", "no fim, a visita fecha e a abertura termina")
+	t.check(hud.tour == null and AHTutorial.stage(Campaign.state) == "done", "aberto o mapa, a visita fecha e a abertura termina")
+	t.check(hud._map.visible, "com o mapa das fases aberto")
+	hud._map.visible = false
 	t.check(Tips.seen("station"), "as dicas da Estação contam como vistas")
 	hud.open_room(AHStationRules.FORGE)
 	await _frames(2)
@@ -114,6 +117,24 @@ func _walk() -> void:
 	hud.close_panel()
 	station = await _open()
 	t.check(station != null and station.hud.tour == null, "a visita não abre de novo")
+
+
+## Fechar o jogo num passo de fechar (o painel não volta aberto): a visita retoma no passo de abrir, e as teclas seguem.
+func _resume_close() -> void:
+	Campaign.state = _after_opening(46)
+	Campaign.state.tutorial.tour = AHTutorial.tour_steps().map(func(s): return s.Id).find("room_panel")
+	Campaign.save()
+	var station = await _open()
+	if not t.check(station != null and station.hud.tour != null, "reaberta num passo de fechar, a visita abre"):
+		return
+	var tour: AHStationTour = station.hud.tour
+	t.check(tour.waiting_for().begins_with("room:"), "e volta ao passo de abrir o cômodo")
+	await _action("interact")
+	await _frames(2)
+	t.check(station.hud.current != "" and tour.waiting_for() == "close", "Interagir abre e segue")
+	await _action("ui_cancel")
+	await _frames(2)
+	t.check(station.hud.current == "" and tour.index > 4, "e Voltar fecha")
 
 
 func _skip() -> void:

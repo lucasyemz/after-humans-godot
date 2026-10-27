@@ -1458,3 +1458,5 @@ tutorial_guide.gd: Briefing
 station_report.gd: tutorial
 station_report.gd: bandages
 station_report.gd: tool
+station_tour.gd: %d/%d  ·  %s
+refuge_hud.gd: map

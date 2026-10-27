@@ -6,7 +6,8 @@
 ## abertura termina (stage "done").
 ## Os alvos: "overview" (os cômodos), "resources" (a barra do alto), "next_step" (o Próximo passo), "room:<id>" (um
 ## cômodo; "room:next" é o do próximo passo), "panel" (o painel aberto), "characters" (a aba da Sala) e "prepare"
-## (Preparar expedição). As esperas: "next", "room:<id>" (o cômodo aberto), "room:characters" (a Sala) e "close".
+## (Preparar expedição). As esperas: "next", "room:<id>" (o cômodo aberto), "room:characters" (a Sala), "close" e "map"
+## (Preparar expedição aberto).
 class_name AHStationTour
 extends Control
 
@@ -47,6 +48,9 @@ static func pending(campaign: Dictionary) -> bool:
 func _ready() -> void:
 	steps = AHTutorial.tour_steps()
 	index = clampi(int(Campaign.state.get("tutorial", {}).get("tour", 0)), 0, steps.size() - 1)
+	# Retomada num passo de fechar (o painel que estava aberto não volta aberto): o passo de antes, o de abrir.
+	while index > 0 and waiting_for() == "close" and hud.current == "":
+		index -= 1
 	# Nos passos do PRÓXIMO a tela de baixo não recebe o clique (a visita não sai do lugar por um clique perdido).
 	_blocker = Control.new()
 	_blocker.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -135,6 +139,8 @@ func _show() -> void:
 	var last := index + 1 >= steps.size()
 	_next.text = (tr("Começar") if last else tr("Próximo")).to_upper()
 	_next.visible = waits == "next"
+	if last and waits != "next":
+		_page.text = "%d/%d  ·  %s" % [index + 1, steps.size(), tr(String(step.get("Do", "")))]
 	_skip.visible = not last
 	_blocker.mouse_filter = Control.MOUSE_FILTER_STOP if waits == "next" else Control.MOUSE_FILTER_IGNORE
 	if AHUiStyle.using_keys and _next.visible:
@@ -169,18 +175,31 @@ func _target() -> String:
 func _process(_delta: float) -> void:
 	if _done:
 		return
+	# A seleção de cômodo da Estação (a moldura do teclado) não disputa com o destaque da visita.
+	hud.clear_room_selection()
 	var rect: Rect2 = hud.tour_rect(_target())
+	# Logo depois da chegada a câmera ainda vem da plataforma: a fala espera a vista em corte (o destaque) aparecer.
+	_box.visible = rect.has_area() or not String(current().get("Target", "")).begins_with("overview")
 	_hint.show_frame(rect, true, waiting_for() != "next")
 	_place()
 
 
-## A fala embaixo no meio; se cobriria o destaque, no alto.
+## A fala no primeiro lugar que não cobre o destaque (embaixo no meio, no alto, à esquerda, à direita); se todos cobrem
+## (o painel alto), no que cobre menos.
 func _place() -> void:
 	_box.reset_size()
 	var size := _box.get_combined_minimum_size()
 	var rect := _hint.focus_rect.grow(24.0)
-	var bottom := Rect2(Vector2(960.0 - size.x * 0.5, 1080.0 - 150.0 - size.y), size)
-	_box.position = bottom.position if not bottom.intersects(rect) else Vector2(960.0 - size.x * 0.5, 130.0)
+	var spots := [Vector2(960.0 - size.x * 0.5, 1080.0 - 150.0 - size.y), Vector2(960.0 - size.x * 0.5, 130.0),
+		Vector2(28.0, 540.0 - size.y * 0.5), Vector2(1892.0 - size.x, 540.0 - size.y * 0.5), Vector2(28.0, 1080.0 - 150.0 - size.y)]
+	var best: Vector2 = spots[0]
+	var least := INF
+	for spot: Vector2 in spots:
+		var overlap := Rect2(spot, size).intersection(rect).get_area() if rect.has_area() else 0.0
+		if overlap < least:
+			least = overlap
+			best = spot
+	_box.position = best
 
 
 ## O que o HUD da Estação avisa (open_room, open_service, close_panel): se é a espera do passo, ele segue.
@@ -226,13 +245,16 @@ func _input(event: InputEvent) -> void:
 	var wait := waiting_for()
 	if event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
 		get_viewport().set_input_as_handled()
+		# Com a fala ainda esperando a câmera, nada segue.
+		if not _box.visible:
+			return
 		if wait == "next":
 			advance()
 		else:
 			hud.tour_act(wait)
 	elif AHUiStyle.is_back(event):
 		get_viewport().set_input_as_handled()
-		if wait == "close":
+		if wait == "close" and hud.current != "":
 			hud.tour_act(wait)
 		else:
 			skip()

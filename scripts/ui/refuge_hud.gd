@@ -1064,8 +1064,9 @@ func tour_rect(target: String) -> Rect2:
 			var card := _menu.get_node_or_null("NextStep") as Control
 			return card.get_global_rect() if card != null and card.is_visible_in_tree() else Rect2()
 		"panel":
+			# Na Sala, a coluna da direita (o nível e o Treino, que a fala explica).
 			if is_instance_valid(_room_screen):
-				return _room_screen.get_global_rect()
+				return AHCharacterRoom.RIGHT
 			return _panel.get_global_rect() if _panel.visible else Rect2()
 		"characters", "prepare":
 			var node := _frame.find_child("Nav_characters" if target == "characters" else "Prepare*", true, false) as Control
@@ -1075,16 +1076,24 @@ func tour_rect(target: String) -> Rect2:
 	return Rect2()
 
 
-## A ação que a visita espera, pelo teclado ou pelo controle (Interagir): abrir o cômodo ou fechar o painel.
+## A ação que a visita espera, pelo teclado ou pelo controle (Interagir): abrir o cômodo, fechar o painel ou o mapa.
 func tour_act(wait: String) -> void:
 	if wait.begins_with("room:") and current == "":
 		open_room(wait.substr(5))
 	elif wait == "close" and current != "":
 		close_panel()
+	elif wait == "map" and current == "":
+		open_map()
+
+
+## Tira a seleção de cômodo do teclado (a visita tem o destaque dela).
+func clear_room_selection() -> void:
+	_key_room = ""
 
 
 ## Preparar expedição (AAHHUD::OpenPhaseMap): com algo pendente (a noite, o trem), a Preparação diz o quê; senão, o mapa.
 func open_map() -> void:
+	_tour_moment("map")
 	if S.preparation_block(Campaign.state) != "":
 		open_room(S.PREPARATION)
 		return
