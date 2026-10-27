@@ -1,7 +1,7 @@
 ## O tutorial da abertura (#144):
 ## - Pular tutorial deixa a campanha no mesmo estado que jogá-lo até o trem (a recompensa, o elenco, o relatório);
-## - "Começar pela abertura" abre o cartão "Você precisa escapar." e o Corredor de Contenção com o Bento sozinho, com as
-##   dicas de primeira vez caladas;
+## - "Começar pela abertura" abre o cartão "Você precisa escapar." e o Corredor de Contenção com o Bento, a Íris e a
+##   Véspera, com as dicas de primeira vez caladas;
 ## - a jornada pela cena de verdade: a dica de andar; a primeira luta trava as ações até a escolha da habilidade, com a
 ##   dica da habilidade e a do alvo; ninguém cai (a vida para em 1); o Nick chega com a conversa; a busca e a Mochila;
 ##   recuar de uma luta a recomeça; fechar o jogo no meio e voltar retoma do mesmo ponto; o embarque leva à Estação com a
@@ -52,13 +52,13 @@ func _skip_equals_play() -> void:
 	t.equal(int(skipped.inventory.bandages), bandages + int(prize.bandages), "o curativo")
 	t.check(prize.tool != "" and skipped.tools.has(prize.tool), "e a ferramenta")
 	t.check(skipped.session.expedition == null and skipped.session.screen == "shelter", "e começa na Estação")
-	t.equal(skipped.roster.size(), 4, "com os quatro fundadores (a proposta B, a de data/tutorial.json)")
+	t.equal(skipped.roster.size(), 4, "com os quatro fundadores")
 	# Jogado: a jornada com as lutas (a vida gasta, o XP ganho, a busca feita) e o embarque.
 	var played := Campaign.create_initial(31)
 	t.check(AHTutorial.begin(played), "a abertura começa")
 	t.equal(AHTutorial.stage(played), "journey", "no meio da fuga")
 	t.check(AHTutorial.suppresses_tips(played), "com as dicas de primeira vez caladas")
-	t.equal(played.session.expedition.team, ["hero_cao_bento"], "o Bento sozinho")
+	t.equal(played.session.expedition.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera"], "o Bento, a Íris e a Véspera")
 	AHTutorial.join(played)
 	# Quem foi ao tutorial volta ferido; o resto do elenco ficou na Estação (o embarque só cura a equipe).
 	for hero in played.roster.filter(func(h): return played.session.expedition.team.has(h.id)):
@@ -76,9 +76,9 @@ func _skip_equals_play() -> void:
 	t.equal(JSON.stringify(a, "", true), JSON.stringify(b, "", true), "pular dá o mesmo estado que jogar até o trem")
 	t.check(not played.completed_phases.has(AHTutorial.PHASE_ID), "o tutorial não vira fase concluída")
 	var report: Dictionary = played.station.last_return
-	t.equal(report.team, ["hero_cao_bento", "hero_gato_nick"], "o relatório da chegada traz o Bento e o Nick")
+	t.equal(report.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "o relatório da chegada traz os quatro")
 	var lines := AHBriefing.debriefing(played, report)
-	t.equal(lines.map(func(l): return l.speaker.id), ["hero_gato_nick", "hero_cao_bento", "hero_gato_nick"], "o debriefing da chegada é dos dois")
+	t.equal(lines.map(func(l): return l.speaker.id), ["hero_gato_nick", "hero_cao_bento", "hero_gato_nick", "hero_cao_bento", "hero_gato_nick"], "o debriefing da chegada é do Bento e do Nick")
 	t.equal(lines[-1].text, "Só por uma noite.", "e termina com \"Só por uma noite.\"")
 	# O relatório da chegada: sem guardião, com o curativo e a ferramenta à vista (#144).
 	var screen := AHStationReport.new()
@@ -127,7 +127,7 @@ func _title_opening() -> void:
 	if not await _until(func(): return _street() != null and not GameFlow.busy, "o Corredor de Contenção abrir"):
 		return
 	t.equal(_street().scenario.map_name, AHTutorial.MAP, "a abertura joga no Corredor de Contenção")
-	t.equal(Campaign.state.session.expedition.team, ["hero_cao_bento"], "com o Bento sozinho")
+	t.equal(Campaign.state.session.expedition.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera"], "com o Bento, a Íris e a Véspera")
 	var saved = Campaign.read_file(Campaign.primary_path())
 	t.check(saved != null and AHTutorial.stage(saved) == "journey", "a campanha nova grava o ponto do tutorial")
 
@@ -153,10 +153,10 @@ func _journey() -> void:
 	Input.action_release("move_right")
 	var arena: AHCombatArena = street._arena
 	arena.speed = 20.0
-	if not await _until(func(): return arena.hud.waiting and arena.hud._actor_id.contains("cao"), "a vez do Bento"):
+	if not await _until(func(): return arena.hud.waiting, "a vez de um herói"):
 		return
 	await _frames(2)
-	t.equal(guide.hint.step_id, "ability", "na vez do Bento, a dica da habilidade")
+	t.equal(guide.hint.step_id, "ability", "na vez do herói, a dica da habilidade")
 	var actions: Array = arena.hud._actions.get_children()
 	t.check(actions.all(func(b): return b.disabled), "a primeira escolha trava as ações: só as habilidades")
 	t.check(guide.hint._shades[0].visible and guide.hint._frame.visible, "com o resto da tela escurecido e o destaque nas habilidades")
@@ -185,10 +185,10 @@ func _journey() -> void:
 	# O Nick: a conversa com o retrato e ele entra na equipe.
 	corridor.debug_next_fight()
 	if await _until(func(): return _dialog(street) != null, "a conversa do Nick"):
-		t.equal(_dialog(street).lines.size(), 3, "três falas no encontro")
+		t.equal(_dialog(street).lines.size(), 4, "quatro falas no encontro")
 		_dialog(street).skip_button.pressed.emit()
-	await _until(func(): return Campaign.state.session.expedition.team.size() == 2 and not corridor.busy, "o Nick entrar")
-	t.equal(street.party_ids, ["hero_cao_bento", "hero_gato_nick"], "o Nick anda com o Bento")
+	await _until(func(): return Campaign.state.session.expedition.team.size() == 4 and not corridor.busy, "o Nick entrar")
+	t.equal(street.party_ids, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "o Nick anda com os três")
 	# A busca e a Mochila.
 	var entry: Dictionary = corridor.scenario_props[0]
 	street._place_leader(Vector3(entry.x, street.floor_y, street.lane_z))
@@ -215,7 +215,7 @@ func _journey() -> void:
 	corridor = street.corridor
 	guide = corridor.guide
 	t.equal(Campaign.state.session.expedition.corridor.index, index, "o save retoma do mesmo trecho")
-	t.equal(street.party_ids, ["hero_cao_bento", "hero_gato_nick"], "com a dupla")
+	t.equal(street.party_ids, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "com os quatro")
 	t.check(guide != null and guide.done("search") and guide.hint.step_id != "walk", "e as dicas já vistas não voltam")
 	# A segunda patrulha à frente: a dica de chegar sem ser visto.
 	t.check(await _until(func(): return guide.hint.step_id == "patrol", "a dica da patrulha", 8.0), "a patrulha da segunda luta abre a dica dela")

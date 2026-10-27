@@ -122,6 +122,15 @@ O Lucas pediu para seguir com as propostas desta tabela e, onde não havia, faze
 
 As descrições das fases 1, 2 e 5 e o Próximo passo final ("Os Antigos ainda existem?…") são as da seção 4.
 
+### Decisão do Lucas (27/10): a abertura segue o arco
+
+- **O tutorial (#144, #147, #145) segue o arco** (`bento-nick-arc.md` §3, §4 e §26, Atos 1 e 2): o Bento sai da
+  Estação numa missão de abastecimento com a Íris e a **Véspera**, a área automatizada entra em protocolo de contenção,
+  o grupo fica preso, e o Nick, que vigiava de longe, volta para ajudar e mostra a rota alternativa.
+- **A Véspera faz o papel da Amora (opção B):** a Amora não está no jogo. Ela continua na lore e no arco e entra depois,
+  com arte própria; o pedido de arte passa pelo Orquestrador. Até lá, a Véspera é quem testemunha o Nick escolhendo
+  voltar (o papel da Amora no §21).
+
 ## 4. Progressão das fases
 
 | Fase | O que a escada pede (`narrative-design.md` §7) | O que os textos do jogo contam hoje | O que falta (proposta concreta) |

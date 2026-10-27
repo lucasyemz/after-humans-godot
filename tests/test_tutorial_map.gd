@@ -91,7 +91,7 @@ func _journey() -> void:
 	if not t.check(AHTutorial.start_journey(Campaign.state), "a jornada do tutorial começa"):
 		return
 	var expedition: Dictionary = Campaign.state.session.expedition
-	t.equal(expedition.team, ["hero_cao_bento"], "o Bento começa sozinho")
+	t.equal(expedition.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera"], "o Bento começa com a Íris e a Véspera")
 	var route: Dictionary = expedition.corridor
 	t.equal(route.steps.map(func(s): return s.type), ["start", "combat", "nick", "loot", "combat", "combat", "train"], "os trechos do tutorial")
 	Campaign.save()
@@ -103,9 +103,9 @@ func _journey() -> void:
 	t.equal(street.scenario.map_name, AHTutorial.MAP, "a rua abre no Corredor de Contenção")
 	t.equal(corridor.segments.map(func(s): return s.steps), [2, 3, 1, 1], "os trechos de cada zona")
 	t.equal(corridor.guards.keys(), [1, 4, 5], "as três patrulhas do tutorial")
-	t.equal(corridor.guards[1].specs.map(func(s): return s.enemy_id), ["broto"], "a primeira luta: o Bento contra o Broto")
-	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["rastejante_raiz"], "a segunda luta")
-	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["ninho_errante"], "a terceira luta")
+	t.equal(corridor.guards[1].specs.map(func(s): return s.enemy_id), ["broto", "faisca", "pipoco"], "a primeira luta: os três contra três pequenos")
+	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["rastejante_raiz", "broto"], "a segunda luta")
+	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["faisca", "ninho_errante"], "a terceira luta")
 	# A HUD da abertura: o objetivo é o trem, a plaqueta diz Abertura (sem clima: é um subsolo).
 	t.check(street.exploration_hud._goal_title.text.begins_with("Chegar ao trem"), "o objetivo da abertura é o trem")
 	t.equal(street.exploration_hud._place_sub.text, "Abertura", "a plaqueta: Abertura, sem clima")
@@ -129,8 +129,8 @@ func _journey() -> void:
 	# O Nick: o próximo passo é o encontro, e ele entra na equipe.
 	corridor.debug_next_fight()
 	await _frames(2)
-	t.equal(Campaign.state.session.expedition.team, ["hero_cao_bento", "hero_gato_nick"], "o Nick entra na equipe")
-	t.equal(street.party_ids, ["hero_cao_bento", "hero_gato_nick"], "e anda com o Bento")
+	t.equal(Campaign.state.session.expedition.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "o Nick entra na equipe")
+	t.equal(street.party_ids, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "e anda com os três")
 	t.equal(corridor.segment, 1, "a sala das celas")
 	t.check(not street.scenario.door_open(street.scenario.doors_of(1, "entry")[0]), "a porta de trás baixou")
 	# Sem volta: andar para a esquerda até a ponta não leva de volta ao corredor.

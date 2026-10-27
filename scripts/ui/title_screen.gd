@@ -536,7 +536,7 @@ func _start_new_campaign(number: int) -> void:
 	var any_save := range(1, Campaign.SLOT_COUNT + 1).any(func(n): return Campaign.slot_has_save(n))
 	_modal_back = _open_slots.bind(true, number) if any_save else close_modal
 	var opening := _choice_row(tr("Começar pela abertura (recomendado)"),
-		tr("A fuga do Bento e do Nick pelo Corredor de Contenção: três lutas curtas que ensinam a jogar."), true)
+		tr("O Bento, a Íris e a Véspera presos no Corredor de Contenção, e o Nick, que volta para ajudar: três lutas curtas que ensinam a jogar."), true)
 	opening.name = "Opening"
 	opening.pressed.connect(_begin_campaign.bind(number, true))
 	box.add_child(opening)
