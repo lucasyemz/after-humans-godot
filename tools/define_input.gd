@@ -34,16 +34,17 @@ const ACTIONS := {
 	"combat_log": {"keys": [KEY_L], "buttons": [JOY_BUTTON_RIGHT_STICK]},
 	# A barra de Admin para testes (#130): só na build de teste ou com --admin.
 	"admin_toggle": {"keys": [KEY_F1]},
-	# As teclas de teste antigas da rua (a barra de Admin as liga em Ajustes).
-	"debug_rain": {"keys": [KEY_R]},
-	"debug_time": {"keys": [KEY_T]},
-	"debug_post": {"keys": [KEY_P]},
-	"debug_colliders": {"keys": [KEY_C]},
-	"debug_combat": {"keys": [KEY_K]},
+	# Exploração (#129): a ordem da equipe nas plaquinhas de baixo (vale para a fila e para a próxima luta).
+	"formation": {"keys": [KEY_R], "buttons": [JOY_BUTTON_X]},
 }
 
 
 func _initialize() -> void:
+	# Uma ação que saiu da tabela sai do projeto também (as teclas de teste antigas da rua, #129); as ui_* são da Godot.
+	for property in ProjectSettings.get_property_list():
+		var name: String = property.name
+		if name.begins_with("input/") and not name.begins_with("input/ui_") and not ACTIONS.has(name.trim_prefix("input/")):
+			ProjectSettings.clear(name)
 	for action in ACTIONS:
 		var spec: Dictionary = ACTIONS[action]
 		var events: Array = []

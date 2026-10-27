@@ -229,6 +229,21 @@ static func in_corridor(campaign: Dictionary) -> bool:
 		and session.get("event") == null
 
 
+## A formação na exploração (#129): troca dois heróis de lugar na ordem da equipe, fora da luta, dos eventos e do
+## acampamento. A ordem vale para a fila da rua e para a próxima luta (as posições 1 a 4) e fica no save da expedição.
+static func swap_team(campaign: Dictionary, a: String, b: String) -> bool:
+	if not in_corridor(campaign) or a == b:
+		return false
+	var team: Array = campaign.session.expedition.team
+	var i := team.find(a)
+	var k := team.find(b)
+	if i < 0 or k < 0:
+		return false
+	team[i] = b
+	team[k] = a
+	return true
+
+
 ## Entrar num trecho vizinho (EnterCorridorStep). Devolve "combat", "boss", "rest" ou "" (nada a fazer).
 static func enter_step(campaign: Dictionary, index: int) -> String:
 	if not in_corridor(campaign):

@@ -22,8 +22,6 @@ const LOD_THRESHOLD := [6.0, 3.0, 1.0, 1.0]
 var level := 2
 var fullscreen := false
 var vsync := true
-## Modo de desenvolvedor (F1): as teclas de teste (K, R, T, P, C) e o contador de quadros. Fica fora da tela do jogador.
-var dev_mode := false
 ## Cores para daltonismo: azul e laranja no lugar de verde e vermelho (AHUiStyle.set_colorblind).
 var colorblind := false
 ## O tamanho do texto das telas (AHUiStyle.text_scale): as telas ficam na base de 1920x1080 e só as letras crescem.
@@ -36,7 +34,7 @@ var touch_controls := 0
 ## As teclas trocadas nas Opções: a ação e a tecla principal nova (código físico). As outras teclas da ação (as setas,
 ## por exemplo) e os botões do controle continuam.
 var keys := {}
-const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run", "interact", "inventory", "cancel", "menu",
+const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run", "interact", "inventory", "formation", "cancel", "menu",
 	"combat_ability_1", "combat_ability_2", "combat_ability_3", "combat_ability_4", "combat_move", "combat_defend", "combat_flee", "combat_examine", "combat_log", "hide_hud",
 	"report_details", "station_prepare"]
 
@@ -58,7 +56,6 @@ func _ready() -> void:
 		level = clampi(int(config.get_value("graphics", "level", level)), 0, 3)
 		fullscreen = bool(config.get_value("graphics", "fullscreen", fullscreen))
 		vsync = bool(config.get_value("graphics", "vsync", vsync))
-		dev_mode = bool(config.get_value("dev", "enabled", dev_mode))
 		colorblind = bool(config.get_value("accessibility", "colorblind", colorblind))
 		text_size = clampi(int(config.get_value("accessibility", "text_size", text_size)), 0, TEXT_SIZES.size() - 1)
 		touch_controls = clampi(int(config.get_value("controls", "touch", touch_controls)), 0, TOUCH_MODES.size() - 1)
@@ -89,11 +86,6 @@ func _input(event: InputEvent) -> void:
 		AHUiStyle.using_keys = true
 	elif event is InputEventMouseButton or event is InputEventScreenTouch:
 		AHUiStyle.using_keys = false
-
-
-func set_dev_mode(value: bool) -> void:
-	dev_mode = value
-	_store()
 
 
 ## As teclas padrão (as de tools/define_input.gd, no project.godot) com as trocas por cima.
@@ -212,7 +204,6 @@ func _store() -> void:
 	config.set_value("graphics", "level", level)
 	config.set_value("graphics", "fullscreen", fullscreen)
 	config.set_value("graphics", "vsync", vsync)
-	config.set_value("dev", "enabled", dev_mode)
 	config.set_value("accessibility", "colorblind", colorblind)
 	config.set_value("accessibility", "text_size", text_size)
 	config.set_value("controls", "keys", keys)

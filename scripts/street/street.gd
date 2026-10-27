@@ -25,6 +25,15 @@ const COMBAT_FEET_LINE := 0.4
 ## A câmera dos cenários: inclinação (quase reta) e meio campo de visão na horizontal, em graus.
 const SCENARIO_PITCH := 0.5
 const SCENARIO_HALF_FOV := 15.0
+## A câmera da exploração (#129), num lugar só: a distância até a equipe e a altura do alvo sobre o piso (m), na rua,
+## nos cenários (a Ponte, mais aberta, à parte) e dentro das lojas. Uns 17% mais perto que antes (18,5, 19, 28 e 11 m);
+## o alvo desce junto, para os pés ficarem acima das plaquinhas da equipe. A barra de Admin ainda aproxima ou afasta.
+const EXPLORE_CAMERA := {
+	"street": {"distance": 15.4, "height": 1.7},
+	"scenario": {"distance": 15.8, "height": 1.45},
+	"bridge": {"distance": 23.3, "height": 2.3},
+	"indoor": {"distance": 9.2, "height": 1.45},
+}
 ## O preenchimento da luta nos cenários: energia no fim de tarde e quanto soma de noite e na chuva.
 const COMBAT_FILL := 0.3
 const COMBAT_FILL_NIGHT := 0.35
@@ -88,7 +97,6 @@ var _camera: Camera3D
 var _post: ShaderMaterial
 var _hud_stats: Label
 var _hud_weather: Label
-var _dev_overlay: Control
 var _dust: CPUParticles3D
 
 var _leader: CharacterBody3D
@@ -718,27 +726,30 @@ func _build_camera() -> void:
 func _update_camera(delta: float) -> void:
 	# Teleobjetiva a ~18 m, olhando um pouco de cima (o enquadramento do Emberfall); avança um pouco nos becos.
 	var leader := _leader.position
-	var target := Vector3(clampf(leader.x, -6.0, 76.0), 2.5, clampf(-1.4 + minf(leader.z + 1.0, 0.0) * 0.45, -6.5, -1.4))
+	var view_spec: Dictionary = EXPLORE_CAMERA.street
+	var target := Vector3(clampf(leader.x, -6.0, 76.0), view_spec.height, clampf(-1.4 + minf(leader.z + 1.0, 0.0) * 0.45, -6.5, -1.4))
 	var pitch := deg_to_rad(12.0)
-	var distance := 18.5
+	var distance: float = view_spec.distance
 	if scenario and not _zone.is_empty():
 		# A câmera da prévia da Unreal: 19 m de distância, 1,7 m acima do piso, quase reta (0,5°), 30° na horizontal; a
 		# Ponte usa a da rua (28 m, 2,7 m). O centro vai até 4 m das pontas da zona (LaneEdgePadding).
 		var bridge: bool = scenario.map_name == "RootBridge"
-		distance = 28.0 if bridge else 19.0
+		view_spec = EXPLORE_CAMERA.bridge if bridge else EXPLORE_CAMERA.scenario
+		distance = view_spec.distance
 		pitch = deg_to_rad(SCENARIO_PITCH)
 		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(SCENARIO_HALF_FOV)) / get_viewport().get_visible_rect().size.aspect()))
 		var half_view: float = tan(deg_to_rad(SCENARIO_HALF_FOV)) * distance
 		var low: float = _zone.x0 + minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
 		var high: float = _zone.x1 - minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
-		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + (2.7 if bridge else 1.7), lane_z)
+		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + float(view_spec.height), lane_z)
 	if _indoor:
 		# Dentro da loja, a câmera desce para ficar abaixo do forro e enquadra a sala.
 		# Vai até perto das paredes do lado (elas tapam o que fica fora da sala): na frente da sala a câmera vê só ~3,5 m
 		# para cada lado, e com a folga maior a equipe saía do quadro nas pontas.
-		target = Vector3(clampf(leader.x, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN), 1.6, -1.2)
+		target = Vector3(clampf(leader.x, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN),
+			EXPLORE_CAMERA.indoor.height, -1.2)
 		pitch = deg_to_rad(4.0)
-		distance = 11.0
+		distance = EXPLORE_CAMERA.indoor.distance
 		# No acampamento (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
 		if corridor != null and corridor.camp != null and corridor.camp.active:
 			target = Vector3(corridor.camp.focus_x, AHCampScene.FOCUS_HEIGHT, -0.2)
@@ -789,15 +800,10 @@ func _build_post_and_hud() -> void:
 	_hud_weather = _label("", 20, Vector2(36, 112))
 	_hud_weather.visible = false
 	hud.add_child(_hud_weather)
-	_dev_overlay = Control.new()
-	_dev_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hud.add_child(_dev_overlay)
+	# O contador de quadros: no modo de captura e pela barra de Admin (#130, Ajustes).
 	_hud_stats = _label("", 18, Vector2(1380, 1000))
-	_dev_overlay.add_child(_hud_stats)
-	_dev_overlay.add_child(_label("Teclas de teste (Admin)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1046)))
-	# Só na build de teste (#130): na do jogador, o modo gravado de antes não liga nada.
-	_dev_overlay.visible = (Settings.dev_mode and Admin.allowed()) or _capture_dir != ""
-	Settings.changed.connect(func(): _dev_overlay.visible = (Settings.dev_mode and Admin.allowed()) or _capture_dir != "")
+	_hud_stats.visible = _capture_dir != ""
+	hud.add_child(_hud_stats)
 
 
 func _label(text: String, size: int, at: Vector2) -> Label:
@@ -928,28 +934,6 @@ func _update_fire(delta: float) -> void:
 
 # ---------------------------------------------------------------- quadro a quadro
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_echo():
-		return
-	# As teclas de teste só valem com elas ligadas na barra de Admin, e só na build de teste (#130).
-	if not Settings.dev_mode or not Admin.allowed():
-		return
-	if event.is_action_pressed("debug_time"):
-		_mood = "night" if _mood == "golden" else "golden"
-		_apply_weather()
-	elif event.is_action_pressed("debug_rain"):
-		_raining = not _raining
-		_next_flash = 4.0
-		_apply_weather()
-	elif event.is_action_pressed("debug_post"):
-		_post.set_shader_parameter("enabled", not _post.get_shader_parameter("enabled"))
-	elif event.is_action_pressed("debug_colliders"):
-		for debug in _debug_colliders:
-			debug.visible = not debug.visible
-	elif event.is_action_pressed("debug_combat") and not _arena.active:
-		corridor.debug_next_fight()
-
-
 func _input_vector() -> Vector2:
 	if _capture_dir != "":
 		return _capture_input
@@ -1054,6 +1038,22 @@ static func combat_slope_for(aspect: float) -> float:
 func end_fight() -> void:
 	_street_hud.visible = true
 	combat_lift = 0.0
+
+
+## A formação (#129): dois heróis trocam de lugar na fila. As placas andam com a ordem, e a fila se refaz atrás do
+## líder, virada para o mesmo lado.
+func swap_party(a: String, b: String) -> void:
+	var i := party_ids.find(a)
+	var k := party_ids.find(b)
+	if i < 0 or k < 0 or i == k:
+		return
+	var facing: float = _heroes[0].facing
+	party_ids[i] = b
+	party_ids[k] = a
+	var card := _heroes[i]
+	_heroes[i] = _heroes[k]
+	_heroes[k] = card
+	_place_leader(_leader.position, facing)
 
 
 ## Quem caiu sai da equipe até a volta (#118); os outros voltam a andar do lugar onde terminaram a luta.

@@ -90,6 +90,8 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	hud.menu_return.connect(_retreat)
 	hud.menu_requested.connect(open_menu)
 	hud.inventory_requested.connect(open_inventory)
+	hud.formation_requested.connect(open_formation)
+	hud.formation_swap.connect(_swap_formation)
 	hud.new_campaign.connect(_new_campaign)
 	street._arena.finished.connect(_on_combat_finished)
 	doors = street.door_list()
@@ -131,7 +133,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 
 ## Bloqueia o movimento da equipe (painel aberto, transição ou luta).
 func blocking() -> bool:
-	return busy or hud.modal_open() or street._arena.active or camp.active
+	return busy or hud.modal_open() or street._arena.active or camp.active or hud.formation_open()
 
 
 func _step_x(index: int, fraction: float) -> float:
@@ -709,11 +711,37 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open_inventory()
 		return
+	if event.is_action_pressed("formation"):
+		get_viewport().set_input_as_handled()
+		open_formation()
+		return
 	if event.is_action_pressed("interact") and not blocking() and _action.is_valid() and not Tips.showing():
 		get_viewport().set_input_as_handled()
 		var action := _action
 		_action = Callable()
 		action.call()
+
+
+## A formação (#129): fora da luta, dos eventos, do acampamento e de um painel aberto, com dois ou mais de pé.
+func can_open_formation() -> bool:
+	if busy or street._arena.active or hud.modal_open() or camp.active or not R.in_corridor(Campaign.state):
+		return false
+	return street.party_ids.size() >= 2
+
+
+func open_formation() -> void:
+	if hud.formation_open():
+		hud.close_formation()
+	elif can_open_formation():
+		hud.open_formation()
+
+
+func _swap_formation(a: String, b: String) -> void:
+	if not R.swap_team(Campaign.state, a, b):
+		return
+	street.swap_party(a, b)
+	Campaign.save()
+	hud.refresh(Campaign.state)
 
 
 ## O menu da exploração (Esc ou o botão): continuar, voltar à Estação ou começar uma campanha nova.

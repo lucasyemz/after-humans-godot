@@ -15,7 +15,7 @@ signal title_requested
 
 ## As ações do jogo e o nome delas na tela (as de teste ficam de fora).
 const CONTROLS := [["move_left", "Andar para a esquerda"], ["move_right", "Andar para a direita"], ["move_back", "Para o fundo"],
-	["move_front", "Para a frente"], ["run", "Correr"], ["interact", "Interagir"], ["inventory", "Mochila"], ["cancel", "Voltar"], ["menu", "Menu"],
+	["move_front", "Para a frente"], ["run", "Correr"], ["interact", "Interagir"], ["inventory", "Mochila"], ["formation", "Formação"], ["cancel", "Voltar"], ["menu", "Menu"],
 	["combat_ability_1", "Luta: habilidade 1"], ["combat_ability_2", "Luta: habilidade 2"], ["combat_ability_3", "Luta: habilidade 3"],
 	["combat_ability_4", "Luta: habilidade 4"], ["combat_move", "Luta: mover"], ["combat_defend", "Luta: defender"], ["combat_flee", "Luta: fugir"],
 	["combat_examine", "Luta: inspecionar"], ["combat_log", "Luta: registro"], ["hide_hud", "Estação: ocultar a interface"],
