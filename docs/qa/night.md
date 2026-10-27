@@ -19,8 +19,8 @@ No Maior e no daltonismo: [screens.jpg](night/screens.jpg). As fotos saem de `to
   - a luz da manhã volta, todos se levantam, e o amanhecer abre.
 - **Pular:** Interagir, Esc, Voltar, um clique ou um toque pulam para o amanhecer. Nada passa para trás da cena.
 - **Com "Reduzir efeitos",** a Estação não escurece: só o cartão.
-- **Depois de pular,** o amanhecer ignora Interagir por meio segundo (a mesma trava da chegada): quem martela E ou A
-  para pular vê o resumo antes de começar o dia.
+- **Quando a noite acaba** (pulada ou sozinha), o amanhecer ignora Interagir por meio segundo (a mesma trava da
+  chegada): quem martela E ou A vê o resumo antes de começar o dia.
 - **O foco** do teclado e do controle volta para COMEÇAR O DIA, pulando ou esperando.
 
 ## O amanhecer
@@ -97,6 +97,18 @@ mesmo, e salvar e voltar não troca o evento. Os números são **propostas para 
 - A Estação escurecia pouco: uma sombra cobre a tela na noite, e as dicas de baixo deixam de chamar atenção.
 - O cartão mostra "E / A", como os botões.
 - O commit traz `tools/capture_119.gd.uid`, que faltou no commit da #119, e agora também o da `capture_132`.
+
+### Rodada 2: APROVADO
+
+A QA refez os cenários com scripts próprios: o segundo toque logo depois do pulo (Interagir, Esc, clique, toque e A),
+as perdas com o estoque vazio, com 1 e com vigia, a saída da Estação no meio da cena, a sombra e as capturas no Maior e
+no daltonismo.
+
+**Baixa, corrigida depois:** a trava valia só para a noite pulada; agora vale também quando a cena acaba sozinha.
+
+**Ficam:**
+- Com a água ou a despensa já vazias, o texto do vigia ainda diz que ele evitou a perda.
+- Os ruídos dizem que "o sono acalmou menos o instinto" mesmo com o instinto de todos em 0.
 
 ## Para o Lucas
 

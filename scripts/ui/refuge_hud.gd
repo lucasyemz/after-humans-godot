@@ -266,7 +266,7 @@ func _input(event: InputEvent) -> void:
 		if event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton or event is InputEventScreenTouch or event is InputEventAction:
 			get_viewport().set_input_as_handled()
 			if AHPassageCard.is_skip(event) or U.is_back(event):
-				_finish_night(true)
+				_finish_night()
 		return
 	# Logo que o relatório abre depois da chegada, o segundo toque do pular (Interagir, Enter, Esc, clique) não conclui
 	# nem fecha o relatório: quem pulou a cena ainda vê o que a equipe trouxe.
@@ -2407,12 +2407,12 @@ func _start_night() -> void:
 
 
 ## Fim da noite (ou pulada): a luz volta e o amanhecer abre.
-func _finish_night(skipped: bool = false) -> void:
+func _finish_night() -> void:
 	if not night_scene_open():
 		return
-	# Quem martela Interagir para pular não começa o dia sem ver o amanhecer (a mesma trava da chegada).
-	if skipped:
-		_report_guard_ms = Time.get_ticks_msec() + REPORT_GUARD_MS
+	# Quem martela Interagir (para pular, ou logo que a cena acaba) não começa o dia sem ver o amanhecer (a mesma trava
+	# da chegada).
+	_report_guard_ms = Time.get_ticks_msec() + REPORT_GUARD_MS
 	if _night_tween != null and _night_tween.is_valid():
 		_night_tween.kill()
 	_night_tween = null
