@@ -15,14 +15,14 @@
     "Weight": 14,
     "Bad": true,
     "Amount": 3,
-    "Text": "Ruídos distantes inquietaram quem dormia: o instinto baixou %d a menos.",
+    "Text": "Ruídos distantes inquietaram quem dormia: o sono acalmou menos o instinto.",
     "TextWatched": "O vigia verificou os ruídos distantes. Os outros puderam descansar em segurança.",
     "Description": "Proposta (#132): quem dorme baixa Amount de instinto a menos. Com vigia, nada acontece."
   },
   {
     "Name": "platform_noise",
     "Weight": 10,
-    "Text": "Um barulho na plataforma de madrugada: alguém passou pelos trilhos. O próximo trem deve trazer gente.",
+    "Text": "Um barulho na plataforma de madrugada: alguém passou pelos trilhos. Pode ser que o próximo trem traga gente.",
     "Description": "Proposta (#132): a chance do próximo trem sobe um passo (como uma volta vazia, #122)."
   },
   {
@@ -31,6 +31,8 @@
     "Bad": true,
     "Amount": 2,
     "Text": "Uma goteira no Depósito: %d de água se perderam.",
+    "TextOne": "Uma goteira no Depósito: 1 de água se perdeu.",
+    "TextEmpty": "Uma goteira pingou no Depósito, mas não havia água para perder.",
     "TextWatched": "O vigia ouviu uma goteira e pôs um balde embaixo: a água ficou.",
     "Description": "Proposta (#132): a água da Estação cai Amount. Com vigia, nada se perde."
   },
@@ -40,6 +42,8 @@
     "Bad": true,
     "Amount": 2,
     "Text": "Baratas acharam a despensa: %d suprimentos se perderam.",
+    "TextOne": "Baratas acharam a despensa: 1 suprimento se perdeu.",
+    "TextEmpty": "Baratas rondaram a despensa vazia: não havia o que estragar.",
     "TextWatched": "O vigia espantou as baratas da despensa antes do estrago.",
     "TextProtected": "Baratas rondaram a despensa, mas as prateleiras novas do Depósito seguraram tudo.",
     "Description": "Proposta (#132): os suprimentos caem Amount. O Depósito no nível 2 protege; com vigia, nada se perde. (O pedido dizia \"um rato\"; na lore, os roedores são povos, então a praga virou baratas.)"

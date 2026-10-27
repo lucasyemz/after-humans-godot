@@ -1264,6 +1264,11 @@ func set_night_scene(on: bool) -> void:
 	_update_sleepers()
 
 
+## A cena não sobrevive à Estação (a troca de cena no meio da noite): quem dormiu não fica deitado por engano.
+func _exit_tree() -> void:
+	night_scene = false
+
+
 ## À noite, quem dorme deita no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica de pé no Dormitório. Com a
 ## noite resolvida, todos voltam a passear.
 func _update_sleepers() -> void:

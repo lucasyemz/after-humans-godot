@@ -284,6 +284,10 @@ func _return() -> void:
 			await _send("interact")
 			await _frames(3)
 			t.check(not hud.night_scene_open() and _focus() is BaseButton, "Interagir pula a noite, e o foco fica no amanhecer")
+			# O amanhecer recém-aberto pelo pulo ignora Interagir por um instante (o segundo toque de quem pula).
+			var night_guard := Time.get_ticks_msec() + AHRefugeHud.REPORT_GUARD_MS + 50
+			while Time.get_ticks_msec() < night_guard:
+				await _frames(1)
 	t.equal(c.night.phase, "none", "a noite passou só com o teclado")
 	if S.visit_pending(c):
 		await _frames(3)

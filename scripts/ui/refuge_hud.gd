@@ -266,7 +266,7 @@ func _input(event: InputEvent) -> void:
 		if event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton or event is InputEventScreenTouch or event is InputEventAction:
 			get_viewport().set_input_as_handled()
 			if AHPassageCard.is_skip(event) or U.is_back(event):
-				_finish_night()
+				_finish_night(true)
 		return
 	# Logo que o relatório abre depois da chegada, o segundo toque do pular (Interagir, Enter, Esc, clique) não conclui
 	# nem fecha o relatório: quem pulou a cena ainda vê o que a equipe trouxe.
@@ -2292,7 +2292,10 @@ func _dawn(c: Dictionary) -> void:
 	for line in S.night_conditions_text(c):
 		event.add_child(_wrapped(line, "small", AHKit.alert_text(), false, BODY_WIDTH - 40.0))
 	# O que a noite gastou e o que sobrou.
-	_icon_line("lobby-food", tr("%d suprimentos comidos · restam %d") % [int(night.supplies_consumed), S.quantity(c, S.SUPPLIES)])
+	var eaten := int(night.supplies_consumed)
+	var left := S.quantity(c, S.SUPPLIES)
+	_icon_line("lobby-food", "%s · %s" % [tr("1 suprimento comido") if eaten == 1 else tr("%d suprimentos comidos") % eaten,
+		tr("resta 1") if left == 1 else tr("restam %d") % left])
 	_icon_line("lobby-water", tr("Água: %d na Estação") % int(c.station.water))
 	# Quem descansou e quanto o instinto baixou.
 	for result in night.results:
@@ -2319,6 +2322,12 @@ func _rest_line(entry: Dictionary, result: Dictionary) -> String:
 	if int(result.instinct_reduced) > 0:
 		parts.append(tr("−%d de instinto") % int(result.instinct_reduced))
 	var hungry := "" if result.fed else tr(" (sem comida)")
+	# Quem o trauma não deixou dormir (#132): recupera a vida, mas não o instinto.
+	var event: Dictionary = Campaign.state.night.get("event", {})
+	if String(event.get("id", "")) == "sleepless" and String(event.get("hero_id", "")) == String(entry.id):
+		if int(result.hp_recovered) > 0:
+			return tr("%s não pegou no sono: +%d de vida%s.") % [entry.display_name, int(result.hp_recovered), hungry]
+		return tr("%s não pegou no sono%s.") % [entry.display_name, hungry]
 	if parts.is_empty():
 		return tr("%s dormiu, sem nada a recuperar%s.") % [entry.display_name, hungry]
 	return "%s: %s%s." % [entry.display_name, ", ".join(parts), hungry]
@@ -2351,6 +2360,14 @@ func _start_night() -> void:
 	_night_scene.size = Vector2(1920, 1080)
 	_night_scene.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(_night_scene)
+	# A sombra da noite: as luzes dos cômodos sozinhas mal escurecem as paredes, e as dicas de baixo não valem na cena.
+	var shade := ColorRect.new()
+	shade.name = "Shade"
+	shade.color = AHKit.VEIL
+	shade.size = _night_scene.size
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shade.modulate.a = 0.0
+	_night_scene.add_child(shade)
 	var box := AHKit.panel_box("large")
 	box.name = "Card"
 	_night_scene.add_child(box)
@@ -2368,7 +2385,7 @@ func _start_night() -> void:
 	clock.name = "Clock"
 	clock.custom_minimum_size = Vector2(520, 18)
 	column.add_child(clock)
-	var skip := AHKit.label(tr("%s: pular a noite") % U.key_name("interact"), "small", AHKit.MUTED)
+	var skip := AHKit.label(tr("%s / A: pular a noite") % U.key_name("interact"), "small", AHKit.MUTED)
 	skip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(skip)
 	box.reset_size()
@@ -2379,16 +2396,23 @@ func _start_night() -> void:
 	_night_tween = create_tween()
 	if not reduced:
 		_night_tween.tween_method(station.set_night_dim, 1.0, 0.15, 0.9)
+		_night_tween.parallel().tween_property(shade, "modulate:a", 1.0, 0.9)
 	_night_tween.tween_property(box, "modulate:a", 1.0, 0.35)
 	_night_tween.tween_method(func(v: float): clock.set_value(v, 100.0), 0.0, 100.0, 2.0)
 	_night_tween.tween_property(box, "modulate:a", 0.0, 0.35)
 	if not reduced:
 		_night_tween.tween_method(station.set_night_dim, 0.15, 1.0, 0.9)
+		_night_tween.parallel().tween_property(shade, "modulate:a", 0.0, 0.9)
 	_night_tween.finished.connect(_finish_night)
 
 
 ## Fim da noite (ou pulada): a luz volta e o amanhecer abre.
-func _finish_night() -> void:
+func _finish_night(skipped: bool = false) -> void:
+	if not night_scene_open():
+		return
+	# Quem martela Interagir para pular não começa o dia sem ver o amanhecer (a mesma trava da chegada).
+	if skipped:
+		_report_guard_ms = Time.get_ticks_msec() + REPORT_GUARD_MS
 	if _night_tween != null and _night_tween.is_valid():
 		_night_tween.kill()
 	_night_tween = null

@@ -12,13 +12,15 @@ No Maior e no daltonismo: [screens.jpg](night/screens.jpg). As fotos saem de `to
 
 - **Ao INICIAR DESCANSO:**
   - a regra resolve a noite e salva antes da cena, então o save no meio da noite abre no amanhecer;
-  - as luzes dos cômodos caem até 15% em 0,9 s;
+  - as luzes dos cômodos caem até 15% em 0,9 s, e uma sombra escurece a tela (as paredes e as dicas de baixo);
   - quem dorme fica deitado no beliche, e o vigia de pé no Dormitório;
   - o cartão "Noite N" aparece embaixo, acima das teclas, para o Dormitório ficar à vista. Ele traz uma linha ("O vigia
     escuta os trilhos", ou "Ninguém vigia esta noite") e o tempo correndo numa barra por 2 s;
   - a luz da manhã volta, todos se levantam, e o amanhecer abre.
 - **Pular:** Interagir, Esc, Voltar, um clique ou um toque pulam para o amanhecer. Nada passa para trás da cena.
 - **Com "Reduzir efeitos",** a Estação não escurece: só o cartão.
+- **Depois de pular,** o amanhecer ignora Interagir por meio segundo (a mesma trava da chegada): quem martela E ou A
+  para pular vê o resumo antes de começar o dia.
 - **O foco** do teclado e do controle volta para COMEÇAR O DIA, pulando ou esperando.
 
 ## O amanhecer
@@ -28,8 +30,8 @@ O painel do Dormitório abre "Amanhecer · Dia N", com:
   avisa); o bom ou neutro vem com a lua;
 - **as condições:** a fome e a sede, quando faltou comida ou água;
 - **o que a noite gastou:** "3 suprimentos comidos · restam 3" e a água da Estação;
-- **quem descansou:** só o que mudou ("+5 de vida, −15 de instinto"), "dormiu, sem nada a recuperar", ou "ficou de
-  vigia";
+- **quem descansou:** só o que mudou ("+5 de vida, −15 de instinto"), "dormiu, sem nada a recuperar", "ficou de
+  vigia", ou "não pegou no sono" (o sem sono);
 - **a Enfermaria (#121):** cada caído e quando volta;
 - **o Depois:** o passo seguinte ao amanhecer (o Próximo passo de depois de COMEÇAR O DIA).
 
@@ -42,9 +44,9 @@ mesmo, e salvar e voltar não troca o evento. Os números são **propostas para 
 |---|---|---|---|
 | Noite tranquila | 30 | Nada. | — |
 | Ruídos distantes (ruim) | 14 | Quem dorme baixa 3 de instinto a menos. | O vigia verifica: nada. |
-| Barulho na plataforma | 10 | A chance do próximo trem sobe um passo, como uma volta vazia (#122). | — |
-| Goteira (ruim) | 12 | 2 de água a menos. | O balde segura: nada. |
-| Baratas na despensa (ruim) | 12 | 2 suprimentos a menos. O Depósito no nível 2 protege. | O vigia espanta: nada. |
+| Barulho na plataforma | 10 | A chance do próximo trem sobe um passo, como uma volta vazia (#122). O texto diz "pode ser". | — |
+| Goteira (ruim) | 12 | 2 de água a menos (o texto conta o que de fato caiu; sem água, "não havia água para perder"). | O balde segura: nada. |
+| Baratas na despensa (ruim) | 12 | 2 suprimentos a menos, depois da ceia. O Depósito no nível 2 protege. Com a despensa vazia, "não havia o que estragar". | O vigia espanta: nada. |
 | O vigia vê algo | 10 | Só com vigia: o próximo lugar liberado fica lido no Mapa da Rede (o guardião e os inimigos). | — |
 | Um morador conversa | 10 | Só com a Dora, o Otto ou a Cora na Estação: uma fala curta de quem estiver. | — |
 | Sem sono (ruim) | 8 | Só com alguém com trauma: ele não dorme, e o instinto dele não baixa. | Não evita. |
@@ -75,6 +77,26 @@ mesmo, e salvar e voltar não troca o evento. Os números são **propostas para 
     - o amanhecer mostra os números, o evento, o Depois certo e nenhum "+0".
 - **`test_keyboard_navigation`:** Iniciar descanso abre a cena; Interagir pula, e o foco fica no amanhecer.
 - **`test_station_rules`:** a sede passa a ser uma condição da noite, à parte do evento.
+
+## Rodadas da QA
+
+### Rodada 1: REPROVADO
+
+**Médias, corrigidas:**
+- **Interagir duas vezes pulava a noite e o amanhecer:** o segundo toque caía no COMEÇAR O DIA. Agora o amanhecer
+  recém-aberto pelo pulo ignora Interagir por meio segundo.
+- **As baratas e a goteira contavam perdas que não aconteceram** ("0 suprimentos se perderam", "2 de água" com 1 no
+  estoque). O evento guarda o que de fato caiu, o singular tem texto próprio, e o vazio tem um texto sem alerta.
+
+**Baixas, corrigidas:**
+- O sem sono dizia "dormiu" na linha do herói: agora "não pegou no sono".
+- Os ruídos diziam "baixou 3 a menos" mesmo sem efeito: o texto não promete número.
+- "1 suprimentos comidos" e "restam 1" no singular.
+- O barulho na plataforma prometia gente no trem: agora "pode ser".
+- O `night_scene` estático fica falso quando a Estação sai da cena no meio da noite.
+- A Estação escurecia pouco: uma sombra cobre a tela na noite, e as dicas de baixo deixam de chamar atenção.
+- O cartão mostra "E / A", como os botões.
+- O commit traz `tools/capture_119.gd.uid`, que faltou no commit da #119, e agora também o da `capture_132`.
 
 ## Para o Lucas
 

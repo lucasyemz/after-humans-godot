@@ -1468,3 +1468,7 @@ station_rules.gd: leak
 station_rules.gd: Text
 station_rules.gd: talk_%s
 refuge_hud.gd: %s: %s%s.
+refuge_hud.gd: event
+refuge_hud.gd: id
+refuge_hud.gd: sleepless
+refuge_hud.gd: Shade

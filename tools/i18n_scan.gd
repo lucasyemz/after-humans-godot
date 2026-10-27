@@ -29,7 +29,7 @@ const DATA_FIELDS := {
 	"expedition-nodes": ["Title", "Description"], "perks": ["DisplayName", "Description"], "relics": ["DisplayName", "Description"],
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
 	"hero-upgrades": ["DisplayName", "Description"], "recruitment": ["Text"], "hero-jobs": ["Text"],
-	"night-events": ["Text", "TextWatched", "TextProtected"],
+	"night-events": ["Text", "TextOne", "TextEmpty", "TextWatched", "TextProtected"],
 }
 
 

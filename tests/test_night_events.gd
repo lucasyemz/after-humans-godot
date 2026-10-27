@@ -68,7 +68,7 @@ func _events() -> void:
 	var noise := _night()
 	S.resolve_night(noise, "distant_noise")
 	t.equal(S.hero(noise, "hero_gato_nick").instinct, S.hero(quiet, "hero_gato_nick").instinct + 3, "ruídos: o instinto baixa 3 a menos")
-	t.check(S.night_event_text(noise).contains("3"), "e o texto diz quanto")
+	t.check(S.night_event_text(noise).contains("Ruídos"), "e o texto conta")
 	var guarded := _night("night-1", "hero_cao_bento")
 	S.resolve_night(guarded, "distant_noise")
 	t.check(guarded.night.event.prevented and S.night_event_text(guarded).contains("vigia"), "com vigia, os ruídos não atrapalham")
@@ -92,6 +92,23 @@ func _events() -> void:
 	S.resolve_night(shelves, "pests")
 	t.check(shelves.night.event.protected and S.night_event_text(shelves).contains("prateleiras"), "o Depósito melhorado protege")
 	t.equal(S.quantity(shelves, S.SUPPLIES), S.quantity(reference, S.SUPPLIES), "e nada se perde")
+	# Com o estoque vazio ou baixo, o texto conta o que de fato se perdeu (e o vazio não é ruim).
+	var empty := _night()
+	empty.station.water = 0
+	S.resolve_night(empty, "leak")
+	t.check(S.night_event_text(empty).contains("não havia água") and not S.night_event_bad(empty), "goteira sem água: nada a perder, sem alerta")
+	var low := _night()
+	low.station.water = 1
+	S.resolve_night(low, "leak")
+	t.check(int(low.station.water) == 0 and S.night_event_text(low).contains("1 de água se perdeu"), "goteira com 1 de água: perde 1, no singular")
+	var bare := _night()
+	S.adjust(bare, S.SUPPLIES, -S.quantity(bare, S.SUPPLIES))
+	S.resolve_night(bare, "pests")
+	t.check(S.night_event_text(bare).contains("não havia o que estragar") and not S.night_event_bad(bare), "baratas na despensa vazia: nada a estragar")
+	var one := _night()
+	S.adjust(one, S.SUPPLIES, -S.quantity(one, S.SUPPLIES) + 5)
+	S.resolve_night(one, "pests")
+	t.check(S.night_event_text(one).contains("1 suprimento se perdeu"), "baratas com 1 suprimento sobrando depois da ceia: no singular")
 	# Barulho na plataforma: a chance do próximo trem sobe.
 	var platform := _night()
 	S.resolve_night(platform, "platform_noise")
@@ -184,6 +201,10 @@ func _scene() -> void:
 		t.check(_label(hud._panel, "suprimentos comidos") and _label(hud._panel, "Água:"), "com os números da noite")
 		t.check(_label(hud._panel, "Depois:") and not _label(hud._panel, "Depois: Passar a noite"), "o Depois diz o passo seguinte ao amanhecer")
 		t.check(not _label(hud._panel, "−0 de instinto") and not _label(hud._panel, "+0 de vida"), "sem os zeros de quem não tinha o que recuperar")
+		# Martelar Interagir não pula o amanhecer (a trava depois do pulo).
+		_send("interact")
+		await _frames(3)
+		t.equal(Campaign.state.night.phase, "dawn", "o segundo Interagir logo depois do pulo não começa o dia")
 		var told: Label = hud._panel.find_child("EventText", true, false)
 		t.check(told != null and told.text == S.night_event_text(Campaign.state), "e o evento da noite")
 		_tree.unload_current_scene()

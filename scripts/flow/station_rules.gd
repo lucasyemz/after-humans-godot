@@ -904,10 +904,15 @@ static func _apply_night_event(campaign: Dictionary, event: Dictionary) -> void:
 		return
 	match String(event.id):
 		"leak":
-			campaign.station.water = maxi(0, int(campaign.station.water) - int(event.amount))
+			# O que de fato se perdeu (com pouca água, menos; sem água, nada a perder).
+			var lost := mini(int(campaign.station.water), int(event.amount))
+			campaign.station.water = int(campaign.station.water) - lost
+			event.amount = lost
+			event.empty = lost == 0
 		"pests":
 			if not event.protected:
 				event.amount = -adjust(campaign, SUPPLIES, -int(event.amount))
+				event.empty = int(event.amount) == 0
 		"platform_noise":
 			campaign.station.train_dry = int(campaign.station.get("train_dry", 0)) + 1
 		"watcher_sees":
@@ -957,10 +962,14 @@ static func night_event_text(campaign: Dictionary) -> String:
 		if event.get("prevented", false):
 			return TranslationServer.translate(String(row.get("TextWatched", "")))
 		match String(event.id):
-			"distant_noise", "leak":
+			"leak", "pests":
+				if event.get("protected", false):
+					return TranslationServer.translate(String(row.get("TextProtected", "")))
+				if event.get("empty", false):
+					return TranslationServer.translate(String(row.get("TextEmpty", "")))
+				if int(event.amount) == 1:
+					return TranslationServer.translate(String(row.get("TextOne", "")))
 				return text % int(event.amount)
-			"pests":
-				return TranslationServer.translate(String(row.get("TextProtected", ""))) if event.protected else text % int(event.amount)
 			"watcher_sees":
 				var watcher = hero(campaign, String(event.hero_id))
 				return text % [watcher.display_name if watcher != null else "", TranslationServer.translate(String(J.phase(String(event.phase_id)).get("name", "")))]
@@ -997,7 +1006,8 @@ static func night_conditions_text(campaign: Dictionary) -> Array:
 ## O evento da noite é ruim e aconteceu (não foi evitado pelo vigia nem pelo Depósito)?
 static func night_event_bad(campaign: Dictionary) -> bool:
 	var event: Dictionary = campaign.night.get("event", {})
-	return not event.is_empty() and bool(night_row(String(event.id)).get("Bad", false)) and not event.get("prevented", false) and not event.get("protected", false)
+	return not event.is_empty() and bool(night_row(String(event.id)).get("Bad", false)) and not event.get("prevented", false) \
+		and not event.get("protected", false) and not event.get("empty", false)
 
 
 # ================================================================ refúgio: elenco, enfermaria, pesquisa, forja
