@@ -91,23 +91,41 @@ func _input(event: InputEvent) -> void:
 ## As teclas padrão (as de tools/define_input.gd, no project.godot) com as trocas por cima.
 func apply_controls() -> void:
 	InputMap.load_from_project_settings()
+	var defaults := {}
+	for action in REMAPPABLE:
+		defaults[action] = primary_key(action)
 	for action in keys:
-		if not InputMap.has_action(action):
+		if InputMap.has_action(action):
+			_put_key(action, int(keys[action]))
+	# Uma ação que ficou na tecla de fábrica, quando outra ação já foi trocada para ela num save antigo (a formação no R,
+	# #129, com o R salvo em outra): ela fica com a tecla de fábrica da outra, a mesma troca do set_key, sem conflito.
+	for action in REMAPPABLE:
+		if keys.has(action) or not InputMap.has_action(action):
 			continue
-		# A tecla nova entra no lugar da primeira (a ordem diz qual é a principal).
-		var events := InputMap.action_get_events(action)
-		var key := InputEventKey.new()
-		key.physical_keycode = int(keys[action])
-		var replaced := false
-		for i in events.size():
-			if events[i] is InputEventKey and not replaced:
-				events[i] = key
-				replaced = true
-		if not replaced:
-			events.push_front(key)
-		InputMap.action_erase_events(action)
-		for event in events:
-			InputMap.action_add_event(action, event)
+		var code := primary_key(action)
+		for other in keys:
+			if other != action and int(keys[other]) == code and code != 0:
+				var free := int(defaults.get(other, 0))
+				if free != 0 and not REMAPPABLE.any(func(a): return a != action and primary_key(a) == free):
+					_put_key(action, free)
+				break
+
+
+## A tecla nova entra no lugar da primeira (a ordem diz qual é a principal).
+func _put_key(action: String, code: int) -> void:
+	var events := InputMap.action_get_events(action)
+	var key := InputEventKey.new()
+	key.physical_keycode = code
+	var replaced := false
+	for i in events.size():
+		if events[i] is InputEventKey and not replaced:
+			events[i] = key
+			replaced = true
+	if not replaced:
+		events.push_front(key)
+	InputMap.action_erase_events(action)
+	for event in events:
+		InputMap.action_add_event(action, event)
 
 
 ## A tecla principal da ação agora (código físico; 0 se não houver).

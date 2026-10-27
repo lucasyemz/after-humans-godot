@@ -21,6 +21,7 @@ func run(context) -> void:
 	var tips: bool = Tips.enabled
 	Tips.enabled = false
 	_rules()
+	_keys()
 	await _formation()
 	await _camera("fase_1")
 	await _camera("fase_2")
@@ -53,6 +54,23 @@ func _rules() -> void:
 	t.check(not J.swap_team(c, team[0], "ninguem"), "quem não está na equipe, não")
 
 
+## Um save antigo com a tecla R trocada para outra ação: a formação (que nasce no R) fica com a tecla de fábrica da
+## outra, a mesma troca do set_key, sem dividir a tecla com outra ação.
+func _keys() -> void:
+	var real_keys: Dictionary = Settings.keys.duplicate()
+	Settings.keys = {"interact": KEY_R}
+	Settings.apply_controls()
+	var interact_default := KEY_E
+	t.equal(Settings.primary_key("interact"), KEY_R, "a tecla salva vale")
+	t.equal(Settings.primary_key("formation"), interact_default, "a formação fica com a tecla de fábrica do Interagir")
+	var formation: int = Settings.primary_key("formation")
+	var clash: Array = Settings.REMAPPABLE.filter(func(a): return a != "formation" and Settings.primary_key(a) == formation)
+	t.equal(clash, [], "a tecla da formação não fica em outra ação")
+	Settings.keys = real_keys
+	Settings.apply_controls()
+	t.equal(Settings.primary_key("formation"), KEY_R, "sem o save antigo, a formação volta ao R")
+
+
 func _open(c: Dictionary):
 	Campaign.state = c
 	Campaign.save()
@@ -73,6 +91,16 @@ func _formation() -> void:
 		return
 	var corridor: AHStreetCorridor = street.corridor
 	var hud: AHExplorationHud = street.exploration_hud
+	# Com uma dica aberta, a formação não abre por cima dela (a tecla é da dica).
+	Tips.enabled = true
+	var seen_explore: bool = Tips._seen.has("explore")
+	Tips._seen.erase("explore")
+	Tips.show_tip("explore")
+	t.check(Tips.showing() and not corridor.can_open_formation(), "com uma dica aberta, a formação não abre")
+	Tips.dismiss()
+	Tips.enabled = false
+	if seen_explore:
+		Tips._seen["explore"] = true
 	t.check(hud._formation_button.is_visible_in_tree(), "o botão FORMAÇÃO no canto")
 	await _action("formation")
 	t.check(hud.formation_open() and corridor.blocking(), "a tecla da formação abre, e a equipe para")
@@ -119,7 +147,7 @@ func _formation() -> void:
 	await _action("formation")
 	t.check(not hud.formation_open(), "nem pela tecla")
 	# O X do controle é também o Defender: na luta, ele defende (a formação não come o botão).
-	if arena.hud.waiting:
+	if t.check(arena.hud.waiting, "a luta espera o comando"):
 		for pressed in [true, false]:
 			var pad := InputEventJoypadButton.new()
 			pad.button_index = JOY_BUTTON_X
