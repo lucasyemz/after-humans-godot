@@ -812,8 +812,9 @@ func _bottom(c: Dictionary) -> void:
 	recruit.reset_size()
 	recruit.position = Vector2(back.position.x + maxf(216.0, back.get_combined_minimum_size().x) + 12.0, AHStationFrame.BACK_Y)
 	# As teclas entre os dois painéis (Voltar mostra o Esc: ui_cancel volta sempre, com qualquer troca nas Opções).
+	# O cômodo ao lado (#131): o Dormitório e o Bar, sem voltar à vista geral.
 	AHStationFrame.keys(self, [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["Esc", tr("Voltar")],
-		["hide_hud", tr("Ocultar")]], 962.0, LEFT.end.x + 12.0, RIGHT.position.x - 12.0)
+		["station_room_next", tr("Ao lado")], ["hide_hud", tr("Ocultar")]], 962.0, LEFT.end.x + 12.0, RIGHT.position.x - 12.0)
 	AHStationFrame.tabs(self, "characters", _nav)
 	AHStationFrame.prepare(self, tr("Preparar expedição"), "station", S.preparation_block(c), func(): hud.open_map())
 

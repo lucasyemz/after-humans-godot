@@ -61,7 +61,15 @@ func card_centers() -> Dictionary:
 
 func _team() -> Array:
 	var c: Dictionary = Campaign.state
-	return report.get("team", []).filter(func(id): return S.hero(c, id) != null)
+	return scene_order(report.get("team", []).filter(func(id): return S.hero(c, id) != null))
+
+
+## A equipe na ordem da cena (#131): a formação que o jogador deixou, com a posição 1 (a frente) à direita e a 4 à
+## esquerda, como na Preparação e na luta. team vem da frente para trás.
+static func scene_order(team: Array) -> Array:
+	var out := team.duplicate()
+	out.reverse()
+	return out
 
 
 func _build() -> void:

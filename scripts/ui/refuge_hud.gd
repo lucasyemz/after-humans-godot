@@ -24,6 +24,14 @@ const RIGHT := Rect2(1296, 132, 596, 844)
 ## A largura do conteúdo do painel (a chapa menos as margens dela e a barra de rolagem).
 const BODY_WIDTH := 530.0
 ## O ícone do kit de cada cômodo e de cada tela de serviço.
+## A vista geral anda (#131): a velocidade (m/s), a faixa da borda da tela que empurra e quanto o mouse anda antes de
+## o clique virar arraste (px).
+const PAN_SPEED := 14.0
+const PAN_EDGE := 6.0
+## O mouse precisa ficar este tempo (s) encostado na borda antes de a câmera andar: quem passa por ela a caminho do menu
+## não arrasta a vista.
+const PAN_EDGE_DWELL := 0.35
+const DRAG_START := 12.0
 const ROOM_ICONS := {S.CHARACTERS: "room_quarters", S.CANTEEN: "room_canteen", S.BAR: "room_bar", S.DORMITORY: "bed", S.FORGE: "room_forge",
 	S.DEPOT: "room_depot", S.RESEARCH: "room_research", S.INFIRMARY: "intent-heal", S.PREPARATION: "expeditions", "plan": "plan", "train": "train_arrival",
 	"new_campaign": "alert", "departure": "expeditions"}
@@ -71,6 +79,17 @@ var _arrival_hint: PanelContainer
 ## (com GERENCIAR). O do próximo passo e o Dormitório com a noite pendente ficam com os cantos apagados.
 var _room_marks: Control
 var _room_tag: PanelContainer
+## Os marcadores dos cômodos por recuperar (#131, como no XCOM 2): {id: PanelContainer}, em cima de cada um na vista geral.
+var _lock_marks := {}
+## O cartão do cômodo apontado ficou sem as linhas do custo (texto Maior): o marcador dele continua à vista.
+var _card_without_lock := false
+## A vista geral arrastada com o mouse (#131): de onde o arraste começou e o deslocamento de então; arrastou de verdade
+## (o clique não abre o cômodo).
+var _drag_from := Vector2.INF
+var _drag_pan := 0.0
+var _dragged := false
+## Há quanto tempo (s) o mouse está encostado na borda da tela.
+var _edge_time := 0.0
 var _room_tag_icon: TextureRect
 var _room_tag_label: Label
 var _room_card: PanelContainer
@@ -296,6 +315,19 @@ func _input(event: InputEvent) -> void:
 		else:
 			open_map()
 		return
+	if _drag_from != Vector2.INF and (event is InputEventMouseMotion or event is InputEventMouseButton):
+		_drag_input(event)
+		return
+	# Com um cômodo aberto, o vizinho do mesmo andar direto, sem voltar à vista geral (#131).
+	var in_training: bool = is_instance_valid(_room_screen) and _room_screen.training
+	if (_room_open() or (current == S.CHARACTERS and not in_training)) and not _map.visible:
+		for spec in [["station_room_prev", -1], ["station_room_next", 1]]:
+			if event.is_action_pressed(spec[0]):
+				var next := neighbor_room(current, spec[1])
+				if next != "":
+					open_room(next)
+				get_viewport().set_input_as_handled()
+				return
 	var scope := focus_scope()
 	if scope != null:
 		if U.press_focused(scope, event):
@@ -406,16 +438,29 @@ func _step_room(direction: Vector2) -> void:
 		if best != "":
 			_key_room = best
 	_last_mouse = get_viewport().get_mouse_position()
+	# A câmera acompanha o cômodo escolhido pelas setas (o que o menu cobre fica à vista).
+	station.pan_to_room(_key_room, _overview_left() + 12.0, 1900.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Na chegada não há painel para fechar (Voltar pula a chegada, no _input).
-	if U.is_back(event) and current != "" and current != ARRIVAL and not _map.visible:
+	if U.is_back(event) and current == "report" and not _map.visible:
+		# Voltar no relatório conclui como Entrar no abrigo (#131): a fila sai andando, e o relatório fica visto.
+		_enter_shelter_then(Callable())
+		get_viewport().set_input_as_handled()
+	elif U.is_back(event) and current != "" and current != ARRIVAL and not _map.visible:
 		close_panel()
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and current == "" and not _map.visible:
-		var room := _room_at(event.position)
-		if room != "":
+		# Na vista geral, o clique abre o cômodo ao soltar; arrastando, a câmera anda (#131).
+		_drag_from = event.position
+		_drag_pan = station.pan
+		_dragged = false
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and _room_open() and not _map.visible:
+		# Com um cômodo aberto, clicar no vizinho (fora do painel) troca direto (#131).
+		var room := _room_at_point(station.room_screen_rects(), event.position)
+		if room != "" and room != current:
 			open_room(room)
 			get_viewport().set_input_as_handled()
 
@@ -514,12 +559,15 @@ func _build_frame(c: Dictionary) -> void:
 	AHStationFrame.tabs(_frame, _active_tab(), _nav)
 	var pairs: Array
 	if current == "":
-		pairs = [[tr("Setas"), tr("Cômodos")], ["interact", tr("Abrir")], ["menu", tr("Menu")], ["hide_hud", tr("Ocultar")]]
+		pairs = [[tr("Setas"), tr("Cômodos")], ["interact", tr("Abrir")], ["menu", tr("Menu")], ["hide_hud", tr("Ocultar")], [tr("Arraste"), tr("Câmera")]]
 		AHStationFrame.keys(_frame, pairs, LEFT.end.x + 300.0, LEFT.end.x + 32.0, _prepare.position.x - 24.0)
 		return
 	AHStationFrame.back_button(_frame, close_panel)
 	if current == "options":
 		pairs = [[tr("Setas"), tr("Navegar")], ["interact", tr("Mudar")], ["Esc", tr("Fechar")]]
+	elif _room_open():
+		# O cômodo vizinho direto (#131).
+		pairs = [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["station_room_next", tr("Ao lado")], ["Esc", tr("Voltar")], ["hide_hud", tr("Ocultar")]]
 	else:
 		pairs = [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["Esc", tr("Voltar")], ["hide_hud", tr("Ocultar")]]
 	AHStationFrame.keys(_frame, pairs, 962.0, 268.0, (RIGHT.position.x if _panel.visible or current != S.PREPARATION else 1400.0) - 24.0)
@@ -822,9 +870,11 @@ func _refresh_room_card() -> void:
 	_room_card.visible = show
 	if not show:
 		return
-	if String(_room_card.get_meta("room", "")) == _hover_room and _room_card.get_child_count() > 0:
+	# O cartão é refeito para outro cômodo e para outro tamanho de texto (#131: no Maior, as linhas do custo saem dele).
+	var key := "%s|%s" % [_hover_room, AHUiStyle.text_scale]
+	if String(_room_card.get_meta("room", "")) == key and _room_card.get_child_count() > 0:
 		return
-	_room_card.set_meta("room", _hover_room)
+	_room_card.set_meta("room", key)
 	for child in _room_card.get_children():
 		_room_card.remove_child(child)
 		child.queue_free()
@@ -843,6 +893,16 @@ func _refresh_room_card() -> void:
 	state.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(state)
 	box.add_child(_wrapped(tr(S.ROOM_ROLES.get(_hover_room, "")), "text", AHKit.TEXT, false, LEFT.size.x - 48.0))
+	# Por recuperar (#131): o que o marcador resume, por extenso: o custo, o que se tem ou o motivo.
+	var lock := lock_mark_info(c, _hover_room)
+	if not lock.is_empty():
+		var title := _wrapped(lock.title, "text", AHKit.AMBER if lock.state == "ready" else AHKit.TEXT, true, LEFT.size.x - 48.0)
+		title.name = "LockTitle"
+		title.set_meta("lock", true)
+		box.add_child(title)
+		var note := _wrapped(lock.note, "small", AHKit.alert_text() if lock.state == "short" else AHKit.MUTED, false, LEFT.size.x - 48.0)
+		note.set_meta("lock", true)
+		box.add_child(note)
 	var manage := AHKit.button(tr("Gerenciar"), "secondary")
 	manage.name = "Manage"
 	manage.custom_minimum_size = Vector2(0, 60)
@@ -851,8 +911,197 @@ func _refresh_room_card() -> void:
 		if _hover_room != "":
 			open_room(_hover_room))
 	box.add_child(manage)
+	_card_without_lock = false
+	_fit_room_card()
+
+
+## O que o marcador do cômodo por recuperar diz (#131): {state, title, note, cost}. state: "ready" (dá para recuperar
+## agora), "short" (falta recurso) ou "closed" (a recuperação chega numa próxima fase); {} no cômodo recuperado. O
+## marcador mostra o estado e o custo em ícones; o título e o motivo vão no cartão do cômodo apontado.
+func lock_mark_info(c: Dictionary, id: String) -> Dictionary:
+	if S.room_level(c, id) >= 1:
+		return {}
+	var cost := S.next_level_cost(c, id)
+	if cost.is_empty():
+		return {"state": "closed", "title": tr("Fechado"), "note": S.upgrade_block(c, id), "cost": {}}
+	var block := S.upgrade_block(c, id)
+	var stock := {"scrap": S.quantity(c, "scrap"), "fragments": S.quantity(c, "fragments")}
+	var have := tr("sem sucata nem fragmentos") if stock.scrap + stock.fragments == 0 else tr("tem %s") % S.cost_text(stock)
+	return {"state": "ready" if block == "" else "short", "title": tr("Recuperar · %s") % S.cost_text(cost),
+		"note": have if block == "" else block, "cost": cost}
+
+
+## O cômodo (com a câmera andada) passa por trás da coluna da esquerda: os cantos não ficam por cima dela.
+func _under_column(rect: Rect2) -> bool:
+	for cover in [_menu, _room_card]:
+		if cover != null and cover.visible and cover.get_global_rect().intersects(rect):
+			return true
+	return false
+
+
+## Um marcador por cômodo por recuperar, no alto da boca do cômodo; some fora da vista geral e no cômodo apontado (o
+## cartão do cômodo diz o resto).
+func _place_lock_marks() -> void:
+	var c: Dictionary = Campaign.state
+	for id in _lock_marks.keys():
+		var mark: PanelContainer = _lock_marks[id]
+		if not _room_rects.has(id) or lock_mark_info(c, id).is_empty():
+			mark.queue_free()
+			_lock_marks.erase(id)
+	for id in _room_rects:
+		var info := lock_mark_info(c, id)
+		if info.is_empty():
+			continue
+		var mark: PanelContainer = _lock_marks.get(id)
+		var signature := "%s|%s|%s|%s" % [info.state, info.title, info.note, AHUiStyle.text_scale]
+		if mark == null or String(mark.get_meta("signature", "")) != signature:
+			if mark != null:
+				mark.queue_free()
+			mark = _lock_mark(c, id, info)
+			mark.set_meta("signature", signature)
+			_room_marks.add_child(mark)
+			_room_marks.move_child(mark, 0)
+			_lock_marks[id] = mark
+		var rect: Rect2 = _room_rects[id]
+		mark.reset_size()
+		mark.size = mark.get_combined_minimum_size()
+		mark.position = Vector2(rect.get_center().x - mark.size.x * 0.5, rect.position.y + 8.0)
+		# Com a câmera andada, o cômodo pode ficar atrás da coluna da esquerda: o marcador não fica por cima dela.
+		var covered := false
+		for cover in [_menu, _room_card]:
+			if cover != null and cover.visible and cover.get_global_rect().intersects(mark.get_global_rect()):
+				covered = true
+		mark.visible = (id != _hover_room or _card_without_lock) and not covered
+
+
+## O marcador: o ícone do estado (pronto, faltando ou fechado) e o custo em ícones com os números (o que falta, na cor
+## de alerta); o fechado diz só "Fechado".
+func _lock_mark(c: Dictionary, id: String, info: Dictionary) -> PanelContainer:
+	var tone: Color = AHKit.AMBER if info.state == "ready" else AHKit.MUTED
+	var mark := AHKit.chip("cost")
+	mark.name = "Lock_%s" % id
+	mark.set_meta("state", info.state)
+	mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mark.add_child(row)
+	row.add_child(_icon({"ready": "next_step", "short": "alert", "closed": "objective_failed"}[info.state], 24, tone))
+	if info.cost.is_empty():
+		row.add_child(AHKit.label(info.title, "small", AHKit.MUTED, true))
+		return mark
+	for resource in ["scrap", "fragments"]:
+		var amount := int(info.cost.get(resource, 0))
+		if amount <= 0:
+			continue
+		var enough := S.quantity(c, resource) >= amount
+		row.add_child(_icon(RESOURCE_ICONS[resource], 22, AHKit.TEXT if enough else AHKit.alert_text()))
+		var number := AHKit.label(str(amount), "small", AHKit.TEXT if enough else AHKit.alert_text(), true)
+		number.name = "Cost_%s" % resource
+		row.add_child(number)
+	return mark
+
+
+## O arraste da vista geral: andou mais que um toque, a câmera segue o mouse; soltou sem arrastar, abre o cômodo.
+func _drag_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		if not _dragged and event.position.distance_to(_drag_from) > DRAG_START:
+			_dragged = true
+		if _dragged:
+			station.set_pan(_drag_pan - (event.position.x - _drag_from.x) / station.overview_pixels_per_meter())
+		return
+	if event.button_index != MOUSE_BUTTON_LEFT or event.pressed:
+		return
+	var from := _drag_from
+	_drag_from = Vector2.INF
+	get_viewport().set_input_as_handled()
+	if not _dragged and current == "" and not _map.visible:
+		var room := _room_at(from)
+		if room != "":
+			open_room(room)
+
+
+## Um cômodo aberto no painel (não a Sala, que é uma tela do kit, nem os serviços).
+func _room_open() -> bool:
+	return current != "" and current != S.CHARACTERS and not S.room_def(current).is_empty()
+
+
+## O vizinho do mesmo andar (pela posição na Estação), à esquerda (-1) ou à direita (1); "" na ponta.
+static func neighbor_room(room_id: String, direction: int) -> String:
+	var here := AHStation.room_def(room_id)
+	if here.is_empty():
+		return ""
+	var best := ""
+	var best_gap := INF
+	for room in AHStation.ROOMS:
+		if room.id == room_id or room.ceiling != here.ceiling:
+			continue
+		var gap: float = (room.x0 - here.x0) * direction
+		if gap > 0.0 and gap < best_gap:
+			best_gap = gap
+			best = room.id
+	return best
+
+
+## Onde a vista geral começa, à direita do menu da esquerda.
+func _overview_left() -> float:
+	return _menu.get_global_rect().end.x if _menu != null and _menu.visible else 20.0
+
+
+static func _room_at_point(rects: Dictionary, point: Vector2) -> String:
+	for id in rects:
+		if rects[id].has_point(point):
+			return id
+	return ""
+
+
+## A vista geral anda com o analógico direito e com o mouse encostado na borda da tela (#131).
+func _pan_overview(delta: float) -> void:
+	if current != "" or _map.visible or _hud_hidden or briefing_open() or _drag_from != Vector2.INF:
+		# Fora da vista geral, a espera da borda recomeça: fechado o painel, o mouse parado na borda espera de novo.
+		_edge_time = 0.0
+		return
+	var push := Input.get_axis("station_pan_left", "station_pan_right")
+	var mouse := get_viewport().get_mouse_position()
+	var inside: bool = get_viewport().get_visible_rect().has_point(mouse) and DisplayServer.window_is_focused()
+	var edge := edge_push(mouse.x if inside else -INF, get_viewport().get_visible_rect().size.x, delta)
+	if edge != 0.0:
+		push = edge
+	if absf(push) > 0.01:
+		station.set_pan(station.pan + push * PAN_SPEED * delta)
+
+
+## O empurrão da borda (-1, 0 ou 1): o mouse encostado na borda (x; -INF fora da janela) há pelo menos
+## PAN_EDGE_DWELL segundos.
+func edge_push(x: float, width: float, delta: float) -> float:
+	var edge := 0.0
+	if x != -INF:
+		if x <= PAN_EDGE:
+			edge = -1.0
+		elif x >= width - PAN_EDGE:
+			edge = 1.0
+	_edge_time = _edge_time + delta if edge != 0.0 else 0.0
+	return edge if _edge_time >= PAN_EDGE_DWELL else 0.0
+
+
+## O cartão cresce para cima: com o texto Maior, as linhas do cômodo por recuperar subiam por cima da coluna do menu
+## (#131). Nesse caso, saem do cartão (o marcador no cômodo apontado fica à vista e diz o custo). Roda a cada quadro: o
+## menu pode crescer depois do cartão (a troca do tamanho do texto).
+func _fit_room_card() -> void:
+	if _room_card == null or not _room_card.visible or _room_card.get_child_count() == 0:
+		return
 	_room_card.reset_size()
 	_room_card.size = _room_card.get_combined_minimum_size()
+	var top := AHStationFrame.BACK_Y + 56.0 - _room_card.size.y
+	if _menu != null and _menu.visible and top < _menu.get_global_rect().end.y + 12.0:
+		var box: Node = _room_card.get_child(0)
+		for node in box.get_children():
+			if node.has_meta("lock") and not node.is_queued_for_deletion():
+				box.remove_child(node)
+				node.queue_free()
+				_card_without_lock = true
+		_room_card.reset_size()
+		_room_card.size = _room_card.get_combined_minimum_size()
 	_room_card.position = Vector2(LEFT.position.x, AHStationFrame.BACK_Y + 56.0 - _room_card.size.y)
 
 
@@ -888,6 +1137,8 @@ func _update_room_hover() -> void:
 		_fit_overview_to_menu()
 	# A etiqueta do Dormitório com a noite pendente (fora do desenho: acompanha a vista geral a cada quadro).
 	var rest: bool = Campaign.state.night.phase != "none" and _room_rects.has(S.DORMITORY) and _hover_room != S.DORMITORY
+	_fit_room_card()
+	_place_lock_marks()
 	_rest_tag.visible = rest
 	if rest:
 		_rest_tag.size = _rest_tag.get_combined_minimum_size()
@@ -916,8 +1167,17 @@ func _draw_room_marks() -> void:
 		hints[_next.room] = AHKit.AMBER
 	if c.night.phase != "none":
 		hints[S.DORMITORY] = AHKit.NIGHT
+	# Os cômodos por recuperar (#131): o que já dá para recuperar ganha os cantos âmbar; o que ainda não dá, a penumbra.
+	for id in _room_rects:
+		var info := lock_mark_info(c, id)
+		if info.is_empty():
+			continue
+		if info.state == "ready":
+			hints[id] = AHKit.AMBER
+		elif id != _hover_room:
+			_room_marks.draw_rect(_room_rects[id], Color(AHKit.SHADE, 0.32))
 	for id in hints:
-		if id != _hover_room and _room_rects.has(id):
+		if id != _hover_room and _room_rects.has(id) and not _under_column(_room_rects[id]):
 			_corners(_room_rects[id], Color(hints[id], 0.5), 2.0, 18.0)
 	if _hover_room == "" or not _room_rects.has(_hover_room):
 		return
@@ -971,7 +1231,7 @@ func open_service(service: String) -> void:
 			Tips.show_tip("return")
 			var report: Dictionary = Campaign.state.station.last_return
 			# Depois da chegada, a câmera desliza da plataforma inteira até a fila (sem corte).
-			station.show_report(report.get("team", []).filter(func(id): return S.hero(Campaign.state, id) != null and S.hero(Campaign.state, id).alive),
+			station.show_report(AHStationReport.scene_order(report.get("team", [])).filter(func(id): return S.hero(Campaign.state, id) != null and S.hero(Campaign.state, id).alive),
 				not _after_arrival)
 			_after_arrival = false
 		"train":
@@ -1029,6 +1289,10 @@ func open_map() -> void:
 	if S.preparation_block(Campaign.state) != "":
 		open_room(S.PREPARATION)
 		return
+	# A Sala dos Personagens (e o relatório) ficam por cima de tudo: o mapa abre com eles fechados, senão o herói de
+	# corpo inteiro ficava por cima do mapa (#131).
+	if is_instance_valid(_room_screen) or is_instance_valid(_report_screen):
+		close_panel()
 	if _draft.is_empty():
 		_reset_draft()
 	_map.open(_draft.phase, _draft.get("focus", ""))
@@ -1051,7 +1315,8 @@ func open_departure() -> void:
 	refresh()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_pan_overview(delta)
 	_update_room_hover()
 	if _feedback.modulate.a > 0.0 and _feedback.text != "":
 		_place_feedback()
@@ -2619,7 +2884,9 @@ func _close_report_screen() -> void:
 ## Fecha o relatório (visto) e segue: a noite, o trem ou o que foi pedido (then).
 func _enter_shelter_then(then: Callable) -> void:
 	Campaign.state.station.last_return.seen = true
-	station.clear_lineup()
+	# A fila sai andando da plataforma (#131): a câmera espera um pouco antes de descer (AHStation.walk_off_lineup);
+	# quem ainda não saiu do quadro vai para o cômodo quando a câmera passar.
+	station.walk_off_lineup()
 	station.commit()
 	if Campaign.state.night.phase != "none":
 		# A câmera volta à vista geral: o Próximo passo e o Dormitório em destaque dizem que a equipe precisa dormir,
