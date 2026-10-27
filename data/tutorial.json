@@ -77,18 +77,6 @@
     "Tool": "pe_de_cabra"
   },
   {
-    "Name": "station",
-    "Roster": "B",
-    "Proposals": {
-      "A": "Só o Bento e o Nick; a Íris e a Véspera chegam nas primeiras saídas, pelo trem (#122).",
-      "B": "Os quatro fundadores, como hoje."
-    },
-    "Waiting": [
-      "hero_sapo_iris",
-      "hero_coruja_vespera"
-    ]
-  },
-  {
     "Name": "hints",
     "Steps": [
       {
@@ -104,7 +92,7 @@
       {
         "Id": "ability",
         "Title": "Escolha uma habilidade",
-        "Text": "Na vez do herói, cada habilidade diz de que posições sai e quais alcança. O Broto é fraco: ataque.",
+        "Text": "Na vez do herói, cada habilidade diz de que posições sai e quais alcança. Os inimigos daqui são pequenos: ataque.",
         "Keys": [
           "combat_ability_1",
           "combat_ability_2",

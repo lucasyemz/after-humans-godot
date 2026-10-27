@@ -209,19 +209,25 @@
         "Speakers": [
           "hero_gato_nick"
         ],
-        "Text": "Essa porta não abre mais. As máquinas fecharam o corredor inteiro, e você ficou do lado de dentro."
+        "Text": "Essa porta não abre mais. O protocolo de contenção fechou o corredor inteiro, e vocês três ficaram do lado de dentro."
+      },
+      {
+        "Speakers": [
+          "hero_coruja_vespera"
+        ],
+        "Text": "Ele estava nos vigiando desde a escada."
       },
       {
         "Speakers": [
           "hero_cao_bento"
         ],
-        "Text": "Tem gente na Estação esperando por estes suprimentos. Eu não volto de mãos vazias: tem que haver outro caminho."
+        "Text": "Tem gente na Estação esperando estes suprimentos. Íris, Véspera, atrás de mim: tem que haver outro caminho."
       },
       {
         "Speakers": [
           "hero_gato_nick"
         ],
-        "Text": "Tem. Pelo duto, depois a escada até o alçapão. Eu ia seguir viagem... Anda, antes que eu mude de ideia."
+        "Text": "Tem. Pelo duto, depois a escada até o alçapão. Eu ia seguir viagem... Andem, antes que eu mude de ideia."
       }
     ]
   },
@@ -232,13 +238,25 @@
         "Speakers": [
           "hero_gato_nick"
         ],
-        "Text": "Você ia ficar preso lá embaixo por causa de uma mochila de comida."
+        "Text": "Você ia acabar morrendo junto com elas."
       },
       {
         "Speakers": [
           "hero_cao_bento"
         ],
-        "Text": "Por quem está esperando por ela. Fica? Aqui tem comida, cama e porta que abre por dentro."
+        "Text": "Talvez."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Idiota."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Fica? Aqui tem comida, cama e porta que abre por dentro."
       },
       {
         "Speakers": [

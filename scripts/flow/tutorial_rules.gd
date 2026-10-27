@@ -165,7 +165,7 @@ static func stage(campaign: Dictionary) -> String:
 	return String(campaign.get("tutorial", {}).get("stage", "done"))
 
 
-## A campanha nova começa pela abertura: a jornada do tutorial, com o Bento sozinho no Corredor de Contenção.
+## A campanha nova começa pela abertura: a jornada do tutorial, com o Bento, a Íris e a Véspera no Corredor de Contenção.
 static func begin(campaign: Dictionary, seed_value: int = 20261026) -> bool:
 	if not start_journey(campaign, seed_value):
 		return false
@@ -180,8 +180,8 @@ static func skip(campaign: Dictionary) -> void:
 
 
 ## O fim do tutorial (o embarque, ou o Pular): a equipe inteira e descansada, os heróis como saíram (as lutas do
-## tutorial não contam na carreira), a recompensa no estoque, o elenco da Estação (proposta A ou B) e o relatório da
-## chegada, que a Estação mostra com o debriefing do Bento e do Nick.
+## tutorial não contam na carreira), a recompensa no estoque e o relatório da chegada, que a Estação mostra com o
+## debriefing do Bento e do Nick.
 ## Só vale na campanha recém-criada (a Nova campanha do título, que começa pelo tutorial): zera o nível, o XP e as
 ## melhorias de todo o elenco. Numa campanha com progresso, apagaria tudo; por isso a guarda do estágio.
 static func complete(campaign: Dictionary) -> Dictionary:
@@ -201,15 +201,8 @@ static func complete(campaign: Dictionary) -> Dictionary:
 	campaign.inventory.bandages = int(campaign.inventory.bandages) + int(prize.bandages)
 	if prize.tool != "" and not campaign.tools.has(prize.tool):
 		campaign.tools.append(prize.tool)
+	# Os quatro fundadores voltam juntos: o Bento, a Íris e a Véspera, e o Nick, que chegou no aperto.
 	var team: Array = journey().get("StartTeam", []) + journey().get("JoinTeam", [])
-	if String(row("station").get("Roster", "B")) == "A":
-		# A proposta A: só a dupla na Estação; os outros fundadores esperam o trem dos recrutas (#122). Os que esperam
-		# são a Íris e a Véspera, o quarteto do jogo hoje; no arco (docs/narrative/bento-nick-arc.md) a segunda é a Amora,
-		# que fica na lore e entra no jogo depois (docs/narrative/review.md, item 2). Trocar só com a decisão do Lucas.
-		var waiting: Array = row("station").get("Waiting", [])
-		campaign.roster = campaign.roster.filter(func(h): return not waiting.has(h.id))
-		campaign.preferred_formation = campaign.preferred_formation.filter(func(id): return not waiting.has(id))
-		campaign.tutorial_waiting = waiting.duplicate()
 	campaign.station.last_return = {"result": "victory", "percent": 100, "phase_id": PHASE_ID, "seeds": int(prize.seeds),
 		"scrap": 0, "fragments": 0, "water": 0, "supplies": 0, "request": "", "team": team.filter(func(id): return AHStationRules.hero(campaign, id) != null),
 		"food_left": 0, "stats": {}, "focus": "", "objective_done": false, "unlocked_phase": "", "story": "", "returning": team.size(),
