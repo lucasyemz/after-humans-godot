@@ -711,7 +711,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open_inventory()
 		return
-	if event.is_action_pressed("formation"):
+	# A formação só pega a tecla quando abre ou fecha de fato: na luta, o X do controle é o Defender (#129).
+	if event.is_action_pressed("formation") and not street._arena.active and (hud.formation_open() or can_open_formation()):
 		get_viewport().set_input_as_handled()
 		open_formation()
 		return
@@ -735,6 +736,8 @@ func open_formation() -> void:
 	elif can_open_formation():
 		hud.formation_cards = street._heroes
 		hud.open_formation()
+	elif street.party_ids.size() < 2 and not busy and not street._arena.active:
+		hud.toast(tr("Com um herói só, não há ordem para trocar."), 2.5)
 
 
 func _swap_formation(a: String, b: String) -> void:
@@ -750,6 +753,8 @@ func open_menu() -> void:
 	# No acampamento também (#98): voltar à Estação e as Opções não podem esperar o levantar acampamento.
 	if busy or street._arena.active or hud.modal_open() or camp.switching():
 		return
+	# Com a formação aberta (o clique no MENU), ela fecha antes.
+	hud.close_formation()
 	var session: Dictionary = Campaign.state.session
 	if not AHExplorationHud.session_open(Campaign.state):
 		return
@@ -760,6 +765,7 @@ func open_menu() -> void:
 func open_inventory() -> void:
 	if busy or street._arena.active or hud.modal_open() or camp.switching() or not AHExplorationHud.session_open(Campaign.state):
 		return
+	hud.close_formation()
 	Sound.play("res://audio/ui/bag_open.ogg")
 	hud.show_inventory()
 	Tips.show_tip("bag")
