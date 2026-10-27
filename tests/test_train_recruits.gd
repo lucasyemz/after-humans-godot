@@ -264,6 +264,17 @@ func _screens() -> void:
 		t.check(buy.is_empty() and room.find_child("Tab_recruit", true, false) == null, "a Sala não tem mais o + RECRUTAR")
 		var to_train: Button = room.find_child("ToTrain", true, false)
 		t.check(to_train != null and to_train.text.to_lower().contains(String(c.station.train.recruit.display_name).to_lower()), "e leva até quem espera na plataforma")
+		# Sem ninguém vivo no elenco (um save antigo, de antes da #118), a Sala abre sem herói, com o aviso.
+		var alive_before: Array = Campaign.state.roster.map(func(h): return h.alive)
+		for entry in Campaign.state.roster:
+			entry.alive = false
+		room.rebuild()
+		await _frames(2)
+		t.check(room.find_child("EmptyRoster", true, false) != null and room.find_child("Right", true, false) == null, "sem ninguém vivo, a Sala abre com o aviso e sem o painel do herói")
+		for i in alive_before.size():
+			Campaign.state.roster[i].alive = alive_before[i]
+		room.rebuild()
+		await _frames(2)
 		hud.close_panel()
 		await _frames(2)
 		t.check(is_instance_valid(station._candidate) and station._candidate.visible, "na vista geral, ele espera na plataforma")

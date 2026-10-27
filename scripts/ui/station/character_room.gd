@@ -54,12 +54,18 @@ func rebuild() -> void:
 	var c: Dictionary = Campaign.state
 	var living: Array = S.living(c)
 	if selected == "" or S.hero(c, selected) == null or not S.hero(c, selected).alive:
-		selected = living[0].id
+		# Sem ninguém no elenco (um save antigo, de antes da #118, com todos mortos), não há herói para mostrar.
+		selected = living[0].id if not living.is_empty() else ""
+	var hero = S.hero(c, selected) if selected != "" else null
+	if hero == null:
+		training = false
 	_first_focus = null
 	_top(c)
-	_stage(S.hero(c, selected))
+	if hero != null:
+		_stage(hero)
 	_left(c)
-	_right(c, S.hero(c, selected))
+	if hero != null:
+		_right(c, hero)
 	_bottom(c)
 	# O painel PERSONAGEM termina acima de IR AO MAPA (que cresce com o motivo do bloqueio e no Maior).
 	var right := get_node_or_null("Right") as Control
@@ -204,7 +210,14 @@ func _left(c: Dictionary) -> void:
 		tabs.add_child(_hero_tab(entry))
 	_roster_line(c, column)
 	column.add_child(_divider())
-	var hero = S.hero(c, selected)
+	var hero = S.hero(c, selected) if selected != "" else null
+	if hero == null:
+		var empty := AHKit.label(tr("Ninguém no Alojamento agora. Quem chegar no trem aparece aqui."), "text", AHKit.TEXT)
+		empty.name = "EmptyRoster"
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		empty.custom_minimum_size = Vector2(300, 0)
+		column.add_child(empty)
+		return
 	column.add_child(AHKit.label(tr("Habilidades"), "panel_title", AHKit.TEXT, true, true))
 	var hero_class = GameData.row("classes", String(hero.class_id))
 	var ids: Array = hero_class.get("AbilityIds", []) if hero_class != null else []
