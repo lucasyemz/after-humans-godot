@@ -79,13 +79,25 @@ Cada fase pode ir para um mapa piloto (a Rua das Vitrines) antes dos outros.
 - **O "longe":** um fundo distante para cada mapa (a cidade alagada, as torres, a ponte), sumindo na névoa.
 - A Awesomic faz a arte, no contrato dos cenários, e o Claude monta.
 
-### Fase 4: a vida (arte e código)
-- **Os moradores e bichos de fundo:** silhuetas animadas simples, sem combate, que andam, sentam e trabalham.
-  Coerentes com a história: os sobreviventes de outras comunidades e as máquinas desligadas, nunca humanos.
-- **As falas curtas em balão** quando a equipe passa, com textos em `data/` e a regra de consistência da narrativa.
-- **As coisas que se mexem:** cabos e panos balançando, placas rangendo, luz piscando.
+### Fase 4: a vida nos mapas é das máquinas (arte e código)
+**Decisão do Lucas (26/10):** os mapas são pouco habitados por animais com personalidade, ao contrário do mercado
+cheio do REPLACED. Quem ocupa a cidade são as máquinas. Os poucos sobreviventes que existem lá fora se escondem. A
+Estação Raiz é o único lugar cheio de vida.
+- **A vida de fundo são as máquinas,** e é ela que faz a cidade parecer habitada e perigosa:
+  - drones passando ao longe com o farol varrendo a névoa;
+  - robôs de serviço repetindo rotinas sem sentido (varrendo uma calçada vazia, conferindo uma porta);
+  - máquinas quebradas que ainda piscam, faíscam ou tentam se mexer;
+  - sensores, câmeras e alto-falantes que acordam quando a equipe passa.
+  - Nada disso luta: é cenário, coerente com a VIGIA de cada fase (`docs/narrative/`).
+- **Os sobreviventes escondidos:** sinais de que há alguém (uma fogueira apagada ainda quente, um esconderijo, um
+  vulto que some na janela). Poucos, e quase nunca à vista.
+- **Encontros com sobreviventes específicos, raros e marcados:** um animal escondido que a equipe encontra, com uma
+  escolha. Ajudar (dar comida ou um curativo, levar até a Estação pelo trem, #122), negociar ou saquear o que ele tem,
+  com consequência na Esperança, nos recursos ou num recruta futuro. Os textos passam pela regra de consistência da
+  narrativa, e os números ficam em `data/`, como os eventos.
+- **As coisas que se mexem:** cabos e panos balançando, placas rangendo, luz piscando, água pingando.
 
-### Fase 5: a Estação Raiz como lugar habitado
+### Fase 5: a Estação Raiz como lugar habitado (o contraste com a cidade vazia)
 - **Na chegada e na Visão geral,** a câmera desce e abre devagar, como no vídeo do hub.
 - **Mais luz prática** (gambiarra na plataforma, lampiões nos cômodos), névoa com raios de luz e a poeira no ar.
 - **Os moradores circulando** entre os cômodos e a plataforma.
