@@ -507,6 +507,9 @@ func refresh() -> void:
 	_build_left(c)
 	if current != "":
 		_show(current)
+	# A cena da noite (#132) por cima: o amanhecer só aparece quando ela acaba.
+	if night_scene_open():
+		_panel.visible = false
 	_fit_panel.call_deferred()
 
 
@@ -2527,7 +2530,7 @@ func _night_plan(c: Dictionary) -> void:
 		tr("disponível") if preview.available == 1 else tr("disponíveis")], "text", AHKit.TEXT, true))
 	if short > 0:
 		_footer.add_child(_wrapped(tr("Faltam %d: os cartões marcados recuperam menos.") % short, "small", AHKit.alert_text(), false, BODY_WIDTH))
-	_footer.add_child(_wrapped(tr("Quem vigia não descansa, mas protege os outros dos ruídos da noite."), "small", AHKit.MUTED, false, BODY_WIDTH))
+	_footer.add_child(_wrapped(tr("Quem vigia não descansa, mas evita as perdas da noite (os ruídos, a goteira, as baratas)."), "small", AHKit.MUTED, false, BODY_WIDTH))
 	_footer_primary(tr("Iniciar descanso"), "sleep", _start_night)
 
 
@@ -2571,7 +2574,7 @@ func _night_card(c: Dictionary, row: Dictionary, can_watch: bool) -> Control:
 		top.add_child(button)
 	var outcome := ""
 	if row.watch:
-		outcome = tr("Vigiando · não descansa e protege dos ruídos")
+		outcome = tr("Vigiando · não descansa e evita as perdas")
 	else:
 		outcome = tr("%s · +%d de vida, %+d de instinto") % [tr("Alimentado") if row.fed else tr("Sem alimentação"), row.hp_gain, row.instinct_change]
 	box.add_child(_wrapped(outcome, "small", AHKit.TEXT if row.fed or row.watch else AHKit.alert_text(), false, BODY_WIDTH - 40.0))

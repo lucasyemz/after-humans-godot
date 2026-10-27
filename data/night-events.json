@@ -1,10 +1,5 @@
 [
   {
-    "Name": "watch",
-    "WatchFactor": 50,
-    "Description": "Proposta (#132): com alguém de vigia, o peso de cada evento ruim cai para esta porcentagem."
-  },
-  {
     "Name": "quiet",
     "Weight": 30,
     "Text": "A noite passou tranquila. O abrigo permaneceu seguro.",

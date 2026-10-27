@@ -808,9 +808,9 @@ static func resolve_night(campaign: Dictionary, force: String = "") -> bool:
 			var noise := int(event.get("amount", 0)) if event.id == "distant_noise" and not event.get("prevented", false) else 0
 			var thirst := THIRST_INSTINCT_PENALTY if night.thirsty else 0
 			entry.instinct = clampi(entry.instinct - (15 if result.fed else 5) + noise + thirst, 0, 200)
-			# Quem não dormiu pelo trauma (#132) não baixa o instinto.
+			# Quem não dormiu pelo trauma (#132) perde só o desconto do sono: a sede pesa igual.
 			if event.id == "sleepless" and String(event.get("hero_id", "")) == hero_id:
-				entry.instinct = before_instinct
+				entry.instinct = clampi(before_instinct + thirst, 0, 200)
 			result.hp_recovered = entry.hp - before_hp
 			result.instinct_reduced = before_instinct - entry.instinct
 		night.results.append(result)
@@ -836,26 +836,14 @@ static func night_row(name: String) -> Dictionary:
 static func _draw_night_event(campaign: Dictionary, awake: Array, force: String = "") -> Dictionary:
 	var night: Dictionary = campaign.night
 	var watch := String(night.watch_hero_id)
-	var sleepers: Array = awake.filter(func(id): return id != watch)
-	var troubled: Array = sleepers.filter(func(id): return bool(hero(campaign, id).get("trauma", false)))
+	var troubled: Array = awake.filter(func(id): return id != watch and bool(hero(campaign, id).get("trauma", false)))
 	var sighting := _next_sighting(campaign)
-	var factor := float(night_row("watch").get("WatchFactor", 50)) / 100.0
+	# O sorteio usa os pesos cheios, sem olhar o vigia: trocar quem vigia não escolhe a noite. O vigia só muda o que o
+	# evento sorteado faz (evita as perdas) e se ele vê algo.
 	var options: Array = []
 	for row in GameData.table("night_events").values():
-		if not row.has("Weight"):
-			continue
-		match String(row.get("Requires", "")):
-			"watch":
-				if watch == "" or sighting == "":
-					continue
-			"resident":
-				if campaign.station.residents.is_empty():
-					continue
-			"trauma":
-				if troubled.is_empty():
-					continue
-		var weight := float(row.Weight) * (factor if bool(row.get("Bad", false)) and watch != "" else 1.0)
-		options.append([String(row.Name), weight])
+		if row.has("Weight"):
+			options.append([String(row.Name), float(row.Weight)])
 	options.sort_custom(func(a, b): return a[0] < b[0])
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("%s:night" % night.expedition_id)
@@ -871,6 +859,17 @@ static func _draw_night_event(campaign: Dictionary, awake: Array, force: String 
 			break
 	if force != "":
 		id = force
+	# Sem quem o evento pede (o vigia e um lugar por ver, um morador, alguém com trauma que dormiu), a noite é tranquila.
+	match String(night_row(id).get("Requires", "")):
+		"watch":
+			if watch == "" or sighting == "":
+				id = "quiet"
+		"resident":
+			if campaign.station.residents.is_empty():
+				id = "quiet"
+		"trauma":
+			if troubled.is_empty():
+				id = "quiet"
 	var row := night_row(id)
 	var event := {"id": id, "amount": int(row.get("Amount", 0)), "hero_id": "", "civilian_id": "", "phase_id": "",
 		"prevented": bool(row.get("Bad", false)) and watch != "" and row.has("TextWatched"), "protected": false}

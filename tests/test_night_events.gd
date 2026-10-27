@@ -46,18 +46,26 @@ func _draw() -> void:
 	t.check(seen.size() >= 4 and seen.has("quiet"), "em 80 noites, vários eventos (%s)" % ", ".join(seen.keys()))
 
 
-## O vigia diminui as chances ruins.
+## O vigia diminui as chances ruins (evita as perdas) sem escolher a noite: a mesma semente sorteia o mesmo evento com
+## ou sem vigia (a revisão do #172).
 func _watch_odds() -> void:
 	var bad_alone := 0
 	var bad_watched := 0
+	var changed: Array = []
 	for i in 300:
 		var alone := _night("odds-%d" % i)
 		S.resolve_night(alone)
-		bad_alone += 1 if bool(S.night_row(alone.night.event_id).get("Bad", false)) else 0
-		var watched := _night("odds-%d" % i, "hero_cao_bento")
-		S.resolve_night(watched)
-		bad_watched += 1 if bool(S.night_row(watched.night.event_id).get("Bad", false)) else 0
-	t.check(bad_watched < bad_alone, "com vigia, menos noites ruins (%d contra %d em 300)" % [bad_watched, bad_alone])
+		bad_alone += 1 if S.night_event_bad(alone) else 0
+		for watcher in ["hero_cao_bento", "hero_gato_nick"]:
+			var watched := _night("odds-%d" % i, watcher)
+			S.resolve_night(watched)
+			if watcher == "hero_cao_bento":
+				bad_watched += 1 if S.night_event_bad(watched) else 0
+			# O vigia só pode trocar a noite tranquila pela que ele vê (o evento que pede vigia).
+			if watched.night.event_id != alone.night.event_id and watched.night.event_id != "watcher_sees":
+				changed.append("%d:%s>%s" % [i, alone.night.event_id, watched.night.event_id])
+	t.check(bad_watched < bad_alone, "com vigia, menos noites com perda (%d contra %d em 300)" % [bad_watched, bad_alone])
+	t.check(changed.is_empty(), "trocar o vigia não troca o evento sorteado (%s)" % ", ".join(changed.slice(0, 5)))
 
 
 func _events() -> void:
@@ -131,6 +139,12 @@ func _events() -> void:
 	t.equal(trauma.night.event.hero_id, "hero_gato_nick", "o Nick, com trauma, não dorme")
 	t.equal(S.hero(trauma, "hero_gato_nick").instinct, 60, "o instinto dele não baixa")
 	t.check(S.night_event_text(trauma).contains("Nick"), "e o texto diz")
+	# Sem sono, perde só o desconto do sono: a sede pesa igual (a revisão do #172).
+	var dry_trauma := _night()
+	S.hero(dry_trauma, "hero_gato_nick").trauma = true
+	dry_trauma.night.thirsty = true
+	S.resolve_night(dry_trauma, "sleepless")
+	t.equal(S.hero(dry_trauma, "hero_gato_nick").instinct, 60 + S.THIRST_INSTINCT_PENALTY, "sem sono e com sede, a sede ainda pesa")
 	# Os eventos que pedem algo só saem com ele.
 	var strays: Array = []
 	for i in 60:
@@ -180,6 +194,10 @@ func _scene() -> void:
 		start[0].pressed.emit()
 		await _frames(2)
 		t.check(hud.night_scene_open() and _label(hud._night_scene, "Noite 1"), "a cena da noite abre com o cartão")
+		# Um refresh no meio da cena (as Opções, o trem) não religa o amanhecer por baixo da sombra.
+		hud.refresh()
+		await _frames(2)
+		t.check(hud.night_scene_open() and not hud._panel.visible, "um refresh durante a cena não mostra o amanhecer por baixo")
 		t.equal(Campaign.state.night.phase, "dawn", "e a noite já foi resolvida (o save no meio abre no amanhecer)")
 		# Quem dormiu fica deitado no beliche, e o vigia de pé, até a manhã.
 		var lying: Array = station._walkers.filter(func(w): return w.has("hero_id") and w.get("sleeping", false)).map(func(w): return w.hero_id)

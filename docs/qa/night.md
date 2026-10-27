@@ -49,13 +49,15 @@ mesmo, e salvar e voltar não troca o evento. Os números são **propostas para 
 | Baratas na despensa (ruim) | 12 | 2 suprimentos a menos, depois da ceia. O Depósito no nível 2 protege. Com a despensa vazia, "não havia o que estragar". | O vigia espanta: nada. |
 | O vigia vê algo | 10 | Só com vigia: o próximo lugar liberado fica lido no Mapa da Rede (o guardião e os inimigos). | — |
 | Um morador conversa | 10 | Só com a Dora, o Otto ou a Cora na Estação: uma fala curta de quem estiver. | — |
-| Sem sono (ruim) | 8 | Só com alguém com trauma: ele não dorme, e o instinto dele não baixa. | Não evita. |
+| Sem sono (ruim) | 8 | Só com alguém com trauma que dormiu: ele não pega no sono e perde o desconto do sono no instinto (a sede pesa igual). | Não evita. |
 
-- **O vigia diminui as chances ruins:** com alguém de vigia, o peso de cada evento ruim cai pela metade (`WatchFactor`
-  50), e os ruídos, a goteira e as baratas viram o texto de "o vigia evitou". O preço é o de antes: o vigia não dorme.
-- **Sem vigia, sem morador e sem trauma,** esses três eventos não saem.
-- **Medido em 1000 noites** com a equipe dos fundadores: sem vigia, 47% das noites têm um evento ruim; com vigia, 24%,
-  e nenhum deles custa nada.
+- **O sorteio não olha o vigia:** os pesos são sempre os da tabela, então trocar quem vigia não escolhe a noite (a
+  revisão do #172). O vigia muda o que o evento sorteado faz: os ruídos, a goteira e as baratas viram o texto de "o
+  vigia evitou", sem perda. O preço é o de antes: o vigia não dorme.
+- **Sem quem o evento pede** (o vigia e um lugar por ver, um morador, alguém com trauma que dormiu), a noite sai
+  tranquila.
+- **Medido em 1000 noites** com a equipe dos fundadores: 33% das noites têm um evento ruim, com ou sem vigia; sem vigia,
+  todas essas custam algo; com vigia, nenhuma.
 - **O pedido dizia "um rato na despensa".** Na lore, os roedores são povos (os ratos, os esquilos), então a praga virou
   baratas. A fala dos moradores segue o que cada um faz na Estação (a Dora, cozinheira, que evita
   desperdício; o Otto, técnico, no gerador; a Cora, pesquisadora, nos fragmentos).
@@ -109,6 +111,18 @@ no daltonismo.
 **Ficam:**
 - Com a água ou a despensa já vazias, o texto do vigia ainda diz que ele evitou a perda.
 - Os ruídos dizem que "o sono acalmou menos o instinto" mesmo com o instinto de todos em 0.
+
+### Revisão do PR
+
+- **Média, corrigida:** o sorteio dependia do vigia (os pesos dos ruins caíam com ele, e o vigia vê algo só entrava com
+  ele), então trocar o vigia escolhia a noite. Agora o sorteio usa os pesos cheios, e o vigia só evita a perda.
+- **Baixas, corrigidas:**
+  - o sem sono apagava também a sede: agora perde só o desconto do sono;
+  - o rodapé do Dormitório prometia proteger "dos ruídos": agora diz que o vigia evita as perdas da noite;
+  - um refresh no meio da cena (as Opções, o trem) religava o amanhecer por baixo da sombra: o painel fica escondido
+    até a cena acabar.
+- `test_night_events` cobre os três casos (o vigia que não troca o evento em 300 noites, a sede do sem sono e o
+  refresh na cena).
 
 ## Para o Lucas
 
