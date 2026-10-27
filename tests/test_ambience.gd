@@ -129,6 +129,7 @@ func _street() -> void:
 		AHAdminActions.run("amb_leaves_up")
 	t.check(float(AHAmbience.profile("ShopfrontStreet").leaves) <= 1.0, "e as frações não passam de 1")
 	AHAdminActions.run("amb_reset")
+	t.check(AHAdminActions._ambience(street, "naoexiste_up").contains("naoexiste"), "um campo que não existe responde com erro, sem quebrar")
 	var amb_actions: Array = AHAdminActions.all().filter(func(a): return a.tab == "Ambiência")
 	t.check(amb_actions.size() >= 20 and amb_actions.all(func(a): return AHAdminActions.blocked(a) == ""), "a aba Ambiência vale na jornada")
 
