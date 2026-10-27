@@ -840,8 +840,11 @@ func _update_camera(delta: float) -> void:
 		pitch = deg_to_rad(SCENARIO_PITCH)
 		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(SCENARIO_HALF_FOV)) / get_viewport().get_visible_rect().size.aspect()))
 		var half_view: float = tan(deg_to_rad(SCENARIO_HALF_FOV)) * distance
-		var low: float = _zone.x0 + minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
-		var high: float = _zone.x1 - minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
+		# Numa zona coberta (#175) a borda do quadro para na parede do lado: os 4 m além da ponta mostravam o vazio por
+		# fora da sala.
+		var reach: float = half_view if sheltered else half_view - 4.0
+		var low: float = _zone.x0 + minf(reach, (_zone.x1 - _zone.x0) * 0.5)
+		var high: float = _zone.x1 - minf(reach, (_zone.x1 - _zone.x0) * 0.5)
 		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + float(view_spec.height), lane_z)
 	if _indoor:
 		# Dentro da loja, a câmera desce para ficar abaixo do forro e enquadra a sala.
@@ -1030,7 +1033,8 @@ func _update_sun(delta: float) -> void:
 	# parede do lado.
 	var covered := _indoor or sheltered
 	_sun.light_energy = w.sun_energy * direct_scale * COVERED_SUN if covered else w.sun_energy * direct_scale + flicker * 3.0
-	_sun.light_color = w.sun_color.lerp(Color(0.75, 0.82, 1.0), clampf(flicker, 0.0, 1.0))
+	# O clarão do relâmpago não atravessa o teto.
+	_sun.light_color = w.sun_color if covered else w.sun_color.lerp(Color(0.75, 0.82, 1.0), clampf(flicker, 0.0, 1.0))
 
 
 ## Chão molhado: escurece, fica liso e as poças do ruído brilham. wet vai de 0 a 1 devagar.
