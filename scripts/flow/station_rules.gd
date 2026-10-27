@@ -435,7 +435,7 @@ static func _room_benefit(room_id: String, level: int) -> String:
 			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.")
 		CHARACTERS:
 			# Cada nível comporta mais heróis (#119).
-			return TranslationServer.translate("Elenco, treino, trauma e relíquias. Comporta %d heróis.") % _job_level_value("limit_heroes", level - 1, MAX_ROSTER)
+			return TranslationServer.translate("Elenco, treino, trauma e relíquias. Comporta %d heróis.") % hero_limit_at(level)
 		INFIRMARY:
 			if level <= 0:
 				return TranslationServer.translate("Sala de primeiros socorros da estação, com as macas tombadas. Recuperada, os caídos se recuperam mais rápido num leito.")
@@ -1423,14 +1423,14 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 		return TranslationServer.translate("Sementes insuficientes para os suprimentos selecionados.")
 	if J.phase(phase_id).is_empty() or not phase_unlocked(campaign, phase_id):
 		return TranslationServer.translate("Essa fase ainda está bloqueada.")
-	# Quem esperava no trem e ninguém decidiu vai embora com ele (#122).
-	train_leaves(campaign)
-	# Quem parte deixa o posto na Estação (#119).
-	leave_posts(campaign, team)
 	adjust(campaign, "seeds", -extra_food * FOOD_COST)
 	campaign.preferred_formation = team.duplicate()
 	if not J.start_expedition(campaign, phase_id, seed_value):
 		return TranslationServer.translate("A expedição não pôde começar.")
+	# Só com a expedição começada: quem esperava no trem e ninguém decidiu vai embora com ele (#122), e quem parte deixa
+	# o posto na Estação (#119).
+	train_leaves(campaign)
+	leave_posts(campaign, team)
 	var expedition: Dictionary = campaign.session.expedition
 	expedition.food = J.FREE_FOOD + extra_food
 	expedition.focus = focus
@@ -1672,7 +1672,12 @@ static func _job_level_value(name: String, index: int, fallback: int) -> int:
 
 ## Quantos heróis a Estação comporta: o nível do Alojamento (data/hero-jobs.json). Quem está em recuperação conta.
 static func hero_limit(campaign: Dictionary) -> int:
-	return mini(MAX_ROSTER, _job_level_value("limit_heroes", room_level(campaign, CHARACTERS) - 1, MAX_ROSTER))
+	return hero_limit_at(room_level(campaign, CHARACTERS))
+
+
+## Quantos heróis o Alojamento comporta num nível (1 a 4).
+static func hero_limit_at(level: int) -> int:
+	return mini(MAX_ROSTER, _job_level_value("limit_heroes", level - 1, MAX_ROSTER))
 
 
 ## Quantos ajudantes (os civis) a Estação comporta: o nível do Dormitório.

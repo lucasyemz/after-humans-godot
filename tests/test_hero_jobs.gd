@@ -45,6 +45,11 @@ func _limits() -> void:
 	var c: Dictionary = Campaign.create_initial(1)
 	t.equal(S.hero_limit(c), 6, "o Alojamento no nível 1 comporta 6 heróis")
 	t.equal(S.helper_limit(c), 3, "sem o Dormitório, 3 ajudantes")
+	t.equal([1, 2, 3, 4].map(func(level): return S.hero_limit_at(level)), [6, 8, 10, 12], "os limites de cada nível do Alojamento")
+	var dorm := Campaign.create_initial(1)
+	dorm.station.rooms[S.DORMITORY] = S.room_def(S.DORMITORY).max_level
+	var helpers: Array = GameData.row("hero_jobs", "limit_helpers").Levels
+	t.equal(S.helper_limit(dorm), int(helpers.back()), "o último limite de ajudantes é o do Dormitório no nível máximo (nenhum inalcançável)")
 	t.equal(S.limits_text(c), "Heróis 4 de 6 · Ajudantes 0 de 3", "o texto da barra")
 	S.recruit(c, "cao", RandomNumberGenerator.new(), "A")
 	S.recruit(c, "gato", RandomNumberGenerator.new(), "B")
@@ -95,6 +100,10 @@ func _posts() -> void:
 	var e := _campaign()
 	S.set_post(e, "hero_cao_bento", S.FORGE)
 	S.set_post(e, _id(e, "Sereno"), S.RESEARCH)
+	# Uma partida recusada não tira ninguém do posto (os postos só saem com a expedição começada).
+	e.inventory.seeds = 0
+	t.check(S.confirm_departure(e, FOUNDERS.duplicate(), 2, 9, "fase_1") != "" and S.post_of(S.hero(e, "hero_cao_bento")) == S.FORGE, "a partida recusada deixa o Bento na Forja")
+	e.inventory.seeds = 12
 	t.equal(S.confirm_departure(e, FOUNDERS.duplicate(), 0, 9, "fase_1"), "", "a equipe parte")
 	t.check(S.post_of(S.hero(e, "hero_cao_bento")) == "" and S.post_of(S.hero(e, _id(e, "Sereno"))) == S.RESEARCH, "o Bento deixa a Forja; a coruja fica na Pesquisa")
 

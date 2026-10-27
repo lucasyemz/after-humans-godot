@@ -358,7 +358,7 @@ func _roster_line(c: Dictionary, column: VBoxContainer) -> void:
 		grow.name = "GrowRoom"
 		grow.custom_minimum_size = Vector2(0, 56)
 		grow.disabled = block != ""
-		grow.tooltip_text = block if block != "" else tr("Nível %d: %d heróis.") % [level + 1, S._job_level_value("limit_heroes", level, S.MAX_ROSTER)]
+		grow.tooltip_text = block if block != "" else tr("Nível %d: %d heróis.") % [level + 1, S.hero_limit_at(level + 1)]
 		grow.pressed.connect(func(): hud._act(S.upgrade_room(Campaign.state, S.CHARACTERS, level), tr("O Alojamento cresceu: %s.") % S.limits_text(Campaign.state)))
 		column.add_child(grow)
 		# O motivo à vista (o toque não mostra a dica).
