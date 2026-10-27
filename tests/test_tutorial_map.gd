@@ -78,8 +78,8 @@ func _journey() -> void:
 	t.equal(corridor.segments.map(func(s): return s.steps), [2, 3, 1, 1], "os trechos de cada zona")
 	t.equal(corridor.guards.keys(), [1, 4, 5], "as três patrulhas do tutorial")
 	t.equal(corridor.guards[1].specs.map(func(s): return s.enemy_id), ["broto"], "a primeira luta: o Bento contra o Broto")
-	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["rastejante_raiz", "broto"], "a segunda luta")
-	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["cao_eco", "broto"], "a terceira luta")
+	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["rastejante_raiz"], "a segunda luta")
+	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["ninho_errante"], "a terceira luta")
 	# A HUD da abertura: o objetivo é o trem, a plaqueta diz Abertura (sem clima: é um subsolo).
 	t.check(street.exploration_hud._goal_title.text.begins_with("Chegar ao trem"), "o objetivo da abertura é o trem")
 	t.equal(street.exploration_hud._place_sub.text, "Abertura", "a plaqueta: Abertura, sem clima")

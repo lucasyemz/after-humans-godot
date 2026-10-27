@@ -43,17 +43,15 @@
     "Step": 4,
     "Lesson": "O Nick chega: as posições (o Rastejante empurra), mover, defender, a ordem da rodada e o instinto.",
     "Enemies": [
-      "rastejante_raiz",
-      "broto"
+      "rastejante_raiz"
     ]
   },
   {
     "Name": "fight_3",
     "Step": 5,
-    "Lesson": "Os estados (o sangramento do Rastreador) e um item da Mochila na luta.",
+    "Lesson": "Os estados (a contaminação do Drone de Expurgo) e um item da Mochila na luta.",
     "Enemies": [
-      "cao_eco",
-      "broto"
+      "ninho_errante"
     ]
   }
 ]
