@@ -179,6 +179,13 @@ static func skip(campaign: Dictionary) -> void:
 	campaign.station.last_return.seen = true
 
 
+## As regras das lutas do tutorial: a vida dos heróis para em 1 (ninguém cai) e a contaminação e o sangramento sempre
+## pegam neles (sem os 20% de resistência), para a lição dos estados aparecer na terceira luta.
+static func prepare_fight(context: AHCombat.Context) -> void:
+	context.min_hero_hp = 1
+	context.sure_hero_dots = true
+
+
 ## O fim do tutorial (o embarque, ou o Pular): a equipe inteira e descansada, os heróis como saíram (as lutas do
 ## tutorial não contam na carreira), a recompensa no estoque e o relatório da chegada, que a Estação mostra com o
 ## debriefing do Bento e do Nick.

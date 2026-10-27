@@ -934,15 +934,15 @@ func _board_train() -> void:
 	if busy:
 		return
 	busy = true
-	if guide != null:
-		guide.event("board")
-	Sound.play("res://audio/station/train_bell.ogg")
 	var team: Array = Campaign.state.session.expedition.team.duplicate()
 	var prize := AHTutorial.complete(Campaign.state)
-	# complete() recusa fora da jornada do tutorial (devolve {}): nada a embarcar.
+	# complete() recusa fora da jornada do tutorial (devolve {}): nada a embarcar, e a dica do trem fica aberta.
 	if prize.is_empty():
 		busy = false
 		return
+	if guide != null:
+		guide.event("board")
+	Sound.play("res://audio/station/train_bell.ogg")
 	Tips.mark_seen(AHTutorial.COVERED_TIPS)
 	Campaign.save()
 	var gains: Array = []

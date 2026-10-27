@@ -3,15 +3,15 @@
 ## jogo no meio e voltar não repete). Só a primeira escolha de habilidade e de alvo trava a luta: as outras ações ficam
 ## desligadas até o jogador escolher uma habilidade.
 ## Os passos e quando cada um abre:
-##   walk      a partida                      fecha ao andar uns metros
-##   ability   a primeira vez do Bento na luta fecha ao mirar (a habilidade escolhida)
-##   target    a mira                         fecha com o comando
-##   patrol    a segunda patrulha à frente    fecha quando a luta começa
-##   search    o armário ao alcance           fecha ao vasculhar
-##   bag       logo depois da busca           fecha ao abrir a Mochila
-##   position  a primeira vez na segunda luta fecha com o comando
-##   item      a primeira vez na terceira     fecha ao usar um item (ou no fim da luta)
-##   train     o trem parado na plataforma    fecha ao embarcar
+##   walk      a partida                           fecha ao andar uns metros
+##   ability   a primeira vez de um herói na luta  fecha ao mirar (a habilidade escolhida)
+##   target    a mira                              fecha com o comando
+##   patrol    a patrulha da segunda luta à frente fecha quando a luta começa (depois do Nick)
+##   position  a primeira vez na segunda luta      fecha com o comando
+##   search    o armário ao alcance                fecha ao vasculhar
+##   bag       logo depois da busca                fecha ao abrir a Mochila
+##   item      a primeira vez na terceira          fecha ao usar um item (ou no fim da luta)
+##   train     o trem parado na plataforma         fecha ao embarcar
 class_name AHTutorialGuide
 extends Node
 

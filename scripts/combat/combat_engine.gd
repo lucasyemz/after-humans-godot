@@ -216,6 +216,8 @@ func status_name(effect: String, machine: bool) -> String:
 
 
 func _resisted_effect(unit: Unit, dot: bool) -> bool:
+	if dot and unit.is_player and context.sure_hero_dots:
+		return false
 	# Sangramento e contaminação usam dotResist (0,2 sem inimigo); só sorteia entre 0 e 1.
 	var enemy = find_enemy(unit.enemy_id)
 	var value: float = (enemy.DotResist if enemy != null else 0.2) if dot else 0.0
