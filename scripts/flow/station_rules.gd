@@ -994,9 +994,15 @@ static func attacks_from_rank(class_id: String, rank: int) -> Array:
 static func abandon_to_refuge(campaign: Dictionary) -> bool:
 	if in_refuge(campaign):
 		return false
+	# Quem caiu na expedição largada volta Caído (#118); quem já se recuperava continua com a vida e os dias que tinha.
+	var expedition = campaign.get("session", {}).get("expedition")
+	var fell: Array = expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive) if expedition != null else []
 	for entry in living(campaign):
+		if recovering(entry):
+			continue
 		entry.hp = entry.max_hp
 		entry.instinct = 0
+	admit_fallen(campaign, fell)
 	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
 	return true
 

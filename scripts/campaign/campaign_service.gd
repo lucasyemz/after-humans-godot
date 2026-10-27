@@ -290,7 +290,8 @@ func slot_summary(number: int) -> Dictionary:
 	summary.merge({"status": "ok", "recovered": path == slot_path(number, true),
 		"cycle": int(campaign.get("station", {}).get("cycle_number", 0)),
 		"phases": campaign.get("completed_phases", []).size(),
-		# Prontos para partir: fora do memorial dos saves antigos e da recuperação (#118).
+		# "alive" (o nome antigo da chave, lida pelo título): quantos estão prontos para partir, fora do memorial dos saves
+		# antigos e da recuperação (#118).
 		"alive": roster.filter(func(h): return h.get("alive", true) and int(h.get("recovery_days", 0)) <= 0).size(), "roster": roster.size(),
 		"played_seconds": int(campaign.get("played_seconds", 0)), "saved_at": _saved_at(path),
 		"in_expedition": campaign.get("session", {}).get("expedition") != null and campaign.get("session", {}).get("result", "") == ""}, true)

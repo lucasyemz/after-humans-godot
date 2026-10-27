@@ -105,6 +105,14 @@ func _cannot_deploy(t) -> void:
 	# O atalho que parte com a formação salva (a barra de Admin) também deixa quem se recupera na Estação.
 	t.check(J.start_expedition(c, "fase_1", 901), "a expedição pela formação parte")
 	t.check(not c.session.expedition.team.has(team[1]), "sem quem está em recuperação")
+	# Largar a expedição (a barra de Admin): quem caiu nela volta Caído; quem já se recuperava não sara de graça.
+	var runner: String = c.session.expedition.team[0]
+	S.hero(c, runner).alive = false
+	var days := S.recovery_days(S.hero(c, team[1]))
+	t.check(S.abandon_to_refuge(c), "largar a expedição")
+	t.check(S.recovering(S.hero(c, runner)) and S.hero(c, runner).alive, "quem caiu nela volta Caído")
+	t.equal(S.recovery_days(S.hero(c, team[1])), days, "quem já se recuperava continua com os mesmos dias")
+	t.equal(int(S.hero(c, team[1]).hp), int(S.recovery_rule("fallen").Hp), "e com a vida baixa")
 
 
 func _bandage(t) -> void:
