@@ -167,13 +167,13 @@ func _no_decision() -> void:
 func _full_house() -> void:
 	var c := _campaign()
 	var classes := ["cao", "gato", "sapo", "coruja"]
-	for i in S.MAX_ROSTER - S.living(c).size():
+	for i in S.hero_limit(c) - S.living(c).size():
 		S.recruit(c, classes[i % 4], RandomNumberGenerator.new(), "Morador %d" % i)
-	t.equal(S.living(c).size(), S.MAX_ROSTER, "a Estação cheia")
+	t.equal(S.living(c).size(), S.hero_limit(c), "o Alojamento cheio")
 	t.check(S.train_on_return(c, "full", "hero"), "o trem ainda traz alguém")
 	c.inventory.seeds = 50
-	t.check(S.recruit_block(c).contains("cheia"), "com o motivo")
-	t.check(S.decide_candidate(c, c.station.train.candidate_id, true) != "" and S.living(c).size() == S.MAX_ROSTER, "e não entra")
+	t.check(S.recruit_block(c).contains("cheio"), "com o motivo")
+	t.check(S.decide_candidate(c, c.station.train.candidate_id, true) != "" and S.living(c).size() == S.hero_limit(c), "e não entra")
 
 
 ## O save no meio, com alguém esperando, e o save antigo (sem o recruta nem a contagem).

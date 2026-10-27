@@ -349,7 +349,7 @@ static func _recruit() -> String:
 	var c: Dictionary = Campaign.state
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
-	if S.living(c).size() >= S.MAX_ROSTER:
+	if S.heroes_full(c):
 		return ""
 	for class_id in c.get("unlocked_classes", []):
 		var hero := S.recruit(c, class_id, rng, S.hero_name(c, class_id))

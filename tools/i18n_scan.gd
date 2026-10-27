@@ -28,7 +28,7 @@ const DATA_FIELDS := {
 	"enemies": ["DisplayName", "Role", "Description"], "enemy-actions": ["DisplayName", "Description"], "events": ["Title", "Description"],
 	"expedition-nodes": ["Title", "Description"], "perks": ["DisplayName", "Description"], "relics": ["DisplayName", "Description"],
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
-	"hero-upgrades": ["DisplayName", "Description"], "recruitment": ["Text"],
+	"hero-upgrades": ["DisplayName", "Description"], "recruitment": ["Text"], "hero-jobs": ["Text"],
 }
 
 

@@ -1429,3 +1429,22 @@ station_rules.gd: Chance
 station_rules.gd: hero_%s_0
 station_rules.gd: %s:train
 station_rules.gd: origin
+refuge_hud.gd: Workers
+refuge_hud.gd: Worker_%s
+refuge_hud.gd: %s · +%d
+station_report.gd: posts
+station_report.gd: Unit
+character_room.gd: Post
+character_room.gd: Post_%s
+station_rules.gd: characters_level_%d
+station_rules.gd: Levels
+station_rules.gd: job_%s
+station_rules.gd: post
+station_rules.gd: Base
+station_rules.gd: Room
+station_rules.gd: Add
+station_rules.gd: Perk
+station_rules.gd: Unit
+campaign_service.gd: post
+refuge_hud.gd: %s · %s
+character_room.gd: %s · +%d

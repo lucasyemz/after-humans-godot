@@ -1,0 +1,54 @@
+[
+  {
+    "Name": "limit_heroes",
+    "Levels": [6, 8, 10, 12],
+    "Description": "Proposta (#119): quantos heróis a Estação comporta em cada nível do Alojamento (1 a 4). Quem está em recuperação conta."
+  },
+  {
+    "Name": "limit_helpers",
+    "Levels": [3, 4, 6],
+    "Description": "Proposta (#119): quantos ajudantes (os civis) a Estação comporta, pelo nível do Dormitório (0, 1 e 2)."
+  },
+  {"Name": "characters_level_2", "Scrap": 4, "Fragments": 1, "Description": "Proposta (#119): ampliar o Alojamento para o nível 2."},
+  {"Name": "characters_level_3", "Scrap": 6, "Fragments": 2, "Description": "Proposta (#119): o nível 3."},
+  {"Name": "characters_level_4", "Scrap": 8, "Fragments": 3, "Description": "Proposta (#119): o nível 4."},
+  {
+    "Name": "job_research",
+    "Room": "research",
+    "Base": 1,
+    "Unit": "fragments",
+    "Text": "Organiza as anotações e ajuda a ler o que a equipe trouxe.",
+    "Description": "Proposta (#119): o posto da Pesquisa rende fragmentos a cada volta (até a #94 medir a pesquisa em expedições)."
+  },
+  {
+    "Name": "job_forge",
+    "Room": "forge",
+    "Base": 1,
+    "Unit": "scrap",
+    "Text": "Separa e endireita a sucata para a próxima obra.",
+    "Description": "Proposta (#119): o posto da Forja rende sucata a cada volta (a sucata a menos na próxima relíquia ou obra)."
+  },
+  {
+    "Name": "job_canteen",
+    "Room": "canteen",
+    "Base": 1,
+    "Unit": "supplies",
+    "Text": "Ajuda a preparar e a repartir a comida da Cantina.",
+    "Description": "Proposta (#119): o posto da Cantina rende suprimentos a cada volta, somados aos da Dora."
+  },
+  {
+    "Name": "job_infirmary",
+    "Room": "infirmary",
+    "Base": 1,
+    "Unit": "days",
+    "Text": "Troca curativos e vigia o sono dos caídos.",
+    "Description": "Proposta (#119): o posto da Enfermaria tira um dia da recuperação de tantos caídos a cada volta."
+  },
+  {"Name": "bonus_coruja_research", "ClassId": "coruja", "Room": "research", "Add": 1, "Description": "Proposta (#119): a coruja lê e observa; rende mais na Pesquisa."},
+  {"Name": "bonus_sapo_research", "ClassId": "sapo", "Room": "research", "Add": 1, "Description": "Proposta (#119): o sapo mede tudo; rende mais na Pesquisa."},
+  {"Name": "bonus_sapo_infirmary", "ClassId": "sapo", "Room": "infirmary", "Add": 1, "Description": "Proposta (#119): o sapo prepara ampolas; rende mais na Enfermaria."},
+  {"Name": "bonus_cao_forge", "ClassId": "cao", "Room": "forge", "Add": 1, "Description": "Proposta (#119): o cão aguenta o trabalho pesado; rende mais na Forja."},
+  {"Name": "bonus_rato_forge", "ClassId": "rato", "Room": "forge", "Add": 1, "Description": "Proposta (#119): o guaxinim desmonta e reaproveita; rende mais na Forja."},
+  {"Name": "perk_hopeful", "Perk": "hopeful", "Add": 1, "Description": "Proposta (#119): quem tem esperança rende um a mais em qualquer posto."},
+  {"Name": "perk_gloomy", "Perk": "gloomy", "Add": -1, "Description": "Proposta (#119): o pessimista rende um a menos em qualquer posto (nunca menos que zero)."}
+]

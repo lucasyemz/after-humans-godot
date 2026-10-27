@@ -35,7 +35,8 @@ const ROOMS := [
 	{"id": CANTEEN, "name": "Cantina", "basic": true, "max_level": 1, "costs": []},
 	{"id": DEPOT, "name": "Depósito", "basic": true, "max_level": 2, "costs": [{}, {"scrap": 5, "fragments": 1}]},
 	{"id": PREPARATION, "name": "Preparação", "basic": true, "max_level": 1, "costs": []},
-	{"id": CHARACTERS, "name": "Alojamento", "basic": true, "max_level": 1, "costs": []},
+	# O Alojamento cresce (#119): cada nível comporta mais heróis (data/hero-jobs.json, limit_heroes e o custo).
+	{"id": CHARACTERS, "name": "Alojamento", "basic": true, "max_level": 4, "costs": [], "data_costs": "characters_level_%d", "data_table": "hero_jobs"},
 	{"id": FORGE, "name": "Forja", "basic": false, "max_level": 2, "costs": [{"scrap": 4, "fragments": 0}, {"scrap": 6, "fragments": 2}]},
 	{"id": RESEARCH, "name": "Centro de Pesquisa", "basic": false, "max_level": 1, "costs": [{"scrap": 3, "fragments": 2}]},
 	{"id": DORMITORY, "name": "Dormitório", "basic": false, "max_level": 1, "costs": []},
@@ -178,6 +179,7 @@ static func migrate(campaign: Dictionary) -> void:
 			entry.art_variant = pick_art_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
 	# Ninguém morre (#118): o memorial dos saves antigos volta em recuperação.
 	_migrate_fallen(campaign)
+	_migrate_posts(campaign)
 	# O trem de antes do #122 não tem o recruta: quem espera é um civil.
 	if typeof(campaign.station.train.get("recruit")) != TYPE_DICTIONARY:
 		campaign.station.train.recruit = {}
@@ -292,13 +294,13 @@ static func next_level_cost(campaign: Dictionary, room_id: String) -> Dictionary
 	return cost
 
 
-## O custo de cada nível: o da tabela ROOMS ou, na Enfermaria, o de data/recovery.json (as linhas infirmary_level_N).
+## O custo de cada nível: o da tabela ROOMS ou o de data/ (a Enfermaria em recovery.json, o Alojamento em hero-jobs.json).
 static func room_costs(room: Dictionary) -> Array:
 	if not room.has("data_costs"):
 		return room.get("costs", [])
 	var out: Array = []
 	for level in range(1, int(room.max_level) + 1):
-		var row = GameData.row("recovery", String(room.data_costs) % level)
+		var row = GameData.row(String(room.get("data_table", "recovery")), String(room.data_costs) % level)
 		out.append({} if row == null else {"scrap": int(row.get("Scrap", 0)), "fragments": int(row.get("Fragments", 0))})
 	return out
 
@@ -432,7 +434,8 @@ static func _room_benefit(room_id: String, level: int) -> String:
 		PREPARATION:
 			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.")
 		CHARACTERS:
-			return TranslationServer.translate("Elenco, treino, trauma e relíquias.")
+			# Cada nível comporta mais heróis (#119).
+			return TranslationServer.translate("Elenco, treino, trauma e relíquias. Comporta %d heróis.") % _job_level_value("limit_heroes", level - 1, MAX_ROSTER)
 		INFIRMARY:
 			if level <= 0:
 				return TranslationServer.translate("Sala de primeiros socorros da estação, com as macas tombadas. Recuperada, os caídos se recuperam mais rápido num leito.")
@@ -616,8 +619,10 @@ static func train_on_return(campaign: Dictionary, expedition_id: String, force: 
 	station.train = _train_defaults()
 	station.train.expedition_id = expedition_id
 	var classes := train_classes(campaign)
+	# O civil só vem com lugar para ajudante (#119).
+	var civilians_open: bool = not station.candidate_queue.is_empty() and not helpers_full(campaign)
 	var arrives := rng.randi_range(1, 100) <= train_chance(campaign) or force != ""
-	if not arrives or (station.candidate_queue.is_empty() and classes.is_empty()):
+	if not arrives or (not civilians_open and classes.is_empty()):
 		station.train_dry = int(station.get("train_dry", 0)) + 1
 		return false
 	station.train_dry = 0
@@ -625,7 +630,7 @@ static func train_on_return(campaign: Dictionary, expedition_id: String, force: 
 	if force != "":
 		civilian_turn = force == "civilian"
 	station.train.phase = "waiting"
-	if not station.candidate_queue.is_empty() and (civilian_turn or classes.is_empty()):
+	if civilians_open and (civilian_turn or classes.is_empty()):
 		station.train.candidate_id = station.candidate_queue[0]
 		return true
 	var class_id: String = classes[rng.randi() % classes.size()]
@@ -663,8 +668,8 @@ static func recruit_block(campaign: Dictionary) -> String:
 	var recruit := train_recruit(campaign)
 	if recruit.is_empty():
 		return ""
-	if living(campaign).size() >= MAX_ROSTER:
-		return TranslationServer.translate("A Estação está cheia (%d de %d): não há lugar para %s agora.") % [living(campaign).size(), MAX_ROSTER, recruit.display_name]
+	if heroes_full(campaign):
+		return TranslationServer.translate("O Alojamento está cheio (%d de %d heróis): não há lugar para %s agora.") % [living(campaign).size(), hero_limit(campaign), recruit.display_name]
 	var price := recruit_price(campaign, recruit.class_id)
 	if quantity(campaign, "seeds") < price:
 		return TranslationServer.translate("Faltam sementes: %s pede %d.") % [recruit.display_name, price]
@@ -688,6 +693,8 @@ static func decide_candidate(campaign: Dictionary, candidate_id: String, accept:
 			var hero_id := candidate_id if hero(campaign, candidate_id) == null else _next_hero_id(campaign, recruit.class_id)
 			_add_hero(campaign, hero_id, recruit.class_id, recruit.display_name, recruit.perks, recruit.art_variant)
 	else:
+		if accept and helpers_full(campaign) and not station.residents.has(candidate_id):
+			return TranslationServer.translate("Não há lugar para mais ajudantes (%d de %d).") % [station.residents.size(), helper_limit(campaign)]
 		station.candidate_queue.erase(candidate_id)
 		if accept:
 			if not station.residents.has(candidate_id):
@@ -896,8 +903,8 @@ static func recruit(campaign: Dictionary, class_id: String, rng: RandomNumberGen
 	var hero_class = GameData.row("classes", class_id)
 	if hero_class == null or not campaign.unlocked_classes.has(class_id):
 		return {"error": TranslationServer.translate("Essa classe ainda não chegou à Estação.")}
-	if living(campaign).size() >= MAX_ROSTER:
-		return {"error": TranslationServer.translate("Limite de 12 animais vivos na Estação Raiz.")}
+	if heroes_full(campaign):
+		return {"error": TranslationServer.translate("O Alojamento está cheio (%d de %d heróis).") % [living(campaign).size(), hero_limit(campaign)]}
 	var free := given_name != "" or can_recruit_volunteer(campaign, class_id)
 	if not free and quantity(campaign, "seeds") < RECRUIT_COST:
 		return {"error": TranslationServer.translate("Sementes insuficientes (custa 10 sementes).")}
@@ -963,7 +970,7 @@ static func is_recruit(hero_id: String) -> bool:
 ## Os voluntários a caminho entram no elenco, enquanto houver vaga.
 static func receive_volunteers(campaign: Dictionary, rng: RandomNumberGenerator) -> int:
 	var arrived := 0
-	while not campaign.pending_offers.is_empty() and living(campaign).size() < MAX_ROSTER:
+	while not campaign.pending_offers.is_empty() and not heroes_full(campaign):
 		var offer: Dictionary = campaign.pending_offers.pop_front()
 		if not campaign.unlocked_classes.has(offer.class_id):
 			campaign.unlocked_classes.append(offer.class_id)
@@ -1249,6 +1256,8 @@ static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
 		entry.hp = clampi(int(rule.get("Hp", 1)), 1, int(entry.max_hp))
 		entry.recovery_days = maxi(1, int(rule.get("Days", 3)))
 		entry.recovery_bed = false
+		# Em recuperação, ninguém fica no posto (#119).
+		entry.post = ""
 		entry.recovery_treated = -1
 	_fill_beds(campaign)
 	var out: Array = []
@@ -1416,6 +1425,8 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 		return TranslationServer.translate("Essa fase ainda está bloqueada.")
 	# Quem esperava no trem e ninguém decidiu vai embora com ele (#122).
 	train_leaves(campaign)
+	# Quem parte deixa o posto na Estação (#119).
+	leave_posts(campaign, team)
 	adjust(campaign, "seeds", -extra_food * FOOD_COST)
 	campaign.preferred_formation = team.duplicate()
 	if not J.start_expedition(campaign, phase_id, seed_value):
@@ -1498,6 +1509,10 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	# Ninguém morre (#118): o dia passa para quem já estava em recuperação, e quem caiu nesta expedição chega Caído
 	# (fora da noite: dorme na Enfermaria ou no Dormitório, sem vigiar nem comer da noite).
 	delivered.recovered = tick_recovery(campaign)
+	# Os postos de quem ficou (#119): o que cada um rendeu; quem a Enfermaria pôs de pé volta no relatório.
+	delivered.posts = run_posts(campaign, expedition.team)
+	for post in delivered.posts:
+		delivered.recovered.append_array(post.recovered)
 	delivered.fallen = admit_fallen(campaign, expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive))
 	delivered.cycle = campaign.station.last_cycle.duplicate()
 	# O trem da volta (#122): quem chegou, ou ninguém; o relatório diz.
@@ -1639,3 +1654,181 @@ static func grant_objective(campaign: Dictionary) -> String:
 		var key: String = {FOCUS_WATER: "water", FOCUS_PARTS: "scrap", FOCUS_PROVISIONS: "supplies"}[entry.id]
 		loot[key] = int(loot.get(key, 0)) + entry.amount
 	return TranslationServer.translate(" Objetivo cumprido (%s): %s, entregue na volta.") % [focus_label(entry.id), focus_reward_text(entry.id)]
+
+
+# ================================================================ limites e postos (#119)
+
+## Os cômodos com um posto para quem fica na Estação (um herói por cômodo).
+const JOB_ROOMS := [RESEARCH, FORGE, CANTEEN, INFIRMARY]
+
+
+static func _job_level_value(name: String, index: int, fallback: int) -> int:
+	var row = GameData.row("hero_jobs", name)
+	var levels: Array = row.get("Levels", []) if row != null else []
+	if levels.is_empty():
+		return fallback
+	return int(levels[clampi(index, 0, levels.size() - 1)])
+
+
+## Quantos heróis a Estação comporta: o nível do Alojamento (data/hero-jobs.json). Quem está em recuperação conta.
+static func hero_limit(campaign: Dictionary) -> int:
+	return mini(MAX_ROSTER, _job_level_value("limit_heroes", room_level(campaign, CHARACTERS) - 1, MAX_ROSTER))
+
+
+## Quantos ajudantes (os civis) a Estação comporta: o nível do Dormitório.
+static func helper_limit(campaign: Dictionary) -> int:
+	return _job_level_value("limit_helpers", room_level(campaign, DORMITORY), CIVILIANS.size())
+
+
+static func heroes_full(campaign: Dictionary) -> bool:
+	return living(campaign).size() >= hero_limit(campaign)
+
+
+static func helpers_full(campaign: Dictionary) -> bool:
+	return campaign.station.residents.size() >= helper_limit(campaign)
+
+
+## "Heróis 5 de 6 · Ajudantes 1 de 3": a barra da Estação e a Sala.
+static func limits_text(campaign: Dictionary) -> String:
+	return TranslationServer.translate("Heróis %d de %d · Ajudantes %d de %d") % [living(campaign).size(), hero_limit(campaign),
+		campaign.station.residents.size(), helper_limit(campaign)]
+
+
+## Os postos abertos: os cômodos com posto já recuperados.
+static func job_rooms(campaign: Dictionary) -> Array:
+	return JOB_ROOMS.filter(func(id): return room_available(campaign, id))
+
+
+static func job_rule(room_id: String) -> Dictionary:
+	var row = GameData.row("hero_jobs", "job_%s" % room_id)
+	return row if row != null else {}
+
+
+## O posto do herói ("" sem posto).
+static func post_of(entry) -> String:
+	return String(entry.get("post", "")) if entry != null else ""
+
+
+## "na Forja", "no Centro de Pesquisa": o cômodo com a preposição certa (o artigo de ROOM_ARTICLE).
+static func room_in(room_id: String) -> String:
+	var name := TranslationServer.translate(room_def(room_id).name)
+	return (TranslationServer.translate("no %s") if ROOM_ARTICLE.get(room_id, "") == "o " else TranslationServer.translate("na %s")) % name
+
+
+## "da Forja", "do Centro de Pesquisa".
+static func room_from(room_id: String) -> String:
+	var name := TranslationServer.translate(room_def(room_id).name)
+	return (TranslationServer.translate("do %s") if ROOM_ARTICLE.get(room_id, "") == "o " else TranslationServer.translate("da %s")) % name
+
+
+## Quem trabalha no cômodo, ou null.
+static func worker(campaign: Dictionary, room_id: String):
+	for entry in living(campaign):
+		if post_of(entry) == room_id:
+			return entry
+	return null
+
+
+## O que o herói rende no posto a cada volta: a base, mais a espécie e os traços (data/hero-jobs.json), nunca menos que 0.
+static func post_yield(entry: Dictionary, room_id: String) -> int:
+	var amount := int(job_rule(room_id).get("Base", 0))
+	for row in GameData.table("hero_jobs").values():
+		if String(row.get("Room", "")) == room_id and String(row.get("ClassId", "")) == String(entry.class_id):
+			amount += int(row.get("Add", 0))
+		elif row.has("Perk") and entry.get("perks", []).has(String(row.Perk)):
+			amount += int(row.get("Add", 0))
+	return maxi(0, amount)
+
+
+## "+2 fragmentos por volta": o rendimento em texto.
+static func yield_text(room_id: String, amount: int) -> String:
+	match String(job_rule(room_id).get("Unit", "")):
+		"fragments":
+			return TranslationServer.translate("+%d fragmento por volta") % amount if amount == 1 else TranslationServer.translate("+%d fragmentos por volta") % amount
+		"scrap":
+			return TranslationServer.translate("+%d sucata por volta") % amount if amount == 1 else TranslationServer.translate("+%d sucatas por volta") % amount
+		"supplies":
+			return TranslationServer.translate("+%d suprimento por volta") % amount if amount == 1 else TranslationServer.translate("+%d suprimentos por volta") % amount
+		"days":
+			return TranslationServer.translate("−1 dia de recuperação para %d caído por volta") % amount if amount == 1 \
+				else TranslationServer.translate("−1 dia de recuperação para %d caídos por volta") % amount
+	return ""
+
+
+## Por que o herói não pode ficar no posto ("" quando pode). room_id "" tira do posto.
+static func post_block(campaign: Dictionary, hero_id: String, room_id: String) -> String:
+	var entry = hero(campaign, hero_id)
+	if entry == null or not entry.alive:
+		return TranslationServer.translate("Esse herói não está na Estação.")
+	if room_id == "":
+		return ""
+	if recovering(entry):
+		return TranslationServer.translate("%s está em recuperação e não trabalha agora.") % entry.display_name
+	if not job_rooms(campaign).has(room_id):
+		return TranslationServer.translate("Esse cômodo ainda não tem posto.")
+	return ""
+
+
+## Põe o herói no posto do cômodo (quem estava lá fica sem posto) ou o tira ("" ).
+static func set_post(campaign: Dictionary, hero_id: String, room_id: String) -> String:
+	var block := post_block(campaign, hero_id, room_id)
+	if block != "":
+		return block
+	var previous = worker(campaign, room_id) if room_id != "" else null
+	if previous != null and previous.id != hero_id:
+		previous.post = ""
+	hero(campaign, hero_id).post = room_id
+	return ""
+
+
+## Quem parte na equipe deixa o posto (a Preparação avisa antes).
+static func leave_posts(campaign: Dictionary, team: Array) -> void:
+	for hero_id in team:
+		var entry = hero(campaign, hero_id)
+		if entry != null:
+			entry.post = ""
+
+
+## Na volta: cada posto ocupado por quem ficou rende o seu. Devolve [{hero_id, room, amount}].
+static func run_posts(campaign: Dictionary, team: Array) -> Array:
+	var out: Array = []
+	for room_id in job_rooms(campaign):
+		var entry = worker(campaign, room_id)
+		if entry == null or team.has(entry.id) or recovering(entry):
+			continue
+		var amount := post_yield(entry, room_id)
+		match String(job_rule(room_id).get("Unit", "")):
+			"fragments":
+				adjust(campaign, "fragments", amount)
+			"scrap":
+				adjust(campaign, "scrap", amount)
+			"supplies":
+				# Até o que o Depósito guarda: o excesso estraga, como o da Cantina.
+				var room := maxi(0, supply_capacity(campaign) - quantity(campaign, SUPPLIES))
+				amount = mini(amount, room)
+				adjust(campaign, SUPPLIES, amount)
+		var back: Array = []
+		if String(job_rule(room_id).get("Unit", "")) == "days":
+			var helped := 0
+			for patient in fallen(campaign):
+				if helped >= amount:
+					break
+				patient.recovery_days = recovery_days(patient) - 1
+				if patient.recovery_days <= 0:
+					_recover(patient)
+					back.append(patient.id)
+				helped += 1
+			amount = helped
+			_fill_beds(campaign)
+		out.append({"hero_id": entry.id, "room": room_id, "amount": amount, "recovered": back})
+	return out
+
+
+## Saves de antes do #119: ninguém tem posto, e o Alojamento cresce até caber quem já mora lá.
+static func _migrate_posts(campaign: Dictionary) -> void:
+	for entry in campaign.get("roster", []):
+		if not entry.has("post"):
+			entry.post = ""
+	var rooms: Dictionary = campaign.station.rooms
+	while hero_limit(campaign) < living(campaign).size() and room_level(campaign, CHARACTERS) < int(room_def(CHARACTERS).max_level):
+		rooms[CHARACTERS] = room_level(campaign, CHARACTERS) + 1
