@@ -1,7 +1,7 @@
 ## A Sala dos Personagens no kit (#60, docs/design/hud-station.md): a tela inteira, com o cômodo ao fundo.
 ## - No alto: a plaqueta da Estação, Comida, Água e Energia, e a engrenagem (as Opções).
 ## - À esquerda: as abas dos heróis (e a de recrutar), as HABILIDADES e o detalhe da escolhida.
-## - No meio: o herói de corpo inteiro (a pose idle), sobre a sombra e um escurecido.
+## - No meio: o cômodo com o herói escolhido de pé nele (a placa da Estação, #181).
 ## - À direita: o painel PERSONAGEM (Fundador ou Recruta, o nível e o XP, o Treino, a vida, a velocidade e o instinto, a
 ##   relíquia, os contadores e os traços).
 ## - Embaixo: VOLTAR, as teclas, as abas da Estação e IR AO MAPA (G/X, a ação station_prepare).
@@ -104,84 +104,12 @@ func _top(c: Dictionary) -> void:
 
 # ---------------------------------------------------------------- o herói no meio
 
-## O herói de corpo inteiro: a pose idle, sobre a sombra no chão e um escurecido atrás (a câmera do cômodo não chega a
-## esse tamanho).
+## O herói escolhido fica no próprio cômodo, de pé no chão da sala e na escala da Estação (#181): a placa é da Estação
+## (AHStation.show_stage_hero), não uma figura da interface.
 func _stage(hero: Dictionary) -> void:
-	var shade := TextureRect.new()
-	var gradient := Gradient.new()
-	gradient.set_color(0, Color(AHKit.SHADE, 0.55))
-	gradient.set_color(1, Color(AHKit.SHADE, 0.0))
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.55)
-	texture.fill_to = Vector2(1.0, 0.55)
-	shade.texture = texture
-	shade.position = Vector2(628, 120)
-	shade.size = Vector2(668, 860)
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(shade)
-	var ground := TextureRect.new()
-	var ground_gradient := Gradient.new()
-	ground_gradient.set_color(0, Color(AHKit.SHADE, 0.6))
-	ground_gradient.set_color(1, Color(AHKit.SHADE, 0.0))
-	var ground_texture := GradientTexture2D.new()
-	ground_texture.gradient = ground_gradient
-	ground_texture.fill = GradientTexture2D.FILL_RADIAL
-	ground_texture.fill_from = Vector2(0.5, 0.5)
-	ground_texture.fill_to = Vector2(1.0, 0.5)
-	ground.texture = ground_texture
-	ground.position = Vector2(962 - 220, 858)
-	ground.size = Vector2(440, 64)
-	ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(ground)
-	var figure := Figure.new()
-	figure.name = "Hero"
-	figure.art = AHCombatArena.hero_art_of(hero.id, String(hero.get("art_variant", ""))).get("idle", {})
-	# Os pés no chão do meio (y 890), o corpo na altura do herói (o de referência, 1,64 m, com 620 px).
-	figure.body_px = 620.0 * AHCharacterHeights.find(hero.id) / AHCharacterHeights.REFERENCE
-	figure.feet = Vector2(962, 890)
-	add_child(figure)
-
-
-## O herói de corpo inteiro na interface: a arte idle do manifesto (com os quadros da respiração), o pé na âncora.
-class Figure extends Control:
-	var art := {}
-	var body_px := 620.0
-	var feet := Vector2.ZERO
-	var _texture: Texture2D
-	var _frame := 0
-	var _time := 0.0
-
-	func _ready() -> void:
-		set_anchors_preset(Control.PRESET_FULL_RECT)
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_texture = load(art.file) if art.has("file") else null
-
-	func _process(delta: float) -> void:
-		if not art.has("frames"):
-			return
-		_time += delta
-		var step := 1.0 / float(art.get("fps", 10))
-		if _time >= step:
-			_time -= step
-			_frame = (_frame + 1) % art.frames.size()
-			queue_redraw()
-
-	func _draw() -> void:
-		if _texture == null:
-			return
-		var canvas := Vector2(art.canvas[0], art.canvas[1])
-		var region := Rect2(Vector2.ZERO, canvas)
-		var texture_scale := float(_texture.get_width()) / canvas.x
-		if art.has("frames"):
-			var f: Array = art.frames[_frame]
-			region = Rect2(f[0], f[1], f[2], f[3])
-			texture_scale = 1.0
-		var scale := body_px / float(art.body_reference_pixels)
-		var anchor := Vector2(art.anchor[0], art.anchor[1])
-		draw_texture_rect_region(_texture, Rect2(feet - anchor * scale, region.size * scale),
-			Rect2(region.position * texture_scale, region.size * texture_scale))
+	var station = hud.get("station") if hud != null else null
+	if station != null:
+		station.show_stage_hero(String(hero.id))
 
 
 # ---------------------------------------------------------------- a coluna da esquerda

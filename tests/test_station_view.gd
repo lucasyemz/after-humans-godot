@@ -47,18 +47,17 @@ func _neighbors() -> void:
 	t.equal(AHRefugeHud.neighbor_room(S.DEPOT, 1), S.FORGE, "e do Depósito à Forja (o mesmo andar, mesmo com o piso mais fundo)")
 
 
-## Na Sala dos Personagens, PREPARAR EXPEDIÇÃO abre o mapa com a Sala fechada: o herói de corpo inteiro não fica por cima.
+## Na Sala dos Personagens, PREPARAR EXPEDIÇÃO abre o mapa com a Sala fechada: o herói escolhido sai do cômodo (#181).
 func _sala_to_map(station) -> void:
 	var hud: AHRefugeHud = station.hud
 	hud.open_room(S.CHARACTERS)
 	await _frames(5)
-	t.check(is_instance_valid(hud._room_screen) and hud._room_screen.find_child("Hero", true, false) != null, "a Sala abre com o herói")
+	t.check(is_instance_valid(hud._room_screen) and is_instance_valid(station.stage_card), "a Sala abre com o herói no cômodo")
 	hud.open_map()
 	await _frames(5)
 	t.check(hud._map.visible, "Preparar expedição abre o mapa")
 	t.check(not is_instance_valid(hud._room_screen), "com a Sala (e o herói) fechada")
-	var heroes: Array = hud.find_children("Hero", "", true, false).filter(func(n): return n is Control and n.is_visible_in_tree())
-	t.equal(heroes.size(), 0, "nenhum herói da Sala por cima do mapa")
+	t.check(not is_instance_valid(station.stage_card) and station.stage_hero == "", "o herói da Sala sai do cômodo")
 	hud._map.visible = false
 	hud.close_panel()
 	await _frames(5)

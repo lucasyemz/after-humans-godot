@@ -2642,6 +2642,8 @@ func open_from_room(service: String) -> void:
 func _close_room_screen() -> void:
 	if is_instance_valid(_room_screen):
 		_room_screen.queue_free()
+		# O escolhido sai do cômodo; os moradores reaparecem onde estavam (#181).
+		station.clear_stage_hero()
 		station.hide_residents(false)
 	_room_screen = null
 

@@ -153,6 +153,10 @@ var _env: Environment
 var _post: ShaderMaterial
 ## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt}.
 var _arrivals: Array = []
+## O herói escolhido na Sala dos Personagens (#181): de pé no cômodo, na escala da Estação, enquanto a tela está aberta.
+## A placa dele de morador só fica escondida (hide_residents), então, ao sair, cada um está onde estava.
+var stage_card: AHSpriteCard
+var stage_hero := ""
 ## O trem da volta fechando e indo embora depois de a equipe descer (não conta como cena do trem ocupada).
 var _team_train_leaving := false
 
@@ -290,6 +294,9 @@ func _process(delta: float) -> void:
 	if _reopen_pending:
 		_tick_reopen()
 	_walk(delta)
+	if is_instance_valid(stage_card):
+		# A respiração do parado, como a dos moradores esperando.
+		stage_card.scale = Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
 	_tick_leaving(delta)
 	if not _held_go.is_empty() and (not lineup_leaving() or Time.get_ticks_msec() >= _hold_until):
 		var held := _held_go
@@ -484,6 +491,35 @@ func focus_room_stage(room_id: String, left_px: float, right_px: float, instant:
 ## A câmera chegou aonde ia (sem caminho pela passagem e perto da chave).
 func camera_settled() -> bool:
 	return _path.is_empty() and not _goal.is_empty() and _key.pos.distance_to(_goal.pos) < 0.02
+
+
+## O herói escolhido na Sala dos Personagens (#181) entra no cômodo: a pose parada, os pés no chão, no meio da sala (o
+## meio entre os painéis, pelo focus_room_stage). Trocar de herói troca a placa; "" tira.
+func show_stage_hero(hero_id: String) -> void:
+	if hero_id == stage_hero and is_instance_valid(stage_card):
+		return
+	clear_stage_hero()
+	var art := _hero_art(S.hero(Campaign.state, hero_id)) if hero_id != "" else {}
+	if art.is_empty():
+		return
+	var room := room_def(S.CHARACTERS)
+	stage_card = AHSpriteCard.new()
+	stage_card.name = "StageHero"
+	stage_card.body_height = AHCharacterHeights.find(hero_id)
+	stage_card.show_art(art.idle)
+	add_child(stage_card)
+	stage_card.position = Vector3((room.x0 + room.x1) * 0.5, room.floor, LANE_Z)
+	stage_card.set_facing(1.0)
+	stage_hero = hero_id
+
+
+func clear_stage_hero() -> void:
+	if is_instance_valid(stage_card):
+		# Fora da árvore já: a placa nova, no mesmo quadro, fica com o nome StageHero.
+		remove_child(stage_card)
+		stage_card.queue_free()
+	stage_card = null
+	stage_hero = ""
 
 
 ## Todos os moradores (heróis e civis) somem enquanto uma tela do kit cobre a Estação: nenhum aparece no vão entre os
