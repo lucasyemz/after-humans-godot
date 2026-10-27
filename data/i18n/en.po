@@ -4431,6 +4431,10 @@ msgstr " Under the workbench, a crowbar. (Tool: Crowbar)"
 msgid "Suprimentos recolhidos · +1 alimento e +1 semente"
 msgstr "Supplies gathered · +1 food and +1 seed"
 
+#: scripts/flow/journey_rules.gd:964
+msgid ". A equipe recupera o fôlego."
+msgstr ". The team catches its breath."
+
 #: scripts/flow/exploration_care.gd:68
 msgid "Disponível fora de combate e eventos, durante a exploração."
 msgstr "Available outside combat and events, while exploring."

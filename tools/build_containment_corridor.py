@@ -8,6 +8,7 @@ scenario_world.gd lê, sem mexer na planta ("Para integrar", docs/design/tutoria
     caem junto, cada lâmpada na sua fase (blink);
   - o armário de manutenção é o único prop (a busca); o painel das portas e a porta de segurança da rota do Nick viram
     door_panel e security_doors (a porta baixa atrás da equipe; o painel fica acionado da sala das celas em diante);
+  - o entulho no chão à frente da faixa vira primeiro plano (foreground): some quando tapa alguém, na luta também;
   - o vagão e as luzes frias dele ficam num nó "Metro" (node), que o corredor esconde até o trem chegar e faz entrar no
     fosso (arrive_train); o embarque é na porta aberta da direita, no fim da plataforma (train.x).
 
@@ -91,6 +92,13 @@ def build():
         if light.get('type') == 'point' and light['color'] == COLD and abs(light['origin'][0] - train_x) <= TRAIN_LIGHT_X \
                 and light['origin'][2] < TRAIN_LIGHT_Z:
             light['node'] = 'Metro'
+    # O entulho do pé da faixa (os cards no chão entre a borda da zona e a câmera, como o T_TU05): primeiro plano, que
+    # some quando tapa alguém, na luta também; o scenario_world só pega sozinho o que fica além de FOREGROUND_GAP.
+    for part in data['parts']:
+        x, z = part['origin'][0], part['origin'][2]
+        zone = next((z_ for z_ in zones if z_['x0'] <= x <= z_['x1']), None)
+        if zone is not None and z > zone['z1'] and material_of(data, part)['kind'] == 'art':
+            part['foreground'] = True
     platform = len(zones) - 1
     data['train'] = {'x': round(zones[platform]['x1'] - BOARD_MARGIN, 3), 'zone': platform}
     data['models'] = []
