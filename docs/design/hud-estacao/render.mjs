@@ -26,8 +26,9 @@ const pending = (rows) => nine("panel_large", { repeat: "round", cls: "col", ext
 
 // ------------------------------------------------------------------ 1. Visão geral
 // next: o miolo do Próximo passo no lugar de "Recuperar a Forja" (o lote 6, hud-laco: a Pesquisa concluída); extra: o
-// que vai por cima da tela.
-export function overview({ next: nextBody = null, extra = "", subtitle = "Ciclo 0 · 4 no elenco" } = {}) {
+// que vai por cima da tela. Do tutorial (docs/design/tutorial): bare tira o cômodo escolhido, o cartão dele, o Próximo
+// passo e o Plano (a visita guiada mostra a Estação sem nada escolhido).
+export function overview({ next: nextBody = null, extra = "", subtitle = "Ciclo 0 · 4 no elenco", bare = false } = {}) {
   const next = nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:10px" },
     `<div class="row" style="gap:10px">${glyph("next_step", 28, "var(--amber)")}<span class="tx f22 semi amber kicker">Próximo passo</span></div>` +
     (nextBody || `<span class="tx f36 semi">Recuperar a Forja</span><span class="wrap f22">Fabrica relíquias por 3 sucatas. Gasta 1 de energia.</span>` +
@@ -41,9 +42,9 @@ export function overview({ next: nextBody = null, extra = "", subtitle = "Ciclo 
   const card = nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:8px" },
     `<div class="row" style="gap:12px">${glyph("room_quarters", 36, "var(--amber)")}<span class="tx f32 semi up">Alojamento</span>${roomTag("Aberto", "var(--good)")}</div>` +
     `<span class="wrap f22">Conhecer e acompanhar os moradores do abrigo.</span>` + secondary("Gerenciar", { hit: "manage", height: 60, extra: "width:100%" }));
-  return BG("station") + topBar({ subtitle }) + room +
+  return BG("station") + topBar({ subtitle }) + (bare ? "" : room +
     `<div class="abs col" style="left:28px;top:132px;gap:12px">${next}${plan}</div>` +
-    `<div class="abs" style="left:28px;bottom:calc(14px + 72px*var(--k) + 14px)">${card}</div>` +
+    `<div class="abs" style="left:28px;bottom:calc(14px + 72px*var(--k) + 14px)">${card}</div>`) +
     bottom({ active: 0, back: false, keysAt: 840, keys: [["Setas", "Cômodos"], ["E", "Abrir"], ["Esc", "Menu"], ["F2", "Ocultar"]] }) + extra;
 }
 
