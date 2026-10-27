@@ -5,7 +5,7 @@ nuvem. O Claude local (esta conversa, ou uma nova) revisa e integra os PRs.
 
 ## Quem faz o quê
 
-### As quatro frentes (desde 26/10/2026)
+### As frentes (desde 26/10/2026; a Awesomic 2 saiu em 27/10)
 
 Cada frente tem a sua etiqueta nas issues. Ninguém pega issue de outra frente, para dois agentes nunca mexerem no mesmo
 arquivo ao mesmo tempo.
@@ -14,8 +14,7 @@ arquivo ao mesmo tempo.
 |---|---|---|---|
 | **Claude 1** (nuvem) | `claude-1` | `claude-cloud-<issue>` | **Estação e regras:** ninguém morre e Enfermaria (#118, #121), a Estação (#131), a preparação (#123), o trem dos recrutas (#122), limites e postos (#119), a noite (#132), o som do trem (#133), as skins (#138) |
 | **Claude 2** (nuvem) | `claude-2` | `claude2-<issue>` | **Exploração, mapas, tutorial e ambiência:** o tutorial (#144, #145, #147), a exploração (#129, #143, #142), a água e o Cais (#140, #141), a ambiência (#153, #154) |
-| **Awesomic 1** | `awesomic-1` | `design-<assunto>` | **Design da Estação, da HUD e das skins:** a Enfermaria e a Estação nova (#120, #124, PR #139), os ajustes depois de jogar (#134, PR #148), as skins do Bento (#137) |
-| **Awesomic 2** | `awesomic-2` | `design2-<assunto>` | **Design de cenários, tutorial e ambiência:** o mapa do tutorial e as telas (#146, #147, PR #152), a arte da luz prática (#154), as camadas dos mapas (fase 3 de `docs/design/ambience.md`), as camadas do Armazém e do Navio (#141), se o Claude 2 pedir |
+| **Awesomic 1** | `awesomic-1` | `design-<assunto>` | **Todo o design:** a Estação, a HUD e as skins (#120, #124, PR #139; #134, PR #148; #137) e, desde 27/10, os cenários, o tutorial e a ambiência que eram da Awesomic 2 (#146, a arte da #147, da #154 e as camadas da #141, se o Claude 2 pedir) |
 | Claude local | — | `main` | Revisa e junta os PRs, roda os testes no Windows, faz o build e escreve as issues e as mensagens |
 
 **Regras entre as frentes:**
@@ -24,7 +23,9 @@ arquivo ao mesmo tempo.
   "Automatically delete head branches" ligado; quem juntar confere) e ninguém volta a usá-la;
 - os arquivos de todos (`data/i18n/en.po`, `tools/i18n_ignore.txt`, `data/presentation/*.json`, o kit) dão conflito: o
   Claude local resolve na junção;
-- uma issue nova entra na frente da área dela. Na dúvida, o Lucas decide.
+- uma issue nova entra na frente da área dela. Na dúvida, o Lucas decide;
+- a arte de cenário e de luz se prova na captura do jogo em Forward+, que só o Orquestrador PC (com placa de vídeo) tira:
+  a nuvem e a Awesomic não têm placa de vídeo, e montagem 2D não vale como prova.
 
 ### Os dois orquestradores (desde 26/10/2026)
 
@@ -41,7 +42,7 @@ Desde 27/10/2026 o da nuvem junta sozinho, na ronda automática (abaixo):
 **Para os dois não juntarem ao mesmo tempo:** antes de juntar, comentar no PR "Integrando (Orquestrador Nuvem)" ou "Integrando (Orquestrador PC)". Se o outro já comentou, não mexer.
 
 **O que os dois fazem igual:**
-- as issues no formato `[Agente] Área: descrição`, com a frente certa (`claude-1`, `claude-2`, `awesomic-1`, `awesomic-2`);
+- as issues no formato `[Agente] Área: descrição`, com a frente certa (`claude-1`, `claude-2`, `awesomic-1`);
 - os textos em português;
 - as decisões do Lucas registradas na issue ou no PR;
 - nunca escrever `@codex` ou `@claude` em comentários.
