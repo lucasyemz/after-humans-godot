@@ -37,6 +37,9 @@ func run(t) -> void:
 			poses_ok = poses_ok and ResourceLoader.exists(reaction.get("file", "")) and reaction.body_reference_pixels == entry.idle.body_reference_pixels
 		t.check(poses_ok, "%s: o golpe de cada habilidade e as reações, com o pé e a altura do parado" % class_id)
 		t.check(AHCharacterHeights.HEIGHTS.has(class_id), "%s: altura própria" % class_id)
+		# A escala (o Lucas, no #196): o Guaxinim e o Tatu menores que a Íris e o Nick, e a largura medida para a fila.
+		t.check(AHCharacterHeights.HEIGHTS[class_id] < AHCharacterHeights.HEIGHTS.sapo, "%s: menor que a Íris" % class_id)
+		t.check(float(entry.idle.get("body_width_pixels", 0)) > 0, "%s: largura do corpo medida" % class_id)
 		t.check(S.train_classes({"unlocked_classes": ["cao", class_id]}).has(class_id), "%s: o trem pode trazê-lo" % class_id)
 
 	var real_dir: String = Campaign.save_dir

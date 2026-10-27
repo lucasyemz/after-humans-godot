@@ -11,6 +11,7 @@
 					1429
 				],
 				"body_reference_pixels": 1419,
+				"body_width_pixels": 822,
 				"canvas": [
 					1086,
 					1448
@@ -251,6 +252,7 @@
 					1286
 				],
 				"body_reference_pixels": 1255,
+				"body_width_pixels": 825,
 				"canvas": [
 					1178,
 					1335
@@ -492,6 +494,7 @@
 					1264
 				],
 				"body_reference_pixels": 1208,
+				"body_width_pixels": 777,
 				"canvas": [
 					1178,
 					1335
@@ -732,6 +735,7 @@
 					1297
 				],
 				"body_reference_pixels": 1271,
+				"body_width_pixels": 834,
 				"canvas": [
 					1178,
 					1335
@@ -978,6 +982,7 @@
 					1425
 				],
 				"body_reference_pixels": 1385,
+				"body_width_pixels": 820,
 				"canvas": [
 					1086,
 					1448
@@ -994,6 +999,7 @@
 					1312
 				],
 				"body_reference_pixels": 1260,
+				"body_width_pixels": 735,
 				"canvas": [
 					1178,
 					1336
@@ -1010,6 +1016,7 @@
 					1311
 				],
 				"body_reference_pixels": 1219,
+				"body_width_pixels": 761,
 				"canvas": [
 					1178,
 					1336
@@ -1026,6 +1033,7 @@
 					1312
 				],
 				"body_reference_pixels": 1272,
+				"body_width_pixels": 747,
 				"canvas": [
 					1178,
 					1336
@@ -1042,6 +1050,7 @@
 					1184
 				],
 				"body_reference_pixels": 999,
+				"body_width_pixels": 821,
 				"canvas": [
 					1178,
 					1335
@@ -1056,6 +1065,7 @@
 							1184
 						],
 						"body_reference_pixels": 999,
+						"body_width_pixels": 821,
 						"canvas": [
 							1178,
 							1335
@@ -1070,6 +1080,7 @@
 							1184
 						],
 						"body_reference_pixels": 999,
+						"body_width_pixels": 821,
 						"canvas": [
 							1178,
 							1335
@@ -1084,6 +1095,7 @@
 							1184
 						],
 						"body_reference_pixels": 999,
+						"body_width_pixels": 821,
 						"canvas": [
 							1178,
 							1335
@@ -1098,6 +1110,7 @@
 							1184
 						],
 						"body_reference_pixels": 999,
+						"body_width_pixels": 821,
 						"canvas": [
 							1178,
 							1335
@@ -1113,6 +1126,7 @@
 						1184
 					],
 					"body_reference_pixels": 999,
+					"body_width_pixels": 821,
 					"canvas": [
 						1178,
 						1335
@@ -1125,6 +1139,7 @@
 						1184
 					],
 					"body_reference_pixels": 999,
+					"body_width_pixels": 821,
 					"canvas": [
 						1178,
 						1335
@@ -1137,6 +1152,7 @@
 						1184
 					],
 					"body_reference_pixels": 999,
+					"body_width_pixels": 821,
 					"canvas": [
 						1178,
 						1335
@@ -1149,6 +1165,7 @@
 						1184
 					],
 					"body_reference_pixels": 999,
+					"body_width_pixels": 821,
 					"canvas": [
 						1178,
 						1335
@@ -1165,6 +1182,7 @@
 					1087
 				],
 				"body_reference_pixels": 807,
+				"body_width_pixels": 882,
 				"canvas": [
 					1178,
 					1335
@@ -1179,6 +1197,7 @@
 							1087
 						],
 						"body_reference_pixels": 807,
+						"body_width_pixels": 882,
 						"canvas": [
 							1178,
 							1335
@@ -1193,6 +1212,7 @@
 							1087
 						],
 						"body_reference_pixels": 807,
+						"body_width_pixels": 882,
 						"canvas": [
 							1178,
 							1335
@@ -1207,6 +1227,7 @@
 							1087
 						],
 						"body_reference_pixels": 807,
+						"body_width_pixels": 882,
 						"canvas": [
 							1178,
 							1335
@@ -1221,6 +1242,7 @@
 							1087
 						],
 						"body_reference_pixels": 807,
+						"body_width_pixels": 882,
 						"canvas": [
 							1178,
 							1335
@@ -1236,6 +1258,7 @@
 						1087
 					],
 					"body_reference_pixels": 807,
+					"body_width_pixels": 882,
 					"canvas": [
 						1178,
 						1335
@@ -1248,6 +1271,7 @@
 						1087
 					],
 					"body_reference_pixels": 807,
+					"body_width_pixels": 882,
 					"canvas": [
 						1178,
 						1335
@@ -1260,6 +1284,7 @@
 						1087
 					],
 					"body_reference_pixels": 807,
+					"body_width_pixels": 882,
 					"canvas": [
 						1178,
 						1335
@@ -1272,6 +1297,7 @@
 						1087
 					],
 					"body_reference_pixels": 807,
+					"body_width_pixels": 882,
 					"canvas": [
 						1178,
 						1335
@@ -1290,6 +1316,7 @@
 						1277
 					],
 					"body_reference_pixels": 1275,
+					"body_width_pixels": 968,
 					"canvas": [
 						1178,
 						1335
@@ -1302,6 +1329,7 @@
 						1298
 					],
 					"body_reference_pixels": 1275,
+					"body_width_pixels": 1096,
 					"canvas": [
 						1178,
 						1335
@@ -1314,6 +1342,7 @@
 						1301
 					],
 					"body_reference_pixels": 1285,
+					"body_width_pixels": 840,
 					"canvas": [
 						1179,
 						1334
@@ -1326,6 +1355,7 @@
 						1287
 					],
 					"body_reference_pixels": 1275,
+					"body_width_pixels": 987,
 					"canvas": [
 						1178,
 						1335
@@ -1338,6 +1368,7 @@
 						1245
 					],
 					"body_reference_pixels": 1275,
+					"body_width_pixels": 1122,
 					"canvas": [
 						1178,
 						1335
@@ -1350,6 +1381,7 @@
 						1268
 					],
 					"body_reference_pixels": 1275,
+					"body_width_pixels": 1141,
 					"canvas": [
 						1178,
 						1335
@@ -1362,6 +1394,7 @@
 						1265
 					],
 					"body_reference_pixels": 1275,
+					"body_width_pixels": 1144,
 					"canvas": [
 						1178,
 						1335
@@ -1531,6 +1564,7 @@
 						1137
 					],
 					"body_reference_pixels": 928,
+					"body_width_pixels": 860,
 					"canvas": [
 						1178,
 						1335
@@ -1543,6 +1577,7 @@
 						1137
 					],
 					"body_reference_pixels": 928,
+					"body_width_pixels": 816,
 					"canvas": [
 						1178,
 						1335
@@ -1555,6 +1590,7 @@
 						1137
 					],
 					"body_reference_pixels": 928,
+					"body_width_pixels": 669,
 					"canvas": [
 						1178,
 						1335
@@ -1567,6 +1603,7 @@
 						1137
 					],
 					"body_reference_pixels": 928,
+					"body_width_pixels": 746,
 					"canvas": [
 						1178,
 						1335
@@ -1579,6 +1616,7 @@
 						1138
 					],
 					"body_reference_pixels": 928,
+					"body_width_pixels": 709,
 					"canvas": [
 						1178,
 						1335
@@ -1591,6 +1629,7 @@
 						1137
 					],
 					"body_reference_pixels": 928,
+					"body_width_pixels": 512,
 					"canvas": [
 						1178,
 						1335
@@ -1603,6 +1642,7 @@
 						1137
 					],
 					"body_reference_pixels": 928,
+					"body_width_pixels": 964,
 					"canvas": [
 						1178,
 						1335
@@ -1784,6 +1824,7 @@
 						1136
 					],
 					"body_reference_pixels": 1004,
+					"body_width_pixels": 901,
 					"canvas": [
 						1178,
 						1335
@@ -1796,6 +1837,7 @@
 						1136
 					],
 					"body_reference_pixels": 1004,
+					"body_width_pixels": 815,
 					"canvas": [
 						1178,
 						1335
@@ -1808,6 +1850,7 @@
 						1136
 					],
 					"body_reference_pixels": 1004,
+					"body_width_pixels": 824,
 					"canvas": [
 						1178,
 						1335
@@ -1820,6 +1863,7 @@
 						1136
 					],
 					"body_reference_pixels": 1004,
+					"body_width_pixels": 990,
 					"canvas": [
 						1178,
 						1335
@@ -1832,6 +1876,7 @@
 						1137
 					],
 					"body_reference_pixels": 1004,
+					"body_width_pixels": 905,
 					"canvas": [
 						1178,
 						1335
@@ -1844,6 +1889,7 @@
 						1136
 					],
 					"body_reference_pixels": 1004,
+					"body_width_pixels": 768,
 					"canvas": [
 						1178,
 						1335
@@ -1856,6 +1902,7 @@
 						1136
 					],
 					"body_reference_pixels": 1004,
+					"body_width_pixels": 1068,
 					"canvas": [
 						1178,
 						1335
@@ -1869,6 +1916,7 @@
 					1137
 				],
 				"body_reference_pixels": 924,
+				"body_width_pixels": 842,
 				"canvas": [
 					1178,
 					1335
@@ -1884,6 +1932,7 @@
 						1058
 					],
 					"body_reference_pixels": 609,
+					"body_width_pixels": 942,
 					"canvas": [
 						1178,
 						1335
@@ -1896,6 +1945,7 @@
 						1059
 					],
 					"body_reference_pixels": 609,
+					"body_width_pixels": 939,
 					"canvas": [
 						1178,
 						1335
@@ -1908,6 +1958,7 @@
 						1058
 					],
 					"body_reference_pixels": 609,
+					"body_width_pixels": 937,
 					"canvas": [
 						1178,
 						1335
@@ -1920,6 +1971,7 @@
 						1059
 					],
 					"body_reference_pixels": 609,
+					"body_width_pixels": 930,
 					"canvas": [
 						1178,
 						1335
@@ -1932,6 +1984,7 @@
 						1058
 					],
 					"body_reference_pixels": 609,
+					"body_width_pixels": 946,
 					"canvas": [
 						1178,
 						1335
@@ -1944,6 +1997,7 @@
 						1058
 					],
 					"body_reference_pixels": 609,
+					"body_width_pixels": 904,
 					"canvas": [
 						1178,
 						1335
@@ -1956,6 +2010,7 @@
 						1058
 					],
 					"body_reference_pixels": 609,
+					"body_width_pixels": 945,
 					"canvas": [
 						1178,
 						1335
@@ -1969,6 +2024,7 @@
 					1058
 				],
 				"body_reference_pixels": 686,
+				"body_width_pixels": 864,
 				"canvas": [
 					1178,
 					1335
@@ -1984,6 +2040,7 @@
 						1094
 					],
 					"body_reference_pixels": 711,
+					"body_width_pixels": 937,
 					"canvas": [
 						1178,
 						1335
@@ -1996,6 +2053,7 @@
 						1093
 					],
 					"body_reference_pixels": 711,
+					"body_width_pixels": 960,
 					"canvas": [
 						1178,
 						1335
@@ -2008,6 +2066,7 @@
 						1093
 					],
 					"body_reference_pixels": 711,
+					"body_width_pixels": 840,
 					"canvas": [
 						1178,
 						1335
@@ -2020,6 +2079,7 @@
 						1093
 					],
 					"body_reference_pixels": 711,
+					"body_width_pixels": 821,
 					"canvas": [
 						1178,
 						1335
@@ -2032,6 +2092,7 @@
 						1093
 					],
 					"body_reference_pixels": 711,
+					"body_width_pixels": 774,
 					"canvas": [
 						1178,
 						1335
@@ -2044,6 +2105,7 @@
 						1093
 					],
 					"body_reference_pixels": 711,
+					"body_width_pixels": 1084,
 					"canvas": [
 						1178,
 						1335
@@ -2057,6 +2119,7 @@
 					1094
 				],
 				"body_reference_pixels": 869,
+				"body_width_pixels": 750,
 				"canvas": [
 					1178,
 					1335
@@ -2072,6 +2135,7 @@
 						1172
 					],
 					"body_reference_pixels": 892,
+					"body_width_pixels": 510,
 					"canvas": [
 						1178,
 						1335
@@ -2084,6 +2148,7 @@
 						1172
 					],
 					"body_reference_pixels": 892,
+					"body_width_pixels": 617,
 					"canvas": [
 						1178,
 						1335
@@ -2096,6 +2161,7 @@
 						1172
 					],
 					"body_reference_pixels": 892,
+					"body_width_pixels": 624,
 					"canvas": [
 						1178,
 						1335
@@ -2108,6 +2174,7 @@
 						1172
 					],
 					"body_reference_pixels": 892,
+					"body_width_pixels": 574,
 					"canvas": [
 						1178,
 						1335
@@ -2120,6 +2187,7 @@
 						1172
 					],
 					"body_reference_pixels": 892,
+					"body_width_pixels": 563,
 					"canvas": [
 						1178,
 						1335
@@ -2132,6 +2200,7 @@
 						1172
 					],
 					"body_reference_pixels": 892,
+					"body_width_pixels": 454,
 					"canvas": [
 						1178,
 						1335
@@ -2144,6 +2213,7 @@
 						1172
 					],
 					"body_reference_pixels": 892,
+					"body_width_pixels": 955,
 					"canvas": [
 						1178,
 						1335
@@ -2157,6 +2227,7 @@
 					1173
 				],
 				"body_reference_pixels": 981,
+				"body_width_pixels": 450,
 				"canvas": [
 					1178,
 					1335
@@ -2172,6 +2243,7 @@
 						979
 					],
 					"body_reference_pixels": 538,
+					"body_width_pixels": 959,
 					"canvas": [
 						1178,
 						1335
@@ -2184,6 +2256,7 @@
 						979
 					],
 					"body_reference_pixels": 538,
+					"body_width_pixels": 968,
 					"canvas": [
 						1178,
 						1335
@@ -2196,6 +2269,7 @@
 						980
 					],
 					"body_reference_pixels": 538,
+					"body_width_pixels": 847,
 					"canvas": [
 						1178,
 						1335
@@ -2208,6 +2282,7 @@
 						979
 					],
 					"body_reference_pixels": 538,
+					"body_width_pixels": 904,
 					"canvas": [
 						1178,
 						1335
@@ -2220,6 +2295,7 @@
 						979
 					],
 					"body_reference_pixels": 538,
+					"body_width_pixels": 854,
 					"canvas": [
 						1178,
 						1335
@@ -2232,6 +2308,7 @@
 						979
 					],
 					"body_reference_pixels": 538,
+					"body_width_pixels": 858,
 					"canvas": [
 						1178,
 						1335
@@ -2244,6 +2321,7 @@
 						979
 					],
 					"body_reference_pixels": 538,
+					"body_width_pixels": 913,
 					"canvas": [
 						1178,
 						1335
@@ -2257,6 +2335,7 @@
 					980
 				],
 				"body_reference_pixels": 637,
+				"body_width_pixels": 849,
 				"canvas": [
 					1178,
 					1335
@@ -2272,6 +2351,7 @@
 						1086
 					],
 					"body_reference_pixels": 701,
+					"body_width_pixels": 955,
 					"canvas": [
 						1178,
 						1335
@@ -2284,6 +2364,7 @@
 						1086
 					],
 					"body_reference_pixels": 701,
+					"body_width_pixels": 871,
 					"canvas": [
 						1178,
 						1335
@@ -2296,6 +2377,7 @@
 						1085
 					],
 					"body_reference_pixels": 701,
+					"body_width_pixels": 831,
 					"canvas": [
 						1178,
 						1335
@@ -2308,6 +2390,7 @@
 						1086
 					],
 					"body_reference_pixels": 701,
+					"body_width_pixels": 896,
 					"canvas": [
 						1178,
 						1335
@@ -2320,6 +2403,7 @@
 						1086
 					],
 					"body_reference_pixels": 701,
+					"body_width_pixels": 878,
 					"canvas": [
 						1178,
 						1335
@@ -2332,6 +2416,7 @@
 						1086
 					],
 					"body_reference_pixels": 701,
+					"body_width_pixels": 849,
 					"canvas": [
 						1178,
 						1335
@@ -2344,6 +2429,7 @@
 						1085
 					],
 					"body_reference_pixels": 701,
+					"body_width_pixels": 1022,
 					"canvas": [
 						1178,
 						1335
@@ -2357,6 +2443,7 @@
 					1086
 				],
 				"body_reference_pixels": 773,
+				"body_width_pixels": 865,
 				"canvas": [
 					1178,
 					1335
@@ -2372,6 +2459,7 @@
 						967
 					],
 					"body_reference_pixels": 616,
+					"body_width_pixels": 894,
 					"canvas": [
 						1178,
 						1335
@@ -2384,6 +2472,7 @@
 						967
 					],
 					"body_reference_pixels": 616,
+					"body_width_pixels": 901,
 					"canvas": [
 						1178,
 						1335
@@ -2396,6 +2485,7 @@
 						967
 					],
 					"body_reference_pixels": 616,
+					"body_width_pixels": 862,
 					"canvas": [
 						1178,
 						1335
@@ -2408,6 +2498,7 @@
 						968
 					],
 					"body_reference_pixels": 616,
+					"body_width_pixels": 893,
 					"canvas": [
 						1178,
 						1335
@@ -2420,6 +2511,7 @@
 						967
 					],
 					"body_reference_pixels": 616,
+					"body_width_pixels": 851,
 					"canvas": [
 						1178,
 						1335
@@ -2432,6 +2524,7 @@
 						968
 					],
 					"body_reference_pixels": 616,
+					"body_width_pixels": 877,
 					"canvas": [
 						1178,
 						1335
@@ -2444,6 +2537,7 @@
 						967
 					],
 					"body_reference_pixels": 616,
+					"body_width_pixels": 919,
 					"canvas": [
 						1178,
 						1335
@@ -2457,6 +2551,7 @@
 					967
 				],
 				"body_reference_pixels": 607,
+				"body_width_pixels": 831,
 				"canvas": [
 					1178,
 					1335
@@ -2472,6 +2567,7 @@
 						1138
 					],
 					"body_reference_pixels": 877,
+					"body_width_pixels": 1075,
 					"canvas": [
 						1178,
 						1335
@@ -2484,6 +2580,7 @@
 						1138
 					],
 					"body_reference_pixels": 877,
+					"body_width_pixels": 980,
 					"canvas": [
 						1178,
 						1335
@@ -2496,6 +2593,7 @@
 						1138
 					],
 					"body_reference_pixels": 877,
+					"body_width_pixels": 912,
 					"canvas": [
 						1178,
 						1335
@@ -2508,6 +2606,7 @@
 						1138
 					],
 					"body_reference_pixels": 877,
+					"body_width_pixels": 1019,
 					"canvas": [
 						1178,
 						1335
@@ -2520,6 +2619,7 @@
 						1138
 					],
 					"body_reference_pixels": 877,
+					"body_width_pixels": 965,
 					"canvas": [
 						1178,
 						1335
@@ -2532,6 +2632,7 @@
 						1138
 					],
 					"body_reference_pixels": 877,
+					"body_width_pixels": 891,
 					"canvas": [
 						1178,
 						1335
@@ -2544,6 +2645,7 @@
 						1139
 					],
 					"body_reference_pixels": 877,
+					"body_width_pixels": 1073,
 					"canvas": [
 						1178,
 						1335
@@ -2557,6 +2659,7 @@
 					1138
 				],
 				"body_reference_pixels": 965,
+				"body_width_pixels": 838,
 				"canvas": [
 					1178,
 					1335

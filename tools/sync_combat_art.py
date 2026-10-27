@@ -96,9 +96,11 @@ def convert(src: Path, dst: Path, scale: float = SCALE, force: bool = False) -> 
 
 
 def measured(image: Image.Image) -> dict:
-    """Âncora no pé (centro da base do que é visível) e altura do corpo, pelo alfa."""
+    """Âncora no pé (centro da base do que é visível), altura e largura do corpo, pelo alfa. A largura afasta na fila
+    quem é mais largo que a posição (o escudo do Tatu, #187)."""
     left, top, right, bottom = image.getchannel("A").point(lambda a: 255 if a > 24 else 0).getbbox()
-    return {"anchor": [(left + right) / 2, bottom], "body_reference_pixels": bottom - top, "canvas": [image.width, image.height]}
+    return {"anchor": [(left + right) / 2, bottom], "body_reference_pixels": bottom - top, "body_width_pixels": right - left,
+            "canvas": [image.width, image.height]}
 
 
 def with_portrait(idle: dict, name: str) -> dict:

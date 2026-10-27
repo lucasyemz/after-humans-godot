@@ -10,6 +10,11 @@ const ART_MANIFEST := "res://data/presentation/combat_art.json"
 const HERO_GAP := 1.2
 const ENEMY_GAP := 1.35
 const FRONT_GAP := 1.0
+## Folga entre dois heróis vizinhos mais largos que a posição (o escudo do Tatu, #187): o espaço entre eles cresce até
+## as larguras medidas mais esta folga.
+const WIDE_ROOM := 0.1
+## Meia largura de quem não tem medida e da posição vazia: a que, com a folga, dá o espaço de sempre (HERO_GAP).
+const NARROW_HALF := (HERO_GAP - WIDE_ROOM) * 0.5
 ## O menor encolhimento dos espaços da fila num lugar apertado (abaixo disso os personagens se sobrepõem demais).
 const MIN_GAP_SCALE := 0.6
 ## A fila vai até a posição 4 dos dois lados (Mover, Recuar e o empurrão param nela).
@@ -61,6 +66,8 @@ var speed := 1.0
 var center_x := 0.0
 ## O quanto os espaços da fila encolhem para a luta caber no lugar (#52): 1 = os de sempre.
 var gap_scale := 1.0
+## Meia largura do corpo de cada herói, em metros (pelo parado, com a altura dele).
+var _half_widths := {}
 var active := false
 ## A luta é a do guardião do trecho (a ficha diz, #89; as estrelas dele ficam no save, #91).
 var boss_fight := false
@@ -284,16 +291,21 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 		# A barra de Admin (#130) pode pôr a luta em 4x.
 		if Admin.battle_speed > 0.0 and Admin.allowed():
 			speed = Admin.battle_speed
+	cards.clear()
+	_half_widths.clear()
+	var wide := 0.0
+	for index in session.state.player_team.size():
+		var unit: AHCombat.Unit = session.state.player_team[index]
+		cards[unit.id] = hero_cards[index]
+		_half_widths[unit.id] = half_width(hero_cards[index])
+		wide += maxf(0.0, _half_widths[unit.id] - NARROW_HALF)
 	center_x = at_x
 	gap_scale = 1.0
 	if _street != null and _street.has_method("combat_room"):
 		var room: Dictionary = _street.combat_room(at_x)
-		var placed := fit(at_x, room.bounds, room.obstacles)
+		var placed := fit(at_x, room.bounds, room.obstacles, wide * 2.0)
 		center_x = placed.x
 		gap_scale = placed.y
-	cards.clear()
-	for index in session.state.player_team.size():
-		cards[session.state.player_team[index].id] = hero_cards[index]
 	for index in session.state.enemy_team.size():
 		cards[session.state.enemy_team[index].id] = enemy_cards[index]
 	# Os inimigos ganham a silhueta enquanto a luta dura (#51); a equipe já tem a dela.
@@ -345,8 +357,8 @@ func camera_view() -> Vector2:
 ## chefe de duas posições (que empurra os outros para a 3 e a 4) continuam dentro. Entre os vãos onde a fila cabe,
 ## fica no que deixa o centro mais perto de at_x; se não cabe em nenhum, no maior, com os espaços encolhidos até
 ## MIN_GAP_SCALE. Devolve (centro, escala dos espaços).
-static func fit(at_x: float, bounds: Vector2, obstacles: Array) -> Vector2:
-	var left: float = FRONT_GAP + (RANKS - 1) * HERO_GAP
+static func fit(at_x: float, bounds: Vector2, obstacles: Array, hero_extra: float = 0.0) -> Vector2:
+	var left: float = FRONT_GAP + (RANKS - 1) * HERO_GAP + hero_extra
 	var right: float = FRONT_GAP + (RANKS - 1) * ENEMY_GAP
 	var cuts: Array = obstacles.duplicate()
 	cuts.sort_custom(func(a, b): return a.x < b.x)
@@ -389,8 +401,30 @@ func slot_position(unit: AHCombat.Unit) -> Vector3:
 		hero_z = _street.lane_z - 0.3
 		enemy_z = hero_z - 0.25
 	if unit.is_player:
-		return Vector3(center_x - (FRONT_GAP + (rank - 1) * HERO_GAP) * gap_scale, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
+		return Vector3(center_x - hero_offset(rank) * gap_scale, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
 	return Vector3(center_x + (FRONT_GAP + (rank - 1) * ENEMY_GAP) * gap_scale, _street.call("_ground_height", enemy_z), enemy_z - 0.03 * rank)
+
+
+## Distância do centro até a posição rank dos heróis: HERO_GAP entre vizinhos, ou mais, se os dois juntos são mais
+## largos (cada um pela largura de quem está na posição agora; posição vazia conta como NARROW_HALF). Nunca passa do
+## que start() reserva no fit(): cada herói alarga no máximo os dois vãos dele, em meia largura além de NARROW_HALF.
+func hero_offset(rank: int) -> float:
+	var at := {}
+	for unit in (session.state.player_team if session != null else []):
+		if unit.rank > 0:
+			at[unit.rank] = _half_widths.get(unit.id, NARROW_HALF)
+	var offset := FRONT_GAP
+	for k in range(2, rank + 1):
+		offset += maxf(HERO_GAP, float(at.get(k - 1, NARROW_HALF)) + float(at.get(k, NARROW_HALF)) + WIDE_ROOM)
+	return offset
+
+
+## Meia largura, em metros, da arte que o cartão mostra (body_width_pixels do manifesto); sem a medida, NARROW_HALF.
+static func half_width(card: AHSpriteCard) -> float:
+	var art := card.art()
+	if not art.has("body_width_pixels"):
+		return NARROW_HALF
+	return float(art.body_width_pixels) * 0.5 * card.body_height / float(art.body_reference_pixels)
 
 
 ## Leva cada unidade de pé para a posição dela (depois de trocas, empurrões e mortes).

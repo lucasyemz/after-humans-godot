@@ -45,7 +45,8 @@ func _run() -> void:
 		print("acolhido: %s %s %s" % [error, hero.id, hero.get("art_variant", "")])
 		arrived.append(hero.id)
 	c.unlocked_classes = unlocked + ["rato", "tatu"]
-	c.preferred_formation = arrived + ["hero_cao_bento", "hero_gato_nick"]
+	# O Tatu entre dois vizinhos: o escudo dele não pode cobrir nenhum.
+	c.preferred_formation = ["hero_cao_bento", arrived[1], arrived[0], "hero_gato_nick"]
 	load("res://scripts/flow/journey_rules.gd").start_expedition(c, "fase_1", 4242)
 	campaign.state = c
 	root.get_node("GameFlow").change_to("street", {}, false)
@@ -57,6 +58,31 @@ func _run() -> void:
 	for index in street.corridor.guards:
 		for card in street.corridor.guards[index].cards:
 			card.visible = false
+	# Os seis lado a lado, na mesma linha do chão: a escala do Guaxinim e do Tatu contra a dos fundadores.
+	var lineup := ["hero_cao_bento", "hero_coruja_vespera", "hero_gato_nick", "hero_sapo_iris"] + arrived
+	var base: Vector3 = street._heroes[0].position
+	var shown: Array = []
+	var Card = load("res://scripts/world/sprite_card.gd")
+	var Heights = load("res://scripts/world/character_heights.gd")
+	var Arena = load("res://scripts/combat/combat_arena.gd")
+	for card in street._heroes:
+		card.visible = false
+	for i in lineup.size():
+		var hero = campaign.hero(lineup[i])
+		var card = Card.new()
+		card.body_height = Heights.find(lineup[i])
+		card.show_art(Arena.art_entry(street._combat_art.heroes, lineup[i], String(hero.get("art_variant", ""))).idle)
+		street.add_child(card)
+		card.position = Vector3(street._leader.position.x + (i - 2.5) * 1.25, base.y, base.z)
+		card.set_facing(1.0)
+		shown.append(card)
+	await _frames(30)
+	await _save("00-lineup")
+	for card in shown:
+		print("fila %s: altura %.2f m, pé em y=%.3f" % [lineup[shown.find(card)], card.body_height, card.global_position.y])
+		card.queue_free()
+	for card in street._heroes:
+		card.visible = true
 	var cards: Array = []
 	for id in ENEMIES:
 		cards.append(street.corridor._enemy_card(id))
