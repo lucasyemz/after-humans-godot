@@ -666,7 +666,6 @@ func _reachable(route: Dictionary, step: int) -> bool:
 	return true
 
 
-## Onde fica a marca da volta à Estação: o começo da rua ou da primeira zona do mapa.
 ## A porta de volta de um interior lateral (a marca e o aviso).
 func _side_exit_point(room_entry: Dictionary) -> Vector3:
 	return Vector3(room_entry.x0 + EXIT_X * 0.5, street.floor_y + MARKER_DOOR_HEIGHT, street.lane_z - 0.6)
@@ -681,6 +680,7 @@ func _house_exit_point() -> Vector3:
 	return Vector3(room.exit_x - 0.6, MARKER_DOOR_HEIGHT, -0.5)
 
 
+## Onde fica a marca da volta à Estação: o começo da rua ou da primeira zona do mapa.
 func _exit_point() -> Vector3:
 	if street.scenario == null or segments.is_empty():
 		return Vector3(EXIT_X * 0.5, MARKER_DOOR_HEIGHT, -0.2)
@@ -715,10 +715,11 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 		if R.can_start_camp(campaign):
 			text = tr("E  Acampar (fechar a porta e acender a fogueira)")
 			action = _start_camp
+			where = _camp_point()
 		elif site.camped:
 			text = tr("Acampamento já feito nesta fase")
 			action = Callable()
-		where = _camp_point()
+			where = _camp_point()
 	if leader.x < room.exit_x:
 		text = tr("E  Sair para a rua")
 		action = _leave_house

@@ -45,6 +45,7 @@ Vitrines, nos seis cenários, nos interiores laterais e nas casas.
 | Rodada | Veredito | O que a QA achou | Como ficou |
 |---|---|---|---|
 | 1 | REPROVADO | **Médias:** nos interiores, o aviso de um objeto apontava para o vizinho; nas casas, a marca da fogueira e a da porta sumiam quando viravam a da vez, e o teste não cobria as casas nem a patrulha de pé; faltavam as capturas dos seis cenários. **Baixas:** a marca da fogueira 1 m acima dela; os números repetidos | Todas corrigidas, com os casos novos no teste e as capturas acima |
+| 2 | APROVADO | Baixas: um comentário no lugar errado; num caso de borda (o inimigo da casa de pé), o aviso podia apontar para a fogueira com o texto da busca | Corrigidas depois do veredito |
 
 ## Para o Lucas
 
