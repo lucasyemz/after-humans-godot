@@ -263,12 +263,17 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 ## Começa a luta: hero_cards e enemy_cards já estão na cena (na ordem da formação). enemies: ids ou os inimigos já
 ## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
 func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
-	session = AHCombatSession.create(heroes, enemies, opening, seed_value)
+	# Os efeitos de fase dos eventos (#78): valem nesta luta; o de uma luta só (Exposto) se gasta aqui.
+	session = AHCombatSession.create(heroes, enemies, opening, seed_value, 80, AHJourneyRules.phase_effects(Campaign.state))
+	AHJourneyRules.spend_fight_effects(Campaign.state)
 	session.use_expedition(Campaign.state)
 	Tips.show_tip("combat")
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
 	if speed <= 2.0:
 		speed = float(clampi(int(Campaign.state.get("settings", {}).get("battle_speed", 1)), 1, 2))
+		# A barra de Admin (#130) pode pôr a luta em 4x.
+		if Admin.battle_speed > 0.0 and Admin.allowed():
+			speed = Admin.battle_speed
 	center_x = at_x
 	gap_scale = 1.0
 	if _street != null and _street.has_method("combat_room"):
@@ -469,7 +474,8 @@ func _execute(actor_id: String, command: Dictionary) -> Dictionary:
 
 
 func _wait(seconds: float) -> void:
-	await get_tree().create_timer(seconds / speed).timeout
+	# A espera para com o jogo pausado (a barra de Admin, #130): o inimigo não age por trás dela.
+	await get_tree().create_timer(seconds / speed, false).timeout
 
 
 # ---------------------------------------------------------------- lances
@@ -569,7 +575,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 			for target_id in (targets if not targets.is_empty() else [actor.id]):
 				_spawn_vfx(actor, ability_id, target_id)
 	else:
-		_play_enemy_cue(actor, action)
+		_play_enemy_cue(actor, ability_id, action)
 		if action != null:
 			_float_text(card, action.DisplayName, Color(1.0, 0.85, 0.7), 0.9)
 	var impact_start := Time.get_ticks_msec()
@@ -578,7 +584,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 	var held := (Time.get_ticks_msec() - impact_start) * 0.001
 	var impact := maxf(IMPACT_SECONDS * (0.8 if support else 1.0), life) / speed
 	if held < impact:
-		await get_tree().create_timer(impact - held).timeout
+		await get_tree().create_timer(impact - held, false).timeout
 	# Volta: todos ao descanso e a câmera abre de novo.
 	show_pose(actor, "idle")
 	var back := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -743,7 +749,7 @@ func _hitstop(seconds: float) -> void:
 		return
 	_hitstop_scale = Engine.time_scale
 	Engine.time_scale = _hitstop_scale * HITSTOP_TIME_SCALE
-	await get_tree().create_timer(seconds / speed, true, false, true).timeout
+	await get_tree().create_timer(seconds / speed, false, false, true).timeout
 	_end_hitstop()
 
 
@@ -829,6 +835,10 @@ func _is_machine(unit: AHCombat.Unit) -> bool:
 
 # ---------------------------------------------------------------- sons
 
+## Os sons das ações dos inimigos: audio/combat/enemies/<inimigo>/<ação>.wav.
+const ENEMY_CUES := "res://audio/combat/enemies/%s/%s.wav"
+
+
 func _hero_cue(actor: AHCombat.Unit, ability_id: String) -> String:
 	var prefix: String = HERO_CUES.get(actor.class_id, "")
 	var hero_class = session.data.classes.get(actor.class_id)
@@ -838,7 +848,13 @@ func _hero_cue(actor: AHCombat.Unit, ability_id: String) -> String:
 	return "%s%d" % [prefix, index + 1] if index >= 0 else ""
 
 
-func _play_enemy_cue(actor: AHCombat.Unit, action) -> void:
+## O som da ação do inimigo: cada habilidade tem o dela (tools/synth_enemy_sounds.py, ligado ao que a arte mostra). Sem
+## arquivo, o soco ou a cura de robô de antes.
+func _play_enemy_cue(actor: AHCombat.Unit, ability_id: String, action) -> void:
+	var path := ENEMY_CUES % [actor.enemy_id, ability_id]
+	if ResourceLoader.exists(path):
+		_play_path(path)
+		return
 	if action == null or not _is_machine(actor):
 		return
 	if action.TargetType == "Self":
@@ -849,7 +865,10 @@ func _play_enemy_cue(actor: AHCombat.Unit, action) -> void:
 
 
 func _play_cue(cue: String) -> void:
-	var path: String = art.audio.get(cue, "")
+	_play_path(art.audio.get(cue, ""))
+
+
+func _play_path(path: String) -> void:
 	if path == "" or speed > 2.0:
 		return
 	var player := _audio[_audio_next]

@@ -1,6 +1,7 @@
 ## O popup curto do fim da luta (#109, docs/design/hud-ajustes.md), com as decisões do Lucas:
-## - a vitória e a fuga fecham sozinhas (POPUP_HOLD, metade no 2x) ou com qualquer tecla; a derrota espera um toque;
-## - sem botão; no alto, no lugar da faixa da rodada (que some enquanto ele está aberto);
+## - a vitória e a fuga fecham sozinhas (POPUP_HOLD, pelo menos 5 s de verdade, também no 2x; #128) ou com qualquer tecla
+##   ou o X; o mouse em cima segura; a derrota espera um toque;
+## - no alto, no lugar da faixa da rodada (que some enquanto ele está aberto);
 ## - os recursos da luta são os que end_combat vai somar (combat_loot), e a fuga mostra o achado perdido.
 extends RefCounted
 
@@ -76,7 +77,7 @@ func _popup() -> void:
 		await _tree.process_frame
 	if not t.check(hud.waiting, "a vez do jogador chega"):
 		return
-	# Vitória: fecha sozinha em ~2,5 s.
+	# Vitória: fecha sozinha em POPUP_HOLD s.
 	var closed := [false]
 	var watch := func(): closed[0] = true
 	hud.result_closed.connect(watch)
@@ -85,13 +86,46 @@ func _popup() -> void:
 	await _frames(3)
 	t.check(hud._result.visible and not hud._order_panel.visible, "o popup abre e a faixa da rodada sai")
 	t.check(hud._result.position.y <= 60.0 and hud._result.get_rect().end.y < 700.0, "no alto, longe da equipe")
-	t.equal(hud._result.find_children("*", "BaseButton", true, false).size(), 0, "sem botão")
+	t.check(AHCombatHud.POPUP_HOLD >= 5.0, "o popup fica pelo menos 5 s (%.1f)" % AHCombatHud.POPUP_HOLD)
+	t.equal(hud._result.find_children("*", "BaseButton", true, false).size(), 0, "sem botão dentro")
+	t.check(hud._result_close.visible and hud._result.get_global_rect().encloses(hud._result_close.get_global_rect()), "e o X no canto")
 	t.check(hud._result.find_child("NoLoot", true, false) != null, "na patrulha, \"Nenhum recurso nesta luta\"")
 	await _until(func(): return closed[0], 6.0)
 	var took := (Time.get_ticks_msec() - started) / 1000.0
 	t.check(closed[0] and absf(took - AHCombatHud.POPUP_HOLD) < 0.6, "a vitória fecha sozinha em ~%.1f s (%.2f s)" % [AHCombatHud.POPUP_HOLD, took])
 	await _frames(2)
 	t.check(not hud._result.visible and hud._order_panel.visible, "e a faixa da rodada volta")
+	# No 2x, o mesmo tempo (a velocidade da batalha não encurta a leitura).
+	Campaign.state.settings.battle_speed = 2
+	hud.arena.speed = 2.0
+	hud.show_result("victory", false, {})
+	await _frames(2)
+	t.check(absf(hud._result_left - AHCombatHud.POPUP_HOLD) < 0.2, "no 2x, os mesmos %.0f s" % AHCombatHud.POPUP_HOLD)
+	# O mouse em cima segura: a contagem para, e fecha depois que ele sai.
+	hud._mouse = hud._result.get_global_rect().get_center()
+	var held: float = hud._result_left
+	await _tree.create_timer(1.0).timeout
+	t.check(hud._result.visible and absf(hud._result_left - held) < 0.05, "o mouse em cima segura a contagem")
+	hud._mouse = Vector2(960, 900)
+	await _tree.create_timer(0.5).timeout
+	t.check(hud._result_left < held - 0.3, "e ela volta a andar quando ele sai")
+	# No toque, o último ponto do mouse emulado não segura (#128, a QA).
+	hud.sheet.touch_mode = true
+	hud._mouse = hud._result.get_global_rect().get_center()
+	held = hud._result_left
+	await _tree.create_timer(0.5).timeout
+	t.check(hud._result_left < held - 0.3, "no toque, o mouse parado não segura")
+	hud.sheet.touch_mode = false
+	hud._mouse = Vector2(960, 900)
+	# O X fecha.
+	closed[0] = false
+	hud._result_close.pressed.emit()
+	await _frames(2)
+	t.check(closed[0] and not hud._result.visible, "o X fecha")
+	await _frames(1)
+	t.check(not hud._result_close.visible, "e sai junto")
+	Campaign.state.settings.battle_speed = 1
+	hud.arena.speed = 1.0
 	# Qualquer tecla fecha antes.
 	closed[0] = false
 	hud.show_result("escaped", false, {})

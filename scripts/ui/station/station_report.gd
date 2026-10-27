@@ -61,7 +61,15 @@ func card_centers() -> Dictionary:
 
 func _team() -> Array:
 	var c: Dictionary = Campaign.state
-	return report.get("team", []).filter(func(id): return S.hero(c, id) != null)
+	return scene_order(report.get("team", []).filter(func(id): return S.hero(c, id) != null))
+
+
+## A equipe na ordem da cena (#131): a formação que o jogador deixou, com a posição 1 (a frente) à direita e a 4 à
+## esquerda, como na Preparação e na luta. team vem da frente para trás.
+static func scene_order(team: Array) -> Array:
+	var out := team.duplicate()
+	out.reverse()
+	return out
 
 
 func _build() -> void:
@@ -273,6 +281,19 @@ func _chips(c: Dictionary, result: String) -> Array:
 		out.append({"icon": "objective_done" if done else "objective_failed",
 			"text": (tr("Objetivo: %s cumprido") if done else tr("Objetivo: %s não cumprido")) % label.to_lower(),
 			"color": AHKit.TEXT if done else AHKit.alert_text()})
+	# Quem caiu (#118): ninguém morre, mas o relatório diz com clareza quem voltou em recuperação.
+	var fell: Array = report.get("fallen", [])
+	if fell.size() == 1:
+		var hero = S.hero(c, String(fell[0].get("hero_id", "")))
+		if hero != null:
+			out.append({"icon": "state_wounded", "text": tr("%s caiu: em recuperação") % hero.display_name, "color": AHKit.alert_text()})
+	elif fell.size() > 1:
+		out.append({"icon": "state_wounded", "text": tr("%d caíram: em recuperação") % fell.size(), "color": AHKit.alert_text()})
+	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
+	if report.has("train"):
+		var arrived := String(report.train)
+		out.append({"icon": "train_arrival", "text": tr("Chegou alguém no trem: %s") % arrived if arrived != "" else tr("O trem veio vazio"),
+			"color": AHKit.AMBER if arrived != "" else AHKit.MUTED})
 	return out
 
 
@@ -360,7 +381,9 @@ func _card(hero_id: String) -> Control:
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	face.clip_contents = true
-	if not hero.alive:
+	# Quem caiu nesta expedição (#118) volta Caído: o retrato apagado e o estado em vermelho.
+	var fell := fell_here(hero_id)
+	if fell or not hero.alive:
 		face.modulate = AHKit.FALLEN
 	frame.add_child(face)
 	top.add_child(frame)
@@ -376,14 +399,14 @@ func _card(hero_id: String) -> Control:
 	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	name_row.add_child(name_label)
 	# O destaque da volta (quem mais fez: dano, cura em dobro e quedas valendo cinco) ganha a estrela âmbar.
-	if hero_id == _best() and hero.alive:
+	if hero_id == _best() and not fell:
 		var star := AHKit.label("★", "card_name", AHKit.AMBER, true)
 		star.name = "Best"
 		star.tooltip_text = tr("Destaque da expedição")
 		star.mouse_filter = Control.MOUSE_FILTER_PASS
 		name_row.add_child(star)
 	# O XP desta volta, ao lado do nome.
-	if hero.alive and int(stats.get("xp", 0)) > 0:
+	if not fell and int(stats.get("xp", 0)) > 0:
 		var xp := AHKit.label(tr("+%d XP") % int(stats.xp), "text", AHKit.XP, true)
 		xp.name = "Xp"
 		xp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -391,17 +414,14 @@ func _card(hero_id: String) -> Control:
 	var hero_class = GameData.row("classes", String(hero.class_id))
 	if hero_class != null:
 		names.add_child(AHKit.label(tr(String(hero_class.DisplayName)), "text", AHKit.MUTED))
-	if hero.alive:
+	if fell:
+		names.add_child(fallen_line(hero))
+	else:
 		var state_row := HBoxContainer.new()
 		state_row.add_theme_constant_override("separation", 12)
 		names.add_child(state_row)
 		var pill := AHKitPill.make(int(hero.hp), int(hero.max_hp))
 		state_row.add_child(pill)
-	else:
-		var gone := AHKit.label(tr("Não voltou: está no Memorial."), "text", AHKit.alert_text())
-		gone.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		gone.custom_minimum_size = Vector2(180, 0)
-		names.add_child(gone)
 	# A vida: no texto Maior, o número vai na linha da barra (a carta não cresce para cima da fila).
 	var big := AHUiStyle.text_scale > 1.2
 	var life_row := HBoxContainer.new() if big else null
@@ -451,7 +471,7 @@ func _card(hero_id: String) -> Control:
 	column.add_child(relic_row)
 	# A aba da melhoria da classe (a Pesquisa): quando há o que pesquisar para ela.
 	var research := _research_for(c, String(hero.class_id))
-	if hero.alive and not research.is_empty():
+	if not fell and not research.is_empty():
 		var tab := AHKit.tab("card")
 		tab.name = "Tab"
 		tab.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -464,6 +484,34 @@ func _card(hero_id: String) -> Control:
 		tab.position = Vector2(28, -38)
 	holder.custom_minimum_size.y = card.get_combined_minimum_size().y
 	return holder
+
+
+## Caiu nesta expedição (o relatório guarda quem chegou Caído).
+func fell_here(hero_id: String) -> bool:
+	return report.get("fallen", []).any(func(e): return String(e.get("hero_id", "")) == hero_id)
+
+
+## "Caído · Volta em 2 dias", com o lugar embaixo ("Na Enfermaria" ou "No Dormitório"); já recuperado, "Recuperado".
+static func fallen_line(hero: Dictionary) -> VBoxContainer:
+	var box := VBoxContainer.new()
+	box.name = "Fallen"
+	box.add_theme_constant_override("separation", 0)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(row)
+	row.add_child(AHKit.glyph("state_wounded", 24, AHKit.alert_text()))
+	var days: int = S.recovery_days(hero)
+	var text: String = (TranslationServer.translate("Caído") + " · " + S.return_text(days)) if days > 0 else TranslationServer.translate("Caído · recuperado")
+	var label := AHKit.label(text, "text", AHKit.alert_text(), true)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.custom_minimum_size = Vector2(180, 0)
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(label)
+	if days > 0:
+		box.add_child(AHKit.label(TranslationServer.translate("Em recuperação na Enfermaria") if S.in_bed(hero) else TranslationServer.translate("Em recuperação no Dormitório"), "small", AHKit.MUTED))
+	return box
 
 
 ## O destaque da volta ("" sem ninguém que tenha feito nada): o mesmo cálculo do relatório antigo.
@@ -524,6 +572,9 @@ func _details_band() -> PanelContainer:
 		if int(cycle.get("fragments_produced", 0)) > 0:
 			lines.append(tr("A Cora trouxe %d fragmento.") % cycle.fragments_produced)
 		columns.add_child(_detail_column(tr("A Estação no ciclo %d") % cycle.number, lines))
+	var care := recovery_lines(c, report)
+	if not care.is_empty():
+		columns.add_child(_detail_column(tr("Recuperação"), care))
 	var unlocks: Array = []
 	for room_id in S.NEXT_ROOMS:
 		if not S.next_level_cost(c, room_id).is_empty() and S.upgrade_block(c, room_id) == "":
@@ -541,6 +592,22 @@ func _details_band() -> PanelContainer:
 			column.add_child(button)
 		columns.add_child(column)
 	return band
+
+
+## As linhas da recuperação (#121): quem chegou Caído e para onde foi, e quem voltou da Enfermaria nesta volta.
+static func recovery_lines(c: Dictionary, last_return: Dictionary) -> Array:
+	var lines: Array = []
+	for entry in last_return.get("fallen", []):
+		var hero = S.hero(c, String(entry.get("hero_id", "")))
+		if hero == null:
+			continue
+		var place := TranslationServer.translate("a Enfermaria") if bool(entry.get("bed", false)) else TranslationServer.translate("o Dormitório, sem leito livre")
+		lines.append(TranslationServer.translate("%s foi para %s: %s.") % [hero.display_name, place, S.return_text(int(entry.get("days", 1))).to_lower()])
+	for hero_id in last_return.get("recovered", []):
+		var hero = S.hero(c, String(hero_id))
+		if hero != null:
+			lines.append(TranslationServer.translate("%s se recuperou e voltou ao Alojamento.") % hero.display_name)
+	return lines
 
 
 func _detail_column(title: String, lines: Array) -> VBoxContainer:

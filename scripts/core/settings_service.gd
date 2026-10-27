@@ -38,7 +38,7 @@ var touch_controls := 0
 var keys := {}
 const REMAPPABLE := ["move_left", "move_right", "move_back", "move_front", "run", "interact", "inventory", "cancel", "menu",
 	"combat_ability_1", "combat_ability_2", "combat_ability_3", "combat_ability_4", "combat_move", "combat_defend", "combat_flee", "combat_examine", "combat_log", "hide_hud",
-	"report_details", "station_prepare"]
+	"report_details", "station_prepare", "station_room_prev", "station_room_next"]
 
 
 ## O idioma das telas (#35): o português é o padrão e o inglês está em teste (data/i18n/en.po; o que falta traduzir
@@ -89,12 +89,6 @@ func _input(event: InputEvent) -> void:
 		AHUiStyle.using_keys = true
 	elif event is InputEventMouseButton or event is InputEventScreenTouch:
 		AHUiStyle.using_keys = false
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("debug_toggle"):
-		set_dev_mode(not dev_mode)
-		get_viewport().set_input_as_handled()
 
 
 func set_dev_mode(value: bool) -> void:

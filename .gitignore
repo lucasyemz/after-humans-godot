@@ -8,3 +8,6 @@ art/combat/source/reactions/kneeling_20261023/
 
 # Telas temporárias das maquetes da HUD (render.mjs); as provas ficam em WebP na pasta do lote.
 docs/design/*/.render/
+
+# Cache do Python das ferramentas de docs
+__pycache__/

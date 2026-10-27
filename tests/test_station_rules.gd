@@ -9,6 +9,11 @@ const DOOR_SHOPS := [0, 1, 2, 0, 1, 2]
 
 
 func run(t) -> void:
+	# O trem da volta (#122) é sorteado: aqui ele traz sempre o próximo civil da fila (o test_train_recruits sorteia).
+	var train_rule: Dictionary = GameData.table("recruitment").get("train", {})
+	var train_before := train_rule.duplicate()
+	train_rule.Chance = 100
+	train_rule.CivilianShare = 100
 	_new_campaign(t)
 	_rooms(t)
 	_departure(t)
@@ -25,6 +30,7 @@ func run(t) -> void:
 	_next_step(t)
 	_save_round_trip(t)
 	_undeployable(t)
+	train_rule.merge(train_before, true)
 
 
 ## O próximo passo da Estação: na ordem do que pede atenção (relatório, noite, trem, cômodo, sucata, fase).
@@ -154,7 +160,7 @@ func _return_and_night(t) -> void:
 	t.equal(S.quantity(c, S.SUPPLIES), 4 - 3, "três suprimentos comidos")
 	t.check(c.night.phase == "dawn" and S.night_event_text(c) != "", "amanhecer com o relato da noite")
 	t.check(S.finish_dawn(c) and c.night.phase == "none", "a noite termina")
-	t.check(S.preparation_block(c) != "", "o candidato ainda espera na plataforma")
+	t.check(S.visit_pending(c) and S.preparation_block(c) == "", "o candidato ainda espera na plataforma, sem travar a partida (#122)")
 
 
 func _civilians(t) -> void:

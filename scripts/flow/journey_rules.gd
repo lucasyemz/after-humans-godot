@@ -39,6 +39,15 @@ const PHASES := [
 		"description": "Bombas antigas mantêm a água em movimento, e os filtros foram trocados há pouco tempo, não há gerações. Na eclusa central, o Porteiro guarda uma ordem de contenção que ninguém cancelou."},
 ]
 const DIFFICULTY_NAMES := ["Fácil", "Moderada", "Difícil", "Muito difícil"]
+## Os efeitos de fase dos eventos (corridor.effects) na luta (#78, decisão do Lucas: a luta aplica): cada herói começa a
+## luta com os marcadores (vuln, block) e a velocidade a mais ou a menos (speed). once: vale só na próxima luta (sai da
+## lista quando ela começa); sem once, até o fim da fase. good: bom para a equipe (o chip do resultado). text: o chip;
+## log: a linha do Registro, já dentro da luta.
+const PHASE_EFFECTS := {
+	"exposto": {"vuln": 1, "once": true, "good": false, "text": "Exposto: próxima luta Vulnerável", "log": "Exposto: a equipe começa Vulnerável."},
+	"cansado": {"speed": -1, "good": false, "text": "Cansado: -1 de velocidade até o fim da fase", "log": "Cansado: a equipe tem -1 de velocidade."},
+	"preparado": {"block": 1, "once": true, "good": true, "text": "Preparado: 1 Bloqueio na próxima luta", "log": "Preparado: a equipe começa com 1 Bloqueio."},
+}
 ## A escada da história (docs/narrative/narrative-design.md §7), uma camada por fase: 1 Sobrevivência, 2 O despertar,
 ## 3 Origem, 4 Contradição, 5 Presença humana (#64). O evento de história de cada fase abre na primeira Passagem dela.
 const STORY_EVENTS := {"fase_2": "voz_interfone", "fase_3": "porta_espera", "fase_5": "sobrevivente_tuneis"}
@@ -157,7 +166,8 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	var most: int = team_limits(phase_id).max
 	for hero_id in campaign.get("preferred_formation", []):
 		for hero in campaign.roster:
-			if hero.id == hero_id and hero.alive and team.size() < most:
+			# Quem está em recuperação (#118) fica na Estação.
+			if hero.id == hero_id and hero.alive and int(hero.get("recovery_days", 0)) <= 0 and team.size() < most:
 				team.append(hero_id)
 	if team.is_empty():
 		return false
@@ -489,16 +499,12 @@ static func combat_loot(campaign: Dictionary, result: String, boss: bool) -> Dic
 	return out
 
 
-## Fim de uma luta do corredor (EndCombat). result: "victory", "defeat" ou "escaped". As mortes vão para o memorial.
-static func end_combat(campaign: Dictionary, result: String, boss: bool, cause: String = "") -> void:
+## Fim de uma luta do corredor (EndCombat). result: "victory", "defeat" ou "escaped". Ninguém morre (#118): quem caiu
+## fica fora da expedição (alive = false) e volta à Estação Caído (AHStationRules.admit_fallen, no fim da volta).
+static func end_combat(campaign: Dictionary, result: String, boss: bool, _cause: String = "") -> void:
 	var session: Dictionary = campaign.session
 	var expedition: Dictionary = session.expedition
 	var route: Dictionary = expedition.corridor
-	var info := phase(expedition.phase_id)
-	for hero in campaign.roster:
-		if expedition.team.has(hero.id) and not hero.alive and not campaign.memorial.any(func(e): return e.hero_id == hero.id):
-			campaign.memorial.append({"hero_id": hero.id, "display_name": hero.display_name, "class_id": hero.class_id,
-				"mission_name": info.get("name", ""), "cause": cause, "completed_expeditions": hero.get("completed_expeditions", 0)})
 	if result == "escaped":
 		session.result = "fled"
 		session.screen = "result"
@@ -593,11 +599,40 @@ static func grant_tool(campaign: Dictionary, tool: String) -> bool:
 	if tool == "" or has_tool(campaign, tool):
 		return false
 	campaign.tools.append(tool)
+	# A novidade (#143): o aviso na exploração e o selo NOVO na Mochila até ela abrir.
+	for key in ["new_tools", "tool_notices"]:
+		var list: Array = campaign.get(key, [])
+		if not list.has(tool):
+			list.append(tool)
+		campaign[key] = list
 	return true
 
 
 static func lose_tool(campaign: Dictionary, tool: String) -> void:
 	campaign.tools.erase(tool)
+	# Perdida antes de a Mochila abrir, ela deixa de ser novidade (#143).
+	for key in ["new_tools", "tool_notices"]:
+		if campaign.has(key):
+			campaign[key].erase(tool)
+
+
+## Os efeitos de fase que valem na próxima luta da expedição (os ids de PHASE_EFFECTS em corridor.effects).
+static func phase_effects(campaign: Dictionary) -> Array:
+	var expedition = campaign.get("session", {}).get("expedition")
+	if expedition == null:
+		return []
+	return Array(expedition.get("corridor", {}).get("effects", [])).filter(func(id): return PHASE_EFFECTS.has(id))
+
+
+## A luta começou: os efeitos de uma luta só (Exposto e Preparado) saem da lista; os da fase (Cansado) ficam.
+static func spend_fight_effects(campaign: Dictionary) -> void:
+	var expedition = campaign.get("session", {}).get("expedition")
+	if expedition == null or not expedition.has("corridor"):
+		return
+	var effects: Array = expedition.corridor.get("effects", [])
+	for id in effects.duplicate():
+		if bool(PHASE_EFFECTS.get(id, {}).get("once", false)):
+			effects.erase(id)
 
 
 static func _team_alive(campaign: Dictionary) -> Array:
@@ -876,6 +911,12 @@ static func _guarded(route: Dictionary, step: int) -> bool:
 		and (route.steps[step].type == "combat" or route.steps[step].type == "boss")
 
 
+## O trecho já está aberto para usar o que tem nele (vasculhar um objeto, entrar num interior): a equipe chegou até ele
+## e não há patrulha de pé guardando. A marca de interação (#142) e a tecla usam a mesma regra.
+static func step_open(route: Dictionary, step: int) -> bool:
+	return route.index >= step and not _guarded(route, step)
+
+
 static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
 	if not in_corridor(campaign):
 		return false
@@ -883,7 +924,7 @@ static func can_search_scenario_prop(campaign: Dictionary, prop: int) -> bool:
 	_scenario_fields(route)
 	if prop < 0 or prop >= route.prop_steps.size() or route.searched_props.has(prop) or route.current_house != -1:
 		return false
-	return route.index >= route.prop_steps[prop] and not _guarded(route, route.prop_steps[prop])
+	return step_open(route, route.prop_steps[prop])
 
 
 ## Vasculha o prop (SearchScenarioProp): a tabela das casas (1 em 3 ruim) e o objetivo da rota. Devolve {ok, text}.
@@ -914,7 +955,7 @@ static func can_enter_scenario_room(campaign: Dictionary, door_step: int) -> boo
 		return false
 	var route: Dictionary = corridor(campaign)
 	_scenario_fields(route)
-	return route.current_house == -1 and int(route.current_room) == -1 and route.index >= door_step and not _guarded(route, door_step)
+	return route.current_house == -1 and int(route.current_room) == -1 and step_open(route, door_step)
 
 
 static func enter_scenario_room(campaign: Dictionary, zone: int, door_step: int) -> bool:
@@ -1003,15 +1044,20 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 			hurt = hero.display_name
 			if hero.hp != hp_before:
 				changes.push_front({"kind": "life", "amount": hero.hp - hp_before, "hero": hurt})
-	grant_tool(campaign, String(effects.get("GrantTool", "")))
-	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "":
+	if grant_tool(campaign, String(effects.get("GrantTool", ""))):
+		changes.append({"kind": "tool", "amount": 1, "hero": "", "id": String(effects.GrantTool)})
+	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "" and has_tool(campaign, choice.RequirementTool):
 		lose_tool(campaign, choice.RequirementTool)
+		changes.append({"kind": "tool", "amount": -1, "hero": "", "id": String(choice.RequirementTool)})
 	var unlock: String = effects.get("UnlockClass", "")
 	if unlock != "" and not campaign.unlocked_classes.has(unlock):
 		campaign.unlocked_classes.append(unlock)
 	for effect in effects.get("PhaseEffects", []):
 		if not expedition.corridor.effects.has(effect):
 			expedition.corridor.effects.append(effect)
+		# O chip diz o efeito, mesmo se ele já valia (o texto do resultado o promete de novo).
+		if PHASE_EFFECTS.has(effect):
+			changes.append({"kind": "effect", "amount": 1 if PHASE_EFFECTS[effect].good else -1, "hero": "", "id": String(effect)})
 	var resolution := String(effects.get("Result", "")).replace("{Instinto}", str(instinct)).replace("{Heroi}", hurt)
 	event.resolution = resolution if resolution != "" else String(choice.get("Text", "…"))
 	# O modelo em português e o que entra nele, para a tela traduzir (#35, #64): o save continua em português.
@@ -1052,12 +1098,46 @@ static func can_start_camp(campaign: Dictionary) -> bool:
 	if route.current_house < 0 or route.current_house >= route.sites.size():
 		return false
 	var site: Dictionary = route.sites[route.current_house]
-	return site.camp_site and not site.camped and (not site.has_enemy or site.enemy_defeated)
+	return site.camp_site and not camped(route) and (not site.has_enemy or site.enemy_defeated)
 
 
 static func start_camp(campaign: Dictionary) -> bool:
 	if not can_start_camp(campaign):
 		return false
+	campaign.session.screen = "rest"
+	return true
+
+
+## Um acampamento por fase: o da casa ou o da parada de descanso (#143), o que vier primeiro.
+static func camped(route: Dictionary) -> bool:
+	return bool(route.get("stop_camped", false)) or route.sites.any(func(s): return s.camped)
+
+
+## A casa do acampamento na mesma parada de descanso (o trecho dela), aberta e sem patrulha de pé; -1 se não houver.
+## Aí as duas viram uma parada só: Acampar aqui entra nela.
+static func stop_camp_house(campaign: Dictionary) -> int:
+	var route: Dictionary = corridor(campaign)
+	for i in route.sites.size():
+		var site: Dictionary = route.sites[i]
+		if site.camp_site and site.step == route.index and (not site.locked or site.forced) and (not site.has_enemy or site.enemy_defeated):
+			return i
+	return -1
+
+
+## Acampar na parada de descanso (#143): só no trecho de descanso em que a equipe está, uma vez por fase.
+static func can_camp_at_stop(campaign: Dictionary) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	return route.current_house == -1 and route.steps[route.index].type == "rest" and not camped(route)
+
+
+## Acende a fogueira na parada (x: a fogueira; leave: onde a fila recomeça). A volta ao jogo no meio do acampamento a
+## refaz no mesmo lugar.
+static func start_stop_camp(campaign: Dictionary, x: float, leave: float) -> bool:
+	if not can_camp_at_stop(campaign):
+		return false
+	corridor(campaign).stop_camp = {"step": corridor(campaign).index, "x": x, "leave": leave}
 	campaign.session.screen = "rest"
 	return true
 
@@ -1123,6 +1203,9 @@ static func leave_camp(campaign: Dictionary, seed_value: int) -> bool:
 	var route: Dictionary = expedition.corridor
 	if route.current_house >= 0:
 		route.sites[route.current_house].camped = true
+	if route.has("stop_camp"):
+		route.erase("stop_camp")
+		route.stop_camped = true
 	var options: Array = WEATHERS.get(expedition.scenario_id, WEATHERS["rua-das-vitrines"]).filter(func(w): return w != route.weather)
 	var random := _rand(seed_value)
 	route.weather = options[clampi(floori(random.next() * options.size()), 0, options.size() - 1)]

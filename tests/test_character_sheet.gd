@@ -140,77 +140,130 @@ func _combat() -> void:
 	var enemy: AHCombat.Unit = arena.session.state.enemy_team[0]
 	var body: Rect2 = hud._body_rect(camera, arena.cards[enemy.id])
 	AHUiStyle.using_keys = false
-	t.check(not hud.sheet.showing(), "fechada sem ninguém apontado")
-	# O mouse em cima do corpo abre; fora dele, fecha.
+	# #128: o mouse em cima só marca quem é (o nome numa plaqueta acima da cabeça); a ficha não abre na luta.
 	await _move(body.get_center())
-	t.check(hud.sheet.showing(enemy.id), "o mouse no corpo do inimigo abre a ficha dele")
-	t.check(hud.sheet.find_child("Name", true, false).text == AHCombatHud.unit_name(enemy.display_name), "com o nome dele")
+	t.check(not hud.sheet.showing() and not hud.inspecting(), "o mouse no corpo do inimigo não abre a ficha")
+	t.check(hud._hover_label.visible and hud._hover_label.text == AHCombatHud.unit_name(enemy.display_name), "e mostra o nome dele (%s)" % hud._hover_label.text)
+	t.check(hud._hover_label.get_global_rect().end.y <= body.position.y + body.size.y * 0.25, "acima do corpo")
 	await _move(Vector2(960, 60))
-	t.check(not hud.sheet.showing(), "o mouse fora fecha")
-	# O alvo com foco do teclado: a ficha de quem ele é.
+	t.check(not hud._hover_label.visible, "fora dele, o nome some")
+	await _move(body.get_center())
+	await _touch(body.get_center(), true)
+	await _wait(AHCharacterSheet.LONG_PRESS + 0.1)
+	t.check(not hud.sheet.showing(), "nem o toque longo")
+	await _touch(body.get_center(), false)
+	await _emulated_release(body.get_center())
+	await _frames(3)
+	t.check(hud.waiting, "e a vez continua")
+	# O botão INSPECIONAR liga: o painel de baixo, no lugar do herói da vez, com quem age.
+	var button: Button = hud._panel.find_child("Inspect", true, false)
+	t.check(button != null and button.text == "INSPECIONAR" and button.find_child("Key", true, false) != null, "o botão INSPECIONAR, com a tecla")
+	await _move(Vector2(960, 60))
+	button.pressed.emit()
+	await _frames(3)
+	var panel: Control = hud._panel.find_child("InspectPanel", true, false)
+	var actor: AHCombat.Unit = arena.session.current_actor()
+	t.check(hud.inspecting() and panel.visible, "ligado, o painel abre")
+	t.check(panel.get_global_rect().encloses(hud._panel.find_child("HeroPanel", true, false).get_global_rect()), "no lugar do painel do herói da vez")
+	t.equal(_inspect_name(panel), AHCombatHud.unit_name(actor.display_name), "com quem age")
+	for part in ["Life", "Instinct", "Speed", "Passives", "States"]:
+		t.check(panel.find_child(part, true, false) != null, "com %s" % part)
+	t.check(not hud.sheet.showing(), "sem a ficha solta")
+	# O mouse em cima de outro mostra ele; o clique escolhe.
+	await _move(body.get_center())
+	t.equal(_inspect_name(panel), AHCombatHud.unit_name(enemy.display_name), "o mouse em cima mostra o inimigo")
+	t.check(panel.find_child("Instinct", true, false) == null, "a máquina sem instinto")
+	await _click(body.get_center())
+	await _move(Vector2(960, 60))
+	t.equal(_inspect_name(panel), AHCombatHud.unit_name(enemy.display_name), "o clique escolhe: ele fica sem o mouse")
+	t.check(hud.waiting and arena.session.current_actor() == actor, "e não age")
+	await _inspect_fits(hud, arena, panel)
+	# As setas passam; a tecla fecha; Voltar também.
+	AHUiStyle.using_keys = true
+	var before := _inspect_name(panel)
+	await _press("ui_right")
+	await _frames(2)
+	t.check(_inspect_name(panel) != before, "a seta passa para o personagem ao lado")
+	await _press("combat_examine")
+	await _frames(2)
+	t.check(not hud.inspecting() and not panel.visible and hud.waiting, "a tecla desliga, e a vez continua")
+	var note: String = hud._description.text
+	await _press("combat_examine")
+	await _frames(2)
+	t.check(hud.inspecting(), "a tecla liga")
+	await _press("cancel")
+	await _frames(2)
+	t.check(not hud.inspecting(), "Voltar desliga")
+	t.equal(hud._description.text, note, "com a instrução da vez de volta")
+	# Na mira, a inspeção não liga (o alvo é o foco).
 	var option: Dictionary = {}
 	for entry in arena.session.ability_options(arena.session.current_actor().id):
 		if entry.usable and not entry.self and entry.enemy_side:
 			option = entry
 			break
 	if t.check(not option.is_empty(), "uma habilidade com alvo inimigo"):
-		AHUiStyle.using_keys = true
 		hud._on_ability(option)
 		await _frames(3)
-		var focused := hud.get_viewport().gui_get_focus_owner()
-		t.check(focused != null and focused.has_meta("unit_id") and hud.sheet.showing(focused.get_meta("unit_id")), "o alvo com foco do teclado abre a ficha dele")
-		AHUiStyle.using_keys = false
-		# Na mira, o toque longo no alvo já escolhido só mostra a ficha: soltar não usa a habilidade.
-		var marker_body: Rect2 = hud._body_rect(camera, arena.cards[focused.get_meta("unit_id")])
-		await _touch(marker_body.get_center(), true)
-		await _touch(marker_body.get_center(), false)
-		await _frames(3)
-		var actor_before: String = arena.session.current_actor().id
-		await _touch(marker_body.get_center(), true)
-		await _wait(AHCharacterSheet.LONG_PRESS + 0.1)
-		t.check(hud.sheet.showing(focused.get_meta("unit_id")), "na mira, o toque longo abre a ficha do alvo")
-		await _touch(marker_body.get_center(), false)
-		await _emulated_release(marker_body.get_center())
-		await _frames(5)
-		t.check(hud.waiting and arena.session.current_actor().id == actor_before and not hud._markers.is_empty(), "e soltar não usa a habilidade")
-		AHUiStyle.using_keys = true
+		await _press("combat_examine")
+		await _frames(2)
+		t.check(not hud.inspecting() and not hud.sheet.showing(), "na mira, nem a inspeção nem a ficha")
 		await _press("cancel")
 		await _frames(3)
-		t.check(not hud.sheet.showing(), "Voltar da mira fecha")
-	# Examinar (teclado e controle): a ação abre o foco nos personagens, as setas passam, Voltar fecha.
-	AHUiStyle.using_keys = true
-	var note: String = hud._description.text
-	await _press("combat_examine")
-	await _frames(2)
-	var first: String = hud.sheet.info.get("id", "")
-	t.check(hud.sheet.showing() and first == arena.session.current_actor().id, "Examinar abre a ficha de quem age")
-	await _press("ui_right")
-	await _frames(2)
-	t.check(hud.sheet.showing() and hud.sheet.info.id != first, "a seta passa para o personagem ao lado")
-	await _press("ui_left")
-	await _press("ui_left")
-	await _frames(2)
-	t.check(hud.sheet.showing() and hud.sheet.info.id != first, "e para o outro lado")
-	await _press("cancel")
-	await _frames(2)
-	t.check(not hud.sheet.showing() and hud.waiting, "Voltar fecha o Examinar, e a vez continua")
-	t.equal(hud._description.text, note, "com a instrução da vez de volta")
 	AHUiStyle.using_keys = false
-	# O toque curto não abre; o longo abre até soltar.
-	await _touch(body.get_center(), true)
-	await _frames(2)
-	t.check(not hud.sheet.showing(), "o toque curto não abre")
-	await _wait(AHCharacterSheet.LONG_PRESS + 0.1)
-	t.check(hud.sheet.showing(enemy.id), "o toque longo abre a ficha")
-	await _touch(body.get_center(), false)
-	await _frames(2)
-	t.check(not hud.sheet.showing(), "soltar fecha")
-	await _move(body.get_center(), true)
-	t.check(not hud.sheet.showing(), "o mouse que a Godot emula do toque não abre a ficha")
 	hud._clear_markers()
 
 
-## Na Preparação: o mouse, o foco e o toque longo no cartão.
+## O painel cabe no espaço dele e não cobre o botão, com três estados em todos, no Normal e no Maior (a QA da #128).
+func _inspect_fits(hud: AHCombatHud, arena: AHCombatArena, panel: Control) -> void:
+	var saved: Array = []
+	for unit in arena.session.units():
+		saved.append([unit.bleed.duration, unit.bleed.magnitude, unit.blight.duration, unit.blight.magnitude, unit.mark_duration])
+		unit.bleed.duration = 2
+		unit.bleed.magnitude = 1
+		unit.blight.duration = 2
+		unit.blight.magnitude = 1
+		unit.mark_duration = 2
+	var size := Settings.text_size
+	for text_size in [0, 2]:
+		Settings.set_text_size(text_size)
+		await _frames(4)
+		var button: Control = hud._panel.find_child("Inspect", true, false)
+		for index in hud._examine.size():
+			hud._examine_index = index
+			hud._inspect_info = {}
+			await _frames(3)
+			var rect: Rect2 = panel.get_global_rect()
+			t.check(rect.size.x <= AHCombatHud.KIT_INSPECT_PANEL.size.x + 0.5 and rect.size.y <= AHCombatHud.KIT_INSPECT_PANEL.size.y + 0.5
+				and not rect.intersects(button.get_global_rect()),
+				"texto %d, %s: o painel cabe (%s) e não cobre o botão" % [text_size, hud._examine[index], rect.size])
+	Settings.set_text_size(size)
+	await _frames(3)
+	for i in arena.session.units().size():
+		var unit: AHCombat.Unit = arena.session.units()[i]
+		unit.bleed.duration = saved[i][0]
+		unit.bleed.magnitude = saved[i][1]
+		unit.blight.duration = saved[i][2]
+		unit.blight.magnitude = saved[i][3]
+		unit.mark_duration = saved[i][4]
+
+
+func _inspect_name(panel: Control) -> String:
+	var label := panel.find_child("Name", true, false) as Label
+	return label.text if label != null else ""
+
+
+func _click(point: Vector2) -> void:
+	for pressed in [true, false]:
+		var click := InputEventMouseButton.new()
+		click.button_index = MOUSE_BUTTON_LEFT
+		click.pressed = pressed
+		click.position = point
+		click.global_position = point
+		_tree.root.push_input(click, true)
+		await _frames(2)
+
+
+## Na plataforma (#123): o mouse, o foco e o toque longo na carta.
 func _preparation() -> void:
 	Campaign.state = Campaign.create_initial(89)
 	Campaign.save()
@@ -220,10 +273,11 @@ func _preparation() -> void:
 		if not GameFlow.busy and GameFlow.passage == null and _tree.current_scene != null and _tree.current_scene.name == "Station" and frame > 3:
 			break
 	var hud: AHRefugeHud = _tree.current_scene.hud
-	hud.open_room(S.PREPARATION)
+	hud.open_departure()
+	hud._briefed = hud._draft.phase
 	await _frames(5)
-	var cards: Array = hud._prep.find_children("*", "Button", true, false).filter(func(b): return String(b.name).begins_with("Slot"))
-	if not t.check(cards.size() == 4, "os quatro cartões da Preparação"):
+	var cards: Array = hud._departure.find_children("*", "Button", true, false).filter(func(b): return String(b.name).begins_with("Slot"))
+	if not t.check(cards.size() == 4, "as quatro cartas da plataforma"):
 		return
 	var card: Button = cards[0]
 	var hero_id: String = hud._draft.team[3]
@@ -242,7 +296,7 @@ func _preparation() -> void:
 	await _frames(1)
 	t.check(not hud.sheet.showing(), "o foco que sai fecha")
 	# O toque longo pela tela: abre segurando e, ao soltar, não escolhe o cartão.
-	var selected: int = hud._prep_selected
+	var selected: int = hud._departure.selected
 	var team: Array = hud._draft.team.duplicate()
 	var center: Vector2 = card.get_global_rect().get_center()
 	await _touch(center, true)
@@ -252,7 +306,7 @@ func _preparation() -> void:
 	await _emulated_release(center)
 	await _frames(2)
 	t.check(not hud.sheet.showing(), "soltar fecha")
-	t.equal([hud._prep_selected, hud._draft.team], [selected, team], "e o toque longo não escolhe nem troca o cartão")
+	t.equal([hud._departure.selected, hud._draft.team], [selected, team], "e o toque longo não escolhe nem troca a carta")
 
 
 ## O mouse até o ponto (nas coordenadas da tela do jogo); emulated: o mouse que a Godot cria do toque.

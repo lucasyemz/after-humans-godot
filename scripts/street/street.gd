@@ -90,6 +90,14 @@ var _hud_stats: Label
 var _hud_weather: Label
 var _dev_overlay: Control
 var _dust: CPUParticles3D
+## A ambiência do lugar (#153, AHAmbience): o perfil, as folhas que caem e os respiros de vapor.
+var ambience := {}
+var _leaves: CPUParticles3D
+const DUST_AMOUNT := 220
+const LEAVES_AMOUNT := 26
+const STEAM_AMOUNT := 14
+const EMBERS_AMOUNT := 40
+var _steam: Array[CPUParticles3D] = []
 
 var _leader: CharacterBody3D
 ## Heróis da equipe (a equipe viva da expedição) e as placas deles, na mesma ordem.
@@ -225,6 +233,7 @@ func _ready() -> void:
 	add_child(_fill_light)
 	_build_camera()
 	_build_post_and_hud()
+	_build_ambience()
 	_arena = AHCombatArena.new()
 	add_child(_arena)
 	_arena.setup(self)
@@ -408,10 +417,58 @@ func _build_environment() -> void:
 	add_child(_sun)
 
 
+## O perfil de ambiência do lugar (#153): os respiros de vapor ficam no mundo; a cor, a névoa, o glow e as partículas
+## acompanham o clima e a qualidade em _apply_ambience.
+func _build_ambience() -> void:
+	ambience = AHAmbience.profile(ambience_id())
+	for steam in _steam:
+		steam.queue_free()
+	_steam.clear()
+	for point in ambience.get("steam", []):
+		var vent := CPUParticles3D.new()
+		vent.name = "Steam"
+		vent.position = Vector3(float(point[0]), float(point[1]), float(point[2]))
+		vent.amount = STEAM_AMOUNT
+		vent.lifetime = 4.5
+		vent.preprocess = 4.5
+		vent.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+		vent.emission_sphere_radius = 0.15
+		vent.direction = Vector3(0.15, 1, 0)
+		vent.spread = 12.0
+		vent.gravity = Vector3(0.08, 0.12, 0)
+		vent.initial_velocity_min = 0.25
+		vent.initial_velocity_max = 0.45
+		vent.scale_amount_min = 1.0
+		vent.scale_amount_max = 2.6
+		vent.mesh = _soft_mesh(Vector2(0.9, 0.9), Color(0.82, 0.84, 0.86), 0.14, false)
+		vent.color_ramp = _fade_ramp(Color(1, 1, 1, 1))
+		vent.local_coords = false
+		add_child(vent)
+		_steam.append(vent)
+
+
+## Quantas partículas, pela fração do perfil e da qualidade (trocar a quantidade recomeça a emissão: só quando muda).
+func _set_amount(particles: CPUParticles3D, full: int, ratio: float) -> void:
+	var amount := maxi(1, roundi(full * clampf(ratio, 0.0, 1.0)))
+	if particles.amount != amount:
+		particles.amount = amount
+
+
+## O id do perfil de ambiência: o mapa do cenário ou a Rua das Vitrines.
+func ambience_id() -> String:
+	return scenario.map_name if scenario else "ShopfrontStreet"
+
+
+## Aplica o perfil (de novo pela barra de Admin, que o muda ao vivo): o pós, o glow e a névoa por altura, as partículas.
+func apply_ambience() -> void:
+	ambience = AHAmbience.profile(ambience_id())
+	_apply_weather()
+
+
 func _build_atmosphere() -> void:
 	# Poeira no ar, presa à câmera (como o pó do Emberfall).
 	_dust = CPUParticles3D.new()
-	_dust.amount = 220
+	_dust.amount = DUST_AMOUNT
 	_dust.lifetime = 9.0
 	_dust.preprocess = 9.0
 	_dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
@@ -426,6 +483,27 @@ func _build_atmosphere() -> void:
 	_dust.mesh = _mote_mesh(0.045, Color(1.0, 0.82, 0.6), 1.6)
 	_dust.local_coords = false
 	add_child(_dust)
+	# Folhas secas caindo devagar, de lado (a quantidade é do perfil do lugar, #153).
+	_leaves = CPUParticles3D.new()
+	_leaves.name = "Leaves"
+	_leaves.amount = LEAVES_AMOUNT
+	_leaves.lifetime = 10.0
+	_leaves.preprocess = 10.0
+	_leaves.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	_leaves.emission_box_extents = Vector3(16, 1, 4)
+	_leaves.direction = Vector3(1, -0.4, 0)
+	_leaves.spread = 25.0
+	_leaves.gravity = Vector3(0.12, -0.18, 0)
+	_leaves.initial_velocity_min = 0.2
+	_leaves.initial_velocity_max = 0.5
+	_leaves.angular_velocity_min = -90.0
+	_leaves.angular_velocity_max = 90.0
+	_leaves.scale_amount_min = 0.7
+	_leaves.scale_amount_max = 1.3
+	_leaves.mesh = _soft_mesh(Vector2(0.09, 0.05), Color(0.62, 0.38, 0.16), 0.85, false)
+	_leaves.local_coords = false
+	_leaves.emitting = false
+	add_child(_leaves)
 
 	# Fogueira na rua, com brasas, luz que tremula e fumaça quando a chuva apaga.
 	_dynamic.begin("Campfire", Vector3.ZERO)
@@ -450,7 +528,7 @@ func _build_atmosphere() -> void:
 	_fire_light.shadow_enabled = Settings.effects().lamp_shadows
 
 	_embers = CPUParticles3D.new()
-	_embers.amount = 40
+	_embers.amount = EMBERS_AMOUNT
 	_embers.lifetime = 2.6
 	_embers.position = ue(FIRE.x, FIRE.y + 10, FIRE.z + 30)
 	_embers.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
@@ -739,10 +817,17 @@ func _update_camera(delta: float) -> void:
 		target = Vector3(clampf(leader.x, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN), 1.6, -1.2)
 		pitch = deg_to_rad(4.0)
 		distance = 11.0
-		# No acampamento (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
-		if corridor != null and corridor.camp != null and corridor.camp.active:
+		# No acampamento da casa (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
+		if corridor != null and corridor.camp != null and corridor.camp.active and not corridor.camp.at_stop():
 			target = Vector3(corridor.camp.focus_x, AHCampScene.FOCUS_HEIGHT, -0.2)
 			distance = AHCampScene.FOCUS_DISTANCE
+	# Na parada de descanso (#143), a fogueira fica na rua ou no cenário: a câmera fica parada nela, baixa, e recua o
+	# bastante para a fileira inteira caber (nos cenários a lente é mais fechada, 30° na horizontal).
+	if corridor != null and corridor.camp != null and corridor.camp.active and corridor.camp.at_stop():
+		target = corridor.camp.focus_point()
+		pitch = deg_to_rad(4.0)
+		var half_h := atan(tan(deg_to_rad(_camera.fov * 0.5)) * get_viewport().get_visible_rect().size.aspect())
+		distance = maxf(AHCampScene.FOCUS_DISTANCE, AHCampScene.ROW_HALF_WIDTH / tan(half_h))
 	if _arena != null and _arena.active:
 		# Na luta, a arena enquadra todos e se aproxima do golpe. A altura do alvo põe os pés sempre na mesma linha da
 		# tela, acima do painel do HUD, qualquer que seja a distância.
@@ -750,6 +835,8 @@ func _update_camera(delta: float) -> void:
 		distance = view.y
 		target = Vector3(view.x, floor_y + combat_lift + COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch),
 			(lane_z - 1.35) if scenario else -0.9)
+	# A câmera da barra de Admin (#130): mais perto ou mais longe, na exploração e na luta.
+	distance *= Admin.zoom("fight" if _arena != null and _arena.active else "explore")
 	# O tremor do acerto (#33): desloca a vista sem mover a câmera (a suavização não o arrasta), em pixels da tela.
 	var shake: Vector2 = _arena.camera_shake() if _arena != null and _arena.active else Vector2.ZERO
 	var meters_per_pixel := 2.0 * tan(deg_to_rad(_camera.fov * 0.5)) * distance / 1080.0
@@ -763,6 +850,8 @@ func _update_camera(delta: float) -> void:
 	# Na luta num cenário, o preenchimento acende sobre quem luta (#48).
 	_fill_light.visible = scenario != null and _arena != null and _arena.active
 	_dust.position = Vector3(_camera.position.x, ground + 2.6, -1.0 + (lane_z if scenario else 0.0))
+	if _leaves != null:
+		_leaves.position = Vector3(_camera.position.x, ground + 5.0, -1.5 + (lane_z if scenario else 0.0))
 	_rain.position = Vector3(_camera.position.x + 0.8, ground + 9.0, -1.0 + (lane_z if scenario else 0.0))
 	_splashes.position = Vector3(_camera.position.x, ground + 0.03, -1.0 + (lane_z if scenario else 0.0))
 
@@ -792,9 +881,10 @@ func _build_post_and_hud() -> void:
 	hud.add_child(_dev_overlay)
 	_hud_stats = _label("", 18, Vector2(1380, 1000))
 	_dev_overlay.add_child(_hud_stats)
-	_dev_overlay.add_child(_label("Modo de desenvolvedor (F1)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1046)))
-	_dev_overlay.visible = Settings.dev_mode or _capture_dir != ""
-	Settings.changed.connect(func(): _dev_overlay.visible = Settings.dev_mode or _capture_dir != "")
+	_dev_overlay.add_child(_label("Teclas de teste (Admin)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1046)))
+	# Só na build de teste (#130): na do jogador, o modo gravado de antes não liga nada.
+	_dev_overlay.visible = (Settings.dev_mode and Admin.allowed()) or _capture_dir != ""
+	Settings.changed.connect(func(): _dev_overlay.visible = (Settings.dev_mode and Admin.allowed()) or _capture_dir != "")
 
 
 func _label(text: String, size: int, at: Vector2) -> Label:
@@ -828,6 +918,8 @@ func _weather() -> Dictionary:
 
 func _apply_weather() -> void:
 	var w := _weather()
+	if ambience.is_empty():
+		ambience = AHAmbience.profile(ambience_id())
 	_sun.light_color = w.sun_color
 	_sun.rotation_degrees = w.sun_angle
 	_sky.sky_top_color = w.sky_top
@@ -836,12 +928,14 @@ func _apply_weather() -> void:
 	_sky.ground_bottom_color = w.ground
 	_env.ambient_light_energy = w.ambient
 	_env.fog_light_color = w.fog
-	_env.fog_density = w.fog_density * _fog_boost
+	_env.fog_density = w.fog_density * _fog_boost * float(ambience.get("fog_density", 1.0))
 	# O Compatibility (web) soma a luz direta e o glow mais forte: a mesma cena, calibrada a olho contra o Forward+.
 	_env.tonemap_exposure = w.exposure * (1.0 if _forward_plus else 0.9)
-	_env.glow_intensity = 0.7 if _forward_plus else 0.45
+	AHAmbience.apply_env(_env, ambience, 0.7 if _forward_plus else 0.45)
+	if _post != null:
+		AHAmbience.apply_post(_post, ambience, Settings.level)
 	if _forward_plus:
-		_env.volumetric_fog_density = w.volumetric
+		_env.volumetric_fog_density = w.volumetric * float(ambience.get("volumetric", 1.0))
 		_env.volumetric_fog_albedo = w.fog.lightened(0.3)
 		_env.ssr_enabled = _raining and Settings.effects().ssr
 	for material in _skyline_materials:
@@ -858,6 +952,19 @@ func _apply_weather() -> void:
 	_rain.visible = not covered
 	_dust.emitting = not _raining and not covered and not _reduced_effects()
 	_dust.visible = not covered
+	_set_amount(_dust, DUST_AMOUNT, AHAmbience.particles(ambience, "dust", Settings.level))
+	# As fagulhas da fogueira da rua (quanto do perfil e da qualidade).
+	if _embers != null:
+		_set_amount(_embers, EMBERS_AMOUNT, AHAmbience.particles(ambience, "embers", Settings.level))
+	if _leaves != null:
+		var leaves := AHAmbience.particles(ambience, "leaves", Settings.level)
+		# As folhas secas param na chuva (molhadas, não voam), como a poeira.
+		_leaves.emitting = leaves > 0.0 and not _raining and not covered and not _reduced_effects()
+		_leaves.visible = _leaves.emitting
+		_set_amount(_leaves, LEAVES_AMOUNT, leaves)
+	for steam in _steam:
+		steam.emitting = not covered and not _reduced_effects()
+		_set_amount(steam, STEAM_AMOUNT, 1.0 if Settings.level > 0 else AHAmbience.LOW_PARTICLES)
 	_splashes.emitting = _raining and not covered
 	_splashes.visible = not covered
 	if scenario:
@@ -928,8 +1035,8 @@ func _update_fire(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
 		return
-	# As teclas de teste só valem no modo de desenvolvedor (F1).
-	if not Settings.dev_mode:
+	# As teclas de teste só valem com elas ligadas na barra de Admin, e só na build de teste (#130).
+	if not Settings.dev_mode or not Admin.allowed():
 		return
 	if event.is_action_pressed("debug_time"):
 		_mood = "night" if _mood == "golden" else "golden"
@@ -1053,7 +1160,7 @@ func end_fight() -> void:
 	combat_lift = 0.0
 
 
-## Quem morreu sai da equipe; os outros voltam a andar do lugar onde terminaram a luta.
+## Quem caiu sai da equipe até a volta (#118); os outros voltam a andar do lugar onde terminaram a luta.
 func remove_dead_heroes() -> void:
 	for index in range(party_ids.size() - 1, -1, -1):
 		var hero = Campaign.hero(party_ids[index])

@@ -38,15 +38,12 @@ combat_hud.gd: Status
 combat_hud.gd: status-%s_%s
 combat_hud.gd: Icon
 combat_hud.gd: Count
-combat_hud.gd: %s → %s
 combat_hud.gd: %d–%d
 combat_hud.gd: +%d–%d
 combat_hud.gd: combat_ability_%d
 combat_hud.gd: %s: %s
 combat_hud.gd: %d/%d
 combat_hud.gd: Description
-refuge_hud.gd: %s · %d/%d
-refuge_hud.gd: Role
 refuge_hud.gd: UI
 refuge_hud.gd: Description
 *: abilities
@@ -702,7 +699,7 @@ street.gd: Compatibility
 street.gd: Dynamic
 street.gd: FAIL
 street.gd: Forward+
-street.gd: Modo de desenvolvedor (F1)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões
+street.gd: Teclas de teste (Admin)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões
 street.gd: Occlusion
 street.gd: PASS
 street.gd: Rua: %s não existe; montando em código (rode tools/bake_street.gd).
@@ -879,7 +876,6 @@ fight_rewards.gd: seed
 cargo_picker.gd: Box%d
 cargo_picker.gd: revealed
 combat_hud.gd: Stars
-combat_hud.gd: value
 fight_rewards.gd: Items
 street_corridor.gd: bandage
 camp_hud.gd: Name
@@ -926,7 +922,6 @@ character_sheet.gd: Heading
 character_sheet.gd: Empty
 character_sheet.gd: Row
 character_sheet.gd: part
-combat_hud.gd: since
 inventory_panel.gd: screen
 inventory_panel.gd: detail
 combat_hud.gd: Register
@@ -1018,7 +1013,6 @@ station_report.gd: %s / LB
 character_room.gd: Key
 station_report.gd: Key
 station_report.gd: %s / A
-character_room.gd: +recruit
 character_room.gd: overview
 character_room.gd: facilities
 character_room.gd: characters
@@ -1031,15 +1025,12 @@ character_room.gd: Left
 character_room.gd: Heroes
 character_room.gd: Tab_%s
 character_room.gd: tab
-character_room.gd: Tab_recruit
 character_room.gd: primary
 character_room.gd: UI
-character_room.gd: recruit
 character_room.gd: Ability_%s
 character_room.gd: Detail
 character_room.gd: Max
 character_room.gd: %s · %s
-character_room.gd: %s · %s · %s
 character_room.gd: Right
 character_room.gd: Close
 character_room.gd: X
@@ -1187,11 +1178,6 @@ refuge_hud.gd: Plan_%s
 refuge_hud.gd: %s: %s
 refuge_hud.gd: See_%s
 refuge_hud.gd: Upgrade
-refuge_hud.gd: Preparation
-refuge_hud.gd: Focus_%s
-refuge_hud.gd: [b][color=#%s]%s[/color][/b] %s
-refuge_hud.gd: [lb]
-refuge_hud.gd: Slot%d
 refuge_hud.gd: Supplies
 refuge_hud.gd: Water
 refuge_hud.gd: Power
@@ -1280,6 +1266,21 @@ title_screen.gd: Esc
 title_screen.gd: Esc / B
 title_screen.gd: slot
 briefing_dialog.gd: Esc
+exploration_hud.gd: exposto
+exploration_hud.gd: cansado
+exploration_hud.gd: preparado
+exploration_hud.gd: tool
+exploration_hud.gd: id
+journey_rules.gd: exposto
+journey_rules.gd: vuln
+journey_rules.gd: once
+journey_rules.gd: cansado
+journey_rules.gd: speed
+journey_rules.gd: preparado
+journey_rules.gd: tool
+combat_session.gd: speed
+combat_session.gd: vuln
+journey_rules.gd: log
 phase_map.gd: enemies
 phase_map.gd: story
 phase_map.gd: Plaque
@@ -1336,3 +1337,105 @@ network_radar.gd: known
 network_radar.gd: partial
 phase_map.gd: Footer
 camp_hud.gd: painted
+combat_hud.gd: Inspect
+combat_hud.gd: Key
+combat_hud.gd: X
+combat_hud.gd: Passives
+combat_hud.gd: States
+combat_hud.gd: Identity
+combat_hud.gd: art
+combat_hud.gd: Name
+combat_hud.gd: Kind
+combat_hud.gd: Life
+combat_hud.gd: Instinct
+combat_hud.gd: Speed
+combat_hud.gd: Row
+combat_hud.gd: part
+combat_hud.gd: Empty
+combat_hud.gd: id
+street.gd: fight
+exploration_hud.gd: fallen
+combat_hud.gd: Fallen
+combat_hud.gd: names
+refuge_hud.gd: Fallen_%s
+refuge_hud.gd: Days
+refuge_hud.gd: Treat
+station_report.gd: fallen
+station_report.gd: Fallen
+station_report.gd: days
+station_report.gd: recovered
+character_room.gd: Recovering
+character_room.gd: Recovery
+station_rules.gd: infirmary
+station_rules.gd: infirmary_level_%d
+station_rules.gd: recovery
+station_rules.gd: Scrap
+station_rules.gd: Fragments
+station_rules.gd: Days
+station_rules.gd: memorial
+station_rules.gd: Beds
+station_rules.gd: fallen
+station_rules.gd: Hp
+station_rules.gd: days
+station_rules.gd: Cost
+station_rules.gd: rest_%d
+station_rules.gd: recovered
+station_build.gd: infirmary
+station_build.gd: infirmary@2
+inventory_panel.gd: New
+*: leave
+refuge_hud.gd: closed
+refuge_hud.gd: note
+refuge_hud.gd: ready
+refuge_hud.gd: short
+refuge_hud.gd: %s|%s|%s|%s
+refuge_hud.gd: signature
+refuge_hud.gd: Lock_%s
+refuge_hud.gd: lock
+refuge_hud.gd: %s|%s
+departure_screen.gd: Departure
+departure_screen.gd: Slot1
+departure_screen.gd: Band
+departure_screen.gd: Place
+departure_screen.gd: Warning
+departure_screen.gd: known
+departure_screen.gd: partial
+departure_screen.gd: Supplies
+departure_screen.gd: Focus_%s
+departure_screen.gd: Food
+departure_screen.gd: Lineup
+departure_screen.gd: Cards
+departure_screen.gd: Bench
+departure_screen.gd: %s · %d/%d
+departure_screen.gd: %s · %s · %s
+departure_screen.gd: Bench_%s
+departure_screen.gd: Leave
+departure_screen.gd: Slot%d
+departure_screen.gd: Note
+departure_screen.gd: Control
+departure_screen.gd: Rank
+departure_screen.gd: Esc / B
+departure_screen.gd: Key
+departure_screen.gd: Start
+departure_screen.gd: Confirm
+departure_screen.gd: Cancel
+departure_screen.gd: Go
+departure_screen.gd: %s · %s
+departure_screen.gd: %d. %s
+departure_screen.gd: %s / X
+refuge_hud.gd: origin
+refuge_hud.gd: perks
+character_room.gd: Roster
+station_rules.gd: recruitment
+station_rules.gd: Chance
+station_rules.gd: hero_%s_0
+station_rules.gd: %s:train
+station_rules.gd: origin
+street.gd: steam
+street.gd: embers
+street.gd: Steam
+street.gd: Leaves
+street.gd: dust
+street.gd: leaves
+refuge_hud.gd: %s:%s
+refuge_hud.gd: id
