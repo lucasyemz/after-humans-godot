@@ -1,6 +1,7 @@
 # O Corredor de Contenção: o mapa do tutorial (#147)
 
-O código do mapa da abertura, montado com peças provisórias até a arte da Awesomic (PR #152) chegar. O fluxo do tutorial
+O código do mapa da abertura, montado com peças provisórias até a arte chegar (o PR #152 da Awesomic 2 foi fechado; a
+arte passou para a Awesomic 1, no mesmo contrato `T_TU*`). O fluxo do tutorial
 (o título, as dicas, a recompensa, a chegada) é da #144, que vem por cima deste.
 
 ![As quatro zonas, de noite (o clima do tutorial)](tutorial-map/zones.jpg)
@@ -9,7 +10,7 @@ O código do mapa da abertura, montado com peças provisórias até a arte da Aw
 
 - `data/scenarios/ContainmentCorridor.json`, gerado por `tools/build_containment_corridor.py` no contrato dos cenários
   (as peças com as malhas de `meshes.json`, os materiais, as luzes, as zonas e os props). As medidas são as da página
-  `docs/design/tutorial.md` do PR #152.
+  `docs/design/tutorial.md` do PR #152 (guardada na branch `design-tutorial`).
 - **As zonas:** o corredor de contenção (a partida e a primeira luta), a sala das celas (o Nick, o armário de
   manutenção e a segunda luta), a rota do Nick (o duto, a escada até o alçapão e a terceira luta) e a plataforma (o
   vagão no fosso e o embarque).
@@ -28,8 +29,9 @@ O código do mapa da abertura, montado com peças provisórias até a arte da Aw
 
 - A fase "tutorial" (`AHTutorial`, `data/tutorial.json`) joga pelo corredor de sempre, mas fica fora de
   `AHJourneyRules.PHASES`: não aparece no Mapa da Rede nem no "Jogar de novo".
-- Sete trechos: a partida, a luta 1 (o Broto), o encontro com o Nick, a busca, a luta 2 (o Rastejante de Cabos e o
-  Broto), a luta 3 (o Rastreador Quadrúpede e o Robô) e o trem.
+- Sete trechos: a partida, a luta 1 (o Broto), o encontro com o Nick, a busca, a luta 2 (o Rastejante de Cabos, que
+  empurra) e a luta 3 (o Drone de Expurgo, que contamina) e o trem. Em 40 sorteios seguidos, sem cura entre as lutas,
+  ninguém cai.
 - A porta do fim de cada zona só abre com a zona vencida. A de trás baixa quando a equipe passa, e não há volta.
 - O vagão chega quando a equipe entra na plataforma. O embarque leva à Estação pela passagem do vagão (#75).
 
@@ -49,6 +51,9 @@ O código do mapa da abertura, montado com peças provisórias até a arte da Aw
 | Rodada | Veredito | O que a QA achou | Como ficou |
 |---|---|---|---|
 | 1 | REPROVADO | **Médias:** o Menu deixava voltar à Estação e abandonava a abertura; o objetivo dizia "Vencer o guardião"; o vagão aparecia parado durante o fade e depois sumia para chegar; o embarque não usava a passagem do vagão; o céu atrás das paredes e o escuro na noite real. **Baixas:** a plaqueta com o clima, o painel parado, o som da porta, o ícone do trem, os nomes das zonas fora do PO, o Pipoco e a Faísca soltos na lore | Todas corrigidas |
+| 2 | REPROVADO | **Alta:** com o Robô, a luta 3 matava a dupla com a vida que sobrava da luta 2, e o teste escondia isso curando entre as lutas | A luta 3 voltou ao Rastreador e o teste parou de curar |
+| 3 | REPROVADO | **Alta:** o Bento ainda morria em 2 de 5 percursos sem cura | As lutas 2 e 3 ficaram mais leves (o Rastejante sozinho, o Drone de Expurgo) |
+| 4 | APROVADO | 10 percursos andando, sem cura: as três lutas vencidas, ninguém caiu, a menor vida no fim foi 11 | — |
 
 ## Para o Lucas
 
