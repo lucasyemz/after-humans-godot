@@ -318,7 +318,7 @@ func _return_report() -> bool:
 		return false
 	if not await _until(func(): return hud.current == "report", "o relatório abrir depois da chegada", 30.0):
 		return false
-	t.equal(_station().lineup.map(func(e): return e.hero_id), alive, "os que voltaram estão na fila do relatório")
+	t.equal(_station().lineup.map(func(e): return e.hero_id), AHStationReport.scene_order(alive), "os que voltaram estão na fila do relatório, na ordem da formação")
 	var report: Dictionary = Campaign.state.station.last_return
 	t.equal(report.get("result", ""), "victory", "o relatório é de vitória")
 	t.equal(report.get("phase_id", ""), "fase_1", "o relatório é da fase 1")

@@ -151,8 +151,12 @@ func _screens() -> void:
 	hud.close_panel()
 	await _frames(2)
 	t.check(hud.current == "" and not is_instance_valid(hud._room_screen), "e fechar a Sala volta à vista geral")
-	t.equal(station.residents.values().filter(func(card): return is_instance_valid(card) and not card.visible and not station.lineup.any(func(e): return e.card == card)).size(),
-		0, "os moradores voltam com a Sala fechada")
+	# Quem ainda sai andando da plataforma (#131) só volta ao cômodo depois de sair da câmera.
+	var walking: Array = station._leaving.map(func(e): return e.hero_id)
+	var hidden: Array = station.residents.keys().filter(func(id): return is_instance_valid(station.residents[id]) and not station.residents[id].visible and not walking.has(id))
+	t.equal(hidden, [], "os moradores voltam com a Sala fechada")
+	await _until(func(): return not station.lineup_leaving())
+	t.equal(station.residents.values().filter(func(card): return is_instance_valid(card) and not card.visible).size(), 0, "e quem saía da plataforma também, ao sair da câmera")
 
 
 func _press(action: String) -> void:
