@@ -1,5 +1,5 @@
-"""Leva a captura do capture.gd para before/: os PNG em WebP (qualidade 88, com _clean no nome), o fight_two.json como
-saiu, e o fight_two_hud.json, o mesmo DTO no formato que hud-luta/render.mjs lê (loop-screens/before/<nome>.json): as
+"""Leva a captura do capture_map.gd (com a zona 1 copiada como explore_two.png) para before/: os PNG em WebP
+(qualidade 88, com _clean no nome), o fight_two.json como saiu, e o fight_two_hud.json, o mesmo DTO no formato que hud-luta/render.mjs lê (loop-screens/before/<nome>.json): as
 unidades, quem age e os textos que ele usa (a plaquinha do nome sob cada um, a faixa da rodada e o alcance das
 habilidades de quem age, de data/abilities.json).
 

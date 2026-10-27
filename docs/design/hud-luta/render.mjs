@@ -54,7 +54,7 @@ useCapture();
 const FACE = { Bento: "bento", Nick: "nick", "Íris": "iris", "Véspera": "vespera" };
 // Os rostos: o retrato dos heróis e, nas máquinas, o recorte do sprite (coordenadas do canvas 1178 convertidas para a
 // textura de 589, como no render.py do alvo).
-const SPRITE = { recreador: [360, 20, 800, 460], sussurrador: [360, 160, 850, 650] };
+const SPRITE = { recreador: [360, 20, 800, 460], sussurrador: [360, 160, 850, 650], cao_eco: [760, 500, 1080, 820] };
 function face(u, size, bg) {
   let file, box, tex;
   if (u.player) { file = `art/ui/portraits/${FACE[u.name]}.png`; box = [40, 0, 230, 190]; tex = 256; }

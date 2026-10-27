@@ -1,11 +1,11 @@
 {
- "actor": "unit_hero_gato_nick",
+ "actor": "unit_hero_cao_bento",
  "name": "fight_two",
  "texts": [
   {
    "text": "Bento",
    "rect": [
-    625.598022460938,
+    565.6201171875,
     720,
     160,
     22
@@ -14,16 +14,16 @@
   {
    "text": "Nick",
    "rect": [
-    343.199584960938,
+    216.38909912109398,
     720,
     160,
     22
    ]
   },
   {
-   "text": "Recreador",
+   "text": "Rastreador Quadrúpede",
    "rect": [
-    1093.63220214844,
+    1144.84387207031,
     720,
     160,
     22
@@ -32,7 +32,7 @@
   {
    "text": "Emissor de Comando",
    "rect": [
-    1403.89135742188,
+    1529.73937988281,
     720,
     160,
     22
@@ -48,7 +48,7 @@
    ]
   },
   {
-   "text": "Nick · agora",
+   "text": "Bento · agora",
    "rect": [
     0,
     0,
@@ -57,7 +57,7 @@
    ]
   },
   {
-   "text": "Recreador",
+   "text": "Nick",
    "rect": [
     0,
     0,
@@ -75,7 +75,7 @@
    ]
   },
   {
-   "text": "Bento",
+   "text": "Rastreador",
    "rect": [
     0,
     0,
@@ -84,7 +84,7 @@
    ]
   },
   {
-   "text": "Corte de Fase",
+   "text": "Punho de Sucata",
    "rect": [
     0,
     0,
@@ -93,7 +93,7 @@
    ]
   },
   {
-   "text": "4–6",
+   "text": "5–8",
    "rect": [
     0,
     0,
@@ -102,7 +102,7 @@
    ]
   },
   {
-   "text": "Salto Entre Ruínas",
+   "text": "Impacto Hidráulico",
    "rect": [
     0,
     0,
@@ -120,7 +120,7 @@
    ]
   },
   {
-   "text": "Sumir na Sombra",
+   "text": "Fique Atrás de Mim",
    "rect": [
     0,
     0,
@@ -138,7 +138,7 @@
    ]
   },
   {
-   "text": "Caçada Precisa",
+   "text": "Não Estamos Sós",
    "rect": [
     0,
     0,
@@ -147,7 +147,7 @@
    ]
   },
   {
-   "text": "7–10",
+   "text": "",
    "rect": [
     0,
     0,
@@ -193,16 +193,16 @@
    "block": 0,
    "class_id": "",
    "dodge": 0,
-   "enemy_id": "recreador",
+   "enemy_id": "cao_eco",
    "guard": 0,
-   "hp": 8,
-   "id": "corridor_1117577169_2_0_recreador",
+   "hp": 10,
+   "id": "corridor_2885921763_2_0_cao_eco",
    "instinct": 0,
-   "max_hp": 8,
-   "name": "Recreador",
+   "max_hp": 10,
+   "name": "Rastreador Quadrúpede",
    "player": false,
    "rank": 1,
-   "speed": 3,
+   "speed": 4,
    "stun": 0
   },
   {
@@ -211,10 +211,10 @@
    "dodge": 0,
    "enemy_id": "sussurrador",
    "guard": 0,
-   "hp": 6,
-   "id": "corridor_1117577169_2_1_sussurrador",
+   "hp": 8,
+   "id": "corridor_2885921763_2_1_sussurrador",
    "instinct": 0,
-   "max_hp": 6,
+   "max_hp": 8,
    "name": "Emissor de Comando",
    "player": false,
    "rank": 2,

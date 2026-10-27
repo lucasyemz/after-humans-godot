@@ -3,7 +3,7 @@ projeto na Awesomic) para art/scenarios/, no contrato dos cenários de hoje (too
 WebP qualidade 88, até 1024 px no lado maior, opaco sem alfa e recortado com alfa (os cards "masked"). Os pares de busca e de porta (T_TUX*) saem com o mesmo tamanho, recortados pela mesma
 caixa, como os _Open de hoje.
 
-Uso: python3 -B docs/design/tutorial/cut_scenario.py <pasta images/tutorial>
+Uso: python3 -B docs/design/tutorial/cut_scenario.py <pasta images/tutorial>  (a segunda versão em <pasta>/v2)
 """
 import sys
 from pathlib import Path
@@ -16,8 +16,7 @@ from cut_icons import unmix, despill_edges  # noqa: E402
 
 OUT = ROOT / "art/scenarios"
 # As superfícies opacas (paredes e piso): a imagem inteira, reduzida.
-SURFACES = {"T_TU01": ("tu-wall-corridor.png", 1024), "T_TU02": ("tu-floor.png", 1024), "T_TU03": ("tu-wall-platform.png", 1024),
-            "T_TU09": ("tu-platform-floor.png", 1024)}
+SURFACES = {"T_TU09": ("tu-platform-floor.png", 1024)}
 # Os elementos recortados, um por imagem (a folha 3x2, tu-props-sheet.png, foi a referência deles); a lâmpada sai
 # recortada da própria folha (ela é pequena na cena). A escada é a segunda versão (tu-ladder-2.png: de lado, até o
 # alçapão no teto).
@@ -81,8 +80,75 @@ def lit_lamp(lamp: Image.Image) -> Image.Image:
     return on
 
 
+# A segunda versão (os ajustes do Lucas de 26/10, em images/tutorial/v2): uma parede por zona, sem repetição, com o alto
+# no escuro e a sujeira na base; as aberturas (portas, celas, o túnel) vêm em magenta e viram alfa, para o escuro mais
+# fundo atrás delas ser uma caixa de verdade na cena. Os pisos vistos de cima (o fundo em cima: a sujeira e a água do pé
+# da parede), os objetos do chão e as silhuetas do primeiro plano (escuras e um pouco desfocadas).
+WALLS = {"T_TU01": "tu2-wall-corridor.png", "T_TU11": "tu2-wall-cells.png", "T_TU12": "tu2-wall-route.png",
+         "T_TU03": "tu2-wall-platform.png"}
+FLOORS = {"T_TU02": "tu2-floor-corridor.png", "T_TU13": "tu2-floor-corridor-2.png"}
+# As caixas (px) de cada peça nas folhas, medidas pelos pedaços conexos fora do magenta.
+SHEET_PROPS = {"T_TU14": (40, 72, 420, 356), "T_TU15": (504, 44, 860, 368), "T_TU16": (960, 40, 1304, 380),
+               "T_TU17": (48, 436, 452, 700), "T_TU19": (1012, 464, 1344, 696)}
+# (A raiz caída da folha, em 504, 420, 984, 732, saiu igual à T_TU05 e ficou de fora.)
+SHEET_FRONT = {"T_TU20": (48, 24, 1184, 232), "T_TU21": (52, 268, 836, 544), "T_TU22": (1196, 80, 1316, 740)}
+# (A grade de proteção da folha, em 452, 548, 1136, 744, ficou de fora: no chão perto da câmera ela sai do quadro.)
+
+
+def keyed_wall(im: Image.Image) -> Image.Image:
+    """A parede com as aberturas em alfa: o magenta (e o halo rosado em volta) sai; a borda fica dura (o jogo corta o
+    alfa em 0,333)."""
+    im = im.convert("RGBA")
+    px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, _ = px[x, y]
+            if r > 150 and b > 150 and g < 120 and min(r, b) - g > 70:
+                px[x, y] = (0, 0, 0, 0)
+    hole = im.getchannel("A").point(lambda v: 255 if v == 0 else 0).filter(ImageFilter.MaxFilter(5))
+    a = ImageChops.subtract(im.getchannel("A"), hole)
+    im.putalpha(a)
+    # O alto no escuro, igual nas quatro: o terço de cima vai para o preto (a pintura do corredor quase não escurecia).
+    px = im.load()
+    for y in range(im.height):
+        k = min(1.0, y / (im.height * 0.36)) ** 1.4
+        if k >= 1.0:
+            break
+        for x in range(im.width):
+            r, g, b, al = px[x, y]
+            px[x, y] = (int(r * k), int(g * k), int(b * k), al)
+    return clean(im)
+
+
+def front(im: Image.Image) -> Image.Image:
+    """A peça do primeiro plano: um pouco mais escura (a luz da cena a recorta) e desfocada, com o alfa macio. No jogo de
+    hoje o alfa é cortado em 0,333 (a silhueta fica um pouco mais larga); com o card em alpha blend, que é do código, o
+    desfoque aparece inteiro."""
+    rgb = im.convert("RGB").point(lambda v: int(v * 0.85)).filter(ImageFilter.GaussianBlur(4))
+    a = im.getchannel("A").filter(ImageFilter.GaussianBlur(4))
+    rgb.putalpha(a)
+    return rgb
+
+
+def rework(src: Path) -> None:
+    for name, file in WALLS.items():
+        save(shrink(keyed_wall(Image.open(src / file)), 1024), name)
+    for name, file in FLOORS.items():
+        save(shrink(Image.open(src / file).convert("RGB"), 1024), name)
+    # O piso da rota do Nick: o do corredor espelhado (as zonas a cada duas amostras repetiam as mesmas poças).
+    save(shrink(Image.open(src / FLOORS["T_TU02"]).convert("RGB").transpose(Image.Transpose.FLIP_LEFT_RIGHT), 1024), "T_TU24")
+    bbox = lambda im: im.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()
+    for sheet, boxes, finish in (("tu2-props-sheet.png", SHEET_PROPS, None), ("tu2-foreground-sheet.png", SHEET_FRONT, front)):
+        whole = Image.open(src / sheet)
+        for name, (x0, y0, x1, y1) in boxes.items():
+            piece = cut(whole.crop((max(0, x0 - 12), max(0, y0 - 12), x1 + 12, y1 + 12)))
+            piece = piece.crop(bbox(piece))
+            save(shrink(finish(piece) if finish else piece, 1024), name)
+
+
 def main(src: str) -> None:
     src = Path(src)
+    rework(src / "v2")
     for name, (file, side) in SURFACES.items():
         save(shrink(Image.open(src / file).convert("RGB"), side), name)
     bbox = lambda im: im.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()

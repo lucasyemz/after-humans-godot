@@ -1,47 +1,47 @@
 {
- "actor": "unit_hero_gato_nick",
+ "actor": "unit_hero_cao_bento",
  "options": [
   {
-   "id": "gato_corte_fase",
-   "name": "Corte de Fase",
+   "id": "cao_punho_sucata",
+   "name": "Punho de Sucata",
    "usable": true
   },
   {
-   "id": "gato_salto_entre_ruinas",
-   "name": "Salto Entre Ruínas",
+   "id": "cao_impacto_hidraulico",
+   "name": "Impacto Hidráulico",
    "usable": true
   },
   {
-   "id": "gato_sumir_na_sombra",
-   "name": "Sumir na Sombra",
+   "id": "cao_fique_atras_de_mim",
+   "name": "Fique Atrás de Mim",
    "usable": true
   },
   {
-   "id": "gato_cacada_precisa",
-   "name": "Caçada Precisa",
-   "usable": false
+   "id": "cao_nao_estamos_sos",
+   "name": "Não Estamos Sós",
+   "usable": true
   }
  ],
  "order": [
+  "unit_hero_cao_bento",
   "unit_hero_gato_nick",
-  "corridor_1117577169_2_0_recreador",
-  "corridor_1117577169_2_1_sussurrador",
-  "unit_hero_cao_bento"
+  "corridor_2885921763_2_1_sussurrador",
+  "corridor_2885921763_2_0_cao_eco"
  ],
  "round": 1,
  "units": [
   {
    "body": [
-    619.82373046875,
-    367.025787353516,
-    199.313659667969,
-    407.268707275391
+    549.978149414062,
+    245.779724121094,
+    242.807922363281,
+    531.689880371094
    ],
    "class_id": "cao",
    "enemy_id": "",
    "feet": [
-    705.598022460938,
-    774.294494628906
+    645.6201171875,
+    777.469604492188
    ],
    "hp": 34,
    "id": "unit_hero_cao_bento",
@@ -54,16 +54,16 @@
   },
   {
    "body": [
-    331.61767578125,
-    413.287841796875,
-    219.592102050781,
-    358.84130859375
+    203.037811279297,
+    306.247497558594,
+    259.340301513672,
+    470.533630371094
    ],
    "class_id": "gato",
    "enemy_id": "",
    "feet": [
-    423.199584960938,
-    772.129150390625
+    296.389099121094,
+    776.781127929688
    ],
    "hp": 24,
    "id": "unit_hero_gato_nick",
@@ -76,47 +76,48 @@
   },
   {
    "body": [
-    1051.60559082031,
-    332.288146972656,
-    233.126831054688,
-    424.34521484375
+    1075.22998046875,
+    300.620300292969,
+    314.494750976562,
+    471.217834472656
    ],
    "class_id": "",
-   "enemy_id": "recreador",
+   "enemy_id": "cao_eco",
    "feet": [
-    1173.63220214844,
-    756.633361816406
+    1224.84387207031,
+    771.838134765625
    ],
-   "hp": 8,
-   "id": "corridor_1117577169_2_0_recreador",
+   "hp": 10,
+   "id": "corridor_2885921763_2_0_cao_eco",
    "instinct": 0,
-   "max_hp": 8,
-   "name": "Recreador",
+   "max_hp": 10,
+   "name": "Rastreador Quadrúpede",
    "player": false,
    "rank": 1,
-   "speed": 3
+   "speed": 4
   },
   {
    "body": [
-    1393.87292480469,
-    387.349792480469,
-    208.839233398438,
-    367.221313476562
+    1474.66003417969,
+    289.194091796875,
+    289.653076171875,
+    481.984130859375
    ],
    "class_id": "",
    "enemy_id": "sussurrador",
    "feet": [
-    1483.89135742188,
-    754.571105957031
+    1609.73937988281,
+    771.17822265625
    ],
-   "hp": 6,
-   "id": "corridor_1117577169_2_1_sussurrador",
+   "hp": 8,
+   "id": "corridor_2885921763_2_1_sussurrador",
    "instinct": 0,
-   "max_hp": 6,
+   "max_hp": 8,
    "name": "Emissor de Comando",
    "player": false,
    "rank": 2,
    "speed": 3
   }
- ]
+ ],
+ "zone": 0
 }

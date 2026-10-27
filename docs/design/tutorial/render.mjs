@@ -1,7 +1,8 @@
 // O tutorial (#146): os cartões da abertura, as dicas na exploração e na luta, a visita guiada da Estação e a campanha
 // nova com Pular tutorial, no kit da Awesomic (art/ui/kit/station).
-// Fundos: as capturas limpas do jogo com a equipe da abertura (só o Bento e o Nick, capture.gd: a Rua das Vitrines, que
-// a #144 usa até o mapa do tutorial ficar pronto) e as de hud-v2/before (a Estação e o título).
+// Fundos: as capturas limpas do jogo com a equipe da abertura (só o Bento e o Nick) no mapa do tutorial, o Corredor de
+// Contenção montado na Godot (capture_map.gd: a zona 1 e a primeira luta, nela), e as de hud-v2/before (a Estação e o
+// título).
 // Uso (da raiz do repositório, com python3 -m http.server 8765 --bind 127.0.0.1 servindo a raiz):
 //   node docs/design/tutorial/render.mjs http://127.0.0.1:8765
 import {
@@ -34,54 +35,43 @@ function tip({ x, y, width = 560, step, title, text, keys, arrow = null, arrowAt
     pointer + `</div>`;
 }
 
-// ------------------------------------------------------------------ 1. os cartões da abertura
-// No idioma do cartão de passagem (passage_card.gd, hud-fluxo): o aço escuro, a chapa do kit com o título grande, a
-// divisa com o losango âmbar e a linha de baixo; o aviso de pular no canto. Por enquanto só texto, com o fade de hoje.
+// ------------------------------------------------------------------ 1. a abertura
+// Um cartão só (a decisão do Lucas de 26/10): "Você precisa escapar.", no idioma do cartão de passagem
+// (passage_card.gd, hud-fluxo): o aço escuro, a chapa do kit com a frase grande e a divisa com o losango âmbar; o aviso
+// de pular no canto. O fade continua o de hoje, e a tirinha entra depois.
 const STEEL = `<div class="abs" style="inset:0;background:#1b1d20 url(${BASE}/art/ui/kit/combat/steel_material.webp);background-blend-mode:multiply"></div>`;
-const CARDS = [
-  ["Antes da Estação", "As máquinas dos Antigos ainda cumprem ordens que ninguém cancelou."],
-  ["Bento", "Saiu atrás de suprimentos. Uma área antiga entrou em contenção e baixou as portas com ele lá dentro."],
-  ["Nick", "Viajava sozinho. Viu uma saída que as máquinas não vigiam, e voltou."],
-  ["A plataforma", "No fim do corredor, um trem ainda espera."],
-];
-function plate(i, bottom) {
-  const [title, sub] = CARDS[i];
-  return `<div class="abs" data-hit="panel" style="left:50%;transform:translateX(-50%);${bottom}">` + nine("panel_large", { repeat: "round", cls: "col", extra: "min-width:820px;max-width:1000px;gap:10px;align-items:center;padding:6px 0" },
-    `<span class="tx semi up" style="font-size:calc(56px*var(--k));line-height:1.12">${title}</span>` +
-    `<div class="row" style="gap:12px">${img("art/ui/kit/station/divider.webp", "width:180px;height:8px")}<i style="width:10px;height:10px;background:var(--amber);transform:rotate(45deg)"></i>${img("art/ui/kit/station/divider.webp", "width:180px;height:8px")}</div>` +
-    `<span class="wrap f30" style="text-align:center;max-width:900px">${sub}</span>`) + `</div>`;
-}
-// O passo da abertura (quatro pontos, o de agora em âmbar) e o pular, como no cartão de passagem.
-const dots = (i) => `<div class="abs row" style="left:50%;transform:translateX(-50%);bottom:40px;gap:12px">` +
-  CARDS.map((_, j) => `<i style="width:12px;height:12px;transform:rotate(45deg);background:${j === i ? "var(--amber)" : "#4a4e55"}"></i>`).join("") + `</div>`;
+const CARD = "Você precisa escapar.";
+const cardDivider = `<div class="row" style="gap:12px">${img("art/ui/kit/station/divider.webp", "width:180px;height:8px")}<i style="width:10px;height:10px;background:var(--amber);transform:rotate(45deg)"></i>${img("art/ui/kit/station/divider.webp", "width:180px;height:8px")}</div>`;
+const plate = () => `<div class="abs" data-hit="panel" style="left:50%;top:50%;transform:translate(-50%,-50%)">` + nine("panel_large", { repeat: "round", cls: "col", extra: "min-width:820px;max-width:1000px;gap:16px;align-items:center;padding:18px 0" },
+  `<span class="tx semi" style="font-size:calc(56px*var(--k));line-height:1.12">${CARD}</span>` + cardDivider) + `</div>`;
 const skip = `<div class="abs" data-hit="skip" style="right:40px;bottom:28px">` + nine("keys_bar", { cls: "row", extra: "gap:14px;height:calc(56px*var(--k));justify-content:center" },
   `<div class="row" style="gap:6px">${key("E")}<span class="tx f22">Avançar</span></div><div class="row" style="gap:6px">${key("Esc")}<span class="tx f22">Pular abertura</span></div>`) + `</div>`;
-const openingCard = () => STEEL + plate(1, "top:calc(50% - 150px)") + dots(1) + skip;
-// O lugar da tirinha: o quadro 16:9 no alto (1120 × 630), a chapa do texto embaixo. Até a tirinha existir, o quadro
-// mostra a prévia do corredor de contenção (zone_corridor.webp), no lugar e na medida dela.
+const openingCard = () => STEEL + plate() + skip;
+// O lugar da tirinha, depois do cartão: o quadro 16:9 no meio (1440 × 810, na moldura do kit), sem texto por cima (a
+// tirinha conta sozinha). Até ela existir, o quadro mostra a zona 1 do corredor de contenção, capturada na Godot.
 const openingFrame = () => STEEL +
-  `<div class="abs" style="left:400px;top:56px;width:1120px;height:630px">${img("docs/design/tutorial/zone_corridor.webp", "position:absolute;left:8px;top:8px;width:1104px;height:614px;object-fit:cover")}${nine("square_portrait", { extra: "position:absolute;inset:0" })}</div>` +
-  plate(3, "bottom:calc(110px - 20px*(var(--k) - 1)/0.3)") + dots(3) + skip;
+  `<div class="abs" style="left:240px;top:110px;width:1440px;height:810px">${img("docs/design/tutorial/zone_corridor.webp", "position:absolute;left:8px;top:8px;width:1424px;height:794px;object-fit:cover")}${nine("square_portrait", { extra: "position:absolute;inset:0" })}</div>` +
+  skip;
 
 // ------------------------------------------------------------------ 2. as dicas na exploração e na luta
 const TWO = [["bento", "Bento", 34, 34], ["nick", "Nick", 24, 24]];
-// A rua da abertura (a Rua das Vitrines até o mapa do tutorial chegar): o passo 1, andar. O destaque é a dupla.
+// O corredor de contenção (a zona 1 do mapa do tutorial): o passo 1, andar. O destaque é a dupla.
 const tutorialExplore = () => OWN("explore_two") +
   // O nome do lugar é a proposta da #147 (Corredor de Contenção); o corredor curto da abertura tem cinco trechos (a
   // partida, as três lutas e a busca entre a primeira e a segunda), todos à vista. O mapa é um subsolo: sem clima.
   frame({ place: "Corredor de Contenção", sub: "Abertura", title: "Trecho 1 de 5 · Partida", team: TWO,
     route: [["start", "now"], ["combat", "known"], ["loot", "known"], ["combat", "known"], ["combat", "known"]],
     goal: { kicker: "Objetivo", title: "Chegar à plataforma", text: "O trem no fim do corredor é a saída.", done: false } }) +
-  spot(740, 700, 320, 290, 0.5) +
-  tip({ x: 1110, y: 560, width: 560, step: 1, title: "Ande até o fim do corredor", text: "O Bento e o Nick andam juntos. As portas fecham atrás de vocês: a saída é para a frente.", keys: [["A|D", "Andar"], ["Shift", "Correr"]], arrow: "left" });
-// Os passos da luta: a dica fica no alto à esquerda, acima das cabeças (a faixa livre sob o REGISTRO), sem seta: o
-// destaque mostra onde apertar.
+  spot(680, 500, 410, 380, 0.5) +
+  tip({ x: 64, y: 560, width: 560, step: 1, title: "Ande até o fim do corredor", text: "O Bento e o Nick andam juntos. As portas fecham atrás de vocês: a saída é para a frente.", keys: [["A|D", "Andar"], ["Shift", "Correr"]], arrow: "right" });
+// Os passos da luta: a dica fica no alto à direita, acima das máquinas (a câmera da luta no corredor põe as cabeças da
+// dupla logo abaixo do REGISTRO), sem seta: o destaque mostra onde apertar. No alvo, ela fica à direita do destaque.
 // A luta da abertura: o passo 3, escolher a habilidade, e o passo 4, escolher o alvo.
 useCapture("docs/design/tutorial/before/fight_two_hud");
 const tutorialCombat = (p) => combat(p, { bg: "docs/design/tutorial/before/fight_two", withRing: false, target: false, aim: false,
-  extra: spot(678, 806, 636, 248, 0.5) + tip({ x: 28, y: 108, width: 600, step: 2, title: "Escolha uma habilidade", text: "É a vez do Nick. Cada herói tem quatro; o número no canto é a tecla.", keys: [["1|2|3|4", "Habilidade"]] }) });
+  extra: spot(678, 806, 636, 248, 0.5) + tip({ x: 1292, y: 96, width: 600, step: 2, title: "Escolha uma habilidade", text: "É a vez do Bento. Cada herói tem quatro; o número no canto é a tecla.", keys: [["1|2|3|4", "Habilidade"]] }) });
 const tutorialTarget = (p) => combat(p, { bg: "docs/design/tutorial/before/fight_two", withRing: false, target: false,
-  extra: spot(1040, 320, 258, 492, 0.5) + tip({ x: 28, y: 108, width: 600, step: 3, title: "Escolha o alvo", text: "Corte de Fase alcança o Recreador. Aperte E, ou clique nele, para atacar.", keys: [["Setas", "Trocar o alvo"], ["E", "Atacar"]] }) });
+  extra: spot(1060, 290, 330, 510, 0.5) + tip({ x: 1416, y: 96, width: 476, step: 3, title: "Escolha o alvo", text: "Punho de Sucata alcança o Rastreador. Aperte E, ou clique nele, para atacar.", keys: [["Setas", "Trocar o alvo"], ["E", "Atacar"]] }) });
 
 // ------------------------------------------------------------------ 3. a visita guiada da Estação
 // A primeira vez na Estação: a tela escurecida, a moldura no que se mostra, a fala do Bento com o retrato e o passo,
