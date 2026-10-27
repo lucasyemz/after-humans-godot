@@ -119,9 +119,15 @@ static func search(campaign: Dictionary) -> String:
 	return ", ".join(parts)
 
 
-## O fôlego da busca (Search.Heal, a fração da vida máxima): entre a segunda e a terceira luta a equipe se recompõe, e o
-## piso de vida 1 das lutas do tutorial fica só como rede, não como o que segura a luta do Drone. Devolve se alguém curou.
+## O fôlego (Search.Heal, a fração da vida máxima): entre a segunda e a terceira luta a equipe se recompõe, e o piso de
+## vida 1 das lutas do tutorial fica só como rede, não como o que segura a luta do Drone. Vem uma vez só por jornada: na
+## busca do armário ou, para quem passou sem vasculhar, ao chegar à zona da luta (breath_on_arrival). Devolve se alguém
+## curou.
 static func catch_breath(campaign: Dictionary) -> bool:
+	var expedition: Dictionary = campaign.session.expedition
+	if expedition.get("tutorial_breath", false):
+		return false
+	expedition.tutorial_breath = true
 	var heal := float(journey().get("Search", {}).get("Heal", 0.0))
 	var healed := false
 	for hero_id in campaign.session.expedition.team:
@@ -131,6 +137,24 @@ static func catch_breath(campaign: Dictionary) -> bool:
 		hero.hp = mini(int(hero.max_hp), int(hero.hp) + ceili(float(hero.max_hp) * heal))
 		healed = true
 	return healed
+
+
+## O trecho da luta que vem depois da busca (o trecho seguinte ao "loot" em Steps): a luta do Drone.
+static func breath_step() -> int:
+	var steps: Array = journey().get("Steps", [])
+	var loot := steps.find("loot")
+	return loot + 1 if loot >= 0 and loot + 1 < steps.size() else -1
+
+
+## A equipe chega à zona dos trechos first..first+count-1: se a luta do Drone está nela e o fôlego ainda não veio da
+## busca, ele vem agora (quem passou pelo armário sem vasculhar não enfrenta o Drone sem fôlego). Devolve se alguém curou.
+static func breath_on_arrival(campaign: Dictionary, first: int, count: int) -> bool:
+	if not is_tutorial(campaign):
+		return false
+	var step := breath_step()
+	if step < first or step >= first + count:
+		return false
+	return catch_breath(campaign)
 
 
 ## O Nick (JoinTeam) entra na equipe e o encontro fica resolvido. Devolve quem entrou.

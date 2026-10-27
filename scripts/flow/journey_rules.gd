@@ -961,7 +961,8 @@ static func search_scenario_prop(campaign: Dictionary, prop: int, object_name: S
 	if route.get("node_type", "") == AHTutorial.PHASE_ID:
 		var found := AHTutorial.search(campaign)
 		if AHTutorial.catch_breath(campaign):
-			found += TranslationServer.translate(". A equipe recupera o fôlego.")
+			var breath := TranslationServer.translate("A equipe recupera o fôlego.")
+			found = breath if found == "" else found + ". " + breath
 		return {"ok": true, "text": found, "event": ""}
 	# O objeto com escolha abre um evento do lugar (o do objetivo da rota fica com o achado dele).
 	if route.choice_props.has(prop) and prop != int(route.objective_prop):

@@ -993,7 +993,7 @@ msgstr "Finish the fight or the event before going back."
 #: scripts/ui/exploration_hud.gd:1442
 #: scripts/ui/exploration_hud.gd:1664
 #: scripts/ui/phase_map.gd:169
-#: scripts/street/street_corridor.gd:1601
+#: scripts/street/street_corridor.gd:1606
 msgid "Voltar à Estação"
 msgstr "Back to the Station"
 
@@ -3599,22 +3599,22 @@ msgid "Este cômodo já mudou de nível."
 msgstr "This room has already changed level."
 
 #: scripts/flow/station_rules.gd:348
-#: scripts/street/street_corridor.gd:1367
+#: scripts/street/street_corridor.gd:1372
 msgid "sucata"
 msgstr "scrap"
 
 #: scripts/flow/station_rules.gd:348
-#: scripts/street/street_corridor.gd:1367
+#: scripts/street/street_corridor.gd:1372
 msgid "sucatas"
 msgstr "scrap"
 
 #: scripts/flow/station_rules.gd:350
-#: scripts/street/street_corridor.gd:1368
+#: scripts/street/street_corridor.gd:1373
 msgid "fragmento"
 msgstr "fragment"
 
 #: scripts/flow/station_rules.gd:350
-#: scripts/street/street_corridor.gd:1368
+#: scripts/street/street_corridor.gd:1373
 msgid "fragmentos"
 msgstr "fragments"
 
@@ -4391,8 +4391,9 @@ msgid "Suprimentos recolhidos · +1 alimento e +1 semente"
 msgstr "Supplies gathered · +1 food and +1 seed"
 
 #: scripts/flow/journey_rules.gd:964
-msgid ". A equipe recupera o fôlego."
-msgstr ". The team catches its breath."
+#: scripts/street/street_corridor.gd:509
+msgid "A equipe recupera o fôlego."
+msgstr "The team catches its breath."
 
 #: scripts/flow/exploration_care.gd:68
 msgid "Disponível fora de combate e eventos, durante a exploração."
@@ -5050,210 +5051,210 @@ msgstr "Moving on…"
 msgid "Seguindo para: %s…"
 msgstr "Heading to: %s…"
 
-#: scripts/street/street_corridor.gd:576
+#: scripts/street/street_corridor.gd:581
 msgid "Trecho %d · Descanso. Um lugar quieto."
 msgstr "Stretch %d · Rest. A quiet place."
 
-#: scripts/street/street_corridor.gd:579
+#: scripts/street/street_corridor.gd:584
 msgid "Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro."
 msgstr "Stretch %d · %s ahead. Get there unseen to act first."
 
-#: scripts/street/street_corridor.gd:581
+#: scripts/street/street_corridor.gd:586
 msgid "O guardião está à frente"
 msgstr "The guardian is ahead"
 
-#: scripts/street/street_corridor.gd:581
+#: scripts/street/street_corridor.gd:586
 msgid "Vencer o guardião conclui a fase e leva todo o achado. Se a equipe cair, o achado fica para trás; voltar agora leva metade."
 msgstr "Defeating the guardian completes the phase and brings everything found. If the team falls, what was found stays behind; going back now brings half."
 
-#: scripts/street/street_corridor.gd:584
+#: scripts/street/street_corridor.gd:589
 msgid "Trecho %d · %s"
 msgstr "Stretch %d · %s"
 
-#: scripts/street/street_corridor.gd:600
+#: scripts/street/street_corridor.gd:605
 msgid "Dá para acampar aqui: comer, cuidar dos feridos e baixar o instinto antes do guardião."
 msgstr "The team can camp here: eat, tend the wounded and calm the instinct before the guardian."
 
-#: scripts/street/street_corridor.gd:601
+#: scripts/street/street_corridor.gd:606
 msgid "Acampar aqui"
 msgstr "Camp here"
 
-#: scripts/street/street_corridor.gd:603
+#: scripts/street/street_corridor.gd:608
 msgid "A equipe já acampou nesta fase."
 msgstr "The team already camped in this phase."
 
-#: scripts/street/street_corridor.gd:604
-#: scripts/street/street_corridor.gd:725
+#: scripts/street/street_corridor.gd:609
+#: scripts/street/street_corridor.gd:730
 msgid "Seguir em frente"
 msgstr "Keep going"
 
-#: scripts/street/street_corridor.gd:605
-#: scripts/street/street_corridor.gd:726
+#: scripts/street/street_corridor.gd:610
+#: scripts/street/street_corridor.gd:731
 msgid "Voltar à Estação (metade do achado)"
 msgstr "Back to the Station (half of what was found)"
 
-#: scripts/street/street_corridor.gd:606
+#: scripts/street/street_corridor.gd:611
 msgid "Um lugar quieto"
 msgstr "A quiet place"
 
-#: scripts/street/street_corridor.gd:624
+#: scripts/street/street_corridor.gd:629
 msgid "A equipe está com %d de %d de vida"
 msgstr "The team has %d of %d health"
 
-#: scripts/street/street_corridor.gd:626
+#: scripts/street/street_corridor.gd:631
 msgid "; o instinto mais alto é o de %s (%d)"
 msgstr "; the highest instinct is %s's (%d)"
 
-#: scripts/street/street_corridor.gd:627
+#: scripts/street/street_corridor.gd:632
 msgid "; a comida está em %d de %d."
 msgstr "; food is at %d of %d."
 
-#: scripts/street/street_corridor.gd:744
+#: scripts/street/street_corridor.gd:749
 msgid "E  Entrar n%s"
 msgstr "E  Enter %s"
 
-#: scripts/street/street_corridor.gd:747
+#: scripts/street/street_corridor.gd:752
 msgid "E  Arrombar a porta d%s (o pé de cabra quebra)"
 msgstr "E  Force the door of %s (the crowbar breaks)"
 
-#: scripts/street/street_corridor.gd:750
+#: scripts/street/street_corridor.gd:755
 msgid "Porta trancada · Precisa de um pé de cabra para arrombar"
 msgstr "Locked door · You need a crowbar to force it"
 
-#: scripts/street/street_corridor.gd:756
-#: scripts/street/street_corridor.gd:979
+#: scripts/street/street_corridor.gd:761
+#: scripts/street/street_corridor.gd:984
 msgid "E  Vasculhar %s"
 msgstr "E  Search %s"
 
-#: scripts/street/street_corridor.gd:767
-#: scripts/street/street_corridor.gd:976
-#: scripts/street/street_corridor.gd:1175
+#: scripts/street/street_corridor.gd:772
+#: scripts/street/street_corridor.gd:981
+#: scripts/street/street_corridor.gd:1180
 msgid "%s (já vasculhado)"
 msgstr "%s (already searched)"
 
-#: scripts/street/street_corridor.gd:770
-#: scripts/street/street_corridor.gd:1178
+#: scripts/street/street_corridor.gd:775
+#: scripts/street/street_corridor.gd:1183
 msgid "E  Vasculhar: %s"
 msgstr "E  Search: %s"
 
-#: scripts/street/street_corridor.gd:780
+#: scripts/street/street_corridor.gd:785
 msgid "E  Entrar: %s"
 msgstr "E  Enter: %s"
 
-#: scripts/street/street_corridor.gd:783
+#: scripts/street/street_corridor.gd:788
 msgid "%s · a patrulha guarda a porta"
 msgstr "%s · the patrol guards the door"
 
-#: scripts/street/street_corridor.gd:792
+#: scripts/street/street_corridor.gd:797
 msgid "E  Voltar à Estação (%s)"
 msgstr "E  Back to the Station (%s)"
 
-#: scripts/street/street_corridor.gd:792
+#: scripts/street/street_corridor.gd:797
 msgid "fase concluída: todo o achado"
 msgstr "phase complete: everything found"
 
-#: scripts/street/street_corridor.gd:792
+#: scripts/street/street_corridor.gd:797
 msgid "retirada: metade do achado"
 msgstr "retreat: half of what was found"
 
-#: scripts/street/street_corridor.gd:797
-#: scripts/street/street_corridor.gd:812
+#: scripts/street/street_corridor.gd:802
+#: scripts/street/street_corridor.gd:817
 msgid "E  Vasculhar"
 msgstr "E  Search"
 
-#: scripts/street/street_corridor.gd:808
+#: scripts/street/street_corridor.gd:813
 msgid "E  Embarcar no trem"
 msgstr "E  Board the train"
 
-#: scripts/street/street_corridor.gd:961
+#: scripts/street/street_corridor.gd:966
 msgid "Emboscada!"
 msgstr "Ambush!"
 
-#: scripts/street/street_corridor.gd:973
+#: scripts/street/street_corridor.gd:978
 msgid "o canto"
 msgstr "the corner"
 
-#: scripts/street/street_corridor.gd:983
+#: scripts/street/street_corridor.gd:988
 msgid "E  Acampar (fechar a porta e acender a fogueira)"
 msgstr "E  Camp (close the door and light the fire)"
 
-#: scripts/street/street_corridor.gd:987
+#: scripts/street/street_corridor.gd:992
 msgid "Acampamento já feito nesta fase"
 msgstr "Camp already made this phase"
 
-#: scripts/street/street_corridor.gd:991
+#: scripts/street/street_corridor.gd:996
 msgid "E  Sair para a rua"
 msgstr "E  Go out to the street"
 
-#: scripts/street/street_corridor.gd:1052
+#: scripts/street/street_corridor.gd:1057
 msgid "Com um herói só, não há ordem para trocar."
 msgstr "With a single hero, there is no order to change."
 
-#: scripts/street/street_corridor.gd:1075
+#: scripts/street/street_corridor.gd:1080
 msgid "Na abertura, a saída é o trem da plataforma."
 msgstr "In the opening, the way out is the train on the platform."
 
-#: scripts/street/street_corridor.gd:1122
+#: scripts/street/street_corridor.gd:1127
 msgid "Entrando: %s…"
 msgstr "Entering: %s…"
 
-#: scripts/street/street_corridor.gd:1187
+#: scripts/street/street_corridor.gd:1192
 msgid "E  Voltar: %s"
 msgstr "E  Back: %s"
 
-#: scripts/street/street_corridor.gd:1244
+#: scripts/street/street_corridor.gd:1249
 msgid "O pé de cabra entorta e quebra, mas a porta cede."
 msgstr "The crowbar bends and breaks, but the door gives way."
 
-#: scripts/street/street_corridor.gd:1367
+#: scripts/street/street_corridor.gd:1372
 msgid "semente"
 msgstr "seed"
 
-#: scripts/street/street_corridor.gd:1367
+#: scripts/street/street_corridor.gd:1372
 msgid "sementes"
 msgstr "seeds"
 
-#: scripts/street/street_corridor.gd:1368
+#: scripts/street/street_corridor.gd:1373
 msgid "comida"
 msgstr "food"
 
-#: scripts/street/street_corridor.gd:1368
+#: scripts/street/street_corridor.gd:1373
 msgid "comidas"
 msgstr "food"
 
-#: scripts/street/street_corridor.gd:1369
+#: scripts/street/street_corridor.gd:1374
 msgid "curativo"
 msgstr "bandage"
 
-#: scripts/street/street_corridor.gd:1369
+#: scripts/street/street_corridor.gd:1374
 msgid "curativos"
 msgstr "bandages"
 
-#: scripts/street/street_corridor.gd:1369
+#: scripts/street/street_corridor.gd:1374
 msgid "ferramenta"
 msgstr "tool"
 
-#: scripts/street/street_corridor.gd:1369
+#: scripts/street/street_corridor.gd:1374
 msgid "ferramentas"
 msgstr "tools"
 
-#: scripts/street/street_corridor.gd:1457
+#: scripts/street/street_corridor.gd:1462
 msgid "A equipe descansou. Lá fora, o tempo mudou: %s."
 msgstr "The team rested. Outside, the weather changed: %s."
 
-#: scripts/street/street_corridor.gd:1495
+#: scripts/street/street_corridor.gd:1500
 msgid "patrulha"
 msgstr "patrol"
 
-#: scripts/street/street_corridor.gd:1498
+#: scripts/street/street_corridor.gd:1503
 msgid "A equipe chegou sem ser vista: age primeiro."
 msgstr "The team arrived unseen: it acts first."
 
-#: scripts/street/street_corridor.gd:1529
+#: scripts/street/street_corridor.gd:1534
 msgid "O guardião caiu. Vasculhe o que restou ou volte à Estação pelo Menu (%s)."
 msgstr "The guardian fell. Search what's left or go back to the Station through the Menu (%s)."
 
-#: scripts/street/street_corridor.gd:1531
+#: scripts/street/street_corridor.gd:1536
 msgid "O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua."
 msgstr "The guardian fell. Shopfront Street is clear: explore the houses or go back to the Station from the start of the street."
 
