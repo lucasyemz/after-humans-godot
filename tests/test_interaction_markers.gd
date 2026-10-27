@@ -83,6 +83,16 @@ func _map(map: String) -> void:
 		street._place_leader(Vector3(float(room_entry.door_x) - 3.0, street.floor_y, street.lane_z))
 		_frame(corridor, c, route)
 		t.check(_marked(street, corridor._side_door_point(room_entry)), "%s: a porta de %s marcada" % [map, scenario.zones[room_entry.zone].name])
+	# Com o caminho livre, o que está à frente na zona já tem a marca (antes, só ao pisar no trecho do objeto).
+	var ahead: Array = corridor.scenario_props.filter(func(e): return corridor._side_room_of_zone(e.zone) < 0 and int(e.step) > corridor.segments[corridor._segment_of(int(e.step))].first)
+	if not ahead.is_empty():
+		var far: Dictionary = ahead[0]
+		var part: Dictionary = corridor.segments[corridor._segment_of(int(far.step))]
+		route.index = int(part.first)
+		corridor._enter_segment(corridor._segment_of(int(far.step)), float(part.x0) + 0.5)
+		_frame(corridor, c, route)
+		var mark := corridor._scenario_prop_point(far)
+		t.check(absf(mark.x - street._leader.position.x) >= 14.0 or _marked(street, mark), "%s: %s marcado de longe, com o caminho livre" % [map, far.name])
 	# A saída para a Estação, no começo do mapa da fase (o de travessia não volta por ali).
 	if corridor.map_first == 0:
 		route.index = 0

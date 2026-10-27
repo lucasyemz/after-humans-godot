@@ -638,16 +638,28 @@ func _marker_points(campaign: Dictionary, route: Dictionary, leader: Vector3, ac
 		if index <= route.index and not route.props.get(str(index), false):
 			points.append(_prop_point(index))
 	if street.scenario:
+		# Tudo o que dá para alcançar na zona (sem patrulha de pé no caminho) já tem a marca, como as lojas da Rua vistas
+		# de longe; antes ela só aparecia ao pisar no trecho do objeto (#142).
 		for entry in scenario_props:
-			if entry.zone == segments[segment].zone and R.can_search_scenario_prop(campaign, entry.prop):
+			if entry.zone == segments[segment].zone and _reachable(route, int(entry.step)) and not route.searched_props.has(entry.prop):
 				points.append(_scenario_prop_point(entry))
 		for room_entry in side_rooms:
-			if room_entry.door_segment == segment and R.can_enter_scenario_room(campaign, room_entry.door_step):
+			if room_entry.door_segment == segment and _reachable(route, int(room_entry.door_step)) and int(route.get("current_room", -1)) == -1:
 				points.append(_side_door_point(room_entry))
 	# A saída para a Estação, no começo do corredor (#142): a marca dela também, como a dos outros pontos de uso.
 	if segments.is_empty() or (segment == 0 and map_first == 0):
 		points.append(_exit_point())
 	return points.filter(func(p): return absf(p.x - leader.x) < 14.0 and (active == null or p.distance_to(active) > 0.05))
+
+
+## O trecho dá para alcançar daqui: o atual ou um à frente com todos os do meio vencidos (e ele sem patrulha de pé).
+func _reachable(route: Dictionary, step: int) -> bool:
+	if step <= route.index:
+		return not (step == route.index and not route.steps[step].resolved and ["combat", "boss"].has(route.steps[step].type))
+	for i in range(route.index, mini(step + 1, route.steps.size())):
+		if not route.steps[i].resolved and ["combat", "boss"].has(route.steps[i].type):
+			return false
+	return true
 
 
 ## Onde fica a marca da volta à Estação: o começo da rua ou da primeira zona do mapa.
