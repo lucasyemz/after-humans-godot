@@ -1468,8 +1468,7 @@ func _walk(delta: float) -> void:
 			# faixa estreita ou cheia (a Preparação, a Forja com o Otto), três voltas não bastavam para achar lugar; o
 			# teto alto só vale para uma faixa sem lugar nenhum, onde andar para sempre seria pior que parar perto.
 			if _crowded(walker, card.position.x) and walker.get("rerouted", 0) < REROUTE_LIMIT:
-				walker.rerouted = walker.get("rerouted", 0) + 1
-				_choose_target(walker)
+				_choose_target(walker, true)
 				continue
 			walker.rerouted = 0
 			walker.wait = randf_range(2.5, 7.0)
@@ -1479,7 +1478,10 @@ func _walk(delta: float) -> void:
 		card.scale = Vector3(1, 1.0 + 0.025 * absf(sin(time * 7.0 + walker.phase)), 1)
 
 
-func _choose_target(walker: Dictionary) -> void:
+## retry: a busca de outro lugar de quem chegou num ponto cheio (conta para o REROUTE_LIMIT); qualquer outro passeio
+## começa a contagem do zero.
+func _choose_target(walker: Dictionary, retry: bool = false) -> void:
+	walker.rerouted = walker.get("rerouted", 0) + 1 if retry else 0
 	var card: AHSpriteCard = walker.card
 	# Pelo menos 1 m de caminhada e longe de quem está parado ou indo parar na mesma faixa; perto de uma ponta, vai
 	# para a outra.
