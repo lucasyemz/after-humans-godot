@@ -35,9 +35,14 @@ arquivo ao mesmo tempo.
 | **Claude Orquestrador PC** | o Claude local no Windows | o teste definitivo: junta os PRs que mexem no jogo, roda os testes e as capturas na Godot do Windows, faz o build, cuida da referência da Unreal (que só existe nesse PC) e dos saves do Lucas |
 
 **Quem junta o quê:**
-Desde 27/10/2026 o da nuvem junta sozinho, na ronda automática (abaixo):
-- **os PRs de arte e documentos** (sem `scripts/`, `data/` nem `tests/`) com o CI verde e o revisor em PRONTO PARA O MERGE, sem esperar o Lucas;
-- **os PRs de código** (Claude 1 e Claude 2) também, com o CI verde e o revisor em PRONTO, e com um comentário no PR avisando que falta o teste no Windows. O do PC faz esse teste depois, na `main`.
+Desde 27/10/2026 o da nuvem junta sozinho, na ronda automática (abaixo), com o CI verde e o revisor em PRONTO PARA O MERGE:
+- **os PRs de documentos;**
+- **os PRs de código que não mudam o que se vê** (Claude 1 e Claude 2), com um comentário no PR avisando que falta o teste
+  no Windows. O do PC faz esse teste depois, na `main`.
+
+**O que muda o que se vê nunca entra sozinho** (decisão do Lucas, 27/10, depois do #156): arte em `art/`, cenários, telas,
+HUD, luz e animação, seja PR de design ou de código. O revisor lê o diff, mas não vê se fica bonito no mapa. O da nuvem
+resume o PR para o Lucas com as capturas do jogo e espera o ok dele no PR ou na conversa.
 
 **Para os dois não juntarem ao mesmo tempo:** antes de juntar, comentar no PR "Integrando (Orquestrador Nuvem)" ou "Integrando (Orquestrador PC)". Se o outro já comentou, não mexer.
 
@@ -54,7 +59,7 @@ Uma tarefa agendada acorda o Orquestrador Nuvem de hora em hora (e os eventos do
 1. **Lê os PRs abertos para a `main`:** o CI, o comentário do revisor, o escopo (os arquivos), os conflitos e os
    comentários do Lucas.
 2. **Junta** quando tudo bate: CI verde, revisor em PRONTO PARA O MERGE, sem conflito, sem pedido do Lucas em aberto no
-   PR e sem "Integrando (Orquestrador PC)". Antes, comenta "Integrando (Orquestrador Nuvem)"; nos de código, avisa que
+   PR, sem a etiqueta `descartar` e sem "Integrando (Orquestrador PC)". O que muda o que se vê espera o ok do Lucas. Antes, comenta "Integrando (Orquestrador Nuvem)"; nos de código, avisa que
    falta o teste no Windows. A branch é apagada depois do merge.
 3. **Devolve para o agente** quando o PR pede ajuste: o revisor em AJUSTAR ANTES, o CI vermelho ou um pedido do Lucas.
    O Claude 1 e o Claude 2 recebem a mensagem direto na sessão deles; o Awesomic 1 e o 2 recebem pela issue e pelo
