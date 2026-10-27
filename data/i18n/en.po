@@ -4011,7 +4011,7 @@ msgid "Vitrines tomadas por raízes ainda guardam comida e peças que a Estaçã
 msgstr "Shopfronts overrun by roots still hold food and parts the Station no longer knows how to make. The Galleries' sensors keep sorting the Ancients' customers from unauthorized fauna."
 
 #: scripts/flow/journey_rules.gd:32
-#: scripts/scenario/scenario_world.gd:40
+#: scripts/scenario/scenario_world.gd:46
 #. expedition-nodes.4.Title
 #. scenarios.3.DisplayName
 msgid "Ponte das Raízes"
@@ -4796,15 +4796,15 @@ msgstr "night"
 msgid "noite de chuva"
 msgstr "rainy night"
 
-#: scripts/street/street.gd:985
+#: scripts/street/street.gd:986
 msgid "Noite"
 msgstr "Night"
 
-#: scripts/street/street.gd:985
+#: scripts/street/street.gd:986
 msgid "Fim de tarde"
 msgstr "Late afternoon"
 
-#: scripts/street/street.gd:985
+#: scripts/street/street.gd:986
 msgid " · chuva"
 msgstr " · rain"
 
@@ -5026,26 +5026,26 @@ msgstr "The guardian fell. Search what's left or go back to the Station through 
 msgid "O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua."
 msgstr "The guardian fell. Shopfront Street is clear: explore the houses or go back to the Station from the start of the street."
 
-#: scripts/scenario/scenario_world.gd:40
+#: scripts/scenario/scenario_world.gd:46
 msgid "Cais do Rio"
 msgstr "River Dock"
 
-#: scripts/scenario/scenario_world.gd:40
+#: scripts/scenario/scenario_world.gd:46
 #. expedition-nodes.3.Title
 msgid "Depósito Inundado"
 msgstr "Flooded Depot"
 
-#: scripts/scenario/scenario_world.gd:41
+#: scripts/scenario/scenario_world.gd:47
 #. expedition-nodes.2.Title
 msgid "Abrigo Lacrado"
 msgstr "Sealed Shelter"
 
-#: scripts/scenario/scenario_world.gd:41
+#: scripts/scenario/scenario_world.gd:47
 #. expedition-nodes.8.Title
 msgid "Dutos de Esgoto"
 msgstr "Sewer Ducts"
 
-#: scripts/scenario/scenario_world.gd:41
+#: scripts/scenario/scenario_world.gd:47
 #. expedition-nodes.10.Title
 msgid "Portão de Triagem"
 msgstr "Triage Gate"

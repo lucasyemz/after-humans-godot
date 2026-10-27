@@ -34,6 +34,12 @@ var _materials: Array = []
 var _open_materials := {}
 var _prop_nodes := {}
 var _cards: Array[ShaderMaterial] = []
+## A água pintada (#140): a do chão e a do fundo pintado; "Reduzir efeitos" a deixa mais lenta e sem piscar.
+var _waters: Array[ShaderMaterial] = []
+const WATER_COVERED := 0.3
+## O que a água pintada guarda de espuma (os arrays do water_painted.gdshader).
+const MAX_FOAM_POINTS := 16
+const MAX_FOAM_LINES := 4
 var _blockouts: Array[ShaderMaterial] = []
 
 
@@ -113,11 +119,37 @@ func build(map: String) -> void:
 		_text(text)
 
 
-## Tempo molhado nos materiais (a chuva lá fora) e a cor do clima nos cards de fundo.
-func set_weather(wet: float, tint: Color) -> void:
+## As cores da água pintada (#140) que o mapa troca (surface, mid, deep, ripple e foam, em [r, g, b]) e o passo
+## dela: com "Reduzir efeitos", mais devagar e sem o brilho piscando.
+func _water_colors(material: ShaderMaterial, m: Dictionary) -> void:
+	for key in ["surface", "mid", "deep", "ripple", "foam", "horizon"]:
+		var c = m.get(key + "_color")
+		if c != null:
+			material.set_shader_parameter(key + "_color", Color(c[0], c[1], c[2]))
+	_water_pace(material)
+
+
+func _water_pace(material: ShaderMaterial) -> void:
+	var reduced: bool = GameFlow.reduced_effects()
+	material.set_shader_parameter("flow", 0.4 if reduced else 1.0)
+	material.set_shader_parameter("sparkle", 0.0 if reduced else 1.0)
+
+
+## A opção "Reduzir efeitos" mudou: a água pintada acompanha.
+func refresh_water_pace() -> void:
+	for material in _waters:
+		_water_pace(material)
+
+
+## Tempo molhado nos materiais (a chuva lá fora) e a cor do clima nos cards de fundo. covered: a equipe num interior; a
+## água pintada, sem luz própria, escurece com ele (vista da porta, não brilha ao lado da sala escura).
+func set_weather(wet: float, tint: Color, covered: bool = false) -> void:
 	for material in _cards:
 		material.set_shader_parameter("wet", wet)
 		material.set_shader_parameter("weather", Vector4(tint.r, tint.g, tint.b, 1.0))
+	if covered:
+		for material in _waters:
+			material.set_shader_parameter("weather", Vector4(tint.r * WATER_COVERED, tint.g * WATER_COVERED, tint.b * WATER_COVERED, 1.0))
 	for material in _blockouts:
 		material.set_shader_parameter("wet", wet)
 
@@ -266,6 +298,15 @@ func _material(m: Dictionary) -> Material:
 		"card", "unlit":
 			var material := ShaderMaterial.new()
 			material.shader = preload("res://shaders/scenario_card.gdshader")
+			# O fundo pintado com água (#140): abaixo da linha d'água, a água viva no lugar da pintura parada.
+			if m.get("waterline") != null:
+				material.shader = preload("res://shaders/scenario_card_water.gdshader")
+				material.set_shader_parameter("waterline", float(m.waterline))
+				material.set_shader_parameter("width_m", float(m.get("width_m", 75.0)))
+				material.set_shader_parameter("far_m", float(m.get("far_m", 60.0)))
+				material.set_shader_parameter("detail", float(m.get("detail", 0.4)))
+				_water_colors(material, m)
+				_waters.append(material)
 			var albedo := _tex(m.get("albedo", ""))
 			if albedo:
 				material.set_shader_parameter("albedo_tex", albedo)
@@ -280,6 +321,32 @@ func _material(m: Dictionary) -> Material:
 			return material
 		"water":
 			var material := ShaderMaterial.new()
+			if m.get("painted", false):
+				# A água pintada (#140): as faixas, as ondinhas desenhadas, o brilho e a espuma na margem e nas estacas.
+				material.shader = preload("res://shaders/water_painted.gdshader")
+				material.set_shader_parameter("front_z", float(m.get("front_z", 0.0)))
+				material.set_shader_parameter("depth_scale", float(m.get("depth_scale", 18.0)))
+				var lines: Array = m.get("foam_lines", [])
+				var points: Array = m.get("foam_points", [])
+				if lines.size() > MAX_FOAM_LINES or points.size() > MAX_FOAM_POINTS:
+					push_warning("%s: a água pintada guarda %d linhas e %d pontos de espuma; o resto some (%d e %d no mapa)." % [
+						map_name, MAX_FOAM_LINES, MAX_FOAM_POINTS, lines.size(), points.size()])
+				var packed := Vector4(-9999, -9999, -9999, -9999)
+				for i in mini(MAX_FOAM_LINES, lines.size()):
+					packed[i] = float(lines[i])
+				material.set_shader_parameter("foam_lines", packed)
+				material.set_shader_parameter("line_foam_width", float(m.get("line_foam_width", 0.9)))
+				var list: Array[Vector4] = []
+				for point in points.slice(0, MAX_FOAM_POINTS):
+					list.append(Vector4(float(point[0]), float(point[1]), float(point[2]), 0.0))
+				while list.size() < MAX_FOAM_POINTS:
+					list.append(Vector4.ZERO)
+				material.set_shader_parameter("foam_points", list)
+				material.set_shader_parameter("foam_count", mini(MAX_FOAM_POINTS, points.size()))
+				_water_colors(material, m)
+				_waters.append(material)
+				_cards.append(material)
+				return material
 			material.shader = preload("res://shaders/water_waves.gdshader")
 			for key in [["Amplitude", "amplitude"], ["Wavelength", "wavelength"], ["Speed", "speed"], ["Foam", "foam"],
 					["RippleStrength", "ripple"], ["Roughness", "roughness_value"], ["Specular", "specular_value"]]:
