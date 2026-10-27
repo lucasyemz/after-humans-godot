@@ -267,9 +267,9 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 	session = AHCombatSession.create(heroes, enemies, opening, seed_value, 80, AHJourneyRules.phase_effects(Campaign.state))
 	AHJourneyRules.spend_fight_effects(Campaign.state)
 	session.use_expedition(Campaign.state)
-	# No tutorial (#144) os inimigos não derrubam ninguém: a vida para em 1.
+	# No tutorial (#144) os inimigos não derrubam ninguém, e os estados sempre pegam.
 	if AHTutorial.is_tutorial(Campaign.state):
-		session.context.min_hero_hp = 1
+		AHTutorial.prepare_fight(session.context)
 	Tips.show_tip("combat")
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
 	if speed <= 2.0:

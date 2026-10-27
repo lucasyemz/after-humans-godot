@@ -75,10 +75,18 @@ func _skip_equals_play() -> void:
 		c.erase("tutorial")
 	t.equal(JSON.stringify(a, "", true), JSON.stringify(b, "", true), "pular dá o mesmo estado que jogar até o trem")
 	t.check(not played.completed_phases.has(AHTutorial.PHASE_ID), "o tutorial não vira fase concluída")
+	# Fora da jornada (já na Estação, ou numa campanha com progresso), complete() recusa e não mexe em nada.
+	var before := JSON.stringify(played, "", true)
+	t.equal(AHTutorial.complete(played), {}, "complete() fora da jornada devolve {}")
+	t.equal(JSON.stringify(played, "", true), before, "e deixa a campanha como estava")
+	played.tutorial = {"stage": "done"}
+	t.equal(AHTutorial.complete(played), {}, "nem com o tutorial já feito")
+	played.tutorial = {"stage": "station"}
 	var report: Dictionary = played.station.last_return
 	t.equal(report.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "o relatório da chegada traz os quatro")
 	var lines := AHBriefing.debriefing(played, report)
-	t.equal(lines.map(func(l): return l.speaker.id), ["hero_gato_nick", "hero_cao_bento", "hero_gato_nick", "hero_cao_bento", "hero_gato_nick"], "o debriefing da chegada é do Bento e do Nick")
+	t.equal(lines.map(func(l): return l.speaker.id), ["hero_cao_bento", "hero_gato_nick", "hero_cao_bento", "hero_gato_nick", "hero_cao_bento", "hero_gato_nick"], "o debriefing da chegada é do Bento e do Nick")
+	t.equal(lines[0].text, "Obrigado.", "e começa com o Bento agradecendo")
 	t.equal(lines[-1].text, "Só por uma noite.", "e termina com \"Só por uma noite.\"")
 	# O relatório da chegada: sem guardião, com o curativo e a ferramenta à vista (#144).
 	var screen := AHStationReport.new()

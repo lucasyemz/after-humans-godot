@@ -92,6 +92,7 @@ refuge_hud.gd: Description
 *: flee
 *: focus
 *: font
+*: foreground
 *: fragments
 *: fullscreen
 *: gap

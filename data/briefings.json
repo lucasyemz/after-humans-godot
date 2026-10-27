@@ -209,7 +209,7 @@
         "Speakers": [
           "hero_gato_nick"
         ],
-        "Text": "Essa porta não abre mais. O protocolo de contenção fechou o corredor inteiro, e vocês três ficaram do lado de dentro."
+        "Text": "As portas lá atrás não abrem mais. O protocolo de contenção fechou o corredor inteiro, e vocês três ficaram do lado de dentro."
       },
       {
         "Speakers": [
@@ -234,6 +234,12 @@
   {
     "Name": "tutorial",
     "Debriefing": [
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Obrigado."
+      },
       {
         "Speakers": [
           "hero_gato_nick"

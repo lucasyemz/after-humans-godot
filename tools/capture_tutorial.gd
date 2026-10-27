@@ -1,8 +1,9 @@
 ## QA por captura do tutorial da abertura (#144) no Corredor de Contenção (#147), pelas cenas de verdade:
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_tutorial.gd -- --out=<pasta>
-## Campanha própria na pasta da saída (o save do jogador fica intacto). Fotografa a escolha da campanha nova, o cartão da
-## abertura, cada dica (andar, a habilidade e o alvo na primeira luta, a busca, a Mochila, a patrulha, a posição na
-## segunda luta, o item na terceira, o trem), a conversa do Nick, a recompensa, o vagão e a chegada com o debriefing.
+## Campanha própria na pasta da saída (o save do jogador fica intacto). Fotografa, na ordem da jornada, a escolha da
+## campanha nova, o cartão da abertura, cada dica (andar, a habilidade e o alvo na primeira luta, a patrulha e a posição
+## na segunda, a busca e a Mochila, o item na terceira, o trem), a conversa do Nick, a recompensa, o vagão e a chegada
+## com o debriefing.
 extends SceneTree
 
 var out := ""
@@ -59,47 +60,36 @@ func _initialize() -> void:
 	arena.hud._via_mouse = false
 	arena.hud._markers[0].pressed.emit()
 	await _auto(arena)
-	# O Nick.
+	# O Nick, logo depois da primeira luta.
+	await _idle(corridor, street)
 	corridor.debug_next_fight()
 	await _until(func(): return street.exploration_hud.find_child("Briefing", true, false) != null)
 	await _wait(0.8)
 	await _shot("06-nick-arrives")
 	street.exploration_hud.find_child("Briefing", true, false).skip_button.pressed.emit()
 	await _until(func(): return not corridor.busy)
-	# A busca e a Mochila.
+	# A patrulha da segunda luta à frente, e a luta, com a dica de posição.
+	await _until(func(): return guide.hint.step_id == "patrol", 10.0)
+	await _wait(0.6)
+	await _shot("07-patrol-hint")
+	await _fight(corridor, street, guide, "position", "08-fight2-position-hint")
+	# A busca e a Mochila, depois da segunda luta.
+	await _idle(corridor, street)
 	var entry: Dictionary = corridor.scenario_props[0]
 	street._place_leader(Vector3(entry.x - 0.4, street.floor_y, street.lane_z))
 	await _until(func(): return guide.hint.step_id == "search")
 	await _wait(0.6)
-	await _shot("07-search-hint")
+	await _shot("09-search-hint")
 	corridor._action.call()
 	await _wait(0.8)
-	await _shot("08-bag-hint")
+	await _shot("10-bag-hint")
 	corridor.open_inventory()
 	await _wait(0.5)
 	street.exploration_hud.close_modal()
-	# A patrulha à frente e a segunda luta.
-	street._place_leader(Vector3(entry.x + 1.0, street.floor_y, street.lane_z))
-	await _until(func(): return guide.hint.step_id == "patrol", 6.0)
-	await _wait(0.6)
-	await _shot("09-patrol-hint")
-	for fight in [["10-fight2-position-hint", "position"], ["11-fight3-item-hint", "item"]]:
-		await _until(func(): return not corridor.busy and not street._arena.active and not street.exploration_hud.modal_open())
-		await _wait(0.5)
-		street._arena.auto_battle = false
-		corridor.debug_next_fight()
-		await _wait(0.3)
-		Input.action_press("move_right")
-		await _until(func(): return street._arena.active)
-		Input.action_release("move_right")
-		arena = street._arena
-		await _until(func(): return arena.hud.waiting and guide.hint.step_id == fight[1], 20.0)
-		await _wait(0.8)
-		await _shot(fight[0])
-		await _auto(arena)
+	# A terceira luta: o Drone de Expurgo contamina e a dica do item.
+	await _fight(corridor, street, guide, "item", "11-fight3-item-hint")
 	# O trem chega e o embarque.
-	await _until(func(): return not corridor.busy and not street._arena.active)
-	await _wait(0.5)
+	await _idle(corridor, street)
 	corridor.debug_next_fight()
 	await _until(func(): return guide.hint.step_id == "train" and not corridor.busy, 20.0)
 	street._place_leader(Vector3(float(street.scenario.train.x) - 1.5, street.floor_y, street.lane_z))
@@ -108,14 +98,36 @@ func _initialize() -> void:
 	corridor._action.call()
 	await _wait(0.9)
 	await _shot("13-reward")
-	await _until(func(): return flow.passage != null and flow.passage.title_lit, 20.0)
+	await _until(func(): return flow.passage != null and flow.passage.title_lit, 40.0)
 	await _shot("14-wagon")
-	await _until(func(): return current_scene != null and current_scene.name == "Station" and not flow.busy, 40.0)
-	await _until(func(): return current_scene.find_child("Briefing", true, false) != null, 20.0)
+	await _until(func(): return current_scene != null and current_scene.name == "Station" and not flow.busy, 90.0)
+	await _until(func(): return current_scene.find_child("Briefing", true, false) != null, 60.0)
 	await _wait(0.8)
 	await _shot("15-arrival-debriefing")
 	print("%d capturas em %s" % [shots, out])
 	quit(0)
+
+
+## Uma luta pela cena: anda até a patrulha, espera a dica do passo e fotografa; o resto vai no automático.
+func _fight(corridor, street, guide, step_id: String, shot: String) -> void:
+	await _idle(corridor, street)
+	street._arena.auto_battle = false
+	corridor.debug_next_fight()
+	await _wait(0.3)
+	Input.action_press("move_right")
+	await _until(func(): return street._arena.active)
+	Input.action_release("move_right")
+	var arena = street._arena
+	await _until(func(): return arena.hud.waiting and guide.hint.step_id == step_id, 20.0)
+	await _wait(0.8)
+	await _shot(shot)
+	await _auto(arena)
+
+
+## Espera a rua parada: sem luta, sem modal e o corredor livre (o fim da luta ainda mexe nele por um instante).
+func _idle(corridor, street) -> void:
+	await _until(func(): return not corridor.busy and not street._arena.active and not street.exploration_hud.modal_open())
+	await _wait(0.5)
 
 
 func _auto(arena) -> void:

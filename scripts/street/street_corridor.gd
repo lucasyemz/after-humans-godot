@@ -506,8 +506,9 @@ func _travel_segment(direction: int) -> void:
 	_enter_segment(to, _step_x(entry, ARRIVAL_SPOT if direction > 0 else 1.0 - ARRIVAL_SPOT))
 	await GameFlow.fade(0.0)
 	busy = false
-	# A porta de segurança baixa atrás da equipe (#147): o estrondo, sem volta.
-	if tutorial() and direction > 0:
+	# A porta de segurança baixa atrás da equipe (#147): o estrondo, sem volta. Só na zona que tem a porta de entrada.
+	var door_behind: bool = street.scenario != null and not street.scenario.doors_of(segments[to].zone, "entry").is_empty()
+	if tutorial() and direction > 0 and door_behind:
 		Sound.play("res://audio/world/security_door.ogg")
 
 
@@ -934,15 +935,15 @@ func _board_train() -> void:
 	if busy:
 		return
 	busy = true
-	if guide != null:
-		guide.event("board")
-	Sound.play("res://audio/station/train_bell.ogg")
 	var team: Array = Campaign.state.session.expedition.team.duplicate()
 	var prize := AHTutorial.complete(Campaign.state)
-	# complete() recusa fora da jornada do tutorial (devolve {}): nada a embarcar.
+	# complete() recusa fora da jornada do tutorial (devolve {}): nada a embarcar, e a dica do trem fica aberta.
 	if prize.is_empty():
 		busy = false
 		return
+	if guide != null:
+		guide.event("board")
+	Sound.play("res://audio/station/train_bell.ogg")
 	Tips.mark_seen(AHTutorial.COVERED_TIPS)
 	Campaign.save()
 	var gains: Array = []
