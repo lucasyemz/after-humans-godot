@@ -217,7 +217,8 @@ Só no jogo (decidir se entram na lore):
 - Centro de Pesquisa — só no jogo (sala)
 - Dormitório — só no jogo (sala)
 - Bar — só no jogo (sala)
-- Memorial — só no jogo (refuge_hud)
+- Enfermaria — só no jogo (sala, #121): o antigo posto de primeiros socorros da estação; as macas viraram leitos
+- Memorial — saiu com o #118 (ninguém morre: quem cai volta à Estação em recuperação)
 - Dora — só no jogo (civil, Texugo)
 - Otto — só no jogo (civil, Castor)
 - Cora — só no jogo (civil, Gambá)

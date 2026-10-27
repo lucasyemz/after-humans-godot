@@ -169,7 +169,8 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	var most: int = team_limits(phase_id).max
 	for hero_id in campaign.get("preferred_formation", []):
 		for hero in campaign.roster:
-			if hero.id == hero_id and hero.alive and team.size() < most:
+			# Quem está em recuperação (#118) fica na Estação.
+			if hero.id == hero_id and hero.alive and int(hero.get("recovery_days", 0)) <= 0 and team.size() < most:
 				team.append(hero_id)
 	if team.is_empty():
 		return false
@@ -507,16 +508,12 @@ static func combat_loot(campaign: Dictionary, result: String, boss: bool) -> Dic
 	return out
 
 
-## Fim de uma luta do corredor (EndCombat). result: "victory", "defeat" ou "escaped". As mortes vão para o memorial.
-static func end_combat(campaign: Dictionary, result: String, boss: bool, cause: String = "") -> void:
+## Fim de uma luta do corredor (EndCombat). result: "victory", "defeat" ou "escaped". Ninguém morre (#118): quem caiu
+## fica fora da expedição (alive = false) e volta à Estação Caído (AHStationRules.admit_fallen, no fim da volta).
+static func end_combat(campaign: Dictionary, result: String, boss: bool, _cause: String = "") -> void:
 	var session: Dictionary = campaign.session
 	var expedition: Dictionary = session.expedition
 	var route: Dictionary = expedition.corridor
-	var info := phase(expedition.phase_id)
-	for hero in campaign.roster:
-		if expedition.team.has(hero.id) and not hero.alive and not campaign.memorial.any(func(e): return e.hero_id == hero.id):
-			campaign.memorial.append({"hero_id": hero.id, "display_name": hero.display_name, "class_id": hero.class_id,
-				"mission_name": info.get("name", ""), "cause": cause, "completed_expeditions": hero.get("completed_expeditions", 0)})
 	if result == "escaped":
 		session.result = "fled"
 		session.screen = "result"

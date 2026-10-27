@@ -147,6 +147,9 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		"art_variant": "",
 		# O nível (#90): o XP desde o último treino e as melhorias escolhidas (AHHeroLevels).
 		"level": 1, "xp": 0, "upgrades": [],
+		# Ninguém morre (#118): os dias que faltam na recuperação (0: pronto), se está num leito da Enfermaria e o ciclo
+		# do último curativo.
+		"recovery_days": 0, "recovery_bed": false, "recovery_treated": -1,
 	}
 
 
@@ -168,6 +171,7 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		"mission_stars": {},
 		"researched_skills": [],
 		"inventory": {"seeds": 30, "scrap": 0, "fragments": 0, "bandages": 2, "relics": [], "items": {}},
+		# O memorial (antes do #118): ninguém mais entra; fica vazio, e os saves antigos voltam com os heróis.
 		"memorial": [],
 		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false},
 		# Estação (cômodos, civis, economia), noite da volta e fila de voluntários: AHStationRules.init_new_campaign.
@@ -286,7 +290,9 @@ func slot_summary(number: int) -> Dictionary:
 	summary.merge({"status": "ok", "recovered": path == slot_path(number, true),
 		"cycle": int(campaign.get("station", {}).get("cycle_number", 0)),
 		"phases": campaign.get("completed_phases", []).size(),
-		"alive": roster.filter(func(h): return h.get("alive", true)).size(), "roster": roster.size(),
+		# "alive" (o nome antigo da chave, lida pelo título): quantos estão prontos para partir, fora do memorial dos saves
+		# antigos e da recuperação (#118).
+		"alive": roster.filter(func(h): return h.get("alive", true) and int(h.get("recovery_days", 0)) <= 0).size(), "roster": roster.size(),
 		"played_seconds": int(campaign.get("played_seconds", 0)), "saved_at": _saved_at(path),
 		"in_expedition": campaign.get("session", {}).get("expedition") != null and campaign.get("session", {}).get("result", "") == ""}, true)
 	return summary

@@ -1684,6 +1684,34 @@ func _popup_loot(box: VBoxContainer, result: String) -> void:
 		chips.add_child(chip)
 
 
+## Quem caiu nesta luta (#118), em vermelho e com o ícone: "Íris caiu". Ninguém morre: volta à Estação em recuperação.
+func _popup_fallen(box: VBoxContainer) -> void:
+	if session == null:
+		return
+	var names := PackedStringArray()
+	for unit in session.state.player_team:
+		if unit.hp <= 0 and not unit.deaths_door:
+			names.append(String(unit.display_name))
+	if names.is_empty():
+		return
+	var row := HBoxContainer.new()
+	row.name = "Fallen"
+	row.set_meta("names", Array(names))
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 8)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(AHKit.glyph("state_wounded", AHUiStyle.px(26), AHKit.alert_text()))
+	var who := names[0] if names.size() == 1 else tr("%s e %s") % [", ".join(names.slice(0, names.size() - 1)), names[names.size() - 1]]
+	var label := AHKit.label((tr("%s caiu") if names.size() == 1 else tr("%s caíram")) % who, "row", AHKit.alert_text(), true)
+	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	row.add_child(label)
+	box.add_child(row)
+	var note := AHKit.label(tr("Volta à Estação para se recuperar.") if names.size() == 1 else tr("Voltam à Estação para se recuperar."), "small", MUTED)
+	note.name = "FallenNote"
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(note)
+
+
 ## O XP da luta numa linha, o de cada herói na ordem da cena (a soma enganava: o nível pede o XP de cada um), e quem
 ## fechou o XP do nível ("Treino pronto", que sobe no Alojamento).
 func _popup_xp(box: VBoxContainer, result: String) -> void:
@@ -2282,6 +2310,7 @@ func show_result(result: String, automatic: bool = false, rewards: Dictionary = 
 			stars.add_child(AHKit.glyph("star" if i < int(rewards.stars) else "star_empty", AHUiStyle.px(28), AHKit.AMBER if i < int(rewards.stars) else MUTED))
 		line.add_child(stars)
 	box.add_child(_popup_divider())
+	_popup_fallen(box)
 	_popup_loot(box, result)
 	_popup_xp(box, result)
 	if result == "victory" and arena != null and arena.boss_fight:

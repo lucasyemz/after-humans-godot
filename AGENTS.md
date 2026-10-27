@@ -32,6 +32,8 @@ arte. Nada daqui depende dele em tempo de execução, e nada de lá entra neste 
   migrar ficam em `tools/kit_guard_exceptions.txt`, uma lista que só encolhe.
 - **QA em Play:** o Lucas joga e faz a QA. A automação roda sem janela (`--headless`) ou no modo de captura.
 - **Git:** commit e push só quando pedido.
+- **Branches:** uma branch por issue, saída da `main` atualizada. Quando o PR entra na `main`, a branch é apagada
+  (no GitHub e na cópia local). A próxima issue abre uma branch nova; nada de reaproveitar branch antiga.
 
 ## Narrativa e coerência visual
 
@@ -55,9 +57,9 @@ Cada issue passa por duas personas antes de chegar ao Lucas:
 
 ## Ciclo design e QA de design (Codex)
 
-O Codex cuida de UI/UX e design gráfico (imagens, ícones, molduras, propostas de tela), no branch `codex-design`, sem
+O Codex cuida de UI/UX e design gráfico (imagens, ícones, molduras, propostas de tela), numa branch por entrega, sem
 mexer em código. Cada entrega passa por duas personas:
 - **Designer** (o Codex): faz a entrega e passa para a QA de design.
 - **QA de design**: avalia com o checklist de [docs/design/qa.md](docs/design/qa.md) e devolve `VEREDITO: APROVADO` ou
   `VEREDITO: REPROVADO` com os problemas por gravidade. Reprovado, o designer corrige e manda de novo, até aprovar.
-- Aprovado, o PR do `codex-design` para a `main` registra as rodadas; o Claude integra no jogo e a QA dele testa lá.
+- Aprovado, o PR da entrega para a `main` registra as rodadas; o Claude integra no jogo e a QA dele testa lá.

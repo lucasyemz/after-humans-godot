@@ -80,8 +80,8 @@ func _journey() -> void:
 	t.equal(corridor.segments.map(func(s): return s.steps), [2, 3, 1, 1], "os trechos de cada zona")
 	t.equal(corridor.guards.keys(), [1, 4, 5], "as três patrulhas do tutorial")
 	t.equal(corridor.guards[1].specs.map(func(s): return s.enemy_id), ["broto"], "a primeira luta: o Bento contra o Broto")
-	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["rastejante_raiz", "broto"], "a segunda luta")
-	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["cao_eco", "robot"], "a terceira luta")
+	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["rastejante_raiz"], "a segunda luta")
+	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["ninho_errante"], "a terceira luta")
 	# A HUD da abertura: o objetivo é o trem, a plaqueta diz Abertura (sem clima: é um subsolo).
 	t.check(street.exploration_hud._goal_title.text.begins_with("Chegar ao trem"), "o objetivo da abertura é o trem")
 	t.equal(street.exploration_hud._place_sub.text, "Abertura", "a plaqueta: Abertura, sem clima")
@@ -116,7 +116,8 @@ func _journey() -> void:
 	t.check(not corridor._action.is_valid() or corridor._action.get_method() != "_retreat", "nem a volta à Estação pelo começo")
 	await _fight(street)
 	await _fight(street)
-	t.check(route.steps.filter(func(s): return s.type == "combat" and s.resolved).size() == 3, "as três lutas vencidas")
+	t.check(route.steps.filter(func(s): return s.type == "combat" and s.resolved).size() == 3, "as três lutas vencidas em sequência, sem cura entre elas")
+	t.check(Campaign.state.roster.filter(func(h): return Campaign.state.session.expedition.team.has(h.id)).all(func(h): return h.alive), "e ninguém cai")
 	# A plataforma: o trem chega e para; o embarque leva à Estação.
 	corridor.debug_next_fight()
 	if not await _until(func(): return route.steps[6].resolved and not corridor.busy, "o trem parar na plataforma"):
@@ -133,9 +134,6 @@ func _journey() -> void:
 
 ## Anda até a patrulha do trecho e luta no automático. Devolve se venceu.
 func _fight(street) -> bool:
-	# O teste confere o fluxo, não o desgaste de uma luta para a outra (a vida que não desce de 1 é da #144).
-	for hero_id in Campaign.state.session.expedition.team:
-		Campaign.hero(hero_id).hp = Campaign.hero(hero_id).max_hp
 	street.corridor.debug_next_fight()
 	await _frames(2)
 	Input.action_press("move_right")

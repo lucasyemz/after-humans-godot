@@ -25,6 +25,7 @@ const ROOMS := [
 	{"id": "depot", "x0": 5.6, "x1": 11.6, "floor": -9.4, "ceiling": -6.2, "lane": [7.2, 10.3]},
 	{"id": "research", "x0": -6.4, "x1": 5.6, "floor": -9.4, "ceiling": -6.2, "lane": [-4.9, 4.1]},
 	{"id": "preparation", "x0": 21.6, "x1": STATION_END, "floor": -9.4, "ceiling": -6.2, "lane": [22.9, 26.2]},
+	{"id": "infirmary", "x0": -12.4, "x1": -6.4, "floor": -9.4, "ceiling": -6.2, "lane": [-11.2, -7.6]},
 ]
 ## Profundidade em que os moradores ficam (a faixa de passeio da Unreal, Y -330).
 const LANE_Z := -3.3
@@ -220,7 +221,9 @@ func refresh() -> void:
 		light.light_energy = float(light.get_meta("energy")) * ((1.0 if powered else 0.4) if level >= 1 else 0.3)
 	# O mobiliário some nos cômodos vazios (nível 0: Forja, Pesquisa, Bar e Dormitório numa jornada nova).
 	for room_id in _build.dressing:
-		var furnished := S.room_level(campaign, room_id) >= 1
+		# "infirmary@2": a peça que só aparece no nível 2.
+		var parts: PackedStringArray = String(room_id).split("@")
+		var furnished := S.room_level(campaign, parts[0]) >= (int(parts[1]) if parts.size() > 1 else 1)
 		for node in _build.dressing[room_id]:
 			if is_instance_valid(node):
 				node.visible = furnished
@@ -1048,6 +1051,34 @@ static func sleep_slots() -> Array:
 	return out
 
 
+## Os leitos da Enfermaria (#121), na ordem em que enchem: o de baixo e o de cima do primeiro beliche, depois os do
+## segundo (nível 2).
+static func infirmary_slots() -> Array:
+	var out: Array = []
+	for x in AHStationBuild.INFIRMARY_BUNK_X:
+		for tier in 2:
+			out.append(AHStationBuilder.vu(Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
+				AHStationBuild.INFIRMARY_FLOOR + tier * AHStationBuild.BUNK_UPPER + AHStationBuild.MATTRESS_TOP - SLEEP_DROP)))
+	return out
+
+
+## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um beliche livre do
+## Dormitório (os de baixo para cima, de trás para a frente, para não tomar o de quem dorme a noite). Vector3.INF sem
+## lugar.
+static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
+	var entry = S.hero(campaign, hero_id)
+	var fallen := S.fallen(campaign)
+	if S.in_bed(entry):
+		var index: int = fallen.filter(func(h): return S.in_bed(h)).map(func(h): return h.id).find(hero_id)
+		var slots := infirmary_slots()
+		return slots[index] if index >= 0 and index < slots.size() else Vector3.INF
+	var index: int = fallen.filter(func(h): return not S.in_bed(h)).map(func(h): return h.id).find(hero_id)
+	var slots := sleep_slots()
+	var taken: int = sleepers(campaign).size()
+	var slot: int = slots.size() - 1 - index
+	return slots[slot] if index >= 0 and slot >= taken else Vector3.INF
+
+
 ## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview).
 static func sleepers(campaign: Dictionary) -> Array:
 	if campaign.night.phase != "planning":
@@ -1063,10 +1094,34 @@ func _update_sleepers() -> void:
 	var slots := sleep_slots()
 	var watch: String = campaign.night.watch_hero_id if campaign.night.phase == "planning" else ""
 	var dorm := room_def(S.DORMITORY)
+	var replace := false
 	for walker in _walkers:
 		if not walker.has("hero_id") or not is_instance_valid(walker.card):
 			continue
 		var card: AHSpriteCard = walker.card
+		# Em recuperação (#118): deitado no leito da Enfermaria (ou num beliche do Dormitório), sem passear. Sem a pose
+		# de dormir ou sem lugar, fica de pé, parado, no cômodo onde se recupera.
+		if S.recovering(S.hero(campaign, walker.hero_id)):
+			walker.sleeping = true
+			walker.recovering = true
+			var spot := recovery_spot(campaign, walker.hero_id)
+			if spot != Vector3.INF and _poses.has(walker.hero_id + "_sleep"):
+				card.show_art(_poses[walker.hero_id + "_sleep"])
+				card.position = spot
+			else:
+				var place := room_def(S.INFIRMARY if S.in_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
+				card.show_art(walker.idle)
+				# Sem lugar no beliche, de pé no cômodo, cada um no seu ponto da faixa (nunca um por cima do outro).
+				var order: int = S.fallen(campaign).map(func(h): return h.id).find(walker.hero_id)
+				var along := fmod(0.15 + order * 0.29, 0.7) + 0.15
+				card.position = Vector3(spot.x if spot != Vector3.INF else lerpf(place.lane[0], place.lane[1], along), place.floor, LANE_Z)
+			card.set_facing(1.0)
+			card.scale = Vector3.ONE
+			continue
+		if walker.get("recovering", false):
+			# Recuperado: volta a passear (os cômodos são sorteados de novo).
+			replace = true
+			continue
 		# Cada um tem o seu lugar pela ordem na equipe: trocar o vigia não muda os outros de cama.
 		var slot: int = campaign.night.participants.find(walker.hero_id) if asleep.has(walker.hero_id) else -1
 		if slot >= 0 and slot < slots.size() and _poses.has(walker.hero_id + "_sleep"):
@@ -1090,7 +1145,10 @@ func _update_sleepers() -> void:
 			card.position = Vector3(walker.max, dorm.floor, walker.home_z)
 			card.show_art(walker.idle)
 			card.scale = Vector3.ONE
-
+	if replace:
+		var rng := RandomNumberGenerator.new()
+		rng.randomize()
+		_place_residents.call_deferred(rng)
 
 
 ## Cada herói vivo num cômodo sorteado (30% de chance de dividir um já ocupado, no máximo dois), passeando pela faixa
@@ -1110,11 +1168,15 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 			continue
 		var room_id: String
 		var shared: Array = occupancy.keys().filter(func(id): return occupancy[id] < 2)
-		if free_rooms.is_empty() or (not shared.is_empty() and rng.randf() < SHARE_ROOM_CHANCE):
+		if S.recovering(entry):
+			# Quem se recupera não passeia (_update_sleepers deita no leito); não toma o cômodo de ninguém.
+			room_id = S.INFIRMARY if S.in_bed(entry) else S.DORMITORY
+		elif free_rooms.is_empty() or (not shared.is_empty() and rng.randf() < SHARE_ROOM_CHANCE):
 			room_id = shared[rng.randi_range(0, shared.size() - 1)] if not shared.is_empty() else ROOMS[0].id
 		else:
 			room_id = free_rooms.pop_at(rng.randi_range(0, free_rooms.size() - 1))
-		occupancy[room_id] = int(occupancy.get(room_id, 0)) + 1
+		if not S.recovering(entry):
+			occupancy[room_id] = int(occupancy.get(room_id, 0)) + 1
 		var room := room_def(room_id)
 		var card := AHSpriteCard.new()
 		card.body_height = AHCharacterHeights.find(entry.id)
@@ -1122,7 +1184,7 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		add_child(card)
 		occlusion.track(card)
 		var lane: Array = room.lane
-		var occupants: int = occupancy[room_id]
+		var occupants: int = int(occupancy.get(room_id, 1))
 		var half: float = (lane[1] - lane[0]) * 0.5
 		# O segundo morador do cômodo passeia na metade da direita da faixa.
 		var lane_min: float = lane[0] if occupants == 1 else lane[0] + half

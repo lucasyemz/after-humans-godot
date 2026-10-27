@@ -223,7 +223,10 @@ func _street() -> void:
 	t.check(not Admin.is_open(), "o F1 fecha, e a equipe segue para a patrulha")
 	var arena: AHCombatArena = street._arena
 	var hud: AHCombatHud = arena.hud
-	for i in 900:
+	# A equipe anda até a patrulha no tempo do jogo: espera pelo relógio, não por quadros (sem janela, os quadros correm
+	# mais rápido que a caminhada, e 900 quadros às vezes acabavam antes de ela chegar).
+	var limit := Time.get_ticks_msec() + 30000
+	while Time.get_ticks_msec() < limit:
 		if arena.active and hud.waiting:
 			break
 		if not arena.active and street.exploration_hud.modal_open():

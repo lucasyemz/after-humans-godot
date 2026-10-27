@@ -57,6 +57,8 @@ const ROOMS := [
 	{"id": "depot", "x0": 560.0, "x1": 1160.0, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "concrete_floor_worn_001", "wall": "concrete_wall_008", "wainscot": "", "light": NEUTRAL, "door": 680.0, "lining": ""},
 	{"id": "research", "x0": -640.0, "x1": 560.0, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "concrete_floor_painted", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "door": 390.0, "lining": ""},
 	{"id": "preparation", "x0": 2160.0, "x1": STATION_END, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "rubber_tiles", "wall": "concrete_wall_008", "wainscot": "", "light": NEUTRAL, "door": 2280.0, "lining": ""},
+	# A Enfermaria (#121), embaixo do Dormitório: o cômodo provisório até a arte do design (#124), no mesmo contrato.
+	{"id": "infirmary", "x0": -1240.0, "x1": -640.0, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "worn_tile_floor", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "door": -1150.0, "lining": ""},
 ]
 
 var b: AHStationBuilder
@@ -110,9 +112,10 @@ func build() -> void:
 	mark = b.mark()
 	_bar()
 	_tag_dressing("bar", mark)
+	_infirmary()
 	_characters_room()
 	for index in ROOMS.size():
-		if not ["canteen", "depot", "forge", "dormitory"].has(ROOMS[index].id):
+		if not ["canteen", "depot", "forge", "dormitory", "infirmary"].has(ROOMS[index].id):
 			_placeholder_lighting(index)
 	_corner_dressing()
 	_room_returns()
@@ -185,7 +188,7 @@ func _earth() -> void:
 	box(Vector3(1160, CORRIDOR_BACK - 40, FORGE_FLOOR - 30), Vector3(2160, 0, FORGE_FLOOR - FINISH), rock)
 	# Rocha nas pontas de cada nível.
 	box(Vector3(-1800, CORRIDOR_BACK - 40, B1_FLOOR), Vector3(-1240, 0, B1_CEILING), rock)
-	box(Vector3(-1800, CORRIDOR_BACK - 40, B2_FLOOR), Vector3(-640, 0, B2_CEILING), rock)
+	box(Vector3(-1800, CORRIDOR_BACK - 40, B2_FLOOR), Vector3(-1240, 0, B2_CEILING), rock)
 	box(Vector3(-1800, -1360, -140), Vector3(-40, 0, 1100), rock)
 	box(Vector3(CORE_X1 + 40, -1360, -1500), Vector3(3900, 0, 1100), rock)
 	box(Vector3(STATION_END, -1360, 330), Vector3(CORE_X1 + 40, 0, 1100), rock)
@@ -993,6 +996,31 @@ func _dormitory() -> void:
 	b.prop("wooden_bowl_01", table + Vector3(0, 0, 62))
 	b.hang("caged_hanging_light", Vector3(-760, -460, -200))
 	room_lights["dormitory"] = b.light(Vector3(-760, -460, -290), 650, 800, Color(1, 0.72, 0.42), true)
+
+
+## A Enfermaria provisória (#121): os beliches do Dormitório como leitos (um beliche no nível 1, dois no nível 2), a
+## estante de amostras como a de remédios e o armário com a frente da Cantina. Vazia (nível 0), só uma caixa tombada.
+const INFIRMARY_BUNK_X := [-1075.0, -805.0]
+const INFIRMARY_FLOOR := -940.0
+
+
+func _infirmary() -> void:
+	var f := INFIRMARY_FLOOR
+	var height := BUNK_PX.y * BUNK_SCALE
+	for index in INFIRMARY_BUNK_X.size():
+		var mark := b.mark()
+		var x: float = INFIRMARY_BUNK_X[index]
+		var base := Vector3(x + (BUNK_PX.x * 0.5 - BUNK_ANCHOR_X_PX) * BUNK_SCALE, BUNK_Y, f - (BUNK_PX.y - BUNK_FLOOR_PX) * BUNK_SCALE)
+		b.card(BUNK_CARD, base, BUNK_WIDTH, height)
+		# O segundo beliche só aparece com a Enfermaria melhorada (os leitos 3 e 4).
+		_tag_dressing("infirmary" if index == 0 else "infirmary@2", mark)
+	var mark := b.mark()
+	b.card("Research_SampleShelves", Vector3(-940, -886, f + 160), 150, 97)
+	b.card("Cantina_Front", Vector3(-700, -720, f), 90, 90.0 * 788.0 / 1380.0)
+	b.hang("caged_hanging_light", Vector3(-940, -480, B2_CEILING))
+	room_lights["infirmary"] = b.light(Vector3(-940, -480, B2_CEILING - 90), 1100, 700, COOL, true)
+	_tag_dressing("infirmary", mark)
+	b.card("Depot_Container", Vector3(-1180, -520, f), 60, 60.0 / 1.1509804)
 
 
 func _preparation() -> void:
