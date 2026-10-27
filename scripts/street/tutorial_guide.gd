@@ -80,7 +80,9 @@ func event(kind: String) -> void:
 		"bag":
 			complete("bag")
 		"fight_start":
-			complete("patrol")
+			# A patrulha só conta como ensinada se a dica dela estava aberta (a primeira luta vem antes dela).
+			if hint.step_id == "patrol":
+				complete("patrol")
 			complete("walk")
 			hint.hide_hint()
 		"fight_end":

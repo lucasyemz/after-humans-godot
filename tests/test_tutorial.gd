@@ -199,6 +199,8 @@ func _journey() -> void:
 	t.equal(Campaign.state.session.expedition.corridor.index, index, "o save retoma do mesmo trecho")
 	t.equal(street.party_ids, ["hero_cao_bento", "hero_gato_nick"], "com a dupla")
 	t.check(guide != null and guide.done("search") and guide.hint.step_id != "walk", "e as dicas já vistas não voltam")
+	# A segunda patrulha à frente: a dica de chegar sem ser visto.
+	t.check(await _until(func(): return guide.hint.step_id == "patrol", "a dica da patrulha", 8.0), "a patrulha da segunda luta abre a dica dela")
 	# A segunda luta: recuar recomeça a mesma luta, com a equipe inteira.
 	corridor.debug_next_fight()
 	await _frames(2)
