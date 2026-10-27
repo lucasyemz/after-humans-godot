@@ -24,11 +24,15 @@ const SWITCH_FADE := 0.12
 const FOCUS_PULL := 0.0
 const FOCUS_DISTANCE := 10.5
 const FOCUS_HEIGHT := 0.75
+## A meia largura da fileira com a folga dos corpos (m): a câmera recua até ela caber (a lente fechada dos cenários).
+const ROW_HALF_WIDTH := 4.6
 ## O intervalo mínimo entre duas trocas de herói (s), com ou sem o fade: um toque no analógico troca um só.
 const SWITCH_GAP := 0.2
 ## Ao levantar, o líder fica esta distância à direita da fogueira (m), para a fila de quatro (1,15 m entre um e outro)
 ## ficar toda à direita do fogo; numa sala estreita, até a parede.
 const LEAVE_OFFSET := 4.3
+## A pose de cuidar (a de usar item da luta, reactions.item) depois de comer ou curar, antes de voltar a sentar (s).
+const CARE_POSE_SECONDS := 1.2
 
 signal selected_changed(index: int)
 
@@ -38,7 +42,8 @@ var members: Array = []
 var selected := 0
 var focus_x := 0.0
 var _street
-var _room: AHHouseRoom
+## O lugar da fogueira: a casa do acampamento (AHHouseRoom) ou a parada de descanso (AHStreetCamp, #143).
+var _room: Node3D
 var _poses := {}
 ## O que cada carta mostrava antes (a arte, a posição e o lado), para devolver ao levantar.
 var _before := {}
@@ -71,9 +76,14 @@ func pose_for(hero: Dictionary) -> Dictionary:
 	return {}
 
 
+## A altura e a linha do foco da câmera (o piso e a fogueira do lugar).
+func focus_point() -> Vector3:
+	return Vector3(focus_x, (_room.floor_y if _room != null else 0.0) + FOCUS_HEIGHT, (_room.camp_z if _room != null else 0.0) - 0.2)
+
+
 ## Entra no acampamento: a equipe vai para os lugares em volta da fogueira (com fade, a não ser instant: o jogo
 ## reaberto no meio do acampamento já abre nele).
-func begin(room: AHHouseRoom, team: Array, instant: bool = false) -> void:
+func begin(room: Node3D, team: Array, instant: bool = false) -> void:
 	if active or room == null:
 		return
 	_room = room
@@ -108,7 +118,7 @@ func end(instant: bool = false) -> void:
 	active = false
 	if _street != null and _room != null:
 		# A fila recomeça à direita da fogueira, virada para a porta de saída, sem ninguém em cima do fogo.
-		_street._place_leader(Vector3(minf(_room.camp_x + LEAVE_OFFSET, _street.walk_max.x), 0, 1.1), 1.0)
+		_street._place_leader(Vector3(minf(_room.camp_x + LEAVE_OFFSET, _street.walk_max.x), _room.floor_y, _room.leave_z), 1.0)
 	if not instant:
 		await GameFlow.fade(0.0)
 
@@ -136,7 +146,7 @@ func _arrange(team: Array) -> void:
 			card.show_art(pose.art)
 		card.scale = Vector3.ONE
 		var inset: float = LIE_INSET * signf(offset.x) if pose.get("kind", "") == "sleep" and (slot == 0 or slot == SLOTS.size() - 1) else 0.0
-		card.position = Vector3(_room.camp_x + offset.x - inset, 0, offset.z + 0.35)
+		card.position = Vector3(_room.camp_x + offset.x - inset, _room.floor_y, _room.camp_z + offset.z + 0.35)
 		card.set_facing(-1.0 if offset.x > 0.0 else 1.0)
 		card.visible = true
 		members.append({"hero_id": hero_id, "card": card, "slot": slot, "pose": pose.get("kind", "stand")})
@@ -192,4 +202,22 @@ func member_card(hero_id: String) -> AHSpriteCard:
 
 func switching() -> bool:
 	return _switching
+
+
+## Comer ou curar (#143): o herói mostra a pose de usar item (a mesma da luta) e volta à de descanso. Sem a pose (os
+## recrutas), fica como está.
+func show_care_pose(hero_id: String) -> void:
+	var card := member_card(hero_id)
+	var hero = Campaign.hero(hero_id)
+	if card == null or hero == null:
+		return
+	var item: Dictionary = AHCombatArena.hero_art_of(hero_id, String(hero.get("art_variant", ""))).get("reactions", {}).get("item", {})
+	if item.is_empty():
+		return
+	var rest := card.art()
+	card.show_art(item)
+	await get_tree().create_timer(CARE_POSE_SECONDS).timeout
+	# Levantou acampamento no meio: a arte de antes já voltou (end); senão, a de descanso.
+	if active and is_instance_valid(card) and card.art() == item:
+		card.show_art(rest)
 

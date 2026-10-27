@@ -56,6 +56,8 @@ var guards := {}
 var doors: Array = []
 var props := {}
 var room: AHHouseRoom
+## A fogueira da parada de descanso (#143), enquanto a equipe acampa nela.
+var stop_camp: AHStreetCamp
 var room_guards: Array = []
 var busy := false
 ## O acampamento encenado (#77): a equipe em volta da fogueira enquanto ele estiver ativo.
@@ -123,6 +125,11 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 		# Reaberto no meio do acampamento: a equipe já em volta da fogueira, sem o fade.
 		room.set_camp_lit(true)
 		camp.begin(room, session.expedition.team, true)
+		hud.show_camp(campaign, camp)
+	elif session.screen == "rest" and route.has("stop_camp"):
+		# Reaberto no meio do acampamento da parada: a fogueira no mesmo lugar.
+		_light_stop_camp(float(route.stop_camp.x))
+		camp.begin(stop_camp, session.expedition.team, true)
 		hud.show_camp(campaign, camp)
 	elif AHFightRewards.cargo_pending(campaign):
 		# Reaberto com o guardião vencido e a carga ainda fechada: as mesmas caixas de antes.
@@ -511,12 +518,8 @@ func _announce(index: int, outcome: String, first_time: bool) -> void:
 	var label: String = AHExplorationHud.STEP_LABELS.get(route.steps[index].type, "")
 	match outcome:
 		"rest":
-			var camp: int = route.sites.map(func(s): return s.camp_site).find(true)
-			var where := ""
-			if camp >= 0:
-				where = tr(" O acampamento fica %s do trecho %d.") % [(tr("no cinema") if route.sites[camp].shop == 2 else tr("na ") + tr(R.SHOP_NAMES[route.sites[camp].shop])), route.sites[camp].step + 1]
-			hud.toast(tr("Trecho %d · Descanso. Um lugar quieto.%s") % [index + 1, where], 5.0)
-			_ask_risk("rest", tr("Um lugar quieto"), tr("A equipe para no descanso.%s Daqui dá para seguir até o guardião ou voltar à Estação com metade do achado.") % where)
+			hud.toast(tr("Trecho %d · Descanso. Um lugar quieto.") % (index + 1), 3.0)
+			_ask_rest()
 		"combat", "boss":
 			hud.toast(tr("Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro.") % [index + 1, tr(label)])
 			if outcome == "boss":
@@ -524,6 +527,79 @@ func _announce(index: int, outcome: String, first_time: bool) -> void:
 		_:
 			if first_time:
 				hud.toast(tr("Trecho %d · %s") % [index + 1, tr(label)], 2.5)
+
+
+## A parada de descanso é o acampamento opcional (#143): acampar aqui, seguir ou voltar com metade do achado. O texto diz
+## como a equipe está (a vida, o instinto, a comida), para a escolha fazer sentido. Uma vez por jornada.
+func _ask_rest() -> void:
+	var expedition: Dictionary = Campaign.state.session.expedition
+	var asked: Array = expedition.get("asked", [])
+	if asked.has("rest") or street._capture_dir != "" or expedition.objective_completed:
+		return
+	asked.append("rest")
+	expedition.asked = asked
+	Campaign.save()
+	var text := rest_state_text(Campaign.state)
+	var options: Array = []
+	if R.can_camp_at_stop(Campaign.state):
+		text += " " + tr("Dá para acampar aqui: comer, cuidar dos feridos e baixar o instinto antes do guardião.")
+		options.append([tr("Acampar aqui"), _camp_at_stop])
+	else:
+		text += " " + tr("A equipe já acampou nesta fase.")
+	options.append([tr("Seguir em frente"), func(): pass])
+	options.append([tr("Voltar à Estação (metade do achado)"), _retreat])
+	hud.show_choice(tr("Um lugar quieto"), text, options)
+
+
+## Como a equipe chega à parada: a vida somada, o instinto mais alto (e quem) e a comida.
+func rest_state_text(campaign: Dictionary) -> String:
+	var expedition: Dictionary = campaign.session.expedition
+	var hp := 0
+	var max_hp := 0
+	var top_instinct := -1
+	var top_name := ""
+	for hero in campaign.roster:
+		if not expedition.team.has(hero.id) or not hero.alive:
+			continue
+		hp += int(hero.hp)
+		max_hp += int(hero.max_hp)
+		if int(hero.instinct) > top_instinct:
+			top_instinct = int(hero.instinct)
+			top_name = String(hero.display_name)
+	var text := tr("A equipe está com %d de %d de vida") % [hp, max_hp]
+	if top_instinct > 0:
+		text += tr("; o instinto mais alto é o de %s (%d)") % [top_name, top_instinct]
+	return text + tr("; a comida está em %d de %d.") % [R.food(campaign), R.MAX_FOOD]
+
+
+## Acampar aqui: com a casa do acampamento na mesma parada, a equipe entra nela e acampa lá (uma parada só); senão a
+## fogueira acende na rua, onde a equipe parou.
+func _camp_at_stop() -> void:
+	var house := R.stop_camp_house(Campaign.state)
+	if house >= 0 and R.can_enter_house(Campaign.state, house):
+		await _enter_house(house)
+		_start_camp()
+		return
+	if not R.start_stop_camp(Campaign.state, street._leader.position.x):
+		return
+	Campaign.save()
+	busy = true
+	await GameFlow.fade(1.0)
+	_light_stop_camp(float(Campaign.state.session.expedition.corridor.stop_camp.x))
+	await camp.begin(stop_camp, Campaign.state.session.expedition.team, true)
+	await GameFlow.fade(0.0)
+	busy = false
+	hud.show_camp(Campaign.state, camp)
+
+
+func _light_stop_camp(x: float) -> void:
+	if stop_camp != null:
+		stop_camp.queue_free()
+	stop_camp = AHStreetCamp.new()
+	street.add_child(stop_camp)
+	stop_camp.build(x, street.floor_y if street.scenario else street._ground_height(street.lane_z), street.lane_z,
+		street.walk_min.x, street.walk_max.x)
+	stop_camp.set_camp_lit(true)
 
 
 ## A pergunta de risco, uma vez por jornada em cada ponto: seguir com a equipe como está ou voltar com metade.
@@ -674,7 +750,7 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 		if R.can_start_camp(campaign):
 			text = tr("E  Acampar (fechar a porta e acender a fogueira)")
 			action = _start_camp
-		elif site.camped:
+		elif R.camped(route):
 			text = tr("Acampamento já feito nesta fase")
 			action = Callable()
 		where = null
@@ -1011,6 +1087,7 @@ func _camp_care(hero_id: String, kind: String) -> void:
 	if ok:
 		Campaign.save()
 		hud.camp_respond(hero_id, kind, hero.hp - hp_before, hero.instinct - instinct_before)
+		camp.show_care_pose(hero_id)
 	hud.show_camp(Campaign.state, camp)
 	hud.refresh(Campaign.state)
 
@@ -1032,7 +1109,11 @@ func _on_camp_leave() -> void:
 	Campaign.save()
 	hud.hide_camp()
 	await camp.end()
-	room.set_camp_lit(false)
+	if room != null:
+		room.set_camp_lit(false)
+	if stop_camp != null:
+		stop_camp.queue_free()
+		stop_camp = null
 	street.apply_corridor_weather(weather)
 	busy = false
 	hud.toast(tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather)), 4.0)

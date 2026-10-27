@@ -15,6 +15,10 @@ const C = preload("res://scripts/flow/exploration_care.gd")
 const KNOWN_TOOLS := ["pe_de_cabra", "lanterna", "mascara"]
 const TOOL_NAMES := {"pe_de_cabra": "Pé de cabra", "lanterna": "Lanterna", "mascara": "Máscara com filtro"}
 const TOOL_ICONS := {"pe_de_cabra": "tool-crowbar", "lanterna": "tool-flashlight", "mascara": "tool-mask"}
+## O que cada ferramenta faz (o aviso de quando chega e a Mochila, #143).
+const TOOL_TEXTS := {"pe_de_cabra": "Abre portas e gavetas emperradas nos eventos e arromba uma loja trancada (aí ele quebra).",
+	"lanterna": "Ilumina poços e cantos escuros: abre escolhas nos eventos.",
+	"mascara": "Filtra o ar tomado de esporos: abre escolhas nos eventos."}
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 const GROUPS := ["Suprimentos", "Ferramentas", "Recursos e relíquias"]
 ## O lado do quadrado de um item e a largura do detalhe.
@@ -26,11 +30,16 @@ var session: AHCombatSession
 var hero_id := ""
 var selected := "food"
 var feedback := ""
+## As ferramentas que chegaram desde a última vez que a Mochila abriu (#143): ficam com o selo NOVO, e a primeira abre
+## escolhida.
+var fresh: Array = []
 var _slots: Array = []
 
 
 func _ready() -> void:
 	add_theme_constant_override("separation", 12)
+	if not fresh.is_empty():
+		selected = fresh[0]
 	_validate_hero()
 	_build()
 
@@ -93,6 +102,17 @@ func _build() -> void:
 	row.add_child(detail)
 
 
+## O selo NOVO no canto de cima à direita (a ferramenta que acabou de chegar e o botão MOCHILA, #143).
+static func new_tag() -> PanelContainer:
+	var tag := AHKit.chip("cost")
+	tag.name = "New"
+	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tag.add_child(AHKit.label(TranslationServer.translate("Novo").to_upper(), "small", AHKit.AMBER, true))
+	tag.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 2)
+	tag.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	return tag
+
+
 ## Um ícone do kit (ou dos ícones antigos, que o kit ainda não tem).
 func _icon(name: String, side: float, tint: Color) -> TextureRect:
 	var rect := TextureRect.new()
@@ -131,7 +151,7 @@ func _make_slots() -> Array:
 	for tool in tools:
 		var has := AHJourneyRules.has_tool(campaign, tool)
 		out.append({"id": tool, "name": tr(TOOL_NAMES.get(tool, tool.capitalize())), "icon": TOOL_ICONS.get(tool, "tool-generic"), "count": "",
-			"group": 1, "owned": has, "text": tr("Reutilizável: abre escolhas nos eventos. Não se gasta.") if has else tr("A equipe ainda não tem esta ferramenta.")})
+			"group": 1, "owned": has, "text": (tool_text(tool) + " " + tr("Não se gasta.")) if has else tr("A equipe ainda não tem esta ferramenta.")})
 	for spec in [["seeds", "Sementes", "lobby-seed", "Moeda do refúgio: comida extra na preparação, pesquisa e obras."],
 			["scrap", "Sucata", "lobby-scrap", "Matéria-prima da Forja."], ["fragments", "Fragmentos", "lobby-fragment", "Restos raros usados nas pesquisas."]]:
 		out.append({"id": spec[0], "name": tr(spec[1]), "icon": spec[2], "count": str(int(campaign.inventory.get(spec[0], 0))), "group": 2,
@@ -146,6 +166,11 @@ func _make_slots() -> Array:
 		out.append({"id": relic_id, "name": name, "icon": RELIC_ICONS.get(relic_id, "relic-generic"), "count": str(relics[relic_id]),
 			"group": 2, "owned": true, "text": text + tr("Equipe no Alojamento.")})
 	return out
+
+
+## O que a ferramenta faz, traduzido.
+static func tool_text(tool: String) -> String:
+	return TranslationServer.translate(TOOL_TEXTS.get(tool, "Reutilizável: abre escolhas nos eventos."))
 
 
 ## Um item: o quadrado de recurso com o ícone (o escolhido com a moldura âmbar) e, embaixo, o nome e a quantidade. O
@@ -171,6 +196,8 @@ func _slot_button(item: Dictionary) -> Button:
 	tile.add_child(glyph)
 	if chosen:
 		tile.add_child(AHKit.selected_overlay())
+	if fresh.has(item.id):
+		button.add_child(new_tag())
 	var name := AHKit.label(item.name, "small", AHKit.TEXT if item.owned else AHKit.MUTED)
 	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
