@@ -48,7 +48,7 @@ var _time := 0.0
 const DISPLAY := {"RootBridge": "Ponte das Raízes", "RiverDock": "Cais do Rio", "FloodedDepot": "Depósito Inundado",
 	"SealedShelter": "Abrigo Lacrado", "SewerDucts": "Dutos de Esgoto", "TriageGate": "Portão de Triagem",
 	"ContainmentCorridor": "Corredor de Contenção"}
-## A lâmpada de emergência (docs/design/tutorial.md): 0,6 s acesa e 0,4 s quase apagada (a 25%), fora de fase entre
+## A lâmpada de emergência (o desenho do tutorial, PR #152): 0,6 s acesa e 0,4 s quase apagada (a 25%), fora de fase entre
 ## vizinhas; com "Reduzir efeitos", acesa sem piscar.
 const BLINK_PERIOD := 1.0
 const BLINK_ON := 0.6

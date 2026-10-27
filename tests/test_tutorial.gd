@@ -60,7 +60,8 @@ func _skip_equals_play() -> void:
 	t.check(AHTutorial.suppresses_tips(played), "com as dicas de primeira vez caladas")
 	t.equal(played.session.expedition.team, ["hero_cao_bento"], "o Bento sozinho")
 	AHTutorial.join(played)
-	for hero in played.roster:
+	# Quem foi ao tutorial volta ferido; o resto do elenco ficou na Estação (o embarque só cura a equipe).
+	for hero in played.roster.filter(func(h): return played.session.expedition.team.has(h.id)):
 		hero.hp = 3
 		hero.xp = 40
 		hero.instinct = 70
@@ -83,7 +84,7 @@ func _skip_equals_play() -> void:
 	var screen := AHStationReport.new()
 	screen.report = report
 	var chips: Array = screen._chips(played, "victory").map(func(c): return c.icon)
-	t.check(not chips.has("guardian_defeated") and chips.has("res-bandages") and chips.has("tool-crowbar"), "o relatório da abertura diz a fuga, o curativo e a ferramenta, sem guardião")
+	t.check(not chips.has("guardian_defeated") and chips.has("res-bandages") and chips.has(AHInventoryPanel.TOOL_ICONS[AHTutorial.reward().tool]), "o relatório da abertura diz a fuga, o curativo e a ferramenta, sem guardião")
 	screen.free()
 	# Um save de antes do tutorial (sem a marca) já passou dele.
 	var old := Campaign.create_initial(32)

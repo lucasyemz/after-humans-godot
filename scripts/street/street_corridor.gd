@@ -709,8 +709,10 @@ func _refresh_security_doors(sound: bool = false) -> void:
 ## O encontro com o Nick (o tutorial): ele aparece adiante, a conversa curta com o retrato (a caixa do briefing, #88) e
 ## ele entra na equipe; o trecho fica resolvido. Fechar o jogo no meio da conversa repete o encontro.
 func _meet_nick() -> void:
-	if busy:
+	# A reabertura chama pelo call_deferred e o quadro da rua pode chamar de novo no mesmo trecho: só uma vez por cena.
+	if busy or _nick_met:
 		return
+	_nick_met = true
 	busy = true
 	var team: Array = Campaign.state.session.expedition.team.duplicate()
 	var arriving: Array = AHTutorial.journey().get("JoinTeam", []).filter(func(id): return not team.has(id))
@@ -725,6 +727,10 @@ func _meet_nick() -> void:
 	busy = false
 	hud.refresh(Campaign.state)
 	_refresh_security_doors(true)
+
+
+## O encontro com o Nick já rodou nesta cena (a guarda do _meet_nick).
+var _nick_met := false
 
 
 ## Recuou de uma luta do tutorial: a equipe volta inteira um pouco antes da patrulha, que retoma o posto.
