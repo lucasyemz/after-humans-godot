@@ -34,8 +34,9 @@ arquivo ao mesmo tempo.
 | **Claude Orquestrador PC** | o Claude local no Windows | o teste definitivo: junta os PRs que mexem no jogo, roda os testes e as capturas na Godot do Windows, faz o build, cuida da referência da Unreal (que só existe nesse PC) e dos saves do Lucas |
 
 **Quem junta o quê:**
-- **o da nuvem junta** só os PRs de arte e documentos (design, sem `scripts/`, `data/` nem `tests/`) com o CI verde e a aprovação do Lucas;
-- **os PRs de código** (Claude 1 e Claude 2) ficam para o do PC, que roda a bateria inteira no Windows antes. Se o Lucas pedir ao da nuvem para juntar um PR de código, ele junta com o CI verde e avisa num comentário que falta o teste no Windows.
+Desde 27/10/2026 o da nuvem junta sozinho, na ronda automática (abaixo):
+- **os PRs de arte e documentos** (sem `scripts/`, `data/` nem `tests/`) com o CI verde e o revisor em PRONTO PARA O MERGE, sem esperar o Lucas;
+- **os PRs de código** (Claude 1 e Claude 2) também, com o CI verde e o revisor em PRONTO, e com um comentário no PR avisando que falta o teste no Windows. O do PC faz esse teste depois, na `main`.
 
 **Para os dois não juntarem ao mesmo tempo:** antes de juntar, comentar no PR "Integrando (Orquestrador Nuvem)" ou "Integrando (Orquestrador PC)". Se o outro já comentou, não mexer.
 
@@ -44,6 +45,27 @@ arquivo ao mesmo tempo.
 - os textos em português;
 - as decisões do Lucas registradas na issue ou no PR;
 - nunca escrever `@codex` ou `@claude` em comentários.
+
+### A ronda automática do Orquestrador Nuvem (desde 27/10/2026)
+
+Uma tarefa agendada acorda o Orquestrador Nuvem de hora em hora (e os eventos dos PRs também o acordam). Em cada ronda:
+
+1. **Lê os PRs abertos para a `main`:** o CI, o comentário do revisor, o escopo (os arquivos), os conflitos e os
+   comentários do Lucas.
+2. **Junta** quando tudo bate: CI verde, revisor em PRONTO PARA O MERGE, sem conflito, sem pedido do Lucas em aberto no
+   PR e sem "Integrando (Orquestrador PC)". Antes, comenta "Integrando (Orquestrador Nuvem)"; nos de código, avisa que
+   falta o teste no Windows. A branch é apagada depois do merge.
+3. **Devolve para o agente** quando o PR pede ajuste: o revisor em AJUSTAR ANTES, o CI vermelho ou um pedido do Lucas.
+   O Claude 1 e o Claude 2 recebem a mensagem direto na sessão deles; o Awesomic 1 e o 2 recebem pela issue e pelo
+   Lucas, até eles poderem ler o GitHub sozinhos.
+4. **Passa a próxima tarefa** a um agente parado: a próxima issue aberta da etiqueta dele, na ordem da tabela das
+   frentes. Só issues que o Lucas pediu; nada fora delas.
+5. **Pergunta ao Lucas** e não junta quando: o revisor diz NÃO INTEGRAR; o PR traz uma escolha entre alternativas, uma
+   regra nova ou um texto da história que o Lucas ainda não aprovou; o PR sai da issue dele; ou dois PRs se contradizem.
+   Os números de balanceamento que o PR marca como proposta podem entrar, e a pergunta vai para o Lucas.
+
+O que a ronda nunca faz: criar issue ou tarefa por conta própria, mudar o escopo de uma issue, mexer no código do jogo,
+fechar issue sem o PR dela na `main`.
 
 ### Os papéis
 
