@@ -13,6 +13,10 @@ uniform vec4 weather = vec4(1.0);
 uniform float wet = 0.0;
 uniform float foam_width = 0.9;
 uniform vec4 foam_lines = vec4(-9999.0);
+// A largura da espuma das linhas de margem (m). Com a câmera da exploração quase rente, a água logo atrás do cais fica
+// escondida pelo próprio piso: a primeira que aparece está uns 10 m para trás, e a linha de espuma vai ali (no Cais,
+// em -12,6), onde na tela a água encontra a beira do cais.
+uniform float line_foam_width = 0.9;
 uniform vec4 foam_points[16];
 uniform int foam_count = 0;
 // Um balanço de poucos centímetros na malha, só para a água não ficar dura.
@@ -35,7 +39,7 @@ void fragment() {
 	float foam = smoothstep(foam_width, 0.0, abs(p.y));
 	for (int i = 0; i < 4; i++) {
 		if (foam_lines[i] > -9000.0) {
-			foam = max(foam, smoothstep(foam_width, 0.0, abs(world.z - foam_lines[i])));
+			foam = max(foam, smoothstep(line_foam_width, 0.0, abs(world.z - foam_lines[i])));
 		}
 	}
 	for (int i = 0; i < foam_count; i++) {

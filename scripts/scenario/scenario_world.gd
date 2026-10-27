@@ -34,6 +34,7 @@ var _prop_nodes := {}
 var _cards: Array[ShaderMaterial] = []
 ## A água pintada (#140): a do chão e a do fundo pintado; "Reduzir efeitos" a deixa mais lenta e sem piscar.
 var _waters: Array[ShaderMaterial] = []
+const WATER_COVERED := 0.3
 var _blockouts: Array[ShaderMaterial] = []
 
 
@@ -135,11 +136,15 @@ func refresh_water_pace() -> void:
 		_water_pace(material)
 
 
-## Tempo molhado nos materiais (a chuva lá fora) e a cor do clima nos cards de fundo.
-func set_weather(wet: float, tint: Color) -> void:
+## Tempo molhado nos materiais (a chuva lá fora) e a cor do clima nos cards de fundo. covered: a equipe num interior; a
+## água pintada, sem luz própria, escurece com ele (vista da porta, não brilha ao lado da sala escura).
+func set_weather(wet: float, tint: Color, covered: bool = false) -> void:
 	for material in _cards:
 		material.set_shader_parameter("wet", wet)
 		material.set_shader_parameter("weather", Vector4(tint.r, tint.g, tint.b, 1.0))
+	if covered:
+		for material in _waters:
+			material.set_shader_parameter("weather", Vector4(tint.r * WATER_COVERED, tint.g * WATER_COVERED, tint.b * WATER_COVERED, 1.0))
 	for material in _blockouts:
 		material.set_shader_parameter("wet", wet)
 
@@ -304,6 +309,7 @@ func _material(m: Dictionary) -> Material:
 				for i in mini(4, lines.size()):
 					packed[i] = float(lines[i])
 				material.set_shader_parameter("foam_lines", packed)
+				material.set_shader_parameter("line_foam_width", float(m.get("line_foam_width", 0.9)))
 				var points: Array = m.get("foam_points", [])
 				var list: Array[Vector4] = []
 				for point in points.slice(0, 16):

@@ -1,8 +1,9 @@
 ## QA por captura da #140 (a água pintada do Cais e da Ponte das Raízes), pela cena de verdade:
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_140.gd -- --out=<pasta>
 ## Campanha própria na pasta da saída e as opções só na memória. Roda também na main de antes. Para cada mapa: cada zona
-## no fim de tarde e na noite com chuva (no Ultra), uma no Baixo, e uma sequência de 4 quadros (0,4 s) mostrando o
-## movimento. Grava camera.txt com a distância e a altura da câmera até o líder em cada mapa.
+## no fim de tarde e na noite com chuva (no Ultra), uma no Baixo, as sequências de 4 quadros (0,4 s) mostrando o
+## movimento no Ultra e no Baixo e um interior lateral. Grava camera.txt com a distância e a altura da câmera até o
+## líder em cada mapa.
 extends SceneTree
 
 const MAPS := [["RiverDock", "fase_2", 0], ["RootBridge", "fase_2", 4]]
@@ -93,7 +94,15 @@ func _map(spec: Array) -> void:
 			settings.set_level(0)
 			await _wait(1.0)
 			await _shot("%s-z0-low" % spec[0])
+			for i in 4:
+				await _wait(0.4)
+				await _shot("%s-low-seq%d" % [spec[0], i])
 			settings.set_level(3)
+	# Um interior lateral (a água vista pela porta acompanha o escuro de dentro).
+	if not corridor.side_rooms.is_empty():
+		corridor._show_side_room(0)
+		await _wait(1.0)
+		await _shot("%s-inside" % spec[0])
 
 
 func _shot(name: String) -> void:

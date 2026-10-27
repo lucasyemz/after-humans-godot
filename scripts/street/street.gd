@@ -872,7 +872,7 @@ func _apply_weather() -> void:
 	_splashes.visible = not covered
 	if scenario:
 		# Nos cenários o céu e o sol da rua só tingem; a luz é a das luminárias do mapa (e a lanterna).
-		scenario.set_weather(_wet if not covered else 0.0, Color(1, 1, 1) if _mood == "golden" else Color(0.55, 0.6, 0.75))
+		scenario.set_weather(_wet if not covered else 0.0, Color(1, 1, 1) if _mood == "golden" else Color(0.55, 0.6, 0.75), covered)
 	# Luz de leitura: acende de noite e na chuva, sobre a equipe e a luta.
 	var readable := (1.0 if _mood == "night" else 0.0) + (0.3 if _raining else 0.0)
 	_key_light.light_energy = 0.7 * clampf(readable, 0.0, 1.2)
