@@ -6,9 +6,9 @@
 ##   walk      a partida                      fecha ao andar uns metros
 ##   ability   a primeira vez do Bento na luta fecha ao mirar (a habilidade escolhida)
 ##   target    a mira                         fecha com o comando
+##   patrol    a segunda patrulha à frente    fecha quando a luta começa
 ##   search    o armário ao alcance           fecha ao vasculhar
 ##   bag       logo depois da busca           fecha ao abrir a Mochila
-##   patrol    a segunda patrulha à frente    fecha quando a luta começa
 ##   position  a primeira vez na segunda luta fecha com o comando
 ##   item      a primeira vez na terceira     fecha ao usar um item (ou no fim da luta)
 ##   train     o trem parado na plataforma    fecha ao embarcar
@@ -152,8 +152,11 @@ func _watch_world() -> void:
 	var route: Dictionary = Campaign.state.session.expedition.corridor
 	if not done("search") and corridor._action.is_valid() and corridor._action.get_method() == "_search_scenario_prop":
 		show("search")
-	elif not done("patrol") and route.index >= 3 and (corridor.guards.has(route.index) or corridor.guards.has(route.index + 1)):
-		show("patrol")
+	elif not done("patrol"):
+		# A patrulha à frente (a do trecho ou a do próximo), menos a da primeira luta, que vem antes da dica.
+		var ahead: int = route.index if corridor.guards.has(route.index) else route.index + 1
+		if corridor.guards.has(ahead) and String(AHTutorial.fight_at(ahead).get("Name", "")) != "fight_1":
+			show("patrol")
 
 
 func _on_combat(kind: String, data: Dictionary) -> void:
@@ -162,14 +165,16 @@ func _on_combat(kind: String, data: Dictionary) -> void:
 	match kind:
 		"turn":
 			_fight_step = route.index
-			if _fight_step == 1 and not done("ability"):
+			# Cada luta ensina o dela, pelo nome em data/tutorial.json (o trecho de cada uma muda com o mapa).
+			var fight := String(AHTutorial.fight_at(_fight_step).get("Name", ""))
+			if fight == "fight_1" and not done("ability"):
 				# A primeira escolha trava: só as habilidades (as ações voltam quando ela é feita).
 				hud.tutorial_locks = ["move", "defend", "item", "flee"]
 				hud.apply_tutorial_locks()
 				show("ability", "left")
-			elif _fight_step == 4 and not done("position"):
+			elif fight == "fight_2" and not done("position"):
 				show("position", "left")
-			elif _fight_step == 5 and not done("item"):
+			elif fight == "fight_3" and not done("item"):
 				show("item", "left")
 		"target":
 			if hint.step_id == "ability":

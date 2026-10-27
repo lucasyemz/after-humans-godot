@@ -118,7 +118,7 @@ Seu problema não é realmente:
 
 > **No jogo hoje (decisão do Lucas, 27/10):** a abertura jogável (o tutorial) segue esta cena com a **Véspera no lugar
 > da Amora**, que ainda não está no jogo. A Amora entra depois, com arte própria (`review.md`, "Decisão do Lucas
-> (27/10)").
+> (27/10)"). A área automatizada da cena é o **Corredor de Contenção** (`lore.md` §9), o mapa do tutorial.
 
 Bento sai da Estação em uma missão de abastecimento acompanhado de **Íris e Amora**.
 

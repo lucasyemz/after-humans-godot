@@ -44,8 +44,8 @@ func _data() -> void:
 	t.check(AHScenarioWorld.exists(AHTutorial.MAP), "o mapa do tutorial existe em data/scenarios")
 	t.equal(AHScenarioWorld.display_of(AHTutorial.MAP), "Corredor de Contenção", "o nome do lugar (decisão do Lucas)")
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/scenarios/%s.json" % AHTutorial.MAP))
-	t.equal(data.zones.map(func(z): return z.name), ["Corredor de contenção", "Sala das celas", "Rota do Nick", "Plataforma"], "as quatro zonas")
-	t.equal(data.security_doors.size(), 6, "as portas de segurança: a saída das três primeiras zonas e a entrada das três últimas")
+	t.equal(data.zones.map(func(z): return z.name), ["Corredor", "Celas", "Rota do Nick", "Plataforma"], "as quatro zonas (o mapa do PR #173)")
+	t.equal(data.security_doors.map(func(d): return [int(d.zone), d.role]), [[2, "entry"]], "a porta de segurança: a da rota do Nick, que baixa atrás da equipe")
 	t.equal(data.props.map(func(p): return p.name), ["Armário de manutenção"], "a busca do tutorial é o armário de manutenção")
 	t.check(not data.door_panel.is_empty() and int(data.train.zone) == 3, "o painel das portas e o trem na plataforma")
 	t.check(data.lights.filter(func(l): return l.has("blink")).size() >= 6, "as lâmpadas de emergência piscam")
@@ -93,7 +93,7 @@ func _journey() -> void:
 	var expedition: Dictionary = Campaign.state.session.expedition
 	t.equal(expedition.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera"], "o Bento começa com a Íris e a Véspera")
 	var route: Dictionary = expedition.corridor
-	t.equal(route.steps.map(func(s): return s.type), ["start", "combat", "nick", "loot", "combat", "combat", "train"], "os trechos do tutorial")
+	t.equal(route.steps.map(func(s): return s.type), ["start", "combat", "nick", "combat", "loot", "combat", "train"], "os trechos do tutorial")
 	Campaign.save()
 	GameFlow.change_to("street", {}, false)
 	if not await _until(func(): return _street() != null and not GameFlow.busy, "a rua abrir"):
@@ -102,9 +102,9 @@ func _journey() -> void:
 	var corridor: AHStreetCorridor = street.corridor
 	t.equal(street.scenario.map_name, AHTutorial.MAP, "a rua abre no Corredor de Contenção")
 	t.equal(corridor.segments.map(func(s): return s.steps), [2, 3, 1, 1], "os trechos de cada zona")
-	t.equal(corridor.guards.keys(), [1, 4, 5], "as três patrulhas do tutorial")
+	t.equal(corridor.guards.keys(), [1, 3, 5], "as três patrulhas do tutorial")
 	t.equal(corridor.guards[1].specs.map(func(s): return s.enemy_id), ["broto", "faisca", "pipoco"], "a primeira luta: os três contra três pequenos")
-	t.equal(corridor.guards[4].specs.map(func(s): return s.enemy_id), ["rastejante_raiz", "broto"], "a segunda luta")
+	t.equal(corridor.guards[3].specs.map(func(s): return s.enemy_id), ["rastejante_raiz", "broto"], "a segunda luta")
 	t.equal(corridor.guards[5].specs.map(func(s): return s.enemy_id), ["faisca", "ninho_errante"], "a terceira luta")
 	# A HUD da abertura: o objetivo é o trem, a plaqueta diz Abertura (sem clima: é um subsolo).
 	t.check(street.exploration_hud._goal_title.text.begins_with("Chegar ao trem"), "o objetivo da abertura é o trem")
@@ -121,18 +121,15 @@ func _journey() -> void:
 	t.check(Campaign.state.session.result == "" and Campaign.state.station.last_return.is_empty(), "e a retirada não abandona a abertura")
 	var metro: Node3D = street.scenario.get_node("Metro")
 	t.check(not metro.visible, "o vagão só aparece quando chega")
-	t.equal(corridor.scenario_props.map(func(e): return e.step), [3], "o armário fica no trecho da busca, antes da segunda luta")
-	var exit0: int = street.scenario.doors_of(0, "exit")[0]
-	t.check(not street.scenario.door_open(exit0), "a porta do fim do corredor fica baixada antes da primeira luta")
+	t.equal(corridor.scenario_props.map(func(e): return e.step), [4], "o armário fica no trecho da busca, depois da segunda luta")
+	var route_door: int = street.scenario.doors_of(2, "entry")[0]
 	await _fight(street)
-	t.check(street.scenario.door_open(exit0), "vencida a primeira luta, a porta abre")
 	# O Nick: o próximo passo é o encontro, e ele entra na equipe.
 	corridor.debug_next_fight()
 	await _frames(2)
 	t.equal(Campaign.state.session.expedition.team, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "o Nick entra na equipe")
 	t.equal(street.party_ids, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "e anda com os três")
 	t.equal(corridor.segment, 1, "a sala das celas")
-	t.check(not street.scenario.door_open(street.scenario.doors_of(1, "entry")[0]), "a porta de trás baixou")
 	# Sem volta: andar para a esquerda até a ponta não leva de volta ao corredor.
 	street._place_leader(Vector3(corridor.segments[1].x0 + 0.3, street.floor_y, street.lane_z))
 	await _frames(4)
@@ -140,6 +137,8 @@ func _journey() -> void:
 	t.check(not corridor._action.is_valid() or corridor._action.get_method() != "_retreat", "nem a volta à Estação pelo começo")
 	await _fight(street)
 	await _fight(street)
+	t.equal(corridor.segment, 2, "a rota do Nick")
+	t.check(not street.scenario.door_open(route_door), "a porta de segurança baixou atrás da equipe")
 	t.check(route.steps.filter(func(s): return s.type == "combat" and s.resolved).size() == 3, "as três lutas vencidas em sequência, sem cura entre elas")
 	t.check(Campaign.state.roster.filter(func(h): return Campaign.state.session.expedition.team.has(h.id)).all(func(h): return h.alive), "e ninguém cai")
 	# A plataforma: o trem chega e para; o embarque leva à Estação.
@@ -147,7 +146,8 @@ func _journey() -> void:
 	if not await _until(func(): return route.steps[6].resolved and not corridor.busy, "o trem parar na plataforma"):
 		return
 	t.equal(corridor.segment, 3, "a plataforma")
-	t.check(metro.visible and absf(metro.position.x - float(street.scenario.train.x)) < 0.01, "o vagão chegou e parou")
+	# O nó do vagão fica na origem (as peças estão no lugar delas no mapa): parado, ele volta ao zero.
+	t.check(metro.visible and metro.position.is_zero_approx() and metro.get_child_count() > 0, "o vagão chegou e parou")
 	street._place_leader(Vector3(float(street.scenario.train.x), street.floor_y, street.lane_z))
 	await _frames(3)
 	t.check(corridor._train_point() != null and corridor._action.is_valid() and corridor._action.get_method() == "_board_train", "perto do vagão, o aviso é embarcar")

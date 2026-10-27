@@ -130,6 +130,9 @@ As descrições das fases 1, 2 e 5 e o Próximo passo final ("Os Antigos ainda e
 - **A Véspera faz o papel da Amora (opção B):** a Amora não está no jogo. Ela continua na lore e no arco e entra depois,
   com arte própria; o pedido de arte passa pelo Orquestrador. Até lá, a Véspera é quem testemunha o Nick escolhendo
   voltar (o papel da Amora no §21).
+- **O lugar se chama Corredor de Contenção:** a passagem automatizada onde o grupo fica preso. O nome vem do Protocolo
+  de Contenção (`lore.md` §9): o corredor fecha porque as máquinas ainda classificam os animais como vetores, não por
+  ódio. O mapa é o do PR #173 (`data/scenarios/ContainmentCorridor.json`).
 
 ## 4. Progressão das fases
 
@@ -157,6 +160,7 @@ Da lore e dos documentos:
 - O Retorno — lore.md §4, §26
 - Programa de Adaptação — lore.md §6, §26
 - Protocolo de Contenção — lore.md §9
+- Corredor de Contenção — lore.md §9; bento-nick-arc.md §3 (o lugar do tutorial)
 - Protocolo de Preservação Humana — lore.md §19 ("PROTOCOLO DE PRESERVAÇÃO HUMANA ATIVO")
 - VIGIA — lore.md §11
 - Sistemas de Segurança — lore.md §10.1

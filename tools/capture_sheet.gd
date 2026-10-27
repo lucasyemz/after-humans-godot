@@ -115,9 +115,10 @@ func _run() -> void:
 			break
 	await _frames(20)
 	var hud = current_scene.hud
-	hud.open_room(S.PREPARATION)
+	hud.open_departure()
+	hud._briefed = hud._draft.phase
 	await _frames(20)
-	var cards: Array = hud._prep.find_children("*", "Button", true, false).filter(func(b): return b.custom_minimum_size == Vector2(318, 250))
+	var cards: Array = hud._departure.find_children("Slot*", "Button", true, false)
 	if not cards.is_empty():
 		var motion := InputEventMouseMotion.new()
 		motion.position = cards.back().get_global_rect().get_center()

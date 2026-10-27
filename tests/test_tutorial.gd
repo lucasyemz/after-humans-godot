@@ -188,6 +188,43 @@ func _journey() -> void:
 		_dialog(street).skip_button.pressed.emit()
 	await _until(func(): return Campaign.state.session.expedition.team.size() == 4 and not corridor.busy, "o Nick entrar")
 	t.equal(street.party_ids, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "o Nick anda com os três")
+	# A segunda patrulha à frente: a dica de chegar sem ser visto.
+	t.check(await _until(func(): return guide.hint.step_id == "patrol", "a dica da patrulha", 8.0), "a patrulha da segunda luta abre a dica dela")
+	corridor.open_menu()
+	await _frames(3)
+	t.check(not guide.hint.visible, "com o Menu aberto, a dica sai da frente")
+	street.exploration_hud.close_modal()
+	await _frames(3)
+	t.check(guide.hint.visible, "e volta ao fechar")
+	# A segunda luta: recuar recomeça a mesma luta, com a equipe inteira.
+	corridor.debug_next_fight()
+	await _frames(2)
+	Input.action_press("move_right")
+	await _until(func(): return street._arena.active, "a segunda luta")
+	Input.action_release("move_right")
+	arena = street._arena
+	arena.speed = 20.0
+	# A mesma arena da primeira luta, que terminou no automático: aqui quem escolhe é o teste.
+	arena.auto_battle = false
+	var step: int = Campaign.state.session.expedition.corridor.index
+	if await _until(func():
+		if arena.hud.waiting:
+			arena.hud.command_chosen.emit({"kind": "flee"})
+		return not arena.active, "a fuga", 90.0):
+		await _frames(3)
+		t.equal(Campaign.state.session.result, "", "recuar não encerra a abertura")
+		t.check(not Campaign.state.session.expedition.corridor.steps[step].resolved and corridor.guards.has(step), "a patrulha continua no caminho")
+		t.check(Campaign.state.roster.filter(func(h): return Campaign.state.session.expedition.team.has(h.id)).all(func(h): return h.hp == h.max_hp),
+			"e a equipe volta inteira")
+	corridor.debug_next_fight()
+	await _frames(2)
+	Input.action_press("move_right")
+	await _until(func(): return street._arena.active, "a segunda luta, de novo")
+	Input.action_release("move_right")
+	arena = street._arena
+	arena.speed = 20.0
+	await _auto_rest(arena)
+	_alive_check("luta 2")
 	# A busca e a Mochila.
 	var entry: Dictionary = corridor.scenario_props[0]
 	street._place_leader(Vector3(entry.x, street.floor_y, street.lane_z))
@@ -215,43 +252,17 @@ func _journey() -> void:
 	guide = corridor.guide
 	t.equal(Campaign.state.session.expedition.corridor.index, index, "o save retoma do mesmo trecho")
 	t.equal(street.party_ids, ["hero_cao_bento", "hero_sapo_iris", "hero_coruja_vespera", "hero_gato_nick"], "com os quatro")
-	t.check(guide != null and guide.done("search") and guide.hint.step_id != "walk", "e as dicas já vistas não voltam")
-	# A segunda patrulha à frente: a dica de chegar sem ser visto.
-	t.check(await _until(func(): return guide.hint.step_id == "patrol", "a dica da patrulha", 8.0), "a patrulha da segunda luta abre a dica dela")
-	corridor.open_menu()
-	await _frames(3)
-	t.check(not guide.hint.visible, "com o Menu aberto, a dica sai da frente")
-	street.exploration_hud.close_modal()
-	await _frames(3)
-	t.check(guide.hint.visible, "e volta ao fechar")
-	# A segunda luta: recuar recomeça a mesma luta, com a equipe inteira.
+	t.check(guide != null and guide.done("bag") and guide.hint.step_id != "walk", "e as dicas já vistas não voltam")
+	# A terceira luta.
 	corridor.debug_next_fight()
 	await _frames(2)
 	Input.action_press("move_right")
-	await _until(func(): return street._arena.active, "a segunda luta")
+	await _until(func(): return street._arena.active, "a luta 3")
 	Input.action_release("move_right")
 	arena = street._arena
 	arena.speed = 20.0
-	var step: int = Campaign.state.session.expedition.corridor.index
-	if await _until(func():
-		if arena.hud.waiting:
-			arena.hud.command_chosen.emit({"kind": "flee"})
-		return not arena.active, "a fuga", 90.0):
-		await _frames(3)
-		t.equal(Campaign.state.session.result, "", "recuar não encerra a abertura")
-		t.check(not Campaign.state.session.expedition.corridor.steps[step].resolved and corridor.guards.has(step), "a patrulha continua no caminho")
-		t.check(Campaign.state.roster.filter(func(h): return Campaign.state.session.expedition.team.has(h.id)).all(func(h): return h.hp == h.max_hp),
-			"e a equipe volta inteira")
-	for i in 2:
-		corridor.debug_next_fight()
-		await _frames(2)
-		Input.action_press("move_right")
-		await _until(func(): return street._arena.active, "a luta %d" % (i + 2))
-		Input.action_release("move_right")
-		arena = street._arena
-		arena.speed = 20.0
-		await _auto_rest(arena)
-		_alive_check("luta %d" % (i + 2))
+	await _auto_rest(arena)
+	_alive_check("luta 3")
 	# O trem e o embarque.
 	corridor.debug_next_fight()
 	var route: Dictionary = Campaign.state.session.expedition.corridor

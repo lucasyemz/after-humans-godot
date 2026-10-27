@@ -7,6 +7,8 @@ extends Node3D
 const MESHES := "res://data/scenarios/meshes.json"
 ## A Unreal mede a luz em lúmens; a mesma escala da Estação.
 const LUMENS_PER_ENERGY := 260.0
+## A folga da marca de interação acima do desenho do prop (m).
+const MARKER_LIFT := 0.35
 ## Brilho dos cards de fundo (unlit, Emissive 0,5 na Unreal, sem adaptação de exposição): calibrado na tela.
 const CARD_BRIGHTNESS := 1.7
 
@@ -32,6 +34,24 @@ var _materials: Array = []
 var _open_materials := {}
 var _prop_nodes := {}
 var _cards: Array[ShaderMaterial] = []
+## A água pintada (#140): a do chão e a do fundo pintado; "Reduzir efeitos" a deixa mais lenta e sem piscar.
+var _waters: Array[ShaderMaterial] = []
+const WATER_COVERED := 0.3
+## O que a água pintada guarda de espuma (os arrays do water_painted.gdshader).
+const MAX_FOAM_POINTS := 16
+const MAX_FOAM_LINES := 4
+## As portas de dentro dos interiores (#141): a vista de fora (o material) e a luz que entra, por zona. Não escurecem com
+## o interior: são o lado de fora, com a hora e a chuva de lá (set_doorways).
+var _door_views: Array[ShaderMaterial] = []
+var _door_lights: Array[OmniLight3D] = []
+var doorway_zones: Array[int] = []
+## A luz de fora pela porta: a cor e a força no fim de tarde e na noite; a chuva tira um pouco e acinzenta.
+const DOOR_LIGHT := {"golden": [Color(1.0, 0.8, 0.58), 1.7], "night": [Color(0.55, 0.65, 0.92), 0.8]}
+const DOOR_RAIN_LIGHT := 0.7
+## Fora é mais claro que a sala: a vista da porta brilha um pouco acima da cor do clima.
+const DOOR_VIEW_BRIGHTNESS := {"golden": 1.25, "night": 0.75}
+## A cor da hora de fora na vista: o céu do mapa é de dia, e o fim de tarde lá fora é pêssego (a mesma luz do cais).
+const DOOR_VIEW_TINT := {"golden": Color(1.0, 0.76, 0.58), "night": Color(0.55, 0.6, 0.75)}
 var _blockouts: Array[ShaderMaterial] = []
 ## O que só o Corredor de Contenção tem (#147, tools/build_containment_corridor.py): as lâmpadas que piscam (a luz e o
 ## card, cada uma na sua fase), as portas de segurança e o painel (abertas ou fechadas) e onde fica o vagão.
@@ -116,6 +136,10 @@ func build(map: String) -> void:
 			node.set_surface_override_material(surface, _materials[index])
 		if part.get("no_shadow", false) or data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"]:
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		# Uma peça de um nó (o vagão do tutorial, "Metro"): fica nele, fora da junção, para andar junto (arrive_train).
+		if part.has("node"):
+			_group(String(part.node)).add_child(node)
+			continue
 		add_child(node)
 		if not data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"] \
 				and not data.materials[int(part.materials[0])].get("masked", false):
@@ -148,6 +172,10 @@ func build(map: String) -> void:
 		_light(light)
 	for text in data.texts:
 		_text(text)
+	for doorway in data.get("doorways", []):
+		_doorway(doorway)
+	for layered in data.get("layered_cards", []):
+		_layered_card(layered)
 	for model in data.get("models", []):
 		_model(model)
 	set_process(not _blink_lights.is_empty() or not _blink_parts.is_empty())
@@ -245,13 +273,58 @@ func _model(model: Dictionary) -> void:
 		walls.append(body)
 
 
-## Tempo molhado nos materiais (a chuva lá fora) e a cor do clima nos cards de fundo.
-func set_weather(wet: float, tint: Color) -> void:
+## As cores da água pintada (#140) que o mapa troca (surface, mid, deep, ripple e foam, em [r, g, b]) e o passo
+## dela: com "Reduzir efeitos", mais devagar e sem o brilho piscando.
+func _water_colors(material: ShaderMaterial, m: Dictionary) -> void:
+	for key in ["surface", "mid", "deep", "ripple", "foam", "horizon"]:
+		var c = m.get(key + "_color")
+		if c != null:
+			material.set_shader_parameter(key + "_color", Color(c[0], c[1], c[2]))
+	_water_pace(material)
+
+
+func _water_pace(material: ShaderMaterial) -> void:
+	var reduced: bool = GameFlow.reduced_effects()
+	material.set_shader_parameter("flow", 0.4 if reduced else 1.0)
+	material.set_shader_parameter("sparkle", 0.0 if reduced else 1.0)
+
+
+## A opção "Reduzir efeitos" mudou: a água pintada acompanha.
+func refresh_water_pace() -> void:
+	for material in _waters + _door_views:
+		_water_pace(material)
+
+
+## Tempo molhado nos materiais (a chuva lá fora) e a cor do clima nos cards de fundo. covered: a equipe num interior; a
+## água pintada, sem luz própria, escurece com ele (vista da porta, não brilha ao lado da sala escura).
+func set_weather(wet: float, tint: Color, covered: bool = false) -> void:
 	for material in _cards:
 		material.set_shader_parameter("wet", wet)
 		material.set_shader_parameter("weather", Vector4(tint.r, tint.g, tint.b, 1.0))
+	if covered:
+		for material in _waters:
+			material.set_shader_parameter("weather", Vector4(tint.r * WATER_COVERED, tint.g * WATER_COVERED, tint.b * WATER_COVERED, 1.0))
 	for material in _blockouts:
 		material.set_shader_parameter("wet", wet)
+
+
+## O lado de fora pelas portas de dentro (#141): a hora (golden ou night) e a chuva de fora, mesmo com a equipe dentro.
+func set_doorways(mood: String, raining: bool) -> void:
+	var key := mood if DOOR_LIGHT.has(mood) else "golden"
+	var tint: Color = DOOR_VIEW_TINT[key]
+	for material in _door_views:
+		material.set_shader_parameter("weather", Vector4(tint.r, tint.g, tint.b, 1.0))
+		material.set_shader_parameter("wet", 1.0 if raining else 0.0)
+		material.set_shader_parameter("brightness", DOOR_VIEW_BRIGHTNESS[key])
+	var light: Array = DOOR_LIGHT[key]
+	for lamp in _door_lights:
+		lamp.light_color = (light[0] as Color).lerp(Color(0.62, 0.66, 0.72), 0.5 if raining else 0.0)
+		lamp.light_energy = float(light[1]) * (DOOR_RAIN_LIGHT if raining else 1.0)
+
+
+## A porta de dentro da zona (o spec do mapa) ou um vazio: o interior sem ela entra do jeito antigo, sem a passagem.
+func has_doorway(zone: int) -> bool:
+	return doorway_zones.has(zone)
 
 
 ## Guarda a caixa se ela atrapalha a passagem em alguma zona: dentro da zona, na altura da equipe, na faixa de passeio
@@ -267,6 +340,23 @@ func _add_obstacle(box: AABB) -> void:
 			continue
 		obstacles.append(clipped)
 		return
+
+
+## O ponto da marca de interação do prop (#142): o meio de cima do desenho dele, um palmo acima, como o marker_point
+## dos objetos de busca da Rua. Sem peça montada (o prop só com o x), na altura de uma cômoda na faixa da zona.
+func prop_marker_point(index: int) -> Vector3:
+	var box := AABB()
+	var first := true
+	for node: MeshInstance3D in _prop_nodes.get(index, []):
+		var part := node.global_transform * node.mesh.get_aabb() if node.is_inside_tree() else node.transform * node.mesh.get_aabb()
+		# A primeira peça começa a caixa (uma carta de fundo é plana: sem volume, mas conta).
+		box = part if first else box.merge(part)
+		first = false
+	if first:
+		var zone := zone_at(float(props[index].x))
+		var y: float = zones[zone].y if zone >= 0 else 0.0
+		return Vector3(float(props[index].x), y + 1.9, -0.7)
+	return Vector3(box.get_center().x, box.end.y + MARKER_LIFT, box.end.z)
 
 
 ## O prop vasculhado mostra a versão aberta (o material _Open da Unreal).
@@ -381,6 +471,15 @@ func _material(m: Dictionary) -> Material:
 		"card", "unlit":
 			var material := ShaderMaterial.new()
 			material.shader = preload("res://shaders/scenario_card.gdshader")
+			# O fundo pintado com água (#140): abaixo da linha d'água, a água viva no lugar da pintura parada.
+			if m.get("waterline") != null:
+				material.shader = preload("res://shaders/scenario_card_water.gdshader")
+				material.set_shader_parameter("waterline", float(m.waterline))
+				material.set_shader_parameter("width_m", float(m.get("width_m", 75.0)))
+				material.set_shader_parameter("far_m", float(m.get("far_m", 60.0)))
+				material.set_shader_parameter("detail", float(m.get("detail", 0.4)))
+				_water_colors(material, m)
+				_waters.append(material)
 			var albedo := _tex(m.get("albedo", ""))
 			if albedo:
 				material.set_shader_parameter("albedo_tex", albedo)
@@ -395,6 +494,32 @@ func _material(m: Dictionary) -> Material:
 			return material
 		"water":
 			var material := ShaderMaterial.new()
+			if m.get("painted", false):
+				# A água pintada (#140): as faixas, as ondinhas desenhadas, o brilho e a espuma na margem e nas estacas.
+				material.shader = preload("res://shaders/water_painted.gdshader")
+				material.set_shader_parameter("front_z", float(m.get("front_z", 0.0)))
+				material.set_shader_parameter("depth_scale", float(m.get("depth_scale", 18.0)))
+				var lines: Array = m.get("foam_lines", [])
+				var points: Array = m.get("foam_points", [])
+				if lines.size() > MAX_FOAM_LINES or points.size() > MAX_FOAM_POINTS:
+					push_warning("%s: a água pintada guarda %d linhas e %d pontos de espuma; o resto some (%d e %d no mapa)." % [
+						map_name, MAX_FOAM_LINES, MAX_FOAM_POINTS, lines.size(), points.size()])
+				var packed := Vector4(-9999, -9999, -9999, -9999)
+				for i in mini(MAX_FOAM_LINES, lines.size()):
+					packed[i] = float(lines[i])
+				material.set_shader_parameter("foam_lines", packed)
+				material.set_shader_parameter("line_foam_width", float(m.get("line_foam_width", 0.9)))
+				var list: Array[Vector4] = []
+				for point in points.slice(0, MAX_FOAM_POINTS):
+					list.append(Vector4(float(point[0]), float(point[1]), float(point[2]), 0.0))
+				while list.size() < MAX_FOAM_POINTS:
+					list.append(Vector4.ZERO)
+				material.set_shader_parameter("foam_points", list)
+				material.set_shader_parameter("foam_count", mini(MAX_FOAM_POINTS, points.size()))
+				_water_colors(material, m)
+				_waters.append(material)
+				_cards.append(material)
+				return material
 			material.shader = preload("res://shaders/water_waves.gdshader")
 			for key in [["Amplitude", "amplitude"], ["Wavelength", "wavelength"], ["Speed", "speed"], ["Foam", "foam"],
 					["RippleStrength", "ripple"], ["Roughness", "roughness_value"], ["Specular", "specular_value"]]:
@@ -465,6 +590,92 @@ func _merge(groups: Dictionary) -> void:
 			node.queue_free()
 
 
+## Uma fachada pintada em camadas (#141): os pedaços da mesma pintura ([u0, v0, u1, v1] e o z de cada um, com a posição
+## e o tamanho já corrigidos pela perspectiva; shade escurece o pedaço, a silhueta de trás que dá a espessura) numa malha
+## só, com um material só, iluminada como a arte do mapa. Numa malha só, a fachada inteira recebe as mesmas luzes (no
+## Compatibility, cada malha pega no máximo 8) e as emendas não mudam de cor.
+func _layered_card(spec: Dictionary) -> void:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	surface.set_normal(Vector3(0, 0, 1))
+	for piece in spec.pieces:
+		var c := Vector3(float(piece.x), float(piece.y), float(piece.z))
+		var half := Vector2(float(piece.w), float(piece.h)) * 0.5
+		var r: Array = piece.rect
+		var corners := [[Vector3(-half.x, half.y, 0), Vector2(r[0], r[1])], [Vector3(half.x, half.y, 0), Vector2(r[2], r[1])],
+			[Vector3(half.x, -half.y, 0), Vector2(r[2], r[3])], [Vector3(-half.x, -half.y, 0), Vector2(r[0], r[3])]]
+		var shade := float(piece.get("shade", 1.0))
+		for i in [0, 1, 2, 0, 2, 3]:
+			surface.set_color(Color(shade, shade, shade))
+			surface.set_uv(corners[i][1])
+			surface.add_vertex(c + corners[i][0])
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = _tex(String(spec.albedo))
+	material.vertex_color_use_as_albedo = true
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	material.roughness = 0.9
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	material.alpha_scissor_threshold = 0.333
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var node := MeshInstance3D.new()
+	node.name = "Layered_%s" % String(spec.get("name", "card"))
+	node.mesh = surface.commit()
+	node.material_override = material
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(node)
+
+
+## A porta de um interior lateral por dentro (#141): o batente escuro e, por ela, um pedaço do lado de fora (o céu e a
+## água pintada do mapa, door_view.gdshader), com a luz de fora entrando. spec: x, y (o piso), z (a parede de trás),
+## w e h (o vão), sky (a textura do céu).
+func _doorway(spec: Dictionary) -> void:
+	var x := float(spec.x)
+	var y := float(spec.get("y", 0.0))
+	var z := float(spec.z)
+	var w := float(spec.get("w", 1.5))
+	var h := float(spec.get("h", 2.4))
+	var view := ShaderMaterial.new()
+	view.shader = preload("res://shaders/door_view.gdshader")
+	var sky := _tex(String(spec.get("sky", "")))
+	if sky:
+		view.set_shader_parameter("sky_tex", sky)
+	_water_colors(view, spec)
+	_water_pace(view)
+	_door_views.append(view)
+	doorway_zones.append(int(spec.get("zone", -1)))
+	var quad := QuadMesh.new()
+	quad.size = Vector2(w, h)
+	var outside := MeshInstance3D.new()
+	outside.name = "DoorwayView_%d" % roundi(x * 10.0)
+	outside.mesh = quad
+	outside.material_override = view
+	outside.position = Vector3(x, y + h * 0.5, z)
+	outside.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(outside)
+	var frame := StandardMaterial3D.new()
+	frame.albedo_color = Color(0.16, 0.13, 0.11)
+	frame.roughness = 0.85
+	for piece in [[Vector3(x - w * 0.5 - 0.1, y + h * 0.5, z + 0.08), Vector3(0.2, h, 0.25)],
+			[Vector3(x + w * 0.5 + 0.1, y + h * 0.5, z + 0.08), Vector3(0.2, h, 0.25)],
+			[Vector3(x, y + h + 0.1, z + 0.08), Vector3(w + 0.4, 0.2, 0.25)]]:
+		var box := BoxMesh.new()
+		box.size = piece[1]
+		var node := MeshInstance3D.new()
+		node.mesh = box
+		node.material_override = frame
+		node.position = piece[0]
+		add_child(node)
+	var light := OmniLight3D.new()
+	light.name = "DoorwayLight_%d" % roundi(x * 10.0)
+	light.light_color = DOOR_LIGHT.golden[0]
+	light.light_energy = DOOR_LIGHT.golden[1]
+	light.omni_range = 4.5
+	light.position = Vector3(x + 0.3, y + h * 0.7, z + 1.0)
+	add_child(light)
+	_door_lights.append(light)
+	set_doorways("golden", false)
+
+
 func _light(light: Dictionary) -> void:
 	if light.type == "sun":
 		# O sol do mapa: a rua já tem o seu (o clima), então o do cenário entra fraco, só para a direção de cada mapa.
@@ -483,7 +694,20 @@ func _light(light: Dictionary) -> void:
 	if shadows:
 		lamp.add_to_group(Settings.SHADOW_LAMPS)
 	lamp.shadow_enabled = shadows and Settings.effects().lamp_shadows
-	add_child(lamp)
+	if light.has("node"):
+		_group(String(light.node)).add_child(lamp)
+	else:
+		add_child(lamp)
+
+
+## O nó de um grupo de peças e luzes do mapa (criado na primeira vez), na origem: o que fica nele anda junto.
+func _group(group_name: String) -> Node3D:
+	var holder := get_node_or_null(group_name) as Node3D
+	if holder == null:
+		holder = Node3D.new()
+		holder.name = group_name
+		add_child(holder)
+	return holder
 
 
 func _text(text: Dictionary) -> void:

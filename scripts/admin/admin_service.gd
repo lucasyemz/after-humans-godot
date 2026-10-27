@@ -10,6 +10,8 @@ const LAYER := 120
 
 ## Multiplica a distância da câmera da rua e da luta e o campo de visão da Estação.
 var camera_zoom := {"explore": 1.0, "fight": 1.0, "station": 1.0}
+## A ambiência mudada ao vivo pela barra (#153), por lugar: {id: {campo: valor}} por cima do perfil do arquivo.
+var ambience := {}
 ## A velocidade da luta escolhida na barra (1, 2 ou 4); 0: a das Opções.
 var battle_speed := 0.0
 ## O inimigo da próxima patrulha ("" = o da rota).

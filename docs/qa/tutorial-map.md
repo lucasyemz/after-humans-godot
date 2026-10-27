@@ -1,50 +1,56 @@
 # O Corredor de Contenção: o mapa do tutorial (#147)
 
-O código do mapa da abertura, montado com peças provisórias até a arte chegar (o PR #152 da Awesomic 2 foi fechado; a
-arte passou para a Awesomic 1, no mesmo contrato `T_TU*`). O fluxo do tutorial
-(o título, as dicas, a recompensa, a chegada) é da #144, que vem por cima deste.
+Fecha #147. O mapa agora é o do PR #173 (a planta e a arte `T_TU*`/`T_TUX*` da Awesomic), com a camada de jogo por
+cima. O fluxo do tutorial (os textos, as dicas, a recompensa, a chegada) é da #144, que vem por cima deste.
 
 ![As quatro zonas, de noite (o clima do tutorial)](tutorial-map/zones.jpg)
 
 ## O mapa
 
-- `data/scenarios/ContainmentCorridor.json`, gerado por `tools/build_containment_corridor.py` no contrato dos cenários
-  (as peças com as malhas de `meshes.json`, os materiais, as luzes, as zonas e os props). As medidas são as da página
-  `docs/design/tutorial.md` do PR #152 (guardada na branch `design-tutorial`).
-- **As zonas:** o corredor de contenção (a partida e a primeira luta), a sala das celas (o Nick, o armário de
-  manutenção e a segunda luta), a rota do Nick (o duto, a escada até o alçapão e a terceira luta) e a plataforma (o
-  vagão no fosso e o embarque).
-- **As peças provisórias:** a parede e o piso de concreto molhado, a porta de aço (`T_DI20`) e o arco aberto (`T_PT02`)
-  no lugar da porta de segurança, o armário de ferramentas (`T_DEX01`) no lugar do de manutenção, o painel (`T_PT12`), as
-  grades (`T_PT03`), o duto (`T_DE05`), a escada (`T_DE10`), as raízes e o metrô da Estação no lugar do vagão pintado.
-  Quando a arte TU estiver em `art/scenarios`, rodar `python tools/build_containment_corridor.py` troca cada peça.
-- **A luz:** as lâmpadas de emergência vermelhas que piscam (0,6 s acesas, 0,4 s a 25%, fora de fase; acesas com
-  "Reduzir efeitos"), a luz fria de serviço em cada zona, a lanterna do líder e a luz fria do vagão. Cada zona tem os
-  materiais dela: no Compatibility, cada malha pega no máximo 8 luzes.
-- **A caixa fechada:** concreto além das pontas, acima do teto e atrás de tudo. A câmera nunca vê céu.
-- **O som:** o ambiente da contenção, com o alarme ao fundo, e a porta de segurança baixando e subindo, por síntese
-  (`tools/synth_sounds.py`, CC0); o trem chegando é o da Estação.
+- `data/scenarios/ContainmentCorridor.json` é gerado por `python tools/build_containment_corridor.py` a partir de
+  `docs/design/tutorial/map/ContainmentCorridor.json` (o mapa do #173). A planta, as peças, os materiais e as luzes ficam
+  como a Awesomic entregou; o script só acrescenta o que `scenario_world.gd` lê ("Para integrar",
+  `docs/design/tutorial.md`).
+- **As zonas** (10 m cada; a última, 12 m): Corredor (a partida e a luta 1), Celas (o Nick, a luta 2 e o armário de
+  manutenção), Rota do Nick (a porta de segurança, o duto, a escada e a luta 3) e Plataforma (o vagão e o embarque).
+- **As lâmpadas:** os 9 cards acesos (`T_TU08_Lit`) trocam pelo apagado (`T_TU08`) e as 20 luzes vermelhas deles caem
+  junto, cada lâmpada na sua fase (0,6 s acesas, 0,4 s a 25%; acesas com "Reduzir efeitos").
+- **Os interativos:** o armário (`TUX02`) é a busca (1 curativo e 1 comida); o painel (`TUX03`) fica acionado da sala
+  das celas em diante; a porta de segurança (`TUX01`, x 43,8) é a única porta: baixa atrás da equipe quando ela entra
+  na Rota do Nick, e não há volta.
+- **O trem:** o vagão (`T_TU10`) e as 4 luzes frias dele ficam num nó `Metro` (o campo `node` das peças e das luzes),
+  escondido até a equipe entrar na plataforma; aí ele entra no fosso. O embarque é na porta aberta da direita, no fim da
+  plataforma (x 75,0), e leva à Estação pela passagem do vagão (#75).
+- **A luz do lugar:** `street.gd` (`SITE_LIGHT`) dá ao corredor um ambiente baixo e quente, a névoa vermelha escura e o
+  reflexo no piso molhado (SSR) mesmo sem chuva.
 
 ## A jornada
 
 - A fase "tutorial" (`AHTutorial`, `data/tutorial.json`) joga pelo corredor de sempre, mas fica fora de
   `AHJourneyRules.PHASES`: não aparece no Mapa da Rede nem no "Jogar de novo".
-- Sete trechos: a partida, a luta 1 (o Broto), o encontro com o Nick, a busca, a luta 2 (o Rastejante de Cabos, que
-  empurra), a luta 3 (o Drone de Expurgo, que contamina) e o trem. Em 40 sorteios seguidos, sem cura entre as lutas,
-  ninguém cai.
-- A porta do fim de cada zona só abre com a zona vencida. A de trás baixa quando a equipe passa, e não há volta.
-- O vagão chega quando a equipe entra na plataforma. O embarque leva à Estação pela passagem do vagão (#75).
+- **Sete trechos, numa ordem nova:** a partida, a luta 1, o Nick, a luta 2, a busca, a luta 3 e o trem. Antes a busca
+  vinha antes da luta 2; no mapa do #173 o armário e o painel ficam no fim da sala das celas, então a luta 2 vem antes
+  deles.
+
+## O que ficou de fora do "Para integrar" (para o Lucas)
+
+- **2:** os véus de névoa (`MIST_SHADER`).
+- **7:** a sombra das lâmpadas no Compatibility.
+- **8:** a luz de preenchimento das lutas tingida com a cor do lugar.
+- **9:** o primeiro plano em alpha blend.
+- `tools/sync_scenarios.py` não mudou: é a lista do export da Unreal, e o corredor não vem de lá.
 
 ## Testes
 
-- `tests/test_tutorial_map.gd`: o contrato do mapa, a fase fora do Mapa da Rede, a jornada pela cena de verdade
-  (as lutas, as portas, o Nick, sem volta, o Menu sem retirada, o vagão escondido até chegar e o embarque).
+- `tests/test_tutorial_map.gd` (96): o contrato do mapa (as zonas, a porta, o painel, o trem), a fase fora do Mapa da
+  Rede e a jornada pela cena de verdade (as lutas, a porta que baixa, o Nick, sem volta, o vagão escondido até chegar e
+  o embarque).
 - `tools/capture_scenarios.gd --maps=ContainmentCorridor`: as 4 zonas no piso e na faixa (8 de 8).
 - A captura da rua (`-- --capture=`), com a colisão: `08-collision-car` e `09-collision-facade` PASS.
 
 ## Antes e depois
 
-![A primeira rodada (o céu atrás das paredes e o escuro) e a de agora](tutorial-map/before_after.jpg)
+![Em cima, o mapa provisório; embaixo, o do #173 (as 4 zonas, fim de tarde)](tutorial-map/before_after.jpg)
 
 ## QA
 
