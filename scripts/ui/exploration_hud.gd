@@ -25,7 +25,7 @@ signal new_campaign
 
 const S = preload("res://scripts/ui/ui_style.gd")
 const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprimentos", "rest": "Descanso", "passage": "Passagem",
-	"boss": "Guardião"}
+	"boss": "Guardião", "nick": "Encontro", "train": "Trem"}
 
 ## O lugar da jornada (a Rua ou o cenário): muda os textos da volta e do resultado.
 ## A altura do Concluir jornada; no acampamento, ele sobe para cima da barra (camp_hud._process).
@@ -92,7 +92,7 @@ var _hint_time := 0.0
 var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
 const STEP_ICONS := {"start": "node-start", "combat": "node-combat", "loot": "node-loot", "rest": "node-rest",
-	"passage": "node-event", "boss": "node-boss"}
+	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "node-start"}
 ## A casa do corredor (o lado do quadrado) e o elo entre duas.
 const CELL := 46.0
 const LINK := 12.0

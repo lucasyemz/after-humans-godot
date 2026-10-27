@@ -319,7 +319,7 @@ func set_scenario_zone(index: int) -> void:
 	var edge: float = scenario.front_edge(index, lane_z) + 0.04
 	for card in _heroes:
 		card.set_silhouette_foot(maxf(AHSpriteCard.SILHOUETTE_FOOT, edge))
-	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot"].has(scenario.map_name)
+	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot", "ContainmentCorridor"].has(scenario.map_name)
 	_apply_weather()
 
 
@@ -605,6 +605,24 @@ func _build_party() -> void:
 		party_ids.append(hero_id)
 		_heroes.append(card)
 	_place_leader(Vector3(7.6, 0, 0.45))
+
+
+## Um herói entra na equipe no meio da jornada (o Nick no tutorial, #144): a placa nasce em at e anda até o lugar dele
+## na fila.
+func add_hero(hero_id: String, at: Vector3) -> void:
+	var hero = Campaign.hero(hero_id)
+	var art := {} if hero == null else AHCombatArena.art_entry(_combat_art.heroes, hero_id, String(hero.get("art_variant", "")))
+	if hero == null or art.is_empty() or party_ids.has(hero_id) or party_ids.size() >= 4:
+		return
+	var card := AHSpriteCard.new()
+	card.body_height = AHCharacterHeights.find(hero_id)
+	card.show_art(art.idle)
+	add_child(card)
+	card.position = at
+	card.set_facing(-1.0)
+	party_ids.append(hero_id)
+	_heroes.append(card)
+	occlusion.track(card)
 
 
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).

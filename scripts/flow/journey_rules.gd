@@ -107,6 +107,9 @@ static func phase(phase_id: String) -> Dictionary:
 	for entry in PHASES:
 		if entry.id == phase_id:
 			return entry
+	# O tutorial (#144, #147) joga como uma fase, mas fora da lista: nem o Mapa da Rede nem o "Jogar de novo" o veem.
+	if phase_id == AHTutorial.PHASE_ID:
+		return AHTutorial.phase_info()
 	return {}
 
 
@@ -250,6 +253,9 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 		"rest":
 			step.resolved = true
 			return "rest"
+		"nick", "train":
+			# O encontro com o Nick e o embarque (o tutorial, #144): resolvidos pela cena (a fala, o trem).
+			return step.type
 		"passage":
 			step.resolved = true
 			# Na primeira Passagem da fase (no mapa dela, não na travessia), o evento de história (#64).
@@ -368,6 +374,9 @@ static func generate_enemy_team(encounter: String, difficulty: int, node_id: Str
 ## Cada um: {enemy_id, unit_id, rank, hp, max_hp, damage_bonus, display_name}.
 static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 	var route: Dictionary = expedition.corridor
+	# As lutas do tutorial são fixas (data/tutorial.json).
+	if route.get("node_type", "") == AHTutorial.PHASE_ID:
+		return AHTutorial.enemies_at(expedition, index)
 	var level: int = expedition.level
 	var house := index >= HOUSE_ENEMY_INDEX
 	var boss: bool = not house and index < route.steps.size() and route.steps[index].type == "boss"
@@ -836,8 +845,9 @@ static func map_for_step(phase_id: String, step: int) -> String:
 ## Os trechos que ficam no mapa: [primeiro, quantos] (PhaseStepRange).
 static func step_range(phase_id: String, transit_map: bool) -> Array:
 	var info := phase(phase_id)
-	var transit: int = clampi(int(info.get("transit_steps", 0)), 0, 9) if info.get("transit", "") != "" else 0
-	return [0, transit] if transit_map else [transit, 10 - transit]
+	var total := int(info.get("steps", 10))
+	var transit: int = clampi(int(info.get("transit_steps", 0)), 0, total - 1) if info.get("transit", "") != "" else 0
+	return [0, transit] if transit_map else [transit, total - transit]
 
 
 ## Campos dos cenários num corredor de save anterior a eles.
@@ -880,7 +890,7 @@ static func assign_scenario_props(campaign: Dictionary, map: String, steps: Arra
 	for i in steps.size():
 		if names.is_empty() or not event_pool(event_place(campaign), object_kind(String(names[i]) if i < names.size() else "")).is_empty():
 			compatible.append(first + i)
-	if not compatible.is_empty() and choice_random.next() < 0.5:
+	if not compatible.is_empty() and choice_random.next() < 0.5 and route.get("node_type", "") != AHTutorial.PHASE_ID:
 		route.choice_props.append(compatible[mini(compatible.size() - 1, floori(choice_random.next() * compatible.size()))])
 	if int(route.objective_prop) != -1 or steps.is_empty() or AHStationRules.focus_def(expedition.get("focus", "")).is_empty():
 		return first
@@ -920,6 +930,8 @@ static func search_scenario_prop(campaign: Dictionary, prop: int, object_name: S
 		return {"ok": false}
 	var route: Dictionary = corridor(campaign)
 	route.searched_props.append(prop)
+	if route.get("node_type", "") == AHTutorial.PHASE_ID:
+		return {"ok": true, "text": AHTutorial.search(campaign), "event": ""}
 	# O objeto com escolha abre um evento do lugar (o do objetivo da rota fica com o achado dele).
 	if route.choice_props.has(prop) and prop != int(route.objective_prop):
 		var choices := event_pool(event_place(campaign), object_kind(object_name))

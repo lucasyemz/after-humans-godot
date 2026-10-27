@@ -136,6 +136,38 @@ def crisis():
     return boom * 1.2 + swell * 0.5 + whine
 
 
+def security_door():
+    """A porta de segurança do Corredor de Contenção (#147) baixando: o chiado hidráulico e a batida de aço no chão."""
+    rng = np.random.default_rng(147)
+    t = time(1.5)
+    hiss = bandpass(rng.standard_normal(t.size), 1500.0, 6000.0) * np.clip(t / 0.08, 0, 1) * np.clip((0.75 - t) / 0.2, 0, 1) * 0.35
+    slide = np.sin(2 * np.pi * (90.0 + 25.0 * t) * t) * np.clip(t / 0.1, 0, 1) * np.clip((0.78 - t) / 0.1, 0, 1) * 0.25
+    hit_t = np.clip(t - 0.78, 0, None)
+    hit = (t >= 0.78) * (np.sin(2 * np.pi * 48.0 * hit_t) * 1.0 + np.sin(2 * np.pi * 131.0 * hit_t) * 0.5
+                         + np.sin(2 * np.pi * 347.0 * hit_t) * 0.25) * np.exp(-hit_t * 5.5)
+    clank = (t >= 0.78) * bandpass(rng.standard_normal(t.size), 400.0, 3000.0) * np.exp(-hit_t * 22.0) * 0.8
+    return hiss + slide + hit + clank
+
+
+def containment_loop():
+    """O ambiente do Corredor de Contenção (#147): o zumbido da casa de máquinas e, ao fundo, o alarme da contenção
+    (dois tons que sobem e descem a cada 4 s). 16 s que emendam: tudo tem período que divide a duração."""
+    rng = np.random.default_rng(1147)
+    seconds = 16.0
+    t = time(seconds)
+    hum = (np.sin(2 * np.pi * 50.0 * t) + 0.45 * np.sin(2 * np.pi * 100.0 * t) + 0.2 * np.sin(2 * np.pi * 150.0 * t)) * 0.35
+    air = lowpass(rng.standard_normal(t.size), 400.0) * 0.6
+    # O ruído emenda: o fim se funde ao começo em 0,5 s.
+    fade = int(0.5 * RATE)
+    air[:fade] = air[:fade] * np.linspace(0, 1, fade) + air[-fade:] * np.linspace(1, 0, fade)
+    cycle = np.mod(t, 4.0)
+    pitch = 620.0 + 180.0 * np.sin(np.pi * np.clip(cycle / 1.6, 0, 1))
+    phase = 2 * np.pi * np.cumsum(pitch) / RATE
+    gate = np.clip(cycle / 0.05, 0, 1) * np.clip((1.6 - cycle) / 0.2, 0, 1)
+    alarm = lowpass(np.sign(np.sin(phase)) * 0.5 + np.sin(phase) * 0.5, 2500.0) * gate * 0.22
+    return hum + air + alarm
+
+
 SOUNDS = {
     "station/train_bell": train_bell,
     "station/train_brake": train_brake,
@@ -146,6 +178,8 @@ SOUNDS = {
     "ui/victory": victory,
     "ui/defeat": defeat,
     "combat/crisis": crisis,
+    "world/security_door": security_door,
+    "ambience/ContainmentCorridor": containment_loop,
 }
 
 
@@ -170,5 +204,9 @@ def write(stem, signal):
 
 
 if __name__ == "__main__":
+    import sys
+    # Com nomes (python tools/synth_sounds.py world/security_door), só esses.
+    wanted = sys.argv[1:]
     for stem, make in SOUNDS.items():
-        write(stem, make())
+        if not wanted or stem in wanted:
+            write(stem, make())

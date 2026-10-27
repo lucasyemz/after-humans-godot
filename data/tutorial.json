@@ -1,0 +1,31 @@
+[
+  {
+    "Name": "journey",
+    "Map": "ContainmentCorridor",
+    "Place": "corredor-de-contencao",
+    "Weather": "night",
+    "Steps": ["start", "combat", "nick", "loot", "combat", "combat", "train"],
+    "ZoneSteps": [2, 3, 1, 1],
+    "StartTeam": ["hero_cao_bento"],
+    "JoinTeam": ["hero_gato_nick"],
+    "Search": {"bandages": 1, "food": 1}
+  },
+  {
+    "Name": "fight_1",
+    "Step": 1,
+    "Lesson": "O Bento sozinho: escolher a habilidade, escolher o alvo, a vez de cada um e a vida.",
+    "Enemies": ["broto"]
+  },
+  {
+    "Name": "fight_2",
+    "Step": 4,
+    "Lesson": "O Nick chega: as posições, mover, defender, a ordem da rodada e o instinto.",
+    "Enemies": ["faisca", "pipoco"]
+  },
+  {
+    "Name": "fight_3",
+    "Step": 5,
+    "Lesson": "Os estados (o sangramento e o bloqueio) e um item da Mochila na luta.",
+    "Enemies": ["cao_eco", "broto"]
+  }
+]
