@@ -1058,6 +1058,8 @@ static func _room_at_point(rects: Dictionary, point: Vector2) -> String:
 ## A vista geral anda com o analógico direito e com o mouse encostado na borda da tela (#131).
 func _pan_overview(delta: float) -> void:
 	if current != "" or _map.visible or _hud_hidden or briefing_open() or _drag_from != Vector2.INF:
+		# Fora da vista geral, a espera da borda recomeça: fechado o painel, o mouse parado na borda espera de novo.
+		_edge_time = 0.0
 		return
 	var push := Input.get_axis("station_pan_left", "station_pan_right")
 	var mouse := get_viewport().get_mouse_position()

@@ -112,6 +112,10 @@ func _pan(station) -> void:
 	t.equal(hud.edge_push(400.0, 1920.0, 0.2), 0.0, "saindo da borda, para")
 	t.equal(hud.edge_push(1918.0, 1920.0, 0.1), 0.0, "e a outra borda também espera")
 	t.equal(hud.edge_push(1918.0, 1920.0, 0.3), 1.0, "antes de andar para a direita")
+	hud.current = S.BAR
+	hud._pan_overview(0.1)
+	hud.current = ""
+	t.equal(hud._edge_time, 0.0, "com um painel aberto, a espera da borda recomeça")
 	hud._edge_time = 0.0
 	# Arrastar com o mouse anda a câmera e não abre o cômodo.
 	var rect: Rect2 = hud._room_rects.get(S.CANTEEN, Rect2())
