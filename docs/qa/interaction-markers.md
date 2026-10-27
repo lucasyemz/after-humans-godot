@@ -22,8 +22,9 @@ Vitrines, nos seis cenários, nos interiores laterais e nas casas.
 ## Testes
 
 - `tests/run_all.gd`: 64 de 64, com a paridade 48/48.
-- `tests/test_interaction_markers.gd` (novo, 114 verificações): os seis cenários pela cena de verdade, com a equipe ao
-  lado de cada prop, de cada porta de interior e da saída; o que está à frente marcado de longe; o vasculhado sem marca;
+- `tests/test_interaction_markers.gd` (novo, 126 verificações): os seis cenários pela cena de verdade, com a equipe ao
+  lado de cada prop, de cada porta de interior e da saída;
+  o que está num trecho à frente só marcado quando a tecla já o vasculha (a mesma regra, `R.step_open`); o vasculhado sem marca;
   andando pelos interiores de 0,1 em 0,1 m, o aviso sobre o objeto mais perto; com a patrulha de pé em cada trecho de
   luta do Cais, nada atrás dela marcado; a casa do acampamento (a fogueira e a porta, e a fogueira sem marca depois de
   acampar).

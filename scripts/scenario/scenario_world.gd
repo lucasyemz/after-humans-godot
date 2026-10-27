@@ -141,10 +141,13 @@ func _add_obstacle(box: AABB) -> void:
 ## dos objetos de busca da Rua. Sem peça montada (o prop só com o x), na altura de uma cômoda na faixa da zona.
 func prop_marker_point(index: int) -> Vector3:
 	var box := AABB()
+	var first := true
 	for node: MeshInstance3D in _prop_nodes.get(index, []):
 		var part := node.global_transform * node.mesh.get_aabb() if node.is_inside_tree() else node.transform * node.mesh.get_aabb()
-		box = part if not box.has_volume() and box.size == Vector3.ZERO else box.merge(part)
-	if box.size == Vector3.ZERO:
+		# A primeira peça começa a caixa (uma carta de fundo é plana: sem volume, mas conta).
+		box = part if first else box.merge(part)
+		first = false
+	if first:
 		var zone := zone_at(float(props[index].x))
 		var y: float = zones[zone].y if zone >= 0 else 0.0
 		return Vector3(float(props[index].x), y + 1.9, -0.7)

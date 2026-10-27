@@ -5,9 +5,12 @@
 ##   Estação, o ponto está nas marcas do HUD (ou é o do aviso, o da vez); vasculhado, sai das marcas;
 ## - dentro dos interiores laterais há marcas (os props e a porta de volta), como no corredor, e o aviso fica sobre o
 ##   objeto que a tecla vasculha;
-## - com uma patrulha de pé, nada do trecho dela em diante tem marca;
+## - com uma patrulha de pé, nada do trecho dela em diante tem marca; um objeto num trecho à frente do atual só ganha a
+##   marca quando a tecla já o vasculha (R.step_open, a mesma regra);
 ## - nas casas da Rua das Vitrines, a fogueira e a porta de saída têm a marca, e o aviso delas fica sobre elas.
 extends RefCounted
+
+const R := preload("res://scripts/flow/journey_rules.gd")
 
 const PHASE_OF := {"RiverDock": ["fase_2", 0], "RootBridge": ["fase_2", 4], "SealedShelter": ["fase_3", 0],
 	"TriageGate": ["fase_4", 0], "FloodedDepot": ["fase_5", 0], "SewerDucts": ["fase_5", 4]}
@@ -105,7 +108,7 @@ func _map(map: String) -> void:
 		street._place_leader(Vector3(float(room_entry.door_x) - 3.0, street.floor_y, street.lane_z))
 		_frame(corridor, c, route)
 		t.check(_marked(street, corridor._side_door_point(room_entry)), "%s: a porta de %s marcada" % [map, scenario.zones[room_entry.zone].name])
-	# Com o caminho livre, o que está à frente na zona já tem a marca (antes, só ao pisar no trecho do objeto).
+	# Um objeto num trecho à frente do atual (route.index): a marca concorda com a tecla (R.can_search_scenario_prop).
 	var ahead: Array = corridor.scenario_props.filter(func(e): return corridor._side_room_of_zone(e.zone) < 0 and int(e.step) > corridor.segments[corridor._segment_of(int(e.step))].first)
 	if not ahead.is_empty():
 		var far: Dictionary = ahead[0]
@@ -114,7 +117,14 @@ func _map(map: String) -> void:
 		corridor._enter_segment(corridor._segment_of(int(far.step)), float(part.x0) + 0.5)
 		_frame(corridor, c, route)
 		var mark := corridor._scenario_prop_point(far)
-		t.check(absf(mark.x - street._leader.position.x) >= 14.0 or _marked(street, mark), "%s: %s marcado de longe, com o caminho livre" % [map, far.name])
+		var can := R.can_search_scenario_prop(c, int(far.prop))
+		t.check(not can, "%s: %s, à frente do trecho atual, ainda não se vasculha" % [map, far.name])
+		t.equal(_marked(street, mark), can, "%s: %s, à frente, sem a marca (a marca e a tecla concordam)" % [map, far.name])
+		# Chegando ao trecho dele, a marca e a tecla abrem juntas.
+		route.index = int(far.step)
+		_frame(corridor, c, route)
+		t.check(R.can_search_scenario_prop(c, int(far.prop)) and (absf(mark.x - street._leader.position.x) >= 14.0 or _marked(street, mark)),
+			"%s: %s, no trecho dele, marcado e vasculhável" % [map, far.name])
 	# A saída para a Estação, no começo do mapa da fase (o de travessia não volta por ali).
 	if corridor.map_first == 0:
 		route.index = 0
