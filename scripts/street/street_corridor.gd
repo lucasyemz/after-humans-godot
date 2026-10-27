@@ -15,6 +15,10 @@
 class_name AHStreetCorridor
 extends Node
 
+## A altura das marcas (m sobre o piso, #142): a das portas (a saída para a Estação, a de volta dos interiores e a das
+## casas) e a da fogueira apagada da casa do acampamento.
+const MARKER_DOOR_HEIGHT := 2.4
+const MARKER_CAMP_HEIGHT := 0.95
 const R = preload("res://scripts/flow/journey_rules.gd")
 const STEP_LENGTH := 7.8
 const MIN_X := 0.0
@@ -663,10 +667,24 @@ func _reachable(route: Dictionary, step: int) -> bool:
 
 
 ## Onde fica a marca da volta à Estação: o começo da rua ou da primeira zona do mapa.
+## A porta de volta de um interior lateral (a marca e o aviso).
+func _side_exit_point(room_entry: Dictionary) -> Vector3:
+	return Vector3(room_entry.x0 + EXIT_X * 0.5, street.floor_y + MARKER_DOOR_HEIGHT, street.lane_z - 0.6)
+
+
+## A fogueira apagada da casa do acampamento e a porta de saída da casa (as marcas e o aviso, #142).
+func _camp_point() -> Vector3:
+	return Vector3(room.camp_x, MARKER_CAMP_HEIGHT, 0.35)
+
+
+func _house_exit_point() -> Vector3:
+	return Vector3(room.exit_x - 0.6, MARKER_DOOR_HEIGHT, -0.5)
+
+
 func _exit_point() -> Vector3:
 	if street.scenario == null or segments.is_empty():
-		return Vector3(EXIT_X * 0.5, 2.4, -0.2)
-	return Vector3(segments[0].x0 + EXIT_X * 0.5, street.floor_y + 2.4, street.lane_z - 0.6)
+		return Vector3(EXIT_X * 0.5, MARKER_DOOR_HEIGHT, -0.2)
+	return Vector3(segments[0].x0 + EXIT_X * 0.5, street.floor_y + MARKER_DOOR_HEIGHT, street.lane_z - 0.6)
 
 
 func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
@@ -700,23 +718,22 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 		elif site.camped:
 			text = tr("Acampamento já feito nesta fase")
 			action = Callable()
-		where = null
+		where = _camp_point()
 	if leader.x < room.exit_x:
 		text = tr("E  Sair para a rua")
 		action = _leave_house
-		where = null
+		where = _house_exit_point()
 	hud.show_prompt(text, where)
 	# O losango de cada objeto ainda fechado fica sobre ele (#50); o do que está ao alcance vira o do aviso.
 	var points: Array = []
 	for i in mini(room.search_props.size(), site.spots.size()):
 		if not site.spots[i].searched and (where == null or room.search_props[i].marker_point().distance_to(where) > 0.05):
 			points.append(room.search_props[i].marker_point())
-	# A fogueira do acampamento e a porta de saída também têm a marca (#142).
-	if site.camp_site and R.can_start_camp(campaign) and absf(room.camp_x - leader.x) >= 0.9:
-		points.append(Vector3(room.camp_x, 1.4, 0.35))
-	if leader.x >= room.exit_x:
-		points.append(Vector3(room.exit_x - 0.6, 2.4, -0.5))
-	hud.set_markers(points)
+	# A fogueira do acampamento e a porta de saída também têm a marca (#142); a da vez é a do aviso.
+	if site.camp_site and R.can_start_camp(campaign):
+		points.append(_camp_point())
+	points.append(_house_exit_point())
+	hud.set_markers(points.filter(func(p): return where == null or p.distance_to(where) > 0.05))
 	hud.set_patrol(null, 0.0, false)
 	_action = action
 
@@ -816,20 +833,22 @@ func _side_room_frame(campaign: Dictionary, route: Dictionary) -> void:
 	var text := ""
 	var action := Callable()
 	var best := REACH
+	var where = null
 	for entry in scenario_props:
 		if entry.zone != room_entry.zone or absf(entry.x - leader.x) >= best:
 			continue
-		best = absf(entry.x - leader.x)
 		if route.searched_props.has(entry.prop):
 			text = tr("%s (já vasculhado)") % tr(entry.name)
+			action = Callable()
 		elif R.can_search_scenario_prop(campaign, entry.prop):
 			text = tr("E  Vasculhar: %s") % tr(entry.name)
 			action = _search_scenario_prop.bind(entry)
-	var exit := Vector3(room_entry.x0 + EXIT_X * 0.5, street.floor_y + 2.4, street.lane_z - 0.6)
-	var where = null
-	for entry in scenario_props:
-		if entry.zone == room_entry.zone and absf(entry.x - leader.x) < REACH and (R.can_search_scenario_prop(campaign, entry.prop) or route.searched_props.has(entry.prop)):
-			where = _scenario_prop_point(entry)
+		else:
+			continue
+		# O aviso fica sobre o mesmo objeto que a tecla vai vasculhar (o mais perto).
+		best = absf(entry.x - leader.x)
+		where = _scenario_prop_point(entry)
+	var exit := _side_exit_point(room_entry)
 	if leader.x < room_entry.x0 + EXIT_X:
 		text = tr("E  Voltar: %s") % tr(street.scenario.zones[segments[room_entry.door_segment].zone].name)
 		action = _leave_side_room

@@ -3,7 +3,10 @@
 ##   desenho do prop, no x dele e acima do piso;
 ## - na rua de verdade, em cada cenário, com a equipe perto de cada prop, de cada porta de interior e da saída para a
 ##   Estação, o ponto está nas marcas do HUD (ou é o do aviso, o da vez); vasculhado, sai das marcas;
-## - dentro dos interiores laterais há marcas (os props e a porta de volta), como no corredor.
+## - dentro dos interiores laterais há marcas (os props e a porta de volta), como no corredor, e o aviso fica sobre o
+##   objeto que a tecla vasculha;
+## - com uma patrulha de pé, nada do trecho dela em diante tem marca;
+## - nas casas da Rua das Vitrines, a fogueira e a porta de saída têm a marca, e o aviso delas fica sobre elas.
 extends RefCounted
 
 const PHASE_OF := {"RiverDock": ["fase_2", 0], "RootBridge": ["fase_2", 4], "SealedShelter": ["fase_3", 0],
@@ -21,6 +24,8 @@ func run(context) -> void:
 	Campaign.save_dir = "user://test-markers-%d" % Time.get_ticks_usec()
 	for map in PHASE_OF:
 		await _map(map)
+	await _patrol("RiverDock")
+	await _house()
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
 	await _tree.process_frame
@@ -77,6 +82,23 @@ func _map(map: String) -> void:
 		t.check(_marked(street, point), "%s: %s marcado (a %s)" % [map, entry.name, "dentro do interior" if room >= 0 else "no corredor"])
 		if room >= 0:
 			t.check(street.exploration_hud._marker_points.size() >= 2, "%s: o interior tem as marcas dos props e da porta de volta" % map)
+			# Andando pelo interior: o aviso fica sobre o objeto que a tecla vasculha (o mais perto).
+			var wrong := ""
+			var x0: float = float(entry.x) - 1.0
+			for step in 21:
+				street._place_leader(Vector3(x0 + step * 0.1, street.floor_y, street.lane_z))
+				corridor._side_room_frame(c, route)
+				var leader_x: float = street._leader.position.x
+				var near = null
+				for other in corridor.scenario_props:
+					if other.zone == entry.zone and absf(other.x - leader_x) < AHStreetCorridor.REACH \
+							and (near == null or absf(other.x - leader_x) < absf(near.x - leader_x)):
+						near = other
+				var anchor = street.exploration_hud._prompt_world
+				if near != null and leader_x >= corridor.side_rooms[room].x0 + AHStreetCorridor.EXIT_X \
+						and (anchor == null or anchor.distance_to(corridor._scenario_prop_point(near)) > 0.05):
+					wrong = "%.1f" % leader_x
+			t.check(wrong == "", "%s: no interior, o aviso fica sobre o objeto mais perto (%s)" % [map, wrong])
 	for room_entry in corridor.side_rooms:
 		corridor._enter_segment(room_entry.door_segment, float(room_entry.door_x) - 3.0)
 		route.index = maxi(route.index, int(room_entry.door_step))
@@ -127,3 +149,81 @@ func _marked(street, point: Vector3) -> bool:
 		if p.distance_to(point) < 0.05:
 			return true
 	return hud._prompt_world != null and hud._prompt_world.distance_to(point) < 0.05
+
+
+## A rua de uma fase aberta com a campanha c.
+func _open(c: Dictionary):
+	Campaign.state = c
+	Campaign.save()
+	GameFlow.change_to("street", {}, false)
+	for frame in 300:
+		await _tree.process_frame
+		var scene := _tree.current_scene
+		if not GameFlow.busy and scene != null and scene.get("corridor") != null and scene.corridor != null and frame > 3:
+			return scene
+	return null
+
+
+## Com a patrulha de pé num trecho de luta, nada do trecho dela em diante tem a marca (o caminho está fechado).
+func _patrol(map: String) -> void:
+	var spec: Array = PHASE_OF[map]
+	var c := Campaign.create_initial(11)
+	c.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
+	AHStationRules.confirm_departure(c, c.preferred_formation.duplicate(), 0, 4242, spec[0], "")
+	var street = await _open(c)
+	if not t.check(street != null, "%s abriu para a patrulha" % map):
+		return
+	var corridor: AHStreetCorridor = street.corridor
+	corridor.process_mode = Node.PROCESS_MODE_DISABLED
+	var route: Dictionary = c.session.expedition.corridor
+	var checked := 0
+	for index in range(corridor.map_first, route.steps.size()):
+		if route.steps[index].type != "combat":
+			continue
+		for i in index:
+			route.steps[i].resolved = true
+		route.index = index
+		var part: Dictionary = corridor.segments[corridor._segment_of(index)]
+		corridor._enter_segment(corridor._segment_of(index), float(part.x0) + 0.5)
+		_frame(corridor, c, route)
+		var behind: Array = corridor.scenario_props.filter(func(e): return int(e.step) > index and corridor._side_room_of_zone(e.zone) < 0)
+		var marked: Array = behind.filter(func(e): return _marked(street, corridor._scenario_prop_point(e)))
+		t.equal(marked.map(func(e): return e.name), [], "%s: com a patrulha do trecho %d de pé, nada atrás dela tem marca" % [map, index + 1])
+		checked += 1
+	t.check(checked > 0, "%s: os trechos de luta conferidos" % map)
+
+
+## A casa do acampamento na Rua das Vitrines: a fogueira e a porta de saída marcadas, e o aviso delas sobre elas.
+func _house() -> void:
+	var c := Campaign.create_initial(23)
+	AHJourneyRules.start_expedition(c, "fase_1", 23)
+	var street = await _open(c)
+	if not t.check(street != null, "a Rua das Vitrines abriu"):
+		return
+	var corridor: AHStreetCorridor = street.corridor
+	corridor.process_mode = Node.PROCESS_MODE_DISABLED
+	var route: Dictionary = c.session.expedition.corridor
+	var site: int = route.sites.map(func(s): return s.camp_site).find(true)
+	if not t.check(site >= 0, "a rua tem a casa do acampamento"):
+		return
+	route.index = route.sites[site].step
+	for i in route.index + 1:
+		route.steps[i].resolved = true
+	route.sites[site].has_enemy = false
+	await corridor._enter_house(site)
+	var room: AHHouseRoom = corridor.room
+	var hud: AHExplorationHud = street.exploration_hud
+	street._place_leader(Vector3(room.camp_x + 3.0, 0, -0.5))
+	corridor._house_frame(c, route)
+	t.check(_marked(street, corridor._camp_point()) and _marked(street, corridor._house_exit_point()), "a casa: a fogueira e a porta marcadas de longe")
+	street._place_leader(Vector3(room.camp_x + 0.3, 0, -0.5))
+	corridor._house_frame(c, route)
+	t.check(hud._prompt_world != null and hud._prompt_world.distance_to(corridor._camp_point()) < 0.05, "perto da fogueira, o aviso Acampar fica sobre ela")
+	street._place_leader(Vector3(room.exit_x - 0.3, 0, -0.5))
+	corridor._house_frame(c, route)
+	t.check(hud._prompt_world != null and hud._prompt_world.distance_to(corridor._house_exit_point()) < 0.05, "na porta, o aviso Sair fica sobre ela")
+	route.sites[site].camped = true
+	street._place_leader(Vector3(room.camp_x + 3.0, 0, -0.5))
+	corridor._house_frame(c, route)
+	t.check(not _marked(street, corridor._camp_point()), "acampamento feito: a fogueira sai das marcas")
+	t.check(corridor._camp_point().y < 1.2, "a marca da fogueira fica logo acima dela")
