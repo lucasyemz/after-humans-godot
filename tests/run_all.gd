@@ -47,6 +47,7 @@ func _run() -> void:
 		errors.first = ""
 		await test.run(t)
 		# O que o teste adiou (call_deferred, um sinal no fim do quadro) ainda conta para ele, e não para o seguinte (#66).
+		# Um timer ou tween que dispara mais tarde ainda cai no teste seguinte.
 		for i in 2:
 			await process_frame
 		var elapsed := Time.get_ticks_msec() - test_started
@@ -72,8 +73,8 @@ func _run() -> void:
 	for i in 2:
 		await process_frame
 	OS.remove_logger(errors)
-	if errors.count > 0:
-		failed += 1
+	var exit_failed := errors.count > 0
+	if exit_failed:
 		print("FAIL a saída (%d erro(s) ao liberar a última cena; o primeiro: %s)" % [errors.count, errors.first])
-	print("%d de %d testes passaram em %d ms." % [ran - failed, ran, Time.get_ticks_msec() - started])
-	root.get_node("Sound").quit(0 if failed == 0 and ran > 0 else 1)
+	print("%d de %d testes passaram em %d ms.%s" % [ran - failed, ran, Time.get_ticks_msec() - started, " A saída falhou." if exit_failed else ""])
+	root.get_node("Sound").quit(0 if failed == 0 and not exit_failed and ran > 0 else 1)
