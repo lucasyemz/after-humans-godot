@@ -145,9 +145,10 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		"relic_id": "", "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
 		"art_variant": "",
-		# O recruta flexível (#189, AHRecruitSkills): as 2 habilidades escolhidas ([] = as da classe), as de fora que
-		# aprendeu e as expedições com cada fundador que ensina.
-		"loadout": [], "learned": [], "mentor": {},
+		# Os recrutas (#215, AHRecruitSkills): as que leva para a luta ([] = as primeiras) e as aprendidas no Treino.
+		"loadout": [], "learned": [],
+		# A skin completa que ele veste (#138): "default" é a arte de hoje; as outras ficam em data/skins.json.
+		"skin_id": "default",
 		# O nível (#90): o XP desde o último treino e as melhorias escolhidas (AHHeroLevels).
 		"level": 1, "xp": 0, "upgrades": [],
 		# Ninguém morre (#118): os dias que faltam na recuperação (0: pronto), se está num leito da Enfermaria e o ciclo

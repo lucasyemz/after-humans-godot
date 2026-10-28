@@ -31,6 +31,7 @@ const DATA_FIELDS := {
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
 	"hero-upgrades": ["DisplayName", "Description"], "recruitment": ["Text"], "hero-jobs": ["Text"],
 	"night-events": ["Text", "TextOne", "TextEmpty", "TextWatched", "TextProtected"],
+	"skins": ["DisplayName", "ShortName", "Text"],
 }
 
 

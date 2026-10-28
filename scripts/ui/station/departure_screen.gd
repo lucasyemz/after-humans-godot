@@ -61,7 +61,7 @@ func _ready() -> void:
 	if AHUiStyle.using_keys:
 		var front: Control = find_child("Slot1", true, false)
 		if front != null:
-			_focus_later(front)
+			AHKit.focus_later(front)
 
 
 ## Quantas cartas: as vagas que a jornada aceita (no mínimo a equipe de agora).
@@ -116,7 +116,7 @@ func rebuild() -> void:
 	elif focus_name != "":
 		var again := find_child(focus_name, true, false)
 		if again is Control and (again as Control).focus_mode != Control.FOCUS_NONE:
-			_focus_later(again)
+			AHKit.focus_later(again)
 
 
 func restyle() -> void:
@@ -649,7 +649,7 @@ func open_confirm() -> void:
 	box.reset_size()
 	box.size = box.get_combined_minimum_size()
 	box.position = (Vector2(1920, 1080) - box.size) * 0.5
-	_focus_later(go)
+	AHKit.focus_later(go)
 	Sound.play("res://audio/ui/click.ogg", 0.5)
 
 
@@ -681,13 +681,6 @@ func _summary_line(icon_name: String, title: String, text: String) -> HBoxContai
 
 
 # ---------------------------------------------------------------- peças
-
-## O foco no quadro seguinte, se o controle ainda estiver na tela (a tela pode ter sido refeita no meio).
-func _focus_later(control: Control) -> void:
-	(func():
-		if is_instance_valid(control) and control.is_inside_tree():
-			control.grab_focus()).call_deferred()
-
 
 func _chip(text: String) -> Button:
 	var button := AHKit.button(text, "chip")

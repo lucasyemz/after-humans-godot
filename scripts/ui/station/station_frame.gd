@@ -177,7 +177,9 @@ static func back_button(parent: Control, action: Callable) -> Button:
 		arrow.position = Vector2(back.size.x * 0.5 - back.get_theme_font("font").get_string_size(back.text, HORIZONTAL_ALIGNMENT_LEFT, -1,
 		back.get_theme_font_size("font_size")).x * 0.5 - 26.0, (back.size.y - 28.0) * 0.5)
 	back.resized.connect(place)
-	place.call_deferred()
+	# No quadro seguinte, pelo próprio botão: se o painel for refeito antes, a chamada cai junto com ele (a lambda
+	# adiada sozinha rodava com o botão e o ícone já liberados).
+	back.resized.emit.call_deferred()
 	back.add_theme_font_override("font", AHKit.font(true))
 	back.add_theme_font_size_override("font_size", AHKit.size("primary"))
 	back.custom_minimum_size = Vector2(216, 64)

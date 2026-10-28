@@ -1614,3 +1614,9 @@ recruit_skills.gd: done
 recruit_skills.gd: needed
 recruit_skills.gd: roster
 campaign_service.gd: learned
+character_room.gd: Skins
+character_room.gd: Skin_%s
+*: skins
+*: heroes
+*: default
+station_rules.gd: Unlock
