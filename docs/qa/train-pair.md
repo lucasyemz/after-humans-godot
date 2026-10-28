@@ -28,8 +28,11 @@ não cabia. Para quem joga, parecia que o trem tinha parado.
   - quem já é repetido num save antigo fica como está, porque ninguém some;
   - quem é recusado libera o rosto, que pode voltar mais tarde com outro nome, porque é outra pessoa. O Lucas ainda
     vai decidir se ele volta; hoje volta.
-  - Hoje há uma arte de recruta por classe (cão, gato, sapo e coruja). Sem artes novas, o elenco para em 8: os 4
-    fundadores e 4 recrutas. O pedido de variantes à Awesomic 1 está na issue.
+  - Hoje há uma arte de recruta por classe: o cão, o gato, o sapo e a coruja, e, com o #187, o Guaxinim e o Tatu. Sem
+    artes novas, o elenco para em 10: os 4 fundadores e 6 recrutas, com as classes liberadas. O pedido de variantes à
+    Awesomic 1 está na issue.
+  - O teste do #187 (`test_recruit_art`, "o trem pode trazê-lo") agora usa um save de verdade, porque a regra olha o
+    elenco.
 - **Às vezes descem dois** (proposta em `data/recruitment.json`: `SingleWeight` 60, `PairWeight` 15, ou seja, 20% das
   chegadas de animal):
   - o segundo só desce com lugar para os dois no Alojamento e com um rosto livre;
