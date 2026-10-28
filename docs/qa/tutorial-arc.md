@@ -162,3 +162,16 @@ O teste fixo (40 sementes, metade com a busca e metade sem):
 - **Vida 1 na luta 3:** 0 de 40 na ingênua e 1 de 40 na automática.
 
 Sem frase nova: quem não vasculhou lê a mesma "A equipe recupera o fôlego." ao chegar à luta do Drone.
+
+## A rodada 4 da QA do arco
+
+A QA aprovou a regra do fôlego, que vem uma vez só, também depois de carregar o save, e a dica que desvia do aviso da
+busca. Achou mais isto:
+
+| O que a QA achou | Como ficou |
+|---|---|
+| Sem a busca, o aviso "A equipe recupera o fôlego." durava 1 quadro: o anúncio do trecho da luta do Drone o trocava no quadro seguinte | O anúncio da luta leva a frase junto ("A equipe recupera o fôlego. Trecho 6 · Patrulha à frente…"), por 5,5 s (`street_corridor.gd`, `_breath_note`). O `test_tutorial` confere a frase no anúncio e que ela vem uma vez só |
+| No texto Maior, a chapa do aviso da busca saía com 932x250, alta e meio vazia, cobrindo o achado | O aviso aplica a largura final ao rótulo antes de medir a altura (`exploration_hud.gd`, `toast`). O `test_toast_fit` reproduz o caso (um aviso curto e, logo depois, um que quebra em duas linhas) e falha sem a correção (250 px para 84 px de texto) |
+| A dica da Mochila pulava para o alto quando o aviso sumia, enquanto ainda era lida | O lugar do aviso segue evitado até a dica mudar (`tutorial_guide.gd`). O `test_tutorial` confere que a chapa fica no lugar |
+
+O registro "Combate iniciado nas ruínas do Bairro Submerso!" é anterior ao tutorial e fica para o Lucas decidir.
