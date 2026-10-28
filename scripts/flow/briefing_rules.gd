@@ -53,8 +53,14 @@ static func debriefing(campaign: Dictionary, report: Dictionary) -> Array:
 	var row_name := String(report.get("phase_id", "")) if result == "victory" else result
 	if result == "defeat" and back.is_empty():
 		row_name = "defeat_none"
-	var line := _line(campaign, data().get(row_name, {}).get("Debriefing", {}), back)
-	return [] if line.is_empty() else [line]
+	# Uma fala, ou uma lista delas (a chegada do tutorial, #144).
+	var entries = data().get(row_name, {}).get("Debriefing", {})
+	var out: Array = []
+	for entry in (entries if entries is Array else [entries]):
+		var line := _line(campaign, entry, back, out.back().speaker.id if not out.is_empty() else "")
+		if not line.is_empty():
+			out.append(line)
+	return out
 
 
 ## Quem fala: {id, name, role, art (a entrada do manifesto para o retrato)}; {} se não está (herói morto ou fora do

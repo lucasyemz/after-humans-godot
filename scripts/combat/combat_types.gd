@@ -122,6 +122,10 @@ class Context:
 	var researched_skills: Array = []
 	## Só a paridade com as gravações da web liga (ver bLegacyWebAdvanceSwap no C++).
 	var legacy_web_advance_swap := false
+	## A vida de um herói não desce disto (0: desce até o Último Fôlego). O tutorial (#144) usa 1: ninguém cai.
+	var min_hero_hp := 0
+	## O herói não resiste a sangramento nem a contaminação (o tutorial liga: a lição dos estados sempre aparece).
+	var sure_hero_dots := false
 
 
 class ActionResult:
