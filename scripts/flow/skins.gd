@@ -10,7 +10,9 @@ const DEFAULT := "default"
 ## O retrato da skin, na pasta dela (o padrão fica em art/ui/portraits, com o nome do herói).
 const PORTRAIT := "portrait.webp"
 
-## As entradas de arte já vestidas, por herói e skin.
+## As entradas de arte já vestidas, por herói e skin ("<herói>|<skin>"): vestir confere o arquivo de cada pose na pasta
+## da skin (ResourceLoader.exists), e a luta e a Estação pedem a mesma entrada a cada quadro de troca. A arte não muda
+## com o jogo rodando, então o cache vale até o fim; forget() limpa (os testes trocam a pasta de uma skin).
 static var _dressed := {}
 
 
