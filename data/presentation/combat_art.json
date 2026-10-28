@@ -1054,7 +1054,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"portrait": "res://art/ui/portraits/raccoon_recruit_01.png"
 			},
 			"actions": {
 				"rato_frasco": {
@@ -1186,7 +1187,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"portrait": "res://art/ui/portraits/armadillo_recruit_01.png"
 			},
 			"actions": {
 				"tatu_pancada": {
