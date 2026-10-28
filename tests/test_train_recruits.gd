@@ -127,8 +127,13 @@ func _accept_and_refuse() -> void:
 	var f := _campaign()
 	S.train_on_return(f, "same-id", "hero")
 	var reserved: String = f.station.train.candidate_id
-	var other := S.recruit(f, f.station.train.recruit.class_id, RandomNumberGenerator.new(), "Outro")
-	t.equal(other.hero_id, reserved, "a Admin usa o id reservado")
+	# Um segundo rosto da classe, para a Admin poder recrutar (o do trem está reservado, #182).
+	var saved_art: Dictionary = S._recruit_art.duplicate(true)
+	var cls: String = f.station.train.recruit.class_id
+	S._recruit_art["test_%s_02" % cls] = {"class_id": cls, "idle": saved_art[S.art_variants(cls)[0]].idle}
+	var other := S.recruit(f, cls, RandomNumberGenerator.new(), "Outro")
+	S._recruit_art = saved_art
+	t.equal(other.get("hero_id", ""), reserved, "a Admin usa o id reservado")
 	f.inventory.seeds = 50
 	S.decide_candidate(f, reserved, true)
 	var ids: Array = f.roster.map(func(h): return h.id)
@@ -163,17 +168,26 @@ func _no_decision() -> void:
 	t.check(not S.is_resident(d, civilian) and d.station.candidate_queue.back() == civilian, "o civil que ninguém acolheu volta ao fim da fila")
 
 
-## A casa cheia: o trem ainda traz alguém, mas só fica abrindo lugar.
+## A casa cheia (#182): o trem não traz animal (ele não teria onde ficar, ia embora na partida e o trem parecia
+## parado); com lugar de ajudante, ainda traz o civil.
 func _full_house() -> void:
 	var c := _campaign()
 	var classes := ["cao", "gato", "sapo", "coruja"]
 	for i in S.hero_limit(c) - S.living(c).size():
 		S.recruit(c, classes[i % 4], RandomNumberGenerator.new(), "Morador %d" % i)
 	t.equal(S.living(c).size(), S.hero_limit(c), "o Alojamento cheio")
-	t.check(S.train_on_return(c, "full", "hero"), "o trem ainda traz alguém")
+	t.check(S.train_classes(c).is_empty(), "com a casa cheia, nenhuma classe vem no trem")
+	var arrived := S.train_on_return(c, "full", "hero")
+	t.check(S.train_recruit(c).is_empty(), "o trem não traz animal")
+	t.check(not arrived or not S.civilian(c.station.train.candidate_id).is_empty(), "só o civil, se houver lugar de ajudante")
+	# O recruta já esperando (um save de antes) continua barrado com o motivo.
+	c.station.train = S._train_defaults()
+	c.station.train.phase = "waiting"
+	c.station.train.candidate_id = "hero_cao_99"
+	c.station.train.recruit = {"class_id": "cao", "display_name": "Antigo", "perks": [], "art_variant": "", "origin": ""}
 	c.inventory.seeds = 50
-	t.check(S.recruit_block(c).contains("cheio"), "com o motivo")
-	t.check(S.decide_candidate(c, c.station.train.candidate_id, true) != "" and S.living(c).size() == S.hero_limit(c), "e não entra")
+	t.check(S.recruit_block(c).contains("cheio"), "o animal que já esperava fica barrado, com o motivo")
+	t.check(S.decide_candidate(c, "hero_cao_99", true) != "" and S.living(c).size() == S.hero_limit(c), "e não entra")
 
 
 ## O save no meio, com alguém esperando, e o save antigo (sem o recruta nem a contagem).

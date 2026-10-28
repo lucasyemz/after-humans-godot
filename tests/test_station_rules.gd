@@ -288,7 +288,8 @@ func _shelter(t) -> void:
 	c.inventory.seeds = 10
 	# O Alojamento ampliado (#119): cabem os recrutas do teste.
 	c.station.rooms[S.CHARACTERS] = 4
-	S.recruit(c, "cao", rng)
+	# O terceiro cão entra direto, como num save antigo (o recrutamento não repete rosto, #182).
+	S._add_hero(c, S._next_hero_id(c, "cao"), "cao", "Rex", [], "")
 	var dogs: Array = c.roster.filter(func(h): return h.class_id == "cao").map(func(h): return h.id)
 	t.check(S.validate_team(c, [dogs[0], dogs[1], dogs[2], "hero_gato_nick"]) != "", "três cães não partem juntos")
 	t.equal(S.validate_team(c, ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]), "", "a formação inicial parte")

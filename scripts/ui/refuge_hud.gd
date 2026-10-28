@@ -2766,6 +2766,13 @@ func _train_recruit(c: Dictionary) -> void:
 	var block := S.recruit_block(c)
 	if block != "":
 		_text(block, AHKit.alert_text())
+	# Desceram dois (#182): o outro espera a vez dele, decidido depois deste (depois do pedido e do motivo, que ficam à
+	# vista sem rolar no Maior).
+	var second: Dictionary = train.get("next", {}).get("recruit", {})
+	if not second.is_empty():
+		var second_class = GameData.row("classes", second.class_id)
+		_trait_box("", tr("Desceu junto"), tr("%s (%s), que você decide depois.") % [second.display_name,
+			tr(second_class.DisplayName) if second_class != null else ""], AHKit.TEXT)
 	for perk_id in recruit.get("perks", []):
 		var perk = GameData.row("perks", perk_id)
 		if perk == null:
@@ -2832,10 +2839,28 @@ func _decide(candidate_id: String, accept: bool) -> void:
 	else:
 		var who := S.civilian(candidate_id)
 		toast((tr("%s vai morar na Estação.") % who.name) if accept else tr("%s segue no trem. Pode voltar numa próxima viagem.") % who.name)
+	# O segundo do trem (#182): o primeiro sai da plataforma (acolhido, vai para o cômodo; recusado, volta ao vagão) e o
+	# painel mostra quem desceu junto; o trem só parte depois dele.
+	if c.station.train.phase == "waiting":
+		_arrived_candidate = c.station.train.candidate_id
+		# O acolhido vai para um cômodo antes (refazer os moradores limpa os passeios da plataforma).
+		if accept:
+			var rng := RandomNumberGenerator.new()
+			rng.randomize()
+			station._place_residents(rng)
+		station.promote_companion(c.station.train.candidate_id, not accept)
+		refresh()
+		return
 	# O trem fecha e parte (o recusado volta para ele); acolhido, o civil fica e vai para o cômodo dele. O painel sai da
-	# frente da cena e o resto espera o trem sumir no túnel.
-	station.play_train_departure(not accept)
+	# frente da cena e o resto espera o trem sumir no túnel. O primeiro recusado de dois (#182) entra antes das portas
+	# fecharem.
 	_panel.visible = false
+	station.departure_pending = true
+	while is_instance_valid(station) and station.boarding_back():
+		await get_tree().process_frame
+	if not is_instance_valid(station):
+		return
+	station.play_train_departure(not accept)
 	await station.train_event_named("gone")
 	S.finish_departure(c)
 	station.commit()

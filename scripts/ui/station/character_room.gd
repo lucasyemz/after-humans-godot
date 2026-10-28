@@ -370,7 +370,7 @@ func _roster_line(c: Dictionary, column: VBoxContainer) -> void:
 			column.add_child(reason)
 	var waiting := S.train_candidate_name(c)
 	if waiting != "":
-		var go := AHKit.button(tr("%s espera na plataforma") % waiting, "secondary")
+		var go := AHKit.button((tr("%s esperam na plataforma") if S.train_waiting_names(c).size() > 1 else tr("%s espera na plataforma")) % waiting, "secondary")
 		go.name = "ToTrain"
 		go.custom_minimum_size = Vector2(0, 60)
 		go.pressed.connect(func(): hud.open_service("train"))
