@@ -1,7 +1,7 @@
 {
   "issue": 221,
   "base_commit": "5bb2928",
-  "source_tag": "codex-pr<N>-originals",
+  "source_tag": "codex-pr231-originals",
   "dependency": {
     "issue": 225,
     "source_tag": "codex-pr229-originals",

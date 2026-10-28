@@ -59,7 +59,7 @@ Ambiente sem GPU física: Godot4.7.2, OpenGL Compatibility/Mesa llvmpipe CPU, Xv
 
 ## Originais e integração
 
-Tag `codex-pr<N>-originals`, pasta `art/combat/source/stances_20261028/`: sete PNG novos, registros, contrato e helpers de QA. O Release da tag oferece ZIP automático de uma árvore isolada de fontes, fora do histórico do PR para a main. As gerações brutas permanecem fora do Git.
+Tag `codex-pr231-originals`, pasta `art/combat/source/stances_20261028/`: sete PNG novos, registros, contrato e helpers de QA. O Release da tag oferece ZIP automático de uma árvore isolada de fontes, fora do histórico do PR para a main. As gerações brutas permanecem fora do Git.
 
 1. Converter os sete PNG por `tools/sync_combat_art.py`, preservando canvas, âncora e referência acima. Não remedir a altura por uma guarda dobrada. O contrato detalha cada arquivo.
 2. Manter os idles dos quatro fundadores e do Bento Ronda como exploração; registrar seus novos `combat_idle.webp`. A skin usa `art/skins/bento/watch/combat_idle.webp`.
@@ -76,3 +76,5 @@ Tag `codex-pr<N>-originals`, pasta `art/combat/source/stances_20261028/`: sete P
 ## Verificação
 
 Runner inteiro local: **92/92 em641,292s**, paridade **48/48 lutas,3351 passos**, Godot4.7.2, base `5bb2928`. O log inclui mensagens de erro dos testes que exercitam estados inválidos do tutorial; o runner termina aprovado. Auditoria dos sete PNG em [audit.json](stances/audit.json); contrato em [contract.json](stances/contract.json), capturas/metadados em [capture.json](stances/capture.json). Somente docs/pranchas no diff.
+
+[PR #231](https://github.com/lucasyemz/after-humans-godot/pull/231) · [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr231-originals) · [ZIP dos sete originais](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr231-originals.zip).
