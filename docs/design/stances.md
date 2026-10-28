@@ -61,7 +61,7 @@ Ambiente sem GPU física: Godot4.7.2, OpenGL Compatibility/Mesa llvmpipe CPU, Xv
 
 Tag `codex-pr231-originals`, pasta `art/combat/source/stances_20261028/`: sete PNG novos, registros, contrato e helpers de QA. O Release da tag oferece ZIP automático de uma árvore isolada de fontes, fora do histórico do PR para a main. As gerações brutas permanecem fora do Git.
 
-1. Converter os sete PNG por `tools/sync_combat_art.py`, preservando canvas, âncora e referência acima. Não remedir a altura por uma guarda dobrada. O contrato detalha cada arquivo.
+1. Preparar os sete PNG com o conversor de revisão abaixo; o PC registra depois os novos arquivos no pipeline de `tools/sync_combat_art.py`, que ainda não importa automaticamente estas novas poses. Preservar canvas, âncora e referência acima. Não remedir a altura por uma guarda dobrada. O contrato detalha cada arquivo.
 2. Manter os idles dos quatro fundadores e do Bento Ronda como exploração; registrar seus novos `combat_idle.webp`. A skin usa `art/skins/bento/watch/combat_idle.webp`.
 3. Integrar primeiro a base da #225 pelo pacote `codex-pr229-originals`. Para o Guaxinim, manter aquele idle como exploração e adicionar esta guarda. Para o Tatu, reutilizar aquele idle como `combat_idle.webp`; a imagem nova de mãos livres passa a `idle.webp`. Os dois arquivos de referência da #225 não foram duplicados neste pacote.
 4. A exploração/Estação usa idle; a luta usa combat_idle com fallback para idle. Essa seleção, a ida/volta e os testes pertencem ao PR de código do Claude 2. Não trocar feridos, ataques ou retratos por estas imagens.
@@ -78,3 +78,20 @@ Tag `codex-pr231-originals`, pasta `art/combat/source/stances_20261028/`: sete P
 Runner inteiro local: **92/92 em641,292s**, paridade **48/48 lutas,3351 passos**, Godot4.7.2, base `5bb2928`. O log inclui mensagens de erro dos testes que exercitam estados inválidos do tutorial; o runner termina aprovado. Auditoria dos sete PNG em [audit.json](stances/audit.json); contrato em [contract.json](stances/contract.json), capturas/metadados em [capture.json](stances/capture.json). Somente docs/pranchas no diff.
 
 [PR #231](https://github.com/lucasyemz/after-humans-godot/pull/231) · [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr231-originals) · [ZIP dos sete originais](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr231-originals.zip).
+
+## Preparador de WebP para revisão
+
+[prepare_webp.py](stances/prepare_webp.py) converte as sete poses novas e, opcionalmente, os dois idles reutilizados da #225. Confere os hashes da auditoria deste PR, formato RGBA, canvas, referência e contato dos pés antes de criar o pacote. A pasta de saída deve ser nova e ficar fora do jogo e das fontes. Os PNG, arquivos de produção e uma saída já existente são preservados.
+
+No Windows, a partir do checkout com este PR, com os ZIP dos dois Releases extraídos:
+
+```powershell
+py -m pip install pillow
+py docs/design/stances/prepare_webp.py --sources "C:\arte\art\combat\source\stances_20261028" --redraw-sources "C:\arte\art\combat\source\recruits_redraw_20261028" --output "C:\arte_pronta\poses_221"
+```
+
+Os caminhos são exemplos. Com `--redraw-sources`, o pacote leva **nove WebP**: sete novos, mais o idle de exploração do Guaxinim e o combat_idle do Tatu reutilizados da #225. Sem essa opção são sete, e `registration.json` marca explicitamente que as bases reaproveitadas faltam. Os cinco outros idles de exploração são mantidos dos arquivos atuais do jogo, sem duplicação neste pacote.
+
+O registro conserva as unidades da fonte — canvas/âncora/referência canônicos — e informa o tamanho real das texturas, hashes, id/skin e destino sugerido de cada arquivo. A Ronda aponta para `art/skins/bento/watch/`, preservando o id do Bento. Destino sugerido é uma indicação para a revisão; o script não copia nada para ele nem modifica o manifesto. A troca automática de exploração/combate continua no PR de integração do Claude2.
+
+**Verificação:** os nove WebP preservam os píxeis visíveis e o alfa dos protótipos aprovados. Fontes intactas; destinos existentes/dentro do jogo, hash incorreto e caminho fora das fontes foram recusados; o modo de sete arquivos também foi conferido. Resultados em [preparation_checks.json](stances/preparation_checks.json). A arte e as capturas anteriores não mudaram.
