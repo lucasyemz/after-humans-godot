@@ -1,0 +1,794 @@
+{
+  "issue": 225,
+  "related_issue": 210,
+  "base_commit": "561f798",
+  "source_folder": "art/combat/source/recruits_redraw_20261028",
+  "source_tag": "codex-pr<N>-originals",
+  "delivery": "PR contains review sheets/docs only; production assets come from source tag via PC integration.",
+  "actors": {
+    "raccoon": {
+      "class_id": "rato",
+      "id": "raccoon_recruit_01",
+      "height_m": 1.44,
+      "old_height_m": 1.3,
+      "idle_height_ratio": 0.9288389513108615,
+      "assets": {
+        "idle": {
+          "source_file": "raccoon/rato-idle.png",
+          "source_sha256": "bc4011dc1af3960599935f3baa972c0169031b9109839de3b4b5b950392b7065",
+          "prototype_file": "raccoon/idle.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            362,
+            65,
+            815,
+            1305
+          ],
+          "world_width_m": 0.5261,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/idle.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "12aa5fff94371d7fe3e120fb4f040dd7a4a8798cd49067c012628d9117c01674"
+        },
+        "rato_frasco": {
+          "source_file": "raccoon/rato-attack1-rato_frasco.png",
+          "source_sha256": "33caf013900153499399b84ba039e479a7aee289978f72af8d6f6a8220f35b9f",
+          "prototype_file": "raccoon/rato_frasco.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            240,
+            72,
+            1035,
+            1305
+          ],
+          "world_width_m": 0.9232,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/rato_frasco.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "fa816734eaf60347b4db557803e39dd19501569ee6bbde2635e9ede1908114e9"
+        },
+        "rato_mordida": {
+          "source_file": "raccoon/rato-attack2-rato_mordida.png",
+          "source_sha256": "fa79b5a505ce087d9300c16c060b4356fed97f8d0289bef73b462c305b72c079",
+          "prototype_file": "raccoon/rato_mordida.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            197,
+            17,
+            969,
+            1305
+          ],
+          "world_width_m": 0.8965,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/rato_mordida.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "b00a1a5a7ab4e1e99ac2a49a6644fb50b447c6f624b58d7ca99be0455ae89d65"
+        },
+        "rato_passagem": {
+          "source_file": "raccoon/rato-attack3-rato_passagem.png",
+          "source_sha256": "7889a0790fd06be85537ddca6fa6e1dd2bd0cda038186fbdcef97d2efed712b0",
+          "prototype_file": "raccoon/rato_passagem.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            197,
+            179,
+            1122,
+            1305
+          ],
+          "world_width_m": 1.0742,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/rato_passagem.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "36086aae3dc872597746920042dad115d71a2d6e9f597e9338d7f2fa28bf723a"
+        },
+        "rato_poeira": {
+          "source_file": "raccoon/rato-attack4-rato_poeira.png",
+          "source_sha256": "8eab19a2386fcd5c8d5778198798fef5ddafa66555ef3aa8561aafb2f3b8fcf0",
+          "prototype_file": "raccoon/rato_poeira.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            202,
+            109,
+            1082,
+            1305
+          ],
+          "world_width_m": 1.0219,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/rato_poeira.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "b08b4e5b9204fcdfa01ea789a592bb5b8131ab5ad4b26f4fc08d35837cba61ba"
+        },
+        "hurt": {
+          "source_file": "raccoon/rato-hurt.png",
+          "source_sha256": "c1cab66c9c73eb11100ee4f45f4e04980ca82de4b2be908c3b9a97eb72fd2e4b",
+          "prototype_file": "raccoon/hurt.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            239,
+            40,
+            879,
+            1305
+          ],
+          "world_width_m": 0.7432,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/hurt.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "3db534a2fe1371ce08bb7e66086b09393c4f8c618cb7c98f63c958e5301d0ef4"
+        },
+        "dodge": {
+          "source_file": "raccoon/rato-dodge.png",
+          "source_sha256": "05cd6b6f8589d710e9431e86749af4f42e5510a583c00c5da0ac3fbf0b263150",
+          "prototype_file": "raccoon/dodge.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            121,
+            72,
+            935,
+            1305
+          ],
+          "world_width_m": 0.9453,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/dodge.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "cac26f378ad99661b85918aff948ea388f8d25d7e94aeffa90d486e759bb6b9e"
+        },
+        "defense": {
+          "source_file": "raccoon/rato-block.png",
+          "source_sha256": "8c01b5d5233b52a1d0d0da42d6c3c8e5314cda2518c2168870d8aed8c1bcca83",
+          "prototype_file": "raccoon/defense.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            207,
+            65,
+            958,
+            1305
+          ],
+          "world_width_m": 0.8721,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/defense.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "c79f14f18b7a84229e804a469da80805d079886c09028c0cf45ce33bd92d08a9"
+        },
+        "death": {
+          "source_file": "raccoon/rato-defeat.png",
+          "source_sha256": "19b1b43f1accac4f8f6d0d3c75d035c33d200701d92c5a11b4c42b1042e34ba8",
+          "prototype_file": "raccoon/death.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            153,
+            451,
+            978,
+            1305
+          ],
+          "world_width_m": 0.9581,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/death.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "97a9e49b91bd5a9bc9a287e5969528f16ae574eecc254c67046e839bffba0643"
+        },
+        "item": {
+          "source_file": "raccoon/rato-item.png",
+          "source_sha256": "89292efdfe1455d8b5d8bfa748fe9ab43146684889a972a95e2b422ba31a80d3",
+          "prototype_file": "raccoon/item.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            352,
+            64,
+            874,
+            1305
+          ],
+          "world_width_m": 0.6062,
+          "old_reference": "art/combat/recruits/raccoon_recruit_01/idle.webp",
+          "old_origin": "SEM POSE / FALLBACK IDLE",
+          "old_sha256": "12aa5fff94371d7fe3e120fb4f040dd7a4a8798cd49067c012628d9117c01674"
+        },
+        "seat": {
+          "source_file": "raccoon/rato-seat.png",
+          "source_sha256": "cbda886c53b055cb2848434ef6ed8b0f55bd0772881ba5532fbd110854822dbe",
+          "prototype_file": "raccoon/seat.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            188,
+            544,
+            988,
+            1305
+          ],
+          "world_width_m": 0.929,
+          "old_reference": "qa/before/raccoon_seat.webp",
+          "old_origin": "PROPOSTA #220",
+          "old_sha256": "c6d33bf94ea7c70033bd5073a3c7703350455fdec281f38c64a9c47cf0d98561"
+        },
+        "sleep": {
+          "source_file": "raccoon/rato-sleep.png",
+          "source_sha256": "6199990151fc6e773a5258e68fc36badbc9af71303ac4fb6bc40acf6a401fc84",
+          "prototype_file": "raccoon/sleep.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 453,
+          "visible": [
+            136,
+            852,
+            1042,
+            1305
+          ],
+          "world_width_m": 1.0521,
+          "old_reference": "qa/before/raccoon_sleep.webp",
+          "old_origin": "PROPOSTA #220",
+          "old_sha256": "a3aeffa441beb72b312b4a92b7fc7514033225b5cdeb4f2bd01ec654a4e78b0c"
+        }
+      }
+    },
+    "armadillo": {
+      "class_id": "tatu",
+      "id": "armadillo_recruit_01",
+      "height_m": 1.56,
+      "old_height_m": 1.35,
+      "idle_height_ratio": 0.9288389513108615,
+      "assets": {
+        "idle": {
+          "source_file": "armadillo/tatu-idle.png",
+          "source_sha256": "5dbef43bc82481bb5a84d38e7f03cbf14776bdce28ca61c581114d0c05b5e5eb",
+          "prototype_file": "armadillo/idle.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            252,
+            65,
+            926,
+            1305
+          ],
+          "world_width_m": 0.8479,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/idle.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "dc443043f43b13fe4e04609b8af7942c5e07c96a64dbabf6614048b2d7035836"
+        },
+        "tatu_pancada": {
+          "source_file": "armadillo/tatu-attack1-tatu_pancada.png",
+          "source_sha256": "5029a8c9da21ffda22f1cf552dc46ef8d7cb348db39f1274cee540249c8416a4",
+          "prototype_file": "armadillo/tatu_pancada.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            90,
+            24,
+            1076,
+            1305
+          ],
+          "world_width_m": 1.2405,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/tatu_pancada.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "a8b772e50bf0d1f6c850e8a16732202c9a06b25dee50c601e13624425f54730b"
+        },
+        "tatu_enrolar": {
+          "source_file": "armadillo/tatu-attack2-tatu_enrolar.png",
+          "source_sha256": "646491263a66596c01909f9641447d4319e790263f4f43df5efc7c3d8d1ea9dd",
+          "prototype_file": "armadillo/tatu_enrolar.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            141,
+            367,
+            1129,
+            1305
+          ],
+          "world_width_m": 1.243,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/tatu_enrolar.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "0716f71ba7ef9545b5a41ee9072f2214918a6bb507436f0c9750bb333580c063"
+        },
+        "tatu_investida": {
+          "source_file": "armadillo/tatu-attack3-tatu_investida.png",
+          "source_sha256": "8295f47d05a4db0dcdb968b60ab15ae3a83ea0682abe7a5c34abf90befe437ce",
+          "prototype_file": "armadillo/tatu_investida.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            79,
+            145,
+            1083,
+            1305
+          ],
+          "world_width_m": 1.2631,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/tatu_investida.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "b9f54b1b9ede7784338d2981541ccb66cc89afbc9dbaafdfa1620ab71ef14c40"
+        },
+        "tatu_abrigo": {
+          "source_file": "armadillo/tatu-attack4-tatu_abrigo.png",
+          "source_sha256": "532de2cf688588c41b2b95fc64eee5c8abccec4e347acf6947948131403d3c55",
+          "prototype_file": "armadillo/tatu_abrigo.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            93,
+            111,
+            1158,
+            1305
+          ],
+          "world_width_m": 1.3398,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/tatu_abrigo.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "a1dc614f69144ab4e2c17317f391c86682a279999fb90981367d74b6837ddc18"
+        },
+        "hurt": {
+          "source_file": "armadillo/tatu-hurt.png",
+          "source_sha256": "f8183c97a13384be1e58d2ee0db63f657076fd5620468af8f76f605e5d624090",
+          "prototype_file": "armadillo/hurt.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            156,
+            71,
+            1002,
+            1305
+          ],
+          "world_width_m": 1.0643,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/hurt.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "1d3113d7edce47d234085c8950ef8cb8c71ef6d409d3e683913402cd5654a720"
+        },
+        "dodge": {
+          "source_file": "armadillo/tatu-dodge.png",
+          "source_sha256": "6abc2b4441a0d0c7a863b1be2397a71e41f016241041a400485480d11df56b03",
+          "prototype_file": "armadillo/dodge.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            156,
+            66,
+            1128,
+            1305
+          ],
+          "world_width_m": 1.2228,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/dodge.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "4f3689f024df56fa52ea1dd9b5907f768349023e18ac6c0a981cd3c9249e6de4"
+        },
+        "defense": {
+          "source_file": "armadillo/tatu-block.png",
+          "source_sha256": "8f441b7d1eded1c8ff0f94eafcf40e9ff5ef900de9803b81e298e4b831580439",
+          "prototype_file": "armadillo/defense.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            83,
+            68,
+            1051,
+            1305
+          ],
+          "world_width_m": 1.2178,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/defense.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "8927c94d3260607f5853cc4768d5ea431cdc0451c4680ca697ee40460bf304e7"
+        },
+        "death": {
+          "source_file": "armadillo/tatu-defeat.png",
+          "source_sha256": "ed45c26ef148fd4d1e57d4592cf86448954bd2a82134c4038eaaff1e4fa4bea7",
+          "prototype_file": "armadillo/death.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            69,
+            401,
+            1051,
+            1305
+          ],
+          "world_width_m": 1.2354,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/death.webp",
+          "old_origin": "MAIN",
+          "old_sha256": "8e21d99360f575f918db4f565ade558ccf0697f760a7300f4eff3193825a7704"
+        },
+        "item": {
+          "source_file": "armadillo/tatu-item.png",
+          "source_sha256": "0b76ecf0eaa7afcf6acd4f6cfd741e72d0fcbc5b4478bd923283889e6fb35025",
+          "prototype_file": "armadillo/item.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            225,
+            64,
+            941,
+            1305
+          ],
+          "world_width_m": 0.9008,
+          "old_reference": "art/combat/recruits/armadillo_recruit_01/idle.webp",
+          "old_origin": "SEM POSE / FALLBACK IDLE",
+          "old_sha256": "dc443043f43b13fe4e04609b8af7942c5e07c96a64dbabf6614048b2d7035836"
+        },
+        "seat": {
+          "source_file": "armadillo/tatu-seat.png",
+          "source_sha256": "b127219b9b014e7ef4a62b5ed07d7aa391bbed690fcb1a0de1da464e0063c2d1",
+          "prototype_file": "armadillo/seat.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            88,
+            477,
+            1090,
+            1305
+          ],
+          "world_width_m": 1.2606,
+          "old_reference": "qa/before/armadillo_seat.webp",
+          "old_origin": "PROPOSTA #220",
+          "old_sha256": "9fdafd3eb476375b0d62f8705d5fb9eb544d7e3df645839f13bcfc606a037437"
+        },
+        "sleep": {
+          "source_file": "armadillo/tatu-sleep.png",
+          "source_sha256": "d39a6be06a3d9c66c259e7d9d6b009027c7786ed0a4427ed7295c207571b8455",
+          "prototype_file": "armadillo/sleep.webp",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "body_width_pixels": 674,
+          "visible": [
+            123,
+            769,
+            1055,
+            1305
+          ],
+          "world_width_m": 1.1725,
+          "old_reference": "qa/before/armadillo_sleep.webp",
+          "old_origin": "PROPOSTA #220",
+          "old_sha256": "0fefd0d268b588f2286c5433d93451e930eaf9b764e512a4183097aa2f9b5973"
+        }
+      }
+    }
+  },
+  "portraits": {
+    "raccoon": {
+      "file": "raccoon_recruit_01.png",
+      "source_idle": "rato-idle.png",
+      "source_crop": [
+        429.0,
+        16.5,
+        829.0,
+        416.5
+      ],
+      "source_eye": [
+        654,
+        179
+      ],
+      "eye_anchor": [
+        144,
+        104
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "layout_anchor": [
+        128,
+        128
+      ],
+      "circle_inner_radius": 112.64,
+      "safe_face_radius": 104,
+      "generated_independently": false,
+      "source_file": "raccoon/raccoon_recruit_01.png",
+      "source_sha256": "b2602d6b7aac57e2084b8c93ca04e3955066aeee16a3474cf4cdc48bbe63024d"
+    },
+    "armadillo": {
+      "file": "armadillo_recruit_01.png",
+      "source_idle": "tatu-idle.png",
+      "source_crop": [
+        490.0,
+        4.5,
+        890.0,
+        404.5
+      ],
+      "source_eye": [
+        715,
+        167
+      ],
+      "eye_anchor": [
+        144,
+        104
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "layout_anchor": [
+        128,
+        128
+      ],
+      "circle_inner_radius": 112.64,
+      "safe_face_radius": 104,
+      "generated_independently": false,
+      "source_file": "armadillo/armadillo_recruit_01.png",
+      "source_sha256": "0bcd6a1a01202cf9be7d5a738dc12b18f234f27ee97b145b1b92748e2df16c88"
+    }
+  },
+  "integration": {
+    "body_conversion": "PNG 1178x1335 -> WebP 589x668; use fixed idle registration across all states.",
+    "portraits": "PNG256x256, copy at 1:1, no half-scale.",
+    "legacy_source_filenames": "Same rato/tatu-idle, attackN-ability, hurt,dodge,block,defeat prefixes; add item,seat,sleep.",
+    "old_layers": "Raccoon/armadillo layers from #211 have old proportions; do not overlay them on this redraw."
+  }
+}
