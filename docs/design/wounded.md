@@ -36,7 +36,7 @@ A prancha compõe pares na mesma escala e marca a mesma âncora em âmbar. A cab
 
 ## Fontes fora da main
 
-Tag `codex-pr<N>-originals`; pasta `art/combat/source/wounded_20261028/`, somente num commit isolado de fontes. O Release usa o ZIP automático dessa tag, cuja árvore contém só originais/contrato. Os PNG não entram no PR nem no histórico da branch para a main. Tag/link serão preenchidos ao abrir o PR.
+Tag `codex-pr209-originals`; pasta `art/combat/source/wounded_20261028/`, somente num commit isolado de fontes. O Release usa o ZIP automático dessa tag, cuja árvore contém só originais/contrato. Os PNG não entram no PR nem no histórico da branch para a main. [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr209-originals) · [ZIP dos originais](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr209-originals.zip).
 
 Reprodução depois de extrair a tag: `python docs/design/wounded/build_delivery.py --sources art/combat/source/wounded_20261028`. Dependências: Pillow, numpy e scipy. Os arquivos individuais PNG são as fontes normalizadas para o pipeline do Claude; os brutos da ferramenta de imagens permanecem fora do Git.
 
