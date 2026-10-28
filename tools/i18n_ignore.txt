@@ -1507,7 +1507,9 @@ street.gd: Leaves
 street.gd: dust
 street.gd: leaves
 refuge_hud.gd: %s:%s
-refuge_hud.gd: id
+scenario_world.gd: ZoneEnd_%d_%s
+scenario_world.gd: left
+scenario_world.gd: right
 passage_card.gd: sound
 passage_card.gd: loop
 passage_card.gd: Sound
@@ -1523,3 +1525,4 @@ journey_rules.gd: alive
 journey_rules.gd: house
 street_corridor.gd: reactions
 street_corridor.gd: death
+ui_style.gd: enemies
