@@ -205,7 +205,7 @@ func _team() -> void:
 		var entry = AHStationRules.hero(Campaign.state, hero_id)
 		if entry == null or not entry.get("alive", true):
 			continue
-		var seat: Dictionary = poses.get(String(hero_id) + "_seat", {})
+		var seat: Dictionary = AHSkins.pose(poses.get(String(hero_id) + "_seat", {}), String(hero_id))
 		if not seat.is_empty():
 			seated.append({"id": hero_id, "art": seat, "seated": true})
 		else:
