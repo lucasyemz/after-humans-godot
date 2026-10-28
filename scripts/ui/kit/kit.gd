@@ -141,12 +141,12 @@ static func health_state(hp: int, max_hp: int) -> Dictionary:
 
 ## Abaixo desta fração da vida, ferimento grave: o mesmo limite do herói ferido que manca na exploração (#194), em
 ## data/wounded.json (Threshold). Lido pela árvore, e não pelo nome do autoload, para os scripts de captura (-s), que
-## compilam antes dos autoloads; sem a tabela, LIGHT_FROM.
+## compilam antes dos autoloads; sem a tabela, LIGHT_FROM. Fica abaixo de HEALTHY_ABOVE, para o "Ferimento leve" não sumir.
 static func heavy_below() -> float:
 	var tree := Engine.get_main_loop() as SceneTree
 	var data: Node = tree.root.get_node_or_null("GameData") if tree != null else null
 	var row = data.row("wounded", "wounded") if data != null else null
-	return float(row.Threshold) if row != null else LIGHT_FROM
+	return clampf(float(row.Threshold), 0.05, HEALTHY_ABOVE - 0.05) if row != null else LIGHT_FROM
 
 
 ## A entrada da peça no manifesto (os dois kits; os nomes não se repetem).

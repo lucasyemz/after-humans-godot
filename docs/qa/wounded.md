@@ -9,10 +9,12 @@ Os números ficam em `data/wounded.json`, para o Lucas ajustar:
 - **Ferido** (`AHWounded.is_wounded(hero)`): vivo e com a vida abaixo de 50% da máxima (`Threshold`), ou Caído em
   recuperação (#118/#121), mesmo com a vida cheia. Uma função só, para a exploração, a Estação e a HUD. É o mesmo
   limite do "Ferimento grave" (o coração rachado) da Estação: o kit lê o `Threshold` daqui (`AHKit.heavy_below`), um
-  número só para as duas telas. A issue propunha 40%; ficou 50%, o limite que o coração rachado já tinha na Estação.
+  número só para as duas telas. O kit trava o limite abaixo do "Em forma" (75%), para o "Ferimento leve" não
+  sumir com um número alto demais. A issue propunha 40%; ficou 50%, o limite que o coração rachado já tinha na Estação.
 - **O passo** (`AHWounded.speed_factor`): 70% da velocidade (`SpeedFactor`).
 - **A pose** (`AHWounded.pose(idle)`): o `wounded.webp` da pasta da arte do herói, no canvas e na âncora do idle (a
-  entrega do Codex, PR #209). Sem o arquivo, o idle de pé. A pose troca sozinha quando a arte entrar.
+  entrega do Codex, PR #209). Sem o arquivo, o idle de pé. A pose troca sozinha quando a arte entrar: até o #209 entrar na `main`, os heróis
+  andam feridos no idle (o teste confere a troca com uma pose de mentira).
 
 ## Na exploração
 
@@ -39,11 +41,14 @@ A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWo
 
 ## Testes
 
-- `tests/test_wounded.gd` (novo, 22 verificações):
+- `tests/test_wounded.gd` (novo, 28 verificações):
   - o limite (abaixo dele ferido, nele não), o Caído em recuperação, o morto e o herói ausente; o ferido é o
     "Ferimento grave" do kit em toda vida de 0 a 100, com o mesmo número;
   - a fração da velocidade e a pose (o arquivo da pasta com o canvas e a âncora do idle; sem o arquivo, o idle);
-  - na rua: a fila no passo do ferido, o ferido mancando e os inteiros retos, sem o balanço com "Reduzir efeitos";
+  - o limite travado abaixo do "Em forma";
+  - na rua: a placa troca para a pose (uma de mentira, o `hurt.webp`) e volta ao idle com a cura; a velocidade que o
+    `_physics_process` dá ao líder, ferido e inteiro; a troca de formação leva a pose e o mancar com o ferido;
+  - a fila no passo do ferido, o ferido mancando e os inteiros retos, sem o balanço com "Reduzir efeitos";
   - o aviso na HUD só no ferido (com o clique passando para a plaquinha), e fora quando a vida volta;
   - o save: a vida baixa volta com ele.
 - `tests/run_all.gd` inteiro.
@@ -62,3 +67,7 @@ A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWo
   mostra o aviso, e a Estação diz "Ferimento grave"; com 50%, nem um nem outro. O prumo volta suave ao parar. `run_all`
   86/86, com a paridade 48/48. Notas baixas: com o `Threshold` acima de 0,75 o "Ferimento leve" some (o
   `HEALTHY_ABOVE`); a pose de ferido dos recrutas pede uma pasta por recruta (#191).
+
+- **Revisão do PR #216: AJUSTAR ANTES.** A pose de ferido fica pendente do #209 (dito na #194), e os testes ganharam
+  a troca de pose na rua, a velocidade medida no `_physics_process` e a troca de formação com o ferido; o kit trava o
+  `Threshold` abaixo do "Em forma".

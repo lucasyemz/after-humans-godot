@@ -55,6 +55,12 @@ func _rule() -> void:
 	t.check(other.file.ends_with("/hurt.webp") and other.anchor == idle.anchor and other.canvas == idle.canvas,
 		"com o arquivo na pasta, a pose troca o arquivo e guarda o canvas e a âncora")
 	t.equal(AHWounded.pose(idle, "nao-existe.webp"), idle, "sem o arquivo, fica o idle")
+	# O limite fica abaixo do "Em forma": um Threshold alto demais não apaga o "Ferimento leve".
+	var row: Dictionary = GameData.row("wounded", "wounded")
+	row.Threshold = 0.9
+	t.check(AHKit.heavy_below() < AHKit.HEALTHY_ABOVE and AHKit.health_state(72, 100).id == "light",
+		"com o Threshold em 0,9, o kit para em %.2f e o Ferimento leve continua" % AHKit.heavy_below())
+	row.Threshold = limit
 
 
 func _street() -> void:
@@ -74,6 +80,23 @@ func _street() -> void:
 	if not t.check(street != null, "a rua abre"):
 		return
 	t.equal(street.party_speed_factor(), float(AHWounded.rules().SpeedFactor), "com o líder ferido, a fila anda no passo dele")
+	# A pose de ferido: a arte do #209 ainda não entrou, então uma pose de mentira (o hurt.webp da mesma pasta).
+	var idle: Dictionary = AHCombatArena.hero_art_of(leader.id).idle
+	AHWounded.pose_file = "hurt.webp"
+	street._wounded.clear()
+	street._check_wounds()
+	var card = street._heroes[0]
+	t.check(card._art.file == idle.file.get_base_dir().path_join("hurt.webp"), "ferido, a placa troca para a pose (%s)" % card._art.file)
+	# O passo: o líder anda mais devagar com o ferido na fila, pelo _physics_process de verdade.
+	var hurt_step := await _stride(street)
+	leader.hp = leader.max_hp
+	street._check_wounds()
+	t.equal(card._art.file, idle.file, "curado, a placa volta ao idle")
+	var whole_step := await _stride(street)
+	t.check(whole_step > 0.0 and absf(hurt_step / whole_step - float(AHWounded.rules().SpeedFactor)) < 0.001,
+		"o líder anda a %.2f ferido e a %.2f inteiro (a fração do dado)" % [hurt_step, whole_step])
+	leader.hp = maxi(1, int(leader.max_hp * 0.2))
+	street._check_wounds()
 	# O balanço: andando, o ferido pende para o lado e o inteiro não; com "Reduzir efeitos", ninguém.
 	var tilts := _walk(street)
 	t.check(tilts[0] > 0.01, "o ferido manca andando (pende %.3f rad)" % tilts[0])
@@ -82,6 +105,15 @@ func _street() -> void:
 	tilts = _walk(street)
 	t.check(tilts.all(func(v): return v < 0.0001), "com Reduzir efeitos, sem o balanço")
 	Campaign.state.settings.reduced_environment_effects = false
+	# A troca de formação: o ferido vai para o segundo lugar e leva a pose e o mancar; quem fica na frente anda reto.
+	var second: String = street.party_ids[1]
+	street.swap_party(leader.id, second)
+	tilts = _walk(street)
+	t.check(street._heroes[1]._art.file.ends_with("/hurt.webp") and not street._heroes[0]._art.file.ends_with("/hurt.webp"),
+		"trocado, a pose de ferido segue o ferido")
+	t.check(tilts[1] > 0.01 and tilts[0] < 0.0001, "e o mancar também (%s)" % [tilts])
+	street.swap_party(leader.id, second)
+	AHWounded.pose_file = AHWounded.POSE_FILE
 	# O aviso na HUD: o coração rachado no retrato do ferido, e some quando a vida volta.
 	var hud: AHExplorationHud = street.exploration_hud
 	hud.refresh(Campaign.state)
@@ -99,6 +131,22 @@ func _street() -> void:
 	t.equal(street.party_speed_factor(), 1.0, "e a fila volta ao passo todo")
 	_tree.unload_current_scene()
 	await _tree.process_frame
+
+
+## A velocidade que o _physics_process dá ao líder com a tecla de andar apertada, em 10 quadros. A posição não serve de
+## régua: fora do quadro de física, o move_and_slide anda pelo relógio do motor, e não pelo delta.
+func _stride(street) -> float:
+	street.set_physics_process(false)
+	street._leader.position = Vector3(7.6, 0, 0.45)
+	Input.action_press("move_right")
+	var speed := 0.0
+	for frame in 10:
+		street._physics_process(1.0 / 60.0)
+		speed = maxf(speed, street._leader.velocity.x)
+	Input.action_release("move_right")
+	street.set_physics_process(true)
+	await _tree.process_frame
+	return speed
 
 
 ## Anda a fila alguns quadros para a direita e devolve o maior balanço de cada um.

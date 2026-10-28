@@ -6,6 +6,9 @@ extends RefCounted
 
 const POSE_FILE := "wounded.webp"
 
+## O arquivo da pose que a rua procura (os testes trocam por um que já existe, enquanto a arte do #209 não entra).
+static var pose_file := POSE_FILE
+
 
 ## Os números da regra (data/wounded.json).
 static func rules() -> Dictionary:
@@ -30,11 +33,11 @@ static func speed_factor(hero) -> float:
 
 ## A pose de ferido a partir do idle: o mesmo canvas e a mesma âncora, com o arquivo wounded.webp da mesma pasta (sem as
 ## folhas da respiração do idle). Sem o arquivo (a arte ainda não chegou), o próprio idle.
-static func pose(idle: Dictionary, pose_file: String = POSE_FILE) -> Dictionary:
+static func pose(idle: Dictionary, file_name: String = "") -> Dictionary:
 	var file := String(idle.get("file", ""))
 	if file == "":
 		return idle
-	var wounded := file.get_base_dir().path_join(pose_file)
+	var wounded := file.get_base_dir().path_join(file_name if file_name != "" else pose_file)
 	if not ResourceLoader.exists(wounded):
 		return idle
 	var art := idle.duplicate()
