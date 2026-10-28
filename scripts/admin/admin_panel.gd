@@ -131,7 +131,7 @@ func _fill() -> void:
 			first = button
 	if first != null and AHUiStyle.using_keys:
 		# Depois do quadro: a lista pode ter sido refeita de novo nele (o botão já saiu).
-		(func(): if is_instance_valid(first) and first.is_inside_tree(): first.grab_focus()).call_deferred()
+		AHKit.focus_later(first)
 
 
 ## Aperta uma ação: a que muda o save arma no primeiro aperto e faz no segundo.

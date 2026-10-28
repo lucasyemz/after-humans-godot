@@ -55,9 +55,13 @@ const REPORT_FEET_Y := 634.0
 ## Na fila do relatório, um pouco mais afastados que na partida: a câmera recua e os heróis cabem entre a faixa do alto
 ## (que cresce no texto Maior) e as abas das cartas.
 const REPORT_SPACING := 2.6
-## A Sala dos Personagens no kit (#60): o teto e o piso do cômodo na tela.
-const STAGE_TOP := 112.0
-const STAGE_FLOOR := 900.0
+## A Sala dos Personagens (#181): os pés do herói na tela e o tamanho da figura antiga da interface (o Nick, 1,50 m, com
+## 555 px da orelha ao pé em 1080; o Bento, 1,72 m, com 630 px). A arte passa um pouco da altura do corpo, então a
+## escala medida na tela é 381 px por metro de body_height, e os pés caem perto de y 878, como antes.
+const STAGE_FEET := 890.0
+const STAGE_PX_PER_METER := 381.0
+## A folga mínima, em px de 1080, entre a arte do escolhido e cada painel da Sala (o teste confere com o Tatu no Maior).
+const STAGE_MARGIN := 16.0
 ## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
 ## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
 ## o candidato desce e anda; só então a câmera fecha nele. Na saída: o recusado volta ao trem, o sino avisa, as portas
@@ -157,6 +161,10 @@ var _env: Environment
 var _post: ShaderMaterial
 ## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt}.
 var _arrivals: Array = []
+## O herói escolhido na Sala dos Personagens (#181): de pé no cômodo, na escala da Estação, enquanto a tela está aberta.
+## A placa dele de morador só fica escondida (hide_residents), então, ao sair, cada um está onde estava.
+var stage_card: AHSpriteCard
+var stage_hero := ""
 ## O trem da volta fechando e indo embora depois de a equipe descer (não conta como cena do trem ocupada).
 var _team_train_leaving := false
 
@@ -294,6 +302,9 @@ func _process(delta: float) -> void:
 	if _reopen_pending:
 		_tick_reopen()
 	_walk(delta)
+	if is_instance_valid(stage_card):
+		# A respiração do parado, como a dos moradores esperando.
+		stage_card.scale = Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
 	_tick_leaving(delta)
 	if not _held_go.is_empty() and (not lineup_leaving() or Time.get_ticks_msec() >= _hold_until):
 		var held := _held_go
@@ -469,9 +480,9 @@ func focus_room(room_id: String, instant: bool = false) -> void:
 	_go(_framed_key(room.x0 + ROOM_CROP, room.x1 - ROOM_CROP, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
 
 
-## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): a câmera fecha na altura do
-## cômodo (do teto em STAGE_TOP ao piso em STAGE_FLOOR, na tela), então o fundo atrás do herói é só o próprio cômodo,
-## sem a plataforma e o trem em cima nem o andar de baixo.
+## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): o meio da sala entre os painéis, e a
+## câmera dentro do cômodo, perto o bastante para o herói ter o tamanho da figura antiga da interface (#181, o pedido
+## do Lucas), com os pés em STAGE_FEET. Cada herói mantém a altura dele.
 func focus_room_stage(room_id: String, left_px: float, right_px: float, instant: bool = false) -> void:
 	var room := room_def(room_id)
 	if room.is_empty():
@@ -479,15 +490,55 @@ func focus_room_stage(room_id: String, left_px: float, right_px: float, instant:
 	var fov := 26.0
 	var pitch := -3.0
 	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
-	var depth: float = focal * (room.ceiling - room.floor) / (STAGE_FLOOR - STAGE_TOP)
-	var drop := atan((STAGE_FLOOR - 540.0) / focal) + deg_to_rad(-pitch)
-	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * depth / focal
-	_go({"pos": Vector3(x, room.floor + depth * tan(drop), depth), "fov": fov, "pitch": pitch}, false, instant)
+	var drop := atan((STAGE_FEET - 540.0) / focal) + deg_to_rad(-pitch)
+	# Todos na mesma escala: a coluna estreita da Sala deixa o vão caber o Tatu no Maior.
+	var distance: float = focal / STAGE_PX_PER_METER
+	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * distance / focal
+	_go({"pos": Vector3(x, room.floor + distance * tan(drop), LANE_Z + distance), "fov": fov, "pitch": pitch}, false, instant)
 
 
 ## A câmera chegou aonde ia (sem caminho pela passagem e perto da chave).
 func camera_settled() -> bool:
 	return _path.is_empty() and not _goal.is_empty() and _key.pos.distance_to(_goal.pos) < 0.02
+
+
+## O herói escolhido na Sala dos Personagens (#181) entra no cômodo: a pose parada, os pés no chão, no meio da sala (o
+## meio entre os painéis, pelo focus_room_stage). Trocar de herói troca a placa; "" tira.
+func show_stage_hero(hero_id: String) -> void:
+	if hero_id == stage_hero and is_instance_valid(stage_card):
+		return
+	clear_stage_hero()
+	var art := _hero_art(S.hero(Campaign.state, hero_id)) if hero_id != "" else {}
+	if art.is_empty():
+		return
+	var room := room_def(S.CHARACTERS)
+	stage_card = AHSpriteCard.new()
+	stage_card.name = "StageHero"
+	stage_card.body_height = AHCharacterHeights.find(hero_id)
+	stage_card.show_art(art.idle)
+	add_child(stage_card)
+	stage_card.position = Vector3((room.x0 + room.x1) * 0.5, room.floor, LANE_Z)
+	stage_card.set_facing(1.0)
+	stage_hero = hero_id
+
+
+## A largura da arte do escolhido na Sala (body_width_pixels do manifesto), em metros; 0 sem ele ou sem a medida.
+func stage_width() -> float:
+	if not is_instance_valid(stage_card):
+		return 0.0
+	var art := stage_card.art()
+	if not art.has("body_width_pixels"):
+		return 0.0
+	return float(art.body_width_pixels) * stage_card.body_height / float(art.body_reference_pixels)
+
+
+func clear_stage_hero() -> void:
+	if is_instance_valid(stage_card):
+		# Fora da árvore já: a placa nova, no mesmo quadro, fica com o nome StageHero.
+		remove_child(stage_card)
+		stage_card.queue_free()
+	stage_card = null
+	stage_hero = ""
 
 
 ## Todos os moradores (heróis e civis) somem enquanto uma tela do kit cobre a Estação: nenhum aparece no vão entre os
@@ -568,8 +619,8 @@ func _go(key: Dictionary, platform: bool, instant: bool) -> void:
 	on_platform = platform
 
 
-## Plataforma -> diante do painel -> porta -> antecâmara -> eixo de escadas -> abrigo (e o inverso), com o painel do
-## mapa da rede abrindo e fechando atrás da equipe (StartPassage da Unreal).
+## Plataforma -> diante da parede secreta -> porta -> antecâmara -> eixo de escadas -> abrigo (e o inverso), com a
+## parede falsa (#203) abrindo e fechando atrás da equipe (StartPassage da Unreal).
 func _start_passage(down: bool, final: Dictionary) -> void:
 	var door := ue_key(DOOR_X * 100 + 60, 760, 150, 50, -2)
 	var antechamber := ue_key(3080, 1150, 140, 56, -6)
@@ -589,12 +640,15 @@ func passage_moving() -> bool:
 	return not _path.is_empty()
 
 
-## O painel desliza 3 m para a esquerda, a alavanca gira e a fresta de luz some (ApplyPanel).
+## A parede falsa (#203) desliza 3 m para a esquerda, a alavanca gira e a fresta de luz some (ApplyPanel).
 func _apply_panel(open: float) -> void:
 	_panel_open = clampf(open, 0.0, 1.0)
 	var eased := smoothstep(0.0, 1.0, _panel_open)
 	if _build.panel:
 		_build.panel.position.x = DOOR_X - PANEL_SLIDE * eased
+		# O azulejo e o concreto da parede falsa (#203) andam com ela.
+		for material in _build.panel_materials:
+			material.set_shader_parameter("slide_offset", Vector3(-PANEL_SLIDE * eased, 0, 0))
 	if _build.lever:
 		_build.lever.basis = AHStationBuilder.basis(0, 0, -110.0 * clampf(_panel_open * 4.0, 0.0, 1.0))
 	if _build.slit:
@@ -1429,7 +1483,7 @@ func _update_sleepers() -> void:
 			walker.recovering = true
 			var spot := recovery_spot(campaign, walker.hero_id)
 			if spot != Vector3.INF and _poses.has(walker.hero_id + "_sleep"):
-				card.show_art(_poses[walker.hero_id + "_sleep"])
+				card.show_art(AHSkins.pose(_poses[walker.hero_id + "_sleep"], walker.hero_id))
 				card.position = spot
 			else:
 				var place := room_def(S.INFIRMARY if S.in_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
@@ -1449,7 +1503,7 @@ func _update_sleepers() -> void:
 		var slot: int = campaign.night.participants.find(walker.hero_id) if asleep.has(walker.hero_id) else -1
 		if slot >= 0 and slot < slots.size() and _poses.has(walker.hero_id + "_sleep"):
 			walker.sleeping = true
-			card.show_art(_poses[walker.hero_id + "_sleep"])
+			card.show_art(AHSkins.pose(_poses[walker.hero_id + "_sleep"], walker.hero_id))
 			card.position = slots[slot]
 			card.set_facing(1.0)
 			card.scale = Vector3.ONE
@@ -1558,6 +1612,34 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		hide_residents(true)
 
 
+## O herói trocou de skin (#138): a placa dele veste a nova onde está, na pose de agora (de pé, sentado, no posto ou
+## dormindo), sem mudar de cômodo.
+func redress(hero_id: String) -> void:
+	# O escolhido na Sala dos Personagens (#181): a placa no cômodo troca de roupa junto (show_stage_hero não refaz a
+	# placa do mesmo herói).
+	if hero_id == stage_hero and is_instance_valid(stage_card):
+		var dressed := _hero_art(S.hero(Campaign.state, hero_id))
+		if not dressed.is_empty():
+			stage_card.show_art(dressed.idle)
+	for walker in _walkers:
+		if String(walker.get("hero_id", "")) != hero_id:
+			continue
+		var art := _hero_art(S.hero(Campaign.state, hero_id))
+		if art.is_empty():
+			return
+		walker.idle = art.idle
+		var card: AHSpriteCard = walker.card
+		if walker.get("sitting", 0.0) > 0.0 and _poses.has(hero_id + "_seat"):
+			card.show_art(AHSkins.pose(_poses[hero_id + "_seat"], hero_id))
+		elif walker.get("working", 0.0) > 0.0 and _poses.has(hero_id + "_work"):
+			card.show_art(AHSkins.pose(_poses[hero_id + "_work"], hero_id))
+		elif walker.get("sleeping", false) and _poses.has(hero_id + "_sleep"):
+			card.show_art(AHSkins.pose(_poses[hero_id + "_sleep"], hero_id))
+		else:
+			card.show_art(art.idle)
+	_update_sleepers()
+
+
 ## A arte do herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 func _hero_art(entry) -> Dictionary:
 	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id, String(entry.get("art_variant", "")))
@@ -1613,7 +1695,7 @@ func _walk(delta: float) -> void:
 				if walker.pause <= 0.0 and walker.wait > 0.0 and _post_taken(walker):
 					walker.pause = randf_range(3.0, 6.0)
 				if walker.pause <= 0.0 and walker.wait > 0.0:
-					card.show_art(_poses[walker.hero_id + "_work"])
+					card.show_art(AHSkins.pose(_poses[walker.hero_id + "_work"], walker.hero_id))
 					card.position = Vector3(_work_post(walker), walker.floor, -5.6)
 					card.set_facing(1.0)
 					card.scale = Vector3.ONE
@@ -1726,7 +1808,7 @@ func _post_taken(walker: Dictionary) -> bool:
 
 func _sit_down(walker: Dictionary) -> void:
 	var card: AHSpriteCard = walker.card
-	card.show_art(_poses[walker.hero_id + "_seat"])
+	card.show_art(AHSkins.pose(_poses[walker.hero_id + "_seat"], walker.hero_id))
 	card.position = Vector3(CANTEEN_SEATS[walker.seat], walker.floor, CANTEEN_SEAT_Z)
 	card.set_facing(1.0)
 	walker.sitting = randf_range(6.0, 11.0)

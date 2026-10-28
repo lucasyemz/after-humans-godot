@@ -143,6 +143,8 @@ static func init_new_campaign(campaign: Dictionary) -> void:
 	campaign.completed_expeditions = 0
 	campaign.last_completed_expedition_id = ""
 	campaign.last_returned_expedition_id = ""
+	campaign.unlocked_skins = []
+	_grant_start_skins(campaign)
 
 
 ## Save anterior à Estação (fase 2): completa o que falta. Como na Unreal (MigrateLegacy), um save sem cômodos fica
@@ -177,6 +179,13 @@ static func migrate(campaign: Dictionary) -> void:
 	for entry in campaign.get("roster", []):
 		if not entry.has("art_variant"):
 			entry.art_variant = _least_used_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
+	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
+	for entry in campaign.get("roster", []):
+		if String(entry.get("skin_id", "")) == "":
+			entry.skin_id = AHSkins.DEFAULT
+	if typeof(campaign.get("unlocked_skins")) != TYPE_ARRAY:
+		campaign.unlocked_skins = []
+	_grant_start_skins(campaign, true)
 	# Ninguém morre (#118): o memorial dos saves antigos volta em recuperação.
 	_migrate_fallen(campaign)
 	_migrate_posts(campaign)
@@ -1385,7 +1394,7 @@ static func abandon_to_refuge(campaign: Dictionary) -> bool:
 			continue
 		entry.hp = entry.max_hp
 		entry.instinct = 0
-	admit_fallen(campaign, fell)
+	admit_fallen(campaign, fell, expedition.get("carried", []) if expedition != null else [])
 	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
 	return true
 
@@ -1508,13 +1517,24 @@ static func _fill_beds(campaign: Dictionary) -> void:
 			return
 		if not in_bed(entry):
 			entry.recovery_bed = true
-			entry.recovery_days = mini(recovery_days(entry), bed_days)
+			# O carregado (#179) tem a parte dos dias também no leito (decisão do Lucas, 28/10).
+			entry.recovery_days = mini(recovery_days(entry), _carried_part(entry, bed_days))
 			free -= 1
+
+
+## Os dias de quem a equipe carregou (#179): a parte do recovery.json (carried: Factor, para cima, no mínimo 1); os
+## outros, os dias inteiros.
+static func _carried_part(entry: Dictionary, days: int) -> int:
+	if not entry.get("recovery_carried", false):
+		return days
+	return maxi(1, ceili(days * float(recovery_rule("carried").get("Factor", 1.0))))
 
 
 ## Os caídos de uma expedição chegam à Estação: vivos, com a vida baixa e os dias de recuperação. Devolve
 ## [{hero_id, days, bed}] para o relatório.
-static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
+## carried (#179): os que a equipe levantou e carregou; chegam com uma parte dos dias (recovery.json, carried: Factor, para
+## cima, no mínimo 1), na cama ou no Dormitório.
+static func admit_fallen(campaign: Dictionary, hero_ids: Array, carried: Array = []) -> Array:
 	var rule := recovery_rule("fallen")
 	for hero_id in hero_ids:
 		var entry = hero(campaign, hero_id)
@@ -1522,7 +1542,8 @@ static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
 			continue
 		entry.alive = true
 		entry.hp = clampi(int(rule.get("Hp", 1)), 1, int(entry.max_hp))
-		entry.recovery_days = maxi(1, int(rule.get("Days", 3)))
+		entry.recovery_carried = carried.has(hero_id)
+		entry.recovery_days = _carried_part(entry, maxi(1, int(rule.get("Days", 3))))
 		entry.recovery_bed = false
 		# Em recuperação, ninguém fica no posto (#119).
 		entry.post = ""
@@ -1531,14 +1552,16 @@ static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
 	var out: Array = []
 	for hero_id in hero_ids:
 		var entry = hero(campaign, hero_id)
-		if entry != null:
-			out.append({"hero_id": hero_id, "days": recovery_days(entry), "bed": in_bed(entry)})
+		if entry == null:
+			continue
+		out.append({"hero_id": hero_id, "days": recovery_days(entry), "bed": in_bed(entry), "carried": carried.has(hero_id)})
 	return out
 
 
 static func _recover(entry: Dictionary) -> void:
 	entry.recovery_days = 0
 	entry.recovery_bed = false
+	entry.recovery_carried = false
 	# Os dias de cuidado fecham as feridas: volta ao Alojamento com a vida cheia.
 	entry.hp = int(entry.max_hp)
 
@@ -1745,6 +1768,8 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	if factor > 0.0 and is_resident(campaign, request) and not campaign.station.completed_requests.has(request):
 		campaign.station.completed_requests.append(request)
 		delivered.request = request
+	# A skin que vem com a fase terminada (#138): liberada agora, com o aviso no relatório.
+	delivered.skins = _grant_start_skins(campaign)
 	for entry in campaign.roster:
 		entry.expedition_uses = {}
 		# Os abates da carreira (o campo já existia no herói, sem conta): as máquinas derrubadas nesta jornada (#60).
@@ -1781,7 +1806,8 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	delivered.posts = run_posts(campaign, expedition.team)
 	for post in delivered.posts:
 		delivered.recovered.append_array(post.recovered)
-	delivered.fallen = admit_fallen(campaign, expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive))
+	delivered.fallen = admit_fallen(campaign, expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive),
+		expedition.get("carried", []))
 	delivered.cycle = campaign.station.last_cycle.duplicate()
 	# O trem da volta (#122): quem chegou, ou ninguém; o relatório diz.
 	delivered.train = train_candidate_name(campaign) if train_on_return(campaign, expedition.id) else ""
@@ -2105,3 +2131,75 @@ static func _migrate_posts(campaign: Dictionary) -> void:
 	var rooms: Dictionary = campaign.station.rooms
 	while hero_limit(campaign) < living(campaign).size() and room_level(campaign, CHARACTERS) < int(room_def(CHARACTERS).max_level):
 		rooms[CHARACTERS] = room_level(campaign, CHARACTERS) + 1
+
+
+# ---------------------------------------------------------------- skins (#138)
+
+## As skins que a campanha já ganhou (data/skins.json, Unlock): "start" vem liberada; "phase:<id>" vem ao terminar a
+## fase (a Ronda do Bento, na fase 4: decisão do Lucas, #138). Na campanha nova, nos saves antigos (quem já terminou a
+## fase ganha ao abrir) e na volta da expedição. Devolve as que liberou agora, para o aviso do relatório.
+## Ao abrir o save (on_load), a fase da expedição em curso fica para a volta: o guardião caiu, mas o aviso vem no
+## relatório, não em silêncio ao reabrir o jogo no meio da jornada.
+static func _grant_start_skins(campaign: Dictionary, on_load: bool = false) -> Array:
+	var granted: Array = []
+	var open = campaign.get("session", {}).get("expedition") if on_load else null
+	var pending := String(open.get("phase_id", "")) if typeof(open) == TYPE_DICTIONARY else ""
+	for row in GameData.table("skins").values():
+		var unlock := String(row.get("Unlock", ""))
+		var phase := unlock.trim_prefix("phase:")
+		var earned: bool = unlock == "start" or (unlock.begins_with("phase:") and phase != pending and campaign.get("completed_phases", []).has(phase))
+		if earned and not campaign.unlocked_skins.has(String(row.Name)):
+			campaign.unlocked_skins.append(String(row.Name))
+			granted.append(String(row.Name))
+	return granted
+
+
+## A skin está liberada nesta campanha (a padrão sempre está).
+static func skin_unlocked(campaign: Dictionary, skin_id: String) -> bool:
+	return skin_id == AHSkins.DEFAULT or campaign.get("unlocked_skins", []).has(skin_id)
+
+
+## Por que a skin ainda não se escolhe ("" se já está liberada).
+static func skin_lock_reason(campaign: Dictionary, skin_id: String) -> String:
+	if skin_unlocked(campaign, skin_id):
+		return ""
+	var row = GameData.row("skins", skin_id)
+	# Unlock "phase:<id>": o motivo diz qual fase termina; "boss:<id>" (os desafios dos chefes, #95), de onde vem; as
+	# outras ficam só bloqueadas.
+	if row != null and String(row.get("Unlock", "")).begins_with("phase:"):
+		var phase: Dictionary = AHJourneyRules.phase(String(row.Unlock).trim_prefix("phase:"))
+		return TranslationServer.translate("Ainda bloqueada: vem ao terminar %s.") % TranslationServer.translate(String(phase.get("name", "")))
+	if row != null and String(row.get("Unlock", "")).begins_with("boss"):
+		return TranslationServer.translate("Ainda bloqueada: vem com os desafios dos chefes.")
+	return TranslationServer.translate("Ainda bloqueada.")
+
+
+## Vestir uma skin (só visual, fora da expedição e sem custo). Devolve o erro, ou "".
+static func choose_skin(campaign: Dictionary, hero_id: String, skin_id: String) -> String:
+	var entry = hero(campaign, hero_id)
+	if entry == null:
+		return TranslationServer.translate("Esse herói não está na Estação.")
+	if skin_id != AHSkins.DEFAULT:
+		var row = GameData.row("skins", skin_id)
+		if row == null or String(row.get("HeroId", "")) != hero_id:
+			return TranslationServer.translate("Essa roupa não é desse herói.")
+		if not AHSkins.has_art(skin_id):
+			return TranslationServer.translate("Essa roupa ainda não chegou.")
+	if not skin_unlocked(campaign, skin_id):
+		return skin_lock_reason(campaign, skin_id)
+	if campaign.get("session", {}).get("expedition") != null:
+		return TranslationServer.translate("A roupa se troca na Estação, fora da expedição.")
+	entry.skin_id = skin_id
+	return ""
+
+
+## Libera todas as skins (a barra de Admin). Devolve quantas eram novas.
+static func unlock_all_skins(campaign: Dictionary) -> int:
+	var added := 0
+	# Só as que têm arte: a skin sem arte não aparece na Sala nem se veste, e não conta como liberada.
+	for row in GameData.table("skins").values():
+		if AHSkins.has_art(String(row.Name)) and not campaign.unlocked_skins.has(String(row.Name)):
+			campaign.unlocked_skins.append(String(row.Name))
+			added += 1
+	return added
+

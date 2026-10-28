@@ -27,7 +27,8 @@ var xp_gained := {}
 
 
 ## heroes: heróis da campanha (Campaign.state.roster) na ordem da formação. enemies: da frente para trás, cada um o id
-## do inimigo ou já montado pelo corredor ({enemy_id, unit_id, rank, hp, max_hp, damage_bonus, display_name}).
+## do inimigo ou já montado pelo corredor ({enemy_id, unit_id, rank, hp, max_hp, damage_bonus, display_name} e, no
+## tutorial, speed_bonus).
 ## phase_effects: os efeitos de fase da expedição (AHJourneyRules.phase_effects, #78): a velocidade entra antes da
 ## iniciativa e os marcadores (Vulnerável, Bloqueio) já estão nos heróis quando a luta começa.
 static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed_value: int = -1, hope: int = 80,
@@ -66,6 +67,7 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 			built.hp = spec.get("hp", built.hp)
 			built.max_hp = spec.get("max_hp", built.max_hp)
 			built.damage_bonus = spec.get("damage_bonus", 0)
+			built.speed += int(spec.get("speed_bonus", 0))
 			built.display_name = spec.get("display_name", built.display_name)
 			enemies.append(built)
 			continue

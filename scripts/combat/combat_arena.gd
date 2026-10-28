@@ -142,10 +142,12 @@ func hero_art(hero_id: String) -> Dictionary:
 ## a pose parada e o retrato dela, as poses próprias quando a variação tem (o Guaxinim e o Tatu, #187) e o efeito visual
 ## das habilidades do fundador. Sem variação (saves antigos sem arte, classe sem recruta desenhado), a do fundador; a
 ## classe sem fundador (o rato e o tatu) usa o recruta desenhado dela.
-## variant: a do herói, se quem chama já tem a entrada; "" procura na campanha (Campaign.hero).
+## variant: a do herói, se quem chama já tem a entrada; "" procura na campanha (Campaign.hero). O fundador vem na skin
+## dele (AHSkins).
 static func art_entry(heroes: Dictionary, hero_id: String, variant: String = "") -> Dictionary:
+	# O fundador na skin que ele veste (#138): o único lugar que decide a arte da luta, da rua, da Sala e dos rostos.
 	if heroes.has(hero_id):
-		return heroes[hero_id]
+		return AHSkins.dress(heroes[hero_id], AHSkins.skin_of(hero_id))
 	var founder := {}
 	var parts := hero_id.split("_")
 	if parts.size() > 2 and parts[0] == "hero":
@@ -200,6 +202,13 @@ static func hero_art_of(hero_id: String, variant: String = "") -> Dictionary:
 	if _manifest.is_empty():
 		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
 	return art_entry(_manifest.heroes, hero_id, variant)
+
+
+## A entrada do fundador no manifesto, sem skin (a base que a Sala veste em cada aba da Roupa, #138).
+static func founder_art_of(hero_id: String) -> Dictionary:
+	if _manifest.is_empty():
+		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
+	return _manifest.get("heroes", {}).get(hero_id, {})
 
 
 ## A arte de um inimigo fora da luta (o rosto no Mapa da Rede, #87), do mesmo manifesto.
@@ -284,6 +293,9 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 	session = AHCombatSession.create(heroes, enemies, opening, seed_value, 80, AHJourneyRules.phase_effects(Campaign.state))
 	AHJourneyRules.spend_fight_effects(Campaign.state)
 	session.use_expedition(Campaign.state)
+	# No tutorial (#144) os inimigos não derrubam ninguém, e os estados sempre pegam.
+	if AHTutorial.is_tutorial(Campaign.state):
+		AHTutorial.prepare_fight(session.context)
 	Tips.show_tip("combat")
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
 	if speed <= 2.0:

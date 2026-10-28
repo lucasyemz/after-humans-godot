@@ -10,6 +10,9 @@ extends Control
 
 signal command_chosen(command: Dictionary)
 signal result_closed
+## Os momentos da vez que o tutorial (#144) acompanha: "turn" (a vez de um herói, {actor}), "target" (a mira de uma
+## habilidade ou do Mover, {ability}), "cancel" (a mira desfeita), "command" (o comando escolhido) e "bag" (a Mochila).
+signal tutorial_moment(kind: String, data: Dictionary)
 
 const S = preload("res://scripts/ui/ui_style.gd")
 const GOLD := S.GOLD
@@ -142,6 +145,8 @@ var _bag: PanelContainer
 var _crisis: Control
 ## Esperando o comando do herói (a captura usa para jogar por ele).
 var waiting := false
+## As ações travadas pelo tutorial nesta vez ("move", "defend", "item", "flee"): a primeira escolha é de uma habilidade.
+var tutorial_locks: Array = []
 
 
 func _ready() -> void:
@@ -1374,8 +1379,10 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	_panel.visible = true
 	_build_abilities()
 	waiting = true
+	tutorial_moment.emit("turn", {"actor": actor_id})
 	var command: Dictionary = await command_chosen
 	waiting = false
+	tutorial_moment.emit("command", command)
 	stop_examine()
 	# A Mochila não é modal: um comando escolhido com ela aberta (Defender, uma habilidade) fecha ela também. Aberta, ela
 	# travava os atalhos dos próximos heróis e passava para a luta seguinte.
@@ -1389,6 +1396,38 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	# Durante o lance o painel sai da frente: a luta fica inteira à vista.
 	_panel.visible = false
 	return command
+
+
+## Liga as travas do tutorial nas ações que já estão na tela (sem remontar as habilidades: o foco adiado delas fica).
+func apply_tutorial_locks() -> void:
+	for child in _actions.get_children():
+		var kind: String = child.get_meta("kind", "")
+		if tutorial_locks.has(kind):
+			child.set_meta("locked", true)
+			child.disabled = true
+			(child.get_node("Icon") as Control).modulate = AHKit.LOCKED
+
+
+## O que o tutorial destaca (na tela de 1920 x 1080): "abilities" (as quatro habilidades), "actions" (Mover e Defender),
+## "item" (a Mochila) ou "targets" (os alvos acesos). Vazio quando não está na tela.
+func tutorial_rect(kind: String) -> Rect2:
+	match kind:
+		"abilities":
+			return _abilities.get_global_rect() if _abilities.is_visible_in_tree() and _abilities.get_child_count() > 0 else Rect2()
+		"actions", "item":
+			var found := Rect2()
+			for child in _actions.get_children():
+				var wanted: Array = ["move", "defend"] if kind == "actions" else ["item"]
+				if child.is_visible_in_tree() and wanted.has(child.get_meta("kind", "")):
+					found = child.get_global_rect() if not found.has_area() else found.merge(child.get_global_rect())
+			return found
+		"targets":
+			var found := Rect2()
+			for marker in _markers:
+				if is_instance_valid(marker) and marker.is_visible_in_tree():
+					found = marker.get_global_rect() if not found.has_area() else found.merge(marker.get_global_rect())
+			return found
+	return Rect2()
 
 
 func show_waiting(text: String) -> void:
@@ -1528,7 +1567,8 @@ func _build_abilities(take_focus: bool = true) -> void:
 	_show_header(shown[0] if not shown.is_empty() else (_options[0] if not _options.is_empty() else {}))
 	for child in _actions.get_children():
 		var kind: String = child.get_meta("kind")
-		var locked: bool = (kind == "move" and session.move_targets(_actor_id).is_empty()) or (kind == "flee" and not session.can_flee())
+		var locked: bool = (kind == "move" and session.move_targets(_actor_id).is_empty()) or (kind == "flee" and not session.can_flee()) \
+			or tutorial_locks.has(kind)
 		child.set_meta("locked", locked)
 		child.disabled = locked
 		# Bloqueada, a ação também apaga o ícone (como as habilidades): a peça escura quase não muda no desligado.
@@ -2028,6 +2068,7 @@ func _open_bag() -> void:
 	stop_examine()
 	_hide_tip()
 	Tips.show_tip("bag")
+	tutorial_moment.emit("bag", {})
 	Sound.play("res://audio/ui/bag_open.ogg")
 	_bag = PanelContainer.new()
 	_bag.add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("panel", "large")))
@@ -2102,10 +2143,11 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 		_markers[i].focus_neighbor_right = _markers[(i + 1) % _markers.size()].get_path()
 	# A aba diz como no alvo ("Escolha um alvo"); o como fica na dica do alvo apontado (_describe).
 	_description.text = tr("Escolha um alvo")
+	tutorial_moment.emit("target", {"ability": ability_id})
 	_paint_targets()
 	if not _markers.is_empty():
 		_via_mouse = false
-		_markers[0].grab_focus.call_deferred()
+		AHKit.focus_later(_markers[0])
 
 
 ## De onde veio o último toque no alvo: mouse ou toque (o primeiro clique só escolhe) ou teclado e controle.
@@ -2254,6 +2296,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _choosing != "" and S.is_back(event):
 		_clear_markers()
 		_set_enabled(true)
+		tutorial_moment.emit("cancel", {})
 		_build_abilities()
 		get_viewport().set_input_as_handled()
 

@@ -363,7 +363,7 @@ func _build_labels(c: Dictionary) -> void:
 		button.focus_previous = previous
 	var focus_on: Button = _labels.get_node_or_null("Place_%s" % (selected if selected != "" else "refuge"))
 	if focus_on != null and AHUiStyle.using_keys:
-		focus_on.grab_focus.call_deferred()
+		AHKit.focus_later(focus_on)
 
 
 ## Os sinais de uma fase, numa chapinha: o guardião, os inimigos, os suprimentos e a história, cada um no estado da leitura
@@ -575,7 +575,7 @@ func _build_aside(c: Dictionary) -> void:
 		for side in ["focus_neighbor_top", "focus_neighbor_bottom", "focus_neighbor_left", "focus_neighbor_right"]:
 			go.set(side, place.get_path())
 	if open and AHUiStyle.using_keys:
-		go.grab_focus.call_deferred()
+		AHKit.focus_later(go)
 
 
 func _aside_head(icon_name: String, title: String, closable: bool) -> void:

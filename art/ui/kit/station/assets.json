@@ -1719,6 +1719,15 @@
       "sha256": "201b91c075ca278057145552ca840984b4904518ff598796a990a91857d6a68d",
       "kind": "glyph_white_tintable"
     },
+    "dawn": {
+      "file": "art/ui/kit/station/icons/dawn.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "07fde68c9e62ebe656495ee12be76f34c84daaeae90a6dd021b56ad30cb2448d",
+      "kind": "glyph_white_tintable"
+    },
     "expeditions": {
       "file": "art/ui/kit/station/icons/expeditions.webp",
       "size": [
@@ -1728,6 +1737,15 @@
       "sha256": "a7755afa0ed1765cd4f366e700312f3e428ee8e4802c230aacd395684de2925f",
       "kind": "glyph_white_tintable"
     },
+    "formation_swap": {
+      "file": "art/ui/kit/station/icons/formation_swap.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "3e708978e26eecd5f9fe037fe649131b528164d5ea2d9e54b2788476ffe7cfcf",
+      "kind": "glyph_white_tintable"
+    },
     "guardian_defeated": {
       "file": "art/ui/kit/station/icons/guardian_defeated.webp",
       "size": [
@@ -1735,6 +1753,69 @@
         64
       ],
       "sha256": "a92265e0443cfd6d2eb94d8ae8f06886331179d7bb3408dd5bbf9298d2fa3b3a",
+      "kind": "glyph_white_tintable"
+    },
+    "helpers": {
+      "file": "art/ui/kit/station/icons/helpers.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "74a9f8610e3ff9ef6d83c25f35000a586eefd270f3373850427d641f07ae2e1c",
+      "kind": "glyph_white_tintable"
+    },
+    "inspect": {
+      "file": "art/ui/kit/station/icons/inspect.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "5be7e4a729e1071d5856fd5556b8ac52b3e1e4bcb600ed1dc4124a0037c700f4",
+      "kind": "glyph_white_tintable"
+    },
+    "job_canteen": {
+      "file": "art/ui/kit/station/icons/job_canteen.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "401ac926fa5fb786a0a2153f85b0061275aa5a0ed0f61553d537009f92ca92fd",
+      "kind": "glyph_white_tintable"
+    },
+    "job_dormitory": {
+      "file": "art/ui/kit/station/icons/job_dormitory.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "cf3c9a5177a5fa9780599a9b251b2c909f94bf2a982b36117c09af09afda8422",
+      "kind": "glyph_white_tintable"
+    },
+    "job_forge": {
+      "file": "art/ui/kit/station/icons/job_forge.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "e4cb82d872b244c17a9ab08a424e3c18d0a0510671170001a7cc8d55176e6c5f",
+      "kind": "glyph_white_tintable"
+    },
+    "job_infirmary": {
+      "file": "art/ui/kit/station/icons/job_infirmary.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "b0d118613442662ab7e4544d47c9493c9de435555120606860c081b7da8e6e8a",
+      "kind": "glyph_white_tintable"
+    },
+    "job_research": {
+      "file": "art/ui/kit/station/icons/job_research.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "609e2ebadd1459b248a56307ca966b3ef451a3c15051ddfdc66c49a098eb4748",
       "kind": "glyph_white_tintable"
     },
     "kills": {
@@ -1926,6 +2007,15 @@
       "sha256": "fe8eca5bb955eaf41e5434037b0a426b402bb7cd7e8c7b2470c4674f174f14d9",
       "kind": "glyph_white_tintable"
     },
+    "room_infirmary": {
+      "file": "art/ui/kit/station/icons/room_infirmary.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "7f64a08aa678a2cdb258161aad606a824dee681e2e396dea2134a6ddb8c8467e",
+      "kind": "glyph_white_tintable"
+    },
     "room_quarters": {
       "file": "art/ui/kit/station/icons/room_quarters.webp",
       "size": [
@@ -1989,6 +2079,15 @@
       "sha256": "73b3815e52204229f6551891bb71235ccaa1b902cd0752839944eeb59108af0e",
       "kind": "glyph_white_tintable"
     },
+    "state_fallen": {
+      "file": "art/ui/kit/station/icons/state_fallen.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "e3406c3b1c7d9dd5d06cfc77eb30bb71f8df38f1f11b32dc9927d96346f74129",
+      "kind": "glyph_white_tintable"
+    },
     "state_light_wound": {
       "file": "art/ui/kit/station/icons/state_light_wound.webp",
       "size": [
@@ -1996,6 +2095,15 @@
         64
       ],
       "sha256": "da6002d2f40bbe8b025b874f731ca841c31e2857659f78572d9b98612c943f7b",
+      "kind": "glyph_white_tintable"
+    },
+    "state_recovering": {
+      "file": "art/ui/kit/station/icons/state_recovering.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "2bb6281679c2539345b9c278c92051e962f7496254d46557303be1830e678fad",
       "kind": "glyph_white_tintable"
     },
     "state_wounded": {

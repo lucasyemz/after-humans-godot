@@ -220,7 +220,7 @@ func _ready() -> void:
 	occlusion.scan.call_deferred(_dynamic)
 	for card in _heroes:
 		occlusion.track(card)
-	if scenario and ["FloodedDepot", "SewerDucts"].has(scenario.map_name):
+	if scenario and ["FloodedDepot", "SewerDucts", "ContainmentCorridor"].has(scenario.map_name):
 		# Lanterna de mão no Depósito e nos Dutos (a da Unreal: 160 lm, 10 m, presa ao líder, um pouco à frente).
 		var lantern := OmniLight3D.new()
 		lantern.position = Vector3(0, 0.8, 0.5)
@@ -281,7 +281,7 @@ func _apply_graphics() -> void:
 	var fx := Settings.effects()
 	_env.ssao_enabled = _forward_plus and fx.ssao
 	_env.volumetric_fog_enabled = _forward_plus and fx.volumetric_fog
-	_env.ssr_enabled = _forward_plus and _raining and fx.ssr
+	_env.ssr_enabled = _forward_plus and (_raining or _site_light().get("ssr", false)) and fx.ssr
 	_sun.shadow_enabled = fx.shadows and not (_indoor or sheltered)
 	Settings.apply_lamp_shadows()
 	_rain.amount_ratio = fx.rain_scale
@@ -342,7 +342,7 @@ func set_scenario_zone(index: int) -> void:
 	var edge: float = scenario.front_edge(index, lane_z) + 0.04
 	for card in _heroes:
 		card.set_silhouette_foot(maxf(AHSpriteCard.SILHOUETTE_FOOT, edge))
-	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot"].has(scenario.map_name)
+	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot", "ContainmentCorridor"].has(scenario.map_name)
 	if sheltered:
 		scenario.close_zone_ends(index)
 	_apply_weather()
@@ -701,6 +701,24 @@ func _build_party() -> void:
 	_place_leader(Vector3(7.6, 0, 0.45))
 
 
+## Um herói entra na equipe no meio da jornada (o Nick no tutorial, #144): a placa nasce em at e anda até o lugar dele
+## na fila.
+func add_hero(hero_id: String, at: Vector3) -> void:
+	var hero = Campaign.hero(hero_id)
+	var art := {} if hero == null else AHCombatArena.art_entry(_combat_art.heroes, hero_id, String(hero.get("art_variant", "")))
+	if hero == null or art.is_empty() or party_ids.has(hero_id) or party_ids.size() >= 4:
+		return
+	var card := AHSpriteCard.new()
+	card.body_height = AHCharacterHeights.find(hero_id)
+	card.show_art(art.idle)
+	add_child(card)
+	card.position = at
+	card.set_facing(-1.0)
+	party_ids.append(hero_id)
+	_heroes.append(card)
+	occlusion.track(card)
+
+
 ## Leva o líder andando até um ponto (passar por uma porta, #141), com a fila atrás e sem o jogador comandar: o rastro
 ## cresce como no andar de verdade, e a fila vira para o lado do passo. Sem limite da área de andar (a porta fica fora).
 ## Devolve false se a cena saiu no meio (quem chamou para ali).
@@ -861,15 +879,16 @@ func _update_camera(delta: float) -> void:
 			EXPLORE_CAMERA.indoor.height, -1.2)
 		pitch = deg_to_rad(4.0)
 		distance = EXPLORE_CAMERA.indoor.distance
-		# No acampamento da casa (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
+		# No acampamento da casa (#77), a câmera fica na fogueira, mais perto, e olha de cima como a arte das poses (#205).
 		if corridor != null and corridor.camp != null and corridor.camp.active and not corridor.camp.at_stop():
 			target = Vector3(corridor.camp.focus_x, AHCampScene.FOCUS_HEIGHT, -0.2)
 			distance = AHCampScene.FOCUS_DISTANCE
-	# Na parada de descanso (#143), a fogueira fica na rua ou no cenário: a câmera fica parada nela, baixa, e recua o
+			pitch = deg_to_rad(AHCampScene.FOCUS_PITCH)
+	# Na parada de descanso (#143), a fogueira fica na rua ou no cenário: a câmera fica parada nela, de cima (#205), e recua o
 	# bastante para a fileira inteira caber (nos cenários a lente é mais fechada, 30° na horizontal).
 	if corridor != null and corridor.camp != null and corridor.camp.active and corridor.camp.at_stop():
 		target = corridor.camp.focus_point()
-		pitch = deg_to_rad(4.0)
+		pitch = deg_to_rad(corridor.camp.pitch())
 		var half_h := atan(tan(deg_to_rad(_camera.fov * 0.5)) * get_viewport().get_visible_rect().size.aspect())
 		distance = maxf(AHCampScene.FOCUS_DISTANCE, AHCampScene.ROW_HALF_WIDTH / tan(half_h))
 	if _arena != null and _arena.active:
@@ -955,6 +974,17 @@ func _weather() -> Dictionary:
 	return w
 
 
+## A luz de um lugar fechado que não segue o céu (docs/design/tutorial.md, "Para integrar" 1 e 4): no Corredor de
+## Contenção, o ambiente vem de uma cor neutra (o céu da noite puxava a névoa para o roxo), a exposição fica 5% abaixo,
+## a neblina é rala e avermelhada, e o reflexo de espelho do Forward+ (o SSR) fica ligado, sem esperar a chuva.
+const SITE_LIGHT := {"ContainmentCorridor": {"ambient_color": Color(0.36, 0.34, 0.33), "ambient": 0.3, "exposure": 0.95,
+	"fog_density": 0.006, "fog": Color(0.16, 0.08, 0.07), "ssr": true}}
+
+
+func _site_light() -> Dictionary:
+	return SITE_LIGHT.get(scenario.map_name, {}) if scenario else {}
+
+
 func _apply_weather() -> void:
 	var w := _weather()
 	if ambience.is_empty():
@@ -971,12 +1001,20 @@ func _apply_weather() -> void:
 	# O Compatibility (web) soma a luz direta e o glow mais forte: a mesma cena, calibrada a olho contra o Forward+.
 	_env.tonemap_exposure = w.exposure * (1.0 if _forward_plus else 0.9)
 	AHAmbience.apply_env(_env, ambience, 0.7 if _forward_plus else 0.45)
+	var site := _site_light()
+	if not site.is_empty():
+		_env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+		_env.ambient_light_color = site.ambient_color
+		_env.ambient_light_energy = site.ambient
+		_env.tonemap_exposure *= site.exposure
+		_env.fog_density = site.fog_density * float(ambience.get("fog_density", 1.0))
+		_env.fog_light_color = site.fog
 	if _post != null:
 		AHAmbience.apply_post(_post, ambience, Settings.level)
 	if _forward_plus:
 		_env.volumetric_fog_density = w.volumetric * float(ambience.get("volumetric", 1.0))
 		_env.volumetric_fog_albedo = w.fog.lightened(0.3)
-		_env.ssr_enabled = _raining and Settings.effects().ssr
+		_env.ssr_enabled = (_raining or _site_light().get("ssr", false)) and Settings.effects().ssr
 	for material in _skyline_materials:
 		material.set_shader_parameter("haze_color", w.haze)
 	for shaft in _shafts:
@@ -1450,4 +1488,6 @@ func _run_combat_capture(delta: float) -> void:
 			if _combat_time > 0.8:
 				_save_capture("16-house-search", "16-house-search food=%d seeds=%d event=%s" % [campaign.session.expedition.food,
 					campaign.session.expedition.loot.seeds, str(campaign.session.event != null)])
-				get_tree().quit()
+				# Uma vez só: o Sound.quit espera o áudio antes de fechar, e a fase rodaria de novo nesse meio-tempo.
+				_combat_phase = 8
+				Sound.quit()

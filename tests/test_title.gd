@@ -70,7 +70,8 @@ func _options_without_save() -> void:
 	t.equal(_texts(title._buttons), ["nova campanha", "opções"], "depois das Opções, ainda sem Continuar")
 	title.new_button.pressed.emit()
 	await _frames(2)
-	t.check(not title.modal_open(), "sem save, Nova campanha não pergunta")
+	t.check(title.modal_open() and title._modal.find_child("Slot1", true, false) == null, "sem save, Nova campanha não pergunta o espaço")
+	await _skip_tutorial(title)
 	t.check(await _settles_on("Station"), "e vai para a Estação")
 	t.equal(int(Campaign.state.settings.battle_speed), 2, "a campanha nova leva a velocidade escolhida no título")
 	var saved = Campaign.read_file(Campaign.primary_path())
@@ -87,7 +88,13 @@ func _without_save() -> void:
 	t.check(title.continue_button == null, "sem save, não há Continuar")
 	t.equal(_texts(title._buttons), ["nova campanha", "opções"], "sem save: Nova campanha e Opções")
 	title.new_button.pressed.emit()
-	t.check(await _settles_on("Station"), "Nova campanha sem save vai direto para a Estação")
+	await _frames(2)
+	# A campanha nova pergunta como começar (#144): pela abertura (escolhida) ou Pular tutorial.
+	var opening := title._modal.find_child("Opening", true, false) as Button if title.modal_open() else null
+	t.check(opening != null and title.get_viewport().gui_get_focus_owner() == opening, "Nova campanha sem save pergunta como começar, com a abertura escolhida")
+	await _skip_tutorial(title)
+	t.check(await _settles_on("Station"), "Pular tutorial vai direto para a Estação")
+	t.equal(AHTutorial.stage(Campaign.state), "done", "e a campanha fica como depois do tutorial, sem a visita")
 	t.check(Campaign.has_valid_save(), "e grava a campanha nova")
 
 
@@ -145,6 +152,8 @@ func _new_campaign_asks() -> void:
 	_press_name(title._modal, "Slot1")
 	await _frames(2)
 	_press(title._modal, "Começar do zero")
+	await _frames(2)
+	await _skip_tutorial(title)
 	t.check(await _settles_on("Station"), "Começar do zero vai para a Estação")
 	t.check(int(Campaign.state.inventory.seeds) != 777, "Começar do zero troca a campanha")
 	var saved = Campaign.read_file(Campaign.primary_path())
@@ -268,12 +277,20 @@ func _other_slot() -> void:
 	title.new_button.pressed.emit()
 	await _frames(2)
 	_press_name(title._modal, "Slot3")
+	await _frames(2)
+	await _skip_tutorial(title)
 	t.check(await _settles_on("Station"), "o espaço vazio começa direto")
 	t.check(Campaign.slot == 3 and Campaign.slot_summary(3).status == "ok", "e grava no espaço 3")
 	t.equal(Campaign.slot_summary(2).status, "ok", "o espaço 2 continua lá")
 
 
 # ---------------------------------------------------------------- apoio
+
+## A janela da campanha nova (#144): Pular tutorial.
+func _skip_tutorial(title: AHTitleScreen) -> void:
+	_press_name(title._modal, "Skip")
+	await _frames(2)
+
 
 func _press_name(scope: Node, name: String) -> void:
 	var button := scope.find_child(name, true, false) as Button
