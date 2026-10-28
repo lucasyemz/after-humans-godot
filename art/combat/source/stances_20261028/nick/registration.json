@@ -1,0 +1,42 @@
+{
+  "canvas": [
+    1178,
+    1335
+  ],
+  "anchor": [
+    488.5,
+    1286
+  ],
+  "body_reference_pixels": 1255,
+  "body_width_pixels": 641,
+  "visible": [
+    244,
+    86,
+    885,
+    1286
+  ],
+  "source_file": "nick/combat_idle.png",
+  "source_sha256": "d74c7894b9476570e16cfe43f2b9d9ee31912471734d687b067af637b4079060",
+  "generated_bbox": [
+    292,
+    21,
+    961,
+    1273
+  ],
+  "normalization": {
+    "uniform_scale": 0.9584664536741214,
+    "translation": [
+      244,
+      86
+    ],
+    "body_height_pixels": 1200,
+    "old_support_center_x": 597.5,
+    "new_support_center_x": 353.0,
+    "support_quantiles": [
+      3,
+      97
+    ],
+    "support_band": 0.08
+  },
+  "mode": "combat_idle"
+}

@@ -1,0 +1,42 @@
+{
+  "canvas": [
+    1178,
+    1335
+  ],
+  "anchor": [
+    589.0,
+    1305
+  ],
+  "body_reference_pixels": 1240,
+  "body_width_pixels": 649,
+  "visible": [
+    268,
+    65,
+    917,
+    1305
+  ],
+  "source_file": "armadillo/idle.png",
+  "source_sha256": "7e379fe69553e61e929f0ba40d7c6a389d206b591a3649bdfddbc14d33a487c9",
+  "generated_bbox": [
+    280,
+    47,
+    935,
+    1298
+  ],
+  "normalization": {
+    "uniform_scale": 0.991207034372502,
+    "translation": [
+      268,
+      65
+    ],
+    "body_height_pixels": 1240,
+    "old_support_center_x": 647.0,
+    "new_support_center_x": 378.5,
+    "support_quantiles": [
+      3,
+      97
+    ],
+    "support_band": 0.08
+  },
+  "mode": "idle"
+}

@@ -1,0 +1,42 @@
+{
+  "canvas": [
+    1178,
+    1335
+  ],
+  "anchor": [
+    588.5,
+    1305
+  ],
+  "body_reference_pixels": 1240,
+  "body_width_pixels": 714,
+  "visible": [
+    249,
+    105,
+    963,
+    1305
+  ],
+  "source_file": "raccoon/combat_idle.png",
+  "source_sha256": "047809099ce3f5c544ae824bedd6e89cd4137ed4a6af8b6300b6bcbddda6db91",
+  "generated_bbox": [
+    245,
+    46,
+    992,
+    1302
+  ],
+  "normalization": {
+    "uniform_scale": 0.9554140127388535,
+    "translation": [
+      249,
+      105
+    ],
+    "body_height_pixels": 1200,
+    "old_support_center_x": 601.5,
+    "new_support_center_x": 352.5,
+    "support_quantiles": [
+      3,
+      97
+    ],
+    "support_band": 0.08
+  },
+  "mode": "combat_idle"
+}

@@ -1,0 +1,42 @@
+{
+  "canvas": [
+    1086,
+    1448
+  ],
+  "anchor": [
+    473.0,
+    1429
+  ],
+  "body_reference_pixels": 1419,
+  "body_width_pixels": 894,
+  "visible": [
+    96,
+    54,
+    990,
+    1429
+  ],
+  "source_file": "bento/combat_idle.png",
+  "source_sha256": "2273dc49c46ad61a8c94a6a06a5ee133ceaf851270d5cf4b643e38430273e36f",
+  "generated_bbox": [
+    111,
+    11,
+    1024,
+    1415
+  ],
+  "normalization": {
+    "uniform_scale": 0.9793447293447294,
+    "translation": [
+      96,
+      54
+    ],
+    "body_height_pixels": 1375,
+    "old_support_center_x": 579.0,
+    "new_support_center_x": 483.0,
+    "support_quantiles": [
+      3,
+      97
+    ],
+    "support_band": 0.08
+  },
+  "mode": "combat_idle"
+}

@@ -1,0 +1,42 @@
+{
+  "canvas": [
+    1086,
+    1448
+  ],
+  "anchor": [
+    473.0,
+    1429
+  ],
+  "body_reference_pixels": 1419,
+  "body_width_pixels": 703,
+  "visible": [
+    228,
+    54,
+    931,
+    1429
+  ],
+  "source_file": "watch/combat_idle.png",
+  "source_sha256": "8cb77b7c7bbabf313fbeb4ef7c56e5debf1f821478d7f8264621613e3f96345d",
+  "generated_bbox": [
+    236,
+    10,
+    958,
+    1422
+  ],
+  "normalization": {
+    "uniform_scale": 0.9737960339943342,
+    "translation": [
+      228,
+      54
+    ],
+    "body_height_pixels": 1375,
+    "old_support_center_x": 578.0,
+    "new_support_center_x": 350.0,
+    "support_quantiles": [
+      3,
+      97
+    ],
+    "support_band": 0.08
+  },
+  "mode": "combat_idle"
+}

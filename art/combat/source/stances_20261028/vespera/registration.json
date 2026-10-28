@@ -1,0 +1,42 @@
+{
+  "canvas": [
+    1178,
+    1335
+  ],
+  "anchor": [
+    451.0,
+    1297
+  ],
+  "body_reference_pixels": 1271,
+  "body_width_pixels": 661,
+  "visible": [
+    236,
+    47,
+    897,
+    1297
+  ],
+  "source_file": "vespera/combat_idle.png",
+  "source_sha256": "d8c9679e3fc3e6341e625d01d285359be56da8899bc23a7849d165a2adeb906f",
+  "generated_bbox": [
+    305,
+    35,
+    963,
+    1280
+  ],
+  "normalization": {
+    "uniform_scale": 1.0040160642570282,
+    "translation": [
+      236,
+      47
+    ],
+    "body_height_pixels": 1250,
+    "old_support_center_x": 552.0,
+    "new_support_center_x": 315.5,
+    "support_quantiles": [
+      3,
+      97
+    ],
+    "support_band": 0.08
+  },
+  "mode": "combat_idle"
+}
