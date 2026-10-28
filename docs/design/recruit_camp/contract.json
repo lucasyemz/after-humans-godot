@@ -1,0 +1,204 @@
+{
+  "issue": 210,
+  "base_commit": "ff8fc83",
+  "source_tag": "codex-pr<N>-originals",
+  "source_folder": "art/combat/source/recruit_camp_20261028",
+  "poses": [
+    {
+      "recruit_id": "raccoon_recruit_01",
+      "state": "seat",
+      "file": "art/camp/raccoon_recruit_01_seat.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        300.75,
+        592.0
+      ],
+      "texture_body_reference_pixels": 499.5,
+      "manifest_canvas": [
+        1178,
+        1335
+      ],
+      "manifest_anchor": [
+        601.5,
+        1184
+      ],
+      "body_reference_pixels": 999,
+      "alpha_bbox": [
+        51,
+        192,
+        550,
+        592
+      ],
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          601.5,
+          1184
+        ],
+        "body_reference_pixels": 999,
+        "file": "res://art/camp/raccoon_recruit_01_seat.webp"
+      },
+      "source_of_truth": "data/presentation/combat_art.json:recruits.raccoon_recruit_01.idle",
+      "issue": 210,
+      "source_file": "raccoon_seat.png",
+      "source_sha256": "860764996815389920c494eab3edff7b3571ed385896c79f39cc16a112af8e95",
+      "sha256": "c6d33bf94ea7c70033bd5073a3c7703350455fdec281f38c64a9c47cf0d98561",
+      "reference_sha256": "12aa5fff94371d7fe3e120fb4f040dd7a4a8798cd49067c012628d9117c01674"
+    },
+    {
+      "recruit_id": "raccoon_recruit_01",
+      "state": "sleep",
+      "file": "art/camp/raccoon_recruit_01_sleep.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        300.75,
+        592.0
+      ],
+      "texture_body_reference_pixels": 499.5,
+      "manifest_canvas": [
+        1178,
+        1335
+      ],
+      "manifest_anchor": [
+        601.5,
+        1184
+      ],
+      "body_reference_pixels": 999,
+      "alpha_bbox": [
+        80,
+        364,
+        522,
+        593
+      ],
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          601.5,
+          1184
+        ],
+        "body_reference_pixels": 999,
+        "file": "res://art/camp/raccoon_recruit_01_sleep.webp"
+      },
+      "source_of_truth": "data/presentation/combat_art.json:recruits.raccoon_recruit_01.idle",
+      "issue": 210,
+      "source_file": "raccoon_sleep.png",
+      "source_sha256": "7752d7b4eb75ee01e37b236fbb39b5e9fbbe89285acc7be37b8f3747d8788efe",
+      "sha256": "a3aeffa441beb72b312b4a92b7fc7514033225b5cdeb4f2bd01ec654a4e78b0c",
+      "reference_sha256": "12aa5fff94371d7fe3e120fb4f040dd7a4a8798cd49067c012628d9117c01674"
+    },
+    {
+      "recruit_id": "armadillo_recruit_01",
+      "state": "seat",
+      "file": "art/camp/armadillo_recruit_01_seat.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        300.5,
+        543.5
+      ],
+      "texture_body_reference_pixels": 403.5,
+      "manifest_canvas": [
+        1178,
+        1335
+      ],
+      "manifest_anchor": [
+        601.0,
+        1087
+      ],
+      "body_reference_pixels": 807,
+      "alpha_bbox": [
+        26,
+        150,
+        576,
+        544
+      ],
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          601.0,
+          1087
+        ],
+        "body_reference_pixels": 807,
+        "file": "res://art/camp/armadillo_recruit_01_seat.webp"
+      },
+      "source_of_truth": "data/presentation/combat_art.json:recruits.armadillo_recruit_01.idle",
+      "issue": 210,
+      "source_file": "armadillo_seat.png",
+      "source_sha256": "3125d6626db086cc23dea51f787e500391981663d71eb9f92bbd37c024d6bf3b",
+      "sha256": "9fdafd3eb476375b0d62f8705d5fb9eb544d7e3df645839f13bcfc606a037437",
+      "reference_sha256": "dc443043f43b13fe4e04609b8af7942c5e07c96a64dbabf6614048b2d7035836"
+    },
+    {
+      "recruit_id": "armadillo_recruit_01",
+      "state": "sleep",
+      "file": "art/camp/armadillo_recruit_01_sleep.webp",
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "texture_anchor": [
+        300.5,
+        543.5
+      ],
+      "texture_body_reference_pixels": 403.5,
+      "manifest_canvas": [
+        1178,
+        1335
+      ],
+      "manifest_anchor": [
+        601.0,
+        1087
+      ],
+      "body_reference_pixels": 807,
+      "alpha_bbox": [
+        97,
+        322,
+        504,
+        544
+      ],
+      "nine_slice": null,
+      "use": "show_art",
+      "show_art": {
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          601.0,
+          1087
+        ],
+        "body_reference_pixels": 807,
+        "file": "res://art/camp/armadillo_recruit_01_sleep.webp"
+      },
+      "source_of_truth": "data/presentation/combat_art.json:recruits.armadillo_recruit_01.idle",
+      "issue": 210,
+      "source_file": "armadillo_sleep.png",
+      "source_sha256": "df60c6f49475606ad8ffbf7f613b7bd7e9b78083bc0db9f3b23f95084e15cad0",
+      "sha256": "0fefd0d268b588f2286c5433d93451e930eaf9b764e512a4183097aa2f9b5973",
+      "reference_sha256": "dc443043f43b13fe4e04609b8af7942c5e07c96a64dbabf6614048b2d7035836"
+    }
+  ]
+}
