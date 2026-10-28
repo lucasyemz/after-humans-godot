@@ -43,8 +43,57 @@ static func known(hero: Dictionary) -> Array:
 	if AHHeroLevels.level(hero) >= 2 and String(row.get("Level2", "")) != "":
 		out.append(String(row.Level2))
 	for ability_id in hero.get("learned", []):
-		if not out.has(ability_id):
-			out.append(String(ability_id))
+		# Só texto (um save editado com número ou null não zera as outras).
+		if typeof(ability_id) == TYPE_STRING and not out.has(ability_id):
+			out.append(ability_id)
+	return out
+
+
+## Onde vale um bônus de habilidade de antes (#215, a melhoria "Mão treinada" que o recruta já pagou para uma habilidade
+## do fundador): a própria, se ele a sabe; senão, a dele que usa a arte dela (ArtOf: Corte de Fase → Arranhão); "" se
+## nenhuma.
+static func bonus_target(hero: Dictionary, ability_id: String) -> String:
+	var all := known(hero)
+	if not flexible(hero) or all.has(ability_id):
+		return ability_id
+	for own in all:
+		var row = GameData.row("abilities", own)
+		if row != null and String(row.get("ArtOf", "")) == ability_id:
+			return own
+	return ""
+
+
+## Uma formação em que cada um tem ataque da sua posição (#95): a mesma, se já vale; senão, a primeira ordem que vale
+## (o save de antes, com o recruta numa posição de onde as habilidades dele não atacam); [] se nenhuma vale.
+static func valid_order(campaign: Dictionary, team: Array) -> Array:
+	var heroes: Array = []
+	for hero_id in team:
+		var entry = S.hero(campaign, hero_id)
+		if entry == null:
+			return []
+		heroes.append(entry)
+	for order in _orders(range(team.size())):
+		var ok := true
+		for rank in order.size():
+			var entry: Dictionary = heroes[order[rank]]
+			if S.attacks_from_rank(String(entry.class_id), rank + 1, abilities(entry)).is_empty():
+				ok = false
+				break
+		if ok:
+			return order.map(func(i): return team[i])
+	return []
+
+
+## As ordens possíveis, a de hoje primeiro.
+static func _orders(items: Array) -> Array:
+	if items.size() <= 1:
+		return [items.duplicate()]
+	var out: Array = []
+	for i in items.size():
+		var rest := items.duplicate()
+		var first = rest.pop_at(i)
+		for tail in _orders(rest):
+			out.append([first] + tail)
 	return out
 
 
@@ -94,8 +143,16 @@ static func founder_option(hero: Dictionary) -> Dictionary:
 		"DisplayName": TranslationServer.translate("Aprender com %s: %s") % [teacher, name] if teacher != ""
 			else TranslationServer.translate("Aprender o ofício: %s") % name,
 		# Curta, como as das melhorias (o cartão do Treino); o detalhe da habilidade fica na Sala.
-		"Description": TranslationServer.translate("%s ensina a habilidade dele.") % teacher if teacher != ""
+		"Description": TranslationServer.translate("%s ensina a técnica.") % teacher if teacher != ""
 			else TranslationServer.translate("A oficina da Estação ensina o ofício.")}
+
+
+## O aviso do Treino ao aprender (antes de treinar): o nível, a habilidade e onde escolher as que leva.
+static func learned_notice(hero: Dictionary) -> String:
+	var ability = GameData.row("abilities", founder_ability(String(hero.get("class_id", ""))))
+	return TranslationServer.translate("%s subiu para o nível %d e aprendeu %s. Na Sala, escolha as %d que leva.") % [
+		String(hero.display_name), AHHeroLevels.level(hero) + 1, TranslationServer.translate(String(ability.DisplayName)) if ability != null else "",
+		int(rule("MaxCarried", 4))]
 
 
 ## Trocar as que leva (na Estação, sem custo). Devolve o erro, ou "".
@@ -129,12 +186,21 @@ static func invalid(hero: Dictionary, chosen: Array) -> String:
 	return ""
 
 
-## O save: os campos que faltam vazios; a escolha que não vale mais (um save editado, o fundador) volta ao padrão.
+## O save: os campos que faltam vazios; o que não vale mais (um save editado, o fundador) volta ao padrão: aprendida só
+## a do fundador da espécie, e a escolha das que leva só com as que sabe. A formação de antes, com o recruta numa
+## posição de onde ele não ataca mais, troca de ordem.
 static func migrate(campaign: Dictionary) -> void:
 	for entry in campaign.get("roster", []):
 		if typeof(entry.get("loadout")) != TYPE_ARRAY:
 			entry.loadout = []
 		if typeof(entry.get("learned")) != TYPE_ARRAY:
 			entry.learned = []
+		var founder := founder_ability(String(entry.get("class_id", "")))
+		entry.learned = entry.learned.filter(func(id): return flexible(entry) and founder != "" and typeof(id) == TYPE_STRING and id == founder).slice(0, 1)
 		if not entry.loadout.is_empty() and (not flexible(entry) or invalid(entry, entry.loadout) != ""):
 			entry.loadout = []
+	var formation = campaign.get("preferred_formation")
+	if typeof(formation) == TYPE_ARRAY and not formation.is_empty():
+		var order := valid_order(campaign, formation)
+		if not order.is_empty():
+			campaign.preferred_formation = order

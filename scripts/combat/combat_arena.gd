@@ -666,7 +666,11 @@ func _advance(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, hero
 	var direction := signf(gap)
 	var available := maxf(0.0, absf(gap) - ((card.body_height + struck.body_height) * 0.3 + 0.3))
 	var key := art_id(ability_id)
-	if RANGED.has(key) or key.contains("tiro") or key.contains("descarga"):
+	# A do recruta (#215) com a arte de outra: o alcance é o dela (a Bicada, da frente, anda até o alvo).
+	var own = GameData.row("abilities", ability_id) if key != ability_id else null
+	var ranged: bool = Array(own.get("OriginRanks", [])).map(func(r): return int(r)).min() >= 2 if own != null \
+		else (RANGED.has(key) or key.contains("tiro") or key.contains("descarga"))
+	if ranged:
 		return direction * minf(available, card.body_height * 0.16)
 	if not actor.is_player:
 		return direction * available * 0.4

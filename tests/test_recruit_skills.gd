@@ -22,6 +22,8 @@ func run(context) -> void:
 	_choose()
 	_combat()
 	_save()
+	_old_saves()
+	_ampoule()
 	await _screen()
 
 
@@ -189,6 +191,66 @@ func _save() -> void:
 	t.equal(migrated.loadout, [], "uma escolha que não vale (um save editado) volta ao padrão ao abrir")
 
 
+## A QA da #215: o save de antes e o editado não perdem nem inventam nada.
+func _old_saves() -> void:
+	# A "Mão treinada" que o gato recruta pagou para o Corte de Fase vale no Arranhão (que usa a arte dele).
+	var c := _campaign(1898)
+	var cat := _recruit(c, "gato", 3)
+	cat.upgrades = ["habilidade_gato", "habilidade_gato"]
+	for key in ["loadout", "learned"]:
+		cat.erase(key)
+	var back = Campaign._normalize(JSON.parse_string(JSON.stringify(c)))
+	S.migrate(back)
+	var again = S.hero(back, cat.id)
+	t.equal(AHHeroLevels.combat_bonus(again).abilities, {"rec_gato_arranhao": 2}, "a Mão treinada de antes vale no Arranhão")
+	var sheet: Array = AHCharacterSheet._hero_passives(again, [], "gato")
+	var texts: String = " ".join(sheet.map(func(row): return "%s %s" % [row[0], row[1]]))
+	t.check(texts.contains("Arranhão") and not texts.contains("Corte de Fase"), "a ficha diz onde ela vale (%s)" % texts)
+	# A Pesquisa do Corte de Fase não aparece na ficha do recruta, que não o sabe.
+	var real_state: Dictionary = Campaign.state
+	back.researched_skills = ["gato_corte_fase"]
+	Campaign.state = back
+	sheet = AHCharacterSheet._hero_passives(again, [], "gato")
+	t.check(not sheet.any(func(row): return String(row[0]).contains("Corte de Fase")), "nem o treino da Pesquisa que ele não usa")
+	Campaign.state = real_state
+	# O learned editado: só a do fundador da espécie, em texto.
+	for bad in [[5], [null], ["bogus"], ["sapo_ampola_reparo_vivo"], ["cao_fique_atras_de_mim", "cao_fique_atras_de_mim"]]:
+		var edited := _campaign(1899)
+		var dog := _recruit(edited, "cao", 4)
+		dog.learned = bad
+		var race: Array = AHRecruitSkills.race("cao").Kit + [AHRecruitSkills.race("cao").Level2]
+		t.equal(AHRecruitSkills.known(dog).slice(0, 4), race, "antes de abrir, não perde as da raça (%s)" % [bad])
+		var reopened = Campaign._normalize(JSON.parse_string(JSON.stringify(edited)))
+		S.migrate(reopened)
+		var fixed = S.hero(reopened, dog.id)
+		t.equal(fixed.learned, [FOUNDER_CAO] if bad.has(FOUNDER_CAO) else [], "o learned editado volta ao que vale (%s)" % [bad])
+		t.equal(AHRecruitSkills.abilities(fixed).size(), 4, "e ele luta com 4 (%s)" % [bad])
+	# A formação de antes com o recruta cão na posição 4: troca de ordem ao abrir, e a partida vale.
+	var formed := _campaign(1900)
+	var front := _recruit(formed, "cao")
+	formed.preferred_formation = ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", front.id]
+	t.check(S.confirm_departure(formed.duplicate(true), formed.preferred_formation, 0, 1, "fase_1") != "", "antes: o cão recruta não ataca da posição 4")
+	S.migrate(formed)
+	t.equal(formed.preferred_formation.size(), 4, "a formação continua com os 4")
+	t.equal(S.confirm_departure(formed.duplicate(true), formed.preferred_formation, 0, 1, "fase_1"), "", "depois de abrir, a formação parte (%s)" % [formed.preferred_formation])
+	var valid: Array = formed.preferred_formation.duplicate()
+	S.migrate(formed)
+	t.equal(formed.preferred_formation, valid, "uma formação que vale não muda")
+	# O aviso de aprender diz a habilidade e onde escolher.
+	var learner := _recruit(_campaign(1901), "cao", 3)
+	var notice := AHRecruitSkills.learned_notice(learner)
+	t.check(notice.contains("nível 4") and notice.contains("Fique Atrás de Mim") and notice.contains("Sala"), "o aviso de aprender (%s)" % notice)
+
+
+## A Ampola fora da luta é de quem a leva: o sapo recruta não conta como a Íris.
+func _ampoule() -> void:
+	var c := _campaign(1902)
+	var frog := _recruit(c, "sapo")
+	S.confirm_departure(c, [frog.id, "hero_cao_bento", "hero_gato_nick", "hero_coruja_vespera"], 0, 1, "fase_1")
+	t.equal(AHExplorationCare.iris(c), null, "o sapo recruta sem a Ampola não cura fora da luta")
+	t.equal(AHExplorationCare.ampoule_charges(c), 0, "e não tem cargas")
+
+
 ## Na Sala: o recruta mostra as que sabe e o que vem; com 5, a que fica na Estação e a troca.
 func _screen() -> void:
 	var real_state: Dictionary = Campaign.state
@@ -233,6 +295,17 @@ func _screen() -> void:
 			await _frames(4)
 		t.check(AHRecruitSkills.abilities(S.hero(Campaign.state, vet.id)).has(FOUNDER_CAO)
 			and not AHRecruitSkills.abilities(S.hero(Campaign.state, vet.id)).has("rec_cao_patada"), "trocar pela Sala vale")
+		# Pela que fica na Estação: "Levar no lugar de" e as que vão.
+		screen = hud._room_screen
+		screen.selected = vet.id
+		screen.ability = "rec_cao_patada"
+		screen.rebuild()
+		await _frames(3)
+		var replace: Button = screen.find_child("Replace_%s" % FOUNDER_CAO, true, false)
+		if t.check(replace != null, "a que ficou mostra Levar no lugar de, com as que vão"):
+			replace.pressed.emit()
+			await _frames(4)
+		t.check(AHRecruitSkills.abilities(S.hero(Campaign.state, vet.id)).has("rec_cao_patada"), "e trocar por ela também vale")
 		screen = hud._room_screen
 		screen.selected = BENTO
 		screen.rebuild()

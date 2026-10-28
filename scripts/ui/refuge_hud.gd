@@ -2004,8 +2004,11 @@ func _train_hero(hero_id: String, upgrade_id: String) -> void:
 	var entry = S.hero(Campaign.state, hero_id)
 	var upgrade = GameData.row("hero_upgrades", upgrade_id)
 	var next := AHHeroLevels.level(entry) + 1
-	_act(AHHeroLevels.train(Campaign.state, hero_id, upgrade_id),
-		tr("%s subiu para o nível %d: %s.") % [entry.display_name, next, tr(upgrade.DisplayName) if upgrade else ""], "res://audio/ui/forge_confirm.ogg")
+	var done := tr("%s subiu para o nível %d: %s.") % [entry.display_name, next, tr(upgrade.DisplayName) if upgrade else ""]
+	# Aprender com o fundador (#215): a opção não está em hero-upgrades; diz o que aprendeu e onde escolher o que leva.
+	if upgrade_id == AHRecruitSkills.LEARN:
+		done = AHRecruitSkills.learned_notice(entry)
+	_act(AHHeroLevels.train(Campaign.state, hero_id, upgrade_id), done, "res://audio/ui/forge_confirm.ogg")
 
 
 func _cycle_relic(hero_id: String) -> void:

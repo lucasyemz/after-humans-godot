@@ -605,7 +605,7 @@
   {
     "Name": "rec_cao_escudo_lata",
     "ClassId": "cao",
-    "ArtOf": "tatu_abrigo",
+    "ArtOf": "cao_fique_atras_de_mim",
     "DisplayName": "Escudo de Lata",
     "Description": "Põe um pedaço de lata na frente de outro aliado: 1 carga de Bloqueio.",
     "OriginRanks": [

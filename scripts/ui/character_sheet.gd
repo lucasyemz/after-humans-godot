@@ -135,10 +135,24 @@ static func _hero_passives(hero, perks: Array, class_id: String) -> Array:
 				var title := TranslationServer.translate(String(upgrade.DisplayName))
 				if counts[upgrade_id] > 1:
 					title = TranslationServer.translate("%s ×%d") % [title, counts[upgrade_id]]
-				out.append([title, TranslationServer.translate(String(upgrade.get("Description", ""))), true])
+				var text := TranslationServer.translate(String(upgrade.get("Description", "")))
+				# O recruta de antes (#215): a melhoria paga para a habilidade do fundador vale na dele que a substitui.
+				if String(upgrade.get("Stat", "")) == "Ability":
+					var target := AHRecruitSkills.bonus_target(hero, String(upgrade.AbilityId))
+					if target == "":
+						continue
+					if target != String(upgrade.AbilityId):
+						var ability = GameData.row("abilities", target)
+						text = TranslationServer.translate("+%d nos limites de dano ou cura de %s.") % [int(upgrade.Value),
+							TranslationServer.translate(String(ability.DisplayName)) if ability != null else target]
+				out.append([title, text, true])
 	var learned: Array = Campaign.state.get("researched_skills", []) if Campaign.state is Dictionary else []
 	for research in GameData.table("research").values():
-		if String(research.get("ClassId", "")) == class_id and learned.has(String(research.get("SkillId", ""))):
+		# A Pesquisa treina as habilidades do fundador: no recruta (#215), só a que ele aprendeu.
+		var skill := String(research.get("SkillId", ""))
+		if hero != null and AHRecruitSkills.flexible(hero) and not AHRecruitSkills.known(hero).has(skill):
+			continue
+		if String(research.get("ClassId", "")) == class_id and learned.has(skill):
 			out.append([TranslationServer.translate(String(research.DisplayName)), TranslationServer.translate(String(research.get("Description", ""))), true])
 	return out
 

@@ -304,7 +304,31 @@ func _skill_choices(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> v
 	var carried := AHRecruitSkills.abilities(hero)
 	var resting: Array = AHRecruitSkills.known(hero).filter(func(id): return not carried.has(id))
 	var slot := carried.find(ability)
-	if resting.is_empty() or slot < 0:
+	if resting.is_empty():
+		return
+	# A que fica na Estação, apontada, troca pela que vai (#215): "Levar no lugar de" e as que vão.
+	if slot < 0:
+		if not resting.has(ability):
+			return
+		box.add_child(AHKit.label(tr("Levar no lugar de"), "text", AHKit.AMBER, true, true))
+		var swaps := HFlowContainer.new()
+		swaps.add_theme_constant_override("h_separation", 10)
+		swaps.add_theme_constant_override("v_separation", 8)
+		box.add_child(swaps)
+		var incoming := String(ability)
+		var incoming_data = GameData.row("abilities", incoming)
+		for index in carried.size():
+			var out_data = GameData.row("abilities", carried[index])
+			var swap := _small_button(tr(String(out_data.DisplayName)) if out_data != null else String(carried[index]))
+			swap.name = "Replace_%s" % carried[index]
+			var chosen := carried.duplicate()
+			chosen[index] = incoming
+			var hero_id := String(hero.id)
+			swap.pressed.connect(func():
+				var error := AHRecruitSkills.choose(Campaign.state, hero_id, chosen)
+				hud._act(error, "" if error != "" else tr("%s leva %s.") % [String(S.hero(Campaign.state, hero_id).display_name),
+					tr(String(incoming_data.DisplayName)) if incoming_data != null else incoming]))
+			swaps.add_child(swap)
 		return
 	box.add_child(AHKit.label(tr("Trocar por"), "text", AHKit.AMBER, true, true))
 	var row := HFlowContainer.new()

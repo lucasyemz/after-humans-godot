@@ -893,6 +893,8 @@ briefing_dialog.gd: %d/%d
 character_sheet.gd: id
 character_sheet.gd: hp
 character_sheet.gd: speed
+character_sheet.gd: Stat
+character_sheet.gd: Ability
 character_sheet.gd: passives
 character_sheet.gd: states
 character_sheet.gd: enemy
@@ -1594,6 +1596,7 @@ street_corridor.gd: reactions
 street_corridor.gd: death
 ui_style.gd: enemies
 character_room.gd: Swap_%s
+character_room.gd: Replace_%s
 recruit_skills.gd: learned
 recruit_skills.gd: rules
 recruit_skills.gd: id

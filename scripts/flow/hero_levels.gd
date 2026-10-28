@@ -161,7 +161,10 @@ static func combat_bonus(hero: Dictionary) -> Dictionary:
 			"Calm":
 				out.calm += int(upgrade.Value)
 			"Ability":
-				out.abilities[upgrade.AbilityId] = int(out.abilities.get(upgrade.AbilityId, 0)) + int(upgrade.Value)
+				# O recruta de antes (#215): a melhoria paga para a habilidade do fundador vale na dele que a substitui.
+				var target := AHRecruitSkills.bonus_target(hero, String(upgrade.AbilityId))
+				if target != "":
+					out.abilities[target] = int(out.abilities.get(target, 0)) + int(upgrade.Value)
 	return out
 
 
