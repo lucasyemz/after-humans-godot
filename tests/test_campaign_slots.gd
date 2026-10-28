@@ -156,7 +156,7 @@ func _broken_slot() -> void:
 		file.close()
 	t.equal([Campaign.slot_summary(1).status, Campaign.slot_summary(2).status, Campaign.slot_summary(3).status], ["ok", "broken", "ok"], "só o espaço 2 aparece estragado")
 	t.equal(Campaign.use_slot(2), "new", "abrir o espaço estragado dá uma campanha nova sem gravar")
-	t.check(Campaign.load_warning != "", "com o aviso")
+	t.check(Campaign.warning_text() != "", "com o aviso")
 	t.equal(FileAccess.get_file_as_string(Campaign.slot_path(2)), "{ estragado", "o arquivo estragado fica como estava")
 	t.equal(Campaign.use_slot(1), "primary", "o espaço 1 continua abrindo")
 	t.equal(FileAccess.get_file_as_string(Campaign.slot_path(1)), one, "sem mudar")
@@ -181,7 +181,7 @@ func _broken_slot() -> void:
 	file.close()
 	Campaign.slot = Campaign.last_slot()
 	Campaign.load_or_new()
-	t.check(Campaign.load_warning.contains("espaço 2") and Campaign.load_warning.contains("Campanhas"), "o aviso diz que só o espaço 2 não abre: %s" % Campaign.load_warning)
+	t.check(Campaign.warning_text().contains("espaço 2") and Campaign.warning_text().contains("Campanhas"), "o aviso diz que só o espaço 2 não abre: %s" % Campaign.warning_text())
 	Campaign.slot = 1
 
 

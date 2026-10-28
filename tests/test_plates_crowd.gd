@@ -1,5 +1,6 @@
 ## As placas das máquinas numa luta cheia (quatro inimigos, #60 sobre a #63): no texto Normal e no Maior, a intenção e a
-## barra não cobrem o corpo (a barra e os estados no máximo um quinto dele; a intenção, acima da cabeça, nada) e as placas de um mesmo lado não se cobrem.
+## barra não cobrem o corpo (a barra e os estados no máximo um quinto dele; a intenção, acima da cabeça, nada) e as
+## placas de um mesmo lado não se cobrem. Também com os espaços no mínimo (MIN_GAP_SCALE), o lugar mais apertado (#72).
 extends RefCounted
 
 var t
@@ -69,6 +70,15 @@ func _fight() -> void:
 		for i in 6:
 			await _tree.process_frame
 		_check(hud, "Maior" if size == 2 else "Normal")
+	# O lugar mais apertado que a luta aceita (#72): os espaços encolhidos até MIN_GAP_SCALE, com a placa no mínimo.
+	var arena: AHCombatArena = hud.arena
+	arena.gap_scale = AHCombatArena.MIN_GAP_SCALE
+	await arena._sync_positions(0.05)
+	for size in [0, 2]:
+		Settings.set_text_size(size)
+		for i in 6:
+			await _tree.process_frame
+		_check(hud, ("Maior" if size == 2 else "Normal") + " no espaço mínimo")
 
 
 func _check(hud: AHCombatHud, profile: String) -> void:

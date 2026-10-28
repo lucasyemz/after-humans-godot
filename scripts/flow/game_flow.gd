@@ -39,8 +39,12 @@ func _ready() -> void:
 	add_child(layer)
 
 
+## Cenas a mais, só para os testes (uma que não carrega, para conferir a saída limpa da passagem).
+static var test_scenes := {}
+
+
 static func scene_path(scene_id: String) -> String:
-	return SCENES.get(scene_id, "")
+	return SCENES.get(scene_id, test_scenes.get(scene_id, ""))
 
 
 ## Primeira cena depois do boot: a tela de título (#28). O modo de captura da rua (--capture=) monta a própria campanha e
@@ -100,6 +104,10 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	var path := scene_path(scene_id)
 	if path == "" or busy:
 		push_warning("GameFlow: cena desconhecida ou troca em andamento (%s)." % scene_id)
+		# A cena de fundo do cartão (o vagão, #75) já nasceu e não vai para a árvore: sai aqui, para não ficar órfã.
+		var refused = card.get("backdrop")
+		if refused is Node and is_instance_valid(refused) and refused.get_parent() == null:
+			refused.free()
 		return false
 	busy = true
 	params = scene_params
@@ -132,6 +140,8 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 			elif status != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
 				# O pedido em segundo plano falhou (ou já foi consumido): carrega aqui mesmo.
 				packed = load(path)
+			if packed == null:
+				return await _travel_failed(path)
 		elif scene == null and (passage.title_delay <= 0.0 or passage.title_lit) and passage.sound_settled():
 			# Com a cena de fundo andando (o vagão, #75), a montagem (um quadro travado) espera o título aceso por cima.
 			# A cena nova monta por baixo do cartão (opaco), parada: não anda nem recebe tecla até o cartão sair. Só
@@ -154,6 +164,17 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	await _fade_to(0.0)
 	busy = false
 	return true
+
+
+## A cena não carregou (o arquivo sumiu ou quebrou): o cartão sai e a troca termina sem prender o busy.
+func _travel_failed(path: String) -> bool:
+	push_error("GameFlow: a cena %s não carregou." % path)
+	passage.end_sound(AHPassageCard.SOUND_SKIP_FADE, false)
+	passage.queue_free()
+	passage = null
+	await _fade_to(0.0)
+	busy = false
+	return false
 
 
 static func reduced_effects() -> bool:

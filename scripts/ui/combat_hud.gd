@@ -904,7 +904,7 @@ func _process(_delta: float) -> void:
 			plate.size = Vector2(widths[unit_id], 0)
 		var feet := camera.unproject_position(card.global_position)
 		var head := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 1.05, 0))
-		var short := card.body_height < SHORT_HEIGHT
+		var short := card.body_height < SHORT_HEIGHT or _plate_stagger.has(unit_id)
 		# O limite é o da barra (a última da placa): o resto sobe por cima dela.
 		var bar_height: float = (plate.get_child(0).get_node("Hp") as Control).size.y
 		var dock_limit := _dock_top() - bar_height - 6 if _panel.visible else INF
@@ -921,11 +921,11 @@ func _process(_delta: float) -> void:
 			# A barra (a última da placa) na linha de todas: sob os pés, sem passar do rodapé; a intenção e os estados
 			# ficam por cima dela.
 			y = minf(feet.y + 10.0, dock_limit) - (plate.size.y - bar_height)
+		# A intenção acima da cabeça (acima da placa, no baixinho), sem subir na faixa da rodada.
+		var tag := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
 		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
 		if short:
 			short_plates.append(Rect2(plate.position, plate.size))
-		# A intenção acima da cabeça (acima da placa, no baixinho), sem subir na faixa da rodada.
-		var tag := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
 		# Com o popup do fim aberto, as intenções saem (a luta acabou, e elas subiriam por trás dele).
 		if tag != null and _result.visible:
 			tag.visible = false
@@ -934,6 +934,7 @@ func _process(_delta: float) -> void:
 			var bottom := minf(crown.y, plate.position.y - 4.0) if short else crown.y
 			tag.position = Vector2(feet.x - tag.size.x * 0.5, maxf(INTENT_TOP, bottom - tag.size.y))
 			short_plates.append(Rect2(tag.position, tag.size))
+	_lift_staggered()
 	for marker in _markers:
 		if marker.has_meta("card"):
 			# O botão do alvo cobre o corpo inteiro na tela (do pé à cabeça, na largura do corpo).
@@ -1290,10 +1291,49 @@ func unit_at(point: Vector2) -> String:
 	return best
 
 
+## As placas escalonadas (_plate_stagger) sobem, com a intenção delas, para cima do que cobririam nos vizinhos (a
+## placa e a intenção deles; a intenção fica na altura da cabeça, e a de quem é mais alto, mais embaixo).
+func _lift_staggered() -> void:
+	for unit_id in _plate_stagger:
+		var plate: Control = _unit_bars.get(unit_id)
+		if plate == null or not plate.visible:
+			continue
+		var tag := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
+		if tag != null and not tag.visible:
+			tag = null
+		var player: bool = session.state.find_unit(unit_id).is_player
+		var theirs: Array[Rect2] = []
+		for other_id in _unit_bars:
+			var other: Control = _unit_bars[other_id]
+			var unit = session.state.find_unit(other_id)
+			if other_id == unit_id or _plate_stagger.has(other_id) or not other.visible or unit == null or unit.is_player != player:
+				continue
+			theirs.append(Rect2(other.position, other.size))
+			var other_tag := (other.get_meta("intent") if other.has_meta("intent") else null) as Control
+			if other_tag != null and other_tag.visible:
+				theirs.append(Rect2(other_tag.position, other_tag.size))
+		# Subir pela intenção pode pôr a placa sobre outra coisa do vizinho: sobe de novo, até não cobrir nada.
+		for round in 4:
+			var lift := 0.0
+			var mine: Array[Rect2] = [Rect2(plate.position, plate.size)]
+			if tag != null:
+				mine.append(Rect2(tag.position, tag.size))
+			for rect in theirs:
+				for own in mine:
+					if own.grow(-1).intersects(rect.grow(-1)):
+						lift = maxf(lift, own.end.y - rect.position.y + 4.0)
+			if lift <= 0.0:
+				break
+			plate.position.y -= lift
+			if tag != null:
+				tag.position.y = maxf(INTENT_TOP, tag.position.y - lift)
+
+
 ## A largura das placas de cada lado: a de sempre (176 dos heróis, 246 dos inimigos), estreitada até caber entre os pés
 ## vizinhos (com quatro inimigos a ~200 px um do outro, as placas de 246 px se cobriam: "Fa|ísca", #63).
 func _plate_widths(camera: Camera3D) -> Dictionary:
 	var out := {}
+	_plate_stagger.clear()
 	for player in [true, false]:
 		var xs: Array = []
 		for unit_id in _unit_bars:
@@ -1311,6 +1351,10 @@ func _plate_widths(camera: Camera3D) -> Dictionary:
 			if i < xs.size() - 1:
 				width = minf(width, xs[i + 1][0] - xs[i][0] - PLATE_GAP)
 			out[xs[i][1]] = maxf(PLATE_MIN, width)
+			# Nem no mínimo cabe ao lado do vizinho (os espaços encolhidos num lugar apertado, #72): esta sobe para cima
+			# da cabeça, uma sim e outra não, e as duas linhas não se cobrem.
+			if i > 0 and xs[i][0] - xs[i - 1][0] < PLATE_MIN + PLATE_GAP and not _plate_stagger.has(xs[i - 1][1]):
+				_plate_stagger[xs[i][1]] = true
 	return out
 
 
@@ -1318,6 +1362,8 @@ const PLATE_PLAYER := 200.0
 const PLATE_ENEMY := 200.0
 const PLATE_MIN := 140.0
 const PLATE_GAP := 8.0
+## As placas escalonadas (acima da cabeça) porque o vizinho está mais perto que a placa mínima: _plate_widths as marca.
+var _plate_stagger := {}
 
 
 ## O retângulo do corpo de um personagem na tela: do pé à cabeça e com a largura do corpo (a placa tem margem

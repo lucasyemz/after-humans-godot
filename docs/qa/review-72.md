@@ -1,0 +1,47 @@
+# As pendências da revisão (#72)
+
+![Antes (à esquerda) e depois (à direita), nos textos Normal e Maior: a luta cheia com os espaços no mínimo; antes, as placas dos heróis e as dos inimigos se cobriam e a "Garra de Captura" saía cortada; depois, uma placa sim e outra não sobe para cima da cabeça](review-72/before_after.jpg)
+
+O que sobrou da auditoria do Claude 1 (comentário de 28/10 na issue), item por item.
+
+## As placas no lugar mais apertado (`combat_hud.gd`)
+
+Com os espaços da luta encolhidos até o mínimo (`MIN_GAP_SCALE`, num lugar apertado), os pés ficam a 105–117 px e
+as placas, no mínimo de 140 px, se cobriam (a auditoria mediu 142–146 px sem obstáculo; com a luta cheia do passo 7
+da Rua das Vitrines, cobriam). Agora, quando o vizinho está mais perto que a placa mínima, uma placa sim e outra não
+sobe para cima da cabeça (o mesmo caminho dos baixinhos), e sobe de novo por cima da intenção e da placa dos vizinhos
+se encostar nelas (`_lift_staggered`). Nas lutas de sempre, com os pés a ~175 px, nada muda.
+
+## A origem do toque no alvo (`test_target_pick`)
+
+Na primeira vez do jogador, com um `on_pick` do teste (sem gastar a vez): o clique escolhe e a tecla Enter de verdade
+(`InputEventKey`, não a ação) usa no escolhido na hora; o primeiro toque na tela (`InputEventScreenTouch`) escolhe sem
+usar e o segundo usa. As verificações de antes que dependiam da vez seguinte continuam como estavam (a vez seguinte
+nem sempre tem uma habilidade de dois alvos, e aí elas não rodam); as novas rodam sempre.
+
+## As saídas limpas da troca de cena (pendências do #85)
+
+- **O vagão órfão:** a passagem recusada (outra troca em andamento) libera a cena de fundo do cartão.
+- **A cena que não carrega:** `push_error`, o cartão sai e o `GameFlow.busy` solta (`_travel_failed`), em vez de o
+  `instantiate()` quebrar com o `busy` preso.
+- **O corredor preso:** com outra troca em andamento, o corredor não avança o trecho nem liga o `busy` dele.
+
+## O aviso do save
+
+O `load_warning` saiu: o jogo e os testes leem `warning_text()`, um caminho só.
+
+## O rodízio de tocadores
+
+O `Sound.play()` pegava o próximo da roda de 10 tocadores, tocando ou não: com o trem chegando (7 s), dez efeitos
+nesse tempo tomavam o tocador dele e cortavam o trem. Agora pega o próximo livre na roda e, com todos tocando, o que
+está mais perto de acabar (`_free_effect`). Combinado pelo Orquestrador com o Claude 1 (#66), que mexe em outra função
+do `Sound`.
+
+## Testes
+
+- `tests/test_flow_guards.gd` (novo): o vagão recusado, a cena que não carrega e o corredor com a troca em andamento.
+- `tests/test_sound_pool.gd` (novo): o trem tocando e mais dez efeitos curtos; o trem não é cortado.
+- `tests/test_plates_crowd.gd`: a luta cheia também no espaço mínimo, nos textos Normal e Maior.
+- `tests/test_target_pick.gd`: o clique e Enter e o toque, sempre na primeira vez.
+- `tests/test_campaign.gd`, `tests/test_campaign_slots.gd`: o aviso pelo `warning_text()`.
+- `tools/capture_72.gd`: a luta cheia no espaço mínimo, nos dois textos; roda também na `main` de antes.
