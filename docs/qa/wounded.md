@@ -6,8 +6,10 @@
 
 Os números ficam em `data/wounded.json`, para o Lucas ajustar:
 
-- **Ferido** (`AHWounded.is_wounded(hero)`): vivo e com a vida abaixo de 40% da máxima (`Threshold`), ou Caído em
-  recuperação (#118/#121), mesmo com a vida cheia. Uma função só, para a exploração, a Estação e a HUD.
+- **Ferido** (`AHWounded.is_wounded(hero)`): vivo e com a vida abaixo de 50% da máxima (`Threshold`), ou Caído em
+  recuperação (#118/#121), mesmo com a vida cheia. Uma função só, para a exploração, a Estação e a HUD. É o mesmo
+  limite do "Ferimento grave" (o coração rachado) da Estação: o kit lê o `Threshold` daqui (`AHKit.heavy_below`), um
+  número só para as duas telas. A issue propunha 40%; ficou 50%, o limite que o coração rachado já tinha na Estação.
 - **O passo** (`AHWounded.speed_factor`): 70% da velocidade (`SpeedFactor`).
 - **A pose** (`AHWounded.pose(idle)`): o `wounded.webp` da pasta da arte do herói, no canvas e na âncora do idle (a
   entrega do Codex, PR #209). Sem o arquivo, o idle de pé. A pose troca sozinha quando a arte entrar.
@@ -27,7 +29,8 @@ Os números ficam em `data/wounded.json`, para o Lucas ajustar:
 ## Na HUD da exploração
 
 O coração rachado (`state_wounded`, o da Sala dos Personagens) no canto do retrato do ferido, com a dica "Precisa se
-recuperar". Some quando a vida volta acima do limite.
+recuperar". Some quando a vida volta acima do limite. O clique passa por ele até a plaquinha (a Formação escolhe o herói
+clicando no retrato).
 
 ## Na Estação
 
@@ -36,11 +39,22 @@ A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWo
 
 ## Testes
 
-- `tests/test_wounded.gd` (novo, 20 verificações):
-  - o limite (abaixo de 40% ferido, no limite não), o Caído em recuperação, o morto e o herói ausente;
+- `tests/test_wounded.gd` (novo, 22 verificações):
+  - o limite (abaixo dele ferido, nele não), o Caído em recuperação, o morto e o herói ausente; o ferido é o
+    "Ferimento grave" do kit em toda vida de 0 a 100, com o mesmo número;
   - a fração da velocidade e a pose (o arquivo da pasta com o canvas e a âncora do idle; sem o arquivo, o idle);
   - na rua: a fila no passo do ferido, o ferido mancando e os inteiros retos, sem o balanço com "Reduzir efeitos";
-  - o aviso na HUD só no ferido, e fora quando a vida volta;
+  - o aviso na HUD só no ferido (com o clique passando para a plaquinha), e fora quando a vida volta;
   - o save: a vida baixa volta com ele.
 - `tests/run_all.gd` inteiro.
 - `tools/capture_194.gd`: a Rua com o Bento a 20% e a Véspera a 30%, parada e andando; roda também na `main` de antes.
+
+## QA
+
+- **Rodada 1: REPROVADO.** A regra, o passo (andando e correndo a 70%), o mancar, a pose com a arte do PR #209, a HUD
+  no texto Maior e no daltonismo e o save passaram (`run_all` 86/86). Dois médios:
+  - o coração rachado pegava o clique da Formação;
+  - o limite de 40% não batia com o "Ferimento grave" (abaixo de 50%), que usa o mesmo ícone na Estação.
+
+  Correção: o clique passa para a plaquinha, e um limite só, em `data/wounded.json` (50%), lido pelo kit. Das baixas: o
+  corpo volta ao prumo suave ao parar, e a troca de formação confere de novo quem está ferido.

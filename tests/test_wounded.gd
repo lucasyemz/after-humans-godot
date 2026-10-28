@@ -32,6 +32,13 @@ func _rule() -> void:
 	t.check(AHWounded.is_wounded(hero), "abaixo do limite (%d de 100), ferido" % hero.hp)
 	hero.hp = int(ceil(100 * limit))
 	t.check(not AHWounded.is_wounded(hero), "no limite (%d de 100), não" % hero.hp)
+	# Um limite só: o ferido que manca é o "Ferimento grave" do kit (o coração rachado da Sala dos Personagens).
+	for hp in range(0, 101):
+		var same: bool = AHWounded.is_wounded({"alive": true, "max_hp": 100, "hp": hp}) == (AHKit.health_state(hp, 100).id == "heavy")
+		if not same:
+			t.check(false, "com %d de 100, o ferido e o Ferimento grave do kit não batem" % hp)
+			break
+	t.equal(AHKit.heavy_below(), limit, "o kit lê o mesmo limite de data/wounded.json")
 	hero.hp = 100
 	hero.recovery_days = 2
 	t.check(AHWounded.is_wounded(hero), "o Caído em recuperação conta como ferido, mesmo com a vida cheia")
@@ -80,6 +87,7 @@ func _street() -> void:
 	hud.refresh(Campaign.state)
 	var mark: Control = hud.find_child("Mate_%s" % leader.id, true, false).find_child("Wounded", true, false)
 	t.check(mark != null and mark.tooltip_text == hud.tr("Precisa se recuperar"), "o retrato do ferido com o aviso")
+	t.check(mark != null and mark.mouse_filter == Control.MOUSE_FILTER_PASS, "e o clique passa para a plaquinha (a Formação escolhe o herói)")
 	t.equal(hud.find_children("Wounded", "", true, false).size(), 1, "só o ferido tem o aviso")
 	# O save: a vida baixa volta com o save, e o herói segue ferido.
 	Campaign.save()

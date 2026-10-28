@@ -134,9 +134,19 @@ static func health_state(hp: int, max_hp: int) -> Dictionary:
 	var share := float(hp) / float(maxi(1, max_hp))
 	if share > HEALTHY_ABOVE:
 		return {"id": "healthy", "label": "Em forma", "icon": "state_active", "color": _HEALTHY[_cb()]}
-	if share >= LIGHT_FROM:
+	if share >= heavy_below():
 		return {"id": "light", "label": "Ferimento leve", "icon": "state_light_wound", "color": _LIGHT_WOUND[_cb()]}
 	return {"id": "heavy", "label": "Ferimento grave", "icon": "state_wounded", "color": _HEAVY_WOUND[_cb()]}
+
+
+## Abaixo desta fração da vida, ferimento grave: o mesmo limite do herói ferido que manca na exploração (#194), em
+## data/wounded.json (Threshold). Lido pela árvore, e não pelo nome do autoload, para os scripts de captura (-s), que
+## compilam antes dos autoloads; sem a tabela, LIGHT_FROM.
+static func heavy_below() -> float:
+	var tree := Engine.get_main_loop() as SceneTree
+	var data: Node = tree.root.get_node_or_null("GameData") if tree != null else null
+	var row = data.row("wounded", "wounded") if data != null else null
+	return float(row.Threshold) if row != null else LIGHT_FROM
 
 
 ## A entrada da peça no manifesto (os dois kits; os nomes não se repetem).

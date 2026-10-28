@@ -10,7 +10,7 @@ const POSE_FILE := "wounded.webp"
 ## Os números da regra (data/wounded.json).
 static func rules() -> Dictionary:
 	var row = GameData.row("wounded", "wounded")
-	return row if row != null else {"Threshold": 0.4, "SpeedFactor": 0.7, "LimpTilt": 3.5, "LimpDip": 0.55, "BreathDepth": 2.0}
+	return row if row != null else {"Threshold": 0.5, "SpeedFactor": 0.7, "LimpTilt": 3.5, "LimpDip": 0.55, "BreathDepth": 2.0}
 
 
 ## Se o herói está ferido: vivo, com a vida abaixo do limite, ou Caído em recuperação (#118/#121).
@@ -19,8 +19,8 @@ static func is_wounded(hero) -> bool:
 		return false
 	if int(hero.get("recovery_days", 0)) > 0:
 		return true
-	var max_hp := maxi(1, int(hero.get("max_hp", 1)))
-	return float(hero.get("hp", max_hp)) < float(max_hp) * float(rules().Threshold)
+	# O mesmo limite do "Ferimento grave" do kit (o coração rachado da Sala dos Personagens): AHKit.heavy_below.
+	return AHKit.health_state(int(hero.get("hp", 1)), int(hero.get("max_hp", 1))).id == "heavy"
 
 
 ## Quanto da velocidade sobra para quem está ferido (1 para quem não está).

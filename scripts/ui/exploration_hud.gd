@@ -658,7 +658,8 @@ func _mate(hero: Dictionary) -> PanelContainer:
 		mark.size = Vector2(WOUND_MARK, WOUND_MARK)
 		mark.position = Vector2(52 - WOUND_MARK + 4, 52 - WOUND_MARK + 4)
 		mark.tooltip_text = tr("Precisa se recuperar")
-		mark.mouse_filter = Control.MOUSE_FILTER_STOP
+		# A dica aparece, e o clique sobe para a plaquinha (a Formação escolhe o herói clicando nela).
+		mark.mouse_filter = Control.MOUSE_FILTER_PASS
 		holder.add_child(mark)
 		row.add_child(holder)
 	else:

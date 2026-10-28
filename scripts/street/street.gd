@@ -879,7 +879,8 @@ func _place_party(delta: float) -> void:
 			var good_step := fmod(phase, TAU) < PI
 			bob *= 1.0 if good_step else float(limp.LimpDip)
 			tilt = deg_to_rad(float(limp.LimpTilt)) * sin(phase) * card.facing
-		card.rotation.z = tilt
+		# Ao parar, o corpo volta ao prumo suave, não num quadro.
+		card.rotation.z = tilt if delta == 0.0 or tilt != 0.0 or reduced else lerpf(card.rotation.z, 0.0, 1.0 - exp(-12.0 * delta))
 		card.position = Vector3(x, _ground_height(z) + bob, z - PARTY_DEPTH_STEP * index)
 
 
@@ -1280,6 +1281,8 @@ func swap_party(a: String, b: String) -> void:
 	var card := _heroes[i]
 	_heroes[i] = _heroes[k]
 	_heroes[k] = card
+	# Quem está ferido acompanha a placa (#194): conferido de novo na ordem nova.
+	_wounded.clear()
 	_place_leader(_leader.position, facing)
 
 
