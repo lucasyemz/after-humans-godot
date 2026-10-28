@@ -12,6 +12,10 @@ extends Node3D
 const FIRE := Vector3(180, 40, 0)
 # O corredor de 10 trechos começa em X 0 e tem 78 m (AHStreetCorridor).
 const CORRIDOR_LENGTH := 78.0
+## Quanto do sol fica sob teto (#175), sem sombra: só para a equipe não sumir no escuro.
+const COVERED_SUN := 0.3
+## Numa zona coberta, quanto o quadro mostra além da ponta (m): a equipe inteira na tela, e lá as colunas da ponta.
+const COVERED_EDGE_REACH := 1.5
 const WEATHER_NAMES := {"clear": "céu limpo", "sunset": "fim de tarde", "rain": "chuva", "storm": "tempestade", "mist": "névoa",
 	"fog": "neblina", "night": "noite", "nightRain": "noite de chuva"}
 const PARTY_SPACING := 1.15
@@ -278,7 +282,7 @@ func _apply_graphics() -> void:
 	_env.ssao_enabled = _forward_plus and fx.ssao
 	_env.volumetric_fog_enabled = _forward_plus and fx.volumetric_fog
 	_env.ssr_enabled = _forward_plus and (_raining or _site_light().get("ssr", false)) and fx.ssr
-	_sun.shadow_enabled = fx.shadows
+	_sun.shadow_enabled = fx.shadows and not (_indoor or sheltered)
 	Settings.apply_lamp_shadows()
 	_rain.amount_ratio = fx.rain_scale
 	_splashes.amount_ratio = fx.rain_scale
@@ -339,6 +343,8 @@ func set_scenario_zone(index: int) -> void:
 	for card in _heroes:
 		card.set_silhouette_foot(maxf(AHSpriteCard.SILHOUETTE_FOOT, edge))
 	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot", "ContainmentCorridor"].has(scenario.map_name)
+	if sheltered:
+		scenario.close_zone_ends(index)
 	_apply_weather()
 
 
@@ -856,8 +862,12 @@ func _update_camera(delta: float) -> void:
 		pitch = deg_to_rad(SCENARIO_PITCH)
 		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(SCENARIO_HALF_FOV)) / get_viewport().get_visible_rect().size.aspect()))
 		var half_view: float = tan(deg_to_rad(SCENARIO_HALF_FOV)) * distance
-		var low: float = _zone.x0 + minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
-		var high: float = _zone.x1 - minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
+		# Numa zona coberta (#175) a borda do quadro vai só um pouco além da ponta, onde ficam as colunas que fecham a
+		# zona (AHScenarioWorld.close_zone_ends): os 4 m mostravam o vazio por fora da sala, e sem folga o líder saía
+		# cortado na borda.
+		var reach: float = half_view - (COVERED_EDGE_REACH if sheltered else 4.0)
+		var low: float = _zone.x0 + minf(reach, (_zone.x1 - _zone.x0) * 0.5)
+		var high: float = _zone.x1 - minf(reach, (_zone.x1 - _zone.x0) * 0.5)
 		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + float(view_spec.height), lane_z)
 	if _indoor:
 		# Dentro da loja, a câmera desce para ficar abaixo do forro e enquadra a sala.
@@ -1044,6 +1054,8 @@ func _apply_weather() -> void:
 	_hud_weather.text = (tr("Noite") if _mood == "night" else tr("Fim de tarde")) + (tr(" · chuva") if _raining else "")
 	if exploration_hud:
 		exploration_hud.set_weather(_hud_weather.text)
+	# A sombra do sol só ao ar livre (#175): sob teto ele é a luz fraca de _update_sun.
+	_sun.shadow_enabled = Settings.effects().shadows and not covered
 	_update_sun(0.0)
 
 
@@ -1058,8 +1070,13 @@ func _update_sun(delta: float) -> void:
 			_flash = 1.0
 	_flash = maxf(0.0, _flash - delta * 3.5)
 	var flicker := _flash * (0.6 + 0.4 * sin(_flash * 40.0))
-	_sun.light_energy = w.sun_energy * direct_scale + flicker * 3.0
-	_sun.light_color = w.sun_color.lerp(Color(0.75, 0.82, 1.0), clampf(flicker, 0.0, 1.0))
+	# Sob teto (a sala de uma loja ou a zona coberta de um cenário) o sol não entra (#175): fica só uma luz fraca e sem
+	# sombra, na direção dele, que mantém a equipe legível sem os raios diagonais pela frente aberta nem o clarão na
+	# parede do lado.
+	var covered := _indoor or sheltered
+	_sun.light_energy = w.sun_energy * direct_scale * COVERED_SUN if covered else w.sun_energy * direct_scale + flicker * 3.0
+	# O clarão do relâmpago não atravessa o teto.
+	_sun.light_color = w.sun_color if covered else w.sun_color.lerp(Color(0.75, 0.82, 1.0), clampf(flicker, 0.0, 1.0))
 
 
 ## Chão molhado: escurece, fica liso e as poças do ruído brilham. wet vai de 0 a 1 devagar.

@@ -45,6 +45,8 @@ const MAX_FOAM_LINES := 4
 ## As portas de dentro dos interiores (#141): a vista de fora (o material) e a luz que entra, por zona. Não escurecem com
 ## o interior: são o lado de fora, com a hora e a chuva de lá (set_doorways).
 var _door_views: Array[ShaderMaterial] = []
+## As zonas cobertas que já ganharam as colunas das pontas (close_zone_ends).
+var _closed_zones: Array[int] = []
 var _door_lights: Array[OmniLight3D] = []
 var doorway_zones: Array[int] = []
 ## A luz de fora pela porta: a cor e a força no fim de tarde e na noite; a chuva tira um pouco e acinzenta.
@@ -54,6 +56,12 @@ const DOOR_RAIN_LIGHT := 0.7
 const DOOR_VIEW_BRIGHTNESS := {"golden": 1.25, "night": 0.75}
 ## A cor da hora de fora na vista: o céu do mapa é de dia, e o fim de tarde lá fora é pêssego (a mesma luz do cais).
 const DOOR_VIEW_TINT := {"golden": Color(1.0, 0.76, 0.58), "night": Color(0.55, 0.6, 0.75)}
+## As colunas que fecham as pontas de uma zona coberta (#175), na frente da faixa (m): a largura, a altura (do piso
+## menos END_CAP_BELOW) e quanto ficam na frente da borda da zona.
+const END_CAP_WIDTH := 2.0
+const END_CAP_HEIGHT := 5.6
+const END_CAP_BELOW := 1.0
+const END_CAP_FRONT := 0.4
 var _blockouts: Array[ShaderMaterial] = []
 ## O que só o Corredor de Contenção tem (#147, tools/build_containment_corridor.py): as lâmpadas que piscam (a luz e o
 ## card, cada uma na sua fase), as portas de segurança e o painel (abertas ou fechadas) e onde fica o vagão.
@@ -277,6 +285,41 @@ func _model(model: Dictionary) -> void:
 		first = false
 	if not first:
 		walls.append(body)
+
+
+## Fecha as pontas de uma zona coberta (#175): uma coluna de cada lado, na frente da faixa e por fora da parede do
+## lado, com a arte dessa parede. A câmera da zona coberta mostra um pouco além da ponta (a equipe não encosta na borda
+## do quadro) e lá, em vez do vazio por fora da sala, fica a parede.
+func close_zone_ends(index: int) -> void:
+	if _closed_zones.has(index):
+		return
+	_closed_zones.append(index)
+	var zone: Dictionary = zones[index]
+	for side in [-1.0, 1.0]:
+		var edge: float = float(zone.x0) if side < 0.0 else float(zone.x1)
+		var box := BoxMesh.new()
+		box.size = Vector3(END_CAP_WIDTH, END_CAP_HEIGHT, 0.4)
+		var cap := MeshInstance3D.new()
+		cap.name = "ZoneEnd_%d_%s" % [index, "left" if side < 0.0 else "right"]
+		cap.mesh = box
+		cap.material_override = _end_material(edge)
+		cap.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		cap.position = Vector3(edge + side * (END_CAP_WIDTH * 0.5 + 0.1), float(zone.y) - END_CAP_BELOW + END_CAP_HEIGHT * 0.5,
+			float(zone.z1) + END_CAP_FRONT)
+		add_child(cap)
+
+
+## A arte da parede do lado nessa ponta (a peça alta e fina junto dela), ou a primeira superfície do mapa.
+func _end_material(edge: float) -> Material:
+	for part in data.parts:
+		var b: Array = part.basis
+		if not part.get("hidden", false) and absf(float(part.origin[0]) - edge) < 0.8 and absf(b[0]) < 0.7 and absf(b[4]) >= 2.5 \
+				and absf(b[8]) >= 3.0:
+			return _materials[int(part.materials[0])]
+	for i in data.materials.size():
+		if data.materials[i].kind == "surface":
+			return _materials[i]
+	return _materials[0]
 
 
 ## As cores da água pintada (#140) que o mapa troca (surface, mid, deep, ripple e foam, em [r, g, b]) e o passo

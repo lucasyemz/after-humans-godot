@@ -548,6 +548,62 @@ static func end_combat(campaign: Dictionary, result: String, boss: bool, _cause:
 		finish_corridor(campaign)
 
 
+# ---------------------------------------------------------------- os caídos no mapa (#179)
+# Quem cai na luta fica no lugar dela, deitado: expedition.downed guarda cada um com o mapa, a posição e a casa (-1 na
+# rua). Levantar (lift) passa o caído para expedition.carried: ele segue com a equipe, sem lutar, e chega à Estação com
+# menos dias de recuperação (data/recovery.json, carried). Quem fica no mapa chega com a recuperação inteira.
+
+## Os caídos da expedição que ainda estão no mapa (sem os levantados): [{hero_id, map, x, y, z, house}].
+static func downed_left(campaign: Dictionary) -> Array:
+	var expedition = campaign.get("session", {}).get("expedition")
+	if expedition == null:
+		return []
+	var carried: Array = expedition.get("carried", [])
+	return expedition.get("downed", []).filter(func(entry): return not carried.has(entry.hero_id))
+
+
+## Os levantados, carregados pela equipe até a volta.
+static func carried(campaign: Dictionary) -> Array:
+	var expedition = campaign.get("session", {}).get("expedition")
+	return expedition.get("carried", []) if expedition != null else []
+
+
+## Depois da luta: quem da equipe caiu e ainda não está no mapa fica onde caiu. places: {hero_id: Vector3} (onde fica o
+## corpo de quem caiu nesta luta); map: o mapa da rua; house: a casa da luta (-1 na rua). Devolve os ids de quem caiu agora.
+static func mark_downed(campaign: Dictionary, places: Dictionary, map: String, house: int = -1) -> Array:
+	var expedition: Dictionary = campaign.session.expedition
+	if not expedition.has("downed"):
+		expedition.downed = []
+	if not expedition.has("carried"):
+		expedition.carried = []
+	var known: Array = expedition.downed.map(func(entry): return entry.hero_id)
+	var fresh: Array = []
+	# Só quem estava nesta luta (places): quem já tinha caído antes, num save de antes do #179, não volta a cair.
+	for hero_id in expedition.team:
+		var entry = _hero(campaign, hero_id)
+		if entry == null or entry.get("alive", true) or not places.has(hero_id) or known.has(hero_id) or expedition.carried.has(hero_id):
+			continue
+		var at: Vector3 = places[hero_id]
+		expedition.downed.append({"hero_id": hero_id, "map": map, "x": at.x, "y": at.y, "z": at.z, "house": house})
+		fresh.append(hero_id)
+	return fresh
+
+
+## Levanta o caído: ele sai do mapa e segue carregado pela equipe. false se ele não está no mapa.
+static func lift(campaign: Dictionary, hero_id: String) -> bool:
+	if not downed_left(campaign).any(func(entry): return entry.hero_id == hero_id):
+		return false
+	campaign.session.expedition.carried.append(hero_id)
+	return true
+
+
+static func _hero(campaign: Dictionary, hero_id: String):
+	for entry in campaign.roster:
+		if entry.id == hero_id:
+			return entry
+	return null
+
+
 ## O guardião vencido conclui a fase (FinishCorridor): saque completo na volta; as casas continuam abertas.
 static func finish_corridor(campaign: Dictionary) -> bool:
 	var expedition: Dictionary = campaign.session.expedition

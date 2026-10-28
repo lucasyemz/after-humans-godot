@@ -7,6 +7,9 @@ const REFERENCE := 1.64
 const HEIGHTS := {
 	# Heróis, pela classe. Mais contraste (decisão do Lucas, 18/10/2026).
 	"cao": 1.72, "gato": 1.50, "sapo": 1.38, "coruja": 1.66,
+	# O Guaxinim e o Tatu (#187), sem altura na Unreal: o guaxinim um pouco menor que a Íris, o tatu baixo e largo. A
+	# arte deles é mais encorpada que a dos fundadores (cabeça grande, cauda e escudo), então a altura fica abaixo.
+	"rato": 1.30, "tatu": 1.35,
 	# Civis.
 	"civil_dora": 1.56, "civil_otto": 1.62, "civil_cora": 1.70,
 	# Inimigos com arte aprovada.

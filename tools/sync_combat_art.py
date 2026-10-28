@@ -9,7 +9,8 @@
 - Ícones das habilidades (SourceArt/ApprovedActionIcons) e os sons do combate (SourceArt/Audio/manifest.json).
 - Recrutas (#32, a entrega #14 do Codex): a variação parada de cada classe, da fonte 2x que já está neste repositório
   (art/combat/source/recruits); o id é o nome do arquivo (dog_recruit_01) e não um id de herói. Cada parado (fundador
-  ou recruta) leva o retrato recortado da entrega #26 (art/ui/portraits), quando existe.
+  ou recruta) leva o retrato recortado da entrega #26 (art/ui/portraits), quando existe. O Guaxinim e o Tatu (#187), sem fundador, vêm da arte aprovada da web antiga
+  (SourceArt/Legacy) com as poses de luta e os ícones das habilidades.
 - O dano e a queda ajoelhada da Íris e da Véspera (Codex, #13): pelo contrato docs/design/combat_reactions_contract.json
   e as fontes da tag codex-pr54-originals. Sem a pasta da Unreal, só esta parte:
       git archive codex-pr54-originals art/combat/source/reactions | tar -x
@@ -60,6 +61,14 @@ RECRUITS = {
     "frog_recruit_01": "sapo",
     "owl_recruit_01": "coruja",
 }
+# O Guaxinim e o Tatu (#187): classes sem fundador, com a arte aprovada da web antiga (SourceArt/Legacy, a mesma tela
+# 1178x1335 em todas as poses). Entram como recrutas, com o parado, um golpe por habilidade (attackN-<habilidade>),
+# o dano, a esquiva, o bloqueio e a queda; os ícones das habilidades vêm da mesma pasta (ability-<habilidade>).
+LEGACY_RECRUITS = {
+    "raccoon_recruit_01": "rato",
+    "armadillo_recruit_01": "tatu",
+}
+LEGACY_REACTIONS = {"hurt": "hurt", "death": "defeat", "dodge": "dodge", "defense": "block"}
 PORTRAITS = PROTO / "art" / "ui" / "portraits"
 # Vilões do John (conceitos de 09/10/2026, idles de SourceArt/CharacterGallery/EnemyHelperIdles20261010): só a pose
 # parada, voltada à direita como os outros. Entram os que a distribuição dele põe num cenário (Lucas, 22/10/2026).
@@ -87,9 +96,11 @@ def convert(src: Path, dst: Path, scale: float = SCALE, force: bool = False) -> 
 
 
 def measured(image: Image.Image) -> dict:
-    """Âncora no pé (centro da base do que é visível) e altura do corpo, pelo alfa."""
+    """Âncora no pé (centro da base do que é visível), altura e largura do corpo, pelo alfa. A largura afasta na fila
+    quem é mais largo que a posição (o escudo do Tatu, #187)."""
     left, top, right, bottom = image.getchannel("A").point(lambda a: 255 if a > 24 else 0).getbbox()
-    return {"anchor": [(left + right) / 2, bottom], "body_reference_pixels": bottom - top, "canvas": [image.width, image.height]}
+    return {"anchor": [(left + right) / 2, bottom], "body_reference_pixels": bottom - top, "body_width_pixels": right - left,
+            "canvas": [image.width, image.height]}
 
 
 def with_portrait(idle: dict, name: str) -> dict:
@@ -107,6 +118,21 @@ def recruits() -> dict:
         dst = ART / "recruits" / f"{variant}_idle.webp"
         image = convert(src, dst)
         out[variant] = {"class_id": class_id, "idle": with_portrait({"file": res(dst), **measured(image)}, variant)}
+    for variant, class_id in LEGACY_RECRUITS.items():
+        source = LEGACY / "public" / "characters" / "approved" / class_id
+        folder = ART / "recruits" / variant
+        # Todas as poses com as medidas do parado: o pé no mesmo ponto e a queda ajoelhada sem crescer.
+        measures = measured(convert(source / f"{class_id}-idle.png", folder / "idle.webp"))
+        entry = {"class_id": class_id, "idle": with_portrait({"file": res(folder / "idle.webp"), **measures}, variant),
+                 "actions": {}, "reactions": {}}
+        for src in sorted(source.glob(f"{class_id}-attack*-*.png")):
+            ability = src.stem.split("-", 2)[2]
+            convert(src, folder / f"{ability}.webp")
+            entry["actions"][ability] = {"execucao": {"file": res(folder / f"{ability}.webp"), **measures}}
+        for pose, name in LEGACY_REACTIONS.items():
+            convert(source / f"{class_id}-{name}.png", folder / f"{pose}.webp")
+            entry["reactions"][pose] = {"file": res(folder / f"{pose}.webp"), **measures}
+        out[variant] = entry
     return out
 
 
@@ -253,6 +279,12 @@ def icons() -> dict:
         image = Image.open(src)
         convert(src, dst, ICON_SIZE / image.width)
         out[src.stem] = res(dst)
+    for class_id in LEGACY_RECRUITS.values():
+        for src in sorted((LEGACY / "public" / "characters" / "approved" / class_id).glob(f"{class_id}-ability-*.png")):
+            ability = src.stem.split("-", 2)[2]
+            dst = ART / "icons" / f"{ability}.webp"
+            convert(src, dst, ICON_SIZE / Image.open(src).width)
+            out[ability] = res(dst)
     return out
 
 

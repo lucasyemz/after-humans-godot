@@ -16,6 +16,11 @@ const SIDE_MARGIN := 0.65
 const BACK_MARGIN := 0.75
 const HEIGHT := 3.4
 const WALL_HEIGHT := 3.2
+## O pedaço de rua do lado de fora da porta (m): até onde vai o muro em frente e o muro do lado, atrás da porta.
+const DOORSTEP_DEPTH := 2.6
+const DOORSTEP_BACK_Z := -3.4
+## O tom das paredes do lado sobre a arte da parede do fundo.
+const SIDE_WALL_SHADE := Color(0.62, 0.58, 0.55)
 const DOOR_Z := Vector2(-1.4, 0.4)
 const SPOT_FRACTIONS := [0.36, 0.56, 0.74]
 ## A frente dos objetos de busca (#50): na frente dos móveis pintados no fundo, atrás de onde a equipe anda (a colisão
@@ -32,6 +37,10 @@ const WALL_ITEMS := [
 	[1, 3, 250, 150, 70], [1, 0, 470, 105, 125], [1, 1, 960, 15, 195], [1, 2, 1190, 25, 205],
 	[2, 0, 177, 40, 190], [2, 5, 387, 30, 245], [2, 3, 569, 120, 42], [2, 1, 741, 40, 190], [2, 2, 950, 180, 62], [2, 4, 1132, 180, 62],
 ]
+
+## Os materiais da rua de fora e das paredes do lado, montados uma vez só (abrir outra loja reaproveita), pelo
+## arquivo da rua ou pela arte da loja.
+static var _surfaces := {}
 
 var shop := 0
 ## Caixas de colisão visíveis com C (a rua junta estas às dela enquanto a sala está aberta).
@@ -132,6 +141,50 @@ func _search_prop(i: int, open: bool) -> void:
 	_solid((back + front) * 0.5, front - back)
 
 
+## O lado de fora da porta (#175): um pedaço da rua (o asfalto, o muro de tijolo em frente e o do lado, e o forro do
+## beiral), para o vão da porta não abrir para o céu. Fica fora da sala, sem colisão (a equipe sai pela porta e troca
+## de cena antes de chegar lá).
+func _doorstep() -> void:
+	var ground := _street_surface("asphalt-v1.webp")
+	var brick := _street_surface("alley-brick-v1.webp")
+	_box(Vector3(-DOORSTEP_DEPTH, -0.2, DOORSTEP_BACK_Z), Vector3(-0.3, 0.0, DOOR_Z.y + 0.6), ground, false)
+	_box(Vector3(-DOORSTEP_DEPTH - 0.3, -0.2, DOORSTEP_BACK_Z), Vector3(-DOORSTEP_DEPTH, HEIGHT, DOOR_Z.y + 0.6), brick, false)
+	_box(Vector3(-DOORSTEP_DEPTH, -0.2, DOORSTEP_BACK_Z - 0.3), Vector3(-0.3, HEIGHT, DOORSTEP_BACK_Z), brick, false)
+	_box(Vector3(-DOORSTEP_DEPTH, 2.6, DOORSTEP_BACK_Z), Vector3(-0.3, 2.8, DOOR_Z.y + 0.6), _tone(Color(0.06, 0.05, 0.045)), false)
+
+
+static func _street_surface(file: String) -> StandardMaterial3D:
+	if _surfaces.has(file):
+		return _surfaces[file]
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = load("res://art/street/" + file)
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	material.uv1_triplanar = true
+	material.uv1_world_triplanar = true
+	material.uv1_scale = Vector3.ONE / 2.5
+	material.roughness = 0.95
+	_surfaces[file] = material
+	return material
+
+
+## As paredes do lado com a mesma arte do fundo, mais escura (ficam de quina para a luz), em vez do reboco liso (#175).
+## A textura vai pelo mundo (triplanar), na altura da parede, para o desenho não esticar na profundidade.
+static func _side_wall(art: String) -> StandardMaterial3D:
+	if _surfaces.has(art):
+		return _surfaces[art]
+	var texture: Texture2D = load(ART + art + "-walltile-seamless.webp")
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = texture
+	material.albedo_color = SIDE_WALL_SHADE
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	material.uv1_triplanar = true
+	material.uv1_world_triplanar = true
+	material.uv1_scale = Vector3.ONE / WALL_HEIGHT
+	material.roughness = 0.95
+	_surfaces[art] = material
+	return material
+
+
 static func _tone(color: Color) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
@@ -191,7 +244,7 @@ func _back_wall(art: String) -> void:
 
 
 func _walls() -> void:
-	var plaster := _tone(Color(0.24, 0.19, 0.15))
+	var plaster := _side_wall(SHOP_ART[shop])
 	# Esquerda: a fachada vista de dentro, com o vão da porta na linha da equipe.
 	_box(Vector3(-0.3, 0, BACK_Z - 0.3), Vector3(0, HEIGHT, DOOR_Z.x), plaster, true)
 	_box(Vector3(-0.3, 0, DOOR_Z.y), Vector3(0, HEIGHT, FRONT_Z), plaster, true)
@@ -203,6 +256,7 @@ func _walls() -> void:
 	street_light.light_energy = 1.2
 	street_light.omni_range = 5.0
 	add_child(street_light)
+	_doorstep()
 	_box(Vector3(WIDTH, 0, BACK_Z - 0.3), Vector3(WIDTH + 0.3, HEIGHT, FRONT_Z), plaster, true)
 	# Frente aberta para a câmera, mas com colisão (a equipe não sai da sala pela frente).
 	_solid(Vector3(WIDTH * 0.5, 1.0, WALK_FRONT_Z + 0.1), Vector3(WIDTH, 2.0, 0.2))

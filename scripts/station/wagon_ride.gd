@@ -28,6 +28,9 @@ const TUNNEL_Z := -2.7
 const LAMP_SPACING := 3.6
 const SPEED := 13.0
 const WARM := Color(1.0, 0.78, 0.52)
+## O trem andando na passagem (#133), no canal do Ambiente.
+const RIDE_SOUND := "res://audio/station/train_ride.ogg"
+const RIDE_GAIN := 0.8
 
 ## A equipe (ids dos heróis, posição 1 primeiro).
 var team: Array = []
@@ -54,8 +57,19 @@ static func departure_card(campaign: Dictionary) -> Dictionary:
 	if card.is_empty() or expedition == null:
 		return card
 	card.backdrop = AHWagonRide.new(expedition.get("team", []))
+	# O trem saindo da plataforma, andando no túnel e freando na chegada (#133).
+	card.sound = {"loop": RIDE_SOUND, "gain": RIDE_GAIN, "start": "res://audio/station/train_departure.ogg",
+		"end": "res://audio/station/train_brake.ogg"}
 	card.title_delay = RIDE_SECONDS
 	card.hold = RIDE_SECONDS + GameFlow.CARD_SECONDS
+	return card
+
+
+## O cartão da volta à Estação (#133): o da Estação, com o trem andando por baixo. A freada, o sino e a chegada tocam
+## na plataforma, já na Estação.
+static func return_card() -> Dictionary:
+	var card: Dictionary = GameFlow.card_for("station")
+	card.sound = {"loop": RIDE_SOUND, "gain": RIDE_GAIN}
 	return card
 
 
