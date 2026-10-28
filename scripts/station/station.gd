@@ -556,8 +556,8 @@ func _go(key: Dictionary, platform: bool, instant: bool) -> void:
 	on_platform = platform
 
 
-## Plataforma -> diante do painel -> porta -> antecâmara -> eixo de escadas -> abrigo (e o inverso), com o painel do
-## mapa da rede abrindo e fechando atrás da equipe (StartPassage da Unreal).
+## Plataforma -> diante da parede secreta -> porta -> antecâmara -> eixo de escadas -> abrigo (e o inverso), com a
+## parede falsa (#203) abrindo e fechando atrás da equipe (StartPassage da Unreal).
 func _start_passage(down: bool, final: Dictionary) -> void:
 	var door := ue_key(DOOR_X * 100 + 60, 760, 150, 50, -2)
 	var antechamber := ue_key(3080, 1150, 140, 56, -6)
@@ -577,12 +577,15 @@ func passage_moving() -> bool:
 	return not _path.is_empty()
 
 
-## O painel desliza 3 m para a esquerda, a alavanca gira e a fresta de luz some (ApplyPanel).
+## A parede falsa (#203) desliza 3 m para a esquerda, a alavanca gira e a fresta de luz some (ApplyPanel).
 func _apply_panel(open: float) -> void:
 	_panel_open = clampf(open, 0.0, 1.0)
 	var eased := smoothstep(0.0, 1.0, _panel_open)
 	if _build.panel:
 		_build.panel.position.x = DOOR_X - PANEL_SLIDE * eased
+		# O azulejo e o concreto da parede falsa (#203) andam com ela.
+		for material in _build.panel_materials:
+			material.set_shader_parameter("slide_offset", Vector3(-PANEL_SLIDE * eased, 0, 0))
 	if _build.lever:
 		_build.lever.basis = AHStationBuilder.basis(0, 0, -110.0 * clampf(_panel_open * 4.0, 0.0, 1.0))
 	if _build.slit:
