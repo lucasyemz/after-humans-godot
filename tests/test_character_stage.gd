@@ -107,7 +107,7 @@ func _stage(station, profile: String, fallen_id: String) -> void:
 
 ## O revisor do #200 e o Lucas: a arte mais larga (o escudo do Tatu) cabe no vão também no Maior, na escala de todos (a
 ## coluna da esquerda é que é estreita), a câmera não se mexe ao refazer a
-## tela com o mesmo vão, a respiração não apaga a escala da placa e outra tela (a chegada) tira o escolhido da sala.
+## tela com o mesmo vão e outra tela (a chegada) tira o escolhido da sala.
 func _wide(station, profile: String) -> void:
 	var hud: AHRefugeHud = station.hud
 	var tatu = Campaign.state.roster.filter(func(h): return h.class_id == "tatu")
@@ -139,10 +139,6 @@ func _wide(station, profile: String) -> void:
 	screen.rebuild()
 	await _frames(4)
 	t.equal(station._goal, goal, "%s: refazer a tela com o mesmo vão não mexe na câmera" % profile)
-	station.stage_scale = Vector3(1.5, 1.5, 1.5)
-	await _frames(2)
-	t.check(is_equal_approx(station.stage_card.scale.x, 1.5) and station.stage_card.scale.y > 1.45, "%s: a respiração respeita a escala da placa" % profile)
-	station.stage_scale = Vector3.ONE
 	hud.current = AHRefugeHud.ARRIVAL
 	hud.refresh()
 	await _frames(3)

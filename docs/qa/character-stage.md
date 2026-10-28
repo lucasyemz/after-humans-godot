@@ -103,6 +103,9 @@ placa sai, os moradores voltam onde estavam, os pés ficam no chão e nada tapa 
   - Com o vão maior, o Tatu cabe no Maior na mesma escala de todos, com 16 px de folga de cada lado.
 - **A câmera:** ela só se move quando o vão muda, e não a cada vez que a tela é refeita.
 - **Outra tela:** a chegada, o trem, o relatório ou a partida fecham a Sala e tiram o escolhido do cômodo.
-- **A respiração:** ela se soma à escala da placa (`stage_scale`) em vez de sobrescrever.
+- **O inglês no Maior:** com o nome mais longo ("Emergency Sledgehammer"), a coluna continua em 540 px, e o título do
+  detalhe quebra a linha.
+
+  ![o Tatu em inglês, no Maior: a coluna em 540 px](character-stage/english-larger.jpg)
 - O `tools/capture_181.gd` saiu. As fotos são de uma captura temporária: o Tatu entrou no elenco como recruta.
 - O `test_character_stage` confere o Tatu no Normal e no Maior: a escala dos outros e a folga no vão.

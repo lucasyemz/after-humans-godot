@@ -161,8 +161,6 @@ var _arrivals: Array = []
 ## A placa dele de morador só fica escondida (hide_residents), então, ao sair, cada um está onde estava.
 var stage_card: AHSpriteCard
 var stage_hero := ""
-## A escala da placa do escolhido; a respiração multiplica por cima dela.
-var stage_scale := Vector3.ONE
 ## O trem da volta fechando e indo embora depois de a equipe descer (não conta como cena do trem ocupada).
 var _team_train_leaving := false
 
@@ -301,8 +299,8 @@ func _process(delta: float) -> void:
 		_tick_reopen()
 	_walk(delta)
 	if is_instance_valid(stage_card):
-		# A respiração do parado, como a dos moradores esperando, por cima da escala da placa (não a substitui).
-		stage_card.scale = stage_scale * Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
+		# A respiração do parado, como a dos moradores esperando.
+		stage_card.scale = Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
 	_tick_leaving(delta)
 	if not _held_go.is_empty() and (not lineup_leaving() or Time.get_ticks_msec() >= _hold_until):
 		var held := _held_go
@@ -489,8 +487,7 @@ func focus_room_stage(room_id: String, left_px: float, right_px: float, instant:
 	var pitch := -3.0
 	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
 	var drop := atan((STAGE_FEET - 540.0) / focal) + deg_to_rad(-pitch)
-	# Todos na mesma escala (o Lucas não quer a câmera recuando): o vão entre os painéis é que cabe a arte mais larga, o
-	# escudo do Tatu no texto Maior (a coluna da esquerda da Sala, mais estreita).
+	# Todos na mesma escala: a coluna estreita da Sala deixa o vão caber o Tatu no Maior.
 	var distance: float = focal / STAGE_PX_PER_METER
 	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * distance / focal
 	_go({"pos": Vector3(x, room.floor + distance * tan(drop), LANE_Z + distance), "fov": fov, "pitch": pitch}, false, instant)
