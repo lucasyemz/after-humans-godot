@@ -2717,7 +2717,7 @@ func _character_room() -> void:
 	_room_screen = AHCharacterRoom.make(self)
 	add_child(_room_screen)
 	move_child(_room_screen, _panel.get_index())
-	station.focus_room_stage(S.CHARACTERS, AHCharacterRoom.LEFT.end.x, AHCharacterRoom.RIGHT.position.x)
+	# A câmera entra no cômodo pelo vão real entre os painéis (a própria tela a chama depois de montar, #181).
 	station.hide_residents(true)
 
 
@@ -2730,6 +2730,8 @@ func open_from_room(service: String) -> void:
 func _close_room_screen() -> void:
 	if is_instance_valid(_room_screen):
 		_room_screen.queue_free()
+		# O escolhido sai do cômodo; os moradores reaparecem onde estavam (#181).
+		station.clear_stage_hero()
 		station.hide_residents(false)
 	_room_screen = null
 

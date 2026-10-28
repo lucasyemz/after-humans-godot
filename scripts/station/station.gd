@@ -53,9 +53,11 @@ const REPORT_FEET_Y := 634.0
 ## Na fila do relatório, um pouco mais afastados que na partida: a câmera recua e os heróis cabem entre a faixa do alto
 ## (que cresce no texto Maior) e as abas das cartas.
 const REPORT_SPACING := 2.6
-## A Sala dos Personagens no kit (#60): o teto e o piso do cômodo na tela.
-const STAGE_TOP := 112.0
-const STAGE_FLOOR := 900.0
+## A Sala dos Personagens (#181): os pés do herói na tela e o tamanho da figura antiga da interface (o Nick, 1,50 m, com
+## 555 px da orelha ao pé em 1080; o Bento, 1,72 m, com 630 px). A arte passa um pouco da altura do corpo, então a
+## escala medida na tela é 381 px por metro de body_height, e os pés caem perto de y 878, como antes.
+const STAGE_FEET := 890.0
+const STAGE_PX_PER_METER := 381.0
 ## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
 ## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
 ## o candidato desce e anda; só então a câmera fecha nele. Na saída: o recusado volta ao trem, o sino avisa, as portas
@@ -153,6 +155,10 @@ var _env: Environment
 var _post: ShaderMaterial
 ## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt}.
 var _arrivals: Array = []
+## O herói escolhido na Sala dos Personagens (#181): de pé no cômodo, na escala da Estação, enquanto a tela está aberta.
+## A placa dele de morador só fica escondida (hide_residents), então, ao sair, cada um está onde estava.
+var stage_card: AHSpriteCard
+var stage_hero := ""
 ## O trem da volta fechando e indo embora depois de a equipe descer (não conta como cena do trem ocupada).
 var _team_train_leaving := false
 
@@ -290,6 +296,9 @@ func _process(delta: float) -> void:
 	if _reopen_pending:
 		_tick_reopen()
 	_walk(delta)
+	if is_instance_valid(stage_card):
+		# A respiração do parado, como a dos moradores esperando.
+		stage_card.scale = Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
 	_tick_leaving(delta)
 	if not _held_go.is_empty() and (not lineup_leaving() or Time.get_ticks_msec() >= _hold_until):
 		var held := _held_go
@@ -465,9 +474,9 @@ func focus_room(room_id: String, instant: bool = false) -> void:
 	_go(_framed_key(room.x0 + ROOM_CROP, room.x1 - ROOM_CROP, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
 
 
-## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): a câmera fecha na altura do
-## cômodo (do teto em STAGE_TOP ao piso em STAGE_FLOOR, na tela), então o fundo atrás do herói é só o próprio cômodo,
-## sem a plataforma e o trem em cima nem o andar de baixo.
+## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): o meio da sala entre os painéis, e a
+## câmera dentro do cômodo, perto o bastante para o herói ter o tamanho da figura antiga da interface (#181, o pedido
+## do Lucas), com os pés em STAGE_FEET. Cada herói mantém a altura dele.
 func focus_room_stage(room_id: String, left_px: float, right_px: float, instant: bool = false) -> void:
 	var room := room_def(room_id)
 	if room.is_empty():
@@ -475,15 +484,44 @@ func focus_room_stage(room_id: String, left_px: float, right_px: float, instant:
 	var fov := 26.0
 	var pitch := -3.0
 	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
-	var depth: float = focal * (room.ceiling - room.floor) / (STAGE_FLOOR - STAGE_TOP)
-	var drop := atan((STAGE_FLOOR - 540.0) / focal) + deg_to_rad(-pitch)
-	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * depth / focal
-	_go({"pos": Vector3(x, room.floor + depth * tan(drop), depth), "fov": fov, "pitch": pitch}, false, instant)
+	var drop := atan((STAGE_FEET - 540.0) / focal) + deg_to_rad(-pitch)
+	var distance: float = focal / STAGE_PX_PER_METER
+	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * distance / focal
+	_go({"pos": Vector3(x, room.floor + distance * tan(drop), LANE_Z + distance), "fov": fov, "pitch": pitch}, false, instant)
 
 
 ## A câmera chegou aonde ia (sem caminho pela passagem e perto da chave).
 func camera_settled() -> bool:
 	return _path.is_empty() and not _goal.is_empty() and _key.pos.distance_to(_goal.pos) < 0.02
+
+
+## O herói escolhido na Sala dos Personagens (#181) entra no cômodo: a pose parada, os pés no chão, no meio da sala (o
+## meio entre os painéis, pelo focus_room_stage). Trocar de herói troca a placa; "" tira.
+func show_stage_hero(hero_id: String) -> void:
+	if hero_id == stage_hero and is_instance_valid(stage_card):
+		return
+	clear_stage_hero()
+	var art := _hero_art(S.hero(Campaign.state, hero_id)) if hero_id != "" else {}
+	if art.is_empty():
+		return
+	var room := room_def(S.CHARACTERS)
+	stage_card = AHSpriteCard.new()
+	stage_card.name = "StageHero"
+	stage_card.body_height = AHCharacterHeights.find(hero_id)
+	stage_card.show_art(art.idle)
+	add_child(stage_card)
+	stage_card.position = Vector3((room.x0 + room.x1) * 0.5, room.floor, LANE_Z)
+	stage_card.set_facing(1.0)
+	stage_hero = hero_id
+
+
+func clear_stage_hero() -> void:
+	if is_instance_valid(stage_card):
+		# Fora da árvore já: a placa nova, no mesmo quadro, fica com o nome StageHero.
+		remove_child(stage_card)
+		stage_card.queue_free()
+	stage_card = null
+	stage_hero = ""
 
 
 ## Todos os moradores (heróis e civis) somem enquanto uma tela do kit cobre a Estação: nenhum aparece no vão entre os
