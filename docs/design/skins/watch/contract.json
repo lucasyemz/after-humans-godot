@@ -1,0 +1,626 @@
+{
+  "issue": 137,
+  "skin_id": "watch",
+  "hero": "bento",
+  "base_commit": "177c70d",
+  "origin_folder": "art/combat/source/bento_watch_20261028",
+  "source_tag": "codex-pr<N>-originals",
+  "format": "WEBP RGBA",
+  "poses": 16,
+  "portraits": 1,
+  "files": [
+    {
+      "name": "idle",
+      "file": "art/skins/bento/watch/idle.webp",
+      "reference": "art/combat/heroes/bento/idle.webp",
+      "size": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "source_file": "idle.png",
+      "canonical_canvas": [
+        1086,
+        1448
+      ],
+      "canonical_anchor": [
+        473.0,
+        1429
+      ],
+      "texture_anchor": [
+        236.5,
+        714.5
+      ],
+      "body_reference_pixels": 1419,
+      "bbox": [
+        31,
+        5,
+        524,
+        714
+      ],
+      "sha256": "e332f34f102fb0142fa952353f20079f036903be0578ab572821e7b208282827",
+      "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+      "source_sha256": "599793f5a101af3f9ca9b1b4a2bc75494f76bae6f07bf6822ef2ed6477681cb1"
+    },
+    {
+      "name": "cao_fique_atras_de_mim_execucao",
+      "file": "art/skins/bento/watch/cao_fique_atras_de_mim_execucao.webp",
+      "reference": "art/combat/heroes/bento/cao_fique_atras_de_mim_execucao.webp",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "source_file": "cao_fique_atras_de_mim_execucao.png",
+      "canonical_canvas": [
+        1178,
+        1335
+      ],
+      "canonical_anchor": [
+        595,
+        1323
+      ],
+      "texture_anchor": [
+        297.5,
+        661.5
+      ],
+      "body_reference_pixels": 1310,
+      "bbox": [
+        20,
+        1,
+        580,
+        662
+      ],
+      "sha256": "bf09c532117d065dfec69982080824e13bbd448173005407caf19e75b43a8a74",
+      "reference_sha256": "0f7f097ddfdee4a0813ee25536c5b87795a971cb224f10bc0d0843f74ef00c2e",
+      "source_sha256": "ada97cf0204620cd155c4bfeaec24ca5a3d841dd95d187024f1b86a220de172c"
+    },
+    {
+      "name": "cao_fique_atras_de_mim_preparacao",
+      "file": "art/skins/bento/watch/cao_fique_atras_de_mim_preparacao.webp",
+      "reference": "art/combat/heroes/bento/cao_fique_atras_de_mim_preparacao.webp",
+      "size": [
+        550,
+        716
+      ],
+      "source_canvas": [
+        1099,
+        1431
+      ],
+      "source_file": "cao_fique_atras_de_mim_preparacao.png",
+      "canonical_canvas": [
+        1099,
+        1431
+      ],
+      "canonical_anchor": [
+        580,
+        1378
+      ],
+      "texture_anchor": [
+        290.2638762511374,
+        689.6269335759781
+      ],
+      "body_reference_pixels": 1310,
+      "bbox": [
+        11,
+        33,
+        546,
+        690
+      ],
+      "sha256": "1a5f54fd6c3d0416f903d287466d49e29ebfabcb3004e324a1e5283f3f7b3af1",
+      "reference_sha256": "c728de08f3a04d2b834b708caa9e230a72bd9a5cfc80717daea6cf8079049b9e",
+      "source_sha256": "614f9c5b0ee456f3d66dd33c0be62b6dd75e515e3acd6eca057cc4abf29d2fb2"
+    },
+    {
+      "name": "cao_impacto_hidraulico_execucao",
+      "file": "art/skins/bento/watch/cao_impacto_hidraulico_execucao.webp",
+      "reference": "art/combat/heroes/bento/cao_impacto_hidraulico_execucao.webp",
+      "size": [
+        590,
+        667
+      ],
+      "source_canvas": [
+        1179,
+        1334
+      ],
+      "source_file": "cao_impacto_hidraulico_execucao.png",
+      "canonical_canvas": [
+        1179,
+        1334
+      ],
+      "canonical_anchor": [
+        610,
+        1292
+      ],
+      "texture_anchor": [
+        305.2586938083121,
+        646.5479219677693
+      ],
+      "body_reference_pixels": 1190,
+      "bbox": [
+        7,
+        59,
+        584,
+        646
+      ],
+      "sha256": "6a427468511b7b82cd21597adf2d1cf6a941c068a6316c5508e93c255e502661",
+      "reference_sha256": "7b269ea802454ce10921ae1ac26b1e62581a4658608b4cac235031bd91130e93",
+      "source_sha256": "1c517fa7b1284cb1934b7dbdd687cdfc2a2f7774403ca0e1159780ad170d69ba"
+    },
+    {
+      "name": "cao_impacto_hidraulico_preparacao",
+      "file": "art/skins/bento/watch/cao_impacto_hidraulico_preparacao.webp",
+      "reference": "art/combat/heroes/bento/cao_impacto_hidraulico_preparacao.webp",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "source_file": "cao_impacto_hidraulico_preparacao.png",
+      "canonical_canvas": [
+        1178,
+        1335
+      ],
+      "canonical_anchor": [
+        615,
+        1298
+      ],
+      "texture_anchor": [
+        307.5,
+        649.0
+      ],
+      "body_reference_pixels": 1190,
+      "bbox": [
+        36,
+        54,
+        584,
+        650
+      ],
+      "sha256": "83bda302467f9824f0a668d6e9664fbfea438319c9b798c31576b6abfcdbbc98",
+      "reference_sha256": "67b11d5f87f438f4537ae1082a8585812928fb26d9573a14542cfb93efff972b",
+      "source_sha256": "91c73508ff7d01b08df0195eaf72ed70d1720dbad9139d7ba026a8d647a70469"
+    },
+    {
+      "name": "cao_nao_estamos_sos_execucao",
+      "file": "art/skins/bento/watch/cao_nao_estamos_sos_execucao.webp",
+      "reference": "art/combat/heroes/bento/cao_nao_estamos_sos_execucao.webp",
+      "size": [
+        550,
+        716
+      ],
+      "source_canvas": [
+        1099,
+        1431
+      ],
+      "source_file": "cao_nao_estamos_sos_execucao.png",
+      "canonical_canvas": [
+        1099,
+        1431
+      ],
+      "canonical_anchor": [
+        580,
+        1417
+      ],
+      "texture_anchor": [
+        290.2638762511374,
+        709.1446769790718
+      ],
+      "body_reference_pixels": 1410,
+      "bbox": [
+        31,
+        6,
+        546,
+        710
+      ],
+      "sha256": "c2316e90f07759231a73f49d798c213108515c3adf62368037ef8138b22227aa",
+      "reference_sha256": "ba6c4c6cec04a05a6dc00b77c055ca122e5d5fe68d23c0e521ae653977d67c83",
+      "source_sha256": "4b6058e6011c7e2719c8c4297b36c40866e5365001f06c8f39a201f90772b0cf"
+    },
+    {
+      "name": "cao_nao_estamos_sos_preparacao",
+      "file": "art/skins/bento/watch/cao_nao_estamos_sos_preparacao.webp",
+      "reference": "art/combat/heroes/bento/cao_nao_estamos_sos_preparacao.webp",
+      "size": [
+        549,
+        716
+      ],
+      "source_canvas": [
+        1098,
+        1432
+      ],
+      "source_file": "cao_nao_estamos_sos_preparacao.png",
+      "canonical_canvas": [
+        1098,
+        1432
+      ],
+      "canonical_anchor": [
+        595,
+        1420
+      ],
+      "texture_anchor": [
+        297.5,
+        710.0
+      ],
+      "body_reference_pixels": 1410,
+      "bbox": [
+        48,
+        5,
+        530,
+        712
+      ],
+      "sha256": "7dc442744c4a2354ca3cd3e92fdb5c3b71c1f15fdb823da634bd596f1d74e42e",
+      "reference_sha256": "e2a1885cc640129597b9d30b2cdb9ebda4bd6509787c39d8204bdb13526a331f",
+      "source_sha256": "17c7d6b35e441dcdbe7234467026194e291746c4543107c298d82a22875450ed"
+    },
+    {
+      "name": "cao_punho_sucata_execucao",
+      "file": "art/skins/bento/watch/cao_punho_sucata_execucao.webp",
+      "reference": "art/combat/heroes/bento/cao_punho_sucata_execucao.webp",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "source_file": "cao_punho_sucata_execucao.png",
+      "canonical_canvas": [
+        1178,
+        1335
+      ],
+      "canonical_anchor": [
+        610,
+        1212
+      ],
+      "texture_anchor": [
+        305.0,
+        606.0
+      ],
+      "body_reference_pixels": 1080,
+      "bbox": [
+        35,
+        93,
+        566,
+        607
+      ],
+      "sha256": "1652b2f481eaa50d9e58f5b2336dfaba194326444e0af75f4d950703f098ec0d",
+      "reference_sha256": "961866110d865c0659031093150fab1818fdd356113e6af6599192fe588e27f3",
+      "source_sha256": "569f7d7bd833d0df9e0c126eb6821b02360d838c1db4c5db2d80eccdb0a8673a"
+    },
+    {
+      "name": "cao_punho_sucata_preparacao",
+      "file": "art/skins/bento/watch/cao_punho_sucata_preparacao.webp",
+      "reference": "art/combat/heroes/bento/cao_punho_sucata_preparacao.webp",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "source_file": "cao_punho_sucata_preparacao.png",
+      "canonical_canvas": [
+        1178,
+        1335
+      ],
+      "canonical_anchor": [
+        600,
+        1248
+      ],
+      "texture_anchor": [
+        300.0,
+        624.0
+      ],
+      "body_reference_pixels": 1080,
+      "bbox": [
+        29,
+        84,
+        565,
+        626
+      ],
+      "sha256": "b095ac68460a522de31290d2da19fe94746d5340c95b6d40385d389656e95572",
+      "reference_sha256": "0bacc11a1bab5379a8b1236c63a47e88006e40918baaeb2472e2195460e1ce9b",
+      "source_sha256": "3e62c467fc8293fc7e7471dc63be5a5abb5e114b336d67764f01bda8aa37486b"
+    },
+    {
+      "name": "hurt",
+      "file": "art/skins/bento/watch/hurt.webp",
+      "reference": "art/combat/heroes/bento/hurt.webp",
+      "size": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "source_file": "hurt.png",
+      "canonical_canvas": [
+        1086,
+        1448
+      ],
+      "canonical_anchor": [
+        590,
+        1428
+      ],
+      "texture_anchor": [
+        295.0,
+        714.0
+      ],
+      "body_reference_pixels": 1420,
+      "bbox": [
+        7,
+        4,
+        542,
+        715
+      ],
+      "sha256": "e443497b6616bb1aa01a294668f7ecda1d3751b76341de099b7dfef1485e6e38",
+      "reference_sha256": "fd5cd5ced71b76fa0342b42208a50bc79a42c14568d258a150d802b60ac89844",
+      "source_sha256": "3768a2b603c20070bc865acc9cb15bd3119421528dafc150cf93d7cf787ed00a"
+    },
+    {
+      "name": "death",
+      "file": "art/skins/bento/watch/death.webp",
+      "reference": "art/combat/heroes/bento/death.webp",
+      "size": [
+        627,
+        627
+      ],
+      "source_canvas": [
+        1254,
+        1254
+      ],
+      "source_file": "death.png",
+      "canonical_canvas": [
+        1254,
+        1254
+      ],
+      "canonical_anchor": [
+        680,
+        1198
+      ],
+      "texture_anchor": [
+        340.0,
+        599.0
+      ],
+      "body_reference_pixels": 1950,
+      "bbox": [
+        49,
+        38,
+        626,
+        603
+      ],
+      "sha256": "e263204925874038e9520b2ae1d6487d764209d01cc5e2302768800a8044e6a8",
+      "reference_sha256": "42afa20f57080bd9d4d3d7bf80e61c71e2473c342eff93cd66712dcc5ed38f50",
+      "source_sha256": "ed1c47bacfe1b03003f13b3fbda58f85d601067b0b313b2d670b164577a8220b"
+    },
+    {
+      "name": "item",
+      "file": "art/skins/bento/watch/item.webp",
+      "reference": "art/combat/heroes/bento/item.webp",
+      "size": [
+        608,
+        647
+      ],
+      "source_canvas": [
+        1216,
+        1294
+      ],
+      "source_file": "item.png",
+      "canonical_canvas": [
+        1216,
+        1294
+      ],
+      "canonical_anchor": [
+        700,
+        1274
+      ],
+      "texture_anchor": [
+        350.0,
+        637.0
+      ],
+      "body_reference_pixels": 1253,
+      "bbox": [
+        84,
+        9,
+        497,
+        638
+      ],
+      "sha256": "5fd68cb055181dca0f006aaaf2365c4b7f2dd49858a2ad0507167a662af38982",
+      "reference_sha256": "9f766b4fd0a46851880f63b738332311f30c02fc9ab006d9de39c8b56007c43a",
+      "source_sha256": "f95d2d92b2cdb964c99d9a1b3addcf2d00d7b66970b622d086f16ec2e6c2a898"
+    },
+    {
+      "name": "hero_cao_bento_seat",
+      "file": "art/skins/bento/watch/hero_cao_bento_seat.webp",
+      "reference": "art/station/poses/hero_cao_bento_seat.webp",
+      "size": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        543,
+        724
+      ],
+      "source_file": "hero_cao_bento_seat.png",
+      "canonical_canvas": [
+        543,
+        724
+      ],
+      "canonical_anchor": [
+        283,
+        710
+      ],
+      "texture_anchor": [
+        283.0,
+        710.0
+      ],
+      "body_reference_pixels": 948,
+      "bbox": [
+        12,
+        27,
+        542,
+        710
+      ],
+      "sha256": "efef802ecfdb3eafba2911d30d9bde932d9eeda6436891f7bae47c77c3a9db1b",
+      "reference_sha256": "976b0742f1b20cd35537d24bf523fb76df38743d1a635cdea55d33d54ef29bab",
+      "source_sha256": "531b6922766f3c7ad9343e91aadf352cdcf16b516de508a69173b48a11457782"
+    },
+    {
+      "name": "hero_cao_bento_sleep",
+      "file": "art/skins/bento/watch/hero_cao_bento_sleep.webp",
+      "reference": "art/station/poses/hero_cao_bento_sleep.webp",
+      "size": [
+        887,
+        443
+      ],
+      "source_canvas": [
+        887,
+        443
+      ],
+      "source_file": "hero_cao_bento_sleep.png",
+      "canonical_canvas": [
+        887,
+        443
+      ],
+      "canonical_anchor": [
+        445,
+        336
+      ],
+      "texture_anchor": [
+        445.0,
+        336.0
+      ],
+      "body_reference_pixels": 863,
+      "bbox": [
+        13,
+        104,
+        877,
+        336
+      ],
+      "sha256": "3ad9d51f3c32cadec6b52585a2dd786fcaa5d982ffe28c31bc6ad1c1288ce725",
+      "reference_sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2",
+      "source_sha256": "81a8f98a13d8f1800a17cce184ff6c752fde5f9d10383bfe75b700c435ce9d3d"
+    },
+    {
+      "name": "hero_cao_bento_work",
+      "file": "art/skins/bento/watch/hero_cao_bento_work.webp",
+      "reference": "art/station/poses/hero_cao_bento_work.webp",
+      "size": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        543,
+        724
+      ],
+      "source_file": "hero_cao_bento_work.png",
+      "canonical_canvas": [
+        543,
+        724
+      ],
+      "canonical_anchor": [
+        302,
+        716
+      ],
+      "texture_anchor": [
+        302.0,
+        716.0
+      ],
+      "body_reference_pixels": 708,
+      "bbox": [
+        34,
+        8,
+        530,
+        717
+      ],
+      "sha256": "d1122ec0a6f9e5a33403fcbb283f170dce726c10603f4d157cd631e8c1c1aa74",
+      "reference_sha256": "96033c41198600dc724b0ce9b5ef07b95143bc908249fcc508598eb2f0c4e556",
+      "source_sha256": "c73084202a55ba1c431d5c510d4242f9c8319b02c475756d5cf86f2e0e186485"
+    },
+    {
+      "name": "bento_seat_floor",
+      "file": "art/skins/bento/watch/bento_seat_floor.webp",
+      "reference": "art/camp/bento_seat_floor.webp",
+      "size": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "source_file": "bento_seat_floor.png",
+      "canonical_canvas": [
+        1086,
+        1448
+      ],
+      "canonical_anchor": [
+        473.0,
+        1429
+      ],
+      "texture_anchor": [
+        236.5,
+        714.5
+      ],
+      "body_reference_pixels": 1419,
+      "bbox": [
+        17,
+        247,
+        450,
+        713
+      ],
+      "sha256": "57c44f474fd0d1709f85bd75e0c4f249e867fa473b47581b7fda93aa369ed8c7",
+      "reference_sha256": "1c2d607419b95d3586e52b33510b1f0fa58cd4b7d7242735769a26789740b548",
+      "source_sha256": "8fdbbddee7752ec1344f34b4fbe21296aa96fb287e6e86e718231e7349c5e5cc"
+    },
+    {
+      "name": "portrait",
+      "file": "art/skins/bento/watch/portrait.webp",
+      "reference": "art/ui/portraits/bento.png",
+      "size": [
+        256,
+        256
+      ],
+      "source_canvas": [
+        512,
+        512
+      ],
+      "source_file": "portrait.png",
+      "canonical_canvas": [
+        512,
+        512
+      ],
+      "canonical_anchor": [
+        256.0,
+        512
+      ],
+      "texture_anchor": [
+        128.0,
+        256.0
+      ],
+      "body_reference_pixels": null,
+      "bbox": [
+        0,
+        30,
+        222,
+        256
+      ],
+      "sha256": "dc50684394f308be80456e2004ee1fbbe4d7653baebcbc67abf3d8d94324f42c",
+      "reference_sha256": "43117818bce36380138c3a9ad9d78d56d1d248374beced8455a1f79409e87962",
+      "source_sha256": "7b224ee59518c6c871b8c7b8aa9b5c609b11df6279c9d6856a81e006dc09c083"
+    }
+  ],
+  "note": "Source anchors/canvases are copied from canonical production manifests; original game files unchanged. VFX/audio reused. Wounded skin supplied with issue195."
+}
