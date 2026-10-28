@@ -65,3 +65,7 @@ do `Sound`.
   Correção: as placas acima da cabeça em ordem de baixo para cima (quem desvia só sobe, então uma passada basta); o
   `_aim` confere a placa inteira e a intenção. O caso só aparece na tela de 1920x1080: o teste o pega rodando com
   janela (`xvfb-run`, como no modo de captura); sem janela, as medidas da tela são outras.
+- **Rodada 3: APROVADO.** A varredura das placas de 0,6 a 1,0, nos textos Normal e Maior, mirando os quatro inimigos
+  em cada passo (72 capturas): o ALVO não cobre placa nem intenção em nenhum caso (caiu também o do Pipoco sobre a
+  intenção do Relé, que já existia na `main`). `run_all` 87/87, paridade 48/48. Nota baixa, de antes: no espaço
+  mínimo, a intenção do Pipoco cobre 16% da altura do corpo do Relé.
