@@ -118,10 +118,16 @@ COLD = [0.75, 0.85, 1.0]
 RED_BOOST = 1.3
 
 
+# A luminária de emergência (o pedido do Lucas de 28/10 no #224): a caixa de aço blindada com a lente vermelha, a
+# grade e a faixa de perigo, e o eletroduto subindo pelo pilar até o escuro do alto (cut_lamp.py). A lente fica a
+# 20 cm da base do card.
+LAMP_W, LAMP_H = 0.5, 1.6
+
+
 def red_lamp(x, z=-2.5, y=2.95, lumens=210.0, radius=4.4):
-    """A lâmpada de emergência: o card aceso e a luz vermelha logo à frente e abaixo dele, curta, para a poça de luz no
-    chão e na parede (entre uma e outra, o escuro). O pisca é do código (#147)."""
-    plate(x, y - 0.22, z + 0.04, 0.3, 0.45, card("T_TU08_Lit", 1.0))
+    """A luminária de emergência: o card aceso, com a lente na altura `y`, e a luz vermelha logo à frente e abaixo dele,
+    curta, para a poça de luz no chão e na parede (entre uma e outra, o escuro). O pisca é do código (#147)."""
+    plate(x, y - 0.2, z + 0.04, LAMP_W, LAMP_H, card("T_TU08_Lit", 1.0))
     # A luz sai da própria lâmpada, rente à parede: o cone na parede começa nela e cai para baixo e para os lados.
     lumens *= RED_BOOST
     light([x, y - 0.3, z + 0.35], RED, lumens, radius, shadows=True)
@@ -199,7 +205,15 @@ def end_block(x, side, wall_z=-2.6):
     box([x + side * 0.9, 2.1, (wall_z + 2.6) * 0.5], [1.8, 4.6, 5.2 - wall_z], concrete(0.2, 0.5))
 
 
-def prop_card(code, x, width, height, z=-1.95, bottom=0.0):
+# Os objetos soltos no chão (o pedido do Lucas de 28/10 no #224): a câmera da exploração é quase rasa, e um objeto
+# encostado na parede fica com a base na linha do pé dela, como se flutuasse. Eles ficam no piso visível, à frente da
+# parede (Z = -1,6 a -1,2), com a base 3 cm dentro do piso (sem fresta) e a sombra de contato pintada no piso embaixo
+# (docs/design/tutorial-acabamento/ground_shadows.py, que lê as posições deste mapa).
+GROUND_Z = -1.4
+SINK = 0.03
+
+
+def prop_card(code, x, width, height, z=GROUND_Z, bottom=-SINK):
     return plate(x, bottom, z, width, height, art(code), shadow=True)
 
 
@@ -236,7 +250,7 @@ def main() -> None:
     zones = []
 
     # ---- 1. O corredor de contenção: a parede com a passagem para o escuro do lado, a faixa de perigo, os pilares com as
-    # lâmpadas, caixas, tambores e raízes no pé da parede, a grade solta e o cano no primeiro plano.
+    # luminárias, caixas, tambores e o rolo de cabo no chão, a grade solta e o cano no primeiro plano.
     ZONE[0] = 0
     x0, x1 = 0.0, 10.0
     shell(x0, x1, "T_TU02")
@@ -252,10 +266,10 @@ def main() -> None:
         red_lamp(px, z=pillar(px, face=face), y=2.85, radius=3.4)
     # Acima do batente da porta de enrolar (a lâmpada não tapa o sinal dela).
     red_lamp(8.38, y=3.55, lumens=150.0, radius=3.2)
-    prop_card("T_TU15", 0.8, 0.95, 0.86, z=-2.15)
-    prop_card("T_TU14", 3.7, 1.45, 1.1, z=-2.05)
-    prop_card("T_TU19", 5.2, 0.8, 0.56, z=-1.75)
-    prop_card("T_TU05", 7.0, 1.9, 1.24, z=-1.7)
+    # As raízes (T_TU05) saíram: são de outro bioma (o Lucas, 28/10). O rolo de cabo fica no lugar delas, ao pé da porta.
+    prop_card("T_TU15", 0.8, 0.95, 0.86, z=-1.6)
+    prop_card("T_TU14", 3.7, 1.45, 1.1, z=-1.5)
+    prop_card("T_TU19", 7.15, 0.8, 0.56, z=-1.25)
     prop_card("T_TU17", 1.2, 1.5, 0.98, z=3.4)
     # O primeiro plano, na frente de onde a câmera fica no meio da zona (x0 + 5,6): os canos no alto e o cano quebrado.
     foreground(5.9, "T_TU20", 3.3, 0.6, 2.38)
@@ -279,16 +293,15 @@ def main() -> None:
     red_lamp(x0 + 8.4, z=pillar(x0 + 9.3) - 0.55, y=3.0, lumens=180.0)
     interactive("T_TUX02_Maintenance_Locker", "Armário de manutenção", "Curativos", x0 + 7.0, 1.25, 1.62)
     interactive("T_TUX03_Door_Panel", "Painel das portas", "", x0 + 8.4, 0.55, 0.87, z=-2.52, bottom=0.95)
-    prop_card("T_TU16", x0 + 9.5, 0.95, 0.95, z=-1.75)
-    prop_card("T_TU15", x0 + 5.7, 0.9, 0.82, z=-2.1)
-    prop_card("T_TU05", x0 + 3.0, 1.6, 1.04, z=3.3)
+    prop_card("T_TU16", x0 + 9.45, 0.95, 0.95, z=-1.45)
+    prop_card("T_TU15", x0 + 5.7, 0.9, 0.82, z=-1.6)
     foreground(x0 + 5.2, "T_TU21", 2.9, 1.02, 2.15)
     foreground(x0 + 7.4, "T_TU22", 0.3, 1.62, 1.2)
     front_light(x0 + 6.4)
     zones.append({"x0": x0, "x1": x1, "z0": -2.4 + DZ, "z1": 2.4 + DZ, "y": 0.0, "name": "Celas"})
 
-    # ---- 3. A rota do Nick: a porta de segurança baixada atrás da equipe (na abertura da esquerda), o buraco com as
-    # raízes e a água, o duto com a grade arrancada e a escada até o alçapão aberto no teto.
+    # ---- 3. A rota do Nick: a porta de segurança baixada atrás da equipe (na abertura da esquerda), o buraco na parede
+    # e a água, o duto com a grade arrancada e a escada até o alçapão aberto no teto.
     ZONE[0] = 2
     x0 = 2 * PITCH
     x1 = x0 + 10.0
@@ -303,8 +316,7 @@ def main() -> None:
     red_lamp(x0 + 9.45, z=pillar(x0 + 9.45, face="T_TU26"), y=2.9)
     plate(x0 + 7.6, 1.05, -2.45, 1.15, 1.27, art("T_TU07"), shadow=True)
     plate(x0 + 5.6, -0.05, -2.2, 3.32, 4.32, art("T_TU06"), shadow=True)
-    prop_card("T_TU17", x0 + 8.6, 1.3, 0.86, z=-1.9)
-    prop_card("T_TU05", x0 + 0.9, 1.6, 1.04, z=3.3)
+    prop_card("T_TU17", x0 + 8.4, 1.3, 0.86, z=-1.45)
     foreground(x0 + 5.3, "T_TU20", 3.3, 0.6, 2.42)
     foreground(x0 + 3.8, "T_TU22", 0.3, 1.62, 0.7)
     front_light(x0 + 4.6)
@@ -338,7 +350,7 @@ def main() -> None:
     light([x1 - 0.6, 1.4, -1.6], COLD, 340.0, 5.0, shadows=True)
     red_lamp(x0 + 0.9, z=-6.3, y=2.6)
     light([x0 + 0.9, 1.7, -2.2], RED, 200.0, 4.5)
-    prop_card("T_TU14", x0 + 1.4, 1.3, 1.0, z=-2.15)
+    prop_card("T_TU14", x0 + 1.4, 1.3, 1.0, z=-1.6)
     foreground(x0 + 5.6, "T_TU21", 2.9, 1.02, 2.2)
     foreground(x0 + 3.9, "T_TU22", 0.3, 1.62, 0.9)
     front_light(x0 + 4.8, COLD, 260.0)

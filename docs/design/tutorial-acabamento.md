@@ -18,6 +18,65 @@ edição à mão (o caminho que o Claude 2 deixou para a arte entrar no comentá
 Sem ele, a arte nova não aparece no jogo e não haveria o depois tirado de dentro do jogo. Se o Lucas preferir, o
 Claude regenera o arquivo na integração e este PR o tira.
 
+## Os ajustes do Lucas (28/10, no #224)
+
+> Ainda tem coisa pra melhorar, vamos tentar primeiro encaixar os props no chão fazer uma lanterna vermelha para
+> substituir a atual por uma que se encaixe no cenário. Remova props que não fazem sentido como aquelas raizes.
+
+O antes é este PR como o Lucas o viu (a6224cb, com a main de hoje); o depois, com os ajustes. Os dois saem da mesma
+captura do jogo ([capture_game.gd](tutorial-acabamento/capture_game.gd)), na mesma câmera, com a mesma equipe e no
+mesmo ponto. A lanterna do líder a 30% fica para depois destes ajustes (a decisão do Lucas).
+
+![O corredor](tutorial-acabamento/ajustes/corridor.webp)
+![A sala das celas](tutorial-acabamento/ajustes/cells.webp)
+![A rota do Nick](tutorial-acabamento/ajustes/nick_route.webp)
+![A plataforma](tutorial-acabamento/ajustes/platform.webp)
+![O embarque no vagão](tutorial-acabamento/ajustes/platform_exit.webp)
+![A primeira luta, no corredor](tutorial-acabamento/ajustes/fight.webp)
+![O que mudou na arte](tutorial-acabamento/ajustes/art.webp)
+
+1. **Os objetos apoiados no chão.** A câmera da exploração é quase rasa (1,7 m de altura, a 19 m da faixa): os 2,6 m
+   de piso entre a equipe e a parede viram uns 40 px na tela. Um objeto encostado na parede ficava com a base na linha
+   do pé dela, sobre a faixa escura, e parecia flutuar. Agora:
+   - os objetos soltos (as caixas, os tambores, o rolo de cabo, o carrinho e a grade com entulho) ficam no piso
+     visível, de 1,25 a 1,6 m à frente da parede (eram 1,7 a 2,15), com a base 3 cm dentro do piso, sem fresta;
+   - a sombra de contato está pintada no piso, embaixo de cada objeto, inclusive do armário e da escada
+     ([ground_shadows.py](tutorial-acabamento/ground_shadows.py), que lê as posições do mapa). Ela aparece no
+     Compatibility e no Forward+, sem depender da sombra das luzes. A plataforma fica de fora: o piso dela é mapeado
+     pela malha, e as caixas dela já pousam no piso claro da beira;
+   - nenhum objeto atravessa pilar, parede ou porta: os pilares vão até 1,8 m da parede, e os objetos ficam na frente
+     deles.
+2. **A luminária de emergência nova** (`T_TU08_Lit` acesa, `T_TU08` apagada para o pisca, nos mesmos nomes: a camada de
+   jogo não muda). É uma caixa de aço blindada com a lente vermelha atrás da grade, a faixa de perigo e quatro
+   parafusos. O eletroduto sobe pelo pilar até sumir no escuro do alto, como as paredes (o card tem 0,5 × 1,6 m; a
+   caixa, os 0,5 m de baixo). A antiga, um globo de 0,3 m, lia como lâmpada de casa. O card dela é aceso por inteiro,
+   então a caixa está pintada escura e tingida do vermelho da lente, e o centro da lente desce um pouco; só a lente
+   brilha
+   ([cut_lamp.py](tutorial-acabamento/cut_lamp.py)). As luzes vermelhas, a posição e o pisca continuam iguais.
+3. **Sem as raízes.** Elas são de outro bioma. Saíram:
+   - o prop das raízes (`T_TU05`), que estava no corredor (ao pé da porta de enrolar, onde agora fica o rolo de cabo) e
+     no primeiro plano das celas e da rota do Nick. O arquivo saiu de `art/scenarios/`;
+   - a raiz que subia pela fissura da parede do corredor (`T_TU01`);
+   - o emaranhado em volta do buraco da parede da rota do Nick (`T_TU12`), que virou concreto rachado, vergalhão à
+     mostra e dois cabos soltos, e os restos de raiz no pé dela;
+   - as raízes penduradas do alto da parede de azulejo da plataforma (`T_TU03`), que viraram azulejo encardido com as
+     manchas de ferrugem;
+   - as raízes e o musgo do teto do vagão (`T_TU10`), que virou o teto de metal enferrujado, no mesmo quadro (o card
+     dele continua 10 × 4,03 m).
+
+   O resto de cada pintura é o mesmo, e as aberturas das paredes têm o mesmo alfa, pixel a pixel. No vagão, o recorte
+   muda só no teto, onde o musgo saía da silhueta ([cut_walls.py](tutorial-acabamento/cut_walls.py)).
+
+   Ainda há fios finos de raiz pintados nas juntas do piso do corredor (`T_TU02` e `T_TU24`). Na câmera da exploração,
+   eles leem como rachaduras. Se o Lucas quiser, eles saem numa próxima volta.
+
+   **Pendência:** o tambor da ponta esquerda do corredor e o carrinho das celas pousam no piso, mas ficam na faixa
+   escura entre as poças de luz, e o contato com o chão quase não se vê. Não flutuam; se incomodar no Play, eles podem
+   ir para perto de uma luminária.
+
+O par da main com o estado final está logo abaixo. Os trípticos de luz de "Para integrar" são da primeira versão
+desta arte, com a lâmpada antiga, porque a lanterna ficou para depois.
+
 ## Antes e depois, os dois dentro do jogo
 
 O antes é a `main` de hoje; o depois, esta branch. A mesma ferramenta fotografa os dois
@@ -137,15 +196,17 @@ Corredor (o `data/` dele já é este mapa com a camada de jogo, e as chaves dela
 ## Como refazer
 
 Da raiz do repositório:
-1. `python3 -B docs/design/tutorial-acabamento/cut_art.py <images/tutorial/v4>`: as texturas novas e a escada.
-2. `python3 -B docs/design/tutorial/build_map.py`, `python3 -B docs/design/tutorial/check_map.py` e
-   `python tools/build_containment_corridor.py`: o mapa e o `data/` do jogo.
+1. `python3 -B docs/design/tutorial-acabamento/cut_art.py <images/tutorial/v4>`: as texturas novas e a escada; e, dos
+   ajustes de 28/10, `cut_lamp.py <images/tutorial/v5/emergency-light-red.png>` e `cut_walls.py <images/tutorial/v5/walls>`.
+2. `python3 -B docs/design/tutorial/build_map.py`, `python3 -B docs/design/tutorial-acabamento/ground_shadows.py`,
+   `python3 -B docs/design/tutorial/check_map.py` e `python tools/build_containment_corridor.py`: o mapa, a sombra
+   de contato no piso e o `data/` do jogo.
 3. A captura (no Linux sem tela, Xvfb), na `main` (o antes) e nesta branch (o depois), cada uma numa pasta:
    `xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path . --rendering-driver opengl3 --resolution 1920x1080 -s res://docs/design/tutorial-acabamento/capture_game.gd -- --out=<pasta> --zones=0,1 --fight`
    e, com o Nick, `-- --out=<pasta> --zones=2,3 --nick --exit`. A proposta de luz: as mesmas, com `--proto`. Para rodar
    duas ao mesmo tempo, cada uma com o seu `xvfb-run -n <número>`.
-4. `python3 -B docs/design/tutorial-acabamento/compose.py <antes> <depois> <proposta>` (cada pasta com as fotos das
-   duas rodadas juntas).
+4. `python3 -B docs/design/tutorial-acabamento/compose.py <antes> <depois> [<proposta>]` (cada pasta com as fotos das
+   duas rodadas juntas) e, para os ajustes, `compose_ajustes.py <antes, o #224 em a6224cb> <depois>`.
 
 ## QA de design
 
@@ -178,3 +239,20 @@ A tabela confere com as capturas brutas, número a número, e a equipe se lê em
 plataforma reduzida a 40%. Observações baixas: a proposta ainda é menos vermelha que a aprovada (R/G 3,0 a 3,6, contra
 4,8), e a dose da lanterna pode ser ajustada na integração; a plataforma antes do trem fica com metade do brilho de hoje
 na área da equipe (vale o Lucas olhar no Play); as pendências registradas; o PR com as imagens e as rodadas.
+
+### Rodada 4 (os ajustes do Lucas de 28/10): REPROVADO
+
+**Médias, corrigidas:** o eletroduto da luminária acabava no meio do pilar aceso e lia como antena (o card passou a
+ter 1,6 m, e o eletroduto some só no escuro do alto); ainda havia raízes na parede da plataforma (`T_TU03`) e no teto
+do vagão (`T_TU10`), que saíram.
+
+**Baixas, corrigidas:** restos de raiz no pé da parede da rota do Nick; o texto antigo de `tutorial.md` (as raízes,
+o número de arquivos, a nota da lâmpada antiga); o centro da lente, quase amarelo, desceu um pouco. Registradas: os fios
+de raiz no piso e o tambor e o carrinho na faixa escura.
+
+### Rodada 5: APROVADO
+
+O gerador sai idêntico numa cópia limpa (o `data/` também), o `check_map.py` dá OK, as aberturas das paredes têm o
+mesmo alfa e o vagão muda só no teto. O eletroduto sobe pelo pilar até o escuro em todas as zonas, e não há raiz em
+prop, parede nem vagão. Observações baixas, aplicadas: a pendência do tambor e do carrinho na página e a frase do
+recorte do vagão. Fica a divergência antiga da altura do vagão (4,02 m em `tutorial.md`, 4,03 m no mapa).

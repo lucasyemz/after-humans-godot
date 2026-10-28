@@ -2,8 +2,9 @@
 depois (esta branch), os dois do jogo, na mesma câmera, com a mesma equipe e no mesmo ponto; o depois inteiro, em
 1920 × 1080; a proposta de luz do código ao lado do depois; e a prancha da arte nova.
 
-Uso: python3 -B docs/design/tutorial-acabamento/compose.py <antes> <depois> <proposta>
-     (cada pasta com zone0..zone3, exit e fight, .png, como capture_game.gd grava)
+Uso: python3 -B docs/design/tutorial-acabamento/compose.py <antes> <depois> [<proposta>]
+     (cada pasta com zone0..zone3, exit e fight, .png, como capture_game.gd grava). Sem a proposta, os trípticos de luz
+     ficam como estão (a lanterna a 30% ficou para depois dos ajustes de 28/10).
 """
 import sys
 from pathlib import Path
@@ -20,7 +21,7 @@ SHOTS = [("zone0", "corridor", "1. O corredor"), ("zone1", "cells", "2. A sala d
 # A proposta de luz, com a referência aprovada no #173 (as capturas daquele PR, sem a lanterna do líder).
 PROTO = {"zone0": "docs/design/tutorial/zone_corridor.webp", "zone3": "docs/design/tutorial/zone_platform.webp",
          "fight": "docs/design/tutorial/before/fight_two_clean.webp"}
-NEW_ART = [("T_TU25", "Face do pilar"), ("T_TU26", "Face do pilar (2)"), ("T_TU27", "Concreto molhado (sem emenda)"),
+NEW_ART = [("T_TU08_Lit", "Luminária de emergência"), ("T_TU25", "Face do pilar"), ("T_TU26", "Face do pilar (2)"), ("T_TU27", "Concreto molhado (sem emenda)"),
            ("T_TUX04_Security_Shutter", "Porta de enrolar, baixada"), ("T_TUX04_Security_Shutter_Open", "Porta de enrolar, erguida"),
            ("T_TU06", "Escada: o alçapão no escuro")]
 
@@ -73,16 +74,16 @@ def sheet() -> Image.Image:
     return out
 
 
-def main(before: str, after: str, proto: str) -> None:
-    before, after, proto = Path(before), Path(after), Path(proto)
+def main(before: str, after: str, proto: str = "") -> None:
+    before, after = Path(before), Path(after)
     for shot, name, title in SHOTS:
         b = Image.open(before / f"{shot}.png").convert("RGB")
         a = Image.open(after / f"{shot}.png").convert("RGB")
         a.save(OUT / f"{name}.webp", quality=86, method=6)
         pair(b, f"Antes (main): {title}", a, f"Depois: {title}").save(OUT / f"before_after_{name}.webp", quality=86, method=6)
-        if shot in PROTO:
+        if proto and shot in PROTO:
             ref = Image.open(ROOT / PROTO[shot]).convert("RGB")
-            p = Image.open(proto / f"{shot}.png").convert("RGB")
+            p = Image.open(Path(proto) / f"{shot}.png").convert("RGB")
             triple([(ref, "Aprovada (#173)"), (a, "Depois, no jogo"), (p, "Proposta: a lanterna a 30%")]).save(
                 OUT / f"light_{name}.webp", quality=86, method=6)
         print(name)
