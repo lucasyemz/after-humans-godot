@@ -19,6 +19,9 @@ extends Node
 ## casas) e a da fogueira apagada da casa do acampamento.
 const MARKER_DOOR_HEIGHT := 2.4
 const MARKER_CAMP_HEIGHT := 0.95
+## Quanto a frase do fôlego que vem sem a busca fica na tela (s), na frente dos avisos que chegam em seguida (o anúncio
+## do trecho e o começo da luta): o mesmo tempo que ela tem no aviso da busca.
+const BREATH_LINE_SECONDS := 7.0
 const R = preload("res://scripts/flow/journey_rules.gd")
 const STEP_LENGTH := 7.8
 const MIN_X := 0.0
@@ -101,9 +104,6 @@ var side_rooms: Array = []
 var side_room := -1
 ## Props do cenário: {prop (índice no corredor), local (no mapa), x, zone, step}.
 var scenario_props: Array = []
-## O fôlego que veio ao chegar à zona da luta (sem a busca): o anúncio do trecho, logo em seguida, leva a frase junto
-## para ela não sumir sob ele.
-var _breath_note := false
 
 
 func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
@@ -509,8 +509,8 @@ func _travel_segment(direction: int) -> void:
 	if direction > 0 and AHTutorial.breath_on_arrival(Campaign.state, part.first, part.steps):
 		Campaign.save()
 		hud.refresh(Campaign.state)
-		hud.toast(tr("A equipe recupera o fôlego."), 3.5)
-		_breath_note = true
+		# O anúncio do trecho e o aviso do começo da luta chegam logo em seguida: a frase vai na frente deles.
+		hud.hold_line(tr("A equipe recupera o fôlego."), BREATH_LINE_SECONDS)
 
 
 ## Fim do mapa de passagem: a equipe entra no primeiro trecho do mapa da fase e viaja para ele (só de ida).
@@ -580,15 +580,12 @@ func _sight_strength(front: AHSpriteCard, leader: Vector3) -> float:
 func _announce(index: int, outcome: String, first_time: bool) -> void:
 	var route: Dictionary = Campaign.state.session.expedition.corridor
 	var label: String = AHExplorationHud.STEP_LABELS.get(route.steps[index].type, "")
-	var breath := tr("A equipe recupera o fôlego.") + " " if _breath_note else ""
-	_breath_note = false
 	match outcome:
 		"rest":
 			hud.toast(tr("Trecho %d · Descanso. Um lugar quieto.") % (index + 1), 3.0)
 			_ask_rest()
 		"combat", "boss":
-			hud.toast(breath + tr("Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro.") % [index + 1, tr(label)],
-				5.5 if breath != "" else 3.5)
+			hud.toast(tr("Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro.") % [index + 1, tr(label)])
 			if outcome == "boss":
 				_ask_risk("boss", tr("O guardião está à frente"), tr("Vencer o guardião conclui a fase e leva todo o achado. Se a equipe cair, o achado fica para trás; voltar agora leva metade."))
 		_:
