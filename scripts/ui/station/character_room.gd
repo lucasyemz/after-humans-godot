@@ -402,6 +402,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		line.custom_minimum_size = Vector2(300, 0)
 		column.add_child(line)
+	_skins(c, hero, column)
 	# As melhorias escolhidas nos treinos, com quantas vezes cada uma.
 	var counts := {}
 	for upgrade_id in hero.get("upgrades", []):
@@ -482,6 +483,100 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 	column.add_child(counters)
 	column.add_child(_divider())
 	_traits(hero, column)
+
+
+## A roupa (#138): as skins completas do herói, a padrão e as de data/skins.json, com o rosto de cada uma, o nome e o
+## estado. A liberada se veste na hora (só visual, sem custo); a bloqueada diz o motivo. Sem skin além da padrão, nada.
+func _skins(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
+	var rows := AHSkins.of_hero(String(hero.id))
+	if rows.is_empty():
+		return
+	var box := VBoxContainer.new()
+	box.name = "Skins"
+	box.add_theme_constant_override("separation", 6)
+	column.add_child(box)
+	box.add_child(AHKit.label(tr("Roupa"), "text", AHKit.AMBER, true, true))
+	var tabs := HFlowContainer.new()
+	tabs.add_theme_constant_override("h_separation", 12)
+	tabs.add_theme_constant_override("v_separation", 8)
+	box.add_child(tabs)
+	var current := String(hero.get("skin_id", AHSkins.DEFAULT))
+	var chosen_text := tr("Padrão")
+	var locked_reason := ""
+	# A aba leva o nome curto (cabe numa linha também no Maior); o nome inteiro vai no texto embaixo.
+	for spec in [[AHSkins.DEFAULT, tr("Padrão"), tr("Padrão")]] + rows.map(func(row): return [String(row.Name),
+			tr(String(row.get("ShortName", row.DisplayName))), tr(String(row.DisplayName))]):
+		var skin_id: String = spec[0]
+		var tab := _skin_tab(hero, skin_id, spec[1], spec[2], skin_id == current, S.skin_unlocked(c, skin_id))
+		tabs.add_child(tab)
+		if skin_id == current:
+			chosen_text = spec[2]
+		elif not S.skin_unlocked(c, skin_id) and locked_reason == "":
+			locked_reason = S.skin_lock_reason(c, skin_id)
+	var row = GameData.row("skins", current)
+	var about := AHKit.label(tr("%s: %s") % [chosen_text, tr(String(row.Text))] if row != null else tr("A roupa de sempre."), "small", AHKit.MUTED)
+	about.name = "SkinText"
+	about.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	about.custom_minimum_size = Vector2(300, 0)
+	box.add_child(about)
+	if locked_reason != "":
+		var lock := AHKit.label(locked_reason, "small", AHKit.MUTED)
+		lock.name = "SkinLock"
+		lock.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lock.custom_minimum_size = Vector2(300, 0)
+		box.add_child(lock)
+	column.add_child(_divider())
+
+
+## A aba de uma skin: o rosto dela, o nome e, bloqueada, apagada e sem vestir.
+func _skin_tab(hero: Dictionary, skin_id: String, label: String, full_name: String, chosen: bool, unlocked: bool) -> Button:
+	var tab := Button.new()
+	tab.name = "Skin_%s" % skin_id
+	tab.toggle_mode = false
+	AHKit.style_as(tab, "hero_selected" if chosen else "hero")
+	tab.custom_minimum_size = Vector2(104, 122)
+	tab.clip_contents = true
+	tab.tooltip_text = full_name if unlocked else "%s · %s" % [full_name, tr("Bloqueada")]
+	var face := TextureRect.new()
+	var founder := _founder_art(String(hero.id))
+	face.texture = AHUiStyle.face_texture(AHSkins.dress(founder, skin_id).get("idle", {}))
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	face.position = Vector2(6, 6)
+	face.size = Vector2(92, 82)
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not unlocked:
+		face.modulate = AHKit.LOCKED
+	tab.add_child(face)
+	var name := AHKit.label(label if unlocked else tr("Bloqueada"), "small", AHKit.AMBER if chosen else (AHKit.TEXT if unlocked else AHKit.MUTED))
+	name.name = "SkinName"
+	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name.position = Vector2(2, 90)
+	name.size = Vector2(100, 30)
+	name.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tab.add_child(name)
+	var hero_id := String(hero.id)
+	tab.pressed.connect(func(): _choose_skin(hero_id, skin_id, full_name))
+	return tab
+
+
+## A entrada do fundador no manifesto, sem skin (a base para vestir cada aba).
+func _founder_art(hero_id: String) -> Dictionary:
+	return AHCombatArena.founder_art_of(hero_id)
+
+
+func _choose_skin(hero_id: String, skin_id: String, label: String) -> void:
+	var c: Dictionary = Campaign.state
+	if String(S.hero(c, hero_id).get("skin_id", AHSkins.DEFAULT)) == skin_id:
+		return
+	var error := S.choose_skin(c, hero_id, skin_id)
+	var who := String(S.hero(c, hero_id).display_name)
+	var done := tr("%s volta à roupa de sempre.") % who if skin_id == AHSkins.DEFAULT else tr("%s veste %s.") % [who, label]
+	hud._act(error, "" if error != "" else done)
+	# A placa dele na Estação veste a nova também (a tela já se refez pelo refresh do _act).
+	var station = hud.get("station") if error == "" else null
+	if station != null:
+		station.redress(hero_id)
 
 
 ## O posto na Estação (#119): onde o herói trabalha enquanto a equipe está fora, e o que rende a cada volta. Um posto
