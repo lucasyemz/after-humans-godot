@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    "20 prepared WebP match audited prototypes exactly",
+    "existing output: rejected (Output already exists; choose a new directory. Nothing was overwritten.)",
+    "output inside repository: rejected (Output must be outside the game repository and source tree.)",
+    "bad SHA256: rejected (SHA256 mismatch: raccoon/base_a.png)",
+    "path traversal: rejected (Source path must be relative: ../escape.png)",
+    "colored tint layer: rejected (Tintable layer is not grayscale: raccoon/clothes.png)",
+    "20 source PNG unchanged after conversion and rejection checks"
+  ]
+}

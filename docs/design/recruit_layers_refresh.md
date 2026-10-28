@@ -85,7 +85,7 @@ Ambiente sem GPU física: Godot4.7.2, OpenGL Compatibility/Mesa llvmpipe CPU, Xv
 
 Tag `codex-pr240-originals`, pasta `art/combat/source/recruit_layers_refresh_20261028/`, com20 PNG, contrato, auditoria e helpers. Release com ZIP automático de árvore isolada de fontes; PNG fora da branch para a main. As fontes aprovadas reutilizadas são `codex-pr229-originals` (corpos) e `codex-pr211-originals` (acessórios); o pacote final já contém os20 PNG necessários, sem exigir as fontes anteriores para apenas convertê-los.
 
-O PC converte pelo pipeline de `tools/sync_combat_art.py`, preserva os nomes WebP de `art/combat/recruits/layers/<raccoon|armadillo>/`, atualiza os registros/contratos da integração e conserva os ids `rato`, `tatu`, `raccoon_recruit_01`, `armadillo_recruit_01`. `preview_idle` no contrato é somente uma composição de QA temporária; não é uma21ª camada ou uma nova pose de produção.
+`tools/sync_combat_art.py` ainda não tem um importador dessas camadas. O preparador abaixo gera os WebP para revisão; o PC registra a importação no fluxo da #189, preserva os nomes WebP de `art/combat/recruits/layers/<raccoon|armadillo>/`, atualiza os registros/contratos da integração e conserva os ids `rato`, `tatu`, `raccoon_recruit_01`, `armadillo_recruit_01`. `preview_idle` no contrato é somente uma composição de QA temporária; não é uma21ª camada ou uma nova pose de produção.
 
 As bases só correspondem ao idle da #225: a exploração/guarda diferente da #221, ataques, feridos e acampamento exigem registro próprio. A aparência da personalização não deve ser sobreposta a uma postura incompatível. Este lote não amplia a integração da #189 nem modifica as histórias do Gustavo.
 
@@ -100,3 +100,18 @@ As bases só correspondem ao idle da #225: a exploração/guarda diferente da #2
 Auditoria de20 PNG e20 WebP, grayscale exato, hashes, canvas, alfa das bases e âncoras em [audit.json](recruit_layers_refresh/audit.json). A base `5bb2928` é a mesma já validada nesta sessão pelo runner inteiro: **92/92 em641,292s, paridade48/48 lutas,3351 passos**. Não houve alteração de produção desde essa execução; esta rodada verifica os novos arquivos de arte e capturas, sem repetir o runner idêntico. O CI do PR terá a própria execução.
 
 [PR #240](https://github.com/lucasyemz/after-humans-godot/pull/240) · [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr240-originals) · [ZIP de20 PNG e medidas](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr240-originals.zip).
+
+## Preparar o pacote sem alterar o jogo
+
+O [prepare_webp.py](recruit_layers_refresh/prepare_webp.py) lê os20 PNG do ZIP do Release e o contrato revisado deste PR, confere hashes/RGBA/canvas/cinza/contato e gera20 WebP lossless mais `registration.json` em uma **pasta nova fora do repositório**. Preserva as unidades canônicas (canvas1178×1335, âncoras e referência1240px) na ficha; a textura fica589×668. Não grava no jogo, não registra dados e não substitui fontes ou uma saída existente.
+
+No Windows, a partir do checkout com este PR, depois de extrair o ZIP:
+
+```powershell
+py -m pip install pillow
+py docs/design/recruit_layers_refresh/prepare_webp.py --sources "C:\arte\art\combat\source\recruit_layers_refresh_20261028" --output "C:\arte_pronta\layers_239"
+```
+
+Os caminhos são exemplos e devem apontar para as pastas reais. `--output` deve ser uma pasta que ainda não existe. O pacote gerado continua sendo material de revisão: a integração posterior liga os arquivos e o contrato à personalização, respeitando o registro exclusivo do idle da #225.
+
+**Verificação do preparador:** os20 WebP gerados são byte a byte iguais aos protótipos usados nas capturas; os20 PNG originais permanecem idênticos. Foram rejeitados destino já existente, destino dentro do jogo, hash incorreto, caminho fora das fontes e peça tingível colorida. Resultados em [preparation_checks.json](recruit_layers_refresh/preparation_checks.json). A arte/capturas já aprovadas não mudaram; esta complementação fecha a preparação da entrega.
