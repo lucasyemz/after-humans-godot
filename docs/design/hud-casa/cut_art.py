@@ -95,6 +95,14 @@ def beds(sheet_path: str) -> None:
     for name, box in BEDS.items():
         im = card(sheet.crop(box))
         im = im.resize((round(im.width * BED_SCALE), round(im.height * BED_SCALE)), Image.Resampling.LANCZOS)
+        # A borda semitransparente que ainda puxa para o roxo (o fio sob o estrado) vira cinza do mesmo brilho.
+        px = im.load()
+        for y in range(im.height):
+            for x in range(im.width):
+                r, g, b, a = px[x, y]
+                if 0 < a < 250 and r > g + 8 and b > g + 8:
+                    v = (r * 3 + g * 6 + b) // 10
+                    px[x, y] = (v, v, v, a)
         im.save(CARDS / f"{name}.webp", "WEBP", quality=90, method=4)
         print(name, im.size)
 

@@ -4,7 +4,9 @@ cópias mudadas, que capture_infirmary.gd carrega por cima do projeto. Nada em s
 
 As mudanças (cada uma confere o trecho de hoje e falha se ele mudou):
 - **o lugar:** a Enfermaria vai de x −1840 a −640 no subsolo 2 (12 m, a largura do Dormitório). Ela começa onde já
-  está no jogo, embaixo do Dormitório, e avança 6 m na rocha da esquerda; a rocha das pontas passa a ir até −2400;
+  está no jogo, embaixo do Dormitório, e avança 6 m na rocha da esquerda; a rocha das pontas passa a ir até −2400, e o
+  fundo de rocha, as lajes entre os níveis e a rocha sob o subsolo 2 passam a começar em −1840 (hoje, em −1800);
+- **a porta do fundo** em x −1400 (entre o primeiro e o segundo leito) e o caixote tombado do nível 0 em −1780;
 - **os móveis em profundidade, nos planos do Dormitório:** os leitos da frente a y −665 (a linha dos beliches), os do
   fundo e o armário a y −780, com 120 cm até a parede do fundo (ROOM_BACK −900);
 - **nível 1:** 2 leitos em uso, o soro entre eles, o armário, e 2 leitos que esperam a melhoria (o quebrado e o
@@ -59,6 +61,14 @@ def build_script() -> str:
     s = path.read_text()
     s = patch(s, '{"id": "infirmary", "x0": -1240.0, "x1": -640.0, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "worn_tile_floor", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "door": -1150.0',
               '{"id": "infirmary", "x0": -1840.0, "x1": -640.0, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "worn_tile_floor", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "door": -1400.0', BUILD)
+    s = patch(s, "box(Vector3(-4000, -1360, -1500), Vector3(-1800, 0, 1100), rock)",
+              "box(Vector3(-4000, -1360, -1500), Vector3(-1840, 0, 1100), rock)", BUILD)
+    s = patch(s, """	box(Vector3(-1800, CORRIDOR_BACK - 40, B2_CEILING), Vector3(3900, 0, B1_FLOOR - FINISH), slab)
+	box(Vector3(-1800, CORRIDOR_BACK - 40, B1_CEILING), Vector3(STATION_END, 0, -140), slab)
+	box(Vector3(-1800, CORRIDOR_BACK - 40, -1500), Vector3(3900, 0, FORGE_FLOOR - 30), rock)""",
+              """	box(Vector3(-1840, CORRIDOR_BACK - 40, B2_CEILING), Vector3(3900, 0, B1_FLOOR - FINISH), slab)
+	box(Vector3(-1840, CORRIDOR_BACK - 40, B1_CEILING), Vector3(STATION_END, 0, -140), slab)
+	box(Vector3(-1840, CORRIDOR_BACK - 40, -1500), Vector3(3900, 0, FORGE_FLOOR - 30), rock)""", BUILD)
     s = patch(s, "box(Vector3(-1800, CORRIDOR_BACK - 40, FORGE_FLOOR - 30), Vector3(1160, 0, B2_FLOOR - FINISH), rock)",
               "box(Vector3(-2400, CORRIDOR_BACK - 40, FORGE_FLOOR - 30), Vector3(1160, 0, B2_FLOOR - FINISH), rock)", BUILD)
     s = patch(s, "box(Vector3(-1800, CORRIDOR_BACK - 40, B1_FLOOR), Vector3(-1240, 0, B1_CEILING), rock)\n\tbox(Vector3(-1800, CORRIDOR_BACK - 40, B2_FLOOR), Vector3(-1240, 0, B2_CEILING), rock)\n\tbox(Vector3(-1800, -1360, -140), Vector3(-40, 0, 1100), rock)",

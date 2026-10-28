@@ -214,10 +214,10 @@ function leftColumn(selected, view) {
     // Os postos de hoje, um por linha: quem está onde (heróis e ajudantes), o que rende, o que fica livre.
     const row = (icon, room, who, yieldText, free = false) => `<div data-hit="post-row" style="min-width:0">` + nine("list_row", { cls: "row", extra: "gap:12px;min-height:56px;min-width:0" },
       `${glyph(icon, 30, free ? "var(--muted)" : "var(--amber)")}<div class="col" style="flex:1;min-width:0"><span class="wrap f24 semi ${free ? "muted" : ""}">${room} · <span class="${free ? "muted" : "amber"}">${who}</span></span><span class="wrap f20 ${free ? "muted" : "good"}">${yieldText}</span></div>`) + `</div>`;
-    body = `<span class="wrap f20 muted">O Alojamento abre mais lugares para heróis; o Dormitório, para ajudantes. Quem está em recuperação conta.</span>` +
+    body = `<span class="wrap f20 muted">O Alojamento abre mais lugares para heróis; o Dormitório, para ajudantes. Quem está caído conta.</span>` +
       row("job_infirmary", "Enfermaria", "Lupa", "Menos 1 dia nos leitos") + row("job_forge", "Forja", "Brasa · Otto", "−2 sucatas na próxima obra") +
       row("job_research", "Pesquisa", "Cora", "+1 fragmento por volta") + row("job_canteen", "Cantina", "Dora", "+2 suprimentos por volta") +
-      row("job_dormitory", "Dormitório", "livre", "Quem está em recuperação melhora mais rápido", true);
+      row("job_dormitory", "Dormitório", "livre", "Quem está caído melhora mais rápido", true);
   }
   return `<div class="abs" style="left:28px;top:132px">` + nine("panel_large", { repeat: "round", cls: "col", extra: "width:600px;height:calc(1080px - 132px - 14px - 72px*var(--k) - 10px - 64px - 14px);gap:12px" },
     `<div class="row" style="gap:6px;flex:none">${tabs}</div>${divider()}${limits}${switcher}` +
