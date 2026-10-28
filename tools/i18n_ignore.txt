@@ -1540,3 +1540,4 @@ journey_rules.gd: house
 street_corridor.gd: reactions
 street_corridor.gd: death
 ui_style.gd: enemies
+exploration_hud.gd: Wounded

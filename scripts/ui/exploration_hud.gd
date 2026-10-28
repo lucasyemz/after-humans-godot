@@ -27,6 +27,8 @@ signal formation_requested
 signal formation_swap(a: String, b: String)
 
 const S = preload("res://scripts/ui/ui_style.gd")
+## O coração rachado do herói ferido (#194) no canto do retrato da equipe (px).
+const WOUND_MARK := 22
 const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprimentos", "rest": "Descanso", "passage": "Passagem",
 	"boss": "Guardião", "nick": "Encontro", "train": "Trem"}
 
@@ -643,7 +645,24 @@ func _mate(hero: Dictionary) -> PanelContainer:
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(row)
 	var art: Dictionary = AHCombatArena.hero_art_of(hero.id, String(hero.get("art_variant", ""))).get("idle", {})
-	row.add_child(AHKit.portrait(S.face_texture(art), 52))
+	var face := AHKit.portrait(S.face_texture(art), 52)
+	if AHWounded.is_wounded(hero):
+		# Ferido (#194): o coração rachado da Sala dos Personagens no canto do retrato, com a dica. Some com a vida de volta
+		# acima do limite (a placa é refeita a cada refresh).
+		var holder := Control.new()
+		holder.custom_minimum_size = Vector2(52, 52)
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.add_child(face)
+		var mark := AHKit.glyph("state_wounded", WOUND_MARK, AHKit.alert_text())
+		mark.name = "Wounded"
+		mark.size = Vector2(WOUND_MARK, WOUND_MARK)
+		mark.position = Vector2(52 - WOUND_MARK + 4, 52 - WOUND_MARK + 4)
+		mark.tooltip_text = tr("Precisa se recuperar")
+		mark.mouse_filter = Control.MOUSE_FILTER_STOP
+		holder.add_child(mark)
+		row.add_child(holder)
+	else:
+		row.add_child(face)
 	var info := VBoxContainer.new()
 	info.add_theme_constant_override("separation", 4)
 	info.custom_minimum_size = Vector2(140, 0)
