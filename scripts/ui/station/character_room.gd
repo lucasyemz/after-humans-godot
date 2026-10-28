@@ -281,7 +281,11 @@ func _ability_detail(c: Dictionary, hero: Dictionary, ability_id: String) -> Pan
 	inset.add_child(box)
 	if data == null:
 		return inset
-	box.add_child(AHKit.label(tr(String(data.DisplayName)), "panel_title", AHKit.TEXT, true))
+	var title := AHKit.label(tr(String(data.DisplayName)), "panel_title", AHKit.TEXT, true)
+	# Quebra a linha em vez de alargar a coluna estreita ("Emergency Sledgehammer" no inglês Maior).
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.custom_minimum_size = Vector2(400, 0)
+	box.add_child(title)
 	var bonus := (1 if c.get("researched_skills", []).has(ability_id) else 0) + int(AHHeroLevels.combat_bonus(hero).get("abilities", {}).get(ability_id, 0))
 	var star := " ★" if bonus > 0 else ""
 	var damage: Dictionary = data.get("DamageRange", {})
