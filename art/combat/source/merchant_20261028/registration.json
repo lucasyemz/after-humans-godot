@@ -1,0 +1,72 @@
+{
+  "canvas": [
+    1086,
+    1448
+  ],
+  "texture_canvas": [
+    543,
+    724
+  ],
+  "anchor": [
+    664.0,
+    1429
+  ],
+  "body_reference_pixels": 1419,
+  "height_m": 1.72,
+  "normalization": {
+    "raw_bbox": [
+      58,
+      27,
+      937,
+      1415
+    ],
+    "scale": 1.0223342939481268,
+    "paste": [
+      93,
+      10
+    ]
+  },
+  "head_reference_width": 305,
+  "poses": {
+    "walk": {
+      "raw_bbox": [
+        83,
+        11,
+        1047,
+        1420
+      ],
+      "head_reference_width": 305,
+      "raw_head_width": 306,
+      "scale": 0.9967320261437909,
+      "paste": [
+        62,
+        25
+      ],
+      "anchor": [
+        488.0,
+        1429
+      ],
+      "head_width_after": 306
+    },
+    "trade": {
+      "raw_bbox": [
+        93,
+        10,
+        1059,
+        1429
+      ],
+      "head_reference_width": 305,
+      "raw_head_width": 305,
+      "scale": 1.0,
+      "paste": [
+        60,
+        10
+      ],
+      "anchor": [
+        635.9,
+        1429
+      ],
+      "head_width_after": 305
+    }
+  }
+}
