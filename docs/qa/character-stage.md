@@ -91,15 +91,18 @@ placa sai, os moradores voltam onde estavam, os pés ficam no chão e nada tapa 
 
 ## Depois do merge: os ajustes do revisor do #200
 
-![o Tatu no Maior: antes, o escudo passava dos painéis; depois, cabe no vão](character-stage/tatu.jpg)
+![o Tatu: antes, a câmera recuava no Maior; depois, a coluna da esquerda é mais estreita e ele fica na escala de todos](character-stage/tatu.jpg)
+
+![a coluna da esquerda mais estreita: os nomes, o botão de ampliar e o texto do Maior continuam cabendo](character-stage/narrow.jpg)
 
 - **O Tatu no texto Maior:** o escudo passava uns 46 px dos painéis de cada lado.
-  - Agora a câmera se afasta só quando a arte do escolhido (`body_width_pixels`) é mais larga que o vão, com 16 px de
-    folga de cada lado.
-  - Os pés continuam na linha de sempre, e os outros heróis não mudam.
-  - Na foto, o Tatu entrou direto no elenco com um id de teste, por isso a ficha diz FUNDADOR.
-- **A câmera:** ela só se move quando o vão ou a largura da arte muda, e não a cada vez que a tela é refeita.
+  - A primeira correção afastava a câmera, e o Tatu ficava menor que os outros. O Lucas não quis isso (28/10).
+  - Agora a coluna da esquerda ficou mais estreita: 540 px, em vez de 600. Os heróis vão 4 por linha, em abas de
+    104 px.
+  - O botão de ampliar e as habilidades quebram a linha, em vez de alargar a coluna.
+  - Com o vão maior, o Tatu cabe no Maior na mesma escala de todos, com 16 px de folga de cada lado.
+- **A câmera:** ela só se move quando o vão muda, e não a cada vez que a tela é refeita.
 - **Outra tela:** a chegada, o trem, o relatório ou a partida fecham a Sala e tiram o escolhido do cômodo.
 - **A respiração:** ela se soma à escala da placa (`stage_scale`) em vez de sobrescrever.
-- O `tools/capture_181.gd` saiu.
-- O `test_character_stage` passou a ter 41 checagens, com o Tatu no Normal e no Maior.
+- O `tools/capture_181.gd` saiu. As fotos são de uma captura temporária: o Tatu entrou no elenco como recruta.
+- O `test_character_stage` confere o Tatu no Normal e no Maior: a escala dos outros e a folga no vão.

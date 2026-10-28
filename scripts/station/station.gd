@@ -58,7 +58,7 @@ const REPORT_SPACING := 2.6
 ## escala medida na tela é 381 px por metro de body_height, e os pés caem perto de y 878, como antes.
 const STAGE_FEET := 890.0
 const STAGE_PX_PER_METER := 381.0
-## A folga, em px de 1080, entre a arte do escolhido e cada painel da Sala.
+## A folga mínima, em px de 1080, entre a arte do escolhido e cada painel da Sala (o teste confere com o Tatu no Maior).
 const STAGE_MARGIN := 16.0
 ## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
 ## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
@@ -489,14 +489,9 @@ func focus_room_stage(room_id: String, left_px: float, right_px: float, instant:
 	var pitch := -3.0
 	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
 	var drop := atan((STAGE_FEET - 540.0) / focal) + deg_to_rad(-pitch)
-	# A arte mais larga que o vão (o escudo do Tatu no texto Maior): a câmera se afasta só o bastante para ela caber, com
-	# STAGE_MARGIN de cada lado; os pés continuam em STAGE_FEET.
-	var px_per_meter := STAGE_PX_PER_METER
-	var width := stage_width()
-	var room_px := right_px - left_px - 2.0 * STAGE_MARGIN
-	if width > 0.0 and room_px > 0.0 and width * px_per_meter > room_px:
-		px_per_meter = room_px / width
-	var distance: float = focal / px_per_meter
+	# Todos na mesma escala (o Lucas não quer a câmera recuando): o vão entre os painéis é que cabe a arte mais larga, o
+	# escudo do Tatu no texto Maior (a coluna da esquerda da Sala, mais estreita).
+	var distance: float = focal / STAGE_PX_PER_METER
 	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * distance / focal
 	_go({"pos": Vector3(x, room.floor + distance * tan(drop), LANE_Z + distance), "fov": fov, "pitch": pitch}, false, instant)
 

@@ -10,7 +10,10 @@ class_name AHCharacterRoom
 extends Control
 
 const S := preload("res://scripts/flow/station_rules.gd")
-const LEFT := Rect2(28, 132, 600, 772)
+## A coluna da esquerda, estreita (#181, o pedido do Lucas): o vão entre os painéis cabe a arte mais larga (o escudo do
+## Tatu) na escala de todos, também no texto Maior; o que tem texto longo quebra a linha em vez de alargar a coluna.
+const LEFT := Rect2(28, 132, 540, 772)
+const HERO_TAB_WIDTH := 104.0
 const RIGHT := Rect2(1296, 132, 596, 844)
 const DIALOG := Rect2(620, 250, 680, 0)
 const MAX_INSTINCT := 200
@@ -25,8 +28,8 @@ var training := false
 var _upgrade := ""
 var _first_focus: Control
 var _trait_ids := {}
-## O vão e a largura da arte do último enquadramento (_frame_stage).
-var _framing := Vector3(-1, -1, -1)
+## O vão do último enquadramento (_frame_stage).
+var _framing := Vector2(-1, -1)
 
 
 static func make(owner: Control) -> AHCharacterRoom:
@@ -103,14 +106,14 @@ func stage_gap() -> Vector2:
 
 
 ## A câmera põe o meio da Sala no meio do vão real entre os painéis (#181), depois que eles tomam o tamanho. Só quando o
-## vão (ou a largura da arte do escolhido) muda: refazer a tela sem mudar o vão não mexe na câmera.
+## vão muda: refazer a tela sem mudar o vão não mexe na câmera.
 func _frame_stage() -> void:
 	await get_tree().process_frame
 	var station = hud.get("station") if hud != null else null
 	if station == null or not is_inside_tree() or not is_visible_in_tree():
 		return
 	var gap := stage_gap()
-	var framing := Vector3(gap.x, gap.y, station.stage_width())
+	var framing := gap
 	if framing == _framing:
 		return
 	_framing = framing
@@ -161,7 +164,7 @@ func _left(c: Dictionary) -> void:
 	scroll.add_child(column)
 	var tabs := HFlowContainer.new()
 	tabs.name = "Heroes"
-	tabs.add_theme_constant_override("h_separation", 14)
+	tabs.add_theme_constant_override("h_separation", 10)
 	tabs.add_theme_constant_override("v_separation", 10)
 	column.add_child(tabs)
 	for entry in S.living(c):
@@ -192,7 +195,8 @@ func _hero_tab(entry: Dictionary) -> Button:
 	tab.name = "Tab_%s" % entry.id
 	tab.toggle_mode = false
 	AHKit.style_as(tab, "hero_selected" if entry.id == selected else "hero")
-	tab.custom_minimum_size = Vector2(116, 132)
+	# Quatro por linha na coluna estreita.
+	tab.custom_minimum_size = Vector2(HERO_TAB_WIDTH, 132)
 	tab.clip_contents = true
 	tab.set_meta("hero_id", entry.id)
 	var face := TextureRect.new()
@@ -200,7 +204,7 @@ func _hero_tab(entry: Dictionary) -> Button:
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	face.position = Vector2(6, 6)
-	face.size = Vector2(104, 92)
+	face.size = Vector2(HERO_TAB_WIDTH - 12, 92)
 	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tab.add_child(face)
 	# Em recuperação (#118): o retrato apagado, o ícone de Caído e os dias no canto.
@@ -219,7 +223,7 @@ func _hero_tab(entry: Dictionary) -> Button:
 	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name.position = Vector2(4, 98)
-	name.size = Vector2(108, 30)
+	name.size = Vector2(HERO_TAB_WIDTH - 8, 30)
 	tab.add_child(name)
 	tab.tooltip_text = String(entry.display_name) if not S.recovering(entry) else S.recovery_block(entry)
 	var id: String = entry.id
@@ -257,6 +261,7 @@ func _ability_row(ability_id: String) -> Button:
 	row.add_theme_font_override("font", AHKit.font(false))
 	row.add_theme_font_size_override("font_size", AHKit.size("row"))
 	row.custom_minimum_size = Vector2(0, 60)
+	row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var id := ability_id
 	row.pressed.connect(func():
 		ability = id
@@ -293,7 +298,7 @@ func _ability_detail(c: Dictionary, hero: Dictionary, ability_id: String) -> Pan
 	box.add_child(ranks)
 	var text := AHKit.label(tr(String(data.Description)), "text", AHKit.TEXT)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text.custom_minimum_size = Vector2(480, 0)
+	text.custom_minimum_size = Vector2(400, 0)
 	box.add_child(text)
 	var enemy: bool = String(data.TargetType) == "SingleEnemy"
 	box.add_child(AHKit.label(tr(TARGETS.get(String(data.TargetType), "")), "text", AHKit.alert_text() if enemy else AHKit.good()))
@@ -315,6 +320,7 @@ func _roster_line(c: Dictionary, column: VBoxContainer) -> void:
 		var grow := AHKit.button(tr("Ampliar o Alojamento · %s") % S.cost_text(cost), "secondary")
 		grow.name = "GrowRoom"
 		grow.custom_minimum_size = Vector2(0, 56)
+		grow.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		grow.disabled = block != ""
 		grow.tooltip_text = block if block != "" else tr("Nível %d: %d heróis.") % [level + 1, S.hero_limit_at(level + 1)]
 		grow.pressed.connect(func(): hud._act(S.upgrade_room(Campaign.state, S.CHARACTERS, level), tr("O Alojamento cresceu: %s.") % S.limits_text(Campaign.state)))
@@ -331,6 +337,7 @@ func _roster_line(c: Dictionary, column: VBoxContainer) -> void:
 		var go := AHKit.button(tr("%s espera na plataforma") % waiting, "secondary")
 		go.name = "ToTrain"
 		go.custom_minimum_size = Vector2(0, 60)
+		go.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		go.pressed.connect(func(): hud.open_service("train"))
 		column.add_child(go)
 

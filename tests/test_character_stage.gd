@@ -105,12 +105,13 @@ func _stage(station, profile: String, fallen_id: String) -> void:
 	await _wide(station, profile)
 
 
-## O revisor do #200: a arte mais larga (o escudo do Tatu) cabe no vão também no Maior, a câmera não se mexe ao refazer a
+## O revisor do #200 e o Lucas: a arte mais larga (o escudo do Tatu) cabe no vão também no Maior, na escala de todos (a
+## coluna da esquerda é que é estreita), a câmera não se mexe ao refazer a
 ## tela com o mesmo vão, a respiração não apaga a escala da placa e outra tela (a chegada) tira o escolhido da sala.
 func _wide(station, profile: String) -> void:
 	var hud: AHRefugeHud = station.hud
 	var tatu = Campaign.state.roster.filter(func(h): return h.class_id == "tatu")
-	var tatu_id: String = tatu[0].id if not tatu.is_empty() else "hero_tatu_test"
+	var tatu_id: String = tatu[0].id if not tatu.is_empty() else "hero_tatu_9"
 	if tatu.is_empty():
 		# Direto no elenco (a classe pode ainda não ter chegado à Estação nessa campanha).
 		S._add_hero(Campaign.state, tatu_id, "tatu", "Casco", [], S.pick_art_variant(Campaign.state, "tatu"))
@@ -127,8 +128,13 @@ func _wide(station, profile: String) -> void:
 	var left_px: float = station.camera.unproject_position(card.global_position - Vector3(half, 0, 0)).x
 	var right_px: float = station.camera.unproject_position(card.global_position + Vector3(half, 0, 0)).x
 	var gap: Vector2 = screen.stage_gap()
-	t.check(left_px >= gap.x - 2.0 and right_px <= gap.y + 2.0,
-		"%s: a arte do Tatu cabe no vão (%.0f a %.0f; o vão, %.0f a %.0f)" % [profile, left_px, right_px, gap.x, gap.y])
+	t.check(left_px >= gap.x + AHStation.STAGE_MARGIN - 1.0 and right_px <= gap.y - AHStation.STAGE_MARGIN + 1.0,
+		"%s: a arte do Tatu cabe no vão, com folga (%.0f a %.0f; o vão, %.0f a %.0f)" % [profile, left_px, right_px, gap.x, gap.y])
+	# Na mesma escala de todos (a câmera não recua): a altura dele em px é a do metro da Sala.
+	var feet: Vector2 = station.camera.unproject_position(card.global_position)
+	var head: Vector2 = station.camera.unproject_position(card.global_position + Vector3(0, card.body_height, 0))
+	t.check(absf((feet.y - head.y) - card.body_height * AHStation.STAGE_PX_PER_METER) < card.body_height * AHStation.STAGE_PX_PER_METER * 0.05,
+		"%s: o Tatu na escala dos outros (%.0f px)" % [profile, feet.y - head.y])
 	var goal: Dictionary = station._goal.duplicate()
 	screen.rebuild()
 	await _frames(4)
