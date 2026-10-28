@@ -1,0 +1,21 @@
+{
+  "Description": "A caixa da cara de cada personagem sem retrato (#193): [x, y, lado] em pixels do canvas da pose parada (no quadro, nas folhas). Os ícones de personagem (a ordem de turno, as placas, o Mapa da Rede) recortam este quadrado. Sem caixa, o recorte automático fica de reserva. Conferir com tools/face_sheet.gd.",
+  "enemies": {
+    "robot": [104, 14, 48],
+    "robot_fungo": [108, 52, 54],
+    "vigia_enferrujado": [509, 200, 220],
+    "cao_eco": [790, 520, 300],
+    "condutor_raiz": [750, 584, 300],
+    "sussurrador": [390, 350, 420],
+    "rastejante_raiz": [690, 570, 380],
+    "ninho_errante": [810, 500, 360],
+    "carcaca_colonizada": [510, 490, 420],
+    "porteiro": [470, 404, 360],
+    "recreador": [480, 70, 320],
+    "pipoco": [430, 220, 420],
+    "enraizado": [490, 80, 320],
+    "broto": [630, 510, 380],
+    "carrasco_industrial": [640, 40, 320],
+    "faisca": [550, 550, 420]
+  }
+}
