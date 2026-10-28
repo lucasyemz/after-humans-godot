@@ -84,6 +84,17 @@ var busy := false
 var camp: AHCampScene
 var _room_time := 0.0
 var _fight := {}
+## Os caídos no mapa (#179): o corpo de cada um, deitado no lugar da luta (hero_id: AHMapActor).
+var bodies := {}
+## O marcador do caído (m sobre o pé): baixo, para a pose deitada.
+const BODY_MARKER := 1.4
+## O tom do caído no mapa: acinzentado como na luta, mais claro para ler na noite e na chuva.
+const FALLEN_TINT := Color(0.78, 0.78, 0.84)
+## Onde o corpo fica (m): o passo atrás da fila (e entre dois corpos) e o quanto à frente da faixa da equipe.
+const BODY_GAP := 1.5
+const BODY_FRONT := 0.2
+## Quanto a equipe recua da borda do mapa quando o aviso do caído para a passagem (m).
+const TRAVEL_STEP_BACK := 1.0
 var _action := Callable()
 var _overlays := {}
 ## Segmentos do corredor neste mapa: {x0, x1, first, steps, length, zone (-1 na rua)}; o atual; os trechos deste mapa.
@@ -130,6 +141,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	street.apply_corridor_weather(route.weather)
 	_spawn_guards()
 	_spawn_props()
+	_spawn_bodies()
 	_refresh_doors()
 	if route.current_house >= 0:
 		_open_room(route.current_house)
@@ -472,7 +484,17 @@ func _travel_segment(direction: int) -> void:
 
 
 ## Fim do mapa de passagem: a equipe entra no primeiro trecho do mapa da fase e viaja para ele (só de ida).
-func _travel_map(campaign: Dictionary, next: int) -> void:
+func _travel_map(campaign: Dictionary, next: int, confirmed: bool = false) -> void:
+	# Com caído no chão deste mapa (#179), seguir o deixa para trás (o próximo mapa não volta): pergunta antes.
+	var left: Array = _downed_here().map(func(entry): return entry.hero_id)
+	if not confirmed and not left.is_empty():
+		# Fora da borda que leva ao próximo mapa, para o quadro seguinte não perguntar de novo.
+		street._leader.position.x -= TRAVEL_STEP_BACK
+		hud.show_choice(tr("Ainda há quem caiu neste mapa"),
+			(tr("%s ainda está no lugar da luta, e a equipe não volta para cá depois de seguir. Quem fica no chão só é recolhido na saída, mais ferido, e chega com a recuperação inteira.") if left.size() == 1
+				else tr("%s ainda estão no lugar da luta, e a equipe não volta para cá depois de seguir. Quem fica no chão só é recolhido na saída, mais ferido, e chega com a recuperação inteira.")) % _names(left),
+			[[tr("Ficar e levantar"), func(): pass], [tr("Seguir mesmo assim"), func(): _travel_map(Campaign.state, next, true)]])
+		return
 	busy = true
 	R.enter_step(campaign, next)
 	Campaign.save()
@@ -749,6 +771,13 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 			else:
 				text = tr("%s · a patrulha guarda a porta") % tr(area)
 				action = Callable()
+	# Os caídos no chão (#179): levantar.
+	var body := _body_near(leader, best)
+	if not body.is_empty():
+		best = body[1]
+		text = bodies[body[0]].action_text
+		action = _lift.bind(body[0])
+		where = _body_point(body[0])
 	var exit_x: float = EXIT_X if street.scenario == null else segments[0].x0 + EXIT_X
 	# No cenário, com o guardião vencido, a volta vale de qualquer ponto (RequestExpeditionReturn da Unreal).
 	var done_here: bool = street.scenario != null and campaign.session.expedition.objective_completed and text == ""
@@ -860,6 +889,13 @@ func _house_frame(campaign: Dictionary, route: Dictionary) -> void:
 			text = tr("Acampamento já feito nesta fase")
 			action = Callable()
 			where = _camp_point()
+	# Os caídos dentro da casa (#179): levantar.
+	var body := _body_near(leader, best)
+	if not body.is_empty():
+		best = body[1]
+		text = bodies[body[0]].action_text
+		action = _lift.bind(body[0])
+		where = _body_point(body[0])
 	if leader.x < room.exit_x:
 		text = tr("E  Sair para a rua")
 		action = _leave_house
@@ -1114,9 +1150,18 @@ func _force_house(site_index: int) -> void:
 		hud.refresh(Campaign.state)
 
 
-func _retreat() -> void:
+func _retreat(confirmed: bool = false) -> void:
 	# Com a carga do guardião na tela, só sai depois de escolher e fechar (a carga não se perde).
 	if busy or AHFightRewards.cargo_pending(Campaign.state):
+		return
+	# Com caído ainda neste mapa (#179), a volta lembra antes: quem fica chega com a recuperação inteira.
+	var left: Array = _downed_here().map(func(entry): return entry.hero_id)
+	if not confirmed and not left.is_empty():
+		hud.show_choice(tr("Ainda há quem caiu no mapa"),
+			(tr("%s ainda está no lugar da luta. Quem não for levantado só é recolhido na saída, mais ferido, e chega com a recuperação inteira.") if left.size() == 1
+				else tr("%s ainda estão no lugar da luta. Quem não for levantado só é recolhido na saída, mais ferido, e chega com a recuperação inteira.")) % _names(left),
+			# A primeira opção fica com a tecla de interagir: é a segura (o mesmo E que pediu a volta não larga ninguém).
+			[[tr("Ficar e levantar"), func(): pass], [tr("Voltar mesmo assim"), func(): _retreat(true)]])
 		return
 	if not R.safe_retreat(Campaign.state):
 		return
@@ -1171,6 +1216,7 @@ func _open_room(site_index: int) -> void:
 			var card := _enemy_card(specs[i].enemy_id)
 			card.position = Vector3(room.guard_x + i * 1.35, 0, -0.8 - 0.03 * i)
 			room_guards.append(card)
+	_spawn_bodies()
 
 
 func _leave_house() -> void:
@@ -1182,6 +1228,7 @@ func _leave_house() -> void:
 		Campaign.save()
 		Sound.play("res://audio/world/door_close.ogg")
 		_close_room()
+		_spawn_bodies()
 		street._place_leader(Vector3(doors[site.door].x, 0, 0.45))
 	await GameFlow.fade(0.0)
 	busy = false
@@ -1372,7 +1419,19 @@ func _on_combat_finished(result: String) -> void:
 	var campaign: Dictionary = Campaign.state
 	R.end_combat(campaign, result, _fight.get("boss", false), "%s (%s)" % [_fight.get("cause", ""), R.phase(campaign.session.expedition.phase_id).get("name", "")])
 	street.end_fight()
+	# Quem caiu fica deitado no lugar da luta (#179); o resto da equipe segue. A equipe se refaz no mesmo trecho, então o
+	# corpo fica logo atrás da fila, um ao lado do outro (no lugar de quem caiu, alguém de pé o cobriria).
+	var places := {}
+	var fallen_ids: Array = street.party_ids.filter(func(id): return Campaign.hero(id) != null and not Campaign.hero(id).alive)
 	street.remove_dead_heroes()
+	if not street._heroes.is_empty():
+		var rear: AHSpriteCard = street._heroes[-1]
+		for k in fallen_ids.size():
+			var x: float = clampf(rear.position.x - street._heroes[0].facing * (BODY_GAP + BODY_GAP * k), street.walk_min.x, street.walk_max.x)
+			places[fallen_ids[k]] = Vector3(x, rear.position.y, minf(street._leader.position.z + BODY_FRONT, street.walk_max.z))
+	var fell := R.mark_downed(campaign, places, _map_id(), int(campaign.session.expedition.corridor.current_house) if _fight.get("house", false) else -1) \
+		if campaign.session.result == "" else []
+	_spawn_bodies()
 	if campaign.session.result != "":
 		Campaign.save()
 		_show_result()
@@ -1390,12 +1449,88 @@ func _on_combat_finished(result: String) -> void:
 			Campaign.save()
 			await open_cargo()
 			Tips.show_tip("boss_down")
-			if street.scenario:
-				hud.toast(tr("O guardião caiu. Vasculhe o que restou ou volte à Estação pelo Menu (%s).") % AHUiStyle.key_name("menu"), 6.0)
-			else:
-				hud.toast(tr("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua."), 6.0)
+			var boss_text: String = tr("O guardião caiu. Vasculhe o que restou ou volte à Estação pelo Menu (%s).") % AHUiStyle.key_name("menu") \
+				if street.scenario else tr("O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua.")
+			# Com caído na luta do guardião, os dois avisos num só (um toast apaga o outro).
+			hud.toast(boss_text if fell.is_empty() else boss_text + "\n" + _fallen_text(fell), 6.0 if fell.is_empty() else 9.0)
+			fell = []
 	Campaign.save()
 	hud.refresh(campaign)
+	if not fell.is_empty():
+		hud.toast(_fallen_text(fell), 7.0)
+
+
+## O aviso logo depois da luta (#179): quem caiu fica no lugar; quem não for levantado é recolhido na saída, mais ferido,
+## e chega com a recuperação inteira.
+func _fallen_text(fell: Array) -> String:
+	var who := _names(fell)
+	return (tr("%s caiu e ficou no lugar da luta. Levante agora: quem fica no chão só é recolhido na saída, mais ferido.") if fell.size() == 1
+		else tr("%s caíram e ficaram no lugar da luta. Levante agora: quem fica no chão só é recolhido na saída, mais ferido.")) % who
+
+
+## Os nomes numa frase: "Nick", "Nick e Íris", "Nick, Íris e Bento".
+func _names(hero_ids: Array) -> String:
+	var names: Array = hero_ids.map(func(id): return String(Campaign.hero(id).display_name))
+	return names[0] if names.size() == 1 else tr("%s e %s") % [", ".join(names.slice(0, -1)), names[-1]]
+
+
+## Os caídos ainda no chão deste mapa (os de um mapa que ficou para trás não estão mais ao alcance).
+func _downed_here() -> Array:
+	return R.downed_left(Campaign.state).filter(func(entry): return String(entry.map) == _map_id())
+
+
+## O mapa da rua (o cenário pelo nome; a Rua das Vitrines é "street"): onde o corpo do caído fica.
+func _map_id() -> String:
+	return String(street.scenario.map_name) if street.scenario else "street"
+
+
+## Os corpos dos caídos deste mapa (e, numa casa, os dela), deitados onde caíram (os levantados saem).
+func _spawn_bodies() -> void:
+	for card in bodies.values():
+		card.queue_free()
+	bodies.clear()
+	var inside := int(Campaign.state.session.expedition.corridor.current_house)
+	for entry in R.downed_left(Campaign.state):
+		# Do mapa de agora; o da casa só com a equipe dentro dela (a sala só existe aberta).
+		if String(entry.map) != _map_id() or (int(entry.get("house", -1)) >= 0 and int(entry.house) != inside):
+			continue
+		var hero = Campaign.hero(entry.hero_id)
+		var art := AHCombatArena.art_entry(street._combat_art.heroes, entry.hero_id, String(hero.get("art_variant", "")) if hero != null else "")
+		if art.is_empty() or hero == null:
+			continue
+		# A pose de caído do herói; o recruta, sem ela, fica na de pé, acinzentado como na luta.
+		var body := AHMapActor.create(entry.hero_id, art.get("reactions", {}).get("death", art.idle), AHCharacterHeights.find(entry.hero_id), FALLEN_TINT)
+		body.action_text = tr("E  Levantar %s") % hero.display_name
+		body.marker_height = BODY_MARKER
+		street.add_child(body)
+		body.position = Vector3(float(entry.x), float(entry.y), float(entry.z))
+		bodies[entry.hero_id] = body
+
+
+## O caído ao alcance do líder (o mais perto, dentro de best): [hero_id, distância], ou [] sem nenhum.
+func _body_near(leader: Vector3, best: float) -> Array:
+	var found: Array = []
+	for hero_id in bodies:
+		var distance := absf(bodies[hero_id].position.x - leader.x)
+		if distance < best and absf(bodies[hero_id].position.y - leader.y) < 1.0:
+			best = distance
+			found = [hero_id, distance]
+	return found
+
+
+func _body_point(hero_id: String) -> Vector3:
+	return bodies[hero_id].marker_point()
+
+
+## Levanta o caído (#179): ele sai do chão e segue carregado com a equipe, fora das lutas.
+func _lift(hero_id: String) -> void:
+	if not R.lift(Campaign.state, hero_id):
+		return
+	Campaign.save()
+	Sound.play("res://audio/world/search_cloth_1.ogg")
+	hud.toast(tr("A equipe levantou %s: segue junto até a volta, sem lutar.") % Campaign.hero(hero_id).display_name, 3.5)
+	_spawn_bodies()
+	hud.refresh(Campaign.state)
 
 
 ## A carga recuperada do guardião (#91), se ainda não foi escolhida: as caixas viradas, a escolha e a revelação.

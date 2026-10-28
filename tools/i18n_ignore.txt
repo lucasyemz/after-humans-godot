@@ -1507,7 +1507,6 @@ street.gd: Leaves
 street.gd: dust
 street.gd: leaves
 refuge_hud.gd: %s:%s
-refuge_hud.gd: id
 scenario_world.gd: ZoneEnd_%d_%s
 scenario_world.gd: left
 scenario_world.gd: right
@@ -1517,4 +1516,13 @@ passage_card.gd: Sound
 passage_card.gd: Ambience
 passage_card.gd: gain
 passage_card.gd: end
+exploration_hud.gd: Carried
+*: carried
+exploration_hud.gd: %s (%s)
+station_rules.gd: Factor
+journey_rules.gd: downed
+journey_rules.gd: alive
+journey_rules.gd: house
+street_corridor.gd: reactions
+street_corridor.gd: death
 ui_style.gd: enemies
