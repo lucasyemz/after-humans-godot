@@ -486,6 +486,12 @@
 			"gain_db": 0.0,
 			"normalized": false
 		},
+		"res://audio/station/train_ride.ogg": {
+			"category": "ambience",
+			"lufs": -19.0,
+			"gain_db": -7.0,
+			"normalized": true
+		},
 		"res://audio/ui/bag_open.ogg": {
 			"category": "ui",
 			"lufs": -20.2,

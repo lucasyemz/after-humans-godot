@@ -1895,9 +1895,18 @@ func _civilian_card(c: Dictionary, who: Dictionary) -> void:
 		"small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
 
 
+const CIVILIAN_ART := "res://data/presentation/civilians.json"
+static var _civilian_art := {}
+static var _civilian_art_loaded := false
+
+
+## O rosto do morador (#193): o recorte da portrait_uv dele (data/presentation/civilians.json), não o corpo inteiro.
 static func _civilian_face(civilian_id: String) -> Texture2D:
-	var path := "res://art/civilians/%s.webp" % civilian_id
-	return load(path) if ResourceLoader.exists(path) else null
+	if not _civilian_art_loaded:
+		_civilian_art_loaded = true
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(CIVILIAN_ART)) if FileAccess.file_exists(CIVILIAN_ART) else null
+		_civilian_art = parsed if typeof(parsed) == TYPE_DICTIONARY else {}
+	return U.face_texture(_civilian_art.get(civilian_id, {}))
 
 
 # ---------------------------------------------------------------- Alojamento (a Sala dos Personagens)
