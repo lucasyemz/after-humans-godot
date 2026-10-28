@@ -55,6 +55,17 @@ func _rule() -> void:
 	t.check(other.file.ends_with("/hurt.webp") and other.anchor == idle.anchor and other.canvas == idle.canvas,
 		"com o arquivo na pasta, a pose troca o arquivo e guarda o canvas e a âncora")
 	t.equal(AHWounded.pose(idle, "nao-existe.webp"), idle, "sem o arquivo, fica o idle")
+	# A pose de verdade (#209): cada herói com o wounded.webp na pasta troca para ele, no canvas e na âncora do idle.
+	var real := 0
+	for hero_id in ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]:
+		var hero_idle: Dictionary = AHCombatArena.hero_art_of(hero_id).idle
+		if not ResourceLoader.exists(String(hero_idle.file).get_base_dir().path_join(AHWounded.POSE_FILE)):
+			continue
+		real += 1
+		var wounded := AHWounded.pose(hero_idle)
+		t.check(String(wounded.file).ends_with("/wounded.webp") and wounded.canvas == hero_idle.canvas and wounded.anchor == hero_idle.anchor,
+			"%s: a pose de ferido de verdade, no canvas e na âncora do idle" % hero_id)
+	t.equal(real, 4, "os quatro fundadores têm a pose de ferido")
 	# O limite fica abaixo do "Em forma": um Threshold alto demais não apaga o "Ferimento leve".
 	var row: Dictionary = GameData.row("wounded", "wounded")
 	row.Threshold = 0.9

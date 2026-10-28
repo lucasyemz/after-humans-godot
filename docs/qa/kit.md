@@ -32,8 +32,8 @@ as peças da luta sem equivalente: `round_strip`, `ability_header`, `ability_slo
   - as fontes são a Barlow Condensed Medium e SemiBold. Os tamanhos de cada uso (`SIZE`) passam pelo
     `AHUiStyle.px()`, então o texto Maior (130%) vale na hora;
   - as cores dos alvos, com as do daltonismo. O Instinto fica em ferrugem e o XP em violeta (decisões do Lucas);
-  - os estados de vida (decisão do Lucas): Em forma acima de 75%, Ferimento leve de 50% a 75% e Ferimento grave abaixo
-    de 50%.
+  - os estados de vida (decisão do Lucas): Em forma acima de 75%, Ferimento leve de 30% a 75% e Ferimento grave abaixo
+    de 30% (o `Threshold` de `data/wounded.json`, desde o #194; antes, 50%).
 - A Barra, a pílula e a Tecla recolorem no `restyle()` quando o daltonismo muda. A Tecla também acompanha as trocas das
   Opções.
 - **O anel de quem age** (`scripts/combat/actor_ring.gd`): a peça `actor_ring` num plano deitado no chão, sob os pés,

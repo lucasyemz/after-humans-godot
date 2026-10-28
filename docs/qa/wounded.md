@@ -43,10 +43,11 @@ A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWo
 
 ## Testes
 
-- `tests/test_wounded.gd` (novo, 28 verificações):
+- `tests/test_wounded.gd` (novo, 33 verificações):
   - o limite (abaixo dele ferido, nele não), o Caído em recuperação, o morto e o herói ausente; o ferido é o
     "Ferimento grave" do kit em toda vida de 0 a 100, com o mesmo número;
-  - a fração da velocidade e a pose (o arquivo da pasta com o canvas e a âncora do idle; sem o arquivo, o idle);
+  - a fração da velocidade e a pose (o arquivo da pasta com o canvas e a âncora do idle; sem o arquivo, o idle), e a
+    pose de verdade dos quatro fundadores (o `wounded.webp` do #209);
   - o limite travado abaixo do "Em forma";
   - na rua: a placa troca para a pose (uma de mentira, o `hurt.webp`) e volta ao idle com a cura; a velocidade que o
     `_physics_process` dá ao líder, ferido e inteiro; a troca de formação leva a pose e o mancar com o ferido;
@@ -76,3 +77,6 @@ A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWo
   `Threshold` abaixo do "Em forma".
 - **Decisão do Lucas (28/10):** o limite em 30% (o passo segue em 70%), e o "Ferimento grave" da Estação junto; a main
   com o #209 traz as poses de ferido, e as capturas foram refeitas com elas.
+- **Revisão do PR #216 (com os 30%): AJUSTAR ANTES.** Os documentos da HUD da Estação e do kit ainda diziam 50%:
+  agora dizem 30%, com o `data/wounded.json`; o teste confere a pose de verdade de cada fundador; o `LIGHT_FROM` diz
+  que acompanha o dado; o `test_secret_wall.gd.uid`, que veio da `main` sem relação, saiu do PR.

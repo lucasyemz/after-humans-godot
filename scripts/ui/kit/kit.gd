@@ -98,6 +98,7 @@ const VEIL := Color(0.04, 0.04, 0.05, 0.62)
 
 ## Os limites dos estados (fração da vida máxima).
 const HEALTHY_ABOVE := 0.75
+## Só o valor sem a tabela: o limite de verdade é o Threshold de data/wounded.json (heavy_below), e este acompanha ele.
 const LIGHT_FROM := 0.3
 
 static var _entries := {}
