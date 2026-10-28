@@ -56,7 +56,7 @@ Conferidos `docs/narrative/lore.md` (sociedade animal, Remendadores e vocabulár
 
 ## Originais fora da main
 
-Tag `codex-pr<N>-originals`; pasta `art/combat/source/merchant_20261028/`. O Release da mesma tag fornece o ZIP automático, cuja árvore isolada contém somente os quatro PNG normalizados, registro de medidas e contrato. Os brutos da geração ficam fora do Git. Nenhum PNG entra no diff ou histórico do PR para a main.
+Tag `codex-pr222-originals`; pasta `art/combat/source/merchant_20261028/`. O Release da mesma tag fornece o ZIP automático, cuja árvore isolada contém somente os quatro PNG normalizados, registro de medidas e contrato. Os brutos da geração ficam fora do Git. Nenhum PNG entra no diff ou histórico do PR para a main.
 
 Para reproduzir após extrair o pacote: `python docs/design/merchant/build_delivery.py --sources art/combat/source/merchant_20261028`. Dependências: Pillow, numpy e scipy. A normalização usa o utilitário de recorte existente em `docs/design/recruit_layers/prepare_layers.py`.
 
@@ -69,3 +69,5 @@ Para reproduzir após extrair o pacote: `python docs/design/merchant/build_deliv
 ## Validação técnica
 
 Godot4.7.2: importação final e capturas reais do protótipo concluídas; runner completo desta branch **87/87 em598,190s**, paridade **48/48**. O log mantém avisos de foco/recursos e coroutine do tutorial ao encerrar; retorno zero. Auditoria das quatro imagens e hashes aprovada. Sem mudanças em scripts/data/tests ou ids e sem registro antecipado do NPC em produção.
+
+[Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr222-originals) · [ZIP dos originais](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr222-originals.zip).
