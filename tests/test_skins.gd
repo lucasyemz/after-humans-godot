@@ -236,8 +236,9 @@ func _screens() -> void:
 					spilled.append("%s (%s)" % [skin_tab.name, label.text])
 			t.equal(spilled, [], "o nome cabe na aba (%s)" % ("Maior" if size == 2 else "Normal"))
 		Settings.set_text_size(size_before)
-		var figure = hud._room_screen.find_child("Hero", true, false)
-		t.check(figure != null and figure.art.get("file", "") == "res://art/combat/heroes/nick/idle.webp", "a figura do herói troca na hora")
+		# O escolhido está no cômodo da Sala (#181): a placa dele troca de roupa na hora, sem sair da sala.
+		t.check(station.stage_hero == BENTO and is_instance_valid(station.stage_card)
+			and String(station.stage_card.art().get("file", "")) == "res://art/combat/heroes/nick/idle.webp", "a placa no cômodo da Sala troca na hora")
 		resident = station.residents.get(BENTO)
 		t.check(resident != null and resident._texture != before, "e a placa dele na Estação também")
 		hud.close_panel()

@@ -1464,6 +1464,12 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 ## O herói trocou de skin (#138): a placa dele veste a nova onde está, na pose de agora (de pé, sentado, no posto ou
 ## dormindo), sem mudar de cômodo.
 func redress(hero_id: String) -> void:
+	# O escolhido na Sala dos Personagens (#181): a placa no cômodo troca de roupa junto (show_stage_hero não refaz a
+	# placa do mesmo herói).
+	if hero_id == stage_hero and is_instance_valid(stage_card):
+		var dressed := _hero_art(S.hero(Campaign.state, hero_id))
+		if not dressed.is_empty():
+			stage_card.show_art(dressed.idle)
 	for walker in _walkers:
 		if String(walker.get("hero_id", "")) != hero_id:
 			continue
