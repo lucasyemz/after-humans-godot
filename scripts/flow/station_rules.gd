@@ -1265,7 +1265,7 @@ static func abandon_to_refuge(campaign: Dictionary) -> bool:
 			continue
 		entry.hp = entry.max_hp
 		entry.instinct = 0
-	admit_fallen(campaign, fell)
+	admit_fallen(campaign, fell, expedition.get("carried", []) if expedition != null else [])
 	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
 	return true
 
@@ -1386,13 +1386,24 @@ static func _fill_beds(campaign: Dictionary) -> void:
 			return
 		if not in_bed(entry):
 			entry.recovery_bed = true
-			entry.recovery_days = mini(recovery_days(entry), bed_days)
+			# O carregado (#179) tem a parte dos dias também no leito (decisão do Lucas, 28/10).
+			entry.recovery_days = mini(recovery_days(entry), _carried_part(entry, bed_days))
 			free -= 1
+
+
+## Os dias de quem a equipe carregou (#179): a parte do recovery.json (carried: Factor, para cima, no mínimo 1); os
+## outros, os dias inteiros.
+static func _carried_part(entry: Dictionary, days: int) -> int:
+	if not entry.get("recovery_carried", false):
+		return days
+	return maxi(1, ceili(days * float(recovery_rule("carried").get("Factor", 1.0))))
 
 
 ## Os caídos de uma expedição chegam à Estação: vivos, com a vida baixa e os dias de recuperação. Devolve
 ## [{hero_id, days, bed}] para o relatório.
-static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
+## carried (#179): os que a equipe levantou e carregou; chegam com uma parte dos dias (recovery.json, carried: Factor, para
+## cima, no mínimo 1), na cama ou no Dormitório.
+static func admit_fallen(campaign: Dictionary, hero_ids: Array, carried: Array = []) -> Array:
 	var rule := recovery_rule("fallen")
 	for hero_id in hero_ids:
 		var entry = hero(campaign, hero_id)
@@ -1400,7 +1411,8 @@ static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
 			continue
 		entry.alive = true
 		entry.hp = clampi(int(rule.get("Hp", 1)), 1, int(entry.max_hp))
-		entry.recovery_days = maxi(1, int(rule.get("Days", 3)))
+		entry.recovery_carried = carried.has(hero_id)
+		entry.recovery_days = _carried_part(entry, maxi(1, int(rule.get("Days", 3))))
 		entry.recovery_bed = false
 		# Em recuperação, ninguém fica no posto (#119).
 		entry.post = ""
@@ -1409,14 +1421,16 @@ static func admit_fallen(campaign: Dictionary, hero_ids: Array) -> Array:
 	var out: Array = []
 	for hero_id in hero_ids:
 		var entry = hero(campaign, hero_id)
-		if entry != null:
-			out.append({"hero_id": hero_id, "days": recovery_days(entry), "bed": in_bed(entry)})
+		if entry == null:
+			continue
+		out.append({"hero_id": hero_id, "days": recovery_days(entry), "bed": in_bed(entry), "carried": carried.has(hero_id)})
 	return out
 
 
 static func _recover(entry: Dictionary) -> void:
 	entry.recovery_days = 0
 	entry.recovery_bed = false
+	entry.recovery_carried = false
 	# Os dias de cuidado fecham as feridas: volta ao Alojamento com a vida cheia.
 	entry.hp = int(entry.max_hp)
 
@@ -1659,7 +1673,8 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	delivered.posts = run_posts(campaign, expedition.team)
 	for post in delivered.posts:
 		delivered.recovered.append_array(post.recovered)
-	delivered.fallen = admit_fallen(campaign, expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive))
+	delivered.fallen = admit_fallen(campaign, expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive),
+		expedition.get("carried", []))
 	delivered.cycle = campaign.station.last_cycle.duplicate()
 	# O trem da volta (#122): quem chegou, ou ninguém; o relatório diz.
 	delivered.train = train_candidate_name(campaign) if train_on_return(campaign, expedition.id) else ""

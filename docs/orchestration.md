@@ -14,7 +14,8 @@ arquivo ao mesmo tempo.
 |---|---|---|---|
 | **Claude 1** (nuvem) | `claude-1` | `claude-cloud-<issue>` | **Estação e regras:** ninguém morre e Enfermaria (#118, #121), a Estação (#131), a preparação (#123), o trem dos recrutas (#122), limites e postos (#119), a noite (#132), o som do trem (#133), as skins (#138) |
 | **Claude 2** (nuvem) | `claude-2` | `claude2-<issue>` | **Exploração, mapas, tutorial e ambiência:** o tutorial (#144, #145, #147), a exploração (#129, #143, #142), a água e o Cais (#140, #141), a ambiência (#153, #154) |
-| **Awesomic 1** | `awesomic-1` | `design-<assunto>` | **Todo o design:** a Estação, a HUD e as skins (#120, #124, PR #139; #134, PR #148; #137) e, desde 27/10, os cenários, o tutorial e a ambiência que eram da Awesomic 2 (#146, a arte da #147, da #154 e as camadas da #141, se o Claude 2 pedir) |
+| **Awesomic 1** | `awesomic-1` | `design-<assunto>` | **Design de telas e cenários:** a Estação e a HUD (#120, #124, PR #139; #134, PR #148) e, desde 27/10, os cenários, o tutorial e a ambiência que eram da Awesomic 2 (#146, a arte da #147, da #154 e as camadas da #141, se o Claude 2 pedir) |
+| **Codex** (design) | `agent:codex` | `codex-<issue>` | **Poses de personagem** (desde 28/10, por ser mais consistente em manter o personagem igual): as 16 poses do Bento com a skin Ronda (#137), a pose de ferido (#195) e os recrutas em camadas (#191) |
 | Claude local | — | `main` | Revisa e junta os PRs, roda os testes no Windows, faz o build e escreve as issues e as mensagens |
 
 **Regras entre as frentes:**
