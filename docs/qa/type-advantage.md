@@ -99,3 +99,16 @@ O efeito é pequeno: nas fases 1 a 4 fica dentro da variação de 40 sementes. N
   - a ficha e a inspeção, ligada e desligada.
 - `tests/test_combat_parity.gd` com a regra desligada; `tests/run_all.gd` inteiro.
 - `tools/capture_227.gd`: a inspeção e a mira, nos textos Normal e Maior; roda também na `main` de antes.
+
+## QA
+
+- **Rodada 1: REPROVADO.** A regra do motor, a paridade, o `run_all` 89/89 e a medição passaram. Três médias:
+  - a inspeção perdia as explicações dos passivos no Normal e cortava a espécie no Maior;
+  - a dica da mira com vantagem esticava (de 478 para 744 px no Maior) e cobria a equipe;
+  - "Linhagem dos Cães" desde a fase 1 contradiz o relatório da fase 3, em que "linhagem" é uma palavra que ninguém
+    entende (§14): perguntado ao Lucas na issue.
+
+  Correção: na inspeção, cada nível tenta primeiro com a vantagem inteira (sem as explicações dela), depois só a
+  classificação e, sem caber, como era; ninguém cai de nível nem corta. A linha da vantagem na dica quebra na largura
+  de sempre. Das baixas: a plaqueta do ALVO encurta para "NOME · +25%" (o ícone e a cor seguem) e o "pode cair" conta
+  o percentual contra máquina.

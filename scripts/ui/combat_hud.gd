@@ -1153,21 +1153,34 @@ func _paint_examine() -> void:
 func _fill_inspect(info: Dictionary) -> void:
 	var margins: Vector2 = _inspect_panel.get_theme_stylebox("panel").get_minimum_size()
 	var inner := KIT_INSPECT_PANEL.size - margins
+	# A vantagem de tipo (#227) só entra quando cabe: em cada nível, primeiro inteira (a classificação numa linha própria
+	# e as duas linhas nos passivos, sem explicação: o título já diz tudo), depois só a classificação e, sem caber, o mesmo
+	# nível sem ela, como era.
+	var plain: Array = info.passives.filter(func(entry): return entry.size() < 4 or entry[3] != "type")
+	var typed: Array = plain + info.passives.filter(func(entry): return entry.size() >= 4 and entry[3] == "type").map(func(entry): return [entry[0], "", entry[2], entry[3]])
+	var steps: Array = []
 	for level in 5:
+		if typed.size() > plain.size():
+			steps.append([level, true, true])
+		if String(info.get("type", "")) != "":
+			steps.append([level, true, false])
+		steps.append([level, false, false])
+	for step in steps:
+		var level: int = step[0]
+		var with_type: bool = step[1]
+		var with_rows: bool = step[2]
 		_clear(_inspect_panel)
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 18)
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_inspect_panel.add_child(row)
-		var identity := _inspect_identity(info, level)
+		var identity := _inspect_identity(info, level, with_type)
 		row.add_child(identity)
 		# As duas colunas dividem o resto pelo que cada uma tem (a dos estados vazia fica estreita).
 		var columns := inner.x - identity.custom_minimum_size.x - 36.0 - 4.0
-		var share := float(maxi(1, info.passives.size())) / float(maxi(1, info.passives.size()) + maxi(1, info.states.size()))
+		var shown: Array = typed if with_rows else plain
+		var share := float(maxi(1, shown.size())) / float(maxi(1, shown.size()) + maxi(1, info.states.size()))
 		var passives := clampf(columns * share, 220.0, columns - 220.0)
-		# No nível mais apertado, as linhas da vantagem de tipo (#227) saem dos passivos: a classificação segue na linha da
-		# velocidade.
-		var shown: Array = info.passives if level < 4 else info.passives.filter(func(entry): return entry.size() < 4 or entry[3] != "type")
 		row.add_child(_inspect_list(tr("Efeitos passivos"), shown, tr("Nenhum"), level < 1, level >= 3, passives, "Passives"))
 		row.add_child(_inspect_list(tr("Estados"), info.states, tr("Nenhum agora"), level < 2, level >= 3, columns - passives, "States"))
 		var need := _inspect_panel.get_combined_minimum_size()
@@ -1177,7 +1190,7 @@ func _fill_inspect(info: Dictionary) -> void:
 	_inspect_panel.size = KIT_INSPECT_PANEL.size
 
 
-func _inspect_identity(info: Dictionary, level: int = 0) -> VBoxContainer:
+func _inspect_identity(info: Dictionary, level: int = 0, with_type: bool = true) -> VBoxContainer:
 	var column := VBoxContainer.new()
 	column.name = "Identity"
 	column.custom_minimum_size.x = 400 if level < 4 else 340
@@ -1209,9 +1222,9 @@ func _inspect_identity(info: Dictionary, level: int = 0) -> VBoxContainer:
 		kind_label.name = "Kind"
 		kind_label.clip_text = true
 		names.add_child(kind_label)
-	# A linhagem ou a família mecânica (#227), numa linha própria (no fim da espécie, o texto Maior a cortava); sem caber,
-	# vai para a linha da velocidade.
-	var type_name := String(info.get("type", ""))
+	# A linhagem ou a família mecânica (#227): no nível 0, numa linha própria (no fim da espécie, o texto Maior a cortava);
+	# do 1 ao 3, junto da velocidade, que ali é curta; no 4 (a coluna estreita), não cabe.
+	var type_name := String(info.get("type", "")) if with_type and level < 4 else ""
 	if type_name != "" and level < 1:
 		var type_label := AHKit.label(type_name, "small", AHKit.AMBER)
 		type_label.name = "Type"
@@ -1921,7 +1934,10 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			var note := tr("%s (vida %d)") % [_name(unit), unit.hp]
 			# A previsão já com a vantagem de tipo (#227): o dano mais alto, com o tipo, derruba?
 			var bonus := _type_bonus(option.id, unit)
-			var most := AHCombatEngine.typed_damage(session.effective_range(option.id, "damage", _actor_id).Max, bonus)
+			var most: int = session.effective_range(option.id, "damage", _actor_id).Max
+			if session.engine.is_machine(unit):
+				most = maxi(1, most * int(ability.MachineDamagePercent) / 100)
+			most = AHCombatEngine.typed_damage(most, bonus)
 			if not unit.is_player and ability.DamageRange.Max > 0 and most >= unit.hp:
 				note += tr(" · pode cair")
 			if bonus > 1.0:
@@ -1982,8 +1998,14 @@ func _advantage_row() -> HBoxContainer:
 	row.name = "Advantage"
 	row.add_theme_constant_override("separation", 6)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(AHKit.glyph(ADVANTAGE_GLYPH, S.px(20), AHKit.good()))
-	row.add_child(_kit_label(tr("Vantagem +%d%%: a linhagem ou a família de quem ataca vence a do alvo") % AHTypes.percent(), S.MIN_TEXT, AHKit.good(), "bold"))
+	var icon := AHKit.glyph(ADVANTAGE_GLYPH, S.px(20), AHKit.good())
+	icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(icon)
+	# Na largura das outras linhas da dica (sem esticar a caixa): quebra como elas.
+	var text := _kit_label(tr("Vantagem +%d%%: a linhagem ou a família de quem ataca vence a do alvo") % AHTypes.percent(), S.MIN_TEXT, AHKit.good(), "bold")
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.custom_minimum_size = Vector2(430 - S.px(20) - 6, 0)
+	row.add_child(text)
 	return row
 
 
@@ -2287,7 +2309,7 @@ func _paint_targets(pointed: int = -2) -> void:
 			var bonus := _type_bonus(_pick_ability, unit)
 			if bonus > 1.0:
 				# O espaço do ícone à esquerda, dentro da plaqueta.
-				_target_label.text = "      " + _target_label.text + "  ·  " + tr("Vantagem +%d%%") % AHTypes.percent()
+				_target_label.text = "      " + _target_label.text + "  ·  +%d%%" % AHTypes.percent()
 			var mark := _target_label.get_node("Advantage") as TextureRect
 			mark.visible = bonus > 1.0
 			(_target_label.get_node("Line") as ColorRect).color = AHKit.enemy_hp() if unit == null or not unit.is_player else AHKit.hero_hp()
