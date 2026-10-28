@@ -1,0 +1,274 @@
+{
+  "canvas": [
+    1178,
+    1335
+  ],
+  "anchor": [
+    588.5,
+    1305
+  ],
+  "body_reference_pixels": 1240,
+  "height_m": 1.44,
+  "idle_bbox": [
+    362,
+    65,
+    815,
+    1305
+  ],
+  "idle_raw_bbox": [
+    255,
+    20,
+    802,
+    1516
+  ],
+  "idle_raw_scale": 0.8288770053475936,
+  "support_center_x": 577.655,
+  "paste": [
+    362,
+    65
+  ],
+  "groups": {
+    "skills": {
+      "native_sheet": [
+        1178,
+        1335
+      ],
+      "scale_by_cell_width": 2.0,
+      "calibration_scale": 1.0,
+      "poses": {
+        "rato_frasco": {
+          "native_bbox": [
+            323,
+            90,
+            1118,
+            1323
+          ],
+          "shift": [
+            -83,
+            -18
+          ],
+          "normalized_bbox": [
+            240,
+            72,
+            1035,
+            1305
+          ]
+        },
+        "rato_mordida": {
+          "native_bbox": [
+            228,
+            40,
+            1000,
+            1328
+          ],
+          "shift": [
+            -31,
+            -23
+          ],
+          "normalized_bbox": [
+            197,
+            17,
+            969,
+            1305
+          ]
+        },
+        "rato_passagem": {
+          "native_bbox": [
+            193,
+            118,
+            1118,
+            1244
+          ],
+          "shift": [
+            4,
+            61
+          ],
+          "normalized_bbox": [
+            197,
+            179,
+            1122,
+            1305
+          ]
+        },
+        "rato_poeira": {
+          "native_bbox": [
+            215,
+            63,
+            1095,
+            1259
+          ],
+          "shift": [
+            -13,
+            46
+          ],
+          "normalized_bbox": [
+            202,
+            109,
+            1082,
+            1305
+          ]
+        }
+      }
+    },
+    "reactions": {
+      "native_sheet": [
+        1178,
+        1335
+      ],
+      "scale_by_cell_width": 2.0,
+      "calibration_scale": 1.0,
+      "poses": {
+        "hurt": {
+          "native_bbox": [
+            327,
+            71,
+            967,
+            1336
+          ],
+          "shift": [
+            -88,
+            -31
+          ],
+          "normalized_bbox": [
+            239,
+            40,
+            879,
+            1305
+          ]
+        },
+        "dodge": {
+          "native_bbox": [
+            229,
+            103,
+            1043,
+            1336
+          ],
+          "shift": [
+            -108,
+            -31
+          ],
+          "normalized_bbox": [
+            121,
+            72,
+            935,
+            1305
+          ]
+        },
+        "defense": {
+          "native_bbox": [
+            294,
+            39,
+            1045,
+            1279
+          ],
+          "shift": [
+            -87,
+            26
+          ],
+          "normalized_bbox": [
+            207,
+            65,
+            958,
+            1305
+          ]
+        },
+        "death": {
+          "native_bbox": [
+            127,
+            374,
+            952,
+            1228
+          ],
+          "shift": [
+            26,
+            77
+          ],
+          "normalized_bbox": [
+            153,
+            451,
+            978,
+            1305
+          ]
+        }
+      }
+    },
+    "camp": {
+      "native_sheet": [
+        1178,
+        1335
+      ],
+      "scale_by_cell_width": 2.0,
+      "calibration_scale": 1.0032362459546926,
+      "poses": {
+        "item": {
+          "native_bbox": [
+            361,
+            64,
+            883,
+            1305
+          ],
+          "shift": [
+            -9,
+            0
+          ],
+          "normalized_bbox": [
+            352,
+            64,
+            874,
+            1305
+          ]
+        },
+        "seat": {
+          "native_bbox": [
+            216,
+            537,
+            1016,
+            1298
+          ],
+          "shift": [
+            -28,
+            7
+          ],
+          "normalized_bbox": [
+            188,
+            544,
+            988,
+            1305
+          ]
+        },
+        "sleep": {
+          "native_bbox": [
+            148,
+            731,
+            1054,
+            1184
+          ],
+          "shift": [
+            -12,
+            121
+          ],
+          "normalized_bbox": [
+            136,
+            852,
+            1042,
+            1305
+          ]
+        }
+      }
+    }
+  },
+  "files": {
+    "idle": "rato-idle.png",
+    "rato_frasco": "rato-attack1-rato_frasco.png",
+    "rato_mordida": "rato-attack2-rato_mordida.png",
+    "rato_passagem": "rato-attack3-rato_passagem.png",
+    "rato_poeira": "rato-attack4-rato_poeira.png",
+    "hurt": "rato-hurt.png",
+    "dodge": "rato-dodge.png",
+    "defense": "rato-block.png",
+    "death": "rato-defeat.png",
+    "item": "rato-item.png",
+    "seat": "rato-seat.png",
+    "sleep": "rato-sleep.png"
+  }
+}

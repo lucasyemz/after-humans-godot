@@ -1,0 +1,1 @@
+Originais da #225 e acampamento #210. 24 corpos PNG RGBA 1178×1335 e 2 retratos 256×256. Consultar contract.json e registros por personagem. Integração pelo PC usando tools/sync_combat_art.py; referência corporal 1240px, alturas 1.44/1.56m. Não aplicar as camadas antigas sobre a anatomia nova. Helpers em qa/ são apenas de auditoria/captura. Nenhum PNG desta tag entra na main.

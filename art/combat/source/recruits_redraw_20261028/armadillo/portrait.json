@@ -1,0 +1,29 @@
+{
+  "file": "armadillo_recruit_01.png",
+  "source_idle": "tatu-idle.png",
+  "source_crop": [
+    490.0,
+    4.5,
+    890.0,
+    404.5
+  ],
+  "source_eye": [
+    715,
+    167
+  ],
+  "eye_anchor": [
+    144,
+    104
+  ],
+  "size": [
+    256,
+    256
+  ],
+  "layout_anchor": [
+    128,
+    128
+  ],
+  "circle_inner_radius": 112.64,
+  "safe_face_radius": 104,
+  "generated_independently": false
+}

@@ -1,0 +1,29 @@
+{
+  "file": "raccoon_recruit_01.png",
+  "source_idle": "rato-idle.png",
+  "source_crop": [
+    429.0,
+    16.5,
+    829.0,
+    416.5
+  ],
+  "source_eye": [
+    654,
+    179
+  ],
+  "eye_anchor": [
+    144,
+    104
+  ],
+  "size": [
+    256,
+    256
+  ],
+  "layout_anchor": [
+    128,
+    128
+  ],
+  "circle_inner_radius": 112.64,
+  "safe_face_radius": 104,
+  "generated_independently": false
+}

@@ -1,0 +1,274 @@
+{
+  "canvas": [
+    1178,
+    1335
+  ],
+  "anchor": [
+    589.0,
+    1305
+  ],
+  "body_reference_pixels": 1240,
+  "height_m": 1.56,
+  "idle_bbox": [
+    252,
+    65,
+    926,
+    1305
+  ],
+  "idle_raw_bbox": [
+    220,
+    10,
+    928,
+    1313
+  ],
+  "idle_raw_scale": 0.9516500383729855,
+  "support_center_x": 635.0,
+  "paste": [
+    252,
+    65
+  ],
+  "groups": {
+    "skills": {
+      "native_sheet": [
+        1178,
+        1335
+      ],
+      "scale_by_cell_width": 2.0,
+      "calibration_scale": 1.0,
+      "poses": {
+        "tatu_pancada": {
+          "native_bbox": [
+            126,
+            23,
+            1112,
+            1304
+          ],
+          "shift": [
+            -36,
+            1
+          ],
+          "normalized_bbox": [
+            90,
+            24,
+            1076,
+            1305
+          ]
+        },
+        "tatu_enrolar": {
+          "native_bbox": [
+            81,
+            367,
+            1069,
+            1305
+          ],
+          "shift": [
+            60,
+            0
+          ],
+          "normalized_bbox": [
+            141,
+            367,
+            1129,
+            1305
+          ]
+        },
+        "tatu_investida": {
+          "native_bbox": [
+            113,
+            43,
+            1117,
+            1203
+          ],
+          "shift": [
+            -34,
+            102
+          ],
+          "normalized_bbox": [
+            79,
+            145,
+            1083,
+            1305
+          ]
+        },
+        "tatu_abrigo": {
+          "native_bbox": [
+            61,
+            43,
+            1126,
+            1237
+          ],
+          "shift": [
+            32,
+            68
+          ],
+          "normalized_bbox": [
+            93,
+            111,
+            1158,
+            1305
+          ]
+        }
+      }
+    },
+    "reactions": {
+      "native_sheet": [
+        1178,
+        1335
+      ],
+      "scale_by_cell_width": 2.0,
+      "calibration_scale": 1.0,
+      "poses": {
+        "hurt": {
+          "native_bbox": [
+            178,
+            75,
+            1024,
+            1309
+          ],
+          "shift": [
+            -22,
+            -4
+          ],
+          "normalized_bbox": [
+            156,
+            71,
+            1002,
+            1305
+          ]
+        },
+        "dodge": {
+          "native_bbox": [
+            145,
+            71,
+            1117,
+            1310
+          ],
+          "shift": [
+            11,
+            -5
+          ],
+          "normalized_bbox": [
+            156,
+            66,
+            1128,
+            1305
+          ]
+        },
+        "defense": {
+          "native_bbox": [
+            119,
+            38,
+            1087,
+            1275
+          ],
+          "shift": [
+            -36,
+            30
+          ],
+          "normalized_bbox": [
+            83,
+            68,
+            1051,
+            1305
+          ]
+        },
+        "death": {
+          "native_bbox": [
+            69,
+            297,
+            1051,
+            1201
+          ],
+          "shift": [
+            0,
+            104
+          ],
+          "normalized_bbox": [
+            69,
+            401,
+            1051,
+            1305
+          ]
+        }
+      }
+    },
+    "camp": {
+      "native_sheet": [
+        1178,
+        1335
+      ],
+      "scale_by_cell_width": 2.0,
+      "calibration_scale": 0.998389694041868,
+      "poses": {
+        "item": {
+          "native_bbox": [
+            221,
+            62,
+            937,
+            1303
+          ],
+          "shift": [
+            4,
+            2
+          ],
+          "normalized_bbox": [
+            225,
+            64,
+            941,
+            1305
+          ]
+        },
+        "seat": {
+          "native_bbox": [
+            49,
+            447,
+            1051,
+            1275
+          ],
+          "shift": [
+            39,
+            30
+          ],
+          "normalized_bbox": [
+            88,
+            477,
+            1090,
+            1305
+          ]
+        },
+        "sleep": {
+          "native_bbox": [
+            161,
+            613,
+            1093,
+            1149
+          ],
+          "shift": [
+            -38,
+            156
+          ],
+          "normalized_bbox": [
+            123,
+            769,
+            1055,
+            1305
+          ]
+        }
+      }
+    }
+  },
+  "files": {
+    "idle": "tatu-idle.png",
+    "tatu_pancada": "tatu-attack1-tatu_pancada.png",
+    "tatu_enrolar": "tatu-attack2-tatu_enrolar.png",
+    "tatu_investida": "tatu-attack3-tatu_investida.png",
+    "tatu_abrigo": "tatu-attack4-tatu_abrigo.png",
+    "hurt": "tatu-hurt.png",
+    "dodge": "tatu-dodge.png",
+    "defense": "tatu-block.png",
+    "death": "tatu-defeat.png",
+    "item": "tatu-item.png",
+    "seat": "tatu-seat.png",
+    "sleep": "tatu-sleep.png"
+  }
+}
