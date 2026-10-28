@@ -1069,6 +1069,10 @@ func toast(text: String, seconds: float = 3.5) -> void:
 	# Quebra só o que passa de 900 (com a quebra ligada, o rótulo curto pedia a altura de uma palavra por linha).
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if width >= 900.0 else TextServer.AUTOWRAP_OFF
 	_toast_label.custom_minimum_size = Vector2(width, 0)
+	# A altura do texto quebrado depende da largura do rótulo: aplica a final antes de medir (com a largura velha, a
+	# chapa saía alta e meio vazia no texto Maior).
+	_toast_label.size = Vector2(width, 0)
+	_toast_label.size = Vector2(width, _toast_label.get_minimum_size().y)
 	_toast.reset_size()
 	_toast.size = _toast.get_combined_minimum_size()
 	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
