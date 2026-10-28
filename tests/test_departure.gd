@@ -138,13 +138,18 @@ func _departure(skip: String) -> void:
 	if not t.check(station != null and station.name == "Station", "a Estação abre"):
 		return
 	var c: Dictionary = Campaign.state
-	var team: Array = c.roster.slice(0, 3).map(func(h): return h.id)
-	team.append(c.roster[4].id)
+	# O recruta cão na frente: com as habilidades dele (#189), o ataque é só da frente.
+	var team: Array = [c.roster[4].id] + c.roster.slice(0, 3).map(func(h): return h.id)
+	t.equal(AHStationRules.confirm_departure(c.duplicate(true), team, 0, 1, "fase_1"), "", "a equipe pode partir")
 	station.hud._draft = {"phase": "fase_1", "team": team, "focus": "", "extra": 0}
 	# O briefing (#88) abre na chegada à plataforma (test_briefing); a confirmação parte direto.
 	station.hud._depart()
-	while GameFlow.passage == null:
+	for frame in 600:
+		if GameFlow.passage != null:
+			break
 		await _tree.process_frame
+	if not t.check(GameFlow.passage != null, "a partida abre a passagem"):
+		return
 	var card: AHPassageCard = GameFlow.passage
 	t.check(card.backdrop is AHWagonRide, "a passagem da partida mostra o vagão")
 	var ride: AHWagonRide = card.backdrop
