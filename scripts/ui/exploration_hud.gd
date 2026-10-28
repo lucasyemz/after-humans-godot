@@ -69,6 +69,10 @@ const TOOL_NOTICE_SECONDS := 5.0
 var _bag_new: Control
 var _toast_label: Label
 var _toast_tween: Tween
+## Uma frase que vai na frente de todo aviso até esta hora (Time.get_ticks_msec): o fôlego do tutorial que não pode
+## sumir sob o anúncio do trecho nem o aviso do começo da luta, que chegam logo em seguida.
+var _held_line := ""
+var _held_until := 0
 var _modal: PanelContainer
 ## O HUD do acampamento aberto (#77), null fora dele.
 var camp_hud: AHCampHud
@@ -1059,10 +1063,21 @@ func hide_tool_notice() -> void:
 	_tool_notice = null
 
 
+## Mostra a frase agora e a mantém na frente dos avisos seguintes até completar os segundos dela.
+func hold_line(line: String, seconds: float) -> void:
+	_held_line = line
+	_held_until = Time.get_ticks_msec() + int(seconds * 1000.0)
+	toast(line, seconds)
+
+
 ## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
 func toast(text: String, seconds: float = 3.5) -> void:
 	if _toast_tween:
 		_toast_tween.kill()
+	var left := (_held_until - Time.get_ticks_msec()) / 1000.0
+	if left > 0.0 and text != _held_line and not text.begins_with(_held_line):
+		text = _held_line + " " + text
+		seconds = maxf(seconds, left)
 	_toast_label.text = text
 	var width := minf(900.0, _toast_label.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1,
 		_toast_label.get_theme_font_size("font_size")).x + 8.0)

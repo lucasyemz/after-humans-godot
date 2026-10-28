@@ -262,13 +262,17 @@ func _journey() -> void:
 		toast.modulate.a = 0.0
 		await _frames(3)
 		t.equal(guide.hint._plate.position, held, "o aviso some e a dica da Mochila fica no lugar")
-		# Sem a busca, o fôlego vem ao chegar à luta do Drone e vai junto no anúncio do trecho (não some sob ele).
-		corridor._breath_note = true
+		# Sem a busca, o fôlego vem ao chegar à luta do Drone. Quem segue andando ouve o anúncio do trecho e logo o aviso
+		# do começo da luta: a frase vai na frente dos dois, até completar o tempo dela.
+		var breath := TranslationServer.translate("A equipe recupera o fôlego.")
+		street.exploration_hud.hold_line(breath, AHStreetCorridor.BREATH_LINE_SECONDS)
 		corridor._announce(5, "combat", true)
 		said = street.exploration_hud._toast_label.text
-		t.check(said.begins_with(TranslationServer.translate("A equipe recupera o fôlego.")) and said.contains("6"),
-			"sem a busca, o anúncio da luta do Drone leva o fôlego junto (%s)" % said)
-		t.check(not corridor._breath_note, "e só uma vez")
+		t.check(said.begins_with(breath) and said.contains("6"), "sem a busca, o anúncio da luta do Drone leva o fôlego junto (%s)" % said)
+		street.exploration_hud.toast(TranslationServer.translate("A equipe chegou sem ser vista: age primeiro."), 2.5)
+		said = street.exploration_hud._toast_label.text
+		t.check(said.begins_with(breath), "e o aviso do começo da luta também, sem a frase sumir (%s)" % said)
+		street.exploration_hud._held_until = 0
 		corridor.open_inventory()
 		await _frames(2)
 		t.check(guide.done("bag"), "aberta a Mochila, a dica cumprida")

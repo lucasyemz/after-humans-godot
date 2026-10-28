@@ -1,5 +1,6 @@
 ## O aviso do alto da exploração fica justo ao texto: um aviso que quebra em duas linhas, logo depois de um curto, não
-## mede a altura com a largura velha do rótulo (no texto Maior, a chapa saía alta e meio vazia, cobrindo o achado).
+## mede a altura com a largura velha do rótulo (no texto Maior, a chapa saía alta e meio vazia, cobrindo o achado). E a
+## frase mantida (hold_line) vai na frente dos avisos seguintes até completar o tempo dela.
 extends RefCounted
 
 const LONG := "Armário de manutenção: +1 curativo, +1 comida. A equipe recupera o fôlego."
@@ -32,6 +33,15 @@ func run(t) -> void:
 			var text_height: float = label.get_line_count() * label.get_line_height()
 			t.check(hud._toast.size.y <= text_height + 40.0, "tamanho de texto %d: a chapa do aviso justa ao texto (%.0f px para %d linhas de %.0f)" % [
 				size, hud._toast.size.y, label.get_line_count(), text_height])
+		# A frase mantida (o fôlego do tutorial) vai na frente dos avisos que chegam em seguida, até completar o tempo dela.
+		hud.hold_line("Linha mantida.", 6.0)
+		hud.toast("Outro aviso.", 2.5)
+		t.equal(hud._toast_label.text, "Linha mantida. Outro aviso.", "a frase mantida vai na frente do aviso seguinte")
+		hud.toast("Linha mantida. Já com ela.", 2.5)
+		t.equal(hud._toast_label.text, "Linha mantida. Já com ela.", "e não se repete num aviso que já começa com ela")
+		hud._held_until = Time.get_ticks_msec() - 1
+		hud.toast("Depois do tempo.", 2.5)
+		t.equal(hud._toast_label.text, "Depois do tempo.", "passado o tempo dela, o aviso vem sozinho")
 		tree.unload_current_scene()
 		await tree.process_frame
 	Settings.set_text_size(real_size)
