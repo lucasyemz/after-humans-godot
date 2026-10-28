@@ -1,0 +1,1 @@
+Originais da #210: quatro PNG RGBA normalizados. Fora da main, somente nesta tag/Release. Usar show_art do contrato: canvas, âncora e body_reference_pixels canônicos, sem remedir centro por cauda/escudo. Claude 2 integra pelo tools/build_camp_poses.py. Conversão usa razão uniforme pela largura e dimensões finais explícitas 589×668. Os brutos da geração permanecem fora do Git.
