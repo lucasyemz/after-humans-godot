@@ -1,9 +1,14 @@
+import {getLocalProject} from './project_library.js';
 async function readJson(url){const response=await fetch(url);if(!response.ok)throw new Error('Não foi possível carregar '+url);return response.json();}
+export let activeStoryPath=null;
 export async function loadStory(){
+ const localId=new URL(location.href).searchParams.get('project');
+ if(localId){const entry=await getLocalProject(localId);if(!entry)throw new Error('Projeto local não encontrado neste navegador. Volte às histórias e importe o arquivo salvo.');return entry.project;}
  const config=await readJson(new URL('../config/default_story.json',import.meta.url));
  const requested=new URL(location.href).searchParams.get('story')||config.story;
  const url=new URL(requested,new URL('../',import.meta.url));
  if(url.origin!==location.origin)throw new Error('A história deve estar no mesmo servidor.');
+ activeStoryPath=requested;
  const project=await readJson(url);
  await Promise.all(Object.values(project.assets).map(async asset=>{
   if(asset.data)return;

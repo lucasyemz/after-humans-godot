@@ -37,3 +37,23 @@ A busca completa também localizou os checkouts existentes em `Desktop/ah-claude
 ## Suíte do repositório Godot
 
 `D:\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://tests/run_all.gd`: **92/92 testes passaram**, saída 0, em 803.828 ms. Inclui paridade **48/48 lutas, 3.351 passos** e testes de save. `APPDATA` e `LOCALAPPDATA` foram direcionados a `comic_generator/outputs/godot_profile`, sem usar o perfil/saves reais do jogador. Log local: `outputs/godot_tests.log` (ignorado). A importação preparatória gerou apenas cache local; nenhuma mudança do jogo entrou no stage.
+
+## Dashboard e prévia responsiva (evolução do aplicativo)
+
+A raiz agora é a biblioteca de projetos; `editor.html` abre a história selecionada. O catálogo lê automaticamente os manifestos em `stories/`. Importações completas ficam no IndexedDB deste navegador, com IDs próprios. Projetos publicados usam resumos leves no painel; as imagens não são duplicadas nesse resumo. Alterações no nome, número de cenas e duração aparecem ao voltar do editor.
+
+Validação desta entrega:
+
+- `npm run check`: **4/4**. Sintaxe de todos os módulos, integridade do exemplo e regressões de importação inválida (nome não textual, 41 cenas e configuração incompleta).
+- Chrome headless: dashboard e editor em 1440×1000 e 390×844; QA independente também em 375 px. Sem overflow horizontal no painel, no editor e na prévia.
+- Prévia celular/tablet/tela livre: redimensiona sem alterar o projeto empacotado, câmera, enquadramento ou sequência narrativa.
+- Importação, edição e retorno: dois projetos com os mesmos IDs de cena permaneceram independentes; o nome salvo reapareceu no cartão correto.
+- Recuperação antiga em `comic_generator:/:default` preservada; entrar pelo cartão padrão retomou a edição anterior.
+- Retorno ao dashboard aguarda persistência; bloqueado durante exportação e quando IndexedDB não consegue salvar.
+- Exportação real de uma cena em 720p pela QA: 1.052.246 bytes. O motor de exportação continua o mesmo; a exportação completa de 44,3 s registrada acima permanece a referência.
+- QA independente: primeira rodada identificou validação insuficiente de import e cobertura de sintaxe; correções com testes de regressão. Rodada final: **VEREDITO: APROVADO**.
+- Capturas locais, ignoradas: `outputs/dashboard_desktop.png`, `dashboard_phone.png`, `preview_phone_desktop.png`, `preview_phone.png` e `editor_phone.png`. O registro anterior `outputs/editor.png` preserva a vista do editor antes do dashboard.
+
+Limites: prévia mantém 16:9 e simula larguras, sem gerar adaptação vertical ou reposicionar elementos narrativos. Testes de viewport foram feitos em Chrome headless; não substituem uma conferência em aparelhos físicos. Projetos importados e edições locais não são enviados ao servidor nem publicados automaticamente.
+
+Suíte do repositório repetida após a entrega do dashboard, com o mesmo perfil isolado: **92/92 testes passaram**, saída 0, em 727.346 ms, incluindo paridade 48/48. Log local: `outputs/godot_dashboard_tests.log`, ignorado. Nenhum arquivo do jogo, história ou imagem foi alterado nesta evolução.

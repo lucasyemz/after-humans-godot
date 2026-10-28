@@ -12,16 +12,18 @@ npm run check
 npm start
 ```
 
-Abra http://127.0.0.1:8766 e clique em **▶ Sequência**. Para outra porta: defina a variável `PORT` antes de executar. A instalação precisa de internet; depois dela o editor, as imagens, Three.js, o muxer e a fonte funcionam localmente. Não abra `index.html` pelo protocolo `file://`.
+Abra http://127.0.0.1:8766 para ver o dashboard. Escolha **Abrir projeto** no cartão da história e clique em **▶ Sequência** no editor. Para outra porta: defina a variável `PORT` antes de executar. A instalação precisa de internet; depois dela o editor, as imagens, Three.js, o muxer e a fonte funcionam localmente. Não abra `index.html` pelo protocolo `file://`.
 
 **MP4 · Cena** exporta a cena; **MP4 · Sequência** exporta a história completa. Use Chrome/Edge com WebCodecs e codificador H.264 disponíveis. O navegador baixa o vídeo; escolha `outputs/` como destino. Vídeos são ignorados pelo Git em toda esta pasta. “Salvar projeto” baixa um `.comic.json` com imagens incorporadas, que pode ser reaberto em “Carregar”.
 
-A recuperação automática fica no IndexedDB do navegador, separada pelo caminho e parâmetro `story`. “Abrir tirinha entregue” salva um backup antes de restaurar o exemplo selecionado. Para conferir a versão publicada após editar no navegador, use esse botão ou um perfil limpo.
+A recuperação automática fica no IndexedDB do navegador, separada por história ou projeto importado. O editor mantém acesso à recuperação anterior da URL raiz. “Abrir tirinha entregue” salva um backup antes de restaurar o exemplo selecionado. Para conferir a versão publicada após editar no navegador, use esse botão ou um perfil limpo.
 
 ## Estrutura
 
 ```text
-src/                      editor, estilos, servidor e carregador de histórias
+index.html                dashboard de histórias
+editor.html               editor e prévia responsiva
+src/                      dashboard, biblioteca local, editor, estilos e servidor
 config/default_story.json história aberta por padrão
 stories/bento_loss/        único exemplo provisório: story.json e assets/
 tests/                    verificações de integridade sem navegador
@@ -36,7 +38,7 @@ outputs/                  renders, vídeos e relatórios locais (ignorados)
 1. Crie `stories/my_story/`, com `story.json` e `assets/`; não copie `src/`.
 2. Parta do formato do exemplo: `format: "motion-comic-project"`, `version: 1`, `scenes` ordenadas, `selectedId` existente e `assets` indexados por id. Preserve as configurações necessárias de cada cena. Edite cenas, camadas e falas no editor, ou importe um `.comic.json` salvo.
 3. Cada `scene.images` relaciona o nome da camada ao id do asset. No disco, cada asset contém `name` e `path` relativo ao `story.json`. Também é aceito `data` com uma imagem incorporada, como no arquivo salvo pelo editor. Camadas visíveis precisam de imagem; `full` é a referência opcional usada pelo botão O.
-4. Abra `http://127.0.0.1:8766/?story=stories/my_story/story.json`. Para torná-la padrão, altere `config/default_story.json`. A recuperação de cada URL de história fica separada.
+4. A história aparece automaticamente no dashboard quando há `stories/my_story/story.json`. Abra `http://127.0.0.1:8766/editor.html?story=stories/my_story/story.json`. Para torná-la padrão, altere `config/default_story.json`. A recuperação de cada URL de história fica separada.
 5. Publique apenas os recursos usados por essa história, sem históricos ou versões alternativas. Os testes atuais também verificam o conteúdo específico do exemplo Bento; mantenha esse teste e acrescente validação própria para novas histórias.
 
 Os textos podem continuar em português. IDs e chaves do formato existente são preservados para compatibilidade. A interface permite criar e duplicar cenas e adicionar camadas sem duplicar o gerador.
@@ -52,3 +54,14 @@ Ficaram fora: backups de projetos, histórico de artes, exemplos alternativos, s
 O exportador preserva `mp4-muxer@5.2.2`, que o fornecedor marcou como substituído por Mediabunny. A migração de biblioteca fica para outro trabalho; não é necessária para reproduzir esta versão.
 
 Veja [a validação](docs/validation.md) e execute `npm run check` depois de mudar arquivos.
+
+
+## Dashboard e telas menores
+
+A página inicial lista as histórias existentes em `stories/*/story.json`, com capa, nome, número de cenas e duração. A busca filtra os cartões pelo nome. Use **Importar projeto** para adicionar um `.comic.json` completo, com imagens incorporadas, salvo pelo editor. Cada importação vira um projeto independente neste navegador; editar um não sobrescreve os outros nem os arquivos do disco. O painel reflete mudanças de nome, cenas e duração ao voltar do editor.
+
+**← Histórias** aguarda o salvamento local antes de sair. Durante carregamento ou exportação, a navegação fica bloqueada; se o navegador não puder salvar, o editor avisa e permanece aberto. Continue usando **Salvar projeto** para guardar uma cópia portátil. Limpar os dados do navegador remove os projetos importados e suas edições locais.
+
+**Ver prévia** no cartão abre a visualização em modo celular. Dentro do editor, **Prévia responsiva** alterna entre edição e visualização sem recarregar a história. Opções: **Celular · 390**, **Tablet · 768** e **Tela livre**; a medida real aparece ao lado. A largura se limita ao espaço disponível, inclusive ao abrir em um celular de verdade. O painel, os controles e o editor se reorganizam em telas menores.
+
+A prévia preserva o enquadramento 16:9 e permite avaliar o tamanho das falas e legendas, sem recortar a arte nem alterar câmeras, tempos ou exportação MP4. Ela não converte a história para formato vertical. A interface do editor e a fonte dos balões acompanham a largura da prévia; os arquivos da história permanecem iguais.
