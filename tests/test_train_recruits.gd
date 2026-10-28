@@ -98,9 +98,14 @@ func _recruit_arrives() -> void:
 		"e uma linha de onde veio, da classe dele")
 	t.check(S.hero(c, c.station.train.candidate_id) == null, "ainda fora do elenco")
 	t.equal(S.train_candidate_name(c), recruit.display_name, "o nome de quem espera")
-	# Uma classe sem arte de luta (o rato, liberado por evento) não chega no trem.
+	# Uma classe sem arte de luta não chega no trem (o rato, liberado por evento, antes da arte da #187): sem o recruta
+	# desenhado dele no manifesto, fica fora; com ele, chega.
 	c.unlocked_classes.append("rato")
+	t.check(S.train_classes(c).has("rato"), "o rato, com o recruta desenhado, chega")
+	var saved_art: Dictionary = S._recruit_art.duplicate(true)
+	S._recruit_art.erase("raccoon_recruit_01")
 	t.check(not S.train_classes(c).has("rato"), "a classe sem arte de luta não chega")
+	S._recruit_art = saved_art
 
 
 ## Aceitar custa o que ele pede; recusar manda embora, e ele não volta.

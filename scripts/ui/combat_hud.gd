@@ -50,6 +50,15 @@ const POPUP_HOLD := 5.0
 ## O toque que fecha o popup só vale depois disto (ms): a tecla que acabou a luta não o fecha no mesmo instante.
 const POPUP_GUARD_MS := 250
 const KIT_PORTRAIT := 60.0
+## A faixa da ordem (#193): a folga depois do último retrato (a ponta da direita da peça), a largura máxima na base de
+## 1920 (com a margem de cada lado) e o menor retrato quando a fila é longa.
+const ORDER_END_PAD := 14.0
+const ORDER_EDGE := 24.0
+const ORDER_MAX_WIDTH := 1920.0 - 2.0 * ORDER_EDGE
+const ORDER_MIN_PORTRAIT := 36.0
+## O espaço entre os retratos da faixa, e o menor, quando a fila é longa demais até para o menor retrato.
+const ORDER_GAP := 8.0
+const ORDER_MIN_GAP := 2.0
 const ACTIONS := [["Mover", "move", "Q", "combat_move"], ["Defender", "defend", "W", "combat_defend"],
 	["Mochila", "item", "I", "inventory"], ["Fugir", "flee", "F", "combat_flee"]]
 
@@ -186,11 +195,13 @@ static func _kit_label(text: String, size: int, color: Color = TEXT, kind: Strin
 
 func _build() -> void:
 	# A faixa da rodada (hud-target.md): "RODADA n", a linha com o ponto e os retratos quadrados da ordem.
-	_order_panel = AHKit.panel("round_strip")
+	# A folga no fim: a área de conteúdo da peça (content_xywh) entra na ponta da direita, e o último retrato a cobria.
+	_order_panel = PanelContainer.new()
+	_order_panel.add_theme_stylebox_override("panel", AHKit.style("round_strip", Color.WHITE, Vector4(0, 0, ORDER_END_PAD, 0)))
 	_order_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_order_panel)
 	_order = HBoxContainer.new()
-	_order.add_theme_constant_override("separation", 8)
+	_order.add_theme_constant_override("separation", int(ORDER_GAP))
 	_order.alignment = BoxContainer.ALIGNMENT_CENTER
 	_order.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_order_panel.add_child(_order)
@@ -664,7 +675,9 @@ func refresh() -> void:
 		if plate == null:
 			continue
 		var card: AHSpriteCard = arena.cards.get(unit.id)
-		plate.visible = card != null and card.visible and (unit.hp > 0 or unit.is_player)
+		# Quem caiu (o inimigo derrubado, o herói Caído, #178) perde a placa inteira: a barra, a moldura de quem age e os
+		# estados. O herói no Último Fôlego (vida 0, ainda na luta) fica com ela.
+		plate.visible = card != null and card.visible and AHCombatEngine.alive_any(unit)
 		var box := plate.get_child(0)
 		var hp: AHKitBar = box.get_node("Hp")
 		hp.set_value(unit.hp, unit.max_hp, "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else tr("Último Fôlego"))
@@ -752,8 +765,22 @@ func _refresh_order(current: String) -> void:
 		if unit == null or (unit.hp <= 0 and not unit.deaths_door) or (item.acted and item.unit_id != current):
 			continue
 		_order.add_child(_order_face(unit, item.unit_id == current))
+	# Fila longa demais para a largura: os retratos encolhem até caber; no menor retrato, o espaço entre eles também. A
+	# ponta da direita fica sempre livre (a folga é da peça), e a faixa fica dentro da margem enquanto couber.
+	_order.add_theme_constant_override("separation", int(ORDER_GAP))
+	var width := _order_panel.get_combined_minimum_size().x
+	if width > ORDER_MAX_WIDTH:
+		var faces: Array = _order.get_children().filter(func(child): return child.has_meta("unit_id"))
+		var side := maxf(ORDER_MIN_PORTRAIT, KIT_PORTRAIT - (width - ORDER_MAX_WIDTH) / maxf(1.0, faces.size()))
+		for cell in faces:
+			cell.custom_minimum_size = Vector2.ONE * side
+		width = _order_panel.get_combined_minimum_size().x
+		if width > ORDER_MAX_WIDTH:
+			var gaps := maxf(1.0, _order.get_child_count() - 1)
+			_order.add_theme_constant_override("separation", int(maxf(ORDER_MIN_GAP, ORDER_GAP - ceilf((width - ORDER_MAX_WIDTH) / gaps))))
 	_order_panel.size = _order_panel.get_combined_minimum_size()
-	_order_panel.position = Vector2(KIT_ROUND_CENTER.x - _order_panel.size.x * 0.5, KIT_ROUND_CENTER.y)
+	var left := KIT_ROUND_CENTER.x - _order_panel.size.x * 0.5
+	_order_panel.position = Vector2(clampf(left, ORDER_EDGE, maxf(ORDER_EDGE, 1920.0 - ORDER_EDGE - _order_panel.size.x)), KIT_ROUND_CENTER.y)
 
 
 ## Um retrato quadrado da ordem: o rosto no square_portrait, o fundo avermelhado nas máquinas e a borda âmbar em quem
@@ -761,6 +788,8 @@ func _refresh_order(current: String) -> void:
 func _order_face(unit: AHCombat.Unit, now: bool) -> Control:
 	var cell := AHKit.panel("square_portrait")
 	cell.custom_minimum_size = Vector2(KIT_PORTRAIT, KIT_PORTRAIT)
+	# Quadrado mesmo quando a fila longa o encolhe (a linha da faixa não o estica na altura).
+	cell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cell.set_meta("unit_id", unit.id)
 	cell.tooltip_text = unit.display_name
