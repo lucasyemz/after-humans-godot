@@ -870,7 +870,7 @@ func _update_camera(delta: float) -> void:
 	# bastante para a fileira inteira caber (nos cenários a lente é mais fechada, 30° na horizontal).
 	if corridor != null and corridor.camp != null and corridor.camp.active and corridor.camp.at_stop():
 		target = corridor.camp.focus_point()
-		pitch = deg_to_rad(AHCampScene.FOCUS_PITCH)
+		pitch = deg_to_rad(corridor.camp.pitch())
 		var half_h := atan(tan(deg_to_rad(_camera.fov * 0.5)) * get_viewport().get_visible_rect().size.aspect())
 		distance = maxf(AHCampScene.FOCUS_DISTANCE, AHCampScene.ROW_HALF_WIDTH / tan(half_h))
 	if _arena != null and _arena.active:

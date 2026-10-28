@@ -21,6 +21,7 @@ func run(context) -> void:
 	t = context
 	_tree = Engine.get_main_loop()
 	_art()
+	_stops()
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-camp-ground-%d" % Time.get_ticks_usec()
@@ -61,6 +62,20 @@ func _art() -> void:
 					"%s %s: o apoio cai no chão embaixo do corpo (%.2f m atrás do pé)" % [owner, kind, depth])
 				count += 1
 	t.check(count >= 16, "todas as poses conferidas (%d)" % count)
+
+
+## O ângulo da parada de descanso por cenário: no chão alagado do Depósito, o de antes (a água fica fina, como era); com
+## o lago pintado do Cais, o menor (o fundo continua no quadro); no seco (o Abrigo), o da arte.
+func _stops() -> void:
+	for spec in [["FloodedDepot", AHCampScene.FLOODED_STOP_PITCH], ["RiverDock", AHCampScene.WATER_STOP_PITCH],
+			["SealedShelter", AHCampScene.FOCUS_PITCH]]:
+		var scenario := AHScenarioWorld.new()
+		_tree.root.add_child(scenario)
+		scenario.build(spec[0])
+		var zone: Dictionary = scenario.zones[0]
+		var fire := Vector3((float(zone.x0) + float(zone.x1)) * 0.5, float(zone.y), (float(zone.z0) + float(zone.z1)) * 0.5)
+		t.equal(AHCampScene.stop_pitch(scenario, fire), spec[1], "%s: o ângulo da parada de descanso" % spec[0])
+		scenario.free()
 
 
 ## O apoio: na faixa do meio do corpo visível (40% da largura), a mediana da última linha opaca de cada coluna.

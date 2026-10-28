@@ -24,6 +24,10 @@ sapo e coruja) e o Guaxinim e o Tatu (#196), cada equipe com o último ferido (d
 - **A câmera do acampamento olha do ângulo da arte** (`AHCampScene.FOCUS_PITCH`, 15°), na casa e na parada de
   descanso: o apoio de cada pose cai no chão a até 0,6 m atrás do pé (`MAX_SUPPORT_DEPTH`), embaixo do corpo. O alvo
   desceu (`FOCUS_HEIGHT` 0,35 m) para a fileira ficar no mesmo lugar da tela, acima do painel.
+- **Nas paradas de descanso com água** (`AHCampScene.stop_pitch`): com o lago pintado no fundo (o Cais), a câmera olha
+  de 8° (`WATER_STOP_PITCH`), para o fundo continuar no quadro; com a fogueira no chão alagado (o Depósito Inundado), do
+  ângulo de antes (4°, `FLOODED_STOP_PITCH`), com a água fina como era. A sombra acompanha o ângulo, até 1,2 m atrás do
+  pé. A água do chão vem do mapa (`AHScenarioWorld.water_floor`).
 - **A sombra de contato** (`AHCampScene._contact`): uma mancha escura e macia no chão, do pé até um pouco atrás do apoio
   (`support_depth`), na largura do corpo visível. Acompanha a pose de cuidar (de pé, a do pé) e sai ao levantar
   acampamento.
@@ -35,16 +39,19 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
 
 ## Para o Lucas
 
+- No Depósito Inundado, a parada de descanso monta a fogueira no chão alagado, e a equipe senta na água (já era assim
+  na `main`). Ali a câmera fica como era; tirar a fogueira da água pede outra issue.
 - O enquadramento do acampamento ficou mais de cima (mais chão, menos parede).
 - Com todos deitados, os vizinhos de dentro se sobrepõem (a Íris na Véspera, o Nick no Bento). Isso já acontecia
   antes, com a câmera reta; dá para afastar os lugares de quem deita, se ele quiser.
 
 ## Testes
 
-- `tests/test_camp_ground.gd` (novo, 72 verificações):
+- `tests/test_camp_ground.gd` (novo, 75 verificações):
   - em cada pose, o ponto mais baixo do corpo na linha do chão (até 2 cm) e o apoio do dado igual ao medido na arte;
   - o apoio de cada pose cai no chão embaixo do corpo (até 0,6 m atrás do pé) na câmera do acampamento: com a câmera
     antiga (4°), dez poses falham;
+  - o ângulo da parada por cenário: o Depósito (chão alagado), o Cais (lago pintado) e o Abrigo (seco);
   - na cena, com o Bento, o Guaxinim, o Tatu e o Nick deitado: a câmera no ângulo da arte, a sombra de cada um no chão,
     na largura do corpo e chegando ao apoio, a troca da sombra na pose de cuidar e a saída ao levantar acampamento.
 - `tests/run_all.gd` inteiro e o modo de captura da Rua, com o teste de colisão.
@@ -56,3 +63,6 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
   15 cm acima, e o teste media o pé. Faltavam as fotos com todos deitados. Correção: o apoio nos dados, a câmera no
   ângulo da arte e a sombra até o apoio; o teste mede o apoio; a ferramenta fotografa as 16 poses; a sombra acompanha a
   pose de cuidar; as poses que faltam vão para o Codex (#210).
+- **Rodada 2: REPROVADO.** O apoio no chão, a sombra, o enquadramento e o clique ficaram certos (`run_all` 80/80), mas
+  a câmera de 15° nas paradas com água mostrava o lago no lugar do fundo (Cais) e a água como placa lisa (Depósito).
+  Correção: o ângulo da parada por cenário (8° com água pintada, 4° com a fogueira no chão alagado).

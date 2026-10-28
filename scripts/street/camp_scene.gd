@@ -31,6 +31,12 @@ const FOCUS_HEIGHT := 0.35
 const FOCUS_PITCH := 15.0
 ## Até onde atrás do pé o apoio pode cair no chão (m): a fundura de um corpo sentado ou deitado de lado.
 const MAX_SUPPORT_DEPTH := 0.6
+## Na parada de descanso de um cenário com água, a câmera de 15° mostrava o lago no lugar do fundo pintado (o Cais) e,
+## com a fogueira no chão alagado (o Depósito), a água como uma placa lisa: com água no cenário, ela olha de
+## WATER_STOP_PITCH; com a fogueira dentro d'água, do ângulo de antes (FLOODED_STOP_PITCH). A sombra acompanha o ângulo,
+## até CONTACT_MAX_BACK atrás do pé.
+const WATER_STOP_PITCH := 8.0
+const FLOODED_STOP_PITCH := 4.0
 ## A meia largura da fileira com a folga dos corpos (m): a câmera recua até ela caber (a lente fechada dos cenários).
 const ROW_HALF_WIDTH := 4.6
 ## O intervalo mínimo entre duas trocas de herói (s), com ou sem o fade: um toque no analógico troca um só.
@@ -46,6 +52,7 @@ const CARE_POSE_SECONDS := 1.2
 const CONTACT_WIDTH := 0.9
 const CONTACT_FRONT := 0.12
 const CONTACT_PAST := 0.15
+const CONTACT_MAX_BACK := 1.2
 const CONTACT_DARKNESS := 0.8
 const CONTACT_STANDING_WIDTH := 0.8
 ## O nome do nó da sombra, filho da carta.
@@ -98,6 +105,22 @@ func pose_for(hero: Dictionary) -> Dictionary:
 ## A fogueira é a da parada de descanso (#143, AHStreetCamp), e não a da casa do acampamento.
 func at_stop() -> bool:
 	return _room is AHStreetCamp
+
+
+## O ângulo da câmera do acampamento (graus): o da arte, ou o menor na parada de um cenário com água.
+func pitch() -> float:
+	var scenario = _street.scenario if _street != null and "scenario" in _street else null
+	if not at_stop() or scenario == null:
+		return FOCUS_PITCH
+	return stop_pitch(scenario, Vector3(_room.camp_x, _room.floor_y, _room.camp_z + 0.35))
+
+
+## O ângulo na parada de descanso de um cenário, com a fogueira em fire: o de antes no chão alagado, o menor com água
+## pintada no cenário e o da arte no seco.
+static func stop_pitch(scenario: AHScenarioWorld, fire: Vector3) -> float:
+	if scenario.water_floor(fire):
+		return FLOODED_STOP_PITCH
+	return WATER_STOP_PITCH if not scenario._waters.is_empty() else FOCUS_PITCH
 
 
 func focus_point() -> Vector3:
@@ -200,7 +223,7 @@ func _contact(card: AHSpriteCard, art: Dictionary) -> void:
 		var visible: Array = art.visible
 		width = (float(visible[2]) - float(visible[0])) * px_to_m * CONTACT_WIDTH
 		center = ((float(visible[0]) + float(visible[2])) * 0.5 - float(art.anchor[0])) * px_to_m * card.facing
-	var back := support_depth(art, card.body_height) + CONTACT_PAST
+	var back := minf(support_depth(art, card.body_height, pitch()) + CONTACT_PAST, CONTACT_MAX_BACK)
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(width, CONTACT_FRONT + back)
 	shadow.mesh = plane
@@ -210,11 +233,11 @@ func _contact(card: AHSpriteCard, art: Dictionary) -> void:
 
 ## Quanto atrás do pé o apoio do corpo cai no chão, na câmera do acampamento (m): a altura do apoio sobre o pé
 ## ("support" de camp_poses.json, em pixels da arte) dividida pela inclinação da câmera. Sem apoio (de pé), zero.
-static func support_depth(art: Dictionary, body_height: float = 1.8) -> float:
+static func support_depth(art: Dictionary, body_height: float = 1.8, degrees: float = FOCUS_PITCH) -> float:
 	if not art.has("support") or not art.has("anchor") or not art.has("body_reference_pixels"):
 		return 0.0
 	var lift: float = (float(art.anchor[1]) - float(art.support)) * body_height / float(art.body_reference_pixels)
-	return maxf(0.0, lift) / tan(deg_to_rad(FOCUS_PITCH))
+	return maxf(0.0, lift) / tan(deg_to_rad(degrees))
 
 
 static func _contact_shadow_material() -> StandardMaterial3D:

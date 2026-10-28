@@ -306,6 +306,21 @@ func front_edge(zone_index: int, feet_z: float) -> float:
 	return edge
 
 
+## Se o chão neste ponto está debaixo d'água (uma peça de água do mapa cobre o ponto, entre o chão e um pouco acima).
+func water_floor(point: Vector3) -> bool:
+	for part in data.parts:
+		if part.get("hidden", false) or data.materials[int(part.materials[0])].kind != "water":
+			continue
+		var b: Array = part.basis
+		var transform := Transform3D(Basis(Vector3(b[0], b[1], b[2]), Vector3(b[3], b[4], b[5]), Vector3(b[6], b[7], b[8])),
+			Vector3(part.origin[0], part.origin[1], part.origin[2]))
+		var box: AABB = (transform * _mesh_cache[int(part.mesh)].get_aabb()).grow(0.05)
+		if box.position.x <= point.x and point.x <= box.end.x and box.position.z <= point.z and point.z <= box.end.z \
+				and box.end.y > point.y and box.position.y < point.y + 1.0:
+			return true
+	return false
+
+
 ## A zona (0..n) que contém x, ou -1.
 func zone_at(x: float) -> int:
 	for i in zones.size():
