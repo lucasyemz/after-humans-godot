@@ -1,3 +1,9 @@
+# Skins do Bento — Ronda da Estação escolhida
+
+**Decisão atual do Lucas na #137:** Ronda da Estação (`watch`), substituindo a escolha anterior do Mergulhador. **[Entrega das16 poses, medidas, pranchas e QA](bento-watch.md).** A referência aprovada está em `docs/design/skins/watch/`; os arquivos para integração ficam em `art/skins/bento/watch/`.
+
+## Histórico das propostas aprovadas no #192
+
 # Skins: as três propostas do Bento (#137, 27/10/2026)
 
 O Lucas pediu só skins completas, começando pelo Bento. Uma skin é o mesmo personagem com outra roupa, nas mesmas
@@ -66,10 +72,9 @@ de cada proposta, a prancha, a redução a 40% e o cinza.
 prancha compara com a arte de hoje na escala do jogo. A captura entra com as 16 poses da escolhida, junto com a
 integração.
 
-## Para o Lucas escolher
+## Escolha (histórico; já definida acima)
 
-Uma das três: o mergulhador, a ronda ou o mecânico. Também dá para pedir uma mistura ou outro tema. Escolhida a skin,
-vêm as 16 poses.
+A escolha final é a Ronda; ver a entrega vinculada no topo. As três propostas abaixo permanecem como referência histórica.
 
 ## QA de design
 

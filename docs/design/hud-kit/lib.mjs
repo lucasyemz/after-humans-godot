@@ -31,8 +31,16 @@ export function nine(key, { repeat = "stretch", extra = "", cls = "", attrs = ""
 export const over = (key, extra = "") => nine(key, { cls: "over", extra });
 export const img = (file, style = "") => `<img src="${BASE}/${file}" style="${style}">`;
 // Glifo branco de um tom, tingido pela cor (como o modulate da Godot). ".svg" são os ícones que o jogo já tem.
+// Pelo nome antigo (".svg"), a mesma ordem do jogo (AHKit.painted e AHKit.legacy_icon, #125 e #135): o recurso pintado,
+// que não se tinge; senão o glifo do kit com o mesmo nome; só sem os dois, o SVG de art/ui/icons.
+const PAINTED = { "lobby-seed": "resource_seeds", "lobby-scrap": "resource_scrap", "lobby-fragment": "resource_fragments",
+  "lobby-food": "resource_food", "lobby-water": "resource_water", "lobby-energy": "resource_power",
+  "res-bandages": "resource_bandages", "res-hope": "resource_hope" };
 export const glyph = (name, size, color = "var(--text)", style = "") => {
-  const file = name.endsWith(".svg") ? `art/ui/icons/${name}` : `art/ui/kit/station/icons/${name}.webp`;
+  const old = name.endsWith(".svg") ? name.slice(0, -4) : null;
+  if (old && PAINTED[old]) return `<i class="glyph" style="width:${size}px;height:${size}px;background:url(${BASE}/art/ui/kit/station/icons/${PAINTED[old]}.webp) center/contain no-repeat;${style}"></i>`;
+  const kit = `art/ui/kit/station/icons/${old || name}.webp`;
+  const file = old && !fs.existsSync(kit) ? `art/ui/icons/${name}` : kit;
   return `<i class="glyph" style="width:${size}px;height:${size}px;background:${color};-webkit-mask-image:url(${BASE}/${file});${style}"></i>`;
 };
 export const key = (label) => `<span class="key">${img(COMBAT.key_tab.file, "position:absolute;inset:0;width:100%;height:100%")}<b>${label}</b></span>`;
@@ -288,6 +296,9 @@ export async function run(screens, out) {
             track.appendChild(thumb);
             document.body.appendChild(track);
             el._track = track;
+            // A borda que corta o que continua some num esmaecido (44 px): a linha pela metade não lê como texto cortado,
+            // e o esmaecido diz que há mais embaixo. Rolado até o fim, o esmaecido passa para o alto.
+            el.style.webkitMaskImage = "linear-gradient(#000 calc(100% - 44px), transparent)";
           }
         });
       }
@@ -296,6 +307,7 @@ export async function run(screens, out) {
         await page.evaluate(() => {
           for (const el of document.querySelectorAll("[data-scroll]")) {
             el.scrollTop = el.scrollHeight - el.clientHeight;
+            if (el._track) el.style.webkitMaskImage = "linear-gradient(transparent, #000 44px)";
             if (el._track) el._track.firstChild.style.top = `${Math.round(el.clientHeight - el.clientHeight * el.clientHeight / el.scrollHeight)}px`;
           }
         });
