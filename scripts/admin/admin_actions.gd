@@ -73,6 +73,7 @@ static func all() -> Array:
 	out.append(_a("recover_all", "Heróis", "Recuperar os caídos agora", "campaign", true))
 	out.append(_a("fall_one", "Heróis", "Derrubar um herói (volta Caído)", "station", true))
 	out.append(_a("pass_day", "Heróis", "Passar um dia na Estação (a recuperação anda)", "station", true))
+	out.append(_a("skins_all", "Heróis", "Liberar todas as skins", "campaign", true))
 	out.append(_a("next_patrol", "Combate", "Próxima patrulha", "explore", true))
 	out.append(_a("breakthrough", "Combate", "Forçar Superação em quem age", "fight", false))
 	out.append(_a("collapse", "Combate", "Forçar Colapso em quem age", "fight", false))
@@ -220,6 +221,10 @@ static func run(id: String) -> String:
 			return _saved(TranslationServer.translate("%d herói(s) prontos para subir de nível no Alojamento") % raised)
 		"recruit_now":
 			return _recruit()
+		"skins_all":
+			var freed := S.unlock_all_skins(c)
+			_refresh_station(scene)
+			return _saved(TranslationServer.translate("%d skin(s) liberada(s)") % freed) if freed > 0 else ""
 		"train_hero", "train_civilian":
 			if c.station.train.phase != "none":
 				return ""
@@ -271,6 +276,8 @@ static func run(id: String) -> String:
 			return _saved(TranslationServer.translate("Fases concluídas desfeitas"))
 		"phase_unlock":
 			c.completed_phases = J.PHASES.slice(0, J.PHASES.size() - 1).map(func(p): return p.id)
+			# As skins que vêm com as fases (a Ronda, #138) também, sem esperar a próxima volta.
+			S._grant_start_skins(c)
 			return _saved(TranslationServer.translate("Todas as fases liberadas"))
 		"rooms_all":
 			for room in S.ROOMS:

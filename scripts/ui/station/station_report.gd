@@ -283,6 +283,13 @@ func _chips(c: Dictionary, result: String) -> Array:
 	var unlocked := String(report.get("unlocked_phase", ""))
 	if unlocked != "":
 		out.append({"icon": "place_unlocked", "text": tr("%s liberada") % tr(J.phase(unlocked).get("name", "")), "color": AHKit.TEXT})
+	# A roupa nova (#138): a skin que veio com a fase terminada; a Sala dos Personagens já mostra a aba dela.
+	for skin_id in report.get("skins", []):
+		var skin = GameData.row("skins", String(skin_id))
+		if skin != null:
+			# Curto (o nome da aba da Sala): no Maior, o nome inteiro quebrava em 7 linhas e a faixa cobria a plataforma.
+			out.append({"icon": "room_quarters", "text": tr("Roupa nova: %s") % tr(String(skin.get("ShortName", skin.DisplayName))),
+				"color": AHKit.AMBER})
 	var focus := String(report.get("focus", ""))
 	if focus != "":
 		var done: bool = report.get("objective_done", false)
