@@ -238,6 +238,10 @@ As telas da Estação com a Enfermaria e a Forja de nível 1 estão sobre captur
 - `station-forge-workers_clean.webp`: a câmera da Forja de nível 1, com o Brasa junto da bancada e o Otto no posto dele
   ("Quem trabalha aqui").
 
+Esses fundos, os da plataforma (`platform_*_clean.webp`, de build_platform.py) e os da luta (`fight_fallen_clean.webp`
+e `fight_fallen.json`, de capture.gd) são rascunhos de trabalho: não ficam no repositório. Para refazer as telas, gere-os
+antes com o "Como refazer" (passos 2 e 4); o render.mjs os lê de `before/`.
+
 O antes das telas fica em `before/game/`: as fotos do jogo de hoje, com a interface (veja "As telas").
 
 As montagens que o PR tinha para a Enfermaria e para a Forja (`build_room.py` e `build_forge.py`) saíram: a cena 3D
@@ -344,7 +348,7 @@ Da raiz do repositório:
 4. A luta com a Íris caída (precisa de uma tela; no Linux sem tela, `xvfb-run`):
    `xvfb-run -a -s "-screen 0 1920x1080x24" "$GODOT" --path . --rendering-driver opengl3 --resolution 1920x1080 -s res://docs/design/hud-casa/capture.gd -- --out=<pasta>`.
    Ela grava `fight_fallen.png` (sem a HUD) e `fight_fallen.json` em `<pasta>`; o PNG vai para `before/` convertido em
-   WebP (qualidade 88), com o nome `fight_fallen_clean.webp`, e o JSON é copiado. A luta corre no automático e não sai
+   WebP (qualidade 88), com o nome `fight_fallen_clean.webp`, e o JSON é copiado (os dois são rascunhos, fora do repositório). A luta corre no automático e não sai
    igual a cada vez (a semente que derruba a Íris pode mudar): a de `before/` saiu na `main` com a #125 e a #135, na
    semente 6464. No Último Fôlego, a Íris fica na arena, de pé (ela não tem a pose de caída), e a barra dela diz "Caído".
 5. `python3 -m http.server 8765 --bind 127.0.0.1` e, noutro terminal, `node docs/design/hud-casa/render.mjs http://127.0.0.1:8765`.
