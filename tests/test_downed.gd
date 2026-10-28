@@ -160,6 +160,25 @@ func _save_roundtrip() -> void:
 	var left: Array = J.downed_left(back)
 	t.check(left.size() == 1 and left[0].hero_id == team[1] and is_equal_approx(float(left[0].x), 30.25), "o caído continua no mesmo lugar")
 	t.equal(J.carried(back), [team[2]], "e o levantado continua carregado")
+	# O carregado no Dormitório (recovery_carried) sai e volta do save igual: ganhando um leito depois, ainda fica com a
+	# parte dos dias do leito.
+	var dorm := _campaign(1798)
+	dorm.station.rooms[S.INFIRMARY] = 0
+	var dorm_id: String = dorm.session.expedition.team[0]
+	_fell(dorm, dorm_id)
+	S.admit_fallen(dorm, [dorm_id], [dorm_id])
+	Campaign.state = dorm
+	t.check(Campaign.save(), "o save grava o carregado no Dormitório")
+	var reopened = Campaign.read_file(Campaign.primary_path())
+	if not t.check(reopened != null, "e abre de novo"):
+		return
+	var again = reopened.roster.filter(func(h): return h.id == dorm_id)[0]
+	t.check(again.get("recovery_carried", false) and not S.in_bed(again), "o carregado continua marcado, no Dormitório")
+	reopened.station.rooms[S.INFIRMARY] = 1
+	S._fill_beds(reopened)
+	var bed_days := int(S.recovery_rule("infirmary").get("Days", 2))
+	t.check(S.in_bed(again) and S.recovery_days(again) == maxi(1, ceili(bed_days * float(S.recovery_rule("carried").get("Factor", 1.0)))),
+		"e, com um leito depois, fica com a parte dos dias do leito (%d)" % S.recovery_days(again))
 
 
 func _scene() -> void:

@@ -8,7 +8,7 @@
   {
     "Name": "carried",
     "Factor": 0.5,
-    "Description": "Proposta (#179): quem a equipe levantou no mapa e carregou chega com esta parte dos dias de recuperação (para cima, no mínimo 1): na Enfermaria, 2 viram 1; no Dormitório, 3 viram 2. Quem ficou no mapa chega com os dias inteiros."
+    "Description": "Decisão do Lucas (28/10, #179): quem a equipe levantou no mapa e carregou chega com esta parte dos dias de recuperação (para cima, no mínimo 1): na Enfermaria, 2 viram 1; no Dormitório, 3 viram 2. A metade vale também no leito que ele ganhar depois, enquanto se recupera. Quem ficou no mapa chega com os dias inteiros."
   },
   {
     "Name": "infirmary",
