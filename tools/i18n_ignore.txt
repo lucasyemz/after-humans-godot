@@ -92,6 +92,7 @@ refuge_hud.gd: Description
 *: flee
 *: focus
 *: font
+*: foreground
 *: fragments
 *: fullscreen
 *: gap
@@ -482,6 +483,7 @@ scenario_world.gd: haze
 scenario_world.gd: hidden
 scenario_world.gd: masked
 scenario_world.gd: merged
+scenario_world.gd: node
 scenario_world.gd: prop
 scenario_world.gd: ripple
 scenario_world.gd: roughness
@@ -1352,6 +1354,18 @@ combat_hud.gd: part
 combat_hud.gd: Empty
 combat_hud.gd: id
 street.gd: fight
+exploration_hud.gd: nick
+journey_rules.gd: nick
+street_corridor.gd: nick
+street_corridor.gd: entry
+scenario_world.gd: door
+scenario_world.gd: parts
+scenario_world.gd: blink
+scenario_world.gd: models
+scenario_world.gd: Metro
+scenario_world.gd: metro
+scenario_world.gd: SM_BombardierBody
+scenario_world.gd: yaw
 exploration_hud.gd: fallen
 combat_hud.gd: Fallen
 combat_hud.gd: names

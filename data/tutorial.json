@@ -1,0 +1,85 @@
+[
+  {
+    "Name": "journey",
+    "Map": "ContainmentCorridor",
+    "Place": "corredor-de-contencao",
+    "Weather": "night",
+    "Steps": [
+      "start",
+      "combat",
+      "nick",
+      "combat",
+      "loot",
+      "combat",
+      "train"
+    ],
+    "ZoneSteps": [
+      2,
+      3,
+      1,
+      1
+    ],
+    "StartTeam": [
+      "hero_cao_bento",
+      "hero_sapo_iris",
+      "hero_coruja_vespera"
+    ],
+    "JoinTeam": [
+      "hero_gato_nick"
+    ],
+    "Search": {
+      "bandages": 1,
+      "food": 1,
+      "Heal": 0.35
+    }
+  },
+  {
+    "Name": "fight_1",
+    "Step": 1,
+    "Lesson": "O Bento, a Íris e a Véspera contra três pequenos (o Broto, a Faísca e o Pipoco): escolher a habilidade, escolher o alvo, a vez de cada um e a vida.",
+    "Enemies": [
+      "broto",
+      "faisca",
+      "pipoco"
+    ],
+    "Boost": {
+      "broto": {
+        "Damage": 4,
+        "Speed": 3
+      },
+      "faisca": {
+        "Damage": 4,
+        "Speed": 3
+      }
+    }
+  },
+  {
+    "Name": "fight_2",
+    "Step": 3,
+    "Lesson": "Com o Nick na equipe: as posições (o Rastejante empurra), mover, defender, a ordem da rodada e o instinto.",
+    "Enemies": [
+      "rastejante_raiz",
+      "broto"
+    ],
+    "Boost": {
+      "rastejante_raiz": {
+        "Damage": -2
+      }
+    }
+  },
+  {
+    "Name": "fight_3",
+    "Step": 5,
+    "Lesson": "Os estados (a contaminação do Drone de Expurgo, protegido atrás da Faísca) e um item da Mochila na luta.",
+    "Enemies": [
+      "faisca",
+      "ninho_errante"
+    ],
+    "Boost": {
+      "ninho_errante": {
+        "Speed": 8,
+        "Damage": -1
+      }
+    }
+  }
+]

@@ -6,6 +6,12 @@
 		"ui": -24.0
 	},
 	"files": {
+		"res://audio/ambience/ContainmentCorridor.ogg": {
+			"category": "ambience",
+			"lufs": -16.4,
+			"gain_db": -9.6,
+			"normalized": true
+		},
 		"res://audio/ambience/FloodedDepot.ogg": {
 			"category": "ambience",
 			"lufs": -31.0,
@@ -665,6 +671,18 @@
 			"lufs": -28.6,
 			"gain_db": 0.0,
 			"normalized": false
+		},
+		"res://audio/world/security_door.ogg": {
+			"category": "sfx",
+			"lufs": -20.6,
+			"gain_db": 0.6,
+			"normalized": true
+		},
+		"res://audio/world/security_door_open.ogg": {
+			"category": "sfx",
+			"lufs": -12.5,
+			"gain_db": -7.5,
+			"normalized": true
 		}
 	}
 }

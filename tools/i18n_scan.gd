@@ -126,6 +126,15 @@ static func data_texts() -> Array:
 			out.append({"text": row.Briefing[index].Text, "where": "briefings.%s.%d" % [row.Name, index]})
 		if row.has("Debriefing"):
 			out.append({"text": row.Debriefing.Text, "where": "briefings.%s.debriefing" % row.Name})
+	# Os cenários (#147): o nome de cada zona (o "Seguindo para:" da troca de zona) e de cada prop vasculhável.
+	for file in DirAccess.get_files_at("res://data/scenarios"):
+		if not file.ends_with(".json") or file == "meshes.json":
+			continue
+		var map: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/scenarios/" + file))
+		for zone in map.get("zones", []):
+			out.append({"text": zone.name, "where": "scenarios.%s.zones" % file.get_basename()})
+		for prop in map.get("props", []):
+			out.append({"text": prop.name, "where": "scenarios.%s.props" % file.get_basename()})
 	# As escolhas dos eventos: o texto do botão, o requisito e o resultado de cada saída (#64; o resultado vai traduzido
 	# pelo modelo, com {Heroi} e {Instinto} trocados depois).
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/events.json")):

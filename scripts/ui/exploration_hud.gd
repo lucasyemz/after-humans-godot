@@ -28,7 +28,7 @@ signal formation_swap(a: String, b: String)
 
 const S = preload("res://scripts/ui/ui_style.gd")
 const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprimentos", "rest": "Descanso", "passage": "Passagem",
-	"boss": "Guardião"}
+	"boss": "Guardião", "nick": "Encontro", "train": "Trem"}
 
 ## O lugar da jornada (a Rua ou o cenário): muda os textos da volta e do resultado.
 ## A altura do Concluir jornada; no acampamento, ele sobe para cima da barra (camp_hud._process).
@@ -69,6 +69,10 @@ const TOOL_NOTICE_SECONDS := 5.0
 var _bag_new: Control
 var _toast_label: Label
 var _toast_tween: Tween
+## Uma frase que vai na frente de todo aviso até esta hora (Time.get_ticks_msec): o fôlego do tutorial que não pode
+## sumir sob o anúncio do trecho nem o aviso do começo da luta, que chegam logo em seguida.
+var _held_line := ""
+var _held_until := 0
 var _modal: PanelContainer
 ## O HUD do acampamento aberto (#77), null fora dele.
 var camp_hud: AHCampHud
@@ -118,7 +122,7 @@ var _hint_time := 0.0
 var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
 const STEP_ICONS := {"start": "node-start", "combat": "node-combat", "loot": "node-loot", "rest": "node-rest",
-	"passage": "node-event", "boss": "node-boss"}
+	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "node-boss"}
 ## A casa do corredor (o lado do quadrado) e o elo entre duas.
 const CELL := 46.0
 const LINK := 12.0
@@ -436,8 +440,9 @@ func _refresh_place() -> void:
 	var parts := PackedStringArray()
 	if expedition != null:
 		var info := AHJourneyRules.phase(expedition.phase_id)
-		parts.append(tr("Jornada %d") % (AHJourneyRules.PHASES.find(info) + 1))
-	if _weather != "":
+		# O tutorial (#144) não é uma jornada da campanha: é a abertura, num subsolo (sem clima).
+		parts.append(tr("Abertura") if expedition.phase_id == AHTutorial.PHASE_ID else tr("Jornada %d") % (AHJourneyRules.PHASES.find(info) + 1))
+	if _weather != "" and (expedition == null or expedition.phase_id != AHTutorial.PHASE_ID):
 		parts.append(_weather)
 	_place_sub.text = " · ".join(parts)
 
@@ -462,7 +467,11 @@ func refresh(campaign: Dictionary) -> void:
 	var focus := AHStationRules.focus_def(expedition.get("focus", ""))
 	var boss_step: int = route.steps.size()
 	var done := false
-	if focus.is_empty():
+	if expedition.phase_id == AHTutorial.PHASE_ID:
+		# A abertura: fugir até o trem da plataforma.
+		_goal_title.text = tr("Chegar ao trem (trecho %d)") % boss_step
+		_goal_text.text = tr("A porta da contenção baixa atrás da equipe. A saída é a plataforma.")
+	elif focus.is_empty():
 		_goal_title.text = tr("Vencer o guardião (trecho %d)") % boss_step
 		_goal_text.text = tr("Rota básica: o achado das buscas volta com a equipe.")
 	elif expedition.get("objective_done", false):
@@ -1069,6 +1078,19 @@ func hide_tool_notice() -> void:
 	_tool_notice = null
 
 
+## Mostra a frase agora e a mantém na frente dos avisos seguintes até completar os segundos dela.
+func hold_line(line: String, seconds: float) -> void:
+	_held_line = line
+	_held_until = Time.get_ticks_msec() + int(seconds * 1000.0)
+	toast(line, seconds)
+
+
+## Solta a frase mantida: os avisos seguintes vêm sozinhos (a luta acabou antes do tempo dela).
+func release_line() -> void:
+	_held_line = ""
+	_held_until = 0
+
+
 ## A chapa do aviso no tamanho do texto, centrada embaixo do objetivo (fora da árvore, a chamada adiada não mede nada).
 func _fit_toast() -> void:
 	if not is_inside_tree():
@@ -1082,12 +1104,20 @@ func _fit_toast() -> void:
 func toast(text: String, seconds: float = 3.5) -> void:
 	if _toast_tween:
 		_toast_tween.kill()
+	var left := (_held_until - Time.get_ticks_msec()) / 1000.0
+	if left > 0.0 and text != _held_line and not text.begins_with(_held_line):
+		text = _held_line + " " + text
+		seconds = maxf(seconds, left)
 	_toast_label.text = text
 	var width := minf(900.0, _toast_label.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1,
 		_toast_label.get_theme_font_size("font_size")).x + 8.0)
 	# Quebra só o que passa de 900 (com a quebra ligada, o rótulo curto pedia a altura de uma palavra por linha).
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if width >= 900.0 else TextServer.AUTOWRAP_OFF
 	_toast_label.custom_minimum_size = Vector2(width, 0)
+	# A altura do texto quebrado depende da largura do rótulo: aplica a final antes de medir (com a largura velha, a
+	# chapa saía alta e meio vazia no texto Maior).
+	_toast_label.size = Vector2(width, 0)
+	_toast_label.size = Vector2(width, _toast_label.get_minimum_size().y)
 	_fit_toast()
 	# O rótulo que quebra mede a altura pela largura de agora: no primeiro aviso longo, ele ainda tinha 0 e media uma
 	# palavra por linha (a caixa saía com milhares de px e o texto fora da tela). Depois do layout, mede de novo.
@@ -1421,7 +1451,7 @@ func camp_respond(hero_id: String, kind: String, life_gain: int, instinct_change
 
 ## Esc na exploração: continuar ou voltar à Estação. Antes do guardião a volta é uma retirada (metade do achado) e
 ## pergunta antes, como o Retornar da Unreal ("Abandonar a expedição?").
-func show_menu(completed: bool, can_return: bool) -> void:
+func show_menu(completed: bool, can_return: bool, blocked_note: String = "") -> void:
 	# O Menu da expedição (#109, docs/design/hud-ajustes.md; decisão do Lucas: fica o menu), no Painel do kit: à direita
 	# do cartão do objetivo, com o pé acima das cabeças da equipe; cresce para cima no texto Maior.
 	var box := _open_modal(MENU_WIDTH)
@@ -1457,7 +1487,8 @@ func show_menu(completed: bool, can_return: bool) -> void:
 	line.custom_minimum_size = Vector2(0, 8)
 	box.add_child(line)
 	# Voltar à Estação com o custo numa sublinha (não quebra o botão no Maior); no meio da luta ou do evento, apagado.
-	var sub := (tr("Fase concluída: todo o achado") if completed else tr("Retirada: metade do achado")) if can_return else tr("Termine a luta ou o evento antes de voltar.")
+	var sub := (tr("Fase concluída: todo o achado") if completed else tr("Retirada: metade do achado")) if can_return \
+		else (blocked_note if blocked_note != "" else tr("Termine a luta ou o evento antes de voltar."))
 	var back := _menu_entry(tr("Voltar à Estação"), "station", func(): _confirm_return(completed), sub)
 	back.name = "Return"
 	back.disabled = not can_return
