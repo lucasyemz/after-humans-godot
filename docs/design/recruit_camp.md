@@ -22,9 +22,9 @@ Sem banco, cama, almofada, plataforma ou sombra desenhada. As fontes não têm p
 
 Os dois estados vão em `art/camp/`, como os outros recrutas já consumidos por `tools/build_camp_poses.py`; a linguagem da pose deitada segue as da Estação. Sem cópia duplicada em `art/station/poses/`. WebP RGBA lossless, sem texto, 9-slice não se aplica.
 
-`docs/design/camp/contract.json` recebe somente as quatro entradas novas. `show_art` reutiliza `canvas`, `anchor` e `body_reference_pixels` do idle canônico; a conversão das coordenadas usa a razão uniforme da largura, inclusive na altura ímpar. O canvas final explícito evita arredondar 667,5 para o lado errado. O corpo mantém a escala do idle quando o motor aplica a altura de 1,30 m do Guaxinim e 1,35 m do Tatu.
+`docs/design/recruit_camp/contract.json` entrega as quatro entradas propostas; o contrato canônico de produção em `docs/design/camp/contract.json` permanece intacto até a integração. `show_art` reutiliza `canvas`, `anchor` e `body_reference_pixels` do idle canônico; a conversão das coordenadas usa a razão uniforme da largura, inclusive na altura ímpar. O canvas final explícito evita arredondar 667,5 para o lado errado. O corpo mantém a escala do idle quando o motor aplica a altura de 1,30 m do Guaxinim e 1,35 m do Tatu.
 
-**Integração pelo Claude 2:** executar `tools/build_camp_poses.py` depois do merge para gerar o manifesto de produção e sua caixa visível. A entrega não modifica `data/`, `scripts/`, `tests/` ou ids. O contrato de documentação já é compatível com a ferramenta existente. Nenhuma regra de vida/descanso foi alterada.
+**Integração pelo Claude 2:** gerar o contrato proposto com `python docs/design/recruit_camp/prepare_contract.py --out /tmp/camp_contract.json`; aplicar as quatro entradas ao contrato canônico junto com a execução de `tools/build_camp_poses.py`, o manifesto de produção e a atualização da contagem de recrutas no teste (de quatro para seis). A entrega não modifica `data/`, `scripts/`, `tests/` ou ids. Os payloads propostos são compatíveis com a ferramenta existente; o contrato ativo só pode mudar junto do manifesto, pois o teste compara os dois. Nenhuma regra de vida/descanso foi alterada.
 
 ## Antes/depois dentro do jogo
 
@@ -50,6 +50,14 @@ Após extrair o pacote: `python docs/design/recruit_camp/build_delivery.py --sou
 
 **Rodada 2 — VEREDITO: APROVADO.** Conferidas quatro poses e o comparativo com os quatro recrutas existentes: rosto/espécie, equipamento, mãos/garras, cabeça, escala, apoio, alfa no claro/escuro, 40%/cinza, nomes/arquivos e contrato. As capturas reais repetidas mostram os dois estados com apoio no chão, sem o contato entre escudo e cabeça. Sem pendência alta ou média na arte. Observação baixa: a cauda da pose sentada do Tatu chega à borda esquerda no enquadramento atual do acampamento; não foi cortada na textura. A câmera de produção e a luz Forward+ serão conferidas na integração. Aprovação artística final das pranchas pelo Lucas.
 
-**Validação:** Godot 4.7.2; runner completo **87/87 em 601,989 s**, paridade **48/48**. O teste de retratos agora passa na main. Importação final e checker do contrato: 16 payloads iguais aos idles, incluindo os quatro novos. O log registra avisos de foco/recursos e coroutine do tutorial ao encerrar; o runner retorna zero. Nenhuma mudança em scripts/data/tests ou ids.
+**Validação:** Godot 4.7.2; runner completo **87/87 em 601,989 s**, paridade **48/48**. O teste de retratos agora passa na main. Importação final e checkers: quatro propostas iguais aos idles; contrato ativo preservado com 12 payloads. O log registra avisos de foco/recursos e coroutine do tutorial ao encerrar; o runner retorna zero. Nenhuma mudança em scripts/data/tests ou ids.
 
 [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr220-originals) · [ZIP dos originais](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr220-originals.zip).
+
+## Ajuste após o primeiro CI
+
+**Rodada 3 — VEREDITO: REPROVADO (contrato).** Gravidade alta: o primeiro PR tinha acrescentado as quatro propostas ao contrato canônico, mas o manifesto de produção ainda tinha quatro recrutas. O CI falhou em `test_camp_scene.gd:67` ao comparar os dois. A execução local 87/87 havia ocorrido antes dessa alteração de contrato, portanto não validava aquele estado intermediário.
+
+Correção: contrato ativo restaurado exatamente à main; as quatro novas entradas ficam só em `recruit_camp/contract.json`. O gerador de arte não altera mais o contrato ativo. `prepare_contract.py` gera uma proposta em arquivo temporário para o Claude aplicar junto da integração, e `check_proposal.py` valida as quatro imagens sem exigir dados de produção antecipados. Nenhum teste ou dado de produção foi alterado para contornar a falha.
+
+**Rodada 4 — VEREDITO: APROVADO.** `test_camp_scene`: 121 verificações,1/1 em17,087s; checker das quatro propostas e checker do contrato ativo passaram. Confirmado por diff que scripts/data/tests e o contrato ativo são idênticos à main. A arte aprovada na rodada2 e as capturas não mudaram. Os originais na tag continuam válidos. O CI completo foi reacionado após a correção; a aprovação final e o merge aguardam o Lucas e o CI verde.
