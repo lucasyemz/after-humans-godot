@@ -34,6 +34,10 @@ e concreta, e devolve um veredito.
 - Ícones de um tom só quando o jogo tinge (o HUD aplica a cor).
 - Nome em inglês e `snake_case`, na pasta pedida; os arquivos que substituem outros mantêm o mesmo nome.
 - Sem texto dentro das imagens (o jogo escreve em português).
+- Personagem novo segue o padrão de imagem em [characters.md](characters.md): a tela de 1178×1335 com o corpo
+  ocupando 90% a 95% da altura, o pé no mesmo ponto em todas as poses, a proporção dos fundadores e a largura perto da
+  deles, seja qual for a altura. A prancha mostra o personagem ao lado dos quatro fundadores, com os pés na mesma
+  linha. Fora do padrão é gravidade alta.
 
 **Medidas e entrega**
 - As medidas que o Claude precisa estão na página: âncoras em pixels, margens de 9-slice, área de conteúdo, tamanhos.
