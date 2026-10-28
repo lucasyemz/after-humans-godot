@@ -2147,7 +2147,7 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 	_paint_targets()
 	if not _markers.is_empty():
 		_via_mouse = false
-		_markers[0].grab_focus.call_deferred()
+		AHKit.focus_later(_markers[0])
 
 
 ## De onde veio o último toque no alvo: mouse ou toque (o primeiro clique só escolhe) ou teclado e controle.

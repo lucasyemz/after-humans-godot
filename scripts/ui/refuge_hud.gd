@@ -10,6 +10,9 @@
 class_name AHRefugeHud
 extends Control
 
+## Um quadro do HUD (as esperas da chegada: some junto com ele).
+signal _frame_passed
+
 ## Abrir e fechar um painel (#36).
 const PANEL_OPEN := "res://audio/ui/panel_open.ogg"
 const PANEL_CLOSE := "res://audio/ui/panel_close.ogg"
@@ -785,8 +788,10 @@ func play_arrival() -> void:
 	_arrival_skip = false
 	refresh()
 	# A chegada (e o som do trem) começa com a Estação na tela, não embaixo do cartão da passagem.
+	# O quadro pelo sinal do próprio HUD: se a Estação sai antes (o teste ou a troca de cena), a espera cai junto com
+	# ele em vez de voltar numa instância liberada.
 	while GameFlow.busy and is_inside_tree():
-		await get_tree().process_frame
+		await _frame_passed
 	if current != ARRIVAL or not is_inside_tree():
 		return
 	station.play_team_arrival(report.get("team", []))
@@ -1469,6 +1474,7 @@ static func _lines_signature(lines: Array) -> String:
 
 
 func _process(delta: float) -> void:
+	_frame_passed.emit()
 	_pan_overview(delta)
 	_update_room_hover()
 	if _feedback.modulate.a > 0.0 and _feedback.text != "":
@@ -1694,6 +1700,10 @@ func _show(key: String) -> void:
 		child.queue_free()
 	_panel_focus = null
 	var c: Dictionary = Campaign.state
+	# Qualquer outra tela (a partida, a chegada, o trem, o relatório, um cômodo): a Sala fecha e o escolhido sai do
+	# cômodo (#181), antes de cada caminho abaixo.
+	if key != S.CHARACTERS:
+		_close_room_screen()
 	if key == "departure":
 		_panel.visible = false
 		_departure_view()
@@ -1719,7 +1729,6 @@ func _show(key: String) -> void:
 		_panel.visible = false
 		_character_room()
 		return
-	_close_room_screen()
 	_panel.visible = true
 	# Outra tela: a lista começa do alto (a mesma tela refeita fica na mesma rolagem).
 	if key != _shown:
@@ -1750,7 +1759,7 @@ func _show(key: String) -> void:
 	_footer.visible = _footer.get_child_count() > 0
 	_fit_panel()
 	if _panel_focus != null and U.using_keys:
-		_panel_focus.grab_focus.call_deferred()
+		AHKit.focus_later(_panel_focus)
 
 
 ## O plano da Estação: um bloco por cômodo, na ordem do jogo, com o ícone, o nome, o nível ou Vazio, o que faz, o custo
@@ -2730,9 +2739,10 @@ func open_from_room(service: String) -> void:
 func _close_room_screen() -> void:
 	if is_instance_valid(_room_screen):
 		_room_screen.queue_free()
-		# O escolhido sai do cômodo; os moradores reaparecem onde estavam (#181).
-		station.clear_stage_hero()
 		station.hide_residents(false)
+	# O escolhido sai do cômodo; os moradores reaparecem onde estavam (#181). Também sem a tela (ela já saiu antes).
+	if station != null:
+		station.clear_stage_hero()
 	_room_screen = null
 
 

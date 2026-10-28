@@ -124,7 +124,7 @@ func _ready() -> void:
 	_keys.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_keys)
 	_show()
-	next_button.grab_focus.call_deferred()
+	AHKit.focus_later(next_button)
 	# Na carência, os botões também esperam (um duplo clique em Partir caía no Próximo por cima).
 	_set_guard(true)
 	get_tree().create_timer(GUARD_MS / 1000.0).timeout.connect(_set_guard.bind(false))

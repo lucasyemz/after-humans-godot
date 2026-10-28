@@ -122,7 +122,7 @@ var _hint_time := 0.0
 var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
 const STEP_ICONS := {"start": "node-start", "combat": "node-combat", "loot": "node-loot", "rest": "node-rest",
-	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "node-boss"}
+	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "train_arrival"}
 ## A casa do corredor (o lado do quadrado) e o elo entre duas.
 const CELL := 46.0
 const LINK := 12.0
@@ -1334,7 +1334,7 @@ func show_event(campaign: Dictionary) -> void:
 			if first == null and available:
 				first = button
 	if first:
-		first.grab_focus.call_deferred()
+		AHKit.focus_later(first)
 
 
 ## Uma escolha do evento: a linha de lista com o ícone (a ferramenta, o triângulo do risco ou a seta), o texto e, à
@@ -1520,7 +1520,7 @@ func show_menu(completed: bool, can_return: bool, blocked_note: String = "") -> 
 		key.position = Vector2(resume.size.x - key.size.x - 52.0, (resume.size.y - key.size.y) * 0.5))
 	box.add_child(resume)
 	_place_menu.call_deferred()
-	resume.grab_focus.call_deferred()
+	AHKit.focus_later(resume)
 
 
 ## O pé do Menu acima das cabeças (MENU_BOTTOM), centrado à direita do cartão do objetivo (MENU_CENTER_X).
@@ -1632,7 +1632,7 @@ func show_choice(title: String, text: String, options: Array) -> void:
 			button.icon = AHKit.icon("station")
 			button.add_theme_constant_override("icon_max_width", 28)
 		box.add_child(button)
-	first.grab_focus.call_deferred()
+	AHKit.focus_later(first)
 	# No Maior a equipe alarga o painel: ele fica centrado na largura de verdade, sem cobrir o cartão do objetivo.
 	_center_modal.call_deferred()
 
@@ -1679,7 +1679,7 @@ func _confirm_new_campaign() -> void:
 		new_campaign.emit())
 	go.add_theme_color_override("font_color", AHKit.alert_text())
 	box.add_child(go)
-	stay.grab_focus.call_deferred()
+	AHKit.focus_later(stay)
 
 
 ## A expedição ainda está na rua (sem resultado): concluir ou sair faz sentido.
@@ -1717,7 +1717,7 @@ func _confirm_return(completed: bool) -> void:
 	back.icon = AHKit.icon("station")
 	back.add_theme_constant_override("icon_max_width", 28)
 	row.add_child(back)
-	stay.grab_focus.call_deferred()
+	AHKit.focus_later(stay)
 
 
 # ---------------------------------------------------------------- resultado
@@ -1759,4 +1759,4 @@ func show_result(result: String, delivered: Dictionary, campaign: Dictionary, bu
 		box.add_child(label)
 	var button := _primary(button_text, "station", tr("%s / A") % S.key_name("interact"), func(): result_continue.emit())
 	box.add_child(button)
-	button.grab_focus.call_deferred()
+	AHKit.focus_later(button)
