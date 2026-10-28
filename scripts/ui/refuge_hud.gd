@@ -1724,8 +1724,8 @@ func _new_campaign_view() -> void:
 		AHKit.alert_text())
 	_button(tr("Cancelar"), close_panel)
 	var go := _button(tr("Começar do zero"), func():
-		Campaign.new_game()
-		GameFlow.travel("station"))
+		# A campanha nova passa pela escolha do título (#144): a abertura ou Pular tutorial, no mesmo espaço.
+		GameFlow.travel("title", {}, {"new_campaign": Campaign.slot}))
 	go.add_theme_color_override("font_color", AHKit.alert_text())
 
 

@@ -198,3 +198,102 @@ static func finish(campaign: Dictionary) -> void:
 		hero.trauma = false
 		hero.expedition_uses = {}
 	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
+
+
+# ---------------------------------------------------------------- a campanha (#144)
+
+## Em que ponto do tutorial a campanha está (campaign.tutorial.stage): "journey" (a fuga), "station" (chegou à Estação,
+## a visita guiada da #145 ainda por fazer) ou "done". Um save sem a chave (de antes do tutorial, ou da campanha
+## criada pelos testes) já passou dele.
+static func stage(campaign: Dictionary) -> String:
+	return String(campaign.get("tutorial", {}).get("stage", "done"))
+
+
+## A campanha nova começa pela abertura: a jornada do tutorial, com o Bento, a Íris e a Véspera no Corredor de Contenção.
+static func begin(campaign: Dictionary, seed_value: int = 20261026) -> bool:
+	if not start_journey(campaign, seed_value):
+		return false
+	campaign.tutorial = {"stage": "journey", "done": []}
+	return true
+
+
+## Pular tutorial: a campanha fica como depois dele (a mesma recompensa, o mesmo elenco), com o relatório já visto.
+static func skip(campaign: Dictionary) -> void:
+	complete(campaign)
+	campaign.station.last_return.seen = true
+
+
+## As regras das lutas do tutorial: a vida dos heróis para em 1 (ninguém cai) e a contaminação e o sangramento sempre
+## pegam neles (sem os 20% de resistência), para a lição dos estados aparecer na terceira luta.
+static func prepare_fight(context: AHCombat.Context) -> void:
+	context.min_hero_hp = 1
+	context.sure_hero_dots = true
+
+
+## O fim do tutorial (o embarque, ou o Pular): a equipe inteira e descansada, os heróis como saíram (as lutas do
+## tutorial não contam na carreira), a recompensa no estoque e o relatório da chegada, que a Estação mostra com o
+## debriefing do Bento e do Nick.
+## Só vale na campanha recém-criada (a Nova campanha do título, que começa pelo tutorial): zera o nível, o XP e as
+## melhorias de todo o elenco. Numa campanha com progresso, apagaria tudo; por isso a guarda do estágio.
+static func complete(campaign: Dictionary) -> Dictionary:
+	if campaign.has("tutorial") and stage(campaign) != "journey":
+		push_error("Tutorial: complete() fora da jornada do tutorial (estágio %s)." % stage(campaign))
+		return {}
+	finish(campaign)
+	for hero in campaign.get("roster", []):
+		hero.level = 1
+		hero.xp = 0
+		hero.upgrades = []
+		hero.kills_count = 0
+		hero.expeditions_count = 0
+		hero.completed_expeditions = 0
+	var prize := reward()
+	campaign.inventory.seeds = int(campaign.inventory.seeds) + int(prize.seeds)
+	campaign.inventory.bandages = int(campaign.inventory.bandages) + int(prize.bandages)
+	if prize.tool != "" and not campaign.tools.has(prize.tool):
+		campaign.tools.append(prize.tool)
+	# Os quatro fundadores voltam juntos: o Bento, a Íris e a Véspera, e o Nick, que chegou no aperto.
+	var team: Array = journey().get("StartTeam", []) + journey().get("JoinTeam", [])
+	campaign.station.last_return = {"result": "victory", "percent": 100, "phase_id": PHASE_ID, "seeds": int(prize.seeds),
+		"scrap": 0, "fragments": 0, "water": 0, "supplies": 0, "request": "", "team": team.filter(func(id): return AHStationRules.hero(campaign, id) != null),
+		"food_left": 0, "stats": {}, "focus": "", "objective_done": false, "unlocked_phase": "", "story": "", "returning": team.size(),
+		"cycle": {}, "bandages": int(prize.bandages), "tool": prize.tool, "tutorial": true}
+	# "station": a visita guiada da Estação (#145) leva a "done" ao terminar ou ao ser pulada.
+	campaign.tutorial = {"stage": "station"}
+	return prize
+
+
+## A recompensa do fim do tutorial: {seeds, bandages, tool}.
+static func reward() -> Dictionary:
+	var data := row("reward")
+	return {"seeds": int(data.get("Seeds", 0)), "bandages": int(data.get("Bandages", 0)), "tool": String(data.get("Tool", ""))}
+
+
+## O cartão da abertura (o primeiro quadro; a tirinha entra depois no lugar dele).
+static func opening_card() -> Dictionary:
+	var cards: Array = row("opening").get("Cards", [])
+	if cards.is_empty():
+		return {}
+	return {"title": TranslationServer.translate(String(cards[0].get("Title", ""))),
+		"subtitle": TranslationServer.translate(String(cards[0].get("Subtitle", "")))}
+
+
+## As dicas do tutorial, na ordem ({Id, Title, Text, Keys, Blocking}).
+static func hints() -> Array:
+	return row("hints").get("Steps", [])
+
+
+static func hint_index(id: String) -> int:
+	var steps := hints()
+	for index in steps.size():
+		if steps[index].Id == id:
+			return index
+	return -1
+
+
+## As dicas de primeira vez (Tips) que a abertura já ensina: ficam caladas durante ela e contam como vistas no fim.
+const COVERED_TIPS := ["explore", "combat", "search", "bag", "patrol", "instinct"]
+
+
+static func suppresses_tips(campaign: Dictionary) -> bool:
+	return stage(campaign) == "journey"

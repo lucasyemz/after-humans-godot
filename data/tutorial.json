@@ -1,5 +1,15 @@
 [
   {
+    "Name": "opening",
+    "Cards": [
+      {
+        "Title": "Você precisa escapar.",
+        "Subtitle": "",
+        "Image": ""
+      }
+    ]
+  },
+  {
     "Name": "journey",
     "Map": "ContainmentCorridor",
     "Place": "corredor-de-contencao",
@@ -81,5 +91,96 @@
         "Damage": -1
       }
     }
+  },
+  {
+    "Name": "reward",
+    "Seeds": 10,
+    "Bandages": 1,
+    "Tool": "pe_de_cabra"
+  },
+  {
+    "Name": "hints",
+    "Steps": [
+      {
+        "Id": "walk",
+        "Title": "Ande até o fim do corredor",
+        "Text": "A equipe segue o líder. Segure Correr para ir mais rápido.",
+        "Keys": [
+          "move_left",
+          "move_right",
+          "run"
+        ]
+      },
+      {
+        "Id": "ability",
+        "Title": "Escolha uma habilidade",
+        "Text": "Na vez do herói, cada habilidade diz de que posições sai e quais alcança. Os inimigos daqui são pequenos: ataque.",
+        "Keys": [
+          "combat_ability_1",
+          "combat_ability_2",
+          "combat_ability_3",
+          "combat_ability_4"
+        ],
+        "Blocking": true
+      },
+      {
+        "Id": "target",
+        "Title": "Escolha o alvo",
+        "Text": "Os alvos possíveis acendem. A barra sobre cada um é a vida; a ordem da rodada fica no alto.",
+        "Keys": [
+          "interact"
+        ],
+        "Blocking": true
+      },
+      {
+        "Id": "search",
+        "Title": "Vasculhe o armário",
+        "Text": "O losango dourado marca o que dá para usar. Chegue perto e aperte Interagir.",
+        "Keys": [
+          "interact"
+        ]
+      },
+      {
+        "Id": "bag",
+        "Title": "Abra a Mochila",
+        "Text": "Comida e curativos curam fora da luta. Na luta, usar um item não gasta a vez.",
+        "Keys": [
+          "inventory"
+        ]
+      },
+      {
+        "Id": "patrol",
+        "Title": "Chegue sem ser visto",
+        "Text": "A patrulha olha à frente. Se ela não vir a equipe até o encontro, vocês agem primeiro.",
+        "Keys": [
+          "move_right"
+        ]
+      },
+      {
+        "Id": "position",
+        "Title": "Posição e defesa",
+        "Text": "A frente fica à direita. O Rastejante empurra quem acerta; Mover troca de lugar com o vizinho e Defender dá Bloqueio. A ordem da rodada fica no alto, e o instinto na barra de baixo de cada herói.",
+        "Keys": [
+          "combat_move",
+          "combat_defend"
+        ]
+      },
+      {
+        "Id": "item",
+        "Title": "Estados e a Mochila na luta",
+        "Text": "O Drone de Expurgo contamina: a contaminação tira vida no começo de cada vez. Um curativo da Mochila cura sem gastar a vez.",
+        "Keys": [
+          "inventory"
+        ]
+      },
+      {
+        "Id": "train",
+        "Title": "Embarque no trem",
+        "Text": "O vagão leva a equipe à Estação Raiz.",
+        "Keys": [
+          "interact"
+        ]
+      }
+    ]
   }
 ]
