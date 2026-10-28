@@ -1700,6 +1700,10 @@ func _show(key: String) -> void:
 		child.queue_free()
 	_panel_focus = null
 	var c: Dictionary = Campaign.state
+	# Qualquer outra tela (a partida, a chegada, o trem, o relatório, um cômodo): a Sala fecha e o escolhido sai do
+	# cômodo (#181), antes de cada caminho abaixo.
+	if key != S.CHARACTERS:
+		_close_room_screen()
 	if key == "departure":
 		_panel.visible = false
 		_departure_view()
@@ -1725,7 +1729,6 @@ func _show(key: String) -> void:
 		_panel.visible = false
 		_character_room()
 		return
-	_close_room_screen()
 	_panel.visible = true
 	# Outra tela: a lista começa do alto (a mesma tela refeita fica na mesma rolagem).
 	if key != _shown:
@@ -2736,9 +2739,10 @@ func open_from_room(service: String) -> void:
 func _close_room_screen() -> void:
 	if is_instance_valid(_room_screen):
 		_room_screen.queue_free()
-		# O escolhido sai do cômodo; os moradores reaparecem onde estavam (#181).
-		station.clear_stage_hero()
 		station.hide_residents(false)
+	# O escolhido sai do cômodo; os moradores reaparecem onde estavam (#181). Também sem a tela (ela já saiu antes).
+	if station != null:
+		station.clear_stage_hero()
 	_room_screen = null
 
 

@@ -5,7 +5,7 @@ chão. Quando a gente sair, ele sai dali ou volta para o cômodo em que já esta
 
 ![antes e depois](character-stage/before_after.jpg)
 
-As fotos saem de `tools/capture_181.gd` (`--text-size=2`). O antes é a `main`.
+As fotos saíram do `tools/capture_181.gd` (`--text-size=2`), retirado depois do merge do #200. O antes é a `main` de então.
 
 ## O que muda
 
@@ -88,3 +88,24 @@ placa sai, os moradores voltam onde estavam, os pés ficam no chão e nada tapa 
 - Corrigido: ao trocar de herói, a placa nova perdia o nome "StageHero", porque a antiga ainda estava na árvore. Agora
   a antiga sai da árvore antes, e o teste confere que fica uma placa só.
 - Fica: o `en.po` regenerado atualiza números de linha de outros arquivos, que já estavam desatualizados.
+
+## Depois do merge: os ajustes do revisor do #200
+
+![o Tatu: antes, a câmera recuava no Maior; depois, a coluna da esquerda é mais estreita e ele fica na escala de todos](character-stage/tatu.jpg)
+
+![a coluna da esquerda mais estreita: os nomes, o botão de ampliar e o texto do Maior continuam cabendo](character-stage/narrow.jpg)
+
+- **O Tatu no texto Maior:** o escudo passava uns 46 px dos painéis de cada lado.
+  - A primeira correção afastava a câmera, e o Tatu ficava menor que os outros. O Lucas não quis isso (28/10).
+  - Agora a coluna da esquerda ficou mais estreita: 540 px, em vez de 600. Os heróis vão 4 por linha, em abas de
+    104 px.
+  - O botão de ampliar e as habilidades quebram a linha, em vez de alargar a coluna.
+  - Com o vão maior, o Tatu cabe no Maior na mesma escala de todos, com 16 px de folga de cada lado.
+- **A câmera:** ela só se move quando o vão muda, e não a cada vez que a tela é refeita.
+- **Outra tela:** a chegada, o trem, o relatório ou a partida fecham a Sala e tiram o escolhido do cômodo.
+- **O inglês no Maior:** com o nome mais longo ("Emergency Sledgehammer"), a coluna continua em 540 px, e o título do
+  detalhe quebra a linha.
+
+  ![o Tatu em inglês, no Maior: a coluna em 540 px](character-stage/english-larger.jpg)
+- O `tools/capture_181.gd` saiu. As fotos são de uma captura temporária: o Tatu entrou no elenco como recruta.
+- O `test_character_stage` confere o Tatu no Normal e no Maior: a escala dos outros e a folga no vão.
