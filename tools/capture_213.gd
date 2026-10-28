@@ -3,7 +3,7 @@
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_213.gd -- --out=<pasta>
 ## Campanha própria na pasta da saída. Roda também na main de antes. 01 a parada no Depósito Inundado (fase 5, semente
 ## 1, trecho 2), acampada; 02 o mesmo com dois quadros do fogo a outro tempo (o fogo tremula); 03 a parada seca do Cais
-## (fase 2), que segue com a fogueira.
+## (fase 2), que segue com a fogueira; 04 a parada nos Dutos de Esgoto (fase 5, semente 7), também com água no chão.
 extends SceneTree
 
 var out := ""
@@ -30,6 +30,7 @@ func _initialize() -> void:
 	campaign.save_dir = out.path_join("save")
 	await _stop("fase_5", 1, ["01-depot-camp", "02-depot-camp-flicker"])
 	await _stop("fase_2", 32, ["03-dock-camp"])
+	await _stop("fase_5", 7, ["04-sewer-camp"])
 	print("capturas do tambor em %s" % out)
 	quit(0)
 

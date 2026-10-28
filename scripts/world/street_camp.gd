@@ -1,7 +1,7 @@
 ## A fogueira da parada de descanso (#143): o acampamento fora das casas, na rua ou no cenário, onde a equipe parou.
 ## Tem o que a cena do acampamento (AHCampScene) usa de um cômodo: o x da fogueira, o piso, a linha dela e onde a fila
-## recomeça ao levantar. Onde há água no chão (o Depósito Inundado), a fogueira é o tambor de ferro com fogo (T_LP03,
-## docs/design/luz-pratica.md): ninguém acende fogo na água, e o tambor fica em pé nela.
+## recomeça ao levantar. Onde há água no chão (o Depósito Inundado, os Dutos de Esgoto), a fogueira é o tambor de ferro
+## com fogo (T_LP03, docs/design/luz-pratica.md): ninguém acende fogo na água, e o tambor fica em pé nela.
 class_name AHStreetCamp
 extends Node3D
 
@@ -27,13 +27,17 @@ const BARREL_LIGHT_PX := Vector2(115, 107)
 const BARREL_FIRE_FPS := 8.0
 ## O fogo acima de 1 (o glow pega) e o halo mais baixo, só o brilho em volta.
 const BARREL_FIRE_ENERGY := 1.6
-const BARREL_HALO_ENERGY := 0.8
+const BARREL_HALO_ENERGY := 1.5
+## A camada só do card do tambor: a luz dele não o ilumina (de frente, estourava o ferro num laranja chapado); o brilho
+## do corpo vem da textura acesa e do halo.
+const BARREL_LAYER := 1 << 19
 ## Se a fogueira é o tambor (água no chão).
 var barrel := false
 var _fire_material: ShaderMaterial
 var _fire_light: OmniLight3D
 var _barrel_fire: MeshInstance3D
 var _barrel_halo: MeshInstance3D
+var _barrel_material: StandardMaterial3D
 var _fire_frames: Array[Texture2D] = []
 var _fire_frame := 0
 var _fire_time := 0.0
@@ -82,13 +86,14 @@ func _build_barrel() -> void:
 	card.name = "Barrel"
 	card.mesh = QuadMesh.new()
 	card.mesh.size = size
-	var material := StandardMaterial3D.new()
-	material.albedo_texture = load("res://art/scenarios/T_LP03.webp")
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
-	material.alpha_scissor_threshold = 0.333
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	material.roughness = 1.0
-	card.material_override = material
+	_barrel_material = StandardMaterial3D.new()
+	_barrel_material.albedo_texture = load("res://art/scenarios/T_LP03.webp")
+	_barrel_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	_barrel_material.alpha_scissor_threshold = 0.333
+	_barrel_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_barrel_material.roughness = 1.0
+	card.material_override = _barrel_material
+	card.layers = BARREL_LAYER
 	card.position = base + Vector3(0, size.y * 0.5, 0)
 	add_child(card)
 	for i in 4:
@@ -101,6 +106,7 @@ func _build_barrel() -> void:
 	_barrel_halo = _added_quad("BarrelHalo", size * 2.0, load("res://art/scenarios/T_LP03_Halo.webp"), BARREL_HALO_ENERGY)
 	_barrel_halo.position = card.position + Vector3(0, 0, 0.01)
 	_fire_light.light_color = Color(1.0, 0.5, 0.2)
+	_fire_light.light_cull_mask &= ~BARREL_LAYER
 	_fire_light.position = base + Vector3((BARREL_LIGHT_PX.x - BARREL_PX.x * 0.5) * meters, size.y - BARREL_LIGHT_PX.y * meters, 0.25)
 
 
@@ -123,6 +129,8 @@ func _added_quad(node_name: String, size: Vector2, texture: Texture2D, energy: f
 
 func set_camp_lit(lit: bool) -> void:
 	if barrel:
+		# Aceso, o card troca para a versão acesa (as brasas nos furos), como pede o contrato da luz prática.
+		_barrel_material.albedo_texture = load("res://art/scenarios/T_LP03_Lit.webp" if lit else "res://art/scenarios/T_LP03.webp")
 		_barrel_fire.visible = lit
 		_barrel_halo.visible = lit
 	else:
@@ -132,8 +140,9 @@ func set_camp_lit(lit: bool) -> void:
 
 
 ## O fogo do tambor tremula: os quatro quadros em ciclo, numa ordem que não se repete à vista (nunca o mesmo duas vezes).
+## Com "Reduzir efeitos", fica parado e aceso, num quadro só.
 func _process(delta: float) -> void:
-	if not barrel or not _barrel_fire.visible:
+	if not barrel or not _barrel_fire.visible or GameFlow.reduced_effects():
 		return
 	_fire_time += delta
 	if _fire_time < 1.0 / BARREL_FIRE_FPS:

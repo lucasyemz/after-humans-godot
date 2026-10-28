@@ -112,11 +112,27 @@ func _barrel() -> void:
 	t.check(not fire.visible and not halo.visible, "apagado, o tambor frio")
 	camp.set_camp_lit(true)
 	t.check(fire.visible and halo.visible, "aceso, o fogo e o halo")
+	var texture: Texture2D = (barrel.material_override as StandardMaterial3D).albedo_texture
+	t.check(texture.resource_path.ends_with("T_LP03_Lit.webp"), "aceso, o card na versão acesa")
+	t.check(barrel.layers & camp._fire_light.light_cull_mask == 0, "e a luz do tambor não ilumina o próprio card (não estoura o ferro)")
+	# Com "Reduzir efeitos", o fogo parado, num quadro só.
+	var settings: Dictionary = Campaign.state.get("settings", {})
+	var reduced = settings.get("reduced_environment_effects", false)
+	Campaign.state["settings"] = settings
+	settings.reduced_environment_effects = true
+	var still: Texture2D = (fire.material_override as ShaderMaterial).get_shader_parameter("tex")
+	for i in 10:
+		camp._process(1.0 / AHStreetCamp.BARREL_FIRE_FPS)
+	t.check((fire.material_override as ShaderMaterial).get_shader_parameter("tex") == still, "com Reduzir efeitos, o fogo parado")
+	settings.reduced_environment_effects = reduced
 	var frames := {}
 	for i in 30:
 		camp._process(1.0 / AHStreetCamp.BARREL_FIRE_FPS)
 		frames[(fire.material_override as ShaderMaterial).get_shader_parameter("tex")] = true
 	t.check(frames.size() == 4, "o fogo tremula nos quatro quadros (%d)" % frames.size())
+	camp.set_camp_lit(false)
+	texture = (barrel.material_override as StandardMaterial3D).albedo_texture
+	t.check(texture.resource_path.ends_with("T_LP03.webp"), "apagado, o card volta ao tambor frio")
 	camp.free()
 	var dry := AHStreetCamp.new()
 	_tree.root.add_child(dry)

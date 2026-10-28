@@ -40,21 +40,28 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
 
 ## Para o Lucas
 
-- **O tambor com fogo (decisão do Lucas, 28/10):** onde a fogueira cairia na água do chão (o Depósito Inundado), a
-  parada monta o tambor de ferro com fogo (`T_LP03`, de `docs/design/luz-pratica.md`), com 0,92 m e o pé no piso. O
-  fogo (`T_LP03_Fire_0` a `_3`) assenta na boca, em y = 95 px do card e com 85% da largura dele, somado e trocando
-  de quadro a uns 8 por segundo. O halo (`T_LP03_Halo`) tem o dobro do tamanho, e a luz sai da boca na cor
-  [1, 0,5, 0,2]. As peças somadas usam `shaders/added_sprite.gdshader`, sem névoa: com névoa, o preto do quad virava
-  um retângulo claro. A equipe segue sentada no chão alagado em volta.
+- **O tambor com fogo (decisão do Lucas, 28/10):** onde a fogueira cairia na água do chão (o Depósito Inundado e os
+  Dutos de Esgoto, os dois da fase 5), a parada monta o tambor de ferro com fogo (`T_LP03`, de
+  `docs/design/luz-pratica.md`), com 0,92 m e o pé no piso:
+  - aceso, o card troca para `T_LP03_Lit` (as brasas nos furos), e o fogo (`T_LP03_Fire_0` a `_3`) assenta na boca, em
+    y = 95 px do card e com 85% da largura dele, somado e trocando de quadro a uns 8 por segundo; com "Reduzir efeitos",
+    parado num quadro;
+  - o halo (`T_LP03_Halo`, energia 1,5) tem o dobro do tamanho, e a luz sai da boca na cor [1, 0,5, 0,2], mas não
+    ilumina o próprio card (uma camada só dele): de frente, ela estourava o ferro num laranja chapado;
+  - as peças somadas usam `shaders/added_sprite.gdshader`, sem névoa (com névoa, o preto do quad virava um retângulo
+    claro); a equipe segue sentada no chão alagado em volta.
 
-  ![Antes, no Depósito Inundado, a fogueira no chão alagado; depois, o tambor de ferro com fogo no lugar dela; embaixo, no Cais, de chão seco, a fogueira de sempre](camp-ground/barrel.jpg)
+  Fica para depois do contrato da luz prática: a variação de 80% a 110% na luz e no halo, a poça desenhada no chão e
+  o tambor sem OmniLight na qualidade Baixo.
+
+  ![Antes, no Depósito Inundado, a fogueira no chão alagado; depois, o tambor de ferro com fogo no lugar dela; nos Dutos de Esgoto, também com água, o tambor; embaixo, no Cais, de chão seco, a fogueira de sempre](camp-ground/barrel.jpg)
 - O enquadramento do acampamento ficou mais de cima (mais chão, menos parede).
 - Com todos deitados, os vizinhos de dentro se sobrepõem (a Íris na Véspera, o Nick no Bento). Isso já acontecia
   antes, com a câmera reta; dá para afastar os lugares de quem deita, se ele quiser.
 
 ## Testes
 
-- `tests/test_camp_ground.gd` (novo, 103 verificações, com o tambor):
+- `tests/test_camp_ground.gd` (novo, 107 verificações, com o tambor):
   - em cada pose, o ponto mais baixo do corpo na linha do chão (até 2 cm) e o apoio do dado igual ao medido na arte;
   - o apoio de cada pose cai no chão embaixo do corpo (até 0,6 m atrás do pé) na câmera do acampamento: com a câmera
     antiga (4°), dez poses falham;
@@ -64,7 +71,8 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
     na largura do corpo e chegando ao apoio, a troca da sombra na pose de cuidar e a saída ao levantar acampamento.
 - `tests/run_all.gd` inteiro e o modo de captura da Rua, com o teste de colisão.
 - `tools/capture_205.gd` (as 16 poses), `tools/capture_143.gd` (a parada de descanso no cenário, de noite e com chuva)
-  e `tools/capture_213.gd` (o tambor no Depósito Inundado e a fogueira no Cais; roda também na `main` de antes).
+  e `tools/capture_213.gd` (o tambor no Depósito Inundado e nos Dutos de Esgoto, e a fogueira no Cais; roda também na `main`
+  de antes).
 
 ## QA
 
@@ -78,3 +86,6 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
 - **Rodada 3: REPROVADO.** O Cais a 8° e as paradas secas ficaram certos; no Depósito a 4°, a altura do alvo de 15°
   deixava uma faixa escura vazia embaixo da fileira. Correção: a altura do alvo acompanha o ângulo (no Depósito, a luminância
   das faixas embaixo da fileira volta a ser a da `main`).
+- **O tambor, rodada 1: REPROVADO.** Três médias: a luz do tambor estourava o corpo num laranja chapado; aceso, o card
+  não trocava para `T_LP03_Lit`; o fogo tremulava com "Reduzir efeitos". Correção: o card numa camada fora da luz
+  dele, a textura acesa e o fogo parado. Das baixas: os Dutos de Esgoto citados e na captura, e o halo em 1,5.
