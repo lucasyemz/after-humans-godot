@@ -12,12 +12,15 @@ uniform float roughness_scale = 1.0;
 uniform float floor_y = 0.0;
 uniform float damp_height = 0.35;
 uniform float damp_amount = 0.0;
+// O quanto a peça andou desde o lugar dela (a parede secreta que desliza, #203): a textura vai junto com a peça, e não
+// fica presa ao mundo.
+uniform vec3 slide_offset = vec3(0.0);
 
 varying vec3 world_pos;
 varying vec3 world_normal;
 
 void vertex() {
-	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz - slide_offset;
 	world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
 }
 
