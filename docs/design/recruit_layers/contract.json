@@ -1,7 +1,7 @@
 {
   "issue": 191,
   "base_commit": "20890be",
-  "source_tag": "codex-pr<N>-originals",
+  "source_tag": "codex-pr211-originals",
   "source_folder": "art/combat/source/recruit_layers_20261028",
   "frame_origin": [
     0,

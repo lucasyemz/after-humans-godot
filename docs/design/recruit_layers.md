@@ -62,7 +62,7 @@ A prancha antes/depois compara a arte atual e duas montagens com a mesma escala 
 
 ## Fontes fora da main
 
-Tag `codex-pr<N>-originals`, pasta `art/combat/source/recruit_layers_20261028/`, somente em commit isolado de fontes. O Release na mesma tag fornece o ZIP automático: a árvore da tag contém apenas fontes, medidas e instruções. Os PNG individuais normalizados não entram no PR nem no histórico da branch para a main; os atlas brutos da geração continuam fora do Git. O Claude integra pela #189, usando `tools/sync_combat_art.py`, preservando o contrato.
+Tag `codex-pr211-originals`, pasta `art/combat/source/recruit_layers_20261028/`, somente em commit isolado de fontes. O Release na mesma tag fornece o ZIP automático: a árvore da tag contém apenas fontes, medidas e instruções. [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr211-originals) · [ZIP dos originais](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr211-originals.zip). Os PNG individuais normalizados não entram no PR nem no histórico da branch para a main; os atlas brutos da geração continuam fora do Git. O Claude integra pela #189, usando `tools/sync_combat_art.py`, preservando o contrato.
 
 Depois de extrair as fontes: `python docs/design/recruit_layers/build_delivery.py --sources art/combat/source/recruit_layers_20261028`. Dependências: Pillow, numpy, scipy e cairosvg. As máscaras de oclusão e os retângulos de encaixe ficam junto ao gerador; não são dados do jogo. O contrato contém hashes dos WebP, PNG e referências.
 
