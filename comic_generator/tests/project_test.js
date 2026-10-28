@@ -53,16 +53,16 @@ test('import requires a complete project and summaries follow scene durations',a
 import {mobileSettings,cropRectangle,composeMobile} from '../src/mobile_compositor.js';
 test('mobile crop stays inside the original frame at every pan limit',()=>{
  for(const zoom of [1,1.5,3])for(const x of [0,.5,1])for(const y of [0,.5,1]){
-  const crop=cropRectangle(1920,1080,720,1280,{zoom,x,y});
+  const crop=cropRectangle(1920,1080,1280,720,{zoom,x,y});
   assert.ok(crop.x>=0&&crop.y>=0);assert.ok(crop.x+crop.width<=1920+1e-8);assert.ok(crop.y+crop.height<=1080+1e-8);
-  assert.ok(Math.abs(crop.width/crop.height-9/16)<1e-8);
+  assert.ok(Math.abs(crop.width/crop.height-16/9)<1e-8);
  }
  assert.equal(mobileSettings({zoom:99,x:-1,textScale:Infinity}).zoom,3);
  assert.equal(mobileSettings({x:-1}).x,0);assert.equal(mobileSettings({textScale:Infinity}).textScale,1);
 });
 test('mobile text fits safe areas without dropping characters at maximum length',()=>{
  const noop=()=>{};const ctx={font:'',save:noop,restore:noop,clearRect:noop,drawImage:noop,beginPath:noop,roundRect:noop,fill:noop,stroke:noop,moveTo:noop,lineTo:noop,fillText:noop,measureText(text){return {width:text.length*Number(this.font.match(/([\d.]+)px/)[1])*.9};}};
- const speech='W'.repeat(140),caption='W'.repeat(200);const {panels}=composeMobile(ctx,{width:1920,height:1080},{width:720,height:1280,settings:{textScale:1.8,speechY:.75},speech,caption});
- for(const panel of Object.values(panels)){assert.ok(panel.top>=1280*.035);assert.ok(panel.top+panel.height<=1280*.965+1e-8);assert.ok(panel.left>=0&&panel.left+panel.width<=720);assert.ok(panel.fontSize<=panel.requestedSize);}
+ const speech='W'.repeat(140),caption='W'.repeat(200);const {panels}=composeMobile(ctx,{width:1920,height:1080},{width:1280,height:720,settings:{textScale:1.8,speechY:.75},speech,caption});
+ for(const panel of Object.values(panels)){assert.ok(panel.top>=720*.035);assert.ok(panel.top+panel.height<=720*.965+1e-8);assert.ok(panel.left>=0&&panel.left+panel.width<=1280);assert.ok(panel.fontSize<=panel.requestedSize);}
  assert.equal(panels.speech.lines.join(''),speech);assert.equal(panels.caption.lines.join(''),caption);assert.ok(panels.speech.top+panels.speech.height<panels.caption.top);
 });

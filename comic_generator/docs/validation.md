@@ -54,23 +54,28 @@ Validação desta entrega:
 - QA independente: primeira rodada identificou validação insuficiente de import e cobertura de sintaxe; correções com testes de regressão. Rodada final: **VEREDITO: APROVADO**.
 - Capturas locais, ignoradas: `outputs/dashboard_desktop.png`, `dashboard_phone.png`, `preview_phone_desktop.png`, `preview_phone.png` e `editor_phone.png`. O registro anterior `outputs/editor.png` preserva a vista do editor antes do dashboard.
 
-O teste desta seção cobre a prévia original em 16:9; o reenquadramento vertical está validado na seção seguinte. Testes de viewport foram feitos em Chrome headless; não substituem uma conferência em aparelhos físicos. Projetos importados e edições locais não são enviados ao servidor nem publicados automaticamente.
+O teste desta seção cobre a prévia original em 16:9; o reenquadramento horizontal para celular está validado na seção seguinte. Testes de viewport foram feitos em Chrome headless; não substituem uma conferência em aparelhos físicos. Projetos importados e edições locais não são enviados ao servidor nem publicados automaticamente.
 
 Suíte do repositório repetida após a entrega do dashboard, com o mesmo perfil isolado: **92/92 testes passaram**, saída 0, em 727.346 ms, incluindo paridade 48/48. Log local: `outputs/godot_dashboard_tests.log`, ignorado. Nenhum arquivo do jogo, história ou imagem foi alterado nesta evolução.
 
-## Versão móvel com reenquadramento e exportação
+## Celular horizontal: reenquadramento e exportação
 
-- Prévia opcional 9:16, com zoom, deslocamento horizontal/vertical, escala do texto e altura do balão independentes por cena. Valores em `scene.mobileFraming`, separados de `scene.config`; presentes no salvamento, reimportação e duplicação.
-- Prévia e MP4 vertical compartilham `composeMobile`; a arte é recortada, e as falas/legendas são recompostas na área segura. Textos máximos de 140/200 caracteres mantêm todos os caracteres e não se sobrepõem. Se necessário, a fonte diminui para caber.
-- Configurações, textos, ordem, imagens e duração das oito cenas originais continuam intactos. Nenhuma edição dos arquivos da história ou arte foi preparada para commit.
-- `npm run check`: **6/6**, incluindo limites geométricos do recorte em todos os extremos de zoom/pan e regressão de texto longo.
-- Chrome headless: ajustes por cena, persistência após reload, reimportação, duplicação, reset, prévia das oito cenas e viewport de 390 px, sem erros JavaScript ou overflow horizontal.
-- Exportações da sessão principal com fixture de duas cenas de 1 segundo, derivadas das cenas reais: **720×1280 / 60 quadros / 2 segundos / 836.593 bytes** (celular) e **1280×720 / 60 quadros / 2 segundos / 841.919 bytes** (original). Metadados lidos por `<video>`; projeto empacotado idêntico antes/depois. Resultado local: `outputs/mobile_export_validation.json`.
-- QA independente repetiu a exportação da fixture nos dois formatos: 341.082 / 341.383 bytes, ambos com 60 quadros e 2 segundos; cena, tempo e projeto restaurados, sem pageerrors. Confirmou persistência/reimportação/reset/duplicação e as prévias das oito cenas.
-- Rodada de QA identificou texto longo fora dos limites e duplicação do aviso de alarme em um recorte extremo. Corrigidos com encaixe sem truncamento e supressão dos textos no passe de arte; apenas o compositor móvel desenha os avisos. Rodada final: **VEREDITO: APROVADO**, sem pendências médias ou altas.
-- Capturas locais ignoradas: `outputs/mobile_framing_desktop.png` e `outputs/mobile_framing_phone.png`. Os registros anteriores de prévia 16:9 permitem comparar tamanho de imagem e texto.
+Formato final definido pelo projeto: **horizontal 16:9**, incluindo celular. A opção vertical implementada anteriormente foi corrigida e removida da interface, da prévia e do exportador. A revisão atual mantém zoom/pan e texto por cena, em scene.mobileFraming, sem modificar a câmera, a narrativa ou os arquivos de arte.
 
-Limites desta validação: MP4 móvel validado em sequência curta; a história inteira foi percorrida na prévia, sem reexportar seus 44,3 s no novo formato. H.264/WebCodecs continuam dependendo do navegador. O recorte móvel é fixo por cena e acompanha a câmera original; não adiciona novos keyframes, não reescreve a história e não altera a exportação horizontal.
+- Celular horizontal: largura máxima 844 px na prévia; quadro sempre 16:9, inclusive se o navegador estiver estreito.
+- Prévia, PNG de conferência e MP4 móvel: **1280×720**, 30 FPS na exportação. Original também continua horizontal.
+- Zoom 1 mostra a imagem inteira; zoom maior permite ajustar posição X/Y, preservando a proporção 16:9.
+- Falas/legendas recompostas na área segura, com ajuste de fonte sem truncamento. A cauda do balão também é limitada pela altura, evitando sobreposição com a legenda em uma tela mais baixa.
+- Testes geométricos e de texto extremo atualizados para 1280×720; npm run check 6/6.
 
+Os resultados verticais antigos não representam o formato final e foram substituídos nesta validação. Logs e capturas antigos continuam apenas nos outputs locais ignorados.
 
-Suíte Godot executada novamente nesta entrega, em perfil isolado: **92/92 testes passaram**, saída 0, em 749.689 ms; paridade **48/48** preservada. Log local ignorado: `outputs/godot_mobile_tests.log`. O primeiro processo foi interrompido junto com a sessão anterior; a execução da retomada terminou integralmente.
+- Validação da sessão principal: sequência curta de duas cenas, 2 segundos, 60 quadros, **1280×720** tanto no celular reenquadrado (898.626 bytes) quanto no original (841.919 bytes). Projeto empacotado permaneceu idêntico antes/depois, sem pageerrors. Resultado local: `outputs/landscape_export_validation.json`.
+- QA independente: prévia 16:9 em 844×390 e 390×844, todas as oito cenas em PNG 1280×720, sem overflow. Exportações reais de 2 segundos/60 quadros: celular 344.582 bytes e original 341.383 bytes; projeto, cena e tempo restaurados. Textos de 140/200 caracteres preservados na área segura.
+- Zoom 1 mantém os 1920×1080 completos; zoom 2/pan máximo produz recorte 960×540, mantendo 16:9. Ajustes continuam separados por cena e a versão original é preservada.
+- QA final: **VEREDITO: APROVADO — celular horizontal**, sem pendências médias ou altas. Capturas locais: `outputs/landscape_framing_desktop.png` e `outputs/landscape_framing_phone.png`, ignoradas no Git.
+
+- Conferência visual final: o tamanho da fonte móvel usa o menor lado do quadro, e a largura do balão acompanha o texto dentro da área segura. Cena 1 em t=3,6 s, zoom 1,15 e texto 120%: dois rostos visíveis. Captura final: `outputs/landscape_final_phone.png`.
+- QA da última revisão: exportação horizontal de 1 segundo/30 quadros, 155.953 bytes; controles móveis desabilitados durante a geração e restaurados ao final. Sem pageerrors. **VEREDITO: APROVADO**.
+
+Suíte completa após a correção horizontal: **92/92 testes passaram**, saída 0, em 788.757 ms; paridade 48/48 preservada. Perfil isolado e log local `outputs/godot_landscape_tests.log`, ignorado. Testes do app 6/6 e QA independente aprovados. Nenhum arquivo da história, arte ou jogo foi alterado.
