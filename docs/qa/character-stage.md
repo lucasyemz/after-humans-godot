@@ -45,13 +45,21 @@ que praticamente entrar dentro do cômodo."
   (`STAGE_PX_PER_METER`, com a arte passando um pouco do corpo). O Nick fica com uns 555 px e o Bento com uns 630,
   cada um na altura dele.
 - **Os pés:** caem em y≈878, onde ficavam os da figura antiga (`STAGE_FEET`).
-- **O resto:** o meio da sala continua entre os dois painéis. O teto e a luminária saem do quadro, e o fundo é a parede,
-  a porta, a estante e o sofá da própria sala.
+- **O meio:** o herói fica no meio do vão real entre os dois painéis. No Maior, o painel da esquerda cresce com o
+  texto (até x 831), então a própria tela, depois de montar, passa à câmera a borda medida (`stage_gap`), em vez da
+  constante.
+- **O fundo:** a parede, a porta, a estante e o sofá da própria sala. O teto sai do quadro; só uma lasca da luminária
+  fica atrás da barra de cima.
 
 ![antes e depois do zoom](character-stage/zoom.jpg)
 
-O `test_character_stage` confere os pés entre os painéis e a altura na tela (a do Nick e a do Bento contra a figura
-antiga), no Normal e no Maior.
+O `test_character_stage` confere, no Normal e no Maior, os pés no meio do vão real entre os painéis e a altura na tela
+contra a figura antiga.
+
+**QA do zoom, rodada 1: REPROVADO.** No Maior, a câmera usava a borda fixa do painel da esquerda, o herói ficava uns
+100 px fora do meio, e o painel cobria o Tatu e o rabo do Guaxinim. Corrigido com o vão real, e o teste agora mede
+contra os painéis como estão na tela. A QA também viu que, com as Opções por cima da Sala, os moradores andam no zoom
+de perto (isso já acontecia antes).
 
 ## Rodadas da QA
 

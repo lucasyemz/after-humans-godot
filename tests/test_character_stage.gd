@@ -67,8 +67,13 @@ func _stage(station, profile: String, fallen_id: String) -> void:
 	# Os pés aparecem entre os dois painéis, acima da barra de baixo.
 	await _settle(station)
 	var feet: Vector2 = station.camera.unproject_position(card.global_position)
-	t.check(feet.x > AHCharacterRoom.LEFT.end.x and feet.x < AHCharacterRoom.RIGHT.position.x and feet.y > 400.0 and feet.y < 1000.0,
-		"%s: os pés na tela, entre os painéis (%.0f, %.0f)" % [profile, feet.x, feet.y])
+	# O vão real entre os painéis (no Maior, o da esquerda cresce com o texto): os pés no meio dele.
+	var left_end: float = screen.get_node("Left").get_global_rect().end.x
+	var right_start: float = screen.get_node("Right").get_global_rect().position.x
+	t.check(is_equal_approx(screen.stage_gap().x, left_end) and is_equal_approx(screen.stage_gap().y, right_start),
+		"%s: a câmera usa o vão real entre os painéis (%.0f a %.0f)" % [profile, left_end, right_start])
+	t.check(absf(feet.x - (left_end + right_start) * 0.5) < 12.0 and feet.y > 400.0 and feet.y < 1000.0,
+		"%s: os pés no meio do vão entre os painéis (%.0f, %.0f; o meio em %.0f)" % [profile, feet.x, feet.y, (left_end + right_start) * 0.5])
 	# O tamanho da figura antiga da interface (o pedido do Lucas): a câmera dentro do cômodo, a altura do herói em px.
 	var head: Vector2 = station.camera.unproject_position(card.global_position + Vector3(0, card.body_height, 0))
 	var expected: float = card.body_height * AHStation.STAGE_PX_PER_METER

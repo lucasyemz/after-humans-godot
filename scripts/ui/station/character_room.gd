@@ -75,6 +75,7 @@ func rebuild() -> void:
 		right.custom_minimum_size.y = right.size.y
 	if training:
 		_training_dialog(c, S.hero(c, selected))
+	_frame_stage()
 	var again := get_node_or_null(focus_path) if not focus_path.is_empty() else null
 	if again == null and focus_name != "":
 		again = find_child(focus_name, true, false)
@@ -85,6 +86,28 @@ func rebuild() -> void:
 
 func restyle() -> void:
 	rebuild()
+
+
+## O vão entre os dois painéis como ficaram na tela (no Maior, o da esquerda cresce com o texto), em px de 1080.
+func stage_gap() -> Vector2:
+	var gap := Vector2(LEFT.end.x, RIGHT.position.x)
+	var left := get_node_or_null("Left") as Control
+	var right := get_node_or_null("Right") as Control
+	if left != null and not left.is_queued_for_deletion():
+		gap.x = maxf(gap.x, left.position.x + left.size.x)
+	if right != null and not right.is_queued_for_deletion():
+		gap.y = minf(gap.y, right.position.x)
+	return gap
+
+
+## A câmera põe o meio da Sala no meio do vão real entre os painéis (#181), depois que eles tomam o tamanho.
+func _frame_stage() -> void:
+	await get_tree().process_frame
+	var station = hud.get("station") if hud != null else null
+	if station == null or not is_inside_tree() or not is_visible_in_tree():
+		return
+	var gap := stage_gap()
+	station.focus_room_stage(S.CHARACTERS, gap.x, gap.y)
 
 
 func _unhandled_input(event: InputEvent) -> void:
