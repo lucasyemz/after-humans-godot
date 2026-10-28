@@ -1,20 +1,22 @@
 # O herói ferido (#194)
 
-![Antes (à esquerda) e depois (à direita): em cima, a equipe com o Bento a 6 de 34 e a Véspera a 9 de 30, com o coração rachado no retrato dos dois; embaixo, três momentos do andar, com o Bento pendendo no passo](wounded/before_after.jpg)
+![Em cima, antes (à esquerda) e depois (à direita): a equipe com o Bento a 6 de 34 e a Véspera a 7 de 30; depois, os dois na pose de ferido e com o coração rachado no retrato. Embaixo, os quatro fundadores feridos parados, cada um com o pé no chão, e o andar mancando](wounded/before_after.jpg)
 
 ## A regra (`scripts/flow/wounded.gd`, `AHWounded`)
 
 Os números ficam em `data/wounded.json`, para o Lucas ajustar:
 
-- **Ferido** (`AHWounded.is_wounded(hero)`): vivo e com a vida abaixo de 50% da máxima (`Threshold`), ou Caído em
+- **Ferido** (`AHWounded.is_wounded(hero)`): vivo e com a vida abaixo de 30% da máxima (`Threshold`), ou Caído em
   recuperação (#118/#121), mesmo com a vida cheia. Uma função só, para a exploração, a Estação e a HUD. É o mesmo
   limite do "Ferimento grave" (o coração rachado) da Estação: o kit lê o `Threshold` daqui (`AHKit.heavy_below`), um
   número só para as duas telas. O kit trava o limite abaixo do "Em forma" (75%), para o "Ferimento leve" não
-  sumir com um número alto demais. A issue propunha 40%; ficou 50%, o limite que o coração rachado já tinha na Estação.
+  sumir com um número alto demais. A issue propunha 40%; o Lucas decidiu 30% (28/10), e o "Ferimento grave" da Estação foi
+  junto (antes, abaixo de 50%).
 - **O passo** (`AHWounded.speed_factor`): 70% da velocidade (`SpeedFactor`).
 - **A pose** (`AHWounded.pose(idle)`): o `wounded.webp` da pasta da arte do herói, no canvas e na âncora do idle (a
-  entrega do Codex, PR #209). Sem o arquivo, o idle de pé. A pose troca sozinha quando a arte entrar: até o #209 entrar na `main`, os heróis
-  andam feridos no idle (o teste confere a troca com uma pose de mentira).
+  entrega do Codex, PR #209, já na `main`). Sem o arquivo, o idle de pé. As quatro poses têm o tamanho do idle e o pé
+  na mesma linha (no máximo 1 px de diferença); a Íris e a Véspera pendem uns 35 px da arte para o lado, a inclinação
+  do ferido.
 
 ## Na exploração
 
@@ -52,7 +54,8 @@ A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWo
   - o aviso na HUD só no ferido (com o clique passando para a plaquinha), e fora quando a vida volta;
   - o save: a vida baixa volta com ele.
 - `tests/run_all.gd` inteiro.
-- `tools/capture_194.gd`: a Rua com o Bento a 20% e a Véspera a 30%, parada e andando; roda também na `main` de antes.
+- `tools/capture_194.gd`: a Rua com o Bento a 20% e a Véspera a 25%, parada e andando, e os quatro feridos parados;
+  roda também na `main` de antes.
 
 ## QA
 
@@ -71,3 +74,5 @@ A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWo
 - **Revisão do PR #216: AJUSTAR ANTES.** A pose de ferido fica pendente do #209 (dito na #194), e os testes ganharam
   a troca de pose na rua, a velocidade medida no `_physics_process` e a troca de formação com o ferido; o kit trava o
   `Threshold` abaixo do "Em forma".
+- **Decisão do Lucas (28/10):** o limite em 30% (o passo segue em 70%), e o "Ferimento grave" da Estação junto; a main
+  com o #209 traz as poses de ferido, e as capturas foram refeitas com elas.

@@ -1,6 +1,6 @@
 ## O kit da HUD (#60): as peças do Codex viram estilos com as medidas do assets.json (9-slice e recuo do conteúdo), o
 ## aço repete nas peças grandes, as fontes são a Barlow Condensed, os estados de vida seguem a decisão do Lucas (75% e
-## 50%), as cores do daltonismo valem na hora nas barras e nas pílulas, e a tecla acompanha a troca nas Opções.
+## 30%), as cores do daltonismo valem na hora nas barras e nas pílulas, e a tecla acompanha a troca nas Opções.
 extends RefCounted
 
 var t
@@ -46,10 +46,10 @@ func _states() -> void:
 	t.equal(AHKit.health_state(34, 34).id, "healthy", "vida cheia: Em forma")
 	t.equal(AHKit.health_state(26, 34).id, "healthy", "acima de 75%: Em forma")
 	t.equal(AHKit.health_state(25, 34).id, "light", "75% ou menos: Ferimento leve")
-	t.equal(AHKit.health_state(12, 24).id, "light", "50% exatos: Ferimento leve")
-	t.equal(AHKit.health_state(11, 24).id, "heavy", "abaixo de 50%: Ferimento grave")
+	t.equal(AHKit.health_state(9, 30).id, "light", "30% exatos: Ferimento leve")
+	t.equal(AHKit.health_state(8, 30).id, "heavy", "abaixo de 30%: Ferimento grave")
 	t.equal(AHKit.health_state(0, 24).id, "heavy", "caído: Ferimento grave")
-	t.equal([AHKit.health_state(34, 34).label, AHKit.health_state(17, 23).label, AHKit.health_state(8, 24).label], ["Em forma", "Ferimento leve", "Ferimento grave"],
+	t.equal([AHKit.health_state(34, 34).label, AHKit.health_state(17, 23).label, AHKit.health_state(7, 24).label], ["Em forma", "Ferimento leve", "Ferimento grave"],
 		"os rótulos neutros")
 
 
@@ -103,7 +103,7 @@ func _components() -> void:
 	var host := Control.new()
 	_tree.root.add_child(host)
 	var bar := AHKit.bar("enemy", 6, 8, "6/8")
-	var pill := AHKitPill.make(8, 24)
+	var pill := AHKitPill.make(7, 24)
 	var key := AHKitKey.make("combat_move")
 	var instinct := AHKit.bar("instinct", 10, 200)
 	for node in [bar, pill, key, instinct]:

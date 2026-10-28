@@ -1,8 +1,8 @@
 ## QA por captura da #194 (o herói ferido), pela cena de verdade:
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_194.gd -- --out=<pasta>
 ## Campanha própria na pasta da saída. Roda também na main de antes. A Rua da fase 1 com o Bento (o líder) a 20% da vida
-## e a Véspera a 30%: a equipe parada (o aviso na HUD) e uma sequência andando (walk-00..walk-11, o mancar), e os
-## recortes dos pés (feet-*) para a folha de antes e depois.
+## e a Véspera a 25%: a equipe parada (o aviso na HUD) e uma sequência andando (walk-00..walk-11, o mancar), e os
+## recortes dos pés (feet-*) para a folha de antes e depois; por fim, os quatro feridos parados (all-wounded).
 extends SceneTree
 
 var out := ""
@@ -30,7 +30,7 @@ func _initialize() -> void:
 		if hero.id == team[0]:
 			hero.hp = maxi(1, int(hero.max_hp * 0.2))
 		elif hero.id == team.back():
-			hero.hp = maxi(1, int(hero.max_hp * 0.3))
+			hero.hp = maxi(1, int(hero.max_hp * 0.25))
 	campaign.state = c
 	campaign.save()
 	flow.change_to("street", {}, false)
@@ -51,6 +51,15 @@ func _initialize() -> void:
 		await process_frame
 		if frame % 4 == 3:
 			await _shot("walk-%02d" % (frame / 4))
+	# Os quatro fundadores feridos, parados: a âncora da pose de cada um (o pé na linha do chão).
+	street.corridor.busy = false
+	for hero in campaign.state.roster:
+		if hero.id in team:
+			hero.hp = maxi(1, int(hero.max_hp * 0.2))
+	street._check_wounds()
+	street.exploration_hud.refresh(campaign.state)
+	await create_timer(1.0).timeout
+	await _shot("all-wounded")
 	print("capturas da #194 em %s" % out)
 	quit(0)
 

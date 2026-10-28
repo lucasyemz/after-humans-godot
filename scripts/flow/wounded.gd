@@ -13,7 +13,7 @@ static var pose_file := POSE_FILE
 ## Os números da regra (data/wounded.json).
 static func rules() -> Dictionary:
 	var row = GameData.row("wounded", "wounded")
-	return row if row != null else {"Threshold": 0.5, "SpeedFactor": 0.7, "LimpTilt": 3.5, "LimpDip": 0.55, "BreathDepth": 2.0}
+	return row if row != null else {"Threshold": 0.3, "SpeedFactor": 0.7, "LimpTilt": 3.5, "LimpDip": 0.55, "BreathDepth": 2.0}
 
 
 ## Se o herói está ferido: vivo, com a vida abaixo do limite, ou Caído em recuperação (#118/#121).

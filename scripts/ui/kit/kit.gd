@@ -12,8 +12,8 @@
 ##   por AHUiStyle.px(), então o texto Maior (130%) vale na hora, como no resto do jogo.
 ## - As cores dos alvos (hud-target.md, "Cores e daltonismo"; hud-station.md, "Cores de tinta"), com as do daltonismo;
 ##   os componentes recolorem no restyle() quando o daltonismo muda.
-## - Os estados de vida (decisão do Lucas): Em forma acima de 75%, Ferimento leve de 50% a 75%, Ferimento grave abaixo de
-##   50%.
+## - Os estados de vida (decisão do Lucas): Em forma acima de 75%, Ferimento leve de 30% a 75%, Ferimento grave abaixo de
+##   30% (o mesmo limite do herói ferido que manca, #194, em data/wounded.json).
 ## Nenhum componente decide regra de jogo: recebem os dados prontos (da sessão da luta, das regras da Estação).
 class_name AHKit
 extends RefCounted
@@ -98,7 +98,7 @@ const VEIL := Color(0.04, 0.04, 0.05, 0.62)
 
 ## Os limites dos estados (fração da vida máxima).
 const HEALTHY_ABOVE := 0.75
-const LIGHT_FROM := 0.5
+const LIGHT_FROM := 0.3
 
 static var _entries := {}
 static var _textures := {}

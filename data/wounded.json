@@ -1,11 +1,11 @@
 [
   {
     "Name": "wounded",
-    "Threshold": 0.5,
+    "Threshold": 0.3,
     "SpeedFactor": 0.7,
     "LimpTilt": 3.5,
     "LimpDip": 0.55,
     "BreathDepth": 2.0,
-    "Description": "Proposta (#194): o herói fica ferido com a vida abaixo desta fração da máxima (Threshold), e o Caído em recuperação também. É o mesmo limite do Ferimento grave (o coração rachado) da Estação, que o kit lê daqui: um número só. Ferido, a equipe anda nesta fração da velocidade (SpeedFactor) e ele manca: o corpo pende até LimpTilt graus para o lado do passo, o passo de um lado sobe só LimpDip do outro e a respiração fica BreathDepth vezes mais funda. Com Reduzir efeitos, só a pose e o passo mais lento."
+    "Description": "#194 (decisão do Lucas, 28/10: 30%, passo a 70%): o herói fica ferido com a vida abaixo desta fração da máxima (Threshold), e o Caído em recuperação também. É o mesmo limite do Ferimento grave (o coração rachado) da Estação, que o kit lê daqui: um número só. Ferido, a equipe anda nesta fração da velocidade (SpeedFactor) e ele manca: o corpo pende até LimpTilt graus para o lado do passo, o passo de um lado sobe só LimpDip do outro e a respiração fica BreathDepth vezes mais funda. Com Reduzir efeitos, só a pose e o passo mais lento."
   }
 ]
