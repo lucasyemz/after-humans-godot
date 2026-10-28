@@ -51,10 +51,22 @@ func _data() -> void:
 		t.check(manifest.heroes.has(String(row.HeroId)), "%s: de um herói do manifesto" % row.Name)
 		t.check(String(row.DisplayName) != "" and String(row.get("Text", "")) != "" and String(row.Folder).begins_with("res://art/skins/"),
 			"%s: nome, texto e pasta em art/skins" % row.Name)
-		t.check(["start", "admin"].has(String(row.Unlock)), "%s: como se libera (%s)" % [row.Name, row.Unlock])
+		var unlock := String(row.Unlock)
+		t.check(["start", "admin"].has(unlock) or (unlock.begins_with("phase:") and not AHJourneyRules.phase(unlock.trim_prefix("phase:")).is_empty()),
+			"%s: como se libera (%s)" % [row.Name, unlock])
 		# O que ainda falta na skin (as poses que caem na padrão): a lista sai no relatório do teste.
 		var missing := AHSkins.missing(String(row.Name), manifest.heroes[row.HeroId], _extra_files(String(row.HeroId)))
 		print("    %s: faltam %d pose(s)%s" % [row.Name, missing.size(), (": " + ", ".join(missing)) if not missing.is_empty() else ""])
+	# A Ronda inteira (a arte do #204 na main): as 17 poses de verdade (o parado, as 8 das habilidades, as 3 reações e
+	# as 5 da Estação e do acampamento) e o retrato, nenhuma caindo na padrão.
+	var watch = GameData.row("skins", "bento_watch")
+	if t.check(watch != null and AHSkins.has_art("bento_watch"), "a Ronda tem a arte no projeto"):
+		var poses: Array = Array(DirAccess.get_files_at(String(watch.Folder))).filter(func(f): return f.ends_with(".webp") and f != AHSkins.PORTRAIT)
+		t.equal(poses.size(), 17, "a Ronda tem as 17 poses (%s)" % [poses])
+		t.equal(AHSkins.missing("bento_watch", manifest.heroes[BENTO], _extra_files(BENTO)), [], "e nenhuma pose do Bento cai na padrão")
+		for file in poses:
+			t.check(ResourceLoader.exists(String(watch.Folder).path_join(file)) and load(String(watch.Folder).path_join(file)) is Texture2D,
+				"a pose %s abre" % file)
 
 
 ## A entrada vestida: as poses que a pasta tem trocam, o resto fica na padrão; as medidas e os efeitos ficam os da padrão.
@@ -81,6 +93,35 @@ func _rules() -> void:
 	for row in GameData.table("skins").values():
 		if row.Unlock == "start":
 			t.check(c.unlocked_skins.has(row.Name), "%s: liberada na campanha nova" % row.Name)
+	# A Ronda vem ao terminar a fase 4 (decisão do Lucas): bloqueada no começo, com o motivo; liberada na volta da fase
+	# terminada, com o aviso no relatório; e o save antigo de quem já terminou a fase abre com ela.
+	t.check(not c.unlocked_skins.has("bento_watch"), "a Ronda começa bloqueada")
+	t.check(S.skin_lock_reason(c, "bento_watch").contains(tr(AHJourneyRules.phase("fase_4").name)), "e diz que vem com a fase 4 (%s)" % S.skin_lock_reason(c, "bento_watch"))
+	var won: Dictionary = Campaign.create_initial(1384)
+	won.completed_phases.append("fase_4")
+	won.session.expedition = {"id": "test-fase-4", "phase_id": "fase_4", "team": [BENTO], "loot": {}, "food": 0, "first_clear": true}
+	won.session.result = "victory"
+	var delivered: Dictionary = S.finish_return(won)
+	t.check(won.unlocked_skins.has("bento_watch") and delivered.get("skins", []) == ["bento_watch"], "terminada a fase 4, a volta libera a Ronda e avisa (%s)" % [delivered.get("skins")])
+	var report := AHStationReport.new()
+	report.report = delivered
+	var chips: Array = report._chips(won, "victory")
+	report.free()
+	t.check(chips.any(func(chip): return String(chip.text) == tr("Roupa nova: %s") % tr("Ronda")), "o relatório mostra a roupa nova, curto (o nome da aba)")
+	var again: Dictionary = S.finish_return(won)
+	t.check(again.get("skins", []).is_empty(), "e só avisa uma vez")
+	# Salvo e reaberto entre o guardião e a volta: o save abre sem liberar a fase em curso, e o aviso vem na volta.
+	var reopened: Dictionary = Campaign.create_initial(1386)
+	reopened.completed_phases.append("fase_4")
+	reopened.session.expedition = {"id": "test-fase-4b", "phase_id": "fase_4", "team": [BENTO], "loot": {}, "food": 0, "first_clear": true}
+	reopened.session.result = "victory"
+	S.migrate(reopened)
+	t.check(not reopened.unlocked_skins.has("bento_watch"), "reaberto no meio da fase 4, a Ronda espera a volta")
+	t.equal(S.finish_return(reopened).get("skins", []), ["bento_watch"], "e a volta libera e avisa")
+	var old: Dictionary = Campaign.create_initial(1385)
+	old.completed_phases.append("fase_4")
+	S.migrate(old)
+	t.check(old.unlocked_skins.has("bento_watch"), "o save de quem já terminou a fase 4 abre com a Ronda")
 	var art_before: String = AHCombatArena.hero_art_of(BENTO).idle.file
 	t.check(S.choose_skin(c, BENTO, TEST_SKIN) != "" and S.hero(c, BENTO).skin_id == AHSkins.DEFAULT, "a bloqueada não se veste")
 	t.check(S.skin_lock_reason(c, TEST_SKIN) != "", "e diz o motivo")
@@ -135,7 +176,9 @@ func _watch() -> void:
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
 	t.equal(AHSkins.missing("bento_watch", manifest.heroes[BENTO], _extra_files(BENTO)), [], "a Ronda tem todas as poses")
 	Campaign.state = Campaign.create_initial(1383)
-	S.choose_skin(Campaign.state, BENTO, "bento_watch")
+	Campaign.state.completed_phases.append("fase_4")
+	S.migrate(Campaign.state)
+	t.equal(S.choose_skin(Campaign.state, BENTO, "bento_watch"), "", "com a fase 4 terminada, a Ronda se veste")
 	var poses: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/station_poses.json"))
 	for kind in ["seat", "sleep", "work"]:
 		t.check(String(AHSkins.pose(poses[BENTO + "_" + kind], BENTO).file).begins_with("res://art/skins/bento/watch/"), "a Ronda na pose %s da Estação" % kind)

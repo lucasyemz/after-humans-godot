@@ -276,6 +276,8 @@ static func run(id: String) -> String:
 			return _saved(TranslationServer.translate("Fases concluídas desfeitas"))
 		"phase_unlock":
 			c.completed_phases = J.PHASES.slice(0, J.PHASES.size() - 1).map(func(p): return p.id)
+			# As skins que vêm com as fases (a Ronda, #138) também, sem esperar a próxima volta.
+			S._grant_start_skins(c)
 			return _saved(TranslationServer.translate("Todas as fases liberadas"))
 		"rooms_all":
 			for room in S.ROOMS:

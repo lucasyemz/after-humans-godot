@@ -34,8 +34,12 @@ roupas.
   - A liberada se veste na hora: a figura do herói e a placa dele na Estação trocam (`station.redress`). É fora da
     expedição e sem custo.
   - Só aparece para o herói que tem skin além da padrão.
-- **Como se libera (proposta para o Lucas):**
-  - a Ronda já vem liberada (`Unlock: start`), na campanha nova e nos saves antigos, para testar;
+- **Como se libera (decisão do Lucas, 28/10):**
+  - a Ronda vem ao terminar a fase 4, o Laboratório Silencioso (`Unlock: phase:fase_4`). Até lá, a aba dela fica
+    apagada com "Ainda bloqueada: vem ao terminar Laboratório Silencioso.";
+  - na volta da fase terminada, o relatório avisa: "Roupa nova: Ronda" (o nome curto da aba). Reaberto o jogo no meio
+    da fase 4, o aviso continua vindo na volta;
+  - o save de quem já terminou a fase 4 abre com ela liberada;
   - depois, as outras viram o prêmio dos desafios dos chefes (#95);
   - a barra de Admin tem "Liberar todas as skins".
 - **Só visual:** nenhum número muda, e a paridade continua 48/48.
@@ -44,6 +48,10 @@ roupas.
 
 - **`test_skins` (novo):**
   - os dados: cada skin de um herói que existe, com nome, texto e pasta, e a lista do que falta;
+  - a Ronda inteira, com a arte do #204: as 17 poses (o parado, as 8 das habilidades, as 3 reações e as 5 da Estação e
+    do acampamento) e o retrato, todas abrindo e nenhuma caindo na padrão;
+  - a liberação na fase 4: bloqueada no começo e com o motivo; liberada na volta da fase, com o aviso uma vez só; e o
+    save antigo de quem já terminou a fase;
   - vestir: a pasta troca as poses que tem, e o resto (as habilidades, o retrato) cai na padrão, com as medidas e os
     efeitos da padrão; vestir não mexe no manifesto;
   - as regras: a bloqueada não se veste e diz o motivo; a de outro herói, não; na expedição, não; a liberada e a padrão

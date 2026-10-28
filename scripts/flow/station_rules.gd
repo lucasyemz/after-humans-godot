@@ -185,7 +185,7 @@ static func migrate(campaign: Dictionary) -> void:
 			entry.skin_id = AHSkins.DEFAULT
 	if typeof(campaign.get("unlocked_skins")) != TYPE_ARRAY:
 		campaign.unlocked_skins = []
-	_grant_start_skins(campaign)
+	_grant_start_skins(campaign, true)
 	# Ninguém morre (#118): o memorial dos saves antigos volta em recuperação.
 	_migrate_fallen(campaign)
 	_migrate_posts(campaign)
@@ -1646,6 +1646,8 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	if factor > 0.0 and is_resident(campaign, request) and not campaign.station.completed_requests.has(request):
 		campaign.station.completed_requests.append(request)
 		delivered.request = request
+	# A skin que vem com a fase terminada (#138): liberada agora, com o aviso no relatório.
+	delivered.skins = _grant_start_skins(campaign)
 	for entry in campaign.roster:
 		entry.expedition_uses = {}
 		# Os abates da carreira (o campo já existia no herói, sem conta): as máquinas derrubadas nesta jornada (#60).
@@ -2011,11 +2013,23 @@ static func _migrate_posts(campaign: Dictionary) -> void:
 
 # ---------------------------------------------------------------- skins (#138)
 
-## As skins que já vêm liberadas (Unlock "start" em data/skins.json), na campanha nova e nos saves antigos.
-static func _grant_start_skins(campaign: Dictionary) -> void:
+## As skins que a campanha já ganhou (data/skins.json, Unlock): "start" vem liberada; "phase:<id>" vem ao terminar a
+## fase (a Ronda do Bento, na fase 4: decisão do Lucas, #138). Na campanha nova, nos saves antigos (quem já terminou a
+## fase ganha ao abrir) e na volta da expedição. Devolve as que liberou agora, para o aviso do relatório.
+## Ao abrir o save (on_load), a fase da expedição em curso fica para a volta: o guardião caiu, mas o aviso vem no
+## relatório, não em silêncio ao reabrir o jogo no meio da jornada.
+static func _grant_start_skins(campaign: Dictionary, on_load: bool = false) -> Array:
+	var granted: Array = []
+	var open = campaign.get("session", {}).get("expedition") if on_load else null
+	var pending := String(open.get("phase_id", "")) if typeof(open) == TYPE_DICTIONARY else ""
 	for row in GameData.table("skins").values():
-		if String(row.get("Unlock", "")) == "start" and not campaign.unlocked_skins.has(String(row.Name)):
+		var unlock := String(row.get("Unlock", ""))
+		var phase := unlock.trim_prefix("phase:")
+		var earned: bool = unlock == "start" or (unlock.begins_with("phase:") and phase != pending and campaign.get("completed_phases", []).has(phase))
+		if earned and not campaign.unlocked_skins.has(String(row.Name)):
 			campaign.unlocked_skins.append(String(row.Name))
+			granted.append(String(row.Name))
+	return granted
 
 
 ## A skin está liberada nesta campanha (a padrão sempre está).
@@ -2028,7 +2042,11 @@ static func skin_lock_reason(campaign: Dictionary, skin_id: String) -> String:
 	if skin_unlocked(campaign, skin_id):
 		return ""
 	var row = GameData.row("skins", skin_id)
-	# Unlock "boss:<id>" (os desafios dos chefes, #95): o motivo diz de onde vem; as outras ficam só bloqueadas.
+	# Unlock "phase:<id>": o motivo diz qual fase termina; "boss:<id>" (os desafios dos chefes, #95), de onde vem; as
+	# outras ficam só bloqueadas.
+	if row != null and String(row.get("Unlock", "")).begins_with("phase:"):
+		var phase: Dictionary = AHJourneyRules.phase(String(row.Unlock).trim_prefix("phase:"))
+		return TranslationServer.translate("Ainda bloqueada: vem ao terminar %s.") % TranslationServer.translate(String(phase.get("name", "")))
 	if row != null and String(row.get("Unlock", "")).begins_with("boss"):
 		return TranslationServer.translate("Ainda bloqueada: vem com os desafios dos chefes.")
 	return TranslationServer.translate("Ainda bloqueada.")
