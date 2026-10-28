@@ -116,11 +116,11 @@ A QA refez cada caso com scripts próprios:
 
 **Ficam para o Lucas:** o fator 0,5, o texto do cânone e o visual do carregado.
 
-## Para o Lucas
+## As decisões do Lucas (28/10)
 
-- O `Factor` de 0,5 é uma proposta. Hoje ele vale na chegada. O carregado que chega ao Dormitório (2 dias) e ganha um
-  leito depois fica com 2, não com 1. Quer que o leito também conte a parte?
-- O texto novo do cânone (quem fica no chão só é recolhido na saída, mais ferido) precisa do seu ok.
-- O visual do carregado é o selo na HUD da equipe (o corpo sai do mapa). Se preferir, ele pode ir junto do herói que
-  o levantou.
+- O `Factor` 0,5 está aprovado.
+- O leito também conta a redução: o carregado que chega ao Dormitório e ganha um leito depois fica com a metade dos
+  dias do leito (`recovery_carried` no herói, até ele se recuperar). O `test_downed` confere.
+- O texto novo do cânone está aprovado.
+- O carregado fica só como o selo na HUD da equipe.
 - Esta entrega mexe em `scripts/street/street_corridor.gd` (o mapa é do Claude 2, #175).

@@ -97,6 +97,19 @@ func _recovery() -> void:
 			"%s: deixado, %d dias; carregado, %d (recovery.json)" % [where, full[0].days, part[0].days])
 		t.check(part[0].carried and not full[0].carried, "%s: o resumo sabe quem foi carregado" % where)
 		t.check(part[0].days < full[0].days or full[0].days == 1, "%s: levantar encurta a recuperação" % where)
+	# O carregado que chega ao Dormitório e ganha um leito depois também fica com a parte dos dias do leito (decisão do
+	# Lucas, 28/10).
+	var later := _campaign(1797)
+	later.station.rooms[S.INFIRMARY] = 0
+	var late_id: String = later.session.expedition.team[0]
+	_fell(later, late_id)
+	var arrived: Array = S.admit_fallen(later, [late_id], [late_id])
+	later.station.rooms[S.INFIRMARY] = 1
+	S._fill_beds(later)
+	var bed_days := int(S.recovery_rule("infirmary").get("Days", 2))
+	var hero_late = later.roster.filter(func(h): return h.id == late_id)[0]
+	t.check(not arrived[0].bed and S.in_bed(hero_late), "o carregado do Dormitório ganha um leito depois")
+	t.equal(S.recovery_days(hero_late), maxi(1, ceili(bed_days * factor)), "e fica com a parte dos dias do leito (%d)" % S.recovery_days(hero_late))
 	# Sem a regra carried no recovery.json (um dado antigo), o fator é 1: o carregado chega com os dias inteiros.
 	var rules: Dictionary = GameData.table("recovery")
 	var kept = rules.get("carried")
