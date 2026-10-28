@@ -1487,4 +1487,6 @@ func _run_combat_capture(delta: float) -> void:
 			if _combat_time > 0.8:
 				_save_capture("16-house-search", "16-house-search food=%d seeds=%d event=%s" % [campaign.session.expedition.food,
 					campaign.session.expedition.loot.seeds, str(campaign.session.event != null)])
-				get_tree().quit()
+				# Uma vez só: o Sound.quit espera o áudio antes de fechar, e a fase rodaria de novo nesse meio-tempo.
+				_combat_phase = 8
+				Sound.quit()

@@ -168,4 +168,4 @@ func _finish() -> void:
 			DirAccess.remove_absolute(dir.path_join(file))
 		DirAccess.remove_absolute(dir)
 	print("PERF fim %d paradas" % rows.size())
-	get_tree().quit()
+	Sound.quit()

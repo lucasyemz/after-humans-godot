@@ -81,7 +81,7 @@ func rebuild() -> void:
 		again = find_child(focus_name, true, false)
 	var target: Control = again if again is Control and (again as Control).focus_mode != Control.FOCUS_NONE else _first_focus
 	if target != null and AHUiStyle.using_keys:
-		target.grab_focus.call_deferred()
+		AHKit.focus_later(target)
 
 
 func restyle() -> void:
@@ -232,7 +232,7 @@ func _select(hero_id: String) -> void:
 	rebuild()
 	var tab := find_child("Tab_%s" % hero_id, true, false) as Control
 	if tab != null:
-		tab.grab_focus.call_deferred()
+		AHKit.focus_later(tab)
 
 
 func _ability_row(ability_id: String) -> Button:
@@ -865,7 +865,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 			rebuild()
 			var again := find_child("Upgrade_%s" % id, true, false) as Control
 			if again != null:
-				again.grab_focus.call_deferred())
+				AHKit.focus_later(again))
 		cards.add_child(card)
 		if first == null or option.Name == _upgrade:
 			first = card

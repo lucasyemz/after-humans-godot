@@ -151,7 +151,7 @@ func _show() -> void:
 	_skip.visible = not last
 	_blocker.mouse_filter = Control.MOUSE_FILTER_STOP if waits == "next" else Control.MOUSE_FILTER_IGNORE
 	if AHUiStyle.using_keys and _next.visible:
-		_next.grab_focus.call_deferred()
+		AHKit.focus_later(_next)
 	_place()
 
 
