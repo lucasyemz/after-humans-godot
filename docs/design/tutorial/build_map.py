@@ -49,9 +49,11 @@ ZONE = [0]
 
 
 def concrete(tint: float, damp=0.6) -> int:
-    return mat({"zone": ZONE[0], "kind": "surface", "two_sided": False, "masked": False, "albedo": ART + "T_SH_rough_concrete_base_color.webp",
-                "normal": ART + "T_SH_rough_concrete_normal.webp", "tint": [tint, tint * 0.97, tint * 0.95, 1.0], "tile": 123.0,
-                "desaturation": 0.12, "damp": damp, "roughness": 1.0})
+    """O concreto molhado do lugar (T_TU27, sem emenda, projetado pelo mundo em placas de 2,4 m): os recuos, os lados dos
+    pilares, os blocos das pontas e o fosso. Era o concreto do Abrigo Lacrado (o acabamento de 28/10)."""
+    return mat({"zone": ZONE[0], "kind": "surface", "two_sided": False, "masked": False, "albedo": ART + "T_TU27.webp",
+                "normal": "", "tint": [tint, tint * 0.97, tint * 0.95, 1.0], "tile": 240.0,
+                "desaturation": 0.0, "damp": damp, "roughness": 1.0})
 
 
 def metal(tint: float) -> int:
@@ -111,11 +113,17 @@ RED = [1.0, 0.28, 0.2]
 COLD = [0.75, 0.85, 1.0]
 
 
+# O acabamento de 28/10: as lâmpadas 30% mais fortes que no #173 (as faces pintadas dos pilares são mais escuras que o
+# concreto liso de antes). O que esquentava o jogo é a lanterna do líder, que é do código (tutorial-acabamento.md).
+RED_BOOST = 1.3
+
+
 def red_lamp(x, z=-2.5, y=2.95, lumens=210.0, radius=4.4):
     """A lâmpada de emergência: o card aceso e a luz vermelha logo à frente e abaixo dele, curta, para a poça de luz no
     chão e na parede (entre uma e outra, o escuro). O pisca é do código (#147)."""
     plate(x, y - 0.22, z + 0.04, 0.3, 0.45, card("T_TU08_Lit", 1.0))
     # A luz sai da própria lâmpada, rente à parede: o cone na parede começa nela e cai para baixo e para os lados.
+    lumens *= RED_BOOST
     light([x, y - 0.3, z + 0.35], RED, lumens, radius, shadows=True)
     # A poça no chão, logo abaixo e à frente da lâmpada (no pé da parede, entrando na faixa): a mesma lâmpada, pisca junto.
     # Com sombra, ela projeta para a frente a sombra de contato dos objetos e de quem passa.
@@ -169,9 +177,20 @@ def shell(x0, x1, floor_code, back=-2.6, front=8.0, ceiling=4.3):
     water(x0 - 0.8, x1 + 0.8, back + 0.02, back + 0.3)
 
 
-def pillar(x, width=0.45, depth=0.8, wall_z=-2.6, height=4.4, tint=0.5):
-    """O pilar (o recuo da parede): concreto na frente da parede, do piso até o escuro de cima, com a lâmpada nele."""
+# A face pintada de cada pilar (docs/design/tutorial-acabamento/cut_art.py) e a largura para a qual ela foi cortada.
+PILLAR_FACE = {"T_TU25": 0.9, "T_TU26": 1.0}
+
+
+def pillar(x, depth=0.8, wall_z=-2.6, height=4.4, tint=0.6, face="T_TU25"):
+    """O pilar (o recuo da parede): o bloco de concreto na frente da parede, do piso até o escuro de cima, e a face
+    pintada dele (T_TU25 ou T_TU26: a faixa de perigo, a linha d'água, o eletroduto), na altura inteira, indo para o
+    preto no alto, como as paredes. A lâmpada fica nele."""
+    width = PILLAR_FACE[face]
     box([x, height * 0.5 - 0.1, wall_z + depth * 0.5], [width, height + 0.2, depth], concrete(tint, 0.7))
+    # Um material por zona (a chave zone, que o jogo ignora): as faces iguais de duas zonas virariam uma malha só, e o
+    # Compatibility corta as luzes além de 8 por objeto (a face ficava apagada).
+    face_mat = mat({"zone": ZONE[0], "kind": "art", "two_sided": True, "masked": False, "albedo": ART + face + ".webp"})
+    plate(x, -0.04, wall_z + depth + 0.006, width, height + 0.04, face_mat, shadow=False)
     return wall_z + depth
 
 
@@ -221,13 +240,18 @@ def main() -> None:
     ZONE[0] = 0
     x0, x1 = 0.0, 10.0
     shell(x0, x1, "T_TU02")
-    wall(x0, x1, "T_TU01", holes=[(0.771, 0.892, 0.318, 0.952)], recess_glow=220.0, depth=4.5)
+    (sx0, sx1, sb, st), = wall(x0, x1, "T_TU01", holes=[(0.771, 0.892, 0.318, 0.952)], recess_glow=220.0, depth=4.5)
+    # A passagem do lado, fechada pela contenção: a porta de enrolar baixada (a segunda porta de segurança; o batente
+    # dela cobre a abertura inteira). Fica parada no jogo até o código decidir se ela também baixa na frente da equipe.
+    interactive("T_TUX04_Security_Shutter", "Porta de segurança", "", (sx0 + sx1) * 0.5, (st - sb + 0.5) * 756 / 1024,
+                st - sb + 0.5, z=-2.52, bottom=sb - 0.14)
     end_block(x0, -1)
     end_block(x1, 1)
     # As lâmpadas do corredor ficam mais perto umas das outras: o raio menor deixa o escuro entre as poças.
-    for px in (2.45, 6.05):
-        red_lamp(px, z=pillar(px), y=2.85, radius=3.4)
-    red_lamp(8.38, y=3.2, lumens=150.0, radius=3.2)
+    for px, face in ((2.45, "T_TU25"), (6.05, "T_TU26")):
+        red_lamp(px, z=pillar(px, face=face), y=2.85, radius=3.4)
+    # Acima do batente da porta de enrolar (a lâmpada não tapa o sinal dela).
+    red_lamp(8.38, y=3.55, lumens=150.0, radius=3.2)
     prop_card("T_TU15", 0.8, 0.95, 0.86, z=-2.15)
     prop_card("T_TU14", 3.7, 1.45, 1.1, z=-2.05)
     prop_card("T_TU19", 5.2, 0.8, 0.56, z=-1.75)
@@ -252,7 +276,7 @@ def main() -> None:
         plate((hx0 + hx1) * 0.5, hb - 0.05, -2.52, hx1 - hx0 + 0.2, ht - hb + 0.1, art("T_TU04"), shadow=True)
     red_lamp(x0 + 0.55, y=3.05)
     red_lamp(x0 + 5.55, y=3.05)
-    red_lamp(x0 + 8.4, z=pillar(x0 + 9.3, width=0.5) - 0.55, y=3.0, lumens=180.0)
+    red_lamp(x0 + 8.4, z=pillar(x0 + 9.3) - 0.55, y=3.0, lumens=180.0)
     interactive("T_TUX02_Maintenance_Locker", "Armário de manutenção", "Curativos", x0 + 7.0, 1.25, 1.62)
     interactive("T_TUX03_Door_Panel", "Painel das portas", "", x0 + 8.4, 0.55, 0.87, z=-2.52, bottom=0.95)
     prop_card("T_TU16", x0 + 9.5, 0.95, 0.95, z=-1.75)
@@ -276,7 +300,7 @@ def main() -> None:
     interactive("T_TUX01_Security_Door", "Porta de segurança", "", (dx0 + dx1) * 0.5, (dt - db + 0.45) * 834 / 1024,
                 dt - db + 0.45, z=-2.52, bottom=db - 0.12)
     red_lamp(x0 + 3.4, y=3.1)
-    red_lamp(x0 + 9.45, z=pillar(x0 + 9.45, width=0.5), y=2.9)
+    red_lamp(x0 + 9.45, z=pillar(x0 + 9.45, face="T_TU26"), y=2.9)
     plate(x0 + 7.6, 1.05, -2.45, 1.15, 1.27, art("T_TU07"), shadow=True)
     plate(x0 + 5.6, -0.05, -2.2, 3.32, 4.32, art("T_TU06"), shadow=True)
     prop_card("T_TU17", x0 + 8.6, 1.3, 0.86, z=-1.9)

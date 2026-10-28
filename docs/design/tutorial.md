@@ -100,7 +100,7 @@ iluminados pela cena (tipo `art`), como a parede. As medidas são as do mapa (`b
 | `T_TU09` | 12 × 4,8 | 1024 × 434 | O piso da plataforma, com a faixa amarela na beira do lado do trem (tipo `art`, na face de cima da caixa, como os pisos do Abrigo) |
 | `T_TU04` | 1,73 × 2,39 | 1024 × 572 | As grades da cela, na abertura |
 | `T_TU05` | 1,6 a 1,9 | 1024 × 667 | As raízes no piso |
-| `T_TU06` | 3,32 × 4,31 | 788 × 1024 | A escada até o alçapão aberto |
+| `T_TU06` | 3,32 × 4,32 | 788 × 1024 | A escada até o alçapão aberto |
 | `T_TU07` | 1,15 × 1,27 | 868 × 958 | O duto com a grade arrancada |
 | `T_TU08`, `T_TU08_Lit` | 0,3 × 0,45 | 149 × 222 | A lâmpada de emergência apagada e acesa |
 | `T_TU10` | 10 × 4,02 | 1024 × 412 | O vagão, com a luz fria por dentro e as portas abertas |
@@ -109,6 +109,10 @@ iluminados pela cena (tipo `art`), como a parede. As medidas são as do mapa (`b
 | `T_TUX01_Security_Door` (+ `_Open`) | 2,44 × 3 | 834 × 1024 | A porta de segurança, na abertura da rota do Nick: baixada, ou erguida com a luz verde |
 | `T_TUX02_Maintenance_Locker` (+ `_Open`) | 1,25 × 1,62 | 788 × 1024 | O armário de manutenção (a busca) |
 | `T_TUX03_Door_Panel` (+ `_Open`) | 0,55 × 0,87 | 645 × 1024 | O painel das portas |
+
+O acabamento no jogo de 28/10 (as faces dos pilares `T_TU25` e `T_TU26`, o concreto do lugar `T_TU27` no lugar do
+concreto do Abrigo, a porta de enrolar `T_TUX04` e a escada `T_TU06` refeita) está em
+[tutorial-acabamento.md](tutorial-acabamento.md).
 
 São 29 arquivos (12 novos; `T_TU01`, `T_TU02` e `T_TU03` refeitos, sem repetição). Da folha do primeiro plano, a grade
 de proteção ficou de fora (no chão perto da câmera, ela sai do quadro), e da folha dos objetos, a raiz caída (igual à

@@ -18,7 +18,8 @@ SCENARIOS = ROOT / "data/scenarios"
 
 def main() -> int:
     new = json.loads(MAP.read_text())
-    today = [json.loads(p.read_text()) for p in sorted(SCENARIOS.glob("*.json")) if p.name != "meshes.json"]
+    # Os mapas de hoje, sem o próprio Corredor (o data/ dele já é este mapa com a camada de jogo por cima).
+    today = [json.loads(p.read_text()) for p in sorted(SCENARIOS.glob("*.json")) if p.name not in ("meshes.json", "ContainmentCorridor.json")]
     meshes = len(json.loads((SCENARIOS / "meshes.json").read_text())["meshes"])
     errors = []
     top = set(today[0])
