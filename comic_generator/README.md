@@ -64,4 +64,30 @@ A página inicial lista as histórias existentes em `stories/*/story.json`, com 
 
 **Ver prévia** no cartão abre a visualização em modo celular. Dentro do editor, **Prévia responsiva** alterna entre edição e visualização sem recarregar a história. Opções: **Celular · 390**, **Tablet · 768** e **Tela livre**; a medida real aparece ao lado. A largura se limita ao espaço disponível, inclusive ao abrir em um celular de verdade. O painel, os controles e o editor se reorganizam em telas menores.
 
-A prévia preserva o enquadramento 16:9 e permite avaliar o tamanho das falas e legendas, sem recortar a arte nem alterar câmeras, tempos ou exportação MP4. Ela não converte a história para formato vertical. A interface do editor e a fonte dos balões acompanham a largura da prévia; os arquivos da história permanecem iguais.
+A prévia original preserva o enquadramento 16:9. No modo celular, a opção de reenquadramento prepara uma versão vertical independente, com os controles abaixo. A narrativa, as câmeras e os tempos do original permanecem iguais.
+
+## Reenquadramento e exportação para celular
+
+1. Abra **Ver prévia** no cartão ou **Prévia responsiva → Celular · 390** dentro do editor.
+2. Marque **Reenquadrar para celular · 9:16**. Escolha a cena no seletor desse painel.
+3. Ajuste **Zoom** (1–3×), **Posição horizontal**, **Posição vertical**, **Tamanho do texto** (80–180%) e **Altura do balão**. O recorte acompanha o movimento original da cena. Na ampliação mínima, a imagem usa toda a altura; o controle vertical ganha efeito conforme o zoom aumenta.
+4. Confira o resultado pela linha do tempo e pelo botão **▶ Sequência**. Cada cena mantém ajustes próprios; as demais usam recorte central e texto no tamanho padrão até serem ajustadas. **Restaurar recorte desta cena** repõe apenas os valores dessa versão.
+5. Use **MP4 celular · Cena** ou **MP4 celular · Sequência**. A saída é H.264, **720×1280, 9:16, 30 FPS**, com sufixo `_mobile.mp4`.
+
+A versão vertical corta partes da imagem de propósito: revise os atores e o movimento em cada cena. Falas e legendas são recompostas na área segura, com quebra de linhas e ajuste de fonte para caber integralmente. Textos muito longos podem usar fonte menor que a escala solicitada para evitar cortes; os textos nunca são reescritos ou truncados.
+
+Os ajustes ficam em `scene.mobileFraming`, separados de `scene.config`, no salvamento automático e no **Salvar projeto**. Também acompanham duplicação de cena e reimportação do arquivo. A prévia vertical e a exportação usam o mesmo compositor de recorte e texto. Desmarque o reenquadramento para comparar com a prévia original; os botões regulares **MP4 · Cena / Sequência** continuam exportando a versão horizontal, sem os ajustes de celular.
+
+Formato opcional no manifesto da cena (posições de 0 a 1):
+
+```json
+"mobileFraming": {
+  "zoom": 1,
+  "x": 0.5,
+  "y": 0.5,
+  "textScale": 1,
+  "speechY": 0.2
+}
+```
+
+Cenas sem esse campo usam esses valores padrão na versão vertical. A exportação original ignora o campo.

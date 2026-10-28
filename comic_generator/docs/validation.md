@@ -54,6 +54,23 @@ Validação desta entrega:
 - QA independente: primeira rodada identificou validação insuficiente de import e cobertura de sintaxe; correções com testes de regressão. Rodada final: **VEREDITO: APROVADO**.
 - Capturas locais, ignoradas: `outputs/dashboard_desktop.png`, `dashboard_phone.png`, `preview_phone_desktop.png`, `preview_phone.png` e `editor_phone.png`. O registro anterior `outputs/editor.png` preserva a vista do editor antes do dashboard.
 
-Limites: prévia mantém 16:9 e simula larguras, sem gerar adaptação vertical ou reposicionar elementos narrativos. Testes de viewport foram feitos em Chrome headless; não substituem uma conferência em aparelhos físicos. Projetos importados e edições locais não são enviados ao servidor nem publicados automaticamente.
+O teste desta seção cobre a prévia original em 16:9; o reenquadramento vertical está validado na seção seguinte. Testes de viewport foram feitos em Chrome headless; não substituem uma conferência em aparelhos físicos. Projetos importados e edições locais não são enviados ao servidor nem publicados automaticamente.
 
 Suíte do repositório repetida após a entrega do dashboard, com o mesmo perfil isolado: **92/92 testes passaram**, saída 0, em 727.346 ms, incluindo paridade 48/48. Log local: `outputs/godot_dashboard_tests.log`, ignorado. Nenhum arquivo do jogo, história ou imagem foi alterado nesta evolução.
+
+## Versão móvel com reenquadramento e exportação
+
+- Prévia opcional 9:16, com zoom, deslocamento horizontal/vertical, escala do texto e altura do balão independentes por cena. Valores em `scene.mobileFraming`, separados de `scene.config`; presentes no salvamento, reimportação e duplicação.
+- Prévia e MP4 vertical compartilham `composeMobile`; a arte é recortada, e as falas/legendas são recompostas na área segura. Textos máximos de 140/200 caracteres mantêm todos os caracteres e não se sobrepõem. Se necessário, a fonte diminui para caber.
+- Configurações, textos, ordem, imagens e duração das oito cenas originais continuam intactos. Nenhuma edição dos arquivos da história ou arte foi preparada para commit.
+- `npm run check`: **6/6**, incluindo limites geométricos do recorte em todos os extremos de zoom/pan e regressão de texto longo.
+- Chrome headless: ajustes por cena, persistência após reload, reimportação, duplicação, reset, prévia das oito cenas e viewport de 390 px, sem erros JavaScript ou overflow horizontal.
+- Exportações da sessão principal com fixture de duas cenas de 1 segundo, derivadas das cenas reais: **720×1280 / 60 quadros / 2 segundos / 836.593 bytes** (celular) e **1280×720 / 60 quadros / 2 segundos / 841.919 bytes** (original). Metadados lidos por `<video>`; projeto empacotado idêntico antes/depois. Resultado local: `outputs/mobile_export_validation.json`.
+- QA independente repetiu a exportação da fixture nos dois formatos: 341.082 / 341.383 bytes, ambos com 60 quadros e 2 segundos; cena, tempo e projeto restaurados, sem pageerrors. Confirmou persistência/reimportação/reset/duplicação e as prévias das oito cenas.
+- Rodada de QA identificou texto longo fora dos limites e duplicação do aviso de alarme em um recorte extremo. Corrigidos com encaixe sem truncamento e supressão dos textos no passe de arte; apenas o compositor móvel desenha os avisos. Rodada final: **VEREDITO: APROVADO**, sem pendências médias ou altas.
+- Capturas locais ignoradas: `outputs/mobile_framing_desktop.png` e `outputs/mobile_framing_phone.png`. Os registros anteriores de prévia 16:9 permitem comparar tamanho de imagem e texto.
+
+Limites desta validação: MP4 móvel validado em sequência curta; a história inteira foi percorrida na prévia, sem reexportar seus 44,3 s no novo formato. H.264/WebCodecs continuam dependendo do navegador. O recorte móvel é fixo por cena e acompanha a câmera original; não adiciona novos keyframes, não reescreve a história e não altera a exportação horizontal.
+
+
+Suíte Godot executada novamente nesta entrega, em perfil isolado: **92/92 testes passaram**, saída 0, em 749.689 ms; paridade **48/48** preservada. Log local ignorado: `outputs/godot_mobile_tests.log`. O primeiro processo foi interrompido junto com a sessão anterior; a execução da retomada terminou integralmente.
