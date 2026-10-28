@@ -44,6 +44,14 @@ func run(context) -> void:
 	cell = hud._route_cell(train, false, true, route)
 	t.check(_tint(cell).is_equal_approx(AHKit.TEXT), "e, à frente, na cor dos outros ícones")
 	cell.free()
+	# Resolvido: verde como os outros trechos; com o check só quando já não é o de agora.
+	train.resolved = true
+	cell = hud._route_cell(train, true, true, route)
+	t.check(_tint(cell).is_equal_approx(AHKit.good()) and not _has_check(cell), "o trem resolvido, sendo o de agora: verde, sem o check")
+	cell.free()
+	cell = hud._route_cell(train, false, true, route)
+	t.check(_tint(cell).is_equal_approx(AHKit.good()) and _has_check(cell), "e, depois dele, verde e com o check")
+	cell.free()
 	hud.free()
 
 
