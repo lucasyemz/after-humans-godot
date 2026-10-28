@@ -1,0 +1,503 @@
+{
+  "issue": 239,
+  "base_commit": "5bb2928",
+  "source_tag": "codex-pr240-originals",
+  "source_folder": "art/combat/source/recruit_layers_refresh_20261028",
+  "dependencies": [
+    "codex-pr229-originals",
+    "codex-pr211-originals"
+  ],
+  "frame_origin": [
+    0,
+    0
+  ],
+  "blend": "straight-alpha source-over",
+  "order": [
+    "bag",
+    "base",
+    "clothes",
+    "scarf",
+    "cap",
+    "badge"
+  ],
+  "colors": [
+    "#c98a4b",
+    "#8fb4f0",
+    "#86c98f",
+    "#b7a6f4",
+    "#d55e00",
+    "#a69a84"
+  ],
+  "actors": {
+    "raccoon": {
+      "id": "raccoon_recruit_01",
+      "class_id": "rato",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "anchor": [
+        588.5,
+        1305
+      ],
+      "texture_anchor": [
+        294.25,
+        652.5
+      ],
+      "body_reference_pixels": 1240,
+      "height_m": 1.44,
+      "old_height_m": 1.3,
+      "source_pose": "#225 idle; do not apply to #221 alternate stance",
+      "assets": {
+        "base_a": {
+          "source_file": "raccoon/base_a.png",
+          "source_sha256": "dc3f3d9e8b41f4c14b44035edeab4ed20648b4fdd0abb36a94000a07a9fd0a1e",
+          "prototype_file": "raccoon/base_a.webp",
+          "bbox": [
+            362,
+            65,
+            815,
+            1305
+          ],
+          "tintable": false
+        },
+        "base_b": {
+          "source_file": "raccoon/base_b.png",
+          "source_sha256": "befc6d8be65e2e65b6a5e37e1095bd232482860fde59d9473861575acc800061",
+          "prototype_file": "raccoon/base_b.webp",
+          "bbox": [
+            362,
+            65,
+            815,
+            1305
+          ],
+          "tintable": false
+        },
+        "clothes": {
+          "source_file": "raccoon/clothes.png",
+          "source_sha256": "7794aa036934ac456c685fdb6379f501e7234aa2f5525e6f656bd70003bb25c3",
+          "prototype_file": "raccoon/clothes.webp",
+          "bbox": [
+            424,
+            249,
+            719,
+            1116
+          ],
+          "tintable": true
+        },
+        "scarf": {
+          "source_file": "raccoon/scarf.png",
+          "source_sha256": "bd61b5ea15b115cfa3e98bed018731b6acc50785ffdd5c8828fd3ee71290429b",
+          "prototype_file": "raccoon/scarf.webp",
+          "bbox": [
+            521,
+            224,
+            671,
+            402
+          ],
+          "tintable": true
+        },
+        "bag": {
+          "source_file": "raccoon/bag.png",
+          "source_sha256": "d62e2ef048e79a0ab11b087fd04e45ad1dddfb183bbdc076113078980751df86",
+          "prototype_file": "raccoon/bag.webp",
+          "bbox": [
+            315,
+            463,
+            492,
+            642
+          ],
+          "tintable": false
+        },
+        "cap": {
+          "source_file": "raccoon/cap.png",
+          "source_sha256": "673629bf0d7f03cb05aa062b8c50507d3549a64dbd38738440c34c34d7812bb8",
+          "prototype_file": "raccoon/cap.webp",
+          "bbox": [
+            550,
+            65,
+            689,
+            177
+          ],
+          "tintable": true
+        },
+        "badge_protection": {
+          "source_file": "raccoon/badge_protection.png",
+          "source_sha256": "ec8511a0f548e33a06aead465ce640df74d66cd9fdc05d88d20c8db805bda46e",
+          "prototype_file": "raccoon/badge_protection.webp",
+          "bbox": [
+            604,
+            492,
+            661,
+            534
+          ],
+          "tintable": false
+        },
+        "badge_healing": {
+          "source_file": "raccoon/badge_healing.png",
+          "source_sha256": "430f14d6f5de17033dc41842a6d503da46637c138916efd7f0180cf1ac1b774c",
+          "prototype_file": "raccoon/badge_healing.webp",
+          "bbox": [
+            604,
+            492,
+            661,
+            534
+          ],
+          "tintable": false
+        },
+        "badge_ranged": {
+          "source_file": "raccoon/badge_ranged.png",
+          "source_sha256": "71ef2537492f1417b5b13c919ffa39bcd7486925ff94c4fbb41006dd3de57522",
+          "prototype_file": "raccoon/badge_ranged.webp",
+          "bbox": [
+            604,
+            492,
+            661,
+            534
+          ],
+          "tintable": false
+        },
+        "badge_chemistry": {
+          "source_file": "raccoon/badge_chemistry.png",
+          "source_sha256": "c31ff9d7f4901f7ddf44f43a61b94222a6857578e208b03cff2da81b12096a7a",
+          "prototype_file": "raccoon/badge_chemistry.webp",
+          "bbox": [
+            604,
+            492,
+            661,
+            534
+          ],
+          "tintable": false
+        }
+      },
+      "attachments": {
+        "bag": [
+          315,
+          405,
+          492,
+          700
+        ],
+        "cap": [
+          545,
+          65,
+          695,
+          177
+        ],
+        "badge": [
+          598,
+          492,
+          667,
+          534
+        ]
+      },
+      "combinations": [
+        {
+          "base": "base_a",
+          "clothes_color": "#c98a4b",
+          "scarf_color": "#86c98f",
+          "accessories": [],
+          "badge": "protection"
+        },
+        {
+          "base": "base_b",
+          "clothes_color": "#8fb4f0",
+          "scarf_color": "#b7a6f4",
+          "accessories": [
+            "scarf"
+          ],
+          "badge": "healing"
+        },
+        {
+          "base": "base_a",
+          "clothes_color": "#86c98f",
+          "scarf_color": "#d55e00",
+          "accessories": [
+            "bag"
+          ],
+          "badge": "ranged"
+        },
+        {
+          "base": "base_b",
+          "clothes_color": "#b7a6f4",
+          "scarf_color": "#a69a84",
+          "accessories": [
+            "cap"
+          ],
+          "badge": "chemistry"
+        },
+        {
+          "base": "base_a",
+          "clothes_color": "#d55e00",
+          "scarf_color": "#c98a4b",
+          "accessories": [
+            "scarf",
+            "bag"
+          ],
+          "badge": "protection"
+        },
+        {
+          "base": "base_b",
+          "clothes_color": "#a69a84",
+          "scarf_color": "#8fb4f0",
+          "accessories": [
+            "scarf",
+            "bag",
+            "cap"
+          ],
+          "badge": "healing"
+        }
+      ],
+      "preview_idle": {
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          588.5,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "prototype_file": "raccoon/idle.webp"
+      }
+    },
+    "armadillo": {
+      "id": "armadillo_recruit_01",
+      "class_id": "tatu",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "texture_canvas": [
+        589,
+        668
+      ],
+      "anchor": [
+        589.0,
+        1305
+      ],
+      "texture_anchor": [
+        294.5,
+        652.5
+      ],
+      "body_reference_pixels": 1240,
+      "height_m": 1.56,
+      "old_height_m": 1.35,
+      "source_pose": "#225 idle; do not apply to #221 alternate stance",
+      "assets": {
+        "base_a": {
+          "source_file": "armadillo/base_a.png",
+          "source_sha256": "618cf87a2dfd2c80211e34509efa40ab091a5dc286cdfbd8f622eead823ea87c",
+          "prototype_file": "armadillo/base_a.webp",
+          "bbox": [
+            252,
+            65,
+            926,
+            1305
+          ],
+          "tintable": false
+        },
+        "base_b": {
+          "source_file": "armadillo/base_b.png",
+          "source_sha256": "a822ecf685e67042cfc4dfc89e64a3476422e949f44b7521413e1dd4b30575a8",
+          "prototype_file": "armadillo/base_b.webp",
+          "bbox": [
+            252,
+            65,
+            926,
+            1305
+          ],
+          "tintable": false
+        },
+        "clothes": {
+          "source_file": "armadillo/clothes.png",
+          "source_sha256": "b0e7dda2c15a5b7f7fccd073aed438c5353ea43747a77f521d26f1ccaba709aa",
+          "prototype_file": "armadillo/clothes.webp",
+          "bbox": [
+            373,
+            213,
+            795,
+            1147
+          ],
+          "tintable": true
+        },
+        "scarf": {
+          "source_file": "armadillo/scarf.png",
+          "source_sha256": "94c0092cc9b505c1e452f9d6859869a82d5efc63e5d1325f7f1a9625b5971c59",
+          "prototype_file": "armadillo/scarf.webp",
+          "bbox": [
+            566,
+            213,
+            719,
+            329
+          ],
+          "tintable": true
+        },
+        "bag": {
+          "source_file": "armadillo/bag.png",
+          "source_sha256": "be8d928e8db35474becaefa3576b9bde5ed1e57d0931d67636f4f8a1749b0951",
+          "prototype_file": "armadillo/bag.webp",
+          "bbox": [
+            325,
+            390,
+            486,
+            554
+          ],
+          "tintable": false
+        },
+        "cap": {
+          "source_file": "armadillo/cap.png",
+          "source_sha256": "a6d312dac6090eebf25d501fc5fa383fa800c86a27c3bb45cc3b694f3a36d90c",
+          "prototype_file": "armadillo/cap.webp",
+          "bbox": [
+            592,
+            70,
+            697,
+            155
+          ],
+          "tintable": true
+        },
+        "badge_protection": {
+          "source_file": "armadillo/badge_protection.png",
+          "source_sha256": "948b35fa6a133c2f811c2f498eaf2bd15d000810b6b689cf138a821423653a2d",
+          "prototype_file": "armadillo/badge_protection.webp",
+          "bbox": [
+            645,
+            355,
+            714,
+            402
+          ],
+          "tintable": false
+        },
+        "badge_healing": {
+          "source_file": "armadillo/badge_healing.png",
+          "source_sha256": "461d8e07d7da8005103526ab265ec488a55ccc5d59f8e3ce24623dcd7f138699",
+          "prototype_file": "armadillo/badge_healing.webp",
+          "bbox": [
+            645,
+            355,
+            714,
+            402
+          ],
+          "tintable": false
+        },
+        "badge_ranged": {
+          "source_file": "armadillo/badge_ranged.png",
+          "source_sha256": "3e6e7cc19798f0b634aa384226f63648623ba84da107760022450f3fb1746715",
+          "prototype_file": "armadillo/badge_ranged.webp",
+          "bbox": [
+            645,
+            355,
+            714,
+            402
+          ],
+          "tintable": false
+        },
+        "badge_chemistry": {
+          "source_file": "armadillo/badge_chemistry.png",
+          "source_sha256": "dcf44386fa1513a3015f24926b36578371278037d2fbf3f710c6fbbc0b40570f",
+          "prototype_file": "armadillo/badge_chemistry.webp",
+          "bbox": [
+            645,
+            355,
+            714,
+            402
+          ],
+          "tintable": false
+        }
+      },
+      "attachments": {
+        "bag": [
+          325,
+          325,
+          486,
+          620
+        ],
+        "cap": [
+          572,
+          70,
+          718,
+          155
+        ],
+        "badge": [
+          643,
+          355,
+          716,
+          402
+        ]
+      },
+      "combinations": [
+        {
+          "base": "base_a",
+          "clothes_color": "#c98a4b",
+          "scarf_color": "#86c98f",
+          "accessories": [],
+          "badge": "protection"
+        },
+        {
+          "base": "base_b",
+          "clothes_color": "#8fb4f0",
+          "scarf_color": "#b7a6f4",
+          "accessories": [
+            "scarf"
+          ],
+          "badge": "healing"
+        },
+        {
+          "base": "base_a",
+          "clothes_color": "#86c98f",
+          "scarf_color": "#d55e00",
+          "accessories": [
+            "bag"
+          ],
+          "badge": "ranged"
+        },
+        {
+          "base": "base_b",
+          "clothes_color": "#b7a6f4",
+          "scarf_color": "#a69a84",
+          "accessories": [
+            "cap"
+          ],
+          "badge": "chemistry"
+        },
+        {
+          "base": "base_a",
+          "clothes_color": "#d55e00",
+          "scarf_color": "#c98a4b",
+          "accessories": [
+            "scarf",
+            "bag"
+          ],
+          "badge": "protection"
+        },
+        {
+          "base": "base_b",
+          "clothes_color": "#a69a84",
+          "scarf_color": "#8fb4f0",
+          "accessories": [
+            "scarf",
+            "bag",
+            "cap"
+          ],
+          "badge": "healing"
+        }
+      ],
+      "preview_idle": {
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589.0,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "prototype_file": "armadillo/idle.webp"
+      }
+    }
+  }
+}
