@@ -1,0 +1,1 @@
+Fontes do PR #209 / #195. Cinco PNG, idles de referencia/canvases/ancoras e destinos no contract.json. Converter a cada tamanho final indicado; preservar canonical_anchor/body_reference_pixels, sem aumentar a arte porque a cabeca esta mais baixa. Normalization.json documenta as translacoes da prova. Fontes somente nesta tag, fora da main.
