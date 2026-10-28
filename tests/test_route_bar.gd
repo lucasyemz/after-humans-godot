@@ -1,5 +1,6 @@
 ## A barra de trechos da exploração (#180): a casa do guardião fica em alerta até ser vencido; vencido, fica como as
-## outras resolvidas (o ícone verde e o check), mesmo sendo o trecho de agora, e o título diz "Guardião vencido".
+## outras resolvidas (o ícone verde e o check), mesmo sendo o trecho de agora, e o título diz "Guardião vencido". O
+## trecho do trem no tutorial (#147) tem o ícone do trem, na cor dos outros.
 extends RefCounted
 
 var t
@@ -31,6 +32,17 @@ func run(context) -> void:
 	cell.free()
 	cell = hud._route_cell(fight, false, true, route)
 	t.check(_has_check(cell) and _tint(cell).is_equal_approx(AHKit.good()), "o de antes, verde e com o check")
+	cell.free()
+	# O trem do tutorial (#147): o ícone do trem do lobby (train_arrival, o do serviço do trem na Estação), na cor dos
+	# ícones da exploração (não o do guardião, nem o alerta dele).
+	var train := {"type": "train", "resolved": false}
+	cell = hud._route_cell(train, true, true, route)
+	var icon := cell.get_child(0) as TextureRect
+	t.check(icon.texture == AHKit.legacy_icon("train_arrival") and icon.texture != AHKit.legacy_icon("node-boss"), "o trecho do trem com o ícone do trem")
+	t.check(_tint(cell).is_equal_approx(AHKit.AMBER), "na cor do trecho de agora, como os outros")
+	cell.free()
+	cell = hud._route_cell(train, false, true, route)
+	t.check(_tint(cell).is_equal_approx(AHKit.TEXT), "e, à frente, na cor dos outros ícones")
 	cell.free()
 	hud.free()
 

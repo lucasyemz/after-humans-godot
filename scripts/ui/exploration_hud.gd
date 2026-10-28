@@ -122,7 +122,7 @@ var _hint_time := 0.0
 var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
 const STEP_ICONS := {"start": "node-start", "combat": "node-combat", "loot": "node-loot", "rest": "node-rest",
-	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "node-boss"}
+	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "train_arrival"}
 ## A casa do corredor (o lado do quadrado) e o elo entre duas.
 const CELL := 46.0
 const LINK := 12.0
