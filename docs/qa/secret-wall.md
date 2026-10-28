@@ -66,3 +66,12 @@ A QA conferiu e capturou:
 - Fica: as linhas coloridas do Mapa da Rede, escuras como já eram na `main`, quase não aparecem no mapa menor; só "MAPA DA
   REDE" e "RAIZ" se leem. Se o Lucas aprovar o mapa fixo, dá para clarear a tinta.
 - Fica: o topo do batente aparece acima da faixa de aço quando a porta abre, como já era antes.
+
+### A revisão do PR
+
+**Baixas, corrigidas:**
+- O `test_secret_wall` agora mede a peça (as caixas do pivô) contra o batente e a altura da porta, em vez de comparar
+  duas constantes.
+- O vão de 12 cm entre o azulejo e o concreto foi fechado. O concreto começa logo acima do azulejo, atrás da faixa de
+  aço, que segue inteira.
+- As linhas em branco entre as funções voltaram ao padrão.

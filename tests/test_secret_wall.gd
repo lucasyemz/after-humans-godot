@@ -52,8 +52,16 @@ func _pieces(station: AHStation) -> void:
 	t.check(not tiles_like.is_empty(), "com o azulejo da parede da plataforma")
 	var signs: Array = build.panel.find_children("*", "Label3D", true, false)
 	t.equal(signs.size(), 0, "sem letreiro na peça (o Mapa da Rede não desliza mais)")
-	var half := B.SECRET_WALL_WIDTH * 0.005
-	t.check(half > B.DOOR_WIDTH * 0.005, "fechada, ela cobre a porta e o batente")
+	# A peça medida (as caixas do pivô, fechado): cobre a porta e o batente (8 cm de cada lado) e o vão até em cima.
+	station._apply_panel(0.0)
+	var bounds := AABB()
+	for mesh in build.panel.find_children("*", "MeshInstance3D", true, false):
+		var box: AABB = (mesh as MeshInstance3D).global_transform * (mesh as MeshInstance3D).get_aabb()
+		bounds = box if bounds.size == Vector3.ZERO else bounds.merge(box)
+	var left := (B.DOOR_X - B.DOOR_WIDTH * 0.5 - 8.0) * 0.01
+	var right := (B.DOOR_X + B.DOOR_WIDTH * 0.5 + 8.0) * 0.01
+	t.check(bounds.position.x <= left and bounds.end.x >= right and bounds.end.y >= B.DOOR_HEIGHT * 0.01,
+		"fechada, ela cobre a porta e o batente (x %.2f a %.2f; o batente, %.2f a %.2f)" % [bounds.position.x, bounds.end.x, left, right])
 	station._apply_panel(0.0)
 	t.check(is_equal_approx(build.panel.position.x, AHStation.DOOR_X) and build.slit.visible, "fechada: no lugar, com a fresta de luz")
 	station._apply_panel(1.0)

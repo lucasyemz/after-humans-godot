@@ -469,7 +469,7 @@ func _secret_passage() -> void:
 	box(Vector3(left - PANEL_SLIDE - 40, STATION_BACK + 6, 0), Vector3(right + 50, STATION_BACK + 12, 2), steel)
 	for y in [STATION_BACK + 22, STATION_BACK + 30]:
 		box(Vector3(left - PANEL_SLIDE, y, 0), Vector3(right + 30, y + 3, 0.4), scuff, false)
-	# A parede falsa, fechada sobre a porta: o azulejo da plataforma até 2,2 m e o concreto acima, numa chapa rente à
+	# A parede falsa, fechada sobre a porta: o azulejo da plataforma até 2,2 m e o concreto acima, sem vão, numa chapa rente à
 	# parede (logo à frente do batente). Os materiais são cópias que andam com a peça (sem o azulejo "escorregar" no
 	# deslize).
 	var tiles := _moving(S("long_white_tiles", 0, 0.45, Color(0.96, 0.92, 0.82)))
@@ -480,7 +480,8 @@ func _secret_passage() -> void:
 	var x0 := DOOR_X - SECRET_WALL_WIDTH * 0.5
 	var x1 := DOOR_X + SECRET_WALL_WIDTH * 0.5
 	box(Vector3(x0, STATION_BACK + 3, 0), Vector3(x1, STATION_BACK + 3.8, 220), tiles)
-	box(Vector3(x0, STATION_BACK + 3, 232), Vector3(x1, STATION_BACK + 5.5, DOOR_HEIGHT + 22), cover)
+	# O concreto começa logo acima do azulejo (sem vão) e fica atrás da faixa de aço de 2,2 a 2,32 m, que segue inteira.
+	box(Vector3(x0, STATION_BACK + 3, 220), Vector3(x1, STATION_BACK + 4.5, DOOR_HEIGHT + 22), cover)
 	# A junta das bordas, uma linha suja de rejunte: fechada quase não se vê; no deslize, mostra a peça andando.
 	for edge_x in [x0, x1 - 1.5]:
 		box(Vector3(edge_x, STATION_BACK + 3.8, 0), Vector3(edge_x + 1.5, STATION_BACK + 4.2, 220), seam, false)
@@ -505,7 +506,6 @@ func _secret_passage() -> void:
 	box(Vector3(left - 60, y1, 0), Vector3(left - 20, y0, 240), concrete)
 	b.light(Vector3(DOOR_X, -1120, 210), 260, 420, WARM, true)
 	b.light(Vector3(3000, -1120, 210), 200, 380, WARM, false)
-
 
 
 ## Uma cópia própria de uma superfície (os mesmos parâmetros), para a peça que se move mexer só no slide_offset dela.
@@ -544,6 +544,7 @@ func _network_map(center_x: float) -> void:
 	box(Vector3(px + half - 36, py + 6, z0 + step * 0.6), Vector3(px + half - 27, py + 9, z0 + step * 3.4), S("metal_plate", 0, 0, Color(0.9, 0.86, 0.78)))
 	b.sign("MAPA DA REDE", Vector3(px, py + 11, z1 - 26), 18, Color8(232, 224, 200))
 	b.sign("RAIZ", Vector3(px + half - 30, py + 11, z0 + step * 3.4 + 12), 11, Color8(232, 224, 200))
+
 
 func _stair_core() -> void:
 	var concrete := S("concrete_wall_008", 0, 0.2, Color(0.88, 0.85, 0.8))
