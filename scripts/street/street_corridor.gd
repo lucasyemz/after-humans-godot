@@ -1512,6 +1512,8 @@ func _start_fight(index: int, advantage: bool) -> void:
 
 
 func _on_combat_finished(result: String) -> void:
+	# A frase mantida (o fôlego do tutorial) era do começo da luta: não gruda no aviso de depois dela (a fuga, a vitória).
+	hud.release_line()
 	var campaign: Dictionary = Campaign.state
 	R.end_combat(campaign, result, _fight.get("boss", false), "%s (%s)" % [_fight.get("cause", ""), R.phase(campaign.session.expedition.phase_id).get("name", "")])
 	street.end_fight()

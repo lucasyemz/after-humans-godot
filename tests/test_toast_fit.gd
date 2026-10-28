@@ -42,6 +42,10 @@ func run(t) -> void:
 		hud._held_until = Time.get_ticks_msec() - 1
 		hud.toast("Depois do tempo.", 2.5)
 		t.equal(hud._toast_label.text, "Depois do tempo.", "passado o tempo dela, o aviso vem sozinho")
+		hud.hold_line("Linha mantida.", 6.0)
+		hud.release_line()
+		hud.toast("Depois da luta.", 2.5)
+		t.equal(hud._toast_label.text, "Depois da luta.", "solta (a luta acabou), o aviso seguinte vem sozinho")
 		tree.unload_current_scene()
 		await tree.process_frame
 	Settings.set_text_size(real_size)

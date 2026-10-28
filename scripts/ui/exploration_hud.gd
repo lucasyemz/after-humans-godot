@@ -1070,6 +1070,12 @@ func hold_line(line: String, seconds: float) -> void:
 	toast(line, seconds)
 
 
+## Solta a frase mantida: os avisos seguintes vêm sozinhos (a luta acabou antes do tempo dela).
+func release_line() -> void:
+	_held_line = ""
+	_held_until = 0
+
+
 ## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
 func toast(text: String, seconds: float = 3.5) -> void:
 	if _toast_tween:
