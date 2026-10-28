@@ -142,10 +142,12 @@ func hero_art(hero_id: String) -> Dictionary:
 ## a pose parada e o retrato dela, as poses próprias quando a variação tem (o Guaxinim e o Tatu, #187) e o efeito visual
 ## das habilidades do fundador. Sem variação (saves antigos sem arte, classe sem recruta desenhado), a do fundador; a
 ## classe sem fundador (o rato e o tatu) usa o recruta desenhado dela.
-## variant: a do herói, se quem chama já tem a entrada; "" procura na campanha (Campaign.hero).
+## variant: a do herói, se quem chama já tem a entrada; "" procura na campanha (Campaign.hero). O fundador vem na skin
+## dele (AHSkins).
 static func art_entry(heroes: Dictionary, hero_id: String, variant: String = "") -> Dictionary:
+	# O fundador na skin que ele veste (#138): o único lugar que decide a arte da luta, da rua, da Sala e dos rostos.
 	if heroes.has(hero_id):
-		return heroes[hero_id]
+		return AHSkins.dress(heroes[hero_id], AHSkins.skin_of(hero_id))
 	var founder := {}
 	var parts := hero_id.split("_")
 	if parts.size() > 2 and parts[0] == "hero":

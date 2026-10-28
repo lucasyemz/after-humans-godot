@@ -68,7 +68,7 @@ func pose_for(hero: Dictionary) -> Dictionary:
 	var kind := "sleep" if lie else "seat"
 	var by_hero: Dictionary = _poses.get("heroes", {}).get(String(hero.id), {})
 	if not by_hero.is_empty():
-		return {"kind": kind, "art": by_hero.get(kind, by_hero.get("seat", {}))}
+		return {"kind": kind, "art": AHSkins.pose(by_hero.get(kind, by_hero.get("seat", {})), String(hero.id))}
 	var variant := String(hero.get("art_variant", ""))
 	var by_variant: Dictionary = _poses.get("recruits", {}).get(variant, {})
 	if not by_variant.is_empty():

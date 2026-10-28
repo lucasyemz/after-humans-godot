@@ -143,6 +143,8 @@ static func init_new_campaign(campaign: Dictionary) -> void:
 	campaign.completed_expeditions = 0
 	campaign.last_completed_expedition_id = ""
 	campaign.last_returned_expedition_id = ""
+	campaign.unlocked_skins = []
+	_grant_start_skins(campaign)
 
 
 ## Save anterior à Estação (fase 2): completa o que falta. Como na Unreal (MigrateLegacy), um save sem cômodos fica
@@ -177,6 +179,13 @@ static func migrate(campaign: Dictionary) -> void:
 	for entry in campaign.get("roster", []):
 		if not entry.has("art_variant"):
 			entry.art_variant = pick_art_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
+	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
+	for entry in campaign.get("roster", []):
+		if String(entry.get("skin_id", "")) == "":
+			entry.skin_id = AHSkins.DEFAULT
+	if typeof(campaign.get("unlocked_skins")) != TYPE_ARRAY:
+		campaign.unlocked_skins = []
+	_grant_start_skins(campaign)
 	# Ninguém morre (#118): o memorial dos saves antigos volta em recuperação.
 	_migrate_fallen(campaign)
 	_migrate_posts(campaign)
@@ -1998,3 +2007,58 @@ static func _migrate_posts(campaign: Dictionary) -> void:
 	var rooms: Dictionary = campaign.station.rooms
 	while hero_limit(campaign) < living(campaign).size() and room_level(campaign, CHARACTERS) < int(room_def(CHARACTERS).max_level):
 		rooms[CHARACTERS] = room_level(campaign, CHARACTERS) + 1
+
+
+# ---------------------------------------------------------------- skins (#138)
+
+## As skins que já vêm liberadas (Unlock "start" em data/skins.json), na campanha nova e nos saves antigos.
+static func _grant_start_skins(campaign: Dictionary) -> void:
+	for row in GameData.table("skins").values():
+		if String(row.get("Unlock", "")) == "start" and not campaign.unlocked_skins.has(String(row.Name)):
+			campaign.unlocked_skins.append(String(row.Name))
+
+
+## A skin está liberada nesta campanha (a padrão sempre está).
+static func skin_unlocked(campaign: Dictionary, skin_id: String) -> bool:
+	return skin_id == AHSkins.DEFAULT or campaign.get("unlocked_skins", []).has(skin_id)
+
+
+## Por que a skin ainda não se escolhe ("" se já está liberada).
+static func skin_lock_reason(campaign: Dictionary, skin_id: String) -> String:
+	if skin_unlocked(campaign, skin_id):
+		return ""
+	var row = GameData.row("skins", skin_id)
+	# Unlock "boss:<id>" (os desafios dos chefes, #95): o motivo diz de onde vem; as outras ficam só bloqueadas.
+	if row != null and String(row.get("Unlock", "")).begins_with("boss"):
+		return TranslationServer.translate("Ainda bloqueada: vem com os desafios dos chefes.")
+	return TranslationServer.translate("Ainda bloqueada.")
+
+
+## Vestir uma skin (só visual, fora da expedição e sem custo). Devolve o erro, ou "".
+static func choose_skin(campaign: Dictionary, hero_id: String, skin_id: String) -> String:
+	var entry = hero(campaign, hero_id)
+	if entry == null:
+		return TranslationServer.translate("Esse herói não está na Estação.")
+	if skin_id != AHSkins.DEFAULT:
+		var row = GameData.row("skins", skin_id)
+		if row == null or String(row.get("HeroId", "")) != hero_id:
+			return TranslationServer.translate("Essa roupa não é desse herói.")
+		if not AHSkins.has_art(skin_id):
+			return TranslationServer.translate("Essa roupa ainda não chegou.")
+	if not skin_unlocked(campaign, skin_id):
+		return skin_lock_reason(campaign, skin_id)
+	if campaign.get("session", {}).get("expedition") != null:
+		return TranslationServer.translate("A roupa se troca na Estação, fora da expedição.")
+	entry.skin_id = skin_id
+	return ""
+
+
+## Libera todas as skins (a barra de Admin). Devolve quantas eram novas.
+static func unlock_all_skins(campaign: Dictionary) -> int:
+	var added := 0
+	for row in GameData.table("skins").values():
+		if not campaign.unlocked_skins.has(String(row.Name)):
+			campaign.unlocked_skins.append(String(row.Name))
+			added += 1
+	return added
+

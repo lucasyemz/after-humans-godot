@@ -1293,7 +1293,7 @@ func _update_sleepers() -> void:
 			walker.recovering = true
 			var spot := recovery_spot(campaign, walker.hero_id)
 			if spot != Vector3.INF and _poses.has(walker.hero_id + "_sleep"):
-				card.show_art(_poses[walker.hero_id + "_sleep"])
+				card.show_art(AHSkins.pose(_poses[walker.hero_id + "_sleep"], walker.hero_id))
 				card.position = spot
 			else:
 				var place := room_def(S.INFIRMARY if S.in_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
@@ -1313,7 +1313,7 @@ func _update_sleepers() -> void:
 		var slot: int = campaign.night.participants.find(walker.hero_id) if asleep.has(walker.hero_id) else -1
 		if slot >= 0 and slot < slots.size() and _poses.has(walker.hero_id + "_sleep"):
 			walker.sleeping = true
-			card.show_art(_poses[walker.hero_id + "_sleep"])
+			card.show_art(AHSkins.pose(_poses[walker.hero_id + "_sleep"], walker.hero_id))
 			card.position = slots[slot]
 			card.set_facing(1.0)
 			card.scale = Vector3.ONE
@@ -1420,6 +1420,28 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		hide_residents(true)
 
 
+## O herói trocou de skin (#138): a placa dele veste a nova onde está, na pose de agora (de pé, sentado, no posto ou
+## dormindo), sem mudar de cômodo.
+func redress(hero_id: String) -> void:
+	for walker in _walkers:
+		if String(walker.get("hero_id", "")) != hero_id:
+			continue
+		var art := _hero_art(S.hero(Campaign.state, hero_id))
+		if art.is_empty():
+			return
+		walker.idle = art.idle
+		var card: AHSpriteCard = walker.card
+		if walker.get("sitting", 0.0) > 0.0 and _poses.has(hero_id + "_seat"):
+			card.show_art(AHSkins.pose(_poses[hero_id + "_seat"], hero_id))
+		elif walker.get("working", 0.0) > 0.0 and _poses.has(hero_id + "_work"):
+			card.show_art(AHSkins.pose(_poses[hero_id + "_work"], hero_id))
+		elif walker.get("sleeping", false) and _poses.has(hero_id + "_sleep"):
+			card.show_art(AHSkins.pose(_poses[hero_id + "_sleep"], hero_id))
+		else:
+			card.show_art(art.idle)
+	_update_sleepers()
+
+
 ## A arte do herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 func _hero_art(entry) -> Dictionary:
 	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id, String(entry.get("art_variant", "")))
@@ -1475,7 +1497,7 @@ func _walk(delta: float) -> void:
 				if walker.pause <= 0.0 and walker.wait > 0.0 and _post_taken(walker):
 					walker.pause = randf_range(3.0, 6.0)
 				if walker.pause <= 0.0 and walker.wait > 0.0:
-					card.show_art(_poses[walker.hero_id + "_work"])
+					card.show_art(AHSkins.pose(_poses[walker.hero_id + "_work"], walker.hero_id))
 					card.position = Vector3(_work_post(walker), walker.floor, -5.6)
 					card.set_facing(1.0)
 					card.scale = Vector3.ONE
@@ -1584,7 +1606,7 @@ func _post_taken(walker: Dictionary) -> bool:
 
 func _sit_down(walker: Dictionary) -> void:
 	var card: AHSpriteCard = walker.card
-	card.show_art(_poses[walker.hero_id + "_seat"])
+	card.show_art(AHSkins.pose(_poses[walker.hero_id + "_seat"], walker.hero_id))
 	card.position = Vector3(CANTEEN_SEATS[walker.seat], walker.floor, CANTEEN_SEAT_Z)
 	card.set_facing(1.0)
 	walker.sitting = randf_range(6.0, 11.0)
