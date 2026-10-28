@@ -1400,6 +1400,23 @@ street_corridor.gd: board
 street_corridor.gd: searched
 tutorial_guide.gd: actions
 tutorial_guide.gd: targets
+refuge_hud.gd: close
+refuge_hud.gd: seen
+refuge_hud.gd: prepare
+refuge_hud.gd: Nav_characters
+refuge_hud.gd: Prepare*
+tutorial_hint.gd: frame
+station_tour.gd: tutorial
+station_tour.gd: tour
+station_tour.gd: Speaker
+station_tour.gd: art
+station_tour.gd: Text
+station_tour.gd: %d/%d
+station_tour.gd: next
+station_tour.gd: Do
+station_tour.gd: Wait
+station_tour.gd: Target
+station_tour.gd: close
 exploration_hud.gd: fallen
 combat_hud.gd: Fallen
 combat_hud.gd: names
@@ -1432,6 +1449,8 @@ tutorial_guide.gd: Briefing
 station_report.gd: tutorial
 station_report.gd: bandages
 station_report.gd: tool
+station_tour.gd: %d/%d  ·  %s
+refuge_hud.gd: map
 *: formation
 *: distance
 *: height

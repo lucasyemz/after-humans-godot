@@ -94,7 +94,7 @@ func _without_save() -> void:
 	t.check(opening != null and title.get_viewport().gui_get_focus_owner() == opening, "Nova campanha sem save pergunta como começar, com a abertura escolhida")
 	await _skip_tutorial(title)
 	t.check(await _settles_on("Station"), "Pular tutorial vai direto para a Estação")
-	t.equal(AHTutorial.stage(Campaign.state), "station", "e a campanha fica como depois do tutorial")
+	t.equal(AHTutorial.stage(Campaign.state), "done", "e a campanha fica como depois do tutorial, sem a visita")
 	t.check(Campaign.has_valid_save(), "e grava a campanha nova")
 
 

@@ -22,7 +22,7 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/street/street.gd", "res://scripts/street/street_corridor.gd", "res://scripts/scenario/scenario_world.gd",
 	"res://scripts/station/station_build.gd", "res://scripts/campaign/campaign_service.gd",
 	"res://scripts/core/game_data_service.gd", "res://scripts/flow/game_flow.gd", "res://scripts/combat/combat_arena.gd",
-	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd"]
+	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
 	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],
@@ -147,8 +147,9 @@ static func data_texts() -> Array:
 					out.append({"text": row.Cards[index][field], "where": "tutorial.%s.%d.%s" % [row.Name, index, field]})
 		for step in row.get("Steps", []):
 			if step is Dictionary:
-				for field in ["Title", "Text"]:
-					out.append({"text": step[field], "where": "tutorial.hints.%s.%s" % [step.Id, field]})
+				for field in ["Title", "Text", "Do"]:
+					if String(step.get(field, "")).strip_edges() != "":
+						out.append({"text": step[field], "where": "tutorial.%s.%s.%s" % [row.Name, step.Id, field]})
 	# As escolhas dos eventos: o texto do botão, o requisito e o resultado de cada saída (#64; o resultado vai traduzido
 	# pelo modelo, com {Heroi} e {Instinto} trocados depois).
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/events.json")):

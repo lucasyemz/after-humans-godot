@@ -46,7 +46,7 @@ func _skip_equals_play() -> void:
 	var seeds: int = skipped.inventory.seeds
 	var bandages: int = skipped.inventory.bandages
 	AHTutorial.skip(skipped)
-	t.equal(AHTutorial.stage(skipped), "station", "pulando, a campanha fica no ponto depois da abertura")
+	t.equal(AHTutorial.stage(skipped), "done", "pulando, a abertura e a visita da Estação (#145) ficam para trás")
 	var prize := AHTutorial.reward()
 	t.equal(int(skipped.inventory.seeds), seeds + int(prize.seeds), "a recompensa: as sementes")
 	t.equal(int(skipped.inventory.bandages), bandages + int(prize.bandages), "o curativo")
@@ -67,11 +67,12 @@ func _skip_equals_play() -> void:
 		hero.instinct = 70
 	played.session.expedition.food = 2
 	AHTutorial.complete(played)
-	t.check(not AHTutorial.suppresses_tips(played), "no fim, as dicas voltam")
+	t.check(AHTutorial.suppresses_tips(played), "no fim da fuga, as dicas esperam a visita da Estação (#145)")
 	var a: Dictionary = played.duplicate(true)
 	var b: Dictionary = skipped.duplicate(true)
 	for c in [a, b]:
 		c.station.last_return.erase("seen")
+		c.erase("tutorial")
 	t.equal(JSON.stringify(a, "", true), JSON.stringify(b, "", true), "pular dá o mesmo estado que jogar até o trem")
 	t.check(not played.completed_phases.has(AHTutorial.PHASE_ID), "o tutorial não vira fase concluída")
 	# Fora da jornada (já na Estação, ou numa campanha com progresso), complete() recusa e não mexe em nada.
