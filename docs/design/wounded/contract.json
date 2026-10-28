@@ -1,0 +1,170 @@
+{
+  "issue": 195,
+  "base_commit": "20890be",
+  "source_tag": "codex-pr<N>-originals",
+  "source_folder": "art/combat/source/wounded_20261028",
+  "format": "WEBP RGBA",
+  "files": [
+    {
+      "name": "bento",
+      "file": "art/combat/heroes/bento/wounded.webp",
+      "reference": "art/combat/heroes/bento/idle.webp",
+      "source_file": "bento_wounded.png",
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "size": [
+        543,
+        724
+      ],
+      "canonical_anchor": [
+        473.0,
+        1429
+      ],
+      "texture_anchor": [
+        236.5,
+        714.5
+      ],
+      "body_reference_pixels": 1419,
+      "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+      "sha256": "584429fd83e075055d23886040f5da592a08789a73bd7b117cb927d00b5ea7f4",
+      "source_sha256": "171f6c593ec975d26600a7f2d4d4166da3c1a971718d0cf754ec10e0ac94c0d4",
+      "bbox": [
+        59,
+        37,
+        422,
+        714
+      ]
+    },
+    {
+      "name": "nick",
+      "file": "art/combat/heroes/nick/wounded.webp",
+      "reference": "art/combat/heroes/nick/idle.webp",
+      "source_file": "nick_wounded.png",
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "size": [
+        589,
+        668
+      ],
+      "canonical_anchor": [
+        488.5,
+        1286
+      ],
+      "texture_anchor": [
+        244.25,
+        643.0
+      ],
+      "body_reference_pixels": 1255,
+      "reference_sha256": "e97fb01fa320a2bc2d43cfb8399fdb1d93e11bbdc30abda5b24e7d17eafbce63",
+      "sha256": "09cbdc11831cbc3309dbc2781c2e5c991e0359071ce8ebfbfc7a58d7eab2cc9e",
+      "source_sha256": "87b3f1d3b5b7d75919e1e64b80f30aeb8e8ed9ad8cf8c58b0ee8da466696bbcf",
+      "bbox": [
+        70,
+        45,
+        448,
+        644
+      ]
+    },
+    {
+      "name": "iris",
+      "file": "art/combat/heroes/iris/wounded.webp",
+      "reference": "art/combat/heroes/iris/idle.webp",
+      "source_file": "iris_wounded.png",
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "size": [
+        589,
+        668
+      ],
+      "canonical_anchor": [
+        587.5,
+        1264
+      ],
+      "texture_anchor": [
+        293.75,
+        632.0
+      ],
+      "body_reference_pixels": 1208,
+      "reference_sha256": "e2da1f9727c8d5ba2801384d2eea5cad8696603c49cb852634359a6126690890",
+      "sha256": "613964fafd42dc9b98e256a1c8956b539850ee9e930bd844f5fb0cc0e60af59c",
+      "source_sha256": "d62a6afeffcc914ce96de0b29a5bada7671bee80fea7262173e2c117f16b2cae",
+      "bbox": [
+        168,
+        49,
+        532,
+        633
+      ]
+    },
+    {
+      "name": "vespera",
+      "file": "art/combat/heroes/vespera/wounded.webp",
+      "reference": "art/combat/heroes/vespera/idle.webp",
+      "source_file": "vespera_wounded.png",
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "size": [
+        589,
+        668
+      ],
+      "canonical_anchor": [
+        451.0,
+        1297
+      ],
+      "texture_anchor": [
+        225.5,
+        648.5
+      ],
+      "body_reference_pixels": 1271,
+      "reference_sha256": "5d714a11c05f986eeb600f66c1a7c9c0546df04d0f95b50d7739a3f1f8681276",
+      "sha256": "24fe8ee42519ef80a5ee84962509c5c1210bdb9249ebb82624dd271fb661a75b",
+      "source_sha256": "344bf0ab12bf63366ddd407e201673ef3c4db948623a8c220f455c57c91c2371",
+      "bbox": [
+        0,
+        13,
+        403,
+        649
+      ]
+    },
+    {
+      "name": "bento_watch",
+      "file": "art/skins/bento/watch/wounded.webp",
+      "reference": "docs/design/skins/watch/idle.webp",
+      "source_file": "bento_watch_wounded.png",
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "size": [
+        543,
+        724
+      ],
+      "canonical_anchor": [
+        473.0,
+        1429
+      ],
+      "texture_anchor": [
+        236.5,
+        714.5
+      ],
+      "body_reference_pixels": 1419,
+      "reference_sha256": "071cea3b86ede36a6af333153f4404ac80a2c3cfad4751fbeea31bb6529cd9c4",
+      "sha256": "85bd2b6b8e18328403f01088db27247f0b79b7280383ddd1696affd2a77d7b49",
+      "source_sha256": "3bc975dbc32137786dac4347cff872f9cb50620d546add16af85de71fb533391",
+      "bbox": [
+        60,
+        37,
+        485,
+        714
+      ]
+    }
+  ],
+  "note": "Keep canonical idle canvas/anchor/body_reference_pixels; lower head is intentional hunch, not a change of scale."
+}
