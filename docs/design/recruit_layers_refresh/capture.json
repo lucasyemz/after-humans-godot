@@ -1,0 +1,78 @@
+{
+  "actors": [
+    {
+      "body_height": 1.72,
+      "id": "hero_cao_bento",
+      "position": "Vector3(-1.3, 0, 1.25)"
+    },
+    {
+      "body_height": 1.66,
+      "id": "hero_coruja_vespera",
+      "position": "Vector3(4.7683717e-08, 0, 1.25)"
+    },
+    {
+      "body_height": 1.5,
+      "id": "hero_gato_nick",
+      "position": "Vector3(1.3000001, 0, 1.25)"
+    },
+    {
+      "body_height": 1.38,
+      "id": "hero_sapo_iris",
+      "position": "Vector3(2.6000001, 0, 1.25)"
+    },
+    {
+      "body_height": 1.44,
+      "id": "raccoon",
+      "position": "Vector3(3.9, 0, 1.25)"
+    },
+    {
+      "body_height": 1.56,
+      "id": "armadillo",
+      "position": "Vector3(5.2, 0, 1.25)"
+    }
+  ],
+  "after": "external proposed WebP loaded as ImageTexture in memory",
+  "base_commit": "5bb2928",
+  "before": "main code/data/current art and heights",
+  "engine": "4.7.2-stable (official)",
+  "height_only": "diagnostic: old art at target heights, not main",
+  "lineup_camera": "Transform3D(1, 0, 0, 0, 0.9781476, 0.2079117, 0, -0.2079117, 0.9781476, 1.95, 4.90184, 13.663473)",
+  "lineup_fov": 26.0,
+  "physical_gpu": false,
+  "renderer": "OpenGL Compatibility / Mesa llvmpipe CPU / Xvfb",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "same_process_pairs": true,
+  "screenshots": {
+    "lineup_before": {
+      "png_sha256": "ecdbfb5ad025fd6f01444f7167e77f3f9b3789fd5488c835afe7abc85df63aa4",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "lineup_after": {
+      "png_sha256": "4d9d2b5c83d599251df4f5a4d66ea039f8745bded506d9132e7c010592415899",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "fight_before": {
+      "png_sha256": "45ce4a0c2e47e942ed58677b3186d6ef9efd4e5e8e8baec378b39602f2b0c9c1",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "fight_after": {
+      "png_sha256": "87a2061c3a77f506b73737a5e33d5a3fad54b14003b7b7623bb7147dcbb4987a",
+      "size": [
+        1920,
+        1080
+      ]
+    }
+  }
+}

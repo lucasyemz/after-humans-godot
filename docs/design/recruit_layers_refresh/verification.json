@@ -1,0 +1,21 @@
+{
+  "base_commit": "5bb2928",
+  "production_diff": [],
+  "full_runner": {
+    "result": "92/92",
+    "duration_ms": 641292,
+    "parity": "48/48 battles,3351 steps",
+    "run": "Previously run in this session for codex-221 on same production tree; not repeated for docs-only delivery",
+    "log_sha256": "71d4056c86abe9fb4f8c138cdf3fad83a96fc6e19358f3f6dec895c12c900f11"
+  },
+  "art_audit": "20 source PNG +20 temporary lossless WebP; fresh verification",
+  "production_trees": {
+    "scripts": "679531ad1782cc75a8cab1d04f501b076527a232",
+    "data": "fb430f072aae7acb10f2302588dcff5b9b6fb9ef",
+    "tests": "aafe4e60ad6718f5a501d04da1f115d71e2164d1",
+    "art": "4ad430deb7ab300ea5e45312a8250ab45ba2612d",
+    "tools": "95dd85aae8099236ba413a41e6878cb463ebe1e3",
+    "scenes": "1d2044d4547f252b585700f5432da4a5524b0ca3",
+    "project.godot": "f1bcd7ccd06a92b14899e3955024579716635650"
+  }
+}
