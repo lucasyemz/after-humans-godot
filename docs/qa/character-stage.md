@@ -5,7 +5,7 @@ chão. Quando a gente sair, ele sai dali ou volta para o cômodo em que já esta
 
 ![antes e depois](character-stage/before_after.jpg)
 
-As fotos saem de `tools/capture_181.gd` (`--text-size=2`). O antes é a `main`.
+As fotos saíram do `tools/capture_181.gd` (`--text-size=2`), retirado depois do merge do #200. O antes é a `main` de então.
 
 ## O que muda
 

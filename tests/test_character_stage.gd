@@ -102,6 +102,47 @@ func _stage(station, profile: String, fallen_id: String) -> void:
 		if card_now == null or card_now.visible != before[id][1] or card_now.position.distance_to(before[id][0]) > 0.6:
 			moved.append(id)
 	t.equal(moved, [], "%s: cada morador volta para onde estava (e o caído, para a recuperação)" % profile)
+	await _wide(station, profile)
+
+
+## O revisor do #200: a arte mais larga (o escudo do Tatu) cabe no vão também no Maior, a câmera não se mexe ao refazer a
+## tela com o mesmo vão, a respiração não apaga a escala da placa e outra tela (a chegada) tira o escolhido da sala.
+func _wide(station, profile: String) -> void:
+	var hud: AHRefugeHud = station.hud
+	var tatu = Campaign.state.roster.filter(func(h): return h.class_id == "tatu")
+	var tatu_id: String = tatu[0].id if not tatu.is_empty() else "hero_tatu_test"
+	if tatu.is_empty():
+		# Direto no elenco (a classe pode ainda não ter chegado à Estação nessa campanha).
+		S._add_hero(Campaign.state, tatu_id, "tatu", "Casco", [], S.pick_art_variant(Campaign.state, "tatu"))
+	if not t.check(tatu_id != "", "%s: um Tatu no elenco" % profile):
+		return
+	hud.open_room(S.CHARACTERS)
+	await _frames(5)
+	var screen: AHCharacterRoom = hud._room_screen
+	screen.selected = tatu_id
+	screen.rebuild()
+	await _settle(station)
+	var card: AHSpriteCard = station.stage_card
+	var half: float = station.stage_width() * 0.5
+	var left_px: float = station.camera.unproject_position(card.global_position - Vector3(half, 0, 0)).x
+	var right_px: float = station.camera.unproject_position(card.global_position + Vector3(half, 0, 0)).x
+	var gap: Vector2 = screen.stage_gap()
+	t.check(left_px >= gap.x - 2.0 and right_px <= gap.y + 2.0,
+		"%s: a arte do Tatu cabe no vão (%.0f a %.0f; o vão, %.0f a %.0f)" % [profile, left_px, right_px, gap.x, gap.y])
+	var goal: Dictionary = station._goal.duplicate()
+	screen.rebuild()
+	await _frames(4)
+	t.equal(station._goal, goal, "%s: refazer a tela com o mesmo vão não mexe na câmera" % profile)
+	station.stage_scale = Vector3(1.5, 1.5, 1.5)
+	await _frames(2)
+	t.check(is_equal_approx(station.stage_card.scale.x, 1.5) and station.stage_card.scale.y > 1.45, "%s: a respiração respeita a escala da placa" % profile)
+	station.stage_scale = Vector3.ONE
+	hud.current = AHRefugeHud.ARRIVAL
+	hud.refresh()
+	await _frames(3)
+	t.check(not is_instance_valid(station.stage_card) and not is_instance_valid(hud._room_screen), "%s: outra tela tira o escolhido da sala" % profile)
+	hud.close_panel()
+	await _frames(3)
 
 
 func _open():

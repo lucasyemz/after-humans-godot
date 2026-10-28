@@ -58,6 +58,8 @@ const REPORT_SPACING := 2.6
 ## escala medida na tela é 381 px por metro de body_height, e os pés caem perto de y 878, como antes.
 const STAGE_FEET := 890.0
 const STAGE_PX_PER_METER := 381.0
+## A folga, em px de 1080, entre a arte do escolhido e cada painel da Sala.
+const STAGE_MARGIN := 16.0
 ## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
 ## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
 ## o candidato desce e anda; só então a câmera fecha nele. Na saída: o recusado volta ao trem, o sino avisa, as portas
@@ -159,6 +161,8 @@ var _arrivals: Array = []
 ## A placa dele de morador só fica escondida (hide_residents), então, ao sair, cada um está onde estava.
 var stage_card: AHSpriteCard
 var stage_hero := ""
+## A escala da placa do escolhido; a respiração multiplica por cima dela.
+var stage_scale := Vector3.ONE
 ## O trem da volta fechando e indo embora depois de a equipe descer (não conta como cena do trem ocupada).
 var _team_train_leaving := false
 
@@ -297,8 +301,8 @@ func _process(delta: float) -> void:
 		_tick_reopen()
 	_walk(delta)
 	if is_instance_valid(stage_card):
-		# A respiração do parado, como a dos moradores esperando.
-		stage_card.scale = Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
+		# A respiração do parado, como a dos moradores esperando, por cima da escala da placa (não a substitui).
+		stage_card.scale = stage_scale * Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
 	_tick_leaving(delta)
 	if not _held_go.is_empty() and (not lineup_leaving() or Time.get_ticks_msec() >= _hold_until):
 		var held := _held_go
@@ -485,7 +489,14 @@ func focus_room_stage(room_id: String, left_px: float, right_px: float, instant:
 	var pitch := -3.0
 	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
 	var drop := atan((STAGE_FEET - 540.0) / focal) + deg_to_rad(-pitch)
-	var distance: float = focal / STAGE_PX_PER_METER
+	# A arte mais larga que o vão (o escudo do Tatu no texto Maior): a câmera se afasta só o bastante para ela caber, com
+	# STAGE_MARGIN de cada lado; os pés continuam em STAGE_FEET.
+	var px_per_meter := STAGE_PX_PER_METER
+	var width := stage_width()
+	var room_px := right_px - left_px - 2.0 * STAGE_MARGIN
+	if width > 0.0 and room_px > 0.0 and width * px_per_meter > room_px:
+		px_per_meter = room_px / width
+	var distance: float = focal / px_per_meter
 	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * distance / focal
 	_go({"pos": Vector3(x, room.floor + distance * tan(drop), LANE_Z + distance), "fov": fov, "pitch": pitch}, false, instant)
 
@@ -513,6 +524,16 @@ func show_stage_hero(hero_id: String) -> void:
 	stage_card.position = Vector3((room.x0 + room.x1) * 0.5, room.floor, LANE_Z)
 	stage_card.set_facing(1.0)
 	stage_hero = hero_id
+
+
+## A largura da arte do escolhido na Sala (body_width_pixels do manifesto), em metros; 0 sem ele ou sem a medida.
+func stage_width() -> float:
+	if not is_instance_valid(stage_card):
+		return 0.0
+	var art := stage_card.art()
+	if not art.has("body_width_pixels"):
+		return 0.0
+	return float(art.body_width_pixels) * stage_card.body_height / float(art.body_reference_pixels)
 
 
 func clear_stage_hero() -> void:

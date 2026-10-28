@@ -25,6 +25,8 @@ var training := false
 var _upgrade := ""
 var _first_focus: Control
 var _trait_ids := {}
+## O vão e a largura da arte do último enquadramento (_frame_stage).
+var _framing := Vector3(-1, -1, -1)
 
 
 static func make(owner: Control) -> AHCharacterRoom:
@@ -100,13 +102,18 @@ func stage_gap() -> Vector2:
 	return gap
 
 
-## A câmera põe o meio da Sala no meio do vão real entre os painéis (#181), depois que eles tomam o tamanho.
+## A câmera põe o meio da Sala no meio do vão real entre os painéis (#181), depois que eles tomam o tamanho. Só quando o
+## vão (ou a largura da arte do escolhido) muda: refazer a tela sem mudar o vão não mexe na câmera.
 func _frame_stage() -> void:
 	await get_tree().process_frame
 	var station = hud.get("station") if hud != null else null
 	if station == null or not is_inside_tree() or not is_visible_in_tree():
 		return
 	var gap := stage_gap()
+	var framing := Vector3(gap.x, gap.y, station.stage_width())
+	if framing == _framing:
+		return
+	_framing = framing
 	station.focus_room_stage(S.CHARACTERS, gap.x, gap.y)
 
 
