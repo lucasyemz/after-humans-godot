@@ -141,7 +141,7 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 				# O pedido em segundo plano falhou (ou já foi consumido): carrega aqui mesmo.
 				packed = load(path)
 			if packed == null:
-				return await _travel_failed(path)
+				return await _travel_failed(scene_id, path)
 		elif scene == null and (passage.title_delay <= 0.0 or passage.title_lit) and passage.sound_settled():
 			# Com a cena de fundo andando (o vagão, #75), a montagem (um quadro travado) espera o título aceso por cima.
 			# A cena nova monta por baixo do cartão (opaco), parada: não anda nem recebe tecla até o cartão sair. Só
@@ -166,14 +166,17 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	return true
 
 
-## A cena não carregou (o arquivo sumiu ou quebrou): o cartão sai e a troca termina sem prender o busy.
-func _travel_failed(path: String) -> bool:
+## A cena não carregou (o arquivo sumiu ou quebrou): o cartão sai, a troca termina sem prender o busy e o jogo volta
+## ao título (a cena de antes já saiu no preto: sem isto, a tela ficava vazia e sem tecla).
+func _travel_failed(scene_id: String, path: String) -> bool:
 	push_error("GameFlow: a cena %s não carregou." % path)
 	passage.end_sound(AHPassageCard.SOUND_SKIP_FADE, false)
 	passage.queue_free()
 	passage = null
-	await _fade_to(0.0)
 	busy = false
+	if scene_id != "title":
+		await change_to("title", {}, false)
+	await _fade_to(0.0)
 	return false
 
 

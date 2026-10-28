@@ -881,7 +881,8 @@ func _process(_delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
 		return
-	var short_plates: Array[Rect2] = []
+	# As placas e intenções acima da cabeça (o ALVO desvia delas), lidas depois de as escalonadas subirem.
+	var short_controls: Array[Control] = []
 	var widths := _plate_widths(camera)
 	for unit_id in _unit_bars:
 		var plate: Control = _unit_bars[unit_id]
@@ -925,7 +926,7 @@ func _process(_delta: float) -> void:
 		var tag := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
 		plate.position = Vector2(feet.x - plate.size.x * 0.5, y)
 		if short:
-			short_plates.append(Rect2(plate.position, plate.size))
+			short_controls.append(plate)
 		# Com o popup do fim aberto, as intenções saem (a luta acabou, e elas subiriam por trás dele).
 		if tag != null and _result.visible:
 			tag.visible = false
@@ -933,8 +934,11 @@ func _process(_delta: float) -> void:
 			var crown := camera.unproject_position(card.global_position + Vector3(0, card.head_height() + 0.15, 0))
 			var bottom := minf(crown.y, plate.position.y - 4.0) if short else crown.y
 			tag.position = Vector2(feet.x - tag.size.x * 0.5, maxf(INTENT_TOP, bottom - tag.size.y))
-			short_plates.append(Rect2(tag.position, tag.size))
+			short_controls.append(tag)
 	_lift_staggered()
+	var short_plates: Array[Rect2] = []
+	for control in short_controls:
+		short_plates.append(Rect2(control.position, control.size))
 	for marker in _markers:
 		if marker.has_meta("card"):
 			# O botão do alvo cobre o corpo inteiro na tela (do pé à cabeça, na largura do corpo).
@@ -1336,12 +1340,21 @@ func _plate_widths(camera: Camera3D) -> Dictionary:
 	_plate_stagger.clear()
 	for player in [true, false]:
 		var xs: Array = []
+		var slots: Array = []
 		for unit_id in _unit_bars:
 			var unit = session.state.find_unit(unit_id)
 			var card: AHSpriteCard = arena.cards.get(unit_id)
 			if unit != null and unit.is_player == player and card != null and _unit_bars[unit_id].visible:
 				xs.append([camera.unproject_position(card.global_position).x, unit_id])
+				if unit.rank > 0:
+					slots.append([camera.unproject_position(arena.slot_position(unit)).x, unit_id])
 		xs.sort_custom(func(a, b): return a[0] < b[0])
+		slots.sort_custom(func(a, b): return a[0] < b[0])
+		# O escalonamento (#72) sai do lugar de destino de cada um, e não de onde a placa está no quadro: numa troca de
+		# posição as placas não pulam de linha enquanto os dois se cruzam, e nas lutas de espaço normal nada sobe.
+		for i in range(1, slots.size()):
+			if slots[i][0] - slots[i - 1][0] < PLATE_MIN + PLATE_GAP and not _plate_stagger.has(slots[i - 1][1]):
+				_plate_stagger[slots[i][1]] = true
 		# Cada placa com a sua largura: a de sempre, ou o que cabe até o vizinho de cada lado (metade da distância de
 		# cada um), para quem tem espaço não estreitar por causa dos outros.
 		for i in xs.size():
@@ -1351,10 +1364,6 @@ func _plate_widths(camera: Camera3D) -> Dictionary:
 			if i < xs.size() - 1:
 				width = minf(width, xs[i + 1][0] - xs[i][0] - PLATE_GAP)
 			out[xs[i][1]] = maxf(PLATE_MIN, width)
-			# Nem no mínimo cabe ao lado do vizinho (os espaços encolhidos num lugar apertado, #72): esta sobe para cima
-			# da cabeça, uma sim e outra não, e as duas linhas não se cobrem.
-			if i > 0 and xs[i][0] - xs[i - 1][0] < PLATE_MIN + PLATE_GAP and not _plate_stagger.has(xs[i - 1][1]):
-				_plate_stagger[xs[i][1]] = true
 	return out
 
 
@@ -1362,7 +1371,8 @@ const PLATE_PLAYER := 200.0
 const PLATE_ENEMY := 200.0
 const PLATE_MIN := 140.0
 const PLATE_GAP := 8.0
-## As placas escalonadas (acima da cabeça) porque o vizinho está mais perto que a placa mínima: _plate_widths as marca.
+## As placas escalonadas (acima da cabeça) porque o lugar do vizinho está mais perto que a placa mínima: _plate_widths
+## as marca, pelo lugar de destino de cada um.
 var _plate_stagger := {}
 
 

@@ -1,6 +1,6 @@
 ## As saídas limpas da troca de cena (#72, pendências do #85):
 ## - a passagem recusada (outra troca em andamento) libera a cena de fundo do cartão (o vagão), que não fica órfã;
-## - a cena que não carrega termina a passagem com push_error, sem prender o GameFlow.busy;
+## - a cena que não carrega termina a passagem com push_error, sem prender o GameFlow.busy, e volta ao título;
 ## - o corredor não avança o trecho nem fica preso no busy quando a troca de mapa seria recusada.
 extends RefCounted
 
@@ -48,6 +48,7 @@ func _missing_scene() -> void:
 	t.check(not went, "a cena que não carrega devolve false")
 	t.check(not GameFlow.busy, "e solta o busy (a próxima troca anda)")
 	t.check(GameFlow.passage == null, "sem o cartão preso na tela")
+	t.check(GameFlow.current_id == "title" and _tree.current_scene != null, "e o jogo volta ao título, em vez de uma tela vazia")
 
 
 func _corridor_waits() -> void:

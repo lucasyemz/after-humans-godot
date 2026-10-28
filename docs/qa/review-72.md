@@ -10,7 +10,9 @@ Com os espaços da luta encolhidos até o mínimo (`MIN_GAP_SCALE`, num lugar ap
 as placas, no mínimo de 140 px, se cobriam (a auditoria mediu 142–146 px sem obstáculo; com a luta cheia do passo 7
 da Rua das Vitrines, cobriam). Agora, quando o vizinho está mais perto que a placa mínima, uma placa sim e outra não
 sobe para cima da cabeça (o mesmo caminho dos baixinhos), e sobe de novo por cima da intenção e da placa dos vizinhos
-se encostar nelas (`_lift_staggered`). Nas lutas de sempre, com os pés a ~175 px, nada muda.
+se encostar nelas (`_lift_staggered`). Quem sobe sai do lugar de destino de cada um (`slot_position`), não de onde a
+placa está no quadro: numa troca de posição as placas não pulam enquanto os dois se cruzam. O ALVO desvia das placas
+já levantadas. Nas lutas de sempre, com os pés a ~175 px, nada muda.
 
 ## A origem do toque no alvo (`test_target_pick`)
 
@@ -22,8 +24,8 @@ nem sempre tem uma habilidade de dois alvos, e aí elas não rodam); as novas ro
 ## As saídas limpas da troca de cena (pendências do #85)
 
 - **O vagão órfão:** a passagem recusada (outra troca em andamento) libera a cena de fundo do cartão.
-- **A cena que não carrega:** `push_error`, o cartão sai e o `GameFlow.busy` solta (`_travel_failed`), em vez de o
-  `instantiate()` quebrar com o `busy` preso.
+- **A cena que não carrega:** `push_error`, o cartão sai, o `GameFlow.busy` solta e o jogo volta ao título
+  (`_travel_failed`), em vez de o `instantiate()` quebrar com o `busy` preso.
 - **O corredor preso:** com outra troca em andamento, o corredor não avança o trecho nem liga o `busy` dele.
 
 ## O aviso do save
@@ -41,7 +43,19 @@ do `Sound`.
 
 - `tests/test_flow_guards.gd` (novo): o vagão recusado, a cena que não carrega e o corredor com a troca em andamento.
 - `tests/test_sound_pool.gd` (novo): o trem tocando e mais dez efeitos curtos; o trem não é cortado.
-- `tests/test_plates_crowd.gd`: a luta cheia também no espaço mínimo, nos textos Normal e Maior.
+- `tests/test_plates_crowd.gd`: a luta cheia também no espaço mínimo, nos textos Normal e Maior, com o ALVO em cada
+  inimigo sem cobrir a vida de ninguém; e a troca de posição no espaço normal sem placa nenhuma pulando.
 - `tests/test_target_pick.gd`: o clique e Enter e o toque, sempre na primeira vez.
 - `tests/test_campaign.gd`, `tests/test_campaign_slots.gd`: o aviso pelo `warning_text()`.
 - `tools/capture_72.gd`: a luta cheia no espaço mínimo, nos dois textos; roda também na `main` de antes.
+
+## QA
+
+- **Rodada 1: REPROVADO.** Uma alta e duas médias:
+  - o `test_sound_pool` falhava em metade das vezes (o clique dura 0,07 s, e o teste esperava um quadro entre eles);
+  - o ALVO desviava das placas na posição de antes de elas subirem e cobria a vida do alvo e do vizinho;
+  - as placas pulavam para cima da cabeça durante uma troca de posição, até nas lutas de espaço normal.
+
+  Correção: os cliques no mesmo quadro (e sem exigir todos os tocadores ocupados, que depende do relógio do áudio); o
+  ALVO lê as placas depois de subirem; o escalonamento pelo lugar de destino. Da baixa: a cena que não carrega volta ao
+  título.
