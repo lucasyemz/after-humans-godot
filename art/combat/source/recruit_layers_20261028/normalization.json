@@ -1,0 +1,44 @@
+{
+  "dog": {
+    "scale": 1.0,
+    "translation": [
+      0,
+      0
+    ]
+  },
+  "cat": {
+    "scale": 1.0031847133757963,
+    "translation": [
+      -4,
+      -2
+    ]
+  },
+  "frog": {
+    "scale": 1.0066006600660067,
+    "translation": [
+      -6,
+      -1
+    ]
+  },
+  "owl": {
+    "scale": 1.0095238095238095,
+    "translation": [
+      -4,
+      -1
+    ]
+  },
+  "raccoon": {
+    "scale": 0.8849557522123894,
+    "translation": [
+      49,
+      34
+    ]
+  },
+  "armadillo": {
+    "scale": 0.8997772828507795,
+    "translation": [
+      17,
+      28
+    ]
+  }
+}
