@@ -1,0 +1,16 @@
+async function readJson(url){const response=await fetch(url);if(!response.ok)throw new Error('Não foi possível carregar '+url);return response.json();}
+export async function loadStory(){
+ const config=await readJson(new URL('../config/default_story.json',import.meta.url));
+ const requested=new URL(location.href).searchParams.get('story')||config.story;
+ const url=new URL(requested,new URL('../',import.meta.url));
+ if(url.origin!==location.origin)throw new Error('A história deve estar no mesmo servidor.');
+ const project=await readJson(url);
+ await Promise.all(Object.values(project.assets).map(async asset=>{
+  if(asset.data)return;
+  const response=await fetch(new URL(asset.path,url));
+  if(!response.ok)throw new Error('Recurso ausente: '+asset.path);
+  asset.data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;response.blob().then(blob=>reader.readAsDataURL(blob),reject);});
+  delete asset.path;
+ }));
+ return project;
+}

@@ -1,0 +1,3385 @@
+{
+  "format": "motion-comic-project",
+  "version": 1,
+  "nextSceneNumber": 9,
+  "name": "After Humans · direção cinematográfica",
+  "selectedId": "6dafc2d4-71cd-445b-a5b3-cda1bee91e6f",
+  "scenes": [
+    {
+      "id": "6dafc2d4-71cd-445b-a5b3-cda1bee91e6f",
+      "sceneNumber": 1,
+      "notes": "",
+      "layerNames": {
+        "theo": "Théo / grupo",
+        "bento": "Bento / grupo",
+        "bg": "Fundo",
+        "full": "Referência (opcional)"
+      },
+      "imagePrompts": {
+        "bg": "Exact same scene, camera, lighting and framing, without characters or crate. Reconstruct hidden wall, floor and background. Keep SETOR B sign, ceiling lamp, vines and pipes. No added text, balloons or borders.",
+        "theo": "Only Théo, same pose, outfit, lighting, gritty style and original dark contrast. Upper body down to knees with nothing cropped, transparent background. Keep flashlight in hand without light cone. No floor shadow, no text.",
+        "bento": "Only Bento with crate, same pose, outfit, lighting and style as full scene, upper body down to knees with nothing cropped, transparent background. Keep PROPRIEDADE DA HUMANIDADE stencil. No floor shadow, no other text.",
+        "full": "Use the comic top-left panel as style and character reference. Single wide cinematic 16:9, dark abandoned industrial facility at night, SETOR B sign, cold caged lamp, pipes, vines, damp concrete and rain mist. Théo blue-merle border collie, pale blue eyes, calm half-smile, worn dark hooded field jacket with triangle patch, red bandana, radio harness and blue device lights, lit flashlight pointed down. Bento black-white border collie, amber eyes, tired serious expression, worn olive jacket, backpack, bandaged forearm, holding crate PROPRIEDADE DA HUMANIDADE. Three-quarter view facing each other, Théo speaking. Gritty painted comic, heavy black outlines, crosshatching, textured brushwork, desaturated blue-gray, warm flashlight, film grain. Generous empty margins, no balloons, captions or borders."
+      },
+      "assetHistory": [],
+      "name": "Setor B · original",
+      "config": {
+        "plates": {
+          "bg": {
+            "position": [
+              0,
+              -0.3,
+              -12
+            ],
+            "height": 15.9,
+            "scale": 1,
+            "visible": true,
+            "uvScale": 1.4,
+            "motionGroup": "",
+            "order": 0
+          },
+          "theo": {
+            "position": [
+              -1.95,
+              -0.65,
+              -4.5
+            ],
+            "height": 5.15,
+            "scale": 1,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0
+          },
+          "bento": {
+            "position": [
+              1.55,
+              -0.8,
+              -3.6
+            ],
+            "height": 5.1,
+            "scale": 1,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0
+          }
+        },
+        "camera": {
+          "fov": 30,
+          "keys": [
+            {
+              "t": 0,
+              "p": [
+                -3.2,
+                0.6,
+                3.5
+              ],
+              "a": [
+                -3.6,
+                0.8,
+                -12
+              ],
+              "cut": false
+            },
+            {
+              "t": 1.2,
+              "p": [
+                -2.8,
+                0.55,
+                3.4
+              ],
+              "a": [
+                -3.2,
+                0.7,
+                -12
+              ],
+              "cut": false
+            },
+            {
+              "t": 3.6,
+              "p": [
+                0,
+                0,
+                6
+              ],
+              "a": [
+                0,
+                0.68,
+                -6
+              ],
+              "cut": false
+            },
+            {
+              "t": 5.8,
+              "p": [
+                1,
+                0.1,
+                4.6
+              ],
+              "a": [
+                1.4,
+                0.68,
+                -4
+              ],
+              "cut": false
+            },
+            {
+              "t": 6.4,
+              "p": [
+                1,
+                0.1,
+                4
+              ],
+              "a": [
+                1.4,
+                0.68,
+                -4
+              ],
+              "cut": true
+            },
+            {
+              "t": 7.5,
+              "p": [
+                1,
+                0.1,
+                4
+              ],
+              "a": [
+                1.4,
+                0.68,
+                -4
+              ],
+              "cut": false
+            }
+          ],
+          "shake": 0.009,
+          "alarmShake": 0.095
+        },
+        "lights": {
+          "ambient": 1.8,
+          "sky": 11913184,
+          "ground": 3158590,
+          "lamp": 11128575,
+          "lampPower": 38,
+          "lampPosition": [
+            -4,
+            4,
+            -2
+          ],
+          "flash": 16765330,
+          "flashPower": 32,
+          "hand": [
+            1.28,
+            2.2,
+            0.15
+          ],
+          "beamLength": 4.5,
+          "alarm": 16719893
+        },
+        "fog": {
+          "color": 2569281,
+          "density": 0.012
+        },
+        "floor": {
+          "y": -2.78,
+          "color": 1515820
+        },
+        "speech": {
+          "start": 2.2,
+          "end": 5.6,
+          "text": "Última caixa. Depois, casa, maninho.",
+          "anchor": [
+            0,
+            5.45,
+            0
+          ],
+          "speaker": "theo",
+          "screen": false,
+          "x": 0.5,
+          "y": 0.2
+        },
+        "particles": {
+          "rainBack": 230,
+          "rainFront": 110,
+          "drips": 24,
+          "dust": 85,
+          "seed": 421
+        },
+        "post": {
+          "bloom": 0.23,
+          "bloomAlarm": 0.65,
+          "threshold": 0.8,
+          "radius": 0.35,
+          "grain": 0.012,
+          "halftone": 0.018,
+          "vignette": 0.28,
+          "cold": 0.12
+        },
+        "timing": {
+          "alarm": 6.4,
+          "shakeEnd": 7,
+          "cutBlack": 7.5,
+          "loopEnd": 8.3,
+          "fadeIn": 0.65
+        },
+        "effects": {
+          "rain": 1,
+          "alarm": true,
+          "flash": true,
+          "floor": true,
+          "boxLift": true,
+          "painted": false,
+          "breath": true,
+          "alarmLabel": true,
+          "alarmGrade": 0.6
+        },
+        "endTitle": "→ Quadro 2",
+        "caption": {
+          "text": "",
+          "start": 0,
+          "end": 8.3,
+          "x": 0.5,
+          "y": 0.88
+        }
+      },
+      "images": {
+        "bg": "original-bg",
+        "theo": "original-theo",
+        "bento": "original-bento",
+        "full": "original-full"
+      },
+      "transition": {
+        "type": "cut",
+        "duration": 0.35
+      }
+    },
+    {
+      "id": "23fd7686-9122-4000-bfc6-3c0edd44bb37",
+      "sceneNumber": 2,
+      "notes": "Alarme vermelho. Théo reage; Bento segura a caixa. Preservar os designs e a iluminação da referência.\n\nPROMPTS DE GERAÇÃO\n{\n  \"full\": \"Recreate ONLY the TOP-RIGHT panel of the attached comic as one wide cinematic 16:9 illustration with generous margins for camera pan. Gritty painted comic art, heavy black ink outlines, crosshatching, textured brushwork, dark strong contrast, desaturated blue-gray with strong red alarm illumination. Abandoned industrial facility at night: wet concrete and metal floor, pipes, vines. Full bodies of TWO anthropomorphic border collies visible, boots through ears with ample empty margins, no cropping. Bento at left: black/white fur, amber eyes, worn olive green jacket, large backpack, white bandaged forearm, holding the heavy metal crate stenciled PROPRIEDADE DA HUMANIDADE. Théo at right: blue-merle gray/white/black/brown patches, pale blue eyes, dark worn hooded field jacket with triangle shoulder patch, red bandana, chest harness with radio antenna and small blue lights, flashlight pointing down-right. Both startled, nearly back to back, Bento looking left and Théo right, matching top-right panel pose and expressions. Wall monitor behind to right has red warning triangle and ONLY words INTRUSOS DETECTADOS. No other signage or text except crate stencil. No balloons, no captions, no borders. Maintain exact reference character designs. This is full composite scene 2.\",\n  \"background\": \"Edit this image into a perfectly matching empty background plate. REMOVE BOTH DOG CHARACTERS, their crate, their flashlight and its light beam, backpacks, every character-associated element. Fill the occluded architecture and wet floor naturally. Keep EXACT camera, framing, dimensions, all existing environment, monitor INTRUSOS DETECTADOS, dark contrast and red lighting. No characters, no silhouettes, no extra text, no borders. Do not redesign the background.\",\n  \"foreground\": \"Extract BOTH dog characters together with the held crate and flashlight as a foreground layer on TRUE TRANSPARENT BACKGROUND. Preserve exactly their pose, position, relative sizes, facial expressions, outfit, dark inked contrast and red edge lighting from this scene. Retain full bodies, ears, tails, boots, backpacks, arms, hands and entire crate, nothing cropped. Keep the same wide canvas and their positions on it for compositing. Remove ALL architecture, floor, monitor, rain, mist, flashlight cone, ground shadows. Do not brighten characters for the transparent background. ONLY text is existing PROPRIEDADE DA HUMANIDADE stencil on crate. No borders.\"\n}\nDireção v2: trilhas, batidas, câmera e atmosfera conforme Texto colado(3). Cena 1 protegida pelo hash de referência.",
+      "layerNames": {
+        "theo": "Théo",
+        "bento": "Bento + caixa",
+        "bg": "Fundo",
+        "full": "Referência (opcional)"
+      },
+      "imagePrompts": {
+        "full": "Recreate ONLY the TOP-RIGHT panel of the attached comic as one wide cinematic 16:9 illustration with generous margins for camera pan. Gritty painted comic art, heavy black ink outlines, crosshatching, textured brushwork, dark strong contrast, desaturated blue-gray with strong red alarm illumination. Abandoned industrial facility at night: wet concrete and metal floor, pipes, vines. Full bodies of TWO anthropomorphic border collies visible, boots through ears with ample empty margins, no cropping. Bento at left: black/white fur, amber eyes, worn olive green jacket, large backpack, white bandaged forearm, holding the heavy metal crate stenciled PROPRIEDADE DA HUMANIDADE. Théo at right: blue-merle gray/white/black/brown patches, pale blue eyes, dark worn hooded field jacket with triangle shoulder patch, red bandana, chest harness with radio antenna and small blue lights, flashlight pointing down-right. Both startled, nearly back to back, Bento looking left and Théo right, matching top-right panel pose and expressions. Wall monitor behind to right has red warning triangle and ONLY words INTRUSOS DETECTADOS. No other signage or text except crate stencil. No balloons, no captions, no borders. Maintain exact reference character designs. This is full composite scene 2.",
+        "bg": "Edit this image into a perfectly matching empty background plate. REMOVE BOTH DOG CHARACTERS, their crate, their flashlight and its light beam, backpacks, every character-associated element. Fill the occluded architecture and wet floor naturally. Keep EXACT camera, framing, dimensions, all existing environment, monitor INTRUSOS DETECTADOS, dark contrast and red lighting. No characters, no silhouettes, no extra text, no borders. Do not redesign the background.",
+        "theo": "Extract ONLY Théo, the blue-merle anthropomorphic border collie on RIGHT of this full scene. True transparent background. Keep EXACT same pixel position, scale and canvas 1672x941; leave empty transparent space everywhere else. Full body, boots ears tail backpack radio harness red bandana and handheld flashlight remain together. Preserve original dark contrast and red edge illumination. Remove Bento, crate, ALL environment, all shadows, and flashlight cone. DO NOT recenter or enlarge the character, match its original bounding rectangle precisely. No text.",
+        "bento": "Extract ONLY BENTO, the black and white anthropomorphic border collie at LEFT, WITH metal crate PROPRIEDADE DA HUMANIDADE in his hands. True transparent background. Keep EXACT same pixel position, scale, pose and wide canvas 1672x941, leave transparent empty margins elsewhere. Full body with ears tail boots backpack bandages and entire crate remain. Preserve original dark contrast and red rim illumination, do not brighten. Remove Théo and ALL environment, floor, shadows, mist, flashlight cone. DO NOT enlarge or recenter Bento. Match original bounding rectangle. No text except crate stencil."
+      },
+      "assetHistory": [],
+      "name": "Alarme",
+      "config": {
+        "plates": {
+          "bg": {
+            "position": [
+              0,
+              0,
+              -12
+            ],
+            "height": 9.646170927520417,
+            "scale": 1.22,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.54,
+                "v": 0.06,
+                "size": 0.45,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.534,
+                "v": 0.3,
+                "size": 0.4,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.83,
+                "v": 0.25,
+                "size": 1.25,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              }
+            ]
+          },
+          "theo": {
+            "position": [
+              0.1,
+              0,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 1.04,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 2,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 0.05,
+                "ease": "linear"
+              },
+              {
+                "t": 0.25,
+                "dy": 0.06,
+                "ease": "outExpo"
+              },
+              {
+                "t": 0.45,
+                "ease": "inOutCubic"
+              }
+            ],
+            "bob": {
+              "mode": "breath",
+              "amp": 0.006,
+              "freq": 1.6,
+              "phase": 0,
+              "roll": 0.1,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": []
+          },
+          "bento": {
+            "position": [
+              -0.1,
+              0,
+              -5
+            ],
+            "height": 5.894882233484699,
+            "scale": 0.95,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 3,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 0.05,
+                "ease": "linear"
+              },
+              {
+                "t": 0.25,
+                "dy": 0.06,
+                "ease": "outExpo"
+              },
+              {
+                "t": 0.45,
+                "ease": "inOutCubic"
+              }
+            ],
+            "bob": {
+              "mode": "breath",
+              "amp": 0.006,
+              "freq": 1.6,
+              "phase": 0,
+              "roll": 0.1,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": []
+          }
+        },
+        "camera": {
+          "fov": 30,
+          "keys": [
+            {
+              "t": 0,
+              "p": [
+                0,
+                0.3,
+                7.2
+              ],
+              "a": [
+                0,
+                0.18,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            },
+            {
+              "t": 0.35,
+              "p": [
+                0,
+                0.1,
+                5.6
+              ],
+              "a": [
+                0,
+                0.06,
+                -8
+              ],
+              "ease": "outExpo",
+              "cut": false
+            },
+            {
+              "t": 4.5,
+              "p": [
+                0.35,
+                0.05,
+                5
+              ],
+              "a": [
+                0.22749999999999998,
+                0.03,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            }
+          ],
+          "shake": 0.006,
+          "alarmShake": 0,
+          "roll": 0
+        },
+        "lights": {
+          "ambient": 1.8,
+          "sky": 11913184,
+          "ground": 3158590,
+          "lamp": 11128575,
+          "lampPower": 38,
+          "lampPosition": [
+            -4,
+            4,
+            -2
+          ],
+          "flash": 16765330,
+          "flashPower": 36,
+          "hand": [
+            1.287377129128629,
+            2.84240503330935,
+            0.15
+          ],
+          "beamLength": 4.5,
+          "alarm": 16719893,
+          "flashPlate": "theo",
+          "flashAngle": [
+            0.6,
+            -0.7,
+            0.15
+          ],
+          "flashSwing": 0.07,
+          "flashOnFloor": false,
+          "flashTurn": -0.22
+        },
+        "fog": {
+          "color": 2497317,
+          "density": 0.009
+        },
+        "floor": {
+          "y": -2.78,
+          "color": 1515820
+        },
+        "speech": {
+          "start": 0.5,
+          "end": 2.6,
+          "text": "Ferrou!",
+          "anchor": [
+            0,
+            4.7,
+            0
+          ],
+          "speaker": "bento",
+          "screen": false,
+          "x": 0.51,
+          "y": 0.085,
+          "anchorUV": [
+            0.43,
+            0.055
+          ],
+          "mouthUV": [
+            0.31,
+            0.19
+          ]
+        },
+        "particles": {
+          "rainBack": 230,
+          "rainFront": 110,
+          "drips": 24,
+          "dust": 85,
+          "seed": 421,
+          "rainAngle": 0.16,
+          "rainSpeed": 1,
+          "splashFloorY": -2.35,
+          "mist": 0.055,
+          "sparks": 0
+        },
+        "post": {
+          "bloom": 0.22,
+          "bloomAlarm": 0.45,
+          "threshold": 0.8,
+          "radius": 0.35,
+          "grain": 0.012,
+          "halftone": 0.018,
+          "vignette": 0.26,
+          "cold": 0.1,
+          "saturation": 0.85,
+          "redClamp": 0.35
+        },
+        "timing": {
+          "alarm": 0,
+          "shakeEnd": 0,
+          "cutBlack": 4.5,
+          "loopEnd": 4.5,
+          "fadeIn": 0
+        },
+        "effects": {
+          "rain": 0.9,
+          "alarm": true,
+          "flash": true,
+          "floor": false,
+          "boxLift": false,
+          "painted": true,
+          "breath": true,
+          "alarmLabel": false,
+          "alarmGrade": 0
+        },
+        "endTitle": "",
+        "caption": {
+          "text": "",
+          "start": 1.7,
+          "end": 4.5,
+          "x": 0.5,
+          "y": 0.88,
+          "type": false,
+          "rate": 15
+        },
+        "motionVersion": 2,
+        "transitionIn": {
+          "type": "flash",
+          "color": "#ff2015",
+          "dur": 0.15
+        },
+        "transitionOut": {
+          "type": "cut"
+        },
+        "beats": [
+          {
+            "type": "strobe",
+            "t": 0,
+            "from": 0,
+            "to": 4.5,
+            "color": "#ff2015",
+            "rate": 1.2,
+            "amount": 0.32,
+            "decay": false
+          },
+          {
+            "t": 0.05,
+            "type": "shake",
+            "amount": 0.06,
+            "dur": 0.4
+          }
+        ],
+        "motionGroups": {}
+      },
+      "images": {
+        "bg": "16a902ce-dd74-414b-95e0-e541c6c679f7",
+        "theo": "7a8cf852-2bca-4085-aadb-7a5d4f7430dc",
+        "bento": "12e2c007-98e0-4e61-81b9-bbc5d8ca5056",
+        "full": "b852e0d0-6375-44ed-9941-f80608476f91"
+      },
+      "transition": {
+        "type": "cut",
+        "duration": 0.35
+      }
+    },
+    {
+      "id": "0f39c223-200f-4ea4-b1a0-3a7130fc8530",
+      "sceneNumber": 3,
+      "notes": "Théo e Bento fogem pelo corredor, robôs atrás. Robôs podem integrar o fundo; protagonistas em camadas transparentes.\n\nPROMPTS DE GERAÇÃO\n{\n  \"full\": \"Recreate ONLY SECOND ROW LEFT panel of comic as one cinematic wide 16:9 illustration, full bodies with ample margins for camera animation, nothing cut off. Two anthropomorphic border collies RUNNING TOWARD CAMERA escaping along wet grated industrial corridor, looming black security robots with red eye lights pursuing at mid-background, same perspective/composition/action as original panel. Bento left: black and white fur, amber eyes, olive green worn field jacket, large backpack, bandaged forearm, carrying metal crate with stencil PROPRIEDADE DA HUMANIDADE; looks worried toward Théo on right. Théo right: blue merle gray/white/black/brown dog, pale blue eyes, dark hooded worn jacket, triangle shoulder insignia, red bandana, harness with blue glowing small devices and radio antenna, holding lit flashlight directed diagonally down-right, running determined. Boots and ears entirely visible, distinct plausible running leg anatomy. Gritty painted comic, heavy black outlines, crosshatching, textured brushwork, deep black shadows, desaturated blue-gray, red alarms and reflections, dim warm flashlight. Abandoned pipes, vines, rain mist, damp concrete and metal. No speech balloons, no borders, no captions, no text except crate stencil. Match the original attached character designs exactly. This is scene 3 full composite.\",\n  \"background\": \"Edit this full scene into a matching BACKGROUND PLATE: REMOVE ONLY THE TWO FOREGROUND DOGS, crate, backpacks, flashlight and flashlight beam and splashes directly associated with their feet. Fill their occluded regions with plausible continuous wet industrial corridor. KEEP pursuing robots in background exactly as is, all red lights, wet floor, rails, vines, pipes, camera, perspective, framing, dimensions, palette and dark contrast. No new characters or writing. No captions, no balloons, no borders. The scene must be compositable with the original foreground dogs.\",\n  \"foreground\": \"Extract ONLY TWO FOREGROUND RUNNING DOGS with held crate and flashlight as one foreground group layer on true transparent background. Preserve EXACT original pose, facial expression, running anatomy, dark contrast, red edge lighting, clothing, proportions and positions on SAME wide canvas. Do not crop ears, tails, boots or any equipment. No robot, no environment, no floor, no shadow, no splash, no flashlight light cone, no mist. Keep small blue lights on harness and existing crate stencil PROPRIEDADE DA HUMANIDADE. Otherwise no text. The dogs should precisely match the input so this layer composites over its empty plate.\"\n}\nDireção v2: trilhas, batidas, câmera e atmosfera conforme Texto colado(3). Cena 1 protegida pelo hash de referência.",
+      "layerNames": {
+        "theo": "Théo",
+        "bento": "Bento + caixa",
+        "bg": "Fundo",
+        "full": "Referência (opcional)",
+        "robots": "Robôs",
+        "hands": "Braços · alternativa oculta"
+      },
+      "imagePrompts": {
+        "full": "Recreate ONLY SECOND ROW LEFT panel of comic as one cinematic wide 16:9 illustration, full bodies with ample margins for camera animation, nothing cut off. Two anthropomorphic border collies RUNNING TOWARD CAMERA escaping along wet grated industrial corridor, looming black security robots with red eye lights pursuing at mid-background, same perspective/composition/action as original panel. Bento left: black and white fur, amber eyes, olive green worn field jacket, large backpack, bandaged forearm, carrying metal crate with stencil PROPRIEDADE DA HUMANIDADE; looks worried toward Théo on right. Théo right: blue merle gray/white/black/brown dog, pale blue eyes, dark hooded worn jacket, triangle shoulder insignia, red bandana, harness with blue glowing small devices and radio antenna, holding lit flashlight directed diagonally down-right, running determined. Boots and ears entirely visible, distinct plausible running leg anatomy. Gritty painted comic, heavy black outlines, crosshatching, textured brushwork, deep black shadows, desaturated blue-gray, red alarms and reflections, dim warm flashlight. Abandoned pipes, vines, rain mist, damp concrete and metal. No speech balloons, no borders, no captions, no text except crate stencil. Match the original attached character designs exactly. This is scene 3 full composite.",
+        "bg": "Create a completely empty environmental background plate from this image: remove ALL ROBOTS without exception, no characters or creatures anywhere. Keep EXACT camera, 1672x941 canvas, perspective, red/cold lighting, architecture, wet floor and walkway railings. Inpaint behind robots with continuation of long abandoned industrial corridor. Keep railings/floor intact as part of background. No text, no new objects. Preserve all other environmental details and dark inked comic contrast.",
+        "theo": "Extract ONLY Théo, the blue-merle anthropomorphic border collie running at RIGHT in this image, as a TRUE transparent layer. EXACT same pose, pixel position and scale on the SAME 1672x941 canvas, do not enlarge or recenter. Preserve red bandana, blue eyes, harness, blue device lights, entire boots/tail/ears/backpack and flashlight held in hand. No flashlight cone or floor shadows or splashes. Remove Bento, crate, all robots and ALL background. Preserve dark source contrast and red edge illumination without brightening. No text.",
+        "bento": "Extract ONLY Bento, the black-and-white anthropomorphic border collie running at LEFT in this image WITH held metal crate stenciled PROPRIEDADE DA HUMANIDADE. True transparent background. Preserve EXACT running pose, original position and original scale on SAME 1672x941 wide canvas, do not recenter/enlarge. Entire ears, tail, boots, backpack, bandaged arms and crate visible. Keep dark original ink contrast and red rim illumination, don't brighten. Remove Théo, robots, architecture, floor, ALL background, splashes and shadows. No text except existing crate stencil.",
+        "robots": "Extract ONLY the pursuing BLACK SECURITY ROBOTS as one isolated group layer on TRUE transparent background. Preserve their EXACT positions and relative scale on this SAME wide 1672x941 canvas, no enlarging or recentering. Complete any occluded robot body naturally consistent with perspective. Keep dark metal, red eyes, red small lights and original dark contrast; do not brighten. REMOVE ALL corridor, rails, pipes, vines, floor, mist, splashes, shadows and architecture. No dogs. Only robots visible on transparency; no text or extra props. Maintain original group silhouette and depth arrangement."
+      },
+      "assetHistory": [],
+      "name": "Fuga",
+      "config": {
+        "plates": {
+          "bg": {
+            "position": [
+              0,
+              0,
+              -12
+            ],
+            "height": 9.646170927520417,
+            "scale": 1.22,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.27,
+                "v": 0.22,
+                "size": 0.35,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.77,
+                "v": 0.18,
+                "size": 0.35,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.85,
+                "v": 0.04,
+                "size": 0.4,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              }
+            ]
+          },
+          "theo": {
+            "position": [
+              0.19054164795102077,
+              -0.267949192431123,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 0.8,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 2,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 4.4,
+                "dz": 0.352,
+                "ease": "linear"
+              },
+              {
+                "t": 4.7,
+                "dz": 0.376,
+                "rot": 15,
+                "dy": -0.15,
+                "ease": "inOutCubic"
+              },
+              {
+                "t": 5,
+                "dz": 0.4,
+                "rot": 15,
+                "dy": -0.15,
+                "ease": "linear"
+              }
+            ],
+            "bob": {
+              "mode": "step",
+              "amp": 0.06,
+              "freq": 2.6,
+              "phase": 0.5,
+              "roll": 1.5,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": []
+          },
+          "bento": {
+            "position": [
+              -0.2095958127461228,
+              0,
+              -5
+            ],
+            "height": 5.894882233484699,
+            "scale": 0.86,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 3,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 4.4,
+                "dz": 0.352,
+                "ease": "linear"
+              },
+              {
+                "t": 4.7,
+                "dz": 0.376,
+                "ease": "inOutCubic"
+              },
+              {
+                "t": 5,
+                "dz": 0.4,
+                "ease": "linear"
+              }
+            ],
+            "bob": {
+              "mode": "step",
+              "amp": 0.06,
+              "freq": 2.6,
+              "phase": 0,
+              "roll": 1.5,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": []
+          },
+          "robots": {
+            "position": [
+              1.2861561236693886,
+              0.16076951545867377,
+              -9
+            ],
+            "height": 8.038475772933682,
+            "scale": 0.53,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 1,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 5,
+                "dz": 1.4,
+                "ease": "linear"
+              }
+            ],
+            "bob": {
+              "mode": "step",
+              "amp": 0.025,
+              "freq": 1.3,
+              "phase": 0,
+              "roll": 1.5,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.15,
+                "v": 0.3,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              },
+              {
+                "u": 0.44,
+                "v": 0.16,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              },
+              {
+                "u": 0.607,
+                "v": 0.32,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              },
+              {
+                "u": 0.89,
+                "v": 0.24,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              }
+            ]
+          }
+        },
+        "camera": {
+          "fov": 30,
+          "keys": [
+            {
+              "t": 0,
+              "p": [
+                0.1,
+                0.05,
+                5.2
+              ],
+              "a": [
+                0.065,
+                0.03,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            },
+            {
+              "t": 5,
+              "p": [
+                -0.05,
+                0,
+                6
+              ],
+              "a": [
+                -0.0325,
+                0,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            }
+          ],
+          "shake": 0.012,
+          "alarmShake": 0,
+          "roll": 2
+        },
+        "lights": {
+          "ambient": 1.8,
+          "sky": 11913184,
+          "ground": 3158590,
+          "lamp": 11128575,
+          "lampPower": 38,
+          "lampPosition": [
+            -4,
+            4,
+            -2
+          ],
+          "flash": 16765330,
+          "flashPower": 36,
+          "hand": [
+            1.889168804875148,
+            2.315081022604901,
+            0.15
+          ],
+          "beamLength": 4.5,
+          "alarm": 16719893,
+          "flashPlate": "theo",
+          "flashAngle": [
+            0.6,
+            -0.7,
+            0.15
+          ],
+          "flashSwing": 0.14,
+          "flashOnFloor": false,
+          "flashTurn": 0
+        },
+        "fog": {
+          "color": 2497317,
+          "density": 0.009
+        },
+        "floor": {
+          "y": -2.78,
+          "color": 1515820
+        },
+        "speech": {
+          "start": 0.35,
+          "end": 3.75,
+          "text": "",
+          "anchor": [
+            0,
+            4.7,
+            0
+          ],
+          "speaker": "theo",
+          "screen": false,
+          "x": 0.55,
+          "y": 0.19
+        },
+        "particles": {
+          "rainBack": 230,
+          "rainFront": 110,
+          "drips": 24,
+          "dust": 85,
+          "seed": 421,
+          "rainAngle": 0.16,
+          "rainSpeed": 1,
+          "splashFloorY": -2.35,
+          "mist": 0.055,
+          "sparks": 0
+        },
+        "post": {
+          "bloom": 0.22,
+          "bloomAlarm": 0.45,
+          "threshold": 0.8,
+          "radius": 0.35,
+          "grain": 0.012,
+          "halftone": 0.018,
+          "vignette": 0.26,
+          "cold": 0.1,
+          "saturation": 0.85,
+          "redClamp": 0.35
+        },
+        "timing": {
+          "alarm": 0,
+          "shakeEnd": 0,
+          "cutBlack": 5,
+          "loopEnd": 5,
+          "fadeIn": 0
+        },
+        "effects": {
+          "rain": 1,
+          "alarm": true,
+          "flash": true,
+          "floor": false,
+          "boxLift": false,
+          "painted": true,
+          "breath": true,
+          "alarmLabel": false,
+          "alarmGrade": 0
+        },
+        "endTitle": "",
+        "caption": {
+          "text": "",
+          "start": 1.7,
+          "end": 5,
+          "x": 0.5,
+          "y": 0.88,
+          "type": false,
+          "rate": 15
+        },
+        "motionVersion": 2,
+        "transitionIn": {
+          "type": "cut"
+        },
+        "transitionOut": {
+          "type": "cut"
+        },
+        "beats": [
+          {
+            "type": "strobe",
+            "t": 0,
+            "from": 0,
+            "to": 5,
+            "color": "#ff2015",
+            "rate": 1.2,
+            "amount": 0.32,
+            "decay": false
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 0.15,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 0.3,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 0.5346153846153846,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 0.6846153846153846,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 0.9192307692307692,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 1.0692307692307692,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 1.3038461538461537,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 1.4538461538461536,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 1.6884615384615382,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 1.8384615384615381,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 2.073076923076923,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 2.2230769230769227,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 2.4576923076923074,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 2.6076923076923073,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 2.842307692307692,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 2.992307692307692,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 3.2269230769230766,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 3.3769230769230765,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 3.611538461538461,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 3.761538461538461,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 3.9961538461538457,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 4.146153846153846,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 4.38076923076923,
+            "uv": [
+              0.66,
+              0.88
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 4.530769230769231,
+            "uv": [
+              0.35,
+              0.9
+            ],
+            "count": 24
+          },
+          {
+            "type": "flash",
+            "t": 4.75,
+            "dur": 0.12,
+            "color": "#fff"
+          }
+        ],
+        "motionGroups": {}
+      },
+      "images": {
+        "bg": "dcc2786e-509d-4b8f-88c8-022670159725",
+        "theo": "23f4ee3a-8225-4cc3-8794-8625cbeb702d",
+        "full": "6c6a2bab-1666-4e27-8e84-0c3e1f60aab6",
+        "bento": "a3a76afe-0e27-42d9-b279-829de078814e",
+        "robots": "1dc65c7d-d091-4ed1-bf6a-c0bbcd6a821f"
+      },
+      "transition": {
+        "type": "cut",
+        "duration": 0.35
+      }
+    },
+    {
+      "id": "440d5f78-63ca-4dd2-bd8a-fdf6e52357da",
+      "sceneNumber": 4,
+      "notes": "Théo cai no chão; Bento olha para trás. Plano baixo, lanterna caída. Sem acrescentar falas.\n\nPROMPTS DE GERAÇÃO\n A queda de Théo\nFull libfile_6d5f5f9d37ec8191adf56a943d00d863 exec-0944bd6c-869f-4b0b-aa2f-90305021970a.png\nBG libfile_4341d47396588191a61cd4d41cab7609 exec-f03ee042-32fe-4cf4-a4d1-a47f5c438344.png\nTheo libfile_0189e2545500819192a95a11b7c5fb5f exec-9603651b-68ee-4db5-9959-44a43db87af9.png\nBento libfile_509e9546f4e08191b77999ce206c2778 exec-55cf2d01-3c8f-4698-a305-269558df6067.png\nScene prompt: Wide low-camera 16:9 abandoned wet industrial corridor, cold desaturated ink-painted comic with red alarm reflections. Blue-merle Theo prone reaching lit flashlight, Bento black-white border collie olive jacket backpack holding humanity crate farther back right looking behind, distant robots approaching. Intact anatomy. No balloons captions borders SFX.\nBG prompt: Remove both dogs, crate, flashlight and splashes; reconstruct hidden wet grating railings walls; retain distant robots. Same exact composition.\nTheo layer prompt: Only prone Theo and flashlight, same outfit/pose/dark contrast, transparent background without cone, floor shadow or splashes, complete silhouette.\nBento layer prompt: Only Bento+crate in exact running looking-back pose, same contrast/clothes/backpack, intact full silhouette, transparent no environment or floor shadow.\n\nDireção v2: trilhas, batidas, câmera e atmosfera conforme Texto colado(3). Cena 1 protegida pelo hash de referência.",
+      "layerNames": {
+        "theo": "Théo",
+        "bento": "Bento + caixa",
+        "bg": "Fundo",
+        "robots": "Robôs perseguidores",
+        "full": "Referência (opcional)"
+      },
+      "imagePrompts": {
+        "bg": "Remove EVERY robot from previous background; reconstruct empty corridor floor railings walls. Preserve exact composition dark contrast cold ambient and red alarms. No characters anywhere.",
+        "theo": "Only prone Theo and flashlight, same outfit/pose/dark contrast, transparent background without cone, floor shadow or splashes, complete silhouette.",
+        "bento": "Only Bento+crate in exact running looking-back pose, same contrast/clothes/backpack, intact full silhouette, transparent no environment or floor shadow.",
+        "robots": "Isolate only distant advancing robot group from full, reconstruct obscured feet, same painted metal red lamps. No dogs crate flashlight or environment. Transparent no shadows. Keep original distant scale and coordinates.",
+        "full": "Wide low-camera 16:9 abandoned wet industrial corridor, cold desaturated ink-painted comic with red alarm reflections. Blue-merle Theo prone reaching lit flashlight, Bento black-white border collie olive jacket backpack holding humanity crate farther back right looking behind, distant robots approaching. Intact anatomy. No balloons captions borders SFX."
+      },
+      "assetHistory": [],
+      "name": "A queda",
+      "config": {
+        "plates": {
+          "bg": {
+            "position": [
+              0,
+              0,
+              -12
+            ],
+            "height": 9.646170927520417,
+            "scale": 1.22,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.947,
+                "v": 0.03,
+                "size": 0.35,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.64,
+                "v": 0.18,
+                "size": 0.35,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              }
+            ]
+          },
+          "theo": {
+            "position": [
+              -0.4287187078897963,
+              -0.3349364905389034,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 0.75,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 2,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 0.5,
+                "dx": 0.6,
+                "ease": "outExpo"
+              }
+            ],
+            "bob": null,
+            "localTrack": [],
+            "glows": []
+          },
+          "bento": {
+            "position": [
+              1.3099738296632664,
+              0.7958091015204344,
+              -5
+            ],
+            "height": 5.894882233484699,
+            "scale": 0.59,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 3,
+            "light": 0.35,
+            "track": [],
+            "bob": {
+              "mode": "step",
+              "amp": 0.045,
+              "freq": 2.6,
+              "phase": 0,
+              "roll": 1.5,
+              "from": 0,
+              "to": 1.5,
+              "decay": true
+            },
+            "localTrack": [],
+            "glows": [],
+            "bobAfter": {
+              "mode": "breath",
+              "amp": 0.006,
+              "freq": 1.6,
+              "phase": 0,
+              "roll": 0.1,
+              "from": 1.5,
+              "to": 20
+            }
+          },
+          "robots": {
+            "position": [
+              0.14290623596326546,
+              1.4469256391280627,
+              -9
+            ],
+            "height": 8.038475772933682,
+            "scale": 0.7,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 1,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 5,
+                "dz": 1.2,
+                "ease": "linear"
+              }
+            ],
+            "bob": {
+              "mode": "step",
+              "amp": 0.025,
+              "freq": 1.3,
+              "phase": 0,
+              "roll": 1.5,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.506,
+                "v": 0.36,
+                "color": 16718092,
+                "size": 0.18,
+                "pulse": 0.22,
+                "flicker": 0.12
+              },
+              {
+                "u": 0.61,
+                "v": 0.43,
+                "color": 16718092,
+                "size": 0.14,
+                "pulse": 0.22,
+                "flicker": 0.12
+              }
+            ]
+          }
+        },
+        "camera": {
+          "fov": 30,
+          "keys": [
+            {
+              "t": 0,
+              "p": [
+                0,
+                -0.3,
+                6.2
+              ],
+              "a": [
+                0,
+                -0.18,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            },
+            {
+              "t": 5,
+              "p": [
+                -0.3,
+                -0.35,
+                5.2
+              ],
+              "a": [
+                -0.195,
+                -0.21,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            }
+          ],
+          "shake": 0.006,
+          "alarmShake": 0,
+          "roll": 0
+        },
+        "lights": {
+          "ambient": 1.8,
+          "sky": 11913184,
+          "ground": 3158590,
+          "lamp": 11128575,
+          "lampPower": 38,
+          "lampPosition": [
+            -4,
+            4,
+            -2
+          ],
+          "flash": 16765330,
+          "flashPower": 36,
+          "hand": [
+            3.199398782449846,
+            0.7797321499745669,
+            0.15
+          ],
+          "beamLength": 4.5,
+          "alarm": 16719893,
+          "flashPlate": "theo",
+          "flashAngle": [
+            0.6,
+            -0.7,
+            0.15
+          ],
+          "flashSwing": 0.07,
+          "flashOnFloor": true,
+          "flashTurn": 0
+        },
+        "fog": {
+          "color": 2497317,
+          "density": 0.009
+        },
+        "floor": {
+          "y": -2.78,
+          "color": 1515820
+        },
+        "speech": {
+          "start": 0.35,
+          "end": 2.75,
+          "text": "",
+          "anchor": [
+            0,
+            4.7,
+            0
+          ],
+          "speaker": "theo",
+          "screen": false,
+          "x": 0.55,
+          "y": 0.19
+        },
+        "particles": {
+          "rainBack": 230,
+          "rainFront": 110,
+          "drips": 24,
+          "dust": 85,
+          "seed": 421,
+          "rainAngle": 0.16,
+          "rainSpeed": 1,
+          "splashFloorY": -2.35,
+          "mist": 0.055,
+          "sparks": 12
+        },
+        "post": {
+          "bloom": 0.22,
+          "bloomAlarm": 0.45,
+          "threshold": 0.8,
+          "radius": 0.35,
+          "grain": 0.012,
+          "halftone": 0.018,
+          "vignette": 0.26,
+          "cold": 0.1,
+          "saturation": 0.85,
+          "redClamp": 0.35
+        },
+        "timing": {
+          "alarm": 0,
+          "shakeEnd": 0,
+          "cutBlack": 5,
+          "loopEnd": 5,
+          "fadeIn": 0
+        },
+        "effects": {
+          "rain": 0.9,
+          "alarm": true,
+          "flash": true,
+          "floor": false,
+          "boxLift": false,
+          "painted": true,
+          "breath": true,
+          "alarmLabel": false,
+          "alarmGrade": 0
+        },
+        "endTitle": "",
+        "caption": {
+          "text": "",
+          "start": 1.7,
+          "end": 5,
+          "x": 0.5,
+          "y": 0.88,
+          "type": false,
+          "rate": 15
+        },
+        "motionVersion": 2,
+        "transitionIn": {
+          "type": "flash",
+          "color": "#fff",
+          "dur": 0.2
+        },
+        "transitionOut": {
+          "type": "cut"
+        },
+        "beats": [
+          {
+            "type": "strobe",
+            "t": 0,
+            "from": 0,
+            "to": 5,
+            "color": "#ff2015",
+            "rate": 1.2,
+            "amount": 0.32,
+            "decay": false
+          },
+          {
+            "type": "sfx",
+            "t": 0,
+            "text": "CRÁS!",
+            "x": 0.18,
+            "y": 0.78,
+            "size": 100,
+            "rot": -8,
+            "dur": 1.4
+          },
+          {
+            "type": "shake",
+            "t": 0,
+            "amount": 0.08,
+            "dur": 0.35
+          },
+          {
+            "type": "punch",
+            "t": 0,
+            "zoom": 0.04,
+            "dur": 0.4
+          },
+          {
+            "type": "splash",
+            "plate": "theo",
+            "t": 0,
+            "uv": [
+              0.57,
+              0.87
+            ],
+            "count": 100
+          }
+        ],
+        "motionGroups": {}
+      },
+      "images": {
+        "bg": "ea1c9c6f-fd58-4e84-9569-569e295745bb",
+        "theo": "47eca4fd-bb2a-4411-948d-125c8ab2c679",
+        "bento": "8f1cb72e-e849-4c16-911e-23cf1ed02076",
+        "robots": "19d23c31-ef13-4ea9-a11e-00b402360d74",
+        "full": "17cff195-dccf-45fb-941e-c29357c5e93c"
+      },
+      "transition": {
+        "type": "cut",
+        "duration": 0.35
+      }
+    },
+    {
+      "id": "55b06d28-06db-4952-8d2c-480a744e2ad5",
+      "sceneNumber": 5,
+      "notes": "Robôs agarram Théo em primeiro plano; Bento estende a mão. Théo e robôs devem permanecer uma camada composta para preservar contato e oclusão.\n\nPROMPTS DE GERAÇÃO\n A captura\nFull libfile_1375519d93f48191845bc2a3d2dbc920 exec-7853a280-5849-4a86-bc56-95b9f3abcb4f.png\nBG libfile_2d62623663e4819196161309b07759c9 exec-e3bd5d6c-1a6d-4d01-ad6e-4711d3b7e954.png\nCapture group libfile_8fba5262e2cc81918ad1e7e491eaa233 exec-3a5b5711-30cc-409a-97d7-8168b8b51a12.png\nBento libfile_0c4122874af08191949f1254c07c514f exec-e064693c-2ac1-4c9e-bc55-f6bf30ecc733.png\nScene prompt: Wide cinematic 16:9 wet industrial corridor, two black industrial robots red rectangular lamps physically grasp blue-merle Theo shoulders/arms as he lies prone foreground. Bento farther right extends free hand holding crate with other arm. Gritty heavy ink outlines crosshatching high dark contrast cold light/red alarm. Whole connected anatomy. No balloons captions borders SFX. Crate text PROPRIEDADE DA HUMANIDADE only.\nBG prompt: Remove all characters including both robots, Theo, Bento and crate; restore hidden floor walls pipes railings, exact framing and lighting.\nGroup prompt: Transparent coherent single group of both robots holding Theo; exact physical grip/pose, red lamps and blue device lights, same dark contrast. No environment, splashes or floor shadow. Entire silhouette intact.\nBento prompt: Transparent only Bento+crate reaching hand pose, same outfit and exact contrast; full legs boots tail intact, no environment or shadow.\nAll filenames reside in /workspace/scratch/76e5bf9db73e/generated_images/.\n\nCorreção V3: robôs e Théo no mesmo canvas, x/y/escala/pivô idênticos; robôs atrás, mãos anteriores ocultas. Prompt: libfile_fdb1252d477c8191aab36ee3fc6b1f8e.\nDireção v2: trilhas, batidas, câmera e atmosfera conforme Texto colado(3). Cena 1 protegida pelo hash de referência.",
+      "layerNames": {
+        "theo": "Théo · captura",
+        "bento": "Bento + caixa (fundo)",
+        "bg": "Fundo",
+        "robots": "Robôs · captura",
+        "hands": "Mãos · contato a revisar",
+        "full": "Referência (opcional)"
+      },
+      "imagePrompts": {
+        "bg": "Remove all characters including both robots, Theo, Bento and crate; restore hidden floor walls pipes railings, exact framing and lighting.",
+        "theo": "Extract only prone Theo, remove robots entirely including hands; reconstruct shoulders back sleeves where occluded. Preserve prone pose clothing merle fur face red bandana dark contrast, complete connected body boots. Transparent without environment shadows splashes.",
+        "bento": "Transparent only Bento+crate reaching hand pose, same outfit and exact contrast; full legs boots tail intact, no environment or shadow.",
+        "robots": "Using unchanged transparent Theo as precise layout guide and full capture scene as style reference, generate only two black security robots kneeling behind Theo back. Same 1672x941 canvas. Hands reach behind backpack near x590 y490 and x850 y450, never right of x1000 or across face. All arms physically connected. Dark painted industrial armor red face lamps heavy ink. No dog, environment, floor, shadow, text. Large transparent right/bottom region. Compose behind unchanged Theo to hide hands at backpack grip.",
+        "hands": "Only four forearms and hands of robot layer, cut at elbows, remaining pixels transparent. Keep same scale/coordinates orientation dark metal and red rim. Overlay for contact in front of dog.",
+        "full": "Wide cinematic 16:9 wet industrial corridor, two black industrial robots red rectangular lamps physically grasp blue-merle Theo shoulders/arms as he lies prone foreground. Bento farther right extends free hand holding crate with other arm. Gritty heavy ink outlines crosshatching high dark contrast cold light/red alarm. Whole connected anatomy. No balloons captions borders SFX. Crate text PROPRIEDADE DA HUMANIDADE only."
+      },
+      "assetHistory": [],
+      "name": "Captura",
+      "config": {
+        "plates": {
+          "bg": {
+            "position": [
+              0,
+              0,
+              -12
+            ],
+            "height": 9.646170927520417,
+            "scale": 1.22,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.305,
+                "v": 0.1,
+                "size": 0.4,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.94,
+                "v": 0.12,
+                "size": 0.4,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              }
+            ]
+          },
+          "theo": {
+            "position": [
+              -1.7625102435469406,
+              -0.495706005997577,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 0.75,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "captura",
+            "order": 2,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": []
+          },
+          "bento": {
+            "position": [
+              1.854922942803185,
+              0.17684646700454096,
+              -5
+            ],
+            "height": 5.894882233484699,
+            "scale": 0.56,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 3,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 2,
+                "dz": 0.15,
+                "ease": "inOutCubic"
+              }
+            ],
+            "bob": {
+              "mode": "breath",
+              "amp": 0.006,
+              "freq": 1.6,
+              "phase": 0,
+              "roll": 0.1,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": []
+          },
+          "robots": {
+            "position": [
+              -1.7625102435469406,
+              -0.495706005997577,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 0.75,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "captura",
+            "order": 1,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [
+              {
+                "t": 0,
+                "dy": 0.35,
+                "dz": -0.4,
+                "ease": "linear"
+              },
+              {
+                "t": 0.6,
+                "ease": "outBack"
+              }
+            ],
+            "glows": [
+              {
+                "u": 0.348,
+                "v": 0.213,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              },
+              {
+                "u": 0.563,
+                "v": 0.27,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              }
+            ]
+          },
+          "hands": {
+            "position": [
+              -1.0479790637306134,
+              0.32153903091734726,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 0.82,
+            "visible": false,
+            "uvScale": 1,
+            "motionGroup": "captura",
+            "order": 4,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": []
+          }
+        },
+        "camera": {
+          "fov": 30,
+          "keys": [
+            {
+              "t": 0,
+              "p": [
+                0,
+                0,
+                6.2
+              ],
+              "a": [
+                0,
+                0,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            },
+            {
+              "t": 5,
+              "p": [
+                -0.6,
+                -0.1,
+                5
+              ],
+              "a": [
+                -0.39,
+                -0.06,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            }
+          ],
+          "shake": 0.006,
+          "alarmShake": 0,
+          "roll": 0
+        },
+        "lights": {
+          "ambient": 1.8,
+          "sky": 11913184,
+          "ground": 3158590,
+          "lamp": 11128575,
+          "lampPower": 38,
+          "lampPosition": [
+            -4,
+            4,
+            -2
+          ],
+          "flash": 16765330,
+          "flashPower": 36,
+          "hand": [
+            1.28,
+            2.2,
+            0.15
+          ],
+          "beamLength": 4.5,
+          "alarm": 16719893,
+          "flashPlate": "theo",
+          "flashAngle": [
+            0.6,
+            -0.7,
+            0.15
+          ],
+          "flashSwing": 0.07,
+          "flashOnFloor": false,
+          "flashTurn": 0
+        },
+        "fog": {
+          "color": 2497317,
+          "density": 0.009
+        },
+        "floor": {
+          "y": -2.78,
+          "color": 1515820
+        },
+        "speech": {
+          "start": 0.35,
+          "end": 3.75,
+          "text": "",
+          "anchor": [
+            0,
+            4.7,
+            0
+          ],
+          "speaker": "theo",
+          "screen": false,
+          "x": 0.55,
+          "y": 0.19
+        },
+        "particles": {
+          "rainBack": 230,
+          "rainFront": 110,
+          "drips": 24,
+          "dust": 85,
+          "seed": 421,
+          "rainAngle": 0.16,
+          "rainSpeed": 1,
+          "splashFloorY": -2.35,
+          "mist": 0.055,
+          "sparks": 0
+        },
+        "post": {
+          "bloom": 0.22,
+          "bloomAlarm": 0.45,
+          "threshold": 0.8,
+          "radius": 0.35,
+          "grain": 0.012,
+          "halftone": 0.018,
+          "vignette": 0.26,
+          "cold": 0.1,
+          "saturation": 0.85,
+          "redClamp": 0.35
+        },
+        "timing": {
+          "alarm": 0,
+          "shakeEnd": 0,
+          "cutBlack": 5,
+          "loopEnd": 5,
+          "fadeIn": 0
+        },
+        "effects": {
+          "rain": 0.9,
+          "alarm": true,
+          "flash": false,
+          "floor": false,
+          "boxLift": false,
+          "painted": true,
+          "breath": true,
+          "alarmLabel": false,
+          "alarmGrade": 0
+        },
+        "endTitle": "",
+        "caption": {
+          "text": "",
+          "start": 1.7,
+          "end": 5,
+          "x": 0.5,
+          "y": 0.88,
+          "type": false,
+          "rate": 15
+        },
+        "motionVersion": 2,
+        "transitionIn": {
+          "type": "cut"
+        },
+        "transitionOut": {
+          "type": "cut"
+        },
+        "beats": [
+          {
+            "type": "strobe",
+            "t": 0,
+            "from": 0,
+            "to": 5,
+            "color": "#ff2015",
+            "rate": 1.2,
+            "amount": 0.32,
+            "decay": false
+          },
+          {
+            "type": "shake",
+            "t": 0.6,
+            "amount": 0.05,
+            "dur": 0.4
+          },
+          {
+            "type": "punch",
+            "t": 0.6,
+            "zoom": 0.02,
+            "dur": 0.3
+          },
+          {
+            "type": "strobe",
+            "t": 0.6,
+            "from": 0.6,
+            "to": 0.85,
+            "rate": 5,
+            "amount": 0.6
+          }
+        ],
+        "motionGroups": {
+          "captura": {
+            "pivot": [
+              -1.7625102435469406,
+              -0.495706005997577,
+              -4
+            ],
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 0.6,
+                "ease": "linear"
+              },
+              {
+                "t": 0.7,
+                "dy": -0.03,
+                "ease": "linear"
+              },
+              {
+                "t": 0.9,
+                "ease": "linear"
+              }
+            ],
+            "bob": {
+              "amp": 0.004,
+              "roll": 1,
+              "freq": 5,
+              "from": 0.6,
+              "to": 2.5,
+              "decay": true
+            }
+          }
+        }
+      },
+      "images": {
+        "bg": "ae7e092a-e635-4a56-83ac-e3ba51c0afb8",
+        "theo": "fe78737d-7f99-4c7d-9deb-780b1e58dd5a",
+        "bento": "96234a5a-f243-4543-8608-5d3bf5bc4069",
+        "robots": "87cd3a7c-179d-4bf9-ad83-f341395dea99",
+        "hands": "704462fa-1d0e-4206-b056-ef6f03cc62ec",
+        "full": "d61612c4-676d-47e5-adeb-7e37621858f1"
+      },
+      "transition": {
+        "type": "cut",
+        "duration": 0.35
+      }
+    },
+    {
+      "id": "db5f0cd2-47f8-4932-876b-e08b13307fb1",
+      "sceneNumber": 6,
+      "notes": "Close de Théo preso pelos robôs. Camada composta Théo + robôs; Bento pode aparecer como mão/ombro em primeiro plano.\n\nPROMPTS DE GERAÇÃO\n{\n  \"id\": 6,\n  \"title\": \"Corre, Bento!\",\n  \"full\": \"libfile_ba6368315ab08191a448e215ce559f43\",\n  \"bg\": \"libfile_26a5f58d778c8191bee07a0b7dc7612c\",\n  \"fg\": \"libfile_141679021e148191a3b6042ebbd356db\",\n  \"prompt\": \"Panel6 third-row right expanded cinematic16:9. Blue-merle Théo blue eyes red bandana tactical jacket blue chest lights restrained by black armored red-lit robot. Théo desperately looks right toward Bento foreground hand. Wet industrial corridor pipes red alarms. No balloons or text.\",\n  \"bgPrompt\": \"Remove all characters and foreground hand. Reconstruct obscured wall floor pipes with same camera lighting.\",\n  \"fgPrompt\": \"Extract coherent robot-holding-Théo group onto transparency, same pose scale contrast. Remove foreground Bento hand and environment.\",\n  \"integration\": \"Anchor foreground bottom; do not expose lower cutoff. Optional blurred foreground hand exists only in full reference.\"\n}\nDireção v2: trilhas, batidas, câmera e atmosfera conforme Texto colado(3). Cena 1 protegida pelo hash de referência.",
+      "layerNames": {
+        "theo": "Théo",
+        "bento": "Bento · mão desfocada",
+        "bg": "Fundo",
+        "full": "Referência (opcional)",
+        "robots": "Robôs",
+        "hands": "Braços · alternativa oculta"
+      },
+      "imagePrompts": {
+        "bg": "Remove all characters and foreground hand. Reconstruct obscured wall floor pipes with same camera lighting.",
+        "theo": "Edit this transparent Theo cutout: DELETE both large black METAL ROBOT HANDS lying across his belly and chest. Those are NOT Theo's hands. Fill jacket beneath with natural dark cloth harness straps and fur. Keep Theo's own outstretched furry right arm and gloved paw. His other forearm bent low at waist can show ordinary small fabric glove if needed, absolutely NO armored mechanical fingers or robot pieces. Preserve exact pose scale canvas colors contrast and transparent background.",
+        "bento": "Extract ONLY the out-of-focus Bento foreground reaching paw and shoulder on far RIGHT of image. Keep exact original blur, position, scale, lighting on same1672x941 canvas. Every other pixel fully transparent: no Theo robot floor wall. Do not unblur or invent full character. Natural cropped foreground hand at right boundary intentionally.",
+        "full": "Panel6 third-row right expanded cinematic16:9. Blue-merle Théo blue eyes red bandana tactical jacket blue chest lights restrained by black armored red-lit robot. Théo desperately looks right toward Bento foreground hand. Wet industrial corridor pipes red alarms. No balloons or text.",
+        "robots": "Extract ONLY black red-lit restraining robot from scene on actual transparent background. Same canvas1672x941 same scale placement. Remove Theo dog and Bento foreground hand and ALL background. Reconstruct robot torso hidden behind Theo. Robot arms remain in gripping position (curved forward around invisible captive), preserve both hands and limbs original pose. Robot dark ink contrast red lights unchanged. No floor shadow no text. Entire rest transparent.",
+        "hands": "Extract ONLY the robot's front gripping forearms and two mechanical hands wrapped across Theo's stomach from original scene. Same1672x941 canvas, exact source position scale. All dog pixels, robot torso/head/legs, background and Bento hand must be transparent. This is a tiny foreground occlusion overlay, NOT a full robot. Two coherent dark mechanical forearms with red lights and gripping fingers only. Do NOT center or enlarge."
+      },
+      "assetHistory": [],
+      "name": "Corre, Bento!",
+      "config": {
+        "plates": {
+          "bg": {
+            "position": [
+              0,
+              0,
+              -12
+            ],
+            "height": 9.646170927520417,
+            "scale": 1.22,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.16,
+                "v": 0.11,
+                "size": 0.4,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.71,
+                "v": 0.19,
+                "size": 0.4,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              }
+            ]
+          },
+          "theo": {
+            "position": [
+              -1.619604007583675,
+              -0.5358983848622453,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 0.9,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "captura",
+            "order": 2,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": []
+          },
+          "bento": {
+            "position": [
+              0,
+              0,
+              -2.5
+            ],
+            "height": 4.5551362713290855,
+            "scale": 1.04,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 4,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "dx": 0.4,
+                "ease": "linear"
+              },
+              {
+                "t": 1.2,
+                "ease": "inOutCubic"
+              }
+            ],
+            "bob": {
+              "mode": "breath",
+              "amp": 0.01,
+              "freq": 5,
+              "phase": 0,
+              "roll": 0.25,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": []
+          },
+          "robots": {
+            "position": [
+              -0.28581247192653086,
+              -0.3751288694035718,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 0.9,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "captura",
+            "order": 1,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.286,
+                "v": 0.12,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              }
+            ]
+          },
+          "hands": {
+            "position": [
+              0,
+              0,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 1.04,
+            "visible": false,
+            "uvScale": 1,
+            "motionGroup": "captura",
+            "order": 4,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": []
+          }
+        },
+        "camera": {
+          "fov": 30,
+          "keys": [
+            {
+              "t": 0,
+              "p": [
+                0,
+                0,
+                6
+              ],
+              "a": [
+                0,
+                0,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            },
+            {
+              "t": 4.5,
+              "p": [
+                -0.5,
+                0.15,
+                4.9
+              ],
+              "a": [
+                -0.325,
+                0.09,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            }
+          ],
+          "shake": 0.006,
+          "alarmShake": 0,
+          "roll": 0
+        },
+        "lights": {
+          "ambient": 1.8,
+          "sky": 11913184,
+          "ground": 3158590,
+          "lamp": 11128575,
+          "lampPower": 38,
+          "lampPosition": [
+            -4,
+            4,
+            -2
+          ],
+          "flash": 16765330,
+          "flashPower": 36,
+          "hand": [
+            1.28,
+            2.2,
+            0.15
+          ],
+          "beamLength": 4.5,
+          "alarm": 16719893,
+          "flashPlate": "theo",
+          "flashAngle": [
+            0.6,
+            -0.7,
+            0.15
+          ],
+          "flashSwing": 0.07,
+          "flashOnFloor": false,
+          "flashTurn": 0
+        },
+        "fog": {
+          "color": 2497317,
+          "density": 0.009
+        },
+        "floor": {
+          "y": -2.78,
+          "color": 1515820
+        },
+        "speech": {
+          "start": 0.6,
+          "end": 3.8,
+          "text": "Corre, Bento!",
+          "anchor": [
+            0,
+            4.7,
+            0
+          ],
+          "speaker": "theo",
+          "screen": false,
+          "x": 0.71,
+          "y": 0.2,
+          "anchorUV": [
+            0.71,
+            0.15
+          ],
+          "mouthUV": [
+            0.57,
+            0.31
+          ]
+        },
+        "particles": {
+          "rainBack": 230,
+          "rainFront": 110,
+          "drips": 24,
+          "dust": 85,
+          "seed": 421,
+          "rainAngle": 0.16,
+          "rainSpeed": 1,
+          "splashFloorY": -2.35,
+          "mist": 0.055,
+          "sparks": 0
+        },
+        "post": {
+          "bloom": 0.22,
+          "bloomAlarm": 0.45,
+          "threshold": 0.8,
+          "radius": 0.35,
+          "grain": 0.012,
+          "halftone": 0.018,
+          "vignette": 0.26,
+          "cold": 0.1,
+          "saturation": 0.85,
+          "redClamp": 0.35
+        },
+        "timing": {
+          "alarm": 0,
+          "shakeEnd": 0,
+          "cutBlack": 4.5,
+          "loopEnd": 4.5,
+          "fadeIn": 0
+        },
+        "effects": {
+          "rain": 0.9,
+          "alarm": true,
+          "flash": false,
+          "floor": false,
+          "boxLift": false,
+          "painted": true,
+          "breath": true,
+          "alarmLabel": false,
+          "alarmGrade": 0
+        },
+        "endTitle": "",
+        "caption": {
+          "text": "",
+          "start": 1.7,
+          "end": 4.5,
+          "x": 0.5,
+          "y": 0.88,
+          "type": false,
+          "rate": 15
+        },
+        "motionVersion": 2,
+        "transitionIn": {
+          "type": "cut"
+        },
+        "transitionOut": {
+          "type": "cut"
+        },
+        "beats": [
+          {
+            "type": "strobe",
+            "t": 0,
+            "from": 0,
+            "to": 4.5,
+            "color": "#ff2015",
+            "rate": 1.2,
+            "amount": 0.32,
+            "decay": false
+          },
+          {
+            "type": "punch",
+            "t": 0.6,
+            "zoom": 0.03,
+            "dur": 0.35
+          },
+          {
+            "type": "shake",
+            "t": 0.6,
+            "amount": 0.02,
+            "dur": 0.3
+          }
+        ],
+        "motionGroups": {
+          "captura": {
+            "pivot": [
+              -1.619604007583675,
+              -0.5358983848622453,
+              -4
+            ],
+            "bob": {
+              "amp": 0.008,
+              "roll": 0.35,
+              "freq": 3.3,
+              "from": 0,
+              "to": 4.5
+            }
+          }
+        }
+      },
+      "images": {
+        "bg": "4fca1228-2e24-48d9-9d00-52ee76224d0d",
+        "theo": "59822e75-7406-4baf-8a99-10a991414ac3",
+        "full": "4301eedd-db9a-480b-a760-d18b3cc900bd",
+        "robots": "b7c6d8ca-219f-45e2-960f-2f84c6bfdf8b",
+        "hands": "f76c74e9-1534-4be1-b4bf-65d5990d9ef5",
+        "bento": "4294e7d6-4a9f-4ecb-8823-11b9207ddabc"
+      },
+      "transition": {
+        "type": "cut",
+        "duration": 0.35
+      }
+    },
+    {
+      "id": "b5cccedc-86d3-435d-800d-0ca399212733",
+      "sceneNumber": 7,
+      "notes": "Bento estende a mão para Théo, que permanece capturado ao fundo. Preservar caixa e mochila.\n\nPROMPTS DE GERAÇÃO\n{\n  \"id\": 7,\n  \"title\": \"Eu não vou te deixar!\",\n  \"full\": \"libfile_a5a8e6ce16248191be32d77a4d219d1e\",\n  \"bg\": \"libfile_40294d415c4881919da679b398880159\",\n  \"fg\": \"libfile_fba960244d788191adb029785f25e0a4\",\n  \"prompt\": \"Panel7 bottom-left expanded cinematic16:9. Bento black-white collie amber eyes olive jacket backpack bandaged forearm holds crate PROPRIEDADE DA HUMANIDADE, reaches desperately with free hand. Distant blue-merle Théo held by black red-lit robots in right background. Wet industrial red alarm corridor. No balloons captions borders.\",\n  \"bgPrompt\": \"Remove foreground Bento and crate only, reconstruct environment. Retain captive Théo and robots distant background unchanged.\",\n  \"fgPrompt\": \"Extract foreground Bento with crate backpack reaching hand and tail onto transparent canvas. Preserve pose lighting. No background or shadows.\",\n  \"integration\": \"Bottom-anchor foreground; never expose lower cutoff. Distant captive group is baked into bg intentionally.\"\n}\nDireção v2: trilhas, batidas, câmera e atmosfera conforme Texto colado(3). Cena 1 protegida pelo hash de referência.",
+      "layerNames": {
+        "theo": "Théo",
+        "bento": "Bento + caixa",
+        "bg": "Fundo",
+        "full": "Referência (opcional)",
+        "robots": "Robôs",
+        "hands": "Braços · alternativa oculta"
+      },
+      "imagePrompts": {
+        "bg": "Clean environment background ONLY matching this exact full scene canvas1672x941 camera lighting. Remove ALL characters: large foreground Bento and crate, and distant Theo and all robots. Fill hidden wall pipes metal floor with coherent empty corridor. Keep red lights reflections mist same. NO characters or shadows or text.",
+        "theo": "Extract ONLY distant captive Théo blue-merle dog red bandana from right background, removing robots from around him and repairing hidden jacket/arms naturally. Same1672x941 canvas exact tiny distant scale and same location x~1380,y~510; do NOT enlarge or center. Preserve dangling pose and original outfit, blue eyes, dark contrast red rim. All else transparent including robots, Bento, crate and environment. No shadow.",
+        "bento": "Extract foreground Bento with crate backpack reaching hand and tail onto transparent canvas. Preserve pose lighting. No background or shadows.",
+        "full": "Panel7 bottom-left expanded cinematic16:9. Bento black-white collie amber eyes olive jacket backpack bandaged forearm holds crate PROPRIEDADE DA HUMANIDADE, reaches desperately with free hand. Distant blue-merle Théo held by black red-lit robots in right background. Wet industrial red alarm corridor. No balloons captions borders.",
+        "robots": "Extract ONLY distant black red-lit robots from right background, as one coherent group layer WITHOUT captive Theo. Repair robot bodies where dog hid them, keep arms in original restraining pose around invisible captive. Same1672x941 canvas exact distant scale and location x1200..1560 y220..750; do not enlarge or center. All else transparent, remove foreground Bento crate, Theo and setting. Same heavy blacks red rim, no floor shadow no text."
+      },
+      "assetHistory": [],
+      "name": "Eu não vou te deixar!",
+      "config": {
+        "plates": {
+          "bg": {
+            "position": [
+              0,
+              0,
+              -12
+            ],
+            "height": 9.646170927520417,
+            "scale": 1.22,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.41,
+                "v": 0.14,
+                "size": 0.4,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.805,
+                "v": 0.17,
+                "size": 0.3,
+                "color": 16719893,
+                "pulse": 0.16,
+                "flicker": 0.1
+              }
+            ]
+          },
+          "theo": {
+            "position": [
+              0.6668957678285721,
+              0,
+              -8
+            ],
+            "height": 7.502577388071435,
+            "scale": 0.85,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "captura",
+            "order": 2,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": []
+          },
+          "bento": {
+            "position": [
+              0,
+              0,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 1.04,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 3,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 1,
+                "dz": 0.1,
+                "rot": -2,
+                "ease": "inOutCubic"
+              }
+            ],
+            "bob": {
+              "mode": "breath",
+              "amp": 0.006,
+              "freq": 1.6,
+              "phase": 0,
+              "roll": 0.15,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": []
+          },
+          "robots": {
+            "position": [
+              1.7339289963542874,
+              -0.07502577388071442,
+              -8
+            ],
+            "height": 7.502577388071435,
+            "scale": 0.65,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "captura",
+            "order": 1,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.728,
+                "v": 0.18,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              },
+              {
+                "u": 0.86,
+                "v": 0.2,
+                "color": 16718092,
+                "size": 0.24,
+                "pulse": 0.22,
+                "flicker": 0.12
+              }
+            ]
+          }
+        },
+        "camera": {
+          "fov": 30,
+          "keys": [
+            {
+              "t": 0,
+              "p": [
+                0.4,
+                0,
+                5.4
+              ],
+              "a": [
+                0.26,
+                0,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            },
+            {
+              "t": 5.5,
+              "p": [
+                -0.2,
+                0.05,
+                6
+              ],
+              "a": [
+                -0.13,
+                0.03,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            }
+          ],
+          "shake": 0.006,
+          "alarmShake": 0,
+          "roll": 0
+        },
+        "lights": {
+          "ambient": 1.8,
+          "sky": 11913184,
+          "ground": 3158590,
+          "lamp": 11128575,
+          "lampPower": 38,
+          "lampPosition": [
+            -4,
+            4,
+            -2
+          ],
+          "flash": 16765330,
+          "flashPower": 36,
+          "hand": [
+            1.28,
+            2.2,
+            0.15
+          ],
+          "beamLength": 4.5,
+          "alarm": 16719893,
+          "flashPlate": "theo",
+          "flashAngle": [
+            0.6,
+            -0.7,
+            0.15
+          ],
+          "flashSwing": 0.07,
+          "flashOnFloor": false,
+          "flashTurn": 0
+        },
+        "fog": {
+          "color": 2497317,
+          "density": 0.009
+        },
+        "floor": {
+          "y": -2.78,
+          "color": 1515820
+        },
+        "speech": {
+          "start": 0.8,
+          "end": 4,
+          "text": "Eu não vou te deixar!",
+          "anchor": [
+            0,
+            4.7,
+            0
+          ],
+          "speaker": "bento",
+          "screen": false,
+          "x": 0.6,
+          "y": 0.16,
+          "anchorUV": [
+            0.58,
+            0.2
+          ],
+          "mouthUV": [
+            0.405,
+            0.29
+          ]
+        },
+        "particles": {
+          "rainBack": 230,
+          "rainFront": 110,
+          "drips": 24,
+          "dust": 85,
+          "seed": 421,
+          "rainAngle": 0.16,
+          "rainSpeed": 1,
+          "splashFloorY": -2.35,
+          "mist": 0.055,
+          "sparks": 0
+        },
+        "post": {
+          "bloom": 0.22,
+          "bloomAlarm": 0.45,
+          "threshold": 0.8,
+          "radius": 0.35,
+          "grain": 0.012,
+          "halftone": 0.018,
+          "vignette": 0.26,
+          "cold": 0.1,
+          "saturation": 0.85,
+          "redClamp": 0.35
+        },
+        "timing": {
+          "alarm": 0,
+          "shakeEnd": 0,
+          "cutBlack": 5.5,
+          "loopEnd": 5.5,
+          "fadeIn": 0
+        },
+        "effects": {
+          "rain": 0.9,
+          "alarm": true,
+          "flash": false,
+          "floor": false,
+          "boxLift": false,
+          "painted": true,
+          "breath": true,
+          "alarmLabel": false,
+          "alarmGrade": 0
+        },
+        "endTitle": "",
+        "caption": {
+          "text": "",
+          "start": 1.7,
+          "end": 5.5,
+          "x": 0.5,
+          "y": 0.88,
+          "type": false,
+          "rate": 15
+        },
+        "motionVersion": 2,
+        "transitionIn": {
+          "type": "cut"
+        },
+        "transitionOut": {
+          "type": "fade",
+          "dur": 0.4
+        },
+        "beats": [
+          {
+            "type": "strobe",
+            "t": 0,
+            "from": 0,
+            "to": 5.5,
+            "color": "#ff2015",
+            "rate": 1.2,
+            "amount": 0.32,
+            "decay": true
+          }
+        ],
+        "motionGroups": {
+          "captura": {
+            "pivot": [
+              0.6668957678285721,
+              0,
+              -8
+            ],
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 0.5,
+                "ease": "linear"
+              },
+              {
+                "t": 5.5,
+                "dz": -3,
+                "dx": 0.3,
+                "ease": "linear"
+              }
+            ],
+            "bob": {
+              "mode": "step",
+              "amp": 0.025,
+              "freq": 1.3,
+              "phase": 0,
+              "roll": 0.35,
+              "from": 0,
+              "to": 20
+            }
+          }
+        }
+      },
+      "images": {
+        "bg": "cf014cf7-8855-490b-8a66-26fc63ef337b",
+        "bento": "fa6ab652-eb26-4639-b6b5-ed539cb7441c",
+        "full": "53877e22-ab4d-447e-9abd-0c16c8888f4d",
+        "theo": "e230fdae-e84f-4f55-af4f-7f4bc3973efa",
+        "robots": "8f481d0f-2fa6-48e0-b522-a8d457d4da95"
+      },
+      "transition": {
+        "type": "cut",
+        "duration": 0.35
+      }
+    },
+    {
+      "id": "4d659e7f-3f9a-46e2-8ef5-32f57473bcc1",
+      "sceneNumber": 8,
+      "notes": "Bento foge de costas rumo à saída verde. Legenda: Eu fui embora. E meu irmão ficou. Não usar outro final.\n\nPROMPTS DE GERAÇÃO\n{\n  \"id\": 8,\n  \"title\": \"A fuga\",\n  \"caption\": \"Eu fui embora. E meu irmão ficou.\",\n  \"full\": \"libfile_3aa4586b502c81918ada5254cf4e8e91\",\n  \"bg\": \"libfile_6d18ed796e308191bf30c6bf8ca7d8a1\",\n  \"fg\": \"libfile_a2a60ac0774c81919cf4e2197229325b\",\n  \"prompt\": \"Panel8 bottom-right expanded cinematic16:9. Bento running away rear view, complete body tail boots, olive jacket backpack crate under right arm, toward green SAÍDA sign. Dark wet corridor pipes steel doors cold mist green reflections. No other characters. No caption balloon border.\",\n  \"bgPrompt\": \"Remove Bento crate splash shadow, fill wet corridor. Keep SAÍDA sign and exact camera framing.\",\n  \"fgPrompt\": \"Extract full-body running Bento and crate onto transparent background with broad margins. Retain PROPRIEDADE DA HUMANIDADE stencil. Preserve pose outfit lighting, no environment floor splash shadow.\",\n  \"integration\": \"Revised fg has legible crate stencil and complete boots. Generated fg is larger than reference; scale about0.74 and position using full reference (body center approx x0.5 y0.61). Do not crop feet. Supersedes older fg libfile_fdd47b9502188191a04ae76be9e9355b.\"\n}\nDireção v2: trilhas, batidas, câmera e atmosfera conforme Texto colado(3). Cena 1 protegida pelo hash de referência.",
+      "layerNames": {
+        "theo": "Sem segunda camada",
+        "bento": "Bento de costas + caixa",
+        "bg": "Fundo",
+        "full": "Referência (opcional)"
+      },
+      "imagePrompts": {
+        "bg": "Remove Bento crate splash shadow, fill wet corridor. Keep SAÍDA sign and exact camera framing.",
+        "theo": "",
+        "bento": "Extract full-body running Bento and crate onto transparent background with broad margins. Retain PROPRIEDADE DA HUMANIDADE stencil. Preserve pose outfit lighting, no environment floor splash shadow.",
+        "full": "Panel8 bottom-right expanded cinematic16:9. Bento running away rear view, complete body tail boots, olive jacket backpack crate under right arm, toward green SAÍDA sign. Dark wet corridor pipes steel doors cold mist green reflections. No other characters. No caption balloon border."
+      },
+      "assetHistory": [],
+      "name": "A saída",
+      "config": {
+        "plates": {
+          "bg": {
+            "position": [
+              0,
+              0,
+              -12
+            ],
+            "height": 9.646170927520417,
+            "scale": 1.22,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 0,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": [
+              {
+                "u": 0.54,
+                "v": 0.2,
+                "size": 1.3,
+                "color": 7012245,
+                "pulse": 0.16,
+                "flicker": 0.1
+              },
+              {
+                "u": 0.55,
+                "v": 0.76,
+                "size": 0.9,
+                "color": 7012245,
+                "pulse": 0.16,
+                "flicker": 0.1
+              }
+            ]
+          },
+          "theo": {
+            "position": [
+              0,
+              0,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 1.04,
+            "visible": false,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 2,
+            "light": 0.35,
+            "track": [],
+            "bob": null,
+            "localTrack": [],
+            "glows": []
+          },
+          "bento": {
+            "position": [
+              0,
+              -0.1071796769724491,
+              -4
+            ],
+            "height": 5.358983848622454,
+            "scale": 0.74,
+            "visible": true,
+            "uvScale": 1,
+            "motionGroup": "",
+            "order": 3,
+            "light": 0.35,
+            "track": [
+              {
+                "t": 0,
+                "ease": "linear"
+              },
+              {
+                "t": 6.5,
+                "dz": -3.5,
+                "ease": "linear"
+              }
+            ],
+            "bob": {
+              "mode": "step",
+              "amp": 0.05,
+              "freq": 2.4,
+              "phase": 0,
+              "roll": 1.5,
+              "from": 0,
+              "to": 20
+            },
+            "localTrack": [],
+            "glows": []
+          }
+        },
+        "camera": {
+          "fov": 30,
+          "keys": [
+            {
+              "t": 0,
+              "p": [
+                0,
+                0,
+                6
+              ],
+              "a": [
+                0,
+                0,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            },
+            {
+              "t": 6.5,
+              "p": [
+                0,
+                0.05,
+                5.4
+              ],
+              "a": [
+                0,
+                0.03,
+                -8
+              ],
+              "ease": "inOutCubic",
+              "cut": false
+            }
+          ],
+          "shake": 0.004,
+          "alarmShake": 0,
+          "roll": 0
+        },
+        "lights": {
+          "ambient": 1.8,
+          "sky": 10217909,
+          "ground": 3158590,
+          "lamp": 7663515,
+          "lampPower": 25,
+          "lampPosition": [
+            -4,
+            4,
+            -2
+          ],
+          "flash": 16765330,
+          "flashPower": 36,
+          "hand": [
+            1.28,
+            2.2,
+            0.15
+          ],
+          "beamLength": 4.5,
+          "alarm": 5818763,
+          "flashPlate": "theo",
+          "flashAngle": [
+            0.6,
+            -0.7,
+            0.15
+          ],
+          "flashSwing": 0.07,
+          "flashOnFloor": false,
+          "flashTurn": 0
+        },
+        "fog": {
+          "color": 1058848,
+          "density": 0.01
+        },
+        "floor": {
+          "y": -2.78,
+          "color": 1515820
+        },
+        "speech": {
+          "start": 0.35,
+          "end": 5.25,
+          "text": "",
+          "anchor": [
+            0,
+            4.7,
+            0
+          ],
+          "speaker": "bento",
+          "screen": false,
+          "x": 0.55,
+          "y": 0.19
+        },
+        "particles": {
+          "rainBack": 230,
+          "rainFront": 110,
+          "drips": 24,
+          "dust": 85,
+          "seed": 421,
+          "rainAngle": 0.16,
+          "rainSpeed": 1,
+          "splashFloorY": -2.35,
+          "mist": 0.17,
+          "sparks": 0
+        },
+        "post": {
+          "bloom": 0.22,
+          "bloomAlarm": 0.45,
+          "threshold": 0.8,
+          "radius": 0.35,
+          "grain": 0.012,
+          "halftone": 0.018,
+          "vignette": 0.26,
+          "cold": 0.1,
+          "saturation": 0.85,
+          "redClamp": 0
+        },
+        "timing": {
+          "alarm": 0,
+          "shakeEnd": 0,
+          "cutBlack": 6.5,
+          "loopEnd": 6.5,
+          "fadeIn": 0
+        },
+        "effects": {
+          "rain": 1,
+          "alarm": false,
+          "flash": false,
+          "floor": false,
+          "boxLift": false,
+          "painted": true,
+          "breath": true,
+          "alarmLabel": false,
+          "alarmGrade": 0
+        },
+        "endTitle": "",
+        "caption": {
+          "text": "Eu fui embora. E meu irmão ficou.",
+          "start": 2,
+          "end": 6.5,
+          "x": 0.68,
+          "y": 0.94,
+          "type": true,
+          "rate": 15
+        },
+        "motionVersion": 2,
+        "transitionIn": {
+          "type": "cut"
+        },
+        "transitionOut": {
+          "type": "fade",
+          "dur": 0.9
+        },
+        "beats": [
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 0.2,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 0.6166666666666667,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 1.0333333333333334,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 1.4500000000000002,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 1.866666666666667,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 2.2833333333333337,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 2.7,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 3.1166666666666667,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 3.533333333333333,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 3.9499999999999997,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 4.366666666666666,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 4.783333333333333,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 5.2,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 5.616666666666667,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 6.033333333333334,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          },
+          {
+            "type": "splash",
+            "plate": "bento",
+            "t": 6.450000000000001,
+            "uv": [
+              0.5,
+              0.87
+            ],
+            "count": 24
+          }
+        ],
+        "motionGroups": {}
+      },
+      "images": {
+        "bg": "8e89bca5-e5f3-452b-9762-90a3c76cd3b1",
+        "bento": "606a65b5-6066-46e4-a5a2-e85c942beee5",
+        "full": "37d5705f-ea0a-46aa-b02c-02bbb1f45d07"
+      },
+      "transition": {
+        "type": "cut",
+        "duration": 0.35
+      }
+    }
+  ],
+  "assets": {
+    "original-bg": {
+      "name": "image_01.webp",
+      "path": "assets/image_01.webp"
+    },
+    "original-theo": {
+      "name": "image_02.webp",
+      "path": "assets/image_02.webp"
+    },
+    "original-bento": {
+      "name": "image_03.webp",
+      "path": "assets/image_03.webp"
+    },
+    "original-full": {
+      "name": "image_04.webp",
+      "path": "assets/image_04.webp"
+    },
+    "b852e0d0-6375-44ed-9941-f80608476f91": {
+      "name": "image_05.webp",
+      "path": "assets/image_05.webp"
+    },
+    "16a902ce-dd74-414b-95e0-e541c6c679f7": {
+      "name": "image_06.webp",
+      "path": "assets/image_06.webp"
+    },
+    "17cff195-dccf-45fb-941e-c29357c5e93c": {
+      "name": "image_07.webp",
+      "path": "assets/image_07.webp"
+    },
+    "47eca4fd-bb2a-4411-948d-125c8ab2c679": {
+      "name": "image_08.webp",
+      "path": "assets/image_08.webp"
+    },
+    "8f1cb72e-e849-4c16-911e-23cf1ed02076": {
+      "name": "image_09.webp",
+      "path": "assets/image_09.webp"
+    },
+    "4301eedd-db9a-480b-a760-d18b3cc900bd": {
+      "name": "image_10.webp",
+      "path": "assets/image_10.webp"
+    },
+    "4fca1228-2e24-48d9-9d00-52ee76224d0d": {
+      "name": "image_11.webp",
+      "path": "assets/image_11.webp"
+    },
+    "d61612c4-676d-47e5-adeb-7e37621858f1": {
+      "name": "image_12.webp",
+      "path": "assets/image_12.webp"
+    },
+    "ae7e092a-e635-4a56-83ac-e3ba51c0afb8": {
+      "name": "image_13.webp",
+      "path": "assets/image_13.webp"
+    },
+    "96234a5a-f243-4543-8608-5d3bf5bc4069": {
+      "name": "image_14.webp",
+      "path": "assets/image_14.webp"
+    },
+    "53877e22-ab4d-447e-9abd-0c16c8888f4d": {
+      "name": "image_15.webp",
+      "path": "assets/image_15.webp"
+    },
+    "fa6ab652-eb26-4639-b6b5-ed539cb7441c": {
+      "name": "image_16.webp",
+      "path": "assets/image_16.webp"
+    },
+    "6c6a2bab-1666-4e27-8e84-0c3e1f60aab6": {
+      "name": "image_17.webp",
+      "path": "assets/image_17.webp"
+    },
+    "37d5705f-ea0a-46aa-b02c-02bbb1f45d07": {
+      "name": "image_18.webp",
+      "path": "assets/image_18.webp"
+    },
+    "8e89bca5-e5f3-452b-9762-90a3c76cd3b1": {
+      "name": "image_19.webp",
+      "path": "assets/image_19.webp"
+    },
+    "606a65b5-6066-46e4-a5a2-e85c942beee5": {
+      "name": "image_20.webp",
+      "path": "assets/image_20.webp"
+    },
+    "7a8cf852-2bca-4085-aadb-7a5d4f7430dc": {
+      "name": "image_21.webp",
+      "path": "assets/image_21.webp"
+    },
+    "12e2c007-98e0-4e61-81b9-bbc5d8ca5056": {
+      "name": "image_22.webp",
+      "path": "assets/image_22.webp"
+    },
+    "ea1c9c6f-fd58-4e84-9569-569e295745bb": {
+      "name": "image_23.webp",
+      "path": "assets/image_23.webp"
+    },
+    "19d23c31-ef13-4ea9-a11e-00b402360d74": {
+      "name": "image_24.webp",
+      "path": "assets/image_24.webp"
+    },
+    "fe78737d-7f99-4c7d-9deb-780b1e58dd5a": {
+      "name": "image_25.webp",
+      "path": "assets/image_25.webp"
+    },
+    "704462fa-1d0e-4206-b056-ef6f03cc62ec": {
+      "name": "image_26.webp",
+      "path": "assets/image_26.webp"
+    },
+    "dcc2786e-509d-4b8f-88c8-022670159725": {
+      "name": "image_27.webp",
+      "path": "assets/image_27.webp"
+    },
+    "23f4ee3a-8225-4cc3-8794-8625cbeb702d": {
+      "name": "image_28.webp",
+      "path": "assets/image_28.webp"
+    },
+    "a3a76afe-0e27-42d9-b279-829de078814e": {
+      "name": "image_29.webp",
+      "path": "assets/image_29.webp"
+    },
+    "1dc65c7d-d091-4ed1-bf6a-c0bbcd6a821f": {
+      "name": "image_30.webp",
+      "path": "assets/image_30.webp"
+    },
+    "59822e75-7406-4baf-8a99-10a991414ac3": {
+      "name": "image_31.webp",
+      "path": "assets/image_31.webp"
+    },
+    "b7c6d8ca-219f-45e2-960f-2f84c6bfdf8b": {
+      "name": "image_32.webp",
+      "path": "assets/image_32.webp"
+    },
+    "f76c74e9-1534-4be1-b4bf-65d5990d9ef5": {
+      "name": "image_33.webp",
+      "path": "assets/image_33.webp"
+    },
+    "4294e7d6-4a9f-4ecb-8823-11b9207ddabc": {
+      "name": "image_34.webp",
+      "path": "assets/image_34.webp"
+    },
+    "cf014cf7-8855-490b-8a66-26fc63ef337b": {
+      "name": "image_35.webp",
+      "path": "assets/image_35.webp"
+    },
+    "e230fdae-e84f-4f55-af4f-7f4bc3973efa": {
+      "name": "image_36.webp",
+      "path": "assets/image_36.webp"
+    },
+    "8f481d0f-2fa6-48e0-b522-a8d457d4da95": {
+      "name": "image_37.webp",
+      "path": "assets/image_37.webp"
+    },
+    "87cd3a7c-179d-4bf9-ad83-f341395dea99": {
+      "name": "image_38.webp",
+      "path": "assets/image_38.webp"
+    }
+  }
+}
