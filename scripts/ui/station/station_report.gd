@@ -110,7 +110,7 @@ func restyle() -> void:
 	var focused := get_viewport().gui_get_focus_owner() == _toggle if get_viewport() != null else false
 	_build()
 	if focused:
-		_toggle.grab_focus.call_deferred()
+		AHKit.focus_later(_toggle)
 
 
 # ---------------------------------------------------------------- a faixa do alto
@@ -670,7 +670,7 @@ func _buttons() -> void:
 	_toggle.pressed.connect(toggle_details)
 	add_child(_toggle)
 	_fit_buttons()
-	_enter.grab_focus.call_deferred()
+	AHKit.focus_later(_enter)
 
 
 ## O botão principal âmbar com as divisas: o ícone, o texto e a tecla dentro (que cresce com o texto Maior).

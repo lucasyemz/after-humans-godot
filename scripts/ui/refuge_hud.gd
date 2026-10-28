@@ -16,6 +16,9 @@ const PANEL_CLOSE := "res://audio/ui/panel_close.ogg"
 const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
+## Um quadro do HUD (as esperas da chegada: some junto com ele).
+signal _frame_passed
+
 ## A chegada da equipe de trem na volta (#76), antes do relatório: sem painel, só a dica de pular.
 const ARRIVAL := "arrival"
 const REPORT_GUARD_MS := 500
@@ -785,8 +788,10 @@ func play_arrival() -> void:
 	_arrival_skip = false
 	refresh()
 	# A chegada (e o som do trem) começa com a Estação na tela, não embaixo do cartão da passagem.
+	# O quadro pelo sinal do próprio HUD: se a Estação sai antes (o teste ou a troca de cena), a espera cai junto com
+	# ele em vez de voltar numa instância liberada.
 	while GameFlow.busy and is_inside_tree():
-		await get_tree().process_frame
+		await _frame_passed
 	if current != ARRIVAL or not is_inside_tree():
 		return
 	station.play_team_arrival(report.get("team", []))
@@ -1469,6 +1474,7 @@ static func _lines_signature(lines: Array) -> String:
 
 
 func _process(delta: float) -> void:
+	_frame_passed.emit()
 	_pan_overview(delta)
 	_update_room_hover()
 	if _feedback.modulate.a > 0.0 and _feedback.text != "":
@@ -1750,7 +1756,7 @@ func _show(key: String) -> void:
 	_footer.visible = _footer.get_child_count() > 0
 	_fit_panel()
 	if _panel_focus != null and U.using_keys:
-		_panel_focus.grab_focus.call_deferred()
+		AHKit.focus_later(_panel_focus)
 
 
 ## O plano da Estação: um bloco por cômodo, na ordem do jogo, com o ícone, o nome, o nível ou Vazio, o que faz, o custo

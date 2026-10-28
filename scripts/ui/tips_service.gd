@@ -119,7 +119,7 @@ func show_tip(id: String) -> void:
 	_card.modulate.a = 0.0
 	_card.visible = true
 	if AHUiStyle.using_keys:
-		_ok.grab_focus.call_deferred()
+		AHKit.focus_later(_ok)
 	create_tween().tween_property(_card, "modulate:a", 1.0, 0.25)
 
 

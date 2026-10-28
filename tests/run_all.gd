@@ -6,21 +6,7 @@
 extends SceneTree
 
 const TestContext = preload("res://tests/test_context.gd")
-
-
-## Conta os erros de script (acesso inválido, chamada inexistente...) durante cada teste. Um erro desses interrompe a
-## função do teste no meio, e sem isto o teste passava com menos verificações. Avisos e push_error não contam.
-class ScriptErrors extends Logger:
-	var count := 0
-	var first := ""
-
-	func _log_error(_function: String, file: String, line: int, _code: String, rationale: String, _editor_notify: bool,
-			error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
-		if error_type != ERROR_TYPE_SCRIPT:
-			return
-		count += 1
-		if first == "":
-			first = "%s:%d %s" % [file, line, rationale]
+const ErrorCounter = preload("res://tests/error_counter.gd")
 
 
 func _initialize() -> void:
@@ -39,7 +25,7 @@ func _run() -> void:
 	var files := Array(DirAccess.get_files_at("res://tests")).filter(func(file): return file.begins_with("test_") and file.ends_with(".gd") and file != "test_context.gd")
 	files.sort()
 
-	var errors := ScriptErrors.new()
+	var errors := ErrorCounter.new()
 	OS.add_logger(errors)
 	var failed := 0
 	var ran := 0
@@ -62,7 +48,7 @@ func _run() -> void:
 		await test.run(t)
 		var elapsed := Time.get_ticks_msec() - test_started
 		if errors.count > 0:
-			t.failures.append("%d erro(s) de script durante o teste; o primeiro: %s" % [errors.count, errors.first])
+			t.failures.append("%d erro(s) durante o teste; o primeiro: %s" % [errors.count, errors.first])
 		var ok := t.failures.is_empty() and t.checks > 0
 		if not ok:
 			failed += 1
@@ -75,5 +61,9 @@ func _run() -> void:
 		if t.failures.size() > 10:
 			print("    ... e mais %d falhas" % (t.failures.size() - 10))
 	OS.remove_logger(errors)
+	# A saída limpa (#66): a cena que o último teste deixou aberta e os sons do Sound não ficam presos ao fechar.
+	if current_scene != null:
+		unload_current_scene()
+	await process_frame
 	print("%d de %d testes passaram em %d ms." % [ran - failed, ran, Time.get_ticks_msec() - started])
-	quit(0 if failed == 0 and ran > 0 else 1)
+	root.get_node("Sound").quit(0 if failed == 0 and ran > 0 else 1)
