@@ -88,3 +88,18 @@ placa sai, os moradores voltam onde estavam, os pés ficam no chão e nada tapa 
 - Corrigido: ao trocar de herói, a placa nova perdia o nome "StageHero", porque a antiga ainda estava na árvore. Agora
   a antiga sai da árvore antes, e o teste confere que fica uma placa só.
 - Fica: o `en.po` regenerado atualiza números de linha de outros arquivos, que já estavam desatualizados.
+
+## Depois do merge: os ajustes do revisor do #200
+
+![o Tatu no Maior: antes, o escudo passava dos painéis; depois, cabe no vão](character-stage/tatu.jpg)
+
+- **O Tatu no texto Maior:** o escudo passava uns 46 px dos painéis de cada lado.
+  - Agora a câmera se afasta só quando a arte do escolhido (`body_width_pixels`) é mais larga que o vão, com 16 px de
+    folga de cada lado.
+  - Os pés continuam na linha de sempre, e os outros heróis não mudam.
+  - Na foto, o Tatu entrou direto no elenco com um id de teste, por isso a ficha diz FUNDADOR.
+- **A câmera:** ela só se move quando o vão ou a largura da arte muda, e não a cada vez que a tela é refeita.
+- **Outra tela:** a chegada, o trem, o relatório ou a partida fecham a Sala e tiram o escolhido do cômodo.
+- **A respiração:** ela se soma à escala da placa (`stage_scale`) em vez de sobrescrever.
+- O `tools/capture_181.gd` saiu.
+- O `test_character_stage` passou a ter 41 checagens, com o Tatu no Normal e no Maior.
