@@ -58,3 +58,7 @@ A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWo
 
   Correção: o clique passa para a plaquinha, e um limite só, em `data/wounded.json` (50%), lido pelo kit. Das baixas: o
   corpo volta ao prumo suave ao parar, e a troca de formação confere de novo quem está ferido.
+- **Rodada 2: APROVADO.** O clique no coração escolhe o herói na Formação (no xvfb); com 47% de vida o herói manca e
+  mostra o aviso, e a Estação diz "Ferimento grave"; com 50%, nem um nem outro. O prumo volta suave ao parar. `run_all`
+  86/86, com a paridade 48/48. Notas baixas: com o `Threshold` acima de 0,75 o "Ferimento leve" some (o
+  `HEALTHY_ABOVE`); a pose de ferido dos recrutas pede uma pasta por recruta (#191).
