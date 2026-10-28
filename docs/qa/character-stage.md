@@ -57,9 +57,19 @@ O `test_character_stage` confere, no Normal e no Maior, os pés no meio do vão 
 contra a figura antiga.
 
 **QA do zoom, rodada 1: REPROVADO.** No Maior, a câmera usava a borda fixa do painel da esquerda, o herói ficava uns
-100 px fora do meio, e o painel cobria o Tatu e o rabo do Guaxinim. Corrigido com o vão real, e o teste agora mede
-contra os painéis como estão na tela. A QA também viu que, com as Opções por cima da Sala, os moradores andam no zoom
-de perto (isso já acontecia antes).
+100 px fora do meio, e o painel cobria uns 145 px do Tatu, de um lado só, e o rabo do Guaxinim. Com o vão real, o
+herói fica no meio, e o teste agora mede contra os painéis como estão na tela. A QA também viu que, com as Opções por
+cima da Sala, os moradores andam no zoom de perto (isso já acontecia antes).
+
+**Rodada 2: APROVADO.** Os pés ficam no meio do vão real, a até 1 px, no Normal e no Maior, testados com:
+- a troca do tamanho do texto com a Sala aberta;
+- as Opções por cima;
+- o fechar no mesmo quadro de um rebuild;
+- a Sala aberta logo depois da volta da expedição.
+
+**Fica (baixa, para o Lucas):** no Maior, o vão entre os painéis tem 465 px, e o Tatu, com o escudo, tem 558. As pontas
+(o rabo e a borda do escudo) passam uns 47 px de cada lado. O corpo, a cabeça e os pés ficam inteiros. Se incomodar, a
+câmera pode recuar só quando a arte não couber no vão.
 
 ## Rodadas da QA
 
