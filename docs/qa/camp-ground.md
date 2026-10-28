@@ -89,3 +89,8 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
 - **O tambor, rodada 1: REPROVADO.** Três médias: a luz do tambor estourava o corpo num laranja chapado; aceso, o card
   não trocava para `T_LP03_Lit`; o fogo tremulava com "Reduzir efeitos". Correção: o card numa camada fora da luz
   dele, a textura acesa e o fogo parado. Das baixas: os Dutos de Esgoto citados e na captura, e o halo em 1,5.
+- **O tambor, rodada 2: APROVADO.** De noite com chuva no Depósito, a média do corpo caiu de (239, 121, 41) para
+  (112, 62, 31): ferro enferrujado com os furos em brasa. O `_Lit` aceso, o fogo parado com "Reduzir efeitos", o save e
+  o load no meio do acampamento e o levantar acampamento conferidos no Depósito e nos Dutos. `run_all` 87/87. Notas
+  baixas: o halo em 1,5 deixa um véu claro na metade de cima do tambor, mais visível nos Dutos de dia (o Lucas pode
+  preferir entre 1,0 e 1,2; é o `BARREL_HALO_ENERGY`); o teste devolve as Opções como estavam.
