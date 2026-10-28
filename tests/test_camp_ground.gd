@@ -1,8 +1,11 @@
 ## As poses do acampamento no chão (#205):
 ## - em cada pose (fundadores e recrutas, sentado e deitado), o ponto mais baixo do corpo na arte cai na linha do chão:
 ##   a âncora (o pé) fica no último pixel opaco, sem o corpo boiar acima dela;
-## - na cena, cada herói em volta da fogueira tem a sombra de contato no chão, embaixo do corpo (também quem não tem pose
-##   de acampamento, como o Guaxinim e o Tatu, e fica de pé), e ela sai ao levantar acampamento.
+## - o apoio do corpo (o quadril do sentado, o tronco do deitado: "support", medido na arte) cai no chão embaixo do
+##   corpo na câmera do acampamento, a até MAX_SUPPORT_DEPTH atrás do pé, e o dado confere com a arte;
+## - na cena, a câmera olha do ângulo da arte e cada herói em volta da fogueira tem a sombra de contato no chão, do pé
+##   até atrás do apoio (também quem não tem pose de acampamento, como o Guaxinim e o Tatu, e fica de pé); ela acompanha
+##   a pose de cuidar e sai ao levantar acampamento.
 extends RefCounted
 
 const J := preload("res://scripts/flow/journey_rules.gd")
@@ -49,8 +52,28 @@ func _art() -> void:
 				var px_to_m: float = 1.8 / float(art.body_reference_pixels)
 				var gap: float = (float(art.anchor[1]) - (lowest + 1) * scale) * px_to_m
 				t.check(absf(gap) <= GROUND_TOLERANCE, "%s %s: o ponto mais baixo do corpo na linha do chão (%.3f m)" % [owner, kind, gap])
+				# O apoio, medido de novo na arte (a mediana da faixa do meio), confere com o dado.
+				var support: float = _support_row(image) * scale
+				t.check(art.has("support") and absf(float(art.support) - support) <= 2.0 * scale,
+					"%s %s: o apoio do dado confere com a arte (%s, medido %.1f)" % [owner, kind, art.get("support"), support])
+				var depth := AHCampScene.support_depth(art)
+				t.check(depth <= AHCampScene.MAX_SUPPORT_DEPTH,
+					"%s %s: o apoio cai no chão embaixo do corpo (%.2f m atrás do pé)" % [owner, kind, depth])
 				count += 1
 	t.check(count >= 16, "todas as poses conferidas (%d)" % count)
+
+
+## O apoio: na faixa do meio do corpo visível (40% da largura), a mediana da última linha opaca de cada coluna.
+func _support_row(image: Image) -> float:
+	var used := image.get_used_rect()
+	var lows: Array = []
+	for x in range(int(used.position.x + used.size.x * 0.3), int(used.position.x + used.size.x * 0.7)):
+		for y in range(used.end.y - 1, -1, -1):
+			if image.get_pixel(x, y).a > 0.5:
+				lows.append(y + 1)
+				break
+	lows.sort()
+	return float(lows[lows.size() / 2])
 
 
 ## A última linha com algum pixel opaco (alfa acima da metade).
@@ -97,6 +120,11 @@ func _scene() -> void:
 	await corridor._start_camp()
 	var camp: AHCampScene = corridor.camp
 	t.equal(camp.members.size(), 4, "os quatro em volta da fogueira")
+	for frame in 90:
+		street._update_camera(0.05)
+	var camera: Camera3D = street._camera
+	t.check(absf(rad_to_deg(-camera.global_rotation.x) - AHCampScene.FOCUS_PITCH) < 0.5,
+		"a câmera do acampamento olha do ângulo da arte (%.1f°)" % rad_to_deg(-camera.global_rotation.x))
 	for member in camp.members:
 		var card: AHSpriteCard = member.card
 		var shadow := card.get_node_or_null(AHCampScene.CONTACT_NAME) as MeshInstance3D
@@ -106,7 +134,19 @@ func _scene() -> void:
 		t.check(is_equal_approx(shadow.global_position.y, corridor.room.floor_y + 0.015), "%s: a sombra no chão" % who)
 		var width: float = (shadow.mesh as PlaneMesh).size.x
 		t.check(width >= 0.5, "%s: a sombra na largura do corpo (%.2f m)" % [who, width])
+		# Do pé até atrás do apoio: a borda de trás da sombra passa do ponto onde o apoio toca o chão.
+		var back: float = (shadow.mesh as PlaneMesh).size.y * 0.5 - shadow.position.z
+		t.check(back >= AHCampScene.support_depth(card.art(), card.body_height), "%s: a sombra chega ao apoio (%.2f m atrás do pé)" % [who, back])
 	t.check(camp.members.filter(func(m): return m.pose == "stand").size() == 2, "o Guaxinim e o Tatu, sem pose de acampamento, de pé")
+	# A pose de cuidar (de pé, a de usar item) troca a sombra pela do pé, e a de descanso volta depois.
+	var sitter: Dictionary = camp.members.filter(func(m): return m.pose == "seat" or m.pose == "sleep")[0]
+	var rest_size: Vector2 = (sitter.card.get_node(AHCampScene.CONTACT_NAME).mesh as PlaneMesh).size
+	camp.show_care_pose(sitter.hero_id)
+	await _tree.process_frame
+	var care_size: Vector2 = (sitter.card.get_node(AHCampScene.CONTACT_NAME).mesh as PlaneMesh).size
+	t.check(not care_size.is_equal_approx(rest_size), "de pé para cuidar, a sombra é a do pé (%s, sentado %s)" % [care_size, rest_size])
+	await _tree.create_timer(AHCampScene.CARE_POSE_SECONDS + 0.2).timeout
+	t.check((sitter.card.get_node(AHCampScene.CONTACT_NAME).mesh as PlaneMesh).size.is_equal_approx(rest_size), "e volta a do descanso")
 	await camp.end(true)
 	t.check(street._heroes.all(func(card): return card.get_node_or_null(AHCampScene.CONTACT_NAME) == null),
 		"ao levantar acampamento, as sombras saem")

@@ -23,7 +23,14 @@ const SWITCH_FADE := 0.12
 ## distância e a altura do alvo (m).
 const FOCUS_PULL := 0.0
 const FOCUS_DISTANCE := 10.5
-const FOCUS_HEIGHT := 0.75
+const FOCUS_HEIGHT := 0.35
+## O ângulo da câmera do acampamento (graus, para baixo), o da arte das poses (#205): a arte é vista de cima, e o apoio
+## do corpo (o quadril do sentado, o tronco do deitado: "support" de camp_poses.json) fica acima do pé. Numa carta de
+## pé no chão, esse apoio cai no chão logo atrás do pé, embaixo do corpo, só se a câmera olhar do mesmo ângulo; com a
+## câmera quase reta (4°), ele caía a mais de 1 m, e o corpo parecia voar.
+const FOCUS_PITCH := 15.0
+## Até onde atrás do pé o apoio pode cair no chão (m): a fundura de um corpo sentado ou deitado de lado.
+const MAX_SUPPORT_DEPTH := 0.6
 ## A meia largura da fileira com a folga dos corpos (m): a câmera recua até ela caber (a lente fechada dos cenários).
 const ROW_HALF_WIDTH := 4.6
 ## O intervalo mínimo entre duas trocas de herói (s), com ou sem o fade: um toque no analógico troca um só.
@@ -33,11 +40,12 @@ const SWITCH_GAP := 0.2
 const LEAVE_OFFSET := 4.3
 ## A pose de cuidar (a de usar item da luta, reactions.item) depois de comer ou curar, antes de voltar a sentar (s).
 const CARE_POSE_SECONDS := 1.2
-## A sombra de contato (#205): sem ela, sentado e deitado pareciam soltos do chão (a fogueira e a luz da sala não fazem
-## sombra embaixo do corpo). Uma mancha escura e macia no chão, na largura do corpo visível da pose: a fração dessa
-## largura, a profundidade (m), quanto escurece no centro e a largura de quem fica de pé (sem pose de acampamento).
+## A sombra de contato (#205): o chão embaixo do corpo, do pé até o apoio (a fogueira e a luz da sala não fazem sombra
+## ali). Uma mancha escura e macia, na largura do corpo visível da pose: a fração dessa largura, quanto passa à frente do
+## pé e atrás do apoio (m), quanto escurece no centro e a largura de quem fica de pé (sem pose de acampamento).
 const CONTACT_WIDTH := 0.9
-const CONTACT_DEPTH := 0.7
+const CONTACT_FRONT := 0.12
+const CONTACT_PAST := 0.15
 const CONTACT_DARKNESS := 0.8
 const CONTACT_STANDING_WIDTH := 0.8
 ## O nome do nó da sombra, filho da carta.
@@ -192,10 +200,21 @@ func _contact(card: AHSpriteCard, art: Dictionary) -> void:
 		var visible: Array = art.visible
 		width = (float(visible[2]) - float(visible[0])) * px_to_m * CONTACT_WIDTH
 		center = ((float(visible[0]) + float(visible[2])) * 0.5 - float(art.anchor[0])) * px_to_m * card.facing
+	var back := support_depth(art, card.body_height) + CONTACT_PAST
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(width, CONTACT_DEPTH)
+	plane.size = Vector2(width, CONTACT_FRONT + back)
 	shadow.mesh = plane
-	shadow.position = Vector3(center, 0.015, 0.0)
+	# Do pé (um pouco à frente) até atrás do apoio: a câmera está do lado de +z.
+	shadow.position = Vector3(center, 0.015, (CONTACT_FRONT - back) * 0.5)
+
+
+## Quanto atrás do pé o apoio do corpo cai no chão, na câmera do acampamento (m): a altura do apoio sobre o pé
+## ("support" de camp_poses.json, em pixels da arte) dividida pela inclinação da câmera. Sem apoio (de pé), zero.
+static func support_depth(art: Dictionary, body_height: float = 1.8) -> float:
+	if not art.has("support") or not art.has("anchor") or not art.has("body_reference_pixels"):
+		return 0.0
+	var lift: float = (float(art.anchor[1]) - float(art.support)) * body_height / float(art.body_reference_pixels)
+	return maxf(0.0, lift) / tan(deg_to_rad(FOCUS_PITCH))
 
 
 static func _contact_shadow_material() -> StandardMaterial3D:
@@ -280,8 +299,10 @@ func show_care_pose(hero_id: String) -> void:
 		return
 	var rest := card.art()
 	card.show_art(item)
+	_contact(card, item)
 	await get_tree().create_timer(CARE_POSE_SECONDS).timeout
 	# Levantou acampamento no meio: a arte de antes já voltou (end); senão, a de descanso.
 	if active and is_instance_valid(card) and card.art() == item:
 		card.show_art(rest)
+		_contact(card, rest)
 

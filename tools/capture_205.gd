@@ -2,8 +2,8 @@
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_205.gd -- --out=<pasta> [--level=0..3]
 ## Campanha própria na pasta da saída (o save do jogador fica intacto). Roda também na main de antes. O acampamento numa
 ## casa com quatro equipes: os fundadores e, com o Bento e o Nick, os recrutas com pose (cão e gato, sapo e coruja) e o
-## Guaxinim e o Tatu (sem pose de acampamento). Em cada uma, o último está ferido e deita. Cada foto tem o recorte
-## dos pés (feet-*).
+## Guaxinim e o Tatu (sem pose de acampamento). Cada equipe duas vezes: com o último ferido (deita) e com todos
+## feridos (todos deitam). Cada foto tem o recorte dos pés (feet-*).
 extends SceneTree
 
 ## Dois recrutas por equipe (o Alojamento do começo tem lugar para dois), entre o Bento e o Nick.
@@ -39,7 +39,8 @@ func _run() -> void:
 	root.get_node("Settings")._persist = false
 	if level >= 0:
 		root.get_node("Settings").set_level(level)
-	for team_name in TEAMS:
+	for shot in TEAMS.keys().map(func(k): return [k, false]) + TEAMS.keys().map(func(k): return [k, true]):
+		var team_name: String = shot[0]
 		var c: Dictionary = campaign.create_initial(23)
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 5
@@ -52,8 +53,9 @@ func _run() -> void:
 		J.start_expedition(c, "fase_1", 23)
 		if not recruited.is_empty():
 			c.session.expedition.team = [c.roster[0].id, recruited[0], recruited[1], c.roster[1].id]
-		var tired = S.hero(c, c.session.expedition.team.back())
-		tired.hp = maxi(1, int(tired.max_hp) / 5)
+		# Na primeira volta só o último deita; na segunda, todos (as 16 poses deitadas e sentadas aparecem).
+		for id in (c.session.expedition.team if shot[1] else [c.session.expedition.team.back()]):
+			S.hero(c, id).hp = maxi(1, int(S.hero(c, id).max_hp) / 5)
 		campaign.state = c
 		campaign.save()
 		flow.change_to("street", {}, false)
@@ -71,7 +73,7 @@ func _run() -> void:
 		await _frames(20)
 		await corridor._start_camp()
 		await _frames(40)
-		await _shot("camp-" + team_name)
+		await _shot("camp-" + team_name + ("-asleep" if shot[1] else ""))
 	for file in DirAccess.get_files_at(campaign.save_dir):
 		DirAccess.remove_absolute(campaign.save_dir.path_join(file))
 	DirAccess.remove_absolute(campaign.save_dir)
