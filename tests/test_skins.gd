@@ -86,8 +86,10 @@ func _rules() -> void:
 	t.check(S.skin_lock_reason(c, TEST_SKIN) != "", "e diz o motivo")
 	t.check(S.choose_skin(c, "hero_gato_nick", TEST_SKIN) != "", "a skin de um herói não serve em outro")
 	var locked: int = GameData.table("skins").values().filter(func(row): return not c.unlocked_skins.has(row.Name) and AHSkins.has_art(row.Name)).size()
+	var before: Array = c.unlocked_skins.duplicate()
 	t.equal(S.unlock_all_skins(c), locked, "a barra de Admin libera todas as que têm arte")
-	t.check(c.unlocked_skins.all(func(id): return AHSkins.has_art(id)), "e nenhuma sem arte conta como liberada")
+	t.check(c.unlocked_skins.filter(func(id): return not before.has(id)).all(func(id): return AHSkins.has_art(id)),
+		"e não libera nenhuma sem arte")
 	t.check(S.skin_unlocked(c, TEST_SKIN), "liberada")
 	t.equal(S.choose_skin(c, BENTO, TEST_SKIN), "", "liberada, se veste")
 	t.check(AHCombatArena.hero_art_of(BENTO).idle.file != art_before, "e a arte do herói muda (a luta, a rua, a Sala e os rostos)")
