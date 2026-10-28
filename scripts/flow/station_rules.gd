@@ -178,7 +178,7 @@ static func migrate(campaign: Dictionary) -> void:
 	# Saves anteriores à arte dos recrutas (#32): o fundador continua com a dele; o recruta ganha a variação da classe.
 	for entry in campaign.get("roster", []):
 		if not entry.has("art_variant"):
-			entry.art_variant = pick_art_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
+			entry.art_variant = _least_used_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
 		if String(entry.get("skin_id", "")) == "":
@@ -192,6 +192,9 @@ static func migrate(campaign: Dictionary) -> void:
 	# O trem de antes do #122 não tem o recruta: quem espera é um civil.
 	if typeof(campaign.station.train.get("recruit")) != TYPE_DICTIONARY:
 		campaign.station.train.recruit = {}
+	# O trem de antes do #182 traz um só.
+	if typeof(campaign.station.train.get("next")) != TYPE_DICTIONARY:
+		campaign.station.train.next = {}
 	campaign.station.train_dry = int(campaign.station.get("train_dry", 0))
 	# "departing" é só a animação do trem saindo (4 s na tela). Um save gravado nesse meio (o jogo fechou) abriria com o
 	# trem partindo para sempre: a Preparação ficava bloqueada e a plataforma sem botão.
@@ -216,8 +219,10 @@ static func _night_defaults() -> Dictionary:
 
 ## recruit: o animal que o trem trouxe (#122), ainda fora do elenco ({class_id, display_name, perks, art_variant,
 ## origin}); vazio quando quem espera é um civil.
+## next (#182): o segundo animal quando o trem traz dois ({candidate_id, recruit}, ou {}); decidido o primeiro, ele passa
+## a ser quem espera.
 static func _train_defaults() -> Dictionary:
-	return {"phase": "none", "candidate_id": "", "expedition_id": "", "accepted": false, "recruit": {}}
+	return {"phase": "none", "candidate_id": "", "expedition_id": "", "accepted": false, "recruit": {}, "next": {}}
 
 
 static func in_refuge(campaign: Dictionary) -> bool:
@@ -612,7 +617,12 @@ static func train_chance(campaign: Dictionary) -> int:
 
 ## As classes que podem chegar no trem: as liberadas e com arte de luta (quem não tem fica fora, como na partida).
 static func train_classes(campaign: Dictionary) -> Array:
-	return campaign.unlocked_classes.filter(func(id): return GameData.row("classes", id) != null and not AHCombatArena.hero_art_of("hero_%s_0" % id).is_empty())
+	# Com o Alojamento cheio, o trem não traz animal (#182): ele não teria onde ficar, ia embora na partida, e o trem
+	# parecia parado. Sem variação livre da classe, também não (nenhum personagem repetido).
+	if heroes_full(campaign):
+		return []
+	return campaign.unlocked_classes.filter(func(id): return GameData.row("classes", id) != null \
+		and not AHCombatArena.hero_art_of("hero_%s_0" % id).is_empty() and not free_art_variants(campaign, id).is_empty())
 
 
 ## Na volta (#122): às vezes o trem traz alguém, às vezes não. Quem vem: um animal de uma classe liberada ou o próximo
@@ -642,23 +652,52 @@ static func train_on_return(campaign: Dictionary, expedition_id: String, force: 
 	if civilians_open and (civilian_turn or classes.is_empty()):
 		station.train.candidate_id = station.candidate_queue[0]
 		return true
-	var class_id: String = classes[rng.randi() % classes.size()]
-	var origins: Array = GameData.table("recruitment").values().filter(func(r): return String(r.get("ClassId", "")) == class_id)
-	origins.sort_custom(func(a, b): return String(a.Name) < String(b.Name))
-	station.train.candidate_id = _next_hero_id(campaign, class_id)
-	station.train.recruit = {"class_id": class_id, "display_name": hero_name(campaign, class_id),
-		"perks": Campaign.roll_perks(GameData.table("perks"), rng), "art_variant": pick_art_variant(campaign, class_id),
-		"origin": String(origins[rng.randi() % origins.size()].Text) if not origins.is_empty() else ""}
+	var first := _train_animal(campaign, classes, rng, [])
+	station.train.candidate_id = first.candidate_id
+	station.train.recruit = first.recruit
+	# Às vezes descem dois (#182): o segundo só com lugar para os dois e um rosto livre (sem repetir o do primeiro).
+	var single := train_rule("train", "SingleWeight", 60)
+	var pair := train_rule("train", "PairWeight", 0)
+	var room_for_two: bool = hero_limit(campaign) - living(campaign).size() >= 2
+	if room_for_two and pair > 0 and rng.randi_range(1, single + pair) > single:
+		var others := train_classes(campaign)
+		if not others.is_empty():
+			station.train.next = _train_animal(campaign, others, rng, [first.candidate_id])
 	return true
 
 
-## O nome de quem espera na plataforma (o civil ou o animal do trem), ou "".
+## Um animal do trem de uma das classes: {candidate_id, recruit}. taken: os ids já reservados nesta chegada.
+static func _train_animal(campaign: Dictionary, classes: Array, rng: RandomNumberGenerator, taken: Array) -> Dictionary:
+	var class_id: String = classes[rng.randi() % classes.size()]
+	var origins: Array = GameData.table("recruitment").values().filter(func(r): return String(r.get("ClassId", "")) == class_id)
+	origins.sort_custom(func(a, b): return String(a.Name) < String(b.Name))
+	var candidate_id := _next_hero_id(campaign, class_id)
+	var suffix: int = campaign.roster.size()
+	while taken.has(candidate_id) or hero(campaign, candidate_id) != null:
+		suffix += 1
+		candidate_id = "hero_%s_%d" % [class_id, suffix]
+	return {"candidate_id": candidate_id, "recruit": {"class_id": class_id, "display_name": hero_name(campaign, class_id),
+		"perks": Campaign.roll_perks(GameData.table("perks"), rng), "art_variant": pick_art_variant(campaign, class_id),
+		"origin": String(origins[rng.randi() % origins.size()].Text) if not origins.is_empty() else ""}}
+
+
+## O nome de quem espera na plataforma (o civil ou o animal do trem), ou "". Com dois (#182), os dois: "Nix e Sereno".
 static func train_candidate_name(campaign: Dictionary) -> String:
+	var names := train_waiting_names(campaign)
+	return names[0] if names.size() == 1 else (TranslationServer.translate("%s e %s") % names if names.size() == 2 else "")
+
+
+## Os nomes de quem espera na plataforma: o de agora e, se desceram dois (#182), o outro.
+static func train_waiting_names(campaign: Dictionary) -> Array:
 	var train: Dictionary = campaign.station.train
 	if train.phase != "waiting":
-		return ""
+		return []
 	var recruit: Dictionary = train.get("recruit", {})
-	return String(recruit.display_name) if not recruit.is_empty() else String(civilian(train.candidate_id).get("name", ""))
+	var names: Array = [String(recruit.display_name) if not recruit.is_empty() else String(civilian(train.candidate_id).get("name", ""))]
+	var second: Dictionary = train.get("next", {}).get("recruit", {})
+	if typeof(second) == TYPE_DICTIONARY and not second.is_empty():
+		names.append(String(second.display_name))
+	return names
 
 
 ## Quem espera no trem é um animal (#122), e não um civil.
@@ -685,9 +724,32 @@ static func recruit_block(campaign: Dictionary) -> String:
 	return ""
 
 
-## Acolher ou recusar quem espera na plataforma. O civil recusado volta ao fim da fila; o animal recusado vai embora e
-## não volta. Acolher o animal custa o que ele pede (recruit_price).
+## Desceram dois (#182, a decisão do Lucas): o jogador decide os dois na ordem que quiser. Trazer à frente o segundo
+## troca os dois de lugar no trem (quem é decidido agora e quem espera); devolve se trocou.
+static func bring_forward(campaign: Dictionary, candidate_id: String) -> bool:
+	var train: Dictionary = campaign.station.train
+	var second: Dictionary = train.get("next", {})
+	if train.phase != "waiting" or second.is_empty() or candidate_id == "" or second.get("candidate_id", "") != candidate_id:
+		return false
+	train.next = {"candidate_id": train.candidate_id, "recruit": train.recruit}
+	train.candidate_id = second.candidate_id
+	train.recruit = second.recruit
+	return true
+
+
+## Acolher ou recusar quem espera na plataforma (qualquer um dos dois, quando desceram dois). O civil recusado volta ao
+## fim da fila; o animal recusado vai embora e não volta. Acolher o animal custa o que ele pede (recruit_price).
 static func decide_candidate(campaign: Dictionary, candidate_id: String, accept: bool) -> String:
+	var front: String = campaign.station.train.candidate_id
+	var swapped := bring_forward(campaign, candidate_id)
+	var error := _decide_front(campaign, candidate_id, accept)
+	# A decisão não passou (sem sementes, sem lugar): os dois voltam à ordem de antes.
+	if error != "" and swapped:
+		bring_forward(campaign, front)
+	return error
+
+
+static func _decide_front(campaign: Dictionary, candidate_id: String, accept: bool) -> String:
 	var station: Dictionary = campaign.station
 	if station.train.phase != "waiting" or station.train.candidate_id != candidate_id or candidate_id == "":
 		return TranslationServer.translate("Ninguém está esperando na plataforma.")
@@ -711,6 +773,13 @@ static func decide_candidate(campaign: Dictionary, candidate_id: String, accept:
 		else:
 			station.candidate_queue.append(candidate_id)
 	station.train.accepted = accept
+	# O outro do trem (#182): decidido um, o outro continua esperando (o trem ainda não parte).
+	var second: Dictionary = station.train.get("next", {})
+	if not second.is_empty():
+		station.train.candidate_id = second.candidate_id
+		station.train.recruit = second.recruit
+		station.train.next = {}
+		return ""
 	station.train.phase = "departing"
 	return ""
 
@@ -718,8 +787,15 @@ static func decide_candidate(campaign: Dictionary, candidate_id: String, accept:
 ## Ninguém decidiu antes da partida (#122): quem esperava vai embora no trem, como recusado, e a visita acaba.
 static func train_leaves(campaign: Dictionary) -> void:
 	var station: Dictionary = campaign.station
+	# Os dois do trem (#182) vão embora juntos. Um trem inconsistente (sem candidato, num save velho) não trava a partida:
+	# o erro da decisão encerra a visita.
+	for attempt in 3:
+		if station.train.phase != "waiting":
+			break
+		if decide_candidate(campaign, station.train.candidate_id, false) != "":
+			station.train.phase = "departing"
 	if station.train.phase == "waiting":
-		decide_candidate(campaign, station.train.candidate_id, false)
+		station.train.phase = "departing"
 	finish_departure(campaign)
 
 
@@ -1041,6 +1117,9 @@ static func hero_name(campaign: Dictionary, class_id: String) -> String:
 	var used := {}
 	for entry in campaign.roster:
 		used[String(entry.display_name).to_lower()] = true
+	# Quem espera no trem também tem nome (#182: os dois que chegam juntos não se chamam igual).
+	for waiting in waiting_recruits(campaign):
+		used[String(waiting.get("display_name", "")).to_lower()] = true
 	for entry in campaign.get("memorial", []):
 		used[String(entry.display_name).to_lower()] = true
 	var pool: Array = NAME_POOLS.get(class_id, ["Recruta"])
@@ -1060,6 +1139,11 @@ static func recruit(campaign: Dictionary, class_id: String, rng: RandomNumberGen
 		return {"error": TranslationServer.translate("Essa classe ainda não chegou à Estação.")}
 	if heroes_full(campaign):
 		return {"error": TranslationServer.translate("O Alojamento está cheio (%d de %d heróis).") % [living(campaign).size(), hero_limit(campaign)]}
+	# Nenhum personagem repetido (#182): sem variação livre da classe, ninguém novo dela chega (a classe sem nenhum
+	# recruta desenhado, o Guaxinim e o Tatu, segue como antes).
+	var variant := pick_art_variant(campaign, class_id)
+	if variant == "" and not art_variants(class_id).is_empty():
+		return {"error": TranslationServer.translate("Ninguém novo dessa classe chega agora: todos os rostos dela já estão na Estação.")}
 	var free := given_name != "" or can_recruit_volunteer(campaign, class_id)
 	if not free and quantity(campaign, "seeds") < RECRUIT_COST:
 		return {"error": TranslationServer.translate("Sementes insuficientes (custa 10 sementes).")}
@@ -1067,14 +1151,17 @@ static func recruit(campaign: Dictionary, class_id: String, rng: RandomNumberGen
 		adjust(campaign, "seeds", -RECRUIT_COST)
 	var hero_id := _next_hero_id(campaign, class_id)
 	var display := given_name if given_name != "" else hero_name(campaign, class_id)
-	_add_hero(campaign, hero_id, class_id, display, Campaign.roll_perks(GameData.table("perks"), rng), pick_art_variant(campaign, class_id))
+	_add_hero(campaign, hero_id, class_id, display, Campaign.roll_perks(GameData.table("perks"), rng), variant)
 	return {"error": "", "hero_id": hero_id}
 
 
-## O próximo id livre de recruta da classe (hero_cao_5).
+## O próximo id livre de recruta da classe (hero_cao_5), fora do elenco e dos ids reservados de quem espera no trem
+## (#182: a barra de Admin recrutando no meio não toma o id do segundo).
 static func _next_hero_id(campaign: Dictionary, class_id: String) -> String:
+	var train: Dictionary = campaign.get("station", {}).get("train", {})
+	var reserved: Array = [String(train.get("candidate_id", "")), String(train.get("next", {}).get("candidate_id", ""))]
 	var suffix: int = campaign.roster.size()
-	while hero(campaign, "hero_%s_%d" % [class_id, suffix]) != null:
+	while hero(campaign, "hero_%s_%d" % [class_id, suffix]) != null or reserved.has("hero_%s_%d" % [class_id, suffix]):
 		suffix += 1
 	return "hero_%s_%d" % [class_id, suffix]
 
@@ -1101,9 +1188,36 @@ static func art_variants(class_id: String) -> Array:
 	return out
 
 
-## A variação para um recruta novo: a menos usada pelos vivos da mesma classe (empate: a primeira). Não sorteia, para o
-## recrutamento continuar com as mesmas sementes. "" se a classe não tem arte própria (usa a do fundador).
+## Nenhum personagem repetido (#182, decisão do Lucas): as variações da classe que ninguém usa, nem no elenco (vivo,
+## caído ou em recuperação) nem o animal que espera no trem. Cada arte é uma pessoa só.
+static func free_art_variants(campaign: Dictionary, class_id: String) -> Array:
+	var taken: Array = campaign.roster.map(func(h): return String(h.get("art_variant", "")))
+	for waiting in waiting_recruits(campaign):
+		taken.append(String(waiting.get("art_variant", "")))
+	return art_variants(class_id).filter(func(v): return not taken.has(v))
+
+
+## Os animais que esperam no trem (#182): quem é decidido agora e quem desceu junto. O rosto e o nome deles ficam
+## reservados até a decisão.
+static func waiting_recruits(campaign: Dictionary) -> Array:
+	var train: Dictionary = campaign.get("station", {}).get("train", {})
+	var out: Array = []
+	for recruit in [train.get("recruit", {}), train.get("next", {}).get("recruit", {})]:
+		if typeof(recruit) == TYPE_DICTIONARY and not recruit.is_empty():
+			out.append(recruit)
+	return out
+
+
+## A variação para um recruta novo: a primeira livre (free_art_variants), sem sortear, para o recrutamento continuar com
+## as mesmas sementes. "" sem nenhuma livre: não vem ninguém dessa classe.
 static func pick_art_variant(campaign: Dictionary, class_id: String) -> String:
+	var free := free_art_variants(campaign, class_id)
+	return free[0] if not free.is_empty() else ""
+
+
+## A variação de um recruta de save antigo sem o campo (#32): a menos usada pelos vivos da classe. Quem já é repetido
+## num save antigo continua como está (#182: ninguém some).
+static func _least_used_variant(campaign: Dictionary, class_id: String) -> String:
 	var variants := art_variants(class_id)
 	if variants.is_empty():
 		return ""
@@ -1125,11 +1239,17 @@ static func is_recruit(hero_id: String) -> bool:
 ## Os voluntários a caminho entram no elenco, enquanto houver vaga.
 static func receive_volunteers(campaign: Dictionary, rng: RandomNumberGenerator) -> int:
 	var arrived := 0
+	var waiting: Array = []
 	while not campaign.pending_offers.is_empty() and not heroes_full(campaign):
 		var offer: Dictionary = campaign.pending_offers.pop_front()
 		if not campaign.unlocked_classes.has(offer.class_id):
 			campaign.unlocked_classes.append(offer.class_id)
+		# Sem rosto livre da classe (#182, nenhum personagem repetido), o voluntário espera a vez, sem se perder.
+		if pick_art_variant(campaign, offer.class_id) == "" and not art_variants(offer.class_id).is_empty():
+			waiting.append(offer)
+			continue
 		arrived += 1 if recruit(campaign, offer.class_id, rng, offer.display_name).error == "" else 0
+	campaign.pending_offers = waiting + campaign.pending_offers
 	return arrived
 
 
@@ -1301,7 +1421,9 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."),
 			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
 	if train_candidate_name(campaign) != "":
-		return {"title": TranslationServer.translate("Chegou alguém no trem"), "text": TranslationServer.translate("%s espera na plataforma. Veja o que traz e decida se fica; se a equipe partir antes, vai embora no trem.") % train_candidate_name(campaign),
+		var many := train_waiting_names(campaign).size() > 1
+		return {"title": TranslationServer.translate("Chegou alguém no trem"), "text": (TranslationServer.translate("%s esperam na plataforma. Veja o que trazem e decida quem fica; se a equipe partir antes, vão embora no trem.") if many
+			else TranslationServer.translate("%s espera na plataforma. Veja o que traz e decida se fica; se a equipe partir antes, vai embora no trem.")) % train_candidate_name(campaign),
 			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
 	if rest_block(campaign) == "":
 		return {"title": TranslationServer.translate("Esperar a recuperação"), "text": TranslationServer.translate("Ninguém pode partir: a equipe está em recuperação. Passe um dia na Estação, e cada caído fica um dia mais perto de voltar."),

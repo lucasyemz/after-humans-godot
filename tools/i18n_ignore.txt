@@ -1583,6 +1583,9 @@ passage_card.gd: Sound
 passage_card.gd: Ambience
 passage_card.gd: gain
 passage_card.gd: end
+*: next
+ui_style.gd: enemies
+refuge_hud.gd: Pair_%s
 exploration_hud.gd: Carried
 *: carried
 exploration_hud.gd: %s (%s)
@@ -1592,7 +1595,6 @@ journey_rules.gd: alive
 journey_rules.gd: house
 street_corridor.gd: reactions
 street_corridor.gd: death
-ui_style.gd: enemies
 character_room.gd: Skins
 character_room.gd: Skin_%s
 *: skins

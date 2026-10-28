@@ -47,6 +47,8 @@ const WORK_POSES := {"hero_cao_bento": "forge", "hero_gato_nick": "depot", "hero
 const LINE_CENTER_X := 13.8
 const LINE_SPACING := 2.1
 const LINE_Z := -6.4
+## O segundo do trem (#182) espera a esta distância do primeiro (m).
+const COMPANION_GAP := 1.4
 ## O relatório no kit (#60): os centros das cartas dos heróis a 416 px um do outro, e os pés da fila logo acima delas.
 const REPORT_CARD_STEP := 416.0
 const REPORT_FEET_Y := 634.0
@@ -144,6 +146,8 @@ var _train_time := 0.0
 signal train_event(name: String)
 var _warning_time := -1.0
 var _candidate: AHSpriteCard
+## O segundo que desceu do trem (#182), à espera da vez dele.
+var _companion: AHSpriteCard
 var _candidate_id := ""
 var _pending_arrival := ""
 ## O som do trem que está tocando (esmaece na parada e quando o trem some, #61).
@@ -580,7 +584,15 @@ func follow_train() -> void:
 
 func _candidate_key() -> Dictionary:
 	var feet := _departure_slot(1)
+	# Desceram dois (#182): a câmera recua para o segundo, ao lado, também caber à esquerda do painel.
+	if not Campaign.state.station.train.get("next", {}).is_empty():
+		return ue_key(feet.x * 100 + 20, feet.z * 100 + 800, 92, 44, 0)
 	return ue_key(feet.x * 100 + 100, feet.z * 100 + 650, 92, 44, 0)
+
+
+## Onde o segundo do trem espera: ao lado do primeiro, um pouco atrás.
+func _companion_slot() -> Vector3:
+	return _departure_slot(1) + Vector3(-COMPANION_GAP, 0, -0.3)
 
 
 ## A câmera da fila na plataforma: baixa, olhando um pouco para cima, com a fila inteira à esquerda do painel.
@@ -710,6 +722,7 @@ func align_lineup(centers: Dictionary) -> void:
 ## (align_lineup); do abrigo, a câmera sobe pela passagem. hero_ids vem na ordem da cena (a posição 1 à direita).
 func show_departure(hero_ids: Array) -> void:
 	clear_lineup()
+	_release_boarding()
 	for index in hero_ids.size():
 		_line_card(hero_ids[index], Vector3(LINE_CENTER_X + (index - (maxi(1, hero_ids.size()) - 1) * 0.5) * REPORT_SPACING, 0, LINE_Z))
 	_go(_report_key(), true, false)
@@ -897,6 +910,7 @@ func play_train_arrival(candidate_id: String) -> void:
 ## Fecha e acelera para o túnel; fica fora até a próxima chegada (PlayTrainDeparture). Recusado, o candidato volta
 ## para dentro do trem antes de as portas fecharem.
 func play_train_departure(candidate_leaves: bool) -> void:
+	departure_pending = false
 	_team_train_leaving = false
 	_warning_time = -1.0
 	_train_time = 0.0
@@ -981,7 +995,7 @@ func train_event_named(name: String) -> void:
 
 func train_busy() -> bool:
 	# O trem que trouxe a equipe indo embora não segura a cena do candidato: a chegada dele começa do túnel.
-	return (_train_mode != 0 and not _team_train_leaving) or _pending_arrival != "" or _reopen_pending
+	return (_train_mode != 0 and not _team_train_leaving) or _pending_arrival != "" or _reopen_pending or departure_pending
 
 
 # ---------------------------------------------------------------- a volta da equipe (#76)
@@ -1114,6 +1128,7 @@ func show_candidate(candidate_id: String) -> void:
 	_remove_candidate()
 	_candidate_id = candidate_id
 	_spawn_candidate(_departure_slot(1))
+	_spawn_companion()
 	_offset_wagon(0.0)
 
 
@@ -1126,7 +1141,122 @@ func _remove_candidate() -> void:
 	if is_instance_valid(_candidate):
 		_candidate.queue_free()
 	_candidate = null
+	if is_instance_valid(_companion):
+		_companion.queue_free()
+	_companion = null
 	_walkers = _walkers.filter(func(w): return is_instance_valid(w.card))
+
+
+## Decidido o primeiro do trem (#182), o segundo passa a esperar: o recusado volta andando ao vagão (o acolhido já foi
+## para o cômodo), o segundo anda até o lugar do primeiro, e a câmera fecha nele.
+func promote_companion(candidate_id: String, first_leaves: bool) -> void:
+	if is_instance_valid(_candidate):
+		if first_leaves:
+			_set_door_open(1.0)
+			var own: Array = _walkers.filter(func(w): return w.card == _candidate)
+			var walker: Dictionary = own[0] if not own.is_empty() else {"card": _candidate, "phase": 0.0, "home_z": _candidate.position.z}
+			if own.is_empty():
+				_walkers.append(walker)
+			walker.min = _train_door_x()
+			walker.max = _candidate.position.x
+			walker.target = _train_door_x()
+			walker.wait = 0.0
+			walker.stay = false
+			walker.vanish = true
+			walker.speed = TRAIN_WALK_SPEED * train_speed()
+		else:
+			_candidate.queue_free()
+	_candidate = null
+	_candidate_id = candidate_id
+	if not is_instance_valid(_companion):
+		show_candidate(candidate_id)
+	else:
+		_candidate = _companion
+		_companion = null
+		var slot := _departure_slot(1)
+		var own: Array = _walkers.filter(func(w): return w.card == _candidate)
+		var walker: Dictionary = own[0] if not own.is_empty() else {"card": _candidate, "phase": 0.0}
+		if own.is_empty():
+			_walkers.append(walker)
+		walker.min = minf(slot.x, _candidate.position.x)
+		walker.max = maxf(slot.x, _candidate.position.x)
+		walker.target = slot.x
+		walker.wait = 0.0
+		walker.stay = true
+		walker.home_z = slot.z
+		walker.speed = TRAIN_WALK_SPEED * train_speed()
+		_candidate.position.z = slot.z
+	if on_platform:
+		_go(_candidate_key(), true, false)
+
+
+## O jogador escolheu decidir primeiro o outro dos dois (#182, S.bring_forward): as placas trocam de papel, cada uma no
+## lugar onde está.
+func swap_pair() -> void:
+	var train: Dictionary = Campaign.state.station.train
+	if train.candidate_id == _candidate_id or not is_instance_valid(_companion):
+		return
+	var first := _candidate
+	_candidate = _companion
+	_companion = first
+	_candidate_id = train.candidate_id
+
+
+## Os dois do trem (#182) na ordem em que estão na plataforma, da esquerda para a direita (as abas do painel seguem a
+## cena, e trocar quem é decidido não as troca de lugar).
+func pair_order(ids: Array) -> Array:
+	var cards := {_candidate_id: _candidate}
+	if is_instance_valid(_companion):
+		for id in ids:
+			if id != _candidate_id:
+				cards[id] = _companion
+	if ids.any(func(id): return not cards.has(id) or not is_instance_valid(cards[id])):
+		return ids
+	var sorted := ids.duplicate()
+	sorted.sort_custom(func(a, b): return cards[a].position.x < cards[b].position.x)
+	return sorted
+
+
+## Os moradores de novo nos cômodos, num sorteio novo (o acolhido do trem vai para um deles).
+func place_residents() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	_place_residents(rng)
+
+
+## A partida decidida, esperando o recusado (#182) entrar no vagão: o trem já conta como ocupado (a Preparação não
+## abre com ele partindo atrás da fila).
+var departure_pending := false
+
+
+## O recusado (#182) ainda andando de volta ao vagão.
+func boarding_back() -> bool:
+	return _walkers.any(func(w): return w.get("vanish", false) and is_instance_valid(w.card) and not w.card.is_queued_for_deletion())
+
+
+## Quem voltava ao vagão sai da cena de vez (a Preparação monta a fila na plataforma).
+func _release_boarding() -> void:
+	for walker in _walkers:
+		if walker.get("vanish", false) and is_instance_valid(walker.card):
+			walker.card.queue_free()
+
+
+## O segundo animal do trem (#182), de pé ao lado de quem é decidido agora, até a vez dele.
+func _spawn_companion(feet: Vector3 = Vector3.INF) -> AHSpriteCard:
+	var second: Dictionary = Campaign.state.station.train.get("next", {})
+	if second.is_empty():
+		return null
+	var art: Dictionary = AHCombatArena.hero_art_of(String(second.candidate_id), String(second.recruit.art_variant)).get("idle", {})
+	if art.is_empty():
+		return null
+	_companion = AHSpriteCard.new()
+	_companion.name = "TrainCompanion"
+	_companion.body_height = AHCharacterHeights.find(String(second.candidate_id))
+	_companion.show_art(art)
+	add_child(_companion)
+	_companion.position = _companion_slot() if feet == Vector3.INF else feet
+	_companion.set_facing(1.0)
+	return _companion
 
 
 func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
@@ -1200,6 +1330,12 @@ func _tick_arrival(before: float) -> void:
 		if card:
 			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
 				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": target.z})
+		# Desceram dois (#182): o segundo desce logo atrás e para ao lado.
+		var beside := _companion_slot()
+		var companion := _spawn_companion(Vector3(_train_door_x(), beside.y, beside.z))
+		if companion:
+			_walkers.append({"card": companion, "min": beside.x, "max": beside.x, "target": beside.x, "wait": 0.0, "phase": 0.0,
+				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": beside.z})
 		train_event.emit("candidate_out")
 	if not _camera_pending and _train_time >= TRAIN_DOOR_END and (not is_instance_valid(_candidate) or absf(_candidate.position.x - target.x) < 0.05):
 		_camera_pending = true
@@ -1395,6 +1531,8 @@ func _update_sleepers() -> void:
 ## Cada herói vivo num cômodo sorteado (30% de chance de dividir um já ocupado, no máximo dois), passeando pela faixa
 ## do cômodo; os civis ficam no cômodo deles, alternando o idle e a pose de trabalho.
 func _place_residents(rng: RandomNumberGenerator) -> void:
+	# Quem voltava ao vagão (#182) não fica parado na plataforma sem o passeio.
+	_release_boarding()
 	for card in residents.values():
 		card.queue_free()
 	residents.clear()
@@ -1573,6 +1711,10 @@ func _walk(delta: float) -> void:
 		var speed: float = walker.get("speed", WALK_SPEED)
 		if absf(gap) < 0.05:
 			card.scale = Vector3.ONE
+			# O recusado que voltou ao vagão (#182) some na porta.
+			if walker.get("vanish", false):
+				card.queue_free()
+				continue
 			if walker.get("stay", false):
 				walker.wait = INF
 				continue

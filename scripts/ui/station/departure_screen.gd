@@ -180,7 +180,9 @@ func _band() -> void:
 	# Quem espera no trem (#122) vai embora com ele se a equipe partir antes de decidir.
 	var waiting_name := S.train_candidate_name(c)
 	if waiting_name != "":
-		warning = tr("%s espera no trem: se a equipe partir, vai embora.") % waiting_name + ("\n" + warning if warning != "" else "")
+		# Com dois (#182), os dois vão embora.
+		warning = (tr("%s esperam no trem: se a equipe partir, vão embora.") if S.train_waiting_names(c).size() > 1
+			else tr("%s espera no trem: se a equipe partir, vai embora.")) % waiting_name + ("\n" + warning if warning != "" else "")
 	# Quem parte deixa o posto na Estação (#119).
 	for hero_id in draft.team:
 		var member = S.hero(c, hero_id)
