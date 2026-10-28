@@ -175,3 +175,12 @@ busca. Achou mais isto:
 | A dica da Mochila pulava para o alto quando o aviso sumia, enquanto ainda era lida | O lugar do aviso segue evitado até a dica mudar (`tutorial_guide.gd`). O `test_tutorial` confere que a chapa fica no lugar |
 
 O registro "Combate iniciado nas ruínas do Bairro Submerso!" é anterior ao tutorial e fica para o Lucas decidir.
+
+## A rodada 5 da QA do arco
+
+A QA aprovou o aviso justo no texto Maior (932x115) e a dica da Mochila parada no lugar. Achou mais isto:
+
+| O que a QA achou | Como ficou |
+|---|---|
+| Sem a busca, quem segue andando alcança a patrulha logo depois da porta, e o aviso do começo da luta ("A equipe chegou sem ser vista: age primeiro.") trocava a frase do fôlego em 0,8 s | A frase fica mantida na HUD (`hold_line`) e vai na frente de todo aviso que chega até completar 7 s, o tempo que ela tem na busca: o anúncio do trecho e o começo da luta a trazem junto. O `test_toast_fit` confere a regra, e o `test_tutorial` anda do anúncio ao aviso do começo da luta com a frase na frente |
+| O aviso solto da chegada piscava 1 quadro antes do anúncio | É o mesmo aviso que a frase mantida abre: o anúncio, logo em seguida, começa com ela |
