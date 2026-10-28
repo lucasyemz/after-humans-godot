@@ -5,7 +5,8 @@
 ##   corpo na câmera do acampamento, a até MAX_SUPPORT_DEPTH atrás do pé, e o dado confere com a arte;
 ## - na cena, a câmera olha do ângulo da arte e cada herói em volta da fogueira tem a sombra de contato no chão, do pé
 ##   até atrás do apoio (também quem não tem pose de acampamento, como o Guaxinim e o Tatu, e fica de pé); ela acompanha
-##   a pose de cuidar e sai ao levantar acampamento.
+##   a pose de cuidar e sai ao levantar acampamento;
+## - na parada com água no chão, o tambor de ferro com fogo no lugar da fogueira (decisão do Lucas).
 extends RefCounted
 
 const J := preload("res://scripts/flow/journey_rules.gd")
@@ -22,6 +23,7 @@ func run(context) -> void:
 	_tree = Engine.get_main_loop()
 	_art()
 	_stops()
+	await _barrel()
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-camp-ground-%d" % Time.get_ticks_usec()
@@ -85,6 +87,43 @@ func _stops() -> void:
 		var height := AHCampScene.focus_height(spec[1])
 		t.check(height >= AHCampScene.FOCUS_HEIGHT and height <= AHCampScene.FLAT_FOCUS_HEIGHT, "%s: a altura do alvo (%.2f m)" % [spec[0], height])
 		scenario.free()
+
+
+## A fogueira da parada na água do chão (decisão do Lucas): o tambor de ferro com fogo, o fogo assentado na boca dele,
+## tremulando, e o halo; aceso e apagado. No seco, a fogueira de sempre.
+func _barrel() -> void:
+	var camp := AHStreetCamp.new()
+	_tree.root.add_child(camp)
+	camp.build(10.0, 12.0, 0.0, 1.0, true)
+	var barrel: MeshInstance3D = camp.get_node_or_null("Barrel")
+	var fire: MeshInstance3D = camp.get_node_or_null("BarrelFire")
+	var halo: MeshInstance3D = camp.get_node_or_null("BarrelHalo")
+	if not t.check(barrel != null and fire != null and halo != null, "na água, o tambor com o fogo e o halo"):
+		camp.free()
+		return
+	var height: float = (barrel.mesh as QuadMesh).size.y
+	t.check(is_equal_approx(height, AHStreetCamp.BARREL_HEIGHT) and is_equal_approx(barrel.position.y - height * 0.5, 0.0),
+		"o tambor com %.2f m e o pé no piso" % height)
+	# O pé do fogo na boca do tambor: y = 95 px do card, de cima.
+	var seat := height - AHStreetCamp.BARREL_FIRE_SEAT * AHStreetCamp.BARREL_HEIGHT / AHStreetCamp.BARREL_PX.y
+	var fire_size: Vector2 = (fire.mesh as QuadMesh).size
+	t.check(absf(fire.position.y - fire_size.y * 0.5 - seat) < 0.001 and is_equal_approx(fire_size.x, (barrel.mesh as QuadMesh).size.x * AHStreetCamp.BARREL_FIRE_WIDTH),
+		"o fogo assenta na boca, com 85% da largura do tambor")
+	t.check(not fire.visible and not halo.visible, "apagado, o tambor frio")
+	camp.set_camp_lit(true)
+	t.check(fire.visible and halo.visible, "aceso, o fogo e o halo")
+	var frames := {}
+	for i in 30:
+		camp._process(1.0 / AHStreetCamp.BARREL_FIRE_FPS)
+		frames[(fire.material_override as ShaderMaterial).get_shader_parameter("tex")] = true
+	t.check(frames.size() == 4, "o fogo tremula nos quatro quadros (%d)" % frames.size())
+	camp.free()
+	var dry := AHStreetCamp.new()
+	_tree.root.add_child(dry)
+	dry.build(10.0, 12.0, 0.0, 1.0)
+	t.check(dry.get_node_or_null("Barrel") == null and not dry.barrel, "no seco, a fogueira de sempre")
+	dry.free()
+	await _tree.process_frame
 
 
 ## O apoio: na faixa do meio do corpo visível (40% da largura), a mediana da última linha opaca de cada coluna.
