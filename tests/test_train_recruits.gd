@@ -128,7 +128,8 @@ func _accept_and_refuse() -> void:
 	t.equal(S.quantity(c, "seeds"), 5, "pagou o que pediu")
 	t.check(S.next_step(c).title != "Chegou alguém no trem", "decidido, o Próximo passo não diz mais que alguém espera")
 	t.check(S.finish_departure(c) and c.station.train.recruit.is_empty(), "o trem parte vazio")
-	# O id reservado na chegada usado por outro (a Admin recrutou da mesma classe): quem chegou ganha outro.
+	# A Admin recrutando a mesma classe enquanto alguém espera no trem (#182): ela pula o id reservado, e quem chegou
+	# entra com ele (os ids nunca repetem).
 	var f := _campaign()
 	S.train_on_return(f, "same-id", "hero")
 	var reserved: String = f.station.train.candidate_id
@@ -138,11 +139,12 @@ func _accept_and_refuse() -> void:
 	S._recruit_art["test_%s_02" % cls] = {"class_id": cls, "idle": saved_art[S.art_variants(cls)[0]].idle}
 	var other := S.recruit(f, cls, RandomNumberGenerator.new(), "Outro")
 	S._recruit_art = saved_art
-	t.equal(other.get("hero_id", ""), reserved, "a Admin usa o id reservado")
+	t.check(other.get("hero_id", "") != "" and other.get("hero_id", "") != reserved, "a Admin não toma o id reservado (%s)" % other.get("hero_id", ""))
 	f.inventory.seeds = 50
 	S.decide_candidate(f, reserved, true)
 	var ids: Array = f.roster.map(func(h): return h.id)
-	t.equal(ids.size(), {}.merged(Dictionary(ids.reduce(func(acc, id): acc[id] = true; return acc, {}))).size(), "e quem chegou ganha um id novo (sem repetir)")
+	t.check(S.hero(f, reserved) != null and ids.size() == {}.merged(Dictionary(ids.reduce(func(acc, id): acc[id] = true; return acc, {}))).size(),
+		"e quem chegou entra com o id reservado (sem repetir)")
 	# Recusar: vai embora e não volta (o civil recusado, sim, volta ao fim da fila).
 	var d := _campaign()
 	S.train_on_return(d, "refuse", "hero")

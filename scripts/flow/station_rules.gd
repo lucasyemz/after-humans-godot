@@ -715,9 +715,32 @@ static func recruit_block(campaign: Dictionary) -> String:
 	return ""
 
 
-## Acolher ou recusar quem espera na plataforma. O civil recusado volta ao fim da fila; o animal recusado vai embora e
-## não volta. Acolher o animal custa o que ele pede (recruit_price).
+## Desceram dois (#182, a decisão do Lucas): o jogador decide os dois na ordem que quiser. Trazer à frente o segundo
+## troca os dois de lugar no trem (quem é decidido agora e quem espera); devolve se trocou.
+static func bring_forward(campaign: Dictionary, candidate_id: String) -> bool:
+	var train: Dictionary = campaign.station.train
+	var second: Dictionary = train.get("next", {})
+	if train.phase != "waiting" or second.is_empty() or candidate_id == "" or second.get("candidate_id", "") != candidate_id:
+		return false
+	train.next = {"candidate_id": train.candidate_id, "recruit": train.recruit}
+	train.candidate_id = second.candidate_id
+	train.recruit = second.recruit
+	return true
+
+
+## Acolher ou recusar quem espera na plataforma (qualquer um dos dois, quando desceram dois). O civil recusado volta ao
+## fim da fila; o animal recusado vai embora e não volta. Acolher o animal custa o que ele pede (recruit_price).
 static func decide_candidate(campaign: Dictionary, candidate_id: String, accept: bool) -> String:
+	var front: String = campaign.station.train.candidate_id
+	var swapped := bring_forward(campaign, candidate_id)
+	var error := _decide_front(campaign, candidate_id, accept)
+	# A decisão não passou (sem sementes, sem lugar): os dois voltam à ordem de antes.
+	if error != "" and swapped:
+		bring_forward(campaign, front)
+	return error
+
+
+static func _decide_front(campaign: Dictionary, candidate_id: String, accept: bool) -> String:
 	var station: Dictionary = campaign.station
 	if station.train.phase != "waiting" or station.train.candidate_id != candidate_id or candidate_id == "":
 		return TranslationServer.translate("Ninguém está esperando na plataforma.")
@@ -741,7 +764,7 @@ static func decide_candidate(campaign: Dictionary, candidate_id: String, accept:
 		else:
 			station.candidate_queue.append(candidate_id)
 	station.train.accepted = accept
-	# O segundo do trem (#182): decidido o primeiro, ele passa a esperar (o trem ainda não parte).
+	# O outro do trem (#182): decidido um, o outro continua esperando (o trem ainda não parte).
 	var second: Dictionary = station.train.get("next", {})
 	if not second.is_empty():
 		station.train.candidate_id = second.candidate_id
@@ -1123,10 +1146,13 @@ static func recruit(campaign: Dictionary, class_id: String, rng: RandomNumberGen
 	return {"error": "", "hero_id": hero_id}
 
 
-## O próximo id livre de recruta da classe (hero_cao_5).
+## O próximo id livre de recruta da classe (hero_cao_5), fora do elenco e dos ids reservados de quem espera no trem
+## (#182: a barra de Admin recrutando no meio não toma o id do segundo).
 static func _next_hero_id(campaign: Dictionary, class_id: String) -> String:
+	var train: Dictionary = campaign.get("station", {}).get("train", {})
+	var reserved: Array = [String(train.get("candidate_id", "")), String(train.get("next", {}).get("candidate_id", ""))]
 	var suffix: int = campaign.roster.size()
-	while hero(campaign, "hero_%s_%d" % [class_id, suffix]) != null:
+	while hero(campaign, "hero_%s_%d" % [class_id, suffix]) != null or reserved.has("hero_%s_%d" % [class_id, suffix]):
 		suffix += 1
 	return "hero_%s_%d" % [class_id, suffix]
 

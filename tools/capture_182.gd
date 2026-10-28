@@ -1,5 +1,5 @@
-## Fotos do trem (#182): a chegada com dois recrutas (os dois na plataforma e o painel com "Desceu junto") e o painel do
-## segundo depois de decidir o primeiro. No código de antes, o trem traz um só (o antes).
+## Fotos do trem (#182): a chegada com dois recrutas (os dois na plataforma e as duas abas no painel), a aba do segundo
+## escolhida (ele vem à frente) e, decidido ele, o painel do primeiro. No código de antes, o trem traz um só.
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_182.gd -- --out=<pasta> [--text-size=2]
 ## A campanha fica numa pasta dentro de <pasta>; o save do jogador fica intacto.
 extends SceneTree
@@ -46,13 +46,19 @@ func _run() -> void:
 	var station = current_scene
 	var hud = station.hud
 	hud.open_service("train")
-	var end := Time.get_ticks_msec() + 40000
+	var end := Time.get_ticks_msec() + 120000
 	while (station.train_busy() or not hud._panel.visible) and Time.get_ticks_msec() < end:
 		await process_frame
 	await _frames(40)
 	await _shot("arrival")
 	if not c.station.train.get("next", {}).is_empty():
-		hud._decide(c.station.train.candidate_id, true)
+		var second_id: String = c.station.train.next.candidate_id
+		var tab = hud._panel.find_child("Pair_%s" % second_id, true, false)
+		if tab:
+			tab.pressed.emit()
+			await _frames(20)
+			await _shot("chosen")
+		hud._decide(second_id, true)
 		await _frames(60)
 		await _shot("second")
 	for file in DirAccess.get_files_at(campaign.save_dir):

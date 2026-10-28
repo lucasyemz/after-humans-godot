@@ -37,10 +37,24 @@ não cabia. Para quem joga, parecia que o trem tinha parado.
   chegadas de animal):
   - o segundo só desce com lugar para os dois no Alojamento e com um rosto livre;
   - na plataforma, ele fica de pé ao lado do primeiro, e a câmera recua para os dois caberem;
-  - o painel do primeiro diz quem desceu junto;
-  - decidido o primeiro (acolhido ou recusado), o painel mostra o segundo, e o trem só parte depois dele;
+  - **na ordem que o jogador quiser** (a decisão do Lucas, 28/10): no lugar do rosto, o painel mostra as duas abas, com
+    o rosto e o nome, como as da Sala dos Personagens. A aba do outro o traz à frente (`S.bring_forward`): o painel
+    passa a ser dele, e na plataforma cada um continua no lugar dele. Decidido um, o painel mostra o outro, sozinho,
+    e o trem só parte depois dos dois;
   - sem decisão, os dois vão embora juntos na partida.
+
+![a escolha entre os dois](train-pair/choice.jpg)
 - **O save:** guarda o segundo (`train.next`). O save antigo abre com o trem de um só.
+
+## A revisão do PR (28/10)
+
+- **Corrigido:**
+  - a HUD não chama mais o método privado da Estação: ela usa `station.place_residents()`;
+  - a espera do recusado de dois tem um limite (`BOARDING_WAIT`, 8 s), e quem se perder do passeio não segura a
+    partida;
+  - o próximo id livre de recruta pula os ids reservados de quem espera no trem. Assim, a barra de Admin recrutando a
+    mesma classe no meio não toma o id do segundo, e os dois entram com o id reservado (`test_train_unique`).
+- **Para o Lucas:** os pesos 60/15 e se o recusado volta (o texto e o jogo precisam seguir a escolha).
 
 ## Testes
 
@@ -51,7 +65,10 @@ não cabia. Para quem joga, parecia que o trem tinha parado.
   - em 200 chegadas, os dois descem na proporção da tabela, com rostos, nomes e ids diferentes, e nunca sem lugar;
   - as decisões um de cada vez, e a partida que leva os dois;
   - o save e o save antigo;
-  - a tela: o painel com "Desceu junto", o segundo na plataforma e, decidido o primeiro, o painel do segundo.
+  - a ordem livre: o segundo decidido antes do primeiro, a troca do `bring_forward` e o id reservado com a barra de
+    Admin no meio;
+  - a tela: as duas abas no painel, o segundo na plataforma, a aba que o traz à frente (cada um no lugar dele) e,
+    decidido ele, o painel do primeiro sozinho.
 - **Ajustados para a regra nova:** `test_recruit_art` (o segundo cão não chega), `test_train_recruits` (a casa cheia
   não traz animal), `test_hero_jobs` e `test_station_rules`. Os testes que precisavam de vários heróis da mesma classe
   agora os põem direto no elenco, como um save antigo.
@@ -136,3 +153,36 @@ Em todos os casos, a flag desliga depois da partida, e a Preparação volta a ab
 
 **Baixa, fora desta entrega:** os erros "Lambda capture … was freed" na chegada do trem com `last_return` vazio. Eles
 já aconteciam na `main` antes.
+
+### Rodada 5 (a escolha livre): REPROVADO
+
+**Alta, corrigida:** trocar de aba e reabrir o trem fazia a chegada tocar de novo, e, depois da Preparação, a
+plataforma ficava vazia. O HUD não sabia que quem foi trazido à frente já tinha descido (`_arrived_candidate`). Agora a
+troca e a decisão atualizam isso. O teste fecha e reabre o trem depois da troca: os dois continuam na plataforma, e a
+chegada não volta.
+
+**Baixas:**
+- Corrigido: as abas trocavam de lugar ao clicar. Agora seguem a plataforma, da esquerda para a direita
+  (`station.pair_order`).
+- Corrigido: uma decisão barrada (sem sementes) deixava os dois trocados. Agora a ordem volta, nas regras e na cena,
+  e o teste confere.
+- Corrigido: o `test_train_recruits` esperava que a barra de Admin tomasse o id reservado de quem espera no trem. Agora
+  confere o contrário: ela pula o id, e quem chegou entra com ele.
+- Fica: salvar e carregar com a ordem trocada põe quem está à frente no lugar 1 da plataforma. Isso é só visual: as
+  abas seguem a cena.
+- Fica: o ramo de reserva do `decide_candidate` (o id já tomado) só acontece em save antigo e não tem teste.
+
+### Rodada 6: APROVADO
+
+A QA testou:
+- trocar de aba e reabrir o trem;
+- a Preparação depois da troca (os dois voltam à plataforma);
+- sete trocas rápidas;
+- o Acolher barrado no outro (a ordem volta nas regras, na cena e no HUD);
+- recusar um e acolher o outro até a partida.
+
+Tudo ficou coerente. A suíte deu 80/80.
+
+**Ficam (baixas):** quando a cena reconstrói os dois (o fim da Preparação, ou salvar e carregar com a ordem trocada), o
+escolhido aparece no lugar da frente. Os erros "Lambda capture … was freed" na chegada do trem já existiam na `main`
+(rodada 4).

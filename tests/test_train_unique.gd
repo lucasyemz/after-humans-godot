@@ -1,6 +1,7 @@
 ## O trem que não trava e não repete (#182): nenhum personagem repetido (o trem e o recrutamento só trazem um rosto
 ## que não está no elenco; sem rosto livre, não vem animal), a casa cheia não traz animal, e às vezes descem dois
-## (decididos um de cada vez; os dois vão embora juntos na partida). O save guarda o segundo, e o save antigo abre.
+## (decididos na ordem que o jogador quiser; os dois vão embora juntos na partida). O save guarda o segundo, e o save
+## antigo abre.
 extends RefCounted
 
 const S = preload("res://scripts/flow/station_rules.gd")
@@ -117,6 +118,33 @@ func _pair_decisions() -> void:
 		"e o segundo passa a esperar (o trem ainda não parte)")
 	t.equal(S.decide_candidate(c, second_id, false), "", "recusa o segundo")
 	t.check(S.hero(c, second_id) == null and c.station.train.phase == "departing", "aí o trem parte")
+	# Na ordem que o jogador quiser (a decisão do Lucas): o segundo decidido antes do primeiro.
+	var f := _pair_campaign()
+	var f_first: String = f.station.train.candidate_id
+	var f_second: String = f.station.train.next.candidate_id
+	t.equal(S.decide_candidate(f, f_second, true), "", "acolhe o segundo antes do primeiro")
+	t.check(S.hero(f, f_second) != null and S.hero(f, f_first) == null and f.station.train.phase == "waiting"
+		and f.station.train.candidate_id == f_first and f.station.train.next.is_empty(), "e o primeiro continua esperando")
+	t.equal(S.decide_candidate(f, f_first, true), "", "depois o primeiro")
+	t.check(S.hero(f, f_first) != null and f.station.train.phase == "departing", "aí o trem parte, com os dois acolhidos")
+	var g := _pair_campaign()
+	var g_first: String = g.station.train.candidate_id
+	t.check(S.bring_forward(g, g.station.train.next.candidate_id) and g.station.train.next.candidate_id == g_first,
+		"trazer o segundo à frente troca os dois de lugar")
+	t.check(not S.bring_forward(g, g.station.train.candidate_id) and not S.bring_forward(g, "hero_ninguem_9"),
+		"quem já está à frente, ou não está no trem, não troca nada")
+	# O id reservado dos dois: a barra de Admin recrutando a mesma classe no meio não o toma.
+	var h := _pair_campaign()
+	var h_ids := [String(h.station.train.candidate_id), String(h.station.train.next.candidate_id)]
+	var taken_ids: Array = []
+	for recruit in [h.station.train.recruit, h.station.train.next.recruit]:
+		h.station.rooms[S.CHARACTERS] = 4
+		var extra := S._next_hero_id(h, String(recruit.class_id))
+		taken_ids.append(extra)
+	t.check(not taken_ids.any(func(id): return h_ids.has(id)), "o próximo id livre pula os ids de quem espera no trem")
+	S.decide_candidate(h, h_ids[1], true)
+	S.decide_candidate(h, h_ids[0], true)
+	t.check(S.hero(h, h_ids[0]) != null and S.hero(h, h_ids[1]) != null, "e os dois entram com o id reservado")
 	# Os dois têm o rosto e o nome reservados: o recrutamento (a barra de Admin) não repete o segundo.
 	var e := _pair_campaign()
 	var second: Dictionary = e.station.train.next.recruit
@@ -165,8 +193,8 @@ func _saves() -> void:
 	t.check(typeof(old.station.train.get("next")) == TYPE_DICTIONARY and old.station.train.next.is_empty(), "o save antigo abre com um só")
 
 
-## Na tela: o painel diz quem desceu junto, o segundo está de pé na plataforma, e decidido o primeiro, o painel mostra
-## o segundo (o trem não parte).
+## Na tela: o painel tem os dois à escolha, o segundo está de pé na plataforma, a aba dele o traz à frente, e decidido
+## um, o painel mostra o outro (o trem não parte).
 func _screens() -> void:
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
@@ -193,10 +221,49 @@ func _screens() -> void:
 		while (station.train_busy() or not hud._panel.visible) and Time.get_ticks_msec() < end:
 			await _tree.process_frame
 		await _frames(3)
+		var first_id: String = c.station.train.candidate_id
+		var second_id: String = c.station.train.next.candidate_id
+		var first_name: String = c.station.train.recruit.display_name
 		var second_name: String = c.station.train.next.recruit.display_name
-		t.check(_label(hud._panel, "Desceu junto") and _label(hud._panel, second_name), "o painel diz quem desceu junto (%s)" % second_name)
-		t.check(is_instance_valid(station._companion) and station._companion.visible, "e ele está de pé na plataforma")
-		# No Maior, com Acolher travado, o pedido e o motivo ficam à vista sem rolar (o "Desceu junto" vem depois).
+		var pair: Node = hud._panel.find_child("TrainPair", true, false)
+		t.check(pair != null and pair.get_child_count() == 2 and _label(pair, first_name) and _label(pair, second_name),
+			"o painel tem os dois à escolha (%s e %s)" % [first_name, second_name])
+		t.check(is_instance_valid(station._companion) and station._companion.visible, "e o segundo está de pé na plataforma")
+		# A aba do segundo o traz à frente: o painel passa a ser dele, e na plataforma ninguém sai do lugar.
+		var spots := [station._candidate.position, station._companion.position]
+		var order_before: Array = pair.get_children().map(func(n): return String(n.name)) if pair else []
+		var tab: Button = pair.find_child("Pair_%s" % second_id, false, false) if pair else null
+		if t.check(tab != null, "a aba do segundo"):
+			tab.pressed.emit()
+		await _frames(4)
+		t.check(Campaign.state.station.train.candidate_id == second_id and station._candidate_id == second_id
+			and _label(hud._panel, tr_line(second_name)),
+			"a aba traz o segundo à frente, no painel e na cena")
+		t.check(station._candidate.position == spots[1] and station._companion.position == spots[0], "cada um continua no lugar dele")
+		var pair_now: Node = hud._panel.find_child("TrainPair", true, false)
+		t.equal(pair_now.get_children().map(func(n): return String(n.name)) if pair_now else [], order_before,
+			"as abas não trocam de lugar (seguem a plataforma)")
+		# Fechar e reabrir o trem depois da troca: os dois continuam onde estavam, sem a chegada de novo.
+		hud.close_panel()
+		await _frames(6)
+		hud.open_service("train")
+		t.check(not station._pending_arrival, "reabrir o trem depois da troca não chama a chegada de novo")
+		var settle := Time.get_ticks_msec() + 20000
+		while station.train_busy() and Time.get_ticks_msec() < settle:
+			await _tree.process_frame
+		await _frames(4)
+		t.check(not station.train_busy() and is_instance_valid(station._candidate) and is_instance_valid(station._companion)
+			and station._candidate_id == second_id, "e os dois continuam na plataforma, com o escolhido à frente")
+		# Acolher travado (sem sementes) no outro: a ordem e a cena ficam como estavam.
+		Campaign.state.inventory.seeds = 0
+		hud._decide(first_id, true)
+		await _frames(3)
+		t.check(Campaign.state.station.train.candidate_id == second_id and station._candidate_id == second_id
+			and Campaign.state.station.train.next.get("candidate_id", "") == first_id, "a decisão barrada não troca ninguém de lugar")
+		Campaign.state.inventory.seeds = 500
+		hud.refresh()
+		await _frames(3)
+		# No Maior, com Acolher travado, o pedido e o motivo ficam à vista sem rolar.
 		var size_before: int = Settings.text_size
 		Settings.set_text_size(2)
 		Campaign.state.inventory.seeds = 3
@@ -209,18 +276,19 @@ func _screens() -> void:
 		Campaign.state.inventory.seeds = 500
 		hud.refresh()
 		await _frames(4)
-		var first_id: String = c.station.train.candidate_id
-		hud._decide(first_id, false)
+		hud._decide(second_id, false)
 		await _frames(6)
-		t.check(Campaign.state.station.train.phase == "waiting" and _label(hud._panel, second_name), "recusado o primeiro, o painel mostra o segundo")
+		t.check(Campaign.state.station.train.phase == "waiting" and Campaign.state.station.train.candidate_id == first_id
+			and _label(hud._panel, first_name) and hud._panel.find_child("TrainPair", true, false) == null,
+			"recusado o segundo, o painel mostra o primeiro, sozinho")
 		t.check(station._candidate_id == Campaign.state.station.train.candidate_id and not is_instance_valid(station._companion),
-			"e ele vira quem espera na plataforma")
+			"e ele é quem espera na plataforma")
 		var promoted: AHSpriteCard = station._candidate
 		end = Time.get_ticks_msec() + 15000
 		while is_instance_valid(promoted) and absf(promoted.position.x - station._departure_slot(1).x) > 0.06 and Time.get_ticks_msec() < end:
 			await _tree.process_frame
-		t.check(is_instance_valid(promoted) and absf(promoted.position.x - station._departure_slot(1).x) <= 0.06, "e anda até o lugar do primeiro")
-		# Decidido o segundo logo em seguida, com o recusado ainda voltando ao vagão: as portas só fecham depois que ele
+		t.check(is_instance_valid(promoted) and absf(promoted.position.x - station._departure_slot(1).x) <= 0.06, "e fica no lugar de quem espera")
+		# Decidido o outro logo em seguida, com o recusado ainda voltando ao vagão: as portas só fecham depois que ele
 		# entra.
 		t.check(station.boarding_back(), "o recusado ainda volta ao vagão")
 		hud._decide(Campaign.state.station.train.candidate_id, true)
@@ -247,6 +315,11 @@ func _screens() -> void:
 	Tips.enabled = tips
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## O título do painel de um animal do trem.
+func tr_line(name: String) -> String:
+	return TranslationServer.translate("%s quer entrar na Estação") % name
 
 
 func _label(node: Node, text: String) -> bool:

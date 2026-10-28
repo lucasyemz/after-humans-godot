@@ -1518,3 +1518,4 @@ passage_card.gd: gain
 passage_card.gd: end
 *: next
 ui_style.gd: enemies
+refuge_hud.gd: Pair_%s

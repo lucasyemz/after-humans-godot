@@ -1136,6 +1136,40 @@ func promote_companion(candidate_id: String, first_leaves: bool) -> void:
 		_go(_candidate_key(), true, false)
 
 
+## O jogador escolheu decidir primeiro o outro dos dois (#182, S.bring_forward): as placas trocam de papel, cada uma no
+## lugar onde está.
+func swap_pair() -> void:
+	var train: Dictionary = Campaign.state.station.train
+	if train.candidate_id == _candidate_id or not is_instance_valid(_companion):
+		return
+	var first := _candidate
+	_candidate = _companion
+	_companion = first
+	_candidate_id = train.candidate_id
+
+
+## Os dois do trem (#182) na ordem em que estão na plataforma, da esquerda para a direita (as abas do painel seguem a
+## cena, e trocar quem é decidido não as troca de lugar).
+func pair_order(ids: Array) -> Array:
+	var cards := {_candidate_id: _candidate}
+	if is_instance_valid(_companion):
+		for id in ids:
+			if id != _candidate_id:
+				cards[id] = _companion
+	if ids.any(func(id): return not cards.has(id) or not is_instance_valid(cards[id])):
+		return ids
+	var sorted := ids.duplicate()
+	sorted.sort_custom(func(a, b): return cards[a].position.x < cards[b].position.x)
+	return sorted
+
+
+## Os moradores de novo nos cômodos, num sorteio novo (o acolhido do trem vai para um deles).
+func place_residents() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	_place_residents(rng)
+
+
 ## A partida decidida, esperando o recusado (#182) entrar no vagão: o trem já conta como ocupado (a Preparação não
 ## abre com ele partindo atrás da fila).
 var departure_pending := false
