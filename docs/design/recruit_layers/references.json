@@ -1,0 +1,346 @@
+[
+  {
+    "name": "dog",
+    "id": "dog_recruit_01",
+    "class_id": "cao",
+    "idle": {
+      "file": "res://art/combat/recruits/dog_recruit_01_idle.webp",
+      "anchor": [
+        542.0,
+        1425
+      ],
+      "body_reference_pixels": 1385,
+      "body_width_pixels": 820,
+      "canvas": [
+        1086,
+        1448
+      ],
+      "portrait": "res://art/ui/portraits/dog_recruit_01.png"
+    }
+  },
+  {
+    "name": "cat",
+    "id": "cat_recruit_01",
+    "class_id": "gato",
+    "idle": {
+      "file": "res://art/combat/recruits/cat_recruit_01_idle.webp",
+      "anchor": [
+        589.5,
+        1312
+      ],
+      "body_reference_pixels": 1260,
+      "body_width_pixels": 735,
+      "canvas": [
+        1178,
+        1336
+      ],
+      "portrait": "res://art/ui/portraits/cat_recruit_01.png"
+    }
+  },
+  {
+    "name": "frog",
+    "id": "frog_recruit_01",
+    "class_id": "sapo",
+    "idle": {
+      "file": "res://art/combat/recruits/frog_recruit_01_idle.webp",
+      "anchor": [
+        588.5,
+        1311
+      ],
+      "body_reference_pixels": 1219,
+      "body_width_pixels": 761,
+      "canvas": [
+        1178,
+        1336
+      ],
+      "portrait": "res://art/ui/portraits/frog_recruit_01.png"
+    }
+  },
+  {
+    "name": "owl",
+    "id": "owl_recruit_01",
+    "class_id": "coruja",
+    "idle": {
+      "file": "res://art/combat/recruits/owl_recruit_01_idle.webp",
+      "anchor": [
+        589.5,
+        1312
+      ],
+      "body_reference_pixels": 1272,
+      "body_width_pixels": 747,
+      "canvas": [
+        1178,
+        1336
+      ],
+      "portrait": "res://art/ui/portraits/owl_recruit_01.png"
+    }
+  },
+  {
+    "name": "raccoon",
+    "id": "raccoon_recruit_01",
+    "class_id": "rato",
+    "idle": {
+      "file": "res://art/combat/recruits/raccoon_recruit_01/idle.webp",
+      "anchor": [
+        601.5,
+        1184
+      ],
+      "body_reference_pixels": 999,
+      "body_width_pixels": 821,
+      "canvas": [
+        1178,
+        1335
+      ]
+    },
+    "actions": {
+      "rato_frasco": {
+        "execucao": {
+          "file": "res://art/combat/recruits/raccoon_recruit_01/rato_frasco.webp",
+          "anchor": [
+            601.5,
+            1184
+          ],
+          "body_reference_pixels": 999,
+          "body_width_pixels": 821,
+          "canvas": [
+            1178,
+            1335
+          ]
+        }
+      },
+      "rato_mordida": {
+        "execucao": {
+          "file": "res://art/combat/recruits/raccoon_recruit_01/rato_mordida.webp",
+          "anchor": [
+            601.5,
+            1184
+          ],
+          "body_reference_pixels": 999,
+          "body_width_pixels": 821,
+          "canvas": [
+            1178,
+            1335
+          ]
+        }
+      },
+      "rato_passagem": {
+        "execucao": {
+          "file": "res://art/combat/recruits/raccoon_recruit_01/rato_passagem.webp",
+          "anchor": [
+            601.5,
+            1184
+          ],
+          "body_reference_pixels": 999,
+          "body_width_pixels": 821,
+          "canvas": [
+            1178,
+            1335
+          ]
+        }
+      },
+      "rato_poeira": {
+        "execucao": {
+          "file": "res://art/combat/recruits/raccoon_recruit_01/rato_poeira.webp",
+          "anchor": [
+            601.5,
+            1184
+          ],
+          "body_reference_pixels": 999,
+          "body_width_pixels": 821,
+          "canvas": [
+            1178,
+            1335
+          ]
+        }
+      }
+    },
+    "reactions": {
+      "hurt": {
+        "file": "res://art/combat/recruits/raccoon_recruit_01/hurt.webp",
+        "anchor": [
+          601.5,
+          1184
+        ],
+        "body_reference_pixels": 999,
+        "body_width_pixels": 821,
+        "canvas": [
+          1178,
+          1335
+        ]
+      },
+      "death": {
+        "file": "res://art/combat/recruits/raccoon_recruit_01/death.webp",
+        "anchor": [
+          601.5,
+          1184
+        ],
+        "body_reference_pixels": 999,
+        "body_width_pixels": 821,
+        "canvas": [
+          1178,
+          1335
+        ]
+      },
+      "dodge": {
+        "file": "res://art/combat/recruits/raccoon_recruit_01/dodge.webp",
+        "anchor": [
+          601.5,
+          1184
+        ],
+        "body_reference_pixels": 999,
+        "body_width_pixels": 821,
+        "canvas": [
+          1178,
+          1335
+        ]
+      },
+      "defense": {
+        "file": "res://art/combat/recruits/raccoon_recruit_01/defense.webp",
+        "anchor": [
+          601.5,
+          1184
+        ],
+        "body_reference_pixels": 999,
+        "body_width_pixels": 821,
+        "canvas": [
+          1178,
+          1335
+        ]
+      }
+    }
+  },
+  {
+    "name": "armadillo",
+    "id": "armadillo_recruit_01",
+    "class_id": "tatu",
+    "idle": {
+      "file": "res://art/combat/recruits/armadillo_recruit_01/idle.webp",
+      "anchor": [
+        601.0,
+        1087
+      ],
+      "body_reference_pixels": 807,
+      "body_width_pixels": 882,
+      "canvas": [
+        1178,
+        1335
+      ]
+    },
+    "actions": {
+      "tatu_pancada": {
+        "execucao": {
+          "file": "res://art/combat/recruits/armadillo_recruit_01/tatu_pancada.webp",
+          "anchor": [
+            601.0,
+            1087
+          ],
+          "body_reference_pixels": 807,
+          "body_width_pixels": 882,
+          "canvas": [
+            1178,
+            1335
+          ]
+        }
+      },
+      "tatu_enrolar": {
+        "execucao": {
+          "file": "res://art/combat/recruits/armadillo_recruit_01/tatu_enrolar.webp",
+          "anchor": [
+            601.0,
+            1087
+          ],
+          "body_reference_pixels": 807,
+          "body_width_pixels": 882,
+          "canvas": [
+            1178,
+            1335
+          ]
+        }
+      },
+      "tatu_investida": {
+        "execucao": {
+          "file": "res://art/combat/recruits/armadillo_recruit_01/tatu_investida.webp",
+          "anchor": [
+            601.0,
+            1087
+          ],
+          "body_reference_pixels": 807,
+          "body_width_pixels": 882,
+          "canvas": [
+            1178,
+            1335
+          ]
+        }
+      },
+      "tatu_abrigo": {
+        "execucao": {
+          "file": "res://art/combat/recruits/armadillo_recruit_01/tatu_abrigo.webp",
+          "anchor": [
+            601.0,
+            1087
+          ],
+          "body_reference_pixels": 807,
+          "body_width_pixels": 882,
+          "canvas": [
+            1178,
+            1335
+          ]
+        }
+      }
+    },
+    "reactions": {
+      "hurt": {
+        "file": "res://art/combat/recruits/armadillo_recruit_01/hurt.webp",
+        "anchor": [
+          601.0,
+          1087
+        ],
+        "body_reference_pixels": 807,
+        "body_width_pixels": 882,
+        "canvas": [
+          1178,
+          1335
+        ]
+      },
+      "death": {
+        "file": "res://art/combat/recruits/armadillo_recruit_01/death.webp",
+        "anchor": [
+          601.0,
+          1087
+        ],
+        "body_reference_pixels": 807,
+        "body_width_pixels": 882,
+        "canvas": [
+          1178,
+          1335
+        ]
+      },
+      "dodge": {
+        "file": "res://art/combat/recruits/armadillo_recruit_01/dodge.webp",
+        "anchor": [
+          601.0,
+          1087
+        ],
+        "body_reference_pixels": 807,
+        "body_width_pixels": 882,
+        "canvas": [
+          1178,
+          1335
+        ]
+      },
+      "defense": {
+        "file": "res://art/combat/recruits/armadillo_recruit_01/defense.webp",
+        "anchor": [
+          601.0,
+          1087
+        ],
+        "body_reference_pixels": 807,
+        "body_width_pixels": 882,
+        "canvas": [
+          1178,
+          1335
+        ]
+      }
+    }
+  }
+]
