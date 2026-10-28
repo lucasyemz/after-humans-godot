@@ -19,6 +19,9 @@ extends Node
 ## casas) e a da fogueira apagada da casa do acampamento.
 const MARKER_DOOR_HEIGHT := 2.4
 const MARKER_CAMP_HEIGHT := 0.95
+## Quanto a frase do fôlego que vem sem a busca fica na tela (s), na frente dos avisos que chegam em seguida (o anúncio
+## do trecho e o começo da luta): o mesmo tempo que ela tem no aviso da busca.
+const BREATH_LINE_SECONDS := 7.0
 const R = preload("res://scripts/flow/journey_rules.gd")
 const STEP_LENGTH := 7.8
 const MIN_X := 0.0
@@ -65,6 +68,11 @@ const STOP_CAMP_MARGIN := 1.5
 const STOP_CAMP_GUARD_GAP := 1.5
 ## Perto da porta de um interior lateral ou de um prop, o aviso aparece.
 const REACH := 1.1
+## O embarque no trem do tutorial: a que distância (m) da porta do vagão e quanto o trem leva para parar.
+const BOARD_REACH := 2.5
+const TRAIN_ARRIVAL_SECONDS := 4.0
+## Quanto a recompensa fica à vista antes de o vagão partir.
+const REWARD_SECONDS := 2.5
 
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
 const SWITCH_WAIT_MS := 2000
@@ -80,6 +88,8 @@ var stop_camp: AHStreetCamp
 var _camp_hidden: Array[Node3D] = []
 var room_guards: Array = []
 var busy := false
+## O encontro com o Nick já rodou nesta cena (a guarda do _meet_nick).
+var _nick_met := false
 ## O acampamento encenado (#77): a equipe em volta da fogueira enquanto ele estiver ativo.
 var camp: AHCampScene
 var _room_time := 0.0
@@ -107,6 +117,9 @@ var side_rooms: Array = []
 var side_room := -1
 ## Props do cenário: {prop (índice no corredor), local (no mapa), x, zone, step}.
 var scenario_props: Array = []
+## O guia das dicas do tutorial (#144; null fora dele) e onde fica o que o aviso de agora usa (null: sem lugar).
+var guide: AHTutorialGuide
+var _action_where = null
 
 
 func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
@@ -141,6 +154,10 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	street.apply_corridor_weather(route.weather)
 	_spawn_guards()
 	_spawn_props()
+	# O trem do tutorial só aparece quando chega (com o trecho dele resolvido, já parado na plataforma).
+	if street.scenario and not street.scenario.train.is_empty():
+		var last: Dictionary = route.steps[route.steps.size() - 1]
+		street.scenario.park_train(last.type == "train" and last.resolved)
 	_spawn_bodies()
 	_refresh_doors()
 	if route.current_house >= 0:
@@ -151,6 +168,16 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 		_enter_segment(_segment_of(route.index), _step_x(route.index, ARRIVAL_SPOT))
 	hud.refresh(campaign)
 	var session: Dictionary = campaign.session
+	if tutorial():
+		guide = AHTutorialGuide.new(self)
+		add_child(guide)
+	# Reaberto no meio do tutorial: o encontro ou a chegada do trem que ficou pela metade continua.
+	var here: Dictionary = route.steps[route.index]
+	if tutorial() and not here.resolved and session.result == "" and session.event == null:
+		if here.type == "nick":
+			_meet_nick.call_deferred()
+		elif here.type == "train":
+			_reach_platform.call_deferred()
 	if session.result != "":
 		_show_result()
 	elif session.event != null:
@@ -168,6 +195,11 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	elif AHFightRewards.cargo_pending(campaign):
 		# Reaberto com o guardião vencido e a carga ainda fechada: as mesmas caixas de antes.
 		open_cargo.call_deferred()
+
+
+## A jornada do tutorial (#144) no Corredor de Contenção (#147).
+func tutorial() -> bool:
+	return AHTutorial.is_tutorial(Campaign.state)
 
 
 ## Bloqueia o movimento da equipe (painel aberto, transição ou luta).
@@ -226,10 +258,12 @@ func _build_segments(campaign: Dictionary) -> void:
 	var count: int = step_range[1]
 	var counts: Array = []
 	var assigned := 0
-	for part in segments:
-		counts.append(maxi(1, roundi(count * (part.x1 - part.x0) / total)))
+	# O tutorial diz quantos trechos ficam em cada zona (a luta na sala certa, o trem na plataforma).
+	var fixed: Array = AHTutorial.zone_steps() if tutorial() else []
+	for i in segments.size():
+		counts.append(int(fixed[i]) if i < fixed.size() else maxi(1, roundi(count * (segments[i].x1 - segments[i].x0) / total)))
 		assigned += counts[-1]
-	while assigned != count:
+	while assigned != count and fixed.is_empty():
 		var pick := 0
 		for i in range(1, segments.size()):
 			var per: float = (segments[i].x1 - segments[i].x0) / counts[i]
@@ -261,6 +295,7 @@ func _enter_segment(index: int, front_x: float) -> void:
 	side_room = -1
 	if street.scenario:
 		street.set_scenario_zone(segments[index].zone)
+		_refresh_security_doors()
 		street._place_leader(Vector3(front_x, street.floor_y, street.lane_z))
 	else:
 		street._place_leader(Vector3(front_x, 0, 0.45))
@@ -439,7 +474,8 @@ func _street_frame(campaign: Dictionary, route: Dictionary, delta: float) -> voi
 			if last == map_last and map_last < route.steps.size() - 1:
 				_travel_map(campaign, map_last + 1)
 				return
-		if leader.x <= part.x0 + 0.15 and segment > 0:
+		# No tutorial as portas baixam atrás da equipe: não há volta.
+		if leader.x <= part.x0 + 0.15 and segment > 0 and not tutorial():
 			_travel_segment(-1)
 			return
 	var under := _step_under(leader.x)
@@ -454,6 +490,10 @@ func _street_frame(campaign: Dictionary, route: Dictionary, delta: float) -> voi
 			# A Passagem com o evento de história da fase (#64): ele abre ali mesmo.
 			if outcome == "event":
 				hud.show_event(campaign)
+			elif outcome == "nick":
+				_meet_nick()
+			elif outcome == "train":
+				_reach_platform()
 	for index in [route.index, route.index + 1]:
 		if guards.has(index) and _segment_of(index) == segment and _sight_frame(index, delta, leader):
 			return
@@ -481,6 +521,16 @@ func _travel_segment(direction: int) -> void:
 	_enter_segment(to, _step_x(entry, ARRIVAL_SPOT if direction > 0 else 1.0 - ARRIVAL_SPOT))
 	await GameFlow.fade(0.0)
 	busy = false
+	# A porta de segurança baixa atrás da equipe (#147): o estrondo, sem volta. Só na zona que tem a porta de entrada.
+	var door_behind: bool = street.scenario != null and not street.scenario.doors_of(segments[to].zone, "entry").is_empty()
+	if tutorial() and direction > 0 and door_behind:
+		Sound.play("res://audio/world/security_door.ogg")
+	# Passou pelo armário sem vasculhar: o fôlego vem ao chegar à zona da luta do Drone (uma vez só).
+	if direction > 0 and AHTutorial.breath_on_arrival(Campaign.state, part.first, part.steps):
+		Campaign.save()
+		hud.refresh(Campaign.state)
+		# O anúncio do trecho e o aviso do começo da luta chegam logo em seguida: a frase vai na frente deles.
+		hud.hold_line(tr("A equipe recupera o fôlego."), BREATH_LINE_SECONDS)
 
 
 ## Fim do mapa de passagem: a equipe entra no primeiro trecho do mapa da fase e viaja para ele (só de ida).
@@ -781,6 +831,9 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 	var exit_x: float = EXIT_X if street.scenario == null else segments[0].x0 + EXIT_X
 	# No cenário, com o guardião vencido, a volta vale de qualquer ponto (RequestExpeditionReturn da Unreal).
 	var done_here: bool = street.scenario != null and campaign.session.expedition.objective_completed and text == ""
+	if tutorial():
+		_tutorial_action(campaign, route, leader, text, action, where)
+		return
 	if done_here or (leader.x < exit_x and segment == 0 and map_first == 0):
 		text = tr("E  Voltar à Estação (%s)") % (tr("fase concluída: todo o achado") if campaign.session.expedition.objective_completed else tr("retirada: metade do achado"))
 		action = _retreat
@@ -790,7 +843,162 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 	if text.begins_with(tr("E  Vasculhar")):
 		Tips.show_tip("search")
 	_action = action
+	_action_where = where
 	hud.set_markers(_marker_points(campaign, route, leader, where))
+
+
+## O aviso e as marcas no tutorial: sem a volta à Estação pelo começo (as portas baixaram atrás); na plataforma, com o
+## trem parado, o embarque.
+func _tutorial_action(campaign: Dictionary, route: Dictionary, leader: Vector3, text: String, action: Callable, where) -> void:
+	var boarding = _train_point()
+	if boarding != null and absf(boarding.x - leader.x) < BOARD_REACH:
+		text = tr("E  Embarcar no trem")
+		action = _board_train
+		where = boarding
+	hud.show_prompt(text, where)
+	if text.begins_with(tr("E  Vasculhar")):
+		Tips.show_tip("search")
+	_action = action
+	_action_where = where
+	var points := _marker_points(campaign, route, leader, where)
+	if boarding != null and where != boarding and absf(boarding.x - leader.x) < 14.0:
+		points.append(boarding)
+	hud.set_markers(points)
+
+
+## Onde fica o que o aviso de agora usa (o armário, a porta do vagão), ou null.
+func _action_point():
+	return _action_where
+
+
+## A porta do vagão onde se embarca (a marca), ou null fora da plataforma ou com o trem ainda chegando.
+func _train_point():
+	if street.scenario == null or street.scenario.train.is_empty() or segments.is_empty():
+		return null
+	var route: Dictionary = Campaign.state.session.expedition.corridor
+	var step: Dictionary = route.steps[route.index]
+	if segments[segment].zone != int(street.scenario.train.zone) or step.type != "train" or not step.resolved:
+		return null
+	return Vector3(float(street.scenario.train.x), street.floor_y + 2.6, street.lane_z - 1.2)
+
+
+## As portas de segurança da zona: a de entrada baixada (a equipe veio por ela) e a de saída aberta só com os trechos da
+## zona vencidos. sound: toca a porta que abriu agora.
+func _refresh_security_doors(sound: bool = false) -> void:
+	if street.scenario == null or street.scenario.security_doors.is_empty() or segments.is_empty():
+		return
+	var route: Dictionary = Campaign.state.session.expedition.corridor
+	var part: Dictionary = segments[segment]
+	var done := true
+	for step in range(part.first, mini(part.first + part.steps, route.steps.size())):
+		done = done and route.steps[step].resolved
+	for index in street.scenario.doors_of(part.zone, "entry"):
+		street.scenario.set_door(index, false)
+	# O painel da sala das celas: a alavanca embaixo, depois que as portas baixaram atrás da equipe.
+	street.scenario.set_panel_down(part.zone >= int(street.scenario.door_panel.get("zone", 0)))
+	for index in street.scenario.doors_of(part.zone, "exit"):
+		if sound and done and not street.scenario.door_open(index):
+			Sound.play("res://audio/world/security_door_open.ogg")
+		street.scenario.set_door(index, done)
+
+
+## O encontro com o Nick (o tutorial): ele aparece adiante, a conversa curta com o retrato (a caixa do briefing, #88) e
+## ele entra na equipe; o trecho fica resolvido. Fechar o jogo no meio da conversa repete o encontro.
+func _meet_nick() -> void:
+	# A reabertura chama pelo call_deferred e o quadro da rua pode chamar de novo no mesmo trecho: só uma vez por cena.
+	if busy or _nick_met:
+		return
+	_nick_met = true
+	busy = true
+	var team: Array = Campaign.state.session.expedition.team.duplicate()
+	var arriving: Array = AHTutorial.journey().get("JoinTeam", []).filter(func(id): return not team.has(id))
+	for hero_id in arriving:
+		street.add_hero(hero_id, Vector3(street._leader.position.x + 2.2, street.floor_y, street.lane_z - 0.6))
+	var lines := AHBriefing.departure(Campaign.state, "tutorial_nick", team + arriving)
+	if not lines.is_empty() and street._capture_dir == "":
+		var dialog := AHBriefingDialog.open(hud, lines, tr("Seguir"))
+		await dialog.finished
+	AHTutorial.join(Campaign.state)
+	Campaign.save()
+	busy = false
+	hud.refresh(Campaign.state)
+	_refresh_security_doors(true)
+
+
+## Recuou de uma luta do tutorial: a equipe volta inteira um pouco antes da patrulha, que retoma o posto.
+func _restart_fight() -> void:
+	street.end_fight()
+	var index: int = _fight.get("index", -1)
+	for hero_id in Campaign.state.session.expedition.team:
+		var hero = Campaign.hero(hero_id)
+		if hero != null:
+			hero.hp = int(hero.max_hp)
+			hero.alive = true
+	if guards.has(index):
+		var guard: Dictionary = guards[index]
+		for i in guard.cards.size():
+			var card: AHSpriteCard = guard.cards[i]
+			card.position = _guard_position(index, i)
+			card.show_art(street._combat_art.enemies[guard.specs[i].enemy_id].idle)
+			card.set_facing(-1.0)
+			card.set_tint(Color.WHITE)
+			card.visible = true
+		guard.meter = 0.0
+		guard.detected = false
+		street._place_leader(Vector3(_step_x(index, 0.05), street.floor_y, street.lane_z))
+	street.remove_dead_heroes()
+	if guide != null:
+		guide.event("fight_end")
+	Campaign.save()
+	hud.refresh(Campaign.state)
+	hud.toast(tr("A equipe recua e se recompõe. A patrulha continua no caminho: tente de novo."), 4.0)
+
+
+## A plataforma: o trem chega (o som e o vagão entrando no fosso) e para com as portas abertas.
+func _reach_platform() -> void:
+	busy = true
+	Sound.play("res://audio/station/train_arrival.ogg")
+	await street.scenario.arrive_train(TRAIN_ARRIVAL_SECONDS)
+	AHTutorial.resolve_step(Campaign.state, "train")
+	Campaign.save()
+	busy = false
+	hud.refresh(Campaign.state)
+	if guide != null:
+		guide.event("platform")
+
+
+## O embarque: a recompensa da fuga à vista (o que se ganhou voa para o alto, #143), e o vagão leva a equipe à Estação,
+## que abre com a chegada, o debriefing do Bento e do Nick e o relatório.
+func _board_train() -> void:
+	if busy:
+		return
+	busy = true
+	var team: Array = Campaign.state.session.expedition.team.duplicate()
+	var prize := AHTutorial.complete(Campaign.state)
+	# complete() recusa fora da jornada do tutorial (devolve {}): nada a embarcar, e a dica do trem fica aberta.
+	if prize.is_empty():
+		busy = false
+		return
+	if guide != null:
+		guide.event("board")
+	Sound.play("res://audio/station/train_bell.ogg")
+	Tips.mark_seen(AHTutorial.COVERED_TIPS)
+	Campaign.save()
+	var gains: Array = []
+	if int(prize.seeds) > 0:
+		gains.append(["lobby-seed", "+%d %s" % [prize.seeds, tr("sementes")]])
+	if int(prize.bandages) > 0:
+		gains.append(["res-bandages", "+%d %s" % [prize.bandages, tr("curativo") if int(prize.bandages) == 1 else tr("curativos")]])
+	if prize.tool != "":
+		gains.append([AHInventoryPanel.TOOL_ICONS.get(prize.tool, "tool-generic"), tr(AHInventoryPanel.TOOL_NAMES.get(prize.tool, prize.tool))])
+	hud.loot_burst(gains, street._leader.global_position + Vector3(0, 1.9, 0))
+	hud.toast(tr("Recompensa da fuga: %s.") % ", ".join(gains.map(func(g): return g[1])), REWARD_SECONDS)
+	await get_tree().create_timer(REWARD_SECONDS if street._capture_dir == "" else 0.1).timeout
+	var card: Dictionary = GameFlow.card_for("station")
+	card.backdrop = AHWagonRide.new(team)
+	card.title_delay = AHWagonRide.RIDE_SECONDS
+	card.hold = AHWagonRide.RIDE_SECONDS + GameFlow.CARD_SECONDS
+	GameFlow.travel("station", card)
 
 
 ## Onde fica, no mundo, a marca de cada coisa usável: a porta da loja, os caixotes, os props e as portas dos cenários.
@@ -979,6 +1187,10 @@ func open_menu() -> void:
 	var session: Dictionary = Campaign.state.session
 	if not AHExplorationHud.session_open(Campaign.state):
 		return
+	if tutorial():
+		# Na abertura a volta é o trem: o menu fica com as Opções e a campanha nova.
+		hud.show_menu(false, false, tr("Na abertura, a saída é o trem da plataforma."))
+		return
 	hud.show_menu(session.expedition.objective_completed, session.get("event") == null and ["corridor", "rest"].has(session.get("screen")))
 
 
@@ -990,11 +1202,13 @@ func open_inventory() -> void:
 	Sound.play("res://audio/ui/bag_open.ogg")
 	hud.show_inventory()
 	Tips.show_tip("bag")
+	if guide != null:
+		guide.event("bag")
 
 
 func _new_campaign() -> void:
-	Campaign.new_game()
-	GameFlow.travel("station")
+	# A campanha nova passa pela escolha do título (#144): a abertura ou Pular tutorial, no mesmo espaço.
+	GameFlow.travel("title", {}, {"new_campaign": Campaign.slot})
 
 
 func _search_scenario_prop(entry: Dictionary) -> void:
@@ -1006,6 +1220,8 @@ func _search_scenario_prop(entry: Dictionary) -> void:
 		_search_sound(objective_before, int(street.scenario.props[entry.local].open) >= 0)
 		_show_gains(stock)
 		street.scenario.open_prop(entry.local)
+		if guide != null:
+			guide.event("searched")
 		Campaign.save()
 		hud.refresh(Campaign.state)
 		# O objeto com escolha abre o evento ali mesmo (#7).
@@ -1151,6 +1367,9 @@ func _force_house(site_index: int) -> void:
 
 
 func _retreat(confirmed: bool = false) -> void:
+	# No tutorial não há retirada: a saída é o trem.
+	if tutorial():
+		return
 	# Com a carga do guardião na tela, só sai depois de escolher e fechar (a carga não se perde).
 	if busy or AHFightRewards.cargo_pending(Campaign.state):
 		return
@@ -1407,6 +1626,8 @@ func _start_fight(index: int, advantage: bool) -> void:
 	_fight = {"index": index, "boss": fight.boss, "house": house, "cards": cards,
 		"cause": fight.enemies[0].display_name if not fight.enemies.is_empty() else "patrulha"}
 	street.begin_fight()
+	if guide != null:
+		guide.event("fight_start")
 	if fight.opening:
 		hud.toast(tr("A equipe chegou sem ser vista: age primeiro."), 2.5)
 	var heroes: Array = street.party_ids.map(func(id): return Campaign.hero(id))
@@ -1416,7 +1637,13 @@ func _start_fight(index: int, advantage: bool) -> void:
 
 
 func _on_combat_finished(result: String) -> void:
+	# A frase mantida (o fôlego do tutorial) era do começo da luta: não gruda no aviso de depois dela (a fuga, a vitória).
+	hud.release_line()
 	var campaign: Dictionary = Campaign.state
+	# No tutorial ninguém cai e não há fuga que encerre a jornada: quem recua tenta a mesma luta de novo.
+	if tutorial() and result != "victory":
+		_restart_fight()
+		return
 	R.end_combat(campaign, result, _fight.get("boss", false), "%s (%s)" % [_fight.get("cause", ""), R.phase(campaign.session.expedition.phase_id).get("name", "")])
 	street.end_fight()
 	# Quem caiu fica deitado no lugar da luta (#179); o resto da equipe segue. A equipe se refaz no mesmo trecho, então o
@@ -1444,6 +1671,9 @@ func _on_combat_finished(result: String) -> void:
 		else:
 			guards[_fight.index].mark.queue_free()
 			guards.erase(_fight.index)
+		_refresh_security_doors(true)
+		if guide != null:
+			guide.event("fight_end")
 		if campaign.session.expedition.objective_completed and _fight.boss:
 			# A carga recuperada (#91): seis caixas com o que o guardião guardava; escolhida uma vez.
 			Campaign.save()
@@ -1559,11 +1789,21 @@ func debug_next_fight() -> bool:
 	var route: Dictionary = campaign.session.expedition.corridor
 	while route.steps[route.index].resolved and route.index < mini(map_last, route.steps.size() - 1):
 		# A Passagem com o evento de história para ali, com o cartão aberto (o laço não saía com o evento aberto).
-		if R.enter_step(campaign, route.index + 1) == "event":
+		var outcome := R.enter_step(campaign, route.index + 1)
+		if outcome == "event":
 			Campaign.save()
 			hud.refresh(campaign)
 			hud.show_event(campaign)
 			return true
+		# O encontro do tutorial resolve ali (o Nick entra); o trem para a caminhada.
+		if outcome == "nick":
+			_enter_segment(_segment_of(route.index), _step_x(route.index, ARRIVAL_SPOT))
+			_meet_nick()
+		elif outcome == "train":
+			Campaign.save()
+			_enter_segment(_segment_of(route.index), _step_x(route.index, ARRIVAL_SPOT))
+			_reach_platform()
+			return false
 	Campaign.save()
 	# Passou do mapa de passagem: viaja para o da fase.
 	if route.steps[route.index].resolved and route.index == map_last and map_last < route.steps.size() - 1:

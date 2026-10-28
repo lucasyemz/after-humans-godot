@@ -82,6 +82,9 @@ func _ready() -> void:
 	var capture := _capture_dir()
 	if capture != "":
 		_capture.call_deferred(capture)
+	# Nova campanha confirmada na Estação ou na rua (#144): a mesma escolha do título, no espaço de agora.
+	elif int(GameFlow.params.get("new_campaign", 0)) > 0:
+		_ask_after_travel(int(GameFlow.params.new_campaign))
 
 
 ## Continuar só aparece com um save que abre (o principal ou a cópia); sem ele, Nova campanha é o botão principal.
@@ -523,16 +526,88 @@ func _pick_slot(number: int, for_new: bool) -> void:
 	_center_modal.call_deferred()
 
 
-## A campanha nova no espaço leva as opções mexidas no título (volumes, velocidade), que até aqui ficaram só na memória.
+## A campanha nova (#144): começar pela abertura (o tutorial, o padrão) ou pular para a Estação, com a mesma recompensa.
+## Cada escolha numa linha do kit, com o que ela faz; a da abertura vem escolhida.
 func _start_new_campaign(number: int) -> void:
+	if _leaving or GameFlow.busy:
+		return
+	var box := _open_modal(760, tr("Como começar?"), "recruit")
+	# Voltar leva à lista dos espaços (quando ela abriu antes) ou fecha.
+	var any_save := range(1, Campaign.SLOT_COUNT + 1).any(func(n): return Campaign.slot_has_save(n))
+	_modal_back = _open_slots.bind(true, number) if any_save else close_modal
+	var opening := _choice_row(tr("Começar pela abertura (recomendado)"),
+		tr("O Bento, a Íris e a Véspera presos no Corredor de Contenção, e o Nick, que volta para ajudar: três lutas curtas que ensinam a jogar."), true)
+	opening.name = "Opening"
+	opening.pressed.connect(_begin_campaign.bind(number, true))
+	box.add_child(opening)
+	var skip := _choice_row(tr("Pular tutorial"),
+		tr("Começa direto na Estação Raiz, como depois da abertura e com a mesma recompensa."), false)
+	skip.name = "Skip"
+	skip.pressed.connect(_begin_campaign.bind(number, false))
+	box.add_child(skip)
+	var back := _modal_button(tr("Voltar"), _go_back, true)
+	_icon_beside_text(back, load("res://art/ui/icons/ui-arrow-right.svg"), AHKit.TEXT, true)
+	back.name = "Back"
+	box.add_child(back)
+	opening.grab_focus.call_deferred()
+	_center_modal.call_deferred()
+
+
+## A escolha da campanha nova pedida de fora do título: espera a passagem terminar (a janela não abre embaixo do cartão).
+func _ask_after_travel(number: int) -> void:
+	while GameFlow.busy and is_inside_tree():
+		await get_tree().process_frame
+	if is_inside_tree():
+		_start_new_campaign(number)
+
+
+## Uma escolha da campanha nova: a linha do kit (a escolhida com a moldura), o nome e o que ela faz embaixo. O texto do
+## botão é o nome (o teclado e os testes leem por ele), desenhado pelas linhas de dentro.
+func _choice_row(text: String, detail: String, chosen: bool) -> Button:
+	var button := Button.new()
+	AHKit.style_as(button, "list_selected" if chosen else "list")
+	button.text = text
+	for state in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color", "font_disabled_color"]:
+		button.add_theme_color_override(state, Color.TRANSPARENT)
+	var lines := VBoxContainer.new()
+	lines.add_theme_constant_override("separation", 2)
+	lines.set_anchors_preset(Control.PRESET_FULL_RECT)
+	lines.offset_left = 20
+	lines.offset_right = -16
+	lines.alignment = BoxContainer.ALIGNMENT_CENTER
+	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(lines)
+	lines.add_child(AHKit.label(text, "row", AHKit.TEXT, true))
+	var note := AHKit.label(detail, "small", AHKit.MUTED)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(680, 0)
+	lines.add_child(note)
+	var grow := func(): button.custom_minimum_size.y = maxf(72.0, lines.get_combined_minimum_size().y + 20.0)
+	lines.minimum_size_changed.connect(grow)
+	grow.call()
+	return button
+
+
+## A campanha nova no espaço leva as opções mexidas no título (volumes, velocidade), que até aqui ficaram só na memória.
+## Pela abertura, o cartão "Você precisa escapar." e o Corredor de Contenção; pulando, a Estação.
+func _begin_campaign(number: int, tutorial: bool) -> void:
 	if _leaving or GameFlow.busy:
 		return
 	_leaving = true
 	var settings: Dictionary = Campaign.state.get("settings", {}).duplicate(true)
 	Campaign.new_game_in(number)
 	Campaign.state.settings.merge(settings, true)
+	if tutorial:
+		AHTutorial.begin(Campaign.state)
+	else:
+		AHTutorial.skip(Campaign.state)
 	Campaign.save()
-	if not await GameFlow.travel("station"):
+	var travelled: bool
+	if tutorial:
+		travelled = await GameFlow.travel("street", AHTutorial.opening_card())
+	else:
+		travelled = await GameFlow.travel("station")
+	if not travelled:
 		_leaving = false
 
 

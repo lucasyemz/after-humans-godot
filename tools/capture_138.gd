@@ -78,8 +78,11 @@ func _station() -> void:
 	var poses: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/station_poses.json"))
 	for walker in station._walkers:
 		if walker.get("hero_id", "") == BENTO:
-			walker.wait = INF
+			# Como o jogo deita quem dorme: o passeio pula o adormecido (só esperar não basta, o posto de
+			# trabalho da sala o levantava no meio da captura).
+			walker.sleeping = true
 			walker.sitting = 0.0
+			walker.working = 0.0
 	card.show_art(load("res://scripts/flow/skins.gd").pose(poses[BENTO + "_sleep"], BENTO))
 	card.position = station.sleep_slots()[0]
 	station.focus_room_stage(S.DORMITORY, 160.0, 1760.0, true)

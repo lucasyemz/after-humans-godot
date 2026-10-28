@@ -207,6 +207,10 @@ As máquinas não odeiam os animais.
 
 Elas obedecem a uma ordem que ninguém cancelou.
 
+O **Corredor de Contenção** é um desses lugares: uma passagem automatizada perto da Estação que, ao detectar animais,
+fecha as portas e prende quem estiver do lado de dentro. É onde o Bento, a Íris e a Véspera ficam presos na missão de
+abastecimento e onde o Nick volta para ajudar (`bento-nick-arc.md` §3; o tutorial).
+
 ---
 
 # 10. As IAs não são uma só
