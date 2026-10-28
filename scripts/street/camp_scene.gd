@@ -77,6 +77,8 @@ var _poses := {}
 var _before := {}
 var _switching := false
 var _last_switch := -1000.0
+## O ângulo da câmera deste acampamento (pitch), escolhido ao montar.
+var _pitch := FOCUS_PITCH
 static var _contact_material: StandardMaterial3D
 
 
@@ -117,8 +119,13 @@ static func focus_height(degrees: float) -> float:
 	return lerpf(FLAT_FOCUS_HEIGHT, FOCUS_HEIGHT, clampf((degrees - FLAT_PITCH) / (FOCUS_PITCH - FLAT_PITCH), 0.0, 1.0))
 
 
-## O ângulo da câmera do acampamento (graus): o da arte, ou o menor na parada de um cenário com água.
+## O ângulo da câmera do acampamento (graus): o da arte, ou o menor na parada de um cenário com água. Calculado uma vez
+## ao montar o acampamento (_pick_pitch), e não a cada quadro da câmera.
 func pitch() -> float:
+	return _pitch
+
+
+func _pick_pitch() -> float:
 	var scenario = _street.scenario if _street != null and "scenario" in _street else null
 	if not at_stop() or scenario == null:
 		return FOCUS_PITCH
@@ -130,7 +137,7 @@ func pitch() -> float:
 static func stop_pitch(scenario: AHScenarioWorld, fire: Vector3) -> float:
 	if scenario.water_floor(fire):
 		return FLOODED_STOP_PITCH
-	return WATER_STOP_PITCH if not scenario._waters.is_empty() else FOCUS_PITCH
+	return WATER_STOP_PITCH if scenario.has_water() else FOCUS_PITCH
 
 
 func focus_point() -> Vector3:
@@ -143,6 +150,7 @@ func begin(room: Node3D, team: Array, instant: bool = false) -> void:
 	if active or room == null:
 		return
 	_room = room
+	_pitch = _pick_pitch()
 	if not instant:
 		await GameFlow.fade(1.0)
 	_arrange(team)

@@ -48,7 +48,7 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
 
 ## Testes
 
-- `tests/test_camp_ground.gd` (novo, 80 verificações):
+- `tests/test_camp_ground.gd` (novo, 96 verificações):
   - em cada pose, o ponto mais baixo do corpo na linha do chão (até 2 cm) e o apoio do dado igual ao medido na arte;
   - o apoio de cada pose cai no chão embaixo do corpo (até 0,6 m atrás do pé) na câmera do acampamento: com a câmera
     antiga (4°), dez poses falham;

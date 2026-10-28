@@ -60,6 +60,10 @@ func _art() -> void:
 				var depth := AHCampScene.support_depth(art)
 				t.check(depth <= AHCampScene.MAX_SUPPORT_DEPTH,
 					"%s %s: o apoio cai no chão embaixo do corpo (%.2f m atrás do pé)" % [owner, kind, depth])
+				# Na parada com água pintada (8°), o apoio cai mais atrás: o teto da sombra não a corta antes dele.
+				var water_depth := AHCampScene.support_depth(art, 1.8, AHCampScene.WATER_STOP_PITCH)
+				t.check(minf(water_depth + AHCampScene.CONTACT_PAST, AHCampScene.CONTACT_MAX_BACK) >= water_depth,
+					"%s %s: a 8°, a sombra chega ao apoio (%.2f m atrás do pé)" % [owner, kind, water_depth])
 				count += 1
 	t.check(count >= 16, "todas as poses conferidas (%d)" % count)
 

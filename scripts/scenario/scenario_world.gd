@@ -306,6 +306,11 @@ func front_edge(zone_index: int, feet_z: float) -> float:
 	return edge
 
 
+## Se o cenário tem água pintada (o lago e o rio vivos do fundo, #140).
+func has_water() -> bool:
+	return not _waters.is_empty()
+
+
 ## Se o chão neste ponto está debaixo d'água (uma peça de água do mapa cobre o ponto, entre o chão e um pouco acima).
 func water_floor(point: Vector3) -> bool:
 	for part in data.parts:
