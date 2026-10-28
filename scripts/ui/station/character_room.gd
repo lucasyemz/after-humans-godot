@@ -327,6 +327,12 @@ func _skill_choices(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> v
 		# Antes do nível 2 (decisão do Lucas): as habilidades da chegada, sem escolha; o que aprende fica guardado.
 		box.add_child(_note(tr("%s luta com as habilidades da classe. A partir do nível %d, escolhe as que leva.") % [String(hero.display_name),
 			int(AHRecruitSkills.rule("ChooseFromLevel", 2))]))
+		# O que já aprendeu (o mentor, a Pesquisa) fica guardado para quando puder escolher.
+		var known: Array = AHRecruitSkills.known_foreign(c, hero).map(func(id):
+			var known_row = GameData.row("abilities", String(id))
+			return tr(String(known_row.DisplayName)) if known_row != null else String(id))
+		if not known.is_empty():
+			box.add_child(_note(tr("Já sabe, para quando escolher: %s.") % ", ".join(known)))
 	elif slot >= 0:
 		var swaps: Array = AHRecruitSkills.options(c, hero).filter(func(id): return not AHRecruitSkills.abilities(hero).has(id))
 		# Só as que valem nesse lugar: com a outra escolha já de fora, as de fora passam do limite (MaxForeign).

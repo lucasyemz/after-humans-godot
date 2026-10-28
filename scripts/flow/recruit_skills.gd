@@ -199,7 +199,7 @@ static func migrate(campaign: Dictionary) -> void:
 			entry.learned = []
 		if typeof(entry.get("mentor")) != TYPE_DICTIONARY:
 			entry.mentor = {}
-		# A escolha que não vale mais (um MaxForeign menor, uma fixa nova, um save editado, o fundador com escolha)
-		# volta para o kit da classe ao abrir o save.
-		if not entry.loadout.is_empty() and (not flexible(entry) or invalid(campaign, entry, entry.loadout) != ""):
+		# A escolha que não vale mais (um MaxForeign menor, uma fixa nova, um save editado, o fundador com escolha, o
+		# recruta abaixo do nível da escolha) volta para o kit da classe ao abrir o save.
+		if not entry.loadout.is_empty() and (not can_choose(entry) or invalid(campaign, entry, entry.loadout) != ""):
 			entry.loadout = []

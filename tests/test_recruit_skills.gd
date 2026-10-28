@@ -54,6 +54,13 @@ func _gate() -> void:
 	t.check(error.contains("2"), "no nível 1 não escolhe, e diz a partir de qual nível (%s)" % error)
 	fresh.loadout = [AMPOLA, "cao_nao_estamos_sos"]
 	t.equal(AHRecruitSkills.abilities(fresh), AHRecruitSkills.class_abilities("cao"), "uma escolha guardada no nível 1 não vale na luta")
+	# Um save com escolha no nível 1 (a rodada antes da regra do nível): abre com o kit, e no nível 2 nada vale sozinho.
+	var saved: Dictionary = Campaign._normalize(JSON.parse_string(JSON.stringify(c)))
+	S.migrate(saved)
+	var reopened = S.hero(saved, fresh.id)
+	t.equal(reopened.loadout, [], "a escolha guardada no nível 1 volta ao kit ao abrir o save")
+	reopened.level = int(AHRecruitSkills.rule("ChooseFromLevel", 2))
+	t.equal(AHRecruitSkills.abilities(reopened), AHRecruitSkills.class_abilities("cao"), "e no nível 2 ele continua com o kit até escolher")
 	fresh.loadout = []
 	fresh.level = int(AHRecruitSkills.rule("ChooseFromLevel", 2))
 	t.equal(AHRecruitSkills.choose(c, fresh.id, [AMPOLA, "cao_nao_estamos_sos"]), "", "no nível 2 escolhe, com o que aprendeu antes")
@@ -271,6 +278,9 @@ func _screen() -> void:
 		t.check(choices != null and screen.find_children("Swap_*", "Button", true, false).is_empty(), "o recém-chegado não troca na Sala")
 		t.check(choices != null and choices.find_children("*", "Label", true, false).any(func(l): return l.text.contains("2")),
 			"e a Sala diz a partir de qual nível ele escolhe")
+		var ampola_name := tr(String(GameData.row("abilities", AMPOLA).DisplayName))
+		t.check(choices != null and choices.find_children("*", "Label", true, false).any(func(l): return l.text.contains(ampola_name)),
+			"e mostra o que ele já aprendeu, guardado para o nível 2")
 		hud.close_panel()
 		await _frames(3)
 	_tree.unload_current_scene()
