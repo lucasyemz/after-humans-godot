@@ -40,6 +40,13 @@ e concreta, e devolve um veredito.
 - A página em `docs/design/<assunto>.md` tem a prévia, as medidas e as decisões.
 - Nada fora do escopo: nenhum arquivo em `scripts/`, `data/`, `tests/`, nenhum id alterado.
 
+**Antes e depois no jogo** (pedido do Lucas, 28/10)
+- Todo PR que mexe no que se vê mostra o antes e o depois, e os dois saem de dentro do jogo, na Godot: o antes é a
+  `main` de hoje, sem mudança nenhuma; o depois, o jogo com a proposta (o pacote do protótipo carregado por cima, ou a
+  tela do kit sobre a captura do jogo). Maquete do lote anterior não vale como antes.
+- Os dois na mesma câmera, com as mesmas pessoas e o mesmo momento, lado a lado, cada lado com a legenda de onde veio.
+- As imagens ficam no PR (no corpo ou num comentário), não só na página. Sem placa de vídeo, o PR diz isso.
+
 ## Gravidade
 
 - **Alta**: fora da direção visual, ilegível no tamanho de uso, formato ou tamanho errado, alfa sujo, faltam medidas.
