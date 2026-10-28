@@ -151,7 +151,7 @@ msgstr "The save in slot %d could not be opened. A new campaign writes over it, 
 #: scripts/ui/title_screen.gd:510
 #: scripts/ui/exploration_hud.gd:1675
 #: scripts/ui/refuge_hud.gd:1804
-#: scripts/ui/station/character_room.gd:908
+#: scripts/ui/station/character_room.gd:865
 msgid "Cancelar"
 msgstr "Cancel"
 
@@ -264,7 +264,7 @@ msgstr "+1 bandage"
 
 #: scripts/flow/fight_rewards.gd:137
 #: scripts/ui/character_sheet.gd:126
-#: scripts/ui/station/character_room.gd:742
+#: scripts/ui/station/character_room.gd:699
 msgid "Relíquia: %s"
 msgstr "Relic: %s"
 
@@ -390,7 +390,7 @@ msgid "Trauma"
 msgstr "Trauma"
 
 #: scripts/ui/character_sheet.gd:137
-#: scripts/ui/station/character_room.gd:538
+#: scripts/ui/station/character_room.gd:495
 msgid "%s ×%d"
 msgstr "%s ×%d"
 
@@ -415,7 +415,7 @@ msgstr "Passive effects"
 #: scripts/ui/character_sheet.gd:288
 #: scripts/ui/character_sheet.gd:302
 #: scripts/ui/combat_hud.gd:1160
-#: scripts/ui/station/character_room.gd:645
+#: scripts/ui/station/character_room.gd:602
 msgid "Nenhum"
 msgstr "None"
 
@@ -438,7 +438,7 @@ msgstr "Instinct %d/200 · at 200, crisis"
 
 #: scripts/ui/character_sheet.gd:309
 #: scripts/ui/combat_hud.gd:1210
-#: scripts/ui/station/character_room.gd:565
+#: scripts/ui/station/character_room.gd:522
 msgid "Velocidade %d"
 msgstr "Speed %d"
 
@@ -642,7 +642,7 @@ msgstr "Press a key…"
 
 #: scripts/ui/options_panel.gd:121
 #: scripts/ui/exploration_hud.gd:770
-#: scripts/ui/station/character_room.gd:748
+#: scripts/ui/station/character_room.gd:705
 msgid "Trocar"
 msgstr "Change"
 
@@ -1043,7 +1043,7 @@ msgstr "Bandages %d"
 #: scripts/ui/exploration_hud.gd:1617
 #: scripts/ui/exploration_hud.gd:1740
 #: scripts/ui/refuge_hud.gd:1581
-#: scripts/ui/station/character_room.gd:691
+#: scripts/ui/station/character_room.gd:648
 msgid "%d sementes"
 msgstr "%d seeds"
 
@@ -1559,7 +1559,7 @@ msgstr "Platform 1"
 
 #: scripts/ui/refuge_hud.gd:568
 #: scripts/ui/refuge_hud.gd:2049
-#: scripts/ui/station/character_room.gd:949
+#: scripts/ui/station/character_room.gd:906
 #: scripts/flow/station_rules.gd:1316
 msgid "Ir ao mapa"
 msgstr "Go to map"
@@ -1599,12 +1599,12 @@ msgstr "Camera"
 
 #: scripts/ui/refuge_hud.gd:585
 #: scripts/ui/refuge_hud.gd:587
-#: scripts/ui/station/character_room.gd:946
+#: scripts/ui/station/character_room.gd:903
 msgid "Selecionar"
 msgstr "Select"
 
 #: scripts/ui/refuge_hud.gd:585
-#: scripts/ui/station/character_room.gd:947
+#: scripts/ui/station/character_room.gd:904
 msgid "Ao lado"
 msgstr "Next room"
 
@@ -1722,7 +1722,7 @@ msgstr "Upgrade"
 #: scripts/ui/refuge_hud.gd:1892
 #: scripts/ui/refuge_hud.gd:1968
 #: scripts/ui/refuge_hud.gd:2274
-#: scripts/ui/refuge_hud.gd:2789
+#: scripts/ui/refuge_hud.gd:2791
 msgid "%s · %s"
 msgstr "%s · %s"
 
@@ -1849,7 +1849,7 @@ msgid "A água vai faltar na volta."
 msgstr "Water will run out on the return."
 
 #: scripts/ui/refuge_hud.gd:2144
-#: scripts/ui/refuge_hud.gd:2799
+#: scripts/ui/refuge_hud.gd:2801
 msgid "Energia"
 msgstr "Power"
 
@@ -2244,91 +2244,91 @@ msgstr "Fed"
 msgid "Sem alimentação"
 msgstr "Not fed"
 
-#: scripts/ui/refuge_hud.gd:2768
+#: scripts/ui/refuge_hud.gd:2770
 msgid "O trem parte"
 msgstr "The train leaves"
 
-#: scripts/ui/refuge_hud.gd:2769
+#: scripts/ui/refuge_hud.gd:2771
 msgid "As portas fecham; o trem volta para o túnel."
 msgstr "The doors close; the train heads back into the tunnel."
 
-#: scripts/ui/refuge_hud.gd:2778
-#: scripts/ui/refuge_hud.gd:2834
+#: scripts/ui/refuge_hud.gd:2780
+#: scripts/ui/refuge_hud.gd:2836
 msgid "O trem chegou"
 msgstr "The train arrived"
 
-#: scripts/ui/refuge_hud.gd:2786
+#: scripts/ui/refuge_hud.gd:2788
 msgid "%s quer morar na Estação"
 msgstr "%s wants to live at the Station"
 
-#: scripts/ui/refuge_hud.gd:2791
+#: scripts/ui/refuge_hud.gd:2793
 msgid "Ponto forte"
 msgstr "Strength"
 
-#: scripts/ui/refuge_hud.gd:2792
+#: scripts/ui/refuge_hud.gd:2794
 msgid "Ponto fraco"
 msgstr "Weakness"
 
-#: scripts/ui/refuge_hud.gd:2793
-#: scripts/ui/refuge_hud.gd:2853
+#: scripts/ui/refuge_hud.gd:2795
+#: scripts/ui/refuge_hud.gd:2855
 msgid "Pedido"
 msgstr "Request"
 
-#: scripts/ui/refuge_hud.gd:2796
+#: scripts/ui/refuge_hud.gd:2798
 msgid "Na próxima volta"
 msgstr "On the next return"
 
-#: scripts/ui/refuge_hud.gd:2797
+#: scripts/ui/refuge_hud.gd:2799
 msgid "Suprimentos depois da noite"
 msgstr "Supplies after the night"
 
-#: scripts/ui/refuge_hud.gd:2798
+#: scripts/ui/refuge_hud.gd:2800
 msgid "Água depois da noite"
 msgstr "Water after the night"
 
-#: scripts/ui/refuge_hud.gd:2819
+#: scripts/ui/refuge_hud.gd:2821
 msgid "A equipe ainda precisa passar a noite: decida depois do Dormitório, se preferir."
 msgstr "The team still has to spend the night: decide after the Dormitory, if you prefer."
 
-#: scripts/ui/refuge_hud.gd:2821
-#: scripts/ui/refuge_hud.gd:2865
+#: scripts/ui/refuge_hud.gd:2823
+#: scripts/ui/refuge_hud.gd:2867
 msgid "Acolher %s"
 msgstr "Take in %s"
 
-#: scripts/ui/refuge_hud.gd:2822
-#: scripts/ui/refuge_hud.gd:2867
+#: scripts/ui/refuge_hud.gd:2824
+#: scripts/ui/refuge_hud.gd:2869
 msgid "Recusar"
 msgstr "Decline"
 
-#: scripts/ui/refuge_hud.gd:2842
+#: scripts/ui/refuge_hud.gd:2844
 msgid "%s quer entrar na Estação"
 msgstr "%s wants to join the Station"
 
-#: scripts/ui/refuge_hud.gd:2853
+#: scripts/ui/refuge_hud.gd:2855
 msgid "Nada: a Estação ainda não fecha uma equipe de quatro."
 msgstr "Nothing: the Station still can't field a team of four."
 
-#: scripts/ui/refuge_hud.gd:2853
+#: scripts/ui/refuge_hud.gd:2855
 msgid "%d sementes (a Estação tem %d)."
 msgstr "%d seeds (the Station has %d)."
 
-#: scripts/ui/refuge_hud.gd:2863
+#: scripts/ui/refuge_hud.gd:2865
 msgid "Quem a Estação recusa vai embora no trem e não volta. Quem a equipe deixa sem resposta ao partir, também."
 msgstr "Whoever the Station turns away leaves on the train and doesn't come back. So does whoever the team leaves without an answer when it departs."
 
-#: scripts/ui/refuge_hud.gd:2919
+#: scripts/ui/refuge_hud.gd:2921
 msgid "%s entra para a Estação."
 msgstr "%s joins the Station."
 
-#: scripts/ui/refuge_hud.gd:2919
+#: scripts/ui/refuge_hud.gd:2921
 msgid "%s segue no trem."
 msgstr "%s stays on the train."
 
-#: scripts/ui/refuge_hud.gd:2922
+#: scripts/ui/refuge_hud.gd:2924
 msgid "%s vai morar na Estação."
 msgstr "%s will live at the Station."
 
-#: scripts/ui/refuge_hud.gd:2922
+#: scripts/ui/refuge_hud.gd:2924
 msgid "%s segue no trem. Pode voltar numa próxima viagem."
 msgstr "%s stays on the train. They may come back on a later trip."
 
@@ -2440,7 +2440,7 @@ msgid "+%d XP"
 msgstr "+%d XP"
 
 #: scripts/ui/station/station_report.gd:451
-#: scripts/ui/station/character_room.gd:556
+#: scripts/ui/station/character_room.gd:513
 msgid "Vida"
 msgstr "Life"
 
@@ -2453,7 +2453,7 @@ msgid "Abates"
 msgstr "Kills"
 
 #: scripts/ui/station/station_report.gd:491
-#: scripts/ui/station/character_room.gd:742
+#: scripts/ui/station/character_room.gd:699
 msgid "Sem relíquia"
 msgstr "No relic"
 
@@ -2732,206 +2732,210 @@ msgstr "Another ally"
 msgid "Si mesmo"
 msgstr "Self"
 
-#: scripts/ui/station/character_room.gd:102
+#: scripts/ui/station/character_room.gd:125
 msgid "Sala dos Personagens"
 msgstr "Characters Room"
 
-#: scripts/ui/station/character_room.gd:215
+#: scripts/ui/station/character_room.gd:166
 msgid "Ninguém no Alojamento agora. Quem chegar no trem aparece aqui."
 msgstr "No one in the Quarters right now. Whoever arrives on the train shows up here."
 
-#: scripts/ui/station/character_room.gd:221
+#: scripts/ui/station/character_room.gd:172
 msgid "Habilidades"
 msgstr "Abilities"
 
-#: scripts/ui/station/character_room.gd:259
+#: scripts/ui/station/character_room.gd:210
 msgid "%d d"
 msgstr "%d d"
 
-#: scripts/ui/station/character_room.gd:297
+#: scripts/ui/station/character_room.gd:248
 msgid "%s · de %s"
 msgstr "%s · from %s"
 
-#: scripts/ui/station/character_room.gd:325
+#: scripts/ui/station/character_room.gd:276
 msgid "Fixa da classe: %s sempre leva esta."
 msgstr "Class fixed: %s always carries this one."
 
-#: scripts/ui/station/character_room.gd:328
+#: scripts/ui/station/character_room.gd:279
 msgid "%s luta com as habilidades da classe. A partir do nível %d, escolhe as que leva."
 msgstr "%s fights with the class skills. From level %d, they choose which ones to carry."
 
-#: scripts/ui/station/character_room.gd:339
+#: scripts/ui/station/character_room.gd:286
+msgid "Já sabe, para quando escolher: %s."
+msgstr "Already knows, for when they choose: %s."
+
+#: scripts/ui/station/character_room.gd:296
 msgid "%s já leva uma habilidade de fora da classe: troque aquela para levar outra."
 msgstr "%s already carries a skill from outside the class: swap that one to carry another."
 
-#: scripts/ui/station/character_room.gd:341
+#: scripts/ui/station/character_room.gd:298
 msgid "Nenhuma outra para pôr no lugar. Saindo com um fundador de outra classe, %s aprende com ele."
 msgstr "Nothing else to put in its place. Going out with a founder of another class, %s learns from them."
 
-#: scripts/ui/station/character_room.gd:343
+#: scripts/ui/station/character_room.gd:300
 msgid "Trocar por"
 msgstr "Swap for"
 
-#: scripts/ui/station/character_room.gd:360
+#: scripts/ui/station/character_room.gd:317
 msgid "%s leva %s."
 msgstr "%s takes %s."
 
-#: scripts/ui/station/character_room.gd:365
+#: scripts/ui/station/character_room.gd:322
 msgid "Aprendendo com %s: %d de %d expedições juntos (%s)."
 msgstr "Learning from %s: %d of %d expeditions together (%s)."
 
-#: scripts/ui/station/character_room.gd:403
+#: scripts/ui/station/character_room.gd:360
 msgid "Dano %d–%d"
 msgstr "Damage %d–%d"
 
-#: scripts/ui/station/character_room.gd:405
+#: scripts/ui/station/character_room.gd:362
 msgid "Cura %d–%d"
 msgstr "Healing %d–%d"
 
-#: scripts/ui/station/character_room.gd:408
+#: scripts/ui/station/character_room.gd:365
 msgid "Origem: posições %s"
 msgstr "From: positions %s"
 
-#: scripts/ui/station/character_room.gd:410
+#: scripts/ui/station/character_room.gd:367
 msgid "Alvo: posições %s"
 msgstr "Target: positions %s"
 
-#: scripts/ui/station/character_room.gd:424
+#: scripts/ui/station/character_room.gd:381
 msgid "os novos chegam de trem, na volta das expedições"
 msgstr "newcomers arrive by train, when expeditions return"
 
-#: scripts/ui/station/character_room.gd:433
+#: scripts/ui/station/character_room.gd:390
 msgid "Ampliar o Alojamento · %s"
 msgstr "Expand the Quarters · %s"
 
-#: scripts/ui/station/character_room.gd:437
+#: scripts/ui/station/character_room.gd:394
 msgid "Nível %d: %d heróis."
 msgstr "Level %d: %d heroes."
 
-#: scripts/ui/station/character_room.gd:438
+#: scripts/ui/station/character_room.gd:395
 msgid "O Alojamento cresceu: %s."
 msgstr "The Quarters grew: %s."
 
-#: scripts/ui/station/character_room.gd:449
+#: scripts/ui/station/character_room.gd:406
 msgid "%s espera na plataforma"
 msgstr "%s waits on the platform"
 
-#: scripts/ui/station/character_room.gd:485
+#: scripts/ui/station/character_room.gd:442
 msgid "Personagem"
 msgstr "Character"
 
-#: scripts/ui/station/character_room.gd:500
+#: scripts/ui/station/character_room.gd:457
 msgid "Recruta"
 msgstr "Recruit"
 
-#: scripts/ui/station/character_room.gd:500
+#: scripts/ui/station/character_room.gd:457
 msgid "Fundador"
 msgstr "Founder"
 
-#: scripts/ui/station/character_room.gd:516
+#: scripts/ui/station/character_room.gd:473
 msgid "Nível %d · máximo"
 msgstr "Level %d · max"
 
-#: scripts/ui/station/character_room.gd:518
+#: scripts/ui/station/character_room.gd:475
 msgid "Nível %d · XP %d / %d"
 msgstr "Level %d · XP %d / %d"
 
-#: scripts/ui/station/character_room.gd:540
+#: scripts/ui/station/character_room.gd:497
 msgid "Melhorias: %s"
 msgstr "Upgrades: %s"
 
-#: scripts/ui/station/character_room.gd:566
+#: scripts/ui/station/character_room.gd:523
 msgid "Instinto %d / %d"
 msgstr "Instinct %d / %d"
 
-#: scripts/ui/station/character_room.gd:580
+#: scripts/ui/station/character_room.gd:537
 #: scripts/flow/station_rules.gd:1302
 msgid "Ver a Enfermaria"
 msgstr "See the Infirmary"
 
-#: scripts/ui/station/character_room.gd:590
+#: scripts/ui/station/character_room.gd:547
 msgid "Trauma da última crise"
 msgstr "Trauma from the last crisis"
 
-#: scripts/ui/station/character_room.gd:593
+#: scripts/ui/station/character_room.gd:550
 msgid "Tratar (%d sementes)"
 msgstr "Treat (%d seeds)"
 
-#: scripts/ui/station/character_room.gd:595
+#: scripts/ui/station/character_room.gd:552
 msgid "Trauma tratado."
 msgstr "Trauma treated."
 
-#: scripts/ui/station/character_room.gd:601
+#: scripts/ui/station/character_room.gd:558
 msgid "Expedições %d"
 msgstr "Expeditions %d"
 
-#: scripts/ui/station/character_room.gd:606
+#: scripts/ui/station/character_room.gd:563
 msgid "Abates %d"
 msgstr "Kills %d"
 
-#: scripts/ui/station/character_room.gd:619
+#: scripts/ui/station/character_room.gd:576
 msgid "Posto"
 msgstr "Post"
 
-#: scripts/ui/station/character_room.gd:623
+#: scripts/ui/station/character_room.gd:580
 msgid "Em recuperação: sem posto até voltar."
 msgstr "Recovering: no post until back."
 
-#: scripts/ui/station/character_room.gd:625
+#: scripts/ui/station/character_room.gd:582
 msgid "Sem posto: descansa enquanto a equipe está fora."
 msgstr "No post: rests while the team is away."
 
-#: scripts/ui/station/character_room.gd:651
+#: scripts/ui/station/character_room.gd:608
 msgid " · %s sai de lá"
 msgstr " · %s leaves it"
 
-#: scripts/ui/station/character_room.gd:685
+#: scripts/ui/station/character_room.gd:642
 msgid "nível máximo"
 msgstr "max level"
 
-#: scripts/ui/station/character_room.gd:687
+#: scripts/ui/station/character_room.gd:644
 msgid "faltam %d XP"
 msgstr "%d XP short"
 
-#: scripts/ui/station/character_room.gd:689
+#: scripts/ui/station/character_room.gd:646
 msgid "faltam sementes"
 msgstr "not enough seeds"
 
-#: scripts/ui/station/character_room.gd:691
-#: scripts/ui/station/character_room.gd:863
+#: scripts/ui/station/character_room.gd:648
+#: scripts/ui/station/character_room.gd:820
 msgid "1 semente"
 msgstr "1 seed"
 
-#: scripts/ui/station/character_room.gd:692
-#: scripts/ui/station/character_room.gd:921
+#: scripts/ui/station/character_room.gd:649
+#: scripts/ui/station/character_room.gd:878
 msgid "Treinar"
 msgstr "Train"
 
-#: scripts/ui/station/character_room.gd:743
+#: scripts/ui/station/character_room.gd:700
 msgid "Equipe uma relíquia ao preparar a expedição."
 msgstr "Equip a relic when preparing the expedition."
 
-#: scripts/ui/station/character_room.gd:769
+#: scripts/ui/station/character_room.gd:726
 msgid "Traços"
 msgstr "Traits"
 
-#: scripts/ui/station/character_room.gd:790
+#: scripts/ui/station/character_room.gd:747
 msgid "Pontos fortes"
 msgstr "Strengths"
 
-#: scripts/ui/station/character_room.gd:790
+#: scripts/ui/station/character_room.gd:747
 msgid "Pontos fracos"
 msgstr "Weaknesses"
 
-#: scripts/ui/station/character_room.gd:860
+#: scripts/ui/station/character_room.gd:817
 msgid "Treino · nível %d"
 msgstr "Training · level %d"
 
-#: scripts/ui/station/character_room.gd:863
+#: scripts/ui/station/character_room.gd:820
 msgid "Escolha uma melhoria. O treino gasta o XP do nível e %s."
 msgstr "Choose an upgrade. Training spends the level's XP and %s."
 
-#: scripts/ui/station/character_room.gd:891
+#: scripts/ui/station/character_room.gd:848
 msgid "Já tem: %d"
 msgstr "Already has: %d"
 
@@ -8279,9 +8283,6 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
-
-#~ msgid "Fixa da classe: vem com o corpo de %s."
-#~ msgstr "Fixed by class: it comes with %s's body."
 
 #~ msgid "Carregados para a Estação: %s"
 #~ msgstr "Carried back to the Station: %s"

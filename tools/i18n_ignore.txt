@@ -1017,10 +1017,6 @@ character_room.gd: overview
 character_room.gd: facilities
 character_room.gd: characters
 character_room.gd: hide
-character_room.gd: Hero
-character_room.gd: file
-character_room.gd: frames
-character_room.gd: fps
 character_room.gd: Left
 character_room.gd: Heroes
 character_room.gd: Tab_%s
