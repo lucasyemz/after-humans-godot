@@ -1,18 +1,18 @@
 {
   "issue": 243,
   "stage": "costume concepts pending Lucas approval; no production poses",
-  "source_tag": "codex-pr244-originals",
+  "source_tag": "codex-pr244-originals-r2",
   "base_commit": "5bb29281c578f37f135a859a3d0073cd2f083f58",
   "assets": {
     "founders": {
       "source_file": "founders_concept.png",
-      "source_sha256": "898a8f3436c261d03fb607fae2c3e780bcb220fbb5d8bd6ca8f5865d33fb0b28",
+      "source_sha256": "5059fc2cf4d2418f00f88b5b93511f019a4db49f1fd1dd86ea6f45c6672d7735",
       "canvas": [
         1774,
         887
       ],
       "review_file": "founders.webp",
-      "review_sha256": "7329073e77d9ba9377fbe288f99ef92cd1ed31388e6dcbdf0a7707449f2e89d2",
+      "review_sha256": "2953b04965be2e3a6f507a2b2c1f7aa87bdb169e9df453c6b1de0f5633e98f41",
       "reduced_canvas": [
         710,
         355
@@ -44,13 +44,13 @@
     },
     "recruits": {
       "source_file": "recruits_concept.png",
-      "source_sha256": "765bf98ca43892cb82e095e9d03b620172f0d7f47b495875da59aafbc12884dd",
+      "source_sha256": "61ccc5e37f7ad8b3183e7295da319bf369c004aa0e544fb7bd6842dcaea7813f",
       "canvas": [
         1536,
         1024
       ],
       "review_file": "recruits.webp",
-      "review_sha256": "736814daaceb82c6e7a9a0e2866f81b61ac8de945a81a39c142c078da8a87913",
+      "review_sha256": "dd200122a3da44a79664c6b25a95245d494def48b2651a627c102a41ef225b4f",
       "reduced_canvas": [
         614,
         410
@@ -109,5 +109,7 @@
       ]
     }
   },
-  "source_folder": "art/combat/source/lobby_outfits_20261028"
+  "source_folder": "art/combat/source/lobby_outfits_20261028",
+  "revision": 2,
+  "supersedes_source_tag": "codex-pr244-originals"
 }

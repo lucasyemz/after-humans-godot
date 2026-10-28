@@ -23,8 +23,10 @@ Roupa original para comparação (arte canônica, não captura de jogo):
 | Íris | Blusa verde-sálvia sem mangas e calça curta de tecido | Pele amarela e azul, mãos e pés anfíbios; sem capuz, capa, tubos e frascos |
 | Véspera | Colete cruzado de tecido cru sobre blusa escura e calça curta | Disco facial, penas naturais e garras; sem rifle, binóculos e capa de equipamento |
 
-As asas da Véspera continuam sendo anatomia: não devem virar uma capa removível. O estudo encurta a silhueta externa
-de penas em relação ao primeiro ensaio, mantendo os braços emplumados. O punho de sucata do Bento foi tratado aqui
+As duas corujas têm **braços articulados, cotovelos, antebraços, punhos e mãos com dedos**, como nas artes
+originais. As penas naturais cobrem ombros e braços, sem substituir as mãos por asas fechadas nem escondê-las.
+A roupa do lobby não usa luvas; as duas mãos devem aparecer livres ao lado do corpo. Não acrescentar outro par
+de asas ou membros. A capa de equipamento da expedição sai, a anatomia fica. O punho de sucata do Bento foi tratado aqui
 como equipamento retirado; a aprovação visual inclui confirmar essa leitura antes de desenhar as mãos nas poses.
 
 ## Recrutas
@@ -107,15 +109,31 @@ não foram produzidos. O aceite artístico do Lucas permanece pendente mesmo com
 - **Média, recrutas:** luvas do gato, faixas do cão e costuras decorativas excessivas deixavam a roupa carregada.
   Removidos; mantidos apenas remendos pontuais e costuras de construção.
 
-### Rodada 2 — VEREDITO: APROVADO para revisão de figurino
+### Rodada 2 — APROVADO inicial, superado pela revisão do Lucas
 
-Conferidos os dez personagens com as referências, mãos/pés visíveis, ausência de armas/mochilas/armaduras,
-leitura a 40% e em cinza, WebP, nomes e escopo exclusivo de documentação. Nenhum problema alto ou médio no
-**conceito de roupa**. A aprovação do Lucas e a conferência de sprites no jogo continuam pendentes.
+A revisão inicial conferiu roupas, leitura reduzida e escopo, mas deixou passar um erro de anatomia nas duas
+corujas: as penas escondiam os braços e as mãos. Lucas identificou o problema; o aceite inicial não vale para
+aquelas imagens.
 
-Observações para a próxima etapa: confirmar a leitura das penas das corujas e da mão sem o punho do Bento;
+Observações para a próxima etapa: confirmar a mão sem o punho do Bento;
 normalizar alturas com as referências; não copiar das pranchas uma anatomia ou âncora nova. O Guaxinim ainda
 usa um pequeno pano nos tornozelos; Lucas pode pedir sua remoção junto com os ajustes do figurino.
+
+### Rodada 3 — VEREDITO: REPROVADO (correção solicitada pelo Lucas)
+
+- **Alta, `founders.webp` e `recruits.webp`:** Véspera e a coruja recruta não mostravam braços/mãos articulados
+  como os originais. As penas foram tratadas como asas fechadas. Correção: restaurar dois braços com cotovelos,
+  antebraços e mãos visíveis, sem luvas ou equipamento pesado. Usar também a Véspera trabalhando com livro
+  (`art/station/poses/hero_coruja_vespera_work.webp`) como referência de articulação.
+
+### Rodada 4 — VEREDITO: APROVADO para revisão de figurino
+
+Conferidas novamente as duas corujas com os originais e com a Véspera segurando o livro: dois braços com
+cotovelos/antebraços e duas mãos visíveis, sem os painéis de penas que os escondiam. As mãos continuam legíveis
+a 40% e em cinza. Figurinos e identidades dos demais personagens mantidos. Sem problemas altos ou médios no
+escopo do conceito; a aprovação artística do Lucas continua pendente.
+
+A correção continua restrita ao figurino ilustrado de pé. Não há novas poses de produção.
 
 A entrega não modifica código nem arte de produção. A suíte completa já passou na mesma base `5bb29281`
 (92/92, incluindo paridade 48/48); não foi repetida para estes documentos. As imagens, hashes e dimensões
@@ -123,10 +141,11 @@ foram verificados separadamente.
 
 ## Fontes e pranchas pequenas
 
-As três imagens PNG de conceito ficam fora da main, na tag `codex-pr244-originals`, pasta
-`art/combat/source/lobby_outfits_20261028/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr244-originals) e
-[ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr244-originals.zip). Nenhum desses PNG é origem
-pronta para conversão direta em pose do jogo.
+As três imagens PNG de conceito ficam fora da main, na tag `codex-pr244-originals-r2`, pasta
+`art/combat/source/lobby_outfits_20261028/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr244-originals-r2) e
+[ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr244-originals-r2.zip). Nenhum desses PNG é origem
+pronta para conversão direta em pose do jogo. A tag anterior `codex-pr244-originals` permanece como histórico;
+esta revisão a substitui para a avaliação das roupas.
 
 | Grupo | 40% | Cinza a 40% |
 | --- | --- | --- |
