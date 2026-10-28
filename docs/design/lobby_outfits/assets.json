@@ -1,7 +1,7 @@
 {
   "issue": 243,
   "stage": "costume concepts pending Lucas approval; no production poses",
-  "source_tag": null,
+  "source_tag": "codex-pr244-originals",
   "base_commit": "5bb29281c578f37f135a859a3d0073cd2f083f58",
   "assets": {
     "founders": {
@@ -108,5 +108,6 @@
         }
       ]
     }
-  }
+  },
+  "source_folder": "art/combat/source/lobby_outfits_20261028"
 }

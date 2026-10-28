@@ -123,7 +123,9 @@ foram verificados separadamente.
 
 ## Fontes e pranchas pequenas
 
-As três imagens PNG de conceito ficam fora da main; publicação vinculada no PR. Nenhum desses PNG é origem
+As três imagens PNG de conceito ficam fora da main, na tag `codex-pr244-originals`, pasta
+`art/combat/source/lobby_outfits_20261028/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr244-originals) e
+[ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr244-originals.zip). Nenhum desses PNG é origem
 pronta para conversão direta em pose do jogo.
 
 | Grupo | 40% | Cinza a 40% |
@@ -131,4 +133,3 @@ pronta para conversão direta em pose do jogo.
 | Fundadores | [Cor](lobby_outfits/founders_40.webp) | [Cinza](lobby_outfits/founders_gray_40.webp) |
 | Recrutas | [Cor](lobby_outfits/recruits_40.webp) | [Cinza](lobby_outfits/recruits_gray_40.webp) |
 | Guaxinim/Tatu | [Cor](lobby_outfits/raccoon_armadillo_40.webp) | [Cinza](lobby_outfits/raccoon_armadillo_gray_40.webp) |
-
