@@ -25,6 +25,9 @@ var _layer: CanvasLayer
 var _start_x := 0.0
 ## Em que luta do tutorial a vez está (o trecho), ou -1 fora dela.
 var _fight_step := -1
+## O aviso do alto que a dica evitou e a dica de então (o lugar fica evitado até ela mudar).
+var _toast_rect := Rect2()
+var _toast_step := ""
 
 
 func _init(owner_corridor: AHStreetCorridor) -> void:
@@ -115,10 +118,16 @@ func _process(_delta: float) -> void:
 	var prompt: Control = corridor.hud.get("_prompt")
 	if prompt != null and prompt.visible:
 		avoid.append(prompt.get_global_rect())
-	# E o aviso do alto enquanto está na tela (o achado da busca e o fôlego): a dica que abre junto não o cobre.
+	# E o aviso do alto enquanto está na tela (o achado da busca e o fôlego): a dica que abre junto não o cobre. O lugar
+	# dele segue evitado até a dica mudar, para a chapa não pular de lugar enquanto ainda é lida quando o aviso some.
 	var toast: Control = corridor.hud.get("_toast")
 	if toast != null and toast.modulate.a > 0.01:
-		avoid.append(toast.get_global_rect())
+		_toast_rect = toast.get_global_rect()
+		_toast_step = hint.step_id
+	elif hint.step_id != _toast_step:
+		_toast_rect = Rect2()
+	if _toast_rect.has_area():
+		avoid.append(_toast_rect)
 	hint.set_avoid(avoid)
 	if street._arena.active:
 		_combat_focus()

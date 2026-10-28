@@ -256,6 +256,19 @@ func _journey() -> void:
 		t.check(toast.modulate.a > 0.5 and not plate.intersects(toast.get_global_rect()),
 			"a dica da Mochila não cobre o aviso da busca (%s, %s)" % [plate, toast.get_global_rect()])
 		t.check(not said.contains(": ."), "o aviso não começa com ponto solto (%s)" % said)
+		# O aviso some e a dica da Mochila fica onde estava (não pula enquanto ainda é lida).
+		var held: Vector2 = guide.hint._plate.position
+		street.exploration_hud._toast_tween.kill()
+		toast.modulate.a = 0.0
+		await _frames(3)
+		t.equal(guide.hint._plate.position, held, "o aviso some e a dica da Mochila fica no lugar")
+		# Sem a busca, o fôlego vem ao chegar à luta do Drone e vai junto no anúncio do trecho (não some sob ele).
+		corridor._breath_note = true
+		corridor._announce(5, "combat", true)
+		said = street.exploration_hud._toast_label.text
+		t.check(said.begins_with(TranslationServer.translate("A equipe recupera o fôlego.")) and said.contains("6"),
+			"sem a busca, o anúncio da luta do Drone leva o fôlego junto (%s)" % said)
+		t.check(not corridor._breath_note, "e só uma vez")
 		corridor.open_inventory()
 		await _frames(2)
 		t.check(guide.done("bag"), "aberta a Mochila, a dica cumprida")
