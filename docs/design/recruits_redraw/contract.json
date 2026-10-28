@@ -3,7 +3,7 @@
   "related_issue": 210,
   "base_commit": "561f798",
   "source_folder": "art/combat/source/recruits_redraw_20261028",
-  "source_tag": "codex-pr<N>-originals",
+  "source_tag": "codex-pr229-originals",
   "delivery": "PR contains review sheets/docs only; production assets come from source tag via PC integration.",
   "actors": {
     "raccoon": {

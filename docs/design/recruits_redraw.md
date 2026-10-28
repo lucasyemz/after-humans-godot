@@ -59,7 +59,7 @@ Sem GPU física: Godot4.7.2, OpenGL Compatibility/Mesa llvmpipe CPU, Xvfb,1920×
 
 ## Originais e integração pelo PC
 
-Tag `codex-pr<N>-originals`, pasta `art/combat/source/recruits_redraw_20261028/`, com PNG normalizados, registros, contrato e helpers de QA. Release na mesma tag com ZIP automático de uma árvore isolada de fontes, fora do histórico da branch para a main. Atlas brutos de geração permanecem fora do Git. Os corpos dos atlas foram normalizados ao canvas pedido; os painéis nativos têm aproximadamente a resolução de uso no jogo, sem alegação de detalhe extra pelo aumento para o PNG de conversão.
+Tag `codex-pr229-originals`, pasta `art/combat/source/recruits_redraw_20261028/`, com PNG normalizados, registros, contrato e helpers de QA. Release na mesma tag com ZIP automático de uma árvore isolada de fontes, fora do histórico da branch para a main. Atlas brutos de geração permanecem fora do Git. Os corpos dos atlas foram normalizados ao canvas pedido; os painéis nativos têm aproximadamente a resolução de uso no jogo, sem alegação de detalhe extra pelo aumento para o PNG de conversão.
 
 - Apontar `LEGACY_RECRUITS`/fontes do `tools/sync_combat_art.py` para as novas pastas `raccoon/` e `armadillo/`. Os nomes preservam o padrão `rato-idle`, `rato-attackN-<habilidade>`, `rato-hurt/dodge/block/defeat` e equivalentes do Tatu. `block` vira reaction `defense`; `defeat` vira `death`, como hoje.
 - Acrescentar os novos `*-item.png` à reação `item`, sem mudar as habilidades ou ids. Converter corpos para589×668 e copiar os retratos256×256 com os nomes atuais.
@@ -80,3 +80,5 @@ A proposta substitui o desenho antigo de acampamento do PR #220. A #210 permanec
 ## Verificação
 
 88/88 testes locais em593,178s, paridade48/48, Godot4.7.2. Os logs mantêm avisos de recursos/coroutine ao encerrar. Contratos ativos e todos os arquivos de produção permanecem iguais à base; somente pranchas/docs entram no PR. Auditoria dos26 PNG e medidas em [audit.json](recruits_redraw/audit.json).
+
+[PR #229](https://github.com/lucasyemz/after-humans-godot/pull/229) · [Release dos originais](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr229-originals) · [Baixar ZIP dos originais](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr229-originals.zip).
