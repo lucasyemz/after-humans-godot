@@ -51,7 +51,7 @@ A [prova](skins/watch/night_readability.webp) compõe amostras de seis poses sob
 
 ## Originais fora da main
 
-As fontes PNG normalizadas ficam somente na tag `codex-pr<N>-originals`, pasta `art/combat/source/bento_watch_20261028/`, com contrato e `.gdignore`. O Release da mesma tag entrega um ZIP com essa pasta. O número/tag/link serão preenchidos ao abrir o PR. O commit de originais é destacado, fora do histórico da branch enviada para a main.
+As fontes PNG normalizadas ficam somente na tag `codex-pr204-originals`, pasta `art/combat/source/bento_watch_20261028/`, com contrato e `.gdignore`. O Release da mesma tag entrega um ZIP com essa pasta. [Release com ZIP dos originais](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr204-originals). O commit de originais é destacado, fora do histórico da branch enviada para a main.
 
 O Claude pode extrair com `git archive <tag> art/combat/source/bento_watch_20261028 | tar -x`. Para reproduzir os WebP e pranchas: `python docs/design/skins/watch/build_delivery.py --sources art/combat/source/bento_watch_20261028`. Pillow, numpy e scipy. As edições desta entrega usaram a ferramenta de geração de imagens do Codex, com a pose canônica e a roupa aprovada como referências; o fundo magenta foi recortado e as medidas normalizadas por código. Os brutos de geração ficam fora do Git; a tag contém os PNG individuais utilizáveis pelo pipeline.
 
