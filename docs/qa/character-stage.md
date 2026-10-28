@@ -35,6 +35,15 @@ As fotos saem de `tools/capture_181.gd` (`--text-size=2`). O antes é a `main`.
   - ao sair, ninguém fica na sala, e cada morador está onde estava.
 - **`test_station_view`:** a Sala abre com o herói no cômodo, e o mapa a fecha com o herói fora dele.
 
+## O zoom (28/10)
+
+O pedido do Lucas: mais zoom na câmera da Sala dos Personagens. O `focus_room_stage` agora chega 1,4 vez mais perto
+(`STAGE_ZOOM`), com o mesmo ponto de mira: o meio da sala continua entre os dois painéis, e os pés no chão dela.
+
+![antes e depois do zoom](character-stage/zoom.jpg)
+
+O `test_character_stage` confere os pés entre os painéis no Normal e no Maior.
+
 ## Rodadas da QA
 
 ### Rodada 1: APROVADO

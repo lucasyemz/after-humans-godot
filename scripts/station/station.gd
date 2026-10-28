@@ -56,6 +56,8 @@ const REPORT_SPACING := 2.6
 ## A Sala dos Personagens no kit (#60): o teto e o piso do cômodo na tela.
 const STAGE_TOP := 112.0
 const STAGE_FLOOR := 900.0
+## Quanto a câmera da Sala dos Personagens chega mais perto do herói escolhido que o enquadramento da sala inteira.
+const STAGE_ZOOM := 1.4
 ## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
 ## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
 ## o candidato desce e anda; só então a câmera fecha nele. Na saída: o recusado volta ao trem, o sino avisa, as portas
@@ -484,8 +486,11 @@ func focus_room_stage(room_id: String, left_px: float, right_px: float, instant:
 	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
 	var depth: float = focal * (room.ceiling - room.floor) / (STAGE_FLOOR - STAGE_TOP)
 	var drop := atan((STAGE_FLOOR - 540.0) / focal) + deg_to_rad(-pitch)
-	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * depth / focal
-	_go({"pos": Vector3(x, room.floor + depth * tan(drop), depth), "fov": fov, "pitch": pitch}, false, instant)
+	# Mais perto do herói escolhido (#181, o pedido do Lucas): a distância até a faixa dele cai STAGE_ZOOM vezes, e os pés
+	# continuam na linha de STAGE_FLOOR (o teto sai do quadro).
+	var distance: float = (depth - LANE_Z) / STAGE_ZOOM
+	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * distance / focal
+	_go({"pos": Vector3(x, room.floor + distance * tan(drop), LANE_Z + distance), "fov": fov, "pitch": pitch}, false, instant)
 
 
 ## A câmera chegou aonde ia (sem caminho pela passagem e perto da chave).
