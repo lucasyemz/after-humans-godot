@@ -67,6 +67,8 @@ func _art() -> void:
 ## O ângulo da parada de descanso por cenário: no chão alagado do Depósito, o de antes (a água fica fina, como era); com
 ## o lago pintado do Cais, o menor (o fundo continua no quadro); no seco (o Abrigo), o da arte.
 func _stops() -> void:
+	t.equal(AHCampScene.focus_height(AHCampScene.FLAT_PITCH), AHCampScene.FLAT_FOCUS_HEIGHT, "no ângulo de antes, a altura do alvo de antes")
+	t.equal(AHCampScene.focus_height(AHCampScene.FOCUS_PITCH), AHCampScene.FOCUS_HEIGHT, "no ângulo da arte, a altura da casa")
 	for spec in [["FloodedDepot", AHCampScene.FLOODED_STOP_PITCH], ["RiverDock", AHCampScene.WATER_STOP_PITCH],
 			["SealedShelter", AHCampScene.FOCUS_PITCH]]:
 		var scenario := AHScenarioWorld.new()
@@ -75,6 +77,9 @@ func _stops() -> void:
 		var zone: Dictionary = scenario.zones[0]
 		var fire := Vector3((float(zone.x0) + float(zone.x1)) * 0.5, float(zone.y), (float(zone.z0) + float(zone.z1)) * 0.5)
 		t.equal(AHCampScene.stop_pitch(scenario, fire), spec[1], "%s: o ângulo da parada de descanso" % spec[0])
+		# O alvo acompanha o ângulo: a fileira na mesma linha da tela (no de antes, a altura de antes).
+		var height := AHCampScene.focus_height(spec[1])
+		t.check(height >= AHCampScene.FOCUS_HEIGHT and height <= AHCampScene.FLAT_FOCUS_HEIGHT, "%s: a altura do alvo (%.2f m)" % [spec[0], height])
 		scenario.free()
 
 

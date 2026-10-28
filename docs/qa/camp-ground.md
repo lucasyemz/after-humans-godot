@@ -27,7 +27,8 @@ sapo e coruja) e o Guaxinim e o Tatu (#196), cada equipe com o último ferido (d
 - **Nas paradas de descanso com água** (`AHCampScene.stop_pitch`): com o lago pintado no fundo (o Cais), a câmera olha
   de 8° (`WATER_STOP_PITCH`), para o fundo continuar no quadro; com a fogueira no chão alagado (o Depósito Inundado), do
   ângulo de antes (4°, `FLOODED_STOP_PITCH`), com a água fina como era. A sombra acompanha o ângulo, até 1,2 m atrás do
-  pé. A água do chão vem do mapa (`AHScenarioWorld.water_floor`).
+  pé. A água do chão vem do mapa (`AHScenarioWorld.water_floor`). A altura do alvo acompanha o ângulo (`focus_height`:
+  0,35 m a 15°, 0,75 m a 4°, como era), para a fileira ficar na mesma linha da tela.
 - **A sombra de contato** (`AHCampScene._contact`): uma mancha escura e macia no chão, do pé até um pouco atrás do apoio
   (`support_depth`), na largura do corpo visível. Acompanha a pose de cuidar (de pé, a do pé) e sai ao levantar
   acampamento.
@@ -47,11 +48,12 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
 
 ## Testes
 
-- `tests/test_camp_ground.gd` (novo, 75 verificações):
+- `tests/test_camp_ground.gd` (novo, 80 verificações):
   - em cada pose, o ponto mais baixo do corpo na linha do chão (até 2 cm) e o apoio do dado igual ao medido na arte;
   - o apoio de cada pose cai no chão embaixo do corpo (até 0,6 m atrás do pé) na câmera do acampamento: com a câmera
     antiga (4°), dez poses falham;
-  - o ângulo da parada por cenário: o Depósito (chão alagado), o Cais (lago pintado) e o Abrigo (seco);
+  - o ângulo da parada por cenário (o Depósito com o chão alagado, o Cais com o lago pintado, o Abrigo seco) e a altura
+    do alvo para cada ângulo;
   - na cena, com o Bento, o Guaxinim, o Tatu e o Nick deitado: a câmera no ângulo da arte, a sombra de cada um no chão,
     na largura do corpo e chegando ao apoio, a troca da sombra na pose de cuidar e a saída ao levantar acampamento.
 - `tests/run_all.gd` inteiro e o modo de captura da Rua, com o teste de colisão.
@@ -66,3 +68,6 @@ As poses de acampamento do Guaxinim e do Tatu (sentado no chão e deitado).
 - **Rodada 2: REPROVADO.** O apoio no chão, a sombra, o enquadramento e o clique ficaram certos (`run_all` 80/80), mas
   a câmera de 15° nas paradas com água mostrava o lago no lugar do fundo (Cais) e a água como placa lisa (Depósito).
   Correção: o ângulo da parada por cenário (8° com água pintada, 4° com a fogueira no chão alagado).
+- **Rodada 3: REPROVADO.** O Cais a 8° e as paradas secas ficaram certos; no Depósito a 4°, a altura do alvo de 15°
+  deixava uma faixa escura vazia embaixo da fileira. Correção: a altura do alvo acompanha o ângulo (no Depósito, a luminância
+  das faixas embaixo da fileira volta a ser a da `main`).

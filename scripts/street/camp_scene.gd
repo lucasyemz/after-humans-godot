@@ -24,6 +24,10 @@ const SWITCH_FADE := 0.12
 const FOCUS_PULL := 0.0
 const FOCUS_DISTANCE := 10.5
 const FOCUS_HEIGHT := 0.35
+## A altura do alvo com a câmera quase reta (FLAT_PITCH, a de antes da #205): o alvo sobe enquanto o ângulo desce, para
+## a fileira ficar na mesma linha da tela, acima do painel, em qualquer ângulo (focus_height).
+const FLAT_FOCUS_HEIGHT := 0.75
+const FLAT_PITCH := 4.0
 ## O ângulo da câmera do acampamento (graus, para baixo), o da arte das poses (#205): a arte é vista de cima, e o apoio
 ## do corpo (o quadril do sentado, o tronco do deitado: "support" de camp_poses.json) fica acima do pé. Numa carta de
 ## pé no chão, esse apoio cai no chão logo atrás do pé, embaixo do corpo, só se a câmera olhar do mesmo ângulo; com a
@@ -107,6 +111,12 @@ func at_stop() -> bool:
 	return _room is AHStreetCamp
 
 
+## A altura do alvo da câmera para este ângulo (m acima do chão): FOCUS_HEIGHT no ângulo da arte, FLAT_FOCUS_HEIGHT no
+## de antes, e entre os dois no meio.
+static func focus_height(degrees: float) -> float:
+	return lerpf(FLAT_FOCUS_HEIGHT, FOCUS_HEIGHT, clampf((degrees - FLAT_PITCH) / (FOCUS_PITCH - FLAT_PITCH), 0.0, 1.0))
+
+
 ## O ângulo da câmera do acampamento (graus): o da arte, ou o menor na parada de um cenário com água.
 func pitch() -> float:
 	var scenario = _street.scenario if _street != null and "scenario" in _street else null
@@ -124,7 +134,7 @@ static func stop_pitch(scenario: AHScenarioWorld, fire: Vector3) -> float:
 
 
 func focus_point() -> Vector3:
-	return Vector3(focus_x, (_room.floor_y if _room != null else 0.0) + FOCUS_HEIGHT, (_room.camp_z if _room != null else 0.0) - 0.2)
+	return Vector3(focus_x, (_room.floor_y if _room != null else 0.0) + focus_height(pitch()), (_room.camp_z if _room != null else 0.0) - 0.2)
 
 
 ## Entra no acampamento: a equipe vai para os lugares em volta da fogueira (com fade, a não ser instant: o jogo
