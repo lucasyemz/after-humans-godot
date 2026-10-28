@@ -26,7 +26,13 @@ const VAULT_RISE := 320.0
 const DOOR_X := 2200.0
 const DOOR_WIDTH := 110.0
 const DOOR_HEIGHT := 225.0
-const PANEL_WIDTH := 300.0
+## A parede secreta (#203): a largura da peça que desliza (cobre a porta e o batente).
+const SECRET_WALL_WIDTH := 160.0
+## O Mapa da Rede fixo na parede da plataforma (#203), entre a pilastra (até x 1622) e o caminho da parede falsa (de x
+## 1820): o centro, o tamanho (largura, altura) e a altura do pé (cm).
+const NETWORK_MAP_X := 1721.0
+const NETWORK_MAP_SIZE := Vector2(176, 120)
+const NETWORK_MAP_Z := 96.0
 const PANEL_SLIDE := 300.0
 const LANE_FRONT0 := -400.0
 const LANE_FRONT1 := -580.0
@@ -75,8 +81,10 @@ var room_lights := {}
 var ember_light: OmniLight3D
 var signal_light: OmniLight3D
 var signal_glow: MeshInstance3D
-## A passagem secreta: o painel do mapa da rede (desliza para a esquerda), a alavanca (gira) e a fresta de luz.
+## A passagem secreta: a parede falsa sobre a porta (#203; desliza para a esquerda, e os materiais dela andam junto pelo
+## slide_offset do station_surface), a alavanca (gira) e a fresta de luz.
 var panel: Node3D
+var panel_materials: Array = []
 var lever: Node3D
 var slit: MeshInstance3D
 var slit_light: OmniLight3D
@@ -445,10 +453,11 @@ func _box_wagon() -> void:
 	box(Vector3(880 + shift, -200, top - 12), Vector3(920 + shift, -160, top - 2), b.emissive(WARM, 8), false)
 
 
-## A porta de manutenção atrás do painel do mapa da rede (o painel fica fechado; abrir é da 3c).
+## A porta de manutenção escondida atrás de uma parede falsa (#203): um pedaço da própria parede da plataforma, o mesmo
+## azulejo e o mesmo concreto, que a comunidade montou sobre a porta e que desliza num trilho no chão. Fechada, só a
+## fresta de luz na borda e a alavanca ao lado a denunciam. O Mapa da Rede fica fixo na parede ao lado.
 func _secret_passage() -> void:
 	var steel := S("green_metal_rust", 0, 0, STEEL_TINT, 0.9)
-	var board := S("metal_plate", 0, 0, Color(0.12, 0.2, 0.18))
 	var concrete := S("concrete_wall_008", 0, 0.3, Color(0.85, 0.83, 0.8))
 	var floor := S("concrete_floor_worn_001")
 	var scuff := S("concrete_floor_worn_001", 0, 0, Color(0.45, 0.42, 0.38))
@@ -460,30 +469,27 @@ func _secret_passage() -> void:
 	box(Vector3(left - PANEL_SLIDE - 40, STATION_BACK + 6, 0), Vector3(right + 50, STATION_BACK + 12, 2), steel)
 	for y in [STATION_BACK + 22, STATION_BACK + 30]:
 		box(Vector3(left - PANEL_SLIDE, y, 0), Vector3(right + 30, y + 3, 0.4), scuff, false)
-	# O painel do mapa da rede, fechado sobre a porta: as peças ficam num pivô que desliza (ApplyPanel).
+	# A parede falsa, fechada sobre a porta: o azulejo da plataforma até 2,2 m e o concreto acima, numa chapa rente à
+	# parede (logo à frente do batente). Os materiais são cópias que andam com a peça (sem o azulejo "escorregar" no
+	# deslize).
+	var tiles := _moving(S("long_white_tiles", 0, 0.45, Color(0.96, 0.92, 0.82)))
+	var cover := _moving(S("concrete_wall_008", 0, 0.35))
+	var seam := _moving(S("long_white_tiles", 0, 0.45, Color(0.34, 0.31, 0.27)))
+	panel_materials = [tiles, cover, seam]
 	var panel_start := b.mark()
-	var half := PANEL_WIDTH * 0.5
-	var px := DOOR_X
-	var py := STATION_BACK + 10
-	box(Vector3(px - half, py - 2, 6), Vector3(px + half, py + 6, 250), board)
-	box(Vector3(px - half - 4, py + 6, 4), Vector3(px + half + 4, py + 10, 14), steel)
-	box(Vector3(px - half - 4, py + 6, 242), Vector3(px + half + 4, py + 10, 254), steel)
-	for x in [-half - 4, half - 4]:
-		box(Vector3(px + x, py + 6, 4), Vector3(px + x + 8, py + 10, 254), steel)
-	for line in [[160.0, Color(0.72, 0.2, 0.12)], [120.0, Color(0.85, 0.62, 0.15)], [80.0, Color(0.2, 0.45, 0.38)]]:
-		var paint := S("metal_plate", 0, 0, line[1], 0.8)
-		box(Vector3(px - half + 20, py + 6, line[0] - 3), Vector3(px + half - 40, py + 8, line[0] + 3), paint)
-		var station_x := -half + 30
-		while station_x < half - 40:
-			box(Vector3(px + station_x - 5, py + 7, line[0] - 5), Vector3(px + station_x + 5, py + 9, line[0] + 5), paint)
-			station_x += 55
-	box(Vector3(px + half - 46, py + 6, 70), Vector3(px + half - 34, py + 9, 170), S("metal_plate", 0, 0, Color(0.9, 0.86, 0.78)))
-	b.sign("MAPA DA REDE", Vector3(px, py + 11, 214), 22, Color8(232, 224, 200))
-	b.sign("RAIZ", Vector3(px + half - 40, py + 11, 190), 13, Color8(232, 224, 200))
-	panel = _pivot(b.v(px, py, 0), panel_start)
-	# Fresta de luz na borda do painel (some quando ele abre) e a alavanca do mecanismo ao lado.
-	slit = box(Vector3(right + 1, STATION_BACK + 1, 12), Vector3(right + 3, STATION_BACK + 4, DOOR_HEIGHT - 6), b.emissive(WARM, 0.6), false)
-	slit_light = b.light(Vector3(right + 14, STATION_BACK + 30, 120), 8, 180, WARM, false)
+	var x0 := DOOR_X - SECRET_WALL_WIDTH * 0.5
+	var x1 := DOOR_X + SECRET_WALL_WIDTH * 0.5
+	box(Vector3(x0, STATION_BACK + 3, 0), Vector3(x1, STATION_BACK + 3.8, 220), tiles)
+	box(Vector3(x0, STATION_BACK + 3, 232), Vector3(x1, STATION_BACK + 5.5, DOOR_HEIGHT + 22), cover)
+	# A junta das bordas, uma linha suja de rejunte: fechada quase não se vê; no deslize, mostra a peça andando.
+	for edge_x in [x0, x1 - 1.5]:
+		box(Vector3(edge_x, STATION_BACK + 3.8, 0), Vector3(edge_x + 1.5, STATION_BACK + 4.2, 220), seam, false)
+	panel = _pivot(b.v(DOOR_X, STATION_BACK + 4, 0), panel_start)
+	_network_map(NETWORK_MAP_X)
+	# Fresta de luz na borda da parede falsa (some quando ela abre) e a alavanca do mecanismo ao lado.
+	var edge := DOOR_X + SECRET_WALL_WIDTH * 0.5
+	slit = box(Vector3(edge, STATION_BACK + 1, 12), Vector3(edge + 2, STATION_BACK + 6, 214), b.emissive(WARM, 0.6), false)
+	slit_light = b.light(Vector3(edge + 12, STATION_BACK + 30, 120), 8, 180, WARM, false)
 	b.prop("power_box_01", Vector3(right + 140, STATION_BACK + 6, 92))
 	box(Vector3(right + 186, STATION_BACK, 112), Vector3(right + 206, STATION_BACK + 10, 144), steel)
 	var lever_start := b.mark()
@@ -500,6 +506,44 @@ func _secret_passage() -> void:
 	b.light(Vector3(DOOR_X, -1120, 210), 260, 420, WARM, true)
 	b.light(Vector3(3000, -1120, 210), 200, 380, WARM, false)
 
+
+
+## Uma cópia própria de uma superfície (os mesmos parâmetros), para a peça que se move mexer só no slide_offset dela.
+func _moving(source: ShaderMaterial) -> ShaderMaterial:
+	var copy := ShaderMaterial.new()
+	copy.shader = source.shader
+	for uniform in source.shader.get_shader_uniform_list():
+		copy.set_shader_parameter(uniform.name, source.get_shader_parameter(uniform.name))
+	return copy
+
+
+## O Mapa da Rede da plataforma (#203: antes na peça que desliza, agora fixo na parede ao lado, sob a placa
+## PLATAFORMA 1): a chapa com as três linhas, as estações e a Raiz no fim.
+func _network_map(center_x: float) -> void:
+	var steel := S("green_metal_rust", 0, 0, STEEL_TINT, 0.9)
+	var board := S("metal_plate", 0, 0, Color(0.12, 0.2, 0.18))
+	var half := NETWORK_MAP_SIZE.x * 0.5
+	var px := center_x
+	var py := STATION_BACK + 2
+	var z0 := NETWORK_MAP_Z
+	var z1 := NETWORK_MAP_Z + NETWORK_MAP_SIZE.y
+	box(Vector3(px - half, py, z0), Vector3(px + half, py + 6, z1), board)
+	box(Vector3(px - half - 4, py + 6, z0 - 2), Vector3(px + half + 4, py + 10, z0 + 8), steel)
+	box(Vector3(px - half - 4, py + 6, z1 - 8), Vector3(px + half + 4, py + 10, z1 + 2), steel)
+	for x in [-half - 4, half - 4]:
+		box(Vector3(px + x, py + 6, z0 - 2), Vector3(px + x + 8, py + 10, z1 + 2), steel)
+	var step := (z1 - z0 - 50) / 4.0
+	var lines := [[z0 + step * 3, Color(0.72, 0.2, 0.12)], [z0 + step * 2, Color(0.85, 0.62, 0.15)], [z0 + step, Color(0.2, 0.45, 0.38)]]
+	for line in lines:
+		var paint := S("metal_plate", 0, 0, line[1], 0.8)
+		box(Vector3(px - half + 16, py + 6, line[0] - 2), Vector3(px + half - 32, py + 8, line[0] + 2), paint)
+		var station_x := -half + 24
+		while station_x < half - 32:
+			box(Vector3(px + station_x - 4, py + 7, line[0] - 4), Vector3(px + station_x + 4, py + 9, line[0] + 4), paint)
+			station_x += 44
+	box(Vector3(px + half - 36, py + 6, z0 + step * 0.6), Vector3(px + half - 27, py + 9, z0 + step * 3.4), S("metal_plate", 0, 0, Color(0.9, 0.86, 0.78)))
+	b.sign("MAPA DA REDE", Vector3(px, py + 11, z1 - 26), 18, Color8(232, 224, 200))
+	b.sign("RAIZ", Vector3(px + half - 30, py + 11, z0 + step * 3.4 + 12), 11, Color8(232, 224, 200))
 
 func _stair_core() -> void:
 	var concrete := S("concrete_wall_008", 0, 0.2, Color(0.88, 0.85, 0.8))
