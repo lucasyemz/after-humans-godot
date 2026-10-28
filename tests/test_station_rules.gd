@@ -451,8 +451,12 @@ func _sleepers(t) -> void:
 	t.equal(AHStation.sleepers(c), [], "no amanhecer ninguém fica deitado")
 
 
-## Uma classe sem arte de combate ainda (o rato do evento dos túneis) não parte: a rua e a luta não teriam como mostrá-la.
+## Uma classe sem arte de combate (o rato do evento dos túneis, com a arte tirada do manifesto) não parte: a rua e a luta não teriam como mostrá-la.
 func _undeployable(t) -> void:
+	# O rato tem arte desde a #187: aqui o recruta desenhado dele sai do manifesto, para ele seguir sem arte de luta.
+	S.art_variants("rato")
+	var recruit_art: Dictionary = S._recruit_art.duplicate(true)
+	S._recruit_art.erase("raccoon_recruit_01")
 	var c := _campaign(13)
 	c.unlocked_classes.append("rato")
 	var risco := S.recruit(c, "rato", RandomNumberGenerator.new(), "Risco")
@@ -466,3 +470,4 @@ func _undeployable(t) -> void:
 	t.equal(S.confirm_departure(c, team, 0, 4242, "fase_1"), "Risco ainda não tem arte de combate e fica na Estação por enquanto.",
 		"a partida com o Risco é recusada, com o motivo")
 	t.equal(c.session.expedition, null, "e a expedição não começa")
+	S._recruit_art = recruit_art

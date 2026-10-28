@@ -499,7 +499,7 @@ func refresh(campaign: Dictionary) -> void:
 			_route_row.add_child(link)
 		_route_row.add_child(_route_cell(step, index == route.index, known, route))
 	var current: Dictionary = route.steps[route.index]
-	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(current.type, ""))]
+	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), _step_label(current)]
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
 		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + tr(AHJourneyRules.SHOP_NAMES[site.shop]))
@@ -565,7 +565,7 @@ func refresh(campaign: Dictionary) -> void:
 
 
 ## Uma casa do corredor: o quadrado do retrato com o ícone do tipo; a de agora com a moldura âmbar, a resolvida com o
-## tipo em verde e o check no canto, o guardião em alerta e a não alcançada com "?".
+## tipo em verde e o check por cima do ícone, o guardião em alerta e a não alcançada com "?".
 func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) -> Control:
 	var cell := AHKit.panel("square_portrait")
 	cell.custom_minimum_size = Vector2(CELL, CELL)
@@ -574,7 +574,8 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 	var boss: bool = step.type == "boss"
 	if known:
 		var type: String = step.type
-		var tint: Color = AHKit.alert_text() if boss else (AHKit.good() if step.resolved else (AHKit.AMBER if now else AHKit.TEXT))
+		# O guardião em alerta até ser vencido (#180); vencido, fica verde como os outros trechos resolvidos.
+		var tint: Color = AHKit.good() if step.resolved else (AHKit.alert_text() if boss else (AHKit.AMBER if now else AHKit.TEXT))
 		var glyph := _icon(STEP_ICONS.get(type, "node-event"), CELL * 0.56, tint)
 		glyph.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		cell.add_child(glyph)
@@ -583,14 +584,21 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 		unknown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		unknown.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		cell.add_child(unknown)
-	if step.resolved and not now:
-		var check := AHKit.glyph("state_active", 16, AHKit.good())
-		check.size = Vector2(16, 16)
-		check.position = Vector2(CELL - 18, -2)
-		cell.add_child(check)
 	if now:
 		cell.add_child(AHKit.selected_overlay())
+	# O check do resolvido; no trecho de agora só o do guardião vencido, que é o último e fica "agora" para sempre. Vem
+	# depois da moldura de agora, por cima dela.
+	if step.resolved and (not now or boss):
+		# A casa é um PanelContainer: o check estica e fica centrado sobre o ícone, como nas outras resolvidas.
+		cell.add_child(AHKit.glyph("state_active", 16, AHKit.good()))
 	return cell
+
+
+## O nome do trecho no título: o do tipo, ou "Guardião vencido" depois da vitória (#180).
+func _step_label(step: Dictionary) -> String:
+	if step.type == "boss" and step.resolved:
+		return tr("Guardião vencido")
+	return tr(STEP_LABELS.get(step.type, ""))
 
 
 ## Um recurso da ficha do alto: o ícone, o nome pequeno e o valor em âmbar (em alerta, quando acaba).
@@ -1417,7 +1425,7 @@ func show_menu(completed: bool, can_return: bool) -> void:
 		var route: Dictionary = expedition.corridor
 		if not route.steps.is_empty():
 			var step: Dictionary = route.steps[clampi(route.index, 0, route.steps.size() - 1)]
-			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(step.type, ""))], "text", AHKit.MUTED))
+			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), _step_label(step)], "text", AHKit.MUTED))
 	var close := AHKit.button("X", "icon")
 	close.name = "Close"
 	close.tooltip_text = tr("Fechar")

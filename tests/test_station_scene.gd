@@ -12,6 +12,10 @@ func run(t) -> void:
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-station-scene-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(21)
+	# O rato tem arte desde a #187: aqui o recruta desenhado dele sai do manifesto, para ele seguir sem arte de luta.
+	S.art_variants("rato")
+	var recruit_art: Dictionary = S._recruit_art.duplicate(true)
+	S._recruit_art.erase("raccoon_recruit_01")
 	var counts: Array = []
 	for visit in 3:
 		var station = await _open(tree)
@@ -95,6 +99,7 @@ func run(t) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+	S._recruit_art = recruit_art
 
 
 func _open(tree: SceneTree):

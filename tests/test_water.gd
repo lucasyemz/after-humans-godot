@@ -110,4 +110,6 @@ func _map(map: String, index: int):
 				"de volta ao Cais, a água volta")
 	var camera: Camera3D = street.get_viewport().get_camera_3d()
 	var leader: Vector3 = street._leader.global_position
-	return Vector2(camera.global_position.distance_to(leader), camera.global_position.y - leader.y)
+	# Sem o deslocamento de lado: na zona coberta a câmera para na parede do lado (#175) e não fica sobre o líder.
+	var from := Vector3(leader.x, camera.global_position.y, camera.global_position.z)
+	return Vector2(from.distance_to(leader), camera.global_position.y - leader.y)
