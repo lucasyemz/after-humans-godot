@@ -1,0 +1,325 @@
+[
+  [
+    {
+      "file": "art/combat/heroes/bento/cao_fique_atras_de_mim_execucao.webp",
+      "box": [
+        19,
+        1,
+        579,
+        662
+      ],
+      "size": [
+        589,
+        668
+      ],
+      "cell": 0,
+      "rect": [
+        44,
+        62,
+        680,
+        771
+      ],
+      "scale": 1.1544991511035654
+    },
+    {
+      "file": "art/combat/heroes/bento/cao_fique_atras_de_mim_preparacao.webp",
+      "box": [
+        13,
+        33,
+        542,
+        690
+      ],
+      "size": [
+        550,
+        716
+      ],
+      "cell": 1,
+      "rect": [
+        844,
+        48,
+        615,
+        800
+      ],
+      "scale": 1.1173184357541899
+    },
+    {
+      "file": "art/combat/heroes/bento/cao_impacto_hidraulico_execucao.webp",
+      "box": [
+        7,
+        60,
+        581,
+        646
+      ],
+      "size": [
+        590,
+        667
+      ],
+      "cell": 2,
+      "rect": [
+        44,
+        959,
+        680,
+        769
+      ],
+      "scale": 1.152542372881356
+    },
+    {
+      "file": "art/combat/heroes/bento/cao_impacto_hidraulico_preparacao.webp",
+      "box": [
+        30,
+        54,
+        581,
+        650
+      ],
+      "size": [
+        589,
+        668
+      ],
+      "cell": 3,
+      "rect": [
+        812,
+        958,
+        680,
+        771
+      ],
+      "scale": 1.1544991511035654
+    }
+  ],
+  [
+    {
+      "file": "art/combat/heroes/bento/cao_nao_estamos_sos_execucao.webp",
+      "box": [
+        31,
+        6,
+        547,
+        710
+      ],
+      "size": [
+        550,
+        716
+      ],
+      "cell": 0,
+      "rect": [
+        76,
+        48,
+        615,
+        800
+      ],
+      "scale": 1.1173184357541899
+    },
+    {
+      "file": "art/combat/heroes/bento/cao_nao_estamos_sos_preparacao.webp",
+      "box": [
+        49,
+        5,
+        512,
+        711
+      ],
+      "size": [
+        549,
+        716
+      ],
+      "cell": 1,
+      "rect": [
+        845,
+        48,
+        613,
+        800
+      ],
+      "scale": 1.1173184357541899
+    },
+    {
+      "file": "art/combat/heroes/bento/cao_punho_sucata_execucao.webp",
+      "box": [
+        35,
+        93,
+        564,
+        607
+      ],
+      "size": [
+        589,
+        668
+      ],
+      "cell": 2,
+      "rect": [
+        44,
+        958,
+        680,
+        771
+      ],
+      "scale": 1.1544991511035654
+    },
+    {
+      "file": "art/combat/heroes/bento/cao_punho_sucata_preparacao.webp",
+      "box": [
+        29,
+        84,
+        564,
+        626
+      ],
+      "size": [
+        589,
+        668
+      ],
+      "cell": 3,
+      "rect": [
+        812,
+        958,
+        680,
+        771
+      ],
+      "scale": 1.1544991511035654
+    }
+  ],
+  [
+    {
+      "file": "art/combat/heroes/bento/hurt.webp",
+      "box": [
+        37,
+        4,
+        512,
+        715
+      ],
+      "size": [
+        543,
+        724
+      ],
+      "cell": 0,
+      "rect": [
+        84,
+        48,
+        600,
+        800
+      ],
+      "scale": 1.1049723756906078
+    },
+    {
+      "file": "art/combat/heroes/bento/death.webp",
+      "box": [
+        94,
+        38,
+        531,
+        603
+      ],
+      "size": [
+        627,
+        627
+      ],
+      "cell": 1,
+      "rect": [
+        812,
+        108,
+        680,
+        680
+      ],
+      "scale": 1.0845295055821371
+    },
+    {
+      "file": "art/combat/heroes/bento/item.webp",
+      "box": [
+        83,
+        10,
+        474,
+        638
+      ],
+      "size": [
+        608,
+        647
+      ],
+      "cell": 2,
+      "rect": [
+        44,
+        982,
+        680,
+        724
+      ],
+      "scale": 1.118421052631579
+    },
+    {
+      "file": "art/station/poses/hero_cao_bento_seat.webp",
+      "box": [
+        23,
+        27,
+        543,
+        710
+      ],
+      "size": [
+        543,
+        724
+      ],
+      "cell": 3,
+      "rect": [
+        852,
+        944,
+        600,
+        800
+      ],
+      "scale": 1.1049723756906078
+    }
+  ],
+  [
+    {
+      "file": "art/station/poses/hero_cao_bento_sleep.webp",
+      "box": [
+        13,
+        108,
+        877,
+        336
+      ],
+      "size": [
+        887,
+        443
+      ],
+      "cell": 0,
+      "rect": [
+        44,
+        278,
+        680,
+        340
+      ],
+      "scale": 0.7666290868094702
+    },
+    {
+      "file": "art/station/poses/hero_cao_bento_work.webp",
+      "box": [
+        34,
+        8,
+        471,
+        717
+      ],
+      "size": [
+        543,
+        724
+      ],
+      "cell": 1,
+      "rect": [
+        852,
+        48,
+        600,
+        800
+      ],
+      "scale": 1.1049723756906078
+    },
+    {
+      "file": "art/camp/bento_seat_floor.webp",
+      "box": [
+        23,
+        247,
+        450,
+        713
+      ],
+      "size": [
+        543,
+        724
+      ],
+      "cell": 2,
+      "rect": [
+        84,
+        944,
+        600,
+        800
+      ],
+      "scale": 1.1049723756906078
+    }
+  ]
+]
