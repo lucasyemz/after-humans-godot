@@ -46,6 +46,9 @@ func _run() -> void:
 		errors.count = 0
 		errors.first = ""
 		await test.run(t)
+		# O que o teste adiou (call_deferred, um sinal no fim do quadro) ainda conta para ele, e não para o seguinte (#66).
+		for i in 2:
+			await process_frame
 		var elapsed := Time.get_ticks_msec() - test_started
 		if errors.count > 0:
 			t.failures.append("%d erro(s) durante o teste; o primeiro: %s" % [errors.count, errors.first])
@@ -60,10 +63,17 @@ func _run() -> void:
 			print("    " + failure)
 		if t.failures.size() > 10:
 			print("    ... e mais %d falhas" % (t.failures.size() - 10))
-	OS.remove_logger(errors)
-	# A saída limpa (#66): a cena que o último teste deixou aberta e os sons do Sound não ficam presos ao fechar.
+	# A saída limpa (#66): a cena que o último teste deixou aberta sai ainda com o contador ligado (um erro ao liberá-la
+	# também falha a suíte), e os sons do Sound não ficam presos ao fechar.
+	errors.count = 0
+	errors.first = ""
 	if current_scene != null:
 		unload_current_scene()
-	await process_frame
+	for i in 2:
+		await process_frame
+	OS.remove_logger(errors)
+	if errors.count > 0:
+		failed += 1
+		print("FAIL a saída (%d erro(s) ao liberar a última cena; o primeiro: %s)" % [errors.count, errors.first])
 	print("%d de %d testes passaram em %d ms." % [ran - failed, ran, Time.get_ticks_msec() - started])
 	root.get_node("Sound").quit(0 if failed == 0 and ran > 0 else 1)

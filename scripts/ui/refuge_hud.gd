@@ -10,15 +10,15 @@
 class_name AHRefugeHud
 extends Control
 
+## Um quadro do HUD (as esperas da chegada: some junto com ele).
+signal _frame_passed
+
 ## Abrir e fechar um painel (#36).
 const PANEL_OPEN := "res://audio/ui/panel_open.ogg"
 const PANEL_CLOSE := "res://audio/ui/panel_close.ogg"
 const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
-## Um quadro do HUD (as esperas da chegada: some junto com ele).
-signal _frame_passed
-
 ## A chegada da equipe de trem na volta (#76), antes do relatório: sem painel, só a dica de pular.
 const ARRIVAL := "arrival"
 const REPORT_GUARD_MS := 500
