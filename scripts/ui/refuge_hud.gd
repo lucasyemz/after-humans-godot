@@ -2311,7 +2311,7 @@ static func _relic_effect(relic: Dictionary) -> String:
 
 ## Os ramos da Pesquisa, na ordem do painel (a árvore da #94: Classe, Estação e Radar). Uma pesquisa sem "Branch" no
 ## research.json é de Classe (as melhorias de hoje).
-const RESEARCH_BRANCHES := [["class", "Melhorias de classe"], ["teach", "Ensinar a comunidade"], ["station", "Estação"], ["radar", "Radar"]]
+const RESEARCH_BRANCHES := [["class", "Melhorias de classe"], ["station", "Estação"], ["radar", "Radar"]]
 
 
 ## O Centro de Pesquisa: as pesquisas de research.json por ramo, cada uma com o ícone, o nome, o efeito e PESQUISAR com

@@ -71,10 +71,17 @@ static func options(hero: Dictionary) -> Array:
 			break
 		if upgrade.get("Fallback", false) and not out.has(upgrade) and _open(hero, upgrade):
 			out.append(upgrade)
+	# O recruta, a partir do nível do fundador (#215): aprender a habilidade dele, uma opção a mais.
+	var learn := AHRecruitSkills.founder_option(hero)
+	if not learn.is_empty():
+		out.append(learn)
 	return out
 
 
 static func _open(hero: Dictionary, upgrade: Dictionary) -> bool:
+	# A melhoria de uma habilidade só para quem a tem (o recruta tem as da raça, não as do fundador, #215).
+	if String(upgrade.get("Stat", "")) == "Ability" and not AHRecruitSkills.known(hero).has(String(upgrade.get("AbilityId", ""))):
+		return false
 	return stacks(hero, upgrade.Name) < int(upgrade.get("MaxStacks", 99))
 
 
@@ -112,10 +119,23 @@ static func train(campaign: Dictionary, hero_id: String, upgrade_id: String) -> 
 			upgrade = option
 	if upgrade == null:
 		return TranslationServer.translate("Essa melhoria não é desta espécie.")
+	var fragments := int(upgrade.get("Fragments", 0))
+	if AHStationRules.quantity(campaign, "fragments") < fragments:
+		return TranslationServer.translate("Fragmentos insuficientes: aprender custa %d.") % fragments
 	var cost := next_cost(hero)
 	AHStationRules.adjust(campaign, "seeds", -int(cost.seeds))
+	if fragments > 0:
+		AHStationRules.adjust(campaign, "fragments", -fragments)
 	hero.xp = xp(hero) - int(cost.xp)
 	hero.level = level(hero) + 1
+	# Aprender (#215): a habilidade entra no que o recruta sabe; não é uma melhoria que se acumula.
+	if String(upgrade.Stat) == "Learn":
+		if typeof(hero.get("learned")) != TYPE_ARRAY:
+			hero.learned = []
+		hero.learned.append(String(upgrade.AbilityId))
+		if level(hero) >= MAX_LEVEL:
+			hero.xp = 0
+		return ""
 	if not hero.has("upgrades"):
 		hero.upgrades = []
 	hero.upgrades.append(upgrade_id)

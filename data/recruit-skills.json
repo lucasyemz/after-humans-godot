@@ -1,15 +1,15 @@
 [
   {
     "Name": "rules",
-    "MentorExpeditions": 2,
-    "ChooseFromLevel": 2,
-    "MaxForeign": 1,
-    "Description": "Proposta (#189, decisões do Lucas de 27/10): só os recrutas são flexíveis (os fundadores ficam com o kit da história). O recruta aprende uma habilidade de um fundador de outra classe depois de MentorExpeditions expedições na mesma equipe (a volta conta, em qualquer resultado), e a Pesquisa tem um nó por fundador que ensina todas as dele (Branch teach). Leva no máximo MaxForeign habilidades de fora, trocadas livremente na Estação. Decisão do Lucas (28/10): o recruta chega com as habilidades iniciais da classe e só escolhe a partir do nível ChooseFromLevel."
+    "FounderLevel": 4,
+    "FounderFragments": 3,
+    "MaxCarried": 4,
+    "Description": "Decisões do Lucas (#189 e #215, 28/10): os fundadores ficam com o kit da história; o recruta tem habilidades próprias, mais fracas (rec_*). Chega com Kit (3: o golpe, o Remendo e o toque da raça), ganha Level2 ao subir para o nível 2 e aprende Founder no Treino a partir do nível FounderLevel, pagando FounderFragments além do custo do nível. Com mais de MaxCarried, leva MaxCarried para a luta (troca na Sala, fora da expedição). O Guaxinim e o Tatu não têm fundador da espécie: Founder é a habilidade de ofício do kit da classe, sem Teacher."
   },
-  {"Name": "cao", "Fixed": ["cao_punho_sucata", "cao_fique_atras_de_mim"], "Mentor": "hero_cao_bento", "Teaches": ["cao_fique_atras_de_mim", "cao_nao_estamos_sos"]},
-  {"Name": "gato", "Fixed": ["gato_corte_fase", "gato_sumir_na_sombra"], "Mentor": "hero_gato_nick", "Teaches": ["gato_sumir_na_sombra", "gato_cacada_precisa"]},
-  {"Name": "sapo", "Fixed": ["sapo_carga_voltaica", "sapo_ampola_reparo_vivo"], "Mentor": "hero_sapo_iris", "Teaches": ["sapo_ampola_reparo_vivo", "sapo_antidoto_campo"]},
-  {"Name": "coruja", "Fixed": ["coruja_disparo_perfurante", "coruja_granada_fumaca"], "Mentor": "hero_coruja_vespera", "Teaches": ["coruja_olho_nas_ruinas", "coruja_granada_fumaca"]},
-  {"Name": "rato", "Fixed": ["rato_frasco", "rato_poeira"]},
-  {"Name": "tatu", "Fixed": ["tatu_pancada", "tatu_abrigo"]}
+  {"Name": "cao", "Kit": ["rec_cao_patada", "rec_remendo", "rec_cao_escudo_lata"], "Level2": "rec_cao_empurrao", "Founder": "cao_fique_atras_de_mim", "Teacher": "cao"},
+  {"Name": "gato", "Kit": ["rec_gato_arranhao", "rec_remendo", "rec_gato_marcar_presa"], "Level2": "rec_gato_bote", "Founder": "gato_sumir_na_sombra", "Teacher": "gato"},
+  {"Name": "sapo", "Kit": ["rec_sapo_cuspe_acido", "rec_remendo", "rec_sapo_frasco_reparo"], "Level2": "rec_sapo_gas_irritante", "Founder": "sapo_antidoto_campo", "Teacher": "sapo"},
+  {"Name": "coruja", "Kit": ["rec_coruja_estilingue", "rec_remendo", "rec_coruja_bicada"], "Level2": "rec_coruja_vigia", "Founder": "coruja_granada_fumaca", "Teacher": "coruja"},
+  {"Name": "rato", "Kit": ["rec_rato_chave_torta", "rec_remendo", "rec_rato_fio_desencapado"], "Level2": "rec_rato_afrouxar", "Founder": "rato_passagem", "Teacher": ""},
+  {"Name": "tatu", "Kit": ["rec_tatu_cabecada", "rec_remendo", "rec_tatu_enrolar"], "Level2": "rec_tatu_escorar", "Founder": "tatu_pancada", "Teacher": ""}
 ]

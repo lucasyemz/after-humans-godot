@@ -180,8 +180,8 @@ func _left(c: Dictionary) -> void:
 		column.add_child(empty)
 		return
 	column.add_child(AHKit.label(tr("Habilidades"), "panel_title", AHKit.TEXT, true, true))
-	# As que ele leva (o recruta flexível, #189: as fixas e as escolhidas, na ordem da classe).
-	var ids := AHRecruitSkills.abilities(hero)
+	# As que ele sabe (o recruta, #215: as da raça e a aprendida no Treino; com mais de 4, as que ficam na Estação também).
+	var ids := AHRecruitSkills.known(hero)
 	if ability == "" or not ids.has(ability):
 		ability = ids[0] if not ids.is_empty() else ""
 	for ability_id in ids:
@@ -253,10 +253,15 @@ func _ability_row(ability_id: String) -> Button:
 	row.name = "Ability_%s" % ability_id
 	var data = GameData.row("abilities", ability_id)
 	row.text = tr(String(data.DisplayName)) if data != null else ability_id
-	# A aprendida de outra classe (#189) diz de quem veio.
-	var teacher := _teacher_name(ability_id)
-	if teacher != "" and not AHRecruitSkills.class_abilities(String(S.hero(Campaign.state, selected).class_id)).has(ability_id):
-		row.text = tr("%s · de %s") % [row.text, teacher]
+	# A aprendida com o fundador (#215) diz de quem veio; a que não vai para a luta diz que fica.
+	var owner = S.hero(Campaign.state, selected)
+	if owner != null and AHRecruitSkills.flexible(owner):
+		var teacher := AHRecruitSkills.teacher_name(String(owner.class_id))
+		if teacher != "" and ability_id == AHRecruitSkills.founder_ability(String(owner.class_id)):
+			row.text = tr("%s · de %s") % [row.text, teacher]
+		if not AHRecruitSkills.abilities(owner).has(ability_id):
+			row.text = tr("%s · fica na Estação") % row.text
+			row.modulate = AHKit.FALLEN
 	row.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var path := AHCombatArena.icon_of(ability_id)
 	row.icon = load(path) if path != "" else null
@@ -275,64 +280,51 @@ func _ability_row(ability_id: String) -> Button:
 	return row
 
 
-## O recruta flexível (#189): a habilidade escolhida na lista se troca aqui (as fixas da classe, não), e o que ele está
-## aprendendo com cada fundador de outra classe.
+## O recruta (#215): o que vem pela frente (a 4ª no nível 2, a do fundador no Treino) e, com mais habilidades que as
+## que leva, a troca da escolhida por uma que ficou na Estação.
 func _skill_choices(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
 	var box := VBoxContainer.new()
 	box.name = "SkillChoices"
 	box.add_theme_constant_override("separation", 6)
 	column.add_child(box)
-	var current := AHRecruitSkills.loadout(hero)
-	var slot := current.find(ability)
-	if AHRecruitSkills.fixed(String(hero.class_id)).has(ability):
-		box.add_child(_note(tr("Fixa da classe: %s sempre leva esta.") % String(hero.display_name)))
-	elif not AHRecruitSkills.can_choose(hero):
-		# Antes do nível 2 (decisão do Lucas): as habilidades da chegada, sem escolha; o que aprende fica guardado.
-		box.add_child(_note(tr("%s luta com as habilidades da classe. A partir do nível %d, escolhe as que leva.") % [String(hero.display_name),
-			int(AHRecruitSkills.rule("ChooseFromLevel", 2))]))
-		# O que já aprendeu (o mentor, a Pesquisa) fica guardado para quando puder escolher.
-		var known: Array = AHRecruitSkills.known_foreign(c, hero).map(func(id):
-			var known_row = GameData.row("abilities", String(id))
-			return tr(String(known_row.DisplayName)) if known_row != null else String(id))
-		if not known.is_empty():
-			box.add_child(_note(tr("Já sabe, para quando escolher: %s.") % ", ".join(known)))
-	elif slot >= 0:
-		var swaps: Array = AHRecruitSkills.options(c, hero).filter(func(id): return not AHRecruitSkills.abilities(hero).has(id))
-		# Só as que valem nesse lugar: com a outra escolha já de fora, as de fora passam do limite (MaxForeign).
-		var over: Array = swaps.filter(func(id):
-			var trial := current.duplicate()
-			trial[slot] = id
-			return AHRecruitSkills.invalid(c, hero, trial) != "")
-		swaps = swaps.filter(func(id): return not over.has(id))
-		if not over.is_empty():
-			box.add_child(_note(tr("%s já leva uma habilidade de fora da classe: troque aquela para levar outra.") % String(hero.display_name)))
-		if swaps.is_empty():
-			box.add_child(_note(tr("Nenhuma outra para pôr no lugar. Saindo com um fundador de outra classe, %s aprende com ele.") % String(hero.display_name)))
-		else:
-			box.add_child(AHKit.label(tr("Trocar por"), "text", AHKit.AMBER, true, true))
-			var row := HFlowContainer.new()
-			row.add_theme_constant_override("h_separation", 10)
-			row.add_theme_constant_override("v_separation", 8)
-			box.add_child(row)
-			for option in swaps:
-				var data = GameData.row("abilities", option)
-				var button := _small_button(tr(String(data.DisplayName)) if data != null else String(option))
-				button.name = "Swap_%s" % option
-				var chosen := current.duplicate()
-				chosen[slot] = option
-				var hero_id := String(hero.id)
-				var picked := String(option)
-				button.pressed.connect(func():
-					var error := AHRecruitSkills.choose(Campaign.state, hero_id, chosen)
-					if error == "":
-						ability = picked
-					hud._act(error, "" if error != "" else tr("%s leva %s.") % [String(S.hero(Campaign.state, hero_id).display_name), tr(String(data.DisplayName)) if data != null else picked]))
-				row.add_child(button)
-	for lesson in AHRecruitSkills.lessons(c, hero):
-		var mentor = S.hero(c, String(lesson.mentor_id))
-		var lesson_ability = GameData.row("abilities", String(lesson.ability_id))
-		box.add_child(_note(tr("Aprendendo com %s: %d de %d expedições juntos (%s).") % [String(mentor.display_name), int(lesson.done),
-			int(lesson.needed), tr(String(lesson_ability.DisplayName)) if lesson_ability != null else ""]))
+	var class_id := String(hero.class_id)
+	var row_data := AHRecruitSkills.race(class_id)
+	var level := AHHeroLevels.level(hero)
+	var next_race = GameData.row("abilities", String(row_data.get("Level2", "")))
+	if level < 2 and next_race != null:
+		box.add_child(_note(tr("No nível 2, %s aprende %s.") % [String(hero.display_name), tr(String(next_race.DisplayName))]))
+	var founder_id := AHRecruitSkills.founder_ability(class_id)
+	var founder = GameData.row("abilities", founder_id)
+	if founder != null and not hero.get("learned", []).has(founder_id):
+		var teacher := AHRecruitSkills.teacher_name(class_id)
+		var from_level := int(AHRecruitSkills.rule("FounderLevel", 4))
+		var fragments := int(AHRecruitSkills.rule("FounderFragments", 3))
+		box.add_child(_note((tr("A partir do nível %d, aprende %s com %s no Treino (+%d fragmentos).") % [from_level, tr(String(founder.DisplayName)), teacher, fragments])
+			if teacher != "" else tr("A partir do nível %d, aprende o ofício no Treino: %s (+%d fragmentos).") % [from_level, tr(String(founder.DisplayName)), fragments]))
+	var carried := AHRecruitSkills.abilities(hero)
+	var resting: Array = AHRecruitSkills.known(hero).filter(func(id): return not carried.has(id))
+	var slot := carried.find(ability)
+	if resting.is_empty() or slot < 0:
+		return
+	box.add_child(AHKit.label(tr("Trocar por"), "text", AHKit.AMBER, true, true))
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", 10)
+	row.add_theme_constant_override("v_separation", 8)
+	box.add_child(row)
+	for option in resting:
+		var data = GameData.row("abilities", option)
+		var button := _small_button(tr(String(data.DisplayName)) if data != null else String(option))
+		button.name = "Swap_%s" % option
+		var chosen := carried.duplicate()
+		chosen[slot] = option
+		var hero_id := String(hero.id)
+		var picked := String(option)
+		button.pressed.connect(func():
+			var error := AHRecruitSkills.choose(Campaign.state, hero_id, chosen)
+			if error == "":
+				ability = picked
+			hud._act(error, "" if error != "" else tr("%s leva %s.") % [String(S.hero(Campaign.state, hero_id).display_name), tr(String(data.DisplayName)) if data != null else picked]))
+		row.add_child(button)
 
 
 func _note(text: String) -> Label:
@@ -340,15 +332,6 @@ func _note(text: String) -> Label:
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.custom_minimum_size = Vector2(300, 0)
 	return label
-
-
-## O fundador que ensina uma habilidade (o nome dele), pela classe dela; "" sem fundador (o Guaxinim e o Tatu).
-func _teacher_name(ability_id: String) -> String:
-	var data = GameData.row("abilities", ability_id)
-	var class_id := String(data.get("ClassId", "")) if data != null else ""
-	var row = GameData.row("recruit_skills", class_id)
-	var founder = GameData.row("initial_heroes", class_id) if row != null and String(row.get("Mentor", "")) != "" else null
-	return String(founder.DisplayName) if founder != null else ""
 
 
 ## O detalhe da habilidade: o nome, a faixa (com o treino da Pesquisa e as melhorias do nível), as posições, o texto e
@@ -942,7 +925,9 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 		var card := Button.new()
 		card.name = "Upgrade_%s" % option.Name
 		AHKit.style_as(card, "upgrade_selected" if option.Name == _upgrade else "upgrade")
-		card.custom_minimum_size = Vector2(296, 200)
+		# Três cartões (com a de aprender, #215) ficam mais estreitos; a altura acompanha o texto.
+		var card_width := 296.0 if options.size() < 3 else 248.0
+		card.custom_minimum_size = Vector2(card_width, 200)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 6)
@@ -953,12 +938,28 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 		box.offset_bottom = -22
 		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(box)
-		box.add_child(AHKit.label(tr(String(option.DisplayName)), "ability_name", AHKit.AMBER if option.Name == _upgrade else AHKit.TEXT, true))
+		var title := AHKit.label(tr(String(option.DisplayName)), "ability_name", AHKit.AMBER if option.Name == _upgrade else AHKit.TEXT, true)
+		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		title.custom_minimum_size = Vector2(card_width - 56.0, 0)
+		box.add_child(title)
 		var effect := AHKit.label(tr(String(option.Description)), "text", AHKit.TEXT)
 		effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		effect.custom_minimum_size = Vector2(240, 0)
+		effect.custom_minimum_size = Vector2(card_width - 56.0, 0)
 		box.add_child(effect)
-		box.add_child(AHKit.label(tr("Já tem: %d") % AHHeroLevels.stacks(hero, option.Name), "small", AHKit.MUTED))
+		if String(option.get("Stat", "")) == "Learn":
+			# Aprender com o fundador (#215): custa fragmentos além do nível.
+			var fragments := int(option.get("Fragments", 0))
+			var short := S.quantity(c, "fragments") < fragments
+			var price := AHKit.label(tr("Custa também %d fragmentos") % fragments, "small", AHKit.alert_text() if short else AHKit.MUTED)
+			price.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			price.custom_minimum_size = Vector2(card_width - 56.0, 0)
+			box.add_child(price)
+		else:
+			box.add_child(AHKit.label(tr("Já tem: %d") % AHHeroLevels.stacks(hero, option.Name), "small", AHKit.MUTED))
+		# O botão não cresce com o que tem dentro: a altura segue o texto (quebrado na largura do cartão).
+		var grow := func(): card.custom_minimum_size.y = maxf(200.0, box.get_combined_minimum_size().y + 44.0)
+		box.minimum_size_changed.connect(grow)
+		grow.call()
 		var id: String = option.Name
 		card.pressed.connect(func():
 			_upgrade = id
