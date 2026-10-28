@@ -302,6 +302,14 @@ func _chips(c: Dictionary, result: String) -> Array:
 	var posts: Array = report.get("posts", []).filter(func(p): return int(p.get("amount", 0)) > 0)
 	if not posts.is_empty():
 		out.append({"icon": "room_quarters", "text": tr("Postos: %s") % ", ".join(posts.map(func(p): return post_line(p))), "color": AHKit.TEXT})
+	# O mentor (#189): o recruta que aprendeu com um fundador de outra classe nesta volta.
+	for lesson in report.get("learned", []):
+		var recruit = S.hero(c, String(lesson.get("hero_id", "")))
+		var mentor = S.hero(c, String(lesson.get("mentor_id", "")))
+		var ability = GameData.row("abilities", String(lesson.get("ability_id", "")))
+		if recruit != null and mentor != null and ability != null:
+			out.append({"icon": "room_research", "text": tr("%s aprendeu com %s: %s") % [recruit.display_name, mentor.display_name, tr(String(ability.DisplayName))],
+				"color": AHKit.AMBER})
 	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
 	if report.has("train"):
 		var arrived := String(report.train)
@@ -561,7 +569,8 @@ func _research_for(c: Dictionary, class_id: String) -> Dictionary:
 	if not S.room_available(c, S.RESEARCH):
 		return {}
 	for row in GameData.table("research").values():
-		if String(row.get("ClassId", "")) == class_id and not c.get("researched_skills", []).has(String(row.get("SkillId", ""))):
+		if String(row.get("Branch", "class")) == "class" and String(row.get("ClassId", "")) == class_id \
+				and not c.get("researched_skills", []).has(String(row.get("SkillId", ""))):
 			return row
 	return {}
 
