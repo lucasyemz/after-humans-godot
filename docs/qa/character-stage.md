@@ -37,12 +37,21 @@ As fotos saem de `tools/capture_181.gd` (`--text-size=2`). O antes é a `main`.
 
 ## O zoom (28/10)
 
-O pedido do Lucas: mais zoom na câmera da Sala dos Personagens. O `focus_room_stage` agora chega 1,4 vez mais perto
-(`STAGE_ZOOM`), com o mesmo ponto de mira: o meio da sala continua entre os dois painéis, e os pés no chão dela.
+O pedido do Lucas: "Está muito longe ainda. O tamanho do personagem tem que ser o mesmo de antes, mas aí a câmera tem
+que praticamente entrar dentro do cômodo."
+
+- **O tamanho:** a figura antiga da interface media 555 px no Nick (1,50 m) e 630 px no Bento (1,72 m), em 1080. O
+  `focus_room_stage` agora põe a câmera dentro do cômodo, à distância que dá 381 px por metro de `body_height`
+  (`STAGE_PX_PER_METER`, com a arte passando um pouco do corpo). O Nick fica com uns 555 px e o Bento com uns 630,
+  cada um na altura dele.
+- **Os pés:** caem em y≈878, onde ficavam os da figura antiga (`STAGE_FEET`).
+- **O resto:** o meio da sala continua entre os dois painéis. O teto e a luminária saem do quadro, e o fundo é a parede,
+  a porta, a estante e o sofá da própria sala.
 
 ![antes e depois do zoom](character-stage/zoom.jpg)
 
-O `test_character_stage` confere os pés entre os painéis no Normal e no Maior.
+O `test_character_stage` confere os pés entre os painéis e a altura na tela (a do Nick e a do Bento contra a figura
+antiga), no Normal e no Maior.
 
 ## Rodadas da QA
 

@@ -69,6 +69,11 @@ func _stage(station, profile: String, fallen_id: String) -> void:
 	var feet: Vector2 = station.camera.unproject_position(card.global_position)
 	t.check(feet.x > AHCharacterRoom.LEFT.end.x and feet.x < AHCharacterRoom.RIGHT.position.x and feet.y > 400.0 and feet.y < 1000.0,
 		"%s: os pés na tela, entre os painéis (%.0f, %.0f)" % [profile, feet.x, feet.y])
+	# O tamanho da figura antiga da interface (o pedido do Lucas): a câmera dentro do cômodo, a altura do herói em px.
+	var head: Vector2 = station.camera.unproject_position(card.global_position + Vector3(0, card.body_height, 0))
+	var expected: float = card.body_height * AHStation.STAGE_PX_PER_METER
+	t.check(absf((feet.y - head.y) - expected) < expected * 0.05 and absf(feet.y - AHStation.STAGE_FEET) < 20.0,
+		"%s: do tamanho da figura antiga (%.0f px, esperado %.0f) e com os pés na linha dela (y %.0f)" % [profile, feet.y - head.y, expected, feet.y])
 	# Trocar de herói: o de antes sai da sala, o novo entra.
 	var other: String = S.living(Campaign.state).filter(func(h): return h.id != first)[0].id
 	screen.selected = other
