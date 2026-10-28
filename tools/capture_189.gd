@@ -1,5 +1,6 @@
 ## Fotos dos recrutas flexíveis (#189): na Sala dos Personagens, um recruta cão que aprendeu a Ampola com a Íris (a
-## habilidade escolhida, com Trocar por; e depois da troca) e o ramo Ensinar a comunidade na Pesquisa.
+## habilidade escolhida, com Trocar por; e depois da troca), um recém-chegado de nível 1 (a nota de quando a escolha
+## abre e o que ele já sabe) e o ramo Ensinar a comunidade na Pesquisa.
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_189.gd -- --out=<pasta> [--text-size=2]
 ## A campanha fica numa pasta dentro de <pasta>; o save do jogador fica intacto.
 extends SceneTree
@@ -40,6 +41,10 @@ func _run() -> void:
 	recruit.level = 2
 	recruit.learned = ["sapo_ampola_reparo_vivo"]
 	recruit.mentor = {"hero_coruja_vespera": 1}
+	# Um recém-chegado (nível 1) que já aprendeu a Ampola: a nota de quando a escolha abre e o que ele já sabe.
+	var fresh_made: Dictionary = S.recruit(c, "gato", RandomNumberGenerator.new(), "Brasa")
+	var fresh = S.hero(c, String(fresh_made.hero_id))
+	fresh.learned = ["sapo_ampola_reparo_vivo"]
 	c.station.last_return = {}
 	campaign.state = c
 	campaign.save()
@@ -67,6 +72,15 @@ func _run() -> void:
 		swap.pressed.emit()
 	await _frames(30)
 	await _shot("02-sala-trocada")
+	screen = hud._room_screen
+	screen.selected = fresh.id
+	screen.ability = "gato_salto_entre_ruinas"
+	screen.rebuild()
+	await _frames(10)
+	scroll = screen.get_node("Left").get_child(0)
+	scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
+	await _frames(20)
+	await _shot("04-sala-nivel-1")
 	hud.close_panel()
 	await _frames(10)
 	hud.open_room(S.RESEARCH)

@@ -14,8 +14,13 @@ As camadas de aparência (a arte do #211) entram num PR separado.
 
 ![a Pesquisa com o ramo Ensinar a comunidade (Normal e Maior)](recruit-skills/pesquisa.jpg)
 
-As fotos saem de `tools/capture_189.gd`. A Faísca, uma recruta de cão, já aprendeu a Ampola de Reparo Vivo com a Íris
-e tem 1 de 2 expedições com a Véspera. Na Sala, ela troca Impacto Hidráulico pela Ampola.
+![o recém-chegado, no nível 1: a nota de quando a escolha abre e o que ele já sabe (Normal e Maior)](recruit-skills/nivel-1.jpg)
+
+As fotos saem de `tools/capture_189.gd`.
+- A Faísca, uma recruta de cão já no nível 2, aprendeu a Ampola de Reparo Vivo com a Íris e tem 1 de 2 expedições com
+  a Véspera. Na Sala, ela troca Impacto Hidráulico pela Ampola.
+- A Brasa, uma recruta de gato no nível 1, também já sabe a Ampola. Ela ainda luta com as habilidades da classe, e a
+  Sala diz quando a escolha abre e o que ela já sabe.
 
 ## A chegada (decisão do Lucas, 28/10)
 
@@ -25,7 +30,8 @@ e tem 1 de 2 expedições com a Véspera. Na Sala, ela troca Impacto Hidráulico
 - **Já no jogo:** o recruta chega com as habilidades iniciais da classe, sem escolha.
   - A escolha abre no nível 2 (`ChooseFromLevel` em `data/recruit-skills.json`).
   - Antes disso, a Sala diz "Faísca luta com as habilidades da classe. A partir do nível 2, escolhe as que leva.".
-  - O que ele aprende antes, com o mentor ou com a Pesquisa, fica guardado para quando puder escolher.
+  - O que ele aprende antes, com o mentor ou com a Pesquisa, fica guardado para quando puder escolher, e a Sala mostra:
+    "Já sabe, para quando escolher: Ampola de Reparo Vivo.".
   - Uma escolha guardada no nível 1 (um save editado) não vale na luta e volta ao kit da classe ao abrir o save.
 - **Para o Lucas decidir: o que é a "habilidade de foco"?** A frase tem duas leituras:
   - **A, o foco é a habilidade que se troca:** no nível 2, o recruta troca uma das habilidades que não são fixas.
@@ -109,7 +115,7 @@ Ampola de Reparo Vivo". Se o Lucas preferir a fala, ela entra como texto de cada
 
 ## Como testar
 
-- `tests/test_recruit_skills.gd` (65 checagens) cobre:
+- `tests/test_recruit_skills.gd` (68 checagens) cobre:
   - a chegada: o recruta de nível 1 com o kit da classe, sem escolher, e a escolha que abre no nível 2;
   - as regras;
   - a migração e o save;
