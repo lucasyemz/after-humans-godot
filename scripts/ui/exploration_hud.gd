@@ -559,6 +559,13 @@ func refresh(campaign: Dictionary) -> void:
 			if hero == null or not hero.alive:
 				continue
 			_party_box.add_child(_mate(hero))
+		# Os levantados no mapa (#179) seguem com a equipe, sem lutar: um selo ao lado das plaquinhas.
+		var carried: Array = AHJourneyRules.carried(campaign).map(func(id): return String(Campaign.hero(id).display_name))
+		if not carried.is_empty():
+			var carried_chip := _change_chip("bed", tr("A equipe carrega: %s") % ", ".join(carried), AHKit.TEXT)
+			carried_chip.name = "Carried"
+			carried_chip.size_flags_vertical = Control.SIZE_SHRINK_END
+			_party_box.add_child(carried_chip)
 		_party_box.reset_size()
 		_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
 	_place_corner()
@@ -1062,6 +1069,15 @@ func hide_tool_notice() -> void:
 	_tool_notice = null
 
 
+## A chapa do aviso no tamanho do texto, centrada embaixo do objetivo (fora da árvore, a chamada adiada não mede nada).
+func _fit_toast() -> void:
+	if not is_inside_tree():
+		return
+	_toast.reset_size()
+	_toast.size = _toast.get_combined_minimum_size()
+	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+
+
 ## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
 func toast(text: String, seconds: float = 3.5) -> void:
 	if _toast_tween:
@@ -1072,9 +1088,10 @@ func toast(text: String, seconds: float = 3.5) -> void:
 	# Quebra só o que passa de 900 (com a quebra ligada, o rótulo curto pedia a altura de uma palavra por linha).
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if width >= 900.0 else TextServer.AUTOWRAP_OFF
 	_toast_label.custom_minimum_size = Vector2(width, 0)
-	_toast.reset_size()
-	_toast.size = _toast.get_combined_minimum_size()
-	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+	_fit_toast()
+	# O rótulo que quebra mede a altura pela largura de agora: no primeiro aviso longo, ele ainda tinha 0 e media uma
+	# palavra por linha (a caixa saía com milhares de px e o texto fora da tela). Depois do layout, mede de novo.
+	_fit_toast.call_deferred()
 	_toast.modulate.a = 1.0
 	_toast_tween = create_tween()
 	_toast_tween.tween_interval(seconds)
@@ -1692,10 +1709,23 @@ func show_result(result: String, delivered: Dictionary, campaign: Dictionary, bu
 	chips.add_child(_change_chip("lobby-seed", tr("%d sementes") % delivered.get("seeds", 0), AHKit.TEXT))
 	chips.add_child(_change_chip("lobby-scrap", tr("%d sucata") % delivered.get("scrap", 0), AHKit.TEXT))
 	chips.add_child(_change_chip("lobby-fragment", tr("%d fragmentos") % delivered.get("fragments", 0), AHKit.TEXT))
-	# Ninguém morre (#118): quem caiu volta em recuperação.
-	var fell: Array = delivered.get("fallen", []).map(func(e): var h = AHStationRules.hero(campaign, String(e.hero_id)); return String(h.display_name) if h != null else "")
-	box.add_child(AHKit.label(tr("Toda a equipe voltou de pé.") if fell.is_empty() else (tr("Volta em recuperação: %s") if fell.size() == 1 else tr("Voltam em recuperação: %s")) % ", ".join(fell),
-		"text", AHKit.MUTED if fell.is_empty() else AHKit.alert_text()))
+	# Ninguém morre (#118): quem caiu volta em recuperação. Os levantados no mapa (#179) chegam carregados, com menos dias;
+	# os outros, com a recuperação inteira, na Enfermaria (com leito) ou no Dormitório.
+	var fallen: Array = delivered.get("fallen", [])
+	if fallen.is_empty():
+		box.add_child(AHKit.label(tr("Toda a equipe voltou de pé."), "text", AHKit.MUTED))
+	# [o texto com um nome, o texto com vários, quem]: "A equipe carregou" vale para os dois (sem gênero no nome).
+	var lines := [[tr("A equipe carregou: %s"), tr("A equipe carregou: %s"), fallen.filter(func(e): return e.get("carried", false))],
+		[tr("Foi para a Enfermaria: %s"), tr("Foram para a Enfermaria: %s"), fallen.filter(func(e): return not e.get("carried", false) and e.get("bed", false))],
+		[tr("Foi para o Dormitório, em recuperação: %s"), tr("Foram para o Dormitório, em recuperação: %s"),
+			fallen.filter(func(e): return not e.get("carried", false) and not e.get("bed", false))]]
+	for line in lines:
+		if line[2].is_empty():
+			continue
+		var names: Array = line[2].map(func(e): var h = AHStationRules.hero(campaign, String(e.hero_id)); return "%s (%s)" % [String(h.display_name) if h != null else "", AHStationRules.return_text(int(e.days)).to_lower()])
+		var label := AHKit.label((line[0] if names.size() == 1 else line[1]) % ", ".join(names), "text", AHKit.alert_text())
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(label)
 	var button := _primary(button_text, "station", tr("%s / A") % S.key_name("interact"), func(): result_continue.emit())
 	box.add_child(button)
 	button.grab_focus.call_deferred()

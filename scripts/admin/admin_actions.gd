@@ -314,7 +314,8 @@ static func _map(target: String) -> String:
 		# Quem caiu na expedição largada volta Caído (#118), como numa volta.
 		var expedition = c.get("session", {}).get("expedition")
 		if expedition != null:
-			S.admit_fallen(c, expedition.team.filter(func(id): return S.hero(c, id) != null and not S.hero(c, id).alive))
+			S.admit_fallen(c, expedition.team.filter(func(id): return S.hero(c, id) != null and not S.hero(c, id).alive),
+				expedition.get("carried", []))
 		c.session = {"expedition": null, "event": null, "screen": "", "result": ""}
 		Campaign.save()
 		GameFlow.change_to("station")
