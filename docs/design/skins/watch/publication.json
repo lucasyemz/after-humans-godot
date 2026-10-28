@@ -2,5 +2,7 @@
   "pr": 204,
   "source_tag": "codex-pr204-originals",
   "release": "https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr204-originals",
-  "source_folder": "art/combat/source/bento_watch_20261028"
+  "source_folder": "art/combat/source/bento_watch_20261028",
+  "zip": "https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr204-originals.zip",
+  "archive_tree": "source-only root commit, outside PR branch"
 }
