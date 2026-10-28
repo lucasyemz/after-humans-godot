@@ -177,6 +177,8 @@ static func migrate(campaign: Dictionary) -> void:
 	for entry in campaign.get("roster", []):
 		if not entry.has("art_variant"):
 			entry.art_variant = pick_art_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
+	# Os recrutas flexíveis (#189): os de antes ficam com o kit da classe.
+	AHRecruitSkills.migrate(campaign)
 	# Ninguém morre (#118): o memorial dos saves antigos volta em recuperação.
 	_migrate_fallen(campaign)
 	_migrate_posts(campaign)
@@ -1241,12 +1243,13 @@ static func team_size_text(limits: Dictionary) -> String:
 
 
 ## Os ataques que a classe tem na posição (#95): cada um precisa de um ataque na posição em que parte.
-static func attacks_from_rank(class_id: String, rank: int) -> Array:
+## ability_ids: as que o herói leva (o recruta flexível, #189); vazio, as da classe.
+static func attacks_from_rank(class_id: String, rank: int, ability_ids: Array = []) -> Array:
 	var out: Array = []
 	var hero_class = GameData.row("classes", class_id)
 	if hero_class == null:
 		return out
-	for ability_id in hero_class.AbilityIds:
+	for ability_id in (ability_ids if not ability_ids.is_empty() else hero_class.AbilityIds):
 		var ability = GameData.row("abilities", ability_id)
 		if ability != null and ability.get("DamageRange") != null and Array(ability.get("OriginRanks", [])).map(func(r): return int(r)).has(rank):
 			out.append(ability.DisplayName)
@@ -1568,7 +1571,7 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 			return TranslationServer.translate("Só integrantes vivos podem partir.")
 		if not can_deploy(entry):
 			return deploy_block(entry)
-		if attacks_from_rank(entry.class_id, rank).is_empty():
+		if attacks_from_rank(entry.class_id, rank, AHRecruitSkills.abilities(entry)).is_empty():
 			return TranslationServer.translate("%s não tem ataque na posição %d.") % [entry.display_name, rank]
 	var team_block := validate_team(campaign, team, phase_id)
 	if team_block != "":
@@ -1637,6 +1640,9 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	if factor > 0.0 and is_resident(campaign, request) and not campaign.station.completed_requests.has(request):
 		campaign.station.completed_requests.append(request)
 		delivered.request = request
+	# O mentor (#189): o recruta que voltou com um fundador de outra classe conta a expedição e, completa a conta,
+	# aprende a próxima habilidade que ele ensina.
+	delivered.learned = AHRecruitSkills.mentor_return(campaign, expedition.team)
 	for entry in campaign.roster:
 		entry.expedition_uses = {}
 		# Os abates da carreira (o campo já existia no herói, sem conta): as máquinas derrubadas nesta jornada (#60).

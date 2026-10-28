@@ -74,6 +74,8 @@ class Unit:
 	var mark_duration := 0
 	var cooldowns := {}
 	var remaining_uses := {}
+	## As habilidades que ele leva (o recruta flexível, #189); vazio = as da classe.
+	var ability_ids: Array = []
 	## +n nos limites de dano ou cura de uma habilidade (o nível do herói, #90): {ability_id: n}.
 	var ability_bonus := {}
 	var trauma := false

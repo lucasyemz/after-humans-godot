@@ -596,7 +596,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 	var home := card.position
 	var hostile := targets.any(func(id): return session.state.find_unit(id) != null and session.state.find_unit(id).is_player != actor.is_player)
 	var action = null if actor.is_player else session.enemy_action(actor.enemy_id, ability_id)
-	var hero_action: Dictionary = hero_art(actor.hero_id).get("actions", {}).get(ability_id, {}) if actor.is_player else {}
+	var hero_action: Dictionary = _action_art(actor, ability_id) if actor.is_player else {}
 	var support: bool = not hostile or (action != null and (action.bIsDefend or action.TargetType == "Self"))
 	# Preparo: a pose de quem age, já na frente dos outros.
 	if actor.is_player:
@@ -834,7 +834,7 @@ func _recoil(card: AHSpriteCard, contact_x, strength: float) -> void:
 
 
 func _spawn_vfx(actor: AHCombat.Unit, ability_id: String, target_id: String) -> void:
-	var vfx: Dictionary = hero_art(actor.hero_id).actions[ability_id].vfx
+	var vfx: Dictionary = _action_art(actor, ability_id).vfx
 	var target_card: AHSpriteCard = cards.get(target_id)
 	if target_card == null:
 		return
@@ -887,8 +887,11 @@ const ENEMY_CUES := "res://audio/combat/enemies/%s/%s.wav"
 
 
 func _hero_cue(actor: AHCombat.Unit, ability_id: String) -> String:
-	var prefix: String = HERO_CUES.get(actor.class_id, "")
-	var hero_class = session.data.classes.get(actor.class_id)
+	# O som é o da habilidade (a da classe dela): o recruta que aprendeu com a Íris (#189) toca o som da ampola.
+	var ability = session.data.abilities.get(ability_id)
+	var class_id := String(ability.get("ClassId", actor.class_id)) if ability != null else actor.class_id
+	var prefix: String = HERO_CUES.get(class_id, "")
+	var hero_class = session.data.classes.get(class_id)
 	if prefix == "" or hero_class == null:
 		return ""
 	var index: int = hero_class.AbilityIds.find(ability_id)
@@ -936,3 +939,17 @@ func show_ring(unit_id: String) -> void:
 		add_child(ring)
 	var card: AHSpriteCard = cards.get(unit_id) if unit_id != "" else null
 	ring.follow(card if active else null)
+
+
+## A arte de uma ação do herói: a da arte dele e, sem ela (a habilidade aprendida de outra classe, #189), o efeito do
+## fundador dono da habilidade, com o herói parado (sem pose de golpe própria).
+func _action_art(actor: AHCombat.Unit, ability_id: String) -> Dictionary:
+	var own: Dictionary = hero_art(actor.hero_id).get("actions", {}).get(ability_id, {})
+	if own.has("vfx"):
+		return own
+	for founder_id in art.heroes:
+		var action: Dictionary = art.heroes[founder_id].get("actions", {}).get(ability_id, {})
+		if action.has("vfx"):
+			return own.merged({"vfx": action.vfx})
+	return own
+

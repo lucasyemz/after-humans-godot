@@ -138,7 +138,8 @@ static func _hero_passives(hero, perks: Array, class_id: String) -> Array:
 				out.append([title, TranslationServer.translate(String(upgrade.get("Description", ""))), true])
 	var learned: Array = Campaign.state.get("researched_skills", []) if Campaign.state is Dictionary else []
 	for research in GameData.table("research").values():
-		if String(research.get("ClassId", "")) == class_id and learned.has(String(research.get("SkillId", ""))):
+		# Só o Treino da classe (o ramo "Ensinar a comunidade", #189, ensina os recrutas de outras classes).
+		if String(research.get("Branch", "class")) == "class" and String(research.get("ClassId", "")) == class_id and learned.has(String(research.get("SkillId", ""))):
 			out.append([TranslationServer.translate(String(research.DisplayName)), TranslationServer.translate(String(research.get("Description", ""))), true])
 	return out
 

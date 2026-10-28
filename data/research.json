@@ -30,5 +30,9 @@
     "ClassId": "coruja",
     "CostFragments": 3,
     "Description": "+1 nos limites de dano ou cura de Recurso de Emergência."
-  }
+  },
+  {"Name": "res_teach_cao", "Branch": "teach", "DisplayName": "Ensinar a comunidade: Bento", "SkillId": "teach_cao", "ClassId": "cao", "CostFragments": 4, "Description": "Bento ensina os recrutas de outras classes: Fique Atrás de Mim e Não Estamos Sós."},
+  {"Name": "res_teach_gato", "Branch": "teach", "DisplayName": "Ensinar a comunidade: Nick", "SkillId": "teach_gato", "ClassId": "gato", "CostFragments": 4, "Description": "Nick ensina os recrutas de outras classes: Sumir na Sombra e Caçada Precisa."},
+  {"Name": "res_teach_sapo", "Branch": "teach", "DisplayName": "Ensinar a comunidade: Íris", "SkillId": "teach_sapo", "ClassId": "sapo", "CostFragments": 4, "Description": "Íris ensina os recrutas de outras classes: Ampola de Reparo Vivo e Antídoto de Campo."},
+  {"Name": "res_teach_coruja", "Branch": "teach", "DisplayName": "Ensinar a comunidade: Véspera", "SkillId": "teach_coruja", "ClassId": "coruja", "CostFragments": 4, "Description": "Véspera ensina os recrutas de outras classes: Olho nas Ruínas e Granada de Fumaça."}
 ]
