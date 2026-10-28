@@ -1,7 +1,7 @@
 {
   "issue": 210,
   "base_commit": "ff8fc83",
-  "source_tag": "codex-pr<N>-originals",
+  "source_tag": "codex-pr220-originals",
   "source_folder": "art/combat/source/recruit_camp_20261028",
   "poses": [
     {

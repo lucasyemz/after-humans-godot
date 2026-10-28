@@ -40,7 +40,7 @@ O harness e a identificação das capturas ficam em `recruit_camp/capture.gd` e 
 
 ## Originais fora da main
 
-Tag `codex-pr<N>-originals`; pasta `art/combat/source/recruit_camp_20261028/`. O Release da tag fornece o ZIP automático de uma árvore isolada contendo somente os PNG normalizados, contrato e instruções. Os atlas/brutos da geração ficam fora do Git; nenhum PNG é incluído no PR ou no histórico da branch para a main.
+Tag `codex-pr220-originals`; pasta `art/combat/source/recruit_camp_20261028/`. O Release da tag fornece o ZIP automático de uma árvore isolada contendo somente os PNG normalizados, contrato e instruções. Os atlas/brutos da geração ficam fora do Git; nenhum PNG é incluído no PR ou no histórico da branch para a main.
 
 Após extrair o pacote: `python docs/design/recruit_camp/build_delivery.py --sources art/combat/source/recruit_camp_20261028`. Dependências: Pillow, numpy e scipy; o recorte compartilha o utilitário já existente em `docs/design/recruit_layers/prepare_layers.py`.
 
@@ -51,3 +51,5 @@ Após extrair o pacote: `python docs/design/recruit_camp/build_delivery.py --sou
 **Rodada 2 — VEREDITO: APROVADO.** Conferidas quatro poses e o comparativo com os quatro recrutas existentes: rosto/espécie, equipamento, mãos/garras, cabeça, escala, apoio, alfa no claro/escuro, 40%/cinza, nomes/arquivos e contrato. As capturas reais repetidas mostram os dois estados com apoio no chão, sem o contato entre escudo e cabeça. Sem pendência alta ou média na arte. Observação baixa: a cauda da pose sentada do Tatu chega à borda esquerda no enquadramento atual do acampamento; não foi cortada na textura. A câmera de produção e a luz Forward+ serão conferidas na integração. Aprovação artística final das pranchas pelo Lucas.
 
 **Validação:** Godot 4.7.2; runner completo **87/87 em 601,989 s**, paridade **48/48**. O teste de retratos agora passa na main. Importação final e checker do contrato: 16 payloads iguais aos idles, incluindo os quatro novos. O log registra avisos de foco/recursos e coroutine do tutorial ao encerrar; o runner retorna zero. Nenhuma mudança em scripts/data/tests ou ids.
+
+[Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr220-originals) · [ZIP dos originais](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr220-originals.zip).
