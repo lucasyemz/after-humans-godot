@@ -204,6 +204,13 @@ static func hero_art_of(hero_id: String, variant: String = "") -> Dictionary:
 	return art_entry(_manifest.heroes, hero_id, variant)
 
 
+## A entrada do fundador no manifesto, sem skin (a base que a Sala veste em cada aba da Roupa, #138).
+static func founder_art_of(hero_id: String) -> Dictionary:
+	if _manifest.is_empty():
+		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
+	return _manifest.get("heroes", {}).get(hero_id, {})
+
+
 ## A arte de um inimigo fora da luta (o rosto no Mapa da Rede, #87), do mesmo manifesto.
 static func enemy_art_of(sprite_key: String) -> Dictionary:
 	if _manifest.is_empty():

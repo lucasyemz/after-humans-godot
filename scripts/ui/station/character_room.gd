@@ -25,7 +25,6 @@ var training := false
 var _upgrade := ""
 var _first_focus: Control
 var _trait_ids := {}
-var _manifest_heroes := {}
 
 
 static func make(owner: Control) -> AHCharacterRoom:
@@ -612,9 +611,7 @@ func _skin_tab(hero: Dictionary, skin_id: String, label: String, full_name: Stri
 
 ## A entrada do fundador no manifesto, sem skin (a base para vestir cada aba).
 func _founder_art(hero_id: String) -> Dictionary:
-	if _manifest_heroes.is_empty():
-		_manifest_heroes = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST)).get("heroes", {})
-	return _manifest_heroes.get(hero_id, {})
+	return AHCombatArena.founder_art_of(hero_id)
 
 
 func _choose_skin(hero_id: String, skin_id: String, label: String) -> void:

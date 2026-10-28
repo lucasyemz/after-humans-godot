@@ -2056,8 +2056,9 @@ static func choose_skin(campaign: Dictionary, hero_id: String, skin_id: String) 
 ## Libera todas as skins (a barra de Admin). Devolve quantas eram novas.
 static func unlock_all_skins(campaign: Dictionary) -> int:
 	var added := 0
+	# Só as que têm arte: a skin sem arte não aparece na Sala nem se veste, e não conta como liberada.
 	for row in GameData.table("skins").values():
-		if not campaign.unlocked_skins.has(String(row.Name)):
+		if AHSkins.has_art(String(row.Name)) and not campaign.unlocked_skins.has(String(row.Name)):
 			campaign.unlocked_skins.append(String(row.Name))
 			added += 1
 	return added
