@@ -101,6 +101,9 @@ func showing() -> bool:
 
 ## Mostra a dica se ela ainda não foi vista (e as dicas estão ligadas). Uma de cada vez; as outras esperam a vez.
 func show_tip(id: String) -> void:
+	# Na abertura (#144) quem ensina é o tutorial: as dicas de primeira vez esperam.
+	if AHTutorial.suppresses_tips(Campaign.state):
+		return
 	if not enabled or _seen.has(id) or not TIPS.has(id) or id == _current or _queue.has(id):
 		return
 	if _current != "":
@@ -125,6 +128,13 @@ func dismiss() -> void:
 	_current = ""
 	if not _queue.is_empty():
 		show_tip(_queue.pop_front())
+
+
+## Conta as dicas como vistas (as que o tutorial já ensinou, #144).
+func mark_seen(ids: Array) -> void:
+	for id in ids:
+		_seen[id] = true
+	_store()
 
 
 func seen(id: String) -> bool:

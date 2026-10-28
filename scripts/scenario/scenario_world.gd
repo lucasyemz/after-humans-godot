@@ -16,6 +16,8 @@ const CARD_BRIGHTNESS := 1.7
 const FRONT_LIFT_MARGIN := 0.06
 ## A borda da frente mais alta que ainda conta como piso (acima disso é parede, e a silhueta vale).
 const FRONT_EDGE_MAX := 0.6
+## O primeiro plano começa a tantos metros além da borda da frente da zona (os objetos no pé da faixa ficam de fora).
+const FOREGROUND_GAP := 2.0
 
 static var _mesh_cache: Array = []
 
@@ -61,10 +63,28 @@ const END_CAP_HEIGHT := 5.6
 const END_CAP_BELOW := 1.0
 const END_CAP_FRONT := 0.4
 var _blockouts: Array[ShaderMaterial] = []
+## O que só o Corredor de Contenção tem (#147, tools/build_containment_corridor.py): as lâmpadas que piscam (a luz e o
+## card, cada uma na sua fase), as portas de segurança e o painel (abertas ou fechadas) e onde fica o vagão.
+var security_doors: Array = []
+var door_panel := {}
+var train := {}
+var _blink_lights: Array = []
+var _blink_parts: Array = []
+var _door_nodes := {}
+var _panel_nodes: Array = []
+var _time := 0.0
 
 
 const DISPLAY := {"RootBridge": "Ponte das Raízes", "RiverDock": "Cais do Rio", "FloodedDepot": "Depósito Inundado",
-	"SealedShelter": "Abrigo Lacrado", "SewerDucts": "Dutos de Esgoto", "TriageGate": "Portão de Triagem"}
+	"SealedShelter": "Abrigo Lacrado", "SewerDucts": "Dutos de Esgoto", "TriageGate": "Portão de Triagem",
+	"ContainmentCorridor": "Corredor de Contenção"}
+## A lâmpada de emergência (o desenho do tutorial, PR #152): 0,6 s acesa e 0,4 s quase apagada (a 25%), fora de fase entre
+## vizinhas; com "Reduzir efeitos", acesa sem piscar.
+const BLINK_PERIOD := 1.0
+const BLINK_ON := 0.6
+const BLINK_LOW := 0.25
+## De quanto mais à direita o vagão vem ao chegar (m).
+const TRAIN_RUN := 30.0
 
 ## Ajustes de luz de cada local ao ar livre (AHWeatherSite dos scripts de ajuste da Unreal): a lua e o céu têm um
 ## mínimo, para a noite continuar legível, e a neblina rende. Os cenários fechados ficam com as luminárias do mapa.
@@ -91,6 +111,16 @@ func build(map: String) -> void:
 	zones = data.zones
 	side_doors = data.side_doors
 	props = data.props
+	security_doors = data.get("security_doors", [])
+	door_panel = data.get("door_panel", {})
+	train = data.get("train", {})
+	# As peças que mudam depois de montadas (a porta, o painel, a lâmpada) ficam soltas, fora da junção.
+	var kept := {}
+	for index in security_doors.size():
+		for part in security_doors[index].parts:
+			kept[int(part)] = ["door", index]
+	for part in door_panel.get("parts", []):
+		kept[int(part)] = ["panel", 0]
 	if _mesh_cache.is_empty():
 		var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(MESHES))
 		for mesh in raw.meshes:
@@ -116,13 +146,32 @@ func build(map: String) -> void:
 			node.set_surface_override_material(surface, _materials[index])
 		if part.get("no_shadow", false) or data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"]:
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		# Uma peça de um nó (o vagão do tutorial, "Metro"): fica nele, fora da junção, para andar junto (arrive_train).
+		if part.has("node"):
+			_group(String(part.node)).add_child(node)
+			continue
 		add_child(node)
+		# O primeiro plano, entre a faixa e a câmera: o AHOcclusion quase o apaga quando tapa alguém. O mapa pode marcar
+		# uma peça mais perto da faixa (foreground, o entulho do pé da faixa do tutorial).
+		if part.get("foreground", false) or _foreground(node.transform * node.mesh.get_aabb()):
+			node.set_meta("foreground", true)
 		if not data.materials[int(part.materials[0])].kind in ["card", "unlit", "water", "glow"] \
 				and not data.materials[int(part.materials[0])].get("masked", false):
 			walls.append(node.transform * node.mesh.get_aabb())
 		if part.get("solid", false):
 			_add_obstacle(node.transform * node.mesh.get_aabb())
-		if prop_parts.has(i):
+		if part.has("blink"):
+			_blink_parts.append([node, _materials[int(part.materials[0])], _materials[int(part.blink.off)], float(part.blink.phase)])
+		if kept.has(i):
+			if kept[i][0] == "door":
+				if not _door_nodes.has(kept[i][1]):
+					_door_nodes[kept[i][1]] = []
+				_door_nodes[kept[i][1]].append(node)
+			else:
+				_panel_nodes.append(node)
+		elif part.has("blink"):
+			pass
+		elif prop_parts.has(i):
 			if not _prop_nodes.has(prop_parts[i]):
 				_prop_nodes[prop_parts[i]] = []
 			_prop_nodes[prop_parts[i]].append(node)
@@ -141,6 +190,101 @@ func build(map: String) -> void:
 		_doorway(doorway)
 	for layered in data.get("layered_cards", []):
 		_layered_card(layered)
+	for model in data.get("models", []):
+		_model(model)
+	set_process(not _blink_lights.is_empty() or not _blink_parts.is_empty())
+
+
+## As lâmpadas de emergência: acesas BLINK_ON do período e quase apagadas no resto, cada uma na fase dela.
+func _process(delta: float) -> void:
+	_time += delta
+	var steady := GameFlow.reduced_effects()
+	for entry in _blink_lights:
+		var lamp: OmniLight3D = entry[0]
+		lamp.light_energy = entry[1] * (1.0 if steady or blink_lit(_time, entry[2]) else BLINK_LOW)
+	for entry in _blink_parts:
+		var node: MeshInstance3D = entry[0]
+		var lit: bool = steady or blink_lit(_time, entry[3])
+		node.set_surface_override_material(0, entry[1] if lit else entry[2])
+
+
+static func blink_lit(time: float, phase: float) -> bool:
+	return fposmod(time / BLINK_PERIOD + phase, 1.0) < BLINK_ON / BLINK_PERIOD
+
+
+## O vagão parado na plataforma (true) ou ainda fora dela, escondido (false), até arrive_train.
+func park_train(here: bool) -> void:
+	var metro := get_node_or_null("Metro") as Node3D
+	if metro != null:
+		metro.visible = here
+
+
+## O trem do tutorial chega: o vagão entra no fosso pela direita e para no lugar (seconds com a freada no fim).
+func arrive_train(seconds: float) -> void:
+	var metro := get_node_or_null("Metro") as Node3D
+	if metro == null or seconds <= 0.0:
+		park_train(true)
+		return
+	var home := metro.position
+	metro.position = home + Vector3(TRAIN_RUN, 0, 0)
+	metro.visible = true
+	var tween := create_tween()
+	tween.tween_property(metro, "position", home, seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await tween.finished
+
+
+## A porta de segurança (pelo índice em security_doors) aberta ou baixada; e o painel, com a alavanca embaixo.
+func set_door(index: int, open: bool) -> void:
+	if index < 0 or index >= security_doors.size():
+		return
+	var entry: Dictionary = security_doors[index]
+	for node: MeshInstance3D in _door_nodes.get(index, []):
+		node.set_surface_override_material(0, _materials[int(entry.open if open else entry.closed)])
+
+
+func door_open(index: int) -> bool:
+	var nodes: Array = _door_nodes.get(index, [])
+	return not nodes.is_empty() and nodes[0].get_surface_override_material(0) == _materials[int(security_doors[index].open)]
+
+
+func set_panel_down(down: bool) -> void:
+	for node: MeshInstance3D in _panel_nodes:
+		node.set_surface_override_material(0, _materials[int(door_panel.open if down else door_panel.closed)])
+
+
+## As portas de segurança da zona (os índices), pelo papel: "entry" (por onde a equipe chegou) ou "exit".
+func doors_of(zone: int, role: String) -> Array:
+	var found: Array = []
+	for index in security_doors.size():
+		if int(security_doors[index].zone) == zone and security_doors[index].role == role:
+			found.append(index)
+	return found
+
+
+## Um modelo inteiro no mapa. "metro": o vagão da Estação (o mesmo Bombardier), com as portas, no lugar do vagão pintado
+## enquanto a arte do mapa não chega.
+func _model(model: Dictionary) -> void:
+	if model.kind != "metro":
+		return
+	var holder := Node3D.new()
+	holder.name = "Metro"
+	add_child(holder)
+	var build := AHStationBuild.new(AHStationBuilder.new(holder))
+	var pieces: Array[Node3D] = [build._metro_piece("SM_BombardierBody", AHStationBuild.METRO_BODY_SLOTS)]
+	for door in AHStationBuild.METRO_DOORS:
+		pieces.append(build._metro_piece(door[0], AHStationBuild.METRO_DOOR_SLOTS))
+	for piece in pieces:
+		piece.position = Vector3.ZERO
+	holder.position = Vector3(model.origin[0], model.origin[1], model.origin[2])
+	holder.rotation_degrees.y = float(model.get("yaw", 0.0))
+	var body := AABB()
+	var first := true
+	for mesh: MeshInstance3D in holder.find_children("*", "MeshInstance3D", true, false):
+		var box := mesh.global_transform * mesh.get_aabb()
+		body = box if first else body.merge(box)
+		first = false
+	if not first:
+		walls.append(body)
 
 
 ## Fecha as pontas de uma zona coberta (#175): uma coluna de cada lado, na frente da faixa e por fora da parede do
@@ -475,6 +619,12 @@ func _in_front(box: AABB) -> bool:
 	return zone >= 0 and box.position.z > (zones[zone].z0 + zones[zone].z1) * 0.5
 
 
+## Bem à frente da faixa (FOREGROUND_GAP além da borda da zona): os canos e cabos do primeiro plano.
+func _foreground(box: AABB) -> bool:
+	var zone := zone_at(box.get_center().x)
+	return zone >= 0 and box.position.z > float(zones[zone].z1) + FOREGROUND_GAP
+
+
 func _merge(groups: Dictionary) -> void:
 	for key in groups:
 		var parts: Array = groups[key]
@@ -590,6 +740,8 @@ func _light(light: Dictionary) -> void:
 	var lamp := OmniLight3D.new()
 	lamp.position = Vector3(light.origin[0], light.origin[1], light.origin[2])
 	lamp.light_energy = float(light.lumens) / LUMENS_PER_ENERGY
+	if light.has("blink"):
+		_blink_lights.append([lamp, lamp.light_energy, float(light.blink.phase)])
 	lamp.omni_range = float(light.radius)
 	lamp.omni_attenuation = 1.4
 	lamp.light_color = Color(light.color[0], light.color[1], light.color[2])
@@ -597,7 +749,20 @@ func _light(light: Dictionary) -> void:
 	if shadows:
 		lamp.add_to_group(Settings.SHADOW_LAMPS)
 	lamp.shadow_enabled = shadows and Settings.effects().lamp_shadows
-	add_child(lamp)
+	if light.has("node"):
+		_group(String(light.node)).add_child(lamp)
+	else:
+		add_child(lamp)
+
+
+## O nó de um grupo de peças e luzes do mapa (criado na primeira vez), na origem: o que fica nele anda junto.
+func _group(group_name: String) -> Node3D:
+	var holder := get_node_or_null(group_name) as Node3D
+	if holder == null:
+		holder = Node3D.new()
+		holder.name = group_name
+		add_child(holder)
+	return holder
 
 
 func _text(text: Dictionary) -> void:

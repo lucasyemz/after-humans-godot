@@ -7,7 +7,8 @@
 extends SceneTree
 
 const PHASE_OF := {"RiverDock": ["fase_2", 0], "RootBridge": ["fase_2", 4], "SealedShelter": ["fase_3", 0],
-	"TriageGate": ["fase_4", 0], "FloodedDepot": ["fase_5", 0], "SewerDucts": ["fase_5", 4]}
+	"TriageGate": ["fase_4", 0], "FloodedDepot": ["fase_5", 0], "SewerDucts": ["fase_5", 4],
+	"ContainmentCorridor": ["tutorial", 0]}
 
 var out := ""
 var lines: Array[String] = []
@@ -45,7 +46,13 @@ func _capture_map(campaign, map: String) -> void:
 	var c: Dictionary = campaign.create_initial(7)
 	c.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
 	# Carregado na hora: um script de -s não enxerga as classes globais antes dos autoloads.
-	load("res://scripts/flow/station_rules.gd").confirm_departure(c, c.preferred_formation.duplicate(), 0, 20261021, spec[0], "")
+	if spec[0] == "tutorial":
+		# O mapa do tutorial (#147): a jornada do Bento, com o Nick já na equipe (as fotos mostram a equipe de quatro).
+		var tutorial = load("res://scripts/flow/tutorial_rules.gd")
+		tutorial.start_journey(c)
+		c.session.expedition.team.append("hero_gato_nick")
+	else:
+		load("res://scripts/flow/station_rules.gd").confirm_departure(c, c.preferred_formation.duplicate(), 0, 20261021, spec[0], "")
 	var route: Dictionary = c.session.expedition.corridor
 	for i in int(spec[1]):
 		route.steps[i].resolved = true
