@@ -2043,6 +2043,11 @@ func _reset_draft() -> void:
 	for entry in S.living(c):
 		if team.size() < size and not team.has(entry.id) and S.can_deploy(entry):
 			team.append(entry.id)
+	# Quem entra no lugar de quem caiu vai para o fim; o recruta que só ataca da frente (#215) troca de lugar até cada
+	# um ter ataque da sua posição.
+	var order := AHRecruitSkills.valid_order(c, team)
+	if not order.is_empty():
+		team = order
 	_draft = {"phase": next, "team": team, "focus": S.focus_recommended(c), "extra": 0}
 
 

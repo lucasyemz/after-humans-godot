@@ -84,6 +84,7 @@ func run(t) -> void:
 		station.hud.open_departure()
 		station.hud._briefed = station.hud._draft.phase
 		t.check(not station.hud._draft.team.has(risco) and station.hud._draft.team.has(rex), "a plataforma escala o Rex no lugar do Bento, não o Risco")
+		t.equal(S.confirm_departure(c.duplicate(true), station.hud._draft.team, 0, 1, station.hud._draft.phase), "", "numa ordem em que cada um ataca da sua posição (%s)" % [station.hud._draft.team])
 		station.hud._depart()
 		station.hud._depart()
 		await tree.process_frame
