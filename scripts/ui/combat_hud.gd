@@ -664,7 +664,9 @@ func refresh() -> void:
 		if plate == null:
 			continue
 		var card: AHSpriteCard = arena.cards.get(unit.id)
-		plate.visible = card != null and card.visible and (unit.hp > 0 or unit.is_player)
+		# Quem caiu (o inimigo derrubado, o herói Caído, #178) perde a placa inteira: a barra, a moldura de quem age e os
+		# estados. O herói no Último Fôlego (vida 0, ainda na luta) fica com ela.
+		plate.visible = card != null and card.visible and AHCombatEngine.alive_any(unit)
 		var box := plate.get_child(0)
 		var hp: AHKitBar = box.get_node("Hp")
 		hp.set_value(unit.hp, unit.max_hp, "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else tr("Último Fôlego"))
