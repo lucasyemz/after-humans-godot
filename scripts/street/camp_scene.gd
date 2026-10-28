@@ -33,6 +33,15 @@ const SWITCH_GAP := 0.2
 const LEAVE_OFFSET := 4.3
 ## A pose de cuidar (a de usar item da luta, reactions.item) depois de comer ou curar, antes de voltar a sentar (s).
 const CARE_POSE_SECONDS := 1.2
+## A sombra de contato (#205): sem ela, sentado e deitado pareciam soltos do chão (a fogueira e a luz da sala não fazem
+## sombra embaixo do corpo). Uma mancha escura e macia no chão, na largura do corpo visível da pose: a fração dessa
+## largura, a profundidade (m), quanto escurece no centro e a largura de quem fica de pé (sem pose de acampamento).
+const CONTACT_WIDTH := 0.9
+const CONTACT_DEPTH := 0.7
+const CONTACT_DARKNESS := 0.8
+const CONTACT_STANDING_WIDTH := 0.8
+## O nome do nó da sombra, filho da carta.
+const CONTACT_NAME := "CampContact"
 
 signal selected_changed(index: int)
 
@@ -49,6 +58,7 @@ var _poses := {}
 var _before := {}
 var _switching := false
 var _last_switch := -1000.0
+static var _contact_material: StandardMaterial3D
 
 
 func _init(street = null) -> void:
@@ -114,6 +124,9 @@ func end(instant: bool = false) -> void:
 		if not is_instance_valid(card):
 			continue
 		card.set_highlight(Color.BLACK, 0.0)
+		var contact := card.get_node_or_null(CONTACT_NAME)
+		if contact != null:
+			contact.free()
 		var before: Dictionary = _before.get(member.hero_id, {})
 		if before.has("art"):
 			card.show_art(before.art)
@@ -155,10 +168,54 @@ func _arrange(team: Array) -> void:
 		var inset: float = LIE_INSET * signf(offset.x) if pose.get("kind", "") == "sleep" and (slot == 0 or slot == SLOTS.size() - 1) else 0.0
 		card.position = Vector3(_room.camp_x + offset.x - inset, _room.floor_y, _room.camp_z + offset.z + 0.35)
 		card.set_facing(-1.0 if offset.x > 0.0 else 1.0)
+		_contact(card, pose.get("art", {}))
 		card.visible = true
 		members.append({"hero_id": hero_id, "card": card, "slot": slot, "pose": pose.get("kind", "stand")})
 	# Na ordem da cena, da esquerda para a direita: as setas e as cartas andam como se vê.
 	members.sort_custom(func(a, b): return a.card.position.x < b.card.position.x)
+
+
+## A sombra de contato embaixo da carta (#205), no chão: sob o corpo visível da pose ("visible" de camp_poses.json, em
+## pixels da arte original) ou, de pé, sob o pé.
+func _contact(card: AHSpriteCard, art: Dictionary) -> void:
+	var shadow := card.get_node_or_null(CONTACT_NAME) as MeshInstance3D
+	if shadow == null:
+		shadow = MeshInstance3D.new()
+		shadow.name = CONTACT_NAME
+		shadow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		shadow.material_override = _contact_shadow_material()
+		card.add_child(shadow)
+	var width := CONTACT_STANDING_WIDTH
+	var center := 0.0
+	if art.has("visible") and art.has("anchor") and art.has("body_reference_pixels"):
+		var px_to_m: float = card.body_height / float(art.body_reference_pixels)
+		var visible: Array = art.visible
+		width = (float(visible[2]) - float(visible[0])) * px_to_m * CONTACT_WIDTH
+		center = ((float(visible[0]) + float(visible[2])) * 0.5 - float(art.anchor[0])) * px_to_m * card.facing
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(width, CONTACT_DEPTH)
+	shadow.mesh = plane
+	shadow.position = Vector3(center, 0.015, 0.0)
+
+
+static func _contact_shadow_material() -> StandardMaterial3D:
+	if _contact_material != null:
+		return _contact_material
+	# Escura até o meio do raio e macia na borda: lê como o corpo apoiado, sem um contorno duro.
+	var gradient := Gradient.new()
+	gradient.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	gradient.colors = PackedColorArray([Color(0, 0, 0, CONTACT_DARKNESS), Color(0, 0, 0, CONTACT_DARKNESS * 0.7), Color(0, 0, 0, 0)])
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill = GradientTexture2D.FILL_RADIAL
+	texture.fill_from = Vector2(0.5, 0.5)
+	texture.fill_to = Vector2(1.0, 0.5)
+	_contact_material = StandardMaterial3D.new()
+	_contact_material.albedo_texture = texture
+	_contact_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_contact_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_contact_material.render_priority = -1
+	return _contact_material
 
 
 ## Escolhe o herói (o índice em members). fade: o fade curto entre as posições (sem Reduzir efeitos, que corta direto).
