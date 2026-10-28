@@ -23,6 +23,12 @@ static func flexible(hero: Dictionary) -> bool:
 	return S.is_recruit(String(hero.get("id", "")))
 
 
+## Já pode escolher (decisão do Lucas, 28/10): o recruta chega com as habilidades iniciais da classe e só escolhe
+## depois de subir de nível (ChooseFromLevel, o nível 2).
+static func can_choose(hero: Dictionary) -> bool:
+	return flexible(hero) and AHHeroLevels.level(hero) >= int(rule("ChooseFromLevel", 2))
+
+
 ## Uma cópia (quem chama pode mudar a lista sem mexer na tabela das classes).
 static func class_abilities(class_id: String) -> Array:
 	var row = GameData.row("classes", class_id)
@@ -37,7 +43,7 @@ static func fixed(class_id: String) -> Array:
 ## As habilidades que o herói leva para a luta, na ordem da classe (o fundador e o recruta sem escolha: as da classe).
 static func abilities(hero: Dictionary) -> Array:
 	var out := class_abilities(String(hero.get("class_id", "")))
-	if not flexible(hero):
+	if not can_choose(hero):
 		return out
 	var chosen: Array = hero.get("loadout", [])
 	if chosen.size() != 2:
@@ -51,7 +57,7 @@ static func abilities(hero: Dictionary) -> Array:
 ## As 2 escolhidas agora (as da classe, sem escolha).
 static func loadout(hero: Dictionary) -> Array:
 	var chosen: Array = hero.get("loadout", [])
-	if chosen.size() == 2:
+	if chosen.size() == 2 and can_choose(hero):
 		return chosen.duplicate()
 	var ids := class_abilities(String(hero.get("class_id", "")))
 	return _free_slots(String(hero.get("class_id", ""))).map(func(i): return ids[i])
@@ -98,6 +104,8 @@ static func choose(campaign: Dictionary, hero_id: String, chosen: Array) -> Stri
 		return TranslationServer.translate("Esse herói não está na Estação.")
 	if not flexible(hero):
 		return TranslationServer.translate("Os fundadores lutam com as habilidades de sempre.")
+	if not can_choose(hero):
+		return TranslationServer.translate("%s escolhe a partir do nível %d.") % [hero.display_name, int(rule("ChooseFromLevel", 2))]
 	if campaign.get("session", {}).get("expedition") != null:
 		return TranslationServer.translate("As habilidades se trocam na Estação, fora da expedição.")
 	var error := invalid(campaign, hero, chosen)

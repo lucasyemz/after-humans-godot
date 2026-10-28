@@ -2,8 +2,9 @@
   {
     "Name": "rules",
     "MentorExpeditions": 2,
+    "ChooseFromLevel": 2,
     "MaxForeign": 1,
-    "Description": "Proposta (#189, decisões do Lucas de 27/10): só os recrutas são flexíveis (os fundadores ficam com o kit da história). O recruta aprende uma habilidade de um fundador de outra classe depois de MentorExpeditions expedições na mesma equipe (a volta conta, em qualquer resultado), e a Pesquisa tem um nó por fundador que ensina todas as dele (Branch teach). Leva no máximo MaxForeign habilidades de fora, trocadas livremente na Estação."
+    "Description": "Proposta (#189, decisões do Lucas de 27/10): só os recrutas são flexíveis (os fundadores ficam com o kit da história). O recruta aprende uma habilidade de um fundador de outra classe depois de MentorExpeditions expedições na mesma equipe (a volta conta, em qualquer resultado), e a Pesquisa tem um nó por fundador que ensina todas as dele (Branch teach). Leva no máximo MaxForeign habilidades de fora, trocadas livremente na Estação. Decisão do Lucas (28/10): o recruta chega com as habilidades iniciais da classe e só escolhe a partir do nível ChooseFromLevel."
   },
   {"Name": "cao", "Fixed": ["cao_punho_sucata", "cao_fique_atras_de_mim"], "Mentor": "hero_cao_bento", "Teaches": ["cao_fique_atras_de_mim", "cao_nao_estamos_sos"]},
   {"Name": "gato", "Fixed": ["gato_corte_fase", "gato_sumir_na_sombra"], "Mentor": "hero_gato_nick", "Teaches": ["gato_sumir_na_sombra", "gato_cacada_precisa"]},

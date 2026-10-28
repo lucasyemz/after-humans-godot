@@ -18,6 +18,7 @@ func run(context) -> void:
 	t = context
 	_tree = Engine.get_main_loop()
 	_data()
+	_gate()
 	_rules()
 	_mentor()
 	_research()
@@ -33,9 +34,30 @@ func _campaign(seed_value: int) -> Dictionary:
 	return c
 
 
-func _recruit(c: Dictionary, class_id: String) -> Dictionary:
+## Um recruta que já subiu de nível (a escolha abre no nível 2); o _gate confere o de nível 1.
+func _recruit(c: Dictionary, class_id: String, level: int = 2) -> Dictionary:
 	var made := S.recruit(c, class_id, RandomNumberGenerator.new(), "Teste")
-	return S.hero(c, String(made.get("hero_id", "")))
+	var hero = S.hero(c, String(made.get("hero_id", "")))
+	hero.level = level
+	return hero
+
+
+## A chegada (decisão do Lucas, 28/10): o recruta chega com as habilidades iniciais da classe e só escolhe a partir do
+## nível 2; o que aprende antes fica guardado para quando puder escolher.
+func _gate() -> void:
+	var c := _campaign(1900)
+	var fresh := _recruit(c, "cao", 1)
+	t.equal(AHHeroLevels.level(fresh), 1, "o recruta chega no nível 1")
+	t.equal(AHRecruitSkills.abilities(fresh), AHRecruitSkills.class_abilities("cao"), "com as habilidades iniciais da classe")
+	fresh.learned = [AMPOLA]
+	var error := AHRecruitSkills.choose(c, fresh.id, [AMPOLA, "cao_nao_estamos_sos"])
+	t.check(error.contains("2"), "no nível 1 não escolhe, e diz a partir de qual nível (%s)" % error)
+	fresh.loadout = [AMPOLA, "cao_nao_estamos_sos"]
+	t.equal(AHRecruitSkills.abilities(fresh), AHRecruitSkills.class_abilities("cao"), "uma escolha guardada no nível 1 não vale na luta")
+	fresh.loadout = []
+	fresh.level = int(AHRecruitSkills.rule("ChooseFromLevel", 2))
+	t.equal(AHRecruitSkills.choose(c, fresh.id, [AMPOLA, "cao_nao_estamos_sos"]), "", "no nível 2 escolhe, com o que aprendeu antes")
+	t.check(AHRecruitSkills.abilities(fresh).has(AMPOLA), "e a escolha vale")
 
 
 ## data/recruit-skills.json: cada classe com 2 fixas que são dela; o que cada fundador ensina é da classe dele.
@@ -238,6 +260,17 @@ func _screen() -> void:
 		screen.rebuild()
 		await _frames(3)
 		t.check(screen.find_child("SkillChoices", true, false) == null, "o fundador não tem escolhas")
+		# O recém-chegado (nível 1): a Sala explica quando a escolha abre, sem Trocar por.
+		var newcomer := _recruit(Campaign.state, "gato", 1)
+		newcomer.learned = [AMPOLA]
+		screen.selected = newcomer.id
+		screen.ability = "gato_salto_entre_ruinas"
+		screen.rebuild()
+		await _frames(3)
+		var choices = screen.find_child("SkillChoices", true, false)
+		t.check(choices != null and screen.find_children("Swap_*", "Button", true, false).is_empty(), "o recém-chegado não troca na Sala")
+		t.check(choices != null and choices.find_children("*", "Label", true, false).any(func(l): return l.text.contains("2")),
+			"e a Sala diz a partir de qual nível ele escolhe")
 		hud.close_panel()
 		await _frames(3)
 	_tree.unload_current_scene()

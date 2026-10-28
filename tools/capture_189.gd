@@ -36,6 +36,8 @@ func _run() -> void:
 	c.inventory.fragments = 12
 	var made: Dictionary = S.recruit(c, "cao", RandomNumberGenerator.new(), "Faísca")
 	var recruit = S.hero(c, String(made.hero_id))
+	# Já no nível 2: a escolha abre depois de subir um nível (decisão do Lucas, 28/10).
+	recruit.level = 2
 	recruit.learned = ["sapo_ampola_reparo_vivo"]
 	recruit.mentor = {"hero_coruja_vespera": 1}
 	c.station.last_return = {}

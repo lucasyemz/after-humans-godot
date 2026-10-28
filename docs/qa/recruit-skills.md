@@ -17,6 +17,28 @@ As camadas de aparência (a arte do #211) entram num PR separado.
 As fotos saem de `tools/capture_189.gd`. A Faísca, uma recruta de cão, já aprendeu a Ampola de Reparo Vivo com a Íris
 e tem 1 de 2 expedições com a Véspera. Na Sala, ela troca Impacto Hidráulico pela Ampola.
 
+## A chegada (decisão do Lucas, 28/10)
+
+> recrutas tem que ter alguma habilidade inicial, que podemos aprimorar depois, dai depois de evoluirem pelo menos um
+> nivel a gente pode começar a escolher uma habilidade pra ser o foco dependendo da classe.
+
+- **Já no jogo:** o recruta chega com as habilidades iniciais da classe, sem escolha.
+  - A escolha abre no nível 2 (`ChooseFromLevel` em `data/recruit-skills.json`).
+  - Antes disso, a Sala diz "Faísca luta com as habilidades da classe. A partir do nível 2, escolhe as que leva.".
+  - O que ele aprende antes, com o mentor ou com a Pesquisa, fica guardado para quando puder escolher.
+  - Uma escolha guardada no nível 1 (um save editado) não vale na luta e volta ao kit da classe ao abrir o save.
+- **Para o Lucas decidir: o que é a "habilidade de foco"?** A frase tem duas leituras:
+  - **A, o foco é a habilidade que se troca:** no nível 2, o recruta troca uma das habilidades que não são fixas.
+    - As opções são a outra da classe, ou a que aprendeu com o mentor ou com a Pesquisa.
+    - É o que este PR já faz, só que a partir do nível 2.
+    - O mentor e a Pesquisa entram como fontes de opção: contam desde a chegada e abrem opções de foco no nível 2.
+  - **B, o foco é a habilidade que se aprimora:** no nível 2, o recruta escolhe uma das habilidades da classe para
+    ser o foco.
+    - As melhorias de nível (`hero-upgrades.json`) passam a reforçar a habilidade de foco.
+    - Não troca habilidade nenhuma.
+    - Nessa leitura, o mentor e a Pesquisa ensinariam uma habilidade de fora como um foco extra, a partir do nível 3.
+  - Até a resposta, o PR segue a leitura A, que é a mais próxima do que já foi aprovado na issue.
+
 ## O que muda
 
 - **Os dados:** `data/recruit-skills.json`.
@@ -34,6 +56,7 @@ e tem 1 de 2 expedições com a Véspera. Na Sala, ela troca Impacto Hidráulico
   - A Sala só oferece as trocas que valem: com uma de fora já escolhida, a outra de fora só entra no lugar dela.
   - Sem escolha, ele luta com o kit da classe, e o recruta de antes não muda.
   - A troca é na Estação, fora da expedição e sem custo. Um fundador não troca.
+  - A escolha só abre no nível 2 (veja acima).
 - **O mentor:** na volta (`S.finish_return`), em qualquer resultado:
   - cada recruta conta mais 1 expedição com cada fundador de outra classe que estava na equipe;
   - ao chegar em `MentorExpeditions`, aprende a próxima habilidade que esse fundador ensina, e a conta recomeça;
@@ -86,7 +109,8 @@ Ampola de Reparo Vivo". Se o Lucas preferir a fala, ela entra como texto de cada
 
 ## Como testar
 
-- `tests/test_recruit_skills.gd` (55 checagens) cobre:
+- `tests/test_recruit_skills.gd` (65 checagens) cobre:
+  - a chegada: o recruta de nível 1 com o kit da classe, sem escolher, e a escolha que abre no nível 2;
   - as regras;
   - a migração e o save;
   - o mentor na volta, de ponta a ponta (`finish_return` e o chip do relatório), com quem caiu;
