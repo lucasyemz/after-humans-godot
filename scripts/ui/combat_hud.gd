@@ -939,6 +939,8 @@ func _process(_delta: float) -> void:
 	var short_plates: Array[Rect2] = []
 	for control in short_controls:
 		short_plates.append(Rect2(control.position, control.size))
+	# De baixo para cima: quem desvia só sobe, então uma passada basta (desviar de uma não cai em cima de outra já vista).
+	short_plates.sort_custom(func(a: Rect2, b: Rect2): return a.position.y > b.position.y)
 	for marker in _markers:
 		if marker.has_meta("card"):
 			# O botão do alvo cobre o corpo inteiro na tela (do pé à cabeça, na largura do corpo).

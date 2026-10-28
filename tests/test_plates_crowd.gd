@@ -134,7 +134,7 @@ func _check(hud: AHCombatHud, profile: String) -> void:
 	t.equal(overlaps, [], "no %s, as placas de um lado não se cobrem" % profile)
 
 
-## Na mira, em cada inimigo: o ALVO (acima da cabeça) não cobre a barra de vida de ninguém, nem a das placas que subiram.
+## Na mira, em cada inimigo: o ALVO (acima da cabeça) não cobre a placa nem a intenção de ninguém, nem as que subiram.
 func _aim(hud: AHCombatHud, profile: String) -> void:
 	var ranks: Array = hud.session.state.enemy_team.filter(func(u): return u.rank > 0).map(func(u): return u.rank)
 	hud._show_markers(ranks, true, func(_rank): pass, "")
@@ -147,9 +147,11 @@ func _aim(hud: AHCombatHud, profile: String) -> void:
 		var label := Rect2(hud._target_label.position, hud._target_label.size)
 		for unit_id in hud._unit_bars:
 			var plate: Control = hud._unit_bars[unit_id]
-			var bar: Control = plate.get_child(0).get_node("Hp")
-			if plate.visible and Rect2(bar.global_position, bar.size).grow(-1).intersects(label.grow(-1)):
+			var tag = plate.get_meta("intent") if plate.has_meta("intent") else null
+			if plate.visible and Rect2(plate.position, plate.size).grow(-1).intersects(label.grow(-1)):
 				covered.append("%s (mirando %s)" % [unit_id, marker.get_meta("unit_id")])
+			if tag != null and tag.visible and Rect2(tag.position, tag.size).grow(-1).intersects(label.grow(-1)):
+				covered.append("%s intenção (mirando %s)" % [unit_id, marker.get_meta("unit_id")])
 	hud._clear_markers()
 	hud._set_enabled(true)
-	t.equal(covered, [], "no %s, o ALVO não cobre a vida de ninguém" % profile)
+	t.equal(covered, [], "no %s, o ALVO não cobre placa nem intenção de ninguém" % profile)

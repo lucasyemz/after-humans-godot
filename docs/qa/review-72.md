@@ -59,3 +59,9 @@ do `Sound`.
   Correção: os cliques no mesmo quadro (e sem exigir todos os tocadores ocupados, que depende do relógio do áudio); o
   ALVO lê as placas depois de subirem; o escalonamento pelo lugar de destino. Da baixa: a cena que não carrega volta ao
   título.
+- **Rodada 2: REPROVADO.** Um médio: o desvio do ALVO passava uma vez só pelas placas e, ao mirar o Relé no espaço
+  apertado (texto Normal), subia por cima da placa e da intenção levantadas do Rastreador vizinho.
+
+  Correção: as placas acima da cabeça em ordem de baixo para cima (quem desvia só sobe, então uma passada basta); o
+  `_aim` confere a placa inteira e a intenção. O caso só aparece na tela de 1920x1080: o teste o pega rodando com
+  janela (`xvfb-run`, como no modo de captura); sem janela, as medidas da tela são outras.
