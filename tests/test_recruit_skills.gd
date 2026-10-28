@@ -173,6 +173,15 @@ func _save() -> void:
 	var migrated = S.hero(reopened, old_recruit.id)
 	t.check(migrated.loadout == [] and migrated.learned == [] and AHRecruitSkills.abilities(migrated) == AHRecruitSkills.class_abilities("sapo"),
 		"o recruta de antes abre com o kit da classe, sem perder nada")
+	# Um save editado (ou um MaxForeign menor): a escolha que passa do limite volta ao kit da classe ao abrir.
+	var edited: Dictionary = _campaign(1899)
+	var greedy := _recruit(edited, "cao")
+	greedy.learned = [AMPOLA, "gato_sumir_na_sombra"]
+	greedy.loadout = [AMPOLA, "gato_sumir_na_sombra"]
+	S.hero(edited, BENTO).loadout = [AMPOLA, "cao_nao_estamos_sos"]
+	S.migrate(edited)
+	t.check(greedy.loadout == [] and AHRecruitSkills.abilities(greedy) == AHRecruitSkills.class_abilities("cao"), "duas de fora no save: volta ao kit da classe")
+	t.equal(S.hero(edited, BENTO).loadout, [], "o fundador com escolha no save: volta ao kit dele")
 
 
 ## Na Sala dos Personagens: o recruta mostra as que leva, a escolhida se troca, a fixa não.

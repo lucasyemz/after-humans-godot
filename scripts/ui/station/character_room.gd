@@ -372,9 +372,10 @@ func _note(text: String) -> Label:
 ## O fundador que ensina uma habilidade (o nome dele), pela classe dela; "" sem fundador (o Guaxinim e o Tatu).
 func _teacher_name(ability_id: String) -> String:
 	var data = GameData.row("abilities", ability_id)
-	var row = GameData.row("recruit_skills", String(data.get("ClassId", ""))) if data != null else null
-	var mentor = S.hero(Campaign.state, String(row.get("Mentor", ""))) if row != null else null
-	return String(mentor.display_name) if mentor != null else ""
+	var class_id := String(data.get("ClassId", "")) if data != null else ""
+	var row = GameData.row("recruit_skills", class_id)
+	var founder = GameData.row("initial_heroes", class_id) if row != null and String(row.get("Mentor", "")) != "" else null
+	return String(founder.DisplayName) if founder != null else ""
 
 
 ## O detalhe da habilidade: o nome, a faixa (com o treino da Pesquisa e as melhorias do nível), as posições, o texto e
