@@ -77,13 +77,13 @@ O antes usa arte/altura atuais da main `5bb2928`; o depois carrega em memória a
 
 ![Antes/depois na luta](recruit_layers_refresh/fight_before_after.webp)
 
-Metadados, câmera e hashes em [capture.json](recruit_layers_refresh/capture.json). Os sprites foram carregados pelo jogo, sem colagem de personagens na captura. O log de encerramento traz avisos de recursos/coroutine, sem falha na geração das fotos.
+Metadados, câmera e hashes em [capture.json](recruit_layers_refresh/capture.json). Os sprites foram carregados pelo jogo, sem colagem de personagens na captura. O log de encerramento traz avisos de recursos, sem falha na geração das fotos.
 
 Ambiente sem GPU física: Godot4.7.2, OpenGL Compatibility/Mesa llvmpipe CPU, Xvfb,1920×1080. Forward+ e o uso dinâmico das camadas ficam para a integração no PC.
 
 ## Fontes e integração
 
-Tag `codex-pr<N>-originals`, pasta `art/combat/source/recruit_layers_refresh_20261028/`, com20 PNG, contrato, auditoria e helpers. Release com ZIP automático de árvore isolada de fontes; PNG fora da branch para a main. As fontes aprovadas reutilizadas são `codex-pr229-originals` (corpos) e `codex-pr211-originals` (acessórios); o pacote final já contém os20 PNG necessários, sem exigir as fontes anteriores para apenas convertê-los.
+Tag `codex-pr240-originals`, pasta `art/combat/source/recruit_layers_refresh_20261028/`, com20 PNG, contrato, auditoria e helpers. Release com ZIP automático de árvore isolada de fontes; PNG fora da branch para a main. As fontes aprovadas reutilizadas são `codex-pr229-originals` (corpos) e `codex-pr211-originals` (acessórios); o pacote final já contém os20 PNG necessários, sem exigir as fontes anteriores para apenas convertê-los.
 
 O PC converte pelo pipeline de `tools/sync_combat_art.py`, preserva os nomes WebP de `art/combat/recruits/layers/<raccoon|armadillo>/`, atualiza os registros/contratos da integração e conserva os ids `rato`, `tatu`, `raccoon_recruit_01`, `armadillo_recruit_01`. `preview_idle` no contrato é somente uma composição de QA temporária; não é uma21ª camada ou uma nova pose de produção.
 
@@ -98,3 +98,5 @@ As bases só correspondem ao idle da #225: a exploração/guarda diferente da #2
 ## Verificação
 
 Auditoria de20 PNG e20 WebP, grayscale exato, hashes, canvas, alfa das bases e âncoras em [audit.json](recruit_layers_refresh/audit.json). A base `5bb2928` é a mesma já validada nesta sessão pelo runner inteiro: **92/92 em641,292s, paridade48/48 lutas,3351 passos**. Não houve alteração de produção desde essa execução; esta rodada verifica os novos arquivos de arte e capturas, sem repetir o runner idêntico. O CI do PR terá a própria execução.
+
+[PR #240](https://github.com/lucasyemz/after-humans-godot/pull/240) · [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr240-originals) · [ZIP de20 PNG e medidas](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr240-originals.zip).
