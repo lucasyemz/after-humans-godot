@@ -18,6 +18,7 @@ func run(context) -> void:
 	t = context
 	_tree = Engine.get_main_loop()
 	_fit_rules()
+	_hero_spacing()
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-combat-room-%d" % Time.get_ticks_usec()
@@ -36,6 +37,77 @@ func run(context) -> void:
 		DirAccess.remove_absolute(dir)
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## O espaço entre heróis vizinhos (o escudo do Tatu, #196): só fundadores, qualquer equipe de 1 a 4 e qualquer
+## distribuição nas posições (com vazias no meio, depois de Recuar ou de uma morte), ficam na fila de sempre; com o Tatu
+## e o Guaxinim, os vizinhos ficam a pelo menos as meias larguras mais a folga, e a posição 4 nunca passa do que o fit()
+## reservou.
+func _hero_spacing() -> void:
+	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Arena.ART_MANIFEST))
+	var halves := {}
+	for hero_id in ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera", "hero_tatu_5", "hero_rato_6"]:
+		var class_id: String = hero_id.split("_")[1]
+		var variants := AHStationRules.art_variants(class_id)
+		var card := AHSpriteCard.new()
+		card.body_height = AHCharacterHeights.find(hero_id)
+		card.show_art(Arena.art_entry(manifest.heroes, hero_id, variants[0] if class_id in ["rato", "tatu"] else "").idle)
+		halves[hero_id] = Arena.half_width(card)
+		card.free()
+	t.check(halves.hero_tatu_5 > Arena.NARROW_HALF, "o Tatu é mais largo que a posição (%.2f m de meia largura)" % halves.hero_tatu_5)
+	var arena = Arena.new()
+	arena.session = AHCombatSession.new()
+	arena.session.state = AHCombat.State.new()
+	var founders_same := true
+	var wide_ok := true
+	var wide_inside := true
+	for team in [["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"],
+			["hero_cao_bento", "hero_tatu_5", "hero_rato_6", "hero_gato_nick"], ["hero_tatu_5", "hero_rato_6"]]:
+		var founders: bool = not team.has("hero_tatu_5")
+		# Cada subconjunto da equipe em cada jeito de ocupar as posições 1 a 4.
+		for mask in range(1, 1 << team.size()):
+			var members: Array = []
+			for i in team.size():
+				if mask & (1 << i):
+					members.append(team[i])
+			for ranks in _placements(members.size()):
+				arena.session.state.player_team.clear()
+				arena._half_widths.clear()
+				var reserve := 0.0
+				var at := {}
+				for i in members.size():
+					var unit := AHCombat.Unit.new()
+					unit.id = members[i]
+					unit.is_player = true
+					unit.rank = ranks[i]
+					arena.session.state.player_team.append(unit)
+					arena._half_widths[unit.id] = halves[unit.id]
+					reserve += maxf(0.0, halves[unit.id] - Arena.NARROW_HALF) * 2.0
+					at[unit.rank] = halves[unit.id]
+				for rank in range(1, Arena.RANKS + 1):
+					var offset: float = arena.hero_offset(rank)
+					if founders and absf(offset - (Arena.FRONT_GAP + (rank - 1) * Arena.HERO_GAP)) > 0.0001:
+						founders_same = false
+					if rank > 1 and at.has(rank) and at.has(rank - 1):
+						wide_ok = wide_ok and offset - arena.hero_offset(rank - 1) >= at[rank] + at[rank - 1] + Arena.WIDE_ROOM - 0.0001
+				if arena.hero_offset(Arena.RANKS) > Arena.FRONT_GAP + (Arena.RANKS - 1) * Arena.HERO_GAP + reserve + 0.0001:
+					wide_inside = false
+	arena.free()
+	t.check(founders_same, "só fundadores: a fila de sempre em qualquer equipe e posição")
+	t.check(wide_ok, "com o Tatu: os vizinhos não se cobrem")
+	t.check(wide_inside, "com o Tatu: a posição 4 fica dentro do que o fit() reservou")
+
+
+## Todos os jeitos de pôr count heróis em posições distintas de 1 a RANKS.
+func _placements(count: int) -> Array:
+	if count == 0:
+		return [[]]
+	var out: Array = []
+	for rest in _placements(count - 1):
+		for rank in range(1, Arena.RANKS + 1):
+			if not rest.has(rank):
+				out.append(rest + [rank])
+	return out
 
 
 ## A regra sozinha: com espaço fica onde pediu (ou encosta), apertada encolhe, e um obstáculo divide o lugar. A fila

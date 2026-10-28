@@ -60,6 +60,7 @@ Os ambientes iam de -24 a -33 LUFS e agora ficam todos em -26.
 | Pesquisa concluída | `station/research_beep` (existia e não tocava) | Pesquisa |
 | Trem chegando | `station/train_arrival`, depois `station/train_brake` **(novo)** 1,6 s antes de parar e `station/train_bell` **(novo)** ao parar | Plataforma |
 | Trem partindo | `station/train_departure` e `station/train_bell` | Plataforma |
+| Passagem do vagão (#133) | `station/train_ride` **(novo)**, um laço de 5 s: o "ta-dum" das rodas nas emendas, o ronco do motor e o chiado. Entra com o cartão (0,3 s, pelo relógio, antes de a cena seguinte montar) e sai com ele; pular corta em 0,15 s. Na partida, `station/train_departure` no começo (uns 4 dB acima do laço, de propósito: o trem arrancando é um momento) e `station/train_brake` na chegada (sem pular); a partida sai junto com o laço, sem passar para a fase. Na volta, só o laço: a freada e o sino tocam na plataforma. Tudo no canal do Ambiente. | Partida no vagão e volta à Estação |
 | Passos | `world/footstep_<piso>_N`: concreto, água no Depósito e nos Dutos, madeira na Ponte e no Cais | Exploração |
 | Porta de casa | `world/door_open`, `world/door_close` | Rua |
 | Busca | `world/find_coins` (objetivo da rota), `world/prop_open` (prop que abre), `world/search_cloth_N` (o resto) | Rua e cenários |

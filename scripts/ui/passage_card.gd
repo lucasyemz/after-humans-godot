@@ -24,6 +24,16 @@ var ready_to_skip := false
 var skipped := false
 ## O título já está aceso na tela (o GameFlow não fecha o cartão antes disso, nem numa máquina lenta).
 var title_lit := false
+## O som da passagem (#133): {"loop": o laço que toca com o cartão, "gain", "start": o som de quando o cartão abre,
+## "end": o de quando ele fecha sem pular}. Toca no canal do Ambiente (o volume do Ambiente nas Opções).
+var sound := {}
+var _sound_player: AudioStreamPlayer
+var _sound_tween: Tween
+## O som de abrir (a partida do trem), tocado pelo Sound: sai junto com o laço.
+var _start_player: AudioStreamPlayer
+## O laço entrando, pelo relógio (ms desde que começou; -1 parado): o quadro que monta a cena seguinte trava o tempo do
+## jogo, e um fade no tempo do jogo ficava parado lá embaixo durante a montagem.
+var _sound_fade_from := -1
 ## Pular apertado durante o passeio (antes de a cena seguinte montar, que espera o título): o passeio acaba, o título
 ## acende na hora, a cena monta e o cartão fecha assim que ela estiver pronta (#75).
 var skip_requested := false
@@ -49,6 +59,7 @@ func _init(card: Dictionary = {}, reduce_motion: bool = false) -> void:
 	backdrop = card.get("backdrop")
 	reduced = reduce_motion
 	title_delay = float(card.get("title_delay", 0.0))
+	sound = card.get("sound", {})
 	# Já na criação: a dica do primeiro quadro conta a carência a partir daqui.
 	_opened_ms = Time.get_ticks_msec()
 	name = "Passage"
@@ -58,6 +69,7 @@ func _init(card: Dictionary = {}, reduce_motion: bool = false) -> void:
 
 
 func _ready() -> void:
+	_start_sound()
 	var ink := ColorRect.new()
 	ink.color = AHKit.STEEL
 	ink.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -163,6 +175,63 @@ func _add_backdrop() -> void:
 	view.add_child(backdrop)
 
 
+## O laço entra com o cartão (fade in), e o som de abrir toca por cima.
+func _start_sound() -> void:
+	var path := String(sound.get("loop", ""))
+	if path != "":
+		_sound_player = AudioStreamPlayer.new()
+		_sound_player.name = "Sound"
+		_sound_player.bus = "Ambience"
+		_sound_player.stream = Sound.looped(path)
+		_sound_player.volume_db = -60.0
+		add_child(_sound_player)
+		_sound_player.play()
+		_sound_fade_from = Time.get_ticks_msec()
+	if String(sound.get("start", "")) != "":
+		_start_player = Sound.play(sound.start, float(sound.get("gain", 1.0)), 1.0, "Ambience")
+
+
+## O laço subindo de -60 dB até o volume dele em SOUND_FADE_IN, pelo relógio.
+func _fade_in_sound() -> void:
+	if _sound_fade_from < 0 or _sound_player == null:
+		return
+	var t := clampf((Time.get_ticks_msec() - _sound_fade_from) / (SOUND_FADE_IN * 1000.0), 0.0, 1.0)
+	_sound_player.volume_db = lerpf(-60.0, _sound_db(), t)
+	if t >= 1.0:
+		_sound_fade_from = -1
+
+
+func _sound_db() -> float:
+	return linear_to_db(maxf(float(sound.get("gain", 1.0)), 0.001)) + Sound.mix_db(String(sound.get("loop", "")))
+
+
+## O cartão fecha: o laço sai em seconds (o fade do GameFlow; curto ao pular) e, sem pular, o som de chegar toca (a
+## freada do trem). Chamado pelo GameFlow antes do fade que fecha o cartão.
+func end_sound(seconds: float, arrived: bool) -> void:
+	_sound_fade_from = -1
+	# O som de abrir (a partida, 6 s) não passa para a cena seguinte nem toca por cima da freada.
+	Sound.fade_out(_start_player, seconds)
+	_start_player = null
+	if _sound_player != null and _sound_player.playing:
+		if _sound_tween != null:
+			_sound_tween.kill()
+		_sound_tween = create_tween()
+		_sound_tween.tween_property(_sound_player, "volume_db", -60.0, seconds)
+		_sound_tween.tween_callback(_sound_player.stop)
+	if arrived and String(sound.get("end", "")) != "":
+		Sound.play(sound.end, float(sound.get("gain", 1.0)), 1.0, "Ambience")
+
+
+## O laço já chegou ao volume dele (ou não há laço): o GameFlow só monta a cena seguinte depois disso, porque o quadro
+## da montagem trava o jogo e o som ficaria baixo durante ela.
+func sound_settled() -> bool:
+	return _sound_fade_from < 0
+
+
+func sound_playing() -> bool:
+	return _sound_player != null and _sound_player.playing
+
+
 ## A cena seguinte está pronta: a dica troca de "Carregando…" para a de pular.
 func mark_ready() -> void:
 	if ready_to_skip:
@@ -211,6 +280,7 @@ func _can_skip_now() -> bool:
 
 
 func _process(_delta: float) -> void:
+	_fade_in_sound()
 	if _hint != null and _hint_skip != _can_skip_now():
 		_show_hint()
 	if not title_lit and not _revealing and Time.get_ticks_msec() - _opened_ms >= title_delay * 1000.0:
@@ -253,6 +323,9 @@ func _input(event: InputEvent) -> void:
 ## Logo que o cartão abre, pular ainda não vale: o mesmo Interagir que confirmou a partida, apertado duas vezes, pulava
 ## o vagão antes de ele aparecer.
 const SKIP_GRACE_MS := 300
+## O laço do som entra em (s, pelo relógio, antes de a cena seguinte montar); ao pular, sai em SOUND_SKIP_FADE.
+const SOUND_FADE_IN := 0.3
+const SOUND_SKIP_FADE := 0.15
 
 
 ## Interagir (A no controle), Esc ou Start (menu), Voltar (Backspace ou B), um clique ou um toque.

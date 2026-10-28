@@ -57,7 +57,7 @@ func _fall_does_not_kill(t) -> void:
 	t.equal(int(iris.hp), int(S.recovery_rule("fallen").Hp), "com a vida baixa de data/recovery.json")
 	t.equal(S.recovery_days(iris), int(S.recovery_rule("fallen").Days), "em recuperação pelos dias de data/recovery.json (sem Enfermaria)")
 	t.check(S.recovering(iris) and not S.in_bed(iris), "sem a Enfermaria, se recupera no Dormitório")
-	t.equal(report.fallen, [{"hero_id": team[2], "days": S.recovery_days(iris), "bed": false}], "o relatório diz quem chegou Caído")
+	t.equal(report.fallen, [{"hero_id": team[2], "days": S.recovery_days(iris), "bed": false, "carried": false}], "o relatório diz quem chegou Caído (no mapa, não carregado: #179)")
 	t.check(not c.night.participants.has(team[2]), "quem caiu não entra na noite (nem vigia nem come)")
 	t.equal(report.returning, 3, "a água conta só quem voltou de pé")
 

@@ -508,7 +508,7 @@ func refresh(campaign: Dictionary) -> void:
 			_route_row.add_child(link)
 		_route_row.add_child(_route_cell(step, index == route.index, known, route))
 	var current: Dictionary = route.steps[route.index]
-	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(current.type, ""))]
+	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), _step_label(current)]
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
 		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + tr(AHJourneyRules.SHOP_NAMES[site.shop]))
@@ -568,13 +568,20 @@ func refresh(campaign: Dictionary) -> void:
 			if hero == null or not hero.alive:
 				continue
 			_party_box.add_child(_mate(hero))
+		# Os levantados no mapa (#179) seguem com a equipe, sem lutar: um selo ao lado das plaquinhas.
+		var carried: Array = AHJourneyRules.carried(campaign).map(func(id): return String(Campaign.hero(id).display_name))
+		if not carried.is_empty():
+			var carried_chip := _change_chip("bed", tr("A equipe carrega: %s") % ", ".join(carried), AHKit.TEXT)
+			carried_chip.name = "Carried"
+			carried_chip.size_flags_vertical = Control.SIZE_SHRINK_END
+			_party_box.add_child(carried_chip)
 		_party_box.reset_size()
 		_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
 	_place_corner()
 
 
 ## Uma casa do corredor: o quadrado do retrato com o ícone do tipo; a de agora com a moldura âmbar, a resolvida com o
-## tipo em verde e o check no canto, o guardião em alerta e a não alcançada com "?".
+## tipo em verde e o check por cima do ícone, o guardião em alerta e a não alcançada com "?".
 func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) -> Control:
 	var cell := AHKit.panel("square_portrait")
 	cell.custom_minimum_size = Vector2(CELL, CELL)
@@ -583,7 +590,8 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 	var boss: bool = step.type == "boss"
 	if known:
 		var type: String = step.type
-		var tint: Color = AHKit.alert_text() if boss else (AHKit.good() if step.resolved else (AHKit.AMBER if now else AHKit.TEXT))
+		# O guardião em alerta até ser vencido (#180); vencido, fica verde como os outros trechos resolvidos.
+		var tint: Color = AHKit.good() if step.resolved else (AHKit.alert_text() if boss else (AHKit.AMBER if now else AHKit.TEXT))
 		var glyph := _icon(STEP_ICONS.get(type, "node-event"), CELL * 0.56, tint)
 		glyph.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		cell.add_child(glyph)
@@ -592,14 +600,21 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 		unknown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		unknown.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		cell.add_child(unknown)
-	if step.resolved and not now:
-		var check := AHKit.glyph("state_active", 16, AHKit.good())
-		check.size = Vector2(16, 16)
-		check.position = Vector2(CELL - 18, -2)
-		cell.add_child(check)
 	if now:
 		cell.add_child(AHKit.selected_overlay())
+	# O check do resolvido; no trecho de agora só o do guardião vencido, que é o último e fica "agora" para sempre. Vem
+	# depois da moldura de agora, por cima dela.
+	if step.resolved and (not now or boss):
+		# A casa é um PanelContainer: o check estica e fica centrado sobre o ícone, como nas outras resolvidas.
+		cell.add_child(AHKit.glyph("state_active", 16, AHKit.good()))
 	return cell
+
+
+## O nome do trecho no título: o do tipo, ou "Guardião vencido" depois da vitória (#180).
+func _step_label(step: Dictionary) -> String:
+	if step.type == "boss" and step.resolved:
+		return tr("Guardião vencido")
+	return tr(STEP_LABELS.get(step.type, ""))
 
 
 ## Um recurso da ficha do alto: o ícone, o nome pequeno e o valor em âmbar (em alerta, quando acaba).
@@ -1076,6 +1091,15 @@ func release_line() -> void:
 	_held_until = 0
 
 
+## A chapa do aviso no tamanho do texto, centrada embaixo do objetivo (fora da árvore, a chamada adiada não mede nada).
+func _fit_toast() -> void:
+	if not is_inside_tree():
+		return
+	_toast.reset_size()
+	_toast.size = _toast.get_combined_minimum_size()
+	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+
+
 ## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
 func toast(text: String, seconds: float = 3.5) -> void:
 	if _toast_tween:
@@ -1094,9 +1118,10 @@ func toast(text: String, seconds: float = 3.5) -> void:
 	# chapa saía alta e meio vazia no texto Maior).
 	_toast_label.size = Vector2(width, 0)
 	_toast_label.size = Vector2(width, _toast_label.get_minimum_size().y)
-	_toast.reset_size()
-	_toast.size = _toast.get_combined_minimum_size()
-	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+	_fit_toast()
+	# O rótulo que quebra mede a altura pela largura de agora: no primeiro aviso longo, ele ainda tinha 0 e media uma
+	# palavra por linha (a caixa saía com milhares de px e o texto fora da tela). Depois do layout, mede de novo.
+	_fit_toast.call_deferred()
 	_toast.modulate.a = 1.0
 	_toast_tween = create_tween()
 	_toast_tween.tween_interval(seconds)
@@ -1447,7 +1472,7 @@ func show_menu(completed: bool, can_return: bool, blocked_note: String = "") -> 
 		var route: Dictionary = expedition.corridor
 		if not route.steps.is_empty():
 			var step: Dictionary = route.steps[clampi(route.index, 0, route.steps.size() - 1)]
-			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(step.type, ""))], "text", AHKit.MUTED))
+			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), _step_label(step)], "text", AHKit.MUTED))
 	var close := AHKit.button("X", "icon")
 	close.name = "Close"
 	close.tooltip_text = tr("Fechar")
@@ -1715,10 +1740,23 @@ func show_result(result: String, delivered: Dictionary, campaign: Dictionary, bu
 	chips.add_child(_change_chip("lobby-seed", tr("%d sementes") % delivered.get("seeds", 0), AHKit.TEXT))
 	chips.add_child(_change_chip("lobby-scrap", tr("%d sucata") % delivered.get("scrap", 0), AHKit.TEXT))
 	chips.add_child(_change_chip("lobby-fragment", tr("%d fragmentos") % delivered.get("fragments", 0), AHKit.TEXT))
-	# Ninguém morre (#118): quem caiu volta em recuperação.
-	var fell: Array = delivered.get("fallen", []).map(func(e): var h = AHStationRules.hero(campaign, String(e.hero_id)); return String(h.display_name) if h != null else "")
-	box.add_child(AHKit.label(tr("Toda a equipe voltou de pé.") if fell.is_empty() else (tr("Volta em recuperação: %s") if fell.size() == 1 else tr("Voltam em recuperação: %s")) % ", ".join(fell),
-		"text", AHKit.MUTED if fell.is_empty() else AHKit.alert_text()))
+	# Ninguém morre (#118): quem caiu volta em recuperação. Os levantados no mapa (#179) chegam carregados, com menos dias;
+	# os outros, com a recuperação inteira, na Enfermaria (com leito) ou no Dormitório.
+	var fallen: Array = delivered.get("fallen", [])
+	if fallen.is_empty():
+		box.add_child(AHKit.label(tr("Toda a equipe voltou de pé."), "text", AHKit.MUTED))
+	# [o texto com um nome, o texto com vários, quem]: "A equipe carregou" vale para os dois (sem gênero no nome).
+	var lines := [[tr("A equipe carregou: %s"), tr("A equipe carregou: %s"), fallen.filter(func(e): return e.get("carried", false))],
+		[tr("Foi para a Enfermaria: %s"), tr("Foram para a Enfermaria: %s"), fallen.filter(func(e): return not e.get("carried", false) and e.get("bed", false))],
+		[tr("Foi para o Dormitório, em recuperação: %s"), tr("Foram para o Dormitório, em recuperação: %s"),
+			fallen.filter(func(e): return not e.get("carried", false) and not e.get("bed", false))]]
+	for line in lines:
+		if line[2].is_empty():
+			continue
+		var names: Array = line[2].map(func(e): var h = AHStationRules.hero(campaign, String(e.hero_id)); return "%s (%s)" % [String(h.display_name) if h != null else "", AHStationRules.return_text(int(e.days)).to_lower()])
+		var label := AHKit.label((line[0] if names.size() == 1 else line[1]) % ", ".join(names), "text", AHKit.alert_text())
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(label)
 	var button := _primary(button_text, "station", tr("%s / A") % S.key_name("interact"), func(): result_continue.emit())
 	box.add_child(button)
 	button.grab_focus.call_deferred()
