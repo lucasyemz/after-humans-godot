@@ -37,14 +37,20 @@ def resize(im: Image.Image, k: float) -> Image.Image:
 
 
 def rim_row(a: Image.Image) -> int:
-    """A boca do tambor: a primeira linha, de cima, em que o corpo já tem a largura cheia (as tábuas são estreitas)."""
+    """A boca do tambor (a borda de trás do aro): a primeira linha, de cima, com um pedaço só e contínuo na largura do
+    corpo. As tábuas abertas somam uma largura parecida, mas em dois ou três pedaços separados."""
     px = a.load()
-    widths = []
-    for y in range(a.height):
-        xs = [x for x in range(a.width) if px[x, y] > 128]
-        widths.append(xs[-1] - xs[0] if xs else 0)
-    body = sorted(widths[a.height // 2:])[len(widths[a.height // 2:]) // 2]
-    return next(y for y, w in enumerate(widths) if w >= body * 0.93)
+
+    def longest(y):
+        best = run = 0
+        for x in range(a.width):
+            run = run + 1 if px[x, y] > 128 else 0
+            best = max(best, run)
+        return best
+
+    runs = [longest(y) for y in range(a.height)]
+    body = sorted(runs[a.height // 2:])[len(runs[a.height // 2:]) // 2]
+    return next(y for y, w in enumerate(runs) if w >= body * 0.93)
 
 
 def warm_red(im: Image.Image) -> Image.Image:
@@ -74,9 +80,11 @@ def place(name: str, off: Image.Image, lit: Image.Image, gain: Image.Image):
         x = EMERGENCY_LIGHT[0] - cx * k
         y = EMERGENCY_LIGHT[1] - cy * k
     else:
-        k = H / (box[3] - box[1])
-        x = LANTERN_X - (box[0] + box[2]) / 2 * k
-        y = -box[1] * k
+        # O lampião cabe inteiro no card (3 px de folga dos lados), com o pé embaixo (ele fica no chão) e a alça no
+        # meio.
+        k = min(H / (box[3] - box[1]), (W - 6) / (box[2] - box[0]))
+        x = W / 2 - (box[0] + box[2]) / 2 * k
+        y = H - box[3] * k
     out = []
     for im in (off, lit, gain.convert("RGBA")):
         canvas = Image.new("RGBA", (W, H))
@@ -118,6 +126,17 @@ def tight(frames):
     """Os quadros na largura da base das chamas, com o ar quente em volta (a união dos quatro, na faixa de baixo): as fagulhas soltas dos lados
     alargavam o quadro, e o fogo, com 85% da largura do card, saía mais estreito que a boca do tambor. As laterais
     somem em 10 px de novo (o quad somado não mostra o corte)."""
+    # Cada quadro com o meio da base das chamas no meio do quadro: senão o fogo desliza de um lado para o outro.
+    centered = []
+    for f in frames:
+        h = f.height
+        band = f.convert("L").crop((0, int(h * 0.7), f.width, int(h * 0.9))).point(lambda v: 255 if v > 60 else 0)
+        b = band.getbbox()
+        shift = round(f.width / 2 - (b[0] + b[2]) / 2) if b else 0
+        moved = Image.new("RGB", f.size)
+        moved.paste(f, (shift, 0))
+        centered.append(moved)
+    frames = centered
     x0, x1 = None, None
     for f in frames:
         h = f.height
@@ -197,8 +216,8 @@ def main(src: str) -> None:
             hl, hm = with_fire(l, lit_mask, fire[0])
         h = halo(hl, hm, l.size)
         if name == "T_LP03":
-            # Com o fogo, o halo cheio apagava o tambor pintado no escuro: fica em 60%.
-            h = h.point(lambda v: int(v * 0.6))
+            # Com o fogo, o halo cheio apagava o tambor pintado no escuro: fica em 75%.
+            h = h.point(lambda v: int(v * 0.75))
         save(shrink(h, 1024), name + "_Halo", manifest, out)
         pieces[name] = {"box_in_sheet": list(big), "lit_offset": [dx, dy], "placed": placed, **anchors(lit_mask, a)}
     for i, frame in enumerate(fire):
