@@ -14,7 +14,7 @@ São 10 arquivos novos em `art/scenarios/` (cerca de 609 KB), com o `.import` do
 | Arquivo | O que tem | Caixa na pintura (px: x0, y0, x1, y1) | Profundidade sugerida |
 |---|---|---|---|
 | **O Navio** (1024 × 576) | | | |
-| `T_CD14_HullMid` | o meio do casco, com a linha d'água, os pneus, as correntes e a prancha | 129, 383, 892, 539 | o plano de hoje |
+| `T_CD14_HullMid` | o meio do casco, com a linha d'água, os pneus, as correntes e a prancha (as tábuas e o corrimão) | 129, 383, 892, 539 | o plano de hoje |
 | `T_CD14_HullBow` | a proa (a curva da esquerda) | 11, 368, 172, 529 | 0,25 m atrás |
 | `T_CD14_HullStern` | a popa (a curva da direita) | 849, 437, 1020, 536 | 0,25 m atrás |
 | `T_CD14_Deck` | o convés: a amurada, as caixas e os postes; desce 10 px por baixo da borda do casco | 32, 312, 1017, 471 | 0,15 m atrás |
@@ -57,7 +57,8 @@ Onde uma camada da frente cobre a de trás, a de trás vem pintada por inteiro:
 - **o convés:** a amurada atrás da prancha, até a porta da cabine;
 - **o interior do Armazém:** o vão uns 60 px mais largo de cada lado e em cima, e 27 px embaixo (até a soleira), por
   trás dos pilares, da viga e da soleira;
-- **o telhado:** a parede de cima atrás da coluna alta da esquerda e do poste do canto da direita;
+- **o telhado:** a parede de cima atrás da coluna alta da esquerda (com o corrimão e a hera até o topo) e do poste do
+  canto da direita;
 - **as laterais:** as duas paredes em perspectiva continuam por trás dos pilares e, na direita, por trás do poste do canto
   e da ponta do telhado (de x = 740 a 786);
 - **o convés:** 10 px por baixo da borda do meio do casco, para a emenda não abrir do lado da prancha;
@@ -162,3 +163,9 @@ Da raiz do repositório:
   - (baixa) o número da diferença na página. Ficam como observação: a faixa um pouco mais clara na quina direita com a
     câmera à direita (sem buraco) e um pixel transparente em cada ponta do zigue-zague do casco (fica por baixo do
     vizinho).
+- **Rodada 3, reprovada:**
+  - (média) o polígono da prancha levava para o casco a parede da cabine e o batente atrás do corrimão: no casco ficam só
+    as tábuas e o latão do corrimão da prancha; a parede e o batente vão para a cabine;
+  - (média) o pedaço escondido do telhado não chegava ao topo da coluna (a edição não tinha nada ali): o corrimão e a
+    hera da faixa logo à direita da coluna continuam por baixo dela, de x = 184 a 210;
+  - (baixa) o cabinho da folha no vão: a máscara da hera cresceu mais 2 px.

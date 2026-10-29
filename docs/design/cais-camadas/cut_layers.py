@@ -111,8 +111,12 @@ def ship(src: Path, manifest: dict) -> None:
     S = art.size
     # 1. O casco, com a prancha e as correntes (penduradas nele): tudo abaixo da borda do casco.
     hull = poly(S, [(0, 360), (30, 367), (100, 382), (150, 389), (200, 395), (250, 403), (300, 407), (400, 409),
-                    (500, 411), (556, 414), (560, 452), (665, 452), (668, 438), (1024, 436), (1024, 576), (0, 576)],
-                [(345, 528), (350, 505), (415, 440), (500, 393), (580, 383), (580, 470), (560, 492), (470, 532)])
+                    (500, 411), (556, 414), (560, 452), (665, 452), (668, 438), (1024, 436), (1024, 576), (0, 576)])
+    # A prancha: as tábuas (abaixo da linha da rampa) e o latão do corrimão dela; a parede e o batente da porta atrás do
+    # corrimão ficam na cabine.
+    gangway = poly(S, [(345, 528), (350, 505), (415, 440), (500, 393), (580, 383), (580, 470), (560, 492), (470, 532)])
+    ramp = poly(S, [(330, 506), (580, 440), (580, 576), (330, 576)])
+    hull = ImageChops.lighter(hull, ImageChops.multiply(gangway, ImageChops.lighter(ramp, gold(art))))
     # 3. A cabine: a forma inteira dela na edição só com a cabine.
     cabin_edit = edit(src / "ship-cabin-only.png", S)
     cabin_full = ImageChops.multiply(not_magenta(cabin_edit), rect(S, (540, 120, 1024, 456)))
@@ -137,7 +141,8 @@ def ship(src: Path, manifest: dict) -> None:
     rest = minus(rest, own_crane)
     own_cabin = ImageChops.multiply(minus(cabin_full, rect(S, (540, 320, 556, 400))), rest)
     rest = minus(rest, own_cabin)
-    own_deck = ImageChops.lighter(own_rail, ImageChops.multiply(deck_band, rest))
+    own_deck = ImageChops.lighter(own_rail, ImageChops.multiply(ImageChops.lighter(deck_band, rect(S, (470, 380, 540, 470))),
+                                                                rest))
     rest = minus(rest, own_deck)
     # O que sobra: o mastro alto e os cabos; na popa, abaixo do mastro, a amurada e as plantas da cabine.
     stern_rest = ImageChops.multiply(rest, minus(rect(S, (540, 140, 1024, 456)), mast))
@@ -198,7 +203,7 @@ def warehouse(src: Path, manifest: dict) -> None:
     # As folhas da hera do pilar esquerdo que caem na borda do vão também são da frente.
     r, g, b = art.convert("RGB").split()
     leaf = ImageChops.subtract(g, b).point(lambda v: 255 if v > 70 else 0)
-    front = ImageChops.lighter(front, ImageChops.multiply(leaf, rect(S, (300, 540, 318, 614))).filter(ImageFilter.MaxFilter(3)))
+    front = ImageChops.lighter(front, ImageChops.multiply(leaf, rect(S, (300, 540, 318, 614))).filter(ImageFilter.MaxFilter(7)))
     # 4. As laterais em perspectiva: a da esquerda e a da direita (com a quina do telhado descendo).
     sides = ImageChops.lighter(minus(rect(S, (0, 0, 148, 683)), front), minus(rect(S, (782, 0, 1024, 683)), front))
     # 3. O interior: o vão, sem a moldura.
@@ -229,7 +234,16 @@ def warehouse(src: Path, manifest: dict) -> None:
             if f.exists():
                 fill = edit(f, S)
                 mask = ImageChops.multiply(mask, fill_alpha(fill))
-        save(layer(art, own, fill, mask if fill is not None else None), "T_CD15_" + name, manifest)
+        out = layer(art, own, fill, mask if fill is not None else None)
+        if name == "Roof":
+            # O corrimão e a hera do telhado continuam por trás do topo da coluna esquerda (x 184 a 210, y 0 a 56): a
+            # faixa logo à direita da coluna, repetida por baixo dela.
+            strip = art.crop((210, 0, 236, 56))
+            behind = Image.new("RGBA", S)
+            behind.paste(strip, (184, 0))
+            behind.alpha_composite(out)
+            out = behind
+        save(out, "T_CD15_" + name, manifest)
 
 
 def main(src: str) -> None:
