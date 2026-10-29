@@ -1,7 +1,8 @@
 # Roupas confortáveis do lobby — proposta #243
 
 **Lucas aprovou os figurinos dos quatro fundadores e dos seis recrutas após a correção dos braços das corujas.**
-As seis versões femininas abaixo são um complemento novo, ainda aguardando aprovação antes das poses delas.
+As seis versões femininas abaixo têm **roupas próprias**, conforme o novo pedido do Lucas, e ainda aguardam
+aprovação antes das poses delas.
 Este PR continua sendo de conceito; não integrar as pranchas como sprites.
 
 A pedido do Lucas em 28/10/2026, o estudo de paletas foi cancelado (#242, #239 e PR #240). Esta proposta muda o
@@ -62,8 +63,9 @@ variações de pelagem neste pacote.
 ## Recrutas: versões femininas para aprovação
 
 Lucas autorizou uma versão feminina para cada um dos seis tipos de recruta. Os modelos atuais são a referência
-masculina nas comparações. Os figurinos já aprovados permanecem; as diferenças novas estão na face, na silhueta
-e no caimento da roupa, não em uma simples troca de cor.
+masculina nas comparações. Os figurinos masculinos já aprovados permanecem. Lucas pediu que as versões femininas usem **peças diferentes**,
+não apenas as mesmas roupas ajustadas ao corpo. A revisão atual muda a construção e a silhueta do vestuário,
+além dos traços do personagem. Não é um seletor de cores.
 
 Todas são personagens adultas. Cão, gato, Guaxinim e Tatu podem ter busto discreto sob tecido opaco e uma silhueta
 diferente de ombros/quadril, preservando a espécie e a robustez de cada corpo. Sapo e coruja usam outros traços de
@@ -72,6 +74,15 @@ universais das espécies.
 
 Não acrescentar equipamento de expedição, joias, maquiagem ou cabelo humano como atalho. As corujas precisam manter
 braços articulados e mãos visíveis. Os dois sexos usam roupa igualmente prática e confortável.
+
+| Versão feminina | Roupa própria nesta revisão | Diferença em relação ao macho |
+| --- | --- | --- |
+| Cão | Jardineira índigo folgada sobre camiseta clara | Peitoral e alças de tecido no lugar da camisa azul abotoada |
+| Gato | Blusa cruzada terracota e calça oliva de pernas largas | Fechamento lateral e caimento amplo no lugar da camiseta de botões |
+| Sapo | Túnica sálvia até meia coxa com aberturas laterais e bermuda escura | Comprimento e combinação de peças diferentes da camisa ferrugem e calça curta |
+| Coruja | Blusa sem gola ameixa desbotada e calça clara ampla até meia canela | Uma blusa leve, sem o colete do macho |
+| Guaxinim | Colete ocre simples sobre camiseta clara e calça carvão | Sobreposição leve no lugar da camisa oliva |
+| Tatu | Blusa azul sem gola e calça bege ampla abaixo do joelho | Frente abotoada, mangas e pernas com comprimentos diferentes da camiseta ocre |
 
 Cada prancha traz dois pares: **macho à esquerda, fêmea à direita**, depois o segundo par na mesma ordem.
 
@@ -191,7 +202,7 @@ iniciais, já aprovados pelo Lucas.
 - **Média, `frog_owl_variants.webp`:** ainda havia sombreamento arredondado duplo na camisa da sapo. Corrigir
   apenas a frente da camisa para um caimento reto e solto, sem sugerir seios. Braços/mãos das corujas corretos.
 
-### Rodada 3 — VEREDITO: APROVADO para revisão de figurino
+### Rodada 3 — APROVADO técnico do desenho anterior, substituído pelo novo pedido de roupa
 
 Conferidos seis pares com mãos/pés completos, roupa confortável sem equipamento e identidades de espécie;
 corujas com braços articulados e mãos visíveis; sapo/coruja sem seios, com a frente da camisa da sapo reta e solta.
@@ -204,13 +215,33 @@ na ilustração são aproximadas, não valores para integração. O aceite artí
 
 Não foram produzidos ataques, retratos novos ou poses de trabalho, sentado ou deitado destas variações.
 
+## Revisão: roupas femininas próprias
+
+Após ver a r3, Lucas pediu roupas diferentes. A aprovação técnica anterior não é aprovação artística das fêmeas;
+esta revisão substitui aquelas propostas nas três comparações. As peças novas estão na tabela do complemento.
+
+### Rodada 1 — VEREDITO: APROVADO para revisão de figurino
+
+Conferidas as três comparações em tamanho normal, reduzidas a 40% e em cinza: jardineira versus camisa;
+blusa cruzada versus camiseta de botões; túnica/bermuda versus camisa/calça; blusa sem colete versus conjunto
+com colete; colete/camiseta versus camisa; blusa abotoada/calça ampla curta versus camiseta/calça comprida.
+As diferenças são estruturais, não dependem de cor. Mantidos os braços articulados e mãos das corujas, os
+pés/caudas visíveis e a roupa leve sem equipamento de missão. Sem problemas altos ou médios no conceito.
+
+Seis PNG e 21 WebP com formato/dimensões/hash conferidos. Os três conceitos iniciais aprovados permanecem
+idênticos à r2. O aceite artístico do Lucas para as seis roupas femininas continua pendente.
+
+Critérios adicionais: cada fêmea precisa ter uma combinação de peças/cortes própria, distinguível em cinza e a
+40%, mantendo conforto, braços/mãos das corujas e a anatomia de cada espécie. Nenhuma pose nova nesta revisão.
+
 ## Fontes e pranchas pequenas
 
-As imagens PNG de conceito ficam fora da main, na tag `codex-pr244-originals-r3`, pasta
-`art/combat/source/lobby_outfits_20261028/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr244-originals-r3) e
-[ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr244-originals-r3.zip). Nenhum desses PNG é origem
-pronta para conversão direta em pose do jogo. As tags anteriores `codex-pr244-originals` e `codex-pr244-originals-r2` permanecem como histórico;
-a revisão r3 acrescenta o complemento feminino sem reescrever os originais aprovados.
+As imagens PNG de conceito ficam fora da main, na tag `codex-pr244-originals-r4`, pasta
+`art/combat/source/lobby_outfits_20261028/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr244-originals-r4) e
+[ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr244-originals-r4.zip). Nenhum desses PNG é origem
+pronta para conversão direta em pose do jogo. As tags anteriores, até `codex-pr244-originals-r3`, permanecem como
+histórico. A r4 troca apenas as três comparações femininas pelas propostas de roupas próprias, preservando
+os três conceitos iniciais aprovados.
 
 | Grupo | 40% | Cinza a 40% |
 | --- | --- | --- |

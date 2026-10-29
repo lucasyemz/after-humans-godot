@@ -1,7 +1,7 @@
 {
   "issue": 243,
-  "stage": "initial 10 outfits approved by Lucas; 6 female variants pending visual approval; no production poses",
-  "source_tag": "codex-pr244-originals-r3",
+  "stage": "initial 10 outfits approved; six female outfits redressed with distinct garments, pending Lucas approval; no production poses",
+  "source_tag": "codex-pr244-originals-r4",
   "base_commit": "5bb29281c578f37f135a859a3d0073cd2f083f58",
   "assets": {
     "founders": {
@@ -113,13 +113,13 @@
     },
     "dog_cat_variants": {
       "source_file": "dog_cat_variants_concept.png",
-      "source_sha256": "b3fddbde516152962af618f7f2d31fd2056822baa56f9a241a2e3141184c5e9a",
+      "source_sha256": "d35e4fc56f0c2b434f4005fac1517b8387c9719b037d811b472efce405339a74",
       "canvas": [
         1536,
         1024
       ],
       "review_file": "dog_cat_variants.webp",
-      "review_sha256": "5384578a03e1168f61f6aab3d3d6f80936fed9d8712ef64e2f1a9fc767be2cc0",
+      "review_sha256": "151d89f8996ded2728fd0568183e094dbf24908e01feab1e4b621a2157a2d9a3",
       "reduced_canvas": [
         614,
         410
@@ -137,13 +137,13 @@
     },
     "frog_owl_variants": {
       "source_file": "frog_owl_variants_concept.png",
-      "source_sha256": "5170b7cf040a7347182c9d3bf4d0be7192012055e2590acaef156374f5d09218",
+      "source_sha256": "9a87910cecd79718ac278663ba3543024fd199b81b314068372b97d9cd22e123",
       "canvas": [
         1536,
         1024
       ],
       "review_file": "frog_owl_variants.webp",
-      "review_sha256": "746e020e3d59c1c2b53ef4bd8ba6be878c850e3b07d0826153031f5890c1feda",
+      "review_sha256": "92497f75057e36702b204044927afd4acba365969ea746e3bc34d00595facc22",
       "reduced_canvas": [
         614,
         410
@@ -161,13 +161,13 @@
     },
     "raccoon_armadillo_variants": {
       "source_file": "raccoon_armadillo_variants_concept.png",
-      "source_sha256": "0a6690bbd5cd729529e53205fd83227c1435f901a410bd35400aaf3596f6f82f",
+      "source_sha256": "7f09ac82b9e38eacf85714ee08b39febcf765d0c9ac6d88db6edd791174e9615",
       "canvas": [
         1610,
         977
       ],
       "review_file": "raccoon_armadillo_variants.webp",
-      "review_sha256": "3e4e5c2d3dba6509768b87bbd19be42a2a944c96d9dc736aed658bd37525713f",
+      "review_sha256": "9ff6f7dce1c10d4cb438c8987ea74067fbcc2c9da567af06bc89a7966f3828b2",
       "reduced_canvas": [
         644,
         391
@@ -185,6 +185,14 @@
     }
   },
   "source_folder": "art/combat/source/lobby_outfits_20261028",
-  "revision": 3,
-  "supersedes_source_tag": "codex-pr244-originals-r2"
+  "revision": 4,
+  "supersedes_source_tag": "codex-pr244-originals-r3",
+  "female_outfit_changes": {
+    "dog": "indigo bib overalls over off-white tee",
+    "cat": "rust wrap blouse with olive wide trousers",
+    "frog": "sage straight tunic with charcoal shorts",
+    "owl": "dusty plum collarless blouse without vest and oatmeal cropped trousers",
+    "raccoon": "ochre light vest over off-white tee with charcoal trousers",
+    "armadillo": "faded blue collarless blouse and tan cropped trousers"
+  }
 }

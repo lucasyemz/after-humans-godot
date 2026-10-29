@@ -14,8 +14,8 @@
   "concept_qa": "APROVADO",
   "lucas_approval": "female variants pending only",
   "game_capture": "not produced: costume approval before poses",
-  "webp_bytes": 2915654,
-  "revision": 3,
+  "webp_bytes": 2889010,
+  "revision": 4,
   "corrected_anatomy": [
     "vespera: two articulated arms and visible hands",
     "owl recruit: two articulated arms and visible hands"
@@ -25,5 +25,7 @@
   "female_qa_rounds": 3,
   "initial_outfits_lucas_approval": "approved in chat after owl arms correction",
   "original_approved_pngs_unchanged": true,
-  "original_approved_webps_unchanged": true
+  "original_approved_webps_unchanged": true,
+  "wardrobe_revision_qa_rounds": 1,
+  "female_approval": "pending: revised outfits with distinct garments"
 }
