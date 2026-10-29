@@ -1,5 +1,9 @@
 # Partida e cartão de passagem — #79
 
+> **Interior substituído pela #149 (29/10):** o trem oficial passou a ser o vagão verde do Tutorial. O fundo e o banco
+> daqui deram lugar ao interior dele, com os bancos presos à parede e as barras na frente: ver [trem-2d.md](trem-2d.md).
+> O cartão, o túnel e o tempo da animação continuam valendo.
+
 Proposta de arte para integração pelo Claude nas #74/#75. Base `83e2717`. **QA de design: APROVADO na rodada4.** Não altera o fluxo do jogo nem o metrô3D existente.
 
 ![Quatro fundadores sentados](departure/train_team.jpg)
@@ -17,8 +21,8 @@ Origem superior esquerda, coordenadas em pixels finais. [Contrato completo](depa
 | Arquivo | Resolução | Posição/âncora | Uso |
 |---|---|---|---|
 | `art/transitions/train/tunnel_loop.webp` | 2048×256 | canto superior em(0,160) | Primeiro, atrás de tudo; repetir horizontalmente |
-| `art/transitions/train/carriage_background.webp` | 1920×1080 | (0,0) | Parede/piso; três vãos com alfa0 |
-| `art/transitions/train/carriage_bench.webp` | 1920×1080 | (0,0) | Banco separado, antes das personagens; corpo visível começa em(168,600), mede1584×363 |
+| `art/transitions/train/carriage_background.webp` | 1920×1080 | (0,0) | Parede/piso; três vãos com alfa0 (**trocado pela #149**: o interior do vagão verde) |
+| ~~`art/transitions/train/carriage_bench.webp`~~ | 1920×1080 | (0,0) | **Removido pela #149**: os bancos agora são da parede do vagão |
 | `art/transitions/passage_title_frame.webp` | 960×240 | centro(480,120), na tela(960,540) | Cartão sem texto, derivado da moldura do kit #59 |
 
 O túnel é opaco (alfa255), os outros assets têm transparência real; não adicionar transparência artificial no túnel que revelaria o vazio. O strip foi montado em ida/espelho para fechar o ciclo: primeira/última coluna e a junção central coincidem exatamente. O strip final recorta só a faixa visível e usa paleta de256 cores, codificada sem perdas, reduzindo1.321.534 para447.476 bytes (−66%). Isso cria ritmo simétrico de alvenaria, sem salto de luminosidade na emenda. Sugestão96px/s: ciclo21,333s; em `Reduzir efeitos`, congelar o deslocamento e as luzes, sem pulsos. Usar Repeat em X, sem compressão de alfa; o fundo inteiro não se move.
