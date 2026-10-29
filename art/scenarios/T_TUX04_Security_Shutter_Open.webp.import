@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cxxg27lhkubyx"
-path="res://.godot/imported/T_TU05.webp-3365713f38c412cd004dae80c52c8145.ctex"
+uid="uid://blsc0aoqnh2ln"
+path="res://.godot/imported/T_TUX04_Security_Shutter_Open.webp-0f74b5a4d373a05f5c38ba7936d53819.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/scenarios/T_TU05.webp"
-dest_files=["res://.godot/imported/T_TU05.webp-3365713f38c412cd004dae80c52c8145.ctex"]
+source_file="res://art/scenarios/T_TUX04_Security_Shutter_Open.webp"
+dest_files=["res://.godot/imported/T_TUX04_Security_Shutter_Open.webp-0f74b5a4d373a05f5c38ba7936d53819.ctex"]
 
 [params]
 
