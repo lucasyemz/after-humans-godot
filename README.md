@@ -57,7 +57,7 @@ data/             JSON de produção (classes, habilidades, inimigos...) e a gra
 audio/            combat (sons das habilidades), music, ambience (cenários e chuva), world (passos, portas, busca),
                   station e ui
 art/              arte pintada usada pelo jogo (street: a rua; rooms: interiores; station: superfícies, modelos da Poly Haven e cards
-                  da Estação, civilians: os civis do trem; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários;
+                  da Estação, civilians: os civis do trem; transitions/train: o interior do vagão da passagem, créditos em art/transitions/train/CREDITS.md; combat: heróis, inimigos, efeitos e ícones; scenarios: texturas dos cenários;
                   ui: o mapa de fases, as imagens das fases e os ícones dos nós)
 tests/            run_all.gd e os test_*.gd (paridade 48/48, save, dados, cenas e input; test_full_journey joga
                   uma campanha da Estação à volta com as cenas de verdade)

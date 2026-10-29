@@ -10,7 +10,7 @@ Proposta de arte para integração pelo Claude nas #74/#75. Base `83e2717`. **QA
 
 ![Antes e depois proposto](departure/train_before_after.jpg)
 
-À esquerda, captura real da Estação desta base; à direita, composição proposta com as novas camadas e as poses sentadas atuais. Não é captura da integração. O modelo de referência local é `art/station/metro`, conforme seus créditos (Bombardier S Stock, timblewee, CC BY4.0); a pintura usa metal claro desgastado, montantes vermelhos e iluminação quente, sem marcas ou texto. O jogo continua tendo sua própria iluminação3D; esta cena é uma composição2D de passagem.
+À esquerda, captura real da Estação desta base; à direita, composição proposta com as novas camadas e as poses sentadas atuais. Não é captura da integração. O modelo de referência era o metrô `art/station/metro` (Bombardier S Stock, timblewee, CC BY4.0; saiu do jogo na #256, e o crédito ficou em `art/transitions/train/CREDITS.md`); a pintura usa metal claro desgastado, montantes vermelhos e iluminação quente, sem marcas ou texto. O jogo continua tendo sua própria iluminação3D; esta cena é uma composição2D de passagem.
 
 ## Camadas e contrato
 
