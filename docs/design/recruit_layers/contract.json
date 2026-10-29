@@ -1,0 +1,1876 @@
+{
+  "issue": 191,
+  "base_commit": "20890be",
+  "source_tag": "codex-pr211-originals",
+  "source_folder": "art/combat/source/recruit_layers_20261028",
+  "frame_origin": [
+    0,
+    0
+  ],
+  "blend": "straight-alpha source-over, no additive blend",
+  "color_samples": [
+    "#c98a4b",
+    "#8fb4f0",
+    "#86c98f",
+    "#b7a6f4",
+    "#d55e00",
+    "#a69a84"
+  ],
+  "palette_status": "Preview samples from existing kit; final selectable palette belongs to Lucas.",
+  "role_glyphs": {
+    "protection": "art/ui/icons/intent-block.svg",
+    "healing": "art/ui/icons/intent-heal.svg",
+    "ranged": "art/ui/icons/status-marked_good.svg",
+    "chemistry": "art/ui/icons/item-ampoule.svg"
+  },
+  "classes": [
+    {
+      "name": "dog",
+      "label": "Cão",
+      "id": "dog_recruit_01",
+      "class_id": "cao",
+      "reference": "art/combat/recruits/dog_recruit_01_idle.webp",
+      "reference_sha256": "b14e3de96c7d9907cdeb7b58f4e16acb4748fa8259c47a082c1aeb81cd4d27c2",
+      "size": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "canonical_anchor": [
+        542.0,
+        1425
+      ],
+      "texture_anchor": [
+        271.0,
+        712.5
+      ],
+      "body_reference_pixels": 1385,
+      "draw_order": [
+        "bag",
+        "base",
+        "clothes",
+        "scarf",
+        "cap",
+        "badge"
+      ],
+      "assets": {
+        "base_a": {
+          "file": "art/combat/recruits/layers/dog/base_a.webp",
+          "source_file": "dog/base_a.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "7a049c2ca747359e899e9dd787c475470b970eeaa29ea3228ae218c0c3b97e22",
+          "source_sha256": "5ec909856a06742c6a7e70e4a8e699be276593420ad13bd7fff96277fd9fa367",
+          "bbox": [
+            67,
+            20,
+            477,
+            712
+          ]
+        },
+        "base_b": {
+          "file": "art/combat/recruits/layers/dog/base_b.webp",
+          "source_file": "dog/base_b.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "baeeade9ba102ee7d9717866a6d373208e1f015caf7514d6f244e4d97906f6da",
+          "source_sha256": "03be6f39cb5cc6b9158303e0483f2f204d7664a8f3f9c7bdd3c53a85b1afa4e0",
+          "bbox": [
+            65,
+            20,
+            477,
+            713
+          ]
+        },
+        "clothes": {
+          "file": "art/combat/recruits/layers/dog/clothes.webp",
+          "source_file": "dog/clothes.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "74191c2e6d583a51718431d75c9c20c8568b4d7ca493b863b74f1f16ae53145d",
+          "source_sha256": "0d17c409834602e7599c52f9afc2c9b111d2c6e3d7a27e4a858b8cef62afae10",
+          "bbox": [
+            136,
+            94,
+            445,
+            612
+          ]
+        },
+        "scarf": {
+          "file": "art/combat/recruits/layers/dog/scarf.webp",
+          "source_file": "dog/scarf.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "a701c5902b9b4f3dfd28972ea202baf8d1e1e32bd65e0c4e1b365396dfe39bf8",
+          "source_sha256": "b73dbcd3bebdc14011108a8a597b13bf165bfcc21f41fb18ff8ad21c51076442",
+          "bbox": [
+            263,
+            123,
+            371,
+            219
+          ]
+        },
+        "bag": {
+          "file": "art/combat/recruits/layers/dog/bag.webp",
+          "source_file": "dog/bag.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "4bbbdb05471b4de1c4aae50bdd2e4b911acf15475d6b8fe41f14b3a0c2580ff9",
+          "source_sha256": "5abd8650f65fba70930f685b790c6868118e549510f9bb10f10d085df6481cdc",
+          "bbox": [
+            80,
+            155,
+            226,
+            313
+          ]
+        },
+        "cap": {
+          "file": "art/combat/recruits/layers/dog/cap.webp",
+          "source_file": "dog/cap.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "cc8508b036d2cc048fe768caaeab5ae6b13cfef12651335dcda101a15a96c852",
+          "source_sha256": "0005474e05666b0844623754759f1c5bad188fa38a462b31d1ff9dcb8a84c424",
+          "bbox": [
+            291,
+            3,
+            384,
+            81
+          ]
+        },
+        "badge_protection": {
+          "file": "art/combat/recruits/layers/dog/badge_protection.webp",
+          "source_file": "dog/badge_protection.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "039afe35e607af917ba50b3850ce2615f5dd8082bbb9769592d1da485035924c",
+          "source_sha256": "074c0eaeafe54c9bd63490849a5d6fa4b63440510340c97819e31e9c15d882dc",
+          "bbox": [
+            329,
+            221,
+            379,
+            248
+          ]
+        },
+        "badge_healing": {
+          "file": "art/combat/recruits/layers/dog/badge_healing.webp",
+          "source_file": "dog/badge_healing.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "6d17260308373e32fad43df32c79d35a4b194caa89345ef43cd3bb06d4157888",
+          "source_sha256": "585350fb35abdc23e5c8ff615122e22a20a78dda8077dcf0906a8813e4c5df13",
+          "bbox": [
+            329,
+            221,
+            379,
+            248
+          ]
+        },
+        "badge_ranged": {
+          "file": "art/combat/recruits/layers/dog/badge_ranged.webp",
+          "source_file": "dog/badge_ranged.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "283b9470a8bbc7dbe271ba9a173362aff22fdd9c91eb62a5e8571848fc308290",
+          "source_sha256": "42c9ddb650c76acc621e48af732726f116cce91d52fa3b2db95cf698a86cd04e",
+          "bbox": [
+            329,
+            221,
+            379,
+            248
+          ]
+        },
+        "badge_chemistry": {
+          "file": "art/combat/recruits/layers/dog/badge_chemistry.webp",
+          "source_file": "dog/badge_chemistry.png",
+          "size": [
+            543,
+            724
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "1f7412f150171b86e8af81ed087a6c83a7cdae48e04734a6a280dae3b0003cca",
+          "source_sha256": "a9860a873a5851ca35520b810042abe887fa25fd021ae8842418552fe04569f4",
+          "bbox": [
+            329,
+            221,
+            379,
+            248
+          ]
+        }
+      },
+      "combinations": [
+        {
+          "base": "base_a",
+          "cloth_tint": "#c98a4b",
+          "scarf_tint": "#86c98f",
+          "accessories": [],
+          "badge": "protection",
+          "index": 1
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#8fb4f0",
+          "scarf_tint": "#b7a6f4",
+          "accessories": [
+            "scarf"
+          ],
+          "badge": "healing",
+          "index": 2
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#86c98f",
+          "scarf_tint": "#d55e00",
+          "accessories": [
+            "bag"
+          ],
+          "badge": "ranged",
+          "index": 3
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#b7a6f4",
+          "scarf_tint": "#a69a84",
+          "accessories": [
+            "cap"
+          ],
+          "badge": "chemistry",
+          "index": 4
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#d55e00",
+          "scarf_tint": "#c98a4b",
+          "accessories": [
+            "scarf",
+            "bag"
+          ],
+          "badge": "protection",
+          "index": 5
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#a69a84",
+          "scarf_tint": "#8fb4f0",
+          "accessories": [
+            "scarf",
+            "bag",
+            "cap"
+          ],
+          "badge": "healing",
+          "index": 6
+        }
+      ]
+    },
+    {
+      "name": "cat",
+      "label": "Gato",
+      "id": "cat_recruit_01",
+      "class_id": "gato",
+      "reference": "art/combat/recruits/cat_recruit_01_idle.webp",
+      "reference_sha256": "a284912890ef2efd3a04eb67af6a9f1af385b5c55283702873f2f7a0db0ad286",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1336
+      ],
+      "canonical_anchor": [
+        589.5,
+        1312
+      ],
+      "texture_anchor": [
+        294.75,
+        656.0
+      ],
+      "body_reference_pixels": 1260,
+      "draw_order": [
+        "bag",
+        "base",
+        "clothes",
+        "scarf",
+        "cap",
+        "badge"
+      ],
+      "assets": {
+        "base_a": {
+          "file": "art/combat/recruits/layers/cat/base_a.webp",
+          "source_file": "cat/base_a.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "0d861f2df709bc12af5b29e04ad2d39f96b338fe425861613fa808a245203422",
+          "source_sha256": "d4ef1bea49452b3a5602947a7c253bdac9a9ca7bab1b212dc39e0dbe761f0b71",
+          "bbox": [
+            107,
+            26,
+            481,
+            656
+          ]
+        },
+        "base_b": {
+          "file": "art/combat/recruits/layers/cat/base_b.webp",
+          "source_file": "cat/base_b.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "d86808ad246d302fe19d8bea481f9bda5f42c41b39ed72ae1f475e20269547f7",
+          "source_sha256": "372924fe44f2ed601c4502b42df45fd65b8796ebb4945dc45a634b9117c5fc07",
+          "bbox": [
+            100,
+            26,
+            478,
+            656
+          ]
+        },
+        "clothes": {
+          "file": "art/combat/recruits/layers/cat/clothes.webp",
+          "source_file": "cat/clothes.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "c0f61b5d62c00b567cc6a0b529ed8a3c26afd5bc3e5c5233640f151ce63e2769",
+          "source_sha256": "3f30d40f645c660130805f7c92d7a10d3ee0ecf00b6625a329c3cf5bf67eaf99",
+          "bbox": [
+            172,
+            138,
+            435,
+            578
+          ]
+        },
+        "scarf": {
+          "file": "art/combat/recruits/layers/cat/scarf.webp",
+          "source_file": "cat/scarf.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "78573454764ad2afe22081bb08bdd858f8ece89e6c112a61138a890e84c8a8cb",
+          "source_sha256": "a8ad7fe019eca53888ff714ec4662ca7e817f449deff75c8e781b05684f817d3",
+          "bbox": [
+            278,
+            120,
+            391,
+            198
+          ]
+        },
+        "bag": {
+          "file": "art/combat/recruits/layers/cat/bag.webp",
+          "source_file": "cat/bag.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "e13e61f9e24ce215a85ce163f6eecf20f359872530886110f7e57aad3f3cede0",
+          "source_sha256": "ac7665d80e41069ed4f7903c2a33e51cf761bffe116e90839ddc75ef21332aaf",
+          "bbox": [
+            140,
+            124,
+            270,
+            268
+          ]
+        },
+        "cap": {
+          "file": "art/combat/recruits/layers/cat/cap.webp",
+          "source_file": "cat/cap.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "dd4149a150f5f072aae3cbc4addbc65fb71d5fc796b7a6d8594dbf9b8933725a",
+          "source_sha256": "dca31d8bde4c34a7545623aafda80262a2eac6190e45e609b91363d4529ee927",
+          "bbox": [
+            290,
+            25,
+            386,
+            100
+          ]
+        },
+        "badge_protection": {
+          "file": "art/combat/recruits/layers/cat/badge_protection.webp",
+          "source_file": "cat/badge_protection.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "77199d9684c4c4a5018cf7e034d87c3d1dc0051507477ca51de3bbc2f70bc38e",
+          "source_sha256": "6b79621d3e15cb0788022f649d2b061edee4c6e0104d85f69cd2515063c0620e",
+          "bbox": [
+            349,
+            216,
+            398,
+            248
+          ]
+        },
+        "badge_healing": {
+          "file": "art/combat/recruits/layers/cat/badge_healing.webp",
+          "source_file": "cat/badge_healing.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "f6f007f6fa0af03a471b7bcd0d9859d6678a6628f9bad1afa889f1fea05cadb1",
+          "source_sha256": "ed529f7493ee4337f6a3f0d69aa370ccc47be23a4577f2053e7d8cae411078bc",
+          "bbox": [
+            349,
+            216,
+            398,
+            248
+          ]
+        },
+        "badge_ranged": {
+          "file": "art/combat/recruits/layers/cat/badge_ranged.webp",
+          "source_file": "cat/badge_ranged.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "4cdf9129fe74587a3ebd807cc9b23740910ecaa34235aec3ba69cfed1e8f7c30",
+          "source_sha256": "ee17162a1f21b0db292108da03b58b2389591bcccb4e8a916d9b7f7cb1edcaa7",
+          "bbox": [
+            349,
+            216,
+            398,
+            248
+          ]
+        },
+        "badge_chemistry": {
+          "file": "art/combat/recruits/layers/cat/badge_chemistry.webp",
+          "source_file": "cat/badge_chemistry.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "0543dc79d3fe641d529c5890c1bd740722ab0ac9ec673b4611ff8527468df881",
+          "source_sha256": "a23838ec56b871b25e90e920f51c5552645ed651dba9edb9c83ee6727dfe8ada",
+          "bbox": [
+            349,
+            216,
+            398,
+            248
+          ]
+        }
+      },
+      "combinations": [
+        {
+          "base": "base_a",
+          "cloth_tint": "#c98a4b",
+          "scarf_tint": "#86c98f",
+          "accessories": [],
+          "badge": "protection",
+          "index": 1
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#8fb4f0",
+          "scarf_tint": "#b7a6f4",
+          "accessories": [
+            "scarf"
+          ],
+          "badge": "healing",
+          "index": 2
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#86c98f",
+          "scarf_tint": "#d55e00",
+          "accessories": [
+            "bag"
+          ],
+          "badge": "ranged",
+          "index": 3
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#b7a6f4",
+          "scarf_tint": "#a69a84",
+          "accessories": [
+            "cap"
+          ],
+          "badge": "chemistry",
+          "index": 4
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#d55e00",
+          "scarf_tint": "#c98a4b",
+          "accessories": [
+            "scarf",
+            "bag"
+          ],
+          "badge": "protection",
+          "index": 5
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#a69a84",
+          "scarf_tint": "#8fb4f0",
+          "accessories": [
+            "scarf",
+            "bag",
+            "cap"
+          ],
+          "badge": "healing",
+          "index": 6
+        }
+      ]
+    },
+    {
+      "name": "frog",
+      "label": "Sapo",
+      "id": "frog_recruit_01",
+      "class_id": "sapo",
+      "reference": "art/combat/recruits/frog_recruit_01_idle.webp",
+      "reference_sha256": "9bee03570295fcf0a91d45eed85a82d13eb84a70bc3236ec890ad25e5023c585",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1336
+      ],
+      "canonical_anchor": [
+        588.5,
+        1311
+      ],
+      "texture_anchor": [
+        294.25,
+        655.5
+      ],
+      "body_reference_pixels": 1219,
+      "draw_order": [
+        "bag",
+        "base",
+        "clothes",
+        "scarf",
+        "cap",
+        "badge"
+      ],
+      "assets": {
+        "base_a": {
+          "file": "art/combat/recruits/layers/frog/base_a.webp",
+          "source_file": "frog/base_a.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "f3a606aebdaf69774b14a653aa5c71f406cc7216a22897fc650a4b061c81bcba",
+          "source_sha256": "91223e0fa0f52c9662fcb07ed00f9799f93cd13610f8df726fddfbe9504edaf8",
+          "bbox": [
+            153,
+            47,
+            487,
+            657
+          ]
+        },
+        "base_b": {
+          "file": "art/combat/recruits/layers/frog/base_b.webp",
+          "source_file": "frog/base_b.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "a5100c0cd12407c9391958a870352899a765d592198e81583568b3a2fa678a63",
+          "source_sha256": "b2fd13c378eeca7a5283a43453333340bce7dd0a4f3d5f58a99e7a5cd8432853",
+          "bbox": [
+            153,
+            47,
+            487,
+            657
+          ]
+        },
+        "clothes": {
+          "file": "art/combat/recruits/layers/frog/clothes.webp",
+          "source_file": "frog/clothes.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "6ad9a202d868d9c478657418a7b5fd5e37c5f70071e99abbcff2a2e5d8189515",
+          "source_sha256": "ca940036422426fb0a1313980f353e41d00e3578dd9777ff0dae6967b5e9b0bb",
+          "bbox": [
+            131,
+            125,
+            450,
+            579
+          ]
+        },
+        "scarf": {
+          "file": "art/combat/recruits/layers/frog/scarf.webp",
+          "source_file": "frog/scarf.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "9fef469ae3b27f3859f1f53a9e66d76e1578ff86a823f833ab1399a60a611188",
+          "source_sha256": "6f7d2231442f660bcf2d24e5ef61074d168d22a949d1025553fe683b347a9568",
+          "bbox": [
+            301,
+            122,
+            384,
+            203
+          ]
+        },
+        "bag": {
+          "file": "art/combat/recruits/layers/frog/bag.webp",
+          "source_file": "frog/bag.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "e12aa60ec27a30ce90dbf00e7160e035fecf86e6f75316db422c759068fc910b",
+          "source_sha256": "4874385c7727c0fad55f40f948717dcb745e4e785465166009d155151217cc3f",
+          "bbox": [
+            144,
+            150,
+            275,
+            280
+          ]
+        },
+        "cap": {
+          "file": "art/combat/recruits/layers/frog/cap.webp",
+          "source_file": "frog/cap.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "feb6ff53a0194cf0bebb0aeb2021ee1a998cee7c5401bd9b62397f84328acc23",
+          "source_sha256": "a42c8ab2a40dabab1ba527f48c09dec3fa7046d5c68948e15d122e99f3f243a4",
+          "bbox": [
+            318,
+            21,
+            393,
+            76
+          ]
+        },
+        "badge_protection": {
+          "file": "art/combat/recruits/layers/frog/badge_protection.webp",
+          "source_file": "frog/badge_protection.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "ed68504d3f7d1ac8bc37d421e437628cc396a06701a0e3cc229faf014806571d",
+          "source_sha256": "4c7f11569d3dce3f5b72ac9952716985fbc9436eff3ffc388615203e143f0890",
+          "bbox": [
+            345,
+            224,
+            394,
+            256
+          ]
+        },
+        "badge_healing": {
+          "file": "art/combat/recruits/layers/frog/badge_healing.webp",
+          "source_file": "frog/badge_healing.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "c9d10a545c78e1dfc59e84107237f593b0f8da8607b6de07687252f0a0ab1c75",
+          "source_sha256": "d55c0aa398d218c5face07426349005a41758282d1caaefd28644d42c5138be7",
+          "bbox": [
+            345,
+            224,
+            394,
+            256
+          ]
+        },
+        "badge_ranged": {
+          "file": "art/combat/recruits/layers/frog/badge_ranged.webp",
+          "source_file": "frog/badge_ranged.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "a65bb8260ddf79df8f17f0cfc30cc943527aca290b32c1ae58030a86b49bf1cb",
+          "source_sha256": "f3707b6dea3735ae4f7801fd2d9641d89526aeab7a8f3aa4371483b33d2c8481",
+          "bbox": [
+            345,
+            224,
+            394,
+            256
+          ]
+        },
+        "badge_chemistry": {
+          "file": "art/combat/recruits/layers/frog/badge_chemistry.webp",
+          "source_file": "frog/badge_chemistry.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "72ff9ffbf636fdd96dec43cbd5e57900c642fe57988a84552b6db372510b9940",
+          "source_sha256": "d2467b5c2479004387fa12f77a26aa027fb99c9fe1b1ea57e0e15ee2b20838df",
+          "bbox": [
+            345,
+            224,
+            394,
+            256
+          ]
+        }
+      },
+      "combinations": [
+        {
+          "base": "base_a",
+          "cloth_tint": "#c98a4b",
+          "scarf_tint": "#86c98f",
+          "accessories": [],
+          "badge": "protection",
+          "index": 1
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#8fb4f0",
+          "scarf_tint": "#b7a6f4",
+          "accessories": [
+            "scarf"
+          ],
+          "badge": "healing",
+          "index": 2
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#86c98f",
+          "scarf_tint": "#d55e00",
+          "accessories": [
+            "bag"
+          ],
+          "badge": "ranged",
+          "index": 3
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#b7a6f4",
+          "scarf_tint": "#a69a84",
+          "accessories": [
+            "cap"
+          ],
+          "badge": "chemistry",
+          "index": 4
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#d55e00",
+          "scarf_tint": "#c98a4b",
+          "accessories": [
+            "scarf",
+            "bag"
+          ],
+          "badge": "protection",
+          "index": 5
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#a69a84",
+          "scarf_tint": "#8fb4f0",
+          "accessories": [
+            "scarf",
+            "bag",
+            "cap"
+          ],
+          "badge": "healing",
+          "index": 6
+        }
+      ]
+    },
+    {
+      "name": "owl",
+      "label": "Coruja",
+      "id": "owl_recruit_01",
+      "class_id": "coruja",
+      "reference": "art/combat/recruits/owl_recruit_01_idle.webp",
+      "reference_sha256": "b17b94ede190e6e81acac9ee7396d42c259a1cf3eea9f6b67c5f77a2c3c84c4f",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1336
+      ],
+      "canonical_anchor": [
+        589.5,
+        1312
+      ],
+      "texture_anchor": [
+        294.75,
+        656.0
+      ],
+      "body_reference_pixels": 1272,
+      "draw_order": [
+        "bag",
+        "base",
+        "clothes",
+        "scarf",
+        "cap",
+        "badge"
+      ],
+      "assets": {
+        "base_a": {
+          "file": "art/combat/recruits/layers/owl/base_a.webp",
+          "source_file": "owl/base_a.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "c4f9d2f71428052e62bccd3e3767efc05d252061bbe4abe83d04d1ebe151a267",
+          "source_sha256": "9ab22ce59e11fa4325aa42562fc23d2dd7ec6f10af5ee194168b029b3ae74ae0",
+          "bbox": [
+            106,
+            20,
+            482,
+            655
+          ]
+        },
+        "base_b": {
+          "file": "art/combat/recruits/layers/owl/base_b.webp",
+          "source_file": "owl/base_b.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "9d2dfed31cff33ef1e73f27db0be649c0454508f918b6ffacb0180dad06c170e",
+          "source_sha256": "c9f457791a5bfc05e27200421238d99b8f88b1a747dc20692e40bbf1c0ea02a9",
+          "bbox": [
+            105,
+            20,
+            482,
+            655
+          ]
+        },
+        "clothes": {
+          "file": "art/combat/recruits/layers/owl/clothes.webp",
+          "source_file": "owl/clothes.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "deb80651a1cefcabbe7e4fba983e3dfbabf113622e37b7b946e9f96e77944f72",
+          "source_sha256": "0b4ae40aa9c005f21b98027a8dd0da56bd851450f990ca00c27fe1f9ee790492",
+          "bbox": [
+            106,
+            106,
+            458,
+            591
+          ]
+        },
+        "scarf": {
+          "file": "art/combat/recruits/layers/owl/scarf.webp",
+          "source_file": "owl/scarf.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "0e48826db6942cc8825872bf3126149de868660517fc82f237207434ed9cb367",
+          "source_sha256": "11bc3b9b05f1474b064241b65b96bfedbecb3b5c5c41d210b5b53a0ffad496ea",
+          "bbox": [
+            300,
+            135,
+            387,
+            217
+          ]
+        },
+        "bag": {
+          "file": "art/combat/recruits/layers/owl/bag.webp",
+          "source_file": "owl/bag.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "835bc7ea04fe84ebb45efb1c013e507249cd318c074aea67d503241a8fadf6df",
+          "source_sha256": "855f03e6034402cbf754e14fcc5258fdf36bc469c1d48dd3938b5161c0b77a24",
+          "bbox": [
+            135,
+            145,
+            271,
+            296
+          ]
+        },
+        "cap": {
+          "file": "art/combat/recruits/layers/owl/cap.webp",
+          "source_file": "owl/cap.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "2cf5c7ab4cadd9e52324d98e0e6c472b79832edd97ec521edafdc9d40f993326",
+          "source_sha256": "25aeee75f0eb26b0a0eb6e2b695821211029ad36c865e3790c42c2be263756c7",
+          "bbox": [
+            304,
+            5,
+            384,
+            67
+          ]
+        },
+        "badge_protection": {
+          "file": "art/combat/recruits/layers/owl/badge_protection.webp",
+          "source_file": "owl/badge_protection.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "0bbea8ee4fc692631c5f7b051374b54a2048c7c40b0eeca9695ecf9e085b6b20",
+          "source_sha256": "fbdeb71431e3824ca76bbb1525bad10eac0b0ff29dd628054d0557f904cce486",
+          "bbox": [
+            359,
+            229,
+            403,
+            260
+          ]
+        },
+        "badge_healing": {
+          "file": "art/combat/recruits/layers/owl/badge_healing.webp",
+          "source_file": "owl/badge_healing.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "7562068f760e304aecb414791bba5f48d625ecf2e34aff09b04e91dc9d9e0ce5",
+          "source_sha256": "0bf77baaaf8193d1d6d95dce179bb651f22be7ff2f419e608db9e2bd82dc0d33",
+          "bbox": [
+            359,
+            229,
+            403,
+            260
+          ]
+        },
+        "badge_ranged": {
+          "file": "art/combat/recruits/layers/owl/badge_ranged.webp",
+          "source_file": "owl/badge_ranged.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "df9907fe4fd0d035cf3ded23018062f4fabfd794eff355bb4c0a4b147b60d23c",
+          "source_sha256": "5732b9906aea43554e19f12e44b48d0002bfdbe981cf4781c71c803d18e6400d",
+          "bbox": [
+            359,
+            229,
+            403,
+            260
+          ]
+        },
+        "badge_chemistry": {
+          "file": "art/combat/recruits/layers/owl/badge_chemistry.webp",
+          "source_file": "owl/badge_chemistry.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "677d241fa5d9218a77966d86a14e288328c16fe96f8fc8bbb19d10a26ece78fa",
+          "source_sha256": "517b850fef233ac6d677852bda81dea37877c14a9230182ab508cb5c2f87ed12",
+          "bbox": [
+            359,
+            229,
+            403,
+            260
+          ]
+        }
+      },
+      "combinations": [
+        {
+          "base": "base_a",
+          "cloth_tint": "#c98a4b",
+          "scarf_tint": "#86c98f",
+          "accessories": [],
+          "badge": "protection",
+          "index": 1
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#8fb4f0",
+          "scarf_tint": "#b7a6f4",
+          "accessories": [
+            "scarf"
+          ],
+          "badge": "healing",
+          "index": 2
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#86c98f",
+          "scarf_tint": "#d55e00",
+          "accessories": [
+            "bag"
+          ],
+          "badge": "ranged",
+          "index": 3
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#b7a6f4",
+          "scarf_tint": "#a69a84",
+          "accessories": [
+            "cap"
+          ],
+          "badge": "chemistry",
+          "index": 4
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#d55e00",
+          "scarf_tint": "#c98a4b",
+          "accessories": [
+            "scarf",
+            "bag"
+          ],
+          "badge": "protection",
+          "index": 5
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#a69a84",
+          "scarf_tint": "#8fb4f0",
+          "accessories": [
+            "scarf",
+            "bag",
+            "cap"
+          ],
+          "badge": "healing",
+          "index": 6
+        }
+      ]
+    },
+    {
+      "name": "raccoon",
+      "label": "Guaxinim",
+      "id": "raccoon_recruit_01",
+      "class_id": "rato",
+      "reference": "art/combat/recruits/raccoon_recruit_01/idle.webp",
+      "reference_sha256": "12aa5fff94371d7fe3e120fb4f040dd7a4a8798cd49067c012628d9117c01674",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "canonical_anchor": [
+        601.5,
+        1184
+      ],
+      "texture_anchor": [
+        300.75,
+        592.0
+      ],
+      "body_reference_pixels": 999,
+      "draw_order": [
+        "bag",
+        "base",
+        "clothes",
+        "scarf",
+        "cap",
+        "badge"
+      ],
+      "assets": {
+        "base_a": {
+          "file": "art/combat/recruits/layers/raccoon/base_a.webp",
+          "source_file": "raccoon/base_a.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "992e073c518e192a8d435d2b6cb8a1d871f4f0d178722881513348cee291d6c7",
+          "source_sha256": "214dca0f86a449a17ab1a13b1316b4efa85312edfcf5d67e665a3aff695e14c9",
+          "bbox": [
+            93,
+            93,
+            512,
+            593
+          ]
+        },
+        "base_b": {
+          "file": "art/combat/recruits/layers/raccoon/base_b.webp",
+          "source_file": "raccoon/base_b.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "37339370aa8f97357e63487f884363887f2cda11b7c7b258e0e8c3fb8de3bad9",
+          "source_sha256": "1be94cf57a06f3a37908be8e66b2336aebcd68c103505b8b15ddbb2e3f0b11d8",
+          "bbox": [
+            92,
+            93,
+            512,
+            593
+          ]
+        },
+        "clothes": {
+          "file": "art/combat/recruits/layers/raccoon/clothes.webp",
+          "source_file": "raccoon/clothes.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "165d3349a5397130d75b26cd13b2e845874edabbe94b4902ce25cfa6d53f78be",
+          "source_sha256": "ef8030ee2efbc4e7d36ab95ff5848fb652f563fce6be5ea9e18185ff70ec8e37",
+          "bbox": [
+            168,
+            190,
+            491,
+            528
+          ]
+        },
+        "scarf": {
+          "file": "art/combat/recruits/layers/raccoon/scarf.webp",
+          "source_file": "raccoon/scarf.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "a321ef4c08e53cd99b63570627c7b67a5fcd28d7343ea073829d6f86d3c1c7bc",
+          "source_sha256": "ccfec4f9d4dea8bb296170f08801dfc625277560ffef0533b6aec27251c1ab7f",
+          "bbox": [
+            313,
+            202,
+            396,
+            283
+          ]
+        },
+        "bag": {
+          "file": "art/combat/recruits/layers/raccoon/bag.webp",
+          "source_file": "raccoon/bag.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "5d9c0aec761d5b5192aed39e846697361bd8dd9cbdfb66c5de32fc6a27a5df34",
+          "source_sha256": "c17ddea3ae433e402c0efa4edc9cc80d754ecba22f4e90f221801f5ed7d2a15f",
+          "bbox": [
+            135,
+            219,
+            280,
+            367
+          ]
+        },
+        "cap": {
+          "file": "art/combat/recruits/layers/raccoon/cap.webp",
+          "source_file": "raccoon/cap.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "118107d4f5782e3068cc4116befc42760d18738516c78185742db6cca38ff608",
+          "source_sha256": "bd9cddb73a630002a339a0c5f7de25175c8cb3317e5d1cd45a835be5ee496307",
+          "bbox": [
+            330,
+            80,
+            426,
+            157
+          ]
+        },
+        "badge_protection": {
+          "file": "art/combat/recruits/layers/raccoon/badge_protection.webp",
+          "source_file": "raccoon/badge_protection.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "b1c2834e81eecfdf2eed1014b7192fc8b2f966aacdb9aff78f8964d752c207ef",
+          "source_sha256": "bfee48a265c7bf3190c249bb639e0756aca879b458483d1669c831439a14e207",
+          "bbox": [
+            351,
+            274,
+            392,
+            303
+          ]
+        },
+        "badge_healing": {
+          "file": "art/combat/recruits/layers/raccoon/badge_healing.webp",
+          "source_file": "raccoon/badge_healing.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "357aa219981d35819b18e238358cce2549aba7cd3a00e73ffa09cdc4f1e58878",
+          "source_sha256": "1ac9f80b0e77139857bc4da116ba489ce66464e962c3d40c3343bd1cbe94ee3e",
+          "bbox": [
+            351,
+            274,
+            392,
+            303
+          ]
+        },
+        "badge_ranged": {
+          "file": "art/combat/recruits/layers/raccoon/badge_ranged.webp",
+          "source_file": "raccoon/badge_ranged.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "5f0332c6d70f0437420857902dcf448eaac044e926ac06ea9da167a814f0d753",
+          "source_sha256": "ee0bcc77c2bdee47418a9f2336ee932d441ebbb70c97c0dc1849fd44ef8a0eda",
+          "bbox": [
+            351,
+            274,
+            392,
+            303
+          ]
+        },
+        "badge_chemistry": {
+          "file": "art/combat/recruits/layers/raccoon/badge_chemistry.webp",
+          "source_file": "raccoon/badge_chemistry.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "56bdeaf6497eac564927e864947f3f5ff16443b8de9a413f4a685b80530c878d",
+          "source_sha256": "e61c4229c86fbf5ca32a138cad1518a5347c40713c462a8103ae2186bc0571ba",
+          "bbox": [
+            351,
+            274,
+            392,
+            303
+          ]
+        }
+      },
+      "combinations": [
+        {
+          "base": "base_a",
+          "cloth_tint": "#c98a4b",
+          "scarf_tint": "#86c98f",
+          "accessories": [],
+          "badge": "protection",
+          "index": 1
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#8fb4f0",
+          "scarf_tint": "#b7a6f4",
+          "accessories": [
+            "scarf"
+          ],
+          "badge": "healing",
+          "index": 2
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#86c98f",
+          "scarf_tint": "#d55e00",
+          "accessories": [
+            "bag"
+          ],
+          "badge": "ranged",
+          "index": 3
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#b7a6f4",
+          "scarf_tint": "#a69a84",
+          "accessories": [
+            "cap"
+          ],
+          "badge": "chemistry",
+          "index": 4
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#d55e00",
+          "scarf_tint": "#c98a4b",
+          "accessories": [
+            "scarf",
+            "bag"
+          ],
+          "badge": "protection",
+          "index": 5
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#a69a84",
+          "scarf_tint": "#8fb4f0",
+          "accessories": [
+            "scarf",
+            "bag",
+            "cap"
+          ],
+          "badge": "healing",
+          "index": 6
+        }
+      ]
+    },
+    {
+      "name": "armadillo",
+      "label": "Tatu",
+      "id": "armadillo_recruit_01",
+      "class_id": "tatu",
+      "reference": "art/combat/recruits/armadillo_recruit_01/idle.webp",
+      "reference_sha256": "dc443043f43b13fe4e04609b8af7942c5e07c96a64dbabf6614048b2d7035836",
+      "size": [
+        589,
+        668
+      ],
+      "source_canvas": [
+        1178,
+        1335
+      ],
+      "canonical_anchor": [
+        601.0,
+        1087
+      ],
+      "texture_anchor": [
+        300.5,
+        543.5
+      ],
+      "body_reference_pixels": 807,
+      "draw_order": [
+        "bag",
+        "base",
+        "clothes",
+        "scarf",
+        "cap",
+        "badge"
+      ],
+      "assets": {
+        "base_a": {
+          "file": "art/combat/recruits/layers/armadillo/base_a.webp",
+          "source_file": "armadillo/base_a.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "1558aad3f5488a9ca0b4f173d290b8d67486ecb8c8df15d622d6ef56325f97a8",
+          "source_sha256": "83da04c32bfaf8a45939b0a59a0bafcf4d9729be0d0a4cce9c5bf66a53123a19",
+          "bbox": [
+            87,
+            140,
+            519,
+            544
+          ]
+        },
+        "base_b": {
+          "file": "art/combat/recruits/layers/armadillo/base_b.webp",
+          "source_file": "armadillo/base_b.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "babb2ba5443ad40197993d5047980b67aff706d939bd0111ab3934374de72e4d",
+          "source_sha256": "12e27fd1a89b84339a5ab6c6623548755c2312ec44bf72bacf8624f3385d0a45",
+          "bbox": [
+            80,
+            140,
+            513,
+            544
+          ]
+        },
+        "clothes": {
+          "file": "art/combat/recruits/layers/armadillo/clothes.webp",
+          "source_file": "armadillo/clothes.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "c82649416839e85e4631b6dced558c938714861a231335abe176a0b7565f3a79",
+          "source_sha256": "495bccd216c8a22cbe69c35f47b79e54b17ea3c0a33bcaf27fac4aa3cf0ff6ff",
+          "bbox": [
+            133,
+            150,
+            401,
+            487
+          ]
+        },
+        "scarf": {
+          "file": "art/combat/recruits/layers/armadillo/scarf.webp",
+          "source_file": "armadillo/scarf.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "5cfdfdf9f223958e29cc1c4a29a9fa315e73ff7a91d6cfc6fc7673608e17a862",
+          "source_sha256": "014d792d066cbc3bd020b8f3e07bc4ce3d801f42709f3f27bb748c1205447474",
+          "bbox": [
+            330,
+            214,
+            392,
+            248
+          ]
+        },
+        "bag": {
+          "file": "art/combat/recruits/layers/armadillo/bag.webp",
+          "source_file": "armadillo/bag.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "f1943e565e0dca42132bff42e8c064c248965fdc6d4a6b3e64e5208d42bd52ca",
+          "source_sha256": "f4aae72850d14b2570fd45b956f6cc04d386ed7a39ec83cb7a057206ef9499a3",
+          "bbox": [
+            126,
+            200,
+            249,
+            326
+          ]
+        },
+        "cap": {
+          "file": "art/combat/recruits/layers/armadillo/cap.webp",
+          "source_file": "armadillo/cap.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": true,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "d149b66cfcce0792783dc1989905b26b69672b059bde7f205dd41c1c4af8e897",
+          "source_sha256": "8b1ee35d2014b1fd30fff5b00f6e24081c79ea7b9499540d7a87e85206fa997d",
+          "bbox": [
+            345,
+            136,
+            417,
+            194
+          ]
+        },
+        "badge_protection": {
+          "file": "art/combat/recruits/layers/armadillo/badge_protection.webp",
+          "source_file": "armadillo/badge_protection.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "fa47d505964d50eef985976bedbd8170df97c16c0b0d251cd7d978be103c2ec7",
+          "source_sha256": "1ada197a9c13a19aac502352fef1366b796c1e7f89b8541325ec01edb2b024ce",
+          "bbox": [
+            233,
+            222,
+            279,
+            253
+          ]
+        },
+        "badge_healing": {
+          "file": "art/combat/recruits/layers/armadillo/badge_healing.webp",
+          "source_file": "armadillo/badge_healing.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "f06df131162d40f7418a9a6496aa75a2638b8f343d6b5b45d763fe136a0cf4f8",
+          "source_sha256": "1d9a21f31ef40724b3791a4286fb9ace2ddf3d8cb86d2d7dbd3bc25ca7b254a8",
+          "bbox": [
+            233,
+            222,
+            279,
+            253
+          ]
+        },
+        "badge_ranged": {
+          "file": "art/combat/recruits/layers/armadillo/badge_ranged.webp",
+          "source_file": "armadillo/badge_ranged.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "9c005b06ce5243530ed0c61169b848788b297eb76cf41e1e4a4ae53c107643a9",
+          "source_sha256": "f734570054d4a02511d2826e07b2b43c5a473e33198e1337eba6c661d4759ad9",
+          "bbox": [
+            233,
+            222,
+            279,
+            253
+          ]
+        },
+        "badge_chemistry": {
+          "file": "art/combat/recruits/layers/armadillo/badge_chemistry.webp",
+          "source_file": "armadillo/badge_chemistry.png",
+          "size": [
+            589,
+            668
+          ],
+          "tintable": false,
+          "frame_origin": [
+            0,
+            0
+          ],
+          "sha256": "4fe46c9b911a71b3c0aa596b37d8b90c7a61a810790d6cf9c3ab7c3912706fe6",
+          "source_sha256": "29a2e239c704b9b7e4bee48c0efc7035e2940b497c7f30e6cd2987188c27b89d",
+          "bbox": [
+            233,
+            222,
+            279,
+            253
+          ]
+        }
+      },
+      "combinations": [
+        {
+          "base": "base_a",
+          "cloth_tint": "#c98a4b",
+          "scarf_tint": "#86c98f",
+          "accessories": [],
+          "badge": "protection",
+          "index": 1
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#8fb4f0",
+          "scarf_tint": "#b7a6f4",
+          "accessories": [
+            "scarf"
+          ],
+          "badge": "healing",
+          "index": 2
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#86c98f",
+          "scarf_tint": "#d55e00",
+          "accessories": [
+            "bag"
+          ],
+          "badge": "ranged",
+          "index": 3
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#b7a6f4",
+          "scarf_tint": "#a69a84",
+          "accessories": [
+            "cap"
+          ],
+          "badge": "chemistry",
+          "index": 4
+        },
+        {
+          "base": "base_a",
+          "cloth_tint": "#d55e00",
+          "scarf_tint": "#c98a4b",
+          "accessories": [
+            "scarf",
+            "bag"
+          ],
+          "badge": "protection",
+          "index": 5
+        },
+        {
+          "base": "base_b",
+          "cloth_tint": "#a69a84",
+          "scarf_tint": "#8fb4f0",
+          "accessories": [
+            "scarf",
+            "bag",
+            "cap"
+          ],
+          "badge": "healing",
+          "index": 6
+        }
+      ]
+    }
+  ]
+}

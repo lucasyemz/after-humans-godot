@@ -21,6 +21,11 @@ func run(context) -> void:
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-keyboard-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(41)
+	# O trem da volta (#122) é sorteado: aqui ele traz sempre o próximo civil da fila (o test_train_recruits sorteia).
+	var train_rule: Dictionary = GameData.table("recruitment").get("train", {})
+	var train_before := train_rule.duplicate()
+	train_rule.Chance = 100
+	train_rule.CivilianShare = 100
 	await _station()
 	await _street()
 	await _return()
@@ -34,6 +39,7 @@ func run(context) -> void:
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
 	AHBriefing.enabled = briefing
+	train_rule.merge(train_before, true)
 
 
 func _station() -> void:
@@ -60,12 +66,12 @@ func _station() -> void:
 	t.equal(hud.current, "", "Voltar fecha o cômodo")
 	# Só com as setas: Menu e ↓ descem da coluna da esquerda até o botão principal; Voltar devolve aos cômodos.
 	await _send("menu")
-	t.check(await _walk_to("Preparar expedição", 12), "↓ desce da coluna da esquerda até PREPARAR EXPEDIÇÃO")
+	t.check(await _walk_to("Ir ao mapa", 12), "↓ desce da coluna da esquerda até IR AO MAPA")
 	await _send("cancel")
 	t.equal(_focus(), null, "e Voltar devolve as setas aos cômodos")
-	# Preparar expedição pelo botão principal (o foco nele, como o mouse): o mapa, a fase, a Preparação e Voltar.
+	# IR AO MAPA pelo botão principal (o foco nele, como o mouse): o mapa, o lugar, a plataforma e Voltar (#123).
 	var prepare: Button = hud.find_child("Prepare", true, false)
-	if not t.check(prepare != null and prepare.text.begins_with("PREPARAR EXPEDIÇÃO"), "o botão principal é PREPARAR EXPEDIÇÃO"):
+	if not t.check(prepare != null and prepare.text.begins_with("IR AO MAPA"), "o botão principal é IR AO MAPA"):
 		return
 	prepare.grab_focus()
 	await _send("interact")
@@ -81,27 +87,36 @@ func _station() -> void:
 	t.check(not hud._map.visible, "Voltar fecha o mapa")
 	hud.open_map()
 	await _frames(2)
-	var go := _find(hud._map, "Preparar expedição")
+	var go := _find(hud._map, "PREPARAR NESTE LUGAR")
 	if go != null:
 		go.grab_focus()
+	# O briefing do lugar (#88) fica de fora aqui (o test_briefing cuida dele).
+	hud._briefed = hud._map.selected
 	await _send("ui_accept")
-	t.check(hud.current == S.PREPARATION and hud._prep != null and hud._prep.visible, "Enter (A) prepara a fase escolhida")
+	t.check(hud.current == "departure" and hud._departure != null and hud._departure.visible, "Enter (A) leva a equipe para a plataforma")
 	await _frames(2)
-	t.check(_inside(hud._prep), "o foco está na Preparação")
+	t.check(_inside(hud._departure), "o foco está na plataforma")
+	t.check(_focus() is Button and String((_focus() as Button).name).begins_with("Slot"), "a plataforma começa numa carta da equipe")
 	for step in ["ui_down", "ui_right", "ui_down", "ui_left", "ui_up"]:
 		await _send(step)
-		t.check(_inside(hud._prep), "a Preparação mantém o foco com %s" % step)
-	t.check(_focus() is Button and (_focus() as Button).text == "", "a Preparação começa num cartão da equipe, não no Vista geral")
+		t.check(_inside(hud._departure), "a plataforma mantém o foco com %s" % step)
 	# O "+" da comida até o máximo: quando ele desliga, o foco fica por perto e o E nunca faz partir.
-	var plus := _find(hud._prep, "+")
-	if t.check(plus != null, "a Preparação tem o + da comida"):
+	var plus := _find(hud._departure, "+")
+	if t.check(plus != null, "a plataforma tem o + da comida"):
 		plus.grab_focus()
 		for i in 8:
 			await _send("interact")
 			t.check(Campaign.state.session.expedition == null and not GameFlow.busy, "E no + (%d) não parte" % (i + 1))
-			t.check(not (_focus() is Button and (_focus() as Button).text.begins_with("Partir")), "e o foco não cai no Partir")
+			t.check(not hud._departure.confirm_open(), "e não abre a confirmação (%d)" % (i + 1))
+	# G (X) abre a confirmação; Voltar fecha só ela.
+	await _send("station_prepare")
+	t.check(hud._departure.confirm_open() and _inside(hud._departure._confirm), "G abre a confirmação, com o foco nela")
 	await _send("cancel")
-	t.equal(hud.current, "", "Voltar fecha a Preparação")
+	t.check(hud.current == "departure" and not hud._departure.confirm_open(), "Voltar fecha a confirmação e fica na plataforma")
+	await _send("cancel")
+	t.check(hud._map.visible and hud._map.selected != "", "Voltar na plataforma volta ao mapa, com o lugar escolhido")
+	await _send("cancel")
+	t.check(not hud._map.visible and hud.current == "", "e Voltar no mapa volta à vista geral")
 	# As Opções pela engrenagem do alto; Interagir liga o daltonismo; Voltar fecha.
 	var gear: Button = hud.find_child("Options", true, false)
 	if t.check(gear != null, "a engrenagem das Opções no alto"):
@@ -263,6 +278,16 @@ func _return() -> void:
 		await _frames(3)
 		if step[1] != "":
 			t.equal(hud.current, step[1], "%s leva ao %s" % [step[0], step[1]])
+		# A cena da noite (#132): Interagir pula para o amanhecer.
+		if step[0] == "Iniciar descanso":
+			t.check(hud.night_scene_open(), "Iniciar descanso abre a cena da noite")
+			await _send("interact")
+			await _frames(3)
+			t.check(not hud.night_scene_open() and _focus() is BaseButton, "Interagir pula a noite, e o foco fica no amanhecer")
+			# O amanhecer recém-aberto pelo pulo ignora Interagir por um instante (o segundo toque de quem pula).
+			var night_guard := Time.get_ticks_msec() + AHRefugeHud.REPORT_GUARD_MS + 50
+			while Time.get_ticks_msec() < night_guard:
+				await _frames(1)
 	t.equal(c.night.phase, "none", "a noite passou só com o teclado")
 	if S.visit_pending(c):
 		await _frames(3)

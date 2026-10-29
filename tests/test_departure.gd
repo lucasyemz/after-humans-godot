@@ -40,10 +40,13 @@ func run(context) -> void:
 ## Uma campanha com os quatro fundadores e dois recrutas (um cão e um gato).
 func _campaign() -> Dictionary:
 	var c: Dictionary = Campaign.create_initial(31)
+	# O Alojamento ampliado (#119): cabem os recrutas.
+	c.station.rooms[AHStationRules.CHARACTERS] = 4
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 31
+	# Quatro recrutas direto no elenco, como num save antigo (o recrutamento não repete rosto, #182).
 	for class_id in ["cao", "gato", "cao", "gato"]:
-		AHStationRules.recruit(c, class_id, rng, "Teste")
+		AHStationRules._add_hero(c, AHStationRules._next_hero_id(c, class_id), class_id, "Teste", [], "")
 	return c
 
 
@@ -139,10 +142,8 @@ func _departure(skip: String) -> void:
 	var team: Array = c.roster.slice(0, 3).map(func(h): return h.id)
 	team.append(c.roster[4].id)
 	station.hud._draft = {"phase": "fase_1", "team": team, "focus": "", "extra": 0}
+	# O briefing (#88) abre na chegada à plataforma (test_briefing); a confirmação parte direto.
 	station.hud._depart()
-	# O briefing (#88, conferido em test_briefing): pulado, a partida segue.
-	if t.check(station.hud.briefing_open(), "o briefing abre antes da partida"):
-		station.hud.briefing.skip()
 	while GameFlow.passage == null:
 		await _tree.process_frame
 	var card: AHPassageCard = GameFlow.passage

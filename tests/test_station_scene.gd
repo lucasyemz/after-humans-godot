@@ -12,6 +12,10 @@ func run(t) -> void:
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-station-scene-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(21)
+	# O rato tem arte desde a #187: aqui o recruta desenhado dele sai do manifesto, para ele seguir sem arte de luta.
+	S.art_variants("rato")
+	var recruit_art: Dictionary = S._recruit_art.duplicate(true)
+	S._recruit_art.erase("raccoon_recruit_01")
 	var counts: Array = []
 	for visit in 3:
 		var station = await _open(tree)
@@ -63,23 +67,27 @@ func run(t) -> void:
 			S.decide_candidate(c, c.station.train.candidate_id, false)
 			S.finish_departure(c)
 		t.equal(S.preparation_block(c), "", "a Estação fica livre para partir")
-		# Um fundador caído e o Risco (sem arte de combate) na Estação: a Preparação escala quem pode ir.
+		# Um fundador caído e o Risco (sem arte de combate) na Estação: a plataforma escala quem pode ir (#123).
 		c.unlocked_classes.append("rato")
 		var risco: String = S.recruit(c, "rato", RandomNumberGenerator.new(), "Risco").hero_id
 		var rex: String = S.recruit(c, "cao", RandomNumberGenerator.new(), "Rex").hero_id
 		S.hero(c, "hero_cao_bento").alive = false
-		station.hud._draft = {}
-		station.hud.open_room(S.PREPARATION)
-		t.check(not station.hud._draft.team.has(risco) and station.hud._draft.team.has(rex), "a Preparação escala o Rex no lugar do Bento, não o Risco")
-		station.hud._depart()
-		station.hud._depart()
-		await tree.process_frame
-		# O briefing (#88) abre uma vez só; pulado, a equipe parte.
-		t.equal(tree.root.find_children("Briefing", "AHBriefingDialog", true, false).size(), 1, "Partir clicado duas vezes abre um briefing só")
+		# A equipe só sobe para a plataforma com o trem parado (#122).
+		var end := Time.get_ticks_msec() + 30000
+		while station.train_busy() and Time.get_ticks_msec() < end:
+			await tree.process_frame
+		# O debriefing da volta (#88) abriu na espera: fechado, como o jogador faria.
 		if station.hud.briefing_open():
 			station.hud.briefing.skip()
+			await tree.process_frame
+		station.hud._draft = {}
+		station.hud.open_departure()
+		station.hud._briefed = station.hud._draft.phase
+		t.check(not station.hud._draft.team.has(risco) and station.hud._draft.team.has(rex), "a plataforma escala o Rex no lugar do Bento, não o Risco")
+		station.hud._depart()
+		station.hud._depart()
 		await tree.process_frame
-		t.check(c.session.expedition != null, "Partir clicado duas vezes parte")
+		t.check(c.session.expedition != null, "Iniciar clicado duas vezes parte")
 		var id: String = c.session.expedition.id if c.session.expedition != null else ""
 		while GameFlow.busy:
 			await tree.process_frame
@@ -91,6 +99,7 @@ func run(t) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Campaign.save_dir))
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+	S._recruit_art = recruit_art
 
 
 func _open(tree: SceneTree):

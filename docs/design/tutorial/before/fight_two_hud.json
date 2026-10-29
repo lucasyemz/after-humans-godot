@@ -1,0 +1,259 @@
+{
+ "actor": "unit_hero_cao_bento",
+ "name": "fight_two",
+ "texts": [
+  {
+   "text": "Bento",
+   "rect": [
+    765.92333984375,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "Íris",
+   "rect": [
+    478.576721191406,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "Véspera",
+   "rect": [
+    192.43719482421898,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "Rastreador Quadrúpede",
+   "rect": [
+    1239.91931152344,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "Emissor de Comando",
+   "rect": [
+    1557.13293457031,
+    720,
+    160,
+    22
+   ]
+  },
+  {
+   "text": "RODADA 1",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Bento · agora",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Rastreador",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Véspera",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Íris",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Emissor",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Punho de Sucata",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "5–8",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Impacto Hidráulico",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "2–4",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Fique Atrás de Mim",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "Não Estamos Sós",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "text": "",
+   "rect": [
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ ],
+ "units": [
+  {
+   "block": 0,
+   "class_id": "cao",
+   "dodge": 0,
+   "enemy_id": "",
+   "guard": 0,
+   "hp": 34,
+   "id": "unit_hero_cao_bento",
+   "instinct": 0,
+   "max_hp": 34,
+   "name": "Bento",
+   "player": true,
+   "rank": 1,
+   "speed": 2,
+   "stun": 0
+  },
+  {
+   "block": 0,
+   "class_id": "sapo",
+   "dodge": 0,
+   "enemy_id": "",
+   "guard": 0,
+   "hp": 23,
+   "id": "unit_hero_sapo_iris",
+   "instinct": 0,
+   "max_hp": 23,
+   "name": "Íris",
+   "player": true,
+   "rank": 2,
+   "speed": 4,
+   "stun": 0
+  },
+  {
+   "block": 0,
+   "class_id": "coruja",
+   "dodge": 0,
+   "enemy_id": "",
+   "guard": 0,
+   "hp": 30,
+   "id": "unit_hero_coruja_vespera",
+   "instinct": 0,
+   "max_hp": 30,
+   "name": "Véspera",
+   "player": true,
+   "rank": 3,
+   "speed": 2,
+   "stun": 0
+  },
+  {
+   "block": 0,
+   "class_id": "",
+   "dodge": 0,
+   "enemy_id": "cao_eco",
+   "guard": 0,
+   "hp": 10,
+   "id": "corridor_2885921763_2_0_cao_eco",
+   "instinct": 0,
+   "max_hp": 10,
+   "name": "Rastreador Quadrúpede",
+   "player": false,
+   "rank": 1,
+   "speed": 4,
+   "stun": 0
+  },
+  {
+   "block": 0,
+   "class_id": "",
+   "dodge": 0,
+   "enemy_id": "sussurrador",
+   "guard": 0,
+   "hp": 8,
+   "id": "corridor_2885921763_2_1_sussurrador",
+   "instinct": 0,
+   "max_hp": 8,
+   "name": "Emissor de Comando",
+   "player": false,
+   "rank": 2,
+   "speed": 3,
+   "stun": 0
+  }
+ ]
+}

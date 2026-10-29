@@ -1,0 +1,29 @@
+[
+  {
+    "Name": "train",
+    "Chance": 40,
+    "ChanceStep": 15,
+    "ChanceMax": 90,
+    "CivilianShare": 50,
+    "SingleWeight": 60,
+    "PairWeight": 15,
+    "Description": "Proposta (#122): na volta de cada expedição, a chance (em %) de o trem trazer alguém. Sobe ChanceStep a cada volta sem ninguém, até ChanceMax, e volta à base quando alguém chega. Com a fila dos civis e uma classe liberada, CivilianShare é a parte dos civis. Proposta (#182): quando vem um animal, SingleWeight e PairWeight são os pesos de vir um ou dois (o segundo só com lugar para os dois no Alojamento e um rosto livre; cada um é decidido à parte). O Mercador (peso 25 na proposta) entra depois da decisão do Lucas."
+  },
+  {
+    "Name": "recruit",
+    "Cost": 10,
+    "Description": "Proposta (#122): o que um animal do trem pede para ficar, em sementes (o preço do + RECRUTAR de antes). Vem de graça enquanto o elenco não fecha uma equipe de quatro, como o voluntário."
+  },
+  {"Name": "origin_cao_1", "ClassId": "cao", "Text": "Patrulhava uma linha alagada com a matilha; a última cheia levou o posto, e seguiu os trilhos até aqui."},
+  {"Name": "origin_cao_2", "ClassId": "cao", "Text": "Guardava uma sentinela que ninguém mais vinha render. Ouviu que a Estação Raiz ainda cuida dos seus."},
+  {"Name": "origin_gato_1", "ClassId": "gato", "Text": "Vivia nos telhados das Galerias; quando a passarela caiu, desceu pela primeira vez até os trilhos."},
+  {"Name": "origin_gato_2", "ClassId": "gato", "Text": "Conhece três rotas que ninguém usa. Procura uma quarta: a que volta com comida."},
+  {"Name": "origin_sapo_1", "ClassId": "sapo", "Text": "Cresceu entre as cisternas do Bairro Submerso; a água ficou turva demais até para quem nasceu ali."},
+  {"Name": "origin_sapo_2", "ClassId": "sapo", "Text": "Traz uma bolsa de ampolas vazias e uma pergunta: a Estação ainda filtra a própria água?"},
+  {"Name": "origin_coruja_1", "ClassId": "coruja", "Text": "Vigiava uma torre de antenas; viu a luz da Estação de longe e esperou o trem passar."},
+  {"Name": "origin_coruja_2", "ClassId": "coruja", "Text": "Desceu das passarelas altas depois de três noites sem ver outra luz acesa."},
+  {"Name": "origin_rato_1", "ClassId": "rato", "Text": "Conserta filtros e máscaras desde filhote, nos corredores de manutenção; as peças acabaram."},
+  {"Name": "origin_rato_2", "ClassId": "rato", "Text": "O túnel técnico onde morava inundou. Trouxe só as ferramentas."},
+  {"Name": "origin_tatu_1", "ClassId": "tatu", "Text": "Abria caminho nos desabamentos das galerias de baixo; procura um grupo que precise de passagem."},
+  {"Name": "origin_tatu_2", "ClassId": "tatu", "Text": "Cavou até a linha do trem quando o abrigo cedeu."}
+]

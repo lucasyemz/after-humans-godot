@@ -12,6 +12,10 @@ extends Node3D
 const FIRE := Vector3(180, 40, 0)
 # O corredor de 10 trechos começa em X 0 e tem 78 m (AHStreetCorridor).
 const CORRIDOR_LENGTH := 78.0
+## Quanto do sol fica sob teto (#175), sem sombra: só para a equipe não sumir no escuro.
+const COVERED_SUN := 0.3
+## Numa zona coberta, quanto o quadro mostra além da ponta (m): a equipe inteira na tela, e lá as colunas da ponta.
+const COVERED_EDGE_REACH := 1.5
 const WEATHER_NAMES := {"clear": "céu limpo", "sunset": "fim de tarde", "rain": "chuva", "storm": "tempestade", "mist": "névoa",
 	"fog": "neblina", "night": "noite", "nightRain": "noite de chuva"}
 const PARTY_SPACING := 1.15
@@ -25,6 +29,15 @@ const COMBAT_FEET_LINE := 0.4
 ## A câmera dos cenários: inclinação (quase reta) e meio campo de visão na horizontal, em graus.
 const SCENARIO_PITCH := 0.5
 const SCENARIO_HALF_FOV := 15.0
+## A câmera da exploração (#129), num lugar só: a distância até a equipe e a altura do alvo sobre o piso (m), na rua,
+## nos cenários e dentro das lojas. Uns 17% mais perto que antes (18,5, 19 e 11 m); o alvo desce junto, para os pés
+## ficarem acima das plaquinhas da equipe. A Ponte das Raízes (antes 28 m e 2,7 m) usa a dos outros cenários (#140).
+## A barra de Admin ainda aproxima ou afasta.
+const EXPLORE_CAMERA := {
+	"street": {"distance": 15.4, "height": 1.7},
+	"scenario": {"distance": 15.8, "height": 1.45},
+	"indoor": {"distance": 9.2, "height": 1.45},
+}
 ## O preenchimento da luta nos cenários: energia no fim de tarde e quanto soma de noite e na chuva.
 const COMBAT_FILL := 0.3
 const COMBAT_FILL_NIGHT := 0.35
@@ -88,8 +101,15 @@ var _camera: Camera3D
 var _post: ShaderMaterial
 var _hud_stats: Label
 var _hud_weather: Label
-var _dev_overlay: Control
 var _dust: CPUParticles3D
+## A ambiência do lugar (#153, AHAmbience): o perfil, as folhas que caem e os respiros de vapor.
+var ambience := {}
+var _leaves: CPUParticles3D
+const DUST_AMOUNT := 220
+const LEAVES_AMOUNT := 26
+const STEAM_AMOUNT := 14
+const EMBERS_AMOUNT := 40
+var _steam: Array[CPUParticles3D] = []
 
 var _leader: CharacterBody3D
 ## Heróis da equipe (a equipe viva da expedição) e as placas deles, na mesma ordem.
@@ -200,7 +220,7 @@ func _ready() -> void:
 	occlusion.scan.call_deferred(_dynamic)
 	for card in _heroes:
 		occlusion.track(card)
-	if scenario and ["FloodedDepot", "SewerDucts"].has(scenario.map_name):
+	if scenario and ["FloodedDepot", "SewerDucts", "ContainmentCorridor"].has(scenario.map_name):
 		# Lanterna de mão no Depósito e nos Dutos (a da Unreal: 160 lm, 10 m, presa ao líder, um pouco à frente).
 		var lantern := OmniLight3D.new()
 		lantern.position = Vector3(0, 0.8, 0.5)
@@ -225,13 +245,16 @@ func _ready() -> void:
 	add_child(_fill_light)
 	_build_camera()
 	_build_post_and_hud()
+	_build_ambience()
 	_arena = AHCombatArena.new()
 	add_child(_arena)
 	_arena.setup(self)
 	_apply_graphics()
 	Settings.changed.connect(func():
 		_apply_graphics()
-		_apply_weather())
+		_apply_weather()
+		if scenario:
+			scenario.refresh_water_pace())
 	_apply_weather()
 	exploration_hud = AHExplorationHud.new()
 	_street_hud.add_child(exploration_hud)
@@ -258,8 +281,8 @@ func _apply_graphics() -> void:
 	var fx := Settings.effects()
 	_env.ssao_enabled = _forward_plus and fx.ssao
 	_env.volumetric_fog_enabled = _forward_plus and fx.volumetric_fog
-	_env.ssr_enabled = _forward_plus and _raining and fx.ssr
-	_sun.shadow_enabled = fx.shadows
+	_env.ssr_enabled = _forward_plus and (_raining or _site_light().get("ssr", false)) and fx.ssr
+	_sun.shadow_enabled = fx.shadows and not (_indoor or sheltered)
 	Settings.apply_lamp_shadows()
 	_rain.amount_ratio = fx.rain_scale
 	_splashes.amount_ratio = fx.rain_scale
@@ -319,7 +342,9 @@ func set_scenario_zone(index: int) -> void:
 	var edge: float = scenario.front_edge(index, lane_z) + 0.04
 	for card in _heroes:
 		card.set_silhouette_foot(maxf(AHSpriteCard.SILHOUETTE_FOOT, edge))
-	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot"].has(scenario.map_name)
+	sheltered = index > 0 or ["SewerDucts", "SealedShelter", "FloodedDepot", "ContainmentCorridor"].has(scenario.map_name)
+	if sheltered:
+		scenario.close_zone_ends(index)
 	_apply_weather()
 
 
@@ -408,10 +433,58 @@ func _build_environment() -> void:
 	add_child(_sun)
 
 
+## O perfil de ambiência do lugar (#153): os respiros de vapor ficam no mundo; a cor, a névoa, o glow e as partículas
+## acompanham o clima e a qualidade em _apply_ambience.
+func _build_ambience() -> void:
+	ambience = AHAmbience.profile(ambience_id())
+	for steam in _steam:
+		steam.queue_free()
+	_steam.clear()
+	for point in ambience.get("steam", []):
+		var vent := CPUParticles3D.new()
+		vent.name = "Steam"
+		vent.position = Vector3(float(point[0]), float(point[1]), float(point[2]))
+		vent.amount = STEAM_AMOUNT
+		vent.lifetime = 4.5
+		vent.preprocess = 4.5
+		vent.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+		vent.emission_sphere_radius = 0.15
+		vent.direction = Vector3(0.15, 1, 0)
+		vent.spread = 12.0
+		vent.gravity = Vector3(0.08, 0.12, 0)
+		vent.initial_velocity_min = 0.25
+		vent.initial_velocity_max = 0.45
+		vent.scale_amount_min = 1.0
+		vent.scale_amount_max = 2.6
+		vent.mesh = _soft_mesh(Vector2(0.9, 0.9), Color(0.82, 0.84, 0.86), 0.14, false)
+		vent.color_ramp = _fade_ramp(Color(1, 1, 1, 1))
+		vent.local_coords = false
+		add_child(vent)
+		_steam.append(vent)
+
+
+## Quantas partículas, pela fração do perfil e da qualidade (trocar a quantidade recomeça a emissão: só quando muda).
+func _set_amount(particles: CPUParticles3D, full: int, ratio: float) -> void:
+	var amount := maxi(1, roundi(full * clampf(ratio, 0.0, 1.0)))
+	if particles.amount != amount:
+		particles.amount = amount
+
+
+## O id do perfil de ambiência: o mapa do cenário ou a Rua das Vitrines.
+func ambience_id() -> String:
+	return scenario.map_name if scenario else "ShopfrontStreet"
+
+
+## Aplica o perfil (de novo pela barra de Admin, que o muda ao vivo): o pós, o glow e a névoa por altura, as partículas.
+func apply_ambience() -> void:
+	ambience = AHAmbience.profile(ambience_id())
+	_apply_weather()
+
+
 func _build_atmosphere() -> void:
 	# Poeira no ar, presa à câmera (como o pó do Emberfall).
 	_dust = CPUParticles3D.new()
-	_dust.amount = 220
+	_dust.amount = DUST_AMOUNT
 	_dust.lifetime = 9.0
 	_dust.preprocess = 9.0
 	_dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
@@ -426,6 +499,27 @@ func _build_atmosphere() -> void:
 	_dust.mesh = _mote_mesh(0.045, Color(1.0, 0.82, 0.6), 1.6)
 	_dust.local_coords = false
 	add_child(_dust)
+	# Folhas secas caindo devagar, de lado (a quantidade é do perfil do lugar, #153).
+	_leaves = CPUParticles3D.new()
+	_leaves.name = "Leaves"
+	_leaves.amount = LEAVES_AMOUNT
+	_leaves.lifetime = 10.0
+	_leaves.preprocess = 10.0
+	_leaves.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	_leaves.emission_box_extents = Vector3(16, 1, 4)
+	_leaves.direction = Vector3(1, -0.4, 0)
+	_leaves.spread = 25.0
+	_leaves.gravity = Vector3(0.12, -0.18, 0)
+	_leaves.initial_velocity_min = 0.2
+	_leaves.initial_velocity_max = 0.5
+	_leaves.angular_velocity_min = -90.0
+	_leaves.angular_velocity_max = 90.0
+	_leaves.scale_amount_min = 0.7
+	_leaves.scale_amount_max = 1.3
+	_leaves.mesh = _soft_mesh(Vector2(0.09, 0.05), Color(0.62, 0.38, 0.16), 0.85, false)
+	_leaves.local_coords = false
+	_leaves.emitting = false
+	add_child(_leaves)
 
 	# Fogueira na rua, com brasas, luz que tremula e fumaça quando a chuva apaga.
 	_dynamic.begin("Campfire", Vector3.ZERO)
@@ -450,7 +544,7 @@ func _build_atmosphere() -> void:
 	_fire_light.shadow_enabled = Settings.effects().lamp_shadows
 
 	_embers = CPUParticles3D.new()
-	_embers.amount = 40
+	_embers.amount = EMBERS_AMOUNT
 	_embers.lifetime = 2.6
 	_embers.position = ue(FIRE.x, FIRE.y + 10, FIRE.z + 30)
 	_embers.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
@@ -607,6 +701,44 @@ func _build_party() -> void:
 	_place_leader(Vector3(7.6, 0, 0.45))
 
 
+## Um herói entra na equipe no meio da jornada (o Nick no tutorial, #144): a placa nasce em at e anda até o lugar dele
+## na fila.
+func add_hero(hero_id: String, at: Vector3) -> void:
+	var hero = Campaign.hero(hero_id)
+	var art := {} if hero == null else AHCombatArena.art_entry(_combat_art.heroes, hero_id, String(hero.get("art_variant", "")))
+	if hero == null or art.is_empty() or party_ids.has(hero_id) or party_ids.size() >= 4:
+		return
+	var card := AHSpriteCard.new()
+	card.body_height = AHCharacterHeights.find(hero_id)
+	card.show_art(art.idle)
+	add_child(card)
+	card.position = at
+	card.set_facing(-1.0)
+	party_ids.append(hero_id)
+	_heroes.append(card)
+	occlusion.track(card)
+
+
+## Leva o líder andando até um ponto (passar por uma porta, #141), com a fila atrás e sem o jogador comandar: o rastro
+## cresce como no andar de verdade, e a fila vira para o lado do passo. Sem limite da área de andar (a porta fica fora).
+## Devolve false se a cena saiu no meio (quem chamou para ali).
+func walk_leader(target: Vector3, seconds: float) -> bool:
+	var start := _leader.position
+	var time := 0.0
+	while time < seconds:
+		await get_tree().process_frame
+		# A cena pode sair no meio do passo (voltar à Estação, o fim da jornada): nada de mexer num líder liberado.
+		if not is_instance_valid(_leader) or not is_inside_tree():
+			return false
+		time += get_process_delta_time()
+		_leader.position = start.lerp(target, clampf(time / seconds, 0.0, 1.0))
+		if _trail.is_empty() or _leader.position.distance_to(_trail[0]) > 0.05:
+			_trail.push_front(_leader.position)
+			if _trail.size() > 200:
+				_trail.pop_back()
+	return true
+
+
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
 func _place_leader(at: Vector3, facing: float = 1.0) -> void:
 	at = _free_spot(at)
@@ -718,31 +850,47 @@ func _build_camera() -> void:
 func _update_camera(delta: float) -> void:
 	# Teleobjetiva a ~18 m, olhando um pouco de cima (o enquadramento do Emberfall); avança um pouco nos becos.
 	var leader := _leader.position
-	var target := Vector3(clampf(leader.x, -6.0, 76.0), 2.5, clampf(-1.4 + minf(leader.z + 1.0, 0.0) * 0.45, -6.5, -1.4))
+	var view_spec: Dictionary = EXPLORE_CAMERA.street
+	var target := Vector3(clampf(leader.x, -6.0, 76.0), view_spec.height, clampf(-1.4 + minf(leader.z + 1.0, 0.0) * 0.45, -6.5, -1.4))
 	var pitch := deg_to_rad(12.0)
-	var distance := 18.5
+	var distance: float = view_spec.distance
 	if scenario and not _zone.is_empty():
 		# A câmera da prévia da Unreal: 19 m de distância, 1,7 m acima do piso, quase reta (0,5°), 30° na horizontal; a
 		# Ponte usa a da rua (28 m, 2,7 m). O centro vai até 4 m das pontas da zona (LaneEdgePadding).
-		var bridge: bool = scenario.map_name == "RootBridge"
-		distance = 28.0 if bridge else 19.0
+		view_spec = EXPLORE_CAMERA.scenario
+		distance = view_spec.distance
 		pitch = deg_to_rad(SCENARIO_PITCH)
 		_camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(SCENARIO_HALF_FOV)) / get_viewport().get_visible_rect().size.aspect()))
 		var half_view: float = tan(deg_to_rad(SCENARIO_HALF_FOV)) * distance
-		var low: float = _zone.x0 + minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
-		var high: float = _zone.x1 - minf(half_view - 4.0, (_zone.x1 - _zone.x0) * 0.5)
-		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + (2.7 if bridge else 1.7), lane_z)
+		# Numa zona coberta (#175) a borda do quadro vai só um pouco além da ponta, onde ficam as colunas que fecham a
+		# zona (AHScenarioWorld.close_zone_ends): os 4 m mostravam o vazio por fora da sala, e sem folga o líder saía
+		# cortado na borda.
+		var reach: float = half_view - (COVERED_EDGE_REACH if sheltered else 4.0)
+		var low: float = _zone.x0 + minf(reach, (_zone.x1 - _zone.x0) * 0.5)
+		var high: float = _zone.x1 - minf(reach, (_zone.x1 - _zone.x0) * 0.5)
+		target = Vector3(clampf(leader.x, low, maxf(low, high)), floor_y + float(view_spec.height), lane_z)
 	if _indoor:
 		# Dentro da loja, a câmera desce para ficar abaixo do forro e enquadra a sala.
 		# Vai até perto das paredes do lado (elas tapam o que fica fora da sala): na frente da sala a câmera vê só ~3,5 m
 		# para cada lado, e com a folga maior a equipe saía do quadro nas pontas.
-		target = Vector3(clampf(leader.x, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN), 1.6, -1.2)
+		# Com a câmera mais perto (#129), o centro fica entre o líder e o último da fila: a equipe inteira no quadro.
+		var middle: float = leader.x if _heroes.is_empty() else (leader.x + _heroes[-1].position.x) * 0.5
+		target = Vector3(clampf(middle, _room_x + INDOOR_CAMERA_MARGIN, _room_x + _room_width - INDOOR_CAMERA_MARGIN),
+			EXPLORE_CAMERA.indoor.height, -1.2)
 		pitch = deg_to_rad(4.0)
-		distance = 11.0
-		# No acampamento (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
-		if corridor != null and corridor.camp != null and corridor.camp.active:
+		distance = EXPLORE_CAMERA.indoor.distance
+		# No acampamento da casa (#77), a câmera fica na fogueira, mais perto, e olha de cima como a arte das poses (#205).
+		if corridor != null and corridor.camp != null and corridor.camp.active and not corridor.camp.at_stop():
 			target = Vector3(corridor.camp.focus_x, AHCampScene.FOCUS_HEIGHT, -0.2)
 			distance = AHCampScene.FOCUS_DISTANCE
+			pitch = deg_to_rad(AHCampScene.FOCUS_PITCH)
+	# Na parada de descanso (#143), a fogueira fica na rua ou no cenário: a câmera fica parada nela, de cima (#205), e recua o
+	# bastante para a fileira inteira caber (nos cenários a lente é mais fechada, 30° na horizontal).
+	if corridor != null and corridor.camp != null and corridor.camp.active and corridor.camp.at_stop():
+		target = corridor.camp.focus_point()
+		pitch = deg_to_rad(corridor.camp.pitch())
+		var half_h := atan(tan(deg_to_rad(_camera.fov * 0.5)) * get_viewport().get_visible_rect().size.aspect())
+		distance = maxf(AHCampScene.FOCUS_DISTANCE, AHCampScene.ROW_HALF_WIDTH / tan(half_h))
 	if _arena != null and _arena.active:
 		# Na luta, a arena enquadra todos e se aproxima do golpe. A altura do alvo põe os pés sempre na mesma linha da
 		# tela, acima do painel do HUD, qualquer que seja a distância.
@@ -750,6 +898,8 @@ func _update_camera(delta: float) -> void:
 		distance = view.y
 		target = Vector3(view.x, floor_y + combat_lift + COMBAT_FEET_LINE * tan(deg_to_rad(_camera.fov * 0.5)) * distance / cos(pitch),
 			(lane_z - 1.35) if scenario else -0.9)
+	# A câmera da barra de Admin (#130): mais perto ou mais longe, na exploração e na luta.
+	distance *= Admin.zoom("fight" if _arena != null and _arena.active else "explore")
 	# O tremor do acerto (#33): desloca a vista sem mover a câmera (a suavização não o arrasta), em pixels da tela.
 	var shake: Vector2 = _arena.camera_shake() if _arena != null and _arena.active else Vector2.ZERO
 	var meters_per_pixel := 2.0 * tan(deg_to_rad(_camera.fov * 0.5)) * distance / 1080.0
@@ -763,6 +913,8 @@ func _update_camera(delta: float) -> void:
 	# Na luta num cenário, o preenchimento acende sobre quem luta (#48).
 	_fill_light.visible = scenario != null and _arena != null and _arena.active
 	_dust.position = Vector3(_camera.position.x, ground + 2.6, -1.0 + (lane_z if scenario else 0.0))
+	if _leaves != null:
+		_leaves.position = Vector3(_camera.position.x, ground + 5.0, -1.5 + (lane_z if scenario else 0.0))
 	_rain.position = Vector3(_camera.position.x + 0.8, ground + 9.0, -1.0 + (lane_z if scenario else 0.0))
 	_splashes.position = Vector3(_camera.position.x, ground + 0.03, -1.0 + (lane_z if scenario else 0.0))
 
@@ -787,14 +939,10 @@ func _build_post_and_hud() -> void:
 	_hud_weather = _label("", 20, Vector2(36, 112))
 	_hud_weather.visible = false
 	hud.add_child(_hud_weather)
-	_dev_overlay = Control.new()
-	_dev_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hud.add_child(_dev_overlay)
+	# O contador de quadros: no modo de captura e pela barra de Admin (#130, Ajustes).
 	_hud_stats = _label("", 18, Vector2(1380, 1000))
-	_dev_overlay.add_child(_hud_stats)
-	_dev_overlay.add_child(_label("Modo de desenvolvedor (F1)   K próxima patrulha   R chuva   T dia/noite   P pós   C colisões", 18, Vector2(36, 1046)))
-	_dev_overlay.visible = Settings.dev_mode or _capture_dir != ""
-	Settings.changed.connect(func(): _dev_overlay.visible = Settings.dev_mode or _capture_dir != "")
+	_hud_stats.visible = _capture_dir != ""
+	hud.add_child(_hud_stats)
 
 
 func _label(text: String, size: int, at: Vector2) -> Label:
@@ -826,8 +974,21 @@ func _weather() -> Dictionary:
 	return w
 
 
+## A luz de um lugar fechado que não segue o céu (docs/design/tutorial.md, "Para integrar" 1 e 4): no Corredor de
+## Contenção, o ambiente vem de uma cor neutra (o céu da noite puxava a névoa para o roxo), a exposição fica 5% abaixo,
+## a neblina é rala e avermelhada, e o reflexo de espelho do Forward+ (o SSR) fica ligado, sem esperar a chuva.
+const SITE_LIGHT := {"ContainmentCorridor": {"ambient_color": Color(0.36, 0.34, 0.33), "ambient": 0.3, "exposure": 0.95,
+	"fog_density": 0.006, "fog": Color(0.16, 0.08, 0.07), "ssr": true}}
+
+
+func _site_light() -> Dictionary:
+	return SITE_LIGHT.get(scenario.map_name, {}) if scenario else {}
+
+
 func _apply_weather() -> void:
 	var w := _weather()
+	if ambience.is_empty():
+		ambience = AHAmbience.profile(ambience_id())
 	_sun.light_color = w.sun_color
 	_sun.rotation_degrees = w.sun_angle
 	_sky.sky_top_color = w.sky_top
@@ -836,14 +997,24 @@ func _apply_weather() -> void:
 	_sky.ground_bottom_color = w.ground
 	_env.ambient_light_energy = w.ambient
 	_env.fog_light_color = w.fog
-	_env.fog_density = w.fog_density * _fog_boost
+	_env.fog_density = w.fog_density * _fog_boost * float(ambience.get("fog_density", 1.0))
 	# O Compatibility (web) soma a luz direta e o glow mais forte: a mesma cena, calibrada a olho contra o Forward+.
 	_env.tonemap_exposure = w.exposure * (1.0 if _forward_plus else 0.9)
-	_env.glow_intensity = 0.7 if _forward_plus else 0.45
+	AHAmbience.apply_env(_env, ambience, 0.7 if _forward_plus else 0.45)
+	var site := _site_light()
+	if not site.is_empty():
+		_env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+		_env.ambient_light_color = site.ambient_color
+		_env.ambient_light_energy = site.ambient
+		_env.tonemap_exposure *= site.exposure
+		_env.fog_density = site.fog_density * float(ambience.get("fog_density", 1.0))
+		_env.fog_light_color = site.fog
+	if _post != null:
+		AHAmbience.apply_post(_post, ambience, Settings.level)
 	if _forward_plus:
-		_env.volumetric_fog_density = w.volumetric
+		_env.volumetric_fog_density = w.volumetric * float(ambience.get("volumetric", 1.0))
 		_env.volumetric_fog_albedo = w.fog.lightened(0.3)
-		_env.ssr_enabled = _raining and Settings.effects().ssr
+		_env.ssr_enabled = (_raining or _site_light().get("ssr", false)) and Settings.effects().ssr
 	for material in _skyline_materials:
 		material.set_shader_parameter("haze_color", w.haze)
 	for shaft in _shafts:
@@ -858,11 +1029,25 @@ func _apply_weather() -> void:
 	_rain.visible = not covered
 	_dust.emitting = not _raining and not covered and not _reduced_effects()
 	_dust.visible = not covered
+	_set_amount(_dust, DUST_AMOUNT, AHAmbience.particles(ambience, "dust", Settings.level))
+	# As fagulhas da fogueira da rua (quanto do perfil e da qualidade).
+	if _embers != null:
+		_set_amount(_embers, EMBERS_AMOUNT, AHAmbience.particles(ambience, "embers", Settings.level))
+	if _leaves != null:
+		var leaves := AHAmbience.particles(ambience, "leaves", Settings.level)
+		# As folhas secas param na chuva (molhadas, não voam), como a poeira.
+		_leaves.emitting = leaves > 0.0 and not _raining and not covered and not _reduced_effects()
+		_leaves.visible = _leaves.emitting
+		_set_amount(_leaves, LEAVES_AMOUNT, leaves)
+	for steam in _steam:
+		steam.emitting = not covered and not _reduced_effects()
+		_set_amount(steam, STEAM_AMOUNT, 1.0 if Settings.level > 0 else AHAmbience.LOW_PARTICLES)
 	_splashes.emitting = _raining and not covered
 	_splashes.visible = not covered
 	if scenario:
 		# Nos cenários o céu e o sol da rua só tingem; a luz é a das luminárias do mapa (e a lanterna).
-		scenario.set_weather(_wet if not covered else 0.0, Color(1, 1, 1) if _mood == "golden" else Color(0.55, 0.6, 0.75))
+		scenario.set_weather(_wet if not covered else 0.0, Color(1, 1, 1) if _mood == "golden" else Color(0.55, 0.6, 0.75), covered)
+		scenario.set_doorways(_mood, _raining)
 	# Luz de leitura: acende de noite e na chuva, sobre a equipe e a luta.
 	var readable := (1.0 if _mood == "night" else 0.0) + (0.3 if _raining else 0.0)
 	_key_light.light_energy = 0.7 * clampf(readable, 0.0, 1.2)
@@ -870,6 +1055,8 @@ func _apply_weather() -> void:
 	_hud_weather.text = (tr("Noite") if _mood == "night" else tr("Fim de tarde")) + (tr(" · chuva") if _raining else "")
 	if exploration_hud:
 		exploration_hud.set_weather(_hud_weather.text)
+	# A sombra do sol só ao ar livre (#175): sob teto ele é a luz fraca de _update_sun.
+	_sun.shadow_enabled = Settings.effects().shadows and not covered
 	_update_sun(0.0)
 
 
@@ -884,8 +1071,13 @@ func _update_sun(delta: float) -> void:
 			_flash = 1.0
 	_flash = maxf(0.0, _flash - delta * 3.5)
 	var flicker := _flash * (0.6 + 0.4 * sin(_flash * 40.0))
-	_sun.light_energy = w.sun_energy * direct_scale + flicker * 3.0
-	_sun.light_color = w.sun_color.lerp(Color(0.75, 0.82, 1.0), clampf(flicker, 0.0, 1.0))
+	# Sob teto (a sala de uma loja ou a zona coberta de um cenário) o sol não entra (#175): fica só uma luz fraca e sem
+	# sombra, na direção dele, que mantém a equipe legível sem os raios diagonais pela frente aberta nem o clarão na
+	# parede do lado.
+	var covered := _indoor or sheltered
+	_sun.light_energy = w.sun_energy * direct_scale * COVERED_SUN if covered else w.sun_energy * direct_scale + flicker * 3.0
+	# O clarão do relâmpago não atravessa o teto.
+	_sun.light_color = w.sun_color if covered else w.sun_color.lerp(Color(0.75, 0.82, 1.0), clampf(flicker, 0.0, 1.0))
 
 
 ## Chão molhado: escurece, fica liso e as poças do ruído brilham. wet vai de 0 a 1 devagar.
@@ -924,28 +1116,6 @@ func _update_fire(delta: float) -> void:
 
 
 # ---------------------------------------------------------------- quadro a quadro
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_echo():
-		return
-	# As teclas de teste só valem no modo de desenvolvedor (F1).
-	if not Settings.dev_mode:
-		return
-	if event.is_action_pressed("debug_time"):
-		_mood = "night" if _mood == "golden" else "golden"
-		_apply_weather()
-	elif event.is_action_pressed("debug_rain"):
-		_raining = not _raining
-		_next_flash = 4.0
-		_apply_weather()
-	elif event.is_action_pressed("debug_post"):
-		_post.set_shader_parameter("enabled", not _post.get_shader_parameter("enabled"))
-	elif event.is_action_pressed("debug_colliders"):
-		for debug in _debug_colliders:
-			debug.visible = not debug.visible
-	elif event.is_action_pressed("debug_combat") and not _arena.active:
-		corridor.debug_next_fight()
-
 
 func _input_vector() -> Vector2:
 	if _capture_dir != "":
@@ -1053,7 +1223,23 @@ func end_fight() -> void:
 	combat_lift = 0.0
 
 
-## Quem morreu sai da equipe; os outros voltam a andar do lugar onde terminaram a luta.
+## A formação (#129): dois heróis trocam de lugar na fila. As placas andam com a ordem, e a fila se refaz atrás do
+## líder, virada para o mesmo lado.
+func swap_party(a: String, b: String) -> void:
+	var i := party_ids.find(a)
+	var k := party_ids.find(b)
+	if i < 0 or k < 0 or i == k:
+		return
+	var facing: float = _heroes[0].facing
+	party_ids[i] = b
+	party_ids[k] = a
+	var card := _heroes[i]
+	_heroes[i] = _heroes[k]
+	_heroes[k] = card
+	_place_leader(_leader.position, facing)
+
+
+## Quem caiu sai da equipe até a volta (#118); os outros voltam a andar do lugar onde terminaram a luta.
 func remove_dead_heroes() -> void:
 	for index in range(party_ids.size() - 1, -1, -1):
 		var hero = Campaign.hero(party_ids[index])
@@ -1302,4 +1488,6 @@ func _run_combat_capture(delta: float) -> void:
 			if _combat_time > 0.8:
 				_save_capture("16-house-search", "16-house-search food=%d seeds=%d event=%s" % [campaign.session.expedition.food,
 					campaign.session.expedition.loot.seeds, str(campaign.session.event != null)])
-				get_tree().quit()
+				# Uma vez só: o Sound.quit espera o áudio antes de fechar, e a fase rodaria de novo nesse meio-tempo.
+				_combat_phase = 8
+				Sound.quit()

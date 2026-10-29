@@ -14,8 +14,9 @@ FONT = str(ROOT / "art/ui/fonts/barlow_condensed_medium.ttf")
 PANEL, TEXT, MUTED, AMBER = (13, 16, 18), (239, 230, 214), (169, 162, 148), (240, 160, 32)
 # O tamanho proposto na Estação (cm de largura), o que vale na integração (b.card(nome, base, largura, altura)).
 CARDS = [("Infirmary_Bed", "Leito", 172), ("Infirmary_Cabinet", "Armário de remédios", 124), ("Infirmary_Drip", "Soro", 55),
-         ("Infirmary_Screen", "Biombo (nível 2)", 170), ("Infirmary_Washstand", "Lavatório (nível 2)", 70), ("Infirmary_Trolley", "Carrinho (nível 2)", 80)]
-GLYPHS = [("state_fallen", "Caído"), ("state_recovering", "Em recuperação"), ("job_research", "Posto: Pesquisa"), ("job_forge", "Posto: Forja"),
+         ("Infirmary_Screen", "Biombo (nível 2)", 150), ("Infirmary_Washstand", "Lavatório (nível 2)", 70), ("Infirmary_Trolley", "Carrinho (nível 2)", 80),
+         ("Infirmary_Bed_Broken", "Leito quebrado (nível 1)", 181), ("Infirmary_Bed_Covered", "Leito coberto (nível 1)", 182)]
+GLYPHS = [("state_fallen", "Caído"), ("state_recovering", "Caído (na pílula)"), ("job_research", "Posto: Pesquisa"), ("job_forge", "Posto: Forja"),
           ("job_canteen", "Posto: Cantina"), ("job_dormitory", "Posto: Dormitório"), ("job_infirmary", "Posto: Enfermaria"), ("room_infirmary", "Enfermaria"),
           ("inspect", "Inspecionar"), ("helpers", "Ajudantes"), ("formation_swap", "Trocar a formação"), ("dawn", "Amanhecer")]
 
@@ -23,9 +24,9 @@ GLYPHS = [("state_fallen", "Caído"), ("state_recovering", "Em recuperação"), 
 def cards() -> None:
     f = ImageFont.truetype(FONT, 24)
     px_cm = 1.6
-    im = Image.new("RGB", (1880, 520), PANEL)
+    im = Image.new("RGB", (2300, 520), PANEL)
     d = ImageDraw.Draw(im)
-    d.line((20, 440, 1860, 440), fill=(60, 64, 70), width=2)
+    d.line((20, 440, 2280, 440), fill=(60, 64, 70), width=2)
     x = 30
     for name, label, cm in CARDS:
         c = Image.open(ROOT / f"art/station/cards/{name}.webp").convert("RGBA")

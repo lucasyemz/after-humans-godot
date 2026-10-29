@@ -6,6 +6,12 @@
 		"ui": -24.0
 	},
 	"files": {
+		"res://audio/ambience/ContainmentCorridor.ogg": {
+			"category": "ambience",
+			"lufs": -16.4,
+			"gain_db": -9.6,
+			"normalized": true
+		},
 		"res://audio/ambience/FloodedDepot.ogg": {
 			"category": "ambience",
 			"lufs": -31.0,
@@ -192,6 +198,204 @@
 			"gain_db": -1.2,
 			"normalized": true
 		},
+		"res://audio/combat/enemies/broto/ataque_basico.wav": {
+			"category": "sfx",
+			"lufs": -18.7,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/cao_eco/avancar_matilha.wav": {
+			"category": "sfx",
+			"lufs": -14.2,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/cao_eco/mordida_ferrugem.wav": {
+			"category": "sfx",
+			"lufs": -17.1,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/carcaca_colonizada/avanco_lento.wav": {
+			"category": "sfx",
+			"lufs": -16.7,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/carcaca_colonizada/esmagamento_fungico.wav": {
+			"category": "sfx",
+			"lufs": -16.1,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/carrasco_industrial/corte_demolicao.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/condutor_raiz/descarga_raiz.wav": {
+			"category": "sfx",
+			"lufs": -14.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/enraizado/golpe_provisorio.wav": {
+			"category": "sfx",
+			"lufs": -14.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/faisca/serrada_curta.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/ninho_errante/esporo_contaminante.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/ninho_errante/recuo_fumegante.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/pipoco/buzina_irritante.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/porteiro/porteiro_esmagamento_brutal.wav": {
+			"category": "sfx",
+			"lufs": -18.7,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/porteiro/porteiro_golpe_escotilha.wav": {
+			"category": "sfx",
+			"lufs": -18.4,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/porteiro/porteiro_impacto_hidraulico.wav": {
+			"category": "sfx",
+			"lufs": -15.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/porteiro/porteiro_sirene.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/rastejante_raiz/esgueirar_frente.wav": {
+			"category": "sfx",
+			"lufs": -16.2,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/rastejante_raiz/lufada_chicote.wav": {
+			"category": "sfx",
+			"lufs": -15.3,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/recreador/pega_pega.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/recreador/risada_gravada.wav": {
+			"category": "sfx",
+			"lufs": -15.1,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/robot/robot_avanco.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/robot/robot_blindagem.wav": {
+			"category": "sfx",
+			"lufs": -15.9,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/robot/robot_descarga.wav": {
+			"category": "sfx",
+			"lufs": -15.2,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/robot/robot_golpe.wav": {
+			"category": "sfx",
+			"lufs": -16.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/robot_fungo/robot_avanco.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/robot_fungo/robot_blindagem.wav": {
+			"category": "sfx",
+			"lufs": -16.4,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/robot_fungo/robot_descarga.wav": {
+			"category": "sfx",
+			"lufs": -14.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/robot_fungo/robot_golpe.wav": {
+			"category": "sfx",
+			"lufs": -17.3,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/sussurrador/deslizar_sombra.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/sussurrador/voz_do_eco.wav": {
+			"category": "sfx",
+			"lufs": -13.0,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/vigia_enferrujado/avanco_pesado.wav": {
+			"category": "sfx",
+			"lufs": -16.5,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/vigia_enferrujado/defender_vigia.wav": {
+			"category": "sfx",
+			"lufs": -18.3,
+			"gain_db": 0.0,
+			"normalized": false
+		},
+		"res://audio/combat/enemies/vigia_enferrujado/golpe_vigia.wav": {
+			"category": "sfx",
+			"lufs": -15.7,
+			"gain_db": 0.0,
+			"normalized": false
+		},
 		"res://audio/music/battle.ogg": {
 			"category": "music",
 			"lufs": -12.8,
@@ -281,6 +485,12 @@
 			"lufs": -20.3,
 			"gain_db": 0.0,
 			"normalized": false
+		},
+		"res://audio/station/train_ride.ogg": {
+			"category": "ambience",
+			"lufs": -19.0,
+			"gain_db": -7.0,
+			"normalized": true
 		},
 		"res://audio/ui/bag_open.ogg": {
 			"category": "ui",
@@ -461,6 +671,18 @@
 			"lufs": -28.6,
 			"gain_db": 0.0,
 			"normalized": false
+		},
+		"res://audio/world/security_door.ogg": {
+			"category": "sfx",
+			"lufs": -20.6,
+			"gain_db": 0.6,
+			"normalized": true
+		},
+		"res://audio/world/security_door_open.ogg": {
+			"category": "sfx",
+			"lufs": -12.5,
+			"gain_db": -7.5,
+			"normalized": true
 		}
 	}
 }

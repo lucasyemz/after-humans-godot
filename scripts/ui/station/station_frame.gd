@@ -4,7 +4,7 @@
 ##   curativos) numa ficha, Comida, Água e Energia, e a engrenagem (as Opções). Faltando Comida, o chip troca o ícone
 ##   pelo alerta (a forma avisa no daltonismo).
 ## - Embaixo: VOLTAR (nos cômodos), a barra das teclas, as abas da Estação (a ativa sublinhada em âmbar) e o botão
-##   principal, PREPARAR EXPEDIÇÃO (G / X), bloqueado com o motivo dentro (AHStationRules.preparation_block).
+##   principal, IR AO MAPA (G / X), bloqueado com o motivo dentro (AHStationRules.preparation_block).
 ## A moldura só monta as peças: as ações vêm de quem a usa (o HUD da Estação e a Sala).
 class_name AHStationFrame
 extends RefCounted
@@ -177,7 +177,9 @@ static func back_button(parent: Control, action: Callable) -> Button:
 		arrow.position = Vector2(back.size.x * 0.5 - back.get_theme_font("font").get_string_size(back.text, HORIZONTAL_ALIGNMENT_LEFT, -1,
 		back.get_theme_font_size("font_size")).x * 0.5 - 26.0, (back.size.y - 28.0) * 0.5)
 	back.resized.connect(place)
-	place.call_deferred()
+	# No quadro seguinte, pelo próprio botão: se o painel for refeito antes, a chamada cai junto com ele (a lambda
+	# adiada sozinha rodava com o botão e o ícone já liberados).
+	back.resized.emit.call_deferred()
 	back.add_theme_font_override("font", AHKit.font(true))
 	back.add_theme_font_size_override("font_size", AHKit.size("primary"))
 	back.custom_minimum_size = Vector2(216, 64)
@@ -246,7 +248,7 @@ static func tabs(parent: Control, active: String, nav: Callable) -> HBoxContaine
 	return row
 
 
-## O botão principal embaixo à direita: PREPARAR EXPEDIÇÃO (ou o texto pedido, PARTIR na Preparação), com a tecla
+## O botão principal embaixo à direita: IR AO MAPA (ou o texto pedido, INICIAR EXPEDIÇÃO na plataforma), com a tecla
 ## G / X; com block, apagado e com o motivo dentro, embaixo do título.
 static func prepare(parent: Control, text: String, icon_name: String, block: String, action: Callable) -> Button:
 	var button := AHStationReport._primary(text, icon_name, "station_prepare")

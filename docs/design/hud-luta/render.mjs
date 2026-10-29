@@ -18,8 +18,9 @@ const center = (u) => {
   const t = META.texts.find((t) => t.text === u.name && t.rect[1] > 650 && t.rect[1] < 800);
   return Math.round(t.rect[0] + t.rect[2] / 2);
 };
+// Um nome com "/" é o caminho do DTO sem o .json (o lote do tutorial: docs/design/tutorial/before/fight_two_hud).
 export function useCapture(name = "combat") {
-  META = JSON.parse(fs.readFileSync(`docs/design/loop-screens/before/${name}.json`, "utf8"));
+  META = JSON.parse(fs.readFileSync(name.includes("/") ? `${name}.json` : `docs/design/loop-screens/before/${name}.json`, "utf8"));
   QUOTES = name === "combat" ? JSON.parse(fs.readFileSync("docs/design/hud-c/session_quotes.json", "utf8")).combat : quotesFrom(META);
   UNITS = META.units.map((u) => ({ ...u, cx: center(u) }));
   ACTOR = UNITS.find((u) => u.id === META.actor);
@@ -28,11 +29,16 @@ export function useCapture(name = "combat") {
     const ts = META.texts.map((t) => t.text);
     const i = ts.findIndex((t) => t.startsWith("RODADA"));
     const left = [...UNITS];
-    return ts.slice(i + 1, i + 7).map((n) => {
+    // Até seis nomes depois de "RODADA"; com menos unidades (o tutorial tem quatro), para no primeiro texto que não é
+    // de ninguém.
+    const out = [];
+    for (const n of ts.slice(i + 1, i + 7)) {
       const u = left.find((u) => u.name.includes(n.split(" · ")[0]));
+      if (!u) break;
       left.splice(left.indexOf(u), 1);
-      return u;
-    });
+      out.push(u);
+    }
+    return out;
   })();
 }
 // Sem as cotações da sessão (as capturas dos laços), as habilidades de quem age saem de data/abilities.json, na ordem da
@@ -48,7 +54,7 @@ useCapture();
 const FACE = { Bento: "bento", Nick: "nick", "Íris": "iris", "Véspera": "vespera" };
 // Os rostos: o retrato dos heróis e, nas máquinas, o recorte do sprite (coordenadas do canvas 1178 convertidas para a
 // textura de 589, como no render.py do alvo).
-const SPRITE = { recreador: [360, 20, 800, 460], sussurrador: [360, 160, 850, 650] };
+const SPRITE = { recreador: [360, 20, 800, 460], sussurrador: [360, 160, 850, 650], cao_eco: [760, 500, 1080, 820] };
 function face(u, size, bg) {
   let file, box, tex;
   if (u.player) { file = `art/ui/portraits/${FACE[u.name]}.png`; box = [40, 0, 230, 190]; tex = 256; }
@@ -75,8 +81,9 @@ const register = () => `<div class="abs" data-hit="log" style="left:46px;top:32p
     `<span class="tx l1 f30 up">Registro</span>` + nine("key_tab", { pad: [2, 2, 2, 2], cls: "row", extra: "width:42px;height:42px;justify-content:center" }, `<span class="tx l1 f26 semi">L</span>`)) + `</div>`;
 
 // A ordem da rodada: a faixa round_strip, o nome no bolso e os retratos a partir de x 244 da peça.
-const order = (p) => `<div class="abs" style="left:636px;top:30px">` +
-  nine("round_strip", { cls: "row", extra: "width:720px;height:64px;gap:0" },
+// Com menos de seis na ordem (o tutorial tem quatro), a faixa encolhe junto, centrada no mesmo lugar.
+const order = (p) => `<div class="abs" style="left:${ORDER.length < 6 ? 996 - (226 + ORDER.length * 68 + 30) / 2 : 636}px;top:30px">` +
+  nine("round_strip", { cls: "row", extra: `width:${ORDER.length < 6 ? 226 + ORDER.length * 68 + 30 : 720}px;height:64px;gap:0` },
     `<span class="tx l1 f30 up" style="width:178px;text-align:center;flex:none">Rodada 1</span><i style="width:48px;flex:none"></i>` +
     `<div class="row" style="gap:8px">${ORDER.map((u) => cell(u, 60, u.id === META.actor, p.cb)).join("")}</div>`) + `</div>`;
 
@@ -131,11 +138,13 @@ const hero = (large) => {
 const RANGE = "4–6";
 const rangeOf = (o) => o.range === undefined ? RANGE : o.range;
 const ICON = (id) => `art/combat/icons/${id}.webp`;
-function abilities(large, { selected = 0, focus = -1, pressed = -1 } = {}) {
+// Do tutorial: aim = false é a vez de quem age, antes de escolher a habilidade (a aba diz "Vez de <nome>", nenhuma
+// escolhida; a barra mostra a do foco do teclado, a primeira, como _show_header faz ao começar a vez).
+function abilities(large, { selected = 0, focus = -1, pressed = -1, aim = true } = {}) {
   const opt = QUOTES.options;
-  const sel = opt[selected];
+  const sel = opt[selected < 0 ? 0 : selected];
   const tab = `<div class="abs" style="left:856px;top:816px">` +
-    nine("target_tab", { cls: "row", extra: `width:336px;height:${large ? 44 : 40}px;padding-left:6px` }, `<span class="tx l1 f26 up">Escolha um alvo</span>`) + `</div>`;
+    nine("target_tab", { cls: "row", extra: `width:336px;height:${large ? 44 : 40}px;padding-left:6px` }, `<span class="tx l1 f26 up">${aim ? "Escolha um alvo" : `Vez de ${ACTOR.name}`}</span>`) + `</div>`;
   const head = `<div class="abs" style="left:684px;top:852px">` +
     nine("ability_header", { cls: "row", extra: "width:624px;height:56px;gap:0" },
       `<div style="width:42px;height:42px;flex:none;margin-left:2px;background:url(${BASE}/${ICON(sel.id)}) center/cover;clip-path:polygon(5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px),0 5px)"></div>` +
@@ -165,16 +174,16 @@ const actions = () => ACTIONS.map(([icon, cap], i) => {
 }).join("");
 
 const EXTRA = (p) => `<style>:root{--enemy:${p.cb ? "var(--danger-fill)" : "#d23a2e"}}.l1{line-height:1.1}</style>`;
-const BG = (name = "combat") => img(`docs/design/loop-screens/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px") +
+const BG = (name = "combat") => img(name.includes("/") ? `${name}_clean.webp` : `docs/design/loop-screens/before/${name}_clean.webp`, "position:absolute;inset:0;width:1920px;height:1080px") +
   `<div class="abs" style="left:0;top:796px;width:1920px;height:284px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.24))"></div>`;
 
 // Opções do lote 6 (hud-laco): o fundo da captura, sem o anel (a máscara dele é a do sprite de Nick) e sem o nome do
 // alvo, e o que vai por cima (extra). Do lote 8 (hud-ajustes2): bottom troca o painel do herói da vez e as habilidades
 // (a inspeção mostra os detalhes ali).
-export const combat = (p, { bg = "combat", withRing = true, target = true, extra = "", bottom = null } = {}) => {
+export const combat = (p, { bg = "combat", withRing = true, target = true, extra = "", aim = true, bottom = null } = {}) => {
   const large = p.k > 1;
   return EXTRA(p) + BG(bg) + (withRing ? ring() : "") + UNITS.map((u) => worldBar(u, large, p.cb)).join("") + (target ? targetName() : "") +
-    register() + order(p) + (bottom === null ? hero(large) + abilities(large) : bottom) + actions() + extra;
+    register() + order(p) + (bottom === null ? hero(large) + abilities(large, aim ? {} : { selected: -1, aim: false }) : bottom) + actions() + extra;
 };
 
 // ------------------------------------------------------------------ a prancha dos estados

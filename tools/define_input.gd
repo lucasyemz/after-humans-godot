@@ -20,6 +20,12 @@ const ACTIONS := {
 	# Estação (#60): os detalhes do relatório da volta e Preparar expedição (só nas telas da Estação).
 	"report_details": {"keys": [KEY_V], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
 	"station_prepare": {"keys": [KEY_G], "buttons": [JOY_BUTTON_X]},
+	# A Estação (#131): a vista geral anda para os lados (o analógico direito; o mouse na borda ou arrastando) e, com um
+	# cômodo aberto, o vizinho do mesmo andar.
+	"station_pan_left": {"axes": [[JOY_AXIS_RIGHT_X, -1.0]]},
+	"station_pan_right": {"axes": [[JOY_AXIS_RIGHT_X, 1.0]]},
+	"station_room_prev": {"keys": [KEY_PAGEUP], "buttons": [JOY_BUTTON_LEFT_SHOULDER]},
+	"station_room_next": {"keys": [KEY_PAGEDOWN], "buttons": [JOY_BUTTON_RIGHT_SHOULDER]},
 	# Combate: as quatro habilidades e as ações (Mochila é a mesma tecla da exploração).
 	"combat_ability_1": {"keys": [KEY_1]},
 	"combat_ability_2": {"keys": [KEY_2]},
@@ -32,17 +38,19 @@ const ACTIONS := {
 	"combat_examine": {"keys": [KEY_X], "buttons": [JOY_BUTTON_LEFT_STICK]},
 	# O registro da luta, escondido por padrão (#56): abre e fecha.
 	"combat_log": {"keys": [KEY_L], "buttons": [JOY_BUTTON_RIGHT_STICK]},
-	# Só para teste do protótipo (teclado).
-	"debug_toggle": {"keys": [KEY_F1]},
-	"debug_rain": {"keys": [KEY_R]},
-	"debug_time": {"keys": [KEY_T]},
-	"debug_post": {"keys": [KEY_P]},
-	"debug_colliders": {"keys": [KEY_C]},
-	"debug_combat": {"keys": [KEY_K]},
+	# A barra de Admin para testes (#130): só na build de teste ou com --admin.
+	"admin_toggle": {"keys": [KEY_F1]},
+	# Exploração (#129): a ordem da equipe nas plaquinhas de baixo (vale para a fila e para a próxima luta).
+	"formation": {"keys": [KEY_R], "buttons": [JOY_BUTTON_X]},
 }
 
 
 func _initialize() -> void:
+	# Uma ação que saiu da tabela sai do projeto também (as teclas de teste antigas da rua, #129); as ui_* são da Godot.
+	for property in ProjectSettings.get_property_list():
+		var name: String = property.name
+		if name.begins_with("input/") and not name.begins_with("input/ui_") and not ACTIONS.has(name.trim_prefix("input/")):
+			ProjectSettings.clear(name)
 	for action in ACTIONS:
 		var spec: Dictionary = ACTIONS[action]
 		var events: Array = []

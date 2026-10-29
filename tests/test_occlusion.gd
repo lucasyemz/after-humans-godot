@@ -107,6 +107,24 @@ func _fade() -> void:
 	await _tree.process_frame
 	await _tree.process_frame
 	t.check(is_equal_approx(crate.transparency, AHOcclusion.FADED), "com Reduzir efeitos, esmaece na hora")
+	# O primeiro plano (a meta "foreground" do cenário) quase some quando tapa alguém.
+	var pipe := MeshInstance3D.new()
+	var thin := BoxMesh.new()
+	thin.size = Vector3(0.3, 1.6, 0.05)
+	pipe.mesh = thin
+	pipe.position = Vector3(0, 0.8, 4.5)
+	pipe.set_meta("foreground", true)
+	stage.add_child(pipe)
+	occlusion.add_occluder(pipe)
+	await _tree.process_frame
+	await _tree.process_frame
+	t.check(is_equal_approx(pipe.transparency, AHOcclusion.FOREGROUND_FADED) and not pipe.visible, "o primeiro plano na frente esmaece e sai (%.2f)" % pipe.transparency)
+	pipe.position.x = -6.0
+	occlusion.forget(pipe)
+	occlusion.add_occluder(pipe)
+	await _tree.process_frame
+	await _tree.process_frame
+	t.check(pipe.visible and pipe.transparency == 0.0, "fora da frente, volta")
 	settings.reduced_environment_effects = reduced
 	occlusion.untrack(card)
 	t.check(not card.has_silhouette(), "quem sai da lista perde a silhueta")

@@ -10,6 +10,11 @@ const ART_MANIFEST := "res://data/presentation/combat_art.json"
 const HERO_GAP := 1.2
 const ENEMY_GAP := 1.35
 const FRONT_GAP := 1.0
+## Folga entre dois heróis vizinhos mais largos que a posição (o escudo do Tatu, #187): o espaço entre eles cresce até
+## as larguras medidas mais esta folga.
+const WIDE_ROOM := 0.1
+## Meia largura de quem não tem medida e da posição vazia: a que, com a folga, dá o espaço de sempre (HERO_GAP).
+const NARROW_HALF := (HERO_GAP - WIDE_ROOM) * 0.5
 ## O menor encolhimento dos espaços da fila num lugar apertado (abaixo disso os personagens se sobrepõem demais).
 const MIN_GAP_SCALE := 0.6
 ## A fila vai até a posição 4 dos dois lados (Mover, Recuar e o empurrão param nela).
@@ -61,6 +66,8 @@ var speed := 1.0
 var center_x := 0.0
 ## O quanto os espaços da fila encolhem para a luta caber no lugar (#52): 1 = os de sempre.
 var gap_scale := 1.0
+## Meia largura do corpo de cada herói, em metros (pelo parado, com a altura dele).
+var _half_widths := {}
 var active := false
 ## A luta é a do guardião do trecho (a ficha diz, #89; as estrelas dele ficam no save, #91).
 var boss_fight := false
@@ -132,12 +139,15 @@ func hero_art(hero_id: String) -> Dictionary:
 
 
 ## A arte de um herói no manifesto. O recruta (hero_cao_4) usa a variação da classe guardada no save (art_variant, #32):
-## a pose parada e o retrato dela em todas as poses (as poses de ação ainda são só dos fundadores), com o efeito visual
-## das habilidades do fundador. Sem variação (saves antigos sem arte, classe sem recruta desenhado), a do fundador.
-## variant: a do herói, se quem chama já tem a entrada; "" procura na campanha (Campaign.hero).
+## a pose parada e o retrato dela, as poses próprias quando a variação tem (o Guaxinim e o Tatu, #187) e o efeito visual
+## das habilidades do fundador. Sem variação (saves antigos sem arte, classe sem recruta desenhado), a do fundador; a
+## classe sem fundador (o rato e o tatu) usa o recruta desenhado dela.
+## variant: a do herói, se quem chama já tem a entrada; "" procura na campanha (Campaign.hero). O fundador vem na skin
+## dele (AHSkins).
 static func art_entry(heroes: Dictionary, hero_id: String, variant: String = "") -> Dictionary:
+	# O fundador na skin que ele veste (#138): o único lugar que decide a arte da luta, da rua, da Sala e dos rostos.
 	if heroes.has(hero_id):
-		return heroes[hero_id]
+		return AHSkins.dress(heroes[hero_id], AHSkins.skin_of(hero_id))
 	var founder := {}
 	var parts := hero_id.split("_")
 	if parts.size() > 2 and parts[0] == "hero":
@@ -148,6 +158,12 @@ static func art_entry(heroes: Dictionary, hero_id: String, variant: String = "")
 	if variant == "":
 		var entry = Campaign.hero(hero_id)
 		variant = String(entry.get("art_variant", "")) if entry != null else ""
+	# Classe sem fundador (o Guaxinim e o Tatu, #187): a arte é a do recruta dela, mesmo sem variação guardada.
+	if founder.is_empty() and parts.size() > 2 and parts[0] == "hero":
+		if variant == "":
+			var variants := AHStationRules.art_variants(parts[1])
+			variant = variants[0] if not variants.is_empty() else ""
+		return {} if variant == "" else _variant_entry(founder, variant)
 	if variant == "" or founder.is_empty():
 		return founder
 	return _variant_entry(founder, variant)
@@ -170,7 +186,10 @@ static func _variant_entry(founder: Dictionary, variant: String) -> Dictionary:
 		var action: Dictionary = founder.actions[ability_id]
 		if action.has("vfx"):
 			actions[ability_id] = {"vfx": action.vfx}
-	var out := {"name": variant, "variant": variant, "idle": art.idle, "actions": actions, "reactions": {}}
+	# As poses próprias do recruta, quando ele tem (o Guaxinim e o Tatu, #187: um golpe por habilidade e as reações).
+	for ability_id in art.get("actions", {}):
+		actions[ability_id] = actions.get(ability_id, {}).merged(art.actions[ability_id])
+	var out := {"name": variant, "variant": variant, "idle": art.idle, "actions": actions, "reactions": art.get("reactions", {})}
 	_variants[key] = out
 	return out
 
@@ -183,6 +202,13 @@ static func hero_art_of(hero_id: String, variant: String = "") -> Dictionary:
 	if _manifest.is_empty():
 		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
 	return art_entry(_manifest.heroes, hero_id, variant)
+
+
+## A entrada do fundador no manifesto, sem skin (a base que a Sala veste em cada aba da Roupa, #138).
+static func founder_art_of(hero_id: String) -> Dictionary:
+	if _manifest.is_empty():
+		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
+	return _manifest.get("heroes", {}).get(hero_id, {})
 
 
 ## A arte de um inimigo fora da luta (o rosto no Mapa da Rede, #87), do mesmo manifesto.
@@ -263,22 +289,35 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 ## Começa a luta: hero_cards e enemy_cards já estão na cena (na ordem da formação). enemies: ids ou os inimigos já
 ## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
 func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
-	session = AHCombatSession.create(heroes, enemies, opening, seed_value)
+	# Os efeitos de fase dos eventos (#78): valem nesta luta; o de uma luta só (Exposto) se gasta aqui.
+	session = AHCombatSession.create(heroes, enemies, opening, seed_value, 80, AHJourneyRules.phase_effects(Campaign.state))
+	AHJourneyRules.spend_fight_effects(Campaign.state)
 	session.use_expedition(Campaign.state)
+	# No tutorial (#144) os inimigos não derrubam ninguém, e os estados sempre pegam.
+	if AHTutorial.is_tutorial(Campaign.state):
+		AHTutorial.prepare_fight(session.context)
 	Tips.show_tip("combat")
 	# Velocidade da batalha das opções (1x ou 2x); a QA acelera mais e fica com a dela.
 	if speed <= 2.0:
 		speed = float(clampi(int(Campaign.state.get("settings", {}).get("battle_speed", 1)), 1, 2))
+		# A barra de Admin (#130) pode pôr a luta em 4x.
+		if Admin.battle_speed > 0.0 and Admin.allowed():
+			speed = Admin.battle_speed
+	cards.clear()
+	_half_widths.clear()
+	var wide := 0.0
+	for index in session.state.player_team.size():
+		var unit: AHCombat.Unit = session.state.player_team[index]
+		cards[unit.id] = hero_cards[index]
+		_half_widths[unit.id] = half_width(hero_cards[index])
+		wide += maxf(0.0, _half_widths[unit.id] - NARROW_HALF)
 	center_x = at_x
 	gap_scale = 1.0
 	if _street != null and _street.has_method("combat_room"):
 		var room: Dictionary = _street.combat_room(at_x)
-		var placed := fit(at_x, room.bounds, room.obstacles)
+		var placed := fit(at_x, room.bounds, room.obstacles, wide * 2.0)
 		center_x = placed.x
 		gap_scale = placed.y
-	cards.clear()
-	for index in session.state.player_team.size():
-		cards[session.state.player_team[index].id] = hero_cards[index]
 	for index in session.state.enemy_team.size():
 		cards[session.state.enemy_team[index].id] = enemy_cards[index]
 	# Os inimigos ganham a silhueta enquanto a luta dura (#51); a equipe já tem a dela.
@@ -330,8 +369,8 @@ func camera_view() -> Vector2:
 ## chefe de duas posições (que empurra os outros para a 3 e a 4) continuam dentro. Entre os vãos onde a fila cabe,
 ## fica no que deixa o centro mais perto de at_x; se não cabe em nenhum, no maior, com os espaços encolhidos até
 ## MIN_GAP_SCALE. Devolve (centro, escala dos espaços).
-static func fit(at_x: float, bounds: Vector2, obstacles: Array) -> Vector2:
-	var left: float = FRONT_GAP + (RANKS - 1) * HERO_GAP
+static func fit(at_x: float, bounds: Vector2, obstacles: Array, hero_extra: float = 0.0) -> Vector2:
+	var left: float = FRONT_GAP + (RANKS - 1) * HERO_GAP + hero_extra
 	var right: float = FRONT_GAP + (RANKS - 1) * ENEMY_GAP
 	var cuts: Array = obstacles.duplicate()
 	cuts.sort_custom(func(a, b): return a.x < b.x)
@@ -374,8 +413,30 @@ func slot_position(unit: AHCombat.Unit) -> Vector3:
 		hero_z = _street.lane_z - 0.3
 		enemy_z = hero_z - 0.25
 	if unit.is_player:
-		return Vector3(center_x - (FRONT_GAP + (rank - 1) * HERO_GAP) * gap_scale, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
+		return Vector3(center_x - hero_offset(rank) * gap_scale, _street.call("_ground_height", hero_z), hero_z - 0.03 * rank)
 	return Vector3(center_x + (FRONT_GAP + (rank - 1) * ENEMY_GAP) * gap_scale, _street.call("_ground_height", enemy_z), enemy_z - 0.03 * rank)
+
+
+## Distância do centro até a posição rank dos heróis: HERO_GAP entre vizinhos, ou mais, se os dois juntos são mais
+## largos (cada um pela largura de quem está na posição agora; posição vazia conta como NARROW_HALF). Nunca passa do
+## que start() reserva no fit(): cada herói alarga no máximo os dois vãos dele, em meia largura além de NARROW_HALF.
+func hero_offset(rank: int) -> float:
+	var at := {}
+	for unit in (session.state.player_team if session != null else []):
+		if unit.rank > 0:
+			at[unit.rank] = _half_widths.get(unit.id, NARROW_HALF)
+	var offset := FRONT_GAP
+	for k in range(2, rank + 1):
+		offset += maxf(HERO_GAP, float(at.get(k - 1, NARROW_HALF)) + float(at.get(k, NARROW_HALF)) + WIDE_ROOM)
+	return offset
+
+
+## Meia largura, em metros, da arte que o cartão mostra (body_width_pixels do manifesto); sem a medida, NARROW_HALF.
+static func half_width(card: AHSpriteCard) -> float:
+	var art := card.art()
+	if not art.has("body_width_pixels"):
+		return NARROW_HALF
+	return float(art.body_width_pixels) * 0.5 * card.body_height / float(art.body_reference_pixels)
 
 
 ## Leva cada unidade de pé para a posição dela (depois de trocas, empurrões e mortes).
@@ -469,7 +530,8 @@ func _execute(actor_id: String, command: Dictionary) -> Dictionary:
 
 
 func _wait(seconds: float) -> void:
-	await get_tree().create_timer(seconds / speed).timeout
+	# A espera para com o jogo pausado (a barra de Admin, #130): o inimigo não age por trás dela.
+	await get_tree().create_timer(seconds / speed, false).timeout
 
 
 # ---------------------------------------------------------------- lances
@@ -565,11 +627,11 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 	if actor.is_player:
 		show_pose(actor, "execucao", ability_id)
 		_play_cue(_hero_cue(actor, ability_id))
-		if not hero_action.is_empty():
+		if hero_action.has("vfx"):
 			for target_id in (targets if not targets.is_empty() else [actor.id]):
 				_spawn_vfx(actor, ability_id, target_id)
 	else:
-		_play_enemy_cue(actor, action)
+		_play_enemy_cue(actor, ability_id, action)
 		if action != null:
 			_float_text(card, action.DisplayName, Color(1.0, 0.85, 0.7), 0.9)
 	var impact_start := Time.get_ticks_msec()
@@ -578,7 +640,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 	var held := (Time.get_ticks_msec() - impact_start) * 0.001
 	var impact := maxf(IMPACT_SECONDS * (0.8 if support else 1.0), life) / speed
 	if held < impact:
-		await get_tree().create_timer(impact - held).timeout
+		await get_tree().create_timer(impact - held, false).timeout
 	# Volta: todos ao descanso e a câmera abre de novo.
 	show_pose(actor, "idle")
 	var back := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -743,7 +805,7 @@ func _hitstop(seconds: float) -> void:
 		return
 	_hitstop_scale = Engine.time_scale
 	Engine.time_scale = _hitstop_scale * HITSTOP_TIME_SCALE
-	await get_tree().create_timer(seconds / speed, true, false, true).timeout
+	await get_tree().create_timer(seconds / speed, false, false, true).timeout
 	_end_hitstop()
 
 
@@ -829,6 +891,10 @@ func _is_machine(unit: AHCombat.Unit) -> bool:
 
 # ---------------------------------------------------------------- sons
 
+## Os sons das ações dos inimigos: audio/combat/enemies/<inimigo>/<ação>.wav.
+const ENEMY_CUES := "res://audio/combat/enemies/%s/%s.wav"
+
+
 func _hero_cue(actor: AHCombat.Unit, ability_id: String) -> String:
 	var prefix: String = HERO_CUES.get(actor.class_id, "")
 	var hero_class = session.data.classes.get(actor.class_id)
@@ -838,7 +904,13 @@ func _hero_cue(actor: AHCombat.Unit, ability_id: String) -> String:
 	return "%s%d" % [prefix, index + 1] if index >= 0 else ""
 
 
-func _play_enemy_cue(actor: AHCombat.Unit, action) -> void:
+## O som da ação do inimigo: cada habilidade tem o dela (tools/synth_enemy_sounds.py, ligado ao que a arte mostra). Sem
+## arquivo, o soco ou a cura de robô de antes.
+func _play_enemy_cue(actor: AHCombat.Unit, ability_id: String, action) -> void:
+	var path := ENEMY_CUES % [actor.enemy_id, ability_id]
+	if ResourceLoader.exists(path):
+		_play_path(path)
+		return
 	if action == null or not _is_machine(actor):
 		return
 	if action.TargetType == "Self":
@@ -849,7 +921,10 @@ func _play_enemy_cue(actor: AHCombat.Unit, action) -> void:
 
 
 func _play_cue(cue: String) -> void:
-	var path: String = art.audio.get(cue, "")
+	_play_path(art.audio.get(cue, ""))
+
+
+func _play_path(path: String) -> void:
 	if path == "" or speed > 2.0:
 		return
 	var player := _audio[_audio_next]

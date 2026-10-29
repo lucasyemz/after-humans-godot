@@ -4,9 +4,12 @@
 - 12 glifos brancos de um tom (art/ui/kit/station/icons/), no recorte dos glifos do kit, com alfa reto (RGB 255 onde
   há alfa) e sem grão.
 
-Uso: python3 -B docs/design/hud-casa/cut_art.py <folha_dos_moveis.png> <folha_dos_glifos.png> <folha_refeita.png>
-     (as do lote: images/hud-casa/infirmary-props-sheet-2.png, images/hud-casa/casa-glyphs-sheet.png e
-     images/hud-casa/casa-glyphs-sheet-3.png)
+Uso: python3 -B docs/design/hud-casa/cut_art.py <folha_dos_moveis.png> <folha_dos_glifos.png> <folha_refeita.png> \
+       [<folha_dos_leitos.png>]
+     (as do lote: images/hud-casa/infirmary-props-sheet-2.png, images/hud-casa/casa-glyphs-sheet.png,
+     images/hud-casa/casa-glyphs-sheet-3.png e images/hud-casa/infirmary-bed-broken-covered-2.png)
+A folha dos leitos (os ajustes do Lucas de 26/10) é uma edição do próprio Infirmary_Bed, ampliado de 477 para 620 px:
+o leito quebrado e o coberto com a lona, que esperam a melhoria no nível 1. Eles voltam para a escala do leito.
 A folha refeita (2x1) traz de novo o Caído e o Amanhecer: na primeira, as pernas da maca e o horizonte eram traço preto, e
 o recorte (o alfa vem da luminância) os perdia. Na nova, tudo é traço branco grosso.
 """
@@ -24,6 +27,9 @@ ICONS = ROOT / "art/ui/kit/station/icons"
 # Os móveis na folha (1264 x 848): a cama passa da linha da grade 3x2, então cada um sai de uma caixa medida na folha.
 PROPS = {"Infirmary_Bed": (6, 8, 498, 426), "Infirmary_Cabinet": (550, 8, 894, 426), "Infirmary_Drip": (982, 8, 1128, 426),
          "Infirmary_Screen": (34, 438, 472, 846), "Infirmary_Washstand": (556, 438, 838, 846), "Infirmary_Trolley": (900, 438, 1244, 846)}
+# Os leitos que esperam a melhoria, na folha dos leitos (1376 x 768), e a escala de volta para a do Infirmary_Bed.
+BEDS = {"Infirmary_Bed_Broken": (0, 180, 688, 560), "Infirmary_Bed_Covered": (688, 180, 1376, 560)}
+BED_SCALE = 477 / 620
 # A folha 4x3 dos glifos, na ordem.
 GLYPHS = ["state_fallen", "state_recovering", "job_research", "job_forge",
           "job_canteen", "job_dormitory", "job_infirmary", "room_infirmary",
@@ -84,6 +90,23 @@ def glyph(cell: Image.Image) -> Image.Image:
     return out
 
 
+def beds(sheet_path: str) -> None:
+    sheet = Image.open(sheet_path)
+    for name, box in BEDS.items():
+        im = card(sheet.crop(box))
+        im = im.resize((round(im.width * BED_SCALE), round(im.height * BED_SCALE)), Image.Resampling.LANCZOS)
+        # A borda semitransparente que ainda puxa para o roxo (o fio sob o estrado) vira cinza do mesmo brilho.
+        px = im.load()
+        for y in range(im.height):
+            for x in range(im.width):
+                r, g, b, a = px[x, y]
+                if 0 < a < 250 and r > g + 8 and b > g + 8:
+                    v = (r * 3 + g * 6 + b) // 10
+                    px[x, y] = (v, v, v, a)
+        im.save(CARDS / f"{name}.webp", "WEBP", quality=90, method=4)
+        print(name, im.size)
+
+
 def main(props_sheet: str, glyph_sheet: str, redone_sheet: str) -> None:
     sheet = Image.open(props_sheet)
     for name, box in PROPS.items():
@@ -99,3 +122,5 @@ def main(props_sheet: str, glyph_sheet: str, redone_sheet: str) -> None:
 
 if __name__ == "__main__":
     main(sys.argv[1], sys.argv[2], sys.argv[3])
+    if len(sys.argv) > 4:
+        beds(sys.argv[4])

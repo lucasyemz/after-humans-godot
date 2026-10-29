@@ -92,6 +92,12 @@ func _intents(t) -> void:
 			case[0].kind, case[0].target_ids.size(), case[0].either, case[1] if case[1] != "" else "sem ícone"])
 	hud._show_intent(label, {"kind": "attack", "name": "Golpe", "target_ids": [heroes[0]], "sure": false, "either": false})
 	t.check(label.text.ends_with(" ?"), "plano incerto leva o ?")
+	# #128: a intenção diz o que ele faz, nunca em quem (nem na placa, nem na dica).
+	var names: Array = session.state.player_team.map(func(u): return String(u.display_name))
+	for case in cases.slice(0, 3):
+		hud._show_intent(label, case[0])
+		var said: String = label.text + " " + label.tooltip_text + " " + icon.tooltip_text
+		t.check(not said.contains("→") and names.all(func(n): return not said.contains(n)), "a intenção %s não diz o alvo (%s)" % [case[0].name, label.text])
 	# Cada termo uma vez só na dica: dois alvos com os mesmos estados explicam Sangra uma vez.
 	var terms: Array = []
 	var unit: AHCombat.Unit = session.state.enemy_team[0]

@@ -28,7 +28,13 @@ func run(context) -> void:
 	Engine.time_scale = TIME_SCALE
 	# As lutas e as buscas sorteiam pelo randi() global: com a semente fixa, a jornada sai sempre igual.
 	seed(SEED)
+	# O trem da volta (#122) é sorteado: aqui ele traz sempre o próximo civil da fila (o test_train_recruits sorteia).
+	var train_rule: Dictionary = GameData.table("recruitment").get("train", {})
+	var train_before := train_rule.duplicate()
+	train_rule.Chance = 100
+	train_rule.CivilianShare = 100
 	await _play()
+	train_rule.merge(train_before, true)
 	randomize()
 	Engine.time_scale = real_scale
 	_release_all()
@@ -72,41 +78,49 @@ func _station_to_departure() -> bool:
 	var hud: AHRefugeHud = _station().hud
 	await _frames(3)
 	t.equal(Campaign.state.night.phase, "none", "campanha nova: sem noite pendente")
-	if not await _press(hud, "Preparar expedição", "o botão Preparar expedição da Estação"):
+	# A saída em três passos (#123): IR AO MAPA, o lugar, a equipe na plataforma e a confirmação.
+	if not await _press(hud, "Ir ao mapa", "o botão Ir ao mapa da Estação"):
 		return false
 	var map: AHPhaseMap = hud._map
 	if not await _until(func(): return map.visible, "o mapa de fases abrir"):
 		return false
-	# Escolhe a fase 1 na lista do mapa e prepara a expedição dela.
+	# Escolhe a fase 1 na lista do mapa e prepara a expedição nela.
 	if not await _press(map, "Fase 1", "a fase 1 no mapa"):
 		return false
 	t.equal(map.selected, "fase_1", "a fase 1 fica escolhida no mapa")
-	if not await _press(map, "Preparar expedição", "Preparar expedição no painel da fase"):
+	if not await _press(map, "Preparar neste lugar", "Preparar neste lugar no painel da fase"):
 		return false
-	if not await _until(func(): return not map.visible and hud.current == S.PREPARATION, "a Preparação abrir"):
+	if not await _until(func(): return not map.visible and hud.current == "departure" and hud._departure != null, "a equipe subir para a plataforma"):
 		return false
-	t.equal(hud._draft.get("phase", ""), "fase_1", "a Preparação vem com a fase do mapa")
-	t.equal(hud._draft.get("team", []).size(), 4, "a Preparação escala os quatro fundadores")
-	# Escolher no mapa volta ao mapa; Preparar expedição de novo volta à mesma Preparação.
-	if not await _press(hud, "Escolher no mapa", "Escolher no mapa na Preparação"):
-		return false
-	t.check(map.visible, "Escolher no mapa abre o mapa de fases")
-	if not await _press(map, "Preparar expedição", "Preparar expedição de novo no mapa"):
-		return false
-	if not await _until(func(): return not map.visible and hud.current == S.PREPARATION and hud._prep != null and hud._prep.visible, "voltar à Preparação"):
-		return false
-	t.equal(hud._draft.get("phase", ""), "fase_1", "a Preparação continua com a fase 1")
-	if not await _press(hud, "Partir", "o botão Partir da Preparação"):
-		return false
-	# O briefing (#88): as falas de quem pede, passadas com Próximo, e Partir na última.
-	if not await _until(func(): return hud.briefing_open(), "o briefing abrir"):
+	t.equal(hud._draft.get("phase", ""), "fase_1", "a plataforma vem com a fase do mapa")
+	t.equal(hud._draft.get("team", []).size(), 4, "a plataforma escala os quatro fundadores")
+	# O briefing (#88) abre quando a equipe chega na plataforma: as falas passadas com Próximo, e Continuar na última.
+	if not await _until(func(): return hud.briefing_open(), "o briefing abrir na plataforma"):
 		return false
 	var lines: int = hud.briefing.lines.size()
 	t.check(lines >= 2 and lines <= 3, "o briefing tem duas ou três falas (%d)" % lines)
+	t.equal(_station().lineup.size(), 4, "os quatro estão em fila na plataforma")
 	for i in lines - 1:
 		if not await _press(hud.briefing, "Próximo", "Próximo no briefing"):
 			return false
-	if not await _press(hud.briefing, "Partir", "Partir na última fala do briefing"):
+	if not await _press(hud.briefing, "Continuar", "Continuar na última fala do briefing"):
+		return false
+	# VOLTAR AO MAPA volta ao mesmo lugar; Preparar neste lugar de novo volta à plataforma, sem repetir o briefing.
+	if not await _press(hud, "Voltar ao mapa", "Voltar ao mapa na plataforma"):
+		return false
+	t.check(map.visible and map.selected == "fase_1", "Voltar ao mapa abre o mapa com o lugar escolhido")
+	if not await _press(map, "Preparar neste lugar", "Preparar neste lugar de novo no mapa"):
+		return false
+	if not await _until(func(): return not map.visible and hud.current == "departure" and _station().camera_settled(), "voltar à plataforma"):
+		return false
+	await _frames(10)
+	t.check(not hud.briefing_open(), "o briefing do mesmo lugar não repete")
+	t.equal(hud._draft.get("phase", ""), "fase_1", "a plataforma continua com a fase 1")
+	if not await _press(hud, "Iniciar expedição", "o botão Iniciar expedição da plataforma"):
+		return false
+	t.check(hud._departure.confirm_open(), "Iniciar expedição abre a confirmação")
+	t.check(_label(hud._departure._confirm, "Rua das Vitrines"), "a confirmação diz o lugar")
+	if not await _press(hud._departure._confirm, "Iniciar expedição", "Iniciar expedição na confirmação"):
 		return false
 	if not await _until(func(): return _street() != null and _street().corridor != null and not GameFlow.busy, "a rua abrir depois da partida"):
 		return false
@@ -147,8 +161,19 @@ func _journey() -> bool:
 			continue
 		street.corridor.debug_next_fight()
 		await _frames(2)
+		# Os efeitos de fase dos eventos (#78) na primeira luta: Exposto e Preparado valem só nela (decisão do Lucas no #136).
+		var first_fight: bool = route.steps.filter(func(s): return (s.type == "combat" or s.type == "boss") and s.resolved).is_empty()
+		if first_fight:
+			route.effects = ["exposto", "preparado"]
 		if not await _walk_into_fight(street):
 			return false
+		if first_fight:
+			var lines := Array(street._arena.session.state.combat_log)
+			t.check(lines.has("Exposto: a equipe começa Vulnerável.") and lines.has("Preparado: a equipe começa com 1 Bloqueio."), "a luta da rua começa com os efeitos de fase")
+			t.equal(route.effects, [], "o Exposto e o Preparado se gastam na luta")
+			# O resto da jornada sem efeitos, como antes: o teste confere o fluxo, e o Preparado mudaria o sorteio das lutas
+			# (o debriefing da fase 1 cala se o Bento não volta).
+			route.effects = []
 		if not await _auto_fight(street):
 			return false
 	# A carga recuperada do guardião (#91): escolhe a primeira caixa e continua.
@@ -307,7 +332,7 @@ func _return_report() -> bool:
 		return false
 	if not await _until(func(): return hud.current == "report", "o relatório abrir depois da chegada", 30.0):
 		return false
-	t.equal(_station().lineup.map(func(e): return e.hero_id), alive, "os que voltaram estão na fila do relatório")
+	t.equal(_station().lineup.map(func(e): return e.hero_id), AHStationReport.scene_order(alive), "os que voltaram estão na fila do relatório, na ordem da formação")
 	var report: Dictionary = Campaign.state.station.last_return
 	t.equal(report.get("result", ""), "victory", "o relatório é de vitória")
 	t.equal(report.get("phase_id", ""), "fase_1", "o relatório é da fase 1")
@@ -420,6 +445,10 @@ func _has_label(root: Node, part: String) -> bool:
 		if not node.is_queued_for_deletion() and node.is_visible_in_tree() and node.text.contains(part):
 			return true
 	return false
+
+
+func _label(root: Node, part: String) -> bool:
+	return root.find_children("*", "Label", true, false).any(func(l): return (l as Label).text.contains(part))
 
 
 func _buttons(root: Node) -> Array:

@@ -189,7 +189,7 @@ const adminSettings = () => admin(EXPLORE_BG("explore"), "Ajustes",
   row("Colisões", `<div class="row" style="gap:10px">${toggle(false)}<span class="tx f22">Desligado</span></div>`, "O antigo C da rua") +
   row("Qualidade", small("Baixa") + small("Média") + small("Alta", { selected: true })));
 const RES = [["lobby-seed.svg", "Sementes", "30"], ["lobby-scrap.svg", "Sucata", "9"], ["lobby-fragment.svg", "Fragmentos", "3"],
-  ["lobby-food.svg", "Comida", "4 / 12"], ["lobby-water.svg", "Água", "6"], ["res-bandages.svg", "Curativos", "2"]];
+  ["lobby-food.svg", "Comida", "6 / 12"], ["lobby-water.svg", "Água", "6"], ["res-bandages.svg", "Curativos", "2"]];
 const adminResources = () => admin(DAY5(), "Recursos",
   saveNote + RES.map(([icon, name, value]) => row(`<span class="row" style="gap:10px">${glyph(icon, 30)}${name} · <span class="amber">${value}</span></span>`,
     small("−1") + small("+1") + small("+5") + small("+10"))).join(""),
@@ -235,7 +235,7 @@ function adminJourney() {
 // "Quarto por recuperar"; a equipe dorme nos beliches assim mesmo) chegam numa próxima fase.
 const MARKERS = [
   { cx: 1310, top: 662, name: "Forja", icon: "room_forge", avail: true, text: "4 sucatas · tem 9" },
-  { cx: 530, top: 662, name: "Enfermaria", icon: "room_infirmary", avail: false, text: "Faltam 2 fragmentos" },
+  { cx: 530, top: 662, name: "Enfermaria", icon: "room_infirmary", avail: false, text: "Falta 1 fragmento" },
   { cx: 1162, top: 532, name: "Bar", icon: "room_bar", avail: false, text: "Numa próxima fase" },
   { cx: 676, top: 532, name: "Dormitório", icon: "room_quarters", avail: false, text: "Numa próxima fase" },
 ];
@@ -250,13 +250,14 @@ function stationMarkers({ focus = false } = {}) {
   // Mapa da Rede) e os chips do cost.
   const body = `<span class="tx f36 semi">Recuperar a Forja</span><span class="wrap f22">Fabrica relíquias por 3 sucatas. Gasta 1 de energia. Remenda a antena do terminal: no Mapa da Rede, lê a história e o clima de cada lugar.</span>` +
     `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("lobby-scrap.svg", "4 sucatas · tem 9")}</div>` + secondary("Ver a Forja", { icon: "room_forge", hit: "next", height: 60, extra: "width:100%" });
-  // Com o foco na placa da Enfermaria, o cartão do cômodo embaixo mostra o que falta e o que ela destrava.
+  // Com o foco na placa da Enfermaria, o cartão do cômodo embaixo mostra o que falta e o que ela destrava. O custo e os
+  // dias são os de hoje (data/recovery.json): 4 sucatas e 1 fragmento; 2 dias no leito, 3 no Dormitório.
   // Com o foco numa placa, o cartão do cômodo toma o lugar do Próximo passo, no alto à esquerda: longe das placas.
   const card = focus ? nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:8px" },
     `<div class="row" style="gap:12px">${glyph("room_infirmary", 36, "var(--amber)")}<span class="tx f32 semi up">Enfermaria</span>${roomTag("Vazio")}</div>` +
-    `<span class="wrap f22">Recuperada, os leitos de quem caiu: volta em 3 dias, e não em 4 no Dormitório.</span>` +
-    `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("lobby-scrap.svg", "4 sucatas · tem 9")}${cost("lobby-fragment.svg", "2 fragmentos · tem 0", true)}</div>` +
-    train("Recuperar", "faltam 2 fragmentos", { hit: "recover", locked: true, icon: "lock" })) : "";
+    `<span class="wrap f22">Recuperada, os leitos de quem caiu: volta em 2 dias, e não em 3 no Dormitório.</span>` +
+    `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("lobby-scrap.svg", "4 sucatas · tem 9")}${cost("lobby-fragment.svg", "1 fragmento · tem 0", true)}</div>` +
+    train("Recuperar", "falta 1 fragmento", { hit: "recover", locked: true, icon: "lock" })) : "";
   return OWN("station_markers") + topBar(STOCK) + MARKERS.map((m) => marker(m, focus && m.name === "Enfermaria")).join("") +
     `<div class="abs col" data-hit="panel" style="left:28px;top:calc(132px + 30px*(var(--k) - 1)/0.3);gap:12px">${focus ? card : next(body)}</div>` +
     bottom({ active: 0, back: false, keysAt: 840, keys: [["Setas", "Cômodos"], ["E", "Abrir"], ["Esc", "Menu"], ["F2", "Ocultar"]], main: TO_MAP });
@@ -275,21 +276,24 @@ function nightCard() {
   return OWN("station_night") + card;
 }
 // O painel "Amanhecer · Dia N" no lugar do painel do cômodo: o que a noite fez (a comida, quem descansou, a
-// Enfermaria), o evento da noite e o Próximo passo; COMEÇAR O DIA no pé. PREPARAR fica bloqueado até lá.
+// Enfermaria), o evento da noite e o Próximo passo; COMEÇAR O DIA no pé. PREPARAR fica bloqueado até lá. Os números e
+// os textos são os do jogo de hoje (AHStationRules.resolve_night e data/night-events.json): só quem voltou e dorme come
+// (o Bento e o Nick: 8 → 6; a Véspera vigia e a Íris, Caída, fica fora da noite); o texto do evento é o de watcher_sees
+// e o da noite calma, o de quiet.
 function dawn({ event = true } = {}) {
   const who = (hero, name, text, color = "var(--text)") => `<div class="row" style="gap:12px">${face(hero, 44)}<span class="wrap f22" style="flex:1;min-width:0;color:${color}"><b class="semi">${name}</b> ${text}</span></div>`;
   const ev = event
-    ? inset(`<div class="row" style="gap:14px;align-items:flex-start">${glyph("watch", 44, "var(--amber)")}<div class="col" style="flex:1;min-width:0"><span class="tx f28 semi">A Véspera viu luzes na Ponte</span>` +
-      `<span class="wrap f22">Da vigia, ela viu as lanternas da patrulha na Ponte das Raízes. O Mapa da Rede leu os inimigos de lá: Enraizado.</span></div></div>`)
+    ? inset(`<div class="row" style="gap:14px;align-items:flex-start">${glyph("watch", 44, "var(--amber)")}<div class="col" style="flex:1;min-width:0"><span class="tx f28 semi">Véspera viu luzes ao longe</span>` +
+      `<span class="wrap f22">Véspera viu luzes se mexendo longe, no rumo do próximo lugar (Ponte das Raízes). O Mapa da Rede agora lê o guardião e os inimigos de lá.</span></div></div>`)
     : inset(`<div class="row" style="gap:14px;align-items:flex-start">${glyph("night", 44, "var(--muted)")}<div class="col" style="flex:1;min-width:0"><span class="tx f28 semi">Noite calma</span>` +
-      `<span class="wrap f22">Nada aconteceu. Com alguém de vigia, as chances de uma noite ruim caem pela metade.</span></div></div>`);
+      `<span class="wrap f22">A noite passou tranquila. O abrigo permaneceu seguro.</span><span class="wrap f20 muted">Com alguém de vigia, a goteira, as baratas e os ruídos não levam nada.</span></div></div>`);
   const body = section("O que a noite fez", "night") +
-    `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("lobby-food.svg", "Comida 8 → 4")}</div><span class="wrap f20 muted">A Cantina e a Dora renderam 4; os civis comeram 4, e a noite, 4. A água não cai à noite.</span>` +
+    `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("lobby-food.svg", "Comida 8 → 6")}</div><span class="wrap f20 muted">Quem dormiu comeu 1 suprimento: o Bento e o Nick. Quem vigia não come. A água não cai à noite.</span>` +
     who("nick", "Nick", `+8 de vida (9 ${arrow()} 17), −15 de instinto`) + who("bento", "Bento", "−15 de instinto") +
     who("vespera", "Véspera", "vigiou: não descansou") + who("iris", "Íris", "na Enfermaria: volta amanhã", "var(--amber)") +
     section("Durante a noite", event ? "watch" : "night") + ev +
     section("Próximo passo", "next_step") + `<span class="wrap f22">Escolher o lugar da próxima expedição no Mapa da Rede. A Íris volta amanhã.</span>`;
-  return MINE("station_day5") + topBar({ subtitle: "Dia 5 · Amanhecer", food: ["4 / 12 suprimentos", "Abastecida · demanda 4", false] }) +
+  return MINE("station_day5") + topBar({ subtitle: "Dia 5 · Amanhecer", food: ["6 / 12 suprimentos", "Abastecida · demanda 4", false] }) +
     roomPanel({ icon: "dawn", title: "Amanhecer · Dia 5", body, footer: primary("Começar o dia", { keyLabel: "E / A", hit: "start-day", height: 64, size: "f26" }) }) +
     bottom({ active: 0, back: false, keysAt: 840, keys: [["Setas", "Rolar"], ["E", "Começar"], ["F2", "Ocultar"]], main: { ...TO_MAP, locked: true, reason: "Comece o dia antes de partir." } });
 }

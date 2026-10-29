@@ -1,0 +1,43 @@
+[
+  {
+    "Name": "fallen",
+    "Hp": 1,
+    "Days": 3,
+    "Description": "Proposta (#118): quem cai na luta volta à Estação Caído, com esta vida, e fica em recuperação estes dias (um dia é um ciclo da Estação: uma volta de expedição). Sem leito na Enfermaria, a recuperação é esta, no Dormitório."
+  },
+  {
+    "Name": "carried",
+    "Factor": 0.5,
+    "Description": "Decisão do Lucas (28/10, #179): quem a equipe levantou no mapa e carregou chega com esta parte dos dias de recuperação (para cima, no mínimo 1): na Enfermaria, 2 viram 1; no Dormitório, 3 viram 2. A metade vale também no leito que ele ganhar depois, enquanto se recupera. Quem ficou no mapa chega com os dias inteiros."
+  },
+  {
+    "Name": "infirmary",
+    "Days": 2,
+    "Beds": 2,
+    "BedsLevel2": 4,
+    "Description": "Proposta (#121): num leito da Enfermaria, a recuperação leva estes dias. Os leitos são o limite (2 no nível 1, 4 no nível 2); quem não cabe se recupera no Dormitório, mais devagar."
+  },
+  {
+    "Name": "bandage",
+    "Days": 1,
+    "Cost": 1,
+    "Description": "Proposta (#121): um curativo usado num leito da Enfermaria tira este tanto de dias, uma vez por dia em cada herói."
+  },
+  {
+    "Name": "post",
+    "Days": 1,
+    "Description": "Proposta (#121, entra com a #119): um herói ou ajudante no posto da Enfermaria tira mais este tanto de dias."
+  },
+  {
+    "Name": "infirmary_level_1",
+    "Scrap": 4,
+    "Fragments": 1,
+    "Description": "Proposta (#121): o custo de recuperar a Enfermaria (2 leitos)."
+  },
+  {
+    "Name": "infirmary_level_2",
+    "Scrap": 6,
+    "Fragments": 2,
+    "Description": "Proposta (#121): o custo de melhorar a Enfermaria (4 leitos)."
+  }
+]

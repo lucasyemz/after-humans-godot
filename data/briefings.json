@@ -201,5 +201,75 @@
       ],
       "Text": "Ninguém desceu do trem. Na Estação, alguém deixa a luz da plataforma acesa."
     }
+  },
+  {
+    "Name": "tutorial_nick",
+    "Briefing": [
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "As portas lá atrás não abrem mais. O protocolo de contenção fechou o corredor inteiro, e vocês três ficaram do lado de dentro."
+      },
+      {
+        "Speakers": [
+          "hero_coruja_vespera"
+        ],
+        "Text": "Ele estava nos vigiando desde a escada."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Tem gente na Estação esperando estes suprimentos. Íris, Véspera, atrás de mim: tem que haver outro caminho."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Tem. Pelo duto, depois a escada até o alçapão. Eu ia seguir viagem... Andem, antes que eu mude de ideia."
+      }
+    ]
+  },
+  {
+    "Name": "tutorial",
+    "Debriefing": [
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Obrigado."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Você ia acabar morrendo junto com elas."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Talvez."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Idiota."
+      },
+      {
+        "Speakers": [
+          "hero_cao_bento"
+        ],
+        "Text": "Fica? Aqui tem comida, cama e porta que abre por dentro."
+      },
+      {
+        "Speakers": [
+          "hero_gato_nick"
+        ],
+        "Text": "Só por uma noite."
+      }
+    ]
   }
 ]

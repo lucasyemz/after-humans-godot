@@ -15,6 +15,8 @@ const BUSES := ["Music", "Ambience", "SFX", "UI"]
 ## efeitos (as Opções têm três controles).
 const SETTING_OF := {"Music": "music_volume", "Ambience": "ambience_volume", "SFX": "sfx_volume", "UI": "sfx_volume"}
 const MIX := "res://data/presentation/audio_mix.json"
+## O tempo de relógio, ao fechar, para o servidor de áudio descartar os sons parados (quit).
+const RELEASE_SECONDS := 0.25
 ## Os passos de cada classe (altura e volume): o Bento pesado, o Nick leve.
 const HERO_STEPS := {"cao": [0.88, 0.85], "gato": [1.12, 0.5], "sapo": [1.0, 0.65], "coruja": [1.05, 0.6]}
 const FOOTSTEP_VARIANTS := {"water": 4, "wood": 5, "concrete": 5}
@@ -66,9 +68,48 @@ func _ready() -> void:
 			_mix[path] = float(table.files[path].get("gain_db", 0.0))
 	Campaign.changed.connect(apply_volumes)
 	apply_volumes()
+	# Fechar a janela passa pelo quit daqui (o Campaign grava o tempo jogado no mesmo aviso).
+	get_tree().auto_accept_quit = false
 
 
 ## Os volumes das opções (0 a 1) nos canais.
+## Ao sair do jogo (#66): para os tocadores e solta os sons que eles e o cache de laços seguram. Sem isso, o que estava
+## tocando ao fechar (a música, o ambiente, um efeito) ficava preso no servidor de áudio e vazava na saída. A paisagem
+## sonora também para, para não voltar a tocar a música da cena.
+func release() -> void:
+	set_process(false)
+	for channel in _channels:
+		if channel.tween:
+			channel.tween.kill()
+	if _duck_tween:
+		_duck_tween.kill()
+	for player in get_children():
+		if player is AudioStreamPlayer:
+			player.stop()
+			player.stream = null
+	_streams.clear()
+
+
+func _exit_tree() -> void:
+	release()
+
+
+## Fechar o jogo (#66) sem prender som: solta tudo, espera o servidor de áudio descartar o que parou na mixagem seguinte
+## (uns 80 ms de relógio; 0,25 s de folga) e só então fecha. A janela fechada passa por aqui (auto_accept_quit desligado
+## no _ready), e as ferramentas de captura e a suíte de testes também.
+func quit(code: int = 0) -> void:
+	release()
+	var until := Time.get_ticks_msec() + int(RELEASE_SECONDS * 1000.0)
+	while Time.get_ticks_msec() < until:
+		await get_tree().process_frame
+	get_tree().quit(code)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		quit()
+
+
 func apply_volumes() -> void:
 	for bus in BUSES:
 		_apply_bus(bus)
@@ -155,6 +196,11 @@ func _fade(channel: Dictionary, player: AudioStreamPlayer, db: float, seconds: f
 		channel.tween.kill()
 	channel.tween = create_tween()
 	channel.tween.tween_property(player, "volume_db", db, seconds)
+
+
+## O arquivo em laço (o mesmo stream das cenas), para quem toca o próprio laço (o trem da passagem, #133).
+func looped(path: String) -> AudioStream:
+	return _loop(path)
 
 
 func _loop(path: String) -> AudioStream:

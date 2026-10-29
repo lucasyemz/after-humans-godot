@@ -34,11 +34,22 @@ e concreta, e devolve um veredito.
 - Ícones de um tom só quando o jogo tinge (o HUD aplica a cor).
 - Nome em inglês e `snake_case`, na pasta pedida; os arquivos que substituem outros mantêm o mesmo nome.
 - Sem texto dentro das imagens (o jogo escreve em português).
+- Personagem novo segue o padrão de imagem em [characters.md](characters.md): a tela de 1178×1335 com o corpo
+  ocupando 90% a 95% da altura, o pé no mesmo ponto em todas as poses, a proporção dos fundadores e a largura perto da
+  deles, seja qual for a altura. A prancha mostra o personagem ao lado dos quatro fundadores, com os pés na mesma
+  linha. Fora do padrão é gravidade alta.
 
 **Medidas e entrega**
 - As medidas que o Claude precisa estão na página: âncoras em pixels, margens de 9-slice, área de conteúdo, tamanhos.
 - A página em `docs/design/<assunto>.md` tem a prévia, as medidas e as decisões.
 - Nada fora do escopo: nenhum arquivo em `scripts/`, `data/`, `tests/`, nenhum id alterado.
+
+**Antes e depois no jogo** (pedido do Lucas, 28/10)
+- Todo PR que mexe no que se vê mostra o antes e o depois, e os dois saem de dentro do jogo, na Godot: o antes é a
+  `main` de hoje, sem mudança nenhuma; o depois, o jogo com a proposta (o pacote do protótipo carregado por cima, ou a
+  tela do kit sobre a captura do jogo). Maquete do lote anterior não vale como antes.
+- Os dois na mesma câmera, com as mesmas pessoas e o mesmo momento, lado a lado, cada lado com a legenda de onde veio.
+- As imagens ficam no PR (no corpo ou num comentário), não só na página. Sem placa de vídeo, o PR diz isso.
 
 ## Gravidade
 

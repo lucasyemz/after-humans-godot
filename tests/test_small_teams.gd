@@ -93,14 +93,16 @@ func _journey(t, size: int) -> void:
 	t.check(S.resolve_night(c), "%d: a noite passa" % size)
 	t.equal(c.night.results.size(), size, "%d: um resultado da noite por herói" % size)
 	S.finish_dawn(c)
-	# A derrota com a equipe pequena: todos caem, ninguém fantasma no memorial.
+	# A derrota com a equipe pequena: todos caem e voltam Caídos (#118), ninguém fica no memorial.
 	var d: Dictionary = Campaign.create_initial(40 + size)
 	t.equal(S.confirm_departure(d, team, 0, 200 + size, "fase_1"), "", "%d: parte para a derrota" % size)
 	for hero_id in team:
 		S.hero(d, hero_id).alive = false
 	J.end_combat(d, "defeat", false, "teste")
 	t.equal(d.session.result, "defeat", "%d: a derrota fecha a expedição" % size)
-	t.equal(d.memorial.size(), size, "%d: o memorial tem só quem foi" % size)
+	S.finish_return(d)
+	t.equal(d.memorial.size(), 0, "%d: ninguém vai para o memorial" % size)
+	t.equal(S.fallen(d).map(func(h): return h.id), team, "%d: quem foi volta Caído, e só quem foi" % size)
 
 
 ## Na Preparação: escolher um cartão e "Deixar na Estação" parte com um a menos; a fase que pede mais avisa e trava o
@@ -117,12 +119,13 @@ func _preparation(t) -> void:
 		if not GameFlow.busy and tree.current_scene is AHStation and tree.current_scene.hud != null:
 			break
 	var hud: AHRefugeHud = tree.current_scene.hud
-	hud.open_room(S.PREPARATION)
+	hud.open_departure()
+	hud._briefed = hud._draft.phase
 	await tree.process_frame
-	hud._prep_click(3)
+	hud._departure.pick(3)
 	await tree.process_frame
-	var leave := _button(hud._prep, "Deixar na Estação")
-	if t.check(leave != null, "com um cartão escolhido, aparece Deixar na Estação"):
+	var leave := _button(hud._departure, "Deixar na Estação")
+	if t.check(leave != null, "com uma carta escolhida, aparece Deixar na Estação"):
 		leave.pressed.emit()
 		await tree.process_frame
 		t.equal(hud._draft.team, FOUNDERS.slice(0, 3), "a Vespera fica na Estação; partem três")
@@ -130,24 +133,31 @@ func _preparation(t) -> void:
 	hud._draft.phase = "fase_5"
 	hud.refresh()
 	await tree.process_frame
-	var go: Button = hud.find_child("PrepareBlocked", true, false)
-	t.check(go != null and go.disabled and go.text.begins_with("PARTIR"), "Túneis do Eco com três: Partir travado")
-	t.check(_label(hud._prep, "pede 4 animais"), "e o motivo na tela")
-	# Texto Maior, doze na Estação e um só na equipe: o banco quebra em linhas e a gaveta cabe na tela.
+	var go: Button = hud.find_child("StartBlocked", true, false)
+	t.check(go != null and go.disabled and go.text.begins_with("INICIAR EXPEDIÇÃO"), "Túneis do Eco com três: Iniciar expedição travado")
+	t.check(_label(hud._departure, "pede 4 animais"), "e o motivo na tela")
+	# Texto Maior, doze na Estação e um só na equipe: a lista da Estação quebra em linhas e cabe acima dos botões.
 	var classes := ["cao", "gato", "sapo", "coruja", "cao", "gato", "sapo", "coruja"]
+	# O Alojamento no nível máximo (#119): cabem doze.
+	Campaign.state.station.rooms[S.CHARACTERS] = 4
+	# Direto no elenco, como num save antigo: com um rosto por classe, o recrutamento para em oito (#182).
 	for i in classes.size():
-		S.recruit(Campaign.state, classes[i], RandomNumberGenerator.new(), "Voluntário %d" % (i + 1))
+		S._add_hero(Campaign.state, S._next_hero_id(Campaign.state, classes[i]), classes[i], "Voluntário %d" % (i + 1), [], "")
 	t.equal(S.living(Campaign.state).size(), 12, "doze na Estação")
 	Settings.set_text_size(2)
 	hud._draft.phase = "fase_1"
 	hud._draft.team = [FOUNDERS[0]]
-	hud._prep_selected = 0
+	hud._departure.selected = 0
 	hud.refresh()
 	for frame in 4:
 		await tree.process_frame
-	var right: float = hud._prep.position.x + hud._prep.size.x
-	t.check(right <= 1920.0, "a gaveta cabe na largura da tela (%.0f)" % right)
-	var plus := _button(hud._prep, "+")
+	var lineup: Control = hud._departure.find_child("Lineup", true, false)
+	var start: Button = hud._departure.find_child("Start", true, false)
+	t.check(lineup != null and lineup.get_global_rect().position.x >= 0.0 and lineup.get_global_rect().end.x <= 1920.0,
+		"as cartas e a lista cabem na largura da tela")
+	t.check(lineup != null and start != null and lineup.get_global_rect().end.y <= start.get_global_rect().position.y,
+		"e terminam acima de Iniciar expedição (%.0f)" % (lineup.get_global_rect().end.y if lineup else 0.0))
+	var plus := _button(hud._departure, "+")
 	t.check(plus != null and plus.get_global_rect().end.x <= 1920.0, "o + da comida fica na tela")
 	Settings.set_text_size(0)
 	# A Preparação lembra a equipe pequena da última partida.

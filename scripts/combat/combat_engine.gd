@@ -138,7 +138,7 @@ func _n(unit: Unit) -> String:
 	return unit.display_name if unit.is_player else AHCombatHud.unit_name(unit.display_name)
 
 
-## A causa de uma morte (state.deaths, que vai para o memorial no save) fica em português, como os ids: esta função a
+## A causa de uma queda (state.deaths; o memorial do save saiu com o #118) fica em português, como os ids: esta função a
 ## traduz na hora de mostrar. "Robô (Golpe mecânico)" traduz as duas partes; um efeito ("Sangramento"), inteiro.
 static func cause_text(cause: String) -> String:
 	var open := cause.rfind(" (")
@@ -216,6 +216,8 @@ func status_name(effect: String, machine: bool) -> String:
 
 
 func _resisted_effect(unit: Unit, dot: bool) -> bool:
+	if dot and unit.is_player and context.sure_hero_dots:
+		return false
 	# Sangramento e contaminação usam dotResist (0,2 sem inimigo); só sorteia entre 0 e 1.
 	var enemy = find_enemy(unit.enemy_id)
 	var value: float = (enemy.DotResist if enemy != null else 0.2) if dot else 0.0
@@ -633,7 +635,7 @@ func _apply_damage(unit: Unit, raw_damage: int, direct_attack: bool, out_events:
 				_log(tr("%s resistiu à morte por um triz!") % _n(unit))
 			return
 
-		unit.hp = maxi(0, unit.hp - damage)
+		unit.hp = maxi(context.min_hero_hp, unit.hp - damage)
 		if unit.hp == 0:
 			unit.deaths_door = true
 			_add_event(out_events, tr("ÚLTIMO FÔLEGO!"), EventType.INFO, unit.id)

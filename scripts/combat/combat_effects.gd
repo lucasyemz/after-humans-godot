@@ -9,13 +9,10 @@ class_name AHCombatEffects
 extends RefCounted
 
 const MANIFEST := "res://data/presentation/combat_effects.json"
-## O tamanho na tela de 1080 (px) do quadro de 256: impactos de 128 a 192, cura, bloqueio e esquiva 128. Nos estados, o
-## desenho ocupa só uns 120 dos 256 px do quadro: com o quadro em 192, a forma fica com uns 90 px (os 64 a 96 do
-## documento).
-const SCREEN_PX := {"hit_metal": 176.0, "hit_dust": 176.0, "critical": 192.0, "healing": 128.0, "block": 128.0,
-	"dodge": 128.0, "status": 192.0}
-## Onde, no corpo, cada um fica (fração da altura do corpo a partir do pé; a âncora do efeito vai nesse ponto).
-const BODY_HEIGHT_AT := {"hit_metal": 0.5, "hit_dust": 0.3, "critical": 0.5, "healing": 0.5, "block": 0.5, "dodge": 0.02}
+## O tamanho e o ponto de cada efeito no corpo (#128: os pixels fixos da tela deixavam os efeitos pequenos perto do
+## corpo, diferente da Unreal): o quadro em frações da altura de quem recebe, com um mínimo em px da tela de 1080, e a
+## âncora em frações da altura a partir do pé. "status" vale para os loops.
+const LAYOUT := "res://data/presentation/combat_effects_layout.json"
 ## A altura do atordoado e da marca (fração do corpo): na cabeça (as estrelas giram em volta dela e os cantos da marca a
 ## enquadram). Acima dela, os dois caíam no desfoque do alto da tela.
 const HEAD_AT := 0.88
@@ -34,12 +31,26 @@ const HITS := ["hit_metal", "hit_dust", "critical"]
 const PRIORITY := ["critical", "block", "hit_metal", "hit_dust", "dodge", "healing"]
 
 var _effects := {}
+var _layout := {}
 var _speed := 1.0
 
 
 func _init() -> void:
 	if FileAccess.file_exists(MANIFEST):
 		_effects = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST)).get("effects", {})
+	if FileAccess.file_exists(LAYOUT):
+		_layout = JSON.parse_string(FileAccess.get_file_as_string(LAYOUT)).get("effects", {})
+
+
+## A medida de um efeito (o nome dele em LAYOUT, ou "status"): {body, min_px, at}.
+func layout(effect: String) -> Dictionary:
+	return _layout.get(effect, {"body": 0.8, "min_px": 140.0, "at": 0.5})
+
+
+## A altura do quadro do efeito (m) no personagem: a fração do corpo, sem ficar abaixo do mínimo na tela.
+func size_on(effect: String, card: AHSpriteCard, camera: Camera3D) -> float:
+	var entry := layout(effect)
+	return maxf(card.body_height * float(entry.body), meters(float(entry.min_px), card, camera))
 
 
 func has(effect: String) -> bool:
@@ -97,12 +108,12 @@ func play(effect: String, card: AHSpriteCard, camera: Camera3D, speed: float, re
 	art.fps = float(art.fps) * _speed
 	if reduced:
 		art.frames = [art.frames[mini(REDUCED_FRAME, art.frames.size() - 1)]]
-	var node := _sprite(art, meters(SCREEN_PX.get(effect, 160.0), card, camera))
+	var node := _sprite(art, size_on(effect, card, camera))
 	node.name = "Effect_" + effect
 	node.add_to_group("combat_effect")
 	node.set_meta("effect", effect)
 	card.add_child(node)
-	node.position = Vector3(0, card.body_height * float(BODY_HEIGHT_AT.get(effect, 0.5)), FRONT)
+	node.position = Vector3(0, card.body_height * float(layout(effect).at), FRONT)
 	var life: float = REDUCED_SECONDS if reduced else float(_effects[effect].frames.size()) / float(_effects[effect].fps)
 	var tween := node.create_tween()
 	tween.tween_interval(life / _speed)
@@ -132,7 +143,7 @@ func sync_states(card: AHSpriteCard, states: Dictionary, camera: Camera3D, reduc
 			var effect: String = wanted[state]
 			if not _effects.has(effect):
 				continue
-			node = _sprite(_effects[effect], meters(SCREEN_PX.status, card, camera))
+			node = _sprite(_effects[effect], size_on("status", card, camera))
 			node.name = "State_" + state
 			node.add_to_group("combat_state")
 			node.set_meta("state", state)

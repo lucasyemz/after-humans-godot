@@ -9,6 +9,11 @@ const DOOR_SHOPS := [0, 1, 2, 0, 1, 2]
 
 
 func run(t) -> void:
+	# O trem da volta (#122) é sorteado: aqui ele traz sempre o próximo civil da fila (o test_train_recruits sorteia).
+	var train_rule: Dictionary = GameData.table("recruitment").get("train", {})
+	var train_before := train_rule.duplicate()
+	train_rule.Chance = 100
+	train_rule.CivilianShare = 100
 	_new_campaign(t)
 	_rooms(t)
 	_departure(t)
@@ -25,6 +30,7 @@ func run(t) -> void:
 	_next_step(t)
 	_save_round_trip(t)
 	_undeployable(t)
+	train_rule.merge(train_before, true)
 
 
 ## O próximo passo da Estação: na ordem do que pede atenção (relatório, noite, trem, cômodo, sucata, fase).
@@ -154,7 +160,7 @@ func _return_and_night(t) -> void:
 	t.equal(S.quantity(c, S.SUPPLIES), 4 - 3, "três suprimentos comidos")
 	t.check(c.night.phase == "dawn" and S.night_event_text(c) != "", "amanhecer com o relato da noite")
 	t.check(S.finish_dawn(c) and c.night.phase == "none", "a noite termina")
-	t.check(S.preparation_block(c) != "", "o candidato ainda espera na plataforma")
+	t.check(S.visit_pending(c) and S.preparation_block(c) == "", "o candidato ainda espera na plataforma, sem travar a partida (#122)")
 
 
 func _civilians(t) -> void:
@@ -211,7 +217,7 @@ func _thirst(t) -> void:
 	S.resolve_night(dry)
 	var sleeper = S.hero(dry, "hero_gato_nick")
 	t.equal(sleeper.instinct, 50 - 15 + S.THIRST_INSTINCT_PENALTY, "com sede, 10 de instinto a menos recuperados")
-	t.equal(dry.night.event_id, "no_water", "o relato explica a sede")
+	t.check(dry.night.conditions.has("no_water") and S.night_conditions_text(dry)[-1].contains("água"), "o relato explica a sede")
 
 
 func _route_focus(t) -> void:
@@ -280,7 +286,10 @@ func _shelter(t) -> void:
 	t.equal(S.equip_relic(c, "hero_cao_bento", ""), "", "tira")
 	t.check(c.inventory.relics == ["botao_cobre"], "voltou ao estoque")
 	c.inventory.seeds = 10
-	S.recruit(c, "cao", rng)
+	# O Alojamento ampliado (#119): cabem os recrutas do teste.
+	c.station.rooms[S.CHARACTERS] = 4
+	# O terceiro cão entra direto, como num save antigo (o recrutamento não repete rosto, #182).
+	S._add_hero(c, S._next_hero_id(c, "cao"), "cao", "Rex", [], "")
 	var dogs: Array = c.roster.filter(func(h): return h.class_id == "cao").map(func(h): return h.id)
 	t.check(S.validate_team(c, [dogs[0], dogs[1], dogs[2], "hero_gato_nick"]) != "", "três cães não partem juntos")
 	t.equal(S.validate_team(c, ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]), "", "a formação inicial parte")
@@ -442,8 +451,12 @@ func _sleepers(t) -> void:
 	t.equal(AHStation.sleepers(c), [], "no amanhecer ninguém fica deitado")
 
 
-## Uma classe sem arte de combate ainda (o rato do evento dos túneis) não parte: a rua e a luta não teriam como mostrá-la.
+## Uma classe sem arte de combate (o rato do evento dos túneis, com a arte tirada do manifesto) não parte: a rua e a luta não teriam como mostrá-la.
 func _undeployable(t) -> void:
+	# O rato tem arte desde a #187: aqui o recruta desenhado dele sai do manifesto, para ele seguir sem arte de luta.
+	S.art_variants("rato")
+	var recruit_art: Dictionary = S._recruit_art.duplicate(true)
+	S._recruit_art.erase("raccoon_recruit_01")
 	var c := _campaign(13)
 	c.unlocked_classes.append("rato")
 	var risco := S.recruit(c, "rato", RandomNumberGenerator.new(), "Risco")
@@ -457,3 +470,4 @@ func _undeployable(t) -> void:
 	t.equal(S.confirm_departure(c, team, 0, 4242, "fase_1"), "Risco ainda não tem arte de combate e fica na Estação por enquanto.",
 		"a partida com o Risco é recusada, com o motivo")
 	t.equal(c.session.expedition, null, "e a expedição não começa")
+	S._recruit_art = recruit_art

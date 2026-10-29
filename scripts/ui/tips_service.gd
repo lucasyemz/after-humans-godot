@@ -7,8 +7,8 @@ extends CanvasLayer
 
 const PATH := "user://tips.cfg"
 const TIPS := {
-	"station": ["A Estação Raiz", "Este é o refúgio. O cartão \"Próximo passo\" diz o que fazer agora; clique num cômodo para ver o que ele faz. Para partir, use Preparar expedição."],
-	"preparation": ["Montar a equipe", "A posição importa: cada habilidade sai de certas posições e alcança outras (as bolinhas). A frente fica à direita, como na luta. Clique em dois heróis para trocá-los de lugar."],
+	"station": ["A Estação Raiz", "Este é o refúgio. O cartão \"Próximo passo\" diz o que fazer agora; clique num cômodo para ver o que ele faz. Para partir, use Ir ao mapa."],
+	"preparation": ["Montar a equipe", "A posição importa: cada habilidade sai de certas posições e alcança outras (as bolinhas). A frente fica à direita, como na luta. Na plataforma, clique em duas cartas para trocar os heróis de lugar."],
 	"explore": ["Explorar", "Ande com A e D. Os losangos dourados marcam o que dá para usar: chegue perto e aperte E. A rota no alto mostra os trechos até o guardião."],
 	"patrol": ["Patrulhas", "A patrulha olha à frente. Se ela não te vir até você encostar, a equipe ganha a abertura e age primeiro. A barra amarela é a suspeita dela."],
 	"combat": ["Combate por posição", "Na sua vez, escolha uma habilidade (1 a 4) e depois o alvo. As bolinhas \"de\" dizem de que posições ela sai; as \"em\", quais alcança. Passe o mouse para ver o resultado. O ▶ sob cada inimigo diz o que ele pretende fazer."],
@@ -101,6 +101,9 @@ func showing() -> bool:
 
 ## Mostra a dica se ela ainda não foi vista (e as dicas estão ligadas). Uma de cada vez; as outras esperam a vez.
 func show_tip(id: String) -> void:
+	# Na abertura (#144) quem ensina é o tutorial: as dicas de primeira vez esperam.
+	if AHTutorial.suppresses_tips(Campaign.state):
+		return
 	if not enabled or _seen.has(id) or not TIPS.has(id) or id == _current or _queue.has(id):
 		return
 	if _current != "":
@@ -116,7 +119,7 @@ func show_tip(id: String) -> void:
 	_card.modulate.a = 0.0
 	_card.visible = true
 	if AHUiStyle.using_keys:
-		_ok.grab_focus.call_deferred()
+		AHKit.focus_later(_ok)
 	create_tween().tween_property(_card, "modulate:a", 1.0, 0.25)
 
 
@@ -125,6 +128,13 @@ func dismiss() -> void:
 	_current = ""
 	if not _queue.is_empty():
 		show_tip(_queue.pop_front())
+
+
+## Conta as dicas como vistas (as que o tutorial já ensinou, #144).
+func mark_seen(ids: Array) -> void:
+	for id in ids:
+		_seen[id] = true
+	_store()
 
 
 func seen(id: String) -> bool:

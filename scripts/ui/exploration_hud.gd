@@ -22,10 +22,13 @@ signal menu_return
 signal menu_requested
 signal inventory_requested
 signal new_campaign
+## A formação (#129): o botão FORMAÇÃO pediu para abrir; dois heróis escolhidos trocam de lugar.
+signal formation_requested
+signal formation_swap(a: String, b: String)
 
 const S = preload("res://scripts/ui/ui_style.gd")
 const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprimentos", "rest": "Descanso", "passage": "Passagem",
-	"boss": "Guardião"}
+	"boss": "Guardião", "nick": "Encontro", "train": "Trem"}
 
 ## O lugar da jornada (a Rua ou o cenário): muda os textos da volta e do resultado.
 ## A altura do Concluir jornada; no acampamento, ele sobe para cima da barra (camp_hud._process).
@@ -58,13 +61,40 @@ var _prompt_check: TextureRect
 var _prompt_touch: TextureRect
 var _prompt_world = null
 var _toast: PanelContainer
+## O aviso da ferramenta nova (#143): o ícone grande, o nome e o que ela faz; some sozinho ou com uma tecla.
+var _tool_notice: PanelContainer
+var _tool_tween: Tween
+const TOOL_NOTICE_SECONDS := 5.0
+## O selo NOVO no botão MOCHILA, até ela abrir.
+var _bag_new: Control
 var _toast_label: Label
 var _toast_tween: Tween
+## Uma frase que vai na frente de todo aviso até esta hora (Time.get_ticks_msec): o fôlego do tutorial que não pode
+## sumir sob o anúncio do trecho nem o aviso do começo da luta, que chegam logo em seguida.
+var _held_line := ""
+var _held_until := 0
 var _modal: PanelContainer
 ## O HUD do acampamento aberto (#77), null fora dele.
 var camp_hud: AHCampHud
 var _menu_button: Button
 var _bag_button: Button
+var _formation_button: Button
+## A formação aberta nas plaquinhas da equipe (#129): a ordem mostrada, o herói do cursor e o escolhido (-1: nenhum).
+var _formation := false
+var _formation_ids: Array = []
+var _formation_cursor := 0
+var _formation_pick := -1
+var _formation_head: PanelContainer
+var _formation_keys: Control
+## As placas da equipe na rua, na ordem da fila (o corredor passa): o número da posição sobre a cabeça de cada um.
+var formation_cards: Array = []
+var _formation_heads: Array[Control] = []
+## A moldura do cursor e do escolhido, por fora da plaquinha (px), e o espaço entre as plaquinhas com a formação aberta.
+const FORMATION_FRAME := 7.0
+const FORMATION_GAP := 22
+## O analógico: um empurrão anda uma casa (o intervalo mínimo entre dois passos do cursor, ms).
+const FORMATION_STEP_MS := 220
+var _formation_moved_at := -1000
 var _finish_button: Button
 var _markers: Array[Control] = []
 var _marker_points: Array = []
@@ -92,7 +122,7 @@ var _hint_time := 0.0
 var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
 const STEP_ICONS := {"start": "node-start", "combat": "node-combat", "loot": "node-loot", "rest": "node-rest",
-	"passage": "node-event", "boss": "node-boss"}
+	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "train_arrival"}
 ## A casa do corredor (o lado do quadrado) e o elo entre duas.
 const CELL := 46.0
 const LINK := 12.0
@@ -230,6 +260,12 @@ func _ready() -> void:
 	_menu_button.name = "Menu"
 	_bag_button = _corner_button(tr("Mochila"), "room_depot", "inventory", func(): inventory_requested.emit())
 	_bag_button.name = "Bag"
+	_formation_button = _corner_button(tr("Formação"), "nav_characters", "formation", func(): formation_requested.emit())
+	_formation_button.name = "Formation"
+	_bag_new = AHInventoryPanel.new_tag()
+	_bag_new.position.y = -14.0
+	_bag_new.visible = false
+	_bag_button.add_child(_bag_new)
 	_place_corner.call_deferred()
 
 	# Concluir jornada (o guardião vencido): o botão âmbar, sem tecla (o Esc é do MENU, e a volta também sai pelo Menu).
@@ -349,9 +385,14 @@ func _corner_button(text: String, icon_name: String, key_action: String, action:
 func _place_corner() -> void:
 	var touch := Settings.touch_visible()
 	var right := 1892.0
-	for button in [_menu_button, _bag_button]:
+	for button in [_menu_button, _bag_button, _formation_button]:
 		if button == null:
 			continue
+		# A formação não vale no acampamento: o botão sai de lá (a fogueira tem a ordem dela).
+		if button == _formation_button:
+			button.visible = not camp_open()
+			if not button.visible:
+				continue
 		var key: Control = button.get_node("Key")
 		key.visible = not touch
 		AHStationReport.fit_key(button, 14.0)
@@ -399,8 +440,9 @@ func _refresh_place() -> void:
 	var parts := PackedStringArray()
 	if expedition != null:
 		var info := AHJourneyRules.phase(expedition.phase_id)
-		parts.append(tr("Jornada %d") % (AHJourneyRules.PHASES.find(info) + 1))
-	if _weather != "":
+		# O tutorial (#144) não é uma jornada da campanha: é a abertura, num subsolo (sem clima).
+		parts.append(tr("Abertura") if expedition.phase_id == AHTutorial.PHASE_ID else tr("Jornada %d") % (AHJourneyRules.PHASES.find(info) + 1))
+	if _weather != "" and (expedition == null or expedition.phase_id != AHTutorial.PHASE_ID):
 		parts.append(_weather)
 	_place_sub.text = " · ".join(parts)
 
@@ -417,13 +459,19 @@ func refresh(campaign: Dictionary) -> void:
 	var expedition = campaign.get("session", {}).get("expedition")
 	if expedition == null:
 		return
+	if _bag_new != null:
+		_bag_new.visible = not Array(campaign.get("new_tools", [])).is_empty()
 	_refresh_place()
 	var route: Dictionary = expedition.corridor
 	# O objetivo: o foco escolhido na Preparação e o guardião no fim.
 	var focus := AHStationRules.focus_def(expedition.get("focus", ""))
 	var boss_step: int = route.steps.size()
 	var done := false
-	if focus.is_empty():
+	if expedition.phase_id == AHTutorial.PHASE_ID:
+		# A abertura: fugir até o trem da plataforma.
+		_goal_title.text = tr("Chegar ao trem (trecho %d)") % boss_step
+		_goal_text.text = tr("A porta da contenção baixa atrás da equipe. A saída é a plataforma.")
+	elif focus.is_empty():
 		_goal_title.text = tr("Vencer o guardião (trecho %d)") % boss_step
 		_goal_text.text = tr("Rota básica: o achado das buscas volta com a equipe.")
 	elif expedition.get("objective_done", false):
@@ -460,7 +508,7 @@ func refresh(campaign: Dictionary) -> void:
 			_route_row.add_child(link)
 		_route_row.add_child(_route_cell(step, index == route.index, known, route))
 	var current: Dictionary = route.steps[route.index]
-	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(current.type, ""))]
+	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), _step_label(current)]
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
 		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + tr(AHJourneyRules.SHOP_NAMES[site.shop]))
@@ -509,20 +557,31 @@ func refresh(campaign: Dictionary) -> void:
 	right.reset_size()
 	right.size = right.get_combined_minimum_size()
 	right.position = Vector2(1892.0 - right.size.x, 14)
-	# A equipe: as plaquinhas com o retrato, o nome, a vida e a barra (e o instinto quando sobe).
-	_clear(_party_box)
-	for hero_id in expedition.team:
-		var hero = Campaign.hero(hero_id)
-		if hero == null or not hero.alive:
-			continue
-		_party_box.add_child(_mate(hero))
-	_party_box.reset_size()
-	_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
+	# A equipe: as plaquinhas com o retrato, o nome, a vida e a barra (e o instinto quando sobe); com a formação aberta,
+	# as da formação.
+	if _formation:
+		_show_formation()
+	else:
+		_clear(_party_box)
+		for hero_id in expedition.team:
+			var hero = Campaign.hero(hero_id)
+			if hero == null or not hero.alive:
+				continue
+			_party_box.add_child(_mate(hero))
+		# Os levantados no mapa (#179) seguem com a equipe, sem lutar: um selo ao lado das plaquinhas.
+		var carried: Array = AHJourneyRules.carried(campaign).map(func(id): return String(Campaign.hero(id).display_name))
+		if not carried.is_empty():
+			var carried_chip := _change_chip("bed", tr("A equipe carrega: %s") % ", ".join(carried), AHKit.TEXT)
+			carried_chip.name = "Carried"
+			carried_chip.size_flags_vertical = Control.SIZE_SHRINK_END
+			_party_box.add_child(carried_chip)
+		_party_box.reset_size()
+		_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
 	_place_corner()
 
 
 ## Uma casa do corredor: o quadrado do retrato com o ícone do tipo; a de agora com a moldura âmbar, a resolvida com o
-## tipo em verde e o check no canto, o guardião em alerta e a não alcançada com "?".
+## tipo em verde e o check por cima do ícone, o guardião em alerta e a não alcançada com "?".
 func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) -> Control:
 	var cell := AHKit.panel("square_portrait")
 	cell.custom_minimum_size = Vector2(CELL, CELL)
@@ -531,7 +590,8 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 	var boss: bool = step.type == "boss"
 	if known:
 		var type: String = step.type
-		var tint: Color = AHKit.alert_text() if boss else (AHKit.good() if step.resolved else (AHKit.AMBER if now else AHKit.TEXT))
+		# O guardião em alerta até ser vencido (#180); vencido, fica verde como os outros trechos resolvidos.
+		var tint: Color = AHKit.good() if step.resolved else (AHKit.alert_text() if boss else (AHKit.AMBER if now else AHKit.TEXT))
 		var glyph := _icon(STEP_ICONS.get(type, "node-event"), CELL * 0.56, tint)
 		glyph.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		cell.add_child(glyph)
@@ -540,14 +600,21 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 		unknown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		unknown.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		cell.add_child(unknown)
-	if step.resolved and not now:
-		var check := AHKit.glyph("state_active", 16, AHKit.good())
-		check.size = Vector2(16, 16)
-		check.position = Vector2(CELL - 18, -2)
-		cell.add_child(check)
 	if now:
 		cell.add_child(AHKit.selected_overlay())
+	# O check do resolvido; no trecho de agora só o do guardião vencido, que é o último e fica "agora" para sempre. Vem
+	# depois da moldura de agora, por cima dela.
+	if step.resolved and (not now or boss):
+		# A casa é um PanelContainer: o check estica e fica centrado sobre o ícone, como nas outras resolvidas.
+		cell.add_child(AHKit.glyph("state_active", 16, AHKit.good()))
 	return cell
+
+
+## O nome do trecho no título: o do tipo, ou "Guardião vencido" depois da vitória (#180).
+func _step_label(step: Dictionary) -> String:
+	if step.type == "boss" and step.resolved:
+		return tr("Guardião vencido")
+	return tr(STEP_LABELS.get(step.type, ""))
 
 
 ## Um recurso da ficha do alto: o ícone, o nome pequeno e o valor em âmbar (em alerta, quando acaba).
@@ -600,6 +667,182 @@ func _mate(hero: Dictionary) -> PanelContainer:
 		instinct.tooltip_text = S.GLOSSARY.Instinto
 		info.add_child(instinct)
 	return box
+
+
+## A formação (#129) nas plaquinhas de baixo: a posição de cada um (1 vai na frente), o cursor e o escolhido; clicar em
+## dois (ou as setas e Interagir) troca os dois. A tecla da formação, Voltar ou o Menu fecham.
+func open_formation() -> void:
+	var expedition = Campaign.state.get("session", {}).get("expedition")
+	if _formation or expedition == null:
+		return
+	_formation = true
+	_formation_cursor = 0
+	_formation_pick = -1
+	_party_box.add_theme_constant_override("separation", FORMATION_GAP)
+	Sound.play("res://audio/ui/panel_open.ogg")
+	_show_formation()
+
+
+func close_formation() -> void:
+	if not _formation:
+		return
+	_formation = false
+	_formation_pick = -1
+	_party_box.add_theme_constant_override("separation", 10)
+	for node in [_formation_head, _formation_keys, _formation_button.get_node_or_null("On")] + _formation_heads:
+		if node != null and is_instance_valid(node):
+			node.queue_free()
+	_formation_head = null
+	_formation_keys = null
+	_formation_heads.clear()
+	Sound.play("res://audio/ui/panel_close.ogg")
+	refresh(Campaign.state)
+
+
+func formation_open() -> bool:
+	return _formation
+
+
+func _show_formation() -> void:
+	var expedition: Dictionary = Campaign.state.session.expedition
+	_formation_ids = Array(expedition.team).filter(func(id):
+		var hero = Campaign.hero(id)
+		return hero != null and hero.alive)
+	_formation_cursor = clampi(_formation_cursor, 0, maxi(0, _formation_ids.size() - 1))
+	_clear(_party_box)
+	for i in _formation_ids.size():
+		var mate := _mate(Campaign.hero(_formation_ids[i]))
+		mate.mouse_filter = Control.MOUSE_FILTER_STOP
+		mate.gui_input.connect(_formation_click.bind(i))
+		# Por cima da plaquinha (o PanelContainer estica os filhos: o que fica solto vai num Control comum).
+		var holder := Control.new()
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.set_anchors_preset(Control.PRESET_FULL_RECT)
+		mate.add_child(holder)
+		# O medalhão da posição no canto de cima (1 vai na frente), como na Preparação: pequeno e meio para fora, sem
+		# tapar o retrato.
+		var rank := _rank_medal(i + 1, 26.0)
+		rank.name = "Rank"
+		rank.position = Vector2(-12, -14)
+		holder.add_child(rank)
+		if i == _formation_pick:
+			# O escolhido: o nome em âmbar, além da moldura.
+			for label in mate.find_children("", "Label", true, false):
+				if label.text == Campaign.hero(_formation_ids[i]).display_name:
+					label.add_theme_color_override("font_color", AHKit.AMBER)
+		# As molduras do escolhido e do cursor por fora da plaquinha: não tapam o nome nem a vida.
+		if i == _formation_pick:
+			holder.add_child(_outside(AHKit.selected_overlay()))
+		if i == _formation_cursor:
+			var frame := Panel.new()
+			frame.name = "Cursor"
+			frame.add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("focus", "focus")))
+			frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			holder.add_child(_outside(frame))
+		_party_box.add_child(mate)
+	_party_box.reset_size()
+	_party_box.position = Vector2(28, 1066 - _party_box.get_combined_minimum_size().y)
+	# Em cima das plaquinhas, a faixa: FORMAÇÃO e o que a tecla faz agora ("E troca Nick e Íris de lugar").
+	if _formation_head == null:
+		_formation_head = AHKit.plaque()
+		_formation_head.name = "FormationHead"
+		_formation_head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_formation_head)
+	_clear(_formation_head)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_formation_head.add_child(row)
+	row.add_child(_icon("nav_characters", 26, AHKit.AMBER))
+	row.add_child(AHKit.label(tr("Formação"), "row", AHKit.AMBER, true, true))
+	var line: String = tr("da frente para trás · escolha dois para trocar")
+	if _formation_pick >= 0 and _formation_pick != _formation_cursor:
+		var names := [Campaign.hero(_formation_ids[_formation_pick]).display_name, Campaign.hero(_formation_ids[_formation_cursor]).display_name]
+		# No toque não há tecla: o toque no segundo troca.
+		line = tr("Troca %s e %s de lugar") % names if Settings.touch_visible() else tr("%s troca %s e %s de lugar") % ([S.key_name("interact")] + names)
+	elif _formation_pick >= 0:
+		line = tr("Trocar %s com quem? Escolha o outro") % Campaign.hero(_formation_ids[_formation_pick]).display_name
+	row.add_child(AHKit.label(line, "text", AHKit.TEXT))
+	_formation_head.reset_size()
+	_formation_head.size = _formation_head.get_combined_minimum_size()
+	_formation_head.position = Vector2(28, _party_box.position.y - _formation_head.size.y - 22)
+	if _formation_keys == null:
+		_formation_keys = _keys_bar([[[tr("Setas")], tr("Escolher")], [["interact"], tr("Trocar")], [["menu"], tr("Fechar")]])
+		_formation_keys.name = "FormationKeys"
+	# O botão FORMAÇÃO aceso enquanto ela está aberta.
+	if _formation_button.get_node_or_null("On") == null:
+		var lit := AHKit.selected_overlay()
+		lit.name = "On"
+		_formation_button.add_child(lit)
+	# O número de cada um sobre a cabeça, na rua.
+	while _formation_heads.size() < formation_cards.size():
+		var medal := _rank_medal(_formation_heads.size() + 1, 40.0)
+		medal.name = "Head" + str(_formation_heads.size() + 1)
+		add_child(medal)
+		_formation_heads.append(medal)
+
+
+## Uma moldura em volta da plaquinha, FORMATION_FRAME px por fora.
+func _outside(frame: Control) -> Control:
+	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	frame.offset_left = -FORMATION_FRAME
+	frame.offset_top = -FORMATION_FRAME
+	frame.offset_right = FORMATION_FRAME
+	frame.offset_bottom = FORMATION_FRAME
+	return frame
+
+
+## O medalhão da posição (o mesmo da Preparação): o número em âmbar no medalhão do kit.
+func _rank_medal(rank: int, side: float) -> Control:
+	var medal := AHKit.panel(AHKit.piece_of("medal", "level"))
+	medal.custom_minimum_size = Vector2(side, side)
+	medal.size = Vector2(side, side)
+	medal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var number := AHKit.label(str(rank), "small", AHKit.AMBER, true)
+	number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	medal.add_child(number)
+	return medal
+
+
+func _formation_click(event: InputEvent, index: int) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_formation_cursor = index
+		_formation_choose()
+
+
+## Interagir (ou o clique): o primeiro escolhe; o segundo troca os dois; o mesmo de novo desfaz a escolha.
+func _formation_choose() -> void:
+	if _formation_pick < 0:
+		_formation_pick = _formation_cursor
+		Sound.play("res://audio/ui/confirm.ogg")
+	elif _formation_pick == _formation_cursor:
+		_formation_pick = -1
+	else:
+		var a: String = _formation_ids[_formation_pick]
+		var b: String = _formation_ids[_formation_cursor]
+		_formation_pick = -1
+		formation_swap.emit(a, b)
+	_show_formation()
+
+
+func _formation_input(event: InputEvent) -> void:
+	if not (event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion or event is InputEventAction):
+		return
+	if event.is_action_pressed("formation") or S.is_back(event) or event.is_action_pressed("menu"):
+		close_formation()
+	elif event.is_action_pressed("move_left") or event.is_action_pressed("ui_left") or event.is_action_pressed("move_right") \
+			or event.is_action_pressed("ui_right"):
+		var now := Time.get_ticks_msec()
+		if now - _formation_moved_at >= FORMATION_STEP_MS or not event is InputEventJoypadMotion:
+			_formation_moved_at = now
+			var step := -1 if event.is_action_pressed("move_left") or event.is_action_pressed("ui_left") else 1
+			_formation_cursor = posmod(_formation_cursor + step, maxi(1, _formation_ids.size()))
+			_show_formation()
+	elif event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
+		_formation_choose()
+	# Com a formação aberta, nenhuma tecla passa para a rua (andar, Mochila, Interagir).
+	get_viewport().set_input_as_handled()
 
 
 ## O aviso de interação: perto do que se usa (where, no mundo), ou embaixo no meio quando não tem lugar. "E  Vasculhar"
@@ -695,8 +938,15 @@ func set_patrol(where, meter: float, detected: bool) -> void:
 ## confirma o botão com foco, além de Enter e do A; Voltar (B, Backspace) fecha o menu, a Mochila e as Opções (os
 ## eventos e o resultado pedem uma escolha).
 func _input(event: InputEvent) -> void:
+	if _formation:
+		_formation_input(event)
+		return
 	if modal_open() and S.press_focused(_modal, event):
 		get_viewport().set_input_as_handled()
+	# O aviso da ferramenta sai com qualquer tecla, clique ou toque (sem engolir: andar continua andando).
+	if tool_notice_shown() and (event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton
+			or event is InputEventScreenTouch) and event.is_pressed():
+		hide_tool_notice()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -708,11 +958,23 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if modal_open():
 		S.keep_focus(_modal)
+	# A ferramenta que chegou (a busca, o evento): o aviso, uma de cada vez, sem painel aberto por cima e fora do
+	# acampamento (o HUD dele ocupa a tela; o aviso espera a equipe levantar).
+	var notices: Array = Campaign.state.get("tool_notices", [])
+	if not notices.is_empty() and not modal_open() and not camp_open() and not tool_notice_shown() and is_visible_in_tree():
+		show_tool_notice(String(notices.pop_front()))
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
 		return
 	var view := get_viewport_rect().size
 	var to_hud := Vector2(1920.0 / view.x, 1080.0 / view.y)
+	for i in _formation_heads.size():
+		var card = formation_cards[i] if i < formation_cards.size() else null
+		var shown: bool = card != null and is_instance_valid(card)
+		_formation_heads[i].visible = shown
+		if shown:
+			var head: Vector3 = card.global_position + Vector3(0, card.body_height + 0.35, 0)
+			_formation_heads[i].position = camera.unproject_position(head) * to_hud - _formation_heads[i].size * 0.5
 	for i in _marker_points.size():
 		var point: Vector3 = _marker_points[i]
 		var screen := camera.unproject_position(point) * to_hud
@@ -745,10 +1007,12 @@ func _process(delta: float) -> void:
 	if modal_open():
 		_set_panel_keys("menu" if _modal.has_meta("menu") else ("continue" if _modal.has_meta("continue") else "choose"))
 	_hint.modulate.a = clampf(1.0 - (_hint_time - 12.0) / 2.0, 0.0, 1.0)
-	_hint.visible = not touch and first_journey() and not camp_open() and not modal_open()
+	_hint.visible = not touch and first_journey() and not camp_open() and not modal_open() and not _formation
 	_panel_keys.visible = not touch and modal_open() and not camp_open()
-	for bar in [_hint, _panel_keys]:
-		if bar.visible:
+	if _formation_keys != null and is_instance_valid(_formation_keys):
+		_formation_keys.visible = not touch
+	for bar in [_hint, _panel_keys, _formation_keys]:
+		if bar != null and is_instance_valid(bar) and bar.visible:
 			bar.reset_size()
 			bar.size = bar.get_combined_minimum_size()
 			bar.position = Vector2(1892 - bar.size.x, KEYS_Y)
@@ -757,19 +1021,107 @@ func _process(delta: float) -> void:
 		_panel_keys.visible = false
 
 
+## O aviso da ferramenta nova (#143), no meio do alto, abaixo do corredor: o ícone grande, FERRAMENTA NOVA, o nome, o
+## que ela faz e onde ela fica. Some em TOOL_NOTICE_SECONDS ou com uma tecla.
+func show_tool_notice(tool: String) -> void:
+	hide_tool_notice()
+	_tool_notice = AHKit.panel_box("large")
+	_tool_notice.name = "ToolNotice"
+	_tool_notice.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_tool_notice)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 22)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tool_notice.add_child(row)
+	var tile := AHKit.panel(AHKit.piece_of("chip", "resource_tile"))
+	tile.custom_minimum_size = Vector2(120, 120)
+	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var glyph := AHKit.glyph(AHInventoryPanel.TOOL_ICONS.get(tool, "tool-generic"), 84, AHKit.AMBER)
+	glyph.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	tile.add_child(glyph)
+	row.add_child(tile)
+	var words := VBoxContainer.new()
+	words.add_theme_constant_override("separation", 6)
+	words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(words)
+	words.add_child(AHKit.label(tr("Ferramenta nova"), "small", AHKit.AMBER, true, true))
+	words.add_child(AHKit.label(tr(AHInventoryPanel.TOOL_NAMES.get(tool, tool.capitalize())), "panel_title", AHKit.TEXT, true))
+	var text := AHKit.label(AHInventoryPanel.tool_text(tool), "text", AHKit.TEXT)
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.custom_minimum_size = Vector2(560, 0)
+	words.add_child(text)
+	# A tecla só fora do toque (no toque, a Mochila é o botão).
+	var where := tr("Fica na Mochila.") if Settings.touch_visible() else tr("Fica na Mochila (%s).") % S.key_name("inventory")
+	words.add_child(AHKit.label(where, "small", AHKit.MUTED))
+	_tool_notice.reset_size()
+	_tool_notice.size = _tool_notice.get_combined_minimum_size()
+	_tool_notice.position = Vector2(960 - _tool_notice.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+	Sound.play("res://audio/ui/confirm.ogg")
+	_tool_tween = create_tween()
+	_tool_tween.tween_interval(TOOL_NOTICE_SECONDS)
+	_tool_tween.tween_property(_tool_notice, "modulate:a", 0.0, 0.5)
+	_tool_tween.tween_callback(hide_tool_notice)
+
+
+func tool_notice_shown() -> bool:
+	return _tool_notice != null and is_instance_valid(_tool_notice)
+
+
+func hide_tool_notice() -> void:
+	if _tool_tween:
+		_tool_tween.kill()
+		_tool_tween = null
+	if tool_notice_shown():
+		_tool_notice.queue_free()
+	_tool_notice = null
+
+
+## Mostra a frase agora e a mantém na frente dos avisos seguintes até completar os segundos dela.
+func hold_line(line: String, seconds: float) -> void:
+	_held_line = line
+	_held_until = Time.get_ticks_msec() + int(seconds * 1000.0)
+	toast(line, seconds)
+
+
+## Solta a frase mantida: os avisos seguintes vêm sozinhos (a luta acabou antes do tempo dela).
+func release_line() -> void:
+	_held_line = ""
+	_held_until = 0
+
+
+## A chapa do aviso no tamanho do texto, centrada embaixo do objetivo (fora da árvore, a chamada adiada não mede nada).
+func _fit_toast() -> void:
+	if not is_inside_tree():
+		return
+	_toast.reset_size()
+	_toast.size = _toast.get_combined_minimum_size()
+	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+
+
 ## Um aviso (a busca, o trecho, o tempo) numa chapa no alto, abaixo do corredor; some sozinho.
 func toast(text: String, seconds: float = 3.5) -> void:
 	if _toast_tween:
 		_toast_tween.kill()
+	var left := (_held_until - Time.get_ticks_msec()) / 1000.0
+	if left > 0.0 and text != _held_line and not text.begins_with(_held_line):
+		text = _held_line + " " + text
+		seconds = maxf(seconds, left)
 	_toast_label.text = text
 	var width := minf(900.0, _toast_label.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1,
 		_toast_label.get_theme_font_size("font_size")).x + 8.0)
 	# Quebra só o que passa de 900 (com a quebra ligada, o rótulo curto pedia a altura de uma palavra por linha).
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if width >= 900.0 else TextServer.AUTOWRAP_OFF
 	_toast_label.custom_minimum_size = Vector2(width, 0)
-	_toast.reset_size()
-	_toast.size = _toast.get_combined_minimum_size()
-	_toast.position = Vector2(960 - _toast.size.x * 0.5, maxf(132.0, _route_panel.get_global_rect().end.y + 14.0))
+	# A altura do texto quebrado depende da largura do rótulo: aplica a final antes de medir (com a largura velha, a
+	# chapa saía alta e meio vazia no texto Maior).
+	_toast_label.size = Vector2(width, 0)
+	_toast_label.size = Vector2(width, _toast_label.get_minimum_size().y)
+	_fit_toast()
+	# O rótulo que quebra mede a altura pela largura de agora: no primeiro aviso longo, ele ainda tinha 0 e media uma
+	# palavra por linha (a caixa saía com milhares de px e o texto fora da tela). Depois do layout, mede de novo.
+	_fit_toast.call_deferred()
 	_toast.modulate.a = 1.0
 	_toast_tween = create_tween()
 	_toast_tween.tween_interval(seconds)
@@ -877,14 +1229,32 @@ func event_art() -> Texture2D:
 	return load(path) if ResourceLoader.exists(path) else null
 
 
+## O marcador que o efeito de fase dá na luta (#78).
+const EFFECT_ICONS := {"exposto": "status-vulnerable_bad", "cansado": "intent-move", "preparado": "status-block_good"}
 ## Os ícones das mudanças do resultado do evento (journey_rules, event.changes).
 const CHANGE_ICONS := {"life": "intent-heal", "hope": "res-hope", "food": "lobby-food", "bandages": "res-bandages",
 	"scrap": "lobby-scrap", "fragments": "lobby-fragment", "seeds": "lobby-seed", "instinct": "intent-unknown"}
 
 
-## O texto de uma mudança do evento ("+2 Comida", "-6 de vida").
-func _change_text(kind: String, amount: int) -> String:
+## O ícone do chip: o da ferramenta, o do marcador do efeito de fase ou o do recurso.
+func _change_icon(change: Dictionary) -> String:
+	match String(change.kind):
+		"tool":
+			return AHInventoryPanel.TOOL_ICONS.get(String(change.get("id", "")), "tool-generic")
+		"effect":
+			return EFFECT_ICONS.get(String(change.get("id", "")), "intent-unknown")
+	return CHANGE_ICONS.get(String(change.kind), "intent-unknown")
+
+
+## O texto de uma mudança do evento ("+2 Comida", "-6 de vida", "+ Máscara com filtro", "Exposto: …"). id: a ferramenta
+## ou o efeito de fase.
+func _change_text(kind: String, amount: int, id: String = "") -> String:
 	match kind:
+		"tool":
+			var tool := tr(AHInventoryPanel.TOOL_NAMES.get(id, id.capitalize()))
+			return (tr("+ %s") if amount > 0 else tr("- %s")) % tool
+		"effect":
+			return tr(String(AHJourneyRules.PHASE_EFFECTS.get(id, {}).get("text", id)))
 		"life": return tr("%+d de vida") % amount
 		"hope": return tr("%+d de Esperança") % amount
 		"food": return tr("%+d Comida") % amount
@@ -941,12 +1311,12 @@ func show_event(campaign: Dictionary) -> void:
 			box.add_child(flow)
 			for change in changes:
 				var amount := int(change.amount)
-				var text := _change_text(String(change.kind), amount)
+				var text := _change_text(String(change.kind), amount, String(change.get("id", "")))
 				if String(change.get("hero", "")) != "":
 					text += " · " + String(change.hero)
-				# O instinto que sobe é perda; o resto, quando baixa.
+				# O instinto que sobe é perda; o resto, quando baixa (a ferramenta perdida e o efeito ruim também).
 				var loss := amount > 0 if change.kind == "instinct" else amount < 0
-				flow.add_child(_change_chip(CHANGE_ICONS.get(String(change.kind), "intent-unknown"), text, AHKit.alert_text() if loss else AHKit.good()))
+				flow.add_child(_change_chip(_change_icon(change), text, AHKit.alert_text() if loss else AHKit.good()))
 		_modal.set_meta("continue", true)
 		first = _primary(tr("Continuar"), "", tr("%s / A") % S.key_name("interact"), func(): event_closed.emit())
 		first.name = "Continue"
@@ -964,7 +1334,7 @@ func show_event(campaign: Dictionary) -> void:
 			if first == null and available:
 				first = button
 	if first:
-		first.grab_focus.call_deferred()
+		AHKit.focus_later(first)
 
 
 ## Uma escolha do evento: a linha de lista com o ícone (a ferramenta, o triângulo do risco ou a seta), o texto e, à
@@ -1060,6 +1430,9 @@ func _set_camp_layout(camping: bool) -> void:
 	for button in [_bag_button, _menu_button]:
 		if button != null:
 			button.position.y = CAMP_CORNER_Y if camping else CORNER_Y
+	# A formação não vale no acampamento (a fogueira tem a ordem dela).
+	if _formation_button != null:
+		_formation_button.visible = not camping
 	if camping:
 		set_markers([])
 
@@ -1078,7 +1451,7 @@ func camp_respond(hero_id: String, kind: String, life_gain: int, instinct_change
 
 ## Esc na exploração: continuar ou voltar à Estação. Antes do guardião a volta é uma retirada (metade do achado) e
 ## pergunta antes, como o Retornar da Unreal ("Abandonar a expedição?").
-func show_menu(completed: bool, can_return: bool) -> void:
+func show_menu(completed: bool, can_return: bool, blocked_note: String = "") -> void:
 	# O Menu da expedição (#109, docs/design/hud-ajustes.md; decisão do Lucas: fica o menu), no Painel do kit: à direita
 	# do cartão do objetivo, com o pé acima das cabeças da equipe; cresce para cima no texto Maior.
 	var box := _open_modal(MENU_WIDTH)
@@ -1099,7 +1472,7 @@ func show_menu(completed: bool, can_return: bool) -> void:
 		var route: Dictionary = expedition.corridor
 		if not route.steps.is_empty():
 			var step: Dictionary = route.steps[clampi(route.index, 0, route.steps.size() - 1)]
-			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), tr(STEP_LABELS.get(step.type, ""))], "text", AHKit.MUTED))
+			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), _step_label(step)], "text", AHKit.MUTED))
 	var close := AHKit.button("X", "icon")
 	close.name = "Close"
 	close.tooltip_text = tr("Fechar")
@@ -1114,7 +1487,8 @@ func show_menu(completed: bool, can_return: bool) -> void:
 	line.custom_minimum_size = Vector2(0, 8)
 	box.add_child(line)
 	# Voltar à Estação com o custo numa sublinha (não quebra o botão no Maior); no meio da luta ou do evento, apagado.
-	var sub := (tr("Fase concluída: todo o achado") if completed else tr("Retirada: metade do achado")) if can_return else tr("Termine a luta ou o evento antes de voltar.")
+	var sub := (tr("Fase concluída: todo o achado") if completed else tr("Retirada: metade do achado")) if can_return \
+		else (blocked_note if blocked_note != "" else tr("Termine a luta ou o evento antes de voltar."))
 	var back := _menu_entry(tr("Voltar à Estação"), "station", func(): _confirm_return(completed), sub)
 	back.name = "Return"
 	back.disabled = not can_return
@@ -1146,7 +1520,7 @@ func show_menu(completed: bool, can_return: bool) -> void:
 		key.position = Vector2(resume.size.x - key.size.x - 52.0, (resume.size.y - key.size.y) * 0.5))
 	box.add_child(resume)
 	_place_menu.call_deferred()
-	resume.grab_focus.call_deferred()
+	AHKit.focus_later(resume)
 
 
 ## O pé do Menu acima das cabeças (MENU_BOTTOM), centrado à direita do cartão do objetivo (MENU_CENTER_X).
@@ -1201,6 +1575,12 @@ func show_inventory() -> void:
 	_modal.set_meta("inventory", true)
 	_modal.position = Vector2(500, 132)
 	var bag := AHInventoryPanel.new()
+	# A novidade (#143): as ferramentas novas abrem destacadas, e o selo do botão sai.
+	bag.fresh = Array(Campaign.state.get("new_tools", [])).duplicate()
+	Campaign.state.new_tools = []
+	hide_tool_notice()
+	if _bag_new != null:
+		_bag_new.visible = false
 	# No acampamento, a Mochila abre no herói escolhido na fogueira.
 	if camp_open():
 		bag.hero_id = camp_hud.camp.selected_id()
@@ -1252,7 +1632,7 @@ func show_choice(title: String, text: String, options: Array) -> void:
 			button.icon = AHKit.icon("station")
 			button.add_theme_constant_override("icon_max_width", 28)
 		box.add_child(button)
-	first.grab_focus.call_deferred()
+	AHKit.focus_later(first)
 	# No Maior a equipe alarga o painel: ele fica centrado na largura de verdade, sem cobrir o cartão do objetivo.
 	_center_modal.call_deferred()
 
@@ -1299,7 +1679,7 @@ func _confirm_new_campaign() -> void:
 		new_campaign.emit())
 	go.add_theme_color_override("font_color", AHKit.alert_text())
 	box.add_child(go)
-	stay.grab_focus.call_deferred()
+	AHKit.focus_later(stay)
 
 
 ## A expedição ainda está na rua (sem resultado): concluir ou sair faz sentido.
@@ -1337,7 +1717,7 @@ func _confirm_return(completed: bool) -> void:
 	back.icon = AHKit.icon("station")
 	back.add_theme_constant_override("icon_max_width", 28)
 	row.add_child(back)
-	stay.grab_focus.call_deferred()
+	AHKit.focus_later(stay)
 
 
 # ---------------------------------------------------------------- resultado
@@ -1360,8 +1740,23 @@ func show_result(result: String, delivered: Dictionary, campaign: Dictionary, bu
 	chips.add_child(_change_chip("lobby-seed", tr("%d sementes") % delivered.get("seeds", 0), AHKit.TEXT))
 	chips.add_child(_change_chip("lobby-scrap", tr("%d sucata") % delivered.get("scrap", 0), AHKit.TEXT))
 	chips.add_child(_change_chip("lobby-fragment", tr("%d fragmentos") % delivered.get("fragments", 0), AHKit.TEXT))
-	var alive: Array = campaign.roster.filter(func(h): return h.alive)
-	box.add_child(AHKit.label(tr("Heróis vivos: %d · No memorial: %d") % [alive.size(), campaign.memorial.size()], "text", AHKit.MUTED))
+	# Ninguém morre (#118): quem caiu volta em recuperação. Os levantados no mapa (#179) chegam carregados, com menos dias;
+	# os outros, com a recuperação inteira, na Enfermaria (com leito) ou no Dormitório.
+	var fallen: Array = delivered.get("fallen", [])
+	if fallen.is_empty():
+		box.add_child(AHKit.label(tr("Toda a equipe voltou de pé."), "text", AHKit.MUTED))
+	# [o texto com um nome, o texto com vários, quem]: "A equipe carregou" vale para os dois (sem gênero no nome).
+	var lines := [[tr("A equipe carregou: %s"), tr("A equipe carregou: %s"), fallen.filter(func(e): return e.get("carried", false))],
+		[tr("Foi para a Enfermaria: %s"), tr("Foram para a Enfermaria: %s"), fallen.filter(func(e): return not e.get("carried", false) and e.get("bed", false))],
+		[tr("Foi para o Dormitório, em recuperação: %s"), tr("Foram para o Dormitório, em recuperação: %s"),
+			fallen.filter(func(e): return not e.get("carried", false) and not e.get("bed", false))]]
+	for line in lines:
+		if line[2].is_empty():
+			continue
+		var names: Array = line[2].map(func(e): var h = AHStationRules.hero(campaign, String(e.hero_id)); return "%s (%s)" % [String(h.display_name) if h != null else "", AHStationRules.return_text(int(e.days)).to_lower()])
+		var label := AHKit.label((line[0] if names.size() == 1 else line[1]) % ", ".join(names), "text", AHKit.alert_text())
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(label)
 	var button := _primary(button_text, "station", tr("%s / A") % S.key_name("interact"), func(): result_continue.emit())
 	box.add_child(button)
-	button.grab_focus.call_deferred()
+	AHKit.focus_later(button)

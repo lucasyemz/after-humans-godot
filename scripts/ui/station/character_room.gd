@@ -1,19 +1,21 @@
 ## A Sala dos Personagens no kit (#60, docs/design/hud-station.md): a tela inteira, com o cômodo ao fundo.
 ## - No alto: a plaqueta da Estação, Comida, Água e Energia, e a engrenagem (as Opções).
-## - À esquerda: as abas dos heróis (e a de recrutar, com o Memorial), as HABILIDADES e o detalhe da escolhida.
-## - No meio: o herói de corpo inteiro (a pose idle), sobre a sombra e um escurecido.
+## - À esquerda: as abas dos heróis (e a de recrutar), as HABILIDADES e o detalhe da escolhida.
+## - No meio: o cômodo com o herói escolhido de pé nele (a placa da Estação, #181).
 ## - À direita: o painel PERSONAGEM (Fundador ou Recruta, o nível e o XP, o Treino, a vida, a velocidade e o instinto, a
 ##   relíquia, os contadores e os traços).
-## - Embaixo: VOLTAR, as teclas, as abas da Estação e PREPARAR EXPEDIÇÃO (G/X, a ação station_prepare).
+## - Embaixo: VOLTAR, as teclas, as abas da Estação e IR AO MAPA (G/X, a ação station_prepare).
 ## O Treino abre o diálogo com as duas melhorias. As ações passam pelo HUD da Estação (hud), que mostra o aviso e salva.
 class_name AHCharacterRoom
 extends Control
 
 const S := preload("res://scripts/flow/station_rules.gd")
-const LEFT := Rect2(28, 132, 600, 772)
+## A coluna da esquerda, estreita (#181, o pedido do Lucas): o vão entre os painéis cabe a arte mais larga (o escudo do
+## Tatu) na escala de todos, também no texto Maior; o que tem texto longo quebra a linha em vez de alargar a coluna.
+const LEFT := Rect2(28, 132, 540, 772)
+const HERO_TAB_WIDTH := 104.0
 const RIGHT := Rect2(1296, 132, 596, 844)
 const DIALOG := Rect2(620, 250, 680, 0)
-const RECRUIT := "+recruit"
 const MAX_INSTINCT := 200
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 const TARGETS := {"SingleEnemy": "Inimigo", "SingleAlly": "Aliado", "SingleOtherAlly": "Outro aliado", "Self": "Si mesmo"}
@@ -26,6 +28,8 @@ var training := false
 var _upgrade := ""
 var _first_focus: Control
 var _trait_ids := {}
+## O vão do último enquadramento (_frame_stage).
+var _framing := Vector2(-1, -1)
 
 
 static func make(owner: Control) -> AHCharacterRoom:
@@ -47,37 +51,73 @@ func _ready() -> void:
 func rebuild() -> void:
 	var owner := get_viewport().gui_get_focus_owner() if get_viewport() != null else null
 	var focus_path := get_path_to(owner) if owner != null and is_ancestor_of(owner) else NodePath("")
+	# O caminho tem nomes gerados que mudam a cada vez: o nome do botão (Post_research, GrowRoom) acha de novo.
+	var focus_name := String(owner.name) if owner != null and is_ancestor_of(owner) and not String(owner.name).begins_with("@") else ""
 	for child in get_children():
 		remove_child(child)
 		child.queue_free()
 	var c: Dictionary = Campaign.state
 	var living: Array = S.living(c)
-	if selected != RECRUIT and (selected == "" or S.hero(c, selected) == null or not S.hero(c, selected).alive):
-		selected = living[0].id if not living.is_empty() else RECRUIT
+	if selected == "" or S.hero(c, selected) == null or not S.hero(c, selected).alive:
+		# Sem ninguém no elenco (um save antigo, de antes da #118, com todos mortos), não há herói para mostrar.
+		selected = living[0].id if not living.is_empty() else ""
+	var hero = S.hero(c, selected) if selected != "" else null
+	if hero == null:
+		training = false
 	_first_focus = null
 	_top(c)
-	if selected != RECRUIT:
-		_stage(S.hero(c, selected))
+	if hero != null:
+		_stage(hero)
 	_left(c)
-	if selected != RECRUIT:
-		_right(c, S.hero(c, selected))
+	if hero != null:
+		_right(c, hero)
 	_bottom(c)
-	# O painel PERSONAGEM termina acima de PREPARAR EXPEDIÇÃO (que cresce com o motivo do bloqueio e no Maior).
+	# O painel PERSONAGEM termina acima de IR AO MAPA (que cresce com o motivo do bloqueio e no Maior).
 	var right := get_node_or_null("Right") as Control
 	var prepare := get_node_or_null("Prepare") as Control
 	if right != null and prepare != null:
 		right.size.y = minf(RIGHT.size.y, prepare.position.y - 12.0 - RIGHT.position.y)
 		right.custom_minimum_size.y = right.size.y
-	if training and selected != RECRUIT:
+	if training:
 		_training_dialog(c, S.hero(c, selected))
+	_frame_stage()
 	var again := get_node_or_null(focus_path) if not focus_path.is_empty() else null
+	if again == null and focus_name != "":
+		again = find_child(focus_name, true, false)
 	var target: Control = again if again is Control and (again as Control).focus_mode != Control.FOCUS_NONE else _first_focus
 	if target != null and AHUiStyle.using_keys:
-		target.grab_focus.call_deferred()
+		AHKit.focus_later(target)
 
 
 func restyle() -> void:
 	rebuild()
+
+
+## O vão entre os dois painéis como ficaram na tela (no Maior, o da esquerda cresce com o texto), em px de 1080.
+func stage_gap() -> Vector2:
+	var gap := Vector2(LEFT.end.x, RIGHT.position.x)
+	var left := get_node_or_null("Left") as Control
+	var right := get_node_or_null("Right") as Control
+	if left != null and not left.is_queued_for_deletion():
+		gap.x = maxf(gap.x, left.position.x + left.size.x)
+	if right != null and not right.is_queued_for_deletion():
+		gap.y = minf(gap.y, right.position.x)
+	return gap
+
+
+## A câmera põe o meio da Sala no meio do vão real entre os painéis (#181), depois que eles tomam o tamanho. Só quando o
+## vão muda: refazer a tela sem mudar o vão não mexe na câmera.
+func _frame_stage() -> void:
+	await get_tree().process_frame
+	var station = hud.get("station") if hud != null else null
+	if station == null or not is_inside_tree() or not is_visible_in_tree():
+		return
+	var gap := stage_gap()
+	var framing := gap
+	if framing == _framing:
+		return
+	_framing = framing
+	station.focus_room_stage(S.CHARACTERS, gap.x, gap.y)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -97,84 +137,12 @@ func _top(c: Dictionary) -> void:
 
 # ---------------------------------------------------------------- o herói no meio
 
-## O herói de corpo inteiro: a pose idle, sobre a sombra no chão e um escurecido atrás (a câmera do cômodo não chega a
-## esse tamanho).
+## O herói escolhido fica no próprio cômodo, de pé no chão da sala e na escala da Estação (#181): a placa é da Estação
+## (AHStation.show_stage_hero), não uma figura da interface.
 func _stage(hero: Dictionary) -> void:
-	var shade := TextureRect.new()
-	var gradient := Gradient.new()
-	gradient.set_color(0, Color(AHKit.SHADE, 0.55))
-	gradient.set_color(1, Color(AHKit.SHADE, 0.0))
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.55)
-	texture.fill_to = Vector2(1.0, 0.55)
-	shade.texture = texture
-	shade.position = Vector2(628, 120)
-	shade.size = Vector2(668, 860)
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(shade)
-	var ground := TextureRect.new()
-	var ground_gradient := Gradient.new()
-	ground_gradient.set_color(0, Color(AHKit.SHADE, 0.6))
-	ground_gradient.set_color(1, Color(AHKit.SHADE, 0.0))
-	var ground_texture := GradientTexture2D.new()
-	ground_texture.gradient = ground_gradient
-	ground_texture.fill = GradientTexture2D.FILL_RADIAL
-	ground_texture.fill_from = Vector2(0.5, 0.5)
-	ground_texture.fill_to = Vector2(1.0, 0.5)
-	ground.texture = ground_texture
-	ground.position = Vector2(962 - 220, 858)
-	ground.size = Vector2(440, 64)
-	ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(ground)
-	var figure := Figure.new()
-	figure.name = "Hero"
-	figure.art = AHCombatArena.hero_art_of(hero.id, String(hero.get("art_variant", ""))).get("idle", {})
-	# Os pés no chão do meio (y 890), o corpo na altura do herói (o de referência, 1,64 m, com 620 px).
-	figure.body_px = 620.0 * AHCharacterHeights.find(hero.id) / AHCharacterHeights.REFERENCE
-	figure.feet = Vector2(962, 890)
-	add_child(figure)
-
-
-## O herói de corpo inteiro na interface: a arte idle do manifesto (com os quadros da respiração), o pé na âncora.
-class Figure extends Control:
-	var art := {}
-	var body_px := 620.0
-	var feet := Vector2.ZERO
-	var _texture: Texture2D
-	var _frame := 0
-	var _time := 0.0
-
-	func _ready() -> void:
-		set_anchors_preset(Control.PRESET_FULL_RECT)
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_texture = load(art.file) if art.has("file") else null
-
-	func _process(delta: float) -> void:
-		if not art.has("frames"):
-			return
-		_time += delta
-		var step := 1.0 / float(art.get("fps", 10))
-		if _time >= step:
-			_time -= step
-			_frame = (_frame + 1) % art.frames.size()
-			queue_redraw()
-
-	func _draw() -> void:
-		if _texture == null:
-			return
-		var canvas := Vector2(art.canvas[0], art.canvas[1])
-		var region := Rect2(Vector2.ZERO, canvas)
-		var texture_scale := float(_texture.get_width()) / canvas.x
-		if art.has("frames"):
-			var f: Array = art.frames[_frame]
-			region = Rect2(f[0], f[1], f[2], f[3])
-			texture_scale = 1.0
-		var scale := body_px / float(art.body_reference_pixels)
-		var anchor := Vector2(art.anchor[0], art.anchor[1])
-		draw_texture_rect_region(_texture, Rect2(feet - anchor * scale, region.size * scale),
-			Rect2(region.position * texture_scale, region.size * texture_scale))
+	var station = hud.get("station") if hud != null else null
+	if station != null:
+		station.show_stage_hero(String(hero.id))
 
 
 # ---------------------------------------------------------------- a coluna da esquerda
@@ -196,16 +164,21 @@ func _left(c: Dictionary) -> void:
 	scroll.add_child(column)
 	var tabs := HFlowContainer.new()
 	tabs.name = "Heroes"
-	tabs.add_theme_constant_override("h_separation", 14)
+	tabs.add_theme_constant_override("h_separation", 10)
 	tabs.add_theme_constant_override("v_separation", 10)
 	column.add_child(tabs)
 	for entry in S.living(c):
 		tabs.add_child(_hero_tab(entry))
+	_roster_line(c, column)
 	column.add_child(_divider())
-	if selected == RECRUIT:
-		_recruit_list(c, column)
+	var hero = S.hero(c, selected) if selected != "" else null
+	if hero == null:
+		var empty := AHKit.label(tr("Ninguém no Alojamento agora. Quem chegar no trem aparece aqui."), "text", AHKit.TEXT)
+		empty.name = "EmptyRoster"
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		empty.custom_minimum_size = Vector2(300, 0)
+		column.add_child(empty)
 		return
-	var hero = S.hero(c, selected)
 	column.add_child(AHKit.label(tr("Habilidades"), "panel_title", AHKit.TEXT, true, true))
 	var hero_class = GameData.row("classes", String(hero.class_id))
 	var ids: Array = hero_class.get("AbilityIds", []) if hero_class != null else []
@@ -222,7 +195,8 @@ func _hero_tab(entry: Dictionary) -> Button:
 	tab.name = "Tab_%s" % entry.id
 	tab.toggle_mode = false
 	AHKit.style_as(tab, "hero_selected" if entry.id == selected else "hero")
-	tab.custom_minimum_size = Vector2(116, 132)
+	# Quatro por linha na coluna estreita.
+	tab.custom_minimum_size = Vector2(HERO_TAB_WIDTH, 132)
 	tab.clip_contents = true
 	tab.set_meta("hero_id", entry.id)
 	var face := TextureRect.new()
@@ -230,41 +204,33 @@ func _hero_tab(entry: Dictionary) -> Button:
 	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	face.position = Vector2(6, 6)
-	face.size = Vector2(104, 92)
+	face.size = Vector2(HERO_TAB_WIDTH - 12, 92)
 	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tab.add_child(face)
+	# Em recuperação (#118): o retrato apagado, o ícone de Caído e os dias no canto.
+	if S.recovering(entry):
+		face.modulate = AHKit.FALLEN
+		var badge := HBoxContainer.new()
+		badge.name = "Recovering"
+		badge.add_theme_constant_override("separation", 2)
+		badge.position = Vector2(8, 6)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		badge.add_child(AHKit.glyph("state_wounded", 26, AHKit.alert_text()))
+		badge.add_child(AHKit.label(tr("%d d") % S.recovery_days(entry), "small", AHKit.alert_text(), true))
+		tab.add_child(badge)
 	var name := AHKit.label(String(entry.display_name), "small" if AHUiStyle.text_scale > 1.2 else "tab", AHKit.AMBER if entry.id == selected else AHKit.TEXT)
 	name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name.position = Vector2(4, 98)
-	name.size = Vector2(108, 30)
+	name.size = Vector2(HERO_TAB_WIDTH - 8, 30)
 	tab.add_child(name)
-	tab.tooltip_text = String(entry.display_name)
+	tab.tooltip_text = String(entry.display_name) if not S.recovering(entry) else S.recovery_block(entry)
 	var id: String = entry.id
 	tab.pressed.connect(func(): _select(id))
 	if entry.id == selected:
 		_first_focus = tab
 	return tab
-
-
-## Recrutar e o Memorial: o botão ao lado de VOLTAR (as quatro abas dos heróis enchem a coluna, como no alvo).
-func _recruit_button() -> Button:
-	var button := Button.new()
-	button.name = "Tab_recruit"
-	button.text = ("+ " + tr("Recrutar")).to_upper()
-	button.tooltip_text = tr("Recrutar e Memorial")
-	AHKit.style_as(button, "secondary")
-	button.add_theme_font_override("font", AHKit.font(true))
-	button.add_theme_font_size_override("font_size", AHKit.size("primary"))
-	if selected == RECRUIT:
-		for state in ["font_color", "font_hover_color", "font_focus_color"]:
-			button.add_theme_color_override(state, AHKit.AMBER)
-	button.custom_minimum_size = Vector2(216, 64)
-	button.pressed.connect(func(): _select(RECRUIT))
-	if selected == RECRUIT:
-		_first_focus = button
-	return button
 
 
 func _select(hero_id: String) -> void:
@@ -275,9 +241,9 @@ func _select(hero_id: String) -> void:
 	ability = ""
 	training = false
 	rebuild()
-	var tab := find_child("Tab_%s" % ("recruit" if hero_id == RECRUIT else hero_id), true, false) as Control
+	var tab := find_child("Tab_%s" % hero_id, true, false) as Control
 	if tab != null:
-		tab.grab_focus.call_deferred()
+		AHKit.focus_later(tab)
 
 
 func _ability_row(ability_id: String) -> Button:
@@ -295,6 +261,7 @@ func _ability_row(ability_id: String) -> Button:
 	row.add_theme_font_override("font", AHKit.font(false))
 	row.add_theme_font_size_override("font_size", AHKit.size("row"))
 	row.custom_minimum_size = Vector2(0, 60)
+	row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var id := ability_id
 	row.pressed.connect(func():
 		ability = id
@@ -314,7 +281,11 @@ func _ability_detail(c: Dictionary, hero: Dictionary, ability_id: String) -> Pan
 	inset.add_child(box)
 	if data == null:
 		return inset
-	box.add_child(AHKit.label(tr(String(data.DisplayName)), "panel_title", AHKit.TEXT, true))
+	var title := AHKit.label(tr(String(data.DisplayName)), "panel_title", AHKit.TEXT, true)
+	# Quebra a linha em vez de alargar a coluna estreita ("Emergency Sledgehammer" no inglês Maior).
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.custom_minimum_size = Vector2(400, 0)
+	box.add_child(title)
 	var bonus := (1 if c.get("researched_skills", []).has(ability_id) else 0) + int(AHHeroLevels.combat_bonus(hero).get("abilities", {}).get(ability_id, 0))
 	var star := " ★" if bonus > 0 else ""
 	var damage: Dictionary = data.get("DamageRange", {})
@@ -331,40 +302,48 @@ func _ability_detail(c: Dictionary, hero: Dictionary, ability_id: String) -> Pan
 	box.add_child(ranks)
 	var text := AHKit.label(tr(String(data.Description)), "text", AHKit.TEXT)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text.custom_minimum_size = Vector2(480, 0)
+	text.custom_minimum_size = Vector2(400, 0)
 	box.add_child(text)
 	var enemy: bool = String(data.TargetType) == "SingleEnemy"
 	box.add_child(AHKit.label(tr(TARGETS.get(String(data.TargetType), "")), "text", AHKit.alert_text() if enemy else AHKit.good()))
 	return inset
 
 
-## Recrutar (as classes liberadas, de graça com o voluntário) e o Memorial.
-func _recruit_list(c: Dictionary, column: VBoxContainer) -> void:
-	column.add_child(AHKit.label(tr("Recrutar"), "panel_title", AHKit.TEXT, true, true))
-	column.add_child(AHKit.label(tr("Elenco: %d de %d") % [S.living(c).size(), S.MAX_ROSTER], "text", AHKit.MUTED))
-	for class_id in c.unlocked_classes:
-		var hero_class = GameData.row("classes", class_id)
-		var free := S.can_recruit_volunteer(c, class_id)
-		var id: String = class_id
-		var button := Button.new()
-		button.text = "%s · %s" % [tr(hero_class.DisplayName) if hero_class else class_id, tr("voluntário, de graça") if free else tr("%d sementes") % S.RECRUIT_COST]
-		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		AHKit.style_as(button, "list")
-		button.add_theme_font_override("font", AHKit.font(false))
-		button.add_theme_font_size_override("font_size", AHKit.size("row"))
-		button.custom_minimum_size = Vector2(0, 60)
-		button.disabled = not (free or S.quantity(c, "seeds") >= S.RECRUIT_COST)
-		button.pressed.connect(func(): hud._recruit(id))
-		column.add_child(button)
-	if c.memorial.is_empty():
-		return
-	column.add_child(_divider())
-	column.add_child(AHKit.label(tr("Memorial"), "panel_title", AHKit.TEXT, true, true))
-	for entry in c.memorial:
-		var line := AHKit.label("%s · %s · %s" % [entry.display_name, tr(entry.get("mission_name", "")), AHCombatEngine.cause_text(entry.get("cause", ""))], "text", AHKit.MUTED)
-		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.custom_minimum_size = Vector2(500, 0)
-		column.add_child(line)
+## Os limites da Estação (#119: heróis pelo Alojamento, ajudantes pelo Dormitório), como os novos chegam (#122: de trem)
+## e ampliar o Alojamento. Com alguém esperando na plataforma, o caminho até lá.
+func _roster_line(c: Dictionary, column: VBoxContainer) -> void:
+	var note := AHKit.label("%s · %s" % [S.limits_text(c), tr("os novos chegam de trem, na volta das expedições")], "text", AHKit.MUTED)
+	note.name = "Roster"
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(300, 0)
+	column.add_child(note)
+	var cost := S.next_level_cost(c, S.CHARACTERS)
+	if not cost.is_empty():
+		var level := S.room_level(c, S.CHARACTERS)
+		var block := S.upgrade_block(c, S.CHARACTERS)
+		var grow := AHKit.button(tr("Ampliar o Alojamento · %s") % S.cost_text(cost), "secondary")
+		grow.name = "GrowRoom"
+		grow.custom_minimum_size = Vector2(0, 56)
+		grow.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		grow.disabled = block != ""
+		grow.tooltip_text = block if block != "" else tr("Nível %d: %d heróis.") % [level + 1, S.hero_limit_at(level + 1)]
+		grow.pressed.connect(func(): hud._act(S.upgrade_room(Campaign.state, S.CHARACTERS, level), tr("O Alojamento cresceu: %s.") % S.limits_text(Campaign.state)))
+		column.add_child(grow)
+		# O motivo à vista (o toque não mostra a dica).
+		if block != "":
+			var reason := AHKit.label(block, "small", AHKit.alert_text())
+			reason.name = "GrowBlock"
+			reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			reason.custom_minimum_size = Vector2(300, 0)
+			column.add_child(reason)
+	var waiting := S.train_candidate_name(c)
+	if waiting != "":
+		var go := AHKit.button((tr("%s esperam na plataforma") if S.train_waiting_names(c).size() > 1 else tr("%s espera na plataforma")) % waiting, "secondary")
+		go.name = "ToTrain"
+		go.custom_minimum_size = Vector2(0, 60)
+		go.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		go.pressed.connect(func(): hud.open_service("train"))
+		column.add_child(go)
 
 
 func _divider() -> TextureRect:
@@ -441,6 +420,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		line.custom_minimum_size = Vector2(300, 0)
 		column.add_child(line)
+	_skins(c, hero, column)
 	# As melhorias escolhidas nos treinos, com quantas vezes cada uma.
 	var counts := {}
 	for upgrade_id in hero.get("upgrades", []):
@@ -484,7 +464,20 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 	instinct.custom_minimum_size = Vector2(0, 28)
 	column.add_child(instinct)
 	column.add_child(_divider())
+	if S.recovering(hero):
+		var down := AHStationReport.fallen_line(hero)
+		down.name = "Recovery"
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		down.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(down)
+		var care := _small_button(tr("Ver a Enfermaria"))
+		care.pressed.connect(func(): hud.open_room(S.INFIRMARY))
+		row.add_child(care)
+		column.add_child(row)
+		column.add_child(_divider())
 	_relic(c, hero, column)
+	_post(c, hero, column)
 	if hero.get("trauma", false):
 		var trauma := HBoxContainer.new()
 		trauma.add_theme_constant_override("separation", 12)
@@ -508,6 +501,149 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 	column.add_child(counters)
 	column.add_child(_divider())
 	_traits(hero, column)
+
+
+## A roupa (#138): as skins completas do herói, a padrão e as de data/skins.json, com o rosto de cada uma, o nome e o
+## estado. A liberada se veste na hora (só visual, sem custo); a bloqueada diz o motivo. Sem skin além da padrão, nada.
+func _skins(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
+	var rows := AHSkins.of_hero(String(hero.id))
+	if rows.is_empty():
+		return
+	var box := VBoxContainer.new()
+	box.name = "Skins"
+	box.add_theme_constant_override("separation", 6)
+	column.add_child(box)
+	box.add_child(AHKit.label(tr("Roupa"), "text", AHKit.AMBER, true, true))
+	var tabs := HFlowContainer.new()
+	tabs.add_theme_constant_override("h_separation", 12)
+	tabs.add_theme_constant_override("v_separation", 8)
+	box.add_child(tabs)
+	var current := String(hero.get("skin_id", AHSkins.DEFAULT))
+	var chosen_text := tr("Padrão")
+	var locked_reason := ""
+	# A aba leva o nome curto (cabe numa linha também no Maior); o nome inteiro vai no texto embaixo.
+	for spec in [[AHSkins.DEFAULT, tr("Padrão"), tr("Padrão")]] + rows.map(func(row): return [String(row.Name),
+			tr(String(row.get("ShortName", row.DisplayName))), tr(String(row.DisplayName))]):
+		var skin_id: String = spec[0]
+		var tab := _skin_tab(hero, skin_id, spec[1], spec[2], skin_id == current, S.skin_unlocked(c, skin_id))
+		tabs.add_child(tab)
+		if skin_id == current:
+			chosen_text = spec[2]
+		elif not S.skin_unlocked(c, skin_id) and locked_reason == "":
+			locked_reason = S.skin_lock_reason(c, skin_id)
+	var row = GameData.row("skins", current)
+	var about := AHKit.label(tr("%s: %s") % [chosen_text, tr(String(row.Text))] if row != null else tr("A roupa de sempre."), "small", AHKit.MUTED)
+	about.name = "SkinText"
+	about.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	about.custom_minimum_size = Vector2(300, 0)
+	box.add_child(about)
+	if locked_reason != "":
+		var lock := AHKit.label(locked_reason, "small", AHKit.MUTED)
+		lock.name = "SkinLock"
+		lock.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lock.custom_minimum_size = Vector2(300, 0)
+		box.add_child(lock)
+	column.add_child(_divider())
+
+
+## A aba de uma skin: o rosto dela, o nome e, bloqueada, apagada e sem vestir.
+func _skin_tab(hero: Dictionary, skin_id: String, label: String, full_name: String, chosen: bool, unlocked: bool) -> Button:
+	var tab := Button.new()
+	tab.name = "Skin_%s" % skin_id
+	tab.toggle_mode = false
+	AHKit.style_as(tab, "hero_selected" if chosen else "hero")
+	tab.custom_minimum_size = Vector2(104, 122)
+	tab.clip_contents = true
+	tab.tooltip_text = full_name if unlocked else "%s · %s" % [full_name, tr("Bloqueada")]
+	var face := TextureRect.new()
+	var founder := _founder_art(String(hero.id))
+	face.texture = AHUiStyle.face_texture(AHSkins.dress(founder, skin_id).get("idle", {}))
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	face.position = Vector2(6, 6)
+	face.size = Vector2(92, 82)
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not unlocked:
+		face.modulate = AHKit.LOCKED
+	tab.add_child(face)
+	var name := AHKit.label(label if unlocked else tr("Bloqueada"), "small", AHKit.AMBER if chosen else (AHKit.TEXT if unlocked else AHKit.MUTED))
+	name.name = "SkinName"
+	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name.position = Vector2(2, 90)
+	name.size = Vector2(100, 30)
+	name.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tab.add_child(name)
+	var hero_id := String(hero.id)
+	tab.pressed.connect(func(): _choose_skin(hero_id, skin_id, full_name))
+	return tab
+
+
+## A entrada do fundador no manifesto, sem skin (a base para vestir cada aba).
+func _founder_art(hero_id: String) -> Dictionary:
+	return AHCombatArena.founder_art_of(hero_id)
+
+
+func _choose_skin(hero_id: String, skin_id: String, label: String) -> void:
+	var c: Dictionary = Campaign.state
+	if String(S.hero(c, hero_id).get("skin_id", AHSkins.DEFAULT)) == skin_id:
+		return
+	var error := S.choose_skin(c, hero_id, skin_id)
+	var who := String(S.hero(c, hero_id).display_name)
+	var done := tr("%s volta à roupa de sempre.") % who if skin_id == AHSkins.DEFAULT else tr("%s veste %s.") % [who, label]
+	hud._act(error, "" if error != "" else done)
+	# A placa dele na Estação veste a nova também (a tela já se refez pelo refresh do _act).
+	var station = hud.get("station") if error == "" else null
+	if station != null:
+		station.redress(hero_id)
+
+
+## O posto na Estação (#119): onde o herói trabalha enquanto a equipe está fora, e o que rende a cada volta. Um posto
+## por herói e um herói por cômodo; quem parte na equipe deixa o posto.
+func _post(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
+	var box := VBoxContainer.new()
+	box.name = "Post"
+	box.add_theme_constant_override("separation", 6)
+	column.add_child(box)
+	box.add_child(AHKit.label(tr("Posto"), "text", AHKit.AMBER, true, true))
+	var current := S.post_of(hero)
+	var text := ""
+	if S.recovering(hero):
+		text = tr("Em recuperação: sem posto até voltar.")
+	elif current == "":
+		text = tr("Sem posto: descansa enquanto a equipe está fora.")
+	else:
+		text = "%s · %s" % [tr(S.room_def(current).name), S.yield_text(current, S.post_yield(hero, current))]
+	var line := AHKit.label(text, "text", AHKit.MUTED if current == "" else AHKit.TEXT)
+	line.name = "PostText"
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	line.custom_minimum_size = Vector2(300, 0)
+	box.add_child(line)
+	var rooms := S.job_rooms(c)
+	if S.recovering(hero) or rooms.is_empty():
+		column.add_child(_divider())
+		return
+	var chips := HFlowContainer.new()
+	chips.add_theme_constant_override("h_separation", 8)
+	chips.add_theme_constant_override("v_separation", 8)
+	box.add_child(chips)
+	var id: String = hero.id
+	for room_id in [""] + rooms:
+		var room: String = room_id
+		# O rendimento no próprio chip: o toque e o controle não mostram a dica do mouse.
+		var chip := AHKit.button(tr("Nenhum") if room == "" else "%s · +%d" % [tr(S.room_def(room).name), S.post_yield(hero, room)], "chip")
+		AHOptionsPanel._chip_font(chip)
+		chip.name = "Post_%s" % (room if room != "" else "none")
+		chip.custom_minimum_size = Vector2(0, 52)
+		if room != "":
+			var other = S.worker(c, room)
+			chip.tooltip_text = S.yield_text(room, S.post_yield(hero, room)) + ((tr(" · %s sai de lá") % other.display_name) if other != null and other.id != id else "")
+		if room == current:
+			for state in ["font_color", "font_hover_color", "font_focus_color"]:
+				chip.add_theme_color_override(state, AHKit.AMBER)
+			chip.add_child(AHKit.selected_overlay())
+		chip.pressed.connect(func(): hud._act(S.set_post(Campaign.state, id, room)))
+		chips.add_child(chip)
+	column.add_child(_divider())
 
 
 func _medal(level: int) -> Control:
@@ -747,7 +883,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 			rebuild()
 			var again := find_child("Upgrade_%s" % id, true, false) as Control
 			if again != null:
-				again.grab_focus.call_deferred())
+				AHKit.focus_later(again))
 		cards.add_child(card)
 		if first == null or option.Name == _upgrade:
 			first = card
@@ -792,16 +928,13 @@ func _fit_keys(buttons: Array) -> void:
 # ---------------------------------------------------------------- embaixo
 
 func _bottom(c: Dictionary) -> void:
-	var back := AHStationFrame.back_button(self, func(): hud.close_panel())
-	var recruit := _recruit_button()
-	add_child(recruit)
-	recruit.reset_size()
-	recruit.position = Vector2(back.position.x + maxf(216.0, back.get_combined_minimum_size().x) + 12.0, AHStationFrame.BACK_Y)
+	AHStationFrame.back_button(self, func(): hud.close_panel())
 	# As teclas entre os dois painéis (Voltar mostra o Esc: ui_cancel volta sempre, com qualquer troca nas Opções).
+	# O cômodo ao lado (#131): o Dormitório e o Bar, sem voltar à vista geral.
 	AHStationFrame.keys(self, [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["Esc", tr("Voltar")],
-		["hide_hud", tr("Ocultar")]], 962.0, LEFT.end.x + 12.0, RIGHT.position.x - 12.0)
+		["station_room_next", tr("Ao lado")], ["hide_hud", tr("Ocultar")]], 962.0, LEFT.end.x + 12.0, RIGHT.position.x - 12.0)
 	AHStationFrame.tabs(self, "characters", _nav)
-	AHStationFrame.prepare(self, tr("Preparar expedição"), "station", S.preparation_block(c), func(): hud.open_map())
+	AHStationFrame.prepare(self, tr("Ir ao mapa"), "station", S.preparation_block(c), func(): hud.open_map())
 
 
 func _nav(id: String) -> void:

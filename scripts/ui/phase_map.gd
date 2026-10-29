@@ -2,8 +2,8 @@
 ## alagado pintado, com cada lugar projetado pelo terminal da plataforma no estado dele (disponível, escolhido, concluído,
 ## bloqueado), a rota da Estação até o escolhido e, sobre cada lugar, os sinais do radar (AHNetworkRadar: o guardião, os
 ## inimigos, os suprimentos e a história). Clicar ou tocar no lugar escolhe a fase; à direita, o painel dela com a leitura
-## do radar e PREPARAR EXPEDIÇÃO. O teclado e o controle andam pelos rótulos dos lugares (as setas) e escolhem com
-## Interagir. A fase escolhida segue para a Preparação.
+## do radar e PREPARAR NESTE LUGAR. O teclado e o controle andam pelos rótulos dos lugares (as setas) e escolhem com
+## Interagir. A fase escolhida segue para a equipe na plataforma (#123).
 class_name AHPhaseMap
 extends Control
 
@@ -145,7 +145,7 @@ func _init() -> void:
 	var aside_column := VBoxContainer.new()
 	aside_column.add_theme_constant_override("separation", 12)
 	aside_panel.add_child(aside_column)
-	# O conteúdo rola (o Maior não cabe inteiro); PREPARAR EXPEDIÇÃO fica fixo no pé.
+	# O conteúdo rola (o Maior não cabe inteiro); PREPARAR NESTE LUGAR fica fixo no pé.
 	var scroll := ScrollContainer.new()
 	scroll.name = "AsideScroll"
 	# A rolagem acompanha o foco do teclado e do controle (#5).
@@ -211,7 +211,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		closed.emit()
 	elif event.is_action_pressed("station_prepare"):
-		# G / X, como diz o botão: com uma fase aberta escolhida, segue para a Preparação.
+		# G / X, como diz o botão: com uma fase aberta escolhida, segue para a plataforma.
 		get_viewport().set_input_as_handled()
 		var go: Button = _footer.get_node_or_null("Prepare")
 		if go != null and not go.disabled:
@@ -349,7 +349,7 @@ func _build_labels(c: Dictionary) -> void:
 			marks.size = marks.get_combined_minimum_size()
 			marks.position = anchor + Vector2(-marks.size.x * 0.5, 48 - 24 - marks.size.y - 6)
 	# As setas andam pelos lugares na ordem da rede (a Estação e as fases, em volta): ↓ e → para o próximo, ↑ e ← para o
-	# de antes. Interagir escolhe o lugar; com ele escolhido, o foco vai para PREPARAR EXPEDIÇÃO.
+	# de antes. Interagir escolhe o lugar; com ele escolhido, o foco vai para PREPARAR NESTE LUGAR.
 	for i in buttons.size():
 		var button: Button = buttons[i]
 		button.focus_mode = Control.FOCUS_ALL
@@ -363,7 +363,7 @@ func _build_labels(c: Dictionary) -> void:
 		button.focus_previous = previous
 	var focus_on: Button = _labels.get_node_or_null("Place_%s" % (selected if selected != "" else "refuge"))
 	if focus_on != null and AHUiStyle.using_keys:
-		focus_on.grab_focus.call_deferred()
+		AHKit.focus_later(focus_on)
 
 
 ## Os sinais de uma fase, numa chapinha: o guardião, os inimigos, os suprimentos e a história, cada um no estado da leitura
@@ -383,7 +383,7 @@ func _marks(read: Dictionary) -> PanelContainer:
 
 ## Um sinal: o rosto do guardião ou do inimigo mais comum (conhecido), o marcador da leitura (não lido, parcial, conhecido
 ## ou, na história, a ausência conhecida).
-func _signal(part: String, entry: Dictionary, side: float) -> Control:
+static func _signal(part: String, entry: Dictionary, side: float) -> Control:
 	var state: String = entry.state
 	if state == "known" and (part == "boss" or part == "enemies"):
 		var enemy_id: String = entry.id if part == "boss" else (entry.ids[0] if not entry.ids.is_empty() else "")
@@ -420,13 +420,13 @@ static func portrait_of(enemy_id: String) -> Texture2D:
 	return AHUiStyle.face_texture(art) if not art.is_empty() else null
 
 
-func _icon_texture(name: String) -> Texture2D:
+static func _icon_texture(name: String) -> Texture2D:
 	if name == "lock":
 		return load(NETWORK % "lock_32")
 	return AHKit.legacy_icon(name)
 
 
-func _mark_icon(name: String, side: float, tint: Color) -> TextureRect:
+static func _mark_icon(name: String, side: float, tint: Color) -> TextureRect:
 	var rect := TextureRect.new()
 	rect.texture = _icon_texture(name)
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -542,9 +542,9 @@ func _build_aside(c: Dictionary) -> void:
 	radar.add_theme_constant_override("separation", 6)
 	_aside.add_child(radar)
 	for part in R.PARTS:
-		radar.add_child(_radar_row(part, read[part], width))
-	# PREPARAR EXPEDIÇÃO (G / X): o botão principal; bloqueado, com o motivo dentro.
-	var go := AHStationReport._primary(tr("Preparar expedição"), "station", "station_prepare")
+		radar.add_child(radar_row(part, read[part], width))
+	# PREPARAR NESTE LUGAR (G / X): o botão principal; bloqueado, com o motivo dentro.
+	var go := AHStationReport._primary(tr("Preparar neste lugar"), "station", "station_prepare")
 	go.name = "Prepare"
 	go.custom_minimum_size = Vector2(0, 64)
 	go.add_theme_font_size_override("font_size", AHKit.size("row"))
@@ -575,7 +575,7 @@ func _build_aside(c: Dictionary) -> void:
 		for side in ["focus_neighbor_top", "focus_neighbor_bottom", "focus_neighbor_left", "focus_neighbor_right"]:
 			go.set(side, place.get_path())
 	if open and AHUiStyle.using_keys:
-		go.grab_focus.call_deferred()
+		AHKit.focus_later(go)
 
 
 func _aside_head(icon_name: String, title: String, closable: bool) -> void:
@@ -597,8 +597,8 @@ func _aside_head(icon_name: String, title: String, closable: bool) -> void:
 		head.add_child(close)
 
 
-## Uma linha do radar: o marcador no estado da leitura, a parte em caixa alta e o que o terminal captou.
-func _radar_row(part: String, entry: Dictionary, width: float) -> HBoxContainer:
+## Uma linha do radar (também na faixa da partida, #123): o marcador no estado da leitura, a parte em caixa alta e o que o terminal captou.
+static func radar_row(part: String, entry: Dictionary, width: float) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.name = "Read_%s" % part
 	row.add_theme_constant_override("separation", 12)

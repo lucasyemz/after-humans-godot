@@ -1,10 +1,12 @@
 // Lote 7: a Estação nova (#120 e #124), no kit da Awesomic (art/ui/kit/station):
-// - a Enfermaria (#121): o cômodo na Estação em corte (build_room.py), o painel e o aviso no Próximo passo;
-// - Caído e em recuperação (#118): as cartas do relatório, da Sala e da Preparação, e "Íris caiu" no popup de fim de luta;
+// - a Enfermaria (#121): o cômodo na Estação em corte (a captura da Godot, capture_infirmary.gd), o painel e o aviso no
+//   Próximo passo;
+// - Caído (#118): as cartas do relatório, da Sala e da Preparação, e "Íris caiu" no popup de fim de luta;
 // - os limites e o posto (#119): "Heróis 6 de 8", "Ajudantes 3 de 4", o campo Posto, "Quem trabalha aqui" e o rendimento;
 // - o recrutamento pelo trem (#122): quem chegou, a casa cheia e a volta sem ninguém;
 // - a preparação na plataforma (#123): IR AO MAPA, PREPARAR NESTE LUGAR, a equipe de pé com as cartas e a confirmação.
-// Fundos: as capturas limpas da Estação (hud-v2/before) e as montagens de before/ (build_room.py e build_platform.py), e
+// Fundos: as capturas limpas da Estação (hud-v2/before e as de capture_infirmary.gd em before/), as montagens da
+// plataforma (build_platform.py) e
 // a luta de verdade com a Íris caída (capture.gd). Números de exemplo: as propostas das issues, em data/ na integração.
 // Uso (da raiz do repositório, com python3 -m http.server 8765 --bind 127.0.0.1 servindo a raiz):
 //   node docs/design/hud-casa/render.mjs http://127.0.0.1:8765
@@ -29,7 +31,7 @@ export const face = (hero, size, style = "") => square(`art/ui/portraits/${PORTR
 // gênero, como os outros estados ("Em forma", "Ferimento leve"): os heróis não têm gênero nos dados.
 export const recovering = () => `<div class="pill">${img(KIT.status_pill.file, "position:absolute;inset:0;width:100%;height:100%")}` +
   `<div class="tint" style="background:var(--danger-fill);-webkit-mask-image:url(${BASE}/${KIT.status_pill.file})"></div>` +
-  `${glyph("state_recovering", 22, "#fff6ee", "position:relative")}<span class="tx" style="color:#fff6ee">Em recuperação</span></div>`;
+  `${glyph("state_recovering", 22, "#fff6ee", "position:relative")}<span class="tx" style="color:#fff6ee">Caído</span></div>`;
 // O véu das cartas de quem não pode sair: o mesmo da habilidade sem uso (riscas escuras), com o texto no tom cheio.
 const veil = `<i style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(6,7,8,.55) 0 10px,rgba(6,7,8,.42) 10px 20px);pointer-events:none"></i>`;
 // O botão principal da Estação na saída nova (#123): IR AO MAPA, no lugar de PREPARAR EXPEDIÇÃO.
@@ -59,7 +61,7 @@ export function topBar({ subtitle = "", heroes = "6 de 8", helpers = "3 de 4", f
 
 // ------------------------------------------------------------------ 1. a Enfermaria (#121)
 // O cômodo escolhido no corte: cantos âmbar e a etiqueta (como o Alojamento na Visão geral). Na câmera do cômodo, a
-// Enfermaria fica de x 54 a 420; na Visão geral, de x 440 a 620 (build_room.py).
+// Enfermaria de 12 m fica de x 466 a 1178; na Visão geral, de x 596 a 892 (as capturas de capture_infirmary.gd).
 export const roomMark = (x, y, w, h, icon, label) => `<div class="abs" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">${nine("selected_slot", { extra: "position:absolute;inset:0" })}</div>` +
   `<div class="abs" style="left:${x + w / 2}px;top:calc(${y}px - 52px*var(--k));transform:translateX(-50%)">` + nine("room_tag", { cls: "row", extra: "min-width:200px;height:calc(52px*var(--k));justify-content:center;gap:8px" }, `${glyph(icon, 22, "var(--amber)")}<span class="tx f22 semi">${label}</span>`) + `</div>`;
 export const next = (body) => nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:10px" },
@@ -72,12 +74,13 @@ function overview({ main = TO_MAP, nextBody = null, mark = true, focus = false }
   const card = nine("panel_large", { repeat: "round", cls: "col", extra: "width:500px;gap:8px" },
     `<div class="row" style="gap:12px">${glyph("room_infirmary", 36, "var(--amber)")}<span class="tx f32 semi up">Enfermaria</span>${roomTag("Nível 1", "var(--good)")}</div>` +
     `<span class="wrap f22">Os leitos de quem caiu. Volta mais rápido daqui do que do Dormitório.</span>` + secondary("Gerenciar", { hit: "manage", height: 60, extra: "width:100%" }));
-  // O Dia 5, o dia seguinte ao da volta (Dia 4: o relatório, o painel da Enfermaria e a Sala, com "Volta em 2 dias"):
-  // passou uma noite, falta um dia, e a Íris volta amanhã. A Comida segue a conta de AHStationRules.forecast: 8, mais 4
+  // O Dia 5, o dia seguinte ao da volta (Dia 4: o relatório, o painel da Enfermaria e a Sala). Os dias de
+  // data/recovery.json: 2 no leito, menos 1 do posto da Lupa; um dia é uma volta de expedição, e a noite não conta:
+  // no Dia 4 e no Dia 5 falta uma volta, e a Íris volta amanhã. A Comida segue a conta de AHStationRules.forecast: 8, mais 4
   // da Cantina e da Dora, menos 4 que os civis comem e 4 da noite (8 → 4). A Forja de nível 1 acesa, com o Brasa e o
-  // Otto (build_forge.py). Sem cômodo escolhido (a tela do IR AO MAPA), sem o cartão do cômodo.
+  // Otto (capture_infirmary.gd). Sem cômodo escolhido (a tela do IR AO MAPA), sem o cartão do cômodo.
   return MINE("station_day5") + topBar({ subtitle: "Dia 5 · Visão geral", food: ["4 / 12 suprimentos", "Abastecida · demanda 4", false] }) +
-    (mark ? roomMark(434, 650, 196, 106, "room_infirmary", "Enfermaria") : "") +
+    (mark ? roomMark(596, 628, 296, 86, "room_infirmary", "Enfermaria") : "") +
     `<div class="abs col" style="left:28px;top:132px;gap:12px">${next(body)}</div>` +
     (mark ? `<div class="abs" style="left:28px;bottom:calc(14px + 72px*var(--k) + 14px)">${card}</div>` : "") +
     bottom({ active: 0, back: false, keysAt: 840, keys: [["Setas", "Cômodos"], ["E", "Abrir"], ["Esc", "Menu"], ["F2", "Ocultar"]], main }) +
@@ -89,23 +92,25 @@ function overview({ main = TO_MAP, nextBody = null, mark = true, focus = false }
 function infirmary() {
   const bed = inset(`<div class="row" style="gap:14px;align-items:flex-start">${face("iris", 72)}<div class="col" style="flex:1;min-width:0;gap:4px">` +
     `<div class="row" style="gap:10px;justify-content:space-between"><span class="tx f30 semi">Íris</span><span class="tx f22 muted">Leito 1</span></div>` +
-    `<span class="tx f22 muted">Sapo Química</span><div class="row" style="gap:12px;flex-wrap:wrap">${recovering()}<span class="tx f30 semi amber">Volta em 2 dias</span></div></div></div>` +
+    `<span class="tx f22 muted">Sapo Química</span><div class="row" style="gap:12px;flex-wrap:wrap">${recovering()}<span class="tx f30 semi amber">Volta amanhã</span></div></div></div>` +
     `<div class="row" style="gap:10px"><span class="tx f20 muted up">Vida</span><span class="tx f22">1 / 23</span></div>${bar("100%", 22, 1 / 23, "var(--danger-fill)")}` +
     line("state_fallen", "var(--danger)", "Caiu na Rua das Vitrines, na luta do trecho 4.", "f22") +
-    `<div class="row" style="gap:12px;justify-content:space-between;flex-wrap:wrap"><span class="tx f22">Com o curativo, volta amanhã.</span>` +
+    `<div class="row" style="gap:12px;justify-content:space-between;flex-wrap:wrap"><span class="tx f22">Com o curativo, sai hoje.</span>` +
     cost("res-bandages.svg", "Curativo · tem 2") + `</div>` +
     `<div data-hit="bandage">` + nine("train_button", { cls: "row", extra: "height:calc(56px*var(--k));gap:10px" },
       `${glyph("res-bandages.svg", 26, "var(--amber)")}<span class="tx f26 semi up">Usar curativo</span><span class="tx f22 muted">menos 1 dia</span>`) + `</div>`);
   const empty = inset(`<div class="row" style="gap:14px">${glyph("room_infirmary", 40, "var(--muted)")}<div class="col"><span class="tx f24 semi muted">Leito 2 · livre</span><span class="tx f20 muted">Quem cair na próxima expedição vem para cá.</span></div></div>`);
+  // Os ajustes do Lucas (26/10): os leitos 3 e 4 estão no cômodo, quebrado e coberto, esperando a melhoria.
+  const waiting = inset(`<div class="row" style="gap:14px">${glyph("lobby-scrap.svg", 40, "var(--muted)")}<div class="col" style="flex:1;min-width:0"><span class="tx f24 semi muted">Leitos 3 e 4 · esperam a melhoria</span><span class="wrap f20 muted">Um quebrado e um coberto com a lona. No nível 2, os quatro ficam em uso.</span></div></div>`);
   const carer = inset(`<div class="row" style="gap:14px">${face("lupa", 60)}<div class="col" style="flex:1;min-width:0"><span class="tx f26 semi">Lupa</span>` +
     `<span class="wrap f20 muted">Sapo Química · Química e Suporte</span></div>${chip("Trocar", { hit: "post" })}</div>` +
     line("job_infirmary", "var(--good)", "<b class=\"semi good\">Menos 1 dia</b> para quem está nos leitos. Sapo cuida melhor: mais 1 dia a menos a cada duas voltas.", "f20"));
   const body = `<span class="wrap f22">Leitos de cano e porta velha, no subsolo, embaixo do Dormitório. Quem cai na luta se recupera aqui.</span>` +
-    `<div class="row" style="gap:10px;flex-wrap:wrap">${roomTag("Leitos 1 de 2", "var(--amber)")}${roomTag("Sem a Enfermaria: 4 dias no Dormitório")}</div>` +
-    section("Nos leitos", "room_infirmary") + bed + empty + section("Quem cuida · o posto", "job_infirmary") + carer;
+    `<div class="row" style="gap:10px;flex-wrap:wrap">${roomTag("Leitos 1 de 2 em uso", "var(--amber)")}${roomTag("Sem a Enfermaria: 3 dias no Dormitório")}</div>` +
+    section("Nos leitos", "room_infirmary") + bed + empty + waiting + section("Quem cuida · o posto", "job_infirmary") + carer;
   const footer = `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("lobby-scrap.svg", "6 sucatas · tem 9")}${cost("lobby-fragment.svg", "2 fragmentos · tem 3")}</div>` +
     train("Melhorar", "nível 2: 4 leitos", { hit: "upgrade", icon: "room_infirmary" });
-  return MINE("station-infirmary") + topBar({ subtitle: "Enfermaria" }) + roomMark(48, 438, 380, 206, "room_infirmary", "Enfermaria") +
+  return MINE("station-infirmary") + topBar({ subtitle: "Enfermaria" }) + roomMark(466, 416, 712, 238, "room_infirmary", "Enfermaria") +
     roomPanel({ icon: "room_infirmary", title: "Enfermaria", tag: roomTag("Nível 1", "var(--good)"), body, footer }) + bottom({ active: 1, main: TO_MAP });
 }
 
@@ -128,7 +133,7 @@ function reportCard(h, x, p) {
     : `<div class="col" style="gap:4px"><div class="row" style="gap:12px"><span class="tx f22 muted up">Vida</span><span class="tx f24">${h.hp} / ${h.max}</span></div>${bar(340, 26, ratio, color)}</div>`;
   // A linha de baixo: as expedições e os abates; caído, o motivo e os dias, no lugar da relíquia.
   const foot = fallen
-    ? `<div class="row" style="gap:10px">${glyph("room_infirmary", 28, "var(--amber)")}<span class="tx f22 semi amber">Enfermaria · volta em 2 dias</span></div>`
+    ? `<div class="row" style="gap:10px">${glyph("room_infirmary", 28, "var(--amber)")}<span class="tx f22 semi amber">Enfermaria · volta amanhã</span></div>`
     : `<div class="row" style="gap:12px">${glyph("relic_empty", 28, "var(--muted)")}<span class="tx f22">Sem relíquia</span></div>`;
   return `<div class="abs" data-hit="card" style="left:${x}px;top:calc(678px - 4px*(var(--k) - 1)/0.3);width:380px">` +
     nine("hero_card", { repeat: "round", cls: "col", extra: `width:380px;gap:${large ? 3 : 8}px;padding:0` },
@@ -166,7 +171,7 @@ function report(p, details = false) {
     const post = (icon, who, where, what) => `<div class="row" style="gap:10px;align-items:flex-start">${glyph(icon, 26, "var(--amber)", "margin-top:2px")}<span class="wrap f22" style="flex:1;min-width:0"><b class="semi">${who} · ${where}:</b> <span class="good">${what}</span></span></div>`;
     lower = `<div class="abs" data-hit="details" style="left:96px;top:668px;width:1728px">` +
       nine("report_band", { repeat: "round", cls: "row", extra: "width:100%;min-height:256px;align-items:flex-start" },
-        column("Quem caiu", line("state_fallen", "var(--danger)", "Íris, no trecho 4. Na Enfermaria: volta em 2 dias.", "f22"), 360) + dv +
+        column("Quem caiu", line("state_fallen", "var(--danger)", "Íris, no trecho 4. Na Enfermaria, com a Lupa no posto: volta amanhã.", "f22"), 360) + dv +
         column("O que chegou", line("lobby-seed.svg", "var(--text)", "+16 sementes") + line("lobby-scrap.svg", "var(--text)", "+3 sucatas") + line("lobby-fragment.svg", "var(--text)", "+1 fragmento"), 220) + dv +
         column("Os postos renderam", post("job_infirmary", "Lupa", "Enfermaria", "a Íris volta 1 dia antes") +
           post("job_forge", "Brasa e Otto", "Forja", "−2 sucatas na próxima obra") + post("job_research", "Cora", "Pesquisa", "+1 fragmento") +
@@ -210,10 +215,10 @@ function leftColumn(selected, view) {
     // Os postos de hoje, um por linha: quem está onde (heróis e ajudantes), o que rende, o que fica livre.
     const row = (icon, room, who, yieldText, free = false) => `<div data-hit="post-row" style="min-width:0">` + nine("list_row", { cls: "row", extra: "gap:12px;min-height:56px;min-width:0" },
       `${glyph(icon, 30, free ? "var(--muted)" : "var(--amber)")}<div class="col" style="flex:1;min-width:0"><span class="wrap f24 semi ${free ? "muted" : ""}">${room} · <span class="${free ? "muted" : "amber"}">${who}</span></span><span class="wrap f20 ${free ? "muted" : "good"}">${yieldText}</span></div>`) + `</div>`;
-    body = `<span class="wrap f20 muted">O Alojamento abre mais lugares para heróis; o Dormitório, para ajudantes. Quem está em recuperação conta.</span>` +
+    body = `<span class="wrap f20 muted">O Alojamento abre mais lugares para heróis; o Dormitório, para ajudantes. Quem está caído conta.</span>` +
       row("job_infirmary", "Enfermaria", "Lupa", "Menos 1 dia nos leitos") + row("job_forge", "Forja", "Brasa · Otto", "−2 sucatas na próxima obra") +
       row("job_research", "Pesquisa", "Cora", "+1 fragmento por volta") + row("job_canteen", "Cantina", "Dora", "+2 suprimentos por volta") +
-      row("job_dormitory", "Dormitório", "livre", "Quem está em recuperação melhora mais rápido", true);
+      row("job_dormitory", "Dormitório", "livre", "Quem está caído melhora mais rápido", true);
   }
   return `<div class="abs" style="left:28px;top:132px">` + nine("panel_large", { repeat: "round", cls: "col", extra: "width:600px;height:calc(1080px - 132px - 14px - 72px*var(--k) - 10px - 64px - 14px);gap:12px" },
     `<div class="row" style="gap:6px;flex:none">${tabs}</div>${divider()}${limits}${switcher}` +
@@ -237,7 +242,7 @@ function characterPanel(hero) {
     `<span class="tx f26 amber">Sapo Química · Química e Suporte</span>`;
   // Em recuperação, TREINAR sai (não treina no leito) e o lugar dele mostra os dias; com XP de menos, TREINAR apagado.
   const state = fallen
-    ? `<div class="row" style="gap:14px;flex-wrap:wrap">${recovering()}<span class="tx f24 semi amber">Volta em 2 dias</span></div>` +
+    ? `<div class="row" style="gap:14px;flex-wrap:wrap">${recovering()}<span class="tx f24 semi amber">Volta amanhã</span></div>` +
       line("state_fallen", "var(--danger)", "Caiu na Rua das Vitrines. Está num leito da Enfermaria e não pode sair em expedição.", "f22")
     : `<div class="row" style="gap:14px">${pill("active", false)}<div data-hit="train" style="opacity:.55;filter:saturate(.2)">` +
       nine("train_button", { cls: "row", extra: "height:calc(56px*var(--k));gap:10px" }, `${glyph("train", 26, "var(--muted)")}<span class="tx f26 semi up muted">Treinar</span><span class="tx f22 muted">faltam 48 XP</span>`) + `</div></div>`;
@@ -292,8 +297,10 @@ function forgeWorkers() {
 // ------------------------------------------------------------------ 5. o popup de fim de luta com "Íris caiu" (#118)
 // O popup do lote 5 (hud-ajustes.md), sobre a luta de verdade em que a Íris caiu (capture.gd): a linha em perigo com o
 // glifo, logo abaixo das estrelas.
-const FIGHT = JSON.parse(fs.readFileSync("docs/design/hud-casa/before/fight_fallen.json", "utf8"));
+// Lido só ao desenhar esta tela: o lote 8 (hud-ajustes2) importa este arquivo sem o rascunho de before/.
+let FIGHT = null;
 function fightFallen(p) {
+  FIGHT ??= JSON.parse(fs.readFileSync("docs/design/hud-casa/before/fight_fallen.json", "utf8"));
   // No Último Fôlego, quem caiu fica na arena: a Íris também tem a barra, com "Caído" no lugar da vida.
   const up = FIGHT.units;
   const xs = up.map((u) => u.feet[0]).sort((a, b) => a - b);
@@ -357,11 +364,11 @@ function nobody() {
 // ------------------------------------------------------------------ 7. a preparação: Estação → Mapa → plataforma (#123)
 // 7a. A Estação: o botão principal vira IR AO MAPA (o mapa abre o Mapa da Rede).
 const goMap = () => overview({ focus: true, mark: false, nextBody: `<span class="tx f36 semi">Escolher o lugar</span><span class="wrap f22">Primeiro o lugar e a missão, no Mapa da Rede; a equipe depois, na plataforma.</span>` +
-  `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("nav_characters", "5 prontos · 1 em recuperação")}</div>` });
+  `<div class="row" style="gap:10px;flex-wrap:wrap">${cost("nav_characters", "5 prontos · 1 caído")}</div>` });
 // 7b. O Mapa: o lugar escolhido e PREPARAR NESTE LUGAR, no pé do painel do lugar.
 // A plaqueta do mapa dizia "Equipe: 4 vivos": com ninguém morrendo (#118), conta quem está pronto.
 const mapPrepare = () => networkMap({ selected: "bridge", panel: { footer: primary("Preparar neste lugar", { icon: "expeditions", keyLabel: "G / X", hit: "prepare", height: 64, size: "f26" }) } })
-  .replace("Equipe: 4 vivos", "Equipe: 5 prontos · 1 em recuperação");
+  .replace("Equipe: 4 vivos", "Equipe: 5 prontos · 1 caído");
 // 7c. A plataforma: a equipe de pé (platform_team: Bento, Nick, Brasa e Véspera), uma carta embaixo de cada um, a faixa
 // do lugar e do radar no alto, o Foco e a Comida na faixa, e quem fica na Estação à direita.
 const PLATFORM_BODIES = [[428, 466, 104, 176], [662, 488, 90, 154], [862, 474, 110, 172], [1058, 472, 136, 170]];
@@ -406,7 +413,7 @@ function platform(p, { confirm = false } = {}) {
   const bench = `<div class="abs" style="left:1262px;top:262px">` + nine("panel_large", { repeat: "round", cls: "col", extra: "width:622px;gap:8px" },
     `<div class="row" style="gap:10px">${glyph("station", 26, "var(--amber)")}<span class="tx f22 semi up amber kicker">Fica na Estação</span></div>` +
     benchRow("lupa", "Lupa", "Na Enfermaria (posto): se entrar, a Íris volta 1 dia depois", "post") +
-    benchRow("iris", "Íris", "Em recuperação · volta amanhã · não pode sair", "off")) + `</div>`;
+    benchRow("iris", "Íris", "Caído · volta amanhã · não pode sair", "off")) + `</div>`;
   const xs = [146, 562, 978, 1394];
   const foot = `<div class="abs" style="left:28px;bottom:14px">` + secondary("Voltar ao mapa", { icon: "ui-arrow-right.svg", iconStyle: "transform:scaleX(-1)", keyLabel: "Esc / B", hit: "back", height: 64 }) + `</div>` +
     `<div class="abs" style="right:28px;bottom:14px;min-width:520px">` + primary("Iniciar expedição", { icon: "expeditions", keyLabel: "G / X", hit: "start" }) + `</div>`;

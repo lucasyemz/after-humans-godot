@@ -10,10 +10,12 @@ O lote 8, a issue #134, com as propostas de tela para as issues do Claude que sa
 - **ícones novos** no mesmo método: o cadeado, o clima, o Admin, pular, a noite, o rato e a conversa.
 
 Tudo no kit da Awesomic (`art/ui/kit/station`), sobre as capturas do jogo, nos quatro perfis (Normal, Maior, daltonismo
-e Maior com daltonismo). Nada em `scripts/`, `data/` nem `tests/`. Este PR vem depois do da Estação nova
-([hud-casa.md](hud-casa.md), #139) e usa o que ele trouxe (os ícones INSPECIONAR, troca de formação e amanhecer, a
+e Maior com daltonismo). Nada em `scripts/`, `data/` nem `tests/`. Usa o que a Estação nova
+([hud-casa.md](hud-casa.md), #139, já na `main`) trouxe (os ícones INSPECIONAR, troca de formação e amanhecer, a
 Enfermaria, a barra com os limites e a história do Dia 4 e do Dia 5). As telas servem para comparar e aprovar; a
-integração é do Claude, nas issues de cada item.
+integração é do Claude, nas issues de cada item. Os números e as regras das telas são os do jogo de hoje (`data/` e
+`station_rules.gd`); o que este lote sugere mudar nelas fica em [Para o Lucas decidir](#para-o-lucas-decidir), só como
+proposta.
 
 ## As telas
 
@@ -110,7 +112,7 @@ Como no XCOM 2: sobre cada cômodo não recuperado, uma placa (a `room_tag` do k
 falta. É a informação do Plano, no lugar.
 - **O que já dá para recuperar** fica aceso: o ícone do cômodo em âmbar, a moldura âmbar e o custo com o que se tem
   ("Forja · 4 sucatas · tem 9").
-- **O que ainda não dá** fica apagado, com o cadeado e o motivo: "Enfermaria · Faltam 2 fragmentos", "Bar · Numa
+- **O que ainda não dá** fica apagado, com o cadeado e o motivo: "Enfermaria · Falta 1 fragmento", "Bar · Numa
   próxima fase", "Dormitório · Numa próxima fase" (o `upgrade_block` de hoje). O Dormitório começa no nível 0 ("Quarto
   por recuperar"), e a equipe dorme nos beliches assim mesmo.
 - **Os recuperados** ficam sem placa.
@@ -118,8 +120,9 @@ falta. É a informação do Plano, no lugar.
   das placas), o cartão do cômodo: o que ele destrava, o custo em chips (o que falta em alerta) e RECUPERAR travado com
   o motivo.
 - É o Dia 2, dois dias antes da volta do lote 7: a Forja e a Enfermaria ainda vazias, o Próximo passo "Recuperar a
-  Forja" com o texto e os chips de `next_step`. O custo de recuperar a Enfermaria (4 sucatas e 2 fragmentos) é
-  proposta; o resto é o de `station_rules.gd`.
+  Forja" com o texto e os chips de `next_step`. Os custos são os de hoje: a Forja, 4 sucatas (`station_rules.gd`); a
+  Enfermaria, 4 sucatas e 1 fragmento (`data/recovery.json`, `infirmary_level_1`). Com 0 fragmentos, falta 1. O cartão
+  do foco diz os dias de hoje: 2 no leito, 3 no Dormitório.
 
 ## 4. A noite e o amanhecer (#132)
 
@@ -127,34 +130,41 @@ falta. É a informação do Plano, no lugar.
   cômodos se apagam; a do Dormitório e a da Enfermaria ficam baixas) e o cartão mostra a noite, quem dorme, quem vigia
   e quem está na Enfermaria, a barra do tempo passando e PULAR (Esc / B). Sem a HUD. Com "Reduzir efeitos", só o
   cartão. No corte, o Bento e o Nick deitados nos beliches (a pose de dormir), a Véspera de pé no Depósito, de vigia, e
-  a Íris no leito da Enfermaria. A Lupa e o Brasa também dormem, mas os recrutas não têm pose de dormir: ficam fora do
-  corte na montagem.
+  a Íris no leito da Enfermaria. O texto do cartão cita só quem aparece (o Bento, o Nick, a Véspera e a Íris). A Lupa e
+  o Brasa ficaram na Estação e também dormiriam, mas os recrutas não têm pose de dormir: ficam fora do corte na
+  montagem (ver "Para integrar").
 - **O painel "Amanhecer · Dia 5",** no lugar e na medida do painel do cômodo (596 de largura, à direita):
-  - **o que a noite fez:** a Comida (8 → 4, a conta do lote 7), quem descansou e quanto (o Nick +8 de vida, −15 de
-    instinto), quem vigiou e a Enfermaria (a Íris volta amanhã);
+  - **o que a noite fez:** a Comida (8 → 6), quem descansou e quanto (o Nick +8 de vida, −15 de instinto), quem vigiou
+    e a Enfermaria (a Íris volta amanhã). A conta é a do `resolve_night` de hoje: cada um que voltou e dorme come 1
+    suprimento (o Bento e o Nick); quem vigia não come (a Véspera), e quem chegou Caído fica fora da noite (a Íris);
+    a produção da Cantina e da Dora e o que os civis comem entram no ciclo da volta, antes da noite;
   - **durante a noite:** o evento, com o ícone, o título e o que mudou;
   - **o Próximo passo;**
   - COMEÇAR O DIA no pé. IR AO MAPA fica bloqueado com o motivo até lá.
-- **Com evento:** "A Véspera viu luzes na Ponte": da vigia, ela viu as lanternas da patrulha, e o Mapa da Rede leu os
-  inimigos da Ponte das Raízes (é a leitura que a plataforma do lote 7 mostra no "O radar leu").
-- **Sem evento:** "Noite calma", com a nota de que alguém de vigia diminui as chances ruins.
-- **Os eventos da noite** (a tabela da #132, um sorteio por noite pela semente), com os ícones:
+- **Com evento:** o `watcher_sees` de `data/night-events.json`, com o texto do jogo: "Véspera viu luzes se mexendo
+  longe, no rumo do próximo lugar (Ponte das Raízes). O Mapa da Rede agora lê o guardião e os inimigos de lá." O título
+  curto ("Véspera viu luzes ao longe") é a proposta do painel; hoje o jogo mostra "A noite" no alto do quadro.
+- **Sem evento:** o `quiet`, com o texto do jogo ("A noite passou tranquila. O abrigo permaneceu seguro."), e a nota do
+  vigia como o jogo faz: o sorteio não olha o vigia, mas com alguém de vigia a goteira, as baratas e os ruídos não levam
+  nada.
+- **Os eventos da noite** são os de `data/night-events.json` (#132, já no jogo: um sorteio por noite pela semente da
+  expedição, com os pesos de lá). Os ícones propostos:
 
 | Evento | Ícone | O que muda |
 |---|---|---|
-| Nada | `night` | Noite calma |
-| Barulho na plataforma | `train_arrival` | Alguém chegou no trem (#122) |
-| Goteira | `resource_water` (pintado) | A água cai |
-| Rato na despensa | `night_rat` | A comida cai; o Depósito melhorado protege |
-| O vigia vê algo | `watch` | Uma leitura do Mapa da Rede (#87) |
-| Um morador conversa | `night_talk` | Uma fala curta da Dora, do Otto ou da Cora |
-| Herói com trauma não dorme | `alert` | O instinto dele não baixa |
+| `quiet` | `night` | Noite calma |
+| `distant_noise` | `alert` | Quem dorme baixa menos o instinto; com vigia, nada |
+| `platform_noise` | `train_arrival` | A chance do próximo trem sobe (#122) |
+| `leak` | `resource_water` (pintado) | A água cai; com vigia, nada se perde |
+| `pests` (baratas na despensa) | `night_rat` (ver "Para o Lucas decidir") | Os suprimentos caem; o Depósito no nível 2 protege; com vigia, nada |
+| `watcher_sees` | `watch` | Só com vigia: o próximo lugar fica lido no Mapa da Rede (#87) |
+| `resident_talk` | `night_talk` | Uma fala curta da Dora, do Otto ou da Cora |
+| `sleepless` | `alert` | Quem tem trauma e dormiu não baixa o instinto |
 
-Hoje, o `resolve_night` já tem quatro resultados: `quiet` (a noite calma), `distant_noise` (um barulho ao longe, nas
-noites pares: seria o da Noite 4), `short_supplies` e `no_water`. Na proposta, o sorteio pela semente substitui a regra
-das noites pares (o barulho vira uma das linhas da tabela), e a falta de comida e de água deixa de ser evento: vira o
-"O que a noite fez" do painel, que já mostra a comida e a água. Os textos dos eventos passam pela regra de consistência
-de `docs/narrative/` na integração.
+A fome e a sede não são eventos: o jogo as guarda à parte (`short_supplies` e `no_water`, nas condições da noite) e o
+painel as mostra em "O que a noite fez", junto da comida e da água. As telas usam os textos de
+`data/night-events.json`, que passaram pela regra de consistência (`narrative-design.md`, seção 14) na rodada 3
+(abaixo).
 
 ## 5. A troca de formação na exploração (#129)
 
@@ -205,12 +215,16 @@ As telas da luta usam as capturas limpas de `loop-screens/before/` e `hud-ajuste
 
 ## O que mudou fora desta pasta
 
-- `hud-luta/render.mjs`: `combat()` aceita `bottom`, que troca o painel do herói da vez e as habilidades (a inspeção).
+- `hud-luta/render.mjs`: `combat()` aceita `bottom` (junto do `aim` da `main`), que troca o painel do herói da vez e as habilidades (a inspeção).
   Sem ele, a luta sai como antes.
 - `hud-casa/render.mjs`: exporta a barra do alto com os limites e as outras peças que este lote usa, aceita o estoque
-  na barra e não gera nada quando é importado. As telas do lote 7 saem iguais.
+  na barra e não gera nada quando é importado; lê o `before/fight_fallen.json` só ao desenhar a tela da luta (a `main`
+  tirou esse rascunho do repositório). As telas do lote 7 saem iguais.
 
 ## Para integrar (é do Claude)
+
+As telas mostram o jogo de hoje; nada aqui pede mudar regra ou número. O que mudaria regra está em "Para o Lucas
+decidir".
 
 - **#128:** a ação de inspecionar reaproveita `combat_examine`; os detalhes vêm de `AHCharacterSheet.from_unit`; a
   plaqueta da intenção perde o "→ alvo" e fica com o ícone e o nome; o popup ganha o X e a pausa com o mouse em cima, e
@@ -219,12 +233,29 @@ As telas da luta usam as capturas limpas de `loop-screens/before/` e `hud-ajuste
   de desenvolvimento ou com `--admin`.
 - **#131:** as placas leem `AHStationRules.next_level_cost` e `upgrade_block`; o foco nelas segue as setas, como os
   cômodos.
-- **#132:** a conta da comida da noite (8 → 4 aqui e no lote 7) usa 4 para a noite; pelo `resolve_night`, só quem
-  voltou e dorme come (2, ou 3 com a Íris na Enfermaria). Acertar os dois lotes juntos na integração.
-- **#132:** a tabela dos eventos vai para `data/night-events.json`; o painel do amanhecer lê o resultado de
-  `resolve_night`. Os recrutas precisam da pose de dormir para deitar nos beliches.
+- **#132:** o painel do amanhecer lê o resultado de `resolve_night` (`night.results`, `supplies_consumed`,
+  `night_event_text` e `night_conditions_text`); a comida é a do jogo (aqui, 8 → 6).
+- **#132, a cena da noite:** para mostrar a Lupa e o Brasa dormindo, a integração precisa da pose de dormir dos
+  recrutas, que é uma tarefa do Codex (poses de personagem). Sem essa pose, a cena fica como a montagem (os recrutas
+  fora do corte) e nenhum texto da noite pode dizer que eles dormem.
 - **#129:** a ação nova de formação em `tools/define_input.gd` (trocável nas Opções); a troca usa
   `AHStationRules.set_formation` na expedição.
+
+## Para o Lucas decidir
+
+Propostas deste lote que mudariam regra ou número do jogo. Nenhuma está nas telas nem em `data/`; ficam aqui até a
+decisão (na #132 ou na #131):
+- **A comida da noite:** o lote 7 ([hud-casa.md](hud-casa.md), já na `main`) mostra o Dia 5 com 4/12, pela previsão
+  (`AHStationRules.forecast` desconta a noite de todos que voltam); o `resolve_night` desconta só quem dorme, e o
+  amanhecer deste lote mostra 6/12. Ou a previsão passa a descontar só quem dorme, ou a noite passa a cobrar de todos.
+- **O custo da Enfermaria:** a primeira versão deste lote propunha 4 sucatas e 2 fragmentos; hoje é 4 e 1
+  (`data/recovery.json`), e as telas seguem o de hoje.
+- **O título do evento no amanhecer:** um título curto por evento (como "Véspera viu luzes ao longe") no lugar de "A
+  noite". Pede um campo novo em `data/night-events.json` e textos novos, que passam pela regra de consistência.
+- **O vigia e o sorteio:** a primeira versão dizia que o vigia diminuía as chances de uma noite ruim; o jogo de hoje
+  não muda o sorteio (o vigia só evita as perdas). Fica como ideia, se o Lucas quiser que vigiar pese no sorteio.
+- **O ícone das baratas:** o glifo `night_rat` desenha um rato, e na lore os roedores são povos (o jogo trocou o rato
+  da #132 por baratas). Redesenhar o glifo como baratas (e renomear) ou trocar por outro ícone antes de integrar.
 
 ## Como refazer
 
@@ -274,3 +305,26 @@ Observações baixas, aplicadas depois do veredito:
 - a coluna do meio da inspeção alinhada no alto, abaixo da aba; na máquina, sem a explicação da velocidade (que o
   herói já mostra), para a intenção caber no Maior;
 - a conta da comida da noite (8 → 4, do lote 7) fica anotada em "Para integrar", para acertar os dois lotes juntos.
+
+### Rodada 3: a revisão do PR (AJUSTAR ANTES) e a `main` trazida
+
+- A `main` entrou no branch (merge, sem rebase): o #139 já estava lá, e o PR passa a ter só este lote. Os conflitos
+  foram em `hud-casa/render.mjs` (as posições novas da Enfermaria, da `main`, com os `export` deste lote) e em
+  `hud-luta/render.mjs` (o `aim` da `main` e o `bottom` deste lote, juntos). O `hud-casa/render.mjs` lê o
+  `fight_fallen.json` só ao desenhar aquela tela, porque a `main` tirou os rascunhos de `before/`.
+- **Média, corrigido:** os números e as regras que não eram de design. As telas mostram o jogo de hoje: a Enfermaria
+  custa 4 sucatas e 1 fragmento ("Falta 1 fragmento", 2 dias no leito, 3 no Dormitório); a noite come 1 suprimento por
+  quem dorme (8 → 6, também no Admin); os eventos são os de `data/night-events.json`, com os textos do jogo; a fome e a
+  sede ficam como condições da noite, como o jogo faz. O que mudaria regra foi para "Para o Lucas decidir".
+- **Narrativa:** os textos da noite passaram pela regra de consistência (seção 14). "As lanternas da patrulha" saiu
+  (sugeria gente na Ponte, onde só há sensores e máquinas) e o texto passou a ser o do jogo; "Rato na despensa" virou
+  as baratas do jogo (os roedores são povos na lore), com o glifo para o Lucas decidir; "as chances de uma noite ruim
+  caem pela metade" prometia uma regra que não existe e saiu. As falas da Dora, do Otto e da Cora são as do jogo
+  (`talk_*`): cada uma cabe no ofício do morador (as sementes, o gerador, os fragmentos) e não revela nada cedo.
+- **Baixa:** as cartas da Enfermaria (`art/station/cards/Infirmary_*`) vieram com o #139 e não estão mais no diff
+  deste PR.
+- **Baixa:** a cena da noite: "Para integrar" diz que a Lupa e o Brasa dormindo pedem a pose de dormir dos recrutas
+  (Codex); sem ela, nenhum texto diz que eles dormem.
+- As telas e as provas foram refeitas (`render.mjs` e `compose.py`): 76 de 76 nas conferências, o menor texto com 20 px.
+  Mudaram a Estação com os marcadores, o amanhecer e as abas do Admin sobre a Estação do Dia 5 (o fundo e o "Caído" da
+  `main`).

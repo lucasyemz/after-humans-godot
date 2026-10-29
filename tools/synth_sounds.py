@@ -1,5 +1,6 @@
 """Gera por síntese os sons que faltavam no jogo (#36): o sino e o freio do trem, abrir e fechar os painéis, a confirmação
-da Forja, o achado raro da busca, a vitória e a derrota e a crise de instinto. Feitos aqui, do zero (osciladores e ruído),
+da Forja, o achado raro da busca, a vitória e a derrota e a crise de instinto; e o trem andando na passagem do vagão
+(#133), um laço sem emenda. Feitos aqui, do zero (osciladores e ruído),
 são de domínio público (CC0) e não dependem da referência Unreal. Cada um sai em OGG Vorbis em audio/ (mono, 44,1 kHz),
 com o pico em -3 dBFS; o volume de cada um no jogo fica nas chamadas e na tabela de mixagem
 (tools/measure_audio.py). Precisa do numpy e do ffmpeg (com libvorbis):
@@ -136,6 +137,86 @@ def crisis():
     return boom * 1.2 + swell * 0.5 + whine
 
 
+def security_door():
+    """A porta de segurança do Corredor de Contenção (#147) baixando: o chiado hidráulico e a batida de aço no chão."""
+    rng = np.random.default_rng(147)
+    t = time(1.5)
+    hiss = bandpass(rng.standard_normal(t.size), 1500.0, 6000.0) * np.clip(t / 0.08, 0, 1) * np.clip((0.75 - t) / 0.2, 0, 1) * 0.35
+    slide = np.sin(2 * np.pi * (90.0 + 25.0 * t) * t) * np.clip(t / 0.1, 0, 1) * np.clip((0.78 - t) / 0.1, 0, 1) * 0.25
+    hit_t = np.clip(t - 0.78, 0, None)
+    hit = (t >= 0.78) * (np.sin(2 * np.pi * 48.0 * hit_t) * 1.0 + np.sin(2 * np.pi * 131.0 * hit_t) * 0.5
+                         + np.sin(2 * np.pi * 347.0 * hit_t) * 0.25) * np.exp(-hit_t * 5.5)
+    clank = (t >= 0.78) * bandpass(rng.standard_normal(t.size), 400.0, 3000.0) * np.exp(-hit_t * 22.0) * 0.8
+    return hiss + slide + hit + clank
+
+
+def security_door_open():
+    """A porta de segurança subindo (a zona vencida, #147): o chiado hidráulico e o motor que sobe, sem a batida."""
+    rng = np.random.default_rng(1470)
+    t = time(1.3)
+    hiss = bandpass(rng.standard_normal(t.size), 1500.0, 6000.0) * np.clip(t / 0.05, 0, 1) * np.clip((0.4 - t) / 0.2, 0, 1) * 0.3
+    motor = np.sin(2 * np.pi * (70.0 + 60.0 * t) * t) * np.clip(t / 0.15, 0, 1) * np.clip((1.3 - t) / 0.35, 0, 1) * 0.45
+    whine = np.sin(2 * np.pi * (300.0 + 180.0 * t) * t) * np.clip(t / 0.3, 0, 1) * np.clip((1.3 - t) / 0.4, 0, 1) * 0.12
+    stop_t = np.clip(t - 1.05, 0, None)
+    stop = (t >= 1.05) * bandpass(rng.standard_normal(t.size), 300.0, 2500.0) * np.exp(-stop_t * 30.0) * 0.5
+    return hiss + motor + whine + stop
+
+
+def containment_loop():
+    """O ambiente do Corredor de Contenção (#147): o zumbido da casa de máquinas e, ao fundo, o alarme da contenção
+    (dois tons que sobem e descem a cada 4 s). 16 s que emendam: tudo tem período que divide a duração."""
+    rng = np.random.default_rng(1147)
+    seconds = 16.0
+    t = time(seconds)
+    hum = (np.sin(2 * np.pi * 50.0 * t) + 0.45 * np.sin(2 * np.pi * 100.0 * t) + 0.2 * np.sin(2 * np.pi * 150.0 * t)) * 0.35
+    air = lowpass(rng.standard_normal(t.size), 400.0) * 0.6
+    # O ruído emenda: o fim se funde ao começo em 0,5 s.
+    fade = int(0.5 * RATE)
+    air[:fade] = air[:fade] * np.linspace(0, 1, fade) + air[-fade:] * np.linspace(1, 0, fade)
+    cycle = np.mod(t, 4.0)
+    pitch = 620.0 + 180.0 * np.sin(np.pi * np.clip(cycle / 1.6, 0, 1))
+    phase = 2 * np.pi * np.cumsum(pitch) / RATE
+    gate = np.clip(cycle / 0.05, 0, 1) * np.clip((1.6 - cycle) / 0.2, 0, 1)
+    alarm = lowpass(np.sign(np.sin(phase)) * 0.5 + np.sin(phase) * 0.5, 2500.0) * gate * 0.22
+    return hum + air + alarm
+
+
+## O trem andando (#133): o "ta-dum" das rodas nas emendas dos trilhos (dois truques por vagão, a cada 1,25 s), o ronco
+## grave do motor, que sobe e desce devagar, e o chiado das rodas. RIDE_SECONDS fecha um número inteiro de batidas e de
+## ondas do ronco; o rabo do ruído entra misturado no começo, então o laço emenda sem estalo.
+RIDE_SECONDS = 5.0
+RIDE_BEAT = 1.25
+
+
+def rail_click(seconds=0.18):
+    t = time(seconds)
+    knock = bandpass(RNG.standard_normal(t.size), 500.0, 2800.0) * np.exp(-t * 38.0)
+    thump = np.sin(2 * np.pi * 72.0 * t) * np.exp(-t * 22.0)
+    return knock * 0.9 + thump * 0.8
+
+
+def train_ride():
+    size = int(RIDE_SECONDS * RATE)
+    tail = int(0.6 * RATE)
+    total = (size + tail) / RATE
+    t = np.arange(size + tail) / RATE
+    out = np.zeros_like(t)
+    beat = 0.0
+    while beat < total:
+        for offset, gain in ((0.0, 1.0), (0.11, 0.8), (0.46, 0.85), (0.57, 0.7)):
+            place(out, rail_click() * gain, beat + offset)
+        beat += RIDE_BEAT
+    swell = 0.75 + 0.25 * np.sin(2 * np.pi * t / RIDE_SECONDS)
+    motor = (np.sin(2 * np.pi * 46.0 * t) + 0.45 * np.sin(2 * np.pi * 92.0 * t) + 0.2 * np.sin(2 * np.pi * 138.0 * t)) * 0.35
+    rumble = lowpass(RNG.standard_normal(t.size), 160.0) * 3.0
+    hiss = bandpass(RNG.standard_normal(t.size), 400.0, 1800.0) * 0.25
+    out += (motor + rumble) * swell + hiss
+    loop = out[:size].copy()
+    ramp = np.linspace(0.0, 1.0, tail)
+    loop[:tail] = loop[:tail] * ramp + out[size:size + tail] * (1.0 - ramp)
+    return loop
+
+
 SOUNDS = {
     "station/train_bell": train_bell,
     "station/train_brake": train_brake,
@@ -146,14 +227,22 @@ SOUNDS = {
     "ui/victory": victory,
     "ui/defeat": defeat,
     "combat/crisis": crisis,
+    "world/security_door": security_door,
+    "world/security_door_open": security_door_open,
+    "ambience/ContainmentCorridor": containment_loop,
+    "station/train_ride": train_ride,
 }
+## Os laços: sem a saída suave do fim (o fim emenda com o começo).
+LOOPED = {"station/train_ride"}
 
 
 def write(stem, signal):
-    # 25 ms de saída suave: nenhum som termina com sinal ainda tocando (o "tum" no fim da crise).
-    fade = int(0.025 * RATE)
     signal = signal.copy()
-    signal[-fade:] *= np.linspace(1.0, 0.0, fade)
+    # 25 ms de saída suave: nenhum som termina com sinal ainda tocando (o "tum" no fim da crise). O laço não: o fim
+    # emenda com o começo.
+    if stem not in LOOPED:
+        fade = int(0.025 * RATE)
+        signal[-fade:] *= np.linspace(1.0, 0.0, fade)
     peak = np.max(np.abs(signal))
     signal = signal / peak * (10 ** (-3.0 / 20.0)) if peak > 0 else signal
     target = AUDIO / f"{stem}.ogg"
@@ -170,5 +259,9 @@ def write(stem, signal):
 
 
 if __name__ == "__main__":
+    import sys
+    # Com nomes (python tools/synth_sounds.py world/security_door), só esses.
+    wanted = sys.argv[1:]
     for stem, make in SOUNDS.items():
-        write(stem, make())
+        if not wanted or stem in wanted:
+            write(stem, make())
