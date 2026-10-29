@@ -100,7 +100,9 @@ equipe.
 
 ## Para a integração (Claude)
 
-Feita na #256: os itens 1 e 2 estão no jogo, com as capturas em [docs/qa/train-2d.md](../qa/train-2d.md).
+Feita na #256: os três itens estão no jogo, com as capturas em [docs/qa/train-2d.md](../qa/train-2d.md). Decisão do Lucas
+(29/10): a Estação Raiz também usa o vagão verde, e a chegada com faísca fica só onde dá para ver o trem parar (as
+plataformas); na passagem, só a partida no túnel.
 
 1. **Tutorial (#147):** trocar o card `T_TU10` pelas camadas, no mesmo lugar do fosso (o chão do vagão na altura da
    plataforma). O embarque passa a ser a equipe entrando pela porta da direita, com as portas fechando depois.

@@ -77,6 +77,9 @@ var wagon: Array[Node3D] = []
 ## candidato desce; sem o modelo, nenhuma folha e o x fica NAN (o vagão de caixas).
 var wagon_doors: Array = []
 var train_exit_x := NAN
+## O vagão verde em camadas (#149, #256): o trem da Estação é o mesmo do Tutorial e da passagem. Ele não entra em
+## `wagon` (as peças que o OffsetWagon arrasta): anda pelo AHTrainCar.drive, que gira as rodas.
+var train_car: AHTrainCar
 var room_lights := {}
 var ember_light: OmniLight3D
 var signal_light: OmniLight3D
@@ -356,9 +359,36 @@ var _metro_paint := {}
 
 
 func _wagon() -> void:
+	if _train_2d():
+		return
 	if _metro():
 		return
 	_box_wagon()
+
+
+## O vagão em camadas na plataforma (#256), no lugar do metrô vermelho: o chão dele na altura da plataforma, a carroceria
+## logo à frente da beira (as rodas aparecem no fosso, com a faísca na freada) e a frente no fim da linha, onde ficava a
+## do metrô. Desce e sobe pela porta da direita. As luzes frias das portas andam com ele (ficam em `wagon`).
+const TRAIN_2D_RIGHT := 11.5
+const TRAIN_2D_Z := -3.4
+## A distância da câmera da plataforma até o vagão (m): o interior cresce por ela, para casar com as janelas.
+const TRAIN_2D_CAMERA := 24.0
+const TRAIN_2D_BRIGHTNESS := 0.95
+
+
+func _train_2d() -> bool:
+	if not ResourceLoader.exists(AHTrainCar.CONTRACT):
+		return false
+	train_car = AHTrainCar.new(TRAIN_2D_CAMERA, TRAIN_2D_BRIGHTNESS)
+	train_car.name = "Train"
+	train_car.position = Vector3(TRAIN_2D_RIGHT - train_car.length() * 0.5, 0.0, TRAIN_2D_Z)
+	b.root.add_child(train_car)
+	train_car.set_home()
+	train_exit_x = train_car.position.x + train_car.door_x(1)
+	for door in 2:
+		var x: float = (train_car.position.x + train_car.door_x(door)) * 100.0
+		b.light(Vector3(x, (TRAIN_2D_Z - 0.6) * 100.0, 200), 260, 420, Color(0.62, 0.8, 1.0), false)
+	return true
 
 
 func _metro() -> bool:

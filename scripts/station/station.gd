@@ -877,6 +877,10 @@ func lineup_screen_positions() -> Array:
 ## (OffsetWagon e SetTrainDoorOpen da Unreal).
 func _offset_wagon(x: float) -> void:
 	_wagon_x = x
+	# O vagão em camadas (#256) anda pelo drive (as rodas giram pelo que ele anda) e abre as folhas dele.
+	if _build.train_car != null:
+		_build.train_car.drive(x)
+		_build.train_car.set_doors(_door_open)
 	var slides := {}
 	for door in _build.wagon_doors:
 		slides[door[0]] = door[1] * 0.88 * _door_open
@@ -1352,6 +1356,12 @@ func _tick_slide_in(before: float) -> void:
 		train_event.emit("brake")
 	var slide := clampf((_train_time - TRAIN_WARNING) / (TRAIN_STOP - TRAIN_WARNING), 0.0, 1.0)
 	_offset_wagon(TRAIN_OUT * (1.0 - slide) * (1.0 - slide))
+	# A faísca nas rodas da metade da velocidade até parar (o trem vem da esquerda, andando para a direita), à vista no
+	# fosso da plataforma; com "Reduzir efeitos", sem ela.
+	if _build.train_car != null:
+		var reduced: bool = Campaign.state.get("settings", {}).get("reduced_environment_effects", false)
+		_build.train_car.sparks_enabled = not reduced
+		_build.train_car.brake(slide >= 0.5 and slide < 1.0, 1.0 - (slide - 0.5) * 2.0, 1.0)
 	if before < TRAIN_STOP and _train_time >= TRAIN_STOP:
 		_warning_time = -1.0
 		# O ruído do trem rodando acaba quando ele para (o arquivo segue até 5,5 s; a 2x o trem para antes).

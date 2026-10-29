@@ -1,24 +1,22 @@
 ## A viagem no vagão (#75, pintada na #256): a cena de fundo da passagem. Dentro, o interior do mesmo vagão verde do
 ## Tutorial (#149, o contrato em data/presentation/train_2d.json), com o túnel correndo nas janelas e a equipe sentada de
 ## frente nos bancos da parede (station_poses.json, *_seat_front, #253); quem não tem essa pose (os recrutas, a skin
-## sem ela) fica de pé na frente do lugar dele. Antes do interior, o vagão parte no túnel, com as rodas girando; no fim,
-## depois do título, ele chega freando, com a faísca nas rodas e a freada.
+## sem ela) fica de pé na frente do lugar dele. Antes do interior, o vagão parte no túnel, com as rodas girando. A
+## chegada com a faísca fica só onde dá para ver o trem parar (a plataforma da Estação, o Tutorial): aqui, só a freada.
 class_name AHWagonRide
 extends Control
 
 ## Quanto a viagem fica sozinha antes de o título da fase aparecer por cima (a partida no túnel e o interior).
 const RIDE_SECONDS := 2.8
-## O plano da partida no túnel, no começo, e o da chegada, no fim (depois do título).
+## O plano da partida no túnel, no começo.
 const DEPART_SECONDS := 1.3
-const ARRIVE_SECONDS := 2.2
 ## O trem andando na passagem (#133), no canal do Ambiente.
 const RIDE_SOUND := "res://audio/station/train_ride.ogg"
 const RIDE_GAIN := 0.8
 const BRAKE_SOUND := "res://audio/station/train_brake.ogg"
 ## O quadro da passagem (px): a cena cobre a tela inteira, centrada.
 const FRAME := Vector2(1920, 1080)
-## O plano do túnel: o vagão na escala da tela, o trilho nesta altura (acima da chapa do título, que fica embaixo) e o
-## caminho que ele faz na partida e na chegada (px).
+## O plano do túnel: o vagão na escala da tela, o trilho nesta altura e o caminho que ele faz na partida (px).
 const TUNNEL_SCALE := 1.1
 const TUNNEL_RAIL_Y := 700.0
 const TUNNEL_RUN := 1700.0
@@ -30,10 +28,7 @@ const SLOTS := {1: [2], 2: [2, 3], 3: [1, 2, 3], 4: [0, 1, 2, 3]}
 var team: Array = []
 ## Quem está no vagão, da esquerda para a direita, com {"id", "seated", "card" (o Sprite2D)}.
 var seats: Array = []
-## Quanto o cartão fica aberto (s): a chegada acontece nos últimos ARRIVE_SECONDS.
-var hold := 0.0
 var depart_shot := true
-var arrive_shot := true
 
 var _p: Dictionary
 var _stage: Node2D
@@ -43,26 +38,17 @@ var _tunnel: Sprite2D
 var _car: AHTrainCar2D
 var _time := 0.0
 var _opened_ms := -1
-## Quando a chegada começou (s no relógio da viagem; -1 ainda não): só com a cena seguinte já montada, porque o quadro
-## que monta trava a tela por segundos e cortava a chegada ao meio.
-var _arrive_from := -1.0
-var _brake_player: AudioStreamPlayer
-var _door_seconds := 0.8
-var _phase := ""
 var _car_home := 0.0
 
 
-## hero_ids: a equipe. ride_hold: o tempo do cartão (sem ele, nada de chegada). depart e arrive: os planos do túnel.
-func _init(hero_ids: Array = [], ride_hold: float = 0.0, depart: bool = true, arrive: bool = true) -> void:
+## hero_ids: a equipe. depart: com o plano da partida no túnel antes do interior.
+func _init(hero_ids: Array = [], depart: bool = true) -> void:
 	team = hero_ids.duplicate()
-	hold = ride_hold
 	depart_shot = depart
-	arrive_shot = arrive and ride_hold > 0.0
 	name = "WagonRide"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
 	_p = AHTrainCar.contract().passage
-	_door_seconds = float(AHTrainCar.contract().train.door_seconds.open)
 	_stage = Node2D.new()
 	add_child(_stage)
 	_build_inside()
@@ -70,18 +56,19 @@ func _init(hero_ids: Array = [], ride_hold: float = 0.0, depart: bool = true, ar
 	_show(depart_shot)
 
 
-## O cartão da passagem da partida: o da rua (a fase e o trecho) com a viagem por trás, o título depois da partida e do
-## interior, e a chegada no fim.
+## O cartão da passagem da partida: o da rua (a fase e o trecho) com a viagem por trás e o título depois da partida e
+## do interior.
 static func departure_card(campaign: Dictionary) -> Dictionary:
 	var card: Dictionary = GameFlow.card_for("street")
 	var expedition = campaign.get("session", {}).get("expedition")
 	if card.is_empty() or expedition == null:
 		return card
-	card.hold = RIDE_SECONDS + GameFlow.CARD_SECONDS + ARRIVE_SECONDS
-	card.backdrop = AHWagonRide.new(expedition.get("team", []), card.hold)
-	# O trem saindo da plataforma e andando no túnel (#133); a freada toca na chegada, com a faísca (a cena de fundo).
-	card.sound = {"loop": RIDE_SOUND, "gain": RIDE_GAIN, "start": "res://audio/station/train_departure.ogg"}
+	card.backdrop = AHWagonRide.new(expedition.get("team", []))
+	# O trem saindo da plataforma, andando no túnel e freando na chegada (#133).
+	card.sound = {"loop": RIDE_SOUND, "gain": RIDE_GAIN, "start": "res://audio/station/train_departure.ogg",
+		"end": BRAKE_SOUND}
 	card.title_delay = RIDE_SECONDS
+	card.hold = RIDE_SECONDS + GameFlow.CARD_SECONDS
 	return card
 
 
@@ -111,48 +98,12 @@ func _process(_delta: float) -> void:
 		var t := _time / DEPART_SECONDS
 		_car.drive(_car_home + TUNNEL_RUN * t * t)
 		return
-	if arrive_shot and _arrive_from < 0.0 and _time >= hold - ARRIVE_SECONDS and _scene_mounted():
-		_arrive_from = _time
-		_phase = "arrive"
-		_show(true)
-		_brake_player = Sound.play(BRAKE_SOUND, RIDE_GAIN, 1.0, "Ambience")
-	if _arrive_from >= 0.0:
-		# A chegada: entra pela esquerda freando (ease-out) e para no meio; a faísca da metade da velocidade até parar, e
-		# as portas abrem depois, no tempo do contrato.
-		var brake_seconds := ARRIVE_SECONDS - _door_seconds
-		var since := _time - _arrive_from
-		var u := clampf(since / brake_seconds, 0.0, 1.0)
-		_car.drive(_car_home - TUNNEL_RUN * (1.0 - u) * (1.0 - u))
-		_car.brake(u >= 0.5 and u < 1.0, 1.0)
-		_car.set_doors(clampf((since - brake_seconds) / _door_seconds, 0.0, 1.0))
-		return
 	_show(false)
-
-
-## A viagem terminou o que tinha a mostrar: sem a chegada, logo; com ela, depois de o vagão parar e as portas abrirem.
-## O cartão espera isso para fechar (AHPassageCard.backdrop_done).
-func done() -> bool:
-	return not arrive_shot or (_arrive_from >= 0.0 and _time - _arrive_from >= ARRIVE_SECONDS)
-
-
-## A cena seguinte já montou por baixo do cartão (fora de um cartão, como nas capturas, vale sempre).
-func _scene_mounted() -> bool:
-	var card := get_parent() as AHPassageCard
-	return card == null or card.ready_to_skip
-
-
-## Pulada no meio da chegada, a freada não fica tocando por cima da fase.
-func _exit_tree() -> void:
-	if not done() and _brake_player != null and is_instance_valid(_brake_player) and _brake_player.playing \
-			and _brake_player.stream != null and _brake_player.stream.resource_path == BRAKE_SOUND:
-		_brake_player.stop()
 
 
 func _show(outside: bool) -> void:
 	_outside.visible = outside
 	_inside.visible = not outside
-	if not outside:
-		_car.brake(false)
 
 
 ## A cena de 1920 × 1080 cobre a tela, centrada (corta as sobras, sem faixa preta).
@@ -306,7 +257,6 @@ func _build_outside() -> void:
 	_outside.add_child(bed)
 	_car = AHTrainCar2D.new()
 	_car.scale = Vector2(TUNNEL_SCALE, TUNNEL_SCALE)
-	_car.sparks_enabled = not GameFlow.reduced_effects()
 	var car_size := _car.canvas() * TUNNEL_SCALE
 	_car_home = (FRAME.x - car_size.x) * 0.5
 	_car.position = Vector2(_car_home, TUNNEL_RAIL_Y - _car.rail_y() * TUNNEL_SCALE)

@@ -24,10 +24,25 @@ não entrava no vagão); agora a equipe está dentro, vista pela porta da esquer
 
 ![a passagem](train-2d/passage.jpg)
 
-Em cima, antes e depois do interior. Embaixo, os planos do túnel da partida da Preparação: o vagão sai de lado com as
-rodas girando, e no fim, depois do título, chega freando com a faísca e a freada (`train_brake`). A chegada só começa
-com a fase já montada por baixo (o quadro que monta trava a tela, e numa máquina lenta cortava a chegada ao meio), e o
-cartão espera ela terminar (`AHPassageCard.backdrop_done`). Pulada no meio, a freada para junto.
+Em cima, antes e depois do interior. Embaixo, à esquerda, o plano do túnel da partida da Preparação: o vagão sai de
+lado com as rodas girando. A chegada freando com a faísca (à direita) saiu depois, pela decisão do Lucas de 29/10: a
+faísca é só onde dá para ver o trem parar (a plataforma da Estação e a do Tutorial). Na passagem, a freada volta a ser
+só o som, no fim do cartão, como antes.
+
+## A Estação Raiz
+
+![a Estação](train-2d/station.jpg)
+
+As fotos da Estação são de 640x360 (o antes, de 1280x720), na vista geral: a Estação renderiza a cerca de 1 quadro
+por segundo aqui, sem placa de vídeo, e a câmera da plataforma não chegou a fechar a tempo. A faísca não se lê nesse
+tamanho.
+
+Pela mesma decisão, o trem da Estação também é o vagão verde: tudo é o mesmo trem. O metrô vermelho 3D sai da
+plataforma (`AHStationBuild._train_2d`; o metrô fica só como reserva, se o contrato faltar). O vagão fica logo à
+frente da beira da plataforma, com a frente no fim da linha onde ficava a do metrô, e as rodas no fosso. Ele chega da
+esquerda freando, com a faísca da metade da velocidade até parar (sem ela com "Reduzir efeitos"), abre as portas, e
+quem desce ou sobe usa a porta da direita; parte de volta para a esquerda, como o metrô (a Estação é o fim da linha).
+As luzes frias das portas andam com ele.
 
 ## Como funciona
 
@@ -56,4 +71,5 @@ cartão espera ela terminar (`AHPassageCard.backdrop_done`). Pulada no meio, a f
 
 - **Forward+:** as capturas são do Compatibility, sem placa de vídeo.
 - **A equipe no túnel:** nos planos de fora da passagem, o vagão passa vazio (a equipe aparece só no interior).
-- **A plataforma da Estação Raiz** continua com o metrô vermelho 3D: é a decisão que a #256 deixa para o Lucas.
+- **A Estação na tela:** a Estação renderiza a cerca de 1 quadro por segundo nesta máquina sem placa de vídeo; ver a
+  nota da captura na seção da Estação.

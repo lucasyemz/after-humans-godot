@@ -194,8 +194,7 @@ func _departure(skip: String) -> void:
 	t.check(street != null and street.name == "Street" and Campaign.state.session.expedition.id == expedition_id
 		and Campaign.state.session.expedition.phase_id == "fase_1", "%s, a passagem abre a fase" % {"none": "sem pular", "late": "pulada", "early": "pulada no passeio"}[skip])
 	if skip == "none":
-		var hold := AHWagonRide.RIDE_SECONDS + GameFlow.CARD_SECONDS + AHWagonRide.ARRIVE_SECONDS
-		t.check(elapsed >= hold, "sem pular, a viagem, o título e a chegada ficam %.1f s (%.2f s)" % [hold, elapsed])
+		t.check(elapsed >= AHWagonRide.RIDE_SECONDS + GameFlow.CARD_SECONDS, "sem pular, o vagão e o título ficam %.1f s (%.2f s)" % [AHWagonRide.RIDE_SECONDS + GameFlow.CARD_SECONDS, elapsed])
 	# Reaberto do save do meio: o Continuar segue para a rua.
 	Campaign.state = disk
 	var target: bool = Campaign.state.session.get("expedition") != null and Campaign.state.session.get("result", "") == ""

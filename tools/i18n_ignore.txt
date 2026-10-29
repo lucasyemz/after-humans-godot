@@ -1444,6 +1444,7 @@ station_rules.gd: rest_%d
 station_rules.gd: recovered
 station_build.gd: infirmary
 station_build.gd: infirmary@2
+station_build.gd: Train
 tutorial_guide.gd: Briefing
 station_report.gd: tutorial
 station_report.gd: bandages
@@ -1588,7 +1589,6 @@ passage_card.gd: Sound
 passage_card.gd: Ambience
 passage_card.gd: gain
 passage_card.gd: end
-passage_card.gd: done
 *: next
 ui_style.gd: enemies
 refuge_hud.gd: Pair_%s
