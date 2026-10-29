@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bv2lq62kvrpek"
-path="res://.godot/imported/carriage_bench.webp-067ad374a0c3ab67b283f1b7cbb767f9.ctex"
+uid="uid://coqyq82k7vmq3"
+path="res://.godot/imported/T_TR_Bogie.webp-3f26a1683f4470a6a668dbdb61febe1e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/transitions/train/carriage_bench.webp"
-dest_files=["res://.godot/imported/carriage_bench.webp-067ad374a0c3ab67b283f1b7cbb767f9.ctex"]
+source_file="res://art/train/T_TR_Bogie.webp"
+dest_files=["res://.godot/imported/T_TR_Bogie.webp-3f26a1683f4470a6a668dbdb61febe1e.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
 compress/lossy_quality=0.85
 compress/uastc_level=0
