@@ -1,7 +1,7 @@
 # A pose sentada de frente — #253
 
 A pose sentada **de frente** dos quatro fundadores, para os bancos encostados no fundo (o vagão da passagem e, depois,
-qualquer banco visto de frente). Empilhado no #252 (o trem 2D), que passa a usar esta pose na passagem.
+qualquer banco visto de frente). A passagem do trem 2D (#252, já na `main`) passa a usar esta pose.
 
 **Decisões do Lucas (29/10):** de lado, no banco do fundo do vagão, a equipe ficava esquisita e com os pés no ar. A
 pose de frente entra quando sentar de lado não faz sentido. Na folha, os pés ficam retos, as duas solas na mesma linha,
@@ -15,8 +15,7 @@ nenhum pé recuado ou levantado (o Nick e a Íris eram os exemplos). Aprovada co
 
 ![A passagem: de lado e de frente](poses-frente/before_after_passage.jpg)
 
-As duas da Godot (Compatibility, sem placa de vídeo), a mesma cena de passagem do #252 (o antes sai da branch dele,
-porque a passagem 2D ainda não está na `main`), a mesma equipe e o mesmo quadro
+As duas da Godot (Compatibility, sem placa de vídeo): a mesma cena de passagem do #252, a mesma equipe e o mesmo quadro
 (`docs/design/trem-2d/capture_train.gd -- --passage --stills`). À esquerda, as poses de lado de hoje: o quadril no
 assento deixa os pés do Nick, da Íris e da Véspera 10 a 13 cm no ar. À direita, as de frente: os quatro com os pés no
 chão, à frente do banco.
