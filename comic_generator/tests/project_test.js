@@ -1,0 +1,80 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile,readdir,stat} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import path from 'node:path';
+const root=new URL('../',import.meta.url);
+const json=async p=>JSON.parse(await readFile(new URL(p,root),'utf8'));
+test('example resolves all scene assets, with no historical or unused assets',async()=>{
+ const config=await json('config/default_story.json');const story=await json(config.story);
+ assert.equal(createHash('sha256').update(JSON.stringify(story.scenes.map(s=>s.config))).digest('hex'),'bc50d89480ce8a8132d0bcbd2e1182f300680783ad015a649d4e594037f0483c');
+ assert.equal(story.scenes.length,8);assert.equal(story.scenes.reduce((n,s)=>n+s.config.timing.loopEnd,0),44.3);
+ const used=new Set(story.scenes.flatMap(s=>Object.values(s.images)));
+ assert.deepEqual([...used].sort(),Object.keys(story.assets).sort());
+ for(const scene of story.scenes){assert.deepEqual(scene.assetHistory,[]);for(const [slot,plate] of Object.entries(scene.config.plates)){if(plate.visible!==false)assert.ok(scene.images[slot],slot);}}
+ const inventory=await json('docs/asset_inventory.json');
+ for(const [id,asset] of Object.entries(story.assets)){
+  assert.match(asset.path,/^assets\/[a-z0-9_]+\.(png|webp)$/);
+  const bytes=await readFile(new URL(asset.path,new URL(config.story,root)));
+  const entry=inventory.find(a=>a.id===id);assert.equal(bytes.length,entry.bytes);
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),entry.sha256);
+ }
+ assert.equal(story.scenes[0].config.speech.text,'Última caixa. Depois, casa, maninho.');
+ assert.equal(story.scenes[7].config.caption.text,'Eu fui embora. E meu irmão ficou.');
+});
+test('runtime uses local pinned dependencies and no embedded story',async()=>{
+ const code=await readFile(new URL('src/comic_editor.js',root),'utf8');
+ assert.ok(!code.includes('const STORY='));assert.ok(!code.includes('base64,'+ 'iVBOR'));
+ const manifest=await json('package.json'),lock=await json('package-lock.json');
+ assert.deepEqual(lock.packages[''].dependencies,manifest.dependencies);
+ for(const version of Object.values(manifest.dependencies))assert.match(version,/^\d+\.\d+\.\d+$/);
+});
+
+import {execFileSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+import {validateImport,projectSummary} from '../src/project_library.js';
+test('all browser and server modules parse',async()=>{
+ for(const name of await readdir(new URL('src/',root))){if(name.endsWith('.js'))execFileSync(process.execPath,['--check',fileURLToPath(new URL('src/'+name,root))]);}
+});
+test('import requires a complete project and summaries follow scene durations',async()=>{
+ const example=await json('stories/bento_loss/story.json');
+ const scene={id:'scene',config:structuredClone(example.scenes[0].config),images:{bg:'background'}};
+ scene.config.timing.loopEnd=2.5;
+ const project={format:'motion-comic-project',version:1,name:'Rascunho',scenes:[scene],assets:{background:{data:'data:image/webp;base64,AAAA'}}};
+ assert.equal(validateImport(project),project);assert.equal(projectSummary(project).duration,2.5);
+ assert.throws(()=>validateImport({...project,scenes:[]}));
+ assert.throws(()=>validateImport({...project,name:{invalid:true}}));
+ assert.throws(()=>validateImport({...project,scenes:Array(41).fill(scene)}));
+ assert.throws(()=>validateImport({...project,scenes:[{...scene,config:{plates:{},camera:{},timing:{loopEnd:2.5}}}]}));
+ assert.equal(typeof projectSummary({...project,name:{invalid:true}}).name,'string');
+ assert.throws(()=>validateImport({...project,assets:{background:{path:'assets/background.webp'}}}));
+});
+
+import {mobileSettings,cropRectangle,composeMobile} from '../src/mobile_compositor.js';
+test('mobile crop stays inside the original frame at every pan limit',()=>{
+ for(const zoom of [1,1.5,3])for(const x of [0,.5,1])for(const y of [0,.5,1]){
+  const crop=cropRectangle(1920,1080,1280,720,{zoom,x,y});
+  assert.ok(crop.x>=0&&crop.y>=0);assert.ok(crop.x+crop.width<=1920+1e-8);assert.ok(crop.y+crop.height<=1080+1e-8);
+  assert.ok(Math.abs(crop.width/crop.height-16/9)<1e-8);
+ }
+ assert.equal(mobileSettings({zoom:99,x:-1,textScale:Infinity}).zoom,3);
+ assert.equal(mobileSettings({x:-1}).x,0);assert.equal(mobileSettings({textScale:Infinity}).textScale,1);
+});
+test('mobile text fits safe areas without dropping characters at maximum length',()=>{
+ const noop=()=>{};const ctx={font:'',save:noop,restore:noop,clearRect:noop,drawImage:noop,beginPath:noop,roundRect:noop,fill:noop,stroke:noop,moveTo:noop,lineTo:noop,fillText:noop,measureText(text){return {width:text.length*Number(this.font.match(/([\d.]+)px/)[1])*.9};}};
+ const speech='W'.repeat(140),caption='W'.repeat(200);const {panels}=composeMobile(ctx,{width:1920,height:1080},{width:1280,height:720,settings:{textScale:1.8,speechY:.75},speech,caption});
+ for(const panel of Object.values(panels)){assert.ok(panel.top>=720*.035);assert.ok(panel.top+panel.height<=720*.965+1e-8);assert.ok(panel.left>=0&&panel.left+panel.width<=1280);assert.ok(panel.fontSize<=panel.requestedSize);}
+ assert.equal(panels.speech.lines.join(''),speech);assert.equal(panels.caption.lines.join(''),caption);assert.ok(panels.speech.top+panels.speech.height<panels.caption.top);
+});
+
+import {canonicalStoryKey,declaredLegacyKeys,legacyNames,matchesStory} from '../src/recovery_keys.js';
+test('recovery uses canonical story identity and legacy ownership',()=>{
+ const base='http://localhost:8766/',path='stories/bento_loss/story.json';
+ assert.equal(canonicalStoryKey('./'+path,base),path);assert.equal(canonicalStoryKey(base+path,base),path);
+ const story={scenes:[{id:'original'}],legacyRecovery:{story:path,keys:['default']}};
+ assert.deepEqual(declaredLegacyKeys(story,path,base),['default']);
+ assert.deepEqual(declaredLegacyKeys(story,'stories/new_story/story.json',base),[]);
+ const snapshot={format:'motion-comic-project',version:1,scenes:[{id:'original'},{id:'new-edit'}]};
+ assert.equal(matchesStory(snapshot,story),true);assert.equal(matchesStory({...snapshot,scenes:[{id:'unrelated'}]},story),false);
+ const current='comic_generator:/:'+path;assert.ok(!legacyNames('/',[path,'default'],current).includes(current));assert.ok(legacyNames('/',[path,'default'],current).includes('comic_generator:/:default'));
+});

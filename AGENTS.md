@@ -64,3 +64,9 @@ mexer em código. Cada entrega passa por duas personas:
 - **QA de design**: avalia com o checklist de [docs/design/qa.md](docs/design/qa.md) e devolve `VEREDITO: APROVADO` ou
   `VEREDITO: REPROVADO` com os problemas por gravidade. Reprovado, o designer corrige e manda de novo, até aprovar.
 - Aprovado, o PR da entrega para a `main` registra as rodadas; o Claude integra no jogo e a QA dele testa lá.
+
+## Ferramenta de autoria de tirinhas
+
+Por decisão explícita do Lucas (28/10/2026), `comic_generator/` é uma exceção à restrição de conteúdo usado diretamente pelo jogo e ao escopo de design do Codex. Pode conter o gerador independente em JavaScript/Node, configuração, documentação e somente o exemplo provisório de Bento com seus recursos leves necessários. O Codex pode implementar e testar o código dessa ferramenta.
+
+Vídeos, renders, dependências instaladas e originais pesados ficam fora do Git. A tirinha preservada é um exemplo provisório de autoria, a revisar depois; não altera o cânone da campanha, e sua narrativa não deve ser reescrita como parte da organização ou integração da ferramenta. As regras de código, dados e arte de produção da Godot continuam valendo.
