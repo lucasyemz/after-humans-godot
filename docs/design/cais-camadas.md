@@ -169,3 +169,14 @@ Da raiz do repositório:
   - (média) o pedaço escondido do telhado não chegava ao topo da coluna (a edição não tinha nada ali): o corrimão e a
     hera da faixa logo à direita da coluna continuam por baixo dela, de x = 184 a 210;
   - (baixa) o cabinho da folha no vão: a máscara da hera cresceu mais 2 px.
+- **Rodada 4, reprovada (a última pelo `qa.md`):** o topo da coluna e as folhas no vão ficaram resolvidos. Ficaram dois
+  médios, pequenos, em volta da porta da cabine, corrigidos depois da rodada:
+  - o latão da prancha levava para o casco a borda acesa do batente esquerdo (dois batentes com a câmera de lado) e o
+    trecho do corrimão do convés: agora o latão da prancha vale só à esquerda de x = 574 e abaixo de y = 396;
+  - um buraco de uns 8 × 8 px ao lado da quina da cabine, abaixo da faixa que foi para o convés: a faixa agora desce
+    até y = 420.
+
+  Conferido depois da correção, com o deslocamento real da câmera (26 px por metro): a porta sem batente duplicado e
+  sem buraco, e a pintura de hoje devolvida (1 px do Navio passa de 60). Ficam como observação: a linha de 1 a 2 px
+  numa folha no topo da coluna esquerda, a faixa um pouco mais clara na quina direita e o pixel transparente nas
+  pontas do zigue-zague do casco.

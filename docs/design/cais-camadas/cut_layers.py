@@ -116,7 +116,9 @@ def ship(src: Path, manifest: dict) -> None:
     # corrimão ficam na cabine.
     gangway = poly(S, [(345, 528), (350, 505), (415, 440), (500, 393), (580, 383), (580, 470), (560, 492), (470, 532)])
     ramp = poly(S, [(330, 506), (580, 440), (580, 576), (330, 576)])
-    hull = ImageChops.lighter(hull, ImageChops.multiply(gangway, ImageChops.lighter(ramp, gold(art))))
+    # O latão só à esquerda de x = 574 (o batente aceso da porta fica na cabine) e abaixo do corrimão do convés (y 396).
+    rail = ImageChops.multiply(gold(art), rect(S, (0, 396, 574, 576)))
+    hull = ImageChops.lighter(hull, ImageChops.multiply(gangway, ImageChops.lighter(ramp, rail)))
     # 3. A cabine: a forma inteira dela na edição só com a cabine.
     cabin_edit = edit(src / "ship-cabin-only.png", S)
     cabin_full = ImageChops.multiply(not_magenta(cabin_edit), rect(S, (540, 120, 1024, 456)))
@@ -124,7 +126,7 @@ def ship(src: Path, manifest: dict) -> None:
     # A porta da cabine, com os batentes, fica toda na cabine; a faixa escura da quina esquerda da cabine (x 540 a 556),
     # no convés, que está na frente (a cabine tem a parede pintada por trás dela).
     door = rect(S, (562, 318, 672, 458))
-    deck_band = ImageChops.lighter(minus(rect(S, (0, 312, 590, 420)), door), rect(S, (540, 320, 556, 400)))
+    deck_band = ImageChops.lighter(minus(rect(S, (0, 312, 590, 420)), door), rect(S, (540, 320, 556, 420)))
     # A porta acesa da cabine fica toda na cabine (a amurada não passa na frente dela).
     front_rail = ImageChops.multiply(gold(art), minus(rect(S, (548, 380, 1024, 450)), rect(S, (566, 318, 672, 458))))
     # 4. O mastro e o guindaste (com o gancho, os cabos e o mastro da proa); o pé do guindaste fica atrás das caixas.
@@ -139,7 +141,7 @@ def ship(src: Path, manifest: dict) -> None:
     rest = minus(rest, own_rail)
     own_crane = ImageChops.multiply(ImageChops.lighter(crane, bow_mast), rest)
     rest = minus(rest, own_crane)
-    own_cabin = ImageChops.multiply(minus(cabin_full, rect(S, (540, 320, 556, 400))), rest)
+    own_cabin = ImageChops.multiply(minus(cabin_full, rect(S, (540, 320, 556, 420))), rest)
     rest = minus(rest, own_cabin)
     own_deck = ImageChops.lighter(own_rail, ImageChops.multiply(ImageChops.lighter(deck_band, rect(S, (470, 380, 540, 470))),
                                                                 rest))
