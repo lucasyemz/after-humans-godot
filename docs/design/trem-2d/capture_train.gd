@@ -462,7 +462,7 @@ func _passage() -> void:
 			stage.add_child(shadow)
 	for seat in p.seats:
 		var hero := Sprite2D.new()
-		hero.texture = load(seat.existing_seat_file)
+		hero.texture = load(seat.file)
 		hero.centered = false
 		hero.scale = Vector2(seat.preview_scale, seat.preview_scale)
 		hero.position = Vector2(seat.sprite_top_left[0], seat.sprite_top_left[1])
