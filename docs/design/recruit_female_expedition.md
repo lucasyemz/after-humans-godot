@@ -84,7 +84,9 @@ Referências de expedição: `art/combat/recruits/{dog,cat,frog,owl}_recruit_01_
 `raccoon/rato-idle.png` e `armadillo/tatu-idle.png` da #225/tag `codex-pr229-originals`. Referências de rosto do lobby:
 `{dog_cat,frog_owl,raccoon_armadillo}_variants_concept.png` na tag `codex-pr244-originals-r4`. Os hashes ficam no contrato.
 
-Os PNG de conceito ficam fora da main. Tag, Release e pasta de originais serão vinculados no PR.
+Os três PNG de conceito ficam fora da main na tag `codex-pr248-originals`, pasta
+`art/combat/source/recruit_female_expedition_20261029/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr248-originals) /
+[ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr248-originals.zip). São ilustrações de figurino, não sprites.
 
 ## QA de conceito
 
