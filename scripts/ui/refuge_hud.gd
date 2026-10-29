@@ -10,12 +10,19 @@
 class_name AHRefugeHud
 extends Control
 
+## Um quadro do HUD (as esperas da chegada: some junto com ele).
+signal _frame_passed
+
 ## Abrir e fechar um painel (#36).
 const PANEL_OPEN := "res://audio/ui/panel_open.ogg"
 const PANEL_CLOSE := "res://audio/ui/panel_close.ogg"
 const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
+## Quanto a partida espera o recusado de dois (#182) voltar ao vagão antes de seguir sem ele (s).
+const BOARDING_WAIT := 8.0
+## As abas dos dois do trem (#182), no lugar do rosto do painel.
+const PAIR_TAB := Vector2(88, 108)
 ## A chegada da equipe de trem na volta (#76), antes do relatório: sem painel, só a dica de pular.
 const ARRIVAL := "arrival"
 const REPORT_GUARD_MS := 500
@@ -140,6 +147,8 @@ var _back_to := ""
 var _arrived_candidate := ""
 ## Mapa da Rede: IR AO MAPA abre por cima de tudo; o lugar escolhido vai para a plataforma (#123).
 var _map: AHPhaseMap
+## A visita guiada da primeira vez (#145), aberta por cima da Estação, ou null.
+var tour: AHStationTour
 
 
 func _ready() -> void:
@@ -176,6 +185,7 @@ func _ready() -> void:
 	_map.closed.connect(_on_map_closed)
 	add_child(_map)
 	Tips.show_tip.call_deferred("station")
+	_maybe_tour.call_deferred()
 
 
 ## O painel do cômodo: a chapa grande no lugar do painel PERSONAGEM, com o cabeçalho, o divisor, o conteúdo que rola e o
@@ -565,6 +575,11 @@ func _build_frame(c: Dictionary) -> void:
 	_prepare = AHStationFrame.prepare(_frame, tr("Ir ao mapa"), "station", S.preparation_block(c), open_map)
 	AHStationFrame.tabs(_frame, _active_tab(), _nav)
 	var pairs: Array
+	if current == "" and tour != null:
+		# Na visita, as setas e o Menu não passam: Interagir segue e Voltar pula.
+		pairs = [["interact", tr("Seguir")], ["Esc", tr("Pular visita")]]
+		AHStationFrame.keys(_frame, pairs, LEFT.end.x + 300.0, LEFT.end.x + 32.0, _prepare.position.x - 24.0)
+		return
 	if current == "":
 		pairs = [[tr("Setas"), tr("Cômodos")], ["interact", tr("Abrir")], ["menu", tr("Menu")], ["hide_hud", tr("Ocultar")], [tr("Arraste"), tr("Câmera")]]
 		AHStationFrame.keys(_frame, pairs, LEFT.end.x + 300.0, LEFT.end.x + 32.0, _prepare.position.x - 24.0)
@@ -777,8 +792,10 @@ func play_arrival() -> void:
 	_arrival_skip = false
 	refresh()
 	# A chegada (e o som do trem) começa com a Estação na tela, não embaixo do cartão da passagem.
+	# O quadro pelo sinal do próprio HUD: se a Estação sai antes (o teste ou a troca de cena), a espera cai junto com
+	# ele em vez de voltar numa instância liberada.
 	while GameFlow.busy and is_inside_tree():
-		await get_tree().process_frame
+		await _frame_passed
 	if current != ARRIVAL or not is_inside_tree():
 		return
 	station.play_team_arrival(report.get("team", []))
@@ -1127,7 +1144,10 @@ func _update_room_hover() -> void:
 	var mouse := get_viewport().get_mouse_position()
 	if mouse.distance_to(_last_mouse) > 2.0:
 		_key_room = ""
-	if overview and _key_room != "" and _room_rects.has(_key_room):
+	if tour != null:
+		# Na visita, só o destaque dela: sem a moldura e o cartão do cômodo debaixo do mouse ou do teclado.
+		hovered = ""
+	elif overview and _key_room != "" and _room_rects.has(_key_room):
 		hovered = _key_room
 	elif overview:
 		var over := get_viewport().gui_get_hovered_control()
@@ -1222,6 +1242,7 @@ func open_room(room_id: String) -> void:
 	current = room_id
 	station.focus_room(room_id)
 	refresh()
+	_tour_moment("room:" + room_id)
 
 
 func open_service(service: String) -> void:
@@ -1285,11 +1306,78 @@ func close_panel() -> void:
 	# De volta à vista geral, as setas voltam a andar entre os cômodos.
 	if get_viewport() != null:
 		get_viewport().gui_release_focus()
+	_tour_moment("close")
+	# Fechado o relatório da chegada da abertura, começa a visita guiada (#145).
+	_maybe_tour()
+
+
+# ---------------------------------------------------------------- a visita guiada (#145)
+
+## A visita abre na vista geral, com a chegada e o relatório da abertura já vistos.
+func _maybe_tour() -> void:
+	if tour != null or current != "" or briefing_open() or not is_inside_tree() or not AHStationTour.pending(Campaign.state):
+		return
+	var report: Dictionary = Campaign.state.station.get("last_return", {})
+	if not report.is_empty() and not report.get("seen", false):
+		return
+	tour = AHStationTour.new(self)
+	tour.finished.connect(func():
+		tour = null
+		refresh())
+	add_child(tour)
+	refresh()
+
+
+func _tour_moment(what: String) -> void:
+	if tour != null:
+		tour.moment(what)
+
+
+## O que a visita destaca, na tela de 1920 x 1080 (vazio se não está à vista).
+func tour_rect(target: String) -> Rect2:
+	match target:
+		"overview":
+			var all := Rect2()
+			for rect: Rect2 in station.room_screen_rects().values():
+				all = rect if not all.has_area() else all.merge(rect)
+			return all
+		"resources":
+			return _resources.get_global_rect() if is_instance_valid(_resources) and _resources.is_visible_in_tree() else Rect2()
+		"next_step":
+			var card := _menu.get_node_or_null("NextStep") as Control
+			return card.get_global_rect() if card != null and card.is_visible_in_tree() else Rect2()
+		"panel":
+			# Na Sala, a coluna da direita (o nível e o Treino, que a fala explica).
+			if is_instance_valid(_room_screen):
+				return AHCharacterRoom.RIGHT
+			return _panel.get_global_rect() if _panel.visible else Rect2()
+		"characters", "prepare":
+			var node := _frame.find_child("Nav_characters" if target == "characters" else "Prepare*", true, false) as Control
+			return node.get_global_rect() if node != null and node.is_visible_in_tree() else Rect2()
+	if target.begins_with("room:") and current == "":
+		return station.room_screen_rects().get(target.substr(5), Rect2())
+	return Rect2()
+
+
+## A ação que a visita espera, pelo teclado ou pelo controle (Interagir): abrir o cômodo, fechar o painel ou o mapa.
+func tour_act(wait: String) -> void:
+	if wait.begins_with("room:") and current == "":
+		open_room(wait.substr(5))
+	elif wait == "close" and current != "":
+		close_panel()
+	elif wait == "map" and current == "":
+		open_map()
+
+
+## Tira a seleção de cômodo do teclado (a visita tem o destaque dela).
+func clear_room_selection() -> void:
+	_key_room = ""
 
 
 ## IR AO MAPA (AAHHUD::OpenPhaseMap; #123): com algo pendente (a noite, o trem), a Preparação diz o quê; senão, o Mapa
 ## da Rede.
 func open_map() -> void:
+	_tour_moment("map")
 	if S.preparation_block(Campaign.state) != "":
 		open_room(S.PREPARATION)
 		return
@@ -1390,6 +1478,7 @@ static func _lines_signature(lines: Array) -> String:
 
 
 func _process(delta: float) -> void:
+	_frame_passed.emit()
 	_pan_overview(delta)
 	_update_room_hover()
 	if _feedback.modulate.a > 0.0 and _feedback.text != "":
@@ -1615,6 +1704,10 @@ func _show(key: String) -> void:
 		child.queue_free()
 	_panel_focus = null
 	var c: Dictionary = Campaign.state
+	# Qualquer outra tela (a partida, a chegada, o trem, o relatório, um cômodo): a Sala fecha e o escolhido sai do
+	# cômodo (#181), antes de cada caminho abaixo.
+	if key != S.CHARACTERS:
+		_close_room_screen()
 	if key == "departure":
 		_panel.visible = false
 		_departure_view()
@@ -1640,7 +1733,6 @@ func _show(key: String) -> void:
 		_panel.visible = false
 		_character_room()
 		return
-	_close_room_screen()
 	_panel.visible = true
 	# Outra tela: a lista começa do alto (a mesma tela refeita fica na mesma rolagem).
 	if key != _shown:
@@ -1671,7 +1763,7 @@ func _show(key: String) -> void:
 	_footer.visible = _footer.get_child_count() > 0
 	_fit_panel()
 	if _panel_focus != null and U.using_keys:
-		_panel_focus.grab_focus.call_deferred()
+		AHKit.focus_later(_panel_focus)
 
 
 ## O plano da Estação: um bloco por cômodo, na ordem do jogo, com o ícone, o nome, o nível ou Vazio, o que faz, o custo
@@ -1724,8 +1816,8 @@ func _new_campaign_view() -> void:
 		AHKit.alert_text())
 	_button(tr("Cancelar"), close_panel)
 	var go := _button(tr("Começar do zero"), func():
-		Campaign.new_game()
-		GameFlow.travel("station"))
+		# A campanha nova passa pela escolha do título (#144): a abertura ou Pular tutorial, no mesmo espaço.
+		GameFlow.travel("title", {}, {"new_campaign": Campaign.slot}))
 	go.add_theme_color_override("font_color", AHKit.alert_text())
 
 
@@ -1895,9 +1987,18 @@ func _civilian_card(c: Dictionary, who: Dictionary) -> void:
 		"small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
 
 
+const CIVILIAN_ART := "res://data/presentation/civilians.json"
+static var _civilian_art := {}
+static var _civilian_art_loaded := false
+
+
+## O rosto do morador (#193): o recorte da portrait_uv dele (data/presentation/civilians.json), não o corpo inteiro.
 static func _civilian_face(civilian_id: String) -> Texture2D:
-	var path := "res://art/civilians/%s.webp" % civilian_id
-	return load(path) if ResourceLoader.exists(path) else null
+	if not _civilian_art_loaded:
+		_civilian_art_loaded = true
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(CIVILIAN_ART)) if FileAccess.file_exists(CIVILIAN_ART) else null
+		_civilian_art = parsed if typeof(parsed) == TYPE_DICTIONARY else {}
+	return U.face_texture(_civilian_art.get(civilian_id, {}))
 
 
 # ---------------------------------------------------------------- Alojamento (a Sala dos Personagens)
@@ -2629,7 +2730,7 @@ func _character_room() -> void:
 	_room_screen = AHCharacterRoom.make(self)
 	add_child(_room_screen)
 	move_child(_room_screen, _panel.get_index())
-	station.focus_room_stage(S.CHARACTERS, AHCharacterRoom.LEFT.end.x, AHCharacterRoom.RIGHT.position.x)
+	# A câmera entra no cômodo pelo vão real entre os painéis (a própria tela a chama depois de montar, #181).
 	station.hide_residents(true)
 
 
@@ -2643,6 +2744,9 @@ func _close_room_screen() -> void:
 	if is_instance_valid(_room_screen):
 		_room_screen.queue_free()
 		station.hide_residents(false)
+	# O escolhido sai do cômodo; os moradores reaparecem onde estavam (#181). Também sem a tela (ela já saiu antes).
+	if station != null:
+		station.clear_stage_hero()
 	_room_screen = null
 
 
@@ -2747,19 +2851,33 @@ func _train_recruit(c: Dictionary) -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 16)
 	_body.add_child(head)
-	head.add_child(AHKit.portrait(U.face_texture(AHCombatArena.hero_art_of(train.candidate_id, String(recruit.art_variant)).get("idle", {})), 116))
+	# Desceram dois (#182, a decisão do Lucas): no lugar do rosto, os dois à escolha, na ordem que o jogador quiser; a
+	# aba traz o outro à frente, e o trem só parte depois dos dois.
+	var second: Dictionary = train.get("next", {})
+	if second.is_empty():
+		head.add_child(AHKit.portrait(U.face_texture(AHCombatArena.hero_art_of(train.candidate_id, String(recruit.art_variant)).get("idle", {})), 116))
+	else:
+		var pair := HBoxContainer.new()
+		pair.name = "TrainPair"
+		pair.add_theme_constant_override("separation", 8)
+		pair.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		head.add_child(pair)
+		var recruits := {String(train.candidate_id): recruit, String(second.candidate_id): second.recruit}
+		for id in station.pair_order(recruits.keys()):
+			pair.add_child(_pair_tab(id, recruits[id], id == train.candidate_id))
+	var name_width := 380.0 if second.is_empty() else BODY_WIDTH - 2 * PAIR_TAB.x - 8.0 - 16.0
 	var names := VBoxContainer.new()
 	names.add_theme_constant_override("separation", 2)
 	head.add_child(names)
-	names.add_child(_wrapped(tr("%s quer entrar na Estação") % recruit.display_name, "small", AHKit.AMBER, true, 380.0))
+	names.add_child(_wrapped(tr("%s quer entrar na Estação") % recruit.display_name, "small", AHKit.AMBER, true, name_width))
 	(names.get_child(-1) as Label).uppercase = true
 	var name_label := AHKit.label(String(recruit.display_name), "card_name", AHKit.TEXT, true)
 	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	names.add_child(name_label)
 	if hero_class != null:
-		names.add_child(_wrapped(tr("%s · %s") % [tr(hero_class.DisplayName), tr(hero_class.Role)], "row", AHKit.AMBER, false, 380.0))
+		names.add_child(_wrapped(tr("%s · %s") % [tr(hero_class.DisplayName), tr(hero_class.Role)], "row", AHKit.AMBER, false, name_width))
 	if String(recruit.get("origin", "")) != "":
-		names.add_child(_wrapped(tr(String(recruit.origin)), "text", AHKit.MUTED, false, 380.0))
+		names.add_child(_wrapped(tr(String(recruit.origin)), "text", AHKit.MUTED, false, name_width))
 	# O que pede e o motivo de não poder ficar antes dos traços: no texto Maior, à vista sem rolar.
 	var price := S.recruit_price(c, recruit.class_id)
 	_trait_box("", tr("Pedido"), tr("Nada: a Estação ainda não fecha uma equipe de quatro.") if price == 0 else tr("%d sementes (a Estação tem %d).") % [price, S.quantity(c, "seeds")], AHKit.AMBER)
@@ -2772,6 +2890,8 @@ func _train_recruit(c: Dictionary) -> void:
 			continue
 		var good: bool = perk.get("bPositive", true)
 		_trait_box("+" if good else "−", tr(perk.DisplayName), tr(perk.Description), AHKit.good() if good else AHKit.alert_text())
+	if not second.is_empty():
+		_text(tr("Desceram dois: decida cada um, na ordem que quiser. O trem só parte depois dos dois."), AHKit.MUTED, "small")
 	_text(tr("Quem a Estação recusa vai embora no trem e não volta. Quem a equipe deixa sem resposta ao partir, também."), AHKit.MUTED, "small")
 	var id: String = train.candidate_id
 	var accept := _footer_primary(tr("Acolher %s") % recruit.display_name, "recruit", func(): _decide(id, true))
@@ -2787,6 +2907,44 @@ func _train_recruit(c: Dictionary) -> void:
 		accept.get_node("Key").visible = false
 		refuse.focus_mode = Control.FOCUS_NONE
 		_panel_focus = null
+
+
+## A aba de um dos dois do trem (#182): o rosto e o nome, como as abas da Sala dos Personagens; a escolhida é quem o
+## painel mostra. Apertar a outra a traz à frente.
+func _pair_tab(candidate_id: String, recruit: Dictionary, chosen: bool) -> Button:
+	var tab := Button.new()
+	tab.name = "Pair_%s" % candidate_id
+	AHKit.style_as(tab, "hero_selected" if chosen else "hero")
+	tab.custom_minimum_size = PAIR_TAB
+	tab.clip_contents = true
+	var face := TextureRect.new()
+	face.texture = U.face_texture(AHCombatArena.hero_art_of(candidate_id, String(recruit.get("art_variant", ""))).get("idle", {}))
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	face.position = Vector2(5, 5)
+	face.size = Vector2(PAIR_TAB.x - 10.0, PAIR_TAB.y - 36.0)
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tab.add_child(face)
+	var name := AHKit.label(String(recruit.get("display_name", "")), "small" if U.text_scale > 1.2 else "tab", AHKit.AMBER if chosen else AHKit.TEXT)
+	name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name.clip_text = true
+	name.position = Vector2(2, PAIR_TAB.y - 32.0)
+	name.size = Vector2(PAIR_TAB.x - 4.0, 30)
+	name.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tab.add_child(name)
+	if not chosen:
+		tab.pressed.connect(func(): _bring_forward(candidate_id))
+	return tab
+
+
+## Mostra o outro dos dois do trem (#182): ele passa a ser quem o painel decide, e a câmera continua nos dois.
+func _bring_forward(candidate_id: String) -> void:
+	if S.bring_forward(Campaign.state, candidate_id):
+		station.swap_pair()
+		# Os dois já desceram: reabrir o trem não refaz a chegada.
+		_arrived_candidate = candidate_id
+		refresh()
 
 
 ## Uma caixa do trem: o quadradinho de + ou − (ou o ícone do pedido), o título na cor e o texto.
@@ -2821,9 +2979,18 @@ func _on_train_event(name: String) -> void:
 
 func _decide(candidate_id: String, accept: bool) -> void:
 	var c: Dictionary = Campaign.state
+	# Qualquer um dos dois (#182): quem é decidido vem à frente nas regras e na cena.
+	var front: String = c.station.train.candidate_id
+	if S.bring_forward(c, candidate_id):
+		station.swap_pair()
+		_arrived_candidate = candidate_id
 	var recruit := S.train_recruit(c)
 	var error := S.decide_candidate(c, candidate_id, accept)
 	if error != "":
+		# A decisão não passou: os dois voltam à ordem de antes, nas regras e na cena.
+		S.bring_forward(c, front)
+		station.swap_pair()
+		_arrived_candidate = c.station.train.candidate_id
 		toast(error, true)
 		return
 	station.commit()
@@ -2832,17 +2999,34 @@ func _decide(candidate_id: String, accept: bool) -> void:
 	else:
 		var who := S.civilian(candidate_id)
 		toast((tr("%s vai morar na Estação.") % who.name) if accept else tr("%s segue no trem. Pode voltar numa próxima viagem.") % who.name)
+	# O segundo do trem (#182): o primeiro sai da plataforma (acolhido, vai para o cômodo; recusado, volta ao vagão) e o
+	# painel mostra quem desceu junto; o trem só parte depois dele.
+	if c.station.train.phase == "waiting":
+		_arrived_candidate = c.station.train.candidate_id
+		# O acolhido vai para um cômodo antes (refazer os moradores limpa os passeios da plataforma).
+		if accept:
+			station.place_residents()
+		station.promote_companion(c.station.train.candidate_id, not accept)
+		refresh()
+		return
 	# O trem fecha e parte (o recusado volta para ele); acolhido, o civil fica e vai para o cômodo dele. O painel sai da
-	# frente da cena e o resto espera o trem sumir no túnel.
-	station.play_train_departure(not accept)
+	# frente da cena e o resto espera o trem sumir no túnel. O primeiro recusado de dois (#182) entra antes das portas
+	# fecharem.
 	_panel.visible = false
+	station.departure_pending = true
+	# Um limite (BOARDING_WAIT s): o recusado que se perdeu do passeio não segura a partida.
+	var waited := 0.0
+	while is_instance_valid(station) and station.boarding_back() and waited < BOARDING_WAIT:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	if not is_instance_valid(station):
+		return
+	station.play_train_departure(not accept)
 	await station.train_event_named("gone")
 	S.finish_departure(c)
 	station.commit()
-	var rng := RandomNumberGenerator.new()
-	rng.randomize()
 	station.clear_candidate()
-	station._place_residents(rng)
+	station.place_residents()
 	# O jogador abriu outra coisa durante a partida (um cômodo, as Opções): ela fica aberta.
 	if current != "train":
 		return

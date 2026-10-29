@@ -58,10 +58,10 @@ func _limits() -> void:
 	# O caído conta no limite.
 	S.admit_fallen(c, [_id(c, "A")])
 	t.check(S.heroes_full(c), "quem está em recuperação conta")
-	# O trem ainda traz alguém, mas Acolher trava.
+	# Com a casa cheia, o trem não traz animal (#182: ele ia embora na partida, e o trem parecia parado).
 	S.train_on_return(c, "limits", "hero")
 	c.inventory.seeds = 50
-	t.check(S.recruit_block(c).contains("cheio"), "o animal do trem não entra com a casa cheia")
+	t.check(S.train_recruit(c).is_empty(), "com a casa cheia, o trem não traz animal")
 	# Ampliar o Alojamento: o limite sobe.
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5
@@ -180,7 +180,8 @@ func _old_save() -> void:
 	var c := _campaign()
 	for name in ["X1", "X2", "X3"]:
 		c.station.rooms[S.CHARACTERS] = 4
-		S.recruit(c, "gato", RandomNumberGenerator.new(), name)
+		# Um save antigo, de antes do #182: três gatos com o mesmo rosto.
+		S._add_hero(c, S._next_hero_id(c, "gato"), "gato", name, [], "cat_recruit_01")
 	c.station.rooms[S.CHARACTERS] = 1
 	for entry in c.roster:
 		entry.erase("post")

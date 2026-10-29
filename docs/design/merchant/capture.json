@@ -1,0 +1,43 @@
+{
+  "after": "AHSpriteCard prototype in memory, no production registry/logic change",
+  "base_commit": "ff8fc83",
+  "before": "main scene, founders, no merchant art registered",
+  "camera": "Transform3D(1, 0, 0, 0, 0.9781476, 0.2079117, 0, -0.2079117, 0.9781476, 1.95, 4.90184, 13.663473)",
+  "engine": "4.7.2-stable (official)",
+  "fov": 26.0,
+  "physical_gpu": false,
+  "renderer": "OpenGL Compatibility / Mesa llvmpipe CPU / Xvfb",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "same_process": true,
+  "subjects": [
+    {
+      "body_height": 1.72,
+      "position": "Vector3(-1.3499999, 0, 1.25)",
+      "subject": "hero_cao_bento"
+    },
+    {
+      "body_height": 1.5,
+      "position": "Vector3(0.30000004, 0, 1.25)",
+      "subject": "hero_gato_nick"
+    },
+    {
+      "body_height": 1.38,
+      "position": "Vector3(3.6000001, 0, 1.25)",
+      "subject": "hero_sapo_iris"
+    },
+    {
+      "body_height": 1.66,
+      "position": "Vector3(5.25, 0, 1.25)",
+      "subject": "hero_coruja_vespera"
+    },
+    {
+      "body_height": 1.72,
+      "position": "Vector3(1.95, 0, 1.25)",
+      "subject": "merchant prototype"
+    }
+  ],
+  "time_scale": 0.0
+}

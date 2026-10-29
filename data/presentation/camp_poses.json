@@ -18,7 +18,8 @@
           494.0,
           900.0,
           1426.0
-        ]
+        ],
+        "support": 1368.0
       },
       "sleep": {
         "file": "res://art/station/poses/hero_cao_bento_sleep.webp",
@@ -36,7 +37,8 @@
           108.0,
           877.0,
           336.0
-        ]
+        ],
+        "support": 316.0
       }
     },
     "hero_coruja_vespera": {
@@ -56,7 +58,8 @@
           462.0,
           1040.0,
           1296.0
-        ]
+        ],
+        "support": 1250.0
       },
       "sleep": {
         "file": "res://art/station/poses/hero_coruja_vespera_sleep.webp",
@@ -74,7 +77,8 @@
           71.0,
           866.0,
           410.0
-        ]
+        ],
+        "support": 362.0
       }
     },
     "hero_gato_nick": {
@@ -94,7 +98,8 @@
           520.0,
           958.0,
           1284.0
-        ]
+        ],
+        "support": 1190.0
       },
       "sleep": {
         "file": "res://art/station/poses/hero_gato_nick_sleep.webp",
@@ -112,7 +117,8 @@
           128.0,
           879.0,
           367.0
-        ]
+        ],
+        "support": 345.0
       }
     },
     "hero_sapo_iris": {
@@ -132,7 +138,8 @@
           504.0,
           1108.0,
           1262.0
-        ]
+        ],
+        "support": 1220.0
       },
       "sleep": {
         "file": "res://art/station/poses/hero_sapo_iris_sleep.webp",
@@ -150,7 +157,8 @@
           86.0,
           872.0,
           369.0
-        ]
+        ],
+        "support": 344.0
       }
     }
   },
@@ -172,7 +180,8 @@
           396.0,
           1160.0,
           1308.0
-        ]
+        ],
+        "support": 1208.0
       },
       "sleep": {
         "file": "res://art/camp/cat_recruit_01_sleep.webp",
@@ -190,7 +199,8 @@
           910.0,
           1136.0,
           1308.0
-        ]
+        ],
+        "support": 1276.0
       }
     },
     "dog_recruit_01": {
@@ -210,7 +220,8 @@
           660.0,
           976.0,
           1422.0
-        ]
+        ],
+        "support": 1406.0
       },
       "sleep": {
         "file": "res://art/camp/dog_recruit_01_sleep.webp",
@@ -228,7 +239,8 @@
           958.0,
           1064.0,
           1422.0
-        ]
+        ],
+        "support": 1382.0
       }
     },
     "frog_recruit_01": {
@@ -248,7 +260,8 @@
           604.0,
           1100.0,
           1308.0
-        ]
+        ],
+        "support": 1240.0
       },
       "sleep": {
         "file": "res://art/camp/frog_recruit_01_sleep.webp",
@@ -266,7 +279,8 @@
           874.0,
           1104.0,
           1308.0
-        ]
+        ],
+        "support": 1286.0
       }
     },
     "owl_recruit_01": {
@@ -286,7 +300,8 @@
           546.0,
           1046.0,
           1308.0
-        ]
+        ],
+        "support": 1278.0
       },
       "sleep": {
         "file": "res://art/camp/owl_recruit_01_sleep.webp",
@@ -304,7 +319,8 @@
           802.0,
           1106.0,
           1308.0
-        ]
+        ],
+        "support": 1296.0
       }
     }
   }

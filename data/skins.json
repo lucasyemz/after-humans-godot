@@ -1,0 +1,13 @@
+[
+  {
+    "Name": "bento_watch",
+    "HeroId": "hero_cao_bento",
+    "DisplayName": "Ronda da Estação",
+    "ShortName": "Ronda",
+    "Text": "A capa de lona remendada da ronda da noite, o apito e o lampião.",
+    "Folder": "res://art/skins/bento/watch",
+    "Unlock": "phase:fase_4",
+    "Order": 1,
+    "Description": "A primeira skin do Bento (#138; a arte é a #137, entregue no #204). Unlock: phase:<id> (liberada ao terminar a fase, com o aviso no relatório da volta; a Ronda na fase 4, decisão do Lucas), start (liberada desde o começo) ou admin (só pela barra de Admin); depois, os desafios dos chefes (#95). ShortName é o nome na aba da Sala (uma linha, também no Maior). Cada pose é o arquivo de mesmo nome da pose padrão na pasta Folder (o retrato, portrait.webp), com o canvas, a âncora e a altura da pose padrão; a que falta usa a padrão."
+  }
+]

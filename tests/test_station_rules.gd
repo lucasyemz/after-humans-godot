@@ -288,7 +288,8 @@ func _shelter(t) -> void:
 	c.inventory.seeds = 10
 	# O Alojamento ampliado (#119): cabem os recrutas do teste.
 	c.station.rooms[S.CHARACTERS] = 4
-	S.recruit(c, "cao", rng)
+	# O terceiro cão entra direto, como num save antigo (o recrutamento não repete rosto, #182).
+	S._add_hero(c, S._next_hero_id(c, "cao"), "cao", "Rex", [], "")
 	var dogs: Array = c.roster.filter(func(h): return h.class_id == "cao").map(func(h): return h.id)
 	t.check(S.validate_team(c, [dogs[0], dogs[1], dogs[2], "hero_gato_nick"]) != "", "três cães não partem juntos")
 	t.equal(S.validate_team(c, ["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"]), "", "a formação inicial parte")
@@ -450,8 +451,12 @@ func _sleepers(t) -> void:
 	t.equal(AHStation.sleepers(c), [], "no amanhecer ninguém fica deitado")
 
 
-## Uma classe sem arte de combate ainda (o rato do evento dos túneis) não parte: a rua e a luta não teriam como mostrá-la.
+## Uma classe sem arte de combate (o rato do evento dos túneis, com a arte tirada do manifesto) não parte: a rua e a luta não teriam como mostrá-la.
 func _undeployable(t) -> void:
+	# O rato tem arte desde a #187: aqui o recruta desenhado dele sai do manifesto, para ele seguir sem arte de luta.
+	S.art_variants("rato")
+	var recruit_art: Dictionary = S._recruit_art.duplicate(true)
+	S._recruit_art.erase("raccoon_recruit_01")
 	var c := _campaign(13)
 	c.unlocked_classes.append("rato")
 	var risco := S.recruit(c, "rato", RandomNumberGenerator.new(), "Risco")
@@ -465,3 +470,4 @@ func _undeployable(t) -> void:
 	t.equal(S.confirm_departure(c, team, 0, 4242, "fase_1"), "Risco ainda não tem arte de combate e fica na Estação por enquanto.",
 		"a partida com o Risco é recusada, com o motivo")
 	t.equal(c.session.expedition, null, "e a expedição não começa")
+	S._recruit_art = recruit_art

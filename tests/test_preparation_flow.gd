@@ -20,6 +20,10 @@ func run(context) -> void:
 	var real_state: Dictionary = Campaign.state
 	var tips: bool = Tips.enabled
 	Tips.enabled = false
+	# O rato tem arte desde a #187: aqui o recruta desenhado dele sai do manifesto, para ele seguir sem arte de luta.
+	S.art_variants("rato")
+	var recruit_art: Dictionary = S._recruit_art.duplicate(true)
+	S._recruit_art.erase("raccoon_recruit_01")
 	Campaign.save_dir = "user://test-preparation-flow-%d" % Time.get_ticks_usec()
 	Campaign.state = _campaign()
 	Campaign.save()
@@ -44,9 +48,10 @@ func run(context) -> void:
 	Tips.enabled = tips
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+	S._recruit_art = recruit_art
 
 
-## Os quatro fundadores, um recruta caído (na Enfermaria) e o Risco (o rato, ainda sem arte de luta).
+## Os quatro fundadores, um recruta caído (na Enfermaria) e o Risco (o rato, aqui sem arte de luta: ver run).
 func _campaign() -> Dictionary:
 	var c: Dictionary = Campaign.create_initial(123)
 	c.preferred_formation = FOUNDERS.duplicate()

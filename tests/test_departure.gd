@@ -44,8 +44,9 @@ func _campaign() -> Dictionary:
 	c.station.rooms[AHStationRules.CHARACTERS] = 4
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 31
+	# Quatro recrutas direto no elenco, como num save antigo (o recrutamento não repete rosto, #182).
 	for class_id in ["cao", "gato", "cao", "gato"]:
-		AHStationRules.recruit(c, class_id, rng, "Teste")
+		AHStationRules._add_hero(c, AHStationRules._next_hero_id(c, class_id), class_id, "Teste", [], "")
 	return c
 
 

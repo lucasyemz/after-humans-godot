@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "checks": [
+    "9 WebP preserve alpha and all visible pixels of audited prototypes",
+    "existing output: rejected (Output already exists; nothing was overwritten.)",
+    "output inside repository: rejected (Output must be outside the repository and source trees.)",
+    "bad SHA256: rejected (Missing source or SHA256 mismatch: combat_idle.png)",
+    "path traversal: rejected (Source path must be relative: ../escape.png)",
+    "Seven-only conversion explicitly records missing reused recruit baselines",
+    "All nine input PNG unchanged",
+    "All nine suggested destinations unique; watch keeps Bento id and skin path; reused/new Tatu tags correct"
+  ]
+}

@@ -10,6 +10,9 @@ extends Control
 
 signal command_chosen(command: Dictionary)
 signal result_closed
+## Os momentos da vez que o tutorial (#144) acompanha: "turn" (a vez de um herói, {actor}), "target" (a mira de uma
+## habilidade ou do Mover, {ability}), "cancel" (a mira desfeita), "command" (o comando escolhido) e "bag" (a Mochila).
+signal tutorial_moment(kind: String, data: Dictionary)
 
 const S = preload("res://scripts/ui/ui_style.gd")
 const GOLD := S.GOLD
@@ -50,6 +53,15 @@ const POPUP_HOLD := 5.0
 ## O toque que fecha o popup só vale depois disto (ms): a tecla que acabou a luta não o fecha no mesmo instante.
 const POPUP_GUARD_MS := 250
 const KIT_PORTRAIT := 60.0
+## A faixa da ordem (#193): a folga depois do último retrato (a ponta da direita da peça), a largura máxima na base de
+## 1920 (com a margem de cada lado) e o menor retrato quando a fila é longa.
+const ORDER_END_PAD := 14.0
+const ORDER_EDGE := 24.0
+const ORDER_MAX_WIDTH := 1920.0 - 2.0 * ORDER_EDGE
+const ORDER_MIN_PORTRAIT := 36.0
+## O espaço entre os retratos da faixa, e o menor, quando a fila é longa demais até para o menor retrato.
+const ORDER_GAP := 8.0
+const ORDER_MIN_GAP := 2.0
 const ACTIONS := [["Mover", "move", "Q", "combat_move"], ["Defender", "defend", "W", "combat_defend"],
 	["Mochila", "item", "I", "inventory"], ["Fugir", "flee", "F", "combat_flee"]]
 
@@ -133,6 +145,8 @@ var _bag: PanelContainer
 var _crisis: Control
 ## Esperando o comando do herói (a captura usa para jogar por ele).
 var waiting := false
+## As ações travadas pelo tutorial nesta vez ("move", "defend", "item", "flee"): a primeira escolha é de uma habilidade.
+var tutorial_locks: Array = []
 
 
 func _ready() -> void:
@@ -186,11 +200,13 @@ static func _kit_label(text: String, size: int, color: Color = TEXT, kind: Strin
 
 func _build() -> void:
 	# A faixa da rodada (hud-target.md): "RODADA n", a linha com o ponto e os retratos quadrados da ordem.
-	_order_panel = AHKit.panel("round_strip")
+	# A folga no fim: a área de conteúdo da peça (content_xywh) entra na ponta da direita, e o último retrato a cobria.
+	_order_panel = PanelContainer.new()
+	_order_panel.add_theme_stylebox_override("panel", AHKit.style("round_strip", Color.WHITE, Vector4(0, 0, ORDER_END_PAD, 0)))
 	_order_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_order_panel)
 	_order = HBoxContainer.new()
-	_order.add_theme_constant_override("separation", 8)
+	_order.add_theme_constant_override("separation", int(ORDER_GAP))
 	_order.alignment = BoxContainer.ALIGNMENT_CENTER
 	_order.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_order_panel.add_child(_order)
@@ -664,7 +680,9 @@ func refresh() -> void:
 		if plate == null:
 			continue
 		var card: AHSpriteCard = arena.cards.get(unit.id)
-		plate.visible = card != null and card.visible and (unit.hp > 0 or unit.is_player)
+		# Quem caiu (o inimigo derrubado, o herói Caído, #178) perde a placa inteira: a barra, a moldura de quem age e os
+		# estados. O herói no Último Fôlego (vida 0, ainda na luta) fica com ela.
+		plate.visible = card != null and card.visible and AHCombatEngine.alive_any(unit)
 		var box := plate.get_child(0)
 		var hp: AHKitBar = box.get_node("Hp")
 		hp.set_value(unit.hp, unit.max_hp, "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else tr("Último Fôlego"))
@@ -752,8 +770,22 @@ func _refresh_order(current: String) -> void:
 		if unit == null or (unit.hp <= 0 and not unit.deaths_door) or (item.acted and item.unit_id != current):
 			continue
 		_order.add_child(_order_face(unit, item.unit_id == current))
+	# Fila longa demais para a largura: os retratos encolhem até caber; no menor retrato, o espaço entre eles também. A
+	# ponta da direita fica sempre livre (a folga é da peça), e a faixa fica dentro da margem enquanto couber.
+	_order.add_theme_constant_override("separation", int(ORDER_GAP))
+	var width := _order_panel.get_combined_minimum_size().x
+	if width > ORDER_MAX_WIDTH:
+		var faces: Array = _order.get_children().filter(func(child): return child.has_meta("unit_id"))
+		var side := maxf(ORDER_MIN_PORTRAIT, KIT_PORTRAIT - (width - ORDER_MAX_WIDTH) / maxf(1.0, faces.size()))
+		for cell in faces:
+			cell.custom_minimum_size = Vector2.ONE * side
+		width = _order_panel.get_combined_minimum_size().x
+		if width > ORDER_MAX_WIDTH:
+			var gaps := maxf(1.0, _order.get_child_count() - 1)
+			_order.add_theme_constant_override("separation", int(maxf(ORDER_MIN_GAP, ORDER_GAP - ceilf((width - ORDER_MAX_WIDTH) / gaps))))
 	_order_panel.size = _order_panel.get_combined_minimum_size()
-	_order_panel.position = Vector2(KIT_ROUND_CENTER.x - _order_panel.size.x * 0.5, KIT_ROUND_CENTER.y)
+	var left := KIT_ROUND_CENTER.x - _order_panel.size.x * 0.5
+	_order_panel.position = Vector2(clampf(left, ORDER_EDGE, maxf(ORDER_EDGE, 1920.0 - ORDER_EDGE - _order_panel.size.x)), KIT_ROUND_CENTER.y)
 
 
 ## Um retrato quadrado da ordem: o rosto no square_portrait, o fundo avermelhado nas máquinas e a borda âmbar em quem
@@ -761,6 +793,8 @@ func _refresh_order(current: String) -> void:
 func _order_face(unit: AHCombat.Unit, now: bool) -> Control:
 	var cell := AHKit.panel("square_portrait")
 	cell.custom_minimum_size = Vector2(KIT_PORTRAIT, KIT_PORTRAIT)
+	# Quadrado mesmo quando a fila longa o encolhe (a linha da faixa não o estica na altura).
+	cell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cell.set_meta("unit_id", unit.id)
 	cell.tooltip_text = unit.display_name
@@ -1345,8 +1379,10 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	_panel.visible = true
 	_build_abilities()
 	waiting = true
+	tutorial_moment.emit("turn", {"actor": actor_id})
 	var command: Dictionary = await command_chosen
 	waiting = false
+	tutorial_moment.emit("command", command)
 	stop_examine()
 	# A Mochila não é modal: um comando escolhido com ela aberta (Defender, uma habilidade) fecha ela também. Aberta, ela
 	# travava os atalhos dos próximos heróis e passava para a luta seguinte.
@@ -1360,6 +1396,38 @@ func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	# Durante o lance o painel sai da frente: a luta fica inteira à vista.
 	_panel.visible = false
 	return command
+
+
+## Liga as travas do tutorial nas ações que já estão na tela (sem remontar as habilidades: o foco adiado delas fica).
+func apply_tutorial_locks() -> void:
+	for child in _actions.get_children():
+		var kind: String = child.get_meta("kind", "")
+		if tutorial_locks.has(kind):
+			child.set_meta("locked", true)
+			child.disabled = true
+			(child.get_node("Icon") as Control).modulate = AHKit.LOCKED
+
+
+## O que o tutorial destaca (na tela de 1920 x 1080): "abilities" (as quatro habilidades), "actions" (Mover e Defender),
+## "item" (a Mochila) ou "targets" (os alvos acesos). Vazio quando não está na tela.
+func tutorial_rect(kind: String) -> Rect2:
+	match kind:
+		"abilities":
+			return _abilities.get_global_rect() if _abilities.is_visible_in_tree() and _abilities.get_child_count() > 0 else Rect2()
+		"actions", "item":
+			var found := Rect2()
+			for child in _actions.get_children():
+				var wanted: Array = ["move", "defend"] if kind == "actions" else ["item"]
+				if child.is_visible_in_tree() and wanted.has(child.get_meta("kind", "")):
+					found = child.get_global_rect() if not found.has_area() else found.merge(child.get_global_rect())
+			return found
+		"targets":
+			var found := Rect2()
+			for marker in _markers:
+				if is_instance_valid(marker) and marker.is_visible_in_tree():
+					found = marker.get_global_rect() if not found.has_area() else found.merge(marker.get_global_rect())
+			return found
+	return Rect2()
 
 
 func show_waiting(text: String) -> void:
@@ -1499,7 +1567,8 @@ func _build_abilities(take_focus: bool = true) -> void:
 	_show_header(shown[0] if not shown.is_empty() else (_options[0] if not _options.is_empty() else {}))
 	for child in _actions.get_children():
 		var kind: String = child.get_meta("kind")
-		var locked: bool = (kind == "move" and session.move_targets(_actor_id).is_empty()) or (kind == "flee" and not session.can_flee())
+		var locked: bool = (kind == "move" and session.move_targets(_actor_id).is_empty()) or (kind == "flee" and not session.can_flee()) \
+			or tutorial_locks.has(kind)
 		child.set_meta("locked", locked)
 		child.disabled = locked
 		# Bloqueada, a ação também apaga o ícone (como as habilidades): a peça escura quase não muda no desligado.
@@ -1999,6 +2068,7 @@ func _open_bag() -> void:
 	stop_examine()
 	_hide_tip()
 	Tips.show_tip("bag")
+	tutorial_moment.emit("bag", {})
 	Sound.play("res://audio/ui/bag_open.ogg")
 	_bag = PanelContainer.new()
 	_bag.add_theme_stylebox_override("panel", AHKit.style(AHKit.piece_of("panel", "large")))
@@ -2073,10 +2143,11 @@ func _show_markers(ranks: Array, enemy_side: bool, on_pick: Callable, ability_id
 		_markers[i].focus_neighbor_right = _markers[(i + 1) % _markers.size()].get_path()
 	# A aba diz como no alvo ("Escolha um alvo"); o como fica na dica do alvo apontado (_describe).
 	_description.text = tr("Escolha um alvo")
+	tutorial_moment.emit("target", {"ability": ability_id})
 	_paint_targets()
 	if not _markers.is_empty():
 		_via_mouse = false
-		_markers[0].grab_focus.call_deferred()
+		AHKit.focus_later(_markers[0])
 
 
 ## De onde veio o último toque no alvo: mouse ou toque (o primeiro clique só escolhe) ou teclado e controle.
@@ -2225,6 +2296,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _choosing != "" and S.is_back(event):
 		_clear_markers()
 		_set_enabled(true)
+		tutorial_moment.emit("cancel", {})
 		_build_abilities()
 		get_viewport().set_input_as_handled()
 

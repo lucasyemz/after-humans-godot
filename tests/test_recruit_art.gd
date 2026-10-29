@@ -16,6 +16,34 @@ func run(t) -> void:
 			t.check(ResourceLoader.exists(idle.file) and ResourceLoader.exists(idle.portrait), "%s: o parado e o retrato existem" % variant)
 			t.check(float(idle.body_reference_pixels) > 0 and idle.anchor.size() == 2, "%s: âncora e altura medidas" % variant)
 
+	# O Guaxinim e o Tatu (#187): sem fundador, a arte é a do recruta, com um golpe por habilidade, as reações e os
+	# ícones; e o trem passa a trazê-los quando a classe está liberada.
+	for class_id in ["rato", "tatu"]:
+		var variants := S.art_variants(class_id)
+		if not t.check(variants.size() == 1, "%s: um recruta desenhado" % class_id):
+			continue
+		var entry := AHCombatArena.art_entry(manifest.heroes, "hero_%s_5" % class_id, variants[0])
+		t.equal(entry.get("variant", ""), variants[0], "%s: a arte do recruta, sem fundador" % class_id)
+		t.equal(AHCombatArena.art_entry(manifest.heroes, "hero_%s_0" % class_id, "").get("variant", ""), variants[0],
+			"%s: sem variação guardada, a da classe" % class_id)
+		var abilities: Array = GameData.row("classes", class_id).AbilityIds
+		var poses_ok := ResourceLoader.exists(entry.idle.file) and float(entry.idle.body_reference_pixels) > 0
+		for ability_id in abilities:
+			var execute: Dictionary = entry.actions.get(ability_id, {}).get("execucao", {})
+			poses_ok = poses_ok and ResourceLoader.exists(execute.get("file", "")) and execute.anchor == entry.idle.anchor
+			t.check(ResourceLoader.exists(manifest.icons.get(ability_id, "")), "%s: o ícone de %s" % [class_id, ability_id])
+		for pose in ["hurt", "death", "dodge", "defense"]:
+			var reaction: Dictionary = entry.reactions.get(pose, {})
+			poses_ok = poses_ok and ResourceLoader.exists(reaction.get("file", "")) and reaction.body_reference_pixels == entry.idle.body_reference_pixels
+		t.check(poses_ok, "%s: o golpe de cada habilidade e as reações, com o pé e a altura do parado" % class_id)
+		t.check(AHCharacterHeights.HEIGHTS.has(class_id), "%s: altura própria" % class_id)
+		# A escala (o Lucas, no #196): o Guaxinim e o Tatu menores que a Íris e o Nick, e a largura medida para a fila.
+		t.check(AHCharacterHeights.HEIGHTS[class_id] < AHCharacterHeights.HEIGHTS.sapo, "%s: menor que a Íris" % class_id)
+		t.check(float(entry.idle.get("body_width_pixels", 0)) > 0, "%s: largura do corpo medida" % class_id)
+		var campaign: Dictionary = Campaign.create_initial(187)
+		campaign.unlocked_classes = ["cao", class_id]
+		t.check(S.train_classes(campaign).has(class_id), "%s: o trem pode trazê-lo" % class_id)
+
 	var real_dir: String = Campaign.save_dir
 	var real_state: Dictionary = Campaign.state
 	Campaign.save_dir = "user://test-recruit-art-%d" % Time.get_ticks_usec()
@@ -27,10 +55,12 @@ func run(t) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 5
 	var first: Dictionary = S.recruit(c, "cao", rng)
+	t.equal(first.error, "", "um recruta cão")
+	# Nenhum personagem repetido (#182): com o único rosto de cão em uso, ninguém novo da classe chega.
 	var second: Dictionary = S.recruit(c, "cao", rng)
-	t.equal([first.error, second.error], ["", ""], "dois recrutas cão")
+	t.check(second.error.contains("rostos"), "o segundo cão não chega: o rosto já está na Estação (%s)" % second.error)
+	t.equal(S.pick_art_variant(c, "cao"), "", "e não há rosto livre")
 	var a = S.hero(c, first.hero_id)
-	var b = S.hero(c, second.hero_id)
 	t.equal(a.art_variant, "dog_recruit_01", "o recruta ganha a variação da classe")
 	t.equal(S.hero(c, "hero_cao_bento").art_variant, "", "o fundador continua com a arte dele")
 
@@ -48,14 +78,16 @@ func run(t) -> void:
 	t.check(face != null and face.get_width() == 256 and face.resource_path == recruit.idle.portrait, "o retrato do HUD é o recortado da entrega #26")
 	t.check(AHUiStyle.face_texture(bento.idle).resource_path.ends_with("bento.png"), "e o do Bento também")
 
-	# Com duas variações da classe, dois recrutas ficam diferentes entre si (a menos usada vai para o novo).
+	# Com duas variações da classe, o próximo cão ganha a livre, e depois nenhum.
 	var saved_art: Dictionary = S._recruit_art.duplicate(true)
 	S._recruit_art["dog_recruit_02"] = {"class_id": "cao", "idle": saved_art.dog_recruit_01.idle}
 	var third: Dictionary = S.recruit(c, "cao", rng)
-	t.equal(S.hero(c, third.hero_id).art_variant, "dog_recruit_02", "com duas variações, o terceiro cão ganha a outra")
-	t.equal(S.pick_art_variant(c, "cao"), "dog_recruit_02", "e a escolha segue a menos usada")
+	t.equal(S.hero(c, third.hero_id).art_variant, "dog_recruit_02", "com duas variações, o próximo cão ganha a livre")
+	t.equal(S.free_art_variants(c, "cao"), [], "e as duas estão em uso")
+	# Quem está caído ou em recuperação também conta: o rosto não volta enquanto ele está no elenco.
+	S.admit_fallen(c, [third.hero_id])
+	t.equal(S.pick_art_variant(c, "cao"), "", "o caído em recuperação segura o rosto dele")
 	S._recruit_art = saved_art
-	t.equal(b.art_variant, "dog_recruit_01", "hoje há uma variação por classe: os dois primeiros cães dividem a arte")
 
 	# Save e load mantêm a variação.
 	t.check(Campaign.save(), "grava")

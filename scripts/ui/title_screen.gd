@@ -82,6 +82,9 @@ func _ready() -> void:
 	var capture := _capture_dir()
 	if capture != "":
 		_capture.call_deferred(capture)
+	# Nova campanha confirmada na Estação ou na rua (#144): a mesma escolha do título, no espaço de agora.
+	elif int(GameFlow.params.get("new_campaign", 0)) > 0:
+		_ask_after_travel(int(GameFlow.params.new_campaign))
 
 
 ## Continuar só aparece com um save que abre (o principal ou a cópia); sem ele, Nova campanha é o botão principal.
@@ -107,7 +110,7 @@ func _build_buttons() -> void:
 	_note_label.text = Campaign.warning_text()
 	_note.visible = _note_label.text != ""
 	_set_keys([[[tr("Setas")], tr("Navegar")], [["interact"], tr("Confirmar")]])
-	(continue_button if continue_button != null else new_button).grab_focus.call_deferred()
+	AHKit.focus_later(continue_button if continue_button != null else new_button)
 
 
 ## Um botão do menu: o principal é o âmbar com a tecla de Interagir dentro; os outros, de aço.
@@ -156,7 +159,9 @@ static func _icon_beside_text(button: Button, texture: Texture2D, tint: Color, f
 		var center := left + (button.size.x - left - right) * 0.5
 		glyph.position = Vector2(center - text_width * 0.5 - 38.0, (button.size.y - 26.0) * 0.5)
 	button.resized.connect(place)
-	place.call_deferred()
+	# No quadro seguinte, pelo próprio botão: se o painel for refeito antes, a chamada cai junto com ele (a lambda
+	# adiada sozinha rodava com o botão e o ícone já liberados).
+	button.resized.emit.call_deferred()
 
 
 ## A chapinha do espaço do Continuar (Campaign.slot_summary): o número, o ciclo, as fases e os vivos.
@@ -277,7 +282,7 @@ func close_modal() -> void:
 	S.reset_focus(_buttons)
 	var back: Button = _opener if _opener != null and is_instance_valid(_opener) and _opener.is_inside_tree() else \
 		(continue_button if continue_button != null else new_button)
-	back.grab_focus.call_deferred()
+	AHKit.focus_later(back)
 
 
 ## Uma janela do kit: a chapa grande com o título em maiúsculas e o ícone (as Campanhas, a campanha nova, as Opções).
@@ -363,7 +368,9 @@ func _add_key(button: Button, text: String, action: String = "") -> void:
 		key.reset_size()
 		key.position = Vector2(center + text_width * 0.5 + 14.0, (button.size.y - key.size.y) * 0.5)
 	button.resized.connect(place)
-	place.call_deferred()
+	# No quadro seguinte, pelo próprio botão: se o painel for refeito antes, a chamada cai junto com ele (a lambda
+	# adiada sozinha rodava com o botão e o ícone já liberados).
+	button.resized.emit.call_deferred()
 
 
 func _continue() -> void:
@@ -401,7 +408,7 @@ func _open_slots(for_new: bool, focus_slot: int = 0) -> void:
 	_icon_beside_text(back, load("res://art/ui/icons/ui-arrow-right.svg"), AHKit.TEXT, true)
 	back.name = "Back"
 	box.add_child(back)
-	(first if first != null else back).grab_focus.call_deferred()
+	AHKit.focus_later(first if first != null else back)
 	_center_modal.call_deferred()
 
 
@@ -519,20 +526,92 @@ func _pick_slot(number: int, for_new: bool) -> void:
 		go.add_theme_color_override(state, AHKit.alert_text())
 	go.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(go)
-	stay.grab_focus.call_deferred()
+	AHKit.focus_later(stay)
 	_center_modal.call_deferred()
 
 
-## A campanha nova no espaço leva as opções mexidas no título (volumes, velocidade), que até aqui ficaram só na memória.
+## A campanha nova (#144): começar pela abertura (o tutorial, o padrão) ou pular para a Estação, com a mesma recompensa.
+## Cada escolha numa linha do kit, com o que ela faz; a da abertura vem escolhida.
 func _start_new_campaign(number: int) -> void:
+	if _leaving or GameFlow.busy:
+		return
+	var box := _open_modal(760, tr("Como começar?"), "recruit")
+	# Voltar leva à lista dos espaços (quando ela abriu antes) ou fecha.
+	var any_save := range(1, Campaign.SLOT_COUNT + 1).any(func(n): return Campaign.slot_has_save(n))
+	_modal_back = _open_slots.bind(true, number) if any_save else close_modal
+	var opening := _choice_row(tr("Começar pela abertura (recomendado)"),
+		tr("O Bento, a Íris e a Véspera presos no Corredor de Contenção, e o Nick, que volta para ajudar: três lutas curtas que ensinam a jogar."), true)
+	opening.name = "Opening"
+	opening.pressed.connect(_begin_campaign.bind(number, true))
+	box.add_child(opening)
+	var skip := _choice_row(tr("Pular tutorial"),
+		tr("Começa direto na Estação Raiz, como depois da abertura e com a mesma recompensa."), false)
+	skip.name = "Skip"
+	skip.pressed.connect(_begin_campaign.bind(number, false))
+	box.add_child(skip)
+	var back := _modal_button(tr("Voltar"), _go_back, true)
+	_icon_beside_text(back, load("res://art/ui/icons/ui-arrow-right.svg"), AHKit.TEXT, true)
+	back.name = "Back"
+	box.add_child(back)
+	AHKit.focus_later(opening)
+	_center_modal.call_deferred()
+
+
+## A escolha da campanha nova pedida de fora do título: espera a passagem terminar (a janela não abre embaixo do cartão).
+func _ask_after_travel(number: int) -> void:
+	while GameFlow.busy and is_inside_tree():
+		await get_tree().process_frame
+	if is_inside_tree():
+		_start_new_campaign(number)
+
+
+## Uma escolha da campanha nova: a linha do kit (a escolhida com a moldura), o nome e o que ela faz embaixo. O texto do
+## botão é o nome (o teclado e os testes leem por ele), desenhado pelas linhas de dentro.
+func _choice_row(text: String, detail: String, chosen: bool) -> Button:
+	var button := Button.new()
+	AHKit.style_as(button, "list_selected" if chosen else "list")
+	button.text = text
+	for state in ["font_color", "font_hover_color", "font_focus_color", "font_pressed_color", "font_disabled_color"]:
+		button.add_theme_color_override(state, Color.TRANSPARENT)
+	var lines := VBoxContainer.new()
+	lines.add_theme_constant_override("separation", 2)
+	lines.set_anchors_preset(Control.PRESET_FULL_RECT)
+	lines.offset_left = 20
+	lines.offset_right = -16
+	lines.alignment = BoxContainer.ALIGNMENT_CENTER
+	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(lines)
+	lines.add_child(AHKit.label(text, "row", AHKit.TEXT, true))
+	var note := AHKit.label(detail, "small", AHKit.MUTED)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(680, 0)
+	lines.add_child(note)
+	var grow := func(): button.custom_minimum_size.y = maxf(72.0, lines.get_combined_minimum_size().y + 20.0)
+	lines.minimum_size_changed.connect(grow)
+	grow.call()
+	return button
+
+
+## A campanha nova no espaço leva as opções mexidas no título (volumes, velocidade), que até aqui ficaram só na memória.
+## Pela abertura, o cartão "Você precisa escapar." e o Corredor de Contenção; pulando, a Estação.
+func _begin_campaign(number: int, tutorial: bool) -> void:
 	if _leaving or GameFlow.busy:
 		return
 	_leaving = true
 	var settings: Dictionary = Campaign.state.get("settings", {}).duplicate(true)
 	Campaign.new_game_in(number)
 	Campaign.state.settings.merge(settings, true)
+	if tutorial:
+		AHTutorial.begin(Campaign.state)
+	else:
+		AHTutorial.skip(Campaign.state)
 	Campaign.save()
-	if not await GameFlow.travel("station"):
+	var travelled: bool
+	if tutorial:
+		travelled = await GameFlow.travel("street", AHTutorial.opening_card())
+	else:
+		travelled = await GameFlow.travel("station")
+	if not travelled:
 		_leaving = false
 
 
@@ -610,7 +689,7 @@ func _capture(dir: String) -> void:
 		close_modal()
 		for file in DirAccess.get_files_at(Campaign.save_dir):
 			DirAccess.remove_absolute(Campaign.save_dir.path_join(file))
-	get_tree().quit()
+	Sound.quit()
 
 
 func _rebuild_for_capture() -> void:

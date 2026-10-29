@@ -110,7 +110,7 @@ func restyle() -> void:
 	var focused := get_viewport().gui_get_focus_owner() == _toggle if get_viewport() != null else false
 	_build()
 	if focused:
-		_toggle.grab_focus.call_deferred()
+		AHKit.focus_later(_toggle)
 
 
 # ---------------------------------------------------------------- a faixa do alto
@@ -269,11 +269,27 @@ func _outcome(result: String) -> Dictionary:
 ## (cumprido, ou não, com a cor de perigo).
 func _chips(c: Dictionary, result: String) -> Array:
 	var out: Array = []
+	if report.get("tutorial", false):
+		# A chegada da abertura (#144): não há guardião; o que a fuga trouxe além das sementes (o curativo, a ferramenta).
+		out.append({"icon": "objective_done", "text": tr("A fuga até o trem"), "color": AHKit.TEXT})
+		if int(report.get("bandages", 0)) > 0:
+			out.append({"icon": "res-bandages", "text": tr("+%d curativo") % report.bandages if int(report.bandages) == 1 else tr("+%d curativos") % report.bandages, "color": AHKit.TEXT})
+		var tool := String(report.get("tool", ""))
+		if tool != "":
+			out.append({"icon": AHInventoryPanel.TOOL_ICONS.get(tool, "tool-generic"), "text": tr(AHInventoryPanel.TOOL_NAMES.get(tool, tool)), "color": AHKit.TEXT})
+		return out
 	if result == "victory":
 		out.append({"icon": "guardian_defeated", "text": tr("Guardião derrotado"), "color": AHKit.TEXT})
 	var unlocked := String(report.get("unlocked_phase", ""))
 	if unlocked != "":
 		out.append({"icon": "place_unlocked", "text": tr("%s liberada") % tr(J.phase(unlocked).get("name", "")), "color": AHKit.TEXT})
+	# A roupa nova (#138): a skin que veio com a fase terminada; a Sala dos Personagens já mostra a aba dela.
+	for skin_id in report.get("skins", []):
+		var skin = GameData.row("skins", String(skin_id))
+		if skin != null:
+			# Curto (o nome da aba da Sala): no Maior, o nome inteiro quebrava em 7 linhas e a faixa cobria a plataforma.
+			out.append({"icon": "room_quarters", "text": tr("Roupa nova: %s") % tr(String(skin.get("ShortName", skin.DisplayName))),
+				"color": AHKit.AMBER})
 	var focus := String(report.get("focus", ""))
 	if focus != "":
 		var done: bool = report.get("objective_done", false)
@@ -661,7 +677,7 @@ func _buttons() -> void:
 	_toggle.pressed.connect(toggle_details)
 	add_child(_toggle)
 	_fit_buttons()
-	_enter.grab_focus.call_deferred()
+	AHKit.focus_later(_enter)
 
 
 ## O botão principal âmbar com as divisas: o ícone, o texto e a tecla dentro (que cresce com o texto Maior).

@@ -16,7 +16,8 @@ arte. Nada daqui depende dele em tempo de execução, e nada de lá entra neste 
   builds (`build/`) e o cache (`.godot/`) ficam fora.
 - **Arte e som do combate:** entram por `tools/sync_combat_art.py`, que converte para WebP na metade da resolução e
   mede a âncora no pé em `data/presentation/combat_art.json`. Personagem novo entra na tabela da ferramenta, nunca
-  copiado à mão.
+  copiado à mão, e a imagem dele segue o padrão de [docs/design/characters.md](docs/design/characters.md): a proporção
+  dos fundadores e a largura perto da deles, seja qual for a altura.
 - **Dados:** os JSON em `data/` são a fonte de produção. Ao portar uma regra da Unreal, traga junto um teste que compare
   com o comportamento de lá, como `tests/test_combat_parity.gd` faz com o combate.
 - **Nomes:** pastas, cenas, scripts e shaders em inglês e `snake_case`. A arte mantém o nome que tem na origem

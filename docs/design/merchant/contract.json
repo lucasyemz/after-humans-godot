@@ -1,0 +1,218 @@
+{
+  "issue": 218,
+  "base_commit": "ff8fc83",
+  "asset_group": "merchant",
+  "source_tag": "codex-pr222-originals",
+  "source_folder": "art/combat/source/merchant_20261028",
+  "body_reference": "Same 1.72m and 1419 source pixels as Bento idle. Anchor measured at ground contact for each pose.",
+  "registration": {
+    "canvas": [
+      1086,
+      1448
+    ],
+    "texture_canvas": [
+      543,
+      724
+    ],
+    "anchor": [
+      664.0,
+      1429
+    ],
+    "body_reference_pixels": 1419,
+    "height_m": 1.72,
+    "normalization": {
+      "raw_bbox": [
+        58,
+        27,
+        937,
+        1415
+      ],
+      "scale": 1.0223342939481268,
+      "paste": [
+        93,
+        10
+      ]
+    },
+    "head_reference_width": 305,
+    "poses": {
+      "walk": {
+        "raw_bbox": [
+          83,
+          11,
+          1047,
+          1420
+        ],
+        "head_reference_width": 305,
+        "raw_head_width": 306,
+        "scale": 0.9967320261437909,
+        "paste": [
+          62,
+          25
+        ],
+        "anchor": [
+          488.0,
+          1429
+        ],
+        "head_width_after": 306
+      },
+      "trade": {
+        "raw_bbox": [
+          93,
+          10,
+          1059,
+          1429
+        ],
+        "head_reference_width": 305,
+        "raw_head_width": 305,
+        "scale": 1.0,
+        "paste": [
+          60,
+          10
+        ],
+        "anchor": [
+          635.9,
+          1429
+        ],
+        "head_width_after": 305
+      }
+    }
+  },
+  "assets": {
+    "idle": {
+      "file": "res://art/civilians/merchant/idle.webp",
+      "texture_canvas": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "source_file": "idle.png",
+      "source_sha256": "3887cc3d1ffb2baab207e2999199f141dfb7c08a3acbad9115604ed6073a6111",
+      "sha256": "800a7823bf2e0c383b55d9bfeccd6bb7ee27e2c915db203061d517775529c68e",
+      "alpha_bbox": [
+        46,
+        5,
+        496,
+        715
+      ],
+      "nine_slice": null,
+      "canvas": [
+        1086,
+        1448
+      ],
+      "anchor": [
+        664.0,
+        1429
+      ],
+      "texture_anchor": [
+        332.0,
+        714.5
+      ],
+      "body_reference_pixels": 1419,
+      "height_m": 1.72
+    },
+    "walk": {
+      "file": "res://art/civilians/merchant/walk.webp",
+      "texture_canvas": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "source_file": "walk.png",
+      "source_sha256": "34aafd5966ef26c8fc0c3c58bf86fd333566fe97d2438efe323cc518a585e6d8",
+      "sha256": "19dbaaab03737d78e5a2c280ba0c3b7bb0d6c2261be3c8eb948fe914b958dab8",
+      "alpha_bbox": [
+        31,
+        12,
+        512,
+        715
+      ],
+      "nine_slice": null,
+      "canvas": [
+        1086,
+        1448
+      ],
+      "anchor": [
+        488.0,
+        1429
+      ],
+      "texture_anchor": [
+        244.0,
+        714.5
+      ],
+      "body_reference_pixels": 1419,
+      "height_m": 1.72
+    },
+    "trade": {
+      "file": "res://art/civilians/merchant/trade.webp",
+      "texture_canvas": [
+        543,
+        724
+      ],
+      "source_canvas": [
+        1086,
+        1448
+      ],
+      "source_file": "trade.png",
+      "source_sha256": "4b6c8cfe831011cac18c0049664e02fc8a0e081fbabb32b83444c61e9cc908fd",
+      "sha256": "a282a1b1bfe164fca450b292ce476993703e9fea4ff702d55313824bfb8da19f",
+      "alpha_bbox": [
+        30,
+        5,
+        513,
+        715
+      ],
+      "nine_slice": null,
+      "canvas": [
+        1086,
+        1448
+      ],
+      "anchor": [
+        635.9,
+        1429
+      ],
+      "texture_anchor": [
+        317.95,
+        714.5
+      ],
+      "body_reference_pixels": 1419,
+      "height_m": 1.72
+    },
+    "portrait": {
+      "file": "res://art/ui/portraits/merchant.webp",
+      "texture_canvas": [
+        256,
+        256
+      ],
+      "source_canvas": [
+        1024,
+        1024
+      ],
+      "source_file": "portrait.png",
+      "source_sha256": "72f62bb93282574df337e4b13bc54abc1115286b7357634bb1579c964368f447",
+      "sha256": "3fd95facb4e89e74a28f65493a0729f9ef6dc97f0012e7046a3a142cd5799a61",
+      "alpha_bbox": [
+        12,
+        10,
+        244,
+        246
+      ],
+      "nine_slice": null
+    }
+  },
+  "portrait_fallback_face_box_source_idle": [
+    480,
+    0,
+    390
+  ],
+  "portrait_fallback_face_box_texture_idle": [
+    240,
+    0,
+    195
+  ]
+}
