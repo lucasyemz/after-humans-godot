@@ -95,8 +95,11 @@ func _scene(speed: int, reduced: bool) -> void:
 	else:
 		t.check(blink, "o sinal pisca na chegada")
 		t.check(sparked, "a faísca nas rodas na freada")
-	t.check(car == null or (is_zero_approx(car.position.x - car.get("_home").x) and is_equal_approx(car.doors_open(), 1.0)),
-		"o vagão parado no lugar, com as portas abertas")
+	t.check(car == null or is_zero_approx(car.position.x - car.get("_home").x), "o vagão parado no lugar")
+	# As portas que abrem são as do lado da plataforma (o outro lado): as folhas à vista ficam fechadas, e a luz fria das
+	# portas abertas acende na plataforma.
+	t.check(car == null or (car.doors_open() <= 0.0 and station._build.train_door_lights.all(func(e): return (e[0] as OmniLight3D).light_energy > 0.0)),
+		"as portas do lado da plataforma abertas: as deste lado fechadas e a luz delas na plataforma")
 	t.check(station.passage_moving() == false and station._goal == station._candidate_key(), "a câmera termina no candidato")
 	t.check(station._key.pos.distance_to(station._candidate_key().pos) < 0.1, "e o painel só abre com a câmera já nele")
 	if speed == 2:

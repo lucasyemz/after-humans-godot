@@ -877,10 +877,13 @@ func lineup_screen_positions() -> Array:
 ## (OffsetWagon e SetTrainDoorOpen da Unreal).
 func _offset_wagon(x: float) -> void:
 	_wagon_x = x
-	# O vagão em camadas (#256) anda pelo drive (as rodas giram pelo que ele anda) e abre as folhas dele.
+	# O vagão em camadas (#256) anda pelo drive (as rodas giram pelo que ele anda). As portas que abrem são as do lado da
+	# plataforma, do outro lado do vagão: as folhas deste lado ficam fechadas, e a luz fria sai pelas de lá.
 	if _build.train_car != null:
 		_build.train_car.drive(x)
-		_build.train_car.set_doors(_door_open)
+		_build.train_car.set_doors(0.0)
+		for entry in _build.train_door_lights:
+			(entry[0] as OmniLight3D).light_energy = float(entry[1]) * _door_open
 		# A faísca é só da chegada (_tick_slide_in liga e desliga a cada quadro): fora dela, apagada, também quando a
 		# chegada é pulada no meio da freada.
 		if _train_mode != 1 and _train_mode != 4:

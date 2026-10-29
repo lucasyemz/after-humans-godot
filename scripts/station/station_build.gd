@@ -80,6 +80,8 @@ var train_exit_x := NAN
 ## O vagão verde em camadas (#149, #256): o trem da Estação é o mesmo do Tutorial e da passagem. Ele não entra em
 ## `wagon` (as peças que o OffsetWagon arrasta): anda pelo AHTrainCar.drive, que gira as rodas.
 var train_car: AHTrainCar
+## A luz fria que sai das portas do lado da plataforma quando elas abrem (as luzes e a energia cheia de cada uma).
+var train_door_lights: Array = []
 var room_lights := {}
 var ember_light: OmniLight3D
 var signal_light: OmniLight3D
@@ -349,7 +351,9 @@ func _wagon() -> void:
 
 ## O vagão em camadas na plataforma (#256), no lugar do metrô vermelho: o chão dele na altura da plataforma, a carroceria
 ## logo à frente da beira (as rodas aparecem no fosso, com a faísca na freada) e a frente no fim da linha, onde ficava a
-## do metrô Bombardier que ele substitui. Desce e sobe pela porta da direita. As luzes frias das portas andam com ele (ficam em `wagon`).
+## do metrô Bombardier que ele substitui. A câmera vê o lado do trilho: as portas que abrem são as do outro lado, o da
+## plataforma, onde a equipe e o candidato descem e sobem (pela da direita); as folhas deste lado ficam fechadas, e a luz
+## fria do vagão sai pelas portas abertas na plataforma. As luzes andam com ele (ficam em `wagon`).
 const TRAIN_2D_RIGHT := 11.5
 const TRAIN_2D_Z := -3.4
 ## A distância da câmera da plataforma até o vagão (m): o interior cresce por ela, para casar com as janelas.
@@ -368,7 +372,9 @@ func _train_2d() -> bool:
 	train_exit_x = train_car.position.x + train_car.door_x(1)
 	for door in 2:
 		var x: float = (train_car.position.x + train_car.door_x(door)) * 100.0
-		b.light(Vector3(x, (TRAIN_2D_Z - 0.6) * 100.0, 200), 260, 420, Color(0.62, 0.8, 1.0), false)
+		var lamp := b.light(Vector3(x, (TRAIN_2D_Z - 0.8) * 100.0, 150), 320, 420, Color(0.62, 0.8, 1.0), false)
+		train_door_lights.append([lamp, lamp.light_energy])
+		lamp.light_energy = 0.0
 	return true
 
 

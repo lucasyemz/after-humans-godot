@@ -40,9 +40,11 @@ tamanho.
 Pela mesma decisão, o trem da Estação também é o vagão verde: tudo é o mesmo trem. O metrô vermelho 3D sai da
 plataforma (`AHStationBuild._train_2d`; o metrô fica só como reserva, se o contrato faltar). O vagão fica logo à
 frente da beira da plataforma, com a frente no fim da linha onde ficava a do metrô, e as rodas no fosso. Ele chega da
-esquerda freando, com a faísca da metade da velocidade até parar (sem ela com "Reduzir efeitos"), abre as portas, e
-quem desce ou sobe usa a porta da direita; parte de volta para a esquerda, como o metrô (a Estação é o fim da linha).
-As luzes frias das portas andam com ele.
+esquerda freando, com a faísca da metade da velocidade até parar (sem ela com "Reduzir efeitos"), e parte de volta
+para a esquerda, como o metrô (a Estação é o fim da linha). A câmera vê o lado do trilho: as portas que abrem são as
+do outro lado, o da plataforma, onde quem desce ou sobe passa (pela da direita), como as do metrô faziam. As folhas à
+vista ficam fechadas; a luz fria do vagão sai pelas portas abertas e acende na plataforma, e quem desce aparece saindo
+de trás do vagão.
 
 ## Como funciona
 
