@@ -113,7 +113,11 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	params = scene_params
 	if card.is_empty():
 		card = card_for(scene_id)
-	ResourceLoader.load_threaded_request(path)
+	# O arquivo que sumiu nem vai para o carregamento (ele soltava dois erros do motor antes do nosso): a passagem abre e
+	# termina em _travel_failed como a cena que quebrou.
+	var missing := not ResourceLoader.exists(path)
+	if not missing:
+		ResourceLoader.load_threaded_request(path)
 	await _fade_to(1.0)
 	var tree := get_tree()
 	# A cena de antes sai já no preto: nada por trás do cartão anda nem recebe tecla enquanto a outra carrega.
@@ -135,6 +139,8 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	while scene == null or not (passage.skipped or (Time.get_ticks_msec() - opened >= hold * 1000.0 and passage.title_lit
 			and passage.backdrop_done())):
 		await tree.process_frame
+		if missing:
+			return await _travel_failed(scene_id, path)
 		if packed == null:
 			var status := ResourceLoader.load_threaded_get_status(path)
 			if status == ResourceLoader.THREAD_LOAD_LOADED:
