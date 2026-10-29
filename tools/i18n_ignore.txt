@@ -467,6 +467,7 @@ scenario_world.gd: Foam
 scenario_world.gd: Roughness
 scenario_world.gd: Specular
 scenario_world.gd: Speed
+scenario_world.gd: car
 scenario_world.gd: Wavelength
 scenario_world.gd: albedo
 scenario_world.gd: amplitude
@@ -1571,6 +1572,7 @@ refuge_hud.gd: sleepless
 refuge_hud.gd: Shade
 street.gd: steam
 street.gd: embers
+street.gd: lights
 street.gd: Steam
 street.gd: Leaves
 street.gd: dust
@@ -1579,12 +1581,14 @@ refuge_hud.gd: %s:%s
 scenario_world.gd: ZoneEnd_%d_%s
 scenario_world.gd: left
 scenario_world.gd: right
+scenario_world.gd: Ambience
 passage_card.gd: sound
 passage_card.gd: loop
 passage_card.gd: Sound
 passage_card.gd: Ambience
 passage_card.gd: gain
 passage_card.gd: end
+passage_card.gd: done
 *: next
 ui_style.gd: enemies
 refuge_hud.gd: Pair_%s
@@ -1600,6 +1604,8 @@ street_corridor.gd: death
 ui_style.gd: enemies
 exploration_hud.gd: Wounded
 kit.gd: wounded
+street_corridor.gd: loop
+street_corridor.gd: gain
 character_room.gd: Skins
 character_room.gd: Skin_%s
 *: skins

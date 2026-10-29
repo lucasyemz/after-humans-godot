@@ -10,7 +10,8 @@ scenario_world.gd lê, sem mexer na planta ("Para integrar", docs/design/tutoria
     door_panel e security_doors (a porta baixa atrás da equipe; o painel fica acionado da sala das celas em diante);
   - o entulho no chão à frente da faixa vira primeiro plano (foreground): some quando tapa alguém, na luta também;
   - o vagão e as luzes frias dele ficam num nó "Metro" (node), que o corredor esconde até o trem chegar e faz entrar no
-    fosso (arrive_train); o embarque é na porta aberta da direita, no fim da plataforma (train.x).
+    fosso (arrive_train); o embarque é na porta aberta da direita, no fim da plataforma (train.x). O card T_TU10 dá
+    lugar ao vagão em camadas do trem 2D (#256, train.car).
 
 As zonas, da esquerda para a direita (10 m cada, a cada 21,2 m, 8 m para o fundo; a câmera olha para -Z):
   0 Corredor             a partida e a primeira luta
@@ -37,6 +38,8 @@ COLD = [0.75, 0.85, 1.0]
 ## O vagão: as luzes frias das portas e da plataforma da saída ficam a até 3 m do card, no fosso e na beira dele.
 TRAIN_LIGHT_X = 3.0
 TRAIN_LIGHT_Z = -9.0
+## A distância da câmera da exploração nos cenários até a faixa (EXPLORE_CAMERA.scenario.distance em street.gd).
+SCENARIO_CAMERA_DISTANCE = 15.8
 ## A porta aberta da direita do vagão, no fim da plataforma (x1 - 0,6 m, sob a luz fria): onde se embarca.
 BOARD_MARGIN = 0.6
 
@@ -101,6 +104,15 @@ def build():
             part['foreground'] = True
     platform = len(zones) - 1
     data['train'] = {'x': round(zones[platform]['x1'] - BOARD_MARGIN, 3), 'zone': platform}
+    # O vagão em camadas (#256, art/train no contrato de docs/design/trem-2d): o card some e o vagão entra no lugar dele,
+    # com o chão na altura da plataforma e a carroceria no plano do card. A câmera da exploração fica a
+    # SCENARIO_CAMERA_DISTANCE da faixa (o meio da zona): o interior cresce pela distância até a carroceria.
+    card = data['parts'][train_parts[0]]
+    card['hidden'] = True
+    lane_z = (zones[platform]['z0'] + zones[platform]['z1']) * 0.5
+    data['train']['car'] = {'x': card['origin'][0], 'y': zones[platform]['y'], 'z': card['origin'][2],
+                            'camera_distance': round(lane_z + SCENARIO_CAMERA_DISTANCE - card['origin'][2], 3),
+                            'emissive': material_of(data, card).get('emissive', 0.5)}
     data['models'] = []
     return data
 

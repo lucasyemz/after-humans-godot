@@ -110,6 +110,8 @@ const LEAVES_AMOUNT := 26
 const STEAM_AMOUNT := 14
 const EMBERS_AMOUNT := 40
 var _steam: Array[CPUParticles3D] = []
+## As fontes de luz prática do lugar (#154, AHPracticalLight): o tambor com fogo, o lampião, a emergência, o drone.
+var _practical: Array[AHPracticalLight] = []
 
 var _leader: CharacterBody3D
 ## Heróis da equipe (a equipe viva da expedição) e as placas deles, na mesma ordem.
@@ -133,6 +135,8 @@ var _indoor := false
 var scenario: AHScenarioWorld
 var floor_y := 0.0
 var lane_z := 0.45
+## A equipe vai dentro do vagão que parte (carry_party): a fila fica presa ao rastro.
+var carried := false
 var sheltered := false
 var _zone := {}
 ## Na luta num cenário, o quanto o chão de quem luta sobe para os pés passarem da borda da frente do piso (#48).
@@ -464,6 +468,19 @@ func _build_ambience() -> void:
 		vent.local_coords = false
 		add_child(vent)
 		_steam.append(vent)
+	for source in _practical:
+		source.queue_free()
+	_practical.clear()
+	for entry in ambience.get("lights", []):
+		var source := AHPracticalLight.new()
+		add_child(source)
+		source.setup(entry)
+		_practical.append(source)
+		# As de chão seguram a equipe (a rua anda pelos becos); posta depois de _collect_set, a caixa entra à mão.
+		var box := source.volume()
+		if box.has_volume():
+			var body: StaticBody3D = _dynamic.add_collider(box.get_center(), box.size)
+			_debug_colliders.append(body.get_node("DebugBox"))
 
 
 ## Quantas partículas, pela fração do perfil e da qualidade (trocar a quantidade recomeça a emissão: só quando muda).
@@ -769,6 +786,15 @@ func walk_leader(target: Vector3, seconds: float) -> bool:
 	return true
 
 
+## A equipe dentro do vagão que parte (#256): o líder e o rastro andam dx em x, e a fila fica presa a eles (sem a
+## suavização, que deixava quem vem atrás escorregar para fora do vagão andando).
+func carry_party(dx: float) -> void:
+	carried = true
+	_leader.position.x += dx
+	for index in _trail.size():
+		_trail[index].x += dx
+
+
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
 func _place_leader(at: Vector3, facing: float = 1.0) -> void:
 	at = _free_spot(at)
@@ -839,6 +865,8 @@ func _place_party(delta: float) -> void:
 		for card in _heroes:
 			card.rotation.z = 0.0
 		return
+	if carried:
+		delta = 0.0
 	if _time >= _wound_check or _wounded.size() != _heroes.size():
 		_check_wounds()
 	var limp: Dictionary = AHWounded.rules()
@@ -1084,6 +1112,10 @@ func _apply_weather() -> void:
 		_leaves.emitting = leaves > 0.0 and not _raining and not covered and not _reduced_effects()
 		_leaves.visible = _leaves.emitting
 		_set_amount(_leaves, LEAVES_AMOUNT, leaves)
+	# As fontes de luz prática: a luz da cena só no Forward+ e da Média para cima (no Compatibility, o chão já tem as 8
+	# luzes que cada malha pega); no resto, o halo e a poça desenhados.
+	for source in _practical:
+		source.refresh(_mood == "night", _raining, _forward_plus and Settings.level >= 1, _reduced_effects(), not _indoor)
 	for steam in _steam:
 		steam.emitting = not covered and not _reduced_effects()
 		_set_amount(steam, STEAM_AMOUNT, 1.0 if Settings.level > 0 else AHAmbience.LOW_PARTICLES)

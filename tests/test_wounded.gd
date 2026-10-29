@@ -116,6 +116,19 @@ func _street() -> void:
 	tilts = _walk(street)
 	t.check(tilts.all(func(v): return v < 0.0001), "com Reduzir efeitos, sem o balanço")
 	Campaign.state.settings.reduced_environment_effects = false
+	# No vagão (#256), até o ferido acompanha o trem sem a suavização do passo nem o balanço de mancar.
+	street._place_party(0.0)
+	var aboard: Array = street._heroes.map(func(hero_card): return hero_card.position)
+	street.carry_party(1.25)
+	street._place_party(1.0 / 60.0)
+	var carried_together := true
+	var carried_upright := true
+	for index in street._heroes.size():
+		carried_together = carried_together and street._heroes[index].position.is_equal_approx(aboard[index] + Vector3(1.25, 0, 0))
+		carried_upright = carried_upright and is_zero_approx(street._heroes[index].rotation.z)
+	t.check(carried_together, "o trem leva a fila inteira, inclusive o ferido, sem deixar seguidores para trás")
+	t.check(carried_upright, "dentro do vagão, o ferido não manca")
+	street.carried = false
 	# A troca de formação: o ferido vai para o segundo lugar e leva a pose e o mancar; quem fica na frente anda reto.
 	var second: String = street.party_ids[1]
 	street.swap_party(leader.id, second)

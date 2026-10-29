@@ -299,9 +299,14 @@ func _press(action: String) -> void:
 		await _tree.process_frame
 
 
+## Espera a troca de cena terminar, pelo relógio (até 20 s): a passagem da partida, com a chegada do vagão no túnel
+## (#256), passa dos 900 quadros numa máquina rápida.
 func _settle() -> void:
-	for frame in 900:
+	var limit := Time.get_ticks_msec() + 20000
+	var frame := 0
+	while Time.get_ticks_msec() < limit:
 		await _tree.process_frame
+		frame += 1
 		if not GameFlow.busy and GameFlow.passage == null and _tree.current_scene != null and frame > 3:
 			break
 	await _frames(3)
