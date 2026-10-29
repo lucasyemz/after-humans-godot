@@ -1,0 +1,190 @@
+{
+  "issue": 243,
+  "stage": "initial 10 outfits approved by Lucas; 6 female variants pending visual approval; no production poses",
+  "source_tag": "codex-pr244-originals-r3",
+  "base_commit": "5bb29281c578f37f135a859a3d0073cd2f083f58",
+  "assets": {
+    "founders": {
+      "source_file": "founders_concept.png",
+      "source_sha256": "5059fc2cf4d2418f00f88b5b93511f019a4db49f1fd1dd86ea6f45c6672d7735",
+      "canvas": [
+        1774,
+        887
+      ],
+      "review_file": "founders.webp",
+      "review_sha256": "2953b04965be2e3a6f507a2b2c1f7aa87bdb169e9df453c6b1de0f5633e98f41",
+      "reduced_canvas": [
+        710,
+        355
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "references": [
+        {
+          "file": "art/combat/heroes/bento/idle.webp",
+          "sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "art/combat/heroes/nick/idle.webp",
+          "sha256": "e97fb01fa320a2bc2d43cfb8399fdb1d93e11bbdc30abda5b24e7d17eafbce63",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "art/combat/heroes/iris/idle.webp",
+          "sha256": "e2da1f9727c8d5ba2801384d2eea5cad8696603c49cb852634359a6126690890",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "art/combat/heroes/vespera/idle.webp",
+          "sha256": "5d714a11c05f986eeb600f66c1a7c9c0546df04d0f95b50d7739a3f1f8681276",
+          "origin": "main 5bb29281"
+        }
+      ],
+      "lucas_approval": "approved after owl arms correction"
+    },
+    "recruits": {
+      "source_file": "recruits_concept.png",
+      "source_sha256": "61ccc5e37f7ad8b3183e7295da319bf369c004aa0e544fb7bd6842dcaea7813f",
+      "canvas": [
+        1536,
+        1024
+      ],
+      "review_file": "recruits.webp",
+      "review_sha256": "dd200122a3da44a79664c6b25a95245d494def48b2651a627c102a41ef225b4f",
+      "reduced_canvas": [
+        614,
+        410
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "references": [
+        {
+          "file": "art/combat/recruits/dog_recruit_01_idle.webp",
+          "sha256": "b14e3de96c7d9907cdeb7b58f4e16acb4748fa8259c47a082c1aeb81cd4d27c2",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "art/combat/recruits/cat_recruit_01_idle.webp",
+          "sha256": "a284912890ef2efd3a04eb67af6a9f1af385b5c55283702873f2f7a0db0ad286",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "art/combat/recruits/frog_recruit_01_idle.webp",
+          "sha256": "9bee03570295fcf0a91d45eed85a82d13eb84a70bc3236ec890ad25e5023c585",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "art/combat/recruits/owl_recruit_01_idle.webp",
+          "sha256": "b17b94ede190e6e81acac9ee7396d42c259a1cf3eea9f6b67c5f77a2c3c84c4f",
+          "origin": "main 5bb29281"
+        }
+      ],
+      "lucas_approval": "approved after owl arms correction"
+    },
+    "raccoon_armadillo": {
+      "source_file": "raccoon_armadillo_concept.png",
+      "source_sha256": "d9a540f177e7f2cd2df0f74826ac8eeb749df052836571cb024e3f2f1e1c12b1",
+      "canvas": [
+        1312,
+        1199
+      ],
+      "review_file": "raccoon_armadillo.webp",
+      "review_sha256": "fd56862e20792219311d2a65dc19206d339d4634244d3ff84c48373890e0d29a",
+      "reduced_canvas": [
+        525,
+        480
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "references": [
+        {
+          "file": "raccoon/rato-idle.png",
+          "sha256": "bc4011dc1af3960599935f3baa972c0169031b9109839de3b4b5b950392b7065",
+          "origin": "approved #225 / codex-pr229-originals"
+        },
+        {
+          "file": "armadillo/tatu-idle.png",
+          "sha256": "5dbef43bc82481bb5a84d38e7f03cbf14776bdce28ca61c581114d0c05b5e5eb",
+          "origin": "approved #225 / codex-pr229-originals"
+        }
+      ],
+      "lucas_approval": "approved after owl arms correction"
+    },
+    "dog_cat_variants": {
+      "source_file": "dog_cat_variants_concept.png",
+      "source_sha256": "b3fddbde516152962af618f7f2d31fd2056822baa56f9a241a2e3141184c5e9a",
+      "canvas": [
+        1536,
+        1024
+      ],
+      "review_file": "dog_cat_variants.webp",
+      "review_sha256": "5384578a03e1168f61f6aab3d3d6f80936fed9d8712ef64e2f1a9fc767be2cc0",
+      "reduced_canvas": [
+        614,
+        410
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "left_to_right": [
+        "dog_male",
+        "dog_female",
+        "cat_male",
+        "cat_female"
+      ],
+      "male_role": "comparison redraw of approved outfit",
+      "female_approval": "pending"
+    },
+    "frog_owl_variants": {
+      "source_file": "frog_owl_variants_concept.png",
+      "source_sha256": "5170b7cf040a7347182c9d3bf4d0be7192012055e2590acaef156374f5d09218",
+      "canvas": [
+        1536,
+        1024
+      ],
+      "review_file": "frog_owl_variants.webp",
+      "review_sha256": "746e020e3d59c1c2b53ef4bd8ba6be878c850e3b07d0826153031f5890c1feda",
+      "reduced_canvas": [
+        614,
+        410
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "left_to_right": [
+        "frog_male",
+        "frog_female",
+        "owl_male",
+        "owl_female"
+      ],
+      "male_role": "comparison redraw of approved outfit",
+      "female_approval": "pending"
+    },
+    "raccoon_armadillo_variants": {
+      "source_file": "raccoon_armadillo_variants_concept.png",
+      "source_sha256": "0a6690bbd5cd729529e53205fd83227c1435f901a410bd35400aaf3596f6f82f",
+      "canvas": [
+        1610,
+        977
+      ],
+      "review_file": "raccoon_armadillo_variants.webp",
+      "review_sha256": "3e4e5c2d3dba6509768b87bbd19be42a2a944c96d9dc736aed658bd37525713f",
+      "reduced_canvas": [
+        644,
+        391
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "left_to_right": [
+        "raccoon_male",
+        "raccoon_female",
+        "armadillo_male",
+        "armadillo_female"
+      ],
+      "male_role": "comparison redraw of approved outfit",
+      "female_approval": "pending"
+    }
+  },
+  "source_folder": "art/combat/source/lobby_outfits_20261028",
+  "revision": 3,
+  "supersedes_source_tag": "codex-pr244-originals-r2"
+}
