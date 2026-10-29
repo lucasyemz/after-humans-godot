@@ -2,19 +2,28 @@
   "groups_checked": [
     "founders",
     "recruits",
-    "raccoon_armadillo"
+    "raccoon_armadillo",
+    "dog_cat_variants",
+    "frog_owl_variants",
+    "raccoon_armadillo_variants"
   ],
   "characters": 10,
   "new_production_poses": 0,
   "game_changes": false,
   "qa_rounds": 4,
   "concept_qa": "APROVADO",
-  "lucas_approval": "pending",
+  "lucas_approval": "female variants pending only",
   "game_capture": "not produced: costume approval before poses",
-  "webp_bytes": 1684078,
-  "revision": 2,
+  "webp_bytes": 2915654,
+  "revision": 3,
   "corrected_anatomy": [
     "vespera: two articulated arms and visible hands",
     "owl recruit: two articulated arms and visible hands"
-  ]
+  ],
+  "concept_source_pngs": 6,
+  "female_variants": 6,
+  "female_qa_rounds": 3,
+  "initial_outfits_lucas_approval": "approved in chat after owl arms correction",
+  "original_approved_pngs_unchanged": true,
+  "original_approved_webps_unchanged": true
 }

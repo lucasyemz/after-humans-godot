@@ -1,6 +1,8 @@
 # Roupas confortáveis do lobby — proposta #243
 
-**Aguardando a aprovação visual do Lucas. Não integrar nem produzir poses.**
+**Lucas aprovou os figurinos dos quatro fundadores e dos seis recrutas após a correção dos braços das corujas.**
+As seis versões femininas abaixo são um complemento novo, ainda aguardando aprovação antes das poses delas.
+Este PR continua sendo de conceito; não integrar as pranchas como sprites.
 
 A pedido do Lucas em 28/10/2026, o estudo de paletas foi cancelado (#242, #239 e PR #240). Esta proposta muda o
 vestuário para a vida na Estação: tecido leve, lavado, remendos discretos e poucos acessórios. XCOM 2 é referência
@@ -27,7 +29,7 @@ As duas corujas têm **braços articulados, cotovelos, antebraços, punhos e mã
 originais. As penas naturais cobrem ombros e braços, sem substituir as mãos por asas fechadas nem escondê-las.
 A roupa do lobby não usa luvas; as duas mãos devem aparecer livres ao lado do corpo. Não acrescentar outro par
 de asas ou membros. A capa de equipamento da expedição sai, a anatomia fica. O punho de sucata do Bento foi tratado aqui
-como equipamento retirado; a aprovação visual inclui confirmar essa leitura antes de desenhar as mãos nas poses.
+como equipamento retirado, conforme a proposta aprovada pelo Lucas.
 
 ## Recrutas
 
@@ -54,8 +56,40 @@ Da esquerda para a direita: **cão, gato, sapo e coruja**.
 | Guaxinim | Camisa oliva de manga dobrada e calça marrom simples; sem rádio, ferramentas e mochila |
 | Tatu | Camisa ocre desbotada e calça carvão; sem escudo, martelo e armadura pintada. Escamas naturais ficam |
 
-Não estão incluídos novos figurinos de mercador, civis ou inimigos. Não há novas variações de pelagem nem novas
-opções de personalização neste pacote.
+Não estão incluídos novos figurinos de mercador, civis ou inimigos. Não há seletor de paletas nem novas
+variações de pelagem neste pacote.
+
+## Recrutas: versões femininas para aprovação
+
+Lucas autorizou uma versão feminina para cada um dos seis tipos de recruta. Os modelos atuais são a referência
+masculina nas comparações. Os figurinos já aprovados permanecem; as diferenças novas estão na face, na silhueta
+e no caimento da roupa, não em uma simples troca de cor.
+
+Todas são personagens adultas. Cão, gato, Guaxinim e Tatu podem ter busto discreto sob tecido opaco e uma silhueta
+diferente de ombros/quadril, preservando a espécie e a robustez de cada corpo. Sapo e coruja usam outros traços de
+face, corpo e corte, sem seios. São escolhas de desenho para estes indivíduos fictícios, não regras biológicas
+universais das espécies.
+
+Não acrescentar equipamento de expedição, joias, maquiagem ou cabelo humano como atalho. As corujas precisam manter
+braços articulados e mãos visíveis. Os dois sexos usam roupa igualmente prática e confortável.
+
+Cada prancha traz dois pares: **macho à esquerda, fêmea à direita**, depois o segundo par na mesma ordem.
+
+### Cão e gato
+
+![Cão macho, cão fêmea, gato macho, gato fêmea](lobby_outfits/dog_cat_variants.webp)
+
+### Sapo e coruja
+
+![Sapo macho, sapo fêmea, coruja macho, coruja fêmea](lobby_outfits/frog_owl_variants.webp)
+
+### Guaxinim e Tatu
+
+![Guaxinim macho, Guaxinim fêmea, Tatu macho, Tatu fêmea](lobby_outfits/raccoon_armadillo_variants.webp)
+
+As figuras masculinas nestas pranchas são redesenhos de comparação do conceito aprovado, não substitutos de sua
+arte canônica. As alturas e âncoras de produção continuam sendo as do personagem; não extraí-las desta ilustração.
+A implementação de sexo/aparência dos recrutas no recrutamento ou no save não está incluída nesta entrega.
 
 ## Quando vestir cada roupa
 
@@ -71,19 +105,21 @@ A troca de roupa é uma regra de apresentação futura, não uma substituição 
 deverá manter a escolha original de expedição e evitar exibir roupa confortável na ficha **Ver personagem**.
 Nenhuma dessas trocas foi implementada por esta entrega.
 
-## Poses: somente depois da aprovação
+## Poses: aprovação registrada e limite do complemento
 
 Leitura da main `5bb29281`: `scripts/station/station.gd` usa o idle para moradores andando/parados, `seat` na Cantina,
 `sleep` no Dormitório/recuperação e `work` nos postos específicos dos fundadores. Não existe necessidade comprovada
 de gerar uma sequência de caminhada só para esta skin.
 
-Depois que Lucas aprovar cada roupa, levantar a cobertura real por personagem e sala, reaproveitando apenas os
-encaixes necessários. O lobby usa âncoras diferentes por pose; não copiar a âncora do idle para sentado ou deitado.
+Os figurinos iniciais já foram aprovados, liberando o levantamento das poses de lobby desses modelos.
+As versões femininas novas aguardam confirmação visual antes de produzir suas poses. Levantar a cobertura real
+por personagem e sala, reaproveitando apenas os encaixes necessários. O lobby usa âncoras diferentes por pose;
+não copiar a âncora do idle para sentado ou deitado.
 Não fazer ataques, habilidade, combate, item ou acampamento de expedição para estas roupas.
 
 ## Formato e limites desta etapa
 
-As três pranchas são **conceitos com fundo**, não sprites com alfa. A postura de pé serve apenas para comparar
+As pranchas são **conceitos com fundo**, não sprites com alfa. A postura de pé serve apenas para comparar
 figurinos; não é um novo idle pronto para o jogo. A escala entre figuras é ilustrativa: não usar a prancha para
 extrair âncoras ou calcular alturas. As proporções e a escala finais serão conferidas com os corpos canônicos.
 
@@ -91,14 +127,14 @@ As imagens não contêm nomes nem textos gravados. Os nomes e decisões ficam ne
 e em cinza para conferir a separação das silhuetas sem depender de cores. Tamanhos e hashes estão em
 [assets.json](lobby_outfits/assets.json).
 
-Como esta etapa está explicitamente bloqueada antes das poses, não há sprites recortados, margens de 9-slice,
-âncoras novas ou captura de troca de roupa dentro da Godot. Não se apresenta uma montagem como prova de integração.
+Como este PR reúne apenas conceitos e o complemento feminino ainda depende de aprovação, não há sprites
+recortados, margens de 9-slice, âncoras novas ou captura de troca de roupa dentro da Godot. Não se apresenta uma montagem como prova de integração.
 O antes/depois no jogo será exigido no pacote de poses após a aprovação, na mesma câmera e na mesma escala.
 
 ## QA de conceito
 
 A QA aplica [qa.md](qa.md) ao escopo de aprovação de figurino. Não aprova integração, alfa ou âncoras que ainda
-não foram produzidos. O aceite artístico do Lucas permanece pendente mesmo com a conferência técnica concluída.
+não foram produzidos. O aceite artístico dos figurinos iniciais foi recebido; o das novas versões femininas continua pendente.
 
 ### Rodada 1 — VEREDITO: REPROVADO
 
@@ -131,7 +167,7 @@ usa um pequeno pano nos tornozelos; Lucas pode pedir sua remoção junto com os 
 Conferidas novamente as duas corujas com os originais e com a Véspera segurando o livro: dois braços com
 cotovelos/antebraços e duas mãos visíveis, sem os painéis de penas que os escondiam. As mãos continuam legíveis
 a 40% e em cinza. Figurinos e identidades dos demais personagens mantidos. Sem problemas altos ou médios no
-escopo do conceito; a aprovação artística do Lucas continua pendente.
+escopo do conceito. **Lucas aprovou estes figurinos no chat após esta correção.**
 
 A correção continua restrita ao figurino ilustrado de pé. Não há novas poses de produção.
 
@@ -139,16 +175,51 @@ A entrega não modifica código nem arte de produção. A suíte completa já pa
 (92/92, incluindo paridade 48/48); não foi repetida para estes documentos. As imagens, hashes e dimensões
 foram verificados separadamente.
 
+## QA do complemento feminino
+
+Este complemento tem seu próprio ciclo de conferência; as quatro rodadas anteriores documentam os figurinos
+iniciais, já aprovados pelo Lucas.
+
+### Rodada 1 — VEREDITO: REPROVADO
+
+- **Média, `frog_owl_variants.webp`:** o corte do colete da coruja fêmea sugeria um busto de mamífera e a diferença
+  do sapo se apoiava demais na redução de altura. Sugestão: peito sem seios nas duas espécies; diferenciar
+  face/marcações e corte/caimento, com altura comparável no par. Corrigido no refinamento.
+
+### Rodada 2 — VEREDITO: REPROVADO
+
+- **Média, `frog_owl_variants.webp`:** ainda havia sombreamento arredondado duplo na camisa da sapo. Corrigir
+  apenas a frente da camisa para um caimento reto e solto, sem sugerir seios. Braços/mãos das corujas corretos.
+
+### Rodada 3 — VEREDITO: APROVADO para revisão de figurino
+
+Conferidos seis pares com mãos/pés completos, roupa confortável sem equipamento e identidades de espécie;
+corujas com braços articulados e mãos visíveis; sapo/coruja sem seios, com a frente da camisa da sapo reta e solta.
+Verificadas reduções reais a 40% e em cinza, dimensões e hashes dos seis PNG e das pranchas WebP. Os três PNG e
+WebP dos figurinos já aprovados continuam idênticos à r2. Sem problemas altos ou médios neste escopo.
+
+Observação baixa: em sapo/coruja as diferenças são intencionalmente mais sutis; a legenda identifica os pares.
+Lucas deve confirmar se rosto/marcações e corte da roupa distinguem o suficiente antes das poses. As alturas
+na ilustração são aproximadas, não valores para integração. O aceite artístico das seis fêmeas ainda está pendente.
+
+Não foram produzidos ataques, retratos novos ou poses de trabalho, sentado ou deitado destas variações.
+
 ## Fontes e pranchas pequenas
 
-As três imagens PNG de conceito ficam fora da main, na tag `codex-pr244-originals-r2`, pasta
-`art/combat/source/lobby_outfits_20261028/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr244-originals-r2) e
-[ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr244-originals-r2.zip). Nenhum desses PNG é origem
-pronta para conversão direta em pose do jogo. A tag anterior `codex-pr244-originals` permanece como histórico;
-esta revisão a substitui para a avaliação das roupas.
+As imagens PNG de conceito ficam fora da main, na tag `codex-pr244-originals-r3`, pasta
+`art/combat/source/lobby_outfits_20261028/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr244-originals-r3) e
+[ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr244-originals-r3.zip). Nenhum desses PNG é origem
+pronta para conversão direta em pose do jogo. As tags anteriores `codex-pr244-originals` e `codex-pr244-originals-r2` permanecem como histórico;
+a revisão r3 acrescenta o complemento feminino sem reescrever os originais aprovados.
 
 | Grupo | 40% | Cinza a 40% |
 | --- | --- | --- |
 | Fundadores | [Cor](lobby_outfits/founders_40.webp) | [Cinza](lobby_outfits/founders_gray_40.webp) |
 | Recrutas | [Cor](lobby_outfits/recruits_40.webp) | [Cinza](lobby_outfits/recruits_gray_40.webp) |
 | Guaxinim/Tatu | [Cor](lobby_outfits/raccoon_armadillo_40.webp) | [Cinza](lobby_outfits/raccoon_armadillo_gray_40.webp) |
+
+| Complemento | 40% | Cinza a 40% |
+| --- | --- | --- |
+| Cão/gato M–F | [Cor](lobby_outfits/dog_cat_variants_40.webp) | [Cinza](lobby_outfits/dog_cat_variants_gray_40.webp) |
+| Sapo/coruja M–F | [Cor](lobby_outfits/frog_owl_variants_40.webp) | [Cinza](lobby_outfits/frog_owl_variants_gray_40.webp) |
+| Guaxinim/Tatu M–F | [Cor](lobby_outfits/raccoon_armadillo_variants_40.webp) | [Cinza](lobby_outfits/raccoon_armadillo_variants_gray_40.webp) |
