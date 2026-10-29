@@ -79,3 +79,9 @@ Os resultados verticais antigos não representam o formato final e foram substit
 - QA da última revisão: exportação horizontal de 1 segundo/30 quadros, 155.953 bytes; controles móveis desabilitados durante a geração e restaurados ao final. Sem pageerrors. **VEREDITO: APROVADO**.
 
 Suíte completa após a correção horizontal: **92/92 testes passaram**, saída 0, em 788.757 ms; paridade 48/48 preservada. Perfil isolado e log local `outputs/godot_landscape_tests.log`, ignorado. Testes do app 6/6 e QA independente aprovados. Nenhum arquivo da história, arte ou jogo foi alterado.
+
+## Integração do gerador — 29/10/2026
+
+A autorização original do Lucas para a pasta, o código do gerador e a tirinha provisória foi registrada em AGENTS.md. Isso não altera o cânone nem reescreve o exemplo. O bloqueio funcional de misturar recuperações ao trocar o default foi corrigido: chave por caminho canônico, aliases equivalentes e metadado de propriedade do legado, com cópia de current/previous sem apagar bases antigas. Legado ambíguo exige recuperação explícita com backup e continua disponível após salvar/reabrir.
+
+QA independente: **VEREDITO: APROVADO**, zero pageerrors; default B clonado com mesmos IDs/metadado herdado não absorve A, A recupera seu estado, URLs equivalentes compartilham recuperação, salvar/importar/reabrir e a retenção do legado funcionam. `npm run check`: **7/7**. Não se repetiu a suíte Godot local para esta correção isolada; nenhum script, dado ou asset de produção do jogo foi alterado, e o CI do PR continua validando o jogo.

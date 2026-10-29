@@ -91,3 +91,11 @@ Formato opcional no manifesto da cena (posições de 0 a 1):
 ```
 
 Cenas sem esse campo usam esses valores padrão na versão horizontal de celular. A exportação original ignora o campo.
+
+## Recuperação por história
+
+O salvamento usa o caminho canônico do manifesto, mesmo quando aberto como história padrão, URL absoluta ou caminho com `./`. Trocar `config/default_story.json` não mistura as edições de histórias diferentes. Projetos importados continuam isolados por UUID.
+
+A compatibilidade com a antiga base `:default` pertence somente ao exemplo original, declarada em `legacyRecovery` com caminho proprietário. Copiar esse manifesto para outro caminho não transfere a propriedade do salvamento antigo. A migração copia `current` e `previous` apenas quando encontra identidade de cena compatível; nenhuma base antiga é apagada. Se houver ambiguidade, o menu **Recuperação → Recuperar projeto antigo (faz backup)** oferece acesso explícito e mantém essa opção mesmo após novos salvamentos.
+
+Edições locais da mesma história continuam tendo prioridade sobre o arquivo no disco. Para carregar uma atualização do disco, use **Abrir tirinha entregue (faz backup)**. As notas editoriais originais podem conservar referências de produção antigas; elas não são dependências de execução. Foram retirados o histórico de artes e o campo `referenceId`, preservando as notas.

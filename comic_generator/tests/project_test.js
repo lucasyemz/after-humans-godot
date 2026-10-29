@@ -66,3 +66,15 @@ test('mobile text fits safe areas without dropping characters at maximum length'
  for(const panel of Object.values(panels)){assert.ok(panel.top>=720*.035);assert.ok(panel.top+panel.height<=720*.965+1e-8);assert.ok(panel.left>=0&&panel.left+panel.width<=1280);assert.ok(panel.fontSize<=panel.requestedSize);}
  assert.equal(panels.speech.lines.join(''),speech);assert.equal(panels.caption.lines.join(''),caption);assert.ok(panels.speech.top+panels.speech.height<panels.caption.top);
 });
+
+import {canonicalStoryKey,declaredLegacyKeys,legacyNames,matchesStory} from '../src/recovery_keys.js';
+test('recovery uses canonical story identity and legacy ownership',()=>{
+ const base='http://localhost:8766/',path='stories/bento_loss/story.json';
+ assert.equal(canonicalStoryKey('./'+path,base),path);assert.equal(canonicalStoryKey(base+path,base),path);
+ const story={scenes:[{id:'original'}],legacyRecovery:{story:path,keys:['default']}};
+ assert.deepEqual(declaredLegacyKeys(story,path,base),['default']);
+ assert.deepEqual(declaredLegacyKeys(story,'stories/new_story/story.json',base),[]);
+ const snapshot={format:'motion-comic-project',version:1,scenes:[{id:'original'},{id:'new-edit'}]};
+ assert.equal(matchesStory(snapshot,story),true);assert.equal(matchesStory({...snapshot,scenes:[{id:'unrelated'}]},story),false);
+ const current='comic_generator:/:'+path;assert.ok(!legacyNames('/',[path,'default'],current).includes(current));assert.ok(legacyNames('/',[path,'default'],current).includes('comic_generator:/:default'));
+});

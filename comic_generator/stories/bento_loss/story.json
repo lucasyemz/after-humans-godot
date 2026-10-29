@@ -3381,5 +3381,11 @@
       "name": "image_38.webp",
       "path": "assets/image_38.webp"
     }
+  },
+  "legacyRecovery": {
+    "story": "stories/bento_loss/story.json",
+    "keys": [
+      "default"
+    ]
   }
 }
