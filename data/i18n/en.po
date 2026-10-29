@@ -8,13 +8,13 @@ msgstr ""
 
 #: scripts/ui/title_screen.gd:101
 #: scripts/ui/cargo_picker.gd:58
-#: scripts/ui/exploration_hud.gd:335
-#: scripts/ui/exploration_hud.gd:1321
+#: scripts/ui/exploration_hud.gd:337
+#: scripts/ui/exploration_hud.gd:1341
 msgid "Continuar"
 msgstr "Continue"
 
 #: scripts/ui/title_screen.gd:104
-#: scripts/ui/exploration_hud.gd:1503
+#: scripts/ui/exploration_hud.gd:1523
 #: scripts/ui/refuge_hud.gd:1812
 msgid "Nova campanha"
 msgstr "New campaign"
@@ -27,7 +27,7 @@ msgstr "Campaigns"
 #: scripts/ui/title_screen.gd:109
 #: scripts/ui/title_screen.gd:620
 #: scripts/ui/options_panel.gd:46
-#: scripts/ui/exploration_hud.gd:1500
+#: scripts/ui/exploration_hud.gd:1520
 msgid "Opções"
 msgstr "Options"
 
@@ -53,8 +53,8 @@ msgstr "Confirm"
 
 #: scripts/ui/title_screen.gd:125
 #: scripts/ui/title_screen.gd:349
-#: scripts/ui/exploration_hud.gd:858
-#: scripts/ui/exploration_hud.gd:1321
+#: scripts/ui/exploration_hud.gd:878
+#: scripts/ui/exploration_hud.gd:1341
 msgid "%s / A"
 msgstr "%s / A"
 
@@ -65,7 +65,7 @@ msgid "Espaço %d"
 msgstr "Slot %d"
 
 #: scripts/ui/title_screen.gd:179
-#: scripts/flow/game_flow.gd:71
+#: scripts/flow/game_flow.gd:75
 msgid "Ciclo %d"
 msgstr "Cycle %d"
 
@@ -136,7 +136,7 @@ msgid " · em expedição"
 msgstr " · on an expedition"
 
 #: scripts/ui/title_screen.gd:502
-#: scripts/ui/exploration_hud.gd:1673
+#: scripts/ui/exploration_hud.gd:1693
 msgid "Começar uma campanha nova?"
 msgstr "Start a new campaign?"
 
@@ -149,14 +149,14 @@ msgid "O save do espaço %d não pôde ser aberto. Uma campanha nova grava por c
 msgstr "The save in slot %d could not be opened. A new campaign writes over it, and it won't come back."
 
 #: scripts/ui/title_screen.gd:514
-#: scripts/ui/exploration_hud.gd:1675
+#: scripts/ui/exploration_hud.gd:1695
 #: scripts/ui/refuge_hud.gd:1817
 #: scripts/ui/station/character_room.gd:896
 msgid "Cancelar"
 msgstr "Cancel"
 
 #: scripts/ui/title_screen.gd:523
-#: scripts/ui/exploration_hud.gd:1677
+#: scripts/ui/exploration_hud.gd:1697
 #: scripts/ui/refuge_hud.gd:1818
 msgid "Começar do zero"
 msgstr "Start from scratch"
@@ -188,8 +188,8 @@ msgstr "Change"
 
 #: scripts/ui/title_screen.gd:644
 #: scripts/ui/options_panel.gd:146
-#: scripts/ui/exploration_hud.gd:339
-#: scripts/ui/exploration_hud.gd:770
+#: scripts/ui/exploration_hud.gd:341
+#: scripts/ui/exploration_hud.gd:790
 msgid "Fechar"
 msgstr "Close"
 
@@ -314,7 +314,7 @@ msgstr "That upgrade is not for this species."
 
 #: scripts/ui/briefing_dialog.gd:108
 #: scripts/ui/briefing_dialog.gd:172
-#: scripts/ui/passage_card.gd:270
+#: scripts/ui/passage_card.gd:276
 msgid "Pular"
 msgstr "Skip"
 
@@ -395,39 +395,39 @@ msgid "%s ×%d"
 msgstr "%s ×%d"
 
 #: scripts/ui/character_sheet.gd:282
-#: scripts/ui/combat_hud.gd:1201
+#: scripts/ui/combat_hud.gd:1208
 #: scripts/ui/inventory_panel.gd:314
 msgid "Vida %d/%d"
 msgstr "Health %d/%d"
 
 #: scripts/ui/character_sheet.gd:285
 #: scripts/ui/camp_hud.gd:333
-#: scripts/ui/combat_hud.gd:1206
+#: scripts/ui/combat_hud.gd:1213
 msgid "Instinto %d/200"
 msgstr "Instinct %d/200"
 
 #: scripts/ui/character_sheet.gd:287
 #: scripts/ui/character_sheet.gd:301
-#: scripts/ui/combat_hud.gd:1160
+#: scripts/ui/combat_hud.gd:1167
 msgid "Efeitos passivos"
 msgstr "Passive effects"
 
 #: scripts/ui/character_sheet.gd:287
 #: scripts/ui/character_sheet.gd:301
-#: scripts/ui/combat_hud.gd:1160
+#: scripts/ui/combat_hud.gd:1167
 #: scripts/ui/station/character_room.gd:633
 msgid "Nenhum"
 msgstr "None"
 
 #: scripts/ui/character_sheet.gd:288
 #: scripts/ui/character_sheet.gd:302
-#: scripts/ui/combat_hud.gd:1161
+#: scripts/ui/combat_hud.gd:1168
 msgid "Estados"
 msgstr "Conditions"
 
 #: scripts/ui/character_sheet.gd:288
 #: scripts/ui/character_sheet.gd:302
-#: scripts/ui/combat_hud.gd:1161
+#: scripts/ui/combat_hud.gd:1168
 msgid "Nenhum agora"
 msgstr "None right now"
 
@@ -437,7 +437,7 @@ msgid "Instinto %d/200 · em 200, crise"
 msgstr "Instinct %d/200 · at 200, crisis"
 
 #: scripts/ui/character_sheet.gd:308
-#: scripts/ui/combat_hud.gd:1210
+#: scripts/ui/combat_hud.gd:1217
 #: scripts/ui/station/character_room.gd:459
 msgid "Velocidade %d"
 msgstr "Speed %d"
@@ -467,31 +467,31 @@ msgid "Para a frente"
 msgstr "Move forward"
 
 #: scripts/ui/options_panel.gd:18
-#: scripts/ui/exploration_hud.gd:256
+#: scripts/ui/exploration_hud.gd:258
 msgid "Correr"
 msgstr "Run"
 
 #: scripts/ui/options_panel.gd:18
-#: scripts/ui/exploration_hud.gd:256
+#: scripts/ui/exploration_hud.gd:258
 msgid "Interagir"
 msgstr "Interact"
 
 #: scripts/ui/options_panel.gd:18
-#: scripts/ui/exploration_hud.gd:261
+#: scripts/ui/exploration_hud.gd:263
 #: scripts/ui/combat_hud.gd:66
-#: scripts/ui/combat_hud.gd:2004
+#: scripts/ui/combat_hud.gd:2062
 msgid "Mochila"
 msgstr "Backpack"
 
 #: scripts/ui/options_panel.gd:18
-#: scripts/ui/exploration_hud.gd:263
-#: scripts/ui/exploration_hud.gd:757
+#: scripts/ui/exploration_hud.gd:265
+#: scripts/ui/exploration_hud.gd:777
 msgid "Formação"
 msgstr "Formation"
 
 #: scripts/ui/options_panel.gd:18
-#: scripts/ui/exploration_hud.gd:259
-#: scripts/ui/exploration_hud.gd:260
+#: scripts/ui/exploration_hud.gd:261
+#: scripts/ui/exploration_hud.gd:262
 #: scripts/ui/refuge_hud.gd:584
 msgid "Menu"
 msgstr "Menu"
@@ -641,7 +641,7 @@ msgid "Aperte uma tecla…"
 msgstr "Press a key…"
 
 #: scripts/ui/options_panel.gd:121
-#: scripts/ui/exploration_hud.gd:770
+#: scripts/ui/exploration_hud.gd:790
 #: scripts/ui/station/character_room.gd:736
 msgid "Trocar"
 msgstr "Change"
@@ -726,438 +726,442 @@ msgstr "Português"
 msgid "English (em teste)"
 msgstr "English (beta)"
 
-#: scripts/ui/exploration_hud.gd:30
+#: scripts/ui/exploration_hud.gd:32
 #: scripts/ui/refuge_hud.gd:542
 msgid "Partida"
 msgstr "Start"
 
-#: scripts/ui/exploration_hud.gd:30
+#: scripts/ui/exploration_hud.gd:32
 msgid "Patrulha"
 msgstr "Patrol"
 
-#: scripts/ui/exploration_hud.gd:30
+#: scripts/ui/exploration_hud.gd:32
 #: scripts/ui/refuge_hud.gd:2141
 #: scripts/ui/refuge_hud.gd:2204
 #: scripts/ui/station/station_report.gd:28
 msgid "Suprimentos"
 msgstr "Supplies"
 
-#: scripts/ui/exploration_hud.gd:30
+#: scripts/ui/exploration_hud.gd:32
 msgid "Descanso"
 msgstr "Rest"
 
-#: scripts/ui/exploration_hud.gd:30
+#: scripts/ui/exploration_hud.gd:32
 msgid "Passagem"
 msgstr "Passage"
 
-#: scripts/ui/exploration_hud.gd:31
+#: scripts/ui/exploration_hud.gd:33
 msgid "Guardião"
 msgstr "Guardian"
 
-#: scripts/ui/exploration_hud.gd:31
+#: scripts/ui/exploration_hud.gd:33
 msgid "Encontro"
 msgstr "Encounter"
 
-#: scripts/ui/exploration_hud.gd:31
+#: scripts/ui/exploration_hud.gd:33
 msgid "Trem"
 msgstr "Train"
 
-#: scripts/ui/exploration_hud.gd:36
-#: scripts/ui/exploration_hud.gd:483
-#: scripts/ui/exploration_hud.gd:1730
-#: scripts/ui/exploration_hud.gd:1732
+#: scripts/ui/exploration_hud.gd:38
+#: scripts/ui/exploration_hud.gd:485
+#: scripts/ui/exploration_hud.gd:1750
+#: scripts/ui/exploration_hud.gd:1752
 msgid "Rua das Vitrines"
 msgstr "Shopfront Street"
 
-#: scripts/ui/exploration_hud.gd:173
-#: scripts/ui/exploration_hud.gd:492
+#: scripts/ui/exploration_hud.gd:175
+#: scripts/ui/exploration_hud.gd:494
 msgid "Objetivo da rota"
 msgstr "Route goal"
 
-#: scripts/ui/exploration_hud.gd:240
+#: scripts/ui/exploration_hud.gd:242
 msgid "Patrulha à frente"
 msgstr "Patrol ahead"
 
-#: scripts/ui/exploration_hud.gd:256
+#: scripts/ui/exploration_hud.gd:258
 msgid "Andar"
 msgstr "Walk"
 
-#: scripts/ui/exploration_hud.gd:272
+#: scripts/ui/exploration_hud.gd:274
 msgid "Concluir jornada · Voltar à Estação"
 msgstr "Finish the journey · Back to the Station"
 
-#: scripts/ui/exploration_hud.gd:337
-#: scripts/ui/exploration_hud.gd:770
+#: scripts/ui/exploration_hud.gd:339
+#: scripts/ui/exploration_hud.gd:790
 #: scripts/ui/camp_hud.gd:155
 #: scripts/ui/station/departure_screen.gd:580
 msgid "Escolher"
 msgstr "Choose"
 
-#: scripts/ui/exploration_hud.gd:444
+#: scripts/ui/exploration_hud.gd:446
 msgid "Abertura"
 msgstr "Opening"
 
-#: scripts/ui/exploration_hud.gd:444
+#: scripts/ui/exploration_hud.gd:446
 msgid "Jornada %d"
 msgstr "Journey %d"
 
-#: scripts/ui/exploration_hud.gd:472
+#: scripts/ui/exploration_hud.gd:474
 msgid "Chegar ao trem (trecho %d)"
 msgstr "Reach the train (stretch %d)"
 
-#: scripts/ui/exploration_hud.gd:473
+#: scripts/ui/exploration_hud.gd:475
 msgid "A porta da contenção baixa atrás da equipe. A saída é a plataforma."
 msgstr "The containment door slams shut behind the team. The way out is the platform."
 
-#: scripts/ui/exploration_hud.gd:475
+#: scripts/ui/exploration_hud.gd:477
 msgid "Vencer o guardião (trecho %d)"
 msgstr "Defeat the guardian (stretch %d)"
 
-#: scripts/ui/exploration_hud.gd:476
+#: scripts/ui/exploration_hud.gd:478
 msgid "Rota básica: o achado das buscas volta com a equipe."
 msgstr "Basic route: what the searches find comes back with the team."
 
-#: scripts/ui/exploration_hud.gd:478
+#: scripts/ui/exploration_hud.gd:480
 msgid "%s: cumprido"
 msgstr "%s: done"
 
-#: scripts/ui/exploration_hud.gd:479
+#: scripts/ui/exploration_hud.gd:481
 msgid "%s, entregue na volta. O guardião espera no trecho %d."
 msgstr "%s, delivered on the way back. The guardian waits at stretch %d."
 
-#: scripts/ui/exploration_hud.gd:483
+#: scripts/ui/exploration_hud.gd:485
 msgid "Procure nas casas e nos caixotes."
 msgstr "Search the houses and the crates."
 
-#: scripts/ui/exploration_hud.gd:483
+#: scripts/ui/exploration_hud.gd:485
 msgid "Procure nos objetos marcados do caminho."
 msgstr "Search the marked objects along the way."
 
-#: scripts/ui/exploration_hud.gd:484
+#: scripts/ui/exploration_hud.gd:486
 msgid " O guardião espera no trecho %d."
 msgstr " The guardian waits at stretch %d."
 
-#: scripts/ui/exploration_hud.gd:486
-#: scripts/ui/exploration_hud.gd:616
+#: scripts/ui/exploration_hud.gd:488
+#: scripts/ui/exploration_hud.gd:618
 msgid "Guardião vencido"
 msgstr "Guardian defeated"
 
-#: scripts/ui/exploration_hud.gd:488
+#: scripts/ui/exploration_hud.gd:490
 msgid "Abra um compartimento da carga do guardião antes de voltar."
 msgstr "Open one of the guardian's cargo compartments before heading back."
 
-#: scripts/ui/exploration_hud.gd:489
+#: scripts/ui/exploration_hud.gd:491
 msgid "Fase concluída: volte à Estação com todo o achado pelo Menu (%s)."
 msgstr "Stage cleared: return to the Station with all the finds through the Menu (%s)."
 
-#: scripts/ui/exploration_hud.gd:492
+#: scripts/ui/exploration_hud.gd:494
 msgid "Objetivo cumprido"
 msgstr "Goal done"
 
-#: scripts/ui/exploration_hud.gd:511
-#: scripts/ui/exploration_hud.gd:1475
+#: scripts/ui/exploration_hud.gd:513
+#: scripts/ui/exploration_hud.gd:1495
 msgid "Trecho %d de %d · %s"
 msgstr "Stretch %d of %d · %s"
 
-#: scripts/ui/exploration_hud.gd:514
+#: scripts/ui/exploration_hud.gd:516
 msgid "Dentro %s"
 msgstr "Inside %s"
 
-#: scripts/ui/exploration_hud.gd:514
+#: scripts/ui/exploration_hud.gd:516
 msgid "do cinema"
 msgstr "the cinema"
 
-#: scripts/ui/exploration_hud.gd:514
+#: scripts/ui/exploration_hud.gd:516
 msgid "da "
 msgstr "the "
 
-#: scripts/ui/exploration_hud.gd:532
+#: scripts/ui/exploration_hud.gd:534
 #: scripts/ui/station/departure_screen.gd:619
 #: scripts/ui/inventory_panel.gd:137
 msgid "Comida"
 msgstr "Food"
 
-#: scripts/ui/exploration_hud.gd:533
+#: scripts/ui/exploration_hud.gd:535
 msgid "Da expedição: cura (Mochila, I) e o acampamento. O que sobrar não volta."
 msgstr "Expedition food: heals (Backpack, I) and feeds the camp. Leftovers don't come back."
 
-#: scripts/ui/exploration_hud.gd:534
+#: scripts/ui/exploration_hud.gd:536
 #: scripts/ui/refuge_hud.gd:2223
 msgid "Curativos"
 msgstr "Bandages"
 
-#: scripts/ui/exploration_hud.gd:534
+#: scripts/ui/exploration_hud.gd:536
 msgid "Do refúgio: +8 de vida. Voltam ao refúgio."
 msgstr "From the shelter: +8 health. They go back to the shelter."
 
-#: scripts/ui/exploration_hud.gd:535
+#: scripts/ui/exploration_hud.gd:537
 msgid "Esperança"
 msgstr "Hope"
 
-#: scripts/ui/exploration_hud.gd:536
+#: scripts/ui/exploration_hud.gd:538
 msgid "O ânimo da equipe: alto, a crise de instinto tende à superação; baixo, ao colapso."
 msgstr "The team's morale: high, an instinct crisis leans toward a breakthrough; low, toward a collapse."
 
-#: scripts/ui/exploration_hud.gd:540
+#: scripts/ui/exploration_hud.gd:542
 msgid "Achado da jornada: sementes, sucata, fragmentos e suprimentos. Tudo chega com a fase concluída; metade, na retirada."
 msgstr "What the journey found: seeds, scrap, fragments and supplies. All of it arrives when the phase is complete; half on a retreat."
 
-#: scripts/ui/exploration_hud.gd:546
+#: scripts/ui/exploration_hud.gd:548
 msgid "Achado"
 msgstr "Found"
 
-#: scripts/ui/exploration_hud.gd:574
+#: scripts/ui/exploration_hud.gd:576
 msgid "A equipe carrega: %s"
 msgstr "The team is carrying: %s"
 
-#: scripts/ui/exploration_hud.gd:758
+#: scripts/ui/exploration_hud.gd:660
+msgid "Precisa se recuperar"
+msgstr "Needs to recover"
+
+#: scripts/ui/exploration_hud.gd:778
 msgid "da frente para trás · escolha dois para trocar"
 msgstr "front to back · pick two to swap"
 
-#: scripts/ui/exploration_hud.gd:762
+#: scripts/ui/exploration_hud.gd:782
 msgid "Troca %s e %s de lugar"
 msgstr "Swaps %s and %s"
 
-#: scripts/ui/exploration_hud.gd:762
+#: scripts/ui/exploration_hud.gd:782
 msgid "%s troca %s e %s de lugar"
 msgstr "%s swaps %s and %s"
 
-#: scripts/ui/exploration_hud.gd:764
+#: scripts/ui/exploration_hud.gd:784
 msgid "Trocar %s com quem? Escolha o outro"
 msgstr "Swap %s with whom? Pick the other one"
 
-#: scripts/ui/exploration_hud.gd:930
+#: scripts/ui/exploration_hud.gd:950
 msgid "avistou a equipe!"
 msgstr "spotted the team!"
 
-#: scripts/ui/exploration_hud.gd:930
+#: scripts/ui/exploration_hud.gd:950
 msgid "desconfiada"
 msgstr "suspicious"
 
-#: scripts/ui/exploration_hud.gd:930
+#: scripts/ui/exploration_hud.gd:950
 msgid "não viu a equipe"
 msgstr "hasn't seen the team"
 
-#: scripts/ui/exploration_hud.gd:1049
+#: scripts/ui/exploration_hud.gd:1069
 msgid "Ferramenta nova"
 msgstr "New tool"
 
-#: scripts/ui/exploration_hud.gd:1056
+#: scripts/ui/exploration_hud.gd:1076
 msgid "Fica na Mochila."
 msgstr "It stays in the Backpack."
 
-#: scripts/ui/exploration_hud.gd:1056
+#: scripts/ui/exploration_hud.gd:1076
 msgid "Fica na Mochila (%s)."
 msgstr "It stays in the Backpack (%s)."
 
-#: scripts/ui/exploration_hud.gd:1255
+#: scripts/ui/exploration_hud.gd:1275
 msgid "+ %s"
 msgstr "+ %s"
 
-#: scripts/ui/exploration_hud.gd:1255
+#: scripts/ui/exploration_hud.gd:1275
 msgid "- %s"
 msgstr "- %s"
 
-#: scripts/ui/exploration_hud.gd:1258
+#: scripts/ui/exploration_hud.gd:1278
 msgid "%+d de vida"
 msgstr "%+d life"
 
-#: scripts/ui/exploration_hud.gd:1259
+#: scripts/ui/exploration_hud.gd:1279
 msgid "%+d de Esperança"
 msgstr "%+d Hope"
 
-#: scripts/ui/exploration_hud.gd:1260
+#: scripts/ui/exploration_hud.gd:1280
 msgid "%+d Comida"
 msgstr "%+d Food"
 
-#: scripts/ui/exploration_hud.gd:1261
+#: scripts/ui/exploration_hud.gd:1281
 msgid "%+d Curativos"
 msgstr "%+d Bandages"
 
-#: scripts/ui/exploration_hud.gd:1262
+#: scripts/ui/exploration_hud.gd:1282
 msgid "%+d Sucata"
 msgstr "%+d Scrap"
 
-#: scripts/ui/exploration_hud.gd:1263
+#: scripts/ui/exploration_hud.gd:1283
 msgid "%+d Fragmentos"
 msgstr "%+d Fragments"
 
-#: scripts/ui/exploration_hud.gd:1264
+#: scripts/ui/exploration_hud.gd:1284
 msgid "%+d Sementes"
 msgstr "%+d Seeds"
 
-#: scripts/ui/exploration_hud.gd:1265
+#: scripts/ui/exploration_hud.gd:1285
 msgid "%+d de Instinto"
 msgstr "%+d Instinct"
 
-#: scripts/ui/exploration_hud.gd:1299
+#: scripts/ui/exploration_hud.gd:1319
 msgid "Ao vasculhar: %s"
 msgstr "While searching: %s"
 
-#: scripts/ui/exploration_hud.gd:1374
+#: scripts/ui/exploration_hud.gd:1394
 #. events.busca_choro_porta.arrombar_ombro.RequirementText
 #. events.busca_poco_escuro.descer_escuro.RequirementText
 #. events.busca_sala_esporos.prender_folego.RequirementText
 msgid "Arriscado"
 msgstr "Risky"
 
-#: scripts/ui/exploration_hud.gd:1468
+#: scripts/ui/exploration_hud.gd:1488
 msgid "Menu da expedição"
 msgstr "Expedition menu"
 
-#: scripts/ui/exploration_hud.gd:1490
+#: scripts/ui/exploration_hud.gd:1510
 msgid "Fase concluída: todo o achado"
 msgstr "Stage complete: all the finds"
 
-#: scripts/ui/exploration_hud.gd:1490
+#: scripts/ui/exploration_hud.gd:1510
 #: scripts/ui/station/station_report.gd:262
 msgid "Retirada: metade do achado"
 msgstr "Retreat: half the haul"
 
-#: scripts/ui/exploration_hud.gd:1491
+#: scripts/ui/exploration_hud.gd:1511
 msgid "Termine a luta ou o evento antes de voltar."
 msgstr "Finish the fight or the event before going back."
 
-#: scripts/ui/exploration_hud.gd:1492
-#: scripts/ui/exploration_hud.gd:1714
+#: scripts/ui/exploration_hud.gd:1512
+#: scripts/ui/exploration_hud.gd:1734
 #: scripts/ui/phase_map.gd:169
-#: scripts/street/street_corridor.gd:1834
+#: scripts/street/street_corridor.gd:1881
 msgid "Voltar à Estação"
 msgstr "Back to the Station"
 
-#: scripts/ui/exploration_hud.gd:1513
-#: scripts/ui/exploration_hud.gd:1675
-#: scripts/ui/exploration_hud.gd:1711
+#: scripts/ui/exploration_hud.gd:1533
+#: scripts/ui/exploration_hud.gd:1695
+#: scripts/ui/exploration_hud.gd:1731
 #: scripts/ui/inventory_panel.gd:69
 msgid "%s / B"
 msgstr "%s / B"
 
-#: scripts/ui/exploration_hud.gd:1615
+#: scripts/ui/exploration_hud.gd:1635
 msgid "Comida %d/%d"
 msgstr "Food %d/%d"
 
-#: scripts/ui/exploration_hud.gd:1616
+#: scripts/ui/exploration_hud.gd:1636
 msgid "Curativos %d"
 msgstr "Bandages %d"
 
-#: scripts/ui/exploration_hud.gd:1617
-#: scripts/ui/exploration_hud.gd:1740
+#: scripts/ui/exploration_hud.gd:1637
+#: scripts/ui/exploration_hud.gd:1760
 #: scripts/ui/refuge_hud.gd:1591
 #: scripts/ui/station/character_room.gd:679
 msgid "%d sementes"
 msgstr "%d seeds"
 
-#: scripts/ui/exploration_hud.gd:1618
-#: scripts/ui/exploration_hud.gd:1741
+#: scripts/ui/exploration_hud.gd:1638
+#: scripts/ui/exploration_hud.gd:1761
 msgid "%d sucata"
 msgstr "%d scrap"
 
-#: scripts/ui/exploration_hud.gd:1619
-#: scripts/ui/exploration_hud.gd:1742
+#: scripts/ui/exploration_hud.gd:1639
+#: scripts/ui/exploration_hud.gd:1762
 msgid "%d fragmentos"
 msgstr "%d fragments"
 
-#: scripts/ui/exploration_hud.gd:1674
+#: scripts/ui/exploration_hud.gd:1694
 msgid "A expedição e todo o progresso salvo no espaço %d são substituídos por uma campanha do zero, na Estação. Os outros espaços ficam como estão."
 msgstr "The expedition and all progress saved in slot %d are replaced by a fresh campaign, at the Station. The other slots stay as they are."
 
-#: scripts/ui/exploration_hud.gd:1705
+#: scripts/ui/exploration_hud.gd:1725
 msgid "Abandonar a expedição?"
 msgstr "Abandon the expedition?"
 
-#: scripts/ui/exploration_hud.gd:1706
+#: scripts/ui/exploration_hud.gd:1726
 msgid "A equipe volta pelo trem sem enfrentar o guardião: só metade do achado chega à Estação."
 msgstr "The team takes the train back without facing the guardian: only half of what was found reaches the Station."
 
-#: scripts/ui/exploration_hud.gd:1711
+#: scripts/ui/exploration_hud.gd:1731
 msgid "Continuar a expedição"
 msgstr "Continue the expedition"
 
-#: scripts/ui/exploration_hud.gd:1729
-#: scripts/ui/combat_hud.gd:2340
+#: scripts/ui/exploration_hud.gd:1749
+#: scripts/ui/combat_hud.gd:2398
 msgid "Vitória"
 msgstr "Victory"
 
-#: scripts/ui/exploration_hud.gd:1729
+#: scripts/ui/exploration_hud.gd:1749
 msgid "Retirada"
 msgstr "Retreat"
 
-#: scripts/ui/exploration_hud.gd:1729
-#: scripts/ui/combat_hud.gd:2340
+#: scripts/ui/exploration_hud.gd:1749
+#: scripts/ui/combat_hud.gd:2398
 msgid "Fuga"
 msgstr "Escape"
 
-#: scripts/ui/exploration_hud.gd:1729
-#: scripts/ui/combat_hud.gd:2340
+#: scripts/ui/exploration_hud.gd:1749
+#: scripts/ui/combat_hud.gd:2398
 msgid "Derrota"
 msgstr "Defeat"
 
-#: scripts/ui/exploration_hud.gd:1730
+#: scripts/ui/exploration_hud.gd:1750
 msgid "A Rua das Vitrines está liberada."
 msgstr "Shopfront Street is clear."
 
-#: scripts/ui/exploration_hud.gd:1730
+#: scripts/ui/exploration_hud.gd:1750
 msgid "%s: o guardião caiu."
 msgstr "%s: the guardian fell."
 
-#: scripts/ui/exploration_hud.gd:1730
+#: scripts/ui/exploration_hud.gd:1750
 msgid " Todo o achado chega à Estação."
 msgstr " Everything found reaches the Station."
 
-#: scripts/ui/exploration_hud.gd:1731
+#: scripts/ui/exploration_hud.gd:1751
 msgid "A equipe volta antes do guardião: metade do achado chega à Estação."
 msgstr "The team turns back before the guardian: half of what was found reaches the Station."
 
-#: scripts/ui/exploration_hud.gd:1732
+#: scripts/ui/exploration_hud.gd:1752
 msgid "Na fuga, a equipe larga o que carregava."
 msgstr "Fleeing, the team drops what it was carrying."
 
-#: scripts/ui/exploration_hud.gd:1732
+#: scripts/ui/exploration_hud.gd:1752
 msgid "A equipe caiu %s. O achado ficou para trás."
 msgstr "The team fell %s. What was found stayed behind."
 
-#: scripts/ui/exploration_hud.gd:1732
+#: scripts/ui/exploration_hud.gd:1752
 msgid "na rua"
 msgstr "in the street"
 
-#: scripts/ui/exploration_hud.gd:1732
+#: scripts/ui/exploration_hud.gd:1752
 msgid "no caminho"
 msgstr "along the way"
 
-#: scripts/ui/exploration_hud.gd:1736
+#: scripts/ui/exploration_hud.gd:1756
 msgid "Chegou à Estação"
 msgstr "Reached the Station"
 
-#: scripts/ui/exploration_hud.gd:1747
+#: scripts/ui/exploration_hud.gd:1767
 msgid "Toda a equipe voltou de pé."
 msgstr "The whole team came back on its feet."
 
-#: scripts/ui/exploration_hud.gd:1749
-#: scripts/ui/exploration_hud.gd:1749
+#: scripts/ui/exploration_hud.gd:1769
+#: scripts/ui/exploration_hud.gd:1769
 msgid "A equipe carregou: %s"
 msgstr "The team carried: %s"
 
-#: scripts/ui/exploration_hud.gd:1750
+#: scripts/ui/exploration_hud.gd:1770
 msgid "Foi para a Enfermaria: %s"
 msgstr "Went to the Infirmary: %s"
 
-#: scripts/ui/exploration_hud.gd:1750
+#: scripts/ui/exploration_hud.gd:1770
 msgid "Foram para a Enfermaria: %s"
 msgstr "Went to the Infirmary: %s"
 
-#: scripts/ui/exploration_hud.gd:1751
+#: scripts/ui/exploration_hud.gd:1771
 msgid "Foi para o Dormitório, em recuperação: %s"
 msgstr "Went to the Dormitory, recovering: %s"
 
-#: scripts/ui/exploration_hud.gd:1751
+#: scripts/ui/exploration_hud.gd:1771
 msgid "Foram para o Dormitório, em recuperação: %s"
 msgstr "Went to the Dormitory, recovering: %s"
 
-#: scripts/ui/passage_card.gd:265
+#: scripts/ui/passage_card.gd:271
 msgid "Carregando…"
 msgstr "Loading…"
 
-#: scripts/ui/passage_card.gd:267
+#: scripts/ui/passage_card.gd:273
 #: scripts/ui/refuge_hud.gd:777
 msgid "Toque para pular"
 msgstr "Tap to skip"
@@ -1248,19 +1252,19 @@ msgid "%+d instinto"
 msgstr "%+d instinct"
 
 #: scripts/ui/combat_hud.gd:65
-#: scripts/ui/combat_hud.gd:2001
+#: scripts/ui/combat_hud.gd:2059
 msgid "Mover"
 msgstr "Move"
 
 #: scripts/ui/combat_hud.gd:65
-#: scripts/ui/combat_hud.gd:2002
+#: scripts/ui/combat_hud.gd:2060
 #: scripts/combat/combat_engine.gd:1212
 #: scripts/combat/combat_engine.gd:1225
 msgid "Defender"
 msgstr "Defend"
 
 #: scripts/ui/combat_hud.gd:66
-#: scripts/ui/combat_hud.gd:2003
+#: scripts/ui/combat_hud.gd:2061
 msgid "Fugir"
 msgstr "Flee"
 
@@ -1297,246 +1301,246 @@ msgstr "ROUND %d"
 msgid " · Último Fôlego"
 msgstr " · Last Breath"
 
-#: scripts/ui/combat_hud.gd:1090
+#: scripts/ui/combat_hud.gd:1097
 msgid "Inspecionar · %s/%s ou clique · %s fecha"
 msgstr "Inspect · %s/%s or click · %s closes"
 
-#: scripts/ui/combat_hud.gd:1195
+#: scripts/ui/combat_hud.gd:1202
 #: scripts/ui/refuge_hud.gd:886
 #: scripts/ui/refuge_hud.gd:1798
 msgid "Nível %d"
 msgstr "Level %d"
 
-#: scripts/ui/combat_hud.gd:1210
+#: scripts/ui/combat_hud.gd:1217
 msgid "Velocidade %d · quem é mais rápido age antes"
 msgstr "Speed %d · the faster one acts first"
 
-#: scripts/ui/combat_hud.gd:1495
+#: scripts/ui/combat_hud.gd:1553
 msgid "dano ★"
 msgstr "damage ★"
 
-#: scripts/ui/combat_hud.gd:1495
+#: scripts/ui/combat_hud.gd:1553
 msgid "dano"
 msgstr "damage"
 
-#: scripts/ui/combat_hud.gd:1498
+#: scripts/ui/combat_hud.gd:1556
 msgid "cura ★"
 msgstr "healing ★"
 
-#: scripts/ui/combat_hud.gd:1498
+#: scripts/ui/combat_hud.gd:1556
 msgid "cura"
 msgstr "healing"
 
-#: scripts/ui/combat_hud.gd:1536
+#: scripts/ui/combat_hud.gd:1594
 #: scripts/combat/combat_session.gd:173
 msgid "Recarga %d"
 msgstr "Cooldown %d"
 
-#: scripts/ui/combat_hud.gd:1538
+#: scripts/ui/combat_hud.gd:1596
 msgid "%d uso(s)"
 msgstr "%d use(s)"
 
-#: scripts/ui/combat_hud.gd:1580
+#: scripts/ui/combat_hud.gd:1638
 #: scripts/combat/combat_arena.gd:497
 msgid "Vez de %s"
 msgstr "%s's turn"
 
-#: scripts/ui/combat_hud.gd:1590
+#: scripts/ui/combat_hud.gd:1648
 msgid "REGISTRO · %s fecha"
 msgstr "LOG · %s closes"
 
-#: scripts/ui/combat_hud.gd:1590
+#: scripts/ui/combat_hud.gd:1648
 msgid "REGISTRO · %s abre"
 msgstr "LOG · %s opens"
 
-#: scripts/ui/combat_hud.gd:1690
+#: scripts/ui/combat_hud.gd:1748
 msgid "A equipe recuou pelas sombras e largou o que carregava."
 msgstr "The team fell back through the shadows and dropped what it carried."
 
-#: scripts/ui/combat_hud.gd:1690
+#: scripts/ui/combat_hud.gd:1748
 msgid "Todos caíram nas ruínas. O achado ficou para trás."
 msgstr "Everyone fell in the ruins. The finds were left behind."
 
-#: scripts/ui/combat_hud.gd:1697
+#: scripts/ui/combat_hud.gd:1755
 msgid "Nenhum recurso nesta luta"
 msgstr "No resources from this fight"
 
-#: scripts/ui/combat_hud.gd:1722
+#: scripts/ui/combat_hud.gd:1780
 msgid "−%d"
 msgstr "−%d"
 
-#: scripts/ui/combat_hud.gd:1722
+#: scripts/ui/combat_hud.gd:1780
 msgid "+%d"
 msgstr "+%d"
 
-#: scripts/ui/combat_hud.gd:1743
+#: scripts/ui/combat_hud.gd:1801
 #: scripts/flow/station_rules.gd:687
-#: scripts/street/street_corridor.gd:1707
+#: scripts/street/street_corridor.gd:1754
 msgid "%s e %s"
 msgstr "%s and %s"
 
-#: scripts/ui/combat_hud.gd:1744
+#: scripts/ui/combat_hud.gd:1802
 msgid "%s caiu"
 msgstr "%s fell"
 
-#: scripts/ui/combat_hud.gd:1744
+#: scripts/ui/combat_hud.gd:1802
 msgid "%s caíram"
 msgstr "%s fell"
 
-#: scripts/ui/combat_hud.gd:1748
+#: scripts/ui/combat_hud.gd:1806
 msgid "Volta à Estação para se recuperar."
 msgstr "Heads back to the Station to recover."
 
-#: scripts/ui/combat_hud.gd:1748
+#: scripts/ui/combat_hud.gd:1806
 msgid "Voltam à Estação para se recuperar."
 msgstr "They head back to the Station to recover."
 
-#: scripts/ui/combat_hud.gd:1769
+#: scripts/ui/combat_hud.gd:1827
 msgid "%s +%d"
 msgstr "%s +%d"
 
-#: scripts/ui/combat_hud.gd:1776
+#: scripts/ui/combat_hud.gd:1834
 msgid "XP: %s"
 msgstr "XP: %s"
 
-#: scripts/ui/combat_hud.gd:1792
+#: scripts/ui/combat_hud.gd:1850
 msgid "%d heróis"
 msgstr "%d heroes"
 
-#: scripts/ui/combat_hud.gd:1793
+#: scripts/ui/combat_hud.gd:1851
 msgid "%s: Treino pronto"
 msgstr "%s: Training ready"
 
-#: scripts/ui/combat_hud.gd:1859
+#: scripts/ui/combat_hud.gd:1917
 msgid "%s de %s"
 msgstr "%s %s"
 
-#: scripts/ui/combat_hud.gd:1861
+#: scripts/ui/combat_hud.gd:1919
 msgid "recarga %d"
 msgstr "cooldown %d"
 
-#: scripts/ui/combat_hud.gd:1863
+#: scripts/ui/combat_hud.gd:1921
 msgid "%d usos por expedição"
 msgstr "%d uses per expedition"
 
-#: scripts/ui/combat_hud.gd:1863
+#: scripts/ui/combat_hud.gd:1921
 #: scripts/combat/combat_session.gd:175
 msgid "%d usos"
 msgstr "%d uses"
 
-#: scripts/ui/combat_hud.gd:1874
+#: scripts/ui/combat_hud.gd:1932
 msgid "Sai das posições %s"
 msgstr "From positions %s"
 
-#: scripts/ui/combat_hud.gd:1876
+#: scripts/ui/combat_hud.gd:1934
 msgid " · alcança %s"
 msgstr " · reaches %s"
 
-#: scripts/ui/combat_hud.gd:1890
+#: scripts/ui/combat_hud.gd:1948
 msgid "%s (vida %d)"
 msgstr "%s (health %d)"
 
-#: scripts/ui/combat_hud.gd:1892
+#: scripts/ui/combat_hud.gd:1950
 msgid " · pode cair"
 msgstr " · may fall"
 
-#: scripts/ui/combat_hud.gd:1897
+#: scripts/ui/combat_hud.gd:1955
 msgid "Atinge: "
 msgstr "Hits: "
 
-#: scripts/ui/combat_hud.gd:1903
+#: scripts/ui/combat_hud.gd:1961
 msgid "Você:"
 msgstr "You:"
 
-#: scripts/ui/combat_hud.gd:1914
+#: scripts/ui/combat_hud.gd:1972
 msgid "Clique no alvo e clique de novo para usar (%s usa; %s ou B volta)."
 msgstr "Click the target and click again to use (%s uses; %s or B goes back)."
 
-#: scripts/ui/combat_hud.gd:1916
+#: scripts/ui/combat_hud.gd:1974
 msgid "Escolha uma habilidade (%s–%s) ou uma ação."
 msgstr "Choose an ability (%s–%s) or an action."
 
-#: scripts/ui/combat_hud.gd:1947
-#: scripts/ui/combat_hud.gd:1955
-#: scripts/ui/combat_hud.gd:1956
+#: scripts/ui/combat_hud.gd:2005
+#: scripts/ui/combat_hud.gd:2013
+#: scripts/ui/combat_hud.gd:2014
 #: scripts/flow/journey_rules.gd:473
 msgid " · Guardião"
 msgstr " · Guardian"
 
-#: scripts/ui/combat_hud.gd:1947
-#: scripts/ui/combat_hud.gd:1957
-#: scripts/ui/combat_hud.gd:1958
+#: scripts/ui/combat_hud.gd:2005
+#: scripts/ui/combat_hud.gd:2015
+#: scripts/ui/combat_hud.gd:2016
 #: scripts/flow/journey_rules.gd:353
 msgid " Alfa"
 msgstr " Alpha"
 
-#: scripts/ui/combat_hud.gd:1947
-#: scripts/ui/combat_hud.gd:1959
+#: scripts/ui/combat_hud.gd:2005
+#: scripts/ui/combat_hud.gd:2017
 #: scripts/flow/journey_rules.gd:354
 msgid " Beta"
 msgstr " Beta"
 
-#: scripts/ui/combat_hud.gd:2001
+#: scripts/ui/combat_hud.gd:2059
 msgid "Troca de posição com o aliado vizinho. Gasta a vez."
 msgstr "Swaps places with the neighboring ally. Uses the turn."
 
-#: scripts/ui/combat_hud.gd:2002
+#: scripts/ui/combat_hud.gd:2060
 msgid "+1 Bloqueio e passa a vez. "
 msgstr "+1 Block and passes the turn. "
 
-#: scripts/ui/combat_hud.gd:2003
+#: scripts/ui/combat_hud.gd:2061
 msgid "60% de chance de a equipe recuar e sair da luta. Na fuga, larga o que carregava."
 msgstr "60% chance for the team to fall back and leave the fight. Fleeing, it drops what it was carrying."
 
-#: scripts/ui/combat_hud.gd:2004
+#: scripts/ui/combat_hud.gd:2062
 msgid "Comida ou curativo no herói da vez. Ação livre: a vez continua, um item por vez dele."
 msgstr "Food or a bandage on the active hero. Free action: the turn goes on, one item per turn."
 
-#: scripts/ui/combat_hud.gd:2044
+#: scripts/ui/combat_hud.gd:2102
 msgid "CRISE DE INSTINTO"
 msgstr "INSTINCT CRISIS"
 
-#: scripts/ui/combat_hud.gd:2130
+#: scripts/ui/combat_hud.gd:2188
 msgid "Posição %d"
 msgstr "Position %d"
 
-#: scripts/ui/combat_hud.gd:2145
+#: scripts/ui/combat_hud.gd:2203
 msgid "Escolha um alvo"
 msgstr "Choose a target"
 
-#: scripts/ui/combat_hud.gd:2227
+#: scripts/ui/combat_hud.gd:2285
 msgid "ALVO"
 msgstr "TARGET"
 
-#: scripts/ui/combat_hud.gd:2332
+#: scripts/ui/combat_hud.gd:2390
 msgid "Batalha finalizada"
 msgstr "Battle over"
 
-#: scripts/ui/combat_hud.gd:2357
+#: scripts/ui/combat_hud.gd:2415
 msgid "A carga do guardião abre em seguida"
 msgstr "The guardian's cargo opens next"
 
-#: scripts/ui/combat_hud.gd:2374
+#: scripts/ui/combat_hud.gd:2432
 msgid "Qualquer tecla ou toque para continuar"
 msgstr "Any key or tap to continue"
 
-#: scripts/ui/combat_hud.gd:2374
+#: scripts/ui/combat_hud.gd:2432
 msgid "Fecha sozinho · toque para fechar antes"
 msgstr "Closes on its own · tap to close sooner"
 
-#: scripts/ui/combat_hud.gd:2375
+#: scripts/ui/combat_hud.gd:2433
 msgid "Fecha sozinho · o mouse em cima segura · qualquer tecla fecha"
 msgstr "Closes on its own · hovering holds it · any key closes"
 
-#: scripts/ui/kit/kit.gd:148
+#: scripts/ui/kit/kit.gd:149
 msgid "Em forma"
 msgstr "Fit"
 
-#: scripts/ui/kit/kit.gd:150
+#: scripts/ui/kit/kit.gd:151
 msgid "Ferimento leve"
 msgstr "Light wound"
 
-#: scripts/ui/kit/kit.gd:151
+#: scripts/ui/kit/kit.gd:152
 msgid "Ferimento grave"
 msgstr "Serious wound"
 
@@ -1566,7 +1570,7 @@ msgid "Ir ao mapa"
 msgstr "Go to map"
 
 #: scripts/ui/refuge_hud.gd:580
-#: scripts/street/street_corridor.gd:922
+#: scripts/street/street_corridor.gd:930
 msgid "Seguir"
 msgstr "Go on"
 
@@ -2984,7 +2988,7 @@ msgstr "Bandages: +8 health, on the expedition and at camp."
 #: scripts/ui/station/station_frame.gd:50
 #: scripts/ui/phase_map.gd:327
 #: scripts/ui/phase_map.gd:496
-#: scripts/flow/game_flow.gd:70
+#: scripts/flow/game_flow.gd:74
 msgid "Estação Raiz"
 msgstr "Root Station"
 
@@ -3704,22 +3708,22 @@ msgid "Este cômodo já mudou de nível."
 msgstr "This room has already changed level."
 
 #: scripts/flow/station_rules.gd:362
-#: scripts/street/street_corridor.gd:1502
+#: scripts/street/street_corridor.gd:1549
 msgid "sucata"
 msgstr "scrap"
 
 #: scripts/flow/station_rules.gd:362
-#: scripts/street/street_corridor.gd:1502
+#: scripts/street/street_corridor.gd:1549
 msgid "sucatas"
 msgstr "scrap"
 
 #: scripts/flow/station_rules.gd:364
-#: scripts/street/street_corridor.gd:1503
+#: scripts/street/street_corridor.gd:1550
 msgid "fragmento"
 msgstr "fragment"
 
 #: scripts/flow/station_rules.gd:364
-#: scripts/street/street_corridor.gd:1503
+#: scripts/street/street_corridor.gd:1550
 msgid "fragmentos"
 msgstr "fragments"
 
@@ -4367,7 +4371,7 @@ msgid "Vitrines tomadas por raízes ainda guardam comida e peças que a Estaçã
 msgstr "Shopfronts overrun by roots still hold food and parts the Station no longer knows how to make. The Galleries' sensors keep sorting the Ancients' customers from unauthorized fauna."
 
 #: scripts/flow/journey_rules.gd:32
-#: scripts/scenario/scenario_world.gd:78
+#: scripts/scenario/scenario_world.gd:80
 #. expedition-nodes.4.Title
 #. scenarios.3.DisplayName
 msgid "Ponte das Raízes"
@@ -4529,7 +4533,7 @@ msgid "Suprimentos recolhidos · +1 alimento e +1 semente"
 msgstr "Supplies gathered · +1 food and +1 seed"
 
 #: scripts/flow/journey_rules.gd:1020
-#: scripts/street/street_corridor.gd:533
+#: scripts/street/street_corridor.gd:538
 msgid "A equipe recupera o fôlego."
 msgstr "The team catches its breath."
 
@@ -5157,15 +5161,15 @@ msgstr "night"
 msgid "noite de chuva"
 msgstr "rainy night"
 
-#: scripts/street/street.gd:1074
+#: scripts/street/street.gd:1132
 msgid "Noite"
 msgstr "Night"
 
-#: scripts/street/street.gd:1074
+#: scripts/street/street.gd:1132
 msgid "Fim de tarde"
 msgstr "Late afternoon"
 
-#: scripts/street/street.gd:1074
+#: scripts/street/street.gd:1132
 msgid " · chuva"
 msgstr " · rain"
 
@@ -5181,310 +5185,310 @@ msgstr "the trash can"
 msgid "a caixa de correio"
 msgstr "the mailbox"
 
-#: scripts/street/street_corridor.gd:517
+#: scripts/street/street_corridor.gd:522
 msgid "Seguindo em frente…"
 msgstr "Moving on…"
 
-#: scripts/street/street_corridor.gd:517
+#: scripts/street/street_corridor.gd:522
 msgid "Seguindo para: %s…"
 msgstr "Heading to: %s…"
 
-#: scripts/street/street_corridor.gd:543
+#: scripts/street/street_corridor.gd:548
 msgid "Ainda há quem caiu neste mapa"
 msgstr "Someone is still down on this map"
 
-#: scripts/street/street_corridor.gd:544
+#: scripts/street/street_corridor.gd:549
 msgid "%s ainda está no lugar da luta, e a equipe não volta para cá depois de seguir. Quem fica no chão só é recolhido na saída, mais ferido, e chega com a recuperação inteira."
 msgstr "%s is still where the fight was, and the team does not come back here after moving on. Anyone left on the ground is only picked up on the way out, more hurt, and arrives with full recovery."
 
-#: scripts/street/street_corridor.gd:545
+#: scripts/street/street_corridor.gd:550
 msgid "%s ainda estão no lugar da luta, e a equipe não volta para cá depois de seguir. Quem fica no chão só é recolhido na saída, mais ferido, e chega com a recuperação inteira."
 msgstr "%s are still where the fight was, and the team does not come back here after moving on. Anyone left on the ground is only picked up on the way out, more hurt, and arrives with full recovery."
 
-#: scripts/street/street_corridor.gd:546
-#: scripts/street/street_corridor.gd:1386
+#: scripts/street/street_corridor.gd:551
+#: scripts/street/street_corridor.gd:1433
 msgid "Ficar e levantar"
 msgstr "Stay and lift"
 
-#: scripts/street/street_corridor.gd:546
+#: scripts/street/street_corridor.gd:551
 msgid "Seguir mesmo assim"
 msgstr "Move on anyway"
 
-#: scripts/street/street_corridor.gd:615
+#: scripts/street/street_corridor.gd:623
 msgid "Trecho %d · Descanso. Um lugar quieto."
 msgstr "Stretch %d · Rest. A quiet place."
 
-#: scripts/street/street_corridor.gd:618
+#: scripts/street/street_corridor.gd:626
 msgid "Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro."
 msgstr "Stretch %d · %s ahead. Get there unseen to act first."
 
-#: scripts/street/street_corridor.gd:620
+#: scripts/street/street_corridor.gd:628
 msgid "O guardião está à frente"
 msgstr "The guardian is ahead"
 
-#: scripts/street/street_corridor.gd:620
+#: scripts/street/street_corridor.gd:628
 msgid "Vencer o guardião conclui a fase e leva todo o achado. Se a equipe cair, o achado fica para trás; voltar agora leva metade."
 msgstr "Defeating the guardian completes the phase and brings everything found. If the team falls, what was found stays behind; going back now brings half."
 
-#: scripts/street/street_corridor.gd:623
+#: scripts/street/street_corridor.gd:631
 msgid "Trecho %d · %s"
 msgstr "Stretch %d · %s"
 
-#: scripts/street/street_corridor.gd:639
+#: scripts/street/street_corridor.gd:647
 msgid "Dá para acampar aqui: comer, cuidar dos feridos e baixar o instinto antes do guardião."
 msgstr "The team can camp here: eat, tend the wounded and calm the instinct before the guardian."
 
-#: scripts/street/street_corridor.gd:640
+#: scripts/street/street_corridor.gd:648
 msgid "Acampar aqui"
 msgstr "Camp here"
 
-#: scripts/street/street_corridor.gd:642
+#: scripts/street/street_corridor.gd:650
 msgid "A equipe já acampou nesta fase."
 msgstr "The team already camped in this phase."
 
-#: scripts/street/street_corridor.gd:643
-#: scripts/street/street_corridor.gd:767
+#: scripts/street/street_corridor.gd:651
+#: scripts/street/street_corridor.gd:775
 msgid "Seguir em frente"
 msgstr "Keep going"
 
-#: scripts/street/street_corridor.gd:644
-#: scripts/street/street_corridor.gd:768
+#: scripts/street/street_corridor.gd:652
+#: scripts/street/street_corridor.gd:776
 msgid "Voltar à Estação (metade do achado)"
 msgstr "Back to the Station (half of what was found)"
 
-#: scripts/street/street_corridor.gd:645
+#: scripts/street/street_corridor.gd:653
 msgid "Um lugar quieto"
 msgstr "A quiet place"
 
-#: scripts/street/street_corridor.gd:663
+#: scripts/street/street_corridor.gd:671
 msgid "A equipe está com %d de %d de vida"
 msgstr "The team has %d of %d health"
 
-#: scripts/street/street_corridor.gd:665
+#: scripts/street/street_corridor.gd:673
 msgid "; o instinto mais alto é o de %s (%d)"
 msgstr "; the highest instinct is %s's (%d)"
 
-#: scripts/street/street_corridor.gd:666
+#: scripts/street/street_corridor.gd:674
 msgid "; a comida está em %d de %d."
 msgstr "; food is at %d of %d."
 
-#: scripts/street/street_corridor.gd:786
+#: scripts/street/street_corridor.gd:794
 msgid "E  Entrar n%s"
 msgstr "E  Enter %s"
 
-#: scripts/street/street_corridor.gd:789
+#: scripts/street/street_corridor.gd:797
 msgid "E  Arrombar a porta d%s (o pé de cabra quebra)"
 msgstr "E  Force the door of %s (the crowbar breaks)"
 
-#: scripts/street/street_corridor.gd:792
+#: scripts/street/street_corridor.gd:800
 msgid "Porta trancada · Precisa de um pé de cabra para arrombar"
 msgstr "Locked door · You need a crowbar to force it"
 
-#: scripts/street/street_corridor.gd:798
-#: scripts/street/street_corridor.gd:1092
+#: scripts/street/street_corridor.gd:806
+#: scripts/street/street_corridor.gd:1139
 msgid "E  Vasculhar %s"
 msgstr "E  Search %s"
 
-#: scripts/street/street_corridor.gd:809
-#: scripts/street/street_corridor.gd:1089
-#: scripts/street/street_corridor.gd:1299
+#: scripts/street/street_corridor.gd:817
+#: scripts/street/street_corridor.gd:1136
+#: scripts/street/street_corridor.gd:1346
 msgid "%s (já vasculhado)"
 msgstr "%s (already searched)"
 
-#: scripts/street/street_corridor.gd:812
-#: scripts/street/street_corridor.gd:1302
+#: scripts/street/street_corridor.gd:820
+#: scripts/street/street_corridor.gd:1349
 msgid "E  Vasculhar: %s"
 msgstr "E  Search: %s"
 
-#: scripts/street/street_corridor.gd:822
+#: scripts/street/street_corridor.gd:830
 msgid "E  Entrar: %s"
 msgstr "E  Enter: %s"
 
-#: scripts/street/street_corridor.gd:825
+#: scripts/street/street_corridor.gd:833
 msgid "%s · a patrulha guarda a porta"
 msgstr "%s · the patrol guards the door"
 
-#: scripts/street/street_corridor.gd:841
+#: scripts/street/street_corridor.gd:849
 msgid "E  Voltar à Estação (%s)"
 msgstr "E  Back to the Station (%s)"
 
-#: scripts/street/street_corridor.gd:841
+#: scripts/street/street_corridor.gd:849
 msgid "fase concluída: todo o achado"
 msgstr "phase complete: everything found"
 
-#: scripts/street/street_corridor.gd:841
+#: scripts/street/street_corridor.gd:849
 msgid "retirada: metade do achado"
 msgstr "retreat: half of what was found"
 
-#: scripts/street/street_corridor.gd:846
-#: scripts/street/street_corridor.gd:862
+#: scripts/street/street_corridor.gd:854
+#: scripts/street/street_corridor.gd:870
 msgid "E  Vasculhar"
 msgstr "E  Search"
 
-#: scripts/street/street_corridor.gd:858
+#: scripts/street/street_corridor.gd:866
 msgid "E  Embarcar no trem"
 msgstr "E  Board the train"
 
-#: scripts/street/street_corridor.gd:957
+#: scripts/street/street_corridor.gd:965
 msgid "A equipe recua e se recompõe. A patrulha continua no caminho: tente de novo."
 msgstr "The team falls back and regroups. The patrol is still in the way: try again."
 
-#: scripts/street/street_corridor.gd:992
-#: scripts/street/street_corridor.gd:1502
+#: scripts/street/street_corridor.gd:1000
+#: scripts/street/street_corridor.gd:1549
 msgid "sementes"
 msgstr "seeds"
 
-#: scripts/street/street_corridor.gd:994
-#: scripts/street/street_corridor.gd:1504
+#: scripts/street/street_corridor.gd:1002
+#: scripts/street/street_corridor.gd:1551
 msgid "curativo"
 msgstr "bandage"
 
-#: scripts/street/street_corridor.gd:994
-#: scripts/street/street_corridor.gd:1504
+#: scripts/street/street_corridor.gd:1002
+#: scripts/street/street_corridor.gd:1551
 msgid "curativos"
 msgstr "bandages"
 
-#: scripts/street/street_corridor.gd:998
+#: scripts/street/street_corridor.gd:1006
 msgid "Recompensa da fuga: %s."
 msgstr "Escape reward: %s."
 
-#: scripts/street/street_corridor.gd:1074
+#: scripts/street/street_corridor.gd:1121
 msgid "Emboscada!"
 msgstr "Ambush!"
 
-#: scripts/street/street_corridor.gd:1086
+#: scripts/street/street_corridor.gd:1133
 msgid "o canto"
 msgstr "the corner"
 
-#: scripts/street/street_corridor.gd:1096
+#: scripts/street/street_corridor.gd:1143
 msgid "E  Acampar (fechar a porta e acender a fogueira)"
 msgstr "E  Camp (close the door and light the fire)"
 
-#: scripts/street/street_corridor.gd:1100
+#: scripts/street/street_corridor.gd:1147
 msgid "Acampamento já feito nesta fase"
 msgstr "Camp already made this phase"
 
-#: scripts/street/street_corridor.gd:1111
+#: scripts/street/street_corridor.gd:1158
 msgid "E  Sair para a rua"
 msgstr "E  Go out to the street"
 
-#: scripts/street/street_corridor.gd:1172
+#: scripts/street/street_corridor.gd:1219
 msgid "Com um herói só, não há ordem para trocar."
 msgstr "With a single hero, there is no order to change."
 
-#: scripts/street/street_corridor.gd:1195
+#: scripts/street/street_corridor.gd:1242
 msgid "Na abertura, a saída é o trem da plataforma."
 msgstr "In the opening, the way out is the train on the platform."
 
-#: scripts/street/street_corridor.gd:1246
+#: scripts/street/street_corridor.gd:1293
 msgid "Entrando: %s…"
 msgstr "Entering: %s…"
 
-#: scripts/street/street_corridor.gd:1311
+#: scripts/street/street_corridor.gd:1358
 msgid "E  Voltar: %s"
 msgstr "E  Back: %s"
 
-#: scripts/street/street_corridor.gd:1368
+#: scripts/street/street_corridor.gd:1415
 msgid "O pé de cabra entorta e quebra, mas a porta cede."
 msgstr "The crowbar bends and breaks, but the door gives way."
 
-#: scripts/street/street_corridor.gd:1382
+#: scripts/street/street_corridor.gd:1429
 msgid "Ainda há quem caiu no mapa"
 msgstr "Someone is still down on the map"
 
-#: scripts/street/street_corridor.gd:1383
+#: scripts/street/street_corridor.gd:1430
 msgid "%s ainda está no lugar da luta. Quem não for levantado só é recolhido na saída, mais ferido, e chega com a recuperação inteira."
 msgstr "%s is still where the fight was. Anyone not lifted is only picked up on the way out, more hurt, and arrives with full recovery."
 
-#: scripts/street/street_corridor.gd:1384
+#: scripts/street/street_corridor.gd:1431
 msgid "%s ainda estão no lugar da luta. Quem não for levantado só é recolhido na saída, mais ferido, e chega com a recuperação inteira."
 msgstr "%s are still where the fight was. Anyone not lifted is only picked up on the way out, more hurt, and arrives with full recovery."
 
-#: scripts/street/street_corridor.gd:1386
+#: scripts/street/street_corridor.gd:1433
 msgid "Voltar mesmo assim"
 msgstr "Go back anyway"
 
-#: scripts/street/street_corridor.gd:1502
+#: scripts/street/street_corridor.gd:1549
 msgid "semente"
 msgstr "seed"
 
-#: scripts/street/street_corridor.gd:1503
+#: scripts/street/street_corridor.gd:1550
 msgid "comida"
 msgstr "food"
 
-#: scripts/street/street_corridor.gd:1503
+#: scripts/street/street_corridor.gd:1550
 msgid "comidas"
 msgstr "food"
 
-#: scripts/street/street_corridor.gd:1504
+#: scripts/street/street_corridor.gd:1551
 msgid "ferramenta"
 msgstr "tool"
 
-#: scripts/street/street_corridor.gd:1504
+#: scripts/street/street_corridor.gd:1551
 msgid "ferramentas"
 msgstr "tools"
 
-#: scripts/street/street_corridor.gd:1592
+#: scripts/street/street_corridor.gd:1639
 msgid "A equipe descansou. Lá fora, o tempo mudou: %s."
 msgstr "The team rested. Outside, the weather changed: %s."
 
-#: scripts/street/street_corridor.gd:1630
+#: scripts/street/street_corridor.gd:1677
 msgid "patrulha"
 msgstr "patrol"
 
-#: scripts/street/street_corridor.gd:1635
+#: scripts/street/street_corridor.gd:1682
 msgid "A equipe chegou sem ser vista: age primeiro."
 msgstr "The team arrived unseen: it acts first."
 
-#: scripts/street/street_corridor.gd:1685
+#: scripts/street/street_corridor.gd:1732
 msgid "O guardião caiu. Vasculhe o que restou ou volte à Estação pelo Menu (%s)."
 msgstr "The guardian fell. Search what's left or go back to the Station through the Menu (%s)."
 
-#: scripts/street/street_corridor.gd:1686
+#: scripts/street/street_corridor.gd:1733
 msgid "O guardião caiu. A Rua das Vitrines está livre: explore as casas ou volte à Estação pelo começo da rua."
 msgstr "The guardian fell. Shopfront Street is clear: explore the houses or go back to the Station from the start of the street."
 
-#: scripts/street/street_corridor.gd:1700
+#: scripts/street/street_corridor.gd:1747
 msgid "%s caiu e ficou no lugar da luta. Levante agora: quem fica no chão só é recolhido na saída, mais ferido."
 msgstr "%s fell and stayed where the fight was. Lift them now: anyone left on the ground is only picked up on the way out, more hurt."
 
-#: scripts/street/street_corridor.gd:1701
+#: scripts/street/street_corridor.gd:1748
 msgid "%s caíram e ficaram no lugar da luta. Levante agora: quem fica no chão só é recolhido na saída, mais ferido."
 msgstr "%s fell and stayed where the fight was. Lift them now: anyone left on the ground is only picked up on the way out, more hurt."
 
-#: scripts/street/street_corridor.gd:1736
+#: scripts/street/street_corridor.gd:1783
 msgid "E  Levantar %s"
 msgstr "E  Lift %s"
 
-#: scripts/street/street_corridor.gd:1764
+#: scripts/street/street_corridor.gd:1811
 msgid "A equipe levantou %s: segue junto até a volta, sem lutar."
 msgstr "The team lifted %s: they come along until the return, without fighting."
 
-#: scripts/scenario/scenario_world.gd:78
+#: scripts/scenario/scenario_world.gd:80
 msgid "Cais do Rio"
 msgstr "River Dock"
 
-#: scripts/scenario/scenario_world.gd:78
+#: scripts/scenario/scenario_world.gd:80
 #. expedition-nodes.3.Title
 msgid "Depósito Inundado"
 msgstr "Flooded Depot"
 
-#: scripts/scenario/scenario_world.gd:79
+#: scripts/scenario/scenario_world.gd:81
 #. expedition-nodes.2.Title
 msgid "Abrigo Lacrado"
 msgstr "Sealed Shelter"
 
-#: scripts/scenario/scenario_world.gd:79
+#: scripts/scenario/scenario_world.gd:81
 #. expedition-nodes.8.Title
 msgid "Dutos de Esgoto"
 msgstr "Sewer Ducts"
 
-#: scripts/scenario/scenario_world.gd:79
+#: scripts/scenario/scenario_world.gd:81
 #. expedition-nodes.10.Title
 msgid "Portão de Triagem"
 msgstr "Triage Gate"
 
-#: scripts/scenario/scenario_world.gd:80
+#: scripts/scenario/scenario_world.gd:82
 msgid "Corredor de Contenção"
 msgstr "Containment Corridor"
 
@@ -5528,19 +5532,19 @@ msgstr "RECORDS"
 msgid "ANÁLISE"
 msgstr "ANALYSIS"
 
-#: scripts/campaign/campaign_service.gd:426
+#: scripts/campaign/campaign_service.gd:423
 msgid "O último salvamento não pôde ser aberto. Recuperamos uma cópia de segurança. Ações recentes podem não estar nela."
 msgstr "The last save couldn't be opened. We recovered a backup copy. Recent actions may not be in it."
 
-#: scripts/campaign/campaign_service.gd:428
+#: scripts/campaign/campaign_service.gd:425
 msgid "O save do espaço %d não pôde ser aberto (o arquivo foi preservado). As outras campanhas estão em Campanhas."
 msgstr "The save in slot %d couldn't be opened (the file was kept). The other campaigns are in Campaigns."
 
-#: scripts/campaign/campaign_service.gd:430
+#: scripts/campaign/campaign_service.gd:427
 msgid "Nenhum salvamento válido foi encontrado. Os dados anteriores foram preservados; um novo jogo só será salvo ao começar."
 msgstr "No valid save was found. The previous data was kept; a new game will only be saved once it starts."
 
-#: scripts/flow/game_flow.gd:84
+#: scripts/flow/game_flow.gd:88
 msgid "Trecho %d de %d"
 msgstr "Stretch %d of %d"
 
