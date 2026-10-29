@@ -52,7 +52,30 @@ def gold(im: Image.Image) -> Image.Image:
     """O latão das amuradas (o amarelo do corrimão): o vermelho e o verde acima do azul."""
     r, g, b = im.convert("RGB").split()
     rg = ImageChops.darker(r, g)
-    return ImageChops.subtract(rg, b).point(lambda v: 255 if v > 55 else 0).filter(ImageFilter.MaxFilter(5))
+    return ImageChops.subtract(rg, b).point(lambda v: 255 if v > 70 else 0).filter(ImageFilter.MaxFilter(3))
+
+
+def fill_alpha(fill: Image.Image) -> Image.Image:
+    """O que a edição pintou, sem a franja rosada da borda com o magenta."""
+    return not_magenta(fill).filter(ImageFilter.MinFilter(3))
+
+
+def jagged(size, x: int, overlap: int, left: bool) -> Image.Image:
+    """Um lado de um corte vertical em zigue-zague (a emenda não fica reta), com overlap px por baixo do vizinho."""
+    w, h = size
+    pts = [(x + (5 if (y // 12) % 2 else -5) + (overlap if left else -overlap), y) for y in range(0, h + 12, 12)]
+    edge = [(px, min(py, h)) for px, py in pts]
+    return poly(size, [(0, 0)] + edge + [(0, h)]) if left else poly(size, [(w, 0)] + edge + [(w, h)])
+
+
+def below(mask: Image.Image, n: int) -> Image.Image:
+    """A máscara estendida n px para baixo."""
+    out = mask.copy()
+    for i in range(1, n + 1):
+        shifted = Image.new("L", mask.size)
+        shifted.paste(mask, (0, i))
+        out = ImageChops.lighter(out, shifted)
+    return out
 
 
 def minus(a: Image.Image, b: Image.Image) -> Image.Image:
@@ -95,7 +118,8 @@ def ship(src: Path, manifest: dict) -> None:
     cabin_full = ImageChops.multiply(not_magenta(cabin_edit), rect(S, (540, 120, 1024, 456)))
     # 2. O convés: a faixa da amurada e das caixas acima do casco, e o latão da amurada na frente da cabine.
     deck_band = rect(S, (0, 312, 590, 420))
-    front_rail = ImageChops.multiply(gold(art), rect(S, (548, 380, 1024, 450)))
+    # A porta acesa da cabine fica toda na cabine (a amurada não passa na frente dela).
+    front_rail = ImageChops.multiply(gold(art), minus(rect(S, (548, 380, 1024, 450)), rect(S, (566, 318, 672, 458))))
     # 4. O mastro e o guindaste (com o gancho, os cabos e o mastro da proa); o pé do guindaste fica atrás das caixas.
     crane = poly(S, [(255, 150), (335, 150), (460, 290), (460, 352), (370, 352), (330, 300), (300, 305), (255, 305)])
     bow_mast = rect(S, (40, 255, 100, 348))
@@ -117,11 +141,15 @@ def ship(src: Path, manifest: dict) -> None:
     own_cabin = ImageChops.lighter(own_cabin, stern_rest)
     own_mast = ImageChops.lighter(own_crane, minus(rest, stern_rest))
 
-    # O casco em três (a proa e a popa recuadas na curva), cada um com 16 px a mais por baixo do vizinho.
+    # O casco em três (a proa e a popa recuadas na curva): o corte em zigue-zague numa chapa lisa, fora da hera e dos
+    # pneus (x = 150 e x = 870), cada pedaço com 16 px a mais por baixo do vizinho.
     hull_layer = layer(art, own_hull)
-    for name, (x0, x1) in (("HullBow", (0, 246)), ("HullMid", (214, 886)), ("HullStern", (854, 1024))):
+    cuts = {"HullBow": jagged(S, 150, 16, True),
+            "HullMid": ImageChops.multiply(jagged(S, 150, 16, False), jagged(S, 870, 16, True)),
+            "HullStern": jagged(S, 870, 16, False)}
+    for name, keep in cuts.items():
         piece = Image.new("RGBA", S)
-        piece.paste(hull_layer.crop((x0, 0, x1, S[1])), (x0, 0))
+        piece.paste(hull_layer, (0, 0), ImageChops.multiply(keep, hull_layer.getchannel("A")))
         save(piece, "T_CD14_" + name, manifest)
     fills = {}
     for name in ("deck", "mast"):
@@ -133,14 +161,23 @@ def ship(src: Path, manifest: dict) -> None:
     mast_hidden = ImageChops.lighter(rect(S, (370, 330, 460, 400)), ImageChops.lighter(rect(S, (740, 150, 805, 200)),
                                                                                      rect(S, (50, 330, 95, 380))))
     # As máscaras para as edições do que fica escondido (branco: o que se pinta).
-    deck_hidden.save(src / "ship-deck-fill-mask.png")
-    mast_hidden.save(src / "ship-mast-fill-mask.png")
+    (src / "masks").mkdir(exist_ok=True)
+    deck_hidden.save(src / "masks/ship-deck-fill-mask.png")
+    mast_hidden.save(src / "masks/ship-mast-fill-mask.png")
     if fills["deck"] is not None:
-        deck_hidden = ImageChops.multiply(deck_hidden, not_magenta(fills["deck"]))
+        deck_hidden = ImageChops.multiply(deck_hidden, fill_alpha(fills["deck"]))
     if fills["mast"] is not None:
-        mast_hidden = ImageChops.multiply(mast_hidden, not_magenta(fills["mast"]))
-    save(layer(art, own_deck, fills["deck"], deck_hidden if fills["deck"] else None), "T_CD14_Deck", manifest)
-    save(layer(art, own_cabin, cabin_edit, cabin_full), "T_CD14_Cabin", manifest)
+        mast_hidden = ImageChops.multiply(mast_hidden, fill_alpha(fills["mast"]))
+    # Um pedaço escondido só cobre o que é das camadas da frente (ou fica fora da pintura): nunca o que é de uma de trás.
+    deck_hidden = minus(minus(deck_hidden, own_cabin), own_mast)
+    deck = layer(art, own_deck, fills["deck"], deck_hidden if fills["deck"] else None)
+    # O convés desce 10 px por baixo da borda do casco (a pintura de hoje ali), para a emenda não abrir de lado.
+    under = ImageChops.multiply(minus(below(opaque(deck, 85), 10), opaque(deck, 85)),
+                                ImageChops.multiply(own_hull, rect(S, (0, 300, 600, 470))))
+    deck.paste(art, (0, 0), under)
+    save(deck, "T_CD14_Deck", manifest)
+    save(layer(art, own_cabin, cabin_edit, minus(ImageChops.multiply(cabin_full, fill_alpha(cabin_edit)), own_mast)),
+         "T_CD14_Cabin", manifest)
     save(layer(art, own_mast, fills["mast"], mast_hidden if fills["mast"] else None), "T_CD14_Mast", manifest)
 
 
@@ -149,10 +186,12 @@ def warehouse(src: Path, manifest: dict) -> None:
     S = art.size
     alpha = opaque(art, 0)
     # 1. A frente: o pilar da esquerda (a coluna alta e a treliça), o da direita (o canto e a treliça) e a soleira.
-    front = poly(S, [(148, 0), (206, 0), (206, 228), (300, 228), (300, 614), (745, 614),
-                     (745, 70), (782, 70), (782, 290), (874, 290), (874, 683), (148, 683)])
+    # A coluna alta da esquerda vai inteira, com a hera que cai dela para a esquerda (acima da lateral, até y = 182).
+    front = ImageChops.lighter(poly(S, [(148, 0), (206, 0), (206, 228), (300, 228), (300, 614), (745, 614),
+                                        (745, 70), (782, 70), (782, 290), (874, 290), (874, 683), (148, 683)]),
+                               rect(S, (90, 0, 148, 182)))
     # 4. As laterais em perspectiva: a da esquerda e a da direita (com a quina do telhado descendo).
-    sides = ImageChops.lighter(rect(S, (0, 0, 148, 683)), minus(rect(S, (782, 0, 1024, 683)), front))
+    sides = ImageChops.lighter(minus(rect(S, (0, 0, 148, 683)), front), minus(rect(S, (782, 0, 1024, 683)), front))
     # 3. O interior: o vão, sem a moldura.
     interior = rect(S, (300, 298, 745, 614))
     # 2. O telhado e a viga: o resto, em cima.
@@ -161,22 +200,26 @@ def warehouse(src: Path, manifest: dict) -> None:
     own_interior = ImageChops.multiply(minus(interior, front), alpha)
     own_roof = minus(minus(minus(alpha, own_front), own_sides), own_interior)
     # O que fica escondido atrás da frente (as máscaras das edições, em images/cais-camadas/warehouse-*-fill-mask.png).
+    # A forma inteira de cada camada de trás, menos o que ela já tem da pintura: assim nenhuma borda fica sem dono.
+    # O interior não passa da soleira (y = 641), para não sair da silhueta de hoje.
     hidden = {
-        "Interior": minus(rect(S, (240, 236, 812, 650)), interior),
-        "Roof": ImageChops.multiply(ImageChops.lighter(rect(S, (148, 20, 206, 300)), rect(S, (745, 60, 782, 300))),
-                                    front),
-        "Sides": ImageChops.multiply(ImageChops.lighter(rect(S, (148, 170, 200, 660)), rect(S, (830, 140, 874, 660))),
-                                     front),
+        "Interior": minus(rect(S, (240, 236, 812, 641)), own_interior),
+        "Roof": minus(minus(minus(ImageChops.lighter(rect(S, (148, 20, 210, 300)), rect(S, (741, 60, 786, 300))),
+                                  own_roof), own_sides), own_interior),
+        "Sides": minus(ImageChops.lighter(rect(S, (144, 170, 212, 660)),
+                                          ImageChops.lighter(rect(S, (826, 140, 878, 660)), rect(S, (740, 55, 786, 300)))),
+                       ImageChops.lighter(own_sides, own_interior)),
     }
     for name, own in (("Front", own_front), ("Roof", own_roof), ("Interior", own_interior), ("Sides", own_sides)):
         fill = None
         mask = hidden.get(name)
         if mask is not None:
-            mask.save(src / f"warehouse-{name.lower()}-fill-mask.png")
+            (src / "masks").mkdir(exist_ok=True)
+            mask.save(src / f"masks/warehouse-{name.lower()}-fill-mask.png")
             f = src / f"warehouse-{name.lower()}-fill.png"
             if f.exists():
                 fill = edit(f, S)
-                mask = ImageChops.multiply(mask, not_magenta(fill))
+                mask = ImageChops.multiply(mask, fill_alpha(fill))
         save(layer(art, own, fill, mask if fill is not None else None), "T_CD15_" + name, manifest)
 
 

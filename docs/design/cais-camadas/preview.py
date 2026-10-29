@@ -16,8 +16,14 @@ SETS = {
     "T_CD14": [("Mast", 0.7), ("Cabin", 0.5), ("Deck", 0.15), ("HullBow", 0.25), ("HullStern", 0.25), ("HullMid", 0.0)],
     "T_CD15": [("Interior", 1.6), ("Sides", 0.5), ("Roof", 0.17), ("Front", 0.0)],
 }
-# Quantos px uma camada a 1 m anda no card quando a câmera passa de lado (exagerado, para a prova).
-SHIFT = 34
+# Quantos px uma camada a 1 m anda no card quando a câmera da exploração passa de lado (meia abertura de 15°, o card a
+# 18,3 m: uns 26 px por metro).
+SHIFT = 26
+# As emendas para conferir de perto (a caixa na pintura), com a câmera dos dois lados.
+SEAMS = {
+    "T_CD14": [(110, 340, 260, 470), (520, 330, 700, 470), (820, 400, 960, 540), (360, 260, 480, 380)],
+    "T_CD15": [(60, 0, 260, 220), (700, 40, 880, 320), (250, 250, 360, 450), (700, 420, 820, 660)],
+}
 
 
 def load(name: str) -> Image.Image:
@@ -33,7 +39,7 @@ def on_bg(im: Image.Image, bg=BG) -> Image.Image:
 def stack(base: str, side: float = 0.0) -> Image.Image:
     size = load(base).size
     out = Image.new("RGBA", size)
-    for name, z in SETS[base]:
+    for name, z in sorted(SETS[base], key=lambda layer: -layer[1]):
         out.alpha_composite(load(f"{base}_{name}"), (round(side * z * SHIFT), 0))
     return out
 
@@ -68,6 +74,16 @@ def main() -> None:
         # A câmera de lado: o card chapado de hoje desloca inteiro; as camadas, cada uma pela profundidade.
         grid([label(on_bg(stack(base, -1.0)), "camera a esquerda"), label(on_bg(stacked), "de frente"),
               label(on_bg(stack(base, 1.0)), "camera a direita")], 3).save(HERE / f"{base}_parallax.webp", quality=82)
+        # As emendas de perto (x2), com a câmera à esquerda e à direita.
+        tiles = []
+        for box in SEAMS[base]:
+            for side in (-1.0, 1.0):
+                crop = on_bg(stack(base, side)).crop(box)
+                tiles.append(crop.resize((crop.width * 2, crop.height * 2), Image.Resampling.LANCZOS))
+        w = max(t.width for t in tiles)
+        h = max(t.height for t in tiles)
+        tiles = [t.resize((w, h)) for t in tiles]
+        grid(tiles, 4, 0.75).save(HERE / f"{base}_seams.webp", quality=82)
         print(base, "ok")
 
 

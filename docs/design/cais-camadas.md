@@ -9,37 +9,40 @@ Só arte e docs: nada em `scripts/`, `data/` nem `tests/`. As pinturas de hoje (
 
 ## O que entra
 
-São 10 arquivos novos em `art/scenarios/` (608 KB), com o `.import` dos outros cenários (`lossy_quality` 0,75):
+São 10 arquivos novos em `art/scenarios/` (cerca de 609 KB), com o `.import` dos outros cenários (`lossy_quality` 0,75):
 
 | Arquivo | O que tem | Caixa na pintura (px: x0, y0, x1, y1) | Profundidade sugerida |
 |---|---|---|---|
 | **O Navio** (1024 × 576) | | | |
-| `T_CD14_HullMid` | o meio do casco, com a linha d'água, os pneus, as correntes e a prancha | 214, 383, 886, 539 | o plano de hoje |
-| `T_CD14_HullBow` | a proa (a curva da esquerda) | 11, 368, 246, 533 | 0,25 m atrás |
-| `T_CD14_HullStern` | a popa (a curva da direita) | 854, 437, 1021, 536 | 0,25 m atrás |
-| `T_CD14_Deck` | o convés: a amurada, as caixas e os postes | 32, 312, 1017, 471 | 0,15 m atrás |
-| `T_CD14_Cabin` | a cabine e a casa do leme, com a porta acesa | 540, 140, 1010, 456 | 0,5 m atrás |
+| `T_CD14_HullMid` | o meio do casco, com a linha d'água, os pneus, as correntes e a prancha | 129, 383, 892, 539 | o plano de hoje |
+| `T_CD14_HullBow` | a proa (a curva da esquerda) | 11, 368, 172, 529 | 0,25 m atrás |
+| `T_CD14_HullStern` | a popa (a curva da direita) | 849, 437, 1020, 536 | 0,25 m atrás |
+| `T_CD14_Deck` | o convés: a amurada, as caixas e os postes; desce 10 px por baixo da borda do casco | 32, 312, 1017, 471 | 0,15 m atrás |
+| `T_CD14_Cabin` | a cabine e a casa do leme, com a porta acesa inteira | 540, 140, 1012, 455 | 0,5 m atrás |
 | `T_CD14_Mast` | o mastro alto, o guindaste com o gancho, o mastro da proa e os cabos | 48, 6, 872, 401 | 0,7 m atrás |
 | **O Armazém** (1024 × 683) | | | |
-| `T_CD15_Front` | os pilares e as treliças da frente, e a soleira | 148, 8, 875, 645 | o plano de hoje |
-| `T_CD15_Roof` | a parede de cima (o telhado) e a viga treliçada | 148, 10, 783, 301 | 0,17 m atrás |
-| `T_CD15_Interior` | o interior (o vão), pintado sem a moldura e mais largo que ela | 240, 236, 812, 650 | 1,6 m atrás (o vão de hoje) |
-| `T_CD15_Sides` | as duas laterais em perspectiva (as "bochechas") | 16, 20, 1009, 646 | 0,5 m atrás, ou em volume |
+| `T_CD15_Front` | os pilares e as treliças da frente (a coluna alta da esquerda inteira, com a hera), e a soleira | 90, 8, 875, 645 | o plano de hoje |
+| `T_CD15_Roof` | a parede de cima (o telhado) e a viga treliçada | 148, 10, 787, 301 | 0,17 m atrás |
+| `T_CD15_Interior` | o interior (o vão), pintado sem a moldura e mais largo que ela | 241, 237, 811, 642 | 1,6 m atrás (o vão de hoje) |
+| `T_CD15_Sides` | as duas laterais em perspectiva (as "bochechas") | 16, 90, 1009, 646 | 0,5 m atrás, ou em volume |
 
 As caixas também estão em [cais-camadas/layers.json](cais-camadas/layers.json). As profundidades são só uma sugestão
 para a integração; o gerador manda.
 
-**A ordem, da frente para trás:** casco, convés, cabine, mastro; frente, telhado, laterais, interior. A prancha e as
-correntes ficam no casco porque estão penduradas nele, na frente de tudo.
+**A ordem é a da profundidade:** no Navio, o meio do casco na frente, o convés, a proa e a popa, a cabine e o mastro;
+no Armazém, a frente, o telhado, as laterais e o interior. A prancha e as correntes ficam no meio do casco porque estão
+penduradas nele, na frente de tudo.
 
-**O casco em três:** a proa e a popa saem da mesma camada do casco, cortadas em x = 230 e x = 870, e cada pedaço vai
-**16 px por baixo do vizinho** (a proa até x = 246, o meio de 214 a 886, a popa de 854). Recuadas na curva, a emenda
-não abre.
+**O casco em três:** a proa e a popa saem da mesma camada do casco, cortadas numa chapa lisa, fora da hera e dos pneus
+(em x = 150 e x = 870), num zigue-zague de ±5 px para a emenda não ser uma linha reta. Cada pedaço vai **16 px por
+baixo do vizinho**: recuadas na curva, a emenda não abre.
 
 ## O encaixe
 
-As camadas empilhadas devolvem a pintura de hoje: cada pixel dela é de uma camada só. A diferença que sobra é a da
-compressão do WebP (a média fica abaixo de 3 em 255, sem forma nenhuma).
+As camadas empilhadas devolvem a pintura de hoje: cada pixel dela é de uma camada só, e nenhuma camada sai da
+silhueta de hoje. Um pedaço escondido só cobre o que é de uma camada da frente, nunca o de uma de trás. A diferença que
+sobra é a da compressão do WebP: a média fica abaixo de 3 em 255, e só 5 px do Armazém (na borda da soleira) passam de
+60.
 
 ![O Navio: hoje, as camadas empilhadas e a diferença](cais-camadas/T_CD14_fit.webp)
 
@@ -52,10 +55,12 @@ Onde uma camada da frente cobre a de trás, a de trás vem pintada por inteiro:
 - **o mastro e o guindaste:** o pé do guindaste atrás das caixas, a coluna do mastro atrás da amurada da casa do leme e o
   pé do mastro da proa;
 - **o convés:** a amurada atrás da prancha, até a porta da cabine;
-- **o interior do Armazém:** o vão uns 60 px mais largo de cada lado, em cima e embaixo, por trás dos pilares, da viga e
-  da soleira;
+- **o interior do Armazém:** o vão uns 60 px mais largo de cada lado e em cima, e 27 px embaixo (até a soleira), por
+  trás dos pilares, da viga e da soleira;
 - **o telhado:** a parede de cima atrás da coluna alta da esquerda e do poste do canto da direita;
-- **as laterais:** as duas paredes em perspectiva continuam por trás dos pilares.
+- **as laterais:** as duas paredes em perspectiva continuam por trás dos pilares e, na direita, por trás do poste do canto
+  e da ponta do telhado (de x = 740 a 786);
+- **o convés:** 10 px por baixo da borda do casco, para a emenda não abrir na subida da proa nem do lado da prancha.
 
 ![As camadas do Navio](cais-camadas/T_CD14_layers.webp)
 
@@ -63,13 +68,42 @@ Onde uma camada da frente cobre a de trás, a de trás vem pintada por inteiro:
 
 ## A câmera passando de lado
 
-Uma prova em 2D: cada camada desloca pela profundidade sugerida, exagerada (34 px por metro). Nenhum buraco abre: o
-pedaço escondido aparece pintado. **Não é a cena 3D:** a prova de verdade é a captura do jogo depois da integração
+Uma prova em 2D: cada camada desloca pela profundidade sugerida, uns 26 px por metro, o quanto a câmera da exploração
+anda (meia abertura de 15° e o card a 18,3 m). Nenhum buraco abre: o pedaço escondido aparece pintado. **Não é a cena 3D:** a prova de verdade é a captura do jogo depois da integração
 (`tools/capture_141.gd`).
 
 ![O Navio com a câmera à esquerda, de frente e à direita](cais-camadas/T_CD14_parallax.webp)
 
 ![O Armazém com a câmera à esquerda, de frente e à direita](cais-camadas/T_CD15_parallax.webp)
+
+As emendas de perto (x2), cada uma com a câmera à esquerda e à direita: no Navio, a proa, a porta da cabine, a popa e o
+pé do guindaste; no Armazém, a coluna da esquerda, a quina do telhado, a borda do vão e o pé do pilar da direita.
+
+![As emendas do Navio](cais-camadas/T_CD14_seams.webp)
+
+![As emendas do Armazém](cais-camadas/T_CD15_seams.webp)
+
+## No jogo, antes e depois (protótipo)
+
+Capturas da cena de verdade (`tools/capture_141.gd`, só as fachadas), com a mesma câmera, a mesma equipe e o mesmo
+momento. O antes é a `main` de hoje. O depois carrega as camadas por um **protótipo fora deste PR**: o
+`build_riverdock_depth.py` com um card por camada, no quadro inteiro e no z da tabela acima. A integração de verdade é do
+Claude 2.
+
+**Sem placa de vídeo:** a nuvem da Awesomic roda a Godot em software, e o pedido de Forward+ cai no Compatibility. A
+prova no Forward+ fica para o Orquestrador PC.
+
+![O Navio no fim de tarde, da esquerda](cais-camadas/game-ship-golden-left.webp)
+
+![O Navio no fim de tarde, da direita](cais-camadas/game-ship-golden-right.webp)
+
+![O Navio de noite com chuva, da esquerda](cais-camadas/game-ship-night-rain-left.webp)
+
+![O Armazém no fim de tarde, da esquerda](cais-camadas/game-warehouse-golden-left.webp)
+
+![O Armazém no fim de tarde, da direita](cais-camadas/game-warehouse-golden-right.webp)
+
+![O Armazém de noite com chuva, da direita](cais-camadas/game-warehouse-night-rain-right.webp)
 
 ## Para integrar (é do Claude 2, na #141)
 
@@ -88,7 +122,7 @@ pedaço escondido aparece pintado. **Não é a cena 3D:** a prova de verdade é 
 As edições ficam fora do Git, em `images/cais-camadas/` do projeto na Awesomic: a cabine sozinha
 (`ship-cabin-only.png`), os pedaços escondidos do Navio (`ship-deck-fill.png` e `ship-mast-fill.png`) e do Armazém
 (`warehouse-interior-fill.png`, `warehouse-roof-fill.png` e `warehouse-sides-fill.png`, montados dos recortes em
-`crops/`). Todas são edições da pintura de hoje no Nano Banana Pro, no mesmo quadro.
+`crops/`). O script grava as máscaras do que fica escondido em `masks/`. Todas são edições da pintura de hoje no Nano Banana Pro, no mesmo quadro.
 
 Da raiz do repositório:
 1. `python3 -B docs/design/cais-camadas/cut_layers.py <pasta images/cais-camadas>`: as 10 camadas e `layers.json`.
@@ -96,3 +130,20 @@ Da raiz do repositório:
 2. `python3 -B docs/design/cais-camadas/preview.py`: as pranchas desta página.
 
 ## QA de design
+
+- **Rodada 1, reprovada:**
+  - (alta) o interior tinha uma moldura de 1 px sem dono nas bordas do vão, que abriria um risco com a câmera de lado.
+    Agora cada pedaço escondido é a forma inteira da camada menos o que ela já tem da pintura;
+  - (alta) a coluna alta da esquerda era cortada em x = 148, com a hera partida: ela vai inteira na frente, com a hera, e
+    a lateral continua por trás dela;
+  - (alta) a quina do telhado, à direita, abria um buraco: a lateral agora continua pintada por trás do poste do canto e
+    da ponta do telhado (x 740 a 786);
+  - (alta) a máscara da amurada levava a metade de baixo da porta acesa para o convés: a porta fica inteira na cabine,
+    e a máscara do latão ficou mais justa;
+  - (média) o interior passava da soleira, fora da silhueta de hoje: agora para em y = 641;
+  - (média) o casco era cortado em linha reta no meio da hera: o corte agora é em zigue-zague numa chapa lisa (x = 150
+    e x = 870), com a hera inteira no meio;
+  - (média) o convés acabava na borda do casco: agora desce 10 px por baixo dela;
+  - (média) faltava o antes e o depois no jogo: a seção acima, com o protótipo;
+  - (baixas) o tamanho e a ordem na página, a ordem do `preview.py` (agora pela profundidade), a franja rosada dos
+    pedaços escondidos (o alfa da edição encolhe 1 px) e as máscaras, que agora vão para `masks/`.
