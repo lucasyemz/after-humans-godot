@@ -250,26 +250,27 @@
      692
     ],
     "hero_example": "hero_cao_bento",
-    "existing_seat_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+    "pose": "hero_cao_bento_seat_front",
     "source_hip_contact": [
-     240,
-     480
+     333,
+     455
     ],
     "source_foot_anchor": [
-     283,
-     710
+     333,
+     707
     ],
-    "source_body_reference_pixels": 948,
+    "source_body_reference_pixels": 946,
     "height_m": 1.72,
-    "preview_scale": 0.498945,
+    "preview_scale": 0.5,
     "sprite_top_left": [
-     185.3,
-     452.5
+     138.5,
+     464.5
     ],
     "projected_foot_anchor": [
-     326.5,
-     806.8
-    ]
+     305.0,
+     818.0
+    ],
+    "file": "res://art/station/poses/hero_cao_bento_seat_front.webp"
    },
    {
     "slot": 1,
@@ -278,26 +279,27 @@
      692
     ],
     "hero_example": "hero_gato_nick",
-    "existing_seat_file": "res://art/station/poses/hero_gato_nick_seat.webp",
+    "pose": "hero_gato_nick_seat_front",
     "source_hip_contact": [
-     260,
-     490
+     328,
+     418
     ],
     "source_foot_anchor": [
-     302,
-     639
+     328,
+     707
     ],
-    "source_body_reference_pixels": 804,
+    "source_body_reference_pixels": 946,
     "height_m": 1.5,
-    "preview_scale": 0.51306,
+    "preview_scale": 0.436047,
     "sprite_top_left": [
-     451.6,
-     440.6
+     442.0,
+     509.7
     ],
     "projected_foot_anchor": [
-     606.5,
-     768.4
-    ]
+     585.0,
+     818.0
+    ],
+    "file": "res://art/station/poses/hero_gato_nick_seat_front.webp"
    },
    {
     "slot": 2,
@@ -306,26 +308,27 @@
      692
     ],
     "hero_example": "hero_sapo_iris",
-    "existing_seat_file": "res://art/station/poses/hero_sapo_iris_seat.webp",
+    "pose": "hero_sapo_iris_seat_front",
     "source_hip_contact": [
-     275,
-     490
+     428,
+     393
     ],
     "source_foot_anchor": [
-     273,
-     686
+     428,
+     707
     ],
-    "source_body_reference_pixels": 924,
+    "source_body_reference_pixels": 946,
     "height_m": 1.38,
-    "preview_scale": 0.410714,
+    "preview_scale": 0.401163,
     "sprite_top_left": [
-     1214.1,
-     490.8
+     1155.3,
+     534.3
     ],
     "projected_foot_anchor": [
-     1326.2,
-     772.5
-    ]
+     1327.0,
+     817.9
+    ],
+    "file": "res://art/station/poses/hero_sapo_iris_seat_front.webp"
    },
    {
     "slot": 3,
@@ -334,30 +337,32 @@
      692
     ],
     "hero_example": "hero_coruja_vespera",
-    "existing_seat_file": "res://art/station/poses/hero_coruja_vespera_seat.webp",
+    "pose": "hero_coruja_vespera_seat_front",
     "source_hip_contact": [
-     285,
-     500
+     388,
+     445
     ],
     "source_foot_anchor": [
-     296,
-     623
+     388,
+     706
     ],
-    "source_body_reference_pixels": 784,
+    "source_body_reference_pixels": 946,
     "height_m": 1.66,
-    "preview_scale": 0.58227,
+    "preview_scale": 0.482558,
     "sprite_top_left": [
-     1445.1,
-     400.9
+     1423.8,
+     477.3
     ],
     "projected_foot_anchor": [
-     1617.5,
-     763.7
-    ]
+     1611.0,
+     818.0
+    ],
+    "file": "res://art/station/poses/hero_coruja_vespera_seat_front.webp"
    }
   ],
   "shadow_width_px": 520,
-  "floor_y": 800
+  "floor_y": 800,
+  "seat_rule": "pose de frente (station_poses.json, *_seat_front, #253): o ponto hip vai no assento; ele foi posto para os pés caírem no chão à frente do banco, 0,458 m abaixo da linha do assento na tela"
  },
  "rect_convention": "retângulos [x0, y0, x1, y1] com o fim exclusivo (x1 e y1 ficam fora), em px do quadro"
 }

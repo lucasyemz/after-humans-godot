@@ -23,7 +23,7 @@ Empilhado no #224 (é dele o vagão do Tutorial, `T_TU10`).
 
 ![6. A partida: as rodas girando, a equipe dentro](trem-2d/tunnel_departure.jpg)
 
-![7. A passagem: a equipe sentada nos bancos do mesmo vagão](trem-2d/passage.jpg)
+![7. A passagem: a equipe sentada de frente nos bancos do mesmo vagão](trem-2d/passage.jpg)
 
 As fotos 1 a 6 saem do motor (Godot 4.7.2, Compatibility, sem placa de vídeo) num **palco de prova**: a plataforma, a
 parede e os trilhos são provisórios, e a equipe desliza com a pose de pé. O vagão, as camadas, a profundidade, as portas,
@@ -86,16 +86,17 @@ de cima à esquerda.
 |---|---|---|---|
 | Túnel | `art/transitions/train/tunnel_loop.webp` | (0, 262), escala 1,1 | Atrás de tudo, repetido em X, a 96 px/s; modulado em (0,55; 0,6; 0,68) para casar com a luz fria do vagão |
 | Fundo | `art/transitions/train/carriage_background.webp` | (0, 0) | A parede, os bancos presos a ela, o chão; os oito vidros (as duas janelas e as duas da porta do fundo) com alfa 0 |
-| Sombras | — | sob o quadril e o pé | Uma sombra suave de contato no assento e, quando o pé alcança o chão, no chão (largura 520 px × a escala) |
-| A equipe | `art/station/poses/*_seat.webp` | ver os lugares | Sentada nos bancos, modulada em (0,84; 0,92; 1,0) |
+| Sombras | — | na linha do assento e sob o pé | Uma sombra suave de contato no assento e, quando o pé alcança o chão, no chão (largura 520 px × a escala) |
+| A equipe | `art/station/poses/*_seat_front.webp` | ver os lugares | Sentada de frente nos bancos (#253), modulada em (0,84; 0,92; 1,0) |
 | Barras | `art/transitions/train/carriage_poles.webp` | (0, 0) | As seis barras do corredor, **na frente** de quem está sentado |
 
 `carriage_bench.webp` (o banco solto do #79) sai: os bancos agora são da parede.
 
 **Os lugares** (o quadril no assento, 275 px/m, as alturas de `station_poses.json`): quatro vãos entre as barras, em
-x = 305, 585, 1327 e 1611, com o assento em y = 692. O contrato traz, para cada um, a escala, o canto de cima do sprite e
-onde cai o pé. Como no #79, os pés dos menores (o Nick e a Íris) ficam um pouco no ar: o banco é alto e não se estica a
-perna. Mostrar só quem está na equipe.
+x = 305, 585, 1327 e 1611, com o assento em y = 692. A equipe senta **de frente** (`*_seat_front`, #253, em
+[poses-frente.md](poses-frente.md)): o ponto `hip` da pose vai no assento e os pés caem no chão à frente do banco
+(y = 818). O contrato traz, para cada um, a escala, o canto de cima do sprite e onde cai o pé. Mostrar só quem está na
+equipe.
 
 ## Para a integração (Claude)
 
