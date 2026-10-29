@@ -108,8 +108,8 @@ plataformas); na passagem, só a partida no túnel.
    plataforma). O embarque passa a ser a equipe entrando pela porta da direita, com as portas fechando depois.
 2. **Passagem (`AHWagonRide`):** trocar o metrô 3D pela cena pintada do contrato. A partida e a chegada no túnel (com as
    rodas e a faísca) entram antes e depois do cartão, nos sons que já existem (`train_departure`, `train_brake`).
-3. **A Estação Raiz:** o metrô vermelho 3D (`art/station/metro`) ainda é outro trem. Fica para o Lucas decidir se a
-   plataforma da Estação ganha o vagão 2D também.
+3. **A Estação Raiz:** decidido pelo Lucas (29/10), a plataforma da Estação também usa o vagão 2D; o metrô vermelho 3D
+   (`art/station/metro`) saiu do jogo.
 
 Para gravar a prova de novo:
 

@@ -533,11 +533,6 @@ station_build.gd: Research_Bookshelf
 station_build.gd: Research_Notes
 station_build.gd: Research_RadioDesk
 station_build.gd: Research_SampleShelves
-station_build.gd: SM_BombardierBody
-station_build.gd: SM_BombardierFrontLeft
-station_build.gd: SM_BombardierFrontRight
-station_build.gd: SM_BombardierPlatformLeft
-station_build.gd: SM_BombardierPlatformRight
 station_build.gd: Terminal_Bench
 station_build.gd: bar
 station_build.gd: canteen
@@ -1360,11 +1355,7 @@ street_corridor.gd: entry
 scenario_world.gd: door
 scenario_world.gd: parts
 scenario_world.gd: blink
-scenario_world.gd: models
 scenario_world.gd: Metro
-scenario_world.gd: metro
-scenario_world.gd: SM_BombardierBody
-scenario_world.gd: yaw
 combat_hud.gd: turn
 combat_hud.gd: actor
 combat_hud.gd: command

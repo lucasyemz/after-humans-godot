@@ -137,6 +137,13 @@ func _scene(speed: int, reduced: bool) -> void:
 	await _tree.create_timer(1.0).timeout
 	t.check(Sound._effects.all(func(p): return not p.playing or not ["train_arrival.ogg", "train_departure.ogg"].has(String(p.stream.resource_path).get_file())),
 		"nenhum som do trem depois que ele some (%dx)" % speed)
+	# Pulada a volta da equipe no meio da freada, a faísca e a luz dela apagam com o trem fora (#256).
+	if car != null:
+		station._train_mode = 4
+		car.brake(true, 1.0, 1.0)
+		station.finish_team_arrival()
+		var lit: bool = car.find_children("*", "CPUParticles3D", true, false).any(func(p): return p.emitting or (p.get_child(0) as OmniLight3D).light_energy > 0.0)
+		t.check(not lit, "pulada a chegada na freada, a faísca apaga (%dx)" % speed)
 	station.train_event.disconnect(_on_event)
 
 

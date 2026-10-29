@@ -881,6 +881,10 @@ func _offset_wagon(x: float) -> void:
 	if _build.train_car != null:
 		_build.train_car.drive(x)
 		_build.train_car.set_doors(_door_open)
+		# A faísca é só da chegada (_tick_slide_in liga e desliga a cada quadro): fora dela, apagada, também quando a
+		# chegada é pulada no meio da freada.
+		if _train_mode != 1 and _train_mode != 4:
+			_build.train_car.brake(false)
 	var slides := {}
 	for door in _build.wagon_doors:
 		slides[door[0]] = door[1] * 0.88 * _door_open
@@ -1064,8 +1068,8 @@ func finish_team_arrival() -> void:
 	Sound.fade_out(_train_sound, 0.3)
 	_warning_time = -1.0
 	_door_open = 0.0
-	_offset_wagon(TRAIN_OUT)
 	_train_mode = 0
+	_offset_wagon(TRAIN_OUT)
 	train_event.emit("team_ready")
 
 
