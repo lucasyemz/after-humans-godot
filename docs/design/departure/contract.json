@@ -1,4 +1,5 @@
 {
+  "superseded_by": "docs/design/trem-2d/contract.json (#149, 29/10): o fundo e o banco daqui foram trocados pelo interior do vagão verde; carriage_bench.webp saiu do repositório",
   "issue": 79,
   "base_commit": "83e2717",
   "canvas": [

@@ -20,7 +20,8 @@ SURFACES = {"T_TU09": ("tu-platform-floor.png", 1024)}
 # Os elementos recortados, um por imagem (a folha 3x2, tu-props-sheet.png, foi a referência deles); a lâmpada sai
 # recortada da própria folha (ela é pequena na cena). A escada é a segunda versão (tu-ladder-2.png: de lado, até o
 # alçapão no teto).
-PROPS = {"T_TU04": "tu-bars.png", "T_TU05": "tu-roots.png", "T_TU06": "tu-ladder-2.png", "T_TU07": "tu-duct.png"}
+# As raízes (T_TU05, tu-roots.png) saíram do mapa em 28/10 (o Lucas no #224: são de outro bioma).
+PROPS = {"T_TU04": "tu-bars.png", "T_TU06": "tu-ladder-2.png", "T_TU07": "tu-duct.png"}
 # Os interativos: o fechado e o aberto (o aberto é uma edição do fechado, no mesmo quadro).
 PAIRS = {"T_TUX01_Security_Door": "tu-door", "T_TUX02_Maintenance_Locker": "tu-locker", "T_TUX03_Door_Panel": "tu-panel"}
 
@@ -158,6 +159,7 @@ def main(src: str) -> None:
     # A lâmpada na folha 3x2 (1264 x 848), pela caixa medida: a célula pega uma ponta da plataforma ao lado.
     lamp = cut(Image.open(src / "tu-props-sheet.png").crop((468, 505, 640, 760)))
     lamp = lamp.crop(bbox(lamp))
+    # A lâmpada daqui foi trocada pela luminária de docs/design/tutorial-acabamento/cut_lamp.py (28/10): rode-o depois.
     save(lamp, "T_TU08")
     save(lit_lamp(lamp), "T_TU08_Lit")
     train = cut(Image.open(src / "tu-train-sheet-2.png"))
