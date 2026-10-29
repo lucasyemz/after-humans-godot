@@ -99,3 +99,16 @@ Na rua, as folhas e os dois respiros de vapor custam uma chamada cada, e as prim
 vapor são quads). Na luta, a diferença maior (35 objetos e 8 chamadas no Ultra) vem em parte da luta sorteada em cada
 rodada, que não é a mesma nas duas medidas. O desfoque de profundidade e a névoa volumétrica, que são o custo de verdade, não aparecem nessas colunas: o
 tempo de quadro no Forward+, no Baixo e no Ultra, fica para o PC do Orquestrador, com o mesmo comando.
+
+## A luz prática na Rua (#154)
+
+O tambor com fogo, o lampião, a luz de emergência e o farol do drone (`AHPracticalLight`). No `--perf` da nuvem
+(Compatibility em software), a parada de rua do roteiro fica longe dos becos das fontes (x 37 a 52) e as chamadas e
+primitivas são as da #153 (Rua: 196 e 8.640 no Baixo, 295 e 71.982 no Ultra). No Compatibility e no Baixo, as fontes não
+acendem luz da cena (só o halo e a poça desenhados): cada fonte custa três ou quatro quads somados e, no tambor, as 10
+fagulhas.
+
+O custo que importa é no Forward+, da Média para cima: três OmniLight (a do tambor com sombra pelo `lamp_shadows`) e a
+SpotLight do drone, com a névoa volumétrica. Para medir no beco do tambor, o tempo de quadro de cada foto de
+`tools/capture_154.gd` sai em `frames.txt` (`--rendering-method forward_plus`), no Baixo, no Alto e no Ultra: fica para
+o PC do Orquestrador.

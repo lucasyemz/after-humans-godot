@@ -1572,6 +1572,7 @@ refuge_hud.gd: sleepless
 refuge_hud.gd: Shade
 street.gd: steam
 street.gd: embers
+street.gd: lights
 street.gd: Steam
 street.gd: Leaves
 street.gd: dust

@@ -5157,15 +5157,15 @@ msgstr "night"
 msgid "noite de chuva"
 msgstr "rainy night"
 
-#: scripts/street/street.gd:1055
+#: scripts/street/street.gd:1074
 msgid "Noite"
 msgstr "Night"
 
-#: scripts/street/street.gd:1055
+#: scripts/street/street.gd:1074
 msgid "Fim de tarde"
 msgstr "Late afternoon"
 
-#: scripts/street/street.gd:1055
+#: scripts/street/street.gd:1074
 msgid " · chuva"
 msgstr " · rain"
 
