@@ -1,0 +1,772 @@
+{
+  "after": "external lobby prototypes bound in memory with contract anchors",
+  "base_commit": "5bb29281",
+  "before": "main native art; recruits missing station poses/female variants use their current male idle fallback; no production files changed",
+  "cases": {
+    "idle_0": {
+      "actors": [
+        {
+          "actor": "bento",
+          "before_file": "res://art/combat/heroes/bento/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(1.2, -5.2, -3.3)"
+        },
+        {
+          "actor": "nick",
+          "before_file": "res://art/combat/heroes/nick/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(2.8, -5.2, -3.3)"
+        },
+        {
+          "actor": "iris",
+          "before_file": "res://art/combat/heroes/iris/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(4.4, -5.2, -3.3)"
+        },
+        {
+          "actor": "vespera",
+          "before_file": "res://art/combat/heroes/vespera/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(6, -5.2, -3.3)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 3.6, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "characters",
+      "same_positions_camera_paused_time": true,
+      "state": "idle"
+    },
+    "idle_1": {
+      "actors": [
+        {
+          "actor": "dog_male",
+          "before_file": "res://art/combat/recruits/dog_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(1.2, -5.2, -3.3)"
+        },
+        {
+          "actor": "dog_female",
+          "before_file": "res://art/combat/recruits/dog_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": false,
+          "position": "Vector3(2.8, -5.2, -3.3)"
+        },
+        {
+          "actor": "cat_male",
+          "before_file": "res://art/combat/recruits/cat_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(4.4, -5.2, -3.3)"
+        },
+        {
+          "actor": "cat_female",
+          "before_file": "res://art/combat/recruits/cat_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": false,
+          "position": "Vector3(6, -5.2, -3.3)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 3.6, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "characters",
+      "same_positions_camera_paused_time": true,
+      "state": "idle"
+    },
+    "idle_2": {
+      "actors": [
+        {
+          "actor": "frog_male",
+          "before_file": "res://art/combat/recruits/frog_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(1.2, -5.2, -3.3)"
+        },
+        {
+          "actor": "frog_female",
+          "before_file": "res://art/combat/recruits/frog_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": false,
+          "position": "Vector3(2.8, -5.2, -3.3)"
+        },
+        {
+          "actor": "owl_male",
+          "before_file": "res://art/combat/recruits/owl_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(4.4, -5.2, -3.3)"
+        },
+        {
+          "actor": "owl_female",
+          "before_file": "res://art/combat/recruits/owl_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": false,
+          "position": "Vector3(6, -5.2, -3.3)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 3.6, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "characters",
+      "same_positions_camera_paused_time": true,
+      "state": "idle"
+    },
+    "idle_3": {
+      "actors": [
+        {
+          "actor": "raccoon_male",
+          "before_file": "res://art/combat/recruits/raccoon_recruit_01/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(1.2, -5.2, -3.3)"
+        },
+        {
+          "actor": "raccoon_female",
+          "before_file": "res://art/combat/recruits/raccoon_recruit_01/idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": false,
+          "position": "Vector3(2.8, -5.2, -3.3)"
+        },
+        {
+          "actor": "armadillo_male",
+          "before_file": "res://art/combat/recruits/armadillo_recruit_01/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(4.4, -5.2, -3.3)"
+        },
+        {
+          "actor": "armadillo_female",
+          "before_file": "res://art/combat/recruits/armadillo_recruit_01/idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": false,
+          "position": "Vector3(6, -5.2, -3.3)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 3.6, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "characters",
+      "same_positions_camera_paused_time": true,
+      "state": "idle"
+    },
+    "seat_0": {
+      "actors": [
+        {
+          "actor": "bento",
+          "before_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(17.6, -5.2, -5.94)"
+        },
+        {
+          "actor": "nick",
+          "before_file": "res://art/station/poses/hero_gato_nick_seat.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(19.4, -5.2, -5.94)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 18.5, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "canteen",
+      "same_positions_camera_paused_time": true,
+      "state": "seat"
+    },
+    "seat_1": {
+      "actors": [
+        {
+          "actor": "iris",
+          "before_file": "res://art/station/poses/hero_sapo_iris_seat.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(17.6, -5.2, -5.94)"
+        },
+        {
+          "actor": "vespera",
+          "before_file": "res://art/station/poses/hero_coruja_vespera_seat.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(19.4, -5.2, -5.94)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 18.5, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "canteen",
+      "same_positions_camera_paused_time": true,
+      "state": "seat"
+    },
+    "seat_2": {
+      "actors": [
+        {
+          "actor": "dog_male",
+          "before_file": "res://art/combat/recruits/dog_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(17.6, -5.2, -5.94)"
+        },
+        {
+          "actor": "dog_female",
+          "before_file": "res://art/combat/recruits/dog_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(19.4, -5.2, -5.94)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 18.5, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "canteen",
+      "same_positions_camera_paused_time": true,
+      "state": "seat"
+    },
+    "seat_3": {
+      "actors": [
+        {
+          "actor": "cat_male",
+          "before_file": "res://art/combat/recruits/cat_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(17.6, -5.2, -5.94)"
+        },
+        {
+          "actor": "cat_female",
+          "before_file": "res://art/combat/recruits/cat_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(19.4, -5.2, -5.94)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 18.5, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "canteen",
+      "same_positions_camera_paused_time": true,
+      "state": "seat"
+    },
+    "seat_4": {
+      "actors": [
+        {
+          "actor": "frog_male",
+          "before_file": "res://art/combat/recruits/frog_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(17.6, -5.2, -5.94)"
+        },
+        {
+          "actor": "frog_female",
+          "before_file": "res://art/combat/recruits/frog_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(19.4, -5.2, -5.94)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 18.5, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "canteen",
+      "same_positions_camera_paused_time": true,
+      "state": "seat"
+    },
+    "seat_5": {
+      "actors": [
+        {
+          "actor": "owl_male",
+          "before_file": "res://art/combat/recruits/owl_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(17.6, -5.2, -5.94)"
+        },
+        {
+          "actor": "owl_female",
+          "before_file": "res://art/combat/recruits/owl_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(19.4, -5.2, -5.94)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 18.5, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "canteen",
+      "same_positions_camera_paused_time": true,
+      "state": "seat"
+    },
+    "seat_6": {
+      "actors": [
+        {
+          "actor": "raccoon_male",
+          "before_file": "res://art/combat/recruits/raccoon_recruit_01/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(17.6, -5.2, -5.94)"
+        },
+        {
+          "actor": "raccoon_female",
+          "before_file": "res://art/combat/recruits/raccoon_recruit_01/idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(19.4, -5.2, -5.94)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 18.5, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "canteen",
+      "same_positions_camera_paused_time": true,
+      "state": "seat"
+    },
+    "seat_7": {
+      "actors": [
+        {
+          "actor": "armadillo_male",
+          "before_file": "res://art/combat/recruits/armadillo_recruit_01/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(17.6, -5.2, -5.94)"
+        },
+        {
+          "actor": "armadillo_female",
+          "before_file": "res://art/combat/recruits/armadillo_recruit_01/idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(19.4, -5.2, -5.94)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 18.5, -3.9, 6.2)",
+      "fov": 26.0,
+      "room": "canteen",
+      "same_positions_camera_paused_time": true,
+      "state": "seat"
+    },
+    "sleep_0": {
+      "actors": [
+        {
+          "actor": "bento",
+          "before_file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(-10.219999, -4.7756214, -6.35)"
+        },
+        {
+          "actor": "nick",
+          "before_file": "res://art/station/poses/hero_gato_nick_sleep.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(-6.72, -4.7756214, -6.35)"
+        },
+        {
+          "actor": "iris",
+          "before_file": "res://art/station/poses/hero_sapo_iris_sleep.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(-10.219999, -3.94182, -6.35)"
+        },
+        {
+          "actor": "vespera",
+          "before_file": "res://art/station/poses/hero_coruja_vespera_sleep.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(-6.72, -3.94182, -6.35)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, -8.469999, -3.9587207, 6.2)",
+      "fov": 26.0,
+      "room": "dormitory",
+      "same_positions_camera_paused_time": true,
+      "state": "sleep"
+    },
+    "sleep_1": {
+      "actors": [
+        {
+          "actor": "dog_male",
+          "before_file": "res://art/combat/recruits/dog_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(-10.219999, -4.7756214, -6.35)"
+        },
+        {
+          "actor": "dog_female",
+          "before_file": "res://art/combat/recruits/dog_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(-6.72, -4.7756214, -6.35)"
+        },
+        {
+          "actor": "cat_male",
+          "before_file": "res://art/combat/recruits/cat_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(-10.219999, -3.94182, -6.35)"
+        },
+        {
+          "actor": "cat_female",
+          "before_file": "res://art/combat/recruits/cat_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(-6.72, -3.94182, -6.35)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, -8.469999, -3.9587207, 6.2)",
+      "fov": 26.0,
+      "room": "dormitory",
+      "same_positions_camera_paused_time": true,
+      "state": "sleep"
+    },
+    "sleep_2": {
+      "actors": [
+        {
+          "actor": "frog_male",
+          "before_file": "res://art/combat/recruits/frog_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(-10.219999, -4.7756214, -6.35)"
+        },
+        {
+          "actor": "frog_female",
+          "before_file": "res://art/combat/recruits/frog_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(-6.72, -4.7756214, -6.35)"
+        },
+        {
+          "actor": "owl_male",
+          "before_file": "res://art/combat/recruits/owl_recruit_01_idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(-10.219999, -3.94182, -6.35)"
+        },
+        {
+          "actor": "owl_female",
+          "before_file": "res://art/combat/recruits/owl_recruit_01_idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(-6.72, -3.94182, -6.35)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, -8.469999, -3.9587207, 6.2)",
+      "fov": 26.0,
+      "room": "dormitory",
+      "same_positions_camera_paused_time": true,
+      "state": "sleep"
+    },
+    "sleep_3": {
+      "actors": [
+        {
+          "actor": "raccoon_male",
+          "before_file": "res://art/combat/recruits/raccoon_recruit_01/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(-10.219999, -4.7756214, -6.35)"
+        },
+        {
+          "actor": "raccoon_female",
+          "before_file": "res://art/combat/recruits/raccoon_recruit_01/idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(-6.72, -4.7756214, -6.35)"
+        },
+        {
+          "actor": "armadillo_male",
+          "before_file": "res://art/combat/recruits/armadillo_recruit_01/idle.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": true,
+          "position": "Vector3(-10.219999, -3.94182, -6.35)"
+        },
+        {
+          "actor": "armadillo_female",
+          "before_file": "res://art/combat/recruits/armadillo_recruit_01/idle.webp",
+          "female_missing_in_main": true,
+          "missing_in_main": true,
+          "position": "Vector3(-6.72, -3.94182, -6.35)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, -8.469999, -3.9587207, 6.2)",
+      "fov": 26.0,
+      "room": "dormitory",
+      "same_positions_camera_paused_time": true,
+      "state": "sleep"
+    },
+    "work": {
+      "actors": [
+        {
+          "actor": "bento",
+          "before_file": "res://art/station/poses/hero_cao_bento_work.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(-2.8, -9.4, -3.3)"
+        },
+        {
+          "actor": "nick",
+          "before_file": "res://art/station/poses/hero_gato_nick_work.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(-1.2, -9.4, -3.3)"
+        },
+        {
+          "actor": "iris",
+          "before_file": "res://art/station/poses/hero_sapo_iris_work.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(0.4, -9.4, -3.3)"
+        },
+        {
+          "actor": "vespera",
+          "before_file": "res://art/station/poses/hero_coruja_vespera_work.webp",
+          "female_missing_in_main": false,
+          "missing_in_main": false,
+          "position": "Vector3(2, -9.4, -3.3)"
+        }
+      ],
+      "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, -0.4, -8.1, 6.2)",
+      "fov": 26.0,
+      "room": "research",
+      "same_positions_camera_paused_time": true,
+      "state": "work"
+    }
+  },
+  "engine": "4.7.2-stable (official)",
+  "fixture": "isolated initial campaign with rooms unlocked only in memory; real Station geometry/furniture; external cards in canonical bench/bed slots",
+  "physical_gpu": false,
+  "renderer": "OpenGL Compatibility / Mesa llvmpipe CPU / Xvfb",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "screenshots": {
+    "idle_0_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "73e571757374969bf7aa154fc7ab003c70eb6ffc41402bab9bbb5e4efa4ba332"
+    },
+    "idle_0_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "a066606a8d7cd9365ee250d349024c1ef9a1c85d2e1d1ad641715edbf1b96a91"
+    },
+    "idle_1_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "b5edc1749e8cf78966eb8287f1bc84d38ea4e2e34219c40ad2493dcb5e74216d"
+    },
+    "idle_1_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "df64c7ec085043bb492465be67c1e2864e954206082c612071df8d726c22d753"
+    },
+    "idle_2_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "f1d0d46f4d4f446a7c440765c3d6fb4cd88f95e5c1ad9cf06e2a3ddbeb3dc1ca"
+    },
+    "idle_2_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "8df48001bfe8983c0757101bc48a93caeebb85b739c59892db2792f165221b55"
+    },
+    "idle_3_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "13f0ef5d3ba6160a8878afc29f2ecade91b9ab7a33fae6be75b1b47272e93202"
+    },
+    "idle_3_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "0a63af442bfe31a4ede6f967013fcdff6d7574c8d09635647819c118db33a9cd"
+    },
+    "seat_0_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "6c79ad26132a235d54e3ac84d1d7cdbae54565e0d85ee7699894b033cbe9e887"
+    },
+    "seat_0_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "bfce02860163a71940dd8334dbb29d3a76ca46188a9d83afeaea5503bac2ab6a"
+    },
+    "seat_1_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "f1f384b2b79984c686d54aef31fa06ca1644d9ebd919f23ff55c7f36e2bf455e"
+    },
+    "seat_1_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "c41b8850cf3bfcd571679de33512d41e961d4bff46da32f5fb1da494d3b46201"
+    },
+    "seat_2_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "b63e59a6b606e8c8736ac2dcf50e3101abe9395b5dcd30cd638f0aadbad9d8e3"
+    },
+    "seat_2_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "da25239573489f51a313b3a6562dedc9bc6937d41fad2b8de9fa6a8dd1015607"
+    },
+    "seat_3_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "96aab734b6baf18cf05ca52915911c0e135e8111e8417746f22fc243067c98fb"
+    },
+    "seat_3_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "ae0cbb1bef39684c15ab1fee81ad7c9d09080a727a73fc5fbe5222f601bf9078"
+    },
+    "seat_4_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "6dfc9c4d2ea3b276b1ac26a4728602cde65a093940cdd4fd28dc6a60fc2d5b8c"
+    },
+    "seat_4_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "31a64c93b51308456cf91aad48648780a53abed0dd7a0e5b10622385bd0b5b27"
+    },
+    "seat_5_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "ad12bc60247f2f6a3fc8103cca7a52d0a671866be4cf2bc4444304687da85b5e"
+    },
+    "seat_5_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "60b144970182a67829e0ee02646d912e9c1321d6a6c4361389e085c3d07d0939"
+    },
+    "seat_6_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "2ff0ef5696fd2bef747755c83c5b871d060680b382c800f6a864f330c129405c"
+    },
+    "seat_6_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "8d1bf8763f87eec708b6e0719b47739d0086c2d42e9d29d4f681685bf1d1e3f8"
+    },
+    "seat_7_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "6be0dd5ea8cf67b6008ba2be6b4150a7ff84f71f0045e323d66b449f92c60265"
+    },
+    "seat_7_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "67cd174e348940dff97aa47fff74eb47e6f71489cc40142164f4081322f7e80d"
+    },
+    "sleep_0_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "5deec2baf5ba239220ef51b05fedb5cdb4330f7b9d4df6ca9a114ebac23d71e8"
+    },
+    "sleep_0_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "8c7b4bb9a3b325bcedf6326fcd91928ca6f2f6f8714eec1dfd74beac87d0ce96"
+    },
+    "sleep_1_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "b096c10ce617c2dd1d8ec721d9bf6e0f045b14333bae76e76776eac329c11dc1"
+    },
+    "sleep_1_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "a0aac6423d7911b8403b1e9a90c9b0378eec43d1ee5c3f40bd513e1f3dc3adbd"
+    },
+    "sleep_2_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "df30235ced7e70f1271cdb462020d9ba230aa9991e482cd3de7eb69e76665a3b"
+    },
+    "sleep_2_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "e126bdd45bb88905c401c3f1e0ed395e4d28d46211b7c34a1d98438c8d16aa06"
+    },
+    "sleep_3_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "a0be7c05a7ecf5e899fe2416b59956254aceea7f1cf7e6dfd6a5bf3841070cfd"
+    },
+    "sleep_3_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "2388738d5f3fcb6838074ba674e2eaf3696d68b6ad0f790c7840b9ba5fb0519f"
+    },
+    "work_before": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "162f94827942e4a643e674b7d6cf7278651439c08ca85350b84ccf17bb023da3"
+    },
+    "work_after": {
+      "size": [
+        1920,
+        1080
+      ],
+      "png_sha256": "d1fcff226ceed71fd335a7472b7562b258b894a2e5115d18ef7b7171ad010e37"
+    }
+  }
+}

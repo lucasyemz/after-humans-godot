@@ -106,6 +106,18 @@ static var _textures := {}
 static var _fonts := {}
 
 
+## O foco no quadro seguinte (depois de montar a tela), só se o controle ainda existe e está na árvore: a tela refeita
+## ou fechada antes disso não deixa erro. Guarda o id, não o controle (a lambda com um nó liberado também dá erro).
+static func focus_later(control: Control) -> void:
+	if control == null:
+		return
+	var id := control.get_instance_id()
+	(func():
+		var target = instance_from_id(id)
+		if target is Control and target.is_inside_tree():
+			target.grab_focus()).call_deferred()
+
+
 static func _cb() -> int:
 	return 1 if Settings.colorblind else 0
 

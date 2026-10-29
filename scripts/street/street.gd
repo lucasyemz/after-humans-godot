@@ -924,15 +924,16 @@ func _update_camera(delta: float) -> void:
 			EXPLORE_CAMERA.indoor.height, -1.2)
 		pitch = deg_to_rad(4.0)
 		distance = EXPLORE_CAMERA.indoor.distance
-		# No acampamento da casa (#77), a câmera fica no herói escolhido, mais perto e mais baixa (todos sentados no chão).
+		# No acampamento da casa (#77), a câmera fica na fogueira, mais perto, e olha de cima como a arte das poses (#205).
 		if corridor != null and corridor.camp != null and corridor.camp.active and not corridor.camp.at_stop():
 			target = Vector3(corridor.camp.focus_x, AHCampScene.FOCUS_HEIGHT, -0.2)
 			distance = AHCampScene.FOCUS_DISTANCE
-	# Na parada de descanso (#143), a fogueira fica na rua ou no cenário: a câmera fica parada nela, baixa, e recua o
+			pitch = deg_to_rad(AHCampScene.FOCUS_PITCH)
+	# Na parada de descanso (#143), a fogueira fica na rua ou no cenário: a câmera fica parada nela, de cima (#205), e recua o
 	# bastante para a fileira inteira caber (nos cenários a lente é mais fechada, 30° na horizontal).
 	if corridor != null and corridor.camp != null and corridor.camp.active and corridor.camp.at_stop():
 		target = corridor.camp.focus_point()
-		pitch = deg_to_rad(4.0)
+		pitch = deg_to_rad(corridor.camp.pitch())
 		var half_h := atan(tan(deg_to_rad(_camera.fov * 0.5)) * get_viewport().get_visible_rect().size.aspect())
 		distance = maxf(AHCampScene.FOCUS_DISTANCE, AHCampScene.ROW_HALF_WIDTH / tan(half_h))
 	if _arena != null and _arena.active:
@@ -1537,4 +1538,6 @@ func _run_combat_capture(delta: float) -> void:
 			if _combat_time > 0.8:
 				_save_capture("16-house-search", "16-house-search food=%d seeds=%d event=%s" % [campaign.session.expedition.food,
 					campaign.session.expedition.loot.seeds, str(campaign.session.event != null)])
-				get_tree().quit()
+				# Uma vez só: o Sound.quit espera o áudio antes de fechar, e a fase rodaria de novo nesse meio-tempo.
+				_combat_phase = 8
+				Sound.quit()

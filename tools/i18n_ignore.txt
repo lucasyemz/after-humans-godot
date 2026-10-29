@@ -344,6 +344,8 @@ game_data_service.gd: perks
 game_data_service.gd: tabelas do combate incompletas
 game_flow.gd: GameFlow: cena desconhecida ou troca em andamento (%s).
 game_flow.gd: title
+game_flow.gd: backdrop
+game_flow.gd: GameFlow: a cena %s não carregou.
 inventory_panel.gd: %d / %d
 inventory_panel.gd: Description
 inventory_panel.gd: ampoule
@@ -1017,10 +1019,6 @@ character_room.gd: overview
 character_room.gd: facilities
 character_room.gd: characters
 character_room.gd: hide
-character_room.gd: Hero
-character_room.gd: file
-character_room.gd: frames
-character_room.gd: fps
 character_room.gd: Left
 character_room.gd: Heroes
 character_room.gd: Tab_%s
@@ -1587,6 +1585,9 @@ passage_card.gd: Sound
 passage_card.gd: Ambience
 passage_card.gd: gain
 passage_card.gd: end
+*: next
+ui_style.gd: enemies
+refuge_hud.gd: Pair_%s
 exploration_hud.gd: Carried
 *: carried
 exploration_hud.gd: %s (%s)
@@ -1599,3 +1600,9 @@ street_corridor.gd: death
 ui_style.gd: enemies
 exploration_hud.gd: Wounded
 kit.gd: wounded
+character_room.gd: Skins
+character_room.gd: Skin_%s
+*: skins
+*: heroes
+*: default
+station_rules.gd: Unlock

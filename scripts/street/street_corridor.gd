@@ -545,6 +545,9 @@ func _travel_map(campaign: Dictionary, next: int, confirmed: bool = false) -> vo
 				else tr("%s ainda estão no lugar da luta, e a equipe não volta para cá depois de seguir. Quem fica no chão só é recolhido na saída, mais ferido, e chega com a recuperação inteira.")) % _names(left),
 			[[tr("Ficar e levantar"), func(): pass], [tr("Seguir mesmo assim"), func(): _travel_map(Campaign.state, next, true)]])
 		return
+	# Com outra troca em andamento, a passagem seria recusada: nem o trecho avança nem o corredor fica preso no busy.
+	if GameFlow.busy:
+		return
 	busy = true
 	R.enter_step(campaign, next)
 	Campaign.save()
@@ -694,8 +697,11 @@ func _light_stop_camp(place: Dictionary) -> void:
 	stop_camp = AHStreetCamp.new()
 	street.add_child(stop_camp)
 	var x := float(place.x)
-	stop_camp.build(x, float(place.get("leave", x + AHCampScene.LEAVE_OFFSET)),
-		street.floor_y if street.scenario else street._ground_height(street.lane_z), street.lane_z)
+	# Com água no chão onde a fogueira cairia (o Depósito Inundado), o tambor com fogo no lugar dela.
+	var floor_y: float = street.floor_y if street.scenario else street._ground_height(street.lane_z)
+	# O ponto é o da fogueira (o x dela, o piso, a faixa de andar), o mesmo que a câmera do acampamento lê (stop_pitch).
+	var in_water: bool = street.scenario != null and street.scenario.water_floor(Vector3(x, floor_y, street.lane_z))
+	stop_camp.build(x, float(place.get("leave", x + AHCampScene.LEAVE_OFFSET)), floor_y, street.lane_z, in_water)
 	stop_camp.set_camp_lit(true)
 	_hide_guards_near(stop_camp.camp_x)
 

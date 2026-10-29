@@ -1,0 +1,32 @@
+{
+  "checks": [
+    {
+      "file": "res://art/civilians/merchant/idle.webp",
+      "rgba": true,
+      "size": true,
+      "magenta_pixels": 0,
+      "source_size": true
+    },
+    {
+      "file": "res://art/civilians/merchant/walk.webp",
+      "rgba": true,
+      "size": true,
+      "magenta_pixels": 0,
+      "source_size": true
+    },
+    {
+      "file": "res://art/civilians/merchant/trade.webp",
+      "rgba": true,
+      "size": true,
+      "magenta_pixels": 0,
+      "source_size": true
+    },
+    {
+      "file": "res://art/ui/portraits/merchant.webp",
+      "rgba": true,
+      "size": true,
+      "magenta_pixels": 0,
+      "source_size": true
+    }
+  ]
+}

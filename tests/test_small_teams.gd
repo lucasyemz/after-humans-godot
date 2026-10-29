@@ -140,8 +140,9 @@ func _preparation(t) -> void:
 	var classes := ["cao", "gato", "sapo", "coruja", "cao", "gato", "sapo", "coruja"]
 	# O Alojamento no nível máximo (#119): cabem doze.
 	Campaign.state.station.rooms[S.CHARACTERS] = 4
+	# Direto no elenco, como num save antigo: com um rosto por classe, o recrutamento para em oito (#182).
 	for i in classes.size():
-		S.recruit(Campaign.state, classes[i], RandomNumberGenerator.new(), "Voluntário %d" % (i + 1))
+		S._add_hero(Campaign.state, S._next_hero_id(Campaign.state, classes[i]), classes[i], "Voluntário %d" % (i + 1), [], "")
 	t.equal(S.living(Campaign.state).size(), 12, "doze na Estação")
 	Settings.set_text_size(2)
 	hud._draft.phase = "fase_1"

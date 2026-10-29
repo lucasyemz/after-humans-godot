@@ -1,0 +1,12 @@
+{
+  "body_pngs": 52,
+  "raw_atlases_and_corrections": 18,
+  "models": 16,
+  "real_game_pairs": 17,
+  "qa_rounds": 2,
+  "verdict": "APROVADO",
+  "alpha_rgba_canvas_hash": true,
+  "no_visible_border_clipping": true,
+  "transparent_rgb_zero": true,
+  "production_changes": false
+}

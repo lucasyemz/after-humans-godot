@@ -5,7 +5,9 @@
     "ChanceStep": 15,
     "ChanceMax": 90,
     "CivilianShare": 50,
-    "Description": "Proposta (#122): na volta de cada expedição, a chance (em %) de o trem trazer alguém. Sobe ChanceStep a cada volta sem ninguém, até ChanceMax, e volta à base quando alguém chega. Com a fila dos civis e uma classe liberada, CivilianShare é a parte dos civis."
+    "SingleWeight": 60,
+    "PairWeight": 15,
+    "Description": "Proposta (#122): na volta de cada expedição, a chance (em %) de o trem trazer alguém. Sobe ChanceStep a cada volta sem ninguém, até ChanceMax, e volta à base quando alguém chega. Com a fila dos civis e uma classe liberada, CivilianShare é a parte dos civis. Proposta (#182): quando vem um animal, SingleWeight e PairWeight são os pesos de vir um ou dois (o segundo só com lugar para os dois no Alojamento e um rosto livre; cada um é decidido à parte). O Mercador (peso 25 na proposta) entra depois da decisão do Lucas."
   },
   {
     "Name": "recruit",

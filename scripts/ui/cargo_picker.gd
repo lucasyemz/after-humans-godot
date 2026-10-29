@@ -64,7 +64,7 @@ func _ready() -> void:
 	continue_button.pressed.connect(func(): closed.emit())
 	add_child(continue_button)
 	if not buttons.is_empty():
-		buttons[0].grab_focus.call_deferred()
+		AHKit.focus_later(buttons[0])
 
 
 func _choose(chosen_index: int) -> void:

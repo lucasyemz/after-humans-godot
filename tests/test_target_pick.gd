@@ -60,6 +60,7 @@ func _fight() -> void:
 	if not t.check(not options.is_empty(), "há uma habilidade com dois alvos inimigos"):
 		return
 	var option: Dictionary = options[0]
+	await _origins(hud, option)
 	hud._on_ability(option)
 	await _tree.process_frame
 	await _tree.process_frame
@@ -154,6 +155,60 @@ func _click(at: Vector2) -> void:
 		event.pressed = pressed
 		event.position = at
 		event.global_position = at
+		_tree.root.push_input(event)
+		await _tree.process_frame
+	await _tree.process_frame
+
+
+## A origem do toque no alvo (#72), na mesma vez (a escolha abre com um on_pick do teste, sem gastar a vez):
+## - o clique escolhe e a tecla Enter de verdade (não a ação) usa no escolhido na hora;
+## - o toque na tela: o primeiro escolhe sem usar, o segundo no mesmo usa.
+func _origins(hud: AHCombatHud, option: Dictionary) -> void:
+	var camera := hud.get_viewport().get_camera_3d()
+	var used := [-1]
+	var pick := func(rank): used[0] = rank
+	for origin in ["click_enter", "tap"]:
+		used[0] = -1
+		hud._show_markers(option.targets, option.enemy_side, pick, option.id)
+		await _tree.process_frame
+		await _tree.process_frame
+		var marker: Button = hud._markers.filter(func(m): return m.has_meta("card")).back()
+		var rank := int(marker.get_meta("rank"))
+		var card: AHSpriteCard = marker.get_meta("card")
+		var at := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 0.55, 0))
+		if origin == "click_enter":
+			await _click(at)
+			t.check(used[0] == -1 and hud._picked_rank == rank, "o clique escolhe sem usar")
+			await _key(KEY_ENTER)
+			t.equal(used[0], rank, "e a tecla Enter, depois do clique, usa no escolhido na hora")
+		else:
+			await _tap(at)
+			t.check(used[0] == -1 and hud._picked_rank == rank, "o primeiro toque escolhe sem usar")
+			await _tap(at)
+			t.equal(used[0], rank, "o segundo toque no mesmo usa")
+	t.check(hud.waiting and _command.is_empty(), "a vez segue do jogador")
+
+
+## Um toque de verdade na tela (o dedo, sem o mouse), em coordenadas da tela do jogo.
+func _tap(at: Vector2) -> void:
+	at = _tree.root.get_final_transform() * at
+	for pressed in [true, false]:
+		var event := InputEventScreenTouch.new()
+		event.index = 0
+		event.pressed = pressed
+		event.position = at
+		_tree.root.push_input(event)
+		await _tree.process_frame
+	await _tree.process_frame
+
+
+## Uma tecla de verdade (o evento da tecla, não a ação).
+func _key(keycode: Key) -> void:
+	for pressed in [true, false]:
+		var event := InputEventKey.new()
+		event.keycode = keycode
+		event.physical_keycode = keycode
+		event.pressed = pressed
 		_tree.root.push_input(event)
 		await _tree.process_frame
 	await _tree.process_frame

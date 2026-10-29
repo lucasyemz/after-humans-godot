@@ -34,10 +34,8 @@ var slot := 1
 var state := {}
 ## De onde veio o estado atual: "new", "primary" ou "backup".
 var source := "new"
-## Aviso para mostrar ao jogador (cópia recuperada, save inválido), no idioma de quando o save abriu.
-var load_warning := ""
-## O aviso guardado como tipo ("backup", "slot", "none") e espaço: warning_text() o traduz na hora de mostrar (#35),
-## porque o save abre antes de as Opções ligarem o idioma.
+## O aviso para o jogador (cópia recuperada, save inválido), guardado como tipo ("backup", "slot", "none") e espaço:
+## warning_text() o traduz na hora de mostrar (#35), porque o save abre antes de as Opções ligarem o idioma.
 var _warning_kind := ""
 var _warning_slot := 0
 
@@ -145,6 +143,8 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		"relic_id": "", "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
 		"art_variant": "",
+		# A skin completa que ele veste (#138): "default" é a arte de hoje; as outras ficam em data/skins.json.
+		"skin_id": "default",
 		# O nível (#90): o XP desde o último treino e as melhorias escolhidas (AHHeroLevels).
 		"level": 1, "xp": 0, "upgrades": [],
 		# Ninguém morre (#118): os dias que faltam na recuperação (0: pronto), se está num leito da Enfermaria e o ciclo
@@ -205,7 +205,6 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 func new_game(seed_value: int = -1) -> bool:
 	state = create_initial(seed_value)
 	source = "new"
-	load_warning = ""
 	_warning_kind = ""
 	# O tempo jogado desde o último save é da campanha de antes, não da nova.
 	_play_seconds = 0.0
@@ -431,7 +430,6 @@ func warning_text() -> String:
 
 ## Abre o principal; se não der, a cópia (com aviso); se nenhum servir, uma campanha nova sem gravar.
 func load_or_new() -> String:
-	load_warning = ""
 	_warning_kind = ""
 	var campaign = read_file(primary_path())
 	if campaign != null:
@@ -441,7 +439,6 @@ func load_or_new() -> String:
 		if campaign != null:
 			source = "backup"
 			_warning_kind = "backup"
-			load_warning = warning_text()
 	if campaign == null:
 		campaign = create_initial()
 		source = "new"
@@ -450,10 +447,8 @@ func load_or_new() -> String:
 			# Só este espaço falhou: o aviso diz qual e onde estão as outras campanhas.
 			_warning_kind = "slot"
 			_warning_slot = slot
-			load_warning = warning_text()
 		elif has_save():
 			_warning_kind = "none"
-			load_warning = warning_text()
 	# Saves anteriores às vagas não têm o tempo jogado (#34): começa em 0.
 	if not campaign.has("played_seconds"):
 		campaign.played_seconds = 0
