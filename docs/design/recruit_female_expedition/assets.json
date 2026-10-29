@@ -1,0 +1,127 @@
+{
+  "issue": 247,
+  "stage": "six female expedition costume concepts pending Lucas approval; no production poses",
+  "base_commit": "5bb29281c578f37f135a859a3d0073cd2f083f58",
+  "source_tag": null,
+  "source_folder": "art/combat/source/recruit_female_expedition_20261029",
+  "founders_modified": false,
+  "assets": {
+    "dog_cat": {
+      "source_file": "dog_cat_concept.png",
+      "source_sha256": "3d4b0ac3b7cdc3e7dbb4ea0ff79a4d3d92115ef241bb658804953ea1c4f616a0",
+      "canvas": [
+        1536,
+        1024
+      ],
+      "review_file": "dog_cat.webp",
+      "review_sha256": "ae2746d6834609dfe638c80de3cb4147f35b806c63c0597613bc685e16d81860",
+      "reduced_canvas": [
+        614,
+        410
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "left_to_right": [
+        "dog_male",
+        "dog_female",
+        "cat_male",
+        "cat_female"
+      ],
+      "references": [
+        {
+          "file": "art/combat/recruits/dog_recruit_01_idle.webp",
+          "sha256": "b14e3de96c7d9907cdeb7b58f4e16acb4748fa8259c47a082c1aeb81cd4d27c2",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "art/combat/recruits/cat_recruit_01_idle.webp",
+          "sha256": "a284912890ef2efd3a04eb67af6a9f1af385b5c55283702873f2f7a0db0ad286",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "dog_cat_variants_concept.png",
+          "sha256": "d35e4fc56f0c2b434f4005fac1517b8387c9719b037d811b472efce405339a74",
+          "origin": "codex-pr244-originals-r4 / lobby identity reference"
+        }
+      ]
+    },
+    "frog_owl": {
+      "source_file": "frog_owl_concept.png",
+      "source_sha256": "8bc2d6da6f7c8ba44fc6799dfb73ada8a2d5fce863306ff20866cc4db61d2c4c",
+      "canvas": [
+        1536,
+        1024
+      ],
+      "review_file": "frog_owl.webp",
+      "review_sha256": "798c8608be22804c4d6e0a08381f9c1f9aa27a0b38e95e24f19d37468c9bda73",
+      "reduced_canvas": [
+        614,
+        410
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "left_to_right": [
+        "frog_male",
+        "frog_female",
+        "owl_male",
+        "owl_female"
+      ],
+      "references": [
+        {
+          "file": "art/combat/recruits/frog_recruit_01_idle.webp",
+          "sha256": "9bee03570295fcf0a91d45eed85a82d13eb84a70bc3236ec890ad25e5023c585",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "art/combat/recruits/owl_recruit_01_idle.webp",
+          "sha256": "b17b94ede190e6e81acac9ee7396d42c259a1cf3eea9f6b67c5f77a2c3c84c4f",
+          "origin": "main 5bb29281"
+        },
+        {
+          "file": "frog_owl_variants_concept.png",
+          "sha256": "9a87910cecd79718ac278663ba3543024fd199b81b314068372b97d9cd22e123",
+          "origin": "codex-pr244-originals-r4 / lobby identity reference"
+        }
+      ]
+    },
+    "raccoon_armadillo": {
+      "source_file": "raccoon_armadillo_concept.png",
+      "source_sha256": "5f51a6174d222b71311d57fef0816e783908c95c3aff4f7358a7fc703563f685",
+      "canvas": [
+        1610,
+        977
+      ],
+      "review_file": "raccoon_armadillo.webp",
+      "review_sha256": "fe7639637a4c694db98ae0d415cedd9ed2adfc1bccfbd8288c59169b9cdc1087",
+      "reduced_canvas": [
+        644,
+        391
+      ],
+      "production_sprite": false,
+      "anchor": null,
+      "left_to_right": [
+        "raccoon_male",
+        "raccoon_female",
+        "armadillo_male",
+        "armadillo_female"
+      ],
+      "references": [
+        {
+          "file": "raccoon/rato-idle.png",
+          "sha256": "bc4011dc1af3960599935f3baa972c0169031b9109839de3b4b5b950392b7065",
+          "origin": "codex-pr229-originals"
+        },
+        {
+          "file": "armadillo/tatu-idle.png",
+          "sha256": "5dbef43bc82481bb5a84d38e7f03cbf14776bdce28ca61c581114d0c05b5e5eb",
+          "origin": "codex-pr229-originals"
+        },
+        {
+          "file": "raccoon_armadillo_variants_concept.png",
+          "sha256": "7f09ac82b9e38eacf85714ee08b39febcf765d0c9ac6d88db6edd791174e9615",
+          "origin": "codex-pr244-originals-r4 / lobby identity reference"
+        }
+      ]
+    }
+  }
+}
