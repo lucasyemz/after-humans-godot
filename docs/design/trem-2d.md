@@ -100,6 +100,8 @@ equipe.
 
 ## Para a integração (Claude)
 
+Feita na #256: os itens 1 e 2 estão no jogo, com as capturas em [docs/qa/train-2d.md](../qa/train-2d.md).
+
 1. **Tutorial (#147):** trocar o card `T_TU10` pelas camadas, no mesmo lugar do fosso (o chão do vagão na altura da
    plataforma). O embarque passa a ser a equipe entrando pela porta da direita, com as portas fechando depois.
 2. **Passagem (`AHWagonRide`):** trocar o metrô 3D pela cena pintada do contrato. A partida e a chegada no túnel (com as

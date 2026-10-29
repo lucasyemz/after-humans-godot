@@ -68,6 +68,8 @@ var _blockouts: Array[ShaderMaterial] = []
 var security_doors: Array = []
 var door_panel := {}
 var train := {}
+## O vagão em camadas do tutorial (#256), no lugar do card pintado (train.car); null nos outros mapas.
+var train_car: AHTrainCar
 var _blink_lights: Array = []
 var _blink_parts: Array = []
 var _door_nodes := {}
@@ -192,6 +194,8 @@ func build(map: String) -> void:
 		_layered_card(layered)
 	for model in data.get("models", []):
 		_model(model)
+	if train.has("car"):
+		_train_car(train.car)
 	set_process(not _blink_lights.is_empty() or not _blink_parts.is_empty())
 
 
@@ -212,25 +216,45 @@ static func blink_lit(time: float, phase: float) -> bool:
 	return fposmod(time / BLINK_PERIOD + phase, 1.0) < BLINK_ON / BLINK_PERIOD
 
 
-## O vagão parado na plataforma (true) ou ainda fora dela, escondido (false), até arrive_train.
+## O vagão parado na plataforma, com as portas abertas (true), ou ainda fora dela, escondido (false), até arrive_train.
 func park_train(here: bool) -> void:
 	var metro := get_node_or_null("Metro") as Node3D
 	if metro != null:
 		metro.visible = here
+	if train_car != null:
+		train_car.drive(0.0)
+		train_car.set_doors(1.0 if here else 0.0)
 
 
-## O trem do tutorial chega: o vagão entra no fosso pela direita e para no lugar (seconds com a freada no fim).
+## O trem do tutorial chega: o vagão entra no fosso pela direita, freia (a faísca nas rodas no fim), para no lugar e
+## abre as portas.
 func arrive_train(seconds: float) -> void:
 	var metro := get_node_or_null("Metro") as Node3D
 	if metro == null or seconds <= 0.0:
 		park_train(true)
 		return
-	var home := metro.position
-	metro.position = home + Vector3(TRAIN_RUN, 0, 0)
 	metro.visible = true
-	var tween := create_tween()
-	tween.tween_property(metro, "position", home, seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	await tween.finished
+	if train_car == null:
+		var home := metro.position
+		metro.position = home + Vector3(TRAIN_RUN, 0, 0)
+		var tween := create_tween()
+		tween.tween_property(metro, "position", home, seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		await tween.finished
+		return
+	train_car.sparks_enabled = not GameFlow.reduced_effects()
+	await train_car.arrive(seconds, TRAIN_RUN)
+	if is_inside_tree():
+		await train_car.move_doors(true)
+
+
+## O trem do tutorial parte com a equipe dentro: as portas fecham e o vagão sai pela direita. on_step recebe o quanto ele
+## já andou (m), para a equipe ir junto.
+func depart_train(seconds: float, on_step: Callable = Callable()) -> void:
+	if train_car == null:
+		return
+	await train_car.move_doors(false)
+	if is_inside_tree():
+		await train_car.depart(seconds, TRAIN_RUN, on_step)
 
 
 ## A porta de segurança (pelo índice em security_doors) aberta ou baixada; e o painel, com a alavanca embaixo.
@@ -259,6 +283,19 @@ func doors_of(zone: int, role: String) -> Array:
 		if int(security_doors[index].zone) == zone and security_doors[index].role == role:
 			found.append(index)
 	return found
+
+
+## O vagão em camadas (#149, #256) no grupo do vagão ("Metro", com as luzes frias), onde ficava o card: o chão dele na
+## altura da plataforma, a carroceria no plano do card. O brilho é o do card (emissive), e o clima chega nas camadas.
+func _train_car(spec: Dictionary) -> void:
+	var group := _group("Metro")
+	train_car = AHTrainCar.new(float(spec.camera_distance), float(spec.get("emissive", 0.5)) * 2.0 * CARD_BRIGHTNESS * 0.5)
+	train_car.position = Vector3(spec.x, spec.y, spec.z)
+	train_car.carrier = group
+	group.add_child(train_car)
+	train_car.set_home()
+	for material in train_car.materials():
+		_cards.append(material)
 
 
 ## Um modelo inteiro no mapa. "metro": o vagão da Estação (o mesmo Bombardier), com as portas, no lugar do vagão pintado

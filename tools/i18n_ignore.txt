@@ -467,6 +467,7 @@ scenario_world.gd: Foam
 scenario_world.gd: Roughness
 scenario_world.gd: Specular
 scenario_world.gd: Speed
+scenario_world.gd: car
 scenario_world.gd: Wavelength
 scenario_world.gd: albedo
 scenario_world.gd: amplitude

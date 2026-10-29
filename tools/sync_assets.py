@@ -262,6 +262,17 @@ def station_poses() -> int:
         out[pose_id] = {"file": f"res://art/station/poses/{pose_id}.webp", "canvas": [image.width // 2, image.height // 2],
                         "anchor": [(x0 + x1) // 4, entry["support_y_px"] // 2], "body_reference_pixels": (x1 - x0) // 2}
     target = PROTO / "data" / "presentation" / "station_poses.json"
+    # A direção da pose sentada (#253): as de lado (a cantina, a fogueira) e as de frente (o banco encostado no fundo, o
+    # vagão). As de frente não vêm da Unreal: foram pintadas aqui (docs/design/poses-frente.md), com o ponto hip que vai
+    # no assento; ficam como estão no JSON, senão esta regravação as apagava em silêncio.
+    for pose_id in out:
+        if pose_id.endswith("_seat"):
+            out[pose_id]["facing"] = "side"
+    if target.exists():
+        current = json.loads(target.read_text(encoding="utf-8"))
+        for pose_id, entry in current.items():
+            if entry.get("facing") == "front" and pose_id not in out:
+                out[pose_id] = entry
     target.write_text(json.dumps(out, ensure_ascii=False, indent=2) + chr(10), encoding="utf-8")
     return len(out)
 
