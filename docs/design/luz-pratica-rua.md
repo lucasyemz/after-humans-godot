@@ -95,3 +95,13 @@ uma no quadro e na âncora do card antigo, gera o aceso e o halo e grava o manif
   - (baixa) a chapa avermelhada da emergência fica como escolha do Lucas (acima); a tabela da página foi corrigida. A
     emergência nova só aparece de longe nas capturas da #154 (o ponto vermelho), e a prova no Forward+ continua com o
     Orquestrador PC.
+- **Rodada 2, aprovada:**
+  - a boca do tambor em y = 95, com o fogo nascendo dentro dela;
+  - o centro da base do fogo varia ±7 px entre os quadros, como no fogo antigo;
+  - o lampião inteiro no card;
+  - nas capturas, o fogo tem tanto brilho quanto o de antes, ou mais.
+
+  Ficam como observação:
+  - a chama do lampião 1,4 cm abaixo da origem da luz do jogo;
+  - os furos acesos do tambor, que de noite quase somem atrás do brilho do fogo (vale olhar no Forward+);
+  - a chapa avermelhada da emergência, para o Lucas decidir.
