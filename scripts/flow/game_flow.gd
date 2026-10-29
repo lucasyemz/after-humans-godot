@@ -131,7 +131,9 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	# (~0,14 s); somando deltas, o tempo mínimo só começava depois da montagem.
 	var opened := Time.get_ticks_msec()
 	# Sem pular, o cartão fica o mínimo e até o título acender (numa máquina lenta, o título atrasado ainda aparece).
-	while scene == null or not (passage.skipped or (Time.get_ticks_msec() - opened >= hold * 1000.0 and passage.title_lit)):
+	# Com a cena de fundo, também até ela terminar (a chegada do vagão, que só começa com a cena seguinte montada, #256).
+	while scene == null or not (passage.skipped or (Time.get_ticks_msec() - opened >= hold * 1000.0 and passage.title_lit
+			and passage.backdrop_done())):
 		await tree.process_frame
 		if packed == null:
 			var status := ResourceLoader.load_threaded_get_status(path)

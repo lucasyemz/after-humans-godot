@@ -13,17 +13,21 @@ não entrava no vagão); agora a equipe está dentro, vista pela porta da esquer
 
 ![a plataforma](train-2d/platform.jpg)
 
-1. O trem entra pela direita freando, com as portas fechadas. A faísca sai na metade de baixo da velocidade, mas o piso
+1. O trem sai do túnel pela esquerda e freia, com as portas fechadas (anda sempre para a direita: chega e parte no
+   mesmo sentido, como no túnel da passagem). A faísca sai na metade de baixo da velocidade, mas o piso
    da plataforma cobre as rodas, como pede o design; aparece só a luz laranja no trilho.
 2. Parado, as portas abrem (0,8 s). No Embarcar, a recompensa sobe e a equipe anda até a beira, entra pela porta da
    direita e segue para dentro; a fila vai atrás pelo rastro.
-3. As portas fecham e o vagão parte para a direita, com a equipe dentro, pelas janelas.
-4. A passagem para a Estação mostra só o interior: a partida já passou no mapa e a chegada é na plataforma da Estação.
+3. As portas fecham e o vagão parte para a direita (`train_departure`), com a equipe dentro, pelas janelas.
+4. A passagem para a Estação mostra só o interior, com o trem andando (`train_ride`): a partida já passou no mapa e a
+   chegada é na plataforma da Estação.
 
 ![a passagem](train-2d/passage.jpg)
 
 Em cima, antes e depois do interior. Embaixo, os planos do túnel da partida da Preparação: o vagão sai de lado com as
-rodas girando, e no fim, depois do título, chega freando com a faísca e a freada (`train_brake`).
+rodas girando, e no fim, depois do título, chega freando com a faísca e a freada (`train_brake`). A chegada só começa
+com a fase já montada por baixo (o quadro que monta trava a tela, e numa máquina lenta cortava a chegada ao meio), e o
+cartão espera ela terminar (`AHPassageCard.backdrop_done`). Pulada no meio, a freada para junto.
 
 ## Como funciona
 

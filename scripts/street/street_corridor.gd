@@ -1021,6 +1021,8 @@ func _board_train() -> void:
 	card.title_delay = AHWagonRide.RIDE_SECONDS - AHWagonRide.DEPART_SECONDS
 	card.hold = card.title_delay + GameFlow.CARD_SECONDS
 	card.backdrop = AHWagonRide.new(team, card.hold, false, false)
+	# O trem andando no túnel; a freada, o sino e a chegada tocam na plataforma da Estação (como na volta, #133).
+	card.sound = {"loop": AHWagonRide.RIDE_SOUND, "gain": AHWagonRide.RIDE_GAIN}
 	GameFlow.travel("station", card)
 
 

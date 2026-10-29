@@ -85,8 +85,10 @@ const DISPLAY := {"RootBridge": "Ponte das Raízes", "RiverDock": "Cais do Rio",
 const BLINK_PERIOD := 1.0
 const BLINK_ON := 0.6
 const BLINK_LOW := 0.25
-## De quanto mais à direita o vagão vem ao chegar (m).
+## Quanto o vagão anda no fosso ao chegar e ao partir (m).
 const TRAIN_RUN := 30.0
+## O trem saindo da plataforma (o mesmo da partida da Estação, #133).
+const DEPARTURE_SOUND := "res://audio/station/train_departure.ogg"
 
 ## Ajustes de luz de cada local ao ar livre (AHWeatherSite dos scripts de ajuste da Unreal): a lua e o céu têm um
 ## mínimo, para a noite continuar legível, e a neblina rende. Os cenários fechados ficam com as luminárias do mapa.
@@ -226,8 +228,8 @@ func park_train(here: bool) -> void:
 		train_car.set_doors(1.0 if here else 0.0)
 
 
-## O trem do tutorial chega: o vagão entra no fosso pela direita, freia (a faísca nas rodas no fim), para no lugar e
-## abre as portas.
+## O trem do tutorial chega: o vagão sai do túnel pela esquerda andando para a direita (o sentido de sempre: a partida
+## segue para a direita), freia com a faísca nas rodas no fim, para no lugar e abre as portas.
 func arrive_train(seconds: float) -> void:
 	var metro := get_node_or_null("Metro") as Node3D
 	if metro == null or seconds <= 0.0:
@@ -242,7 +244,7 @@ func arrive_train(seconds: float) -> void:
 		await tween.finished
 		return
 	train_car.sparks_enabled = not GameFlow.reduced_effects()
-	await train_car.arrive(seconds, TRAIN_RUN)
+	await train_car.arrive(seconds, -TRAIN_RUN)
 	if is_inside_tree():
 		await train_car.move_doors(true)
 
@@ -253,8 +255,10 @@ func depart_train(seconds: float, on_step: Callable = Callable()) -> void:
 	if train_car == null:
 		return
 	await train_car.move_doors(false)
-	if is_inside_tree():
-		await train_car.depart(seconds, TRAIN_RUN, on_step)
+	if not is_inside_tree():
+		return
+	Sound.play(DEPARTURE_SOUND, 1.0, 1.0, "Ambience")
+	await train_car.depart(seconds, TRAIN_RUN, on_step)
 
 
 ## A porta de segurança (pelo índice em security_doors) aberta ou baixada; e o painel, com a alavanca embaixo.

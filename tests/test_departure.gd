@@ -24,6 +24,7 @@ func run(context) -> void:
 	await _departure("late")
 	await _departure("early")
 	_reduced()
+	await _sparks()
 	Tips.enabled = tips
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
@@ -231,3 +232,18 @@ func _press(action: String) -> void:
 		event.pressed = pressed
 		_tree.root.push_input(event)
 		await _tree.process_frame
+
+
+## A faísca do vagão (#256): na freada, nas quatro rodas, com a luz no trilho; com "Reduzir efeitos", nem uma nem outra.
+func _sparks() -> void:
+	for enabled in [true, false]:
+		var car := AHTrainCar.new()
+		car.sparks_enabled = enabled
+		_tree.root.add_child(car)
+		car.brake(true, 1.0, 1.0)
+		var particles: Array = car.find_children("*", "CPUParticles3D", true, false)
+		t.equal(particles.size(), 4, "uma faísca em cada roda")
+		t.check(particles.all(func(p): return p.emitting == enabled and ((p.get_child(0) as OmniLight3D).light_energy > 0.0) == enabled),
+			"a faísca e a luz %s" % ("na freada" if enabled else "fora com Reduzir efeitos"))
+		car.free()
+	await _tree.process_frame

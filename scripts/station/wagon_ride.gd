@@ -10,7 +10,7 @@ extends Control
 const RIDE_SECONDS := 2.8
 ## O plano da partida no túnel, no começo, e o da chegada, no fim (depois do título).
 const DEPART_SECONDS := 1.3
-const ARRIVE_SECONDS := 1.8
+const ARRIVE_SECONDS := 2.2
 ## O trem andando na passagem (#133), no canal do Ambiente.
 const RIDE_SOUND := "res://audio/station/train_ride.ogg"
 const RIDE_GAIN := 0.8
@@ -43,6 +43,11 @@ var _tunnel: Sprite2D
 var _car: AHTrainCar2D
 var _time := 0.0
 var _opened_ms := -1
+## Quando a chegada começou (s no relógio da viagem; -1 ainda não): só com a cena seguinte já montada, porque o quadro
+## que monta trava a tela por segundos e cortava a chegada ao meio.
+var _arrive_from := -1.0
+var _brake_player: AudioStreamPlayer
+var _door_seconds := 0.8
 var _phase := ""
 var _car_home := 0.0
 
@@ -57,6 +62,7 @@ func _init(hero_ids: Array = [], ride_hold: float = 0.0, depart: bool = true, ar
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
 	_p = AHTrainCar.contract().passage
+	_door_seconds = float(AHTrainCar.contract().train.door_seconds.open)
 	_stage = Node2D.new()
 	add_child(_stage)
 	_build_inside()
@@ -105,19 +111,41 @@ func _process(_delta: float) -> void:
 		var t := _time / DEPART_SECONDS
 		_car.drive(_car_home + TUNNEL_RUN * t * t)
 		return
-	if arrive_shot and _time >= hold - ARRIVE_SECONDS:
-		if _phase != "arrive":
-			_phase = "arrive"
-			_show(true)
-			Sound.play(BRAKE_SOUND, RIDE_GAIN, 1.0, "Ambience")
+	if arrive_shot and _arrive_from < 0.0 and _time >= hold - ARRIVE_SECONDS and _scene_mounted():
+		_arrive_from = _time
+		_phase = "arrive"
+		_show(true)
+		_brake_player = Sound.play(BRAKE_SOUND, RIDE_GAIN, 1.0, "Ambience")
+	if _arrive_from >= 0.0:
 		# A chegada: entra pela esquerda freando (ease-out) e para no meio; a faísca da metade da velocidade até parar, e
-		# as portas abrem depois.
-		var u := clampf((_time - (hold - ARRIVE_SECONDS)) / (ARRIVE_SECONDS - 0.5), 0.0, 1.0)
+		# as portas abrem depois, no tempo do contrato.
+		var brake_seconds := ARRIVE_SECONDS - _door_seconds
+		var since := _time - _arrive_from
+		var u := clampf(since / brake_seconds, 0.0, 1.0)
 		_car.drive(_car_home - TUNNEL_RUN * (1.0 - u) * (1.0 - u))
 		_car.brake(u >= 0.5 and u < 1.0, 1.0)
-		_car.set_doors(clampf((_time - hold + 0.5) / 0.5, 0.0, 1.0))
+		_car.set_doors(clampf((since - brake_seconds) / _door_seconds, 0.0, 1.0))
 		return
 	_show(false)
+
+
+## A viagem terminou o que tinha a mostrar: sem a chegada, logo; com ela, depois de o vagão parar e as portas abrirem.
+## O cartão espera isso para fechar (AHPassageCard.backdrop_done).
+func done() -> bool:
+	return not arrive_shot or (_arrive_from >= 0.0 and _time - _arrive_from >= ARRIVE_SECONDS)
+
+
+## A cena seguinte já montou por baixo do cartão (fora de um cartão, como nas capturas, vale sempre).
+func _scene_mounted() -> bool:
+	var card := get_parent() as AHPassageCard
+	return card == null or card.ready_to_skip
+
+
+## Pulada no meio da chegada, a freada não fica tocando por cima da fase.
+func _exit_tree() -> void:
+	if not done() and _brake_player != null and is_instance_valid(_brake_player) and _brake_player.playing \
+			and _brake_player.stream != null and _brake_player.stream.resource_path == BRAKE_SOUND:
+		_brake_player.stop()
 
 
 func _show(outside: bool) -> void:

@@ -93,21 +93,10 @@ func _spark(at: Vector2) -> CPUParticles2D:
 	p.scale_amount_min = 0.6
 	p.scale_amount_max = 1.2
 	p.particle_flag_align_y = true
-	p.texture = _spark_texture()
+	p.texture = AHTrainCar.spark_texture(true)
 	var additive := CanvasItemMaterial.new()
 	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	p.material = additive
 	add_child(p)
 	return p
 
-
-## A textura da faísca é um risco deitado com a cabeça à direita; a partícula alinha o Y com a velocidade, então o risco
-## gira em pé, com a cabeça para baixo (para a frente do movimento).
-static var _spark_tex: Texture2D
-func _spark_texture() -> Texture2D:
-	if _spark_tex == null:
-		var image := (load(_t.layers.spark) as Texture2D).get_image()
-		image.decompress()
-		image.rotate_90(CLOCKWISE)
-		_spark_tex = ImageTexture.create_from_image(image)
-	return _spark_tex

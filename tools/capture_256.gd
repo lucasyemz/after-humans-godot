@@ -105,6 +105,9 @@ func _passage() -> void:
 	var opened := Time.get_ticks_msec()
 	for spot in [[0.6, "passage-1-depart"], [2.0, "passage-2-inside"], [3.6, "passage-3-title"], [hold - 0.75, "passage-4-arrive"]]:
 		while (Time.get_ticks_msec() - opened) / 1000.0 < spot[0]:
+			# A fase "monta" com o título aceso, como no GameFlow: a chegada só começa depois disso.
+			if passage.title_lit and passage.has_method("backdrop_done"):
+				passage.mark_ready()
 			await process_frame
 		await _shot(spot[1])
 	passage.queue_free()

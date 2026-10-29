@@ -134,8 +134,8 @@ func brake(on: bool, strength: float = 1.0, direction: float = 1.0) -> void:
 		(spark.get_child(0) as OmniLight3D).light_energy = SPARK_LIGHT * clampf(strength, 0.0, 1.0) if on and sparks_enabled else 0.0
 
 
-## A chegada: o vagão vem de `run` m à direita e para em casa em `seconds`, freando (ease-out); a faísca da metade da
-## velocidade até parar, como no contrato. As portas ficam fechadas.
+## A chegada: o vagão vem de `run` m da casa (negativo: da esquerda) e para nela em `seconds`, freando (ease-out); a
+## faísca da metade da velocidade até parar, como no contrato. As portas ficam fechadas.
 func arrive(seconds: float, run: float) -> void:
 	set_doors(0.0)
 	var time := 0.0
@@ -241,7 +241,7 @@ func _spark(at: Vector3) -> CPUParticles3D:
 	var mesh := QuadMesh.new()
 	mesh.size = Vector2(0.035, 0.16)
 	var material := StandardMaterial3D.new()
-	material.albedo_texture = load(_t.layers.spark)
+	material.albedo_texture = spark_texture(false)
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
@@ -258,3 +258,15 @@ func _spark(at: Vector3) -> CPUParticles3D:
 	glow.omni_range = 1.6
 	p.add_child(glow)
 	return p
+
+
+## A textura da faísca é um risco deitado com a cabeça à direita; a partícula alinha o Y com a velocidade, então o risco
+## fica em pé, com a cabeça para a frente do movimento: para cima no quad 3D (clockwise false), para baixo no 2D.
+static var _spark_textures := {}
+static func spark_texture(clockwise: bool) -> Texture2D:
+	if not _spark_textures.has(clockwise):
+		var image := (load(contract().train.layers.spark) as Texture2D).get_image()
+		image.decompress()
+		image.rotate_90(CLOCKWISE if clockwise else COUNTERCLOCKWISE)
+		_spark_textures[clockwise] = ImageTexture.create_from_image(image)
+	return _spark_textures[clockwise]
