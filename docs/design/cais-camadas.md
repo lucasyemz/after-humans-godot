@@ -41,8 +41,8 @@ baixo do vizinho**: recuadas na curva, a emenda não abre.
 
 As camadas empilhadas devolvem a pintura de hoje: cada pixel dela é de uma camada só, e nenhuma camada sai da
 silhueta de hoje. Um pedaço escondido só cobre o que é de uma camada da frente, nunca o de uma de trás. A diferença que
-sobra é a da compressão do WebP: a média fica abaixo de 3 em 255, e só 5 px do Armazém (na borda da soleira) passam de
-60.
+sobra é a da compressão do WebP: a média fica abaixo de 3 em 255, e no canal mais diferente só 1 px do Navio e 15 do
+Armazém passam de 60 (no máximo 81), soltos, sem forma.
 
 ![O Navio: hoje, as camadas empilhadas e a diferença](cais-camadas/T_CD14_fit.webp)
 
@@ -60,7 +60,9 @@ Onde uma camada da frente cobre a de trás, a de trás vem pintada por inteiro:
 - **o telhado:** a parede de cima atrás da coluna alta da esquerda e do poste do canto da direita;
 - **as laterais:** as duas paredes em perspectiva continuam por trás dos pilares e, na direita, por trás do poste do canto
   e da ponta do telhado (de x = 740 a 786);
-- **o convés:** 10 px por baixo da borda do casco, para a emenda não abrir na subida da proa nem do lado da prancha.
+- **o convés:** 10 px por baixo da borda do meio do casco, para a emenda não abrir do lado da prancha;
+- **a cabine:** a parede da quina esquerda (x 540 a 556), que fica no convés, na frente, para não abrir fresta entre as
+  caixas e a cabine.
 
 ![As camadas do Navio](cais-camadas/T_CD14_layers.webp)
 
@@ -86,7 +88,8 @@ pé do guindaste; no Armazém, a coluna da esquerda, a quina do telhado, a borda
 ## No jogo, antes e depois (protótipo)
 
 Capturas da cena de verdade (`tools/capture_141.gd`, só as fachadas), com a mesma câmera, a mesma equipe e o mesmo
-momento. O antes é a `main` de hoje. O depois carrega as camadas por um **protótipo fora deste PR**: o
+momento (com a arte da rodada 2; as correções da rodada 3 são de poucos pixels e não aparecem nesse enquadramento).
+O antes é a `main` de hoje. O depois carrega as camadas por um **protótipo fora deste PR**: o
 `build_riverdock_depth.py` com um card por camada, no quadro inteiro e no z da tabela acima. A integração de verdade é do
 Claude 2.
 
@@ -147,3 +150,15 @@ Da raiz do repositório:
   - (média) faltava o antes e o depois no jogo: a seção acima, com o protótipo;
   - (baixas) o tamanho e a ordem na página, a ordem do `preview.py` (agora pela profundidade), a franja rosada dos
     pedaços escondidos (o alfa da edição encolhe 1 px) e as máscaras, que agora vão para `masks/`.
+- **Rodada 2, reprovada:**
+  - (média) a quina esquerda da cabine abria uma fresta entre as caixas e a cabine, e o batente esquerdo da porta ficava
+    também no convés: a faixa escura da quina vai para o convés (a cabine tem a parede pintada por trás) e a porta, com
+    os dois batentes, fica só na cabine;
+  - (média) o alto da coluna esquerda abria uma fresta no corrimão do telhado: o pedaço escondido do telhado vai até
+    o topo (y = 0);
+  - (média) as folhas da hera do pilar esquerdo na borda do vão ficavam no interior e se soltavam: vão para a frente,
+    e o piso do interior aparece pintado por baixo delas;
+  - (baixa) o convés por baixo do casco passava por cima da proa: agora só por baixo do meio do casco;
+  - (baixa) o número da diferença na página. Ficam como observação: a faixa um pouco mais clara na quina direita com a
+    câmera à direita (sem buraco) e um pixel transparente em cada ponta do zigue-zague do casco (fica por baixo do
+    vizinho).

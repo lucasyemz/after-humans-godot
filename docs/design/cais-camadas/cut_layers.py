@@ -117,7 +117,10 @@ def ship(src: Path, manifest: dict) -> None:
     cabin_edit = edit(src / "ship-cabin-only.png", S)
     cabin_full = ImageChops.multiply(not_magenta(cabin_edit), rect(S, (540, 120, 1024, 456)))
     # 2. O convés: a faixa da amurada e das caixas acima do casco, e o latão da amurada na frente da cabine.
-    deck_band = rect(S, (0, 312, 590, 420))
+    # A porta da cabine, com os batentes, fica toda na cabine; a faixa escura da quina esquerda da cabine (x 540 a 556),
+    # no convés, que está na frente (a cabine tem a parede pintada por trás dela).
+    door = rect(S, (562, 318, 672, 458))
+    deck_band = ImageChops.lighter(minus(rect(S, (0, 312, 590, 420)), door), rect(S, (540, 320, 556, 400)))
     # A porta acesa da cabine fica toda na cabine (a amurada não passa na frente dela).
     front_rail = ImageChops.multiply(gold(art), minus(rect(S, (548, 380, 1024, 450)), rect(S, (566, 318, 672, 458))))
     # 4. O mastro e o guindaste (com o gancho, os cabos e o mastro da proa); o pé do guindaste fica atrás das caixas.
@@ -132,7 +135,7 @@ def ship(src: Path, manifest: dict) -> None:
     rest = minus(rest, own_rail)
     own_crane = ImageChops.multiply(ImageChops.lighter(crane, bow_mast), rest)
     rest = minus(rest, own_crane)
-    own_cabin = ImageChops.multiply(cabin_full, rest)
+    own_cabin = ImageChops.multiply(minus(cabin_full, rect(S, (540, 320, 556, 400))), rest)
     rest = minus(rest, own_cabin)
     own_deck = ImageChops.lighter(own_rail, ImageChops.multiply(deck_band, rest))
     rest = minus(rest, own_deck)
@@ -172,8 +175,10 @@ def ship(src: Path, manifest: dict) -> None:
     deck_hidden = minus(minus(deck_hidden, own_cabin), own_mast)
     deck = layer(art, own_deck, fills["deck"], deck_hidden if fills["deck"] else None)
     # O convés desce 10 px por baixo da borda do casco (a pintura de hoje ali), para a emenda não abrir de lado.
+    # Só sobre o meio do casco: a proa e a popa ficam atrás do convés.
     under = ImageChops.multiply(minus(below(opaque(deck, 85), 10), opaque(deck, 85)),
-                                ImageChops.multiply(own_hull, rect(S, (0, 300, 600, 470))))
+                                ImageChops.multiply(ImageChops.multiply(own_hull, rect(S, (0, 300, 600, 470))),
+                                                    cuts["HullMid"]))
     deck.paste(art, (0, 0), under)
     save(deck, "T_CD14_Deck", manifest)
     save(layer(art, own_cabin, cabin_edit, minus(ImageChops.multiply(cabin_full, fill_alpha(cabin_edit)), own_mast)),
@@ -190,6 +195,10 @@ def warehouse(src: Path, manifest: dict) -> None:
     front = ImageChops.lighter(poly(S, [(148, 0), (206, 0), (206, 228), (300, 228), (300, 614), (745, 614),
                                         (745, 70), (782, 70), (782, 290), (874, 290), (874, 683), (148, 683)]),
                                rect(S, (90, 0, 148, 182)))
+    # As folhas da hera do pilar esquerdo que caem na borda do vão também são da frente.
+    r, g, b = art.convert("RGB").split()
+    leaf = ImageChops.subtract(g, b).point(lambda v: 255 if v > 70 else 0)
+    front = ImageChops.lighter(front, ImageChops.multiply(leaf, rect(S, (300, 540, 318, 614))).filter(ImageFilter.MaxFilter(3)))
     # 4. As laterais em perspectiva: a da esquerda e a da direita (com a quina do telhado descendo).
     sides = ImageChops.lighter(minus(rect(S, (0, 0, 148, 683)), front), minus(rect(S, (782, 0, 1024, 683)), front))
     # 3. O interior: o vão, sem a moldura.
@@ -204,7 +213,7 @@ def warehouse(src: Path, manifest: dict) -> None:
     # O interior não passa da soleira (y = 641), para não sair da silhueta de hoje.
     hidden = {
         "Interior": minus(rect(S, (240, 236, 812, 641)), own_interior),
-        "Roof": minus(minus(minus(ImageChops.lighter(rect(S, (148, 20, 210, 300)), rect(S, (741, 60, 786, 300))),
+        "Roof": minus(minus(minus(ImageChops.lighter(rect(S, (148, 0, 210, 300)), rect(S, (741, 60, 786, 300))),
                                   own_roof), own_sides), own_interior),
         "Sides": minus(ImageChops.lighter(rect(S, (144, 170, 212, 660)),
                                           ImageChops.lighter(rect(S, (826, 140, 878, 660)), rect(S, (740, 55, 786, 300)))),
