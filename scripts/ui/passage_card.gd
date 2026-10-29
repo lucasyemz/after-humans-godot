@@ -232,6 +232,12 @@ func sound_playing() -> bool:
 	return _sound_player != null and _sound_player.playing
 
 
+## A cena de fundo terminou o que tinha a mostrar (a chegada do vagão no túnel, #256): o cartão não fecha antes, sem
+## pular. Sem cena de fundo, ou uma que não diz, já terminou.
+func backdrop_done() -> bool:
+	return backdrop == null or not is_instance_valid(backdrop) or not backdrop.has_method("done") or backdrop.done()
+
+
 ## A cena seguinte está pronta: a dica troca de "Carregando…" para a de pular.
 func mark_ready() -> void:
 	if ready_to_skip:

@@ -130,6 +130,8 @@ var _indoor := false
 var scenario: AHScenarioWorld
 var floor_y := 0.0
 var lane_z := 0.45
+## A equipe vai dentro do vagão que parte (carry_party): a fila fica presa ao rastro.
+var carried := false
 var sheltered := false
 var _zone := {}
 ## Na luta num cenário, o quanto o chão de quem luta sobe para os pés passarem da borda da frente do piso (#48).
@@ -739,6 +741,15 @@ func walk_leader(target: Vector3, seconds: float) -> bool:
 	return true
 
 
+## A equipe dentro do vagão que parte (#256): o líder e o rastro andam dx em x, e a fila fica presa a eles (sem a
+## suavização, que deixava quem vem atrás escorregar para fora do vagão andando).
+func carry_party(dx: float) -> void:
+	carried = true
+	_leader.position.x += dx
+	for index in _trail.size():
+		_trail[index].x += dx
+
+
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
 func _place_leader(at: Vector3, facing: float = 1.0) -> void:
 	at = _free_spot(at)
@@ -806,6 +817,8 @@ func _ground_height(z: float) -> float:
 func _place_party(delta: float) -> void:
 	if _arena != null and _arena.active:
 		return
+	if carried:
+		delta = 0.0
 	# No acampamento (#77), cada um fica no seu lugar em volta da fogueira.
 	if corridor != null and corridor.camp != null and corridor.camp.active:
 		return

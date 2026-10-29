@@ -1,67 +1,87 @@
-## A partida no vagão (#75): a cena de fundo da passagem da Estação para a fase. A equipe escolhida sentada no banco do
-## metrô (o mesmo Bombardier da Estação, com os materiais de lá) enquanto o túnel passa pelas janelas: as luminárias da
-## parede correndo para trás, a parede de concreto escorrendo e a câmera balançando com o trilho. Os fundadores usam a
-## pose sentada (data/presentation/station_poses.json, *_seat); os recrutas, sem ela, ficam de pé nas pontas do banco
-## até a arte do vagão do Codex (#79), que troca esta primeira versão pelo interior pintado.
+## A viagem no vagão (#75, pintada na #256): a cena de fundo da passagem. Dentro, o interior do mesmo vagão verde do
+## Tutorial (#149, o contrato em data/presentation/train_2d.json), com o túnel correndo nas janelas e a equipe sentada de
+## frente nos bancos da parede (station_poses.json, *_seat_front, #253); quem não tem essa pose (os recrutas, a skin
+## sem ela) fica de pé na frente do lugar dele. Antes do interior, o vagão parte no túnel, com as rodas girando; no fim,
+## depois do título, ele chega freando, com a faísca nas rodas e a freada.
 class_name AHWagonRide
-extends Node3D
+extends Control
 
-## Quanto o vagão fica sozinho antes de o título da fase aparecer por cima.
+## Quanto a viagem fica sozinha antes de o título da fase aparecer por cima (a partida no túnel e o interior).
 const RIDE_SECONDS := 2.8
-## O banco do fundo do vagão (m, no corpo do metrô): o meio, o piso, a frente do assento e o vão entre os lugares.
-const BENCH_X := 2.0
-const FLOOR_Y := 0.96
-const SEAT_Z := -0.6
-const STAND_Z := -0.45
-## O assento do banco vai de BENCH_START a BENCH_END (medido no modelo): até quatro sentados lado a lado, ombro com ombro.
-const BENCH_START := 1.2
-const BENCH_END := 2.8
-const SEAT_SLOT := 0.53
-## Quem está de pé ocupa mais (o corpo inteiro, a cauda): fica fora do assento, nas pontas, com mais folga.
-const STAND_SLOT := 0.85
-## A folga entre o banco ocupado e o primeiro de pé (a cauda e a mochila de quem está de pé).
-const STAND_GAP := 0.2
-## O quadro da câmera, na altura da equipe (x em m): ninguém fica fora dele.
-const FRAME_X := [0.15, 3.85]
-## O túnel lá fora: a parede atrás das janelas do fundo, as luminárias e a velocidade do trem.
-const TUNNEL_Z := -2.7
-const LAMP_SPACING := 3.6
-const SPEED := 13.0
-const WARM := Color(1.0, 0.78, 0.52)
+## O plano da partida no túnel, no começo, e o da chegada, no fim (depois do título).
+const DEPART_SECONDS := 1.3
+const ARRIVE_SECONDS := 2.2
 ## O trem andando na passagem (#133), no canal do Ambiente.
 const RIDE_SOUND := "res://audio/station/train_ride.ogg"
 const RIDE_GAIN := 0.8
+const BRAKE_SOUND := "res://audio/station/train_brake.ogg"
+## O quadro da passagem (px): a cena cobre a tela inteira, centrada.
+const FRAME := Vector2(1920, 1080)
+## O plano do túnel: o vagão na escala da tela, o trilho nesta altura (acima da chapa do título, que fica embaixo) e o
+## caminho que ele faz na partida e na chegada (px).
+const TUNNEL_SCALE := 1.1
+const TUNNEL_RAIL_Y := 700.0
+const TUNNEL_RUN := 1700.0
+## Os lugares usados por tamanho da equipe (índices dos quatro do contrato, da esquerda para a direita): a posição 1
+## fica na direita, e uma equipe menor senta junta, do lado direito do vagão.
+const SLOTS := {1: [2], 2: [2, 3], 3: [1, 2, 3], 4: [0, 1, 2, 3]}
 
 ## A equipe (ids dos heróis, posição 1 primeiro).
 var team: Array = []
-## Os cartões de quem está no banco, na ordem da esquerda para a direita, com {"id", "seated"}.
+## Quem está no vagão, da esquerda para a direita, com {"id", "seated", "card" (o Sprite2D)}.
 var seats: Array = []
-var _camera: Camera3D
-var _camera_home := Vector3(BENCH_X, 1.86, 1.4)
-## Para onde a câmera olha (a altura, no fundo do vagão): uns 2,4° para baixo.
-const LOOK_Y := 1.75
-var _lamps: Array[Node3D] = []
-var _wall: StandardMaterial3D
+## Quanto o cartão fica aberto (s): a chegada acontece nos últimos ARRIVE_SECONDS.
+var hold := 0.0
+var depart_shot := true
+var arrive_shot := true
+
+var _p: Dictionary
+var _stage: Node2D
+var _inside: Node2D
+var _outside: Node2D
+var _tunnel: Sprite2D
+var _car: AHTrainCar2D
 var _time := 0.0
+var _opened_ms := -1
+## Quando a chegada começou (s no relógio da viagem; -1 ainda não): só com a cena seguinte já montada, porque o quadro
+## que monta trava a tela por segundos e cortava a chegada ao meio.
+var _arrive_from := -1.0
+var _brake_player: AudioStreamPlayer
+var _door_seconds := 0.8
+var _phase := ""
+var _car_home := 0.0
 
 
-func _init(hero_ids: Array = []) -> void:
+## hero_ids: a equipe. ride_hold: o tempo do cartão (sem ele, nada de chegada). depart e arrive: os planos do túnel.
+func _init(hero_ids: Array = [], ride_hold: float = 0.0, depart: bool = true, arrive: bool = true) -> void:
 	team = hero_ids.duplicate()
+	hold = ride_hold
+	depart_shot = depart
+	arrive_shot = arrive and ride_hold > 0.0
 	name = "WagonRide"
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip_contents = true
+	_p = AHTrainCar.contract().passage
+	_door_seconds = float(AHTrainCar.contract().train.door_seconds.open)
+	_stage = Node2D.new()
+	add_child(_stage)
+	_build_inside()
+	_build_outside()
+	_show(depart_shot)
 
 
-## O cartão da passagem da partida: o da rua (a fase e o trecho) com o vagão por trás e o título depois do passeio.
+## O cartão da passagem da partida: o da rua (a fase e o trecho) com a viagem por trás, o título depois da partida e do
+## interior, e a chegada no fim.
 static func departure_card(campaign: Dictionary) -> Dictionary:
 	var card: Dictionary = GameFlow.card_for("street")
 	var expedition = campaign.get("session", {}).get("expedition")
 	if card.is_empty() or expedition == null:
 		return card
-	card.backdrop = AHWagonRide.new(expedition.get("team", []))
-	# O trem saindo da plataforma, andando no túnel e freando na chegada (#133).
-	card.sound = {"loop": RIDE_SOUND, "gain": RIDE_GAIN, "start": "res://audio/station/train_departure.ogg",
-		"end": "res://audio/station/train_brake.ogg"}
+	card.hold = RIDE_SECONDS + GameFlow.CARD_SECONDS + ARRIVE_SECONDS
+	card.backdrop = AHWagonRide.new(expedition.get("team", []), card.hold)
+	# O trem saindo da plataforma e andando no túnel (#133); a freada toca na chegada, com a faísca (a cena de fundo).
+	card.sound = {"loop": RIDE_SOUND, "gain": RIDE_GAIN, "start": "res://audio/station/train_departure.ogg"}
 	card.title_delay = RIDE_SECONDS
-	card.hold = RIDE_SECONDS + GameFlow.CARD_SECONDS
 	return card
 
 
@@ -74,169 +94,227 @@ static func return_card() -> Dictionary:
 
 
 func _ready() -> void:
-	_environment()
-	_wagon()
-	_tunnel()
-	_team()
-	_camera = Camera3D.new()
-	# Quase na horizontal e com o fov fechado o bastante para o chão da borda de baixo ficar além do corte (near): com
-	# a câmera inclinada, o chão perto dela era cortado e a borda de baixo ficava com uma faixa preta serrilhada.
-	_camera.fov = 60.0
-	# O lado de perto do vagão (o banco, as barras e a divisória entre a câmera e o corredor) fica inteiro fora do quadro:
-	# com o corte mais perto, as seções cortadas apareciam como peças soltas no chão.
-	_camera.near = 1.3
-	_camera.current = true
-	add_child(_camera)
-	_place_camera()
+	resized.connect(_fit)
+	_fit()
 
 
-func _process(delta: float) -> void:
-	_time += delta
-	for lamp in _lamps:
-		lamp.position.x -= SPEED * delta
-		if lamp.position.x < BENCH_X - LAMP_SPACING * 2.0:
-			lamp.position.x += LAMP_SPACING * _lamps.size()
-	# 40 m de parede em 32 repetições: 1,25 m por repetição.
-	_wall.uv1_offset.x += SPEED * delta / 1.25
-	_place_camera()
+func _process(_delta: float) -> void:
+	# Pelo relógio, como o cartão (o título e o tempo dele): numa máquina lenta o delta chega cortado, e a chegada
+	# atrasava até depois de o cartão fechar.
+	if _opened_ms < 0:
+		_opened_ms = Time.get_ticks_msec()
+	_time = (Time.get_ticks_msec() - _opened_ms) / 1000.0
+	_tunnel.region_rect.position.x = _time * float(_p.tunnel.scroll_px_per_second) / float(_p.tunnel.scale)
+	if depart_shot and _time < DEPART_SECONDS:
+		_show(true)
+		# A partida: parado no meio, o vagão acelera e sai pela direita.
+		var t := _time / DEPART_SECONDS
+		_car.drive(_car_home + TUNNEL_RUN * t * t)
+		return
+	if arrive_shot and _arrive_from < 0.0 and _time >= hold - ARRIVE_SECONDS and _scene_mounted():
+		_arrive_from = _time
+		_phase = "arrive"
+		_show(true)
+		_brake_player = Sound.play(BRAKE_SOUND, RIDE_GAIN, 1.0, "Ambience")
+	if _arrive_from >= 0.0:
+		# A chegada: entra pela esquerda freando (ease-out) e para no meio; a faísca da metade da velocidade até parar, e
+		# as portas abrem depois, no tempo do contrato.
+		var brake_seconds := ARRIVE_SECONDS - _door_seconds
+		var since := _time - _arrive_from
+		var u := clampf(since / brake_seconds, 0.0, 1.0)
+		_car.drive(_car_home - TUNNEL_RUN * (1.0 - u) * (1.0 - u))
+		_car.brake(u >= 0.5 and u < 1.0, 1.0)
+		_car.set_doors(clampf((since - brake_seconds) / _door_seconds, 0.0, 1.0))
+		return
+	_show(false)
 
 
-## O balanço do trilho: uma ondulação curta e outra longa, e um leve giro.
-func _place_camera() -> void:
-	var sway := Vector3(0.0, 0.010 * sin(_time * 9.0) + 0.006 * sin(_time * 2.3), 0.0)
-	_camera.position = _camera_home + sway
-	_camera.look_at(Vector3(BENCH_X, LOOK_Y, -1.2) + sway)
-	_camera.rotate_object_local(Vector3.FORWARD, deg_to_rad(0.35 * sin(_time * 1.7)))
+## A viagem terminou o que tinha a mostrar: sem a chegada, logo; com ela, depois de o vagão parar e as portas abrirem.
+## O cartão espera isso para fechar (AHPassageCard.backdrop_done).
+func done() -> bool:
+	return not arrive_shot or (_arrive_from >= 0.0 and _time - _arrive_from >= ARRIVE_SECONDS)
 
 
-func _environment() -> void:
-	var env := Environment.new()
-	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color(0.02, 0.02, 0.025)
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.55, 0.5, 0.45)
-	env.ambient_light_energy = 0.18
-	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	var world := WorldEnvironment.new()
-	world.environment = env
-	add_child(world)
+## A cena seguinte já montou por baixo do cartão (fora de um cartão, como nas capturas, vale sempre).
+func _scene_mounted() -> bool:
+	var card := get_parent() as AHPassageCard
+	return card == null or card.ready_to_skip
 
 
-## O metrô com as peças e os materiais da Estação (AHStationBuild), na origem.
-func _wagon() -> void:
-	var builder := AHStationBuilder.new(self)
-	var build := AHStationBuild.new(builder)
-	var pieces: Array[Node3D] = [build._metro_piece("SM_BombardierBody", AHStationBuild.METRO_BODY_SLOTS)]
-	for door in AHStationBuild.METRO_DOORS:
-		pieces.append(build._metro_piece(door[0], AHStationBuild.METRO_DOOR_SLOTS))
-	# O vidro da Estação é claro (lá fora é a plataforma acesa); aqui, o túnel escuro aparece pelas janelas.
-	var glass := StandardMaterial3D.new()
-	glass.albedo_color = Color(0.04, 0.05, 0.05, 0.3)
-	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	glass.roughness = 0.2
-	glass.cull_mode = BaseMaterial3D.CULL_DISABLED
-	for piece in pieces:
-		piece.position = Vector3.ZERO
-		for mesh: MeshInstance3D in piece.find_children("*", "MeshInstance3D", true, false):
-			for index in mesh.mesh.get_surface_count():
-				if mesh.get_surface_override_material(index) == builder.glass():
-					mesh.set_surface_override_material(index, glass)
-	# As luminárias do teto ao longo do vagão (a da frente do banco mais forte).
-	for x in [BENCH_X - 4.5, BENCH_X, BENCH_X + 4.5]:
-		var light := OmniLight3D.new()
-		light.position = Vector3(x, 3.1, 0.0)
-		light.light_color = WARM
-		light.light_energy = 1.1 if x == BENCH_X else 0.7
-		light.omni_range = 5.5
-		light.omni_attenuation = 1.2
-		add_child(light)
+## Pulada no meio da chegada, a freada não fica tocando por cima da fase.
+func _exit_tree() -> void:
+	if not done() and _brake_player != null and is_instance_valid(_brake_player) and _brake_player.playing \
+			and _brake_player.stream != null and _brake_player.stream.resource_path == BRAKE_SOUND:
+		_brake_player.stop()
 
 
-## A parede do túnel atrás das janelas do fundo e as luminárias que passam.
-func _tunnel() -> void:
-	# O concreto da Estação, numa placa que escorre (a textura anda: o trem passa por ela).
-	_wall = StandardMaterial3D.new()
-	_wall.albedo_texture = preload("res://art/station/rough_concrete.webp")
-	_wall.albedo_color = Color(0.16, 0.15, 0.14)
-	_wall.uv1_scale = Vector3(32, 5, 1)
-	_wall.roughness = 1.0
-	var wall := MeshInstance3D.new()
-	var plane := QuadMesh.new()
-	plane.size = Vector2(40, 6)
-	wall.mesh = plane
-	wall.position = Vector3(BENCH_X, 2.0, TUNNEL_Z)
-	wall.material_override = _wall
-	add_child(wall)
-	var glow := StandardMaterial3D.new()
-	glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	glow.albedo_color = WARM
-	glow.emission_enabled = true
-	glow.emission = WARM
-	glow.emission_energy_multiplier = 4.0
-	for index in 10:
-		var lamp := Node3D.new()
-		lamp.position = Vector3(BENCH_X - LAMP_SPACING * 2.0 + index * LAMP_SPACING, 2.25, TUNNEL_Z + 0.05)
-		var tube := MeshInstance3D.new()
-		var box := BoxMesh.new()
-		box.size = Vector3(1.4, 0.1, 0.05)
-		tube.mesh = box
-		tube.material_override = glow
-		lamp.add_child(tube)
-		var light := OmniLight3D.new()
-		light.light_color = WARM
-		light.light_energy = 1.4
-		light.omni_range = 3.2
-		light.position = Vector3(0, 0, 0.4)
-		lamp.add_child(light)
-		add_child(lamp)
-		_lamps.append(lamp)
+func _show(outside: bool) -> void:
+	_outside.visible = outside
+	_inside.visible = not outside
+	if not outside:
+		_car.brake(false)
 
 
-## A equipe no banco: os sentados no meio, quem não tem pose sentada de pé nas pontas.
-func _team() -> void:
+## A cena de 1920 × 1080 cobre a tela, centrada (corta as sobras, sem faixa preta).
+func _fit() -> void:
+	var view := size if size.x > 0.0 else get_viewport_rect().size
+	var k := maxf(view.x / FRAME.x, view.y / FRAME.y)
+	_stage.scale = Vector2(k, k)
+	_stage.position = (view - FRAME * k) * 0.5
+
+
+func _build_inside() -> void:
+	_inside = Node2D.new()
+	_inside.name = "Inside"
+	_stage.add_child(_inside)
+	var back := ColorRect.new()
+	back.color = Color(0.02, 0.02, 0.025)
+	back.size = FRAME
+	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_inside.add_child(back)
+	# O túnel: a faixa repetida em X, atrás dos vãos das janelas, correndo para trás.
+	var tunnel: Dictionary = _p.tunnel
+	_tunnel = Sprite2D.new()
+	_tunnel.texture = load(tunnel.file)
+	_tunnel.centered = false
+	_tunnel.region_enabled = true
+	_tunnel.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	_tunnel.region_rect = Rect2(0, 0, FRAME.x / float(tunnel.scale), _tunnel.texture.get_height())
+	_tunnel.scale = Vector2(tunnel.scale, tunnel.scale)
+	_tunnel.position = Vector2(tunnel.position[0], tunnel.position[1])
+	_tunnel.modulate = Color(tunnel.modulate[0], tunnel.modulate[1], tunnel.modulate[2])
+	_inside.add_child(_tunnel)
+	var background := Sprite2D.new()
+	background.texture = load(_p.background.file)
+	background.centered = false
+	_inside.add_child(background)
+	var shadows := Node2D.new()
+	_inside.add_child(shadows)
+	var people := Node2D.new()
+	_inside.add_child(people)
+	var poles := Sprite2D.new()
+	poles.texture = load(_p.poles.file)
+	poles.centered = false
+	_inside.add_child(poles)
+	_team(shadows, people)
+
+
+## A equipe nos lugares: a posição 1 no lugar mais à direita. Sentado de frente quem tem a pose (o quadril no assento),
+## de pé na frente do lugar quem não tem.
+func _team(shadows: Node2D, people: Node2D) -> void:
 	var poses: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/station_poses.json"))
 	var combat_art: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
-	var seated: Array = []
-	var standing: Array = []
-	# Posição 1 na direita, como a fila da partida na plataforma.
-	var order := team.duplicate()
-	order.reverse()
-	for hero_id in order:
+	var riders: Array = []
+	for hero_id in team:
 		var entry = AHStationRules.hero(Campaign.state, hero_id)
-		if entry == null or not entry.get("alive", true):
+		if entry == null or not entry.get("alive", true) or riders.size() >= 4:
 			continue
-		var seat: Dictionary = AHSkins.pose(poses.get(String(hero_id) + "_seat", {}), String(hero_id))
-		if not seat.is_empty():
-			seated.append({"id": hero_id, "art": seat, "seated": true})
+		var seat := AHSkins.seat_pose(poses, String(hero_id), "front")
+		if not seat.is_empty() and seat.has("hip"):
+			riders.append({"id": hero_id, "art": seat, "seated": true})
+			continue
+		var art := AHCombatArena.art_entry(combat_art.heroes, hero_id, String(entry.get("art_variant", "")))
+		if art.has("idle"):
+			riders.append({"id": hero_id, "art": art.idle, "seated": false})
+	if riders.is_empty():
+		return
+	var slots: Array = SLOTS[riders.size()]
+	var px_per_m: float = _p.px_per_m
+	var tint := Color(_p.hero_modulate[0], _p.hero_modulate[1], _p.hero_modulate[2])
+	var placed: Array = []
+	for index in riders.size():
+		var rider: Dictionary = riders[index]
+		# A posição 1 à direita: o primeiro da equipe no último lugar.
+		var seat_spec: Dictionary = _p.seats[slots[slots.size() - 1 - index]]
+		var art: Dictionary = rider.art
+		var texture: Texture2D = load(art.file)
+		# A arte pode estar numa resolução diferente do canvas medido (as da luta ficam na metade).
+		var half: float = texture.get_width() / float(art.canvas[0])
+		var scale: float = AHCharacterHeights.find(rider.id) * px_per_m / (float(art.body_reference_pixels) * half)
+		var sprite := Sprite2D.new()
+		sprite.texture = texture
+		sprite.centered = false
+		sprite.scale = Vector2(scale, scale)
+		sprite.modulate = tint
+		var x: float = seat_spec.seat_support[0]
+		var foot := Vector2(x, float(seat_spec.projected_foot_anchor[1]))
+		if rider.seated:
+			# O ponto hip da pose no assento (os pés caem no chão à frente do banco).
+			sprite.position = Vector2(x, seat_spec.seat_support[1]) - Vector2(art.hip[0], art.hip[1]) * half * scale
+			foot = sprite.position + Vector2(art.anchor[0], art.anchor[1]) * half * scale
+			_shadow(shadows, Vector2(x, float(seat_spec.seat_support[1]) + 8.0), scale * half * float(art.body_reference_pixels) / 946.0, 1.0)
 		else:
-			var art := AHCombatArena.art_entry(combat_art.heroes, hero_id, String(entry.get("art_variant", "")))
-			if art.has("idle"):
-				standing.append({"id": hero_id, "art": art.idle, "seated": false})
-	# Os sentados no meio do assento, na ordem da equipe (posição 1 à direita); quem está de pé nas pontas, por fora
-	# deles: o primeiro da equipe na ponta direita, o seguinte à esquerda, e assim por diante. Cada um um pouco mais à frente
-	# ou atrás do vizinho, para quem se sobrepõe não brigar na mesma profundidade.
-	var left_edge := BENCH_X - seated.size() * SEAT_SLOT * 0.5
-	var right_edge := BENCH_X + seated.size() * SEAT_SLOT * 0.5
-	var spots: Array = []
-	for index in seated.size():
-		spots.append([seated[index], Vector3(left_edge + (index + 0.5) * SEAT_SLOT, FLOOR_Y, SEAT_Z - 0.03 * (index % 2)), 1.0])
-	var by_position := standing.duplicate()
-	by_position.reverse()
-	var right_count := (by_position.size() + 1) / 2
-	for index in by_position.size():
-		var right := index % 2 == 0
-		# Na direita, o primeiro da equipe vai mais para a ponta (a posição 1 à direita de todos).
-		var step: int = right_count - 1 - index / 2 if right else index / 2
-		var x := right_edge + STAND_GAP + STAND_SLOT * (step + 0.5) if right else left_edge - STAND_GAP - STAND_SLOT * (step + 0.5)
-		# Os da direita olham para o meio (a arte olha para a direita).
-		spots.append([by_position[index], Vector3(x, FLOOR_Y, STAND_Z - 0.03 * (index % 2)), -1.0 if right else 1.0])
-	spots.sort_custom(func(a, b): return a[1].x < b[1].x)
-	for entry in spots:
-		var spot: Dictionary = entry[0]
-		var card := AHSpriteCard.new()
-		card.body_height = AHCharacterHeights.find(spot.id)
-		card.show_art(spot.art)
-		card.position = entry[1]
-		card.set_facing(entry[2])
-		add_child(card)
-		seats.append({"id": spot.id, "seated": spot.seated, "card": card})
+			# De pé na frente do lugar, os pés no chão, olhando para o meio do vagão.
+			var facing := 1.0 if x < FRAME.x * 0.5 else -1.0
+			sprite.flip_h = facing < 0.0
+			var anchor_x: float = float(art.anchor[0]) * half
+			if sprite.flip_h:
+				anchor_x = texture.get_width() - anchor_x
+			sprite.position = foot - Vector2(anchor_x, float(art.anchor[1]) * half) * scale
+		_shadow(shadows, foot, scale * half * float(art.body_reference_pixels) / 946.0, 0.8)
+		people.add_child(sprite)
+		placed.append({"id": rider.id, "seated": rider.seated, "card": sprite, "x": x})
+	placed.sort_custom(func(a, b): return a.x < b.x)
+	for spot in placed:
+		seats.append({"id": spot.id, "seated": spot.seated, "card": spot.card})
+
+
+## A sombra de contato: no assento, sob o quadril, e no chão, sob o pé (a largura do contrato na escala de quem senta).
+func _shadow(holder: Node2D, at: Vector2, body_scale: float, strength: float) -> void:
+	var soft := GradientTexture2D.new()
+	soft.fill = GradientTexture2D.FILL_RADIAL
+	soft.fill_from = Vector2(0.5, 0.5)
+	soft.fill_to = Vector2(1.0, 0.5)
+	soft.gradient = Gradient.new()
+	soft.gradient.set_color(0, Color(0, 0, 0, 0.55))
+	soft.gradient.set_color(1, Color(0, 0, 0, 0))
+	var width: float = float(_p.shadow_width_px) * body_scale
+	var shadow := Sprite2D.new()
+	shadow.texture = soft
+	shadow.position = at
+	shadow.scale = Vector2(width / 64.0, width * 0.16 / 64.0) * strength
+	holder.add_child(shadow)
+
+
+## O plano do túnel: a parede escura, os trilhos e o vagão de lado, na escala da tela.
+func _build_outside() -> void:
+	_outside = Node2D.new()
+	_outside.name = "Outside"
+	_stage.add_child(_outside)
+	var back := ColorRect.new()
+	back.color = Color(0.015, 0.015, 0.018)
+	back.size = FRAME
+	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_outside.add_child(back)
+	# A parede do túnel atrás do vagão: a mesma faixa das janelas, mais escura e parada.
+	var wall := Sprite2D.new()
+	wall.texture = load(_p.tunnel.file)
+	wall.centered = false
+	wall.region_enabled = true
+	wall.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	var wall_scale := 2.2
+	wall.region_rect = Rect2(0, 0, FRAME.x / wall_scale, wall.texture.get_height())
+	wall.scale = Vector2(wall_scale, wall_scale)
+	wall.position = Vector2(0, TUNNEL_RAIL_Y - wall.texture.get_height() * wall_scale + 40.0)
+	wall.modulate = Color(0.32, 0.34, 0.38)
+	_outside.add_child(wall)
+	var bed := ColorRect.new()
+	bed.color = Color(0.07, 0.065, 0.06)
+	bed.position = Vector2(0, TUNNEL_RAIL_Y)
+	bed.size = Vector2(FRAME.x, FRAME.y - TUNNEL_RAIL_Y)
+	bed.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_outside.add_child(bed)
+	_car = AHTrainCar2D.new()
+	_car.scale = Vector2(TUNNEL_SCALE, TUNNEL_SCALE)
+	_car.sparks_enabled = not GameFlow.reduced_effects()
+	var car_size := _car.canvas() * TUNNEL_SCALE
+	_car_home = (FRAME.x - car_size.x) * 0.5
+	_car.position = Vector2(_car_home, TUNNEL_RAIL_Y - _car.rail_y() * TUNNEL_SCALE)
+	_car.drive(_car_home)
+	_outside.add_child(_car)
+	var rail := ColorRect.new()
+	rail.color = Color(0.36, 0.33, 0.3)
+	rail.position = Vector2(0, TUNNEL_RAIL_Y - 4.0)
+	rail.size = Vector2(FRAME.x, 9.0)
+	rail.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_outside.add_child(rail)
