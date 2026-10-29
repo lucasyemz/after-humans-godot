@@ -24,6 +24,7 @@ const FOOTSTEP_VARIANTS := {"water": 4, "wood": 5, "concrete": 5}
 ## Música, ambiente e chuva: um par de players por canal (o que sai e o que entra).
 var _channels: Array = []
 var _effects: Array[AudioStreamPlayer] = []
+## Onde a busca do tocador livre começa (a roda gira, para um som novo não pegar sempre o primeiro).
 var _next_effect := 0
 var _refresh := 0.0
 var _streams := {}
@@ -221,14 +222,30 @@ func play(path: String, gain: float = 1.0, pitch: float = 1.0, bus: String = "SF
 	var stream: AudioStream = load(path)
 	if stream == null:
 		return null
-	var player := _effects[_next_effect]
-	_next_effect = (_next_effect + 1) % _effects.size()
+	var player := _free_effect()
 	player.stream = stream
 	player.bus = "UI" if bus == "SFX" and path.begins_with("res://audio/ui/") else bus
 	player.volume_db = linear_to_db(maxf(gain, 0.001)) + mix_db(path)
 	player.pitch_scale = pitch
 	player.play()
 	return player
+
+
+## O tocador para o próximo efeito (#72): o próximo livre na roda; com todos tocando, o que está mais perto de acabar
+## (o rodízio puro tomava o do trem, de 7 s, com dez efeitos curtos nesse tempo).
+func _free_effect() -> AudioStreamPlayer:
+	var best: AudioStreamPlayer = null
+	var best_left := INF
+	for step in _effects.size():
+		var player := _effects[(_next_effect + step) % _effects.size()]
+		if not player.playing:
+			_next_effect = (_next_effect + step + 1) % _effects.size()
+			return player
+		var left := player.stream.get_length() - player.get_playback_position() if player.stream != null else 0.0
+		if left < best_left:
+			best_left = left
+			best = player
+	return best
 
 
 ## Esmaece e para um efeito tocado por play (o som do trem que acaba antes do arquivo, #61). O tocador é reaproveitado:

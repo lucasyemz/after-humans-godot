@@ -344,6 +344,8 @@ game_data_service.gd: perks
 game_data_service.gd: tabelas do combate incompletas
 game_flow.gd: GameFlow: cena desconhecida ou troca em andamento (%s).
 game_flow.gd: title
+game_flow.gd: backdrop
+game_flow.gd: GameFlow: a cena %s não carregou.
 inventory_panel.gd: %d / %d
 inventory_panel.gd: Description
 inventory_panel.gd: ampoule

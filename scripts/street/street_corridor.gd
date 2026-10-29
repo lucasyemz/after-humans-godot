@@ -545,6 +545,9 @@ func _travel_map(campaign: Dictionary, next: int, confirmed: bool = false) -> vo
 				else tr("%s ainda estão no lugar da luta, e a equipe não volta para cá depois de seguir. Quem fica no chão só é recolhido na saída, mais ferido, e chega com a recuperação inteira.")) % _names(left),
 			[[tr("Ficar e levantar"), func(): pass], [tr("Seguir mesmo assim"), func(): _travel_map(Campaign.state, next, true)]])
 		return
+	# Com outra troca em andamento, a passagem seria recusada: nem o trecho avança nem o corredor fica preso no busy.
+	if GameFlow.busy:
+		return
 	busy = true
 	R.enter_step(campaign, next)
 	Campaign.save()

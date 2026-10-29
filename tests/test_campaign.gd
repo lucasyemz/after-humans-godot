@@ -49,7 +49,7 @@ func _save_and_load(t) -> void:
 	Campaign.state = {}
 	t.equal(Campaign.load_or_new(), "primary", "abre pelo principal")
 	t.equal(Campaign.state, saved, "o estado volta igual ao gravado")
-	t.equal(Campaign.load_warning, "", "sem aviso ao abrir um save bom")
+	t.equal(Campaign.warning_text(), "", "sem aviso ao abrir um save bom")
 
 
 func _recovery(t) -> void:
@@ -57,14 +57,14 @@ func _recovery(t) -> void:
 	_write(Campaign.primary_path(), "{ isto não é JSON")
 	t.equal(Campaign.load_or_new(), "backup", "principal corrompido: abre pela cópia")
 	t.equal(Campaign.state, saved, "a cópia tem o estado gravado")
-	t.check(Campaign.load_warning != "", "avisa que recuperou a cópia")
+	t.check(Campaign.warning_text() != "", "avisa que recuperou a cópia")
 
 	# Cópia adulterada (o checksum não bate) e principal corrompido: campanha nova, sem apagar os arquivos.
 	var tampered := FileAccess.get_file_as_string(Campaign.backup_path()).replace("\"seeds\": 30", "\"seeds\": 999")
 	t.check(tampered.contains("999"), "o teste conseguiu adulterar a cópia")
 	_write(Campaign.backup_path(), tampered)
 	t.equal(Campaign.load_or_new(), "new", "nenhum save válido: campanha nova")
-	t.check(Campaign.load_warning.begins_with("Nenhum salvamento válido"), "avisa que nenhum save serviu")
+	t.check(Campaign.warning_text().begins_with("Nenhum salvamento válido"), "avisa que nenhum save serviu")
 	t.check(FileAccess.file_exists(Campaign.primary_path()) and FileAccess.file_exists(Campaign.backup_path()), "os arquivos antigos foram preservados")
 
 	# Versão diferente também não abre.
