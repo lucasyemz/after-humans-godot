@@ -1,0 +1,107 @@
+[
+  {
+    "Name": "layout_new",
+    "Floors": [
+      ["", "", "forge", "forge", "characters", "dormitory", "dormitory"],
+      ["", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", ""]
+    ],
+    "Landings": [false, false],
+    "Description": "Aprovado (#186, opção A): a campanha nova. Cada andar tem 7 vagas de 6 m, da esquerda para a escada (à direita); \"\" é um bloco soterrado, \"free\" uma vaga livre e o id do cômodo, a vaga que ele ocupa (o duplo, nas duas). Landings: os patamares do 2º e do 3º subsolos."
+  },
+  {
+    "Name": "layout_legacy",
+    "Floors": [
+      ["dormitory", "dormitory", "characters", "bar", "canteen", "canteen", "free"],
+      ["infirmary", "infirmary", "research", "research", "depot", "forge", "forge"],
+      ["", "", "", "", "", "", ""]
+    ],
+    "Landings": [true, false],
+    "Description": "Aprovado (#186, ponto 7): a planta herdada dos saves de antes da grade, na ordem dos cômodos de hoje. O Depósito só fica na vaga no nível 2; no nível 1, ele vira os caixotes da plataforma e a vaga fica livre."
+  },
+  {
+    "Name": "floor_1",
+    "Work": 2,
+    "Scrap": 1,
+    "Fragments": 0,
+    "Rolls": [
+      {"Kind": "scrap", "Amount": 1, "Chance": 50, "Text": "Um banco de espera partido ao meio; os parafusos saem inteiros."},
+      {"Kind": "seeds", "Amount": 3, "Chance": 30, "Text": "Uma lata de biscoitos dos Antigos, cheia de sementes secas."},
+      {"Kind": "fragments", "Amount": 1, "Chance": 20, "Text": "Um painel de horários caído, com os circuitos ainda inteiros."}
+    ],
+    "RareChance": 10,
+    "Text": "Atrás do entulho, uma catraca tombada. O metal ainda serve.",
+    "Description": "Proposta (#186, pontos 3 e 11): um bloco do 1º subsolo pede 2 pontos de obra e devolve 1 sucata, mais um sorteio (um destes, ou nada) e a chance de um item raro."
+  },
+  {
+    "Name": "floor_2",
+    "Work": 3,
+    "Scrap": 2,
+    "Fragments": 0,
+    "Rolls": [
+      {"Kind": "fragments", "Amount": 1, "Chance": 50, "Text": "Um painel de controle soterrado, com placas que a Pesquisa vai saber ler."},
+      {"Kind": "scrap", "Amount": 1, "Chance": 30, "Text": "Trilhos de serviço tortos. A Forja vai saber endireitar."}
+    ],
+    "RareChance": 15,
+    "Text": "Uma caixa de fusíveis enterrada, com os fios de cobre secos.",
+    "Description": "Proposta (#186, pontos 3 e 11): um bloco do 2º subsolo pede 3 pontos de obra e devolve 2 sucatas; nada no sorteio em 20%."
+  },
+  {
+    "Name": "floor_3",
+    "Work": 4,
+    "Scrap": 3,
+    "Fragments": 1,
+    "Rolls": [
+      {"Kind": "fragments", "Amount": 1, "Chance": 40, "Text": "Uma bobina de motor do tamanho de um barril, pesada de cobre."}
+    ],
+    "RareChance": 25,
+    "Text": "Um armário de ferramentas emperrado, que nem as raízes abriram.",
+    "Description": "Proposta (#186, pontos 3 e 11): um bloco do 3º subsolo, o fundo da estação, pede 4 pontos de obra e devolve 3 sucatas e 1 fragmento; nada no sorteio em 60%."
+  },
+  {
+    "Name": "landing",
+    "Work": 3,
+    "Scrap": 1,
+    "Fragments": 0,
+    "Rolls": [],
+    "RareChance": 0,
+    "Text": "A escada aparece debaixo da terra. Dá para descer de novo.",
+    "Description": "Proposta (#186, pontos 3 e 11): o patamar de um andar pede 3 pontos de obra e devolve 1 sucata. Aberto, o andar de baixo pode ser escavado."
+  },
+  {
+    "Name": "rare",
+    "Rolls": [
+      {"Kind": "bandage", "Chance": 50, "Text": "Presa sob uma viga, uma caixa de primeiros socorros dos Antigos."},
+      {"Kind": "tool", "Chance": 30},
+      {"Kind": "relic", "Chance": 20, "Text": "Entre as raízes, um objeto pequeno dos Antigos, inteiro depois de tanto tempo."}
+    ],
+    "Tools": [
+      {"Tool": "lanterna", "Text": "Uma lanterna de serviço dos Antigos, com a lente intacta."},
+      {"Tool": "mascara", "Text": "Uma máscara com filtro, ainda lacrada no saco."},
+      {"Tool": "pe_de_cabra", "Text": "Um pé de cabra torto, mas firme, esquecido sob o entulho."}
+    ],
+    "Description": "Proposta (#186, ponto 11): o item raro, num sorteio à parte. A ferramenta é uma que a equipe ainda não tem, e a relíquia uma que ela ainda não tem; sem nada novo para dar, vira um curativo."
+  },
+  {
+    "Name": "community",
+    "Work": 1,
+    "Description": "Proposta (#186, ponto 3): a comunidade escava 1 ponto de obra sozinha a cada volta de expedição (o \"Esperar um dia\" não conta). O posto de escavador soma o dele (data/hero-jobs.json, job_dig)."
+  },
+  {
+    "Name": "canteen_level_2",
+    "Scrap": 3,
+    "Fragments": 0,
+    "Food": 1,
+    "Description": "Proposta (#186, ponto 5): construir a Cantina numa vaga dupla. O fogareiro da plataforma é o nível 1; a Cantina construída, com energia, rende mais 1 suprimento por volta."
+  },
+  {
+    "Name": "intro",
+    "Lines": [
+      {"Speaker": "hero_cao_bento", "Text": "Ouviu isso? Tem vento passando atrás do entulho."},
+      {"Speaker": "hero_gato_nick", "Text": "Vento quer dizer espaço. Espaço quer dizer trabalho. Pra quem ficar."},
+      {"Speaker": "hero_cao_bento", "Text": "Quer dizer mais estação."}
+    ],
+    "Card": "Atrás do entulho tem mais estação.",
+    "Description": "Aprovado (#186, ponto 10): a fala da primeira volta, quando a escavação aparece. Com o Bento ou o Nick fora ou caído, sai só o cartão."
+  }
+]

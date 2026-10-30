@@ -85,9 +85,10 @@ func _posts() -> void:
 	var c := _campaign()
 	var sereno := _id(c, "Sereno")
 	var brasa := _id(c, "Brasa")
-	t.equal(S.job_rooms(c), [S.RESEARCH, S.FORGE, S.CANTEEN, S.INFIRMARY], "os postos dos cômodos recuperados")
+	# Com entulho para cavar, também o posto de escavador (#186).
+	t.equal(S.job_rooms(c), [S.RESEARCH, S.FORGE, S.CANTEEN, S.INFIRMARY, AHStationGrid.DIG], "os postos dos cômodos recuperados e o de escavador")
 	var d: Dictionary = Campaign.create_initial(3)
-	t.equal(S.job_rooms(d), [S.CANTEEN], "na campanha nova, só a Cantina")
+	t.equal(S.job_rooms(d), [S.CANTEEN, AHStationGrid.DIG], "na campanha nova, só a Cantina e a escavação")
 	t.check(S.set_post(d, "hero_cao_bento", S.FORGE) != "", "sem a Forja, sem o posto dela")
 	t.equal(S.set_post(c, sereno, S.RESEARCH), "", "a coruja vai para a Pesquisa")
 	t.equal(S.set_post(c, sereno, S.FORGE), "", "e muda para a Forja: um posto por herói")

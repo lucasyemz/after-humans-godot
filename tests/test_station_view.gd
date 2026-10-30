@@ -76,12 +76,17 @@ func _lock_marks(station) -> void:
 	t.check(String(forge.title).contains(S.cost_text(S.next_level_cost(c, S.FORGE))), "o marcador diz o custo (%s)" % forge.title)
 	t.equal(forge.note, S.upgrade_block(c, S.FORGE), "e o que falta")
 	# O Bar tem custo (#176): o marcador de construir no lugar de "Fechado", e nenhum cômodo fica "fechado".
+	# Na grade (#186), o Bar começa soterrado: o marcador diz "Soterrado" e o que escavar.
+	var buried := hud.lock_mark_info(c, S.BAR)
+	t.check(buried.state == "closed" and buried.title == tr("Soterrado") and buried.note == S.upgrade_block(c, S.BAR), "o Bar soterrado: o marcador diz o que escavar")
+	c.station.grid.cells[0][1] = AHStationGrid.FREE
 	var bar := hud.lock_mark_info(c, S.BAR)
-	t.equal(bar.state, "short", "o Bar sem recurso: o marcador de construir, com o que falta")
+	t.equal(bar.state, "short", "com a vaga livre, o Bar sem recurso: o marcador de construir, com o que falta")
 	t.equal(bar.cost, S.next_level_cost(c, S.BAR), "com o custo do Bar")
 	t.check(hud.lock_mark_info(c, S.DORMITORY).is_empty(), "o Dormitório já existe: sem marcador")
 	for room in S.ROOMS:
-		t.check(hud.lock_mark_info(c, room.id).get("state", "") != "closed", "%s não fica fechado" % room.name)
+		t.check(hud.lock_mark_info(c, room.id).get("title", "") != tr("Fechado"), "%s não fica fechado" % room.name)
+	c.station.grid.cells[0][1] = ""
 	t.check(hud.lock_mark_info(c, S.CANTEEN).is_empty(), "o cômodo recuperado fica sem marcador")
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5

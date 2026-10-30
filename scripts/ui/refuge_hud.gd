@@ -882,7 +882,8 @@ func _build_room_selection() -> void:
 func _room_state(c: Dictionary, id: String) -> String:
 	var level := S.room_level(c, id)
 	if level < 1:
-		return tr("Vazio")
+		# Sem vaga livre do tamanho dele, o cômodo está soterrado (#186).
+		return tr("Soterrado") if AHStationGrid.buried(c, id) else tr("Vazio")
 	var top: int = S.room_def(id).max_level
 	if top > 1:
 		return tr("Nível %d de %d") % [level, top]
@@ -952,6 +953,9 @@ func lock_mark_info(c: Dictionary, id: String) -> Dictionary:
 	if cost.is_empty():
 		# Sem custo definido: nenhum cômodo hoje (#176); o cartão do cômodo diz o motivo.
 		return {"state": "closed", "title": tr("Fechado"), "note": S.upgrade_block(c, id), "cost": {}}
+	# Soterrado (#186): sem vaga livre do tamanho dele, o cartão diz o que escavar.
+	if AHStationGrid.buried(c, id):
+		return {"state": "closed", "title": tr("Soterrado"), "note": S.upgrade_block(c, id), "cost": {}}
 	var block := S.upgrade_block(c, id)
 	var stock := {"scrap": S.quantity(c, "scrap"), "fragments": S.quantity(c, "fragments")}
 	var have := tr("sem sucata nem fragmentos") if stock.scrap + stock.fragments == 0 else tr("tem %s") % S.cost_text(stock)
