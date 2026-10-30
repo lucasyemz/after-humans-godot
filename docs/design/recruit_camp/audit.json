@@ -1,0 +1,38 @@
+{
+  "checks": [
+    {
+      "file": "art/camp/raccoon_recruit_01_seat.webp",
+      "rgba": true,
+      "size": true,
+      "source_canvas": true,
+      "support_delta_px": 0.0
+    },
+    {
+      "file": "art/camp/raccoon_recruit_01_sleep.webp",
+      "rgba": true,
+      "size": true,
+      "source_canvas": true,
+      "support_delta_px": 1.0
+    },
+    {
+      "file": "art/camp/armadillo_recruit_01_seat.webp",
+      "rgba": true,
+      "size": true,
+      "source_canvas": true,
+      "support_delta_px": 0.5
+    },
+    {
+      "file": "art/camp/armadillo_recruit_01_sleep.webp",
+      "rgba": true,
+      "size": true,
+      "source_canvas": true,
+      "support_delta_px": 0.5
+    }
+  ],
+  "magenta_pixels": {
+    "art/camp/raccoon_recruit_01_seat.webp": 0,
+    "art/camp/raccoon_recruit_01_sleep.webp": 0,
+    "art/camp/armadillo_recruit_01_seat.webp": 0,
+    "art/camp/armadillo_recruit_01_sleep.webp": 0
+  }
+}

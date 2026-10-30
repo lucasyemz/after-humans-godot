@@ -1,0 +1,20 @@
+{
+  "base_commit": "ff8fc83",
+  "engine": "Godot 4.7.2",
+  "renderer": "OpenGL Compatibility / Mesa llvmpipe CPU / Xvfb",
+  "physical_gpu": false,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "before": "main camp_poses.json unchanged",
+  "after": "proposal loaded into AHCampScene._poses in memory only",
+  "same_process_pair": true,
+  "frozen_between_shots": true,
+  "subjects": [
+    "Bento",
+    "Iris",
+    "raccoon_recruit_01",
+    "armadillo_recruit_01"
+  ]
+}
