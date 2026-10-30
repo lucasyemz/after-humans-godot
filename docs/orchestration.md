@@ -85,6 +85,17 @@ fechar issue sem o PR dela na `main`.
 Issues: `[Agente] Área: descrição`, etiquetas `agent:claude` ou `agent:codex` e o tipo; as de decisão do Lucas levam
 `question`. Só o Lucas fecha uma issue, depois de jogar.
 
+## Reserva de issue por sessão de agente
+
+- Antes de iniciar, leia a issue inteira, os comentários recentes e as etiquetas. `agent:*` indica a frente; `status:em-andamento` indica que uma sessão reservou a tarefa.
+- Se houver `status:em-andamento`, não comece outra implementação. Confira o comentário de reserva e combine a transferência com quem reservou ou com o Lucas.
+- Para reservar, adicione `status:em-andamento` e comente: `Reserva: <agente / sessão identificável> | branch: <branch> | início: <data/hora UTC> | escopo: <entrega>`. Releia os comentários e as etiquetas antes de editar arquivos. Se duas sessões reservarem ao mesmo tempo, vale o primeiro comentário de reserva; a outra interrompe e coordena a transferência, sem remover a reserva da primeira.
+- Atualize o comentário ou publique um andamento quando retomar a sessão ou mudar o escopo. A etiqueta significa reserva, não comprova que um processo está rodando neste instante; não expire reservas só por tempo.
+- Ao entregar o PR, comente o link e remova `status:em-andamento`; a issue continua aberta para a aprovação do Lucas. Se parar sem entrega, comente o estado, a branch e o que falta antes de liberar a reserva. Para corrigir um PR, reserve novamente.
+- Em uma transferência, registre quem assume e preserve a etiqueta até o novo responsável confirmar. Nunca libere a reserva de outra sessão sem combinar.
+
+A etiqueta é um acordo entre os agentes, não um bloqueio automático do GitHub. Ela aparece nas issues e pode ser filtrada com `is:issue is:open label:"status:em-andamento"`.
+
 ## Montar o MacBook (uma vez)
 
 ```bash
