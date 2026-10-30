@@ -47,6 +47,10 @@ func _run() -> void:
 	c.inventory.fragments = 2
 	S.train_on_return(c, "capture-merchant", "merchant" if merchant else "hero")
 	c.station.last_return = {}
+	# A Estação abre sem ninguém no trem (senão ela mesma abre a cena da chegada, que este renderizador não termina);
+	# quem desceu entra depois, já na plataforma (_on_candidate).
+	var train_state: Dictionary = c.station.train.duplicate(true)
+	c.station.train = {"phase": "none", "candidate_id": "", "expedition_id": "", "accepted": false, "recruit": {}, "next": {}, "trades": {}}
 	# A cena do trem em 2x (a velocidade da luta nas Opções): a mesma chegada, em metade do tempo.
 	if typeof(c.get("settings")) != TYPE_DICTIONARY:
 		c.settings = {}
@@ -60,13 +64,12 @@ func _run() -> void:
 			break
 	var station = current_scene
 	var hud = station.hud
-	# A câmera já na plataforma (sem a passagem secreta): a chegada começa direto.
-	station.focus_platform(true)
-	await _frames(2)
-	hud.open_service("train")
-	var end := Time.get_ticks_msec() + 2400000
-	while (station.train_busy() or not hud._panel.visible) and Time.get_ticks_msec() < end:
-		await process_frame
+	await _frames(4)
+	campaign.state.station.train = train_state
+	# Sem placa de vídeo, a Estação anda a poucos quadros por segundo e a cena da chegada não termina: as fotos usam o
+	# caminho do painel do trem reaberto depois da cena (quem desceu já na plataforma, a câmera nele e o painel aberto),
+	# que é o mesmo estado do jogo.
+	await _on_candidate(station, hud, String(c.station.train.candidate_id))
 	await _frames(8)
 	await _shot("arrival")
 	if merchant:
@@ -79,23 +82,11 @@ func _run() -> void:
 		hud.open_map()
 		await _frames(8)
 		await _shot("preparation")
-		hud.open_service("train")
-		end = Time.get_ticks_msec() + 1800000
-		while (station.train_busy() or not hud._panel.visible) and Time.get_ticks_msec() < end:
-			await process_frame
-		await _frames(6)
+		await _on_candidate(station, hud, S.MERCHANT)
 		hud._dismiss_merchant()
-		# A meio caminho do vagão, de passada.
-		end = Time.get_ticks_msec() + 1200000
-		var start_x: float = station._candidate.position.x if is_instance_valid(station._candidate) else 0.0
-		while is_instance_valid(station._candidate) and absf(station._candidate.position.x - start_x) < 1.2 and Time.get_ticks_msec() < end:
-			await process_frame
+		# Ele sai andando para o vagão, de passada (a partida inteira não cabe no tempo deste renderizador).
+		await _frames(4)
 		await _shot("dismissed")
-		end = Time.get_ticks_msec() + 1800000
-		while campaign.state.station.train.phase != "none" and Time.get_ticks_msec() < end:
-			await process_frame
-		hud.close_panel()
-		await _frames(30)
 		# O relatório da volta que trouxe o Mercador.
 		var report: Dictionary = {}
 		for i in 200:
@@ -115,15 +106,28 @@ func _run() -> void:
 				if not flow.busy and current_scene != null and i > 10:
 					break
 			current_scene.hud.open_service("report")
-			end = Time.get_ticks_msec() + 1200000
+			var end := Time.get_ticks_msec() + 1200000
 			while current_scene.hud.current != "report" and Time.get_ticks_msec() < end:
 				await process_frame
-			await _frames(10)
+			await _frames(6)
 			await _shot("report")
 	for file in DirAccess.get_files_at(campaign.save_dir):
 		DirAccess.remove_absolute(campaign.save_dir.path_join(file))
 	DirAccess.remove_absolute(campaign.save_dir)
 	quit(0)
+
+
+## O painel do trem com quem desceu na plataforma e a câmera já nele (o painel reaberto depois da cena, #61).
+func _on_candidate(station, hud, candidate_id: String) -> void:
+	station.focus_platform(true)
+	station.show_candidate(candidate_id)
+	station._go(station._candidate_key(), true, true)
+	hud._arrived_candidate = candidate_id
+	hud.open_service("train")
+	var end := Time.get_ticks_msec() + 600000
+	while (station.train_busy() or not hud._panel.visible) and Time.get_ticks_msec() < end:
+		await process_frame
+	await _frames(4)
 
 
 func _frames(count: int) -> void:
