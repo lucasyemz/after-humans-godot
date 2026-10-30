@@ -109,8 +109,11 @@ func build() -> void:
 	_canteen()
 	_depot()
 	_forge()
-	_dormitory_bunks()
+	# Os beliches são a melhoria do Dormitório (#176): no nível 1 a equipe dorme no chão.
 	var mark := b.mark()
+	_dormitory_bunks()
+	_tag_dressing("dormitory@2", mark)
+	mark = b.mark()
 	_dormitory()
 	_tag_dressing("dormitory", mark)
 	_preparation()
@@ -990,8 +993,12 @@ func _forge() -> void:
 
 ## Os beliches do Dormitório: o card inteiro da entrega #1 do Codex (art/station/cards/dormitory_bunk.webp, as linhas
 ## medidas em docs/design/bunk.md), uma peça só por beliche. Quatro lugares, um por herói da equipe, onde quem dorme
-## deita à noite (AHStation.sleep_slots). Ficam mesmo com o quarto por recuperar.
+## deita à noite (AHStation.sleep_slots). Chegam com a melhoria do Dormitório (o nível 2, #176).
 const BUNK_X := [-1010.0, -660.0]
+## Sem os beliches (o Dormitório no nível 1, #176), quem dorme deita no chão: quatro lugares lado a lado, à frente da
+## parede dos beliches, um pouco desencontrados na profundidade para um não cortar o outro.
+const FLOOR_SLEEP_X := [-1110.0, -870.0, -630.0, -390.0]
+const FLOOR_SLEEP_Y := [-600.0, -570.0]
 const BUNK_Y := -665.0
 const BUNK_FLOOR := -520.0
 const BUNK_CARD := "dormitory_bunk"

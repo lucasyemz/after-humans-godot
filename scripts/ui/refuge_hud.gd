@@ -947,7 +947,8 @@ func lock_mark_info(c: Dictionary, id: String) -> Dictionary:
 		return {}
 	var cost := S.next_level_cost(c, id)
 	if cost.is_empty():
-		return {"state": "closed", "title": tr("Fechado"), "note": S.upgrade_block(c, id), "cost": {}}
+		# Sem custo definido (nenhum cômodo hoje, #176): o marcador diz quando, nunca só "Fechado".
+		return {"state": "closed", "title": tr("Numa próxima fase"), "note": S.upgrade_block(c, id), "cost": {}}
 	var block := S.upgrade_block(c, id)
 	var stock := {"scrap": S.quantity(c, "scrap"), "fragments": S.quantity(c, "fragments")}
 	var have := tr("sem sucata nem fragmentos") if stock.scrap + stock.fragments == 0 else tr("tem %s") % S.cost_text(stock)
@@ -999,7 +1000,7 @@ func _place_lock_marks() -> void:
 
 
 ## O marcador: o ícone do estado (pronto, faltando ou fechado) e o custo em ícones com os números (o que falta, na cor
-## de alerta); o fechado diz só "Fechado".
+## de alerta); o sem custo diz quando chega.
 func _lock_mark(c: Dictionary, id: String, info: Dictionary) -> PanelContainer:
 	var tone: Color = AHKit.AMBER if info.state == "ready" else AHKit.MUTED
 	var mark := AHKit.chip("cost")
