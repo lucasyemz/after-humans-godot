@@ -44,9 +44,8 @@ func _cards() -> void:
 	AHJourneyRules.start_expedition(Campaign.state, "fase_1", 133)
 	var departure := AHWagonRide.departure_card(Campaign.state)
 	t.equal(departure.get("sound", {}).get("loop", ""), RIDE, "a partida no vagão toca o trem andando")
-	t.check(String(departure.sound.get("start", "")).ends_with("train_departure.ogg") and not departure.sound.has("end"),
-		"com a partida da plataforma no começo; a freada é da chegada no túnel (#256), não do fim do cartão")
-	t.equal(AHWagonRide.BRAKE_SOUND, BRAKE, "e a chegada no túnel toca a freada")
+	t.check(String(departure.sound.get("start", "")).ends_with("train_departure.ogg") and departure.sound.get("end", "") == BRAKE,
+		"com a partida da plataforma no começo e a freada na chegada")
 	if departure.get("backdrop") is Node:
 		departure.backdrop.free()
 	Campaign.state.session.expedition = null

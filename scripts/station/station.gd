@@ -885,6 +885,17 @@ func lineup_screen_positions() -> Array:
 ## (OffsetWagon e SetTrainDoorOpen da Unreal).
 func _offset_wagon(x: float) -> void:
 	_wagon_x = x
+	# O vagão em camadas (#256) anda pelo drive (as rodas giram pelo que ele anda). As portas que abrem são as do lado da
+	# plataforma, do outro lado do vagão: as folhas deste lado ficam fechadas, e a luz fria sai pelas de lá.
+	if _build.train_car != null:
+		_build.train_car.drive(x)
+		_build.train_car.set_doors(0.0)
+		for entry in _build.train_door_lights:
+			(entry[0] as OmniLight3D).light_energy = float(entry[1]) * _door_open
+		# A faísca é só da chegada (_tick_slide_in liga e desliga a cada quadro): fora dela, apagada, também quando a
+		# chegada é pulada no meio da freada.
+		if _train_mode != 1 and _train_mode != 4:
+			_build.train_car.brake(false)
 	var slides := {}
 	for door in _build.wagon_doors:
 		slides[door[0]] = door[1] * 0.88 * _door_open
@@ -1072,8 +1083,8 @@ func finish_team_arrival() -> void:
 	Sound.fade_out(_train_sound, 0.3)
 	_warning_time = -1.0
 	_door_open = 0.0
-	_offset_wagon(TRAIN_OUT)
 	_train_mode = 0
+	_offset_wagon(TRAIN_OUT)
 	train_event.emit("team_ready")
 
 
@@ -1364,6 +1375,12 @@ func _tick_slide_in(before: float) -> void:
 		train_event.emit("brake")
 	var slide := clampf((_train_time - TRAIN_WARNING) / (TRAIN_STOP - TRAIN_WARNING), 0.0, 1.0)
 	_offset_wagon(TRAIN_OUT * (1.0 - slide) * (1.0 - slide))
+	# A faísca nas rodas da metade da velocidade até parar (o trem vem da esquerda, andando para a direita), à vista no
+	# fosso da plataforma; com "Reduzir efeitos", sem ela.
+	if _build.train_car != null:
+		var reduced: bool = Campaign.state.get("settings", {}).get("reduced_environment_effects", false)
+		_build.train_car.sparks_enabled = not reduced
+		_build.train_car.brake(slide >= 0.5 and slide < 1.0, 1.0 - (slide - 0.5) * 2.0, 1.0)
 	if before < TRAIN_STOP and _train_time >= TRAIN_STOP:
 		_warning_time = -1.0
 		# O ruído do trem rodando acaba quando ele para (o arquivo segue até 5,5 s; a 2x o trem para antes).

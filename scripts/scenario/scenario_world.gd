@@ -194,8 +194,6 @@ func build(map: String) -> void:
 		_doorway(doorway)
 	for layered in data.get("layered_cards", []):
 		_layered_card(layered)
-	for model in data.get("models", []):
-		_model(model)
 	if train.has("car"):
 		_train_car(train.car)
 	set_process(not _blink_lights.is_empty() or not _blink_parts.is_empty())
@@ -300,32 +298,6 @@ func _train_car(spec: Dictionary) -> void:
 	train_car.set_home()
 	for material in train_car.materials():
 		_cards.append(material)
-
-
-## Um modelo inteiro no mapa. "metro": o vagão da Estação (o mesmo Bombardier), com as portas, no lugar do vagão pintado
-## enquanto a arte do mapa não chega.
-func _model(model: Dictionary) -> void:
-	if model.kind != "metro":
-		return
-	var holder := Node3D.new()
-	holder.name = "Metro"
-	add_child(holder)
-	var build := AHStationBuild.new(AHStationBuilder.new(holder))
-	var pieces: Array[Node3D] = [build._metro_piece("SM_BombardierBody", AHStationBuild.METRO_BODY_SLOTS)]
-	for door in AHStationBuild.METRO_DOORS:
-		pieces.append(build._metro_piece(door[0], AHStationBuild.METRO_DOOR_SLOTS))
-	for piece in pieces:
-		piece.position = Vector3.ZERO
-	holder.position = Vector3(model.origin[0], model.origin[1], model.origin[2])
-	holder.rotation_degrees.y = float(model.get("yaw", 0.0))
-	var body := AABB()
-	var first := true
-	for mesh: MeshInstance3D in holder.find_children("*", "MeshInstance3D", true, false):
-		var box := mesh.global_transform * mesh.get_aabb()
-		body = box if first else body.merge(box)
-		first = false
-	if not first:
-		walls.append(body)
 
 
 ## Fecha as pontas de uma zona coberta (#175): uma coluna de cada lado, na frente da faixa e por fora da parede do
