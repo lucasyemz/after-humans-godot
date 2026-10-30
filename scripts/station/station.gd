@@ -1428,9 +1428,9 @@ static func infirmary_slots() -> Array:
 	return out
 
 
-## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um lugar livre do
-## Dormitório (os de baixo para cima, de trás para a frente, para não tomar o de quem dorme a noite). Vector3.INF sem
-## lugar.
+## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um lugar do Dormitório que
+## ninguém ocupa esta noite (do último para o primeiro; quem dorme fica no lugar da ordem dele na equipe). Vector3.INF
+## sem lugar.
 static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	var entry = S.hero(campaign, hero_id)
 	var fallen := S.fallen(campaign)
@@ -1440,9 +1440,11 @@ static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 		return slots[index] if index >= 0 and index < slots.size() else Vector3.INF
 	var index: int = fallen.filter(func(h): return not S.in_bed(h)).map(func(h): return h.id).find(hero_id)
 	var slots := sleep_slots(S.room_level(campaign, S.DORMITORY))
-	var taken: int = sleepers(campaign).size()
-	var slot: int = slots.size() - 1 - index
-	return slots[slot] if index >= 0 and slot >= taken else Vector3.INF
+	# Os lugares de quem dorme são os da ordem na equipe (como em _update_sleepers), não os primeiros: com o vigia no
+	# meio, o lugar dele fica livre e o último fica ocupado.
+	var taken: Array = sleepers(campaign).map(func(id): return campaign.night.participants.find(id))
+	var free: Array = range(slots.size() - 1, -1, -1).filter(func(slot): return not taken.has(slot))
+	return slots[free[index]] if index >= 0 and index < free.size() else Vector3.INF
 
 
 ## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview). Durante a

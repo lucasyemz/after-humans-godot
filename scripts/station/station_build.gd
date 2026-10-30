@@ -996,8 +996,9 @@ func _forge() -> void:
 ## deita à noite (AHStation.sleep_slots). Chegam com a melhoria do Dormitório (o nível 2, #176).
 const BUNK_X := [-1010.0, -660.0]
 ## Sem os beliches (o Dormitório no nível 1, #176), quem dorme deita no chão: quatro lugares lado a lado, à frente da
-## parede dos beliches, um pouco desencontrados na profundidade para um não cortar o outro.
-const FLOOR_SLEEP_X := [-1110.0, -870.0, -630.0, -390.0]
+## parede dos beliches, entre a mochila do canto e a faixa do vigia (que fica de pé perto da porta, de -3,9 a -1,9 m),
+## um pouco desencontrados na profundidade para um não cortar o outro.
+const FLOOR_SLEEP_X := [-1020.0, -840.0, -660.0, -480.0]
 const FLOOR_SLEEP_Y := [-600.0, -570.0]
 const BUNK_Y := -665.0
 const BUNK_FLOOR := -520.0

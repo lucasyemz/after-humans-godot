@@ -119,7 +119,12 @@ func _dormitory(station) -> void:
 	t.check(lying.all(func(w): return floor_slots.has(w.card.position)), "no chão do Dormitório")
 	hud.open_room(S.DORMITORY)
 	await _frames(3)
-	t.check(hud._body.find_child("Upgrade", true, false) != null, "o painel do Dormitório oferece os beliches")
+	t.check(hud._body.find_child("Upgrade", true, false) == null, "com a noite pendente, o painel abre no plano da noite, sem os beliches")
+	c.night.phase = "none"
+	hud.refresh()
+	await _frames(3)
+	t.check(hud._body.find_child("Upgrade", true, false) != null, "de dia, o painel do Dormitório oferece os beliches")
+	c.night.phase = "planning"
 	c.inventory.scrap = 3
 	t.equal(S.upgrade_room(c, S.DORMITORY, 1), "", "os beliches por 3 sucatas")
 	station.commit()

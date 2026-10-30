@@ -448,7 +448,30 @@ func _sleepers(t) -> void:
 	var dorm: Dictionary = AHStation.room_def(S.DORMITORY)
 	t.check(floor_slots.all(func(p): return p.x - 0.9 >= dorm.x0 and p.x + 0.9 <= dorm.x1), "todos dentro do Dormitório")
 	for index in range(1, floor_slots.size()):
-		t.check(floor_slots[index].x - floor_slots[index - 1].x >= 2.0, "no chão, lado a lado (%d)" % index)
+		t.check(floor_slots[index].x - floor_slots[index - 1].x >= 1.799, "no chão, lado a lado (%d)" % index)
+	# O vigia fica de pé perto da porta (lane[1] - 2 a lane[1]): ninguém deita debaixo dele.
+	t.check(floor_slots.all(func(p): return p.x + 0.9 <= dorm.lane[1] - 2.0 + 0.001), "nenhum lugar no chão na faixa do vigia")
+	# Quem está caído sem leito deita num lugar que ninguém ocupa esta noite, também com o vigia no meio da equipe (o
+	# lugar de quem dorme é o da ordem dele na equipe).
+	var five: Dictionary = Campaign.create_initial(4)
+	S.recruit(five, "cao", RandomNumberGenerator.new(), "Caído")
+	var fallen_id: String = five.roster.back().id
+	S.admit_fallen(five, [fallen_id])
+	var night_team: Array = five.roster.slice(0, 4).map(func(h): return h.id)
+	five.night.phase = "planning"
+	five.night.participants = night_team
+	for level in [1, 2]:
+		five.station.rooms[S.DORMITORY] = level
+		var level_slots := AHStation.sleep_slots(level)
+		for watch in [night_team[0], night_team[3], ""]:
+			five.night.watch_hero_id = watch
+			var used: Array = AHStation.sleepers(five).map(func(id): return level_slots[night_team.find(id)])
+			var spot := AHStation.recovery_spot(five, fallen_id)
+			if watch == "":
+				# Os quatro dormem: sem lugar, o caído fica de pé à parte (Vector3.INF).
+				t.equal(spot, Vector3.INF, "nível %d, sem vigia: os quatro lugares ocupados, o caído sem lugar" % level)
+			else:
+				t.check(spot != Vector3.INF and not used.has(spot), "nível %d, vigia %s: o caído num lugar livre" % [level, watch])
 	# O beliche é o card inteiro da entrega #1: quem dorme encosta na linha do colchão de baixo e na do de cima, medidas
 	# na arte (docs/design/bunk.md), em cm pela escala do card.
 	t.check(ResourceLoader.exists("res://art/station/cards/%s.webp" % AHStationBuild.BUNK_CARD), "o card do beliche existe")
