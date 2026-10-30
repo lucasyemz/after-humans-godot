@@ -7,7 +7,7 @@
   {
     "Name": "limit_helpers",
     "Levels": [3, 4],
-    "Description": "Proposta (#119): quantos ajudantes (os civis) a Estação comporta, pelo nível do Dormitório (0 e 1; o Dormitório não passa do nível 1)."
+    "Description": "Proposta (#119): quantos ajudantes (os civis) a Estação comporta, pelo nível do Dormitório (1, a equipe no chão, e 2, com os beliches; #176)."
   },
   {"Name": "characters_level_2", "Scrap": 4, "Fragments": 1, "Description": "Proposta (#119): ampliar o Alojamento para o nível 2."},
   {"Name": "characters_level_3", "Scrap": 6, "Fragments": 2, "Description": "Proposta (#119): o nível 3."},
@@ -50,5 +50,6 @@
   {"Name": "bonus_cao_forge", "ClassId": "cao", "Room": "forge", "Add": 1, "Description": "Proposta (#119): o cão aguenta o trabalho pesado; rende mais na Forja."},
   {"Name": "bonus_rato_forge", "ClassId": "rato", "Room": "forge", "Add": 1, "Description": "Proposta (#119): o guaxinim desmonta e reaproveita; rende mais na Forja."},
   {"Name": "perk_hopeful", "Perk": "hopeful", "Add": 1, "Description": "Proposta (#119): quem tem esperança rende um a mais em qualquer posto."},
-  {"Name": "perk_gloomy", "Perk": "gloomy", "Add": -1, "Description": "Proposta (#119): o pessimista rende um a menos em qualquer posto (nunca menos que zero)."}
+  {"Name": "perk_gloomy", "Perk": "gloomy", "Add": -1, "Description": "Proposta (#119): o pessimista rende um a menos em qualquer posto (nunca menos que zero)."},
+  {"Name": "dormitory_level_2", "Scrap": 3, "Fragments": 0, "Description": "Proposta (#176): os beliches do Dormitório (o nível 2). No nível 1, desde o começo, a equipe dorme no chão."}
 ]

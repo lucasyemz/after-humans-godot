@@ -546,12 +546,20 @@ func clear_stage_hero() -> void:
 ## painéis nem numa lasca na borda deles.
 func hide_residents(hidden: bool) -> void:
 	_residents_hidden = hidden
-	# Quem está na fila da plataforma ou saindo dela (#131) não aparece no cômodo ao mesmo tempo.
-	var away: Array = lineup.map(func(e): return e.hero_id) + _leaving.map(func(e): return e.hero_id)
+	var away := _away_ids()
 	for id in residents:
 		var card = residents[id]
 		if is_instance_valid(card):
 			card.visible = not hidden and not away.has(id)
+
+
+## Quem não aparece no cômodo: a fila da plataforma, quem sai dela (#131) e quem ainda vai descer do trem da volta
+## (#76). Esses estão na roupa de expedição; o cômodo mostra a do lobby (#249) só depois que saem da plataforma.
+func _away_ids() -> Array:
+	var away: Array = lineup.map(func(e): return e.hero_id) + _leaving.map(func(e): return e.hero_id)
+	if _train_mode == 4:
+		away.append_array(_arrivals.filter(func(a): return a.card == null).map(func(a): return a.hero_id))
+	return away
 
 
 ## A plataforma onde o trem para e o candidato espera.
@@ -878,6 +886,17 @@ func lineup_screen_positions() -> Array:
 ## (OffsetWagon e SetTrainDoorOpen da Unreal).
 func _offset_wagon(x: float) -> void:
 	_wagon_x = x
+	# O vagão em camadas (#256) anda pelo drive (as rodas giram pelo que ele anda). As portas que abrem são as do lado da
+	# plataforma, do outro lado do vagão: as folhas deste lado ficam fechadas, e a luz fria sai pelas de lá.
+	if _build.train_car != null:
+		_build.train_car.drive(x)
+		_build.train_car.set_doors(0.0)
+		for entry in _build.train_door_lights:
+			(entry[0] as OmniLight3D).light_energy = float(entry[1]) * _door_open
+		# A faísca é só da chegada (_tick_slide_in liga e desliga a cada quadro): fora dela, apagada, também quando a
+		# chegada é pulada no meio da freada.
+		if _train_mode != 1 and _train_mode != 4:
+			_build.train_car.brake(false)
 	var slides := {}
 	for door in _build.wagon_doors:
 		slides[door[0]] = door[1] * 0.88 * _door_open
@@ -1026,6 +1045,10 @@ func play_team_arrival(hero_ids: Array) -> void:
 		var hurt: bool = int(entry.get("hp", 0)) < int(entry.get("max_hp", 0))
 		_arrivals.append({"hero_id": survivors[index], "art": art.idle, "slot": _line_slot(index, survivors.size()),
 			"delay": step * TEAM_STEP_OUT, "speed": TRAIN_WALK_SPEED * (WOUNDED_PACE if hurt else 1.0), "card": null, "hurt": hurt})
+	# Quem ainda está no trem já não aparece no cômodo (lá, na roupa do lobby): ninguém fica em dois lugares.
+	for arrival in _arrivals:
+		if residents.has(arrival.hero_id):
+			residents[arrival.hero_id].visible = false
 	on_platform = true
 	_path.clear()
 	_apply_panel(0.0)
@@ -1061,8 +1084,8 @@ func finish_team_arrival() -> void:
 	Sound.fade_out(_train_sound, 0.3)
 	_warning_time = -1.0
 	_door_open = 0.0
-	_offset_wagon(TRAIN_OUT)
 	_train_mode = 0
+	_offset_wagon(TRAIN_OUT)
 	train_event.emit("team_ready")
 
 
@@ -1371,6 +1394,12 @@ func _tick_slide_in(before: float) -> void:
 		train_event.emit("brake")
 	var slide := clampf((_train_time - TRAIN_WARNING) / (TRAIN_STOP - TRAIN_WARNING), 0.0, 1.0)
 	_offset_wagon(TRAIN_OUT * (1.0 - slide) * (1.0 - slide))
+	# A faísca nas rodas da metade da velocidade até parar (o trem vem da esquerda, andando para a direita), à vista no
+	# fosso da plataforma; com "Reduzir efeitos", sem ela.
+	if _build.train_car != null:
+		var reduced: bool = Campaign.state.get("settings", {}).get("reduced_environment_effects", false)
+		_build.train_car.sparks_enabled = not reduced
+		_build.train_car.brake(slide >= 0.5 and slide < 1.0, 1.0 - (slide - 0.5) * 2.0, 1.0)
 	if before < TRAIN_STOP and _train_time >= TRAIN_STOP:
 		_warning_time = -1.0
 		# O ruído do trem rodando acaba quando ele para (o arquivo segue até 5,5 s; a 2x o trem para antes).
@@ -1419,9 +1448,15 @@ func _tick_camera_on_candidate() -> void:
 const SLEEP_DROP := 10.0
 
 
-## Os quatro lugares dos beliches (m): de baixo à esquerda, de baixo à direita, e os de cima.
-static func sleep_slots() -> Array:
+## Os quatro lugares de quem dorme (m), pelo nível do Dormitório (#176): no nível 1, no chão, da esquerda para a
+## direita; com os beliches (nível 2), de baixo à esquerda, de baixo à direita, e os de cima.
+static func sleep_slots(level: int = 2) -> Array:
 	var out: Array = []
+	if level < 2:
+		for index in AHStationBuild.FLOOR_SLEEP_X.size():
+			out.append(AHStationBuilder.vu(Vector3(AHStationBuild.FLOOR_SLEEP_X[index],
+				AHStationBuild.FLOOR_SLEEP_Y[index % AHStationBuild.FLOOR_SLEEP_Y.size()], AHStationBuild.BUNK_FLOOR)))
+		return out
 	for tier in 2:
 		for x in AHStationBuild.BUNK_X:
 			# Um pouco para a cabeceira (o travesseiro fica à esquerda) e à frente da cama pintada.
@@ -1441,9 +1476,9 @@ static func infirmary_slots() -> Array:
 	return out
 
 
-## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um beliche livre do
-## Dormitório (os de baixo para cima, de trás para a frente, para não tomar o de quem dorme a noite). Vector3.INF sem
-## lugar.
+## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um lugar do Dormitório que
+## ninguém ocupa esta noite (do último para o primeiro; quem dorme fica no lugar da ordem dele na equipe). Vector3.INF
+## sem lugar.
 static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	var entry = S.hero(campaign, hero_id)
 	var fallen := S.fallen(campaign)
@@ -1452,10 +1487,12 @@ static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 		var slots := infirmary_slots()
 		return slots[index] if index >= 0 and index < slots.size() else Vector3.INF
 	var index: int = fallen.filter(func(h): return not S.in_bed(h)).map(func(h): return h.id).find(hero_id)
-	var slots := sleep_slots()
-	var taken: int = sleepers(campaign).size()
-	var slot: int = slots.size() - 1 - index
-	return slots[slot] if index >= 0 and slot >= taken else Vector3.INF
+	var slots := sleep_slots(S.room_level(campaign, S.DORMITORY))
+	# Os lugares de quem dorme são os da ordem na equipe (como em _update_sleepers), não os primeiros: com o vigia no
+	# meio, o lugar dele fica livre e o último fica ocupado.
+	var taken: Array = sleepers(campaign).map(func(id): return campaign.night.participants.find(id))
+	var free: Array = range(slots.size() - 1, -1, -1).filter(func(slot): return not taken.has(slot))
+	return slots[free[index]] if index >= 0 and index < free.size() else Vector3.INF
 
 
 ## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview). Durante a
@@ -1482,12 +1519,12 @@ func _exit_tree() -> void:
 	night_scene = false
 
 
-## À noite, quem dorme deita no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica de pé no Dormitório. Com a
-## noite resolvida, todos voltam a passear.
+## À noite, quem dorme deita no Dormitório, no chão ou no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica
+## de pé no Dormitório. Com a noite resolvida, todos voltam a passear.
 func _update_sleepers() -> void:
 	var campaign: Dictionary = Campaign.state
 	var asleep := sleepers(campaign)
-	var slots := sleep_slots()
+	var slots := sleep_slots(S.room_level(campaign, S.DORMITORY))
 	var watch: String = campaign.night.watch_hero_id if campaign.night.phase == "planning" or (night_scene and campaign.night.phase == "dawn") else ""
 	var dorm := room_def(S.DORMITORY)
 	var replace := false
@@ -1495,14 +1532,14 @@ func _update_sleepers() -> void:
 		if not walker.has("hero_id") or not is_instance_valid(walker.card):
 			continue
 		var card: AHSpriteCard = walker.card
-		# Em recuperação (#118): deitado no leito da Enfermaria (ou num beliche do Dormitório), sem passear. Sem a pose
+		# Em recuperação (#118): deitado no leito da Enfermaria (ou num lugar do Dormitório), sem passear. Sem a pose
 		# de dormir ou sem lugar, fica de pé, parado, no cômodo onde se recupera.
 		if S.recovering(S.hero(campaign, walker.hero_id)):
 			walker.sleeping = true
 			walker.recovering = true
 			var spot := recovery_spot(campaign, walker.hero_id)
-			if spot != Vector3.INF and _poses.has(walker.hero_id + "_sleep"):
-				card.show_art(AHSkins.pose(_poses[walker.hero_id + "_sleep"], walker.hero_id))
+			if spot != Vector3.INF and walker.poses.has("sleep"):
+				card.show_art(walker.poses.sleep)
 				card.position = spot
 			else:
 				var place := room_def(S.INFIRMARY if S.in_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
@@ -1520,9 +1557,9 @@ func _update_sleepers() -> void:
 			continue
 		# Cada um tem o seu lugar pela ordem na equipe: trocar o vigia não muda os outros de cama.
 		var slot: int = campaign.night.participants.find(walker.hero_id) if asleep.has(walker.hero_id) else -1
-		if slot >= 0 and slot < slots.size() and _poses.has(walker.hero_id + "_sleep"):
+		if slot >= 0 and slot < slots.size() and walker.poses.has("sleep"):
 			walker.sleeping = true
-			card.show_art(AHSkins.pose(_poses[walker.hero_id + "_sleep"], walker.hero_id))
+			card.show_art(walker.poses.sleep)
 			card.position = slots[slot]
 			card.set_facing(1.0)
 			card.scale = Vector3.ONE
@@ -1576,9 +1613,10 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		if not S.recovering(entry):
 			occupancy[room_id] = int(occupancy.get(room_id, 0)) + 1
 		var room := room_def(room_id)
+		var poses := _resident_poses(entry, art)
 		var card := AHSpriteCard.new()
 		card.body_height = AHCharacterHeights.find(entry.id)
-		card.show_art(art.idle)
+		card.show_art(poses.idle)
 		add_child(card)
 		occlusion.track(card)
 		var lane: Array = room.lane
@@ -1591,8 +1629,9 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		card.set_facing(1.0 if rng.randf() < 0.5 else -1.0)
 		residents[entry.id] = card
 		var walker := {"card": card, "min": lane_min, "max": lane_max, "target": card.position.x, "wait": rng.randf_range(0.5, 4.0),
-			"phase": rng.randf() * TAU, "room": room_id, "idle": art.idle, "hero_id": entry.id, "home_z": card.position.z,
-			"floor": room.floor, "seat": -1, "sitting": 0.0, "work": WORK_POSES.get(entry.id, "") == room_id and _poses.has(entry.id + "_work"),
+			"phase": rng.randf() * TAU, "room": room_id, "idle": poses.idle, "poses": poses, "hero_id": entry.id,
+			"home_z": card.position.z, "floor": room.floor, "seat": -1, "sitting": 0.0,
+			"work": WORK_POSES.get(entry.id, "") == room_id and poses.has("work"),
 			"working": 0.0, "pause": rng.randf_range(1.0, 4.0)}
 		_walkers.append(walker)
 	for civilian_id in campaign.station.residents:
@@ -1627,8 +1666,8 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		walker.target = card.position.x
 	# Refeitos os passeios (depois do trem, por exemplo), quem dorme volta para o beliche.
 	_update_sleepers()
-	if _residents_hidden:
-		hide_residents(true)
+	# Quem está na plataforma (a fila, a chegada) ou oculto por uma tela do kit continua fora do cômodo.
+	hide_residents(_residents_hidden)
 
 
 ## O herói trocou de skin (#138): a placa dele veste a nova onde está, na pose de agora (de pé, sentado, no posto ou
@@ -1640,28 +1679,45 @@ func redress(hero_id: String) -> void:
 		var dressed := _hero_art(S.hero(Campaign.state, hero_id))
 		if not dressed.is_empty():
 			stage_card.show_art(dressed.idle)
+	# No cômodo, quem tem a roupa do lobby (#249) continua com ela: a skin é a da expedição.
 	for walker in _walkers:
 		if String(walker.get("hero_id", "")) != hero_id:
 			continue
-		var art := _hero_art(S.hero(Campaign.state, hero_id))
+		var entry = S.hero(Campaign.state, hero_id)
+		var art := _hero_art(entry)
 		if art.is_empty():
 			return
-		walker.idle = art.idle
+		walker.poses = _resident_poses(entry, art)
+		walker.idle = walker.poses.idle
 		var card: AHSpriteCard = walker.card
-		if walker.get("sitting", 0.0) > 0.0 and _poses.has(hero_id + "_seat"):
-			card.show_art(AHSkins.pose(_poses[hero_id + "_seat"], hero_id))
-		elif walker.get("working", 0.0) > 0.0 and _poses.has(hero_id + "_work"):
-			card.show_art(AHSkins.pose(_poses[hero_id + "_work"], hero_id))
-		elif walker.get("sleeping", false) and _poses.has(hero_id + "_sleep"):
-			card.show_art(AHSkins.pose(_poses[hero_id + "_sleep"], hero_id))
+		if walker.get("sitting", 0.0) > 0.0 and walker.poses.has("seat"):
+			card.show_art(walker.poses.seat)
+		elif walker.get("working", 0.0) > 0.0 and walker.poses.has("work"):
+			card.show_art(walker.poses.work)
+		elif walker.get("sleeping", false) and walker.poses.has("sleep"):
+			card.show_art(walker.poses.sleep)
 		else:
-			card.show_art(art.idle)
+			card.show_art(walker.idle)
 	_update_sleepers()
 
 
 ## A arte do herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 func _hero_art(entry) -> Dictionary:
 	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id, String(entry.get("art_variant", "")))
+
+
+## As poses de quem mora no cômodo ({idle, seat, sleep, work}, as que ele tem): a roupa confortável do lobby (#249) ou,
+## para quem ainda não tem, a de expedição (o parado da luta e as poses da Estação, na skin dele). Nunca as duas
+## misturadas: sem a pose na roupa que veste, ele não senta, não trabalha ou não deita.
+func _resident_poses(entry, art: Dictionary) -> Dictionary:
+	var lobby := AHLobbyOutfit.poses_of(String(entry.id), art)
+	if lobby.has("idle"):
+		return lobby
+	var out := {"idle": art.idle}
+	for state in ["seat", "sleep", "work"]:
+		if _poses.has(entry.id + "_" + state):
+			out[state] = AHSkins.pose(_poses[entry.id + "_" + state], entry.id)
+	return out
 
 
 func civilian_art(civilian_id: String) -> Dictionary:
@@ -1714,7 +1770,7 @@ func _walk(delta: float) -> void:
 				if walker.pause <= 0.0 and walker.wait > 0.0 and _post_taken(walker):
 					walker.pause = randf_range(3.0, 6.0)
 				if walker.pause <= 0.0 and walker.wait > 0.0:
-					card.show_art(AHSkins.pose(_poses[walker.hero_id + "_work"], walker.hero_id))
+					card.show_art(walker.poses.work)
 					card.position = Vector3(_work_post(walker), walker.floor, -5.6)
 					card.set_facing(1.0)
 					card.scale = Vector3.ONE
@@ -1775,8 +1831,8 @@ func _choose_target(walker: Dictionary, retry: bool = false) -> void:
 			target = x
 	if absf(target - card.position.x) < 1.0:
 		target = walker.min if card.position.x > (walker.min + walker.max) * 0.5 else walker.max
-	# Na Cantina, às vezes vai sentar no banco livre atrás da mesa (só os fundadores têm a pose sentada).
-	if walker.get("room", "") == "canteen" and _poses.has(walker.hero_id + "_seat") and randf() < 0.45:
+	# Na Cantina, às vezes vai sentar no banco livre atrás da mesa (quem tem a pose sentada na roupa que veste).
+	if walker.get("room", "") == "canteen" and walker.poses.has("seat") and randf() < 0.45:
 		for seat in CANTEEN_SEATS.size():
 			if not _seats.has(seat):
 				_seats[seat] = walker
@@ -1827,7 +1883,7 @@ func _post_taken(walker: Dictionary) -> bool:
 
 func _sit_down(walker: Dictionary) -> void:
 	var card: AHSpriteCard = walker.card
-	card.show_art(AHSkins.pose(_poses[walker.hero_id + "_seat"], walker.hero_id))
+	card.show_art(walker.poses.seat)
 	card.position = Vector3(CANTEEN_SEATS[walker.seat], walker.floor, CANTEEN_SEAT_Z)
 	card.set_facing(1.0)
 	walker.sitting = randf_range(6.0, 11.0)

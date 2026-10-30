@@ -40,8 +40,11 @@ const ROOMS := [
 	{"id": CHARACTERS, "name": "Alojamento", "basic": true, "max_level": 4, "costs": [], "data_costs": "characters_level_%d", "data_table": "hero_jobs"},
 	{"id": FORGE, "name": "Forja", "basic": false, "max_level": 2, "costs": [{"scrap": 4, "fragments": 0}, {"scrap": 6, "fragments": 2}]},
 	{"id": RESEARCH, "name": "Centro de Pesquisa", "basic": false, "max_level": 1, "costs": [{"scrap": 3, "fragments": 2}]},
-	{"id": DORMITORY, "name": "Dormitório", "basic": false, "max_level": 1, "costs": []},
-	{"id": BAR, "name": "Bar", "basic": false, "max_level": 1, "costs": []},
+	# O Dormitório existe desde o começo, sem camas: no nível 1 a equipe dorme no chão; os beliches são a melhoria (nível 2,
+	# o custo em data/hero-jobs.json). Decisão do Lucas (28/10, #176).
+	{"id": DORMITORY, "name": "Dormitório", "basic": true, "max_level": 2, "costs": [], "data_costs": "dormitory_level_%d", "data_table": "hero_jobs"},
+	# O Bar tem custo para ser recuperado (#176; o número é proposta).
+	{"id": BAR, "name": "Bar", "basic": false, "max_level": 1, "costs": [{"scrap": 4, "fragments": 1}]},
 	{"id": INFIRMARY, "name": "Enfermaria", "basic": false, "max_level": 2, "costs": [], "data_costs": "infirmary_level_%d"},
 ]
 const RELIC_COST_BASE := 3
@@ -443,10 +446,12 @@ static func _room_benefit(room_id: String, level: int) -> String:
 			return TranslationServer.translate("Laboratório vazio. Recuperado, libera as melhorias de classe e gasta 1 de energia.") if level <= 0 \
 				else TranslationServer.translate("Melhorias de classe com fragmentos. Gasta 1 de energia.")
 		DORMITORY:
-			return TranslationServer.translate("Quarto por recuperar: só os beliches de ferro. A equipe dorme aqui depois de cada volta.") if level <= 0 \
-				else TranslationServer.translate("Descanso da comunidade.")
+			# Sem camas no nível 1 (a equipe dorme no chão); os beliches chegam com a melhoria (#176).
+			if level <= 1:
+				return TranslationServer.translate("Sem camas: a equipe dorme no chão depois de cada volta. Com os beliches, cabem %d ajudantes.") % helper_limit_at(2)
+			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada volta. Cabem %d ajudantes.") % helper_limit_at(level)
 		BAR:
-			return TranslationServer.translate("Salão vazio, sem uso por enquanto.") if level <= 0 else TranslationServer.translate("Um lugar para conversar e fazer uma pausa.")
+			return TranslationServer.translate("Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa.") if level <= 0 else TranslationServer.translate("Um lugar para conversar e fazer uma pausa.")
 		CANTEEN:
 			return TranslationServer.translate("Com energia, produz 2 suprimentos por expedição.")
 		DEPOT:
@@ -2106,7 +2111,12 @@ static func hero_limit_at(level: int) -> int:
 
 ## Quantos ajudantes (os civis) a Estação comporta: o nível do Dormitório.
 static func helper_limit(campaign: Dictionary) -> int:
-	return _job_level_value("limit_helpers", room_level(campaign, DORMITORY), CIVILIANS.size())
+	return helper_limit_at(room_level(campaign, DORMITORY))
+
+
+## Quantos ajudantes cabem num nível do Dormitório (1, no chão; 2, com os beliches).
+static func helper_limit_at(level: int) -> int:
+	return _job_level_value("limit_helpers", level - 1, CIVILIANS.size())
 
 
 static func heroes_full(campaign: Dictionary) -> bool:

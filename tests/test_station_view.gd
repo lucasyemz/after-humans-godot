@@ -24,6 +24,7 @@ func run(context) -> void:
 	if t.check(station != null, "a Estação abriu"):
 		await _sala_to_map(station)
 		await _lock_marks(station)
+		await _dormitory(station)
 		await _pan(station)
 		await _rooms(station)
 	if _tree.current_scene != null:
@@ -74,7 +75,13 @@ func _lock_marks(station) -> void:
 	t.equal(forge.state, "short", "a Forja sem sucata: falta recurso")
 	t.check(String(forge.title).contains(S.cost_text(S.next_level_cost(c, S.FORGE))), "o marcador diz o custo (%s)" % forge.title)
 	t.equal(forge.note, S.upgrade_block(c, S.FORGE), "e o que falta")
-	t.equal(hud.lock_mark_info(c, S.BAR).state, "closed", "o Bar: fechado, com o motivo")
+	# O Bar tem custo (#176): o marcador de construir no lugar de "Fechado", e nenhum cômodo fica "fechado".
+	var bar := hud.lock_mark_info(c, S.BAR)
+	t.equal(bar.state, "short", "o Bar sem recurso: o marcador de construir, com o que falta")
+	t.equal(bar.cost, S.next_level_cost(c, S.BAR), "com o custo do Bar")
+	t.check(hud.lock_mark_info(c, S.DORMITORY).is_empty(), "o Dormitório já existe: sem marcador")
+	for room in S.ROOMS:
+		t.check(hud.lock_mark_info(c, room.id).get("state", "") != "closed", "%s não fica fechado" % room.name)
 	t.check(hud.lock_mark_info(c, S.CANTEEN).is_empty(), "o cômodo recuperado fica sem marcador")
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5
@@ -90,6 +97,49 @@ func _lock_marks(station) -> void:
 	station.commit()
 	await _frames(3)
 	t.check(not hud._lock_marks.has(S.FORGE), "o marcador dela sai")
+
+
+## O Dormitório sem camas (#176): no nível 1 os beliches não aparecem e quem dorme deita no chão; com a melhoria, os
+## beliches aparecem e quem dorme vai para eles. Entrar abre o painel com o custo dos beliches.
+func _dormitory(station) -> void:
+	var hud: AHRefugeHud = station.hud
+	var c: Dictionary = Campaign.state
+	var bunks: Array = station._build.dressing.get("dormitory@2", [])
+	t.check(not bunks.is_empty(), "os beliches são a peça do nível 2")
+	t.check(bunks.all(func(n): return not n.visible), "no nível 1, sem beliches")
+	var team: Array = c.roster.slice(0, 4).map(func(h): return h.id)
+	c.night.phase = "planning"
+	c.night.participants = team
+	c.night.watch_hero_id = ""
+	station.commit()
+	await _frames(3)
+	var floor_slots := AHStation.sleep_slots(1)
+	var lying: Array = station._walkers.filter(func(w): return w.get("sleeping", false) and w.has("hero_id"))
+	t.equal(lying.size(), 4, "os quatro deitam")
+	t.check(lying.all(func(w): return floor_slots.has(w.card.position)), "no chão do Dormitório")
+	hud.open_room(S.DORMITORY)
+	await _frames(3)
+	t.check(hud._body.find_child("Upgrade", true, false) == null, "com a noite pendente, o painel abre no plano da noite, sem os beliches")
+	c.night.phase = "none"
+	hud.refresh()
+	await _frames(3)
+	t.check(hud._body.find_child("Upgrade", true, false) != null, "de dia, o painel do Dormitório oferece os beliches")
+	c.night.phase = "planning"
+	c.inventory.scrap = 3
+	t.equal(S.upgrade_room(c, S.DORMITORY, 1), "", "os beliches por 3 sucatas")
+	station.commit()
+	await _frames(3)
+	t.check(bunks.all(func(n): return n.visible), "com a melhoria, os beliches aparecem")
+	var bunk_slots := AHStation.sleep_slots(2)
+	t.check(station._walkers.filter(func(w): return w.get("sleeping", false) and w.has("hero_id")).all(func(w): return bunk_slots.has(w.card.position)),
+		"e quem dorme vai para eles")
+	t.equal(S.helper_limit(c), 4, "com os beliches, 4 ajudantes")
+	hud.close_panel()
+	c.night.phase = "none"
+	c.night.participants = []
+	c.station.rooms[S.DORMITORY] = 1
+	station.commit()
+	await _frames(3)
 
 
 func _pan(station) -> void:
