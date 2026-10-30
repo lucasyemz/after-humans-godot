@@ -1,0 +1,843 @@
+{
+  "issue": 250,
+  "author": "Awesomic",
+  "batch": "leva 1 de 3",
+  "poses_in_batch": [
+    "idle",
+    "guard",
+    "wounded",
+    "item"
+  ],
+  "generator": "ChatGPT (GPT Image 2.5), fundo magenta recortado",
+  "base_commit": "0f5e61b131b3a5480c0489b45c3e34c0c1ab3118",
+  "source_tag": "awesomic-250-expedicao-originals-leva1",
+  "source_folder": "expedicao_recrutas_awesomic_leva1_20261030",
+  "source_archive": "expedicao_recrutas_awesomic_leva1_20261030.tar.gz",
+  "source_archive_sha256": "3a79ef6ca55f78159994f7ac27b497a485a362b544319c228979f69a52e007a6",
+  "board_scale_px_per_m": 330,
+  "runtime_changes": false,
+  "actors": {
+    "dog_female": {
+      "class_id": "cao",
+      "canonical_recruit": "dog_recruit_01",
+      "canvas": [
+        1086,
+        1448
+      ],
+      "anchor": [
+        542.0,
+        1425
+      ],
+      "body_reference_pixels": 1385,
+      "male_body_width_pixels": 820,
+      "canon_source": "data/presentation/combat_art.json",
+      "assets": {
+        "idle": {
+          "source_file": "dog_female/idle.png",
+          "source_sha256": "9b608faca71b131b4f8e0c71af9e001d6363e8926676469f3e7b1fdd36ece335",
+          "canvas": [
+            1086,
+            1448
+          ],
+          "anchor": [
+            542.0,
+            1425
+          ],
+          "own_canvas": false,
+          "visible": [
+            194,
+            40,
+            891,
+            1425
+          ],
+          "visible_height": 1385,
+          "visible_width": 697,
+          "uniform_scale": 0.9692092372288313,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            194,
+            40
+          ],
+          "generator_file": "gpt-dog-f-idle.png",
+          "generator_sha256": "356ea5bdf028b9456cc37a57618783fed3b5ed88685a7639c5d0448bdf6054f9"
+        },
+        "guard": {
+          "source_file": "dog_female/guard.png",
+          "source_sha256": "bbdf78379fdfc8c825df87959fc4b63ded866b6231d6bbac8baebb8e3d812c9a",
+          "canvas": [
+            1086,
+            1448
+          ],
+          "anchor": [
+            542.0,
+            1425
+          ],
+          "own_canvas": false,
+          "visible": [
+            130,
+            89,
+            1057,
+            1425
+          ],
+          "visible_height": 1336,
+          "visible_width": 927,
+          "uniform_scale": 0.9692092372288313,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            130,
+            89
+          ],
+          "generator_file": "gpt-dog-f-guard.png",
+          "generator_sha256": "e78e6fb2d184cd778435514d4fbaac001b540dfd5bcbe400b701ba2961ae38e9"
+        },
+        "wounded": {
+          "source_file": "dog_female/wounded.png",
+          "source_sha256": "faed1afa4d17c6a97c652f416901513df686f8066d4c86a398bb08e7f7d7f4c5",
+          "canvas": [
+            1086,
+            1448
+          ],
+          "anchor": [
+            542.0,
+            1425
+          ],
+          "own_canvas": false,
+          "visible": [
+            186,
+            92,
+            903,
+            1425
+          ],
+          "visible_height": 1333,
+          "visible_width": 717,
+          "uniform_scale": 0.9692092372288313,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            186,
+            92
+          ],
+          "generator_file": "gpt-dog-f-wounded.png",
+          "generator_sha256": "46ab313402e4334357827c6848a2b32261b3824c69697507e418a40160d16e0c"
+        },
+        "item": {
+          "source_file": "dog_female/item.png",
+          "source_sha256": "389d61ce07095a262560154cfaf140ff7c2027aec473faae512a7e6ddb19e6c8",
+          "canvas": [
+            1086,
+            1448
+          ],
+          "anchor": [
+            542.0,
+            1425
+          ],
+          "own_canvas": false,
+          "visible": [
+            186,
+            57,
+            885,
+            1425
+          ],
+          "visible_height": 1368,
+          "visible_width": 699,
+          "uniform_scale": 0.9692092372288313,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            186,
+            57
+          ],
+          "generator_file": "gpt-dog-f-item.png",
+          "generator_sha256": "708eca431de7a4ca32151f907eb373edd91c6e7d44bf7bd556046e484c281326"
+        }
+      }
+    },
+    "cat_female": {
+      "class_id": "gato",
+      "canonical_recruit": "cat_recruit_01",
+      "canvas": [
+        1178,
+        1336
+      ],
+      "anchor": [
+        589.5,
+        1312
+      ],
+      "body_reference_pixels": 1260,
+      "male_body_width_pixels": 735,
+      "canon_source": "data/presentation/combat_art.json",
+      "assets": {
+        "idle": {
+          "source_file": "cat_female/idle.png",
+          "source_sha256": "ea32f672cd4430fe6a4335eb22bc2ac699cdb7e7510515023c255e525b8da916",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            589.5,
+            1312
+          ],
+          "own_canvas": false,
+          "visible": [
+            240,
+            52,
+            940,
+            1312
+          ],
+          "visible_height": 1260,
+          "visible_width": 700,
+          "uniform_scale": 0.8923512747875354,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            240,
+            52
+          ],
+          "generator_file": "gpt-cat-f-idle.png",
+          "generator_sha256": "6380c20b0339db9e9b9bf9df33052ea350027af1f1ba43675acaf559656b834b"
+        },
+        "guard": {
+          "source_file": "cat_female/guard.png",
+          "source_sha256": "00fe12e51b9ce446088b7e5edfeb0c34ed8ec4919fffa076fe666cec15e2da29",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            589.5,
+            1312
+          ],
+          "own_canvas": false,
+          "visible": [
+            282,
+            175,
+            1134,
+            1312
+          ],
+          "visible_height": 1137,
+          "visible_width": 852,
+          "uniform_scale": 0.8923512747875354,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            282,
+            175
+          ],
+          "generator_file": "gpt-cat-f-guard.png",
+          "generator_sha256": "7c880b0edbe6eb878321e596893311e917a145bf0a0d7accdf471ac9b4e63a7c"
+        },
+        "wounded": {
+          "source_file": "cat_female/wounded.png",
+          "source_sha256": "b1a9e6d321e887196efee49c54fabe807887f71d70663d0bc93bfe8ac6815f99",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            589.5,
+            1312
+          ],
+          "own_canvas": false,
+          "visible": [
+            257,
+            115,
+            968,
+            1312
+          ],
+          "visible_height": 1197,
+          "visible_width": 711,
+          "uniform_scale": 0.8923512747875354,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            257,
+            115
+          ],
+          "generator_file": "gpt-cat-f-wounded.png",
+          "generator_sha256": "30d27a37877557099c66887bb174548578903a6c18d2a2060588d646dd9ac53b"
+        },
+        "item": {
+          "source_file": "cat_female/item.png",
+          "source_sha256": "b60c79a4c6d92304067ff542a442a7d37909d8fe90c312bdc37d16fd4857ad4a",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            589.5,
+            1312
+          ],
+          "own_canvas": false,
+          "visible": [
+            246,
+            104,
+            945,
+            1312
+          ],
+          "visible_height": 1208,
+          "visible_width": 699,
+          "uniform_scale": 0.8923512747875354,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            246,
+            104
+          ],
+          "generator_file": "gpt-cat-f-item.png",
+          "generator_sha256": "d8cca8d9a63a1132fa78a52632da4ef41af62b4122316d884477a2053dad3c80"
+        }
+      }
+    },
+    "frog_female": {
+      "class_id": "sapo",
+      "canonical_recruit": "frog_recruit_01",
+      "canvas": [
+        1178,
+        1336
+      ],
+      "anchor": [
+        588.5,
+        1311
+      ],
+      "body_reference_pixels": 1219,
+      "male_body_width_pixels": 761,
+      "canon_source": "data/presentation/combat_art.json",
+      "assets": {
+        "idle": {
+          "source_file": "frog_female/idle.png",
+          "source_sha256": "8ad78670622cacfc6260c62190d9923b61085297a3865c055a60367a8cc073a4",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            588.5,
+            1311
+          ],
+          "own_canvas": false,
+          "visible": [
+            253,
+            92,
+            924,
+            1311
+          ],
+          "visible_height": 1219,
+          "visible_width": 671,
+          "uniform_scale": 0.8859011627906976,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            253,
+            92
+          ],
+          "generator_file": "gpt-frog-f-idle.png",
+          "generator_sha256": "8f3c130ed693ae46ee31d7c56c83272601a682756be8b90de2ace56e7479a826"
+        },
+        "guard": {
+          "source_file": "frog_female/guard.png",
+          "source_sha256": "b3a6ce88023b531654270f74fa5c02cdd2a66dda0801fda413dfc990eedd73bf",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            588.5,
+            1311
+          ],
+          "own_canvas": false,
+          "visible": [
+            215,
+            111,
+            1070,
+            1311
+          ],
+          "visible_height": 1200,
+          "visible_width": 855,
+          "uniform_scale": 0.8859011627906976,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            215,
+            111
+          ],
+          "generator_file": "gpt-frog-f-guard.png",
+          "generator_sha256": "e2019092cc277eeb94c4faf44e11947c2025719258e7e4621bf68798efeb3365"
+        },
+        "wounded": {
+          "source_file": "frog_female/wounded.png",
+          "source_sha256": "827745114e7bc33992a8dec7b370e754aaac656d95949bc6e37ca7556703ad44",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            588.5,
+            1311
+          ],
+          "own_canvas": false,
+          "visible": [
+            295,
+            127,
+            921,
+            1311
+          ],
+          "visible_height": 1184,
+          "visible_width": 626,
+          "uniform_scale": 0.8859011627906976,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            295,
+            127
+          ],
+          "generator_file": "gpt-frog-f-wounded.png",
+          "generator_sha256": "1dd6b902ce0cfaadfb548db9be2085f0eedc31094c0eb55cbee2c641ea083d2b"
+        },
+        "item": {
+          "source_file": "frog_female/item.png",
+          "source_sha256": "82521181fcd1750ff885e56e94811e22f8760e7ba8311208a8d79245f20b5dfc",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            588.5,
+            1311
+          ],
+          "own_canvas": false,
+          "visible": [
+            286,
+            110,
+            911,
+            1311
+          ],
+          "visible_height": 1201,
+          "visible_width": 625,
+          "uniform_scale": 0.8859011627906976,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            286,
+            110
+          ],
+          "generator_file": "gpt-frog-f-item.png",
+          "generator_sha256": "9a0f9cf05ce1255c6059b7742e354d3d01cff36a96420858d0ef09795a2d8e65"
+        }
+      }
+    },
+    "owl_female": {
+      "class_id": "coruja",
+      "canonical_recruit": "owl_recruit_01",
+      "canvas": [
+        1178,
+        1336
+      ],
+      "anchor": [
+        589.5,
+        1312
+      ],
+      "body_reference_pixels": 1272,
+      "male_body_width_pixels": 747,
+      "canon_source": "data/presentation/combat_art.json",
+      "assets": {
+        "idle": {
+          "source_file": "owl_female/idle.png",
+          "source_sha256": "bdfe989669fbc02965a3e27fa743454557f3126795db8ac15fbb72fe4f4e7f97",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            589.5,
+            1312
+          ],
+          "own_canvas": false,
+          "visible": [
+            308,
+            40,
+            870,
+            1312
+          ],
+          "visible_height": 1272,
+          "visible_width": 562,
+          "uniform_scale": 0.8833333333333333,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            308,
+            40
+          ],
+          "generator_file": "gpt-owl-f-idle.png",
+          "generator_sha256": "a12c1f29d2bf4d001ed590fbaaab3e925e7217dadd30d057c48702cfaee6c79e"
+        },
+        "guard": {
+          "source_file": "owl_female/guard.png",
+          "source_sha256": "13c313a08279155fdce89c19653e8f7309e571e257042a7acc22d97a7d1bf652",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            589.5,
+            1312
+          ],
+          "own_canvas": false,
+          "visible": [
+            240,
+            62,
+            989,
+            1312
+          ],
+          "visible_height": 1250,
+          "visible_width": 749,
+          "uniform_scale": 0.8833333333333333,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            240,
+            62
+          ],
+          "generator_file": "gpt-owl-f-guard.png",
+          "generator_sha256": "5889307db0ee7f2f7d88f559aefc09c8fb306aca71a76a488a0442f8cf2fd524"
+        },
+        "wounded": {
+          "source_file": "owl_female/wounded.png",
+          "source_sha256": "d6c973b90b685aa99366eb17d1dd5fe0cb6a86bb6c08c1abca4409bc30e6d8bd",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            589.5,
+            1312
+          ],
+          "own_canvas": false,
+          "visible": [
+            296,
+            89,
+            888,
+            1312
+          ],
+          "visible_height": 1223,
+          "visible_width": 592,
+          "uniform_scale": 0.8833333333333333,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            296,
+            89
+          ],
+          "generator_file": "gpt-owl-f-wounded.png",
+          "generator_sha256": "38b512ad7fb9669ef49b0db8853de1f8447db99d60de62530b8967501eafbd47"
+        },
+        "item": {
+          "source_file": "owl_female/item.png",
+          "source_sha256": "f0948fcd28e39ed84d73146b0ea123ac58d7951b242d69ba0f87a8f56ed90f6f",
+          "canvas": [
+            1178,
+            1336
+          ],
+          "anchor": [
+            589.5,
+            1312
+          ],
+          "own_canvas": false,
+          "visible": [
+            315,
+            57,
+            878,
+            1312
+          ],
+          "visible_height": 1255,
+          "visible_width": 563,
+          "uniform_scale": 0.8833333333333333,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            315,
+            57
+          ],
+          "generator_file": "gpt-owl-f-item.png",
+          "generator_sha256": "e0d67dac321d1ffaae05ec898e8b14e519f6a87897ece3ff68e41b86bcf2c939"
+        }
+      }
+    },
+    "raccoon_female": {
+      "class_id": "rato",
+      "canonical_recruit": "raccoon_recruit_01",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "anchor": [
+        588.5,
+        1305
+      ],
+      "body_reference_pixels": 1240,
+      "male_body_width_pixels": 453,
+      "canon_source": "docs/design/recruits_redraw/contract.json (#225, tag codex-pr229-originals)",
+      "assets": {
+        "idle": {
+          "source_file": "raccoon_female/idle.png",
+          "source_sha256": "8b3e7fa8150b8ed01c2c808293b25c040598a3881e3621940b8aa0c138670c9e",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "own_canvas": false,
+          "visible": [
+            343,
+            65,
+            834,
+            1305
+          ],
+          "visible_height": 1240,
+          "visible_width": 491,
+          "uniform_scale": 0.8528198074277854,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            343,
+            65
+          ],
+          "generator_file": "gpt-raccoon-f-idle.png",
+          "generator_sha256": "bef6e5ad28273d533d0b55efcc3268155fc3467ea3aee6fd3d8239450567e8a4"
+        },
+        "guard": {
+          "source_file": "raccoon_female/guard.png",
+          "source_sha256": "a66dd302a349787059d11b50454660ef088e0e8d11981422ba0d90a5f83f3ca5",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "own_canvas": false,
+          "visible": [
+            210,
+            74,
+            998,
+            1305
+          ],
+          "visible_height": 1231,
+          "visible_width": 788,
+          "uniform_scale": 0.8528198074277854,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            210,
+            74
+          ],
+          "generator_file": "gpt-raccoon-f-guard.png",
+          "generator_sha256": "16ea622faf61d67b94b26a500abca5d7aeaeb71b585e37ea29c73d8780e682af"
+        },
+        "wounded": {
+          "source_file": "raccoon_female/wounded.png",
+          "source_sha256": "f5f787c480f745fa17b5592b1213c4e4416acac0794a2faaea02fd010b42435c",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "own_canvas": false,
+          "visible": [
+            326,
+            139,
+            873,
+            1305
+          ],
+          "visible_height": 1166,
+          "visible_width": 547,
+          "uniform_scale": 0.8528198074277854,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            326,
+            139
+          ],
+          "generator_file": "gpt-raccoon-f-wounded.png",
+          "generator_sha256": "15be89f91af9eb6edcba6a76ec618e46c2e4f69b00611aed287daba681d5453a"
+        },
+        "item": {
+          "source_file": "raccoon_female/item.png",
+          "source_sha256": "9631e28a55a52548a429539848a6cd444a99974e1268c97e231cfbac50c520a3",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "own_canvas": false,
+          "visible": [
+            323,
+            81,
+            871,
+            1305
+          ],
+          "visible_height": 1224,
+          "visible_width": 548,
+          "uniform_scale": 0.8528198074277854,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            323,
+            81
+          ],
+          "generator_file": "gpt-raccoon-f-item.png",
+          "generator_sha256": "473332640d056dfbab8e6744494f6f7a1a0465e3a57790efcc704cf2e9c16b9f"
+        }
+      }
+    },
+    "armadillo_female": {
+      "class_id": "tatu",
+      "canonical_recruit": "armadillo_recruit_01",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "anchor": [
+        589.0,
+        1305
+      ],
+      "body_reference_pixels": 1240,
+      "male_body_width_pixels": 674,
+      "canon_source": "docs/design/recruits_redraw/contract.json (#225, tag codex-pr229-originals)",
+      "assets": {
+        "idle": {
+          "source_file": "armadillo_female/idle.png",
+          "source_sha256": "9747abaae0530c86c522391b1f49a287ee98623d58751632e1c0e0788835bb9a",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "own_canvas": false,
+          "visible": [
+            236,
+            65,
+            941,
+            1305
+          ],
+          "visible_height": 1240,
+          "visible_width": 705,
+          "uniform_scale": 0.8720112517580872,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            236,
+            65
+          ],
+          "generator_file": "gpt-armadillo-f-idle.png",
+          "generator_sha256": "d99d9809271f29f527bee2224f5d5e7451e8a1e14c5612bedaa289eccc7b6117"
+        },
+        "guard": {
+          "source_file": "armadillo_female/guard.png",
+          "source_sha256": "f8556933ef4a73033d3a7af80778450690f34f57c0671901fe53c66945c38dfa",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "own_canvas": false,
+          "visible": [
+            159,
+            123,
+            996,
+            1305
+          ],
+          "visible_height": 1182,
+          "visible_width": 837,
+          "uniform_scale": 0.8720112517580872,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            159,
+            123
+          ],
+          "generator_file": "gpt-armadillo-f-guard.png",
+          "generator_sha256": "1386cf6d4e7d9d18a78f106fcdd562b0f7b487294e32566a5883aa263d7a239a"
+        },
+        "wounded": {
+          "source_file": "armadillo_female/wounded.png",
+          "source_sha256": "eb165f38b3a8ab06511ed17ed4e9fe451220674d22d5dcba31d78f9ed751d997",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "own_canvas": false,
+          "visible": [
+            138,
+            144,
+            983,
+            1305
+          ],
+          "visible_height": 1161,
+          "visible_width": 845,
+          "uniform_scale": 0.8720112517580872,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            138,
+            144
+          ],
+          "generator_file": "gpt-armadillo-f-wounded.png",
+          "generator_sha256": "3b1faee1c8a0167530057fc30085aabf124abd87dc06d7deff604adf6b581325"
+        },
+        "item": {
+          "source_file": "armadillo_female/item.png",
+          "source_sha256": "91b666c1209b692518ee64c7ca8d769816b1c4680035dce205cc641247f92f9f",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "own_canvas": false,
+          "visible": [
+            176,
+            89,
+            959,
+            1305
+          ],
+          "visible_height": 1216,
+          "visible_width": 783,
+          "uniform_scale": 0.8720112517580872,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            176,
+            89
+          ],
+          "generator_file": "gpt-armadillo-f-item.png",
+          "generator_sha256": "b886fee6bc496a49aece681a754e4850ecaee5996c3c2e1aa5b5c6baab7b2ec2"
+        }
+      }
+    }
+  }
+}
