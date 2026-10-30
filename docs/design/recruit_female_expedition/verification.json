@@ -1,0 +1,19 @@
+{
+  "issue": 247,
+  "groups_checked": [
+    "dog_cat",
+    "frog_owl",
+    "raccoon_armadillo"
+  ],
+  "female_recruits": 6,
+  "source_pngs": 3,
+  "review_webps": 9,
+  "qa_rounds": 1,
+  "concept_qa": "APROVADO for costume review only",
+  "lucas_approval": "pending",
+  "new_production_poses": 0,
+  "founders_modified": false,
+  "game_changes": false,
+  "game_capture": "not produced: costume approval precedes production poses",
+  "webp_bytes": 1743186
+}
