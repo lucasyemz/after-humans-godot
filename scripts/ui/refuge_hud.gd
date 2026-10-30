@@ -145,6 +145,8 @@ var _room_screen: AHCharacterRoom
 var _back_to := ""
 ## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
 var _arrived_candidate := ""
+## A troca do Mercador que acabou de sair (#182): o foco do teclado fica nela ao refazer o painel.
+var _merchant_focus := ""
 ## Mapa da Rede: IR AO MAPA abre por cima de tudo; o lugar escolhido vai para a plataforma (#123).
 var _map: AHPhaseMap
 ## A visita guiada da primeira vez (#145), aberta por cima da Estação, ou null.
@@ -2937,10 +2939,12 @@ func _train_merchant(c: Dictionary) -> void:
 	names.add_child(_wrapped(tr("Mercador · jacaré"), "row", AHKit.AMBER, false, 380.0))
 	names.add_child(_wrapped(tr("Desce do trem sem dizer de onde vem. Abre a bolsa, mostra o que tem e espera a oferta."), "text", AHKit.MUTED, false, 380.0))
 	_section(tr("Trocas desta visita"))
+	# O foco do teclado: na troca que o jogador acabou de apertar (mesmo esgotada: nunca pula sozinho para a troca de
+	# volta nem para DISPENSAR) ou, no começo da visita, na primeira.
 	var first: Button = null
 	for row in S.merchant_trades():
 		var button := _trade_row(c, row)
-		if first == null and not button.disabled:
+		if first == null or String(row.Name) == _merchant_focus:
 			first = button
 	var stock := HFlowContainer.new()
 	stock.name = "Stock"
@@ -2951,16 +2955,19 @@ func _train_merchant(c: Dictionary) -> void:
 	for resource in ["seeds", "scrap", "fragments"]:
 		stock.add_child(_chip(RESOURCE_ICONS[resource], str(S.quantity(c, resource))))
 	_text(tr("Ele fica na plataforma até ser dispensado. A expedição só parte depois disso."), AHKit.MUTED, "small")
-	var dismiss := AHKit.button(tr("Dispensar %s") % tr(S.MERCHANT_NAME), "secondary")
+	var dismiss := AHKit.button(tr("Dispensar o Sr. dos Trilhos"), "secondary")
 	dismiss.name = "Dismiss"
 	dismiss.custom_minimum_size = Vector2(BODY_WIDTH, 60)
 	dismiss.pressed.connect(_dismiss_merchant)
 	_footer.add_child(dismiss)
-	_panel_focus = first if first != null else dismiss
+	# DISPENSAR nunca começa com o foco: só pelas setas, o clique ou o toque.
+	_panel_focus = first
 
 
-## Uma troca do Mercador: o que a Estação dá, a seta, o que recebe e TROCAR; embaixo, quantas ainda saem nesta visita
-## ou o motivo de não sair. Devolve o botão.
+## Uma troca do Mercador: o que a Estação dá, a seta, o que recebe e NEGOCIAR; embaixo, quantas ainda saem nesta visita
+## ou o motivo de não sair. O botão nunca desliga (desligado, ele perdia o foco e o teclado pulava para a troca de volta
+## ou para DISPENSAR): esgotada, ele diz ESGOTADA; sem o que dar, o que falta fica na cor de alerta. Apertado sem poder,
+## diz o motivo. Devolve o botão.
 func _trade_row(c: Dictionary, row: Dictionary) -> Button:
 	var id := String(row.Name)
 	var box := _inset()
@@ -2978,14 +2985,14 @@ func _trade_row(c: Dictionary, row: Dictionary) -> Button:
 	get_chip.name = "Get"
 	get_chip.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_BEGIN
 	line.add_child(get_chip)
-	var button := _chip_button(tr("Trocar"))
+	var left := S.trades_left(c, id)
+	var button := _chip_button(tr("Negociar") if left > 0 else tr("Esgotada"))
 	button.name = "Do"
 	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var block := S.trade_block(c, id)
-	button.disabled = block != ""
+	button.set_meta("block", block)
 	button.pressed.connect(func(): _trade(id))
 	line.add_child(button)
-	var left := S.trades_left(c, id)
 	var note := tr("Esgotada nesta visita.") if left <= 0 else (block if block != "" else tr("Ainda sai %d vez nesta visita.") % left if left == 1
 		else tr("Ainda sai %d vezes nesta visita.") % left)
 	var label := _wrapped(note, "small", AHKit.alert_text() if block != "" and left > 0 else AHKit.MUTED, false, BODY_WIDTH - 40.0)
@@ -2994,20 +3001,16 @@ func _trade_row(c: Dictionary, row: Dictionary) -> Button:
 	return button
 
 
-## Faz uma troca com o Mercador e refaz o painel (o foco fica na mesma troca, se ela ainda sai).
+## Faz uma troca com o Mercador e refaz o painel, com o foco na mesma troca; sem poder, diz o motivo.
 func _trade(trade_id: String) -> void:
 	var row = GameData.row("merchant", trade_id)
 	var error := S.merchant_trade(Campaign.state, trade_id)
 	var done := "" if row == null else tr("Troca feita: %s por %s.") % [S.resource_amount(String(row.Give), int(row.GiveAmount)),
 		S.resource_amount(String(row.Get), int(row.GetAmount))]
+	_merchant_focus = trade_id
 	_act(error, done, "res://audio/ui/confirm.ogg")
-	if error != "":
-		return
-	refresh()
-	var again: Node = _body.find_child("Trade_%s" % trade_id, true, false)
-	var button: Button = again.find_child("Do", true, false) if again != null else null
-	if button != null and not button.disabled and U.using_keys:
-		AHKit.focus_later(button)
+	if error == "":
+		refresh()
 
 
 ## Dispensar o Mercador: ele volta ao vagão e o trem parte, como com o recusado.
@@ -3016,8 +3019,9 @@ func _dismiss_merchant() -> void:
 	if error != "":
 		toast(error, true)
 		return
+	_merchant_focus = ""
 	station.commit()
-	toast(tr("%s volta ao trem.") % tr(S.MERCHANT_NAME))
+	toast(tr("O Sr. dos Trilhos volta ao trem."))
 	_train_departs(true)
 
 

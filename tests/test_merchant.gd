@@ -153,7 +153,12 @@ func _dismissal() -> void:
 	t.check(S.decide_candidate(c, S.MERCHANT, false) != "" and S.merchant_here(c), "nem recusado: ele é dispensado")
 	t.check(not c.roster.any(func(h): return String(h.id) == S.MERCHANT), "e não entra no elenco")
 	var block := S.preparation_block(c)
-	t.check(block.contains(TranslationServer.translate(S.MERCHANT_NAME)), "a Preparação pede para dispensá-lo (%s)" % block)
+	t.check(block.contains("Sr. dos Trilhos"), "a Preparação pede para dispensá-lo (%s)" % block)
+	t.check(AHKit.font(true).get_string_size(block, HORIZONTAL_ALIGNMENT_LEFT, -1, AHKit.size("small")).x
+		<= AHKit.font(true).get_string_size(TranslationServer.translate("Conclua a noite no Dormitório antes de partir."), HORIZONTAL_ALIGNMENT_LEFT, -1, AHKit.size("small")).x,
+		"o motivo é curto como o da noite (ele aparece no botão IR AO MAPA, numa linha)")
+	# Esperar um dia não mexe no trem: o Mercador não trava o descanso.
+	t.equal(S._day_block(c), "", "o Mercador não trava o dia na Estação")
 	var team: Array = S.living(c).slice(0, 4).map(func(h): return String(h.id))
 	t.equal(S.confirm_departure(c, team, 0, 7, "fase_1"), block, "e a partida também")
 	t.check(c.session.get("expedition") == null, "a equipe não parte com ele na plataforma")
@@ -248,8 +253,13 @@ func _screens() -> void:
 				"a troca muda o estoque")
 			buy = hud._body.find_child("Trade_buy_fragments", true, false)
 			button = buy.find_child("Do", true, false) if buy else null
-			t.check(button != null and button.disabled and _label(buy, TranslationServer.translate("Esgotada nesta visita.")),
+			t.check(button != null and button.text == TranslationServer.translate("Esgotada") and _label(buy, TranslationServer.translate("Esgotada nesta visita.")),
 				"e, no limite da visita, a troca fica esgotada")
+			var seeds_now := S.quantity(Campaign.state, "seeds")
+			if button != null:
+				button.pressed.emit()
+			await _frames(2)
+			t.equal(S.quantity(Campaign.state, "seeds"), seeds_now, "apertar a esgotada não troca nada")
 		# Sem sementes, o que falta fica na cor de alerta.
 		Campaign.state.inventory.seeds = 0
 		hud.refresh()
@@ -274,10 +284,11 @@ func _screens() -> void:
 		Settings.set_text_size(size_before)
 		hud.refresh()
 		await _frames(4)
+		await _keys(hud)
 		# A Preparação: o mapa não abre; ela pede para dispensá-lo e leva à plataforma.
 		hud.open_map()
 		await _frames(4)
-		t.check(hud.current == S.PREPARATION and _label(hud._panel, TranslationServer.translate(S.MERCHANT_NAME)),
+		t.check(hud.current == S.PREPARATION and _label(hud._panel, "Sr. dos Trilhos"),
 			"com ele na plataforma, a Preparação pede para dispensá-lo")
 		hud._on_phase_chosen("fase_1")
 		await _frames(3)
@@ -312,6 +323,59 @@ func _screens() -> void:
 	Tips.enabled = tips
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## Só o teclado (a QA da rodada 1): Interagir nunca dispensa o Mercador sem querer, nem sem troca possível, e apertar
+## várias vezes não desfaz uma troca com a de volta (o foco fica na troca apertada, mesmo esgotada).
+func _keys(hud: AHRefugeHud) -> void:
+	var keys_before: bool = AHUiStyle.using_keys
+	AHUiStyle.using_keys = true
+	var c: Dictionary = Campaign.state
+	var stock := [int(c.inventory.seeds), int(c.inventory.scrap), int(c.inventory.fragments)]
+	c.inventory.seeds = 0
+	c.inventory.scrap = 0
+	c.inventory.fragments = 0
+	hud._merchant_focus = ""
+	hud.refresh()
+	await _frames(6)
+	var focus := hud.get_viewport().gui_get_focus_owner()
+	t.check(focus != null and focus.name == "Do", "sem troca possível, o foco começa numa troca, e não em Dispensar (%s)" % (focus.name if focus else "nenhum"))
+	for i in 3:
+		await _send("interact")
+	t.check(S.merchant_here(c), "e Interagir não dispensa o Mercador")
+	# Com o que trocar: Interagir várias vezes faz só a troca do foco, até o limite, e não a de volta.
+	c.inventory.seeds = 40
+	c.inventory.scrap = 6
+	c.inventory.fragments = 3
+	c.station.train.trades = {}
+	hud._merchant_focus = ""
+	hud.refresh()
+	await _frames(6)
+	var first: Dictionary = S.merchant_trades()[0]
+	for i in 8:
+		await _send("interact")
+	focus = hud.get_viewport().gui_get_focus_owner()
+	t.check(S.merchant_here(c), "apertar Interagir oito vezes não dispensa o Mercador")
+	t.equal(int(c.station.train.trades.get(String(first.Name), 0)), int(first.Limit), "faz a troca do foco até o limite")
+	t.equal(c.station.train.trades.keys(), [String(first.Name)], "e nenhuma outra (nem a de volta)")
+	var row: Node = focus.get_parent().get_parent().get_parent() if focus != null else null
+	t.check(focus != null and focus.name == "Do" and row != null and String(row.name) == "Trade_%s" % first.Name,
+		"o foco fica na troca esgotada")
+	c.inventory.seeds = stock[0]
+	c.inventory.scrap = stock[1]
+	c.inventory.fragments = stock[2]
+	AHUiStyle.using_keys = keys_before
+	hud.refresh()
+	await _frames(3)
+
+
+func _send(action: String) -> void:
+	for pressed in [true, false]:
+		var event := InputEventAction.new()
+		event.action = action
+		event.pressed = pressed
+		Input.parse_input_event(event)
+		await _frames(3)
 
 
 func _label(node: Node, text: String) -> bool:

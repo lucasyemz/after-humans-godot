@@ -179,7 +179,8 @@ func _band() -> void:
 	var warning := team_warning(c)
 	# Quem espera no trem (#122) vai embora com ele se a equipe partir antes de decidir.
 	var waiting_name := S.train_candidate_name(c)
-	if waiting_name != "":
+	# O Mercador (#182) não vai embora com a partida: ele trava a partida até ser dispensado (o motivo fica no botão).
+	if waiting_name != "" and not S.merchant_here(c):
 		# Com dois (#182), os dois vão embora.
 		warning = (tr("%s esperam no trem: se a equipe partir, vão embora.") if S.train_waiting_names(c).size() > 1
 			else tr("%s espera no trem: se a equipe partir, vai embora.")) % waiting_name + ("\n" + warning if warning != "" else "")

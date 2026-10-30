@@ -1729,7 +1729,8 @@ static func treat_fallen(campaign: Dictionary, hero_id: String) -> String:
 ## Esperar um dia sem expedição ("" se pode): só quando ninguém pode partir e há caídos (sem isso, o jogo travava com
 ## a equipe toda em recuperação). O dia passa como uma volta: a Estação gasta e produz, e a recuperação anda.
 static func rest_block(campaign: Dictionary) -> String:
-	var block := preparation_block(campaign)
+	# Esperar um dia não mexe no trem: com o Mercador na plataforma, também dá (#182).
+	var block := _day_block(campaign)
 	if block != "":
 		return block
 	if fallen(campaign).is_empty():
@@ -1792,11 +1793,18 @@ const ROOM_ARTICLE := {FORGE: "a ", RESEARCH: "o ", DEPOT: "o "}
 
 ## Por que não dá para preparar uma partida agora ("" se dá).
 static func preparation_block(campaign: Dictionary) -> String:
+	var block := _day_block(campaign)
+	# O Mercador (#182, parte 2, decisão do Lucas): ele é dispensado antes da Preparação. O motivo é curto: ele aparece
+	# também no botão IR AO MAPA, numa linha.
+	if block == "" and merchant_here(campaign):
+		return TranslationServer.translate("Dispense o Sr. dos Trilhos antes de partir.")
+	return block
+
+
+## O que impede qualquer coisa do dia na Estação (partir, esperar um dia): a noite pendente ou a equipe fora.
+static func _day_block(campaign: Dictionary) -> String:
 	if campaign.night.phase != "none":
 		return TranslationServer.translate("Conclua a noite no Dormitório antes de partir.")
-	# O Mercador (#182, parte 2, decisão do Lucas): ele é dispensado antes da Preparação.
-	if merchant_here(campaign):
-		return TranslationServer.translate("O Sr. dos Trilhos ainda está na plataforma: dispense-o antes de preparar a expedição.")
 	if not in_refuge(campaign):
 		return TranslationServer.translate("A equipe já está numa expedição.")
 	return ""

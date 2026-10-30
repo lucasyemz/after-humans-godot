@@ -47,6 +47,10 @@ func _run() -> void:
 	c.inventory.fragments = 2
 	S.train_on_return(c, "capture-merchant", "merchant" if merchant else "hero")
 	c.station.last_return = {}
+	# A cena do trem em 2x (a velocidade da luta nas Opções): a mesma chegada, em metade do tempo.
+	if typeof(c.get("settings")) != TYPE_DICTIONARY:
+		c.settings = {}
+	c.settings.battle_speed = 2
 	campaign.state = c
 	campaign.save()
 	flow.change_to("station", {}, false)
@@ -56,35 +60,38 @@ func _run() -> void:
 			break
 	var station = current_scene
 	var hud = station.hud
+	# A câmera já na plataforma (sem a passagem secreta): a chegada começa direto.
+	station.focus_platform(true)
+	await _frames(2)
 	hud.open_service("train")
-	var end := Time.get_ticks_msec() + 120000
+	var end := Time.get_ticks_msec() + 2400000
 	while (station.train_busy() or not hud._panel.visible) and Time.get_ticks_msec() < end:
 		await process_frame
-	await _frames(40)
+	await _frames(8)
 	await _shot("arrival")
 	if merchant:
 		var buy = hud._body.find_child("Trade_buy_fragments", true, false)
 		var button = buy.find_child("Do", true, false) if buy else null
 		if button:
 			button.pressed.emit()
-		await _frames(30)
+		await _frames(6)
 		await _shot("traded")
 		hud.open_map()
-		await _frames(40)
+		await _frames(8)
 		await _shot("preparation")
 		hud.open_service("train")
-		end = Time.get_ticks_msec() + 60000
+		end = Time.get_ticks_msec() + 1800000
 		while (station.train_busy() or not hud._panel.visible) and Time.get_ticks_msec() < end:
 			await process_frame
-		await _frames(20)
+		await _frames(6)
 		hud._dismiss_merchant()
 		# A meio caminho do vagão, de passada.
-		end = Time.get_ticks_msec() + 30000
+		end = Time.get_ticks_msec() + 1200000
 		var start_x: float = station._candidate.position.x if is_instance_valid(station._candidate) else 0.0
 		while is_instance_valid(station._candidate) and absf(station._candidate.position.x - start_x) < 1.2 and Time.get_ticks_msec() < end:
 			await process_frame
 		await _shot("dismissed")
-		end = Time.get_ticks_msec() + 60000
+		end = Time.get_ticks_msec() + 1800000
 		while campaign.state.station.train.phase != "none" and Time.get_ticks_msec() < end:
 			await process_frame
 		hud.close_panel()
@@ -108,10 +115,10 @@ func _run() -> void:
 				if not flow.busy and current_scene != null and i > 10:
 					break
 			current_scene.hud.open_service("report")
-			end = Time.get_ticks_msec() + 30000
+			end = Time.get_ticks_msec() + 1200000
 			while current_scene.hud.current != "report" and Time.get_ticks_msec() < end:
 				await process_frame
-			await _frames(40)
+			await _frames(10)
 			await _shot("report")
 	for file in DirAccess.get_files_at(campaign.save_dir):
 		DirAccess.remove_absolute(campaign.save_dir.path_join(file))
