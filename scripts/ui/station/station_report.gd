@@ -312,8 +312,11 @@ func _chips(c: Dictionary, result: String) -> Array:
 	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
 	if report.has("train"):
 		var arrived := String(report.train)
-		out.append({"icon": "train_arrival", "text": tr("Chegou alguém no trem: %s") % arrived if arrived != "" else tr("O trem veio vazio"),
-			"color": AHKit.AMBER if arrived != "" else AHKit.MUTED})
+		# O Mercador (#182, parte 2) não é alguém que chega para ficar: ele veio trocar.
+		var text := tr("Chegou alguém no trem: %s") % arrived if arrived != "" else tr("O trem veio vazio")
+		if report.get("merchant", false):
+			text = tr("O trem trouxe o Mercador, %s, para trocar") % tr(S.MERCHANT_NAME)
+		out.append({"icon": "train_arrival", "text": text, "color": AHKit.AMBER if arrived != "" else AHKit.MUTED})
 	return out
 
 

@@ -12,6 +12,8 @@ const HEIGHTS := {
 	"rato": 1.30, "tatu": 1.35,
 	# Civis.
 	"civil_dora": 1.56, "civil_otto": 1.62, "civil_cora": 1.70,
+	# O Mercador (#182, a arte da #218): a altura do Bento, com o fedora.
+	"merchant": 1.72,
 	# Inimigos com arte aprovada.
 	"cao_eco": REFERENCE * 0.62, "condutor_raiz": REFERENCE * 0.65, "sussurrador": REFERENCE * 0.82,
 	"rastejante_raiz": REFERENCE * 0.48, "ninho_errante": REFERENCE * 0.60, "vigia_enferrujado": REFERENCE * 1.08,

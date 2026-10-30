@@ -49,6 +49,9 @@ Núcleo Nulo
 # Só no jogo (docs/narrative/review.md, seção 5: decidir se entram na lore).
 Risco
 Alojamento
+# O Mercador do trem (#182, decisão do Lucas de 28/10): sem nome próprio, só o apelido. A lore não diz de onde vem.
+Sr. dos Trilhos
+Mercador
 
 # Termos de regra mostrados na tela (estados, recursos e atributos).
 Bloqueio

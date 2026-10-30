@@ -14,6 +14,8 @@ func run(t) -> void:
 	var train_before := train_rule.duplicate()
 	train_rule.Chance = 100
 	train_rule.CivilianShare = 100
+	# Nunca o Mercador (#182): o test_merchant o testa.
+	train_rule.MerchantWeight = 0
 	_new_campaign(t)
 	_rooms(t)
 	_departure(t)
