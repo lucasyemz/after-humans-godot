@@ -44,12 +44,13 @@ func _id(c: Dictionary, name: String) -> String:
 func _limits() -> void:
 	var c: Dictionary = Campaign.create_initial(1)
 	t.equal(S.hero_limit(c), 6, "o Alojamento no nível 1 comporta 6 heróis")
-	t.equal(S.helper_limit(c), 3, "sem o Dormitório, 3 ajudantes")
+	t.equal(S.helper_limit(c), 3, "com o Dormitório sem camas, 3 ajudantes")
 	t.equal([1, 2, 3, 4].map(func(level): return S.hero_limit_at(level)), [6, 8, 10, 12], "os limites de cada nível do Alojamento")
 	var dorm := Campaign.create_initial(1)
 	dorm.station.rooms[S.DORMITORY] = S.room_def(S.DORMITORY).max_level
 	var helpers: Array = GameData.row("hero_jobs", "limit_helpers").Levels
 	t.equal(S.helper_limit(dorm), int(helpers.back()), "o último limite de ajudantes é o do Dormitório no nível máximo (nenhum inalcançável)")
+	t.equal(helpers.size(), S.room_def(S.DORMITORY).max_level, "um limite de ajudantes por nível do Dormitório (#176: o chão e os beliches)")
 	t.equal(S.limits_text(c), "Heróis 4 de 6 · Ajudantes 0 de 3", "o texto da barra")
 	S.recruit(c, "cao", RandomNumberGenerator.new(), "A")
 	S.recruit(c, "gato", RandomNumberGenerator.new(), "B")

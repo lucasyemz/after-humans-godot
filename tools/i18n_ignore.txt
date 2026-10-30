@@ -1603,3 +1603,5 @@ character_room.gd: Skin_%s
 *: heroes
 *: default
 station_rules.gd: Unlock
+station_rules.gd: dormitory_level_%d
+station_build.gd: dormitory@2

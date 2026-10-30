@@ -102,7 +102,14 @@ func _rooms(t) -> void:
 	t.equal(S.upgrade_room(c, S.FORGE, 1), "", "melhora a Forja (6 sucatas e 2 fragmentos)")
 	t.check(S.relic_cost(c) == 2 and c.inventory.scrap == 0 and c.inventory.fragments == 0, "relíquia por 2 sucatas")
 	t.equal(S.upgrade_block(c, S.FORGE), "Este cômodo já está no nível máximo.", "Forja no máximo")
-	t.equal(S.upgrade_block(c, S.DORMITORY), "A recuperação deste cômodo chega numa próxima fase.", "Dormitório chega depois")
+	# O Dormitório existe desde o começo, com a equipe no chão; os beliches são a melhoria (#176).
+	t.equal(S.room_level(c, S.DORMITORY), 1, "o Dormitório começa no nível 1, sem camas")
+	t.equal(S.next_level_cost(c, S.DORMITORY), {"scrap": 3, "fragments": 0}, "os beliches custam 3 sucatas (data/hero-jobs.json)")
+	t.equal(S.upgrade_block(c, S.DORMITORY), "Faltam 3 sucatas.", "sem sucata, o que falta para os beliches")
+	t.equal(S.next_level_cost(c, S.BAR), {"scrap": 4, "fragments": 1}, "o Bar tem custo (#176)")
+	for room in S.ROOMS:
+		t.check(not S.room_costs(room).filter(func(cost): return not cost.is_empty()).is_empty() or S.room_level(c, room.id) >= room.max_level,
+			"%s: abaixo do máximo, tem custo (nenhum cômodo sem como subir)" % room.name)
 	c.inventory.scrap = 3
 	c.inventory.fragments = 2
 	t.equal(S.upgrade_room(c, S.RESEARCH, 0), "", "recupera a Pesquisa")
@@ -434,6 +441,37 @@ func _sleepers(t) -> void:
 	S.set_watch(c, team[1])
 	t.check(not AHStation.sleepers(c).has(team[1]) and AHStation.sleepers(c).size() == 3, "o vigia não deita")
 	t.equal(AHStation.sleep_slots().size(), 4, "quatro lugares nos beliches")
+	# No nível 1 (#176), sem os beliches: quatro lugares no chão do Dormitório, sem um em cima do outro.
+	var floor_slots := AHStation.sleep_slots(1)
+	t.equal(floor_slots.size(), 4, "quatro lugares no chão")
+	t.check(floor_slots.all(func(p): return absf(p.y - AHStationBuild.BUNK_FLOOR * 0.01) < 0.001), "no chão, o corpo encosta no piso")
+	var dorm: Dictionary = AHStation.room_def(S.DORMITORY)
+	t.check(floor_slots.all(func(p): return p.x - 0.9 >= dorm.x0 and p.x + 0.9 <= dorm.x1), "todos dentro do Dormitório")
+	for index in range(1, floor_slots.size()):
+		t.check(floor_slots[index].x - floor_slots[index - 1].x >= 1.799, "no chão, lado a lado (%d)" % index)
+	# O vigia fica de pé perto da porta (lane[1] - 2 a lane[1]): ninguém deita debaixo dele.
+	t.check(floor_slots.all(func(p): return p.x + 0.9 <= dorm.lane[1] - 2.0 + 0.001), "nenhum lugar no chão na faixa do vigia")
+	# Quem está caído sem leito deita num lugar que ninguém ocupa esta noite, também com o vigia no meio da equipe (o
+	# lugar de quem dorme é o da ordem dele na equipe).
+	var five: Dictionary = Campaign.create_initial(4)
+	S.recruit(five, "cao", RandomNumberGenerator.new(), "Caído")
+	var fallen_id: String = five.roster.back().id
+	S.admit_fallen(five, [fallen_id])
+	var night_team: Array = five.roster.slice(0, 4).map(func(h): return h.id)
+	five.night.phase = "planning"
+	five.night.participants = night_team
+	for level in [1, 2]:
+		five.station.rooms[S.DORMITORY] = level
+		var level_slots := AHStation.sleep_slots(level)
+		for watch in [night_team[0], night_team[3], ""]:
+			five.night.watch_hero_id = watch
+			var used: Array = AHStation.sleepers(five).map(func(id): return level_slots[night_team.find(id)])
+			var spot := AHStation.recovery_spot(five, fallen_id)
+			if watch == "":
+				# Os quatro dormem: sem lugar, o caído fica de pé à parte (Vector3.INF).
+				t.equal(spot, Vector3.INF, "nível %d, sem vigia: os quatro lugares ocupados, o caído sem lugar" % level)
+			else:
+				t.check(spot != Vector3.INF and not used.has(spot), "nível %d, vigia %s: o caído num lugar livre" % [level, watch])
 	# O beliche é o card inteiro da entrega #1: quem dorme encosta na linha do colchão de baixo e na do de cima, medidas
 	# na arte (docs/design/bunk.md), em cm pela escala do card.
 	t.check(ResourceLoader.exists("res://art/station/cards/%s.webp" % AHStationBuild.BUNK_CARD), "o card do beliche existe")

@@ -947,6 +947,7 @@ func lock_mark_info(c: Dictionary, id: String) -> Dictionary:
 		return {}
 	var cost := S.next_level_cost(c, id)
 	if cost.is_empty():
+		# Sem custo definido: nenhum cômodo hoje (#176); o cartão do cômodo diz o motivo.
 		return {"state": "closed", "title": tr("Fechado"), "note": S.upgrade_block(c, id), "cost": {}}
 	var block := S.upgrade_block(c, id)
 	var stock := {"scrap": S.quantity(c, "scrap"), "fragments": S.quantity(c, "fragments")}
@@ -1889,6 +1890,9 @@ func _room(room_id: String) -> void:
 	if room_id == S.DEPOT:
 		_supplies_bar(c)
 	var cost := S.next_level_cost(c, room_id)
+	# Com a noite pendente, o Dormitório abre no plano da noite: os beliches (#176) ficam para o dia.
+	if room_id == S.DORMITORY and c.night.phase != "none":
+		cost = {}
 	if not cost.is_empty():
 		var block := S.upgrade_block(c, room_id)
 		var verb := tr("Recuperar") if level == 0 else tr("Melhorar")

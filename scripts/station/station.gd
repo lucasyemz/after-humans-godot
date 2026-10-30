@@ -1429,9 +1429,15 @@ func _tick_camera_on_candidate() -> void:
 const SLEEP_DROP := 10.0
 
 
-## Os quatro lugares dos beliches (m): de baixo à esquerda, de baixo à direita, e os de cima.
-static func sleep_slots() -> Array:
+## Os quatro lugares de quem dorme (m), pelo nível do Dormitório (#176): no nível 1, no chão, da esquerda para a
+## direita; com os beliches (nível 2), de baixo à esquerda, de baixo à direita, e os de cima.
+static func sleep_slots(level: int = 2) -> Array:
 	var out: Array = []
+	if level < 2:
+		for index in AHStationBuild.FLOOR_SLEEP_X.size():
+			out.append(AHStationBuilder.vu(Vector3(AHStationBuild.FLOOR_SLEEP_X[index],
+				AHStationBuild.FLOOR_SLEEP_Y[index % AHStationBuild.FLOOR_SLEEP_Y.size()], AHStationBuild.BUNK_FLOOR)))
+		return out
 	for tier in 2:
 		for x in AHStationBuild.BUNK_X:
 			# Um pouco para a cabeceira (o travesseiro fica à esquerda) e à frente da cama pintada.
@@ -1451,9 +1457,9 @@ static func infirmary_slots() -> Array:
 	return out
 
 
-## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um beliche livre do
-## Dormitório (os de baixo para cima, de trás para a frente, para não tomar o de quem dorme a noite). Vector3.INF sem
-## lugar.
+## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um lugar do Dormitório que
+## ninguém ocupa esta noite (do último para o primeiro; quem dorme fica no lugar da ordem dele na equipe). Vector3.INF
+## sem lugar.
 static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	var entry = S.hero(campaign, hero_id)
 	var fallen := S.fallen(campaign)
@@ -1462,10 +1468,12 @@ static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 		var slots := infirmary_slots()
 		return slots[index] if index >= 0 and index < slots.size() else Vector3.INF
 	var index: int = fallen.filter(func(h): return not S.in_bed(h)).map(func(h): return h.id).find(hero_id)
-	var slots := sleep_slots()
-	var taken: int = sleepers(campaign).size()
-	var slot: int = slots.size() - 1 - index
-	return slots[slot] if index >= 0 and slot >= taken else Vector3.INF
+	var slots := sleep_slots(S.room_level(campaign, S.DORMITORY))
+	# Os lugares de quem dorme são os da ordem na equipe (como em _update_sleepers), não os primeiros: com o vigia no
+	# meio, o lugar dele fica livre e o último fica ocupado.
+	var taken: Array = sleepers(campaign).map(func(id): return campaign.night.participants.find(id))
+	var free: Array = range(slots.size() - 1, -1, -1).filter(func(slot): return not taken.has(slot))
+	return slots[free[index]] if index >= 0 and index < free.size() else Vector3.INF
 
 
 ## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview). Durante a
@@ -1492,12 +1500,12 @@ func _exit_tree() -> void:
 	night_scene = false
 
 
-## À noite, quem dorme deita no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica de pé no Dormitório. Com a
-## noite resolvida, todos voltam a passear.
+## À noite, quem dorme deita no Dormitório, no chão ou no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica
+## de pé no Dormitório. Com a noite resolvida, todos voltam a passear.
 func _update_sleepers() -> void:
 	var campaign: Dictionary = Campaign.state
 	var asleep := sleepers(campaign)
-	var slots := sleep_slots()
+	var slots := sleep_slots(S.room_level(campaign, S.DORMITORY))
 	var watch: String = campaign.night.watch_hero_id if campaign.night.phase == "planning" or (night_scene and campaign.night.phase == "dawn") else ""
 	var dorm := room_def(S.DORMITORY)
 	var replace := false
@@ -1505,7 +1513,7 @@ func _update_sleepers() -> void:
 		if not walker.has("hero_id") or not is_instance_valid(walker.card):
 			continue
 		var card: AHSpriteCard = walker.card
-		# Em recuperação (#118): deitado no leito da Enfermaria (ou num beliche do Dormitório), sem passear. Sem a pose
+		# Em recuperação (#118): deitado no leito da Enfermaria (ou num lugar do Dormitório), sem passear. Sem a pose
 		# de dormir ou sem lugar, fica de pé, parado, no cômodo onde se recupera.
 		if S.recovering(S.hero(campaign, walker.hero_id)):
 			walker.sleeping = true
