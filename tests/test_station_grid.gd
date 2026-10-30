@@ -117,6 +117,9 @@ func _dig_on_returns() -> void:
 	for key in G.block_keys():
 		_open(full, key)
 	t.check(_return(full, 1005).get("dig", {}).is_empty() and G.dig_step(full).is_empty(), "com tudo aberto, nada para escavar nem no Próximo passo")
+	# O texto aprovado: "Escavação: o 2º subsolo, vaga 5, foi aberto. 3 sucatas e um curativo."
+	t.equal(G.report_line({"block": "2:5", "opened": true, "finds": {"scrap": 3, "bandages": 1}}), "Escavação: o 2º subsolo, vaga 5, foi aberto. 3 sucatas e um curativo.", "a linha do relatório como aprovada")
+	t.equal(G.report_line({"block": "L2", "opened": true, "finds": {"scrap": 1}}), "Escavação: o patamar do 2º subsolo foi aberto. 1 sucata.", "e a do patamar")
 
 
 func _digger() -> void:
@@ -148,6 +151,15 @@ func _digger() -> void:
 	var report := _return(c, 2001)
 	t.check(report.dig.opened and int(report.dig.points) == 3, "o tatu que ficou abre o bloco do 2º subsolo na volta")
 	t.check(report.posts.any(func(p): return p.room == G.DIG and int(p.amount) == 2), "o relatório mostra o posto de escavador")
+	# Aberto o último bloco, o escavador fica sem posto.
+	var last := _campaign()
+	for key in G.block_keys():
+		if key != "3:1":
+			_open(last, key)
+	var digger := _recruit(last, "tatu", "Casco")
+	S.set_post(last, digger.id, G.DIG)
+	G.grid(last).progress["3:1"] = 3
+	t.check(_return(last, 2002).dig.opened and S.post_of(digger) == "", "aberto o último bloco, o escavador sai do posto")
 	# Quem está em recuperação não cava.
 	tatu.recovery_days = 2
 	t.equal(G.dig_rate(c), 1, "o escavador em recuperação não cava")
@@ -228,15 +240,15 @@ func _build() -> void:
 	var c := _campaign()
 	c.inventory.scrap = 40
 	c.inventory.fragments = 10
-	t.equal(S.upgrade_block(c, S.RESEARCH), TranslationServer.translate("Falta uma vaga dupla livre para %s: escave o entulho até abrir duas vagas vizinhas.") % TranslationServer.translate("Centro de Pesquisa"), "a Pesquisa soterrada pede uma vaga dupla")
+	t.equal(S.upgrade_block(c, S.RESEARCH), TranslationServer.translate("Falta uma vaga dupla livre para %s: escave o entulho até abrir duas vagas vizinhas.") % S.room_the(S.RESEARCH), "a Pesquisa soterrada pede uma vaga dupla")
 	t.check(S.upgrade_room(c, S.RESEARCH, 0) != "" and S.room_level(c, S.RESEARCH) == 0, "e não se constrói")
-	t.equal(S.upgrade_block(c, S.DEPOT), TranslationServer.translate("Falta uma vaga livre para %s: escave o entulho para abrir uma.") % TranslationServer.translate("Depósito"), "construir o Depósito pede uma vaga")
+	t.equal(S.upgrade_block(c, S.DEPOT), TranslationServer.translate("Falta uma vaga livre para %s: escave o entulho para abrir uma.") % S.room_the(S.DEPOT), "construir o Depósito pede uma vaga")
 	_open(c, "1:2")
 	t.equal(G.free_spots(c, S.DEPOT), ["1:2"], "aberto um bloco, o Depósito cabe nele")
 	t.check(G.buried(c, S.RESEARCH), "a Pesquisa ainda não: uma vaga só")
 	_open(c, "1:1")
 	t.equal(G.free_spots(c, S.RESEARCH), ["1:1"], "abertos os dois, a Pesquisa cabe")
-	t.equal(S.build_room(c, S.RESEARCH, "1:2"), TranslationServer.translate("%s não cabe nessa vaga.") % TranslationServer.translate("Centro de Pesquisa"), "o duplo não cabe começando na vaga 2 (a 3 é da Forja)")
+	t.equal(S.build_room(c, S.RESEARCH, "1:2"), TranslationServer.translate("%s não cabe nessa vaga.") % "O Centro de Pesquisa", "o duplo não cabe começando na vaga 2 (a 3 é da Forja)")
 	t.equal(S.build_room(c, S.FORGE, "1:1"), TranslationServer.translate("Este cômodo já tem lugar na Estação."), "a Forja parada já tem lugar")
 	var scrap := S.quantity(c, "scrap")
 	t.equal(S.build_room(c, S.RESEARCH, "1:1"), "", "constrói a Pesquisa nas vagas 1 e 2")

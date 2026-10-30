@@ -1667,3 +1667,4 @@ station_grid.gd: alive
 station_grid.gd: speaker
 station_grid.gd: Card
 station_grid.gd: Lines
+refuge_hud.gd: Dig_%s

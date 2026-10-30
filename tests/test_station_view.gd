@@ -87,6 +87,23 @@ func _lock_marks(station) -> void:
 	for room in S.ROOMS:
 		t.check(hud.lock_mark_info(c, room.id).get("title", "") != tr("Fechado"), "%s não fica fechado" % room.name)
 	c.station.grid.cells[0][1] = ""
+	# O painel do Depósito soterrado: o motivo na tela (o toque não mostra a dica) e a escolha do bloco a escavar.
+	c.inventory.scrap = 20
+	c.inventory.fragments = 5
+	hud.open_room(S.DEPOT)
+	await _frames(3)
+	var why := hud._body.find_child("SpaceBlock", true, false) as Label
+	t.check(why != null and why.text == S.upgrade_block(c, S.DEPOT), "com material de sobra, o painel diz que falta a vaga")
+	var dig := hud._body.find_child("Dig_L2", true, false) as Button
+	if t.check(dig != null and hud._body.find_child("Dig_1_2", true, false) != null, "e mostra os blocos que dá para escavar"):
+		dig.pressed.emit()
+		await _frames(3)
+		t.equal(AHStationGrid.dig_target(c), "L2", "escolher o patamar muda a frente de escavação")
+	AHStationGrid.set_dig_target(c, "")
+	hud.close_panel()
+	c.inventory.scrap = 0
+	c.inventory.fragments = 0
+	await _frames(2)
 	t.check(hud.lock_mark_info(c, S.CANTEEN).is_empty(), "o cômodo recuperado fica sem marcador")
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5

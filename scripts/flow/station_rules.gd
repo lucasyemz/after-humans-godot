@@ -364,7 +364,7 @@ static func upgrade_room(campaign: Dictionary, room_id: String, from_level: int,
 	var place := ""
 	if AHStationGrid.needs_place(campaign, room_id):
 		if spot != "" and not AHStationGrid.spot_fits(campaign, room_id, spot):
-			return TranslationServer.translate("%s não cabe nessa vaga.") % TranslationServer.translate(room_def(room_id).name)
+			return _not_fit(room_id)
 		place = spot if spot != "" else AHStationGrid.free_spots(campaign, room_id)[0]
 	var cost := next_level_cost(campaign, room_id)
 	adjust(campaign, "scrap", -int(cost.get("scrap", 0)))
@@ -384,8 +384,19 @@ static func build_room(campaign: Dictionary, room_id: String, spot: String) -> S
 	if not AHStationGrid.needs_place(campaign, room_id):
 		return TranslationServer.translate("Este cômodo já tem lugar na Estação.")
 	if not AHStationGrid.spot_fits(campaign, room_id, spot):
-		return TranslationServer.translate("%s não cabe nessa vaga.") % TranslationServer.translate(room_def(room_id).name)
+		return _not_fit(room_id)
 	return upgrade_room(campaign, room_id, room_level(campaign, room_id), spot)
+
+
+## "O Centro de Pesquisa não cabe nessa vaga."
+static func _not_fit(room_id: String) -> String:
+	var name := room_the(room_id)
+	return TranslationServer.translate("%s não cabe nessa vaga.") % (name.left(1).to_upper() + name.substr(1))
+
+
+## "a Cantina", "o Depósito": o cômodo com o artigo (ROOM_ARTICLE).
+static func room_the(room_id: String) -> String:
+	return TranslationServer.translate(ROOM_ARTICLE.get(room_id, "")) + TranslationServer.translate(room_def(room_id).get("name", ""))
 
 
 static func relic_cost(campaign: Dictionary) -> int:
@@ -1846,7 +1857,8 @@ static func _migrate_fallen(campaign: Dictionary) -> void:
 
 ## A ordem em que o próximo passo sugere recuperar os cômodos, e o artigo de cada um no texto.
 const NEXT_ROOMS := [FORGE, RESEARCH, DEPOT]
-const ROOM_ARTICLE := {FORGE: "a ", RESEARCH: "o ", DEPOT: "o "}
+const ROOM_ARTICLE := {FORGE: "a ", RESEARCH: "o ", DEPOT: "o ", CANTEEN: "a ", BAR: "o ", INFIRMARY: "a ", DORMITORY: "o ",
+	CHARACTERS: "o ", PREPARATION: "a "}
 
 
 ## Por que não dá para preparar uma partida agora ("" se dá).

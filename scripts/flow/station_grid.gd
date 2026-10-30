@@ -217,7 +217,7 @@ static func free_spots(campaign: Dictionary, room_id: String) -> Array:
 static func space_block(campaign: Dictionary, room_id: String) -> String:
 	if not needs_place(campaign, room_id) or not free_spots(campaign, room_id).is_empty():
 		return ""
-	var name := TranslationServer.translate(AHStationRules.room_def(room_id).name)
+	var name := AHStationRules.room_the(room_id)
 	if room_slots(room_id) >= 2:
 		return TranslationServer.translate("Falta uma vaga dupla livre para %s: escave o entulho até abrir duas vagas vizinhas.") % name
 	return TranslationServer.translate("Falta uma vaga livre para %s: escave o entulho para abrir uma.") % name
@@ -365,6 +365,11 @@ static func run_dig(campaign: Dictionary, expedition_id: String, digger_points: 
 		state.landings[block_floor(key) - 2] = true
 	else:
 		state.cells[block_floor(key) - 1][block_slot(key) - 1] = FREE
+	# Sem mais nada para escavar, o escavador fica sem posto (a ficha não promete pontos que não rendem).
+	if dig_target(campaign) == "":
+		for entry in campaign.roster:
+			if AHStationRules.post_of(entry) == DIG:
+				entry.post = ""
 	out.opened = true
 	out.finds = _find(campaign, expedition_id, key)
 	return out
@@ -491,7 +496,11 @@ static func report_line(dig: Dictionary) -> String:
 	var key := String(dig.get("block", ""))
 	if dig.get("opened", false):
 		var found := finds_text(dig.get("finds", {}))
-		return TranslationServer.translate("Escavação: %s foi aberto. %s.") % [block_name(key), found.left(1).to_upper() + found.substr(1)]
+		found = found.left(1).to_upper() + found.substr(1)
+		# "o 2º subsolo, vaga 5, foi aberto" (a vírgula fecha o aposto); "o patamar do 2º subsolo foi aberto".
+		if is_landing(key):
+			return TranslationServer.translate("Escavação: %s foi aberto. %s.") % [block_name(key), found]
+		return TranslationServer.translate("Escavação: %s, foi aberto. %s.") % [block_name(key), found]
 	return TranslationServer.translate("Escavação: %s, %d de %d pontos de obra.") % [block_name(key), int(dig.get("progress", 0)), int(dig.get("work", 1))]
 
 

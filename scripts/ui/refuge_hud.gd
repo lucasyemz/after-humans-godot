@@ -1820,6 +1820,33 @@ func _station_plan(c: Dictionary) -> void:
 		row.add_child(go)
 
 
+## A frente de escavação (#186, até a interface da #274): os blocos que dá para escavar agora, com as voltas que faltam;
+## o escolhido fica marcado. Sem escolha, a comunidade cava o mais perto da escada.
+func _dig_front(c: Dictionary) -> void:
+	var blocks := AHStationGrid.dig_blocks(c)
+	if blocks.is_empty():
+		return
+	_text(tr("Escavar: escolha o bloco. Quem fica na Estação cava a cada volta de expedição."), AHKit.MUTED, "small")
+	var chips := HFlowContainer.new()
+	chips.name = "DigFront"
+	chips.add_theme_constant_override("h_separation", 8)
+	chips.add_theme_constant_override("v_separation", 8)
+	_body.add_child(chips)
+	var front := AHStationGrid.dig_target(c)
+	for key in blocks:
+		var block: String = key
+		var name := AHStationGrid.block_name(block)
+		var chip := _chip_button("%s · %s" % [name.left(1).to_upper() + name.substr(1), AHStationGrid.returns_text(AHStationGrid.returns_left(c, block))])
+		chip.name = "Dig_%s" % block.replace(":", "_")
+		chip.custom_minimum_size = Vector2(0, 52)
+		if block == front:
+			for state in ["font_color", "font_hover_color", "font_focus_color"]:
+				chip.add_theme_color_override(state, AHKit.AMBER)
+			chip.add_child(AHKit.selected_overlay())
+		chip.pressed.connect(func(): _act(AHStationGrid.set_dig_target(Campaign.state, block), tr("A escavação segue por %s.") % AHStationGrid.block_name(block)))
+		chips.add_child(chip)
+
+
 ## Começar do zero (com confirmação): o save atual é substituído por uma campanha nova.
 func _new_campaign_view() -> void:
 	_header("alert", tr("Nova campanha"))
@@ -1923,6 +1950,11 @@ func _room(room_id: String) -> void:
 		upgrade.tooltip_text = block
 		upgrade.pressed.connect(func(): _act(S.upgrade_room(Campaign.state, room_id, level), tr("%s: nível %d.") % [tr(room_def.name), level + 1]))
 		_body.add_child(upgrade)
+		# Sem vaga do tamanho dele (#186): o motivo na tela (o toque e o controle não mostram a dica) e a frente de escavação.
+		if AHStationGrid.buried(c, room_id):
+			var why := _text(AHStationGrid.space_block(c, room_id), AHKit.alert_text(), "small")
+			why.name = "SpaceBlock"
+			_dig_front(c)
 		_body.add_child(_divider())
 	for civilian_id in c.station.residents:
 		var who := S.civilian(civilian_id)
