@@ -1726,8 +1726,8 @@ msgid "Escavar: escolha o bloco. Quem fica na Estação cava a cada volta de exp
 msgstr "Dig: choose the block. Whoever stays at the Station digs on every expedition return."
 
 #: scripts/ui/refuge_hud.gd:1846
-msgid "A escavação segue por %s."
-msgstr "The dig moves on to %s."
+msgid "Escavação: a frente agora é %s."
+msgstr "Digging: the front is now %s."
 
 #: scripts/ui/refuge_hud.gd:1853
 msgid "Recomeça a Estação, o elenco e as fases do zero."
@@ -5822,7 +5822,7 @@ msgstr "Digging: %s is open. %s."
 
 #: scripts/flow/station_grid.gd:503
 msgid "Escavação: %s, foi aberto. %s."
-msgstr "Digging: %s is open. %s."
+msgstr "Digging: %s, is open. %s."
 
 #: scripts/flow/station_grid.gd:504
 msgid "Escavação: %s, %d de %d pontos de obra."
@@ -8616,6 +8616,9 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "A escavação segue por %s."
+#~ msgstr "The dig moves on to %s."
 
 #~ msgid "Quarto por recuperar: só os beliches de ferro. A equipe dorme aqui depois de cada volta."
 #~ msgstr "A room still to restore: just the iron bunks. The team sleeps here after each return."

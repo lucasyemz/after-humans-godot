@@ -1843,7 +1843,7 @@ func _dig_front(c: Dictionary) -> void:
 			for state in ["font_color", "font_hover_color", "font_focus_color"]:
 				chip.add_theme_color_override(state, AHKit.AMBER)
 			chip.add_child(AHKit.selected_overlay())
-		chip.pressed.connect(func(): _act(AHStationGrid.set_dig_target(Campaign.state, block), tr("A escavação segue por %s.") % AHStationGrid.block_name(block)))
+		chip.pressed.connect(func(): _act(AHStationGrid.set_dig_target(Campaign.state, block), tr("Escavação: a frente agora é %s.") % AHStationGrid.block_name(block)))
 		chips.add_child(chip)
 
 
