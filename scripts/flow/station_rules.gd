@@ -5,7 +5,8 @@
 ## Estado (na campanha):
 ##   station: {water, rooms {id: nível}, cycle_number, last_cycle_expedition_id, last_cycle {...}, residents [],
 ##             candidate_queue [], hungry_civilians [], completed_requests [], train {phase, candidate_id,
-##             expedition_id, accepted, recruit {}}, train_dry (voltas sem ninguém no trem), last_return {...}}
+##             expedition_id, accepted, recruit {}, next {}, trades {}}, train_dry (voltas sem ninguém no trem),
+##             last_return {...}}
 ##   night: {phase ("none", "planning", "dawn"), number, expedition_id, participants [], watch_hero_id, event_id,
 ##           results [{hero_id, watch, fed, hp_recovered, instinct_reduced}], supplies_consumed, thirsty}
 ##   inventory.items["item_suprimentos"]: os suprimentos do refúgio (a comida da noite e da Cantina).
@@ -198,6 +199,9 @@ static func migrate(campaign: Dictionary) -> void:
 	# O trem de antes do #182 traz um só.
 	if typeof(campaign.station.train.get("next")) != TYPE_DICTIONARY:
 		campaign.station.train.next = {}
+	# E sem o Mercador (#182, parte 2), nenhuma troca feita.
+	if typeof(campaign.station.train.get("trades")) != TYPE_DICTIONARY:
+		campaign.station.train.trades = {}
 	campaign.station.train_dry = int(campaign.station.get("train_dry", 0))
 	# "departing" é só a animação do trem saindo (4 s na tela). Um save gravado nesse meio (o jogo fechou) abriria com o
 	# trem partindo para sempre: a Preparação ficava bloqueada e a plataforma sem botão.
@@ -224,8 +228,10 @@ static func _night_defaults() -> Dictionary:
 ## origin}); vazio quando quem espera é um civil.
 ## next (#182): o segundo animal quando o trem traz dois ({candidate_id, recruit}, ou {}); decidido o primeiro, ele passa
 ## a ser quem espera.
+## trades (#182, parte 2): com o Mercador na plataforma (candidate_id MERCHANT), quantas vezes cada troca já saiu nesta
+## visita ({id da troca: vezes}).
 static func _train_defaults() -> Dictionary:
-	return {"phase": "none", "candidate_id": "", "expedition_id": "", "accepted": false, "recruit": {}, "next": {}}
+	return {"phase": "none", "candidate_id": "", "expedition_id": "", "accepted": false, "recruit": {}, "next": {}, "trades": {}}
 
 
 static func in_refuge(campaign: Dictionary) -> bool:
@@ -630,9 +636,10 @@ static func train_classes(campaign: Dictionary) -> Array:
 		and not AHCombatArena.hero_art_of("hero_%s_0" % id).is_empty() and not free_art_variants(campaign, id).is_empty())
 
 
-## Na volta (#122): às vezes o trem traz alguém, às vezes não. Quem vem: um animal de uma classe liberada ou o próximo
-## civil da fila. O sorteio sai da expedição (a mesma volta traz sempre o mesmo), uma vez por expedição.
-## force ("hero" ou "civilian", a barra de Admin): alguém chega, desse tipo quando houver.
+## Na volta (#122): às vezes o trem traz alguém, às vezes não. Quem vem: um animal de uma classe liberada, o próximo
+## civil da fila ou o Mercador (#182, parte 2). O sorteio sai da expedição (a mesma volta traz sempre o mesmo), uma vez
+## por expedição.
+## force ("hero", "civilian" ou "merchant", a barra de Admin): alguém chega, desse tipo quando houver.
 static func train_on_return(campaign: Dictionary, expedition_id: String, force: String = "") -> bool:
 	var station: Dictionary = campaign.station
 	if expedition_id == "" or station.train.phase != "none" or station.train.expedition_id == expedition_id:
@@ -646,6 +653,13 @@ static func train_on_return(campaign: Dictionary, expedition_id: String, force: 
 	# O civil só vem com lugar para ajudante (#119).
 	var civilians_open: bool = not station.candidate_queue.is_empty() and not helpers_full(campaign)
 	var arrives := rng.randi_range(1, 100) <= train_chance(campaign) or force != ""
+	# O Mercador (#182, parte 2): um sorteio à parte (o de quem vem não muda), contra o peso de vir um ou dois. Ele não
+	# precisa de lugar, então vem também com a casa cheia e a fila vazia.
+	if arrives and (force == "merchant" or (force == "" and _merchant_turn(expedition_id))):
+		station.train_dry = 0
+		station.train.phase = "waiting"
+		station.train.candidate_id = MERCHANT
+		return true
 	if not arrives or (not civilians_open and classes.is_empty()):
 		station.train_dry = int(station.get("train_dry", 0)) + 1
 		return false
@@ -669,6 +683,18 @@ static func train_on_return(campaign: Dictionary, expedition_id: String, force: 
 		if not others.is_empty():
 			station.train.next = _train_animal(campaign, others, rng, [first.candidate_id])
 	return true
+
+
+## O trem que chega traz o Mercador? MerchantWeight contra SingleWeight + PairWeight (data/recruitment.json), num
+## sorteio da expedição só dele.
+static func _merchant_turn(expedition_id: String) -> bool:
+	var merchant := train_rule("train", "MerchantWeight", 0)
+	if merchant <= 0:
+		return false
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("%s:merchant" % expedition_id)
+	var others := train_rule("train", "SingleWeight", 60) + train_rule("train", "PairWeight", 0)
+	return rng.randi_range(1, others + merchant) > others
 
 
 ## Um animal do trem de uma das classes: {candidate_id, recruit}. taken: os ids já reservados nesta chegada.
@@ -697,6 +723,8 @@ static func train_waiting_names(campaign: Dictionary) -> Array:
 	var train: Dictionary = campaign.station.train
 	if train.phase != "waiting":
 		return []
+	if train.candidate_id == MERCHANT:
+		return [TranslationServer.translate(MERCHANT_NAME)]
 	var recruit: Dictionary = train.get("recruit", {})
 	var names: Array = [String(recruit.display_name) if not recruit.is_empty() else String(civilian(train.candidate_id).get("name", ""))]
 	var second: Dictionary = train.get("next", {}).get("recruit", {})
@@ -758,6 +786,9 @@ static func _decide_front(campaign: Dictionary, candidate_id: String, accept: bo
 	var station: Dictionary = campaign.station
 	if station.train.phase != "waiting" or station.train.candidate_id != candidate_id or candidate_id == "":
 		return TranslationServer.translate("Ninguém está esperando na plataforma.")
+	# O Mercador não fica nem é recusado: ele troca e é dispensado (dismiss_merchant).
+	if candidate_id == MERCHANT:
+		return TranslationServer.translate("O Sr. dos Trilhos não fica na Estação: ele troca e segue no trem quando for dispensado.")
 	var recruit: Dictionary = station.train.get("recruit", {})
 	if not recruit.is_empty():
 		if accept:
@@ -812,6 +843,90 @@ static func finish_departure(campaign: Dictionary) -> bool:
 	campaign.station.train = _train_defaults()
 	campaign.station.train.expedition_id = train.expedition_id
 	return true
+
+
+# ---------------------------------------------------------------- o Mercador (#182, parte 2)
+
+## O Mercador, o Sr. dos Trilhos: o trem às vezes o traz no lugar de alguém. Ele não entra no elenco e não pode ser
+## recrutado (decisão do Lucas, 28/10): fica na plataforma para trocar e vender até o jogador dispensá-lo, e a
+## Preparação pede para dispensá-lo antes de partir. O id dele é o da arte (art/civilians/merchant).
+const MERCHANT := "merchant"
+const MERCHANT_NAME := "O Sr. dos Trilhos"
+
+
+## O Mercador está na plataforma (chegou e não foi dispensado).
+static func merchant_here(campaign: Dictionary) -> bool:
+	var train: Dictionary = campaign.station.train
+	return train.phase == "waiting" and train.candidate_id == MERCHANT
+
+
+## As trocas do Mercador (data/merchant.json), na ordem da tabela: {Name, Give, GiveAmount, Get, GetAmount, Limit}.
+static func merchant_trades() -> Array:
+	return GameData.table("merchant").values()
+
+
+## Quantas vezes a troca ainda sai nesta visita.
+static func trades_left(campaign: Dictionary, trade_id: String) -> int:
+	var row = GameData.row("merchant", trade_id)
+	if row == null:
+		return 0
+	return maxi(0, int(row.get("Limit", 0)) - int(campaign.station.train.get("trades", {}).get(trade_id, 0)))
+
+
+## Por que a troca não sai agora ("" quando sai): sem o Mercador, o limite da visita ou o que falta dar.
+static func trade_block(campaign: Dictionary, trade_id: String) -> String:
+	if not merchant_here(campaign):
+		return TranslationServer.translate("O Sr. dos Trilhos não está na plataforma.")
+	var row = GameData.row("merchant", trade_id)
+	if row == null:
+		return TranslationServer.translate("Troca desconhecida.")
+	if trades_left(campaign, trade_id) <= 0:
+		return TranslationServer.translate("Nesta visita, ele não faz mais essa troca.")
+	var give := String(row.Give)
+	var amount := int(row.GiveAmount)
+	if quantity(campaign, give) < amount:
+		return TranslationServer.translate("Faltam %s: a troca pede %s.") % [resource_noun(give), resource_amount(give, amount)]
+	return ""
+
+
+## Faz uma troca com o Mercador: dá o que ela pede e recebe o que oferece. Devolve "" ou o motivo.
+static func merchant_trade(campaign: Dictionary, trade_id: String) -> String:
+	var block := trade_block(campaign, trade_id)
+	if block != "":
+		return block
+	var row = GameData.row("merchant", trade_id)
+	adjust(campaign, String(row.Give), -int(row.GiveAmount))
+	adjust(campaign, String(row.Get), int(row.GetAmount))
+	var trades: Dictionary = campaign.station.train.trades
+	trades[trade_id] = int(trades.get(trade_id, 0)) + 1
+	return ""
+
+
+## O jogador dispensa o Mercador: ele volta ao trem, que parte (como o recusado). Devolve "" ou o motivo.
+static func dismiss_merchant(campaign: Dictionary) -> String:
+	if not merchant_here(campaign):
+		return TranslationServer.translate("O Sr. dos Trilhos não está na plataforma.")
+	campaign.station.train.phase = "departing"
+	return ""
+
+
+## O nome de um recurso das trocas, no plural ("sementes", "sucatas", "fragmentos").
+static func resource_noun(resource: String) -> String:
+	match resource:
+		"seeds":
+			return TranslationServer.translate("sementes")
+		"scrap":
+			return TranslationServer.translate("sucatas")
+		"fragments":
+			return TranslationServer.translate("fragmentos")
+	return resource
+
+
+## Uma quantidade de um recurso das trocas ("1 fragmento", "4 sementes").
+static func resource_amount(resource: String, amount: int) -> String:
+	if resource == "seeds":
+		return (TranslationServer.translate("%d semente") if amount == 1 else TranslationServer.translate("%d sementes")) % amount
+	return cost_text({resource: amount})
 
 
 ## Previsão do próximo ciclo como se o candidato já morasse aqui (o impacto mostrado antes da escolha).
@@ -1425,6 +1540,9 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 	if campaign.night.phase != "none":
 		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."),
 			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
+	if merchant_here(campaign):
+		return {"title": TranslationServer.translate("O Mercador está na plataforma"), "text": TranslationServer.translate("O Sr. dos Trilhos veio no trem para trocar sementes, sucata e fragmentos. Troque o que quiser e dispense-o antes de preparar a expedição."),
+			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
 	if train_candidate_name(campaign) != "":
 		var many := train_waiting_names(campaign).size() > 1
 		return {"title": TranslationServer.translate("Chegou alguém no trem"), "text": (TranslationServer.translate("%s esperam na plataforma. Veja o que trazem e decida quem fica; se a equipe partir antes, vão embora no trem.") if many
@@ -1616,7 +1734,8 @@ static func treat_fallen(campaign: Dictionary, hero_id: String) -> String:
 ## Esperar um dia sem expedição ("" se pode): só quando ninguém pode partir e há caídos (sem isso, o jogo travava com
 ## a equipe toda em recuperação). O dia passa como uma volta: a Estação gasta e produz, e a recuperação anda.
 static func rest_block(campaign: Dictionary) -> String:
-	var block := preparation_block(campaign)
+	# Esperar um dia não mexe no trem: com o Mercador na plataforma, também dá (#182).
+	var block := _day_block(campaign)
 	if block != "":
 		return block
 	if fallen(campaign).is_empty():
@@ -1679,6 +1798,16 @@ const ROOM_ARTICLE := {FORGE: "a ", RESEARCH: "o ", DEPOT: "o "}
 
 ## Por que não dá para preparar uma partida agora ("" se dá).
 static func preparation_block(campaign: Dictionary) -> String:
+	var block := _day_block(campaign)
+	# O Mercador (#182, parte 2, decisão do Lucas): ele é dispensado antes da Preparação. O motivo é curto: ele aparece
+	# também no botão IR AO MAPA, numa linha.
+	if block == "" and merchant_here(campaign):
+		return TranslationServer.translate("Dispense o Sr. dos Trilhos antes de partir.")
+	return block
+
+
+## O que impede qualquer coisa do dia na Estação (partir, esperar um dia): a noite pendente ou a equipe fora.
+static func _day_block(campaign: Dictionary) -> String:
 	if campaign.night.phase != "none":
 		return TranslationServer.translate("Conclua a noite no Dormitório antes de partir.")
 	if not in_refuge(campaign):
@@ -1816,6 +1945,7 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	delivered.cycle = campaign.station.last_cycle.duplicate()
 	# O trem da volta (#122): quem chegou, ou ninguém; o relatório diz.
 	delivered.train = train_candidate_name(campaign) if train_on_return(campaign, expedition.id) else ""
+	delivered.merchant = merchant_here(campaign)
 	campaign.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
 	campaign.station.last_return = delivered
 	return delivered

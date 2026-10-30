@@ -299,6 +299,7 @@ func _process(delta: float) -> void:
 		play_train_arrival(_pending_arrival)
 		_pending_arrival = ""
 	_tick_train(delta)
+	_tick_merchant()
 	if _reopen_pending:
 		_tick_reopen()
 	_walk(delta)
@@ -1288,6 +1289,9 @@ func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	var recruit: Dictionary = S.train_recruit(Campaign.state)
 	if art.is_empty() and not recruit.is_empty() and Campaign.state.station.train.candidate_id == _candidate_id:
 		art = AHCombatArena.hero_art_of(_candidate_id, String(recruit.art_variant)).get("idle", {})
+	# O Mercador (#182, parte 2): a arte dele, de pé (_tick_merchant troca a pose).
+	if art.is_empty() and _candidate_id == S.MERCHANT:
+		art = AHCombatArena.npc_art_of(S.MERCHANT).get("idle", {})
 	if art.is_empty():
 		return null
 	_candidate = AHSpriteCard.new()
@@ -1297,6 +1301,21 @@ func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	_candidate.position = feet
 	_candidate.set_facing(1.0)
 	return _candidate
+
+
+## O Mercador na plataforma (#182, parte 2): de passada enquanto anda (descendo do trem ou voltando a ele); parado, de pé
+## e, com o painel do trem aberto, oferecendo a mercadoria. Cada pose tem a âncora na bota de apoio dela.
+func _tick_merchant() -> void:
+	if _candidate_id != S.MERCHANT or not is_instance_valid(_candidate):
+		return
+	var moving := false
+	for walker in _walkers:
+		if walker.card == _candidate:
+			moving = float(walker.get("wait", 0.0)) <= 0.0 and absf(float(walker.get("target", _candidate.position.x)) - _candidate.position.x) >= 0.05
+	var pose := "walk" if moving else ("trade" if hud != null and hud.current == "train" else "idle")
+	var art: Dictionary = AHCombatArena.npc_art_of(S.MERCHANT).get(pose, {})
+	if not art.is_empty() and String(_candidate.art().get("file", "")) != String(art.file):
+		_candidate.show_art(art)
 
 
 func _tick_train(delta: float) -> void:

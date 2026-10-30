@@ -117,10 +117,12 @@ refuge_hud.gd: Description
 *: logo
 *: loot
 *: menu
+*: merchant
 *: move
 *: name
 *: none
 *: normal
+*: npcs
 *: object
 *: ok
 *: options
@@ -130,6 +132,7 @@ refuge_hud.gd: Description
 *: phase
 *: plan
 *: planning
+*: portrait
 *: position
 *: preparation
 *: pressed
@@ -162,6 +165,7 @@ refuge_hud.gd: Description
 *: supplies
 *: team
 *: touch
+*: trades
 *: train
 *: trauma
 *: unit
@@ -1583,6 +1587,12 @@ passage_card.gd: end
 *: next
 ui_style.gd: enemies
 refuge_hud.gd: Pair_%s
+refuge_hud.gd: Dismiss
+refuge_hud.gd: Trade_%s
+refuge_hud.gd: Give
+refuge_hud.gd: Get
+refuge_hud.gd: Do
+refuge_hud.gd: Note
 exploration_hud.gd: Carried
 *: carried
 exploration_hud.gd: %s (%s)
@@ -1603,5 +1613,7 @@ character_room.gd: Skin_%s
 *: heroes
 *: default
 station_rules.gd: Unlock
+station_rules.gd: %s:merchant
+station_rules.gd: Limit
 station_rules.gd: dormitory_level_%d
 station_build.gd: dormitory@2

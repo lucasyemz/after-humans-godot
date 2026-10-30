@@ -145,6 +145,8 @@ var _room_screen: AHCharacterRoom
 var _back_to := ""
 ## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
 var _arrived_candidate := ""
+## A troca do Mercador que acabou de sair (#182): o foco do teclado fica nela ao refazer o painel.
+var _merchant_focus := ""
 ## Mapa da Rede: IR AO MAPA abre por cima de tudo; o lugar escolhido vai para a plataforma (#123).
 var _map: AHPhaseMap
 ## A visita guiada da primeira vez (#145), aberta por cima da Estação, ou null.
@@ -628,7 +630,8 @@ func _build_left(c: Dictionary) -> void:
 		_menu.add_child(_plan_card())
 	var pending: Array = []
 	if S.visit_pending(c) and current != "train" and not (overview and _next.action == "train"):
-		pending.append([tr("O trem chegou: alguém espera na plataforma"), "train_arrival", func(): open_service("train")])
+		pending.append([tr("O Mercador espera na plataforma") if S.merchant_here(c) else tr("O trem chegou: alguém espera na plataforma"),
+			"train_arrival", func(): open_service("train")])
 	if c.night.phase != "none" and current != S.DORMITORY and not (overview and _next.action == "dormitory"):
 		pending.append([tr("A noite espera no Dormitório"), "sleep", func(): open_room(S.DORMITORY)])
 	# Quem volta da recuperação no próximo dia (#121): "Íris volta amanhã".
@@ -1400,6 +1403,11 @@ func _on_phase_chosen(phase_id: String) -> void:
 	if station.train_busy():
 		toast(tr("O trem está chegando à plataforma: espere ele parar."), true)
 		Sound.play("res://audio/ui/deny.ogg")
+		return
+	# O Mercador na plataforma (#182, parte 2): a Preparação pede para dispensá-lo primeiro.
+	if S.merchant_here(Campaign.state):
+		_map.visible = false
+		open_room(S.PREPARATION)
 		return
 	_map.visible = false
 	_map_from_platform = false
@@ -2791,6 +2799,9 @@ func _train() -> void:
 	if train.phase != "waiting":
 		close_panel()
 		return
+	if S.merchant_here(c):
+		_train_merchant(c)
+		return
 	if not S.train_recruit(c).is_empty():
 		_train_recruit(c)
 		return
@@ -2913,6 +2924,111 @@ func _train_recruit(c: Dictionary) -> void:
 		_panel_focus = null
 
 
+## O Mercador no trem (#182, parte 2): o retrato, quem é, as trocas desta visita (o que dá e o que recebe, quantas ainda
+## saem; o que falta, na cor de alerta) e, no pé, DISPENSAR, de aço e sem tecla, como Recusar: a tecla de Interagir faz
+## a primeira troca que dá, nunca manda embora sem querer.
+func _train_merchant(c: Dictionary) -> void:
+	_header("train_arrival", tr("O trem chegou"))
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 16)
+	_body.add_child(head)
+	var face: Texture2D = load(String(AHCombatArena.npc_art_of(S.MERCHANT).get("portrait", "")))
+	head.add_child(AHKit.portrait(face, 116))
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", 2)
+	head.add_child(names)
+	names.add_child(_wrapped(tr("Mercador de passagem"), "small", AHKit.AMBER, true, 380.0))
+	(names.get_child(-1) as Label).uppercase = true
+	names.add_child(_wrapped(tr(S.MERCHANT_NAME), "card_name", AHKit.TEXT, true, 380.0))
+	names.add_child(_wrapped(tr("Mercador · jacaré"), "row", AHKit.AMBER, false, 380.0))
+	names.add_child(_wrapped(tr("Desce do trem sem dizer de onde vem. Abre a bolsa, mostra o que tem e espera a oferta."), "text", AHKit.MUTED, false, 380.0))
+	_section(tr("Trocas desta visita"))
+	# O foco do teclado: na troca que o jogador acabou de apertar (mesmo esgotada: nunca pula sozinho para a troca de
+	# volta nem para DISPENSAR) ou, no começo da visita, na primeira.
+	var first: Button = null
+	for row in S.merchant_trades():
+		var button := _trade_row(c, row)
+		if first == null or String(row.Name) == _merchant_focus:
+			first = button
+	var stock := HFlowContainer.new()
+	stock.name = "Stock"
+	stock.add_theme_constant_override("h_separation", 8)
+	stock.add_theme_constant_override("v_separation", 8)
+	_body.add_child(stock)
+	stock.add_child(AHKit.label(tr("A Estação tem"), "small", AHKit.MUTED, true))
+	for resource in ["seeds", "scrap", "fragments"]:
+		stock.add_child(_chip(RESOURCE_ICONS[resource], str(S.quantity(c, resource))))
+	_text(tr("Ele fica na plataforma até ser dispensado. A expedição só parte depois disso."), AHKit.MUTED, "small")
+	var dismiss := AHKit.button(tr("Dispensar o Sr. dos Trilhos"), "secondary")
+	dismiss.name = "Dismiss"
+	dismiss.custom_minimum_size = Vector2(BODY_WIDTH, 60)
+	dismiss.pressed.connect(_dismiss_merchant)
+	_footer.add_child(dismiss)
+	# DISPENSAR nunca começa com o foco: só pelas setas, o clique ou o toque.
+	_panel_focus = first
+
+
+## Uma troca do Mercador: o que a Estação dá, a seta, o que recebe e NEGOCIAR; embaixo, quantas ainda saem nesta visita
+## ou o motivo de não sair. O botão nunca desliga (desligado, ele perdia o foco e o teclado pulava para a troca de volta
+## ou para DISPENSAR): esgotada, ele diz ESGOTADA; sem o que dar, o que falta fica na cor de alerta. Apertado sem poder,
+## diz o motivo. Devolve o botão.
+func _trade_row(c: Dictionary, row: Dictionary) -> Button:
+	var id := String(row.Name)
+	var box := _inset()
+	box.get_parent().name = "Trade_%s" % id
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 8)
+	box.add_child(line)
+	var give := String(row.Give)
+	var enough := S.quantity(c, give) >= int(row.GiveAmount)
+	var give_chip := _chip(RESOURCE_ICONS[give], S.resource_amount(give, int(row.GiveAmount)), AHKit.TEXT if enough else AHKit.alert_text())
+	give_chip.name = "Give"
+	line.add_child(give_chip)
+	line.add_child(_icon("ui-arrow-right", 22, AHKit.AMBER))
+	var get_chip := _chip(RESOURCE_ICONS[String(row.Get)], S.resource_amount(String(row.Get), int(row.GetAmount)), AHKit.good())
+	get_chip.name = "Get"
+	get_chip.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_BEGIN
+	line.add_child(get_chip)
+	var left := S.trades_left(c, id)
+	var button := _chip_button(tr("Negociar") if left > 0 else tr("Esgotada"))
+	button.name = "Do"
+	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var block := S.trade_block(c, id)
+	button.set_meta("block", block)
+	button.pressed.connect(func(): _trade(id))
+	line.add_child(button)
+	var note := tr("Esgotada nesta visita.") if left <= 0 else (block if block != "" else tr("Ainda sai %d vez nesta visita.") % left if left == 1
+		else tr("Ainda sai %d vezes nesta visita.") % left)
+	var label := _wrapped(note, "small", AHKit.alert_text() if block != "" and left > 0 else AHKit.MUTED, false, BODY_WIDTH - 40.0)
+	label.name = "Note"
+	box.add_child(label)
+	return button
+
+
+## Faz uma troca com o Mercador e refaz o painel, com o foco na mesma troca; sem poder, diz o motivo.
+func _trade(trade_id: String) -> void:
+	var row = GameData.row("merchant", trade_id)
+	var error := S.merchant_trade(Campaign.state, trade_id)
+	var done := "" if row == null else tr("Troca feita: %s por %s.") % [S.resource_amount(String(row.Give), int(row.GiveAmount)),
+		S.resource_amount(String(row.Get), int(row.GetAmount))]
+	_merchant_focus = trade_id
+	_act(error, done, "res://audio/ui/confirm.ogg")
+	if error == "":
+		refresh()
+
+
+## Dispensar o Mercador: ele volta ao vagão e o trem parte, como com o recusado.
+func _dismiss_merchant() -> void:
+	var error := S.dismiss_merchant(Campaign.state)
+	if error != "":
+		toast(error, true)
+		return
+	_merchant_focus = ""
+	station.commit()
+	toast(tr("O Sr. dos Trilhos volta ao trem."))
+	_train_departs(true)
+
+
 ## A aba de um dos dois do trem (#182): o rosto e o nome, como as abas da Sala dos Personagens; a escolhida é quem o
 ## painel mostra. Apertar a outra a traz à frente.
 func _pair_tab(candidate_id: String, recruit: Dictionary, chosen: bool) -> Button:
@@ -3013,9 +3129,14 @@ func _decide(candidate_id: String, accept: bool) -> void:
 		station.promote_companion(c.station.train.candidate_id, not accept)
 		refresh()
 		return
-	# O trem fecha e parte (o recusado volta para ele); acolhido, o civil fica e vai para o cômodo dele. O painel sai da
-	# frente da cena e o resto espera o trem sumir no túnel. O primeiro recusado de dois (#182) entra antes das portas
-	# fecharem.
+	# O trem fecha e parte (o recusado volta para ele); acolhido, o civil fica e vai para o cômodo dele.
+	_train_departs(not accept)
+
+
+## O painel sai da frente da cena e o resto espera o trem sumir no túnel. O primeiro recusado de dois (#182) entra antes
+## das portas fecharem; quem vai embora (o recusado, o Mercador dispensado) volta ao vagão antes.
+func _train_departs(candidate_leaves: bool) -> void:
+	var c: Dictionary = Campaign.state
 	_panel.visible = false
 	station.departure_pending = true
 	# Um limite (BOARDING_WAIT s): o recusado que se perdeu do passeio não segura a partida.
@@ -3025,7 +3146,7 @@ func _decide(candidate_id: String, accept: bool) -> void:
 		waited += get_process_delta_time()
 	if not is_instance_valid(station):
 		return
-	station.play_train_departure(not accept)
+	station.play_train_departure(candidate_leaves)
 	await station.train_event_named("gone")
 	S.finish_departure(c)
 	station.commit()

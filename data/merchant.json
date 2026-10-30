@@ -1,0 +1,38 @@
+[
+  {
+    "Name": "sell_fragments",
+    "Give": "fragments",
+    "GiveAmount": 1,
+    "Get": "seeds",
+    "GetAmount": 4,
+    "Limit": 2,
+    "Description": "Proposta (#182, parte 2): o Mercador, o Sr. dos Trilhos, paga 4 sementes por fragmento, até 2 por visita. Comprar custa 3 vezes mais (buy_fragments): ninguém ganha comprando e vendendo de volta."
+  },
+  {
+    "Name": "buy_fragments",
+    "Give": "seeds",
+    "GiveAmount": 12,
+    "Get": "fragments",
+    "GetAmount": 1,
+    "Limit": 1,
+    "Description": "Proposta (#182, parte 2): 1 fragmento por 12 sementes, 1 por visita. Uma visita a cada 6 ou 7 voltas dá uns 2 fragmentos a mais até a fase 5; os guardiões dão 4 ou 5 nesse tempo."
+  },
+  {
+    "Name": "sell_scrap",
+    "Give": "scrap",
+    "GiveAmount": 1,
+    "Get": "seeds",
+    "GetAmount": 2,
+    "Limit": 3,
+    "Description": "Proposta (#182, parte 2): 2 sementes por sucata, até 3 por visita."
+  },
+  {
+    "Name": "buy_scrap",
+    "Give": "seeds",
+    "GiveAmount": 4,
+    "Get": "scrap",
+    "GetAmount": 1,
+    "Limit": 3,
+    "Description": "Proposta (#182, parte 2): 1 sucata por 4 sementes, até 3 por visita."
+  }
+]
