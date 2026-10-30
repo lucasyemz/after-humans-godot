@@ -1,21 +1,25 @@
 # Poses das roupas confortáveis do lobby — #249
 
-**52 sprites prontos para revisão e integração, com QA de design aprovada.** Figurinos autorizados pelo Lucas
-após o PR #244, incluindo as roupas femininas próprias da r4. Não há novas variantes de sexo dos fundadores.
+**As 52 poses do lobby passam a ser as da Awesomic, feitas no gerador do ChatGPT.** O Lucas comparou, modelo por
+modelo, a versão do Codex que entrou no PR #251 com a da Awesomic e escolheu a da Awesomic (30/10/2026). Esta entrega
+substitui as poses do #251. O contrato, os nomes de arquivo, os canvas, as âncoras e o helper continuam os mesmos, então
+a integração não muda: só as fontes, os hashes e as provas.
 
 ## Cobertura
 
-- Quatro fundadores: `idle`, `seat` no banco, `sleep` no beliche e `work` — 16 sprites.
-- Seis tipos de recruta, macho e fêmea: `idle`, `seat` no banco e `sleep` no beliche — 36 sprites.
-- A Estação move o idle ao caminhar; não foram inventados quadros de caminhada. Não há ataques nem poses do
-  acampamento de expedição nestas roupas. O pacote de expedição das recrutas femininas é a #250.
+- Quatro fundadores: `idle`, `seat` no banco, `sleep` no beliche e `work`, 16 sprites.
+- Seis tipos de recruta, macho e fêmea: `idle`, `seat` no banco e `sleep` no beliche, 36 sprites.
+- Figurinos da r4 do PR #244, as fêmeas com roupa própria. Sem equipamento de expedição, as corujas com braços e mãos.
+- Trabalho: o Bento conserta um rádio, o Nick costura uma bolsa, a Íris mistura um frasco e a Véspera lê um caderno.
+- A Estação move o idle ao caminhar; não há quadros de caminhada, ataques nem poses do acampamento nesta roupa. O
+  pacote de expedição das recrutas femininas é a #250.
 
-![Fundadores com as roupas de lobby, na Godot, antes e depois](lobby_poses/idle_0_before_after.webp)
+![Fundadores com as roupas do lobby, na Godot, antes e depois](lobby_poses/idle_0_before_after.webp)
 
 ## Pranchas em escala métrica
 
-Cada página usa uma escala comum em pixels por metro e o pivô de cada pose; sentado/deitado não foram ampliados
-para encher o quadrado. As versões a 40% e em cinza são reduções reais. Sem texto nos PNG dos personagens.
+Todas as pranchas usam a mesma escala, 330 px por metro, com o pé de cada pose na linha do chão: dá para comparar um
+modelo com outro e uma pose com outra. As versões a 40% e em cinza são reduções reais. Sem texto nos PNG.
 
 | Modelo | Poses | Prancha | 40% | Cinza |
 | --- | --- | --- | --- | --- |
@@ -38,51 +42,85 @@ para encher o quadrado. As versões a 40% e em cinza são reduções reais. Sem 
 
 ## Encaixes e conversão
 
-O [contrato completo](lobby_poses/contract.json) traz por arquivo: PNG/SHA-256, canvas, textura de destino,
-âncora, altura de referência, caixa do alfa, registro/escala uniforme e nome de saída. O [audit](lobby_poses/audit.json)
-conta 52 sprites/16 modelos e nenhum recorte fora da tela.
+O [contrato](lobby_poses/contract.json) traz por arquivo: PNG/SHA-256, a imagem do gerador de onde a pose saiu
+(`generator_file`/`generator_sha256`), canvas, textura de destino, âncora, altura de referência, caixa do alfa, escala
+uniforme, correção de registro e nome de saída. O [audit](lobby_poses/audit.json) conta 52 sprites, 16 modelos e
+nenhum problema.
 
-**Fundadores:** canvas, âncora e altura de referência copiados da pose canônica (`combat_art.json` no idle e
-`station_poses.json` nas outras). Os nomes de trabalho/banco/beliche mantêm os basenames que o jogo procura:
-`hero_cao_bento_seat.webp`, `hero_gato_nick_work.webp` etc. Não renomear para `seat.webp`/`work.webp` nesses modelos.
-A resolução da textura varia por legado: seguir `texture_canvas`, não reduzir todos os PNG pela metade às cegas.
+**Canvas, âncora e altura de referência são os mesmos do #251.** Fundadores: copiados da pose canônica
+(`combat_art.json` no idle, `station_poses.json` nas outras), com os basenames que o jogo procura
+(`hero_cao_bento_seat.webp`, `hero_gato_nick_work.webp` etc.). Recrutas: `idle`/`seat` em 1178×1335, âncora [589,1305],
+referência 1240; `sleep` em 1774×886, âncora [887,738], referência 1240; texturas de 589×668 e 887×443. Seguir
+`texture_canvas`, não reduzir tudo pela metade às cegas.
 
-**Recrutas:** os encaixes de Estação ainda não existem na main; o pacote registra `idle/seat` em 1178×1335,
-âncora [589,1305], altura de referência 1240; `sleep` em 1774×886, âncora[887,738], referência 1240.
-As texturas vão para 589×668 e 887×443. Banco é com pés para baixo; beliche é horizontal com cabeça à esquerda.
-Não confundir essas poses com `seat` no chão do acampamento. As alturas são as das classes (Cão 1,72, Gato 1,50,
-Sapo 1,38, Coruja 1,66), com Guaxinim 1,44/Tatu 1,56 do redesenho aprovado #225, cuja integração de altura ainda está pendente.
+**Como cada pose foi encaixada** (só escala uniforme e translação, nada esticado):
+- **De pé (`idle`, `work`):** a altura da cabeça ao pé é a altura de referência; o meio dos dois pés fica na âncora.
+- **Banco (`seat`):** uma regra só para todos: a altura sentada, da cabeça ao pé, é a fração da altura em pé que a pose
+  canônica do banco do fundador tem hoje (`station_poses.json`): Bento 0,72, Nick 0,76, Íris 0,70, Véspera 0,76. Cada
+  recruta usa a do fundador da mesma família: cão, Guaxinim e Tatu a do Bento, gato a do Nick, sapo a da Íris, coruja a
+  da Véspera. O meio dos pés fica na âncora. É essa altura que põe o quadril no banco da Cantina.
+- **Por que o sentado fica menor que o em pé:** nas imagens do gerador o corpo sentado é mais alto que o de um corpo de
+  verdade (a canela é longa). Com a cabeça do mesmo tamanho da pose em pé, o quadril sobe até a altura da mesa: veja a
+  prova abaixo, na Godot. Com a regra do banco, a cabeça sentada fica com 86% a 92% da cabeça em pé no Nick, na Íris, na
+  Véspera, no gato, na coruja e no Guaxinim; com 78% a 84% no Bento, no cão e no sapo; com 69% a 73% no Tatu. A medida
+  é aproximada (a largura da cabeça pega orelhas e inclinação; por casamento de modelo a QA mediu o Tatu perto de 80%
+  e os gatos perto de 97%). Os números por modelo estão no [audit](lobby_poses/audit.json), em `scale_checks`.
+- **Beliche (`sleep`):** o comprimento do corpo deitado é a altura de referência, centrado na âncora, cabeça à esquerda.
+  Na escala do idle o comprimento daria de 1% a 10% a mais (`scale_checks`), então o deitado não encolhe em relação ao
+  em pé.
+- **Correção de registro:** para caber no canvas canônico com 5 px de folga em cada borda, alguns corpos andam para a
+  direita a partir da âncora: o Bento sentado 52 px (9 cm no jogo) e o Nick sentado 46 px (9 cm), por causa da cauda
+  longa para trás; o Bento em pé 17 px (2 cm) e o Nick em pé 5 px (menos de 1 cm). Ninguém foi cortado.
 
-A normalização só usa escala uniforme e translação, sem esticar braços/tronco. O Bento sentado foi refeito mais
-compacto para caber no canvas original. Correções horizontais de registro acomodam a silhueta mantendo o pivô
-canônico; um ajuste uniforme inferior a 2% no trabalho do Bento evita cortar a cauda. Fundo/ruído de atlas e
-contaminação de borda removidos no recorte; RGB zerado onde alfa é zero. As fontes são reamostradas dos atlas,
-sem alegar detalhe nativo maior que o da geração.
+![O tamanho do sentado na Godot: a regra do banco (meio) e a escala do idle (direita), com o quadril na altura da mesa](lobby_poses/seat_scale_check.webp)
 
-Para preparar os arquivos no PC sem tocar na produção:
+O recorte tira o fundo magenta do gerador pela cor e apaga o ruído solto. No contorno, o magenta misturado é retirado:
+por dentro, nenhuma cor da arte passa de 29 no excesso de magenta (min(R,B)−G), nem o ameixa da coruja, então o
+recorte corta o excesso acima de 20 na imagem do gerador. Depois da redução, as pontas do pelo ainda guardam um leve
+tom ameixa (excesso de até 20, acima disso só em pixels quase transparentes), que não se nota no tamanho do jogo. Pixels
+francamente roxos (R−G e B−G acima de 40, alfa a partir de 32): 57 nas 52 fontes, no máximo 8 por sprite, contra
+milhares por sprite antes da correção. Nenhum pixel com alfa zero tem cor (RGB zerado). As fontes são reamostradas das imagens do gerador (1024×1536 ou 1536×1024),
+sem alegar detalhe maior que o da geração.
+
+Para preparar os WebP no PC sem tocar na produção:
 
 ```sh
-python -B docs/design/lobby_poses/prepare_webp.py --sources /caminho/lobby_poses_20261029 --output /pasta/externa/lobby_ready
+python -B docs/design/lobby_poses/prepare_webp.py --sources /caminho/lobby_poses_awesomic_20261030 --output /pasta/externa/lobby_ready
 ```
 
-Exige Pillow. A saída deve ser nova e ficar fora do repositório/fontes. O helper valida 52 PNG, hashes, RGBA,
-canvas e cobertura; gera 52 WebP lossless e `registration.json`. A [verificação](lobby_poses/preparation_checks.json)
-comparou os 52 WebP byte a byte com os protótipos da QA e conferiu rejeição de saídas inválidas.
+Exige Pillow. A saída tem que ser uma pasta nova, fora do repositório e das fontes. O helper confere 52 PNG, hashes,
+RGBA, canvas e cobertura; gera 52 WebP lossless e `registration.json`. A [verificação](lobby_poses/preparation_checks.json)
+comparou os 52 WebP byte a byte com os que entraram nas capturas da Godot, e conferiu a recusa de saída existente, de
+saída dentro do repositório e de fonte com hash errado.
 
 ## Antes e depois na Godot
 
-17 pares capturados em 1920×1080 no mesmo processo, câmera, posições e instante pausado. Cenário e móveis reais da
-Estação; campanha de teste isolada com salas abertas só em memória. Antes: arte da main `5bb29281`. Depois:
-PNG processado para WebP carregado no protótipo externo, sem modificar arquivos do jogo. Renderer Compatibility,
-Mesa llvmpipe/Xvfb, **sem placa de vídeo física**. Não é uma prova da troca automática de roupa ou da integração.
+17 pares no mesmo processo, com a mesma câmera, as mesmas posições e o mesmo instante: a foto do antes, depois a troca
+só da textura e das medidas, e a foto do depois. O cenário e os móveis são os da Estação; a campanha de teste abre os
+cômodos só na memória. Antes: a arte da main `204f8f7`. Depois: os WebP do helper, carregados só em memória. Câmeras e
+posições são as do #251 ([registro](lobby_poses/capture.json)). Para repetir:
 
-Na main não existem versões femininas nem poses de banco/beliche dos recrutas; nesses casos o controle mostra o
-idle masculino atual, explicitamente como fallback. Não se apresenta uma pose feminina anterior inexistente.
-Guaxinim/Tatu no antes ainda têm a arte/altura antigas da main; o depois usa o redesenho aprovado.
+```sh
+python -B docs/design/lobby_poses/prepare_webp.py --sources <fontes> --output /tmp/lobby_ready
+xvfb-run -s "-screen 0 1920x1080x24" "$GODOT" --path . --rendering-driver opengl3 --resolution 1920x1080 \
+  -s res://docs/design/lobby_poses/capture_lobby.gd -- --out=/tmp/lobby_shots --ready=/tmp/lobby_ready --wait=1
+```
+
+**1920×1080, renderer Compatibility, Mesa llvmpipe, sem placa de vídeo.** Sem placa de vídeo cada quadro da Estação
+leva perto de um minuto, por isso o script espera um quadro só antes de cada foto (`--wait=1`). Não é prova da troca
+automática de roupa nem da integração.
+
+A main não tem versões femininas nem poses de banco/beliche dos recrutas: nesses casos o antes mostra o idle masculino
+de hoje, como no #251. O Guaxinim e o Tatu do antes têm a altura de hoje (1,30 e 1,35 m); o depois usa as do redesenho
+#225 (1,44 e 1,56 m).
+
+Na Cantina, o primeiro lugar do banco (x 17,6) fica atrás de um galão na mesa: a cabeça de quem senta ali fica em
+parte escondida (a Íris no seat_1, o sapo macho no seat_4), como já acontece hoje com a Íris de expedição. É o lugar
+do jogo, não a pose; o integrador pode afastar o galão ou o lugar.
 
 ![Encaixe no banco real da Cantina](lobby_poses/seat_0_before_after.webp)
 
-![Encaixe dos quatro fundadores nos beliches reais](lobby_poses/sleep_0_before_after.webp)
+![Os quatro fundadores nos beliches reais](lobby_poses/sleep_0_before_after.webp)
 
 | Captura | Figuras / pose | Antes e depois | 40% |
 | --- | --- | --- | --- |
@@ -104,41 +142,47 @@ Guaxinim/Tatu no antes ainda têm a arte/altura antigas da main; o depois usa o 
 | sleep_3 | raccoon_male, raccoon_female, armadillo_male, armadillo_female / sleep | [Par](lobby_poses/sleep_3_before_after.webp) | [Redução](lobby_poses/sleep_3_before_after_40.webp) |
 | work | bento, nick, iris, vespera / work | [Par](lobby_poses/work_before_after.webp) | [Redução](lobby_poses/work_before_after_40.webp) |
 
-O [registro das capturas](lobby_poses/capture.json) inclui câmeras, posições, origens e hashes dos PNG brutos,
-que ficam fora da main. Todas as 52 poses aparecem nessas provas em situações de parado, banco, beliche ou trabalho.
-As quatro poses de trabalho estão juntas no laboratório apenas para comparar os corpos; os postos finais continuam
-Forja/Bento, Depósito/Nick e Pesquisa/Íris-Véspera, como definidos no jogo.
+As quatro poses de trabalho estão juntas no laboratório só para comparar os corpos; os postos continuam
+Forja/Bento, Depósito/Nick e Pesquisa/Íris-Véspera, como no jogo.
 
 ## QA de design
 
-Checklist de [qa.md](qa.md), com o limite da entrega de arte: não aprova a lógica futura de troca/contexto/save.
+Checklist de [qa.md](qa.md), com o limite de uma entrega de arte: não aprova a troca de roupa por contexto, o save
+nem a integração.
 
 ### Rodada 1 — VEREDITO: REPROVADO
 
-- **Média, Nick/work:** a geração trouxe luvas da roupa de expedição. Refeito com mãos naturais livres.
-- **Alta, Bento/seat:** silhueta não cabia no canvas ao manter a escala. Refeito com pernas/cauda mais compactas.
-- **Alta, registro:** trabalho do Bento e alguns bancos passavam da borda ao alinhar só a ponta mais baixa do pé.
-  Registro passou a considerar a região dos dois pés e a acomodar a silhueta por translação, sem deformação.
-- **Média, pranchas:** ampliar cada pose para encher o quadro mascarava a escala. Pranchas refeitas em pixels por metro.
+- **Alta, idle_0:** o par dos fundadores em pé saiu com placas brancas nos dois lados. O script pegava a entrada inteira
+  do herói em `combat_art.json` em vez do `idle`. Corrigido em `capture_lobby.gd` e refeito.
+- **Média, franja magenta:** milhares de pixels roxos por sprite no contorno. O recorte passou a tirar o excesso de
+  magenta; sobram no máximo 8 por sprite.
+- **Média, escala do sentado:** pedia uma regra só e prova do quadril no banco. A regra do banco foi escrita por
+  modelo, e a prova na Godot entrou na página (`seat_scale_check`).
+- **Média, Release:** os originais ainda não estavam publicados. Publicados, com o sha256 no contrato.
+- **Baixa:** números da página, cauda a 2 px da borda (agora 5 px) e o cabeçalho do `registration.json`. Corrigidos.
 
 ### Rodada 2 — VEREDITO: APROVADO
 
-52 PNG RGBA com alfa, canvas e pivôs conferidos; nenhuma silhueta cortada; figurinos consistentes, braços/mãos
-nas corujas e mãos livres no Nick; reduções em cor/cinza.17 pares reais na Godot conferem pé no chão, banco e
-corpo apoiado nos beliches. Helper gera 52 WebP idênticos aos da prova. Sem problema alto ou médio nesta entrega.
-Observação baixa: os controles de recruta usam fallback da main e os encaixes novos precisam ser ligados pelo
-integrador; este PR não implementa esse fluxo. O aceite visual final continua com o Lucas.
+Sem problema alto ou médio. Conferido: as 52 fontes (RGBA, canvas, hash, RGB zerado, nenhuma borda tocada, sem
+pontos soltos, o ameixa da coruja intacto), registro e centímetros das correções, os 17 pares iguais às fotos brutas
+com câmeras e posições do #251, a prova do sentado, as faixas da página contra o audit, a Release baixada e
+convertida pelo helper em 52 WebP iguais byte a byte, e o escopo (só `docs/design/lobby_poses*`). Observações baixas,
+para o Lucas decidir:
+- o Bento, o cão e o sapo sentados ficam visivelmente menores que em pé (cabeça perto de 78%); dá para regerar esses
+  sentados com a canela mais curta se incomodar no jogo;
+- o galão da Cantina em x 17,6 cobre a cabeça de quem senta ali;
+- um leve tom ameixa nas pontas do pelo, só visível com zoom.
 
-A suíte inteira já passou na mesma base `5bb29281` (92/92, paridade48/48); não foi repetida para imagens em docs/,
-que têm `.gdignore`. Captura/protótipo e validação de arte foram executados nesta entrega.
+A suíte inteira passou na mesma base `204f8f7`: 96 de 96, paridade 48 de 48.
 
 ## Originais e integração
 
-Fontes e tag vinculadas no PR. PNG de produção e atlas ficam só na tag/Release independente, nunca na main.
-Nenhum arquivo de `scripts/`, `data/`, `tests/`, `tools/` ou `art/` foi alterado, nem ids existentes.
+Os 52 PNG encaixados, as 52 imagens do gerador e os scripts de recorte e encaixe ficam na Release
+[`awesomic-249-lobby-originals`](https://github.com/lucasyemz/after-humans-godot/releases/tag/awesomic-249-lobby-originals),
+nunca na main. Os originais do #251 continuam onde o Codex os deixou. Nenhum arquivo de `scripts/`, `data/`, `tests/`,
+`tools/` ou `art/` foi alterado, nem ids.
 
 O Claude deve escolher o figurino por contexto, sem substituir a skin de expedição gravada: lobby confortável;
-**Ver personagem**, preparação/saída e chegada mantêm roupa de expedição; trocar depois da chegada. Exploração,
-luta e acampamento fora da Estação usam expedição. Não cadastrar a roupa confortável como uma troca global que
-contamine esses contextos. As variantes de sexo dos recrutas e a integração de suas poses ainda precisam ser
-registradas pelo integrador, sem alterar os ids dos personagens já salvos.
+**Ver personagem**, preparação/saída e chegada mantêm a roupa de expedição; troca depois da chegada. Exploração,
+luta e acampamento fora da Estação usam a expedição. As variantes de sexo dos recrutas e as poses deles ainda precisam
+ser registradas pelo integrador, sem alterar os ids dos personagens já salvos.

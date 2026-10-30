@@ -1,8 +1,8 @@
 {
-  "existing_output": "rejected",
-  "repository_output": "rejected",
   "webp_files": 52,
   "all_byte_identical_to_qa_prototypes": true,
-  "production_changed": false,
-  "corrupt_source_hash": "rejected before output"
+  "existing_output": true,
+  "repository_output": true,
+  "corrupt_source_hash": true,
+  "production_changed": false
 }
