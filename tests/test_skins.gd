@@ -187,7 +187,8 @@ func _watch() -> void:
 	t.check(String(AHCombatArena.hero_art_of(BENTO).idle.portrait).ends_with("watch/portrait.webp"), "e com o retrato dela")
 
 
-## Na tela: a Sala mostra o seletor; a bloqueada não veste; vestir troca a figura e a placa do herói na Estação.
+## Na tela: a Sala mostra o seletor; a bloqueada não veste; vestir troca a figura do herói na Sala (no cômodo, ele segue
+## na roupa do lobby, #249).
 func _screens() -> void:
 	Campaign.state = Campaign.create_initial(1384)
 	var tips: bool = Tips.enabled
@@ -239,8 +240,10 @@ func _screens() -> void:
 		# O escolhido está no cômodo da Sala (#181): a placa dele troca de roupa na hora, sem sair da sala.
 		t.check(station.stage_hero == BENTO and is_instance_valid(station.stage_card)
 			and String(station.stage_card.art().get("file", "")) == "res://art/combat/heroes/nick/idle.webp", "a placa no cômodo da Sala troca na hora")
+		# A placa dele no cômodo fica na roupa confortável do lobby (#249): a skin é a da expedição.
 		resident = station.residents.get(BENTO)
-		t.check(resident != null and resident._texture != before, "e a placa dele na Estação também")
+		t.check(resident != null and resident._texture == before and String(resident.art().get("file", "")).begins_with("res://art/station/lobby/"),
+			"e a placa dele no cômodo continua na roupa do lobby")
 		hud.close_panel()
 		await _frames(3)
 	_tree.unload_current_scene()
