@@ -342,6 +342,14 @@ func _return_report() -> bool:
 	if not await _press(hud, "Entrar no abrigo", "Entrar no abrigo no relatório"):
 		return false
 	t.check(Campaign.state.station.last_return.get("seen", false), "o relatório fica visto")
+	# A primeira volta com escavação (#186; a interface, #274): a fala do Bento e do Nick antes de a fila sair.
+	if not await _until(func(): return hud.briefing_open(), "a fala da primeira escavação abrir", 10.0):
+		return false
+	for line in AHRefugeHud.intro_lines(Campaign.state).size() - 1:
+		if not await _press(hud.briefing, tr("Próximo"), "Próximo na fala da escavação"):
+			return false
+	if not await _press(hud.briefing, tr("Continuar"), "Continuar na fala da escavação"):
+		return false
 	# Depois do relatório, a vista geral: o Próximo passo diz que a equipe precisa dormir, o Dormitório em destaque e
 	# Preparar expedição bloqueado com o motivo (#76).
 	if not await _until(func(): return hud.current == "", "a vista geral depois do relatório"):

@@ -2075,7 +2075,9 @@ func _place_block_marks() -> void:
 		var rect: Rect2 = spec.rect
 		mark.reset_size()
 		mark.size = mark.get_combined_minimum_size()
-		mark.position = Vector2(rect.get_center().x - mark.size.x * 0.5, rect.position.y + 8.0)
+		# O patamar fica na beira da tela: o marcador não sai dela.
+		var screen := get_viewport_rect().size.x
+		mark.position = Vector2(clampf(rect.get_center().x - mark.size.x * 0.5, 8.0, screen - mark.size.x - 8.0), rect.position.y + 8.0)
 		var covered := false
 		for cover in [_menu, _room_card]:
 			if cover != null and cover.visible and cover.get_global_rect().intersects(mark.get_global_rect()):
@@ -3250,8 +3252,8 @@ func _enter_shelter_then(then: Callable) -> void:
 	var c: Dictionary = Campaign.state
 	c.station.last_return.seen = true
 	# A primeira volta com escavação (#186, ponto 10): a fala do Bento e do Nick (ou o cartão), com a fila ainda na
-	# plataforma; depois a fila sai.
-	if AHStationGrid.intro_pending(c) and not briefing_open():
+	# plataforma; depois a fila sai. Com as falas desligadas (AHBriefing.enabled, nos testes de outras telas), nada.
+	if AHBriefing.enabled and AHStationGrid.intro_pending(c) and not briefing_open():
 		AHStationGrid.see_intro(c)
 		station.commit()
 		if is_instance_valid(_report_screen):
