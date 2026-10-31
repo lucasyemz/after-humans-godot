@@ -610,13 +610,16 @@ func hide_residents(hidden: bool) -> void:
 			card.visible = not hidden and not away.has(id)
 
 
-## Com a plataforma ocupada (a fila do relatório ou da partida, quem sai dela, o trem), quem mora nos cantos dela (o
-## fogareiro, a Preparação, os caixotes; #186) sai de cena: ninguém fica atrás da fila nem na frente do trem.
+## Com a plataforma ocupada (a fila do relatório ou da partida, quem sai dela, o trem e quem desceu dele), quem mora nos
+## cantos dela (o fogareiro, a Preparação, os caixotes; #186) sai de cena: ninguém fica atrás da fila nem na frente do
+## trem.
 var _platform_busy := false
 
 
 func _platform_in_use() -> bool:
-	return not lineup.is_empty() or not _leaving.is_empty() or _train_mode != 0 or departure_pending
+	# Quem desceu do trem (o candidato, o segundo da dupla ou o Mercador) fica na plataforma até a decisão.
+	return not lineup.is_empty() or not _leaving.is_empty() or _train_mode != 0 or departure_pending \
+		or is_instance_valid(_candidate) or is_instance_valid(_companion)
 
 
 ## Quem não aparece no cômodo: a fila da plataforma, quem sai dela (#131) e quem ainda vai descer do trem da volta

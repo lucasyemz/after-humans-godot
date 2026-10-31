@@ -168,6 +168,21 @@ func _station(station, c: Dictionary) -> void:
 	station.clear_lineup()
 	await _frames(2)
 	t.check(dora.visible, "e volta quando a fila sai")
+	# O trem reaberto com o candidato esperando a decisão: a Dora também sai de cena.
+	var trng := RandomNumberGenerator.new()
+	trng.seed = 182
+	var first: Dictionary = S._train_animal(c, S.train_classes(c), trng, [])
+	if t.check(not first.is_empty(), "um candidato no trem"):
+		c.station.train.phase = "waiting"
+		c.station.train.candidate_id = first.candidate_id
+		c.station.train.recruit = first.recruit
+		station.open_train(first.candidate_id, false)
+		await _frames(2)
+		t.check(not dora.visible, "o candidato na plataforma esperando a decisão: a Dora sai de cena")
+		station._remove_candidate()
+		c.station.train = S._train_defaults()
+		await _frames(2)
+		t.check(dora.visible, "e volta depois da decisão")
 	# Um cômodo soterrado escolhido (o Ver do Plano): a câmera vai para a vista geral, não fica no cômodo de antes.
 	station.focus_room(S.CHARACTERS, true)
 	station.focus_room(S.RESEARCH, true)
