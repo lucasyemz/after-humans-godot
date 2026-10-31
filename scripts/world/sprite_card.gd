@@ -209,6 +209,22 @@ func head_height() -> float:
 	return body_height * 1.05
 
 
+## A altura da cabeça na pose atual (#70): o topo do que se vê nela, com a mesma folga de head_height(). Ajoelhado no
+## Último Fôlego, o herói fica com uns 60% da altura de pé; o ALVO e o clique seguem a pose, e as placas, não.
+func pose_head_height() -> float:
+	return pose_top() + body_height * 0.05
+
+
+## O topo do que se vê na pose atual, em metros acima do pé: o "top" medido pelo alfa (tools/sync_combat_art.py) ou,
+## sem ele, a âncora menos a altura do corpo.
+func pose_top() -> float:
+	if _art.is_empty():
+		return body_height
+	var foot := float(_art.anchor[1])
+	var top := float(_art.get("top", foot - float(_art.body_reference_pixels)))
+	return (foot - top) * body_height / float(_art.body_reference_pixels)
+
+
 ## A arte que o cartão mostra agora (a entrada de combat_art.json, com os quadros e a âncora).
 func art() -> Dictionary:
 	return _art

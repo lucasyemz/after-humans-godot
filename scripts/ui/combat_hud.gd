@@ -950,7 +950,7 @@ func _process(_delta: float) -> void:
 	if _target_label != null and _target_label.visible and _target_label.has_meta("card"):
 		var pointed: AHSpriteCard = _target_label.get_meta("card")
 		if is_instance_valid(pointed):
-			var top := camera.unproject_position(pointed.global_position + Vector3(0, pointed.head_height() + 0.15, 0))
+			var top := camera.unproject_position(pointed.global_position + Vector3(0, pointed.pose_head_height() + 0.15, 0))
 			_target_label.position = top - Vector2(_target_label.size.x * 0.5, _target_label.size.y)
 			# Nos baixinhos a placa fica acima da cabeça: o ALVO sobe para cima dela.
 			for rect in short_plates:
@@ -1020,7 +1020,7 @@ func _update_hover(camera: Camera3D) -> void:
 	_hover_label.visible = card != null
 	if card != null:
 		_hover_label.reset_size()
-		var top := camera.unproject_position(card.global_position + Vector3(0, card.head_height() + 0.15, 0))
+		var top := camera.unproject_position(card.global_position + Vector3(0, card.pose_head_height() + 0.15, 0))
 		_hover_label.position = top - Vector2(_hover_label.size.x * 0.5, _hover_label.size.y)
 		var plate: Control = _unit_bars.get(unit_id)
 		var tag: Control = plate.get_meta("intent") if plate != null and plate.has_meta("intent") else null
@@ -1378,13 +1378,14 @@ const PLATE_GAP := 8.0
 var _plate_stagger := {}
 
 
-## O retângulo do corpo de um personagem na tela: do pé à cabeça e com a largura do corpo (a placa tem margem
-## transparente; o clique vale no corpo).
+## O retângulo do corpo de um personagem na tela: do pé à cabeça da pose atual (ajoelhado, mais baixo, #70) e com a
+## largura do corpo de pé (a placa tem margem transparente; o clique vale no corpo).
 func _body_rect(camera: Camera3D, card: AHSpriteCard) -> Rect2:
 	var feet := camera.unproject_position(card.global_position)
-	var head := camera.unproject_position(card.global_position + Vector3(0, card.head_height(), 0))
+	var head := camera.unproject_position(card.global_position + Vector3(0, card.pose_head_height(), 0))
+	var standing := camera.unproject_position(card.global_position + Vector3(0, card.head_height(), 0))
 	var height := maxf(feet.y - head.y, 24.0)
-	var width := maxf(height * BODY_WIDTH, 48.0)
+	var width := maxf(maxf(feet.y - standing.y, 24.0) * BODY_WIDTH, 48.0)
 	return Rect2(Vector2(feet.x - width * 0.5, head.y), Vector2(width, height))
 
 

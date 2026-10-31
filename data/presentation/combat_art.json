@@ -16,7 +16,8 @@
 					1086,
 					1448
 				],
-				"portrait": "res://art/ui/portraits/bento.png"
+				"portrait": "res://art/ui/portraits/bento.png",
+				"top": 10.0
 			},
 			"actions": {
 				"cao_punho_sucata": {
@@ -30,7 +31,8 @@
 							600,
 							1248
 						],
-						"body_reference_pixels": 1080
+						"body_reference_pixels": 1080,
+						"top": 167.9
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/bento/cao_punho_sucata_execucao.webp",
@@ -46,7 +48,8 @@
 						"contact_pixels": [
 							1120,
 							465
-						]
+						],
+						"top": 185.9
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/bento/cao_punho_sucata_vfx.webp",
@@ -62,7 +65,8 @@
 						"opacity": 0.78,
 						"life_seconds": 0.6,
 						"target_height_in_bodies": 0.64,
-						"anchor_on_hand": true
+						"anchor_on_hand": true,
+						"top": 248.0
 					}
 				},
 				"cao_impacto_hidraulico": {
@@ -76,7 +80,8 @@
 							615,
 							1298
 						],
-						"body_reference_pixels": 1190
+						"body_reference_pixels": 1190,
+						"top": 107.9
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/bento/cao_impacto_hidraulico_execucao.webp",
@@ -92,7 +97,8 @@
 						"contact_pixels": [
 							1140,
 							470
-						]
+						],
+						"top": 120.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/bento/cao_impacto_hidraulico_vfx.webp",
@@ -108,7 +114,8 @@
 						"opacity": 0.75,
 						"life_seconds": 0.65,
 						"target_height_in_bodies": 0.64,
-						"anchor_on_hand": true
+						"anchor_on_hand": true,
+						"top": 230.0
 					}
 				},
 				"cao_fique_atras_de_mim": {
@@ -122,7 +129,8 @@
 							580,
 							1378
 						],
-						"body_reference_pixels": 1310
+						"body_reference_pixels": 1310,
+						"top": 66.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/bento/cao_fique_atras_de_mim_execucao.webp",
@@ -138,7 +146,8 @@
 						"contact_pixels": [
 							920,
 							450
-						]
+						],
+						"top": 2.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/bento/cao_fique_atras_de_mim_vfx.webp",
@@ -154,7 +163,8 @@
 						"opacity": 0.6,
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.5,
-						"anchor_on_hand": false
+						"anchor_on_hand": false,
+						"top": 85.9
 					}
 				},
 				"cao_nao_estamos_sos": {
@@ -168,7 +178,8 @@
 							595,
 							1420
 						],
-						"body_reference_pixels": 1410
+						"body_reference_pixels": 1410,
+						"top": 10.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/bento/cao_nao_estamos_sos_execucao.webp",
@@ -184,7 +195,8 @@
 						"contact_pixels": [
 							950,
 							600
-						]
+						],
+						"top": 12.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/bento/cao_nao_estamos_sos_vfx.webp",
@@ -200,7 +212,8 @@
 						"opacity": 0.65,
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.24,
-						"anchor_on_hand": false
+						"anchor_on_hand": false,
+						"top": 294.0
 					}
 				}
 			},
@@ -215,7 +228,8 @@
 						590,
 						1428
 					],
-					"body_reference_pixels": 1420
+					"body_reference_pixels": 1420,
+					"top": 8.0
 				},
 				"death": {
 					"file": "res://art/combat/heroes/bento/death.webp",
@@ -227,7 +241,8 @@
 						680,
 						1198
 					],
-					"body_reference_pixels": 1950
+					"body_reference_pixels": 1950,
+					"top": 76.0
 				},
 				"item": {
 					"file": "res://art/combat/heroes/bento/item.webp",
@@ -239,7 +254,8 @@
 						700,
 						1274
 					],
-					"body_reference_pixels": 1253
+					"body_reference_pixels": 1253,
+					"top": 20.0
 				}
 			}
 		},
@@ -257,7 +273,8 @@
 					1178,
 					1335
 				],
-				"portrait": "res://art/ui/portraits/nick.png"
+				"portrait": "res://art/ui/portraits/nick.png",
+				"top": 30.0
 			},
 			"actions": {
 				"gato_corte_fase": {
@@ -271,7 +288,8 @@
 							630,
 							1300
 						],
-						"body_reference_pixels": 1080
+						"body_reference_pixels": 1080,
+						"top": 32.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/nick/gato_corte_fase_execucao.webp",
@@ -287,7 +305,8 @@
 						"contact_pixels": [
 							1140,
 							1000
-						]
+						],
+						"top": 224.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/nick/gato_corte_fase_vfx.webp",
@@ -303,7 +322,8 @@
 						"life_seconds": 0.6,
 						"opacity": 0.7,
 						"target_height_in_bodies": 0.7,
-						"anchor_on_hand": true
+						"anchor_on_hand": true,
+						"top": 96.0
 					}
 				},
 				"gato_salto_entre_ruinas": {
@@ -317,7 +337,8 @@
 							615,
 							1252
 						],
-						"body_reference_pixels": 1100
+						"body_reference_pixels": 1100,
+						"top": 99.9
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/nick/gato_salto_entre_ruinas_execucao.webp",
@@ -334,7 +355,8 @@
 							1170,
 							1020
 						],
-						"anchor_note": "Virtual ground line: authored tucked feet are above it during the jump; scale is shared with preparation."
+						"anchor_note": "Virtual ground line: authored tucked feet are above it during the jump; scale is shared with preparation.",
+						"top": 175.9
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/nick/gato_salto_entre_ruinas_vfx.webp",
@@ -350,7 +372,8 @@
 						"life_seconds": 0.6,
 						"opacity": 0.7,
 						"target_height_in_bodies": 0.7,
-						"anchor_on_hand": true
+						"anchor_on_hand": true,
+						"top": 164.0
 					}
 				},
 				"gato_sumir_na_sombra": {
@@ -364,7 +387,8 @@
 							640,
 							1281
 						],
-						"body_reference_pixels": 1210
+						"body_reference_pixels": 1210,
+						"top": 66.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/nick/gato_sumir_na_sombra_execucao.webp",
@@ -380,7 +404,8 @@
 						"contact_pixels": [
 							750,
 							650
-						]
+						],
+						"top": 265.8
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/nick/gato_sumir_na_sombra_vfx.webp",
@@ -396,7 +421,8 @@
 						"life_seconds": 0.8,
 						"opacity": 0.7,
 						"target_height_in_bodies": 0.34,
-						"anchor_on_hand": false
+						"anchor_on_hand": false,
+						"top": 203.8
 					}
 				},
 				"gato_cacada_precisa": {
@@ -410,7 +436,8 @@
 							640,
 							1298
 						],
-						"body_reference_pixels": 1260
+						"body_reference_pixels": 1260,
+						"top": 36.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/nick/gato_cacada_precisa_execucao.webp",
@@ -426,7 +453,8 @@
 						"contact_pixels": [
 							1520,
 							432
-						]
+						],
+						"top": 62.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/nick/gato_cacada_precisa_vfx.webp",
@@ -442,7 +470,8 @@
 						"life_seconds": 0.6,
 						"opacity": 0.7,
 						"target_height_in_bodies": 0.6,
-						"anchor_on_hand": false
+						"anchor_on_hand": false,
+						"top": 128.1
 					}
 				}
 			},
@@ -457,7 +486,8 @@
 						640,
 						1295
 					],
-					"body_reference_pixels": 1274
+					"body_reference_pixels": 1274,
+					"top": 20.0
 				},
 				"death": {
 					"file": "res://art/combat/heroes/nick/death.webp",
@@ -469,7 +499,8 @@
 						780,
 						1183
 					],
-					"body_reference_pixels": 1600
+					"body_reference_pixels": 1600,
+					"top": 116.0
 				},
 				"item": {
 					"file": "res://art/combat/heroes/nick/item.webp",
@@ -481,7 +512,8 @@
 						695,
 						1298
 					],
-					"body_reference_pixels": 1294
+					"body_reference_pixels": 1294,
+					"top": 4.0
 				}
 			}
 		},
@@ -499,7 +531,8 @@
 					1178,
 					1335
 				],
-				"portrait": "res://art/ui/portraits/iris.png"
+				"portrait": "res://art/ui/portraits/iris.png",
+				"top": 56.0
 			},
 			"actions": {
 				"sapo_carga_voltaica": {
@@ -513,7 +546,8 @@
 							660,
 							1277
 						],
-						"body_reference_pixels": 1190
+						"body_reference_pixels": 1190,
+						"top": 91.9
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/iris/sapo_carga_voltaica_execucao.webp",
@@ -529,7 +563,8 @@
 						"contact_pixels": [
 							1150,
 							250
-						]
+						],
+						"top": 91.9
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/iris/sapo_carga_voltaica_vfx.webp",
@@ -545,7 +580,8 @@
 						"opacity": 0.7,
 						"life_seconds": 0.65,
 						"target_height_in_bodies": 0.6,
-						"anchor_on_hand": false
+						"anchor_on_hand": false,
+						"top": 141.9
 					}
 				},
 				"sapo_coquetel_corrosivo": {
@@ -559,7 +595,8 @@
 							655,
 							1287
 						],
-						"body_reference_pixels": 1190
+						"body_reference_pixels": 1190,
+						"top": 89.9
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/iris/sapo_coquetel_corrosivo_execucao.webp",
@@ -575,7 +612,8 @@
 						"contact_pixels": [
 							1140,
 							190
-						]
+						],
+						"top": 22.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/iris/sapo_coquetel_corrosivo_vfx.webp",
@@ -591,7 +629,8 @@
 						"opacity": 0.7,
 						"life_seconds": 0.65,
 						"target_height_in_bodies": 0.55,
-						"anchor_on_hand": false
+						"anchor_on_hand": false,
+						"top": 318.0
 					}
 				},
 				"sapo_ampola_reparo_vivo": {
@@ -605,7 +644,8 @@
 							735,
 							1287
 						],
-						"body_reference_pixels": 1240
+						"body_reference_pixels": 1240,
+						"top": 38.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/iris/sapo_ampola_reparo_vivo_execucao.webp",
@@ -621,7 +661,8 @@
 						"contact_pixels": [
 							1090,
 							300
-						]
+						],
+						"top": 52.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/iris/sapo_ampola_reparo_vivo_vfx.webp",
@@ -637,7 +678,8 @@
 						"opacity": 0.7,
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.42,
-						"anchor_on_hand": false
+						"anchor_on_hand": false,
+						"top": 74.0
 					}
 				},
 				"sapo_antidoto_campo": {
@@ -651,7 +693,8 @@
 							730,
 							1300
 						],
-						"body_reference_pixels": 1240
+						"body_reference_pixels": 1240,
+						"top": 32.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/iris/sapo_antidoto_campo_execucao.webp",
@@ -667,7 +710,8 @@
 						"contact_pixels": [
 							1060,
 							240
-						]
+						],
+						"top": 83.9
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/iris/sapo_antidoto_campo_vfx.webp",
@@ -683,7 +727,8 @@
 						"opacity": 0.7,
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.42,
-						"anchor_on_hand": false
+						"anchor_on_hand": false,
+						"top": 77.9
 					}
 				}
 			},
@@ -698,7 +743,8 @@
 						734,
 						1269
 					],
-					"body_reference_pixels": 1236
+					"body_reference_pixels": 1236,
+					"top": 32.0
 				},
 				"death": {
 					"file": "res://art/combat/heroes/iris/death.webp",
@@ -710,7 +756,8 @@
 						587.5,
 						1264
 					],
-					"body_reference_pixels": 1208
+					"body_reference_pixels": 1208,
+					"top": 517.6
 				},
 				"hurt": {
 					"file": "res://art/combat/heroes/iris/hurt.webp",
@@ -722,7 +769,8 @@
 						587.5,
 						1264
 					],
-					"body_reference_pixels": 1208
+					"body_reference_pixels": 1208,
+					"top": 113.9
 				}
 			}
 		},
@@ -740,7 +788,8 @@
 					1178,
 					1335
 				],
-				"portrait": "res://art/ui/portraits/vespera.png"
+				"portrait": "res://art/ui/portraits/vespera.png",
+				"top": 26.0
 			},
 			"actions": {
 				"coruja_disparo_perfurante": {
@@ -754,7 +803,8 @@
 							620,
 							1255
 						],
-						"body_reference_pixels": 1150
+						"body_reference_pixels": 1150,
+						"top": 103.9
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/vespera/coruja_disparo_perfurante_execucao.webp",
@@ -770,7 +820,8 @@
 						"contact_pixels": [
 							1140,
 							320
-						]
+						],
+						"top": 109.9
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/vespera/coruja_disparo_perfurante_vfx.webp",
@@ -787,7 +838,8 @@
 						"life_seconds": 0.6,
 						"target_height_in_bodies": 0.64,
 						"anchor_on_hand": false,
-						"flip_with_direction": true
+						"flip_with_direction": true,
+						"top": 546.0
 					}
 				},
 				"coruja_olho_nas_ruinas": {
@@ -801,7 +853,8 @@
 							665,
 							1311
 						],
-						"body_reference_pixels": 1250
+						"body_reference_pixels": 1250,
+						"top": 12.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/vespera/coruja_olho_nas_ruinas_execucao.webp",
@@ -817,7 +870,8 @@
 						"contact_pixels": [
 							1020,
 							210
-						]
+						],
+						"top": 6.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/vespera/coruja_olho_nas_ruinas_vfx.webp",
@@ -834,7 +888,8 @@
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.61,
 						"anchor_on_hand": false,
-						"flip_with_direction": false
+						"flip_with_direction": false,
+						"top": 143.9
 					}
 				},
 				"coruja_granada_fumaca": {
@@ -848,7 +903,8 @@
 							620,
 							1308
 						],
-						"body_reference_pixels": 1200
+						"body_reference_pixels": 1200,
+						"top": 40.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/vespera/coruja_granada_fumaca_execucao.webp",
@@ -864,7 +920,8 @@
 						"contact_pixels": [
 							1120,
 							280
-						]
+						],
+						"top": 46.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/vespera/coruja_granada_fumaca_vfx.webp",
@@ -881,7 +938,8 @@
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.42,
 						"anchor_on_hand": false,
-						"flip_with_direction": false
+						"flip_with_direction": false,
+						"top": 312.0
 					}
 				},
 				"coruja_recurso_emergencia": {
@@ -895,7 +953,8 @@
 							650,
 							1420
 						],
-						"body_reference_pixels": 1280
+						"body_reference_pixels": 1280,
+						"top": 4.0
 					},
 					"execucao": {
 						"file": "res://art/combat/heroes/vespera/coruja_recurso_emergencia_execucao.webp",
@@ -911,7 +970,8 @@
 						"contact_pixels": [
 							1020,
 							300
-						]
+						],
+						"top": 46.0
 					},
 					"vfx": {
 						"file": "res://art/combat/heroes/vespera/coruja_recurso_emergencia_vfx.webp",
@@ -928,7 +988,8 @@
 						"life_seconds": 0.6,
 						"target_height_in_bodies": 0.64,
 						"anchor_on_hand": false,
-						"flip_with_direction": true
+						"flip_with_direction": true,
+						"top": 402.0
 					}
 				}
 			},
@@ -943,7 +1004,8 @@
 						605,
 						1299
 					],
-					"body_reference_pixels": 1272
+					"body_reference_pixels": 1272,
+					"top": 26.0
 				},
 				"death": {
 					"file": "res://art/combat/heroes/vespera/death.webp",
@@ -955,7 +1017,8 @@
 						451.0,
 						1297
 					],
-					"body_reference_pixels": 1271
+					"body_reference_pixels": 1271,
+					"top": 455.7
 				},
 				"hurt": {
 					"file": "res://art/combat/heroes/vespera/hurt.webp",
@@ -967,7 +1030,8 @@
 						451.0,
 						1297
 					],
-					"body_reference_pixels": 1271
+					"body_reference_pixels": 1271,
+					"top": 44.0
 				}
 			}
 		}
@@ -987,7 +1051,8 @@
 					1086,
 					1448
 				],
-				"portrait": "res://art/ui/portraits/dog_recruit_01.png"
+				"portrait": "res://art/ui/portraits/dog_recruit_01.png",
+				"top": 40.0
 			}
 		},
 		"cat_recruit_01": {
@@ -1004,7 +1069,8 @@
 					1178,
 					1336
 				],
-				"portrait": "res://art/ui/portraits/cat_recruit_01.png"
+				"portrait": "res://art/ui/portraits/cat_recruit_01.png",
+				"top": 52.0
 			}
 		},
 		"frog_recruit_01": {
@@ -1021,7 +1087,8 @@
 					1178,
 					1336
 				],
-				"portrait": "res://art/ui/portraits/frog_recruit_01.png"
+				"portrait": "res://art/ui/portraits/frog_recruit_01.png",
+				"top": 92.0
 			}
 		},
 		"owl_recruit_01": {
@@ -1038,7 +1105,8 @@
 					1178,
 					1336
 				],
-				"portrait": "res://art/ui/portraits/owl_recruit_01.png"
+				"portrait": "res://art/ui/portraits/owl_recruit_01.png",
+				"top": 40.0
 			}
 		},
 		"raccoon_recruit_01": {
@@ -1055,7 +1123,8 @@
 					1178,
 					1335
 				],
-				"portrait": "res://art/ui/portraits/raccoon_recruit_01.png"
+				"portrait": "res://art/ui/portraits/raccoon_recruit_01.png",
+				"top": 185.9
 			},
 			"actions": {
 				"rato_frasco": {
@@ -1070,7 +1139,8 @@
 						"canvas": [
 							1178,
 							1335
-						]
+						],
+						"top": 241.8
 					}
 				},
 				"rato_mordida": {
@@ -1085,7 +1155,8 @@
 						"canvas": [
 							1178,
 							1335
-						]
+						],
+						"top": 44.0
 					}
 				},
 				"rato_passagem": {
@@ -1100,7 +1171,8 @@
 						"canvas": [
 							1178,
 							1335
-						]
+						],
+						"top": 207.8
 					}
 				},
 				"rato_poeira": {
@@ -1115,7 +1187,8 @@
 						"canvas": [
 							1178,
 							1335
-						]
+						],
+						"top": 151.9
 					}
 				}
 			},
@@ -1131,7 +1204,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 129.9
 				},
 				"death": {
 					"file": "res://art/combat/recruits/raccoon_recruit_01/death.webp",
@@ -1144,7 +1218,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 411.7
 				},
 				"dodge": {
 					"file": "res://art/combat/recruits/raccoon_recruit_01/dodge.webp",
@@ -1157,7 +1232,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 249.8
 				},
 				"defense": {
 					"file": "res://art/combat/recruits/raccoon_recruit_01/defense.webp",
@@ -1170,7 +1246,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 227.8
 				}
 			}
 		},
@@ -1188,7 +1265,8 @@
 					1178,
 					1335
 				],
-				"portrait": "res://art/ui/portraits/armadillo_recruit_01.png"
+				"portrait": "res://art/ui/portraits/armadillo_recruit_01.png",
+				"top": 279.8
 			},
 			"actions": {
 				"tatu_pancada": {
@@ -1203,7 +1281,8 @@
 						"canvas": [
 							1178,
 							1335
-						]
+						],
+						"top": 261.8
 					}
 				},
 				"tatu_enrolar": {
@@ -1218,7 +1297,8 @@
 						"canvas": [
 							1178,
 							1335
-						]
+						],
+						"top": 443.7
 					}
 				},
 				"tatu_investida": {
@@ -1233,7 +1313,8 @@
 						"canvas": [
 							1178,
 							1335
-						]
+						],
+						"top": 417.7
 					}
 				},
 				"tatu_abrigo": {
@@ -1248,7 +1329,8 @@
 						"canvas": [
 							1178,
 							1335
-						]
+						],
+						"top": 199.9
 					}
 				}
 			},
@@ -1264,7 +1346,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 287.8
 				},
 				"death": {
 					"file": "res://art/combat/recruits/armadillo_recruit_01/death.webp",
@@ -1277,7 +1360,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 419.7
 				},
 				"dodge": {
 					"file": "res://art/combat/recruits/armadillo_recruit_01/dodge.webp",
@@ -1290,7 +1374,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 273.8
 				},
 				"defense": {
 					"file": "res://art/combat/recruits/armadillo_recruit_01/defense.webp",
@@ -1303,7 +1388,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 289.8
 				}
 			}
 		}
@@ -1322,7 +1408,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 67.9
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/robot/defense.webp",
@@ -1335,7 +1422,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 22.0
 				},
 				"support": {
 					"file": "res://art/combat/enemies/robot/support.webp",
@@ -1348,7 +1436,8 @@
 					"canvas": [
 						1179,
 						1334
-					]
+					],
+					"top": 16.0
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/robot/hurt.webp",
@@ -1361,7 +1450,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 32.0
 				},
 				"death": {
 					"file": "res://art/combat/enemies/robot/death.webp",
@@ -1374,7 +1464,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 153.9
 				},
 				"attack1": {
 					"file": "res://art/combat/enemies/robot/attack1.webp",
@@ -1387,7 +1478,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 81.9
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/robot/attack2.webp",
@@ -1400,7 +1492,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 101.9
 				}
 			},
 			"idle": {
@@ -1570,7 +1663,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 205.8
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/robot_fungo/attack2.webp",
@@ -1583,7 +1677,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 209.8
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/robot_fungo/defense.webp",
@@ -1596,7 +1691,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 209.8
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/robot_fungo/hurt.webp",
@@ -1609,7 +1705,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 213.8
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/robot_fungo/dodge.webp",
@@ -1622,7 +1719,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 203.8
 				},
 				"support": {
 					"file": "res://art/combat/enemies/robot_fungo/support.webp",
@@ -1635,7 +1733,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 207.8
 				},
 				"death": {
 					"file": "res://art/combat/enemies/robot_fungo/death.webp",
@@ -1648,7 +1747,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 617.5
 				}
 			},
 			"idle": {
@@ -1830,7 +1930,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 66.0
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/vigia_enferrujado/attack2.webp",
@@ -1843,7 +1944,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 217.8
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/vigia_enferrujado/defense.webp",
@@ -1856,7 +1958,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 131.9
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/vigia_enferrujado/hurt.webp",
@@ -1869,7 +1972,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 229.8
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/vigia_enferrujado/dodge.webp",
@@ -1882,7 +1986,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 235.8
 				},
 				"support": {
 					"file": "res://art/combat/enemies/vigia_enferrujado/support.webp",
@@ -1895,7 +2000,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 185.9
 				},
 				"death": {
 					"file": "res://art/combat/enemies/vigia_enferrujado/death.webp",
@@ -1908,7 +2014,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 737.4
 				}
 			},
 			"idle": {
@@ -1922,7 +2029,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 211.8
 			}
 		},
 		"cao_eco": {
@@ -1938,7 +2046,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 487.6
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/cao_eco/attack2.webp",
@@ -1951,7 +2060,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 483.6
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/cao_eco/defense.webp",
@@ -1964,7 +2074,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 447.7
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/cao_eco/hurt.webp",
@@ -1977,7 +2088,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 247.8
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/cao_eco/dodge.webp",
@@ -1990,7 +2102,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 397.7
 				},
 				"support": {
 					"file": "res://art/combat/enemies/cao_eco/support.webp",
@@ -2003,7 +2116,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 347.7
 				},
 				"death": {
 					"file": "res://art/combat/enemies/cao_eco/death.webp",
@@ -2016,7 +2130,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 613.5
 				}
 			},
 			"idle": {
@@ -2030,7 +2145,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 371.7
 			}
 		},
 		"condutor_raiz": {
@@ -2046,7 +2162,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 219.8
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/condutor_raiz/defense.webp",
@@ -2059,7 +2176,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 381.7
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/condutor_raiz/hurt.webp",
@@ -2072,7 +2190,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 171.9
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/condutor_raiz/dodge.webp",
@@ -2085,7 +2204,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 137.9
 				},
 				"support": {
 					"file": "res://art/combat/enemies/condutor_raiz/support.webp",
@@ -2098,7 +2218,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 221.8
 				},
 				"death": {
 					"file": "res://art/combat/enemies/condutor_raiz/death.webp",
@@ -2111,7 +2232,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 537.6
 				}
 			},
 			"idle": {
@@ -2125,7 +2247,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 223.8
 			}
 		},
 		"sussurrador": {
@@ -2141,7 +2264,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 101.9
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/sussurrador/attack2.webp",
@@ -2154,7 +2278,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 209.8
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/sussurrador/defense.webp",
@@ -2167,7 +2292,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 279.8
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/sussurrador/hurt.webp",
@@ -2180,7 +2306,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 221.8
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/sussurrador/dodge.webp",
@@ -2193,7 +2320,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 195.9
 				},
 				"support": {
 					"file": "res://art/combat/enemies/sussurrador/support.webp",
@@ -2206,7 +2334,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 137.9
 				},
 				"death": {
 					"file": "res://art/combat/enemies/sussurrador/death.webp",
@@ -2219,7 +2348,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 867.4
 				}
 			},
 			"idle": {
@@ -2233,7 +2363,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 191.9
 			}
 		},
 		"rastejante_raiz": {
@@ -2249,7 +2380,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 385.7
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/rastejante_raiz/attack2.webp",
@@ -2262,7 +2394,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 439.7
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/rastejante_raiz/defense.webp",
@@ -2275,7 +2408,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 441.7
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/rastejante_raiz/hurt.webp",
@@ -2288,7 +2422,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 367.7
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/rastejante_raiz/dodge.webp",
@@ -2301,7 +2436,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 321.8
 				},
 				"support": {
 					"file": "res://art/combat/enemies/rastejante_raiz/support.webp",
@@ -2314,7 +2450,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 413.7
 				},
 				"death": {
 					"file": "res://art/combat/enemies/rastejante_raiz/death.webp",
@@ -2327,7 +2464,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 689.5
 				}
 			},
 			"idle": {
@@ -2341,7 +2479,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 341.7
 			}
 		},
 		"ninho_errante": {
@@ -2357,7 +2496,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 347.7
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/ninho_errante/attack2.webp",
@@ -2370,7 +2510,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 365.7
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/ninho_errante/defense.webp",
@@ -2383,7 +2524,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 383.7
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/ninho_errante/hurt.webp",
@@ -2396,7 +2538,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 287.8
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/ninho_errante/dodge.webp",
@@ -2409,7 +2552,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 263.8
 				},
 				"support": {
 					"file": "res://art/combat/enemies/ninho_errante/support.webp",
@@ -2422,7 +2566,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 363.7
 				},
 				"death": {
 					"file": "res://art/combat/enemies/ninho_errante/death.webp",
@@ -2435,7 +2580,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 573.6
 				}
 			},
 			"idle": {
@@ -2449,7 +2595,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 311.8
 			}
 		},
 		"carcaca_colonizada": {
@@ -2465,7 +2612,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 351.7
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/carcaca_colonizada/attack2.webp",
@@ -2478,7 +2626,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 385.7
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/carcaca_colonizada/defense.webp",
@@ -2491,7 +2640,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 351.7
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/carcaca_colonizada/hurt.webp",
@@ -2504,7 +2654,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 401.7
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/carcaca_colonizada/dodge.webp",
@@ -2517,7 +2668,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 369.7
 				},
 				"support": {
 					"file": "res://art/combat/enemies/carcaca_colonizada/support.webp",
@@ -2530,7 +2682,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 371.7
 				},
 				"death": {
 					"file": "res://art/combat/enemies/carcaca_colonizada/death.webp",
@@ -2543,7 +2696,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 473.6
 				}
 			},
 			"idle": {
@@ -2557,7 +2711,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 359.7
 			}
 		},
 		"porteiro": {
@@ -2573,7 +2728,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 297.8
 				},
 				"attack2": {
 					"file": "res://art/combat/enemies/porteiro/attack2.webp",
@@ -2586,7 +2742,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 165.9
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/porteiro/defense.webp",
@@ -2599,7 +2756,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 261.8
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/porteiro/hurt.webp",
@@ -2612,7 +2770,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 209.8
 				},
 				"dodge": {
 					"file": "res://art/combat/enemies/porteiro/dodge.webp",
@@ -2625,7 +2784,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 185.9
 				},
 				"support": {
 					"file": "res://art/combat/enemies/porteiro/support.webp",
@@ -2638,7 +2798,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 167.9
 				},
 				"death": {
 					"file": "res://art/combat/enemies/porteiro/death.webp",
@@ -2651,7 +2812,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 557.6
 				}
 			},
 			"idle": {
@@ -2665,7 +2827,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 173.9
 			}
 		},
 		"recreador": {
@@ -2680,7 +2843,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 52.0
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/recreador/defense.webp",
@@ -2692,7 +2856,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 127.9
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/recreador/hurt.webp",
@@ -2704,7 +2869,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 125.9
 				},
 				"support": {
 					"file": "res://art/combat/enemies/recreador/support.webp",
@@ -2716,7 +2882,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 52.0
 				},
 				"death": {
 					"file": "res://art/combat/enemies/recreador/death.webp",
@@ -2728,7 +2895,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 321.8
 				}
 			},
 			"idle": {
@@ -2741,7 +2909,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 50.0
 			}
 		},
 		"pipoco": {
@@ -2756,7 +2925,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 201.8
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/pipoco/defense.webp",
@@ -2768,7 +2938,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 281.8
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/pipoco/hurt.webp",
@@ -2780,7 +2951,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 107.9
 				},
 				"support": {
 					"file": "res://art/combat/enemies/pipoco/support.webp",
@@ -2792,7 +2964,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 107.9
 				},
 				"death": {
 					"file": "res://art/combat/enemies/pipoco/death.webp",
@@ -2804,7 +2977,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 523.6
 				}
 			},
 			"idle": {
@@ -2817,7 +2991,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 105.9
 			}
 		},
 		"enraizado": {
@@ -2832,7 +3007,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 18.0
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/enraizado/defense.webp",
@@ -2844,7 +3020,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 95.9
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/enraizado/hurt.webp",
@@ -2856,7 +3033,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 95.9
 				},
 				"death": {
 					"file": "res://art/combat/enemies/enraizado/death.webp",
@@ -2868,7 +3046,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 363.7
 				}
 			},
 			"idle": {
@@ -2881,7 +3060,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 16.0
 			}
 		},
 		"broto": {
@@ -2896,7 +3076,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 119.9
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/broto/defense.webp",
@@ -2908,7 +3089,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 285.8
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/broto/hurt.webp",
@@ -2920,7 +3102,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 119.9
 				},
 				"death": {
 					"file": "res://art/combat/enemies/broto/death.webp",
@@ -2932,7 +3115,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 551.6
 				}
 			},
 			"idle": {
@@ -2945,7 +3129,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 117.9
 			}
 		},
 		"carrasco_industrial": {
@@ -2960,7 +3145,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 44.0
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/carrasco_industrial/defense.webp",
@@ -2972,7 +3158,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 165.9
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/carrasco_industrial/hurt.webp",
@@ -2984,7 +3171,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 117.9
 				},
 				"death": {
 					"file": "res://art/combat/enemies/carrasco_industrial/death.webp",
@@ -2996,7 +3184,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 317.8
 				}
 			},
 			"idle": {
@@ -3009,7 +3198,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 44.0
 			}
 		},
 		"faisca": {
@@ -3024,7 +3214,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 537.6
 				},
 				"defense": {
 					"file": "res://art/combat/enemies/faisca/defense.webp",
@@ -3036,7 +3227,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 603.5
 				},
 				"hurt": {
 					"file": "res://art/combat/enemies/faisca/hurt.webp",
@@ -3048,7 +3240,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 493.6
 				},
 				"death": {
 					"file": "res://art/combat/enemies/faisca/death.webp",
@@ -3060,7 +3253,8 @@
 					"canvas": [
 						1178,
 						1335
-					]
+					],
+					"top": 703.5
 				}
 			},
 			"idle": {
@@ -3073,7 +3267,8 @@
 				"canvas": [
 					1178,
 					1335
-				]
+				],
+				"top": 489.6
 			}
 		}
 	},
@@ -3138,7 +3333,8 @@
 					664.0,
 					1429
 				],
-				"body_reference_pixels": 1419
+				"body_reference_pixels": 1419,
+				"top": 10.0
 			},
 			"walk": {
 				"file": "res://art/civilians/merchant/walk.webp",
@@ -3150,7 +3346,8 @@
 					488.0,
 					1429
 				],
-				"body_reference_pixels": 1419
+				"body_reference_pixels": 1419,
+				"top": 24.0
 			},
 			"trade": {
 				"file": "res://art/civilians/merchant/trade.webp",
@@ -3162,7 +3359,8 @@
 					635.9,
 					1429
 				],
-				"body_reference_pixels": 1419
+				"body_reference_pixels": 1419,
+				"top": 10.0
 			},
 			"portrait": "res://art/ui/portraits/merchant.webp"
 		}

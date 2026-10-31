@@ -20,6 +20,10 @@
   contrato docs/design/merchant/contract.json: a âncora na bota de apoio de cada pose e a altura do corpo (1,72 m, como
   o Bento). Sem a pasta da Unreal, só esta parte:
       python tools/sync_combat_art.py --npcs
+- O topo do que se vê em cada pose (#70, "top", nos pixels da tela original): medido pelo alfa do WebP que o jogo usa,
+  para o ALVO e o clique ficarem na altura da pose atual (o herói ajoelhado no Último Fôlego é bem mais baixo que de
+  pé). Toda gravação do manifesto mede de novo; sem a pasta da Unreal, só esta parte:
+      python tools/sync_combat_art.py --tops
 
 As imagens viram WebP com metade da resolução (o jogo nunca mostra mais que isso); as medidas no manifesto ficam nos
 pixels originais e o jogo converte pela largura real da textura.
@@ -108,6 +112,35 @@ def measured(image: Image.Image) -> dict:
     left, top, right, bottom = image.getchannel("A").point(lambda a: 255 if a > 24 else 0).getbbox()
     return {"anchor": [(left + right) / 2, bottom], "body_reference_pixels": bottom - top, "body_width_pixels": right - left,
             "canvas": [image.width, image.height]}
+
+
+def with_tops(manifest: dict) -> dict:
+    """Acrescenta "top" a cada pose de imagem única do manifesto: a primeira linha visível (alfa acima de 24) do WebP,
+    convertida para os pixels da tela original. As folhas de quadros ficam sem: o topo delas é a âncora menos a altura
+    do corpo, já medida pelo alfa."""
+    def visit(node) -> None:
+        if isinstance(node, dict):
+            if "file" in node and "canvas" in node and "anchor" in node and "frames" not in node:
+                path = PROTO / node["file"].removeprefix("res://")
+                if path.exists():
+                    image = Image.open(path).convert("RGBA")
+                    box = image.getchannel("A").point(lambda a: 255 if a > 24 else 0).getbbox()
+                    if box is not None:
+                        node["top"] = round(box[1] * node["canvas"][1] / image.height, 1)
+            for value in node.values():
+                visit(value)
+    visit(manifest)
+    return manifest
+
+
+def write_manifest(manifest: dict) -> None:
+    MANIFEST.parent.mkdir(parents=True, exist_ok=True)
+    MANIFEST.write_text(json.dumps(with_tops(manifest), ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
+
+
+def tops_only() -> None:
+    """Sem a pasta da Unreal: só mede de novo o topo de cada pose, no manifesto que já existe."""
+    write_manifest(json.loads(MANIFEST.read_text(encoding="utf-8")))
 
 
 def with_portrait(idle: dict, name: str) -> dict:
@@ -207,7 +240,7 @@ def codex_reactions_only(source: Path) -> None:
     for hero_id, states in codex_reactions(source).items():
         manifest["heroes"][hero_id]["reactions"].update(states)
         print(hero_id, ", ".join(states))
-    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
+    write_manifest(manifest)
 
 
 def npcs() -> dict:
@@ -230,7 +263,7 @@ def npcs_only() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     manifest["npcs"] = npcs()
     print("npcs:", ", ".join(manifest["npcs"]))
-    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
+    write_manifest(manifest)
 
 
 def enemy_pose_files(spec: dict) -> dict:
@@ -339,8 +372,7 @@ def main() -> None:
     manifest = {"schema_version": 1, "scale_note": "Medidas em pixels da imagem original; a textura pode ser menor.",
                 "heroes": heroes(), "recruits": recruits(), "enemies": {**enemies(), **gallery_enemies()}, "icons": icons(),
                 "audio": audio(), "npcs": npcs()}
-    MANIFEST.parent.mkdir(parents=True, exist_ok=True)
-    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
+    write_manifest(manifest)
     size = sum(f.stat().st_size for f in ART.rglob("*") if f.is_file()) + sum(f.stat().st_size for f in AUDIO.rglob("*") if f.is_file())
     print(f"heróis: {len(manifest['heroes'])}, inimigos: {len(manifest['enemies'])}, ícones: {len(manifest['icons'])}, "
           f"sons: {len(manifest['audio'])}; {size / 1e6:.1f} MB em art/combat e audio/combat")
@@ -354,5 +386,7 @@ if __name__ == "__main__":
         codex_reactions_only(Path(rest[0]) if rest else CODEX_REACTIONS_SOURCE)
     elif "--npcs" in sys.argv:
         npcs_only()
+    elif "--tops" in sys.argv:
+        tops_only()
     else:
         main()
