@@ -11,22 +11,15 @@ const S := preload("res://scripts/flow/station_rules.gd")
 
 const STATION_END := 27.6
 const CORE_X1 := 33.6
-const LEFT_END := -12.4
+## A ponta esquerda da grade (AHStationLayout.GRID_X0) e o piso do 3º subsolo, em metros.
+const LEFT_END := -14.4
+const BOTTOM := -13.6
 const DOOR_X := 22.0
 const PANEL_SLIDE := 3.0
 
-## Cômodos (a tabela Rooms da Unreal, na ordem do menu): extensão em X, piso e teto e a faixa livre de passeio.
-const ROOMS := [
-	{"id": "characters", "x0": -0.4, "x1": 7.6, "floor": -5.2, "ceiling": -2.0, "lane": [1.1, 6.1]},
-	{"id": "canteen", "x0": 15.6, "x1": STATION_END, "floor": -5.2, "ceiling": -2.0, "lane": [17.2, 25.6]},
-	{"id": "bar", "x0": 7.6, "x1": 15.6, "floor": -5.2, "ceiling": -2.0, "lane": [9.1, 14.1]},
-	{"id": "dormitory", "x0": -12.4, "x1": -0.4, "floor": -5.2, "ceiling": -2.0, "lane": [-10.9, -1.9]},
-	{"id": "forge", "x0": 11.6, "x1": 21.6, "floor": -10.4, "ceiling": -6.2, "lane": [13.6, 19.6]},
-	{"id": "depot", "x0": 5.6, "x1": 11.6, "floor": -9.4, "ceiling": -6.2, "lane": [7.2, 10.3]},
-	{"id": "research", "x0": -6.4, "x1": 5.6, "floor": -9.4, "ceiling": -6.2, "lane": [-4.9, 4.1]},
-	{"id": "preparation", "x0": 21.6, "x1": STATION_END, "floor": -9.4, "ceiling": -6.2, "lane": [22.9, 26.2]},
-	{"id": "infirmary", "x0": -12.4, "x1": -6.4, "floor": -9.4, "ceiling": -6.2, "lane": [-11.2, -7.6]},
-]
+## Os cômodos na ordem do menu e do Plano da Estação. Onde cada um fica sai da grade da campanha (AHStationLayout, #186):
+## room_def e rooms dão a extensão em X, o piso e o teto, a faixa livre de passeio e a profundidade de quem anda ali.
+const ROOM_ORDER := ["characters", "canteen", "bar", "dormitory", "forge", "depot", "research", "preparation", "infirmary"]
 ## Profundidade em que os moradores ficam (a faixa de passeio da Unreal, Y -330).
 const LANE_Z := -3.3
 ## Chance de um morador dividir um cômodo já ocupado (no máximo dois).
@@ -38,9 +31,12 @@ const TRAIN_WALK_SPEED := 3.0
 const STOP_GAP := 1.1
 ## Quantas vezes quem chega num ponto cheio procura outro antes de parar mesmo assim (a faixa sem lugar nenhum).
 const REROUTE_LIMIT := 12
-## Banco atrás da mesa da Cantina: os dois lugares e a profundidade (CanteenSeats, CanteenSeatY).
+## Banco atrás da mesa da Cantina: os dois lugares e a profundidade (CanteenSeats, CanteenSeatY), no molde da Cantina
+## (o deslocamento até a vaga sai de room_def). Com a Cantina no fogareiro da plataforma, os bancos são os dois do lado dele.
 const CANTEEN_SEATS := [17.6, 19.4]
 const CANTEEN_SEAT_Z := -5.94
+const PLATFORM_SEATS := [11.3, 14.5]
+const PLATFORM_SEAT_Z := -9.3
 ## Trabalho por sala (#80): o herói fundador, o cômodo e a pose. Só vale com o cômodo recuperado e ligado.
 const WORK_POSES := {"hero_cao_bento": "forge", "hero_gato_nick": "depot", "hero_sapo_iris": "research", "hero_coruja_vespera": "research"}
 ## A fila do relatório e da partida na plataforma, diante da parede de serviço (ReportCenterX, ReportSpacing, ReportY).
@@ -86,8 +82,12 @@ const LEAVE_HOLD := 2.5
 ## A câmera da vista geral anda para os lados (#131): o deslocamento em metros, nos limites (na distância da vista geral,
 ## cerca de 330 px para cada lado: as pontas da Estação chegam perto do meio da tela).
 const PAN_RANGE := Vector2(-12.0, 13.0)
+## E para baixo (#186): o 3º subsolo aparece arrastando a vista geral (m; 0 é a vista da plataforma e dos dois primeiros).
+const PAN_Y_RANGE := Vector2(-1.6, 0.0)
 ## Ao escolher um cômodo, a câmera aproxima: as paredes do lado saem um pouco do quadro (m).
 const ROOM_CROP := 0.6
+## A largura mínima (m) do quadro de um canto da plataforma.
+const PLATFORM_FRAME := 3.6
 ## A distância mínima (m) de quem desce atrás para quem vai na frente.
 const FOLLOW_GAP := 1.0
 ## Quanto antes de parar o freio começa (s).
@@ -117,7 +117,10 @@ var _asking_overview := false
 var _hold_until := 0
 ## O deslocamento da vista geral (m) e se a câmera está nela (só ali ele vale).
 var pan := 0.0
+var pan_y := 0.0
 var _in_overview := true
+## A grade montada (AHStationLayout.signature): quando muda, a cena remonta a grade.
+var _grid_signature := ""
 var _build: AHStationBuild
 var _walkers: Array = []
 var occlusion: AHOcclusion
@@ -187,12 +190,6 @@ func _ready() -> void:
 	_build.build()
 	# O que liga e desliga fica separado; o resto vira uma malha por material.
 	var keep := {}
-	for nodes in _build.dressing.values():
-		for node in nodes:
-			keep[node] = true
-	for entry in _build.stock:
-		for node in entry[1]:
-			keep[node] = true
 	for node in _build.wagon:
 		keep[node] = true
 		_wagon_base[node] = node.position
@@ -202,9 +199,9 @@ func _ready() -> void:
 	occlusion.name = "Occlusion"
 	add_child(occlusion)
 	occlusion.scan(self)
+	_build_grid(campaign)
 	_build_camera()
 	_build_post()
-	_build_sound_loops()
 	hud = AHRefugeHud.new()
 	hud.station = self
 	var layer := CanvasLayer.new()
@@ -262,8 +259,38 @@ func commit() -> void:
 	refresh()
 
 
+## Monta (ou remonta) a grade (#186): os cômodos nas vagas, os blocos, os patamares e a plataforma improvisada. O
+## mobiliário, o estoque e as luzes de cada sala ficam separados (ligam e desligam); o resto vira uma malha por material.
+func _build_grid(campaign: Dictionary) -> void:
+	if _build.grid_root != null and is_instance_valid(_build.grid_root):
+		occlusion.forget(_build.grid_root)
+	_build.build_grid(campaign)
+	_grid_signature = AHStationLayout.signature(campaign)
+	var keep := {}
+	for nodes in _build.dressing.values():
+		for node in nodes:
+			keep[node] = true
+	for entry in _build.stock:
+		for node in entry[1]:
+			keep[node] = true
+	var builder := _build.b
+	var main_root := builder.root
+	builder.root = _build.grid_root
+	builder.merge_static(keep)
+	builder.root = main_root
+	occlusion.scan(_build.grid_root)
+	_build_sound_loops()
+
+
 func refresh() -> void:
 	var campaign: Dictionary = Campaign.state
+	# A grade mudou (um cômodo construído, a Cantina ou o Depósito saindo da plataforma): a cena remonta, e os moradores
+	# voltam aos cômodos de agora.
+	if _build != null and AHStationLayout.signature(campaign) != _grid_signature:
+		_build_grid(campaign)
+		var rng := RandomNumberGenerator.new()
+		rng.randomize()
+		_place_residents(rng)
 	var running := S.running_rooms(campaign)
 	for room_id in _build.room_lights:
 		var light: OmniLight3D = _build.room_lights[room_id]
@@ -276,8 +303,12 @@ func refresh() -> void:
 	# O mobiliário some nos cômodos vazios (nível 0: Forja, Pesquisa, Bar e Dormitório numa jornada nova).
 	for room_id in _build.dressing:
 		# "infirmary@2": a peça que só aparece no nível 2.
+		# "infirmary@=1": a peça que só aparece no nível 1 (os leitos que esperam a melhoria).
 		var parts: PackedStringArray = String(room_id).split("@")
-		var furnished := S.room_level(campaign, parts[0]) >= (int(parts[1]) if parts.size() > 1 else 1)
+		var level := S.room_level(campaign, parts[0])
+		var furnished := level >= 1
+		if parts.size() > 1:
+			furnished = level == int(parts[1].trim_prefix("=")) if parts[1].begins_with("=") else level >= int(parts[1])
 		for node in _build.dressing[room_id]:
 			if is_instance_valid(node):
 				node.visible = furnished
@@ -303,6 +334,9 @@ func _process(delta: float) -> void:
 	if _reopen_pending:
 		_tick_reopen()
 	_walk(delta)
+	if _platform_in_use() != _platform_busy:
+		_platform_busy = not _platform_busy
+		hide_residents(_residents_hidden)
 	if is_instance_valid(stage_card):
 		# A respiração do parado, como a dos moradores esperando.
 		stage_card.scale = Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
@@ -315,12 +349,14 @@ func _process(delta: float) -> void:
 		# enquadramento (a Estação inteira, com o HUD oculto) sai como foi pedido.
 		_go(_overview_key() if overview else held[0], held[1], held[2])
 		_in_overview = overview
-	if _build.ember_light:
-		# Brasas: variação lenta e pequena (duas senoides fora de fase), sem piscar.
-		var time := Time.get_ticks_msec() * 0.001
-		if not _build.ember_light.has_meta("energy"):
-			_build.ember_light.set_meta("energy", _build.ember_light.light_energy)
-		_build.ember_light.light_energy = float(_build.ember_light.get_meta("energy")) * (1.0 + 0.1 * sin(time * 6.3) + 0.05 * sin(time * 14.1 + 1.3))
+	# Brasas (a Forja e o fogareiro da plataforma): variação lenta e pequena (duas senoides fora de fase), sem piscar.
+	var time := Time.get_ticks_msec() * 0.001
+	for ember in [_build.ember_light, _build.stove_light]:
+		if ember == null or not is_instance_valid(ember):
+			continue
+		if not ember.has_meta("energy"):
+			ember.set_meta("energy", ember.light_energy)
+		ember.light_energy = float(ember.get_meta("energy")) * (1.0 + 0.1 * sin(time * 6.3) + 0.05 * sin(time * 14.1 + 1.3))
 
 
 # ---------------------------------------------------------------- câmera
@@ -407,12 +443,16 @@ func _framed_key(x0: float, x1: float, y: float, left_px: float, right_px: float
 func _overview_key() -> Dictionary:
 	var key := _framed_key(LEFT_END - 0.5, CORE_X1 + 0.5, -2.4, menu_right, 1900.0, 26.0, -3.0, 0.0)
 	key.pos.x += pan
+	key.pos.y += pan_y
 	return key
 
 
-## Anda a vista geral para os lados (#131), dentro de PAN_RANGE; fora da vista geral, só guarda.
-func set_pan(value: float) -> void:
+## Anda a vista geral para os lados (#131), dentro de PAN_RANGE, e para baixo até o 3º subsolo (#186), dentro de
+## PAN_Y_RANGE; fora da vista geral, só guarda.
+func set_pan(value: float, value_y: float = NAN) -> void:
 	pan = clampf(value, PAN_RANGE.x, PAN_RANGE.y)
+	if not is_nan(value_y):
+		pan_y = clampf(value_y, PAN_Y_RANGE.x, PAN_Y_RANGE.y)
 	if _in_overview and not on_platform and _path.is_empty():
 		_set_goal(_overview_key())
 
@@ -436,10 +476,14 @@ func pan_to_room(room_id: String, left_px: float, right_px: float) -> void:
 	var center_x: float = key.pos.x
 	var screen_x0: float = 960.0 + (room.x0 - center_x) * ppm
 	var screen_x1: float = 960.0 + (room.x1 - center_x) * ppm
+	# O 3º subsolo fica embaixo da vista: escolhido pelas setas, a vista desce até ele (e volta ao subir).
+	var down: float = PAN_Y_RANGE.x if room.floor <= BOTTOM + 0.1 else 0.0
 	if screen_x0 < left_px:
-		set_pan(pan + (screen_x0 - left_px) / ppm)
+		set_pan(pan + (screen_x0 - left_px) / ppm, down)
 	elif screen_x1 > right_px:
-		set_pan(pan + (screen_x1 - right_px) / ppm)
+		set_pan(pan + (screen_x1 - right_px) / ppm, down)
+	elif down != pan_y:
+		set_pan(pan, down)
 
 
 ## A plataforma, o vagão e o fim da linha (PlatformKey da Unreal).
@@ -475,10 +519,23 @@ func focus_clean_overview() -> void:
 func focus_room(room_id: String, instant: bool = false) -> void:
 	var room := room_def(room_id)
 	if room.is_empty():
+		# Soterrado (#186): sem lugar na cena, a vista geral (o painel diz o que escavar).
+		focus_overview(instant)
 		return
 	# Mais perto que a vista do cômodo inteiro (#131): as paredes do lado saem um pouco do quadro.
 	_in_overview = false
-	_go(_framed_key(room.x0 + ROOM_CROP, room.x1 - ROOM_CROP, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
+	var x0: float = room.x0 + ROOM_CROP
+	var x1: float = room.x1 - ROOM_CROP
+	var depth := 0.0
+	if room.place != "grid":
+		# Na plataforma (o fogareiro, os caixotes, a Preparação), o quadro fica no plano de quem anda ali, com pelo menos
+		# PLATFORM_FRAME de largura: a câmera não chega perto do corte (as paredes da frente tapariam o canto).
+		depth = room.z + 0.6
+		var middle := (x0 + x1) * 0.5
+		var half := maxf((x1 - x0) * 0.5, PLATFORM_FRAME * 0.5)
+		x0 = middle - half
+		x1 = middle + half
+	_go(_framed_key(x0, x1, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, depth), false, instant)
 
 
 ## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): o meio da sala entre os painéis, e a
@@ -553,12 +610,28 @@ func hide_residents(hidden: bool) -> void:
 			card.visible = not hidden and not away.has(id)
 
 
+## Com a plataforma ocupada (a fila do relatório ou da partida, quem sai dela, o trem e quem desceu dele), quem mora nos
+## cantos dela (o fogareiro, a Preparação, os caixotes; #186) sai de cena: ninguém fica atrás da fila nem na frente do
+## trem.
+var _platform_busy := false
+
+
+func _platform_in_use() -> bool:
+	# Quem desceu do trem (o candidato, o segundo da dupla ou o Mercador) fica na plataforma até a decisão.
+	return not lineup.is_empty() or not _leaving.is_empty() or _train_mode != 0 or departure_pending \
+		or is_instance_valid(_candidate) or is_instance_valid(_companion)
+
+
 ## Quem não aparece no cômodo: a fila da plataforma, quem sai dela (#131) e quem ainda vai descer do trem da volta
 ## (#76). Esses estão na roupa de expedição; o cômodo mostra a do lobby (#249) só depois que saem da plataforma.
 func _away_ids() -> Array:
 	var away: Array = lineup.map(func(e): return e.hero_id) + _leaving.map(func(e): return e.hero_id)
 	if _train_mode == 4:
 		away.append_array(_arrivals.filter(func(a): return a.card == null).map(func(a): return a.hero_id))
+	if _platform_busy:
+		for walker in _walkers:
+			if room_def(String(walker.get("room", ""))).get("place", "") == "platform":
+				away.append(walker.get("hero_id", walker.get("civilian", "")))
 	return away
 
 
@@ -666,11 +739,20 @@ func _apply_panel(open: float) -> void:
 		_build.slit_light.light_energy = (8.0 if _panel_open < 0.02 else 100.0) / AHStationBuilder.LUMENS_PER_ENERGY
 
 
+## Onde fica o cômodo na campanha de agora (m): {id, x0, x1, floor, ceiling, lane, z, work_z, place, offset}; {} se ele
+## ainda não tem lugar (soterrado).
 static func room_def(room_id: String) -> Dictionary:
-	for room in ROOMS:
-		if room.id == room_id:
-			return room
-	return {}
+	return AHStationLayout.to_meters(AHStationLayout.room(Campaign.state, room_id))
+
+
+## Os cômodos com lugar, na ordem do menu.
+static func rooms() -> Array:
+	var out: Array = []
+	for id in ROOM_ORDER:
+		var room := room_def(id)
+		if not room.is_empty():
+			out.append(room)
+	return out
 
 
 # ---------------------------------------------------------------- filas na plataforma
@@ -860,7 +942,7 @@ func room_screen_rects() -> Dictionary:
 	var out := {}
 	if camera == null or not _path.is_empty():
 		return out
-	for room in ROOMS:
+	for room in rooms():
 		var a := Vector3(room.x0, room.floor, 0.0)
 		var b := Vector3(room.x1, room.ceiling, 0.0)
 		if camera.is_position_behind(a) or camera.is_position_behind(b):
@@ -989,10 +1071,21 @@ func soundscape() -> Dictionary:
 
 
 ## Os loops com lugar (FAHAudio::Loop espacial): o ventilador do Bar e a lâmpada tubular do Depósito.
+## Com a grade, só os que têm sala (o Bar e o Depósito construídos) e no lugar dela; remontada a grade, refeitos.
+var _sound_loops: Array = []
+
+
 func _build_sound_loops() -> void:
+	for player in _sound_loops:
+		if is_instance_valid(player):
+			player.queue_free()
+	_sound_loops.clear()
 	for spec in [["bar", "res://audio/station/bar_fan_loop.ogg", -2.0], ["depot", "res://audio/station/depot_tube_loop.ogg", -6.0]]:
-		var room: Dictionary = ROOMS.filter(func(r): return r.id == spec[0])[0]
+		var room := room_def(spec[0])
+		if room.is_empty() or room.place != "grid":
+			continue
 		var player := AudioStreamPlayer3D.new()
+		_sound_loops.append(player)
 		var stream: AudioStream = load(spec[1])
 		stream.loop = true
 		player.stream = stream
@@ -1000,7 +1093,7 @@ func _build_sound_loops() -> void:
 		player.volume_db = spec[2] + Sound.mix_db(spec[1])
 		player.unit_size = 9.0
 		player.max_distance = 60.0
-		player.position = Vector3((room.x0 + room.x1) * 0.5, room.ceiling - 0.4, LANE_Z)
+		player.position = Vector3((room.x0 + room.x1) * 0.5, room.ceiling - 0.4, room.z)
 		player.autoplay = true
 		add_child(player)
 
@@ -1450,29 +1543,32 @@ const SLEEP_DROP := 10.0
 
 ## Os quatro lugares de quem dorme (m), pelo nível do Dormitório (#176): no nível 1, no chão, da esquerda para a
 ## direita; com os beliches (nível 2), de baixo à esquerda, de baixo à direita, e os de cima.
+## No molde do Dormitório; o deslocamento até a vaga dele sai da grade (#186).
 static func sleep_slots(level: int = 2) -> Array:
 	var out: Array = []
+	var shift := AHStationLayout.offset(Campaign.state, S.DORMITORY)
 	if level < 2:
 		for index in AHStationBuild.FLOOR_SLEEP_X.size():
-			out.append(AHStationBuilder.vu(Vector3(AHStationBuild.FLOOR_SLEEP_X[index],
+			out.append(AHStationBuilder.vu(shift + Vector3(AHStationBuild.FLOOR_SLEEP_X[index],
 				AHStationBuild.FLOOR_SLEEP_Y[index % AHStationBuild.FLOOR_SLEEP_Y.size()], AHStationBuild.BUNK_FLOOR)))
 		return out
 	for tier in 2:
 		for x in AHStationBuild.BUNK_X:
 			# Um pouco para a cabeceira (o travesseiro fica à esquerda) e à frente da cama pintada.
-			out.append(AHStationBuilder.vu(Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
+			out.append(AHStationBuilder.vu(shift + Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
 				AHStationBuild.BUNK_FLOOR + tier * AHStationBuild.BUNK_UPPER + AHStationBuild.MATTRESS_TOP - SLEEP_DROP)))
 	return out
 
 
-## Os leitos da Enfermaria (#121), na ordem em que enchem: o de baixo e o de cima do primeiro beliche, depois os do
-## segundo (nível 2).
+## Os leitos da Enfermaria de 12 m (#139), na ordem em que enchem: os dois em uso no nível 1, depois os do nível 2. No
+## molde dela; o deslocamento até a vaga sai da grade (#186).
 static func infirmary_slots() -> Array:
 	var out: Array = []
-	for x in AHStationBuild.INFIRMARY_BUNK_X:
-		for tier in 2:
-			out.append(AHStationBuilder.vu(Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
-				AHStationBuild.INFIRMARY_FLOOR + tier * AHStationBuild.BUNK_UPPER + AHStationBuild.MATTRESS_TOP - SLEEP_DROP)))
+	var shift := AHStationLayout.offset(Campaign.state, S.INFIRMARY)
+	for bed in AHStationBuild.INFIRMARY_BEDS:
+		# Um pouco para a cabeceira (o travesseiro fica à esquerda) e à frente do leito pintado.
+		out.append(AHStationBuilder.vu(shift + Vector3(bed.x - 12.0, bed.y + 30.0,
+			AHStationBuild.INFIRMARY_FLOOR + AHStationBuild.INFIRMARY_MATTRESS - SLEEP_DROP)))
 	return out
 
 
@@ -1547,7 +1643,7 @@ func _update_sleepers() -> void:
 				# Sem lugar no beliche, de pé no cômodo, cada um no seu ponto da faixa (nunca um por cima do outro).
 				var order: int = S.fallen(campaign).map(func(h): return h.id).find(walker.hero_id)
 				var along := fmod(0.15 + order * 0.29, 0.7) + 0.15
-				card.position = Vector3(spot.x if spot != Vector3.INF else lerpf(place.lane[0], place.lane[1], along), place.floor, LANE_Z)
+				card.position = Vector3(spot.x if spot != Vector3.INF else lerpf(place.lane[0], place.lane[1], along), place.floor, place.z)
 			card.set_facing(1.0)
 			card.scale = Vector3.ONE
 			continue
@@ -1596,7 +1692,7 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 	_seats.clear()
 	var campaign: Dictionary = Campaign.state
 	var occupancy := {}
-	var free_rooms: Array = ROOMS.map(func(r): return r.id)
+	var free_rooms: Array = rooms().map(func(r): return r.id)
 	for entry in S.living(campaign):
 		var art := _hero_art(entry)
 		if art.is_empty():
@@ -1607,7 +1703,7 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 			# Quem se recupera não passeia (_update_sleepers deita no leito); não toma o cômodo de ninguém.
 			room_id = S.INFIRMARY if S.in_bed(entry) else S.DORMITORY
 		elif free_rooms.is_empty() or (not shared.is_empty() and rng.randf() < SHARE_ROOM_CHANCE):
-			room_id = shared[rng.randi_range(0, shared.size() - 1)] if not shared.is_empty() else ROOMS[0].id
+			room_id = shared[rng.randi_range(0, shared.size() - 1)] if not shared.is_empty() else S.DORMITORY
 		else:
 			room_id = free_rooms.pop_at(rng.randi_range(0, free_rooms.size() - 1))
 		if not S.recovering(entry):
@@ -1625,28 +1721,33 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		# O segundo morador do cômodo passeia na metade da direita da faixa.
 		var lane_min: float = lane[0] if occupants == 1 else lane[0] + half
 		var lane_max: float = lane[1]
-		card.position = Vector3(rng.randf_range(lane_min, lane_max), room.floor, LANE_Z + rng.randf_range(-0.3, 0.3))
+		card.position = Vector3(rng.randf_range(lane_min, lane_max), room.floor, room.z + rng.randf_range(-0.3, 0.3))
 		card.set_facing(1.0 if rng.randf() < 0.5 else -1.0)
 		residents[entry.id] = card
 		var walker := {"card": card, "min": lane_min, "max": lane_max, "target": card.position.x, "wait": rng.randf_range(0.5, 4.0),
 			"phase": rng.randf() * TAU, "room": room_id, "idle": poses.idle, "poses": poses, "hero_id": entry.id,
-			"home_z": card.position.z, "floor": room.floor, "seat": -1, "sitting": 0.0,
+			"home_z": card.position.z, "floor": room.floor, "work_z": room.work_z, "seat": -1, "sitting": 0.0,
 			"work": WORK_POSES.get(entry.id, "") == room_id and poses.has("work"),
 			"working": 0.0, "pause": rng.randf_range(1.0, 4.0)}
 		_walkers.append(walker)
 	for civilian_id in campaign.station.residents:
 		var art: Dictionary = _civilian_art.get(civilian_id, {})
-		var room := room_def(S.civilian(civilian_id).get("room", ""))
+		var room_id: String = S.civilian(civilian_id).get("room", "")
+		# O cômodo dele ainda soterrado (#186: a Cora chega antes da Pesquisa): fica no Alojamento até ele ter lugar.
+		if room_def(room_id).is_empty():
+			room_id = S.CHARACTERS
+		var room := room_def(room_id)
 		if art.is_empty() or room.is_empty():
 			continue
 		var card := AHSpriteCard.new()
 		card.body_height = AHCharacterHeights.find(civilian_id)
 		card.show_art(art)
 		add_child(card)
-		card.position = Vector3(lerpf(room.lane[0], room.lane[1], 0.5), room.floor, LANE_Z - 0.4)
+		card.position = Vector3(lerpf(room.lane[0], room.lane[1], 0.5), room.floor, room.z - 0.4)
 		residents[civilian_id] = card
 		# Civil morador: alterna o idle e a pose de trabalho, parado no posto dele.
-		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
+		_walkers.append({"card": card, "civilian": civilian_id, "room": room_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0),
+			"civil_working": false})
 	# Ninguém começa em cima de outro (o morador fica no meio do cômodo, e o herói sorteado podia cair nele).
 	for walker in _walkers:
 		if walker.has("civilian") or not walker.has("hero_id"):
@@ -1771,7 +1872,7 @@ func _walk(delta: float) -> void:
 					walker.pause = randf_range(3.0, 6.0)
 				if walker.pause <= 0.0 and walker.wait > 0.0:
 					card.show_art(walker.poses.work)
-					card.position = Vector3(_work_post(walker), walker.floor, -5.6)
+					card.position = Vector3(_work_post(walker), walker.floor, walker.get("work_z", -5.6))
 					card.set_facing(1.0)
 					card.scale = Vector3.ONE
 					walker.working = randf_range(12.0, 26.0)
@@ -1833,11 +1934,12 @@ func _choose_target(walker: Dictionary, retry: bool = false) -> void:
 		target = walker.min if card.position.x > (walker.min + walker.max) * 0.5 else walker.max
 	# Na Cantina, às vezes vai sentar no banco livre atrás da mesa (quem tem a pose sentada na roupa que veste).
 	if walker.get("room", "") == "canteen" and walker.poses.has("seat") and randf() < 0.45:
-		for seat in CANTEEN_SEATS.size():
+		var seats := canteen_seats()
+		for seat in seats.size():
 			if not _seats.has(seat):
 				_seats[seat] = walker
 				walker.seat = seat
-				target = CANTEEN_SEATS[seat]
+				target = seats[seat].x
 				break
 	walker.target = target
 
@@ -1881,10 +1983,21 @@ func _post_taken(walker: Dictionary) -> bool:
 	return false
 
 
+## Os lugares do banco da Cantina (m, x e profundidade): o de trás da mesa na Cantina construída, deslocado até a vaga, ou
+## o banco ao lado do fogareiro da plataforma.
+static func canteen_seats() -> Array:
+	var room := room_def(S.CANTEEN)
+	if room.get("place", "") == "platform":
+		return PLATFORM_SEATS.map(func(x): return Vector3(x, 0, PLATFORM_SEAT_Z))
+	var shift: Vector3 = room.get("offset", Vector3.ZERO)
+	return CANTEEN_SEATS.map(func(x): return Vector3(x + shift.x, 0, CANTEEN_SEAT_Z))
+
+
 func _sit_down(walker: Dictionary) -> void:
 	var card: AHSpriteCard = walker.card
 	card.show_art(walker.poses.seat)
-	card.position = Vector3(CANTEEN_SEATS[walker.seat], walker.floor, CANTEEN_SEAT_Z)
+	var seat: Vector3 = canteen_seats()[walker.seat]
+	card.position = Vector3(seat.x, walker.floor, seat.z)
 	card.set_facing(1.0)
 	walker.sitting = randf_range(6.0, 11.0)
 

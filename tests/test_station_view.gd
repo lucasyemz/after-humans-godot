@@ -19,12 +19,15 @@ func run(context) -> void:
 	Tips.enabled = false
 	Campaign.save_dir = "user://test-station-view-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(44)
-	_neighbors()
 	var station = await _open()
 	if t.check(station != null, "a Estação abriu"):
 		await _sala_to_map(station)
 		await _lock_marks(station)
 		await _dormitory(station)
+		# Os vizinhos, a vista que anda e os cômodos escolhidos numa Estação inteira: a planta herdada (#186), com os
+		# cômodos na ordem de antes da grade. A cena remonta sem sair da Estação.
+		await _to_legacy(station)
+		_neighbors()
 		await _pan(station)
 		await _rooms(station)
 	if _tree.current_scene != null:
@@ -38,6 +41,20 @@ func run(context) -> void:
 	Tips.enabled = tips
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## Um save de antes da grade, com a Estação quase toda recuperada (o Depósito no nível 2, com sala) e o Bar ainda
+## parado na vaga dele (o nível 0 da planta herdada, com o marcador de construir).
+func _to_legacy(station) -> void:
+	var c: Dictionary = Campaign.state
+	for id in [S.FORGE, S.RESEARCH, S.INFIRMARY]:
+		c.station.rooms[id] = 1
+	c.station.rooms[S.DEPOT] = 2
+	c.station.erase("grid")
+	AHStationGrid.migrate(c)
+	station.commit()
+	await _settle(station)
+	t.check(station._build.dressing.has(S.BAR) and not station.room_def(S.BAR).is_empty(), "a planta herdada: a cena remonta com o Bar")
 
 
 func _neighbors() -> void:
