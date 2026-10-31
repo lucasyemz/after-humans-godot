@@ -135,6 +135,45 @@ func _fight() -> void:
 	await _tree.process_frame
 	await _tree.process_frame
 	t.check(hud._crowded.has(struck) and hud._unit_bars[struck].visible, "no aperto, o alvo confirmado continua com a placa")
+	# O refresh (que o golpe chama fora do _process) já aplica o aperto: nenhuma placa escondida volta, nem por um quadro.
+	hud.refresh()
+	t.equal(_out_of_rule(hud), [], "no aperto, logo depois do refresh, só as placas de quem age e do alvo")
+	# Um golpe de verdade: a vez passa no motor antes da animação, e a placa do alvo fica até a próxima vez começar.
+	var options: Array = hud._options.filter(func(o): return o.enemy_side and not o.targets.is_empty() and o.get("enabled", true))
+	if t.check(not options.is_empty(), "há uma habilidade contra as máquinas"):
+		hud._on_ability(options[0])
+		await _tree.process_frame
+		var marker: Control = hud._markers.filter(func(m): return m.has_meta("unit_id"))[0]
+		var target: String = marker.get_meta("unit_id")
+		hud._select_target(int(marker.get_meta("rank")))
+		hud._via_mouse = false
+		marker.pressed.emit()
+		var frames := 0
+		var shown := 0
+		var wrong: Array = []
+		for i in 1500:
+			await _tree.process_frame
+			if hud.waiting or hud._message.text.begins_with(tr("Vez de")):
+				break
+			frames += 1
+			if hud._has_plate.get(target, false) and hud._unit_bars[target].visible:
+				shown += 1
+			for id in _out_of_rule(hud):
+				if not wrong.has(id):
+					wrong.append(id)
+		t.check(frames > 0 and (shown == frames or not hud._has_plate.get(target, false)),
+			"no aperto, a placa do alvo fica durante o golpe (%d de %d quadros)" % [shown, frames])
+		t.equal(wrong, [], "no aperto, durante o golpe, nenhuma outra placa do aperto aparece")
+
+
+## As placas do aperto à mostra fora da regra: nem de quem age (desde o começo da vez) nem do alvo.
+func _out_of_rule(hud: AHCombatHud) -> Array:
+	var allowed := [hud._spot_actor if hud._spot_actor != "" else hud.session.state.current_turn_unit_id, hud._struck]
+	if hud._target_label.visible and hud._target_label.has_meta("card"):
+		for unit_id in hud.arena.cards:
+			if hud.arena.cards[unit_id] == hud._target_label.get_meta("card"):
+				allowed.append(unit_id)
+	return hud._crowded.keys().filter(func(unit_id): return hud._unit_bars[unit_id].visible and not allowed.has(unit_id))
 
 
 func _check(hud: AHCombatHud, profile: String) -> void:

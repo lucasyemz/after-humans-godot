@@ -524,6 +524,10 @@ func open(new_session: AHCombatSession) -> void:
 			bar.get_meta("intent").queue_free()
 		bar.queue_free()
 	_unit_bars.clear()
+	_has_plate.clear()
+	_crowded.clear()
+	_struck = ""
+	_spot_actor = ""
 	for unit in session.units():
 		_unit_bars[unit.id] = _make_plate(unit)
 	_reset_log()
@@ -702,6 +706,8 @@ func refresh() -> void:
 			status.add_child(_status_chip(entry))
 		# A placa encolhe de volta quando a intenção ou os estados ficam mais curtos.
 		plate.reset_size.call_deferred()
+	# A regra do aperto já no refresh: o golpe chama o refresh fora do _process, e a placa escondida piscava (#72).
+	_show_crowded()
 	_refresh_order(current)
 	arena.show_ring(current)
 	_refresh_log()
@@ -1301,12 +1307,14 @@ func unit_at(point: Vector2) -> String:
 
 ## No aperto (#72, decisão do Lucas de 28/10): quem tem o vizinho mais perto que a placa mínima (_crowded) fica sem a
 ## placa e a intenção, menos o personagem da vez e o alvo (o apontado na mira e, depois de confirmado, o atingido até a
-## vez passar). Se quem age e o alvo são do mesmo lado (a cura num vizinho), só o alvo: as duas se cobririam. Nada de
-## placa em cima e embaixo; a formação já deixa espaço no começo da luta (test_plates_crowd).
+## próxima vez começar). Quem age e o alvo vizinhos do mesmo lado (a cura no do lado): só o alvo, as duas se cobririam.
+## Nada de placa em cima e embaixo; a formação já deixa espaço no começo da luta (test_plates_crowd). Roda a cada quadro
+## e no fim do refresh.
 func _show_crowded() -> void:
-	var current: String = session.state.current_turn_unit_id
-	if _struck_turn != current:
-		_struck = ""
+	if session == null or arena == null:
+		return
+	# A vez de quem age vem do começo dela (ask_command, show_waiting): o motor passa a vez antes da animação do golpe.
+	var current := _spot_actor if _spot_actor != "" else session.state.current_turn_unit_id
 	var target := _struck
 	if _target_label.visible and _target_label.has_meta("card"):
 		for unit_id in arena.cards:
@@ -1314,13 +1322,14 @@ func _show_crowded() -> void:
 				target = unit_id
 	var actor := session.state.find_unit(current)
 	var aimed := session.state.find_unit(target) if target != "" else null
-	var same_side := actor != null and aimed != null and target != current and actor.is_player == aimed.is_player
+	var beside := actor != null and aimed != null and target != current and actor.is_player == aimed.is_player \
+		and absi(actor.rank - aimed.rank) <= 1 and _crowded.has(target)
 	for unit_id in _unit_bars:
 		var plate: Control = _unit_bars[unit_id]
 		var unit := session.state.find_unit(unit_id)
 		var shown: bool = _has_plate.get(unit_id, plate.visible)
 		if shown and _crowded.has(unit_id):
-			shown = unit_id == target or (unit_id == current and not (same_side and _crowded.has(target)))
+			shown = unit_id == target or (unit_id == current and not beside)
 		plate.visible = shown
 		var row := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
 		if row != null:
@@ -1371,9 +1380,10 @@ const PLATE_GAP := 8.0
 var _crowded := {}
 ## Quem tem placa pelo estado (refresh): vivo ou no Último Fôlego, mesmo com ela escondida no aperto.
 var _has_plate := {}
-## O alvo confirmado na mira e de quem era a vez: no aperto, a placa dele fica até a vez passar.
+## O alvo confirmado na mira: no aperto, a placa dele fica durante o golpe, até a próxima vez começar.
 var _struck := ""
-var _struck_turn := ""
+## De quem é a vez para o aperto, desde o começo dela (o motor passa a vez antes da animação do golpe).
+var _spot_actor := ""
 
 
 ## O retângulo do corpo de um personagem na tela: do pé à cabeça e com a largura do corpo (a placa tem margem
@@ -1431,6 +1441,8 @@ static func plate_y(feet_y: float, head_y: float, short: bool, plate_height: flo
 ## note: um aviso que fica na tela enquanto ele decide (o item da Mochila que acabou de usar).
 func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	_actor_id = actor_id
+	_spot_actor = actor_id
+	_struck = ""
 	_message.text = note
 	_panel.visible = true
 	_build_abilities()
@@ -1488,6 +1500,9 @@ func tutorial_rect(kind: String) -> Rect2:
 
 func show_waiting(text: String) -> void:
 	_message.text = text
+	# A vez de outro começa (a máquina, ou o herói antes da escolha): o alvo do golpe anterior perde a placa no aperto.
+	_spot_actor = session.state.current_turn_unit_id if session != null else ""
+	_struck = ""
 	_clear_markers()
 	_set_enabled(false)
 
@@ -2224,7 +2239,6 @@ func _press_target(rank: int, on_pick: Callable) -> void:
 	for marker in _markers:
 		if int(marker.get_meta("rank")) == rank and marker.has_meta("unit_id"):
 			_struck = String(marker.get_meta("unit_id"))
-			_struck_turn = session.state.current_turn_unit_id
 	_clear_markers()
 	_set_enabled(true)
 	on_pick.call(rank)
