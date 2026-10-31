@@ -95,6 +95,7 @@ var _card_without_lock := false
 ## (o clique não abre o cômodo).
 var _drag_from := Vector2.INF
 var _drag_pan := 0.0
+var _drag_pan_y := 0.0
 var _dragged := false
 ## Há quanto tempo (s) o mouse está encostado na borda da tela.
 var _edge_time := 0.0
@@ -485,6 +486,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		# Na vista geral, o clique abre o cômodo ao soltar; arrastando, a câmera anda (#131).
 		_drag_from = event.position
 		_drag_pan = station.pan
+		_drag_pan_y = station.pan_y
 		_dragged = false
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and _room_open() and not _map.visible:
@@ -1040,7 +1042,9 @@ func _drag_input(event: InputEvent) -> void:
 		if not _dragged and event.position.distance_to(_drag_from) > DRAG_START:
 			_dragged = true
 		if _dragged:
-			station.set_pan(_drag_pan - (event.position.x - _drag_from.x) / station.overview_pixels_per_meter())
+			# Para os lados e para baixo (o 3º subsolo, #186).
+			var ppm: float = station.overview_pixels_per_meter()
+			station.set_pan(_drag_pan - (event.position.x - _drag_from.x) / ppm, _drag_pan_y + (event.position.y - _drag_from.y) / ppm)
 		return
 	if event.button_index != MOUSE_BUTTON_LEFT or event.pressed:
 		return
@@ -1065,7 +1069,7 @@ static func neighbor_room(room_id: String, direction: int) -> String:
 		return ""
 	var best := ""
 	var best_gap := INF
-	for room in AHStation.ROOMS:
+	for room in AHStation.rooms():
 		if room.id == room_id or room.ceiling != here.ceiling:
 			continue
 		var gap: float = (room.x0 - here.x0) * direction
@@ -1784,8 +1788,7 @@ func _show(key: String) -> void:
 func _station_plan(c: Dictionary) -> void:
 	_header("plan", tr("Plano da Estação"))
 	_text(tr("A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos."))
-	for room in AHStation.ROOMS:
-		var id: String = room.id
+	for id in AHStation.ROOM_ORDER:
 		var room_def := S.room_def(id)
 		var level := S.room_level(c, id)
 		var cost := S.next_level_cost(c, id)
