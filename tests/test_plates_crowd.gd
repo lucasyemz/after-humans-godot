@@ -146,6 +146,11 @@ func _fight() -> void:
 		var marker: Control = hud._markers.filter(func(m): return m.has_meta("unit_id"))[0]
 		var target: String = marker.get_meta("unit_id")
 		hud._select_target(int(marker.get_meta("rank")))
+		# Os outros heróis atordoados: a vez deles não passa pelo ask_command, e a placa que fica é a deles.
+		var actor_id: String = hud._actor_id
+		for unit in hud.session.state.player_team:
+			if unit.id != actor_id and unit.hp > 0:
+				unit.stun_turns = 1
 		hud._via_mouse = false
 		marker.pressed.emit()
 		var frames := 0
@@ -153,7 +158,8 @@ func _fight() -> void:
 		var wrong: Array = []
 		for i in 1500:
 			await _tree.process_frame
-			if hud.waiting or hud._message.text.begins_with(tr("Vez de")):
+			# Até a próxima vez começar.
+			if hud.waiting or hud._spot_actor != actor_id:
 				break
 			frames += 1
 			if hud._has_plate.get(target, false) and hud._unit_bars[target].visible:
@@ -164,6 +170,21 @@ func _fight() -> void:
 		t.check(frames > 0 and (shown == frames or not hud._has_plate.get(target, false)),
 			"no aperto, a placa do alvo fica durante o golpe (%d de %d quadros)" % [shown, frames])
 		t.equal(wrong, [], "no aperto, durante o golpe, nenhuma outra placa do aperto aparece")
+		# Até a vez do jogador voltar: na vez de um atordoado, a placa dele à mostra e nenhuma outra do aperto fora da regra.
+		var stunned := {}
+		for i in 4000:
+			if hud.waiting or hud.session.is_over():
+				break
+			await _tree.process_frame
+			var current := hud.session.state.find_unit(hud._spot_actor)
+			if current != null and current.is_player and current.id != actor_id:
+				stunned[current.id] = stunned.get(current.id, true) and (not hud._has_plate.get(current.id, false) or hud._unit_bars[current.id].visible)
+			for id in _out_of_rule(hud):
+				if not wrong.has(id):
+					wrong.append(id)
+		t.check(not stunned.is_empty() and stunned.values().all(func(ok): return ok),
+			"no aperto, na vez de um herói atordoado, a placa dele aparece %s" % [stunned])
+		t.equal(wrong, [], "no aperto, nas vezes seguintes, nenhuma placa do aperto fora da regra")
 
 
 ## As placas do aperto à mostra fora da regra: nem de quem age (desde o começo da vez) nem do alvo.

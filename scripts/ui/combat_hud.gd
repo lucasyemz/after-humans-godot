@@ -1313,7 +1313,7 @@ func unit_at(point: Vector2) -> String:
 func _show_crowded() -> void:
 	if session == null or arena == null:
 		return
-	# A vez de quem age vem do começo dela (ask_command, show_waiting): o motor passa a vez antes da animação do golpe.
+	# A vez de quem age vem do começo dela (start_turn): o motor passa a vez antes da animação do golpe.
 	var current := _spot_actor if _spot_actor != "" else session.state.current_turn_unit_id
 	var target := _struck
 	if _target_label.visible and _target_label.has_meta("card"):
@@ -1380,7 +1380,7 @@ const PLATE_GAP := 8.0
 var _crowded := {}
 ## Quem tem placa pelo estado (refresh): vivo ou no Último Fôlego, mesmo com ela escondida no aperto.
 var _has_plate := {}
-## O alvo confirmado na mira: no aperto, a placa dele fica durante o golpe, até a próxima vez começar.
+## O alvo confirmado na mira: no aperto, a placa dele fica durante o golpe, até a próxima vez começar (start_turn).
 var _struck := ""
 ## De quem é a vez para o aperto, desde o começo dela (o motor passa a vez antes da animação do golpe).
 var _spot_actor := ""
@@ -1442,7 +1442,6 @@ static func plate_y(feet_y: float, head_y: float, short: bool, plate_height: flo
 func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	_actor_id = actor_id
 	_spot_actor = actor_id
-	_struck = ""
 	_message.text = note
 	_panel.visible = true
 	_build_abilities()
@@ -1498,11 +1497,16 @@ func tutorial_rect(kind: String) -> Rect2:
 	return Rect2()
 
 
-func show_waiting(text: String) -> void:
-	_message.text = text
-	# A vez de outro começa (a máquina, ou o herói antes da escolha): o alvo do golpe anterior perde a placa no aperto.
+## O começo de uma vez (AHCombatArena._run, antes dos eventos dela): no aperto (#72), a placa que fica é a de quem age
+## agora, e o alvo do golpe anterior perde a dele. O motor passa a vez antes da animação do golpe, então o aperto não lê
+## a vez do estado.
+func start_turn() -> void:
 	_spot_actor = session.state.current_turn_unit_id if session != null else ""
 	_struck = ""
+
+
+func show_waiting(text: String) -> void:
+	_message.text = text
 	_clear_markers()
 	_set_enabled(false)
 

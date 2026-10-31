@@ -466,6 +466,9 @@ func _sync_positions(seconds: float) -> void:
 
 func _run() -> void:
 	while not session.is_over():
+		# O começo de cada vez, num lugar só (também a do atordoado, que não chega ao ask_command): no aperto, a placa
+		# de quem age e o alvo do golpe anterior sai (#72).
+		hud.start_turn()
 		hud.refresh()
 		if session.is_player_turn():
 			var start := session.begin_player_turn()
