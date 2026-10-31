@@ -312,7 +312,8 @@ func _chips(c: Dictionary, result: String) -> Array:
 	# A escavação (#186): o bloco aberto e o que ele devolveu, ou quanto andou.
 	var dig: Dictionary = report.get("dig", {})
 	if not dig.is_empty():
-		out.append({"icon": "room_quarters", "text": AHStationGrid.report_line(dig), "color": AHKit.AMBER if dig.get("opened", false) else AHKit.TEXT})
+		out.append({"icon": "place_unlocked" if dig.get("opened", false) else "lock", "text": AHStationGrid.report_chip(dig),
+			"color": AHKit.AMBER if dig.get("opened", false) else AHKit.TEXT})
 	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
 	if report.has("train"):
 		var arrived := String(report.train)
@@ -610,11 +611,22 @@ func _details_band() -> PanelContainer:
 		arrived.append(tr("Nada chegou desta vez."))
 	columns.add_child(_detail_column(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent), arrived))
 	var cycle: Dictionary = report.get("cycle", {})
+	# A escavação (#274): a linha inteira do chip e o que o bloco aberto devolveu, com a Estação do ciclo (uma coluna a
+	# mais não cabe na faixa).
+	var dug: Array = []
+	var dig: Dictionary = report.get("dig", {})
+	if not dig.is_empty():
+		dug.append(AHStationGrid.report_line(dig))
+		for text in dig.get("finds", {}).get("texts", []):
+			dug.append(tr(String(text)))
+	if cycle.is_empty() and not dug.is_empty():
+		columns.add_child(_detail_column(tr("Escavação"), dug))
 	if not cycle.is_empty():
 		var lines: Array = [tr("A Cantina produziu %d suprimentos; os moradores comeram %d; estragaram %d. Água: %d bebida, %d do coletor%s.") % [
 			cycle.food_produced, cycle.food_civilians, cycle.food_spoiled, cycle.water_consumed, cycle.water_produced, tr("; faltou para alguém") if cycle.thirsty else ""]]
 		if int(cycle.get("fragments_produced", 0)) > 0:
 			lines.append(tr("A Cora trouxe %d fragmento.") % cycle.fragments_produced)
+		lines.append_array(dug)
 		columns.add_child(_detail_column(tr("A Estação no ciclo %d") % cycle.number, lines))
 	var care := recovery_lines(c, report)
 	if not care.is_empty():

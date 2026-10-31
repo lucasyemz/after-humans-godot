@@ -468,7 +468,11 @@ func overview_pixels_per_meter() -> float:
 ## A vista geral anda até o cômodo ficar inteiro na faixa da tela entre left_px e right_px (as setas escolhendo um
 ## cômodo que o menu cobre).
 func pan_to_room(room_id: String, left_px: float, right_px: float) -> void:
-	var room := room_def(room_id)
+	_pan_to_span(room_def(room_id), left_px, right_px)
+
+
+## O cômodo ou o bloco ({x0, x1, floor} em metros) inteiro na faixa da tela entre left_px e right_px.
+func _pan_to_span(room: Dictionary, left_px: float, right_px: float) -> void:
 	if room.is_empty():
 		return
 	var ppm := overview_pixels_per_meter()
@@ -951,6 +955,63 @@ func room_screen_rects() -> Dictionary:
 		var pb := camera.unproject_position(b)
 		out[room.id] = Rect2(Vector2(minf(pa.x, pb.x), minf(pa.y, pb.y)), (pb - pa).abs())
 	return out
+
+
+## Um bloco da grade sem cômodo, em metros (#186; a interface, #274): a vaga soterrada ou livre ("1:3") ou o patamar
+## soterrado da escada ("L2"). {key, x0, x1, floor, ceiling}; {} no que não está na cena (um cômodo, o patamar aberto).
+static func block_def(key: String) -> Dictionary:
+	if AHStationGrid.is_landing(key):
+		var f := AHStationGrid.block_floor(key)
+		if f < 2 or AHStationLayout.landing_open(Campaign.state, f):
+			return {}
+		var z := AHStationLayout.floor_z(f) * 0.01
+		return {"key": key, "x0": STATION_END + 0.4, "x1": CORE_X1, "floor": z, "ceiling": z + AHStationLayout.HEIGHT * 0.01}
+	for entry in AHStationLayout.blocks(Campaign.state):
+		if entry.key == key:
+			return {"key": key, "x0": entry.x0 * 0.01, "x1": entry.x1 * 0.01, "floor": entry.floor * 0.01, "ceiling": entry.ceiling * 0.01}
+	return {}
+
+
+## Os blocos da cena (as vagas soterradas e livres e os patamares soterrados), na ordem da grade.
+static func block_defs() -> Array:
+	var out: Array = []
+	for key in AHStationGrid.block_keys():
+		var block := block_def(key)
+		if not block.is_empty():
+			out.append(block)
+	return out
+
+
+## O retângulo de cada bloco na tela, como room_screen_rects; com a câmera em movimento, nada.
+func block_screen_rects() -> Dictionary:
+	var out := {}
+	if camera == null or not _path.is_empty():
+		return out
+	for block in block_defs():
+		var a := Vector3(block.x0, block.floor, 0.0)
+		var b := Vector3(block.x1, block.ceiling, 0.0)
+		if camera.is_position_behind(a) or camera.is_position_behind(b):
+			continue
+		var pa := camera.unproject_position(a)
+		var pb := camera.unproject_position(b)
+		out[block.key] = Rect2(Vector2(minf(pa.x, pb.x), minf(pa.y, pb.y)), (pb - pa).abs())
+	return out
+
+
+## O bloco escolhido com o painel aberto: ele e os vizinhos, entre o menu e o painel, como um cômodo de 12 m.
+func focus_block(key: String, instant: bool = false) -> void:
+	var block := block_def(key)
+	if block.is_empty():
+		focus_overview(instant)
+		return
+	_in_overview = false
+	var middle: float = (block.x0 + block.x1) * 0.5
+	_go(_framed_key(middle - 6.0 + ROOM_CROP, middle + 6.0 - ROOM_CROP, block.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
+
+
+## A vista geral anda até o bloco ficar na faixa da tela (as setas escolhendo um bloco), como pan_to_room.
+func pan_to_block(key: String, left_px: float, right_px: float) -> void:
+	_pan_to_span(block_def(key), left_px, right_px)
 
 
 ## Onde fica, na tela, o pé de cada um da fila (o HUD põe o cartão embaixo).

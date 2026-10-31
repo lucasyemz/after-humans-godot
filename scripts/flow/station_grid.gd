@@ -504,6 +504,18 @@ static func report_line(dig: Dictionary) -> String:
 	return TranslationServer.translate("Escavação: %s, %d de %d pontos de obra.") % [block_name(key), int(dig.get("progress", 0)), int(dig.get("work", 1))]
 
 
+## O chip do relatório da volta (#274), curto para o cartão estreito: "Escavação: vaga aberta", "Escavação: patamar
+## aberto" ou "Escavação: 1 de 2 pontos". A linha inteira (report_line) fica nos detalhes.
+static func report_chip(dig: Dictionary) -> String:
+	if dig.is_empty():
+		return ""
+	if dig.get("opened", false):
+		if is_landing(String(dig.get("block", ""))):
+			return TranslationServer.translate("Escavação: patamar aberto")
+		return TranslationServer.translate("Escavação: vaga aberta")
+	return TranslationServer.translate("Escavação: %d de %d pontos") % [int(dig.get("progress", 0)), int(dig.get("work", 1))]
+
+
 ## "1 volta", "3 voltas".
 static func returns_text(count: int) -> String:
 	return TranslationServer.translate("1 volta") if count == 1 else TranslationServer.translate("%d voltas") % count
