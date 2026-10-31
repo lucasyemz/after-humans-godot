@@ -6,6 +6,7 @@
 extends SceneTree
 
 var out := ""
+var _log_file: FileAccess
 
 
 func _initialize() -> void:
@@ -22,6 +23,8 @@ func _run() -> void:
 		quit(2)
 		return
 	DirAccess.make_dir_recursive_absolute(out)
+	# Aqui (sem GPU) a Estação desenha devagar: o passo a passo vai para log.txt, para acompanhar.
+	_log_file = FileAccess.open(out.path_join("log.txt"), FileAccess.WRITE)
 	var campaign = root.get_node("Campaign")
 	var flow = root.get_node("GameFlow")
 	campaign.save_dir = out.path_join("save")
@@ -38,29 +41,41 @@ func _run() -> void:
 	c.station.train = S._train_defaults()
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5
+	# O relatório abre direto, sem a chegada do trem (que aqui levaria muitos minutos).
+	c.station.last_return.seen = true
 	campaign.state = c
 	campaign.save()
 	flow.change_to("station", {}, false)
-	for i in 600:
+	while flow.busy or current_scene == null or current_scene.get("hud") == null:
 		await process_frame
-		if not flow.busy and current_scene != null and i > 10:
-			break
-	var hud = current_scene.hud
-	await _frames(8)
+	_log("a Estação abriu")
+	var station = current_scene
+	var hud = station.hud
+	await _frames(2)
 	hud.open_service("report")
-	await _frames(8)
+	await _snap(station)
+	await _frames(2)
 	await _shot("report")
 	hud.close_panel()
-	c.station.last_return.seen = true
-	await _frames(8)
+	station.focus_overview(true)
+	await _snap(station)
+	await _frames(2)
 	await _shot("overview")
 	hud.open_room(S.DEPOT)
-	await _frames(8)
+	await _snap(station)
+	await _frames(2)
 	await _shot("depot")
 	for file in DirAccess.get_files_at(campaign.save_dir):
 		DirAccess.remove_absolute(campaign.save_dir.path_join(file))
 	DirAccess.remove_absolute(campaign.save_dir)
 	quit(0)
+
+
+## A câmera direto no destino, sem o deslize (aqui cada quadro leva segundos).
+func _snap(station) -> void:
+	station._path.clear()
+	station._set_goal(station._goal, true)
+	await _frames(1)
 
 
 func _frames(count: int) -> void:
@@ -71,3 +86,9 @@ func _frames(count: int) -> void:
 func _shot(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out.path_join(name + ".png"))
+	_log("foto " + name)
+
+
+func _log(text: String) -> void:
+	_log_file.store_line("%d ms: %s" % [Time.get_ticks_msec(), text])
+	_log_file.flush()
