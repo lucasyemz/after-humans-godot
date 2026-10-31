@@ -36,6 +36,8 @@ var _dimmed := false
 ## No Último Fôlego (#281): o pulso vermelho está ligado e onde ele está no ciclo (segundos).
 var _danger := false
 var _danger_time := 0.0
+## Com os efeitos reduzidos, o Último Fôlego fica com um brilho vermelho fixo (o meio do pulso), sem piscar.
+var steady_danger := false
 ## Quanto acima do pé (m) fica sem silhueta: o padrão, ou a borda do piso da frente da zona do cenário (#51).
 var silhouette_foot := SILHOUETTE_FOOT
 
@@ -221,7 +223,7 @@ func in_danger() -> bool:
 func _rest_emission() -> Color:
 	if not _danger:
 		return _highlight
-	var wave := 0.5 - 0.5 * cos(TAU * _danger_time / DANGER_PERIOD)
+	var wave := 0.5 if steady_danger else 0.5 - 0.5 * cos(TAU * _danger_time / DANGER_PERIOD)
 	var light := _highlight + DANGER_COLOR * lerpf(DANGER_MIN, DANGER_MAX, wave)
 	light.a = 1.0
 	return light

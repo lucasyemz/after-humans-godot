@@ -279,6 +279,7 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 		return
 	# No Último Fôlego o herói segue de pé, na pose parada, com o pulso vermelho (a Porta da Morte do Darkest
 	# Dungeon); só cai quando o golpe seguinte o derruba de vez.
+	card.steady_danger = reduced_effects()
 	card.set_danger(unit.hp <= 0 and unit.deaths_door)
 	if unit.hp > 0 or unit.deaths_door:
 		show_pose(unit, "idle")
