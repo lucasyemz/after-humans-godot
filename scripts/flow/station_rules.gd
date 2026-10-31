@@ -32,20 +32,23 @@ const BAR := "bar"
 const INFIRMARY := "infirmary"
 ## Cômodos: básico (nível 1 desde o começo), nível máximo e o custo de cada nível (do N ao N+1). Sem custo, a
 ## recuperação chega numa próxima fase do jogo. A Forja é o piloto com dois níveis.
+## A grade (#186, AHStationGrid): slots, as vagas de 6 m que o cômodo ocupa (0: fora da grade, na plataforma); build, o
+## nível em que ele entra numa vaga (construir). A Cantina e o Depósito de nível 1 são o fogareiro e os caixotes da
+## plataforma; construídos, são o nível 2.
 const ROOMS := [
-	{"id": CANTEEN, "name": "Cantina", "basic": true, "max_level": 1, "costs": []},
-	{"id": DEPOT, "name": "Depósito", "basic": true, "max_level": 2, "costs": [{}, {"scrap": 5, "fragments": 1}]},
-	{"id": PREPARATION, "name": "Preparação", "basic": true, "max_level": 1, "costs": []},
+	{"id": CANTEEN, "name": "Cantina", "basic": true, "max_level": 2, "costs": [], "data_costs": "canteen_level_%d", "data_table": "station_grid", "slots": 2, "build": 2},
+	{"id": DEPOT, "name": "Depósito", "basic": true, "max_level": 2, "costs": [{}, {"scrap": 5, "fragments": 1}], "slots": 1, "build": 2},
+	{"id": PREPARATION, "name": "Preparação", "basic": true, "max_level": 1, "costs": [], "slots": 0, "build": 0},
 	# O Alojamento cresce (#119): cada nível comporta mais heróis (data/hero-jobs.json, limit_heroes e o custo).
-	{"id": CHARACTERS, "name": "Alojamento", "basic": true, "max_level": 4, "costs": [], "data_costs": "characters_level_%d", "data_table": "hero_jobs"},
-	{"id": FORGE, "name": "Forja", "basic": false, "max_level": 2, "costs": [{"scrap": 4, "fragments": 0}, {"scrap": 6, "fragments": 2}]},
-	{"id": RESEARCH, "name": "Centro de Pesquisa", "basic": false, "max_level": 1, "costs": [{"scrap": 3, "fragments": 2}]},
+	{"id": CHARACTERS, "name": "Alojamento", "basic": true, "max_level": 4, "costs": [], "data_costs": "characters_level_%d", "data_table": "hero_jobs", "slots": 1, "build": 1},
+	{"id": FORGE, "name": "Forja", "basic": false, "max_level": 2, "costs": [{"scrap": 4, "fragments": 0}, {"scrap": 6, "fragments": 2}], "slots": 2, "build": 1},
+	{"id": RESEARCH, "name": "Centro de Pesquisa", "basic": false, "max_level": 1, "costs": [{"scrap": 3, "fragments": 2}], "slots": 2, "build": 1},
 	# O Dormitório existe desde o começo, sem camas: no nível 1 a equipe dorme no chão; os beliches são a melhoria (nível 2,
 	# o custo em data/hero-jobs.json). Decisão do Lucas (28/10, #176).
-	{"id": DORMITORY, "name": "Dormitório", "basic": true, "max_level": 2, "costs": [], "data_costs": "dormitory_level_%d", "data_table": "hero_jobs"},
+	{"id": DORMITORY, "name": "Dormitório", "basic": true, "max_level": 2, "costs": [], "data_costs": "dormitory_level_%d", "data_table": "hero_jobs", "slots": 2, "build": 1},
 	# O Bar tem custo para ser recuperado (#176; o número é proposta).
-	{"id": BAR, "name": "Bar", "basic": false, "max_level": 1, "costs": [{"scrap": 4, "fragments": 1}]},
-	{"id": INFIRMARY, "name": "Enfermaria", "basic": false, "max_level": 2, "costs": [], "data_costs": "infirmary_level_%d"},
+	{"id": BAR, "name": "Bar", "basic": false, "max_level": 1, "costs": [{"scrap": 4, "fragments": 1}], "slots": 1, "build": 1},
+	{"id": INFIRMARY, "name": "Enfermaria", "basic": false, "max_level": 2, "costs": [], "data_costs": "infirmary_level_%d", "slots": 2, "build": 1},
 ]
 const RELIC_COST_BASE := 3
 const RELIC_COST_UPGRADED := 2
@@ -141,6 +144,8 @@ static func init_new_campaign(campaign: Dictionary) -> void:
 		rooms[room.id] = 1 if room.basic else 0
 	campaign.station = _station_defaults()
 	campaign.station.rooms = rooms
+	# A grade (#186): o Dormitório, o Alojamento e a Forja parada no 1º subsolo; o resto soterrado.
+	AHStationGrid.init_new(campaign)
 	campaign.station.candidate_queue = CIVILIANS.map(func(c): return c.id)
 	campaign.night = _night_defaults()
 	campaign.pending_offers = []
@@ -203,6 +208,8 @@ static func migrate(campaign: Dictionary) -> void:
 	if typeof(campaign.station.train.get("trades")) != TYPE_DICTIONARY:
 		campaign.station.train.trades = {}
 	campaign.station.train_dry = int(campaign.station.get("train_dry", 0))
+	# A grade (#186): os saves de antes ganham a planta herdada, sem nenhum cômodo construído soterrado.
+	AHStationGrid.migrate(campaign)
 	# "departing" é só a animação do trem saindo (4 s na tela). Um save gravado nesse meio (o jogo fechou) abriria com o
 	# trem partindo para sempre: a Preparação ficava bloqueada e a plataforma sem botão.
 	finish_departure(campaign)
@@ -335,6 +342,10 @@ static func upgrade_block(campaign: Dictionary, room_id: String) -> String:
 		var room := room_def(room_id)
 		return TranslationServer.translate("A recuperação deste cômodo chega numa próxima fase.") if not room.is_empty() and room_level(campaign, room_id) < room.max_level \
 			else TranslationServer.translate("Este cômodo já está no nível máximo.")
+	# A grade (#186): construir pede uma vaga livre do tamanho do cômodo.
+	var space := AHStationGrid.space_block(campaign, room_id)
+	if space != "":
+		return space
 	var scrap := quantity(campaign, "scrap")
 	var fragments := quantity(campaign, "fragments")
 	if scrap < int(cost.get("scrap", 0)) or fragments < int(cost.get("fragments", 0)):
@@ -343,20 +354,49 @@ static func upgrade_block(campaign: Dictionary, room_id: String) -> String:
 
 
 ## Sobe um nível e cobra uma vez. from_level é o nível que o jogador viu: clique repetido não compra o seguinte.
-static func upgrade_room(campaign: Dictionary, room_id: String, from_level: int) -> String:
+## No nível de construir (#186), o cômodo entra na vaga dada (spot, a da esquerda) ou na primeira vaga livre onde cabe.
+static func upgrade_room(campaign: Dictionary, room_id: String, from_level: int, spot: String = "") -> String:
 	if room_level(campaign, room_id) != from_level:
 		return TranslationServer.translate("Este cômodo já mudou de nível.")
 	var block := upgrade_block(campaign, room_id)
 	if block != "":
 		return block
+	var place := ""
+	if AHStationGrid.needs_place(campaign, room_id):
+		if spot != "" and not AHStationGrid.spot_fits(campaign, room_id, spot):
+			return _not_fit(room_id)
+		place = spot if spot != "" else AHStationGrid.free_spots(campaign, room_id)[0]
 	var cost := next_level_cost(campaign, room_id)
 	adjust(campaign, "scrap", -int(cost.get("scrap", 0)))
 	adjust(campaign, "fragments", -int(cost.get("fragments", 0)))
 	campaign.station.rooms[room_id] = from_level + 1
+	if place != "":
+		AHStationGrid.place(campaign, room_id, place)
 	# A Enfermaria recuperada ou melhorada: quem já espera no Dormitório vai na hora para os leitos novos.
 	if room_id == INFIRMARY:
 		_fill_beds(campaign)
 	return ""
+
+
+## Construir numa vaga livre (#186): o cômodo cujo próximo nível é o de entrar na grade, na vaga escolhida (a da
+## esquerda, no duplo). Devolve "" ou o motivo.
+static func build_room(campaign: Dictionary, room_id: String, spot: String) -> String:
+	if not AHStationGrid.needs_place(campaign, room_id):
+		return TranslationServer.translate("Este cômodo já tem lugar na Estação.")
+	if not AHStationGrid.spot_fits(campaign, room_id, spot):
+		return _not_fit(room_id)
+	return upgrade_room(campaign, room_id, room_level(campaign, room_id), spot)
+
+
+## "O Centro de Pesquisa não cabe nessa vaga."
+static func _not_fit(room_id: String) -> String:
+	var name := room_the(room_id)
+	return TranslationServer.translate("%s não cabe nessa vaga.") % (name.left(1).to_upper() + name.substr(1))
+
+
+## "a Cantina", "o Depósito": o cômodo com o artigo (ROOM_ARTICLE).
+static func room_the(room_id: String) -> String:
+	return TranslationServer.translate(ROOM_ARTICLE.get(room_id, "")) + TranslationServer.translate(room_def(room_id).get("name", ""))
 
 
 static func relic_cost(campaign: Dictionary) -> int:
@@ -453,6 +493,8 @@ static func _room_benefit(room_id: String, level: int) -> String:
 		BAR:
 			return TranslationServer.translate("Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa.") if level <= 0 else TranslationServer.translate("Um lugar para conversar e fazer uma pausa.")
 		CANTEEN:
+			if level >= 2:
+				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por expedição.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
 			return TranslationServer.translate("Com energia, produz 2 suprimentos por expedição.")
 		DEPOT:
 			return TranslationServer.translate("Guarda até 12 suprimentos; o excesso estraga na volta.") if level <= 1 else TranslationServer.translate("Prateleiras extras: guarda até 20.")
@@ -498,6 +540,11 @@ static func running_rooms(campaign: Dictionary) -> Array:
 	return running
 
 
+## O que a Cantina rende sozinha, com energia: o fogareiro da plataforma (nível 1) ou a Cantina construída (#186).
+static func canteen_food(campaign: Dictionary) -> int:
+	return CANTEEN_FOOD + (int(AHStationGrid.rule("canteen_level_2").get("Food", 1)) if room_level(campaign, CANTEEN) >= 2 else 0)
+
+
 ## Faixas do estoque visível: 0 vazio, 1 (1-3), 2 (4-7), 3 (8-11), 4 (12+).
 static func supply_band(supplies: int) -> int:
 	return 0 if supplies <= 0 else 1 if supplies <= 3 else 2 if supplies <= 7 else 3 if supplies <= 11 else 4
@@ -519,7 +566,7 @@ static func forecast(campaign: Dictionary, returning: int) -> Dictionary:
 			f.unpowered_rooms.append(room[0])
 	f.food = quantity(campaign, SUPPLIES)
 	var dora_food := DORA_FOOD + (REQUEST_BONUS if has_completed_request(campaign, DORA) else 0)
-	f.food_produced = (CANTEEN_FOOD + (dora_food if civilian_working(campaign, DORA) else 0)) if running.has(CANTEEN) else 0
+	f.food_produced = (canteen_food(campaign) + (dora_food if civilian_working(campaign, DORA) else 0)) if running.has(CANTEEN) else 0
 	f.food_night_need = returning
 	f.civilians = resident_count(campaign)
 	f.water = maxi(0, int(campaign.station.water))
@@ -1552,24 +1599,41 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 		return {"title": TranslationServer.translate("Esperar a recuperação"), "text": TranslationServer.translate("Ninguém pode partir: a equipe está em recuperação. Passe um dia na Estação, e cada caído fica um dia mais perto de voltar."),
 			"action": "rest", "button": TranslationServer.translate("Ver a Enfermaria"), "room": INFIRMARY}
 	var missing := {}
+	# A grade (#186, ponto 7): construir só quando há uma vaga livre do tamanho certo; senão, escavar. Escavar vem antes
+	# de juntar material para melhorar um cômodo que já funciona, mas depois de reabrir um parado (a Forja da visita
+	# guiada).
+	var dig_first := false
+	var first := {}
 	for room_id in NEXT_ROOMS:
 		var cost := next_level_cost(campaign, room_id)
 		if cost.is_empty():
+			continue
+		if AHStationGrid.buried(campaign, room_id):
+			dig_first = true
 			continue
 		var level := room_level(campaign, room_id)
 		var name: String = TranslationServer.translate(ROOM_ARTICLE.get(room_id, "")) + TranslationServer.translate(room_def(room_id).name)
 		if upgrade_block(campaign, room_id) == "":
 			return {"title": "%s %s" % [TranslationServer.translate("Recuperar") if level == 0 else TranslationServer.translate("Melhorar"), name], "text": TranslationServer.translate("%s Custa %s.") % [room_benefit(room_id, level + 1), cost_text(cost)],
 				"action": "room", "button": TranslationServer.translate("Ver %s") % name, "room": room_id, "benefit": room_benefit(room_id, level + 1), "cost": cost}
-		if missing.is_empty():
-			missing = {"title": TranslationServer.translate("Trazer %s para %s %s") % [cost_text(cost), TranslationServer.translate("reabrir") if level == 0 else TranslationServer.translate("melhorar"), name],
-				"text": TranslationServer.translate("%s As jornadas trazem sucata e fragmentos das buscas.") % room_benefit(room_id, level + 1), "action": "depart",
-				"button": TranslationServer.translate("Ir ao mapa"), "room": room_id}
-	if not missing.is_empty():
-		return missing
+		var bring := {"title": TranslationServer.translate("Trazer %s para %s %s") % [cost_text(cost), TranslationServer.translate("reabrir") if level == 0 else TranslationServer.translate("melhorar"), name],
+			"text": TranslationServer.translate("%s As jornadas trazem sucata e fragmentos das buscas.") % room_benefit(room_id, level + 1), "action": "depart",
+			"button": TranslationServer.translate("Ir ao mapa"), "room": room_id}
+		if first.is_empty():
+			first = bring
+		if level == 0 and missing.is_empty():
+			missing = bring
+	var dig := AHStationGrid.dig_step(campaign)
+	if dig_first and not dig.is_empty():
+		return missing if not missing.is_empty() else dig
+	if not first.is_empty():
+		return first
 	for info in AHJourneyRules.PHASES:
 		if phase_unlocked(campaign, info.id) and not campaign.completed_phases.has(info.id):
 			return {"title": TranslationServer.translate("Partir para %s") % TranslationServer.translate(info.name), "text": TranslationServer.translate(info.description), "action": "depart", "button": TranslationServer.translate("Ir ao mapa"), "room": ""}
+	# Nada para construir e nenhuma fase nova: o que falta escavar (no save antigo, o patamar do 3º subsolo).
+	if not dig.is_empty():
+		return dig
 	return {"title": TranslationServer.translate("Voltar às ruas"), "text": TranslationServer.translate("Os Antigos ainda existem? A pergunta voltou com a equipe. Dá para jogar qualquer fase de novo pelo mapa."), "action": "depart",
 		"button": TranslationServer.translate("Ir ao mapa"), "room": ""}
 
@@ -1793,7 +1857,8 @@ static func _migrate_fallen(campaign: Dictionary) -> void:
 
 ## A ordem em que o próximo passo sugere recuperar os cômodos, e o artigo de cada um no texto.
 const NEXT_ROOMS := [FORGE, RESEARCH, DEPOT]
-const ROOM_ARTICLE := {FORGE: "a ", RESEARCH: "o ", DEPOT: "o "}
+const ROOM_ARTICLE := {FORGE: "a ", RESEARCH: "o ", DEPOT: "o ", CANTEEN: "a ", BAR: "o ", INFIRMARY: "a ", DORMITORY: "o ",
+	CHARACTERS: "o ", PREPARATION: "a "}
 
 
 ## Por que não dá para preparar uma partida agora ("" se dá).
@@ -1938,8 +2003,13 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	delivered.recovered = tick_recovery(campaign)
 	# Os postos de quem ficou (#119): o que cada um rendeu; quem a Enfermaria pôs de pé volta no relatório.
 	delivered.posts = run_posts(campaign, expedition.team)
+	var digger_points := 0
 	for post in delivered.posts:
 		delivered.recovered.append_array(post.recovered)
+		if post.room == AHStationGrid.DIG:
+			digger_points += int(post.amount)
+	# A escavação (#186): a comunidade e o escavador cavam a frente; o bloco aberto devolve o achado. Só as voltas contam.
+	delivered.dig = AHStationGrid.run_dig(campaign, expedition.id, digger_points)
 	delivered.fallen = admit_fallen(campaign, expedition.team.filter(func(id): return hero(campaign, id) != null and not hero(campaign, id).alive),
 		expedition.get("carried", []))
 	delivered.cycle = campaign.station.last_cycle.duplicate()
@@ -1988,7 +2058,8 @@ static func _needed_room(campaign: Dictionary) -> Array:
 	var scrap := quantity(campaign, "scrap")
 	for room_id in [FORGE, RESEARCH, DEPOT]:
 		var cost := next_level_cost(campaign, room_id)
-		if not cost.is_empty() and int(cost.get("scrap", 0)) > scrap:
+		# Soterrado (#186): a sucata não ajuda enquanto não houver vaga.
+		if not cost.is_empty() and int(cost.get("scrap", 0)) > scrap and not AHStationGrid.buried(campaign, room_id):
 			return [room_id, int(cost.scrap) - scrap]
 	return ["", 0]
 
@@ -2133,9 +2204,19 @@ static func limits_text(campaign: Dictionary) -> String:
 		campaign.station.residents.size(), helper_limit(campaign)]
 
 
-## Os postos abertos: os cômodos com posto já recuperados.
+## Os postos abertos: os cômodos com posto já recuperados e, com entulho para cavar, o de escavador (#186).
 static func job_rooms(campaign: Dictionary) -> Array:
-	return JOB_ROOMS.filter(func(id): return room_available(campaign, id))
+	var out: Array = JOB_ROOMS.filter(func(id): return room_available(campaign, id))
+	if AHStationGrid.dig_target(campaign) != "":
+		out.append(AHStationGrid.DIG)
+	return out
+
+
+## O nome do posto: o do cômodo ou "Escavação".
+static func post_name(room_id: String) -> String:
+	if room_id == AHStationGrid.DIG:
+		return TranslationServer.translate("Escavação")
+	return TranslationServer.translate(room_def(room_id).get("name", ""))
 
 
 static func job_rule(room_id: String) -> Dictionary:
@@ -2150,12 +2231,16 @@ static func post_of(entry) -> String:
 
 ## "na Forja", "no Centro de Pesquisa": o cômodo com a preposição certa (o artigo de ROOM_ARTICLE).
 static func room_in(room_id: String) -> String:
+	if room_id == AHStationGrid.DIG:
+		return TranslationServer.translate("na escavação")
 	var name := TranslationServer.translate(room_def(room_id).name)
 	return (TranslationServer.translate("no %s") if ROOM_ARTICLE.get(room_id, "") == "o " else TranslationServer.translate("na %s")) % name
 
 
 ## "da Forja", "do Centro de Pesquisa".
 static func room_from(room_id: String) -> String:
+	if room_id == AHStationGrid.DIG:
+		return TranslationServer.translate("da escavação")
 	var name := TranslationServer.translate(room_def(room_id).name)
 	return (TranslationServer.translate("do %s") if ROOM_ARTICLE.get(room_id, "") == "o " else TranslationServer.translate("da %s")) % name
 
@@ -2191,6 +2276,8 @@ static func yield_text(room_id: String, amount: int) -> String:
 		"days":
 			return TranslationServer.translate("−1 dia de recuperação para %d caído por volta") % amount if amount == 1 \
 				else TranslationServer.translate("−1 dia de recuperação para %d caídos por volta") % amount
+		"dig":
+			return TranslationServer.translate("+%d ponto de obra por volta") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por volta") % amount
 	return ""
 
 
@@ -2203,6 +2290,8 @@ static func post_block(campaign: Dictionary, hero_id: String, room_id: String) -
 		return ""
 	if recovering(entry):
 		return TranslationServer.translate("%s está em recuperação e não trabalha agora.") % entry.display_name
+	if room_id == AHStationGrid.DIG and AHStationGrid.dig_target(campaign) == "":
+		return TranslationServer.translate("Não há entulho para escavar.")
 	if not job_rooms(campaign).has(room_id):
 		return TranslationServer.translate("Esse cômodo ainda não tem posto.")
 	return ""
