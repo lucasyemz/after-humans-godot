@@ -15,8 +15,8 @@ const SILHOUETTE_FOOT := 0.12
 ## O pulso do Último Fôlego (#281, a Porta da Morte do Darkest Dungeon): a luz vermelha que vai e volta no desenho.
 const DANGER_COLOR := Color(1.0, 0.08, 0.06)
 const DANGER_PERIOD := 1.1
-const DANGER_MIN := 0.12
-const DANGER_MAX := 0.7
+const DANGER_MIN := 0.04
+const DANGER_MAX := 0.3
 
 ## Altura do corpo em metros (do pé ao topo da cabeça na pose parada).
 var body_height := 1.8

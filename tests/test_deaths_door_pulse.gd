@@ -17,13 +17,13 @@ func run(t) -> void:
 		reds.append(material.emission.r)
 	var low: float = reds.min()
 	var high: float = reds.max()
-	t.check(low >= AHSpriteCard.DANGER_MIN * 0.99 and low < 0.25, "o pulso desce perto do mínimo (%.2f)" % low)
-	t.check(high > 0.6 and high <= AHSpriteCard.DANGER_MAX * 1.01, "e sobe perto do máximo (%.2f)" % high)
+	t.check(low >= AHSpriteCard.DANGER_MIN * 0.99 and low < 0.1, "o pulso desce perto do mínimo (%.2f)" % low)
+	t.check(high > 0.25 and high <= AHSpriteCard.DANGER_MAX * 1.01, "e sobe perto do máximo (%.2f)" % high)
 	t.check(material.emission.r > material.emission.g * 4.0, "a luz é vermelha")
 	# A mira acesa: o pulso soma à cor do destaque.
 	card.set_highlight(Color(0.2, 0.4, 0.9), 1.0)
 	card._process(0.01)
-	t.check(material.emission.b > 0.85 and material.emission.r > 0.2, "o pulso soma ao destaque da mira")
+	t.check(material.emission.b > 0.85 and material.emission.r > 0.03, "o pulso soma ao destaque da mira")
 	card.set_highlight(Color.BLACK, 0.0)
 	# O piscar do acerto termina de volta no pulso, não no apagado.
 	card.flash(Color.WHITE, 0.01)
