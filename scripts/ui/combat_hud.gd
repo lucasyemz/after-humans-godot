@@ -1300,16 +1300,27 @@ func unit_at(point: Vector2) -> String:
 
 
 ## No aperto (#72, decisão do Lucas de 28/10): quem tem o vizinho mais perto que a placa mínima (_crowded) fica sem a
-## placa e a intenção, menos o personagem da vez e o alvo escolhido na mira. Nada de placa em cima e embaixo; a luta
-## procura não ter aperto (AHCombatArena._frame_arena aproxima a câmera até as placas caberem).
+## placa e a intenção, menos o personagem da vez e o alvo (o apontado na mira e, depois de confirmado, o atingido até a
+## vez passar). Se quem age e o alvo são do mesmo lado (a cura num vizinho), só o alvo: as duas se cobririam. Nada de
+## placa em cima e embaixo; a formação já deixa espaço no começo da luta (test_plates_crowd).
 func _show_crowded() -> void:
-	var pointed: AHSpriteCard = _target_label.get_meta("card") if _target_label.visible and _target_label.has_meta("card") else null
+	var current: String = session.state.current_turn_unit_id
+	if _struck_turn != current:
+		_struck = ""
+	var target := _struck
+	if _target_label.visible and _target_label.has_meta("card"):
+		for unit_id in arena.cards:
+			if arena.cards[unit_id] == _target_label.get_meta("card"):
+				target = unit_id
+	var actor := session.state.find_unit(current)
+	var aimed := session.state.find_unit(target) if target != "" else null
+	var same_side := actor != null and aimed != null and target != current and actor.is_player == aimed.is_player
 	for unit_id in _unit_bars:
 		var plate: Control = _unit_bars[unit_id]
 		var unit := session.state.find_unit(unit_id)
 		var shown: bool = _has_plate.get(unit_id, plate.visible)
 		if shown and _crowded.has(unit_id):
-			shown = unit_id == session.state.current_turn_unit_id or (pointed != null and arena.cards.get(unit_id) == pointed)
+			shown = unit_id == target or (unit_id == current and not (same_side and _crowded.has(target)))
 		plate.visible = shown
 		var row := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
 		if row != null:
@@ -1360,6 +1371,9 @@ const PLATE_GAP := 8.0
 var _crowded := {}
 ## Quem tem placa pelo estado (refresh): vivo ou no Último Fôlego, mesmo com ela escondida no aperto.
 var _has_plate := {}
+## O alvo confirmado na mira e de quem era a vez: no aperto, a placa dele fica até a vez passar.
+var _struck := ""
+var _struck_turn := ""
 
 
 ## O retângulo do corpo de um personagem na tela: do pé à cabeça e com a largura do corpo (a placa tem margem
@@ -2206,6 +2220,11 @@ func _press_target(rank: int, on_pick: Callable) -> void:
 		_clicked_rank = rank
 		_select_target(rank)
 		return
+	# O alvo confirmado fica com a placa no aperto até a vez passar (a barra descendo no golpe).
+	for marker in _markers:
+		if int(marker.get_meta("rank")) == rank and marker.has_meta("unit_id"):
+			_struck = String(marker.get_meta("unit_id"))
+			_struck_turn = session.state.current_turn_unit_id
 	_clear_markers()
 	_set_enabled(true)
 	on_pick.call(rank)

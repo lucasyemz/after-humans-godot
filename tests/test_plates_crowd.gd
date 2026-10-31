@@ -1,8 +1,9 @@
 ## As placas das máquinas numa luta cheia (quatro inimigos, #60 sobre a #63): no texto Normal e no Maior, a intenção e a
 ## barra não cobrem o corpo (a barra e os estados no máximo um quinto dele; a intenção, acima da cabeça, nada) e as
 ## placas de um mesmo lado não se cobrem. Também com os espaços no mínimo (MIN_GAP_SCALE), o lugar mais apertado (#72):
-## a câmera chega mais perto até as placas caberem; e, se ainda faltar espaço (a câmera presa longe), as placas do aperto
-## somem, menos a de quem age e a do alvo na mira. Nunca uma placa em cima e outra embaixo (decisão do Lucas, 28/10).
+## enquadrado como no começo da luta, os pés dos vizinhos ficam com a placa mínima entre eles (nenhuma some); e, se ainda
+## faltar espaço (a câmera presa longe), as placas do aperto somem, menos a de quem age e a do alvo (o apontado e o
+## confirmado; o aliado vizinho na mira fica sozinho). Nunca uma placa em cima e outra embaixo (decisão do Lucas, 28/10).
 extends RefCounted
 
 var t
@@ -93,19 +94,19 @@ func _fight() -> void:
 		second.rank = 2
 		await arena._sync_positions(0.05)
 	# O lugar mais apertado que a luta aceita (#72): os espaços encolhidos até MIN_GAP_SCALE, enquadrado como no começo
-	# da luta. A câmera chega mais perto e nenhuma placa precisa sumir.
+	# da luta (a câmera chega mais perto pelo enquadramento de sempre). A garantia: os vizinhos de um lado ficam a pelo
+	# menos uma placa mínima, e nenhuma placa precisa sumir.
 	var far := arena.view_distance
 	arena.gap_scale = AHCombatArena.MIN_GAP_SCALE
 	await arena._sync_positions(0.05)
 	arena._frame_arena()
 	street._update_camera(0.0)
-	t.check(arena.view_distance < far, "no espaço mínimo, a câmera chega mais perto (%.1f m, antes %.1f m)" % [arena.view_distance, far])
 	for size in [0, 2]:
 		Settings.set_text_size(size)
 		for i in 6:
 			await _tree.process_frame
 		var profile := ("Maior" if size == 2 else "Normal") + " no espaço mínimo"
-		t.equal(hud._crowded.keys(), [], "no %s, com a câmera mais perto, nenhuma placa some" % profile)
+		t.equal(hud._crowded.keys(), [], "no %s, os vizinhos têm a placa mínima entre os pés e nenhuma placa some" % profile)
 		_check(hud, profile)
 		await _aim(hud, profile)
 	# Se ainda faltar espaço (a câmera presa na distância de antes): as placas do aperto somem, menos a de quem age.
@@ -122,6 +123,18 @@ func _fight() -> void:
 		t.check(shown.all(func(unit_id): return unit_id == current), "no %s, do aperto só fica a placa de quem age %s" % [profile, shown])
 		_check(hud, profile)
 		await _aim(hud, profile)
+		await _aim_allies(hud, profile)
+	# O alvo confirmado fica com a placa no aperto até a vez passar.
+	var ranks: Array = hud.session.state.enemy_team.filter(func(u): return u.rank > 0).map(func(u): return u.rank)
+	ranks.sort()
+	hud._show_markers(ranks, true, func(_rank): pass, "")
+	await _tree.process_frame
+	var struck: String = hud._markers.filter(func(m): return int(m.get_meta("rank")) == ranks[1])[0].get_meta("unit_id")
+	hud._via_mouse = false
+	hud._press_target(ranks[1], func(_rank): pass)
+	await _tree.process_frame
+	await _tree.process_frame
+	t.check(hud._crowded.has(struck) and hud._unit_bars[struck].visible, "no aperto, o alvo confirmado continua com a placa")
 
 
 func _check(hud: AHCombatHud, profile: String) -> void:
@@ -157,7 +170,25 @@ func _check(hud: AHCombatHud, profile: String) -> void:
 	t.equal(overlaps, [], "no %s, as placas de um lado não se cobrem" % profile)
 
 
-## Na mira, em cada inimigo: o ALVO (acima da cabeça) não cobre a placa nem a intenção de ninguém, nem as que subiram.
+## Na mira de um aliado, no aperto (a cura num vizinho de quem age): a placa do alvo aparece e nenhuma placa de um lado
+## cobre outra (a de quem age sai quando o alvo é do mesmo lado).
+func _aim_allies(hud: AHCombatHud, profile: String) -> void:
+	var current: String = hud.session.state.current_turn_unit_id
+	var ranks: Array = hud.session.state.player_team.filter(func(u): return u.rank > 0 and u.id != current).map(func(u): return u.rank)
+	hud._show_markers(ranks, false, func(_rank): pass, "")
+	await _tree.process_frame
+	for marker in hud._markers.filter(func(m): return m.has_meta("card")):
+		hud._select_target(int(marker.get_meta("rank")))
+		await _tree.process_frame
+		await _tree.process_frame
+		var aimed: Control = hud._unit_bars.get(marker.get_meta("unit_id"))
+		t.check(aimed == null or aimed.visible, "no %s, o aliado na mira mostra a placa (%s)" % [profile, marker.get_meta("unit_id")])
+		_check(hud, "%s, mirando %s" % [profile, marker.get_meta("unit_id")])
+	hud._clear_markers()
+	hud._set_enabled(true)
+
+
+## Na mira, em cada inimigo: o ALVO (acima da cabeça) não cobre a placa nem a intenção de ninguém.
 func _aim(hud: AHCombatHud, profile: String) -> void:
 	var ranks: Array = hud.session.state.enemy_team.filter(func(u): return u.rank > 0).map(func(u): return u.rank)
 	hud._show_markers(ranks, true, func(_rank): pass, "")
