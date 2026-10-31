@@ -154,3 +154,8 @@ func _shot(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out.path_join(name + ".png"))
 	_log("foto " + name)
+
+
+func _log(text: String) -> void:
+	_log_file.store_line("%d ms: %s" % [Time.get_ticks_msec(), text])
+	_log_file.flush()
