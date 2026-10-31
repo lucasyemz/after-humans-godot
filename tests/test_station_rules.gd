@@ -114,12 +114,19 @@ func _rooms(t) -> void:
 			"%s: abaixo do máximo, tem custo (nenhum cômodo sem como subir)" % room.name)
 	c.inventory.scrap = 3
 	c.inventory.fragments = 2
+	# A Pesquisa começa soterrada (#186): só se constrói numa vaga dupla livre.
+	t.check(AHStationGrid.buried(c, S.RESEARCH) and S.upgrade_room(c, S.RESEARCH, 0) != "", "a Pesquisa soterrada não se recupera")
+	c.station.grid.cells[0][0] = AHStationGrid.FREE
+	c.station.grid.cells[0][1] = AHStationGrid.FREE
 	t.equal(S.upgrade_room(c, S.RESEARCH, 0), "", "recupera a Pesquisa")
 	var f := S.forecast(c, 4)
 	t.check(f.power_used == 3 and f.power_capacity == 3 and f.unpowered_rooms.is_empty(), "três salas ligadas: energia 3/3")
 	t.equal(S.supply_capacity(c), 12, "Depósito guarda 12")
 	c.inventory.scrap = 5
 	c.inventory.fragments = 1
+	# Construir o Depósito (os caixotes são o nível 1) pede uma vaga livre: a do 2º subsolo, ao lado do patamar.
+	c.station.grid.landings[0] = true
+	c.station.grid.cells[1][6] = AHStationGrid.FREE
 	t.equal(S.upgrade_room(c, S.DEPOT, 1), "", "Depósito com prateleiras extras")
 	t.equal(S.supply_capacity(c), 20, "Depósito melhorado guarda 20")
 

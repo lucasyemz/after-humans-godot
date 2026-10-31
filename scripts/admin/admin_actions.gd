@@ -283,6 +283,8 @@ static func run(id: String) -> String:
 		"rooms_all":
 			for room in S.ROOMS:
 				c.station.rooms[room.id] = maxi(1, int(c.station.rooms.get(room.id, 0)))
+			# A grade (#186): cada cômodo recuperado ganha a vaga dele, desentulhada se preciso.
+			AHStationGrid.heal(c)
 			_refresh_station(scene)
 			return _saved(TranslationServer.translate("Todos os cômodos recuperados"))
 		"night_skip":

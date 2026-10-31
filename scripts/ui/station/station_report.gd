@@ -309,6 +309,10 @@ func _chips(c: Dictionary, result: String) -> Array:
 	var posts: Array = report.get("posts", []).filter(func(p): return int(p.get("amount", 0)) > 0)
 	if not posts.is_empty():
 		out.append({"icon": "room_quarters", "text": tr("Postos: %s") % ", ".join(posts.map(func(p): return post_line(p))), "color": AHKit.TEXT})
+	# A escavação (#186): o bloco aberto e o que ele devolveu, ou quanto andou.
+	var dig: Dictionary = report.get("dig", {})
+	if not dig.is_empty():
+		out.append({"icon": "room_quarters", "text": AHStationGrid.report_line(dig), "color": AHKit.AMBER if dig.get("opened", false) else AHKit.TEXT})
 	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
 	if report.has("train"):
 		var arrived := String(report.train)
@@ -521,6 +525,8 @@ static func post_line(entry: Dictionary) -> String:
 			return TranslationServer.translate("+%d suprimento") % amount if amount == 1 else TranslationServer.translate("+%d suprimentos") % amount
 		"days":
 			return TranslationServer.translate("%d caído mais perto de voltar") % amount if amount == 1 else TranslationServer.translate("%d caídos mais perto de voltar") % amount
+		"dig":
+			return TranslationServer.translate("+%d ponto de obra") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra") % amount
 	return ""
 
 
