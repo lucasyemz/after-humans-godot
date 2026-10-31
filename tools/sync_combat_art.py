@@ -116,11 +116,12 @@ def measured(image: Image.Image) -> dict:
 
 def with_tops(manifest: dict) -> dict:
     """Acrescenta "top" a cada pose de imagem única do manifesto: a primeira linha visível (alfa acima de 24) do WebP,
-    convertida para os pixels da tela original. As folhas de quadros ficam sem: o topo delas é a âncora menos a altura
-    do corpo, já medida pelo alfa."""
+    convertida para os pixels da tela original. Ficam sem as folhas de quadros (o topo delas é a âncora menos a altura
+    do corpo, já medida pelo alfa) e os efeitos visuais (sem altura do corpo, nada lê o topo deles)."""
     def visit(node) -> None:
         if isinstance(node, dict):
-            if "file" in node and "canvas" in node and "anchor" in node and "frames" not in node:
+            node.pop("top", None)
+            if all(key in node for key in ("file", "canvas", "anchor", "body_reference_pixels")) and "frames" not in node:
                 path = PROTO / node["file"].removeprefix("res://")
                 if path.exists():
                     image = Image.open(path).convert("RGBA")

@@ -1020,7 +1020,7 @@ func _update_hover(camera: Camera3D) -> void:
 	_hover_label.visible = card != null
 	if card != null:
 		_hover_label.reset_size()
-		var top := camera.unproject_position(card.global_position + Vector3(0, card.pose_head_height() + 0.15, 0))
+		var top := camera.unproject_position(card.global_position + Vector3(0, card.head_height() + 0.15, 0))
 		_hover_label.position = top - Vector2(_hover_label.size.x * 0.5, _hover_label.size.y)
 		var plate: Control = _unit_bars.get(unit_id)
 		var tag: Control = plate.get_meta("intent") if plate != null and plate.has_meta("intent") else null

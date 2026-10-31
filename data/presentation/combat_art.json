@@ -65,8 +65,7 @@
 						"opacity": 0.78,
 						"life_seconds": 0.6,
 						"target_height_in_bodies": 0.64,
-						"anchor_on_hand": true,
-						"top": 248.0
+						"anchor_on_hand": true
 					}
 				},
 				"cao_impacto_hidraulico": {
@@ -114,8 +113,7 @@
 						"opacity": 0.75,
 						"life_seconds": 0.65,
 						"target_height_in_bodies": 0.64,
-						"anchor_on_hand": true,
-						"top": 230.0
+						"anchor_on_hand": true
 					}
 				},
 				"cao_fique_atras_de_mim": {
@@ -163,8 +161,7 @@
 						"opacity": 0.6,
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.5,
-						"anchor_on_hand": false,
-						"top": 85.9
+						"anchor_on_hand": false
 					}
 				},
 				"cao_nao_estamos_sos": {
@@ -212,8 +209,7 @@
 						"opacity": 0.65,
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.24,
-						"anchor_on_hand": false,
-						"top": 294.0
+						"anchor_on_hand": false
 					}
 				}
 			},
@@ -322,8 +318,7 @@
 						"life_seconds": 0.6,
 						"opacity": 0.7,
 						"target_height_in_bodies": 0.7,
-						"anchor_on_hand": true,
-						"top": 96.0
+						"anchor_on_hand": true
 					}
 				},
 				"gato_salto_entre_ruinas": {
@@ -372,8 +367,7 @@
 						"life_seconds": 0.6,
 						"opacity": 0.7,
 						"target_height_in_bodies": 0.7,
-						"anchor_on_hand": true,
-						"top": 164.0
+						"anchor_on_hand": true
 					}
 				},
 				"gato_sumir_na_sombra": {
@@ -421,8 +415,7 @@
 						"life_seconds": 0.8,
 						"opacity": 0.7,
 						"target_height_in_bodies": 0.34,
-						"anchor_on_hand": false,
-						"top": 203.8
+						"anchor_on_hand": false
 					}
 				},
 				"gato_cacada_precisa": {
@@ -470,8 +463,7 @@
 						"life_seconds": 0.6,
 						"opacity": 0.7,
 						"target_height_in_bodies": 0.6,
-						"anchor_on_hand": false,
-						"top": 128.1
+						"anchor_on_hand": false
 					}
 				}
 			},
@@ -580,8 +572,7 @@
 						"opacity": 0.7,
 						"life_seconds": 0.65,
 						"target_height_in_bodies": 0.6,
-						"anchor_on_hand": false,
-						"top": 141.9
+						"anchor_on_hand": false
 					}
 				},
 				"sapo_coquetel_corrosivo": {
@@ -629,8 +620,7 @@
 						"opacity": 0.7,
 						"life_seconds": 0.65,
 						"target_height_in_bodies": 0.55,
-						"anchor_on_hand": false,
-						"top": 318.0
+						"anchor_on_hand": false
 					}
 				},
 				"sapo_ampola_reparo_vivo": {
@@ -678,8 +668,7 @@
 						"opacity": 0.7,
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.42,
-						"anchor_on_hand": false,
-						"top": 74.0
+						"anchor_on_hand": false
 					}
 				},
 				"sapo_antidoto_campo": {
@@ -727,8 +716,7 @@
 						"opacity": 0.7,
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.42,
-						"anchor_on_hand": false,
-						"top": 77.9
+						"anchor_on_hand": false
 					}
 				}
 			},
@@ -838,8 +826,7 @@
 						"life_seconds": 0.6,
 						"target_height_in_bodies": 0.64,
 						"anchor_on_hand": false,
-						"flip_with_direction": true,
-						"top": 546.0
+						"flip_with_direction": true
 					}
 				},
 				"coruja_olho_nas_ruinas": {
@@ -888,8 +875,7 @@
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.61,
 						"anchor_on_hand": false,
-						"flip_with_direction": false,
-						"top": 143.9
+						"flip_with_direction": false
 					}
 				},
 				"coruja_granada_fumaca": {
@@ -938,8 +924,7 @@
 						"life_seconds": 0.8,
 						"target_height_in_bodies": 0.42,
 						"anchor_on_hand": false,
-						"flip_with_direction": false,
-						"top": 312.0
+						"flip_with_direction": false
 					}
 				},
 				"coruja_recurso_emergencia": {
@@ -988,8 +973,7 @@
 						"life_seconds": 0.6,
 						"target_height_in_bodies": 0.64,
 						"anchor_on_hand": false,
-						"flip_with_direction": true,
-						"top": 402.0
+						"flip_with_direction": true
 					}
 				}
 			},
