@@ -36,6 +36,8 @@ const CLOSE_FOCUS := 0.6
 const CLOSE_DISTANCE := 0.86
 ## Folga de cada borda da tela ao enquadrar a luta inteira.
 const FRAME_MARGIN := 0.84
+## A folga (px) além da placa mínima entre os pés de dois vizinhos, quando a câmera se aproxima no aperto (#72).
+const PLATE_ROOM := 6.0
 ## Quem age passa na frente dos outros (BringAttackerToFront): um pouco mais perto da câmera.
 const FRONT_LIFT := 0.35
 ## Impacto do acerto (#33): a pausa curta (o tempo quase para; mais longa no crítico), o tremor da câmera em pixels da
@@ -343,11 +345,13 @@ func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array,
 
 
 ## Enquadra a luta inteira (como a Unreal): o meio de quem luta e a distância em que o lado mais longo, mais meio
-## personagem, cabe na tela com folga nas bordas.
+## personagem, cabe na tela com folga nas bordas. Num lugar apertado (os espaços encolhidos pelo fit), a câmera chega
+## mais perto, até os vizinhos de um mesmo lado ficarem com o espaço de uma placa entre os pés (#72), sem cortar ninguém.
 func _frame_arena() -> void:
 	var left := center_x - FRONT_GAP * 0.5
 	var right := center_x + FRONT_GAP * 0.5
 	var sprite_half := 0.6
+	var sides := {true: [], false: []}
 	for unit in session.units():
 		if unit.rank <= 0:
 			continue
@@ -355,14 +359,25 @@ func _frame_arena() -> void:
 		left = minf(left, x)
 		right = maxf(right, x)
 		sprite_half = maxf(sprite_half, minf(cards[unit.id].body_height * 0.4, 1.3))
+		sides[unit.is_player].append(x)
 	view_x = (left + right) * 0.5
 	focus_x = view_x
 	close_t = 0.0
 	var camera := get_viewport().get_camera_3d()
 	var half_fov := deg_to_rad((camera.fov if camera else 26.0) * 0.5)
-	var aspect := get_viewport().get_visible_rect().size.aspect()
-	var fit := ((right - left) * 0.5 + sprite_half) / (tan(half_fov) * aspect * FRAME_MARGIN)
+	var screen := get_viewport().get_visible_rect().size
+	var fit := ((right - left) * 0.5 + sprite_half) / (tan(half_fov) * screen.aspect() * FRAME_MARGIN)
 	view_distance = maxf(fit, 10.0)
+	# O menor espaço entre vizinhos de um lado, em metros, e a distância em que ele dá a placa mínima na tela.
+	var closest := INF
+	for xs: Array in sides.values():
+		xs.sort()
+		for i in range(1, xs.size()):
+			closest = minf(closest, xs[i] - xs[i - 1])
+	if closest < INF:
+		var plate := AHCombatHud.PLATE_MIN + AHCombatHud.PLATE_GAP + PLATE_ROOM
+		var roomy := closest * screen.x / (2.0 * tan(half_fov) * screen.aspect() * plate)
+		view_distance = maxf(fit, minf(view_distance, roomy))
 
 
 ## O que a câmera da rua usa durante a luta: x e distância, já com a aproximação do golpe.

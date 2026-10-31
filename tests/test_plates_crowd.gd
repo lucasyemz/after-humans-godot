@@ -1,6 +1,8 @@
 ## As placas das máquinas numa luta cheia (quatro inimigos, #60 sobre a #63): no texto Normal e no Maior, a intenção e a
 ## barra não cobrem o corpo (a barra e os estados no máximo um quinto dele; a intenção, acima da cabeça, nada) e as
-## placas de um mesmo lado não se cobrem. Também com os espaços no mínimo (MIN_GAP_SCALE), o lugar mais apertado (#72).
+## placas de um mesmo lado não se cobrem. Também com os espaços no mínimo (MIN_GAP_SCALE), o lugar mais apertado (#72):
+## a câmera chega mais perto até as placas caberem; e, se ainda faltar espaço (a câmera presa longe), as placas do aperto
+## somem, menos a de quem age e a do alvo na mira. Nunca uma placa em cima e outra embaixo (decisão do Lucas, 28/10).
 extends RefCounted
 
 var t
@@ -77,28 +79,49 @@ func _fight() -> void:
 		var second = team.filter(func(u): return u.rank == 2)[0]
 		first.rank = 2
 		second.rank = 1
-		var raised := {}
+		var hidden := {}
 		arena._sync_positions(0.6)
 		# Até os dois chegarem ao lugar novo (sem janela, os quadros passam mais rápido que o tempo da troca).
 		for i in 600:
 			await _tree.process_frame
-			for unit_id in hud._plate_stagger:
-				raised[unit_id] = true
+			for unit_id in hud._crowded:
+				hidden[unit_id] = true
 			if [first, second].all(func(u): return arena.cards[u.id].position.distance_to(arena.slot_position(u)) < 0.01):
 				break
-		t.equal(raised.keys(), [], "na troca de posição, com o espaço normal, nenhuma placa pula para cima da cabeça")
+		t.equal(hidden.keys(), [], "na troca de posição, com o espaço normal, nenhuma placa some")
 		first.rank = 1
 		second.rank = 2
 		await arena._sync_positions(0.05)
-	# O lugar mais apertado que a luta aceita (#72): os espaços encolhidos até MIN_GAP_SCALE, com a placa no mínimo.
+	# O lugar mais apertado que a luta aceita (#72): os espaços encolhidos até MIN_GAP_SCALE, enquadrado como no começo
+	# da luta. A câmera chega mais perto e nenhuma placa precisa sumir.
+	var far := arena.view_distance
 	arena.gap_scale = AHCombatArena.MIN_GAP_SCALE
 	await arena._sync_positions(0.05)
+	arena._frame_arena()
+	street._update_camera(0.0)
+	t.check(arena.view_distance < far, "no espaço mínimo, a câmera chega mais perto (%.1f m, antes %.1f m)" % [arena.view_distance, far])
 	for size in [0, 2]:
 		Settings.set_text_size(size)
 		for i in 6:
 			await _tree.process_frame
-		_check(hud, ("Maior" if size == 2 else "Normal") + " no espaço mínimo")
-		await _aim(hud, ("Maior" if size == 2 else "Normal") + " no espaço mínimo")
+		var profile := ("Maior" if size == 2 else "Normal") + " no espaço mínimo"
+		t.equal(hud._crowded.keys(), [], "no %s, com a câmera mais perto, nenhuma placa some" % profile)
+		_check(hud, profile)
+		await _aim(hud, profile)
+	# Se ainda faltar espaço (a câmera presa na distância de antes): as placas do aperto somem, menos a de quem age.
+	arena.view_distance = far
+	street._update_camera(0.0)
+	for size in [0, 2]:
+		Settings.set_text_size(size)
+		for i in 6:
+			await _tree.process_frame
+		var profile := ("Maior" if size == 2 else "Normal") + " no aperto"
+		t.check(not hud._crowded.is_empty(), "no %s, há placas no aperto" % profile)
+		var current: String = hud.session.state.current_turn_unit_id
+		var shown: Array = hud._crowded.keys().filter(func(unit_id): return hud._unit_bars[unit_id].visible)
+		t.check(shown.all(func(unit_id): return unit_id == current), "no %s, do aperto só fica a placa de quem age %s" % [profile, shown])
+		_check(hud, profile)
+		await _aim(hud, profile)
 
 
 func _check(hud: AHCombatHud, profile: String) -> void:
@@ -144,6 +167,10 @@ func _aim(hud: AHCombatHud, profile: String) -> void:
 		hud._select_target(int(marker.get_meta("rank")))
 		await _tree.process_frame
 		await _tree.process_frame
+		# O alvo na mira mostra a placa dele, mesmo no aperto.
+		var aimed: Control = hud._unit_bars.get(marker.get_meta("unit_id"))
+		if aimed != null and not aimed.visible:
+			covered.append("%s sem placa na mira" % marker.get_meta("unit_id"))
 		var label := Rect2(hud._target_label.position, hud._target_label.size)
 		for unit_id in hud._unit_bars:
 			var plate: Control = hud._unit_bars[unit_id]
