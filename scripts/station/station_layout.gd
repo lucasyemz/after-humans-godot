@@ -35,11 +35,12 @@ const TEMPLATES := {
 }
 
 ## Os cantos da plataforma (fora da grade, à direita do vagão parado): o fogareiro entre os dois bancos (a Cantina
-## improvisada), a Preparação diante do Mapa da Rede e os caixotes no fim da linha (o Depósito improvisado).
+## improvisada), a Preparação diante do Mapa da Rede e os caixotes entre o Mapa e a porta escondida (o Depósito
+## improvisado; a parede falsa desliza atrás deles).
 const PLATFORM := {
 	"canteen": {"x0": 1060.0, "x1": 1520.0, "lane": [1110.0, 1470.0]},
-	"preparation": {"x0": 1520.0, "x1": 1900.0, "lane": [1560.0, 1860.0]},
-	"depot": {"x0": 2280.0, "x1": 2760.0, "lane": [2330.0, 2700.0]},
+	"preparation": {"x0": 1520.0, "x1": 1860.0, "lane": [1560.0, 1820.0]},
+	"depot": {"x0": 1860.0, "x1": 2140.0, "lane": [1890.0, 2110.0]},
 }
 
 
@@ -110,7 +111,6 @@ static func blocks(campaign: Dictionary) -> Array:
 	var out: Array = []
 	if not _has_grid(campaign):
 		return out
-	var target := AHStationGrid.dig_target(campaign)
 	for f in range(1, AHStationGrid.FLOORS + 1):
 		for k in range(1, AHStationGrid.SLOTS + 1):
 			var value := AHStationGrid.cell(campaign, f, k)
@@ -121,8 +121,9 @@ static func blocks(campaign: Dictionary) -> Array:
 				"floor": floor_z(f), "ceiling": floor_z(f) + HEIGHT, "state": "free" if value == AHStationGrid.FREE else "buried",
 				"stage": 0, "from": 1}
 			if value == "":
+				# A obra começada fica à vista mesmo com a frente trocada (a regra guarda o que já foi cavado).
 				var stage := dig_stage(campaign, key)
-				if stage > 0 and key == target:
+				if stage > 0:
 					entry.state = "digging"
 					entry.stage = stage
 				entry.from = 1 if k == AHStationGrid.SLOTS or AHStationGrid.cell(campaign, f, k + 1) != "" else -1

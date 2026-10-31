@@ -326,7 +326,7 @@ func _station() -> void:
 	_terminal_furniture()
 	b.prop("wall_clock", Vector3(1300, STATION_BACK + 3, 248))
 	b.prop("utility_box_02", Vector3(2660, STATION_BACK + 24, 0))
-	b.prop("korean_fire_extinguisher_01", Vector3(2740, STATION_BACK + 20, 0))
+	b.prop("korean_fire_extinguisher_01", Vector3(2560, STATION_BACK + 20, 0))
 	b.prop("industrial_storage_cart", Vector3(760, -760, 0), 12)
 	b.prop("wooden_military_crate", Vector3(160, -900, 0), 4)
 	for lamp in [220.0, 520.0, 1320.0, 2040.0]:
@@ -349,6 +349,13 @@ func _terminal_furniture() -> void:
 		b.card("Terminal_Bench", Vector3(x, -920, 0), 160, 160.0 * 329 / 564)
 	b.card("Preparation_Crate", Vector3(1680, -940, 0), 78, 78.0 * 380 / 410)
 	b.card("Preparation_Backpack", Vector3(1590, -942, 0), 54, 54.0 * 1240 / 1125)
+	# A Preparação na plataforma (#186): o diagrama das rotas na parede, ao lado do Mapa da Rede, e a prancheta com a
+	# lista em cima do caixote.
+	var routes_width := 104.0
+	var routes_height := routes_width * 123.0 / 266.0
+	box(Vector3(1568 - routes_width * 0.5 - 4, STATION_BACK + 2, 104), Vector3(1568 + routes_width * 0.5 + 4, STATION_BACK + 5, 112 + routes_height), wood)
+	b.card("Preparation_Routes", Vector3(1568, STATION_BACK + 6, 108), routes_width, routes_height)
+	b.card("Preparation_Checklist", Vector3(1680, -936, 78.0 * 380 / 410), 18, 26)
 
 
 func _terminal_details() -> void:
@@ -1498,24 +1505,24 @@ func _stove() -> void:
 	stove_light = b.light(Vector3(x, y + 60, 60), 240, 360, Color(1, 0.5, 0.2), false)
 
 
-## Os caixotes: as caixas, os sacos e os barris empilhados no fim da linha; cada faixa do estoque acende uma pilha.
+## Os caixotes: as caixas, os sacos e os barris empilhados na plataforma; cada faixa do estoque acende uma pilha.
 func _crates() -> void:
 	var ratios := {"Depot_Crate": 1480.0 / 777.0, "Depot_Sack": 1053.0 / 1285.0, "Depot_Container": 1174.0 / 1020.0}
 	var art := func(name: String, base: Vector3, width: float) -> void:
 		b.card(name, base, width, width / ratios[name], true)
-	# À frente da caixa de luz do fim da linha, longe da beira: os caixotes de sempre e as pilhas do estoque.
-	var y := -800.0
-	b.prop("wooden_military_crate", Vector3(2390, y - 20, 0), 4)
-	b.prop("wooden_crate_02", Vector3(2700, y - 10, 0), 80)
+	# Entre o Mapa da Rede e a porta escondida, longe da beira: os caixotes de sempre e as pilhas do estoque.
+	var y := -820.0
+	b.prop("wooden_military_crate", Vector3(1905, y - 30, 0), 4)
+	b.prop("wooden_crate_02", Vector3(2105, y - 20, 0), 80)
 	var bands := [
-		[1, "Depot_Crate", Vector3(2500, y, 0), 70.0],
-		[2, "Depot_Crate", Vector3(2500, y, 37), 64.0],
-		[3, "Depot_Sack", Vector3(2575, y + 6, 0), 40.0],
-		[3, "Depot_Container", Vector3(2612, y + 6, 0), 34.0],
-		[4, "Depot_Crate", Vector3(2595, y + 6, 30), 56.0],
+		[1, "Depot_Crate", Vector3(1975, y, 0), 70.0],
+		[2, "Depot_Crate", Vector3(1975, y, 37), 64.0],
+		[3, "Depot_Sack", Vector3(2040, y + 6, 0), 40.0],
+		[3, "Depot_Container", Vector3(2075, y + 6, 0), 34.0],
+		[4, "Depot_Crate", Vector3(2055, y + 6, 30), 56.0],
 	]
 	for entry in bands:
 		var mark := b.mark()
 		art.call(entry[1], entry[2], entry[3])
 		_tag_stock(mark, entry[0])
-	b.contact(Vector3(2540, y, 0), Vector2(320, 60), 0.35)
+	b.contact(Vector3(2005, y, 0), Vector2(260, 60), 0.35)

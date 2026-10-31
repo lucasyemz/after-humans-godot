@@ -86,6 +86,8 @@ const PAN_RANGE := Vector2(-12.0, 13.0)
 const PAN_Y_RANGE := Vector2(-1.6, 0.0)
 ## Ao escolher um cômodo, a câmera aproxima: as paredes do lado saem um pouco do quadro (m).
 const ROOM_CROP := 0.6
+## A largura mínima (m) do quadro de um canto da plataforma.
+const PLATFORM_FRAME := 3.6
 ## A distância mínima (m) de quem desce atrás para quem vai na frente.
 const FOLLOW_GAP := 1.0
 ## Quanto antes de parar o freio começa (s).
@@ -332,6 +334,9 @@ func _process(delta: float) -> void:
 	if _reopen_pending:
 		_tick_reopen()
 	_walk(delta)
+	if _platform_in_use() != _platform_busy:
+		_platform_busy = not _platform_busy
+		hide_residents(_residents_hidden)
 	if is_instance_valid(stage_card):
 		# A respiração do parado, como a dos moradores esperando.
 		stage_card.scale = Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
@@ -514,12 +519,23 @@ func focus_clean_overview() -> void:
 func focus_room(room_id: String, instant: bool = false) -> void:
 	var room := room_def(room_id)
 	if room.is_empty():
+		# Soterrado (#186): sem lugar na cena, a vista geral (o painel diz o que escavar).
+		focus_overview(instant)
 		return
 	# Mais perto que a vista do cômodo inteiro (#131): as paredes do lado saem um pouco do quadro.
 	_in_overview = false
-	# Na plataforma (o fogareiro, os caixotes, a Preparação), o quadro fica no plano de quem anda ali, longe da beira.
-	var depth: float = 0.0 if room.place == "grid" else room.z + 0.6
-	_go(_framed_key(room.x0 + ROOM_CROP, room.x1 - ROOM_CROP, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, depth), false, instant)
+	var x0: float = room.x0 + ROOM_CROP
+	var x1: float = room.x1 - ROOM_CROP
+	var depth := 0.0
+	if room.place != "grid":
+		# Na plataforma (o fogareiro, os caixotes, a Preparação), o quadro fica no plano de quem anda ali, com pelo menos
+		# PLATFORM_FRAME de largura: a câmera não chega perto do corte (as paredes da frente tapariam o canto).
+		depth = room.z + 0.6
+		var middle := (x0 + x1) * 0.5
+		var half := maxf((x1 - x0) * 0.5, PLATFORM_FRAME * 0.5)
+		x0 = middle - half
+		x1 = middle + half
+	_go(_framed_key(x0, x1, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, depth), false, instant)
 
 
 ## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): o meio da sala entre os painéis, e a
@@ -594,12 +610,25 @@ func hide_residents(hidden: bool) -> void:
 			card.visible = not hidden and not away.has(id)
 
 
+## Com a plataforma ocupada (a fila do relatório ou da partida, quem sai dela, o trem), quem mora nos cantos dela (o
+## fogareiro, a Preparação, os caixotes; #186) sai de cena: ninguém fica atrás da fila nem na frente do trem.
+var _platform_busy := false
+
+
+func _platform_in_use() -> bool:
+	return not lineup.is_empty() or not _leaving.is_empty() or _train_mode != 0 or departure_pending
+
+
 ## Quem não aparece no cômodo: a fila da plataforma, quem sai dela (#131) e quem ainda vai descer do trem da volta
 ## (#76). Esses estão na roupa de expedição; o cômodo mostra a do lobby (#249) só depois que saem da plataforma.
 func _away_ids() -> Array:
 	var away: Array = lineup.map(func(e): return e.hero_id) + _leaving.map(func(e): return e.hero_id)
 	if _train_mode == 4:
 		away.append_array(_arrivals.filter(func(a): return a.card == null).map(func(a): return a.hero_id))
+	if _platform_busy:
+		for walker in _walkers:
+			if room_def(String(walker.get("room", ""))).get("place", "") == "platform":
+				away.append(walker.get("hero_id", walker.get("civilian", "")))
 	return away
 
 
@@ -1700,7 +1729,11 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		_walkers.append(walker)
 	for civilian_id in campaign.station.residents:
 		var art: Dictionary = _civilian_art.get(civilian_id, {})
-		var room := room_def(S.civilian(civilian_id).get("room", ""))
+		var room_id: String = S.civilian(civilian_id).get("room", "")
+		# O cômodo dele ainda soterrado (#186: a Cora chega antes da Pesquisa): fica no Alojamento até ele ter lugar.
+		if room_def(room_id).is_empty():
+			room_id = S.CHARACTERS
+		var room := room_def(room_id)
 		if art.is_empty() or room.is_empty():
 			continue
 		var card := AHSpriteCard.new()
@@ -1710,7 +1743,8 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		card.position = Vector3(lerpf(room.lane[0], room.lane[1], 0.5), room.floor, room.z - 0.4)
 		residents[civilian_id] = card
 		# Civil morador: alterna o idle e a pose de trabalho, parado no posto dele.
-		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
+		_walkers.append({"card": card, "civilian": civilian_id, "room": room_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0),
+			"civil_working": false})
 	# Ninguém começa em cima de outro (o morador fica no meio do cômodo, e o herói sorteado podia cair nele).
 	for walker in _walkers:
 		if walker.has("civilian") or not walker.has("hero_id"):

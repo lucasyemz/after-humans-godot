@@ -103,6 +103,9 @@ func _blocks() -> void:
 	c.station.grid.progress["1:1"] = 1
 	t.check(L.signature(c) != before, "a escavação passando de um terço muda o que a cena mostra")
 	t.equal(L.blocks(c).filter(func(b): return b.key == "1:1")[0].from, 1, "a vaga 1 é cavada a partir da vaga livre à direita")
+	# Trocada a frente, a obra começada continua à vista (a regra guarda o que já foi cavado).
+	c.station.grid.target = "L2"
+	t.equal(L.blocks(c).filter(func(b): return b.key == "1:1")[0].state, "digging", "com a frente no patamar, a vaga 1 continua meio cavada")
 
 
 ## A cena: só os cômodos com lugar são montados; construído o Bar na vaga livre, a cena remonta e ele aparece lá.
@@ -113,6 +116,8 @@ func _scene() -> void:
 	Tips.enabled = false
 	Campaign.save_dir = "user://test-station-layout-%d" % Time.get_ticks_usec()
 	var c := Campaign.create_initial(276)
+	# Os três moradores: a Cora é da Pesquisa, ainda soterrada.
+	c.station.residents = [S.DORA, S.OTTO, S.CORA]
 	Campaign.state = c
 	Campaign.save()
 	GameFlow.change_to("station", {}, false)
@@ -149,6 +154,24 @@ func _station(station, c: Dictionary) -> void:
 	t.check(AHStation.sleep_slots(1).all(func(p): return p.x > dorm.x0 and p.x < dorm.x1 and is_equal_approx(p.y, dorm.floor)),
 		"os lugares de dormir dentro do Dormitório (%.1f a %.1f m)" % [dorm.x0, dorm.x1])
 	t.check(AHStation.canteen_seats().all(func(p): return p.y == 0.0 and p.z < -8.0), "o banco da Cantina é o do fogareiro, na plataforma")
+	# A Cora, com a Pesquisa soterrada, fica no Alojamento; a Dora, no fogareiro da plataforma.
+	var cora = station.residents.get(S.CORA)
+	var characters: Dictionary = station.room_def(S.CHARACTERS)
+	t.check(cora != null and cora.position.x >= characters.x0 and cora.position.x <= characters.x1 and is_equal_approx(cora.position.y, characters.floor),
+		"a moradora da Pesquisa soterrada fica no Alojamento")
+	var dora = station.residents.get(S.DORA)
+	t.check(dora != null and dora.visible and dora.position.y == 0.0, "a Dora no fogareiro, à vista")
+	# Com a fila do relatório na plataforma, quem mora nos cantos dela sai de cena (ninguém atrás da fila).
+	station.show_report([c.roster[0].id], true)
+	await _frames(2)
+	t.check(not dora.visible, "a fila do relatório na plataforma: a Dora sai de cena")
+	station.clear_lineup()
+	await _frames(2)
+	t.check(dora.visible, "e volta quando a fila sai")
+	# Um cômodo soterrado escolhido (o Ver do Plano): a câmera vai para a vista geral, não fica no cômodo de antes.
+	station.focus_room(S.CHARACTERS, true)
+	station.focus_room(S.RESEARCH, true)
+	t.check(station._in_overview, "a Pesquisa soterrada: a vista geral")
 	# A vista geral desce até o 3º subsolo, sem passar do limite.
 	station.focus_overview(true)
 	station.set_pan(station.pan, -100.0)

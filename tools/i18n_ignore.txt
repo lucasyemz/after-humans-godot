@@ -530,7 +530,9 @@ station_build.gd: Forge_Toolbox
 station_build.gd: Forge_Workbay
 station_build.gd: Metal021
 station_build.gd: Preparation_Backpack
+station_build.gd: Preparation_Checklist
 station_build.gd: Preparation_Crate
+station_build.gd: Preparation_Routes
 station_build.gd: Research_Bookshelf
 station_build.gd: Research_Notes
 station_build.gd: Research_RadioDesk
