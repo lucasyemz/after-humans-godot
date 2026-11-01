@@ -1,0 +1,4587 @@
+{
+  "engine": "4.7.2-stable (official)",
+  "fixture": "real Station, initial campaign seed 6, rooms unlocked in isolated memory, Character Room, frozen camera/time; compact ability block and contextual tooltip over the same scene",
+  "physical_gpu": false,
+  "records": [
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PREFERÊNCIA"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVOS · ATAQUES"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 24,
+          "minimum_size": [
+            1.0,
+            29.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "4 equipadas · frente 1 e 2"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 22,
+          "minimum_size": [
+            1.0,
+            27.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · RESUMO DO KIT"
+        }
+      ],
+      "markers": [
+        {
+          "active": false,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": false,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 1,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": false,
+          "enemy": true,
+          "rank": 4,
+          "target": true
+        }
+      ],
+      "variant": "normal",
+      "view": "overview"
+    },
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PARTE DE"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVO · INIMIGO"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 24,
+          "minimum_size": [
+            1.0,
+            29.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "Impacto Hidráulico"
+        },
+        {
+          "actual_position": [
+            24.0,
+            14.0
+          ],
+          "actual_size": [
+            492.0,
+            64.0
+          ],
+          "base_px": 28,
+          "font_px": 28,
+          "minimum_size": [
+            1.0,
+            34.0
+          ],
+          "rect": [
+            24.0,
+            14.0,
+            492.0,
+            64.0
+          ],
+          "text": "Impacto Hidráulico"
+        },
+        {
+          "actual_position": [
+            24.0,
+            89.0
+          ],
+          "actual_size": [
+            492.0,
+            112.0
+          ],
+          "base_px": 23,
+          "font_px": 23,
+          "minimum_size": [
+            1.0,
+            59.0
+          ],
+          "rect": [
+            24.0,
+            89.0,
+            492.0,
+            112.0
+          ],
+          "text": "Dano reduzido e Atordoamento: perde uma ação. Não empurra."
+        },
+        {
+          "actual_position": [
+            24.0,
+            218.0
+          ],
+          "actual_size": [
+            492.0,
+            48.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            218.0,
+            492.0,
+            48.0
+          ],
+          "text": "Cheio: alcança · vazio: fora"
+        },
+        {
+          "actual_position": [
+            24.0,
+            268.0
+          ],
+          "actual_size": [
+            492.0,
+            33.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            25.0
+          ],
+          "rect": [
+            24.0,
+            268.0,
+            492.0,
+            33.0
+          ],
+          "text": "Inimigos: 1 → 4"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 22,
+          "minimum_size": [
+            1.0,
+            27.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · HABILIDADE EM FOCO"
+        }
+      ],
+      "markers": [
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 1,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": false,
+          "enemy": true,
+          "rank": 4,
+          "target": true
+        }
+      ],
+      "variant": "normal",
+      "view": "attack"
+    },
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PARTE DE"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVO · ALIADO"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 24,
+          "minimum_size": [
+            1.0,
+            29.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "Não Estamos Sós"
+        },
+        {
+          "actual_position": [
+            24.0,
+            14.0
+          ],
+          "actual_size": [
+            492.0,
+            64.0
+          ],
+          "base_px": 28,
+          "font_px": 28,
+          "minimum_size": [
+            1.0,
+            34.0
+          ],
+          "rect": [
+            24.0,
+            14.0,
+            492.0,
+            64.0
+          ],
+          "text": "Não Estamos Sós"
+        },
+        {
+          "actual_position": [
+            24.0,
+            89.0
+          ],
+          "actual_size": [
+            492.0,
+            112.0
+          ],
+          "base_px": 23,
+          "font_px": 23,
+          "minimum_size": [
+            1.0,
+            28.0
+          ],
+          "rect": [
+            24.0,
+            89.0,
+            492.0,
+            112.0
+          ],
+          "text": "Reduz 12 Instinto e remove 1 Vulnerável do aliado."
+        },
+        {
+          "actual_position": [
+            24.0,
+            218.0
+          ],
+          "actual_size": [
+            492.0,
+            48.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            218.0,
+            492.0,
+            48.0
+          ],
+          "text": "Cheio: alcança · vazio: fora"
+        },
+        {
+          "actual_position": [
+            24.0,
+            268.0
+          ],
+          "actual_size": [
+            492.0,
+            33.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            25.0
+          ],
+          "rect": [
+            24.0,
+            268.0,
+            492.0,
+            33.0
+          ],
+          "text": "Aliados: 4 → 1"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 22,
+          "minimum_size": [
+            1.0,
+            27.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · HABILIDADE EM FOCO"
+        }
+      ],
+      "markers": [
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": true
+        }
+      ],
+      "variant": "normal",
+      "view": "support"
+    },
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 34,
+          "minimum_size": [
+            1.0,
+            41.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PREFERÊNCIA"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVOS · ATAQUES"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 31,
+          "minimum_size": [
+            1.0,
+            38.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "4 equipadas · frente 1 e 2"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 29,
+          "minimum_size": [
+            1.0,
+            35.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · RESUMO DO KIT"
+        }
+      ],
+      "markers": [
+        {
+          "active": false,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": false,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 1,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": false,
+          "enemy": true,
+          "rank": 4,
+          "target": true
+        }
+      ],
+      "variant": "larger",
+      "view": "overview"
+    },
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 34,
+          "minimum_size": [
+            1.0,
+            41.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PARTE DE"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVO · INIMIGO"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 31,
+          "minimum_size": [
+            1.0,
+            38.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "Impacto Hidráulico"
+        },
+        {
+          "actual_position": [
+            24.0,
+            14.0
+          ],
+          "actual_size": [
+            492.0,
+            64.0
+          ],
+          "base_px": 28,
+          "font_px": 36,
+          "minimum_size": [
+            1.0,
+            44.0
+          ],
+          "rect": [
+            24.0,
+            14.0,
+            492.0,
+            64.0
+          ],
+          "text": "Impacto Hidráulico"
+        },
+        {
+          "actual_position": [
+            24.0,
+            89.0
+          ],
+          "actual_size": [
+            492.0,
+            112.0
+          ],
+          "base_px": 23,
+          "font_px": 30,
+          "minimum_size": [
+            1.0,
+            75.0
+          ],
+          "rect": [
+            24.0,
+            89.0,
+            492.0,
+            112.0
+          ],
+          "text": "Dano reduzido e Atordoamento: perde uma ação. Não empurra."
+        },
+        {
+          "actual_position": [
+            24.0,
+            218.0
+          ],
+          "actual_size": [
+            492.0,
+            48.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            218.0,
+            492.0,
+            48.0
+          ],
+          "text": "Cheio: alcança · vazio: fora"
+        },
+        {
+          "actual_position": [
+            24.0,
+            268.0
+          ],
+          "actual_size": [
+            492.0,
+            33.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            33.0
+          ],
+          "rect": [
+            24.0,
+            268.0,
+            492.0,
+            33.0
+          ],
+          "text": "Inimigos: 1 → 4"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 29,
+          "minimum_size": [
+            1.0,
+            35.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · HABILIDADE EM FOCO"
+        }
+      ],
+      "markers": [
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 1,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": false,
+          "enemy": true,
+          "rank": 4,
+          "target": true
+        }
+      ],
+      "variant": "larger",
+      "view": "attack"
+    },
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 34,
+          "minimum_size": [
+            1.0,
+            41.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PARTE DE"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVO · ALIADO"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            40.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            40.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 31,
+          "minimum_size": [
+            1.0,
+            38.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "Não Estamos Sós"
+        },
+        {
+          "actual_position": [
+            24.0,
+            14.0
+          ],
+          "actual_size": [
+            492.0,
+            64.0
+          ],
+          "base_px": 28,
+          "font_px": 36,
+          "minimum_size": [
+            1.0,
+            44.0
+          ],
+          "rect": [
+            24.0,
+            14.0,
+            492.0,
+            64.0
+          ],
+          "text": "Não Estamos Sós"
+        },
+        {
+          "actual_position": [
+            24.0,
+            89.0
+          ],
+          "actual_size": [
+            492.0,
+            112.0
+          ],
+          "base_px": 23,
+          "font_px": 30,
+          "minimum_size": [
+            1.0,
+            75.0
+          ],
+          "rect": [
+            24.0,
+            89.0,
+            492.0,
+            112.0
+          ],
+          "text": "Reduz 12 Instinto e remove 1 Vulnerável do aliado."
+        },
+        {
+          "actual_position": [
+            24.0,
+            218.0
+          ],
+          "actual_size": [
+            492.0,
+            48.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            218.0,
+            492.0,
+            48.0
+          ],
+          "text": "Cheio: alcança · vazio: fora"
+        },
+        {
+          "actual_position": [
+            24.0,
+            268.0
+          ],
+          "actual_size": [
+            492.0,
+            33.0
+          ],
+          "base_px": 20,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            33.0
+          ],
+          "rect": [
+            24.0,
+            268.0,
+            492.0,
+            33.0
+          ],
+          "text": "Aliados: 4 → 1"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 29,
+          "minimum_size": [
+            1.0,
+            35.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · HABILIDADE EM FOCO"
+        }
+      ],
+      "markers": [
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": true
+        }
+      ],
+      "variant": "larger",
+      "view": "support"
+    },
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PREFERÊNCIA"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVOS · ATAQUES"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 24,
+          "minimum_size": [
+            1.0,
+            29.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "4 equipadas · frente 1 e 2"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 22,
+          "minimum_size": [
+            1.0,
+            27.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · RESUMO DO KIT"
+        }
+      ],
+      "markers": [
+        {
+          "active": false,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": false,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 1,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": false,
+          "enemy": true,
+          "rank": 4,
+          "target": true
+        }
+      ],
+      "variant": "colorblind",
+      "view": "overview"
+    },
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PARTE DE"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVO · INIMIGO"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 24,
+          "minimum_size": [
+            1.0,
+            29.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "Impacto Hidráulico"
+        },
+        {
+          "actual_position": [
+            24.0,
+            14.0
+          ],
+          "actual_size": [
+            492.0,
+            64.0
+          ],
+          "base_px": 28,
+          "font_px": 28,
+          "minimum_size": [
+            1.0,
+            34.0
+          ],
+          "rect": [
+            24.0,
+            14.0,
+            492.0,
+            64.0
+          ],
+          "text": "Impacto Hidráulico"
+        },
+        {
+          "actual_position": [
+            24.0,
+            89.0
+          ],
+          "actual_size": [
+            492.0,
+            112.0
+          ],
+          "base_px": 23,
+          "font_px": 23,
+          "minimum_size": [
+            1.0,
+            59.0
+          ],
+          "rect": [
+            24.0,
+            89.0,
+            492.0,
+            112.0
+          ],
+          "text": "Dano reduzido e Atordoamento: perde uma ação. Não empurra."
+        },
+        {
+          "actual_position": [
+            24.0,
+            218.0
+          ],
+          "actual_size": [
+            492.0,
+            48.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            218.0,
+            492.0,
+            48.0
+          ],
+          "text": "Cheio: alcança · vazio: fora"
+        },
+        {
+          "actual_position": [
+            24.0,
+            268.0
+          ],
+          "actual_size": [
+            492.0,
+            33.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            25.0
+          ],
+          "rect": [
+            24.0,
+            268.0,
+            492.0,
+            33.0
+          ],
+          "text": "Inimigos: 1 → 4"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 22,
+          "minimum_size": [
+            1.0,
+            27.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · HABILIDADE EM FOCO"
+        }
+      ],
+      "markers": [
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 1,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": true,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": false,
+          "enemy": true,
+          "rank": 4,
+          "target": true
+        }
+      ],
+      "variant": "colorblind",
+      "view": "attack"
+    },
+    {
+      "labels": [
+        {
+          "actual_position": [
+            24.0,
+            8.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 26,
+          "font_px": 26,
+          "minimum_size": [
+            1.0,
+            32.0
+          ],
+          "rect": [
+            24.0,
+            8.0,
+            492.0,
+            46.0
+          ],
+          "text": "HABILIDADES DE COMBATE"
+        },
+        {
+          "actual_position": [
+            24.0,
+            60.0
+          ],
+          "actual_size": [
+            220.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            60.0,
+            220.0,
+            34.0
+          ],
+          "text": "PARTE DE"
+        },
+        {
+          "actual_position": [
+            272.0,
+            60.0
+          ],
+          "actual_size": [
+            242.0,
+            34.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            272.0,
+            60.0,
+            242.0,
+            34.0
+          ],
+          "text": "ALVO · ALIADO"
+        },
+        {
+          "actual_position": [
+            28.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            28.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            76.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            76.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            124.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            124.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            172.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            172.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            276.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            276.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            324.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            324.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            372.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            372.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            420.0,
+            146.0
+          ],
+          "actual_size": [
+            32.0,
+            32.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            420.0,
+            146.0,
+            32.0,
+            32.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "1"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "2"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "3"
+        },
+        {
+          "actual_position": [
+            0.0,
+            0.0
+          ],
+          "actual_size": [
+            36.0,
+            36.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            0.0,
+            0.0,
+            36.0,
+            36.0
+          ],
+          "text": "4"
+        },
+        {
+          "actual_position": [
+            24.0,
+            297.0
+          ],
+          "actual_size": [
+            492.0,
+            46.0
+          ],
+          "base_px": 24,
+          "font_px": 24,
+          "minimum_size": [
+            1.0,
+            29.0
+          ],
+          "rect": [
+            24.0,
+            297.0,
+            492.0,
+            46.0
+          ],
+          "text": "Não Estamos Sós"
+        },
+        {
+          "actual_position": [
+            24.0,
+            14.0
+          ],
+          "actual_size": [
+            492.0,
+            64.0
+          ],
+          "base_px": 28,
+          "font_px": 28,
+          "minimum_size": [
+            1.0,
+            34.0
+          ],
+          "rect": [
+            24.0,
+            14.0,
+            492.0,
+            64.0
+          ],
+          "text": "Não Estamos Sós"
+        },
+        {
+          "actual_position": [
+            24.0,
+            89.0
+          ],
+          "actual_size": [
+            492.0,
+            112.0
+          ],
+          "base_px": 23,
+          "font_px": 23,
+          "minimum_size": [
+            1.0,
+            28.0
+          ],
+          "rect": [
+            24.0,
+            89.0,
+            492.0,
+            112.0
+          ],
+          "text": "Reduz 12 Instinto e remove 1 Vulnerável do aliado."
+        },
+        {
+          "actual_position": [
+            24.0,
+            218.0
+          ],
+          "actual_size": [
+            492.0,
+            48.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            24.0
+          ],
+          "rect": [
+            24.0,
+            218.0,
+            492.0,
+            48.0
+          ],
+          "text": "Cheio: alcança · vazio: fora"
+        },
+        {
+          "actual_position": [
+            24.0,
+            268.0
+          ],
+          "actual_size": [
+            492.0,
+            33.0
+          ],
+          "base_px": 20,
+          "font_px": 20,
+          "minimum_size": [
+            1.0,
+            25.0
+          ],
+          "rect": [
+            24.0,
+            268.0,
+            492.0,
+            33.0
+          ],
+          "text": "Aliados: 4 → 1"
+        },
+        {
+          "actual_position": [
+            16.0,
+            8.0
+          ],
+          "actual_size": [
+            588.0,
+            50.0
+          ],
+          "base_px": 22,
+          "font_px": 22,
+          "minimum_size": [
+            1.0,
+            27.0
+          ],
+          "rect": [
+            16.0,
+            8.0,
+            588.0,
+            50.0
+          ],
+          "text": "PROPOSTA #260 · HABILIDADE EM FOCO"
+        }
+      ],
+      "markers": [
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": false
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 4,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 3,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 2,
+          "target": true
+        },
+        {
+          "active": true,
+          "enemy": false,
+          "rank": 1,
+          "target": true
+        }
+      ],
+      "variant": "colorblind",
+      "view": "support"
+    }
+  ],
+  "renderer": "OpenGL Compatibility / Mesa llvmpipe CPU",
+  "resolution": [
+    1920,
+    1080
+  ]
+}

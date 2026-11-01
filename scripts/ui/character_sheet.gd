@@ -44,8 +44,11 @@ static func from_unit(session: AHCombatSession, unit: AHCombat.Unit, boss: bool 
 	if unit.is_player:
 		var hero_class = GameData.row("classes", unit.class_id)
 		out.kind = _kind(hero_class)
+		out.type = AHTypes.label(AHTypes.of_class(unit.class_id))
 		var hero = Campaign.hero(unit.hero_id)
 		out.passives = _hero_passives(hero, unit.perks, unit.class_id)
+		# A linhagem (#227): em quem causa mais dano e de quem recebe.
+		out.passives.append_array(AHTypes.sheet_rows(AHTypes.of_class(unit.class_id)))
 		out.art = AHCombatArena.hero_art_of(unit.hero_id, String(hero.get("art_variant", "")) if hero != null else "").get("idle", {})
 		if hero != null:
 			out.level = AHHeroLevels.level(hero)
@@ -66,6 +69,7 @@ static func from_unit(session: AHCombatSession, unit: AHCombat.Unit, boss: bool 
 		var enemy = GameData.row("enemies", unit.enemy_id)
 		var machine: bool = enemy != null and enemy.get("Category", "") == "Machine"
 		out.kind = TranslationServer.translate("Máquina") if machine else TranslationServer.translate("Criatura")
+		out.type = AHTypes.label(AHTypes.of_enemy(unit.enemy_id))
 		if boss:
 			out.kind += " · " + TranslationServer.translate("guardião do trecho")
 		if enemy != null:
@@ -76,6 +80,8 @@ static func from_unit(session: AHCombatSession, unit: AHCombat.Unit, boss: bool 
 				out.passives.append([TranslationServer.translate("Resiste a dano por turno"), TranslationServer.translate("%d%% de chance de não sangrar nem contaminar") % dot, true])
 			if push > 0:
 				out.passives.append([TranslationServer.translate("Resiste a deslocamento"), TranslationServer.translate("%d%% de chance de não ser empurrado nem puxado") % push, true])
+		# A família mecânica (#227): em quem causa mais dano e de quem recebe.
+		out.passives.append_array(AHTypes.sheet_rows(AHTypes.of_enemy(unit.enemy_id)))
 	for entry in U.statuses(unit):
 		out.states.append([String(entry[0]), U.status_tip(entry) if entry.size() > 4 else "", bool(entry[1])])
 	# O que o painel de baixo só mostra de quem age: o Último Fôlego e o Trauma.
@@ -96,9 +102,11 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 			speed += int(perk.get("Value", 0))
 	# O nível (#90): o Passo ligeiro soma na velocidade, como na luta.
 	speed += int(AHHeroLevels.combat_bonus(hero).speed)
-	var out := {"id": String(hero.get("id", "")), "name": String(hero.get("display_name", "")), "kind": _kind(hero_class),
+	var out := {"id": String(hero.get("id", "")), "name": String(hero.get("display_name", "")),
+		"kind": _kind(hero_class), "type": AHTypes.label(AHTypes.of_class(String(hero.get("class_id", "")))),
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
-		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))), "states": [], "enemy": false,
+		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))) \
+			+ AHTypes.sheet_rows(AHTypes.of_class(String(hero.get("class_id", "")))), "states": [], "enemy": false,
 		"level": AHHeroLevels.level(hero),
 		"art": AHCombatArena.hero_art_of(String(hero.get("id", "")), String(hero.get("art_variant", ""))).get("idle", {})}
 	if hero.get("trauma", false):
@@ -274,6 +282,11 @@ func _build(level: int = 0) -> void:
 		var kind := _text(String(info.kind), "small", AHKit.AMBER, "Kind")
 		kind.custom_minimum_size.x = WIDTH - 200
 		names.add_child(kind)
+	# A linhagem ou a família mecânica (#227), numa linha própria.
+	if String(info.get("type", "")) != "" and level < 4:
+		var type_line := _text(String(info.type), "small", AHKit.AMBER, "Type")
+		type_line.custom_minimum_size.x = WIDTH - 200
+		names.add_child(type_line)
 	if int(info.get("level", 0)) > 0:
 		head.add_child(_level_medal(int(info.level)))
 	if String(info.get("description", "")) != "" and level < 1:

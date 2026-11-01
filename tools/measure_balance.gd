@@ -24,6 +24,8 @@
 ## A coluna da jornada com cuidados mostra também quantas ampolas, em média, a Íris usou fora da luta.
 ## --effects=exposto,cansado,preparado (#78) põe os efeitos de fase dos eventos na expedição, como o jogo: na medida luta a
 ##   luta, cada luta começa com eles; na jornada, o Exposto vale só na primeira luta e os outros até o fim. Sem a opção, nenhum.
+## --types=on|off (#227) liga ou desliga a vantagem de tipo (TypeAdvantage.Enabled) só nesta medida; sem a opção, como
+##   está nos dados.
 ## --stars (#91) troca a tabela pelas estrelas da luta: a média, quantas lutas vencidas dão 1, 2 e 3 estrelas e quanto
 ##   cada critério é cumprido (AHFightRewards.criteria, as mesmas regras da tela do fim).
 extends SceneTree
@@ -95,6 +97,8 @@ func _run() -> void:
 			levels = arg.trim_prefix("--levels=")
 		elif arg == "--stars":
 			stars = true
+		elif arg.begins_with("--types="):
+			root.get_node("GameData").combat.type_advantage.Enabled = arg.trim_prefix("--types=") == "on"
 		elif arg.begins_with("--effects="):
 			effects = Array(arg.trim_prefix("--effects=").split(",", false))
 	if not POLICIES.has(policy) or not OPTIONS.has(option) or not GEARS.has(gear) or not LEVELS.has(levels):
@@ -120,6 +124,7 @@ func _run() -> void:
 			return
 	if not effects.is_empty():
 		team_text += " · efeitos " + ", ".join(effects)
+	team_text += " · vantagem de tipo " + ("ligada" if root.get_node("GameData").combat.type_advantage.Enabled else "desligada")
 	print("política=%s opção=%s gear=%s níveis=%s sementes=%d · %s" % [policy, option, gear, levels, seeds, team_text])
 	if stars:
 		print("fase   | luta      | vitórias | estrelas | 1★ · 2★ · 3★          | ninguém caiu · rodadas · golpe final · instinto | rodadas das vitórias: 25% · mediana · 75%")

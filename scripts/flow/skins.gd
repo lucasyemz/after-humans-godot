@@ -62,6 +62,13 @@ static func dress(entry: Dictionary, skin_id: String) -> Dictionary:
 	idle.file = file_for(skin_id, String(idle.get("file", "")))
 	if idle.has("portrait"):
 		idle.portrait = file_for(skin_id, String(idle.portrait), PORTRAIT)
+	# A guarda de luta (#221): a da skin; sem ela, a skin luta no parado dela (a guarda padrão seria outro figurino).
+	if out.has("combat_idle"):
+		var combat_file := file_for(skin_id, String(out.combat_idle.get("file", "")))
+		if combat_file == String(out.combat_idle.get("file", "")):
+			out.erase("combat_idle")
+		else:
+			out.combat_idle.file = combat_file
 	for ability_id in out.get("actions", {}):
 		for phase in ["preparacao", "execucao"]:
 			var pose: Dictionary = out.actions[ability_id].get(phase, {})
@@ -106,6 +113,7 @@ static func seat_pose(poses: Dictionary, hero_id: String, facing: String) -> Dic
 static func missing(skin_id: String, entry: Dictionary, extra_files: Array = []) -> Array:
 	var files: Array = []
 	files.append(String(entry.get("idle", {}).get("file", "")))
+	files.append(String(entry.get("combat_idle", {}).get("file", "")))
 	for ability_id in entry.get("actions", {}):
 		for phase in ["preparacao", "execucao"]:
 			files.append(String(entry.actions[ability_id].get(phase, {}).get("file", "")))
