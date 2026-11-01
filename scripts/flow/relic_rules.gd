@@ -54,6 +54,16 @@ static func equipped(hero) -> Array:
 ## Idempotente. O estoque não muda; só se o slot já estiver ocupado por outra (um save editado), a antiga volta a ele.
 static func migrate_hero(campaign: Dictionary, hero: Dictionary) -> void:
 	var fresh := slots({"relics": hero.get("relics")}) if typeof(hero.get("relics")) == TYPE_ARRAY else slots({})
+	# Um save editado com mais slots que SLOTS, ou a mesma relíquia nos dois: o excesso e a cópia voltam ao estoque.
+	if typeof(hero.get("relics")) == TYPE_ARRAY:
+		var raw: Array = hero.relics
+		for i in range(SLOTS, raw.size()):
+			if String(raw[i]) != "":
+				campaign.inventory.relics.append(String(raw[i]))
+		for i in range(1, SLOTS):
+			if fresh[i] != "" and fresh.slice(0, i).has(fresh[i]):
+				campaign.inventory.relics.append(fresh[i])
+				fresh[i] = ""
 	var old := String(hero.get("relic_id", ""))
 	if old != "" and not fresh.has(old):
 		var free := fresh.find("")
@@ -125,7 +135,8 @@ static func options(campaign: Dictionary, hero, slot: int) -> Array:
 		var id := String(relic_id)
 		if accepted.has(id) or blocked.has(id):
 			continue
-		var why := block(campaign, hero, slot, id)
+		var why: String = block(campaign, hero, slot, id) if GameData.row("relics", id) != null \
+			else TranslationServer.translate("Relíquia desconhecida.")
 		if why == "":
 			accepted.append(id)
 		else:

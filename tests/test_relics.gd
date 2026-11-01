@@ -76,6 +76,15 @@ func _migration() -> void:
 	S.migrate(c)
 	t.equal(bento.relics, ["botao_cobre", "pena_vidro"], "os dois slots cheios ficam")
 	t.equal(c.inventory.relics.count("coleira_lembranca"), 1, "e a do relic_id volta ao estoque")
+	# Um save editado com mais slots que dois, ou a mesma relíquia repetida: o excesso e a cópia voltam ao estoque.
+	c.inventory.relics = []
+	bento.relics = ["botao_cobre", "pena_vidro", "coleira_lembranca"]
+	S.migrate(c)
+	t.equal([bento.relics, c.inventory.relics], [["botao_cobre", "pena_vidro"], ["coleira_lembranca"]], "a terceira volta ao estoque")
+	c.inventory.relics = []
+	bento.relics = ["pena_vidro", "pena_vidro"]
+	S.migrate(c)
+	t.equal([bento.relics, c.inventory.relics], [["pena_vidro", ""], ["pena_vidro"]], "a cópia repetida volta ao estoque")
 	# Pelo save: grava, lê e migra como o load faz.
 	var saved: Dictionary = Campaign.create_initial(264)
 	for hero in saved.roster:
@@ -123,6 +132,11 @@ func _slots() -> void:
 	var found := AHRelics.options(c, bento, 1)
 	t.equal(found[0], [""], "o slot 1 do Bento só aceita o vazio")
 	t.equal(found[1], {"pena_vidro": "Já equipada no outro slot."}, "e diz por que a pena não serve")
+	# Um id fora da tabela no estoque (de um save antigo) não prende o ciclo: fica bloqueado, e a válida depois dele entra.
+	c.inventory.relics = ["fora_da_tabela", "botao_cobre"]
+	found = AHRelics.options(c, bento, 1)
+	t.equal(found[0], ["", "botao_cobre"], "o id desconhecido fica fora das opções")
+	t.equal(found[1], {"fora_da_tabela": "Relíquia desconhecida."}, "com o motivo")
 
 
 ## Trocar e desequipar: nada se perde, nada se duplica, e o bônus sai junto.
@@ -275,6 +289,12 @@ func _combat() -> void:
 	t.equal(AHCombatEngine.make_hero_unit(two, 1, GameData.combat).speed, speed + 2, "com o teto de +2 de Velocidade")
 	two.RelicIds = ["semente_guardada", ""]
 	t.check(absf(AHCombatEngine.make_hero_unit(two, 1, GameData.combat).virtue_bonus - 0.05) < 0.001, "a Semente no Bolso dá +5 pp de Superação")
+	two.RelicIds = ["sino_vitrine", ""]
+	var bell := AHCombatEngine.make_hero_unit(two, 1, GameData.combat)
+	t.equal([bell.max_hp, bell.hp], [28, 28], "com o Sininho e a vida cheia, a vida desce junto com o máximo")
+	var hurt: Dictionary = two.duplicate()
+	hurt.Hp = 10
+	t.equal(AHCombatEngine.make_hero_unit(hurt, 1, GameData.combat).hp, 10, "e quem está ferido fica com a vida que tem")
 	var old: Dictionary = base.duplicate()
 	old.RelicId = "botao_cobre"
 	t.equal(AHCombatEngine.make_hero_unit(old, 1, GameData.combat).max_hp, 33, "o RelicId antigo ainda vale")

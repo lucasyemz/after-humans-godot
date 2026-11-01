@@ -382,6 +382,8 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 		if perk != null:
 			perk_speed += perk.Speed
 	unit.max_hp = mini(200, hero.MaxHp + int(relic.max_hp))
+	# Uma relíquia com custo de Vida (#263) baixa o máximo; a vida de quem entra cheio desce junto.
+	unit.hp = mini(unit.hp, unit.max_hp)
 	unit.speed = (hero_class.BaseSpeed if hero_class != null and hero_class.BaseSpeed != 0 else 2) + int(relic.speed) + perk_speed \
 		+ int(hero.get("SpeedBonus", 0))
 	return unit
