@@ -1,6 +1,6 @@
 # As missões solo (#183, primeira parte)
 
-![A aba Missões solo no Mapa da Rede: os pinos das missões do dia, a lista "Hoje no rádio" e a missão escolhida com a escolha do herói pelo selo](side-missions/board.jpg)
+![As missões solo no Mapa da Rede. Por linha: a aba apagada com a Preparação no nível 1 e o quadro do dia; a missão escolhida com a escolha do herói pelo selo, no Normal e no Maior; o Nick em missão (o pino de quem está fora) e a volta dele (o relatório); a Íris capturada (o pino do resgate) e o quadro no Maior](side-missions/board.jpg)
 
 ## O que entra
 
@@ -33,6 +33,10 @@
   8%). No nível típico de quem chega à fase 3 (4, `measure_balance`), a mesma missão de perigo médio dá 52% para a
   classe forte (*Arriscado*). O quadro também traz missões das fases de antes.
 - **Ficam para as próximas partes:** a volta no trem e o resgate na rota da fase (#188).
+
+## Observação
+
+- No texto Maior, a tecla ESC / B cobre o fim de VOLTAR À ESTAÇÃO no Mapa da Rede. Já era assim na `main`.
 
 ## Testes
 
