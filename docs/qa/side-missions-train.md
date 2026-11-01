@@ -25,6 +25,13 @@ trem também", com o relatório da missão.
   vista geral.
 - No dia de espera ("Esperar um dia"), quem volta naquele dia também chega no trem: ele aparece no Próximo passo e
   na lista do que espera.
+- **A partida, ao mesmo tempo que a missão solo** (decisão do Lucas, 01/11): quem está fora aparece na lista da
+  Estação, na tela da partida, com o motivo, e não entra na equipe:
+  - "Em missão solo · volta em N dias";
+  - "Com os robôs";
+  - "Chega no trem".
+
+  Antes, o texto dizia "sem arte de combate", inclusive na `main` do #286.
 
 ## Para o Lucas
 
@@ -44,6 +51,8 @@ trem também", com o relatório da missão.
   - o capturado não vem no trem.
 - `tests/test_mission_train.gd` (7 verificações): na Estação de verdade, com uma dupla de recrutas no trem de sempre,
   só a Íris desce (ferida, no passo de quem manca) e, depois de RECEBER, o trem de sempre traz o recruta.
+- `tests/test_preparation_flow.gd`: na tela da partida de verdade, o Risco em missão solo, com os robôs e no trem, com
+  o motivo de cada um, sem entrar na equipe.
 - `tools/capture_183_train.gd`: as fotos acima.
 - `tests/run_all.gd` inteiro.
 

@@ -791,7 +791,7 @@ msgstr "Finish the journey · Back to the Station"
 #: scripts/ui/exploration_hud.gd:339
 #: scripts/ui/exploration_hud.gd:790
 #: scripts/ui/camp_hud.gd:155
-#: scripts/ui/station/departure_screen.gd:581
+#: scripts/ui/station/departure_screen.gd:585
 msgid "Escolher"
 msgstr "Choose"
 
@@ -874,7 +874,7 @@ msgid "da "
 msgstr "the "
 
 #: scripts/ui/exploration_hud.gd:534
-#: scripts/ui/station/departure_screen.gd:620
+#: scripts/ui/station/departure_screen.gd:624
 #: scripts/ui/inventory_panel.gd:137
 msgid "Comida"
 msgstr "Food"
@@ -1001,7 +1001,7 @@ msgid "Ao vasculhar: %s"
 msgstr "While searching: %s"
 
 #: scripts/ui/exploration_hud.gd:1394
-#: scripts/flow/side_mission_rules.gd:226
+#: scripts/flow/side_mission_rules.gd:242
 #. events.busca_choro_porta.arrombar_ombro.RequirementText
 #. events.busca_poco_escuro.descer_escuro.RequirementText
 msgid "Arriscado"
@@ -1603,7 +1603,7 @@ msgstr "Open"
 #: scripts/ui/refuge_hud.gd:590
 #: scripts/ui/refuge_hud.gd:598
 #: scripts/ui/refuge_hud.gd:600
-#: scripts/ui/station/departure_screen.gd:581
+#: scripts/ui/station/departure_screen.gd:585
 msgid "Ocultar"
 msgstr "Hide"
 
@@ -2424,6 +2424,7 @@ msgstr "Mission report"
 
 #: scripts/ui/refuge_hud.gd:3166
 #: scripts/ui/station/station_report.gd:626
+#: scripts/flow/side_mission_rules.gd:174
 msgid "Com os robôs"
 msgstr "With the robots"
 
@@ -2614,8 +2615,8 @@ msgid "+%d pontos de obra"
 msgstr "+%d work points"
 
 #: scripts/ui/station/station_report.gd:550
-#: scripts/ui/station/departure_screen.gd:327
-#: scripts/ui/station/departure_screen.gd:332
+#: scripts/ui/station/departure_screen.gd:331
+#: scripts/ui/station/departure_screen.gd:336
 msgid "Caído"
 msgstr "Fallen"
 
@@ -2744,7 +2745,7 @@ msgid "Mapa da Rede: %s"
 msgstr "Network Map: %s"
 
 #: scripts/ui/station/departure_screen.gd:224
-#: scripts/ui/station/departure_screen.gd:621
+#: scripts/ui/station/departure_screen.gd:625
 msgid "Foco da rota"
 msgstr "Route focus"
 
@@ -2776,82 +2777,82 @@ msgstr "At the Station:"
 msgid "Trocar por:"
 msgstr "Swap for:"
 
-#: scripts/ui/station/departure_screen.gd:329
+#: scripts/ui/station/departure_screen.gd:333
 msgid "sem arte de combate"
 msgstr "no combat art"
 
-#: scripts/ui/station/departure_screen.gd:332
+#: scripts/ui/station/departure_screen.gd:336
 msgid "sem arte"
 msgstr "no art"
 
-#: scripts/ui/station/departure_screen.gd:337
+#: scripts/ui/station/departure_screen.gd:341
 msgid "Escolha uma carta da equipe e clique aqui para trocar."
 msgstr "Pick a team card and click here to swap."
 
-#: scripts/ui/station/departure_screen.gd:347
+#: scripts/ui/station/departure_screen.gd:351
 msgid "Deixar na Estação"
 msgstr "Leave at the Station"
 
-#: scripts/ui/station/departure_screen.gd:350
+#: scripts/ui/station/departure_screen.gd:354
 msgid "Parte com um a menos; os de trás andam uma posição para a frente."
 msgstr "Leaves with one fewer; those behind move up one position."
 
-#: scripts/ui/station/departure_screen.gd:416
+#: scripts/ui/station/departure_screen.gd:420
 msgid "Posição vazia"
 msgstr "Empty position"
 
-#: scripts/ui/station/departure_screen.gd:419
+#: scripts/ui/station/departure_screen.gd:423
 msgid "Escolha esta carta e alguém da Estação."
 msgstr "Pick this card and someone from the Station."
 
-#: scripts/ui/station/departure_screen.gd:444
+#: scripts/ui/station/departure_screen.gd:448
 msgid "Vida %d / %d"
 msgstr "Life %d / %d"
 
-#: scripts/ui/station/departure_screen.gd:474
+#: scripts/ui/station/departure_screen.gd:478
 msgid "Sem ataque desta posição"
 msgstr "No attack from this position"
 
-#: scripts/ui/station/departure_screen.gd:476
+#: scripts/ui/station/departure_screen.gd:480
 msgid "Vida baixa: leve comida ou curativos"
 msgstr "Low life: bring food or bandages"
 
-#: scripts/ui/station/departure_screen.gd:478
+#: scripts/ui/station/departure_screen.gd:482
 msgid "Com trauma: começa com instinto alto"
 msgstr "Traumatized: starts with high instinct"
 
-#: scripts/ui/station/departure_screen.gd:484
+#: scripts/ui/station/departure_screen.gd:488
 msgid "%d de %d habilidades daqui"
 msgstr "%d of %d abilities from here"
 
-#: scripts/ui/station/departure_screen.gd:513
+#: scripts/ui/station/departure_screen.gd:517
 msgid "Ninguém na equipe cura em combate: leve curativos e comida."
 msgstr "Nobody on the team heals in combat: bring bandages and food."
 
-#: scripts/ui/station/departure_screen.gd:567
+#: scripts/ui/station/departure_screen.gd:571
 msgid "Voltar ao mapa"
 msgstr "Back to map"
 
-#: scripts/ui/station/departure_screen.gd:579
-#: scripts/ui/station/departure_screen.gd:612
-#: scripts/ui/station/departure_screen.gd:643
+#: scripts/ui/station/departure_screen.gd:583
+#: scripts/ui/station/departure_screen.gd:616
+#: scripts/ui/station/departure_screen.gd:647
 msgid "Iniciar expedição"
 msgstr "Start expedition"
 
-#: scripts/ui/station/departure_screen.gd:614
+#: scripts/ui/station/departure_screen.gd:618
 #: scripts/ui/phase_map.gd:193
 msgid "Lugar"
 msgstr "Place"
 
-#: scripts/ui/station/departure_screen.gd:614
+#: scripts/ui/station/departure_screen.gd:618
 msgid "nível %d+"
 msgstr "level %d+"
 
-#: scripts/ui/station/departure_screen.gd:619
+#: scripts/ui/station/departure_screen.gd:623
 msgid "Equipe"
 msgstr "Team"
 
-#: scripts/ui/station/departure_screen.gd:620
+#: scripts/ui/station/departure_screen.gd:624
 msgid "%d grátis + %d extras · %d sementes"
 msgstr "%d free + %d extra · %d seeds"
 
@@ -3174,7 +3175,7 @@ msgid "Missões solo"
 msgstr "Solo missions"
 
 #: scripts/ui/phase_map.gd:285
-#: scripts/flow/side_mission_rules.gd:238
+#: scripts/flow/side_mission_rules.gd:254
 msgid "Melhore a Preparação para mandar missões solo."
 msgstr "Upgrade Preparation to send solo missions."
 
@@ -4573,7 +4574,7 @@ msgstr "+%d work points per return"
 
 #: scripts/flow/station_rules.gd:2316
 #: scripts/flow/station_rules.gd:2440
-#: scripts/flow/side_mission_rules.gd:246
+#: scripts/flow/side_mission_rules.gd:262
 msgid "Esse herói não está na Estação."
 msgstr "That hero is not at the Station."
 
@@ -6000,43 +6001,59 @@ msgstr "%s is arriving on the train."
 msgid "%s está numa missão solo (%s)."
 msgstr "%s is on a solo mission (%s)."
 
-#: scripts/flow/side_mission_rules.gd:224
+#: scripts/flow/side_mission_rules.gd:176
+msgid "Chega no trem"
+msgstr "Arriving by train"
+
+#: scripts/flow/side_mission_rules.gd:179
+msgid "volta em 1 dia"
+msgstr "back in 1 day"
+
+#: scripts/flow/side_mission_rules.gd:179
+msgid "volta em %d dias"
+msgstr "back in %d days"
+
+#: scripts/flow/side_mission_rules.gd:180
+msgid "Em missão solo"
+msgstr "On a solo mission"
+
+#: scripts/flow/side_mission_rules.gd:240
 msgid "Boa escolha"
 msgstr "Good choice"
 
-#: scripts/flow/side_mission_rules.gd:227
+#: scripts/flow/side_mission_rules.gd:243
 msgid "Muito arriscado"
 msgstr "Very risky"
 
-#: scripts/flow/side_mission_rules.gd:243
+#: scripts/flow/side_mission_rules.gd:259
 msgid "Essa missão não está no quadro de hoje."
 msgstr "That mission isn't on today's board."
 
-#: scripts/flow/side_mission_rules.gd:252
+#: scripts/flow/side_mission_rules.gd:268
 msgid "Já há %d missões em curso."
 msgstr "There are already %d missions under way."
 
-#: scripts/flow/side_mission_rules.gd:254
+#: scripts/flow/side_mission_rules.gd:270
 msgid "Faltam suprimentos: a missão leva %d."
 msgstr "Not enough supplies: the mission takes %d."
 
-#: scripts/flow/side_mission_rules.gd:365
+#: scripts/flow/side_mission_rules.gd:381
 msgid "%s voltou da missão %s com %s."
 msgstr "%s came back from the %s mission with %s."
 
-#: scripts/flow/side_mission_rules.gd:366
+#: scripts/flow/side_mission_rules.gd:382
 msgid "%s voltou da missão %s."
 msgstr "%s came back from the %s mission."
 
-#: scripts/flow/side_mission_rules.gd:368
+#: scripts/flow/side_mission_rules.gd:384
 msgid "%s voltou da missão %s com ferimentos e com %s."
 msgstr "%s came back from the %s mission hurt, with %s."
 
-#: scripts/flow/side_mission_rules.gd:369
+#: scripts/flow/side_mission_rules.gd:385
 msgid "%s voltou da missão %s com ferimentos e de mãos vazias."
 msgstr "%s came back from the %s mission hurt and empty-handed."
 
-#: scripts/flow/side_mission_rules.gd:370
+#: scripts/flow/side_mission_rules.gd:386
 msgid "%s caiu nas mãos dos robôs na missão %s. O resgate fica marcado no mapa."
 msgstr "%s fell into the robots' hands on the %s mission. The rescue is marked on the map."
 
