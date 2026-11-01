@@ -678,6 +678,8 @@ static func recovery_lines(c: Dictionary, last_return: Dictionary) -> Array:
 		var hero = S.hero(c, String(hero_id))
 		if hero != null:
 			lines.append(TranslationServer.translate("%s se recuperou e voltou ao Alojamento.") % hero.display_name)
+	# Os serviços dos cômodos (#265): o fim do tratamento na Enfermaria e o alívio do Bar.
+	lines.append_array(AHStationServices.report_lines(c, last_return))
 	return lines
 
 

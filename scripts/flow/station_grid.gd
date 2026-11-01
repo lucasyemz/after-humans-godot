@@ -65,7 +65,7 @@ static func _opening(campaign: Dictionary) -> bool:
 	if not ["journey", "station"].has(AHTutorial.stage(campaign)):
 		return false
 	for room in AHStationRules.ROOMS:
-		if int(campaign.station.rooms.get(room.id, 0)) != (1 if room.basic else 0):
+		if int(campaign.station.rooms.get(room.id, 1 if room.basic else 0)) != (1 if room.basic else 0):
 			return false
 	return true
 

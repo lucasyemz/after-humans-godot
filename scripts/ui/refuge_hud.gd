@@ -41,7 +41,7 @@ const PAN_EDGE := 6.0
 const PAN_EDGE_DWELL := 0.35
 const DRAG_START := 12.0
 const ROOM_ICONS := {S.CHARACTERS: "room_quarters", S.CANTEEN: "room_canteen", S.BAR: "room_bar", S.DORMITORY: "bed", S.FORGE: "room_forge",
-	S.DEPOT: "room_depot", S.RESEARCH: "room_research", S.INFIRMARY: "intent-heal", S.PREPARATION: "expeditions", "plan": "plan", "train": "train_arrival",
+	S.DEPOT: "room_depot", S.RESEARCH: "room_research", S.INFIRMARY: "intent-heal", S.PREPARATION: "expeditions", S.TRAINING: "train", "plan": "plan", "train": "train_arrival",
 	"new_campaign": "alert", "departure": "expeditions"}
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 ## Os ícones dos recursos nos chips de custo e no estoque.
@@ -1917,7 +1917,8 @@ func _show(key: String) -> void:
 func _station_plan(c: Dictionary) -> void:
 	_header("plan", tr("Plano da Estação"))
 	_text(tr("A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos."))
-	for id in AHStation.ROOM_ORDER:
+	# O Treino (#265) não tem lugar próprio na cena (fica com a Sala), mas entra no Plano, com o painel e o Melhorar.
+	for id in AHStation.ROOM_ORDER + [S.TRAINING]:
 		var room_def := S.room_def(id)
 		var level := S.room_level(c, id)
 		var cost := S.next_level_cost(c, id)
@@ -2556,6 +2557,9 @@ func _room(room_id: String) -> void:
 			_dormitory(c)
 		S.INFIRMARY:
 			_infirmary(c, level)
+			_quirks(c, level)
+		S.BAR:
+			_bar(c)
 	# Quem trabalha aqui (#119), depois do conteúdo do cômodo (as relíquias da Forja ficam no alto).
 	if S.job_rooms(c).has(room_id):
 		_body.add_child(_divider())
@@ -2578,7 +2582,7 @@ func _workers(c: Dictionary, room_id: String) -> void:
 	chips.add_theme_constant_override("h_separation", 8)
 	chips.add_theme_constant_override("v_separation", 8)
 	box.add_child(chips)
-	for entry in S.living(c).filter(func(h): return not S.recovering(h)):
+	for entry in S.living(c).filter(func(h): return not S.recovering(h) and not AHStationServices.treating(h)):
 		var id: String = entry.id
 		var chip := _chip_button("%s · +%d" % [entry.display_name, S.post_yield(entry, room_id)])
 		chip.name = "Worker_%s" % id
@@ -3225,7 +3229,8 @@ func _infirmary(c: Dictionary, level: int) -> void:
 	var fallen := S.fallen(c)
 	var beds := S.infirmary_beds(c)
 	if level >= 1:
-		_section(tr("Leitos: %d de %d ocupados") % [fallen.filter(func(h): return S.in_bed(h)).size(), beds], "bed")
+		# Os leitos (#265): os caídos e quem trata uma peculiaridade.
+		_section(tr("Leitos: %d de %d ocupados") % [fallen.filter(func(h): return S.in_bed(h)).size() + AHStationServices.beds_treating(c), beds], "bed")
 	if fallen.is_empty():
 		var empty := _inset()
 		var row := HBoxContainer.new()
@@ -3237,7 +3242,7 @@ func _infirmary(c: Dictionary, level: int) -> void:
 		row.add_child(_wrapped(empty_text, "small", AHKit.TEXT, false, BODY_WIDTH - 90.0))
 		# Ninguém caído, mas ninguém para partir (todos em missão solo, #183): o dia também passa daqui.
 		if S.rest_block(c) == "":
-			_footer_primary(tr("Esperar um dia"), "sleep", func(): _act(S.rest_day(Campaign.state), tr("Um dia passou na Estação.")))
+			_footer_primary(tr("Esperar um dia"), "sleep", func(): _rest_day())
 		return
 	if level < 1:
 		_text(tr("Sem a Enfermaria, quem caiu se recupera devagar no Dormitório."), AHKit.MUTED, "small")
@@ -3245,7 +3250,16 @@ func _infirmary(c: Dictionary, level: int) -> void:
 		_body.add_child(_fallen_card(c, entry))
 	if S.rest_block(c) == "":
 		_text(tr("Ninguém pode partir agora. Passar um dia na Estação gasta e produz como um dia de expedição, e cada caído fica um dia mais perto."), AHKit.TEXT, "small")
-		_footer_primary(tr("Esperar um dia"), "sleep", func(): _act(S.rest_day(Campaign.state), tr("Um dia passou na Estação.")))
+		_footer_primary(tr("Esperar um dia"), "sleep", func(): _rest_day())
+
+
+## Esperar um dia: o aviso diz também o que terminou (a recuperação e o tratamento, #265).
+func _rest_day() -> void:
+	var error := S.rest_day(Campaign.state)
+	var done: Array = [tr("Um dia passou na Estação.")]
+	if error == "":
+		done.append_array(AHStationServices.report_lines(Campaign.state, Campaign.state.station.get("last_rest", {})))
+	_act(error, " ".join(done))
 
 
 func _fallen_card(c: Dictionary, entry: Dictionary) -> Control:
@@ -3287,6 +3301,78 @@ func _fallen_card(c: Dictionary, entry: Dictionary) -> Control:
 	if block != "":
 		box.add_child(_wrapped(block, "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
 	return card
+
+
+## A peculiaridade (#265): no nível 2, a Enfermaria trata uma negativa num leito, por alguns dias. Quem já trata e
+## quem tem uma negativa, com o botão de cada uma (apagado com o motivo).
+func _quirks(c: Dictionary, level: int) -> void:
+	var rule := AHStationServices.rule("infirmary_quirk")
+	if level < int(rule.get("Level", 2)):
+		if level >= 1:
+			_text(tr("No nível %d, a Enfermaria também trata uma peculiaridade negativa.") % int(rule.get("Level", 2)), AHKit.MUTED, "small")
+		return
+	_section(tr("Peculiaridades"), "intent-heal")
+	var listed := false
+	for entry in S.living(c):
+		if AHStationServices.treating(entry):
+			_text(entry.display_name + ": " + AHStationServices.treatment_text(entry), AHKit.TEXT, "small")
+			listed = true
+			continue
+		var negatives := AHStationServices.negative_perks(entry)
+		if negatives.is_empty():
+			continue
+		listed = true
+		var box := _inset()
+		box.get_parent().name = "Quirk_%s" % entry.id
+		box.add_child(_wrapped(entry.display_name, "row", AHKit.TEXT, true, BODY_WIDTH - 40.0))
+		var row := HFlowContainer.new()
+		row.add_theme_constant_override("h_separation", 10)
+		box.add_child(row)
+		var hero_id: String = entry.id
+		for perk in negatives:
+			var data = GameData.row("perks", String(perk))
+			var perk_name: String = tr(String(data.DisplayName)) if data != null else String(perk)
+			var button := _chip_button(tr("Tratar: %s · %d dias") % [perk_name, int(rule.get("Days", 2))])
+			button.name = "TreatQuirk_%s" % perk
+			var block := AHStationServices.quirk_block(c, hero_id, String(perk))
+			button.disabled = block != ""
+			button.tooltip_text = block
+			var perk_id := String(perk)
+			button.pressed.connect(func(): _act(AHStationServices.treat_quirk(Campaign.state, hero_id, perk_id),
+				tr("%s fica num leito tratando %s.") % [S.hero(Campaign.state, hero_id).display_name, perk_name]))
+			row.add_child(button)
+		var first_block := AHStationServices.quirk_block(c, hero_id, String(negatives[0]))
+		if first_block != "":
+			box.add_child(_wrapped(first_block, "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
+	if not listed:
+		_text(tr("Ninguém com peculiaridade negativa para tratar."), AHKit.MUTED, "small")
+
+
+## O Bar (#265): o alívio de quem fica e a conversa que trata o trauma (quem tem trauma, com o botão).
+func _bar(c: Dictionary) -> void:
+	if not S.room_available(c, S.BAR):
+		return
+	var troubled: Array = S.living(c).filter(func(h): return bool(h.get("trauma", false)))
+	_section(tr("Conversar · %d hoje") % AHStationServices.talks_left(c), "night_talk")
+	if troubled.is_empty():
+		_text(tr("Ninguém com trauma agora. Quem fica na Estação descansa a cabeça aqui na volta."), AHKit.MUTED, "small")
+		return
+	for entry in troubled:
+		var box := _inset()
+		box.get_parent().name = "Trauma_%s" % entry.id
+		box.add_child(_wrapped(tr("%s · trauma da última crise") % entry.display_name, "row", AHKit.TEXT, true, BODY_WIDTH - 40.0))
+		var hero_id: String = entry.id
+		var button := _chip_button(tr("Conversar e tratar · %d sementes") % AHStationServices.trauma_cost())
+		button.name = "TreatTrauma"
+		var why := ""
+		if AHStationServices.talks_left(c) <= 0:
+			why = tr("O Bar já conversou o que dava hoje. Volte depois da próxima expedição.")
+		elif S.quantity(c, "seeds") < AHStationServices.trauma_cost():
+			why = tr("Sementes insuficientes (custa %d sementes).") % AHStationServices.trauma_cost()
+		button.disabled = why != ""
+		button.tooltip_text = why
+		button.pressed.connect(func(): _act(S.treat_trauma(Campaign.state, hero_id), tr("Trauma tratado.")))
+		box.add_child(button)
 
 
 ## O planejamento da noite (como o da Unreal): a contagem, o custo do suprimento extra, uma linha por herói com rosto,
