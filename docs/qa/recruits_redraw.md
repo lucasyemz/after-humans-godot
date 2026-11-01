@@ -69,3 +69,9 @@ paradas no PR #231 (tag `codex-pr231-originals`). Pela decisão do Lucas de 01/1
   **Correção:** o `--recruits-redraw` reaplica as poses da #221 logo depois, como a conversão completa. Numa cópia
   isolada, ele não gera mais diff. A largura do Tatu fica a da guarda de propósito, e o comentário da ferramenta
   explica o motivo: a fila se espaça pela pose mais larga. A `main` foi juntada.
+
+- **Rodada 2: APROVADO.**
+  - Numa cópia limpa, com as fontes das duas tags, o `--recruits-redraw` e o `--stances` não geram diff.
+  - Os filtros `stances`, `recruit_art`, `combat_room`, `combat_art` e `i18n` passam com a `main` do #286.
+  - A luta de verdade passa sem falhas.
+  - Fica a observação baixa e aceita: a largura do Tatu é a da guarda.
