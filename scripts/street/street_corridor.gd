@@ -1654,7 +1654,10 @@ func _on_camp_leave() -> void:
 		_show_hidden_guards()
 	street.apply_corridor_weather(weather)
 	busy = false
-	hud.toast(tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather)), 4.0)
+	var rested := tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather))
+	# A noite (#261): mal dormida (Exposto) ou segurada por quem vigiou.
+	var night := AHCampSkills.night_notice(String(Campaign.state.session.expedition.corridor.get("camp_night", "")))
+	hud.toast(rested + ("\n" + night if night != "" else ""), 5.0 if night != "" else 4.0)
 	hud.refresh(Campaign.state)
 	# Reaberto no acampamento com o guardião vencido e a carga ainda fechada: as caixas abrem ao levantar acampamento.
 	if AHFightRewards.cargo_pending(Campaign.state):

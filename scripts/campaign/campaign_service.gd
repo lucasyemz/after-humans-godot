@@ -144,7 +144,7 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
 		"art_variant": "",
 		# As sete habilidades (#259, AHHeroSkills): os desbloqueios aprendidos no Treino e as que leva ([] = as 4 de base).
-		"unlocked": [], "loadout": [],
+		"unlocked": [], "loadout": [], "camp_unlocked": [], "camp_loadout": [],
 		# A skin completa que ele veste (#138): "default" é a arte de hoje; as outras ficam em data/skins.json.
 		"skin_id": "default",
 		# O nível (#90): o XP desde o último treino e as melhorias escolhidas (AHHeroLevels).

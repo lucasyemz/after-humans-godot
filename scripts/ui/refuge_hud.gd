@@ -2643,6 +2643,9 @@ func _train_hero(hero_id: String, upgrade_id: String) -> void:
 	# Aprender (#259): a opção não está em hero-upgrades; o aviso diz o que aprendeu e onde escolher as que leva.
 	if upgrade_id.begins_with(AHHeroSkills.LEARN):
 		done = AHHeroSkills.learned_notice(entry, upgrade_id.trim_prefix(AHHeroSkills.LEARN), AHHeroLevels.level(entry) > before)
+	# Os níveis pares (#261): uma habilidade de acampamento para escolher na Sala.
+	if error == "" and AHCampSkills.slots_at(AHHeroLevels.level(entry)) > AHCampSkills.slots_at(before):
+		done += " " + AHCampSkills.level_notice(entry)
 	_act(error, done, "res://audio/ui/forge_confirm.ogg")
 
 
