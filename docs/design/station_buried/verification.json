@@ -1,6 +1,6 @@
 {
   "base_commit": "7345f7a1",
-  "source_tag": null,
+  "source_tag": "codex-pr296-originals",
   "design_qa_round": 4,
   "design_qa_verdict": "APROVADO",
   "source_files": 14,

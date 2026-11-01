@@ -107,7 +107,7 @@ A redução a 40% avalia silhuetas, luz e identificação dos estados; não gara
 
 ## Originais e reprodução
 
-**Tag e Release serão vinculados ao número do PR desta entrega.** O arquivo de origem fica em `art/station/source/station_grid_20261101/` numa árvore Git independente, sem os arquivos do jogo. Não juntar essa tag na main.
+**Originais: [tag `codex-pr296-originals`](https://github.com/lucasyemz/after-humans-godot/tree/codex-pr296-originals) · [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr296-originals) · [ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr296-originals.zip).** O arquivo de origem fica em `art/station/source/station_grid_20261101/` numa árvore Git independente, sem os arquivos do jogo. Não juntar essa tag na main.
 
 O pacote inclui os 14 PNG prontos, os brutos/revisões, `assets.json`, `convert_webp.py` (Pillow) e as receitas de QA. A conversão foi repetida e os **14 WebP ficaram idênticos byte a byte** aos usados nas provas. Com os originais extraídos fora do repositório:
 
