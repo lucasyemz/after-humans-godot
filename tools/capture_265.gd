@@ -2,8 +2,9 @@
 ##   bar: o Bar com as conversas do dia (uma já usada no nível 2) e o trauma a tratar;
 ##   infirmary: a Enfermaria no nível 2, com a peculiaridade negativa a tratar num leito;
 ##   training: o diálogo do Treino (quantos heróis por dia);
+##   plan: o Plano da Estação, rolado até o Treino (o Ver abre o painel com o Melhorar);
 ##   camp: a Sala com uma de acampamento para aprender (o aviso que leva ao Treino) e o Treino de acampamento aberto.
-##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_265.gd -- --out=<pasta> --case=bar|infirmary|training|camp [--text-size=2]
+##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_265.gd -- --out=<pasta> --case=bar|infirmary|training|plan|camp [--text-size=2]
 ## Só mexe no estado por dicionários (roda também na main, para as fotos de antes). O save do jogador fica intacto.
 extends SceneTree
 
@@ -36,6 +37,7 @@ func _run() -> void:
 	c.station.last_return = {}
 	S.adjust(c, "seeds", 40)
 	S.adjust(c, "fragments", 10)
+	S.adjust(c, "scrap", 20)
 	match case_name:
 		"bar":
 			c.station.rooms[S.BAR] = 2
@@ -47,6 +49,11 @@ func _run() -> void:
 			var anxious = S.hero(c, "hero_rato_ana") if S.hero(c, "hero_rato_ana") != null else c.roster[0]
 			if not Array(anxious.perks).has("anxious"):
 				anxious.perks.append("anxious")
+			# Um em tratamento: ocupa um leito (na main, antes da #265, o campo não existe e nada muda).
+			var other = c.roster[1]
+			if not Array(other.perks).has("anxious"):
+				other.perks.append("anxious")
+			other.quirk_treatment = {"perk": "anxious", "days": 2}
 		"training", "camp":
 			c.station.rooms["training"] = 2
 			var bento = S.hero(c, "hero_cao_bento")
@@ -71,6 +78,23 @@ func _run() -> void:
 			hud.open_room(S.INFIRMARY)
 			await _frames(20)
 			await _shot("20-infirmary")
+		"plan":
+			hud.open_service("plan")
+			await _frames(10)
+			var see := hud.find_child("See_training", true, false) as Control
+			if see == null:
+				see = hud.find_child("See_infirmary", true, false) as Control
+			var scroll := see.get_parent()
+			while scroll != null and not scroll is ScrollContainer:
+				scroll = scroll.get_parent()
+			if scroll != null:
+				(scroll as ScrollContainer).ensure_control_visible(see)
+			await _frames(10)
+			await _shot("35-plan")
+			if hud.find_child("See_training", true, false) != null:
+				(hud.find_child("See_training", true, false) as Button).pressed.emit()
+				await _frames(20)
+				await _shot("36-training-room")
 		"training":
 			hud.open_room(S.CHARACTERS)
 			await _frames(10)
