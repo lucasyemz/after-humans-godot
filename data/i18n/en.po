@@ -2218,8 +2218,8 @@ msgid "%s pronta. Equipe no Alojamento."
 msgstr "%s ready. Equip it in the Quarters."
 
 #: scripts/ui/refuge_hud.gd:2975
-msgid "Arma e Segunda Pele · %d hoje"
-msgstr "Weapon and Second Skin · %d today"
+msgid "Arma e Segunda Pele · restam %d hoje"
+msgstr "Weapon and Second Skin · %d left today"
 
 #: scripts/ui/refuge_hud.gd:2978
 msgid "Ninguém na Estação para melhorar as peças."

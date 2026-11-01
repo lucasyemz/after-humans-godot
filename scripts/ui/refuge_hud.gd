@@ -2972,7 +2972,7 @@ func _gear(c: Dictionary, level: int) -> void:
 	if level < 1:
 		return
 	_body.add_child(_divider())
-	_section(tr("Arma e Segunda Pele · %d hoje") % AHGear.left_today(c), "train")
+	_section(tr("Arma e Segunda Pele · restam %d hoje") % AHGear.left_today(c), ROOM_ICONS[S.FORGE])
 	var heroes: Array = S.living(c).filter(func(h): return not AHSideMissions.away(h))
 	if heroes.is_empty():
 		_text(tr("Ninguém na Estação para melhorar as peças."), AHKit.MUTED, "small")
@@ -3014,7 +3014,7 @@ func _gear(c: Dictionary, level: int) -> void:
 		box.add_child(_cost_chips(c, {"scrap": int(next.get("Scrap", 0)), "fragments": int(next.get("Fragments", 0))}))
 		var button := _chip_button(tr("Melhorar"))
 		button.name = "Upgrade_%s" % piece
-		button.icon = AHKit.icon("train")
+		button.icon = AHKit.icon(ROOM_ICONS[S.FORGE])
 		button.add_theme_constant_override("icon_max_width", 26)
 		button.custom_minimum_size = Vector2(0, 56)
 		var reason := AHGear.block(c, _gear_hero, piece)

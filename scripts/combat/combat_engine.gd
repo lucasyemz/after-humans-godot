@@ -264,7 +264,7 @@ func hero_resist(unit: Unit, key: String) -> float:
 	var value := float(hero_class[key]) if hero_class != null else float(AHGameData.CLASS[key])
 	# A Segunda Pele (#262) soma, até o teto de 80% (#258); sem ela, o valor do papel como antes.
 	var extra := float(unit.gear_resist.get(key, 0.0))
-	return minf(HERO_RESIST_CAP, value + extra) if extra > 0.0 else value
+	return maxf(value, minf(HERO_RESIST_CAP, value + extra)) if extra > 0.0 else value
 
 
 ## A chance de crítico de um herói: a de todos mais o crítico do papel (#258, CritBonus em pontos percentuais). Quem não é
