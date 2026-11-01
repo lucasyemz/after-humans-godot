@@ -251,6 +251,12 @@ func _ladder(t) -> void:
 			if power.size() != 4 or power[3] <= power[2] or power[2] <= power[0]:
 				bad += 1
 	t.equal(bad, 0, "%d rotas: 3 patrulhas e o guardião, com a vida total subindo até o guardião" % routes)
+	# Os dados do ritmo têm o formato que o corredor espera: 5 pausas (3 pares com uma, o calmo com duas) e os pares
+	# calmos entre o 2º e o 4º (o 1º sempre tem patrulha, para a travessia das fases 2 e 5 nunca ficar sem luta).
+	var pacing := R.pacing_row("corridor")
+	t.equal((pacing.get("Breaks", []) as Array).size(), 5, "corridor-pacing: 5 pausas")
+	t.check(not (pacing.get("CalmPairs", []) as Array).is_empty() and pacing.CalmPairs.all(func(p): return int(p) >= 2 and int(p) <= 4),
+		"corridor-pacing: os pares calmos entre o 2º e o 4º")
 	var row: Dictionary = R.patrol_row(2, 3)
 	t.equal(int(row.get("Count", 0)), 4, "a última patrulha é a forte, de 4 posições")
 	t.equal(R.patrol_row(0, 4), R.patrol_row(0, 3), "um corredor antigo, de 4 patrulhas, repete a primeira linha no começo")
