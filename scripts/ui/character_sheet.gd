@@ -42,13 +42,12 @@ static func from_unit(session: AHCombatSession, unit: AHCombat.Unit, boss: bool 
 		"speed": unit.speed, "instinct": unit.instinct if unit.is_player else -1, "passives": [], "states": [],
 		"enemy": not unit.is_player}
 	if unit.is_player:
-		var hero_class = GameData.row("classes", unit.class_id)
-		out.kind = _kind(hero_class)
-		out.type = AHTypes.label(AHTypes.of_class(unit.class_id))
 		var hero = Campaign.hero(unit.hero_id)
+		out.kind = _kind(unit.class_id, GameData.combat.species_of(unit.class_id, unit.species))
+		out.type = AHTypes.label(AHTypes.of_unit(unit))
 		out.passives = _hero_passives(hero, unit.perks, unit.class_id)
 		# A linhagem (#227): em quem causa mais dano e de quem recebe.
-		out.passives.append_array(AHTypes.sheet_rows(AHTypes.of_class(unit.class_id)))
+		out.passives.append_array(AHTypes.sheet_rows(AHTypes.of_unit(unit)))
 		out.art = AHCombatArena.hero_art_of(unit.hero_id, String(hero.get("art_variant", "")) if hero != null else "").get("idle", {})
 		if hero != null:
 			out.level = AHHeroLevels.level(hero)
@@ -103,10 +102,10 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 	# O nível (#90): o Passo ligeiro soma na velocidade, como na luta.
 	speed += int(AHHeroLevels.combat_bonus(hero).speed)
 	var out := {"id": String(hero.get("id", "")), "name": String(hero.get("display_name", "")),
-		"kind": _kind(hero_class), "type": AHTypes.label(AHTypes.of_class(String(hero.get("class_id", "")))),
+		"kind": _kind(String(hero.get("class_id", "")), AHSpecies.of_hero(hero)), "type": AHTypes.label(AHTypes.of_hero(hero)),
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
 		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))) \
-			+ AHTypes.sheet_rows(AHTypes.of_class(String(hero.get("class_id", "")))), "states": [], "enemy": false,
+			+ AHTypes.sheet_rows(AHTypes.of_hero(hero)), "states": [], "enemy": false,
 		"level": AHHeroLevels.level(hero),
 		"art": AHCombatArena.hero_art_of(String(hero.get("id", "")), String(hero.get("art_variant", ""))).get("idle", {})}
 	if hero.get("trauma", false):
@@ -114,10 +113,11 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 	return out
 
 
-static func _kind(hero_class) -> String:
-	if hero_class == null:
+## "Cão · Proteção": a espécie do indivíduo e o papel (a classe, #189).
+static func _kind(class_id: String, species_id: String) -> String:
+	if GameData.row("classes", class_id) == null:
 		return ""
-	return "%s · %s" % [TranslationServer.translate(String(hero_class.get("Species", ""))), TranslationServer.translate(String(hero_class.get("Role", "")))]
+	return " · ".join([AHSpecies.display(species_id), AHSpecies.role(class_id)])
 
 
 ## Os traços (perks), a relíquia e os treinos do herói (a Pesquisa da classe, campaign.researched_skills): [título, o que

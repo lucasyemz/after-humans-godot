@@ -439,8 +439,8 @@ func _card(c: Dictionary, rank: int) -> Button:
 		var name_label := AHKit.label(String(hero.display_name), "card_name", AHKit.TEXT, true, true)
 		name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		names.add_child(name_label)
-		var hero_class = GameData.row("classes", String(hero.class_id))
-		names.add_child(AHKit.label(tr(String(hero_class.DisplayName)) if hero_class != null else "", "text", AHKit.MUTED))
+		# A espécie e o papel (#189): "Cão · Proteção".
+		names.add_child(AHKit.label(AHSpecies.kind_text(hero), "text", AHKit.MUTED))
 		names.add_child(AHKit.label(tr("Vida %d / %d") % [hero.hp, hero.max_hp], "text", AHKit.TEXT, true))
 		var bar := AHKit.bar("life", hero.hp, hero.max_hp)
 		bar.custom_minimum_size = Vector2(0, 22)

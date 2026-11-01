@@ -440,7 +440,7 @@ func _card(hero_id: String) -> Control:
 		name_row.add_child(xp)
 	var hero_class = GameData.row("classes", String(hero.class_id))
 	if hero_class != null:
-		names.add_child(AHKit.label(tr(String(hero_class.DisplayName)), "text", AHKit.MUTED))
+		names.add_child(AHKit.label(AHSpecies.kind_text(hero), "text", AHKit.MUTED))
 	if fell:
 		names.add_child(fallen_line(hero))
 	else:

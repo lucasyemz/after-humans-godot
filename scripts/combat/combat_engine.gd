@@ -84,14 +84,14 @@ static func is_direct_attack(ability: Dictionary) -> bool:
 	return ability.DamageRange.Max > 0 and (ability.TargetType == "SingleEnemy" or ability.TargetType == "MarkedEnemy")
 
 
-## A classificação de uma unidade para a vantagem de tipo (#227): a linhagem da classe do herói ou a família mecânica do
-## inimigo ("" sem classificação).
+## A classificação de uma unidade para a vantagem de tipo (#227): a linhagem da espécie do herói (#189) ou a família
+## mecânica do inimigo ("" sem classificação).
 func type_of(unit: Unit) -> String:
 	if unit == null:
 		return ""
 	if unit.is_player:
-		var hero_class = data.classes.get(unit.class_id)
-		return String(hero_class.Lineage) if hero_class != null else ""
+		var row = data.species.get(data.species_of(unit.class_id, unit.species))
+		return String(row.Lineage) if row != null else ""
 	var enemy = data.enemies.get(unit.enemy_id)
 	return String(enemy.MechFamily) if enemy != null else ""
 
@@ -309,13 +309,14 @@ func _hit_ids_from(target: Unit, ability: Dictionary, target_rank: int, opposing
 
 # ---------------------------------------------------------------- início e rodadas
 
-## Unidade de herói a partir da campanha. hero: Id, ClassId, DisplayName, MaxHp, Hp, Instinct, Perks, Trauma, RelicId.
+## Unidade de herói a partir da campanha. hero: Id, ClassId, Species (opcional), DisplayName, MaxHp, Hp, Instinct, Perks, Trauma, RelicId.
 static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -> Unit:
 	var unit := Unit.new()
 	unit.id = "unit_" + hero.Id
 	unit.is_player = true
 	unit.hero_id = hero.Id
 	unit.class_id = hero.ClassId
+	unit.species = String(hero.get("Species", ""))
 	unit.display_name = hero.DisplayName
 	unit.rank = rank
 	unit.hp = hero.Hp

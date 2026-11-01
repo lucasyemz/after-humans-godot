@@ -110,15 +110,6 @@ const TRAUMA_COST := 5
 const MAX_PER_CLASS := 2
 ## Suprimentos comprados na partida, além dos 4 de graça (FoodCost).
 const FOOD_COST := 2
-## Nomes que a comunidade daria (de objetos, lugares e traços; docs/narrative/review.md, #64), não da cultura humana.
-const NAME_POOLS := {
-	"cao": ["Bento", "Brutus", "Argos", "Tobias", "Balto", "Rufus", "Lorde", "Barão", "Brasa", "Trovão", "Pistão", "Farol", "Fumaça", "Trilho", "Bóris"],
-	"gato": ["Nix", "Sombra", "Breu", "Telha", "Maya", "Nuvem", "Fresta", "Calha", "Chico", "Puma", "Luna", "Antena", "Veludo", "Mimi", "Lampião"],
-	"sapo": ["Íris", "Lupa", "Cisterna", "Garganta", "Mirante", "Bubo", "Estrela", "Eco", "Alerta", "Sábio", "Pluma", "Penumbra", "Gisela", "Noctis"],
-	"coruja": ["Véspera", "Sereno", "Jasmim", "Pacato", "Rio", "Sol", "Dengoso", "Flora", "Paz", "Brisa", "Lótus", "Chico Rei", "Pingo", "Mel", "Cacau"],
-	"rato": ["Risco", "Pólvora", "Chispola", "Pipeta", "Ferrugem", "Duto", "Pipoca", "Veneno", "Mola", "Centelha", "Fuligem", "Pinça", "Engrenagem"],
-	"tatu": ["Casco", "Carapaça", "Couraça", "Fortaleza", "Tromba", "Pedregulho", "Bigorna", "Escudo", "Baluarte", "Granito", "Tanque", "Rochedo"],
-}
 
 # ---------------------------------------------------------------- foco da rota (#73)
 
@@ -160,6 +151,9 @@ static func init_new_campaign(campaign: Dictionary) -> void:
 ## Save anterior à Estação (fase 2): completa o que falta. Como na Unreal (MigrateLegacy), um save sem cômodos fica
 ## com todos recuperados, como o jogador já os usava. Idempotente.
 static func migrate(campaign: Dictionary) -> void:
+	# A espécie no indivíduo (#189): quem é de um save de antes fica com a padrão da classe (o rato, Guaxinim).
+	for entry in campaign.get("roster", []):
+		AHSpecies.ensure(entry)
 	var station = campaign.get("station")
 	if typeof(station) != TYPE_DICTIONARY or not station.has("rooms"):
 		var rooms := {}
@@ -1299,7 +1293,10 @@ static func hero_name(campaign: Dictionary, class_id: String) -> String:
 		used[String(waiting.get("display_name", "")).to_lower()] = true
 	for entry in campaign.get("memorial", []):
 		used[String(entry.display_name).to_lower()] = true
-	var pool: Array = NAME_POOLS.get(class_id, ["Recruta"])
+	# Os nomes vêm da cultura da espécie (#189), a padrão da classe enquanto o recruta chega com ela.
+	var pool: Array = AHSpecies.names(AHSpecies.default_for(class_id))
+	if pool.is_empty():
+		pool = ["Recruta"]
 	for candidate in pool:
 		if not used.has(String(candidate).to_lower()):
 			return candidate

@@ -554,76 +554,10 @@ station_build.gd: wall
 station_rules.gd: %d %s
 station_rules.gd: %s %d
 station_rules.gd: %s %s
-station_rules.gd: Argos
-station_rules.gd: Balto
-station_rules.gd: Baluarte
-station_rules.gd: Barão
-station_rules.gd: Bento
-station_rules.gd: Brisa
-station_rules.gd: Brutus
-station_rules.gd: Bubo
-station_rules.gd: Bóris
-station_rules.gd: Cacau
-station_rules.gd: Carapaça
-station_rules.gd: Casco
-station_rules.gd: Chico
-station_rules.gd: Chico Rei
-station_rules.gd: Chispola
 station_rules.gd: Cora
-station_rules.gd: Couraça
-station_rules.gd: Dengoso
 station_rules.gd: Dora
-station_rules.gd: Duto
-station_rules.gd: Eco
-station_rules.gd: Engrenagem
-station_rules.gd: Escudo
-station_rules.gd: Estrela
-station_rules.gd: Ferrugem
-station_rules.gd: Flora
-station_rules.gd: Fortaleza
-station_rules.gd: Fuligem
-station_rules.gd: Fumaça
-station_rules.gd: Garganta
-station_rules.gd: Gisela
-station_rules.gd: Granito
-station_rules.gd: Jasmim
-station_rules.gd: Lorde
-station_rules.gd: Luna
-station_rules.gd: Lótus
-station_rules.gd: Maya
-station_rules.gd: Mel
-station_rules.gd: Mimi
-station_rules.gd: Mola
-station_rules.gd: Nix
-station_rules.gd: Noctis
-station_rules.gd: Nuvem
 station_rules.gd: Otto
-station_rules.gd: Pacato
-station_rules.gd: Paz
-station_rules.gd: Pedregulho
-station_rules.gd: Penumbra
-station_rules.gd: Pingo
-station_rules.gd: Pipeta
-station_rules.gd: Pipoca
-station_rules.gd: Pluma
-station_rules.gd: Puma
-station_rules.gd: Pólvora
 station_rules.gd: Recruta
-station_rules.gd: Rio
-station_rules.gd: Risco
-station_rules.gd: Rochedo
-station_rules.gd: Rufus
-station_rules.gd: Sereno
-station_rules.gd: Sol
-station_rules.gd: Sombra
-station_rules.gd: Sábio
-station_rules.gd: Tanque
-station_rules.gd: Tobias
-station_rules.gd: Tromba
-station_rules.gd: Trovão
-station_rules.gd: Veludo
-station_rules.gd: Veneno
-station_rules.gd: Véspera
 station_rules.gd: accepted
 station_rules.gd: alive
 station_rules.gd: amount
@@ -632,11 +566,9 @@ station_rules.gd: bar
 station_rules.gd: basic
 station_rules.gd: benefit
 station_rules.gd: canteen
-station_rules.gd: cao
 station_rules.gd: characters
 station_rules.gd: choice
 station_rules.gd: civilian
-station_rules.gd: coruja
 station_rules.gd: costs
 station_rules.gd: depot
 station_rules.gd: drawback
@@ -645,7 +577,6 @@ station_rules.gd: event
 station_rules.gd: fed
 station_rules.gd: food
 station_rules.gd: forge
-station_rules.gd: gato
 station_rules.gd: hero_%s_%d
 station_rules.gd: heroes
 station_rules.gd: hungry
@@ -663,14 +594,12 @@ station_rules.gd: perks
 station_rules.gd: power
 station_rules.gd: provisions
 station_rules.gd: quiet
-station_rules.gd: rato
 station_rules.gd: recruits
 station_rules.gd: residents
 station_rules.gd: results
 station_rules.gd: role
 station_rules.gd: rooms
 station_rules.gd: roster
-station_rules.gd: sapo
 station_rules.gd: screen
 station_rules.gd: searched
 station_rules.gd: seen
@@ -678,7 +607,6 @@ station_rules.gd: shelter
 station_rules.gd: shop
 station_rules.gd: species
 station_rules.gd: spot
-station_rules.gd: tatu
 station_rules.gd: text
 station_rules.gd: thirsty
 station_rules.gd: tip
@@ -687,7 +615,6 @@ station_rules.gd: trait
 station_rules.gd: value
 station_rules.gd: warn
 station_rules.gd: watch
-station_rules.gd: Íris
 street.gd: %s %s reached=%.2f limit=%.2f\n
 street.gd: %s avg_ms=%.2f p95_ms=%.2f renderer=%s\n
 street.gd: %s · %dx%d · %d fps (%.1f ms)
@@ -812,23 +739,6 @@ refuge_hud.gd: title
 game_flow.gd: subtitle
 game_flow.gd: hold
 refuge_hud.gd: arrival
-station_rules.gd: Brasa
-station_rules.gd: Pistão
-station_rules.gd: Farol
-station_rules.gd: Trilho
-station_rules.gd: Breu
-station_rules.gd: Telha
-station_rules.gd: Fresta
-station_rules.gd: Calha
-station_rules.gd: Antena
-station_rules.gd: Lampião
-station_rules.gd: Lupa
-station_rules.gd: Cisterna
-station_rules.gd: Mirante
-station_rules.gd: Alerta
-station_rules.gd: Centelha
-station_rules.gd: Pinça
-station_rules.gd: Bigorna
 exploration_hud.gd: Requirement
 journey_rules.gd: hero
 station_rules.gd: xp
@@ -909,9 +819,6 @@ character_sheet.gd: Speed
 character_sheet.gd: Target
 character_sheet.gd: self
 character_sheet.gd: Value
-character_sheet.gd: %s · %s
-character_sheet.gd: Species
-character_sheet.gd: Role
 character_sheet.gd: control
 character_sheet.gd: provider
 character_sheet.gd: since
@@ -1786,3 +1693,11 @@ rescue_rules.gd: join
 rescue_rules.gd: corridor
 station_rules.gd: help
 refuge_hud.gd: A partida não esperou o recusado voltar ao vagão (%.0f s).
+combat_engine.gd: Species
+combat_session.gd: Species
+campaign_service.gd: species
+species_rules.gd: species
+species_rules.gd: Lineage
+species_rules.gd: Height
+species_rules.gd: Names
+combat_session.gd: species

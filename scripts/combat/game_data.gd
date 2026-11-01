@@ -19,7 +19,11 @@ const ABILITY := {
 	},
 	"Cleanses": {"bMark": false, "bBlind": false, "bWeak": false, "bImmobilize": false, "bVuln": false, "bDot": false},
 }
-const CLASS := {"DisplayName": "", "Lineage": "", "BaseMaxHp": 1, "BaseSpeed": 0, "AbilityIds": []}
+## A classe é o papel (#189): a espécie é do indivíduo, e DefaultSpecies é a de quem não tem uma (os fundadores e os saves
+## de antes).
+const CLASS := {"DisplayName": "", "DefaultSpecies": "", "BaseMaxHp": 1, "BaseSpeed": 0, "AbilityIds": []}
+## A espécie (#189): a linhagem da vantagem de tipo (#227) e a altura vêm dela; ela não dá atributos.
+const SPECIES := {"DisplayName": "", "Lineage": "", "Height": 1.64}
 const ENEMY := {
 	"DisplayName": "", "Category": "None", "MechFamily": "", "MaxHp": 1, "Speed": 0, "SpriteKey": "", "bIsBoss": false,
 	"FormationSize": 0, "DisplacementResist": 0.2, "DotResist": 0.2, "ActionIds": [],
@@ -41,6 +45,7 @@ const TYPE_ADVANTAGE := {"Enabled": false, "Multiplier": 1.25}
 const INSTINCT := {"Max": 200, "Crisis": {"Reset": 120, "HpLoss": 0.2, "HpHeal": 0.15, "TokenCap": 3, "BaseVirtue": 0.25}}
 
 var classes := {}
+var species := {}
 var abilities := {}
 var enemies := {}
 var enemy_actions := {}
@@ -57,10 +62,21 @@ static func f32(value: float) -> float:
 	return PackedFloat32Array([value])[0]
 
 
+## A espécie de uma unidade de herói (#189): a dela, ou a padrão da classe; "" sem nenhuma (os kits históricos da
+## paridade não têm, e ficam sem linhagem).
+func species_of(class_id: String, species_id: String) -> String:
+	if species_id != "":
+		return species_id
+	var hero_class = classes.get(class_id)
+	return String(hero_class.DefaultSpecies) if hero_class != null else ""
+
+
 ## Carrega as tabelas. kit_dir troca classes e habilidades (a paridade usa os kits históricos).
 func load_from(data_dir: String, kit_dir: String = "") -> bool:
 	var kits := kit_dir if kit_dir != "" else data_dir
 	classes = _load_table(kits.path_join("classes.json"), CLASS)
+	if FileAccess.file_exists(data_dir.path_join("species.json")):
+		species = _load_table(data_dir.path_join("species.json"), SPECIES)
 	abilities = _load_table(kits.path_join("abilities.json"), ABILITY)
 	enemies = _load_table(data_dir.path_join("enemies.json"), ENEMY)
 	enemy_actions = _load_table(data_dir.path_join("enemy-actions.json"), ENEMY_ACTION)

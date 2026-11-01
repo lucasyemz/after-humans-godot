@@ -59,7 +59,7 @@ func _data() -> void:
 		for ability_id in entry.actions:
 			t.equal(entry.actions[ability_id].execucao.anchor, idle.anchor, "%s: o golpe %s com o pé do parado" % [actor.id, ability_id])
 		t.check(entry.reactions.has("item"), "%s: ganhou a pose de usar item" % actor.id)
-		t.check(absf(float(AHCharacterHeights.HEIGHTS.get(actor.class_id, 0.0)) - float(actor.height_m)) < 0.001,
+		t.check(absf(float(AHSpecies.height(AHSpecies.default_for(actor.class_id))) - float(actor.height_m)) < 0.001,
 			"%s: a altura de %.2f m do redesenho" % [actor.id, float(actor.height_m)])
 		if not t.check(entry.has("combat_idle"), "%s tem a guarda" % actor.id):
 			continue

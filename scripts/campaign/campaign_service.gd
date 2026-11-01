@@ -138,7 +138,9 @@ static func roll_perks(perks: Dictionary, rng: RandomNumberGenerator) -> Array:
 
 static func new_hero(id: String, class_id: String, display_name: String, max_hp: int, perks: Array) -> Dictionary:
 	return {
-		"id": id, "class_id": class_id, "display_name": display_name, "alive": true, "hp": max_hp, "max_hp": max_hp,
+		"id": id, "class_id": class_id, "display_name": display_name,
+		# A espécie do indivíduo (#189): a classe é o papel; quem chega sem uma fica com a padrão da classe.
+		"species": AHSpecies.default_for(class_id), "alive": true, "hp": max_hp, "max_hp": max_hp,
 		"instinct": 0, "perks": perks, "crisis_outcome": "none", "trauma": false, "trainings": [], "expedition_uses": {},
 		"relic_id": "", "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.

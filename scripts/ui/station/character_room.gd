@@ -416,7 +416,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 		level_box.add_child(xp)
 	var hero_class = GameData.row("classes", String(hero.class_id))
 	if hero_class != null:
-		var line := AHKit.label("%s · %s" % [tr(String(hero_class.DisplayName)), tr(String(hero_class.Role))], "row", AHKit.AMBER)
+		var line := AHKit.label(AHSpecies.kind_text(hero), "row", AHKit.AMBER)
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		line.custom_minimum_size = Vector2(300, 0)
 		column.add_child(line)
