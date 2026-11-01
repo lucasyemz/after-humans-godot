@@ -18,7 +18,7 @@ const STORY := "story"
 const WIDTH := 340
 const MAX_LINES := 2
 ## A room_tag tem a moldura até a linha 41 e a ponta embaixo, no meio (o recorte dela, em px da peça).
-const FRAME_ROWS := 42
+const FRAME_ROWS := 41
 const TIP := Rect2(92, 41, 17, 11)
 ## As bolinhas do pensamento, da cabeça para cima: o raio e o deslocamento (px de 1080).
 const DOTS := [[3.0, Vector2(0, -4)], [4.5, Vector2(8, -15)], [6.0, Vector2(18, -30)]]
@@ -107,7 +107,7 @@ func _ready() -> void:
 static func _frame_style() -> StyleBoxTexture:
 	var box := AHKit.style(AHKit.piece_of("tag", "room"))
 	box.region_rect = Rect2(0, 0, AHKit.entry("room_tag").size[0], FRAME_ROWS)
-	box.texture_margin_bottom = 10
+	box.texture_margin_bottom = 9
 	box.content_margin_left = 14
 	box.content_margin_right = 14
 	box.content_margin_top = 6
@@ -119,7 +119,7 @@ static func _frame_style() -> StyleBoxTexture:
 static func _italic() -> FontVariation:
 	var italic := FontVariation.new()
 	italic.base_font = AHKit.font(false)
-	italic.variation_transform = Transform2D(Vector2(1, 0), Vector2(0.2, 1), Vector2.ZERO)
+	italic.variation_transform = Transform2D(Vector2(1, 0.2), Vector2(0, 1), Vector2.ZERO)
 	return italic
 
 

@@ -784,6 +784,9 @@ func _departure_slot(position: int) -> Vector3:
 
 ## O relatório: os sobreviventes de pé na plataforma, a câmera baixa e próxima olhando um pouco para cima (ShowReport).
 func show_report(hero_ids: Array, instant: bool = true) -> void:
+	# Quem trocava de cômodo (#207) volta na hora ao lugar dele.
+	if life != null:
+		life.abort_trip()
 	clear_lineup()
 	for index in hero_ids.size():
 		_line_card(hero_ids[index], Vector3(LINE_CENTER_X + (index - (maxi(1, hero_ids.size()) - 1) * 0.5) * REPORT_SPACING, 0, LINE_Z))
@@ -828,6 +831,8 @@ func align_lineup(centers: Dictionary) -> void:
 ## A partida (#123): a equipe em fila na Plataforma 1, na câmera do relatório, cada um de pé sobre a sua carta
 ## (align_lineup); do abrigo, a câmera sobe pela passagem. hero_ids vem na ordem da cena (a posição 1 à direita).
 func show_departure(hero_ids: Array) -> void:
+	if life != null:
+		life.abort_trip()
 	clear_lineup()
 	_release_boarding()
 	for index in hero_ids.size():
@@ -937,7 +942,12 @@ func _release_leaving(entry: Dictionary) -> void:
 	if is_instance_valid(entry.card):
 		entry.card.queue_free()
 	if residents.has(entry.hero_id):
-		residents[entry.hero_id].visible = not _residents_hidden
+		residents[entry.hero_id].visible = not _residents_hidden and not _in_corridor(entry.hero_id)
+
+
+## Entre as duas portas de uma troca de cômodo (#207): não aparece em lugar nenhum.
+func _in_corridor(hero_id: String) -> bool:
+	return life != null and life.away_ids().has(hero_id)
 
 
 func clear_lineup() -> void:
@@ -945,7 +955,7 @@ func clear_lineup() -> void:
 		if is_instance_valid(entry.card):
 			entry.card.queue_free()
 		if residents.has(entry.hero_id):
-			residents[entry.hero_id].visible = not _residents_hidden
+			residents[entry.hero_id].visible = not _residents_hidden and not _in_corridor(entry.hero_id)
 	lineup.clear()
 	for contact in _contacts:
 		if is_instance_valid(contact):

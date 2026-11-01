@@ -126,12 +126,13 @@ func on_screen(card: AHSpriteCard) -> bool:
 # ---------------------------------------------------------------- as falas
 
 func _tick_talk(delta: float) -> void:
-	var allowed: bool = station.hud.life_allowed() and chatter_on()
+	# A conversa da tirinha é um objetivo: sai mesmo com as falas desligadas nas Opções.
+	var allowed: bool = station.hud.life_allowed() and (chatter_on() or story != "")
 	if not allowed:
 		# Uma tela por cima: a conversa acaba (a da tirinha também; o Próximo passo continua pedindo).
 		if not talk.is_empty() or bubble != null:
 			stop_talk()
-			story = ""
+		story = ""
 		return
 	if not talk.is_empty():
 		_tick_line(delta)
@@ -252,11 +253,24 @@ func play_story(comic: String) -> bool:
 	var room := String(lead.room)
 	if AHStation.room_def(room).get("place", "") != "grid":
 		room = S.DORMITORY
+	var walkers: Array = []
 	for id in ids:
 		var walker = _walker_of(String(id))
 		if walker == null or walker.get("recovering", false):
 			return false
+		walkers.append(walker)
+	for walker in walkers:
 		station.settle_in(walker, room)
+	# Lado a lado: quem responde fica perto de quem conta (dentro da faixa do cômodo).
+	var lead_card: AHSpriteCard = walkers[0].card
+	for index in range(1, walkers.size()):
+		var other: Dictionary = walkers[index]
+		var side := 1.2 * index if lead_card.position.x + 1.2 * index <= float(other.max) else -1.2 * index
+		var x := clampf(lead_card.position.x + side, float(other.min), float(other.max))
+		other.card.position.x = x
+		other.target = x
+		other.card.set_facing(-signf(side))
+		walkers[0].card.set_facing(signf(side))
 	stop_talk()
 	story = comic
 	_story_wait = 0.6
@@ -347,21 +361,21 @@ func _tick_trip(delta: float) -> void:
 	if not trip.is_empty():
 		_step_trip(delta)
 		return
-	if not auto or not station.hud.life_allowed() or story != "":
-		return
+	# O tempo da visita corre com qualquer tela: ninguém fica fora do cômodo dele por muito mais que 2 min.
 	for id in visits.keys():
 		visits[id].left -= delta
+	if not auto or not station.hud.life_allowed() or story != "":
+		return
+	# Primeiro quem visita há tempo demais volta para casa, na hora; senão, um sorteado vai a outro cômodo.
+	for id in visits.keys():
+		if visits[id].left <= 0.0:
+			var walker = _walker_of(id)
+			if walker != null and can_walk(walker) and start_trip(walker, visits[id].home):
+				return
 	_walk_left -= delta
 	if _walk_left > 0.0:
 		return
 	_walk_left = rng.randf_range(WALK_GAP.x, WALK_GAP.y)
-	# Primeiro quem visita há tempo demais volta para casa; senão, um sorteado vai a outro cômodo.
-	for id in visits.keys():
-		if visits[id].left <= 0.0:
-			var walker = _walker_of(id)
-			if walker != null and can_walk(walker):
-				start_trip(walker, visits[id].home)
-				return
 	var movers: Array = station.walkers().filter(func(w): return can_walk(w))
 	if movers.is_empty():
 		return

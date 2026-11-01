@@ -176,6 +176,15 @@ func _rules() -> void:
 	after.night.phase = "none"
 	t.check(C.mark_seen(after, "bento_brother") and not C.mark_seen(after, "bento_brother"), "vista uma vez só")
 	t.check(String(S.next_step(after).get("action", "")) != "story", "vista, a tirinha sai do Próximo passo")
+	# Antes de liberada (nenhuma volta), a conversa da tirinha nem sai no sorteio (QA da #207).
+	var early := _campaign()
+	early.station.cycle_number = 0
+	var pair := {C.BENTO: {"room": S.BAR, "say": true, "think": true}, C.NICK: {"room": S.BAR, "say": true, "think": true}}
+	var early_hits := 0
+	for i in 400:
+		if String(C.pick(early, pair, {}, "", 0, rng).get("row", {}).get("Name", "")) == "bento_brother":
+			early_hits += 1
+	t.equal(early_hits, 0, "antes da primeira volta, o balão interativo não sai no sorteio")
 	# O save antigo ganha a lista vazia (migrate).
 	var old := _campaign()
 	old.station.erase("comics_seen")
@@ -224,8 +233,9 @@ func _bubbles(station) -> void:
 	t.check(say.get_node_or_null("Tip") != null and think.get_node_or_null("Tip") == null, "a fala tem a ponta; o pensamento, não")
 	t.check(say.size.x > 60 and say.size.x <= AHUiStyle.px(AHKitBubble.WIDTH) + 40, "o balão tem a largura do texto (%s)" % say.size)
 	var label: Label = think.get_node("Frame/Text")
-	t.check(label.get_theme_font("font") is FontVariation and label.get_theme_color("font_color") == AHKit.MUTED,
-		"o pensamento em itálico e mais apagado")
+	var italic = label.get_theme_font("font")
+	t.check(italic is FontVariation and italic.variation_transform.x.y > 0.1 and is_equal_approx(italic.variation_transform.y.x, 0.0)
+		and label.get_theme_color("font_color") == AHKit.MUTED, "o pensamento em itálico (inclinado) e mais apagado")
 	var rich: RichTextLabel = story.get_node("Frame/Text")
 	t.check(rich.text.begins_with("[u]") and rich.get_theme_color("default_color") == AHKit.AMBER and rich.get_theme_font("normal_font") == AHKit.font(true),
 		"o interativo em negrito, sublinhado e no âmbar")
@@ -369,11 +379,14 @@ func _story(station) -> void:
 	var hud: AHRefugeHud = station.hud
 	hud.refresh()
 	t.equal(String(hud._next.get("action", "")), "story", "o Próximo passo pede a conversa")
+	# Com as falas desligadas nas Opções, a conversa do objetivo sai mesmo assim (QA da #207: o passo travava).
+	Campaign.state.settings.station_chatter = false
 	hud._run_next()
 	t.equal(life.story, "bento_brother", "a conversa da tirinha começa")
 	var bento = _walker(station, C.BENTO)
 	var nick = _walker(station, C.NICK)
 	t.check(bento != null and nick != null and bento.room == nick.room, "o Bento e o Nick no mesmo cômodo")
+	t.check(absf(bento.card.position.x - nick.card.position.x) <= 1.3, "lado a lado")
 	var shown := false
 	for frame in 600:
 		await tree.process_frame
@@ -383,7 +396,8 @@ func _story(station) -> void:
 		if life.story_bubble() != null:
 			shown = true
 			break
-	t.check(shown, "a conversa chega ao balão interativo")
+	t.check(shown, "a conversa chega ao balão interativo (com as falas desligadas)")
+	Campaign.state.settings.station_chatter = true
 	if not shown:
 		return
 	life._tick_line(60.0)

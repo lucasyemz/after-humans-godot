@@ -161,6 +161,13 @@ static func pick(campaign: Dictionary, present: Dictionary, history: Dictionary,
 	for row in entries():
 		if not open(row, conditions_now, history, now_ms):
 			continue
+		# A conversa da tirinha só sai depois de liberada (Unlock), como o Próximo passo.
+		var locked := false
+		for line in row.get("Lines", []):
+			if String(line.get("Comic", "")) != "" and not comic_unlocked(campaign, String(line.Comic)):
+				locked = true
+		if locked:
+			continue
 		var ids := cast(row, present, campaign, last)
 		if ids.is_empty():
 			continue
@@ -224,7 +231,7 @@ static func story_pending(campaign: Dictionary) -> String:
 		var row: Dictionary = comic(name)
 		if comic_seen(campaign, name) or chatter_for(name).is_empty():
 			continue
-		if int(campaign.station.get("cycle_number", 0)) < int(row.get("Unlock", {}).get("Returns", 1)):
+		if not comic_unlocked(campaign, name):
 			continue
 		var home := true
 		for id in row.get("Speakers", []):
@@ -233,6 +240,12 @@ static func story_pending(campaign: Dictionary) -> String:
 		if home:
 			return name
 	return ""
+
+
+## A tirinha já liberada: quantas voltas da expedição já houve (Unlock.Returns).
+static func comic_unlocked(campaign: Dictionary, name: String) -> bool:
+	var row := comic(name)
+	return not row.is_empty() and int(campaign.station.get("cycle_number", 0)) >= int(row.get("Unlock", {}).get("Returns", 1))
 
 
 ## A conversa que leva à tirinha (a entrada com Comic numa das falas).
