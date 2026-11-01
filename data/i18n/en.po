@@ -2412,19 +2412,19 @@ msgstr "Trade done: %s for %s."
 msgid "O Sr. dos Trilhos volta ao trem."
 msgstr "Mr. Rails goes back to the train."
 
-#: scripts/ui/refuge_hud.gd:3162
+#: scripts/ui/refuge_hud.gd:3165
 msgid "%s entra para a Estação."
 msgstr "%s joins the Station."
 
-#: scripts/ui/refuge_hud.gd:3162
+#: scripts/ui/refuge_hud.gd:3165
 msgid "%s segue no trem."
 msgstr "%s stays on the train."
 
-#: scripts/ui/refuge_hud.gd:3165
+#: scripts/ui/refuge_hud.gd:3168
 msgid "%s vai morar na Estação."
 msgstr "%s will live at the Station."
 
-#: scripts/ui/refuge_hud.gd:3165
+#: scripts/ui/refuge_hud.gd:3168
 msgid "%s segue no trem. Pode voltar numa próxima viagem."
 msgstr "%s stays on the train. They may come back on a later trip."
 

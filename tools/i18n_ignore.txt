@@ -1785,3 +1785,4 @@ rescue_rules.gd: rescue
 rescue_rules.gd: join
 rescue_rules.gd: corridor
 station_rules.gd: help
+refuge_hud.gd: A partida não esperou o recusado voltar ao vagão (%.0f s).
