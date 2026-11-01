@@ -36,9 +36,11 @@
 
 - **A ficha** (a do apontar, a da Preparação) e **a inspeção** da luta: a linhagem ou a família numa linha própria
   (na inspeção apertada, junto da velocidade) e, nos efeitos passivos, "Dano +25% em Guaxinins e Emissores" e "Recebe
-  +25% de Gatos e Perseguidores" (os nomes curtos, para caber; os completos na explicação). No nível mais apertado da
-  inspeção (o texto Maior com muitos traços, como o Bento), as duas linhas saem dos passivos e a classificação fica na
-  linha da velocidade.
+  +25% de Gatos e Perseguidores" (os nomes curtos, para caber; os completos na explicação). Sem estados, a coluna
+  dos estados fica do tamanho do "Nenhum agora", e a folga vai para os passivos: no texto Normal, todo inimigo mostra
+  as duas linhas. Na inspeção do herói com muitos traços (o Bento e a Íris), as linhas não cabem junto das explicações
+  dos passivos: ficam as explicações, e a linhagem vai para a linha da velocidade (as duas linhas estão na ficha, como
+  a issue pede).
 - **A mira:** a plaqueta do alvo diz "Vantagem +25%" com o ícone (as setas do kit) e a cor do bem; a dica soma
   "Vantagem +25%" ao alvo e a linha com o ícone, e o "pode cair" já conta o multiplicador. Com a plaqueta mais larga, a
   dica que não cabe com folga de nenhum lado vai para o lado que menos cobre (`_dodge_tip`): no texto Maior, encostada
@@ -112,3 +114,10 @@ O efeito é pequeno: nas fases 1 a 4 fica dentro da variação de 40 sementes. N
   classificação e, sem caber, como era; ninguém cai de nível nem corta. A linha da vantagem na dica quebra na largura
   de sempre. Das baixas: a plaqueta do ALVO encurta para "NOME · +25%" (o ícone e a cor seguem) e o "pode cair" conta
   o percentual contra máquina.
+
+- **Rodada 2: REPROVADO.** Os três médios da rodada 1 corrigidos, o `run_all` 101/101. Um médio: no texto Normal, a
+  inspeção do inimigo mostrava a família, mas nunca as duas linhas (a coluna vazia dos estados tinha 220 px de mínimo).
+
+  Correção: a coluna dos estados vazia fica do tamanho do título e do "Nenhum agora" (`_states_floor`), e a folga vai
+  para os passivos. O `test_character_sheet` confere, na luta de verdade e no texto Normal, as duas linhas em cada
+  inimigo sem estados.

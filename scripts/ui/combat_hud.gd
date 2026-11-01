@@ -1187,7 +1187,7 @@ func _fill_inspect(info: Dictionary) -> void:
 		var columns := inner.x - identity.custom_minimum_size.x - 36.0 - 4.0
 		var shown: Array = typed if with_rows else plain
 		var share := float(maxi(1, shown.size())) / float(maxi(1, shown.size()) + maxi(1, info.states.size()))
-		var passives := clampf(columns * share, 220.0, columns - 220.0)
+		var passives := clampf(columns * share, 220.0, columns - _states_floor(info.states))
 		row.add_child(_inspect_list(tr("Efeitos passivos"), shown, tr("Nenhum"), level < 1, level >= 3, passives, "Passives"))
 		row.add_child(_inspect_list(tr("Estados"), info.states, tr("Nenhum agora"), level < 2, level >= 3, columns - passives, "States"))
 		var need := _inspect_panel.get_combined_minimum_size()
@@ -1195,6 +1195,19 @@ func _fill_inspect(info: Dictionary) -> void:
 			break
 	# O painel fica no espaço dele (sem crescer sobre o botão nem abaixo da HUD); o que sobrar no último nível é cortado.
 	_inspect_panel.size = KIT_INSPECT_PANEL.size
+
+
+## A largura mínima da coluna dos estados: 220 com estados; vazia, o que o título e o "Nenhum agora" pedem (#227: a
+## folga vai para os passivos, e as linhas da vantagem cabem no texto Normal).
+func _states_floor(states: Array) -> float:
+	if not states.is_empty():
+		return 220.0
+	var widest := 0.0
+	for spec in [[tr("Estados"), true], [tr("Nenhum agora"), false]]:
+		var probe := AHKit.label(spec[0], "small", AHKit.AMBER, spec[1], spec[1])
+		widest = maxf(widest, probe.get_minimum_size().x)
+		probe.free()
+	return minf(220.0, ceilf(widest) + 8.0)
 
 
 func _inspect_identity(info: Dictionary, level: int = 0, with_type: bool = true) -> VBoxContainer:

@@ -177,6 +177,7 @@ func _combat() -> void:
 	await _move(Vector2(960, 60))
 	t.equal(_inspect_name(panel), AHCombatHud.unit_name(enemy.display_name), "o clique escolhe: ele fica sem o mouse")
 	t.check(hud.waiting and arena.session.current_actor() == actor, "e não age")
+	await _inspect_rows(hud, panel)
 	await _inspect_fits(hud, arena, panel)
 	# As setas passam; a tecla fecha; Voltar também.
 	AHUiStyle.using_keys = true
@@ -214,6 +215,27 @@ func _combat() -> void:
 
 
 ## O painel cabe no espaço dele e não cobre o botão, com três estados em todos, no Normal e no Maior (a QA da #128).
+## A vantagem de tipo (#227) na inspeção do texto Normal, sem estados: o inimigo mostra as duas linhas (a issue, §6).
+## O herói as tem na ficha; na inspeção da luta, com muitos traços (o Bento e a Íris), ficam as explicações dos passivos.
+func _inspect_rows(hud: AHCombatHud, panel: Control) -> void:
+	var size := Settings.text_size
+	Settings.set_text_size(0)
+	await _frames(4)
+	var mark := "+%d%%" % AHTypes.percent()
+	for index in hud._examine.size():
+		hud._examine_index = index
+		hud._inspect_info = {}
+		await _frames(3)
+		var unit: AHCombat.Unit = hud.session.state.find_unit(hud._examine[index])
+		var rows := AHTypes.sheet_rows(AHTypes.of_class(unit.class_id) if unit.is_player else AHTypes.of_enemy(unit.enemy_id))
+		var texts: Array = panel.find_children("*", "Label", true, false).map(func(label): return label.text)
+		var found := texts.filter(func(text): return text.contains(mark)).size()
+		if not unit.is_player and hud._inspect_info.get("states", []).is_empty():
+			t.check(found >= rows.size(), "texto Normal, %s: as %d linhas da vantagem na inspeção do inimigo (achei %d)" % [hud._examine[index], rows.size(), found])
+	Settings.set_text_size(size)
+	await _frames(3)
+
+
 func _inspect_fits(hud: AHCombatHud, arena: AHCombatArena, panel: Control) -> void:
 	var saved: Array = []
 	for unit in arena.session.units():
