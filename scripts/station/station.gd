@@ -975,10 +975,12 @@ static func block_def(key: String) -> Dictionary:
 ## Os blocos da cena (as vagas soterradas e livres e os patamares soterrados), na ordem da grade.
 static func block_defs() -> Array:
 	var out: Array = []
-	for key in AHStationGrid.block_keys():
-		var block := block_def(key)
-		if not block.is_empty():
-			out.append(block)
+	for entry in AHStationLayout.blocks(Campaign.state):
+		out.append({"key": entry.key, "x0": entry.x0 * 0.01, "x1": entry.x1 * 0.01, "floor": entry.floor * 0.01, "ceiling": entry.ceiling * 0.01})
+	for f in range(2, AHStationGrid.FLOORS + 1):
+		var landing := block_def("L%d" % f)
+		if not landing.is_empty():
+			out.append(landing)
 	return out
 
 

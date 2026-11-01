@@ -80,6 +80,13 @@ func _rules() -> void:
 	t.equal(AHRefugeHud.build_spot(c, S.RESEARCH, "1:1"), "1:1", "e pela própria vaga 1")
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5
+	# Uma vaga simples isolada onde só sobram os duplos: Vaga livre, sem Construir.
+	var lone := Campaign.create_initial(2742)
+	lone.station.rooms[S.BAR] = 1
+	lone.station.rooms[S.DEPOT] = 2
+	AHStationGrid.heal(lone)
+	lone.station.grid.cells[1][6] = G.FREE
+	t.equal(String(AHRefugeHud.block_info(lone, "2:7").mark), String(tr("Vaga livre")), "a vaga isolada sem cômodo que caiba: só Vaga livre")
 	var free := AHRefugeHud.block_info(c, "1:1")
 	t.equal([free.state, String(free.mark), free.ready], ["free", String(tr("Vaga livre · Construir")), true], "a vaga livre com o que construir agora: acesa")
 	# O chip curto do relatório (a linha inteira ia em quatro linhas no cartão estreito).
@@ -150,6 +157,9 @@ func _buried_panel(station) -> void:
 	t.check(hud._body.find_child("Front", true, false) != null and hud._body.find_child("DigHere", true, false) == null,
 		"a frente: sem o botão de escavar este bloco")
 	t.check(hud._body.find_child("Workers", true, false) != null, "e quem cava (o posto de escavador)")
+	# O vizinho direto (PageUp e PageDown): do bloco para a Forja, e da Forja de volta para o bloco.
+	t.equal(hud.neighbor_place("block:1:2", 1), S.FORGE, "o vizinho à direita do bloco é a Forja")
+	t.equal(hud.neighbor_place(S.FORGE, -1), "block:1:2", "e o da Forja à esquerda, o bloco")
 	hud.open_room("block:L2")
 	await _frames(3)
 	var dig := hud._body.find_child("DigHere", true, false) as Button
@@ -217,17 +227,25 @@ func _return(station) -> void:
 	hud._enter_shelter_then(Callable())
 	await _frames(3)
 	t.check(hud.briefing_open(), "a primeira volta com escavação abre a fala")
-	t.check(G.grid(c).intro_seen, "e a marca de vista")
+	t.check(not G.grid(c).intro_seen, "a fala só fica vista depois de passar (fechar o jogo no meio a repete)")
 	t.check(not hud.dig_notice_shown(), "o aviso espera a fala")
 	if hud.briefing != null:
 		hud.briefing.skip()
 	await _frames(3)
-	t.check(not hud.briefing_open() and hud.dig_notice_shown(), "fechada a fala, o aviso do achado")
+	t.check(G.grid(c).intro_seen, "passada a fala, ela fica vista")
+	t.check(not hud.briefing_open() and hud.dig_notice_shown(), "fechada a fala, o aviso do achado na vista geral")
 	if hud.dig_notice_shown():
 		var texts: Array = hud._dig_notice.find_children("*", "Label", true, false).map(func(l): return l.text)
 		t.check(texts.has(tr("%s: vaga livre") % hud.block_title("1:1")) and texts.has(tr(G.rule("floor_1").Text)), "com o bloco e o achado (%s)" % [texts])
 		t.check(texts.has(tr("Entrou no estoque: %s.") % G.finds_text(c.station.last_return.dig.finds)), "e o que entrou no estoque")
-	hud.hide_dig_notice()
+		var notice: Rect2 = hud._dig_notice.get_global_rect()
+		t.check(notice.position.x >= hud.LEFT.end.x and notice.end.x <= hud.RIGHT.position.x, "entre a coluna da esquerda e o painel (%s)" % notice)
+	# Sai com qualquer tecla (como o aviso da ferramenta nova, #143).
+	var key := InputEventKey.new()
+	key.keycode = KEY_SPACE
+	key.pressed = true
+	hud._input(key)
+	t.check(not hud.dig_notice_shown(), "uma tecla tira o aviso")
 	hud._enter_shelter_then(Callable())
 	await _frames(3)
 	t.check(not hud.briefing_open() and not hud.dig_notice_shown(), "na segunda vez, nem a fala nem o aviso")
