@@ -71,7 +71,9 @@ func _training() -> void:
 		t.equal(AHHeroLevels.train(c, "hero_gato_nick", "velocidade"), "", "o passo ligeiro %d de %d" % [i + 1, speed_limit])
 	nick.xp = 999
 	t.check(AHHeroLevels.train(c, "hero_gato_nick", "velocidade") != "", "passou do limite (%d): o passo ligeiro é recusado" % speed_limit)
-	t.equal(AHHeroLevels.options(nick).map(func(u): return u.Name), ["habilidade_gato", "vida"], "com a velocidade no limite, a reserva (mais vida) completa as duas")
+	# As melhorias (as de aprender, #259, vêm à parte: no treino para o nível 3 em diante).
+	var upgrades: Array = AHHeroLevels.options(nick).filter(func(u): return String(u.get("Stat", "")) != "Learn")
+	t.equal(upgrades.map(func(u): return u.Name), ["habilidade_gato", "vida"], "com a velocidade no limite, a reserva (mais vida) completa as duas")
 	# A ficha da Preparação (#89) mostra a velocidade da luta, com o Passo ligeiro, e as melhorias.
 	var sheet := AHCharacterSheet.from_hero(nick)
 	var in_fight: int = AHCombatSession.create([nick], ["robot"], false, 3).state.player_team[0].speed
@@ -84,6 +86,8 @@ func _training() -> void:
 		if options.is_empty() or AHHeroLevels.train(c, "hero_gato_nick", options[0].Name) != "":
 			break
 	t.equal(AHHeroLevels.level(nick), AHHeroLevels.MAX_LEVEL, "sobe até o nível 10")
+	# No 10, só sobra aprender o que faltou (#259); aprendido tudo, o treino acaba.
+	nick.unlocked = AHHeroSkills.unlocks("gato")
 	t.equal(AHHeroLevels.train_block(c, nick), "Nível máximo.", "e para no 10")
 	t.equal(AHHeroLevels.gain(nick, 50), 0, "no 10, o XP não acumula")
 
@@ -183,11 +187,11 @@ func _xp_from_play() -> void:
 	var session := AHCombatSession.create(heroes, ["robot"], false, 4)
 	session.tally = {"hero_cao_bento": {"damage": 20, "healing": 10, "downs": 1}}
 	var expected := AHHeroLevels.fight_xp({"damage": 20, "healing": 10, "downs": 1})
-	t.equal(expected, 8 + 3 + 2 + 2, "o XP da luta: lutar, derrubar, curar e o dano (hero-xp.json)")
-	t.equal(AHHeroLevels.fight_xp({"protects": 2}), 8 + 2 * int(AHHeroLevels.rule("protect").Xp), "proteger um aliado também dá XP")
+	t.equal(expected, 10 + 3 + 2 + 2, "o XP da luta: lutar, derrubar, curar e o dano (hero-xp.json)")
+	t.equal(AHHeroLevels.fight_xp({"protects": 2}), 10 + 2 * int(AHHeroLevels.rule("protect").Xp), "proteger um aliado também dá XP")
 	session.write_back(c)
 	t.equal(AHHeroLevels.xp(S.hero(c, "hero_cao_bento")), expected, "quem fez mais ganha mais")
-	t.equal(AHHeroLevels.xp(S.hero(c, recruit_id)), roundi(8 * 1.5), "o recruta ganha mais que o fundador pelo mesmo")
+	t.equal(AHHeroLevels.xp(S.hero(c, recruit_id)), roundi(10 * 1.5), "o recruta ganha mais que o fundador pelo mesmo")
 	t.equal(int(c.session.expedition.stats.hero_cao_bento.xp), expected, "o relatório guarda o XP")
 	c.session.result = "victory"
 	var report := S.finish_return(c)

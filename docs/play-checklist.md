@@ -6,7 +6,7 @@ que só se vê jogando: leitura, ritmo, som e se nada trava.
 
 Os itens marcados com **[auto]** o teste `tests/test_full_journey.gd` (dentro do `tests/run_all.gd`) já percorre com as
 cenas de verdade, sem janela: a Estação, o mapa de fases, a Preparação, a Rua das Vitrines (andar, vasculhar os caixotes,
-as cinco lutas no automático, o guardião), a volta, o relatório, a noite no Dormitório e o trem, conferindo a campanha e o
+as quatro lutas no automático, o guardião), a volta, o relatório, a noite no Dormitório e o trem, conferindo a campanha e o
 save em cada passo. Jogando, falta olhar neles só o que o teste não vê: imagem, som e ritmo.
 
 Anote cada item como **ok**, **estranho** (com o que viu) ou **quebrado** (com como chegou lá). Um save travado vale

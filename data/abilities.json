@@ -556,5 +556,443 @@
       "Block": 1
     },
     "UsesMax": 2
+  },
+  {
+    "Name": "cao_ombro_de_carga",
+    "ClassId": "cao",
+    "DisplayName": "Ombro de Carga",
+    "Description": "Investida curta com o ombro: dano baixo e empurra o alvo uma posição.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "PushTarget": 1,
+    "Cooldown": 2,
+    "ArtOf": "cao_impacto_hidraulico"
+  },
+  {
+    "Name": "cao_postura_firme",
+    "ClassId": "cao",
+    "DisplayName": "Postura Firme",
+    "Description": "Firma a postura: ganha 1 Bloqueio e remove o próprio Vulnerável.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "Inflicts": {
+      "Block": 1
+    },
+    "Cleanses": {
+      "bVuln": true
+    },
+    "Cooldown": 2,
+    "ArtOf": "cao_fique_atras_de_mim"
+  },
+  {
+    "Name": "cao_alerta_de_perigo",
+    "ClassId": "cao",
+    "DisplayName": "Alerta de Perigo",
+    "Description": "Aponta a ameaça para a equipe: marca um inimigo por 2 turnos, sem dano.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "Inflicts": {
+      "bMark": true
+    },
+    "ArtOf": "cao_nao_estamos_sos"
+  },
+  {
+    "Name": "gato_salto_da_calha",
+    "ClassId": "gato",
+    "DisplayName": "Salto da Calha",
+    "Description": "Salta da calha sobre o alvo: dano baixo e Sangramento por 2 turnos.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "Inflicts": {
+      "Bleed": {
+        "Magnitude": 1,
+        "Duration": 2
+      }
+    },
+    "ArtOf": "gato_salto_entre_ruinas"
+  },
+  {
+    "Name": "gato_volta_pelo_telhado",
+    "ClassId": "gato",
+    "DisplayName": "Volta pelo Telhado",
+    "Description": "Dá a volta por cima: avança uma posição e ganha 1 Esquiva.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "AdvanceSelf": 1,
+    "Inflicts": {
+      "bDodge": true
+    },
+    "ArtOf": "gato_sumir_na_sombra"
+  },
+  {
+    "Name": "gato_rasgo_rapido",
+    "ClassId": "gato",
+    "DisplayName": "Rasgo Rápido",
+    "Description": "Golpe rápido numa brecha: dano baixo e deixa o alvo Vulnerável.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "Inflicts": {
+      "bVuln": true
+    },
+    "Cooldown": 2,
+    "ArtOf": "gato_corte_fase"
+  },
+  {
+    "Name": "sapo_nevoa_calmante",
+    "ClassId": "sapo",
+    "DisplayName": "Névoa Calmante",
+    "Description": "Borrifa uma névoa de ervas num aliado: reduz 8 Instinto.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "InstinctDelta": -8,
+    "Cooldown": 2,
+    "ArtOf": "sapo_antidoto_campo"
+  },
+  {
+    "Name": "sapo_frasco_aderente",
+    "ClassId": "sapo",
+    "DisplayName": "Frasco Aderente",
+    "Description": "Frasco que gruda no alvo: dano baixo e Contaminação por 2 turnos.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 3
+    },
+    "Inflicts": {
+      "Blight": {
+        "Magnitude": 2,
+        "Duration": 2
+      }
+    },
+    "ArtOf": "sapo_coquetel_corrosivo"
+  },
+  {
+    "Name": "sapo_curativo_rapido",
+    "ClassId": "sapo",
+    "DisplayName": "Curativo Rápido",
+    "Description": "Um curativo às pressas: recupera 2–4 Vida de aliado orgânico. 2 usos por luta.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleAlly",
+    "HealRange": {
+      "Min": 2,
+      "Max": 4
+    },
+    "UsesMax": 2,
+    "bOrganicOnly": true,
+    "ArtOf": "sapo_ampola_reparo_vivo"
+  },
+  {
+    "Name": "coruja_mira_no_marcado",
+    "ClassId": "coruja",
+    "DisplayName": "Mira no Marcado",
+    "Description": "Tiro calculado num inimigo MARCADO.",
+    "OriginRanks": [
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "MarkedEnemy",
+    "DamageRange": {
+      "Min": 4,
+      "Max": 6
+    },
+    "ArtOf": "coruja_disparo_perfurante"
+  },
+  {
+    "Name": "coruja_tiro_de_aviso",
+    "ClassId": "coruja",
+    "DisplayName": "Tiro de Aviso",
+    "Description": "Tiro rápido de qualquer posição: dano baixo e remove 1 Bloqueio.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 3
+    },
+    "RemoveBlock": 1,
+    "ArtOf": "coruja_recurso_emergencia"
+  },
+  {
+    "Name": "coruja_posicao_elevada",
+    "ClassId": "coruja",
+    "DisplayName": "Posição Elevada",
+    "Description": "Sobe para um ponto mais alto: recua uma posição e ganha 1 Esquiva.",
+    "OriginRanks": [
+      1,
+      2
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "AdvanceSelf": -1,
+    "Inflicts": {
+      "bDodge": true
+    },
+    "ArtOf": "coruja_olho_nas_ruinas"
+  },
+  {
+    "Name": "rato_curto_circuito",
+    "ClassId": "rato",
+    "DisplayName": "Curto-Circuito",
+    "Description": "Encosta dois fios no alvo: dano baixo, +25% em máquinas, e remove 1 Bloqueio.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 1,
+      "Max": 3
+    },
+    "MachineDamagePercent": 125,
+    "RemoveBlock": 1,
+    "ArtOf": "rato_frasco"
+  },
+  {
+    "Name": "rato_faisca_nos_olhos",
+    "ClassId": "rato",
+    "DisplayName": "Faísca nos Olhos",
+    "Description": "Uma faísca no rosto do alvo: aplica Cegueira, sem dano.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleEnemy",
+    "Inflicts": {
+      "bBlind": true
+    },
+    "Cooldown": 2,
+    "ArtOf": "rato_poeira"
+  },
+  {
+    "Name": "rato_remendo_de_fio",
+    "ClassId": "rato",
+    "DisplayName": "Remendo de Fio",
+    "Description": "Amarra uma placa solta num aliado: ele ganha 1 Bloqueio. 2 usos por luta.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleOtherAlly",
+    "Inflicts": {
+      "Block": 1
+    },
+    "UsesMax": 2,
+    "ArtOf": "rato_passagem"
+  },
+  {
+    "Name": "tatu_placa_de_protecao",
+    "ClassId": "tatu",
+    "DisplayName": "Placa de Proteção",
+    "Description": "Passa uma placa a um aliado: 1 Bloqueio e remove Sangramento e Contaminação.",
+    "OriginRanks": [
+      1,
+      2,
+      3
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "SingleOtherAlly",
+    "Inflicts": {
+      "Block": 1
+    },
+    "Cleanses": {
+      "bDot": true
+    },
+    "Cooldown": 2,
+    "ArtOf": "tatu_abrigo"
+  },
+  {
+    "Name": "tatu_avanco_de_resgate",
+    "ClassId": "tatu",
+    "DisplayName": "Avanço de Resgate",
+    "Description": "Investe contra o alvo: dano e avança uma posição.",
+    "OriginRanks": [
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2
+    ],
+    "TargetType": "SingleEnemy",
+    "DamageRange": {
+      "Min": 3,
+      "Max": 5
+    },
+    "AdvanceSelf": 1,
+    "ArtOf": "tatu_investida"
+  },
+  {
+    "Name": "tatu_folego_de_resgate",
+    "ClassId": "tatu",
+    "DisplayName": "Fôlego de Resgate",
+    "Description": "Para e recupera o fôlego: recupera 3–5 Vida. 1 uso por luta.",
+    "OriginRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "TargetType": "Self",
+    "HealRange": {
+      "Min": 3,
+      "Max": 5
+    },
+    "UsesMax": 1,
+    "ArtOf": "tatu_enrolar"
   }
 ]

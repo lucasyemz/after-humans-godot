@@ -182,6 +182,31 @@ func _platform(station) -> void:
 	t.check(rex_chip != null and rex_chip.disabled and rex_chip.text.contains("Caído") and rex_chip.text.contains("Volta"), "o caído aparece na lista da Estação com o motivo")
 	var risco_chip: Button = screen.find_child("Bench_%s" % risco.id, true, false)
 	t.check(risco_chip != null and risco_chip.disabled and risco_chip.text.contains("sem arte de combate"), "e quem não tem arte de luta também")
+	# Quem está fora (#183, decisão do Lucas de 01/11): na missão solo, com os robôs ou no trem, o motivo na lista e
+	# nenhum entra. O Risco faz os três papéis, um de cada vez.
+	var mission_id: String = String(AHSideMissions.missions()[0].Name)
+	risco.side_mission = {"id": mission_id, "spot": 0, "sent": AHSideMissions.day(Campaign.state), "back": AHSideMissions.day(Campaign.state) + 2}
+	for state in [["side_mission", "Em missão solo · volta em 2 dias"], ["captured", "Com os robôs"], ["on_train", "Chega no trem"]]:
+		if state[0] == "captured":
+			risco.erase("side_mission")
+			risco.captured = {"mission": mission_id, "spot": 0, "phase": "fase_1", "day": 1}
+		elif state[0] == "on_train":
+			risco.erase("captured")
+			risco.on_train = true
+		screen.rebuild()
+		await _frames(1)
+		var away_chip: Button = screen.find_child("Bench_%s" % risco.id, true, false)
+		t.check(away_chip != null and away_chip.disabled and away_chip.text == "Risco · %s" % state[1], "fora (%s): \"%s\" na lista da partida" % [state[0], away_chip.text if away_chip != null else ""])
+		if screen.selected != 3:
+			screen.pick(3)
+		screen.put_in(risco.id)
+		await _frames(1)
+		t.check(not hud._draft.team.has(risco.id), "e não entra na equipe (%s)" % state[0])
+	risco.erase("on_train")
+	# Solta a carta, como estava antes.
+	if screen.selected >= 0:
+		screen.pick(screen.selected)
+	await _frames(1)
 	screen.pick(3)
 	screen.put_in(rex.id)
 	screen.put_in(risco.id)
@@ -214,6 +239,19 @@ func _platform(station) -> void:
 	t.check(not hud._departure.confirm_open(), "e a confirmação não abre")
 	hud._draft.team[3] = FOUNDERS[3]
 	hud.refresh()
+	await _frames(2)
+	# Mandado à missão solo depois do rascunho (pelo mapa, decisão do Lucas de 01/11): ao abrir a partida, ele sai da
+	# equipe e da plataforma e aparece na lista com o motivo.
+	var sent: Dictionary = S.hero(Campaign.state, FOUNDERS[3])
+	sent.side_mission = {"id": String(AHSideMissions.missions()[0].Name), "spot": 0, "sent": AHSideMissions.day(Campaign.state), "back": AHSideMissions.day(Campaign.state) + 1}
+	hud.open_departure()
+	await _frames(2)
+	t.check(not hud._draft.team.has(FOUNDERS[3]) and not station.lineup.any(func(e): return e.hero_id == FOUNDERS[3]), "quem saiu em missão depois do rascunho sai da equipe e da plataforma")
+	var sent_chip: Button = hud._departure.find_child("Bench_%s" % FOUNDERS[3], true, false)
+	t.check(sent_chip != null and sent_chip.disabled and sent_chip.text.contains("Em missão solo · volta em 1 dia"), "e aparece na lista com o motivo")
+	sent.erase("side_mission")
+	hud._draft.team.append(FOUNDERS[3])
+	hud.open_departure()
 	await _frames(2)
 
 
