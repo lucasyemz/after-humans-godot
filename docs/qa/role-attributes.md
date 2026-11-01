@@ -67,3 +67,6 @@ Segue a matriz da seção 5 da proposta da #189, aprovada pelo Orquestrador em n
 
   **Correção:** os números passaram para o título, com um teste no nível mais encolhido da ficha. Também entraram as
   baixas: o comentário do empurrão, e o inimigo com classe sem o crítico do papel.
+- **Rodada 2: APROVADO.** Na partida, no Maior e no Normal, em português e em inglês, os números aparecem no título nos
+  quatro cartões. No Maior, a linha "Resiste: …" quebra em duas, sem cortar. A luta com o sorteio fixo e a contagem de
+  sorteios continuam iguais à rodada 1, e a paridade fica em 48 de 48.
