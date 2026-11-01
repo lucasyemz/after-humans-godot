@@ -247,9 +247,35 @@ func status_name(effect: String, machine: bool) -> String:
 func _resisted_effect(unit: Unit, dot: bool) -> bool:
 	if dot and unit.is_player and context.sure_hero_dots:
 		return false
-	# Sangramento e contaminação usam dotResist (0,2 sem inimigo); só sorteia entre 0 e 1.
-	var enemy = find_enemy(unit.enemy_id)
-	var value: float = (enemy.DotResist if enemy != null else 0.2) if dot else 0.0
+	# Sangramento e contaminação usam dotResist: o do inimigo, ou o do papel do herói (#258, 0,2 sem); só sorteia entre 0 e 1.
+	var value := 0.0
+	if dot:
+		var enemy = find_enemy(unit.enemy_id)
+		value = enemy.DotResist if enemy != null else hero_resist(unit, "DotResist")
+	return value >= 1.0 or (value > 0.0 and random.next() < value)
+
+
+## A resistência de um herói pelo papel (#258): DotResist, DisplacementResist ou StunResist da classe; sem classe, os
+## padrões de antes (AHGameData.CLASS).
+func hero_resist(unit: Unit, key: String) -> float:
+	var hero_class = find_class(unit.class_id)
+	return float(hero_class[key]) if hero_class != null else float(AHGameData.CLASS[key])
+
+
+## A chance de crítico de um herói: a de todos mais o crítico do papel (#258, CritBonus em pontos percentuais).
+func hero_crit_chance(unit: Unit) -> float:
+	var hero_class = find_class(unit.class_id)
+	return CRITICAL_CHANCE + (float(hero_class.CritBonus) / 100.0 if hero_class != null else 0.0)
+
+
+## O herói resiste a ser empurrado ou puxado? Um sorteio sempre (como antes do papel), contra o DisplacementResist dele.
+func _hero_holds(unit: Unit) -> bool:
+	return random.next() < hero_resist(unit, "DisplacementResist")
+
+
+## O herói resiste ao atordoamento? Só sorteia com a resistência do papel acima de 0 (#258).
+func _hero_resists_stun(unit: Unit) -> bool:
+	var value := hero_resist(unit, "StunResist")
 	return value >= 1.0 or (value > 0.0 and random.next() < value)
 
 
@@ -975,7 +1001,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 		if has_damage:
 			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0))
 			var rolled := _roll_range(ability.DamageRange.Min + bonus, ability.DamageRange.Max + bonus)
-			if random.next() < CRITICAL_CHANCE:
+			if random.next() < hero_crit_chance(user):
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)
 				_add_event(events, tr("CRÍTICO!"), EventType.CRIT, target.id).critical_roll = true
 				_log(tr("[CRÍTICO!] %s desferiu um ataque devastador!") % _n(user))
@@ -1083,7 +1109,8 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 		if ability.PushTarget != 0 and alive_any(target):
 			var target_enemy = null if target.is_player else find_enemy(target.enemy_id)
 			var immune: bool = target_enemy != null and target_enemy.DisplacementResist >= 1.0
-			if not immune and not (random.next() < 0.2):
+			# O sorteio só com quem não é imune, como antes (a paridade conta os sorteios).
+			if not immune and not (_hero_holds(target) if target.is_player else random.next() < 0.2):
 				var team: Array = state.player_team if target.is_player else state.enemy_team
 				var new_rank := clampi(target.rank + ability.PushTarget, 1, 4)
 				if new_rank != target.rank:
@@ -1527,8 +1554,12 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 
 		_apply_control_effects(chosen, inflicts.bBlind, inflicts.bWeak, inflicts.Immobilize, events)
 		if inflicts.Stun > 0 and alive_any(chosen):
-			chosen.stun_turns = maxi(chosen.stun_turns, inflicts.Stun)
-			_add_event(events, tr("Atordoado · %d turnos") % chosen.stun_turns, EventType.INFO, chosen.id)
+			if _hero_resists_stun(chosen):
+				_add_event(events, tr("Resistiu ao atordoamento"), EventType.INFO, chosen.id)
+				_log(tr("%s resistiu ao atordoamento.") % _n(chosen))
+			else:
+				chosen.stun_turns = maxi(chosen.stun_turns, inflicts.Stun)
+				_add_event(events, tr("Atordoado · %d turnos") % chosen.stun_turns, EventType.INFO, chosen.id)
 		if _dot_set(inflicts.Bleed):
 			_apply_dot(chosen, true, inflicts.Bleed, events, true)
 		if _dot_set(inflicts.Blight):
@@ -1537,7 +1568,7 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 			chosen.tokens.vuln = mini(TOKEN_CAP, chosen.tokens.vuln + 1)
 			_add_event(events, tr("Vulnerável!"), EventType.INFO, chosen.id)
 		if inflicts.Push > 0 and alive_any(chosen):
-			if not (random.next() < 0.2):
+			if not _hero_holds(chosen):
 				var new_rank := mini(4, chosen.rank + inflicts.Push)
 				if new_rank != chosen.rank:
 					var pushed_id := chosen.id
