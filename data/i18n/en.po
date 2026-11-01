@@ -1344,7 +1344,7 @@ msgid "%d uso(s)"
 msgstr "%d use(s)"
 
 #: scripts/ui/combat_hud.gd:1699
-#: scripts/combat/combat_arena.gd:503
+#: scripts/combat/combat_arena.gd:506
 msgid "Vez de %s"
 msgstr "%s's turn"
 
@@ -5750,23 +5750,23 @@ msgstr "No valid save was found. The previous data was kept; a new game will onl
 msgid "Trecho %d de %d"
 msgstr "Stretch %d of %d"
 
-#: scripts/combat/combat_arena.gd:478
+#: scripts/combat/combat_arena.gd:481
 msgid "%s age"
 msgstr "%s acts"
 
-#: scripts/combat/combat_arena.gd:503
+#: scripts/combat/combat_arena.gd:506
 msgid "inimigo"
 msgstr "enemy"
 
-#: scripts/combat/combat_arena.gd:564
+#: scripts/combat/combat_arena.gd:567
 msgid "+1 Bloqueio"
 msgstr "+1 Block"
 
-#: scripts/combat/combat_arena.gd:568
+#: scripts/combat/combat_arena.gd:571
 msgid "Fuga!"
 msgstr "Escaped!"
 
-#: scripts/combat/combat_arena.gd:568
+#: scripts/combat/combat_arena.gd:571
 msgid "Fuga falhou"
 msgstr "Escape failed"
 
