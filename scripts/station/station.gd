@@ -1248,7 +1248,12 @@ func _tick_team_arrival(_before: float, step: float) -> void:
 		if absf(gap) < 0.02:
 			card.position.x = arrival.slot.x
 			card.scale = Vector3.ONE
-			card.rotation.z = 0.0
+			# O ferido volta ao prumo suave (como na rua), não num quadro; a fila só fica pronta com todos no prumo.
+			card.rotation.z = lerpf(card.rotation.z, 0.0, 1.0 - exp(-14.0 * step))
+			if absf(card.rotation.z) < 0.003:
+				card.rotation.z = 0.0
+			else:
+				placed = false
 			card.set_facing(1.0)
 			ahead_x = card.position.x
 			continue

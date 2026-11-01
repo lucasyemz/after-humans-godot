@@ -52,11 +52,15 @@ A volta de trem (`scripts/station/station.gd`) usa a mesma regra da exploração
 - **O arranhado,** com a vida abaixo da máxima mas acima do limite, anda normal.
   - Antes, qualquer ferimento fazia o herói descer a 55%, com a pose de sempre.
   - Agora vale um limite só: o mesmo da exploração e do "Ferimento grave" da Sala.
+- **Ao chegar ao lugar,** o corpo volta ao prumo suave, como na rua.
+- **A fila da Preparação (#123)** usa o mesmo cartão da fila do relatório, então o ferido aparece lá com a pose de
+  ferido.
 - **Com Reduzir efeitos,** ficam a pose e o passo mais lento, sem o balanço.
 - **No cômodo,** o herói veste a roupa do lobby (#249). A pose de ferido é da roupa de expedição, então ela fica na
   plataforma.
 
 ## Testes
+
 - `tests/test_return.gd`, a volta de trem (#194):
   - o ferido desce e sai da fila a 70%, com a pose e mancando;
   - o arranhado anda normal;
