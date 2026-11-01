@@ -1683,3 +1683,4 @@ station_grid.gd: speaker
 station_grid.gd: Card
 station_grid.gd: Lines
 refuge_hud.gd: Dig_%s
+refuge_hud.gd: A partida não esperou o recusado voltar ao vagão (%.0f s).
