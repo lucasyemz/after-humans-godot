@@ -1457,6 +1457,7 @@ func open_departure() -> void:
 		_reset_draft()
 	# Quem saiu do elenco desde o rascunho não fica na fila (quem não pode ir fica, com o motivo na tela).
 	_draft.team = _draft.team.filter(func(id): return S.hero(Campaign.state, id) != null)
+	_drop_away()
 	_reset_focus()
 	_close_report_screen()
 	_close_room_screen()
@@ -2098,6 +2099,20 @@ func _reset_draft() -> void:
 		if team.size() < size and not team.has(entry.id) and S.can_deploy(entry):
 			team.append(entry.id)
 	_draft = {"phase": next, "team": team, "focus": S.focus_recommended(c), "extra": 0}
+
+
+## Quem foi mandado à missão solo (ou ficou com os robôs) depois do rascunho sai da equipe, e a vaga é preenchida por
+## quem pode ir, como no rascunho novo (decisão do Lucas de 01/11: a missão solo e a principal ao mesmo tempo).
+func _drop_away() -> void:
+	var c: Dictionary = Campaign.state
+	var size: int = _draft.team.size()
+	var team: Array = _draft.team.filter(func(id): return not AHSideMissions.away(S.hero(c, id)))
+	if team.size() == size:
+		return
+	for entry in S.living(c):
+		if team.size() < size and not team.has(entry.id) and S.can_deploy(entry):
+			team.append(entry.id)
+	_draft.team = team
 
 
 ## O cômodo da Preparação (#123): a equipe se monta na plataforma, depois do lugar escolhido no Mapa da Rede. Bloqueada
