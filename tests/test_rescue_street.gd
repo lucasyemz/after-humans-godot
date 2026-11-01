@@ -1,6 +1,6 @@
 ## O preso do resgate na cena de verdade (#188), nas fases 1 a 5 e em duas sementes: ele fica dentro do trecho dele, com
 ## o líder em cima a ação é soltar (nenhum objeto de busca nem porta toma o aviso) e, vencida a patrulha, a equipe um
-## trecho atrás ainda solta.
+## trecho atrás ainda solta; a escolha diz quem é mandado à Estação.
 extends RefCounted
 
 const J := preload("res://scripts/flow/journey_rules.gd")
@@ -75,3 +75,6 @@ func _case(phase_id: String, seed_value: int) -> void:
 	route.index = step - 1
 	corridor._choose_action(c, route, corridor.prisoner.position)
 	t.equal(corridor._action.get_method() if corridor._action.is_valid() else "", "_free_prisoner", "%s: um trecho atrás, ainda solta" % tag)
+	# A escolha depois de soltar diz quem vai para a Estação (decisão do Lucas, 01/11).
+	var station: Array = corridor.rescue_options(c).filter(func(o): return o[0] == "station")
+	t.equal(station[0][1] if station.size() == 1 else "", "Mandar %s à Estação" % AHRescue.prisoner_name(c), "%s: Mandar <nome> à Estação" % tag)

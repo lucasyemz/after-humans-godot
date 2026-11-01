@@ -1027,7 +1027,7 @@ msgstr "Finish the fight or the event before going back."
 #: scripts/ui/exploration_hud.gd:1512
 #: scripts/ui/exploration_hud.gd:1734
 #: scripts/ui/phase_map.gd:182
-#: scripts/street/street_corridor.gd:2035
+#: scripts/street/street_corridor.gd:2040
 msgid "Voltar à Estação"
 msgstr "Back to the Station"
 
@@ -5733,51 +5733,51 @@ msgstr "The robots were holding %s here. Barely standing, but able to walk."
 msgid "Alguém pedia ajuda aqui: %s."
 msgstr "Someone was calling for help here: %s."
 
-#: scripts/street/street_corridor.gd:1921
+#: scripts/street/street_corridor.gd:1932
 msgid "Entrar na equipe"
 msgstr "Join the team"
 
-#: scripts/street/street_corridor.gd:1921
-msgid "Seguir para a Estação"
-msgstr "Head to the Station"
+#: scripts/street/street_corridor.gd:1932
+msgid "Mandar %s à Estação"
+msgstr "Send %s to the Station"
 
-#: scripts/street/street_corridor.gd:1922
+#: scripts/street/street_corridor.gd:1933
 msgid "Deixar com um pouco de comida"
 msgstr "Leave them some food"
 
-#: scripts/street/street_corridor.gd:1922
+#: scripts/street/street_corridor.gd:1933
 msgid "Deixar para trás"
 msgstr "Leave behind"
 
-#: scripts/street/street_corridor.gd:1937
+#: scripts/street/street_corridor.gd:1942
 msgid "%s volta para a Estação"
 msgstr "%s heads back to the Station"
 
-#: scripts/street/street_corridor.gd:1939
+#: scripts/street/street_corridor.gd:1944
 msgid "Quem dá o lugar?"
 msgstr "Who gives up their place?"
 
-#: scripts/street/street_corridor.gd:1939
+#: scripts/street/street_corridor.gd:1944
 msgid "A equipe está cheia. Quem sai volta para a Estação pelo caminho já limpo, sem perder nada."
 msgstr "The team is full. Whoever steps out heads back to the Station along the cleared path, losing nothing."
 
-#: scripts/street/street_corridor.gd:1948
+#: scripts/street/street_corridor.gd:1953
 msgid "A equipe deixa %s com um pouco de comida."
 msgstr "The team leaves %s some food."
 
-#: scripts/street/street_corridor.gd:1948
+#: scripts/street/street_corridor.gd:1953
 msgid "A equipe segue sem %s."
 msgstr "The team moves on without %s."
 
-#: scripts/street/street_corridor.gd:1949
+#: scripts/street/street_corridor.gd:1954
 msgid "%s segue pelos trilhos para a Estação."
 msgstr "%s follows the tracks to the Station."
 
-#: scripts/street/street_corridor.gd:1965
+#: scripts/street/street_corridor.gd:1970
 msgid "%s entra na equipe."
 msgstr "%s joins the team."
 
-#: scripts/street/street_corridor.gd:1965
+#: scripts/street/street_corridor.gd:1970
 msgid "%s entra na equipe; %s volta para a Estação."
 msgstr "%s joins the team; %s heads back to the Station."
 
@@ -9217,6 +9217,9 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "Seguir para a Estação"
+#~ msgstr "Head to the Station"
 
 #~ msgid "Capturados"
 #~ msgstr "Captured"

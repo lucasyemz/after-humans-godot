@@ -1916,16 +1916,21 @@ func _rescue_choice() -> void:
 		else tr("Alguém pedia ajuda aqui: %s.") % who]
 	# Quem é: a classe e os traços (o pedido de ajuda é um desconhecido; o capturado, para lembrar).
 	lines.append(AHRescue.profile_text(campaign))
-	var food_left: bool = int(campaign.session.expedition.food) >= int(AHRescue.rules().get("LeaveFood", 1))
 	var options: Array = []
-	for spec in [["join", tr("Entrar na equipe")], ["station", tr("Seguir para a Estação")],
-			["leave", tr("Deixar com um pouco de comida") if food_left else tr("Deixar para trás")]]:
+	for spec in rescue_options(campaign):
 		var block := AHRescue.choice_block(campaign, spec[0])
 		if block == "":
 			options.append([spec[1], _rescue_pick.bind(spec[0])])
 		elif (spec[0] != "leave" or rescue.kind != "captured") and not lines.has(block):
 			lines.append(block)
 	hud.show_choice(who, "\n".join(lines), options)
+
+
+## As opções da escolha, [id, texto], antes do filtro do que vale. Mandar à Estação diz quem vai (decisão do Lucas, 01/11).
+func rescue_options(campaign: Dictionary) -> Array:
+	var food_left: bool = int(campaign.session.expedition.food) >= int(AHRescue.rules().get("LeaveFood", 1))
+	return [["join", tr("Entrar na equipe")], ["station", tr("Mandar %s à Estação") % AHRescue.prisoner_name(campaign)],
+		["leave", tr("Deixar com um pouco de comida") if food_left else tr("Deixar para trás")]]
 
 
 func _rescue_pick(option: String) -> void:
