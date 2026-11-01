@@ -323,12 +323,16 @@ func _build_cards() -> void:
 		var id: String = entry.id
 		var ready := S.can_deploy(entry)
 		var text := "%s · %d/%d" % [entry.display_name, entry.hp, entry.max_hp]
-		if S.recovering(entry):
+		# Quem está fora (missão solo, com os robôs ou no trem) aparece com o motivo e a volta (#183).
+		var away := AHSideMissions.away_short(c, entry)
+		if away != "":
+			text = "%s · %s" % [entry.display_name, away]
+		elif S.recovering(entry):
 			text = "%s · %s · %s" % [entry.display_name, tr("Caído"), S.return_text(S.recovery_days(entry))]
 		elif not ready:
 			text = "%s · %s" % [entry.display_name, tr("sem arte de combate")]
 		# Compacta, o nome e o motivo curto (o toque e o controle não mostram a dica do mouse).
-		if _compact:
+		if _compact and away == "":
 			text = String(entry.display_name) if ready else "%s · %s" % [entry.display_name, tr("Caído") if S.recovering(entry) else tr("sem arte")]
 		var button := _chip(text)
 		button.name = "Bench_%s" % id
@@ -337,7 +341,7 @@ func _build_cards() -> void:
 		button.tooltip_text = S.deploy_block(entry) if not ready else tr("Escolha uma carta da equipe e clique aqui para trocar.")
 		if not ready:
 			button.add_theme_color_override("font_disabled_color", AHKit.alert_text())
-			button.icon = AHKit.legacy_icon("state_wounded") if S.recovering(entry) or _compact else null
+			button.icon = AHKit.legacy_icon("state_wounded") if S.recovering(entry) or (_compact and away == "") else null
 			button.add_theme_constant_override("icon_max_width", 22)
 		button.pressed.connect(func(): put_in(id))
 		if sheet != null:
@@ -470,14 +474,13 @@ func _card(c: Dictionary, rank: int) -> Button:
 
 ## O que a carta avisa: sem ataque dali, a vida baixa, o trauma; senão, quantas habilidades funcionam dali.
 func _note(hero: Dictionary, rank: int) -> Dictionary:
-	if S.attacks_from_rank(hero.class_id, rank).is_empty():
+	if S.attacks_from_rank(hero.class_id, rank, AHHeroSkills.equipped(hero)).is_empty():
 		return {"text": tr("Sem ataque desta posição"), "good": false}
 	if hero.hp < hero.max_hp * 0.5:
 		return {"text": tr("Vida baixa: leve comida ou curativos"), "good": false}
 	if hero.trauma:
 		return {"text": tr("Com trauma: começa com instinto alto"), "good": false}
-	var hero_class = GameData.row("classes", String(hero.class_id))
-	var abilities: Array = hero_class.get("AbilityIds", []) if hero_class != null else []
+	var abilities := AHHeroSkills.equipped(hero)
 	var usable := abilities.filter(func(id):
 		var ability = GameData.combat.abilities.get(id)
 		return ability != null and ability.OriginRanks.has(rank)).size()
@@ -505,8 +508,7 @@ func team_warning(c: Dictionary) -> String:
 		var entry = S.hero(c, hero_id)
 		if entry == null:
 			continue
-		var hero_class = GameData.row("classes", entry.class_id)
-		for ability_id in (hero_class.get("AbilityIds", []) if hero_class else []):
+		for ability_id in AHHeroSkills.equipped(entry):
 			var ability = GameData.combat.abilities.get(ability_id)
 			if ability != null and ability.HealRange.Max > 0:
 				return ""

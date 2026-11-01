@@ -16,6 +16,8 @@ const LEFT := Rect2(28, 132, 540, 772)
 const HERO_TAB_WIDTH := 104.0
 const RIGHT := Rect2(1296, 132, 596, 844)
 const DIALOG := Rect2(620, 250, 680, 0)
+## O diálogo do Treino com as de aprender (#259): os cartões lado a lado.
+const WIDE_DIALOG := 1400.0
 const MAX_INSTINCT := 200
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 const TARGETS := {"SingleEnemy": "Inimigo", "SingleAlly": "Aliado", "SingleOtherAlly": "Outro aliado", "Self": "Si mesmo"}
@@ -25,6 +27,10 @@ var hud: Control
 var selected := ""
 var ability := ""
 var training := false
+## A rolagem da coluna da esquerda entre um refazer e outro; apontada uma habilidade (#259, as 7 passam da altura da
+## coluna), a coluna rola até o detalhe e a troca.
+var _left_scroll := 0
+var _reveal := false
 var _upgrade := ""
 var _first_focus: Control
 var _trait_ids := {}
@@ -53,6 +59,9 @@ func rebuild() -> void:
 	var focus_path := get_path_to(owner) if owner != null and is_ancestor_of(owner) else NodePath("")
 	# O caminho tem nomes gerados que mudam a cada vez: o nome do botão (Post_research, GrowRoom) acha de novo.
 	var focus_name := String(owner.name) if owner != null and is_ancestor_of(owner) and not String(owner.name).begins_with("@") else ""
+	var old_scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
+	if old_scroll != null:
+		_left_scroll = old_scroll.scroll_vertical
 	for child in get_children():
 		remove_child(child)
 		child.queue_free()
@@ -155,9 +164,11 @@ func _left(c: Dictionary) -> void:
 	panel.custom_minimum_size = LEFT.size
 	add_child(panel)
 	var scroll := ScrollContainer.new()
+	scroll.name = "LeftScroll"
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	panel.add_child(scroll)
+	scroll.set_deferred("scroll_vertical", _left_scroll)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 10)
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -180,14 +191,26 @@ func _left(c: Dictionary) -> void:
 		column.add_child(empty)
 		return
 	column.add_child(AHKit.label(tr("Habilidades"), "panel_title", AHKit.TEXT, true, true))
-	var hero_class = GameData.row("classes", String(hero.class_id))
-	var ids: Array = hero_class.get("AbilityIds", []) if hero_class != null else []
+	# As 7 da classe (#259): as que vão para a luta, as que ficam na Estação e as bloqueadas, com o requisito.
+	var ids := AHHeroSkills.catalog(String(hero.class_id))
 	if ability == "" or not ids.has(ability):
-		ability = ids[0] if not ids.is_empty() else ""
+		ability = AHHeroSkills.equipped(hero)[0] if not AHHeroSkills.equipped(hero).is_empty() else ""
 	for ability_id in ids:
 		column.add_child(_ability_row(ability_id))
 	if ability != "":
 		column.add_child(_ability_detail(c, hero, ability))
+		_skill_choices(hero, column)
+		if _reveal:
+			_reveal = false
+			_scroll_to_end.call_deferred()
+
+
+## O detalhe e a troca ficam no fim da coluna: depois de ela se montar (um quadro), rola até lá.
+func _scroll_to_end() -> void:
+	await get_tree().process_frame
+	var scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
+	if scroll != null:
+		scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
 
 
 func _hero_tab(entry: Dictionary) -> Button:
@@ -240,6 +263,10 @@ func _select(hero_id: String) -> void:
 	selected = hero_id
 	ability = ""
 	training = false
+	# Outro herói: a coluna volta para o alto.
+	var old_scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
+	if old_scroll != null:
+		old_scroll.scroll_vertical = 0
 	rebuild()
 	var tab := find_child("Tab_%s" % hero_id, true, false) as Control
 	if tab != null:
@@ -251,6 +278,14 @@ func _ability_row(ability_id: String) -> Button:
 	row.name = "Ability_%s" % ability_id
 	var data = GameData.row("abilities", ability_id)
 	row.text = tr(String(data.DisplayName)) if data != null else ability_id
+	# O estado (#259): a que fica na Estação e a bloqueada aparecem apagadas, com o estado no fim.
+	var owner = S.hero(Campaign.state, selected)
+	if owner != null:
+		var state := skill_state(owner, ability_id)
+		row.set_meta("state", state)
+		if state != "equipped":
+			row.text = tr("%s · %s") % [row.text, tr("na Estação") if state == "resting" else tr("bloqueada")]
+			row.modulate = AHKit.FALLEN
 	row.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var path := AHCombatArena.icon_of(ability_id)
 	row.icon = load(path) if path != "" else null
@@ -265,8 +300,90 @@ func _ability_row(ability_id: String) -> Button:
 	var id := ability_id
 	row.pressed.connect(func():
 		ability = id
+		_reveal = true
 		rebuild())
 	return row
+
+
+## O estado da habilidade no herói (#259): "equipped" (vai para a luta), "resting" (sabe, mas fica na Estação) ou
+## "locked" (ainda não aprendeu).
+static func skill_state(hero: Dictionary, ability_id: String) -> String:
+	if AHHeroSkills.equipped(hero).has(ability_id):
+		return "equipped"
+	return "resting" if AHHeroSkills.known(hero).has(ability_id) else "locked"
+
+
+## A troca das 4 que vão para a luta (#259), pela habilidade apontada: a bloqueada diz o requisito; a que vai troca por
+## uma que fica ("Trocar por"); a que fica entra no lugar de uma que vai ("Levar no lugar de"). A troca que deixaria
+## uma posição sem habilidade fica apagada, com o motivo.
+func _skill_choices(hero: Dictionary, column: VBoxContainer) -> void:
+	var box := VBoxContainer.new()
+	box.name = "SkillChoices"
+	box.add_theme_constant_override("separation", 6)
+	column.add_child(box)
+	var state := skill_state(hero, ability)
+	if state == "locked":
+		var need := AHHeroSkills.requirement(hero)
+		box.add_child(_note(tr("Bloqueada · %s") % need if need != "" else tr("Bloqueada.")))
+		return
+	var carried := AHHeroSkills.equipped(hero)
+	var resting: Array = AHHeroSkills.known(hero).filter(func(id): return not carried.has(id))
+	if resting.is_empty():
+		if AHHeroSkills.known(hero).size() < AHHeroSkills.catalog(String(hero.class_id)).size():
+			box.add_child(_note(tr("As outras se aprendem no Treino: %s.") % AHHeroSkills.requirement(hero)))
+		return
+	var incoming := String(ability)
+	var swaps: Array = []
+	if state == "equipped":
+		box.add_child(AHKit.label(tr("Trocar por"), "text", AHKit.AMBER, true, true))
+		var slot := carried.find(incoming)
+		for option in resting:
+			var chosen := carried.duplicate()
+			chosen[slot] = option
+			swaps.append([String(option), chosen, String(option)])
+	else:
+		box.add_child(AHKit.label(tr("Levar no lugar de"), "text", AHKit.AMBER, true, true))
+		for index in carried.size():
+			var chosen := carried.duplicate()
+			chosen[index] = incoming
+			swaps.append([String(carried[index]), chosen, incoming])
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", 10)
+	row.add_theme_constant_override("v_separation", 8)
+	box.add_child(row)
+	var reasons: Array = []
+	var hero_id := String(hero.id)
+	for swap in swaps:
+		var data = GameData.row("abilities", swap[0])
+		var button := _small_button(tr(String(data.DisplayName)) if data != null else String(swap[0]))
+		button.name = ("Swap_%s" if state == "equipped" else "Replace_%s") % swap[0]
+		var error := AHHeroSkills.invalid(hero, swap[1])
+		if error != "":
+			button.disabled = true
+			button.tooltip_text = error
+			if not reasons.has(error):
+				reasons.append(error)
+		var chosen: Array = swap[1]
+		var picked: String = swap[2]
+		button.pressed.connect(func():
+			var result := AHHeroSkills.choose(Campaign.state, hero_id, chosen)
+			if result == "":
+				ability = picked
+			var taken = GameData.row("abilities", picked)
+			hud._act(result, "" if result != "" else tr("%s leva %s.") % [String(S.hero(Campaign.state, hero_id).display_name),
+				tr(String(taken.DisplayName)) if taken != null else picked]))
+		row.add_child(button)
+	for reason in reasons:
+		var why := _note(reason, AHKit.alert_text())
+		why.name = "SwapBlocked"
+		box.add_child(why)
+
+
+func _note(text: String, tint: Color = AHKit.MUTED) -> Label:
+	var label := AHKit.label(text, "small", tint)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.custom_minimum_size = Vector2(300, 0)
+	return label
 
 
 ## O detalhe da habilidade: o nome, a faixa (com o treino da Pesquisa e as melhorias do nível), as posições, o texto e
@@ -670,7 +787,13 @@ func _train_button(c: Dictionary, hero: Dictionary) -> Button:
 	var block := AHHeroLevels.train_block(c, hero)
 	var detail := ""
 	if cost.is_empty():
-		detail = tr("nível máximo")
+		# No nível máximo, ainda aprende o que falta (#259), pelas sementes de um nível (#299).
+		if AHHeroSkills.learn_options(hero).is_empty():
+			detail = tr("nível máximo")
+		elif block != "":
+			detail = tr("faltam sementes")
+		else:
+			detail = AHHeroSkills.seeds_text(AHHeroSkills.max_level_seeds())
 	elif AHHeroLevels.xp(hero) < int(cost.xp):
 		detail = tr("faltam %d XP") % (int(cost.xp) - AHHeroLevels.xp(hero))
 	elif block != "":
@@ -836,8 +959,11 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	add_child(dim)
 	var dialog := AHKit.panel_box("large")
 	dialog.name = "Training"
-	dialog.position = DIALOG.position
-	dialog.custom_minimum_size = Vector2(DIALOG.size.x, 0)
+	# Com as de aprender (#259, até 5 cartões), o diálogo se abre na largura da tela, centrado.
+	var wide := options.any(func(o): return String(o.get("Stat", "")) == "Learn")
+	var dialog_width: float = WIDE_DIALOG if wide else DIALOG.size.x
+	dialog.position = Vector2((1920.0 - dialog_width) * 0.5, DIALOG.position.y) if wide else DIALOG.position
+	dialog.custom_minimum_size = Vector2(dialog_width, 0)
 	add_child(dialog)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 12)
@@ -845,10 +971,15 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 12)
 	head.add_child(AHKit.glyph("train", 36, AHKit.AMBER))
-	head.add_child(AHKit.label(tr("Treino · nível %d") % (AHHeroLevels.level(hero) + 1), "panel_title", AHKit.TEXT, true, true))
-	column.add_child(head)
 	var cost := AHHeroLevels.next_cost(hero)
-	var intro := AHKit.label(tr("Escolha uma melhoria. O treino gasta o XP do nível e %s.") % (tr("1 semente") if int(cost.seeds) == 1 else tr("%d sementes") % cost.seeds), "text", AHKit.TEXT)
+	head.add_child(AHKit.label(tr("Treino · nível %d") % (AHHeroLevels.level(hero) + 1) if not cost.is_empty() else tr("Treino"), "panel_title", AHKit.TEXT, true, true))
+	column.add_child(head)
+	var intro_text := tr("No nível máximo, o treino ensina o que falta: custa os fragmentos e %s.") % AHHeroSkills.seeds_text(AHHeroSkills.max_level_seeds())
+	if not cost.is_empty():
+		var seeds_text: String = tr("1 semente") if int(cost.seeds) == 1 else tr("%d sementes") % cost.seeds
+		intro_text = (tr("Escolha uma melhoria ou uma habilidade para aprender. O treino gasta o XP do nível e %s.") if wide
+			else tr("Escolha uma melhoria. O treino gasta o XP do nível e %s.")) % seeds_text
+	var intro := AHKit.label(intro_text, "text", AHKit.TEXT)
 	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro.custom_minimum_size = Vector2(600, 0)
 	column.add_child(intro)
@@ -860,7 +991,9 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 		var card := Button.new()
 		card.name = "Upgrade_%s" % option.Name
 		AHKit.style_as(card, "upgrade_selected" if option.Name == _upgrade else "upgrade")
-		card.custom_minimum_size = Vector2(296, 200)
+		# Com mais cartões, cada um fica mais estreito; a altura acompanha o texto.
+		var card_width: float = 296.0 if not wide else floorf((dialog_width - 72.0 - 16.0 * (options.size() - 1)) / options.size())
+		card.custom_minimum_size = Vector2(card_width, 200)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 6)
@@ -871,12 +1004,29 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 		box.offset_bottom = -22
 		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(box)
-		box.add_child(AHKit.label(tr(String(option.DisplayName)), "ability_name", AHKit.AMBER if option.Name == _upgrade else AHKit.TEXT, true))
+		var title := AHKit.label(tr(String(option.DisplayName)), "ability_name", AHKit.AMBER if option.Name == _upgrade else AHKit.TEXT, true)
+		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		title.custom_minimum_size = Vector2(card_width - 56.0, 0)
+		box.add_child(title)
 		var effect := AHKit.label(tr(String(option.Description)), "text", AHKit.TEXT)
 		effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		effect.custom_minimum_size = Vector2(240, 0)
+		effect.custom_minimum_size = Vector2(card_width - 56.0, 0)
 		box.add_child(effect)
-		box.add_child(AHKit.label(tr("Já tem: %d") % AHHeroLevels.stacks(hero, option.Name), "small", AHKit.MUTED))
+		if String(option.get("Stat", "")) == "Learn":
+			# Aprender (#259): custa fragmentos além do nível; faltando, o preço fica na cor de alerta.
+			var fragments := int(option.get("Fragments", 0))
+			var short := S.quantity(c, "fragments") < fragments
+			var price := AHKit.label(tr("Custa também %d fragmentos") % fragments if fragments != 1 else tr("Custa também 1 fragmento"), "small", AHKit.alert_text() if short else AHKit.MUTED)
+			price.name = "Price"
+			price.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			price.custom_minimum_size = Vector2(card_width - 56.0, 0)
+			box.add_child(price)
+		else:
+			box.add_child(AHKit.label(tr("Já tem: %d") % AHHeroLevels.stacks(hero, option.Name), "small", AHKit.MUTED))
+		# O botão não cresce com o que tem dentro: a altura segue o texto (quebrado na largura do cartão).
+		var grow := func(): card.custom_minimum_size.y = maxf(200.0, box.get_combined_minimum_size().y + 44.0)
+		box.minimum_size_changed.connect(grow)
+		grow.call()
 		var id: String = option.Name
 		card.pressed.connect(func():
 			_upgrade = id

@@ -4,7 +4,7 @@ Integração do pacote `Depois-dos-Humanos-Integracao.zip` e das regras do `INTE
 
 ## Fluxo
 
-Ao confirmar um destino no mapa ferroviário, abre-se uma travessia com dez passos. A plataforma inicial continua sendo a partida do refúgio. Os oito passos intermediários combinam quatro patrulhas, dois suprimentos, um descanso e uma passagem livre. Cada par tem uma patrulha e uma pausa; a seed da expedição e o ID do destino determinam a ordem. O passo dez contém um guardião.
+Ao confirmar um destino no mapa ferroviário, abre-se uma travessia com dez passos. A plataforma inicial continua sendo a partida do refúgio. Os oito passos intermediários combinam três patrulhas, três suprimentos, um descanso e uma passagem livre (#292). Três pares têm uma patrulha e uma pausa; o par calmo, sorteado entre o 2º e o 4º, tem duas pausas. A seed da expedição e o ID do destino determinam a ordem, e a força de cada patrulha (a última é a forte) vem de `data/corridor-pacing.json`. O passo dez contém um guardião.
 
 - Patrulha: um inimigo do perfil daquela região, com 6 ou 8 PV.
 - Guardião: um inimigo do perfil regional com 26 PV. Na Eclusa Central, é O Porteiro.

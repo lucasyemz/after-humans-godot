@@ -14,6 +14,7 @@ func run(t) -> void:
 	_enemies(t)
 	_john_villains(t)
 	_progression(t)
+	_ladder(t)
 	_sites(t)
 	_search(t)
 	_events(t)
@@ -32,17 +33,25 @@ func _campaign(seed_value: int = 1) -> Dictionary:
 func _corridor_shape(t) -> void:
 	var weathers := {}
 	var bad := 0
+	var calm := {}
 	for seed_value in 300:
 		var route := R.create_corridor(seed_value * 101, "fase_1", "combat", "rua-das-vitrines")
 		var types: Array = route.steps.map(func(s): return s.type)
 		var ok: bool = types.size() == 10 and types[0] == "start" and types[9] == "boss" \
-			and types.count("combat") == 4 and types.count("loot") == 2 and types.count("rest") == 1 and types.count("passage") == 1
-		# Cada par (trechos 1-2, 3-4, 5-6, 7-8) tem uma patrulha e uma pausa.
+			and types.count("combat") == 3 and types.count("loot") == 3 and types.count("rest") == 1 and types.count("passage") == 1
+		# Três pares (trechos 1-2, 3-4, 5-6, 7-8) com uma patrulha e uma pausa e um par calmo (#292), nunca o primeiro.
+		var calm_pair := -1
 		for pair in 4:
-			ok = ok and [types[1 + pair * 2], types[2 + pair * 2]].count("combat") == 1
+			var fights: int = [types[1 + pair * 2], types[2 + pair * 2]].count("combat")
+			ok = ok and (fights == 1 or (fights == 0 and calm_pair == -1))
+			if fights == 0:
+				calm_pair = pair + 1
+		ok = ok and calm_pair >= 2
+		calm[calm_pair] = true
 		bad += 0 if ok else 1
 		weathers[route.weather] = true
-	t.equal(bad, 0, "300 corredores: partida, 4 pares patrulha/pausa e o guardião no fim")
+	t.equal(bad, 0, "300 corredores: partida, 3 pares patrulha/pausa, 1 par calmo (do 2º ao 4º) e o guardião no fim")
+	t.equal(calm.size(), 3, "o par calmo varia entre o 2º, o 3º e o 4º")
 	t.check(weathers.size() >= 5, "o clima varia entre as fases (%d climas)" % weathers.size())
 	t.equal(R.create_corridor(42, "fase_1", "combat", "rua-das-vitrines"), R.create_corridor(42, "fase_1", "combat", "rua-das-vitrines"),
 		"a mesma semente dá o mesmo corredor")
@@ -85,7 +94,7 @@ func _enemies(t) -> void:
 			t.equal(group.size(), 4, "o guardião vem com 4")
 			t.check(group[0].display_name.ends_with("Guardião"), "o primeiro é o guardião")
 			var base: int = int(GameData.row("enemies", group[0].enemy_id).MaxHp)
-			t.equal(group[0].max_hp, maxi(4, roundi(base * 0.51 * 1.6)), "guardião: vida do nível 1 x 1,6")
+			t.equal(group[0].max_hp, maxi(4, roundi(base * 0.51 * 1.8)), "guardião: vida do nível 1 x 1,8 (#292)")
 	t.equal(R.corridor_enemies(expedition, 9), R.corridor_enemies(expedition, 9), "a mesma patrulha a cada vez (salvar e voltar)")
 	# Todos os inimigos das patrulhas da Rua têm arte.
 	var art = JSON.parse_string(FileAccess.get_file_as_string(AHCombatArena.ART_MANIFEST))
@@ -212,10 +221,47 @@ func _progression(t) -> void:
 					robot[phase_id] = true
 		t.check(count > 30, "%s: %d rotas medidas" % [phase_id, count])
 		t.check(last_sum > first_sum, "%s: a última patrulha tem um da frente mais forte que a primeira (%.0f contra %.0f)" % [phase_id, last_sum, first_sum])
-		t.equal(first_sizes.keys(), [2], "%s: a primeira patrulha é sempre de 2" % phase_id)
+		t.check(first_sizes.keys().all(func(n): return n == 2 or n == 3), "%s: a primeira patrulha é de 2 ou 3 (%s)" % [phase_id, first_sizes.keys()])
 		t.check(first_groups.size() >= 2, "%s: a primeira patrulha varia (%d formações)" % [phase_id, first_groups.size()])
 		t.equal(helper_alone, 0, "%s: o ajudante nunca vem sem o mestre quando ele está na lista" % phase_id)
 	t.check(robot.fase_2 and robot.fase_5, "o Robô volta às patrulhas das fases 2 e 5")
+
+
+## A escada da #292: cada patrulha da rota tem mais posições, mais vida e mais dano que a anterior (ou igual), a última é
+## a forte (4 posições) e o guardião fica acima de todas; um corredor de save antigo (4 patrulhas) ainda funciona.
+func _ladder(t) -> void:
+	var bad := 0
+	var routes := 0
+	for phase_id in ["fase_1", "fase_2", "fase_3", "fase_4"]:
+		for seed_value in 40:
+			var campaign: Dictionary = Campaign.create_initial(seed_value + 1)
+			if not R.start_expedition(campaign, phase_id, seed_value * 7907 + 3):
+				continue
+			var expedition: Dictionary = campaign.session.expedition
+			var route: Dictionary = expedition.corridor
+			var power: Array = []
+			for index in route.steps.size():
+				if route.steps[index].type == "combat" or route.steps[index].type == "boss":
+					var group := R.corridor_enemies(expedition, index)
+					var hp := 0
+					for unit in group:
+						hp += int(unit.max_hp)
+					power.append(hp)
+			routes += 1
+			if power.size() != 4 or power[3] <= power[2] or power[2] <= power[0]:
+				bad += 1
+	t.equal(bad, 0, "%d rotas: 3 patrulhas e o guardião, com a vida total subindo até o guardião" % routes)
+	# Os dados do ritmo têm o formato que o corredor espera: 5 pausas (3 pares com uma, o calmo com duas) e os pares
+	# calmos entre o 2º e o 4º (o 1º sempre tem patrulha, para a travessia das fases 2 e 5 nunca ficar sem luta).
+	var pacing := R.pacing_row("corridor")
+	t.equal((pacing.get("Breaks", []) as Array).size(), 5, "corridor-pacing: 5 pausas")
+	t.check(not (pacing.get("CalmPairs", []) as Array).is_empty() and pacing.CalmPairs.all(func(p): return int(p) >= 2 and int(p) <= 4),
+		"corridor-pacing: os pares calmos entre o 2º e o 4º")
+	var row: Dictionary = R.patrol_row(2, 3)
+	t.equal(int(row.get("Count", 0)), 4, "a última patrulha é a forte, de 4 posições")
+	t.equal(R.patrol_row(0, 4), R.patrol_row(0, 3), "um corredor antigo, de 4 patrulhas, repete a primeira linha no começo")
+	t.equal(R.patrol_row(3, 4), R.patrol_row(2, 3), "e termina na forte")
+	t.equal(int(GameData.row("hero_xp", "fight").Xp), 10, "cada luta vale 10 de XP (4 lutas x 10 = as 5 x 8 de antes)")
 
 
 func _sites(t) -> void:

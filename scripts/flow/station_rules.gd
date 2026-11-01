@@ -183,6 +183,8 @@ static func migrate(campaign: Dictionary) -> void:
 	for entry in campaign.get("roster", []):
 		if not entry.has("art_variant"):
 			entry.art_variant = _least_used_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
+	# As sete habilidades (#259): os campos novos; o que um save editado traz e não vale volta ao padrão.
+	AHHeroSkills.migrate(campaign)
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
 		if String(entry.get("skin_id", "")) == "":
@@ -662,7 +664,8 @@ static func allocate(campaign: Dictionary, food: int, water: int) -> Dictionary:
 
 
 static func visit_pending(campaign: Dictionary) -> bool:
-	return campaign.station.train.phase != "none"
+	# O trem das missões solo (#183) também: quem volta delas chega nele.
+	return campaign.station.train.phase != "none" or AHSideMissions.train_pending(campaign)
 
 
 ## Um número do trem (#122) em data/recruitment.json.
@@ -1550,12 +1553,13 @@ static func team_size_text(limits: Dictionary) -> String:
 
 
 ## Os ataques que a classe tem na posição (#95): cada um precisa de um ataque na posição em que parte.
-static func attacks_from_rank(class_id: String, rank: int) -> Array:
+## ability_ids: as que o herói leva (#259); vazio, as 4 de base da classe.
+static func attacks_from_rank(class_id: String, rank: int, ability_ids: Array = []) -> Array:
 	var out: Array = []
 	var hero_class = GameData.row("classes", class_id)
 	if hero_class == null:
 		return out
-	for ability_id in hero_class.AbilityIds:
+	for ability_id in (ability_ids if not ability_ids.is_empty() else hero_class.AbilityIds):
 		var ability = GameData.row("abilities", ability_id)
 		if ability != null and ability.get("DamageRange") != null and Array(ability.get("OriginRanks", [])).map(func(r): return int(r)).has(rank):
 			out.append(ability.DisplayName)
@@ -1600,6 +1604,10 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 	if campaign.night.phase != "none":
 		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."),
 			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
+	# A volta das missões solo (#183): o trem traz quem terminou a missão, com o relatório.
+	if AHSideMissions.train_pending(campaign):
+		return {"title": TranslationServer.translate("O trem trouxe quem estava em missão"), "text": TranslationServer.translate("Quem terminou a missão solo voltou no trem, com o relatório do que achou lá fora."),
+			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
 	if merchant_here(campaign):
 		return {"title": TranslationServer.translate("O Mercador está na plataforma"), "text": TranslationServer.translate("O Sr. dos Trilhos veio no trem para trocar sementes, sucata e fragmentos. Troque o que quiser e dispense-o antes de preparar a expedição."),
 			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
@@ -1882,6 +1890,10 @@ static func preparation_block(campaign: Dictionary) -> String:
 	# também no botão IR AO MAPA, numa linha.
 	if block == "" and merchant_here(campaign):
 		return TranslationServer.translate("Dispense o Sr. dos Trilhos antes de partir.")
+	# O trem das missões solo (#183): quem voltou nele é recebido antes (o relatório chega com ele). Curto como o do
+	# Mercador: numa linha no botão IR AO MAPA, também no texto Maior.
+	if block == "" and AHSideMissions.train_pending(campaign):
+		return TranslationServer.translate("Receba o trem antes de partir.")
 	return block
 
 
@@ -1912,7 +1924,7 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 			return TranslationServer.translate("Só integrantes vivos podem partir.")
 		if not can_deploy(entry):
 			return deploy_block(entry)
-		if attacks_from_rank(entry.class_id, rank).is_empty():
+		if attacks_from_rank(entry.class_id, rank, AHHeroSkills.equipped(entry)).is_empty():
 			return TranslationServer.translate("%s não tem ataque na posição %d.") % [entry.display_name, rank]
 	var team_block := validate_team(campaign, team, phase_id)
 	if team_block != "":
@@ -2293,7 +2305,7 @@ static func yield_text(room_id: String, amount: int) -> String:
 			return TranslationServer.translate("−1 dia de recuperação para %d caído por volta") % amount if amount == 1 \
 				else TranslationServer.translate("−1 dia de recuperação para %d caídos por volta") % amount
 		"dig":
-			return TranslationServer.translate("+%d ponto de obra por volta") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por volta") % amount
+			return TranslationServer.translate("+%d ponto de obra por dia") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por dia") % amount
 	return ""
 
 

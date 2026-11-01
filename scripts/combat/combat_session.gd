@@ -53,6 +53,7 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 			"Id": hero.id, "ClassId": hero.class_id, "Species": String(hero.get("species", "")), "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
 			"Instinct": maxi(0, int(hero.get("instinct", 0)) - int(bonus.calm)), "Perks": hero.get("perks", []), "Trauma": hero.get("trauma", false),
 			"RelicId": hero.get("relic_id", ""), "ExpeditionUses": hero.get("expedition_uses", {}),
+			"AbilityIds": AHHeroSkills.equipped(hero) if not Array(hero.get("loadout", [])).is_empty() else [],
 			"SpeedBonus": int(bonus.speed) + marks.speed, "AbilityBonus": bonus.abilities,
 		}, index + 1, session.data))
 		var unit: Unit = players[-1]
@@ -109,14 +110,13 @@ func units() -> Array:
 
 # ---------------------------------------------------------------- opções do herói da vez
 
-## As habilidades do herói, na ordem da classe: {id, name, description, usable, reason, targets, enemy_side, cooldown, uses}.
+## As habilidades do herói (as que ele leva, #259), na ordem: {id, name, description, usable, reason, targets, enemy_side, cooldown, uses}.
 func ability_options(actor_id: String) -> Array:
 	var actor := state.find_unit(actor_id)
 	var options: Array = []
 	if actor == null:
 		return options
-	var hero_class = data.classes.get(actor.class_id)
-	for ability_id in (hero_class.AbilityIds if hero_class != null else []):
+	for ability_id in engine.abilities_of(actor):
 		var ability = data.abilities.get(ability_id)
 		if ability == null:
 			continue

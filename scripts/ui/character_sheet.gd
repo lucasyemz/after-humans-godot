@@ -51,6 +51,7 @@ static func from_unit(session: AHCombatSession, unit: AHCombat.Unit, boss: bool 
 		out.art = AHCombatArena.hero_art_of(unit.hero_id, String(hero.get("art_variant", "")) if hero != null else "").get("idle", {})
 		if hero != null:
 			out.level = AHHeroLevels.level(hero)
+			out.skills = skills_of(hero)
 		# Os laços desta jornada com quem está na luta (amizade ou rivalidade).
 		var context = session.context if session != null else null
 		if context != null:
@@ -106,11 +107,22 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
 		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))) \
 			+ AHTypes.sheet_rows(AHTypes.of_hero(hero)), "states": [], "enemy": false,
-		"level": AHHeroLevels.level(hero),
+		"level": AHHeroLevels.level(hero), "skills": skills_of(hero),
 		"art": AHCombatArena.hero_art_of(String(hero.get("id", "")), String(hero.get("art_variant", ""))).get("idle", {})}
 	if hero.get("trauma", false):
 		out.states.append([TranslationServer.translate("Trauma"), TranslationServer.translate(TRAUMA), false])
 	return out
+
+
+## As sete habilidades do herói (#259), pelos nomes: as que vão para a luta, as que ficam na Estação e as bloqueadas,
+## com o requisito do próximo desbloqueio.
+static func skills_of(hero: Dictionary) -> Dictionary:
+	var name_of := func(id): return TranslationServer.translate(String(GameData.row("abilities", id).DisplayName)) if GameData.row("abilities", id) != null else String(id)
+	var equipped := AHHeroSkills.equipped(hero)
+	var known := AHHeroSkills.known(hero)
+	var all := AHHeroSkills.catalog(String(hero.get("class_id", "")))
+	return {"equipped": equipped.map(name_of), "resting": known.filter(func(id): return not equipped.has(id)).map(name_of),
+		"locked": all.filter(func(id): return not known.has(id)).map(name_of), "need": AHHeroSkills.requirement(hero)}
 
 
 ## "Cão · Proteção": a espécie do indivíduo e o papel (a classe, #189).
@@ -311,8 +323,26 @@ func _build(level: int = 0) -> void:
 		instinct.custom_minimum_size = Vector2(0, 12)
 		box.add_child(instinct)
 	_speed_row(box, level)
+	if level < 3:
+		_skills(box)
 	_section(box, TranslationServer.translate("Efeitos passivos"), info.passives, TranslationServer.translate("Nenhum"), level < 1, level >= 3)
 	_section(box, TranslationServer.translate("Estados"), info.states, TranslationServer.translate("Nenhum agora"), level < 2, level >= 3)
+
+
+## As habilidades (#259): as 4 da luta, as que ficam na Estação e as bloqueadas com o requisito, uma linha cada.
+func _skills(box: VBoxContainer) -> void:
+	var skills: Dictionary = info.get("skills", {})
+	if skills.is_empty():
+		return
+	box.add_child(_text(TranslationServer.translate("Habilidades"), "text", AHKit.AMBER, "Heading", true, true))
+	box.add_child(_text(TranslationServer.translate("Na luta: %s") % " · ".join(skills.equipped), "small", AHKit.TEXT, "SkillsEquipped"))
+	if not skills.resting.is_empty():
+		box.add_child(_text(TranslationServer.translate("Na Estação: %s") % " · ".join(skills.resting), "small", AHKit.MUTED, "SkillsResting"))
+	if not skills.locked.is_empty():
+		var locked := TranslationServer.translate("Bloqueadas: %s") % " · ".join(skills.locked)
+		if String(skills.need) != "":
+			locked += " (" + String(skills.need) + ")"
+		box.add_child(_text(locked, "small", AHKit.MUTED, "SkillsLocked"))
 
 
 ## A velocidade com o que ela faz (no mínimo, só o número).
