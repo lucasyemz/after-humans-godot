@@ -36,12 +36,13 @@
 
 - **A ficha** (a do apontar, a da Preparação) e **a inspeção** da luta: a linhagem ou a família numa linha própria
   (na inspeção apertada, junto da velocidade) e, nos efeitos passivos, "Dano +25% em Guaxinins e Emissores" e "Recebe
-  +25% de Gatos e Perseguidores" (os nomes curtos, para caber; os completos na explicação). Sem estados, a coluna
-  dos estados fica do tamanho do "Nenhum agora", e a folga vai para os passivos: no texto Normal, todo inimigo mostra
-  as duas linhas. Na inspeção do herói com muitos traços (o Bento e a Íris), as linhas não cabem junto das explicações
+  +25% de Gatos e Perseguidores" (os nomes curtos, para caber; os completos na explicação). No inimigo, as duas
+  linhas são tentadas em todos os níveis antes de sair: saem antes as explicações dos passivos e dos estados, e o
+  inimigo as mostra no Normal e no Maior, com ou sem estados. Sem estados, a coluna dos estados fica do tamanho do
+  "Nenhum agora", e a folga vai para os passivos (as explicações cabem junto). Na inspeção do herói com muitos traços (o Bento e a Íris), as linhas não cabem junto das explicações
   dos passivos: ficam as explicações, e a linhagem vai para a linha da velocidade (as duas linhas estão na ficha, como
   a issue pede).
-- **A mira:** a plaqueta do alvo diz "Vantagem +25%" com o ícone (as setas do kit) e a cor do bem; a dica soma
+- **A mira:** a plaqueta do alvo diz "NOME · +25%", com o ícone (as setas do kit) dentro e a cor do bem; a dica soma
   "Vantagem +25%" ao alvo e a linha com o ícone, e o "pode cair" já conta o multiplicador. Com a plaqueta mais larga, a
   dica que não cabe com folga de nenhum lado vai para o lado que menos cobre (`_dodge_tip`): no texto Maior, encostada
   na borda esquerda, ela não cobre mais a plaqueta.
@@ -121,3 +122,9 @@ O efeito é pequeno: nas fases 1 a 4 fica dentro da variação de 40 sementes. N
   Correção: a coluna dos estados vazia fica do tamanho do título e do "Nenhum agora" (`_states_floor`), e a folga vai
   para os passivos. O `test_character_sheet` confere, na luta de verdade e no texto Normal, as duas linhas em cada
   inimigo sem estados.
+
+- **Rodada 3: REPROVADO.** Sem estados, certo; com um estado só (Sangra 2), os 4 inimigos perdiam as duas linhas de
+  novo, porque o nível 0 sem as linhas vinha antes do nível 1 com elas. O caso do Bento e da Íris foi aceito.
+
+  Correção: no inimigo, as tentativas com as duas linhas vêm todas antes das sem elas. O `test_character_sheet` confere
+  também com Sangra 2 em todos (falha no código da rodada 3).

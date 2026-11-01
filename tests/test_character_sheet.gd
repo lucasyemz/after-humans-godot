@@ -215,7 +215,7 @@ func _combat() -> void:
 
 
 ## O painel cabe no espaço dele e não cobre o botão, com três estados em todos, no Normal e no Maior (a QA da #128).
-## A vantagem de tipo (#227) na inspeção do texto Normal, sem estados: o inimigo mostra as duas linhas (a issue, §6).
+## A vantagem de tipo (#227) na inspeção do texto Normal, sem estados e com um: o inimigo mostra as duas linhas (§6).
 ## O herói as tem na ficha; na inspeção da luta, com muitos traços (o Bento e a Íris), ficam as explicações dos passivos.
 func _inspect_rows(hud: AHCombatHud, panel: Control) -> void:
 	var size := Settings.text_size
@@ -230,8 +230,27 @@ func _inspect_rows(hud: AHCombatHud, panel: Control) -> void:
 		var rows := AHTypes.sheet_rows(AHTypes.of_class(unit.class_id) if unit.is_player else AHTypes.of_enemy(unit.enemy_id))
 		var texts: Array = panel.find_children("*", "Label", true, false).map(func(label): return label.text)
 		var found := texts.filter(func(text): return text.contains(mark)).size()
-		if not unit.is_player and hud._inspect_info.get("states", []).is_empty():
+		if not unit.is_player:
 			t.check(found >= rows.size(), "texto Normal, %s: as %d linhas da vantagem na inspeção do inimigo (achei %d)" % [hud._examine[index], rows.size(), found])
+	# Com um estado (Sangra 2 em todos), as linhas do inimigo seguem: saem antes as explicações.
+	var saved: Array = []
+	for unit in hud.session.units():
+		saved.append([unit.bleed.duration, unit.bleed.magnitude])
+		unit.bleed.duration = 2
+		unit.bleed.magnitude = 1
+	for index in hud._examine.size():
+		hud._examine_index = index
+		hud._inspect_info = {}
+		await _frames(3)
+		var unit: AHCombat.Unit = hud.session.state.find_unit(hud._examine[index])
+		if unit.is_player:
+			continue
+		var rows := AHTypes.sheet_rows(AHTypes.of_enemy(unit.enemy_id))
+		var texts: Array = panel.find_children("*", "Label", true, false).map(func(label): return label.text)
+		t.check(texts.filter(func(text): return text.contains(mark)).size() >= rows.size(), "texto Normal com um estado, %s: as linhas da vantagem seguem" % hud._examine[index])
+	for i in hud.session.units().size():
+		hud.session.units()[i].bleed.duration = saved[i][0]
+		hud.session.units()[i].bleed.magnitude = saved[i][1]
 	Settings.set_text_size(size)
 	await _frames(3)
 

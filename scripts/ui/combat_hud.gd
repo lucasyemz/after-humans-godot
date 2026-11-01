@@ -1166,8 +1166,13 @@ func _fill_inspect(info: Dictionary) -> void:
 	var plain: Array = info.passives.filter(func(entry): return entry.size() < 4 or entry[3] != "type")
 	var typed: Array = plain + info.passives.filter(func(entry): return entry.size() >= 4 and entry[3] == "type").map(func(entry): return [entry[0], "", entry[2], entry[3]])
 	var steps: Array = []
+	# No inimigo, as duas linhas são a única leitura da luta de quem ele apanha mais: valem mais que as explicações dos
+	# passivos e dos estados, e são tentadas em todos os níveis antes de sair (no herói, elas estão na ficha).
+	if info.enemy and typed.size() > plain.size():
+		for level in 5:
+			steps.append([level, true, true])
 	for level in 5:
-		if typed.size() > plain.size():
+		if typed.size() > plain.size() and not info.enemy:
 			steps.append([level, true, true])
 		if String(info.get("type", "")) != "":
 			steps.append([level, true, false])
