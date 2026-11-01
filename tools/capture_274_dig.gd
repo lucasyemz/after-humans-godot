@@ -4,7 +4,9 @@
 ##           painel da frente de escavação e o do patamar (com o posto de escavador);
 ##   free:   a mesma campanha com duas vagas livres no 1º subsolo e material: a vista geral e o painel da vaga livre;
 ##   return: a volta que abre um bloco: o relatório (o chip curto e os detalhes), a fala da primeira volta e o aviso do
-##           achado.
+##           achado;
+##   board:  Escavar e construir (#284), a planta em cartões: a frente, os blocos que dá para escavar, os que dependem do
+##           vizinho, as vagas livres e os cômodos; com um bloco vermelho e uma vaga livre escolhidos. --text-size=2 no Maior.
 ## Roda também no código de antes (sem a interface da #274): no lugar dos painéis novos, o painel do cômodo onde a escolha
 ## ficava (o Depósito, o Bar).
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_274_dig.gd -- --out=<pasta> --case=<new|free|return>
@@ -29,6 +31,8 @@ func _run() -> void:
 			out = arg.trim_prefix("--out=")
 		elif arg.begins_with("--case="):
 			case = arg.trim_prefix("--case=")
+		elif arg.begins_with("--text-size="):
+			root.get_node("Settings").set_text_size(int(arg.trim_prefix("--text-size=")))
 	if out == "":
 		push_error("Falta --out=<pasta>.")
 		quit(2)
@@ -72,6 +76,16 @@ func _run() -> void:
 		"free":
 			await _shot("overview")
 			await _open(station, hud, "block:1:2" if after else S.BAR, "slot")
+		"board":
+			hud.open_service("dig")
+			await _frames(8)
+			await _shot("board")
+			for pick in [["Block_3_3", "board_red"], ["Block_1_1", "board_free"]]:
+				var card = hud._dig_board.find_child(pick[0], true, false)
+				if card != null:
+					card.pressed.emit()
+					await _frames(6)
+					await _shot(pick[1])
 		"return":
 			hud.open_service("report")
 			await _frames(6)
@@ -119,6 +133,13 @@ func _campaign(campaign) -> Dictionary:
 	c.inventory.fragments = 5
 	c.station.last_return.seen = true
 	c.station.grid.intro_seen = true
+	if case == "board":
+		# Duas vagas livres no 1º subsolo, o patamar do 2º aberto e a frente lá: todos os estados na planta.
+		c.station.grid.cells[0][0] = "free"
+		c.station.grid.cells[0][1] = "free"
+		c.station.grid.landings[0] = true
+		c.station.grid.progress = {"2:7": 1}
+		c.station.grid.target = "2:7"
 	if case == "free":
 		# Duas voltas depois: as vagas 1 e 2 do 1º subsolo livres.
 		c.station.grid.cells[0][0] = "free"

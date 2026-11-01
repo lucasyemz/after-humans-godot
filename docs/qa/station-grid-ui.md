@@ -116,3 +116,38 @@ esquerda e o depois à direita.
 - **A arte (#275):** os ícones de soterrado e de escavar, a marca do progresso da obra e o cartão de escolher o cômodo.
   Até lá, o cadeado do kit e a barra de ferrugem.
 - **A barra da obra:** o texto em cima do preenchimento laranja fica com pouco contraste. Vale rever com a arte da #275.
+
+## Escavar e construir: a planta em cartões (pedido do Lucas de 01/11)
+> "Não gosto desse soterrado, parece que só tem uma imagem na frente, muito simples e sem personalidade." O Lucas pediu a tela de construir da base em XCOM como referência.
+
+![antes e depois: a planta, o bloco preso e a vaga livre escolhidos, no Normal e no Maior](station-grid-ui/board.jpg)
+
+- **A aba Escavação** (embaixo, entre Instalações e Personagens) abre a planta dos três subsolos em corte: uma linha de cartões por andar, as sete vagas e o patamar à direita. O botão "Ver a planta", no painel do bloco soterrado, abre a mesma tela com o bloco escolhido.
+- **Cada cartão:**
+  - a moldura do kit;
+  - a imagem do que está ali;
+  - o nome em cima, com o estado: "(BLOQUEADO)" ou "(ESCAVANDO)".
+- **Os estados:**
+  - **dá para escavar:** a moldura clara, a ação ("Limpar o entulho · 2 voltas" ou "Limpar a escada") e a recompensa ("Recompensa: 1 sucata e um achado", o mínimo do andar);
+  - **a frente de escavação:** a moldura âmbar, os pontos e as voltas que faltam;
+  - **depende do vizinho ou da escada:** a moldura e o aviso em vermelho ("Depende do vizinho", "Depende da escada"). O motivo inteiro aparece embaixo ao escolher;
+  - **a vaga livre:** em verde, "Vaga livre · Construir";
+  - **o cômodo construído:** o ícone e "Construído", com o cômodo duplo nas duas vagas;
+  - **a escada aberta:** só a passagem.
+- **Embaixo, o escolhido:** o nome, o lugar e o que falta, com o botão grande, que muda com o escolhido:
+  - ESCAVAR ESTE BLOCO, que faz dele a frente;
+  - CONSTRUIR AQUI, que abre o painel da vaga;
+  - ABRIR O CÔMODO.
+
+  DETALHES abre o painel do bloco, com a barra da obra e o posto de escavador.
+- **No alto:** o ritmo da escavação e quem orienta, o Nick, com a fala da primeira volta.
+- **As imagens:** até a arte da #275, cada bloco usa um par próprio de peças que já existem em `art/scenarios`, uma peça sobre um fundo: os bancos de espera, a bilheteria, o vagão de serviço, os cabos, as raízes. Nenhum par se repete (`data/station-grid.json`, `block_looks`, que o teste confere). Nenhuma imagem de outro jogo entrou no repositório.
+- **Os nomes dos blocos** são proposta e passaram pela §14:
+  - são lugares e coisas de uma estação de metrô dos Antigos;
+  - combinam com os achados de cada andar (o banco partido no 1º subsolo, o painel de controle no 2º, o armário de ferramentas e as raízes no 3º);
+  - não prometem mecânica nova.
+- **Em aberto:**
+  - no Normal, a 3ª linha passa uns 15 px da altura, e a grade rola;
+  - no Maior, a grade rola mais.
+
+As fotos saem de `tools/capture_274_dig.gd --case=board` (com `--text-size=2` no Maior). O antes é a vista geral desta mesma entrega antes do pedido.

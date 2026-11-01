@@ -2,7 +2,8 @@
 ## "Vaga livre · Construir" e um "Soterrado" por trecho), o bloco apontado com o cartão, as setas e o clique chegando aos
 ## blocos, o painel do bloco soterrado (a obra, a frente de escavação, o motivo e o posto de escavador), o painel da vaga
 ## livre (os cômodos que cabem, o tamanho, o custo, o que falta e CONSTRUIR), o chip curto do relatório, a fala da
-## primeira volta (o Bento e o Nick, ou o cartão) e o aviso do achado.
+## primeira volta (o Bento e o Nick, ou o cartão) e o aviso do achado. E a planta Escavar e construir (#284): um cartão por
+## bloco, com a imagem própria, o nome, o estado, a ação e a recompensa, e o vermelho no que depende do vizinho.
 extends RefCounted
 
 const S = preload("res://scripts/flow/station_rules.gd")
@@ -32,6 +33,7 @@ func run(context) -> void:
 		await _buried_panel(station)
 		await _free_panel(station)
 		await _return(station)
+		await _board(station)
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
 	await _tree.process_frame
@@ -261,6 +263,63 @@ func _return(station) -> void:
 	t.check(hud.dig_notice_shown(), "e aparece de volta na vista geral")
 	hud.hide_dig_notice()
 	hud.close_panel()
+
+
+## A planta (#284): a aba Escavação abre os três andares em cartões; cada bloco com a sua imagem; o que dá para escavar
+## mostra a ação e a recompensa e vira a frente pelo botão grande; o que depende do vizinho fica em vermelho.
+func _board(station) -> void:
+	var hud: AHRefugeHud = station.hud
+	var looks: Dictionary = G.rule("block_looks").get("Blocks", {})
+	t.equal(looks.keys().size(), G.block_keys().size(), "cada bloco tem o seu nome e a sua imagem")
+	var pairs := {}
+	for key in looks:
+		var entry: Dictionary = looks[key]
+		pairs["%s+%s" % [entry.Art, entry.Ground]] = true
+		t.check(ResourceLoader.exists(AHDigBoard.SCENARIOS % entry.Art) and ResourceLoader.exists(AHDigBoard.SCENARIOS % entry.Ground), "%s: as peças existem" % key)
+	t.equal(pairs.size(), looks.size(), "nenhum bloco repete a imagem de outro")
+	var c: Dictionary = Campaign.state
+	c.station.grid.landings[0] = false
+	c.station.grid.target = ""
+	var tab: Button = hud._frame.find_child("Nav_dig", true, false)
+	if not t.check(tab != null, "a aba Escavação"):
+		return
+	tab.pressed.emit()
+	await _frames(4)
+	var board: AHDigBoard = hud._dig_board
+	if not t.check(board != null and hud.current == "dig", "a aba abre Escavar e construir"):
+		return
+	for floor_number in [1, 2, 3]:
+		t.check(board.find_child("Floor_%d" % floor_number, true, false) != null, "o %dº subsolo em cartões" % floor_number)
+	var deep: Button = board.find_child("Block_2_4", true, false)
+	t.check(deep != null and deep.get_meta("state", "") == "buried", "o 2º subsolo, preso ao patamar")
+	var alert: Label = deep.find_child("Alert", true, false) if deep else null
+	t.check(alert != null and alert.text == tr("Depende da escada"), "em vermelho, o motivo curto (%s)" % (alert.text if alert else ""))
+	t.check(deep != null and deep.find_child("Name", true, false).text == tr(String(looks["2:4"].Name)), "o nome do que está no bloco")
+	var landing: Button = board.find_child("Block_L2", true, false)
+	t.check(landing != null and landing.get_meta("state", "") == "dig", "o patamar dá para escavar")
+	var reward: Label = landing.find_child("Reward", true, false) if landing else null
+	t.check(reward != null and reward.text.begins_with(tr("Recompensa: %s e um achado").get_slice("%", 0)), "com a recompensa à vista")
+	landing.pressed.emit()
+	await _frames(3)
+	var action: Button = hud._dig_board.find_child("BigAction", true, false)
+	t.check(action != null and not action.disabled, "escolhido, o botão grande escava")
+	action.pressed.emit()
+	await _frames(3)
+	t.equal(G.dig_target(Campaign.state), "L2", "e o patamar vira a frente")
+	deep = hud._dig_board.find_child("Block_2_4", true, false)
+	deep.pressed.emit()
+	await _frames(3)
+	action = hud._dig_board.find_child("BigAction", true, false)
+	var note: Label = hud._dig_board.find_child("Note", true, false)
+	t.check(action != null and action.disabled and note != null and note.text == tr("Escave a escada deste andar para liberar"),
+		"o bloco preso não escava, com o motivo inteiro embaixo")
+	var details: Button = hud._dig_board.find_child("Details", true, false)
+	details.pressed.emit()
+	await _frames(3)
+	t.equal(hud.current, AHRefugeHud.block_place("2:4"), "Detalhes abre o painel do bloco")
+	t.check(hud._dig_board == null, "e a planta fecha")
+	hud.close_panel()
+	await _frames(3)
 
 
 func _click(at: Vector2, down: bool) -> InputEventMouseButton:

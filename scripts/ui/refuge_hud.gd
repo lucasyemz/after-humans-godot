@@ -159,6 +159,10 @@ var _map_from_platform := false
 var _report_screen: AHStationReport
 ## A Sala dos Personagens no kit (#60): a tela inteira, com o cômodo ao fundo.
 var _room_screen: AHCharacterRoom
+## Escavar e construir (#284): a planta dos subsolos em cartões, aberta como um serviço ("dig").
+var _dig_board: AHDigBoard
+## O bloco que a planta abre escolhido (o soterrado apontado na vista geral).
+var _dig_selected := ""
 ## A tela do kit de onde as Opções ou o Plano foram abertos (a Sala): fechar volta para ela.
 var _back_to := ""
 ## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
@@ -573,6 +577,8 @@ func _screen_name(c: Dictionary) -> String:
 			return tr("Ciclo %d · %s") % [c.station.cycle_number, S.limits_text(c)]
 		"plan":
 			return tr("Plano da Estação")
+		"dig":
+			return tr("Escavar e construir")
 		"train":
 			return tr("Plataforma 1")
 		"departure":
@@ -593,6 +599,8 @@ func _active_tab() -> String:
 			return "research"
 		S.PREPARATION:
 			return ""
+		"dig":
+			return "dig"
 	return "facilities"
 
 
@@ -641,6 +649,8 @@ func _nav(id: String) -> void:
 			close_panel()
 		"facilities":
 			open_service("plan")
+		"dig":
+			open_service("dig")
 		"characters":
 			open_room(S.CHARACTERS)
 		"research":
@@ -661,7 +671,7 @@ func _build_left(c: Dictionary) -> void:
 	_next_button = null
 	var overview := current == ""
 	var kit_screen := current == "report" or current == S.CHARACTERS or current == "departure"
-	_menu.visible = not kit_screen and current != ARRIVAL and current != "options"
+	_menu.visible = not kit_screen and current != ARRIVAL and current != "options" and current != "dig"
 	if overview:
 		_menu.add_child(_next_card(c))
 		_menu.add_child(_plan_card())
@@ -715,11 +725,16 @@ func _next_card(c: Dictionary) -> PanelContainer:
 
 ## O Plano da Estação: o que cada cômodo destrava.
 func _plan_card() -> Button:
+	return _plaque_card("PlanCard", "plan", tr("Plano da Estação"), tr("o que cada cômodo destrava"), func(): open_service("plan"))
+
+
+## Uma plaqueta da coluna da esquerda: o ícone, o nome e a linha de baixo.
+func _plaque_card(node_name: String, icon: String, title: String, subtitle: String, action: Callable) -> Button:
 	var button := Button.new()
-	button.name = "PlanCard"
+	button.name = node_name
 	AHKit.style_as(button, "plaque", Vector4(4, 4, 4, 4))
 	button.custom_minimum_size = Vector2(LEFT.size.x, 76)
-	button.pressed.connect(func(): open_service("plan"))
+	button.pressed.connect(action)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 14)
 	row.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -727,7 +742,7 @@ func _plan_card() -> Button:
 	row.offset_right = -16
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(row)
-	var glyph := AHKit.glyph("plan", 38, AHKit.TEXT)
+	var glyph := AHKit.glyph(icon, 38, AHKit.TEXT)
 	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(glyph)
 	var names := VBoxContainer.new()
@@ -735,8 +750,8 @@ func _plan_card() -> Button:
 	names.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(names)
-	names.add_child(AHKit.label(tr("Plano da Estação"), "row", AHKit.TEXT, true, true))
-	names.add_child(AHKit.label(tr("o que cada cômodo destrava"), "small", AHKit.MUTED))
+	names.add_child(AHKit.label(title, "row", AHKit.TEXT, true, true))
+	names.add_child(AHKit.label(subtitle, "small", AHKit.MUTED))
 	var grow := func(): button.custom_minimum_size.y = maxf(76.0, row.get_combined_minimum_size().y + 16.0)
 	row.minimum_size_changed.connect(grow)
 	grow.call()
@@ -1383,6 +1398,7 @@ func close_panel() -> void:
 	_panel.visible = false
 	_close_report_screen()
 	_close_room_screen()
+	_close_dig_board()
 	var back := _back_to
 	_back_to = ""
 	if back != "":
@@ -1812,6 +1828,12 @@ func _show(key: String) -> void:
 	# cômodo (#181), antes de cada caminho abaixo.
 	if key != S.CHARACTERS:
 		_close_room_screen()
+	if key != "dig":
+		_close_dig_board()
+	if key == "dig":
+		_panel.visible = false
+		_show_dig_board()
+		return
 	if key == "departure":
 		_panel.visible = false
 		_departure_view()
@@ -2288,6 +2310,14 @@ func _buried_block(c: Dictionary, key: String, info: Dictionary) -> void:
 		go.pressed.connect(func(): _act(AHStationGrid.set_dig_target(Campaign.state, key), tr("Escavação: a frente agora é %s.") % AHStationGrid.block_name(key)))
 		_body.add_child(go)
 		_panel_focus = go
+	# A planta (#284): os subsolos em cartões, com este bloco escolhido.
+	var plan := AHKit.button(tr("Ver a planta"), "secondary")
+	plan.name = "SeeBoard"
+	plan.custom_minimum_size = Vector2(0, 56)
+	plan.pressed.connect(func():
+		_dig_selected = key
+		open_service("dig"))
+	_body.add_child(plan)
 	var least := AHStationGrid.finds_text({"scrap": int(AHStationGrid.block_rule(key).get("Scrap", 0)), "fragments": int(AHStationGrid.block_rule(key).get("Fragments", 0))})
 	if least != "":
 		_text(tr("Devolve pelo menos %s, e às vezes um achado.") % least, AHKit.MUTED, "small")
@@ -3300,6 +3330,23 @@ func _character_room() -> void:
 	move_child(_room_screen, _panel.get_index())
 	# A câmera entra no cômodo pelo vão real entre os painéis (a própria tela a chama depois de montar, #181).
 	station.hide_residents(true)
+
+
+## Escavar e construir (#284): aberta uma vez e refeita a cada refresh (depois de escolher a frente, de construir).
+func _show_dig_board() -> void:
+	if is_instance_valid(_dig_board):
+		_dig_board.rebuild()
+		return
+	_dig_board = AHDigBoard.make(self, _dig_selected)
+	_dig_selected = ""
+	add_child(_dig_board)
+	move_child(_dig_board, _panel.get_index())
+
+
+func _close_dig_board() -> void:
+	if is_instance_valid(_dig_board):
+		_dig_board.queue_free()
+	_dig_board = null
 
 
 ## Abre as Opções ou o Plano a partir da Sala: fechar volta para a Sala.
