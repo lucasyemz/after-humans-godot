@@ -1662,7 +1662,6 @@ mission_board.gd: Hint
 mission_board.gd: Send
 mission_board.gd: Hero_%s
 mission_board.gd: List_%s
-station_report.gd: missions
 station_rules.gd: missions
 mission_board.gd: spot
 mission_board.gd: Title
@@ -1847,6 +1846,10 @@ rescue_rules.gd: rescue
 rescue_rules.gd: join
 rescue_rules.gd: corridor
 station_rules.gd: help
+refuge_hud.gd: reports
+refuge_hud.gd: captured
+station_report.gd: missions
+station_report.gd: captured
 refuge_hud.gd: A partida não esperou o recusado voltar ao vagão (%.0f s).
 dig_board.gd: intro
 dig_board.gd: Lines

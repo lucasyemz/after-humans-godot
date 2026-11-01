@@ -630,9 +630,11 @@ func _details_band() -> PanelContainer:
 	# O resgate (#188): quem saiu do cativeiro, entrou na equipe ou ficou.
 	if String(report.get("rescue", "")) != "":
 		columns.add_child(_detail_column(tr("Resgate"), [String(report.rescue)]))
-	var missions: Array = cycle.get("missions", [])
-	if not missions.is_empty():
-		columns.add_child(_detail_column(tr("Missões solo"), missions.map(func(entry): return AHSideMissions.report_line(c, entry))))
+	# As missões solo (#183): quem volta chega no trem, com o relatório, depois da missão principal; aqui fica só quem foi
+	# capturado (não vem no trem).
+	var captured: Array = cycle.get("missions", []).filter(func(entry): return String(entry.get("result", "")) == "captured")
+	if not captured.is_empty():
+		columns.add_child(_detail_column(tr("Com os robôs"), captured.map(func(entry): return AHSideMissions.report_line(c, entry))))
 	var care := recovery_lines(c, report)
 	if not care.is_empty():
 		columns.add_child(_detail_column(tr("Recuperação"), care))

@@ -1375,7 +1375,13 @@ func open_service(service: String) -> void:
 		"train":
 			# O trem traz o candidato: chega do túnel uma vez por visita; depois ele só espera na plataforma.
 			var train: Dictionary = Campaign.state.station.train
-			if train.phase == "waiting" and not station.train_busy():
+			# Antes, o trem das missões solo (#183): desce o primeiro de quem volta.
+			var returning := AHSideMissions.on_train(Campaign.state)
+			if not returning.is_empty() and not station.train_busy():
+				var first: String = returning[0].id
+				station.open_train(first, _arrived_candidate != first)
+				_arrived_candidate = first
+			elif train.phase == "waiting" and not station.train_busy():
 				station.open_train(train.candidate_id, _arrived_candidate != train.candidate_id)
 				_arrived_candidate = train.candidate_id
 			elif station.train_busy():
@@ -1562,6 +1568,7 @@ func open_departure() -> void:
 		_reset_draft()
 	# Quem saiu do elenco desde o rascunho não fica na fila (quem não pode ir fica, com o motivo na tela).
 	_draft.team = _draft.team.filter(func(id): return S.hero(Campaign.state, id) != null)
+	_drop_away()
 	_reset_focus()
 	_close_report_screen()
 	_close_room_screen()
@@ -2669,6 +2676,20 @@ func _reset_draft() -> void:
 	_draft = {"phase": next, "team": team, "focus": S.focus_recommended(c), "extra": 0}
 
 
+## Quem foi mandado à missão solo (ou ficou com os robôs) depois do rascunho sai da equipe, e a vaga é preenchida por
+## quem pode ir, como no rascunho novo (decisão do Lucas de 01/11: a missão solo e a principal ao mesmo tempo).
+func _drop_away() -> void:
+	var c: Dictionary = Campaign.state
+	var size: int = _draft.team.size()
+	var team: Array = _draft.team.filter(func(id): return not AHSideMissions.away(S.hero(c, id)))
+	if team.size() == size:
+		return
+	for entry in S.living(c):
+		if team.size() < size and not team.has(entry.id) and S.can_deploy(entry):
+			team.append(entry.id)
+	_draft.team = team
+
+
 ## O cômodo da Preparação (#123): a equipe se monta na plataforma, depois do lugar escolhido no Mapa da Rede. Bloqueada
 ## (a noite, o trem), ela diz o quê e leva até lá.
 func _preparation(c: Dictionary) -> void:
@@ -3435,6 +3456,9 @@ func _enter_shelter_then(then: Callable) -> void:
 func _train() -> void:
 	var c: Dictionary = Campaign.state
 	var train: Dictionary = c.station.train
+	if AHSideMissions.train_pending(c):
+		_mission_train(c)
+		return
 	if train.phase == "departing":
 		_header("train_arrival", tr("O trem parte"))
 		_text(tr("As portas fecham; o trem volta para o túnel."), AHKit.MUTED)
@@ -3738,6 +3762,54 @@ func _watch_train() -> void:
 func _on_train_event(name: String) -> void:
 	if name == "camera_on_candidate" and current == "train":
 		refresh()
+
+
+## O trem das missões solo (#183, decisão do Lucas): depois da missão principal, quem terminou a missão chega no trem,
+## com o relatório. RECEBER: todos descem para a Estação, o trem parte e, se há um candidato no trem de sempre, ele vem.
+func _mission_train(c: Dictionary) -> void:
+	_header("train_arrival", tr("O trem chegou"))
+	_text(tr("Quem estava em missão solo voltou no trem."), AHKit.TEXT)
+	_section(tr("Relatório das missões"), "expeditions")
+	var all: Array = AHSideMissions.state(c).get("reports", [])
+	var reports: Array = all.filter(func(report): return String(report.get("result", "")) != "captured")
+	for report in reports:
+		_text(AHSideMissions.report_line(c, report), AHKit.TEXT, "small")
+	# Quem foi capturado não vem no trem: a notícia fica à parte (o pino do resgate no mapa).
+	var captured: Array = all.filter(func(report): return String(report.get("result", "")) == "captured")
+	if not captured.is_empty():
+		_section(tr("Com os robôs"), "alert")
+		for report in captured:
+			_text(AHSideMissions.report_line(c, report), AHKit.alert_text(), "small")
+	if reports.is_empty():
+		# O save de antes (o trem já pendente, sem o relatório do dia): só os nomes.
+		_text(", ".join(AHSideMissions.on_train(c).map(func(entry): return entry.display_name)), AHKit.TEXT, "small")
+	_footer_primary(tr("Receber"), "train_arrival", _mission_train_done)
+
+
+func _mission_train_done() -> void:
+	var c: Dictionary = Campaign.state
+	var names: Array = AHSideMissions.arrive(c).map(func(id): return S.hero(c, id).display_name)
+	station.commit()
+	toast(tr("%s de volta à Estação.") % ", ".join(names))
+	_panel.visible = false
+	station.departure_pending = true
+	station.play_train_departure(false)
+	await station.train_event_named("gone")
+	if not is_instance_valid(station):
+		return
+	station.clear_candidate()
+	station.place_residents()
+	station.commit()
+	_arrived_candidate = ""
+	if current != "train":
+		return
+	# O trem de sempre (o recruta, o civil, o Mercador) chega depois; senão, a noite ou a vista geral.
+	if Campaign.state.station.train.phase == "waiting":
+		open_service("train")
+	elif Campaign.state.night.phase != "none":
+		open_room(S.DORMITORY)
+	else:
+		close_panel()
 
 
 func _decide(candidate_id: String, accept: bool) -> void:
