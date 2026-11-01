@@ -2,7 +2,8 @@
 ## Cada classe tem 7 no catálogo (data/classes.json): as 4 de base (AbilityIds, as de sempre) e 3 desbloqueios
 ## (UnlockIds). O Treino ensina um desbloqueio ao subir para cada nível de data/hero-skills.json (Levels), pelo custo do
 ## nível mais os fragmentos da vez; o jogador escolhe a ordem. Vão MaxEquipped para a luta, trocadas na Sala, fora da
-## expedição, e nenhuma escolha deixa uma posição (1 a 4) sem habilidade que parta dela.
+## expedição, e nenhuma escolha deixa uma posição (1 a 4) sem um ataque que parta dela: a partida exige ataque da posição
+## (#95), e assim o herói parte de qualquer lugar da formação (a QA da #259).
 ## O save do herói: "unlocked" (os desbloqueios aprendidos) e "loadout" (as que leva; [] = as 4 de base, como sempre).
 class_name AHHeroSkills
 extends RefCounted
@@ -55,11 +56,18 @@ static func equipped(hero: Dictionary) -> Array:
 	return base(class_id)
 
 
-## As posições (1 a 4) de onde nenhuma dessas habilidades parte.
+## As posições (1 a 4) de onde nenhum ataque dessas habilidades parte (o mesmo critério da partida, #95).
 static func uncovered(ability_ids: Array) -> Array:
-	return RANKS.filter(func(rank): return not ability_ids.any(func(id):
-		var row = GameData.row("abilities", String(id))
-		return row != null and Array(row.get("OriginRanks", [])).map(func(r): return int(r)).has(rank)))
+	return RANKS.filter(func(rank): return not ability_ids.any(func(id): return attacks_from(String(id), rank)))
+
+
+## A habilidade ataca (tem dano) partindo da posição.
+static func attacks_from(ability_id: String, rank: int) -> bool:
+	var row = GameData.row("abilities", ability_id)
+	if row == null:
+		return false
+	var damage = row.get("DamageRange")
+	return damage is Dictionary and int(damage.get("Max", 0)) > 0 and Array(row.get("OriginRanks", [])).map(func(r): return int(r)).has(rank)
 
 
 ## Por que essa escolha não vale ("" se vale), sem trocar nada.
@@ -79,7 +87,7 @@ static func invalid(hero: Dictionary, chosen: Array) -> String:
 			return TranslationServer.translate("%s ainda não sabe essa habilidade.") % String(hero.get("display_name", ""))
 	var missing := uncovered(chosen)
 	if not missing.is_empty():
-		return TranslationServer.translate("Sem nada para usar da posição %d.") % int(missing[0])
+		return TranslationServer.translate("Sem ataque da posição %d.") % int(missing[0])
 	return ""
 
 
@@ -149,10 +157,10 @@ static func next_fragments(hero: Dictionary) -> int:
 ## As opções de aprender do próximo treino: uma por desbloqueio ainda bloqueado, enquanto o nível que ele alcança deixa
 ## (um item como os de hero-upgrades.json, com Stat "Learn"). [] sem vaga.
 static func learn_options(hero: Dictionary) -> Array:
-	if AHHeroLevels.next_cost(hero).is_empty():
-		return []
 	var learned: Array = hero.get("unlocked", [])
-	if slots_at(AHHeroLevels.level(hero) + 1) <= learned.size():
+	# No nível máximo, as vagas que sobraram continuam no Treino (só os fragmentos): nenhuma se perde.
+	var at := AHHeroLevels.level(hero) + (0 if at_max(hero) else 1)
+	if slots_at(at) <= learned.size():
 		return []
 	var out: Array = []
 	for ability_id in unlocks(String(hero.get("class_id", ""))):
@@ -167,22 +175,37 @@ static func learn_options(hero: Dictionary) -> Array:
 	return out
 
 
-## O que fica bloqueado e o requisito ("Nível 5 · Treino · +2 fragmentos"), para a ficha e a Sala.
+## No nível máximo: o Treino só ensina (sem XP nem sementes).
+static func at_max(hero: Dictionary) -> bool:
+	return AHHeroLevels.level(hero) >= AHHeroLevels.MAX_LEVEL
+
+
+## "1 fragmento" ou "N fragmentos".
+static func fragments_text(count: int) -> String:
+	return TranslationServer.translate("+1 fragmento") if count == 1 else TranslationServer.translate("+%d fragmentos") % count
+
+
+## O que fica bloqueado e o requisito ("Nível 5 · Treino · +2 fragmentos"), para a ficha e a Sala; no nível máximo, só
+## "Treino · +3 fragmentos" (nunca um nível que não existe).
 static func requirement(hero: Dictionary) -> String:
 	var learned: int = Array(hero.get("unlocked", [])).size()
 	var levels: Array = rule("Levels", [])
 	if learned >= levels.size():
 		return ""
+	if at_max(hero):
+		return TranslationServer.translate("Treino · %s") % fragments_text(next_fragments(hero))
 	var at := maxi(int(levels[learned]), AHHeroLevels.level(hero) + 1)
-	return TranslationServer.translate("Nível %d · Treino · +%d fragmentos") % [at, next_fragments(hero)]
+	return TranslationServer.translate("Nível %d · Treino · %s") % [at, fragments_text(next_fragments(hero))]
 
 
-## O aviso depois de aprender: o nível, a habilidade e onde escolher as que leva.
-static func learned_notice(hero: Dictionary, ability_id: String) -> String:
+## O aviso depois de aprender: o nível (sem ele, no nível máximo), a habilidade e onde escolher as que leva.
+static func learned_notice(hero: Dictionary, ability_id: String, leveled: bool = true) -> String:
 	var data = GameData.row("abilities", ability_id)
+	var name: String = TranslationServer.translate(String(data.DisplayName)) if data != null else ability_id
+	if not leveled:
+		return TranslationServer.translate("%s aprendeu %s. Na Sala, escolha as %d que leva.") % [String(hero.get("display_name", "")), name, max_equipped()]
 	return TranslationServer.translate("%s subiu para o nível %d e aprendeu %s. Na Sala, escolha as %d que leva.") % [
-		String(hero.get("display_name", "")), AHHeroLevels.level(hero), TranslationServer.translate(String(data.DisplayName)) if data != null else ability_id,
-		max_equipped()]
+		String(hero.get("display_name", "")), AHHeroLevels.level(hero), name, max_equipped()]
 
 
 # ---------------------------------------------------------------- o save

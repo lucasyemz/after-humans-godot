@@ -681,7 +681,9 @@ func _advance(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, hero
 	var own = GameData.row("abilities", ability_id) if key != ability_id else null
 	var damage = own.get("DamageRange") if own != null else null
 	var melee: bool = damage is Dictionary and int(damage.get("Max", 0)) > 0 and Array(own.get("OriginRanks", [])).all(func(r): return int(r) <= 2)
-	if not melee and (RANGED.has(key) or key.contains("tiro") or key.contains("descarga")):
+	# O desbloqueio sem dano (o Faro de Perigo marca de onde está) dá só um passo curto.
+	var no_damage: bool = own != null and not (damage is Dictionary and int(damage.get("Max", 0)) > 0)
+	if no_damage or (not melee and (RANGED.has(key) or key.contains("tiro") or key.contains("descarga"))):
 		return direction * minf(available, card.body_height * 0.16)
 	if not actor.is_player:
 		return direction * available * 0.4

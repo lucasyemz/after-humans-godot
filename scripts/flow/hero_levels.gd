@@ -61,6 +61,9 @@ static func fight_xp(entry: Dictionary) -> int:
 ## As duas melhorias que o herói pode escolher no próximo treino: as da espécie; com uma delas no limite (MaxStacks), as
 ## de reserva (Fallback: mais vida, sangue frio) completam as duas, para todos chegarem ao nível 10 escolhendo.
 static func options(hero: Dictionary) -> Array:
+	# No nível máximo, o Treino só ensina o que ainda falta aprender (#259).
+	if level(hero) >= MAX_LEVEL:
+		return AHHeroSkills.learn_options(hero)
 	var out: Array = []
 	var rows: Array = GameData.table("hero_upgrades").values()
 	for upgrade in rows:
@@ -88,7 +91,7 @@ static func stacks(hero: Dictionary, upgrade_id: String) -> int:
 static func train_block(campaign: Dictionary, hero: Dictionary) -> String:
 	var cost := next_cost(hero)
 	if cost.is_empty():
-		return TranslationServer.translate("Nível máximo.")
+		return "" if not AHHeroSkills.learn_options(hero).is_empty() else TranslationServer.translate("Nível máximo.")
 	if xp(hero) < cost.xp:
 		return TranslationServer.translate("Falta XP: %d de %d.") % [xp(hero), cost.xp]
 	if AHStationRules.quantity(campaign, "seeds") < cost.seeds:
@@ -113,15 +116,19 @@ static func train(campaign: Dictionary, hero_id: String, upgrade_id: String) -> 
 		if option.Name == upgrade_id:
 			upgrade = option
 	if upgrade == null:
+		if upgrade_id.begins_with(AHHeroSkills.LEARN):
+			return TranslationServer.translate("Essa habilidade já foi aprendida ou ainda não está no Treino.")
 		return TranslationServer.translate("Essa melhoria não é desta espécie.")
 	var fragments := int(upgrade.get("Fragments", 0))
 	if AHStationRules.quantity(campaign, "fragments") < fragments:
 		return TranslationServer.translate("Fragmentos insuficientes: aprender custa mais %d.") % fragments
+	# No nível máximo, aprender não sobe de nível: custa só os fragmentos.
 	var cost := next_cost(hero)
-	AHStationRules.adjust(campaign, "seeds", -int(cost.seeds))
+	if not cost.is_empty():
+		AHStationRules.adjust(campaign, "seeds", -int(cost.seeds))
+		hero.xp = xp(hero) - int(cost.xp)
+		hero.level = level(hero) + 1
 	AHStationRules.adjust(campaign, "fragments", -fragments)
-	hero.xp = xp(hero) - int(cost.xp)
-	hero.level = level(hero) + 1
 	# Aprender (#259): o desbloqueio entra no que ele sabe, sem equipar sozinho (a escolha das 4 é na Sala).
 	if String(upgrade.Stat) == "Learn":
 		if typeof(hero.get("unlocked")) != TYPE_ARRAY:

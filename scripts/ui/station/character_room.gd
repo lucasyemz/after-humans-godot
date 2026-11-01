@@ -787,7 +787,8 @@ func _train_button(c: Dictionary, hero: Dictionary) -> Button:
 	var block := AHHeroLevels.train_block(c, hero)
 	var detail := ""
 	if cost.is_empty():
-		detail = tr("nível máximo")
+		# No nível máximo, ainda aprende o que falta (#259).
+		detail = tr("nível máximo") if block != "" else tr("aprender")
 	elif AHHeroLevels.xp(hero) < int(cost.xp):
 		detail = tr("faltam %d XP") % (int(cost.xp) - AHHeroLevels.xp(hero))
 	elif block != "":
@@ -954,7 +955,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	var dialog := AHKit.panel_box("large")
 	dialog.name = "Training"
 	# Com as de aprender (#259, até 5 cartões), o diálogo se abre na largura da tela, centrado.
-	var wide := options.size() > 3
+	var wide := options.any(func(o): return String(o.get("Stat", "")) == "Learn")
 	var dialog_width: float = WIDE_DIALOG if wide else DIALOG.size.x
 	dialog.position = Vector2((1920.0 - dialog_width) * 0.5, DIALOG.position.y) if wide else DIALOG.position
 	dialog.custom_minimum_size = Vector2(dialog_width, 0)
@@ -965,12 +966,15 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 12)
 	head.add_child(AHKit.glyph("train", 36, AHKit.AMBER))
-	head.add_child(AHKit.label(tr("Treino · nível %d") % (AHHeroLevels.level(hero) + 1), "panel_title", AHKit.TEXT, true, true))
-	column.add_child(head)
 	var cost := AHHeroLevels.next_cost(hero)
-	var seeds_text: String = tr("1 semente") if int(cost.seeds) == 1 else tr("%d sementes") % cost.seeds
-	var intro := AHKit.label((tr("Escolha uma melhoria ou uma habilidade para aprender. O treino gasta o XP do nível e %s.") if wide
-		else tr("Escolha uma melhoria. O treino gasta o XP do nível e %s.")) % seeds_text, "text", AHKit.TEXT)
+	head.add_child(AHKit.label(tr("Treino · nível %d") % (AHHeroLevels.level(hero) + 1) if not cost.is_empty() else tr("Treino"), "panel_title", AHKit.TEXT, true, true))
+	column.add_child(head)
+	var intro_text := tr("No nível máximo, o treino ensina o que falta: custa só os fragmentos.")
+	if not cost.is_empty():
+		var seeds_text: String = tr("1 semente") if int(cost.seeds) == 1 else tr("%d sementes") % cost.seeds
+		intro_text = (tr("Escolha uma melhoria ou uma habilidade para aprender. O treino gasta o XP do nível e %s.") if wide
+			else tr("Escolha uma melhoria. O treino gasta o XP do nível e %s.")) % seeds_text
+	var intro := AHKit.label(intro_text, "text", AHKit.TEXT)
 	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro.custom_minimum_size = Vector2(600, 0)
 	column.add_child(intro)

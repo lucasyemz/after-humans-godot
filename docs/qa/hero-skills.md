@@ -18,6 +18,7 @@ As fotos saem de `tools/capture_259.gd` (`--text-size=2`). O antes é o mesmo ro
 
 - **O Treino:** ao subir para os níveis 3, 5 e 7, uma das opções é "Aprender: \<habilidade\>".
   - Custa o do nível mais 1, 2 e 3 fragmentos (`data/hero-skills.json`).
+  - No nível 10, a vaga que sobrou continua: o Treino ensina só pelos fragmentos, sem subir de nível.
   - O jogador escolhe a ordem.
   - Quem escolhe uma melhoria no lugar não perde a vaga: ela continua no treino seguinte.
   - Aprender não equipa. O aviso diz onde escolher: "Na Sala, escolha as 4 que leva.".
@@ -26,8 +27,13 @@ As fotos saem de `tools/capture_259.gd` (`--text-size=2`). O antes é o mesmo ro
   - Apontar uma que fica mostra "Levar no lugar de", com as 4 da luta.
   - A bloqueada diz o requisito: "Nível 5 · Treino · +2 fragmentos".
   - A coluna rola até o detalhe e a troca, porque com 7 linhas ela passa da altura.
-- **A garantia das posições:** a troca que deixaria uma posição, de 1 a 4, sem habilidade que parta dela fica apagada,
-  com o motivo à vista ("Sem nada para usar da posição 4.").
+- **A garantia das posições:** a troca que deixaria uma posição, de 1 a 4, sem **ataque** que parta dela fica apagada,
+  com o motivo à vista ("Sem ataque da posição 3.").
+  - **Por que ataque:** a partida (#95) exige um ataque da posição. Contando qualquer habilidade, como na proposta,
+    a Sala aceitava escolhas com que o herói não partia de lugar nenhum. A QA achou 4 combinações sem ataque nenhum.
+  - **Com o ataque de cada posição,** toda escolha aceita parte de qualquer lugar da formação.
+  - **Quantas combinações valem, das 35 de cada classe:** cão 20, gato 29, sapo 20, coruja 29, guaxinim 16 e tatu 16.
+    As 4 de base valem sempre.
   - O save editado que quebre a regra volta para as 4 de base.
   - A formação salva com alguém sem ataque da posição (#95) troca de ordem ao abrir, e a plataforma faz o mesmo com quem
     entra no lugar de quem caiu.
@@ -67,13 +73,14 @@ abaixo do golpe principal da classe.
 ## Como testar
 - `tests/test_hero_skills.gd`, com 218 checagens, cobre:
   - os dados e o equilíbrio;
-  - **a regra das posições:** as 4 de base e as 35 combinações de cada classe, e a Sala aceita exatamente as que
-    cobrem;
+  - **a regra das posições:** as 4 de base e as 35 combinações de cada classe. A Sala aceita exatamente as que têm
+    ataque de cada posição, e toda escolha aceita parte de qualquer posição;
   - o Treino: os níveis, os fragmentos, a ordem e a vaga que não se perde;
   - a escolha das 4;
   - a luta e a Ampola;
-  - **as 205 lutas automáticas:** cada combinação aceita, numa equipe de quatro da classe, com os 18 desbloqueios em
+  - **as 130 lutas automáticas:** cada combinação aceita, numa equipe de quatro da classe, com os 18 desbloqueios em
     ação;
+  - **o nível 10:** aprender sem subir de nível, e o requisito sem "Nível 11";
   - o save: o de antes, o editado e a formação;
   - a Sala e o Treino na tela.
 - `tests/run_all.gd` passa inteiro, com a paridade 48/48.

@@ -86,6 +86,8 @@ func _training() -> void:
 		if options.is_empty() or AHHeroLevels.train(c, "hero_gato_nick", options[0].Name) != "":
 			break
 	t.equal(AHHeroLevels.level(nick), AHHeroLevels.MAX_LEVEL, "sobe até o nível 10")
+	# No 10, só sobra aprender o que faltou (#259); aprendido tudo, o treino acaba.
+	nick.unlocked = AHHeroSkills.unlocks("gato")
 	t.equal(AHHeroLevels.train_block(c, nick), "Nível máximo.", "e para no 10")
 	t.equal(AHHeroLevels.gain(nick, 50), 0, "no 10, o XP não acumula")
 

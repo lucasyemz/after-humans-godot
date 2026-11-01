@@ -83,7 +83,8 @@ func _balance() -> void:
 			t.equal(int(inflicts.get("Stun", 0)) if inflicts is Dictionary else 0, 0, "%s: não atordoa" % id)
 
 
-## A regra das posições: as 4 de base cobrem 1 a 4; das 35 combinações de 4, a Sala aceita exatamente as que cobrem.
+## A regra das posições (a QA da #259, com a #95): as 4 de base atacam das posições 1 a 4; das 35 combinações de 4, a
+## Sala aceita exatamente as que têm um ataque partindo de cada posição.
 func _coverage() -> void:
 	var c := _campaign(2591)
 	for class_id in CLASSES:
@@ -95,20 +96,33 @@ func _coverage() -> void:
 		var accepted := 0
 		var wrong: Array = []
 		for combo in _combinations(all, 4):
-			var covers := [1, 2, 3, 4].all(func(rank): return combo.any(func(id): return _ranks(id).has(rank)))
+			var covers := [1, 2, 3, 4].all(func(rank): return combo.any(func(id): return _damage(id) and _ranks(id).has(rank)))
 			var error := AHHeroSkills.invalid(hero, combo)
 			if covers:
 				accepted += 1
 			if (error == "") != covers:
 				wrong.append(combo)
-			elif not covers and not error.begins_with("Sem nada para usar da posição"):
+			elif not covers and not error.begins_with("Sem ataque da posição"):
 				wrong.append(combo)
-		t.equal(wrong, [], "%s: a Sala aceita só as combinações que cobrem as 4 posições, e diz a que falta" % class_id)
-		t.check(accepted >= 34, "%s: %d de 35 combinações valem" % [class_id, accepted])
+		t.equal(wrong, [], "%s: a Sala aceita só as combinações com ataque de cada posição, e diz a que falta" % class_id)
+		t.check(accepted >= 16, "%s: %d de 35 combinações valem" % [class_id, accepted])
+		# Com a regra, toda escolha aceita parte de qualquer posição (a #95 nunca recusa por causa das habilidades).
+		var free_rank := true
+		for combo in _combinations(all, 4):
+			if AHHeroSkills.invalid(hero, combo) == "":
+				for rank in [1, 2, 3, 4]:
+					if S.attacks_from_rank(class_id, rank, combo).is_empty():
+						free_rank = false
+		t.check(free_rank, "%s: toda escolha aceita ataca de qualquer posição da formação" % class_id)
 	# Os pontos fracos de hoje reforçados: o gato na posição 4, o sapo e a coruja na 1.
 	for pair in [["gato", 4], ["sapo", 1], ["coruja", 1]]:
 		var from_rank: Array = AHHeroSkills.unlocks(pair[0]).filter(func(id): return _ranks(id).has(pair[1]))
 		t.check(not from_rank.is_empty(), "%s: um desbloqueio parte da posição %d" % pair)
+
+
+func _damage(ability_id: String) -> bool:
+	var damage = GameData.row("abilities", ability_id).get("DamageRange")
+	return damage is Dictionary and int(damage.get("Max", 0)) > 0
 
 
 func _ranks(ability_id: String) -> Array:
@@ -156,6 +170,21 @@ func _training() -> void:
 	learn = AHHeroLevels.options(bento).filter(func(o): return String(o.get("Stat", "")) == "Learn")
 	t.check(learn.size() == 2, "a vaga continua no treino para o nível 6")
 	t.equal(AHHeroSkills.requirement(bento), "Nível 6 · Treino · +2 fragmentos", "e o requisito diz quando e quanto")
+	# No nível máximo, a vaga que sobrou continua: o Treino ensina só pelos fragmentos, sem subir de nível.
+	var tc: Dictionary = _campaign(2603)
+	var top: Dictionary = S.hero(tc, "hero_gato_nick")
+	top.level = AHHeroLevels.MAX_LEVEL
+	top.xp = 0
+	tc.inventory.fragments = 1
+	t.equal(AHHeroSkills.requirement(top), "Treino · +1 fragmento", "no nível 10, o requisito não pede um nível que não existe")
+	learn = AHHeroLevels.options(top)
+	t.check(learn.size() == 3 and learn.all(func(o): return String(o.get("Stat", "")) == "Learn"), "no nível 10, o Treino só ensina")
+	var seeds_before := S.quantity(tc, "seeds")
+	t.equal(AHHeroLevels.train(tc, String(top.id), AHHeroSkills.LEARN + "gato_rasgo_rapido"), "", "aprende no nível 10")
+	t.check(AHHeroLevels.level(top) == AHHeroLevels.MAX_LEVEL and S.quantity(tc, "seeds") == seeds_before and S.quantity(tc, "fragments") == 0,
+		"sem subir de nível nem gastar sementes, só o fragmento")
+	t.check(AHHeroLevels.train(tc, String(top.id), AHHeroSkills.LEARN + "gato_rasgo_rapido").contains("já foi aprendida"), "aprender de novo diz o motivo")
+	t.check(not AHHeroSkills.learned_notice(top, "gato_rasgo_rapido", false).contains("nível"), "e o aviso não fala de subir de nível")
 	var notice := AHHeroSkills.learned_notice(bento, "cao_ombro_de_carga")
 	t.check(notice.contains("Ombro de Carga") and notice.contains("Sala"), "o aviso de aprender diz a habilidade e onde escolher (%s)" % notice)
 	# Os recrutados seguem a mesma regra.
@@ -179,7 +208,9 @@ func _choose() -> void:
 	t.check(AHHeroSkills.choose(c, BENTO, ["gato_corte_fase", "cao_impacto_hidraulico", "cao_patas_firmes", "cao_ombro_de_carga"]) != "", "de outra classe, não")
 	t.check(AHHeroSkills.choose(c, BENTO, pick.slice(0, 3)) != "", "menos de 4, não")
 	var gap := ["cao_punho_sucata", "cao_fique_atras_de_mim", "cao_ombro_de_carga", "cao_faro_de_perigo"]
-	t.equal(AHHeroSkills.choose(c, BENTO, gap), "Sem nada para usar da posição 4.", "deixar a posição 4 sem nada, não")
+	t.equal(AHHeroSkills.choose(c, BENTO, gap), "Sem ataque da posição 3.", "deixar a posição 3 sem ataque, não")
+	var support := ["cao_fique_atras_de_mim", "cao_nao_estamos_sos", "cao_patas_firmes", "cao_faro_de_perigo"]
+	t.check(AHHeroSkills.choose(c, BENTO, support) != "", "só apoio, sem ataque nenhum, não")
 	t.equal(AHHeroSkills.equipped(bento), pick, "e a escolha de antes fica")
 	t.equal(AHHeroSkills.choose(c, BENTO, AHHeroSkills.base("cao")), "", "voltar para as 4 de base")
 	t.equal(bento.loadout, [], "volta ao padrão (o loadout vazio)")
@@ -237,7 +268,7 @@ func _auto_fights() -> void:
 				team.append(copy)
 			var session := AHCombatSession.create(team, ["robot", "robot_fungo"], false, 100 + fights)
 			var beats := 0
-			while not session.is_over() and beats < 400:
+			while not session.is_over() and beats < 1500:
 				var beat: Dictionary = session.auto_player_turn() if session.is_player_turn() else session.enemy_turn()
 				if String(beat.get("ability_id", "")) != "":
 					used[beat.ability_id] = true
@@ -297,16 +328,16 @@ func _save() -> void:
 	var gapped = Campaign._normalize(JSON.parse_string(JSON.stringify(gap)))
 	S.migrate(gapped)
 	t.equal(S.hero(gapped, BENTO).loadout, [], "o loadout editado que deixa a posição 4 sem nada volta para as 4 de base")
-	# A formação: a coruja só com ataque de trás numa posição da frente troca de ordem.
+	# A formação: com a regra, a coruja com desbloqueios parte de qualquer posição, até a da frente.
 	var formed := _campaign(2600)
 	var owl: Dictionary = S.hero(formed, "hero_coruja_vespera")
 	owl.level = 7
 	owl.unlocked = AHHeroSkills.unlocks("coruja")
-	AHHeroSkills.choose(formed, owl.id, ["coruja_disparo_perfurante", "coruja_olho_nas_ruinas", "coruja_mira_no_marcado", "coruja_poleiro_alto"])
+	t.equal(AHHeroSkills.choose(formed, owl.id, ["coruja_disparo_perfurante", "coruja_olho_nas_ruinas", "coruja_tiro_de_aviso", "coruja_poleiro_alto"]), "", "a coruja leva o Tiro de Aviso")
+	t.check(AHHeroSkills.choose(formed, owl.id, ["coruja_disparo_perfurante", "coruja_olho_nas_ruinas", "coruja_mira_no_marcado", "coruja_poleiro_alto"]) != "",
+		"mas não fica sem ataque da frente")
 	formed.preferred_formation = ["hero_coruja_vespera", "hero_cao_bento", "hero_gato_nick", "hero_sapo_iris"]
-	t.check(S.confirm_departure(formed.duplicate(true), formed.preferred_formation, 0, 1, "fase_1") != "", "antes: a coruja sem ataque da posição 1")
-	S.migrate(formed)
-	t.equal(S.confirm_departure(formed.duplicate(true), formed.preferred_formation, 0, 1, "fase_1"), "", "ao abrir, a formação troca de ordem e parte (%s)" % [formed.preferred_formation])
+	t.equal(S.confirm_departure(formed.duplicate(true), formed.preferred_formation, 0, 1, "fase_1"), "", "a coruja na frente parte")
 
 
 ## Na Sala: as 7 com o estado (na luta, na Estação, bloqueada); a troca pela que fica vale; a que deixaria uma posição
@@ -357,7 +388,7 @@ func _screen() -> void:
 			await _frames(4)
 		t.check(AHHeroSkills.equipped(S.hero(Campaign.state, BENTO)).has("cao_patas_firmes")
 			and not AHHeroSkills.equipped(S.hero(Campaign.state, BENTO)).has("cao_fique_atras_de_mim"), "a troca pela Sala vale")
-		# Com os 3 aprendidos, o Faro de Perigo (só das posições 1 a 3) no lugar do Impacto deixaria a 4 sem nada.
+		# Com os 3 aprendidos.
 		bento = S.hero(Campaign.state, BENTO)
 		bento.level = 7
 		bento.unlocked = AHHeroSkills.unlocks("cao")
@@ -367,12 +398,16 @@ func _screen() -> void:
 		screen.ability = "cao_impacto_hidraulico"
 		screen.rebuild()
 		await _frames(3)
-		var fine: Button = screen.find_child("Swap_cao_patas_firmes", true, false)
-		t.check(fine != null and not fine.disabled, "trocar o Impacto pelas Patas Firmes vale (elas partem da 4)")
+		# O Impacto é o único ataque das posições 3 e 4: trocar por qualquer outra deixa a 3 sem ataque.
 		var gap: Button = screen.find_child("Swap_cao_faro_de_perigo", true, false)
 		var reason: Label = screen.find_child("SwapBlocked", true, false)
-		t.check(gap != null and gap.disabled and gap.tooltip_text.contains("posição 4"), "trocar pelo Faro deixa a 4 sem nada: apagado")
-		t.check(reason != null and reason.text.contains("posição 4"), "e o motivo fica à vista (%s)" % (reason.text if reason else ""))
+		t.check(gap != null and gap.disabled and gap.tooltip_text.contains("posição 3"), "trocar o Impacto pelo Faro deixa a 3 sem ataque: apagado")
+		t.check(reason != null and reason.text.contains("posição 3"), "e o motivo fica à vista (%s)" % (reason.text if reason else ""))
+		screen.ability = "cao_fique_atras_de_mim"
+		screen.rebuild()
+		await _frames(3)
+		var fine: Button = screen.find_child("Swap_cao_patas_firmes", true, false)
+		t.check(fine != null and not fine.disabled, "trocar o Fique pelas Patas Firmes vale (o Impacto continua)")
 		# A que fica, apontada, entra no lugar de uma que vai.
 		screen.ability = "cao_nao_estamos_sos"
 		screen.rebuild()

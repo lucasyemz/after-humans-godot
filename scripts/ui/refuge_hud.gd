@@ -2058,12 +2058,13 @@ func _train_hero(hero_id: String, upgrade_id: String) -> void:
 	_training = ""
 	var entry = S.hero(Campaign.state, hero_id)
 	var upgrade = GameData.row("hero_upgrades", upgrade_id)
-	var next := AHHeroLevels.level(entry) + 1
+	var before := AHHeroLevels.level(entry)
+	var next := before + 1
 	var error := AHHeroLevels.train(Campaign.state, hero_id, upgrade_id)
 	var done := tr("%s subiu para o nível %d: %s.") % [entry.display_name, next, tr(upgrade.DisplayName) if upgrade else ""]
 	# Aprender (#259): a opção não está em hero-upgrades; o aviso diz o que aprendeu e onde escolher as que leva.
 	if upgrade_id.begins_with(AHHeroSkills.LEARN):
-		done = AHHeroSkills.learned_notice(entry, upgrade_id.trim_prefix(AHHeroSkills.LEARN))
+		done = AHHeroSkills.learned_notice(entry, upgrade_id.trim_prefix(AHHeroSkills.LEARN), AHHeroLevels.level(entry) > before)
 	_act(error, done, "res://audio/ui/forge_confirm.ogg")
 
 
