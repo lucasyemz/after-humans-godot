@@ -206,7 +206,8 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	elif AHFightRewards.cargo_pending(campaign):
 		# Reaberto com o guardião vencido e a carga ainda fechada: as mesmas caixas de antes.
 		open_cargo.call_deferred()
-	elif here.type == "rest" and here.resolved and route.current_house < 0 and not session.expedition.get("asked", []).has("rest"):
+	elif here.type == "rest" and here.resolved and route.current_house < 0 and not session.expedition.objective_completed \
+			and not session.expedition.get("asked", []).has("rest"):
 		# O descanso no 1º trecho do mapa da fase (#301): a viagem do mapa de passagem entra nele sem o anúncio.
 		_arrive_at_rest.call_deferred()
 

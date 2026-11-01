@@ -76,6 +76,19 @@ func _arrive(phase_id: String, seed_value: int) -> void:
 	await _frames(6)
 	modal = _tree.current_scene.corridor.hud._modal
 	t.check(modal == null or not modal.visible or not _contains(modal, "Um lugar quieto"), "%s: reaberta a rua, não pergunta de novo" % phase_id)
+	# Com o objetivo concluído (a volta depois do guardião), reabrir no descanso não anuncia nada (QA da #301).
+	var expedition: Dictionary = Campaign.state.session.expedition
+	expedition.asked = []
+	expedition.objective_completed = true
+	expedition.cargo = {"boxes": [{}], "chosen": 0}
+	Campaign.save()
+	GameFlow.change_to("street", {}, false)
+	if not await _open_street():
+		return
+	await _frames(6)
+	var hud = _tree.current_scene.corridor.hud
+	t.check(not hud._toast_label.text.contains("Descanso") and (hud._modal == null or not hud._modal.visible),
+		"%s: com o objetivo concluído, reabrir no descanso não anuncia (\"%s\")" % [phase_id, hud._toast_label.text])
 
 
 ## Espera a troca em andamento terminar com a rua aberta.
