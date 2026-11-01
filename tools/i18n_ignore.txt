@@ -1671,6 +1671,12 @@ mission_board.gd: Aptitudes
 mission_board.gd: Needs
 mission_board.gd: risky
 mission_board.gd: reports
+combat_hud.gd: Advantage
+character_sheet.gd: type
+character_sheet.gd: Type
+combat_hud.gd: type
+combat_hud.gd: Type
+type_advantage.gd: type
 station_rules.gd: %s:merchant
 station_rules.gd: Limit
 station_rules.gd: dormitory_level_%d

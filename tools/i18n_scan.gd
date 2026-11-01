@@ -24,7 +24,8 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/core/game_data_service.gd", "res://scripts/flow/game_flow.gd", "res://scripts/combat/combat_arena.gd",
 	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd", "res://scripts/flow/station_grid.gd",
 	"res://scripts/flow/side_mission_rules.gd", "res://scripts/ui/mission_board.gd",
-	"res://scripts/flow/rescue_rules.gd"]
+	"res://scripts/flow/rescue_rules.gd",
+	"res://scripts/flow/type_advantage.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
 	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],
@@ -33,7 +34,7 @@ const DATA_FIELDS := {
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
 	"hero-upgrades": ["DisplayName", "Description"], "recruitment": ["Text"], "hero-jobs": ["Text"],
 	"night-events": ["Text", "TextOne", "TextEmpty", "TextWatched", "TextProtected"],
-	"skins": ["DisplayName", "ShortName", "Text"], "side-missions": ["Title", "Text"],
+	"skins": ["DisplayName", "ShortName", "Text"], "side-missions": ["Title", "Text"], "type-classes": ["DisplayName", "ShortName"],
 }
 
 
