@@ -57,12 +57,12 @@ func _data() -> void:
 		# O que ainda falta na skin (as poses que caem na padrão): a lista sai no relatório do teste.
 		var missing := AHSkins.missing(String(row.Name), manifest.heroes[row.HeroId], _extra_files(String(row.HeroId)))
 		print("    %s: faltam %d pose(s)%s" % [row.Name, missing.size(), (": " + ", ".join(missing)) if not missing.is_empty() else ""])
-	# A Ronda inteira (a arte do #204 na main): as 17 poses de verdade (o parado, as 8 das habilidades, as 3 reações e
-	# as 5 da Estação e do acampamento) e o retrato, nenhuma caindo na padrão.
+	# A Ronda inteira (a arte do #204 na main): as 18 poses de verdade (o parado, a guarda de luta da #221, as 8 das
+	# habilidades, as 3 reações e as 5 da Estação e do acampamento) e o retrato, nenhuma caindo na padrão.
 	var watch = GameData.row("skins", "bento_watch")
 	if t.check(watch != null and AHSkins.has_art("bento_watch"), "a Ronda tem a arte no projeto"):
 		var poses: Array = Array(DirAccess.get_files_at(String(watch.Folder))).filter(func(f): return f.ends_with(".webp") and f != AHSkins.PORTRAIT)
-		t.equal(poses.size(), 17, "a Ronda tem as 17 poses (%s)" % [poses])
+		t.equal(poses.size(), 18, "a Ronda tem as 18 poses (%s)" % [poses])
 		t.equal(AHSkins.missing("bento_watch", manifest.heroes[BENTO], _extra_files(BENTO)), [], "e nenhuma pose do Bento cai na padrão")
 		for file in poses:
 			t.check(ResourceLoader.exists(String(watch.Folder).path_join(file)) and load(String(watch.Folder).path_join(file)) is Texture2D,
