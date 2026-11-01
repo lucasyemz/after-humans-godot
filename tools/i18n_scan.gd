@@ -22,7 +22,8 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/street/street.gd", "res://scripts/street/street_corridor.gd", "res://scripts/scenario/scenario_world.gd",
 	"res://scripts/station/station_build.gd", "res://scripts/campaign/campaign_service.gd",
 	"res://scripts/core/game_data_service.gd", "res://scripts/flow/game_flow.gd", "res://scripts/combat/combat_arena.gd",
-	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd"]
+	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd",
+	"res://scripts/flow/side_mission_rules.gd", "res://scripts/ui/mission_board.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
 	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],
@@ -31,7 +32,7 @@ const DATA_FIELDS := {
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
 	"hero-upgrades": ["DisplayName", "Description"], "recruitment": ["Text"], "hero-jobs": ["Text"],
 	"night-events": ["Text", "TextOne", "TextEmpty", "TextWatched", "TextProtected"],
-	"skins": ["DisplayName", "ShortName", "Text"],
+	"skins": ["DisplayName", "ShortName", "Text"], "side-missions": ["Title", "Text"],
 }
 
 
@@ -122,6 +123,10 @@ static func data_texts() -> Array:
 	for phase in load("res://scripts/flow/journey_rules.gd").PHASES:
 		for field in ["name", "description"]:
 			out.append({"text": phase[field], "where": "phases.%s.%s" % [phase.id, field]})
+	# As missões solo (#183): a dica de cada aptidão, dentro da linha das regras.
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/side-missions.json")):
+		for need in row.get("Aptitudes", {}):
+			out.append({"text": row.Aptitudes[need].Hint, "where": "side-missions.%s.%s.Hint" % [row.Name, need]})
 	# O briefing e o debriefing (#88): as falas de cada fase, da retirada e da queda.
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/briefings.json")):
 		for index in row.get("Briefing", []).size():

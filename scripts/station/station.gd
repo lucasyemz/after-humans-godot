@@ -1405,7 +1405,8 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 	var free_rooms: Array = ROOMS.map(func(r): return r.id)
 	for entry in S.living(campaign):
 		var art := _hero_art(entry)
-		if art.is_empty():
+		# Quem está numa missão solo ou capturado (#183) não está na Estação.
+		if art.is_empty() or AHSideMissions.away(entry):
 			continue
 		var room_id: String
 		var shared: Array = occupancy.keys().filter(func(id): return occupancy[id] < 2)
