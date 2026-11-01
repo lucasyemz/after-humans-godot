@@ -468,7 +468,11 @@ func overview_pixels_per_meter() -> float:
 ## A vista geral anda até o cômodo ficar inteiro na faixa da tela entre left_px e right_px (as setas escolhendo um
 ## cômodo que o menu cobre).
 func pan_to_room(room_id: String, left_px: float, right_px: float) -> void:
-	var room := room_def(room_id)
+	_pan_to_span(room_def(room_id), left_px, right_px)
+
+
+## O cômodo ou o bloco ({x0, x1, floor} em metros) inteiro na faixa da tela entre left_px e right_px.
+func _pan_to_span(room: Dictionary, left_px: float, right_px: float) -> void:
 	if room.is_empty():
 		return
 	var ppm := overview_pixels_per_meter()
@@ -667,7 +671,7 @@ func follow_train() -> void:
 func _candidate_key() -> Dictionary:
 	var feet := _departure_slot(1)
 	# Desceram dois (#182): a câmera recua para o segundo, ao lado, também caber à esquerda do painel.
-	if not Campaign.state.station.train.get("next", {}).is_empty():
+	if not Campaign.state.station.train.get("next", {}).is_empty() and not AHSideMissions.train_pending(Campaign.state):
 		return ue_key(feet.x * 100 + 20, feet.z * 100 + 800, 92, 44, 0)
 	return ue_key(feet.x * 100 + 100, feet.z * 100 + 650, 92, 44, 0)
 
@@ -976,6 +980,65 @@ func room_screen_rects() -> Dictionary:
 		var pb := camera.unproject_position(b)
 		out[room.id] = Rect2(Vector2(minf(pa.x, pb.x), minf(pa.y, pb.y)), (pb - pa).abs())
 	return out
+
+
+## Um bloco da grade sem cômodo, em metros (#186; a interface, #274): a vaga soterrada ou livre ("1:3") ou o patamar
+## soterrado da escada ("L2"). {key, x0, x1, floor, ceiling}; {} no que não está na cena (um cômodo, o patamar aberto).
+static func block_def(key: String) -> Dictionary:
+	if AHStationGrid.is_landing(key):
+		var f := AHStationGrid.block_floor(key)
+		if f < 2 or AHStationLayout.landing_open(Campaign.state, f):
+			return {}
+		var z := AHStationLayout.floor_z(f) * 0.01
+		return {"key": key, "x0": STATION_END + 0.4, "x1": CORE_X1, "floor": z, "ceiling": z + AHStationLayout.HEIGHT * 0.01}
+	for entry in AHStationLayout.blocks(Campaign.state):
+		if entry.key == key:
+			return {"key": key, "x0": entry.x0 * 0.01, "x1": entry.x1 * 0.01, "floor": entry.floor * 0.01, "ceiling": entry.ceiling * 0.01}
+	return {}
+
+
+## Os blocos da cena (as vagas soterradas e livres e os patamares soterrados), na ordem da grade.
+static func block_defs() -> Array:
+	var out: Array = []
+	for entry in AHStationLayout.blocks(Campaign.state):
+		out.append({"key": entry.key, "x0": entry.x0 * 0.01, "x1": entry.x1 * 0.01, "floor": entry.floor * 0.01, "ceiling": entry.ceiling * 0.01})
+	for f in range(2, AHStationGrid.FLOORS + 1):
+		var landing := block_def("L%d" % f)
+		if not landing.is_empty():
+			out.append(landing)
+	return out
+
+
+## O retângulo de cada bloco na tela, como room_screen_rects; com a câmera em movimento, nada.
+func block_screen_rects() -> Dictionary:
+	var out := {}
+	if camera == null or not _path.is_empty():
+		return out
+	for block in block_defs():
+		var a := Vector3(block.x0, block.floor, 0.0)
+		var b := Vector3(block.x1, block.ceiling, 0.0)
+		if camera.is_position_behind(a) or camera.is_position_behind(b):
+			continue
+		var pa := camera.unproject_position(a)
+		var pb := camera.unproject_position(b)
+		out[block.key] = Rect2(Vector2(minf(pa.x, pb.x), minf(pa.y, pb.y)), (pb - pa).abs())
+	return out
+
+
+## O bloco escolhido com o painel aberto: ele e os vizinhos, entre o menu e o painel, como um cômodo de 12 m.
+func focus_block(key: String, instant: bool = false) -> void:
+	var block := block_def(key)
+	if block.is_empty():
+		focus_overview(instant)
+		return
+	_in_overview = false
+	var middle: float = (block.x0 + block.x1) * 0.5
+	_go(_framed_key(middle - 6.0 + ROOM_CROP, middle + 6.0 - ROOM_CROP, block.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
+
+
+## A vista geral anda até o bloco ficar na faixa da tela (as setas escolhendo um bloco), como pan_to_room.
+func pan_to_block(key: String, left_px: float, right_px: float) -> void:
+	_pan_to_span(block_def(key), left_px, right_px)
 
 
 ## Onde fica, na tela, o pé de cada um da fila (o HUD põe o cartão embaixo).
@@ -1395,7 +1458,8 @@ func _release_boarding() -> void:
 ## O segundo animal do trem (#182), de pé ao lado de quem é decidido agora, até a vez dele.
 func _spawn_companion(feet: Vector3 = Vector3.INF) -> AHSpriteCard:
 	var second: Dictionary = Campaign.state.station.train.get("next", {})
-	if second.is_empty():
+	# O trem das missões solo (#183) não traz o segundo do recruta: ele vem no trem de sempre, depois.
+	if second.is_empty() or AHSideMissions.train_pending(Campaign.state):
 		return null
 	var art: Dictionary = AHCombatArena.hero_art_of(String(second.candidate_id), String(second.recruit.art_variant)).get("idle", {})
 	if art.is_empty():
@@ -1416,6 +1480,10 @@ func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	var recruit: Dictionary = S.train_recruit(Campaign.state)
 	if art.is_empty() and not recruit.is_empty() and Campaign.state.station.train.candidate_id == _candidate_id:
 		art = AHCombatArena.hero_art_of(_candidate_id, String(recruit.art_variant)).get("idle", {})
+	# Quem volta de uma missão solo (#183): o herói do elenco, na arte dele.
+	var returning = S.hero(Campaign.state, _candidate_id)
+	if art.is_empty() and returning != null:
+		art = AHCombatArena.hero_art_of(_candidate_id, String(returning.get("art_variant", ""))).get("idle", {})
 	# O Mercador (#182, parte 2): a arte dele, de pé (_tick_merchant troca a pose).
 	if art.is_empty() and _candidate_id == S.MERCHANT:
 		art = AHCombatArena.npc_art_of(S.MERCHANT).get("idle", {})
@@ -1496,9 +1564,12 @@ func _tick_arrival(before: float) -> void:
 	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
 		# Desce pela porta do metrô e anda até a plataforma.
 		var card := _spawn_candidate(Vector3(_train_door_x(), target.y, target.z))
+		# Quem volta ferido de uma missão solo (#183) desce mancando, no passo da equipe ferida.
+		var returning = S.hero(Campaign.state, _candidate_id)
+		var pace: float = WOUNDED_PACE if returning != null and int(returning.hp) < int(returning.max_hp) else 1.0
 		if card:
 			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
-				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": target.z})
+				"speed": TRAIN_WALK_SPEED * train_speed() * pace, "stay": true, "home_z": target.z})
 		# Desceram dois (#182): o segundo desce logo atrás e para ao lado.
 		var beside := _companion_slot()
 		var companion := _spawn_companion(Vector3(_train_door_x(), beside.y, beside.z))

@@ -23,10 +23,8 @@
     (1 em 14) nas missões que a têm e 10 de XP;
   - **com ferimentos:** a faixa de 25 pontos acima da chance; volta com 35% da vida e metade da recompensa, sem a
     relíquia;
-  - **com os robôs:** o herói ficaria fora até o resgate, com um pino de resgate no mapa. **A captura fica desligada
-    (`CaptureEnabled: false`) até o resgate na rota (#188)**: sem ele, o capturado ficava fora para sempre e, com todos
-    fora, o jogo travava. Enquanto isso, esse resultado volta com ferimentos e de mãos vazias. O código da captura e o
-    pino estão prontos e testados com a chave ligada.
+  - **com os robôs:** o herói fica fora até o resgate, com um pino vermelho no mapa. A captura ficou desligada
+    (`CaptureEnabled`) nesta primeira parte e foi ligada com o resgate da #188 (`docs/qa/rescue.md`).
 - **O relatório:** a coluna "Missões solo" no retorno da expedição e "Quem voltou" na aba (só os do dia).
 - **Ninguém para partir:** com todos fora ou caídos, "Esperar um dia" aparece na aba e na Enfermaria.
 - **O teclado e o controle:** PgUp / PgDn (LB / RB) trocam a aba; ↑ ↓ andam pelos pinos e pelo painel (os heróis,

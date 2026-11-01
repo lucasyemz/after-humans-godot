@@ -16,6 +16,7 @@ func run(t) -> void:
 	_away(t)
 	_resolve(t)
 	_stable(t)
+	_train_return(t)
 	_migration(t)
 	_screen(t)
 
@@ -155,15 +156,15 @@ func _away(t) -> void:
 
 
 func _resolve(t) -> void:
-	# Com a captura desligada (até o resgate, #188), quem seria capturado volta com ferimentos e de mãos vazias.
-	t.check(not bool(M.rules().get("CaptureEnabled", true)), "a captura fica desligada nos dados até o resgate")
+	# A captura ligada com o resgate (#188). Desligada, quem seria capturado volta com ferimentos e de mãos vazias.
+	t.check(bool(M.rules().get("CaptureEnabled", false)), "a captura fica ligada nos dados, com o resgate")
+	var rules := M.rules()
+	rules.CaptureEnabled = false
 	var off := _round(t, false)
+	rules.CaptureEnabled = true
 	t.check(off.has("success") and off.has("hurt") and not off.has("captured"), "desligada: o sucesso e o ferido, nunca a captura: %s" % str(off.keys()))
 	t.check(off.has("empty"), "e há quem volte ferido de mãos vazias (a captura evitada)")
-	var rules := M.rules()
-	rules.CaptureEnabled = true
 	var on := _round(t, true)
-	rules.CaptureEnabled = false
 	t.check(on.has("success") and on.has("hurt") and on.has("captured"), "ligada: os três resultados aparecem: %s" % str(on.keys()))
 
 
@@ -205,10 +206,47 @@ func _round(t, capture: bool) -> Dictionary:
 				t.check(M.away(hero) and not S.can_deploy(hero), "o capturado fica fora até o resgate")
 				t.check(M.captured(c).has(hero), "e entra na lista dos capturados")
 		t.check(expected >= 5 and expected <= 95, "a chance fica nos limites")
-		# O dia seguinte, sem ninguém voltando, limpa Quem voltou.
+		# Recebido o trem, o dia seguinte, sem ninguém voltando, limpa Quem voltou.
+		M.arrive(c)
 		S.run_cycle(c, "rest_%d" % (int(c.station.cycle_number) + 1), 0)
 		t.equal(M.state(c).reports, [], "no dia seguinte, Quem voltou fica vazio")
 	return results
+
+
+## A volta no trem (decisão do Lucas): quem termina a missão chega depois da missão principal, no trem; até a chegada,
+## fica fora; o Próximo passo leva à plataforma; receber traz todos à Estação; o capturado não vem no trem.
+func _train_return(t) -> void:
+	var c := _campaign(196)
+	var hero: Dictionary = c.roster[0]
+	M.send(c, hero.id, M.board(c)[0].id)
+	var back := int(hero.side_mission.back)
+	M.state(c).seed = 196
+	# Força a volta (a chance no máximo): o herói volta, e chega no trem.
+	var rules := M.rules()
+	var saved := int(rules.MaxChance)
+	rules.MaxChance = 100
+	hero.level = 10
+	while int(c.station.cycle_number) < back:
+		S.run_cycle(c, "rest_%d" % (int(c.station.cycle_number) + 1), 0)
+	rules.MaxChance = saved
+	t.check(not hero.has("side_mission") and bool(hero.get("on_train", false)), "quem volta da missão chega no trem")
+	t.check(M.train_pending(c) and S.visit_pending(c), "o trem das missões é uma visita pendente")
+	t.check(M.away(hero) and not S.can_deploy(hero), "no trem, ainda não está na Estação")
+	c.station.last_return = {}
+	c.night = S._night_defaults()
+	t.equal(S.next_step(c).action, "train", "o Próximo passo leva à plataforma")
+	t.check(S.preparation_block(c) != "", "com o trem das missões pendente, a Preparação espera (o relatório chega com ele)")
+	# Um dia sem receber: o relatório de quem ainda está no trem continua.
+	var report: Dictionary = M.state(c).reports[0]
+	S.run_cycle(c, "rest_%d" % (int(c.station.cycle_number) + 1), 0)
+	t.check(M.state(c).reports.has(report), "um dia sem receber: o relatório de quem está no trem continua")
+	t.equal(M.arrive(c), [hero.id], "receber traz quem estava no trem")
+	t.check(not M.away(hero) and not M.train_pending(c), "e ele está na Estação")
+	# O capturado não vem no trem.
+	var d := _campaign(197)
+	var other: Dictionary = d.roster[1]
+	other.captured = {"mission": "x", "spot": 0, "phase": "fase_1", "day": 0}
+	t.check(not bool(other.get("on_train", false)) and not M.train_pending(d), "o capturado não vem no trem")
 
 
 ## A semente nasce com a campanha: salvar e voltar (sem salvar o quadro) não troca o quadro; os pinos não se cobrem; a

@@ -182,7 +182,7 @@ func _journey() -> bool:
 	if not await _choose_cargo(street):
 		return false
 	var fought: int = route.steps.filter(func(s): return (s.type == "combat" or s.type == "boss") and s.resolved).size()
-	t.equal(fought, 5, "a jornada venceu as 4 patrulhas e o guardião")
+	t.equal(fought, 4, "a jornada venceu as 3 patrulhas e o guardião (#292)")
 	t.check(route.steps[9].resolved, "o guardião (trecho 10) ficou vencido")
 	if not t.check(searched, "a equipe vasculhou os caixotes no caminho (nenhum caixote alcançado até o guardião)"):
 		return false
@@ -342,6 +342,14 @@ func _return_report() -> bool:
 	if not await _press(hud, "Entrar no abrigo", "Entrar no abrigo no relatório"):
 		return false
 	t.check(Campaign.state.station.last_return.get("seen", false), "o relatório fica visto")
+	# A primeira volta com escavação (#186; a interface, #274): a fala do Bento e do Nick antes de a fila sair.
+	if not await _until(func(): return hud.briefing_open(), "a fala da primeira escavação abrir", 10.0):
+		return false
+	for line in AHRefugeHud.intro_lines(Campaign.state).size() - 1:
+		if not await _press(hud.briefing, tr("Próximo"), "Próximo na fala da escavação"):
+			return false
+	if not await _press(hud.briefing, tr("Continuar"), "Continuar na fala da escavação"):
+		return false
 	# Depois do relatório, a vista geral: o Próximo passo diz que a equipe precisa dormir, o Dormitório em destaque e
 	# Preparar expedição bloqueado com o motivo (#76).
 	if not await _until(func(): return hud.current == "", "a vista geral depois do relatório"):
