@@ -1,11 +1,14 @@
 {
   "base_commit": "31e77ba6ae91d599fee8712f02238fe8e7b55ad0",
-  "scope": "documentation-only proposal; no production implementation",
+  "scope": "compact reference revision, documentation only",
   "design_qa_round": 4,
   "design_qa_verdict": "APROVADO",
   "views": 9,
-  "labels_checked": 411,
+  "labels_checked": 177,
+  "markers_checked": 72,
   "layout_problems": [],
+  "marker_semantic_problems": [],
+  "upper_roster_pixel_identical_in_all_nine_views": true,
   "tests": {
     "passed": 100,
     "total": 100,
@@ -13,71 +16,72 @@
     "combat_parity": [
       48,
       48
-    ]
+    ],
+    "reused_same_production_base": true
   },
   "images": [
     {
-      "file": "before_after_formation.webp",
-      "size": [
-        3840,
-        1140
-      ],
-      "bytes": 673308,
-      "sha256": "eb01f7cc3e791ecf59cfe46257787cdc45510f9d18ce6fb691d398e911304425"
-    },
-    {
-      "file": "before_after_kit_change.webp",
-      "size": [
-        3840,
-        1140
-      ],
-      "bytes": 687250,
-      "sha256": "7e39499ebc3eed5fae26a57e065b4b918907cf0609082bb218c0a18ce40212c2"
-    },
-    {
-      "file": "before_after_sheet.webp",
-      "size": [
-        3840,
-        1140
-      ],
-      "bytes": 683236,
-      "sha256": "bf8c1aa6e5978f7596966503b6caa0b343c39fafd9a7a93763d815011bb62633"
-    },
-    {
-      "file": "formation_40.webp",
+      "file": "attack_40.webp",
       "size": [
         768,
         432
       ],
-      "bytes": 75908,
-      "sha256": "9f3724e23adf13ce4cb48c55286d07a44908ecad10a86afb87a4db34ce29ad89"
+      "bytes": 111486,
+      "sha256": "917eda2779d19aac8a12bb14ba52d5228ecd095610a8787c6d0c5f619c797222"
     },
     {
-      "file": "formation_colorblind.webp",
+      "file": "attack_colorblind.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 286712,
-      "sha256": "e7d6369c045285980ea6ec9d5fc2d246648f65d20ca4e01c84df0429a73b68b8"
+      "bytes": 498406,
+      "sha256": "f926a623f898a6a02dbe75735f91543e8c1f1578b3ff350d5c2248a6d0705fd8"
     },
     {
-      "file": "formation_larger.webp",
+      "file": "attack_larger.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 319378,
-      "sha256": "043bfe02ebfb6e2adfe32c64f24f026cdbdd65d94ac126f47afa1e40264dcbeb"
+      "bytes": 510440,
+      "sha256": "b81b2cade406fc4b3f88fc5967123ad1982373eaf866f5747d162f35b058efd4"
     },
     {
-      "file": "formation_normal.webp",
+      "file": "attack_normal.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 285500,
-      "sha256": "60b5b931a3041f4256c54c34ef6f39282554852ebf4850b94b288ae11a6b46ea"
+      "bytes": 498538,
+      "sha256": "31b0cbcab741a38a2a644824d1d09df74dc0e27040dd195cb5cc0862fc7e450a"
+    },
+    {
+      "file": "before_after_attack.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "bytes": 864370,
+      "sha256": "e8ee52a13ebb54e9761ffa7f4bcc681b8db2f6a76d9ec2936ed8091534cab75d"
+    },
+    {
+      "file": "before_after_overview.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "bytes": 839148,
+      "sha256": "c3a7078cd08a216381860f0d4894986d750eb272771711226ec98ea72f546c41"
+    },
+    {
+      "file": "before_after_support.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "bytes": 864382,
+      "sha256": "cca92137935bc34db30c84f441c3bcff722f53a5df029d2cc66d1a89903ffbc7"
     },
     {
       "file": "grayscale.webp",
@@ -85,80 +89,80 @@
         1920,
         3240
       ],
-      "bytes": 671770,
-      "sha256": "7311f0269142b30776d468e2221f43de576bcd8f2ae775d728fee556bf399336"
+      "bytes": 1234690,
+      "sha256": "ad32666a7e534f2581752d846a74b017885299ce3d9a727cb9738872d57f3856"
     },
     {
-      "file": "kit_change_40.webp",
+      "file": "overview_40.webp",
       "size": [
         768,
         432
       ],
-      "bytes": 67062,
-      "sha256": "ad9311b13a7d2923389c9157d20bbdeaa22d74ec9f388a576251e92a4ab9593c"
+      "bytes": 112762,
+      "sha256": "6b6e7fffa4bc0f93c0dc903e35006ddf7af165b1fc85dff105ac49208a7b5fe8"
     },
     {
-      "file": "kit_change_colorblind.webp",
+      "file": "overview_colorblind.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 256434,
-      "sha256": "f55fef66206602a478a902c87237687292d8bff782fdf7ed1e35a358f7a8b282"
+      "bytes": 500080,
+      "sha256": "5c16a88a29868fe2724fbc8685451da13f979a1a45ed3ddd5fd903b2e038767d"
     },
     {
-      "file": "kit_change_larger.webp",
+      "file": "overview_larger.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 288044,
-      "sha256": "bd0008df85d5687ec3033bf68b2a4c90d90bcd8c376e103811575bf45b884f58"
+      "bytes": 502482,
+      "sha256": "648a5d31fe605a568e18a066d9915f21d89c75bf2a4221e08953fc137790b23d"
     },
     {
-      "file": "kit_change_normal.webp",
+      "file": "overview_normal.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 255384,
-      "sha256": "5f92e437562d76d5a7d17d843512064167d67e7ea107f6d7da3e71d07369ff13"
+      "bytes": 498986,
+      "sha256": "0d6845a8eed5c71e99abac2956981f84dfdef3bd561ad89fad0b20ffff28f6af"
     },
     {
-      "file": "sheet_40.webp",
+      "file": "support_40.webp",
       "size": [
         768,
         432
       ],
-      "bytes": 65516,
-      "sha256": "6c1c17aaddeed72b70a34c56130628f38554aa68a022b135af387e8a5c0e12e1"
+      "bytes": 110664,
+      "sha256": "95708455b1a3f81cff7da2d90594871fe601a5563bc8a204f8a097eab7b2ed2f"
     },
     {
-      "file": "sheet_colorblind.webp",
+      "file": "support_colorblind.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 261684,
-      "sha256": "d270eb6c73ccd02edc235b6a6cbd6ffd89aff863b443855d94bdb1b0283ff4a0"
+      "bytes": 498160,
+      "sha256": "b38ee943ff4c95e9cc385cf443757d549c0a09ac1d044df63bb1c39a389ae9aa"
     },
     {
-      "file": "sheet_larger.webp",
+      "file": "support_larger.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 283824,
-      "sha256": "14ea20f185274e422b552d7a75aad420285a346d181c896c49d2fd0103fe165a"
+      "bytes": 509396,
+      "sha256": "9cbd734a54220efdfe7aaae2964fe33e6e9f75bc4c413f714b0956a1917475e8"
     },
     {
-      "file": "sheet_normal.webp",
+      "file": "support_normal.webp",
       "size": [
         1920,
         1080
       ],
-      "bytes": 261432,
-      "sha256": "1dd67e90fcab96b44271f39197a9d14df69bc3b85fd011031cd942c767831701"
+      "bytes": 497742,
+      "sha256": "fcf38ef2475bf342682b1050b1fae5280cbde17ee55860f6d865f50a45d39b34"
     }
   ]
 }

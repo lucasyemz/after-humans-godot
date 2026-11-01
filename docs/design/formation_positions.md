@@ -1,150 +1,101 @@
-# Posições do kit — proposta de interface (#260)
+# Formação e alcance junto das habilidades (#260)
 
-**Para aprovação do Lucas.** Esta entrega propõe como consultar a formação; não implementa recomendação, troca de habilidades, restrição de posição ou balanceamento. Base: `main` **31e77ba6ae91d599fee8712f02238fe8e7b55ad0**. O contrato definitivo depende da #259 (habilidades) e da #258 (atributos/papel). Não pressupõe que sete habilidades conhecidas sejam sete equipadas.
+**Revisão para o Lucas**, a partir das referências enviadas no comentário da conversa. O estudo usa a organização compacta das referências: quatro marcadores de posição, quatro de alvo, ícones de habilidades lado a lado e o personagem grande. As molduras, a Barlow e os ícones continuam sendo os do After Humans.
 
-## Prévias
+A proposta substitui visualmente **só o bloco HABILIDADES da Sala**. Preserva os retratos para trocar de personagem, o elenco, a ação de Alojamento, o personagem central, a ficha e os botões existentes. Não é um painel que cobre a tela inteira. É um protótipo documental, sem mudança em código, dados, save, ids ou balanceamento de produção. Base: `main` **31e77ba6ae91d599fee8712f02238fe8e7b55ad0**, ainda atual na revisão.
 
-A proposta usa os componentes e as texturas existentes do `AHKit`, com Barlow Condensed, aço escuro e cantos âmbar, conforme [hud-direction.md](hud-direction.md). Sem peça nova nem fonte nova. São modais de estudo sobre a Sala real, não telas já integradas. As legendas externas distinguem o que existe da proposta.
+## Ver as pranchas
 
-| Vista | Normal | Maior (130%) | Daltonismo |
+| Situação | Normal | Maior 130% | Daltonismo |
 |---|---|---|---|
-| Comparação da equipe | [Abrir](formation_positions/formation_normal.webp) | [Abrir](formation_positions/formation_larger.webp) | [Abrir](formation_positions/formation_colorblind.webp) |
-| Detalhe da ficha | [Abrir](formation_positions/sheet_normal.webp) | [Abrir](formation_positions/sheet_larger.webp) | [Abrir](formation_positions/sheet_colorblind.webp) |
-| Edição do kit e estado sem opção | [Abrir](formation_positions/kit_change_normal.webp) | [Abrir](formation_positions/kit_change_larger.webp) | [Abrir](formation_positions/kit_change_colorblind.webp) |
+| Resumo do kit, sem habilidade em foco | [Abrir](formation_positions/overview_normal.webp) | [Abrir](formation_positions/overview_larger.webp) | [Abrir](formation_positions/overview_colorblind.webp) |
+| Impacto Hidráulico em foco | [Abrir](formation_positions/attack_normal.webp) | [Abrir](formation_positions/attack_larger.webp) | [Abrir](formation_positions/attack_colorblind.webp) |
+| Não Estamos Sós em foco | [Abrir](formation_positions/support_normal.webp) | [Abrir](formation_positions/support_larger.webp) | [Abrir](formation_positions/support_colorblind.webp) |
 
-![Comparação — Normal](formation_positions/formation_normal.webp)
+![Resumo compacto na Sala](formation_positions/overview_normal.webp)
 
-![Ficha — Maior](formation_positions/sheet_larger.webp)
+![Habilidade ofensiva em foco, texto Maior](formation_positions/attack_larger.webp)
 
-![Edição e estado limite — Maior](formation_positions/kit_change_larger.webp)
+![Habilidade de apoio em foco](formation_positions/support_normal.webp)
 
-[Comparação a 40%](formation_positions/formation_40.webp) · [Ficha a 40%](formation_positions/sheet_40.webp) · [Edição a 40%](formation_positions/kit_change_40.webp) · [Três vistas em cinza](formation_positions/grayscale.webp)
+[A 40%: resumo](formation_positions/overview_40.webp) · [ataque](formation_positions/attack_40.webp) · [apoio](formation_positions/support_40.webp) · [Três vistas em cinza](formation_positions/grayscale.webp)
 
-## Antes e depois na Godot
+## Como funciona a leitura
 
-O antes é a Sala da `main` acima, sem patch de produção. O depois mantém a mesma cena, câmera, elenco e tempo congelado, acrescentando **apenas o modal de estudo do kit**, na memória. Não representa a integração final na partida. As nove propostas foram renderizadas na Godot 4.7.2, em 1920×1080, OpenGL Compatibility/Mesa llvmpipe por CPU, sem GPU física. Luz/Forward+ finais precisam do PC; esta tarefa avalia UI.
+**Sem apontar uma habilidade:** o grupo esquerdo diz **PREFERÊNCIA**, com as quatro posições próprias na ordem **4 · 3 · 2 · 1**; os círculos preenchidos indicam a preferência do kit. O grupo direito diz **ALVOS · ATAQUES** e mostra a união dos ranks de alvo dos ataques contra inimigos, na ordem **1 · 2 · 3 · 4**. Não mistura cura/proteção nessa faixa de inimigos. A linha “4 equipadas · frente 1 e 2” reforça o resumo do Bento sem exibir frações ou uma tabela.
 
-![Antes e depois — comparação](formation_positions/before_after_formation.webp)
+**Ao apontar ou focar uma habilidade:** a primeira legenda muda para **PARTE DE**. Os círculos passam a mostrar exatamente `OriginRanks` daquela habilidade; deixam de representar preferência. A segunda legenda muda para **ALVO · INIMIGO**, **ALVO · ALIADO** ou **SI MESMO**, conforme `TargetType`. O ícone em foco ganha a moldura âmbar. Uma dica temporária mostra nome, descrição e a orientação dos ranks. Ao sair do foco de habilidade, a dica some e as faixas voltam ao resumo do kit.
 
-![Antes e depois — ficha Maior](formation_positions/before_after_sheet.webp)
+Não usar a legenda “Preferência” para as origens de uma habilidade. **Preferência não restringe a formação; origem restringe aquela ação.** No resumo, preenchimento significa preferência à esquerda e alcance agregado de ataques à direita; os cabeçalhos distinguem essas funções. Na habilidade em foco, preenchido significa que alcança e vazio significa que não alcança. Os números das posições permanecem visíveis nos dois modos.
 
-![Antes e depois — edição Maior](formation_positions/before_after_kit_change.webp)
+As posições próprias usam **círculos âmbar**. Os alvos usam **losangos**, vermelhos para inimigos e cianos para aliados, com as cores reais de `AHKit.enemy_hp()` / `hero_hp()` e suas opções de daltonismo. Preenchido/vazio, forma, legenda e números sustentam a leitura em cinza; cor é reforço. As formas são indicadores vetoriais de UI do protótipo, não novas texturas de arte.
 
-## O que o jogador lê
+### Casos das capturas
 
-As posições acompanham a orientação já usada na partida: **4 · 3 · 2 · 1**, retaguarda à esquerda, frente à direita. Não inverter as posições ao abrir a ficha.
+| Vista | Preferência do kit | Origem em foco | Alvo em foco |
+|---|---|---|---|
+| Resumo do Bento | 1 e 2 | Não há habilidade em foco | Ataques atuais: inimigos 1, 2 e 3 |
+| Impacto Hidráulico | Continua 1 e 2, mas não é o que a faixa em foco exibe | 1, 2, 3 e 4 | Inimigos 1, 2 e 3 |
+| Não Estamos Sós | Continua 1 e 2 | 1, 2, 3 e 4 | Aliados 1, 2, 3 e 4; permite o próprio herói |
 
-Cada posição mostra o número da posição, **quantas habilidades equipadas partem dela / total equipado** e uma palavra:
+Isso demonstra a diferença: Bento prefere a frente, mas **Impacto Hidráulico parte das quatro posições**. Não mostrar a preferência como bloqueio desse golpe. Os quatro ícones são os existentes, na ordem atual dos dados: Punho de Sucata, Impacto Hidráulico, Fique Atrás de Mim e Não Estamos Sós. Os números 1–4 nas plaquetas dos ícones indicam sua ordem no kit; não criam atalhos novos na Sala.
 
-- **REC.**: uma das posições com a maior quantidade positiva de opções do kit; tem também moldura de seleção. A legenda expande: “mais opções no kit; não é obrigação”.
-- **POSSÍVEL**: pelo menos uma habilidade parte dali, mas há outra posição com mais opções. Sem cadeado, sem desabilitar a posição.
-- **SEM OPÇÃO**: nenhuma habilidade equipada tem aquela origem. O detalhe diz “Nenhuma habilidade parte daqui. Reveja o kit ou a formação.” O lugar continua disponível.
+O [snapshot auditado](formation_positions/examples.json) conserva os ids, as origens e os alvos das 24 habilidades das seis classes atuais. A preferência proposta continua sendo o máximo positivo da quantidade de habilidades equipadas que partem de cada posição: Bento 1/2, Íris 3/4, Guaxinim 2/3, por exemplo. A contagem fica interna, não ocupa a interface como `4/4`. É um critério simples **a aprovar**, não mede dano, cura ou a composição ideal. Empates positivos mostram todas as posições empatadas; empate completo recebe “Sem preferência”. Sem kit definido: indicadores neutros e “Kit ainda não definido”, sem recomendação inventada.
 
-Contagem, palavra e moldura permanecem no daltonismo e em cinza. A cor é reforço: `AHKit.good()` e `AHKit.alert_text()` respeitam as opções atuais; não congelar uma paleta paralela no componente futuro. O âmbar já usado pelo kit assinala a moldura, sem substituir o texto.
+## Interação e estados para a integração
 
-**Não chamar a contagem de eficácia, dano ou melhor posição.** A comparação dá o mesmo peso a ataque, proteção, cura e suporte; uma opção decisiva pode valer mais que três opções circunstanciais. Não somar os ranks de alvo à contagem de origem. Na ficha, “PARTE DE” corresponde a `OriginRanks`; a informação de alvos continua separada, como já existe nas habilidades.
+- **Mouse:** apontar o ícone revela os ranks e a dica. A moldura identifica a habilidade consultada, não a confunde com equipada. As capturas mostram quatro habilidades já equipadas; não inventam um sistema de marcar/desmarcar o kit.
+- **Teclado/controle:** o foco existente percorre os ícones e revela o mesmo conteúdo. Preserve a ação de voltar, o foco do personagem e a possibilidade de consultar a dica sem clique.
+- **Toque:** toque no ícone consulta e mantém o detalhe; tocar fora fecha. Na integração, confirmar a distinção entre consultar e equipar de acordo com a #259. Não atribuir duplo sentido silencioso ao mesmo toque.
+- **Leitor de tela, quando suportado:** expor nomes e listas de posições (“Parte das posições 1, 2, 3 e 4; atinge inimigos 1, 2 e 3”), não anunciar apenas cor ou “quatro pontos”.
+- **Origem/alvo não é disponibilidade neste turno:** recarga, estado incapacitante e falta de alvo legal têm motivos próprios; não apagar os ranks estáticos por isso. `SingleOtherAlly` continua excluindo o próprio ator, mesmo que o rank apareça nos dados. `Self` usa a legenda SI MESMO e o marcador do ator; não pinta uma linha de inimigos. Alvos múltiplos/conectados precisam de indicação de grupo, sem fingir alvos independentes.
+- **Deslocamento e edição:** deslocamento atualiza a posição atual e a legalidade da ação; a preferência só muda quando muda o kit. Na edição, recalcular a prévia pelo conjunto em edição, identificá-la como não confirmada e restaurar o equipado ao cancelar. Sete habilidades no catálogo não significam sete equipadas.
+- **Sem origem no rank atual:** “Nenhuma habilidade parte desta posição. Reveja o kit ou a formação.” Não bloquear o rank por preferência. Os seis kits completos atuais cobrem todas as posições; esse é um estado limite para contratos futuros, não um kit inválido apresentado como funcional.
 
-## Exemplos conferidos nos dados atuais
+A dica sobrepõe temporariamente a parte inferior da ficha direita, como uma consulta contextual; não cobre o personagem, seu rosto ou os controles do elenco. Ao fechar, devolve a leitura dos atributos. No Maior, manter quebra de linha e rolagem quando o conteúdo superar a área. Não diminuir a fonte. Mais habilidades conhecidas/desbloqueadas e seus estados dependem da #259; não desenhar cadeados fictícios ou inventar custos.
 
-A tabela está na ordem numérica **1 a 4** para auditar; as imagens mostram a ordem visual **4 a 1**. Números extraídos de `data/classes.json.AbilityIds` e `data/abilities.json.OriginRanks`, sem editar esses arquivos. [Snapshot com ids, origens, alvos, hashes e contagens](formation_positions/examples.json).
+## Medidas e peças
 
-| Personagem/classe atual | P1 | P2 | P3 | P4 | Recomendação proposta |
-|---|---:|---:|---:|---:|---|
-| Bento / cão | 4/4 | 4/4 | 3/4 | 2/4 | 1 e 2 — exemplo de frente |
-| Nick / gato | 3/4 | 4/4 | 4/4 | 1/4 | 2 e 3 |
-| Íris / sapo | 1/4 | 3/4 | 4/4 | 4/4 | 3 e 4 — exemplo de retaguarda |
-| Véspera / coruja | 1/4 | 3/4 | 3/4 | 3/4 | 2, 3 e 4 |
-| Guaxinim / rato | 2/4 | 3/4 | 3/4 | 2/4 | 2 e 3 — exemplo de kit misto |
-| Tatu / tatu | 3/4 | 4/4 | 2/4 | 2/4 | 2 |
+Coordenadas em pixels na base **1920×1080**, ancoragem superior esquerda `(0,0)`:
 
-Na ficha de estudo, a Véspera foi simulada na posição **1**, com **1/4** (o modal não muda a equipe real da campanha): apenas Recurso de Emergência parte dali. Disparo Perfurante parte de 3/4; Olho nas Ruínas e Granada de Fumaça partem de 2/3/4. Nenhuma dessas três fica disponível só porque tem alvos na posição 1.
-
-### Edição e deslocamento
-
-A vista de edição compara o kit atual da Íris com uma **prévia hipotética de remoção de Carga Voltaica**: passa de `[1,3,4,4]/4` para `[1,3,3,3]/3`; as posições recomendadas passam de 3/4 para 2/3/4. A demonstração não afirma que confirmar três habilidades seja permitido. A #259 decidirá capacidade, seleção e validação. A contagem deve acompanhar o kit em prévia e ser rotulada “não confirmada”; cancelar restaura a leitura do equipado.
-
-Se alguém for deslocado em combate, o destaque de **posição atual** muda, sem recalcular a recomendação por causa do deslocamento: o kit não mudou. Se o kit mudar, recalcular a partir dos ids efetivamente equipados. Atualizar a ficha aberta/focada sem perder o foco e anunciar a alteração quando houver suporte a leitor de tela na integração.
-
-### Sem habilidade utilizável não é um único estado
-
-Todos os seis kits completos atuais cobrem as quatro posições. Por isso, o exemplo vermelho é **hipotético**, com apenas Carga Voltaica na prévia da Íris: `[0,0,1,1]/1`. Na posição 1, nenhuma habilidade parte dali. Não é um novo kit autorizado e não descreve uma condição que hoje aparece com o kit completo.
-
-Na integração, separar os motivos:
-
-| Situação | Texto do detalhe | Efeito na contagem/recomendação |
-|---|---|---|
-| Nenhuma origem válida | Nenhuma habilidade parte daqui. Reveja o kit ou a formação. | `0/n`; SEM OPÇÃO |
-| Origem válida, todas as opções em recarga | As habilidades desta posição estão em recarga. | Contagem do kit permanece; mostrar recargas individuais |
-| Origem válida, sem alvo legal | Nenhum alvo válido para as habilidades desta posição. | Contagem permanece; explicar o alvo por habilidade |
-| Estado impede agir | Texto do estado já usado pelo jogo | Não transformar a posição em SEM OPÇÃO |
-| Sem habilidades equipadas / dados ausentes | Kit ainda não definido. | Sem REC.; `—`, nunca `0/0` ou recomendação inventada |
-
-Fugir, item, passar a vez e ações universais continuam com as regras atuais; não entram no denominador das habilidades equipadas. A proposta não impede arrastar, trocar ou confirmar uma posição por preferência. Bloqueios reais de partida continuam sendo os definidos pelo jogo.
-
-## Onde entra primeiro — recomendação para aprovação
-
-1. **Seleção de equipe / partida:** resumo abaixo da carta focada, usando a ordem da formação; abrir o detalhe pela mesma interação que abre a ficha (apontar/foco/toque longo), sem nova tecla fixa. Não repetir a matriz de quatro habilidades em cada carta.
-2. **Ficha / Sala de Personagens:** detalhe reutilizável com quatro posições e lista das habilidades, rolável quando necessário; na edição, a prévia acompanha o kit selecionado. A tabela detalhada cabe numa expansão/modal, não encolhida dentro do painel atual de 596 px.
-3. **Formação durante a luta:** só mostrar contexto de posição atual e motivo de indisponibilidade na ficha; não acrescentar mais um painel permanente à HUD da luta.
-
-Proposta: **calcular pelo kit equipado**, sem gravar uma recomendação fixa de ranks por classe no save. O papel narrativo da classe pode continuar como texto independente, sem sobrepor a contagem. Empates positivos mostram todas as posições empatadas. Se todas tiverem o mesmo número positivo, escrever “Mesmas opções nas quatro posições”, sem anunciar uma falsa vantagem.
-
-O Lucas ainda decide: local inicial (partida ou ficha), aceite dessa contagem simples como recomendação e necessidade de um perfil fixo descritivo por classe. Não foram criados pesos, regras de dano, novos atributos, habilidades ou ids. A decisão da #259 pode mudar o denominador, mas não a distinção visual entre origem, alvo e preferência.
-
-## Medidas e componentes
-
-Base 1920×1080; coordenadas em pixels, ancoragem superior esquerda. Os retângulos abaixo são os pedidos ao kit; a composição usa recuos explícitos compatíveis com o kit, sem somar novamente o recuo do StyleBox no protótipo. Não achatar moldura e texto numa nova textura.
-
-| Elemento do protótipo | Retângulo / medida |
+| Elemento | Retângulo / especificação |
 |---|---|
-| Modal de estudo | `(68,62,1784,956)`; zona segura externa ≥62 px |
-| Área de composição | coordenadas locais do conteúdo do modal; margem adicional 30 px |
-| Três cartas comparativas | `(30 + i×570,143,550,407)` |
-| Retrato comparativo | `94×94`; cabeça do retrato canônico, sem recorte novo |
-| Faixa de posições da carta | largura 520; 4 células, intervalo 8; altura 128 |
-| Hierarquia da célula | posição 20 px, contagem 30 px, estado 18 px; o Maior aplica 130% |
-| Ficha: retrato | `150×150` |
-| Ficha: comparação / matriz | `(30,280,620,520)` / `(675,280,1045,520)` |
-| Matriz: linha de habilidade | `1008×73`, passo 82 px; nome à esquerda, origens à direita |
-| Edição: comparação de kits | duas caixas `830×319`, intervalo 30 px |
-| Edição: estado limite | `(30,493,1690,315)` |
-| Fontes | Barlow Condensed Medium / SemiBold já em `art/ui/fonts`, OFL |
-| Texto Normal / Maior | corpo 24–28 / 31–36 px; mínimo 18 / 23 px; títulos 40 / 52 px |
+| Bloco compacto | `(28,510,540,394)` no Normal; `(28,554,540,350)` no Maior, preservando também o aviso de recursos do Alojamento |
+| Cabeçalho | local `(24,8,492,46)` |
+| Legendas de origem/preferência e alvo | locais `(24,60,220,34)` e `(272,60,242,34)` |
+| Marcadores | 32×32 Normal, 40×40 Maior; passo 48; posição própria começa em `(28,102)`, alvo em `(276,102)` |
+| Números dos ranks | 20 px, 26 px no Maior; abaixo dos marcadores, sem usar tamanho minúsculo como único sinal |
+| Ícones de habilidade | quatro peças de 96×96; conteúdo 80×80; x local `24 + i×132`, y `193` |
+| Ordem dos ícones | plaqueta de 36×36 no canto inferior direito do ícone, fonte 20 px; não é uma nova tecla fixa |
+| Linha final | local `(24,297,492,46)`; resumo ou nome em foco |
+| Dica temporária | `(1316,612,540,314)`; nome 28 px, corpo 23 px, notas 20 px; Maior 130% |
+| Plaqueta documental | `(610,144,620,68)`; “PROPOSTA #260”; somente para revisão, não integrar |
 
-As miniaturas a 40% são avaliações da hierarquia, não substituem o modo Maior nem afirmam leitura de cada nota miúda num celular. Uma integração responsiva deve preservar tamanho de toque e rolagem; não diminuir a fonte para fazer caber sete linhas futuras.
+Sem fonte ou textura nova: Barlow Condensed Medium/SemiBold em `art/ui/fonts` (OFL), peças de `AHKit`, ícones existentes retornados por `AHCombatArena.icon_of()`. Mantêm-se as margens originais de 9-slice: `panel_large` **44/44/44/44**, `panel_inset` **24/24/24/24**, `selected_frame` **16/16/16/16**. Botão de ícone e plaqueta `key_tab` usam os estilos já expostos pelo kit; `key_tab` mantém o 9-slice próprio do manifesto. A composição usa recuos explícitos e não soma as margens do container duas vezes. Não há sprite novo ou âncora no pé.
 
-Nenhuma margem nova de 9-slice: reutilizar exatamente os metadados do kit existente:
+## Antes/depois e reprodução
 
-| Peça | Textura | 9-slice L/T/R/B | Conteúdo x/y/w/h |
-|---|---|---|---|
-| `panel_large` | 320×320 | 44/44/44/44 | 24/22/272/276; centro TILE_FIT |
-| `panel_inset` | 240×160 | 24/24/24/24 | 16/14/208/132 |
-| `selected_frame` | 120×60 | 16/16/16/16 | sem recuo próprio |
-| `square_portrait` | 72×72 | 8/8/8/8 | 4/4/64/64 |
+![Antes/depois: resumo](formation_positions/before_after_overview.webp)
 
-Não há sprite ou âncora no pé nesta entrega; a âncora de layout é `(0,0)` e os retratos são os existentes. O texto nas WebP é parte da **captura de revisão**, nunca textura de produção com texto gravado.
+![Antes/depois: ataque Maior](formation_positions/before_after_attack.webp)
 
-## Reprodução e limites
+![Antes/depois: apoio Maior](formation_positions/before_after_support.webp)
 
-[Protótipo de captura](formation_positions/capture_proposal.gd), excluído do projeto por `docs/.gdignore`. Executar manualmente na raiz, com instalação importada:
+Sala real da Godot 4.7.2; mesma campanha seed 6, elenco, câmera e tempo congelado por par. Antes: main intacta. Depois: só bloco compacto e dica em memória. **CPU/Mesa llvmpipe, Compatibility, sem GPU física**; não é uma aprovação da luz Forward+ nem uma integração funcional. Textos nas WebP são capturas de revisão, não texturas de produção com texto gravado. PNG de captura fora do Git.
+
+[Protótipo](formation_positions/capture_proposal.gd), excluído do projeto por `docs/.gdignore`. Executar manualmente, com perfil isolado e pasta de saída externa:
 
 ```bash
 Godot --path . --rendering-method gl_compatibility --audio-driver Dummy \
-  --resolution 1920x1080 \
-  --script docs/design/formation_positions/capture_proposal.gd \
+  --resolution 1920x1080 --script docs/design/formation_positions/capture_proposal.gd \
   -- --out=/tmp/formation_260
-```
-
-Para gerar as pranchas WebP das capturas:
-
-```bash
 python docs/design/formation_positions/build_review.py /tmp/formation_260
 ```
 
-O empacotador requer Pillow, conserva o conteúdo das capturas e acrescenta apenas as legendas externas do antes/depois. Use perfil de usuário isolado via `XDG_DATA_HOME`, `XDG_CONFIG_HOME` e `XDG_CACHE_HOME` na nuvem. O protótipo usa save isolado na pasta de saída e não chama o save do jogador. O parâmetro `--out` é uma pasta de capturas, não destino de arte de produção. A origem PNG das capturas permanece fora do Git em `/workspace/scratch/formation260/captures`; entram somente WebP de revisão, esta especificação, o snapshot e o protótipo documental. Nenhuma alteração em `scripts/`, `data/`, `tests/`, `tools/` ou `art/`.
+O empacotador requer Pillow. Na nuvem, use `XDG_DATA_HOME`, `XDG_CONFIG_HOME` e `XDG_CACHE_HOME` isolados. O save da fixture vai na saída, sem tocar o save do jogador. Protótipo e capturas são casos programados de consulta; não implementam os eventos de foco/toque no jogo.
 
-## QA de design
+## QA e decisões pendentes
 
-Suíte completa da base: **100/100 testes passaram** em 694,373 s, incluindo **48/48 lutas de paridade**. O protótipo documental é verificado pelas capturas e medições próprias, não por essas regras de produção.
+[Registro da QA de design](formation_positions/qa.md). A suíte da mesma base **31e77ba6** passou **100/100**, com paridade **48/48**, na rodada anterior desta entrega; não foi repetida porque esta revisão altera somente documentos, capturas e o protótipo excluído da Godot. A revisão compacta tem sua própria auditoria de layout e capturas.
 
-Registro final após revisão das capturas: ver [qa.md](formation_positions/qa.md). Aprovação da QA significa que a proposta pode ser avaliada; não substitui aprovação de produto do Lucas nem autoriza a integração antes do contrato da #259.
+Aprovar a linguagem visual não define os pesos da recomendação nem o contrato de seleção de habilidades. Continuam pendentes a aprovação do critério calculado pelo kit e o contrato da #259, considerando a #258. A proposta recomenda colocar o componente na Sala/ficha primeiro e reutilizar o resumo nas cartas de preparação; a formação de batalha não recebe outro painel permanente. A issue fica aberta para o Lucas.

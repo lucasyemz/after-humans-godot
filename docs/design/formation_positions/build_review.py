@@ -10,14 +10,14 @@ a = p.parse_args()
 a.out.mkdir(parents=True, exist_ok=True)
 font_path = Path(__file__).resolve().parents[3] / 'art/ui/fonts/barlow_condensed_semibold.ttf'
 font = ImageFont.truetype(str(font_path), 34)
-for view in ('formation', 'sheet', 'kit_change'):
+for view in ('overview', 'attack', 'support'):
     for variant in ('normal', 'larger', 'colorblind'):
         im = Image.open(a.captures / f'{view}_{variant}.png').convert('RGB')
         assert im.size == (1920, 1080)
         im.save(a.out / f'{view}_{variant}.webp', quality=92, method=6)
     normal = Image.open(a.captures / f'{view}_normal.png').convert('RGB')
     normal.resize((768, 432), Image.Resampling.LANCZOS).save(a.out / f'{view}_40.webp', quality=94, method=6)
-    variant = 'normal' if view == 'formation' else 'larger'
+    variant = 'normal' if view == 'overview' else 'larger'
     before = Image.open(a.captures / f'current_{variant}.png').convert('RGB')
     after = Image.open(a.captures / f'{view}_{variant}.png').convert('RGB')
     sheet = Image.new('RGB', (3840, 1140), '#0d1012')
@@ -25,9 +25,9 @@ for view in ('formation', 'sheet', 'kit_change'):
     sheet.paste(after, (1920, 60))
     draw = ImageDraw.Draw(sheet)
     draw.text((28, 9), f'ANTES / MAIN 31e77ba6 / SALA / {variant.upper()}', font=font, fill='#efe6d6')
-    draw.text((1948, 9), 'DEPOIS / MESMA CENA + MODAL DO KIT / PROPOSTA #260', font=font, fill='#efe6d6')
+    draw.text((1948, 9), 'DEPOIS / MESMA CENA + COLUNA COMPACTA / PROPOSTA #260', font=font, fill='#efe6d6')
     sheet.save(a.out / f'before_after_{view}.webp', quality=90, method=6)
 gray = Image.new('RGB', (1920, 3240), '#0d1012')
-for i, view in enumerate(('formation', 'sheet', 'kit_change')):
+for i, view in enumerate(('overview', 'attack', 'support')):
     gray.paste(ImageOps.grayscale(Image.open(a.captures / f'{view}_normal.png')).convert('RGB'), (0, i*1080))
 gray.save(a.out / 'grayscale.webp', quality=92, method=6)
