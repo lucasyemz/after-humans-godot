@@ -37,3 +37,14 @@ mesmo roteiro no código da `main`.
   com os efeitos reduzidos e apaga ao desligar.
 - `tests/test_deaths_door_fight.gd`: uma luta da rua termina com um herói no Último Fôlego, e o pulso apaga.
 - `tests/test_street_scene.gd`: o recruta no Último Fôlego fica de pé, na pose parada, na cor normal e com o pulso.
+
+## QA
+
+- **Rodada 1: REPROVADO**, por um ponto médio: nenhum teste conferia que o pulso apaga no fim da luta. Entrou o
+  `test_deaths_door_fight` (ele falha se o fim da luta não desligar o pulso). As observações baixas foram corrigidas
+  junto: a checagem da mira ficou mais rígida, os efeitos reduzidos ganharam o brilho fixo e um arquivo de outra entrega
+  saiu do commit.
+- **Rodada 2: APROVADO.** A QA rodou a suíte inteira (101/101, paridade 48/48), as capturas do pulso, da mira (#57) e do
+  derrotado, e uma luta real na rua com o herói no Último Fôlego agindo, em crise, curado e terminando por vitória,
+  derrota e fuga. Conferiu também os efeitos reduzidos (fixo em 0,17, sem piscar), o ALVO, as placas e que nada foi
+  gravado nos saves e nas opções do jogador.
