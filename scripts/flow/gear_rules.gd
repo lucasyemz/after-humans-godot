@@ -165,6 +165,22 @@ static func total_text(hero: Dictionary, piece: String) -> String:
 	return ", ".join(parts)
 
 
+## O próximo nível da peça, para a ficha da Sala ("" no máximo): "Próximo: nível 2, +2% de crítico (herói nível 4,
+## Forja nível 1, 4 sucatas e 1 fragmento)".
+static func next_text(hero: Dictionary, piece: String) -> String:
+	var at := level(hero, piece) + 1
+	if at > MAX_LEVEL:
+		return ""
+	var row := step(piece, at)
+	return TranslationServer.translate("Próximo: nível %d, %s (herói nível %d, Forja nível %d, %s)") % [at, step_text(piece, at),
+		int(row.get("HeroLevel", 1)), int(row.get("ForgeLevel", 1)), S.cost_text({"scrap": int(row.get("Scrap", 0)), "fragments": int(row.get("Fragments", 0))})]
+
+
+## A resistência com a peça, como na luta (AHCombatEngine.hero_resist): até o teto, nunca abaixo da do papel.
+static func resist_with(role_value: float, extra_pp: int) -> float:
+	return maxf(role_value, minf(RESIST_CAP, role_value + extra_pp / 100.0)) if extra_pp > 0 else role_value
+
+
 ## Saves de antes da #262 e editados: o gear que não é {weapon, armor} com números de 0 a 4 vira esses números (o que
 ## não for número vira 0; a vida já somada fica, para não cobrar de novo).
 static func migrate(campaign: Dictionary) -> void:

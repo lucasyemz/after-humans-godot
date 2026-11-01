@@ -1892,3 +1892,9 @@ combat_engine.gd: crit
 combat_engine.gd: dot
 combat_engine.gd: stun
 station_services.gd: forge
+character_sheet.gd: dot
+character_sheet.gd: stun
+character_sheet.gd: crit
+character_room.gd: Gear
+character_room.gd: Gear_%s
+character_room.gd: Next

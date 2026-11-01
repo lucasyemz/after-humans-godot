@@ -108,7 +108,7 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 		"kind": _kind(String(hero.get("class_id", "")), AHSpecies.of_hero(hero)), "type": AHTypes.label(AHTypes.of_hero(hero)),
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
 		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))) \
-			+ role_rows(String(hero.get("class_id", ""))) \
+			+ role_rows(String(hero.get("class_id", "")), AHGear.combat_bonus(hero)) \
 			+ AHTypes.sheet_rows(AHTypes.of_hero(hero)), "states": [], "enemy": false,
 		"level": AHHeroLevels.level(hero), "skills": skills_of(hero),
 		"art": AHCombatArena.hero_art_of(String(hero.get("id", "")), String(hero.get("art_variant", ""))).get("idle", {})}
@@ -129,18 +129,27 @@ static func skills_of(hero: Dictionary) -> Dictionary:
 
 
 ## O que o papel dá (#258): as três resistências numa linha e, se o papel soma, a chance de crítico. Os números ficam no
-## título: no texto Maior a ficha encolhe e esconde as explicações.
-static func role_rows(class_id: String) -> Array:
+## título: no texto Maior a ficha encolhe e esconde as explicações. gear: AHGear.combat_bonus do herói (#262): a
+## Segunda Pele soma nas resistências e a Arma no crítico, como na luta.
+static func role_rows(class_id: String, gear: Dictionary = {}) -> Array:
 	var hero_class = GameData.combat.classes.get(class_id)
 	if hero_class == null:
 		return []
 	var pct := func(value): return roundi(float(value) * 100.0)
+	var dot := AHGear.resist_with(float(hero_class.DotResist), int(gear.get("dot", 0)))
+	var stun := AHGear.resist_with(float(hero_class.StunResist), int(gear.get("stun", 0)))
 	var rows: Array = [[TranslationServer.translate("Resiste: dano por turno %d%% · deslocamento %d%% · atordoamento %d%%")
-		% [pct.call(hero_class.DotResist), pct.call(hero_class.DisplacementResist), pct.call(hero_class.StunResist)],
-		TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel."), true]]
-	if int(hero_class.CritBonus) > 0:
-		rows.append([TranslationServer.translate("Crítico %d%% (papel +%d)") % [pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus), int(hero_class.CritBonus)],
-			TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes."), true])
+		% [pct.call(dot), pct.call(hero_class.DisplacementResist), pct.call(stun)],
+		TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel.")
+		if int(gear.get("dot", 0)) + int(gear.get("stun", 0)) <= 0
+		else TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel e pela Segunda Pele."), true]]
+	var weapon_crit := int(gear.get("crit", 0))
+	if int(hero_class.CritBonus) > 0 or weapon_crit > 0:
+		var total: int = pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus) + weapon_crit
+		var title := TranslationServer.translate("Crítico %d%% (papel +%d)") % [total, int(hero_class.CritBonus)] if weapon_crit <= 0 \
+			else TranslationServer.translate("Crítico %d%% (papel +%d, Arma +%d)") % [total, int(hero_class.CritBonus), weapon_crit]
+		rows.append([title, TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes.") if weapon_crit <= 0
+			else TranslationServer.translate("Olho para o ponto fraco: o papel e a Arma acertam golpes críticos mais vezes."), true])
 	return rows
 
 
