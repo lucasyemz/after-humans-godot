@@ -1,6 +1,7 @@
 ## As duas poses paradas (#221): a de exploração (idle, armas guardadas) e a de combate (combat_idle, armas na mão).
 ## - nos dados: cada herói com combat_idle tem o arquivo, a mesma tela e a mesma âncora no pé do idle; a skin Bento Ronda
-##   tem a guarda dela, e a skin sem guarda luta no parado dela;
+##   tem a guarda dela, e a skin sem guarda luta no parado dela; o Guaxinim e o Tatu redesenhados (#225) com as medidas,
+##   as poses, o item e as alturas do contrato, e a guarda deles (o recruta sem guarda luta no parado dele);
 ## - na luta de verdade: ao entrar, cada fundador passa para a guarda; ao vencer, a fila volta à pose de exploração.
 extends RefCounted
 
@@ -42,6 +43,32 @@ func _data() -> void:
 		var texture: Texture2D = load(combat.file)
 		var idle: Texture2D = load(entry.idle.file)
 		t.check(texture != null and texture.get_size() == idle.get_size(), "%s: a textura da guarda com o tamanho da do idle" % hero_id)
+	# O Guaxinim e o Tatu redesenhados (#225) e as duas poses deles (#221).
+	var redraw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://docs/design/recruits_redraw/contract.json"))
+	for key in redraw.actors:
+		var actor: Dictionary = redraw.actors[key]
+		var entry: Dictionary = manifest.recruits[actor.id]
+		var idle: Dictionary = actor.assets.idle
+		t.equal(entry.idle.anchor, idle.anchor, "%s: o pé do redesenho" % actor.id)
+		t.equal(int(entry.idle.body_reference_pixels), int(idle.body_reference_pixels), "%s: a altura do corpo do redesenho" % actor.id)
+		var poses: Array = entry.actions.keys() + entry.reactions.keys()
+		for pose in actor.assets:
+			if pose == "idle" or pose == "seat" or pose == "sleep":
+				continue
+			t.check(poses.has(pose), "%s: a pose %s do redesenho no jogo" % [actor.id, pose])
+		for ability_id in entry.actions:
+			t.equal(entry.actions[ability_id].execucao.anchor, idle.anchor, "%s: o golpe %s com o pé do parado" % [actor.id, ability_id])
+		t.check(entry.reactions.has("item"), "%s: ganhou a pose de usar item" % actor.id)
+		t.check(absf(float(AHCharacterHeights.HEIGHTS.get(actor.class_id, 0.0)) - float(actor.height_m)) < 0.001,
+			"%s: a altura de %.2f m do redesenho" % [actor.id, float(actor.height_m)])
+		if not t.check(entry.has("combat_idle"), "%s tem a guarda" % actor.id):
+			continue
+		t.equal(entry.combat_idle.anchor, entry.idle.anchor, "%s: a guarda com o pé do parado" % actor.id)
+		t.check(entry.combat_idle.file != entry.idle.file and ResourceLoader.exists(entry.combat_idle.file), "%s: a guarda é outra imagem" % actor.id)
+	# A arte do recruta na luta traz a guarda dele; os recrutas sem guarda (o cão, o gato, o sapo e a coruja) não herdam a
+	# do fundador.
+	t.check(AHCombatArena.art_entry(manifest.heroes, "hero_tatu_5", "armadillo_recruit_01").has("combat_idle"), "o Tatu luta na guarda dele")
+	t.check(not AHCombatArena.art_entry(manifest.heroes, "hero_cao_5", "dog_recruit_01").has("combat_idle"), "o cão recruta luta no parado dele")
 	# A skin Bento Ronda: a guarda dela, na pasta dela.
 	var watch := AHSkins.dress(AHCombatArena.art_entry(manifest.heroes, "hero_cao_bento"), "bento_watch")
 	t.check(String(watch.get("combat_idle", {}).get("file", "")).begins_with("res://art/skins/bento/watch/"), "a skin Bento Ronda luta na guarda dela")

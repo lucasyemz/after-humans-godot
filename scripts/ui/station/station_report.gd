@@ -627,6 +627,9 @@ func _details_band() -> PanelContainer:
 			lines.append(tr("A Cora trouxe %d fragmento.") % cycle.fragments_produced)
 		lines.append_array(dug)
 		columns.add_child(_detail_column(tr("A Estação no ciclo %d") % cycle.number, lines))
+	# O resgate (#188): quem saiu do cativeiro, entrou na equipe ou ficou.
+	if String(report.get("rescue", "")) != "":
+		columns.add_child(_detail_column(tr("Resgate"), [String(report.rescue)]))
 	var missions: Array = cycle.get("missions", [])
 	if not missions.is_empty():
 		columns.add_child(_detail_column(tr("Missões solo"), missions.map(func(entry): return AHSideMissions.report_line(c, entry))))
