@@ -19,7 +19,8 @@ trem também", com o relatório da missão.
   relatório das missões do dia, uma linha por herói. RECEBER traz todos para a Estação, e o trem parte.
 - **Depois:** se o trem de sempre traz alguém (recruta, civil ou Mercador), ele chega em seguida. Senão, a noite ou a
   vista geral.
-- O dia de espera ("Esperar um dia") também traz o trem quando alguém volta naquele dia.
+- No dia de espera ("Esperar um dia"), quem volta naquele dia também chega no trem: ele aparece no Próximo passo e
+  na lista do que espera.
 
 ## Para o Lucas
 
