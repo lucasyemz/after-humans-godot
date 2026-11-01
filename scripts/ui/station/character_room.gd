@@ -1135,7 +1135,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	# Com as de aprender (#259, até 5 cartões), o diálogo se abre na largura da tela, centrado.
 	var wide := options.any(func(o): return String(o.get("Stat", "")) == "Learn")
 	var dialog_width: float = WIDE_DIALOG if wide else DIALOG.size.x
-	dialog.position = Vector2((1920.0 - dialog_width) * 0.5, DIALOG.position.y) if wide else DIALOG.position
+	_keep_centered(dialog)
 	dialog.custom_minimum_size = Vector2(dialog_width, 0)
 	add_child(dialog)
 	var column := VBoxContainer.new()
@@ -1241,6 +1241,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 		hud._train_hero(hero_id, _upgrade))
 	buttons.add_child(confirm)
 	_fit_keys([cancel, confirm])
+	_link_cards(cards)
 	_first_focus = first
 
 
@@ -1264,7 +1265,7 @@ func _camp_training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	dialog.name = "Training"
 	var wide := options.size() > 2
 	var dialog_width: float = WIDE_DIALOG if wide else DIALOG.size.x
-	dialog.position = Vector2((1920.0 - dialog_width) * 0.5, DIALOG.position.y)
+	_keep_centered(dialog)
 	dialog.custom_minimum_size = Vector2(dialog_width, 0)
 	add_child(dialog)
 	var column := VBoxContainer.new()
@@ -1364,6 +1365,7 @@ func _camp_training_dialog(c: Dictionary, hero: Dictionary) -> void:
 			tr(String(AHCampSkills.skill(picked).DisplayName))], "res://audio/ui/forge_confirm.ogg"))
 	buttons.add_child(confirm)
 	_fit_keys([cancel, confirm])
+	_link_cards(cards)
 	_first_focus = first
 
 
@@ -1375,6 +1377,22 @@ func _training_day() -> Label:
 	day.name = "TrainingDay"
 	day.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	return day
+
+
+## O diálogo fica no meio da tela pela largura real (o alto cresce com o Melhorar o Treino e no Maior, #265).
+func _keep_centered(dialog: Control) -> void:
+	var center := func(): dialog.position = Vector2(roundf((1920.0 - dialog.size.x) * 0.5), DIALOG.position.y)
+	dialog.resized.connect(center)
+	center.call()
+
+
+## As setas andam de cartão em cartão (a ponta não pula para os botões de baixo).
+func _link_cards(cards: HBoxContainer) -> void:
+	var row: Array = cards.get_children()
+	for index in row.size():
+		var card := row[index] as Control
+		card.focus_neighbor_left = card.get_path_to(row[index - 1]) if index > 0 else NodePath(".")
+		card.focus_neighbor_right = card.get_path_to(row[index + 1]) if index < row.size() - 1 else NodePath(".")
 
 
 ## O Treino ainda melhora (#265): um botão no alto do diálogo abre o painel dele, com o custo e o Melhorar.

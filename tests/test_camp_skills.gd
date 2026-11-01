@@ -326,6 +326,13 @@ func _room() -> void:
 			AHUiStyle.using_keys = keys
 			var dialog := screen.find_child("Training", true, false) as Control
 			t.check(dialog != null and screen.training and screen.training_camp, "o Treino de acampamento abre")
+			if dialog != null:
+				t.check(screen.find_child("TrainingRoom", true, false) != null, "no nível 1, com o Melhorar o Treino no alto")
+				t.check(absf(dialog.position.x + dialog.size.x * 0.5 - 960.0) <= 1.0, "e o diálogo fica no meio da tela (%.0f)" % (dialog.position.x + dialog.size.x * 0.5))
+				var middle := screen.find_child("CampUpgrade_camp_cao_reforcar_a_segunda_pele", true, false) as Control
+				var last := screen.find_child("CampUpgrade_camp_cao_dividir_a_carga", true, false) as Control
+				if middle != null and last != null:
+					t.equal(middle.get_node(middle.focus_neighbor_right), last, "a seta para a direita anda de cartão em cartão")
 			var card := screen.find_child("CampUpgrade_camp_cao_dividir_a_carga", true, false) as Button
 			t.check(card != null and screen._camp_pick == "camp_cao_dividir_a_carga", "com a apontada já escolhida")
 			t.equal(screen.find_children("CampUpgrade_*", "Button", true, false).size(), 3, "os cartões são as 3 que ele não sabe")
