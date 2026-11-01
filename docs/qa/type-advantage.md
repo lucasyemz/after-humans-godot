@@ -38,7 +38,8 @@
   (na inspeção apertada, junto da velocidade) e, nos efeitos passivos, "Dano +25% em Guaxinins e Emissores" e "Recebe
   +25% de Gatos e Perseguidores" (os nomes curtos, para caber; os completos na explicação). No inimigo, as duas
   linhas são tentadas em todos os níveis antes de sair: saem antes as explicações dos passivos e dos estados, e o
-  inimigo as mostra no Normal e no Maior, com ou sem estados. Sem estados, a coluna dos estados fica do tamanho do
+  inimigo as mostra no Normal e no Maior, com ou sem estados (salvo no Maior com muitos estados ao mesmo tempo:
+  aí a família fica na linha da velocidade). Sem estados, a coluna dos estados fica do tamanho do
   "Nenhum agora", e a folga vai para os passivos (as explicações cabem junto). Na inspeção do herói com muitos traços (o Bento e a Íris), as linhas não cabem junto das explicações
   dos passivos: ficam as explicações, e a linhagem vai para a linha da velocidade (as duas linhas estão na ficha, como
   a issue pede).
@@ -128,3 +129,7 @@ O efeito é pequeno: nas fases 1 a 4 fica dentro da variação de 40 sementes. N
 
   Correção: no inimigo, as tentativas com as duas linhas vêm todas antes das sem elas. O `test_character_sheet` confere
   também com Sangra 2 em todos (falha no código da rodada 3).
+
+- **Rodada 4: APROVADO.** Os 8 personagens no Normal e no Maior, sem estados, com um e com 10 estados: nada cortado,
+  e as duas linhas do inimigo aparecem em todos os casos, salvo no Maior com 10 estados ao mesmo tempo. O `run_all`
+  101/101, com a paridade 48/48.
