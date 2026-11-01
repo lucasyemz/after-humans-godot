@@ -7,6 +7,7 @@ extends RefCounted
 
 const M = preload("res://scripts/flow/side_mission_rules.gd")
 const S = preload("res://scripts/flow/station_rules.gd")
+const J = preload("res://scripts/flow/journey_rules.gd")
 
 
 ## Os pinos sobre a pintura: as missões do quadro, quem está fora e os capturados. Cada pino é o farol (que pisca) e o
@@ -26,11 +27,26 @@ static func pins(map, c: Dictionary, parent: Control) -> Array:
 			"sleep", AHKit.MUTED, M.spot_position(int(entry.side_mission.get("spot", -1))), false)
 		pin.focus_mode = Control.FOCUS_NONE
 		pin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for entry in M.captured(c):
-		var pin := _pin(parent, "Captured_%s" % entry.id, TranslationServer.translate("Resgatar %s") % entry.display_name, "alert", AHKit.alert_text(), M.spot_position(int(entry.captured.get("spot", -1))), true)
-		pin.pressed.connect(map.pick_mission.bind("captured:%s" % entry.id))
+	# Os resgates (#188), vermelhos e no lugar da fase deles: o capturado e o pedido de ajuda (um abaixo do outro).
+	var per_phase := {}
+	var rescues := AHRescue.pending(c)
+	for index in rescues.size():
+		var target: Dictionary = rescues[index]
+		var anchor: Array = map.region_of(target.phase).get("anchor", [560, 315])
+		var stack := int(per_phase.get(target.phase, 0))
+		per_phase[target.phase] = stack + 1
+		var pin := _pin(parent, "Rescue_%d" % index, rescue_title(target), "alert", AHKit.alert_text(),
+			Vector2(float(anchor[0]), float(anchor[1]) + 60.0 + 52.0 * stack), true)
+		if map.mission == "rescue:%d" % index:
+			pin.add_child(AHKit.selected_overlay())
+		pin.pressed.connect(map.pick_mission.bind("rescue:%d" % index))
 		buttons.append(pin)
 	return buttons
+
+
+## O título do resgate: "Resgatar Íris" (o capturado) ou "Pedido de ajuda".
+static func rescue_title(target: Dictionary) -> String:
+	return TranslationServer.translate("Resgatar %s") % target.name if target.kind == "captured" else TranslationServer.translate("Pedido de ajuda")
 
 
 ## Um pino: a fileira com o farol e o rótulo, centrada no ponto da pintura sem sair dela. Devolve o rótulo.
@@ -73,8 +89,8 @@ static func _blink(node: CanvasItem) -> void:
 ## uma, a missão e a escolha do herói.
 static func aside(map, c: Dictionary, box: VBoxContainer, footer: VBoxContainer, width: float) -> void:
 	var picked: String = map.mission
-	if picked.begins_with("captured:"):
-		_captured_aside(map, c, box, picked.trim_prefix("captured:"), width)
+	if picked.begins_with("rescue:"):
+		_rescue_aside(map, c, box, footer, int(picked.trim_prefix("rescue:")), width)
 		return
 	var row := M.mission(picked)
 	if row.is_empty() or not M.board(c).any(func(spot): return spot.id == picked):
@@ -192,11 +208,22 @@ static func _list_aside(map, c: Dictionary, box: VBoxContainer, width: float) ->
 		box.add_child(AHKit.label(TranslationServer.translate("Quem voltou"), "text", AHKit.AMBER, true, true))
 		for report in reports:
 			box.add_child(map._wrap(M.report_line(c, report), "small", AHKit.TEXT, width))
-	var captured := M.captured(c)
-	if not captured.is_empty():
-		box.add_child(AHKit.label(TranslationServer.translate("Capturados"), "text", AHKit.alert_text(), true, true))
-		for entry in captured:
-			box.add_child(map._wrap(M.away_text(entry), "small", AHKit.TEXT, width))
+	# Os resgates primeiro (#188): prioridade, sem prazo.
+	var rescues := AHRescue.pending(c)
+	if not rescues.is_empty():
+		box.add_child(AHKit.label(TranslationServer.translate("Resgates"), "text", AHKit.alert_text(), true, true))
+		for index in rescues.size():
+			var target: Dictionary = rescues[index]
+			var item := AHKit.button("", "secondary")
+			item.name = "List_rescue_%d" % index
+			AHKit.style_as(item, "list", Vector4(16, 0, 16, 0))
+			item.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			item.text = " · ".join([rescue_title(target), TranslationServer.translate(String(J.phase(target.phase).get("name", "")))])
+			item.add_theme_font_size_override("font_size", AHKit.size("text"))
+			item.add_theme_color_override("font_color", AHKit.alert_text())
+			item.custom_minimum_size = Vector2(0, 52)
+			item.pressed.connect(map.pick_mission.bind("rescue:%d" % index))
+			box.add_child(item)
 	var running := M.running(c)
 	if not running.is_empty():
 		box.add_child(AHKit.label(TranslationServer.translate("Fora da Estação"), "text", AHKit.AMBER, true, true))
@@ -231,13 +258,30 @@ static func _list_aside(map, c: Dictionary, box: VBoxContainer, width: float) ->
 		box.add_child(item)
 
 
-static func _captured_aside(map, c: Dictionary, box: VBoxContainer, hero_id: String, width: float) -> void:
-	var entry = S.hero(c, hero_id)
-	if entry == null or not M.captured(c).has(entry):
+## O resgate escolhido: quem é, onde está e como chegar (a próxima expedição à fase); PREPARAR NESTA FASE leva à
+## plataforma com a fase escolhida.
+static func _rescue_aside(map, c: Dictionary, box: VBoxContainer, footer: VBoxContainer, index: int, width: float) -> void:
+	var rescues := AHRescue.pending(c)
+	if index < 0 or index >= rescues.size():
 		map.mission = ""
 		_list_aside(map, c, box, width)
 		return
-	map._aside_head("alert", TranslationServer.translate("Resgatar %s") % entry.display_name, true)
-	var row := M.mission(String(entry.captured.mission))
-	box.add_child(map._wrap(TranslationServer.translate("Os robôs levaram %s em %s.") % [entry.display_name, TranslationServer.translate(String(row.get("Title", "")))], "small", AHKit.TEXT, width))
-	box.add_child(map._wrap(TranslationServer.translate("O sinal segue no rádio. O resgate entra na rota da fase, sem prazo: ninguém se perde esperando."), "small", AHKit.MUTED, width))
+	var target: Dictionary = rescues[index]
+	var phase_name := TranslationServer.translate(String(J.phase(target.phase).get("name", "")))
+	map._aside_head("alert", rescue_title(target), true)
+	if target.kind == "captured":
+		var entry = S.hero(c, String(target.hero_id))
+		var row := M.mission(String(entry.captured.mission))
+		box.add_child(map._wrap(TranslationServer.translate("Os robôs levaram %s na missão %s.") % [target.name, TranslationServer.translate(String(row.get("Title", "")))], "small", AHKit.TEXT, width))
+	else:
+		box.add_child(map._wrap(TranslationServer.translate("Um sinal fraco no rádio: alguém preso pede ajuda. Na Estação ninguém sabe quem é."), "small", AHKit.TEXT, width))
+	box.add_child(map._wrap(TranslationServer.translate("Onde: %s. Na próxima expedição para lá, a rota passa por esse ponto, guardado pela patrulha.") % phase_name, "small", AHKit.TEXT, width))
+	box.add_child(map._wrap(TranslationServer.translate("Sem prazo: o sinal continua no rádio até alguém ir."), "small", AHKit.MUTED, width))
+	var go := AHStationReport._primary(TranslationServer.translate("Preparar nesta fase"), "station", "interact")
+	go.name = "Prepare"
+	go.custom_minimum_size = Vector2(0, 64)
+	go.add_theme_font_size_override("font_size", AHKit.size("row"))
+	AHPhaseMap.key_at_end(go)
+	var phase_id: String = target.phase
+	go.pressed.connect(func(): map.phase_chosen.emit(phase_id))
+	footer.add_child(go)

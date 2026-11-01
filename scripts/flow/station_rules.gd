@@ -1976,6 +1976,8 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	adjust(campaign, "fragments", delivered.fragments)
 	campaign.station.water = int(campaign.station.water) + delivered.water
 	adjust(campaign, SUPPLIES, delivered.supplies)
+	# O resgate (#188): quem foi mandado para a Estação chega, até na derrota; a linha do relatório.
+	delivered.rescue = AHRescue.on_return(campaign)
 	# Pedido pessoal: o item volta inteiro na vitória e na retirada; na derrota fica para trás.
 	var request: String = loot.get("request_item", "")
 	if factor > 0.0 and is_resident(campaign, request) and not campaign.station.completed_requests.has(request):
