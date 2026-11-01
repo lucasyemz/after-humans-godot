@@ -45,7 +45,9 @@ static func from_unit(session: AHCombatSession, unit: AHCombat.Unit, boss: bool 
 		var hero = Campaign.hero(unit.hero_id)
 		out.kind = _kind(unit.class_id, GameData.combat.species_of(unit.class_id, unit.species))
 		out.type = AHTypes.label(AHTypes.of_unit(unit))
-		out.passives = _hero_passives(hero, unit.perks, unit.class_id) + role_rows(unit.class_id)
+		# As resistências do papel (#258) ficam na ficha fora da luta: a inspeção tem altura fixa e guarda o lugar para os
+		# passivos e os estados de agora.
+		out.passives = _hero_passives(hero, unit.perks, unit.class_id)
 		# A linhagem (#227): em quem causa mais dano e de quem recebe.
 		out.passives.append_array(AHTypes.sheet_rows(AHTypes.of_unit(unit)))
 		out.art = AHCombatArena.hero_art_of(unit.hero_id, String(hero.get("art_variant", "")) if hero != null else "").get("idle", {})
