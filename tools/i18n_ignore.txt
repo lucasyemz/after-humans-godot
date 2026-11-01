@@ -1748,6 +1748,5 @@ phase_map.gd: Mission_%s
 phase_map.gd: Send
 phase_map.gd: Hero_
 phase_map.gd: Hero_%s
-station_rules.gd: seed
 mission_board.gd: Rest
 side_mission_rules.gd: roster
