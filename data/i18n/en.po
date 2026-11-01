@@ -2142,7 +2142,7 @@ msgstr "Nobody is recovering. Without the Infirmary, whoever falls on an expedit
 
 #: scripts/ui/refuge_hud.gd:2626
 #: scripts/ui/refuge_hud.gd:2634
-#: scripts/ui/mission_board.gd:210
+#: scripts/ui/mission_board.gd:212
 msgid "Esperar um dia"
 msgstr "Wait a day"
 
@@ -5924,7 +5924,7 @@ msgid "%s · volta em %d dias"
 msgstr "%s · back in %d days"
 
 #: scripts/ui/mission_board.gd:30
-#: scripts/ui/mission_board.gd:238
+#: scripts/ui/mission_board.gd:240
 msgid "Resgatar %s"
 msgstr "Rescue %s"
 
@@ -6016,19 +6016,23 @@ msgstr "%s: %s Back in %d days."
 msgid "Ninguém pode partir agora. Esperar um dia traz de volta quem está em missão."
 msgstr "No one can set out right now. Waiting a day brings back whoever is on a mission."
 
-#: scripts/ui/mission_board.gd:215
+#: scripts/ui/mission_board.gd:210
+msgid "Ninguém pode partir agora. Esperar um dia deixa cada caído um dia mais perto de voltar."
+msgstr "No one can set out right now. Waiting a day brings each fallen hero one day closer to returning."
+
+#: scripts/ui/mission_board.gd:217
 msgid "Hoje no rádio"
 msgstr "On the radio today"
 
-#: scripts/ui/mission_board.gd:218
+#: scripts/ui/mission_board.gd:220
 msgid "Nenhum pedido novo hoje."
 msgstr "No new requests today."
 
-#: scripts/ui/mission_board.gd:240
+#: scripts/ui/mission_board.gd:242
 msgid "Os robôs levaram %s em %s."
 msgstr "The robots took %s at %s."
 
-#: scripts/ui/mission_board.gd:241
+#: scripts/ui/mission_board.gd:243
 msgid "O sinal segue no rádio. O resgate entra na rota da fase, sem prazo: ninguém se perde esperando."
 msgstr "The signal is still on the radio. The rescue joins the phase route, with no deadline: no one is lost by waiting."
 

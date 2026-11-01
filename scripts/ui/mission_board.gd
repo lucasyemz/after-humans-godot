@@ -206,7 +206,9 @@ static func _list_aside(map, c: Dictionary, box: VBoxContainer, width: float) ->
 				else TranslationServer.translate("%s: %s Volta em %d dias.") % [entry.display_name, TranslationServer.translate(String(M.mission(String(entry.side_mission.id)).get("Title", ""))) + ".", days], "small", AHKit.TEXT, width))
 	# Ninguém para partir (todos fora ou caídos): o dia passa daqui, para as missões voltarem.
 	if S.rest_block(c) == "":
-		box.add_child(map._wrap(TranslationServer.translate("Ninguém pode partir agora. Esperar um dia traz de volta quem está em missão."), "small", AHKit.TEXT, width))
+		var why := TranslationServer.translate("Ninguém pode partir agora. Esperar um dia traz de volta quem está em missão.") if not M.running(c).is_empty() \
+			else TranslationServer.translate("Ninguém pode partir agora. Esperar um dia deixa cada caído um dia mais perto de voltar.")
+		box.add_child(map._wrap(why, "small", AHKit.TEXT, width))
 		var wait := AHKit.button(TranslationServer.translate("Esperar um dia"), "secondary")
 		wait.name = "Rest"
 		wait.custom_minimum_size = Vector2(0, 56)

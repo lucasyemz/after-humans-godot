@@ -82,3 +82,15 @@
   - os dois modos da captura, o ferido que não sara e o relatório do dia;
   - a semente ao recarregar, os pinos livres e a noite;
   - a tela: a aba por PgDn, a cadeia do teclado até MANDAR e "Esperar um dia" com todos fora.
+
+- **Rodada 2: APROVADO.** O `run_all` deu 101/101, com a paridade 48/48. A QA conferiu os 6 problemas da rodada 1:
+  - o envio e o "Esperar um dia" só com o teclado (PgDn, setas e E), com o save gravado;
+  - o ferido que não sara, em 300 campanhas;
+  - a semente estável na campanha nova, no save antigo e no save sem o campo;
+  - os pinos livres em 200 dias;
+  - a captura desligada: 0 em 300 envios.
+
+  Das baixas, o texto do "Esperar um dia" agora muda com ninguém em missão (só caídos). Ficam como estavam:
+  - a dica do rodapé, que não cita PgUp/PgDn;
+  - o "Equipe: N vivos" do cabeçalho;
+  - a mensagem da noite pendente ao mandar ("antes de partir"), que a tela não alcança.
