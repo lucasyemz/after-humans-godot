@@ -2020,8 +2020,8 @@ msgid "Partir"
 msgstr "Depart"
 
 #: scripts/ui/refuge_hud.gd:2791
-msgid "Próximo dia (equipe de 4)"
-msgstr "Next day (team of 4)"
+msgid "Próxima expedição (equipe de 4)"
+msgstr "Next expedition (team of 4)"
 
 #: scripts/ui/refuge_hud.gd:2795
 msgid "%d no estoque"
@@ -2067,8 +2067,8 @@ msgid "a equipe e os moradores bebem %d"
 msgstr "the team and the residents drink %d"
 
 #: scripts/ui/refuge_hud.gd:2807
-msgid "A água vai faltar no próximo dia."
-msgstr "Water will run out on the next day."
+msgid "A água vai faltar na próxima expedição."
+msgstr "Water will run out on the next expedition."
 
 #: scripts/ui/refuge_hud.gd:2810
 #: scripts/ui/refuge_hud.gd:3507
@@ -2498,8 +2498,8 @@ msgid "Pedido"
 msgstr "Request"
 
 #: scripts/ui/refuge_hud.gd:3504
-msgid "No próximo dia"
-msgstr "On the next day"
+msgid "Na próxima expedição"
+msgstr "On the next expedition"
 
 #: scripts/ui/refuge_hud.gd:3505
 msgid "Suprimentos depois da noite"
@@ -4177,13 +4177,13 @@ msgstr "! %d over %d"
 
 #: scripts/flow/station_rules.gd:457
 #: scripts/flow/station_rules.gd:467
-msgid "! Falta no próximo dia"
-msgstr "! Short on the next day"
+msgid "! Falta na próxima expedição"
+msgstr "! Short on the next expedition"
 
 #: scripts/flow/station_rules.gd:459
 #: scripts/flow/station_rules.gd:467
-msgid "Próximo dia: %d"
-msgstr "Next day: %d"
+msgid "Próxima expedição: %d"
+msgstr "Next expedition: %d"
 
 #: scripts/flow/station_rules.gd:462
 msgid "COMIDA"
@@ -4194,8 +4194,8 @@ msgid "%d / %d suprimentos"
 msgstr "%d / %d supplies"
 
 #: scripts/flow/station_rules.gd:464
-msgid "Estoque e capacidade do Depósito. No próximo dia, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d."
-msgstr "Storeroom stock and capacity. On the next day, with no loot: +%d from the Canteen, %d for the residents, %d spoil, %d for the night; %d left."
+msgid "Estoque e capacidade do Depósito. Na próxima expedição, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d."
+msgstr "Storeroom stock and capacity. On the next expedition, with no loot: +%d from the Canteen, %d for the residents, %d spoil, %d for the night; %d left."
 
 #: scripts/flow/station_rules.gd:466
 msgid "ÁGUA"
@@ -4206,8 +4206,8 @@ msgid "%d em estoque"
 msgstr "%d in stock"
 
 #: scripts/flow/station_rules.gd:468
-msgid "No próximo dia, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto."
-msgstr "On the next day, with no loot: the collector adds %d and the team and residents drink %d; %d left. Without water, rest lowers instinct less."
+msgid "Na próxima expedição, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto."
+msgstr "On the next expedition, with no loot: the collector adds %d and the team and residents drink %d; %d left. Without water, rest lowers instinct less."
 
 #: scripts/flow/station_rules.gd:470
 msgid "ENERGIA"
@@ -4262,24 +4262,24 @@ msgid "Melhorias de classe com fragmentos. Gasta 1 de energia."
 msgstr "Class upgrades with fragments. Uses 1 power."
 
 #: scripts/flow/station_rules.gd:499
-msgid "Sem camas: a equipe dorme no chão depois de cada dia. Com os beliches, cabem %d ajudantes."
-msgstr "No beds: the team sleeps on the floor after each day. With bunks, it fits %d helpers."
+msgid "Sem camas: a equipe dorme no chão depois de cada expedição. Com os beliches, cabem %d ajudantes."
+msgstr "No beds: the team sleeps on the floor after each expedition. With bunks, it fits %d helpers."
 
 #: scripts/flow/station_rules.gd:500
-msgid "Beliches de ferro: a equipe dorme neles depois de cada dia. Cabem %d ajudantes."
-msgstr "Iron bunks: the team sleeps in them after each day. It fits %d helpers."
+msgid "Beliches de ferro: a equipe dorme neles depois de cada expedição. Cabem %d ajudantes."
+msgstr "Iron bunks: the team sleeps in them after each expedition. It fits %d helpers."
 
 #: scripts/flow/station_rules.gd:502
 msgid "Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa."
 msgstr "Empty hall. Restored, it becomes a place to talk and take a break."
 
 #: scripts/flow/station_rules.gd:505
-msgid "Cantina construída: com energia, produz %d suprimentos por expedição."
-msgstr "Built Canteen: with power, makes %d supplies per expedition."
+msgid "Cantina construída: com energia, produz %d suprimentos por dia."
+msgstr "Built Canteen: with power, makes %d supplies per day."
 
 #: scripts/flow/station_rules.gd:506
-msgid "Com energia, produz 2 suprimentos por expedição."
-msgstr "With power, makes 2 supplies per expedition."
+msgid "Com energia, produz 2 suprimentos por dia."
+msgstr "With power, makes 2 supplies per day."
 
 #: scripts/flow/station_rules.gd:508
 msgid "Guarda até 12 suprimentos; o excesso estraga a cada dia."
@@ -4698,12 +4698,12 @@ msgid "%s: %s Entregue, %s."
 msgstr "%s: %s Delivered, %s."
 
 #: scripts/flow/station_rules.gd:2119
-msgid "Água: %d na estação; a equipe bebe %d no próximo dia e vai faltar."
-msgstr "Water: %d at the Station; the team drinks %d on the next day and it will run short."
+msgid "Água: %d na estação; a equipe bebe %d na próxima expedição e vai faltar."
+msgstr "Water: %d at the Station; the team drinks %d on the next expedition and it will run short."
 
 #: scripts/flow/station_rules.gd:2120
-msgid "Água: %d na estação, %d depois do próximo dia."
-msgstr "Water: %d at the Station, %d after the next day."
+msgid "Água: %d na estação, %d depois da próxima expedição."
+msgstr "Water: %d at the Station, %d after the next expedition."
 
 #: scripts/flow/station_rules.gd:2123
 msgid "Sucata para relíquias e melhorias."
@@ -8856,8 +8856,8 @@ msgid "Feche a Sala"
 msgstr "Close the Room"
 
 #. tutorial.station_tour.dormitory.Text
-msgid "O Dormitório: depois de cada dia a equipe dorme ali, come e recupera vida e instinto antes de sair de novo."
-msgstr "The Dormitory: after every day the team sleeps there, eats and recovers health and instinct before heading out again."
+msgid "O Dormitório: depois de cada expedição a equipe dorme ali, come e recupera vida e instinto antes de sair de novo."
+msgstr "The Dormitory: after every expedition the team sleeps there, eats and recovers health and instinct before heading out again."
 
 #. tutorial.station_tour.depart.Text
 msgid "Quando estiverem prontos, Preparar expedição abre o mapa: escolha o lugar, monte a equipe e parta. Abra para ver."

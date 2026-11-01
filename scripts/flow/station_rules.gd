@@ -454,18 +454,18 @@ static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
 	elif food > f.food_capacity:
 		food_note = TranslationServer.translate("! %d acima de %d") % [food - f.food_capacity, f.food_capacity]
 	elif food_short:
-		food_note = TranslationServer.translate("! Falta no próximo dia")
+		food_note = TranslationServer.translate("! Falta na próxima expedição")
 	else:
-		food_note = TranslationServer.translate("Próximo dia: %d") % f.food_after_night
+		food_note = TranslationServer.translate("Próxima expedição: %d") % f.food_after_night
 	var power_short: bool = not f.unpowered_rooms.is_empty()
 	return [
 		{"id": "food", "label": TranslationServer.translate("COMIDA"), "icon": "lobby-food", "value": TranslationServer.translate("%d / %d suprimentos") % [food, f.food_capacity],
 			"note": food_note, "warn": food_short or food > f.food_capacity,
-			"tip": TranslationServer.translate("Estoque e capacidade do Depósito. No próximo dia, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d.") % [
+			"tip": TranslationServer.translate("Estoque e capacidade do Depósito. Na próxima expedição, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d.") % [
 				f.food_produced, f.food_civilians, f.food_spoiled, f.food_night_need, f.food_after_night]},
 		{"id": "water", "label": TranslationServer.translate("ÁGUA"), "icon": "lobby-water", "value": TranslationServer.translate("%d em estoque") % f.water,
-			"note": TranslationServer.translate("! Falta no próximo dia") if f.thirsty else TranslationServer.translate("Próximo dia: %d") % f.water_after, "warn": f.thirsty,
-			"tip": TranslationServer.translate("No próximo dia, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto.") % [
+			"note": TranslationServer.translate("! Falta na próxima expedição") if f.thirsty else TranslationServer.translate("Próxima expedição: %d") % f.water_after, "warn": f.thirsty,
+			"tip": TranslationServer.translate("Na próxima expedição, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto.") % [
 				f.water_produced, f.water_consumed, f.water_after]},
 		{"id": "power", "label": TranslationServer.translate("ENERGIA"), "icon": "lobby-energy", "value": TranslationServer.translate("%d / %d em uso") % [f.power_used, f.power_capacity],
 			"note": (TranslationServer.translate("! %d %s sem energia") % [f.unpowered_rooms.size(), TranslationServer.translate("sala") if f.unpowered_rooms.size() == 1 else TranslationServer.translate("salas")]) if power_short \
@@ -496,14 +496,14 @@ static func _room_benefit(room_id: String, level: int) -> String:
 		DORMITORY:
 			# Sem camas no nível 1 (a equipe dorme no chão); os beliches chegam com a melhoria (#176).
 			if level <= 1:
-				return TranslationServer.translate("Sem camas: a equipe dorme no chão depois de cada dia. Com os beliches, cabem %d ajudantes.") % helper_limit_at(2)
-			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada dia. Cabem %d ajudantes.") % helper_limit_at(level)
+				return TranslationServer.translate("Sem camas: a equipe dorme no chão depois de cada expedição. Com os beliches, cabem %d ajudantes.") % helper_limit_at(2)
+			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada expedição. Cabem %d ajudantes.") % helper_limit_at(level)
 		BAR:
 			return TranslationServer.translate("Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa.") if level <= 0 else TranslationServer.translate("Um lugar para conversar e fazer uma pausa.")
 		CANTEEN:
 			if level >= 2:
-				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por expedição.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
-			return TranslationServer.translate("Com energia, produz 2 suprimentos por expedição.")
+				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por dia.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
+			return TranslationServer.translate("Com energia, produz 2 suprimentos por dia.")
 		DEPOT:
 			return TranslationServer.translate("Guarda até 12 suprimentos; o excesso estraga a cada dia.") if level <= 1 else TranslationServer.translate("Prateleiras extras: guarda até 20.")
 		PREPARATION:
@@ -2116,8 +2116,8 @@ static func focus_reason(campaign: Dictionary, focus_id: String, team: int = 4) 
 	var f := forecast(campaign, team)
 	match focus_id:
 		FOCUS_WATER:
-			return (TranslationServer.translate("Água: %d na estação; a equipe bebe %d no próximo dia e vai faltar.") % [f.water, f.water_consumed]) if f.thirsty \
-				else (TranslationServer.translate("Água: %d na estação, %d depois do próximo dia.") % [f.water, f.water_after])
+			return (TranslationServer.translate("Água: %d na estação; a equipe bebe %d na próxima expedição e vai faltar.") % [f.water, f.water_consumed]) if f.thirsty \
+				else (TranslationServer.translate("Água: %d na estação, %d depois da próxima expedição.") % [f.water, f.water_after])
 		FOCUS_PARTS:
 			var need := _needed_room(campaign)
 			return TranslationServer.translate("Sucata para relíquias e melhorias.") if need[0] == "" else TranslationServer.translate("Faltam %d sucatas para %s.") % [need[1], _room_the(need[0])]

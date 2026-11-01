@@ -379,6 +379,12 @@ func _vitals(t) -> void:
 	t.equal(vitals.map(func(v): return v.id), ["food", "water", "power"], "Comida, Água e Energia, nessa ordem")
 	var f := S.forecast(c, 4)
 	t.equal(vitals[0].value, "%d / %d suprimentos" % [f.food, f.food_capacity], "comida: estoque e capacidade")
+	# "Dia" no jogo todo: a previsão é de uma expedição (a conta da volta com a equipe e a noite), o que se produz e gasta
+	# conta por dia (o "Esperar um dia" também roda o ciclo) e o Dormitório é depois de cada expedição (só ela tem noite).
+	t.check(String(vitals[0].note).to_lower().contains("próxima expedição") and String(vitals[1].tip).begins_with("Na próxima expedição"),
+		"a previsão diz que é da próxima expedição (%s)" % vitals[0].note)
+	t.check(S.room_benefit(S.CANTEEN, 1).ends_with("por dia."), "a Cantina produz por dia (%s)" % S.room_benefit(S.CANTEEN, 1))
+	t.check(S.room_benefit(S.DORMITORY, 1).contains("depois de cada expedição"), "e a equipe dorme depois de cada expedição")
 	S.adjust(c, S.SUPPLIES, 20 - S.quantity(c, S.SUPPLIES))
 	t.equal(S.vitals(c, 4)[0].note, "! 8 acima de 12", "comida acima do Depósito avisa o excesso")
 	S.adjust(c, S.SUPPLIES, -S.quantity(c, S.SUPPLIES))

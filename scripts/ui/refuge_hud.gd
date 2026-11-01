@@ -2788,7 +2788,7 @@ func _close_departure() -> void:
 ## chip, em alerta só quando falta.
 func _canteen(c: Dictionary) -> void:
 	var f := S.forecast(c, 4)
-	_section(tr("Próximo dia (equipe de 4)"))
+	_section(tr("Próxima expedição (equipe de 4)"))
 	var food := _inset()
 	food.get_parent().name = "Supplies"
 	_resource_head(food, "lobby-food", tr("Suprimentos"))
@@ -2804,7 +2804,7 @@ func _canteen(c: Dictionary) -> void:
 		[tr("a equipe e os moradores bebem %d") % f.water_consumed, AHKit.TEXT]],
 		_chip("lobby-water", str(f.water_after), AHKit.alert_text() if f.thirsty else AHKit.TEXT)))
 	if f.thirsty:
-		water.add_child(_wrapped(tr("A água vai faltar no próximo dia."), "small", AHKit.alert_text(), false, BODY_WIDTH - 40.0))
+		water.add_child(_wrapped(tr("A água vai faltar na próxima expedição."), "small", AHKit.alert_text(), false, BODY_WIDTH - 40.0))
 	var power := _inset()
 	power.get_parent().name = "Power"
 	_resource_head(power, "lobby-energy", tr("Energia"))
@@ -3501,7 +3501,7 @@ func _train() -> void:
 	_trait_box("", tr("Pedido"), tr(who.need), AHKit.AMBER)
 	var before := S.forecast(c, 4)
 	var after := S.forecast_with(c, who.id, 4)
-	_section(tr("No próximo dia"))
+	_section(tr("Na próxima expedição"))
 	for spec in [[tr("Suprimentos depois da noite"), "lobby-food", before.food_after_night, after.food_after_night],
 			[tr("Água depois da noite"), "lobby-water", before.water_after, after.water_after],
 			[tr("Energia"), "lobby-energy", before.power_capacity, after.power_capacity]]:
