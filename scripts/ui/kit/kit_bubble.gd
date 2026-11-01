@@ -17,9 +17,10 @@ const STORY := "story"
 ## A largura máxima do texto (px de 1080, antes do texto Maior) e o número de linhas.
 const WIDTH := 340
 const MAX_LINES := 2
-## A room_tag tem a moldura até a linha 41 e a ponta embaixo, no meio (o recorte dela, em px da peça).
-const FRAME_ROWS := 41
-const TIP := Rect2(92, 41, 17, 11)
+## A room_tag tem a moldura até a linha 39 e a ponta embaixo, no meio, a partir da linha 40, com o friso âmbar onde ela
+## encaixa (o recorte dela, em px da peça): o pensamento, sem a ponta, fica sem o friso.
+const FRAME_ROWS := 40
+const TIP := Rect2(92, 40, 17, 12)
 ## As bolinhas do pensamento, da cabeça para cima: o raio e o deslocamento (px de 1080).
 const DOTS := [[3.0, Vector2(0, -4)], [4.5, Vector2(8, -15)], [6.0, Vector2(18, -30)]]
 const DOTS_HEIGHT := 40.0
@@ -107,7 +108,7 @@ func _ready() -> void:
 static func _frame_style() -> StyleBoxTexture:
 	var box := AHKit.style(AHKit.piece_of("tag", "room"))
 	box.region_rect = Rect2(0, 0, AHKit.entry("room_tag").size[0], FRAME_ROWS)
-	box.texture_margin_bottom = 9
+	box.texture_margin_bottom = 8
 	box.content_margin_left = 14
 	box.content_margin_right = 14
 	box.content_margin_top = 6

@@ -47,6 +47,8 @@ var _chat_left := 0.0
 ## A tirinha que o Próximo passo pediu (a conversa sai na hora e o balão fica até ser apertado).
 var story := ""
 var _story_wait := 0.0
+## Quem conversa na tirinha fica parado até ela acabar.
+var _held: Array = []
 ## A troca de cômodo em curso: {walker, id, from, to, phase, t, speed, x_from, x_to, lane_z, floor_to, z_door}.
 var trip := {}
 var _walk_left := 0.0
@@ -154,7 +156,7 @@ func _tick_talk(delta: float) -> void:
 
 ## Começa a conversa (ou o pensamento) escolhida: {row, ids, name}.
 func start_talk(chosen: Dictionary) -> void:
-	stop_talk()
+	_free_bubble()
 	talk = chosen.duplicate()
 	talk.index = 0
 	history[String(chosen.row.Name)] = Time.get_ticks_msec()
@@ -220,6 +222,11 @@ func _end_line() -> void:
 func stop_talk() -> void:
 	_free_bubble()
 	talk = {}
+	# Acabada a conversa da tirinha (lida, desistida ou interrompida), os dois voltam a passear.
+	for walker in _held:
+		if is_instance_valid(walker.get("card")) and is_inf(float(walker.get("wait", 0.0))):
+			walker.wait = rng.randf_range(1.0, 3.0)
+	_held = []
 
 
 func _free_bubble() -> void:
@@ -271,7 +278,11 @@ func play_story(comic: String) -> bool:
 		other.target = x
 		other.card.set_facing(-signf(side))
 		walkers[0].card.set_facing(signf(side))
+	# Os dois ficam parados, lado a lado, até a conversa acabar (não saem passeando no meio dela).
 	stop_talk()
+	for walker in walkers:
+		walker.wait = INF
+	_held = walkers
 	story = comic
 	_story_wait = 0.6
 	station.hud.focus_story_room(room)

@@ -397,6 +397,7 @@ func _story(station) -> void:
 			shown = true
 			break
 	t.check(shown, "a conversa chega ao balão interativo (com as falas desligadas)")
+	t.check(absf(bento.card.position.x - nick.card.position.x) <= 1.3, "e os dois continuam lado a lado durante a conversa")
 	Campaign.state.settings.station_chatter = true
 	if not shown:
 		return
@@ -421,6 +422,7 @@ func _story(station) -> void:
 		reader.advance()
 	await tree.process_frame
 	t.check(not hud.comic_open(), "o último quadro fecha a tirinha")
+	t.check(not is_inf(float(bento.wait)) and not is_inf(float(nick.wait)), "acabada a conversa, os dois voltam a passear")
 	t.check(C.comic_seen(Campaign.state, "bento_brother"), "lida até o fim, fica vista")
 	t.check(String(hud._next.get("action", "")) != "story", "e sai do Próximo passo")
 	var saved: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Campaign.primary_path()))
