@@ -1,0 +1,488 @@
+{
+  "source_tag": "codex-pr296-originals",
+  "source_folder": "art/station/source/station_grid_20261101",
+  "world_cell_m": [
+    6,
+    3.2
+  ],
+  "source_scale_to_runtime": 0.5,
+  "assets": {
+    "platform_rubble": {
+      "source": "illustrations/platform_rubble.png",
+      "prototype": "illustrations/platform_rubble.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "ba681242e071474a96cf95a6260fac192e6bad268b961064b2867edafb96eb67",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
+      "raw_source": "qa/raw/platform_rubble.png",
+      "safe_focus_xywh": [
+        120,
+        150,
+        960,
+        340
+      ],
+      "nine_slice_ltrb": null,
+      "suggested_runtime_path": "art/station/cards/buried/platform_rubble.webp"
+    },
+    "overturned_wagon": {
+      "source": "illustrations/overturned_wagon.png",
+      "prototype": "illustrations/overturned_wagon.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "8c28be30fba96f1ede012035a2da85af48e3e0b3d4a001e14eb1636dddce9d40",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
+      "raw_source": "qa/raw/overturned_wagon_r2.png",
+      "safe_focus_xywh": [
+        120,
+        150,
+        960,
+        340
+      ],
+      "nine_slice_ltrb": null,
+      "suggested_runtime_path": "art/station/cards/buried/overturned_wagon.webp"
+    },
+    "maintenance_machine": {
+      "source": "illustrations/maintenance_machine.png",
+      "prototype": "illustrations/maintenance_machine.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "888f7940c5fda93fa1c84da62fdf7a75845f69d9ebc0f0ddfa68b9f107d065ce",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
+      "raw_source": "qa/raw/maintenance_machine.png",
+      "safe_focus_xywh": [
+        120,
+        150,
+        960,
+        340
+      ],
+      "nine_slice_ltrb": null,
+      "suggested_runtime_path": "art/station/cards/buried/maintenance_machine.webp"
+    },
+    "exposed_cables": {
+      "source": "illustrations/exposed_cables.png",
+      "prototype": "illustrations/exposed_cables.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "2a0682698ed441ea2d68bdc7a42add78b9c06bec0bed20fc0bebda5fa3060340",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
+      "raw_source": "qa/raw/exposed_cables.png",
+      "safe_focus_xywh": [
+        120,
+        150,
+        960,
+        340
+      ],
+      "nine_slice_ltrb": null,
+      "suggested_runtime_path": "art/station/cards/buried/exposed_cables.webp"
+    },
+    "flooded_duct": {
+      "source": "illustrations/flooded_duct.png",
+      "prototype": "illustrations/flooded_duct.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "4778be11fb9039b821aa5b1d19ab6a9f07dad6d1a62b1e92ff25a03548524f65",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
+      "raw_source": "qa/raw/flooded_duct.png",
+      "safe_focus_xywh": [
+        120,
+        150,
+        960,
+        340
+      ],
+      "nine_slice_ltrb": null,
+      "suggested_runtime_path": "art/station/cards/buried/flooded_duct.webp"
+    },
+    "root_chamber": {
+      "source": "illustrations/root_chamber.png",
+      "prototype": "illustrations/root_chamber.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "9f55f470cc0a2cf60a2be0928012b0b597784e432f61550c52607f06fa0ca021",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
+      "raw_source": "qa/raw/root_chamber.png",
+      "safe_focus_xywh": [
+        120,
+        150,
+        960,
+        340
+      ],
+      "nine_slice_ltrb": null,
+      "suggested_runtime_path": "art/station/cards/buried/root_chamber.webp"
+    },
+    "frame_locked": {
+      "source": "frames/frame_locked.png",
+      "prototype": "frames/frame_locked.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "44f7746cb3430125e496d676f58c30cef74d3c836a59749ed45548b8ff991109",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Native painted border normalized by 9-slice; empty alpha center; text and badges remain runtime elements.",
+      "raw_source": "qa/raw/frames_sheet.png",
+      "raw_crop_xyxy": [
+        47,
+        56,
+        819,
+        415
+      ],
+      "source_nine_slice_ltrb": [
+        96,
+        96,
+        96,
+        96
+      ],
+      "nine_slice_ltrb": [
+        48,
+        48,
+        48,
+        48
+      ],
+      "content_xywh": [
+        24,
+        24,
+        552,
+        272
+      ],
+      "transparent_center": true,
+      "suggested_runtime_path": "art/ui/kit/station/excavation/frames/frame_locked.webp"
+    },
+    "frame_available": {
+      "source": "frames/frame_available.png",
+      "prototype": "frames/frame_available.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "51206ce62a18c00b8fafa44ded56a970ac142ebb94be31ac5f89d6ebf936ec41",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Native painted border normalized by 9-slice; empty alpha center; text and badges remain runtime elements.",
+      "raw_source": "qa/raw/frames_sheet.png",
+      "raw_crop_xyxy": [
+        898,
+        56,
+        1670,
+        415
+      ],
+      "source_nine_slice_ltrb": [
+        96,
+        96,
+        96,
+        96
+      ],
+      "nine_slice_ltrb": [
+        48,
+        48,
+        48,
+        48
+      ],
+      "content_xywh": [
+        24,
+        24,
+        552,
+        272
+      ],
+      "transparent_center": true,
+      "suggested_runtime_path": "art/ui/kit/station/excavation/frames/frame_available.webp"
+    },
+    "frame_neighbor": {
+      "source": "frames/frame_neighbor.png",
+      "prototype": "frames/frame_neighbor.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "4dda4df59fe0da3efff7369f6862f48346042c8197ae2d45f3a4a9f18f748579",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Native painted border normalized by 9-slice; empty alpha center; text and badges remain runtime elements.",
+      "raw_source": "qa/raw/frames_sheet.png",
+      "raw_crop_xyxy": [
+        47,
+        499,
+        819,
+        858
+      ],
+      "source_nine_slice_ltrb": [
+        96,
+        96,
+        96,
+        96
+      ],
+      "nine_slice_ltrb": [
+        48,
+        48,
+        48,
+        48
+      ],
+      "content_xywh": [
+        24,
+        24,
+        552,
+        272
+      ],
+      "transparent_center": true,
+      "suggested_runtime_path": "art/ui/kit/station/excavation/frames/frame_neighbor.webp"
+    },
+    "room_choice_card": {
+      "source": "frames/room_choice_card.png",
+      "prototype": "frames/room_choice_card.webp",
+      "source_canvas": [
+        1200,
+        640
+      ],
+      "runtime_canvas": [
+        600,
+        320
+      ],
+      "source_sha256": "b53c5102c3cb28d1035a71cb1af176ceac570d8029135f314b25a70d0a189213",
+      "anchor": [
+        0,
+        0
+      ],
+      "notes": "Native painted border normalized by 9-slice; empty alpha center; text and badges remain runtime elements.",
+      "raw_source": "qa/raw/frames_sheet.png",
+      "raw_crop_xyxy": [
+        897,
+        483,
+        1670,
+        858
+      ],
+      "source_nine_slice_ltrb": null,
+      "nine_slice_ltrb": null,
+      "content_xywh": [
+        24,
+        24,
+        552,
+        272
+      ],
+      "transparent_center": true,
+      "resize_policy": "fixed-aspect template; preserve aspect ratio; use existing kit plaque as an independent overlay if a variable-width header is needed",
+      "suggested_runtime_path": "art/ui/kit/station/excavation/frames/room_choice_card.webp"
+    },
+    "buried": {
+      "source": "icons/buried.png",
+      "prototype": "icons/buried.webp",
+      "source_canvas": [
+        192,
+        192
+      ],
+      "runtime_canvas": [
+        96,
+        96
+      ],
+      "source_sha256": "1093021c25bd873f5c1fe4220de8b85dff0df59ef6a99948e685f304b1c75ba1",
+      "anchor": [
+        96,
+        96
+      ],
+      "notes": "White tintable mask, centered in a 192 source / 96 runtime canvas; test at 22/32 px.",
+      "raw_source": "qa/raw/icons_sheet_r2.png",
+      "raw_crop_xyxy": [
+        207,
+        81,
+        654,
+        480
+      ],
+      "nine_slice_ltrb": null,
+      "tintable": true,
+      "suggested_runtime_path": "art/ui/kit/station/excavation/icons/buried.webp",
+      "runtime_anchor": [
+        48,
+        48
+      ],
+      "layout_anchor_top_left": [
+        0,
+        0
+      ]
+    },
+    "excavate": {
+      "source": "icons/excavate.png",
+      "prototype": "icons/excavate.webp",
+      "source_canvas": [
+        192,
+        192
+      ],
+      "runtime_canvas": [
+        96,
+        96
+      ],
+      "source_sha256": "a47a5523ffe23a3652f8254db4c27074b518c23fe292a248b57e7b311518cdad",
+      "anchor": [
+        96,
+        96
+      ],
+      "notes": "White tintable mask, centered in a 192 source / 96 runtime canvas; test at 22/32 px.",
+      "raw_source": "qa/raw/icons_sheet_r2.png",
+      "raw_crop_xyxy": [
+        900,
+        71,
+        1331,
+        482
+      ],
+      "nine_slice_ltrb": null,
+      "tintable": true,
+      "suggested_runtime_path": "art/ui/kit/station/excavation/icons/excavate.webp",
+      "runtime_anchor": [
+        48,
+        48
+      ],
+      "layout_anchor_top_left": [
+        0,
+        0
+      ]
+    },
+    "work_in_progress": {
+      "source": "icons/work_in_progress.png",
+      "prototype": "icons/work_in_progress.webp",
+      "source_canvas": [
+        192,
+        192
+      ],
+      "runtime_canvas": [
+        96,
+        96
+      ],
+      "source_sha256": "515da8a1da17c1d03dc21f8d793dc267a0f8f905c63f81f15fea7c1e5426d5f1",
+      "anchor": [
+        96,
+        96
+      ],
+      "notes": "White tintable mask, centered in a 192 source / 96 runtime canvas; test at 22/32 px.",
+      "raw_source": "qa/raw/icons_sheet_r2.png",
+      "raw_crop_xyxy": [
+        208,
+        579,
+        679,
+        933
+      ],
+      "nine_slice_ltrb": null,
+      "tintable": true,
+      "suggested_runtime_path": "art/ui/kit/station/excavation/icons/work_in_progress.webp",
+      "runtime_anchor": [
+        48,
+        48
+      ],
+      "layout_anchor_top_left": [
+        0,
+        0
+      ]
+    },
+    "choose_room": {
+      "source": "icons/choose_room.png",
+      "prototype": "icons/choose_room.webp",
+      "source_canvas": [
+        192,
+        192
+      ],
+      "runtime_canvas": [
+        96,
+        96
+      ],
+      "source_sha256": "cbf886cdd03bb10e14ed2600249f1420e7c29f64e1a7e6305aef962ba9ea5162",
+      "anchor": [
+        96,
+        96
+      ],
+      "notes": "White tintable mask, centered in a 192 source / 96 runtime canvas; test at 22/32 px.",
+      "raw_source": "qa/raw/icons_sheet_r2.png",
+      "raw_crop_xyxy": [
+        924,
+        573,
+        1327,
+        951
+      ],
+      "nine_slice_ltrb": null,
+      "tintable": true,
+      "suggested_runtime_path": "art/ui/kit/station/excavation/icons/choose_room.webp",
+      "runtime_anchor": [
+        48,
+        48
+      ],
+      "layout_anchor_top_left": [
+        0,
+        0
+      ]
+    }
+  }
+}
