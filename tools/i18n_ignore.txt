@@ -1779,6 +1779,14 @@ station_frame.gd: dig
 dig_board.gd: Blocks
 dig_board.gd: Name
 dig_board.gd: Pace
+dig_board.gd: Mark
+dig_board.gd: Painting
+dig_board.gd: Frame
+dig_board.gd: Card
+dig_board.gd: frame
+dig_board.gd: choice
+dig_board.gd: neighbor
+dig_board.gd: available
 dig_board.gd: reward
 dig_board.gd: Scrap
 dig_board.gd: Fragments
@@ -1793,7 +1801,6 @@ dig_board.gd: Floor_%d
 dig_board.gd: %d:%d
 dig_board.gd: Block_%s
 dig_board.gd: Art
-dig_board.gd: Ground
 dig_board.gd: Tag
 dig_board.gd: Action
 dig_board.gd: Reward
@@ -1801,7 +1808,6 @@ dig_board.gd: Alert
 dig_board.gd: buried
 dig_board.gd: Room_%s
 dig_board.gd: Stairs_%d
-dig_board.gd: Edge
 dig_board.gd: Bottom
 dig_board.gd: Details
 dig_board.gd: Note

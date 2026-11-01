@@ -2,20 +2,26 @@
 ## os três subsolos em corte, uma linha de cartões por andar (as sete vagas e o patamar), cada cartão com a moldura, a
 ## imagem do que está ali, o nome e o estado. O bloco que dá para escavar mostra a ação e a recompensa; o que depende do vizinho, a moldura e o
 ## aviso em vermelho. Embaixo, o bloco escolhido, quem orienta e o botão grande (escavar, construir, abrir o cômodo).
-## As regras ficam no AHStationGrid; os nomes e as imagens (um recorte das peças de art/scenarios até a arte da #275), em
-## data/station-grid.json (block_looks).
+## As regras ficam no AHStationGrid; os nomes e as pinturas (as seis da #275, revisão r2 do #296), em
+## data/station-grid.json (block_looks). A moldura de cada estado (bloqueado, liberado, depende do vizinho, vaga livre) e
+## os ícones são do kit (art/ui/kit/station/assets.json, as peças dig_*).
 class_name AHDigBoard
 extends Control
 
 ## Entre a barra do alto e as teclas de baixo (a moldura da Estação fica: os recursos, as abas e VOLTAR).
 const PANEL := Rect2(28, 104, 1864, 808)
 const LABEL_WIDTH := 132.0
-const CARD := Vector2(196, 172)
+const CARD := Vector2(196, 184)
 const GAP := 6.0
-const ART_HEIGHT := 56.0
-const SCENARIOS := "res://art/scenarios/%s.webp"
+## A pintura com a moldura, na largura do cartão (mais baixa que as peças, 600×320: a moldura entra pelo 9-slice na
+## escala do cartão, e a pintura é recortada no meio, sem esticar). Assim os três subsolos cabem no Normal.
+const ART_HEIGHT := 70.0
+const CARDS := "res://art/station/cards/buried/%s.webp"
+## A moldura de cada estado do cartão (as peças do kit).
+const FRAMES := {"locked": "dig_frame_locked", "available": "dig_frame_available", "neighbor": "dig_frame_neighbor",
+	"choice": "dig_room_choice_card"}
 
-## As imagens já carregadas (abrir a planta de novo não decodifica as peças outra vez).
+## As pinturas já carregadas (abrir a planta de novo não decodifica as peças outra vez).
 static var _textures := {}
 
 ## O HUD da Estação (as ações passam por ele: _act, open_room, close_panel).
@@ -39,7 +45,7 @@ func _ready() -> void:
 	rebuild()
 
 
-## O que cada bloco mostra: {Name, Art, Ground} (data/station-grid.json, block_looks).
+## O que cada bloco mostra: {Name, Card} (data/station-grid.json, block_looks).
 static func look(key: String) -> Dictionary:
 	var blocks: Dictionary = AHStationGrid.rule("block_looks").get("Blocks", {})
 	return blocks.get(key, {})
@@ -59,16 +65,19 @@ static func block_label(key: String) -> String:
 	return TranslationServer.translate(name) if name != "" else AHRefugeHud.block_title(key)
 
 
-## O que o cartão diz: {state, tag, action, reward, alert}. state: "room", "free", "front", "dig" ou "buried".
+## O que o cartão diz: {state, frame, tag, action, reward, alert}. state: "room", "free", "front", "dig" ou "buried";
+## frame: a moldura (FRAMES): "choice" na vaga livre, "available" no que dá para escavar e na frente, "neighbor" no que
+## depende do vizinho e "locked" no que depende da escada.
 static func card_info(c: Dictionary, key: String) -> Dictionary:
 	var info := AHRefugeHud.block_info(c, key)
-	var out := {"state": info.state, "tag": "", "action": "", "reward": "", "alert": ""}
+	var out := {"state": info.state, "frame": "available", "tag": "", "action": "", "reward": "", "alert": ""}
 	var least := AHStationGrid.finds_text({"scrap": int(AHStationGrid.block_rule(key).get("Scrap", 0)),
 		"fragments": int(AHStationGrid.block_rule(key).get("Fragments", 0))})
 	# No cartão, curta; a frase inteira ("às vezes um achado", como no painel do bloco) fica no escolhido.
 	var reward := TranslationServer.translate("Rende %s") % least if least != "" else ""
 	match String(info.state):
 		"free":
+			out.frame = "choice"
 			out.tag = TranslationServer.translate("Vaga livre")
 			out.action = String(info.mark)
 		"front":
@@ -83,8 +92,9 @@ static func card_info(c: Dictionary, key: String) -> Dictionary:
 		_:
 			out.tag = TranslationServer.translate("(BLOQUEADO)")
 			# No cartão, curto; o motivo inteiro fica embaixo, no escolhido.
-			out.alert = TranslationServer.translate("Depende da escada") if neighbor_reason(c, key) != TranslationServer.translate("Escave o bloco vizinho para liberar") \
-				else TranslationServer.translate("Depende do vizinho")
+			var stairs := neighbor_reason(c, key) != TranslationServer.translate("Escave o bloco vizinho para liberar")
+			out.frame = "locked" if stairs else "neighbor"
+			out.alert = TranslationServer.translate("Depende da escada") if stairs else TranslationServer.translate("Depende do vizinho")
 	return out
 
 
@@ -208,21 +218,29 @@ func _block_card(c: Dictionary, key: String) -> Button:
 	var box := _card_box(card)
 	var looks := look(key)
 	var buried: bool = info.state != "free"
-	box.add_child(_art(String(looks.get("Art", "")), String(looks.get("Ground", "")), info.state))
+	box.add_child(_art(String(looks.get("Card", "")) if buried else "", String(info.frame), info.state))
 	var name := AHKit.label(block_label(key) if buried else AHRefugeHud.block_title(key), "small", AHKit.TEXT, true)
 	name.name = "Name"
-	name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	name.max_lines_visible = 2
+	# Uma linha no Normal, para os três subsolos caberem; no Maior a grade rola de qualquer jeito, e o nome vai em até
+	# duas. O nome inteiro fica na dica e embaixo, no escolhido.
 	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	if AHUiStyle.text_scale > 1.0:
+		name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name.max_lines_visible = 2
+	else:
+		name.clip_text = true
 	name.custom_minimum_size = Vector2(CARD.x - 28.0, 0)
 	box.add_child(name)
 	# O aviso vermelho, cortado no Maior, vai inteiro na dica.
 	card.tooltip_text = name.text if String(info.alert) == "" else name.text + "\n" + neighbor_reason(c, key)
 	var tone: Color = AHKit.AMBER if info.state == "front" else (AHKit.good() if info.state in ["free", "dig"] else AHKit.MUTED)
-	var tag := AHKit.label(String(info.tag), "small", tone, true, true)
-	tag.name = "Tag"
-	box.add_child(tag)
-	for part in [["Action", info.action, AHKit.AMBER if info.state == "front" else AHKit.TEXT], ["Reward", info.reward, AHKit.MUTED],
+	# Três linhas debaixo da pintura: o nome, o estado e o que fazer. O que dá para escavar dispensa a etiqueta (a moldura
+	# liberada e a ação dizem); a frente deixa a recompensa para embaixo, no escolhido.
+	if info.state != "dig":
+		var tag := AHKit.label(String(info.tag), "small", tone, true, true)
+		tag.name = "Tag"
+		box.add_child(tag)
+	for part in [["Action", info.action, AHKit.AMBER if info.state == "front" else AHKit.TEXT], ["Reward", info.reward if info.state == "dig" else "", AHKit.MUTED],
 			["Alert", info.alert, AHKit.alert_text()]]:
 		if String(part[1]) == "":
 			continue
@@ -233,10 +251,8 @@ func _block_card(c: Dictionary, key: String) -> Button:
 		line.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		line.custom_minimum_size = Vector2(CARD.x - 28.0, 0)
 		box.add_child(line)
-	# A moldura do estado: vermelha no que depende do vizinho, âmbar na frente, clara no que dá para escavar.
-	var edge: Color = {"buried": AHKit.alert_text(), "front": AHKit.AMBER, "dig": AHKit.good(), "free": AHKit.good()}.get(info.state, AHKit.MUTED)
-	_frame(card, edge, 3 if info.state in ["buried", "front"] else 2)
 	card.set_meta("state", info.state)
+	card.set_meta("frame", info.frame)
 	_grow(card, box)
 	return card
 
@@ -246,7 +262,7 @@ func _room_card(room_id: String, span: int) -> Button:
 	var width := CARD.x * span + GAP * (span - 1)
 	var card := _card_button("Room_%s" % room_id, "room:" + room_id, width)
 	var box := _card_box(card)
-	var icon := AHKit.glyph(AHRefugeHud.ROOM_ICONS.get(room_id, "station"), ART_HEIGHT - 20.0, AHKit.TEXT)
+	var icon := AHKit.glyph(AHRefugeHud.ROOM_ICONS.get(room_id, "station"), 52.0, AHKit.TEXT)
 	icon.custom_minimum_size = Vector2(width - 28.0, ART_HEIGHT)
 	box.add_child(icon)
 	var name := AHKit.label(tr(AHStationRules.room_def(room_id).name), "small", AHKit.TEXT, true, true)
@@ -312,54 +328,81 @@ func _card_box(card: Button) -> VBoxContainer:
 	return box
 
 
-## A imagem do bloco: o fundo recortado e a peça por cima, mais escura no que ainda não dá para escavar.
-func _art(art: String, ground: String, state: String) -> Control:
+## A pintura do bloco com a moldura do estado por cima. A moldura entra pelo 9-slice das peças (48 de 600) na escala do
+## cartão; a pintura, dentro dela, recortada no meio (sem esticar). A pintura já vem esmaecida (r2 do #296): nenhum véu
+## a mais. A vaga livre mostra o cartão de escolher cômodo inteiro (proporção fixa, sem esticar a plaqueta), com o ícone
+## da planta; a frente, a marca da obra no canto.
+func _art(card_id: String, frame: String, state: String) -> Control:
 	var holder := Control.new()
 	holder.name = "Art"
-	holder.custom_minimum_size = Vector2(CARD.x - 28.0, ART_HEIGHT)
+	var area := Vector2(CARD.x - 28.0, ART_HEIGHT)
+	holder.custom_minimum_size = area
 	holder.clip_contents = true
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for spec in [[ground, TextureRect.STRETCH_KEEP_ASPECT_COVERED], [art, TextureRect.STRETCH_KEEP_ASPECT_CENTERED]]:
-		if String(spec[0]) == "" or not ResourceLoader.exists(SCENARIOS % spec[0]):
-			continue
-		var rect := TextureRect.new()
-		rect.texture = texture_of(String(spec[0]))
-		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		rect.stretch_mode = spec[1]
-		rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-		if spec[1] == TextureRect.STRETCH_KEEP_ASPECT_CENTERED:
-			rect.offset_left = 6
-			rect.offset_top = 6
-			rect.offset_right = -6
-			rect.offset_bottom = -4
-		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		holder.add_child(rect)
+	var scale := area.x / 600.0
+	if frame == "choice":
+		var card := _fill(AHKit.texture(FRAMES.choice))
+		card.name = "Frame"
+		card.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		holder.add_child(card)
+	else:
+		if card_id != "" and ResourceLoader.exists(CARDS % card_id):
+			var painting := _fill(texture_of(card_id))
+			painting.name = "Painting"
+			painting.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			# Dentro da moldura (o recuo de content_xywh, 24 de 600).
+			var inset := 24.0 * scale
+			painting.offset_left = inset
+			painting.offset_top = inset
+			painting.offset_right = -inset
+			painting.offset_bottom = -inset
+			holder.add_child(painting)
+		var piece: String = FRAMES.get(frame, FRAMES.available)
+		var edge := NinePatchRect.new()
+		edge.name = "Frame"
+		edge.texture = AHKit.texture(piece)
+		var slice: Array = AHKit.entry(piece).get("nine_slice_ltrb", [48, 48, 48, 48])
+		edge.patch_margin_left = slice[0]
+		edge.patch_margin_top = slice[1]
+		edge.patch_margin_right = slice[2]
+		edge.patch_margin_bottom = slice[3]
+		edge.size = area / scale
+		edge.scale = Vector2(scale, scale)
+		edge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.add_child(edge)
+	var mark := ""
 	if state == "free":
-		holder.modulate = AHKit.DIM
-	elif state == "buried":
-		holder.modulate = AHKit.FALLEN
+		mark = "dig_choose_room"
+	elif state == "front":
+		mark = "dig_work_in_progress"
+	if mark != "":
+		var side := 30.0 if state == "free" else 22.0
+		var glyph := AHKit.glyph(mark, side, AHKit.AMBER)
+		glyph.name = "Mark"
+		# A vaga livre: no meio, abaixo da plaqueta; a frente: no canto de cima, dentro da moldura (depois da borda de 48 e
+		# do recuo de 24, de 600), sem cobrir a cantoneira âmbar.
+		var inner := (48.0 + 6.0) * scale
+		glyph.position = Vector2((area.x - side) / 2.0, area.y * 0.42) if state == "free" else Vector2(inner + 4.0, inner)
+		glyph.size = Vector2(side, side)
+		holder.add_child(glyph)
 	return holder
 
 
-## A peça de art/scenarios, carregada uma vez.
-static func texture_of(file: String) -> Texture2D:
-	if not _textures.has(file):
-		_textures[file] = load(SCENARIOS % file)
-	return _textures[file]
+func _fill(texture: Texture2D) -> TextureRect:
+	var rect := TextureRect.new()
+	rect.texture = texture
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_SCALE
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return rect
 
 
-## A moldura do estado, por cima do cartão.
-func _frame(card: Button, color: Color, width: int) -> void:
-	var frame := Panel.new()
-	frame.name = "Edge"
-	frame.add_theme_stylebox_override("panel", AHKit.outline(color, width))
-	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
-	frame.offset_left = 4
-	frame.offset_top = 4
-	frame.offset_right = -4
-	frame.offset_bottom = -4
-	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(frame)
+## A pintura de art/station/cards/buried, carregada uma vez.
+static func texture_of(card_id: String) -> Texture2D:
+	if not _textures.has(card_id):
+		_textures[card_id] = load(CARDS % card_id)
+	return _textures[card_id]
 
 
 ## O botão não cresce com o que tem dentro: a altura segue o texto (o Maior quebra mais linhas).
@@ -422,14 +465,17 @@ func _bottom(c: Dictionary, column: VBoxContainer) -> void:
 				action.pressed.connect(func(): hud.open_from_board(AHRefugeHud.block_place(key)))
 			"front":
 				action.text = tr("É a frente de escavação").to_upper()
+				action.icon = AHKit.icon("dig_work_in_progress")
 			"dig":
 				action.text = tr("Escavar este bloco").to_upper()
+				action.icon = AHKit.icon("dig_excavate")
 				action.disabled = false
 				action.pressed.connect(func():
 					hud._act(AHStationGrid.set_dig_target(Campaign.state, key), tr("Escavação: a frente agora é %s.") % AHStationGrid.block_name(key))
 					rebuild())
 			_:
 				action.text = tr("Ainda bloqueado").to_upper()
+				action.icon = AHKit.icon("dig_buried")
 	bar.add_child(details)
 	bar.add_child(action)
 	AHStationReport.fit_key(action, 52.0)

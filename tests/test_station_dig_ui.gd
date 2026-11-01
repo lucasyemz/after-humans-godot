@@ -275,12 +275,15 @@ func _board(station) -> void:
 	var hud: AHRefugeHud = station.hud
 	var looks: Dictionary = G.rule("block_looks").get("Blocks", {})
 	t.equal(looks.keys().size(), G.block_keys().size(), "cada bloco tem o seu nome e a sua imagem")
-	var pairs := {}
+	# As seis pinturas da #275 (r2 do #296): cada bloco usa uma, e todas aparecem na planta.
+	var used := {}
 	for key in looks:
 		var entry: Dictionary = looks[key]
-		pairs["%s+%s" % [entry.Art, entry.Ground]] = true
-		t.check(ResourceLoader.exists(AHDigBoard.SCENARIOS % entry.Art) and ResourceLoader.exists(AHDigBoard.SCENARIOS % entry.Ground), "%s: as peças existem" % key)
-	t.equal(pairs.size(), looks.size(), "nenhum bloco repete a imagem de outro")
+		used[entry.Card] = true
+		t.check(ResourceLoader.exists(AHDigBoard.CARDS % entry.Card), "%s: a pintura %s existe" % [key, entry.Card])
+	t.equal(used.keys().size(), 6, "as seis pinturas da #275 aparecem na planta")
+	for frame in AHDigBoard.FRAMES.values():
+		t.check(AHKit.texture(frame) != null, "a moldura %s está no kit" % frame)
 	var c: Dictionary = Campaign.state
 	c.station.grid.landings[0] = false
 	c.station.grid.target = ""
@@ -296,11 +299,16 @@ func _board(station) -> void:
 		t.check(board.find_child("Floor_%d" % floor_number, true, false) != null, "o %dº subsolo em cartões" % floor_number)
 	var deep: Button = board.find_child("Block_2_4", true, false)
 	t.check(deep != null and deep.get_meta("state", "") == "buried", "o 2º subsolo, preso ao patamar")
+	t.equal(deep.get_meta("frame", "") if deep else "", "locked", "preso ao patamar: a moldura de bloqueado")
+	var art := deep.find_child("Art", true, false) if deep else null
+	t.check(art != null and art.find_child("Painting", true, false) != null and art.find_child("Frame", true, false) != null,
+		"a pintura do bloco com a moldura por cima")
 	var alert: Label = deep.find_child("Alert", true, false) if deep else null
 	t.check(alert != null and alert.text == tr("Depende da escada"), "em vermelho, o motivo curto (%s)" % (alert.text if alert else ""))
 	t.check(deep != null and deep.find_child("Name", true, false).text == tr(String(looks["2:4"].Name)), "o nome do que está no bloco")
 	var landing: Button = board.find_child("Block_L2", true, false)
 	t.check(landing != null and landing.get_meta("state", "") == "dig", "o patamar dá para escavar")
+	t.equal(landing.get_meta("frame", "") if landing else "", "available", "o que dá para escavar: a moldura liberada")
 	var reward: Label = landing.find_child("Reward", true, false) if landing else null
 	t.check(reward != null and reward.text.begins_with(tr("Rende %s").get_slice("%", 0)), "com a recompensa à vista")
 	var act: Label = landing.find_child("Action", true, false) if landing else null
@@ -314,17 +322,36 @@ func _board(station) -> void:
 	await _frames(3)
 	var action: Button = hud._dig_board.find_child("BigAction", true, false)
 	t.check(action != null and not action.disabled, "escolhido, o botão grande escava")
+	t.check(action != null and action.icon == AHKit.icon("dig_excavate") and action.icon != null, "com o ícone de escavar da #275")
 	var full: Label = hud._dig_board.find_child("RewardNote", true, false)
 	t.check(full != null and full.text.contains(tr("às vezes")), "embaixo, a recompensa por extenso, com o às vezes do painel")
 	# Interagir de novo no escolhido aciona o botão grande (como a tecla dele promete).
 	hud._dig_board.find_child("Block_L2", true, false).pressed.emit()
 	await _frames(3)
 	t.equal(G.dig_target(Campaign.state), "L2", "e o patamar vira a frente")
+	var front: Button = hud._dig_board.find_child("Block_L2", true, false)
+	var work_mark := front.find_child("Mark", true, false) as TextureRect if front else null
+	t.check(front != null and front.get_meta("frame", "") == "available" and work_mark != null and work_mark.texture == AHKit.icon("dig_work_in_progress"),
+		"a frente: a moldura liberada e a marca da obra")
+	# Uma vaga livre (a 1:1 aberta), para ver o cartão de escolher cômodo.
+	var first: String = Campaign.state.station.grid.cells[0][0]
+	Campaign.state.station.grid.cells[0][0] = "free"
+	hud._dig_board.rebuild()
+	await _frames(2)
+	var free: Button = hud._dig_board.find_child("Block_1_1", true, false)
+	if t.check(free != null and free.get_meta("state", "") == "free", "a vaga livre na planta"):
+		var choose := free.find_child("Mark", true, false) as TextureRect
+		t.check(free.get_meta("frame", "") == "choice" and choose != null and choose.texture == AHKit.icon("dig_choose_room") and free.find_child("Painting", true, false) == null,
+			"a vaga livre: o cartão de escolher cômodo, com o ícone da planta e sem pintura")
+	Campaign.state.station.grid.cells[0][0] = first
+	hud._dig_board.rebuild()
+	await _frames(2)
 	deep = hud._dig_board.find_child("Block_2_4", true, false)
 	deep.pressed.emit()
 	await _frames(3)
 	action = hud._dig_board.find_child("BigAction", true, false)
 	var note: Label = hud._dig_board.find_child("Note", true, false)
+	t.check(action != null and action.icon != null and action.icon == AHKit.icon("dig_buried"), "o bloco preso: o ícone de soterrado no botão")
 	t.check(action != null and action.disabled and note != null and note.text == tr("Escave a escada deste andar para liberar"),
 		"o bloco preso não escava, com o motivo inteiro embaixo")
 	var details: Button = hud._dig_board.find_child("Details", true, false)

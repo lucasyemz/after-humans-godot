@@ -113,8 +113,8 @@ esquerda e o depois à direita.
 
 ## Em aberto
 
-- **A arte (#275):** os ícones de soterrado e de escavar, a marca do progresso da obra e o cartão de escolher o cômodo.
-  Até lá, o cadeado do kit e a barra de ferrugem.
+- **A arte (#275):** entrou na planta (seção "A arte da #275"). Os marcadores da vista geral e o painel do bloco ainda usam
+  o cadeado do kit e a barra de ferrugem.
 - **A barra da obra:** o texto em cima do preenchimento laranja fica com pouco contraste. Vale rever com a arte da #275.
 
 ## Escavar e construir: a planta em cartões (pedido do Lucas de 01/11)
@@ -147,8 +147,45 @@ esquerda e o depois à direita.
   - combinam com os achados de cada andar (o banco partido no 1º subsolo, o painel de controle no 2º, o armário de ferramentas e as raízes no 3º);
   - não prometem mecânica nova.
 - **O teclado e o controle:** as setas e o direcional andam entre os cartões, Interagir escolhe, e Interagir no escolhido aciona o botão grande (a tecla E / A dele). Fechar o painel aberto pela planta (Construir, Detalhes) volta para a planta.
-- **No Normal, os três andares cabem inteiros. No Maior, a grade rola.** O nome do bloco vai em até duas linhas; a ação e a recompensa, numa linha cada.
-- **Em aberto:** a imagem é uma faixa de 56 px no cartão; a arte da #275 pode pedir um cartão maior.
+- **No Normal, os três andares cabem inteiros. No Maior, a grade rola.** A arte da #275 (seção abaixo) mudou o cartão.
+
+## A arte da #275 (revisão r2 do #296)
+A arte aprovada pelo Lucas, com o ajuste de imagens menos destacadas, entra nos cartões da planta. Os originais estão na
+tag `codex-pr296-originals` (`c636b14`, revisão `r2-muted-background`), convertidos pelo `convert_webp.py` dela, que
+confere os hashes.
+
+![antes e depois: a arte da #275 nos cartões, no Normal e no Maior, e o bloco preso e a vaga livre escolhidos](station-grid-ui/art.jpg)
+
+- **As seis pinturas** ficam em `art/station/cards/buried/`. Cada bloco usa a que combina com o nome (`Card` em
+  `block_looks`, `data/station-grid.json`):
+  - o 1º subsolo e a escada soterrada (L2, logo abaixo da plataforma) mostram os escombros da plataforma;
+  - o painel, os cabos e a caixa de força mostram os cabos;
+  - o vagão e os barris mostram o vagão;
+  - a máquina, o armário e o desmoronamento mostram a máquina;
+  - o encanamento e o duto mostram o duto;
+  - as raízes, os escombros com raízes, a galeria e a escada de serviço (L3) mostram as raízes.
+
+  **Para o Lucas:** três blocos não têm pintura própria entre as seis: os barris (2:6), o desmoronamento (3:7) e as
+  escadas (L2 e L3). Eles usam a pintura mais próxima do lugar. Os caminhos são trocar o nome do bloco para combinar com
+  a pintura ou pedir pinturas para eles ao Codex.
+
+  As pinturas já vêm esmaecidas, e o jogo não soma outro véu.
+- **As molduras de estado** são peças do kit: `dig_frame_*` e `dig_room_choice_card` em `art/ui/kit/station/assets.json`.
+  - liberada (dá para escavar e a frente);
+  - depende do vizinho (trilho interrompido, hachura vermelha);
+  - bloqueada (depende da escada).
+
+  A moldura entra pelo 9-slice (48 de 600) na escala do cartão, e a pintura é recortada no meio, sem esticar. Assim os
+  três subsolos cabem no Normal.
+- **A vaga livre** mostra o cartão de escolher cômodo inteiro (proporção fixa, sem esticar a plaqueta), com o ícone da
+  planta.
+- **A frente** tem a marca da obra no canto, dentro da moldura.
+- **Os ícones** (`dig_*`, no manifesto do kit): a marca da obra também vai no botão grande da frente, o de escavar no
+  botão de escavar este bloco e o de soterrado no do bloco ainda preso.
+- **Os textos continuam da HUD.** O cartão tem três linhas debaixo da pintura: o nome, o estado e o que fazer. O nome
+  vai em uma linha no Normal e em até duas no Maior; inteiro, fica na dica e embaixo, no escolhido. A recompensa da frente também fica embaixo.
+- **O que não entrou:** o protótipo do Codex projetava os cartões sobre o corte da Estação. A planta do #284, já aprovada
+  pelo Lucas, continua no painel.
 
 ## Em dias (pedido do Lucas no #284)
 A escavação conta em **dias**, não em voltas: "Escavar · 2 dias", "1 de 3 · 2 dias", "abre em 2 dias" e "A comunidade cava 1 ponto por dia". Um dia é o de uma expedição: o "Esperar um dia" na Estação continua sem cavar, como na regra da #186, e a planta diz isso no alto, ao lado do ritmo.
