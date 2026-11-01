@@ -7,7 +7,8 @@ paradas no PR #231 (tag `codex-pr231-originals`). Pela decisão do Lucas de 01/1
 
 ## O que entra
 
-- **A ferramenta:** `tools/sync_combat_art.py --recruits-redraw` (e o mesmo passo na conversão completa).
+- **A ferramenta:** `tools/sync_combat_art.py --recruits-redraw` (e o mesmo passo na conversão completa). O modo
+  reaplica as poses da #221 em seguida e pede as fontes das duas tags (`codex-pr229-originals` e `codex-pr231-originals`).
   - Lê o contrato `docs/design/recruits_redraw/contract.json` e os PNG da tag.
   - Converte todas as poses que o jogo usa dos dois: o parado, os 4 golpes de cada um, o dano, a queda, a esquiva, o
     bloqueio e a pose nova de usar item. Usa o registro fixo do parado: o pé no mesmo ponto em todas.

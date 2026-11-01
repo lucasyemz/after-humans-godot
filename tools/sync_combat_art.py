@@ -20,7 +20,10 @@
   docs/design/recruits_redraw/contract.json e as fontes da tag codex-pr229-originals, no lugar da arte da web antiga.
   Os ícones das habilidades continuam os da web antiga. Sem a pasta da Unreal, só esta parte:
       git archive codex-pr229-originals art/combat/source/recruits_redraw_20261028 | tar -x
+      git archive codex-pr231-originals art/combat/source/stances_20261028 | tar -x
       python tools/sync_combat_art.py --recruits-redraw
+  O modo também reaplica as poses de combate abaixo (a guarda dos dois e a exploração do Tatu), então pede as fontes
+  das duas tags.
 - As poses de combate (#221, a arte do Codex no PR #231): a guarda com as armas na mão de cada fundador e da skin
   Bento Ronda (combat_idle.webp, ao lado do idle, na mesma tela e com a mesma âncora), pelo contrato
   docs/design/stances/contract.json e as fontes da tag codex-pr231-originals; a guarda do Guaxinim e a exploração do
@@ -185,9 +188,12 @@ def redraw_recruits(source: Path = REDRAW_SOURCE) -> dict:
 
 
 def redraw_recruits_only(source: Path) -> None:
-    """Sem a pasta da Unreal: só o Guaxinim e o Tatu redesenhados, no manifesto que já existe."""
+    """Sem a pasta da Unreal: só o Guaxinim e o Tatu redesenhados, no manifesto que já existe. As poses da #221 vêm logo
+    depois, como na conversão completa: o redesenho troca a entrada inteira (sem o combat_idle) e o parado do Tatu de lá
+    é a guarda, que a #221 põe no combat_idle.webp, com a exploração nova no idle.webp."""
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     manifest["recruits"].update(redraw_recruits(source))
+    apply_stances(manifest)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
 
 
@@ -291,7 +297,9 @@ def stances(source: Path = STANCES_SOURCE, redraw: Path = REDRAW_SOURCE) -> dict
 
 
 def apply_stances(manifest: dict, source: Path = STANCES_SOURCE) -> None:
-    """Põe a guarda de cada herói e de cada recruta no manifesto (depois dos parados: o do Tatu muda)."""
+    """Põe a guarda de cada herói e de cada recruta no manifesto (depois dos parados: o do Tatu muda). A largura do
+    parado do Tatu fica a medida no redesenho (a guarda, a mais larga), de propósito: a fila se espaça pela pose mais
+    larga, e a exploração, mais estreita, cabe no mesmo lugar."""
     for actor_id, entry in stances(source).items():
         group = "heroes" if actor_id in manifest["heroes"] else "recruits"
         manifest[group][actor_id].update(entry)
