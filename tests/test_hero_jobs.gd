@@ -123,7 +123,7 @@ func _yields() -> void:
 	cao.perks = ["gloomy"]
 	t.equal(S.post_yield(cao, S.CANTEEN), 0, "o pessimista, um a menos")
 	t.equal(S.post_yield(cao, S.FORGE), 1, "mesmo na Forja")
-	t.equal(S.yield_text(S.RESEARCH, 2), "+2 fragmentos por volta", "o texto do rendimento")
+	t.equal(S.yield_text(S.RESEARCH, 2), "+2 fragmentos por dia", "o texto do rendimento")
 
 
 ## Na volta, cada posto de quem ficou rende; o relatório mostra.
@@ -226,7 +226,7 @@ func _screens() -> void:
 			chip.pressed.emit()
 			await _frames(3)
 			t.equal(S.post_of(S.hero(Campaign.state, _id(c, "Sereno"))), S.RESEARCH, "escolher o posto na Sala vale")
-			t.check(_label(hud._room_screen, "+2 fragmentos por volta"), "e mostra o que rende")
+			t.check(_label(hud._room_screen, "+2 fragmentos por dia"), "e mostra o que rende")
 		# No teclado, o foco fica no posto escolhido depois da escolha.
 		AHUiStyle.using_keys = true
 		var forge: Button = hud._room_screen.find_child("Post_forge", true, false)
