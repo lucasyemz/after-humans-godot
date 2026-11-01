@@ -3138,18 +3138,21 @@ func _on_train_event(name: String) -> void:
 
 func _decide(candidate_id: String, accept: bool) -> void:
 	var c: Dictionary = Campaign.state
-	# Qualquer um dos dois (#182): quem é decidido vem à frente nas regras e na cena.
-	var front: String = c.station.train.candidate_id
-	if S.bring_forward(c, candidate_id):
-		station.swap_pair()
+	# Qualquer um dos dois (#182): decide_candidate traz quem é decidido à frente nas regras (e desfaz se a decisão não
+	# passa); aqui, só a cena acompanha.
+	var train: Dictionary = c.station.train
+	var front: String = train.candidate_id
+	var behind: bool = candidate_id != front and train.phase == "waiting" and train.get("next", {}).get("candidate_id", "") == candidate_id
+	var recruit: Dictionary = train.get("next", {}).get("recruit", {}) if behind else S.train_recruit(c)
+	if behind:
+		station.swap_pair(candidate_id)
 		_arrived_candidate = candidate_id
-	var recruit := S.train_recruit(c)
 	var error := S.decide_candidate(c, candidate_id, accept)
 	if error != "":
-		# A decisão não passou: os dois voltam à ordem de antes, nas regras e na cena.
-		S.bring_forward(c, front)
-		station.swap_pair()
-		_arrived_candidate = c.station.train.candidate_id
+		# A decisão não passou: as regras já voltaram à ordem de antes; a cena volta junto.
+		if behind:
+			station.swap_pair(front)
+			_arrived_candidate = front
 		toast(error, true)
 		return
 	station.commit()
@@ -3185,6 +3188,8 @@ func _train_departs(candidate_leaves: bool) -> void:
 		waited += get_process_delta_time()
 	if not is_instance_valid(station):
 		return
+	if station.boarding_back():
+		push_warning("A partida não esperou o recusado voltar ao vagão (%.0f s)." % BOARDING_WAIT)
 	station.play_train_departure(candidate_leaves)
 	await station.train_event_named("gone")
 	S.finish_departure(c)
