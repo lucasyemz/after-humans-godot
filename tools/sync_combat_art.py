@@ -15,10 +15,20 @@
   e as fontes da tag codex-pr54-originals. Sem a pasta da Unreal, só esta parte:
       git archive codex-pr54-originals art/combat/source/reactions | tar -x
       python tools/sync_combat_art.py --codex-reactions
+- O Guaxinim e o Tatu redesenhados (#225, a arte do Codex no PR #229): todas as poses que o jogo usa (o parado, um
+  golpe por habilidade, o dano, a queda, a esquiva, o bloqueio e o item) e o retrato, pelo contrato
+  docs/design/recruits_redraw/contract.json e as fontes da tag codex-pr229-originals, no lugar da arte da web antiga.
+  Os ícones das habilidades continuam os da web antiga. Sem a pasta da Unreal, só esta parte:
+      git archive codex-pr229-originals art/combat/source/recruits_redraw_20261028 | tar -x
+      git archive codex-pr231-originals art/combat/source/stances_20261028 | tar -x
+      python tools/sync_combat_art.py --recruits-redraw
+  O modo também reaplica as poses de combate abaixo (a guarda dos dois e a exploração do Tatu), então pede as fontes
+  das duas tags.
 - As poses de combate (#221, a arte do Codex no PR #231): a guarda com as armas na mão de cada fundador e da skin
   Bento Ronda (combat_idle.webp, ao lado do idle, na mesma tela e com a mesma âncora), pelo contrato
-  docs/design/stances/contract.json e as fontes da tag codex-pr231-originals. O Guaxinim e o Tatu esperam a integração
-  do redesenho da #225 (as poses deles foram desenhadas sobre ele). Sem a pasta da Unreal, só esta parte:
+  docs/design/stances/contract.json e as fontes da tag codex-pr231-originals; a guarda do Guaxinim e a exploração do
+  Tatu (com as mãos livres; a guarda dele é o parado do redesenho da #225), também. Depois do redesenho, sem a pasta
+  da Unreal, só esta parte:
       git archive codex-pr231-originals art/combat/source/stances_20261028 | tar -x
       python tools/sync_combat_art.py --stances
 - O Mercador (#182, parte 2; a arte do Codex na #218, PR #222): as poses de pé, de passada e de oferta e o retrato já
@@ -46,11 +56,14 @@ LEGACY = REPO / "SourceArt" / "Legacy"
 # ficam na tag codex-pr54-originals (git archive codex-pr54-originals art/combat/source/reactions | tar -x).
 CODEX_REACTIONS = PROTO / "docs" / "design" / "combat_reactions_contract.json"
 CODEX_REACTIONS_SOURCE = PROTO / "art" / "combat" / "source" / "reactions" / "kneeling_20261023"
+# O Guaxinim e o Tatu redesenhados (#225, PR #229): o contrato fica na main; os PNG, na tag codex-pr229-originals.
+REDRAW_CONTRACT = PROTO / "docs" / "design" / "recruits_redraw" / "contract.json"
+REDRAW_SOURCE = PROTO / "art" / "combat" / "source" / "recruits_redraw_20261028"
+# As reações do redesenho com o nome do jogo e a pose de usar item.
+REDRAW_REACTIONS = ("hurt", "death", "dodge", "defense", "item")
 # As poses de combate (#221, PR #231): o contrato fica na main; os PNG, na tag codex-pr231-originals.
 STANCES_CONTRACT = PROTO / "docs" / "design" / "stances" / "contract.json"
 STANCES_SOURCE = PROTO / "art" / "combat" / "source" / "stances_20261028"
-# Os recrutas da #221 (o Guaxinim e o Tatu) foram desenhados sobre o redesenho da #225, que o jogo ainda não usa.
-STANCES_WAIT_FOR_225 = ("raccoon_recruit_01", "armadillo_recruit_01")
 # O contrato da arte do Mercador (#218): os arquivos e as medidas de cada pose, em pixels do original.
 MERCHANT_CONTRACT = PROTO / "docs" / "design" / "merchant" / "contract.json"
 SCALE = 0.5
@@ -79,14 +92,12 @@ RECRUITS = {
     "frog_recruit_01": "sapo",
     "owl_recruit_01": "coruja",
 }
-# O Guaxinim e o Tatu (#187): classes sem fundador, com a arte aprovada da web antiga (SourceArt/Legacy, a mesma tela
-# 1178x1335 em todas as poses). Entram como recrutas, com o parado, um golpe por habilidade (attackN-<habilidade>),
-# o dano, a esquiva, o bloqueio e a queda; os ícones das habilidades vêm da mesma pasta (ability-<habilidade>).
+# O Guaxinim e o Tatu (#187): classes sem fundador. As poses vêm do redesenho da #225 (redraw_recruits); da web antiga
+# (SourceArt/Legacy) ficam só os ícones das habilidades (ability-<habilidade>).
 LEGACY_RECRUITS = {
     "raccoon_recruit_01": "rato",
     "armadillo_recruit_01": "tatu",
 }
-LEGACY_REACTIONS = {"hurt": "hurt", "death": "defeat", "dodge": "dodge", "defense": "block"}
 PORTRAITS = PROTO / "art" / "ui" / "portraits"
 # Vilões do John (conceitos de 09/10/2026, idles de SourceArt/CharacterGallery/EnemyHelperIdles20261010): só a pose
 # parada, voltada à direita como os outros. Entram os que a distribuição dele põe num cenário (Lucas, 22/10/2026).
@@ -136,22 +147,54 @@ def recruits() -> dict:
         dst = ART / "recruits" / f"{variant}_idle.webp"
         image = convert(src, dst)
         out[variant] = {"class_id": class_id, "idle": with_portrait({"file": res(dst), **measured(image)}, variant)}
-    for variant, class_id in LEGACY_RECRUITS.items():
-        source = LEGACY / "public" / "characters" / "approved" / class_id
+    # O Guaxinim e o Tatu: o redesenho da #225 (antes, a arte da web antiga).
+    out.update(redraw_recruits())
+    return out
+
+
+def redraw_recruits(source: Path = REDRAW_SOURCE) -> dict:
+    """O Guaxinim e o Tatu redesenhados (#225) pelo contrato do Codex: todas as poses com a tela, a âncora no pé e a
+    altura do corpo do parado (o registro fixo do contrato: o pé no mesmo ponto em todas e a queda ajoelhada sem
+    crescer), em WebP na metade; o retrato de 256 px copiado 1:1. Sempre reconverte (as fontes saem do git archive com a
+    data da tag). As poses de acampamento (seat, sleep, #210) ficam de fora: o acampamento ainda não os mostra."""
+    if not source.exists():
+        raise SystemExit(f"Faltam as fontes em {source}. Extraia na raiz do projeto com:\n"
+                         "  git archive codex-pr229-originals art/combat/source/recruits_redraw_20261028 | tar -x")
+    contract = json.loads(REDRAW_CONTRACT.read_text(encoding="utf-8"))
+    out = {}
+    for key, actor in contract["actors"].items():
+        variant, class_id, assets = actor["id"], actor["class_id"], actor["assets"]
         folder = ART / "recruits" / variant
-        # Todas as poses com as medidas do parado: o pé no mesmo ponto e a queda ajoelhada sem crescer.
-        measures = measured(convert(source / f"{class_id}-idle.png", folder / "idle.webp"))
+        idle = assets["idle"]
+        measures = {"canvas": idle["canvas"], "anchor": idle["anchor"], "body_reference_pixels": idle["body_reference_pixels"],
+                    "body_width_pixels": idle["body_width_pixels"]}
+        convert(source / idle["source_file"], folder / "idle.webp", force=True)
+        portrait = contract["portraits"].get(key)
+        if portrait:
+            PORTRAITS.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source / portrait["source_file"], PORTRAITS / f"{variant}.png")
         entry = {"class_id": class_id, "idle": with_portrait({"file": res(folder / "idle.webp"), **measures}, variant),
                  "actions": {}, "reactions": {}}
-        for src in sorted(source.glob(f"{class_id}-attack*-*.png")):
-            ability = src.stem.split("-", 2)[2]
-            convert(src, folder / f"{ability}.webp")
-            entry["actions"][ability] = {"execucao": {"file": res(folder / f"{ability}.webp"), **measures}}
-        for pose, name in LEGACY_REACTIONS.items():
-            convert(source / f"{class_id}-{name}.png", folder / f"{pose}.webp")
-            entry["reactions"][pose] = {"file": res(folder / f"{pose}.webp"), **measures}
+        for pose, spec in sorted(assets.items()):
+            if pose.startswith(f"{class_id}_"):
+                convert(source / spec["source_file"], folder / f"{pose}.webp", force=True)
+                entry["actions"][pose] = {"execucao": {"file": res(folder / f"{pose}.webp"), **measures}}
+            elif pose in REDRAW_REACTIONS:
+                convert(source / spec["source_file"], folder / f"{pose}.webp", force=True)
+                entry["reactions"][pose] = {"file": res(folder / f"{pose}.webp"), **measures}
         out[variant] = entry
+        print(f"{key}: {len(entry['actions'])} golpes, {', '.join(entry['reactions'])}")
     return out
+
+
+def redraw_recruits_only(source: Path) -> None:
+    """Sem a pasta da Unreal: só o Guaxinim e o Tatu redesenhados, no manifesto que já existe. As poses da #221 vêm logo
+    depois, como na conversão completa: o redesenho troca a entrada inteira (sem o combat_idle) e o parado do Tatu de lá
+    é a guarda, que a #221 põe no combat_idle.webp, com a exploração nova no idle.webp."""
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    manifest["recruits"].update(redraw_recruits(source))
+    apply_stances(manifest)
+    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
 
 
 def heroes() -> dict:
@@ -188,9 +231,6 @@ def heroes() -> dict:
                                           "anchor": [pose["foot_x"], pose["foot_y"]],
                                           "body_reference_pixels": pose["foot_y"] - pose["top"]}
         entry["reactions"].update(codex_reactions().get(hero_id, {}))
-        combat = stances().get(hero_id, {})
-        if combat:
-            entry["combat_idle"] = combat
         out[hero_id] = entry
     return out
 
@@ -215,44 +255,60 @@ def codex_reactions(source: Path = CODEX_REACTIONS_SOURCE) -> dict:
     return out
 
 
-def stances(source: Path = STANCES_SOURCE) -> dict:
-    """As poses de combate (#221) pelo contrato do Codex: a guarda de cada fundador vira combat_idle.webp ao lado do
-    idle, com a tela, a âncora e a altura do corpo do contrato (as do idle: a escala não muda pela guarda flexionada).
-    A da skin (skin_id) vai para a pasta dela, com o mesmo nome. Devolve {hero_id: entrada do combat_idle} dos
-    fundadores. Sempre reconverte (as fontes saem do git archive com a data da tag)."""
+def stances(source: Path = STANCES_SOURCE, redraw: Path = REDRAW_SOURCE) -> dict:
+    """As duas poses paradas (#221) pelo contrato do Codex: a de combate vira combat_idle.webp ao lado do idle e, quando
+    o contrato traz uma de exploração nova (o Tatu, com as mãos livres), ela vira o idle.webp. A tela, a âncora e a
+    altura do corpo são as do idle (a escala não muda pela guarda flexionada). A pose reaproveitada do redesenho da
+    #225 (a guarda do Tatu é o parado dele de lá) vem das fontes daquela tag. A da skin (skin_id) vai para a pasta dela,
+    com o mesmo nome. Devolve {id do herói ou do recruta: {"combat_idle": entrada}}. Sempre reconverte."""
     if not source.exists():
         raise SystemExit(f"Faltam as fontes em {source}. Extraia na raiz do projeto com:\n"
                          "  git archive codex-pr231-originals art/combat/source/stances_20261028 | tar -x")
     out = {}
     for key, actor in json.loads(STANCES_CONTRACT.read_text(encoding="utf-8"))["actors"].items():
-        if actor["id"] in STANCES_WAIT_FOR_225:
-            print(f"{key}: espera a integração do redesenho da #225")
-            continue
-        state = actor["states"]["combat"]
-        if not state.get("source_file"):
-            continue
-        base = PROTO / actor["baseline"]["file"].removeprefix("res://")
-        dst = base.parent / "combat_idle.webp"
-        convert(source / state["source_file"], dst, force=True)
-        if actor.get("skin_id"):
-            print(f"{key}: {res(dst)} (skin {actor['skin_id']})")
-            continue
-        entry = {"file": res(dst), "canvas": state["canvas"], "anchor": state["anchor"],
-                 "body_reference_pixels": state["body_reference_pixels"]}
-        # A largura do corpo fica a do idle, de propósito: a fila da luta se espaça pela pose da rua (o _half_widths
-        # sai antes da troca para a guarda), e a guarda cabe no mesmo lugar (a QA de design da #221 recolheu armas e capa).
-        if "body_width_pixels" in actor["baseline"]:
-            entry["body_width_pixels"] = actor["baseline"]["body_width_pixels"]
-        out[actor["id"]] = entry
-        print(f"{key}: {res(dst)}")
+        folder = (PROTO / actor["baseline"]["file"].removeprefix("res://")).parent
+        if actor["baseline"]["file"].startswith("tag://"):
+            folder = ART / "recruits" / actor["id"]
+        entry = {}
+        for state, name in (("exploration", "idle.webp"), ("combat", "combat_idle.webp")):
+            spec = actor["states"][state]
+            if not spec.get("source_file"):
+                continue
+            src = source / spec["source_file"]
+            if not src.exists():
+                # Reaproveitada do redesenho da #225 (a pasta do personagem lá tem o mesmo nome).
+                src = redraw / spec["source_file"]
+                if not src.exists():
+                    raise SystemExit(f"Falta {spec['source_file']} nas fontes da #221 e do redesenho da #225.")
+            dst = folder / name
+            convert(src, dst, force=True)
+            if state == "combat":
+                entry["combat_idle"] = {"file": res(dst), "canvas": spec["canvas"], "anchor": spec["anchor"],
+                                        "body_reference_pixels": spec["body_reference_pixels"]}
+                # A largura do corpo fica a do idle, de propósito: a fila da luta se espaça pela pose da rua (o
+                # _half_widths sai antes da troca para a guarda), e a guarda cabe no mesmo lugar (a QA de design da #221
+                # recolheu armas e capa).
+                if "body_width_pixels" in actor["baseline"]:
+                    entry["combat_idle"]["body_width_pixels"] = actor["baseline"]["body_width_pixels"]
+            print(f"{key}: {res(dst)}" + (f" (skin {actor['skin_id']})" if actor.get("skin_id") else ""))
+        if entry and not actor.get("skin_id"):
+            out[actor["id"]] = entry
     return out
+
+
+def apply_stances(manifest: dict, source: Path = STANCES_SOURCE) -> None:
+    """Põe a guarda de cada herói e de cada recruta no manifesto (depois dos parados: o do Tatu muda). A largura do
+    parado do Tatu fica a medida no redesenho (a guarda, a mais larga), de propósito: a fila se espaça pela pose mais
+    larga, e a exploração, mais estreita, cabe no mesmo lugar."""
+    for actor_id, entry in stances(source).items():
+        group = "heroes" if actor_id in manifest["heroes"] else "recruits"
+        manifest[group][actor_id].update(entry)
 
 
 def stances_only(source: Path) -> None:
     """Sem a pasta da Unreal: só as poses de combate, no manifesto que já existe."""
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    for hero_id, entry in stances(source).items():
-        manifest["heroes"][hero_id]["combat_idle"] = entry
+    apply_stances(manifest, source)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
 
 
@@ -394,6 +450,7 @@ def main() -> None:
     manifest = {"schema_version": 1, "scale_note": "Medidas em pixels da imagem original; a textura pode ser menor.",
                 "heroes": heroes(), "recruits": recruits(), "enemies": {**enemies(), **gallery_enemies()}, "icons": icons(),
                 "audio": audio(), "npcs": npcs()}
+    apply_stances(manifest)
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
     size = sum(f.stat().st_size for f in ART.rglob("*") if f.is_file()) + sum(f.stat().st_size for f in AUDIO.rglob("*") if f.is_file())
@@ -409,6 +466,10 @@ if __name__ == "__main__":
         codex_reactions_only(Path(rest[0]) if rest else CODEX_REACTIONS_SOURCE)
     elif "--npcs" in sys.argv:
         npcs_only()
+    elif "--recruits-redraw" in sys.argv:
+        # python tools/sync_combat_art.py --recruits-redraw [pasta das fontes]
+        rest = sys.argv[sys.argv.index("--recruits-redraw") + 1:]
+        redraw_recruits_only(Path(rest[0]) if rest else REDRAW_SOURCE)
     elif "--stances" in sys.argv:
         # python tools/sync_combat_art.py --stances [pasta das fontes]
         rest = sys.argv[sys.argv.index("--stances") + 1:]
