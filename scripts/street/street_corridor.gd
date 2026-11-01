@@ -105,6 +105,9 @@ var bodies := {}
 const BODY_MARKER := 1.4
 ## O tom do caído no mapa: acinzentado como na luta, mais claro para ler na noite e na chuva.
 const FALLEN_TINT := Color(0.78, 0.78, 0.84)
+## O preso do resgate (#188): mais escuro que a equipe, para não parecer um da fila; a folga dos objetos de busca (m).
+const PRISONER_TINT := Color(0.6, 0.6, 0.68)
+const PRISONER_CLEARANCE := 1.8
 ## Onde o corpo fica (m): o passo atrás da fila (e entre dois corpos) e o quanto à frente da faixa da equipe.
 const BODY_GAP := 1.5
 const BODY_FRONT := 0.2
@@ -1849,8 +1852,9 @@ func _spawn_prisoner() -> void:
 	var art := AHCombatArena.art_entry(street._combat_art.heroes, art_id, variant)
 	if art.is_empty():
 		return
-	prisoner = AHMapActor.create("prisoner", AHWounded.pose(art.idle), AHCharacterHeights.find(art_id), FALLEN_TINT)
-	prisoner.action_text = tr("E  Soltar %s") % AHRescue.prisoner_name(Campaign.state)
+	prisoner = AHMapActor.create("prisoner", AHWounded.pose(art.idle), AHCharacterHeights.find(art_id), PRISONER_TINT)
+	# Solto antes do save (a escolha ficou por fazer): o aviso reabre a escolha.
+	prisoner.action_text = (tr("E  Soltar %s") if rescue.state == AHRescue.WAITING else tr("E  Decidir com %s")) % AHRescue.prisoner_name(Campaign.state)
 	street.add_child(prisoner)
 	var at := _guard_position(step, 0)
 	at.x = _prisoner_x(step, at.x + (STEP_LENGTH * 0.25 if street.scenario == null else 1.2))
@@ -1858,21 +1862,28 @@ func _spawn_prisoner() -> void:
 	prisoner.set_facing(-1.0)
 
 
-## Onde o preso fica: perto do ponto do trecho, mas longe dos objetos de busca e das portas (o aviso de um disputava o
-## do outro), dentro do segmento do trecho.
+## Onde o preso fica: dentro do trecho dele (a patrulha de antes fica para trás) e o mais longe que dá dos objetos de
+## busca e das portas (o aviso de um disputava o do outro): perto do ponto pedido, se a folga basta; senão, o mais livre.
 func _prisoner_x(step: int, wanted: float) -> float:
-	var part: Dictionary = segments[_segment_of(step)] if not segments.is_empty() else {}
-	var lo: float = float(part.get("x0", -INF)) + 1.0
-	var hi: float = float(part.get("x1", INF)) - 1.0
 	var taken: Array = props.values().map(func(prop): return prop.position.x) + doors.map(func(door): return float(door.x))
 	if street.scenario != null:
-		taken += scenario_props.filter(func(entry): return entry.zone == part.get("zone", -1)).map(func(entry): return float(entry.x))
+		var zone: int = segments[_segment_of(step)].zone
+		taken += scenario_props.filter(func(entry): return entry.zone == zone).map(func(entry): return float(entry.x))
 		taken += side_rooms.filter(func(room): return room.door_segment == _segment_of(step)).map(func(room): return float(room.door_x))
-	for attempt in 17:
-		var x := clampf(wanted + 0.6 * ceilf(attempt / 2.0) * (1.0 if attempt % 2 == 0 else -1.0), lo, hi)
-		if taken.all(func(other): return absf(other - x) >= 2.6):
-			return x
-	return wanted
+	var lo := _step_x(step, 0.15)
+	var hi := _step_x(step, 0.85)
+	var best_x := clampf(wanted, lo, hi)
+	var best_gap := -1.0
+	var x := lo
+	while x <= hi + 0.001:
+		var gap: float = taken.reduce(func(least, other): return minf(least, absf(other - x)), INF)
+		# A folga de PRISONER_CLEARANCE vale como livre: entre os livres, o mais perto do ponto pedido.
+		var score := minf(gap, PRISONER_CLEARANCE) * 100.0 - absf(x - wanted)
+		if score > best_gap:
+			best_gap = score
+			best_x = x
+		x += 0.2
+	return best_x
 
 
 ## A primeira vez que a equipe chega perto (15 m): a linha das batidas na HUD, uma vez por expedição.
@@ -1902,13 +1913,17 @@ func _rescue_choice() -> void:
 	var rescue := AHRescue.current(campaign)
 	var who := AHRescue.prisoner_name(campaign)
 	var lines: Array = [tr("Os robôs prendiam %s aqui. Mal se aguenta, mas consegue andar.") % who if rescue.kind == "captured"
-		else (tr("Alguém pedia ajuda aqui: %s.") % who + ("  " + tr(String(rescue.recruit.get("origin", ""))) if String(rescue.recruit.get("origin", "")) != "" else ""))]
+		else tr("Alguém pedia ajuda aqui: %s.") % who]
+	# Quem é: a classe e os traços (o pedido de ajuda é um desconhecido; o capturado, para lembrar).
+	lines.append(AHRescue.profile_text(campaign))
+	var food_left: bool = int(campaign.session.expedition.food) >= int(AHRescue.rules().get("LeaveFood", 1))
 	var options: Array = []
-	for spec in [["join", tr("Entrar na equipe")], ["station", tr("Seguir para a Estação")], ["leave", tr("Deixar com um pouco de comida")]]:
+	for spec in [["join", tr("Entrar na equipe")], ["station", tr("Seguir para a Estação")],
+			["leave", tr("Deixar com um pouco de comida") if food_left else tr("Deixar para trás")]]:
 		var block := AHRescue.choice_block(campaign, spec[0])
 		if block == "":
 			options.append([spec[1], _rescue_pick.bind(spec[0])])
-		elif spec[0] != "leave" or rescue.kind != "captured":
+		elif (spec[0] != "leave" or rescue.kind != "captured") and not lines.has(block):
 			lines.append(block)
 	hud.show_choice(who, "\n".join(lines), options)
 
@@ -1930,7 +1945,8 @@ func _rescue_pick(option: String) -> void:
 	if AHRescue.choose(campaign, option) != "":
 		return
 	Campaign.save()
-	hud.toast(tr("%s segue pelos trilhos para a Estação.") % who if option == "station" else tr("A equipe deixa %s com um pouco de comida.") % who, 3.5)
+	var leave_text := tr("A equipe deixa %s com um pouco de comida.") if int(AHRescue.current(campaign).get("food_left", 1)) > 0 else tr("A equipe segue sem %s.")
+	hud.toast(tr("%s segue pelos trilhos para a Estação.") % who if option == "station" else leave_text % who, 3.5)
 	_spawn_prisoner()
 	hud.refresh(campaign)
 

@@ -1379,7 +1379,10 @@ static func free_art_variants(campaign: Dictionary, class_id: String) -> Array:
 static func waiting_recruits(campaign: Dictionary) -> Array:
 	var train: Dictionary = campaign.get("station", {}).get("train", {})
 	var out: Array = []
-	for recruit in [train.get("recruit", {}), train.get("next", {}).get("recruit", {})]:
+	# O animal do pedido de ajuda (#188) também: o trem não traz o mesmo nome nem a mesma arte.
+	var help = campaign.get("station", {}).get("side_missions", {}).get("help", {})
+	var help_recruit = help.get("recruit", {}) if typeof(help) == TYPE_DICTIONARY else {}
+	for recruit in [train.get("recruit", {}), train.get("next", {}).get("recruit", {}), help_recruit]:
 		if typeof(recruit) == TYPE_DICTIONARY and not recruit.is_empty():
 			out.append(recruit)
 	return out

@@ -12,25 +12,30 @@ usa a mesma mecânica do resgate de quem foi capturado.
 - **O pedido de ajuda** (`data/rescue.json`): num dia novo, sem pedido no mapa, o rádio capta um com 25% de chance,
   mais 10 a cada dia sem pedido, até 60%. Só com uma das fases 2 a 5 liberada, e no máximo um por vez. O animal é de
   uma classe com arte e lugar no Alojamento, como o do trem (nome, traços, variação de arte e a linha de origem de
-  `recruitment.json`). O sorteio sai da semente das missões e do dia.
+  `recruitment.json`, que fica de fora do modal). O sorteio sai da semente das missões e do dia. O trem não traz o
+  mesmo nome nem a mesma arte do pedido no mapa (#182).
 - **No Mapa das missões solo:**
-  - os resgates são pinos vermelhos no lugar da fase deles;
+  - os resgates são pinos vermelhos no lugar da fase deles, do lado da âncora que não cobre os pinos de missão;
   - eles ficam numa lista "Resgates" no topo do painel, antes das missões do dia;
   - o painel do resgate diz quem é, onde está e que não há prazo;
   - PREPARAR NESTA FASE leva à plataforma com a fase escolhida.
-- **Na rota:** a próxima expedição à fase do resgate tem o preso num trecho de Suprimentos que não é o primeiro. O
+- **Na rota:** a próxima expedição à fase do resgate tem o preso num trecho de Suprimentos com uma patrulha antes. O
   sorteio é da expedição e fica à parte, então a rota continua com os mesmos 10 trechos. O capturado vem antes do
   pedido de ajuda (é nosso).
+  - O preso fica dentro do trecho dele, no ponto mais livre dos objetos de busca e das portas.
+  - Soltar depende das patrulhas vencidas antes do trecho, não do trecho de agora: andar para trás não o prende.
   - Perto dele (15 m), a HUD avisa: "Batidas de metal adiante. Alguém pede ajuda."
   - Antes do trecho, o aviso diz "<nome> · a patrulha guarda".
-  - No trecho, "E  Soltar <nome>", com a ação `interact` (o `AHMapActor` da #179).
-  - O preso fica longe dos objetos de busca e das portas, para os avisos não disputarem o lugar.
-- **A escolha depois de soltar** (o modal do kit), com o motivo de cada opção que não vale:
+  - No trecho, "E  Soltar <nome>", com a ação `interact` (o `AHMapActor` da #179). Solto antes de um save, o aviso
+    vira "E  Decidir com <nome>" e reabre a escolha.
+- **A escolha depois de soltar** (o modal do kit), com a classe e os traços de quem foi solto e o motivo de cada opção
+  que não vale:
   - **Entrar na equipe**, com metade da vida e 20 de instinto. Se a equipe está cheia, o jogador escolhe quem dá o
     lugar. Quem sai volta para a Estação com a vida que tinha, sem o XP da jornada. O caído no mapa não pode dar o
     lugar.
   - **Seguir para a Estação:** chega na volta, até na derrota.
-  - **Deixar**, só no pedido de ajuda: a equipe deixa 1 de comida, e o pedido não volta.
+  - **Deixar**, só no pedido de ajuda: a equipe deixa 1 de comida (sem comida, "Deixar para trás"), e o pedido não
+    volta.
   - **Alojamento cheio:** o pedido de ajuda só pode ser deixado.
 - **O capturado volta como era:** o mesmo nível, os traços e o XP, só com metade da vida.
 - **O relatório da volta:** a coluna "Resgate".
@@ -48,7 +53,7 @@ usa a mesma mecânica do resgate de quem foi capturado.
 
 ## Testes
 
-- `tests/test_rescue.gd` (57 verificações):
+- `tests/test_rescue.gd` (64 verificações):
   - o pedido de ajuda: só com a fase 2, um por vez, estável, e a chance com o passo e o máximo;
   - a partida: a rota de 10 trechos, o trecho de Suprimentos que não é o primeiro, e nada na outra fase;
   - soltar só no trecho;
@@ -58,6 +63,23 @@ usa a mesma mecânica do resgate de quem foi capturado.
   - o Alojamento cheio;
   - o capturado primeiro, que não é deixado e volta como era;
   - o save no meio e o save de antes.
+- `tests/test_rescue_street.gd` (60 verificações): na cena de verdade, fases 1 a 5 e duas sementes, o preso dentro do
+  trecho, a ação de soltar com o líder em cima e um trecho atrás.
 - `tests/test_side_missions.gd`: a captura nos dois modos, agora ligada nos dados.
 - `tools/capture_188.gd`: as fotos acima, com `--text-size=2` para o Maior.
 - `tests/run_all.gd` inteiro e o modo de captura da rua (a colisão), porque a rua mudou.
+
+## QA
+
+- **Rodada 1: REPROVADO.** Três altos, quatro médios e cinco baixos:
+  - alto: o `run_all` vermelho (o literal `corridor` no i18n);
+  - alto: o preso fora do trecho dele e, na fase 3, impossível de soltar (3 de 8 sementes);
+  - alto: o pedido de ajuda com o nome e a arte do recruta do trem;
+  - médio: o pino do resgate sobre o pino de missão;
+  - médio: a linha de origem do trem no texto do preso;
+  - médio: o modal sem a classe e os traços;
+  - médio: o ponto sem patrulha antes em 40% das rotas;
+  - baixas: o motivo repetido, deixar sem comida, o preso parecido com a equipe, a escolha que não reabre depois do
+    save e o foco depois de escolher o resgate.
+
+  Correção: todos, como descrito acima. O tom do preso ficou mais escuro, e o foco vai a PREPARAR NESTA FASE.

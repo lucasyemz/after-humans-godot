@@ -52,9 +52,12 @@ func _depart(c: Dictionary, phase_id: String = "fase_2") -> Dictionary:
 	return AHRescue.current(c)
 
 
+## A equipe chega ao trecho do preso: as patrulhas de antes vencidas.
 func _reach(c: Dictionary) -> void:
 	var route: Dictionary = c.session.expedition.corridor
 	route.index = int(AHRescue.current(c).step)
+	for index in route.index:
+		route.steps[index].resolved = true
 
 
 func _help_request(t) -> void:
@@ -73,7 +76,7 @@ func _help_request(t) -> void:
 	var help := AHRescue.help(c)
 	t.check(not help.is_empty(), "um pedido surge em até 50 dias (%d)" % days)
 	t.check(Array(r.Phases).has(help.phase) and S.phase_unlocked(c, help.phase), "numa fase da lista, liberada")
-	t.check(not String(help.recruit.display_name).is_empty() and S.train_classes(c).has(help.recruit.class_id), "um animal de classe com arte, com nome")
+	t.check(not String(help.recruit.display_name).is_empty() and not AHCombatArena.hero_art_of("hero_%s_0" % help.recruit.class_id).is_empty(), "um animal de classe com arte, com nome")
 	t.equal(int(M.state(c).help_misses), 0, "o pedido zera os dias sem pedido")
 	var before: Dictionary = help.duplicate(true)
 	c.station.cycle_number = int(c.station.cycle_number) + 1
@@ -87,6 +90,16 @@ func _help_request(t) -> void:
 			x.station.cycle_number = day
 			AHRescue.on_new_day(x)
 	t.equal(AHRescue.help(a), AHRescue.help(b), "o mesmo dia e a mesma semente, o mesmo pedido")
+	# O trem não traz o mesmo nome nem a mesma arte do pedido no mapa (#182: nenhum personagem repetido).
+	for seed_value in [904, 905, 906, 907, 908]:
+		var d := _campaign(seed_value)
+		_with_help(d)
+		var recruit: Dictionary = AHRescue.help(d).recruit
+		var rng := RandomNumberGenerator.new()
+		rng.seed = seed_value
+		var train: Dictionary = S._train_animal(d, [recruit.class_id], rng, []).recruit
+		t.check(train.display_name != recruit.display_name and (train.art_variant == "" or train.art_variant != recruit.art_variant),
+			"semente %d: o trem não repete o pedido (%s/%s e %s/%s)" % [seed_value, recruit.display_name, recruit.art_variant, train.display_name, train.art_variant])
 	# A chance cresce a cada dia sem pedido, até o máximo.
 	var chance := func(misses: int): return mini(int(r.Chance) + int(r.ChanceStep) * misses, int(r.ChanceMax))
 	t.equal([chance.call(0), chance.call(1), chance.call(10)], [25, 35, 60], "25%, mais 10 por dia sem pedido, até 60%")
@@ -111,10 +124,18 @@ func _free(t) -> void:
 	var c := _campaign(920)
 	_with_help(c)
 	_depart(c)
-	c.session.expedition.corridor.index = int(AHRescue.current(c).step) - 1
-	t.check(not AHRescue.can_free(c) and not AHRescue.release(c), "antes do trecho (a patrulha guarda), não dá para soltar")
+	var route: Dictionary = c.session.expedition.corridor
+	var step := int(AHRescue.current(c).step)
+	var patrols: Array = range(step).filter(func(index): return String(route.steps[index].type) == "combat")
+	t.check(not patrols.is_empty(), "o preso tem uma patrulha antes dele")
+	route.index = step
+	for index in step:
+		route.steps[index].resolved = index != patrols[-1]
+	t.check(not AHRescue.can_free(c) and not AHRescue.release(c), "com a patrulha de antes de pé, não dá para soltar")
 	_reach(c)
-	t.check(AHRescue.release(c), "no trecho, solta")
+	route.index = step - 1
+	t.check(AHRescue.can_free(c), "vencida a patrulha, solta mesmo com a equipe um trecho atrás")
+	t.check(AHRescue.release(c), "solta")
 	t.equal(AHRescue.current(c).state, AHRescue.FREED, "solto, com a escolha aberta")
 	t.check(AHRescue.can_free(c), "a escolha aberta continua ao alcance (o save no meio)")
 

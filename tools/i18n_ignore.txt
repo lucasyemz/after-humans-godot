@@ -1752,7 +1752,6 @@ station_report.gd: rescue
 street_corridor.gd: captured
 street_corridor.gd: hero_%s_0
 street_corridor.gd: prisoner
-street_corridor.gd: origin
 street_corridor.gd: join
 mission_board.gd: anchor
 mission_board.gd: Rescue_%d
@@ -1778,3 +1777,5 @@ mission_board.gd: captured
 rescue_rules.gd: captured
 rescue_rules.gd: rescue
 rescue_rules.gd: join
+rescue_rules.gd: corridor
+station_rules.gd: help

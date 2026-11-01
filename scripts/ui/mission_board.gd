@@ -27,21 +27,34 @@ static func pins(map, c: Dictionary, parent: Control) -> Array:
 			"sleep", AHKit.MUTED, M.spot_position(int(entry.side_mission.get("spot", -1))), false)
 		pin.focus_mode = Control.FOCUS_NONE
 		pin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# Os resgates (#188), vermelhos e no lugar da fase deles: o capturado e o pedido de ajuda (um abaixo do outro).
+	# Os resgates (#188), vermelhos e no lugar da fase deles: o capturado e o pedido de ajuda, um abaixo do outro, do lado
+	# da âncora (embaixo, em cima ou nos lados) que não cobre nenhum pino de missão.
 	var per_phase := {}
 	var rescues := AHRescue.pending(c)
+	var missions: Array = M.board(c).map(func(spot): return M.spot_position(spot.spot)) \
+		+ M.running(c).map(func(entry): return M.spot_position(int(entry.side_mission.get("spot", -1))))
 	for index in rescues.size():
 		var target: Dictionary = rescues[index]
 		var anchor: Array = map.region_of(target.phase).get("anchor", [560, 315])
 		var stack := int(per_phase.get(target.phase, 0))
 		per_phase[target.phase] = stack + 1
-		var pin := _pin(parent, "Rescue_%d" % index, rescue_title(target), "alert", AHKit.alert_text(),
-			Vector2(float(anchor[0]), float(anchor[1]) + 60.0 + 52.0 * stack), true)
+		var at := rescue_spot(Vector2(float(anchor[0]), float(anchor[1])), stack, missions)
+		var pin := _pin(parent, "Rescue_%d" % index, rescue_title(target), "alert", AHKit.alert_text(), at, true)
 		if map.mission == "rescue:%d" % index:
 			pin.add_child(AHKit.selected_overlay())
 		pin.pressed.connect(map.pick_mission.bind("rescue:%d" % index))
 		buttons.append(pin)
 	return buttons
+
+
+## Onde fica o pino do resgate perto da âncora da fase: o primeiro lado (embaixo, em cima, à esquerda, à direita) em que
+## nenhum pino de missão fica a menos de 240 × 60 px; sem nenhum livre, embaixo.
+static func rescue_spot(anchor: Vector2, stack: int, missions: Array) -> Vector2:
+	for side in [Vector2(0, 60), Vector2(0, -60), Vector2(-260, 0), Vector2(260, 0)]:
+		var at: Vector2 = anchor + side + Vector2(0, 52.0 * stack * (-1.0 if side.y < 0 else 1.0))
+		if missions.all(func(spot): return absf(spot.x - at.x) >= 240.0 or absf(spot.y - at.y) >= 60.0):
+			return at
+	return anchor + Vector2(0, 60.0 + 52.0 * stack)
 
 
 ## O título do resgate: "Resgatar Íris" (o capturado) ou "Pedido de ajuda".

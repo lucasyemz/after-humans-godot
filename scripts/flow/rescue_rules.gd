@@ -75,7 +75,12 @@ static func assign(campaign: Dictionary) -> void:
 	var targets := pending(campaign).filter(func(target): return target.phase == String(expedition.phase_id))
 	if targets.is_empty():
 		return
+	# Um trecho de Suprimentos com uma patrulha antes ("guardado pela patrulha"); sem nenhum, qualquer um depois da
+	# partida.
 	var loots: Array = range(1, route.steps.size()).filter(func(index): return String(route.steps[index].type) == "loot")
+	var guarded: Array = loots.filter(func(index): return range(index).any(func(before): return String(route.steps[before].type) == "combat"))
+	if not guarded.is_empty():
+		loots = guarded
 	if loots.is_empty():
 		return
 	var rng := RandomNumberGenerator.new()
@@ -105,12 +110,35 @@ static func prisoner_name(campaign: Dictionary) -> String:
 	return String(rescue.recruit.get("display_name", ""))
 
 
-## Dá para soltar: o preso espera (ou já solto, com a escolha por fazer) e a equipe chegou ao trecho dele (a patrulha
-## de antes vencida).
+## Quem é o preso: "Gato · Ágil, Ansioso" (a classe e os traços).
+static func profile_text(campaign: Dictionary) -> String:
+	var rescue := current(campaign)
+	var class_id := ""
+	var perks: Array = []
+	if rescue.get("kind", "") == "captured":
+		var entry = S.hero(campaign, String(rescue.hero_id))
+		if entry != null:
+			class_id = String(entry.class_id)
+			perks = entry.get("perks", [])
+	else:
+		class_id = String(rescue.get("recruit", {}).get("class_id", ""))
+		perks = rescue.get("recruit", {}).get("perks", [])
+	var row = GameData.row("classes", class_id)
+	var names: Array = perks.map(func(id):
+		var perk = GameData.row("perks", String(id))
+		return TranslationServer.translate(String(perk.DisplayName)) if perk != null else String(id))
+	var kind: String = TranslationServer.translate(String(row.DisplayName)) if row != null else class_id
+	return kind if names.is_empty() else " · ".join([kind, ", ".join(names)])
+
+
+## Dá para soltar: o preso espera (ou já solto, com a escolha por fazer) e as patrulhas até o trecho dele foram
+## vencidas (andar para trás na rua não o prende de novo).
 static func can_free(campaign: Dictionary) -> bool:
 	var rescue := current(campaign)
-	return not rescue.is_empty() and [WAITING, FREED].has(String(rescue.state)) \
-		and int(campaign.session.expedition.corridor.index) >= int(rescue.step)
+	if rescue.is_empty() or not [WAITING, FREED].has(String(rescue.state)):
+		return false
+	var steps: Array = campaign.session.expedition.corridor.steps
+	return range(mini(int(rescue.step), steps.size())).all(func(index): return bool(steps[index].resolved) or not ["combat", "boss"].has(String(steps[index].type)))
 
 
 ## Solta o preso: a escolha fica aberta (o save no meio volta com ela).
@@ -182,7 +210,10 @@ static func choose(campaign: Dictionary, option: String, out_id: String = "") ->
 		"station":
 			rescue.state = SENT
 		"leave":
-			expedition.food = maxi(0, int(expedition.food) - int(rules().get("LeaveFood", 1)))
+			# Sem comida, a equipe segue sem deixar nada (food_left 0: o relatório não fala de comida).
+			var leave := mini(int(rules().get("LeaveFood", 1)), maxi(0, int(expedition.food)))
+			expedition.food = int(expedition.food) - leave
+			rescue.food_left = leave
 			rescue.state = LEFT
 	# O pin sai do Mapa das missões: o pedido decidido não volta (§14.4); o capturado sai da lista ao chegar.
 	if rescue.kind == "help":
@@ -229,5 +260,7 @@ static func on_return(campaign: Dictionary) -> String:
 				line += " " + TranslationServer.translate("%s deu o lugar e voltou pelo caminho já limpo.") % out.display_name
 			return line
 		LEFT:
-			return TranslationServer.translate("A equipe deixou %s com um pouco de comida.") % String(rescue.recruit.get("display_name", ""))
+			var who := String(rescue.recruit.get("display_name", ""))
+			return TranslationServer.translate("A equipe deixou %s com um pouco de comida.") % who if int(rescue.get("food_left", 1)) > 0 \
+				else TranslationServer.translate("A equipe deixou %s para trás, sem comida para dividir.") % who
 	return ""
