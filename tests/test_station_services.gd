@@ -15,6 +15,7 @@ func run(context) -> void:
 	_data()
 	_bar()
 	_talks()
+	_camp_learning()
 	_bunks()
 	_quirk()
 	_save()
@@ -77,6 +78,23 @@ func _talks() -> void:
 	t.equal(V.talks_left(c), 0, "duas e acabou")
 	c.station.rooms[S.BAR] = 0
 	t.check(S.treat_trauma(c, c.roster[3].id).contains("Recupere o Bar"), "sem o Bar, não há conversa")
+
+
+## Aprender uma de acampamento é no Treino (#265): conta como o treino do dia; com o dia cheio, espera.
+func _camp_learning() -> void:
+	var c: Dictionary = Campaign.create_initial(17)
+	var a: Dictionary = c.roster[0]
+	var b: Dictionary = c.roster[1]
+	for hero in [a, b]:
+		hero.level = 2
+	var skill_a := String(AHCampSkills.catalog(String(a.class_id)).filter(func(id): return not AHCampSkills.known(a).has(id))[0])
+	var skill_b := String(AHCampSkills.catalog(String(b.class_id)).filter(func(id): return not AHCampSkills.known(b).has(id))[0])
+	t.equal(V.learn_camp(c, a.id, skill_a), "", "no Treino, o primeiro aprende")
+	t.check(AHCampSkills.known(a).has(skill_a), "e sabe a nova")
+	t.check(V.learn_camp(c, b.id, skill_b).contains("hoje"), "no nível 1, o segundo herói espera o dia seguinte")
+	t.check(not AHCampSkills.known(b).has(skill_b), "e não aprende")
+	c.station.rooms[S.TRAINING] = 2
+	t.equal(V.learn_camp(c, b.id, skill_b), "", "no nível 2, dois heróis no mesmo dia")
 
 
 func _bunks() -> void:

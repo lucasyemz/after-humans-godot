@@ -89,6 +89,17 @@ static func mark_training(campaign: Dictionary, hero_id: String) -> void:
 	_mark_today(campaign, "training", hero_id)
 
 
+## Aprender uma de acampamento é no Treino (#265): respeita o dia do Treino e conta como o treino de hoje.
+static func learn_camp(campaign: Dictionary, hero_id: String, skill_id: String) -> String:
+	var block := training_block(campaign, hero_id)
+	if block != "":
+		return block
+	var result := AHCampSkills.learn(campaign, hero_id, skill_id)
+	if result == "":
+		mark_training(campaign, hero_id)
+	return result
+
+
 # ---------------------------------------------------------------- o Dormitório
 
 ## Quanto Instinto a mais os beliches tiram de quem dorme na noite da volta (0 sem eles).

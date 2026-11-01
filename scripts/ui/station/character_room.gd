@@ -29,6 +29,8 @@ var ability := ""
 ## A habilidade de acampamento apontada (#261): o detalhe, a troca e o Aprender ("" nenhuma).
 var camp_skill := ""
 var training := false
+## O Treino aberto para aprender uma de acampamento (#265), em vez de subir de nível.
+var training_camp := false
 ## A rolagem da coluna da esquerda entre um refazer e outro; apontada uma habilidade (#259, as 7 passam da altura da
 ## coluna), a coluna rola até o detalhe e a troca.
 var _left_scroll := 0
@@ -36,6 +38,7 @@ var _reveal := false
 ## O apontado é uma habilidade de acampamento (rola até a troca dela, no fim da coluna).
 var _reveal_camp := false
 var _upgrade := ""
+var _camp_pick := ""
 var _first_focus: Control
 var _trait_ids := {}
 ## O vão do último enquadramento (_frame_stage).
@@ -91,7 +94,9 @@ func rebuild() -> void:
 	if right != null and prepare != null:
 		right.size.y = minf(RIGHT.size.y, prepare.position.y - 12.0 - RIGHT.position.y)
 		right.custom_minimum_size.y = right.size.y
-	if training:
+	if training and training_camp:
+		_camp_training_dialog(c, S.hero(c, selected))
+	elif training:
 		_training_dialog(c, S.hero(c, selected))
 	_frame_stage()
 	var again := get_node_or_null(focus_path) if not focus_path.is_empty() else null
@@ -213,7 +218,7 @@ func _left(c: Dictionary) -> void:
 
 
 ## As habilidades de acampamento (#261): as 7 do papel (as que leva, as que ficam e as bloqueadas), a escolha do nível
-## ("Escolha agora") e, na apontada, o texto, o Tempo, a troca (as 4 que leva) e o Aprender.
+## (o aviso que leva ao Treino, #265) e, na apontada, o texto, o Tempo, a troca (as 4 que leva) e o Aprender no Treino.
 func _camp_section(hero: Dictionary, column: VBoxContainer) -> void:
 	column.add_child(_divider())
 	var title := AHKit.label(tr("Acampamento"), "panel_title", AHKit.TEXT, true, true)
@@ -221,10 +226,12 @@ func _camp_section(hero: Dictionary, column: VBoxContainer) -> void:
 	column.add_child(title)
 	var picks := AHCampSkills.picks(hero)
 	if picks > 0:
-		var invite := _note(tr("Escolha agora: %d habilidade para aprender (aponte uma bloqueada).") % picks if picks == 1
-			else tr("Escolha agora: %d habilidades para aprender (aponte uma bloqueada).") % picks, AHKit.AMBER)
+		# Aprender é no Treino (#265): a Sala avisa e leva até lá.
+		var invite := _note(tr("%d habilidade para aprender no Treino.") % picks if picks == 1
+			else tr("%d habilidades para aprender no Treino.") % picks, AHKit.AMBER)
 		invite.name = "CampPicks"
 		column.add_child(invite)
+		column.add_child(_camp_training_button(hero, "CampGoTraining", ""))
 	var ids := AHCampSkills.catalog(String(hero.class_id))
 	for skill_id in ids:
 		column.add_child(_camp_row(hero, skill_id))
@@ -254,12 +261,7 @@ func _camp_section(hero: Dictionary, column: VBoxContainer) -> void:
 			var need := AHCampSkills.requirement(hero)
 			choices.add_child(_note(tr("Bloqueada · %s") % need if need != "" else tr("Bloqueada.")))
 			return
-		var learn := _small_button(tr("Aprender"))
-		learn.name = "CampLearn"
-		learn.pressed.connect(func():
-			var result := AHCampSkills.learn(Campaign.state, hero_id, picked)
-			hud._act(result, "" if result != "" else tr("%s aprendeu %s.") % [String(S.hero(Campaign.state, hero_id).display_name), tr(String(row.DisplayName))]))
-		choices.add_child(learn)
+		choices.add_child(_camp_training_button(hero, "CampLearn", picked))
 		return
 	var carried := AHCampSkills.equipped(hero)
 	var resting: Array = AHCampSkills.known(hero).filter(func(id): return not carried.has(id))
@@ -295,6 +297,22 @@ func _camp_section(hero: Dictionary, column: VBoxContainer) -> void:
 			hud._act(result, "" if result != "" else tr("%s leva %s ao acampamento.") % [String(S.hero(Campaign.state, hero_id).display_name),
 				tr(String(AHCampSkills.skill(keep).DisplayName))]))
 		flow.add_child(button)
+
+
+## O botão que leva ao Treino para aprender (#265), com a de acampamento apontada já escolhida; com o Treino cheio
+## hoje, apagado e com o motivo.
+func _camp_training_button(hero: Dictionary, button_name: String, skill_id: String) -> Button:
+	var button := _small_button(tr("Aprender no Treino"))
+	button.name = button_name
+	var block := AHStationServices.training_block(Campaign.state, String(hero.id))
+	button.disabled = block != ""
+	button.tooltip_text = block
+	button.pressed.connect(func():
+		training = true
+		training_camp = true
+		_camp_pick = skill_id
+		rebuild())
+	return button
 
 
 func _camp_row(hero: Dictionary, skill_id: String) -> Button:
@@ -942,6 +960,7 @@ func _train_button(c: Dictionary, hero: Dictionary) -> Button:
 	button.tooltip_text = block
 	button.pressed.connect(func():
 		training = true
+		training_camp = false
 		_upgrade = ""
 		rebuild())
 	return button
@@ -1102,13 +1121,8 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	head.add_child(AHKit.glyph("train", 36, AHKit.AMBER))
 	var cost := AHHeroLevels.next_cost(hero)
 	head.add_child(AHKit.label(tr("Treino · nível %d") % (AHHeroLevels.level(hero) + 1) if not cost.is_empty() else tr("Treino"), "panel_title", AHKit.TEXT, true, true))
-	# O Treino (#265): quantos heróis ele ainda recebe hoje (o cômodo, no Alojamento).
-	var per_day := AHStationServices.trainees_per_day(Campaign.state)
-	var day := AHKit.label(tr("Treino nível %d · %d herói por dia") % [S.room_level(Campaign.state, S.TRAINING), per_day] if per_day == 1
-		else tr("Treino nível %d · %d heróis por dia") % [S.room_level(Campaign.state, S.TRAINING), per_day], "small", AHKit.MUTED)
-	day.name = "TrainingDay"
-	day.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	head.add_child(day)
+	# O Treino (#265): quantos heróis ele recebe por dia (o cômodo, no Alojamento).
+	head.add_child(_training_day())
 	column.add_child(head)
 	var intro_text := tr("No nível máximo, o treino ensina o que falta: custa os fragmentos e %s.") % AHHeroSkills.seeds_text(AHHeroSkills.max_level_seeds())
 	if not cost.is_empty():
@@ -1202,6 +1216,136 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	buttons.add_child(confirm)
 	_fit_keys([cancel, confirm])
 	_first_focus = first
+
+
+## O Treino de acampamento (#265): os cartões das que ainda não sabe; aprender não gasta XP nem sementes (a escolha
+## vem do nível par) e conta como o treino do dia.
+func _camp_training_dialog(c: Dictionary, hero: Dictionary) -> void:
+	var hero_id := String(hero.id)
+	var options: Array = AHCampSkills.catalog(String(hero.class_id)).filter(func(id): return not AHCampSkills.known(hero).has(id))
+	if options.is_empty() or AHCampSkills.picks(hero) <= 0 or AHStationServices.training_block(c, hero_id) != "":
+		training = false
+		training_camp = false
+		return
+	if not options.has(_camp_pick):
+		_camp_pick = String(options[0])
+	var dim := ColorRect.new()
+	dim.color = Color(AHKit.SHADE, 0.35)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(dim)
+	var dialog := AHKit.panel_box("large")
+	dialog.name = "Training"
+	var wide := options.size() > 2
+	var dialog_width: float = WIDE_DIALOG if wide else DIALOG.size.x
+	dialog.position = Vector2((1920.0 - dialog_width) * 0.5, DIALOG.position.y)
+	dialog.custom_minimum_size = Vector2(dialog_width, 0)
+	add_child(dialog)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 12)
+	dialog.add_child(column)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 12)
+	head.add_child(AHKit.glyph("train", 36, AHKit.AMBER))
+	head.add_child(AHKit.label(tr("Treino · acampamento"), "panel_title", AHKit.TEXT, true, true))
+	head.add_child(_training_day())
+	column.add_child(head)
+	var picks := AHCampSkills.picks(hero)
+	var intro := AHKit.label((tr("Escolha %d habilidade de acampamento para aprender. Não gasta XP nem sementes, e conta como o treino do dia.") if picks == 1
+		else tr("Escolha %d habilidades de acampamento para aprender, uma por vez. Não gasta XP nem sementes, e conta como o treino do dia.")) % picks, "text", AHKit.TEXT)
+	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro.custom_minimum_size = Vector2(600, 0)
+	column.add_child(intro)
+	var cards := HBoxContainer.new()
+	cards.add_theme_constant_override("separation", 16)
+	column.add_child(cards)
+	var first: Button
+	var card_width: float = 296.0 if not wide else floorf((dialog_width - 72.0 - 16.0 * (options.size() - 1)) / options.size())
+	for skill_id in options:
+		var row = AHCampSkills.skill(skill_id)
+		var card := Button.new()
+		card.name = "CampUpgrade_%s" % skill_id
+		AHKit.style_as(card, "upgrade_selected" if skill_id == _camp_pick else "upgrade")
+		card.custom_minimum_size = Vector2(card_width, 200)
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var box := VBoxContainer.new()
+		box.add_theme_constant_override("separation", 6)
+		box.set_anchors_preset(Control.PRESET_FULL_RECT)
+		box.offset_left = 24
+		box.offset_top = 22
+		box.offset_right = -24
+		box.offset_bottom = -22
+		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(box)
+		var title := AHKit.label(tr(String(row.DisplayName)), "ability_name", AHKit.AMBER if skill_id == _camp_pick else AHKit.TEXT, true)
+		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		title.custom_minimum_size = Vector2(card_width - 56.0, 0)
+		box.add_child(title)
+		var target: String = {"self": tr("em si"), "ally": tr("num aliado"), "team": tr("na equipe")}.get(String(row.Target), "")
+		var price := AHKit.label(tr("%d de Tempo de fogueira · %s") % [int(row.Cost), target], "small", AHKit.MUTED)
+		price.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		price.custom_minimum_size = Vector2(card_width - 56.0, 0)
+		box.add_child(price)
+		var effect := AHKit.label(tr(String(row.Description)), "text", AHKit.TEXT)
+		effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		effect.custom_minimum_size = Vector2(card_width - 56.0, 0)
+		box.add_child(effect)
+		var grow := func(): card.custom_minimum_size.y = maxf(200.0, box.get_combined_minimum_size().y + 44.0)
+		box.minimum_size_changed.connect(grow)
+		grow.call()
+		var id := String(skill_id)
+		card.pressed.connect(func():
+			_camp_pick = id
+			rebuild()
+			var again := find_child("CampUpgrade_%s" % id, true, false) as Control
+			if again != null:
+				AHKit.focus_later(again))
+		cards.add_child(card)
+		if first == null or skill_id == _camp_pick:
+			first = card
+	var buttons := HBoxContainer.new()
+	buttons.alignment = BoxContainer.ALIGNMENT_END
+	buttons.add_theme_constant_override("separation", 16)
+	column.add_child(buttons)
+	var cancel := Button.new()
+	cancel.name = "Cancel"
+	cancel.text = tr("Cancelar").to_upper()
+	AHKit.style_as(cancel, "secondary")
+	cancel.add_theme_font_override("font", AHKit.font(true))
+	cancel.add_theme_font_size_override("font_size", AHKit.size("primary"))
+	cancel.custom_minimum_size = Vector2(0, 64)
+	cancel.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	var cancel_key := AHKitKey.make("", "Esc / B", "button")
+	cancel_key.name = "Key"
+	cancel.add_child(cancel_key)
+	cancel.pressed.connect(func():
+		training = false
+		rebuild())
+	buttons.add_child(cancel)
+	var confirm := AHStationReport._primary(tr("Aprender"), "train", "interact")
+	confirm.name = "Confirm"
+	confirm.custom_minimum_size = Vector2(0, 64)
+	confirm.pressed.connect(func():
+		training = false
+		var picked := _camp_pick
+		var result := AHStationServices.learn_camp(Campaign.state, hero_id, picked)
+		if result == "":
+			camp_skill = picked
+		hud._act(result, "" if result != "" else tr("%s aprendeu %s.") % [String(S.hero(Campaign.state, hero_id).display_name),
+			tr(String(AHCampSkills.skill(picked).DisplayName))], "res://audio/ui/forge_confirm.ogg"))
+	buttons.add_child(confirm)
+	_fit_keys([cancel, confirm])
+	_first_focus = first
+
+
+## Quantos heróis o Treino recebe por dia, no alto do diálogo (#265).
+func _training_day() -> Label:
+	var per_day := AHStationServices.trainees_per_day(Campaign.state)
+	var day := AHKit.label(tr("Treino nível %d · %d herói por dia") % [S.room_level(Campaign.state, S.TRAINING), per_day] if per_day == 1
+		else tr("Treino nível %d · %d heróis por dia") % [S.room_level(Campaign.state, S.TRAINING), per_day], "small", AHKit.MUTED)
+	day.name = "TrainingDay"
+	day.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return day
 
 
 ## A tecla no fim de cada botão do diálogo.

@@ -1861,3 +1861,4 @@ character_room.gd: ally
 character_room.gd: CampSwap_%s
 character_room.gd: CampReplace_%s
 character_room.gd: Camp_%s
+character_room.gd: CampUpgrade_%s
