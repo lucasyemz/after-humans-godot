@@ -58,8 +58,9 @@ static func migrate_hero(campaign: Dictionary, hero: Dictionary) -> void:
 	if typeof(hero.get("relics")) == TYPE_ARRAY:
 		var raw: Array = hero.relics
 		for i in range(SLOTS, raw.size()):
-			if String(raw[i]) != "":
-				campaign.inventory.relics.append(String(raw[i]))
+			var extra := String(raw[i]) if raw[i] != null else ""
+			if extra != "":
+				campaign.inventory.relics.append(extra)
 		for i in range(1, SLOTS):
 			if fresh[i] != "" and fresh.slice(0, i).has(fresh[i]):
 				campaign.inventory.relics.append(fresh[i])

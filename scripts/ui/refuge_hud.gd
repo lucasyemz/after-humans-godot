@@ -2662,7 +2662,9 @@ func _cycle_relic(hero_id: String, slot: int) -> void:
 	var current: String = AHRelics.slots(entry)[slot]
 	var next: String = options[(options.find(current) + 1) % options.size()]
 	if next == current:
-		var relic_id: String = blocked.keys()[0] if not blocked.is_empty() else ""
+		# O motivo de uma que existe na tabela; um id desconhecido (save antigo) só se não houver outra.
+		var known: Array = blocked.keys().filter(func(id): return GameData.row("relics", id) != null)
+		var relic_id: String = known[0] if not known.is_empty() else ""
 		var blocked_row = GameData.row("relics", relic_id)
 		_act(tr("%s: %s") % [tr(blocked_row.DisplayName), blocked[relic_id]] if blocked_row != null else tr("Nenhuma outra relíquia no estoque."))
 		return

@@ -85,6 +85,10 @@ func _migration() -> void:
 	bento.relics = ["pena_vidro", "pena_vidro"]
 	S.migrate(c)
 	t.equal([bento.relics, c.inventory.relics], [["pena_vidro", ""], ["pena_vidro"]], "a cópia repetida volta ao estoque")
+	c.inventory.relics = []
+	bento.relics = ["botao_cobre", "", null, "pena_vidro"]
+	S.migrate(c)
+	t.equal([bento.relics, c.inventory.relics], [["botao_cobre", ""], ["pena_vidro"]], "um null no excesso não para a migração")
 	# Pelo save: grava, lê e migra como o load faz.
 	var saved: Dictionary = Campaign.create_initial(264)
 	for hero in saved.roster:
