@@ -23,7 +23,18 @@ func _campaign(phase_id: String) -> Dictionary:
 	var campaign: Dictionary = Campaign.create_initial(31)
 	campaign.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
 	S.confirm_departure(campaign, campaign.preferred_formation.duplicate(), 0, 4242, phase_id, "parts")
+	# Com o par calmo (#292), algumas rotas têm a única Passagem na travessia: sorteia outra, como na segunda expedição.
+	if not _has_phase_passage(campaign, phase_id):
+		_again(campaign, phase_id, 4243)
 	return campaign
+
+
+func _has_phase_passage(campaign: Dictionary, phase_id: String) -> bool:
+	var steps: Array = campaign.session.expedition.corridor.steps
+	for step in steps.size():
+		if steps[step].type == "passage" and R.map_for_step(phase_id, step) == R.phase(phase_id).get("map", ""):
+			return true
+	return false
 
 
 ## Anda pelo corredor até a primeira Passagem no mapa da fase (vencendo as patrulhas do caminho; a da travessia não

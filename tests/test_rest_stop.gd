@@ -29,7 +29,7 @@ func run(context) -> void:
 	await _stop("fase_1", 31)
 	await _stop("fase_2", 32)
 	await _retreat_in_camp()
-	for spec in [["fase_3", 31], ["fase_3", 32], ["fase_3", 34], ["fase_4", 31], ["fase_5", 31], ["fase_5", 35], ["fase_5", 37]]:
+	for spec in [["fase_3", 31], ["fase_3", 32], ["fase_3", 34], ["fase_4", 31], ["fase_5", 31], ["fase_5", 42], ["fase_5", 37]]:
 		await _short(spec[0], spec[1])
 	Tips.enabled = tips
 	if _tree.current_scene != null:
