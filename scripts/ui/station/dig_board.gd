@@ -8,12 +8,15 @@ class_name AHDigBoard
 extends Control
 
 ## Entre a barra do alto e as teclas de baixo (a moldura da Estação fica: os recursos, as abas e VOLTAR).
-const PANEL := Rect2(28, 112, 1864, 800)
+const PANEL := Rect2(28, 104, 1864, 808)
 const LABEL_WIDTH := 132.0
 const CARD := Vector2(196, 172)
-const GAP := 8.0
+const GAP := 6.0
 const ART_HEIGHT := 56.0
 const SCENARIOS := "res://art/scenarios/%s.webp"
+
+## As imagens já carregadas (abrir a planta de novo não decodifica as peças outra vez).
+static var _textures := {}
 
 ## O HUD da Estação (as ações passam por ele: _act, open_room, close_panel).
 var hud: Control
@@ -42,6 +45,14 @@ static func look(key: String) -> Dictionary:
 	return blocks.get(key, {})
 
 
+## A fala do Nick na primeira escavação (data/station-grid.json, intro), a de quem orienta.
+static func guide_line() -> String:
+	for line in AHStationGrid.rule("intro").get("Lines", []):
+		if String(line.get("Speaker", "")) == AHStationGrid.NICK:
+			return String(line.get("Text", ""))
+	return ""
+
+
 ## O nome do que está no bloco ("Bilheteria desabada"); sem a linha, o nome do lugar.
 static func block_label(key: String) -> String:
 	var name := String(look(key).get("Name", ""))
@@ -54,20 +65,20 @@ static func card_info(c: Dictionary, key: String) -> Dictionary:
 	var out := {"state": info.state, "tag": "", "action": "", "reward": "", "alert": ""}
 	var least := AHStationGrid.finds_text({"scrap": int(AHStationGrid.block_rule(key).get("Scrap", 0)),
 		"fragments": int(AHStationGrid.block_rule(key).get("Fragments", 0))})
-	var reward := TranslationServer.translate("Recompensa: %s e um achado") % least if least != "" else ""
+	# No cartão, curta; a frase inteira ("às vezes um achado", como no painel do bloco) fica no escolhido.
+	var reward := TranslationServer.translate("Rende %s") % least if least != "" else ""
 	match String(info.state):
 		"free":
 			out.tag = TranslationServer.translate("Vaga livre")
 			out.action = String(info.mark)
 		"front":
 			out.tag = TranslationServer.translate("(ESCAVANDO)")
-			out.action = TranslationServer.translate("%d de %d · abre em %s") % [AHStationGrid.block_progress(c, key),
+			out.action = TranslationServer.translate("%d de %d · %s") % [AHStationGrid.block_progress(c, key),
 				AHStationGrid.block_work(key), AHStationGrid.returns_text(AHStationGrid.returns_left(c, key))]
 			out.reward = reward
 		"dig":
 			out.tag = TranslationServer.translate("(BLOQUEADO)")
-			out.action = (TranslationServer.translate("Limpar a escada · %s") if AHStationGrid.is_landing(key)
-				else TranslationServer.translate("Limpar o entulho · %s")) % AHStationGrid.returns_text(AHStationGrid.returns_left(c, key))
+			out.action = TranslationServer.translate("Escavar · %s") % AHStationGrid.returns_text(AHStationGrid.returns_left(c, key))
 			out.reward = reward
 		_:
 			out.tag = TranslationServer.translate("(BLOQUEADO)")
@@ -150,7 +161,7 @@ func _head(c: Dictionary, column: VBoxContainer) -> void:
 		var face := AHKit.portrait(AHUiStyle.face_texture(AHCombatArena.hero_art_of(String(guide.id), String(guide.get("art_variant", ""))).get("idle", {})), 56)
 		face.name = "Guide"
 		head.add_child(face)
-		var line := AHKit.label(tr("Vento quer dizer espaço. Espaço quer dizer trabalho. Pra quem ficar."), "text", AHKit.TEXT)
+		var line := AHKit.label(tr(guide_line()), "text", AHKit.TEXT)
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		line.custom_minimum_size = Vector2(640, 0)
 		line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -198,8 +209,11 @@ func _block_card(c: Dictionary, key: String) -> Button:
 	var name := AHKit.label(block_label(key) if buried else AHRefugeHud.block_title(key), "small", AHKit.TEXT, true)
 	name.name = "Name"
 	name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name.max_lines_visible = 2
+	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name.custom_minimum_size = Vector2(CARD.x - 28.0, 0)
 	box.add_child(name)
+	card.tooltip_text = name.text
 	var tone: Color = AHKit.AMBER if info.state == "front" else (AHKit.good() if info.state in ["free", "dig"] else AHKit.MUTED)
 	var tag := AHKit.label(String(info.tag), "small", tone, true, true)
 	tag.name = "Tag"
@@ -208,9 +222,11 @@ func _block_card(c: Dictionary, key: String) -> Button:
 			["Alert", info.alert, AHKit.alert_text()]]:
 		if String(part[1]) == "":
 			continue
+		# Uma linha cada (os três andares cabem no Normal); a frase inteira fica embaixo, no escolhido.
 		var line := AHKit.label(String(part[1]), "small", part[2])
 		line.name = part[0]
-		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		line.clip_text = true
+		line.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		line.custom_minimum_size = Vector2(CARD.x - 28.0, 0)
 		box.add_child(line)
 	# A moldura do estado: vermelha no que depende do vizinho, âmbar na frente, clara no que dá para escavar.
@@ -262,6 +278,12 @@ func _card_button(node_name: String, key: String, width: float) -> Button:
 	card.clip_contents = true
 	card.set_meta("key", key)
 	card.pressed.connect(func():
+		# O escolhido apertado de novo (Interagir no teclado e no controle) aciona o botão grande.
+		if key == selected:
+			var big := find_child("BigAction", true, false) as Button
+			if big != null and not big.disabled:
+				big.pressed.emit()
+				return
 		selected = key
 		rebuild()
 		var again := find_child(node_name, true, false) as Control
@@ -297,7 +319,7 @@ func _art(art: String, ground: String, state: String) -> Control:
 		if String(spec[0]) == "" or not ResourceLoader.exists(SCENARIOS % spec[0]):
 			continue
 		var rect := TextureRect.new()
-		rect.texture = load(SCENARIOS % spec[0])
+		rect.texture = texture_of(String(spec[0]))
 		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		rect.stretch_mode = spec[1]
 		rect.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -313,6 +335,13 @@ func _art(art: String, ground: String, state: String) -> Control:
 	elif state == "buried":
 		holder.modulate = AHKit.FALLEN
 	return holder
+
+
+## A peça de art/scenarios, carregada uma vez.
+static func texture_of(file: String) -> Texture2D:
+	if not _textures.has(file):
+		_textures[file] = load(SCENARIOS % file)
+	return _textures[file]
 
 
 ## A moldura do estado, por cima do cartão.
@@ -352,7 +381,7 @@ func _bottom(c: Dictionary, column: VBoxContainer) -> void:
 	details.custom_minimum_size = Vector2(200, 64)
 	details.visible = selected != "" and not selected.begins_with("room:")
 	var shown := selected
-	details.pressed.connect(func(): hud.open_room(AHRefugeHud.block_place(shown)))
+	details.pressed.connect(func(): hud.open_from_board(AHRefugeHud.block_place(shown)))
 	var action := AHStationReport._primary(tr("Escolha um bloco"), "next_step", "interact")
 	action.name = "BigAction"
 	action.custom_minimum_size = Vector2(380, 64)
@@ -363,7 +392,7 @@ func _bottom(c: Dictionary, column: VBoxContainer) -> void:
 		words.add_child(AHKit.label(tr("Construído"), "text", AHKit.good()))
 		action.text = tr("Abrir o cômodo").to_upper()
 		action.disabled = false
-		action.pressed.connect(func(): hud.open_room(room_id))
+		action.pressed.connect(func(): hud.open_from_board(room_id))
 	elif selected != "":
 		var info := AHRefugeHud.block_info(c, selected)
 		var card := card_info(c, selected)
@@ -375,12 +404,18 @@ func _bottom(c: Dictionary, column: VBoxContainer) -> void:
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		note.custom_minimum_size = Vector2(700, 0)
 		words.add_child(note)
+		var least := AHStationGrid.finds_text({"scrap": int(AHStationGrid.block_rule(selected).get("Scrap", 0)),
+			"fragments": int(AHStationGrid.block_rule(selected).get("Fragments", 0))})
+		if info.state in ["dig", "front"] and least != "":
+			var reward := AHKit.label(tr("Recompensa: %s, e às vezes um achado.") % least, "small", AHKit.MUTED)
+			reward.name = "RewardNote"
+			words.add_child(reward)
 		var key := selected
 		match String(info.state):
 			"free":
 				action.text = tr("Construir aqui").to_upper()
 				action.disabled = false
-				action.pressed.connect(func(): hud.open_room(AHRefugeHud.block_place(key)))
+				action.pressed.connect(func(): hud.open_from_board(AHRefugeHud.block_place(key)))
 			"front":
 				action.text = tr("É a frente de escavação").to_upper()
 			"dig":

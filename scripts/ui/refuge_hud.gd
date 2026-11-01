@@ -390,7 +390,7 @@ func _input(event: InputEvent) -> void:
 			get_viewport().gui_release_focus()
 			get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("menu"):
+	if event.is_action_pressed("menu") and is_instance_valid(_next_button):
 		U.using_keys = true
 		_next_button.grab_focus()
 		get_viewport().set_input_as_handled()
@@ -427,6 +427,9 @@ func focus_scope() -> Control:
 		return _report_screen
 	if current == S.CHARACTERS and is_instance_valid(_room_screen):
 		return _room_screen
+	# A planta (#284): as setas andam entre os cartões, Interagir escolhe e, no escolhido, aciona o botão grande.
+	if current == "dig" and is_instance_valid(_dig_board):
+		return _dig_board
 	# Na cena do trem, sem painel: o foco fica no pé (as setas não andam entre os cômodos por trás da cena, #61).
 	if current == "train" and not _panel.visible:
 		return _corner
@@ -1403,6 +1406,9 @@ func close_panel() -> void:
 	_close_dig_board()
 	var back := _back_to
 	_back_to = ""
+	if back == "dig":
+		open_service("dig")
+		return
 	if back != "":
 		open_room(back)
 		return
@@ -2285,6 +2291,7 @@ func _buried_block(c: Dictionary, key: String, info: Dictionary) -> void:
 	if info.state == "buried":
 		var why := _text(dig_reason(c, key), AHKit.alert_text(), "small")
 		why.name = "Why"
+		_body.add_child(_board_button(key))
 		_body.add_child(_divider())
 		return
 	var rate := AHStationGrid.dig_rate(c)
@@ -2312,20 +2319,30 @@ func _buried_block(c: Dictionary, key: String, info: Dictionary) -> void:
 		go.pressed.connect(func(): _act(AHStationGrid.set_dig_target(Campaign.state, key), tr("Escavação: a frente agora é %s.") % AHStationGrid.block_name(key)))
 		_body.add_child(go)
 		_panel_focus = go
-	# A planta (#284): os subsolos em cartões, com este bloco escolhido.
-	var plan := AHKit.button(tr("Ver a planta"), "secondary")
-	plan.name = "SeeBoard"
-	plan.custom_minimum_size = Vector2(0, 56)
-	plan.pressed.connect(func():
-		_dig_selected = key
-		open_service("dig"))
-	_body.add_child(plan)
+	_body.add_child(_board_button(key))
 	var least := AHStationGrid.finds_text({"scrap": int(AHStationGrid.block_rule(key).get("Scrap", 0)), "fragments": int(AHStationGrid.block_rule(key).get("Fragments", 0))})
 	if least != "":
 		_text(tr("Devolve pelo menos %s, e às vezes um achado.") % least, AHKit.MUTED, "small")
 	_text(tr("Só as voltas de expedição contam: esperar um dia não cava."), AHKit.MUTED, "small")
 	_body.add_child(_divider())
 	_workers(c, AHStationGrid.DIG)
+
+
+## "Ver a planta" (#284): os subsolos em cartões, com este bloco escolhido.
+func _board_button(key: String) -> Button:
+	var plan := AHKit.button(tr("Ver a planta"), "secondary")
+	plan.name = "SeeBoard"
+	plan.custom_minimum_size = Vector2(0, 56)
+	plan.pressed.connect(func():
+		_dig_selected = key
+		open_service("dig"))
+	return plan
+
+
+## Da planta (#284) para um painel (a vaga, o bloco, o cômodo): fechar o painel volta para a planta.
+func open_from_board(place: String) -> void:
+	open_room(place)
+	_back_to = "dig"
 
 
 ## A fala da primeira volta com escavação (#186, ponto 10) no formato do briefing: [{speaker, text}]; o cartão sem quem

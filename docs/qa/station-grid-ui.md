@@ -128,7 +128,7 @@ esquerda e o depois à direita.
   - a imagem do que está ali;
   - o nome em cima, com o estado: "(BLOQUEADO)" ou "(ESCAVANDO)".
 - **Os estados:**
-  - **dá para escavar:** a moldura clara, a ação ("Limpar o entulho · 2 voltas" ou "Limpar a escada") e a recompensa ("Recompensa: 1 sucata e um achado", o mínimo do andar);
+  - **dá para escavar:** a moldura clara, a ação ("Escavar · 2 voltas") e o que rende no mínimo ("Rende 1 sucata"). Embaixo, no escolhido, a frase inteira: "Recompensa: 1 sucata, e às vezes um achado.", como no painel do bloco;
   - **a frente de escavação:** a moldura âmbar, os pontos e as voltas que faltam;
   - **depende do vizinho ou da escada:** a moldura e o aviso em vermelho ("Depende do vizinho", "Depende da escada"). O motivo inteiro aparece embaixo ao escolher;
   - **a vaga livre:** em verde, "Vaga livre · Construir";
@@ -146,8 +146,8 @@ esquerda e o depois à direita.
   - são lugares e coisas de uma estação de metrô dos Antigos;
   - combinam com os achados de cada andar (o banco partido no 1º subsolo, o painel de controle no 2º, o armário de ferramentas e as raízes no 3º);
   - não prometem mecânica nova.
-- **Em aberto:**
-  - no Normal, a 3ª linha passa uns 15 px da altura, e a grade rola;
-  - no Maior, a grade rola mais.
+- **O teclado e o controle:** as setas e o direcional andam entre os cartões, Interagir escolhe, e Interagir no escolhido aciona o botão grande (a tecla E / A dele). Fechar o painel aberto pela planta (Construir, Detalhes) volta para a planta.
+- **No Normal, os três andares cabem inteiros. No Maior, a grade rola.** O nome do bloco vai em até duas linhas; a ação e a recompensa, numa linha cada.
+- **Em aberto:** a imagem é uma faixa de 56 px no cartão; a arte da #275 pode pedir um cartão maior.
 
 As fotos saem de `tools/capture_274_dig.gd --case=board` (com `--text-size=2` no Maior). O antes é a vista geral desta mesma entrega antes do pedido.
