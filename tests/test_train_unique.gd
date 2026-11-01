@@ -127,6 +127,17 @@ func _pair_decisions() -> void:
 		and f.station.train.candidate_id == f_first and f.station.train.next.is_empty(), "e o primeiro continua esperando")
 	t.equal(S.decide_candidate(f, f_first, true), "", "depois o primeiro")
 	t.check(S.hero(f, f_first) != null and f.station.train.phase == "departing", "aí o trem parte, com os dois acolhidos")
+	# Sem sementes para o segundo: a decisão barrada deixa os dois na ordem de antes (só decide_candidate desfaz).
+	var poor := _pair_campaign()
+	var poor_first: String = poor.station.train.candidate_id
+	var poor_second: String = poor.station.train.next.candidate_id
+	poor.inventory.seeds = 0
+	poor.station.rooms[S.CHARACTERS] = 4
+	var asks: Dictionary = poor.station.train.next.get("recruit", {})
+	if t.check(not asks.is_empty() and S.recruit_price(poor, String(asks.class_id)) > 0, "o segundo é um animal que pede sementes"):
+		t.check(S.decide_candidate(poor, poor_second, true) != "", "sem sementes, o segundo não entra")
+		t.check(poor.station.train.candidate_id == poor_first and poor.station.train.next.candidate_id == poor_second
+			and S.hero(poor, poor_second) == null, "e os dois ficam na ordem de antes")
 	var g := _pair_campaign()
 	var g_first: String = g.station.train.candidate_id
 	t.check(S.bring_forward(g, g.station.train.next.candidate_id) and g.station.train.next.candidate_id == g_first,
@@ -256,10 +267,12 @@ func _screens() -> void:
 			and station._candidate_id == second_id, "e os dois continuam na plataforma, com o escolhido à frente")
 		# Acolher travado (sem sementes) no outro: a ordem e a cena ficam como estavam.
 		Campaign.state.inventory.seeds = 0
+		var cards_before := [station._candidate, station._companion]
 		hud._decide(first_id, true)
 		await _frames(3)
 		t.check(Campaign.state.station.train.candidate_id == second_id and station._candidate_id == second_id
 			and Campaign.state.station.train.next.get("candidate_id", "") == first_id, "a decisão barrada não troca ninguém de lugar")
+		t.check(station._candidate == cards_before[0] and station._companion == cards_before[1], "nem os dois na cena")
 		Campaign.state.inventory.seeds = 500
 		hud.refresh()
 		await _frames(3)
