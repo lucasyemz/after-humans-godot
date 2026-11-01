@@ -240,6 +240,19 @@ func _platform(station) -> void:
 	hud._draft.team[3] = FOUNDERS[3]
 	hud.refresh()
 	await _frames(2)
+	# Mandado à missão solo depois do rascunho (pelo mapa, decisão do Lucas de 01/11): ao abrir a partida, ele sai da
+	# equipe e da plataforma e aparece na lista com o motivo.
+	var sent: Dictionary = S.hero(Campaign.state, FOUNDERS[3])
+	sent.side_mission = {"id": String(AHSideMissions.missions()[0].Name), "spot": 0, "sent": AHSideMissions.day(Campaign.state), "back": AHSideMissions.day(Campaign.state) + 1}
+	hud.open_departure()
+	await _frames(2)
+	t.check(not hud._draft.team.has(FOUNDERS[3]) and not station.lineup.any(func(e): return e.hero_id == FOUNDERS[3]), "quem saiu em missão depois do rascunho sai da equipe e da plataforma")
+	var sent_chip: Button = hud._departure.find_child("Bench_%s" % FOUNDERS[3], true, false)
+	t.check(sent_chip != null and sent_chip.disabled and sent_chip.text.contains("Em missão solo · volta em 1 dia"), "e aparece na lista com o motivo")
+	sent.erase("side_mission")
+	hud._draft.team.append(FOUNDERS[3])
+	hud.open_departure()
+	await _frames(2)
 
 
 ## O save no meio: no mapa e na plataforma, nada parte nem gasta; reaberto, a Estação volta à vista geral, e o radar lê
