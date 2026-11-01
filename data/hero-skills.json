@@ -26,6 +26,6 @@
     "Time": 12,
     "BadNight": 0.3333,
     "BadNightEffect": "exposto",
-    "Description": "Aprovado (#261): o acampamento. Cada herói chega com as 3 habilidades Starter de camp-skills.json e aprende uma das que faltam, de graça e à escolha na Sala, em cada nível de Levels. Leva MaxEquipped (troca na Sala, fora da expedição). Cada acampamento tem Time de Tempo de fogueira; cada herói usa cada habilidade uma vez por acampamento. Ao levantar acampamento, BadNight de chance de a equipe ficar com BadNightEffect (a Noite mal dormida), a menos que alguém tenha vigiado."
+    "Description": "Aprovado (#261): o acampamento. Cada herói chega com as 3 habilidades Starter de camp-skills.json e aprende uma das que faltam, de graça e à escolha no Treino (#265, conta como o treino do dia), em cada nível de Levels. Leva MaxEquipped (troca na Sala, fora da expedição). Cada acampamento tem Time de Tempo de fogueira; cada herói usa cada habilidade uma vez por acampamento. Ao levantar acampamento, BadNight de chance de a equipe ficar com BadNightEffect (a Noite mal dormida), a menos que alguém tenha vigiado."
   }
 ]

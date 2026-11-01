@@ -285,6 +285,10 @@ func _shelter(t) -> void:
 	S.hero(c, "hero_cao_bento").trauma = true
 	t.check(S.treat_trauma(c, "hero_cao_bento") != "", "sem sementes não trata")
 	c.inventory.seeds = 5
+	# O trauma se trata no Bar (#265).
+	c.station.rooms[S.BAR] = 0
+	t.check(S.treat_trauma(c, "hero_cao_bento").contains("Bar"), "sem o Bar, não trata (o motivo diz onde)")
+	c.station.rooms[S.BAR] = 1
 	t.equal(S.treat_trauma(c, "hero_cao_bento"), "", "trata o trauma")
 	var project: Dictionary = GameData.table("research").values()[0]
 	var research_id: String = GameData.table("research").keys()[0]
