@@ -128,19 +128,19 @@ static func skills_of(hero: Dictionary) -> Dictionary:
 		"locked": all.filter(func(id): return not known.has(id)).map(name_of), "need": AHHeroSkills.requirement(hero)}
 
 
-## O que o papel dá (#258): as três resistências numa linha e, se o papel soma, a chance de crítico.
+## O que o papel dá (#258): as três resistências numa linha e, se o papel soma, a chance de crítico. Os números ficam no
+## título: no texto Maior a ficha encolhe e esconde as explicações.
 static func role_rows(class_id: String) -> Array:
 	var hero_class = GameData.combat.classes.get(class_id)
 	if hero_class == null:
 		return []
 	var pct := func(value): return roundi(float(value) * 100.0)
-	var rows: Array = [[TranslationServer.translate("Resistências do papel"), " · ".join([
-		TranslationServer.translate("dano por turno %d%%") % pct.call(hero_class.DotResist),
-		TranslationServer.translate("deslocamento %d%%") % pct.call(hero_class.DisplacementResist),
-		TranslationServer.translate("atordoamento %d%%") % pct.call(hero_class.StunResist)]), true]]
+	var rows: Array = [[TranslationServer.translate("Resiste: dano por turno %d%% · deslocamento %d%% · atordoamento %d%%")
+		% [pct.call(hero_class.DotResist), pct.call(hero_class.DisplacementResist), pct.call(hero_class.StunResist)],
+		TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel."), true]]
 	if int(hero_class.CritBonus) > 0:
-		rows.append([TranslationServer.translate("Olho para o ponto fraco"),
-			TranslationServer.translate("%d%% de chance de crítico (o papel soma %d)") % [pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus), int(hero_class.CritBonus)], true])
+		rows.append([TranslationServer.translate("Crítico %d%% (papel +%d)") % [pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus), int(hero_class.CritBonus)],
+			TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes."), true])
 	return rows
 
 

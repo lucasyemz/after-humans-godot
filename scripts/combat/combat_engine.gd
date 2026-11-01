@@ -262,9 +262,10 @@ func hero_resist(unit: Unit, key: String) -> float:
 	return float(hero_class[key]) if hero_class != null else float(AHGameData.CLASS[key])
 
 
-## A chance de crítico de um herói: a de todos mais o crítico do papel (#258, CritBonus em pontos percentuais).
+## A chance de crítico de um herói: a de todos mais o crítico do papel (#258, CritBonus em pontos percentuais). Quem não é
+## herói (o inimigo que usa uma habilidade de classe) fica com a de todos.
 func hero_crit_chance(unit: Unit) -> float:
-	var hero_class = find_class(unit.class_id)
+	var hero_class = find_class(unit.class_id) if unit.is_player else null
 	return CRITICAL_CHANCE + (float(hero_class.CritBonus) / 100.0 if hero_class != null else 0.0)
 
 
@@ -1105,7 +1106,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			target.mark_duration = 0
 			target.tokens.mark = 0
 
-		# Empurrar ou puxar o alvo (20% de resistir; imunes não sorteiam).
+		# Empurrar ou puxar o alvo (o inimigo resiste 20%, o herói pela resistência do papel, #258; imunes não sorteiam).
 		if ability.PushTarget != 0 and alive_any(target):
 			var target_enemy = null if target.is_player else find_enemy(target.enemy_id)
 			var immune: bool = target_enemy != null and target_enemy.DisplacementResist >= 1.0

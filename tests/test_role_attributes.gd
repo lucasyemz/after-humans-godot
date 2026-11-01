@@ -87,8 +87,24 @@ func _engine() -> void:
 func _sheet() -> void:
 	var rows := AHCharacterSheet.role_rows("tatu")
 	t.equal(rows.size(), 1, "o Resgate: só a linha das resistências (sem crítico a mais)")
-	t.equal(String(rows[0][1]), "dano por turno 30% · deslocamento 60% · atordoamento 40%", "as três resistências do Resgate")
+	# Os números vão no título: no texto Maior, a ficha esconde as explicações dos passivos.
+	t.equal(String(rows[0][0]), "Resiste: dano por turno 30% · deslocamento 60% · atordoamento 40%", "as três resistências do Resgate no título")
 	var cat := AHCharacterSheet.role_rows("gato")
-	t.check(cat.size() == 2 and String(cat[1][1]).begins_with("15%"), "o Incursão mostra o crítico de 15%")
+	t.check(cat.size() == 2 and String(cat[1][0]) == "Crítico 15% (papel +5)", "o Incursão mostra o crítico de 15% no título")
 	var hero := Campaign.new_hero("hero_tatu_9", "tatu", "Teste", 38, [])
-	t.check(AHCharacterSheet.from_hero(hero).passives.any(func(row): return String(row[0]) == "Resistências do papel"), "a ficha fora da luta mostra as resistências")
+	t.check(AHCharacterSheet.from_hero(hero).passives.any(func(row): return String(row[0]).begins_with("Resiste: ")), "a ficha fora da luta mostra as resistências")
+	# Na ficha de verdade, no nível mais encolhido (o do Maior), o título com os números continua.
+	var sheet := AHCharacterSheet.new()
+	(Engine.get_main_loop() as SceneTree).root.add_child(sheet)
+	sheet.info = AHCharacterSheet.from_hero(hero)
+	sheet._build(4)
+	var texts: Array = sheet.find_children("*", "Label", true, false).map(func(label): return label.text)
+	t.check(texts.any(func(text): return String(text).contains("deslocamento 60%")), "no nível mais encolhido, os números aparecem")
+	sheet.free()
+	# O inimigo que usa uma habilidade de classe não ganha o crítico do papel.
+	var data := AHGameData.new()
+	data.load_from("res://data")
+	var engine := AHCombatEngine.new(AHCombat.State.new(), AHCombat.Context.new(), data, null)
+	var enemy := AHCombat.Unit.new()
+	enemy.class_id = "gato"
+	t.check(is_equal_approx(engine.hero_crit_chance(enemy), AHCombatEngine.CRITICAL_CHANCE), "o inimigo com classe fica com o crítico de todos")
