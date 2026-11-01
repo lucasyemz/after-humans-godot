@@ -1523,10 +1523,6 @@ msgstr "Choose a target"
 msgid "ALVO"
 msgstr "TARGET"
 
-#: scripts/ui/combat_hud.gd:2370
-msgid "  ·  +%d%%"
-msgstr "  ·  +%d%%"
-
 #: scripts/ui/combat_hud.gd:2478
 msgid "Batalha finalizada"
 msgstr "Battle over"
@@ -8737,6 +8733,9 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "  ·  +%d%%"
+#~ msgstr "  ·  +%d%%"
 
 #~ msgid "ROTAS"
 #~ msgstr "ROUTES"

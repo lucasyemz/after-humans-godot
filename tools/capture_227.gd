@@ -2,8 +2,8 @@
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_227.gd -- --out=<pasta>
 ## Campanha própria na pasta da saída. Roda também na main de antes. A luta cheia do passo 7 da Rua das Vitrines na
 ## semente 1 (dois Rastreadores, da Família Perseguidora; o Relé; o Pipoco, da Emissora), nos textos Normal e Maior:
-## inspect-hero e inspect-enemy (a inspeção do herói da vez e de um Rastreador), target (a mira do Bento num Rastreador
-## ou da Véspera no Pipoco: a vantagem na plaqueta e na dica).
+## inspect-hero e inspect-enemy (a inspeção do herói da vez e de um Rastreador), target (a mira do Bento num Rastreador:
+## a vantagem na plaqueta e na dica).
 extends SceneTree
 
 var out := ""
@@ -46,10 +46,10 @@ func _initialize() -> void:
 			break
 	street.corridor._start_fight(route.index, true)
 	var hud = street._arena.hud
-	# A vez do Bento (Linhagem dos Cães, vence a Perseguidora) ou da Véspera (Corujas, vence a Emissora): os outros se
-	# defendem até ela chegar.
+	# A vez do Bento (Linhagem dos Cães, vence a Perseguidora): os outros se defendem até ela chegar.
 	var options: Array = []
-	var wanted := {"cao": "cao_eco", "coruja": "pipoco"}
+	# Só o Bento no Rastreador: a mesma vez na main de antes e na branch (com a Véspera, a ordem mudava entre as duas).
+	var wanted := {"cao": "cao_eco"}
 	for turn in 12:
 		for i in 1500:
 			if hud.waiting:

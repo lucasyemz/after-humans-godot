@@ -1,6 +1,6 @@
 # A vantagem de tipo: linhagens, famílias mecânicas e +25% no dano direto (#227)
 
-![Antes (à esquerda) e depois (à direita): a inspeção do herói da vez e de um Rastreador, com a linhagem ou a família e as duas linhas da vantagem; a mira num alvo com vantagem, com "Vantagem +25%" na plaqueta, o ícone e a linha da dica, nos textos Normal e Maior](type-advantage/before_after.jpg)
+![Antes (a main, à esquerda) e depois (à direita), o Bento mirando um Rastreador. Por linha: a mira no Normal e no Maior ("+25%" na plaqueta e a linha da vantagem na dica), a inspeção do Bento e do Rastreador no Normal e no Maior (a linhagem ou a família e as linhas da vantagem). A ordem das vezes varia entre as execuções: no depois, a vez do Bento chega mais tarde na rodada](type-advantage/before_after.jpg)
 
 ## Os dados
 

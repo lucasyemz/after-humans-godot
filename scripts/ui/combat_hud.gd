@@ -2367,7 +2367,7 @@ func _paint_targets(pointed: int = -2) -> void:
 			var bonus := _type_bonus(_pick_ability, unit)
 			if bonus > 1.0:
 				# O espaço do ícone à esquerda, dentro da plaqueta.
-				_target_label.text = "      " + _target_label.text + "  ·  +%d%%" % AHTypes.percent()
+				_target_label.text = "      " + _target_label.text + "  ·  +" + str(AHTypes.percent()) + "%"
 			var mark := _target_label.get_node("Advantage") as TextureRect
 			mark.visible = bonus > 1.0
 			(_target_label.get_node("Line") as ColorRect).color = AHKit.enemy_hp() if unit == null or not unit.is_player else AHKit.hero_hp()
