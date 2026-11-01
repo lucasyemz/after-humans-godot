@@ -239,6 +239,8 @@ def stances(source: Path = STANCES_SOURCE) -> dict:
             continue
         entry = {"file": res(dst), "canvas": state["canvas"], "anchor": state["anchor"],
                  "body_reference_pixels": state["body_reference_pixels"]}
+        # A largura do corpo fica a do idle, de propósito: a fila da luta se espaça pela pose da rua (o _half_widths
+        # sai antes da troca para a guarda), e a guarda cabe no mesmo lugar (a QA de design da #221 recolheu armas e capa).
         if "body_width_pixels" in actor["baseline"]:
             entry["body_width_pixels"] = actor["baseline"]["body_width_pixels"]
         out[actor["id"]] = entry

@@ -36,3 +36,13 @@ A arte é do Codex (PR #231, `docs/design/stances.md`). Os originais ficam na ta
 - `tests/test_skins.gd`: a Ronda com as 18 poses (a guarda entrou).
 - `tools/capture_221.gd`: as fotos acima, com `--skin` para a Ronda. Roda também na `main` de antes.
 - `tests/run_all.gd` inteiro, com a paridade 48/48.
+
+## QA
+
+- **Rodada 1: REPROVADO.** Um médio: a pasta das fontes extraída pela receita (`art/combat/source/stances_20261028/`,
+  8,4 MB de PNG) não estava no `.gitignore`, e um `git add -A` a levaria para o Git. A troca de pose passou em todos os
+  caminhos testados (a fase 2 com herói ferido e recruta, a fuga e a vitória), e a ferramenta rodada duas vezes não
+  mudou nada.
+
+  Correção: a pasta entrou no `.gitignore`, como as fontes das poses ajoelhadas (#13). A largura do corpo da guarda
+  (a do idle, de propósito) ganhou um comentário na ferramenta.
