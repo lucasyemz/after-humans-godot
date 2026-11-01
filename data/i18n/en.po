@@ -6505,8 +6505,8 @@ msgid "Avanço de Resgate"
 msgstr "Rescue Advance"
 
 #. abilities.40.Description
-msgid "Avança até a frente e acerta o alvo: dano e avança uma posição."
-msgstr "Charges to the front and hits the target: damage and advances one position."
+msgid "Investe contra o alvo: dano e avança uma posição."
+msgstr "Charges the target: damage and advances one position."
 
 #. abilities.41.DisplayName
 msgid "Fôlego de Resgate"

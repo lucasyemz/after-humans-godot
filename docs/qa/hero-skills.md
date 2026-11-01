@@ -73,7 +73,7 @@ abaixo do golpe principal da classe.
 - **O save de antes** abre com as 4 de base e não perde nada.
 
 ## Como testar
-- `tests/test_hero_skills.gd`, com 218 checagens, cobre:
+- `tests/test_hero_skills.gd`, com 232 checagens, cobre:
   - os dados e o equilíbrio;
   - **a regra das posições:** as 4 de base e as 35 combinações de cada classe. A Sala aceita exatamente as que têm
     ataque de cada posição, e toda escolha aceita parte de qualquer posição;

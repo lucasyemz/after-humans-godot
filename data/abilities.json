@@ -952,7 +952,7 @@
     "Name": "tatu_avanco_de_resgate",
     "ClassId": "tatu",
     "DisplayName": "Avanço de Resgate",
-    "Description": "Avança até a frente e acerta o alvo: dano e avança uma posição.",
+    "Description": "Investe contra o alvo: dano e avança uma posição.",
     "OriginRanks": [
       2,
       3,
