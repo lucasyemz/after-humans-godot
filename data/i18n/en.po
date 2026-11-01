@@ -2435,19 +2435,19 @@ msgstr "Welcome back"
 msgid "%s de volta à Estação."
 msgstr "%s back at the Station."
 
-#: scripts/ui/refuge_hud.gd:3219
+#: scripts/ui/refuge_hud.gd:3222
 msgid "%s entra para a Estação."
 msgstr "%s joins the Station."
 
-#: scripts/ui/refuge_hud.gd:3219
+#: scripts/ui/refuge_hud.gd:3222
 msgid "%s segue no trem."
 msgstr "%s stays on the train."
 
-#: scripts/ui/refuge_hud.gd:3222
+#: scripts/ui/refuge_hud.gd:3225
 msgid "%s vai morar na Estação."
 msgstr "%s will live at the Station."
 
-#: scripts/ui/refuge_hud.gd:3222
+#: scripts/ui/refuge_hud.gd:3225
 msgid "%s segue no trem. Pode voltar numa próxima viagem."
 msgstr "%s stays on the train. They may come back on a later trip."
 

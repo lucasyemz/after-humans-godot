@@ -1309,14 +1309,15 @@ func promote_companion(candidate_id: String, first_leaves: bool) -> void:
 
 ## O jogador escolheu decidir primeiro o outro dos dois (#182, S.bring_forward): as placas trocam de papel, cada uma no
 ## lugar onde está.
-func swap_pair() -> void:
-	var train: Dictionary = Campaign.state.station.train
-	if train.candidate_id == _candidate_id or not is_instance_valid(_companion):
+func swap_pair(front_id: String = "") -> void:
+	# Sem id, segue a ordem das regras; com id, põe esse à frente (o HUD, antes da decisão).
+	var wanted: String = front_id if front_id != "" else String(Campaign.state.station.train.candidate_id)
+	if wanted == _candidate_id or not is_instance_valid(_companion):
 		return
 	var first := _candidate
 	_candidate = _companion
 	_companion = first
-	_candidate_id = train.candidate_id
+	_candidate_id = wanted
 
 
 ## Os dois do trem (#182) na ordem em que estão na plataforma, da esquerda para a direita (as abas do painel seguem a

@@ -52,6 +52,13 @@ func _board(t) -> void:
 	var copy: Dictionary = JSON.parse_string(JSON.stringify(c))
 	copy.station.side_missions.day = -1
 	t.equal(M.board(copy).map(func(s): return s.id), board.map(func(s): return s.id), "o sorteio é estável (a semente da campanha e do dia)")
+	# A decisão do Lucas (01/11): 2 missões por volta nas fases 1 e 2, 4 a partir da fase 3.
+	c.completed_phases = ["fase_1"]
+	c.station.cycle_number = int(c.station.cycle_number) + 1
+	t.equal(M.board(c).size(), 2, "na fase 2, duas missões")
+	c.completed_phases = ["fase_1", "fase_2"]
+	c.station.cycle_number = int(c.station.cycle_number) + 1
+	t.equal(M.board(c).size(), 4, "a partir da fase 3, quatro missões")
 	c.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
 	c.station.cycle_number = int(c.station.cycle_number) + 1
 	t.equal(M.board(c).size(), 4, "na fase 5, quatro missões")

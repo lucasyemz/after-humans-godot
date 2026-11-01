@@ -1788,3 +1788,4 @@ refuge_hud.gd: reports
 refuge_hud.gd: captured
 station_report.gd: missions
 station_report.gd: captured
+refuge_hud.gd: A partida não esperou o recusado voltar ao vagão (%.0f s).
