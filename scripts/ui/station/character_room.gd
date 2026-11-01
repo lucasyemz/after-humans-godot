@@ -27,6 +27,10 @@ var hud: Control
 var selected := ""
 var ability := ""
 var training := false
+## A rolagem da coluna da esquerda entre um refazer e outro; apontada uma habilidade (#259, as 7 passam da altura da
+## coluna), a coluna rola até o detalhe e a troca.
+var _left_scroll := 0
+var _reveal := false
 var _upgrade := ""
 var _first_focus: Control
 var _trait_ids := {}
@@ -55,6 +59,9 @@ func rebuild() -> void:
 	var focus_path := get_path_to(owner) if owner != null and is_ancestor_of(owner) else NodePath("")
 	# O caminho tem nomes gerados que mudam a cada vez: o nome do botão (Post_research, GrowRoom) acha de novo.
 	var focus_name := String(owner.name) if owner != null and is_ancestor_of(owner) and not String(owner.name).begins_with("@") else ""
+	var old_scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
+	if old_scroll != null:
+		_left_scroll = old_scroll.scroll_vertical
 	for child in get_children():
 		remove_child(child)
 		child.queue_free()
@@ -157,9 +164,11 @@ func _left(c: Dictionary) -> void:
 	panel.custom_minimum_size = LEFT.size
 	add_child(panel)
 	var scroll := ScrollContainer.new()
+	scroll.name = "LeftScroll"
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	panel.add_child(scroll)
+	scroll.set_deferred("scroll_vertical", _left_scroll)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 10)
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -191,6 +200,17 @@ func _left(c: Dictionary) -> void:
 	if ability != "":
 		column.add_child(_ability_detail(c, hero, ability))
 		_skill_choices(hero, column)
+		if _reveal:
+			_reveal = false
+			_scroll_to_end.call_deferred()
+
+
+## O detalhe e a troca ficam no fim da coluna: depois de ela se montar (um quadro), rola até lá.
+func _scroll_to_end() -> void:
+	await get_tree().process_frame
+	var scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
+	if scroll != null:
+		scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
 
 
 func _hero_tab(entry: Dictionary) -> Button:
@@ -243,6 +263,10 @@ func _select(hero_id: String) -> void:
 	selected = hero_id
 	ability = ""
 	training = false
+	# Outro herói: a coluna volta para o alto.
+	var old_scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
+	if old_scroll != null:
+		old_scroll.scroll_vertical = 0
 	rebuild()
 	var tab := find_child("Tab_%s" % hero_id, true, false) as Control
 	if tab != null:
@@ -276,6 +300,7 @@ func _ability_row(ability_id: String) -> Button:
 	var id := ability_id
 	row.pressed.connect(func():
 		ability = id
+		_reveal = true
 		rebuild())
 	return row
 
