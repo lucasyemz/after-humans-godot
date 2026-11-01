@@ -143,6 +143,20 @@ static func away_text(entry) -> String:
 	return ""
 
 
+## O motivo curto de quem está fora, para a lista da partida (decisão do Lucas, 01/11): "Em missão solo · volta em N
+## dias" ou "Com os robôs". Vazio para quem está na Estação.
+static func away_short(campaign: Dictionary, entry) -> String:
+	if entry == null:
+		return ""
+	if typeof(entry.get("captured")) == TYPE_DICTIONARY:
+		return TranslationServer.translate("Com os robôs")
+	if typeof(entry.get("side_mission")) == TYPE_DICTIONARY:
+		var left := maxi(1, days_left(campaign, entry))
+		var back: String = TranslationServer.translate("volta em 1 dia") if left == 1 else TranslationServer.translate("volta em %d dias") % left
+		return " · ".join([TranslationServer.translate("Em missão solo"), back])
+	return ""
+
+
 ## Quantos dias faltam para a volta (1: volta no próximo dia).
 static func days_left(campaign: Dictionary, entry: Dictionary) -> int:
 	return maxi(0, int(entry.side_mission.back) - day(campaign))
