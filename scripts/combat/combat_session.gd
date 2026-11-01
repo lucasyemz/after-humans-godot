@@ -58,6 +58,8 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 			"RelicId": hero.get("relic_id", ""), "ExpeditionUses": hero.get("expedition_uses", {}),
 			"AbilityIds": AHHeroSkills.equipped(hero) if not Array(hero.get("loadout", [])).is_empty() else [],
 			"SpeedBonus": int(bonus.speed) + marks.speed + int(own.get("speed", 0)), "AbilityBonus": bonus.abilities,
+			# A Arma e a Segunda Pele (#262): dano (sem cura), crítico e resistências; a vida já está no herói.
+			"Gear": AHGear.combat_bonus(hero),
 		}, index + 1, session.data))
 		var unit: Unit = players[-1]
 		unit.tokens.vuln = mini(AHCombatEngine.TOKEN_CAP, marks.vuln)
@@ -165,7 +167,9 @@ func effective_range(ability_id: String, kind: String = "damage", actor_id: Stri
 	var trained: bool = base.Max > 0 and bonus > 0
 	if not trained:
 		bonus = 0
-	return {"Min": int(base.Min) + bonus, "Max": int(base.Max) + bonus, "trained": trained}
+	# A Arma (#262) soma só no dano, nunca na cura.
+	var gear: int = actor.gear_damage if actor != null and kind == "damage" and int(base.Max) > 0 else 0
+	return {"Min": int(base.Min) + bonus + gear, "Max": int(base.Max) + bonus + gear, "trained": trained}
 
 
 ## Texto curto da habilidade: o que faz em números (com o treino da Pesquisa e o nível de quem age) e a descrição de

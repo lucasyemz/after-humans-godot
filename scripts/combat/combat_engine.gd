@@ -5,6 +5,8 @@ class_name AHCombatEngine
 extends RefCounted
 
 const CRITICAL_CHANCE := 0.1
+## O teto das resistências do herói (#258), com a Segunda Pele (#262).
+const HERO_RESIST_CAP := 0.8
 const CRITICAL_MULTIPLIER := 1.5
 const TOKEN_CAP := 3
 const DOT_CAP := 6
@@ -259,14 +261,18 @@ func _resisted_effect(unit: Unit, dot: bool) -> bool:
 ## padrões de antes (AHGameData.CLASS).
 func hero_resist(unit: Unit, key: String) -> float:
 	var hero_class = find_class(unit.class_id)
-	return float(hero_class[key]) if hero_class != null else float(AHGameData.CLASS[key])
+	var value := float(hero_class[key]) if hero_class != null else float(AHGameData.CLASS[key])
+	# A Segunda Pele (#262) soma, até o teto de 80% (#258); sem ela, o valor do papel como antes.
+	var extra := float(unit.gear_resist.get(key, 0.0))
+	return minf(HERO_RESIST_CAP, value + extra) if extra > 0.0 else value
 
 
 ## A chance de crítico de um herói: a de todos mais o crítico do papel (#258, CritBonus em pontos percentuais). Quem não é
 ## herói (o inimigo que usa uma habilidade de classe) fica com a de todos.
 func hero_crit_chance(unit: Unit) -> float:
 	var hero_class = find_class(unit.class_id) if unit.is_player else null
-	return CRITICAL_CHANCE + (float(hero_class.CritBonus) / 100.0 if hero_class != null else 0.0)
+	# A Arma (#262) soma no crítico do herói.
+	return CRITICAL_CHANCE + (float(hero_class.CritBonus) / 100.0 if hero_class != null else 0.0) + (unit.gear_crit if unit.is_player else 0.0)
 
 
 ## O herói resiste a ser empurrado ou puxado? Um sorteio sempre (como antes do papel), contra o DisplacementResist dele.
@@ -365,6 +371,11 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 	unit.ability_ids = Array(hero.get("AbilityIds", [])).duplicate()
 	# O nível do herói (#90): +1 numa habilidade (como o treino da Pesquisa) e a velocidade; sem nível, nada muda.
 	unit.ability_bonus = hero.get("AbilityBonus", {}).duplicate()
+	# A Arma e a Segunda Pele (#262); sem elas (a paridade, o tutorial), tudo zero.
+	var gear: Dictionary = hero.get("Gear", {})
+	unit.gear_damage = int(gear.get("damage", 0))
+	unit.gear_crit = float(gear.get("crit", 0)) / 100.0
+	unit.gear_resist = {"DotResist": float(gear.get("dot", 0)) / 100.0, "StunResist": float(gear.get("stun", 0)) / 100.0}
 
 	var hero_class = game_data.classes.get(hero.ClassId)
 	var relic = game_data.relics.get(hero.get("RelicId", ""))
@@ -1000,7 +1011,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 		var ability_name: String = ability.DisplayName
 		hit_any_target = true
 		if has_damage:
-			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0))
+			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0)) + user.gear_damage
 			var rolled := _roll_range(ability.DamageRange.Min + bonus, ability.DamageRange.Max + bonus)
 			if random.next() < hero_crit_chance(user):
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)

@@ -190,6 +190,7 @@ static func migrate(campaign: Dictionary) -> void:
 	# As sete habilidades (#259): os campos novos; o que um save editado traz e não vale volta ao padrão.
 	AHHeroSkills.migrate(campaign)
 	AHStationServices.migrate(campaign)
+	AHGear.migrate(campaign)
 	AHCampSkills.migrate(campaign)
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
