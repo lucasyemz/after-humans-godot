@@ -1,7 +1,7 @@
 ## A montagem da Estação Raiz, transcrita do AAHShelterStation da Unreal (Source/AfterHumans/Exploration/AHShelter*.cpp):
 ## a terra e as lajes, a plataforma com a abóbada, a via e o vagão, a passagem secreta, o eixo de escadas, o casco de cada
 ## cômodo e o mobiliário de cada um. As medidas são as da Unreal (cm, X para a direita, Y para o fundo negativo, Z para
-## cima); AHStationBuilder converte. Peças que só existem como .uasset (o metrô Bombardier, a cadeira do bar, o binóculo,
+## cima); AHStationBuilder converte. Peças que só existem como .uasset (a cadeira do bar, o binóculo,
 ## o kit de química, o sofá 3D, a xícara) ficam de fora ou usam a alternativa que a própria Unreal tinha.
 class_name AHStationBuild
 extends RefCounted
@@ -17,7 +17,9 @@ const B1_FLOOR := -520.0
 const B1_CEILING := -200.0
 const B2_FLOOR := -940.0
 const B2_CEILING := -620.0
-const FORGE_FLOOR := -1040.0
+## O 3º subsolo (#186): aparece arrastando a vista geral para baixo.
+const B3_FLOOR := -1360.0
+const B3_CEILING := -1040.0
 const FINISH := 2.0
 const ROOM_BACK := -900.0
 const CORRIDOR_BACK := -1120.0
@@ -52,20 +54,19 @@ const ROCK_TINT := Color(0.17, 0.15, 0.13)
 const PLASTER_TINT := Color(0.78, 0.72, 0.62)
 const IVORY_TINT := Color(0.60, 0.58, 0.52)
 
-## Os cômodos (a tabela Rooms da Unreal): id das regras, X, piso e teto, piso, parede, lambri, luz, porta do fundo
-## (a borda esquerda do vão de 120 cm) e o forro.
-const ROOMS := [
-	{"id": "characters", "x0": -40.0, "x1": 760.0, "floor": B1_FLOOR, "ceiling": B1_CEILING, "floor_art": "wood_planks_grey", "wall": "painted_plaster_wall", "wainscot": "", "light": WARM, "door": 120.0, "lining": ""},
-	{"id": "canteen", "x0": 1560.0, "x1": STATION_END, "floor": B1_FLOOR, "ceiling": B1_CEILING, "floor_art": "worn_tile_floor", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": WARM, "door": 1700.0, "lining": ""},
-	{"id": "bar", "x0": 760.0, "x1": 1560.0, "floor": B1_FLOOR, "ceiling": B1_CEILING, "floor_art": "wood_planks_grey", "wall": "red_brick_03", "wainscot": "", "light": AMBER, "door": 880.0, "lining": ""},
-	{"id": "dormitory", "x0": -1240.0, "x1": -40.0, "floor": B1_FLOOR, "ceiling": B1_CEILING, "floor_art": "wood_planks_grey", "wall": "painted_plaster_wall", "wainscot": "", "light": WARM, "door": -210.0, "lining": ""},
-	{"id": "forge", "x0": 1160.0, "x1": 2160.0, "floor": FORGE_FLOOR, "ceiling": B2_CEILING, "floor_art": "DiamondPlate008A", "wall": "CorrugatedSteel009", "wainscot": "Metal021", "light": NEUTRAL, "door": 1280.0, "lining": "MetalPlates006"},
-	{"id": "depot", "x0": 560.0, "x1": 1160.0, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "concrete_floor_worn_001", "wall": "concrete_wall_008", "wainscot": "", "light": NEUTRAL, "door": 680.0, "lining": ""},
-	{"id": "research", "x0": -640.0, "x1": 560.0, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "concrete_floor_painted", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "door": 390.0, "lining": ""},
-	{"id": "preparation", "x0": 2160.0, "x1": STATION_END, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "rubber_tiles", "wall": "concrete_wall_008", "wainscot": "", "light": NEUTRAL, "door": 2280.0, "lining": ""},
-	# A Enfermaria (#121), embaixo do Dormitório: o cômodo provisório até a arte do design (#124), no mesmo contrato.
-	{"id": "infirmary", "x0": -1240.0, "x1": -640.0, "floor": B2_FLOOR, "ceiling": B2_CEILING, "floor_art": "worn_tile_floor", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "door": -1150.0, "lining": ""},
-]
+## O acabamento de cada cômodo (a tabela Rooms da Unreal): piso, parede, lambri, luz e o forro. Onde cada um fica sai da
+## grade da campanha (AHStationLayout); o mobiliário continua escrito no molde dele (AHStationLayout.TEMPLATES).
+const LOOKS := {
+	"characters": {"floor_art": "wood_planks_grey", "wall": "painted_plaster_wall", "wainscot": "", "light": WARM, "lining": ""},
+	"canteen": {"floor_art": "worn_tile_floor", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": WARM, "lining": ""},
+	"bar": {"floor_art": "wood_planks_grey", "wall": "red_brick_03", "wainscot": "", "light": AMBER, "lining": ""},
+	"dormitory": {"floor_art": "wood_planks_grey", "wall": "painted_plaster_wall", "wainscot": "", "light": WARM, "lining": ""},
+	"forge": {"floor_art": "DiamondPlate008A", "wall": "CorrugatedSteel009", "wainscot": "Metal021", "light": NEUTRAL, "lining": "MetalPlates006"},
+	"depot": {"floor_art": "concrete_floor_worn_001", "wall": "concrete_wall_008", "wainscot": "", "light": NEUTRAL, "lining": ""},
+	"research": {"floor_art": "concrete_floor_painted", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "lining": ""},
+	# A Enfermaria (#121): o cômodo provisório até a arte do design (#124), agora com os 12 m do #139.
+	"infirmary": {"floor_art": "worn_tile_floor", "wall": "painted_plaster_wall", "wainscot": "long_white_tiles", "light": COOL, "lining": ""},
+}
 
 var b: AHStationBuilder
 ## O que a Estação liga e desliga depois de montada: o mobiliário de cada cômodo (some no nível 0), o estoque por faixa,
@@ -73,12 +74,19 @@ var b: AHStationBuilder
 var dressing := {}
 var stock: Array = []
 var wagon: Array[Node3D] = []
-## As folhas do metrô voltadas à plataforma (a folha e o lado em que desliza: -1 ou 1) e o x (m) da porta, por onde o
-## candidato desce; sem o modelo, nenhuma folha e o x fica NAN (o vagão de caixas).
+## As folhas de porta que o OffsetWagon desliza (a folha e o lado: -1 ou 1; o vagão verde abre as dele) e o x (m) da porta
+## por onde o candidato desce; no vagão de caixas, nenhuma folha e o x fica NAN.
 var wagon_doors: Array = []
 var train_exit_x := NAN
+## O vagão verde em camadas (#149, #256): o trem da Estação é o mesmo do Tutorial e da passagem. Ele não entra em
+## `wagon` (as peças que o OffsetWagon arrasta): anda pelo AHTrainCar.drive, que gira as rodas.
+var train_car: AHTrainCar
+## A luz fria que sai das portas do lado da plataforma quando elas abrem (as luzes e a energia cheia de cada uma).
+var train_door_lights: Array = []
 var room_lights := {}
 var ember_light: OmniLight3D
+## A brasa do fogareiro da plataforma (a Cantina de nível 1, #186): tremula como a da Forja.
+var stove_light: OmniLight3D
 var signal_light: OmniLight3D
 var signal_glow: MeshInstance3D
 ## A passagem secreta: a parede falsa sobre a porta (#203; desliza para a esquerda, e os materiais dela andam junto pelo
@@ -104,29 +112,87 @@ func build() -> void:
 	_secret_passage()
 	_terminal_details()
 	_stair_core()
-	for index in ROOMS.size():
-		_room_shell(index)
-	_canteen()
-	_depot()
-	_forge()
-	_dormitory_bunks()
-	var mark := b.mark()
-	_dormitory()
-	_tag_dressing("dormitory", mark)
-	_preparation()
-	mark = b.mark()
-	_research()
-	_tag_dressing("research", mark)
-	mark = b.mark()
-	_bar()
-	_tag_dressing("bar", mark)
-	_infirmary()
-	_characters_room()
-	for index in ROOMS.size():
-		if not ["canteen", "depot", "forge", "dormitory", "infirmary"].has(ROOMS[index].id):
-			_placeholder_lighting(index)
-	_corner_dressing()
-	_room_returns()
+
+
+## A grade da campanha (#273): os cômodos nas vagas deles, os blocos soterrados, a escavação, as vagas livres, os
+## patamares da escada e os improvisos da plataforma. Tudo fica em grid_root, que a Estação remonta quando a grade muda
+## (um bloco abriu, um cômodo foi construído): o mobiliário, o estoque e as luzes das salas são refeitos junto.
+var grid_root: Node3D
+## Os nós da grade (o mobiliário de cada sala, o estoque e as luzes) ficam separados para ligar e desligar.
+var grid_start := 0
+
+
+func build_grid(campaign: Dictionary) -> void:
+	clear_grid()
+	grid_root = Node3D.new()
+	grid_root.name = "Grid"
+	var main_root := b.root
+	main_root.add_child(grid_root)
+	b.root = grid_root
+	grid_start = b.mark()
+	for placed in AHStationLayout.rooms(campaign):
+		if placed.place == "grid":
+			_room(placed)
+	for entry in AHStationLayout.blocks(campaign):
+		_block(entry)
+	_landings(campaign)
+	_platform_nooks(campaign)
+	b.offset = Vector3.ZERO
+	b.root = main_root
+
+
+## Tira a grade montada (antes de remontar): os nós e as referências do que liga e desliga.
+func clear_grid() -> void:
+	if grid_root != null and is_instance_valid(grid_root):
+		grid_root.get_parent().remove_child(grid_root)
+		grid_root.queue_free()
+	grid_root = null
+	b.generated = b.generated.filter(func(node): return is_instance_valid(node) and not node.is_queued_for_deletion())
+	dressing.clear()
+	stock.clear()
+	room_lights.clear()
+	ember_light = null
+	stove_light = null
+
+
+## Um cômodo na vaga dele: o casco do tamanho da vaga e o mobiliário do molde, deslocado até lá.
+func _room(placed: Dictionary) -> void:
+	var id: String = placed.id
+	b.offset = Vector3.ZERO
+	_room_shell(placed)
+	b.offset = placed.offset
+	match id:
+		"canteen":
+			_canteen()
+		"depot":
+			_depot()
+		"forge":
+			_forge()
+		"dormitory":
+			# Os beliches são a melhoria do Dormitório (#176): no nível 1 a equipe dorme no chão.
+			var mark := b.mark()
+			_dormitory_bunks()
+			_tag_dressing("dormitory@2", mark)
+			mark = b.mark()
+			_dormitory()
+			_tag_dressing("dormitory", mark)
+		"research":
+			var mark := b.mark()
+			_research()
+			_tag_dressing("research", mark)
+		"bar":
+			var mark := b.mark()
+			_bar()
+			_tag_dressing("bar", mark)
+		"infirmary":
+			_infirmary()
+		"characters":
+			_characters_room()
+	if ["characters", "bar", "research"].has(id):
+		_placeholder_lighting(room(id))
+	_corner_dressing(id)
+	_room_returns(id)
+	b.offset = Vector3.ZERO
 
 
 func _tag_dressing(room_id: String, start: int) -> void:
@@ -159,11 +225,16 @@ static func vault_z(y: float) -> float:
 	return center_z + sqrt(maxf(0.0, radius * radius - offset * offset))
 
 
+## O molde do cômodo (cm): onde o mobiliário dele foi escrito (AHStationLayout.TEMPLATES), com a largura da vaga dele, a
+## altura de 3,2 m e o acabamento (LOOKS).
 static func room(id: String) -> Dictionary:
-	for entry in ROOMS:
-		if entry.id == id:
-			return entry
-	return {}
+	var template: Dictionary = AHStationLayout.TEMPLATES.get(id, {})
+	if template.is_empty():
+		return {}
+	var out := {"id": id, "x0": template.x0, "x1": template.x0 + AHStationLayout.SLOT * maxi(1, AHStationGrid.room_slots(id)),
+		"floor": template.floor, "ceiling": template.floor + AHStationLayout.HEIGHT, "door": template.door}
+	out.merge(LOOKS.get(id, {}))
+	return out
 
 
 # ---------------------------------------------------------------- atalhos
@@ -187,16 +258,14 @@ func _earth() -> void:
 	box(Vector3(-4000, -1360, -3000), Vector3(6000, 0, -1500), rock)
 	box(Vector3(-4000, -1360, -1500), Vector3(-1800, 0, 1100), rock)
 	box(Vector3(3900, -1360, -1500), Vector3(6000, 0, 1100), rock)
-	# Lajes contínuas entre os níveis.
+	# Lajes contínuas entre os níveis (os três subsolos da grade, #186) e a rocha embaixo do 3º.
 	box(Vector3(-1800, CORRIDOR_BACK - 40, B2_CEILING), Vector3(3900, 0, B1_FLOOR - FINISH), slab)
 	box(Vector3(-1800, CORRIDOR_BACK - 40, B1_CEILING), Vector3(STATION_END, 0, -140), slab)
-	box(Vector3(-1800, CORRIDOR_BACK - 40, -1500), Vector3(3900, 0, FORGE_FLOOR - 30), rock)
-	box(Vector3(-1800, CORRIDOR_BACK - 40, FORGE_FLOOR - 30), Vector3(1160, 0, B2_FLOOR - FINISH), rock)
-	box(Vector3(2160, CORRIDOR_BACK - 40, FORGE_FLOOR - 30), Vector3(3900, 0, B2_FLOOR - FINISH), rock)
-	box(Vector3(1160, CORRIDOR_BACK - 40, FORGE_FLOOR - 30), Vector3(2160, 0, FORGE_FLOOR - FINISH), rock)
-	# Rocha nas pontas de cada nível.
-	box(Vector3(-1800, CORRIDOR_BACK - 40, B1_FLOOR), Vector3(-1240, 0, B1_CEILING), rock)
-	box(Vector3(-1800, CORRIDOR_BACK - 40, B2_FLOOR), Vector3(-1240, 0, B2_CEILING), rock)
+	box(Vector3(-1800, CORRIDOR_BACK - 40, B3_CEILING), Vector3(3900, 0, B2_FLOOR - FINISH), slab)
+	box(Vector3(-1800, CORRIDOR_BACK - 40, -1500), Vector3(3900, 0, B3_FLOOR - FINISH), rock)
+	# Rocha na ponta esquerda de cada nível.
+	for level in [[B1_FLOOR, B1_CEILING], [B2_FLOOR, B2_CEILING], [B3_FLOOR, B3_CEILING]]:
+		box(Vector3(-1800, CORRIDOR_BACK - 40, level[0]), Vector3(AHStationLayout.GRID_X0, 0, level[1]), rock)
 	box(Vector3(-1800, -1360, -140), Vector3(-40, 0, 1100), rock)
 	box(Vector3(CORE_X1 + 40, -1360, -1500), Vector3(3900, 0, 1100), rock)
 	box(Vector3(STATION_END, -1360, 330), Vector3(CORE_X1 + 40, 0, 1100), rock)
@@ -280,6 +349,13 @@ func _terminal_furniture() -> void:
 		b.card("Terminal_Bench", Vector3(x, -920, 0), 160, 160.0 * 329 / 564)
 	b.card("Preparation_Crate", Vector3(1680, -940, 0), 78, 78.0 * 380 / 410)
 	b.card("Preparation_Backpack", Vector3(1590, -942, 0), 54, 54.0 * 1240 / 1125)
+	# A Preparação na plataforma (#186): o diagrama das rotas na parede, ao lado do Mapa da Rede, e a prancheta com a
+	# lista em cima do caixote.
+	var routes_width := 104.0
+	var routes_height := routes_width * 123.0 / 266.0
+	box(Vector3(1568 - routes_width * 0.5 - 4, STATION_BACK + 2, 104), Vector3(1568 + routes_width * 0.5 + 4, STATION_BACK + 5, 112 + routes_height), wood)
+	b.card("Preparation_Routes", Vector3(1568, STATION_BACK + 6, 108), routes_width, routes_height)
+	b.card("Preparation_Checklist", Vector3(1680, -936, 78.0 * 380 / 410), 18, 26)
 
 
 func _terminal_details() -> void:
@@ -338,75 +414,42 @@ func _track() -> void:
 	signal_light = b.light(Vector3(BUFFERS_X - 20, -180, 44), 90, 300, Color(1, 0.15, 0.08), false)
 
 
-## O metrô Bombardier S Stock (timblewee, CC BY 4.0), exportado da Unreal por tools/unreal_export_metro.py: o corpo no
-## LOD2 e as quatro folhas de porta, no mesmo lugar do vagão da Unreal (BuildWagon). Os materiais de cada seção, na ordem
-## dos slots da Unreal: a chapa de metal tingida (a cor da pintura ou o tom), e o vidro.
-const METRO := "res://art/station/metro/%s.glb"
-const METRO_CAR := Vector3(166.0586, -180.0, -97.8462)
-const METRO_BODY_SLOTS := ["MetroDark", "MetroCream", "MetroGrey", "MetroRed", "MetroMetal", "MetroGlass", "MetroSeat"]
-const METRO_DOOR_SLOTS := ["MetroRed", "MetroDark", "MetroCream", "MetroMetal", "MetroGlass", "MetroGrey"]
-const METRO_COLORS := {"MetroDark": Color(0.07, 0.085, 0.075), "MetroCream": Color(0.76, 0.68, 0.55),
-	"MetroGrey": Color(0.82, 0.87, 0.88), "MetroRed": Color(0.8, 0.09, 0.04), "MetroMetal": Color(0.3, 0.32, 0.3),
-	"MetroSeat": Color(0.12, 0.18, 0.15)}
-## As folhas, com o lado em que deslizam (só as da plataforma abrem) e o meio da porta da plataforma (cm, no vagão).
-const METRO_DOORS := [["SM_BombardierPlatformLeft", -1.0], ["SM_BombardierPlatformRight", 1.0], ["SM_BombardierFrontLeft", 0.0],
-	["SM_BombardierFrontRight", 0.0]]
-const METRO_EXIT_X := 505.0
-var _metro_paint := {}
-
-
 func _wagon() -> void:
-	if _metro():
+	if _train_2d():
 		return
 	_box_wagon()
 
 
-func _metro() -> bool:
-	var names: Array = ["SM_BombardierBody"] + METRO_DOORS.map(func(door): return door[0])
-	for name in names:
-		if not ResourceLoader.exists(METRO % name):
-			return false
-	_metro_piece("SM_BombardierBody", METRO_BODY_SLOTS)
-	for door in METRO_DOORS:
-		var leaf := _metro_piece(door[0], METRO_DOOR_SLOTS)
-		if door[1] != 0.0:
-			wagon_doors.append([leaf, door[1]])
-	train_exit_x = (METRO_CAR.x + METRO_EXIT_X) * 0.01
-	# A luminária do teto do vagão e a luz dela, como na Unreal.
-	b.light(Vector3(380, -180, 250), 320, 520, WARM, false)
-	box(Vector3(360, -200, 278), Vector3(400, -160, 288), b.emissive(WARM, 8), false)
+## O vagão em camadas na plataforma (#256), no lugar do metrô vermelho: o chão dele na altura da plataforma, a carroceria
+## logo à frente da beira (as rodas aparecem no fosso, com a faísca na freada) e a frente no fim da linha, onde ficava a
+## do metrô Bombardier que ele substitui. A câmera vê o lado do trilho: as portas que abrem são as do outro lado, o da
+## plataforma, onde a equipe e o candidato descem e sobem (pela da direita); as folhas deste lado ficam fechadas, e a luz
+## fria do vagão sai pelas portas abertas na plataforma. As luzes andam com ele (ficam em `wagon`).
+const TRAIN_2D_RIGHT := 11.5
+const TRAIN_2D_Z := -3.4
+## A distância da câmera da plataforma até o vagão (m): o interior cresce por ela, para casar com as janelas.
+const TRAIN_2D_CAMERA := 24.0
+const TRAIN_2D_BRIGHTNESS := 0.95
+
+
+func _train_2d() -> bool:
+	if not ResourceLoader.exists(AHTrainCar.CONTRACT):
+		return false
+	train_car = AHTrainCar.new(TRAIN_2D_CAMERA, TRAIN_2D_BRIGHTNESS)
+	train_car.name = "Train"
+	train_car.position = Vector3(TRAIN_2D_RIGHT - train_car.length() * 0.5, 0.0, TRAIN_2D_Z)
+	b.root.add_child(train_car)
+	train_car.set_home()
+	train_exit_x = train_car.position.x + train_car.door_x(1)
+	for door in 2:
+		var x: float = (train_car.position.x + train_car.door_x(door)) * 100.0
+		var lamp := b.light(Vector3(x, (TRAIN_2D_Z - 0.8) * 100.0, 150), 320, 420, Color(0.62, 0.8, 1.0), false)
+		train_door_lights.append([lamp, lamp.light_energy])
+		lamp.light_energy = 0.0
 	return true
 
 
-func _metro_piece(name: String, slots: Array) -> Node3D:
-	var node: Node3D = load(METRO % name).instantiate()
-	node.position = AHStationBuilder.vu(METRO_CAR)
-	for child in node.find_children("*", "MeshInstance3D", true, false):
-		var mesh: MeshInstance3D = child
-		for index in mesh.mesh.get_surface_count():
-			var slot: String = slots[index] if index < slots.size() else "MetroMetal"
-			mesh.set_surface_override_material(index, _metro_material(slot))
-	b.root.add_child(node)
-	b.generated.append(node)
-	return node
-
-
-## A pintura (creme, cinza e vermelho) é cor lisa, como o M_MetroPaint da Unreal; o resto é a chapa de metal tingida.
-func _metro_material(slot: String) -> Material:
-	if slot == "MetroGlass":
-		return b.glass()
-	if not ["MetroCream", "MetroGrey", "MetroRed"].has(slot):
-		return S("metal_plate", 0, 0, METRO_COLORS[slot], 0.8)
-	if not _metro_paint.has(slot):
-		var paint := StandardMaterial3D.new()
-		paint.albedo_color = METRO_COLORS[slot]
-		paint.roughness = 0.45
-		paint.metallic = 0.15
-		_metro_paint[slot] = paint
-	return _metro_paint[slot]
-
-
-## O vagão em caixas (o que a Unreal monta quando falta o metrô): piso, lateral de trás com janelas, cabeceiras, teto,
+## O vagão em caixas (o que a Unreal monta quando falta o vagão; aqui, se faltar o contrato do vagão verde): piso, lateral de trás com janelas, cabeceiras, teto,
 ## truques e a carga de chegada.
 func _box_wagon() -> void:
 	var body := S("green_metal_rust", 0, 0, Color(0.55, 0.72, 0.64), 0.95)
@@ -551,10 +594,10 @@ func _stair_core() -> void:
 	var steps := S("concrete_floor_worn_001")
 	var steel := S("green_metal_rust", 0, 0, STEEL_TINT, 0.9)
 	var tiles := S("long_white_tiles", 0, 0.3, Color(0.96, 0.92, 0.82))
-	b.wall_with_openings(STATION_END, CORE_X0, STATION_BACK, 0, B2_FLOOR, B2_CEILING, [b.hole(-760, B2_FLOOR, -580, B2_FLOOR + 220)], concrete, false)
-	b.wall_with_openings(STATION_END, CORE_X0, STATION_BACK, 0, B1_FLOOR, B1_CEILING, [b.hole(-760, B1_FLOOR, -580, B1_FLOOR + 220)], concrete, false)
-	box(Vector3(CORE_X1, STATION_BACK - 40, B2_FLOOR - 30), Vector3(CORE_X1 + 40, 0, 330), concrete)
-	b.wall_with_openings(CORE_X0, CORE_X1, STATION_BACK - 40, STATION_BACK, B2_FLOOR, 300, [b.hole(3240, 0, 3350, 230)], concrete, true)
+	for level in [[B3_FLOOR, B3_CEILING], [B2_FLOOR, B2_CEILING], [B1_FLOOR, B1_CEILING]]:
+		b.wall_with_openings(STATION_END, CORE_X0, STATION_BACK, 0, level[0], level[1], [b.hole(-760, level[0], -580, level[0] + 220)], concrete, false)
+	box(Vector3(CORE_X1, STATION_BACK - 40, B3_FLOOR - 30), Vector3(CORE_X1 + 40, 0, 330), concrete)
+	b.wall_with_openings(CORE_X0, CORE_X1, STATION_BACK - 40, STATION_BACK, B3_FLOOR, 300, [b.hole(3240, 0, 3350, 230)], concrete, true)
 	box(Vector3(CORE_X0, STATION_BACK - 40, 300), Vector3(CORE_X1, 0, 330), concrete)
 	var floor := func(x0: float, x1: float, y0: float, y1: float, z: float) -> void:
 		box(Vector3(x0, y0, z - 25), Vector3(x1, y1, z), steps)
@@ -566,7 +609,12 @@ func _stair_core() -> void:
 	floor.call(CORE_X0, FLIGHT_LEFT, LANE_BACK1, LANE_BACK0, B1_FLOOR)
 	floor.call(FLIGHT_RIGHT, CORE_X1, LANE_BACK1, LANE_BACK0, B1_FLOOR)
 	floor.call(CORE_X0, FLIGHT_LEFT, LANE_BACK1, LANE_FRONT0, -740)
-	floor.call(CORE_X0, CORE_X1, LANE_BACK1, 0, B2_FLOOR)
+	floor.call(CORE_X0, CORE_X1, LANE_FRONT1 - 0.1, 0, B2_FLOOR)
+	floor.call(CORE_X0, CORE_X1, LANE_BACK0, LANE_FRONT1, B2_FLOOR)
+	floor.call(CORE_X0, FLIGHT_LEFT, LANE_BACK1, LANE_BACK0, B2_FLOOR)
+	floor.call(FLIGHT_RIGHT, CORE_X1, LANE_BACK1, LANE_BACK0, B2_FLOOR)
+	floor.call(CORE_X0, FLIGHT_LEFT, LANE_BACK1, LANE_FRONT0, B2_FLOOR - 220)
+	floor.call(CORE_X0, CORE_X1, LANE_BACK1, 0, B3_FLOOR)
 	# Lances: degraus maciços com focinho de aço, a laje inclinada por baixo e o corrimão.
 	var flight := func(x_from: float, x_to: float, z_from: float, z_to: float, y0: float, y1: float) -> void:
 		var risers := maxi(1, roundi(absf(z_to - z_from) / 20.0))
@@ -588,7 +636,9 @@ func _stair_core() -> void:
 	flight.call(FLIGHT_LEFT, FLIGHT_RIGHT, -260, B1_FLOOR, LANE_FRONT1, LANE_FRONT0)
 	flight.call(FLIGHT_RIGHT, FLIGHT_LEFT, B1_FLOOR, -740, LANE_BACK1, LANE_BACK0)
 	flight.call(FLIGHT_LEFT, FLIGHT_RIGHT, -740, B2_FLOOR, LANE_FRONT1, LANE_FRONT0)
-	for z in [0.0, B1_FLOOR]:
+	flight.call(FLIGHT_RIGHT, FLIGHT_LEFT, B2_FLOOR, B2_FLOOR - 220, LANE_BACK1, LANE_BACK0)
+	flight.call(FLIGHT_LEFT, FLIGHT_RIGHT, B2_FLOOR - 220, B3_FLOOR, LANE_FRONT1, LANE_FRONT0)
+	for z in [0.0, B1_FLOOR, B2_FLOOR]:
 		box(Vector3(CORE_X0, LANE_BACK0 - 2, z + 96), Vector3(FLIGHT_RIGHT, LANE_BACK0 + 2, z + 100), steel, false)
 		var post := CORE_X0 + 40
 		while post < FLIGHT_RIGHT:
@@ -598,14 +648,17 @@ func _stair_core() -> void:
 	box(Vector3(CORE_X1 - 2, LANE_BACK1, 0), Vector3(CORE_X1, 0, 180), tiles)
 	box(Vector3(CORE_X0 + 60, STATION_BACK + 2, 200), Vector3(CORE_X0 + 340, STATION_BACK + 7, 240), S("metal_plate", 0, 0, Color(0.16, 0.3, 0.26)))
 	b.sign("ABRIGO", Vector3(CORE_X0 + 200, STATION_BACK + 9, 220), 22, Color8(232, 224, 200))
-	for landing in [0.0, B1_FLOOR, B2_FLOOR]:
+	for landing in [0.0, B1_FLOOR, B2_FLOOR, B3_FLOOR]:
 		var fixture := Vector3(CORE_X1 - 60, STATION_BACK + 8, landing + 230)
 		b.prop("industrial_wall_lamp", fixture)
 		b.light(fixture + Vector3(0, 35, 0), 260, 650, WARM, true)
 
 
-func _room_shell(index: int) -> void:
-	var r: Dictionary = ROOMS[index]
+## O casco do cômodo na vaga (placed, de AHStationLayout.room): piso, parede do fundo com a porta, lambri, paredes do
+## lado, as bordas do corte e o corredor de serviço atrás.
+func _room_shell(placed: Dictionary) -> void:
+	var r: Dictionary = placed.duplicate()
+	r.merge(LOOKS.get(r.id, {}))
 	var bar: bool = r.id == "bar"
 	var forge: bool = r.id == "forge"
 	var depot: bool = r.id == "depot"
@@ -614,7 +667,6 @@ func _room_shell(index: int) -> void:
 	var plaster: bool = r.wall == "painted_plaster_wall"
 	var wall_tint := PLASTER_TINT if plaster else IVORY_TINT if depot else Color(0.85, 0.82, 0.78)
 	var wall := S(r.wall, r.floor, 0.25, Color(0.84, 0.80, 0.74) if bar else wall_tint)
-	var concrete := S("concrete_wall_008", r.floor, 0.3, Color(0.86, 0.84, 0.8))
 	var forge_steel: Material = S(r.wainscot) if forge else null
 	var steel := S("green_metal_rust", 0, 0, STEEL_TINT, 0.9)
 	box(Vector3(r.x0, ROOM_BACK, r.floor - FINISH), Vector3(r.x1, 0, r.floor), floor)
@@ -629,46 +681,48 @@ func _room_shell(index: int) -> void:
 		box(Vector3(r.door + 128, ROOM_BACK, r.floor + height), Vector3(r.x1, ROOM_BACK + 4, r.floor + height + 6), steel)
 	else:
 		# O rodapé claro para nos batentes, sem cobrir a base da porta.
+		var concrete := S("concrete_wall_008", r.floor, 0.3, Color(0.86, 0.84, 0.8))
 		box(Vector3(r.x0, ROOM_BACK, r.floor), Vector3(r.door - 8, ROOM_BACK + 3, r.floor + 12), forge_steel if forge_steel else concrete)
 		box(Vector3(r.door + 128, ROOM_BACK, r.floor), Vector3(r.x1, ROOM_BACK + 3, r.floor + 12), forge_steel if forge_steel else concrete)
+	_back_door(r)
+	_cut_and_corridor(r)
+
+
+## A porta do fundo: os batentes de aço e a folha pintada aprovada (a mesma em todas as salas).
+func _back_door(r: Dictionary) -> void:
 	var frame := S("green_metal_rust", 0, 0, Color(0.42, 0.46, 0.32), 0.9)
 	box(Vector3(r.door - 8, ROOM_BACK - 40, r.floor), Vector3(r.door, ROOM_BACK + 4, r.floor + 228), frame)
 	box(Vector3(r.door + 120, ROOM_BACK - 40, r.floor), Vector3(r.door + 128, ROOM_BACK + 4, r.floor + 228), frame)
 	box(Vector3(r.door - 8, ROOM_BACK - 40, r.floor + 220), Vector3(r.door + 128, ROOM_BACK + 4, r.floor + 228), frame)
-	# A porta pintada aprovada (a mesma nas oito salas), com os batentes que fecham o vão de 120 cm.
 	var leaf_height := 220.0
 	var leaf_width := leaf_height * 776.0 / 1717.0
 	var leaf_left: float = r.door + (120.0 - leaf_width) * 0.5
 	box(Vector3(r.door, ROOM_BACK - 4, r.floor), Vector3(leaf_left + 0.5, ROOM_BACK + 2, r.floor + leaf_height), frame, false)
 	box(Vector3(leaf_left + leaf_width - 0.5, ROOM_BACK - 4, r.floor), Vector3(r.door + 120, ROOM_BACK + 2, r.floor + leaf_height), frame, false)
 	b.card("Door", Vector3(r.door + 60, ROOM_BACK + 3, r.floor), leaf_width, leaf_height)
-	var side_holes: Array = []
-	if r.id == "canteen":
-		side_holes.append(b.hole(-760, r.floor + 95, -600, r.floor + 190))
-	b.wall_with_openings(r.x0 - 15, r.x0 + 15, ROOM_BACK - 40, 0, r.floor - 2, r.ceiling, side_holes, concrete, false)
-	if r.id == "canteen":
-		box(Vector3(r.x0 - 30, -770, r.floor + 90), Vector3(r.x0 + 30, -590, r.floor + 95), S("wood_table_worn", r.floor))
-	if forge:
-		box(Vector3(r.x1 - 15, ROOM_BACK - 40, FORGE_FLOOR), Vector3(r.x1 + 15, 0, B2_FLOOR), concrete)
-	# Bordas do corte: perfil escuro na laje do piso e do teto.
+
+
+## As paredes do lado (cada vaga tem a sua, de 30 cm, na emenda), as bordas escuras do corte na laje do piso e do teto, o
+## corredor de serviço atrás e a tubulação ao longo do teto.
+func _cut_and_corridor(r: Dictionary) -> void:
+	var concrete := S("concrete_wall_008", r.floor, 0.3, Color(0.86, 0.84, 0.8))
+	var steel := S("green_metal_rust", 0, 0, STEEL_TINT, 0.9)
+	for x in [r.x0, r.x1]:
+		box(Vector3(x - 15, ROOM_BACK - 40, r.floor - 2), Vector3(x + 15, 0, r.ceiling), concrete)
 	var cut := S("rough_concrete", 0, 0, Color(0.2, 0.19, 0.18))
 	box(Vector3(r.x0, -2, r.floor - 30), Vector3(r.x1, 0.5, r.floor - 2), cut, false)
 	box(Vector3(r.x0, -2, r.ceiling), Vector3(r.x1, 0.5, r.ceiling + 30), cut, false)
-	# Corredor de serviço atrás e a tubulação ao longo do teto.
 	box(Vector3(r.x0, CORRIDOR_BACK, r.floor - FINISH), Vector3(r.x1, ROOM_BACK - 40, r.floor), S("concrete_floor_worn_001", r.floor))
 	box(Vector3(r.x0, CORRIDOR_BACK - 40, r.floor), Vector3(r.x1, CORRIDOR_BACK, r.ceiling), concrete)
 	b.cylinder(Vector3((r.x0 + r.x1) * 0.5, ROOM_BACK + 30, r.ceiling - 22), 12, r.x1 - r.x0, Vector3(90, 0, 0), steel)
 	b.cylinder(Vector3((r.x0 + r.x1) * 0.5, ROOM_BACK + 52, r.ceiling - 18), 8, r.x1 - r.x0, Vector3(90, 0, 0), S("metal_plate", 0, 0, Color(0.55, 0.42, 0.32)))
 
 
-## Luz das salas sem montagem própria de luz (Alojamento, Bar, Pesquisa, Preparação): o pendente gaiola.
-func _placeholder_lighting(index: int) -> void:
-	var r: Dictionary = ROOMS[index]
+## Luz das salas sem montagem própria de luz (Alojamento, Bar, Pesquisa): o pendente gaiola (no molde; o offset leva).
+func _placeholder_lighting(r: Dictionary) -> void:
 	var center_x: float = (r.x0 + r.x1) * 0.5
 	b.hang("caged_hanging_light", Vector3(center_x, -480, r.ceiling))
 	room_lights[r.id] = b.light(Vector3(center_x, -480, r.ceiling - 90), 1400, maxf(700.0, (r.x1 - r.x0) * 0.8), r.light, true)
-	if r.ceiling - r.floor > 360:
-		b.light(Vector3(center_x, -300, r.floor + 180), 500, 600, r.light, false)
 
 
 # ---------------------------------------------------------------- Cantina
@@ -951,8 +1005,9 @@ func _forge() -> void:
 		b.cylinder(Vector3(x, -495, c - 39), 5, 650, Vector3(90, 90, 0), sooty)
 	box(Vector3(2038, -870, c - 98), Vector3(2135, -812, c - 60), hood_finish, false)
 	box(Vector3(2085, -870, c - 98), Vector3(2135, -180, c - 60), hood_finish, false)
-	for x in [1185.0, 2129.0]:
-		b.cylinder(Vector3(x, -615, f + 250), 8, 240, Vector3.ZERO, painted)
+	# Os eletrodutos nas paredes do lado (a Forja tem 3,2 m desde a grade, #186).
+	for x in [r.x0 + 25.0, r.x1 - 31.0]:
+		b.cylinder(Vector3(x, -615, f + 190), 8, 240, Vector3.ZERO, painted)
 	# Armários baixos nas laterais até o corte, com a caixa de ferramentas e os lingotes em cima.
 	var return_length := 420.0
 	var return_height := return_length * 286.0 / 1068.0
@@ -960,24 +1015,26 @@ func _forge() -> void:
 	var case_material := S("Metal021", f, 0, Color(0.55, 0.55, 0.42))
 	var case_top := S("metal_plate", f, 0, Color(0.27, 0.27, 0.18))
 	for left in [true, false]:
-		var x0 := 1177.0 if left else 2143.0 - return_depth
+		var x0: float = r.x0 + 17.0 if left else r.x1 - 17.0 - return_depth
 		var x1 := x0 + return_depth
 		box(Vector3(x0, -570, f), Vector3(x1, 0, f + return_height - 5), case_material, false)
 		box(Vector3(x0, -570, f + return_height - 5), Vector3(x1, 0, f + return_height), case_top, false)
 		b.contact(Vector3((x0 + x1) * 0.5, -285, f), Vector2(return_depth + 6, 568), 0.38)
 		b.card("Forge_Ingots" if left else "Forge_Toolbox", Vector3((x0 + x1) * 0.5, -295, f + return_height), 55,
 			55.0 * 606.0 / 1439.0 if left else 55.0 * 703.0 / 1439.0, true)
-	# Prateleira alta de peças sobressalentes no fundo e o suporte de barras sobre o armário da esquerda.
-	box(Vector3(1440, ROOM_BACK + 2, f + 288), Vector3(1910, ROOM_BACK + 5, f + 380), painted, false)
-	for height in [285.0, 376.0]:
+	# Prateleira alta de peças sobressalentes no fundo (1 m mais baixa desde a grade) e o suporte de barras sobre o
+	# armário da esquerda.
+	var rack := 205.0
+	box(Vector3(1440, ROOM_BACK + 2, f + rack + 3), Vector3(1910, ROOM_BACK + 5, f + rack + 95), painted, false)
+	for height in [rack, rack + 91]:
 		box(Vector3(1440, ROOM_BACK + 2, f + height), Vector3(1910, ROOM_BACK + 61, f + height + 4), steel, false)
 	for x in [1440.0, 1595.0, 1750.0, 1906.0]:
-		box(Vector3(x, ROOM_BACK + 2, f + 289), Vector3(x + 4, ROOM_BACK + 61, f + 376), painted, false)
-	b.card("Forge_ToolRack", Vector3(1600, ROOM_BACK + 62, f + 289), 150, 150.0 / 1.7597173, true)
+		box(Vector3(x, ROOM_BACK + 2, f + rack + 4), Vector3(x + 4, ROOM_BACK + 61, f + rack + 91), painted, false)
+	b.card("Forge_ToolRack", Vector3(1600, ROOM_BACK + 62, f + rack + 4), 150, 150.0 / 1.7597173, true)
 	for height in [138.0, 258.0]:
-		box(Vector3(1178, -553, f + height), Vector3(1210, -447, f + height + 4), painted, false)
+		box(Vector3(r.x0 + 18, -553, f + height), Vector3(r.x0 + 50, -447, f + height + 4), painted, false)
 	for y in [-540.0, -515.0, -490.0, -465.0]:
-		box(Vector3(1188, y, f + 142), Vector3(1192, y + 8, f + 258), steel, false)
+		box(Vector3(r.x0 + 28, y, f + 142), Vector3(r.x0 + 32, y + 8, f + 258), steel, false)
 	# Luz: pendente sobre a bigorna, um preenchimento fraco e o realce na frente da bigorna.
 	b.hang("caged_hanging_light", Vector3(anvil.x, anvil.y, c))
 	room_lights["forge"] = b.light(Vector3(anvil.x, anvil.y, c - 100), 900, 760, NEUTRAL, true)
@@ -990,8 +1047,13 @@ func _forge() -> void:
 
 ## Os beliches do Dormitório: o card inteiro da entrega #1 do Codex (art/station/cards/dormitory_bunk.webp, as linhas
 ## medidas em docs/design/bunk.md), uma peça só por beliche. Quatro lugares, um por herói da equipe, onde quem dorme
-## deita à noite (AHStation.sleep_slots). Ficam mesmo com o quarto por recuperar.
+## deita à noite (AHStation.sleep_slots). Chegam com a melhoria do Dormitório (o nível 2, #176).
 const BUNK_X := [-1010.0, -660.0]
+## Sem os beliches (o Dormitório no nível 1, #176), quem dorme deita no chão: quatro lugares lado a lado, à frente da
+## parede dos beliches, entre a mochila do canto e a faixa do vigia (que fica de pé perto da porta, de -3,9 a -1,9 m),
+## um pouco desencontrados na profundidade para um não cortar o outro.
+const FLOOR_SLEEP_X := [-1020.0, -840.0, -660.0, -480.0]
+const FLOOR_SLEEP_Y := [-600.0, -570.0]
 const BUNK_Y := -665.0
 const BUNK_FLOOR := -520.0
 const BUNK_CARD := "dormitory_bunk"
@@ -1043,55 +1105,48 @@ func _dormitory() -> void:
 	room_lights["dormitory"] = b.light(Vector3(-760, -460, -290), 650, 800, Color(1, 0.72, 0.42), true)
 
 
-## A Enfermaria provisória (#121): os beliches do Dormitório como leitos (um beliche no nível 1, dois no nível 2), a
-## estante de amostras como a de remédios e o armário com a frente da Cantina. Vazia (nível 0), só uma caixa tombada.
-const INFIRMARY_BUNK_X := [-1075.0, -805.0]
+## A Enfermaria de 12 m (os ajustes do Lucas de 26/10, PR #139, com a proposta de docs/design/hud-casa.md), que entra
+## com a grade (#186): os móveis nos planos do Dormitório. Nível 1: 2 leitos em uso, o soro e o armário, e 2 leitos
+## esperando a melhoria (o quebrado e o coberto); nível 2: os 4 em uso, com o biombo, o lavatório e o carrinho. Cada
+## peça: card, x, y (a profundidade), largura, altura / largura e a marca ("infirmary@=1": só no nível 1). No molde de
+## x −1840 a −640 (AHStationLayout.TEMPLATES).
 const INFIRMARY_FLOOR := -940.0
+const INFIRMARY_PIECES := [
+	["Infirmary_Cabinet", -1740.0, -780.0, 124.0000, 1.213415, "infirmary"],
+	["Infirmary_Bed", -1500.0, -665.0, 172.0000, 0.461216, "infirmary"],
+	["Infirmary_Drip", -1355.0, -720.0, 55.0000, 3.116279, "infirmary"],
+	["Infirmary_Bed", -1210.0, -665.0, 172.0000, 0.461216, "infirmary"],
+	["Infirmary_Bed_Broken", -960.0, -780.0, 181.0147, 0.482072, "infirmary@=1"],
+	["Infirmary_Bed_Covered", -770.0, -665.0, 182.0964, 0.516832, "infirmary@=1"],
+	["Infirmary_Bed", -960.0, -780.0, 172.0000, 0.461216, "infirmary@2"],
+	["Infirmary_Bed", -770.0, -665.0, 172.0000, 0.461216, "infirmary@2"],
+	["Infirmary_Drip", -865.0, -820.0, 55.0000, 3.116279, "infirmary@2"],
+	["Infirmary_Screen", -1085.0, -840.0, 150.0000, 0.893365, "infirmary@2"],
+	["Infirmary_Washstand", -1610.0, -820.0, 70.0000, 1.279245, "infirmary@2"],
+	["Infirmary_Trolley", -1085.0, -640.0, 80.0000, 1.155963, "infirmary@2"],
+]
+## Os leitos, na ordem em que enchem (x e profundidade), e a altura do colchão do Infirmary_Bed acima do piso.
+const INFIRMARY_BEDS := [Vector2(-1500.0, -665.0), Vector2(-1210.0, -665.0), Vector2(-770.0, -665.0), Vector2(-960.0, -780.0)]
+const INFIRMARY_MATTRESS := 68.0
 
 
 func _infirmary() -> void:
 	var f := INFIRMARY_FLOOR
-	var height := BUNK_PX.y * BUNK_SCALE
-	for index in INFIRMARY_BUNK_X.size():
+	for piece in INFIRMARY_PIECES:
 		var mark := b.mark()
-		var x: float = INFIRMARY_BUNK_X[index]
-		var base := Vector3(x + (BUNK_PX.x * 0.5 - BUNK_ANCHOR_X_PX) * BUNK_SCALE, BUNK_Y, f - (BUNK_PX.y - BUNK_FLOOR_PX) * BUNK_SCALE)
-		b.card(BUNK_CARD, base, BUNK_WIDTH, height)
-		# O segundo beliche só aparece com a Enfermaria melhorada (os leitos 3 e 4).
-		_tag_dressing("infirmary" if index == 0 else "infirmary@2", mark)
+		var width: float = piece[3]
+		b.card(piece[0], Vector3(piece[1], piece[2], f), width, width * float(piece[4]))
+		_tag_dressing(piece[5], mark)
 	var mark := b.mark()
-	b.card("Research_SampleShelves", Vector3(-940, -886, f + 160), 150, 97)
-	b.card("Cantina_Front", Vector3(-700, -720, f), 90, 90.0 * 788.0 / 1380.0)
-	b.hang("caged_hanging_light", Vector3(-940, -480, B2_CEILING))
-	room_lights["infirmary"] = b.light(Vector3(-940, -480, B2_CEILING - 90), 1100, 700, COOL, true)
+	# O pendente da esquerda acende o armário e os dois leitos em uso; o da direita, os do nível 2.
+	b.hang("caged_hanging_light", Vector3(-1550, -560, B2_CEILING))
+	room_lights["infirmary"] = b.light(Vector3(-1550, -560, B2_CEILING - 90), 1100, 900, COOL, true)
 	_tag_dressing("infirmary", mark)
-	b.card("Depot_Container", Vector3(-1180, -520, f), 60, 60.0 / 1.1509804)
-
-
-func _preparation() -> void:
-	var f := -940.0
-	var wood := S("wood_table_worn", f, 0, Color(0.65, 0.56, 0.42))
-	var steel := S("green_metal_rust", f, 0, Color(0.55, 0.65, 0.59))
-	b.prop("painted_wooden_bench", Vector3(2220, -590, f), 90)
-	b.prop("steel_frame_shelves_02", Vector3(2220, -830, f))
-	b.prop("metal_jerrycan_green", Vector3(2220, -826, f + 11.447))
-	b.card("Preparation_Crate", Vector3(2220, -811, f + 62.127), 44, 44.0 * 380.0 / 410.0)
-	b.card("Preparation_Crate", Vector3(2220, -811, f + 112.806), 44, 44.0 * 380.0 / 410.0)
-	b.card("Preparation_Crate", Vector3(2472, -545, f), 72, 72.0 * 380.0 / 410.0)
-	b.card("Preparation_Backpack", Vector3(2670, -545, f), 67, 67.0 * 1240.0 / 1125.0)
-	# A bancada com a frente pintada, a caixa de ferramentas e a prancheta com a lista.
-	var table := Vector3(2550, -735, f)
-	box(table + Vector3(-111, -38, 84.8), table + Vector3(111, 38, 90), wood)
-	for x in [-105.0, 105.0]:
-		box(table + Vector3(x - 3, -34, 0), table + Vector3(x + 3, 32, 84.8), steel)
-	b.card("Forge_BenchFront", table + Vector3(0, 39, 0), 222, 222.0 * 683.0 / 1786.0)
-	b.card("Forge_Toolbox", table + Vector3(53, 12, 90), 60, 60.0 * 703.0 / 1439.0)
-	# O diagrama das rotas emoldurado (o título é texto, não arte).
-	box(Vector3(2420, -899, f + 147), Vector3(2700, -892, f + 284), wood)
-	b.card("Preparation_Routes", Vector3(2560, -889, f + 154), 266, 123)
-	b.sign("ROTAS", Vector3(2560, -887, f + 265), 14, Color8(230, 224, 200))
-	box(table + Vector3(-20, 4, 90), table + Vector3(0, 32, 90.8), wood)
-	b.card("Preparation_Checklist", table + Vector3(-10, 33, 90.8), 18, 26)
+	mark = b.mark()
+	b.hang("caged_hanging_light", Vector3(-870, -560, B2_CEILING))
+	b.light(Vector3(-870, -560, B2_CEILING - 90), 700, 700, COOL, false)
+	_tag_dressing("infirmary@2", mark)
+	b.card("Depot_Container", Vector3(-1780, -520, f), 60, 60.0 / 1.1509804)
 
 
 func _research() -> void:
@@ -1160,47 +1215,51 @@ func _characters_room() -> void:
 	var painted := S("green_metal_rust", f, 0, Color(0.61, 0.68, 0.61))
 	var paper := S("painted_plaster_wall", f, 0, Color(0.83, 0.8, 0.68))
 	# O sofá pintado com o assento físico atrás, a estante e o mural.
-	var sofa := Vector3(500, -790, f)
+	var sofa := Vector3(510, -790, f)
 	box(sofa + Vector3(-120, -75, 18), sofa + Vector3(120, -2, 25), wood)
 	for x in [-122.0, 122.0]:
 		for y in [-68.0, -8.0]:
 			box(sofa + Vector3(x - 4, y - 4, 0), sofa + Vector3(x + 4, y + 4, 18), wood)
 	b.card("CharactersRoom_Sofa", sofa, 260, 260.0 * 723.0 / 1763.0)
-	b.card("Research_Bookshelf", Vector3(310, -830, f), 65, 65.0 * 539.0 / 290.0)
-	b.card("CharactersRoom_Notice", Vector3(30, -815, f), 92, 92.0 * 536.0 / 354.0)
-	b.prop("folding_wooden_stool", Vector3(675, -620, f), -25)
+	# Desde a grade (#186), o Alojamento tem 6 m: a porta na ponta esquerda, a estante e o mural entre ela e o sofá.
+	b.card("Research_Bookshelf", Vector3(245, -830, f), 65, 65.0 * 539.0 / 290.0)
+	b.card("CharactersRoom_Notice", Vector3(324, -815, f), 92, 92.0 * 536.0 / 354.0)
+	b.prop("folding_wooden_stool", Vector3(612, -620, f), -25)
 	# Mesa baixa de 44 cm com um livro fechado.
+	var low := Vector3(10, 0, 0)
 	for plank in 3:
-		box(Vector3(435, -690 + 20 * plank, f + 40), Vector3(555, -670.5 + 20 * plank, f + 44), wood)
+		box(low + Vector3(435, -690 + 20 * plank, f + 40), low + Vector3(555, -670.5 + 20 * plank, f + 44), wood)
 	for x in [444.0, 546.0]:
 		for y in [-681.0, -639.0]:
-			box(Vector3(x - 3, y - 3, f), Vector3(x + 3, y + 3, f + 40), painted)
-	box(Vector3(441, -684, f + 12), Vector3(549, -678, f + 18), painted)
-	box(Vector3(441, -642, f + 12), Vector3(549, -636, f + 18), painted)
-	box(Vector3(452, -682, f + 44), Vector3(476, -666, f + 44.3), painted)
-	box(Vector3(453, -681, f + 44.3), Vector3(475, -667, f + 46.8), paper)
-	box(Vector3(452, -682, f + 46.8), Vector3(476, -666, f + 47.1), painted)
+			box(low + Vector3(x - 3, y - 3, f), low + Vector3(x + 3, y + 3, f + 40), painted)
+	box(low + Vector3(441, -684, f + 12), low + Vector3(549, -678, f + 18), painted)
+	box(low + Vector3(441, -642, f + 12), low + Vector3(549, -636, f + 18), painted)
+	box(low + Vector3(452, -682, f + 44), low + Vector3(476, -666, f + 44.3), painted)
+	box(low + Vector3(453, -681, f + 44.3), low + Vector3(475, -667, f + 46.8), paper)
+	box(low + Vector3(452, -682, f + 46.8), low + Vector3(476, -666, f + 47.1), painted)
 
 
-## Peças pintadas nos cantos de cada sala (BuildCornerDressing): no piso, de frente; ou na parede do lado.
-func _corner_dressing() -> void:
-	var items := [
-		["characters", "Preparation_Backpack", Vector3(15, -520, -520), 60.0, 66.0, true],
-		["characters", "Depot_Container", Vector3(710, -520, -520), 55.0, 55.0 / 1.1509804, true],
-		["canteen", "Cantina_Utensils", Vector3(1577, -430, -350), 140.0, 140.0 * 40.94 / 160.0, false],
-		["bar", "Cantina_Front", Vector3(810, -570, -520), 65.0, 65.0 * 788.0 / 1380.0, true],
-		["bar", "CharactersRoom_Notice", Vector3(1543, -280, -380), 60.0, 60.0 * 536.0 / 354.0, false],
-		["dormitory", "Preparation_Backpack", Vector3(-1160, -520, -520), 60.0, 66.0, true],
-		["dormitory", "Dormitory_PersonalPegs", Vector3(-57, -560, -390), 80.0, 80.0 * 1037.0 / 1112.0, false],
-		["forge", "Forge_ToolRack", Vector3(1177, -340, -885), 180.0, 180.0 / 1.7597173, false],
-		["forge", "Depot_Container", Vector3(2050, -600, -1040), 50.0, 50.0 / 1.1509804, true],
-		["depot", "Depot_Container", Vector3(620, -520, -940), 60.0, 60.0 / 1.1509804, true],
-		["depot", "Preparation_Backpack", Vector3(1110, -520, -940), 50.0, 55.0, true],
-		["research", "Depot_Container", Vector3(-570, -520, -940), 60.0, 60.0 / 1.1509804, true],
-		["preparation", "Preparation_Backpack", Vector3(2200, -520, -940), 50.0, 55.0, true],
-		["preparation", "Dormitory_PersonalPegs", Vector3(2743, -560, -810), 80.0, 80.0 * 1037.0 / 1112.0, false],
-	]
-	for item in items:
+## Peças pintadas nos cantos de cada sala (BuildCornerDressing): no piso, de frente; ou na parede do lado. No molde de
+## cada cômodo (o offset leva até a vaga).
+const CORNER_ITEMS := [
+	["characters", "Preparation_Backpack", Vector3(120, -520, -520), 60.0, 66.0, true],
+	["characters", "Depot_Container", Vector3(600, -520, -520), 55.0, 55.0 / 1.1509804, true],
+	["canteen", "Cantina_Utensils", Vector3(1577, -430, -350), 140.0, 140.0 * 40.94 / 160.0, false],
+	["bar", "CharactersRoom_Notice", Vector3(1443, -280, -380), 60.0, 60.0 * 536.0 / 354.0, false],
+	["dormitory", "Preparation_Backpack", Vector3(-1160, -520, -520), 60.0, 66.0, true],
+	["dormitory", "Dormitory_PersonalPegs", Vector3(-57, -560, -390), 80.0, 80.0 * 1037.0 / 1112.0, false],
+	["forge", "Forge_ToolRack", Vector3(1077, -340, -785), 180.0, 180.0 / 1.7597173, false],
+	["forge", "Depot_Container", Vector3(2050, -600, -940), 50.0, 50.0 / 1.1509804, true],
+	["depot", "Depot_Container", Vector3(620, -520, -940), 60.0, 60.0 / 1.1509804, true],
+	["depot", "Preparation_Backpack", Vector3(1110, -520, -940), 50.0, 55.0, true],
+	["research", "Depot_Container", Vector3(-570, -520, -940), 60.0, 60.0 / 1.1509804, true],
+]
+
+
+func _corner_dressing(room_id: String) -> void:
+	for item in CORNER_ITEMS:
+		if item[0] != room_id:
+			continue
 		var start := b.mark()
 		var left_wall: bool = item[0] == "canteen" or item[0] == "forge"
 		var right := Vector3(1, 0, 0) if item[5] else Vector3(0, 1.0 if left_wall else -1.0, 0)
@@ -1211,47 +1270,259 @@ func _corner_dressing() -> void:
 
 
 ## Os armários baixos das laterais de cada sala (BuildRoomReturns): caixa, tampo, a frente pintada e um objeto em cima.
-func _room_returns() -> void:
-	var plans := [
-		["characters", -40.0, 760.0, -520.0, 80.0, 360.0, 140.0, 1380.0 / 788.0],
-		["canteen", 1560.0, 2760.0, -520.0, 90.0, 400.0, 140.0, 1380.0 / 788.0],
-		["bar", 760.0, 1560.0, -520.0, 90.0, 360.0, 275.0, 222.0 / 60.55],
-		["dormitory", -1240.0, -40.0, -520.0, 85.0, 400.0, 140.0, 1380.0 / 788.0],
-		["depot", 560.0, 1160.0, -940.0, 60.0, 340.0, 90.0, 340.0 / 286.0],
-		["research", -640.0, 560.0, -940.0, 90.0, 450.0, 210.0, 1786.0 / 683.0],
-		["preparation", 2160.0, 2760.0, -940.0, 65.0, 360.0, 210.0, 1786.0 / 683.0],
+## Cada um: a fundura, o comprimento, a largura da frente pintada e a proporção dela.
+const RETURNS := {
+	"characters": [80.0, 360.0, 140.0, 1380.0 / 788.0],
+	"canteen": [90.0, 400.0, 140.0, 1380.0 / 788.0],
+	"bar": [90.0, 360.0, 275.0, 222.0 / 60.55],
+	"dormitory": [85.0, 400.0, 140.0, 1380.0 / 788.0],
+	"depot": [60.0, 340.0, 90.0, 340.0 / 286.0],
+	"research": [90.0, 450.0, 210.0, 1786.0 / 683.0],
+}
+
+
+func _room_returns(room_id: String) -> void:
+	if not RETURNS.has(room_id):
+		return
+	var r := room(room_id)
+	var p: Array = [room_id, r.x0, r.x1, r.floor] + RETURNS[room_id]
+	var start := b.mark()
+	var height: float = p[6] / p[7]
+	var top: float = p[3] + height + 4
+	var metal: bool = ["depot", "research"].has(p[0])
+	var body := S("Metal021", p[3], 0, Color(0.55, 0.55, 0.42)) if metal else S("wood_table_worn", p[3], 0, Color(0.55, 0.45, 0.34))
+	var worktop := S("metal_plate", p[3], 0, Color(0.27, 0.27, 0.18)) if metal else S("wood_table_worn", p[3], 0, Color(0.42, 0.38, 0.33))
+	var front := "Forge_BenchFront" if metal else "Cantina_Front"
+	for left in [true, false]:
+		var wall: float = p[1] + 15 if left else p[2] - 15
+		var a: float = wall if left else wall - p[4]
+		var c: float = a + p[4]
+		var mid := (a + c) * 0.5
+		box(Vector3(a, -p[5], p[3]), Vector3(c, 0, top - 4), body, false)
+		box(Vector3(a, -p[5], top - 4), Vector3(c, 0, top), worktop, false)
+		# A frente pintada repetida ao longo do armário, virada para dentro da sala.
+		var tiles := maxi(1, roundi(p[5] / (height * p[7])))
+		var tile_width: float = p[5] / tiles
+		for tile in tiles:
+			var y: float = -p[5] + tile_width * (tile + 0.5)
+			b.card(front, Vector3(c + 0.2 if left else a - 0.2, y, p[3]), tile_width, height, false, Vector3(0, 1.0 if left else -1.0, 0))
+		b.contact(Vector3(mid, -p[5] * 0.5, p[3]), Vector2(p[4] + 6, p[5] - 2), 0.3)
+		var y_prop: float = -p[5] * 0.62
+		match p[0]:
+			"bar":
+				b.card("Bar_Bottle0" if left else "Bar_Bottle2", Vector3(mid - 10, y_prop, top), 16.17 if left else 16.68, 28.0 if left else 30.0)
+				b.card("Bar_Bottle1" if left else "Bar_Bottle3", Vector3(mid + 12, y_prop - 5, top), 9.23 if left else 9.69, 34.0 if left else 32.0)
+			"characters", "depot":
+				b.card("Preparation_Backpack" if left == (p[0] == "characters") else "Preparation_Crate", Vector3(mid, y_prop, top),
+					35.0 if left == (p[0] == "characters") else 46.0, 35.0 * 1240.0 / 1125.0 if left == (p[0] == "characters") else 46.0 * 380.0 / 410.0)
+	_tag_dressing(p[0], start)
+
+
+# ---------------------------------------------------------------- a grade: blocos, vagas livres e patamares
+
+## Um bloco da grade (AHStationLayout.blocks): a frente soterrada, a escavação em andamento ou a vaga livre. A arte
+## provisória é montada aqui, com as superfícies do jogo, até os cartões pintados da #275 chegarem.
+func _block(entry: Dictionary) -> void:
+	match entry.state:
+		"free":
+			_free_slot(entry)
+		"digging":
+			_buried(entry, entry.stage)
+		_:
+			_buried(entry, 0)
+
+
+## A frente soterrada: terra, entulho e raízes atravessando, do piso ao teto da vaga. Com a escavação em andamento
+## (stage 1 ou 2), o lado aberto já tem um terço ou dois terços cavados, com as escoras, a pá, o carrinho e a lâmpada
+## de obra. As três variações saem da vaga (as bordas emendam entre vizinhos: a terra é uma só).
+func _buried(entry: Dictionary, stage: int) -> void:
+	var f: float = entry.floor
+	var c: float = entry.ceiling
+	var earth := S("rough_concrete", f, 0.6, EARTH_TINT, 1.1)
+	var dark := S("rough_concrete", f, 0.4, EARTH_TINT * 0.7, 1.1)
+	var rubble := S("concrete_wall_008", f, 0.4, Color(0.78, 0.74, 0.68))
+	var brick := S("red_brick_03", f, 0.3, Color(0.8, 0.66, 0.58))
+	var root := S("wood_planks_grey", f, 0.2, ROOT_TINT, 1.0)
+	var cut := S("rough_concrete", 0, 0, Color(0.2, 0.19, 0.18))
+	var dug: float = SLOT_DUG[stage] if stage < SLOT_DUG.size() else 0.0
+	var x0: float = entry.x0
+	var x1: float = entry.x1
+	# O lado cavado (de onde vem a escavação) fica aberto; o resto é terra.
+	var earth_x0: float = x0 if entry.from > 0 else x0 + dug
+	var earth_x1: float = x1 - dug if entry.from > 0 else x1
+	box(Vector3(earth_x0, CORRIDOR_BACK - 40, f - FINISH), Vector3(earth_x1, -1, c), earth)
+	box(Vector3(x0, -2, f - 30), Vector3(x1, 0.5, f - 2), cut, false)
+	box(Vector3(x0, -2, c), Vector3(x1, 0.5, c + 30), cut, false)
+	# Os pedaços de entulho na face (concreto e tijolo caídos) e as raízes atravessando, sorteados pela vaga.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(String(entry.key)) + 186
+	var variant := int(entry.slot) % 3
+	var chunks := 7 + variant * 2
+	for index in chunks:
+		var cx := rng.randf_range(earth_x0 + 30, earth_x1 - 30)
+		if earth_x1 - earth_x0 < 80:
+			break
+		var cz := f + rng.randf_range(0.0, 1.0) ** 1.6 * (c - f - 40)
+		var size := Vector3(rng.randf_range(40, 110), rng.randf_range(20, 40), rng.randf_range(18, 60))
+		b.beam(Vector3(cx, -size.y * 0.5 + rng.randf_range(-2, 6), cz + size.z * 0.5), size,
+			Vector3(rng.randf_range(-8, 8), 0, rng.randf_range(-25, 25)), brick if index % 3 == 0 else rubble)
+	for index in 2 + variant:
+		var ax := rng.randf_range(earth_x0, earth_x1)
+		var bx := clampf(ax + rng.randf_range(-260, 260), earth_x0, earth_x1)
+		var a := Vector3(ax, -6, c - rng.randf_range(0, 40))
+		var z := f + rng.randf_range(10, 140)
+		var tip := Vector3(bx, -6, z)
+		b.cylinder((a + tip) * 0.5, rng.randf_range(7, 13), a.distance_to(tip), Vector3(_tilt(tip - a), 0, 0), root)
+		b.cylinder(tip + Vector3(rng.randf_range(-30, 30), 0, -10), 4, rng.randf_range(40, 80), Vector3(rng.randf_range(-40, 40), 0, 0), root)
+	# Um monte de terra solta na boca do corte, no pé da frente.
+	b.beam(Vector3((earth_x0 + earth_x1) * 0.5, -24, f + 10), Vector3(earth_x1 - earth_x0 - 20, 46, 40), Vector3(0, 0, 0), dark)
+	if dug > 0.0:
+		_dig_works(entry, earth_x0, earth_x1)
+
+
+## O pitch (graus) que deita o eixo do cilindro (o Z da Unreal) na direção d, no plano do corte (X e Z).
+static func _tilt(d: Vector3) -> float:
+	return rad_to_deg(atan2(-d.x, d.z))
+
+
+## A terra das vagas soterradas e as raízes que a atravessam (a arte provisória até a #275).
+const EARTH_TINT := Color(0.62, 0.47, 0.34)
+const ROOT_TINT := Color(0.55, 0.42, 0.3)
+
+
+## Quanto da vaga (cm) já foi cavado em cada estágio: nada, um terço e dois terços.
+const SLOT_DUG := [0.0, 200.0, 400.0]
+
+
+## A parte cavada: o chão de terra batida, o fundo de terra, as escoras de madeira na boca da frente, a pá encostada, o
+## carrinho de mão com entulho e a lâmpada de obra pendurada (luz quente e fraca).
+func _dig_works(entry: Dictionary, earth_x0: float, earth_x1: float) -> void:
+	var f: float = entry.floor
+	var c: float = entry.ceiling
+	var opened_x0: float = earth_x1 if entry.from > 0 else entry.x0
+	var opened_x1: float = entry.x1 if entry.from > 0 else earth_x0
+	var face: float = earth_x1 if entry.from > 0 else earth_x0
+	var ground := S("gravel_floor_02", f, 0.5, Color(0.5, 0.42, 0.34))
+	var earth := S("rough_concrete", f, 0.6, EARTH_TINT * 0.85, 1.1)
+	var timber := S("wood_planks_grey", f, 0, Color(0.62, 0.5, 0.36))
+	box(Vector3(opened_x0, ROOM_BACK, f - FINISH), Vector3(opened_x1, 0, f), ground)
+	box(Vector3(opened_x0, CORRIDOR_BACK - 40, f), Vector3(opened_x1, ROOM_BACK, c), earth)
+	box(Vector3(opened_x0, ROOM_BACK, c - 2), Vector3(opened_x1, -2, c), earth, false)
+	# Escoras: dois pontaletes e a travessa na face da terra, outro par no meio da parte aberta.
+	for x in [face, (opened_x0 + opened_x1) * 0.5]:
+		for y in [-160.0, -720.0]:
+			box(Vector3(x - 9, y - 9, f), Vector3(x + 9, y + 9, c - 12), timber)
+		box(Vector3(x - 10, -740, c - 22), Vector3(x + 10, -140, c - 4), timber)
+	var side := -1.0 if entry.from > 0 else 1.0
+	var work_x := face + side * 90.0
+	b.prop_placed("sledgehammer_01", Vector3(face + side * 30.0, -420, f), Vector3(0, 90, 70))
+	b.prop("industrial_storage_cart", Vector3(work_x + side * 60.0, -520, f), 8)
+	b.prop("wooden_bucket_01", Vector3(work_x - side * 20.0, -300, f))
+	b.hang("caged_hanging_light", Vector3((opened_x0 + opened_x1) * 0.5, -480, c))
+	b.light(Vector3((opened_x0 + opened_x1) * 0.5, -480, c - 90), 520, 520, AMBER, true)
+
+
+## A vaga livre: o piso de concreto limpo, o fundo de concreto com as raízes cortadas, as paredes do lado e os restos
+## encostados num canto; uma lâmpada fraca para a vaga se ler na vista geral.
+func _free_slot(entry: Dictionary) -> void:
+	var r := {"x0": entry.x0, "x1": entry.x1, "floor": entry.floor, "ceiling": entry.ceiling}
+	var f: float = entry.floor
+	var c: float = entry.ceiling
+	box(Vector3(r.x0, ROOM_BACK, f - FINISH), Vector3(r.x1, 0, f), S("concrete_floor_worn_001", f, 0.3, Color(0.78, 0.74, 0.68)))
+	box(Vector3(r.x0, ROOM_BACK - 40, f), Vector3(r.x1, ROOM_BACK, c), S("concrete_wall_008", f, 0.45, Color(0.72, 0.68, 0.62)))
+	_cut_and_corridor(r)
+	var root := S("wood_planks_grey", f, 0.2, ROOT_TINT, 1.0)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(String(entry.key)) + 273
+	for index in 4:
+		var x := rng.randf_range(r.x0 + 60, r.x1 - 60)
+		var z := f + rng.randf_range(90, c - f - 40)
+		b.cylinder(Vector3(x, ROOM_BACK + 8, z), rng.randf_range(8, 14), 16, Vector3(0, 0, 90), root)
+		b.cylinder(Vector3(x + rng.randf_range(-8, 8), ROOM_BACK + 2, z - 20), 5, 40, Vector3(rng.randf_range(-30, 30), 0, 0), root)
+	var corner: float = r.x0 + 70.0 if rng.randf() < 0.5 else r.x1 - 110.0
+	b.prop("wooden_crate_02", Vector3(corner, -820, f), 12)
+	b.prop("cardboard_box_01", Vector3(corner + 60, -760, f), -20)
+	b.card("Depot_Sack", Vector3(corner + 20, -700, f), 40, 40.0 * 1285.0 / 1053.0)
+	b.hang("caged_hanging_light", Vector3((r.x0 + r.x1) * 0.5, -480, c))
+	b.light(Vector3((r.x0 + r.x1) * 0.5, -480, c - 90), 520, 560, NEUTRAL, true)
+
+
+## Os patamares da escada: o do 2º e o do 3º subsolo continuam soterrados até serem escavados (a terra enche o eixo
+## naquele andar, com o lance desabado por baixo).
+func _landings(campaign: Dictionary) -> void:
+	var bands := [[2, B2_FLOOR, B1_FLOOR - 40], [3, B3_FLOOR, B2_FLOOR - 40]]
+	for band in bands:
+		if AHStationLayout.landing_open(campaign, band[0]):
+			continue
+		var f: float = band[1]
+		var top: float = band[2]
+		var earth := S("rough_concrete", f, 0.6, EARTH_TINT, 1.1)
+		var rubble := S("concrete_wall_008", f, 0.4, Color(0.78, 0.74, 0.68))
+		box(Vector3(CORE_X0, STATION_BACK - 40, f - FINISH), Vector3(CORE_X1, -1, top), earth)
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 186 + int(band[0])
+		for index in 6:
+			var cx := rng.randf_range(CORE_X0 + 40, CORE_X1 - 40)
+			var cz := rng.randf_range(f, top - 40)
+			var size := Vector3(rng.randf_range(50, 120), 30, rng.randf_range(16, 30))
+			b.beam(Vector3(cx, -14, cz), size, Vector3(0, 0, rng.randf_range(-30, 30)), rubble)
+
+
+# ---------------------------------------------------------------- a plataforma improvisada
+
+## Os improvisos da plataforma (#186): o fogareiro entre os bancos é a Cantina de nível 1 (a Dora trabalha nele, e o banco
+## ao lado é o da Cantina) e os caixotes no fim da linha são o Depósito de nível 1 (as luzes do estoque e o posto do
+## Nick ficam neles). Somem quando o cômodo é construído numa vaga.
+func _platform_nooks(campaign: Dictionary) -> void:
+	b.offset = Vector3.ZERO
+	stove_light = null
+	if AHStationLayout.room(campaign, "canteen").get("place", "") == "platform":
+		var mark := b.mark()
+		_stove()
+		_tag_dressing("canteen", mark)
+	if AHStationLayout.room(campaign, "depot").get("place", "") == "platform":
+		var mark := b.mark()
+		_crates()
+		_tag_dressing("depot", mark)
+
+
+## O fogareiro: um tambor de aço com a boca de brasa, a grelha, a panela e as batatas no chão.
+func _stove() -> void:
+	var x := 1290.0
+	var y := -880.0
+	var drum := S("green_metal_rust", 0, 0, Color(0.3, 0.3, 0.28), 0.95)
+	var soot := S("metal_plate", 0, 0, Color(0.14, 0.13, 0.12), 0.9)
+	var grill := S("metal_plate", 0, 0, Color(0.4, 0.38, 0.35), 0.6)
+	b.cylinder(Vector3(x, y, 40), 58, 80, Vector3.ZERO, drum)
+	b.cylinder(Vector3(x, y, 81), 60, 3, Vector3.ZERO, soot)
+	box(Vector3(x - 16, y + 27, 18), Vector3(x + 16, y + 30, 38), b.emissive(Color(1, 0.36, 0.08), 6), false)
+	for offset in [-14.0, 0.0, 14.0]:
+		box(Vector3(x - 30, y + offset - 1, 83), Vector3(x + 30, y + offset + 1, 85), grill)
+	b.prop("brass_pot_01", Vector3(x - 4, y, 85))
+	b.prop("wooden_bucket_01", Vector3(x + 52, y + 20, 0))
+	for along in [-40.0, -28.0]:
+		b.prop("sweet_potato", Vector3(x + along, y + 40, 0), along * 9.0)
+	stove_light = b.light(Vector3(x, y + 60, 60), 240, 360, Color(1, 0.5, 0.2), false)
+
+
+## Os caixotes: as caixas, os sacos e os barris empilhados na plataforma; cada faixa do estoque acende uma pilha.
+func _crates() -> void:
+	var ratios := {"Depot_Crate": 1480.0 / 777.0, "Depot_Sack": 1053.0 / 1285.0, "Depot_Container": 1174.0 / 1020.0}
+	var art := func(name: String, base: Vector3, width: float) -> void:
+		b.card(name, base, width, width / ratios[name], true)
+	# Entre o Mapa da Rede e a porta escondida, longe da beira: os caixotes de sempre e as pilhas do estoque.
+	var y := -820.0
+	b.prop("wooden_military_crate", Vector3(1905, y - 30, 0), 4)
+	b.prop("wooden_crate_02", Vector3(2105, y - 20, 0), 80)
+	var bands := [
+		[1, "Depot_Crate", Vector3(1975, y, 0), 70.0],
+		[2, "Depot_Crate", Vector3(1975, y, 37), 64.0],
+		[3, "Depot_Sack", Vector3(2040, y + 6, 0), 40.0],
+		[3, "Depot_Container", Vector3(2075, y + 6, 0), 34.0],
+		[4, "Depot_Crate", Vector3(2055, y + 6, 30), 56.0],
 	]
-	for p in plans:
-		var start := b.mark()
-		var height: float = p[6] / p[7]
-		var top: float = p[3] + height + 4
-		var metal: bool = ["depot", "research", "preparation"].has(p[0])
-		var body := S("Metal021", p[3], 0, Color(0.55, 0.55, 0.42)) if metal else S("wood_table_worn", p[3], 0, Color(0.55, 0.45, 0.34))
-		var worktop := S("metal_plate", p[3], 0, Color(0.27, 0.27, 0.18)) if metal else S("wood_table_worn", p[3], 0, Color(0.42, 0.38, 0.33))
-		var front := "Forge_BenchFront" if metal else "Cantina_Front"
-		for left in [true, false]:
-			var wall: float = p[1] + 15 if left else p[2] - 15
-			var a: float = wall if left else wall - p[4]
-			var c: float = a + p[4]
-			var mid := (a + c) * 0.5
-			box(Vector3(a, -p[5], p[3]), Vector3(c, 0, top - 4), body, false)
-			box(Vector3(a, -p[5], top - 4), Vector3(c, 0, top), worktop, false)
-			# A frente pintada repetida ao longo do armário, virada para dentro da sala.
-			var tiles := maxi(1, roundi(p[5] / (height * p[7])))
-			var tile_width: float = p[5] / tiles
-			for tile in tiles:
-				var y: float = -p[5] + tile_width * (tile + 0.5)
-				b.card(front, Vector3(c + 0.2 if left else a - 0.2, y, p[3]), tile_width, height, false, Vector3(0, 1.0 if left else -1.0, 0))
-			b.contact(Vector3(mid, -p[5] * 0.5, p[3]), Vector2(p[4] + 6, p[5] - 2), 0.3)
-			var y_prop: float = -p[5] * 0.62
-			match p[0]:
-				"bar":
-					b.card("Bar_Bottle0" if left else "Bar_Bottle2", Vector3(mid - 10, y_prop, top), 16.17 if left else 16.68, 28.0 if left else 30.0)
-					b.card("Bar_Bottle1" if left else "Bar_Bottle3", Vector3(mid + 12, y_prop - 5, top), 9.23 if left else 9.69, 34.0 if left else 32.0)
-				"characters", "depot":
-					b.card("Preparation_Backpack" if left == (p[0] == "characters") else "Preparation_Crate", Vector3(mid, y_prop, top),
-						35.0 if left == (p[0] == "characters") else 46.0, 35.0 * 1240.0 / 1125.0 if left == (p[0] == "characters") else 46.0 * 380.0 / 410.0)
-				"preparation":
-					b.card("Preparation_Crate" if left else "Forge_Toolbox", Vector3(mid, y_prop, top), 46.0 if left else 42.0,
-						46.0 * 380.0 / 410.0 if left else 42.0 * 703.0 / 1439.0)
-		_tag_dressing(p[0], start)
+	for entry in bands:
+		var mark := b.mark()
+		art.call(entry[1], entry[2], entry[3])
+		_tag_stock(mark, entry[0])
+	b.contact(Vector3(2005, y, 0), Vector2(260, 60), 0.35)

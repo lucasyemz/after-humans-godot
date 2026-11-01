@@ -110,11 +110,16 @@ const LEAVES_AMOUNT := 26
 const STEAM_AMOUNT := 14
 const EMBERS_AMOUNT := 40
 var _steam: Array[CPUParticles3D] = []
+## As fontes de luz prática do lugar (#154, AHPracticalLight): o tambor com fogo, o lampião, a emergência, o drone.
+var _practical: Array[AHPracticalLight] = []
 
 var _leader: CharacterBody3D
 ## Heróis da equipe (a equipe viva da expedição) e as placas deles, na mesma ordem.
 var party_ids: Array = []
 var _heroes: Array[AHSpriteCard] = []
+## Quem da fila está ferido (#194), na ordem de _heroes, e a hora (_time) da próxima conferência.
+var _wounded: Array[bool] = []
+var _wound_check := 0.0
 ## A silhueta de quem está escondido e o esmaecimento do que tapa (#51).
 var occlusion: AHOcclusion
 var _combat_art := {}
@@ -130,6 +135,8 @@ var _indoor := false
 var scenario: AHScenarioWorld
 var floor_y := 0.0
 var lane_z := 0.45
+## A equipe vai dentro do vagão que parte (carry_party): a fila fica presa ao rastro.
+var carried := false
 var sheltered := false
 var _zone := {}
 ## Na luta num cenário, o quanto o chão de quem luta sobe para os pés passarem da borda da frente do piso (#48).
@@ -461,6 +468,19 @@ func _build_ambience() -> void:
 		vent.local_coords = false
 		add_child(vent)
 		_steam.append(vent)
+	for source in _practical:
+		source.queue_free()
+	_practical.clear()
+	for entry in ambience.get("lights", []):
+		var source := AHPracticalLight.new()
+		add_child(source)
+		source.setup(entry)
+		_practical.append(source)
+		# As de chão seguram a equipe (a rua anda pelos becos); posta depois de _collect_set, a caixa entra à mão.
+		var box := source.volume()
+		if box.has_volume():
+			var body: StaticBody3D = _dynamic.add_collider(box.get_center(), box.size)
+			_debug_colliders.append(body.get_node("DebugBox"))
 
 
 ## Quantas partículas, pela fração do perfil e da qualidade (trocar a quantidade recomeça a emissão: só quando muda).
@@ -694,11 +714,38 @@ func _build_party() -> void:
 			continue
 		var card := AHSpriteCard.new()
 		card.body_height = AHCharacterHeights.find(hero_id)
-		card.show_art(art.idle)
+		card.show_art(_rest_art(hero, art))
 		add_child(card)
 		party_ids.append(hero_id)
 		_heroes.append(card)
 	_place_leader(Vector3(7.6, 0, 0.45))
+
+
+## A arte de andar de um herói: o idle, ou a pose de ferido (#194) com a vida baixa.
+func _rest_art(hero, art: Dictionary) -> Dictionary:
+	return AHWounded.pose(art.idle) if AHWounded.is_wounded(hero) else art.idle
+
+
+## A fração da velocidade com que a equipe anda: a do mais ferido (a fila anda junta, no passo de quem manca).
+func party_speed_factor() -> float:
+	var factor := 1.0
+	for hero_id in party_ids:
+		factor = minf(factor, AHWounded.speed_factor(Campaign.hero(hero_id)))
+	return factor
+
+
+## Confere quem está ferido (a vida muda com a luta, a comida, o curativo) e troca a pose de quem mudou.
+func _check_wounds() -> void:
+	_wound_check = _time + 0.25
+	_wounded.resize(_heroes.size())
+	for index in _heroes.size():
+		var hero = Campaign.hero(party_ids[index])
+		var now := AHWounded.is_wounded(hero)
+		if now != _wounded[index]:
+			_wounded[index] = now
+			var art := AHCombatArena.art_entry(_combat_art.heroes, party_ids[index], String(hero.get("art_variant", "")) if hero != null else "")
+			if not art.is_empty():
+				_heroes[index].show_art(_rest_art(hero, art))
 
 
 ## Um herói entra na equipe no meio da jornada (o Nick no tutorial, #144): a placa nasce em at e anda até o lugar dele
@@ -710,7 +757,7 @@ func add_hero(hero_id: String, at: Vector3) -> void:
 		return
 	var card := AHSpriteCard.new()
 	card.body_height = AHCharacterHeights.find(hero_id)
-	card.show_art(art.idle)
+	card.show_art(_rest_art(hero, art))
 	add_child(card)
 	card.position = at
 	card.set_facing(-1.0)
@@ -737,6 +784,15 @@ func walk_leader(target: Vector3, seconds: float) -> bool:
 			if _trail.size() > 200:
 				_trail.pop_back()
 	return true
+
+
+## A equipe dentro do vagão que parte (#256): o líder e o rastro andam dx em x, e a fila fica presa a eles (sem a
+## suavização, que deixava quem vem atrás escorregar para fora do vagão andando).
+func carry_party(dx: float) -> void:
+	carried = true
+	_leader.position.x += dx
+	for index in _trail.size():
+		_trail[index].x += dx
 
 
 ## Põe o líder num ponto e a equipe enfileirada atrás dele (início e capturas).
@@ -804,11 +860,17 @@ func _ground_height(z: float) -> float:
 
 
 func _place_party(delta: float) -> void:
-	if _arena != null and _arena.active:
+	if (_arena != null and _arena.active) or (corridor != null and corridor.camp != null and corridor.camp.active):
+		# Na luta e no acampamento (#77) a arena e a fogueira cuidam das placas: sem o balanço de mancar.
+		for card in _heroes:
+			card.rotation.z = 0.0
 		return
-	# No acampamento (#77), cada um fica no seu lugar em volta da fogueira.
-	if corridor != null and corridor.camp != null and corridor.camp.active:
-		return
+	if carried:
+		delta = 0.0
+	if _time >= _wound_check or _wounded.size() != _heroes.size():
+		_check_wounds()
+	var limp: Dictionary = AHWounded.rules()
+	var reduced := _reduced_effects()
 	# A fila cabe no rastro que existe: perto da ponta da área (na chegada) os espaços encolhem e abrem de novo quando
 	# o líder anda.
 	var spacing := PARTY_SPACING
@@ -827,15 +889,26 @@ func _place_party(delta: float) -> void:
 		var z := target.z if delta == 0.0 or index == 0 else lerpf(previous.z, target.z, 1.0 - exp(-10.0 * delta))
 		if delta > 0.0 and absf(x - previous.x) > 0.004:
 			_set_facing(index, signf(x - previous.x))
-		# Respiração leve: só a escala vertical, com a base no chão.
-		var breath := 1.0 + 0.012 * sin(_time * 2.2 + index * 1.7)
+		# Respiração leve: só a escala vertical, com a base no chão. Ferido (#194), mais funda e mais lenta.
+		var hurt: bool = index < _wounded.size() and _wounded[index]
+		var depth: float = 0.012 * (float(limp.BreathDepth) if hurt else 1.0)
+		var breath := 1.0 + depth * sin(_time * (1.6 if hurt else 2.2) + index * 1.7)
 		card.scale = Vector3(1, breath, 1)
 		# Andando, o passo levanta a placa um pouco (a arte não tem folha de andar).
 		while _bob_time.size() <= index:
 			_bob_time.append(0.0)
 		var moving: bool = delta > 0.0 and Vector2(x - previous.x, z - previous.z).length() > 0.2 * delta
 		_bob_time[index] = _bob_time[index] + delta if moving else 0.0
-		var bob := WALK_BOB * absf(sin(_bob_time[index] * WALK_BOB_STEPS * PI))
+		var phase: float = _bob_time[index] * WALK_BOB_STEPS * PI
+		var bob := WALK_BOB * absf(sin(phase))
+		var tilt := 0.0
+		if hurt and moving and not reduced:
+			# O mancar: um passo sobe inteiro e o outro só LimpDip, e o corpo pende para o lado do passo bom.
+			var good_step := fmod(phase, TAU) < PI
+			bob *= 1.0 if good_step else float(limp.LimpDip)
+			tilt = deg_to_rad(float(limp.LimpTilt)) * sin(phase) * card.facing
+		# Ao parar, o corpo volta ao prumo suave, não num quadro.
+		card.rotation.z = tilt if delta == 0.0 or tilt != 0.0 or reduced else lerpf(card.rotation.z, 0.0, 1.0 - exp(-12.0 * delta))
 		card.position = Vector3(x, _ground_height(z) + bob, z - PARTY_DEPTH_STEP * index)
 
 
@@ -1039,6 +1112,10 @@ func _apply_weather() -> void:
 		_leaves.emitting = leaves > 0.0 and not _raining and not covered and not _reduced_effects()
 		_leaves.visible = _leaves.emitting
 		_set_amount(_leaves, LEAVES_AMOUNT, leaves)
+	# As fontes de luz prática: a luz da cena só no Forward+ e da Média para cima (no Compatibility, o chão já tem as 8
+	# luzes que cada malha pega); no resto, o halo e a poça desenhados.
+	for source in _practical:
+		source.refresh(_mood == "night", _raining, _forward_plus and Settings.level >= 1, _reduced_effects(), not _indoor)
 	for steam in _steam:
 		steam.emitting = not covered and not _reduced_effects()
 		_set_amount(steam, STEAM_AMOUNT, 1.0 if Settings.level > 0 else AHAmbience.LOW_PARTICLES)
@@ -1128,7 +1205,8 @@ func _physics_process(delta: float) -> void:
 		_leader.velocity = Vector3.ZERO
 		return
 	var input := _input_vector()
-	var speed := 4.4 if Input.is_action_pressed("run") else 2.4
+	# Com alguém ferido, a fila anda no passo dele (#194).
+	var speed := (4.4 if Input.is_action_pressed("run") else 2.4) * party_speed_factor()
 	# Para o fundo e para a frente anda mais devagar (a câmera vê pouco dessa direção).
 	_leader.velocity = Vector3(input.x, 0, input.y * 0.75) * speed
 	var before := _leader.position
@@ -1236,6 +1314,8 @@ func swap_party(a: String, b: String) -> void:
 	var card := _heroes[i]
 	_heroes[i] = _heroes[k]
 	_heroes[k] = card
+	# Quem está ferido acompanha a placa (#194): conferido de novo na ordem nova.
+	_wounded.clear()
 	_place_leader(_leader.position, facing)
 
 
@@ -1247,8 +1327,10 @@ func remove_dead_heroes() -> void:
 			_heroes[index].queue_free()
 			_heroes.remove_at(index)
 			party_ids.remove_at(index)
+	_wounded.clear()
 	for index in _heroes.size():
-		_heroes[index].show_art(AHCombatArena.art_entry(_combat_art.heroes, party_ids[index]).idle)
+		var hero = Campaign.hero(party_ids[index])
+		_heroes[index].show_art(_rest_art(hero, AHCombatArena.art_entry(_combat_art.heroes, party_ids[index], String(hero.get("art_variant", "")))))
 		_heroes[index].set_tint(Color.WHITE)
 	if not _heroes.is_empty():
 		_place_leader(Vector3(_heroes[0].position.x, 0, _leader.position.z if not _indoor else -0.5))

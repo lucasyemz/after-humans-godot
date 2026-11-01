@@ -1,0 +1,18 @@
+{
+  "body_pngs": 52,
+  "generator_images": 52,
+  "models": 16,
+  "real_game_pairs": 17,
+  "seat_scale_proof_pairs": 2,
+  "qa_rounds": 2,
+  "verdict": "APROVADO",
+  "alpha_rgba_canvas_hash": true,
+  "no_visible_border_clipping": true,
+  "border_margin_px": 5,
+  "transparent_rgb_zero": true,
+  "magenta_pixels_total": 57,
+  "magenta_pixels_max_per_sprite": 8,
+  "tests_run_all": "96/96",
+  "combat_parity": "48/48",
+  "production_changes": false
+}

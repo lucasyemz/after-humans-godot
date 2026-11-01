@@ -19,6 +19,10 @@ const PANEL_CLOSE := "res://audio/ui/panel_close.ogg"
 const U := preload("res://scripts/ui/ui_style.gd")
 const S := preload("res://scripts/flow/station_rules.gd")
 const J := preload("res://scripts/flow/journey_rules.gd")
+## Quanto a partida espera o recusado de dois (#182) voltar ao vagão antes de seguir sem ele (s).
+const BOARDING_WAIT := 8.0
+## As abas dos dois do trem (#182), no lugar do rosto do painel.
+const PAIR_TAB := Vector2(88, 108)
 ## A chegada da equipe de trem na volta (#76), antes do relatório: sem painel, só a dica de pular.
 const ARRIVAL := "arrival"
 const REPORT_GUARD_MS := 500
@@ -91,6 +95,7 @@ var _card_without_lock := false
 ## (o clique não abre o cômodo).
 var _drag_from := Vector2.INF
 var _drag_pan := 0.0
+var _drag_pan_y := 0.0
 var _dragged := false
 ## Há quanto tempo (s) o mouse está encostado na borda da tela.
 var _edge_time := 0.0
@@ -141,6 +146,8 @@ var _room_screen: AHCharacterRoom
 var _back_to := ""
 ## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
 var _arrived_candidate := ""
+## A troca do Mercador que acabou de sair (#182): o foco do teclado fica nela ao refazer o painel.
+var _merchant_focus := ""
 ## Mapa da Rede: IR AO MAPA abre por cima de tudo; o lugar escolhido vai para a plataforma (#123).
 var _map: AHPhaseMap
 ## A visita guiada da primeira vez (#145), aberta por cima da Estação, ou null.
@@ -479,6 +486,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		# Na vista geral, o clique abre o cômodo ao soltar; arrastando, a câmera anda (#131).
 		_drag_from = event.position
 		_drag_pan = station.pan
+		_drag_pan_y = station.pan_y
 		_dragged = false
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and _room_open() and not _map.visible:
@@ -624,7 +632,8 @@ func _build_left(c: Dictionary) -> void:
 		_menu.add_child(_plan_card())
 	var pending: Array = []
 	if S.visit_pending(c) and current != "train" and not (overview and _next.action == "train"):
-		pending.append([tr("O trem chegou: alguém espera na plataforma"), "train_arrival", func(): open_service("train")])
+		pending.append([tr("O Mercador espera na plataforma") if S.merchant_here(c) else tr("O trem chegou: alguém espera na plataforma"),
+			"train_arrival", func(): open_service("train")])
 	if c.night.phase != "none" and current != S.DORMITORY and not (overview and _next.action == "dormitory"):
 		pending.append([tr("A noite espera no Dormitório"), "sleep", func(): open_room(S.DORMITORY)])
 	# Quem volta da recuperação no próximo dia (#121): "Íris volta amanhã".
@@ -875,7 +884,8 @@ func _build_room_selection() -> void:
 func _room_state(c: Dictionary, id: String) -> String:
 	var level := S.room_level(c, id)
 	if level < 1:
-		return tr("Vazio")
+		# Sem vaga livre do tamanho dele, o cômodo está soterrado (#186).
+		return tr("Soterrado") if AHStationGrid.buried(c, id) else tr("Vazio")
 	var top: int = S.room_def(id).max_level
 	if top > 1:
 		return tr("Nível %d de %d") % [level, top]
@@ -943,7 +953,11 @@ func lock_mark_info(c: Dictionary, id: String) -> Dictionary:
 		return {}
 	var cost := S.next_level_cost(c, id)
 	if cost.is_empty():
+		# Sem custo definido: nenhum cômodo hoje (#176); o cartão do cômodo diz o motivo.
 		return {"state": "closed", "title": tr("Fechado"), "note": S.upgrade_block(c, id), "cost": {}}
+	# Soterrado (#186): sem vaga livre do tamanho dele, o cartão diz o que escavar.
+	if AHStationGrid.buried(c, id):
+		return {"state": "closed", "title": tr("Soterrado"), "note": S.upgrade_block(c, id), "cost": {}}
 	var block := S.upgrade_block(c, id)
 	var stock := {"scrap": S.quantity(c, "scrap"), "fragments": S.quantity(c, "fragments")}
 	var have := tr("sem sucata nem fragmentos") if stock.scrap + stock.fragments == 0 else tr("tem %s") % S.cost_text(stock)
@@ -1028,7 +1042,9 @@ func _drag_input(event: InputEvent) -> void:
 		if not _dragged and event.position.distance_to(_drag_from) > DRAG_START:
 			_dragged = true
 		if _dragged:
-			station.set_pan(_drag_pan - (event.position.x - _drag_from.x) / station.overview_pixels_per_meter())
+			# Para os lados e para baixo (o 3º subsolo, #186).
+			var ppm: float = station.overview_pixels_per_meter()
+			station.set_pan(_drag_pan - (event.position.x - _drag_from.x) / ppm, _drag_pan_y + (event.position.y - _drag_from.y) / ppm)
 		return
 	if event.button_index != MOUSE_BUTTON_LEFT or event.pressed:
 		return
@@ -1053,7 +1069,7 @@ static func neighbor_room(room_id: String, direction: int) -> String:
 		return ""
 	var best := ""
 	var best_gap := INF
-	for room in AHStation.ROOMS:
+	for room in AHStation.rooms():
 		if room.id == room_id or room.ceiling != here.ceiling:
 			continue
 		var gap: float = (room.x0 - here.x0) * direction
@@ -1395,6 +1411,11 @@ func _on_phase_chosen(phase_id: String) -> void:
 	if station.train_busy():
 		toast(tr("O trem está chegando à plataforma: espere ele parar."), true)
 		Sound.play("res://audio/ui/deny.ogg")
+		return
+	# O Mercador na plataforma (#182, parte 2): a Preparação pede para dispensá-lo primeiro.
+	if S.merchant_here(Campaign.state):
+		_map.visible = false
+		open_room(S.PREPARATION)
 		return
 	_map.visible = false
 	_map_from_platform = false
@@ -1767,8 +1788,7 @@ func _show(key: String) -> void:
 func _station_plan(c: Dictionary) -> void:
 	_header("plan", tr("Plano da Estação"))
 	_text(tr("A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos."))
-	for room in AHStation.ROOMS:
-		var id: String = room.id
+	for id in AHStation.ROOM_ORDER:
 		var room_def := S.room_def(id)
 		var level := S.room_level(c, id)
 		var cost := S.next_level_cost(c, id)
@@ -1801,6 +1821,33 @@ func _station_plan(c: Dictionary) -> void:
 		go.size_flags_vertical = Control.SIZE_SHRINK_END
 		go.pressed.connect(func(): open_room(id))
 		row.add_child(go)
+
+
+## A frente de escavação (#186, até a interface da #274): os blocos que dá para escavar agora, com as voltas que faltam;
+## o escolhido fica marcado. Sem escolha, a comunidade cava o mais perto da escada.
+func _dig_front(c: Dictionary) -> void:
+	var blocks := AHStationGrid.dig_blocks(c)
+	if blocks.is_empty():
+		return
+	_text(tr("Escavar: escolha o bloco. Quem fica na Estação cava a cada volta de expedição."), AHKit.MUTED, "small")
+	var chips := HFlowContainer.new()
+	chips.name = "DigFront"
+	chips.add_theme_constant_override("h_separation", 8)
+	chips.add_theme_constant_override("v_separation", 8)
+	_body.add_child(chips)
+	var front := AHStationGrid.dig_target(c)
+	for key in blocks:
+		var block: String = key
+		var name := AHStationGrid.block_name(block)
+		var chip := _chip_button("%s · %s" % [name.left(1).to_upper() + name.substr(1), AHStationGrid.returns_text(AHStationGrid.returns_left(c, block))])
+		chip.name = "Dig_%s" % block.replace(":", "_")
+		chip.custom_minimum_size = Vector2(0, 52)
+		if block == front:
+			for state in ["font_color", "font_hover_color", "font_focus_color"]:
+				chip.add_theme_color_override(state, AHKit.AMBER)
+			chip.add_child(AHKit.selected_overlay())
+		chip.pressed.connect(func(): _act(AHStationGrid.set_dig_target(Campaign.state, block), tr("Escavação: a frente agora é %s.") % AHStationGrid.block_name(block)))
+		chips.add_child(chip)
 
 
 ## Começar do zero (com confirmação): o save atual é substituído por uma campanha nova.
@@ -1885,6 +1932,9 @@ func _room(room_id: String) -> void:
 	if room_id == S.DEPOT:
 		_supplies_bar(c)
 	var cost := S.next_level_cost(c, room_id)
+	# Com a noite pendente, o Dormitório abre no plano da noite: os beliches (#176) ficam para o dia.
+	if room_id == S.DORMITORY and c.night.phase != "none":
+		cost = {}
 	if not cost.is_empty():
 		var block := S.upgrade_block(c, room_id)
 		var verb := tr("Recuperar") if level == 0 else tr("Melhorar")
@@ -1903,6 +1953,11 @@ func _room(room_id: String) -> void:
 		upgrade.tooltip_text = block
 		upgrade.pressed.connect(func(): _act(S.upgrade_room(Campaign.state, room_id, level), tr("%s: nível %d.") % [tr(room_def.name), level + 1]))
 		_body.add_child(upgrade)
+		# Sem vaga do tamanho dele (#186): o motivo na tela (o toque e o controle não mostram a dica) e a frente de escavação.
+		if AHStationGrid.buried(c, room_id):
+			var why := _text(AHStationGrid.space_block(c, room_id), AHKit.alert_text(), "small")
+			why.name = "SpaceBlock"
+			_dig_front(c)
 		_body.add_child(_divider())
 	for civilian_id in c.station.residents:
 		var who := S.civilian(civilian_id)
@@ -2791,6 +2846,9 @@ func _train() -> void:
 	if train.phase != "waiting":
 		close_panel()
 		return
+	if S.merchant_here(c):
+		_train_merchant(c)
+		return
 	if not S.train_recruit(c).is_empty():
 		_train_recruit(c)
 		return
@@ -2855,19 +2913,33 @@ func _train_recruit(c: Dictionary) -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 16)
 	_body.add_child(head)
-	head.add_child(AHKit.portrait(U.face_texture(AHCombatArena.hero_art_of(train.candidate_id, String(recruit.art_variant)).get("idle", {})), 116))
+	# Desceram dois (#182, a decisão do Lucas): no lugar do rosto, os dois à escolha, na ordem que o jogador quiser; a
+	# aba traz o outro à frente, e o trem só parte depois dos dois.
+	var second: Dictionary = train.get("next", {})
+	if second.is_empty():
+		head.add_child(AHKit.portrait(U.face_texture(AHCombatArena.hero_art_of(train.candidate_id, String(recruit.art_variant)).get("idle", {})), 116))
+	else:
+		var pair := HBoxContainer.new()
+		pair.name = "TrainPair"
+		pair.add_theme_constant_override("separation", 8)
+		pair.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		head.add_child(pair)
+		var recruits := {String(train.candidate_id): recruit, String(second.candidate_id): second.recruit}
+		for id in station.pair_order(recruits.keys()):
+			pair.add_child(_pair_tab(id, recruits[id], id == train.candidate_id))
+	var name_width := 380.0 if second.is_empty() else BODY_WIDTH - 2 * PAIR_TAB.x - 8.0 - 16.0
 	var names := VBoxContainer.new()
 	names.add_theme_constant_override("separation", 2)
 	head.add_child(names)
-	names.add_child(_wrapped(tr("%s quer entrar na Estação") % recruit.display_name, "small", AHKit.AMBER, true, 380.0))
+	names.add_child(_wrapped(tr("%s quer entrar na Estação") % recruit.display_name, "small", AHKit.AMBER, true, name_width))
 	(names.get_child(-1) as Label).uppercase = true
 	var name_label := AHKit.label(String(recruit.display_name), "card_name", AHKit.TEXT, true)
 	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	names.add_child(name_label)
 	if hero_class != null:
-		names.add_child(_wrapped(tr("%s · %s") % [tr(hero_class.DisplayName), tr(hero_class.Role)], "row", AHKit.AMBER, false, 380.0))
+		names.add_child(_wrapped(tr("%s · %s") % [tr(hero_class.DisplayName), tr(hero_class.Role)], "row", AHKit.AMBER, false, name_width))
 	if String(recruit.get("origin", "")) != "":
-		names.add_child(_wrapped(tr(String(recruit.origin)), "text", AHKit.MUTED, false, 380.0))
+		names.add_child(_wrapped(tr(String(recruit.origin)), "text", AHKit.MUTED, false, name_width))
 	# O que pede e o motivo de não poder ficar antes dos traços: no texto Maior, à vista sem rolar.
 	var price := S.recruit_price(c, recruit.class_id)
 	_trait_box("", tr("Pedido"), tr("Nada: a Estação ainda não fecha uma equipe de quatro.") if price == 0 else tr("%d sementes (a Estação tem %d).") % [price, S.quantity(c, "seeds")], AHKit.AMBER)
@@ -2880,6 +2952,8 @@ func _train_recruit(c: Dictionary) -> void:
 			continue
 		var good: bool = perk.get("bPositive", true)
 		_trait_box("+" if good else "−", tr(perk.DisplayName), tr(perk.Description), AHKit.good() if good else AHKit.alert_text())
+	if not second.is_empty():
+		_text(tr("Desceram dois: decida cada um, na ordem que quiser. O trem só parte depois dos dois."), AHKit.MUTED, "small")
 	_text(tr("Quem a Estação recusa vai embora no trem e não volta. Quem a equipe deixa sem resposta ao partir, também."), AHKit.MUTED, "small")
 	var id: String = train.candidate_id
 	var accept := _footer_primary(tr("Acolher %s") % recruit.display_name, "recruit", func(): _decide(id, true))
@@ -2895,6 +2969,149 @@ func _train_recruit(c: Dictionary) -> void:
 		accept.get_node("Key").visible = false
 		refuse.focus_mode = Control.FOCUS_NONE
 		_panel_focus = null
+
+
+## O Mercador no trem (#182, parte 2): o retrato, quem é, as trocas desta visita (o que dá e o que recebe, quantas ainda
+## saem; o que falta, na cor de alerta) e, no pé, DISPENSAR, de aço e sem tecla, como Recusar: a tecla de Interagir faz
+## a primeira troca que dá, nunca manda embora sem querer.
+func _train_merchant(c: Dictionary) -> void:
+	_header("train_arrival", tr("O trem chegou"))
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 16)
+	_body.add_child(head)
+	var face: Texture2D = load(String(AHCombatArena.npc_art_of(S.MERCHANT).get("portrait", "")))
+	head.add_child(AHKit.portrait(face, 116))
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", 2)
+	head.add_child(names)
+	names.add_child(_wrapped(tr("Mercador de passagem"), "small", AHKit.AMBER, true, 380.0))
+	(names.get_child(-1) as Label).uppercase = true
+	names.add_child(_wrapped(tr(S.MERCHANT_NAME), "card_name", AHKit.TEXT, true, 380.0))
+	names.add_child(_wrapped(tr("Mercador · jacaré"), "row", AHKit.AMBER, false, 380.0))
+	names.add_child(_wrapped(tr("Desce do trem sem dizer de onde vem. Abre a bolsa, mostra o que tem e espera a oferta."), "text", AHKit.MUTED, false, 380.0))
+	_section(tr("Trocas desta visita"))
+	# O foco do teclado: na troca que o jogador acabou de apertar (mesmo esgotada: nunca pula sozinho para a troca de
+	# volta nem para DISPENSAR) ou, no começo da visita, na primeira.
+	var first: Button = null
+	for row in S.merchant_trades():
+		var button := _trade_row(c, row)
+		if first == null or String(row.Name) == _merchant_focus:
+			first = button
+	var stock := HFlowContainer.new()
+	stock.name = "Stock"
+	stock.add_theme_constant_override("h_separation", 8)
+	stock.add_theme_constant_override("v_separation", 8)
+	_body.add_child(stock)
+	stock.add_child(AHKit.label(tr("A Estação tem"), "small", AHKit.MUTED, true))
+	for resource in ["seeds", "scrap", "fragments"]:
+		stock.add_child(_chip(RESOURCE_ICONS[resource], str(S.quantity(c, resource))))
+	_text(tr("Ele fica na plataforma até ser dispensado. A expedição só parte depois disso."), AHKit.MUTED, "small")
+	var dismiss := AHKit.button(tr("Dispensar o Sr. dos Trilhos"), "secondary")
+	dismiss.name = "Dismiss"
+	dismiss.custom_minimum_size = Vector2(BODY_WIDTH, 60)
+	dismiss.pressed.connect(_dismiss_merchant)
+	_footer.add_child(dismiss)
+	# DISPENSAR nunca começa com o foco: só pelas setas, o clique ou o toque.
+	_panel_focus = first
+
+
+## Uma troca do Mercador: o que a Estação dá, a seta, o que recebe e NEGOCIAR; embaixo, quantas ainda saem nesta visita
+## ou o motivo de não sair. O botão nunca desliga (desligado, ele perdia o foco e o teclado pulava para a troca de volta
+## ou para DISPENSAR): esgotada, ele diz ESGOTADA; sem o que dar, o que falta fica na cor de alerta. Apertado sem poder,
+## diz o motivo. Devolve o botão.
+func _trade_row(c: Dictionary, row: Dictionary) -> Button:
+	var id := String(row.Name)
+	var box := _inset()
+	box.get_parent().name = "Trade_%s" % id
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 8)
+	box.add_child(line)
+	var give := String(row.Give)
+	var enough := S.quantity(c, give) >= int(row.GiveAmount)
+	var give_chip := _chip(RESOURCE_ICONS[give], S.resource_amount(give, int(row.GiveAmount)), AHKit.TEXT if enough else AHKit.alert_text())
+	give_chip.name = "Give"
+	line.add_child(give_chip)
+	line.add_child(_icon("ui-arrow-right", 22, AHKit.AMBER))
+	var get_chip := _chip(RESOURCE_ICONS[String(row.Get)], S.resource_amount(String(row.Get), int(row.GetAmount)), AHKit.good())
+	get_chip.name = "Get"
+	get_chip.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_BEGIN
+	line.add_child(get_chip)
+	var left := S.trades_left(c, id)
+	var button := _chip_button(tr("Negociar") if left > 0 else tr("Esgotada"))
+	button.name = "Do"
+	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var block := S.trade_block(c, id)
+	button.set_meta("block", block)
+	button.pressed.connect(func(): _trade(id))
+	line.add_child(button)
+	var note := tr("Esgotada nesta visita.") if left <= 0 else (block if block != "" else tr("Ainda sai %d vez nesta visita.") % left if left == 1
+		else tr("Ainda sai %d vezes nesta visita.") % left)
+	var label := _wrapped(note, "small", AHKit.alert_text() if block != "" and left > 0 else AHKit.MUTED, false, BODY_WIDTH - 40.0)
+	label.name = "Note"
+	box.add_child(label)
+	return button
+
+
+## Faz uma troca com o Mercador e refaz o painel, com o foco na mesma troca; sem poder, diz o motivo.
+func _trade(trade_id: String) -> void:
+	var row = GameData.row("merchant", trade_id)
+	var error := S.merchant_trade(Campaign.state, trade_id)
+	var done := "" if row == null else tr("Troca feita: %s por %s.") % [S.resource_amount(String(row.Give), int(row.GiveAmount)),
+		S.resource_amount(String(row.Get), int(row.GetAmount))]
+	_merchant_focus = trade_id
+	_act(error, done, "res://audio/ui/confirm.ogg")
+	if error == "":
+		refresh()
+
+
+## Dispensar o Mercador: ele volta ao vagão e o trem parte, como com o recusado.
+func _dismiss_merchant() -> void:
+	var error := S.dismiss_merchant(Campaign.state)
+	if error != "":
+		toast(error, true)
+		return
+	_merchant_focus = ""
+	station.commit()
+	toast(tr("O Sr. dos Trilhos volta ao trem."))
+	_train_departs(true)
+
+
+## A aba de um dos dois do trem (#182): o rosto e o nome, como as abas da Sala dos Personagens; a escolhida é quem o
+## painel mostra. Apertar a outra a traz à frente.
+func _pair_tab(candidate_id: String, recruit: Dictionary, chosen: bool) -> Button:
+	var tab := Button.new()
+	tab.name = "Pair_%s" % candidate_id
+	AHKit.style_as(tab, "hero_selected" if chosen else "hero")
+	tab.custom_minimum_size = PAIR_TAB
+	tab.clip_contents = true
+	var face := TextureRect.new()
+	face.texture = U.face_texture(AHCombatArena.hero_art_of(candidate_id, String(recruit.get("art_variant", ""))).get("idle", {}))
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	face.position = Vector2(5, 5)
+	face.size = Vector2(PAIR_TAB.x - 10.0, PAIR_TAB.y - 36.0)
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tab.add_child(face)
+	var name := AHKit.label(String(recruit.get("display_name", "")), "small" if U.text_scale > 1.2 else "tab", AHKit.AMBER if chosen else AHKit.TEXT)
+	name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name.clip_text = true
+	name.position = Vector2(2, PAIR_TAB.y - 32.0)
+	name.size = Vector2(PAIR_TAB.x - 4.0, 30)
+	name.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tab.add_child(name)
+	if not chosen:
+		tab.pressed.connect(func(): _bring_forward(candidate_id))
+	return tab
+
+
+## Mostra o outro dos dois do trem (#182): ele passa a ser quem o painel decide, e a câmera continua nos dois.
+func _bring_forward(candidate_id: String) -> void:
+	if S.bring_forward(Campaign.state, candidate_id):
+		station.swap_pair()
+		# Os dois já desceram: reabrir o trem não refaz a chegada.
+		_arrived_candidate = candidate_id
+		refresh()
 
 
 ## Uma caixa do trem: o quadradinho de + ou − (ou o ícone do pedido), o título na cor e o texto.
@@ -2929,9 +3146,18 @@ func _on_train_event(name: String) -> void:
 
 func _decide(candidate_id: String, accept: bool) -> void:
 	var c: Dictionary = Campaign.state
+	# Qualquer um dos dois (#182): quem é decidido vem à frente nas regras e na cena.
+	var front: String = c.station.train.candidate_id
+	if S.bring_forward(c, candidate_id):
+		station.swap_pair()
+		_arrived_candidate = candidate_id
 	var recruit := S.train_recruit(c)
 	var error := S.decide_candidate(c, candidate_id, accept)
 	if error != "":
+		# A decisão não passou: os dois voltam à ordem de antes, nas regras e na cena.
+		S.bring_forward(c, front)
+		station.swap_pair()
+		_arrived_candidate = c.station.train.candidate_id
 		toast(error, true)
 		return
 	station.commit()
@@ -2940,17 +3166,39 @@ func _decide(candidate_id: String, accept: bool) -> void:
 	else:
 		var who := S.civilian(candidate_id)
 		toast((tr("%s vai morar na Estação.") % who.name) if accept else tr("%s segue no trem. Pode voltar numa próxima viagem.") % who.name)
-	# O trem fecha e parte (o recusado volta para ele); acolhido, o civil fica e vai para o cômodo dele. O painel sai da
-	# frente da cena e o resto espera o trem sumir no túnel.
-	station.play_train_departure(not accept)
+	# O segundo do trem (#182): o primeiro sai da plataforma (acolhido, vai para o cômodo; recusado, volta ao vagão) e o
+	# painel mostra quem desceu junto; o trem só parte depois dele.
+	if c.station.train.phase == "waiting":
+		_arrived_candidate = c.station.train.candidate_id
+		# O acolhido vai para um cômodo antes (refazer os moradores limpa os passeios da plataforma).
+		if accept:
+			station.place_residents()
+		station.promote_companion(c.station.train.candidate_id, not accept)
+		refresh()
+		return
+	# O trem fecha e parte (o recusado volta para ele); acolhido, o civil fica e vai para o cômodo dele.
+	_train_departs(not accept)
+
+
+## O painel sai da frente da cena e o resto espera o trem sumir no túnel. O primeiro recusado de dois (#182) entra antes
+## das portas fecharem; quem vai embora (o recusado, o Mercador dispensado) volta ao vagão antes.
+func _train_departs(candidate_leaves: bool) -> void:
+	var c: Dictionary = Campaign.state
 	_panel.visible = false
+	station.departure_pending = true
+	# Um limite (BOARDING_WAIT s): o recusado que se perdeu do passeio não segura a partida.
+	var waited := 0.0
+	while is_instance_valid(station) and station.boarding_back() and waited < BOARDING_WAIT:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	if not is_instance_valid(station):
+		return
+	station.play_train_departure(candidate_leaves)
 	await station.train_event_named("gone")
 	S.finish_departure(c)
 	station.commit()
-	var rng := RandomNumberGenerator.new()
-	rng.randomize()
 	station.clear_candidate()
-	station._place_residents(rng)
+	station.place_residents()
 	# O jogador abriu outra coisa durante a partida (um cômodo, as Opções): ela fica aberta.
 	if current != "train":
 		return

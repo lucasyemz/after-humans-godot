@@ -1,5 +1,6 @@
 ## As placas das máquinas numa luta cheia (quatro inimigos, #60 sobre a #63): no texto Normal e no Maior, a intenção e a
-## barra não cobrem o corpo (a barra e os estados no máximo um quinto dele; a intenção, acima da cabeça, nada) e as placas de um mesmo lado não se cobrem.
+## barra não cobrem o corpo (a barra e os estados no máximo um quinto dele; a intenção, acima da cabeça, nada) e as
+## placas de um mesmo lado não se cobrem. Também com os espaços no mínimo (MIN_GAP_SCALE), o lugar mais apertado (#72).
 extends RefCounted
 
 var t
@@ -69,6 +70,35 @@ func _fight() -> void:
 		for i in 6:
 			await _tree.process_frame
 		_check(hud, "Maior" if size == 2 else "Normal")
+	# Numa troca de posição (o Mover, um empurrão), com o espaço normal: nenhuma placa sobe enquanto os dois se cruzam.
+	var arena: AHCombatArena = hud.arena
+	for team in [hud.session.state.player_team, hud.session.state.enemy_team]:
+		var first = team.filter(func(u): return u.rank == 1)[0]
+		var second = team.filter(func(u): return u.rank == 2)[0]
+		first.rank = 2
+		second.rank = 1
+		var raised := {}
+		arena._sync_positions(0.6)
+		# Até os dois chegarem ao lugar novo (sem janela, os quadros passam mais rápido que o tempo da troca).
+		for i in 600:
+			await _tree.process_frame
+			for unit_id in hud._plate_stagger:
+				raised[unit_id] = true
+			if [first, second].all(func(u): return arena.cards[u.id].position.distance_to(arena.slot_position(u)) < 0.01):
+				break
+		t.equal(raised.keys(), [], "na troca de posição, com o espaço normal, nenhuma placa pula para cima da cabeça")
+		first.rank = 1
+		second.rank = 2
+		await arena._sync_positions(0.05)
+	# O lugar mais apertado que a luta aceita (#72): os espaços encolhidos até MIN_GAP_SCALE, com a placa no mínimo.
+	arena.gap_scale = AHCombatArena.MIN_GAP_SCALE
+	await arena._sync_positions(0.05)
+	for size in [0, 2]:
+		Settings.set_text_size(size)
+		for i in 6:
+			await _tree.process_frame
+		_check(hud, ("Maior" if size == 2 else "Normal") + " no espaço mínimo")
+		await _aim(hud, ("Maior" if size == 2 else "Normal") + " no espaço mínimo")
 
 
 func _check(hud: AHCombatHud, profile: String) -> void:
@@ -102,3 +132,26 @@ func _check(hud: AHCombatHud, profile: String) -> void:
 			if rects[i][0] == rects[j][0] and rects[i][1].grow(-1).intersects(rects[j][1].grow(-1)):
 				overlaps.append("%s × %s" % [rects[i][2], rects[j][2]])
 	t.equal(overlaps, [], "no %s, as placas de um lado não se cobrem" % profile)
+
+
+## Na mira, em cada inimigo: o ALVO (acima da cabeça) não cobre a placa nem a intenção de ninguém, nem as que subiram.
+func _aim(hud: AHCombatHud, profile: String) -> void:
+	var ranks: Array = hud.session.state.enemy_team.filter(func(u): return u.rank > 0).map(func(u): return u.rank)
+	hud._show_markers(ranks, true, func(_rank): pass, "")
+	await _tree.process_frame
+	var covered: Array = []
+	for marker in hud._markers.filter(func(m): return m.has_meta("card")):
+		hud._select_target(int(marker.get_meta("rank")))
+		await _tree.process_frame
+		await _tree.process_frame
+		var label := Rect2(hud._target_label.position, hud._target_label.size)
+		for unit_id in hud._unit_bars:
+			var plate: Control = hud._unit_bars[unit_id]
+			var tag = plate.get_meta("intent") if plate.has_meta("intent") else null
+			if plate.visible and Rect2(plate.position, plate.size).grow(-1).intersects(label.grow(-1)):
+				covered.append("%s (mirando %s)" % [unit_id, marker.get_meta("unit_id")])
+			if tag != null and tag.visible and Rect2(tag.position, tag.size).grow(-1).intersects(label.grow(-1)):
+				covered.append("%s intenção (mirando %s)" % [unit_id, marker.get_meta("unit_id")])
+	hud._clear_markers()
+	hud._set_enabled(true)
+	t.equal(covered, [], "no %s, o ALVO não cobre placa nem intenção de ninguém" % profile)

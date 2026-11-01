@@ -1,0 +1,8 @@
+{
+  "webp_files": 52,
+  "all_byte_identical_to_qa_prototypes": true,
+  "existing_output": true,
+  "repository_output": true,
+  "corrupt_source_hash": true,
+  "production_changed": false
+}

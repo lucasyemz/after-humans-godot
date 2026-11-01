@@ -1,0 +1,87 @@
+# Validação da reorganização
+
+Data: 28/10/2026. Branch `codex-comic-generator`, iniciada na `main` atualizada (`5bb2928`). Checkout separado, limpo antes das mudanças. Nenhum arquivo da Godot foi alterado.
+
+## Preservação
+
+Origem somente leitura: `C:\Users\lucas\Documents\Codex\2026-10-15\task\`. Não havia `AGENTS.md` na origem nem em seus diretórios ancestrais; foram lidas as regras do destino antes da edição. Nenhum original foi movido ou apagado.
+
+A sequência ativa foi identificada no `EMBEDDED_PROJECT` do `index.html`, no `After-Humans-direcao-v2.comic.json` e na entrega `entrega-direcao-v2/`. São oito cenas: Setor B, Alarme, Fuga, A queda, Captura, Corre Bento, Eu não vou te deixar e A saída. Duração real atual: 44,3 segundos. Não foi usada a duração dos antigos scripts de preparação.
+
+Comparação estrutural com a origem: todas as propriedades das oito cenas são iguais, exceto a retirada de `assetHistory` e `referenceId` de biblioteca externa. A ordem, IDs, configuração, camadas, imagens associadas, notas, prompts, textos e transições permanecem. O SHA-256 do JSON serializado das configurações é `bc50d89480ce8a8132d0bcbd2e1182f300680783ad015a649d4e594037f0483c`; o teste de integridade verifica esse valor.
+
+O código da entrega leve era idêntico ao do editor atual fora o projeto incorporado. Foram aproveitadas suas imagens WebP das cenas 2–8. Para a primeira cena, Pillow converteu os PNGs para WebP com `lossless=True, exact=True`, mesma resolução, comparando todos os pixels RGBA após reabrir os arquivos. Transparência e cores preservadas sem perdas. Total: 38 imagens, 11.906.596 bytes; maior imagem: 1.834.390 bytes. O inventário inclui hash, dimensão, modo e tamanho. Não há áudio utilizado pela sequência.
+
+## Execução e QA
+
+- Instalação pelo lockfile: `npm ci` (com `--ignore-scripts --no-audit --no-fund` na validação automatizada); 5 pacotes instalados.
+- `npm run check`: 2/2 testes, sintaxe JavaScript válida, configurações originais preservadas, referências completas e hashes das imagens conferidos.
+- `npm start`: servidor local em loopback; porta 8770 usada no teste, equivalente à porta padrão 8766.
+- Chrome headless com perfil temporário: editor pronto, 8 cenas, 44,3 segundos, todos os recursos esperados carregados, nenhum erro JavaScript. Captura visual da primeira cena conferida.
+- QA independente: **VEREDITO: APROVADO**. Navegação das oito cenas e seek repetido determinístico; história alternativa de uma cena carregada pelo mesmo código, persistida e reaberta. Retorno à URL padrão recuperou as oito cenas separadamente. `.env` e tentativa codificada de sair da pasta receberam HTTP 403.
+
+## Conteúdo publicado
+
+Somente `comic_generator/`. `git diff --cached --check`, lista de arquivos preparados, maiores arquivos e busca por padrões de credenciais conferidos. Nenhum vídeo, segredo, dependência instalada ou saída de QA incluído. As regras de ignore foram exercitadas com `.env`, `node_modules`, MP4 em `outputs` e WebM fora dela. O arquivo `.gdignore` evita importação do gerador pelo jogo.
+
+Backups, alternativas, originais pesados, capturas e vídeos anteriores continuam na origem. Resultados e capturas desta execução ficam localmente em `outputs/`, ignorados. O exportador mantém a dependência existente `mp4-muxer`, cujo aviso de descontinuação está documentado no README.
+
+## Exportação completa
+
+Chrome headless exportou a sequência pelo próprio `preview.exportMP4({sequence:true, download:false, height:720, bitrate:2800000})`: MP4 H.264, 1280×720, 1.329 quadros a 30 FPS, 44,3 segundos e 15.021.359 bytes. Metadados lidos por um elemento `<video>`. O projeto empacotado antes e depois permaneceu idêntico; zero erros JavaScript. O vídeo existiu somente em memória, sem inclusão no Git.
+
+O teste percorreu todas as cenas, conferiu assets e repetiu seeks antes da exportação. Não foi repetida exportação 1080p nesta reorganização; o suporte depende do codificador H.264/WebCodecs do navegador. A QA visual em Play do jogo não é parte desta alteração independente.
+
+A busca completa também localizou os checkouts existentes em `Desktop/ah-claude/Godot` e `Desktop/replaced-estudos/after-humans-godot`: ambos estavam limpos na `main`. Permaneceram intactos; a entrega usa um clone separado do mesmo destino.
+
+## Suíte do repositório Godot
+
+`D:\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://tests/run_all.gd`: **92/92 testes passaram**, saída 0, em 803.828 ms. Inclui paridade **48/48 lutas, 3.351 passos** e testes de save. `APPDATA` e `LOCALAPPDATA` foram direcionados a `comic_generator/outputs/godot_profile`, sem usar o perfil/saves reais do jogador. Log local: `outputs/godot_tests.log` (ignorado). A importação preparatória gerou apenas cache local; nenhuma mudança do jogo entrou no stage.
+
+## Dashboard e prévia responsiva (evolução do aplicativo)
+
+A raiz agora é a biblioteca de projetos; `editor.html` abre a história selecionada. O catálogo lê automaticamente os manifestos em `stories/`. Importações completas ficam no IndexedDB deste navegador, com IDs próprios. Projetos publicados usam resumos leves no painel; as imagens não são duplicadas nesse resumo. Alterações no nome, número de cenas e duração aparecem ao voltar do editor.
+
+Validação desta entrega:
+
+- `npm run check`: **4/4**. Sintaxe de todos os módulos, integridade do exemplo e regressões de importação inválida (nome não textual, 41 cenas e configuração incompleta).
+- Chrome headless: dashboard e editor em 1440×1000 e 390×844; QA independente também em 375 px. Sem overflow horizontal no painel, no editor e na prévia.
+- Prévia celular/tablet/tela livre: redimensiona sem alterar o projeto empacotado, câmera, enquadramento ou sequência narrativa.
+- Importação, edição e retorno: dois projetos com os mesmos IDs de cena permaneceram independentes; o nome salvo reapareceu no cartão correto.
+- Recuperação antiga em `comic_generator:/:default` preservada; entrar pelo cartão padrão retomou a edição anterior.
+- Retorno ao dashboard aguarda persistência; bloqueado durante exportação e quando IndexedDB não consegue salvar.
+- Exportação real de uma cena em 720p pela QA: 1.052.246 bytes. O motor de exportação continua o mesmo; a exportação completa de 44,3 s registrada acima permanece a referência.
+- QA independente: primeira rodada identificou validação insuficiente de import e cobertura de sintaxe; correções com testes de regressão. Rodada final: **VEREDITO: APROVADO**.
+- Capturas locais, ignoradas: `outputs/dashboard_desktop.png`, `dashboard_phone.png`, `preview_phone_desktop.png`, `preview_phone.png` e `editor_phone.png`. O registro anterior `outputs/editor.png` preserva a vista do editor antes do dashboard.
+
+O teste desta seção cobre a prévia original em 16:9; o reenquadramento horizontal para celular está validado na seção seguinte. Testes de viewport foram feitos em Chrome headless; não substituem uma conferência em aparelhos físicos. Projetos importados e edições locais não são enviados ao servidor nem publicados automaticamente.
+
+Suíte do repositório repetida após a entrega do dashboard, com o mesmo perfil isolado: **92/92 testes passaram**, saída 0, em 727.346 ms, incluindo paridade 48/48. Log local: `outputs/godot_dashboard_tests.log`, ignorado. Nenhum arquivo do jogo, história ou imagem foi alterado nesta evolução.
+
+## Celular horizontal: reenquadramento e exportação
+
+Formato final definido pelo projeto: **horizontal 16:9**, incluindo celular. A opção vertical implementada anteriormente foi corrigida e removida da interface, da prévia e do exportador. A revisão atual mantém zoom/pan e texto por cena, em scene.mobileFraming, sem modificar a câmera, a narrativa ou os arquivos de arte.
+
+- Celular horizontal: largura máxima 844 px na prévia; quadro sempre 16:9, inclusive se o navegador estiver estreito.
+- Prévia, PNG de conferência e MP4 móvel: **1280×720**, 30 FPS na exportação. Original também continua horizontal.
+- Zoom 1 mostra a imagem inteira; zoom maior permite ajustar posição X/Y, preservando a proporção 16:9.
+- Falas/legendas recompostas na área segura, com ajuste de fonte sem truncamento. A cauda do balão também é limitada pela altura, evitando sobreposição com a legenda em uma tela mais baixa.
+- Testes geométricos e de texto extremo atualizados para 1280×720; npm run check 6/6.
+
+Os resultados verticais antigos não representam o formato final e foram substituídos nesta validação. Logs e capturas antigos continuam apenas nos outputs locais ignorados.
+
+- Validação da sessão principal: sequência curta de duas cenas, 2 segundos, 60 quadros, **1280×720** tanto no celular reenquadrado (898.626 bytes) quanto no original (841.919 bytes). Projeto empacotado permaneceu idêntico antes/depois, sem pageerrors. Resultado local: `outputs/landscape_export_validation.json`.
+- QA independente: prévia 16:9 em 844×390 e 390×844, todas as oito cenas em PNG 1280×720, sem overflow. Exportações reais de 2 segundos/60 quadros: celular 344.582 bytes e original 341.383 bytes; projeto, cena e tempo restaurados. Textos de 140/200 caracteres preservados na área segura.
+- Zoom 1 mantém os 1920×1080 completos; zoom 2/pan máximo produz recorte 960×540, mantendo 16:9. Ajustes continuam separados por cena e a versão original é preservada.
+- QA final: **VEREDITO: APROVADO — celular horizontal**, sem pendências médias ou altas. Capturas locais: `outputs/landscape_framing_desktop.png` e `outputs/landscape_framing_phone.png`, ignoradas no Git.
+
+- Conferência visual final: o tamanho da fonte móvel usa o menor lado do quadro, e a largura do balão acompanha o texto dentro da área segura. Cena 1 em t=3,6 s, zoom 1,15 e texto 120%: dois rostos visíveis. Captura final: `outputs/landscape_final_phone.png`.
+- QA da última revisão: exportação horizontal de 1 segundo/30 quadros, 155.953 bytes; controles móveis desabilitados durante a geração e restaurados ao final. Sem pageerrors. **VEREDITO: APROVADO**.
+
+Suíte completa após a correção horizontal: **92/92 testes passaram**, saída 0, em 788.757 ms; paridade 48/48 preservada. Perfil isolado e log local `outputs/godot_landscape_tests.log`, ignorado. Testes do app 6/6 e QA independente aprovados. Nenhum arquivo da história, arte ou jogo foi alterado.
+
+## Integração do gerador — 29/10/2026
+
+A autorização original do Lucas para a pasta, o código do gerador e a tirinha provisória foi registrada em AGENTS.md. Isso não altera o cânone nem reescreve o exemplo. O bloqueio funcional de misturar recuperações ao trocar o default foi corrigido: chave por caminho canônico, aliases equivalentes e metadado de propriedade do legado, com cópia de current/previous sem apagar bases antigas. Legado ambíguo exige recuperação explícita com backup e continua disponível após salvar/reabrir.
+
+QA independente: **VEREDITO: APROVADO**, zero pageerrors; default B clonado com mesmos IDs/metadado herdado não absorve A, A recupera seu estado, URLs equivalentes compartilham recuperação, salvar/importar/reabrir e a retenção do legado funcionam. `npm run check`: **7/7**. Não se repetiu a suíte Godot local para esta correção isolada; nenhum script, dado ou asset de produção do jogo foi alterado, e o CI do PR continua validando o jogo.

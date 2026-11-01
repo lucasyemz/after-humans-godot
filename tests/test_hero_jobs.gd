@@ -44,12 +44,13 @@ func _id(c: Dictionary, name: String) -> String:
 func _limits() -> void:
 	var c: Dictionary = Campaign.create_initial(1)
 	t.equal(S.hero_limit(c), 6, "o Alojamento no nível 1 comporta 6 heróis")
-	t.equal(S.helper_limit(c), 3, "sem o Dormitório, 3 ajudantes")
+	t.equal(S.helper_limit(c), 3, "com o Dormitório sem camas, 3 ajudantes")
 	t.equal([1, 2, 3, 4].map(func(level): return S.hero_limit_at(level)), [6, 8, 10, 12], "os limites de cada nível do Alojamento")
 	var dorm := Campaign.create_initial(1)
 	dorm.station.rooms[S.DORMITORY] = S.room_def(S.DORMITORY).max_level
 	var helpers: Array = GameData.row("hero_jobs", "limit_helpers").Levels
 	t.equal(S.helper_limit(dorm), int(helpers.back()), "o último limite de ajudantes é o do Dormitório no nível máximo (nenhum inalcançável)")
+	t.equal(helpers.size(), S.room_def(S.DORMITORY).max_level, "um limite de ajudantes por nível do Dormitório (#176: o chão e os beliches)")
 	t.equal(S.limits_text(c), "Heróis 4 de 6 · Ajudantes 0 de 3", "o texto da barra")
 	S.recruit(c, "cao", RandomNumberGenerator.new(), "A")
 	S.recruit(c, "gato", RandomNumberGenerator.new(), "B")
@@ -58,10 +59,10 @@ func _limits() -> void:
 	# O caído conta no limite.
 	S.admit_fallen(c, [_id(c, "A")])
 	t.check(S.heroes_full(c), "quem está em recuperação conta")
-	# O trem ainda traz alguém, mas Acolher trava.
+	# Com a casa cheia, o trem não traz animal (#182: ele ia embora na partida, e o trem parecia parado).
 	S.train_on_return(c, "limits", "hero")
 	c.inventory.seeds = 50
-	t.check(S.recruit_block(c).contains("cheio"), "o animal do trem não entra com a casa cheia")
+	t.check(S.train_recruit(c).is_empty(), "com a casa cheia, o trem não traz animal")
 	# Ampliar o Alojamento: o limite sobe.
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5
@@ -84,9 +85,10 @@ func _posts() -> void:
 	var c := _campaign()
 	var sereno := _id(c, "Sereno")
 	var brasa := _id(c, "Brasa")
-	t.equal(S.job_rooms(c), [S.RESEARCH, S.FORGE, S.CANTEEN, S.INFIRMARY], "os postos dos cômodos recuperados")
+	# Com entulho para cavar, também o posto de escavador (#186).
+	t.equal(S.job_rooms(c), [S.RESEARCH, S.FORGE, S.CANTEEN, S.INFIRMARY, AHStationGrid.DIG], "os postos dos cômodos recuperados e o de escavador")
 	var d: Dictionary = Campaign.create_initial(3)
-	t.equal(S.job_rooms(d), [S.CANTEEN], "na campanha nova, só a Cantina")
+	t.equal(S.job_rooms(d), [S.CANTEEN, AHStationGrid.DIG], "na campanha nova, só a Cantina e a escavação")
 	t.check(S.set_post(d, "hero_cao_bento", S.FORGE) != "", "sem a Forja, sem o posto dela")
 	t.equal(S.set_post(c, sereno, S.RESEARCH), "", "a coruja vai para a Pesquisa")
 	t.equal(S.set_post(c, sereno, S.FORGE), "", "e muda para a Forja: um posto por herói")
@@ -180,7 +182,8 @@ func _old_save() -> void:
 	var c := _campaign()
 	for name in ["X1", "X2", "X3"]:
 		c.station.rooms[S.CHARACTERS] = 4
-		S.recruit(c, "gato", RandomNumberGenerator.new(), name)
+		# Um save antigo, de antes do #182: três gatos com o mesmo rosto.
+		S._add_hero(c, S._next_hero_id(c, "gato"), "gato", name, [], "cat_recruit_01")
 	c.station.rooms[S.CHARACTERS] = 1
 	for entry in c.roster:
 		entry.erase("post")

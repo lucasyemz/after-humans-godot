@@ -167,10 +167,24 @@ func _journey() -> void:
 	t.equal(corridor.segment, 3, "a plataforma")
 	# O nó do vagão fica na origem (as peças estão no lugar delas no mapa): parado, ele volta ao zero.
 	t.check(metro.visible and metro.position.is_zero_approx() and metro.get_child_count() > 0, "o vagão chegou e parou")
+	# O vagão em camadas (#256) no lugar do card: parado com as portas abertas.
+	var car: AHTrainCar = street.scenario.train_car
+	t.check(car != null and car.get_parent() == metro and is_equal_approx(car.doors_open(), 1.0), "o vagão em camadas, com as portas abertas")
 	street._place_leader(Vector3(float(street.scenario.train.x), street.floor_y, street.lane_z))
 	await _frames(3)
 	t.check(corridor._train_point() != null and corridor._action.is_valid() and corridor._action.get_method() == "_board_train", "perto do vagão, o aviso é embarcar")
 	corridor._action.call()
+	# O embarque (#256): a equipe entra pela porta, as portas fecham antes de o vagão andar, e ele parte com todos
+	# dentro (entre o interior e a carroceria, dentro do comprimento do vagão).
+	if await _until(func(): return metro.position.x > 0.3, "o vagão partir", 20.0):
+		t.check(car.doors_open() <= 0.0, "as portas fecham antes de o vagão andar")
+		var x0: float = car.global_position.x - car.length() * 0.5
+		var inside_z: float = car.global_position.z + car.inside_z()
+		var inside := true
+		for hero in street._heroes:
+			var at: Vector3 = hero.global_position
+			inside = inside and at.x > x0 and at.x < x0 + car.length() and absf(at.z - inside_z) < 0.2
+		t.check(inside, "a equipe inteira vai dentro do vagão")
 	if await _until(func(): return _tree.current_scene is AHStation and not GameFlow.busy, "o trem levar à Estação", 40.0):
 		t.check(Campaign.state.session.expedition == null, "a jornada do tutorial terminou")
 

@@ -69,6 +69,7 @@ static func all() -> Array:
 	# O trem da volta (#122): alguém chega agora, sem sorteio.
 	out.append(_a("train_hero", "Heróis", "Trazer um animal no trem", "station", true))
 	out.append(_a("train_civilian", "Heróis", "Trazer um civil no trem", "station", true))
+	out.append(_a("train_merchant", "Heróis", "Trazer o Mercador no trem", "station", true))
 	# Ninguém morre (#118): os caídos voltam Caídos e se recuperam na Enfermaria (#121).
 	out.append(_a("recover_all", "Heróis", "Recuperar os caídos agora", "campaign", true))
 	out.append(_a("fall_one", "Heróis", "Derrubar um herói (volta Caído)", "station", true))
@@ -225,7 +226,7 @@ static func run(id: String) -> String:
 			var freed := S.unlock_all_skins(c)
 			_refresh_station(scene)
 			return _saved(TranslationServer.translate("%d skin(s) liberada(s)") % freed) if freed > 0 else ""
-		"train_hero", "train_civilian":
+		"train_hero", "train_civilian", "train_merchant":
 			if c.station.train.phase != "none":
 				return ""
 			if not S.train_on_return(c, "admin_train_%d" % Time.get_ticks_usec(), id.trim_prefix("train_")):
@@ -282,6 +283,8 @@ static func run(id: String) -> String:
 		"rooms_all":
 			for room in S.ROOMS:
 				c.station.rooms[room.id] = maxi(1, int(c.station.rooms.get(room.id, 0)))
+			# A grade (#186): cada cômodo recuperado ganha a vaga dele, desentulhada se preciso.
+			AHStationGrid.heal(c)
 			_refresh_station(scene)
 			return _saved(TranslationServer.translate("Todos os cômodos recuperados"))
 		"night_skip":

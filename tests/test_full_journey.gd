@@ -33,6 +33,8 @@ func run(context) -> void:
 	var train_before := train_rule.duplicate()
 	train_rule.Chance = 100
 	train_rule.CivilianShare = 100
+	# Nunca o Mercador (#182): o test_merchant o testa.
+	train_rule.MerchantWeight = 0
 	await _play()
 	train_rule.merge(train_before, true)
 	randomize()

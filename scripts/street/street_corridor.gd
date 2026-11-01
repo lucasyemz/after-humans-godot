@@ -73,6 +73,11 @@ const BOARD_REACH := 2.5
 const TRAIN_ARRIVAL_SECONDS := 4.0
 ## Quanto a recompensa fica à vista antes de o vagão partir.
 const REWARD_SECONDS := 2.5
+## A equipe entrando no vagão (#256): o passo (m/s), o quanto o líder anda para dentro, a partir da porta, para a fila
+## inteira entrar atrás dele, e quanto o trem leva para sair da plataforma.
+const BOARD_SPEED := 2.8
+const BOARD_INSIDE_WALK := 4.6
+const TRAIN_DEPART_SECONDS := 2.2
 
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
 const SWITCH_WAIT_MS := 2000
@@ -545,6 +550,9 @@ func _travel_map(campaign: Dictionary, next: int, confirmed: bool = false) -> vo
 				else tr("%s ainda estão no lugar da luta, e a equipe não volta para cá depois de seguir. Quem fica no chão só é recolhido na saída, mais ferido, e chega com a recuperação inteira.")) % _names(left),
 			[[tr("Ficar e levantar"), func(): pass], [tr("Seguir mesmo assim"), func(): _travel_map(Campaign.state, next, true)]])
 		return
+	# Com outra troca em andamento, a passagem seria recusada: nem o trecho avança nem o corredor fica preso no busy.
+	if GameFlow.busy:
+		return
 	busy = true
 	R.enter_step(campaign, next)
 	Campaign.save()
@@ -996,12 +1004,51 @@ func _board_train() -> void:
 		gains.append([AHInventoryPanel.TOOL_ICONS.get(prize.tool, "tool-generic"), tr(AHInventoryPanel.TOOL_NAMES.get(prize.tool, prize.tool))])
 	hud.loot_burst(gains, street._leader.global_position + Vector3(0, 1.9, 0))
 	hud.toast(tr("Recompensa da fuga: %s.") % ", ".join(gains.map(func(g): return g[1])), REWARD_SECONDS)
-	await get_tree().create_timer(REWARD_SECONDS if street._capture_dir == "" else 0.1).timeout
+	var car: AHTrainCar = street.scenario.train_car if street.scenario != null else null
+	if car != null and street._capture_dir == "":
+		if not await _walk_into_train(car):
+			return
+		var carried := [0.0]
+		await street.scenario.depart_train(TRAIN_DEPART_SECONDS, func(offset: float):
+			street.carry_party(offset - carried[0])
+			carried[0] = offset)
+		if not is_inside_tree():
+			return
+	else:
+		await get_tree().create_timer(REWARD_SECONDS if street._capture_dir == "" else 0.1).timeout
+	# A partida já passou no mapa e a chegada é na plataforma da Estação: na passagem, só a viagem por dentro.
 	var card: Dictionary = GameFlow.card_for("station")
-	card.backdrop = AHWagonRide.new(team)
-	card.title_delay = AHWagonRide.RIDE_SECONDS
-	card.hold = AHWagonRide.RIDE_SECONDS + GameFlow.CARD_SECONDS
+	card.title_delay = AHWagonRide.RIDE_SECONDS - AHWagonRide.DEPART_SECONDS
+	card.hold = card.title_delay + GameFlow.CARD_SECONDS
+	card.backdrop = AHWagonRide.new(team, false)
+	# O trem andando no túnel; a freada, o sino e a chegada tocam na plataforma da Estação (como na volta, #133).
+	card.sound = {"loop": AHWagonRide.RIDE_SOUND, "gain": AHWagonRide.RIDE_GAIN}
 	GameFlow.travel("station", card)
+
+
+## A equipe entra pela porta da direita (#256): o líder vai até a beira da plataforma na frente da porta, entra e anda
+## para dentro, e a fila vai atrás dele pelo rastro. Devolve false se a cena saiu no meio.
+func _walk_into_train(car: AHTrainCar) -> bool:
+	var door_x: float = car.global_position.x + car.door_x(1)
+	var edge_z: float = street._zone.z0 + 0.1
+	var inside_z: float = car.global_position.z + car.inside_z()
+	var floor_y: float = street.floor_y
+	var leader: Vector3 = street._leader.position
+	var path: Array = [Vector3(door_x, floor_y, edge_z), Vector3(door_x, floor_y, inside_z),
+		Vector3(door_x - BOARD_INSIDE_WALK, floor_y, inside_z)]
+	for index in path.size():
+		var point: Vector3 = path[index]
+		# Dentro do vagão, a equipe aparece pelas janelas e pelas portas: sem a silhueta de quem está atrás de uma
+		# parede (ela pintava a equipe inteira por cima da carroceria).
+		if index == 1:
+			for card in street._heroes:
+				card.set_silhouette(null)
+		if not await street.walk_leader(point, maxf(leader.distance_to(point) / BOARD_SPEED, 0.05)):
+			return false
+		leader = point
+	# A fila termina de entrar (a suavização dela) antes de as portas fecharem.
+	await get_tree().create_timer(0.4).timeout
+	return is_inside_tree()
 
 
 ## Onde fica, no mundo, a marca de cada coisa usável: a porta da loja, os caixotes, os props e as portas dos cenários.

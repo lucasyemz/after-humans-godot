@@ -1,0 +1,90 @@
+{
+  "problems": [],
+  "sprites": 52,
+  "actors": 16,
+  "scale_checks": {
+    "method": "cabeça: largura mediana do alfa entre 4% e 10% da altura em pé, abaixo do topo, na escala de cada pose; deitado: comprimento que o corpo teria na escala do idle",
+    "models": {
+      "bento": {
+        "seat_height_over_standing": 0.72,
+        "seat_head_over_idle_head": 0.78,
+        "sleep_length_at_idle_scale_over_reference": 1.024
+      },
+      "nick": {
+        "seat_height_over_standing": 0.76,
+        "seat_head_over_idle_head": 0.86,
+        "sleep_length_at_idle_scale_over_reference": 1.104
+      },
+      "iris": {
+        "seat_height_over_standing": 0.701,
+        "seat_head_over_idle_head": 0.86,
+        "sleep_length_at_idle_scale_over_reference": 1.076
+      },
+      "vespera": {
+        "seat_height_over_standing": 0.761,
+        "seat_head_over_idle_head": 0.91,
+        "sleep_length_at_idle_scale_over_reference": 1.05
+      },
+      "dog_male": {
+        "seat_height_over_standing": 0.72,
+        "seat_head_over_idle_head": 0.78,
+        "sleep_length_at_idle_scale_over_reference": 1.035
+      },
+      "dog_female": {
+        "seat_height_over_standing": 0.721,
+        "seat_head_over_idle_head": 0.84,
+        "sleep_length_at_idle_scale_over_reference": 1.03
+      },
+      "cat_male": {
+        "seat_height_over_standing": 0.761,
+        "seat_head_over_idle_head": 0.91,
+        "sleep_length_at_idle_scale_over_reference": 1.077
+      },
+      "cat_female": {
+        "seat_height_over_standing": 0.76,
+        "seat_head_over_idle_head": 0.92,
+        "sleep_length_at_idle_scale_over_reference": 1.087
+      },
+      "frog_male": {
+        "seat_height_over_standing": 0.702,
+        "seat_head_over_idle_head": 0.78,
+        "sleep_length_at_idle_scale_over_reference": 1.058
+      },
+      "frog_female": {
+        "seat_height_over_standing": 0.701,
+        "seat_head_over_idle_head": 0.78,
+        "sleep_length_at_idle_scale_over_reference": 1.038
+      },
+      "owl_male": {
+        "seat_height_over_standing": 0.76,
+        "seat_head_over_idle_head": 0.87,
+        "sleep_length_at_idle_scale_over_reference": 1.026
+      },
+      "owl_female": {
+        "seat_height_over_standing": 0.76,
+        "seat_head_over_idle_head": 0.86,
+        "sleep_length_at_idle_scale_over_reference": 1.013
+      },
+      "raccoon_male": {
+        "seat_height_over_standing": 0.721,
+        "seat_head_over_idle_head": 0.89,
+        "sleep_length_at_idle_scale_over_reference": 1.049
+      },
+      "raccoon_female": {
+        "seat_height_over_standing": 0.721,
+        "seat_head_over_idle_head": 0.89,
+        "sleep_length_at_idle_scale_over_reference": 1.063
+      },
+      "armadillo_male": {
+        "seat_height_over_standing": 0.721,
+        "seat_head_over_idle_head": 0.69,
+        "sleep_length_at_idle_scale_over_reference": 1.038
+      },
+      "armadillo_female": {
+        "seat_height_over_standing": 0.72,
+        "seat_head_over_idle_head": 0.73,
+        "sleep_length_at_idle_scale_over_reference": 1.016
+      }
+    }
+  }
+}

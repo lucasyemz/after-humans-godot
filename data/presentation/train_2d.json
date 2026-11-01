@@ -1,0 +1,368 @@
+{
+ "issue": 149,
+ "origin": "top_left",
+ "train": {
+  "canvas": [
+   1280,
+   543
+  ],
+  "px_per_m": 128.0,
+  "size_m": [
+   10.0,
+   4.242
+  ],
+  "rail_y": 524.4,
+  "floor_y": 386.3,
+  "layers": {
+   "interior": "res://art/train/T_TR_Interior.webp",
+   "interior_off": "res://art/train/T_TR_Interior_Off.webp",
+   "body": "res://art/train/T_TR_Body.webp",
+   "glass": "res://art/train/T_TR_Glass.webp",
+   "wheel": "res://art/train/T_TR_Wheel.webp",
+   "bogie": "res://art/train/T_TR_Bogie.webp",
+   "spark": "res://art/train/T_TR_Spark.webp"
+  },
+  "draw_order": [
+   "interior (ou interior_off)",
+   "equipe dentro",
+   "leaves",
+   "body",
+   "glass",
+   "wheels",
+   "bogie",
+   "sparks"
+  ],
+  "depth": {
+   "interior_z": -0.9,
+   "team_inside": -0.45,
+   "leaves": -0.03,
+   "body": 0.0,
+   "glass": 0.01,
+   "wheels": 0.02,
+   "bogie": 0.03
+  },
+  "interior_emission": 0.55,
+  "doors": [
+   [
+    252,
+    124,
+    465,
+    390
+   ],
+   [
+    818,
+    124,
+    1030,
+    390
+   ]
+  ],
+  "leaves": {
+   "AL": {
+    "file": "res://art/train/T_TR_Door_AL.webp",
+    "closed_top_left": [
+     248,
+     120
+    ],
+    "size": [
+     111,
+     274
+    ],
+    "open_offset_x": -90,
+    "blend": "alpha"
+   },
+   "AR": {
+    "file": "res://art/train/T_TR_Door_AR.webp",
+    "closed_top_left": [
+     357,
+     120
+    ],
+    "size": [
+     112,
+     274
+    ],
+    "open_offset_x": 88,
+    "blend": "alpha"
+   },
+   "BL": {
+    "file": "res://art/train/T_TR_Door_BL.webp",
+    "closed_top_left": [
+     814,
+     120
+    ],
+    "size": [
+     111,
+     274
+    ],
+    "open_offset_x": -91,
+    "blend": "alpha"
+   },
+   "BR": {
+    "file": "res://art/train/T_TR_Door_BR.webp",
+    "closed_top_left": [
+     923,
+     120
+    ],
+    "size": [
+     111,
+     274
+    ],
+    "open_offset_x": 88,
+    "blend": "alpha"
+   }
+  },
+  "door_seconds": {
+   "open": 0.8,
+   "close": 0.8
+  },
+  "wheel_centers": [
+   [
+    178.6,
+    472.7
+   ],
+   [
+    408.1,
+    472.7
+   ],
+   [
+    871.1,
+    472.7
+   ],
+   [
+    1099.0,
+    472.7
+   ]
+  ],
+  "wheel_radius": 52,
+  "wheel_rule": "ângulo = -distância andada / raio (m); gira só com o vagão andando",
+  "sparks": {
+   "when": "na freada, da metade da velocidade até parar",
+   "at": "o ponto de contato de cada roda com o trilho (centro - raio)",
+   "direction": "para trás do movimento, subindo",
+   "lifetime": 0.32,
+   "amount_per_wheel": 46,
+   "blend": "add"
+  },
+  "leaf_rule": "as folhas ficam atrás da carroceria, em mistura alfa (o vidro é semitransparente); 4 px de sobra para fora (em cima, embaixo e na borda de fora), escondidos sob o batente; o curso para antes da janela vizinha, e uns 17 px da folha ficam à vista no vão aberto, como o batente da porta; as folhas de dentro (AR e BL) param a 1 px da janela do meio: não aumentar o curso"
+ },
+ "passage": {
+  "canvas": [
+   1920,
+   1080
+  ],
+  "layer_order": [
+   "tunnel_loop",
+   "carriage_background",
+   "heroes",
+   "carriage_poles",
+   "title_card"
+  ],
+  "tunnel": {
+   "file": "res://art/transitions/train/tunnel_loop.webp",
+   "position": [
+    0,
+    262
+   ],
+   "scale": 1.1,
+   "modulate": [
+    0.55,
+    0.6,
+    0.68
+   ],
+   "repeat": "horizontal",
+   "scroll_px_per_second": 96
+  },
+  "background": {
+   "file": "res://art/transitions/train/carriage_background.webp",
+   "window_panes": [
+    [
+     191,
+     265,
+     382,
+     349
+    ],
+    [
+     398,
+     265,
+     609,
+     349
+    ],
+    [
+     193,
+     368,
+     607,
+     536
+    ],
+    [
+     1314,
+     265,
+     1525,
+     349
+    ],
+    [
+     1538,
+     265,
+     1733,
+     349
+    ],
+    [
+     1316,
+     368,
+     1731,
+     536
+    ],
+    [
+     815,
+     282,
+     935,
+     526
+    ],
+    [
+     985,
+     283,
+     1109,
+     524
+    ]
+   ],
+   "window_panes_note": "os vidros recortados (alfa 0, borda suave de 6 px por dentro)"
+  },
+  "poles": {
+   "file": "res://art/transitions/train/carriage_poles.webp",
+   "x": [
+    159,
+    450,
+    719,
+    1192,
+    1462,
+    1760
+   ]
+  },
+  "hero_modulate": [
+   0.84,
+   0.92,
+   1.0
+  ],
+  "px_per_m": 275.0,
+  "seats": [
+   {
+    "slot": 0,
+    "seat_support": [
+     305,
+     692
+    ],
+    "hero_example": "hero_cao_bento",
+    "pose": "hero_cao_bento_seat_front",
+    "source_hip_contact": [
+     333,
+     455
+    ],
+    "source_foot_anchor": [
+     333,
+     707
+    ],
+    "source_body_reference_pixels": 946,
+    "height_m": 1.72,
+    "preview_scale": 0.5,
+    "sprite_top_left": [
+     138.5,
+     464.5
+    ],
+    "projected_foot_anchor": [
+     305.0,
+     818.0
+    ],
+    "file": "res://art/station/poses/hero_cao_bento_seat_front.webp"
+   },
+   {
+    "slot": 1,
+    "seat_support": [
+     585,
+     692
+    ],
+    "hero_example": "hero_gato_nick",
+    "pose": "hero_gato_nick_seat_front",
+    "source_hip_contact": [
+     328,
+     418
+    ],
+    "source_foot_anchor": [
+     328,
+     707
+    ],
+    "source_body_reference_pixels": 946,
+    "height_m": 1.5,
+    "preview_scale": 0.436047,
+    "sprite_top_left": [
+     442.0,
+     509.7
+    ],
+    "projected_foot_anchor": [
+     585.0,
+     818.0
+    ],
+    "file": "res://art/station/poses/hero_gato_nick_seat_front.webp"
+   },
+   {
+    "slot": 2,
+    "seat_support": [
+     1327,
+     692
+    ],
+    "hero_example": "hero_sapo_iris",
+    "pose": "hero_sapo_iris_seat_front",
+    "source_hip_contact": [
+     428,
+     393
+    ],
+    "source_foot_anchor": [
+     428,
+     707
+    ],
+    "source_body_reference_pixels": 946,
+    "height_m": 1.38,
+    "preview_scale": 0.401163,
+    "sprite_top_left": [
+     1155.3,
+     534.3
+    ],
+    "projected_foot_anchor": [
+     1327.0,
+     817.9
+    ],
+    "file": "res://art/station/poses/hero_sapo_iris_seat_front.webp"
+   },
+   {
+    "slot": 3,
+    "seat_support": [
+     1611,
+     692
+    ],
+    "hero_example": "hero_coruja_vespera",
+    "pose": "hero_coruja_vespera_seat_front",
+    "source_hip_contact": [
+     388,
+     445
+    ],
+    "source_foot_anchor": [
+     388,
+     706
+    ],
+    "source_body_reference_pixels": 946,
+    "height_m": 1.66,
+    "preview_scale": 0.482558,
+    "sprite_top_left": [
+     1423.8,
+     477.3
+    ],
+    "projected_foot_anchor": [
+     1611.0,
+     818.0
+    ],
+    "file": "res://art/station/poses/hero_coruja_vespera_seat_front.webp"
+   }
+  ],
+  "shadow_width_px": 520,
+  "floor_y": 800,
+  "seat_rule": "pose de frente (station_poses.json, *_seat_front, #253): o ponto hip vai no assento; ele foi posto para os pés caírem no chão à frente do banco, 0,458 m abaixo da linha do assento na tela"
+ },
+ "rect_convention": "retângulos [x0, y0, x1, y1] com o fim exclusivo (x1 e y1 ficam fora), em px do quadro"
+}

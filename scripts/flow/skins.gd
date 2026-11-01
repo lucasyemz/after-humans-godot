@@ -88,6 +88,19 @@ static func pose(base: Dictionary, hero_id: String) -> Dictionary:
 	return out
 
 
+## A pose sentada do herói pela direção do banco (#253): "side" (de lado: a cantina, a fogueira) ou "front" (de frente:
+## o banco encostado no fundo, como no vagão), na skin dele. Vazia se o herói não tem essa pose, ou se a skin dele ainda
+## não tem: a pose da roupa padrão numa skin diferente seria outro figurino.
+static func seat_pose(poses: Dictionary, hero_id: String, facing: String) -> Dictionary:
+	var base: Dictionary = poses.get(hero_id + ("_seat_front" if facing == "front" else "_seat"), {})
+	if base.is_empty() or String(base.get("facing", "side")) != facing:
+		return {}
+	var dressed := pose(base, hero_id)
+	if skin_of(hero_id) != DEFAULT and dressed.get("file") == base.get("file"):
+		return {}
+	return dressed
+
+
 ## As poses padrão que a skin ainda não tem (o teste lista o que falta em cada skin): os arquivos do herói no manifesto,
 ## o retrato, as poses da Estação e do acampamento.
 static func missing(skin_id: String, entry: Dictionary, extra_files: Array = []) -> Array:
