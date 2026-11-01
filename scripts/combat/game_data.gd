@@ -21,7 +21,12 @@ const ABILITY := {
 }
 ## A classe é o papel (#189): a espécie é do indivíduo, e DefaultSpecies é a de quem não tem uma (os fundadores e os saves
 ## de antes).
-const CLASS := {"DisplayName": "", "DefaultSpecies": "", "BaseMaxHp": 1, "BaseSpeed": 0, "AbilityIds": []}
+## Os atributos por papel (#258): a resistência a dano por turno, a deslocamento e a atordoamento (de 0 a 1) e o crítico a
+## mais, em pontos percentuais sobre CRITICAL_CHANCE. Os padrões são os de antes do papel (0,2 de dano por turno e de
+## deslocamento, como o motor já fazia com todo herói; nada contra atordoamento; o crítico de todos): os kits históricos
+## da paridade, sem as colunas, lutam igual e sorteiam igual.
+const CLASS := {"DisplayName": "", "DefaultSpecies": "", "BaseMaxHp": 1, "BaseSpeed": 0, "AbilityIds": [],
+	"DotResist": 0.2, "DisplacementResist": 0.2, "StunResist": 0.0, "CritBonus": 0}
 ## A espécie (#189): a linhagem da vantagem de tipo (#227) e a altura vêm dela; ela não dá atributos.
 const SPECIES := {"DisplayName": "", "Lineage": "", "Height": 1.64}
 const ENEMY := {

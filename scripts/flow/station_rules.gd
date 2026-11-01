@@ -185,6 +185,7 @@ static func migrate(campaign: Dictionary) -> void:
 			entry.art_variant = _least_used_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
 	# As sete habilidades (#259): os campos novos; o que um save editado traz e não vale volta ao padrão.
 	AHHeroSkills.migrate(campaign)
+	AHCampSkills.migrate(campaign)
 	# Os dois slots de relíquia (#263): o relic_id antigo vira o slot 0; o estoque não muda.
 	if typeof(campaign.inventory.get("relics")) != TYPE_ARRAY:
 		campaign.inventory.relics = []

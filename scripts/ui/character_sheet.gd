@@ -45,6 +45,8 @@ static func from_unit(session: AHCombatSession, unit: AHCombat.Unit, boss: bool 
 		var hero = Campaign.hero(unit.hero_id)
 		out.kind = _kind(unit.class_id, GameData.combat.species_of(unit.class_id, unit.species))
 		out.type = AHTypes.label(AHTypes.of_unit(unit))
+		# As resistências do papel (#258) ficam na ficha fora da luta: a inspeção tem altura fixa e guarda o lugar para os
+		# passivos e os estados de agora.
 		out.passives = _hero_passives(hero, unit.perks, unit.class_id)
 		# A linhagem (#227): em quem causa mais dano e de quem recebe.
 		out.passives.append_array(AHTypes.sheet_rows(AHTypes.of_unit(unit)))
@@ -106,6 +108,7 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 		"kind": _kind(String(hero.get("class_id", "")), AHSpecies.of_hero(hero)), "type": AHTypes.label(AHTypes.of_hero(hero)),
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
 		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))) \
+			+ role_rows(String(hero.get("class_id", ""))) \
 			+ AHTypes.sheet_rows(AHTypes.of_hero(hero)), "states": [], "enemy": false,
 		"level": AHHeroLevels.level(hero), "skills": skills_of(hero),
 		"art": AHCombatArena.hero_art_of(String(hero.get("id", "")), String(hero.get("art_variant", ""))).get("idle", {})}
@@ -123,6 +126,22 @@ static func skills_of(hero: Dictionary) -> Dictionary:
 	var all := AHHeroSkills.catalog(String(hero.get("class_id", "")))
 	return {"equipped": equipped.map(name_of), "resting": known.filter(func(id): return not equipped.has(id)).map(name_of),
 		"locked": all.filter(func(id): return not known.has(id)).map(name_of), "need": AHHeroSkills.requirement(hero)}
+
+
+## O que o papel dá (#258): as três resistências numa linha e, se o papel soma, a chance de crítico. Os números ficam no
+## título: no texto Maior a ficha encolhe e esconde as explicações.
+static func role_rows(class_id: String) -> Array:
+	var hero_class = GameData.combat.classes.get(class_id)
+	if hero_class == null:
+		return []
+	var pct := func(value): return roundi(float(value) * 100.0)
+	var rows: Array = [[TranslationServer.translate("Resiste: dano por turno %d%% · deslocamento %d%% · atordoamento %d%%")
+		% [pct.call(hero_class.DotResist), pct.call(hero_class.DisplacementResist), pct.call(hero_class.StunResist)],
+		TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel."), true]]
+	if int(hero_class.CritBonus) > 0:
+		rows.append([TranslationServer.translate("Crítico %d%% (papel +%d)") % [pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus), int(hero_class.CritBonus)],
+			TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes."), true])
+	return rows
 
 
 ## "Cão · Proteção": a espécie do indivíduo e o papel (a classe, #189).
