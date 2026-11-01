@@ -142,6 +142,21 @@ func _skills_in_camp() -> void:
 	(panel.find_child("Skill_camp_cao_primeiro_turno", true, false) as Button).focus_entered.emit()
 	await _frames(1)
 	t.check(String(panel._status.text).contains("Já usada"), "a linha de estado diz por quê")
+	# Pelo teclado: a de aliado, as setas até outro herói e Interagir (o caminho em que o herói escolhido muda).
+	var conversa: Button = panel.find_child("Skill_camp_comum_conversa_ao_fogo", true, false)
+	S.hero(Campaign.state, nick).instinct = 30
+	conversa.pressed.emit()
+	await _frames(1)
+	camp.select(ids.find(nick))
+	await _until(func(): return not camp.switching(), 3.0)
+	var accept := InputEventAction.new()
+	accept.action = "interact"
+	accept.pressed = true
+	_tree.root.push_input(accept)
+	await _until(func(): return not camp.switching(), 3.0)
+	await _frames(3)
+	t.equal(int(S.hero(Campaign.state, nick).instinct), 15, "setas até o Nick e Interagir: a Conversa ao Fogo vale (−15 de Instinto)")
+	t.equal(camp.selected_id(), bento, "e o escolhido volta ao Bento")
 	# Esc desiste do alvo.
 	(panel.find_child("Skill_camp_comum_conversa_ao_fogo", true, false) as Button).pressed.emit()
 	await _frames(1)

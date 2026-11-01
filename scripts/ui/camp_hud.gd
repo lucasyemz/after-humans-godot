@@ -260,10 +260,11 @@ func _choose_target(target_id: String) -> void:
 		return
 	var pending := targeting
 	targeting = {}
-	var index := camp.members.map(func(m): return m.hero_id).find(String(pending.user))
-	if index >= 0:
-		camp.select(index)
+	# Usa antes de voltar ao herói: a troca de herói (o fade) recusaria o uso no meio dela.
 	skill.emit(String(pending.user), String(pending.skill), target_id)
+	var index := camp.members.map(func(m): return m.hero_id).find(String(pending.user))
+	if index >= 0 and camp.selected_id() != String(pending.user):
+		camp.select(index)
 
 
 func cancel_target() -> void:
