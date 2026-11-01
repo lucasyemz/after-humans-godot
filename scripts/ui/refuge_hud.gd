@@ -1917,7 +1917,8 @@ func _show(key: String) -> void:
 func _station_plan(c: Dictionary) -> void:
 	_header("plan", tr("Plano da Estação"))
 	_text(tr("A Estação cresce com o que as jornadas trazem. Sucata e fragmentos recuperam e melhoram os cômodos."))
-	for id in AHStation.ROOM_ORDER:
+	# O Treino (#265) não tem lugar próprio na cena (fica com a Sala), mas entra no Plano, com o painel e o Melhorar.
+	for id in AHStation.ROOM_ORDER + [S.TRAINING]:
 		var room_def := S.room_def(id)
 		var level := S.room_level(c, id)
 		var cost := S.next_level_cost(c, id)
@@ -2581,7 +2582,7 @@ func _workers(c: Dictionary, room_id: String) -> void:
 	chips.add_theme_constant_override("h_separation", 8)
 	chips.add_theme_constant_override("v_separation", 8)
 	box.add_child(chips)
-	for entry in S.living(c).filter(func(h): return not S.recovering(h)):
+	for entry in S.living(c).filter(func(h): return not S.recovering(h) and not AHStationServices.treating(h)):
 		var id: String = entry.id
 		var chip := _chip_button("%s · +%d" % [entry.display_name, S.post_yield(entry, room_id)])
 		chip.name = "Worker_%s" % id
@@ -3217,7 +3218,8 @@ func _infirmary(c: Dictionary, level: int) -> void:
 	var fallen := S.fallen(c)
 	var beds := S.infirmary_beds(c)
 	if level >= 1:
-		_section(tr("Leitos: %d de %d ocupados") % [fallen.filter(func(h): return S.in_bed(h)).size(), beds], "bed")
+		# Os leitos (#265): os caídos e quem trata uma peculiaridade.
+		_section(tr("Leitos: %d de %d ocupados") % [fallen.filter(func(h): return S.in_bed(h)).size() + AHStationServices.beds_treating(c), beds], "bed")
 	if fallen.is_empty():
 		var empty := _inset()
 		var row := HBoxContainer.new()
@@ -3229,7 +3231,7 @@ func _infirmary(c: Dictionary, level: int) -> void:
 		row.add_child(_wrapped(empty_text, "small", AHKit.TEXT, false, BODY_WIDTH - 90.0))
 		# Ninguém caído, mas ninguém para partir (todos em missão solo, #183): o dia também passa daqui.
 		if S.rest_block(c) == "":
-			_footer_primary(tr("Esperar um dia"), "sleep", func(): _act(S.rest_day(Campaign.state), tr("Um dia passou na Estação.")))
+			_footer_primary(tr("Esperar um dia"), "sleep", func(): _rest_day())
 		return
 	if level < 1:
 		_text(tr("Sem a Enfermaria, quem caiu se recupera devagar no Dormitório."), AHKit.MUTED, "small")
@@ -3237,7 +3239,16 @@ func _infirmary(c: Dictionary, level: int) -> void:
 		_body.add_child(_fallen_card(c, entry))
 	if S.rest_block(c) == "":
 		_text(tr("Ninguém pode partir agora. Passar um dia na Estação gasta e produz como um dia de expedição, e cada caído fica um dia mais perto."), AHKit.TEXT, "small")
-		_footer_primary(tr("Esperar um dia"), "sleep", func(): _act(S.rest_day(Campaign.state), tr("Um dia passou na Estação.")))
+		_footer_primary(tr("Esperar um dia"), "sleep", func(): _rest_day())
+
+
+## Esperar um dia: o aviso diz também o que terminou (a recuperação e o tratamento, #265).
+func _rest_day() -> void:
+	var error := S.rest_day(Campaign.state)
+	var done: Array = [tr("Um dia passou na Estação.")]
+	if error == "":
+		done.append_array(AHStationServices.report_lines(Campaign.state, Campaign.state.station.get("last_rest", {})))
+	_act(error, " ".join(done))
 
 
 func _fallen_card(c: Dictionary, entry: Dictionary) -> Control:

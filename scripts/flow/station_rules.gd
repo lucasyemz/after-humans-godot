@@ -1466,7 +1466,7 @@ static func treat_trauma(campaign: Dictionary, hero_id: String) -> String:
 	if not room_available(campaign, BAR):
 		return TranslationServer.translate("Recupere o Bar para tratar o trauma.")
 	if AHStationServices.talks_left(campaign) <= 0:
-		return TranslationServer.translate("O Bar já conversou o que dava hoje. Volte depois da próxima expedição.")
+		return TranslationServer.translate("O Bar já conversou o que dava hoje. Volte amanhã.")
 	if not consume(campaign, "seeds", AHStationServices.trauma_cost()):
 		return TranslationServer.translate("Sementes insuficientes (custa %d sementes).") % AHStationServices.trauma_cost()
 	entry.trauma = false
@@ -2356,6 +2356,8 @@ static func post_block(campaign: Dictionary, hero_id: String, room_id: String) -
 		return ""
 	if recovering(entry):
 		return TranslationServer.translate("%s está em recuperação e não trabalha agora.") % entry.display_name
+	if AHStationServices.treating(entry):
+		return AHStationServices.treatment_text(entry)
 	if AHSideMissions.away(entry):
 		return AHSideMissions.away_text(entry)
 	if room_id == AHStationGrid.DIG and AHStationGrid.dig_target(campaign) == "":
@@ -2390,7 +2392,7 @@ static func run_posts(campaign: Dictionary, team: Array) -> Array:
 	var out: Array = []
 	for room_id in job_rooms(campaign):
 		var entry = worker(campaign, room_id)
-		if entry == null or team.has(entry.id) or recovering(entry):
+		if entry == null or team.has(entry.id) or recovering(entry) or AHStationServices.treating(entry):
 			continue
 		var amount := post_yield(entry, room_id)
 		match String(job_rule(room_id).get("Unit", "")):

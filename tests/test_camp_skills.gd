@@ -313,9 +313,17 @@ func _room() -> void:
 		var learn: Button = screen.find_child("CampLearn", true, false)
 		if t.check(learn != null, "a bloqueada leva ao Treino"):
 			t.check(not C.known(S.hero(Campaign.state, bento.id)).has("camp_cao_dividir_a_carga"), "a Sala sozinha não ensina")
+			var keys: bool = AHUiStyle.using_keys
+			AHUiStyle.using_keys = true
+			learn.grab_focus()
 			learn.pressed.emit()
-			await _frames(4)
+			await _frames(6)
 			screen = hud._room_screen
+			var owner := screen.get_viewport().gui_get_focus_owner()
+			t.check(owner != null and String(owner.name) == "CampUpgrade_camp_cao_dividir_a_carga", "pelo teclado, o foco abre no cartão escolhido (%s)" % (owner.name if owner else "nada"))
+			var behind := screen.find_child("CampLearn", true, false) as Control
+			t.check(behind != null and behind.focus_mode == Control.FOCUS_NONE, "e o que fica atrás do diálogo não recebe o foco")
+			AHUiStyle.using_keys = keys
 			var dialog := screen.find_child("Training", true, false) as Control
 			t.check(dialog != null and screen.training and screen.training_camp, "o Treino de acampamento abre")
 			var card := screen.find_child("CampUpgrade_camp_cao_dividir_a_carga", true, false) as Button
@@ -333,6 +341,25 @@ func _room() -> void:
 				screen.rebuild()
 				await _frames(2)
 				t.check(screen.find_child("Training", true, false) == null, "o diálogo fecha depois de aprender")
+		# O Treino no Plano (#265): o Ver abre o painel dele, e o Melhorar compra o nível 2.
+		S.adjust(Campaign.state, "scrap", 20)
+		S.adjust(Campaign.state, "fragments", 5)
+		hud.open_service("plan")
+		await _frames(4)
+		var see := hud.find_child("See_training", true, false) as Button
+		if t.check(see != null, "o Treino está no Plano da Estação"):
+			see.pressed.emit()
+			await _frames(4)
+			t.equal(hud.current, S.TRAINING, "o Ver abre o painel do Treino")
+			var upgrade := hud.find_child("Upgrade", true, false) as Button
+			if t.check(upgrade != null and not upgrade.disabled, "com o Melhorar"):
+				upgrade.pressed.emit()
+				await _frames(4)
+				t.equal(S.room_level(Campaign.state, S.TRAINING), 2, "que leva o Treino ao nível 2")
+				t.equal(AHStationServices.trainees_per_day(Campaign.state), 2, "e ele recebe dois heróis por dia")
+		hud.open_room(S.CHARACTERS)
+		await _frames(4)
+		screen = hud._room_screen
 		screen = hud._room_screen
 		screen.camp_skill = "camp_cao_dividir_a_carga"
 		screen.rebuild()

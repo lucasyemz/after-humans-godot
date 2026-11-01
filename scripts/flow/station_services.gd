@@ -52,20 +52,28 @@ static func talks_left(campaign: Dictionary) -> int:
 ## Quem já usou o serviço hoje (station[key] = {cycle, heroes}); de outro dia, ninguém.
 static func _today(campaign: Dictionary, key: String) -> Array:
 	var day = campaign.get("station", {}).get(key)
-	if typeof(day) != TYPE_DICTIONARY or int(day.get("cycle", -1)) != int(campaign.station.get("cycle_number", 0)):
+	if not _valid_day(day) or int(day.cycle) != int(campaign.station.get("cycle_number", 0)):
 		return []
-	return Array(day.get("heroes", []))
+	return Array(day.heroes)
 
 
-static func _mark_today(campaign: Dictionary, key: String, hero_id: String) -> void:
+## {cycle: número, heroes: [ids]}: o que o save guarda de cada dia (o resto, de um save editado, é ignorado e limpo).
+static func _valid_day(day) -> bool:
+	if typeof(day) != TYPE_DICTIONARY or not [TYPE_INT, TYPE_FLOAT].has(typeof(day.get("cycle"))) or typeof(day.get("heroes")) != TYPE_ARRAY:
+		return false
+	return Array(day.heroes).all(func(id): return typeof(id) == TYPE_STRING)
+
+
+## each: true conta cada vez (as conversas do Bar); false, cada herói uma vez (o Treino).
+static func _mark_today(campaign: Dictionary, key: String, hero_id: String, each: bool = false) -> void:
 	var heroes := _today(campaign, key)
-	if not heroes.has(hero_id):
+	if each or not heroes.has(hero_id):
 		heroes.append(hero_id)
 	campaign.station[key] = {"cycle": int(campaign.station.get("cycle_number", 0)), "heroes": heroes}
 
 
 static func mark_talk(campaign: Dictionary, hero_id: String) -> void:
-	_mark_today(campaign, "bar_talks", hero_id)
+	_mark_today(campaign, "bar_talks", hero_id, true)
 
 
 # ---------------------------------------------------------------- o Treino
@@ -81,8 +89,8 @@ static func training_block(campaign: Dictionary, hero_id: String) -> String:
 	var today := _today(campaign, "training")
 	if today.has(hero_id) or today.size() < trainees_per_day(campaign):
 		return ""
-	return TranslationServer.translate("O Treino já recebeu %d herói hoje. Volte depois da próxima expedição.") % trainees_per_day(campaign) \
-		if trainees_per_day(campaign) == 1 else TranslationServer.translate("O Treino já recebeu %d heróis hoje. Volte depois da próxima expedição.") % trainees_per_day(campaign)
+	return TranslationServer.translate("O Treino já recebeu %d herói hoje. Volte amanhã.") % trainees_per_day(campaign) \
+		if trainees_per_day(campaign) == 1 else TranslationServer.translate("O Treino já recebeu %d heróis hoje. Volte amanhã.") % trainees_per_day(campaign)
 
 
 static func mark_training(campaign: Dictionary, hero_id: String) -> void:
@@ -110,7 +118,12 @@ static func bunk_relief(campaign: Dictionary) -> int:
 # ---------------------------------------------------------------- a Enfermaria
 
 static func treating(entry) -> bool:
-	return entry != null and typeof(entry.get("quirk_treatment")) == TYPE_DICTIONARY and int(entry.quirk_treatment.get("days", 0)) > 0
+	return entry != null and _valid_treatment(entry.get("quirk_treatment")) and int(entry.quirk_treatment.days) > 0
+
+
+## {perk: texto, days: número}: o tratamento que o save guarda.
+static func _valid_treatment(t) -> bool:
+	return typeof(t) == TYPE_DICTIONARY and typeof(t.get("perk")) == TYPE_STRING and [TYPE_INT, TYPE_FLOAT].has(typeof(t.get("days")))
 
 
 ## As peculiaridades negativas do herói (perks.json, bPositive falso).
@@ -186,11 +199,39 @@ static func treatment_text(entry: Dictionary) -> String:
 	return TranslationServer.translate("Em tratamento na Enfermaria: %s · %s") % [name, S.return_text(int(entry.quirk_treatment.days)).to_lower()]
 
 
-## Saves editados: o tratamento de outro tipo ou de uma peculiaridade que ele não tem sai.
+## Saves editados: o tratamento de outro tipo, sem dias ou de uma peculiaridade que não é negativa dele sai; os dias do
+## Bar e do Treino de outro tipo também.
 static func migrate(campaign: Dictionary) -> void:
+	var station = campaign.get("station")
+	if typeof(station) == TYPE_DICTIONARY:
+		for key in ["bar_talks", "training"]:
+			if station.has(key) and not _valid_day(station[key]):
+				station.erase(key)
 	for entry in campaign.get("roster", []):
 		if typeof(entry) != TYPE_DICTIONARY or not entry.has("quirk_treatment"):
 			continue
 		var t = entry.quirk_treatment
-		if typeof(t) != TYPE_DICTIONARY or not Array(entry.get("perks", [])).has(String(t.get("perk", ""))) or int(t.get("days", 0)) <= 0:
+		if typeof(entry.get("perks")) != TYPE_ARRAY or not _valid_treatment(t) or int(t.days) <= 0 or not negative_perks(entry).has(t.perk):
 			entry.erase("quirk_treatment")
+
+
+## O que os serviços fizeram, para o relatório da volta e do Esperar um dia: quem terminou o tratamento e quem o Bar
+## aliviou.
+static func report_lines(campaign: Dictionary, report: Dictionary) -> Array:
+	var lines: Array = []
+	for done in report.get("treated", []):
+		var entry = S.hero(campaign, String(done.get("hero_id", "")))
+		var row = GameData.row("perks", String(done.get("perk", "")))
+		if entry != null:
+			lines.append(TranslationServer.translate("%s terminou o tratamento na Enfermaria: não tem mais %s.") % [entry.display_name,
+				TranslationServer.translate(String(row.DisplayName)) if row != null else String(done.get("perk", ""))])
+	var eased: Array = []
+	var amount := 0
+	for relief in report.get("bar", []):
+		var entry = S.hero(campaign, String(relief.get("hero_id", "")))
+		if entry != null:
+			eased.append(String(entry.display_name))
+			amount = maxi(amount, int(relief.get("instinct", 0)))
+	if not eased.is_empty():
+		lines.append(TranslationServer.translate("O Bar aliviou quem ficou na Estação (%s): −%d de Instinto.") % [", ".join(eased), amount])
+	return lines

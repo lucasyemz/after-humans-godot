@@ -15,11 +15,11 @@ script só mexe no estado por dicionários, então roda também na main para as 
 | Cômodo | O que faz | Os números |
 | --- | --- | --- |
 | Bar | Na volta, quem ficou na Estação perde Instinto. A conversa trata o trauma (saiu do Alojamento). | −5 de Instinto; 5 sementes; 1 conversa por dia (2 no nível 2) |
-| Bar nível 2 | A segunda conversa do dia | 4 sementes e 1 fragmento |
+| Bar nível 2 | A segunda conversa do dia | 4 sucatas e 1 fragmento |
 | Dormitório nível 2 | Os beliches tiram mais Instinto na noite da volta | −3 |
 | Enfermaria nível 2 | Trata uma peculiaridade negativa, ocupando um leito, e o herói não parte enquanto isso | 2 dias |
 | Treino | Subir de nível e aprender as habilidades de luta e de acampamento | 1 herói por dia (2 no nível 2) |
-| Treino nível 2 | O segundo herói do dia | 5 sementes e 1 fragmento |
+| Treino nível 2 | O segundo herói do dia | 5 sucatas e 1 fragmento |
 
 - **O dia** é o ciclo da Estação (`station.cycle_number`). Uma expedição ou o Esperar um dia passa para o seguinte.
 - **Quem já treinou hoje** continua podendo treinar. O limite conta heróis, não sessões.

@@ -102,6 +102,12 @@ func rebuild() -> void:
 	var again := get_node_or_null(focus_path) if not focus_path.is_empty() else null
 	if again == null and focus_name != "":
 		again = find_child(focus_name, true, false)
+	# Com o diálogo do Treino aberto, o foco fica dentro dele (#265): o botão que o abriu, atrás da cortina, não conta.
+	var dialog := get_node_or_null("Training") as Control
+	if dialog != null:
+		_trap_focus(dialog)
+		if again is Control and not dialog.is_ancestor_of(again):
+			again = null
 	var target: Control = again if again is Control and (again as Control).focus_mode != Control.FOCUS_NONE else _first_focus
 	if target != null and AHUiStyle.using_keys:
 		AHKit.focus_later(target)
@@ -144,6 +150,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if training and AHUiStyle.is_back(event):
 		get_viewport().set_input_as_handled()
 		training = false
+		training_camp = false
 		rebuild()
 
 
@@ -232,6 +239,11 @@ func _camp_section(hero: Dictionary, column: VBoxContainer) -> void:
 		invite.name = "CampPicks"
 		column.add_child(invite)
 		column.add_child(_camp_training_button(hero, "CampGoTraining", ""))
+		var full := AHStationServices.training_block(Campaign.state, String(hero.id))
+		if full != "":
+			var why := _note(full, AHKit.alert_text())
+			why.name = "CampTrainingFull"
+			column.add_child(why)
 	var ids := AHCampSkills.catalog(String(hero.class_id))
 	for skill_id in ids:
 		column.add_child(_camp_row(hero, skill_id))
@@ -739,6 +751,19 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 		row.add_child(care)
 		column.add_child(row)
 		column.add_child(_divider())
+	# Em tratamento na Enfermaria (#265): o que trata, os dias e o caminho até lá.
+	if AHStationServices.treating(hero):
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		var treated := _note(AHStationServices.treatment_text(hero), AHKit.AMBER)
+		treated.name = "Treatment"
+		treated.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(treated)
+		var see := _small_button(tr("Ver a Enfermaria"))
+		see.pressed.connect(func(): hud.open_room(S.INFIRMARY))
+		row.add_child(see)
+		column.add_child(row)
+		column.add_child(_divider())
 	_relic(c, hero, column)
 	_post(c, hero, column)
 	if hero.get("trauma", false):
@@ -1121,8 +1146,9 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	head.add_child(AHKit.glyph("train", 36, AHKit.AMBER))
 	var cost := AHHeroLevels.next_cost(hero)
 	head.add_child(AHKit.label(tr("Treino · nível %d") % (AHHeroLevels.level(hero) + 1) if not cost.is_empty() else tr("Treino"), "panel_title", AHKit.TEXT, true, true))
-	# O Treino (#265): quantos heróis ele recebe por dia (o cômodo, no Alojamento).
+	# O Treino (#265): quantos heróis ele recebe por dia (o cômodo, no Alojamento), e o caminho para melhorar.
 	head.add_child(_training_day())
+	_training_upgrade(head)
 	column.add_child(head)
 	var intro_text := tr("No nível máximo, o treino ensina o que falta: custa os fragmentos e %s.") % AHHeroSkills.seeds_text(AHHeroSkills.max_level_seeds())
 	if not cost.is_empty():
@@ -1249,6 +1275,7 @@ func _camp_training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	head.add_child(AHKit.glyph("train", 36, AHKit.AMBER))
 	head.add_child(AHKit.label(tr("Treino · acampamento"), "panel_title", AHKit.TEXT, true, true))
 	head.add_child(_training_day())
+	_training_upgrade(head)
 	column.add_child(head)
 	var picks := AHCampSkills.picks(hero)
 	var intro := AHKit.label((tr("Escolha %d habilidade de acampamento para aprender. Não gasta XP nem sementes, e conta como o treino do dia.") if picks == 1
@@ -1320,6 +1347,7 @@ func _camp_training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	cancel.add_child(cancel_key)
 	cancel.pressed.connect(func():
 		training = false
+		training_camp = false
 		rebuild())
 	buttons.add_child(cancel)
 	var confirm := AHStationReport._primary(tr("Aprender"), "train", "interact")
@@ -1327,6 +1355,7 @@ func _camp_training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	confirm.custom_minimum_size = Vector2(0, 64)
 	confirm.pressed.connect(func():
 		training = false
+		training_camp = false
 		var picked := _camp_pick
 		var result := AHStationServices.learn_camp(Campaign.state, hero_id, picked)
 		if result == "":
@@ -1346,6 +1375,31 @@ func _training_day() -> Label:
 	day.name = "TrainingDay"
 	day.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	return day
+
+
+## O Treino ainda melhora (#265): um botão no alto do diálogo abre o painel dele, com o custo e o Melhorar.
+func _training_upgrade(head: HBoxContainer) -> void:
+	if S.next_level_cost(Campaign.state, S.TRAINING).is_empty():
+		return
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(spacer)
+	var go := _small_button(tr("Melhorar o Treino"))
+	go.name = "TrainingRoom"
+	go.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	go.pressed.connect(func():
+		training = false
+		training_camp = false
+		hud.open_room(S.TRAINING))
+	head.add_child(go)
+
+
+## Com o diálogo aberto, só ele recebe o foco (o resto da tela fica atrás da cortina).
+func _trap_focus(dialog: Control) -> void:
+	for node in find_children("*", "Control", true, false):
+		var control := node as Control
+		if control.focus_mode != Control.FOCUS_NONE and not dialog.is_ancestor_of(control):
+			control.focus_mode = Control.FOCUS_NONE
 
 
 ## A tecla no fim de cada botão do diálogo.

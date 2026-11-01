@@ -1862,3 +1862,6 @@ character_room.gd: CampSwap_%s
 character_room.gd: CampReplace_%s
 character_room.gd: Camp_%s
 character_room.gd: CampUpgrade_%s
+character_room.gd: Treatment
+character_room.gd: Control
+station_services.gd: treated

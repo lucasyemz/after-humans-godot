@@ -76,6 +76,13 @@ func _talks() -> void:
 	t.equal(V.talks_left(c), 1, "no nível 2, a segunda conversa do dia")
 	t.equal(S.treat_trauma(c, c.roster[2].id), "", "e ela trata")
 	t.equal(V.talks_left(c), 0, "duas e acabou")
+	c.station.cycle_number = int(c.station.cycle_number) + 1
+	var again: Dictionary = c.roster[3]
+	S.treat_trauma(c, again.id)
+	again.trauma = true
+	S.treat_trauma(c, again.id)
+	t.equal(V.talks_left(c), 0, "o mesmo herói duas vezes no dia também gasta as duas conversas")
+	again.trauma = true
 	c.station.rooms[S.BAR] = 0
 	t.check(S.treat_trauma(c, c.roster[3].id).contains("Recupere o Bar"), "sem o Bar, não há conversa")
 
@@ -142,6 +149,18 @@ func _quirk() -> void:
 	var done := V.tick_treatments(c)
 	t.check(done.size() == 1 and not Array(hero.perks).has(bad) and not V.treating(hero), "no segundo dia, a peculiaridade sai")
 	t.check(S.can_deploy(hero), "e ele pode partir de novo")
+	t.check(V.report_lines(c, {"treated": done}).any(func(l): return l.contains("Enfermaria") and l.contains(hero.display_name)), "o relatório diz quem terminou o tratamento")
+	# Em tratamento, ele não trabalha num posto (o leito vem antes).
+	var d: Dictionary = Campaign.create_initial(18)
+	d.station.rooms[S.INFIRMARY] = 2
+	d.station.rooms[S.RESEARCH] = 1
+	var worker: Dictionary = d.roster[0]
+	if not Array(worker.perks).has("anxious"):
+		worker.perks = Array(worker.perks) + ["anxious"]
+	t.equal(V.treat_quirk(d, worker.id, "anxious"), "", "começa o tratamento")
+	t.check(S.post_block(d, worker.id, S.RESEARCH).contains("tratamento"), "em tratamento, o posto fica bloqueado")
+	worker.post = S.RESEARCH
+	t.check(not S.run_posts(d, []).any(func(r): return r.hero_id == worker.id), "e o posto dele não rende")
 
 
 func _save() -> void:
@@ -153,3 +172,25 @@ func _save() -> void:
 	hero.quirk_treatment = {"perk": "nada", "days": 2}
 	V.migrate(c)
 	t.check(not hero.has("quirk_treatment"), "o de uma peculiaridade que ele não tem também")
+	# Saves editados com tipos errados: nada de erro de script, e o migrate limpa.
+	if not Array(hero.perks).has("anxious"):
+		hero.perks = Array(hero.perks) + ["anxious"]
+	for bad in [{"perk": "anxious", "days": [1]}, {"perk": null, "days": 2}, {"perk": 7, "days": 2}, "x"]:
+		hero.quirk_treatment = bad
+		t.check(not V.treating(hero), "%s não conta como tratamento" % str(bad))
+		V.migrate(c)
+		t.check(not hero.has("quirk_treatment"), "e sai no migrate: %s" % str(bad))
+	var positives: Array = Array(hero.perks).filter(func(id): return GameData.row("perks", String(id)) != null and not V.negative_perks(hero).has(id))
+	if not positives.is_empty():
+		hero.quirk_treatment = {"perk": String(positives[0]), "days": 2}
+		V.migrate(c)
+		t.check(not hero.has("quirk_treatment"), "o tratamento de uma positiva sai")
+	for bad_day in [{"cycle": 0, "heroes": 5}, {"cycle": [0], "heroes": []}, {"cycle": 0, "heroes": {"a": 1}}, {"cycle": 0, "heroes": [3]}, 9]:
+		c.station.training = bad_day
+		c.station.bar_talks = bad_day
+		t.equal([V.trainees_per_day(c) > 0, V.training_block(c, hero.id), V.talks_left(c) >= 0], [true, "", true], "o dia editado %s não quebra" % str(bad_day))
+		V.migrate(c)
+		t.check(not c.station.has("training") and not c.station.has("bar_talks"), "e sai no migrate: %s" % str(bad_day))
+	c.station.training = {"cycle": 3.0, "heroes": ["hero_cao_bento"]}
+	V.migrate(c)
+	t.check(c.station.has("training"), "o dia válido (do JSON, com número decimal) fica")
