@@ -336,9 +336,14 @@ static func _resolve(campaign: Dictionary, entry: Dictionary) -> Dictionary:
 	return report
 
 
-## O ferimento: a vida cai para HurtHp do máximo; quem já saiu com menos não sara.
+## O ferimento: a vida cai para HurtHp do máximo (arredondado para baixo: fica abaixo do limite de ferido de
+## data/wounded.json com qualquer vida máxima, e ele manca na chegada, #194); quem já saiu com menos não sara.
+static func hurt_hp(max_hp: int) -> int:
+	return maxi(1, floori(max_hp * float(rules().get("HurtHp", 0.25))))
+
+
 static func _hurt(entry: Dictionary) -> void:
-	entry.hp = mini(int(entry.hp), maxi(1, ceili(int(entry.max_hp) * float(rules().get("HurtHp", 0.35)))))
+	entry.hp = mini(int(entry.hp), hurt_hp(int(entry.max_hp)))
 
 
 ## A recompensa da missão: o tipo dela com a faixa da carga recuperada da fase mais alta liberada; a relíquia só nas de
