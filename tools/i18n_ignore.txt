@@ -1734,3 +1734,7 @@ street_corridor.gd: taken
 street_corridor.gd: done
 street_corridor.gd: hidden
 street_corridor.gd: Display
+exploration_hud.gd: blind
+exploration_hud.gd: type
+exploration_hud.gd: resolved
+exploration_hud.gd: Detour0

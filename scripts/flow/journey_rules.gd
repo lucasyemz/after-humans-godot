@@ -556,10 +556,17 @@ static func start_corridor_combat(campaign: Dictionary, party_advantage: bool) -
 static func combat_loot(campaign: Dictionary, result: String, boss: bool) -> Dictionary:
 	var out := {"seeds": 0, "scrap": 0, "fragments": 0}
 	var expedition = campaign.get("session", {}).get("expedition")
-	if result != "victory" or not boss or expedition == null or int(expedition.corridor.get("current_house", -1)) >= 0:
+	if result != "victory" or expedition == null or int(expedition.corridor.get("current_house", -1)) >= 0:
 		return out
 	# A vitória em que o último golpe também derruba o último da equipe: end_combat conta como derrota, sem achado.
 	if not campaign.roster.any(func(h): return expedition.team.has(h.id) and h.alive):
+		return out
+	# A patrulha do ramal de um desvio (#289) rende o achado dela (o mesmo que end_combat soma).
+	var route: Dictionary = expedition.corridor
+	var index := int(route.get("index", 0))
+	if not boss and index < route.get("steps", []).size() and route.steps[index].get("detour", false):
+		out.fragments += int(detour_def(route.get("node_id", "")).get("FragmentsPerPatrol", 0))
+	if not boss:
 		return out
 	out.seeds += 6
 	out.scrap += 1
@@ -965,6 +972,8 @@ static func search_prop(campaign: Dictionary, step: int) -> Dictionary:
 
 
 # ---------------------------------------------------------------- o desvio (#289)
+## Quantas casas com "?" a barra mostra no ramal antes de descer (o número de verdade só aparece lá embaixo).
+const DETOUR_PREVIEW_CELLS := 3
 # Um caminho opcional que leva ao mesmo destino: no trecho Entry, quem fareja (uma das RevealClasses) acha o bueiro; a
 # equipe desce, atravessa o ramal noutro mapa (uma busca, uma passagem e 1 a 3 patrulhas) e sobe no trecho Exit. Os
 # trechos entre os dois ficam para trás. Os números vêm de data/detours.json (uma linha por fase).
@@ -1056,6 +1065,20 @@ static func route_place(expedition: Dictionary, index: int) -> String:
 			and index < int(detour(route).first) + int(detour(route).count)):
 		return TranslationServer.translate(String(detour_def(route.node_id).get("Display", "")))
 	return AHScenarioWorld.display_of(route_map(expedition, index))
+
+
+## O número do trecho na tela, o mesmo da barra: na rua, o de antes do desvio ("Trecho 8 de 10"); no ramal, a posição
+## nele ("Trecho 2 de 4 na Galeria"). with_total: com o "de N".
+static func step_text(route: Dictionary, index: int, with_total: bool = true) -> String:
+	var d := detour(route)
+	if ["taken", "done"].has(d.get("state", "")) and index >= int(d.first) and index < int(d.first) + int(d.count):
+		var where := TranslationServer.translate(String(detour_def(route.node_id).get("ShortName", "")))
+		if with_total:
+			return TranslationServer.translate("Trecho %d de %d na %s") % [index - int(d.first) + 1, int(d.count), where]
+		return TranslationServer.translate("Trecho %d na %s") % [index - int(d.first) + 1, where]
+	if with_total:
+		return TranslationServer.translate("Trecho %d de %d") % [original_index(route, index) + 1, original_index(route, route.steps.size() - 1) + 1]
+	return TranslationServer.translate("Trecho %d") % (original_index(route, index) + 1)
 
 
 ## Os trechos de um mapa do desvio: [primeiro, quantos], ou [] se o mapa não é o do ramal descido.
@@ -1219,8 +1242,10 @@ static func detour_view(route: Dictionary) -> Dictionary:
 	if state == "revealed":
 		for i in route.steps.size():
 			main.append({"step": route.steps[i], "live": i})
-		for kind in d.plan:
-			sub.append({"step": {"type": kind, "resolved": false}, "live": -1})
+		# Antes de descer, o ramal não diz quantos trechos tem (a dica é só o barulho): casas fixas com "?", e uma só às
+		# cegas (sem o faro, nem o caminho aparece).
+		for i in (1 if d.get("blind", false) else DETOUR_PREVIEW_CELLS):
+			sub.append({"step": {"type": "", "resolved": false}, "live": -1})
 	else:
 		for i in entry + 1:
 			main.append({"step": route.steps[i], "live": i})

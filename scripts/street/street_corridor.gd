@@ -89,6 +89,8 @@ const REVEAL_PULL_SECONDS := 1.0
 const REVEAL_LINE_SECONDS := 6.0
 ## O painel da escolha fica abaixo da barra, para a linha do ramal aparecer.
 const DETOUR_CHOICE_TOP := 236.0
+## Os caixotes da busca do ramal: quanto à frente do fundo da faixa (m).
+const DETOUR_PROP_BACK := 0.35
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
 const SWITCH_WAIT_MS := 2000
 var street: Node3D
@@ -428,6 +430,7 @@ func _enemy_card(enemy_id: String) -> AHSpriteCard:
 
 func _spawn_props() -> void:
 	if street.scenario:
+		_spawn_detour_props()
 		return
 	var route: Dictionary = Campaign.state.session.expedition.corridor
 	var order := 0
@@ -447,6 +450,22 @@ func _spawn_props() -> void:
 		var debug: MeshInstance3D = body.get_node("DebugBox")
 		debug.visible = not street._debug_colliders.is_empty() and street._debug_colliders[0].visible
 		street._debug_colliders.append(debug)
+
+
+## A busca do ramal de um desvio (#289): os caixotes no fundo da faixa, no trecho dela (os objetos da Galeria caem
+## onde o mapa os pôs, e o trecho de busca ficaria vazio).
+func _spawn_detour_props() -> void:
+	var route: Dictionary = Campaign.state.session.expedition.corridor
+	if R.detour_range(route, street.scenario.map_name).is_empty():
+		return
+	for index in range(map_first, mini(map_last + 1, route.steps.size())):
+		if route.steps[index].type != "loot":
+			continue
+		var prop := AHSearchProp.new().setup("street_crates", route.props.get(str(index), false))
+		var zone: Dictionary = street.scenario.zones[segments[_segment_of(index)].zone]
+		prop.position = Vector3(_step_x(index, 0.45), float(zone.y), float(zone.z0) + DETOUR_PROP_BACK)
+		street.add_child(prop)
+		props[index] = prop
 
 
 ## Onde o objeto de busca da rua fica: o ponto do trecho, ou o mais perto dele que está longe das portas das lojas (o
@@ -770,15 +789,15 @@ func _announce(index: int, outcome: String, first_time: bool) -> void:
 	var label: String = AHExplorationHud.STEP_LABELS.get(route.steps[index].type, "")
 	match outcome:
 		"rest":
-			hud.toast(tr("Trecho %d · Descanso. Um lugar quieto.") % (index + 1), 3.0)
+			hud.toast(tr("%s · Descanso. Um lugar quieto.") % R.step_text(route, index, false), 3.0)
 			_ask_rest()
 		"combat", "boss":
-			hud.toast(tr("Trecho %d · %s à frente. Chegue sem ser visto para agir primeiro.") % [index + 1, tr(label)])
+			hud.toast(tr("%s · %s à frente. Chegue sem ser visto para agir primeiro.") % [R.step_text(route, index, false), tr(label)])
 			if outcome == "boss":
 				_ask_risk("boss", tr("O guardião está à frente"), tr("Vencer o guardião conclui a fase e leva todo o achado. Se a equipe cair, o achado fica para trás; voltar agora leva metade."))
 		_:
 			if first_time:
-				hud.toast(tr("Trecho %d · %s") % [index + 1, tr(label)], 2.5)
+				hud.toast(R.step_text(route, index, false) + " · " + tr(label), 2.5)
 
 
 ## A parada de descanso é o acampamento opcional (#143): acampar aqui, seguir ou voltar com metade do achado. O texto diz

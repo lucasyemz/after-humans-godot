@@ -490,7 +490,9 @@ func refresh(campaign: Dictionary) -> void:
 		done = true
 	else:
 		_goal_title.text = "%s · %s" % [AHStationRules.focus_label(focus.id), AHStationRules.focus_reward_text(focus.id)]
-		_goal_text.text = (tr("Procure nas casas e nos caixotes.") if place == "Rua das Vitrines" else tr("Procure nos objetos marcados do caminho.")) + \
+		# No ramal de um desvio (#289), o objetivo continua numa casa da rua.
+		var on_street := place == "Rua das Vitrines" or AHJourneyRules.in_detour(route)
+		_goal_text.text = (tr("Procure nas casas e nos caixotes.") if on_street else tr("Procure nos objetos marcados do caminho.")) + \
 			tr(" O guardião espera no trecho %d.") % boss_step
 	if expedition.objective_completed:
 		_goal_title.text = tr("Guardião vencido")
@@ -532,11 +534,7 @@ func refresh(campaign: Dictionary) -> void:
 	if view.shown:
 		_fill_detour_row(view, route)
 	var current: Dictionary = route.steps[route.index]
-	var title := tr("Trecho %d de %d · %s") % [AHJourneyRules.original_index(route, route.index) + 1,
-		AHJourneyRules.original_index(route, route.steps.size() - 1) + 1, _step_label(current)]
-	if AHJourneyRules.in_detour(route):
-		var d := AHJourneyRules.detour(route)
-		title = tr("Trecho %d de %d na Galeria · %s") % [route.index - int(d.first) + 1, int(d.count), _step_label(current)]
+	var title := "%s · %s" % [AHJourneyRules.step_text(route, route.index), _step_label(current)]
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
 		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + tr(AHJourneyRules.SHOP_NAMES[site.shop]))
@@ -675,6 +673,15 @@ func _fill_detour_row(view: Dictionary, route: Dictionary) -> void:
 	var went: bool = view.taken
 	var good := func(on: bool) -> Color: return AHKit.good() if on else Color(AHKit.MUTED, 0.5)
 	var out_of: bool = went and route.index >= int(AHJourneyRules.detour(route).first) + int(AHJourneyRules.detour(route).count)
+	# Às cegas, antes de descer, só a casa com "?" embaixo do bueiro: sem o faro, o caminho não aparece.
+	if view.get("blind", false) and not went:
+		_line(Vector2(from_x - 1.5, -2.0), Vector2(3, row_y + 2.0), good.call(false))
+		var unknown := _route_cell({"type": "", "resolved": false}, false, false, route)
+		unknown.name = "Detour0"
+		unknown.position = Vector2(from_x - CELL * 0.5, row_y)
+		unknown.size = Vector2(CELL, CELL)
+		_detour_row.add_child(unknown)
+		return
 	_line(Vector2(from_x - 1.5, -2.0), Vector2(3, drop + 2.0), good.call(went))
 	_line(Vector2(to_x - 1.5, -2.0), Vector2(3, drop + 2.0), good.call(out_of))
 	_line(Vector2(from_x, drop - 1.5), Vector2(to_x - from_x, 3), good.call(false))
@@ -1583,8 +1590,7 @@ func show_menu(completed: bool, can_return: bool, blocked_note: String = "") -> 
 		var route: Dictionary = expedition.corridor
 		if not route.steps.is_empty():
 			var step: Dictionary = route.steps[clampi(route.index, 0, route.steps.size() - 1)]
-			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [AHJourneyRules.original_index(route, route.index) + 1,
-				AHJourneyRules.original_index(route, route.steps.size() - 1) + 1, _step_label(step)], "text", AHKit.MUTED))
+			titles.add_child(AHKit.label("%s · %s" % [AHJourneyRules.step_text(route, route.index), _step_label(step)], "text", AHKit.MUTED))
 	var close := AHKit.button("X", "icon")
 	close.name = "Close"
 	close.tooltip_text = tr("Fechar")

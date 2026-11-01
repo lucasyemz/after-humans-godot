@@ -163,8 +163,9 @@ static func data_texts() -> Array:
 					out.append({"text": row[list][index].Text, "where": "station-grid.%s.%s.%d" % [row.Name, list, index]})
 	# O desvio (#289): o nome do lugar do ramal, as falas de quem acha o bueiro e da descida e as dicas do barulho.
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/detours.json")):
-		if String(row.get("Display", "")).strip_edges() != "":
-			out.append({"text": row.Display, "where": "detours.%s.Display" % row.Name})
+		for field in ["Display", "ShortName"]:
+			if String(row.get(field, "")).strip_edges() != "":
+				out.append({"text": row[field], "where": "detours.%s.%s" % [row.Name, field]})
 		for group in ["Lines", "Hints"]:
 			for key in row.get(group, {}):
 				out.append({"text": row[group][key], "where": "detours.%s.%s.%s" % [row.Name, group, key]})

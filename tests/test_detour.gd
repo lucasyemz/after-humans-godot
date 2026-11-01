@@ -98,7 +98,18 @@ func _reveal(t) -> void:
 		t.equal(R.detour(campaign.session.expedition.corridor).state, "revealed" if luck else "none", "o estado guarda o que houve")
 		if luck:
 			t.equal(R.detour_line(campaign), R.detour_text("fase_1", "Blind"), "às cegas, a tampa solta")
-			t.check(R.detour_view(campaign.session.expedition.corridor).blind, "e a barra sabe que é às cegas")
+			var blind_view := R.detour_view(campaign.session.expedition.corridor)
+			t.check(blind_view.blind and blind_view.sub.size() == 1, "e a barra mostra só um \"?\" embaixo (sem o caminho)")
+	# Com o faro, antes de descer, a barra não conta as patrulhas: sempre as mesmas casas com "?".
+	var sizes := {}
+	for seed_value in 40:
+		var c := _campaign(200 + seed_value)
+		_at_entry(c)
+		if R.reveal_detour(c) == "scent":
+			var view := R.detour_view(c.session.expedition.corridor)
+			sizes[view.sub.size()] = true
+			t.check(view.sub.all(func(e): return e.live == -1 and e.step.type == ""), "semente %d: o ramal todo em \"?\"" % seed_value)
+	t.equal(sizes.keys(), [R.DETOUR_PREVIEW_CELLS], "o mesmo número de casas, seja quantas forem as patrulhas")
 
 
 func _hint(t) -> void:
@@ -145,6 +156,9 @@ func _take(t) -> void:
 	t.equal(R.original_index(route, int(d.first) + k), int(d.exit), "com o número de antes na barra")
 	t.equal(R.route_place(campaign.session.expedition, int(d.first)), "Galeria sob as Vitrines", "o lugar do ramal tem o nome da fase 1")
 	t.equal(R.detour_range(route, "SewerDucts"), [int(d.first), k], "os trechos do ramal no mapa dele")
+	t.equal(R.step_text(route, int(d.first) + 1), "Trecho 2 de %d na Galeria" % k, "o número do trecho no ramal")
+	t.equal(R.step_text(route, int(d.first) + k), "Trecho %d de 10" % (int(d.exit) + 1), "e na rua, o da barra")
+	t.equal(R.step_text(route, route.steps.size() - 1, false), "Trecho 10", "o guardião continua no trecho 10")
 
 
 func _walk_through(t) -> void:
@@ -167,6 +181,7 @@ func _walk_through(t) -> void:
 				t.check(not fight.opening, "no escuro, sem a vantagem de abertura")
 				var ids: Array = fight.enemies.map(func(u): return u.enemy_id)
 				t.check(ids.all(func(id): return ["robot_fungo", "rastejante_raiz", "cao_eco"].has(id)), "os inimigos do esgoto (%s)" % [ids])
+				t.equal(int(R.combat_loot(campaign, "victory", false).fragments), 1, "o resultado da luta mostra o fragmento")
 				R.end_combat(campaign, "victory", false)
 				fragments += 1
 				t.equal(int(expedition.loot.fragments), fragments, "a patrulha vencida rende 1 fragmento")

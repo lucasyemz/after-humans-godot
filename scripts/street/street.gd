@@ -1147,7 +1147,8 @@ func _apply_weather() -> void:
 	var readable := (1.0 if _mood == "night" else 0.0) + (0.3 if _raining else 0.0)
 	_key_light.light_energy = 0.7 * clampf(readable, 0.0, 1.2)
 	_fill_light.light_energy = COMBAT_FILL + COMBAT_FILL_NIGHT * clampf(readable, 0.0, 1.2)
-	_hud_weather.text = (tr("Noite") if _mood == "night" else tr("Fim de tarde")) + (tr(" · chuva") if _raining else "")
+	# Sob teto (os cenários fechados, a casa, o ramal do desvio) não chove: a ficha não diz chuva.
+	_hud_weather.text = (tr("Noite") if _mood == "night" else tr("Fim de tarde")) + (tr(" · chuva") if _raining and not covered else "")
 	if exploration_hud:
 		exploration_hud.set_weather(_hud_weather.text)
 	# A sombra do sol só ao ar livre (#175): sob teto ele é a luz fraca de _update_sun.
