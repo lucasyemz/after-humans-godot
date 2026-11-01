@@ -83,3 +83,17 @@ usa a mesma mecânica do resgate de quem foi capturado.
     save e o foco depois de escolher o resgate.
 
   Correção: todos, como descrito acima. O tom do preso ficou mais escuro, e o foco vai a PREPARAR NESTA FASE.
+
+- **Rodada 2: APROVADO.** O `run_all` passa 103/103, com a paridade 48/48. A QA testou:
+  - a rua nas fases 1 a 5 com 10 sementes (o preso no trecho e solto andando como o jogador, o save no meio, o líder
+    dando o lugar);
+  - o pedido de ajuda contra 6 chegadas do trem;
+  - 595 rotas, todas com uma patrulha antes do preso;
+  - deixar sem comida;
+  - o mapa com um pino de missão ao lado do resgate, e o foco.
+
+  Ficam três observações baixas:
+  - nos trechos curtos (fase 3 e parte da fase 5), o preso fica a cerca de 1 m de um objeto de busca: com o líder no
+    meio, o aviso é o do objeto, e um passo para o lado solta;
+  - com três resgates na mesma fase, a ordem dos pinos no mapa não segue a da lista;
+  - o Esc no painel do resgate fecha o Mapa da Rede, como no painel de missão.
