@@ -1,7 +1,7 @@
 ## As missões solo (#183, decisão do Lucas de 28/10): com a Preparação no nível 2, um mapa secundário mostra a cada dia
 ## algumas missões em lugares sorteados; o jogador manda (ou não) um herói em cada uma. Quem está em missão sai da
 ## equipe, do posto e da noite. No dia da volta, um sorteio contra a chance (a aptidão da classe, o nível, a vida, os
-## traços e o estado) diz se deu certo (a recompensa inteira e XP), se volta ferido (35% da vida e metade) ou se foi
+## traços e o estado) diz se deu certo (a recompensa inteira e XP), se volta ferido (25% da vida e metade) ou se foi
 ## capturado pelos robôs: aí vira um pino de resgate no mapa, prioritário e sem prazo (o resgate entra na rota, #188).
 ## A captura tem a chave CaptureEnabled (ligada com o resgate, #188, AHRescue); desligada, esse resultado volta com
 ## ferimentos e de mãos vazias.
@@ -336,9 +336,14 @@ static func _resolve(campaign: Dictionary, entry: Dictionary) -> Dictionary:
 	return report
 
 
-## O ferimento: a vida cai para HurtHp do máximo; quem já saiu com menos não sara.
+## O ferimento: a vida cai para HurtHp do máximo (arredondado para baixo: fica abaixo do limite de ferido de
+## data/wounded.json com qualquer vida máxima, e ele manca na chegada, #194); quem já saiu com menos não sara.
+static func hurt_hp(max_hp: int) -> int:
+	return maxi(1, floori(max_hp * float(rules().get("HurtHp", 0.25))))
+
+
 static func _hurt(entry: Dictionary) -> void:
-	entry.hp = mini(int(entry.hp), maxi(1, ceili(int(entry.max_hp) * float(rules().get("HurtHp", 0.35)))))
+	entry.hp = mini(int(entry.hp), hurt_hp(int(entry.max_hp)))
 
 
 ## A recompensa da missão: o tipo dela com a faixa da carga recuperada da fase mais alta liberada; a relíquia só nas de
