@@ -234,6 +234,7 @@ func _return(station) -> void:
 	await _frames(3)
 	t.check(G.grid(c).intro_seen, "passada a fala, ela fica vista")
 	t.check(not hud.briefing_open() and hud.dig_notice_shown(), "fechada a fala, o aviso do achado na vista geral")
+	t.check(c.station.last_return.dig.get("noticed", false), "visto depois de um quadro na tela")
 	if hud.dig_notice_shown():
 		var texts: Array = hud._dig_notice.find_children("*", "Label", true, false).map(func(l): return l.text)
 		t.check(texts.has(tr("%s: vaga livre") % hud.block_title("1:1")) and texts.has(tr(G.rule("floor_1").Text)), "com o bloco e o achado (%s)" % [texts])
@@ -249,6 +250,16 @@ func _return(station) -> void:
 	hud._enter_shelter_then(Callable())
 	await _frames(3)
 	t.check(not hud.briefing_open() and not hud.dig_notice_shown(), "na segunda vez, nem a fala nem o aviso")
+	# O aviso que some no mesmo quadro em que nasce (a Sala indo ao mapa) não fica gasto: volta na vista geral.
+	c.station.last_return.dig.noticed = false
+	hud.show_dig_notice()
+	hud.open_room(S.BAR)
+	await _frames(2)
+	t.check(not hud.dig_notice_shown() and not c.station.last_return.dig.get("noticed", false), "com o painel aberto, o aviso sai sem ficar visto")
+	hud.close_panel()
+	await _frames(2)
+	t.check(hud.dig_notice_shown(), "e aparece de volta na vista geral")
+	hud.hide_dig_notice()
 	hud.close_panel()
 
 

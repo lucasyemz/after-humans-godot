@@ -1580,6 +1580,9 @@ func _process(delta: float) -> void:
 	# Com o mapa ou um painel aberto, o aviso do achado sai (ele é da vista geral).
 	if dig_notice_shown() and (current != "" or _map.visible):
 		hide_dig_notice()
+	elif dig_notice_shown():
+		# Visto só depois de um quadro na tela: o que some no mesmo quadro (a Sala indo ao mapa) volta na vista geral.
+		Campaign.state.station.last_return.dig.noticed = true
 	_pan_overview(delta)
 	_update_room_hover()
 	if _feedback.modulate.a > 0.0 and _feedback.text != "":
@@ -2304,10 +2307,8 @@ static func intro_lines(c: Dictionary) -> Array:
 ## aberto, os textos do que saiu e o que entrou no estoque. Uma vez por volta; some sozinho.
 func show_dig_notice() -> void:
 	var dig: Dictionary = Campaign.state.station.get("last_return", {}).get("dig", {})
-	if not dig.get("opened", false) or dig.get("noticed", false):
+	if not dig.get("opened", false) or dig.get("noticed", false) or dig_notice_shown():
 		return
-	dig.noticed = true
-	hide_dig_notice()
 	var key := String(dig.block)
 	_dig_notice = AHKit.panel_box("large")
 	_dig_notice.name = "DigNotice"
