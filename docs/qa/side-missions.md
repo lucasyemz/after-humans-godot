@@ -6,7 +6,7 @@
 
 - **A Preparação vai ao nível 2** (4 sucatas e 1 fragmento). No nível 2, o Mapa da Rede ganha a aba **Missões solo**;
   antes, a aba aparece apagada, com o motivo.
-- **O quadro do dia:** a cada dia da Estação (uma volta ou um dia de espera), o rádio capta de 2 a 4 missões
+- **O quadro do dia:** a cada dia da Estação (uma volta ou um dia de espera), o rádio capta 2 missões nas fases 1 e 2 e 4 a partir da fase 3 (decisão do Lucas de 01/11)
   (`Board`, pela fase mais alta liberada), sorteadas entre as das fases liberadas e postas em lugares da pintura
   (`Spots`). O sorteio usa a semente das missões e o dia: salvar e voltar não troca o quadro.
 - **Mandar:** a missão leva comida (1 suprimento por dia), tira o herói do posto e o tira da Estação até a volta. No
