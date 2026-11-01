@@ -26,11 +26,15 @@ const TARGETS := {"SingleEnemy": "Inimigo", "SingleAlly": "Aliado", "SingleOther
 var hud: Control
 var selected := ""
 var ability := ""
+## A habilidade de acampamento apontada (#261): o detalhe, a troca e o Aprender ("" nenhuma).
+var camp_skill := ""
 var training := false
 ## A rolagem da coluna da esquerda entre um refazer e outro; apontada uma habilidade (#259, as 7 passam da altura da
 ## coluna), a coluna rola até o detalhe e a troca.
 var _left_scroll := 0
 var _reveal := false
+## O apontado é uma habilidade de acampamento (rola até a troca dela, no fim da coluna).
+var _reveal_camp := false
 var _upgrade := ""
 var _first_focus: Control
 var _trait_ids := {}
@@ -200,17 +204,140 @@ func _left(c: Dictionary) -> void:
 	if ability != "":
 		column.add_child(_ability_detail(c, hero, ability))
 		_skill_choices(hero, column)
-		if _reveal:
-			_reveal = false
-			_scroll_to_end.call_deferred()
+	_camp_section(hero, column)
+	if _reveal:
+		_reveal = false
+		# Até o detalhe apontado: o da luta (#259) ou o do acampamento (#261), que fica no fim.
+		_scroll_to.call_deferred("CampChoices" if _reveal_camp else "SkillChoices")
+	_reveal_camp = false
 
 
-## O detalhe e a troca ficam no fim da coluna: depois de ela se montar (um quadro), rola até lá.
-func _scroll_to_end() -> void:
+## As habilidades de acampamento (#261): as 7 do papel (as que leva, as que ficam e as bloqueadas), a escolha do nível
+## ("Escolha agora") e, na apontada, o texto, o Tempo, a troca (as 4 que leva) e o Aprender.
+func _camp_section(hero: Dictionary, column: VBoxContainer) -> void:
+	column.add_child(_divider())
+	var title := AHKit.label(tr("Acampamento"), "panel_title", AHKit.TEXT, true, true)
+	title.name = "CampTitle"
+	column.add_child(title)
+	var picks := AHCampSkills.picks(hero)
+	if picks > 0:
+		var invite := _note(tr("Escolha agora: %d habilidade para aprender (aponte uma bloqueada).") % picks if picks == 1
+			else tr("Escolha agora: %d habilidades para aprender (aponte uma bloqueada).") % picks, AHKit.AMBER)
+		invite.name = "CampPicks"
+		column.add_child(invite)
+	var ids := AHCampSkills.catalog(String(hero.class_id))
+	for skill_id in ids:
+		column.add_child(_camp_row(hero, skill_id))
+	if camp_skill == "" or not ids.has(camp_skill):
+		return
+	var row = AHCampSkills.skill(camp_skill)
+	var inset := AHKit.panel_box("inset")
+	inset.name = "CampDetail"
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	inset.add_child(box)
+	box.add_child(AHKit.label(tr(String(row.DisplayName)), "row", AHKit.TEXT, true, true))
+	var target: String = {"self": tr("em si"), "ally": tr("num aliado"), "team": tr("na equipe")}.get(String(row.Target), "")
+	box.add_child(AHKit.label(tr("%d de Tempo de fogueira · %s") % [int(row.Cost), target], "small", AHKit.AMBER, true))
+	var text := _note(tr(String(row.Description)), AHKit.TEXT)
+	box.add_child(text)
+	column.add_child(inset)
+	var choices := VBoxContainer.new()
+	choices.name = "CampChoices"
+	choices.add_theme_constant_override("separation", 6)
+	column.add_child(choices)
+	var hero_id := String(hero.id)
+	var picked := camp_skill
+	var state := camp_state(hero, camp_skill)
+	if state == "locked":
+		if picks <= 0:
+			var need := AHCampSkills.requirement(hero)
+			choices.add_child(_note(tr("Bloqueada · %s") % need if need != "" else tr("Bloqueada.")))
+			return
+		var learn := _small_button(tr("Aprender"))
+		learn.name = "CampLearn"
+		learn.pressed.connect(func():
+			var result := AHCampSkills.learn(Campaign.state, hero_id, picked)
+			hud._act(result, "" if result != "" else tr("%s aprendeu %s.") % [String(S.hero(Campaign.state, hero_id).display_name), tr(String(row.DisplayName))]))
+		choices.add_child(learn)
+		return
+	var carried := AHCampSkills.equipped(hero)
+	var resting: Array = AHCampSkills.known(hero).filter(func(id): return not carried.has(id))
+	if resting.is_empty():
+		return
+	var swaps: Array = []
+	if state == "equipped":
+		choices.add_child(AHKit.label(tr("Trocar por"), "text", AHKit.AMBER, true, true))
+		for option in resting:
+			var chosen := carried.duplicate()
+			chosen[carried.find(picked)] = option
+			swaps.append([String(option), chosen])
+	else:
+		choices.add_child(AHKit.label(tr("Levar no lugar de"), "text", AHKit.AMBER, true, true))
+		for index in carried.size():
+			var chosen := carried.duplicate()
+			chosen[index] = picked
+			swaps.append([String(carried[index]), chosen])
+	var flow := HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 10)
+	flow.add_theme_constant_override("v_separation", 8)
+	choices.add_child(flow)
+	for swap in swaps:
+		var other = AHCampSkills.skill(swap[0])
+		var button := _small_button(tr(String(other.DisplayName)))
+		button.name = ("CampSwap_%s" if state == "equipped" else "CampReplace_%s") % swap[0]
+		var chosen: Array = swap[1]
+		var keep: String = swap[0] if state == "equipped" else picked
+		button.pressed.connect(func():
+			var result := AHCampSkills.choose(Campaign.state, hero_id, chosen)
+			if result == "":
+				camp_skill = keep
+			hud._act(result, "" if result != "" else tr("%s leva %s ao acampamento.") % [String(S.hero(Campaign.state, hero_id).display_name),
+				tr(String(AHCampSkills.skill(keep).DisplayName))]))
+		flow.add_child(button)
+
+
+func _camp_row(hero: Dictionary, skill_id: String) -> Button:
+	var row := Button.new()
+	row.name = "Camp_%s" % skill_id
+	var data = AHCampSkills.skill(skill_id)
+	var state := camp_state(hero, skill_id)
+	row.set_meta("state", state)
+	row.text = tr("%s · %d") % [tr(String(data.DisplayName)), int(data.Cost)]
+	if state != "equipped":
+		row.text = tr("%s · %s") % [row.text, tr("na Estação") if state == "resting" else tr("bloqueada")]
+		row.modulate = AHKit.FALLEN
+	row.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	AHKit.style_as(row, "list_selected" if skill_id == camp_skill else "list")
+	row.add_theme_font_override("font", AHKit.font(false))
+	row.add_theme_font_size_override("font_size", AHKit.size("row"))
+	row.custom_minimum_size = Vector2(0, 52)
+	row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var id := skill_id
+	row.pressed.connect(func():
+		camp_skill = id
+		_reveal = true
+		_reveal_camp = true
+		rebuild())
+	return row
+
+
+## O estado da habilidade de acampamento no herói: "equipped" (leva), "resting" (sabe, fica na Estação) ou "locked".
+static func camp_state(hero: Dictionary, skill_id: String) -> String:
+	if AHCampSkills.equipped(hero).has(skill_id):
+		return "equipped"
+	return "resting" if AHCampSkills.known(hero).has(skill_id) else "locked"
+
+
+## O detalhe e a troca: depois de a coluna se montar (um quadro), rola até que a troca apareça inteira (com o detalhe
+## logo acima).
+func _scroll_to(node_name: String) -> void:
 	await get_tree().process_frame
 	var scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
-	if scroll != null:
-		scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
+	var target := find_child(node_name, true, false) as Control
+	if scroll == null or target == null:
+		return
+	scroll.ensure_control_visible(target)
 
 
 func _hero_tab(entry: Dictionary) -> Button:
@@ -262,6 +389,7 @@ func _select(hero_id: String) -> void:
 	Sound.play("res://audio/ui/click.ogg", 0.6, 1.0, "UI") if ResourceLoader.exists("res://audio/ui/click.ogg") else null
 	selected = hero_id
 	ability = ""
+	camp_skill = ""
 	training = false
 	# Outro herói: a coluna volta para o alto.
 	var old_scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
@@ -533,7 +661,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 		level_box.add_child(xp)
 	var hero_class = GameData.row("classes", String(hero.class_id))
 	if hero_class != null:
-		var line := AHKit.label("%s · %s" % [tr(String(hero_class.DisplayName)), tr(String(hero_class.Role))], "row", AHKit.AMBER)
+		var line := AHKit.label(AHSpecies.kind_text(hero), "row", AHKit.AMBER)
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		line.custom_minimum_size = Vector2(300, 0)
 		column.add_child(line)

@@ -1,7 +1,8 @@
-## A vantagem de tipo (#227): as linhagens dos animais (na classe) e as famílias mecânicas dos inimigos, e o ×1,25 no
-## dano direto de quem vence o defensor.
-## - a cobertura: toda classe tem linhagem e todo inimigo tem família (os protótipos também), e quem vence quem aponta
-##   para classificações que existem; a linhagem vem da classe (o save não muda);
+## A vantagem de tipo (#227): as linhagens dos animais (na espécie do indivíduo, #189) e as famílias mecânicas dos
+## inimigos, e o ×1,25 no dano direto de quem vence o defensor.
+## - a cobertura: toda espécie tem linhagem, toda classe tem a espécie padrão e todo inimigo tem família (os protótipos
+##   também), e quem vence quem aponta para classificações que existem; a linhagem vem da espécie (o save guarda só a
+##   espécie);
 ## - o arredondamento para o mais próximo (2 → 3, 3 → 4, 4 → 5, 6 → 8);
 ## - pelo motor de verdade, com o sorteio fixo: a vantagem, o neutro, a direção (Felidae contra Canidae é neutro), o lado
 ##   do inimigo (um Blindado num Felidae) e o acúmulo com o crítico, a Carga Voltaica, o Vulnerável e o Bloqueio, com os
@@ -49,13 +50,16 @@ func _coverage() -> void:
 	var families: Array = data.type_classes.keys().filter(func(id): return data.type_classes[id].Kind == "family")
 	t.equal([lineages.size(), families.size()], [6, 6], "seis linhagens e seis famílias mecânicas")
 	var missing: Array = []
+	for species_id in data.species:
+		if not lineages.has(String(data.species[species_id].Lineage)):
+			missing.append(species_id)
 	for class_id in data.classes:
-		if not lineages.has(String(data.classes[class_id].Lineage)):
+		if not data.species.has(String(data.classes[class_id].DefaultSpecies)):
 			missing.append(class_id)
 	for enemy_id in data.enemies:
 		if not families.has(String(data.enemies[enemy_id].MechFamily)):
 			missing.append(enemy_id)
-	t.equal(missing, [], "toda classe com a linhagem e todo inimigo (os protótipos também) com a família")
+	t.equal(missing, [], "toda espécie com a linhagem, toda classe com a espécie padrão e todo inimigo (os protótipos também) com a família")
 	t.equal(data.enemies.size(), 26, "os 26 inimigos")
 	var broken: Array = []
 	for id in data.type_classes:
@@ -67,10 +71,10 @@ func _coverage() -> void:
 	t.check(lineages.all(func(id): return data.type_classes[id].Beats.size() == 2) and families.all(func(id): return data.type_classes[id].Beats.size() == 1),
 		"cada linhagem vence uma linhagem e uma família; cada família, uma linhagem")
 	# Os ids não mudam: o Guaxinim segue rato, e a máquina segue máquina.
-	t.equal(String(data.classes.rato.Lineage), "Procyonidae", "o rato (o Guaxinim) na Linhagem dos Guaxinins")
+	t.equal(String(data.species[data.classes.rato.DefaultSpecies].Lineage), "Procyonidae", "o rato (o Guaxinim) na Linhagem dos Guaxinins")
 	t.check(data.enemies.values().all(func(e): return e.Category == "Machine"), "os inimigos seguem máquinas")
 	var hero: Dictionary = Campaign.create_initial(5).roster[0]
-	t.check(not hero.has("Lineage") and not hero.has("lineage"), "a linhagem vem da classe: o save do herói não muda")
+	t.check(not hero.has("Lineage") and not hero.has("lineage") and hero.species == "cao", "o save guarda a espécie, e a linhagem vem dela")
 
 
 func _rounding() -> void:

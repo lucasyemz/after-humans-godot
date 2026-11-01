@@ -138,13 +138,15 @@ static func roll_perks(perks: Dictionary, rng: RandomNumberGenerator) -> Array:
 
 static func new_hero(id: String, class_id: String, display_name: String, max_hp: int, perks: Array) -> Dictionary:
 	return {
-		"id": id, "class_id": class_id, "display_name": display_name, "alive": true, "hp": max_hp, "max_hp": max_hp,
+		"id": id, "class_id": class_id, "display_name": display_name,
+		# A espécie do indivíduo (#189): a classe é o papel; quem chega sem uma fica com a padrão da classe.
+		"species": AHSpecies.default_for(class_id), "alive": true, "hp": max_hp, "max_hp": max_hp,
 		"instinct": 0, "perks": perks, "crisis_outcome": "none", "trauma": false, "trainings": [], "expedition_uses": {},
 		"relic_id": "", "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
 		"art_variant": "",
 		# As sete habilidades (#259, AHHeroSkills): os desbloqueios aprendidos no Treino e as que leva ([] = as 4 de base).
-		"unlocked": [], "loadout": [],
+		"unlocked": [], "loadout": [], "camp_unlocked": [], "camp_loadout": [],
 		# A skin completa que ele veste (#138): "default" é a arte de hoje; as outras ficam em data/skins.json.
 		"skin_id": "default",
 		# O nível (#90): o XP desde o último treino e as melhorias escolhidas (AHHeroLevels).

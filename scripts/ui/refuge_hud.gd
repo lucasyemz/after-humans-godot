@@ -2724,6 +2724,9 @@ func _train_hero(hero_id: String, upgrade_id: String) -> void:
 	# Aprender (#259): a opção não está em hero-upgrades; o aviso diz o que aprendeu e onde escolher as que leva.
 	if upgrade_id.begins_with(AHHeroSkills.LEARN):
 		done = AHHeroSkills.learned_notice(entry, upgrade_id.trim_prefix(AHHeroSkills.LEARN), AHHeroLevels.level(entry) > before)
+	# Os níveis pares (#261): uma habilidade de acampamento para escolher na Sala.
+	if error == "" and AHCampSkills.slots_at(AHHeroLevels.level(entry)) > AHCampSkills.slots_at(before):
+		done += " " + AHCampSkills.level_notice(entry)
 	_act(error, done, "res://audio/ui/forge_confirm.ogg")
 
 
@@ -3648,7 +3651,7 @@ func _train_recruit(c: Dictionary) -> void:
 	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	names.add_child(name_label)
 	if hero_class != null:
-		names.add_child(_wrapped(tr("%s · %s") % [tr(hero_class.DisplayName), tr(hero_class.Role)], "row", AHKit.AMBER, false, name_width))
+		names.add_child(_wrapped(AHSpecies.kind_text(recruit), "row", AHKit.AMBER, false, name_width))
 	if String(recruit.get("origin", "")) != "":
 		names.add_child(_wrapped(tr(String(recruit.origin)), "text", AHKit.MUTED, false, name_width))
 	# O que pede e o motivo de não poder ficar antes dos traços: no texto Maior, à vista sem rolar.

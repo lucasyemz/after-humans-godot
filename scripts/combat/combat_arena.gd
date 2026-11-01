@@ -307,8 +307,11 @@ func rest_pose(unit: AHCombat.Unit) -> void:
 ## montados pelo corredor. opening: a equipe age primeiro (chegou sem ser vista).
 func start(heroes: Array, hero_cards: Array, enemies: Array, enemy_cards: Array, at_x: float, opening: bool = false, seed_value: int = -1) -> void:
 	# Os efeitos de fase dos eventos (#78): valem nesta luta; o de uma luta só (Exposto) se gasta aqui.
-	session = AHCombatSession.create(heroes, enemies, opening, seed_value, 80, AHJourneyRules.phase_effects(Campaign.state))
+	# E os bônus do acampamento (#261): as fichas e a velocidade de cada um e a Marca no inimigo da frente.
+	session = AHCombatSession.create(heroes, enemies, opening, seed_value, 80, AHJourneyRules.phase_effects(Campaign.state),
+		AHCampSkills.next_fight(Campaign.state).duplicate(true))
 	AHJourneyRules.spend_fight_effects(Campaign.state)
+	AHCampSkills.spend_next_fight(Campaign.state)
 	session.use_expedition(Campaign.state)
 	# No tutorial (#144) os inimigos não derrubam ninguém, e os estados sempre pegam.
 	if AHTutorial.is_tutorial(Campaign.state):

@@ -46,6 +46,8 @@ class Unit:
 	var hero_id := ""
 	var enemy_id := ""
 	var class_id := ""
+	## A espécie do herói (#189); "" usa a padrão da classe.
+	var species := ""
 	var display_name := ""
 	## 1 a 4; 0 = fora da formação (morto).
 	var rank := 1

@@ -534,7 +534,9 @@ static func start_corridor_combat(campaign: Dictionary, party_advantage: bool) -
 			return {}
 		boss = step.type == "boss"
 	expedition.opening_used = true
-	return {"enemies": corridor_enemies(expedition, index), "opening": party_advantage, "boss": boss}
+	# Rondar o Quarteirão (#261): a equipe age primeiro na luta seguinte ao acampamento.
+	var opening := AHCampSkills.take_opening(campaign) or party_advantage
+	return {"enemies": corridor_enemies(expedition, index), "opening": opening, "boss": boss}
 
 
 ## O que uma luta vencida põe no achado (o que end_combat soma), sem mudar nada: o popup do fim da luta mostra antes de
@@ -1225,6 +1227,8 @@ static func start_camp(campaign: Dictionary) -> bool:
 	if not can_start_camp(campaign):
 		return false
 	campaign.session.screen = "rest"
+	# As habilidades de acampamento (#261): o Tempo de fogueira volta inteiro.
+	AHCampSkills.start(campaign)
 	return true
 
 
@@ -1259,6 +1263,7 @@ static func start_stop_camp(campaign: Dictionary, x: float, leave: float) -> boo
 		return false
 	corridor(campaign).stop_camp = {"step": corridor(campaign).index, "x": x, "leave": leave}
 	campaign.session.screen = "rest"
+	AHCampSkills.start(campaign)
 	return true
 
 
@@ -1326,6 +1331,8 @@ static func leave_camp(campaign: Dictionary, seed_value: int) -> bool:
 	if route.has("stop_camp"):
 		route.erase("stop_camp")
 		route.stop_camped = true
+	# A noite (#261): a Noite mal dormida, a menos que alguém tenha vigiado (o resultado fica em camp_night, para o aviso).
+	AHCampSkills.night(campaign)
 	var options: Array = WEATHERS.get(expedition.scenario_id, WEATHERS["rua-das-vitrines"]).filter(func(w): return w != route.weather)
 	var random := _rand(seed_value)
 	route.weather = options[clampi(floori(random.next() * options.size()), 0, options.size() - 1)]
