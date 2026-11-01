@@ -14,7 +14,7 @@ const LONG_PRESS := 0.45
 const GAP := 14.0
 ## O que o Último Fôlego e o Trauma fazem (o painel de baixo só diz o nome, e só de quem age).
 const LAST_BREATH := "Com 0 de vida, ainda de pé: o próximo golpe tem 50% de chance de derrubar de vez."
-const TRAUMA := "Começa cada jornada com 10 de instinto; trata-se no Alojamento."
+const TRAUMA := "Começa cada jornada com 10 de instinto; trata-se numa conversa no Bar."
 
 ## O que a ficha mostra agora ({} fechada): o dicionário de from_unit ou from_hero.
 var info := {}
