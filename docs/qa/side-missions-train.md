@@ -83,3 +83,18 @@ trem também", com o relatório da missão.
   - a lista do que espera diz "O Mercador espera na plataforma" mesmo quando o trem das missões vem primeiro;
   - o "Quem voltou" do quadro lista quem ainda está no trem;
   - o Mercador que já estava na plataforma sai de cena e chega de novo depois do RECEBER.
+
+### A partida com quem está fora (decisão do Lucas de 01/11)
+
+- **Rodada 1: REPROVADO.** O caso alto: quem era mandado à missão solo pelo mapa, depois de a equipe sugerida ter sido
+  montada ao abrir o mapa, continuava na carta e de pé na plataforma. O motivo só aparecia ao travar o INICIAR.
+  **Correção:** ao abrir a partida, quem está fora sai da equipe, e a vaga é preenchida por quem pode ir.
+- **Rodada 2: APROVADO.** A QA conferiu:
+  - o envio pelo mapa depois do rascunho;
+  - o caído forçado, que continua travando o INICIAR;
+  - a equipe que fica vazia, sem quebrar a tela;
+  - os três motivos no texto Normal e no Maior.
+
+  Ficam observações baixas:
+  - no modo compacto, o motivo vem inteiro e ocupa um terço da linha, mas a lista rola;
+  - com todos fora, o motivo do INICIAR é o genérico do tamanho da equipe.
