@@ -150,8 +150,11 @@ func _head(c: Dictionary, column: VBoxContainer) -> void:
 	head.add_child(AHKit.glyph("place_unlocked", 40, AHKit.AMBER))
 	head.add_child(AHKit.label(tr("Escavar e construir"), "panel_title", AHKit.TEXT, true, true))
 	var rate := AHStationGrid.dig_rate(c)
-	var pace := AHKit.label(tr("A comunidade cava 1 ponto por volta de expedição.") if rate == 1
-		else tr("A comunidade e o escavador cavam %d pontos por volta de expedição.") % rate, "small", AHKit.MUTED)
+	var pace := AHKit.label(tr("A comunidade cava 1 ponto por dia.") if rate == 1
+		else tr("A comunidade e o escavador cavam %d pontos por dia.") % rate, "small", AHKit.MUTED)
+	# Só os dias de expedição cavam (#186): a ressalva fica ao lado do ritmo (#284).
+	pace.text += " " + tr("Esperar um dia na Estação não cava.")
+	pace.name = "Pace"
 	pace.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	pace.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pace.size_flags_vertical = Control.SIZE_SHRINK_CENTER

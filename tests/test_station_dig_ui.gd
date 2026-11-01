@@ -1,4 +1,4 @@
-## A Estação em grade, a interface (#186; parte 3, #274): os marcadores dos blocos ("Escavando", "Escavar · N voltas",
+## A Estação em grade, a interface (#186; parte 3, #274): os marcadores dos blocos ("Escavando", "Escavar · N dias",
 ## "Vaga livre · Construir" e um "Soterrado" por trecho), o bloco apontado com o cartão, as setas e o clique chegando aos
 ## blocos, o painel do bloco soterrado (a obra, a frente de escavação, o motivo e o posto de escavador), o painel da vaga
 ## livre (os cômodos que cabem, o tamanho, o custo, o que falta e CONSTRUIR), o chip curto do relatório, a fala da
@@ -53,9 +53,10 @@ func _rules() -> void:
 	c.tutorial = {"stage": "done"}
 	t.equal(G.dig_target(c), "1:2", "a frente da comunidade: o bloco ao lado da Forja")
 	var front := AHRefugeHud.block_info(c, "1:2")
-	t.equal([front.state, front.mark], ["front", tr("Escavando · %s") % G.returns_text(2)], "a frente: Escavando · 2 voltas")
+	t.equal([front.state, front.mark], ["front", "Escavando · 2 dias"], "a frente: Escavando · 2 dias")
 	var landing := AHRefugeHud.block_info(c, "L2")
-	t.equal([landing.state, landing.mark], ["dig", tr("Escavar · %s") % G.returns_text(3)], "o patamar: Escavar · 3 voltas")
+	t.equal([landing.state, landing.mark], ["dig", "Escavar · 3 dias"], "o patamar: Escavar · 3 dias")
+	t.equal([G.returns_text(1), G.returns_text(2)], ["1 dia", "2 dias"], "a escavação conta em dias (#284)")
 	var deep := AHRefugeHud.block_info(c, "2:4")
 	t.equal([deep.state, String(deep.mark)], ["buried", String(tr("Soterrado"))], "o 2º subsolo: soterrado")
 	t.equal(deep.note, tr("Primeiro é preciso escavar %s.") % G.block_name("L2"), "o motivo: o patamar primeiro")
@@ -110,7 +111,7 @@ func _marks(station) -> void:
 	t.check(hud._block_rects.has("block:1:2") and hud._block_rects.has("block:1:1"), "os blocos do 1º subsolo na tela")
 	var front: PanelContainer = hud._block_marks.get("block:1:2")
 	if t.check(front != null and front.visible, "o marcador da frente de escavação"):
-		t.equal((front.find_child("Text", true, false) as Label).text, tr("Escavando · %s") % G.returns_text(G.returns_left(c, "1:2")), "diz Escavando e as voltas")
+		t.equal((front.find_child("Text", true, false) as Label).text, tr("Escavando · %s") % G.returns_text(G.returns_left(c, "1:2")), "diz Escavando e os dias")
 		t.check(hud._block_rects["block:1:2"].has_point(front.get_global_rect().get_center()), "em cima do bloco")
 	var landing: PanelContainer = hud._block_marks.get("block:L2")
 	t.check(landing != null and String(landing.get_meta("state", "")) == "dig", "o patamar do 2º subsolo: Escavar")
@@ -165,6 +166,9 @@ func _buried_panel(station) -> void:
 	hud.open_room("block:L2")
 	await _frames(3)
 	var dig := hud._body.find_child("DigHere", true, false) as Button
+	var panel_texts := _texts(hud._body)
+	t.check(panel_texts.all(func(x: String) -> bool: return not x.contains("volta")), "o painel do bloco conta em dias, sem voltas")
+	t.check(panel_texts.has(tr("Só os dias de expedição contam: esperar um dia na Estação não cava.")), "e diz que esperar um dia não cava")
 	if t.check(dig != null and not dig.disabled, "o patamar: ESCAVAR ESTE BLOCO"):
 		dig.pressed.emit()
 		await _frames(3)
@@ -299,6 +303,12 @@ func _board(station) -> void:
 	t.check(landing != null and landing.get_meta("state", "") == "dig", "o patamar dá para escavar")
 	var reward: Label = landing.find_child("Reward", true, false) if landing else null
 	t.check(reward != null and reward.text.begins_with(tr("Rende %s").get_slice("%", 0)), "com a recompensa à vista")
+	var act: Label = landing.find_child("Action", true, false) if landing else null
+	t.check(act != null and act.text.begins_with("Escavar · ") and act.text.ends_with(" dias"), "a ação conta em dias (%s)" % (act.text if act else ""))
+	var pace: Label = board.find_child("Pace", true, false)
+	t.check(pace != null and pace.text.contains("por dia") and pace.text.contains("Esperar um dia na Estação não cava"),
+		"o ritmo em dias, com a ressalva do esperar um dia (%s)" % (pace.text if pace else ""))
+	t.check(_texts(board).all(func(x: String) -> bool: return not x.contains("volta")), "a planta não fala mais em voltas")
 	t.equal(hud.focus_scope(), hud._dig_board, "o teclado e o controle andam pela planta")
 	landing.pressed.emit()
 	await _frames(3)
@@ -368,3 +378,12 @@ func _settle(station) -> void:
 func _frames(count: int) -> void:
 	for i in count:
 		await _tree.process_frame
+
+
+func _texts(node: Node) -> Array:
+	var out := []
+	if node is Label:
+		out.append((node as Label).text)
+	for child in node.get_children():
+		out.append_array(_texts(child))
+	return out

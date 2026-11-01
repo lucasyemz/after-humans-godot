@@ -1778,6 +1778,7 @@ dig_board.gd: dig
 station_frame.gd: dig
 dig_board.gd: Blocks
 dig_board.gd: Name
+dig_board.gd: Pace
 dig_board.gd: reward
 dig_board.gd: Scrap
 dig_board.gd: Fragments

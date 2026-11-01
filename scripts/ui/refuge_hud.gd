@@ -1951,7 +1951,7 @@ func _dig_front(c: Dictionary) -> void:
 	var blocks := AHStationGrid.dig_blocks(c)
 	if blocks.is_empty():
 		return
-	_text(tr("Escavar: escolha o bloco. Quem fica na Estação cava a cada volta de expedição."), AHKit.MUTED, "small")
+	_text(tr("Escavar: escolha o bloco. Quem fica na Estação cava a cada dia de expedição."), AHKit.MUTED, "small")
 	var chips := HFlowContainer.new()
 	chips.name = "DigFront"
 	chips.add_theme_constant_override("h_separation", 8)
@@ -2077,7 +2077,7 @@ func _block_card(c: Dictionary, box: VBoxContainer, key: String) -> void:
 
 
 ## Os marcadores dos blocos (#274), no alto da boca de cada um, na vista geral: "Vaga livre · Construir", "Escavar · N
-## voltas" e "Escavando · N voltas" em cada bloco; "Soterrado" uma vez por trecho seguido de blocos que ainda não dá para
+## dias" e "Escavando · N dias" em cada bloco; "Soterrado" uma vez por trecho seguido de blocos que ainda não dá para
 ## escavar, no meio dele. O bloco apontado fica sem o marcador (o cartão diz o resto).
 func _place_block_marks() -> void:
 	var c: Dictionary = Campaign.state
@@ -2144,7 +2144,7 @@ func _place_block_marks() -> void:
 	_unstack_marks()
 
 
-## Os marcadores de vagas vizinhas (6 m cabem menos que "Escavando · 2 voltas") não ficam um por cima do outro: da
+## Os marcadores de vagas vizinhas (6 m cabem menos que "Escavando · 2 dias") não ficam um por cima do outro: da
 ## esquerda para a direita, o que encosta num já posto desce uma linha dentro do bloco.
 func _unstack_marks() -> void:
 	var placed: Array = _lock_marks.values().filter(func(m): return is_instance_valid(m) and m.visible)
@@ -2298,10 +2298,10 @@ func _buried_block(c: Dictionary, key: String, info: Dictionary) -> void:
 		return
 	var rate := AHStationGrid.dig_rate(c)
 	var digger = S.worker(c, AHStationGrid.DIG)
-	var pace := tr("A comunidade cava 1 ponto por volta de expedição.") if AHStationGrid.community_work() == 1 \
-		else tr("A comunidade cava %d pontos por volta de expedição.") % AHStationGrid.community_work()
+	var pace := tr("A comunidade cava 1 ponto por dia.") if AHStationGrid.community_work() == 1 \
+		else tr("A comunidade cava %d pontos por dia.") % AHStationGrid.community_work()
 	if digger != null and rate > AHStationGrid.community_work():
-		pace = tr("A comunidade e %s cavam %d pontos por volta de expedição.") % [digger.display_name, rate]
+		pace = tr("A comunidade e %s cavam %d pontos por dia.") % [digger.display_name, rate]
 	_text(pace, AHKit.MUTED, "small")
 	if info.state == "front":
 		var front := _text(info.note, AHKit.AMBER)
@@ -2325,7 +2325,7 @@ func _buried_block(c: Dictionary, key: String, info: Dictionary) -> void:
 	var least := AHStationGrid.finds_text({"scrap": int(AHStationGrid.block_rule(key).get("Scrap", 0)), "fragments": int(AHStationGrid.block_rule(key).get("Fragments", 0))})
 	if least != "":
 		_text(tr("Devolve pelo menos %s, e às vezes um achado.") % least, AHKit.MUTED, "small")
-	_text(tr("Só as voltas de expedição contam: esperar um dia não cava."), AHKit.MUTED, "small")
+	_text(tr("Só os dias de expedição contam: esperar um dia na Estação não cava."), AHKit.MUTED, "small")
 	_body.add_child(_divider())
 	_workers(c, AHStationGrid.DIG)
 

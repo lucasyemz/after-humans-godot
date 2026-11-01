@@ -516,9 +516,9 @@ static func report_chip(dig: Dictionary) -> String:
 	return TranslationServer.translate("Escavação: %d de %d pontos") % [int(dig.get("progress", 0)), int(dig.get("work", 1))]
 
 
-## "1 volta", "3 voltas".
+## "1 dia", "3 dias": um dia é uma volta de expedição (#284).
 static func returns_text(count: int) -> String:
-	return TranslationServer.translate("1 volta") if count == 1 else TranslationServer.translate("%d voltas") % count
+	return TranslationServer.translate("1 dia") if count == 1 else TranslationServer.translate("%d dias") % count
 
 
 ## O Próximo passo de escavar (#186, ponto 7), ou {} sem bloco para escavar. A escavação anda com as voltas: o botão leva

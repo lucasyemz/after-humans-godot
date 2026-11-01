@@ -14,8 +14,8 @@ esquerda e o depois à direita.
 ![a vista geral da campanha nova, antes e depois](station-grid-ui/new_overview.jpg)
 
 - **Os marcadores:**
-  - "Escavando · N voltas" na frente de escavação;
-  - "Escavar · N voltas" em cada bloco que dá para escavar (aqui, o patamar do 2º subsolo);
+  - "Escavando · N dias" na frente de escavação;
+  - "Escavar · N dias" em cada bloco que dá para escavar (aqui, o patamar do 2º subsolo);
   - "Soterrado" uma vez por trecho seguido de blocos que ainda não dá para escavar, para o 2º e o 3º subsolos não ficarem
     cheios de etiquetas.
 - **Os vizinhos:** em 6 m não cabem dois marcadores lado a lado; o de baixo desce uma linha dentro do bloco.
@@ -24,7 +24,7 @@ esquerda e o depois à direita.
 
 - **O bloco apontado:** pelo mouse, pelo toque ou pelas setas, com a moldura, a etiqueta e o cartão (o estado, o resumo e
   GERENCIAR), como os cômodos.
-- **O painel do patamar:** a obra numa barra, o ritmo de quem cava, quantas voltas faltam, ESCAVAR ESTE BLOCO, o mínimo que
+- **O painel do patamar:** a obra numa barra, o ritmo de quem cava, quantos dias faltam, ESCAVAR ESTE BLOCO, o mínimo que
   ele devolve e "Quem trabalha aqui", o posto de escavador. O posto continua também na Sala, no painel dos postos.
 
 ## A frente de escavação
@@ -32,7 +32,7 @@ esquerda e o depois à direita.
 ![antes, a escolha no painel do Depósito; agora, o painel do bloco](station-grid-ui/new_front.jpg)
 
 - **Antes:** a frente só dava para escolher no painel de um cômodo soterrado (o Depósito).
-- **Agora:** cada bloco tem o painel dele. A frente diz que é a frente e em quantas voltas abre. O bloco que ainda não dá
+- **Agora:** cada bloco tem o painel dele. A frente diz que é a frente e em quantos dias abre. O bloco que ainda não dá
   para escavar diz o motivo ("Primeiro é preciso escavar o patamar do 2º subsolo.").
 
 ## A vaga livre
@@ -128,8 +128,8 @@ esquerda e o depois à direita.
   - a imagem do que está ali;
   - o nome em cima, com o estado: "(BLOQUEADO)" ou "(ESCAVANDO)".
 - **Os estados:**
-  - **dá para escavar:** a moldura clara, a ação ("Escavar · 2 voltas") e o que rende no mínimo ("Rende 1 sucata"). Embaixo, no escolhido, a frase inteira: "Recompensa: 1 sucata, e às vezes um achado.", como no painel do bloco;
-  - **a frente de escavação:** a moldura âmbar, os pontos e as voltas que faltam;
+  - **dá para escavar:** a moldura clara, a ação ("Escavar · 2 dias") e o que rende no mínimo ("Rende 1 sucata"). Embaixo, no escolhido, a frase inteira: "Recompensa: 1 sucata, e às vezes um achado.", como no painel do bloco;
+  - **a frente de escavação:** a moldura âmbar, os pontos e os dias que faltam;
   - **depende do vizinho ou da escada:** a moldura e o aviso em vermelho ("Depende do vizinho", "Depende da escada"). O motivo inteiro aparece embaixo ao escolher;
   - **a vaga livre:** em verde, "Vaga livre · Construir";
   - **o cômodo construído:** o ícone e "Construído", com o cômodo duplo nas duas vagas;
@@ -149,5 +149,10 @@ esquerda e o depois à direita.
 - **O teclado e o controle:** as setas e o direcional andam entre os cartões, Interagir escolhe, e Interagir no escolhido aciona o botão grande (a tecla E / A dele). Fechar o painel aberto pela planta (Construir, Detalhes) volta para a planta.
 - **No Normal, os três andares cabem inteiros. No Maior, a grade rola.** O nome do bloco vai em até duas linhas; a ação e a recompensa, numa linha cada.
 - **Em aberto:** a imagem é uma faixa de 56 px no cartão; a arte da #275 pode pedir um cartão maior.
+
+## Em dias (pedido do Lucas no #284)
+A escavação conta em **dias**, não em voltas: "Escavar · 2 dias", "1 de 3 · 2 dias", "abre em 2 dias" e "A comunidade cava 1 ponto por dia". Um dia é o de uma expedição: o "Esperar um dia" na Estação continua sem cavar, como na regra da #186, e a planta diz isso no alto, ao lado do ritmo.
+
+![antes e depois: voltas viram dias, no Normal e no Maior](station-grid-ui/days.jpg)
 
 As fotos saem de `tools/capture_274_dig.gd --case=board` (com `--text-size=2` no Maior). O antes é a vista geral desta mesma entrega antes do pedido.

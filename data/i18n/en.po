@@ -1741,12 +1741,12 @@ msgid "Ver %s"
 msgstr "See %s"
 
 #: scripts/ui/refuge_hud.gd:1954
-msgid "Escavar: escolha o bloco. Quem fica na Estação cava a cada volta de expedição."
-msgstr "Dig: choose the block. Whoever stays at the Station digs on every expedition return."
+msgid "Escavar: escolha o bloco. Quem fica na Estação cava a cada dia de expedição."
+msgstr "Dig: choose the block. Whoever stays at the Station digs on every expedition day."
 
 #: scripts/ui/refuge_hud.gd:1971
 #: scripts/ui/refuge_hud.gd:2321
-#: scripts/ui/station/dig_board.gd:426
+#: scripts/ui/station/dig_board.gd:429
 msgid "Escavação: a frente agora é %s."
 msgstr "Digging: the front is now %s."
 
@@ -1849,23 +1849,23 @@ msgstr "%d of %d work points"
 
 #: scripts/ui/refuge_hud.gd:2301
 #: scripts/ui/station/dig_board.gd:153
-msgid "A comunidade cava 1 ponto por volta de expedição."
-msgstr "The community digs 1 point per expedition return."
+msgid "A comunidade cava 1 ponto por dia."
+msgstr "The community digs 1 point per day."
 
 #: scripts/ui/refuge_hud.gd:2302
-msgid "A comunidade cava %d pontos por volta de expedição."
-msgstr "The community digs %d points per expedition return."
+msgid "A comunidade cava %d pontos por dia."
+msgstr "The community digs %d points per day."
 
 #: scripts/ui/refuge_hud.gd:2304
-msgid "A comunidade e %s cavam %d pontos por volta de expedição."
-msgstr "The community and %s dig %d points per expedition return."
+msgid "A comunidade e %s cavam %d pontos por dia."
+msgstr "The community and %s dig %d points per day."
 
 #: scripts/ui/refuge_hud.gd:2313
 msgid "Agora a frente é %s; o que já foi cavado lá fica guardado."
 msgstr "The front is now %s; what has been dug there is kept."
 
 #: scripts/ui/refuge_hud.gd:2315
-#: scripts/ui/station/dig_board.gd:423
+#: scripts/ui/station/dig_board.gd:426
 msgid "Escavar este bloco"
 msgstr "Dig this block"
 
@@ -1874,8 +1874,8 @@ msgid "Devolve pelo menos %s, e às vezes um achado."
 msgstr "Yields at least %s, and sometimes a find."
 
 #: scripts/ui/refuge_hud.gd:2328
-msgid "Só as voltas de expedição contam: esperar um dia não cava."
-msgstr "Only expedition returns count: waiting a day does not dig."
+msgid "Só os dias de expedição contam: esperar um dia na Estação não cava."
+msgstr "Only expedition days count: waiting a day at the Station does not dig."
 
 #: scripts/ui/refuge_hud.gd:2335
 msgid "Ver a planta"
@@ -4685,12 +4685,12 @@ msgid "−1 dia de recuperação para %d caídos por volta"
 msgstr "−1 recovery day for %d fallen per return"
 
 #: scripts/flow/station_rules.gd:2294
-msgid "+%d ponto de obra por volta"
-msgstr "+%d work point per return"
+msgid "+%d ponto de obra por dia"
+msgstr "+%d work point per day"
 
 #: scripts/flow/station_rules.gd:2294
-msgid "+%d pontos de obra por volta"
-msgstr "+%d work points per return"
+msgid "+%d pontos de obra por dia"
+msgstr "+%d work points per day"
 
 #: scripts/flow/station_rules.gd:2302
 #: scripts/flow/station_rules.gd:2426
@@ -6030,12 +6030,13 @@ msgid "Escavação: %d de %d pontos"
 msgstr "Digging: %d of %d points"
 
 #: scripts/flow/station_grid.gd:521
-msgid "1 volta"
-msgstr "1 return"
+msgid "1 dia"
+msgstr "1 day"
 
 #: scripts/flow/station_grid.gd:521
-msgid "%d voltas"
-msgstr "%d returns"
+#: scripts/ui/mission_board.gd:87
+msgid "%d dias"
+msgstr "%d days"
 
 #: scripts/flow/station_grid.gd:530
 msgid "Escavar o patamar do %dº subsolo"
@@ -6113,10 +6114,6 @@ msgstr "Rescue %s"
 #: scripts/ui/mission_board.gd:87
 msgid "%d dia"
 msgstr "%d day"
-
-#: scripts/ui/mission_board.gd:87
-msgid "%d dias"
-msgstr "%d days"
 
 #: scripts/ui/mission_board.gd:89
 msgid "Comida: %d"
@@ -6273,47 +6270,51 @@ msgid "Escave a escada deste andar para liberar"
 msgstr "Dig this floor's stairs to free it"
 
 #: scripts/ui/station/dig_board.gd:154
-msgid "A comunidade e o escavador cavam %d pontos por volta de expedição."
-msgstr "The community and the digger dig %d points per expedition return."
+msgid "A comunidade e o escavador cavam %d pontos por dia."
+msgstr "The community and the digger dig %d points per day."
 
-#: scripts/ui/station/dig_board.gd:253
-#: scripts/ui/station/dig_board.gd:393
+#: scripts/ui/station/dig_board.gd:156
+msgid "Esperar um dia na Estação não cava."
+msgstr "Waiting a day at the Station does not dig."
+
+#: scripts/ui/station/dig_board.gd:256
+#: scripts/ui/station/dig_board.gd:396
 msgid "Construído"
 msgstr "Built"
 
-#: scripts/ui/station/dig_board.gd:268
+#: scripts/ui/station/dig_board.gd:271
 msgid "Escada"
 msgstr "Stairs"
 
-#: scripts/ui/station/dig_board.gd:268
+#: scripts/ui/station/dig_board.gd:271
 msgid "Patamar aberto"
 msgstr "Open landing"
 
-#: scripts/ui/station/dig_board.gd:380
+#: scripts/ui/station/dig_board.gd:383
 msgid "Detalhes"
 msgstr "Details"
 
-#: scripts/ui/station/dig_board.gd:386
+#: scripts/ui/station/dig_board.gd:389
 msgid "Escolha um bloco"
 msgstr "Choose a block"
 
-#: scripts/ui/station/dig_board.gd:394
+#: scripts/ui/station/dig_board.gd:397
 msgid "Abrir o cômodo"
 msgstr "Open the room"
 
-#: scripts/ui/station/dig_board.gd:411
+#: scripts/ui/station/dig_board.gd:414
 msgid "Recompensa: %s, e às vezes um achado."
 msgstr "Reward: %s, and sometimes a find."
 
-#: scripts/ui/station/dig_board.gd:417
+#: scripts/ui/station/dig_board.gd:420
 msgid "Construir aqui"
 msgstr "Build here"
 
-#: scripts/ui/station/dig_board.gd:421
+#: scripts/ui/station/dig_board.gd:424
 msgid "É a frente de escavação"
 msgstr "This is the dig front"
 
-#: scripts/ui/station/dig_board.gd:429
+#: scripts/ui/station/dig_board.gd:432
 msgid "Ainda bloqueado"
 msgstr "Still blocked"
 
@@ -9374,6 +9375,39 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "Escavar: escolha o bloco. Quem fica na Estação cava a cada dia."
+#~ msgstr "Dig: choose the block. Whoever stays at the Station digs every day."
+
+#~ msgid "Só as voltas de expedição contam: esperar um dia não cava."
+#~ msgstr "Only expedition returns count: waiting a day does not dig."
+
+#~ msgid "+%d ponto de obra por volta"
+#~ msgstr "+%d work point per return"
+
+#~ msgid "+%d pontos de obra por volta"
+#~ msgstr "+%d work points per return"
+
+#~ msgid "Escavar: escolha o bloco. Quem fica na Estação cava a cada volta de expedição."
+#~ msgstr "Dig: choose the block. Whoever stays at the Station digs on every expedition return."
+
+#~ msgid "A comunidade cava 1 ponto por volta de expedição."
+#~ msgstr "The community digs 1 point per expedition return."
+
+#~ msgid "A comunidade cava %d pontos por volta de expedição."
+#~ msgstr "The community digs %d points per expedition return."
+
+#~ msgid "A comunidade e %s cavam %d pontos por volta de expedição."
+#~ msgstr "The community and %s dig %d points per expedition return."
+
+#~ msgid "1 volta"
+#~ msgstr "1 return"
+
+#~ msgid "%d voltas"
+#~ msgstr "%d returns"
+
+#~ msgid "A comunidade e o escavador cavam %d pontos por volta de expedição."
+#~ msgstr "The community and the digger dig %d points per expedition return."
 
 #~ msgid "Recompensa: %s e um achado"
 #~ msgstr "Reward: %s and a find"
