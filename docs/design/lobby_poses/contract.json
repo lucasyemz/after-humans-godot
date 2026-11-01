@@ -1,0 +1,2410 @@
+{
+  "issue": 249,
+  "author": "Awesomic",
+  "replaces": "PR #251 (Codex)",
+  "generator": "ChatGPT (gerador de imagens), fundo magenta recortado",
+  "base_commit": "204f8f7ed63186aa764413b22875a863650a2d72",
+  "source_tag": "awesomic-249-lobby-originals",
+  "source_folder": "lobby_poses_awesomic_20261030",
+  "source_archive": "lobby_poses_awesomic_20261030.tar.gz",
+  "source_archive_sha256": "c67b3e42c1532196a50dc02a15cdb103edb4552225566caef34e6bdec11b2e33",
+  "runtime_changes": false,
+  "actors": {
+    "bento": {
+      "height_m": 1.72,
+      "founder": true,
+      "sex": "fixed",
+      "assets": {
+        "idle": {
+          "source_file": "bento/idle.png",
+          "source_sha256": "cd7a2e8f87295248b9de4a480c6ffb59f3bd2881ecf4f7033428b6728899668c",
+          "canvas": [
+            1086,
+            1448
+          ],
+          "texture_canvas": [
+            543,
+            724
+          ],
+          "anchor": [
+            473.0,
+            1429
+          ],
+          "body_reference_pixels": 1419,
+          "visible": [
+            5,
+            10,
+            787,
+            1429
+          ],
+          "raw_component": [
+            0,
+            0,
+            807,
+            1464
+          ],
+          "uniform_scale": 0.9692622950819673,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 17,
+          "translation": [
+            5,
+            10
+          ],
+          "contact": "feet",
+          "contact_y": 1429,
+          "reference_file": "res://art/combat/heroes/bento/idle.webp",
+          "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+          "prototype_file": "bento/idle.webp",
+          "generator_file": "gpt-bento-idle.png",
+          "generator_sha256": "940eaf5e8e958eadbd019a019b6aa6d595a875bfca63936f43471c4984d3b991"
+        },
+        "seat": {
+          "source_file": "bento/hero_cao_bento_seat.png",
+          "source_sha256": "4dbbd3382ea77b4b460793b1dcbea364633bbdeaec74fa742c57ffd2522fe722",
+          "canvas": [
+            543,
+            724
+          ],
+          "texture_canvas": [
+            543,
+            724
+          ],
+          "anchor": [
+            283,
+            710
+          ],
+          "body_reference_pixels": 948,
+          "visible": [
+            5,
+            27,
+            485,
+            710
+          ],
+          "raw_component": [
+            0,
+            0,
+            978,
+            1391
+          ],
+          "uniform_scale": 0.4910136592379583,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 52,
+          "translation": [
+            5,
+            27
+          ],
+          "contact": "feet",
+          "contact_y": 710,
+          "reference_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+          "reference_sha256": "976b0742f1b20cd35537d24bf523fb76df38743d1a635cdea55d33d54ef29bab",
+          "prototype_file": "bento/hero_cao_bento_seat.webp",
+          "generator_file": "gpt-bento-seat.png",
+          "generator_sha256": "0247c3b2345659aaafc69f0b24413edb7f21197954799355be609df09049ba83"
+        },
+        "sleep": {
+          "source_file": "bento/hero_cao_bento_sleep.png",
+          "source_sha256": "e23520cf68cf07c3ecf313ea7aa846a98862a01a18f1e327d57ca60d77f59cb3",
+          "canvas": [
+            887,
+            443
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            445,
+            336
+          ],
+          "body_reference_pixels": 863,
+          "visible": [
+            13,
+            113,
+            877,
+            336
+          ],
+          "raw_component": [
+            0,
+            0,
+            1499,
+            387
+          ],
+          "uniform_scale": 0.5763842561707805,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            13,
+            113
+          ],
+          "contact": "bed",
+          "contact_y": 336,
+          "reference_file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+          "reference_sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2",
+          "prototype_file": "bento/hero_cao_bento_sleep.webp",
+          "generator_file": "gpt-bento-sleep.png",
+          "generator_sha256": "7e9db46864b815e544905d45efc3aeb12ea530e8d6907412544e9fbede940e3c"
+        },
+        "work": {
+          "source_file": "bento/hero_cao_bento_work.png",
+          "source_sha256": "0de726825be3b132ac1293db8c7d4d4d9460ffe144d84314e766e09b029684fa",
+          "canvas": [
+            543,
+            724
+          ],
+          "texture_canvas": [
+            543,
+            724
+          ],
+          "anchor": [
+            302,
+            716
+          ],
+          "body_reference_pixels": 708,
+          "visible": [
+            50,
+            16,
+            476,
+            717
+          ],
+          "raw_component": [
+            0,
+            0,
+            879,
+            1447
+          ],
+          "uniform_scale": 0.48445058742225294,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            50,
+            16
+          ],
+          "contact": "feet",
+          "contact_y": 717,
+          "reference_file": "res://art/station/poses/hero_cao_bento_work.webp",
+          "reference_sha256": "96033c41198600dc724b0ce9b5ef07b95143bc908249fcc508598eb2f0c4e556",
+          "prototype_file": "bento/hero_cao_bento_work.webp",
+          "generator_file": "gpt-bento-work.png",
+          "generator_sha256": "249120a4419386b35740853075558f48115dc97a3e1c476d444f1249989d478b"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": "hero_cao_bento",
+      "class_id": "cao"
+    },
+    "nick": {
+      "height_m": 1.5,
+      "founder": true,
+      "sex": "fixed",
+      "assets": {
+        "idle": {
+          "source_file": "nick/idle.png",
+          "source_sha256": "1d1e205c9aca505af731a6675d0731f2dad8f6e877e24b212c6235589a2b7fe8",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            488.5,
+            1286
+          ],
+          "body_reference_pixels": 1255,
+          "visible": [
+            5,
+            29,
+            766,
+            1286
+          ],
+          "raw_component": [
+            0,
+            0,
+            819,
+            1353
+          ],
+          "uniform_scale": 0.9290465631929047,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 5,
+          "translation": [
+            5,
+            29
+          ],
+          "contact": "feet",
+          "contact_y": 1286,
+          "reference_file": "res://art/combat/heroes/nick/idle.webp",
+          "reference_sha256": "e97fb01fa320a2bc2d43cfb8399fdb1d93e11bbdc30abda5b24e7d17eafbce63",
+          "prototype_file": "nick/idle.webp",
+          "generator_file": "gpt-nick-idle.png",
+          "generator_sha256": "7beb42d62fd2191fad69c97bd43e6cc05b4dee4fd8722ff8ae63834f9daaf7d4"
+        },
+        "seat": {
+          "source_file": "nick/hero_gato_nick_seat.png",
+          "source_sha256": "1ec31cc7ca86bc4e7b69f4073bd7a4f15cf8912973da103ebf76611a0a4933ad",
+          "canvas": [
+            589,
+            667
+          ],
+          "texture_canvas": [
+            589,
+            667
+          ],
+          "anchor": [
+            302,
+            639
+          ],
+          "body_reference_pixels": 804,
+          "visible": [
+            5,
+            28,
+            496,
+            639
+          ],
+          "raw_component": [
+            0,
+            0,
+            944,
+            1174
+          ],
+          "uniform_scale": 0.520442930153322,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 46,
+          "translation": [
+            5,
+            28
+          ],
+          "contact": "feet",
+          "contact_y": 639,
+          "reference_file": "res://art/station/poses/hero_gato_nick_seat.webp",
+          "reference_sha256": "4c29c3dfd8dd629d1b95b330f81068d5c82dffdb09344801c01be4e4cb176a66",
+          "prototype_file": "nick/hero_gato_nick_seat.webp",
+          "generator_file": "gpt-nick-seat.png",
+          "generator_sha256": "4048d75236882336aab196202d3241b692f55662bd055740987e534f1b6416f9"
+        },
+        "sleep": {
+          "source_file": "nick/hero_gato_nick_sleep.png",
+          "source_sha256": "0b46e2ca114cfd62ccb9b9db65139b7c6c0ee72991a72139e8233f0f01f115d1",
+          "canvas": [
+            892,
+            441
+          ],
+          "texture_canvas": [
+            892,
+            441
+          ],
+          "anchor": [
+            446,
+            366
+          ],
+          "body_reference_pixels": 862,
+          "visible": [
+            14,
+            133,
+            878,
+            367
+          ],
+          "raw_component": [
+            0,
+            0,
+            1492,
+            404
+          ],
+          "uniform_scale": 0.579088471849866,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            14,
+            133
+          ],
+          "contact": "bed",
+          "contact_y": 367,
+          "reference_file": "res://art/station/poses/hero_gato_nick_sleep.webp",
+          "reference_sha256": "d974d4131d5ccd7f278af044d4b967da38ae6caac764ab36a8b1bf218b4ac010",
+          "prototype_file": "nick/hero_gato_nick_sleep.webp",
+          "generator_file": "gpt-nick-sleep.png",
+          "generator_sha256": "59331d2bb5e98ab144db4f921a882e0b7665b64c9837a54b0e6b936f0f54d0ac"
+        },
+        "work": {
+          "source_file": "nick/hero_gato_nick_work.png",
+          "source_sha256": "cbefaa1e4753c82d46b9e1d4640e6d30e484bd558beaa99787464904988850b6",
+          "canvas": [
+            589,
+            667
+          ],
+          "texture_canvas": [
+            589,
+            667
+          ],
+          "anchor": [
+            305,
+            644
+          ],
+          "body_reference_pixels": 630,
+          "visible": [
+            60,
+            14,
+            441,
+            644
+          ],
+          "raw_component": [
+            0,
+            0,
+            818,
+            1352
+          ],
+          "uniform_scale": 0.46597633136094674,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            60,
+            14
+          ],
+          "contact": "feet",
+          "contact_y": 644,
+          "reference_file": "res://art/station/poses/hero_gato_nick_work.webp",
+          "reference_sha256": "8488a07cfea0c8bd2113293bf9a57420ab6d29c0a7f1747a0035147c5dd8bdb5",
+          "prototype_file": "nick/hero_gato_nick_work.webp",
+          "generator_file": "gpt-nick-work.png",
+          "generator_sha256": "56aa203d5ff7852db43699b964c334d4ef58fce8695915b6438459342c4c6632"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": "hero_gato_nick",
+      "class_id": "gato"
+    },
+    "iris": {
+      "height_m": 1.38,
+      "founder": true,
+      "sex": "fixed",
+      "assets": {
+        "idle": {
+          "source_file": "iris/idle.png",
+          "source_sha256": "7c395b40991ce5de809d8c74063232561451605009aa7942f966f1179e94e3b8",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            587.5,
+            1264
+          ],
+          "body_reference_pixels": 1208,
+          "visible": [
+            326,
+            57,
+            838,
+            1265
+          ],
+          "raw_component": [
+            0,
+            0,
+            566,
+            1335
+          ],
+          "uniform_scale": 0.9048689138576779,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            326,
+            57
+          ],
+          "contact": "feet",
+          "contact_y": 1265,
+          "reference_file": "res://art/combat/heroes/iris/idle.webp",
+          "reference_sha256": "e2da1f9727c8d5ba2801384d2eea5cad8696603c49cb852634359a6126690890",
+          "prototype_file": "iris/idle.webp",
+          "generator_file": "gpt-iris-idle.png",
+          "generator_sha256": "7af9e46d9da33498e7ee27f5065e30ccde86ab0c5a06ec0d556572f5a06761e9"
+        },
+        "seat": {
+          "source_file": "iris/hero_sapo_iris_seat.png",
+          "source_sha256": "bad3183f93290f55d0bbb5940f056d46a2c1b5daca61f5f1368158dd57d6c10a",
+          "canvas": [
+            543,
+            724
+          ],
+          "texture_canvas": [
+            543,
+            724
+          ],
+          "anchor": [
+            273,
+            686
+          ],
+          "body_reference_pixels": 924,
+          "visible": [
+            96,
+            38,
+            441,
+            686
+          ],
+          "raw_component": [
+            0,
+            0,
+            642,
+            1206
+          ],
+          "uniform_scale": 0.5373134328358209,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            96,
+            38
+          ],
+          "contact": "feet",
+          "contact_y": 686,
+          "reference_file": "res://art/station/poses/hero_sapo_iris_seat.webp",
+          "reference_sha256": "bd09f6888501d0ba611517c9c0424ce156c2c9d5848c80f3c78b925ef482c394",
+          "prototype_file": "iris/hero_sapo_iris_seat.webp",
+          "generator_file": "gpt-iris-seat.png",
+          "generator_sha256": "49bd0fc01102f9a3fc29298859ce9386b09a772b278539effa2146d7fd43d7f6"
+        },
+        "sleep": {
+          "source_file": "iris/hero_sapo_iris_sleep.png",
+          "source_sha256": "6addca1824167f8d2de028fa57d37c5a94441065ea584138d6d54b0accffb99a",
+          "canvas": [
+            887,
+            443
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            444,
+            369
+          ],
+          "body_reference_pixels": 854,
+          "visible": [
+            16,
+            156,
+            871,
+            369
+          ],
+          "raw_component": [
+            0,
+            0,
+            1436,
+            358
+          ],
+          "uniform_scale": 0.5954038997214485,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            16,
+            156
+          ],
+          "contact": "bed",
+          "contact_y": 369,
+          "reference_file": "res://art/station/poses/hero_sapo_iris_sleep.webp",
+          "reference_sha256": "964932294edb16d70219455c1e2b0e20f62b15e156034957d36a19b304585aeb",
+          "prototype_file": "iris/hero_sapo_iris_sleep.webp",
+          "generator_file": "gpt-iris-sleep.png",
+          "generator_sha256": "669cd1d17bf40d31e0cb369c1e72bbcc974fddedd53530c91e41a4dbc5a4a2ef"
+        },
+        "work": {
+          "source_file": "iris/hero_sapo_iris_work.png",
+          "source_sha256": "7b19f53fe4580ec795448240a02e2b19770bb317b6a0d553cc831096865f884a",
+          "canvas": [
+            589,
+            667
+          ],
+          "texture_canvas": [
+            589,
+            667
+          ],
+          "anchor": [
+            375,
+            634
+          ],
+          "body_reference_pixels": 611,
+          "visible": [
+            243,
+            23,
+            502,
+            634
+          ],
+          "raw_component": [
+            0,
+            0,
+            564,
+            1329
+          ],
+          "uniform_scale": 0.4597441685477803,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            243,
+            23
+          ],
+          "contact": "feet",
+          "contact_y": 634,
+          "reference_file": "res://art/station/poses/hero_sapo_iris_work.webp",
+          "reference_sha256": "0c9e5153078c3fd42d6a06820d1fe38d498c9a223476933a3a053a85da63a94a",
+          "prototype_file": "iris/hero_sapo_iris_work.webp",
+          "generator_file": "gpt-iris-work.png",
+          "generator_sha256": "abb71cc8ca7c9c92916c5316ec662ba4346c59ee8fa8fdcbbb4f13445ac9ef5f"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": "hero_sapo_iris",
+      "class_id": "sapo"
+    },
+    "vespera": {
+      "height_m": 1.66,
+      "founder": true,
+      "sex": "fixed",
+      "assets": {
+        "idle": {
+          "source_file": "vespera/idle.png",
+          "source_sha256": "85972f4bf951c41e46637749b75d6008bfec7930b1f978729a18d868ab99378c",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            451.0,
+            1297
+          ],
+          "body_reference_pixels": 1271,
+          "visible": [
+            153,
+            25,
+            749,
+            1298
+          ],
+          "raw_component": [
+            0,
+            0,
+            655,
+            1398
+          ],
+          "uniform_scale": 0.9105865522174535,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            153,
+            25
+          ],
+          "contact": "feet",
+          "contact_y": 1298,
+          "reference_file": "res://art/combat/heroes/vespera/idle.webp",
+          "reference_sha256": "5d714a11c05f986eeb600f66c1a7c9c0546df04d0f95b50d7739a3f1f8681276",
+          "prototype_file": "vespera/idle.webp",
+          "generator_file": "gpt-vespera-idle.png",
+          "generator_sha256": "a7cfe8a0d25eaff351b2a530a33afd024bdb437823caedf12f179908065f10e9"
+        },
+        "seat": {
+          "source_file": "vespera/hero_coruja_vespera_seat.png",
+          "source_sha256": "f9dc686b94f96afc9e540303b510d49130bf2221da317e8b5356c080b74b0556",
+          "canvas": [
+            589,
+            667
+          ],
+          "texture_canvas": [
+            589,
+            667
+          ],
+          "anchor": [
+            296,
+            623
+          ],
+          "body_reference_pixels": 784,
+          "visible": [
+            98,
+            26,
+            462,
+            623
+          ],
+          "raw_component": [
+            0,
+            0,
+            771,
+            1266
+          ],
+          "uniform_scale": 0.471563981042654,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            98,
+            26
+          ],
+          "contact": "feet",
+          "contact_y": 623,
+          "reference_file": "res://art/station/poses/hero_coruja_vespera_seat.webp",
+          "reference_sha256": "0afe3332b279529c888572f195d92366fb06aeceac426c6d7ca0788e8b4af26c",
+          "prototype_file": "vespera/hero_coruja_vespera_seat.webp",
+          "generator_file": "gpt-vespera-seat.png",
+          "generator_sha256": "6cc693049d25983436a7223fbbe558a06cc39d63eb41558ea3b01d7a7546026f"
+        },
+        "sleep": {
+          "source_file": "vespera/hero_coruja_vespera_sleep.png",
+          "source_sha256": "731196cd246da17f523e55ce6a5c6ffaf61b01c455702e47071f39777a622ab5",
+          "canvas": [
+            887,
+            443
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            447,
+            410
+          ],
+          "body_reference_pixels": 837,
+          "visible": [
+            28,
+            146,
+            866,
+            410
+          ],
+          "raw_component": [
+            0,
+            0,
+            1466,
+            461
+          ],
+          "uniform_scale": 0.5716234652114598,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            28,
+            146
+          ],
+          "contact": "bed",
+          "contact_y": 410,
+          "reference_file": "res://art/station/poses/hero_coruja_vespera_sleep.webp",
+          "reference_sha256": "4afd526ac19aa311b1573c2e6583938bd63723ed96b45576dc5499d6bd201f64",
+          "prototype_file": "vespera/hero_coruja_vespera_sleep.webp",
+          "generator_file": "gpt-vespera-sleep.png",
+          "generator_sha256": "19d0604205cc701cab9add1ddaebdf16ba17e6592088e77c474042ed9656ffec"
+        },
+        "work": {
+          "source_file": "vespera/hero_coruja_vespera_work.png",
+          "source_sha256": "d0c07c9aaa0f9ccf7e0f9ac724fb4b3a70eda3a783f7467bd83c349f13b0bbf6",
+          "canvas": [
+            589,
+            667
+          ],
+          "texture_canvas": [
+            589,
+            667
+          ],
+          "anchor": [
+            302,
+            651
+          ],
+          "body_reference_pixels": 638,
+          "visible": [
+            154,
+            13,
+            452,
+            651
+          ],
+          "raw_component": [
+            0,
+            0,
+            655,
+            1401
+          ],
+          "uniform_scale": 0.45538900785153463,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            154,
+            13
+          ],
+          "contact": "feet",
+          "contact_y": 651,
+          "reference_file": "res://art/station/poses/hero_coruja_vespera_work.webp",
+          "reference_sha256": "6db2db4ca729071078481a0cef5601897589ba927f7efd95c49461e913023f61",
+          "prototype_file": "vespera/hero_coruja_vespera_work.webp",
+          "generator_file": "gpt-vespera-work.png",
+          "generator_sha256": "6ae5072a9d8df9fe3d217ae8af0c4f96d6c6d43c46a0e0504c4605cc8b4000d0"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": "hero_coruja_vespera",
+      "class_id": "coruja"
+    },
+    "dog_male": {
+      "height_m": 1.72,
+      "founder": false,
+      "sex": "male",
+      "assets": {
+        "idle": {
+          "source_file": "dog_male/idle.png",
+          "source_sha256": "8648b7a123c4b48972e7ab0d3a97d5107a730ab7168b412d5e85e04124fb56d0",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            212,
+            65,
+            850,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            745,
+            1448
+          ],
+          "uniform_scale": 0.856353591160221,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            212,
+            65
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/bento/idle.webp",
+          "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+          "prototype_file": "dog_male/idle.webp",
+          "generator_file": "gpt-dog-m-idle.png",
+          "generator_sha256": "bb705f74d05d5c941b02cb689d10237493ea0406f6725abab183ad0df761b16b"
+        },
+        "seat": {
+          "source_file": "dog_male/seat.png",
+          "source_sha256": "80066e7b15f0b24b1a3f8dbcb33e8c288042c5607e3e5b18ea4bd5df23b5374e",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            158,
+            412,
+            789,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            968,
+            1369
+          ],
+          "uniform_scale": 0.6523009495982469,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            158,
+            412
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+          "reference_sha256": "976b0742f1b20cd35537d24bf523fb76df38743d1a635cdea55d33d54ef29bab",
+          "prototype_file": "dog_male/seat.webp",
+          "generator_file": "gpt-dog-m-seat.png",
+          "generator_sha256": "206d574c117ae057a8b382105de182f0d03bbe1dc51f07a8c78bb9acab3bf56f"
+        },
+        "sleep": {
+          "source_file": "dog_male/sleep.png",
+          "source_sha256": "1fdc38c4c4b0e222aa7b7e60f76fb2d1313ced0ae29a242d6aa5fce1ab563b8d",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            267,
+            414,
+            1507,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1499,
+            392
+          ],
+          "uniform_scale": 0.8272181454302868,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            267,
+            414
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+          "reference_sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2",
+          "prototype_file": "dog_male/sleep.webp",
+          "generator_file": "gpt-dog-m-sleep.png",
+          "generator_sha256": "dbe7cb1ddac7bc7ce655d615fb523157f949aeabbe9a60cc85badbeca365d594"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "cao"
+    },
+    "dog_female": {
+      "height_m": 1.72,
+      "founder": false,
+      "sex": "female",
+      "assets": {
+        "idle": {
+          "source_file": "dog_female/idle.png",
+          "source_sha256": "c2b69da295014716766548756ce359104c6237be6d3631f4bf026c8c69cf50c7",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            230,
+            65,
+            840,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            714,
+            1451
+          ],
+          "uniform_scale": 0.8545830461750517,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            230,
+            65
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/bento/idle.webp",
+          "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+          "prototype_file": "dog_female/idle.webp",
+          "generator_file": "gpt-dog-f-idle.png",
+          "generator_sha256": "8405ed861d223bc55a30ac7c587388f8b932b102076afb672972008406dcaf96"
+        },
+        "seat": {
+          "source_file": "dog_female/seat.png",
+          "source_sha256": "e47bb17a7de1f172a335b7b7946613b3cda7bda97f7c4cc1dcd4ed2567c5ea91",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            162,
+            411,
+            790,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            956,
+            1361
+          ],
+          "uniform_scale": 0.65686994856723,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            162,
+            411
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+          "reference_sha256": "976b0742f1b20cd35537d24bf523fb76df38743d1a635cdea55d33d54ef29bab",
+          "prototype_file": "dog_female/seat.webp",
+          "generator_file": "gpt-dog-f-seat.png",
+          "generator_sha256": "eb2922a347a55a76c092e28fcdec380c7beed1e593a7efa25ea2140b0cde11cf"
+        },
+        "sleep": {
+          "source_file": "dog_female/sleep.png",
+          "source_sha256": "5118da776a1eaeb2c68537322c3cb80bc4bd27d244853d5f7fd58d3d15eb160c",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            411,
+            1507,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1494,
+            394
+          ],
+          "uniform_scale": 0.8306559571619813,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            411
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+          "reference_sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2",
+          "prototype_file": "dog_female/sleep.webp",
+          "generator_file": "gpt-dog-f-sleep.png",
+          "generator_sha256": "aeb7ffdba74f4dd261aff6363553e529368a42db10967e3f77c07494bee75243"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "cao"
+    },
+    "cat_male": {
+      "height_m": 1.5,
+      "founder": false,
+      "sex": "male",
+      "assets": {
+        "idle": {
+          "source_file": "cat_male/idle.png",
+          "source_sha256": "289e701d0d442a5684efa4e3996769e7070464d9fb28846a996310cefa1d84dd",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            121,
+            65,
+            853,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            819,
+            1388
+          ],
+          "uniform_scale": 0.8933717579250721,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            121,
+            65
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/nick/idle.webp",
+          "reference_sha256": "e97fb01fa320a2bc2d43cfb8399fdb1d93e11bbdc30abda5b24e7d17eafbce63",
+          "prototype_file": "cat_male/idle.webp",
+          "generator_file": "gpt-cat-m-idle.png",
+          "generator_sha256": "df9fef3360447ca347fc6253c38052960cf02ebe272cd1807d673b8dacf0fec4"
+        },
+        "seat": {
+          "source_file": "cat_male/seat.png",
+          "source_sha256": "3e1e23b24bbf844032ae6cf11092039a10d10da4c111fb5747ba020a2a6bf406",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            60,
+            361,
+            820,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            942,
+            1170
+          ],
+          "uniform_scale": 0.8068376068376069,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            60,
+            361
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_gato_nick_seat.webp",
+          "reference_sha256": "4c29c3dfd8dd629d1b95b330f81068d5c82dffdb09344801c01be4e4cb176a66",
+          "prototype_file": "cat_male/seat.webp",
+          "generator_file": "gpt-cat-m-seat.png",
+          "generator_sha256": "33688d4377200bb8e12003418a7a64bcc7ddc3fad0b2c0da5cd84d451a2c7d5e"
+        },
+        "sleep": {
+          "source_file": "cat_male/sleep.png",
+          "source_sha256": "7f1d63939b03a21993f3b3c50a24f3cdda0038b733b26517e3250c3ee246267e",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            401,
+            1509,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1495,
+            405
+          ],
+          "uniform_scale": 0.831438127090301,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            401
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_gato_nick_sleep.webp",
+          "reference_sha256": "d974d4131d5ccd7f278af044d4b967da38ae6caac764ab36a8b1bf218b4ac010",
+          "prototype_file": "cat_male/sleep.webp",
+          "generator_file": "gpt-cat-m-sleep.png",
+          "generator_sha256": "f79ee245770581d1361bfb8f0cdcceca845bbbe16cd77aea79deb0a0728a3c9b"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "gato"
+    },
+    "cat_female": {
+      "height_m": 1.5,
+      "founder": false,
+      "sex": "female",
+      "assets": {
+        "idle": {
+          "source_file": "cat_female/idle.png",
+          "source_sha256": "63707df4d5430fa4a2d866e7cfde54fe21e6d2465da6ee2de9c3a935e452cfc9",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            94,
+            66,
+            868,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            859,
+            1375
+          ],
+          "uniform_scale": 0.901090909090909,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            94,
+            66
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/nick/idle.webp",
+          "reference_sha256": "e97fb01fa320a2bc2d43cfb8399fdb1d93e11bbdc30abda5b24e7d17eafbce63",
+          "prototype_file": "cat_female/idle.webp",
+          "generator_file": "gpt-cat-f-idle.png",
+          "generator_sha256": "ea5bb85351582d2d6bbfd86fcc7c0d7a071ffe69eb6a75afaea16ff826f1a23c"
+        },
+        "seat": {
+          "source_file": "cat_female/seat.png",
+          "source_sha256": "89b49b4cf2b4ecfd3ad0a81b43978b5e51800d88b75d4454e0b9aa791d4c76fa",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            59,
+            363,
+            818,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            944,
+            1172
+          ],
+          "uniform_scale": 0.8037542662116041,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            59,
+            363
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_gato_nick_seat.webp",
+          "reference_sha256": "4c29c3dfd8dd629d1b95b330f81068d5c82dffdb09344801c01be4e4cb176a66",
+          "prototype_file": "cat_female/seat.webp",
+          "generator_file": "gpt-cat-f-seat.png",
+          "generator_sha256": "110f795e91e0873cfd9a815ce8e5d9afdfe590906740af1db3fa5fb80068cfdc"
+        },
+        "sleep": {
+          "source_file": "cat_female/sleep.png",
+          "source_sha256": "5ded5cdf7ac052fb1ea0edfe67ed698dc561f0f994c8dda3b19309d73d05e906",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            395,
+            1509,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1496,
+            413
+          ],
+          "uniform_scale": 0.8308823529411765,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            395
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_gato_nick_sleep.webp",
+          "reference_sha256": "d974d4131d5ccd7f278af044d4b967da38ae6caac764ab36a8b1bf218b4ac010",
+          "prototype_file": "cat_female/sleep.webp",
+          "generator_file": "gpt-cat-f-sleep.png",
+          "generator_sha256": "ac0faf6160bae88e698afd1f055691e08af28909934beec999a82eeb2e004043"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "gato"
+    },
+    "frog_male": {
+      "height_m": 1.38,
+      "founder": false,
+      "sex": "male",
+      "assets": {
+        "idle": {
+          "source_file": "frog_male/idle.png",
+          "source_sha256": "ba19d1abcfeb3c537f0327b0a85de30d5f021e0fc1e045928d458330d75c6267",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            326,
+            64,
+            854,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            577,
+            1357
+          ],
+          "uniform_scale": 0.9145173176123802,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            326,
+            64
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/iris/idle.webp",
+          "reference_sha256": "e2da1f9727c8d5ba2801384d2eea5cad8696603c49cb852634359a6126690890",
+          "prototype_file": "frog_male/idle.webp",
+          "generator_file": "gpt-frog-m-idle.png",
+          "generator_sha256": "232a0f57e7461b67f4d726de3bef2a2f39785f8975acf0fee162528c77369c9f"
+        },
+        "seat": {
+          "source_file": "frog_male/seat.png",
+          "source_sha256": "8624c446cfab6b62ab7bec267b6a2c917436c267411896423739bebf0d973afe",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            336,
+            435,
+            815,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            664,
+            1207
+          ],
+          "uniform_scale": 0.7207953603976802,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            336,
+            435
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_sapo_iris_seat.webp",
+          "reference_sha256": "bd09f6888501d0ba611517c9c0424ce156c2c9d5848c80f3c78b925ef482c394",
+          "prototype_file": "frog_male/seat.webp",
+          "generator_file": "gpt-frog-m-seat.png",
+          "generator_sha256": "0439032fb04435f4c1b0030b0d19ddf8fb83a3d944f59546c26f5ca56519b6a3"
+        },
+        "sleep": {
+          "source_file": "frog_male/sleep.png",
+          "source_sha256": "9bf17751f6b386fdc9716e86d8f1cc78c4d10fa937e7ee40ad3ae3af3425acce",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            425,
+            1508,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1435,
+            362
+          ],
+          "uniform_scale": 0.8655052264808363,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            425
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_sapo_iris_sleep.webp",
+          "reference_sha256": "964932294edb16d70219455c1e2b0e20f62b15e156034957d36a19b304585aeb",
+          "prototype_file": "frog_male/sleep.webp",
+          "generator_file": "gpt-frog-m-sleep.png",
+          "generator_sha256": "7d64b335bda12e057e52fb7b2f11a8d433b59dd0fdb50a61fe2a2a3d42f80898"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "sapo"
+    },
+    "frog_female": {
+      "height_m": 1.38,
+      "founder": false,
+      "sex": "female",
+      "assets": {
+        "idle": {
+          "source_file": "frog_female/idle.png",
+          "source_sha256": "613af359c3f11fb49407038b3f1d225b3b19b03874c0d1b81729c1518d65269b",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            340,
+            65,
+            840,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            558,
+            1383
+          ],
+          "uniform_scale": 0.8966015907447578,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            340,
+            65
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/iris/idle.webp",
+          "reference_sha256": "e2da1f9727c8d5ba2801384d2eea5cad8696603c49cb852634359a6126690890",
+          "prototype_file": "frog_female/idle.webp",
+          "generator_file": "gpt-frog-f-idle.png",
+          "generator_sha256": "22b6184b26a08c1c7db52dab84235623903a617d0ca8dc4cb76b3e8be77909ed"
+        },
+        "seat": {
+          "source_file": "frog_female/seat.png",
+          "source_sha256": "e85a7c101244d1c101c7070c7328ed33b00902f65819e653e4487698d1f5b147",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            344,
+            436,
+            811,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            653,
+            1215
+          ],
+          "uniform_scale": 0.7152263374485597,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            344,
+            436
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_sapo_iris_seat.webp",
+          "reference_sha256": "bd09f6888501d0ba611517c9c0424ce156c2c9d5848c80f3c78b925ef482c394",
+          "prototype_file": "frog_female/seat.webp",
+          "generator_file": "gpt-frog-f-seat.png",
+          "generator_sha256": "2c8662dbb6b007985bfc3e54a7ffc0a35054e58e73991cd7fc8159d3ed1d522e"
+        },
+        "sleep": {
+          "source_file": "frog_female/sleep.png",
+          "source_sha256": "1ebbe1de661eaf8dcf402be1b1cfdeb48053a5fddd66d669412c3a44556ccfe2",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            267,
+            421,
+            1507,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1436,
+            367
+          ],
+          "uniform_scale": 0.8635097493036211,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            267,
+            421
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_sapo_iris_sleep.webp",
+          "reference_sha256": "964932294edb16d70219455c1e2b0e20f62b15e156034957d36a19b304585aeb",
+          "prototype_file": "frog_female/sleep.webp",
+          "generator_file": "gpt-frog-f-sleep.png",
+          "generator_sha256": "605afb63fe8351792092892a5df04fd53d7dd5b77063f8e34adcb0c23d3240da"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "sapo"
+    },
+    "owl_male": {
+      "height_m": 1.66,
+      "founder": false,
+      "sex": "male",
+      "assets": {
+        "idle": {
+          "source_file": "owl_male/idle.png",
+          "source_sha256": "baf697a50a462a3644f7f013779e2d7a195971e9b1fef313db6ce960f8b75b74",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            322,
+            65,
+            850,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            601,
+            1411
+          ],
+          "uniform_scale": 0.8788093550673282,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            322,
+            65
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/vespera/idle.webp",
+          "reference_sha256": "5d714a11c05f986eeb600f66c1a7c9c0546df04d0f95b50d7739a3f1f8681276",
+          "prototype_file": "owl_male/idle.webp",
+          "generator_file": "gpt-owl-m-idle.png",
+          "generator_sha256": "919ad7339b50a8b901450af8ffeaf7b784bd4219a905fd3a014a290e4f9335a8"
+        },
+        "seat": {
+          "source_file": "owl_male/seat.png",
+          "source_sha256": "d94886a2b200625c6b0e8894869f6e657a3d02c96c6f751e2cdcc2a6d445bcab",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            362,
+            854,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            780,
+            1251
+          ],
+          "uniform_scale": 0.753796962430056,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            362
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_coruja_vespera_seat.webp",
+          "reference_sha256": "0afe3332b279529c888572f195d92366fb06aeceac426c6d7ca0788e8b4af26c",
+          "prototype_file": "owl_male/seat.webp",
+          "generator_file": "gpt-owl-m-seat.png",
+          "generator_sha256": "0ccb879cf2ba6963d244d5c24d77517785a7404c0198cec28ca24b020e85beee"
+        },
+        "sleep": {
+          "source_file": "owl_male/sleep.png",
+          "source_sha256": "6e1f44102ab31ca8659bcba8fb097273e747a1ef71aa7a964ff7c7c842150c03",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            341,
+            1507,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1447,
+            463
+          ],
+          "uniform_scale": 0.8576364892881825,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            341
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_coruja_vespera_sleep.webp",
+          "reference_sha256": "4afd526ac19aa311b1573c2e6583938bd63723ed96b45576dc5499d6bd201f64",
+          "prototype_file": "owl_male/sleep.webp",
+          "generator_file": "gpt-owl-m-sleep.png",
+          "generator_sha256": "b8d7d3801676fc908e4b51f80d9cc9a1cce57be5f1a31421b75016cc7d14a8e9"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "coruja"
+    },
+    "owl_female": {
+      "height_m": 1.66,
+      "founder": false,
+      "sex": "female",
+      "assets": {
+        "idle": {
+          "source_file": "owl_female/idle.png",
+          "source_sha256": "40d09af0a360fd5a530dc2003a6a757e22d1634937b2e2275b4d5496354abdf4",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            324,
+            64,
+            853,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            613,
+            1438
+          ],
+          "uniform_scale": 0.8630041724617524,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            324,
+            64
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/vespera/idle.webp",
+          "reference_sha256": "5d714a11c05f986eeb600f66c1a7c9c0546df04d0f95b50d7739a3f1f8681276",
+          "prototype_file": "owl_female/idle.webp",
+          "generator_file": "gpt-owl-f-idle.png",
+          "generator_sha256": "08cd0ce918bb77e139b95eb798582bcbf2f09399a27a616427f2efc436dc4fec"
+        },
+        "seat": {
+          "source_file": "owl_female/seat.png",
+          "source_sha256": "5437f36222ff1e323872d56a96be97d028064290d703fceedcf6a7282dcc2031",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            280,
+            363,
+            851,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            764,
+            1260
+          ],
+          "uniform_scale": 0.7476190476190476,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            280,
+            363
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_coruja_vespera_seat.webp",
+          "reference_sha256": "0afe3332b279529c888572f195d92366fb06aeceac426c6d7ca0788e8b4af26c",
+          "prototype_file": "owl_female/seat.webp",
+          "generator_file": "gpt-owl-f-seat.png",
+          "generator_sha256": "3b7d925ece53f43a9f1bbd94d85ab18b9cccc7ebc7ed3fbb9abb27d2a9e7b4f6"
+        },
+        "sleep": {
+          "source_file": "owl_female/sleep.png",
+          "source_sha256": "006cc13c18d426a6151182cdaef452dea6a38782e6cf8ac1daf8f6cd341d062e",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            340,
+            1508,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1456,
+            466
+          ],
+          "uniform_scale": 0.853021978021978,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            340
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_coruja_vespera_sleep.webp",
+          "reference_sha256": "4afd526ac19aa311b1573c2e6583938bd63723ed96b45576dc5499d6bd201f64",
+          "prototype_file": "owl_female/sleep.webp",
+          "generator_file": "gpt-owl-f-sleep.png",
+          "generator_sha256": "f7795e0057abe91369724cf3e16bcfaffd1c2926cf3143ee03b8dfd9147ab8e9"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "coruja"
+    },
+    "raccoon_male": {
+      "height_m": 1.44,
+      "founder": false,
+      "sex": "male",
+      "assets": {
+        "idle": {
+          "source_file": "raccoon_male/idle.png",
+          "source_sha256": "568876a4c53883d4be7a7c23626e0ead4d0b0ef00c0ddeee47f2465c7da45962",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            66,
+            825,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            643,
+            1424
+          ],
+          "uniform_scale": 0.8700842696629213,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            66
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/bento/idle.webp",
+          "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+          "prototype_file": "raccoon_male/idle.webp",
+          "generator_file": "gpt-raccoon-m-idle.png",
+          "generator_sha256": "b72f37211b8cbd58db638a4385cde3dc4310a6403a920974398a56c5a8eef954"
+        },
+        "seat": {
+          "source_file": "raccoon_male/seat.png",
+          "source_sha256": "04bcf02d74ed3ed6900cf54be5e7976813c41f5683c53b697f9c371b2220c5ea",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            83,
+            411,
+            807,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            944,
+            1166
+          ],
+          "uniform_scale": 0.7667238421955404,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            83,
+            411
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+          "reference_sha256": "976b0742f1b20cd35537d24bf523fb76df38743d1a635cdea55d33d54ef29bab",
+          "prototype_file": "raccoon_male/seat.webp",
+          "generator_file": "gpt-raccoon-m-seat.png",
+          "generator_sha256": "a97bdae1f700051c79b394cb9216dd7c7b9e8227d07965cc934f3623d3e85409"
+        },
+        "sleep": {
+          "source_file": "raccoon_male/sleep.png",
+          "source_sha256": "93b0804f56af4aef4874215b821d0e4cc0ffd1b0bb707633689466977cd73936",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            396,
+            1509,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1495,
+            411
+          ],
+          "uniform_scale": 0.831438127090301,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            396
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+          "reference_sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2",
+          "prototype_file": "raccoon_male/sleep.webp",
+          "generator_file": "gpt-raccoon-m-sleep.png",
+          "generator_sha256": "f5aab345864cfbf0ff790677f9ecbb07cfe71c013dbfe960cff9acc757c3189d"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "rato"
+    },
+    "raccoon_female": {
+      "height_m": 1.44,
+      "founder": false,
+      "sex": "female",
+      "assets": {
+        "idle": {
+          "source_file": "raccoon_female/idle.png",
+          "source_sha256": "ce8a5a0e0bac0ff81cd6ab99a18bc5658daef90bcf1b93efad8a9368ca4763f2",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            196,
+            63,
+            810,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            700,
+            1417
+          ],
+          "uniform_scale": 0.876499647141849,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            196,
+            63
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/bento/idle.webp",
+          "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+          "prototype_file": "raccoon_female/idle.webp",
+          "generator_file": "gpt-raccoon-f-idle.png",
+          "generator_sha256": "1cdcba2f6cfaef2e61d63830297216adb1b33ad7a86263d850dee628deffe49f"
+        },
+        "seat": {
+          "source_file": "raccoon_female/seat.png",
+          "source_sha256": "a1b6158a3eb6ba1dc2609e5b955b0d1a2f7a4977fb7c03852fdf759a60b50c52",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            100,
+            411,
+            808,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            922,
+            1165
+          ],
+          "uniform_scale": 0.7673819742489271,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            100,
+            411
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+          "reference_sha256": "976b0742f1b20cd35537d24bf523fb76df38743d1a635cdea55d33d54ef29bab",
+          "prototype_file": "raccoon_female/seat.webp",
+          "generator_file": "gpt-raccoon-f-seat.png",
+          "generator_sha256": "301025adb46b7a2f563cefad88eab2f64378e55b2ed9ac923316a11bf8f5c0aa"
+        },
+        "sleep": {
+          "source_file": "raccoon_female/sleep.png",
+          "source_sha256": "1aca6611ab55a83149787baabe718bf8348f98d85b8e6dfac91687b435561380",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            404,
+            1507,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1504,
+            405
+          ],
+          "uniform_scale": 0.8251329787234043,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            404
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+          "reference_sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2",
+          "prototype_file": "raccoon_female/sleep.webp",
+          "generator_file": "gpt-raccoon-f-sleep.png",
+          "generator_sha256": "c0606aca0f330ce7ae2cec12ee60b4144bfb08bf13ab05f119287f4d1c44b3a0"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "rato"
+    },
+    "armadillo_male": {
+      "height_m": 1.56,
+      "founder": false,
+      "sex": "male",
+      "assets": {
+        "idle": {
+          "source_file": "armadillo_male/idle.png",
+          "source_sha256": "c698e1557b9ea144f49c1c44c75207b2bc5119216cced6af6f96c149127fddb5",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            122,
+            65,
+            847,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            848,
+            1450
+          ],
+          "uniform_scale": 0.8551724137931035,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            122,
+            65
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/bento/idle.webp",
+          "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+          "prototype_file": "armadillo_male/idle.webp",
+          "generator_file": "gpt-armadillo-m-idle.png",
+          "generator_sha256": "d90d68965179b641500fc15534531de87b89e02f277a9ec3d015b25f4c5f1559"
+        },
+        "seat": {
+          "source_file": "armadillo_male/seat.png",
+          "source_sha256": "18d29326f23da54e6327c224cb565134b1433749087d84c2dc3cc88d91154dee",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            146,
+            411,
+            785,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            1000,
+            1398
+          ],
+          "uniform_scale": 0.6394849785407726,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            146,
+            411
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+          "reference_sha256": "976b0742f1b20cd35537d24bf523fb76df38743d1a635cdea55d33d54ef29bab",
+          "prototype_file": "armadillo_male/seat.webp",
+          "generator_file": "gpt-armadillo-m-seat.png",
+          "generator_sha256": "ac7b594f4db64e8cb6081b58a2fce443fe6b280a26fb0bb008d795984fd177ea"
+        },
+        "sleep": {
+          "source_file": "armadillo_male/sleep.png",
+          "source_sha256": "21a1757da0f0c9c539512cc8cc7173c71245f353ef4a185b6367b3bb55c951bd",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            422,
+            1509,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1505,
+            383
+          ],
+          "uniform_scale": 0.8259136212624585,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            422
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+          "reference_sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2",
+          "prototype_file": "armadillo_male/sleep.webp",
+          "generator_file": "gpt-armadillo-m-sleep.png",
+          "generator_sha256": "8f797c89a608540a2c27a7861b9abe5897d2847554882a359147d42dc9ca283c"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "tatu"
+    },
+    "armadillo_female": {
+      "height_m": 1.56,
+      "founder": false,
+      "sex": "female",
+      "assets": {
+        "idle": {
+          "source_file": "armadillo_female/idle.png",
+          "source_sha256": "a214a10da5829a2256ddbfc477abb42c0b6d406de51cc97d18de35866517791b",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            142,
+            65,
+            815,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            794,
+            1463
+          ],
+          "uniform_scale": 0.8475734791524265,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            142,
+            65
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/combat/heroes/bento/idle.webp",
+          "reference_sha256": "cfc555c34ec360161f0170674bdd034253d4ade3435f5ea7e0998364908f87ff",
+          "prototype_file": "armadillo_female/idle.webp",
+          "generator_file": "gpt-armadillo-f-idle.png",
+          "generator_sha256": "dee2293030f8f537d8eca9e2d362ec148156ba5b5e91862a35dfaea090187274"
+        },
+        "seat": {
+          "source_file": "armadillo_female/seat.png",
+          "source_sha256": "8c19cecc6d3afa22ff424d86fb84e9420a37bd671b7d0642ad4df8f608661875",
+          "canvas": [
+            1178,
+            1335
+          ],
+          "texture_canvas": [
+            589,
+            668
+          ],
+          "anchor": [
+            589,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            168,
+            412,
+            779,
+            1305
+          ],
+          "raw_component": [
+            0,
+            0,
+            965,
+            1411
+          ],
+          "uniform_scale": 0.632884479092842,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            168,
+            412
+          ],
+          "contact": "feet",
+          "contact_y": 1305,
+          "reference_file": "res://art/station/poses/hero_cao_bento_seat.webp",
+          "reference_sha256": "976b0742f1b20cd35537d24bf523fb76df38743d1a635cdea55d33d54ef29bab",
+          "prototype_file": "armadillo_female/seat.webp",
+          "generator_file": "gpt-armadillo-f-seat.png",
+          "generator_sha256": "9e45b4ee6efb0d53563c2407b84d0e3f68910b67492b655f3cb6a690b99e1e5e"
+        },
+        "sleep": {
+          "source_file": "armadillo_female/sleep.png",
+          "source_sha256": "41b707431394f17643a3d31d6e8761749a3bfe666b0d39af3f5c655b51459382",
+          "canvas": [
+            1774,
+            886
+          ],
+          "texture_canvas": [
+            887,
+            443
+          ],
+          "anchor": [
+            887,
+            738
+          ],
+          "body_reference_pixels": 1240,
+          "visible": [
+            266,
+            420,
+            1508,
+            738
+          ],
+          "raw_component": [
+            0,
+            0,
+            1486,
+            381
+          ],
+          "uniform_scale": 0.8358008075370121,
+          "fit_correction": 1.0,
+          "horizontal_registration_correction": 0,
+          "translation": [
+            266,
+            420
+          ],
+          "contact": "bed",
+          "contact_y": 738,
+          "reference_file": "res://art/station/poses/hero_cao_bento_sleep.webp",
+          "reference_sha256": "b18c2bd6bb879c331c5e8e07de83156c3b7d9cb57095077e8ebef6ab94a19dc2",
+          "prototype_file": "armadillo_female/sleep.webp",
+          "generator_file": "gpt-armadillo-f-sleep.png",
+          "generator_sha256": "0d22d255fcd80454635c9ef06388ba388ddd57070a0e6d4860955e70e98332d8"
+        }
+      },
+      "costume_origin": "codex-pr244-originals-r4",
+      "game_id": null,
+      "class_id": "tatu"
+    }
+  }
+}

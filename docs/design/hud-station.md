@@ -13,8 +13,9 @@ Aprovado e integrado na `main` com o kit da luta (#97).
 
 - **Estados:**
   - Em forma: acima de 75% da vida;
-  - Ferimento leve: de 50% a 75%;
-  - Ferimento grave: abaixo de 50%.
+  - Ferimento leve: de 30% a 75%;
+  - Ferimento grave: abaixo de 30% (o `Threshold` de `data/wounded.json`, o mesmo limite do herói ferido que manca na
+    exploração, #194).
 - **Instinto em ferrugem.** O XP continua violeta.
 - **Teclas novas, só nas telas da Estação:** V/LB para VER DETALHES e G/X para PREPARAR EXPEDIÇÃO.
 - **A linha acima do nome:** "Fundador" nos quatro fundadores e "Recruta" nos recrutas, no lugar de "Sobrevivente da
@@ -75,8 +76,8 @@ As provas:
   - âmbar: Ferimento leve (curativos em X);
   - vermelho: Ferimento grave (coração rachado).
   - **Por quê:** os heróis não têm gênero nos dados, e o alvo dizia "Levemente ferida" para a Íris e a Véspera.
-  - **Limites propostos** (a regra de hoje é ferido abaixo de 50%): Em forma a partir de 75% da vida, Ferimento leve
-    de 50% a 75%, Ferimento grave abaixo de 50%.
+  - **Limites** (decisão do Lucas, 28/10): Em forma acima de 75% da vida, Ferimento leve de 30% a 75%, Ferimento
+    grave abaixo de 30% (o `Threshold` de `data/wounded.json`, o mesmo do herói ferido da exploração, #194).
   - Decisão do Lucas: os nomes e os limites.
 - **"Sobrevivente da Estação"** fica como no alvo, para todos os heróis: o termo "fundador" é interno, e a narrativa não
   diz que o Bento fundou a Estação.

@@ -27,6 +27,8 @@ signal formation_requested
 signal formation_swap(a: String, b: String)
 
 const S = preload("res://scripts/ui/ui_style.gd")
+## O coração rachado do herói ferido (#194) no canto do retrato da equipe (px).
+const WOUND_MARK := 22
 const STEP_LABELS := {"start": "Partida", "combat": "Patrulha", "loot": "Suprimentos", "rest": "Descanso", "passage": "Passagem",
 	"boss": "Guardião", "nick": "Encontro", "train": "Trem"}
 
@@ -122,7 +124,7 @@ var _hint_time := 0.0
 var _weather := ""
 ## Os ícones dos trechos da rota (os nós do mapa da Unreal).
 const STEP_ICONS := {"start": "node-start", "combat": "node-combat", "loot": "node-loot", "rest": "node-rest",
-	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "node-boss"}
+	"passage": "node-event", "boss": "node-boss", "nick": "node-event", "train": "train_arrival"}
 ## A casa do corredor (o lado do quadrado) e o elo entre duas.
 const CELL := 46.0
 const LINK := 12.0
@@ -643,7 +645,25 @@ func _mate(hero: Dictionary) -> PanelContainer:
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(row)
 	var art: Dictionary = AHCombatArena.hero_art_of(hero.id, String(hero.get("art_variant", ""))).get("idle", {})
-	row.add_child(AHKit.portrait(S.face_texture(art), 52))
+	var face := AHKit.portrait(S.face_texture(art), 52)
+	if AHWounded.is_wounded(hero):
+		# Ferido (#194): o coração rachado da Sala dos Personagens no canto do retrato, com a dica. Some com a vida de volta
+		# acima do limite (a placa é refeita a cada refresh).
+		var holder := Control.new()
+		holder.custom_minimum_size = Vector2(52, 52)
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.add_child(face)
+		var mark := AHKit.glyph("state_wounded", WOUND_MARK, AHKit.alert_text())
+		mark.name = "Wounded"
+		mark.size = Vector2(WOUND_MARK, WOUND_MARK)
+		mark.position = Vector2(52 - WOUND_MARK + 4, 52 - WOUND_MARK + 4)
+		mark.tooltip_text = tr("Precisa se recuperar")
+		# A dica aparece, e o clique sobe para a plaquinha (a Formação escolhe o herói clicando nela).
+		mark.mouse_filter = Control.MOUSE_FILTER_PASS
+		holder.add_child(mark)
+		row.add_child(holder)
+	else:
+		row.add_child(face)
 	var info := VBoxContainer.new()
 	info.add_theme_constant_override("separation", 4)
 	info.custom_minimum_size = Vector2(140, 0)
@@ -1334,7 +1354,7 @@ func show_event(campaign: Dictionary) -> void:
 			if first == null and available:
 				first = button
 	if first:
-		first.grab_focus.call_deferred()
+		AHKit.focus_later(first)
 
 
 ## Uma escolha do evento: a linha de lista com o ícone (a ferramenta, o triângulo do risco ou a seta), o texto e, à
@@ -1520,7 +1540,7 @@ func show_menu(completed: bool, can_return: bool, blocked_note: String = "") -> 
 		key.position = Vector2(resume.size.x - key.size.x - 52.0, (resume.size.y - key.size.y) * 0.5))
 	box.add_child(resume)
 	_place_menu.call_deferred()
-	resume.grab_focus.call_deferred()
+	AHKit.focus_later(resume)
 
 
 ## O pé do Menu acima das cabeças (MENU_BOTTOM), centrado à direita do cartão do objetivo (MENU_CENTER_X).
@@ -1632,7 +1652,7 @@ func show_choice(title: String, text: String, options: Array) -> void:
 			button.icon = AHKit.icon("station")
 			button.add_theme_constant_override("icon_max_width", 28)
 		box.add_child(button)
-	first.grab_focus.call_deferred()
+	AHKit.focus_later(first)
 	# No Maior a equipe alarga o painel: ele fica centrado na largura de verdade, sem cobrir o cartão do objetivo.
 	_center_modal.call_deferred()
 
@@ -1679,7 +1699,7 @@ func _confirm_new_campaign() -> void:
 		new_campaign.emit())
 	go.add_theme_color_override("font_color", AHKit.alert_text())
 	box.add_child(go)
-	stay.grab_focus.call_deferred()
+	AHKit.focus_later(stay)
 
 
 ## A expedição ainda está na rua (sem resultado): concluir ou sair faz sentido.
@@ -1717,7 +1737,7 @@ func _confirm_return(completed: bool) -> void:
 	back.icon = AHKit.icon("station")
 	back.add_theme_constant_override("icon_max_width", 28)
 	row.add_child(back)
-	stay.grab_focus.call_deferred()
+	AHKit.focus_later(stay)
 
 
 # ---------------------------------------------------------------- resultado
@@ -1759,4 +1779,4 @@ func show_result(result: String, delivered: Dictionary, campaign: Dictionary, bu
 		box.add_child(label)
 	var button := _primary(button_text, "station", tr("%s / A") % S.key_name("interact"), func(): result_continue.emit())
 	box.add_child(button)
-	button.grab_focus.call_deferred()
+	AHKit.focus_later(button)

@@ -36,9 +36,9 @@ um cenário que já existe, na mesma câmera, com a mesma equipe e no mesmo pont
 |---|---|
 | O chão em perspectiva até a parede, com poças e sujeira, e a base da parede encostada nele | O piso é um plano só, da parede até a frente da câmera, visto em perspectiva pelo motor. A pintura é vista de cima (concreto em placas, poças, lama, a faixa amarela gasta, ralo, raízes nas juntas) e cai inteira em cada zona, com a sujeira e a água do pé da parede encostadas nela. A parede desce 20 cm abaixo do piso (a base pintada com sujeira e linha d'água), e uma faixa de água parada corre no pé dela. O piso é úmido (a superfície da Estação com a umidade): as lâmpadas fazem a poça de luz nele |
 | A câmera e a escala da exploração (heróis maiores, parede mais baixa, o alto no escuro) | As zonas têm a medida do Abrigo Lacrado (10 m de largura, 4,8 de fundo); a parede tem 4,3 m, com o terço de cima indo para o preto, e o teto fica no escuro. Os heróis saem do mesmo tamanho que nos outros cenários (ver os lado a lado) |
-| Planos em profundidade | Pilares de concreto na frente da parede, com as lâmpadas neles; objetos no chão no pé da parede (caixas, tambores, carrinho, rolo de cabo, raízes, grade solta) e alguns na frente da faixa; o primeiro plano a 8 m da câmera (a faixa fica a 19 m), que passa rápido na frente dela: canos no alto, cabos pendurados e um cano quebrado, um pouco escurecidos e com o desfoque e o alfa macio na pintura (o card em alpha blend, para o desfoque aparecer inteiro, é do código; nas capturas ele já está assim); e as aberturas da parede (a passagem do corredor, as duas celas, a porta da rota do Nick, o túnel da plataforma) recortadas no alfa, com uma caixa funda de verdade atrás e uma luz fraca perto da boca, que some no escuro |
+| Planos em profundidade | Pilares de concreto na frente da parede, com as lâmpadas neles; objetos no chão no pé da parede (caixas, tambores, carrinho, rolo de cabo, grade solta) e alguns na frente da faixa; o primeiro plano a 8 m da câmera (a faixa fica a 19 m), que passa rápido na frente dela: canos no alto, cabos pendurados e um cano quebrado, um pouco escurecidos e com o desfoque e o alfa macio na pintura (o card em alpha blend, para o desfoque aparecer inteiro, é do código; nas capturas ele já está assim); e as aberturas da parede (a passagem do corredor, as duas celas, a porta da rota do Nick, o túnel da plataforma) recortadas no alfa, com uma caixa funda de verdade atrás e uma luz fraca perto da boca, que some no escuro |
 | A luz: poças vermelhas no chão e na parede, névoa baixa, reflexo na água, a luz fria do vagão no fim | Cada lâmpada é o card aceso e duas luzes vermelhas curtas, com sombra: uma sai da própria lâmpada, rente à parede (o cone que desce pela parede e pelo pilar), e uma logo abaixo e à frente dela (a poça no pé da parede, entrando na faixa); entre uma e outra, o escuro. A sombra delas encosta no chão os objetos, os inimigos e a equipe. A água do pé da parede e do fosso brilha com elas. A névoa rente ao chão e o ambiente baixo são do código (protótipo na captura, abaixo). O vagão é o card com o interior aceso e três luzes frias nas portas, que pintam a plataforma de azul e puxam o olho para a saída |
-| A parede sem repetição | Uma parede pintada por zona, sem repetir: painel solto com a fiação, duto que dobra, canos que entram no chão, placas sem texto, manchas de umidade, o buraco com raízes e água, a caixa elétrica, a faixa de perigo interrompida e raspada |
+| A parede sem repetição | Uma parede pintada por zona, sem repetir: painel solto com a fiação, duto que dobra, canos que entram no chão, placas sem texto, manchas de umidade, o buraco com vergalhão e água, a caixa elétrica, a faixa de perigo interrompida e raspada |
 | As lutas dentro do mapa | A luta do tutorial é no corredor de contenção, com a patrulha da zona 1 (a captura da luta e as telas da dica de luta foram refeitas sobre ela) |
 | A saída é o trem | A última zona é a plataforma: a porta aberta da direita do vagão fica no fim da zona, sob uma luz fria; a equipe anda até ela e embarca ([zone_platform_exit](tutorial/zone_platform_exit.webp)). O resto do vagão entra no escuro do túnel |
 
@@ -46,7 +46,7 @@ um cenário que já existe, na mesma câmera, com a mesma equipe e no mesmo pont
 
 Um subsolo de manutenção dos Antigos, que entrou em contenção (`bento-nick-arc.md`, §3 e §4): corredores de concreto
 com a faixa de perigo, uma sala com celas de grade, portas de segurança que baixam sozinhas, lâmpadas de emergência
-vermelhas, raízes entrando pelas frestas e água no chão. No fim, uma plataforma de trem esquecida, com um vagão parado
+vermelhas, fissuras no concreto e água no chão. No fim, uma plataforma de trem esquecida, com um vagão parado
 e a luz fria acesa por dentro: o embarque é a saída do mapa. Nada de humano, nada de nome de sistema: as máquinas e as
 portas são a contenção automática, como pede a escada de revelações (`narrative-design.md`, §7 e §14).
 
@@ -61,9 +61,9 @@ HUD da exploração e o lado a lado com um cenário de hoje.
 
 | Zona | Na Godot | Com a HUD | Lado a lado (mesma câmera) | O que tem |
 |---|---|---|---|---|
-| 1. O corredor de contenção | [zone_corridor](tutorial/zone_corridor.webp) | [hud](tutorial/zone_corridor_hud.webp) | [com o Abrigo Lacrado](tutorial/compare_corridor.webp) | A passagem para o escuro do lado, os pilares com as lâmpadas, caixas, tambores, rolo de cabo e raízes no pé da parede, a grade solta e o cano no primeiro plano. A primeira luta é aqui |
+| 1. O corredor de contenção | [zone_corridor](tutorial/zone_corridor.webp) | [hud](tutorial/zone_corridor_hud.webp) | [com o Abrigo Lacrado](tutorial/compare_corridor.webp) | A passagem para o escuro do lado, os pilares com as lâmpadas, caixas, tambores e rolo de cabo no chão, a grade solta e o cano no primeiro plano. A primeira luta é aqui |
 | 2. A sala das celas | [zone_cells](tutorial/zone_cells.webp) | [hud](tutorial/zone_cells_hud.webp) | [com o Abrigo Lacrado](tutorial/compare_cells.webp) | As duas celas fundas atrás das grades, o armário de manutenção (a busca), o painel das portas, o carrinho, os cabos no primeiro plano |
-| 3. A rota do Nick | [zone_nick_route](tutorial/zone_nick_route.webp) | [hud](tutorial/zone_nick_route_hud.webp) | [com os Dutos de Esgoto](tutorial/compare_nick_route.webp) | A porta de segurança baixada atrás da equipe, o buraco com raízes e água, o duto com a grade arrancada, a escada até o alçapão, os canos e a grade de proteção no primeiro plano |
+| 3. A rota do Nick | [zone_nick_route](tutorial/zone_nick_route.webp) | [hud](tutorial/zone_nick_route_hud.webp) | [com os Dutos de Esgoto](tutorial/compare_nick_route.webp) | A porta de segurança baixada atrás da equipe, o buraco com vergalhão e água, o duto com a grade arrancada, a escada até o alçapão, os canos e a grade de proteção no primeiro plano |
 | 4. A plataforma e o trem | [zone_platform](tutorial/zone_platform.webp) · [o embarque](tutorial/zone_platform_exit.webp) | [hud](tutorial/zone_platform_hud.webp) | [com o Portão de Triagem](tutorial/compare_platform.webp) | A plataforma com a faixa amarela, o fosso com o vagão aceso por dentro, a parede de azulejo com o túnel no escuro. A porta aberta do vagão, no fim da zona, é a saída |
 
 ![O corredor de contenção, ao lado do Abrigo Lacrado](tutorial/compare_corridor.webp)
@@ -99,10 +99,9 @@ iluminados pela cena (tipo `art`), como a parede. As medidas são as do mapa (`b
 | `T_TU24` | 10,6 × 10,6 | 1024 × 506 | O piso da rota do Nick: o `T_TU02` espelhado, para as zonas não repetirem as mesmas poças (novo) |
 | `T_TU09` | 12 × 4,8 | 1024 × 434 | O piso da plataforma, com a faixa amarela na beira do lado do trem (tipo `art`, na face de cima da caixa, como os pisos do Abrigo) |
 | `T_TU04` | 1,73 × 2,39 | 1024 × 572 | As grades da cela, na abertura |
-| `T_TU05` | 1,6 a 1,9 | 1024 × 667 | As raízes no piso |
-| `T_TU06` | 3,32 × 4,31 | 788 × 1024 | A escada até o alçapão aberto |
+| `T_TU06` | 3,32 × 4,32 | 788 × 1024 | A escada até o alçapão aberto |
 | `T_TU07` | 1,15 × 1,27 | 868 × 958 | O duto com a grade arrancada |
-| `T_TU08`, `T_TU08_Lit` | 0,3 × 0,45 | 149 × 222 | A lâmpada de emergência apagada e acesa |
+| `T_TU08`, `T_TU08_Lit` | 0,5 × 1,6 | 256 × 819 | A luminária de emergência apagada e acesa: a caixa de aço blindada com a lente vermelha e o eletroduto subindo para o escuro (a lâmpada antiga saiu em 28/10, `tutorial-acabamento.md`) |
 | `T_TU10` | 10 × 4,02 | 1024 × 412 | O vagão, com a luz fria por dentro e as portas abertas |
 | `T_TU14` a `T_TU17`, `T_TU19` | 0,8 a 1,5 | 233 a 409 px de altura | Os objetos do chão: caixas, tambores, carrinho, grade solta com entulho, rolo de cabo (novos) |
 | `T_TU20` a `T_TU22` | 3,3 × 0,6; 2,9 × 1,02; 0,3 × 1,62 | 1024 × 186; 788 × 277; 123 × 661 | O primeiro plano: canos, cabos pendurados, cano quebrado, um pouco escurecidos e desfocados, com o alfa macio (novos) |
@@ -110,7 +109,11 @@ iluminados pela cena (tipo `art`), como a parede. As medidas são as do mapa (`b
 | `T_TUX02_Maintenance_Locker` (+ `_Open`) | 1,25 × 1,62 | 788 × 1024 | O armário de manutenção (a busca) |
 | `T_TUX03_Door_Panel` (+ `_Open`) | 0,55 × 0,87 | 645 × 1024 | O painel das portas |
 
-São 29 arquivos (12 novos; `T_TU01`, `T_TU02` e `T_TU03` refeitos, sem repetição). Da folha do primeiro plano, a grade
+O acabamento no jogo de 28/10 (as faces dos pilares `T_TU25` e `T_TU26`, o concreto do lugar `T_TU27` no lugar do
+concreto do Abrigo, a porta de enrolar `T_TUX04` e a escada `T_TU06` refeita) está em
+[tutorial-acabamento.md](tutorial-acabamento.md).
+
+São 28 arquivos (12 novos; desde 28/10, sem o `T_TU05` das raízes; `T_TU01`, `T_TU02` e `T_TU03` refeitos, sem repetição). Da folha do primeiro plano, a grade
 de proteção ficou de fora (no chão perto da câmera, ela sai do quadro), e da folha dos objetos, a raiz caída (igual à
 `T_TU05`).
 
@@ -330,7 +333,7 @@ As correções da rodada 1 conferidas; a arte, as prévias e as telas reproduzem
 saem iguais. Observações baixas:
 - a fala da visita subia pouco no Maior e encostava na barra de baixo: agora sobe 24 px (aplicado depois do veredito);
 - a prévia da plataforma empilhava dois pisos: a faixa de andar inteira usa o `T_TU09` (aplicado);
-- o clareado do `T_TU08_Lit` deixa manchas no vidro, que não aparecem no tamanho de uso (cerca de 40 px): se a lâmpada
+- (até 28/10, com a lâmpada antiga) o clareado do `T_TU08_Lit` deixa manchas no vidro, que não aparecem no tamanho de uso (cerca de 40 px): se a lâmpada
   for vista de perto, clarear o vidro por uma máscara da área dele.
 
 ### Rodada 3 (os ajustes do Lucas de 26/10): REPROVADO

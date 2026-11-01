@@ -1,0 +1,107 @@
+{
+  "actors": [
+    {
+      "body_height": 1.72,
+      "id": "hero_cao_bento",
+      "position": "Vector3(-1.3, 0, 1.25)"
+    },
+    {
+      "body_height": 1.66,
+      "id": "hero_coruja_vespera",
+      "position": "Vector3(4.7683717e-08, 0, 1.25)"
+    },
+    {
+      "body_height": 1.5,
+      "id": "hero_gato_nick",
+      "position": "Vector3(1.3000001, 0, 1.25)"
+    },
+    {
+      "body_height": 1.38,
+      "id": "hero_sapo_iris",
+      "position": "Vector3(2.6000001, 0, 1.25)"
+    },
+    {
+      "body_height": 1.44,
+      "id": "raccoon",
+      "position": "Vector3(3.9, 0, 1.25)"
+    },
+    {
+      "body_height": 1.56,
+      "id": "armadillo",
+      "position": "Vector3(5.2, 0, 1.25)"
+    }
+  ],
+  "after": "external proposed WebP loaded as ImageTexture in memory",
+  "base_commit": "561f798",
+  "before": "main code/data/current art and heights",
+  "engine": "4.7.2-stable (official)",
+  "height_only": "diagnostic: old art at target heights, not main",
+  "lineup_camera": "Transform3D(1, 0, 0, 0, 0.9781476, 0.2079117, 0, -0.2079117, 0.9781476, 1.95, 4.90184, 13.663473)",
+  "lineup_fov": 26.0,
+  "physical_gpu": false,
+  "renderer": "OpenGL Compatibility / Mesa llvmpipe CPU / Xvfb",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "same_process_pairs": true,
+  "screenshots": {
+    "lineup_before": {
+      "png_sha256": "3c46ea07a05ffeb22f07c1cbb3a97610952b174bb457b72e28e1fddef8108e16",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "lineup_after": {
+      "png_sha256": "d3227492ac7a28d92fbafa8696e3d759902afe2349928d037be715b3ae04a6e6",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "fight_before": {
+      "png_sha256": "be05abbb4b620b752b69bc77034dcd950a980a80fe68c8106e064ef567fb5614",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "fight_after": {
+      "png_sha256": "0c9358e6e0f1197be8db561ffe40d777ab2e0f3264704af5afffab4566eafe59",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "camp_seat_before": {
+      "png_sha256": "43e443cad5a840c51a78e6ae3842f79fabd0254212a6a26b4808d855e08eab5e",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "camp_seat_after": {
+      "png_sha256": "e49c6cb5101fdc4a75878f344da4a6fb80c6257749c081af5f3eca7b1e5cdc0c",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "camp_sleep_before": {
+      "png_sha256": "da79832c559a43a03ac47d1bda65a333d04e616245ed912557e075846d326bf8",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "camp_sleep_after": {
+      "png_sha256": "bc3a1d4e992a7dd9f11c878d8ec44a9014b19d10e6897dac370a189b5aca5965",
+      "size": [
+        1920,
+        1080
+      ]
+    }
+  },
+  "camp_pairs": "Same team, camera and paused instant; only body art/heights overridden in memory; original positions retained."
+}

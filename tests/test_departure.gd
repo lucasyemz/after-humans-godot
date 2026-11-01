@@ -1,7 +1,7 @@
 ## A partida no vagão (#75): ao confirmar a Preparação, a passagem mostra a equipe escolhida no vagão em movimento e
 ## termina no título da fase, que abre o mapa.
-## - A equipe certa no vagão (1 a 4 heróis): os fundadores sentados (pose *_seat), os recrutas de pé nas pontas; os
-##   mortos e quem ficou na Estação não aparecem.
+## - A equipe certa no vagão (1 a 4 heróis): os fundadores sentados de frente (pose *_seat_front, #256) nos lugares do
+##   contrato, os recrutas de pé na frente do lugar; os mortos e quem ficou na Estação não aparecem.
 ## - O título da fase só depois do passeio; "Reduzir efeitos" tira o vagão (só o título).
 ## - Pular abre a mesma fase; sem pular, também.
 ## - Um save gravado no meio da passagem abre direto na fase.
@@ -24,6 +24,7 @@ func run(context) -> void:
 	await _departure("late")
 	await _departure("early")
 	_reduced()
+	await _sparks()
 	Tips.enabled = tips
 	if _tree.current_scene != null:
 		_tree.unload_current_scene()
@@ -44,8 +45,9 @@ func _campaign() -> Dictionary:
 	c.station.rooms[AHStationRules.CHARACTERS] = 4
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 31
+	# Quatro recrutas direto no elenco, como num save antigo (o recrutamento não repete rosto, #182).
 	for class_id in ["cao", "gato", "cao", "gato"]:
-		AHStationRules.recruit(c, class_id, rng, "Teste")
+		AHStationRules._add_hero(c, AHStationRules._next_hero_id(c, class_id), class_id, "Teste", [], "")
 	return c
 
 
@@ -54,6 +56,11 @@ func _teams() -> void:
 	Campaign.state = c
 	var founders: Array = c.roster.slice(0, 4).map(func(h): return h.id)
 	var recruits: Array = c.roster.slice(4).map(func(h): return h.id)
+	# O contrato que vai no jogo é a cópia do design (docs fica fora da exportação).
+	var design = JSON.parse_string(FileAccess.get_file_as_string("res://docs/design/trem-2d/contract.json"))
+	t.check(design != null and design == AHTrainCar.contract(), "data/presentation/train_2d.json é igual ao contrato do design")
+	var contract: Dictionary = AHTrainCar.contract().passage
+	var slots: Array = contract.seats.map(func(seat): return float(seat.seat_support[0]))
 	for team in [founders.slice(0, 1), founders.slice(0, 2), founders, [founders[0], recruits[0], founders[1], recruits[1]], recruits.slice(0, 1),
 			recruits, [recruits[0], founders[0], founders[1], founders[2]], [founders[0], recruits[0], recruits[1], recruits[2]]]:
 		var ride := AHWagonRide.new(team)
@@ -64,28 +71,18 @@ func _teams() -> void:
 		var want: Array = team.duplicate()
 		want.sort()
 		t.equal(ids, want, "a equipe certa no vagão (%d)" % team.size())
-		t.check(ride.seats.all(func(s): return s.seated == founders.has(s.id)), "os fundadores sentados e os recrutas de pé (%s)" % [team])
-		# Quem está de pé fica nas pontas: entre dois sentados não há ninguém de pé.
-		var shape: String = "".join(ride.seats.map(func(s): return "s" if s.seated else "p"))
-		t.check(_edges_only(shape), "os de pé nas pontas do banco (%s)" % shape)
-		var xs: Array = ride.seats.map(func(s): return s.card.position.x)
-		t.check(xs.all(func(x): return x >= AHWagonRide.FRAME_X[0] and x <= AHWagonRide.FRAME_X[1]), "todos no quadro (%s)" % [xs])
-		var sitting: Array = ride.seats.filter(func(s): return s.seated)
-		t.check(sitting.all(_on_bench), "os sentados dentro do assento (%s)" % [xs])
-		var standing: Array = ride.seats.filter(func(s): return not s.seated)
-		var apart := true
-		for a in standing:
-			for b in ride.seats:
-				if a != b and absf(a.card.position.x - b.card.position.x) < (AHWagonRide.STAND_SLOT if not b.seated else (AHWagonRide.STAND_SLOT + AHWagonRide.SEAT_SLOT) * 0.5) - 0.01:
-					apart = false
-		t.check(apart, "quem está de pé não se sobrepõe a ninguém (%s)" % [xs])
-		# A posição 1 fica à direita dos seus: dos sentados, se está sentada; de todos, se está de pé.
-		var first: Dictionary = ride.seats.filter(func(s): return s.id == team[0])[0]
-		var group: Array = sitting if first.seated else ride.seats
-		t.check(group.all(func(s): return s.card.position.x <= first.card.position.x), "a posição 1 à direita (%s)" % [team])
-		t.check(ride.seats.all(func(s): return is_instance_valid(s.card) and s.card.mesh != null and s.card._texture != null),
-			"cada um com a arte carregada")
-		_floor_beyond_near(ride)
+		t.check(ride.seats.all(func(s): return s.seated == founders.has(s.id)), "os fundadores sentados de frente e os recrutas de pé (%s)" % [team])
+		# Cada um no vão de um lugar do contrato (entre as barras), sem dois no mesmo.
+		var used: Array = []
+		for s in ride.seats:
+			var hit: Array = slots.filter(func(x): return _covers(s.card, x))
+			if hit.size() >= 1 and not used.has(hit[0]):
+				used.append(hit[0])
+		t.equal(used.size(), ride.seats.size(), "cada um no vão do seu lugar (%s)" % [team])
+		t.check(ride.seats.filter(func(s): return s.seated).all(func(s): return _hip_on_seat(s, contract)), "o quadril de quem senta no assento")
+		# A posição 1 fica no lugar mais à direita.
+		t.equal(ride.seats[-1].id, team[0], "a posição 1 à direita (%s)" % [team])
+		t.check(ride.seats.all(func(s): return is_instance_valid(s.card) and s.card.texture != null), "cada um com a arte carregada")
 		ride.free()
 	# Os mortos não embarcam.
 	c.roster[1].alive = false
@@ -94,36 +91,38 @@ func _teams() -> void:
 	await _tree.process_frame
 	t.equal(ride.seats.map(func(s): return s.id), [founders[0]], "quem morreu não aparece no vagão")
 	ride.free()
+	c.roster[1].alive = true
+	# As poses sentadas pela direção do banco (#253): de lado na cantina, de frente (com o ponto hip) no vagão.
+	var poses: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/station_poses.json"))
+	for hero_id in founders:
+		t.equal(String(poses[hero_id + "_seat"].get("facing", "")), "side", "%s: a pose sentada da cantina é de lado" % hero_id)
+		var front: Dictionary = poses.get(hero_id + "_seat_front", {})
+		t.check(front.get("facing", "") == "front" and front.has("hip") and ResourceLoader.exists(String(front.get("file", ""))),
+			"%s: a de frente existe, com o ponto hip" % hero_id)
+		t.equal(AHSkins.seat_pose(poses, hero_id, "front").get("file", ""), front.get("file", ""), "e é a que o banco de frente pede")
+	# A skin sem a pose de frente (a Ronda do Bento, #253): de pé na skin, e não sentado na roupa padrão.
+	c.roster[0].skin_id = "bento_watch"
+	ride = AHWagonRide.new(founders.slice(0, 1))
+	_tree.root.add_child(ride)
+	await _tree.process_frame
+	t.check(not ride.seats[0].seated and String(ride.seats[0].card.texture.resource_path).contains("skins/bento/watch"),
+		"o Bento de Ronda fica de pé, na Ronda")
+	ride.free()
+	c.roster[0].erase("skin_id")
 
 
-## O chão que aparece nos cantos de baixo da tela fica além do corte da câmera (senão a borda de baixo mostra o vazio
-## embaixo do chão), com folga para o balanço.
-func _floor_beyond_near(ride: AHWagonRide) -> void:
-	var camera: Camera3D = ride._camera
-	var view := camera.get_viewport().get_visible_rect().size
-	var worst := INF
-	for point in [Vector2(0, view.y - 1), Vector2(view.x * 0.5, view.y - 1), Vector2(view.x - 1, view.y - 1)]:
-		var origin := camera.project_ray_origin(point)
-		var normal := camera.project_ray_normal(point)
-		if normal.y >= 0.0:
-			continue
-		var hit := origin + normal * ((AHWagonRide.FLOOR_Y - origin.y) / normal.y)
-		worst = minf(worst, (hit - camera.global_position).dot(-camera.global_basis.z))
-	t.check(worst >= camera.near + 0.05, "o chão da borda de baixo fica além do corte da câmera (%.2f m; corte %.2f m)" % [worst, camera.near])
+## O Sprite2D cobre o x (px no quadro).
+func _covers(card: Sprite2D, x: float) -> bool:
+	var left := card.position.x
+	return x > left and x < left + card.texture.get_width() * card.scale.x
 
 
-func _on_bench(spot: Dictionary) -> bool:
-	var x: float = spot.card.position.x
-	return x >= AHWagonRide.BENCH_START and x <= AHWagonRide.BENCH_END
-
-
-func _edges_only(shape: String) -> bool:
-	var inner := shape.strip_edges()
-	while inner.begins_with("p"):
-		inner = inner.substr(1)
-	while inner.ends_with("p"):
-		inner = inner.left(-1)
-	return not inner.contains("p")
+func _hip_on_seat(spot: Dictionary, contract: Dictionary) -> bool:
+	var poses: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/presentation/station_poses.json"))
+	var pose: Dictionary = poses[String(spot.id) + "_seat_front"]
+	var card: Sprite2D = spot.card
+	var hip := card.position + Vector2(pose.hip[0], pose.hip[1]) * card.scale
+	return contract.seats.any(func(seat): return hip.distance_to(Vector2(seat.seat_support[0], seat.seat_support[1])) < 1.0)
 
 
 ## Da Estação para a fase pela Preparação confirmada: o vagão, o título da fase depois e a rua aberta na fase certa. O
@@ -232,3 +231,18 @@ func _press(action: String) -> void:
 		event.pressed = pressed
 		_tree.root.push_input(event)
 		await _tree.process_frame
+
+
+## A faísca do vagão (#256): na freada, nas quatro rodas, com a luz no trilho; com "Reduzir efeitos", nem uma nem outra.
+func _sparks() -> void:
+	for enabled in [true, false]:
+		var car := AHTrainCar.new()
+		car.sparks_enabled = enabled
+		_tree.root.add_child(car)
+		car.brake(true, 1.0, 1.0)
+		var particles: Array = car.find_children("*", "CPUParticles3D", true, false)
+		t.equal(particles.size(), 4, "uma faísca em cada roda")
+		t.check(particles.all(func(p): return p.emitting == enabled and ((p.get_child(0) as OmniLight3D).light_energy > 0.0) == enabled),
+			"a faísca e a luz %s" % ("na freada" if enabled else "fora com Reduzir efeitos"))
+		car.free()
+	await _tree.process_frame

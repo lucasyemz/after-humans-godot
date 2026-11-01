@@ -1,0 +1,403 @@
+{
+  "issue": 221,
+  "base_commit": "5bb2928",
+  "source_tag": "codex-pr231-originals",
+  "dependency": {
+    "issue": 225,
+    "source_tag": "codex-pr229-originals",
+    "note": "Recruits use approved redraw, not old production proportions."
+  },
+  "actors": {
+    "bento": {
+      "id": "hero_cao_bento",
+      "name": "Bento",
+      "skin_id": null,
+      "height_m": 1.72,
+      "new_pose": "combat_idle",
+      "baseline": {
+        "file": "res://art/combat/heroes/bento/idle.webp",
+        "anchor": [
+          473.0,
+          1429
+        ],
+        "body_reference_pixels": 1419,
+        "body_width_pixels": 822,
+        "canvas": [
+          1086,
+          1448
+        ],
+        "portrait": "res://art/ui/portraits/bento.png"
+      },
+      "states": {
+        "exploration": {
+          "canvas": [
+            1086,
+            1448
+          ],
+          "anchor": [
+            473.0,
+            1429
+          ],
+          "body_reference_pixels": 1419,
+          "prototype_file": "bento/exploration.webp",
+          "source_file": null,
+          "reused_from": "res://art/combat/heroes/bento/idle.webp"
+        },
+        "combat": {
+          "canvas": [
+            1086,
+            1448
+          ],
+          "anchor": [
+            473.0,
+            1429
+          ],
+          "body_reference_pixels": 1419,
+          "prototype_file": "bento/combat.webp",
+          "source_file": "bento/combat_idle.png",
+          "reused_from": null
+        }
+      }
+    },
+    "nick": {
+      "id": "hero_gato_nick",
+      "name": "Nick",
+      "skin_id": null,
+      "height_m": 1.5,
+      "new_pose": "combat_idle",
+      "baseline": {
+        "file": "res://art/combat/heroes/nick/idle.webp",
+        "anchor": [
+          488.5,
+          1286
+        ],
+        "body_reference_pixels": 1255,
+        "body_width_pixels": 825,
+        "canvas": [
+          1178,
+          1335
+        ],
+        "portrait": "res://art/ui/portraits/nick.png"
+      },
+      "states": {
+        "exploration": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            488.5,
+            1286
+          ],
+          "body_reference_pixels": 1255,
+          "prototype_file": "nick/exploration.webp",
+          "source_file": null,
+          "reused_from": "res://art/combat/heroes/nick/idle.webp"
+        },
+        "combat": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            488.5,
+            1286
+          ],
+          "body_reference_pixels": 1255,
+          "prototype_file": "nick/combat.webp",
+          "source_file": "nick/combat_idle.png",
+          "reused_from": null
+        }
+      }
+    },
+    "iris": {
+      "id": "hero_sapo_iris",
+      "name": "Íris",
+      "skin_id": null,
+      "height_m": 1.38,
+      "new_pose": "combat_idle",
+      "baseline": {
+        "file": "res://art/combat/heroes/iris/idle.webp",
+        "anchor": [
+          587.5,
+          1264
+        ],
+        "body_reference_pixels": 1208,
+        "body_width_pixels": 777,
+        "canvas": [
+          1178,
+          1335
+        ],
+        "portrait": "res://art/ui/portraits/iris.png"
+      },
+      "states": {
+        "exploration": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            587.5,
+            1264
+          ],
+          "body_reference_pixels": 1208,
+          "prototype_file": "iris/exploration.webp",
+          "source_file": null,
+          "reused_from": "res://art/combat/heroes/iris/idle.webp"
+        },
+        "combat": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            587.5,
+            1264
+          ],
+          "body_reference_pixels": 1208,
+          "prototype_file": "iris/combat.webp",
+          "source_file": "iris/combat_idle.png",
+          "reused_from": null
+        }
+      }
+    },
+    "vespera": {
+      "id": "hero_coruja_vespera",
+      "name": "Véspera",
+      "skin_id": null,
+      "height_m": 1.66,
+      "new_pose": "combat_idle",
+      "baseline": {
+        "file": "res://art/combat/heroes/vespera/idle.webp",
+        "anchor": [
+          451.0,
+          1297
+        ],
+        "body_reference_pixels": 1271,
+        "body_width_pixels": 834,
+        "canvas": [
+          1178,
+          1335
+        ],
+        "portrait": "res://art/ui/portraits/vespera.png"
+      },
+      "states": {
+        "exploration": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            451.0,
+            1297
+          ],
+          "body_reference_pixels": 1271,
+          "prototype_file": "vespera/exploration.webp",
+          "source_file": null,
+          "reused_from": "res://art/combat/heroes/vespera/idle.webp"
+        },
+        "combat": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            451.0,
+            1297
+          ],
+          "body_reference_pixels": 1271,
+          "prototype_file": "vespera/combat.webp",
+          "source_file": "vespera/combat_idle.png",
+          "reused_from": null
+        }
+      }
+    },
+    "raccoon": {
+      "id": "raccoon_recruit_01",
+      "name": "Guaxinim",
+      "skin_id": null,
+      "height_m": 1.44,
+      "new_pose": "combat_idle",
+      "baseline": {
+        "source_file": "raccoon/rato-idle.png",
+        "source_sha256": "bc4011dc1af3960599935f3baa972c0169031b9109839de3b4b5b950392b7065",
+        "prototype_file": "raccoon/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "texture_canvas": [
+          589,
+          668
+        ],
+        "anchor": [
+          588.5,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "body_width_pixels": 453,
+        "visible": [
+          362,
+          65,
+          815,
+          1305
+        ],
+        "world_width_m": 0.5261,
+        "old_reference": "art/combat/recruits/raccoon_recruit_01/idle.webp",
+        "old_origin": "MAIN",
+        "old_sha256": "12aa5fff94371d7fe3e120fb4f040dd7a4a8798cd49067c012628d9117c01674",
+        "file": "tag://codex-pr229-originals/art/combat/source/recruits_redraw_20261028/raccoon/rato-idle.png",
+        "source_tag": "codex-pr229-originals"
+      },
+      "states": {
+        "exploration": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "prototype_file": "raccoon/exploration.webp",
+          "source_file": "raccoon/rato-idle.png",
+          "reused_from": "tag://codex-pr229-originals/art/combat/source/recruits_redraw_20261028/raccoon/rato-idle.png"
+        },
+        "combat": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            588.5,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "prototype_file": "raccoon/combat.webp",
+          "source_file": "raccoon/combat_idle.png",
+          "reused_from": null
+        }
+      }
+    },
+    "armadillo": {
+      "id": "armadillo_recruit_01",
+      "name": "Tatu",
+      "skin_id": null,
+      "height_m": 1.56,
+      "new_pose": "idle",
+      "baseline": {
+        "source_file": "armadillo/tatu-idle.png",
+        "source_sha256": "5dbef43bc82481bb5a84d38e7f03cbf14776bdce28ca61c581114d0c05b5e5eb",
+        "prototype_file": "armadillo/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "texture_canvas": [
+          589,
+          668
+        ],
+        "anchor": [
+          589.0,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "body_width_pixels": 674,
+        "visible": [
+          252,
+          65,
+          926,
+          1305
+        ],
+        "world_width_m": 0.8479,
+        "old_reference": "art/combat/recruits/armadillo_recruit_01/idle.webp",
+        "old_origin": "MAIN",
+        "old_sha256": "dc443043f43b13fe4e04609b8af7942c5e07c96a64dbabf6614048b2d7035836",
+        "file": "tag://codex-pr229-originals/art/combat/source/recruits_redraw_20261028/armadillo/tatu-idle.png",
+        "source_tag": "codex-pr229-originals"
+      },
+      "states": {
+        "exploration": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "prototype_file": "armadillo/exploration.webp",
+          "source_file": "armadillo/idle.png",
+          "reused_from": null
+        },
+        "combat": {
+          "canvas": [
+            1178,
+            1335
+          ],
+          "anchor": [
+            589.0,
+            1305
+          ],
+          "body_reference_pixels": 1240,
+          "prototype_file": "armadillo/combat.webp",
+          "source_file": "armadillo/tatu-idle.png",
+          "reused_from": "tag://codex-pr229-originals/art/combat/source/recruits_redraw_20261028/armadillo/tatu-idle.png"
+        }
+      }
+    },
+    "watch": {
+      "id": "hero_cao_bento",
+      "name": "Bento Ronda",
+      "skin_id": "watch",
+      "height_m": 1.72,
+      "new_pose": "combat_idle",
+      "baseline": {
+        "file": "res://art/skins/bento/watch/idle.webp",
+        "anchor": [
+          473.0,
+          1429
+        ],
+        "body_reference_pixels": 1419,
+        "body_width_pixels": 822,
+        "canvas": [
+          1086,
+          1448
+        ],
+        "portrait": "res://art/ui/portraits/bento.png"
+      },
+      "states": {
+        "exploration": {
+          "canvas": [
+            1086,
+            1448
+          ],
+          "anchor": [
+            473.0,
+            1429
+          ],
+          "body_reference_pixels": 1419,
+          "prototype_file": "watch/exploration.webp",
+          "source_file": null,
+          "reused_from": "res://art/skins/bento/watch/idle.webp"
+        },
+        "combat": {
+          "canvas": [
+            1086,
+            1448
+          ],
+          "anchor": [
+            473.0,
+            1429
+          ],
+          "body_reference_pixels": 1419,
+          "prototype_file": "watch/combat.webp",
+          "source_file": "watch/combat_idle.png",
+          "reused_from": null
+        }
+      }
+    }
+  }
+}

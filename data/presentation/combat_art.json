@@ -3125,5 +3125,46 @@
 		"RobotHeal": "res://audio/combat/RobotHeal.wav",
 		"RobotPunch": "res://audio/combat/RobotPunch.wav",
 		"UIClick": "res://audio/combat/UIClick.wav"
+	},
+	"npcs": {
+		"merchant": {
+			"idle": {
+				"file": "res://art/civilians/merchant/idle.webp",
+				"canvas": [
+					1086,
+					1448
+				],
+				"anchor": [
+					664.0,
+					1429
+				],
+				"body_reference_pixels": 1419
+			},
+			"walk": {
+				"file": "res://art/civilians/merchant/walk.webp",
+				"canvas": [
+					1086,
+					1448
+				],
+				"anchor": [
+					488.0,
+					1429
+				],
+				"body_reference_pixels": 1419
+			},
+			"trade": {
+				"file": "res://art/civilians/merchant/trade.webp",
+				"canvas": [
+					1086,
+					1448
+				],
+				"anchor": [
+					635.9,
+					1429
+				],
+				"body_reference_pixels": 1419
+			},
+			"portrait": "res://art/ui/portraits/merchant.webp"
+		}
 	}
 }

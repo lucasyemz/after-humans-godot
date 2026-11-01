@@ -15,6 +15,8 @@ const BUSES := ["Music", "Ambience", "SFX", "UI"]
 ## efeitos (as Opções têm três controles).
 const SETTING_OF := {"Music": "music_volume", "Ambience": "ambience_volume", "SFX": "sfx_volume", "UI": "sfx_volume"}
 const MIX := "res://data/presentation/audio_mix.json"
+## O tempo de relógio, ao fechar, para o servidor de áudio descartar os sons parados (quit).
+const RELEASE_SECONDS := 0.25
 ## Os passos de cada classe (altura e volume): o Bento pesado, o Nick leve.
 const HERO_STEPS := {"cao": [0.88, 0.85], "gato": [1.12, 0.5], "sapo": [1.0, 0.65], "coruja": [1.05, 0.6]}
 const FOOTSTEP_VARIANTS := {"water": 4, "wood": 5, "concrete": 5}
@@ -22,6 +24,7 @@ const FOOTSTEP_VARIANTS := {"water": 4, "wood": 5, "concrete": 5}
 ## Música, ambiente e chuva: um par de players por canal (o que sai e o que entra).
 var _channels: Array = []
 var _effects: Array[AudioStreamPlayer] = []
+## Onde a busca do tocador livre começa (a roda gira, para um som novo não pegar sempre o primeiro).
 var _next_effect := 0
 var _refresh := 0.0
 var _streams := {}
@@ -66,9 +69,48 @@ func _ready() -> void:
 			_mix[path] = float(table.files[path].get("gain_db", 0.0))
 	Campaign.changed.connect(apply_volumes)
 	apply_volumes()
+	# Fechar a janela passa pelo quit daqui (o Campaign grava o tempo jogado no mesmo aviso).
+	get_tree().auto_accept_quit = false
 
 
 ## Os volumes das opções (0 a 1) nos canais.
+## Ao sair do jogo (#66): para os tocadores e solta os sons que eles e o cache de laços seguram. Sem isso, o que estava
+## tocando ao fechar (a música, o ambiente, um efeito) ficava preso no servidor de áudio e vazava na saída. A paisagem
+## sonora também para, para não voltar a tocar a música da cena.
+func release() -> void:
+	set_process(false)
+	for channel in _channels:
+		if channel.tween:
+			channel.tween.kill()
+	if _duck_tween:
+		_duck_tween.kill()
+	for player in get_children():
+		if player is AudioStreamPlayer:
+			player.stop()
+			player.stream = null
+	_streams.clear()
+
+
+func _exit_tree() -> void:
+	release()
+
+
+## Fechar o jogo (#66) sem prender som: solta tudo, espera o servidor de áudio descartar o que parou na mixagem seguinte
+## (uns 80 ms de relógio; 0,25 s de folga) e só então fecha. A janela fechada passa por aqui (auto_accept_quit desligado
+## no _ready), e as ferramentas de captura e a suíte de testes também.
+func quit(code: int = 0) -> void:
+	release()
+	var until := Time.get_ticks_msec() + int(RELEASE_SECONDS * 1000.0)
+	while Time.get_ticks_msec() < until:
+		await get_tree().process_frame
+	get_tree().quit(code)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		quit()
+
+
 func apply_volumes() -> void:
 	for bus in BUSES:
 		_apply_bus(bus)
@@ -180,14 +222,30 @@ func play(path: String, gain: float = 1.0, pitch: float = 1.0, bus: String = "SF
 	var stream: AudioStream = load(path)
 	if stream == null:
 		return null
-	var player := _effects[_next_effect]
-	_next_effect = (_next_effect + 1) % _effects.size()
+	var player := _free_effect()
 	player.stream = stream
 	player.bus = "UI" if bus == "SFX" and path.begins_with("res://audio/ui/") else bus
 	player.volume_db = linear_to_db(maxf(gain, 0.001)) + mix_db(path)
 	player.pitch_scale = pitch
 	player.play()
 	return player
+
+
+## O tocador para o próximo efeito (#72): o próximo livre na roda; com todos tocando, o que está mais perto de acabar
+## (o rodízio puro tomava o do trem, de 7 s, com dez efeitos curtos nesse tempo).
+func _free_effect() -> AudioStreamPlayer:
+	var best: AudioStreamPlayer = null
+	var best_left := INF
+	for step in _effects.size():
+		var player := _effects[(_next_effect + step) % _effects.size()]
+		if not player.playing:
+			_next_effect = (_next_effect + step + 1) % _effects.size()
+			return player
+		var left := player.stream.get_length() - player.get_playback_position() if player.stream != null else 0.0
+		if left < best_left:
+			best_left = left
+			best = player
+	return best
 
 
 ## Esmaece e para um efeito tocado por play (o som do trem que acaba antes do arquivo, #61). O tocador é reaproveitado:

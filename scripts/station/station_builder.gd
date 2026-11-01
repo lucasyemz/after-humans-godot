@@ -13,6 +13,9 @@ const LUMENS_PER_ENERGY := 260.0
 var root: Node3D
 ## Tudo o que foi criado, na ordem (como Generated da Unreal): marcas para agrupar o vagão e o mobiliário de cada sala.
 var generated: Array[Node3D] = []
+## Deslocamento (cm, eixos da Unreal) somado a tudo o que for criado: o mobiliário de um cômodo, escrito onde ele ficava,
+## vai para a vaga dele na grade (AHStationLayout). A umidade das superfícies acompanha o piso deslocado.
+var offset := Vector3.ZERO
 var _surfaces := {}
 var _materials := {}
 var _models := {}
@@ -67,6 +70,7 @@ func mark() -> int:
 ## Superfície projetada pelo mundo (Surface da Unreal): id da textura, piso do nível (cm, para a umidade), umidade, tinta
 ## e rugosidade.
 func surface(id: String, floor_z: float = 0.0, damp: float = 0.0, tint: Color = Color.WHITE, roughness: float = 1.0) -> Material:
+	floor_z += offset.z
 	var key := "s|%s|%s|%s|%s|%s" % [id, floor_z, damp, tint.to_html(), roughness]
 	if _materials.has(key):
 		return _materials[key]
@@ -133,7 +137,7 @@ func box(min_corner: Vector3, max_corner: Vector3, material: Material, shadow: b
 	var mesh := MeshInstance3D.new()
 	mesh.mesh = _cube
 	mesh.material_override = material
-	mesh.position = vu((min_corner + max_corner) * 0.5)
+	mesh.position = vu((min_corner + max_corner) * 0.5 + offset)
 	var size := (max_corner - min_corner).abs() * 0.01
 	mesh.scale = Vector3(maxf(size.x, 0.0005), maxf(size.z, 0.0005), maxf(size.y, 0.0005))
 	if not shadow:
@@ -155,7 +159,7 @@ func cylinder(center: Vector3, diameter: float, length: float, rotation: Vector3
 	var mesh := MeshInstance3D.new()
 	mesh.mesh = _cylinder
 	mesh.material_override = material
-	mesh.position = vu(center)
+	mesh.position = vu(center + offset)
 	mesh.basis = basis(rotation.x, rotation.y, rotation.z) * Basis.from_scale(Vector3(diameter, length, diameter) * 0.01)
 	_add(mesh)
 	return mesh
@@ -229,7 +233,7 @@ func prop(id: String, feet: Vector3, yaw: float = 0.0, scale: float = 1.0, paren
 	var bottom_center := Vector3(box.get_center().x, box.position.y, box.get_center().z)
 	var rotation := basis(0.0, yaw, 0.0)
 	node.basis = rotation * Basis.from_scale(Vector3.ONE * scale)
-	node.position = vu(feet) - rotation * (bottom_center * scale)
+	node.position = vu(feet + offset) - rotation * (bottom_center * scale)
 	_add(node, parent)
 	return node
 
@@ -261,7 +265,7 @@ func prop_placed(id: String, feet: Vector3, rotation: Vector3) -> Node3D:
 		var turned := turn * point
 		rotated = AABB(turned, Vector3.ZERO) if corner == 0 else rotated.expand(turned)
 	node.basis = turn
-	node.position = vu(feet) - Vector3(rotated.get_center().x, rotated.position.y, rotated.get_center().z)
+	node.position = vu(feet + offset) - Vector3(rotated.get_center().x, rotated.position.y, rotated.get_center().z)
 	return node
 
 
@@ -292,7 +296,7 @@ func card(name: String, base: Vector3, width: float, height: float, shadow: bool
 		mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var axis := vu(right).normalized()
 	mesh.basis = Basis(axis, Vector3.UP, axis.cross(Vector3.UP))
-	mesh.position = vu(base + Vector3(0, 0, height * 0.5))
+	mesh.position = vu(base + offset + Vector3(0, 0, height * 0.5))
 	_add(mesh)
 	return mesh
 
@@ -320,7 +324,7 @@ func contact(center: Vector3, size: Vector2, strength: float) -> MeshInstance3D:
 	mesh.mesh = quad
 	mesh.material_override = _materials[key]
 	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	mesh.position = vu(center + Vector3(0, 0, 0.3))
+	mesh.position = vu(center + offset + Vector3(0, 0, 0.3))
 	# PlaneMesh deita em XZ da Godot: o tamanho X é o X da Unreal e o Y (fundo) é o Z da Godot.
 	_add(mesh)
 	return mesh
@@ -330,7 +334,7 @@ func contact(center: Vector3, size: Vector2, strength: float) -> MeshInstance3D:
 
 func light(position: Vector3, lumens: float, radius: float, color: Color, shadows: bool) -> OmniLight3D:
 	var lamp := OmniLight3D.new()
-	lamp.position = vu(position)
+	lamp.position = vu(position + offset)
 	lamp.light_energy = lumens / LUMENS_PER_ENERGY
 	lamp.omni_range = radius * 0.01
 	lamp.omni_attenuation = 1.4
@@ -353,7 +357,7 @@ func sign(text: String, center: Vector3, size: float, color: Color, yaw: float =
 	label.pixel_size = size * 0.01 / 64.0
 	label.outline_size = 0
 	label.shaded = true
-	label.position = vu(center)
+	label.position = vu(center + offset)
 	label.rotation.y = -deg_to_rad(yaw)
 	_add(label, parent)
 	return label

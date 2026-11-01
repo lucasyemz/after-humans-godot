@@ -110,7 +110,7 @@ func restyle() -> void:
 	var focused := get_viewport().gui_get_focus_owner() == _toggle if get_viewport() != null else false
 	_build()
 	if focused:
-		_toggle.grab_focus.call_deferred()
+		AHKit.focus_later(_toggle)
 
 
 # ---------------------------------------------------------------- a faixa do alto
@@ -309,11 +309,18 @@ func _chips(c: Dictionary, result: String) -> Array:
 	var posts: Array = report.get("posts", []).filter(func(p): return int(p.get("amount", 0)) > 0)
 	if not posts.is_empty():
 		out.append({"icon": "room_quarters", "text": tr("Postos: %s") % ", ".join(posts.map(func(p): return post_line(p))), "color": AHKit.TEXT})
+	# A escavação (#186): o bloco aberto e o que ele devolveu, ou quanto andou.
+	var dig: Dictionary = report.get("dig", {})
+	if not dig.is_empty():
+		out.append({"icon": "room_quarters", "text": AHStationGrid.report_line(dig), "color": AHKit.AMBER if dig.get("opened", false) else AHKit.TEXT})
 	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
 	if report.has("train"):
 		var arrived := String(report.train)
-		out.append({"icon": "train_arrival", "text": tr("Chegou alguém no trem: %s") % arrived if arrived != "" else tr("O trem veio vazio"),
-			"color": AHKit.AMBER if arrived != "" else AHKit.MUTED})
+		# O Mercador (#182, parte 2) não é alguém que chega para ficar: ele veio trocar.
+		var text := tr("Chegou alguém no trem: %s") % arrived if arrived != "" else tr("O trem veio vazio")
+		if report.get("merchant", false):
+			text = tr("O trem trouxe o Sr. dos Trilhos, o Mercador, para trocar")
+		out.append({"icon": "train_arrival", "text": text, "color": AHKit.AMBER if arrived != "" else AHKit.MUTED})
 	return out
 
 
@@ -518,6 +525,8 @@ static func post_line(entry: Dictionary) -> String:
 			return TranslationServer.translate("+%d suprimento") % amount if amount == 1 else TranslationServer.translate("+%d suprimentos") % amount
 		"days":
 			return TranslationServer.translate("%d caído mais perto de voltar") % amount if amount == 1 else TranslationServer.translate("%d caídos mais perto de voltar") % amount
+		"dig":
+			return TranslationServer.translate("+%d ponto de obra") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra") % amount
 	return ""
 
 
@@ -677,7 +686,7 @@ func _buttons() -> void:
 	_toggle.pressed.connect(toggle_details)
 	add_child(_toggle)
 	_fit_buttons()
-	_enter.grab_focus.call_deferred()
+	AHKit.focus_later(_enter)
 
 
 ## O botão principal âmbar com as divisas: o ícone, o texto e a tecla dentro (que cresce com o texto Maior).

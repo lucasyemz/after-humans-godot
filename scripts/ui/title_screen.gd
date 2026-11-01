@@ -110,7 +110,7 @@ func _build_buttons() -> void:
 	_note_label.text = Campaign.warning_text()
 	_note.visible = _note_label.text != ""
 	_set_keys([[[tr("Setas")], tr("Navegar")], [["interact"], tr("Confirmar")]])
-	(continue_button if continue_button != null else new_button).grab_focus.call_deferred()
+	AHKit.focus_later(continue_button if continue_button != null else new_button)
 
 
 ## Um botão do menu: o principal é o âmbar com a tecla de Interagir dentro; os outros, de aço.
@@ -159,7 +159,9 @@ static func _icon_beside_text(button: Button, texture: Texture2D, tint: Color, f
 		var center := left + (button.size.x - left - right) * 0.5
 		glyph.position = Vector2(center - text_width * 0.5 - 38.0, (button.size.y - 26.0) * 0.5)
 	button.resized.connect(place)
-	place.call_deferred()
+	# No quadro seguinte, pelo próprio botão: se o painel for refeito antes, a chamada cai junto com ele (a lambda
+	# adiada sozinha rodava com o botão e o ícone já liberados).
+	button.resized.emit.call_deferred()
 
 
 ## A chapinha do espaço do Continuar (Campaign.slot_summary): o número, o ciclo, as fases e os vivos.
@@ -280,7 +282,7 @@ func close_modal() -> void:
 	S.reset_focus(_buttons)
 	var back: Button = _opener if _opener != null and is_instance_valid(_opener) and _opener.is_inside_tree() else \
 		(continue_button if continue_button != null else new_button)
-	back.grab_focus.call_deferred()
+	AHKit.focus_later(back)
 
 
 ## Uma janela do kit: a chapa grande com o título em maiúsculas e o ícone (as Campanhas, a campanha nova, as Opções).
@@ -366,7 +368,9 @@ func _add_key(button: Button, text: String, action: String = "") -> void:
 		key.reset_size()
 		key.position = Vector2(center + text_width * 0.5 + 14.0, (button.size.y - key.size.y) * 0.5)
 	button.resized.connect(place)
-	place.call_deferred()
+	# No quadro seguinte, pelo próprio botão: se o painel for refeito antes, a chamada cai junto com ele (a lambda
+	# adiada sozinha rodava com o botão e o ícone já liberados).
+	button.resized.emit.call_deferred()
 
 
 func _continue() -> void:
@@ -404,7 +408,7 @@ func _open_slots(for_new: bool, focus_slot: int = 0) -> void:
 	_icon_beside_text(back, load("res://art/ui/icons/ui-arrow-right.svg"), AHKit.TEXT, true)
 	back.name = "Back"
 	box.add_child(back)
-	(first if first != null else back).grab_focus.call_deferred()
+	AHKit.focus_later(first if first != null else back)
 	_center_modal.call_deferred()
 
 
@@ -522,7 +526,7 @@ func _pick_slot(number: int, for_new: bool) -> void:
 		go.add_theme_color_override(state, AHKit.alert_text())
 	go.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(go)
-	stay.grab_focus.call_deferred()
+	AHKit.focus_later(stay)
 	_center_modal.call_deferred()
 
 
@@ -549,7 +553,7 @@ func _start_new_campaign(number: int) -> void:
 	_icon_beside_text(back, load("res://art/ui/icons/ui-arrow-right.svg"), AHKit.TEXT, true)
 	back.name = "Back"
 	box.add_child(back)
-	opening.grab_focus.call_deferred()
+	AHKit.focus_later(opening)
 	_center_modal.call_deferred()
 
 
@@ -685,7 +689,7 @@ func _capture(dir: String) -> void:
 		close_modal()
 		for file in DirAccess.get_files_at(Campaign.save_dir):
 			DirAccess.remove_absolute(Campaign.save_dir.path_join(file))
-	get_tree().quit()
+	Sound.quit()
 
 
 func _rebuild_for_capture() -> void:

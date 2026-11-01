@@ -123,6 +123,9 @@ func _bandage(t) -> void:
 	t.check(S.treat_block(c, team[0]) != "", "sem leito, o curativo não faz efeito")
 	c.inventory.scrap = 50
 	c.inventory.fragments = 50
+	# A Enfermaria começa soterrada (#186): abre-se a vaga dupla do 1º subsolo.
+	c.station.grid.cells[0][0] = AHStationGrid.FREE
+	c.station.grid.cells[0][1] = AHStationGrid.FREE
 	t.equal(S.upgrade_room(c, S.INFIRMARY, 0), "", "recuperar a Enfermaria com caídos esperando")
 	t.check(S.in_bed(bento), "recuperada a Enfermaria, os caídos vão na hora para o leito")
 	var bandages := S.quantity(c, "bandages")
@@ -249,6 +252,9 @@ func _room(t) -> void:
 	t.equal(S.next_level_cost(c, S.INFIRMARY), {"scrap": int(row.Scrap), "fragments": int(row.Fragments)}, "o custo vem de data/recovery.json")
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5
+	# Soterrada na campanha nova (#186): a vaga dupla do 1º subsolo aberta na mão.
+	c.station.grid.cells[0][0] = AHStationGrid.FREE
+	c.station.grid.cells[0][1] = AHStationGrid.FREE
 	t.equal(S.upgrade_room(c, S.INFIRMARY, 0), "", "recuperar a Enfermaria")
 	t.equal(S.room_level(c, S.INFIRMARY), 1, "nível 1")
 	t.equal(S.upgrade_room(c, S.INFIRMARY, 1), "", "melhorar a Enfermaria")

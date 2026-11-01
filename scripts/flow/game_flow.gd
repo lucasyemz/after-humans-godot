@@ -39,8 +39,12 @@ func _ready() -> void:
 	add_child(layer)
 
 
+## Cenas a mais, só para os testes (uma que não carrega, para conferir a saída limpa da passagem).
+static var test_scenes := {}
+
+
 static func scene_path(scene_id: String) -> String:
-	return SCENES.get(scene_id, "")
+	return SCENES.get(scene_id, test_scenes.get(scene_id, ""))
 
 
 ## Primeira cena depois do boot: a tela de título (#28). O modo de captura da rua (--capture=) monta a própria campanha e
@@ -100,12 +104,20 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	var path := scene_path(scene_id)
 	if path == "" or busy:
 		push_warning("GameFlow: cena desconhecida ou troca em andamento (%s)." % scene_id)
+		# A cena de fundo do cartão (o vagão, #75) já nasceu e não vai para a árvore: sai aqui, para não ficar órfã.
+		var refused = card.get("backdrop")
+		if refused is Node and is_instance_valid(refused) and refused.get_parent() == null:
+			refused.free()
 		return false
 	busy = true
 	params = scene_params
 	if card.is_empty():
 		card = card_for(scene_id)
-	ResourceLoader.load_threaded_request(path)
+	# O arquivo que sumiu nem vai para o carregamento (ele soltava dois erros do motor antes do nosso): a passagem abre e
+	# termina em _travel_failed como a cena que quebrou.
+	var missing := not ResourceLoader.exists(path)
+	if not missing:
+		ResourceLoader.load_threaded_request(path)
 	await _fade_to(1.0)
 	var tree := get_tree()
 	# A cena de antes sai já no preto: nada por trás do cartão anda nem recebe tecla enquanto a outra carrega.
@@ -125,6 +137,8 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	# Sem pular, o cartão fica o mínimo e até o título acender (numa máquina lenta, o título atrasado ainda aparece).
 	while scene == null or not (passage.skipped or (Time.get_ticks_msec() - opened >= hold * 1000.0 and passage.title_lit)):
 		await tree.process_frame
+		if missing:
+			return await _travel_failed(scene_id, path)
 		if packed == null:
 			var status := ResourceLoader.load_threaded_get_status(path)
 			if status == ResourceLoader.THREAD_LOAD_LOADED:
@@ -132,6 +146,8 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 			elif status != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
 				# O pedido em segundo plano falhou (ou já foi consumido): carrega aqui mesmo.
 				packed = load(path)
+			if packed == null:
+				return await _travel_failed(scene_id, path)
 		elif scene == null and (passage.title_delay <= 0.0 or passage.title_lit) and passage.sound_settled():
 			# Com a cena de fundo andando (o vagão, #75), a montagem (um quadro travado) espera o título aceso por cima.
 			# A cena nova monta por baixo do cartão (opaco), parada: não anda nem recebe tecla até o cartão sair. Só
@@ -154,6 +170,20 @@ func travel(scene_id: String, card: Dictionary = {}, scene_params: Dictionary = 
 	await _fade_to(0.0)
 	busy = false
 	return true
+
+
+## A cena não carregou (o arquivo sumiu ou quebrou): o cartão sai, a troca termina sem prender o busy e o jogo volta
+## ao título (a cena de antes já saiu no preto: sem isto, a tela ficava vazia e sem tecla).
+func _travel_failed(scene_id: String, path: String) -> bool:
+	push_error("GameFlow: a cena %s não carregou." % path)
+	passage.end_sound(AHPassageCard.SOUND_SKIP_FADE, false)
+	passage.queue_free()
+	passage = null
+	busy = false
+	if scene_id != "title":
+		await change_to("title", {}, false)
+	await _fade_to(0.0)
+	return false
 
 
 static func reduced_effects() -> bool:

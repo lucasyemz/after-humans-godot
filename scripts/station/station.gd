@@ -11,22 +11,15 @@ const S := preload("res://scripts/flow/station_rules.gd")
 
 const STATION_END := 27.6
 const CORE_X1 := 33.6
-const LEFT_END := -12.4
+## A ponta esquerda da grade (AHStationLayout.GRID_X0) e o piso do 3º subsolo, em metros.
+const LEFT_END := -14.4
+const BOTTOM := -13.6
 const DOOR_X := 22.0
 const PANEL_SLIDE := 3.0
 
-## Cômodos (a tabela Rooms da Unreal, na ordem do menu): extensão em X, piso e teto e a faixa livre de passeio.
-const ROOMS := [
-	{"id": "characters", "x0": -0.4, "x1": 7.6, "floor": -5.2, "ceiling": -2.0, "lane": [1.1, 6.1]},
-	{"id": "canteen", "x0": 15.6, "x1": STATION_END, "floor": -5.2, "ceiling": -2.0, "lane": [17.2, 25.6]},
-	{"id": "bar", "x0": 7.6, "x1": 15.6, "floor": -5.2, "ceiling": -2.0, "lane": [9.1, 14.1]},
-	{"id": "dormitory", "x0": -12.4, "x1": -0.4, "floor": -5.2, "ceiling": -2.0, "lane": [-10.9, -1.9]},
-	{"id": "forge", "x0": 11.6, "x1": 21.6, "floor": -10.4, "ceiling": -6.2, "lane": [13.6, 19.6]},
-	{"id": "depot", "x0": 5.6, "x1": 11.6, "floor": -9.4, "ceiling": -6.2, "lane": [7.2, 10.3]},
-	{"id": "research", "x0": -6.4, "x1": 5.6, "floor": -9.4, "ceiling": -6.2, "lane": [-4.9, 4.1]},
-	{"id": "preparation", "x0": 21.6, "x1": STATION_END, "floor": -9.4, "ceiling": -6.2, "lane": [22.9, 26.2]},
-	{"id": "infirmary", "x0": -12.4, "x1": -6.4, "floor": -9.4, "ceiling": -6.2, "lane": [-11.2, -7.6]},
-]
+## Os cômodos na ordem do menu e do Plano da Estação. Onde cada um fica sai da grade da campanha (AHStationLayout, #186):
+## room_def e rooms dão a extensão em X, o piso e o teto, a faixa livre de passeio e a profundidade de quem anda ali.
+const ROOM_ORDER := ["characters", "canteen", "bar", "dormitory", "forge", "depot", "research", "preparation", "infirmary"]
 ## Profundidade em que os moradores ficam (a faixa de passeio da Unreal, Y -330).
 const LANE_Z := -3.3
 ## Chance de um morador dividir um cômodo já ocupado (no máximo dois).
@@ -38,15 +31,20 @@ const TRAIN_WALK_SPEED := 3.0
 const STOP_GAP := 1.1
 ## Quantas vezes quem chega num ponto cheio procura outro antes de parar mesmo assim (a faixa sem lugar nenhum).
 const REROUTE_LIMIT := 12
-## Banco atrás da mesa da Cantina: os dois lugares e a profundidade (CanteenSeats, CanteenSeatY).
+## Banco atrás da mesa da Cantina: os dois lugares e a profundidade (CanteenSeats, CanteenSeatY), no molde da Cantina
+## (o deslocamento até a vaga sai de room_def). Com a Cantina no fogareiro da plataforma, os bancos são os dois do lado dele.
 const CANTEEN_SEATS := [17.6, 19.4]
 const CANTEEN_SEAT_Z := -5.94
+const PLATFORM_SEATS := [11.3, 14.5]
+const PLATFORM_SEAT_Z := -9.3
 ## Trabalho por sala (#80): o herói fundador, o cômodo e a pose. Só vale com o cômodo recuperado e ligado.
 const WORK_POSES := {"hero_cao_bento": "forge", "hero_gato_nick": "depot", "hero_sapo_iris": "research", "hero_coruja_vespera": "research"}
 ## A fila do relatório e da partida na plataforma, diante da parede de serviço (ReportCenterX, ReportSpacing, ReportY).
 const LINE_CENTER_X := 13.8
 const LINE_SPACING := 2.1
 const LINE_Z := -6.4
+## O segundo do trem (#182) espera a esta distância do primeiro (m).
+const COMPANION_GAP := 1.4
 ## O relatório no kit (#60): os centros das cartas dos heróis a 416 px um do outro, e os pés da fila logo acima delas.
 const REPORT_CARD_STEP := 416.0
 const REPORT_FEET_Y := 634.0
@@ -58,6 +56,8 @@ const REPORT_SPACING := 2.6
 ## escala medida na tela é 381 px por metro de body_height, e os pés caem perto de y 878, como antes.
 const STAGE_FEET := 890.0
 const STAGE_PX_PER_METER := 381.0
+## A folga mínima, em px de 1080, entre a arte do escolhido e cada painel da Sala (o teste confere com o Tatu no Maior).
+const STAGE_MARGIN := 16.0
 ## O trem (#61), na ordem da cena: o aviso (o sinal pisca e o sino toca) por TRAIN_WARNING s; o trem entra do túnel
 ## freando em 3,2 s (TrainSlideEnd da Unreal) e para em TRAIN_STOP; as portas abrem de TRAIN_DOOR_START a TRAIN_DOOR_END;
 ## o candidato desce e anda; só então a câmera fecha nele. Na saída: o recusado volta ao trem, o sino avisa, as portas
@@ -82,8 +82,12 @@ const LEAVE_HOLD := 2.5
 ## A câmera da vista geral anda para os lados (#131): o deslocamento em metros, nos limites (na distância da vista geral,
 ## cerca de 330 px para cada lado: as pontas da Estação chegam perto do meio da tela).
 const PAN_RANGE := Vector2(-12.0, 13.0)
+## E para baixo (#186): o 3º subsolo aparece arrastando a vista geral (m; 0 é a vista da plataforma e dos dois primeiros).
+const PAN_Y_RANGE := Vector2(-1.6, 0.0)
 ## Ao escolher um cômodo, a câmera aproxima: as paredes do lado saem um pouco do quadro (m).
 const ROOM_CROP := 0.6
+## A largura mínima (m) do quadro de um canto da plataforma.
+const PLATFORM_FRAME := 3.6
 ## A distância mínima (m) de quem desce atrás para quem vai na frente.
 const FOLLOW_GAP := 1.0
 ## Quanto antes de parar o freio começa (s).
@@ -113,7 +117,10 @@ var _asking_overview := false
 var _hold_until := 0
 ## O deslocamento da vista geral (m) e se a câmera está nela (só ali ele vale).
 var pan := 0.0
+var pan_y := 0.0
 var _in_overview := true
+## A grade montada (AHStationLayout.signature): quando muda, a cena remonta a grade.
+var _grid_signature := ""
 var _build: AHStationBuild
 var _walkers: Array = []
 var occlusion: AHOcclusion
@@ -142,6 +149,8 @@ var _train_time := 0.0
 signal train_event(name: String)
 var _warning_time := -1.0
 var _candidate: AHSpriteCard
+## O segundo que desceu do trem (#182), à espera da vez dele.
+var _companion: AHSpriteCard
 var _candidate_id := ""
 var _pending_arrival := ""
 ## O som do trem que está tocando (esmaece na parada e quando o trem some, #61).
@@ -181,12 +190,6 @@ func _ready() -> void:
 	_build.build()
 	# O que liga e desliga fica separado; o resto vira uma malha por material.
 	var keep := {}
-	for nodes in _build.dressing.values():
-		for node in nodes:
-			keep[node] = true
-	for entry in _build.stock:
-		for node in entry[1]:
-			keep[node] = true
 	for node in _build.wagon:
 		keep[node] = true
 		_wagon_base[node] = node.position
@@ -196,9 +199,9 @@ func _ready() -> void:
 	occlusion.name = "Occlusion"
 	add_child(occlusion)
 	occlusion.scan(self)
+	_build_grid(campaign)
 	_build_camera()
 	_build_post()
-	_build_sound_loops()
 	hud = AHRefugeHud.new()
 	hud.station = self
 	var layer := CanvasLayer.new()
@@ -256,8 +259,38 @@ func commit() -> void:
 	refresh()
 
 
+## Monta (ou remonta) a grade (#186): os cômodos nas vagas, os blocos, os patamares e a plataforma improvisada. O
+## mobiliário, o estoque e as luzes de cada sala ficam separados (ligam e desligam); o resto vira uma malha por material.
+func _build_grid(campaign: Dictionary) -> void:
+	if _build.grid_root != null and is_instance_valid(_build.grid_root):
+		occlusion.forget(_build.grid_root)
+	_build.build_grid(campaign)
+	_grid_signature = AHStationLayout.signature(campaign)
+	var keep := {}
+	for nodes in _build.dressing.values():
+		for node in nodes:
+			keep[node] = true
+	for entry in _build.stock:
+		for node in entry[1]:
+			keep[node] = true
+	var builder := _build.b
+	var main_root := builder.root
+	builder.root = _build.grid_root
+	builder.merge_static(keep)
+	builder.root = main_root
+	occlusion.scan(_build.grid_root)
+	_build_sound_loops()
+
+
 func refresh() -> void:
 	var campaign: Dictionary = Campaign.state
+	# A grade mudou (um cômodo construído, a Cantina ou o Depósito saindo da plataforma): a cena remonta, e os moradores
+	# voltam aos cômodos de agora.
+	if _build != null and AHStationLayout.signature(campaign) != _grid_signature:
+		_build_grid(campaign)
+		var rng := RandomNumberGenerator.new()
+		rng.randomize()
+		_place_residents(rng)
 	var running := S.running_rooms(campaign)
 	for room_id in _build.room_lights:
 		var light: OmniLight3D = _build.room_lights[room_id]
@@ -270,8 +303,12 @@ func refresh() -> void:
 	# O mobiliário some nos cômodos vazios (nível 0: Forja, Pesquisa, Bar e Dormitório numa jornada nova).
 	for room_id in _build.dressing:
 		# "infirmary@2": a peça que só aparece no nível 2.
+		# "infirmary@=1": a peça que só aparece no nível 1 (os leitos que esperam a melhoria).
 		var parts: PackedStringArray = String(room_id).split("@")
-		var furnished := S.room_level(campaign, parts[0]) >= (int(parts[1]) if parts.size() > 1 else 1)
+		var level := S.room_level(campaign, parts[0])
+		var furnished := level >= 1
+		if parts.size() > 1:
+			furnished = level == int(parts[1].trim_prefix("=")) if parts[1].begins_with("=") else level >= int(parts[1])
 		for node in _build.dressing[room_id]:
 			if is_instance_valid(node):
 				node.visible = furnished
@@ -293,9 +330,13 @@ func _process(delta: float) -> void:
 		play_train_arrival(_pending_arrival)
 		_pending_arrival = ""
 	_tick_train(delta)
+	_tick_merchant()
 	if _reopen_pending:
 		_tick_reopen()
 	_walk(delta)
+	if _platform_in_use() != _platform_busy:
+		_platform_busy = not _platform_busy
+		hide_residents(_residents_hidden)
 	if is_instance_valid(stage_card):
 		# A respiração do parado, como a dos moradores esperando.
 		stage_card.scale = Vector3(1, 1.0 + 0.012 * sin(Time.get_ticks_msec() * 0.001 * 2.2), 1)
@@ -308,12 +349,14 @@ func _process(delta: float) -> void:
 		# enquadramento (a Estação inteira, com o HUD oculto) sai como foi pedido.
 		_go(_overview_key() if overview else held[0], held[1], held[2])
 		_in_overview = overview
-	if _build.ember_light:
-		# Brasas: variação lenta e pequena (duas senoides fora de fase), sem piscar.
-		var time := Time.get_ticks_msec() * 0.001
-		if not _build.ember_light.has_meta("energy"):
-			_build.ember_light.set_meta("energy", _build.ember_light.light_energy)
-		_build.ember_light.light_energy = float(_build.ember_light.get_meta("energy")) * (1.0 + 0.1 * sin(time * 6.3) + 0.05 * sin(time * 14.1 + 1.3))
+	# Brasas (a Forja e o fogareiro da plataforma): variação lenta e pequena (duas senoides fora de fase), sem piscar.
+	var time := Time.get_ticks_msec() * 0.001
+	for ember in [_build.ember_light, _build.stove_light]:
+		if ember == null or not is_instance_valid(ember):
+			continue
+		if not ember.has_meta("energy"):
+			ember.set_meta("energy", ember.light_energy)
+		ember.light_energy = float(ember.get_meta("energy")) * (1.0 + 0.1 * sin(time * 6.3) + 0.05 * sin(time * 14.1 + 1.3))
 
 
 # ---------------------------------------------------------------- câmera
@@ -400,12 +443,16 @@ func _framed_key(x0: float, x1: float, y: float, left_px: float, right_px: float
 func _overview_key() -> Dictionary:
 	var key := _framed_key(LEFT_END - 0.5, CORE_X1 + 0.5, -2.4, menu_right, 1900.0, 26.0, -3.0, 0.0)
 	key.pos.x += pan
+	key.pos.y += pan_y
 	return key
 
 
-## Anda a vista geral para os lados (#131), dentro de PAN_RANGE; fora da vista geral, só guarda.
-func set_pan(value: float) -> void:
+## Anda a vista geral para os lados (#131), dentro de PAN_RANGE, e para baixo até o 3º subsolo (#186), dentro de
+## PAN_Y_RANGE; fora da vista geral, só guarda.
+func set_pan(value: float, value_y: float = NAN) -> void:
 	pan = clampf(value, PAN_RANGE.x, PAN_RANGE.y)
+	if not is_nan(value_y):
+		pan_y = clampf(value_y, PAN_Y_RANGE.x, PAN_Y_RANGE.y)
 	if _in_overview and not on_platform and _path.is_empty():
 		_set_goal(_overview_key())
 
@@ -429,10 +476,14 @@ func pan_to_room(room_id: String, left_px: float, right_px: float) -> void:
 	var center_x: float = key.pos.x
 	var screen_x0: float = 960.0 + (room.x0 - center_x) * ppm
 	var screen_x1: float = 960.0 + (room.x1 - center_x) * ppm
+	# O 3º subsolo fica embaixo da vista: escolhido pelas setas, a vista desce até ele (e volta ao subir).
+	var down: float = PAN_Y_RANGE.x if room.floor <= BOTTOM + 0.1 else 0.0
 	if screen_x0 < left_px:
-		set_pan(pan + (screen_x0 - left_px) / ppm)
+		set_pan(pan + (screen_x0 - left_px) / ppm, down)
 	elif screen_x1 > right_px:
-		set_pan(pan + (screen_x1 - right_px) / ppm)
+		set_pan(pan + (screen_x1 - right_px) / ppm, down)
+	elif down != pan_y:
+		set_pan(pan, down)
 
 
 ## A plataforma, o vagão e o fim da linha (PlatformKey da Unreal).
@@ -468,10 +519,23 @@ func focus_clean_overview() -> void:
 func focus_room(room_id: String, instant: bool = false) -> void:
 	var room := room_def(room_id)
 	if room.is_empty():
+		# Soterrado (#186): sem lugar na cena, a vista geral (o painel diz o que escavar).
+		focus_overview(instant)
 		return
 	# Mais perto que a vista do cômodo inteiro (#131): as paredes do lado saem um pouco do quadro.
 	_in_overview = false
-	_go(_framed_key(room.x0 + ROOM_CROP, room.x1 - ROOM_CROP, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
+	var x0: float = room.x0 + ROOM_CROP
+	var x1: float = room.x1 - ROOM_CROP
+	var depth := 0.0
+	if room.place != "grid":
+		# Na plataforma (o fogareiro, os caixotes, a Preparação), o quadro fica no plano de quem anda ali, com pelo menos
+		# PLATFORM_FRAME de largura: a câmera não chega perto do corte (as paredes da frente tapariam o canto).
+		depth = room.z + 0.6
+		var middle := (x0 + x1) * 0.5
+		var half := maxf((x1 - x0) * 0.5, PLATFORM_FRAME * 0.5)
+		x0 = middle - half
+		x1 = middle + half
+	_go(_framed_key(x0, x1, room.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, depth), false, instant)
 
 
 ## O cômodo entre os dois painéis de uma tela do kit (a Sala dos Personagens, #60): o meio da sala entre os painéis, e a
@@ -485,6 +549,7 @@ func focus_room_stage(room_id: String, left_px: float, right_px: float, instant:
 	var pitch := -3.0
 	var focal := 540.0 / tan(deg_to_rad(fov * 0.5))
 	var drop := atan((STAGE_FEET - 540.0) / focal) + deg_to_rad(-pitch)
+	# Todos na mesma escala: a coluna estreita da Sala deixa o vão caber o Tatu no Maior.
 	var distance: float = focal / STAGE_PX_PER_METER
 	var x: float = (room.x0 + room.x1) * 0.5 - ((left_px + right_px) * 0.5 - 960.0) * distance / focal
 	_go({"pos": Vector3(x, room.floor + distance * tan(drop), LANE_Z + distance), "fov": fov, "pitch": pitch}, false, instant)
@@ -515,6 +580,16 @@ func show_stage_hero(hero_id: String) -> void:
 	stage_hero = hero_id
 
 
+## A largura da arte do escolhido na Sala (body_width_pixels do manifesto), em metros; 0 sem ele ou sem a medida.
+func stage_width() -> float:
+	if not is_instance_valid(stage_card):
+		return 0.0
+	var art := stage_card.art()
+	if not art.has("body_width_pixels"):
+		return 0.0
+	return float(art.body_width_pixels) * stage_card.body_height / float(art.body_reference_pixels)
+
+
 func clear_stage_hero() -> void:
 	if is_instance_valid(stage_card):
 		# Fora da árvore já: a placa nova, no mesmo quadro, fica com o nome StageHero.
@@ -528,12 +603,36 @@ func clear_stage_hero() -> void:
 ## painéis nem numa lasca na borda deles.
 func hide_residents(hidden: bool) -> void:
 	_residents_hidden = hidden
-	# Quem está na fila da plataforma ou saindo dela (#131) não aparece no cômodo ao mesmo tempo.
-	var away: Array = lineup.map(func(e): return e.hero_id) + _leaving.map(func(e): return e.hero_id)
+	var away := _away_ids()
 	for id in residents:
 		var card = residents[id]
 		if is_instance_valid(card):
 			card.visible = not hidden and not away.has(id)
+
+
+## Com a plataforma ocupada (a fila do relatório ou da partida, quem sai dela, o trem e quem desceu dele), quem mora nos
+## cantos dela (o fogareiro, a Preparação, os caixotes; #186) sai de cena: ninguém fica atrás da fila nem na frente do
+## trem.
+var _platform_busy := false
+
+
+func _platform_in_use() -> bool:
+	# Quem desceu do trem (o candidato, o segundo da dupla ou o Mercador) fica na plataforma até a decisão.
+	return not lineup.is_empty() or not _leaving.is_empty() or _train_mode != 0 or departure_pending \
+		or is_instance_valid(_candidate) or is_instance_valid(_companion)
+
+
+## Quem não aparece no cômodo: a fila da plataforma, quem sai dela (#131) e quem ainda vai descer do trem da volta
+## (#76). Esses estão na roupa de expedição; o cômodo mostra a do lobby (#249) só depois que saem da plataforma.
+func _away_ids() -> Array:
+	var away: Array = lineup.map(func(e): return e.hero_id) + _leaving.map(func(e): return e.hero_id)
+	if _train_mode == 4:
+		away.append_array(_arrivals.filter(func(a): return a.card == null).map(func(a): return a.hero_id))
+	if _platform_busy:
+		for walker in _walkers:
+			if room_def(String(walker.get("room", ""))).get("place", "") == "platform":
+				away.append(walker.get("hero_id", walker.get("civilian", "")))
+	return away
 
 
 ## A plataforma onde o trem para e o candidato espera.
@@ -567,7 +666,15 @@ func follow_train() -> void:
 
 func _candidate_key() -> Dictionary:
 	var feet := _departure_slot(1)
+	# Desceram dois (#182): a câmera recua para o segundo, ao lado, também caber à esquerda do painel.
+	if not Campaign.state.station.train.get("next", {}).is_empty():
+		return ue_key(feet.x * 100 + 20, feet.z * 100 + 800, 92, 44, 0)
 	return ue_key(feet.x * 100 + 100, feet.z * 100 + 650, 92, 44, 0)
+
+
+## Onde o segundo do trem espera: ao lado do primeiro, um pouco atrás.
+func _companion_slot() -> Vector3:
+	return _departure_slot(1) + Vector3(-COMPANION_GAP, 0, -0.3)
 
 
 ## A câmera da fila na plataforma: baixa, olhando um pouco para cima, com a fila inteira à esquerda do painel.
@@ -632,11 +739,20 @@ func _apply_panel(open: float) -> void:
 		_build.slit_light.light_energy = (8.0 if _panel_open < 0.02 else 100.0) / AHStationBuilder.LUMENS_PER_ENERGY
 
 
+## Onde fica o cômodo na campanha de agora (m): {id, x0, x1, floor, ceiling, lane, z, work_z, place, offset}; {} se ele
+## ainda não tem lugar (soterrado).
 static func room_def(room_id: String) -> Dictionary:
-	for room in ROOMS:
-		if room.id == room_id:
-			return room
-	return {}
+	return AHStationLayout.to_meters(AHStationLayout.room(Campaign.state, room_id))
+
+
+## Os cômodos com lugar, na ordem do menu.
+static func rooms() -> Array:
+	var out: Array = []
+	for id in ROOM_ORDER:
+		var room := room_def(id)
+		if not room.is_empty():
+			out.append(room)
+	return out
 
 
 # ---------------------------------------------------------------- filas na plataforma
@@ -697,6 +813,7 @@ func align_lineup(centers: Dictionary) -> void:
 ## (align_lineup); do abrigo, a câmera sobe pela passagem. hero_ids vem na ordem da cena (a posição 1 à direita).
 func show_departure(hero_ids: Array) -> void:
 	clear_lineup()
+	_release_boarding()
 	for index in hero_ids.size():
 		_line_card(hero_ids[index], Vector3(LINE_CENTER_X + (index - (maxi(1, hero_ids.size()) - 1) * 0.5) * REPORT_SPACING, 0, LINE_Z))
 	_go(_report_key(), true, false)
@@ -825,7 +942,7 @@ func room_screen_rects() -> Dictionary:
 	var out := {}
 	if camera == null or not _path.is_empty():
 		return out
-	for room in ROOMS:
+	for room in rooms():
 		var a := Vector3(room.x0, room.floor, 0.0)
 		var b := Vector3(room.x1, room.ceiling, 0.0)
 		if camera.is_position_behind(a) or camera.is_position_behind(b):
@@ -851,6 +968,17 @@ func lineup_screen_positions() -> Array:
 ## (OffsetWagon e SetTrainDoorOpen da Unreal).
 func _offset_wagon(x: float) -> void:
 	_wagon_x = x
+	# O vagão em camadas (#256) anda pelo drive (as rodas giram pelo que ele anda). As portas que abrem são as do lado da
+	# plataforma, do outro lado do vagão: as folhas deste lado ficam fechadas, e a luz fria sai pelas de lá.
+	if _build.train_car != null:
+		_build.train_car.drive(x)
+		_build.train_car.set_doors(0.0)
+		for entry in _build.train_door_lights:
+			(entry[0] as OmniLight3D).light_energy = float(entry[1]) * _door_open
+		# A faísca é só da chegada (_tick_slide_in liga e desliga a cada quadro): fora dela, apagada, também quando a
+		# chegada é pulada no meio da freada.
+		if _train_mode != 1 and _train_mode != 4:
+			_build.train_car.brake(false)
 	var slides := {}
 	for door in _build.wagon_doors:
 		slides[door[0]] = door[1] * 0.88 * _door_open
@@ -884,6 +1012,7 @@ func play_train_arrival(candidate_id: String) -> void:
 ## Fecha e acelera para o túnel; fica fora até a próxima chegada (PlayTrainDeparture). Recusado, o candidato volta
 ## para dentro do trem antes de as portas fecharem.
 func play_train_departure(candidate_leaves: bool) -> void:
+	departure_pending = false
 	_team_train_leaving = false
 	_warning_time = -1.0
 	_train_time = 0.0
@@ -942,10 +1071,21 @@ func soundscape() -> Dictionary:
 
 
 ## Os loops com lugar (FAHAudio::Loop espacial): o ventilador do Bar e a lâmpada tubular do Depósito.
+## Com a grade, só os que têm sala (o Bar e o Depósito construídos) e no lugar dela; remontada a grade, refeitos.
+var _sound_loops: Array = []
+
+
 func _build_sound_loops() -> void:
+	for player in _sound_loops:
+		if is_instance_valid(player):
+			player.queue_free()
+	_sound_loops.clear()
 	for spec in [["bar", "res://audio/station/bar_fan_loop.ogg", -2.0], ["depot", "res://audio/station/depot_tube_loop.ogg", -6.0]]:
-		var room: Dictionary = ROOMS.filter(func(r): return r.id == spec[0])[0]
+		var room := room_def(spec[0])
+		if room.is_empty() or room.place != "grid":
+			continue
 		var player := AudioStreamPlayer3D.new()
+		_sound_loops.append(player)
 		var stream: AudioStream = load(spec[1])
 		stream.loop = true
 		player.stream = stream
@@ -953,7 +1093,7 @@ func _build_sound_loops() -> void:
 		player.volume_db = spec[2] + Sound.mix_db(spec[1])
 		player.unit_size = 9.0
 		player.max_distance = 60.0
-		player.position = Vector3((room.x0 + room.x1) * 0.5, room.ceiling - 0.4, LANE_Z)
+		player.position = Vector3((room.x0 + room.x1) * 0.5, room.ceiling - 0.4, room.z)
 		player.autoplay = true
 		add_child(player)
 
@@ -968,7 +1108,7 @@ func train_event_named(name: String) -> void:
 
 func train_busy() -> bool:
 	# O trem que trouxe a equipe indo embora não segura a cena do candidato: a chegada dele começa do túnel.
-	return (_train_mode != 0 and not _team_train_leaving) or _pending_arrival != "" or _reopen_pending
+	return (_train_mode != 0 and not _team_train_leaving) or _pending_arrival != "" or _reopen_pending or departure_pending
 
 
 # ---------------------------------------------------------------- a volta da equipe (#76)
@@ -998,6 +1138,10 @@ func play_team_arrival(hero_ids: Array) -> void:
 		var hurt: bool = int(entry.get("hp", 0)) < int(entry.get("max_hp", 0))
 		_arrivals.append({"hero_id": survivors[index], "art": art.idle, "slot": _line_slot(index, survivors.size()),
 			"delay": step * TEAM_STEP_OUT, "speed": TRAIN_WALK_SPEED * (WOUNDED_PACE if hurt else 1.0), "card": null, "hurt": hurt})
+	# Quem ainda está no trem já não aparece no cômodo (lá, na roupa do lobby): ninguém fica em dois lugares.
+	for arrival in _arrivals:
+		if residents.has(arrival.hero_id):
+			residents[arrival.hero_id].visible = false
 	on_platform = true
 	_path.clear()
 	_apply_panel(0.0)
@@ -1033,8 +1177,8 @@ func finish_team_arrival() -> void:
 	Sound.fade_out(_train_sound, 0.3)
 	_warning_time = -1.0
 	_door_open = 0.0
-	_offset_wagon(TRAIN_OUT)
 	_train_mode = 0
+	_offset_wagon(TRAIN_OUT)
 	train_event.emit("team_ready")
 
 
@@ -1101,6 +1245,7 @@ func show_candidate(candidate_id: String) -> void:
 	_remove_candidate()
 	_candidate_id = candidate_id
 	_spawn_candidate(_departure_slot(1))
+	_spawn_companion()
 	_offset_wagon(0.0)
 
 
@@ -1113,7 +1258,122 @@ func _remove_candidate() -> void:
 	if is_instance_valid(_candidate):
 		_candidate.queue_free()
 	_candidate = null
+	if is_instance_valid(_companion):
+		_companion.queue_free()
+	_companion = null
 	_walkers = _walkers.filter(func(w): return is_instance_valid(w.card))
+
+
+## Decidido o primeiro do trem (#182), o segundo passa a esperar: o recusado volta andando ao vagão (o acolhido já foi
+## para o cômodo), o segundo anda até o lugar do primeiro, e a câmera fecha nele.
+func promote_companion(candidate_id: String, first_leaves: bool) -> void:
+	if is_instance_valid(_candidate):
+		if first_leaves:
+			_set_door_open(1.0)
+			var own: Array = _walkers.filter(func(w): return w.card == _candidate)
+			var walker: Dictionary = own[0] if not own.is_empty() else {"card": _candidate, "phase": 0.0, "home_z": _candidate.position.z}
+			if own.is_empty():
+				_walkers.append(walker)
+			walker.min = _train_door_x()
+			walker.max = _candidate.position.x
+			walker.target = _train_door_x()
+			walker.wait = 0.0
+			walker.stay = false
+			walker.vanish = true
+			walker.speed = TRAIN_WALK_SPEED * train_speed()
+		else:
+			_candidate.queue_free()
+	_candidate = null
+	_candidate_id = candidate_id
+	if not is_instance_valid(_companion):
+		show_candidate(candidate_id)
+	else:
+		_candidate = _companion
+		_companion = null
+		var slot := _departure_slot(1)
+		var own: Array = _walkers.filter(func(w): return w.card == _candidate)
+		var walker: Dictionary = own[0] if not own.is_empty() else {"card": _candidate, "phase": 0.0}
+		if own.is_empty():
+			_walkers.append(walker)
+		walker.min = minf(slot.x, _candidate.position.x)
+		walker.max = maxf(slot.x, _candidate.position.x)
+		walker.target = slot.x
+		walker.wait = 0.0
+		walker.stay = true
+		walker.home_z = slot.z
+		walker.speed = TRAIN_WALK_SPEED * train_speed()
+		_candidate.position.z = slot.z
+	if on_platform:
+		_go(_candidate_key(), true, false)
+
+
+## O jogador escolheu decidir primeiro o outro dos dois (#182, S.bring_forward): as placas trocam de papel, cada uma no
+## lugar onde está.
+func swap_pair() -> void:
+	var train: Dictionary = Campaign.state.station.train
+	if train.candidate_id == _candidate_id or not is_instance_valid(_companion):
+		return
+	var first := _candidate
+	_candidate = _companion
+	_companion = first
+	_candidate_id = train.candidate_id
+
+
+## Os dois do trem (#182) na ordem em que estão na plataforma, da esquerda para a direita (as abas do painel seguem a
+## cena, e trocar quem é decidido não as troca de lugar).
+func pair_order(ids: Array) -> Array:
+	var cards := {_candidate_id: _candidate}
+	if is_instance_valid(_companion):
+		for id in ids:
+			if id != _candidate_id:
+				cards[id] = _companion
+	if ids.any(func(id): return not cards.has(id) or not is_instance_valid(cards[id])):
+		return ids
+	var sorted := ids.duplicate()
+	sorted.sort_custom(func(a, b): return cards[a].position.x < cards[b].position.x)
+	return sorted
+
+
+## Os moradores de novo nos cômodos, num sorteio novo (o acolhido do trem vai para um deles).
+func place_residents() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	_place_residents(rng)
+
+
+## A partida decidida, esperando o recusado (#182) entrar no vagão: o trem já conta como ocupado (a Preparação não
+## abre com ele partindo atrás da fila).
+var departure_pending := false
+
+
+## O recusado (#182) ainda andando de volta ao vagão.
+func boarding_back() -> bool:
+	return _walkers.any(func(w): return w.get("vanish", false) and is_instance_valid(w.card) and not w.card.is_queued_for_deletion())
+
+
+## Quem voltava ao vagão sai da cena de vez (a Preparação monta a fila na plataforma).
+func _release_boarding() -> void:
+	for walker in _walkers:
+		if walker.get("vanish", false) and is_instance_valid(walker.card):
+			walker.card.queue_free()
+
+
+## O segundo animal do trem (#182), de pé ao lado de quem é decidido agora, até a vez dele.
+func _spawn_companion(feet: Vector3 = Vector3.INF) -> AHSpriteCard:
+	var second: Dictionary = Campaign.state.station.train.get("next", {})
+	if second.is_empty():
+		return null
+	var art: Dictionary = AHCombatArena.hero_art_of(String(second.candidate_id), String(second.recruit.art_variant)).get("idle", {})
+	if art.is_empty():
+		return null
+	_companion = AHSpriteCard.new()
+	_companion.name = "TrainCompanion"
+	_companion.body_height = AHCharacterHeights.find(String(second.candidate_id))
+	_companion.show_art(art)
+	add_child(_companion)
+	_companion.position = _companion_slot() if feet == Vector3.INF else feet
+	_companion.set_facing(1.0)
+	return _companion
 
 
 func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
@@ -1122,6 +1382,9 @@ func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	var recruit: Dictionary = S.train_recruit(Campaign.state)
 	if art.is_empty() and not recruit.is_empty() and Campaign.state.station.train.candidate_id == _candidate_id:
 		art = AHCombatArena.hero_art_of(_candidate_id, String(recruit.art_variant)).get("idle", {})
+	# O Mercador (#182, parte 2): a arte dele, de pé (_tick_merchant troca a pose).
+	if art.is_empty() and _candidate_id == S.MERCHANT:
+		art = AHCombatArena.npc_art_of(S.MERCHANT).get("idle", {})
 	if art.is_empty():
 		return null
 	_candidate = AHSpriteCard.new()
@@ -1131,6 +1394,21 @@ func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	_candidate.position = feet
 	_candidate.set_facing(1.0)
 	return _candidate
+
+
+## O Mercador na plataforma (#182, parte 2): de passada enquanto anda (descendo do trem ou voltando a ele); parado, de pé
+## e, com o painel do trem aberto, oferecendo a mercadoria. Cada pose tem a âncora na bota de apoio dela.
+func _tick_merchant() -> void:
+	if _candidate_id != S.MERCHANT or not is_instance_valid(_candidate):
+		return
+	var moving := false
+	for walker in _walkers:
+		if walker.card == _candidate:
+			moving = float(walker.get("wait", 0.0)) <= 0.0 and absf(float(walker.get("target", _candidate.position.x)) - _candidate.position.x) >= 0.05
+	var pose := "walk" if moving else ("trade" if hud != null and hud.current == "train" else "idle")
+	var art: Dictionary = AHCombatArena.npc_art_of(S.MERCHANT).get(pose, {})
+	if not art.is_empty() and String(_candidate.art().get("file", "")) != String(art.file):
+		_candidate.show_art(art)
 
 
 func _tick_train(delta: float) -> void:
@@ -1187,6 +1465,12 @@ func _tick_arrival(before: float) -> void:
 		if card:
 			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
 				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": target.z})
+		# Desceram dois (#182): o segundo desce logo atrás e para ao lado.
+		var beside := _companion_slot()
+		var companion := _spawn_companion(Vector3(_train_door_x(), beside.y, beside.z))
+		if companion:
+			_walkers.append({"card": companion, "min": beside.x, "max": beside.x, "target": beside.x, "wait": 0.0, "phase": 0.0,
+				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": beside.z})
 		train_event.emit("candidate_out")
 	if not _camera_pending and _train_time >= TRAIN_DOOR_END and (not is_instance_valid(_candidate) or absf(_candidate.position.x - target.x) < 0.05):
 		_camera_pending = true
@@ -1203,6 +1487,12 @@ func _tick_slide_in(before: float) -> void:
 		train_event.emit("brake")
 	var slide := clampf((_train_time - TRAIN_WARNING) / (TRAIN_STOP - TRAIN_WARNING), 0.0, 1.0)
 	_offset_wagon(TRAIN_OUT * (1.0 - slide) * (1.0 - slide))
+	# A faísca nas rodas da metade da velocidade até parar (o trem vem da esquerda, andando para a direita), à vista no
+	# fosso da plataforma; com "Reduzir efeitos", sem ela.
+	if _build.train_car != null:
+		var reduced: bool = Campaign.state.get("settings", {}).get("reduced_environment_effects", false)
+		_build.train_car.sparks_enabled = not reduced
+		_build.train_car.brake(slide >= 0.5 and slide < 1.0, 1.0 - (slide - 0.5) * 2.0, 1.0)
 	if before < TRAIN_STOP and _train_time >= TRAIN_STOP:
 		_warning_time = -1.0
 		# O ruído do trem rodando acaba quando ele para (o arquivo segue até 5,5 s; a 2x o trem para antes).
@@ -1251,31 +1541,40 @@ func _tick_camera_on_candidate() -> void:
 const SLEEP_DROP := 10.0
 
 
-## Os quatro lugares dos beliches (m): de baixo à esquerda, de baixo à direita, e os de cima.
-static func sleep_slots() -> Array:
+## Os quatro lugares de quem dorme (m), pelo nível do Dormitório (#176): no nível 1, no chão, da esquerda para a
+## direita; com os beliches (nível 2), de baixo à esquerda, de baixo à direita, e os de cima.
+## No molde do Dormitório; o deslocamento até a vaga dele sai da grade (#186).
+static func sleep_slots(level: int = 2) -> Array:
 	var out: Array = []
+	var shift := AHStationLayout.offset(Campaign.state, S.DORMITORY)
+	if level < 2:
+		for index in AHStationBuild.FLOOR_SLEEP_X.size():
+			out.append(AHStationBuilder.vu(shift + Vector3(AHStationBuild.FLOOR_SLEEP_X[index],
+				AHStationBuild.FLOOR_SLEEP_Y[index % AHStationBuild.FLOOR_SLEEP_Y.size()], AHStationBuild.BUNK_FLOOR)))
+		return out
 	for tier in 2:
 		for x in AHStationBuild.BUNK_X:
 			# Um pouco para a cabeceira (o travesseiro fica à esquerda) e à frente da cama pintada.
-			out.append(AHStationBuilder.vu(Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
+			out.append(AHStationBuilder.vu(shift + Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
 				AHStationBuild.BUNK_FLOOR + tier * AHStationBuild.BUNK_UPPER + AHStationBuild.MATTRESS_TOP - SLEEP_DROP)))
 	return out
 
 
-## Os leitos da Enfermaria (#121), na ordem em que enchem: o de baixo e o de cima do primeiro beliche, depois os do
-## segundo (nível 2).
+## Os leitos da Enfermaria de 12 m (#139), na ordem em que enchem: os dois em uso no nível 1, depois os do nível 2. No
+## molde dela; o deslocamento até a vaga sai da grade (#186).
 static func infirmary_slots() -> Array:
 	var out: Array = []
-	for x in AHStationBuild.INFIRMARY_BUNK_X:
-		for tier in 2:
-			out.append(AHStationBuilder.vu(Vector3(x - 12.0, AHStationBuild.BUNK_Y + 30.0,
-				AHStationBuild.INFIRMARY_FLOOR + tier * AHStationBuild.BUNK_UPPER + AHStationBuild.MATTRESS_TOP - SLEEP_DROP)))
+	var shift := AHStationLayout.offset(Campaign.state, S.INFIRMARY)
+	for bed in AHStationBuild.INFIRMARY_BEDS:
+		# Um pouco para a cabeceira (o travesseiro fica à esquerda) e à frente do leito pintado.
+		out.append(AHStationBuilder.vu(shift + Vector3(bed.x - 12.0, bed.y + 30.0,
+			AHStationBuild.INFIRMARY_FLOOR + AHStationBuild.INFIRMARY_MATTRESS - SLEEP_DROP)))
 	return out
 
 
-## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um beliche livre do
-## Dormitório (os de baixo para cima, de trás para a frente, para não tomar o de quem dorme a noite). Vector3.INF sem
-## lugar.
+## Onde fica deitado quem está em recuperação (#118): o leito da Enfermaria, ou, sem leito, um lugar do Dormitório que
+## ninguém ocupa esta noite (do último para o primeiro; quem dorme fica no lugar da ordem dele na equipe). Vector3.INF
+## sem lugar.
 static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	var entry = S.hero(campaign, hero_id)
 	var fallen := S.fallen(campaign)
@@ -1284,10 +1583,12 @@ static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 		var slots := infirmary_slots()
 		return slots[index] if index >= 0 and index < slots.size() else Vector3.INF
 	var index: int = fallen.filter(func(h): return not S.in_bed(h)).map(func(h): return h.id).find(hero_id)
-	var slots := sleep_slots()
-	var taken: int = sleepers(campaign).size()
-	var slot: int = slots.size() - 1 - index
-	return slots[slot] if index >= 0 and slot >= taken else Vector3.INF
+	var slots := sleep_slots(S.room_level(campaign, S.DORMITORY))
+	# Os lugares de quem dorme são os da ordem na equipe (como em _update_sleepers), não os primeiros: com o vigia no
+	# meio, o lugar dele fica livre e o último fica ocupado.
+	var taken: Array = sleepers(campaign).map(func(id): return campaign.night.participants.find(id))
+	var free: Array = range(slots.size() - 1, -1, -1).filter(func(slot): return not taken.has(slot))
+	return slots[free[index]] if index >= 0 and index < free.size() else Vector3.INF
 
 
 ## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview). Durante a
@@ -1314,12 +1615,12 @@ func _exit_tree() -> void:
 	night_scene = false
 
 
-## À noite, quem dorme deita no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica de pé no Dormitório. Com a
-## noite resolvida, todos voltam a passear.
+## À noite, quem dorme deita no Dormitório, no chão ou no beliche (a pose de dormir aprovada pelo Lucas); o vigia fica
+## de pé no Dormitório. Com a noite resolvida, todos voltam a passear.
 func _update_sleepers() -> void:
 	var campaign: Dictionary = Campaign.state
 	var asleep := sleepers(campaign)
-	var slots := sleep_slots()
+	var slots := sleep_slots(S.room_level(campaign, S.DORMITORY))
 	var watch: String = campaign.night.watch_hero_id if campaign.night.phase == "planning" or (night_scene and campaign.night.phase == "dawn") else ""
 	var dorm := room_def(S.DORMITORY)
 	var replace := false
@@ -1327,14 +1628,14 @@ func _update_sleepers() -> void:
 		if not walker.has("hero_id") or not is_instance_valid(walker.card):
 			continue
 		var card: AHSpriteCard = walker.card
-		# Em recuperação (#118): deitado no leito da Enfermaria (ou num beliche do Dormitório), sem passear. Sem a pose
+		# Em recuperação (#118): deitado no leito da Enfermaria (ou num lugar do Dormitório), sem passear. Sem a pose
 		# de dormir ou sem lugar, fica de pé, parado, no cômodo onde se recupera.
 		if S.recovering(S.hero(campaign, walker.hero_id)):
 			walker.sleeping = true
 			walker.recovering = true
 			var spot := recovery_spot(campaign, walker.hero_id)
-			if spot != Vector3.INF and _poses.has(walker.hero_id + "_sleep"):
-				card.show_art(AHSkins.pose(_poses[walker.hero_id + "_sleep"], walker.hero_id))
+			if spot != Vector3.INF and walker.poses.has("sleep"):
+				card.show_art(walker.poses.sleep)
 				card.position = spot
 			else:
 				var place := room_def(S.INFIRMARY if S.in_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
@@ -1342,7 +1643,7 @@ func _update_sleepers() -> void:
 				# Sem lugar no beliche, de pé no cômodo, cada um no seu ponto da faixa (nunca um por cima do outro).
 				var order: int = S.fallen(campaign).map(func(h): return h.id).find(walker.hero_id)
 				var along := fmod(0.15 + order * 0.29, 0.7) + 0.15
-				card.position = Vector3(spot.x if spot != Vector3.INF else lerpf(place.lane[0], place.lane[1], along), place.floor, LANE_Z)
+				card.position = Vector3(spot.x if spot != Vector3.INF else lerpf(place.lane[0], place.lane[1], along), place.floor, place.z)
 			card.set_facing(1.0)
 			card.scale = Vector3.ONE
 			continue
@@ -1352,9 +1653,9 @@ func _update_sleepers() -> void:
 			continue
 		# Cada um tem o seu lugar pela ordem na equipe: trocar o vigia não muda os outros de cama.
 		var slot: int = campaign.night.participants.find(walker.hero_id) if asleep.has(walker.hero_id) else -1
-		if slot >= 0 and slot < slots.size() and _poses.has(walker.hero_id + "_sleep"):
+		if slot >= 0 and slot < slots.size() and walker.poses.has("sleep"):
 			walker.sleeping = true
-			card.show_art(AHSkins.pose(_poses[walker.hero_id + "_sleep"], walker.hero_id))
+			card.show_art(walker.poses.sleep)
 			card.position = slots[slot]
 			card.set_facing(1.0)
 			card.scale = Vector3.ONE
@@ -1382,6 +1683,8 @@ func _update_sleepers() -> void:
 ## Cada herói vivo num cômodo sorteado (30% de chance de dividir um já ocupado, no máximo dois), passeando pela faixa
 ## do cômodo; os civis ficam no cômodo deles, alternando o idle e a pose de trabalho.
 func _place_residents(rng: RandomNumberGenerator) -> void:
+	# Quem voltava ao vagão (#182) não fica parado na plataforma sem o passeio.
+	_release_boarding()
 	for card in residents.values():
 		card.queue_free()
 	residents.clear()
@@ -1389,7 +1692,7 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 	_seats.clear()
 	var campaign: Dictionary = Campaign.state
 	var occupancy := {}
-	var free_rooms: Array = ROOMS.map(func(r): return r.id)
+	var free_rooms: Array = rooms().map(func(r): return r.id)
 	for entry in S.living(campaign):
 		var art := _hero_art(entry)
 		if art.is_empty():
@@ -1400,15 +1703,16 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 			# Quem se recupera não passeia (_update_sleepers deita no leito); não toma o cômodo de ninguém.
 			room_id = S.INFIRMARY if S.in_bed(entry) else S.DORMITORY
 		elif free_rooms.is_empty() or (not shared.is_empty() and rng.randf() < SHARE_ROOM_CHANCE):
-			room_id = shared[rng.randi_range(0, shared.size() - 1)] if not shared.is_empty() else ROOMS[0].id
+			room_id = shared[rng.randi_range(0, shared.size() - 1)] if not shared.is_empty() else S.DORMITORY
 		else:
 			room_id = free_rooms.pop_at(rng.randi_range(0, free_rooms.size() - 1))
 		if not S.recovering(entry):
 			occupancy[room_id] = int(occupancy.get(room_id, 0)) + 1
 		var room := room_def(room_id)
+		var poses := _resident_poses(entry, art)
 		var card := AHSpriteCard.new()
 		card.body_height = AHCharacterHeights.find(entry.id)
-		card.show_art(art.idle)
+		card.show_art(poses.idle)
 		add_child(card)
 		occlusion.track(card)
 		var lane: Array = room.lane
@@ -1417,27 +1721,33 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		# O segundo morador do cômodo passeia na metade da direita da faixa.
 		var lane_min: float = lane[0] if occupants == 1 else lane[0] + half
 		var lane_max: float = lane[1]
-		card.position = Vector3(rng.randf_range(lane_min, lane_max), room.floor, LANE_Z + rng.randf_range(-0.3, 0.3))
+		card.position = Vector3(rng.randf_range(lane_min, lane_max), room.floor, room.z + rng.randf_range(-0.3, 0.3))
 		card.set_facing(1.0 if rng.randf() < 0.5 else -1.0)
 		residents[entry.id] = card
 		var walker := {"card": card, "min": lane_min, "max": lane_max, "target": card.position.x, "wait": rng.randf_range(0.5, 4.0),
-			"phase": rng.randf() * TAU, "room": room_id, "idle": art.idle, "hero_id": entry.id, "home_z": card.position.z,
-			"floor": room.floor, "seat": -1, "sitting": 0.0, "work": WORK_POSES.get(entry.id, "") == room_id and _poses.has(entry.id + "_work"),
+			"phase": rng.randf() * TAU, "room": room_id, "idle": poses.idle, "poses": poses, "hero_id": entry.id,
+			"home_z": card.position.z, "floor": room.floor, "work_z": room.work_z, "seat": -1, "sitting": 0.0,
+			"work": WORK_POSES.get(entry.id, "") == room_id and poses.has("work"),
 			"working": 0.0, "pause": rng.randf_range(1.0, 4.0)}
 		_walkers.append(walker)
 	for civilian_id in campaign.station.residents:
 		var art: Dictionary = _civilian_art.get(civilian_id, {})
-		var room := room_def(S.civilian(civilian_id).get("room", ""))
+		var room_id: String = S.civilian(civilian_id).get("room", "")
+		# O cômodo dele ainda soterrado (#186: a Cora chega antes da Pesquisa): fica no Alojamento até ele ter lugar.
+		if room_def(room_id).is_empty():
+			room_id = S.CHARACTERS
+		var room := room_def(room_id)
 		if art.is_empty() or room.is_empty():
 			continue
 		var card := AHSpriteCard.new()
 		card.body_height = AHCharacterHeights.find(civilian_id)
 		card.show_art(art)
 		add_child(card)
-		card.position = Vector3(lerpf(room.lane[0], room.lane[1], 0.5), room.floor, LANE_Z - 0.4)
+		card.position = Vector3(lerpf(room.lane[0], room.lane[1], 0.5), room.floor, room.z - 0.4)
 		residents[civilian_id] = card
 		# Civil morador: alterna o idle e a pose de trabalho, parado no posto dele.
-		_walkers.append({"card": card, "civilian": civilian_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0), "civil_working": false})
+		_walkers.append({"card": card, "civilian": civilian_id, "room": room_id, "idle": art, "civil_timer": rng.randf_range(3.0, 7.0),
+			"civil_working": false})
 	# Ninguém começa em cima de outro (o morador fica no meio do cômodo, e o herói sorteado podia cair nele).
 	for walker in _walkers:
 		if walker.has("civilian") or not walker.has("hero_id"):
@@ -1457,8 +1767,8 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 		walker.target = card.position.x
 	# Refeitos os passeios (depois do trem, por exemplo), quem dorme volta para o beliche.
 	_update_sleepers()
-	if _residents_hidden:
-		hide_residents(true)
+	# Quem está na plataforma (a fila, a chegada) ou oculto por uma tela do kit continua fora do cômodo.
+	hide_residents(_residents_hidden)
 
 
 ## O herói trocou de skin (#138): a placa dele veste a nova onde está, na pose de agora (de pé, sentado, no posto ou
@@ -1470,28 +1780,45 @@ func redress(hero_id: String) -> void:
 		var dressed := _hero_art(S.hero(Campaign.state, hero_id))
 		if not dressed.is_empty():
 			stage_card.show_art(dressed.idle)
+	# No cômodo, quem tem a roupa do lobby (#249) continua com ela: a skin é a da expedição.
 	for walker in _walkers:
 		if String(walker.get("hero_id", "")) != hero_id:
 			continue
-		var art := _hero_art(S.hero(Campaign.state, hero_id))
+		var entry = S.hero(Campaign.state, hero_id)
+		var art := _hero_art(entry)
 		if art.is_empty():
 			return
-		walker.idle = art.idle
+		walker.poses = _resident_poses(entry, art)
+		walker.idle = walker.poses.idle
 		var card: AHSpriteCard = walker.card
-		if walker.get("sitting", 0.0) > 0.0 and _poses.has(hero_id + "_seat"):
-			card.show_art(AHSkins.pose(_poses[hero_id + "_seat"], hero_id))
-		elif walker.get("working", 0.0) > 0.0 and _poses.has(hero_id + "_work"):
-			card.show_art(AHSkins.pose(_poses[hero_id + "_work"], hero_id))
-		elif walker.get("sleeping", false) and _poses.has(hero_id + "_sleep"):
-			card.show_art(AHSkins.pose(_poses[hero_id + "_sleep"], hero_id))
+		if walker.get("sitting", 0.0) > 0.0 and walker.poses.has("seat"):
+			card.show_art(walker.poses.seat)
+		elif walker.get("working", 0.0) > 0.0 and walker.poses.has("work"):
+			card.show_art(walker.poses.work)
+		elif walker.get("sleeping", false) and walker.poses.has("sleep"):
+			card.show_art(walker.poses.sleep)
 		else:
-			card.show_art(art.idle)
+			card.show_art(walker.idle)
 	_update_sleepers()
 
 
 ## A arte do herói (o recruta, a variação da classe guardada no save; sem ela, a do fundador).
 func _hero_art(entry) -> Dictionary:
 	return {} if entry == null else AHCombatArena.art_entry(_combat_art.heroes, entry.id, String(entry.get("art_variant", "")))
+
+
+## As poses de quem mora no cômodo ({idle, seat, sleep, work}, as que ele tem): a roupa confortável do lobby (#249) ou,
+## para quem ainda não tem, a de expedição (o parado da luta e as poses da Estação, na skin dele). Nunca as duas
+## misturadas: sem a pose na roupa que veste, ele não senta, não trabalha ou não deita.
+func _resident_poses(entry, art: Dictionary) -> Dictionary:
+	var lobby := AHLobbyOutfit.poses_of(String(entry.id), art)
+	if lobby.has("idle"):
+		return lobby
+	var out := {"idle": art.idle}
+	for state in ["seat", "sleep", "work"]:
+		if _poses.has(entry.id + "_" + state):
+			out[state] = AHSkins.pose(_poses[entry.id + "_" + state], entry.id)
+	return out
 
 
 func civilian_art(civilian_id: String) -> Dictionary:
@@ -1544,8 +1871,8 @@ func _walk(delta: float) -> void:
 				if walker.pause <= 0.0 and walker.wait > 0.0 and _post_taken(walker):
 					walker.pause = randf_range(3.0, 6.0)
 				if walker.pause <= 0.0 and walker.wait > 0.0:
-					card.show_art(AHSkins.pose(_poses[walker.hero_id + "_work"], walker.hero_id))
-					card.position = Vector3(_work_post(walker), walker.floor, -5.6)
+					card.show_art(walker.poses.work)
+					card.position = Vector3(_work_post(walker), walker.floor, walker.get("work_z", -5.6))
 					card.set_facing(1.0)
 					card.scale = Vector3.ONE
 					walker.working = randf_range(12.0, 26.0)
@@ -1560,6 +1887,10 @@ func _walk(delta: float) -> void:
 		var speed: float = walker.get("speed", WALK_SPEED)
 		if absf(gap) < 0.05:
 			card.scale = Vector3.ONE
+			# O recusado que voltou ao vagão (#182) some na porta.
+			if walker.get("vanish", false):
+				card.queue_free()
+				continue
 			if walker.get("stay", false):
 				walker.wait = INF
 				continue
@@ -1601,13 +1932,14 @@ func _choose_target(walker: Dictionary, retry: bool = false) -> void:
 			target = x
 	if absf(target - card.position.x) < 1.0:
 		target = walker.min if card.position.x > (walker.min + walker.max) * 0.5 else walker.max
-	# Na Cantina, às vezes vai sentar no banco livre atrás da mesa (só os fundadores têm a pose sentada).
-	if walker.get("room", "") == "canteen" and _poses.has(walker.hero_id + "_seat") and randf() < 0.45:
-		for seat in CANTEEN_SEATS.size():
+	# Na Cantina, às vezes vai sentar no banco livre atrás da mesa (quem tem a pose sentada na roupa que veste).
+	if walker.get("room", "") == "canteen" and walker.poses.has("seat") and randf() < 0.45:
+		var seats := canteen_seats()
+		for seat in seats.size():
 			if not _seats.has(seat):
 				_seats[seat] = walker
 				walker.seat = seat
-				target = CANTEEN_SEATS[seat]
+				target = seats[seat].x
 				break
 	walker.target = target
 
@@ -1651,10 +1983,21 @@ func _post_taken(walker: Dictionary) -> bool:
 	return false
 
 
+## Os lugares do banco da Cantina (m, x e profundidade): o de trás da mesa na Cantina construída, deslocado até a vaga, ou
+## o banco ao lado do fogareiro da plataforma.
+static func canteen_seats() -> Array:
+	var room := room_def(S.CANTEEN)
+	if room.get("place", "") == "platform":
+		return PLATFORM_SEATS.map(func(x): return Vector3(x, 0, PLATFORM_SEAT_Z))
+	var shift: Vector3 = room.get("offset", Vector3.ZERO)
+	return CANTEEN_SEATS.map(func(x): return Vector3(x + shift.x, 0, CANTEEN_SEAT_Z))
+
+
 func _sit_down(walker: Dictionary) -> void:
 	var card: AHSpriteCard = walker.card
-	card.show_art(AHSkins.pose(_poses[walker.hero_id + "_seat"], walker.hero_id))
-	card.position = Vector3(CANTEEN_SEATS[walker.seat], walker.floor, CANTEEN_SEAT_Z)
+	card.show_art(walker.poses.seat)
+	var seat: Vector3 = canteen_seats()[walker.seat]
+	card.position = Vector3(seat.x, walker.floor, seat.z)
 	card.set_facing(1.0)
 	walker.sitting = randf_range(6.0, 11.0)
 

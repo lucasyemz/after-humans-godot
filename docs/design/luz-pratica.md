@@ -22,6 +22,9 @@
 >
 >   As referências do REPLACED que o Lucas mandou não entram no repositório.
 
+> **A Rua refeita (#170, 29/10/2026):** o tambor com o fogo, a emergência e o lampião foram refeitos no estilo das
+> fachadas, sem contorno, no mesmo quadro e nas mesmas âncoras: [luz-pratica-rua.md](luz-pratica-rua.md).
+
 A arte da fase 2 de [ambience.md](ambience.md), pedida na #154: cada fonte de luz é um objeto do cenário, **apagado e
 aceso, com o halo**. A montagem no jogo (as luzes, o pisca, o piloto na Rua das Vitrines e a medição de desempenho) é do
 Claude 2, na #154.

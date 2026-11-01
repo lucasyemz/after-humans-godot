@@ -12,8 +12,8 @@
 ##   por AHUiStyle.px(), então o texto Maior (130%) vale na hora, como no resto do jogo.
 ## - As cores dos alvos (hud-target.md, "Cores e daltonismo"; hud-station.md, "Cores de tinta"), com as do daltonismo;
 ##   os componentes recolorem no restyle() quando o daltonismo muda.
-## - Os estados de vida (decisão do Lucas): Em forma acima de 75%, Ferimento leve de 50% a 75%, Ferimento grave abaixo de
-##   50%.
+## - Os estados de vida (decisão do Lucas): Em forma acima de 75%, Ferimento leve de 30% a 75%, Ferimento grave abaixo de
+##   30% (o mesmo limite do herói ferido que manca, #194, em data/wounded.json).
 ## Nenhum componente decide regra de jogo: recebem os dados prontos (da sessão da luta, das regras da Estação).
 class_name AHKit
 extends RefCounted
@@ -98,11 +98,24 @@ const VEIL := Color(0.04, 0.04, 0.05, 0.62)
 
 ## Os limites dos estados (fração da vida máxima).
 const HEALTHY_ABOVE := 0.75
-const LIGHT_FROM := 0.5
+## Só o valor sem a tabela: o limite de verdade é o Threshold de data/wounded.json (heavy_below), e este acompanha ele.
+const LIGHT_FROM := 0.3
 
 static var _entries := {}
 static var _textures := {}
 static var _fonts := {}
+
+
+## O foco no quadro seguinte (depois de montar a tela), só se o controle ainda existe e está na árvore: a tela refeita
+## ou fechada antes disso não deixa erro. Guarda o id, não o controle (a lambda com um nó liberado também dá erro).
+static func focus_later(control: Control) -> void:
+	if control == null:
+		return
+	var id := control.get_instance_id()
+	(func():
+		var target = instance_from_id(id)
+		if target is Control and target.is_inside_tree():
+			target.grab_focus()).call_deferred()
 
 
 static func _cb() -> int:
@@ -134,9 +147,19 @@ static func health_state(hp: int, max_hp: int) -> Dictionary:
 	var share := float(hp) / float(maxi(1, max_hp))
 	if share > HEALTHY_ABOVE:
 		return {"id": "healthy", "label": "Em forma", "icon": "state_active", "color": _HEALTHY[_cb()]}
-	if share >= LIGHT_FROM:
+	if share >= heavy_below():
 		return {"id": "light", "label": "Ferimento leve", "icon": "state_light_wound", "color": _LIGHT_WOUND[_cb()]}
 	return {"id": "heavy", "label": "Ferimento grave", "icon": "state_wounded", "color": _HEAVY_WOUND[_cb()]}
+
+
+## Abaixo desta fração da vida, ferimento grave: o mesmo limite do herói ferido que manca na exploração (#194), em
+## data/wounded.json (Threshold). Lido pela árvore, e não pelo nome do autoload, para os scripts de captura (-s), que
+## compilam antes dos autoloads; sem a tabela, LIGHT_FROM. Fica abaixo de HEALTHY_ABOVE, para o "Ferimento leve" não sumir.
+static func heavy_below() -> float:
+	var tree := Engine.get_main_loop() as SceneTree
+	var data: Node = tree.root.get_node_or_null("GameData") if tree != null else null
+	var row = data.row("wounded", "wounded") if data != null else null
+	return clampf(float(row.Threshold), 0.05, HEALTHY_ABOVE - 0.05) if row != null else LIGHT_FROM
 
 
 ## A entrada da peça no manifesto (os dois kits; os nomes não se repetem).

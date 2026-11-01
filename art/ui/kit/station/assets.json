@@ -2303,6 +2303,69 @@
       ],
       "sha256": "b986439c42289d33a3f2ea450b598a12e64aa8ee5ab8f064b813660381dc093a",
       "kind": "painted"
+    },
+    "lock": {
+      "file": "art/ui/kit/station/icons/lock.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "9c831ffde30b1095c19ea8afcafcbf6b9b17761e876cefb26134c88d9fe26333",
+      "kind": "glyph_white_tintable"
+    },
+    "weather": {
+      "file": "art/ui/kit/station/icons/weather.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "0f679b4f6c7a8c9d746d934b207159782175e8e72b268114c2673561aad98238",
+      "kind": "glyph_white_tintable"
+    },
+    "admin": {
+      "file": "art/ui/kit/station/icons/admin.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "98b39860ae92a91bfa91bbcaa989bc4144eeba334185dcab0f13699c48958228",
+      "kind": "glyph_white_tintable"
+    },
+    "skip": {
+      "file": "art/ui/kit/station/icons/skip.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "deab6363e073444cab465aecc9c1dffee51ad46395589b09466869c70b4f86f6",
+      "kind": "glyph_white_tintable"
+    },
+    "night_rat": {
+      "file": "art/ui/kit/station/icons/night_rat.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "23a424c72160db2f57843360dde0b7653d05f52387d52acc786e15d72cf8b14e",
+      "kind": "glyph_white_tintable"
+    },
+    "night_talk": {
+      "file": "art/ui/kit/station/icons/night_talk.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "cf94b069da3358bffbeb198b7eee5c9283639f8f9e91ef56a8d35eff48597ed6",
+      "kind": "glyph_white_tintable"
+    },
+    "night": {
+      "file": "art/ui/kit/station/icons/night.webp",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "573b49378654c8600655509abb057c383b0857a51adc3f26b6777f9782460f0f",
+      "kind": "glyph_white_tintable"
     }
   },
   "font": {

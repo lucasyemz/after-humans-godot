@@ -19,11 +19,15 @@ func run(context) -> void:
 	Tips.enabled = false
 	Campaign.save_dir = "user://test-station-view-%d" % Time.get_ticks_usec()
 	Campaign.state = Campaign.create_initial(44)
-	_neighbors()
 	var station = await _open()
 	if t.check(station != null, "a Estação abriu"):
 		await _sala_to_map(station)
 		await _lock_marks(station)
+		await _dormitory(station)
+		# Os vizinhos, a vista que anda e os cômodos escolhidos numa Estação inteira: a planta herdada (#186), com os
+		# cômodos na ordem de antes da grade. A cena remonta sem sair da Estação.
+		await _to_legacy(station)
+		_neighbors()
 		await _pan(station)
 		await _rooms(station)
 	if _tree.current_scene != null:
@@ -37,6 +41,20 @@ func run(context) -> void:
 	Tips.enabled = tips
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## Um save de antes da grade, com a Estação quase toda recuperada (o Depósito no nível 2, com sala) e o Bar ainda
+## parado na vaga dele (o nível 0 da planta herdada, com o marcador de construir).
+func _to_legacy(station) -> void:
+	var c: Dictionary = Campaign.state
+	for id in [S.FORGE, S.RESEARCH, S.INFIRMARY]:
+		c.station.rooms[id] = 1
+	c.station.rooms[S.DEPOT] = 2
+	c.station.erase("grid")
+	AHStationGrid.migrate(c)
+	station.commit()
+	await _settle(station)
+	t.check(station._build.dressing.has(S.BAR) and not station.room_def(S.BAR).is_empty(), "a planta herdada: a cena remonta com o Bar")
 
 
 func _neighbors() -> void:
@@ -74,7 +92,35 @@ func _lock_marks(station) -> void:
 	t.equal(forge.state, "short", "a Forja sem sucata: falta recurso")
 	t.check(String(forge.title).contains(S.cost_text(S.next_level_cost(c, S.FORGE))), "o marcador diz o custo (%s)" % forge.title)
 	t.equal(forge.note, S.upgrade_block(c, S.FORGE), "e o que falta")
-	t.equal(hud.lock_mark_info(c, S.BAR).state, "closed", "o Bar: fechado, com o motivo")
+	# O Bar tem custo (#176): o marcador de construir no lugar de "Fechado", e nenhum cômodo fica "fechado".
+	# Na grade (#186), o Bar começa soterrado: o marcador diz "Soterrado" e o que escavar.
+	var buried := hud.lock_mark_info(c, S.BAR)
+	t.check(buried.state == "closed" and buried.title == tr("Soterrado") and buried.note == S.upgrade_block(c, S.BAR), "o Bar soterrado: o marcador diz o que escavar")
+	c.station.grid.cells[0][1] = AHStationGrid.FREE
+	var bar := hud.lock_mark_info(c, S.BAR)
+	t.equal(bar.state, "short", "com a vaga livre, o Bar sem recurso: o marcador de construir, com o que falta")
+	t.equal(bar.cost, S.next_level_cost(c, S.BAR), "com o custo do Bar")
+	t.check(hud.lock_mark_info(c, S.DORMITORY).is_empty(), "o Dormitório já existe: sem marcador")
+	for room in S.ROOMS:
+		t.check(hud.lock_mark_info(c, room.id).get("title", "") != tr("Fechado"), "%s não fica fechado" % room.name)
+	c.station.grid.cells[0][1] = ""
+	# O painel do Depósito soterrado: o motivo na tela (o toque não mostra a dica) e a escolha do bloco a escavar.
+	c.inventory.scrap = 20
+	c.inventory.fragments = 5
+	hud.open_room(S.DEPOT)
+	await _frames(3)
+	var why := hud._body.find_child("SpaceBlock", true, false) as Label
+	t.check(why != null and why.text == S.upgrade_block(c, S.DEPOT), "com material de sobra, o painel diz que falta a vaga")
+	var dig := hud._body.find_child("Dig_L2", true, false) as Button
+	if t.check(dig != null and hud._body.find_child("Dig_1_2", true, false) != null, "e mostra os blocos que dá para escavar"):
+		dig.pressed.emit()
+		await _frames(3)
+		t.equal(AHStationGrid.dig_target(c), "L2", "escolher o patamar muda a frente de escavação")
+	AHStationGrid.set_dig_target(c, "")
+	hud.close_panel()
+	c.inventory.scrap = 0
+	c.inventory.fragments = 0
+	await _frames(2)
 	t.check(hud.lock_mark_info(c, S.CANTEEN).is_empty(), "o cômodo recuperado fica sem marcador")
 	c.inventory.scrap = 20
 	c.inventory.fragments = 5
@@ -90,6 +136,49 @@ func _lock_marks(station) -> void:
 	station.commit()
 	await _frames(3)
 	t.check(not hud._lock_marks.has(S.FORGE), "o marcador dela sai")
+
+
+## O Dormitório sem camas (#176): no nível 1 os beliches não aparecem e quem dorme deita no chão; com a melhoria, os
+## beliches aparecem e quem dorme vai para eles. Entrar abre o painel com o custo dos beliches.
+func _dormitory(station) -> void:
+	var hud: AHRefugeHud = station.hud
+	var c: Dictionary = Campaign.state
+	var bunks: Array = station._build.dressing.get("dormitory@2", [])
+	t.check(not bunks.is_empty(), "os beliches são a peça do nível 2")
+	t.check(bunks.all(func(n): return not n.visible), "no nível 1, sem beliches")
+	var team: Array = c.roster.slice(0, 4).map(func(h): return h.id)
+	c.night.phase = "planning"
+	c.night.participants = team
+	c.night.watch_hero_id = ""
+	station.commit()
+	await _frames(3)
+	var floor_slots := AHStation.sleep_slots(1)
+	var lying: Array = station._walkers.filter(func(w): return w.get("sleeping", false) and w.has("hero_id"))
+	t.equal(lying.size(), 4, "os quatro deitam")
+	t.check(lying.all(func(w): return floor_slots.has(w.card.position)), "no chão do Dormitório")
+	hud.open_room(S.DORMITORY)
+	await _frames(3)
+	t.check(hud._body.find_child("Upgrade", true, false) == null, "com a noite pendente, o painel abre no plano da noite, sem os beliches")
+	c.night.phase = "none"
+	hud.refresh()
+	await _frames(3)
+	t.check(hud._body.find_child("Upgrade", true, false) != null, "de dia, o painel do Dormitório oferece os beliches")
+	c.night.phase = "planning"
+	c.inventory.scrap = 3
+	t.equal(S.upgrade_room(c, S.DORMITORY, 1), "", "os beliches por 3 sucatas")
+	station.commit()
+	await _frames(3)
+	t.check(bunks.all(func(n): return n.visible), "com a melhoria, os beliches aparecem")
+	var bunk_slots := AHStation.sleep_slots(2)
+	t.check(station._walkers.filter(func(w): return w.get("sleeping", false) and w.has("hero_id")).all(func(w): return bunk_slots.has(w.card.position)),
+		"e quem dorme vai para eles")
+	t.equal(S.helper_limit(c), 4, "com os beliches, 4 ajudantes")
+	hud.close_panel()
+	c.night.phase = "none"
+	c.night.participants = []
+	c.station.rooms[S.DORMITORY] = 1
+	station.commit()
+	await _frames(3)
 
 
 func _pan(station) -> void:
