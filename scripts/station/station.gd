@@ -2047,10 +2047,12 @@ func _walk(delta: float) -> void:
 							_choose_target(walker)
 					continue
 				walker.pause -= delta
-				# O posto do meio da faixa é de um só: com alguém trabalhando nele, espera a vez.
-				if walker.pause <= 0.0 and walker.wait > 0.0 and _post_taken(walker):
+				# O posto do meio da faixa é de um só: com alguém trabalhando nele, espera a vez. Quem está segurado (a
+				# conversa da tirinha, wait INF) não vai trabalhar: ficava longe do outro até o trabalho acabar (QA da #207).
+				var free: bool = walker.wait > 0.0 and not is_inf(float(walker.wait))
+				if walker.pause <= 0.0 and free and _post_taken(walker):
 					walker.pause = randf_range(3.0, 6.0)
-				if walker.pause <= 0.0 and walker.wait > 0.0:
+				if walker.pause <= 0.0 and free:
 					card.show_art(walker.poses.work)
 					card.position = Vector3(_work_post(walker), walker.floor, walker.get("work_z", -5.6))
 					card.set_facing(1.0)

@@ -387,6 +387,16 @@ func _story(station) -> void:
 	var nick = _walker(station, C.NICK)
 	t.check(bento != null and nick != null and bento.room == nick.room, "o Bento e o Nick no mesmo cômodo")
 	t.check(absf(bento.card.position.x - nick.card.position.x) <= 1.3, "lado a lado")
+	# O Bento trabalha na Forja (o posto dele): segurado para a conversa, não volta ao posto (QA da #207, rodada do merge).
+	bento.work = true
+	bento.working = 0.0
+	var forge_on: bool = S.room_level(Campaign.state, bento.room) >= 1 and (not [S.FORGE, S.RESEARCH].has(bento.room)
+		or S.running_rooms(Campaign.state).has(bento.room))
+	for frame in 5:
+		bento.pause = 0.0
+		await tree.process_frame
+	t.check(float(bento.working) <= 0.0 and absf(bento.card.position.x - nick.card.position.x) <= 1.3,
+		"segurado para a conversa, o Bento não vai trabalhar (o cômodo dele funciona: %s)" % forge_on)
 	var shown := false
 	for frame in 600:
 		await tree.process_frame
