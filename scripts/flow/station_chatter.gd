@@ -236,7 +236,8 @@ static func story_pending(campaign: Dictionary) -> String:
 		var home := true
 		for id in row.get("Speakers", []):
 			var entry = S.hero(campaign, id)
-			home = home and entry != null and entry.get("alive", true) and not S.recovering(entry)
+			# Em tratamento (#265) também não: está num leito da Enfermaria.
+			home = home and entry != null and entry.get("alive", true) and not S.recovering(entry) and not AHStationServices.treating(entry)
 		if home:
 			return name
 	return ""

@@ -1705,6 +1705,13 @@ static func infirmary_slots() -> Array:
 static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	var entry = S.hero(campaign, hero_id)
 	var fallen := S.fallen(campaign)
+	if AHStationServices.treating(entry) and not S.recovering(entry):
+		# O tratamento da peculiaridade (#265) ocupa um leito da Enfermaria, depois dos caídos que estão nos leitos.
+		var beds: int = fallen.filter(func(h): return S.in_bed(h)).size()
+		var order: int = campaign.roster.filter(func(h): return AHStationServices.treating(h) and not S.recovering(h)).map(
+			func(h): return h.id).find(hero_id)
+		var beds_slots := infirmary_slots()
+		return beds_slots[beds + order] if order >= 0 and beds + order < beds_slots.size() else Vector3.INF
 	if S.in_bed(entry):
 		var index: int = fallen.filter(func(h): return S.in_bed(h)).map(func(h): return h.id).find(hero_id)
 		var slots := infirmary_slots()
@@ -1716,6 +1723,17 @@ static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	var taken: Array = sleepers(campaign).map(func(id): return campaign.night.participants.find(id))
 	var free: Array = range(slots.size() - 1, -1, -1).filter(func(slot): return not taken.has(slot))
 	return slots[free[index]] if index >= 0 and index < free.size() else Vector3.INF
+
+
+## Fora do passeio (a Estação viva, #207): quem se recupera (#118) e quem trata uma peculiaridade (#265), que ocupa
+## um leito da Enfermaria; nos dois casos, deitado, sem andar e sem falar.
+static func in_care(entry) -> bool:
+	return S.recovering(entry) or AHStationServices.treating(entry)
+
+
+## No leito da Enfermaria (e não no Dormitório): o caído no leito e quem está em tratamento.
+static func care_bed(entry) -> bool:
+	return S.in_bed(entry) or (AHStationServices.treating(entry) and not S.recovering(entry))
 
 
 ## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview). Durante a
@@ -1757,7 +1775,7 @@ func _update_sleepers() -> void:
 		var card: AHSpriteCard = walker.card
 		# Em recuperação (#118): deitado no leito da Enfermaria (ou num lugar do Dormitório), sem passear. Sem a pose
 		# de dormir ou sem lugar, fica de pé, parado, no cômodo onde se recupera.
-		if S.recovering(S.hero(campaign, walker.hero_id)):
+		if in_care(S.hero(campaign, walker.hero_id)):
 			walker.sleeping = true
 			walker.recovering = true
 			var spot := recovery_spot(campaign, walker.hero_id)
@@ -1765,7 +1783,7 @@ func _update_sleepers() -> void:
 				card.show_art(walker.poses.sleep)
 				card.position = spot
 			else:
-				var place := room_def(S.INFIRMARY if S.in_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
+				var place := room_def(S.INFIRMARY if care_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
 				card.show_art(walker.idle)
 				# Sem lugar no beliche, de pé no cômodo, cada um no seu ponto da faixa (nunca um por cima do outro).
 				var order: int = S.fallen(campaign).map(func(h): return h.id).find(walker.hero_id)
@@ -1830,14 +1848,15 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 			continue
 		var room_id: String
 		var shared: Array = occupancy.keys().filter(func(id): return occupancy[id] < 2)
-		if S.recovering(entry):
-			# Quem se recupera não passeia (_update_sleepers deita no leito); não toma o cômodo de ninguém.
-			room_id = S.INFIRMARY if S.in_bed(entry) else S.DORMITORY
+		if in_care(entry):
+			# Quem se recupera ou trata uma peculiaridade (#265) não passeia (_update_sleepers deita no leito); não toma o
+			# cômodo de ninguém.
+			room_id = S.INFIRMARY if care_bed(entry) else S.DORMITORY
 		elif free_rooms.is_empty() or (not shared.is_empty() and rng.randf() < SHARE_ROOM_CHANCE):
 			room_id = shared[rng.randi_range(0, shared.size() - 1)] if not shared.is_empty() else S.DORMITORY
 		else:
 			room_id = free_rooms.pop_at(rng.randi_range(0, free_rooms.size() - 1))
-		if not S.recovering(entry):
+		if not in_care(entry):
 			occupancy[room_id] = int(occupancy.get(room_id, 0)) + 1
 		var room := room_def(room_id)
 		var poses := _resident_poses(entry, art)

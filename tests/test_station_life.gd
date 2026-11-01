@@ -36,6 +36,7 @@ func run(context) -> void:
 		await _walk(station)
 		await _focus_screen(station)
 		await _story(station)
+		station = await _treatment()
 	tree.unload_current_scene()
 	await tree.process_frame
 	for file in DirAccess.get_files_at(Campaign.save_dir):
@@ -190,6 +191,30 @@ func _rules() -> void:
 	old.station.erase("comics_seen")
 	S.migrate(old)
 	t.equal(old.station.get("comics_seen"), [], "o save antigo ganha a lista das tirinhas vistas")
+
+
+## Em tratamento de uma peculiaridade (#265), o herói ocupa um leito da Enfermaria: deitado, sem passear, sem falar e
+## fora da conversa da tirinha (QA da #207, a rodada do merge com o #265).
+func _treatment():
+	var c: Dictionary = Campaign.state
+	c.station.rooms[S.INFIRMARY] = 2
+	c.station.erase("comics_seen")
+	var nick = S.hero(c, C.NICK)
+	nick.perks = Array(nick.perks) + ["machine-fear"]
+	t.equal(AHStationServices.treat_quirk(c, C.NICK, "machine-fear"), "", "o Nick começa o tratamento")
+	t.equal(C.story_pending(c), "", "com o Nick no leito, a tirinha espera o tratamento acabar")
+	var station = await _open()
+	if not t.check(station != null, "a Estação reabre com o Nick em tratamento"):
+		return station
+	var walker = _walker(station, C.NICK)
+	if t.check(walker != null, "o Nick está na Estação"):
+		t.equal(String(walker.room), S.INFIRMARY, "na Enfermaria")
+		t.check(walker.get("recovering", false), "deitado no leito, como quem se recupera")
+		t.check(not station.life.can_walk(walker), "sem passear entre os cômodos")
+		t.check(not station.life.present().has(C.NICK), "sem falar nem pensar")
+	nick.quirk_treatment = {}
+	t.check(C.story_pending(c) != "", "acabado o tratamento, a tirinha volta a valer")
+	return station
 
 
 func _open():
