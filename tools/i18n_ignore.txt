@@ -365,12 +365,15 @@ inventory_panel.gd: reason
 inventory_panel.gd: text
 inventory_panel.gd: tools
 journey_rules.gd: %s_%s
+journey_rules.gd: Breaks
 journey_rules.gd: Choices
+journey_rules.gd: Count
 journey_rules.gd: Damage
 journey_rules.gd: Failure
 journey_rules.gd: Front
 journey_rules.gd: Max
 journey_rules.gd: Objects
+journey_rules.gd: patrol_%d
 journey_rules.gd: Places
 journey_rules.gd: Ranged
 journey_rules.gd: Requirement

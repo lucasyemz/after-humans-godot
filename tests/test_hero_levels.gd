@@ -183,11 +183,11 @@ func _xp_from_play() -> void:
 	var session := AHCombatSession.create(heroes, ["robot"], false, 4)
 	session.tally = {"hero_cao_bento": {"damage": 20, "healing": 10, "downs": 1}}
 	var expected := AHHeroLevels.fight_xp({"damage": 20, "healing": 10, "downs": 1})
-	t.equal(expected, 8 + 3 + 2 + 2, "o XP da luta: lutar, derrubar, curar e o dano (hero-xp.json)")
-	t.equal(AHHeroLevels.fight_xp({"protects": 2}), 8 + 2 * int(AHHeroLevels.rule("protect").Xp), "proteger um aliado também dá XP")
+	t.equal(expected, 10 + 3 + 2 + 2, "o XP da luta: lutar, derrubar, curar e o dano (hero-xp.json)")
+	t.equal(AHHeroLevels.fight_xp({"protects": 2}), 10 + 2 * int(AHHeroLevels.rule("protect").Xp), "proteger um aliado também dá XP")
 	session.write_back(c)
 	t.equal(AHHeroLevels.xp(S.hero(c, "hero_cao_bento")), expected, "quem fez mais ganha mais")
-	t.equal(AHHeroLevels.xp(S.hero(c, recruit_id)), roundi(8 * 1.5), "o recruta ganha mais que o fundador pelo mesmo")
+	t.equal(AHHeroLevels.xp(S.hero(c, recruit_id)), roundi(10 * 1.5), "o recruta ganha mais que o fundador pelo mesmo")
 	t.equal(int(c.session.expedition.stats.hero_cao_bento.xp), expected, "o relatório guarda o XP")
 	c.session.result = "victory"
 	var report := S.finish_return(c)
