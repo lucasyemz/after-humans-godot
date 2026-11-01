@@ -27,9 +27,10 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/flow/rescue_rules.gd",
 	"res://scripts/flow/type_advantage.gd", "res://scripts/flow/hero_skills.gd", "res://scripts/ui/station/dig_board.gd",
 	"res://scripts/flow/station_services.gd",
-	"res://scripts/flow/species_rules.gd"]
+	"res://scripts/flow/camp_skills.gd", "res://scripts/flow/species_rules.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
+	"camp-skills": ["DisplayName", "Description"],
 	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Role", "Description"], "species": ["DisplayName"],
 	"enemies": ["DisplayName", "Role", "Description"], "enemy-actions": ["DisplayName", "Description"], "events": ["Title", "Description"],
 	"expedition-nodes": ["Title", "Description"], "perks": ["DisplayName", "Description"], "relics": ["DisplayName", "Description"],

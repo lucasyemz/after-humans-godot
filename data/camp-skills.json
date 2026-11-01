@@ -1,0 +1,404 @@
+[
+  {
+    "Name": "camp_comum_conversa_ao_fogo",
+    "Class": "",
+    "Starter": true,
+    "Cost": 2,
+    "Target": "ally",
+    "Effects": {
+      "instinct": -15
+    },
+    "DisplayName": "Conversa ao Fogo",
+    "Description": "Uma conversa baixa perto do fogo: o aliado perde 15 de Instinto."
+  },
+  {
+    "Name": "camp_comum_remendo_de_campo",
+    "Class": "",
+    "Starter": false,
+    "Cost": 2,
+    "Target": "ally",
+    "Effects": {
+      "heal_pct": 15
+    },
+    "DisplayName": "Remendo de Campo",
+    "Description": "Um remendo com o que se tem à mão: o aliado recupera 15% da vida."
+  },
+  {
+    "Name": "camp_cao_primeiro_turno",
+    "Class": "cao",
+    "Starter": true,
+    "Cost": 4,
+    "Target": "self",
+    "Effects": {
+      "watch": true,
+      "instinct": -10
+    },
+    "DisplayName": "Primeiro Turno",
+    "Description": "Fica com o primeiro turno de vigia: a equipe dorme sem Noite mal dormida, e ele perde 10 de Instinto."
+  },
+  {
+    "Name": "camp_cao_ombro_a_ombro",
+    "Class": "cao",
+    "Starter": true,
+    "Cost": 3,
+    "Target": "ally",
+    "Effects": {
+      "block": 1,
+      "self_block": 1
+    },
+    "DisplayName": "Ombro a Ombro",
+    "Description": "Combina a defesa com um aliado: os dois começam a próxima luta com 1 Bloqueio."
+  },
+  {
+    "Name": "camp_cao_reforcar_a_segunda_pele",
+    "Class": "cao",
+    "Starter": false,
+    "Cost": 3,
+    "Target": "self",
+    "Effects": {
+      "block": 2
+    },
+    "DisplayName": "Reforçar a Segunda Pele",
+    "Description": "Ajusta as placas da roupa: começa a próxima luta com 2 Bloqueios."
+  },
+  {
+    "Name": "camp_cao_palavra_firme",
+    "Class": "cao",
+    "Starter": false,
+    "Cost": 4,
+    "Target": "team",
+    "Effects": {
+      "instinct": -10
+    },
+    "DisplayName": "Palavra Firme",
+    "Description": "Uma palavra firme para todos: a equipe perde 10 de Instinto."
+  },
+  {
+    "Name": "camp_cao_dividir_a_carga",
+    "Class": "cao",
+    "Starter": false,
+    "Cost": 2,
+    "Target": "team",
+    "Effects": {
+      "clear": [
+        "cansado"
+      ]
+    },
+    "DisplayName": "Dividir a Carga",
+    "Description": "Redistribui o peso das mochilas: a equipe deixa de estar Cansada."
+  },
+  {
+    "Name": "camp_gato_rondar_o_quarteirao",
+    "Class": "gato",
+    "Starter": true,
+    "Cost": 3,
+    "Target": "self",
+    "Effects": {
+      "opening": true
+    },
+    "DisplayName": "Rondar o Quarteirão",
+    "Description": "Ronda o quarteirão antes de sair: a próxima luta começa com a equipe agindo primeiro."
+  },
+  {
+    "Name": "camp_gato_cochilo_leve",
+    "Class": "gato",
+    "Starter": true,
+    "Cost": 2,
+    "Target": "self",
+    "Effects": {
+      "instinct": -20
+    },
+    "DisplayName": "Cochilo Leve",
+    "Description": "Um cochilo com um olho aberto: perde 20 de Instinto."
+  },
+  {
+    "Name": "camp_gato_vasculhar_os_arredores",
+    "Class": "gato",
+    "Starter": false,
+    "Cost": 3,
+    "Target": "self",
+    "Effects": {
+      "food": 1
+    },
+    "DisplayName": "Vasculhar os Arredores",
+    "Description": "Vasculha os arredores do acampamento: +1 comida."
+  },
+  {
+    "Name": "camp_gato_treino_de_queda",
+    "Class": "gato",
+    "Starter": false,
+    "Cost": 3,
+    "Target": "ally",
+    "Effects": {
+      "dodge": 1
+    },
+    "DisplayName": "Treino de Queda",
+    "Description": "Ensina a cair sem se machucar: o aliado começa a próxima luta com 1 Esquiva."
+  },
+  {
+    "Name": "camp_gato_sacudir_o_cansaco",
+    "Class": "gato",
+    "Starter": false,
+    "Cost": 2,
+    "Target": "team",
+    "Effects": {
+      "clear": [
+        "cansado"
+      ]
+    },
+    "DisplayName": "Sacudir o Cansaço",
+    "Description": "Alongamento e um pouco de pressa: a equipe deixa de estar Cansada."
+  },
+  {
+    "Name": "camp_sapo_preparar_ampola",
+    "Class": "sapo",
+    "Starter": true,
+    "Cost": 3,
+    "Target": "self",
+    "Effects": {
+      "ampoule": 1
+    },
+    "DisplayName": "Preparar Ampola",
+    "Description": "Prepara mais uma dose: +1 carga da Ampola de Reparo Vivo."
+  },
+  {
+    "Name": "camp_sapo_cha_de_raizes",
+    "Class": "sapo",
+    "Starter": true,
+    "Cost": 3,
+    "Target": "ally",
+    "Effects": {
+      "heal_pct": 20,
+      "instinct": -10
+    },
+    "DisplayName": "Chá de Raízes",
+    "Description": "Um chá quente de raízes: o aliado recupera 20% da vida e perde 10 de Instinto."
+  },
+  {
+    "Name": "camp_sapo_limpar_feridas",
+    "Class": "sapo",
+    "Starter": false,
+    "Cost": 4,
+    "Target": "ally",
+    "Effects": {
+      "heal_pct": 30
+    },
+    "DisplayName": "Limpar Feridas",
+    "Description": "Limpa e fecha as feridas com calma: o aliado recupera 30% da vida."
+  },
+  {
+    "Name": "camp_sapo_vapor_calmante",
+    "Class": "sapo",
+    "Starter": false,
+    "Cost": 4,
+    "Target": "team",
+    "Effects": {
+      "instinct": -10
+    },
+    "DisplayName": "Vapor Calmante",
+    "Description": "Ferve ervas que acalmam o ar: a equipe perde 10 de Instinto."
+  },
+  {
+    "Name": "camp_sapo_sais_de_alerta",
+    "Class": "sapo",
+    "Starter": false,
+    "Cost": 3,
+    "Target": "team",
+    "Effects": {
+      "clear": [
+        "cansado",
+        "exposto"
+      ]
+    },
+    "DisplayName": "Sais de Alerta",
+    "Description": "Sais que acordam o corpo: a equipe deixa de estar Cansada e Exposta."
+  },
+  {
+    "Name": "camp_coruja_limpar_a_mira",
+    "Class": "coruja",
+    "Starter": true,
+    "Cost": 3,
+    "Target": "self",
+    "Effects": {
+      "mark_front": true
+    },
+    "DisplayName": "Limpar a Mira",
+    "Description": "Limpa e regula a mira: na próxima luta, o inimigo da posição 1 começa Marcado."
+  },
+  {
+    "Name": "camp_coruja_contar_a_rota",
+    "Class": "coruja",
+    "Starter": true,
+    "Cost": 2,
+    "Target": "team",
+    "Effects": {
+      "hope": 10
+    },
+    "DisplayName": "Contar a Rota",
+    "Description": "Conta o caminho que falta, passo a passo: +10 de Esperança."
+  },
+  {
+    "Name": "camp_coruja_posto_alto",
+    "Class": "coruja",
+    "Starter": false,
+    "Cost": 4,
+    "Target": "self",
+    "Effects": {
+      "watch": true
+    },
+    "DisplayName": "Posto Alto",
+    "Description": "Vigia de um ponto alto: a equipe dorme sem Noite mal dormida."
+  },
+  {
+    "Name": "camp_coruja_sinal_combinado",
+    "Class": "coruja",
+    "Starter": false,
+    "Cost": 3,
+    "Target": "ally",
+    "Effects": {
+      "dodge": 1
+    },
+    "DisplayName": "Sinal Combinado",
+    "Description": "Combina um sinal para o perigo: o aliado começa a próxima luta com 1 Esquiva."
+  },
+  {
+    "Name": "camp_coruja_hora_quieta",
+    "Class": "coruja",
+    "Starter": false,
+    "Cost": 2,
+    "Target": "self",
+    "Effects": {
+      "instinct": -20
+    },
+    "DisplayName": "Hora Quieta",
+    "Description": "Uma hora em silêncio, longe do fogo: perde 20 de Instinto."
+  },
+  {
+    "Name": "camp_rato_conserto_rapido",
+    "Class": "rato",
+    "Starter": true,
+    "Cost": 3,
+    "Target": "ally",
+    "Effects": {
+      "block": 1
+    },
+    "DisplayName": "Conserto Rápido",
+    "Description": "Aperta as fivelas e os remendos do aliado: ele começa a próxima luta com 1 Bloqueio."
+  },
+  {
+    "Name": "camp_rato_causo_ao_pe_do_fogo",
+    "Class": "rato",
+    "Starter": true,
+    "Cost": 2,
+    "Target": "team",
+    "Effects": {
+      "instinct": -5,
+      "hope": 5
+    },
+    "DisplayName": "Causo ao Pé do Fogo",
+    "Description": "Um causo da Estação ao pé do fogo: a equipe perde 5 de Instinto, e +5 de Esperança."
+  },
+  {
+    "Name": "camp_rato_armadilha_de_sucata",
+    "Class": "rato",
+    "Starter": false,
+    "Cost": 4,
+    "Target": "team",
+    "Effects": {
+      "watch": true
+    },
+    "DisplayName": "Armadilha de Sucata",
+    "Description": "Arma latas e sucata em volta do acampamento: a equipe dorme sem Noite mal dormida."
+  },
+  {
+    "Name": "camp_rato_desmontar_o_achado",
+    "Class": "rato",
+    "Starter": false,
+    "Cost": 3,
+    "Target": "self",
+    "Effects": {
+      "bandage": 1
+    },
+    "DisplayName": "Desmontar o Achado",
+    "Description": "Desmonta o que achou e aproveita o tecido: +1 curativo."
+  },
+  {
+    "Name": "camp_rato_atalho_pelos_dutos",
+    "Class": "rato",
+    "Starter": false,
+    "Cost": 3,
+    "Target": "team",
+    "Effects": {
+      "speed": 1
+    },
+    "DisplayName": "Atalho pelos Dutos",
+    "Description": "Acha um atalho pelos dutos: a equipe começa a próxima luta com +1 de velocidade."
+  },
+  {
+    "Name": "camp_tatu_maca_improvisada",
+    "Class": "tatu",
+    "Starter": true,
+    "Cost": 3,
+    "Target": "ally",
+    "Effects": {
+      "heal_pct": 25,
+      "wounded": true
+    },
+    "DisplayName": "Maca Improvisada",
+    "Description": "Uma maca com o que sobrou: o aliado Ferido recupera 25% da vida."
+  },
+  {
+    "Name": "camp_tatu_plano_de_resgate",
+    "Class": "tatu",
+    "Starter": true,
+    "Cost": 3,
+    "Target": "team",
+    "Effects": {
+      "phase": "preparado"
+    },
+    "DisplayName": "Plano de Resgate",
+    "Description": "Combina quem tira quem de onde: a equipe fica Preparada para a próxima luta."
+  },
+  {
+    "Name": "camp_tatu_fechar_a_entrada",
+    "Class": "tatu",
+    "Starter": false,
+    "Cost": 4,
+    "Target": "team",
+    "Effects": {
+      "watch": true
+    },
+    "DisplayName": "Fechar a Entrada",
+    "Description": "Fecha a entrada com o que encontra: a equipe dorme sem Noite mal dormida."
+  },
+  {
+    "Name": "camp_tatu_manta_termica",
+    "Class": "tatu",
+    "Starter": false,
+    "Cost": 3,
+    "Target": "ally",
+    "Effects": {
+      "heal_pct": 15,
+      "instinct": -10
+    },
+    "DisplayName": "Manta Térmica",
+    "Description": "Divide a manta térmica: o aliado recupera 15% da vida e perde 10 de Instinto."
+  },
+  {
+    "Name": "camp_tatu_ninguem_fica_para_tras",
+    "Class": "tatu",
+    "Starter": false,
+    "Cost": 4,
+    "Target": "team",
+    "Effects": {
+      "hope": 10,
+      "instinct": -5
+    },
+    "DisplayName": "Ninguém Fica Para Trás",
+    "Description": "Lembra que ninguém fica para trás: +10 de Esperança, e a equipe perde 5 de Instinto."
+  },
+  {
+    "Name": "_about",
+    "Note": "Aprovado (#261, o Orquestrador em nome do Lucas, 01/11): as 7 habilidades de acampamento de cada papel (Class, o id da classe; \"\" é comum a todos), as 3 da chegada (Starter), o Tempo de fogueira (Cost), o alvo (Target: self a si, ally um aliado, team a equipe) e os efeitos (Effects): instinct (soma ao Instinto), heal_pct (% da vida), hope, food, bandage, ampoule (cargas da Ampola), block/dodge/speed (na próxima luta; self_block dá também a quem usa), mark_front (o inimigo da posição 1 começa Marcado), opening (a próxima luta começa com a equipe agindo primeiro), watch (vigiar: evita a Noite mal dormida), phase (um efeito de fase), clear (tira efeitos de fase) e wounded (só em quem está Ferido). As regras (o Tempo, os níveis do desbloqueio, a noite) ficam em hero-skills.json, linha camp."
+  }
+]
