@@ -31,7 +31,8 @@ func _arrival() -> void:
 	var c: Dictionary = Campaign.create_initial(23)
 	var iris: Dictionary = c.roster.filter(func(h): return h.class_id == "sapo")[0]
 	iris.on_train = true
-	iris.hp = ceili(int(iris.max_hp) * 0.35)
+	# Abaixo do limite de ferido (#194, data/wounded.json): desce no passo de quem manca.
+	iris.hp = maxi(1, floori(int(iris.max_hp) * float(AHWounded.rules().Threshold) * 0.8))
 	M.state(c).reports = [{"hero_id": iris.id, "mission": "cisterna_turva", "day": 1, "result": "hurt", "reward": {"kind": "supplies", "amount": 1, "relic_id": ""}}]
 	# O trem de sempre com dois (#182), à força pela barra de Admin, até descerem dois.
 	for attempt in 40:

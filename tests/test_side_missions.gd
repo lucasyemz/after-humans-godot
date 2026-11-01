@@ -10,6 +10,7 @@ const M = preload("res://scripts/flow/side_mission_rules.gd")
 
 func run(t) -> void:
 	_unlock(t)
+	_hurt_limit(t)
 	_board(t)
 	_chance(t)
 	_send(t)
@@ -197,7 +198,9 @@ func _round(t, capture: bool) -> Dictionary:
 				if report.reward.kind == "seeds":
 					t.equal(int(c.inventory.seeds), seeds + int(report.reward.amount), "a recompensa entra no estoque")
 			"hurt":
-				t.equal(int(hero.hp), mini(hp_before, maxi(1, ceili(int(hero.max_hp) * 0.35))), "o ferido volta com até 35% da vida, sem sarar")
+				var hurt_hp := float(M.rules().HurtHp)
+				t.equal(int(hero.hp), mini(hp_before, M.hurt_hp(int(hero.max_hp))), "o ferido volta com até %d%% da vida, sem sarar" % roundi(hurt_hp * 100))
+				t.check(AHWounded.is_wounded(hero), "e volta ferido (#194): manca e desce no passo de quem manca")
 				t.check(report.reward.relic_id == "", "o ferido não traz relíquia")
 				if int(report.reward.amount) == 0:
 					results["empty"] = true
@@ -337,3 +340,17 @@ func _screen(t) -> void:
 	t.equal(int(c.station.cycle_number), cycle + 1, "e o dia passa")
 	map.free()
 	Campaign.state = saved
+
+
+## Quem volta ferido da missão (HurtHp) fica abaixo do limite de ferido (data/wounded.json, #194): manca na chegada, como o
+## #288 prometeu. Vale para a vida máxima de qualquer herói do elenco inicial e dos recrutas (o arredondamento para cima).
+func _hurt_limit(t) -> void:
+	var hurt_hp := float(M.rules().HurtHp)
+	var threshold := float(AHWounded.rules().Threshold)
+	t.check(hurt_hp < threshold, "HurtHp (%.2f) fica abaixo do limite de ferido (%.2f)" % [hurt_hp, threshold])
+	var above: Array = []
+	for max_hp in range(12, 61):
+		var hero := {"alive": true, "max_hp": max_hp, "hp": M.hurt_hp(max_hp)}
+		if not AHWounded.is_wounded(hero):
+			above.append(max_hp)
+	t.equal(above, [], "com qualquer vida máxima de 12 a 60, quem volta ferido manca")
