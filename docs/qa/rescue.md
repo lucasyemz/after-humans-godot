@@ -33,7 +33,8 @@ usa a mesma mecânica do resgate de quem foi capturado.
   - **Entrar na equipe**, com metade da vida e 20 de instinto. Se a equipe está cheia, o jogador escolhe quem dá o
     lugar. Quem sai volta para a Estação com a vida que tinha, sem o XP da jornada. O caído no mapa não pode dar o
     lugar.
-  - **Seguir para a Estação:** chega na volta, até na derrota.
+  - **Mandar <nome> à Estação** (por exemplo, "Mandar Véspera à Estação", decisão do Lucas de 01/11): chega na volta,
+    até na derrota.
   - **Deixar**, só no pedido de ajuda: a equipe deixa 1 de comida (sem comida, "Deixar para trás"), e o pedido não
     volta.
   - **Alojamento cheio:** o pedido de ajuda só pode ser deixado.
