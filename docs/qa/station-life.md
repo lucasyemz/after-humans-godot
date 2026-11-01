@@ -81,6 +81,17 @@ O custo do `AHStationLife` por quadro, medido sem janela:
   - o save, o load e o save antigo.
 - A QA não conseguiu testar o clique e o toque no balão sem janela. Fica para o Lucas conferir jogando.
 
+**Rodada 3 (a integração com a `main` nova): APROVADO**
+- A `main` recebeu a interface da grade (#274), a #194 e o "Dia" (#305), e a branch foi rebaseada sobre ela.
+- O que a QA conferiu:
+  - nenhum balão com o quadro da escavação ou com o aviso do achado;
+  - os marcadores dos blocos ficam por baixo dos balões;
+  - "Ouvir o Bento" vem antes de escavar e construir;
+  - a previsão da comida depois do "Dia".
+- A suíte inteira passa: 111 de 111.
+- As fotos acima são de antes desse rebase. A #274 muda os marcadores da grade na vista geral, mas a Estação viva não
+  muda.
+
 ## O que é diferente da proposta
 
 - **Só os heróis trocam de cômodo.** Os civis continuam no posto deles.
