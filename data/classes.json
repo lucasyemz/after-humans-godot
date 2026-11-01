@@ -18,6 +18,11 @@
       "cao_impacto_hidraulico",
       "cao_fique_atras_de_mim",
       "cao_nao_estamos_sos"
+    ],
+    "UnlockIds": [
+      "cao_ombro_de_carga",
+      "cao_patas_firmes",
+      "cao_faro_de_perigo"
     ]
   },
   {
@@ -39,6 +44,11 @@
       "gato_salto_entre_ruinas",
       "gato_sumir_na_sombra",
       "gato_cacada_precisa"
+    ],
+    "UnlockIds": [
+      "gato_garra_de_calha",
+      "gato_volta_pelo_telhado",
+      "gato_rasgo_rapido"
     ]
   },
   {
@@ -60,6 +70,11 @@
       "sapo_coquetel_corrosivo",
       "sapo_ampola_reparo_vivo",
       "sapo_antidoto_campo"
+    ],
+    "UnlockIds": [
+      "sapo_nevoa_calmante",
+      "sapo_frasco_aderente",
+      "sapo_curativo_rapido"
     ]
   },
   {
@@ -81,6 +96,11 @@
       "coruja_olho_nas_ruinas",
       "coruja_granada_fumaca",
       "coruja_recurso_emergencia"
+    ],
+    "UnlockIds": [
+      "coruja_mira_no_marcado",
+      "coruja_tiro_de_aviso",
+      "coruja_poleiro_alto"
     ]
   },
   {
@@ -102,6 +122,11 @@
       "rato_mordida",
       "rato_passagem",
       "rato_poeira"
+    ],
+    "UnlockIds": [
+      "rato_curto_circuito",
+      "rato_faisca_nos_olhos",
+      "rato_remendo_de_fio"
     ]
   },
   {
@@ -123,6 +148,11 @@
       "tatu_enrolar",
       "tatu_investida",
       "tatu_abrigo"
+    ],
+    "UnlockIds": [
+      "tatu_placa_de_protecao",
+      "tatu_rolar_em_frente",
+      "tatu_folego_de_resgate"
     ]
   }
 ]

@@ -470,14 +470,13 @@ func _card(c: Dictionary, rank: int) -> Button:
 
 ## O que a carta avisa: sem ataque dali, a vida baixa, o trauma; senão, quantas habilidades funcionam dali.
 func _note(hero: Dictionary, rank: int) -> Dictionary:
-	if S.attacks_from_rank(hero.class_id, rank).is_empty():
+	if S.attacks_from_rank(hero.class_id, rank, AHHeroSkills.equipped(hero)).is_empty():
 		return {"text": tr("Sem ataque desta posição"), "good": false}
 	if hero.hp < hero.max_hp * 0.5:
 		return {"text": tr("Vida baixa: leve comida ou curativos"), "good": false}
 	if hero.trauma:
 		return {"text": tr("Com trauma: começa com instinto alto"), "good": false}
-	var hero_class = GameData.row("classes", String(hero.class_id))
-	var abilities: Array = hero_class.get("AbilityIds", []) if hero_class != null else []
+	var abilities := AHHeroSkills.equipped(hero)
 	var usable := abilities.filter(func(id):
 		var ability = GameData.combat.abilities.get(id)
 		return ability != null and ability.OriginRanks.has(rank)).size()
@@ -505,8 +504,7 @@ func team_warning(c: Dictionary) -> String:
 		var entry = S.hero(c, hero_id)
 		if entry == null:
 			continue
-		var hero_class = GameData.row("classes", entry.class_id)
-		for ability_id in (hero_class.get("AbilityIds", []) if hero_class else []):
+		for ability_id in AHHeroSkills.equipped(entry):
 			var ability = GameData.combat.abilities.get(ability_id)
 			if ability != null and ability.HealRange.Max > 0:
 				return ""

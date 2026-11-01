@@ -188,6 +188,8 @@ static func migrate(campaign: Dictionary) -> void:
 	for entry in campaign.get("roster", []):
 		if not entry.has("art_variant"):
 			entry.art_variant = _least_used_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
+	# As sete habilidades (#259): os campos novos; o que um save editado traz e não vale volta ao padrão.
+	AHHeroSkills.migrate(campaign)
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
 		if String(entry.get("skin_id", "")) == "":
@@ -1537,12 +1539,13 @@ static func team_size_text(limits: Dictionary) -> String:
 
 
 ## Os ataques que a classe tem na posição (#95): cada um precisa de um ataque na posição em que parte.
-static func attacks_from_rank(class_id: String, rank: int) -> Array:
+## ability_ids: as que o herói leva (#259); vazio, as 4 de base da classe.
+static func attacks_from_rank(class_id: String, rank: int, ability_ids: Array = []) -> Array:
 	var out: Array = []
 	var hero_class = GameData.row("classes", class_id)
 	if hero_class == null:
 		return out
-	for ability_id in hero_class.AbilityIds:
+	for ability_id in (ability_ids if not ability_ids.is_empty() else hero_class.AbilityIds):
 		var ability = GameData.row("abilities", ability_id)
 		if ability != null and ability.get("DamageRange") != null and Array(ability.get("OriginRanks", [])).map(func(r): return int(r)).has(rank):
 			out.append(ability.DisplayName)
@@ -1898,7 +1901,7 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 			return TranslationServer.translate("Só integrantes vivos podem partir.")
 		if not can_deploy(entry):
 			return deploy_block(entry)
-		if attacks_from_rank(entry.class_id, rank).is_empty():
+		if attacks_from_rank(entry.class_id, rank, AHHeroSkills.equipped(entry)).is_empty():
 			return TranslationServer.translate("%s não tem ataque na posição %d.") % [entry.display_name, rank]
 	var team_block := validate_team(campaign, team, phase_id)
 	if team_block != "":

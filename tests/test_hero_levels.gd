@@ -71,7 +71,9 @@ func _training() -> void:
 		t.equal(AHHeroLevels.train(c, "hero_gato_nick", "velocidade"), "", "o passo ligeiro %d de %d" % [i + 1, speed_limit])
 	nick.xp = 999
 	t.check(AHHeroLevels.train(c, "hero_gato_nick", "velocidade") != "", "passou do limite (%d): o passo ligeiro é recusado" % speed_limit)
-	t.equal(AHHeroLevels.options(nick).map(func(u): return u.Name), ["habilidade_gato", "vida"], "com a velocidade no limite, a reserva (mais vida) completa as duas")
+	# As melhorias (as de aprender, #259, vêm à parte: no treino para o nível 3 em diante).
+	var upgrades: Array = AHHeroLevels.options(nick).filter(func(u): return String(u.get("Stat", "")) != "Learn")
+	t.equal(upgrades.map(func(u): return u.Name), ["habilidade_gato", "vida"], "com a velocidade no limite, a reserva (mais vida) completa as duas")
 	# A ficha da Preparação (#89) mostra a velocidade da luta, com o Passo ligeiro, e as melhorias.
 	var sheet := AHCharacterSheet.from_hero(nick)
 	var in_fight: int = AHCombatSession.create([nick], ["robot"], false, 3).state.player_team[0].speed

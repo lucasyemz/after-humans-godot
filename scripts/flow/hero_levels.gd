@@ -71,6 +71,8 @@ static func options(hero: Dictionary) -> Array:
 			break
 		if upgrade.get("Fallback", false) and not out.has(upgrade) and _open(hero, upgrade):
 			out.append(upgrade)
+	# Os desbloqueios (#259): nos níveis do Treino, aprender uma das habilidades da classe ainda bloqueadas.
+	out.append_array(AHHeroSkills.learn_options(hero))
 	return out
 
 
@@ -112,10 +114,22 @@ static func train(campaign: Dictionary, hero_id: String, upgrade_id: String) -> 
 			upgrade = option
 	if upgrade == null:
 		return TranslationServer.translate("Essa melhoria não é desta espécie.")
+	var fragments := int(upgrade.get("Fragments", 0))
+	if AHStationRules.quantity(campaign, "fragments") < fragments:
+		return TranslationServer.translate("Fragmentos insuficientes: aprender custa mais %d.") % fragments
 	var cost := next_cost(hero)
 	AHStationRules.adjust(campaign, "seeds", -int(cost.seeds))
+	AHStationRules.adjust(campaign, "fragments", -fragments)
 	hero.xp = xp(hero) - int(cost.xp)
 	hero.level = level(hero) + 1
+	# Aprender (#259): o desbloqueio entra no que ele sabe, sem equipar sozinho (a escolha das 4 é na Sala).
+	if String(upgrade.Stat) == "Learn":
+		if typeof(hero.get("unlocked")) != TYPE_ARRAY:
+			hero.unlocked = []
+		hero.unlocked.append(String(upgrade.AbilityId))
+		if level(hero) >= MAX_LEVEL:
+			hero.xp = 0
+		return ""
 	if not hero.has("upgrades"):
 		hero.upgrades = []
 	hero.upgrades.append(upgrade_id)

@@ -36,9 +36,14 @@ static func iris(campaign: Dictionary):
 	if expedition == null:
 		return null
 	for hero in campaign.roster:
-		if hero.class_id == "sapo" and hero.alive and hero.hp > 0 and expedition.team.has(hero.id):
+		if hero.class_id == "sapo" and hero.alive and hero.hp > 0 and expedition.team.has(hero.id) and _carries_ampoule(hero):
 			return hero
 	return null
+
+
+## Quem leva a Ampola entre as 4 da luta (#259): sem ela equipada, ninguém cura fora da luta.
+static func _carries_ampoule(hero: Dictionary) -> bool:
+	return AHHeroSkills.equipped(hero).has(AMPOULE)
 
 
 ## Cargas da ampola que a Íris ainda tem nesta expedição (sem reservar nada).
@@ -185,6 +190,6 @@ static func restore_iris_after_victory(campaign: Dictionary, session: AHCombatSe
 		return
 	for unit in session.state.player_team:
 		var hero = _hero(campaign, unit.hero_id)
-		if hero != null and hero.alive and hero.hp > 0 and hero.class_id == "sapo":
+		if hero != null and hero.alive and hero.hp > 0 and hero.class_id == "sapo" and _carries_ampoule(hero):
 			hero.expedition_uses[AMPOULE] = row.UsesMax
 			unit.remaining_uses[AMPOULE] = row.UsesMax

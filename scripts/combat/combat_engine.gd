@@ -280,6 +280,14 @@ func _hit_ids_from(target: Unit, ability: Dictionary, target_rank: int, opposing
 
 # ---------------------------------------------------------------- início e rodadas
 
+## As habilidades da unidade: as que ela leva (as 4 escolhidas na Sala, #259) ou, sem a lista, as 4 de base da classe.
+func abilities_of(unit: Unit) -> Array:
+	if not unit.ability_ids.is_empty():
+		return unit.ability_ids
+	var unit_class = find_class(unit.class_id)
+	return unit_class.AbilityIds if unit_class != null else []
+
+
 ## Unidade de herói a partir da campanha. hero: Id, ClassId, DisplayName, MaxHp, Hp, Instinct, Perks, Trauma, RelicId.
 static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -> Unit:
 	var unit := Unit.new()
@@ -296,6 +304,8 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 	unit.deaths_door = hero.Hp <= 0
 	unit.sprite_key = hero.ClassId
 	unit.remaining_uses = hero.get("ExpeditionUses", {}).duplicate()
+	# As 4 escolhidas na Sala (#259); sem a lista, as 4 de base da classe (o fundador de sempre, a paridade).
+	unit.ability_ids = Array(hero.get("AbilityIds", [])).duplicate()
 	# O nível do herói (#90): +1 numa habilidade (como o treino da Pesquisa) e a velocidade; sem nível, nada muda.
 	unit.ability_bonus = hero.get("AbilityBonus", {}).duplicate()
 
@@ -353,8 +363,7 @@ static func init_combat(player_units: Array, enemy_units: Array, in_context: AHC
 	# Habilidades limitadas recarregam a cada encontro, dos dois lados.
 	for team in [player_units, enemy_units]:
 		for unit in team:
-			var unit_class = engine.find_class(unit.class_id)
-			for ability_id in (unit_class.AbilityIds if unit_class != null else []):
+			for ability_id in engine.abilities_of(unit):
 				var ability = engine.find_ability(ability_id)
 				if ability != null and ability.UsesMax > 0:
 					if not ability.bUsesPerExpedition or not unit.remaining_uses.has(ability_id):
@@ -848,8 +857,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 	var friendly: Array = state.player_team if user.is_player else state.enemy_team
 	var opposing: Array = state.enemy_team if user.is_player else state.player_team
 
-	var user_class = find_class(user.class_id)
-	var ability = find_ability(ability_id) if user_class != null and user_class.AbilityIds.has(ability_id) else null
+	var ability = find_ability(ability_id) if abilities_of(user).has(ability_id) else null
 	if ability == null:
 		result.error = tr("Habilidade não encontrada")
 		return result
@@ -1559,10 +1567,9 @@ func first_valid_target(actor_id: String, ability_id: String) -> int:
 ## alvo válido; senão, defende.
 func play_auto_turn(actor_id: String) -> AHCombat.ActionResult:
 	var actor := _find_unit(actor_id)
-	var actor_class = find_class(actor.class_id) if actor != null else null
-	if actor_class == null or actor_class.AbilityIds.is_empty():
+	var ids: Array = abilities_of(actor) if actor != null else []
+	if ids.is_empty():
 		return execute_defend(actor_id)
-	var ids: Array = actor_class.AbilityIds
 	var start: int = (state.round + actor.rank) % ids.size()
 	for offset in ids.size():
 		actor = _find_unit(actor_id)
