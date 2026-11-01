@@ -7,6 +7,8 @@ build/
 art/combat/source/reactions/kneeling_20261023/
 # As fontes das poses de combate (#221), extraídas da tag codex-pr231-originals só para converter.
 art/combat/source/stances_20261028/
+# As fontes do Guaxinim e do Tatu redesenhados (#225), extraídas da tag codex-pr229-originals só para converter.
+art/combat/source/recruits_redraw_20261028/
 
 # Telas temporárias das maquetes da HUD (render.mjs); as provas ficam em WebP na pasta do lote.
 docs/design/*/.render/
