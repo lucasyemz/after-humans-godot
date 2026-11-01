@@ -10,6 +10,8 @@ extends Control
 
 signal phase_chosen(phase_id: String)
 signal closed
+## A Estação mudou por aqui (#183: alguém saiu em missão, um dia passou): o HUD grava e redesenha.
+signal changed
 
 const J = preload("res://scripts/flow/journey_rules.gd")
 const S = preload("res://scripts/flow/station_rules.gd")
@@ -224,6 +226,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if AHUiStyle.is_back(event):
 		get_viewport().set_input_as_handled()
 		closed.emit()
+	elif (event.is_action_pressed("station_room_prev") or event.is_action_pressed("station_room_next")) \
+			and AHSideMissions.unlocked(Campaign.state):
+		# PgUp / PgDn, LB / RB: troca a aba (#183), como troca o cômodo na Estação.
+		get_viewport().set_input_as_handled()
+		show_tab("places" if tab == "missions" else "missions")
 	elif event.is_action_pressed("station_prepare") and tab == "places":
 		# G / X, como diz o botão: com uma fase aberta escolhida, segue para a plataforma.
 		get_viewport().set_input_as_handled()
@@ -297,19 +304,43 @@ func _build_missions(c: Dictionary) -> void:
 		for child in box.get_children():
 			box.remove_child(child)
 			child.queue_free()
-	var buttons: Array = AHMissionBoard.pins(self, c, _labels)
-	for i in buttons.size():
-		var button: Button = buttons[i]
-		button.focus_mode = Control.FOCUS_ALL
-		var next: NodePath = buttons[(i + 1) % buttons.size()].get_path()
-		var previous: NodePath = buttons[(i - 1 + buttons.size()) % buttons.size()].get_path()
-		for side in ["focus_neighbor_bottom", "focus_neighbor_right", "focus_next"]:
-			button.set(side, next)
-		for side in ["focus_neighbor_top", "focus_neighbor_left", "focus_previous"]:
-			button.set(side, previous)
+	var pins: Array = AHMissionBoard.pins(self, c, _labels)
 	AHMissionBoard.aside(self, c, _aside, _footer, ASIDE.size.x - 64)
-	if AHUiStyle.using_keys and not buttons.is_empty():
-		AHKit.focus_later(buttons[0])
+	# O teclado e o controle: ↑ ↓ (e Tab) andam pelos pinos e depois pelo painel (os heróis, a lista, MANDAR, esperar um
+	# dia); → vai do mapa ao painel e ← volta ao pino escolhido.
+	var side: Array = (_aside.find_children("*", "Button", true, false) + _footer.find_children("*", "Button", true, false)) \
+		.filter(func(b): return b.focus_mode != Control.FOCUS_NONE and not b.disabled)
+	var chain: Array = pins + side
+	var picked_pin: Button = null
+	for pin in pins:
+		pin.focus_mode = Control.FOCUS_ALL
+		if pin.get_parent().name == "Mission_%s" % mission:
+			picked_pin = pin
+	for i in chain.size():
+		var button: Button = chain[i]
+		var next: NodePath = chain[(i + 1) % chain.size()].get_path()
+		var previous: NodePath = chain[(i - 1 + chain.size()) % chain.size()].get_path()
+		for edge in ["focus_neighbor_bottom", "focus_next"]:
+			button.set(edge, next)
+		for edge in ["focus_neighbor_top", "focus_previous"]:
+			button.set(edge, previous)
+		if pins.has(button):
+			button.focus_neighbor_right = (side[0] if not side.is_empty() else chain[(i + 1) % chain.size()]).get_path()
+			button.focus_neighbor_left = previous
+		else:
+			button.focus_neighbor_left = (picked_pin if picked_pin != null else (pins[0] if not pins.is_empty() else button)).get_path()
+			button.focus_neighbor_right = next
+	if not AHUiStyle.using_keys or chain.is_empty():
+		return
+	# Com a missão e o herói escolhidos, o foco vai a MANDAR; só a missão, ao primeiro herói; senão, ao pino escolhido.
+	var send: Button = _footer.get_node_or_null("Send")
+	var heroes: Array = side.filter(func(b): return String(b.name).begins_with("Hero_"))
+	if send != null and not send.disabled:
+		AHKit.focus_later(send)
+	elif mission != "" and not heroes.is_empty():
+		AHKit.focus_later(heroes.filter(func(b): return String(b.name) == "Hero_%s" % hero_pick)[0] if hero_pick != "" and heroes.any(func(b): return String(b.name) == "Hero_%s" % hero_pick) else heroes[0])
+	else:
+		AHKit.focus_later(picked_pin if picked_pin != null else chain[0])
 
 
 func pick_mission(id: String) -> void:
@@ -334,7 +365,20 @@ func send_mission() -> void:
 	Sound.play("res://audio/ui/click.ogg", 0.7)
 	mission = ""
 	hero_pick = ""
-	Campaign.save()
+	changed.emit()
+	refresh()
+
+
+## Esperar um dia (#183): com ninguém para partir e alguém em missão, o dia passa daqui também.
+func rest_day() -> void:
+	var error := S.rest_day(Campaign.state)
+	if error != "":
+		Sound.play("res://audio/ui/deny.ogg")
+		return
+	Sound.play("res://audio/ui/click.ogg", 0.7)
+	mission = ""
+	hero_pick = ""
+	changed.emit()
 	refresh()
 
 

@@ -1743,3 +1743,10 @@ station_grid.gd: speaker
 station_grid.gd: Card
 station_grid.gd: Lines
 refuge_hud.gd: Dig_%s
+phase_map.gd: Button
+phase_map.gd: Mission_%s
+phase_map.gd: Send
+phase_map.gd: Hero_
+phase_map.gd: Hero_%s
+station_rules.gd: seed
+mission_board.gd: Rest

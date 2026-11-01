@@ -225,7 +225,8 @@ static func _station_defaults() -> Dictionary:
 		# já saiu no relatório (uma vez por campanha).
 		"story_events": [], "story_reports": [],
 		# As missões solo (#183): o quadro do dia e os relatórios de quem voltou.
-		"side_missions": {"day": -1, "board": [], "reports": []},
+		# A semente nasce com a campanha (ou na migração): salvar e voltar não troca o quadro.
+		"side_missions": {"day": -1, "board": [], "reports": [], "seed": randi()},
 	}
 
 

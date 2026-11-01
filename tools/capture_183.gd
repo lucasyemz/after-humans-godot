@@ -1,6 +1,6 @@
 ## Fotos das missões solo (#183), no Mapa da Rede de verdade: a aba fechada (Preparação nível 1), a lista do dia, uma
-## missão escolhida com um herói (o selo), uma missão em curso (o pino de quem está fora), a volta (o relatório) e um
-## capturado (o pino do resgate). Nos textos Normal e Maior.
+## missão escolhida com um herói (o selo), uma missão em curso (o pino de quem está fora) e a volta (o relatório), nos
+## textos Normal e Maior. A captura fica desligada até o resgate (#188).
 ##   "$GODOT" --path . --resolution 1920x1080 -s res://tools/capture_183.gd -- --out=<pasta>
 ## A campanha fica numa pasta dentro de <pasta>; o save do jogador fica intacto.
 extends SceneTree
@@ -61,7 +61,7 @@ func _run() -> void:
 		map.pick_hero(c.roster[1].id)
 		await _frames(8)
 		await _shot("mission-" + tag)
-	# Em curso: a Íris na primeira missão; depois o dia vira e ela volta (o relatório); por fim, um capturado.
+	# Em curso: o Nick na primeira missão; depois o dia vira e ele volta (o relatório).
 	# A missão e a Íris já estão escolhidas (a última foto); pick_mission de novo tiraria a escolha.
 	map.send_mission()
 	await _frames(8)
@@ -72,10 +72,6 @@ func _run() -> void:
 	map.refresh()
 	await _frames(8)
 	await _shot("returned-" + String(c.station.last_cycle.missions[0].result))
-	c.roster[2].captured = {"mission": "cisterna_turva", "spot": 5, "phase": "fase_2", "day": int(c.station.cycle_number)}
-	map.refresh()
-	await _frames(8)
-	await _shot("captured")
 	for file in DirAccess.get_files_at(campaign.save_dir):
 		DirAccess.remove_absolute(campaign.save_dir.path_join(file))
 	DirAccess.remove_absolute(campaign.save_dir)

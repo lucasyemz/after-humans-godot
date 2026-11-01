@@ -3,6 +3,8 @@
 ## equipe, do posto e da noite. No dia da volta, um sorteio contra a chance (a aptidão da classe, o nível, a vida, os
 ## traços e o estado) diz se deu certo (a recompensa inteira e XP), se volta ferido (35% da vida e metade) ou se foi
 ## capturado pelos robôs: aí vira um pino de resgate no mapa, prioritário e sem prazo (o resgate entra na rota, #188).
+## Até o resgate existir, a captura fica desligada (CaptureEnabled): esse resultado volta com ferimentos e de mãos
+## vazias, para ninguém ficar fora para sempre.
 ## Os números ficam em data/side-missions.json (a linha "rules"); o estado, em campaign.station.side_missions e no
 ## herói (side_mission em curso, captured).
 class_name AHSideMissions
@@ -81,7 +83,10 @@ static func _draw_board(campaign: Dictionary) -> Array:
 	pool.sort_custom(func(a, b): return String(a.Name) < String(b.Name))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("missions:%d:%d" % [int(state(campaign).seed), day(campaign)])
-	var spots: Array = range(Array(r.get("Spots", [])).size())
+	# Os lugares de quem está fora ou capturado ficam com os pinos deles.
+	var taken: Array = running(campaign).map(func(entry): return int(entry.side_mission.get("spot", -1))) \
+		+ captured(campaign).map(func(entry): return int(entry.captured.get("spot", -1)))
+	var spots: Array = range(Array(r.get("Spots", [])).size()).filter(func(index): return not taken.has(index))
 	var out: Array = []
 	while out.size() < count and not pool.is_empty():
 		var total := 0
@@ -208,6 +213,9 @@ static func food_cost(mission_id: String) -> int:
 static func send_block(campaign: Dictionary, hero_id: String, mission_id: String) -> String:
 	if not unlocked(campaign):
 		return TranslationServer.translate("Melhore a Preparação para mandar missões solo.")
+	var day_block := S._day_block(campaign)
+	if day_block != "":
+		return day_block
 	if not board(campaign).any(func(spot): return spot.id == mission_id):
 		return TranslationServer.translate("Essa missão não está no quadro de hoje.")
 	var entry = S.hero(campaign, hero_id)
@@ -245,8 +253,8 @@ static func on_new_day(campaign: Dictionary) -> Array:
 	for entry in running(campaign):
 		if int(entry.side_mission.back) <= day(campaign):
 			out.append(_resolve(campaign, entry))
-	if not out.is_empty():
-		state(campaign).reports = out
+	# "Quem voltou" mostra só os do dia.
+	state(campaign).reports = out
 	return out
 
 
@@ -268,12 +276,22 @@ static func _resolve(campaign: Dictionary, entry: Dictionary) -> Dictionary:
 		report.xp = AHHeroLevels.gain(entry, int(r.get("Xp", 10)))
 	elif roll < value + int(r.get("HurtBand", 25)):
 		report.result = "hurt"
-		entry.hp = maxi(1, ceili(int(entry.max_hp) * float(r.get("HurtHp", 0.35))))
+		_hurt(entry)
 		report.reward = _reward(campaign, row, rng, true)
+	elif not bool(r.get("CaptureEnabled", false)):
+		# Sem o resgate (#188), quem seria capturado escapa com ferimentos e de mãos vazias.
+		report.result = "hurt"
+		_hurt(entry)
+		report.reward = {"kind": String(row.get("Reward", "seeds")), "amount": 0, "relic_id": ""}
 	else:
 		report.result = "captured"
 		entry.captured = {"mission": mission_id, "spot": int(entry_spot), "phase": String(row.get("MinPhase", "fase_1")), "day": day(campaign)}
 	return report
+
+
+## O ferimento: a vida cai para HurtHp do máximo; quem já saiu com menos não sara.
+static func _hurt(entry: Dictionary) -> void:
+	entry.hp = mini(int(entry.hp), maxi(1, ceili(int(entry.max_hp) * float(rules().get("HurtHp", 0.35)))))
 
 
 ## A recompensa da missão: o tipo dela com a faixa da carga recuperada da fase mais alta liberada; a relíquia só nas de
@@ -313,9 +331,9 @@ static func report_line(campaign: Dictionary, report: Dictionary) -> String:
 		found.append(AHFightRewards.box_text({"kind": "relic", "relic_id": reward.relic_id}))
 	match String(report.get("result", "")):
 		"success":
-			return TranslationServer.translate("%s voltou de %s com %s.") % [hero_name, title, ", ".join(found)] if not found.is_empty() \
-				else TranslationServer.translate("%s voltou de %s.") % [hero_name, title]
+			return TranslationServer.translate("%s voltou da missão %s com %s.") % [hero_name, title, ", ".join(found)] if not found.is_empty() \
+				else TranslationServer.translate("%s voltou da missão %s.") % [hero_name, title]
 		"hurt":
-			return TranslationServer.translate("%s voltou de %s com ferimentos e com %s.") % [hero_name, title, ", ".join(found)] if not found.is_empty() \
-				else TranslationServer.translate("%s voltou de %s com ferimentos e de mãos vazias.") % [hero_name, title]
-	return TranslationServer.translate("%s caiu nas mãos dos robôs em %s. O resgate fica marcado no mapa.") % [hero_name, title]
+			return TranslationServer.translate("%s voltou da missão %s com ferimentos e com %s.") % [hero_name, title, ", ".join(found)] if not found.is_empty() \
+				else TranslationServer.translate("%s voltou da missão %s com ferimentos e de mãos vazias.") % [hero_name, title]
+	return TranslationServer.translate("%s caiu nas mãos dos robôs na missão %s. O resgate fica marcado no mapa.") % [hero_name, title]

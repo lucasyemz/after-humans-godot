@@ -15,7 +15,9 @@ func run(t) -> void:
 	_send(t)
 	_away(t)
 	_resolve(t)
+	_stable(t)
 	_migration(t)
+	_screen(t)
 
 
 ## Uma campanha com a Preparação no nível 2 e comida de sobra.
@@ -146,11 +148,28 @@ func _away(t) -> void:
 
 
 func _resolve(t) -> void:
-	# O sucesso, o ferido e a captura: o sorteio fica estável pela semente; com a chance forçada, cada um aparece.
+	# Com a captura desligada (até o resgate, #188), quem seria capturado volta com ferimentos e de mãos vazias.
+	t.check(not bool(M.rules().get("CaptureEnabled", true)), "a captura fica desligada nos dados até o resgate")
+	var off := _round(t, false)
+	t.check(off.has("success") and off.has("hurt") and not off.has("captured"), "desligada: o sucesso e o ferido, nunca a captura: %s" % str(off.keys()))
+	t.check(off.has("empty"), "e há quem volte ferido de mãos vazias (a captura evitada)")
+	var rules := M.rules()
+	rules.CaptureEnabled = true
+	var on := _round(t, true)
+	rules.CaptureEnabled = false
+	t.check(on.has("success") and on.has("hurt") and on.has("captured"), "ligada: os três resultados aparecem: %s" % str(on.keys()))
+
+
+## 40 campanhas, cada uma com um herói mandado em missão (alguns já feridos na saída). Devolve os resultados vistos.
+func _round(t, capture: bool) -> Dictionary:
 	var results := {}
 	for seed_value in range(300, 340):
 		var c := _campaign(seed_value)
 		var hero: Dictionary = c.roster[seed_value % 4]
+		# Um em cada três sai com 1 de vida: o ferimento nunca cura.
+		if seed_value % 3 == 0:
+			hero.hp = 1
+		var hp_before := int(hero.hp)
 		var mission_id: String = M.board(c)[0].id
 		var seeds := int(c.inventory.seeds)
 		M.send(c, hero.id, mission_id)
@@ -163,19 +182,56 @@ func _resolve(t) -> void:
 		results[report.result] = true
 		t.equal(report.hero_id, hero.id, "o relatório é do herói")
 		t.check(M.report_line(c, report).contains(hero.display_name), "a linha do relatório diz quem")
+		t.equal(M.state(c).reports, [report], "Quem voltou mostra o relatório do dia")
 		match String(report.result):
 			"success":
 				t.check(int(report.xp) > 0, "o sucesso dá XP")
 				if report.reward.kind == "seeds":
 					t.equal(int(c.inventory.seeds), seeds + int(report.reward.amount), "a recompensa entra no estoque")
 			"hurt":
-				t.equal(int(hero.hp), maxi(1, ceili(int(hero.max_hp) * 0.35)), "o ferido volta com 35% da vida")
+				t.equal(int(hero.hp), mini(hp_before, maxi(1, ceili(int(hero.max_hp) * 0.35))), "o ferido volta com até 35% da vida, sem sarar")
 				t.check(report.reward.relic_id == "", "o ferido não traz relíquia")
+				if int(report.reward.amount) == 0:
+					results["empty"] = true
 			"captured":
+				t.check(capture, "só há captura com ela ligada")
 				t.check(M.away(hero) and not S.can_deploy(hero), "o capturado fica fora até o resgate")
 				t.check(M.captured(c).has(hero), "e entra na lista dos capturados")
 		t.check(expected >= 5 and expected <= 95, "a chance fica nos limites")
-	t.check(results.has("success") and results.has("hurt") and results.has("captured"), "em 40 campanhas, os três resultados aparecem: %s" % str(results.keys()))
+		# O dia seguinte, sem ninguém voltando, limpa Quem voltou.
+		S.run_cycle(c, "rest_%d" % (int(c.station.cycle_number) + 1), 0)
+		t.equal(M.state(c).reports, [], "no dia seguinte, Quem voltou fica vazio")
+	return results
+
+
+## A semente nasce com a campanha: salvar e voltar (sem salvar o quadro) não troca o quadro; os pinos não se cobrem; a
+## noite pendente bloqueia mandar.
+func _stable(t) -> void:
+	var c: Dictionary = Campaign.create_initial(191)
+	c.station.rooms[S.PREPARATION] = 2
+	t.check(c.station.side_missions.has("seed"), "a campanha nova já tem a semente das missões")
+	var saved = Campaign._normalize(JSON.parse_string(JSON.stringify(c)))
+	S.migrate(saved)
+	var board: Array = M.board(c).map(func(spot): return spot.id)
+	t.equal(M.board(saved).map(func(spot): return spot.id), board, "o quadro sorteado depois do save é o mesmo ao recarregar")
+	var old: Dictionary = Campaign.create_initial(192)
+	old.station.erase("side_missions")
+	S.migrate(old)
+	t.check(old.station.side_missions.has("seed"), "o save de antes ganha a semente na migração")
+	# Os pinos: com alguém fora e alguém capturado, nenhuma missão cai nos lugares deles.
+	var d := _campaign(193)
+	d.completed_phases = ["fase_1", "fase_2", "fase_3", "fase_4"]
+	d.roster[0].side_mission = {"id": "x", "spot": 0, "sent": 0, "back": 999}
+	d.roster[1].captured = {"mission": "x", "spot": 5, "phase": "fase_1", "day": 0}
+	var hits := 0
+	for day in 60:
+		d.station.cycle_number = day
+		hits += M.board(d).filter(func(spot): return spot.spot == 0 or spot.spot == 5).size()
+	t.equal(hits, 0, "em 60 dias, nenhuma missão no lugar de quem está fora ou capturado")
+	# A noite pendente bloqueia mandar.
+	var e := _campaign(194)
+	e.night.phase = "pending"
+	t.check(M.send_block(e, e.roster[0].id, M.board(e)[0].id) != "", "com a noite pendente, ninguém sai em missão")
 
 
 func _migration(t) -> void:
@@ -185,3 +241,54 @@ func _migration(t) -> void:
 	S.migrate(old)
 	t.check(typeof(old.station.get("side_missions")) == TYPE_DICTIONARY, "o save de antes ganha o estado das missões")
 	t.check(M.running(old).is_empty() and M.captured(old).is_empty(), "sem ninguém fora")
+
+
+## A aba no Mapa da Rede (sem janela): PgDn / RB troca a aba; com todos fora, Esperar um dia aparece e traz a missão de
+## volta; a cadeia do teclado passa dos pinos aos heróis e a MANDAR.
+func _screen(t) -> void:
+	var saved = Campaign.state
+	var c := _campaign(195)
+	Campaign.state = c
+	var map := AHPhaseMap.new()
+	(Engine.get_main_loop() as SceneTree).root.add_child(map)
+	map.visible = true
+	map.refresh()
+	var next := InputEventAction.new()
+	next.action = "station_room_next"
+	next.pressed = true
+	map._unhandled_input(next)
+	t.equal(map.tab, "missions", "PgDn / RB abre a aba das missões")
+	map._unhandled_input(next)
+	t.equal(map.tab, "places", "e volta aos lugares")
+	map.show_tab("missions")
+	var first: Button = map._labels.find_children("Label", "Button", true, false)[0]
+	t.check(first.focus_neighbor_right != NodePath(""), "do pino, → leva ao painel")
+	map.pick_mission(M.board(c)[0].id)
+	var heroes: Array = map._aside.find_children("Hero_*", "Button", true, false)
+	t.equal(heroes.size(), 4, "a missão lista os quatro heróis")
+	map.pick_hero(c.roster[0].id)
+	var send: Button = map._footer.get_node_or_null("Send")
+	t.check(send != null and not send.disabled, "com a missão e o herói, MANDAR acende")
+	t.check(map.get_node(heroes[0].focus_neighbor_bottom) != null, "os heróis estão na cadeia do teclado")
+	var chain_reaches_send := false
+	var node: Control = first
+	for step in 20:
+		node = map.get_node(node.focus_neighbor_bottom)
+		if node == send:
+			chain_reaches_send = true
+			break
+	t.check(chain_reaches_send, "↓ desde o primeiro pino chega a MANDAR")
+	map.send_mission()
+	t.check(M.running(c).size() == 1, "MANDAR manda")
+	# Todos os outros fora (em missão): Esperar um dia aparece na lista e passa o dia.
+	for entry in c.roster.slice(1):
+		entry.side_mission = {"id": "fresta_galerias", "spot": -1, "sent": 0, "back": 999}
+	map.refresh()
+	var rest: Button = map._aside.find_child("Rest", true, false)
+	t.check(rest != null, "com ninguém para partir, Esperar um dia aparece na aba")
+	var cycle := int(c.station.cycle_number)
+	if rest != null:
+		rest.pressed.emit()
+	t.equal(int(c.station.cycle_number), cycle + 1, "e o dia passa")
+	map.free()
+	Campaign.state = saved
