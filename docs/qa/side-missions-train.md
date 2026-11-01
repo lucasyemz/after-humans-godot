@@ -1,6 +1,6 @@
 # A volta no trem (#183, segunda parte)
 
-![A volta no trem. Em cima: o trem das missões, só com o Nick descendo, o painel "O trem chegou" com o relatório das duas missões e IR AO MAPA esperando ("Receba quem voltou no trem antes de partir"); depois de RECEBER, o trem de sempre com o recruta (Brutus, com o Sereno). Embaixo: a Estação depois, com o Próximo passo do trem de sempre](side-missions-train/train.jpg)
+![A volta no trem. Em cima: o trem das missões, só com o Nick descendo, o painel "O trem chegou" com o relatório das duas missões e IR AO MAPA esperando ("Receba o trem antes de partir"); depois de RECEBER, o trem de sempre com o recruta (Brutus, com o Sereno). Embaixo: a Estação depois, com o Próximo passo do trem de sempre](side-missions-train/train.jpg)
 
 Segue a decisão do Lucas de 28/10: "Prioridade é a missão principal que voltamos e só depois os secundários chegam no
 trem também", com o relatório da missão.
@@ -56,3 +56,9 @@ trem também", com o relatório da missão.
   - o ferido descia no passo normal.
 
   Correção: os quatro, como descrito acima, com o teste de cena novo e os de regra.
+
+- **Rodada 2: REPROVADO.** As quatro correções foram confirmadas, no texto Normal e no Maior. Sobrou um médio: no
+  Maior, o motivo do IR AO MAPA ("Receba quem voltou no trem antes de partir.") quebrava em duas linhas e a segunda saía
+  da tela.
+
+  Correção: o motivo ficou "Receba o trem antes de partir.", que cabe numa linha no Maior, como o do Mercador.

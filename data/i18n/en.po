@@ -245,7 +245,7 @@ msgstr "+1 fragment"
 
 #: scripts/flow/fight_rewards.gd:132
 #: scripts/ui/station/station_report.gd:525
-#: scripts/flow/station_rules.gd:2080
+#: scripts/flow/station_rules.gd:2081
 msgid "+%d suprimentos"
 msgstr "+%d supplies"
 
@@ -1787,7 +1787,7 @@ msgid "Pedido entregue: %s."
 msgstr "Request delivered: %s."
 
 #: scripts/ui/refuge_hud.gd:2045
-#: scripts/flow/station_rules.gd:2070
+#: scripts/flow/station_rules.gd:2071
 msgid "Pedido: %s"
 msgstr "Request: %s"
 
@@ -2578,7 +2578,7 @@ msgid "+%d fragmento"
 msgstr "+%d fragment"
 
 #: scripts/ui/station/station_report.gd:523
-#: scripts/flow/station_rules.gd:2080
+#: scripts/flow/station_rules.gd:2081
 msgid "+%d sucata"
 msgstr "+%d scrap"
 
@@ -4376,229 +4376,229 @@ msgstr "the "
 msgid "Dispense o Sr. dos Trilhos antes de partir."
 msgstr "Dismiss Mr. Rails before leaving."
 
-#: scripts/flow/station_rules.gd:1895
-msgid "Receba quem voltou no trem antes de partir."
-msgstr "Welcome back whoever returned on the train before setting out."
+#: scripts/flow/station_rules.gd:1896
+msgid "Receba o trem antes de partir."
+msgstr "Meet the train before setting out."
 
-#: scripts/flow/station_rules.gd:1902
+#: scripts/flow/station_rules.gd:1903
 msgid "Conclua a noite no Dormitório antes de partir."
 msgstr "Finish the night in the Dormitory before setting out."
 
-#: scripts/flow/station_rules.gd:1904
+#: scripts/flow/station_rules.gd:1905
 msgid "A equipe já está numa expedição."
 msgstr "The team is already on an expedition."
 
-#: scripts/flow/station_rules.gd:1919
+#: scripts/flow/station_rules.gd:1920
 msgid "Esta jornada pede %s diferentes na equipe."
 msgstr "This journey needs %s, all different."
 
-#: scripts/flow/station_rules.gd:1923
+#: scripts/flow/station_rules.gd:1924
 msgid "Só integrantes vivos podem partir."
 msgstr "Only living members can set out."
 
-#: scripts/flow/station_rules.gd:1927
+#: scripts/flow/station_rules.gd:1928
 msgid "%s não tem ataque na posição %d."
 msgstr "%s has no attack from position %d."
 
-#: scripts/flow/station_rules.gd:1932
+#: scripts/flow/station_rules.gd:1933
 msgid "Foco de rota desconhecido."
 msgstr "Unknown route focus."
 
-#: scripts/flow/station_rules.gd:1934
+#: scripts/flow/station_rules.gd:1935
 msgid "Esse pedido não está aberto: o morador não está na Estação ou já recebeu o item."
 msgstr "That request isn't open: the resident isn't at the Station or has already received the item."
 
-#: scripts/flow/station_rules.gd:1936
+#: scripts/flow/station_rules.gd:1937
 msgid "Suprimentos acima do limite."
 msgstr "Supplies over the limit."
 
-#: scripts/flow/station_rules.gd:1938
+#: scripts/flow/station_rules.gd:1939
 msgid "Sementes insuficientes para os suprimentos selecionados."
 msgstr "Not enough seeds for the selected supplies."
 
-#: scripts/flow/station_rules.gd:1940
+#: scripts/flow/station_rules.gd:1941
 msgid "Essa fase ainda está bloqueada."
 msgstr "That phase is still locked."
 
-#: scripts/flow/station_rules.gd:1944
+#: scripts/flow/station_rules.gd:1945
 msgid "A expedição não pôde começar."
 msgstr "The expedition couldn't start."
 
-#: scripts/flow/station_rules.gd:2071
+#: scripts/flow/station_rules.gd:2072
 msgid "Peças"
 msgstr "Parts"
 
-#: scripts/flow/station_rules.gd:2071
+#: scripts/flow/station_rules.gd:2072
 msgid "Provisões"
 msgstr "Provisions"
 
-#: scripts/flow/station_rules.gd:2071
+#: scripts/flow/station_rules.gd:2072
 msgid "Rota básica"
 msgstr "Basic route"
 
-#: scripts/flow/station_rules.gd:2080
+#: scripts/flow/station_rules.gd:2081
 msgid "+%d água"
 msgstr "+%d water"
 
-#: scripts/flow/station_rules.gd:2111
+#: scripts/flow/station_rules.gd:2112
 msgid "%s: %s Entregue, %s."
 msgstr "%s: %s Delivered, %s."
 
-#: scripts/flow/station_rules.gd:2115
+#: scripts/flow/station_rules.gd:2116
 msgid "Água: %d na estação; a equipe bebe %d na volta e vai faltar."
 msgstr "Water: %d at the Station; the team drinks %d on the return and it will run short."
 
-#: scripts/flow/station_rules.gd:2116
+#: scripts/flow/station_rules.gd:2117
 msgid "Água: %d na estação, %d depois da próxima volta."
 msgstr "Water: %d at the Station, %d after the next return."
 
-#: scripts/flow/station_rules.gd:2119
+#: scripts/flow/station_rules.gd:2120
 msgid "Sucata para relíquias e melhorias."
 msgstr "Scrap for relics and upgrades."
 
-#: scripts/flow/station_rules.gd:2119
+#: scripts/flow/station_rules.gd:2120
 msgid "Faltam %d sucatas para %s."
 msgstr "%d scrap missing for %s."
 
-#: scripts/flow/station_rules.gd:2121
+#: scripts/flow/station_rules.gd:2122
 msgid "Suprimentos: %d de %d; a noite da volta pede %d."
 msgstr "Supplies: %d of %d; the night of the return needs %d."
 
-#: scripts/flow/station_rules.gd:2122
+#: scripts/flow/station_rules.gd:2123
 msgid "Sem objetivo: só o que aparecer nas casas."
 msgstr "No goal: just whatever turns up in the houses."
 
-#: scripts/flow/station_rules.gd:2126
+#: scripts/flow/station_rules.gd:2127
 msgid "a Forja"
 msgstr "the Forge"
 
-#: scripts/flow/station_rules.gd:2126
+#: scripts/flow/station_rules.gd:2127
 msgid "a Pesquisa"
 msgstr "the Research Center"
 
-#: scripts/flow/station_rules.gd:2126
+#: scripts/flow/station_rules.gd:2127
 msgid "o Depósito"
 msgstr "the Storeroom"
 
-#: scripts/flow/station_rules.gd:2126
+#: scripts/flow/station_rules.gd:2127
 msgid "um cômodo"
 msgstr "a room"
 
-#: scripts/flow/station_rules.gd:2183
+#: scripts/flow/station_rules.gd:2184
 msgid " Objetivo cumprido (%s): %s, entregue na volta."
 msgstr " Goal done (%s): %s, delivered on the way back."
 
-#: scripts/flow/station_rules.gd:2230
+#: scripts/flow/station_rules.gd:2231
 msgid "Heróis %d de %d · Ajudantes %d de %d"
 msgstr "Heroes %d of %d · Helpers %d of %d"
 
-#: scripts/flow/station_rules.gd:2245
+#: scripts/flow/station_rules.gd:2246
 msgid "Escavação"
 msgstr "Digging"
 
-#: scripts/flow/station_rules.gd:2262
+#: scripts/flow/station_rules.gd:2263
 msgid "na escavação"
 msgstr "at the dig"
 
-#: scripts/flow/station_rules.gd:2264
+#: scripts/flow/station_rules.gd:2265
 msgid "no %s"
 msgstr "at the %s"
 
-#: scripts/flow/station_rules.gd:2264
+#: scripts/flow/station_rules.gd:2265
 msgid "na %s"
 msgstr "at the %s"
 
-#: scripts/flow/station_rules.gd:2270
+#: scripts/flow/station_rules.gd:2271
 msgid "da escavação"
 msgstr "from the dig"
 
-#: scripts/flow/station_rules.gd:2272
+#: scripts/flow/station_rules.gd:2273
 msgid "do %s"
 msgstr "the %s"
 
-#: scripts/flow/station_rules.gd:2272
+#: scripts/flow/station_rules.gd:2273
 msgid "da %s"
 msgstr "the %s"
 
-#: scripts/flow/station_rules.gd:2298
+#: scripts/flow/station_rules.gd:2299
 msgid "+%d fragmento por volta"
 msgstr "+%d fragment per return"
 
-#: scripts/flow/station_rules.gd:2298
+#: scripts/flow/station_rules.gd:2299
 msgid "+%d fragmentos por volta"
 msgstr "+%d fragments per return"
 
-#: scripts/flow/station_rules.gd:2300
+#: scripts/flow/station_rules.gd:2301
 msgid "+%d sucata por volta"
 msgstr "+%d scrap per return"
 
-#: scripts/flow/station_rules.gd:2300
+#: scripts/flow/station_rules.gd:2301
 msgid "+%d sucatas por volta"
 msgstr "+%d scrap per return"
 
-#: scripts/flow/station_rules.gd:2302
+#: scripts/flow/station_rules.gd:2303
 msgid "+%d suprimento por volta"
 msgstr "+%d supply per return"
 
-#: scripts/flow/station_rules.gd:2302
+#: scripts/flow/station_rules.gd:2303
 msgid "+%d suprimentos por volta"
 msgstr "+%d supplies per return"
 
-#: scripts/flow/station_rules.gd:2304
+#: scripts/flow/station_rules.gd:2305
 msgid "−1 dia de recuperação para %d caído por volta"
 msgstr "−1 recovery day for %d fallen per return"
 
-#: scripts/flow/station_rules.gd:2305
+#: scripts/flow/station_rules.gd:2306
 msgid "−1 dia de recuperação para %d caídos por volta"
 msgstr "−1 recovery day for %d fallen per return"
 
-#: scripts/flow/station_rules.gd:2307
+#: scripts/flow/station_rules.gd:2308
 msgid "+%d ponto de obra por volta"
 msgstr "+%d work point per return"
 
-#: scripts/flow/station_rules.gd:2307
+#: scripts/flow/station_rules.gd:2308
 msgid "+%d pontos de obra por volta"
 msgstr "+%d work points per return"
 
-#: scripts/flow/station_rules.gd:2315
-#: scripts/flow/station_rules.gd:2439
+#: scripts/flow/station_rules.gd:2316
+#: scripts/flow/station_rules.gd:2440
 #: scripts/flow/side_mission_rules.gd:246
 msgid "Esse herói não está na Estação."
 msgstr "That hero is not at the Station."
 
-#: scripts/flow/station_rules.gd:2319
+#: scripts/flow/station_rules.gd:2320
 msgid "%s está em recuperação e não trabalha agora."
 msgstr "%s is recovering and can't work now."
 
-#: scripts/flow/station_rules.gd:2323
+#: scripts/flow/station_rules.gd:2324
 msgid "Não há entulho para escavar."
 msgstr "There is no rubble to dig."
 
-#: scripts/flow/station_rules.gd:2325
+#: scripts/flow/station_rules.gd:2326
 msgid "Esse cômodo ainda não tem posto."
 msgstr "That room has no post yet."
 
-#: scripts/flow/station_rules.gd:2429
+#: scripts/flow/station_rules.gd:2430
 msgid "Ainda bloqueada: vem ao terminar %s."
 msgstr "Still locked: comes when you finish %s."
 
-#: scripts/flow/station_rules.gd:2431
+#: scripts/flow/station_rules.gd:2432
 msgid "Ainda bloqueada: vem com os desafios dos chefes."
 msgstr "Still locked: it comes with the boss challenges."
 
-#: scripts/flow/station_rules.gd:2432
+#: scripts/flow/station_rules.gd:2433
 msgid "Ainda bloqueada."
 msgstr "Still locked."
 
-#: scripts/flow/station_rules.gd:2443
+#: scripts/flow/station_rules.gd:2444
 msgid "Essa roupa não é desse herói."
 msgstr "That outfit isn't this hero's."
 
-#: scripts/flow/station_rules.gd:2445
+#: scripts/flow/station_rules.gd:2446
 msgid "Essa roupa ainda não chegou."
 msgstr "That outfit hasn't arrived yet."
 
-#: scripts/flow/station_rules.gd:2449
+#: scripts/flow/station_rules.gd:2450
 msgid "A roupa se troca na Estação, fora da expedição."
 msgstr "Outfits are changed at the Station, outside an expedition."
 
@@ -9077,6 +9077,9 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "Receba quem voltou no trem antes de partir."
+#~ msgstr "Welcome back whoever returned on the train before setting out."
 
 #~ msgid "Capturados"
 #~ msgstr "Captured"
