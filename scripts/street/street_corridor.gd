@@ -141,6 +141,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	hud.event_closed.connect(_on_event_closed)
 	hud.camp_food.connect(func(id): _camp_care(id, "food"))
 	hud.camp_bandage.connect(func(id): _camp_care(id, "bandage"))
+	hud.camp_skill.connect(_camp_skill)
 	hud.camp_leave.connect(_on_camp_leave)
 	hud.result_continue.connect(_on_result_continue)
 	hud.menu_return.connect(_retreat)
@@ -1625,6 +1626,34 @@ func _camp_care(hero_id: String, kind: String) -> void:
 		Campaign.save()
 		hud.camp_respond(hero_id, kind, hero.hp - hp_before, hero.instinct - instinct_before)
 		camp.show_care_pose(hero_id)
+	hud.show_camp(Campaign.state, camp)
+	hud.refresh(Campaign.state)
+
+
+## Uma habilidade de acampamento (#261): a regra decide; quem mudou de vida ou de instinto responde na cena, e a linha de
+## estado do acampamento diz o que aconteceu (ou por que não).
+func _camp_skill(hero_id: String, skill_id: String, target_id: String) -> void:
+	if camp.switching():
+		return
+	var before := {}
+	for id in Campaign.state.session.expedition.team:
+		var hero = Campaign.hero(id)
+		if hero != null:
+			before[id] = [int(hero.hp), int(hero.get("instinct", 0))]
+	var error := AHCampSkills.use(Campaign.state, hero_id, skill_id, target_id)
+	if error == "":
+		Campaign.save()
+		var row = AHCampSkills.skill(skill_id)
+		hud.toast(tr("%s: %s.") % [Campaign.hero(hero_id).display_name, tr(String(row.DisplayName))], 2.5)
+		for id in before:
+			var hero = Campaign.hero(id)
+			var life: int = int(hero.hp) - before[id][0]
+			var calm: int = int(hero.get("instinct", 0)) - before[id][1]
+			if life != 0 or calm != 0:
+				hud.camp_respond(id, "bandage" if life > 0 else "food", life, calm)
+		camp.show_care_pose(hero_id)
+	else:
+		hud.toast(error, 2.5)
 	hud.show_camp(Campaign.state, camp)
 	hud.refresh(Campaign.state)
 

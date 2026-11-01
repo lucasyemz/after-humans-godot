@@ -5,8 +5,10 @@
 ##   pé, a linha de estado, as teclas e CONTINUAR;
 ## - com o foco (ou o mouse) num cuidado, a carta mostra a vida prevista (AHJourneyRules.camp_preview), sem gastar;
 ## - o cuidado sem efeito ganha o véu com riscas, e a linha de estado diz por quê.
-## ←/→ trocam de herói (em qualquer lugar do painel); ↑/↓ andam entre a carta, RAÇÃO, CURATIVO e CONTINUAR; Interagir
-## confirma. O clique no corpo (ou na carta) também escolhe. Cada comida ou curativo responde no herói: o número verde
+## - as habilidades de acampamento (#261): as 4 do herói escolhido, com o Tempo de fogueira que sobra; a de aliado pede o
+##   alvo (as setas e Interagir, ou o clique na carta; Esc desiste), e a linha de estado diz o que muda ou por que não.
+## ←/→ trocam de herói (em qualquer lugar do painel); ↑/↓ andam entre a carta, RAÇÃO, CURATIVO, as habilidades e
+## CONTINUAR; Interagir confirma. O clique no corpo (ou na carta) também escolhe. Cada comida ou curativo responde no herói: o número verde
 ## subindo, o efeito da #80 e o som.
 class_name AHCampHud
 extends Control
@@ -29,6 +31,7 @@ const CARD_GAP := 12.0
 const CARE_HEIGHT := 76.0
 
 signal food(hero_id: String)
+signal skill(hero_id: String, skill_id: String, target_id: String)
 signal bandage(hero_id: String)
 signal leave
 
@@ -47,6 +50,16 @@ var _status: RichTextLabel
 var _previewing := ""
 ## O lado (−1, 1) que está apertado agora; 0 solto.
 var _held := 0
+## As habilidades de acampamento do herói escolhido (#261): a linha, o Tempo e os botões.
+var _skill_row: HBoxContainer
+var _time: Label
+var skill_buttons: Array = []
+## A habilidade com o foco ou o mouse ("" nenhuma): a linha de estado diz o que ela faz.
+var _skill_preview := ""
+## A habilidade de aliado esperando o alvo: {user, skill}; {} sem nenhuma.
+var targeting := {}
+## De quem são os botões agora (refeitos quando o escolhido muda).
+var _skills_of := ""
 
 
 func _init(scene: AHCampScene = null) -> void:
@@ -104,10 +117,18 @@ func _build_bar() -> void:
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 20)
 	column.add_child(top)
+	var left := VBoxContainer.new()
+	left.add_theme_constant_override("separation", 10)
+	top.add_child(left)
 	var cards := HBoxContainer.new()
 	cards.name = "Cards"
 	cards.add_theme_constant_override("separation", int(CARD_GAP))
-	top.add_child(cards)
+	left.add_child(cards)
+	# As habilidades de acampamento (#261): as 4 do escolhido, embaixo das cartas (o painel não cresce).
+	_skill_row = HBoxContainer.new()
+	_skill_row.name = "Skills"
+	_skill_row.add_theme_constant_override("separation", int(CARD_GAP))
+	left.add_child(_skill_row)
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", 8)
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -118,6 +139,11 @@ func _build_bar() -> void:
 	_name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(_name)
+	# O Tempo de fogueira (#261) ao lado do instinto: o painel não cresce.
+	_time = AHKit.label("", "text", AHKit.AMBER, true)
+	_time.name = "Time"
+	_time.size_flags_vertical = Control.SIZE_SHRINK_END
+	head.add_child(_time)
 	_instinct = AHKit.label("", "text", AHKit.MUTED)
 	_instinct.size_flags_vertical = Control.SIZE_SHRINK_END
 	head.add_child(_instinct)
@@ -163,6 +189,87 @@ func _build_bar() -> void:
 	leave_button.custom_minimum_size = Vector2(340, 64)
 	leave_button.pressed.connect(func(): leave.emit())
 	foot.add_child(leave_button)
+
+
+## Os botões das habilidades do herói escolhido (refeitos quando ele muda).
+func _build_skills(hero) -> void:
+	for button in skill_buttons:
+		_skill_row.remove_child(button)
+		button.queue_free()
+	skill_buttons.clear()
+	_skills_of = String(hero.id)
+	for skill_id in AHCampSkills.equipped(hero):
+		var row = AHCampSkills.skill(skill_id)
+		if row == null:
+			continue
+		var button := AHKit.button("", "secondary")
+		button.name = "Skill_" + skill_id
+		button.set_meta("skill", skill_id)
+		button.custom_minimum_size.x = CARD_WIDTH
+		button.tooltip_text = tr(String(row.Description))
+		var words := HBoxContainer.new()
+		words.add_theme_constant_override("separation", 8)
+		words.set_anchors_preset(Control.PRESET_FULL_RECT)
+		words.offset_left = 12
+		words.offset_right = -12
+		words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(words)
+		var title := AHKit.label(tr(String(row.DisplayName)), "text", AHKit.TEXT, true)
+		title.name = "Title"
+		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		title.clip_text = true
+		title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		words.add_child(title)
+		var cost := AHKit.label(str(int(row.Cost)), "text", AHKit.AMBER, true)
+		cost.name = "Cost"
+		cost.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		words.add_child(cost)
+		var cover := AHKit.veil()
+		cover.visible = false
+		button.add_child(cover)
+		button.pressed.connect(func(): _press_skill(skill_id))
+		button.focus_entered.connect(func(): _preview_skill(skill_id))
+		button.focus_exited.connect(func(): _preview_skill(""))
+		button.mouse_entered.connect(func(): _preview_skill(skill_id))
+		button.mouse_exited.connect(func(): _preview_skill(""))
+		_skill_row.add_child(button)
+		skill_buttons.append(button)
+
+
+func _preview_skill(skill_id: String) -> void:
+	_skill_preview = skill_id
+	refresh()
+
+
+## Apertar uma habilidade: a de aliado espera o alvo; as outras vão direto (a regra recusa o que não vale).
+func _press_skill(skill_id: String) -> void:
+	var user := camp.selected_id()
+	if not targeting.is_empty():
+		targeting = {}
+	if AHCampSkills.needs_target(skill_id):
+		targeting = {"user": user, "skill": skill_id}
+		refresh()
+		return
+	skill.emit(user, skill_id, "")
+
+
+## O alvo escolhido (a carta, o corpo ou Interagir com outro herói escolhido): usa e volta ao herói que usou.
+func _choose_target(target_id: String) -> void:
+	if targeting.is_empty():
+		return
+	var pending := targeting
+	targeting = {}
+	var index := camp.members.map(func(m): return m.hero_id).find(String(pending.user))
+	if index >= 0:
+		camp.select(index)
+	skill.emit(String(pending.user), String(pending.skill), target_id)
+
+
+func cancel_target() -> void:
+	if not targeting.is_empty():
+		targeting = {}
+		refresh()
 
 
 func _divider() -> TextureRect:
@@ -241,7 +348,7 @@ func _add_member(hero_id: String) -> void:
 	card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	AHKit.style_button(card, AHKit.piece_of("card", "hero"))
 	card.custom_minimum_size = Vector2(CARD_WIDTH, 0)
-	card.pressed.connect(func(): camp.select(camp.members.map(func(m): return m.hero_id).find(hero_id)))
+	card.pressed.connect(func(): _pick(hero_id))
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
 	column.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -298,10 +405,18 @@ func _add_member(hero_id: String) -> void:
 	body.tooltip_text = String(hero.display_name)
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
 		body.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	body.pressed.connect(func(): camp.select(camp.members.map(func(m): return m.hero_id).find(hero_id)))
+	body.pressed.connect(func(): _pick(hero_id))
 	add_child(body)
 	move_child(body, 0)
 	_bodies[hero_id] = body
+
+
+## O clique numa carta ou num corpo: escolhe o herói, ou, com uma habilidade de aliado esperando, o alvo dela.
+func _pick(hero_id: String) -> void:
+	if not targeting.is_empty() and hero_id != String(targeting.user):
+		_choose_target(hero_id)
+		return
+	camp.select(camp.members.map(func(m): return m.hero_id).find(hero_id))
 
 
 ## O cuidado com o foco agora ("" nenhum).
@@ -353,6 +468,7 @@ func refresh() -> void:
 		line = tr("%s está com a vida cheia e o instinto em 0: nenhum cuidado faz efeito.") % hero.display_name
 	elif not wrap.effect:
 		line = tr("%s está com a vida cheia: a Ração só baixa o instinto (−5).") % hero.display_name
+	line = _skills_refresh(campaign, hero, line)
 	AHKit.set_arrow_text(_status, line)
 	for member in camp.members:
 		var card: Button = _cards.get(member.hero_id)
@@ -374,7 +490,7 @@ func refresh() -> void:
 		card.custom_minimum_size.y = maxf((card.get_child(0) as Control).get_combined_minimum_size().y + 28.0, 72.0 + 26.0 + 36.0)
 	# ↑/↓: a carta escolhida, RAÇÃO, CURATIVO e CONTINUAR, em roda; ←/→ são do herói (o _input).
 	var chosen_card: Button = _cards.get(hero_id)
-	var order: Array = [chosen_card, eat_button, heal_button, leave_button]
+	var order: Array = [chosen_card, eat_button, heal_button] + skill_buttons + [leave_button]
 	# Ao sair da árvore (o foco que sai do cuidado chama a prévia), os filhos saem antes: sem caminho, sem vizinhos.
 	if (_cards.values() + order).any(func(control): return control == null or not control.is_inside_tree()):
 		return
@@ -387,6 +503,7 @@ func refresh() -> void:
 	for control in order:
 		control.focus_neighbor_left = control.get_path()
 		control.focus_neighbor_right = control.get_path()
+	# ←/→ são do herói em todo o painel (o _input), também nas habilidades.
 	# O botão com foco que ficou apagado (a comida acabou) passa o foco para o próximo que serve.
 	var owner := get_viewport().gui_get_focus_owner() if get_viewport() else null
 	if owner is Button and owner.disabled:
@@ -411,6 +528,46 @@ func _style_care(button: Button, stock: int, effect: bool) -> void:
 	else:
 		icon.modulate = AHKit.MUTED if off else AHKit.TEXT
 	(button.get_node("Veil") as Control).visible = off
+
+
+## As habilidades (#261): os botões do escolhido (o custo, o véu na que não serve agora), o Tempo que sobra e a linha de
+## estado (o alvo esperado; senão, a da habilidade com o foco: o que muda ou por que não). Devolve a linha.
+func _skills_refresh(campaign: Dictionary, hero, line: String) -> String:
+	if _skills_of != String(hero.id) and targeting.is_empty():
+		_build_skills(hero)
+	_time.text = tr("Tempo de fogueira %d/%d ·") % [AHCampSkills.time_left(campaign), AHCampSkills.time_budget()]
+	var user := String(targeting.get("user", hero.id))
+	for button in skill_buttons:
+		var skill_id: String = button.get_meta("skill")
+		var q := AHCampSkills.quote(campaign, user, skill_id, "")
+		# A de aliado: vale se houver um aliado em quem ela faz diferença.
+		if q.needs_target and String(q.reason) == tr("Escolha o aliado."):
+			q.available = camp.members.any(func(m): return m.hero_id != user and AHCampSkills.quote(campaign, user, skill_id, m.hero_id).available)
+		var off: bool = not q.available
+		button.disabled = off and targeting.is_empty()
+		(button.get_node("Veil") as Control).visible = off
+		(button.find_child("Title", true, false) as Label).add_theme_color_override("font_color", AHKit.MUTED if off else AHKit.TEXT)
+		(button.find_child("Cost", true, false) as Label).add_theme_color_override("font_color", AHKit.MUTED if off else AHKit.AMBER)
+		button.custom_minimum_size.y = maxf(AHUiStyle.px(44), (button.get_child(0) as Control).get_combined_minimum_size().y + 12.0)
+	if not targeting.is_empty():
+		var row = AHCampSkills.skill(String(targeting.skill))
+		var aimed := camp.selected_id()
+		if aimed != String(targeting.user):
+			var q := AHCampSkills.quote(campaign, String(targeting.user), String(targeting.skill), aimed)
+			var who = Campaign.hero(aimed)
+			return (tr("%s em %s: %s. Interagir confirma; Esc desiste.") % [tr(String(row.DisplayName)), who.display_name, ", ".join(q.changes)]) if q.available \
+				else tr("%s em %s: %s") % [tr(String(row.DisplayName)), who.display_name, q.reason]
+		return tr("%s: escolha o aliado (setas ou o clique na carta). Esc desiste.") % tr(String(row.DisplayName))
+	if _skill_preview != "":
+		var row = AHCampSkills.skill(_skill_preview)
+		var q := AHCampSkills.quote(campaign, String(hero.id), _skill_preview, "")
+		var cost := tr("%d de Tempo") % int(row.Cost)
+		if q.available:
+			return tr(String(row.DisplayName)) + " (" + cost + "): " + ", ".join(q.changes) + "."
+		if q.needs_target and String(q.reason) == tr("Escolha o aliado."):
+			return tr(String(row.DisplayName)) + " (" + cost + "): " + tr(String(row.Description))
+		return tr(String(row.DisplayName)) + " (" + cost + "): " + String(q.reason)
+	return line
 
 
 func _process(_delta: float) -> void:
@@ -490,6 +647,17 @@ func _input(event: InputEvent) -> void:
 	var parent := get_parent()
 	if parent != null and parent.has_method("modal_open") and parent.modal_open():
 		return
+	# A habilidade de aliado esperando o alvo: Interagir escolhe o herói escolhido; Esc desiste.
+	if not targeting.is_empty():
+		if event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
+			if camp.selected_id() != String(targeting.user):
+				_choose_target(camp.selected_id())
+			get_viewport().set_input_as_handled()
+			return
+		if event.is_action_pressed("menu") or event.is_action_pressed("ui_cancel"):
+			cancel_target()
+			get_viewport().set_input_as_handled()
+			return
 	if AHUiStyle.press_focused(self, event):
 		get_viewport().set_input_as_handled()
 		return

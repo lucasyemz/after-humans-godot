@@ -12,10 +12,12 @@ const EFFECTS := ["instinct", "heal_pct", "hope", "food", "bandage", "ampoule", 
 	"mark_front", "opening", "watch", "phase", "clear", "wounded"]
 
 var t
+var _tree: SceneTree
 
 
 func run(context) -> void:
 	t = context
+	_tree = Engine.get_main_loop()
 	_data()
 	_learning()
 	_choose()
@@ -25,6 +27,7 @@ func run(context) -> void:
 	_opening()
 	_night()
 	_save()
+	await _room()
 
 
 func _hero(c: Dictionary, class_id: String) -> Dictionary:
@@ -245,3 +248,73 @@ func _save() -> void:
 	t.equal([old.camp_unlocked, old.camp_loadout], [[], []], "o editado sai limpo (nível 1: nenhuma aprendida)")
 	old.level = 4
 	t.equal(C.picks(old), 2, "quem já está no nível 4 tem as escolhas dos níveis 2 e 4 para fazer na Sala")
+
+
+## A Sala (#261): as 7 de acampamento do papel, com o estado; a escolha do nível ("Escolha agora"); Aprender na
+## bloqueada; a troca entre as que leva e as que ficam.
+func _room() -> void:
+	var real_state: Dictionary = Campaign.state
+	var real_dir: String = Campaign.save_dir
+	var tips: bool = Tips.enabled
+	Tips.enabled = false
+	Campaign.save_dir = "user://test-camp-skills-%d" % Time.get_ticks_usec()
+	var c: Dictionary = Campaign.create_initial(2611)
+	var bento := _hero(c, "cao")
+	bento.level = 4
+	bento.camp_unlocked = ["camp_cao_palavra_firme"]
+	c.station.last_return = {}
+	Campaign.state = c
+	GameFlow.change_to("station", {}, false)
+	var station: AHStation = null
+	for frame in 600:
+		await _tree.process_frame
+		if not GameFlow.busy and _tree.current_scene is AHStation and frame > 3:
+			station = _tree.current_scene
+			break
+	if t.check(station != null, "a Estação abriu"):
+		var hud: AHRefugeHud = station.hud
+		hud.open_room(S.CHARACTERS)
+		await _frames(4)
+		var screen: AHCharacterRoom = hud._room_screen
+		screen.selected = bento.id
+		screen.camp_skill = "camp_cao_dividir_a_carga"
+		screen.rebuild()
+		await _frames(3)
+		var rows: Array = screen.find_children("Camp_*", "Button", true, false)
+		var states := {}
+		for row in rows:
+			states[String(row.get_meta("state", ""))] = int(states.get(String(row.get_meta("state", "")), 0)) + 1
+		t.equal(states, {"equipped": 4, "locked": 3}, "a Sala mostra as 7 de acampamento: 4 levadas e 3 bloqueadas")
+		t.check(screen.find_child("CampPicks", true, false) != null, "e diz que há uma escolha a fazer")
+		var learn: Button = screen.find_child("CampLearn", true, false)
+		if t.check(learn != null, "a bloqueada tem Aprender"):
+			learn.pressed.emit()
+			await _frames(4)
+			t.check(C.known(S.hero(Campaign.state, bento.id)).has("camp_cao_dividir_a_carga"), "Aprender ensina a escolhida")
+		screen = hud._room_screen
+		screen.camp_skill = "camp_cao_dividir_a_carga"
+		screen.rebuild()
+		await _frames(3)
+		t.equal(screen.find_child("Camp_camp_cao_dividir_a_carga", true, false).get_meta("state", ""), "resting", "a nova fica na Estação (já leva 4)")
+		var replace: Button = screen.find_child("CampReplace_camp_comum_conversa_ao_fogo", true, false)
+		if t.check(replace != null, "e pode ir no lugar de uma das 4"):
+			replace.pressed.emit()
+			await _frames(4)
+			t.check(C.equipped(S.hero(Campaign.state, bento.id)).has("camp_cao_dividir_a_carga") and not C.equipped(S.hero(Campaign.state, bento.id)).has("camp_comum_conversa_ao_fogo"),
+				"a troca vale")
+	Tips.enabled = tips
+	if _tree.current_scene != null:
+		_tree.unload_current_scene()
+	await _tree.process_frame
+	var dir := ProjectSettings.globalize_path(Campaign.save_dir)
+	if DirAccess.dir_exists_absolute(dir):
+		for file in DirAccess.get_files_at(dir):
+			DirAccess.remove_absolute(dir.path_join(file))
+		DirAccess.remove_absolute(dir)
+	Campaign.save_dir = real_dir
+	Campaign.state = real_state
+
+
+func _frames(count: int) -> void:
+	for i in count:
+		await _tree.process_frame

@@ -1916,3 +1916,14 @@ camp_skills.gd: seed
 camp_skills.gd: watched
 camp_skills.gd: exposto
 combat_session.gd: dodge
+camp_hud.gd: Skills
+camp_hud.gd: Time
+camp_hud.gd: Skill_
+camp_hud.gd: skill
+camp_hud.gd: Cost
+camp_hud.gd: user
+character_room.gd: self
+character_room.gd: ally
+character_room.gd: CampSwap_%s
+character_room.gd: CampReplace_%s
+character_room.gd: Camp_%s
