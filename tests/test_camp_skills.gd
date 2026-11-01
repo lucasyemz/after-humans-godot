@@ -246,6 +246,17 @@ func _save() -> void:
 	old.camp_loadout = ["nada"]
 	C.migrate(c)
 	t.equal([old.camp_unlocked, old.camp_loadout], [[], []], "o editado sai limpo (nível 1: nenhuma aprendida)")
+	# O save editado com outro tipo no lugar das listas não quebra a migração (#261, QA).
+	old.camp_unlocked = "lixo"
+	old.camp_loadout = 5
+	C.migrate(c)
+	t.equal([old.camp_unlocked, old.camp_loadout], [[], []], "tipos errados viram listas vazias")
+	old.camp_unlocked = [3, null, "camp_cao_palavra_firme"]
+	old.camp_loadout = [null]
+	old.level = 2
+	C.migrate(c)
+	t.equal([old.camp_unlocked, old.camp_loadout], [["camp_cao_palavra_firme"], []], "só os ids de texto contam")
+	old.camp_unlocked = []
 	old.level = 4
 	t.equal(C.picks(old), 2, "quem já está no nível 4 tem as escolhas dos níveis 2 e 4 para fazer na Sala")
 
@@ -280,6 +291,18 @@ func _room() -> void:
 		screen.camp_skill = "camp_cao_dividir_a_carga"
 		screen.rebuild()
 		await _frames(3)
+		# Apontar uma habilidade de luta rola até a troca dela, não até o Acampamento.
+		var fight_row: Button = screen.find_child("Ability_cao_fique_atras_de_mim", true, false)
+		if fight_row != null:
+			fight_row.pressed.emit()
+			await _frames(4)
+			screen = hud._room_screen
+			var scroll := screen.get_node("Left/LeftScroll") as ScrollContainer
+			var choices := screen.find_child("SkillChoices", true, false) as Control
+			t.check(choices != null and scroll.get_global_rect().grow(2).encloses(choices.get_global_rect()), "apontar uma de luta mostra a troca dela")
+			screen.camp_skill = "camp_cao_dividir_a_carga"
+			screen.rebuild()
+			await _frames(3)
 		var rows: Array = screen.find_children("Camp_*", "Button", true, false)
 		var states := {}
 		for row in rows:

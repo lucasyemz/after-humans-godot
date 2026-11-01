@@ -170,15 +170,22 @@ static func level_notice(hero: Dictionary) -> String:
 ## volta para as primeiras que sabe. Quem já está no nível 2 ou acima fica com as escolhas para fazer na Sala.
 static func migrate(campaign: Dictionary) -> void:
 	for hero in campaign.get("roster", []):
+		if typeof(hero) != TYPE_DICTIONARY:
+			continue
 		var own := catalog(String(hero.get("class_id", "")))
 		var start := starters(String(hero.get("class_id", "")))
+		# O save editado pode trazer outro tipo no lugar das listas: vira lista vazia, e só ids (texto) contam.
+		var learned = hero.get("camp_unlocked", [])
 		var kept: Array = []
-		for id in hero.get("camp_unlocked", []):
-			if own.has(String(id)) and not start.has(String(id)) and not kept.has(String(id)):
-				kept.append(String(id))
+		for id in (learned if typeof(learned) == TYPE_ARRAY else []):
+			if typeof(id) == TYPE_STRING and own.has(id) and not start.has(id) and not kept.has(id):
+				kept.append(id)
 		hero.camp_unlocked = kept.slice(0, slots_at(AHHeroLevels.level(hero)))
-		var chosen: Array = hero.get("camp_loadout", [])
-		hero.camp_loadout = chosen.duplicate() if not chosen.is_empty() and invalid(hero, chosen) == "" else []
+		var loadout = hero.get("camp_loadout", [])
+		var chosen: Array = []
+		for id in (loadout if typeof(loadout) == TYPE_ARRAY else []):
+			chosen.append(id if typeof(id) == TYPE_STRING else "")
+		hero.camp_loadout = chosen if not chosen.is_empty() and invalid(hero, chosen) == "" else []
 
 
 # ================================================================ no acampamento
@@ -188,7 +195,7 @@ static func camp(campaign: Dictionary) -> Dictionary:
 	var route = J.corridor(campaign)
 	if route == null:
 		return {}
-	if typeof(route.get("camp")) != TYPE_DICTIONARY:
+	if typeof(route.get("camp")) != TYPE_DICTIONARY or typeof(route.camp.get("used")) != TYPE_DICTIONARY:
 		route.camp = {"time": 0, "used": {}, "watch": false}
 	return route.camp
 
@@ -210,7 +217,7 @@ static func next_fight(campaign: Dictionary) -> Dictionary:
 	var route = J.corridor(campaign)
 	if route == null:
 		return {}
-	if typeof(route.get("camp_next")) != TYPE_DICTIONARY:
+	if typeof(route.get("camp_next")) != TYPE_DICTIONARY or typeof(route.camp_next.get("heroes")) != TYPE_DICTIONARY:
 		route.camp_next = {"heroes": {}, "opening": false, "mark_front": false}
 	return route.camp_next
 
@@ -298,6 +305,9 @@ static func quote(campaign: Dictionary, user_id: String, skill_id: String, targe
 		out.reason = TranslationServer.translate("Escolha outro aliado da equipe.")
 		return out
 	var effects: Dictionary = row.get("Effects", {})
+	if effects.has("ampoule") and AHExplorationCare.iris(campaign) != user:
+		out.reason = TranslationServer.translate("Só quem leva a Ampola entre as 4 da luta.")
+		return out
 	if bool(effects.get("wounded", false)) and not AHWounded.is_wounded(who[0]):
 		out.reason = TranslationServer.translate("Só em quem está Ferido.")
 		return out
@@ -332,8 +342,8 @@ static func _changes(campaign: Dictionary, user: Dictionary, who: Array, effects
 	for kind in ["block", "dodge"]:
 		if effects.has(kind) and who.any(func(h): return _next_of(next, h.id, kind) < AHCombatEngine.TOKEN_CAP):
 			out.append((TranslationServer.translate("+%d Bloqueio na próxima luta") if kind == "block" else TranslationServer.translate("+%d Esquiva na próxima luta")) % int(effects[kind]))
-	if effects.has("self_block") and _next_of(next, user.id, "block") < AHCombatEngine.TOKEN_CAP and not out.has(TranslationServer.translate("+%d Bloqueio na próxima luta") % int(effects.get("block", 0))):
-		out.append(TranslationServer.translate("+%d Bloqueio na próxima luta") % int(effects.self_block))
+	if effects.has("self_block") and _next_of(next, user.id, "block") < AHCombatEngine.TOKEN_CAP:
+		out.append(TranslationServer.translate("e +%d Bloqueio para quem usa") % int(effects.self_block))
 	if effects.has("speed") and who.any(func(h): return _next_of(next, h.id, "speed") < int(effects.speed)):
 		out.append(TranslationServer.translate("+%d de velocidade na próxima luta") % int(effects.speed))
 	if bool(effects.get("mark_front", false)) and not bool(next.get("mark_front", false)):

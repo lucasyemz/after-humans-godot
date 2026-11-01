@@ -157,6 +157,25 @@ func _skills_in_camp() -> void:
 	await _frames(3)
 	t.equal(int(S.hero(Campaign.state, nick).instinct), 15, "setas até o Nick e Interagir: a Conversa ao Fogo vale (−15 de Instinto)")
 	t.equal(camp.selected_id(), bento, "e o escolhido volta ao Bento")
+	# ←/→ com o foco numa habilidade: a linha se refaz para o outro herói sem erro, e o foco fica no painel.
+	(panel.find_child("Skill_camp_cao_ombro_a_ombro", true, false) as Button).grab_focus()
+	await _frames(1)
+	var right := InputEventAction.new()
+	right.action = "move_right"
+	right.pressed = true
+	_tree.root.push_input(right)
+	var release := InputEventAction.new()
+	release.action = "move_right"
+	release.pressed = false
+	_tree.root.push_input(release)
+	await _until(func(): return not camp.switching(), 3.0)
+	await _frames(3)
+	var focused: Control = street.get_viewport().gui_get_focus_owner()
+	t.check(camp.selected_id() != bento and focused != null and panel.is_ancestor_of(focused), "←/→ com o foco numa habilidade: outro herói, e o foco continua no painel")
+	t.equal(panel._skills_of, camp.selected_id(), "a linha é a do novo escolhido")
+	camp.select(ids.find(bento))
+	await _until(func(): return not camp.switching(), 3.0)
+	await _frames(2)
 	# Esc desiste do alvo.
 	(panel.find_child("Skill_camp_comum_conversa_ao_fogo", true, false) as Button).pressed.emit()
 	await _frames(1)

@@ -113,6 +113,7 @@ func _room(campaign) -> void:
 	screen.selected = "hero_cao_bento"
 	screen.camp_skill = "camp_cao_dividir_a_carga"
 	screen._reveal = true
+	screen._reveal_camp = true
 	screen.rebuild()
 	await _frames(20)
 	await _shot("20-room")

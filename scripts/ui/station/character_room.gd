@@ -33,6 +33,8 @@ var training := false
 ## coluna), a coluna rola até o detalhe e a troca.
 var _left_scroll := 0
 var _reveal := false
+## O apontado é uma habilidade de acampamento (rola até a troca dela, no fim da coluna).
+var _reveal_camp := false
 var _upgrade := ""
 var _first_focus: Control
 var _trait_ids := {}
@@ -205,7 +207,9 @@ func _left(c: Dictionary) -> void:
 	_camp_section(hero, column)
 	if _reveal:
 		_reveal = false
-		_scroll_to_end.call_deferred()
+		# Até o detalhe apontado: o da luta (#259) ou o do acampamento (#261), que fica no fim.
+		_scroll_to.call_deferred("CampChoices" if _reveal_camp else "SkillChoices")
+	_reveal_camp = false
 
 
 ## As habilidades de acampamento (#261): as 7 do papel (as que leva, as que ficam e as bloqueadas), a escolha do nível
@@ -313,6 +317,7 @@ func _camp_row(hero: Dictionary, skill_id: String) -> Button:
 	row.pressed.connect(func():
 		camp_skill = id
 		_reveal = true
+		_reveal_camp = true
 		rebuild())
 	return row
 
@@ -324,12 +329,15 @@ static func camp_state(hero: Dictionary, skill_id: String) -> String:
 	return "resting" if AHCampSkills.known(hero).has(skill_id) else "locked"
 
 
-## O detalhe e a troca ficam no fim da coluna: depois de ela se montar (um quadro), rola até lá.
-func _scroll_to_end() -> void:
+## O detalhe e a troca: depois de a coluna se montar (um quadro), rola até que a troca apareça inteira (com o detalhe
+## logo acima).
+func _scroll_to(node_name: String) -> void:
 	await get_tree().process_frame
 	var scroll := get_node_or_null("Left/LeftScroll") as ScrollContainer
-	if scroll != null:
-		scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
+	var target := find_child(node_name, true, false) as Control
+	if scroll == null or target == null:
+		return
+	scroll.ensure_control_visible(target)
 
 
 func _hero_tab(entry: Dictionary) -> Button:

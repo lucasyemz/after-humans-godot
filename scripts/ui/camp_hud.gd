@@ -60,6 +60,8 @@ var _skill_preview := ""
 var targeting := {}
 ## De quem são os botões agora (refeitos quando o escolhido muda).
 var _skills_of := ""
+## A linha está sendo refeita: o foco que sai dos botões removidos não pede outra prévia (nem outra reconstrução).
+var _building := false
 
 
 func _init(scene: AHCampScene = null) -> void:
@@ -193,11 +195,17 @@ func _build_bar() -> void:
 
 ## Os botões das habilidades do herói escolhido (refeitos quando ele muda).
 func _build_skills(hero) -> void:
+	if _building:
+		return
+	_building = true
+	_skills_of = String(hero.id)
+	var owner := get_viewport().gui_get_focus_owner() if get_viewport() != null else null
+	var had_focus: bool = skill_buttons.has(owner)
 	for button in skill_buttons:
 		_skill_row.remove_child(button)
 		button.queue_free()
 	skill_buttons.clear()
-	_skills_of = String(hero.id)
+	_skill_preview = ""
 	for skill_id in AHCampSkills.equipped(hero):
 		var row = AHCampSkills.skill(skill_id)
 		if row == null:
@@ -235,9 +243,17 @@ func _build_skills(hero) -> void:
 		button.mouse_exited.connect(func(): _preview_skill(""))
 		_skill_row.add_child(button)
 		skill_buttons.append(button)
+	_building = false
+	# O foco estava na linha (←/→ com o foco numa habilidade): vai para a mesma posição na linha nova, ou para a carta.
+	if had_focus:
+		var landing: Control = skill_buttons[0] if not skill_buttons.is_empty() else _cards.get(String(hero.id))
+		if landing != null:
+			landing.grab_focus.call_deferred()
 
 
 func _preview_skill(skill_id: String) -> void:
+	if _building:
+		return
 	_skill_preview = skill_id
 	refresh()
 
@@ -259,12 +275,15 @@ func _choose_target(target_id: String) -> void:
 	if targeting.is_empty():
 		return
 	var pending := targeting
-	targeting = {}
-	# Usa antes de voltar ao herói: a troca de herói (o fade) recusaria o uso no meio dela.
+	# Usa antes de voltar ao herói (a troca de herói, o fade, recusaria o uso no meio dela). O alvo ainda conta como
+	# esperado durante o uso: a linha continua a de quem usou (não se refaz para o alvo).
 	skill.emit(String(pending.user), String(pending.skill), target_id)
+	targeting = {}
 	var index := camp.members.map(func(m): return m.hero_id).find(String(pending.user))
 	if index >= 0 and camp.selected_id() != String(pending.user):
 		camp.select(index)
+	else:
+		refresh()
 
 
 func cancel_target() -> void:
@@ -534,7 +553,7 @@ func _style_care(button: Button, stock: int, effect: bool) -> void:
 ## As habilidades (#261): os botões do escolhido (o custo, o véu na que não serve agora), o Tempo que sobra e a linha de
 ## estado (o alvo esperado; senão, a da habilidade com o foco: o que muda ou por que não). Devolve a linha.
 func _skills_refresh(campaign: Dictionary, hero, line: String) -> String:
-	if _skills_of != String(hero.id) and targeting.is_empty():
+	if _skills_of != String(hero.id) and targeting.is_empty() and not _building:
 		_build_skills(hero)
 	_time.text = tr("Tempo de fogueira %d/%d ·") % [AHCampSkills.time_left(campaign), AHCampSkills.time_budget()]
 	var user := String(targeting.get("user", hero.id))
