@@ -1,0 +1,13 @@
+[
+  {
+    "Name": "rules",
+    "Note": "#188 (decisão do Lucas, 28/10): o resgate. O pedido de ajuda surge num dia novo com Chance%, mais ChanceStep a cada dia sem pedido, até ChanceMax, só com uma das Phases liberada; fica no Mapa das missões solo até alguém soltá-lo. O capturado numa missão solo (#183) e o pedido viram um ponto num trecho de Suprimentos (nunca o primeiro) da próxima expedição à fase deles, guardado pela patrulha. Solto, entra na equipe (cheia, alguém volta para a Estação) ou vai para a Estação; o pedido ainda pode ser deixado (LeaveFood de comida). Entra com HpRatio da vida máxima e Instinct de instinto.",
+    "Chance": 25,
+    "ChanceStep": 10,
+    "ChanceMax": 60,
+    "Phases": ["fase_2", "fase_3", "fase_4", "fase_5"],
+    "HpRatio": 0.5,
+    "Instinct": 20,
+    "LeaveFood": 1
+  }
+]
