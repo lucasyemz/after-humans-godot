@@ -230,6 +230,8 @@ static func create_corridor(seed_value: int, node_id: String, node_type: String,
 		# Cenários (#86): os props vasculháveis de cada mapa (o trecho de cada um), os já vasculhados, o do objetivo da
 		# rota e o interior lateral aberto (a zona do mapa, -1 fora).
 		"prop_steps": [], "prop_maps": [], "searched_props": [], "objective_prop": -1, "current_room": -1,
+		# O desvio da fase (#289): {} sem desvio.
+		"detour": _detour_plan(phase_seed, node_id),
 	}
 
 
@@ -287,6 +289,7 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 	if index > route.index and not route.steps[route.index].resolved:
 		return ""
 	route.index = index
+	_detour_moved(campaign, index)
 	var step: Dictionary = route.steps[index]
 	if step.resolved:
 		return ""
@@ -304,7 +307,16 @@ static func enter_step(campaign: Dictionary, index: int) -> String:
 		"passage":
 			step.resolved = true
 			# Na primeira Passagem da fase (no mapa dela, não na travessia), o evento de história (#64).
-			var story := story_event(campaign) if map_for_step(campaign.session.expedition.phase_id, index) == phase(campaign.session.expedition.phase_id).get("map", "") else ""
+			# A passagem do ramal tem o evento dela (#289), uma vez por campanha.
+			if step.get("detour", false):
+				var detour_story := detour_story_event(campaign)
+				if detour_story != "":
+					campaign.station.detour_events = campaign.station.get("detour_events", []) + [detour_story]
+					campaign.session.event = {"event_id": detour_story, "from_search": false, "resolution": "",
+						"pending_hard_combat": false, "object": ""}
+					return "event"
+				return ""
+			var story := story_event(campaign) if route_map(campaign.session.expedition, index) == phase(campaign.session.expedition.phase_id).get("map", "") else ""
 			if story != "":
 				if not campaign.station.story_events.has(campaign.session.expedition.phase_id):
 					campaign.station.story_events.append(campaign.session.expedition.phase_id)
@@ -470,6 +482,8 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 
 	# Count é em posições: um inimigo grande ocupa duas; quem não cabe sai do grupo.
 	var profile_id: String = route.node_id
+	if not house and index < route.steps.size() and route.steps[index].get("detour", false):
+		profile_id = String(detour_def(route.node_id).get("Encounter", profile_id))
 	if house:
 		var site_index := index - HOUSE_ENEMY_INDEX
 		var shop: int = route.sites[site_index].get("shop", -1) if site_index < route.sites.size() else -1
@@ -531,6 +545,9 @@ static func start_corridor_combat(campaign: Dictionary, party_advantage: bool) -
 			return {}
 		boss = step.type == "boss"
 	expedition.opening_used = true
+	# No escuro do ramal (#289), a equipe não pega a patrulha desprevenida.
+	if index < route.steps.size() and route.steps[index].get("detour", false):
+		party_advantage = false
 	return {"enemies": corridor_enemies(expedition, index), "opening": party_advantage, "boss": boss}
 
 
@@ -572,6 +589,9 @@ static func end_combat(campaign: Dictionary, result: String, boss: bool, _cause:
 		route.sites[route.current_house].enemy_defeated = true
 		return
 	route.steps[route.index].resolved = true
+	# Cada patrulha do ramal vencida rende o achado dela (#289).
+	if route.steps[route.index].get("detour", false):
+		expedition.loot.fragments += int(detour_def(route.node_id).get("FragmentsPerPatrol", 0))
 	if boss:
 		expedition.loot.seeds += 6
 		expedition.loot.scrap += 1
@@ -772,8 +792,11 @@ static func assign_search_sites(route: Dictionary, door_steps: Array, door_shops
 		doors[j] = swap
 	doors.resize(mini(3, doors.size()))
 	doors.sort()
-	# O foco da rota garante uma casa da loja certa (troca a última porta sorteada).
-	AHStationRules.choose_doors(focus, doors, door_shops)
+	# O foco da rota garante uma casa da loja certa (troca a última porta sorteada), nunca num trecho que o desvio pula
+	# (#289): lá a porta não conta como da loja.
+	var skippable: Array = detour_skippable(route)
+	var focus_shops: Array = range(door_shops.size()).map(func(d): return -1 if skippable.has(int(door_steps[d])) else door_shops[d])
+	AHStationRules.choose_doors(focus, doors, focus_shops)
 	for door in doors:
 		var spots: Array = []
 		for s in 1 + mini(2, floori(random.next() * 3)):
@@ -799,7 +822,7 @@ static func assign_search_sites(route: Dictionary, door_steps: Array, door_shops
 		route.sites.append({"door": door, "step": door_steps[door], "shop": door_shops[door],
 			"spots": [{"choice": false, "searched": false}, {"choice": false, "searched": false}, {"choice": false, "searched": false}],
 			"has_enemy": false, "enemy_defeated": false, "locked": true, "forced": false, "camp_site": false, "camped": false})
-	AHStationRules.mark_objective(focus, route)
+	AHStationRules.mark_objective(focus, route, skippable)
 	assign_camp_site(route)
 
 
@@ -821,7 +844,8 @@ static func can_enter_house(campaign: Dictionary, site_index: int) -> bool:
 	if route.current_house != -1 or site_index < 0 or site_index >= route.sites.size():
 		return false
 	var site: Dictionary = route.sites[site_index]
-	return site.step <= route.index and (not site.locked or site.forced)
+	# A casa de um trecho que o desvio pulou ficou para trás (#289).
+	return site.step <= route.index and (not site.locked or site.forced) and not site.get("skipped", false)
 
 
 static func enter_house(campaign: Dictionary, site_index: int) -> bool:
@@ -845,7 +869,7 @@ static func can_force_house(campaign: Dictionary, site_index: int) -> bool:
 	if route.current_house != -1 or site_index < 0 or site_index >= route.sites.size():
 		return false
 	var site: Dictionary = route.sites[site_index]
-	return site.step <= route.index and site.locked and not site.forced and has_tool(campaign, CROWBAR)
+	return site.step <= route.index and site.locked and not site.forced and has_tool(campaign, CROWBAR) and not site.get("skipped", false)
 
 
 ## Arrombar a casa trancada: o pé de cabra quebra e a casa fica aberta até o fim da fase.
@@ -940,6 +964,276 @@ static func search_prop(campaign: Dictionary, step: int) -> Dictionary:
 	return {"ok": true, "text": apply_search_outcome(campaign, random, null)}
 
 
+# ---------------------------------------------------------------- o desvio (#289)
+# Um caminho opcional que leva ao mesmo destino: no trecho Entry, quem fareja (uma das RevealClasses) acha o bueiro; a
+# equipe desce, atravessa o ramal noutro mapa (uma busca, uma passagem e 1 a 3 patrulhas) e sobe no trecho Exit. Os
+# trechos entre os dois ficam para trás. Os números vêm de data/detours.json (uma linha por fase).
+#
+# corridor.detour: {} sem desvio, ou {state, entry, exit, map, plan [tipos do ramal], patrols, luck, blind, sniffer,
+#   first, count, shift, skipped}. state: "hidden" (a equipe ainda não chegou), "revealed" (achado: a escolha está aberta
+#   no trecho Entry), "none" (ninguém achou), "declined" (seguiu pela rua), "taken" (no ramal) ou "done" (subiu).
+# Ao descer, os trechos do ramal entram no lugar dos pulados (first..first+count-1) e os de depois andam shift posições;
+# os pulados ficam em skipped, para a barra.
+
+## A linha do desvio da fase ({} sem desvio).
+static func detour_def(phase_id: String) -> Dictionary:
+	var row = GameData.row("detours", phase_id)
+	return row if row is Dictionary else {}
+
+
+## O desvio sorteado com a rota: quantas patrulhas o ramal tem, a ordem dele e a sorte de achar a tampa sem farejador.
+static func _detour_plan(seed_value: int, node_id: String) -> Dictionary:
+	var def := detour_def(node_id)
+	if def.is_empty():
+		return {}
+	var random := _rand(seed_value ^ 0x6d2b79f5)
+	var chances: Array = def.get("Patrols", [1.0])
+	var roll := random.next()
+	var patrols := chances.size()
+	var sum := 0.0
+	for i in chances.size():
+		sum += float(chances[i])
+		if roll < sum:
+			patrols = i + 1
+			break
+	var plan: Array = ["loot"]
+	for i in patrols:
+		plan.append("combat")
+	for i in range(plan.size() - 1, 0, -1):
+		var j := floori(random.next() * (i + 1))
+		var swap = plan[i]
+		plan[i] = plan[j]
+		plan[j] = swap
+	# A passagem é a última: a história e, no fim dela, a escada de subida.
+	plan.append("passage")
+	return {"state": "hidden", "entry": int(def.Entry), "exit": int(def.Exit), "map": String(def.Map), "plan": plan,
+		"patrols": patrols, "luck": random.next() < float(def.get("LuckChance", 0.0)), "blind": false, "sniffer": ""}
+
+
+static func detour(route: Dictionary) -> Dictionary:
+	var value = route.get("detour", {})
+	return value if value is Dictionary else {}
+
+
+## A equipe está no ramal (desceu e ainda não subiu).
+static func in_detour(route: Dictionary) -> bool:
+	var d := detour(route)
+	return d.get("state", "") == "taken" and route.index >= int(d.first) and route.index < int(d.first) + int(d.count)
+
+
+## Os trechos que o desvio pode pular (os de entre a entrada e a saída), enquanto ele não foi recusado: o objetivo da
+## rota nunca cai neles. Depois de descer, os índices são os de antes (a rua não os tem mais).
+static func detour_skippable(route: Dictionary) -> Array:
+	var d := detour(route)
+	if d.is_empty():
+		return []
+	return range(int(d.entry) + 1, int(d.exit))
+
+
+## O índice que o trecho tinha antes do desvio (o da rua, de 0 a 9).
+static func original_index(route: Dictionary, index: int) -> int:
+	var d := detour(route)
+	if not ["taken", "done"].has(d.get("state", "")):
+		return index
+	if index >= int(d.first) + int(d.count):
+		return index - int(d.shift)
+	return index
+
+
+## O mapa do trecho, com o desvio: o do ramal nos trechos dele; fora, o da fase (map_for_step).
+static func route_map(expedition: Dictionary, index: int) -> String:
+	var route: Dictionary = expedition.corridor
+	var d := detour(route)
+	if ["taken", "done"].has(d.get("state", "")) and index >= int(d.first) and index < int(d.first) + int(d.count):
+		return String(d.map)
+	return map_for_step(expedition.phase_id, original_index(route, index))
+
+
+## O nome do lugar do trecho: o do ramal pela linha do desvio (a Galeria, na fase 1), os outros pelo mapa.
+static func route_place(expedition: Dictionary, index: int) -> String:
+	var route: Dictionary = expedition.corridor
+	if in_detour(route) or (detour(route).get("state", "") == "taken" and index >= int(detour(route).first)
+			and index < int(detour(route).first) + int(detour(route).count)):
+		return TranslationServer.translate(String(detour_def(route.node_id).get("Display", "")))
+	return AHScenarioWorld.display_of(route_map(expedition, index))
+
+
+## Os trechos de um mapa do desvio: [primeiro, quantos], ou [] se o mapa não é o do ramal descido.
+static func detour_range(route: Dictionary, map: String) -> Array:
+	var d := detour(route)
+	if not ["taken", "done"].has(d.get("state", "")) or String(d.map) != map:
+		return []
+	return [int(d.first), int(d.count)]
+
+
+## Quem fareja na equipe: o primeiro vivo e de pé de uma das classes que revelam ({} sem ninguém).
+static func detour_sniffer(campaign: Dictionary) -> Dictionary:
+	var classes: Array = detour_def(campaign.session.expedition.phase_id).get("RevealClasses", [])
+	for hero in _team_alive(campaign):
+		if classes.has(String(hero.class_id)) and int(hero.get("hp", 1)) > 0:
+			return hero
+	return {}
+
+
+## Chegando ao trecho da entrada com ele vencido: quem fareja acha o bueiro ("scent"); sem ninguém, a sorte da rota
+## ("blind", às cegas); ou nada (""). Só uma vez por rota.
+static func reveal_detour(campaign: Dictionary) -> String:
+	if not in_corridor(campaign):
+		return ""
+	var route: Dictionary = corridor(campaign)
+	var d := detour(route)
+	if d.get("state", "") != "hidden" or route.index != int(d.entry) or not route.steps[route.index].resolved \
+			or route.current_house != -1:
+		return ""
+	var sniffer := detour_sniffer(campaign)
+	if not sniffer.is_empty():
+		d.state = "revealed"
+		d.sniffer = String(sniffer.id)
+		return "scent"
+	if d.luck:
+		d.state = "revealed"
+		d.blind = true
+		return "blind"
+	d.state = "none"
+	return ""
+
+
+## A escolha do bueiro está aberta: achado, e a equipe no trecho da entrada (fora das casas).
+static func detour_open(campaign: Dictionary) -> bool:
+	if not in_corridor(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	var d := detour(route)
+	return d.get("state", "") == "revealed" and route.index == int(d.entry) and route.steps[route.index].resolved \
+		and route.current_house == -1
+
+
+## As patrulhas dos trechos da rua que o desvio pula.
+static func detour_street_patrols(route: Dictionary) -> int:
+	var d := detour(route)
+	var steps: Array = d.get("skipped", []) if d.get("state", "") in ["taken", "done"] \
+		else route.steps.slice(int(d.get("entry", 0)) + 1, int(d.get("exit", 0)))
+	return steps.filter(func(s): return s.type == "combat").size()
+
+
+## A dica: o barulho de cada lado (menos, o mesmo tanto ou mais patrulhas lá embaixo), sem dizer quantas.
+static func detour_hint(route: Dictionary) -> String:
+	var d := detour(route)
+	if d.is_empty():
+		return ""
+	var below: int = int(d.patrols)
+	var above := detour_street_patrols(route)
+	var key := "less" if below < above else ("same" if below == above else "more")
+	return TranslationServer.translate(String(detour_def(route.node_id).get("Hints", {}).get(key, "")))
+
+
+## A fala de quem achou o bueiro (o farejador pelo nome; às cegas, a tampa solta).
+static func detour_line(campaign: Dictionary) -> String:
+	var route: Dictionary = corridor(campaign)
+	var d := detour(route)
+	var lines: Dictionary = detour_def(campaign.session.expedition.phase_id).get("Lines", {})
+	if d.get("blind", false):
+		return TranslationServer.translate(String(lines.get("Blind", "")))
+	var hero = _hero(campaign, String(d.get("sniffer", "")))
+	if hero == null:
+		return ""
+	# O fundador tem artigo ("O Bento parou"); o recruta, só o nome.
+	var key := "Sniff" if AHStationRules.is_recruit(String(hero.id)) else "SniffFounder"
+	return TranslationServer.translate(String(lines.get(key, lines.get("Sniff", "%s")))) % String(hero.display_name)
+
+
+static func detour_text(phase_id: String, key: String) -> String:
+	return TranslationServer.translate(String(detour_def(phase_id).get("Lines", {}).get(key, "")))
+
+
+## Descer pelo bueiro: os trechos do ramal entram no lugar dos pulados, as casas puladas saem do caminho, as de depois
+## andam junto, e a equipe paga o Instinto da descida. A equipe ainda está no trecho da entrada: o próximo (o primeiro do
+## ramal) é a viagem para o mapa dele.
+static func take_detour(campaign: Dictionary) -> bool:
+	if not detour_open(campaign):
+		return false
+	var route: Dictionary = corridor(campaign)
+	var d := detour(route)
+	var entry := int(d.entry)
+	var exit := int(d.exit)
+	var ramal: Array = []
+	for kind in d.plan:
+		ramal.append({"type": kind, "resolved": false, "detour": true})
+	d.skipped = route.steps.slice(entry + 1, exit).duplicate(true)
+	d.first = entry + 1
+	d.count = ramal.size()
+	d.shift = d.first + d.count - exit
+	route.steps = route.steps.slice(0, entry + 1) + ramal + route.steps.slice(exit)
+	for site in route.sites:
+		var step := int(site.step)
+		if step > entry and step < exit:
+			site.skipped = true
+		elif step >= exit:
+			site.step = step + int(d.shift)
+	var moved := {}
+	for key in route.props:
+		moved[str(int(key) + int(d.shift)) if int(key) >= exit else key] = route.props[key]
+	route.props = moved
+	d.state = "taken"
+	d.announce_down = true
+	var cost := int(detour_def(campaign.session.expedition.phase_id).get("InstinctCost", 0))
+	for hero in _team_alive(campaign):
+		hero.instinct = clampi(int(hero.instinct) + cost, 0, int(AHGameData.INSTINCT.Max))
+	return true
+
+
+## A equipe andou para o trecho index: passar da entrada pela rua fecha o bueiro; subir do ramal o encerra.
+static func _detour_moved(campaign: Dictionary, index: int) -> void:
+	var route: Dictionary = corridor(campaign)
+	var d := detour(route)
+	match d.get("state", ""):
+		"hidden", "revealed":
+			if index > int(d.entry):
+				d.state = "declined" if d.state == "revealed" else "none"
+		"taken":
+			if index >= int(d.first) + int(d.count):
+				d.state = "done"
+				d.announce_up = true
+
+
+## O evento da passagem do ramal ("" se a campanha já o viu).
+static func detour_story_event(campaign: Dictionary) -> String:
+	var event_id := String(detour_def(campaign.session.expedition.phase_id).get("StoryEvent", ""))
+	if event_id == "" or GameData.row("events", event_id) == null:
+		return ""
+	return "" if campaign.get("station", {}).get("detour_events", []).has(event_id) else event_id
+
+
+## A barra com o desvio (para a HUD): main, os 10 trechos da rua como eram (cada um {step, live: índice de agora ou -1
+## se ficou para trás}); sub, os do ramal ({step, live}, os tipos escondidos até a equipe chegar); from e to, os trechos
+## da rua de onde o ramal sai e onde sobe; shown: se a linha de baixo aparece (achado, descido ou subido).
+static func detour_view(route: Dictionary) -> Dictionary:
+	var d := detour(route)
+	var state: String = d.get("state", "")
+	if not ["revealed", "taken", "done"].has(state):
+		return {"shown": false}
+	var main: Array = []
+	var sub: Array = []
+	var entry := int(d.entry)
+	var exit := int(d.exit)
+	if state == "revealed":
+		for i in route.steps.size():
+			main.append({"step": route.steps[i], "live": i})
+		for kind in d.plan:
+			sub.append({"step": {"type": kind, "resolved": false}, "live": -1})
+	else:
+		for i in entry + 1:
+			main.append({"step": route.steps[i], "live": i})
+		for step in d.skipped:
+			main.append({"step": step, "live": -1})
+		for i in range(int(d.first) + int(d.count), route.steps.size()):
+			main.append({"step": route.steps[i], "live": i})
+		for i in int(d.count):
+			sub.append({"step": route.steps[int(d.first) + i], "live": int(d.first) + i})
+	return {"shown": true, "main": main, "sub": sub, "from": entry, "to": exit, "taken": state != "revealed",
+		"blind": d.get("blind", false)}
+
+
 # ---------------------------------------------------------------- cenários (#86)
 
 ## O mapa do trecho: o de passagem nos primeiros trechos, depois o da fase ("" = a rua).
@@ -1000,11 +1294,13 @@ static func assign_scenario_props(campaign: Dictionary, map: String, steps: Arra
 			compatible.append(first + i)
 	if not compatible.is_empty() and choice_random.next() < 0.5 and route.get("node_type", "") != AHTutorial.PHASE_ID:
 		route.choice_props.append(compatible[mini(compatible.size() - 1, floori(choice_random.next() * compatible.size()))])
-	if int(route.objective_prop) != -1 or steps.is_empty() or AHStationRules.focus_def(expedition.get("focus", "")).is_empty():
+	# O ramal de um desvio (#289) não tem objetivo: o da rota fica no caminho da fase (na rua, numa casa).
+	if int(route.objective_prop) != -1 or steps.is_empty() or AHStationRules.focus_def(expedition.get("focus", "")).is_empty() \
+			or not detour_range(route, map).is_empty():
 		return first
 	var later: Array = []
 	for i in range(first, prop_steps.size()):
-		if prop_steps[i] >= 4:
+		if prop_steps[i] >= 4 and not detour_skippable(route).has(int(prop_steps[i])):
 			later.append(i)
 	var info := phase(expedition.phase_id)
 	if later.is_empty() and not (info.get("transit", "") != "" and steps[0] < int(info.transit_steps)):

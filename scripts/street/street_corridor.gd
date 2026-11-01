@@ -79,6 +79,16 @@ const BOARD_SPEED := 2.8
 const BOARD_INSIDE_WALK := 4.6
 const TRAIN_DEPART_SECONDS := 2.2
 
+## O desvio (#289): a tampa do bueiro (lado em m, onde fica no trecho e na faixa da rua), quanto a câmera recua na
+## revelação e em quanto tempo, e quanto a fala de quem achou fica na tela.
+const MANHOLE_SIZE := 0.9
+const MANHOLE_SPOT := 0.75
+const MANHOLE_Z := 1.35
+const SCOUT_PULL := 0.55
+const REVEAL_PULL_SECONDS := 1.0
+const REVEAL_LINE_SECONDS := 6.0
+## O painel da escolha fica abaixo da barra, para a linha do ramal aparecer.
+const DETOUR_CHOICE_TOP := 236.0
 ## O teto da espera pela troca de herói ao levantar acampamento (ms, pelo relógio; a troca leva uns 0,3 s).
 const SWITCH_WAIT_MS := 2000
 var street: Node3D
@@ -111,6 +121,10 @@ const BODY_FRONT := 0.2
 ## Quanto a equipe recua da borda do mapa quando o aviso do caído para a passagem (m).
 const TRAVEL_STEP_BACK := 1.0
 var _action := Callable()
+## As tampas de bueiro do desvio (#289) na rua: a da entrada e a da saída (nulas fora da rua ou sem desvio).
+var manholes: Array[MeshInstance3D] = []
+## A revelação do desvio em andamento (a fala e a câmera se afastando).
+var _revealing := false
 var _overlays := {}
 ## Segmentos do corredor neste mapa: {x0, x1, first, steps, length, zone (-1 na rua)}; o atual; os trechos deste mapa.
 var segments: Array = []
@@ -159,6 +173,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	street.apply_corridor_weather(route.weather)
 	_spawn_guards()
 	_spawn_props()
+	_spawn_manholes()
 	# O trem do tutorial só aparece quando chega (com o trecho dele resolvido, já parado na plataforma).
 	if street.scenario and not street.scenario.train.is_empty():
 		var last: Dictionary = route.steps[route.steps.size() - 1]
@@ -172,6 +187,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	else:
 		_enter_segment(_segment_of(route.index), _step_x(route.index, ARRIVAL_SPOT))
 	hud.refresh(campaign)
+	_announce_detour(route)
 	var session: Dictionary = campaign.session
 	if tutorial():
 		guide = AHTutorialGuide.new(self)
@@ -219,6 +235,13 @@ func _step_x(index: int, fraction: float) -> float:
 	return part.x0 + part.length * (index - part.first + fraction)
 
 
+## O trecho fica neste mapa (num dos segmentos dele): na rua depois do desvio (#289), os do ramal não ficam.
+func _on_this_map(index: int) -> bool:
+	if segments.is_empty():
+		return true
+	return segments.any(func(part): return index >= part.first and index < part.first + part.steps)
+
+
 func _segment_of(index: int) -> int:
 	for part in range(segments.size() - 1, -1, -1):
 		if index >= segments[part].first:
@@ -239,11 +262,27 @@ func _build_segments(campaign: Dictionary) -> void:
 	side_rooms.clear()
 	var expedition: Dictionary = campaign.session.expedition
 	if street.scenario == null:
+		map_first = 0
+		map_last = expedition.corridor.steps.size() - 1
+		var d := R.detour(expedition.corridor)
+		if ["taken", "done"].has(d.get("state", "")):
+			# Depois de descer (#289): a rua até o bueiro de entrada e a rua depois do de saída, com os trechos do ramal
+			# entre elas (noutro mapa). A equipe só volta à rua pelo segundo pedaço.
+			var after: int = int(d.first) + int(d.count)
+			segments.append({"x0": MIN_X, "x1": MIN_X + STEP_LENGTH * (int(d.entry) + 1), "first": 0, "steps": int(d.entry) + 1,
+				"length": STEP_LENGTH, "zone": -1})
+			segments.append({"x0": MIN_X + STEP_LENGTH * int(d.exit), "x1": 79.0, "first": after,
+				"steps": expedition.corridor.steps.size() - after, "length": STEP_LENGTH, "zone": -1})
+			return
 		segments.append({"x0": MIN_X, "x1": 79.0, "first": 0, "steps": 10, "length": STEP_LENGTH, "zone": -1})
 		return
 	var info := R.phase(expedition.phase_id)
 	var transit_map: bool = street.scenario.map_name == info.get("transit", "")
 	var step_range := R.step_range(expedition.phase_id, transit_map)
+	# O ramal do desvio (#289): os trechos dele, neste mapa.
+	var detour_range := R.detour_range(expedition.corridor, street.scenario.map_name)
+	if not detour_range.is_empty():
+		step_range = detour_range
 	map_first = step_range[0]
 	map_last = step_range[0] + step_range[1] - 1
 	var doors: Dictionary = {}
@@ -350,7 +389,7 @@ func _spawn_guards() -> void:
 	var route: Dictionary = expedition.corridor
 	for index in range(map_first, mini(map_last + 1, route.steps.size())):
 		var step: Dictionary = route.steps[index]
-		if step.resolved or (step.type != "combat" and step.type != "boss"):
+		if step.resolved or (step.type != "combat" and step.type != "boss") or not _on_this_map(index):
 			continue
 		var specs := R.corridor_enemies(expedition, index)
 		var cards: Array = []
@@ -393,7 +432,7 @@ func _spawn_props() -> void:
 	var route: Dictionary = Campaign.state.session.expedition.corridor
 	var order := 0
 	for index in route.steps.size():
-		if route.steps[index].type != "loot":
+		if route.steps[index].type != "loot" or not _on_this_map(index):
 			continue
 		# O mesmo trecho sempre com o mesmo objeto (pela ordem dele entre os trechos de busca), aberto se já foi vasculhado.
 		var prop := AHSearchProp.new().setup(AHSearchProp.street_prop(order), route.props.get(str(index), false))
@@ -425,10 +464,11 @@ func _prop_x(wanted: float) -> float:
 	return wanted
 
 
-## Portas das casas abertas (e da trancada depois de arrombada) com a pintura da porta aberta.
+## Portas das casas abertas (e da trancada depois de arrombada) com a pintura da porta aberta. As casas só existem na
+## rua: no ramal de um desvio (#289) a rota guarda as casas da rua, mas o mapa não tem as portas (doors vazio).
 func _refresh_doors() -> void:
 	var route: Dictionary = Campaign.state.session.expedition.corridor
-	for i in route.sites.size():
+	for i in (route.sites.size() if not doors.is_empty() else 0):
 		var site: Dictionary = route.sites[i]
 		if _overlays.has(i) or (site.locked and not site.forced):
 			continue
@@ -465,6 +505,18 @@ func _process(delta: float) -> void:
 func _street_frame(campaign: Dictionary, route: Dictionary, delta: float) -> void:
 	var leader: Vector3 = street._leader.position
 	var part: Dictionary = segments[segment]
+	# O desvio (#289): chegando ao trecho do bueiro com ele vencido, quem fareja acha a entrada.
+	if R.detour(route).get("state", "") == "hidden" and route.index == int(R.detour(route).entry) and route.steps[route.index].resolved:
+		_reveal_detour(campaign)
+		return
+	# Fechada a escolha (de qualquer jeito), a câmera volta.
+	if not busy:
+		_revealing = false
+	if not _revealing and street.scout_pull > 0.0:
+		street.scout_pull = move_toward(street.scout_pull, 0.0, delta * 0.8)
+	# Na rua depois do desvio, a equipe não volta para o pedaço de antes do bueiro de saída.
+	if street.scenario == null and segments.size() > 1:
+		street.walk_min.x = part.x0 + 0.3
 	# Trecho por vencer: a equipe não passa da patrulha.
 	var high: float = part.x1 if route.steps[route.index].resolved else _step_x(route.index, 1.0) - EDGE_MARGIN
 	street.walk_max.x = high
@@ -536,6 +588,104 @@ func _travel_segment(direction: int) -> void:
 		hud.refresh(Campaign.state)
 		# O anúncio do trecho e o aviso do começo da luta chegam logo em seguida: a frase vai na frente deles.
 		hud.hold_line(tr("A equipe recupera o fôlego."), BREATH_LINE_SECONDS)
+
+
+# ---------------------------------------------------------------- o desvio (#289)
+
+## As tampas de bueiro na rua (a arte em art/street/manhole_cover.webp, deitada no asfalto, na frente da fila): a da
+## entrada, no fim do trecho dela, e a da saída, no começo do trecho onde o ramal sobe. Só na fase com desvio.
+func _spawn_manholes() -> void:
+	manholes.clear()
+	var d := R.detour(Campaign.state.session.expedition.corridor)
+	if street.scenario != null or d.is_empty():
+		return
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = load("res://art/street/manhole_cover.webp")
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	material.alpha_scissor_threshold = 0.5
+	material.roughness = 0.85
+	for x in [MIN_X + STEP_LENGTH * (int(d.entry) + MANHOLE_SPOT), MIN_X + STEP_LENGTH * int(d.exit) + 0.6]:
+		var plane := PlaneMesh.new()
+		plane.size = Vector2(MANHOLE_SIZE, MANHOLE_SIZE)
+		var node := MeshInstance3D.new()
+		node.name = "Manhole%d" % manholes.size()
+		node.mesh = plane
+		node.material_override = material
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		node.position = Vector3(x, 0.015, MANHOLE_Z)
+		street.add_child(node)
+		manholes.append(node)
+
+
+## A marca e o aviso do bueiro de entrada.
+func _manhole_point() -> Vector3:
+	return Vector3(manholes[0].position.x, MARKER_CAMP_HEIGHT, MANHOLE_Z)
+
+
+## A revelação: quem fareja fala (ou a tampa solta, às cegas), a câmera se afasta e a escolha abre com a dica.
+func _reveal_detour(campaign: Dictionary) -> void:
+	var outcome := R.reveal_detour(campaign)
+	Campaign.save()
+	if outcome == "":
+		return
+	busy = true
+	_revealing = true
+	hud.refresh(campaign)
+	hud.hold_line(R.detour_line(campaign), REVEAL_LINE_SECONDS)
+	var reduced: bool = bool(campaign.get("settings", {}).get("reduced_environment_effects", false))
+	if reduced:
+		street.scout_pull = SCOUT_PULL
+	else:
+		var tween := create_tween()
+		tween.tween_property(street, "scout_pull", SCOUT_PULL, REVEAL_PULL_SECONDS).set_trans(Tween.TRANS_SINE)
+		await tween.finished
+	await get_tree().create_timer(0.3).timeout
+	busy = false
+	_offer_detour()
+
+
+## A escolha de descer: a dica do barulho, o que fica para trás e o custo; descer ou seguir pela rua (a escolha volta
+## pela tampa enquanto a equipe estiver no trecho dela).
+func _offer_detour() -> void:
+	var campaign: Dictionary = Campaign.state
+	if not R.detour_open(campaign):
+		return
+	_revealing = true
+	if street.scout_pull < SCOUT_PULL:
+		create_tween().tween_property(street, "scout_pull", SCOUT_PULL, REVEAL_PULL_SECONDS * 0.6)
+	var route: Dictionary = campaign.session.expedition.corridor
+	var d := R.detour(route)
+	var def := R.detour_def(campaign.session.expedition.phase_id)
+	var text := R.detour_line(campaign) + "\n" + R.detour_hint(route) + "\n\n" + tr("Só de ida: a equipe sobe por outro bueiro, no trecho %d, e os trechos %d a %d ficam para trás. Descer custa +%d de Instinto para a equipe, e no escuro ninguém pega uma patrulha desprevenida.") \
+		% [int(d.exit) + 1, int(d.entry) + 2, int(d.exit), int(def.get("InstinctCost", 0))]
+	hud.show_choice(tr("Rota pela %s") % tr(String(def.get("Display", ""))), text,
+		[[tr("Descer"), _descend], [tr("Seguir pela rua"), func(): pass]], DETOUR_CHOICE_TOP, "node-event")
+
+
+## Descer: com alguém caído neste mapa a equipe não desce (o corpo ficaria na rua que ela não revê); senão o ramal
+## entra na rota e a equipe viaja para o mapa dele.
+func _descend() -> void:
+	_revealing = false
+	var campaign: Dictionary = Campaign.state
+	if not _downed_here().is_empty():
+		hud.toast(tr("Levante quem caiu antes de descer: a equipe não volta por este pedaço da rua."), 4.0)
+		return
+	if GameFlow.busy or not R.take_detour(campaign):
+		return
+	busy = true
+	Campaign.save()
+	_travel_map(campaign, int(R.detour(campaign.session.expedition.corridor).first), true)
+
+
+## Chegando ao ramal (a descida) ou de volta à rua (a subida): a frase do lugar, uma vez.
+func _announce_detour(route: Dictionary) -> void:
+	var d := R.detour(route)
+	for key in ["announce_down", "announce_up"]:
+		if d.get(key, false):
+			d.erase(key)
+			Campaign.save()
+			hud.hold_line(R.detour_text(Campaign.state.session.expedition.phase_id, "Down" if key == "announce_down" else "Up"),
+				REVEAL_LINE_SECONDS)
 
 
 ## Fim do mapa de passagem: a equipe entra no primeiro trecho do mapa da fase e viaja para ele (só de ida).
@@ -783,7 +933,7 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 	var action := Callable()
 	var where = null
 	var best := 1.3
-	for i in route.sites.size():
+	for i in (route.sites.size() if not doors.is_empty() else 0):
 		var site: Dictionary = route.sites[i]
 		var distance := absf(doors[site.door].x - leader.x)
 		if distance >= best or site.step > route.index:
@@ -832,6 +982,12 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 			else:
 				text = tr("%s · a patrulha guarda a porta") % tr(area)
 				action = Callable()
+	# O bueiro achado (#289): a escolha de descer fica aberta enquanto a equipe está no trecho dele.
+	if R.detour_open(campaign) and not manholes.is_empty() and absf(manholes[0].position.x - leader.x) < maxf(best, REACH + 0.6):
+		best = absf(manholes[0].position.x - leader.x)
+		text = tr("E  Descer pelo bueiro")
+		action = _offer_detour
+		where = _manhole_point()
 	# Os caídos no chão (#179): levantar.
 	var body := _body_near(leader, best)
 	if not body.is_empty():
@@ -1071,7 +1227,7 @@ func _side_door_point(room_entry: Dictionary) -> Vector3:
 ## Os losangos do HUD: o que dá para usar a até 14 m da equipe, menos o que já está ao alcance (esse ganha o aviso).
 func _marker_points(campaign: Dictionary, route: Dictionary, leader: Vector3, active) -> Array:
 	var points: Array = []
-	for i in route.sites.size():
+	for i in (route.sites.size() if not doors.is_empty() else 0):
 		var site: Dictionary = route.sites[i]
 		if site.step <= route.index and (R.can_enter_house(campaign, i) or R.can_force_house(campaign, i)):
 			points.append(_door_point(site))
@@ -1087,6 +1243,8 @@ func _marker_points(campaign: Dictionary, route: Dictionary, leader: Vector3, ac
 		for room_entry in side_rooms:
 			if room_entry.door_segment == segment and R.step_open(route, int(room_entry.door_step)) and int(route.get("current_room", -1)) == -1:
 				points.append(_side_door_point(room_entry))
+	if R.detour_open(campaign) and not manholes.is_empty():
+		points.append(_manhole_point())
 	# A saída para a Estação, no começo do corredor (#142): a marca dela também, como a dos outros pontos de uso.
 	if segments.is_empty() or (segment == 0 and map_first == 0):
 		points.append(_exit_point())

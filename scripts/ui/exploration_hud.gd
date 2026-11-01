@@ -51,6 +51,8 @@ var _goal: PanelContainer
 var _plaque: PanelContainer
 var _route_title: Label
 var _route_row: HBoxContainer
+## A linha do ramal do desvio (#289), embaixo da barra de trechos.
+var _detour_row: Control
 var _route_panel: PanelContainer
 var _supplies: HBoxContainer
 var _loot_row: HBoxContainer
@@ -200,6 +202,12 @@ func _ready() -> void:
 	_route_row.add_theme_constant_override("separation", 0)
 	_route_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	route_box.add_child(_route_row)
+	# O ramal do desvio (#289), embaixo da rua: escondido sem desvio.
+	_detour_row = Control.new()
+	_detour_row.name = "DetourRow"
+	_detour_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_detour_row.visible = false
+	route_box.add_child(_detour_row)
 
 	# Em cima à direita: Comida, Curativos e Esperança numa ficha e, embaixo, o Achado.
 	var right := VBoxContainer.new()
@@ -467,7 +475,7 @@ func refresh(campaign: Dictionary) -> void:
 	var route: Dictionary = expedition.corridor
 	# O objetivo: o foco escolhido na Preparação e o guardião no fim.
 	var focus := AHStationRules.focus_def(expedition.get("focus", ""))
-	var boss_step: int = route.steps.size()
+	var boss_step: int = AHJourneyRules.original_index(route, route.steps.size() - 1) + 1
 	var done := false
 	if expedition.phase_id == AHTutorial.PHASE_ID:
 		# A abertura: fugir até o trem da plataforma.
@@ -496,21 +504,39 @@ func refresh(campaign: Dictionary) -> void:
 	_goal_icon.texture = AHKit.icon("objective_done") if done else AHKit.legacy_icon("marker-here")
 	_goal_icon.modulate = AHKit.good() if done else AHKit.AMBER
 	_goal.reset_size()
-	# O corredor: cada casa com o tipo (as não alcançadas, "?"), ligadas por elos; a de agora com a moldura âmbar.
+	# O corredor: cada casa com o tipo (as não alcançadas, "?"), ligadas por elos; a de agora com a moldura âmbar. Com o
+	# desvio (#289), a linha de cima é a rua como era (os trechos pulados apagados e riscados) e a de baixo, o ramal.
 	_clear(_route_row)
-	for index in route.steps.size():
-		var step: Dictionary = route.steps[index]
-		var known: bool = index <= route.index or step.resolved or step.type == "boss"
-		if index > 0:
+	_clear(_detour_row)
+	var view := AHJourneyRules.detour_view(route)
+	var cells: Array = view.main if view.shown else range(route.steps.size()).map(func(i): return {"step": route.steps[i], "live": i})
+	for order in cells.size():
+		var entry: Dictionary = cells[order]
+		var live: int = entry.live
+		var step: Dictionary = entry.step
+		if order > 0:
+			var before: Dictionary = cells[order - 1]
 			var link := ColorRect.new()
 			link.custom_minimum_size = Vector2(LINK, 3)
 			link.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			link.color = AHKit.good() if route.steps[index - 1].resolved and index <= route.index else Color(AHKit.MUTED, 0.5)
+			link.color = AHKit.good() if live >= 0 and before.live >= 0 and before.step.resolved and live <= route.index \
+				else Color(AHKit.MUTED, 0.5)
 			link.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			_route_row.add_child(link)
-		_route_row.add_child(_route_cell(step, index == route.index, known, route))
+		if live < 0:
+			_route_row.add_child(_left_behind_cell(step))
+			continue
+		var known: bool = live <= route.index or step.resolved or step.type == "boss"
+		_route_row.add_child(_route_cell(step, live == route.index, known, route))
+	_detour_row.visible = view.shown
+	if view.shown:
+		_fill_detour_row(view, route)
 	var current: Dictionary = route.steps[route.index]
-	var title := tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), _step_label(current)]
+	var title := tr("Trecho %d de %d · %s") % [AHJourneyRules.original_index(route, route.index) + 1,
+		AHJourneyRules.original_index(route, route.steps.size() - 1) + 1, _step_label(current)]
+	if AHJourneyRules.in_detour(route):
+		var d := AHJourneyRules.detour(route)
+		title = tr("Trecho %d de %d na Galeria · %s") % [route.index - int(d.first) + 1, int(d.count), _step_label(current)]
 	if route.current_house >= 0:
 		var site: Dictionary = route.sites[route.current_house]
 		title = tr("Dentro %s") % (tr("do cinema") if site.shop == 2 else tr("da ") + tr(AHJourneyRules.SHOP_NAMES[site.shop]))
@@ -610,6 +636,71 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 		# A casa é um PanelContainer: o check estica e fica centrado sobre o ícone, como nas outras resolvidas.
 		cell.add_child(AHKit.glyph("state_active", 16, AHKit.good()))
 	return cell
+
+
+## Um trecho da rua que o desvio pulou (#289): a casa apagada, com o tipo se a equipe o viu, riscada.
+func _left_behind_cell(step: Dictionary) -> Control:
+	var cell := _route_cell(step, false, false, {})
+	cell.name = "LeftBehind"
+	cell.modulate = Color(AHKit.TEXT, 0.38)
+	# A casa é um PanelContainer (estica o filho): o risco vai num Control solto dentro dela.
+	var holder := Control.new()
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cell.add_child(holder)
+	var strike := ColorRect.new()
+	strike.color = AHKit.MUTED
+	strike.size = Vector2(CELL * 1.1, 3)
+	strike.position = Vector2(-CELL * 0.05 - 6.0, CELL * 0.5 - 7.5)
+	strike.pivot_offset = strike.size * 0.5
+	strike.rotation = deg_to_rad(-35.0)
+	strike.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(strike)
+	return cell
+
+
+## A linha de baixo (#289): desce da casa de onde o ramal sai, liga as casas do ramal e sobe na casa onde ele chega.
+## Antes de descer, as casas do ramal ficam com "?"; depois, cada uma mostra o tipo quando a equipe chega nela.
+func _fill_detour_row(view: Dictionary, route: Dictionary) -> void:
+	var pitch := CELL + LINK
+	var from_x: float = int(view.from) * pitch + CELL * 0.5
+	var to_x: float = int(view.to) * pitch + CELL * 0.5
+	var sub: Array = view.sub
+	var row_y := 14.0
+	var drop := row_y + CELL * 0.5
+	_detour_row.custom_minimum_size = Vector2(_route_row.get_combined_minimum_size().x, CELL + row_y + 2.0)
+	var done_through := -1
+	for i in sub.size():
+		if sub[i].live >= 0 and sub[i].live <= route.index and sub[i].step.resolved:
+			done_through = i
+	var went: bool = view.taken
+	var good := func(on: bool) -> Color: return AHKit.good() if on else Color(AHKit.MUTED, 0.5)
+	var out_of: bool = went and route.index >= int(AHJourneyRules.detour(route).first) + int(AHJourneyRules.detour(route).count)
+	_line(Vector2(from_x - 1.5, -2.0), Vector2(3, drop + 2.0), good.call(went))
+	_line(Vector2(to_x - 1.5, -2.0), Vector2(3, drop + 2.0), good.call(out_of))
+	_line(Vector2(from_x, drop - 1.5), Vector2(to_x - from_x, 3), good.call(false))
+	var span := (to_x - from_x) / float(sub.size() + 1)
+	var lit_until: float = from_x + span * (done_through + 1) if went else from_x
+	if out_of:
+		lit_until = to_x
+	_line(Vector2(from_x, drop - 1.5), Vector2(maxf(0.0, lit_until - from_x), 3), good.call(true))
+	for i in sub.size():
+		var entry: Dictionary = sub[i]
+		var live: int = entry.live
+		var known: bool = live >= 0 and (live <= route.index or entry.step.resolved)
+		var cell := _route_cell(entry.step, live == route.index and live >= 0, known, route)
+		cell.name = "Detour%d" % i
+		cell.position = Vector2(from_x + span * (i + 1) - CELL * 0.5, row_y)
+		cell.size = Vector2(CELL, CELL)
+		_detour_row.add_child(cell)
+
+
+func _line(at: Vector2, size: Vector2, color: Color) -> void:
+	var line := ColorRect.new()
+	line.position = at
+	line.size = size
+	line.color = color
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_detour_row.add_child(line)
 
 
 ## O nome do trecho no título: o do tipo, ou "Guardião vencido" depois da vitória (#180).
@@ -1492,7 +1583,8 @@ func show_menu(completed: bool, can_return: bool, blocked_note: String = "") -> 
 		var route: Dictionary = expedition.corridor
 		if not route.steps.is_empty():
 			var step: Dictionary = route.steps[clampi(route.index, 0, route.steps.size() - 1)]
-			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [route.index + 1, route.steps.size(), _step_label(step)], "text", AHKit.MUTED))
+			titles.add_child(AHKit.label(tr("Trecho %d de %d · %s") % [AHJourneyRules.original_index(route, route.index) + 1,
+				AHJourneyRules.original_index(route, route.steps.size() - 1) + 1, _step_label(step)], "text", AHKit.MUTED))
 	var close := AHKit.button("X", "icon")
 	close.name = "Close"
 	close.tooltip_text = tr("Fechar")
@@ -1615,10 +1707,11 @@ func inventory_shown() -> bool:
 
 ## Uma escolha de risco (no descanso e diante do guardião): o título, o texto, a equipe como está, os suprimentos e o
 ## achado em chips e as opções [[texto, ação]]; a primeira é a principal (âmbar, com a tecla), as outras de aço.
-func show_choice(title: String, text: String, options: Array) -> void:
+## top: a altura do painel (o do desvio, #289, fica abaixo da barra com o ramal); icon: o do título.
+func show_choice(title: String, text: String, options: Array, top: float = 132.0, icon: String = "node-boss") -> void:
 	var box := _open_modal(820)
-	_modal.position.y = 132
-	_modal_title(box, title, "node-boss")
+	_modal.position.y = top
+	_modal_title(box, title, icon)
 	_text(box, text, 772.0)
 	var team := HBoxContainer.new()
 	team.add_theme_constant_override("separation", 10)

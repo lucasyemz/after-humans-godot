@@ -1,0 +1,31 @@
+[
+  {
+    "Name": "fase_1",
+    "Description": "O desvio pelo esgoto da Rua das Vitrines (#289): o bueiro do trecho 3 (Entry, índice) leva ao ramal na Galeria (o mapa SewerDucts, só até ZoneX1, com as luminárias a LampScale) e sobe no trecho 8 (Exit); os trechos entre os dois ficam para trás. Patrols: a chance de o ramal ter 1, 2 ou 3 patrulhas, além de uma busca e de uma passagem (a última). Quem revela: uma das RevealClasses viva e de pé; sem ela, LuckChance das rotas acham a tampa por acaso (às cegas).",
+    "Map": "SewerDucts",
+    "Display": "Galeria sob as Vitrines",
+    "Entry": 2,
+    "Exit": 7,
+    "Encounter": "fase_1_esgoto",
+    "RevealClasses": ["cao"],
+    "LuckChance": 0.15,
+    "Patrols": [0.45, 0.35, 0.2],
+    "InstinctCost": 15,
+    "FragmentsPerPatrol": 1,
+    "StoryEvent": "setas_na_parede",
+    "ZoneX1": 39.0,
+    "LampScale": 0.35,
+    "Lines": {
+      "SniffFounder": "O %s parou e está puxando para o bueiro. Sobe um ar frio lá de baixo.",
+      "Sniff": "%s parou e está puxando para o bueiro. Sobe um ar frio lá de baixo.",
+      "Blind": "Uma tampa de bueiro está solta. Lá embaixo, só escuro.",
+      "Down": "A equipe desce pela escada de ferro. Cheira a água parada e ferrugem.",
+      "Up": "A equipe sai por outro bueiro, mais adiante na rua."
+    },
+    "Hints": {
+      "less": "Lá embaixo, só água correndo. Na rua, à frente, passos de patrulha.",
+      "same": "Barulho de máquinas lá embaixo, e na rua também.",
+      "more": "Lá embaixo, barulho de máquinas. Aqui em cima está mais tranquilo."
+    }
+  }
+]

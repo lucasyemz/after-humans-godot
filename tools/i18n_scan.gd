@@ -161,6 +161,13 @@ static func data_texts() -> Array:
 			for index in row.get(list, []).size():
 				if String(row[list][index].get("Text", "")).strip_edges() != "":
 					out.append({"text": row[list][index].Text, "where": "station-grid.%s.%s.%d" % [row.Name, list, index]})
+	# O desvio (#289): o nome do lugar do ramal, as falas de quem acha o bueiro e da descida e as dicas do barulho.
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/detours.json")):
+		if String(row.get("Display", "")).strip_edges() != "":
+			out.append({"text": row.Display, "where": "detours.%s.Display" % row.Name})
+		for group in ["Lines", "Hints"]:
+			for key in row.get(group, {}):
+				out.append({"text": row[group][key], "where": "detours.%s.%s.%s" % [row.Name, group, key]})
 	# As escolhas dos eventos: o texto do botão, o requisito e o resultado de cada saída (#64; o resultado vai traduzido
 	# pelo modelo, com {Heroi} e {Instinto} trocados depois).
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/events.json")):
