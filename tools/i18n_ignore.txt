@@ -1779,3 +1779,6 @@ rescue_rules.gd: join
 rescue_rules.gd: corridor
 station_rules.gd: help
 refuge_hud.gd: reports
+refuge_hud.gd: captured
+station_report.gd: missions
+station_report.gd: captured

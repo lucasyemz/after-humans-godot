@@ -276,8 +276,11 @@ static func on_new_day(campaign: Dictionary) -> Array:
 	for entry in running(campaign):
 		if int(entry.side_mission.back) <= day(campaign):
 			out.append(_resolve(campaign, entry))
-	# "Quem voltou" mostra só os do dia.
-	state(campaign).reports = out
+	# "Quem voltou" mostra os do dia e, se o trem de antes não foi recebido, os de quem ainda está nele.
+	var still: Array = state(campaign).get("reports", []).filter(func(report):
+		var entry = S.hero(campaign, String(report.get("hero_id", "")))
+		return entry != null and bool(entry.get("on_train", false)) and not out.any(func(other): return other.hero_id == report.hero_id))
+	state(campaign).reports = still + out
 	# O pedido de ajuda (#188) também chega num dia novo.
 	AHRescue.on_new_day(campaign)
 	return out

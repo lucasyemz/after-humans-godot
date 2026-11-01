@@ -3156,9 +3156,16 @@ func _mission_train(c: Dictionary) -> void:
 	_header("train_arrival", tr("O trem chegou"))
 	_text(tr("Quem estava em missão solo voltou no trem."), AHKit.TEXT)
 	_section(tr("Relatório das missões"), "expeditions")
-	var reports: Array = AHSideMissions.state(c).get("reports", [])
+	var all: Array = AHSideMissions.state(c).get("reports", [])
+	var reports: Array = all.filter(func(report): return String(report.get("result", "")) != "captured")
 	for report in reports:
 		_text(AHSideMissions.report_line(c, report), AHKit.TEXT, "small")
+	# Quem foi capturado não vem no trem: a notícia fica à parte (o pino do resgate no mapa).
+	var captured: Array = all.filter(func(report): return String(report.get("result", "")) == "captured")
+	if not captured.is_empty():
+		_section(tr("Com os robôs"), "alert")
+		for report in captured:
+			_text(AHSideMissions.report_line(c, report), AHKit.alert_text(), "small")
 	if reports.is_empty():
 		# O save de antes (o trem já pendente, sem o relatório do dia): só os nomes.
 		_text(", ".join(AHSideMissions.on_train(c).map(func(entry): return entry.display_name)), AHKit.TEXT, "small")

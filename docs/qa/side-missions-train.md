@@ -1,6 +1,6 @@
 # A volta no trem (#183, segunda parte)
 
-![A volta no trem. Em cima: o trem das missões, com o Nick descendo e o painel "O trem chegou" com o relatório das duas missões; depois de RECEBER, o trem de sempre com o recruta (Brutus, com o Sereno). Embaixo: a Estação depois, com o Próximo passo do trem de sempre](side-missions-train/train.jpg)
+![A volta no trem. Em cima: o trem das missões, só com o Nick descendo, o painel "O trem chegou" com o relatório das duas missões e IR AO MAPA esperando ("Receba quem voltou no trem antes de partir"); depois de RECEBER, o trem de sempre com o recruta (Brutus, com o Sereno). Embaixo: a Estação depois, com o Próximo passo do trem de sempre](side-missions-train/train.jpg)
 
 Segue a decisão do Lucas de 28/10: "Prioridade é a missão principal que voltamos e só depois os secundários chegam no
 trem também", com o relatório da missão.
@@ -10,13 +10,17 @@ trem também", com o relatório da missão.
 - **Quem termina a missão volta no trem.** O resultado sai no dia da volta, mas o herói (o que deu certo e o ferido)
   fica no trem até a chegada ser vista. Até lá, conta como fora: não parte, não pega posto e não passeia na Estação. O
   capturado não vem no trem: espera o resgate (#188).
-- **A missão principal primeiro.** O relatório da expedição não traz mais a coluna "Missões solo". Depois dele (e da
-  noite, quando há), vem o trem.
+- **A missão principal primeiro.** O relatório da expedição não traz mais quem volta das missões; só quem foi
+  capturado, na coluna "Com os robôs" (não vem no trem). Depois dele (e da noite, quando há), vem o trem.
 - **O trem das missões é uma visita do trem** (`S.visit_pending`). Os mesmos caminhos que levam ao trem de sempre levam
   a ele: depois do relatório, ao amanhecer, ao abrir a Estação, na lista do que espera e no Próximo passo ("O trem trouxe
   quem estava em missão").
-- **A cena:** o trem chega do túnel e o primeiro de quem volta desce na plataforma. O painel "O trem chegou" mostra o
-  relatório das missões do dia, uma linha por herói. RECEBER traz todos para a Estação, e o trem parte.
+- **A cena:** o trem chega do túnel e o primeiro de quem volta desce na plataforma (o ferido, no passo de quem manca).
+  O segundo do recruta do trem de sempre não desce junto: ele vem no trem de sempre, depois. O painel "O trem chegou"
+  mostra o relatório das missões, uma linha por herói, e à parte quem ficou "Com os robôs". RECEBER traz todos para a
+  Estação, e o trem parte.
+- **Antes de partir, receber.** Com o trem das missões pendente, a Preparação espera ("Receba quem voltou no trem antes
+  de partir"), como com o Mercador. Um dia sem receber guarda o relatório de quem ainda está no trem.
 - **Depois:** se o trem de sempre traz alguém (recruta, civil ou Mercador), ele chega em seguida. Senão, a noite ou a
   vista geral.
 - No dia de espera ("Esperar um dia"), quem volta naquele dia também chega no trem: ele aparece no Próximo passo e
@@ -32,10 +36,23 @@ trem também", com o relatório da missão.
 
 ## Testes
 
-- `tests/test_side_missions.gd` (693 verificações):
+- `tests/test_side_missions.gd` (695 verificações):
   - quem volta chega no trem e fica fora até a chegada;
   - o trem é uma visita pendente, e o Próximo passo leva à plataforma;
+  - a Preparação espera o trem, e um dia sem receber guarda o relatório;
   - receber traz todos à Estação;
   - o capturado não vem no trem.
+- `tests/test_mission_train.gd` (7 verificações): na Estação de verdade, com uma dupla de recrutas no trem de sempre,
+  só a Íris desce (ferida, no passo de quem manca) e, depois de RECEBER, o trem de sempre traz o recruta.
 - `tools/capture_183_train.gd`: as fotos acima.
 - `tests/run_all.gd` inteiro.
+
+## QA
+
+- **Rodada 1: REPROVADO.** Quatro médios:
+  - o segundo do recruta do trem de sempre descia junto no trem das missões;
+  - partindo sem receber, o relatório se perdia e o herói ficava no trem;
+  - a captura, sem ninguém voltando, não era avisada;
+  - o ferido descia no passo normal.
+
+  Correção: os quatro, como descrito acima, com o teste de cena novo e os de regra.

@@ -1890,6 +1890,9 @@ static func preparation_block(campaign: Dictionary) -> String:
 	# também no botão IR AO MAPA, numa linha.
 	if block == "" and merchant_here(campaign):
 		return TranslationServer.translate("Dispense o Sr. dos Trilhos antes de partir.")
+	# O trem das missões solo (#183): quem voltou nele é recebido antes (o relatório chega com ele).
+	if block == "" and AHSideMissions.train_pending(campaign):
+		return TranslationServer.translate("Receba quem voltou no trem antes de partir.")
 	return block
 
 

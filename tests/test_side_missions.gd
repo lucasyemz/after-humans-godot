@@ -199,7 +199,8 @@ func _round(t, capture: bool) -> Dictionary:
 				t.check(M.away(hero) and not S.can_deploy(hero), "o capturado fica fora até o resgate")
 				t.check(M.captured(c).has(hero), "e entra na lista dos capturados")
 		t.check(expected >= 5 and expected <= 95, "a chance fica nos limites")
-		# O dia seguinte, sem ninguém voltando, limpa Quem voltou.
+		# Recebido o trem, o dia seguinte, sem ninguém voltando, limpa Quem voltou.
+		M.arrive(c)
 		S.run_cycle(c, "rest_%d" % (int(c.station.cycle_number) + 1), 0)
 		t.equal(M.state(c).reports, [], "no dia seguinte, Quem voltou fica vazio")
 	return results
@@ -227,6 +228,11 @@ func _train_return(t) -> void:
 	c.station.last_return = {}
 	c.night = S._night_defaults()
 	t.equal(S.next_step(c).action, "train", "o Próximo passo leva à plataforma")
+	t.check(S.preparation_block(c) != "", "com o trem das missões pendente, a Preparação espera (o relatório chega com ele)")
+	# Um dia sem receber: o relatório de quem ainda está no trem continua.
+	var report: Dictionary = M.state(c).reports[0]
+	S.run_cycle(c, "rest_%d" % (int(c.station.cycle_number) + 1), 0)
+	t.check(M.state(c).reports.has(report), "um dia sem receber: o relatório de quem está no trem continua")
 	t.equal(M.arrive(c), [hero.id], "receber traz quem estava no trem")
 	t.check(not M.away(hero) and not M.train_pending(c), "e ele está na Estação")
 	# O capturado não vem no trem.

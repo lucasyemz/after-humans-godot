@@ -667,7 +667,7 @@ func follow_train() -> void:
 func _candidate_key() -> Dictionary:
 	var feet := _departure_slot(1)
 	# Desceram dois (#182): a câmera recua para o segundo, ao lado, também caber à esquerda do painel.
-	if not Campaign.state.station.train.get("next", {}).is_empty():
+	if not Campaign.state.station.train.get("next", {}).is_empty() and not AHSideMissions.train_pending(Campaign.state):
 		return ue_key(feet.x * 100 + 20, feet.z * 100 + 800, 92, 44, 0)
 	return ue_key(feet.x * 100 + 100, feet.z * 100 + 650, 92, 44, 0)
 
@@ -1361,7 +1361,8 @@ func _release_boarding() -> void:
 ## O segundo animal do trem (#182), de pé ao lado de quem é decidido agora, até a vez dele.
 func _spawn_companion(feet: Vector3 = Vector3.INF) -> AHSpriteCard:
 	var second: Dictionary = Campaign.state.station.train.get("next", {})
-	if second.is_empty():
+	# O trem das missões solo (#183) não traz o segundo do recruta: ele vem no trem de sempre, depois.
+	if second.is_empty() or AHSideMissions.train_pending(Campaign.state):
 		return null
 	var art: Dictionary = AHCombatArena.hero_art_of(String(second.candidate_id), String(second.recruit.art_variant)).get("idle", {})
 	if art.is_empty():
@@ -1466,9 +1467,12 @@ func _tick_arrival(before: float) -> void:
 	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
 		# Desce pela porta do metrô e anda até a plataforma.
 		var card := _spawn_candidate(Vector3(_train_door_x(), target.y, target.z))
+		# Quem volta ferido de uma missão solo (#183) desce mancando, no passo da equipe ferida.
+		var returning = S.hero(Campaign.state, _candidate_id)
+		var pace: float = WOUNDED_PACE if returning != null and int(returning.hp) < int(returning.max_hp) else 1.0
 		if card:
 			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
-				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": target.z})
+				"speed": TRAIN_WALK_SPEED * train_speed() * pace, "stay": true, "home_z": target.z})
 		# Desceram dois (#182): o segundo desce logo atrás e para ao lado.
 		var beside := _companion_slot()
 		var companion := _spawn_companion(Vector3(_train_door_x(), beside.y, beside.z))
