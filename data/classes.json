@@ -22,8 +22,8 @@
     ],
     "UnlockIds": [
       "cao_ombro_de_carga",
-      "cao_patas_firmes",
-      "cao_faro_de_perigo"
+      "cao_postura_firme",
+      "cao_alerta_de_perigo"
     ]
   },
   {
@@ -48,7 +48,7 @@
       "gato_cacada_precisa"
     ],
     "UnlockIds": [
-      "gato_garra_de_calha",
+      "gato_salto_da_calha",
       "gato_volta_pelo_telhado",
       "gato_rasgo_rapido"
     ]
@@ -104,7 +104,7 @@
     "UnlockIds": [
       "coruja_mira_no_marcado",
       "coruja_tiro_de_aviso",
-      "coruja_poleiro_alto"
+      "coruja_posicao_elevada"
     ]
   },
   {
@@ -157,7 +157,7 @@
     ],
     "UnlockIds": [
       "tatu_placa_de_protecao",
-      "tatu_rolar_em_frente",
+      "tatu_avanco_de_resgate",
       "tatu_folego_de_resgate"
     ]
   }

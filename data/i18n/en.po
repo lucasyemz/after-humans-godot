@@ -6189,24 +6189,24 @@ msgid "Investida curta com o ombro: dano baixo e empurra o alvo uma posição."
 msgstr "Short shoulder charge: low damage and pushes the target one position."
 
 #. abilities.25.DisplayName
-msgid "Patas Firmes"
-msgstr "Firm Paws"
+msgid "Postura Firme"
+msgstr "Firm Stance"
 
 #. abilities.25.Description
-msgid "Firma as patas: ganha 1 Bloqueio e remove o próprio Vulnerável."
-msgstr "Plants its paws: gains 1 Block and removes its own Vulnerable."
+msgid "Firma a postura: ganha 1 Bloqueio e remove o próprio Vulnerável."
+msgstr "Braces its stance: gains 1 Block and removes its own Vulnerable."
 
 #. abilities.26.DisplayName
-msgid "Faro de Perigo"
-msgstr "Nose for Danger"
+msgid "Alerta de Perigo"
+msgstr "Danger Alert"
 
 #. abilities.26.Description
-msgid "Fareja a ameaça e aponta para a equipe: marca um inimigo por 2 turnos, sem dano."
-msgstr "Sniffs out the threat and points it out to the team: marks an enemy for 2 turns, no damage."
+msgid "Aponta a ameaça para a equipe: marca um inimigo por 2 turnos, sem dano."
+msgstr "Points out the threat to the team: marks an enemy for 2 turns, no damage."
 
 #. abilities.27.DisplayName
-msgid "Garra de Calha"
-msgstr "Gutter Claw"
+msgid "Salto da Calha"
+msgstr "Gutter Leap"
 
 #. abilities.27.Description
 msgid "Salta da calha sobre o alvo: dano baixo e Sangramento por 2 turnos."
@@ -6269,8 +6269,8 @@ msgid "Tiro rápido de qualquer posição: dano baixo e remove 1 Bloqueio."
 msgstr "Quick shot from any position: low damage and removes 1 Block."
 
 #. abilities.35.DisplayName
-msgid "Poleiro Alto"
-msgstr "High Perch"
+msgid "Posição Elevada"
+msgstr "High Ground"
 
 #. abilities.35.Description
 msgid "Sobe para um ponto mais alto: recua uma posição e ganha 1 Esquiva."
@@ -6309,12 +6309,12 @@ msgid "Passa uma placa a um aliado: 1 Bloqueio e remove Sangramento e Contamina�
 msgstr "Hands a plate to an ally: 1 Block and removes Bleed and Contamination."
 
 #. abilities.40.DisplayName
-msgid "Rolar em Frente"
-msgstr "Roll Forward"
+msgid "Avanço de Resgate"
+msgstr "Rescue Advance"
 
 #. abilities.40.Description
-msgid "Rola até a frente e acerta o alvo: dano e avança uma posição."
-msgstr "Rolls to the front and hits the target: damage and advances one position."
+msgid "Avança até a frente e acerta o alvo: dano e avança uma posição."
+msgstr "Charges to the front and hits the target: damage and advances one position."
 
 #. abilities.41.DisplayName
 msgid "Fôlego de Resgate"
@@ -8996,6 +8996,30 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "Patas Firmes"
+#~ msgstr "Firm Paws"
+
+#~ msgid "Firma as patas: ganha 1 Bloqueio e remove o próprio Vulnerável."
+#~ msgstr "Plants its paws: gains 1 Block and removes its own Vulnerable."
+
+#~ msgid "Faro de Perigo"
+#~ msgstr "Nose for Danger"
+
+#~ msgid "Fareja a ameaça e aponta para a equipe: marca um inimigo por 2 turnos, sem dano."
+#~ msgstr "Sniffs out the threat and points it out to the team: marks an enemy for 2 turns, no damage."
+
+#~ msgid "Garra de Calha"
+#~ msgstr "Gutter Claw"
+
+#~ msgid "Poleiro Alto"
+#~ msgstr "High Perch"
+
+#~ msgid "Rolar em Frente"
+#~ msgstr "Roll Forward"
+
+#~ msgid "Rola até a frente e acerta o alvo: dano e avança uma posição."
+#~ msgstr "Rolls to the front and hits the target: damage and advances one position."
 
 #~ msgid "Sem nada para usar da posição %d."
 #~ msgstr "Nothing to use from position %d."

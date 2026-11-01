@@ -580,10 +580,10 @@
     "ArtOf": "cao_impacto_hidraulico"
   },
   {
-    "Name": "cao_patas_firmes",
+    "Name": "cao_postura_firme",
     "ClassId": "cao",
-    "DisplayName": "Patas Firmes",
-    "Description": "Firma as patas: ganha 1 Bloqueio e remove o próprio Vulnerável.",
+    "DisplayName": "Postura Firme",
+    "Description": "Firma a postura: ganha 1 Bloqueio e remove o próprio Vulnerável.",
     "OriginRanks": [
       1,
       2,
@@ -607,10 +607,10 @@
     "ArtOf": "cao_fique_atras_de_mim"
   },
   {
-    "Name": "cao_faro_de_perigo",
+    "Name": "cao_alerta_de_perigo",
     "ClassId": "cao",
-    "DisplayName": "Faro de Perigo",
-    "Description": "Fareja a ameaça e aponta para a equipe: marca um inimigo por 2 turnos, sem dano.",
+    "DisplayName": "Alerta de Perigo",
+    "Description": "Aponta a ameaça para a equipe: marca um inimigo por 2 turnos, sem dano.",
     "OriginRanks": [
       1,
       2,
@@ -629,9 +629,9 @@
     "ArtOf": "cao_nao_estamos_sos"
   },
   {
-    "Name": "gato_garra_de_calha",
+    "Name": "gato_salto_da_calha",
     "ClassId": "gato",
-    "DisplayName": "Garra de Calha",
+    "DisplayName": "Salto da Calha",
     "Description": "Salta da calha sobre o alvo: dano baixo e Sangramento por 2 turnos.",
     "OriginRanks": [
       2,
@@ -829,9 +829,9 @@
     "ArtOf": "coruja_recurso_emergencia"
   },
   {
-    "Name": "coruja_poleiro_alto",
+    "Name": "coruja_posicao_elevada",
     "ClassId": "coruja",
-    "DisplayName": "Poleiro Alto",
+    "DisplayName": "Posição Elevada",
     "Description": "Sobe para um ponto mais alto: recua uma posição e ganha 1 Esquiva.",
     "OriginRanks": [
       1,
@@ -949,10 +949,10 @@
     "ArtOf": "tatu_abrigo"
   },
   {
-    "Name": "tatu_rolar_em_frente",
+    "Name": "tatu_avanco_de_resgate",
     "ClassId": "tatu",
-    "DisplayName": "Rolar em Frente",
-    "Description": "Rola até a frente e acerta o alvo: dano e avança uma posição.",
+    "DisplayName": "Avanço de Resgate",
+    "Description": "Avança até a frente e acerta o alvo: dano e avança uma posição.",
     "OriginRanks": [
       2,
       3,

@@ -45,13 +45,13 @@ func _run() -> void:
 	# O Bento no nível 7, com os 3 aprendidos, leva o Ombro de Carga no lugar do Não Estamos Sós.
 	var bento = S.hero(c, "hero_cao_bento")
 	bento.level = 7
-	bento.unlocked = ["cao_ombro_de_carga", "cao_patas_firmes", "cao_faro_de_perigo"]
+	bento.unlocked = ["cao_ombro_de_carga", "cao_postura_firme", "cao_alerta_de_perigo"]
 	bento.loadout = ["cao_punho_sucata", "cao_impacto_hidraulico", "cao_fique_atras_de_mim", "cao_ombro_de_carga"]
-	# O Nick no nível 3, com a Garra de Calha aprendida e levada.
+	# O Nick no nível 3, com a Salto da Calha aprendida e levada.
 	var nick = S.hero(c, "hero_gato_nick")
 	nick.level = 3
-	nick.unlocked = ["gato_garra_de_calha"]
-	nick.loadout = ["gato_corte_fase", "gato_salto_entre_ruinas", "gato_cacada_precisa", "gato_garra_de_calha"]
+	nick.unlocked = ["gato_salto_da_calha"]
+	nick.loadout = ["gato_corte_fase", "gato_salto_entre_ruinas", "gato_cacada_precisa", "gato_salto_da_calha"]
 	# A Íris pronta para o treino do nível 3 (as de aprender), sem fragmentos.
 	var iris = S.hero(c, "hero_sapo_iris")
 	iris.level = 2
@@ -104,7 +104,7 @@ func _run() -> void:
 	iris2.loadout = ["sapo_carga_voltaica", "sapo_coquetel_corrosivo", "sapo_ampola_reparo_vivo", "sapo_curativo_rapido"]
 	var vespera = S.hero(st, "hero_coruja_vespera")
 	vespera.level = 7
-	vespera.unlocked = ["coruja_mira_no_marcado", "coruja_tiro_de_aviso", "coruja_poleiro_alto"]
+	vespera.unlocked = ["coruja_mira_no_marcado", "coruja_tiro_de_aviso", "coruja_posicao_elevada"]
 	vespera.loadout = ["coruja_disparo_perfurante", "coruja_olho_nas_ruinas", "coruja_recurso_emergencia", "coruja_tiro_de_aviso"]
 	# A luta: a equipe parte e a primeira luta abre na vez de um herói.
 	J.start_expedition(campaign.state, "fase_1", 4242)
