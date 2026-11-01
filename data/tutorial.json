@@ -198,7 +198,7 @@
         "Speaker": "hero_cao_bento",
         "Target": "resources",
         "Wait": "next",
-        "Text": "Aqui em cima ficam a comida, a água e a energia da Estação, e os materiais que a gente traz. Cada volta enche um pouco; cada noite gasta um pouco."
+        "Text": "Aqui em cima ficam a comida, a água e a energia da Estação, e os materiais que a gente traz. Cada dia enche um pouco; cada noite gasta um pouco."
       },
       {
         "Id": "next_step",
@@ -244,7 +244,7 @@
         "Speaker": "hero_cao_bento",
         "Target": "room:dormitory",
         "Wait": "next",
-        "Text": "O Dormitório: depois de cada volta a equipe dorme ali, come e recupera vida e instinto antes de sair de novo."
+        "Text": "O Dormitório: depois de cada dia a equipe dorme ali, come e recupera vida e instinto antes de sair de novo."
       },
       {
         "Id": "depart",

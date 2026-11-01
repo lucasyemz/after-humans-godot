@@ -1943,8 +1943,8 @@ msgid "Ponto forte: %s"
 msgstr "Strength: %s"
 
 #: scripts/ui/refuge_hud.gd:2605
-msgid "Sem comida ou água no último ciclo: o ponto forte está parado até a próxima volta."
-msgstr "No food or water in the last cycle: the strength is idle until the next return."
+msgid "Sem comida ou água no último ciclo: o ponto forte está parado até o próximo dia."
+msgstr "No food or water in the last cycle: the strength is idle until the next day."
 
 #: scripts/ui/refuge_hud.gd:2607
 msgid "Ponto fraco: %s"
@@ -1991,8 +1991,8 @@ msgid "Partir"
 msgstr "Depart"
 
 #: scripts/ui/refuge_hud.gd:2760
-msgid "Próxima volta (equipe de 4)"
-msgstr "Next return (team of 4)"
+msgid "Próximo dia (equipe de 4)"
+msgstr "Next day (team of 4)"
 
 #: scripts/ui/refuge_hud.gd:2764
 msgid "%d no estoque"
@@ -2038,8 +2038,8 @@ msgid "a equipe e os moradores bebem %d"
 msgstr "the team and the residents drink %d"
 
 #: scripts/ui/refuge_hud.gd:2776
-msgid "A água vai faltar na volta."
-msgstr "Water will run out on the return."
+msgid "A água vai faltar no próximo dia."
+msgstr "Water will run out on the next day."
 
 #: scripts/ui/refuge_hud.gd:2779
 #: scripts/ui/refuge_hud.gd:3473
@@ -2324,8 +2324,8 @@ msgid "Sem a Enfermaria, quem caiu se recupera devagar no Dormitório."
 msgstr "Without the Infirmary, the fallen recover slowly in the Dormitory."
 
 #: scripts/ui/refuge_hud.gd:3202
-msgid "Ninguém pode partir agora. Passar um dia na Estação gasta e produz como uma volta, e cada caído fica um dia mais perto."
-msgstr "Nobody can leave now. Spending a day at the Station uses and produces like a return, and each fallen animal gets one day closer."
+msgid "Ninguém pode partir agora. Passar um dia na Estação gasta e produz como um dia de expedição, e cada caído fica um dia mais perto."
+msgstr "Nobody can leave now. Spending a day at the Station uses and produces like an expedition day, and each fallen animal gets one day closer."
 
 #: scripts/ui/refuge_hud.gd:3224
 msgid "Vida %d/%d · %s"
@@ -2372,8 +2372,8 @@ msgid "Suprimento comprado."
 msgstr "Supply bought."
 
 #: scripts/ui/refuge_hud.gd:3269
-msgid "Faltou água na volta: o descanso rende menos instinto."
-msgstr "Water ran short on the way back: rest recovers less instinct."
+msgid "Faltou água no último dia: o descanso rende menos instinto."
+msgstr "Water ran short on the last day: rest recovers less instinct."
 
 #: scripts/ui/refuge_hud.gd:3278
 msgid "Suprimentos: %d %s · %d %s"
@@ -2468,8 +2468,8 @@ msgid "Pedido"
 msgstr "Request"
 
 #: scripts/ui/refuge_hud.gd:3470
-msgid "Na próxima volta"
-msgstr "On the next return"
+msgid "No próximo dia"
+msgstr "On the next day"
 
 #: scripts/ui/refuge_hud.gd:3471
 msgid "Suprimentos depois da noite"
@@ -3894,20 +3894,20 @@ msgid "Quer recuperar um caderno de receitas esquecido numa mercearia abandonada
 msgstr "Wants to recover a recipe notebook left behind in an abandoned grocery."
 
 #: scripts/flow/station_rules.gd:84
-msgid "Na Cantina com energia, produz mais 2 suprimentos por volta."
-msgstr "In the Canteen with power, makes 2 more supplies per return."
+msgid "Na Cantina com energia, produz mais 2 suprimentos por dia."
+msgstr "In the Canteen with power, makes 2 more supplies per day."
 
 #: scripts/flow/station_rules.gd:85
-msgid "Cozinhar gasta água: bebe 2 por volta."
-msgstr "Cooking uses water: drinks 2 per return."
+msgid "Cozinhar gasta água: bebe 2 por dia."
+msgstr "Cooking uses water: drinks 2 per day."
 
 #: scripts/flow/station_rules.gd:86
 msgid "o caderno de receitas"
 msgstr "the recipe notebook"
 
 #: scripts/flow/station_rules.gd:86
-msgid "a Cantina rende mais 1 suprimento por volta"
-msgstr "the Canteen makes 1 more supply per return"
+msgid "a Cantina rende mais 1 suprimento por dia"
+msgstr "the Canteen makes 1 more supply per day"
 
 #: scripts/flow/station_rules.gd:88
 msgid "Castor"
@@ -3930,8 +3930,8 @@ msgid "Mantém o gerador: mais 1 de capacidade de energia. Recuperar e melhorar 
 msgstr "Keeps the generator running: 1 more power capacity. Restoring and upgrading rooms costs 1 scrap less."
 
 #: scripts/flow/station_rules.gd:91
-msgid "Trabalho pesado: come 2 suprimentos por volta."
-msgstr "Heavy work: eats 2 supplies per return."
+msgid "Trabalho pesado: come 2 suprimentos por dia."
+msgstr "Heavy work: eats 2 supplies per day."
 
 #: scripts/flow/station_rules.gd:92
 msgid "a maleta da equipe ferroviária"
@@ -3958,8 +3958,8 @@ msgid "Quer recuperar registros de monitoramento para comparar a água local."
 msgstr "Wants to recover monitoring records to compare the local water."
 
 #: scripts/flow/station_rules.gd:96
-msgid "Com a Pesquisa recuperada e ligada, traz 1 fragmento por volta."
-msgstr "With Research restored and powered, brings 1 fragment per return."
+msgid "Com a Pesquisa recuperada e ligada, traz 1 fragmento por dia."
+msgstr "With Research restored and powered, brings 1 fragment per day."
 
 #: scripts/flow/station_rules.gd:97
 msgid "Equipamentos ligados o tempo todo: a Pesquisa gasta 1 de energia a mais."
@@ -3970,8 +3970,8 @@ msgid "os registros de monitoramento"
 msgstr "the monitoring records"
 
 #: scripts/flow/station_rules.gd:98
-msgid "mais 1 fragmento por volta"
-msgstr "1 more fragment per return"
+msgid "mais 1 fragmento por dia"
+msgstr "1 more fragment per day"
 
 #: scripts/flow/station_rules.gd:349
 msgid "A recuperação deste cômodo chega numa próxima fase."
@@ -4076,13 +4076,13 @@ msgstr "! %d over %d"
 
 #: scripts/flow/station_rules.gd:455
 #: scripts/flow/station_rules.gd:465
-msgid "! Falta na volta"
-msgstr "! Short on the return"
+msgid "! Falta no próximo dia"
+msgstr "! Short on the next day"
 
 #: scripts/flow/station_rules.gd:457
 #: scripts/flow/station_rules.gd:465
-msgid "Próxima volta: %d"
-msgstr "Next return: %d"
+msgid "Próximo dia: %d"
+msgstr "Next day: %d"
 
 #: scripts/flow/station_rules.gd:460
 msgid "COMIDA"
@@ -4093,8 +4093,8 @@ msgid "%d / %d suprimentos"
 msgstr "%d / %d supplies"
 
 #: scripts/flow/station_rules.gd:462
-msgid "Estoque e capacidade do Depósito. Na próxima volta, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d."
-msgstr "Storeroom stock and capacity. On the next return, with no loot: +%d from the Canteen, %d for the residents, %d spoil, %d for the night; %d left."
+msgid "Estoque e capacidade do Depósito. No próximo dia, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d."
+msgstr "Storeroom stock and capacity. On the next day, with no loot: +%d from the Canteen, %d for the residents, %d spoil, %d for the night; %d left."
 
 #: scripts/flow/station_rules.gd:464
 msgid "ÁGUA"
@@ -4105,8 +4105,8 @@ msgid "%d em estoque"
 msgstr "%d in stock"
 
 #: scripts/flow/station_rules.gd:466
-msgid "Na próxima volta, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto."
-msgstr "On the next return, with no loot: the collector adds %d and the team and residents drink %d; %d left. Without water, rest lowers instinct less."
+msgid "No próximo dia, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto."
+msgstr "On the next day, with no loot: the collector adds %d and the team and residents drink %d; %d left. Without water, rest lowers instinct less."
 
 #: scripts/flow/station_rules.gd:468
 msgid "ENERGIA"
@@ -4161,12 +4161,12 @@ msgid "Melhorias de classe com fragmentos. Gasta 1 de energia."
 msgstr "Class upgrades with fragments. Uses 1 power."
 
 #: scripts/flow/station_rules.gd:497
-msgid "Sem camas: a equipe dorme no chão depois de cada volta. Com os beliches, cabem %d ajudantes."
-msgstr "No beds: the team sleeps on the floor after each return. With bunks, it fits %d helpers."
+msgid "Sem camas: a equipe dorme no chão depois de cada dia. Com os beliches, cabem %d ajudantes."
+msgstr "No beds: the team sleeps on the floor after each day. With bunks, it fits %d helpers."
 
 #: scripts/flow/station_rules.gd:498
-msgid "Beliches de ferro: a equipe dorme neles depois de cada volta. Cabem %d ajudantes."
-msgstr "Iron bunks: the team sleeps in them after each return. It fits %d helpers."
+msgid "Beliches de ferro: a equipe dorme neles depois de cada dia. Cabem %d ajudantes."
+msgstr "Iron bunks: the team sleeps in them after each day. It fits %d helpers."
 
 #: scripts/flow/station_rules.gd:500
 msgid "Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa."
@@ -4181,8 +4181,8 @@ msgid "Com energia, produz 2 suprimentos por expedição."
 msgstr "With power, makes 2 supplies per expedition."
 
 #: scripts/flow/station_rules.gd:506
-msgid "Guarda até 12 suprimentos; o excesso estraga na volta."
-msgstr "Holds up to 12 supplies; the excess spoils on the return."
+msgid "Guarda até 12 suprimentos; o excesso estraga a cada dia."
+msgstr "Holds up to 12 supplies; the excess spoils each day."
 
 #: scripts/flow/station_rules.gd:506
 msgid "Prateleiras extras: guarda até 20."
@@ -4585,12 +4585,12 @@ msgid "%s: %s Entregue, %s."
 msgstr "%s: %s Delivered, %s."
 
 #: scripts/flow/station_rules.gd:2107
-msgid "Água: %d na estação; a equipe bebe %d na volta e vai faltar."
-msgstr "Water: %d at the Station; the team drinks %d on the return and it will run short."
+msgid "Água: %d na estação; a equipe bebe %d no próximo dia e vai faltar."
+msgstr "Water: %d at the Station; the team drinks %d on the next day and it will run short."
 
 #: scripts/flow/station_rules.gd:2108
-msgid "Água: %d na estação, %d depois da próxima volta."
-msgstr "Water: %d at the Station, %d after the next return."
+msgid "Água: %d na estação, %d depois do próximo dia."
+msgstr "Water: %d at the Station, %d after the next day."
 
 #: scripts/flow/station_rules.gd:2111
 msgid "Sucata para relíquias e melhorias."
@@ -4657,36 +4657,36 @@ msgid "da %s"
 msgstr "the %s"
 
 #: scripts/flow/station_rules.gd:2290
-msgid "+%d fragmento por volta"
-msgstr "+%d fragment per return"
+msgid "+%d fragmento por dia"
+msgstr "+%d fragment per day"
 
 #: scripts/flow/station_rules.gd:2290
-msgid "+%d fragmentos por volta"
-msgstr "+%d fragments per return"
+msgid "+%d fragmentos por dia"
+msgstr "+%d fragments per day"
 
 #: scripts/flow/station_rules.gd:2292
-msgid "+%d sucata por volta"
-msgstr "+%d scrap per return"
+msgid "+%d sucata por dia"
+msgstr "+%d scrap per day"
 
 #: scripts/flow/station_rules.gd:2292
-msgid "+%d sucatas por volta"
-msgstr "+%d scrap per return"
+msgid "+%d sucatas por dia"
+msgstr "+%d scrap per day"
 
 #: scripts/flow/station_rules.gd:2294
-msgid "+%d suprimento por volta"
-msgstr "+%d supply per return"
+msgid "+%d suprimento por dia"
+msgstr "+%d supply per day"
 
 #: scripts/flow/station_rules.gd:2294
-msgid "+%d suprimentos por volta"
-msgstr "+%d supplies per return"
+msgid "+%d suprimentos por dia"
+msgstr "+%d supplies per day"
 
 #: scripts/flow/station_rules.gd:2296
-msgid "−1 dia de recuperação para %d caído por volta"
-msgstr "−1 recovery day for %d fallen per return"
+msgid "−1 dia de recuperação para %d caído por dia"
+msgstr "−1 recovery day for %d fallen per day"
 
 #: scripts/flow/station_rules.gd:2297
-msgid "−1 dia de recuperação para %d caídos por volta"
-msgstr "−1 recovery day for %d fallen per return"
+msgid "−1 dia de recuperação para %d caídos por dia"
+msgstr "−1 recovery day for %d fallen per day"
 
 #: scripts/flow/station_rules.gd:2299
 msgid "+%d ponto de obra por dia"
@@ -8501,8 +8501,8 @@ msgid "Esta é a Estação Raiz: a estação de metrô dos Antigos onde a gente 
 msgstr "This is Root Station: the Old Ones' subway station where we live. Each room is part of the home; the dark ones are still waiting to be restored."
 
 #. tutorial.station_tour.resources.Text
-msgid "Aqui em cima ficam a comida, a água e a energia da Estação, e os materiais que a gente traz. Cada volta enche um pouco; cada noite gasta um pouco."
-msgstr "Up here are the Station's food, water and power, and the materials we bring back. Every return fills them a little; every night spends a little."
+msgid "Aqui em cima ficam a comida, a água e a energia da Estação, e os materiais que a gente traz. Cada dia enche um pouco; cada noite gasta um pouco."
+msgstr "Up here are the Station's food, water and power, and the materials we bring back. Every day fills them a little; every night spends a little."
 
 #. tutorial.station_tour.next_step.Text
 msgid "Na dúvida, olhe o Próximo passo: ele diz o que a Estação mais precisa agora."
@@ -8541,8 +8541,8 @@ msgid "Feche a Sala"
 msgstr "Close the Room"
 
 #. tutorial.station_tour.dormitory.Text
-msgid "O Dormitório: depois de cada volta a equipe dorme ali, come e recupera vida e instinto antes de sair de novo."
-msgstr "The Dormitory: after every return the team sleeps there, eats and recovers health and instinct before heading out again."
+msgid "O Dormitório: depois de cada dia a equipe dorme ali, come e recupera vida e instinto antes de sair de novo."
+msgstr "The Dormitory: after every day the team sleeps there, eats and recovers health and instinct before heading out again."
 
 #. tutorial.station_tour.depart.Text
 msgid "Quando estiverem prontos, Preparar expedição abre o mapa: escolha o lugar, monte a equipe e parta. Abra para ver."
