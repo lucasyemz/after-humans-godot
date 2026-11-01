@@ -1476,20 +1476,20 @@ msgstr "Advantage +%d%%: the attacker's lineage or family beats the target's"
 #: scripts/ui/combat_hud.gd:2103
 #: scripts/ui/combat_hud.gd:2111
 #: scripts/ui/combat_hud.gd:2112
-#: scripts/flow/journey_rules.gd:473
+#: scripts/flow/journey_rules.gd:474
 msgid " · Guardião"
 msgstr " · Guardian"
 
 #: scripts/ui/combat_hud.gd:2103
 #: scripts/ui/combat_hud.gd:2113
 #: scripts/ui/combat_hud.gd:2114
-#: scripts/flow/journey_rules.gd:353
+#: scripts/flow/journey_rules.gd:354
 msgid " Alfa"
 msgstr " Alpha"
 
 #: scripts/ui/combat_hud.gd:2103
 #: scripts/ui/combat_hud.gd:2115
-#: scripts/flow/journey_rules.gd:354
+#: scripts/flow/journey_rules.gd:355
 msgid " Beta"
 msgstr " Beta"
 
@@ -4666,83 +4666,83 @@ msgstr "Prepared: 1 Block in the next fight"
 msgid "Preparado: a equipe começa com 1 Bloqueio."
 msgstr "Prepared: the team starts with 1 Block."
 
-#: scripts/flow/journey_rules.gd:59
+#: scripts/flow/journey_rules.gd:60
 msgid "A Estação aguenta mais alguns dias. O que os Antigos deixaram, ninguém aqui sabe fazer de novo."
 msgstr "The Station holds out a few more days. What the Ancients left behind, no one here knows how to make again."
 
-#: scripts/flow/journey_rules.gd:60
+#: scripts/flow/journey_rules.gd:61
 msgid "Na volta, alguém repete a frase do interfone: \"preservação humana\". Ninguém sabe por que a ponte acordou."
 msgstr "On the way back, someone repeats the intercom's phrase: \"human preservation\". No one knows why the bridge woke up."
 
-#: scripts/flow/journey_rules.gd:61
-msgid "As fichas passam de mão em mão no caminho de casa. Algumas palavras ninguém sabe o que querem dizer: \"edição\", \"linhagem\", \"incubação\"."
-msgstr "The cards pass from paw to paw on the way home. Some words no one knows the meaning of: \"editing\", \"lineage\", \"incubation\"."
-
 #: scripts/flow/journey_rules.gd:62
+msgid "As fichas passam de mão em mão no caminho de casa. Algumas palavras ninguém sabe o que querem dizer: \"edição\", \"incubação\"."
+msgstr "The cards pass from paw to paw on the way home. Some words no one knows the meaning of: \"editing\", \"incubation\"."
+
+#: scripts/flow/journey_rules.gd:63
 msgid "Os dois relatórios voltam na mochila. \"Um deles está errado, ou os dois estão incompletos.\""
 msgstr "The two reports come back in the pack. \"One of them is wrong, or both are incomplete.\""
 
-#: scripts/flow/journey_rules.gd:63
+#: scripts/flow/journey_rules.gd:64
 msgid "No painel da eclusa, uma linha nova piscava: AUTENTICAÇÃO HUMANA VÁLIDA · registro recente. Ninguém fala no caminho de casa."
 msgstr "On the lock's panel, a new line was blinking: VALID HUMAN AUTHENTICATION · recent record. No one speaks on the way home."
 
-#: scripts/flow/journey_rules.gd:80
+#: scripts/flow/journey_rules.gd:81
 msgid "o caixa"
 msgstr "the checkout counter"
 
-#: scripts/flow/journey_rules.gd:80
+#: scripts/flow/journey_rules.gd:81
 msgid "a geladeira"
 msgstr "the fridge"
 
-#: scripts/flow/journey_rules.gd:80
+#: scripts/flow/journey_rules.gd:81
 msgid "as prateleiras"
 msgstr "the shelves"
 
-#: scripts/flow/journey_rules.gd:81
+#: scripts/flow/journey_rules.gd:82
 msgid "a bancada"
 msgstr "the workbench"
 
-#: scripts/flow/journey_rules.gd:81
+#: scripts/flow/journey_rules.gd:82
 msgid "o motor"
 msgstr "the engine"
 
-#: scripts/flow/journey_rules.gd:81
+#: scripts/flow/journey_rules.gd:82
 msgid "o armário de peças"
 msgstr "the parts cabinet"
 
-#: scripts/flow/journey_rules.gd:82
+#: scripts/flow/journey_rules.gd:83
 msgid "a bilheteria"
 msgstr "the ticket booth"
 
-#: scripts/flow/journey_rules.gd:82
+#: scripts/flow/journey_rules.gd:83
 msgid "o carrinho de pipoca"
 msgstr "the popcorn cart"
 
-#: scripts/flow/journey_rules.gd:82
+#: scripts/flow/journey_rules.gd:83
 msgid "a escada"
 msgstr "the stairs"
 
-#: scripts/flow/journey_rules.gd:84
+#: scripts/flow/journey_rules.gd:85
 msgid "mercearia"
 msgstr "grocery"
 
-#: scripts/flow/journey_rules.gd:84
+#: scripts/flow/journey_rules.gd:85
 msgid "oficina"
 msgstr "workshop"
 
-#: scripts/flow/journey_rules.gd:84
+#: scripts/flow/journey_rules.gd:85
 msgid "cinema"
 msgstr "cinema"
 
-#: scripts/flow/journey_rules.gd:866
+#: scripts/flow/journey_rules.gd:867
 msgid " Embaixo da bancada, um pé de cabra. (Ferramenta: Pé de cabra)"
 msgstr " Under the workbench, a crowbar. (Tool: Crowbar)"
 
-#: scripts/flow/journey_rules.gd:881
+#: scripts/flow/journey_rules.gd:882
 msgid "Suprimentos recolhidos · +1 alimento e +1 semente"
 msgstr "Supplies gathered · +1 food and +1 seed"
 
-#: scripts/flow/journey_rules.gd:1020
+#: scripts/flow/journey_rules.gd:1021
 #: scripts/street/street_corridor.gd:538
 msgid "A equipe recupera o fôlego."
 msgstr "The team catches its breath."
@@ -9031,6 +9031,9 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "As fichas passam de mão em mão no caminho de casa. Algumas palavras ninguém sabe o que querem dizer: \"edição\", \"linhagem\", \"incubação\"."
+#~ msgstr "The cards pass from paw to paw on the way home. Some words no one knows the meaning of: \"editing\", \"lineage\", \"incubation\"."
 
 #~ msgid "  ·  +%d%%"
 #~ msgstr "  ·  +%d%%"
