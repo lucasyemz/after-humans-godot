@@ -1416,10 +1416,12 @@ func _sound_open() -> void:
 # ---------------------------------------------------------------- a Estação viva (#207)
 
 ## Os balões e as trocas de cômodo só na vista geral e com um cômodo aberto: nada com uma tela por cima (a Sala, o
-## relatório, a Preparação, o Plano, as Opções, o mapa, a ficha, o briefing, a noite, a tirinha, a visita guiada), com a
+## relatório, a Preparação, o Plano, as Opções, o mapa, a ficha, o briefing, a noite, a tirinha, a visita guiada, o aviso
+## do achado e o quadro da escavação), com a
 ## interface oculta, na plataforma, na passagem, na chegada da equipe ou com o trem em cena.
 func life_allowed() -> bool:
-	if station == null or _hud_hidden or _map.visible or briefing_open() or night_scene_open() or comic_open() or tour != null:
+	if station == null or _hud_hidden or _map.visible or briefing_open() or night_scene_open() or comic_open() or tour != null \
+			or dig_notice_shown():
 		return false
 	if sheet != null and sheet.visible:
 		return false
