@@ -182,7 +182,7 @@ func _journey() -> bool:
 	if not await _choose_cargo(street):
 		return false
 	var fought: int = route.steps.filter(func(s): return (s.type == "combat" or s.type == "boss") and s.resolved).size()
-	t.equal(fought, 5, "a jornada venceu as 4 patrulhas e o guardião")
+	t.equal(fought, 4, "a jornada venceu as 3 patrulhas e o guardião (#292)")
 	t.check(route.steps[9].resolved, "o guardião (trecho 10) ficou vencido")
 	if not t.check(searched, "a equipe vasculhou os caixotes no caminho (nenhum caixote alcançado até o guardião)"):
 		return false

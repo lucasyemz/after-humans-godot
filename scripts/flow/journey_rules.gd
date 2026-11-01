@@ -188,26 +188,38 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	return true
 
 
-## Os dez trechos (CreateCorridor): partida, quatro pares (patrulha e pausa, em ordem sorteada) e o guardião.
+## Os dez trechos (CreateCorridor): partida, quatro pares e o guardião. Menos lutas, cada uma mais forte (#292, Lucas,
+## 01/11/2026): três pares têm uma patrulha e uma pausa (em ordem sorteada) e o par calmo, sorteado, tem duas pausas. As
+## pausas e os pares que podem ser calmos vêm de data/corridor-pacing.json.
 static func create_corridor(seed_value: int, node_id: String, node_type: String, scenario_id: String) -> Dictionary:
 	var phase_seed := seed_value & MASK
 	for i in node_id.length():
 		phase_seed = (phase_seed * 31 + node_id.unicode_at(i)) & MASK
 	var random := _rand(phase_seed)
-	var breaks := ["loot", "rest", "passage", "loot"]
+	var pacing: Dictionary = pacing_row("corridor")
+	var breaks: Array = pacing.get("Breaks", ["loot", "rest", "passage", "loot", "loot"]).duplicate()
 	for i in range(breaks.size() - 1, 0, -1):
 		var j := floori(random.next() * (i + 1))
 		var swap = breaks[i]
 		breaks[i] = breaks[j]
 		breaks[j] = swap
+	var calm_pairs: Array = pacing.get("CalmPairs", [2, 3, 4])
+	var calm: int = int(calm_pairs[mini(calm_pairs.size() - 1, floori(random.next() * calm_pairs.size()))])
 	var steps: Array = [{"type": "start", "resolved": true}]
-	for kind in breaks:
-		if random.next() > 0.5:
+	var next_break := 0
+	for pair in range(1, 5):
+		if pair == calm:
+			steps.append({"type": breaks[next_break], "resolved": false})
+			steps.append({"type": breaks[next_break + 1], "resolved": false})
+			next_break += 2
+		elif random.next() > 0.5:
 			steps.append({"type": "combat", "resolved": false})
-			steps.append({"type": kind, "resolved": false})
+			steps.append({"type": breaks[next_break], "resolved": false})
+			next_break += 1
 		else:
-			steps.append({"type": kind, "resolved": false})
+			steps.append({"type": breaks[next_break], "resolved": false})
 			steps.append({"type": "combat", "resolved": false})
+			next_break += 1
 	steps.append({"type": "boss", "resolved": false})
 	var weathers: Array = WEATHERS.get(scenario_id, WEATHERS["rua-das-vitrines"])
 	var weather_random := _rand(phase_seed ^ 0x73e28b19)
@@ -219,6 +231,23 @@ static func create_corridor(seed_value: int, node_id: String, node_type: String,
 		# rota e o interior lateral aberto (a zona do mapa, -1 fora).
 		"prop_steps": [], "prop_maps": [], "searched_props": [], "objective_prop": -1, "current_room": -1,
 	}
+
+
+## Uma linha do ritmo do corredor (data/corridor-pacing.json), ou {} sem a tabela.
+static func pacing_row(row_name: String) -> Dictionary:
+	var row = GameData.row("corridor_pacing", row_name)
+	return row if row is Dictionary else {}
+
+
+## A linha da patrulha fight (0 = a primeira) de fights: contada a partir do guardião, a última é sempre patrol_N (a
+## forte). Um corredor de save antigo, com mais patrulhas que linhas, repete a primeira no começo.
+static func patrol_row(fight: int, fights: int) -> Dictionary:
+	var rows := 0
+	while not pacing_row("patrol_%d" % (rows + 1)).is_empty():
+		rows += 1
+	if rows == 0:
+		return {}
+	return pacing_row("patrol_%d" % clampi(rows - (fights - fight) + 1, 1, rows))
 
 
 static func corridor(campaign: Dictionary):
@@ -411,14 +440,18 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 			spec.display_name = row.DisplayName + spec.get("suffix", "")
 		return group
 
-	# A fase fica mais difícil até o guardião (Lucas, 22/10/2026): as primeiras patrulhas tiram os inimigos mais fracos
-	# de cada vaga e as últimas, os mais fortes; a patrulha forte (3 a 4) é a última antes do guardião e, às vezes, a
-	# penúltima também; o guardião, 4. As outras, 2 e às vezes 3.
+	# A fase fica mais difícil até o guardião (Lucas, 22/10/2026; a escada da #292, 01/11/2026): as primeiras patrulhas
+	# tiram os inimigos mais fracos de cada vaga e as últimas, os mais fortes; cada patrulha tem as posições, a vida e o
+	# dano da sua linha em data/corridor-pacing.json, contada a partir do guardião (a última patrulha é sempre a forte).
 	var count := 2
-	var elite := false
+	var hp_mult := 0.75
+	var damage := -1
 	var progress := -1.0
 	if boss:
-		count = 4
+		var boss_row := pacing_row("boss")
+		count = int(boss_row.get("Count", 4))
+		hp_mult = float(boss_row.get("HpScale", 1.0))
+		damage = int(boss_row.get("Damage", 1))
 		progress = 1.0
 	elif house:
 		count = mini(3, 1 + (1 if random.next() < 0.5 else 0) + (1 if level >= 6 else 0))
@@ -430,13 +463,10 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 		for step in route.steps:
 			fights += 1 if step.type == "combat" else 0
 		progress = float(fight) / float(maxi(1, fights - 1))
-		var phase_random := _rand(route.seed ^ 0x27d4eb2f)
-		var second_elite := phase_random.next() < 0.4 and fights >= 3
-		elite = fight == fights - 1 or (second_elite and fight == fights - 2)
-		if elite:
-			count = 3 + (1 if random.next() < 0.5 or level >= 5 else 0)
-		else:
-			count = 2 + (1 if fight >= 2 and random.next() < 0.35 else 0)
+		var patrol := patrol_row(fight, fights)
+		count = int(patrol.get("Count", 2)) + (1 if random.next() < float(patrol.get("ExtraChance", 0.0)) else 0)
+		hp_mult = float(patrol.get("HpScale", 1.0))
+		damage = int(patrol.get("Damage", 0))
 
 	# Count é em posições: um inimigo grande ocupa duas; quem não cabe sai do grupo.
 	var profile_id: String = route.node_id
@@ -459,15 +489,15 @@ static func corridor_enemies(expedition: Dictionary, index: int) -> Array:
 		units.append(spec)
 	# Mais forte com o nível: vida da tabela (de ~metade no começo até um pouco acima) e dano.
 	var hp_scale := minf(1.3, 0.45 + 0.06 * level)
-	var light := not boss and not elite
+	var leader: float = float(pacing_row("boss").get("LeaderHp", 1.8))
 	for unit in units.size():
 		var spec: Dictionary = units[unit]
 		var row: Dictionary = enemies[spec.enemy_id]
 		spec.unit_id = "corridor_%d_%d_%d_%s" % [route.seed, index, unit, spec.enemy_id]
-		var scale := hp_scale * (1.6 if boss and unit == 0 else (0.75 if light else 1.0))
+		var scale := hp_scale * (leader if boss and unit == 0 else hp_mult)
 		spec.max_hp = maxi(4, roundi(float(row.MaxHp) * scale))
 		spec.hp = spec.max_hp
-		spec.damage_bonus = maxi(0, level / 4 + (1 if boss else (-1 if light else 0)))
+		spec.damage_bonus = maxi(0, level / 4 + damage)
 		spec.display_name = row.DisplayName
 	if boss and not units.is_empty():
 		units[0].display_name += " · Guardião"

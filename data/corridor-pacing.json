@@ -1,0 +1,50 @@
+[
+  {
+    "Name": "corridor",
+    "Breaks": [
+      "loot",
+      "rest",
+      "passage",
+      "loot",
+      "loot"
+    ],
+    "CalmPairs": [
+      2,
+      3,
+      4
+    ],
+    "Description": "O corredor (#292): 10 trechos, a partida, 4 pares e o guardião. 3 pares têm uma patrulha e uma pausa; o par calmo, sorteado entre CalmPairs (1 = trechos 2 e 3), tem duas pausas. Breaks: as 5 pausas, em ordem sorteada."
+  },
+  {
+    "Name": "patrol_1",
+    "Count": 2,
+    "ExtraChance": 0.35,
+    "HpScale": 0.9,
+    "Damage": -1,
+    "Description": "A primeira patrulha: 2 posições (3 em 35% das rotas), 90% da vida, -1 de dano."
+  },
+  {
+    "Name": "patrol_2",
+    "Count": 3,
+    "ExtraChance": 0,
+    "HpScale": 1.0,
+    "Damage": 0,
+    "Description": "A segunda: 3 posições, vida cheia, dano normal."
+  },
+  {
+    "Name": "patrol_3",
+    "Count": 4,
+    "ExtraChance": 0,
+    "HpScale": 1.1,
+    "Damage": 0,
+    "Description": "A última antes do guardião, a forte: 4 posições, 110% da vida."
+  },
+  {
+    "Name": "boss",
+    "Count": 4,
+    "LeaderHp": 1.8,
+    "Damage": 1,
+    "Description": "O guardião das fases 1 a 4: 4 posições, o líder com 1,8x a vida e os outros com 1,3x (acima da patrulha forte), +1 de dano. O da fase 5 (o Porteiro) tem o grupo próprio.",
+    "HpScale": 1.3
+  }
+]
