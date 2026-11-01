@@ -1,4 +1,4 @@
-## A vantagem de tipo na tela (#227): a linhagem do herói (a da classe) e a família mecânica do inimigo, quem cada uma
+## A vantagem de tipo na tela (#227): a linhagem do herói (a da espécie dele, #189) e a família mecânica do inimigo, quem cada uma
 ## vence e de quem perde, nos textos da ficha, da inspeção e da mira. A regra é a do motor (AHCombatEngine.type_multiplier),
 ## lida das mesmas tabelas (GameData.combat: type_classes e type_advantage).
 class_name AHTypes
@@ -14,10 +14,20 @@ static func percent() -> int:
 	return roundi((float(GameData.combat.type_advantage.Multiplier) - 1.0) * 100.0)
 
 
-## A linhagem de uma classe ("" sem).
-static func of_class(class_id: String) -> String:
-	var hero_class = GameData.combat.classes.get(class_id)
-	return String(hero_class.Lineage) if hero_class != null else ""
+## A linhagem de uma espécie ("" sem).
+static func of_species(species_id: String) -> String:
+	var row = GameData.combat.species.get(species_id)
+	return String(row.Lineage) if row != null else ""
+
+
+## A linhagem de um herói do elenco: a da espécie dele (#189).
+static func of_hero(hero) -> String:
+	return of_species(AHSpecies.of_hero(hero))
+
+
+## A linhagem de uma unidade de herói na luta, como o motor a lê (AHCombatEngine.type_of).
+static func of_unit(unit) -> String:
+	return of_species(GameData.combat.species_of(unit.class_id, unit.species))
 
 
 ## A família mecânica de um inimigo ("" sem).

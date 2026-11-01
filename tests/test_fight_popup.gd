@@ -181,10 +181,11 @@ func _cargo_after_popup() -> void:
 	# A luta vira a do guardião (a carga depende dela), e os quatro ficam a um passo do nível.
 	arena.boss_fight = true
 	street.corridor._fight.boss = true
-	# O pior caso: os quatro nomes mais longos dos recrutas (NAME_POOLS), os quatro de Treino pronto, o XP e a carga.
+	# O pior caso: os quatro nomes mais longos dos recrutas (os nomes das espécies, #189), os quatro de Treino pronto, o
+	# XP e a carga.
 	var long_names: Array = []
-	for pool in load("res://scripts/flow/station_rules.gd").NAME_POOLS.values():
-		long_names.append_array(pool)
+	for species_id in GameData.table("species"):
+		long_names.append_array(AHSpecies.names(species_id))
 	long_names.sort_custom(func(a, b): return a.length() > b.length())
 	for i in hud.session.state.player_team.size():
 		var unit = hud.session.state.player_team[i]

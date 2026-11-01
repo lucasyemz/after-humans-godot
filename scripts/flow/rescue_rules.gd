@@ -110,7 +110,7 @@ static func prisoner_name(campaign: Dictionary) -> String:
 	return String(rescue.recruit.get("display_name", ""))
 
 
-## Quem é o preso: "Gato · Ágil, Ansioso" (a classe e os traços).
+## Quem é o preso: "Gato · Incursão · Ágil, Ansioso" (a espécie, o papel e os traços).
 static func profile_text(campaign: Dictionary) -> String:
 	var rescue := current(campaign)
 	var class_id := ""
@@ -123,11 +123,12 @@ static func profile_text(campaign: Dictionary) -> String:
 	else:
 		class_id = String(rescue.get("recruit", {}).get("class_id", ""))
 		perks = rescue.get("recruit", {}).get("perks", [])
-	var row = GameData.row("classes", class_id)
 	var names: Array = perks.map(func(id):
 		var perk = GameData.row("perks", String(id))
 		return TranslationServer.translate(String(perk.DisplayName)) if perk != null else String(id))
-	var kind: String = TranslationServer.translate(String(row.DisplayName)) if row != null else class_id
+	# A espécie e o papel (#189): "Coruja · Tiro".
+	var who = S.hero(campaign, String(rescue.get("hero_id", ""))) if rescue.kind == "captured" else rescue.get("recruit", {})
+	var kind: String = AHSpecies.kind_text(who) if GameData.row("classes", class_id) != null else class_id
 	return kind if names.is_empty() else " · ".join([kind, ", ".join(names)])
 
 

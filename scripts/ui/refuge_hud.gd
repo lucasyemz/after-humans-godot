@@ -2609,7 +2609,7 @@ func _civilian_card(c: Dictionary, who: Dictionary) -> void:
 	names.add_child(AHKit.label(who.name, "row", AHKit.TEXT, true))
 	names.add_child(AHKit.label(tr("%s · %s") % [tr(who.role), tr(who.species)], "small", AHKit.AMBER))
 	var working := S.civilian_working(c, who.id)
-	box.add_child(_wrapped((tr("Ponto forte: %s") % tr(who.benefit)) if working else tr("Sem comida ou água no último ciclo: o ponto forte está parado até a próxima volta."),
+	box.add_child(_wrapped((tr("Ponto forte: %s") % tr(who.benefit)) if working else tr("Sem comida ou água no último ciclo: o ponto forte está parado até o próximo dia."),
 		"small", AHKit.TEXT if working else AHKit.alert_text(), false, BODY_WIDTH - 40.0))
 	box.add_child(_wrapped(tr("Ponto fraco: %s") % tr(who.drawback), "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
 	box.add_child(_wrapped((tr("Pedido entregue: %s.") % tr(who.request_reward)) if S.has_completed_request(c, who.id) else (tr("Pedido: %s") % tr(who.need)),
@@ -2791,7 +2791,7 @@ func _close_departure() -> void:
 ## chip, em alerta só quando falta.
 func _canteen(c: Dictionary) -> void:
 	var f := S.forecast(c, 4)
-	_section(tr("Próxima volta (equipe de 4)"))
+	_section(tr("Próxima expedição (equipe de 4)"))
 	var food := _inset()
 	food.get_parent().name = "Supplies"
 	_resource_head(food, "lobby-food", tr("Suprimentos"))
@@ -2807,7 +2807,7 @@ func _canteen(c: Dictionary) -> void:
 		[tr("a equipe e os moradores bebem %d") % f.water_consumed, AHKit.TEXT]],
 		_chip("lobby-water", str(f.water_after), AHKit.alert_text() if f.thirsty else AHKit.TEXT)))
 	if f.thirsty:
-		water.add_child(_wrapped(tr("A água vai faltar na volta."), "small", AHKit.alert_text(), false, BODY_WIDTH - 40.0))
+		water.add_child(_wrapped(tr("A água vai faltar na próxima expedição."), "small", AHKit.alert_text(), false, BODY_WIDTH - 40.0))
 	var power := _inset()
 	power.get_parent().name = "Power"
 	_resource_head(power, "lobby-energy", tr("Energia"))
@@ -3233,7 +3233,7 @@ func _infirmary(c: Dictionary, level: int) -> void:
 	for entry in fallen:
 		_body.add_child(_fallen_card(c, entry))
 	if S.rest_block(c) == "":
-		_text(tr("Ninguém pode partir agora. Passar um dia na Estação gasta e produz como uma volta, e cada caído fica um dia mais perto."), AHKit.TEXT, "small")
+		_text(tr("Ninguém pode partir agora. Passar um dia na Estação gasta e produz como um dia de expedição, e cada caído fica um dia mais perto."), AHKit.TEXT, "small")
 		_footer_primary(tr("Esperar um dia"), "sleep", func(): _act(S.rest_day(Campaign.state), tr("Um dia passou na Estação.")))
 
 
@@ -3300,7 +3300,7 @@ func _night_plan(c: Dictionary) -> void:
 	buy.pressed.connect(func(): _act("" if S.buy_supplies(Campaign.state) else tr("Sementes insuficientes."), tr("Suprimento comprado.")))
 	_body.add_child(buy)
 	if night.thirsty:
-		_text(tr("Faltou água na volta: o descanso rende menos instinto."), AHKit.alert_text(), "small")
+		_text(tr("Faltou água no último dia: o descanso rende menos instinto."), AHKit.alert_text(), "small")
 	for row in preview.heroes:
 		_body.add_child(_night_card(c, row, preview.heroes.size() > 1))
 	var short: int = maxi(0, preview.needed - preview.available)
@@ -3504,7 +3504,7 @@ func _train() -> void:
 	_trait_box("", tr("Pedido"), tr(who.need), AHKit.AMBER)
 	var before := S.forecast(c, 4)
 	var after := S.forecast_with(c, who.id, 4)
-	_section(tr("Na próxima volta"))
+	_section(tr("Na próxima expedição"))
 	for spec in [[tr("Suprimentos depois da noite"), "lobby-food", before.food_after_night, after.food_after_night],
 			[tr("Água depois da noite"), "lobby-water", before.water_after, after.water_after],
 			[tr("Energia"), "lobby-energy", before.power_capacity, after.power_capacity]]:
@@ -3570,7 +3570,7 @@ func _train_recruit(c: Dictionary) -> void:
 	name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	names.add_child(name_label)
 	if hero_class != null:
-		names.add_child(_wrapped(tr("%s · %s") % [tr(hero_class.DisplayName), tr(hero_class.Role)], "row", AHKit.AMBER, false, name_width))
+		names.add_child(_wrapped(AHSpecies.kind_text(recruit), "row", AHKit.AMBER, false, name_width))
 	if String(recruit.get("origin", "")) != "":
 		names.add_child(_wrapped(tr(String(recruit.origin)), "text", AHKit.MUTED, false, name_width))
 	# O que pede e o motivo de não poder ficar antes dos traços: no texto Maior, à vista sem rolar.

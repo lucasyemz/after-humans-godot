@@ -53,7 +53,7 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 		var own: Dictionary = camp.get("heroes", {}).get(String(hero.id), {})
 		session.calm[hero.id] = mini(int(bonus.calm), int(hero.get("instinct", 0)))
 		players.append(AHCombatEngine.make_hero_unit({
-			"Id": hero.id, "ClassId": hero.class_id, "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
+			"Id": hero.id, "ClassId": hero.class_id, "Species": String(hero.get("species", "")), "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
 			"Instinct": maxi(0, int(hero.get("instinct", 0)) - int(bonus.calm)), "Perks": hero.get("perks", []), "Trauma": hero.get("trauma", false),
 			"RelicId": hero.get("relic_id", ""), "ExpeditionUses": hero.get("expedition_uses", {}),
 			"AbilityIds": AHHeroSkills.equipped(hero) if not Array(hero.get("loadout", [])).is_empty() else [],
