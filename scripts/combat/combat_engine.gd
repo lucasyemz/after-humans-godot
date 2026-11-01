@@ -84,6 +84,35 @@ static func is_direct_attack(ability: Dictionary) -> bool:
 	return ability.DamageRange.Max > 0 and (ability.TargetType == "SingleEnemy" or ability.TargetType == "MarkedEnemy")
 
 
+## A classificação de uma unidade para a vantagem de tipo (#227): a linhagem da classe do herói ou a família mecânica do
+## inimigo ("" sem classificação).
+func type_of(unit: Unit) -> String:
+	if unit == null:
+		return ""
+	if unit.is_player:
+		var hero_class = data.classes.get(unit.class_id)
+		return String(hero_class.Lineage) if hero_class != null else ""
+	var enemy = data.enemies.get(unit.enemy_id)
+	return String(enemy.MechFamily) if enemy != null else ""
+
+
+## O multiplicador de tipo do dano direto (#227): Multiplier se a classificação do atacante vence a do defensor (só nesse
+## sentido), 1 nos demais e com a regra desligada (TypeAdvantage.Enabled).
+func type_multiplier(attacker: Unit, defender: Unit) -> float:
+	if not bool(data.type_advantage.Enabled):
+		return 1.0
+	var attacking = data.type_classes.get(type_of(attacker))
+	if attacking == null or not attacking.Beats.has(type_of(defender)):
+		return 1.0
+	return float(data.type_advantage.Multiplier)
+
+
+## O dano direto com o tipo, arredondado para o mais próximo (o meio para cima), para o bônus não sumir nos danos
+## pequenos (decisão do Lucas): 2 → 3, 3 → 4, 4 → 5, 6 → 8.
+static func typed_damage(damage: int, multiplier: float) -> int:
+	return damage if multiplier == 1.0 else floori(damage * multiplier + 0.5)
+
+
 static func status_damage(raw_damage: int, weak: bool) -> int:
 	if raw_damage <= 0:
 		return 0
@@ -596,6 +625,15 @@ func _process_turn_start_dot(unit: Unit, out_events: Array) -> bool:
 	return true
 
 
+## O dano direto com a vantagem de tipo do atacante sobre o alvo, com o aviso na luta quando ela vale.
+func _apply_type(attacker: Unit, target: Unit, damage: int, events: Array) -> int:
+	var multiplier := type_multiplier(attacker, target)
+	if multiplier == 1.0:
+		return damage
+	_add_event(events, tr("Vantagem +%d%%") % roundi((multiplier - 1.0) * 100.0), EventType.INFO, target.id)
+	return typed_damage(damage, multiplier)
+
+
 ## Redução do bloqueio, em float32 como AHKitRules::BlockReduction.
 static func _block_reduction(pierce_percent: int, corroded: bool) -> float:
 	var pierce := clampi(pierce_percent, 0, 100)
@@ -943,6 +981,8 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			rolled = status_damage(rolled, attempt.weak)
 			if is_machine(target):
 				rolled = maxi(1, rolled * ability.MachineDamagePercent / 100)
+			# O tipo (#227): depois do percentual contra máquina, antes do Vulnerável e do Bloqueio (_apply_damage).
+			rolled = _apply_type(user, target, rolled, events)
 			target.tokens.block = maxi(0, target.tokens.block - ability.RemoveBlock)
 			if ability.bRequiresMarkOrVuln:
 				if target.mark_duration > 0:
@@ -1467,6 +1507,8 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 							_log(tr("[RIVALIDADE] %s estremeceu ao ver a falha do rival (+5 Instinto).") % _n(other))
 							_apply_instinct_crisis(other, events)
 			rolled = status_damage(rolled, attempt.weak)
+			# O tipo (#227), o mesmo lugar do lado do herói: antes do Vulnerável e do Bloqueio.
+			rolled = _apply_type(enemy, chosen, rolled, events)
 			var hit_id := chosen.id
 			_apply_damage(chosen, rolled, true, events, "%s (%s)" % [enemy.display_name, action_name])
 			chosen = _find(state.player_team, func(u): return u.id == hit_id)

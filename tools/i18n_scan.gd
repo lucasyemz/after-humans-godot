@@ -22,7 +22,8 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/street/street.gd", "res://scripts/street/street_corridor.gd", "res://scripts/scenario/scenario_world.gd",
 	"res://scripts/station/station_build.gd", "res://scripts/campaign/campaign_service.gd",
 	"res://scripts/core/game_data_service.gd", "res://scripts/flow/game_flow.gd", "res://scripts/combat/combat_arena.gd",
-	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd", "res://scripts/flow/station_grid.gd", "res://scripts/flow/hero_skills.gd"]
+	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd", "res://scripts/flow/station_grid.gd",
+	"res://scripts/flow/type_advantage.gd", "res://scripts/flow/hero_skills.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
 	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],
@@ -31,7 +32,7 @@ const DATA_FIELDS := {
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
 	"hero-upgrades": ["DisplayName", "Description"], "recruitment": ["Text"], "hero-jobs": ["Text"],
 	"night-events": ["Text", "TextOne", "TextEmpty", "TextWatched", "TextProtected"],
-	"skins": ["DisplayName", "ShortName", "Text"],
+	"skins": ["DisplayName", "ShortName", "Text"], "type-classes": ["DisplayName", "ShortName"],
 }
 
 

@@ -19,9 +19,9 @@ const ABILITY := {
 	},
 	"Cleanses": {"bMark": false, "bBlind": false, "bWeak": false, "bImmobilize": false, "bVuln": false, "bDot": false},
 }
-const CLASS := {"DisplayName": "", "BaseMaxHp": 1, "BaseSpeed": 0, "AbilityIds": []}
+const CLASS := {"DisplayName": "", "Lineage": "", "BaseMaxHp": 1, "BaseSpeed": 0, "AbilityIds": []}
 const ENEMY := {
-	"DisplayName": "", "Category": "None", "MaxHp": 1, "Speed": 0, "SpriteKey": "", "bIsBoss": false,
+	"DisplayName": "", "Category": "None", "MechFamily": "", "MaxHp": 1, "Speed": 0, "SpriteKey": "", "bIsBoss": false,
 	"FormationSize": 0, "DisplacementResist": 0.2, "DotResist": 0.2, "ActionIds": [],
 }
 const ENEMY_ACTION := {
@@ -35,6 +35,9 @@ const ENEMY_ACTION := {
 }
 const PERK := {"DisplayName": "", "Value": 0.0, "Speed": 0, "Virtue": 0.0}
 const RELIC := {"DisplayName": "", "MaxHpBonus": 0, "SpeedBonus": 0}
+## A vantagem de tipo (#227): as classificações (linhagens e famílias mecânicas) e quem vence quem (Beats), e a chave.
+const TYPE_CLASS := {"Kind": "", "DisplayName": "", "ShortName": "", "Beats": []}
+const TYPE_ADVANTAGE := {"Enabled": false, "Multiplier": 1.25}
 const INSTINCT := {"Max": 200, "Crisis": {"Reset": 120, "HpLoss": 0.2, "HpHeal": 0.15, "TokenCap": 3, "BaseVirtue": 0.25}}
 
 var classes := {}
@@ -44,6 +47,9 @@ var enemy_actions := {}
 var perks := {}
 var relics := {}
 var instinct := {}
+var type_classes := {}
+## {Enabled, Multiplier}: sem a tabela, desligada.
+var type_advantage := TYPE_ADVANTAGE.duplicate()
 
 
 ## Valor de float32 (como um float da DataTable lido em double pelo C++).
@@ -61,6 +67,10 @@ func load_from(data_dir: String, kit_dir: String = "") -> bool:
 	perks = _load_table(data_dir.path_join("perks.json"), PERK)
 	relics = _load_table(data_dir.path_join("relics.json"), RELIC)
 	instinct = _load_table(data_dir.path_join("instinct.json"), INSTINCT)
+	if FileAccess.file_exists(data_dir.path_join("type-classes.json")):
+		type_classes = _load_table(data_dir.path_join("type-classes.json"), TYPE_CLASS)
+	if FileAccess.file_exists(data_dir.path_join("type-advantage.json")):
+		type_advantage = _load_table(data_dir.path_join("type-advantage.json"), TYPE_ADVANTAGE).get("TypeAdvantage", type_advantage)
 	return not (classes.is_empty() or abilities.is_empty() or enemies.is_empty() or enemy_actions.is_empty())
 
 
