@@ -185,6 +185,7 @@ static func migrate(campaign: Dictionary) -> void:
 			entry.art_variant = _least_used_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
 	# As sete habilidades (#259): os campos novos; o que um save editado traz e não vale volta ao padrão.
 	AHHeroSkills.migrate(campaign)
+	AHCampSkills.migrate(campaign)
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
 		if String(entry.get("skin_id", "")) == "":

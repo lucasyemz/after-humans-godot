@@ -16,6 +16,7 @@ signal event_choice(choice_id: String)
 signal event_closed
 signal camp_food(hero_id: String)
 signal camp_bandage(hero_id: String)
+signal camp_skill(hero_id: String, skill_id: String, target_id: String)
 signal camp_leave
 signal result_continue
 signal menu_return
@@ -1428,6 +1429,7 @@ func show_camp(_campaign: Dictionary, camp: AHCampScene) -> void:
 	camp_hud = AHCampHud.new(camp)
 	camp_hud.food.connect(func(id): camp_food.emit(id))
 	camp_hud.bandage.connect(func(id): camp_bandage.emit(id))
+	camp_hud.skill.connect(func(id, skill_id, target_id): camp_skill.emit(id, skill_id, target_id))
 	camp_hud.leave.connect(func(): camp_leave.emit())
 	add_child(camp_hud)
 	# Embaixo, a barra do acampamento no lugar da fila da equipe; o Menu e a Mochila continuam no canto.

@@ -22,6 +22,7 @@ func run(context) -> void:
 	Tips.enabled = false
 	_manifest()
 	await _camp()
+	await _skills_in_camp()
 	await _reopened()
 	await _menu_in_camp()
 	await _camp_with_cargo()
@@ -98,6 +99,122 @@ func _street_at_camp(c: Dictionary):
 	route.sites[site].has_enemy = false
 	await street.corridor._enter_house(site)
 	return street
+
+
+## As habilidades de acampamento (#261) na tela: as do escolhido embaixo das cartas e o Tempo de fogueira ao lado do
+## instinto; a de aliado pede o alvo (a carta ou o corpo de outro); a de si vale na hora; a linha de estado diz o porquê.
+func _skills_in_camp() -> void:
+	var c: Dictionary = Campaign.create_initial(29)
+	J.start_expedition(c, "fase_1", 29)
+	var street = await _street_at_camp(c)
+	if not t.check(street != null, "a rua abre com a casa do acampamento (habilidades)"):
+		return
+	var corridor: AHStreetCorridor = street.corridor
+	var hud: AHExplorationHud = street.exploration_hud
+	await corridor._start_camp()
+	var camp: AHCampScene = corridor.camp
+	var ids: Array = camp.members.map(func(m): return m.hero_id)
+	var bento := "hero_cao_bento"
+	camp.select(ids.find(bento))
+	await _until(func(): return not camp.switching(), 3.0)
+	await _frames(2)
+	var panel: AHCampHud = hud.camp_hud
+	t.equal(panel.skill_buttons.map(func(b): return b.get_meta("skill")), AHCampSkills.equipped(S.hero(Campaign.state, bento)),
+		"embaixo das cartas, as habilidades que o Bento leva")
+	t.check((panel.find_child("Time", true, false) as Label).text.contains("12/12"), "o Tempo de fogueira começa em 12")
+	var nick := "hero_gato_nick"
+	var shoulder: Button = panel.find_child("Skill_camp_cao_ombro_a_ombro", true, false)
+	shoulder.pressed.emit()
+	await _frames(2)
+	t.check(not panel.targeting.is_empty() and String(panel._status.text).contains("aliado"), "a de aliado pede o alvo")
+	var body: Button = panel.find_child("Body_" + nick, true, false)
+	body.pressed.emit()
+	await _until(func(): return not camp.switching(), 3.0)
+	await _frames(3)
+	var next := AHCampSkills.next_fight(Campaign.state)
+	t.equal([AHCampSkills._next_of(next, bento, "block"), AHCampSkills._next_of(next, nick, "block")], [1, 1], "o clique no Nick usa: os dois com 1 Bloqueio")
+	t.equal(camp.selected_id(), bento, "e o escolhido volta a ser quem usou")
+	t.check((panel.find_child("Time", true, false) as Label).text.contains("9/12"), "o Tempo cai para 9")
+	(panel.find_child("Skill_camp_cao_primeiro_turno", true, false) as Button).pressed.emit()
+	await _frames(3)
+	t.check(AHCampSkills.camp(Campaign.state).watch, "o Primeiro Turno vale na hora (vigia)")
+	t.check((panel.find_child("Skill_camp_cao_primeiro_turno", true, false) as Button).disabled, "e fica apagado: uma vez por acampamento")
+	(panel.find_child("Skill_camp_cao_primeiro_turno", true, false) as Button).focus_entered.emit()
+	await _frames(1)
+	t.check(String(panel._status.text).contains("Já usada"), "a linha de estado diz por quê")
+	# Pelo teclado: a de aliado, as setas até outro herói e Interagir (o caminho em que o herói escolhido muda).
+	var conversa: Button = panel.find_child("Skill_camp_comum_conversa_ao_fogo", true, false)
+	S.hero(Campaign.state, nick).instinct = 30
+	conversa.pressed.emit()
+	await _frames(1)
+	camp.select(ids.find(nick))
+	await _until(func(): return not camp.switching(), 3.0)
+	var accept := InputEventAction.new()
+	accept.action = "interact"
+	accept.pressed = true
+	_tree.root.push_input(accept)
+	await _until(func(): return not camp.switching(), 3.0)
+	await _frames(3)
+	t.equal(int(S.hero(Campaign.state, nick).instinct), 15, "setas até o Nick e Interagir: a Conversa ao Fogo vale (−15 de Instinto)")
+	t.equal(camp.selected_id(), bento, "e o escolhido volta ao Bento")
+	# ←/→ com o foco numa habilidade: a linha se refaz para o outro herói sem erro, e o foco fica no painel.
+	(panel.find_child("Skill_camp_cao_ombro_a_ombro", true, false) as Button).grab_focus()
+	await _frames(1)
+	var right := InputEventAction.new()
+	right.action = "move_right"
+	right.pressed = true
+	_tree.root.push_input(right)
+	var release := InputEventAction.new()
+	release.action = "move_right"
+	release.pressed = false
+	_tree.root.push_input(release)
+	await _until(func(): return not camp.switching(), 3.0)
+	await _frames(3)
+	var focused: Control = street.get_viewport().gui_get_focus_owner()
+	t.check(camp.selected_id() != bento and focused != null and panel.is_ancestor_of(focused), "←/→ com o foco numa habilidade: outro herói, e o foco continua no painel")
+	t.equal(panel._skills_of, camp.selected_id(), "a linha é a do novo escolhido")
+	camp.select(ids.find(bento))
+	await _until(func(): return not camp.switching(), 3.0)
+	await _frames(2)
+	# Usar pelo teclado com tudo apagado em volta (a vida cheia, o instinto em 0): o foco não cai em CONTINUAR.
+	var full = S.hero(Campaign.state, bento)
+	full.hp = full.max_hp
+	full.instinct = 0
+	AHCampSkills.start(Campaign.state)
+	panel.refresh()
+	await _frames(1)
+	var ward: Button = panel.find_child("Skill_camp_cao_primeiro_turno", true, false)
+	if t.check(ward != null and not ward.disabled, "num acampamento novo, o Primeiro Turno serve"):
+		ward.grab_focus()
+		ward.pressed.emit()
+		await _frames(3)
+		var after: Control = street.get_viewport().gui_get_focus_owner()
+		t.check(after != panel.leave_button, "depois de usar, o foco não vai para CONTINUAR (%s)" % (after.name if after else "nenhum"))
+	# Com tudo apagado (o Tempo gasto, a vida cheia, o instinto em 0), ↓ a partir da carta chega a CONTINUAR.
+	for id in ids:
+		var someone = S.hero(Campaign.state, id)
+		someone.hp = someone.max_hp
+		someone.instinct = 0
+	AHCampSkills.camp(Campaign.state).time = AHCampSkills.time_budget()
+	panel.refresh()
+	await _frames(1)
+	(panel._cards.get(bento) as Control).grab_focus()
+	await _frames(1)
+	var down := InputEventAction.new()
+	down.action = "ui_down"
+	down.pressed = true
+	_tree.root.push_input(down)
+	await _frames(2)
+	t.equal(street.get_viewport().gui_get_focus_owner(), panel.leave_button, "com tudo apagado, ↓ a partir da carta chega a CONTINUAR")
+	# Esc desiste do alvo.
+	(panel.find_child("Skill_camp_comum_conversa_ao_fogo", true, false) as Button).pressed.emit()
+	await _frames(1)
+	panel.cancel_target()
+	t.check(panel.targeting.is_empty(), "Esc desiste do alvo")
+	await corridor._on_camp_leave()
+	await _frames(3)
+	t.check(not AHCampSkills.camp(Campaign.state).get("watch", false) and String(Campaign.state.session.expedition.corridor.get("camp_night", "")) != "",
+		"ao levantar acampamento, a noite se resolve (camp_night) e o acampamento seguinte começa do zero")
 
 
 func _camp() -> void:
