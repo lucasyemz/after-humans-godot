@@ -38,7 +38,11 @@ camadas dos recrutas vêm nos PRs seguintes.
 - **A lista de nomes do sapo** ainda tem nomes de coruja (Bubo, Noctis, Mirante). Ela passou para a espécie como estava,
   porque mexer nela muda os nomes sorteados. A revisão fica para quando as fichas do elenco chegarem.
 - **Todo recruta ainda chega com a espécie padrão da classe**, porque a arte do recruta é por classe. A espécie livre
-  (um cão na Química) depende do compositor de camadas, que vem no PR 3.
+  (um cão na Química) depende do compositor de camadas, que vem no PR 3. Até lá, só um save editado tem uma espécie
+  diferente da padrão. Nesse caso, a altura segue a espécie e a arte segue a classe. O PR 3 traz as duas juntas, e
+  também leva a espécie no recruta do trem, no pedido de ajuda e no memorial antigo.
+- **O "Resgate"** é ao mesmo tempo o papel do tatu e a mecânica do #188, e na escolha do preso aparece "Tatu · Resgate".
+  É o nome aprovado; só fica o registro.
 
 ## Testes
 
@@ -53,3 +57,24 @@ camadas dos recrutas vêm nos PRs seguintes.
   (`test_fight_popup`) passam a ler a espécie.
 - `tests/run_all.gd` inteiro, com a paridade 48/48 e o save.
 - As fotos acima: `tools/capture_227.gd` e `tools/capture_122.gd`, na `main` e nesta branch.
+
+## QA
+
+- **Rodada 1: APROVADO**, só com observações baixas. A QA conferiu:
+  - o save de antes, sem `species`, pelo load de verdade (`Campaign.save` e `load_or_new`);
+  - um cão no papel Química numa sessão de luta real: o motor, a ficha e a altura;
+  - o Bento como gato na inspeção e na mira da #227, no Normal e no Maior;
+  - o trem, o relatório, a Sala e a partida no Maior, em português e em inglês;
+  - os filtros, a paridade 48/48 e as 7 habilidades da #259.
+
+  Corrigidas na hora:
+  - a espécie que a tabela não conhece (um save editado) deixava o texto como " · Proteção" e o herói sem linhagem.
+    Agora cai na padrão da classe, na tela e no combate, com o teste;
+  - no en.po, "Tiro" passa a ser "Marksmanship" e "Incursão" passa a ser "Incursion", como atividades, igual aos
+    outros papéis.
+
+  Ficam:
+  - a altura e a arte que podem divergir até o PR 3;
+  - a espécie no trem e no memorial, que fica para o PR 3;
+  - o `Role` e a `Description` das classes, que não aparecem mais em nenhuma tela;
+  - `docs/narrative/review.md`, que lista os nomes antigos como histórico.

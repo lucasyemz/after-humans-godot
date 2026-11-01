@@ -12,12 +12,13 @@ static func default_for(class_id: String) -> String:
 	return String(hero_class.get("DefaultSpecies", "")) if hero_class != null else ""
 
 
-## A espécie de um herói (o dicionário do elenco): a dele, ou a padrão da classe.
+## A espécie de um herói (o dicionário do elenco): a dele, ou a padrão da classe (sem uma, ou com uma que a tabela não
+## conhece, como a de um save editado).
 static func of_hero(hero) -> String:
 	if hero == null:
 		return ""
 	var own := String(hero.get("species", ""))
-	return own if own != "" else default_for(String(hero.get("class_id", "")))
+	return own if row(own) != null else default_for(String(hero.get("class_id", "")))
 
 
 static func row(species_id: String):

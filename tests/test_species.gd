@@ -59,6 +59,11 @@ func _save() -> void:
 	t.equal(old.roster[0].species, "gato", "a migração não muda nada na segunda vez")
 	t.equal(AHSpecies.kind_text(old.roster[0]), "Gato · Proteção", "a ficha: a espécie do indivíduo e o papel")
 	t.equal(AHSpecies.kind_text(old.roster[4]), "Guaxinim · Sabotagem", "o Risco: Guaxinim · Sabotagem")
+	# Uma espécie que a tabela não conhece (um save editado): vale a padrão da classe, sem separador solto.
+	var odd := Campaign.new_hero("hero_cao_9", "cao", "Teste", 34, [])
+	odd.species = "lobo"
+	t.equal(AHSpecies.kind_text(odd), "Cão · Proteção", "a espécie desconhecida cai na padrão da classe")
+	t.equal(GameData.combat.species_of("cao", "lobo"), "cao", "e no combate também")
 
 
 func _lineage() -> void:

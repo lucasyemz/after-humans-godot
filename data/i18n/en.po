@@ -6968,7 +6968,7 @@ msgstr "Tank and protection"
 
 #. classes.1.DisplayName
 msgid "Incursão"
-msgstr "Infiltration"
+msgstr "Incursion"
 
 #. classes.1.Role
 #. classes.1.Description
@@ -6986,7 +6986,7 @@ msgstr "Healing and damage over time"
 
 #. classes.3.DisplayName
 msgid "Tiro"
-msgstr "Marksman"
+msgstr "Marksmanship"
 
 #. classes.3.Role
 #. classes.3.Description

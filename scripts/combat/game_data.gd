@@ -62,10 +62,11 @@ static func f32(value: float) -> float:
 	return PackedFloat32Array([value])[0]
 
 
-## A espécie de uma unidade de herói (#189): a dela, ou a padrão da classe; "" sem nenhuma (os kits históricos da
+## A espécie de uma unidade de herói (#189): a dela, ou a padrão da classe (sem uma, ou com uma que a tabela não conhece);
+## "" sem nenhuma (os kits históricos da
 ## paridade não têm, e ficam sem linhagem).
 func species_of(class_id: String, species_id: String) -> String:
-	if species_id != "":
+	if species.has(species_id):
 		return species_id
 	var hero_class = classes.get(class_id)
 	return String(hero_class.DefaultSpecies) if hero_class != null else ""
