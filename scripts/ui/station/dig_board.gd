@@ -213,7 +213,8 @@ func _block_card(c: Dictionary, key: String) -> Button:
 	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name.custom_minimum_size = Vector2(CARD.x - 28.0, 0)
 	box.add_child(name)
-	card.tooltip_text = name.text
+	# O aviso vermelho, cortado no Maior, vai inteiro na dica.
+	card.tooltip_text = name.text if String(info.alert) == "" else name.text + "\n" + neighbor_reason(c, key)
 	var tone: Color = AHKit.AMBER if info.state == "front" else (AHKit.good() if info.state in ["free", "dig"] else AHKit.MUTED)
 	var tag := AHKit.label(String(info.tag), "small", tone, true, true)
 	tag.name = "Tag"

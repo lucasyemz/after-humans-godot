@@ -651,6 +651,8 @@ func _build_frame(c: Dictionary) -> void:
 func _nav(id: String) -> void:
 	match id:
 		"overview":
+			# A aba vai à vista geral, mesmo de um painel aberto pela planta (#284).
+			_back_to = ""
 			close_panel()
 		"facilities":
 			open_service("plan")
@@ -2341,8 +2343,11 @@ func _board_button(key: String) -> Button:
 
 ## Da planta (#284) para um painel (a vaga, o bloco, o cômodo): fechar o painel volta para a planta.
 func open_from_board(place: String) -> void:
+	# A volta reabre a planta com o mesmo escolhido.
+	var chosen := block_of(place)
 	open_room(place)
 	_back_to = "dig"
+	_dig_selected = chosen if chosen != "" else "room:" + place
 
 
 ## A fala da primeira volta com escavação (#186, ponto 10) no formato do briefing: [{speaker, text}]; o cartão sem quem
