@@ -198,6 +198,8 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		campaign.unlocked_classes.append(class_id)
 		campaign.preferred_formation.append(id)
 	AHStationRules.init_new_campaign(campaign)
+	# A semente das missões solo (#183), depois dos fundadores: a mesma semente dá a mesma campanha.
+	campaign.station.side_missions.seed = rng.randi()
 	return campaign
 
 

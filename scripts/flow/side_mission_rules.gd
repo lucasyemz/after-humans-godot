@@ -34,13 +34,14 @@ static func unlocked(campaign: Dictionary) -> bool:
 
 
 ## O estado das missões na Estação: o quadro do dia (day, board), os relatórios de quem voltou (reports) e a semente
-## dos sorteios (seed, sorteada no primeiro uso; a mesma ao salvar e voltar).
+## dos sorteios (seed: da campanha nova, ou do elenco no save de antes; a mesma ao salvar e voltar).
 static func state(campaign: Dictionary) -> Dictionary:
 	var station: Dictionary = campaign.station
 	if typeof(station.get("side_missions")) != TYPE_DICTIONARY:
 		station.side_missions = {"day": -1, "board": [], "reports": []}
 	if not station.side_missions.has("seed"):
-		station.side_missions.seed = randi()
+		# O save de antes: tirada do elenco (os ids e os traços), a mesma a cada carga, salvando ou não.
+		station.side_missions.seed = hash(JSON.stringify(campaign.get("roster", []).map(func(entry): return [entry.get("id", ""), entry.get("perks", [])])))
 	return station.side_missions
 
 

@@ -199,6 +199,8 @@ static func migrate(campaign: Dictionary) -> void:
 	# Ninguém morre (#118): o memorial dos saves antigos volta em recuperação.
 	_migrate_fallen(campaign)
 	_migrate_posts(campaign)
+	# As missões solo (#183): o save de antes ganha a semente (tirada do elenco: a mesma a cada carga).
+	AHSideMissions.state(campaign)
 	# O trem de antes do #122 não tem o recruta: quem espera é um civil.
 	if typeof(campaign.station.train.get("recruit")) != TYPE_DICTIONARY:
 		campaign.station.train.recruit = {}
@@ -225,8 +227,8 @@ static func _station_defaults() -> Dictionary:
 		# já saiu no relatório (uma vez por campanha).
 		"story_events": [], "story_reports": [],
 		# As missões solo (#183): o quadro do dia e os relatórios de quem voltou.
-		# A semente nasce com a campanha (ou na migração): salvar e voltar não troca o quadro.
-		"side_missions": {"day": -1, "board": [], "reports": [], "seed": randi()},
+		# A semente nasce com a campanha (create_initial, ou AHSideMissions.state na migração).
+		"side_missions": {"day": -1, "board": [], "reports": []},
 	}
 
 
