@@ -244,11 +244,24 @@ func _build_skills(hero) -> void:
 		_skill_row.add_child(button)
 		skill_buttons.append(button)
 	_building = false
-	# O foco estava na linha (←/→ com o foco numa habilidade): vai para a mesma posição na linha nova, ou para a carta.
+	# O foco estava na linha (←/→ com o foco numa habilidade): vai para a primeira que ainda serve, ou para a carta
+	# (depois do refresh, que apaga as que não servem).
 	if had_focus:
-		var landing: Control = skill_buttons[0] if not skill_buttons.is_empty() else _cards.get(String(hero.id))
-		if landing != null:
-			landing.grab_focus.call_deferred()
+		_land_focus.call_deferred()
+
+
+## Onde o foco cai quando o dele some ou apaga: uma habilidade que ainda serve, a Ração ou o Curativo, a carta do
+## escolhido e, só por último, CONTINUAR (um E a mais não levanta acampamento enquanto há o que usar).
+func _land_focus() -> void:
+	for button in skill_buttons + [eat_button, heal_button]:
+		if is_instance_valid(button) and button.is_inside_tree() and not button.disabled:
+			button.grab_focus()
+			return
+	var card: Control = _cards.get(camp.selected_id())
+	if card != null and card.is_inside_tree():
+		card.grab_focus()
+		return
+	leave_button.grab_focus()
 
 
 func _preview_skill(skill_id: String) -> void:
@@ -524,13 +537,10 @@ func refresh() -> void:
 		control.focus_neighbor_left = control.get_path()
 		control.focus_neighbor_right = control.get_path()
 	# ←/→ são do herói em todo o painel (o _input), também nas habilidades.
-	# O botão com foco que ficou apagado (a comida acabou) passa o foco para o próximo que serve.
+	# O botão com foco que ficou apagado (a comida acabou, a habilidade já usada) passa o foco para o próximo que serve.
 	var owner := get_viewport().gui_get_focus_owner() if get_viewport() else null
 	if owner is Button and owner.disabled:
-		for button in [eat_button, heal_button, leave_button]:
-			if not button.disabled:
-				button.grab_focus()
-				break
+		_land_focus()
 
 
 ## O cuidado: o estoque ("x4") e, sem efeito ou sem estoque, o véu com riscas e o texto no tom apagado (sem transparência).

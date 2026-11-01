@@ -176,6 +176,20 @@ func _skills_in_camp() -> void:
 	camp.select(ids.find(bento))
 	await _until(func(): return not camp.switching(), 3.0)
 	await _frames(2)
+	# Usar pelo teclado com tudo apagado em volta (a vida cheia, o instinto em 0): o foco não cai em CONTINUAR.
+	var full = S.hero(Campaign.state, bento)
+	full.hp = full.max_hp
+	full.instinct = 0
+	AHCampSkills.start(Campaign.state)
+	panel.refresh()
+	await _frames(1)
+	var ward: Button = panel.find_child("Skill_camp_cao_primeiro_turno", true, false)
+	if t.check(ward != null and not ward.disabled, "num acampamento novo, o Primeiro Turno serve"):
+		ward.grab_focus()
+		ward.pressed.emit()
+		await _frames(3)
+		var after: Control = street.get_viewport().gui_get_focus_owner()
+		t.check(after != panel.leave_button, "depois de usar, o foco não vai para CONTINUAR (%s)" % (after.name if after else "nenhum"))
 	# Esc desiste do alvo.
 	(panel.find_child("Skill_camp_comum_conversa_ao_fogo", true, false) as Button).pressed.emit()
 	await _frames(1)
