@@ -1756,3 +1756,4 @@ phase_map.gd: Hero_
 phase_map.gd: Hero_%s
 mission_board.gd: Rest
 side_mission_rules.gd: roster
+refuge_hud.gd: A partida não esperou o recusado voltar ao vagão (%.0f s).
