@@ -50,3 +50,22 @@ paradas no PR #231 (tag `codex-pr231-originals`). Pela decisão do Lucas de 01/1
 - `tests/test_combat_art.gd` e `tests/test_skins.gd`.
 - `tools/capture_225.gd`: as fotos acima. Roda também na `main` de antes.
 - `tests/run_all.gd` inteiro e o modo de captura da rua.
+
+## QA
+
+- **Rodada 1: REPROVADO.**
+  - Um problema médio: o `--recruits-redraw` rodado sozinho gerava diff e desfazia a #221 dos dois. O parado do Tatu
+    voltava a ser a guarda, e o `combat_idle` dos dois sumia do manifesto.
+  - Duas observações baixas:
+    - a branch estava atrás da `main`;
+    - o parado do Tatu leva a largura da guarda.
+  - A QA conferiu e aprovou a luta de verdade, com o Tatu, o Guaxinim, o Bento e o Nick:
+    - a exploração na rua, a guarda na luta e a volta à exploração depois da vitória;
+    - as folgas entre vizinhos;
+    - os golpes e as reações com o pé e a altura do parado;
+    - os retratos na HUD;
+    - as capturas.
+
+  **Correção:** o `--recruits-redraw` reaplica as poses da #221 logo depois, como a conversão completa. Numa cópia
+  isolada, ele não gera mais diff. A largura do Tatu fica a da guarda de propósito, e o comentário da ferramenta
+  explica o motivo: a fila se espaça pela pose mais larga. A `main` foi juntada.
