@@ -273,23 +273,21 @@ func show_pose(unit: AHCombat.Unit, pose: String, ability_id: String = "") -> vo
 		card.show_art(enemy.poses[pose] if enemy.get("poses", {}).has(pose) else enemy.idle)
 
 
-## A pose de descanso pelo estado: parado, caído no Último Fôlego ou morto.
+## A pose de descanso pelo estado: parado, de pé piscando em vermelho no Último Fôlego (#281) ou caído e cinza.
 func rest_pose(unit: AHCombat.Unit) -> void:
 	var card: AHSpriteCard = cards.get(unit.id)
 	if card == null:
 		return
-	if unit.hp > 0:
+	# No Último Fôlego o herói segue de pé, na pose parada, com o pulso vermelho (a Porta da Morte do Darkest
+	# Dungeon); só cai quando o golpe seguinte o derruba de vez.
+	card.steady_danger = reduced_effects()
+	card.set_danger(unit.hp <= 0 and unit.deaths_door)
+	if unit.hp > 0 or unit.deaths_door:
 		show_pose(unit, "idle")
 		card.set_tint(Color.WHITE)
 	else:
 		show_pose(unit, "death")
-		# Morto de vez fica cinza; no Último Fôlego, só caído. Quem não tem a pose de caído (os recrutas) fica de pé,
-		# então o Último Fôlego escurece um pouco o desenho para não parecer inteiro.
-		var has_fallen: bool = not unit.is_player or hero_art(unit.hero_id).get("reactions", {}).has("death")
-		if not unit.deaths_door:
-			card.set_tint(Color(0.55, 0.55, 0.6))
-		else:
-			card.set_tint(Color.WHITE if has_fallen else Color(0.72, 0.62, 0.62))
+		card.set_tint(Color(0.55, 0.55, 0.6))
 
 
 # ---------------------------------------------------------------- início e fim
@@ -517,6 +515,10 @@ func _run() -> void:
 	# O popup do fim (#109): a vitória e a fuga fecham sozinhas (no ritmo da luta), a derrota espera um toque.
 	await hud.show_result(result, auto_battle, rewards)
 	hud.close()
+	# O pulso do Último Fôlego acaba com a luta (quem sobreviveu volta com 1 de vida).
+	for unit in session.state.player_team:
+		if cards.has(unit.id):
+			cards[unit.id].set_danger(false)
 	var occlusion = _street.get("occlusion") if _street != null else null
 	if occlusion != null:
 		for unit in session.state.enemy_team:

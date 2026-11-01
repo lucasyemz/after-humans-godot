@@ -12,6 +12,11 @@ const SILHOUETTE_SHADER := preload("res://shaders/character_silhouette.gdshader"
 const STENCIL_CHARACTER := 1
 ## A altura acima do pé (m) que fica sem silhueta (a borda do piso da frente encobre a sola em alguns cenários).
 const SILHOUETTE_FOOT := 0.12
+## O pulso do Último Fôlego (#281, a Porta da Morte do Darkest Dungeon): a luz vermelha que vai e volta no desenho.
+const DANGER_COLOR := Color(1.0, 0.08, 0.06)
+const DANGER_PERIOD := 1.1
+const DANGER_MIN := 0.04
+const DANGER_MAX := 0.3
 
 ## Altura do corpo em metros (do pé ao topo da cabeça na pose parada).
 var body_height := 1.8
@@ -28,6 +33,11 @@ var _silhouette: ShaderMaterial
 var _highlight := Color.BLACK
 var _tint := Color.WHITE
 var _dimmed := false
+## No Último Fôlego (#281): o pulso vermelho está ligado e onde ele está no ciclo (segundos).
+var _danger := false
+var _danger_time := 0.0
+## Com os efeitos reduzidos, o Último Fôlego fica com um brilho vermelho fixo (o meio do pulso), sem piscar.
+var steady_danger := false
 ## Quanto acima do pé (m) fica sem silhueta: o padrão, ou a borda do piso da frente da zona do cenário (#51).
 var silhouette_foot := SILHOUETTE_FOOT
 
@@ -81,6 +91,10 @@ func set_facing(value: float) -> void:
 
 
 func _process(delta: float) -> void:
+	if _danger:
+		_danger_time = fmod(_danger_time + delta, DANGER_PERIOD)
+		if _flash_tween == null or not _flash_tween.is_running():
+			_material.emission = _rest_emission()
 	if _art.has("frames"):
 		_frame_time += delta
 		var step := 1.0 / float(_art.get("fps", 10))
@@ -160,9 +174,9 @@ func flash(color: Color, seconds: float = 0.35, white_seconds: float = 0.0) -> v
 	_flash_tween = create_tween()
 	if white_seconds > 0.0:
 		_flash_tween.tween_property(_material, "emission", color, white_seconds)
-	_flash_tween.tween_property(_material, "emission", _highlight, seconds)
+	_flash_tween.tween_property(_material, "emission", _rest_emission(), seconds)
 	# O destaque pode ter mudado durante o piscar (a mira abriu no meio): termina no atual.
-	_flash_tween.tween_callback(func(): _material.emission = _highlight)
+	_flash_tween.tween_callback(func(): _material.emission = _rest_emission())
 
 
 ## Mistura por alfa (efeitos com transparência suave) em vez do recorte duro dos personagens.
@@ -185,10 +199,34 @@ func set_highlight(color: Color, strength: float, dimmed: bool = false) -> void:
 	_highlight = color * strength if strength > 0.0 else Color.BLACK
 	_highlight.a = 1.0
 	if _flash_tween == null or not _flash_tween.is_running():
-		_material.emission = _highlight
+		_material.emission = _rest_emission()
 		_material.emission_energy_multiplier = 0.7
 	_dimmed = dimmed
 	_apply_albedo()
+
+
+## Liga ou desliga o pulso vermelho do Último Fôlego (#281). Ele soma ao destaque da mira e volta depois de um piscar.
+func set_danger(on: bool) -> void:
+	if on == _danger:
+		return
+	_danger = on
+	_danger_time = 0.0
+	if _flash_tween == null or not _flash_tween.is_running():
+		_material.emission = _rest_emission()
+
+
+func in_danger() -> bool:
+	return _danger
+
+
+## A luz de descanso: o destaque da mira mais o pulso do Último Fôlego (um seno, de DANGER_MIN a DANGER_MAX).
+func _rest_emission() -> Color:
+	if not _danger:
+		return _highlight
+	var wave := 0.5 if steady_danger else 0.5 - 0.5 * cos(TAU * _danger_time / DANGER_PERIOD)
+	var light := _highlight + DANGER_COLOR * lerpf(DANGER_MIN, DANGER_MAX, wave)
+	light.a = 1.0
+	return light
 
 
 func highlight() -> Color:
