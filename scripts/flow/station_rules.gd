@@ -28,6 +28,8 @@ const DORMITORY := "dormitory"
 const FORGE := "forge"
 const RESEARCH := "research"
 const BAR := "bar"
+## O Treino (#265): o cômodo onde se sobe de nível e se aprendem as habilidades, já construído no Alojamento.
+const TRAINING := "training"
 ## A Enfermaria (#121): os leitos dos caídos (#118). O custo de cada nível fica em data/recovery.json.
 const INFIRMARY := "infirmary"
 ## Cômodos: básico (nível 1 desde o começo), nível máximo e o custo de cada nível (do N ao N+1). Sem custo, a
@@ -47,8 +49,11 @@ const ROOMS := [
 	# O Dormitório existe desde o começo, sem camas: no nível 1 a equipe dorme no chão; os beliches são a melhoria (nível 2,
 	# o custo em data/hero-jobs.json). Decisão do Lucas (28/10, #176).
 	{"id": DORMITORY, "name": "Dormitório", "basic": true, "max_level": 2, "costs": [], "data_costs": "dormitory_level_%d", "data_table": "hero_jobs", "slots": 2, "build": 1},
-	# O Bar tem custo para ser recuperado (#176; o número é proposta).
-	{"id": BAR, "name": "Bar", "basic": false, "max_level": 1, "costs": [{"scrap": 4, "fragments": 1}], "slots": 1, "build": 1},
+	# O Bar tem custo para ser recuperado (#176; o número é proposta); o nível 2 dá duas conversas por dia (#265).
+	{"id": BAR, "name": "Bar", "basic": false, "max_level": 2, "costs": [], "data_costs": "bar_level_%d", "data_table": "station_services", "slots": 1, "build": 1},
+	# O Treino (#265): já construído, no Alojamento (sem vaga própria na grade, como a Preparação); o nível 2 deixa dois
+	# heróis treinarem no mesmo dia.
+	{"id": TRAINING, "name": "Treino", "basic": true, "max_level": 2, "costs": [], "data_costs": "training_level_%d", "data_table": "station_services", "slots": 0, "build": 0},
 	{"id": INFIRMARY, "name": "Enfermaria", "basic": false, "max_level": 2, "costs": [], "data_costs": "infirmary_level_%d", "slots": 2, "build": 1},
 ]
 const RELIC_COST_BASE := 3
@@ -497,8 +502,8 @@ static func _room_benefit(room_id: String, level: int) -> String:
 			# O Bar (#265): o alívio de quem ficou na volta e a conversa que trata o trauma.
 			var bar := AHStationServices.rule("bar")
 			return TranslationServer.translate("Salão vazio. Recuperado, vira um lugar para conversar: alivia quem fica e trata o trauma.") if level <= 0 \
-				else TranslationServer.translate("Um lugar para conversar. Na volta, quem ficou na Estação perde %d de Instinto. A conversa trata o trauma por %d sementes.") % [
-					int(bar.get("Instinct", 5)), int(bar.get("TraumaSeeds", 5))]
+				else TranslationServer.translate("Um lugar para conversar. Na volta, quem ficou na Estação perde %d de Instinto. A conversa trata o trauma por %d sementes, %d por dia.") % [
+					int(bar.get("Instinct", 5)), int(bar.get("TraumaSeeds", 5)), int(Array(bar.get("TalksPerDay", [1, 2]))[clampi(level, 1, 2) - 1])]
 		CANTEEN:
 			if level >= 2:
 				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por dia.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
@@ -509,6 +514,12 @@ static func _room_benefit(room_id: String, level: int) -> String:
 			# O nível 2 abre as missões solo (#183).
 			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.") if level <= 1 \
 				else TranslationServer.translate("Escolher a partida e mandar heróis em missões solo.")
+		TRAINING:
+			# O Treino (#265): subir de nível e aprender as habilidades; quantos heróis por dia.
+			var per_day: Array = AHStationServices.rule("training").get("PerDay", [1, 2])
+			var trainees := int(per_day[clampi(level, 1, per_day.size()) - 1])
+			return (TranslationServer.translate("Subir de nível e aprender as habilidades de luta e de acampamento. Recebe %d herói por dia.") if trainees == 1
+				else TranslationServer.translate("Subir de nível e aprender as habilidades de luta e de acampamento. Recebe %d heróis por dia.")) % trainees
 		CHARACTERS:
 			# Cada nível comporta mais heróis (#119).
 			return TranslationServer.translate("Elenco, treino e relíquias. Comporta %d heróis.") % hero_limit_at(level)
@@ -1450,12 +1461,15 @@ static func treat_trauma(campaign: Dictionary, hero_id: String) -> String:
 		return TranslationServer.translate("Somente sobreviventes podem ser tratados.")
 	if not entry.trauma:
 		return TranslationServer.translate("%s não tem trauma.") % entry.display_name
-	# O trauma se trata no Bar (#265): a conversa, recuperado o salão.
+	# O trauma se trata no Bar (#265): a conversa, recuperado o salão; uma por dia (duas no nível 2).
 	if not room_available(campaign, BAR):
 		return TranslationServer.translate("Recupere o Bar para tratar o trauma.")
+	if AHStationServices.talks_left(campaign) <= 0:
+		return TranslationServer.translate("O Bar já conversou o que dava hoje. Volte depois da próxima expedição.")
 	if not consume(campaign, "seeds", AHStationServices.trauma_cost()):
 		return TranslationServer.translate("Sementes insuficientes (custa %d sementes).") % AHStationServices.trauma_cost()
 	entry.trauma = false
+	AHStationServices.mark_talk(campaign, hero_id)
 	return ""
 
 

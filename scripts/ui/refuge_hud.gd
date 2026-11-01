@@ -41,7 +41,7 @@ const PAN_EDGE := 6.0
 const PAN_EDGE_DWELL := 0.35
 const DRAG_START := 12.0
 const ROOM_ICONS := {S.CHARACTERS: "room_quarters", S.CANTEEN: "room_canteen", S.BAR: "room_bar", S.DORMITORY: "bed", S.FORGE: "room_forge",
-	S.DEPOT: "room_depot", S.RESEARCH: "room_research", S.INFIRMARY: "intent-heal", S.PREPARATION: "expeditions", "plan": "plan", "train": "train_arrival",
+	S.DEPOT: "room_depot", S.RESEARCH: "room_research", S.INFIRMARY: "intent-heal", S.PREPARATION: "expeditions", S.TRAINING: "train", "plan": "plan", "train": "train_arrival",
 	"new_campaign": "alert", "departure": "expeditions"}
 const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic-glass-feather", "coleira_lembranca": "relic-memory-collar"}
 ## Os ícones dos recursos nos chips de custo e no estoque.
@@ -3328,7 +3328,7 @@ func _bar(c: Dictionary) -> void:
 	if not S.room_available(c, S.BAR):
 		return
 	var troubled: Array = S.living(c).filter(func(h): return bool(h.get("trauma", false)))
-	_section(tr("Conversar"), "night_talk")
+	_section(tr("Conversar · %d hoje") % AHStationServices.talks_left(c), "night_talk")
 	if troubled.is_empty():
 		_text(tr("Ninguém com trauma agora. Quem fica na Estação descansa a cabeça aqui na volta."), AHKit.MUTED, "small")
 		return
@@ -3339,8 +3339,13 @@ func _bar(c: Dictionary) -> void:
 		var hero_id: String = entry.id
 		var button := _chip_button(tr("Conversar e tratar · %d sementes") % AHStationServices.trauma_cost())
 		button.name = "TreatTrauma"
-		button.disabled = S.quantity(c, "seeds") < AHStationServices.trauma_cost()
-		button.tooltip_text = tr("Sementes insuficientes (custa %d sementes).") % AHStationServices.trauma_cost() if button.disabled else ""
+		var why := ""
+		if AHStationServices.talks_left(c) <= 0:
+			why = tr("O Bar já conversou o que dava hoje. Volte depois da próxima expedição.")
+		elif S.quantity(c, "seeds") < AHStationServices.trauma_cost():
+			why = tr("Sementes insuficientes (custa %d sementes).") % AHStationServices.trauma_cost()
+		button.disabled = why != ""
+		button.tooltip_text = why
 		button.pressed.connect(func(): _act(S.treat_trauma(Campaign.state, hero_id), tr("Trauma tratado.")))
 		box.add_child(button)
 

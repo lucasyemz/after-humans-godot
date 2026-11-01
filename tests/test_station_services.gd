@@ -14,6 +14,7 @@ func run(context) -> void:
 	t = context
 	_data()
 	_bar()
+	_talks()
 	_bunks()
 	_quirk()
 	_save()
@@ -53,6 +54,29 @@ func _bar() -> void:
 	t.equal(int(stayed.instinct), 25, "com o Bar, quem ficou na Estação perde 5 de Instinto")
 	t.check(report.bar.any(func(r): return r.hero_id == stayed.id and r.instinct == 5), "e o relatório diz quem")
 	t.check(not report.bar.any(func(r): return r.hero_id == went.id), "quem foi na expedição não ganha o alívio do Bar")
+
+
+## As conversas do Bar: uma por dia no nível 1, duas no nível 2; o dia novo (outro ciclo) zera a conta.
+func _talks() -> void:
+	var c: Dictionary = Campaign.create_initial(16)
+	c.station.rooms[S.BAR] = 1
+	S.adjust(c, "seeds", 50)
+	for entry in c.roster:
+		entry.trauma = true
+	var a: Dictionary = c.roster[0]
+	var b: Dictionary = c.roster[1]
+	t.equal(V.talks_left(c), 1, "no nível 1, uma conversa por dia")
+	t.equal(S.treat_trauma(c, a.id), "", "a primeira conversa trata")
+	t.check(S.treat_trauma(c, b.id).contains("hoje"), "a segunda no mesmo dia espera")
+	t.check(bool(b.trauma), "e o trauma dele fica")
+	c.station.cycle_number = int(c.station.get("cycle_number", 0)) + 1
+	t.equal(S.treat_trauma(c, b.id), "", "no dia seguinte, conversa de novo")
+	c.station.rooms[S.BAR] = 2
+	t.equal(V.talks_left(c), 1, "no nível 2, a segunda conversa do dia")
+	t.equal(S.treat_trauma(c, c.roster[2].id), "", "e ela trata")
+	t.equal(V.talks_left(c), 0, "duas e acabou")
+	c.station.rooms[S.BAR] = 0
+	t.check(S.treat_trauma(c, c.roster[3].id).contains("Recupere o Bar"), "sem o Bar, não há conversa")
 
 
 func _bunks() -> void:

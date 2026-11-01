@@ -974,6 +974,13 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	head.add_child(AHKit.glyph("train", 36, AHKit.AMBER))
 	var cost := AHHeroLevels.next_cost(hero)
 	head.add_child(AHKit.label(tr("Treino · nível %d") % (AHHeroLevels.level(hero) + 1) if not cost.is_empty() else tr("Treino"), "panel_title", AHKit.TEXT, true, true))
+	# O Treino (#265): quantos heróis ele ainda recebe hoje (o cômodo, no Alojamento).
+	var per_day := AHStationServices.trainees_per_day(Campaign.state)
+	var day := AHKit.label(tr("Treino nível %d · %d herói por dia") % [S.room_level(Campaign.state, S.TRAINING), per_day] if per_day == 1
+		else tr("Treino nível %d · %d heróis por dia") % [S.room_level(Campaign.state, S.TRAINING), per_day], "small", AHKit.MUTED)
+	day.name = "TrainingDay"
+	day.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(day)
 	column.add_child(head)
 	var intro_text := tr("No nível máximo, o treino ensina o que falta: custa os fragmentos e %s.") % AHHeroSkills.seeds_text(AHHeroSkills.max_level_seeds())
 	if not cost.is_empty():

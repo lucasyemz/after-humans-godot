@@ -3,7 +3,11 @@
     "Name": "bar",
     "Instinct": 5,
     "TraumaSeeds": 5,
-    "Description": "Aprovado (#265, o Orquestrador em nome do Lucas, 01/11; os números da proposta): o Bar recuperado é o lugar de conversar. Na volta de cada expedição, quem ficou na Estação (vivo, fora da recuperação, da missão solo e do tratamento) perde Instinct de Instinto, sem efeito colateral. A conversa trata o trauma por TraumaSeeds sementes (saiu do Alojamento)."
+    "Description": "Aprovado (#265, o Orquestrador em nome do Lucas, 01/11; os números da proposta): o Bar recuperado é o lugar de conversar. Na volta de cada expedição, quem ficou na Estação (vivo, fora da recuperação, da missão solo e do tratamento) perde Instinct de Instinto, sem efeito colateral. A conversa trata o trauma por TraumaSeeds sementes (saiu do Alojamento). Conversas por dia: TalksPerDay (nível 1 e 2; decisão de 01/11: o nível 2 dá duas vagas de tratamento).",
+    "TalksPerDay": [
+      1,
+      2
+    ]
   },
   {
     "Name": "dormitory",
@@ -15,5 +19,31 @@
     "Level": 2,
     "Days": 2,
     "Description": "Aprovado (#265): a Enfermaria no nível Level trata uma peculiaridade negativa de um herói (perks.json, bPositive falso), sem custo novo. Ele ocupa um leito por Days dias (os ciclos da Estação) e não parte nesse tempo; no fim, a peculiaridade sai. Um tratamento por vez em cada herói; os caídos têm prioridade nos leitos que ficarem livres."
+  },
+  {
+    "Name": "bar_level_1",
+    "Scrap": 4,
+    "Fragments": 1,
+    "Description": "O Bar recuperado (#176; o mesmo custo de antes)."
+  },
+  {
+    "Name": "bar_level_2",
+    "Scrap": 4,
+    "Fragments": 1,
+    "Description": "Aprovado (#265, a proposta): o Bar no nível 2, duas conversas por dia."
+  },
+  {
+    "Name": "training",
+    "PerDay": [
+      1,
+      2
+    ],
+    "Description": "Aprovado (#265, respostas de 01/11): o Treino é um cômodo já construído, no Alojamento (onde o Treino estava; como a Preparação, sem vaga própria na grade). Ali se sobe de nível e se aprendem as habilidades de luta e de acampamento, pelos custos de sempre. Heróis por dia: PerDay (nível 1 e 2)."
+  },
+  {
+    "Name": "training_level_2",
+    "Scrap": 5,
+    "Fragments": 1,
+    "Description": "Aprovado (#265): o Treino no nível 2 custa o mesmo que o nível 2 dos cômodos de 1 vaga (o Depósito)."
   }
 ]

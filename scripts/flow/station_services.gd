@@ -4,8 +4,8 @@
 ##   sementes saíram do Alojamento);
 ## - o Dormitório com os beliches: mais Instinto a menos na noite da volta;
 ## - a Enfermaria no nível 2: trata uma peculiaridade negativa, ocupando um leito por alguns dias.
-## O Treino como cômodo novo espera as respostas da issue (o custo e o que ensina em cada nível).
-## Save: no herói, quirk_treatment {perk, days} enquanto trata.
+## - o Treino: um herói treina por dia (dois no nível 2); o Bar conversa uma vez por dia (duas no nível 2).
+## Save: no herói, quirk_treatment {perk, days} enquanto trata; na Estação, bar_talks e training {cycle, heroes}.
 class_name AHStationServices
 extends RefCounted
 
@@ -38,6 +38,55 @@ static func bar_relief(campaign: Dictionary, team: Array) -> Array:
 		if entry.instinct != before:
 			out.append({"hero_id": entry.id, "instinct": before - entry.instinct})
 	return out
+
+
+## As conversas que o Bar ainda faz hoje (o dia é o ciclo da Estação): uma no nível 1, duas no nível 2.
+static func talks_left(campaign: Dictionary) -> int:
+	if not S.room_available(campaign, S.BAR):
+		return 0
+	var per_day: Array = rule("bar").get("TalksPerDay", [1, 2])
+	var level := clampi(S.room_level(campaign, S.BAR), 1, per_day.size())
+	return maxi(0, int(per_day[level - 1]) - _today(campaign, "bar_talks").size())
+
+
+## Quem já usou o serviço hoje (station[key] = {cycle, heroes}); de outro dia, ninguém.
+static func _today(campaign: Dictionary, key: String) -> Array:
+	var day = campaign.get("station", {}).get(key)
+	if typeof(day) != TYPE_DICTIONARY or int(day.get("cycle", -1)) != int(campaign.station.get("cycle_number", 0)):
+		return []
+	return Array(day.get("heroes", []))
+
+
+static func _mark_today(campaign: Dictionary, key: String, hero_id: String) -> void:
+	var heroes := _today(campaign, key)
+	if not heroes.has(hero_id):
+		heroes.append(hero_id)
+	campaign.station[key] = {"cycle": int(campaign.station.get("cycle_number", 0)), "heroes": heroes}
+
+
+static func mark_talk(campaign: Dictionary, hero_id: String) -> void:
+	_mark_today(campaign, "bar_talks", hero_id)
+
+
+# ---------------------------------------------------------------- o Treino
+
+## Quantos heróis o Treino recebe por dia (1 no nível 1, 2 no nível 2).
+static func trainees_per_day(campaign: Dictionary) -> int:
+	var per_day: Array = rule("training").get("PerDay", [1, 2])
+	return int(per_day[clampi(S.room_level(campaign, S.TRAINING), 1, per_day.size()) - 1])
+
+
+## Por que o herói não treina hoje ("" treina): quem já treinou hoje continua; um novo só se o dia tiver vaga.
+static func training_block(campaign: Dictionary, hero_id: String) -> String:
+	var today := _today(campaign, "training")
+	if today.has(hero_id) or today.size() < trainees_per_day(campaign):
+		return ""
+	return TranslationServer.translate("O Treino já recebeu %d herói hoje. Volte depois da próxima expedição.") % trainees_per_day(campaign) \
+		if trainees_per_day(campaign) == 1 else TranslationServer.translate("O Treino já recebeu %d heróis hoje. Volte depois da próxima expedição.") % trainees_per_day(campaign)
+
+
+static func mark_training(campaign: Dictionary, hero_id: String) -> void:
+	_mark_today(campaign, "training", hero_id)
 
 
 # ---------------------------------------------------------------- o Dormitório

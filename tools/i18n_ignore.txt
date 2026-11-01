@@ -1819,3 +1819,7 @@ station_services.gd: perk
 station_services.gd: Days
 station_services.gd: roster
 refuge_hud.gd: Level
+station_services.gd: training
+station_rules.gd: bar_level_%d
+station_rules.gd: training_level_%d
+station_rules.gd: training
