@@ -138,9 +138,10 @@ func _run() -> void:
 
 
 func _door(station, life, pair: Array) -> void:
-	# A porta abrindo: alguém do Bar sai pela porta do fundo.
-	_frame_rooms(station, pair)
+	# A porta abrindo: alguém do Bar sai pela porta do fundo (o Bar aberto: o vizinho aparece ao lado).
+	station.hud.open_room(pair[0])
 	await _snap(station)
+	await _frames(3)
 	var who = _walker(station, NICK)
 	life.start_trip(who, pair[1])
 	life.set_process(false)
@@ -159,7 +160,7 @@ func _walk(station, life) -> void:
 	var pair := _pair(station)
 	var who = _walker(station, NICK)
 	station.settle_in(who, pair[0])
-	_frame_rooms(station, pair)
+	station.hud.open_room(pair[0])
 	await _snap(station)
 	await _frames(5)
 	life.start_trip(who, pair[1])
