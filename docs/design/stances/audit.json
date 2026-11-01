@@ -1,0 +1,147 @@
+{
+  "new_poses": 7,
+  "png_count": 7,
+  "problems": [],
+  "assets": {
+    "iris/combat_idle.png": {
+      "sha256": "4e4da8bcf19f87e901e2b7d50300dffcde663664942b008ddd2bfdc8bee017fa",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "mode": "RGBA",
+      "anchor": [
+        587.5,
+        1264
+      ],
+      "bbox": [
+        118,
+        84,
+        1058,
+        1264
+      ],
+      "isolated_pixels_over_4px_from_body": 0,
+      "world_width_m": 1.0738410596026489
+    },
+    "bento/combat_idle.png": {
+      "sha256": "2273dc49c46ad61a8c94a6a06a5ee133ceaf851270d5cf4b643e38430273e36f",
+      "canvas": [
+        1086,
+        1448
+      ],
+      "mode": "RGBA",
+      "anchor": [
+        473.0,
+        1429
+      ],
+      "bbox": [
+        96,
+        54,
+        990,
+        1429
+      ],
+      "isolated_pixels_over_4px_from_body": 0,
+      "world_width_m": 1.0836363636363637
+    },
+    "armadillo/idle.png": {
+      "sha256": "7e379fe69553e61e929f0ba40d7c6a389d206b591a3649bdfddbc14d33a487c9",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "mode": "RGBA",
+      "anchor": [
+        589.0,
+        1305
+      ],
+      "bbox": [
+        268,
+        65,
+        917,
+        1305
+      ],
+      "isolated_pixels_over_4px_from_body": 0,
+      "world_width_m": 0.816483870967742
+    },
+    "raccoon/combat_idle.png": {
+      "sha256": "047809099ce3f5c544ae824bedd6e89cd4137ed4a6af8b6300b6bcbddda6db91",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "mode": "RGBA",
+      "anchor": [
+        588.5,
+        1305
+      ],
+      "bbox": [
+        249,
+        105,
+        963,
+        1305
+      ],
+      "isolated_pixels_over_4px_from_body": 0,
+      "world_width_m": 0.8291612903225806
+    },
+    "nick/combat_idle.png": {
+      "sha256": "d74c7894b9476570e16cfe43f2b9d9ee31912471734d687b067af637b4079060",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "mode": "RGBA",
+      "anchor": [
+        488.5,
+        1286
+      ],
+      "bbox": [
+        244,
+        86,
+        885,
+        1286
+      ],
+      "isolated_pixels_over_4px_from_body": 0,
+      "world_width_m": 0.7661354581673306
+    },
+    "vespera/combat_idle.png": {
+      "sha256": "d8c9679e3fc3e6341e625d01d285359be56da8899bc23a7849d165a2adeb906f",
+      "canvas": [
+        1178,
+        1335
+      ],
+      "mode": "RGBA",
+      "anchor": [
+        451.0,
+        1297
+      ],
+      "bbox": [
+        236,
+        47,
+        897,
+        1297
+      ],
+      "isolated_pixels_over_4px_from_body": 0,
+      "world_width_m": 0.8633044846577498
+    },
+    "watch/combat_idle.png": {
+      "sha256": "8cb77b7c7bbabf313fbeb4ef7c56e5debf1f821478d7f8264621613e3f96345d",
+      "canvas": [
+        1086,
+        1448
+      ],
+      "mode": "RGBA",
+      "anchor": [
+        473.0,
+        1429
+      ],
+      "bbox": [
+        228,
+        54,
+        931,
+        1429
+      ],
+      "isolated_pixels_over_4px_from_body": 0,
+      "world_width_m": 0.8521212121212122
+    }
+  }
+}

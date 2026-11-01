@@ -1,0 +1,444 @@
+{
+  "heroes": {
+    "hero_cao_bento": {
+      "idle": {
+        "file": "res://art/station/lobby/bento/idle.webp",
+        "canvas": [
+          1086,
+          1448
+        ],
+        "anchor": [
+          473.0,
+          1429
+        ],
+        "body_reference_pixels": 1419
+      },
+      "seat": {
+        "file": "res://art/station/lobby/bento/seat.webp",
+        "canvas": [
+          543,
+          724
+        ],
+        "anchor": [
+          283,
+          710
+        ],
+        "body_reference_pixels": 948,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/bento/sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          445,
+          336
+        ],
+        "body_reference_pixels": 863
+      },
+      "work": {
+        "file": "res://art/station/lobby/bento/work.webp",
+        "canvas": [
+          543,
+          724
+        ],
+        "anchor": [
+          302,
+          716
+        ],
+        "body_reference_pixels": 708
+      }
+    },
+    "hero_gato_nick": {
+      "idle": {
+        "file": "res://art/station/lobby/nick/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          488.5,
+          1286
+        ],
+        "body_reference_pixels": 1255
+      },
+      "seat": {
+        "file": "res://art/station/lobby/nick/seat.webp",
+        "canvas": [
+          589,
+          667
+        ],
+        "anchor": [
+          302,
+          639
+        ],
+        "body_reference_pixels": 804,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/nick/sleep.webp",
+        "canvas": [
+          892,
+          441
+        ],
+        "anchor": [
+          446,
+          366
+        ],
+        "body_reference_pixels": 862
+      },
+      "work": {
+        "file": "res://art/station/lobby/nick/work.webp",
+        "canvas": [
+          589,
+          667
+        ],
+        "anchor": [
+          305,
+          644
+        ],
+        "body_reference_pixels": 630
+      }
+    },
+    "hero_sapo_iris": {
+      "idle": {
+        "file": "res://art/station/lobby/iris/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          587.5,
+          1264
+        ],
+        "body_reference_pixels": 1208
+      },
+      "seat": {
+        "file": "res://art/station/lobby/iris/seat.webp",
+        "canvas": [
+          543,
+          724
+        ],
+        "anchor": [
+          273,
+          686
+        ],
+        "body_reference_pixels": 924,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/iris/sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          444,
+          369
+        ],
+        "body_reference_pixels": 854
+      },
+      "work": {
+        "file": "res://art/station/lobby/iris/work.webp",
+        "canvas": [
+          589,
+          667
+        ],
+        "anchor": [
+          375,
+          634
+        ],
+        "body_reference_pixels": 611
+      }
+    },
+    "hero_coruja_vespera": {
+      "idle": {
+        "file": "res://art/station/lobby/vespera/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          451.0,
+          1297
+        ],
+        "body_reference_pixels": 1271
+      },
+      "seat": {
+        "file": "res://art/station/lobby/vespera/seat.webp",
+        "canvas": [
+          589,
+          667
+        ],
+        "anchor": [
+          296,
+          623
+        ],
+        "body_reference_pixels": 784,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/vespera/sleep.webp",
+        "canvas": [
+          887,
+          443
+        ],
+        "anchor": [
+          447,
+          410
+        ],
+        "body_reference_pixels": 837
+      },
+      "work": {
+        "file": "res://art/station/lobby/vespera/work.webp",
+        "canvas": [
+          589,
+          667
+        ],
+        "anchor": [
+          302,
+          651
+        ],
+        "body_reference_pixels": 638
+      }
+    }
+  },
+  "recruits": {
+    "dog_recruit_01": {
+      "idle": {
+        "file": "res://art/station/lobby/dog_male/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240
+      },
+      "seat": {
+        "file": "res://art/station/lobby/dog_male/seat.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/dog_male/sleep.webp",
+        "canvas": [
+          1774,
+          886
+        ],
+        "anchor": [
+          887,
+          738
+        ],
+        "body_reference_pixels": 1240
+      }
+    },
+    "cat_recruit_01": {
+      "idle": {
+        "file": "res://art/station/lobby/cat_male/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240
+      },
+      "seat": {
+        "file": "res://art/station/lobby/cat_male/seat.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/cat_male/sleep.webp",
+        "canvas": [
+          1774,
+          886
+        ],
+        "anchor": [
+          887,
+          738
+        ],
+        "body_reference_pixels": 1240
+      }
+    },
+    "frog_recruit_01": {
+      "idle": {
+        "file": "res://art/station/lobby/frog_male/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240
+      },
+      "seat": {
+        "file": "res://art/station/lobby/frog_male/seat.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/frog_male/sleep.webp",
+        "canvas": [
+          1774,
+          886
+        ],
+        "anchor": [
+          887,
+          738
+        ],
+        "body_reference_pixels": 1240
+      }
+    },
+    "owl_recruit_01": {
+      "idle": {
+        "file": "res://art/station/lobby/owl_male/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240
+      },
+      "seat": {
+        "file": "res://art/station/lobby/owl_male/seat.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/owl_male/sleep.webp",
+        "canvas": [
+          1774,
+          886
+        ],
+        "anchor": [
+          887,
+          738
+        ],
+        "body_reference_pixels": 1240
+      }
+    },
+    "raccoon_recruit_01": {
+      "idle": {
+        "file": "res://art/station/lobby/raccoon_male/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240
+      },
+      "seat": {
+        "file": "res://art/station/lobby/raccoon_male/seat.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/raccoon_male/sleep.webp",
+        "canvas": [
+          1774,
+          886
+        ],
+        "anchor": [
+          887,
+          738
+        ],
+        "body_reference_pixels": 1240
+      }
+    },
+    "armadillo_recruit_01": {
+      "idle": {
+        "file": "res://art/station/lobby/armadillo_male/idle.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240
+      },
+      "seat": {
+        "file": "res://art/station/lobby/armadillo_male/seat.webp",
+        "canvas": [
+          1178,
+          1335
+        ],
+        "anchor": [
+          589,
+          1305
+        ],
+        "body_reference_pixels": 1240,
+        "facing": "side"
+      },
+      "sleep": {
+        "file": "res://art/station/lobby/armadillo_male/sleep.webp",
+        "canvas": [
+          1774,
+          886
+        ],
+        "anchor": [
+          887,
+          738
+        ],
+        "body_reference_pixels": 1240
+      }
+    }
+  }
+}

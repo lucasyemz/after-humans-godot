@@ -69,6 +69,10 @@ func _scene(speed: int, reduced: bool) -> void:
 	var seen: int = Sound._next_effect
 	var panel_during := false
 	var blink := false
+	# O trem da Estação é o vagão verde em camadas (#256), e a faísca sai na freada (sem ela com Reduzir efeitos).
+	var car: AHTrainCar = station._build.train_car
+	t.check(car != null and car.is_inside_tree() and station._build.wagon_doors.is_empty(), "o trem da Estação é o vagão verde, sem o metrô (%dx)" % speed)
+	var sparked := false
 	var end := Time.get_ticks_msec() + 60000
 	while not _events.has("camera_on_candidate") and Time.get_ticks_msec() < end:
 		await _tree.process_frame
@@ -79,14 +83,23 @@ func _scene(speed: int, reduced: bool) -> void:
 			panel_during = true
 		if _events.has("warning") and not _events.has("stop") and station._build.signal_glow and not station._build.signal_glow.visible:
 			blink = true
+		if car != null and car.find_children("*", "CPUParticles3D", true, false).any(func(p): return p.emitting):
+			sparked = true
 	t.equal(_events.filter(func(e): return ARRIVAL.has(e)), ARRIVAL, "a chegada na ordem (%dx)" % speed)
 	t.check(not panel_during, "nenhum painel por cima da chegada (%dx)" % speed)
 	t.check(_index(sounds, "train_bell") >= 0 and _index(sounds, "train_bell") < _index(sounds, "train_brake"),
 		"o sino avisa antes do freio %s" % [sounds])
 	if reduced:
 		t.check(not blink, "com Reduzir efeitos, o sinal não pisca")
+		t.check(not sparked, "nem sai faísca na freada")
 	else:
 		t.check(blink, "o sinal pisca na chegada")
+		t.check(sparked, "a faísca nas rodas na freada")
+	t.check(car == null or is_zero_approx(car.position.x - car.get("_home").x), "o vagão parado no lugar")
+	# As portas que abrem são as do lado da plataforma (o outro lado): as folhas à vista ficam fechadas, e a luz fria das
+	# portas abertas acende na plataforma.
+	t.check(car == null or (car.doors_open() <= 0.0 and station._build.train_door_lights.all(func(e): return (e[0] as OmniLight3D).light_energy > 0.0)),
+		"as portas do lado da plataforma abertas: as deste lado fechadas e a luz delas na plataforma")
 	t.check(station.passage_moving() == false and station._goal == station._candidate_key(), "a câmera termina no candidato")
 	t.check(station._key.pos.distance_to(station._candidate_key().pos) < 0.1, "e o painel só abre com a câmera já nele")
 	if speed == 2:
@@ -127,6 +140,13 @@ func _scene(speed: int, reduced: bool) -> void:
 	await _tree.create_timer(1.0).timeout
 	t.check(Sound._effects.all(func(p): return not p.playing or not ["train_arrival.ogg", "train_departure.ogg"].has(String(p.stream.resource_path).get_file())),
 		"nenhum som do trem depois que ele some (%dx)" % speed)
+	# Pulada a volta da equipe no meio da freada, a faísca e a luz dela apagam com o trem fora (#256).
+	if car != null:
+		station._train_mode = 4
+		car.brake(true, 1.0, 1.0)
+		station.finish_team_arrival()
+		var lit: bool = car.find_children("*", "CPUParticles3D", true, false).any(func(p): return p.emitting or (p.get_child(0) as OmniLight3D).light_energy > 0.0)
+		t.check(not lit, "pulada a chegada na freada, a faísca apaga (%dx)" % speed)
 	station.train_event.disconnect(_on_event)
 
 

@@ -15,6 +15,11 @@
   e as fontes da tag codex-pr54-originals. Sem a pasta da Unreal, só esta parte:
       git archive codex-pr54-originals art/combat/source/reactions | tar -x
       python tools/sync_combat_art.py --codex-reactions
+- O Mercador (#182, parte 2; a arte do Codex na #218, PR #222): as poses de pé, de passada e de oferta e o retrato já
+  estão no repositório em WebP, na escala do jogo (os originais ficam na tag codex-pr222-originals). As medidas vêm do
+  contrato docs/design/merchant/contract.json: a âncora na bota de apoio de cada pose e a altura do corpo (1,72 m, como
+  o Bento). Sem a pasta da Unreal, só esta parte:
+      python tools/sync_combat_art.py --npcs
 
 As imagens viram WebP com metade da resolução (o jogo nunca mostra mais que isso); as medidas no manifesto ficam nos
 pixels originais e o jogo converte pela largura real da textura.
@@ -35,6 +40,8 @@ LEGACY = REPO / "SourceArt" / "Legacy"
 # ficam na tag codex-pr54-originals (git archive codex-pr54-originals art/combat/source/reactions | tar -x).
 CODEX_REACTIONS = PROTO / "docs" / "design" / "combat_reactions_contract.json"
 CODEX_REACTIONS_SOURCE = PROTO / "art" / "combat" / "source" / "reactions" / "kneeling_20261023"
+# O contrato da arte do Mercador (#218): os arquivos e as medidas de cada pose, em pixels do original.
+MERCHANT_CONTRACT = PROTO / "docs" / "design" / "merchant" / "contract.json"
 SCALE = 0.5
 ICON_SIZE = 160
 
@@ -203,6 +210,29 @@ def codex_reactions_only(source: Path) -> None:
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
 
 
+def npcs() -> dict:
+    """Os personagens que não lutam nem entram no elenco: o Mercador (#182). Cada pose leva a âncora medida na bota de
+    apoio dela (não a do parado: a passada e a oferta mudam o pé), e o retrato é o WebP dedicado."""
+    contract = json.loads(MERCHANT_CONTRACT.read_text(encoding="utf-8"))
+    entry = {}
+    for pose in ("idle", "walk", "trade"):
+        spec = contract["assets"][pose]
+        if not (PROTO / spec["file"].removeprefix("res://")).exists():
+            raise SystemExit(f"Falta a arte {spec['file']} do contrato do Mercador.")
+        entry[pose] = {"file": spec["file"], "canvas": spec["canvas"], "anchor": spec["anchor"],
+                       "body_reference_pixels": spec["body_reference_pixels"]}
+    entry["portrait"] = contract["assets"]["portrait"]["file"]
+    return {"merchant": entry}
+
+
+def npcs_only() -> None:
+    """Sem a pasta da Unreal: só os personagens de fora da luta, no manifesto que já existe."""
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    manifest["npcs"] = npcs()
+    print("npcs:", ", ".join(manifest["npcs"]))
+    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
+
+
 def enemy_pose_files(spec: dict) -> dict:
     source = LEGACY / spec["poses"]
     if source.suffix == ".json":
@@ -308,7 +338,7 @@ def audio() -> dict:
 def main() -> None:
     manifest = {"schema_version": 1, "scale_note": "Medidas em pixels da imagem original; a textura pode ser menor.",
                 "heroes": heroes(), "recruits": recruits(), "enemies": {**enemies(), **gallery_enemies()}, "icons": icons(),
-                "audio": audio()}
+                "audio": audio(), "npcs": npcs()}
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
     size = sum(f.stat().st_size for f in ART.rglob("*") if f.is_file()) + sum(f.stat().st_size for f in AUDIO.rglob("*") if f.is_file())
@@ -322,5 +352,7 @@ if __name__ == "__main__":
         # python tools/sync_combat_art.py --codex-reactions [pasta das fontes]
         rest = sys.argv[sys.argv.index("--codex-reactions") + 1:]
         codex_reactions_only(Path(rest[0]) if rest else CODEX_REACTIONS_SOURCE)
+    elif "--npcs" in sys.argv:
+        npcs_only()
     else:
         main()

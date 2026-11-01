@@ -1,5 +1,7 @@
 # Partida: a equipe no vagão em movimento (#75)
 
+> O metrô 3D desta página deu lugar ao interior pintado do trem 2D na #256: veja [train-2d.md](train-2d.md).
+
 Fotos de `tools/capture_departure.gd` (1920x1080, gl_compatibility): a Preparação confirmada na Estação e a passagem
 até a fase.
 

@@ -338,7 +338,7 @@ func _roster_line(c: Dictionary, column: VBoxContainer) -> void:
 			column.add_child(reason)
 	var waiting := S.train_candidate_name(c)
 	if waiting != "":
-		var go := AHKit.button(tr("%s espera na plataforma") % waiting, "secondary")
+		var go := AHKit.button((tr("%s esperam na plataforma") if S.train_waiting_names(c).size() > 1 else tr("%s espera na plataforma")) % waiting, "secondary")
 		go.name = "ToTrain"
 		go.custom_minimum_size = Vector2(0, 60)
 		go.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -612,7 +612,7 @@ func _post(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
 	elif current == "":
 		text = tr("Sem posto: descansa enquanto a equipe está fora.")
 	else:
-		text = "%s · %s" % [tr(S.room_def(current).name), S.yield_text(current, S.post_yield(hero, current))]
+		text = "%s · %s" % [S.post_name(current), S.yield_text(current, S.post_yield(hero, current))]
 	var line := AHKit.label(text, "text", AHKit.MUTED if current == "" else AHKit.TEXT)
 	line.name = "PostText"
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -630,7 +630,7 @@ func _post(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
 	for room_id in [""] + rooms:
 		var room: String = room_id
 		# O rendimento no próprio chip: o toque e o controle não mostram a dica do mouse.
-		var chip := AHKit.button(tr("Nenhum") if room == "" else "%s · +%d" % [tr(S.room_def(room).name), S.post_yield(hero, room)], "chip")
+		var chip := AHKit.button(tr("Nenhum") if room == "" else "%s · +%d" % [S.post_name(room), S.post_yield(hero, room)], "chip")
 		AHOptionsPanel._chip_font(chip)
 		chip.name = "Post_%s" % (room if room != "" else "none")
 		chip.custom_minimum_size = Vector2(0, 52)

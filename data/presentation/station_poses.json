@@ -57,7 +57,8 @@
       283,
       710
     ],
-    "body_reference_pixels": 948
+    "body_reference_pixels": 948,
+    "facing": "side"
   },
   "hero_gato_nick_seat": {
     "file": "res://art/station/poses/hero_gato_nick_seat.webp",
@@ -69,7 +70,8 @@
       302,
       639
     ],
-    "body_reference_pixels": 804
+    "body_reference_pixels": 804,
+    "facing": "side"
   },
   "hero_sapo_iris_seat": {
     "file": "res://art/station/poses/hero_sapo_iris_seat.webp",
@@ -81,7 +83,8 @@
       273,
       686
     ],
-    "body_reference_pixels": 924
+    "body_reference_pixels": 924,
+    "facing": "side"
   },
   "hero_coruja_vespera_seat": {
     "file": "res://art/station/poses/hero_coruja_vespera_seat.webp",
@@ -93,7 +96,8 @@
       296,
       623
     ],
-    "body_reference_pixels": 784
+    "body_reference_pixels": 784,
+    "facing": "side"
   },
   "civil_dora_work": {
     "file": "res://art/station/poses/civil_dora_work.webp",
@@ -178,5 +182,73 @@
       410
     ],
     "body_reference_pixels": 837
+  },
+  "hero_cao_bento_seat_front": {
+    "file": "res://art/station/poses/hero_cao_bento_seat_front.webp",
+    "canvas": [
+      498,
+      716
+    ],
+    "anchor": [
+      333,
+      707
+    ],
+    "body_reference_pixels": 946,
+    "facing": "front",
+    "hip": [
+      333,
+      455
+    ]
+  },
+  "hero_gato_nick_seat_front": {
+    "file": "res://art/station/poses/hero_gato_nick_seat_front.webp",
+    "canvas": [
+      534,
+      716
+    ],
+    "anchor": [
+      328,
+      707
+    ],
+    "body_reference_pixels": 946,
+    "facing": "front",
+    "hip": [
+      328,
+      418
+    ]
+  },
+  "hero_sapo_iris_seat_front": {
+    "file": "res://art/station/poses/hero_sapo_iris_seat_front.webp",
+    "canvas": [
+      594,
+      716
+    ],
+    "anchor": [
+      428,
+      707
+    ],
+    "body_reference_pixels": 946,
+    "facing": "front",
+    "hip": [
+      428,
+      393
+    ]
+  },
+  "hero_coruja_vespera_seat_front": {
+    "file": "res://art/station/poses/hero_coruja_vespera_seat_front.webp",
+    "canvas": [
+      593,
+      716
+    ],
+    "anchor": [
+      388,
+      706
+    ],
+    "body_reference_pixels": 946,
+    "facing": "front",
+    "hip": [
+      388,
+      445
+    ]
   }
 }

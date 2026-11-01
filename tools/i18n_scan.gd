@@ -22,7 +22,7 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/street/street.gd", "res://scripts/street/street_corridor.gd", "res://scripts/scenario/scenario_world.gd",
 	"res://scripts/station/station_build.gd", "res://scripts/campaign/campaign_service.gd",
 	"res://scripts/core/game_data_service.gd", "res://scripts/flow/game_flow.gd", "res://scripts/combat/combat_arena.gd",
-	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd",
+	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd", "res://scripts/flow/station_grid.gd",
 	"res://scripts/flow/side_mission_rules.gd", "res://scripts/ui/mission_board.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
@@ -156,6 +156,15 @@ static func data_texts() -> Array:
 				for field in ["Title", "Text", "Do"]:
 					if String(step.get(field, "")).strip_edges() != "":
 						out.append({"text": step[field], "where": "tutorial.%s.%s.%s" % [row.Name, step.Id, field]})
+	# A Estação em grade (#186): os textos dos achados de cada bloco e do item raro, e a fala da primeira volta.
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/station-grid.json")):
+		for field in ["Text", "Card"]:
+			if String(row.get(field, "")).strip_edges() != "":
+				out.append({"text": row[field], "where": "station-grid.%s.%s" % [row.Name, field]})
+		for list in ["Rolls", "Tools", "Lines"]:
+			for index in row.get(list, []).size():
+				if String(row[list][index].get("Text", "")).strip_edges() != "":
+					out.append({"text": row[list][index].Text, "where": "station-grid.%s.%s.%d" % [row.Name, list, index]})
 	# As escolhas dos eventos: o texto do botão, o requisito e o resultado de cada saída (#64; o resultado vai traduzido
 	# pelo modelo, com {Heroi} e {Instinto} trocados depois).
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/events.json")):

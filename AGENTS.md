@@ -45,6 +45,17 @@ arte. Nada daqui depende dele em tempo de execução, e nada de lá entra neste 
 - **Coerência visual:** nada de peça sem textura, personagem fora do cenário, animação fora do tempo ou HUD diferente
   em cada tela. Toda entrega que mexe no que se vê traz capturas de antes e depois, e a QA confere esses pontos.
 
+## Reserva de issue por sessão de agente
+
+- Antes de iniciar, leia a issue inteira, os comentários recentes e as etiquetas. `agent:*` indica a frente; `status:em-andamento` indica que uma sessão reservou a tarefa.
+- Se houver `status:em-andamento`, não comece outra implementação. Confira o comentário de reserva e combine a transferência com quem reservou ou com o Lucas.
+- Para reservar, adicione `status:em-andamento` e comente: `Reserva: <agente / sessão identificável> | branch: <branch> | início: <data/hora UTC> | escopo: <entrega>`. Releia os comentários e as etiquetas antes de editar arquivos. Se duas sessões reservarem ao mesmo tempo, vale o primeiro comentário de reserva; a outra interrompe e coordena a transferência, sem remover a reserva da primeira.
+- Atualize o comentário ou publique um andamento quando retomar a sessão ou mudar o escopo. A etiqueta significa reserva, não comprova que um processo está rodando neste instante; não expire reservas só por tempo.
+- Ao entregar o PR, comente o link e remova `status:em-andamento`; a issue continua aberta para a aprovação do Lucas. Se parar sem entrega, comente o estado, a branch e o que falta antes de liberar a reserva. Para corrigir um PR, reserve novamente.
+- Em uma transferência, registre quem assume e preserve a etiqueta até o novo responsável confirmar. Nunca libere a reserva de outra sessão sem combinar.
+
+A etiqueta é um acordo entre os agentes, não um bloqueio automático do GitHub. Ela aparece nas issues e pode ser filtrada com `is:issue is:open label:"status:em-andamento"`.
+
 ## Ciclo dev e QA
 
 Cada issue passa por duas personas antes de chegar ao Lucas:
@@ -64,3 +75,9 @@ mexer em código. Cada entrega passa por duas personas:
 - **QA de design**: avalia com o checklist de [docs/design/qa.md](docs/design/qa.md) e devolve `VEREDITO: APROVADO` ou
   `VEREDITO: REPROVADO` com os problemas por gravidade. Reprovado, o designer corrige e manda de novo, até aprovar.
 - Aprovado, o PR da entrega para a `main` registra as rodadas; o Claude integra no jogo e a QA dele testa lá.
+
+## Ferramenta de autoria de tirinhas
+
+Por decisão explícita do Lucas (28/10/2026), `comic_generator/` é uma exceção à restrição de conteúdo usado diretamente pelo jogo e ao escopo de design do Codex. Pode conter o gerador independente em JavaScript/Node, configuração, documentação e somente o exemplo provisório de Bento com seus recursos leves necessários. O Codex pode implementar e testar o código dessa ferramenta.
+
+Vídeos, renders, dependências instaladas e originais pesados ficam fora do Git. A tirinha preservada é um exemplo provisório de autoria, a revisar depois; não altera o cânone da campanha, e sua narrativa não deve ser reescrita como parte da organização ou integração da ferramenta. As regras de código, dados e arte de produção da Godot continuam valendo.
