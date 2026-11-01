@@ -31,7 +31,12 @@ trem também", com o relatório da missão.
   - "Com os robôs";
   - "Chega no trem".
 
-  Antes, o texto dizia "sem arte de combate", inclusive na `main` do #286.
+  Antes, o texto dizia "sem arte de combate", inclusive na `main` do #286. Quem é mandado à missão depois do rascunho
+  (o rascunho é montado ao abrir o mapa) sai da equipe ao abrir a partida, e a vaga é preenchida.
+
+  ![A partida com o Nick em missão solo, a Íris com os robôs, a Véspera no trem (estado forçado para a foto: no jogo, o
+  trem é recebido antes de partir) e o Rex caído; à esquerda o texto Normal, à direita o Maior com a lista
+  compacta](side-missions-train/departure.jpg)
 
 ## Para o Lucas
 
