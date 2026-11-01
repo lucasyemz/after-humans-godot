@@ -3,8 +3,8 @@
 ## equipe, do posto e da noite. No dia da volta, um sorteio contra a chance (a aptidão da classe, o nível, a vida, os
 ## traços e o estado) diz se deu certo (a recompensa inteira e XP), se volta ferido (35% da vida e metade) ou se foi
 ## capturado pelos robôs: aí vira um pino de resgate no mapa, prioritário e sem prazo (o resgate entra na rota, #188).
-## Até o resgate existir, a captura fica desligada (CaptureEnabled): esse resultado volta com ferimentos e de mãos
-## vazias, para ninguém ficar fora para sempre.
+## A captura tem a chave CaptureEnabled (ligada com o resgate, #188, AHRescue); desligada, esse resultado volta com
+## ferimentos e de mãos vazias.
 ## Os números ficam em data/side-missions.json (a linha "rules"); o estado, em campaign.station.side_missions e no
 ## herói (side_mission em curso, captured).
 class_name AHSideMissions
@@ -256,6 +256,8 @@ static func on_new_day(campaign: Dictionary) -> Array:
 			out.append(_resolve(campaign, entry))
 	# "Quem voltou" mostra só os do dia.
 	state(campaign).reports = out
+	# O pedido de ajuda (#188) também chega num dia novo.
+	AHRescue.on_new_day(campaign)
 	return out
 
 

@@ -170,8 +170,8 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	var most: int = team_limits(phase_id).max
 	for hero_id in campaign.get("preferred_formation", []):
 		for hero in campaign.roster:
-			# Quem está em recuperação (#118) fica na Estação.
-			if hero.id == hero_id and hero.alive and int(hero.get("recovery_days", 0)) <= 0 and team.size() < most:
+			# Quem está em recuperação (#118), numa missão solo ou capturado (#183) fica na Estação.
+			if hero.id == hero_id and hero.alive and int(hero.get("recovery_days", 0)) <= 0 and not AHSideMissions.away(hero) and team.size() < most:
 				team.append(hero_id)
 	if team.is_empty():
 		return false
@@ -186,6 +186,8 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	}
 	expedition.corridor = create_corridor(expedition.seed, phase_id, info.node_type, info.scenario)
 	campaign.session = {"screen": "corridor", "result": "", "expedition": expedition, "event": null}
+	# O resgate da fase (#188): o capturado ou o pedido de ajuda vira um ponto num trecho de Suprimentos.
+	AHRescue.assign(campaign)
 	return true
 
 
