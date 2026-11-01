@@ -69,9 +69,9 @@ const TRAIN_DOOR_END := TRAIN_DOOR_START + 0.8
 const TRAIN_CLOSE := 0.55
 const TRAIN_LEAVE := 2.6
 const TRAIN_OUT := -32.0
-## A volta da equipe (#76): o intervalo entre quem desce, o passo de quem está ferido e quanto o trem vazio espera.
+## A volta da equipe (#76): o intervalo entre quem desce e quanto o trem vazio espera. Quem está ferido (#194, a regra
+## de AHWounded: a vida abaixo do limite ou Caído em recuperação) desce com a pose de ferido, no passo dele e mancando.
 const TEAM_STEP_OUT := 0.45
-const WOUNDED_PACE := 0.55
 const EMPTY_WAIT := 1.2
 ## Depois do relatório, a fila sai andando para a direita (#131): um de cada vez, a frente primeiro, e cada um só volta
 ## ao seu cômodo depois de sair da câmera.
@@ -162,7 +162,7 @@ var _reopen_pending := false
 var _env: Environment
 ## O pós da Estação (o perfil de ambiência, reaplicado quando a qualidade muda).
 var _post: ShaderMaterial
-## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt}.
+## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt, walked}.
 var _arrivals: Array = []
 ## O herói escolhido na Sala dos Personagens (#181): de pé no cômodo, na escala da Estação, enquanto a tela está aberta.
 ## A placa dele de morador só fica escondida (hide_residents), então, ao sair, cada um está onde estava.
@@ -468,7 +468,11 @@ func overview_pixels_per_meter() -> float:
 ## A vista geral anda até o cômodo ficar inteiro na faixa da tela entre left_px e right_px (as setas escolhendo um
 ## cômodo que o menu cobre).
 func pan_to_room(room_id: String, left_px: float, right_px: float) -> void:
-	var room := room_def(room_id)
+	_pan_to_span(room_def(room_id), left_px, right_px)
+
+
+## O cômodo ou o bloco ({x0, x1, floor} em metros) inteiro na faixa da tela entre left_px e right_px.
+func _pan_to_span(room: Dictionary, left_px: float, right_px: float) -> void:
 	if room.is_empty():
 		return
 	var ppm := overview_pixels_per_meter()
@@ -667,7 +671,7 @@ func follow_train() -> void:
 func _candidate_key() -> Dictionary:
 	var feet := _departure_slot(1)
 	# Desceram dois (#182): a câmera recua para o segundo, ao lado, também caber à esquerda do painel.
-	if not Campaign.state.station.train.get("next", {}).is_empty():
+	if not Campaign.state.station.train.get("next", {}).is_empty() and not AHSideMissions.train_pending(Campaign.state):
 		return ue_key(feet.x * 100 + 20, feet.z * 100 + 800, 92, 44, 0)
 	return ue_key(feet.x * 100 + 100, feet.z * 100 + 650, 92, 44, 0)
 
@@ -826,7 +830,7 @@ func _line_card(hero_id: String, feet: Vector3) -> void:
 		return
 	var card := AHSpriteCard.new()
 	card.body_height = AHCharacterHeights.find(hero_id)
-	card.show_art(art.idle)
+	card.show_art(_line_art(entry, art))
 	add_child(card)
 	card.position = feet
 	card.set_facing(1.0)
@@ -836,6 +840,28 @@ func _line_card(hero_id: String, feet: Vector3) -> void:
 	# Quem está na fila não aparece ao mesmo tempo no seu cômodo.
 	if residents.has(hero_id):
 		residents[hero_id].visible = false
+
+
+## A arte de quem está na plataforma (a fila do relatório, quem desce do trem): o parado da luta, ou a pose de ferido
+## (#194, a mesma da exploração) com a vida baixa ou em recuperação.
+func _line_art(entry, art: Dictionary) -> Dictionary:
+	return AHWounded.pose(art.idle) if AHWounded.is_wounded(entry) else art.idle
+
+
+## O passo de quem anda na plataforma (a descida do trem e a saída da fila): a placa sobe um pouco a cada passo. Ferido
+## (#194, os números de data/wounded.json, como na rua), o passo é mais lento e manca: um passo sobe inteiro e o outro
+## só LimpDip, e o corpo pende para o lado do passo bom. Com Reduzir efeitos, sem o mancar (fica a pose e o passo).
+func _step(card: AHSpriteCard, walked: float, hurt: bool, _time: float) -> void:
+	var phase := walked * (4.5 if hurt else 7.0)
+	var lift := 0.025 * absf(sin(phase))
+	var tilt := 0.0
+	if hurt and not GameFlow.reduced_effects():
+		var limp: Dictionary = AHWounded.rules()
+		if fmod(phase, TAU) >= PI:
+			lift *= float(limp.LimpDip)
+		tilt = deg_to_rad(float(limp.LimpTilt)) * sin(phase) * card.facing
+	card.scale = Vector3(1, 1.0 + lift, 1)
+	card.rotation.z = tilt
 
 
 ## A fila do relatório sai andando (#131): da direita (a posição 1, mais perto da porta) para a esquerda, cada um com o
@@ -848,7 +874,9 @@ func walk_off_lineup() -> void:
 		var entry: Dictionary = entries[i]
 		var hero = S.hero(Campaign.state, entry.hero_id)
 		entry.delay = i * LEAVE_STEP
-		entry.speed = LEAVE_SPEED * (WOUNDED_PACE if hero != null and int(hero.hp) < int(hero.max_hp) else 1.0)
+		entry.hurt = AHWounded.is_wounded(hero)
+		entry.speed = LEAVE_SPEED * AHWounded.speed_factor(hero)
+		entry.walked = 0.0
 		# A sombra de contato vai junto (filha da carta).
 		if entry.has("contact") and is_instance_valid(entry.contact):
 			_contacts.erase(entry.contact)
@@ -875,7 +903,8 @@ func _tick_leaving(delta: float) -> void:
 			continue
 		card.set_facing(1.0)
 		card.position.x += entry.speed * delta
-		card.scale = Vector3(1, 1.0 + 0.025 * absf(sin(time * 7.0)), 1)
+		entry.walked = float(entry.get("walked", 0.0)) + delta
+		_step(card, float(entry.walked), bool(entry.get("hurt", false)), time)
 		if not _on_screen(card) or card.position.x > DOOR_X + 2.0:
 			_release_leaving(entry)
 
@@ -951,6 +980,65 @@ func room_screen_rects() -> Dictionary:
 		var pb := camera.unproject_position(b)
 		out[room.id] = Rect2(Vector2(minf(pa.x, pb.x), minf(pa.y, pb.y)), (pb - pa).abs())
 	return out
+
+
+## Um bloco da grade sem cômodo, em metros (#186; a interface, #274): a vaga soterrada ou livre ("1:3") ou o patamar
+## soterrado da escada ("L2"). {key, x0, x1, floor, ceiling}; {} no que não está na cena (um cômodo, o patamar aberto).
+static func block_def(key: String) -> Dictionary:
+	if AHStationGrid.is_landing(key):
+		var f := AHStationGrid.block_floor(key)
+		if f < 2 or AHStationLayout.landing_open(Campaign.state, f):
+			return {}
+		var z := AHStationLayout.floor_z(f) * 0.01
+		return {"key": key, "x0": STATION_END + 0.4, "x1": CORE_X1, "floor": z, "ceiling": z + AHStationLayout.HEIGHT * 0.01}
+	for entry in AHStationLayout.blocks(Campaign.state):
+		if entry.key == key:
+			return {"key": key, "x0": entry.x0 * 0.01, "x1": entry.x1 * 0.01, "floor": entry.floor * 0.01, "ceiling": entry.ceiling * 0.01}
+	return {}
+
+
+## Os blocos da cena (as vagas soterradas e livres e os patamares soterrados), na ordem da grade.
+static func block_defs() -> Array:
+	var out: Array = []
+	for entry in AHStationLayout.blocks(Campaign.state):
+		out.append({"key": entry.key, "x0": entry.x0 * 0.01, "x1": entry.x1 * 0.01, "floor": entry.floor * 0.01, "ceiling": entry.ceiling * 0.01})
+	for f in range(2, AHStationGrid.FLOORS + 1):
+		var landing := block_def("L%d" % f)
+		if not landing.is_empty():
+			out.append(landing)
+	return out
+
+
+## O retângulo de cada bloco na tela, como room_screen_rects; com a câmera em movimento, nada.
+func block_screen_rects() -> Dictionary:
+	var out := {}
+	if camera == null or not _path.is_empty():
+		return out
+	for block in block_defs():
+		var a := Vector3(block.x0, block.floor, 0.0)
+		var b := Vector3(block.x1, block.ceiling, 0.0)
+		if camera.is_position_behind(a) or camera.is_position_behind(b):
+			continue
+		var pa := camera.unproject_position(a)
+		var pb := camera.unproject_position(b)
+		out[block.key] = Rect2(Vector2(minf(pa.x, pb.x), minf(pa.y, pb.y)), (pb - pa).abs())
+	return out
+
+
+## O bloco escolhido com o painel aberto: ele e os vizinhos, entre o menu e o painel, como um cômodo de 12 m.
+func focus_block(key: String, instant: bool = false) -> void:
+	var block := block_def(key)
+	if block.is_empty():
+		focus_overview(instant)
+		return
+	_in_overview = false
+	var middle: float = (block.x0 + block.x1) * 0.5
+	_go(_framed_key(middle - 6.0 + ROOM_CROP, middle + 6.0 - ROOM_CROP, block.floor + 1.55, SCREEN_MENU_RIGHT, SCREEN_PANEL_LEFT, 26.0, -3.0, 0.0), false, instant)
+
+
+## A vista geral anda até o bloco ficar na faixa da tela (as setas escolhendo um bloco), como pan_to_room.
+func pan_to_block(key: String, left_px: float, right_px: float) -> void:
+	_pan_to_span(block_def(key), left_px, right_px)
 
 
 ## Onde fica, na tela, o pé de cada um da fila (o HUD põe o cartão embaixo).
@@ -1135,9 +1223,10 @@ func play_team_arrival(hero_ids: Array) -> void:
 		var art := _hero_art(entry)
 		if art.is_empty():
 			continue
-		var hurt: bool = int(entry.get("hp", 0)) < int(entry.get("max_hp", 0))
-		_arrivals.append({"hero_id": survivors[index], "art": art.idle, "slot": _line_slot(index, survivors.size()),
-			"delay": step * TEAM_STEP_OUT, "speed": TRAIN_WALK_SPEED * (WOUNDED_PACE if hurt else 1.0), "card": null, "hurt": hurt})
+		var hurt := AHWounded.is_wounded(entry)
+		_arrivals.append({"hero_id": survivors[index], "art": _line_art(entry, art), "slot": _line_slot(index, survivors.size()),
+			"delay": step * TEAM_STEP_OUT, "speed": TRAIN_WALK_SPEED * AHWounded.speed_factor(entry), "card": null, "hurt": hurt,
+			"walked": 0.0})
 	# Quem ainda está no trem já não aparece no cômodo (lá, na roupa do lobby): ninguém fica em dois lugares.
 	for arrival in _arrivals:
 		if residents.has(arrival.hero_id):
@@ -1173,6 +1262,7 @@ func finish_team_arrival() -> void:
 			_spawn_arrival(arrival)
 		arrival.card.position = arrival.slot
 		arrival.card.scale = Vector3.ONE
+		arrival.card.rotation.z = 0.0
 		arrival.card.set_facing(1.0)
 	Sound.fade_out(_train_sound, 0.3)
 	_warning_time = -1.0
@@ -1221,14 +1311,20 @@ func _tick_team_arrival(_before: float, step: float) -> void:
 		if absf(gap) < 0.02:
 			card.position.x = arrival.slot.x
 			card.scale = Vector3.ONE
+			# O ferido volta ao prumo suave (como na rua), não num quadro; a fila só fica pronta com todos no prumo.
+			card.rotation.z = lerpf(card.rotation.z, 0.0, 1.0 - exp(-14.0 * step))
+			if absf(card.rotation.z) < 0.003:
+				card.rotation.z = 0.0
+			else:
+				placed = false
 			card.set_facing(1.0)
 			ahead_x = card.position.x
 			continue
 		placed = false
 		card.position.x = minf(card.position.x + signf(gap) * minf(absf(gap), arrival.speed * step), ahead_x - FOLLOW_GAP)
 		ahead_x = card.position.x
-		# O passo: quem está ferido balança mais devagar.
-		card.scale = Vector3(1, 1.0 + 0.025 * absf(sin(time * (4.5 if arrival.hurt else 7.0))), 1)
+		arrival.walked = float(arrival.get("walked", 0.0)) + step
+		_step(card, float(arrival.walked), bool(arrival.hurt), time)
 	# Ninguém para descer (todos caíram): as portas abrem e o trem espera um instante vazio.
 	if _arrivals.is_empty() and _train_time < TRAIN_DOOR_END + EMPTY_WAIT:
 		placed = false
@@ -1362,7 +1458,8 @@ func _release_boarding() -> void:
 ## O segundo animal do trem (#182), de pé ao lado de quem é decidido agora, até a vez dele.
 func _spawn_companion(feet: Vector3 = Vector3.INF) -> AHSpriteCard:
 	var second: Dictionary = Campaign.state.station.train.get("next", {})
-	if second.is_empty():
+	# O trem das missões solo (#183) não traz o segundo do recruta: ele vem no trem de sempre, depois.
+	if second.is_empty() or AHSideMissions.train_pending(Campaign.state):
 		return null
 	var art: Dictionary = AHCombatArena.hero_art_of(String(second.candidate_id), String(second.recruit.art_variant)).get("idle", {})
 	if art.is_empty():
@@ -1383,6 +1480,10 @@ func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	var recruit: Dictionary = S.train_recruit(Campaign.state)
 	if art.is_empty() and not recruit.is_empty() and Campaign.state.station.train.candidate_id == _candidate_id:
 		art = AHCombatArena.hero_art_of(_candidate_id, String(recruit.art_variant)).get("idle", {})
+	# Quem volta de uma missão solo (#183): o herói do elenco, na arte dele.
+	var returning = S.hero(Campaign.state, _candidate_id)
+	if art.is_empty() and returning != null:
+		art = AHCombatArena.hero_art_of(_candidate_id, String(returning.get("art_variant", ""))).get("idle", {})
 	# O Mercador (#182, parte 2): a arte dele, de pé (_tick_merchant troca a pose).
 	if art.is_empty() and _candidate_id == S.MERCHANT:
 		art = AHCombatArena.npc_art_of(S.MERCHANT).get("idle", {})
@@ -1463,9 +1564,12 @@ func _tick_arrival(before: float) -> void:
 	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
 		# Desce pela porta do metrô e anda até a plataforma.
 		var card := _spawn_candidate(Vector3(_train_door_x(), target.y, target.z))
+		# Quem volta ferido de uma missão solo (#183) desce no passo de ferido (#194, a mesma regra da equipe: AHWounded).
+		var returning = S.hero(Campaign.state, _candidate_id)
+		var pace: float = AHWounded.speed_factor(returning) if returning != null else 1.0
 		if card:
 			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
-				"speed": TRAIN_WALK_SPEED * train_speed(), "stay": true, "home_z": target.z})
+				"speed": TRAIN_WALK_SPEED * train_speed() * pace, "stay": true, "home_z": target.z})
 		# Desceram dois (#182): o segundo desce logo atrás e para ao lado.
 		var beside := _companion_slot()
 		var companion := _spawn_companion(Vector3(_train_door_x(), beside.y, beside.z))
@@ -1696,7 +1800,8 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 	var free_rooms: Array = rooms().map(func(r): return r.id)
 	for entry in S.living(campaign):
 		var art := _hero_art(entry)
-		if art.is_empty():
+		# Quem está numa missão solo ou capturado (#183) não está na Estação.
+		if art.is_empty() or AHSideMissions.away(entry):
 			continue
 		var room_id: String
 		var shared: Array = occupancy.keys().filter(func(id): return occupancy[id] < 2)

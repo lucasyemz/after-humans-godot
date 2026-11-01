@@ -1382,6 +1382,100 @@
       ],
       "note": "O compartimento aberto: o ícone do que havia (48) no meio do vão e o texto embaixo, fora da peça. Os outros cinco abrem apagados (o texto no tom apagado); o escolhido fica com selected_frame e o texto em âmbar.",
       "sha256": "fc7c7be913229e8319c7b7f496b978e86327a97cca2e96324e9f61ece20df4e8"
+    },
+    "dig_frame_locked": {
+      "file": "art/ui/kit/station/excavation/dig_frame_locked.webp",
+      "size": [
+        600,
+        320
+      ],
+      "nine_slice_ltrb": [
+        48,
+        48,
+        48,
+        48
+      ],
+      "content_xywh": [
+        24,
+        24,
+        552,
+        272
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Bloco soterrado que ainda não dá para escavar (patamar fechado): aço escuro, trilho contínuo. Arte #275 (r2, tag codex-pr296-originals).",
+      "sha256": "67ac6a5951d5a377ffb25414b52b68051c38f77206022986f91273f84acd4107"
+    },
+    "dig_frame_available": {
+      "file": "art/ui/kit/station/excavation/dig_frame_available.webp",
+      "size": [
+        600,
+        320
+      ],
+      "nine_slice_ltrb": [
+        48,
+        48,
+        48,
+        48
+      ],
+      "content_xywh": [
+        24,
+        24,
+        552,
+        272
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Bloco que dá para escavar, e a frente: trilho claro duplo, cantos âmbar. Arte #275 (r2, tag codex-pr296-originals).",
+      "sha256": "ff3344ce482d70581180ccd09d0aff0cadf380ab35a994a93c7028b831ef2c83"
+    },
+    "dig_frame_neighbor": {
+      "file": "art/ui/kit/station/excavation/dig_frame_neighbor.webp",
+      "size": [
+        600,
+        320
+      ],
+      "nine_slice_ltrb": [
+        48,
+        48,
+        48,
+        48
+      ],
+      "content_xywh": [
+        24,
+        24,
+        552,
+        272
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Bloco que depende do vizinho: trilho interrompido, faixa vermelha hachurada. Arte #275 (r2, tag codex-pr296-originals).",
+      "sha256": "22b98c1ef0047941107d0de700f9d71da28eed7eac0f8529782ac262588b2243"
+    },
+    "dig_room_choice_card": {
+      "file": "art/ui/kit/station/excavation/dig_room_choice_card.webp",
+      "size": [
+        600,
+        320
+      ],
+      "content_xywh": [
+        24,
+        24,
+        552,
+        272
+      ],
+      "anchor": [
+        0,
+        0
+      ],
+      "note": "Vaga livre (escolher cômodo): plaqueta vazia no alto; proporção fixa, sem 9-slice. Arte #275 (r2, tag codex-pr296-originals).",
+      "sha256": "b9602c241b6984fd6fd1687dc30911c9f4a420671ec7b5fdc034d1002fae4738"
     }
   },
   "trait_ids": {
@@ -2365,6 +2459,42 @@
         64
       ],
       "sha256": "573b49378654c8600655509abb057c383b0857a51adc3f26b6777f9782460f0f",
+      "kind": "glyph_white_tintable"
+    },
+    "dig_buried": {
+      "file": "art/ui/kit/station/icons/dig_buried.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "0d29312fc1ac2cec11f88b8caf6100f4221af45d75bb9b52f1dba35c55cbbc1b",
+      "kind": "glyph_white_tintable"
+    },
+    "dig_excavate": {
+      "file": "art/ui/kit/station/icons/dig_excavate.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "1af224deb2a78d2b38caae877688651503d675a77b9a6cff202007bafdab66aa",
+      "kind": "glyph_white_tintable"
+    },
+    "dig_work_in_progress": {
+      "file": "art/ui/kit/station/icons/dig_work_in_progress.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "d4a398a4ed2e6dfa853e1f9c3ba09892671dff3ae40aa9fcead94c951e7fc6a0",
+      "kind": "glyph_white_tintable"
+    },
+    "dig_choose_room": {
+      "file": "art/ui/kit/station/icons/dig_choose_room.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "0cf70eb66e0b161d86ee9e895885d6a402328f0b5fb5ebc852037a4c053be7fc",
       "kind": "glyph_white_tintable"
     }
   },

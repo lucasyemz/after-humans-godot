@@ -38,7 +38,8 @@ const INFIRMARY := "infirmary"
 const ROOMS := [
 	{"id": CANTEEN, "name": "Cantina", "basic": true, "max_level": 2, "costs": [], "data_costs": "canteen_level_%d", "data_table": "station_grid", "slots": 2, "build": 2},
 	{"id": DEPOT, "name": "Depósito", "basic": true, "max_level": 2, "costs": [{}, {"scrap": 5, "fragments": 1}], "slots": 1, "build": 2},
-	{"id": PREPARATION, "name": "Preparação", "basic": true, "max_level": 1, "costs": [], "slots": 0, "build": 0},
+	# O nível 2 abre as missões solo (#183).
+	{"id": PREPARATION, "name": "Preparação", "basic": true, "max_level": 2, "costs": [{}, {"scrap": 4, "fragments": 1}], "slots": 0, "build": 0},
 	# O Alojamento cresce (#119): cada nível comporta mais heróis (data/hero-jobs.json, limit_heroes e o custo).
 	{"id": CHARACTERS, "name": "Alojamento", "basic": true, "max_level": 4, "costs": [], "data_costs": "characters_level_%d", "data_table": "hero_jobs", "slots": 1, "build": 1},
 	{"id": FORGE, "name": "Forja", "basic": false, "max_level": 2, "costs": [{"scrap": 4, "fragments": 0}, {"scrap": 6, "fragments": 2}], "slots": 2, "build": 1},
@@ -80,21 +81,21 @@ const REQUEST_BONUS := 1
 const CIVILIANS := [
 	{"id": DORA, "name": "Dora", "species": "Texugo", "role": "Cozinheira", "trait": "Prática, evita desperdício.",
 		"need": "Quer recuperar um caderno de receitas esquecido numa mercearia abandonada.",
-		"benefit": "Na Cantina com energia, produz mais 2 suprimentos por volta.",
-		"drawback": "Cozinhar gasta água: bebe 2 por volta.",
-		"request_item": "o caderno de receitas", "request_reward": "a Cantina rende mais 1 suprimento por volta",
+		"benefit": "Na Cantina com energia, produz mais 2 suprimentos por dia.",
+		"drawback": "Cozinhar gasta água: bebe 2 por dia.",
+		"request_item": "o caderno de receitas", "request_reward": "a Cantina rende mais 1 suprimento por dia",
 		"food": 1, "water": 2, "room": CANTEEN},
 	{"id": OTTO, "name": "Otto", "species": "Castor", "role": "Técnico", "trait": "Paciente, testa antes de improvisar.",
 		"need": "Quer recuperar a maleta da equipe ferroviária.",
 		"benefit": "Mantém o gerador: mais 1 de capacidade de energia. Recuperar e melhorar cômodos custa 1 sucata a menos.",
-		"drawback": "Trabalho pesado: come 2 suprimentos por volta.",
+		"drawback": "Trabalho pesado: come 2 suprimentos por dia.",
 		"request_item": "a maleta da equipe ferroviária", "request_reward": "mais 1 de capacidade de energia",
 		"food": 2, "water": 1, "room": FORGE},
 	{"id": CORA, "name": "Cora", "species": "Gambá", "role": "Pesquisadora", "trait": "Metódica e cética.",
 		"need": "Quer recuperar registros de monitoramento para comparar a água local.",
-		"benefit": "Com a Pesquisa recuperada e ligada, traz 1 fragmento por volta.",
+		"benefit": "Com a Pesquisa recuperada e ligada, traz 1 fragmento por dia.",
 		"drawback": "Equipamentos ligados o tempo todo: a Pesquisa gasta 1 de energia a mais.",
-		"request_item": "os registros de monitoramento", "request_reward": "mais 1 fragmento por volta",
+		"request_item": "os registros de monitoramento", "request_reward": "mais 1 fragmento por dia",
 		"food": 1, "water": 1, "room": RESEARCH},
 ]
 
@@ -109,15 +110,6 @@ const TRAUMA_COST := 5
 const MAX_PER_CLASS := 2
 ## Suprimentos comprados na partida, além dos 4 de graça (FoodCost).
 const FOOD_COST := 2
-## Nomes que a comunidade daria (de objetos, lugares e traços; docs/narrative/review.md, #64), não da cultura humana.
-const NAME_POOLS := {
-	"cao": ["Bento", "Brutus", "Argos", "Tobias", "Balto", "Rufus", "Lorde", "Barão", "Brasa", "Trovão", "Pistão", "Farol", "Fumaça", "Trilho", "Bóris"],
-	"gato": ["Nix", "Sombra", "Breu", "Telha", "Maya", "Nuvem", "Fresta", "Calha", "Chico", "Puma", "Luna", "Antena", "Veludo", "Mimi", "Lampião"],
-	"sapo": ["Íris", "Lupa", "Cisterna", "Garganta", "Mirante", "Bubo", "Estrela", "Eco", "Alerta", "Sábio", "Pluma", "Penumbra", "Gisela", "Noctis"],
-	"coruja": ["Véspera", "Sereno", "Jasmim", "Pacato", "Rio", "Sol", "Dengoso", "Flora", "Paz", "Brisa", "Lótus", "Chico Rei", "Pingo", "Mel", "Cacau"],
-	"rato": ["Risco", "Pólvora", "Chispola", "Pipeta", "Ferrugem", "Duto", "Pipoca", "Veneno", "Mola", "Centelha", "Fuligem", "Pinça", "Engrenagem"],
-	"tatu": ["Casco", "Carapaça", "Couraça", "Fortaleza", "Tromba", "Pedregulho", "Bigorna", "Escudo", "Baluarte", "Granito", "Tanque", "Rochedo"],
-}
 
 # ---------------------------------------------------------------- foco da rota (#73)
 
@@ -159,6 +151,9 @@ static func init_new_campaign(campaign: Dictionary) -> void:
 ## Save anterior à Estação (fase 2): completa o que falta. Como na Unreal (MigrateLegacy), um save sem cômodos fica
 ## com todos recuperados, como o jogador já os usava. Idempotente.
 static func migrate(campaign: Dictionary) -> void:
+	# A espécie no indivíduo (#189): quem é de um save de antes fica com a padrão da classe (o rato, Guaxinim).
+	for entry in campaign.get("roster", []):
+		AHSpecies.ensure(entry)
 	var station = campaign.get("station")
 	if typeof(station) != TYPE_DICTIONARY or not station.has("rooms"):
 		var rooms := {}
@@ -188,6 +183,9 @@ static func migrate(campaign: Dictionary) -> void:
 	for entry in campaign.get("roster", []):
 		if not entry.has("art_variant"):
 			entry.art_variant = _least_used_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
+	# As sete habilidades (#259): os campos novos; o que um save editado traz e não vale volta ao padrão.
+	AHHeroSkills.migrate(campaign)
+	AHCampSkills.migrate(campaign)
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
 		if String(entry.get("skin_id", "")) == "":
@@ -198,6 +196,8 @@ static func migrate(campaign: Dictionary) -> void:
 	# Ninguém morre (#118): o memorial dos saves antigos volta em recuperação.
 	_migrate_fallen(campaign)
 	_migrate_posts(campaign)
+	# As missões solo (#183): o save de antes ganha a semente (tirada do elenco: a mesma a cada carga).
+	AHSideMissions.state(campaign)
 	# O trem de antes do #122 não tem o recruta: quem espera é um civil.
 	if typeof(campaign.station.train.get("recruit")) != TYPE_DICTIONARY:
 		campaign.station.train.recruit = {}
@@ -223,6 +223,9 @@ static func _station_defaults() -> Dictionary:
 		# A escada da história (#64): as fases cujo evento de história já apareceu e as cuja linha "O que a equipe viu"
 		# já saiu no relatório (uma vez por campanha).
 		"story_events": [], "story_reports": [],
+		# As missões solo (#183): o quadro do dia e os relatórios de quem voltou.
+		# A semente nasce com a campanha (create_initial, ou AHSideMissions.state na migração).
+		"side_missions": {"day": -1, "board": [], "reports": []},
 	}
 
 
@@ -446,18 +449,18 @@ static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
 	elif food > f.food_capacity:
 		food_note = TranslationServer.translate("! %d acima de %d") % [food - f.food_capacity, f.food_capacity]
 	elif food_short:
-		food_note = TranslationServer.translate("! Falta na volta")
+		food_note = TranslationServer.translate("! Falta na próxima expedição")
 	else:
-		food_note = TranslationServer.translate("Próxima volta: %d") % f.food_after_night
+		food_note = TranslationServer.translate("Próxima expedição: %d") % f.food_after_night
 	var power_short: bool = not f.unpowered_rooms.is_empty()
 	return [
 		{"id": "food", "label": TranslationServer.translate("COMIDA"), "icon": "lobby-food", "value": TranslationServer.translate("%d / %d suprimentos") % [food, f.food_capacity],
 			"note": food_note, "warn": food_short or food > f.food_capacity,
-			"tip": TranslationServer.translate("Estoque e capacidade do Depósito. Na próxima volta, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d.") % [
+			"tip": TranslationServer.translate("Estoque e capacidade do Depósito. Na próxima expedição, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d.") % [
 				f.food_produced, f.food_civilians, f.food_spoiled, f.food_night_need, f.food_after_night]},
 		{"id": "water", "label": TranslationServer.translate("ÁGUA"), "icon": "lobby-water", "value": TranslationServer.translate("%d em estoque") % f.water,
-			"note": TranslationServer.translate("! Falta na volta") if f.thirsty else TranslationServer.translate("Próxima volta: %d") % f.water_after, "warn": f.thirsty,
-			"tip": TranslationServer.translate("Na próxima volta, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto.") % [
+			"note": TranslationServer.translate("! Falta na próxima expedição") if f.thirsty else TranslationServer.translate("Próxima expedição: %d") % f.water_after, "warn": f.thirsty,
+			"tip": TranslationServer.translate("Na próxima expedição, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto.") % [
 				f.water_produced, f.water_consumed, f.water_after]},
 		{"id": "power", "label": TranslationServer.translate("ENERGIA"), "icon": "lobby-energy", "value": TranslationServer.translate("%d / %d em uso") % [f.power_used, f.power_capacity],
 			"note": (TranslationServer.translate("! %d %s sem energia") % [f.unpowered_rooms.size(), TranslationServer.translate("sala") if f.unpowered_rooms.size() == 1 else TranslationServer.translate("salas")]) if power_short \
@@ -488,18 +491,20 @@ static func _room_benefit(room_id: String, level: int) -> String:
 		DORMITORY:
 			# Sem camas no nível 1 (a equipe dorme no chão); os beliches chegam com a melhoria (#176).
 			if level <= 1:
-				return TranslationServer.translate("Sem camas: a equipe dorme no chão depois de cada volta. Com os beliches, cabem %d ajudantes.") % helper_limit_at(2)
-			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada volta. Cabem %d ajudantes.") % helper_limit_at(level)
+				return TranslationServer.translate("Sem camas: a equipe dorme no chão depois de cada expedição. Com os beliches, cabem %d ajudantes.") % helper_limit_at(2)
+			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada expedição. Cabem %d ajudantes.") % helper_limit_at(level)
 		BAR:
 			return TranslationServer.translate("Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa.") if level <= 0 else TranslationServer.translate("Um lugar para conversar e fazer uma pausa.")
 		CANTEEN:
 			if level >= 2:
-				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por expedição.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
-			return TranslationServer.translate("Com energia, produz 2 suprimentos por expedição.")
+				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por dia.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
+			return TranslationServer.translate("Com energia, produz 2 suprimentos por dia.")
 		DEPOT:
-			return TranslationServer.translate("Guarda até 12 suprimentos; o excesso estraga na volta.") if level <= 1 else TranslationServer.translate("Prateleiras extras: guarda até 20.")
+			return TranslationServer.translate("Guarda até 12 suprimentos; o excesso estraga a cada dia.") if level <= 1 else TranslationServer.translate("Prateleiras extras: guarda até 20.")
 		PREPARATION:
-			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.")
+			# O nível 2 abre as missões solo (#183).
+			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.") if level <= 1 \
+				else TranslationServer.translate("Escolher a partida e mandar heróis em missões solo.")
 		CHARACTERS:
 			# Cada nível comporta mais heróis (#119).
 			return TranslationServer.translate("Elenco, treino, trauma e relíquias. Comporta %d heróis.") % hero_limit_at(level)
@@ -599,12 +604,14 @@ static func run_cycle(campaign: Dictionary, expedition_id: String, returning: in
 	station.last_cycle_expedition_id = expedition_id
 	station.cycle_number = int(station.cycle_number) + 1
 	station.hungry_civilians = f.hungry_civilians.duplicate()
+	# Quem chegou ao dia da volta resolve a missão solo (#183).
+	var missions := AHSideMissions.on_new_day(campaign)
 	station.last_cycle = {
 		"number": station.cycle_number, "expedition_id": expedition_id, "food_produced": f.food_produced,
 		"food_spoiled": f.food_spoiled, "food_civilians": f.food_civilians, "fragments_produced": f.fragments_produced,
 		"hungry_civilians": f.hungry_civilians.duplicate(), "water_produced": f.water_produced,
 		"water_consumed": mini(f.water_consumed, f.water + f.water_produced), "thirsty": f.thirsty,
-		"power_used": f.power_used, "power_capacity": f.power_capacity,
+		"power_used": f.power_used, "power_capacity": f.power_capacity, "missions": missions,
 	}
 	if campaign.night.expedition_id == expedition_id:
 		campaign.night.thirsty = f.thirsty
@@ -658,7 +665,8 @@ static func allocate(campaign: Dictionary, food: int, water: int) -> Dictionary:
 
 
 static func visit_pending(campaign: Dictionary) -> bool:
-	return campaign.station.train.phase != "none"
+	# O trem das missões solo (#183) também: quem volta delas chega nele.
+	return campaign.station.train.phase != "none" or AHSideMissions.train_pending(campaign)
 
 
 ## Um número do trem (#122) em data/recruitment.json.
@@ -1289,7 +1297,10 @@ static func hero_name(campaign: Dictionary, class_id: String) -> String:
 		used[String(waiting.get("display_name", "")).to_lower()] = true
 	for entry in campaign.get("memorial", []):
 		used[String(entry.display_name).to_lower()] = true
-	var pool: Array = NAME_POOLS.get(class_id, ["Recruta"])
+	# Os nomes vêm da cultura da espécie (#189), a padrão da classe enquanto o recruta chega com ela.
+	var pool: Array = AHSpecies.names(AHSpecies.default_for(class_id))
+	if pool.is_empty():
+		pool = ["Recruta"]
 	for candidate in pool:
 		if not used.has(String(candidate).to_lower()):
 			return candidate
@@ -1369,7 +1380,10 @@ static func free_art_variants(campaign: Dictionary, class_id: String) -> Array:
 static func waiting_recruits(campaign: Dictionary) -> Array:
 	var train: Dictionary = campaign.get("station", {}).get("train", {})
 	var out: Array = []
-	for recruit in [train.get("recruit", {}), train.get("next", {}).get("recruit", {})]:
+	# O animal do pedido de ajuda (#188) também: o trem não traz o mesmo nome nem a mesma arte.
+	var help = campaign.get("station", {}).get("side_missions", {}).get("help", {})
+	var help_recruit = help.get("recruit", {}) if typeof(help) == TYPE_DICTIONARY else {}
+	for recruit in [train.get("recruit", {}), train.get("next", {}).get("recruit", {}), help_recruit]:
 		if typeof(recruit) == TYPE_DICTIONARY and not recruit.is_empty():
 			out.append(recruit)
 	return out
@@ -1515,13 +1529,16 @@ static func validate_team(campaign: Dictionary, hero_ids: Array, phase_id: Strin
 ## Uma classe sem arte nenhuma ainda (o rato e o tatu, liberados por eventos) fica na Estação até a arte chegar: antes
 ## ela partia na equipe e sumia da rua e da luta, e a expedição lutava com três.
 ## Quem está em recuperação (#118) também fica: só volta à equipe depois dos dias da Enfermaria.
+## Quem está numa missão solo ou capturado (#183) também fica fora.
 static func can_deploy(entry) -> bool:
-	return entry != null and not recovering(entry) and not AHCombatArena.hero_art_of(String(entry.id)).is_empty()
+	return entry != null and not recovering(entry) and not AHSideMissions.away(entry) and not AHCombatArena.hero_art_of(String(entry.id)).is_empty()
 
 
 static func deploy_block(entry) -> String:
 	if can_deploy(entry):
 		return ""
+	if AHSideMissions.away(entry):
+		return AHSideMissions.away_text(entry)
 	if recovering(entry):
 		return recovery_block(entry)
 	return TranslationServer.translate("%s ainda não tem arte de combate e fica na Estação por enquanto.") % entry.display_name
@@ -1537,12 +1554,13 @@ static func team_size_text(limits: Dictionary) -> String:
 
 
 ## Os ataques que a classe tem na posição (#95): cada um precisa de um ataque na posição em que parte.
-static func attacks_from_rank(class_id: String, rank: int) -> Array:
+## ability_ids: as que o herói leva (#259); vazio, as 4 de base da classe.
+static func attacks_from_rank(class_id: String, rank: int, ability_ids: Array = []) -> Array:
 	var out: Array = []
 	var hero_class = GameData.row("classes", class_id)
 	if hero_class == null:
 		return out
-	for ability_id in hero_class.AbilityIds:
+	for ability_id in (ability_ids if not ability_ids.is_empty() else hero_class.AbilityIds):
 		var ability = GameData.row("abilities", ability_id)
 		if ability != null and ability.get("DamageRange") != null and Array(ability.get("OriginRanks", [])).map(func(r): return int(r)).has(rank):
 			out.append(ability.DisplayName)
@@ -1587,6 +1605,10 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 	if campaign.night.phase != "none":
 		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."),
 			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
+	# A volta das missões solo (#183): o trem traz quem terminou a missão, com o relatório.
+	if AHSideMissions.train_pending(campaign):
+		return {"title": TranslationServer.translate("O trem trouxe quem estava em missão"), "text": TranslationServer.translate("Quem terminou a missão solo voltou no trem, com o relatório do que achou lá fora."),
+			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
 	if merchant_here(campaign):
 		return {"title": TranslationServer.translate("O Mercador está na plataforma"), "text": TranslationServer.translate("O Sr. dos Trilhos veio no trem para trocar sementes, sucata e fragmentos. Troque o que quiser e dispense-o antes de preparar a expedição."),
 			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
@@ -1802,7 +1824,8 @@ static func rest_block(campaign: Dictionary) -> String:
 	var block := _day_block(campaign)
 	if block != "":
 		return block
-	if fallen(campaign).is_empty():
+	# Quem está numa missão solo (#183) também volta com os dias.
+	if fallen(campaign).is_empty() and AHSideMissions.running(campaign).is_empty():
 		return TranslationServer.translate("Ninguém em recuperação.")
 	if ready_heroes(campaign).size() >= _smallest_team(campaign):
 		return TranslationServer.translate("Ainda há quem possa partir.")
@@ -1868,6 +1891,10 @@ static func preparation_block(campaign: Dictionary) -> String:
 	# também no botão IR AO MAPA, numa linha.
 	if block == "" and merchant_here(campaign):
 		return TranslationServer.translate("Dispense o Sr. dos Trilhos antes de partir.")
+	# O trem das missões solo (#183): quem voltou nele é recebido antes (o relatório chega com ele). Curto como o do
+	# Mercador: numa linha no botão IR AO MAPA, também no texto Maior.
+	if block == "" and AHSideMissions.train_pending(campaign):
+		return TranslationServer.translate("Receba o trem antes de partir.")
 	return block
 
 
@@ -1898,7 +1925,7 @@ static func confirm_departure(campaign: Dictionary, team: Array, extra_food: int
 			return TranslationServer.translate("Só integrantes vivos podem partir.")
 		if not can_deploy(entry):
 			return deploy_block(entry)
-		if attacks_from_rank(entry.class_id, rank).is_empty():
+		if attacks_from_rank(entry.class_id, rank, AHHeroSkills.equipped(entry)).is_empty():
 			return TranslationServer.translate("%s não tem ataque na posição %d.") % [entry.display_name, rank]
 	var team_block := validate_team(campaign, team, phase_id)
 	if team_block != "":
@@ -1962,6 +1989,8 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	adjust(campaign, "fragments", delivered.fragments)
 	campaign.station.water = int(campaign.station.water) + delivered.water
 	adjust(campaign, SUPPLIES, delivered.supplies)
+	# O resgate (#188): quem foi mandado para a Estação chega, até na derrota; a linha do relatório.
+	delivered.rescue = AHRescue.on_return(campaign)
 	# Pedido pessoal: o item volta inteiro na vitória e na retirada; na derrota fica para trás.
 	var request: String = loot.get("request_item", "")
 	if factor > 0.0 and is_resident(campaign, request) and not campaign.station.completed_requests.has(request):
@@ -2085,8 +2114,8 @@ static func focus_reason(campaign: Dictionary, focus_id: String, team: int = 4) 
 	var f := forecast(campaign, team)
 	match focus_id:
 		FOCUS_WATER:
-			return (TranslationServer.translate("Água: %d na estação; a equipe bebe %d na volta e vai faltar.") % [f.water, f.water_consumed]) if f.thirsty \
-				else (TranslationServer.translate("Água: %d na estação, %d depois da próxima volta.") % [f.water, f.water_after])
+			return (TranslationServer.translate("Água: %d na estação; a equipe bebe %d na próxima expedição e vai faltar.") % [f.water, f.water_consumed]) if f.thirsty \
+				else (TranslationServer.translate("Água: %d na estação, %d depois da próxima expedição.") % [f.water, f.water_after])
 		FOCUS_PARTS:
 			var need := _needed_room(campaign)
 			return TranslationServer.translate("Sucata para relíquias e melhorias.") if need[0] == "" else TranslationServer.translate("Faltam %d sucatas para %s.") % [need[1], _room_the(need[0])]
@@ -2269,16 +2298,16 @@ static func post_yield(entry: Dictionary, room_id: String) -> int:
 static func yield_text(room_id: String, amount: int) -> String:
 	match String(job_rule(room_id).get("Unit", "")):
 		"fragments":
-			return TranslationServer.translate("+%d fragmento por volta") % amount if amount == 1 else TranslationServer.translate("+%d fragmentos por volta") % amount
+			return TranslationServer.translate("+%d fragmento por dia") % amount if amount == 1 else TranslationServer.translate("+%d fragmentos por dia") % amount
 		"scrap":
-			return TranslationServer.translate("+%d sucata por volta") % amount if amount == 1 else TranslationServer.translate("+%d sucatas por volta") % amount
+			return TranslationServer.translate("+%d sucata por dia") % amount if amount == 1 else TranslationServer.translate("+%d sucatas por dia") % amount
 		"supplies":
-			return TranslationServer.translate("+%d suprimento por volta") % amount if amount == 1 else TranslationServer.translate("+%d suprimentos por volta") % amount
+			return TranslationServer.translate("+%d suprimento por dia") % amount if amount == 1 else TranslationServer.translate("+%d suprimentos por dia") % amount
 		"days":
-			return TranslationServer.translate("−1 dia de recuperação para %d caído por volta") % amount if amount == 1 \
-				else TranslationServer.translate("−1 dia de recuperação para %d caídos por volta") % amount
+			return TranslationServer.translate("−1 dia de recuperação para %d caído por dia") % amount if amount == 1 \
+				else TranslationServer.translate("−1 dia de recuperação para %d caídos por dia") % amount
 		"dig":
-			return TranslationServer.translate("+%d ponto de obra por volta") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por volta") % amount
+			return TranslationServer.translate("+%d ponto de obra por dia") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por dia") % amount
 	return ""
 
 
@@ -2291,6 +2320,8 @@ static func post_block(campaign: Dictionary, hero_id: String, room_id: String) -
 		return ""
 	if recovering(entry):
 		return TranslationServer.translate("%s está em recuperação e não trabalha agora.") % entry.display_name
+	if AHSideMissions.away(entry):
+		return AHSideMissions.away_text(entry)
 	if room_id == AHStationGrid.DIG and AHStationGrid.dig_target(campaign) == "":
 		return TranslationServer.translate("Não há entulho para escavar.")
 	if not job_rooms(campaign).has(room_id):

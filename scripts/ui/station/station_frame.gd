@@ -11,7 +11,7 @@ extends RefCounted
 
 const S := preload("res://scripts/flow/station_rules.gd")
 ## As abas de baixo: o id, o ícone e o nome.
-const NAV := [["overview", "nav_overview", "Visão geral"], ["facilities", "nav_facilities", "Instalações"], ["characters", "nav_characters", "Personagens"],
+const NAV := [["overview", "nav_overview", "Visão geral"], ["facilities", "nav_facilities", "Instalações"], ["dig", "place_unlocked", "Escavação"], ["characters", "nav_characters", "Personagens"],
 	["research", "nav_research", "Pesquisa"], ["hide", "nav_hide", "Ocultar HUD"]]
 ## Os materiais da ficha do alto: o ícone, o id no estoque e a dica do mouse.
 const MATERIALS := [["lobby-seed", "seeds", "Sementes: moeda da Estação (comida extra na partida, recrutas e o trauma)."],

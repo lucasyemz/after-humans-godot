@@ -103,5 +103,34 @@
     ],
     "Card": "Atrás do entulho tem mais estação.",
     "Description": "Aprovado (#186, ponto 10): a fala da primeira volta, quando a escavação aparece. Com o Bento ou o Nick fora ou caído, sai só o cartão."
+  },
+  {
+    "Name": "block_looks",
+    "Blocks": {
+      "1:1": {"Name": "Bancos de espera", "Card": "platform_rubble"},
+      "1:2": {"Name": "Bilheteria desabada", "Card": "platform_rubble"},
+      "1:3": {"Name": "Entulho da plataforma", "Card": "platform_rubble"},
+      "1:4": {"Name": "Barreira de obra tombada", "Card": "platform_rubble"},
+      "1:5": {"Name": "Caixotes esmagados", "Card": "platform_rubble"},
+      "1:6": {"Name": "Grade caída", "Card": "platform_rubble"},
+      "1:7": {"Name": "Porta de serviço emperrada", "Card": "platform_rubble"},
+      "2:1": {"Name": "Painel de controle", "Card": "exposed_cables"},
+      "2:2": {"Name": "Vagão de serviço tombado", "Card": "overturned_wagon"},
+      "2:3": {"Name": "Cabos expostos", "Card": "exposed_cables"},
+      "2:4": {"Name": "Máquina antiga de manutenção", "Card": "maintenance_machine"},
+      "2:5": {"Name": "Encanamento rompido", "Card": "flooded_duct"},
+      "2:6": {"Name": "Barris enferrujados", "Card": "overturned_wagon"},
+      "2:7": {"Name": "Caixa de força apagada", "Card": "exposed_cables"},
+      "3:1": {"Name": "Raízes no concreto", "Card": "root_chamber"},
+      "3:2": {"Name": "Duto alagado", "Card": "flooded_duct"},
+      "3:3": {"Name": "Escombros com raízes", "Card": "root_chamber"},
+      "3:4": {"Name": "Armário de manutenção", "Card": "maintenance_machine"},
+      "3:5": {"Name": "Galeria de arcos", "Card": "root_chamber"},
+      "3:6": {"Name": "Raízes no túnel", "Card": "root_chamber"},
+      "3:7": {"Name": "Desmoronamento", "Card": "maintenance_machine"},
+      "L2": {"Name": "Escada soterrada", "Card": "platform_rubble"},
+      "L3": {"Name": "Escada de serviço", "Card": "root_chamber"}
+    },
+    "Description": "Proposta (#284, pedido do Lucas de 01/11): o que cada bloco soterrado mostra no cartão de Escavar e construir. Name: o que está ali (combina com os achados do andar). Card: uma das seis pinturas da #275 (art/station/cards/buried, revisão r2 do #296), a que combina com o nome."
   }
 ]

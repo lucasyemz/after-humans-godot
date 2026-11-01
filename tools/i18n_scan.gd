@@ -23,16 +23,20 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/station/station_build.gd", "res://scripts/campaign/campaign_service.gd",
 	"res://scripts/core/game_data_service.gd", "res://scripts/flow/game_flow.gd", "res://scripts/combat/combat_arena.gd",
 	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd", "res://scripts/flow/station_grid.gd",
-	"res://scripts/flow/type_advantage.gd"]
+	"res://scripts/flow/side_mission_rules.gd", "res://scripts/ui/mission_board.gd",
+	"res://scripts/flow/rescue_rules.gd",
+	"res://scripts/flow/type_advantage.gd", "res://scripts/flow/hero_skills.gd", "res://scripts/ui/station/dig_board.gd",
+	"res://scripts/flow/camp_skills.gd", "res://scripts/flow/species_rules.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
-	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],
+	"camp-skills": ["DisplayName", "Description"],
+	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Role", "Description"], "species": ["DisplayName"],
 	"enemies": ["DisplayName", "Role", "Description"], "enemy-actions": ["DisplayName", "Description"], "events": ["Title", "Description"],
 	"expedition-nodes": ["Title", "Description"], "perks": ["DisplayName", "Description"], "relics": ["DisplayName", "Description"],
 	"research": ["DisplayName", "Description"], "scenarios": ["DisplayName"], "search-outcomes": ["Text"],
 	"hero-upgrades": ["DisplayName", "Description"], "recruitment": ["Text"], "hero-jobs": ["Text"],
 	"night-events": ["Text", "TextOne", "TextEmpty", "TextWatched", "TextProtected"],
-	"skins": ["DisplayName", "ShortName", "Text"], "type-classes": ["DisplayName", "ShortName"],
+	"skins": ["DisplayName", "ShortName", "Text"], "side-missions": ["Title", "Text"], "type-classes": ["DisplayName", "ShortName"],
 }
 
 
@@ -123,6 +127,10 @@ static func data_texts() -> Array:
 	for phase in load("res://scripts/flow/journey_rules.gd").PHASES:
 		for field in ["name", "description"]:
 			out.append({"text": phase[field], "where": "phases.%s.%s" % [phase.id, field]})
+	# As missões solo (#183): a dica de cada aptidão, dentro da linha das regras.
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/side-missions.json")):
+		for need in row.get("Aptitudes", {}):
+			out.append({"text": row.Aptitudes[need].Hint, "where": "side-missions.%s.%s.Hint" % [row.Name, need]})
 	# O briefing e o debriefing (#88): as falas de cada fase, da retirada e da queda.
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/briefings.json")):
 		for index in row.get("Briefing", []).size():
@@ -161,6 +169,10 @@ static func data_texts() -> Array:
 			for index in row.get(list, []).size():
 				if String(row[list][index].get("Text", "")).strip_edges() != "":
 					out.append({"text": row[list][index].Text, "where": "station-grid.%s.%s.%d" % [row.Name, list, index]})
+		# Os nomes dos blocos na planta (#284).
+		var blocks: Dictionary = row.get("Blocks", {})
+		for key in blocks:
+			out.append({"text": blocks[key].Name, "where": "station-grid.%s.%s" % [row.Name, key]})
 	# O desvio (#289): o nome do lugar do ramal, as falas de quem acha o bueiro e da descida e as dicas do barulho.
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/detours.json")):
 		for field in ["Display", "ShortName"]:

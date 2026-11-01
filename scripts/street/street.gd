@@ -782,6 +782,20 @@ func add_hero(hero_id: String, at: Vector3) -> void:
 	occlusion.track(card)
 
 
+## Um herói sai da equipe no meio da jornada (#188: deu o lugar a quem foi solto e volta para a Estação).
+func remove_hero(hero_id: String) -> void:
+	var index := party_ids.find(hero_id)
+	if index < 0:
+		return
+	var facing: float = _heroes[0].facing
+	_heroes[index].queue_free()
+	_heroes.remove_at(index)
+	party_ids.remove_at(index)
+	_wounded.clear()
+	if not _heroes.is_empty():
+		_place_leader(_leader.position, facing)
+
+
 ## Leva o líder andando até um ponto (passar por uma porta, #141), com a fila atrás e sem o jogador comandar: o rastro
 ## cresce como no andar de verdade, e a fila vira para o lado do passo. Sem limite da área de andar (a porta fica fora).
 ## Devolve false se a cena saiu no meio (quem chamou para ali).

@@ -46,6 +46,8 @@ class Unit:
 	var hero_id := ""
 	var enemy_id := ""
 	var class_id := ""
+	## A espécie do herói (#189); "" usa a padrão da classe.
+	var species := ""
 	var display_name := ""
 	## 1 a 4; 0 = fora da formação (morto).
 	var rank := 1
@@ -74,6 +76,8 @@ class Unit:
 	var mark_duration := 0
 	var cooldowns := {}
 	var remaining_uses := {}
+	## As habilidades que ele leva (#259); vazio = as 4 de base da classe.
+	var ability_ids: Array = []
 	## +n nos limites de dano ou cura de uma habilidade (o nível do herói, #90): {ability_id: n}.
 	var ability_bonus := {}
 	var trauma := false

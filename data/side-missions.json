@@ -1,0 +1,335 @@
+[
+  {
+    "Name": "rules", "CaptureEnabled": true,
+    "Kind": "rules",
+    "Note": "#183 (decisão do Lucas, 28/10): as regras das missões solo. A aba abre com a Preparação no nível UnlockLevel. O quadro tem Board[fase mais alta liberada - 1] missões por dia, no máximo MaxActive em curso; cada dia de missão custa FoodPerDay suprimentos na saída. A chance (de MinChance a MaxChance) começa em BaseByDanger[perigo - 1], soma Strong ou Partial por aptidão pedida, LevelUp por nível acima do da missão (até LevelUpMax) e tira LevelDown por nível abaixo, até HpMax pela vida que falta, Trauma com trauma e Crisis com o instinto em CrisisAt ou mais; os traços em Perks. O selo: Good a partir de GoodFrom, Risky a partir de RiskyFrom. O sorteio de 0 a 99: abaixo da chance deu certo (a recompensa e Xp); até HurtBand acima, volta ferido (HurtHp da vida, arredondado para baixo, e metade da recompensa, sem relíquia; decisão de 01/11: 0,25, abaixo do limite de ferido de wounded.json, para ele mancar na chegada, #194); acima disso, capturado. O capturado volta do resgate com RescueHp da vida.",
+    "UnlockLevel": 2,
+    "Board": [
+      2,
+      2,
+      4,
+      4,
+      4
+    ],
+    "MaxActive": 2,
+    "FoodPerDay": 1,
+    "MinChance": 5,
+    "MaxChance": 95,
+    "BaseByDanger": [
+      50,
+      40,
+      30
+    ],
+    "Strong": 20,
+    "Partial": 10,
+    "LevelUp": 3,
+    "LevelUpMax": 15,
+    "LevelDown": 8,
+    "HpMax": 30,
+    "Trauma": 10,
+    "Crisis": 10,
+    "CrisisAt": 120,
+    "GoodFrom": 65,
+    "RiskyFrom": 40,
+    "HurtBand": 25,
+    "HurtHp": 0.25,
+    "Xp": 10,
+    "RescueHp": 0.5,
+    "Aptitudes": {
+      "narrow": {
+        "Strong": [
+          "gato",
+          "rato"
+        ],
+        "Partial": [],
+        "Hint": "Pede alguém que passe por frestas."
+      },
+      "heavy": {
+        "Strong": [
+          "tatu",
+          "cao"
+        ],
+        "Partial": [],
+        "Hint": "Pede alguém que aguente peso."
+      },
+      "far": {
+        "Strong": [
+          "coruja"
+        ],
+        "Partial": [
+          "gato"
+        ],
+        "Hint": "Pede alguém que enxergue longe."
+      },
+      "water": {
+        "Strong": [
+          "sapo"
+        ],
+        "Partial": [
+          "rato"
+        ],
+        "Hint": "Pede alguém que entenda de água."
+      },
+      "machines": {
+        "Strong": [
+          "rato"
+        ],
+        "Partial": [
+          "sapo"
+        ],
+        "Hint": "Pede quem mexa em máquinas sem acordá-las."
+      },
+      "watch": {
+        "Strong": [
+          "cao"
+        ],
+        "Partial": [
+          "coruja"
+        ],
+        "Hint": "Pede alguém que fique de guarda."
+      }
+    },
+    "Perks": [
+      {
+        "Perk": "brave",
+        "Value": 5
+      },
+      {
+        "Perk": "hopeful",
+        "Value": 5
+      },
+      {
+        "Perk": "anxious",
+        "Value": -5
+      },
+      {
+        "Perk": "gloomy",
+        "Value": -5
+      },
+      {
+        "Perk": "agile",
+        "Value": 5,
+        "Need": "narrow"
+      },
+      {
+        "Perk": "sluggish",
+        "Value": -5,
+        "Need": "narrow"
+      },
+      {
+        "Perk": "loyal",
+        "Value": 5,
+        "Need": "watch"
+      },
+      {
+        "Perk": "machine-fear",
+        "Value": -10,
+        "Need": "machines"
+      }
+    ],
+    "Spots": [
+      [
+        150,
+        170
+      ],
+      [
+        300,
+        420
+      ],
+      [
+        420,
+        250
+      ],
+      [
+        560,
+        520
+      ],
+      [
+        610,
+        140
+      ],
+      [
+        700,
+        360
+      ],
+      [
+        820,
+        230
+      ],
+      [
+        880,
+        500
+      ],
+      [
+        960,
+        320
+      ],
+      [
+        1010,
+        120
+      ],
+      [
+        240,
+        560
+      ],
+      [
+        480,
+        80
+      ]
+    ]
+  },
+  {
+    "Name": "fresta_galerias",
+    "Kind": "mission",
+    "Title": "Fresta nas Galerias",
+    "Days": 1,
+    "Danger": 1,
+    "MinPhase": "fase_1",
+    "Weight": 3,
+    "Needs": [
+      "narrow"
+    ],
+    "Reward": "seeds",
+    "RelicChance": 0,
+    "Text": "Metade de uma loja das Galerias desabou. Pela fresta, ainda se vê uma prateleira com potes de sementes."
+  },
+  {
+    "Name": "casulo_tombado",
+    "Kind": "mission",
+    "Title": "Casulo de Ferro Tombado",
+    "Days": 1,
+    "Danger": 1,
+    "MinPhase": "fase_1",
+    "Weight": 3,
+    "Needs": [
+      "heavy"
+    ],
+    "Reward": "scrap",
+    "RelicChance": 0,
+    "Text": "Um Casulo de Ferro caiu na porta de uma oficina. Alguém precisa erguer a lataria para entrar."
+  },
+  {
+    "Name": "cisterna_turva",
+    "Kind": "mission",
+    "Title": "Cisterna Turva",
+    "Days": 1,
+    "Danger": 1,
+    "MinPhase": "fase_1",
+    "Weight": 2,
+    "Needs": [
+      "water"
+    ],
+    "Reward": "supplies",
+    "RelicChance": 0,
+    "Text": "Uma cisterna de prédio ainda guarda água. O filtro entupiu, mas a despensa ao lado está seca."
+  },
+  {
+    "Name": "guarda_caminho_morto",
+    "Kind": "mission",
+    "Title": "Guarda no Caminho Morto",
+    "Days": 1,
+    "Danger": 2,
+    "MinPhase": "fase_2",
+    "Weight": 2,
+    "Needs": [
+      "watch"
+    ],
+    "Reward": "scrap",
+    "RelicChance": 0,
+    "Text": "Um carrinho de sucata parou no meio de um Caminho Morto. Alguém precisa vigiar enquanto a carga é solta."
+  },
+  {
+    "Name": "antena_torre",
+    "Kind": "mission",
+    "Title": "Antena na Torre",
+    "Days": 2,
+    "Danger": 2,
+    "MinPhase": "fase_2",
+    "Weight": 2,
+    "Needs": [
+      "far"
+    ],
+    "Reward": "fragments",
+    "RelicChance": 0,
+    "Text": "Do alto de uma torre dá para ver de onde vem o brilho das peças caídas. A subida leva dois dias."
+  },
+  {
+    "Name": "painel_adormecido",
+    "Kind": "mission",
+    "Title": "Painel Adormecido",
+    "Days": 1,
+    "Danger": 2,
+    "MinPhase": "fase_2",
+    "Weight": 2,
+    "Needs": [
+      "machines"
+    ],
+    "Reward": "scrap",
+    "RelicChance": 0,
+    "Text": "Um painel de máquina dorme numa garagem. Desmontado sem acordar, rende boas peças."
+  },
+  {
+    "Name": "barcos_bairro_submerso",
+    "Kind": "mission",
+    "Title": "Barcos do Bairro Submerso",
+    "Days": 1,
+    "Danger": 2,
+    "MinPhase": "fase_3",
+    "Weight": 2,
+    "Needs": [
+      "water",
+      "heavy"
+    ],
+    "Reward": "supplies",
+    "RelicChance": 0,
+    "Text": "Barcos afundados no Bairro Submerso ainda guardam caixas fechadas. É preciso mergulhar e puxar."
+  },
+  {
+    "Name": "casa_remedio_alagada",
+    "Kind": "mission",
+    "Title": "Casa do Remédio Alagada",
+    "Days": 2,
+    "Danger": 3,
+    "MinPhase": "fase_3",
+    "Weight": 1,
+    "Needs": [
+      "water",
+      "narrow"
+    ],
+    "Reward": "bandages",
+    "RelicChance": 1,
+    "Text": "O andar de baixo de uma Casa do Remédio está debaixo d'água. Lá em cima ainda há caixas fechadas."
+  },
+  {
+    "Name": "deposito_vigiado",
+    "Kind": "mission",
+    "Title": "Depósito Vigiado",
+    "Days": 2,
+    "Danger": 3,
+    "MinPhase": "fase_4",
+    "Weight": 1,
+    "Needs": [
+      "machines",
+      "watch"
+    ],
+    "Reward": "fragments",
+    "RelicChance": 1,
+    "Text": "Um depósito ainda tem um vigia de ferro na porta. Quem passar por ele sem barulho acha o que guardavam lá dentro."
+  },
+  {
+    "Name": "galeria_desabada",
+    "Kind": "mission",
+    "Title": "Galeria Desabada",
+    "Days": 2,
+    "Danger": 3,
+    "MinPhase": "fase_5",
+    "Weight": 1,
+    "Needs": [
+      "heavy",
+      "far"
+    ],
+    "Reward": "scrap",
+    "RelicChance": 1,
+    "Text": "Uma galeria inteira cedeu sobre os trilhos. De longe se vê onde escavar."
+  }
+]

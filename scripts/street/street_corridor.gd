@@ -117,11 +117,16 @@ var bodies := {}
 const BODY_MARKER := 1.4
 ## O tom do caído no mapa: acinzentado como na luta, mais claro para ler na noite e na chuva.
 const FALLEN_TINT := Color(0.78, 0.78, 0.84)
+## O preso do resgate (#188): mais escuro que a equipe, para não parecer um da fila; a folga dos objetos de busca (m).
+const PRISONER_TINT := Color(0.6, 0.6, 0.68)
+const PRISONER_CLEARANCE := 1.8
 ## Onde o corpo fica (m): o passo atrás da fila (e entre dois corpos) e o quanto à frente da faixa da equipe.
 const BODY_GAP := 1.5
 const BODY_FRONT := 0.2
 ## Quanto a equipe recua da borda do mapa quando o aviso do caído para a passagem (m).
 const TRAVEL_STEP_BACK := 1.0
+## O preso do resgate (#188): o capturado numa missão solo ou quem pede ajuda, no trecho dele (null sem nenhum).
+var prisoner: AHMapActor
 var _action := Callable()
 ## As tampas de bueiro do desvio (#289) na rua: a da entrada e a da saída (nulas fora da rua ou sem desvio).
 var manholes: Array[MeshInstance3D] = []
@@ -152,6 +157,7 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	hud.event_closed.connect(_on_event_closed)
 	hud.camp_food.connect(func(id): _camp_care(id, "food"))
 	hud.camp_bandage.connect(func(id): _camp_care(id, "bandage"))
+	hud.camp_skill.connect(_camp_skill)
 	hud.camp_leave.connect(_on_camp_leave)
 	hud.result_continue.connect(_on_result_continue)
 	hud.menu_return.connect(_retreat)
@@ -1014,6 +1020,19 @@ func _choose_action(campaign: Dictionary, route: Dictionary, leader: Vector3) ->
 		text = bodies[body[0]].action_text
 		action = _lift.bind(body[0])
 		where = _body_point(body[0])
+	# O preso (#188): soltar, com a patrulha do trecho vencida.
+	if prisoner != null:
+		_hear_prisoner(campaign, leader)
+		var distance := absf(prisoner.position.x - leader.x)
+		if distance < best and absf(prisoner.position.y - leader.y) < 1.0:
+			best = distance
+			where = prisoner.marker_point()
+			if AHRescue.can_free(campaign):
+				text = prisoner.action_text
+				action = _free_prisoner
+			else:
+				text = tr("%s · a patrulha guarda") % AHRescue.prisoner_name(campaign)
+				action = Callable()
 	var exit_x: float = EXIT_X if street.scenario == null else segments[0].x0 + EXIT_X
 	# No cenário, com o guardião vencido, a volta vale de qualquer ponto (RequestExpeditionReturn da Unreal).
 	var done_here: bool = street.scenario != null and campaign.session.expedition.objective_completed and text == ""
@@ -1788,6 +1807,34 @@ func _camp_care(hero_id: String, kind: String) -> void:
 	hud.refresh(Campaign.state)
 
 
+## Uma habilidade de acampamento (#261): a regra decide; quem mudou de vida ou de instinto responde na cena, e a linha de
+## estado do acampamento diz o que aconteceu (ou por que não).
+func _camp_skill(hero_id: String, skill_id: String, target_id: String) -> void:
+	if camp.switching():
+		return
+	var before := {}
+	for id in Campaign.state.session.expedition.team:
+		var hero = Campaign.hero(id)
+		if hero != null:
+			before[id] = [int(hero.hp), int(hero.get("instinct", 0))]
+	var error := AHCampSkills.use(Campaign.state, hero_id, skill_id, target_id)
+	if error == "":
+		Campaign.save()
+		var row = AHCampSkills.skill(skill_id)
+		hud.toast(tr("%s: %s.") % [Campaign.hero(hero_id).display_name, tr(String(row.DisplayName))], 2.5)
+		for id in before:
+			var hero = Campaign.hero(id)
+			var life: int = int(hero.hp) - before[id][0]
+			var calm: int = int(hero.get("instinct", 0)) - before[id][1]
+			if life != 0 or calm != 0:
+				hud.camp_respond(id, "bandage" if life > 0 else "food", life, calm)
+		camp.show_care_pose(hero_id)
+	else:
+		hud.toast(error, 2.5)
+	hud.show_camp(Campaign.state, camp)
+	hud.refresh(Campaign.state)
+
+
 ## Levantar acampamento: um fade devolve a equipe à fila; lá fora, o tempo mudou.
 func _on_camp_leave() -> void:
 	if busy:
@@ -1813,7 +1860,10 @@ func _on_camp_leave() -> void:
 		_show_hidden_guards()
 	street.apply_corridor_weather(weather)
 	busy = false
-	hud.toast(tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather)), 4.0)
+	var rested := tr("A equipe descansou. Lá fora, o tempo mudou: %s.") % tr(street.WEATHER_NAMES.get(weather, weather))
+	# A noite (#261): mal dormida (Exposto) ou segurada por quem vigiou.
+	var night := AHCampSkills.night_notice(String(Campaign.state.session.expedition.corridor.get("camp_night", "")))
+	hud.toast(rested + ("\n" + night if night != "" else ""), 5.0 if night != "" else 4.0)
 	hud.refresh(Campaign.state)
 	# Reaberto no acampamento com o guardião vencido e a carga ainda fechada: as caixas abrem ao levantar acampamento.
 	if AHFightRewards.cargo_pending(Campaign.state):
@@ -1962,6 +2012,7 @@ func _spawn_bodies() -> void:
 		street.add_child(body)
 		body.position = Vector3(float(entry.x), float(entry.y), float(entry.z))
 		bodies[entry.hero_id] = body
+	_spawn_prisoner()
 
 
 ## O caído ao alcance do líder (o mais perto, dentro de best): [hero_id, distância], ou [] sem nenhum.
@@ -1988,6 +2039,146 @@ func _lift(hero_id: String) -> void:
 	hud.toast(tr("A equipe levantou %s: segue junto até a volta, sem lutar.") % Campaign.hero(hero_id).display_name, 3.5)
 	_spawn_bodies()
 	hud.refresh(Campaign.state)
+
+
+# ---------------------------------------------------------------- o resgate (#188)
+
+## O preso no trecho do resgate, se ele é deste mapa e ainda espera (ou foi solto e a escolha ficou aberta): a pose de
+## ferido (#194) no lugar da patrulha, até a arte do preso chegar.
+func _spawn_prisoner() -> void:
+	if prisoner != null:
+		prisoner.queue_free()
+		prisoner = null
+	var rescue := AHRescue.current(Campaign.state)
+	if rescue.is_empty() or not [AHRescue.WAITING, AHRescue.FREED].has(String(rescue.state)):
+		return
+	var step := int(rescue.step)
+	if step < map_first or step > map_last or int(Campaign.state.session.expedition.corridor.current_house) >= 0:
+		return
+	var art_id: String = String(rescue.hero_id) if rescue.kind == "captured" else "hero_%s_0" % String(rescue.recruit.class_id)
+	var variant: String = String(Campaign.hero(rescue.hero_id).get("art_variant", "")) if rescue.kind == "captured" and Campaign.hero(rescue.hero_id) != null \
+		else String(rescue.recruit.get("art_variant", ""))
+	var art := AHCombatArena.art_entry(street._combat_art.heroes, art_id, variant)
+	if art.is_empty():
+		return
+	prisoner = AHMapActor.create("prisoner", AHWounded.pose(art.idle), AHCharacterHeights.find(art_id), PRISONER_TINT)
+	# Solto antes do save (a escolha ficou por fazer): o aviso reabre a escolha.
+	prisoner.action_text = (tr("E  Soltar %s") if rescue.state == AHRescue.WAITING else tr("E  Decidir com %s")) % AHRescue.prisoner_name(Campaign.state)
+	street.add_child(prisoner)
+	var at := _guard_position(step, 0)
+	at.x = _prisoner_x(step, at.x + (STEP_LENGTH * 0.25 if street.scenario == null else 1.2))
+	prisoner.position = at
+	prisoner.set_facing(-1.0)
+
+
+## Onde o preso fica: dentro do trecho dele (a patrulha de antes fica para trás) e o mais longe que dá dos objetos de
+## busca e das portas (o aviso de um disputava o do outro): perto do ponto pedido, se a folga basta; senão, o mais livre.
+func _prisoner_x(step: int, wanted: float) -> float:
+	var taken: Array = props.values().map(func(prop): return prop.position.x) + doors.map(func(door): return float(door.x))
+	if street.scenario != null:
+		var zone: int = segments[_segment_of(step)].zone
+		taken += scenario_props.filter(func(entry): return entry.zone == zone).map(func(entry): return float(entry.x))
+		taken += side_rooms.filter(func(room): return room.door_segment == _segment_of(step)).map(func(room): return float(room.door_x))
+	var lo := _step_x(step, 0.15)
+	var hi := _step_x(step, 0.85)
+	var best_x := clampf(wanted, lo, hi)
+	var best_gap := -1.0
+	var x := lo
+	while x <= hi + 0.001:
+		var gap: float = taken.reduce(func(least, other): return minf(least, absf(other - x)), INF)
+		# A folga de PRISONER_CLEARANCE vale como livre: entre os livres, o mais perto do ponto pedido.
+		var score := minf(gap, PRISONER_CLEARANCE) * 100.0 - absf(x - wanted)
+		if score > best_gap:
+			best_gap = score
+			best_x = x
+		x += 0.2
+	return best_x
+
+
+## A primeira vez que a equipe chega perto (15 m): a linha das batidas na HUD, uma vez por expedição.
+func _hear_prisoner(campaign: Dictionary, leader: Vector3) -> void:
+	var expedition: Dictionary = campaign.session.expedition
+	var asked: Array = expedition.get("asked", [])
+	if asked.has("rescue_heard") or absf(prisoner.position.x - leader.x) > 15.0:
+		return
+	asked.append("rescue_heard")
+	expedition.asked = asked
+	hud.toast(tr("Batidas de metal adiante. Alguém pede ajuda."), 4.0)
+
+
+## Soltar (#188): o preso sai das amarras e a escolha abre (o save no meio volta com ela aberta).
+func _free_prisoner() -> void:
+	if not AHRescue.release(Campaign.state):
+		return
+	Campaign.save()
+	Sound.play("res://audio/world/search_cloth_1.ogg")
+	_rescue_choice()
+
+
+## A escolha depois de soltar: entrar na equipe, ir para a Estação ou (no pedido de ajuda) ficar. As que não valem
+## saem, com o motivo no texto.
+func _rescue_choice() -> void:
+	var campaign: Dictionary = Campaign.state
+	var rescue := AHRescue.current(campaign)
+	var who := AHRescue.prisoner_name(campaign)
+	var lines: Array = [tr("Os robôs prendiam %s aqui. Mal se aguenta, mas consegue andar.") % who if rescue.kind == "captured"
+		else tr("Alguém pedia ajuda aqui: %s.") % who]
+	# Quem é: a classe e os traços (o pedido de ajuda é um desconhecido; o capturado, para lembrar).
+	lines.append(AHRescue.profile_text(campaign))
+	var options: Array = []
+	for spec in rescue_options(campaign):
+		var block := AHRescue.choice_block(campaign, spec[0])
+		if block == "":
+			options.append([spec[1], _rescue_pick.bind(spec[0])])
+		elif (spec[0] != "leave" or rescue.kind != "captured") and not lines.has(block):
+			lines.append(block)
+	hud.show_choice(who, "\n".join(lines), options)
+
+
+## As opções da escolha, [id, texto], antes do filtro do que vale. Mandar à Estação diz quem vai (decisão do Lucas, 01/11).
+func rescue_options(campaign: Dictionary) -> Array:
+	var food_left: bool = int(campaign.session.expedition.food) >= int(AHRescue.rules().get("LeaveFood", 1))
+	return [["join", tr("Entrar na equipe")], ["station", tr("Mandar %s à Estação") % AHRescue.prisoner_name(campaign)],
+		["leave", tr("Deixar com um pouco de comida") if food_left else tr("Deixar para trás")]]
+
+
+func _rescue_pick(option: String) -> void:
+	var campaign: Dictionary = Campaign.state
+	if option == "join" and AHRescue.team_full(campaign):
+		# A equipe cheia: quem dá o lugar volta para a Estação pelo caminho já limpo.
+		var choices: Array = []
+		for hero_id in AHRescue.can_leave_team(campaign):
+			choices.append([tr("%s volta para a Estação") % Campaign.hero(hero_id).display_name, _rescue_join.bind(hero_id)])
+		choices.append([tr("Voltar"), _rescue_choice])
+		hud.show_choice(tr("Quem dá o lugar?"), tr("A equipe está cheia. Quem sai volta para a Estação pelo caminho já limpo, sem perder nada."), choices)
+		return
+	if option == "join":
+		_rescue_join("")
+		return
+	var who := AHRescue.prisoner_name(campaign)
+	if AHRescue.choose(campaign, option) != "":
+		return
+	Campaign.save()
+	var leave_text := tr("A equipe deixa %s com um pouco de comida.") if int(AHRescue.current(campaign).get("food_left", 1)) > 0 else tr("A equipe segue sem %s.")
+	hud.toast(tr("%s segue pelos trilhos para a Estação.") % who if option == "station" else leave_text % who, 3.5)
+	_spawn_prisoner()
+	hud.refresh(campaign)
+
+
+func _rescue_join(out_id: String) -> void:
+	var campaign: Dictionary = Campaign.state
+	var at: Vector3 = prisoner.position if prisoner != null else street._leader.position
+	if AHRescue.choose(campaign, "join", out_id) != "":
+		return
+	Campaign.save()
+	var rescue := AHRescue.current(campaign)
+	if out_id != "":
+		street.remove_hero(out_id)
+	street.add_hero(String(rescue.hero_id), at)
+	var who: String = Campaign.hero(rescue.hero_id).display_name
+	hud.toast(tr("%s entra na equipe.") % who if out_id == "" else tr("%s entra na equipe; %s volta para a Estação.") % [who, Campaign.hero(out_id).display_name], 3.5)
+	_spawn_prisoner()
+	hud.refresh(campaign)
 
 
 ## A carga recuperada do guardião (#91), se ainda não foi escolhida: as caixas viradas, a escolha e a revelação.

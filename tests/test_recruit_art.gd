@@ -36,9 +36,14 @@ func run(t) -> void:
 			var reaction: Dictionary = entry.reactions.get(pose, {})
 			poses_ok = poses_ok and ResourceLoader.exists(reaction.get("file", "")) and reaction.body_reference_pixels == entry.idle.body_reference_pixels
 		t.check(poses_ok, "%s: o golpe de cada habilidade e as reações, com o pé e a altura do parado" % class_id)
-		t.check(AHCharacterHeights.HEIGHTS.has(class_id), "%s: altura própria" % class_id)
-		# A escala (o Lucas, no #196): o Guaxinim e o Tatu menores que a Íris e o Nick, e a largura medida para a fila.
-		t.check(AHCharacterHeights.HEIGHTS[class_id] < AHCharacterHeights.HEIGHTS.sapo, "%s: menor que a Íris" % class_id)
+		var height := AHSpecies.height(AHSpecies.default_for(class_id))
+		t.check(height > 0.0, "%s: altura própria (a da espécie, #189)" % class_id)
+		# A escala do redesenho (o Lucas, na #225, no lugar da do #196): o Guaxinim entre a Íris e o Nick, e o Tatu um pouco
+		# maior, sem chegar ao Bento.
+		if class_id == "rato":
+			t.check(height > AHSpecies.height("sapo") and height < AHSpecies.height("gato"), "rato: entre a Íris e o Nick")
+		else:
+			t.check(height > AHSpecies.height("guaxinim") and height < AHSpecies.height("cao"), "tatu: maior que o Guaxinim e menor que o Bento")
 		t.check(float(entry.idle.get("body_width_pixels", 0)) > 0, "%s: largura do corpo medida" % class_id)
 		var campaign: Dictionary = Campaign.create_initial(187)
 		campaign.unlocked_classes = ["cao", class_id]

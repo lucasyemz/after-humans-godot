@@ -4,11 +4,14 @@
 ## inimigos, os suprimentos e a história). Clicar ou tocar no lugar escolhe a fase; à direita, o painel dela com a leitura
 ## do radar e PREPARAR NESTE LUGAR. O teclado e o controle andam pelos rótulos dos lugares (as setas) e escolhem com
 ## Interagir. A fase escolhida segue para a equipe na plataforma (#123).
+## Com a Preparação no nível 2, a aba Missões solo (#183, AHMissionBoard) troca os lugares pelos pinos das missões do dia.
 class_name AHPhaseMap
 extends Control
 
 signal phase_chosen(phase_id: String)
 signal closed
+## A Estação mudou por aqui (#183: alguém saiu em missão, um dia passou): o HUD grava e redesenha.
+signal changed
 
 const J = preload("res://scripts/flow/journey_rules.gd")
 const S = preload("res://scripts/flow/station_rules.gd")
@@ -34,6 +37,13 @@ var _footer: VBoxContainer
 var _header: Label
 var _stock: HBoxContainer
 var _readings := {}
+## A aba: "places" (as fases) ou "missions" (as missões solo, #183), a missão escolhida (ou "captured:<herói>") e o
+## herói escolhido para ela.
+var tab := "places"
+var mission := ""
+var hero_pick := ""
+var _tabs: HBoxContainer
+var _legend: HBoxContainer
 
 
 func _init() -> void:
@@ -81,9 +91,11 @@ func _init() -> void:
 	head.custom_minimum_size = Vector2(MAP_PANEL.size.x - 48, 0)
 	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(head)
-	var places := AHKit.label(tr("Lugares"), "text", AHKit.TEXT, true, true)
-	places.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(places)
+	_tabs = HBoxContainer.new()
+	_tabs.name = "Tabs"
+	_tabs.add_theme_constant_override("separation", 6)
+	_tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(_tabs)
 	head.add_child(AHKit.label(tr("Rede antiga · sinal com falhas"), "small", AHKit.MUTED))
 	var art := TextureRect.new()
 	art.name = "Painting"
@@ -115,6 +127,7 @@ func _init() -> void:
 	add_child(_labels)
 	# Embaixo da pintura: a legenda e o estoque da Estação.
 	var legend := HBoxContainer.new()
+	_legend = legend
 	legend.name = "Legend"
 	legend.position = Vector2(PAINT_POS.x, PAINT_POS.y + 642)
 	legend.add_theme_constant_override("separation", 20)
@@ -198,6 +211,9 @@ func open(phase_id: String = "", route_focus: String = "") -> void:
 	_cover()
 	selected = phase_id
 	focus = route_focus
+	tab = "places"
+	mission = ""
+	hero_pick = ""
 	visible = true
 	refresh()
 	# A leitura fixou as sementes das fases (AHNetworkRadar.route_seed): a partida usa as mesmas.
@@ -210,7 +226,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if AHUiStyle.is_back(event):
 		get_viewport().set_input_as_handled()
 		closed.emit()
-	elif event.is_action_pressed("station_prepare"):
+	elif (event.is_action_pressed("station_room_prev") or event.is_action_pressed("station_room_next")) \
+			and AHSideMissions.unlocked(Campaign.state):
+		# PgUp / PgDn, LB / RB: troca a aba (#183), como troca o cômodo na Estação.
+		get_viewport().set_input_as_handled()
+		show_tab("places" if tab == "missions" else "missions")
+	elif event.is_action_pressed("station_prepare") and tab == "places":
 		# G / X, como diz o botão: com uma fase aberta escolhida, segue para a plataforma.
 		get_viewport().set_input_as_handled()
 		var go: Button = _footer.get_node_or_null("Prepare")
@@ -223,13 +244,146 @@ func refresh() -> void:
 	var completed := J.PHASES.filter(func(p): return c.completed_phases.has(p.id)).size()
 	var living := S.living(c).size()
 	_header.text = tr("Bairro Submerso · Fases concluídas %d / %d · Equipe: %d %s") % [completed, J.PHASES.size(), living, tr("vivo") if living == 1 else tr("vivos")]
+	if not AHSideMissions.unlocked(c):
+		tab = "places"
+	_build_tabs(c)
+	_build_stock(c)
+	_legend.visible = tab == "places"
+	if tab == "missions":
+		_build_missions(c)
+		return
 	_readings = {}
 	for info in J.PHASES:
 		_readings[info.id] = R.reading(c, info.id, focus if info.id == selected else "")
-	_build_stock(c)
 	_build_layers(c)
 	_build_labels(c)
 	_build_aside(c)
+
+
+## As abas do mapa: Lugares e Missões solo (fechada, com o motivo, até a Preparação nível 2).
+func _build_tabs(c: Dictionary) -> void:
+	for child in _tabs.get_children():
+		_tabs.remove_child(child)
+		child.queue_free()
+	for spec in [["places", "route", tr("Lugares")], ["missions", "marker-here", tr("Missões solo")]]:
+		var button := Button.new()
+		button.name = "Tab_%s" % spec[0]
+		button.text = String(spec[2]).to_upper()
+		button.icon = AHKit.icon(spec[1])
+		button.add_theme_constant_override("icon_max_width", 24)
+		var on: bool = spec[0] == tab
+		AHKit.style_as(button, "nav_active" if on else "nav")
+		button.add_theme_font_override("font", AHKit.font(true))
+		button.add_theme_font_size_override("font_size", AHKit.size("small"))
+		if on:
+			for state in ["font_color", "font_hover_color", "font_focus_color"]:
+				button.add_theme_color_override(state, AHKit.AMBER)
+			button.add_theme_color_override("icon_normal_color", AHKit.AMBER)
+		button.focus_mode = Control.FOCUS_NONE
+		if spec[0] == "missions" and not AHSideMissions.unlocked(c):
+			button.disabled = true
+			button.tooltip_text = tr("Melhore a Preparação para mandar missões solo.")
+		var id: String = spec[0]
+		button.pressed.connect(show_tab.bind(id))
+		_tabs.add_child(button)
+
+
+func show_tab(id: String) -> void:
+	if tab == id:
+		return
+	tab = id
+	mission = ""
+	hero_pick = ""
+	Sound.play("res://audio/ui/click.ogg", 0.5)
+	refresh()
+
+
+## A aba das missões: a pintura sem as projeções das fases, os pinos e o painel da missão (AHMissionBoard).
+func _build_missions(c: Dictionary) -> void:
+	for box in [_layers, _labels, _aside, _footer]:
+		for child in box.get_children():
+			box.remove_child(child)
+			child.queue_free()
+	var pins: Array = AHMissionBoard.pins(self, c, _labels)
+	AHMissionBoard.aside(self, c, _aside, _footer, ASIDE.size.x - 64)
+	# O teclado e o controle: ↑ ↓ (e Tab) andam pelos pinos e depois pelo painel (os heróis, a lista, MANDAR, esperar um
+	# dia); → vai do mapa ao painel e ← volta ao pino escolhido.
+	var side: Array = (_aside.find_children("*", "Button", true, false) + _footer.find_children("*", "Button", true, false)) \
+		.filter(func(b): return b.focus_mode != Control.FOCUS_NONE and not b.disabled)
+	var chain: Array = pins + side
+	var picked_pin: Button = null
+	for pin in pins:
+		pin.focus_mode = Control.FOCUS_ALL
+		if pin.get_parent().name == "Mission_%s" % mission:
+			picked_pin = pin
+	for i in chain.size():
+		var button: Button = chain[i]
+		var next: NodePath = chain[(i + 1) % chain.size()].get_path()
+		var previous: NodePath = chain[(i - 1 + chain.size()) % chain.size()].get_path()
+		for edge in ["focus_neighbor_bottom", "focus_next"]:
+			button.set(edge, next)
+		for edge in ["focus_neighbor_top", "focus_previous"]:
+			button.set(edge, previous)
+		if pins.has(button):
+			button.focus_neighbor_right = (side[0] if not side.is_empty() else chain[(i + 1) % chain.size()]).get_path()
+			button.focus_neighbor_left = previous
+		else:
+			button.focus_neighbor_left = (picked_pin if picked_pin != null else (pins[0] if not pins.is_empty() else button)).get_path()
+			button.focus_neighbor_right = next
+	if not AHUiStyle.using_keys or chain.is_empty():
+		return
+	# Com a missão e o herói escolhidos, o foco vai a MANDAR; só a missão, ao primeiro herói; senão, ao pino escolhido.
+	var send: Button = _footer.get_node_or_null("Send")
+	var heroes: Array = side.filter(func(b): return String(b.name).begins_with("Hero_"))
+	var prepare: Button = _footer.get_node_or_null("Prepare")
+	if send != null and not send.disabled:
+		AHKit.focus_later(send)
+	elif prepare != null:
+		# O resgate escolhido (#188): o foco vai a PREPARAR NESTA FASE.
+		AHKit.focus_later(prepare)
+	elif mission != "" and not heroes.is_empty():
+		AHKit.focus_later(heroes.filter(func(b): return String(b.name) == "Hero_%s" % hero_pick)[0] if hero_pick != "" and heroes.any(func(b): return String(b.name) == "Hero_%s" % hero_pick) else heroes[0])
+	else:
+		AHKit.focus_later(picked_pin if picked_pin != null else chain[0])
+
+
+func pick_mission(id: String) -> void:
+	mission = "" if mission == id else id
+	hero_pick = ""
+	Sound.play("res://audio/ui/click.ogg", 0.5)
+	refresh()
+
+
+func pick_hero(hero_id: String) -> void:
+	hero_pick = hero_id
+	Sound.play("res://audio/ui/click.ogg", 0.5)
+	refresh()
+
+
+## MANDAR: o herói sai na missão, a Estação grava e o painel volta à lista.
+func send_mission() -> void:
+	var error := AHSideMissions.send(Campaign.state, hero_pick, mission)
+	if error != "":
+		Sound.play("res://audio/ui/deny.ogg")
+		return
+	Sound.play("res://audio/ui/click.ogg", 0.7)
+	mission = ""
+	hero_pick = ""
+	changed.emit()
+	refresh()
+
+
+## Esperar um dia (#183): com ninguém para partir e alguém em missão, o dia passa daqui também.
+func rest_day() -> void:
+	var error := S.rest_day(Campaign.state)
+	if error != "":
+		Sound.play("res://audio/ui/deny.ogg")
+		return
+	Sound.play("res://audio/ui/click.ogg", 0.7)
+	mission = ""
+	hero_pick = ""
+	changed.emit()
+	refresh()
 
 
 ## O tamanho do texto mudou nas Opções (AHUiStyle.retune).
@@ -551,18 +705,7 @@ func _build_aside(c: Dictionary) -> void:
 	go.get_node("Key").set_meta("ah_action", "station_prepare")
 	go.get_node("Key").set_meta("ah_format", tr("%s / X"))
 	(go.get_node("Key").get_child(0) as Label).text = tr("%s / X") % AHUiStyle.key_name("station_prepare")
-	# A tecla no fim do botão, e o texto terminando antes dela.
-	var key: Control = go.get_node("Key")
-	var room: float = key.get_combined_minimum_size().x + 70.0
-	var seen: Array = []
-	for look in ["normal", "hover", "pressed", "focus", "disabled", "hover_pressed"]:
-		var style: StyleBox = go.get_theme_stylebox(look) if go.has_theme_stylebox_override(look) else null
-		if style != null and not seen.has(style):
-			seen.append(style)
-			style.content_margin_right = room
-	go.resized.connect(func():
-		key.reset_size()
-		key.position = Vector2(go.size.x - key.size.x - 52.0, (go.size.y - key.size.y) * 0.5))
+	key_at_end(go)
 	go.disabled = not open
 	if not open:
 		go.tooltip_text = tr("Bloqueada · vença a fase anterior")
@@ -576,6 +719,21 @@ func _build_aside(c: Dictionary) -> void:
 			go.set(side, place.get_path())
 	if open and AHUiStyle.using_keys:
 		AHKit.focus_later(go)
+
+
+## A tecla no fim do botão principal do painel, e o texto terminando antes dela (também o MANDAR das missões solo).
+static func key_at_end(go: Button) -> void:
+	var key: Control = go.get_node("Key")
+	var room: float = key.get_combined_minimum_size().x + 70.0
+	var seen: Array = []
+	for look in ["normal", "hover", "pressed", "focus", "disabled", "hover_pressed"]:
+		var style: StyleBox = go.get_theme_stylebox(look) if go.has_theme_stylebox_override(look) else null
+		if style != null and not seen.has(style):
+			seen.append(style)
+			style.content_margin_right = room
+	go.resized.connect(func():
+		key.reset_size()
+		key.position = Vector2(go.size.x - key.size.x - 52.0, (go.size.y - key.size.y) * 0.5))
 
 
 func _aside_head(icon_name: String, title: String, closable: bool) -> void:
@@ -593,7 +751,7 @@ func _aside_head(icon_name: String, title: String, closable: bool) -> void:
 		close.name = "Deselect"
 		close.custom_minimum_size = Vector2(52, 52)
 		close.focus_mode = Control.FOCUS_NONE
-		close.pressed.connect(_select.bind(""))
+		close.pressed.connect(func(): pick_mission(mission) if tab == "missions" else _select(""))
 		head.add_child(close)
 
 

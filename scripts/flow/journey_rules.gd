@@ -52,13 +52,14 @@ const PHASE_EFFECTS := {
 ## 3 Origem, 4 Contradição, 5 Presença humana (#64). O evento de história de cada fase abre na primeira Passagem dela.
 const STORY_EVENTS := {"fase_2": "voz_interfone", "fase_3": "porta_espera", "fase_5": "sobrevivente_tuneis"}
 ## "O que a equipe viu": a linha do relatório da volta na primeira vitória de cada fase. Nenhuma mostra um humano nem
-## cita Théo (bento-nick-arc §11): o máximo é a autenticação do fim da fase 5 (lore §25.4).
+## cita Théo (bento-nick-arc §11): o máximo é a autenticação do fim da fase 5 (lore §25.4). A da fase 3 não lista "linhagem":
+## desde a #227, é a palavra que a equipe usa na luta (decisão do Lucas no #285).
 ## As fases cuja linha cita o que o evento de história mostrou: só depois de ele aparecer.
 const STORY_REPORT_AFTER_EVENT := ["fase_2"]
 const STORY_REPORTS := {
 	"fase_1": "A Estação aguenta mais alguns dias. O que os Antigos deixaram, ninguém aqui sabe fazer de novo.",
 	"fase_2": "Na volta, alguém repete a frase do interfone: \"preservação humana\". Ninguém sabe por que a ponte acordou.",
-	"fase_3": "As fichas passam de mão em mão no caminho de casa. Algumas palavras ninguém sabe o que querem dizer: \"edição\", \"linhagem\", \"incubação\".",
+	"fase_3": "As fichas passam de mão em mão no caminho de casa. Algumas palavras ninguém sabe o que querem dizer: \"edição\", \"incubação\".",
 	"fase_4": "Os dois relatórios voltam na mochila. \"Um deles está errado, ou os dois estão incompletos.\"",
 	"fase_5": "No painel da eclusa, uma linha nova piscava: AUTENTICAÇÃO HUMANA VÁLIDA · registro recente. Ninguém fala no caminho de casa.",
 }
@@ -169,8 +170,8 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	var most: int = team_limits(phase_id).max
 	for hero_id in campaign.get("preferred_formation", []):
 		for hero in campaign.roster:
-			# Quem está em recuperação (#118) fica na Estação.
-			if hero.id == hero_id and hero.alive and int(hero.get("recovery_days", 0)) <= 0 and team.size() < most:
+			# Quem está em recuperação (#118), numa missão solo ou capturado (#183) fica na Estação.
+			if hero.id == hero_id and hero.alive and int(hero.get("recovery_days", 0)) <= 0 and not AHSideMissions.away(hero) and team.size() < most:
 				team.append(hero_id)
 	if team.is_empty():
 		return false
@@ -185,6 +186,8 @@ static func start_expedition(campaign: Dictionary, phase_id: String, seed_value:
 	}
 	expedition.corridor = create_corridor(expedition.seed, phase_id, info.node_type, info.scenario)
 	campaign.session = {"screen": "corridor", "result": "", "expedition": expedition, "event": null}
+	# O resgate da fase (#188): o capturado ou o pedido de ajuda vira um ponto num trecho de Suprimentos.
+	AHRescue.assign(campaign)
 	return true
 
 
@@ -548,7 +551,9 @@ static func start_corridor_combat(campaign: Dictionary, party_advantage: bool) -
 	# No escuro do ramal (#289), a equipe não pega a patrulha desprevenida.
 	if index < route.steps.size() and route.steps[index].get("detour", false):
 		party_advantage = false
-	return {"enemies": corridor_enemies(expedition, index), "opening": party_advantage, "boss": boss}
+	# Rondar o Quarteirão (#261): a equipe age primeiro na luta seguinte ao acampamento (vale também no ramal).
+	var opening := AHCampSkills.take_opening(campaign) or party_advantage
+	return {"enemies": corridor_enemies(expedition, index), "opening": opening, "boss": boss}
 
 
 ## O que uma luta vencida põe no achado (o que end_combat soma), sem mudar nada: o popup do fim da luta mostra antes de
@@ -1543,6 +1548,8 @@ static func start_camp(campaign: Dictionary) -> bool:
 	if not can_start_camp(campaign):
 		return false
 	campaign.session.screen = "rest"
+	# As habilidades de acampamento (#261): o Tempo de fogueira volta inteiro.
+	AHCampSkills.start(campaign)
 	return true
 
 
@@ -1577,6 +1584,7 @@ static func start_stop_camp(campaign: Dictionary, x: float, leave: float) -> boo
 		return false
 	corridor(campaign).stop_camp = {"step": corridor(campaign).index, "x": x, "leave": leave}
 	campaign.session.screen = "rest"
+	AHCampSkills.start(campaign)
 	return true
 
 
@@ -1644,6 +1652,8 @@ static func leave_camp(campaign: Dictionary, seed_value: int) -> bool:
 	if route.has("stop_camp"):
 		route.erase("stop_camp")
 		route.stop_camped = true
+	# A noite (#261): a Noite mal dormida, a menos que alguém tenha vigiado (o resultado fica em camp_night, para o aviso).
+	AHCampSkills.night(campaign)
 	var options: Array = WEATHERS.get(expedition.scenario_id, WEATHERS["rua-das-vitrines"]).filter(func(w): return w != route.weather)
 	var random := _rand(seed_value)
 	route.weather = options[clampi(floori(random.next() * options.size()), 0, options.size() - 1)]

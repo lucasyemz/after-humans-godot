@@ -84,14 +84,14 @@ static func is_direct_attack(ability: Dictionary) -> bool:
 	return ability.DamageRange.Max > 0 and (ability.TargetType == "SingleEnemy" or ability.TargetType == "MarkedEnemy")
 
 
-## A classificação de uma unidade para a vantagem de tipo (#227): a linhagem da classe do herói ou a família mecânica do
-## inimigo ("" sem classificação).
+## A classificação de uma unidade para a vantagem de tipo (#227): a linhagem da espécie do herói (#189) ou a família
+## mecânica do inimigo ("" sem classificação).
 func type_of(unit: Unit) -> String:
 	if unit == null:
 		return ""
 	if unit.is_player:
-		var hero_class = data.classes.get(unit.class_id)
-		return String(hero_class.Lineage) if hero_class != null else ""
+		var row = data.species.get(data.species_of(unit.class_id, unit.species))
+		return String(row.Lineage) if row != null else ""
 	var enemy = data.enemies.get(unit.enemy_id)
 	return String(enemy.MechFamily) if enemy != null else ""
 
@@ -247,9 +247,36 @@ func status_name(effect: String, machine: bool) -> String:
 func _resisted_effect(unit: Unit, dot: bool) -> bool:
 	if dot and unit.is_player and context.sure_hero_dots:
 		return false
-	# Sangramento e contaminação usam dotResist (0,2 sem inimigo); só sorteia entre 0 e 1.
-	var enemy = find_enemy(unit.enemy_id)
-	var value: float = (enemy.DotResist if enemy != null else 0.2) if dot else 0.0
+	# Sangramento e contaminação usam dotResist: o do inimigo, ou o do papel do herói (#258, 0,2 sem); só sorteia entre 0 e 1.
+	var value := 0.0
+	if dot:
+		var enemy = find_enemy(unit.enemy_id)
+		value = enemy.DotResist if enemy != null else hero_resist(unit, "DotResist")
+	return value >= 1.0 or (value > 0.0 and random.next() < value)
+
+
+## A resistência de um herói pelo papel (#258): DotResist, DisplacementResist ou StunResist da classe; sem classe, os
+## padrões de antes (AHGameData.CLASS).
+func hero_resist(unit: Unit, key: String) -> float:
+	var hero_class = find_class(unit.class_id)
+	return float(hero_class[key]) if hero_class != null else float(AHGameData.CLASS[key])
+
+
+## A chance de crítico de um herói: a de todos mais o crítico do papel (#258, CritBonus em pontos percentuais). Quem não é
+## herói (o inimigo que usa uma habilidade de classe) fica com a de todos.
+func hero_crit_chance(unit: Unit) -> float:
+	var hero_class = find_class(unit.class_id) if unit.is_player else null
+	return CRITICAL_CHANCE + (float(hero_class.CritBonus) / 100.0 if hero_class != null else 0.0)
+
+
+## O herói resiste a ser empurrado ou puxado? Um sorteio sempre (como antes do papel), contra o DisplacementResist dele.
+func _hero_holds(unit: Unit) -> bool:
+	return random.next() < hero_resist(unit, "DisplacementResist")
+
+
+## O herói resiste ao atordoamento? Só sorteia com a resistência do papel acima de 0 (#258).
+func _hero_resists_stun(unit: Unit) -> bool:
+	var value := hero_resist(unit, "StunResist")
 	return value >= 1.0 or (value > 0.0 and random.next() < value)
 
 
@@ -309,13 +336,22 @@ func _hit_ids_from(target: Unit, ability: Dictionary, target_rank: int, opposing
 
 # ---------------------------------------------------------------- início e rodadas
 
-## Unidade de herói a partir da campanha. hero: Id, ClassId, DisplayName, MaxHp, Hp, Instinct, Perks, Trauma, RelicId.
+## As habilidades da unidade: as que ela leva (as 4 escolhidas na Sala, #259) ou, sem a lista, as 4 de base da classe.
+func abilities_of(unit: Unit) -> Array:
+	if not unit.ability_ids.is_empty():
+		return unit.ability_ids
+	var unit_class = find_class(unit.class_id)
+	return unit_class.AbilityIds if unit_class != null else []
+
+
+## Unidade de herói a partir da campanha. hero: Id, ClassId, Species (opcional), DisplayName, MaxHp, Hp, Instinct, Perks, Trauma, RelicId.
 static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -> Unit:
 	var unit := Unit.new()
 	unit.id = "unit_" + hero.Id
 	unit.is_player = true
 	unit.hero_id = hero.Id
 	unit.class_id = hero.ClassId
+	unit.species = String(hero.get("Species", ""))
 	unit.display_name = hero.DisplayName
 	unit.rank = rank
 	unit.hp = hero.Hp
@@ -325,6 +361,8 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 	unit.deaths_door = hero.Hp <= 0
 	unit.sprite_key = hero.ClassId
 	unit.remaining_uses = hero.get("ExpeditionUses", {}).duplicate()
+	# As 4 escolhidas na Sala (#259); sem a lista, as 4 de base da classe (o fundador de sempre, a paridade).
+	unit.ability_ids = Array(hero.get("AbilityIds", [])).duplicate()
 	# O nível do herói (#90): +1 numa habilidade (como o treino da Pesquisa) e a velocidade; sem nível, nada muda.
 	unit.ability_bonus = hero.get("AbilityBonus", {}).duplicate()
 
@@ -382,8 +420,7 @@ static func init_combat(player_units: Array, enemy_units: Array, in_context: AHC
 	# Habilidades limitadas recarregam a cada encontro, dos dois lados.
 	for team in [player_units, enemy_units]:
 		for unit in team:
-			var unit_class = engine.find_class(unit.class_id)
-			for ability_id in (unit_class.AbilityIds if unit_class != null else []):
+			for ability_id in engine.abilities_of(unit):
 				var ability = engine.find_ability(ability_id)
 				if ability != null and ability.UsesMax > 0:
 					if not ability.bUsesPerExpedition or not unit.remaining_uses.has(ability_id):
@@ -886,8 +923,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 	var friendly: Array = state.player_team if user.is_player else state.enemy_team
 	var opposing: Array = state.enemy_team if user.is_player else state.player_team
 
-	var user_class = find_class(user.class_id)
-	var ability = find_ability(ability_id) if user_class != null and user_class.AbilityIds.has(ability_id) else null
+	var ability = find_ability(ability_id) if abilities_of(user).has(ability_id) else null
 	if ability == null:
 		result.error = tr("Habilidade não encontrada")
 		return result
@@ -966,7 +1002,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 		if has_damage:
 			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0))
 			var rolled := _roll_range(ability.DamageRange.Min + bonus, ability.DamageRange.Max + bonus)
-			if random.next() < CRITICAL_CHANCE:
+			if random.next() < hero_crit_chance(user):
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)
 				_add_event(events, tr("CRÍTICO!"), EventType.CRIT, target.id).critical_roll = true
 				_log(tr("[CRÍTICO!] %s desferiu um ataque devastador!") % _n(user))
@@ -1070,11 +1106,12 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			target.mark_duration = 0
 			target.tokens.mark = 0
 
-		# Empurrar ou puxar o alvo (20% de resistir; imunes não sorteiam).
+		# Empurrar ou puxar o alvo (o inimigo resiste 20%, o herói pela resistência do papel, #258; imunes não sorteiam).
 		if ability.PushTarget != 0 and alive_any(target):
 			var target_enemy = null if target.is_player else find_enemy(target.enemy_id)
 			var immune: bool = target_enemy != null and target_enemy.DisplacementResist >= 1.0
-			if not immune and not (random.next() < 0.2):
+			# O sorteio só com quem não é imune, como antes (a paridade conta os sorteios).
+			if not immune and not (_hero_holds(target) if target.is_player else random.next() < 0.2):
 				var team: Array = state.player_team if target.is_player else state.enemy_team
 				var new_rank := clampi(target.rank + ability.PushTarget, 1, 4)
 				if new_rank != target.rank:
@@ -1518,8 +1555,12 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 
 		_apply_control_effects(chosen, inflicts.bBlind, inflicts.bWeak, inflicts.Immobilize, events)
 		if inflicts.Stun > 0 and alive_any(chosen):
-			chosen.stun_turns = maxi(chosen.stun_turns, inflicts.Stun)
-			_add_event(events, tr("Atordoado · %d turnos") % chosen.stun_turns, EventType.INFO, chosen.id)
+			if _hero_resists_stun(chosen):
+				_add_event(events, tr("Resistiu ao atordoamento"), EventType.INFO, chosen.id)
+				_log(tr("%s resistiu ao atordoamento.") % _n(chosen))
+			else:
+				chosen.stun_turns = maxi(chosen.stun_turns, inflicts.Stun)
+				_add_event(events, tr("Atordoado · %d turnos") % chosen.stun_turns, EventType.INFO, chosen.id)
 		if _dot_set(inflicts.Bleed):
 			_apply_dot(chosen, true, inflicts.Bleed, events, true)
 		if _dot_set(inflicts.Blight):
@@ -1528,7 +1569,7 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 			chosen.tokens.vuln = mini(TOKEN_CAP, chosen.tokens.vuln + 1)
 			_add_event(events, tr("Vulnerável!"), EventType.INFO, chosen.id)
 		if inflicts.Push > 0 and alive_any(chosen):
-			if not (random.next() < 0.2):
+			if not _hero_holds(chosen):
 				var new_rank := mini(4, chosen.rank + inflicts.Push)
 				if new_rank != chosen.rank:
 					var pushed_id := chosen.id
@@ -1601,10 +1642,9 @@ func first_valid_target(actor_id: String, ability_id: String) -> int:
 ## alvo válido; senão, defende.
 func play_auto_turn(actor_id: String) -> AHCombat.ActionResult:
 	var actor := _find_unit(actor_id)
-	var actor_class = find_class(actor.class_id) if actor != null else null
-	if actor_class == null or actor_class.AbilityIds.is_empty():
+	var ids: Array = abilities_of(actor) if actor != null else []
+	if ids.is_empty():
 		return execute_defend(actor_id)
-	var ids: Array = actor_class.AbilityIds
 	var start: int = (state.round + actor.rank) % ids.size()
 	for offset in ids.size():
 		actor = _find_unit(actor_id)
