@@ -160,7 +160,8 @@ func _walk(station, life) -> void:
 	var pair := _pair(station)
 	var who = _walker(station, NICK)
 	station.settle_in(who, pair[0])
-	station.hud.open_room(pair[0])
+	# Os dois cômodos de perto: a porta de saída e a de chegada no quadro.
+	_frame_rooms(station, pair)
 	await _snap(station)
 	await _frames(5)
 	life.start_trip(who, pair[1])
@@ -171,9 +172,9 @@ func _walk(station, life) -> void:
 		step += 1
 		life._tick_doors(0.05)
 		life._tick_trip(0.05)
-		# 10 quadros por segundo de jogo; entre as portas, o tempo do corredor passa rápido (só 1 em 4).
+		# 5 quadros por segundo de jogo; entre as portas, o tempo do corredor passa rápido (só 1 em 4).
 		var away: bool = not life.trip.is_empty() and life.trip.phase == "away"
-		if step % 2 == 0 and (not away or step % 8 == 0):
+		if step % 4 == 0 and (not away or step % 16 == 0):
 			await _frames(1)
 			await _shot("walk_%03d" % index)
 			index += 1

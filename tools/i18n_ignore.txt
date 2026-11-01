@@ -1992,3 +1992,4 @@ comic_reader.gd: Speaker
 comic_reader.gd: “%s”
 comic_reader.gd: %s “%s”
 comic_reader.gd: %d/%d
+station_life.gd: wait
