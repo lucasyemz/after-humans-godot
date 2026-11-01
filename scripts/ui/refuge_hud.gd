@@ -186,6 +186,8 @@ func _ready() -> void:
 	_map.visible = false
 	_map.phase_chosen.connect(_on_phase_chosen)
 	_map.closed.connect(_on_map_closed)
+	# Mandar em missão ou esperar um dia pela aba das missões solo (#183): a Estação grava e redesenha.
+	_map.changed.connect(func(): station.commit())
 	add_child(_map)
 	Tips.show_tip.call_deferred("station")
 	_maybe_tour.call_deferred()
@@ -2629,6 +2631,9 @@ func _infirmary(c: Dictionary, level: int) -> void:
 		var empty_text := tr("Ninguém em recuperação. Quem cair numa expedição volta para cá antes de lutar de novo.") if level >= 1 \
 			else tr("Ninguém em recuperação. Sem a Enfermaria, quem cair numa expedição se recupera no Dormitório.")
 		row.add_child(_wrapped(empty_text, "small", AHKit.TEXT, false, BODY_WIDTH - 90.0))
+		# Ninguém caído, mas ninguém para partir (todos em missão solo, #183): o dia também passa daqui.
+		if S.rest_block(c) == "":
+			_footer_primary(tr("Esperar um dia"), "sleep", func(): _act(S.rest_day(Campaign.state), tr("Um dia passou na Estação.")))
 		return
 	if level < 1:
 		_text(tr("Sem a Enfermaria, quem caiu se recupera devagar no Dormitório."), AHKit.MUTED, "small")
@@ -3148,18 +3153,21 @@ func _on_train_event(name: String) -> void:
 
 func _decide(candidate_id: String, accept: bool) -> void:
 	var c: Dictionary = Campaign.state
-	# Qualquer um dos dois (#182): quem é decidido vem à frente nas regras e na cena.
-	var front: String = c.station.train.candidate_id
-	if S.bring_forward(c, candidate_id):
-		station.swap_pair()
+	# Qualquer um dos dois (#182): decide_candidate traz quem é decidido à frente nas regras (e desfaz se a decisão não
+	# passa); aqui, só a cena acompanha.
+	var train: Dictionary = c.station.train
+	var front: String = train.candidate_id
+	var behind: bool = candidate_id != front and train.phase == "waiting" and train.get("next", {}).get("candidate_id", "") == candidate_id
+	var recruit: Dictionary = train.get("next", {}).get("recruit", {}) if behind else S.train_recruit(c)
+	if behind:
+		station.swap_pair(candidate_id)
 		_arrived_candidate = candidate_id
-	var recruit := S.train_recruit(c)
 	var error := S.decide_candidate(c, candidate_id, accept)
 	if error != "":
-		# A decisão não passou: os dois voltam à ordem de antes, nas regras e na cena.
-		S.bring_forward(c, front)
-		station.swap_pair()
-		_arrived_candidate = c.station.train.candidate_id
+		# A decisão não passou: as regras já voltaram à ordem de antes; a cena volta junto.
+		if behind:
+			station.swap_pair(front)
+			_arrived_candidate = front
 		toast(error, true)
 		return
 	station.commit()
@@ -3195,6 +3203,8 @@ func _train_departs(candidate_leaves: bool) -> void:
 		waited += get_process_delta_time()
 	if not is_instance_valid(station):
 		return
+	if station.boarding_back():
+		push_warning("A partida não esperou o recusado voltar ao vagão (%.0f s)." % BOARDING_WAIT)
 	station.play_train_departure(candidate_leaves)
 	await station.train_event_named("gone")
 	S.finish_departure(c)

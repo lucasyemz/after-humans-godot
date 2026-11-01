@@ -38,7 +38,8 @@ const INFIRMARY := "infirmary"
 const ROOMS := [
 	{"id": CANTEEN, "name": "Cantina", "basic": true, "max_level": 2, "costs": [], "data_costs": "canteen_level_%d", "data_table": "station_grid", "slots": 2, "build": 2},
 	{"id": DEPOT, "name": "Depósito", "basic": true, "max_level": 2, "costs": [{}, {"scrap": 5, "fragments": 1}], "slots": 1, "build": 2},
-	{"id": PREPARATION, "name": "Preparação", "basic": true, "max_level": 1, "costs": [], "slots": 0, "build": 0},
+	# O nível 2 abre as missões solo (#183).
+	{"id": PREPARATION, "name": "Preparação", "basic": true, "max_level": 2, "costs": [{}, {"scrap": 4, "fragments": 1}], "slots": 0, "build": 0},
 	# O Alojamento cresce (#119): cada nível comporta mais heróis (data/hero-jobs.json, limit_heroes e o custo).
 	{"id": CHARACTERS, "name": "Alojamento", "basic": true, "max_level": 4, "costs": [], "data_costs": "characters_level_%d", "data_table": "hero_jobs", "slots": 1, "build": 1},
 	{"id": FORGE, "name": "Forja", "basic": false, "max_level": 2, "costs": [{"scrap": 4, "fragments": 0}, {"scrap": 6, "fragments": 2}], "slots": 2, "build": 1},
@@ -200,6 +201,8 @@ static func migrate(campaign: Dictionary) -> void:
 	# Ninguém morre (#118): o memorial dos saves antigos volta em recuperação.
 	_migrate_fallen(campaign)
 	_migrate_posts(campaign)
+	# As missões solo (#183): o save de antes ganha a semente (tirada do elenco: a mesma a cada carga).
+	AHSideMissions.state(campaign)
 	# O trem de antes do #122 não tem o recruta: quem espera é um civil.
 	if typeof(campaign.station.train.get("recruit")) != TYPE_DICTIONARY:
 		campaign.station.train.recruit = {}
@@ -225,6 +228,9 @@ static func _station_defaults() -> Dictionary:
 		# A escada da história (#64): as fases cujo evento de história já apareceu e as cuja linha "O que a equipe viu"
 		# já saiu no relatório (uma vez por campanha).
 		"story_events": [], "story_reports": [],
+		# As missões solo (#183): o quadro do dia e os relatórios de quem voltou.
+		# A semente nasce com a campanha (create_initial, ou AHSideMissions.state na migração).
+		"side_missions": {"day": -1, "board": [], "reports": []},
 	}
 
 
@@ -501,7 +507,9 @@ static func _room_benefit(room_id: String, level: int) -> String:
 		DEPOT:
 			return TranslationServer.translate("Guarda até 12 suprimentos; o excesso estraga na volta.") if level <= 1 else TranslationServer.translate("Prateleiras extras: guarda até 20.")
 		PREPARATION:
-			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.")
+			# O nível 2 abre as missões solo (#183).
+			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.") if level <= 1 \
+				else TranslationServer.translate("Escolher a partida e mandar heróis em missões solo.")
 		CHARACTERS:
 			# Cada nível comporta mais heróis (#119).
 			return TranslationServer.translate("Elenco, treino, trauma e relíquias. Comporta %d heróis.") % hero_limit_at(level)
@@ -601,12 +609,14 @@ static func run_cycle(campaign: Dictionary, expedition_id: String, returning: in
 	station.last_cycle_expedition_id = expedition_id
 	station.cycle_number = int(station.cycle_number) + 1
 	station.hungry_civilians = f.hungry_civilians.duplicate()
+	# Quem chegou ao dia da volta resolve a missão solo (#183).
+	var missions := AHSideMissions.on_new_day(campaign)
 	station.last_cycle = {
 		"number": station.cycle_number, "expedition_id": expedition_id, "food_produced": f.food_produced,
 		"food_spoiled": f.food_spoiled, "food_civilians": f.food_civilians, "fragments_produced": f.fragments_produced,
 		"hungry_civilians": f.hungry_civilians.duplicate(), "water_produced": f.water_produced,
 		"water_consumed": mini(f.water_consumed, f.water + f.water_produced), "thirsty": f.thirsty,
-		"power_used": f.power_used, "power_capacity": f.power_capacity,
+		"power_used": f.power_used, "power_capacity": f.power_capacity, "missions": missions,
 	}
 	if campaign.night.expedition_id == expedition_id:
 		campaign.night.thirsty = f.thirsty
@@ -1517,13 +1527,16 @@ static func validate_team(campaign: Dictionary, hero_ids: Array, phase_id: Strin
 ## Uma classe sem arte nenhuma ainda (o rato e o tatu, liberados por eventos) fica na Estação até a arte chegar: antes
 ## ela partia na equipe e sumia da rua e da luta, e a expedição lutava com três.
 ## Quem está em recuperação (#118) também fica: só volta à equipe depois dos dias da Enfermaria.
+## Quem está numa missão solo ou capturado (#183) também fica fora.
 static func can_deploy(entry) -> bool:
-	return entry != null and not recovering(entry) and not AHCombatArena.hero_art_of(String(entry.id)).is_empty()
+	return entry != null and not recovering(entry) and not AHSideMissions.away(entry) and not AHCombatArena.hero_art_of(String(entry.id)).is_empty()
 
 
 static func deploy_block(entry) -> String:
 	if can_deploy(entry):
 		return ""
+	if AHSideMissions.away(entry):
+		return AHSideMissions.away_text(entry)
 	if recovering(entry):
 		return recovery_block(entry)
 	return TranslationServer.translate("%s ainda não tem arte de combate e fica na Estação por enquanto.") % entry.display_name
@@ -1805,7 +1818,8 @@ static func rest_block(campaign: Dictionary) -> String:
 	var block := _day_block(campaign)
 	if block != "":
 		return block
-	if fallen(campaign).is_empty():
+	# Quem está numa missão solo (#183) também volta com os dias.
+	if fallen(campaign).is_empty() and AHSideMissions.running(campaign).is_empty():
 		return TranslationServer.translate("Ninguém em recuperação.")
 	if ready_heroes(campaign).size() >= _smallest_team(campaign):
 		return TranslationServer.translate("Ainda há quem possa partir.")
@@ -2293,6 +2307,8 @@ static func post_block(campaign: Dictionary, hero_id: String, room_id: String) -
 		return ""
 	if recovering(entry):
 		return TranslationServer.translate("%s está em recuperação e não trabalha agora.") % entry.display_name
+	if AHSideMissions.away(entry):
+		return AHSideMissions.away_text(entry)
 	if room_id == AHStationGrid.DIG and AHStationGrid.dig_target(campaign) == "":
 		return TranslationServer.translate("Não há entulho para escavar.")
 	if not job_rooms(campaign).has(room_id):
