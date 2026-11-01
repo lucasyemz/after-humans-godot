@@ -1,7 +1,7 @@
 ## As missões solo (#183, decisão do Lucas de 28/10): com a Preparação no nível 2, um mapa secundário mostra a cada dia
 ## algumas missões em lugares sorteados; o jogador manda (ou não) um herói em cada uma. Quem está em missão sai da
 ## equipe, do posto e da noite. No dia da volta, um sorteio contra a chance (a aptidão da classe, o nível, a vida, os
-## traços e o estado) diz se deu certo (a recompensa inteira e XP), se volta ferido (35% da vida e metade) ou se foi
+## traços e o estado) diz se deu certo (a recompensa inteira e XP), se volta ferido (25% da vida e metade) ou se foi
 ## capturado pelos robôs: aí vira um pino de resgate no mapa, prioritário e sem prazo (o resgate entra na rota, #188).
 ## A captura tem a chave CaptureEnabled (ligada com o resgate, #188, AHRescue); desligada, esse resultado volta com
 ## ferimentos e de mãos vazias.
