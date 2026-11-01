@@ -395,8 +395,9 @@ func _story(station) -> void:
 	for frame in 5:
 		bento.pause = 0.0
 		await tree.process_frame
+	t.check(forge_on, "o cômodo do Bento funciona (senão a verificação abaixo não testa nada)")
 	t.check(float(bento.working) <= 0.0 and absf(bento.card.position.x - nick.card.position.x) <= 1.3,
-		"segurado para a conversa, o Bento não vai trabalhar (o cômodo dele funciona: %s)" % forge_on)
+		"segurado para a conversa, o Bento não vai trabalhar")
 	var shown := false
 	for frame in 600:
 		await tree.process_frame
