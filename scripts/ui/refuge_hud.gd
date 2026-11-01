@@ -186,6 +186,8 @@ func _ready() -> void:
 	_map.visible = false
 	_map.phase_chosen.connect(_on_phase_chosen)
 	_map.closed.connect(_on_map_closed)
+	# Mandar em missão ou esperar um dia pela aba das missões solo (#183): a Estação grava e redesenha.
+	_map.changed.connect(func(): station.commit())
 	add_child(_map)
 	Tips.show_tip.call_deferred("station")
 	_maybe_tour.call_deferred()
@@ -2619,6 +2621,9 @@ func _infirmary(c: Dictionary, level: int) -> void:
 		var empty_text := tr("Ninguém em recuperação. Quem cair numa expedição volta para cá antes de lutar de novo.") if level >= 1 \
 			else tr("Ninguém em recuperação. Sem a Enfermaria, quem cair numa expedição se recupera no Dormitório.")
 		row.add_child(_wrapped(empty_text, "small", AHKit.TEXT, false, BODY_WIDTH - 90.0))
+		# Ninguém caído, mas ninguém para partir (todos em missão solo, #183): o dia também passa daqui.
+		if S.rest_block(c) == "":
+			_footer_primary(tr("Esperar um dia"), "sleep", func(): _act(S.rest_day(Campaign.state), tr("Um dia passou na Estação.")))
 		return
 	if level < 1:
 		_text(tr("Sem a Enfermaria, quem caiu se recupera devagar no Dormitório."), AHKit.MUTED, "small")
