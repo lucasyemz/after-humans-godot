@@ -2083,6 +2083,22 @@ func _place_block_marks() -> void:
 			if cover != null and cover.visible and cover.get_global_rect().intersects(mark.get_global_rect()):
 				covered = true
 		mark.visible = not spec.places.has(_hover_room) and not covered and tour == null
+	_unstack_marks()
+
+
+## Os marcadores de vagas vizinhas (6 m cabem menos que "Escavando · 2 voltas") não ficam um por cima do outro: da
+## esquerda para a direita, o que encosta num já posto desce uma linha dentro do bloco.
+func _unstack_marks() -> void:
+	var placed: Array = _lock_marks.values().filter(func(m): return is_instance_valid(m) and m.visible)
+	var marks: Array = _block_marks.values().filter(func(m): return is_instance_valid(m) and m.visible)
+	marks.sort_custom(func(a, b): return a.position.x < b.position.x)
+	for mark in marks:
+		for i in 2:
+			var rect: Rect2 = Rect2(mark.position, mark.size).grow(2.0)
+			if not placed.any(func(other): return Rect2(other.position, other.size).intersects(rect)):
+				break
+			mark.position.y += mark.size.y + 4.0
+		placed.append(mark)
 
 
 ## O marcador do bloco: o ícone e o texto; âmbar na frente de escavação e na vaga livre com o que construir agora.
@@ -2267,7 +2283,8 @@ func show_dig_notice() -> void:
 		words.add_child(AHKit.label(tr("Entrou no estoque: %s.") % found, "small", AHKit.AMBER, true))
 	_dig_notice.reset_size()
 	_dig_notice.size = _dig_notice.get_combined_minimum_size()
-	var left := _menu.get_global_rect().end.x + 24.0 if _menu != null and _menu.visible else 24.0
+	# Entre a coluna da esquerda e o painel (o menu ainda está escondido quando o relatório fecha).
+	var left := LEFT.end.x + 24.0
 	var right := RIGHT.position.x - 24.0
 	_dig_notice.position = Vector2(maxf(left, (left + right - _dig_notice.size.x) * 0.5), FEEDBACK_TOP + 64.0)
 	Sound.play("res://audio/ui/confirm.ogg")

@@ -1708,5 +1708,3 @@ refuge_hud.gd: noticed
 refuge_hud.gd: finds
 refuge_hud.gd: texts
 station_report.gd: lock
-station_report.gd: finds
-station_report.gd: texts

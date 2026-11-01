@@ -611,14 +611,13 @@ func _details_band() -> PanelContainer:
 		arrived.append(tr("Nada chegou desta vez."))
 	columns.add_child(_detail_column(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent), arrived))
 	var cycle: Dictionary = report.get("cycle", {})
-	# A escavação (#274): a linha inteira do chip e o que o bloco aberto devolveu, com a Estação do ciclo (uma coluna a
+	# A escavação (#274): a linha inteira do chip, com a Estação do ciclo (uma coluna a
 	# mais não cabe na faixa).
 	var dug: Array = []
 	var dig: Dictionary = report.get("dig", {})
 	if not dig.is_empty():
+		# Os textos do achado ficam no aviso, na vista geral (aqui a coluna passava da faixa).
 		dug.append(AHStationGrid.report_line(dig))
-		for text in dig.get("finds", {}).get("texts", []):
-			dug.append(tr(String(text)))
 	if cycle.is_empty() and not dug.is_empty():
 		columns.add_child(_detail_column(tr("Escavação"), dug))
 	if not cycle.is_empty():
@@ -641,7 +640,9 @@ func _details_band() -> PanelContainer:
 			var id: String = room_id
 			var level := S.room_level(c, id)
 			var button := Button.new()
-			button.text = tr("%s %s%s (%s)") % [tr("Recuperar") if level == 0 else tr("Melhorar"), tr(S.ROOM_ARTICLE.get(id, "")), tr(S.room_def(id).name), S.cost_text(S.next_level_cost(c, id))]
+			# Na grade (#186), o cômodo que entra numa vaga livre é construído (o Depósito saindo dos caixotes, a Cantina).
+			var verb := tr("Construir") if AHStationGrid.needs_place(c, id) else (tr("Recuperar") if level == 0 else tr("Melhorar"))
+			button.text = tr("%s %s%s (%s)") % [verb, tr(S.ROOM_ARTICLE.get(id, "")), tr(S.room_def(id).name), S.cost_text(S.next_level_cost(c, id))]
 			AHKit.style_as(button, "secondary")
 			button.add_theme_font_size_override("font_size", AHKit.size("text"))
 			button.pressed.connect(func(): room_requested.emit(id))
