@@ -135,6 +135,8 @@ var _indoor := false
 var scenario: AHScenarioWorld
 var floor_y := 0.0
 var lane_z := 0.45
+## Quanto a câmera da exploração recua a mais (0 = normal), na revelação do desvio (#289).
+var scout_pull := 0.0
 ## A equipe vai dentro do vagão que parte (carry_party): a fila fica presa ao rastro.
 var carried := false
 var sheltered := false
@@ -203,6 +205,10 @@ func _ready() -> void:
 		scenario = AHScenarioWorld.new()
 		add_child(scenario)
 		scenario.build(map)
+		# O ramal do desvio (#289) usa um pedaço do mapa, mais escuro (data/detours.json).
+		var detour := _detour_variant(map)
+		if not detour.is_empty():
+			scenario.apply_detour(detour)
 		_build_scenario_colliders()
 	else:
 		# A rua vem pronta da cena (editável no editor); sem ela, monta na hora (o mesmo resultado).
@@ -268,6 +274,8 @@ func _ready() -> void:
 	if scenario:
 		exploration_hud.place = scenario.display_name
 		exploration_hud.map_id = scenario.map_name
+		if not _detour_variant(scenario.map_name).is_empty():
+			exploration_hud.place = String(_detour_variant(scenario.map_name).get("Display", scenario.display_name))
 	exploration_hud.set_weather(_hud_weather.text)
 	corridor = AHStreetCorridor.new()
 	add_child(corridor)
@@ -302,7 +310,15 @@ func _journey_map() -> String:
 	var expedition = Campaign.state.get("session", {}).get("expedition")
 	if expedition == null:
 		return ""
-	return AHJourneyRules.map_for_step(expedition.phase_id, int(expedition.corridor.index))
+	return AHJourneyRules.route_map(expedition, int(expedition.corridor.index))
+
+
+## A linha do desvio da fase quando a equipe está no ramal dele, neste mapa (#289); {} fora.
+func _detour_variant(map: String) -> Dictionary:
+	var expedition = Campaign.state.get("session", {}).get("expedition")
+	if _capture_dir != "" or expedition == null or AHJourneyRules.detour_range(expedition.corridor, map).is_empty():
+		return {}
+	return AHJourneyRules.detour_def(expedition.phase_id)
 
 
 ## A colisão dos obstáculos do cenário (o que a Unreal marca como sólido na faixa de passeio), com as caixas da tecla C.
@@ -766,6 +782,20 @@ func add_hero(hero_id: String, at: Vector3) -> void:
 	occlusion.track(card)
 
 
+## Um herói sai da equipe no meio da jornada (#188: deu o lugar a quem foi solto e volta para a Estação).
+func remove_hero(hero_id: String) -> void:
+	var index := party_ids.find(hero_id)
+	if index < 0:
+		return
+	var facing: float = _heroes[0].facing
+	_heroes[index].queue_free()
+	_heroes.remove_at(index)
+	party_ids.remove_at(index)
+	_wounded.clear()
+	if not _heroes.is_empty():
+		_place_leader(_leader.position, facing)
+
+
 ## Leva o líder andando até um ponto (passar por uma porta, #141), com a fila atrás e sem o jogador comandar: o rastro
 ## cresce como no andar de verdade, e a fila vira para o lado do passo. Sem limite da área de andar (a porta fica fora).
 ## Devolve false se a cena saiu no meio (quem chamou para ali).
@@ -973,6 +1003,8 @@ func _update_camera(delta: float) -> void:
 			(lane_z - 1.35) if scenario else -0.9)
 	# A câmera da barra de Admin (#130): mais perto ou mais longe, na exploração e na luta.
 	distance *= Admin.zoom("fight" if _arena != null and _arena.active else "explore")
+	# O faro do desvio (#289): a câmera se afasta para mostrar o caminho.
+	distance *= 1.0 + scout_pull
 	# O tremor do acerto (#33): desloca a vista sem mover a câmera (a suavização não o arrasta), em pixels da tela.
 	var shake: Vector2 = _arena.camera_shake() if _arena != null and _arena.active else Vector2.ZERO
 	var meters_per_pixel := 2.0 * tan(deg_to_rad(_camera.fov * 0.5)) * distance / 1080.0
@@ -1129,7 +1161,8 @@ func _apply_weather() -> void:
 	var readable := (1.0 if _mood == "night" else 0.0) + (0.3 if _raining else 0.0)
 	_key_light.light_energy = 0.7 * clampf(readable, 0.0, 1.2)
 	_fill_light.light_energy = COMBAT_FILL + COMBAT_FILL_NIGHT * clampf(readable, 0.0, 1.2)
-	_hud_weather.text = (tr("Noite") if _mood == "night" else tr("Fim de tarde")) + (tr(" · chuva") if _raining else "")
+	# Sob teto (os cenários fechados, a casa, o ramal do desvio) não chove: a ficha não diz chuva.
+	_hud_weather.text = (tr("Noite") if _mood == "night" else tr("Fim de tarde")) + (tr(" · chuva") if _raining and not covered else "")
 	if exploration_hud:
 		exploration_hud.set_weather(_hud_weather.text)
 	# A sombra do sol só ao ar livre (#175): sob teto ele é a luz fraca de _update_sun.

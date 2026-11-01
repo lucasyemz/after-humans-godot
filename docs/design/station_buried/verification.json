@@ -1,0 +1,309 @@
+{
+  "base_commit": "69ad7910",
+  "source_tag": "codex-pr296-originals",
+  "source_revision": "r2-muted-background",
+  "design_qa_round": 2,
+  "design_qa_cycle": "revision requested after Lucas approval",
+  "design_qa_verdict": "APROVADO",
+  "source_files": 14,
+  "source_png_total_including_raw": 30,
+  "ui_cases": 9,
+  "labels_checked": 339,
+  "image_rects_checked": 312,
+  "grid_cells_reviewed": 16,
+  "conversion_byte_equality": 14,
+  "foreground_files_byte_unchanged": 8,
+  "grade_comparison": {
+    "platform_rubble": {
+      "before": {
+        "mean_luma_8bit": 42.33,
+        "luma_stddev": 44.83,
+        "mean_saturation_8bit": 112.87,
+        "luma_p95": 140
+      },
+      "after": {
+        "mean_luma_8bit": 22.83,
+        "luma_stddev": 18.26,
+        "mean_saturation_8bit": 83.71,
+        "luma_p95": 60
+      }
+    },
+    "overturned_wagon": {
+      "before": {
+        "mean_luma_8bit": 39.48,
+        "luma_stddev": 37.55,
+        "mean_saturation_8bit": 129.72,
+        "luma_p95": 119
+      },
+      "after": {
+        "mean_luma_8bit": 20.22,
+        "luma_stddev": 15.36,
+        "mean_saturation_8bit": 84.02,
+        "luma_p95": 51
+      }
+    },
+    "maintenance_machine": {
+      "before": {
+        "mean_luma_8bit": 40.47,
+        "luma_stddev": 37.42,
+        "mean_saturation_8bit": 118.91,
+        "luma_p95": 118
+      },
+      "after": {
+        "mean_luma_8bit": 23.14,
+        "luma_stddev": 17.88,
+        "mean_saturation_8bit": 79.03,
+        "luma_p95": 56
+      }
+    },
+    "exposed_cables": {
+      "before": {
+        "mean_luma_8bit": 42.4,
+        "luma_stddev": 37.72,
+        "mean_saturation_8bit": 115.13,
+        "luma_p95": 117
+      },
+      "after": {
+        "mean_luma_8bit": 21.5,
+        "luma_stddev": 17.17,
+        "mean_saturation_8bit": 92.84,
+        "luma_p95": 54
+      }
+    },
+    "flooded_duct": {
+      "before": {
+        "mean_luma_8bit": 32.89,
+        "luma_stddev": 35.22,
+        "mean_saturation_8bit": 122.83,
+        "luma_p95": 106
+      },
+      "after": {
+        "mean_luma_8bit": 17.09,
+        "luma_stddev": 15.38,
+        "mean_saturation_8bit": 91.67,
+        "luma_p95": 46
+      }
+    },
+    "root_chamber": {
+      "before": {
+        "mean_luma_8bit": 38.23,
+        "luma_stddev": 33.94,
+        "mean_saturation_8bit": 126.05,
+        "luma_p95": 106
+      },
+      "after": {
+        "mean_luma_8bit": 21.02,
+        "luma_stddev": 13.81,
+        "mean_saturation_8bit": 85.41,
+        "luma_p95": 47
+      }
+    }
+  },
+  "pillow": "13.0.0",
+  "libwebp": "1.6.0",
+  "problems": [],
+  "review_images": [
+    {
+      "file": "art_board.webp",
+      "canvas": [
+        1920,
+        1000
+      ],
+      "bytes": 332390,
+      "sha256": "7f66dcff1ac7a4787d85f78a6cd0a27a975904330841adb65fc6818e905de400"
+    },
+    {
+      "file": "art_board_40.webp",
+      "canvas": [
+        768,
+        400
+      ],
+      "bytes": 68410,
+      "sha256": "dac61861b9e50dba4e971ceac9f4f6bff3285ae2640d2d7d05d422ef63fd596d"
+    },
+    {
+      "file": "art_board_gray.webp",
+      "canvas": [
+        1920,
+        1000
+      ],
+      "bytes": 283336,
+      "sha256": "892fe0c98f81b93f97ff07b2dbc0ec4f08cfbdf65a3dd35fd22622be9e03d125"
+    },
+    {
+      "file": "before_after_choice.webp",
+      "canvas": [
+        3840,
+        1140
+      ],
+      "bytes": 638520,
+      "sha256": "f2aad2ed5141f089fa001679fcac4c486b8d7b2062eea73d2d007e6ada6cbfba"
+    },
+    {
+      "file": "before_after_overview.webp",
+      "canvas": [
+        3840,
+        1140
+      ],
+      "bytes": 638960,
+      "sha256": "81ad24977fc337e3c558348753135b6fea18fe7a1ef1da8abb91d91c9e517297"
+    },
+    {
+      "file": "before_after_work.webp",
+      "canvas": [
+        3840,
+        1140
+      ],
+      "bytes": 648142,
+      "sha256": "3713848571ad519f5deba0837dd6b3ae7f3b3d1b552a42ca2471cb7d5aa6db50"
+    },
+    {
+      "file": "choice_colorblind.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 401180,
+      "sha256": "7696f80921f4ca3795229c1ccbabc9ac484d264fc77991fc68803e209be276ef"
+    },
+    {
+      "file": "choice_larger.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 420528,
+      "sha256": "b3d3b24bc89b594f6fb1cee6a455a6f0b751748c2a22a9d95e1de6c143bff06d"
+    },
+    {
+      "file": "choice_normal.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 399900,
+      "sha256": "be8c5863e5116f812a58b6643ee81f70f85a570dbb07279e74e9b152d6732dc2"
+    },
+    {
+      "file": "frame_board.webp",
+      "canvas": [
+        1920,
+        610
+      ],
+      "bytes": 196674,
+      "sha256": "d9a5bda8c5930d3c72e1f2eb80e6a5f3a36905593dac1bd259ab885c7533f887"
+    },
+    {
+      "file": "frame_board_gray.webp",
+      "canvas": [
+        1920,
+        610
+      ],
+      "bytes": 156992,
+      "sha256": "907fff874f97be2bd880a823fcd69fc0960817ae8609ce638dae03b6e4f029a9"
+    },
+    {
+      "file": "icons_board.webp",
+      "canvas": [
+        1500,
+        770
+      ],
+      "bytes": 43636,
+      "sha256": "8f266a510fc60965a1507ca7e2c33f6d348892ef8d890bc58b830d6c83d04d3f"
+    },
+    {
+      "file": "overview_40.webp",
+      "canvas": [
+        768,
+        432
+      ],
+      "bytes": 75516,
+      "sha256": "3d1df6ec3a7b2e21dc67266640347923aa48a441a5a8982e4d151538ffe9f4a1"
+    },
+    {
+      "file": "overview_colorblind.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 420042,
+      "sha256": "95b1f18756780f12831c070abf065f223fff681af7d1df754fd46c4da4e4481c"
+    },
+    {
+      "file": "overview_gray.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 347552,
+      "sha256": "27747e89590d23b9fca52cb96f330cc20307c5e871c3a91e7df14222cfb58d6f"
+    },
+    {
+      "file": "overview_larger.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 445772,
+      "sha256": "9a1e0bbdecf2574fc73f0fa2a78af8c6775e89ae221c2b95e156ef1fe9970f92"
+    },
+    {
+      "file": "overview_normal.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 420644,
+      "sha256": "0521cfeeae6f95d19ee158b954a9c1c4558f34da098cf7dd763583663ddbbaa1"
+    },
+    {
+      "file": "revision_comparison.webp",
+      "canvas": [
+        3840,
+        1140
+      ],
+      "bytes": 915684,
+      "sha256": "ee842980c807585ea46e1ea46ee2708af56168e4a7e8cbce7d8a21bebca3f91b"
+    },
+    {
+      "file": "work_colorblind.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 419078,
+      "sha256": "d3bd236a273aab6aefb788225fb539f87511135ea960fca943e7c3bfa4bbf3e0"
+    },
+    {
+      "file": "work_larger.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 439538,
+      "sha256": "3c849f5936f3354a8db6e8c0f0d67ad3e77c7ddcaa4de04d7ec50702c0c317ee"
+    },
+    {
+      "file": "work_normal.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 417944,
+      "sha256": "9862e1a7e108790c01c57a2c90787523d6beef4dc8cba2bcf491641450d62b61"
+    },
+    {
+      "file": "work_stage_board.webp",
+      "canvas": [
+        1320,
+        535
+      ],
+      "bytes": 130980,
+      "sha256": "dfcf0a2613d8b0e8dbc32dc00ae2cea47cd5c19d8c1f6f7806e22f52b8ad68a7"
+    }
+  ],
+  "tests_current_main": {
+    "complete": true,
+    "summary": "105 de 105 testes passaram em 699403 ms"
+  }
+}

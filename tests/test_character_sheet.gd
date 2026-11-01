@@ -44,7 +44,7 @@ func _info() -> void:
 	bento.perks = ["agile"]
 	bento.relic_id = "botao_cobre"
 	var info := AHCharacterSheet.from_hero(bento)
-	t.equal(info.kind, "Cão · Tanque e Proteção", "a espécie e o papel")
+	t.equal(info.kind, "Cão · Proteção", "a espécie e o papel (#189)")
 	t.check(info.passives.any(func(p): return p[0] == "Ágil" and p[1].contains("Velocidade")), "o traço com o que faz")
 	t.check(info.passives.any(func(p): return p[0].contains("Botão de Cobre")), "a relíquia")
 	var base := int(GameData.row("classes", "cao").BaseSpeed)
@@ -227,7 +227,7 @@ func _inspect_rows(hud: AHCombatHud, panel: Control) -> void:
 		hud._inspect_info = {}
 		await _frames(3)
 		var unit: AHCombat.Unit = hud.session.state.find_unit(hud._examine[index])
-		var rows := AHTypes.sheet_rows(AHTypes.of_class(unit.class_id) if unit.is_player else AHTypes.of_enemy(unit.enemy_id))
+		var rows := AHTypes.sheet_rows(AHTypes.of_unit(unit) if unit.is_player else AHTypes.of_enemy(unit.enemy_id))
 		var texts: Array = panel.find_children("*", "Label", true, false).map(func(label): return label.text)
 		var found := texts.filter(func(text): return text.contains(mark)).size()
 		if not unit.is_player:

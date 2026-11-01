@@ -1,0 +1,31 @@
+[
+  {
+    "Name": "unlocks",
+    "Levels": [
+      3,
+      5,
+      7
+    ],
+    "Fragments": [
+      1,
+      2,
+      3
+    ],
+    "MaxEquipped": 4,
+    "Description": "Proposta aprovada (#259): o Treino ensina um dos 3 desbloqueios da classe ao subir para cada nível de Levels, pelo custo do nível mais os fragmentos da vez (o 1º, o 2º e o 3º). Vão MaxEquipped para a luta. No nível 10, a vaga que sobrou continua: custa os fragmentos da vez e as sementes de um nível, as do level_10 de hero-levels.json (decisão do Lucas no #299)."
+  },
+  {
+    "Name": "camp",
+    "Levels": [
+      2,
+      4,
+      6,
+      8
+    ],
+    "MaxEquipped": 4,
+    "Time": 12,
+    "BadNight": 0.3333,
+    "BadNightEffect": "exposto",
+    "Description": "Aprovado (#261): o acampamento. Cada herói chega com as 3 habilidades Starter de camp-skills.json e aprende uma das que faltam, de graça e à escolha na Sala, em cada nível de Levels. Leva MaxEquipped (troca na Sala, fora da expedição). Cada acampamento tem Time de Tempo de fogueira; cada herói usa cada habilidade uma vez por acampamento. Ao levantar acampamento, BadNight de chance de a equipe ficar com BadNightEffect (a Noite mal dormida), a menos que alguém tenha vigiado."
+  }
+]

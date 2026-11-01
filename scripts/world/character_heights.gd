@@ -1,15 +1,11 @@
 ## Altura visível de cada personagem, da cabeça aos pés, em metros (port do FAHCharacterHeights da Unreal, #79). A
-## mesma na exploração e no combate. Heróis pela classe; inimigos pelo id da tabela. Mudar um tamanho é mudar só aqui.
+## mesma na exploração e no combate. Heróis pela espécie (#189, a coluna Height de data/species.json); civis, o Mercador e
+## inimigos pelo id desta tabela.
 class_name AHCharacterHeights
 
 ## Altura de origem do Bento (CHARACTER_SCALE da web): os fatores dos inimigos medem contra ela.
 const REFERENCE := 1.64
 const HEIGHTS := {
-	# Heróis, pela classe. Mais contraste (decisão do Lucas, 18/10/2026).
-	"cao": 1.72, "gato": 1.50, "sapo": 1.38, "coruja": 1.66,
-	# O Guaxinim e o Tatu (#187), sem altura na Unreal: o guaxinim um pouco menor que a Íris, o tatu baixo e largo. A
-	# arte deles é mais encorpada que a dos fundadores (cabeça grande, cauda e escudo), então a altura fica abaixo.
-	"rato": 1.30, "tatu": 1.35,
 	# Civis.
 	"civil_dora": 1.56, "civil_otto": 1.62, "civil_cora": 1.70,
 	# O Mercador (#182, a arte da #218): a altura do Bento, com o fedora.
@@ -25,11 +21,16 @@ const HEIGHTS := {
 }
 
 
-## Altura de um herói (hero_cao_bento: pela classe cao), inimigo ou civil; fallback se não estiver na tabela.
+## Altura de um herói (pela espécie dele no elenco; quem ainda não está no elenco, como o recruta no trem, pela espécie
+## padrão da classe do id: hero_cao_5 → cão), inimigo ou civil; fallback se não estiver em nenhuma tabela.
 static func find(id: String, fallback: float = REFERENCE) -> float:
 	if HEIGHTS.has(id):
 		return HEIGHTS[id]
 	var parts := id.split("_")
-	if id.begins_with("hero_") and parts.size() > 1 and HEIGHTS.has(parts[1]):
-		return HEIGHTS[parts[1]]
+	if id.begins_with("hero_") and parts.size() > 1:
+		var hero = Campaign.hero(id)
+		var species_id := AHSpecies.of_hero(hero) if hero != null else AHSpecies.default_for(parts[1])
+		var height := AHSpecies.height(species_id)
+		if height > 0.0:
+			return height
 	return fallback

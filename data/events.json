@@ -72,7 +72,7 @@
         "RequirementAmount": 2,
         "UnavailableIfUnlocked": "rato",
         "Success": {
-          "Result": "O guaxinim guarda uma ração e volta a desmontar o terminal. \"Sou Risco. Ainda tem energia útil nessas máquinas, e eu sei tirar sem acordar ninguém. Se a Estação Raiz tiver lugar, me procurem.\" (Classe Guaxinim Sabotador liberada.)",
+          "Result": "O guaxinim guarda uma ração e volta a desmontar o terminal. \"Sou Risco. Ainda tem energia útil nessas máquinas, e eu sei tirar sem acordar ninguém. Se a Estação Raiz tiver lugar, me procurem.\" (Classe Sabotagem liberada.)",
           "FoodDelta": -2,
           "UnlockClass": "rato",
           "RecruitName": "Risco"
@@ -1216,6 +1216,29 @@
         "Success": {
           "Result": "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)",
           "ScrapDelta": 2
+        }
+      }
+    ]
+  },
+  {
+    "Name": "setas_na_parede",
+    "Title": "Setas na parede",
+    "Description": "Setas riscadas na parede, na altura de um roedor, apontam sempre para o mesmo lado. Ao lado de cada uma, um filtro velho pendurado num prego, entupido. Alguém mantinha esta rota. Faz tempo que ninguém volta para trocar os filtros.",
+    "Choices": [
+      {
+        "Id": "seguir_setas",
+        "Text": "Seguir as setas até o fim da parede",
+        "Success": {
+          "Result": "As setas terminam num nicho seco, atrás de uma grade solta. Lá dentro, peças embrulhadas em pano, guardadas com cuidado (+1 Fragmento).",
+          "FragmentsDelta": 1
+        }
+      },
+      {
+        "Id": "levar_filtro",
+        "Text": "Levar um dos filtros velhos",
+        "Success": {
+          "Result": "O filtro está entupido, mas a carcaça de metal ainda serve na Estação (+1 Sucata).",
+          "ScrapDelta": 1
         }
       }
     ]

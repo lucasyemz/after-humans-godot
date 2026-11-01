@@ -71,6 +71,8 @@ var train := {}
 ## O vagão em camadas do tutorial (#256), no lugar do card pintado (train.car); null nos outros mapas.
 var train_car: AHTrainCar
 var _blink_lights: Array = []
+## As luminárias do mapa (as luzes pontuais dos dados), para o ramal do desvio apagar (#289).
+var _lamps: Array[OmniLight3D] = []
 var _blink_parts: Array = []
 var _door_nodes := {}
 var _panel_nodes: Array = []
@@ -217,6 +219,22 @@ static func blink_lit(time: float, phase: float) -> bool:
 
 
 ## O vagão parado na plataforma, com as portas abertas (true), ou ainda fora dela, escondido (false), até arrive_train.
+## O ramal de um desvio (#289, data/detours.json) usa só o começo do mapa (as zonas acabam em ZoneX1 e os objetos
+## depois dela saem) e as luminárias mais fracas (LampScale): o mesmo lugar não parece o da fase em que ele é o mapa.
+func apply_detour(def: Dictionary) -> void:
+	var end := float(def.get("ZoneX1", 0.0))
+	if end > 0.0:
+		for zone in zones:
+			zone.x1 = minf(float(zone.x1), end)
+		zones = zones.filter(func(z): return float(z.x1) - float(z.x0) > 1.0)
+		props = props.filter(func(p): return float(p.x) < end - 0.5)
+	var scale := float(def.get("LampScale", 1.0))
+	for lamp in _lamps:
+		lamp.light_energy *= scale
+	for entry in _blink_lights:
+		entry[1] = float(entry[1]) * scale
+
+
 func park_train(here: bool) -> void:
 	var metro := get_node_or_null("Metro") as Node3D
 	if metro != null:
@@ -771,6 +789,7 @@ func _light(light: Dictionary) -> void:
 	if not light.get("visible", true):
 		return
 	var lamp := OmniLight3D.new()
+	_lamps.append(lamp)
 	lamp.position = Vector3(light.origin[0], light.origin[1], light.origin[2])
 	lamp.light_energy = float(light.lumens) / LUMENS_PER_ENERGY
 	if light.has("blink"):

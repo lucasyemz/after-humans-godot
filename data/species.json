@@ -1,0 +1,140 @@
+[
+  {
+    "Name": "cao",
+    "DisplayName": "Cão",
+    "Lineage": "Canidae",
+    "Height": 1.72,
+    "ArtFolder": "dog",
+    "Names": [
+      "Bento",
+      "Brutus",
+      "Argos",
+      "Tobias",
+      "Balto",
+      "Rufus",
+      "Lorde",
+      "Barão",
+      "Brasa",
+      "Trovão",
+      "Pistão",
+      "Farol",
+      "Fumaça",
+      "Trilho",
+      "Bóris"
+    ]
+  },
+  {
+    "Name": "gato",
+    "DisplayName": "Gato",
+    "Lineage": "Felidae",
+    "Height": 1.5,
+    "ArtFolder": "cat",
+    "Names": [
+      "Nix",
+      "Sombra",
+      "Breu",
+      "Telha",
+      "Maya",
+      "Nuvem",
+      "Fresta",
+      "Calha",
+      "Chico",
+      "Puma",
+      "Luna",
+      "Antena",
+      "Veludo",
+      "Mimi",
+      "Lampião"
+    ]
+  },
+  {
+    "Name": "sapo",
+    "DisplayName": "Sapo",
+    "Lineage": "Anura",
+    "Height": 1.38,
+    "ArtFolder": "frog",
+    "Names": [
+      "Íris",
+      "Lupa",
+      "Cisterna",
+      "Garganta",
+      "Mirante",
+      "Bubo",
+      "Estrela",
+      "Eco",
+      "Alerta",
+      "Sábio",
+      "Pluma",
+      "Penumbra",
+      "Gisela",
+      "Noctis"
+    ]
+  },
+  {
+    "Name": "coruja",
+    "DisplayName": "Coruja",
+    "Lineage": "Strigiformes",
+    "Height": 1.66,
+    "ArtFolder": "owl",
+    "Names": [
+      "Véspera",
+      "Sereno",
+      "Jasmim",
+      "Pacato",
+      "Rio",
+      "Sol",
+      "Dengoso",
+      "Flora",
+      "Paz",
+      "Brisa",
+      "Lótus",
+      "Chico Rei",
+      "Pingo",
+      "Mel",
+      "Cacau"
+    ]
+  },
+  {
+    "Name": "guaxinim",
+    "DisplayName": "Guaxinim",
+    "Lineage": "Procyonidae",
+    "Height": 1.44,
+    "ArtFolder": "raccoon",
+    "Names": [
+      "Risco",
+      "Pólvora",
+      "Chispola",
+      "Pipeta",
+      "Ferrugem",
+      "Duto",
+      "Pipoca",
+      "Veneno",
+      "Mola",
+      "Centelha",
+      "Fuligem",
+      "Pinça",
+      "Engrenagem"
+    ]
+  },
+  {
+    "Name": "tatu",
+    "DisplayName": "Tatu",
+    "Lineage": "Cingulata",
+    "Height": 1.56,
+    "ArtFolder": "armadillo",
+    "Names": [
+      "Casco",
+      "Carapaça",
+      "Couraça",
+      "Fortaleza",
+      "Tromba",
+      "Pedregulho",
+      "Bigorna",
+      "Escudo",
+      "Baluarte",
+      "Granito",
+      "Tanque",
+      "Rochedo"
+    ]
+  }
+]

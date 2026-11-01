@@ -31,8 +31,10 @@ var xp_gained := {}
 ## tutorial, speed_bonus).
 ## phase_effects: os efeitos de fase da expedição (AHJourneyRules.phase_effects, #78): a velocidade entra antes da
 ## iniciativa e os marcadores (Vulnerável, Bloqueio) já estão nos heróis quando a luta começa.
+## camp: os bônus do acampamento (#261, AHCampSkills.next_fight): {heroes {hero_id: {block, dodge, speed}}, mark_front}.
+## Entram como os de fase, sem sortear nada (a paridade com a Unreal não muda).
 static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed_value: int = -1, hope: int = 80,
-		phase_effects: Array = []) -> AHCombatSession:
+		phase_effects: Array = [], camp: Dictionary = {}) -> AHCombatSession:
 	var session := AHCombatSession.new()
 	session.data = GameData.combat
 	session.random = AHCombatRandom.new(seed_value if seed_value >= 0 else randi())
@@ -48,16 +50,19 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 		var hero: Dictionary = heroes[index]
 		# O nível (#90): a velocidade, o +1 numa habilidade e o instinto a menos no começo da luta (a vida já está no herói).
 		var bonus := AHHeroLevels.combat_bonus(hero)
+		var own: Dictionary = camp.get("heroes", {}).get(String(hero.id), {})
 		session.calm[hero.id] = mini(int(bonus.calm), int(hero.get("instinct", 0)))
 		players.append(AHCombatEngine.make_hero_unit({
-			"Id": hero.id, "ClassId": hero.class_id, "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
+			"Id": hero.id, "ClassId": hero.class_id, "Species": String(hero.get("species", "")), "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
 			"Instinct": maxi(0, int(hero.get("instinct", 0)) - int(bonus.calm)), "Perks": hero.get("perks", []), "Trauma": hero.get("trauma", false),
 			"RelicId": hero.get("relic_id", ""), "ExpeditionUses": hero.get("expedition_uses", {}),
-			"SpeedBonus": int(bonus.speed) + marks.speed, "AbilityBonus": bonus.abilities,
+			"AbilityIds": AHHeroSkills.equipped(hero) if not Array(hero.get("loadout", [])).is_empty() else [],
+			"SpeedBonus": int(bonus.speed) + marks.speed + int(own.get("speed", 0)), "AbilityBonus": bonus.abilities,
 		}, index + 1, session.data))
 		var unit: Unit = players[-1]
 		unit.tokens.vuln = mini(AHCombatEngine.TOKEN_CAP, marks.vuln)
-		unit.tokens.block = mini(AHCombatEngine.TOKEN_CAP, marks.block)
+		unit.tokens.block = mini(AHCombatEngine.TOKEN_CAP, marks.block + int(own.get("block", 0)))
+		unit.tokens.dodge = mini(AHCombatEngine.TOKEN_CAP, unit.tokens.dodge + int(own.get("dodge", 0)))
 	var enemies: Array = []
 	var next_rank := 1
 	for index in enemies_in.size():
@@ -75,6 +80,12 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 		enemies.append(unit)
 		var row = session.data.enemies.get(spec)
 		next_rank += row.FormationSize if row != null and row.FormationSize > 0 else 1
+	# Limpar a Mira (#261): o inimigo da posição 1 começa Marcado (como a Marca de uma habilidade: 2 turnos).
+	if bool(camp.get("mark_front", false)):
+		for enemy in enemies:
+			if int(enemy.rank) == 1:
+				enemy.tokens.mark = 1
+				enemy.mark_duration = 2
 	session.state = AHCombatEngine.init_combat(players, enemies, session.context, session.data, session.random, opening)
 	session.engine = AHCombatEngine.new(session.state, session.context, session.data, session.random)
 	for id in phase_effects:
@@ -109,14 +120,13 @@ func units() -> Array:
 
 # ---------------------------------------------------------------- opções do herói da vez
 
-## As habilidades do herói, na ordem da classe: {id, name, description, usable, reason, targets, enemy_side, cooldown, uses}.
+## As habilidades do herói (as que ele leva, #259), na ordem: {id, name, description, usable, reason, targets, enemy_side, cooldown, uses}.
 func ability_options(actor_id: String) -> Array:
 	var actor := state.find_unit(actor_id)
 	var options: Array = []
 	if actor == null:
 		return options
-	var hero_class = data.classes.get(actor.class_id)
-	for ability_id in (hero_class.AbilityIds if hero_class != null else []):
+	for ability_id in engine.abilities_of(actor):
 		var ability = data.abilities.get(ability_id)
 		if ability == null:
 			continue

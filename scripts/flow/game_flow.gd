@@ -83,9 +83,10 @@ static func card_for(scene_id: String) -> Dictionary:
 			var corridor: Dictionary = expedition.get("corridor", {})
 			var index := int(corridor.get("index", 0))
 			var steps := int(corridor.get("steps", []).size())
-			var place := AHScenarioWorld.display_of(AHJourneyRules.map_for_step(info.id, index))
+			var place := AHJourneyRules.route_place(expedition, index) if expedition.has("corridor") \
+				else AHScenarioWorld.display_of(AHJourneyRules.map_for_step(info.id, index))
 			var phase_name := String(TranslationServer.translate(info.name))
-			var step_text := String(TranslationServer.translate("Trecho %d de %d")) % [index + 1, steps] if steps > 0 else ""
+			var step_text := AHJourneyRules.step_text(corridor, index) if steps > 0 else ""
 			var parts: Array = [] if place == phase_name else [place]
 			if step_text != "":
 				parts.append(step_text)
