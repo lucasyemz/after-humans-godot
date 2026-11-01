@@ -2,7 +2,7 @@
   {
     "Name": "rules", "CaptureEnabled": true,
     "Kind": "rules",
-    "Note": "#183 (decisão do Lucas, 28/10): as regras das missões solo. A aba abre com a Preparação no nível UnlockLevel. O quadro tem Board[fase mais alta liberada - 1] missões por dia, no máximo MaxActive em curso; cada dia de missão custa FoodPerDay suprimentos na saída. A chance (de MinChance a MaxChance) começa em BaseByDanger[perigo - 1], soma Strong ou Partial por aptidão pedida, LevelUp por nível acima do da missão (até LevelUpMax) e tira LevelDown por nível abaixo, até HpMax pela vida que falta, Trauma com trauma e Crisis com o instinto em CrisisAt ou mais; os traços em Perks. O selo: Good a partir de GoodFrom, Risky a partir de RiskyFrom. O sorteio de 0 a 99: abaixo da chance deu certo (a recompensa e Xp); até HurtBand acima, volta ferido (HurtHp da vida e metade da recompensa, sem relíquia); acima disso, capturado. O capturado volta do resgate com RescueHp da vida.",
+    "Note": "#183 (decisão do Lucas, 28/10): as regras das missões solo. A aba abre com a Preparação no nível UnlockLevel. O quadro tem Board[fase mais alta liberada - 1] missões por dia, no máximo MaxActive em curso; cada dia de missão custa FoodPerDay suprimentos na saída. A chance (de MinChance a MaxChance) começa em BaseByDanger[perigo - 1], soma Strong ou Partial por aptidão pedida, LevelUp por nível acima do da missão (até LevelUpMax) e tira LevelDown por nível abaixo, até HpMax pela vida que falta, Trauma com trauma e Crisis com o instinto em CrisisAt ou mais; os traços em Perks. O selo: Good a partir de GoodFrom, Risky a partir de RiskyFrom. O sorteio de 0 a 99: abaixo da chance deu certo (a recompensa e Xp); até HurtBand acima, volta ferido (HurtHp da vida, arredondado para baixo, e metade da recompensa, sem relíquia; decisão de 01/11: 0,25, abaixo do limite de ferido de wounded.json, para ele mancar na chegada, #194); acima disso, capturado. O capturado volta do resgate com RescueHp da vida.",
     "UnlockLevel": 2,
     "Board": [
       2,
@@ -32,7 +32,7 @@
     "GoodFrom": 65,
     "RiskyFrom": 40,
     "HurtBand": 25,
-    "HurtHp": 0.35,
+    "HurtHp": 0.25,
     "Xp": 10,
     "RescueHp": 0.5,
     "Aptitudes": {

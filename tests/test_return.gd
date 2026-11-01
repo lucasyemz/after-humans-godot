@@ -2,6 +2,8 @@
 ## ferido, mais devagar; os mortos não descem), o relatório abre e, ao concluir, a vista geral com o descanso pendente.
 ## - Pular (Interagir, Esc, clique, toque) leva direto ao relatório, com todos na fila; nada abre por trás.
 ## - Sem ninguém vivo, o trem chega vazio e o relatório abre do mesmo jeito.
+## - Quem está ferido (#194, AHWounded: a vida abaixo do limite ou em recuperação) desce com a pose de ferido, a 70% e
+##   mancando, e sai da fila do mesmo jeito; o arranhado anda normal; com Reduzir efeitos, sem o mancar.
 ## - O jogo fechado no meio da chegada: reaberto, a chegada começa de novo e a Estação não trava.
 ## - Depois do relatório: Preparar expedição bloqueado com o motivo até a noite passar; depois, liberado.
 extends RefCounted
@@ -24,6 +26,9 @@ func run(context) -> void:
 	var tips: bool = Tips.enabled
 	Tips.enabled = false
 	await _walk_and_wounded()
+	await _limp(false)
+	await _limp(true)
+	await _skip_limping()
 	await _after_card()
 	for kind in ["interact", "menu", "click", "touch"]:
 		await _skip(kind)
@@ -47,20 +52,103 @@ func run(context) -> void:
 	AHBriefing.enabled = briefing
 
 
-## Uma volta de vitória com a equipe dos quatro fundadores: hurt fica ferido, dead caiu.
-func _returned(hurt: Array = [], dead: Array = []) -> Dictionary:
+## Uma volta de vitória com a equipe dos quatro fundadores: hurt fica ferido (abaixo do limite de AHWounded), scratched
+## só arranhado (acima dele), dead caiu.
+func _returned(hurt: Array = [], dead: Array = [], scratched: Array = []) -> Dictionary:
 	var c: Dictionary = Campaign.create_initial(17)
 	var team: Array = c.roster.slice(0, 4).map(func(h): return h.id)
 	AHJourneyRules.start_expedition(c, "fase_1", 17)
 	c.session.expedition.team = team
 	for id in hurt:
 		var h = S.hero(c, id)
-		h.hp = maxi(1, int(h.max_hp) / 3)
+		h.hp = maxi(1, int(h.max_hp) / 5)
+	for id in scratched:
+		var h = S.hero(c, id)
+		h.hp = maxi(1, int(h.max_hp) * 3 / 4)
 	for id in dead:
 		S.hero(c, id).alive = false
 	c.session.result = "victory"
 	S.finish_return(c)
 	return c
+
+
+## O ferido desce do trem e sai da fila mancando, com a pose de ferido e a 70%; o arranhado, normal. Com Reduzir
+## efeitos, a pose e o passo ficam, sem o balanço.
+func _limp(reduced: bool) -> void:
+	var team: Array = _returned().station.last_return.team
+	var c := _returned([team[1]], [], [team[2]])
+	c.settings.reduced_environment_effects = reduced
+	var label := " (Reduzir efeitos)" if reduced else ""
+	var station := await _open(c)
+	if not t.check(station != null, "a Estação abre na volta com um ferido" + label):
+		return
+	var hurt: Dictionary = {}
+	var scratched: Dictionary = {}
+	for arrival in station._arrivals:
+		if arrival.hero_id == team[1]:
+			hurt = arrival
+		elif arrival.hero_id == team[2]:
+			scratched = arrival
+	if not t.check(not hurt.is_empty() and not scratched.is_empty(), "o ferido e o arranhado descem" + label):
+		return
+	var factor: float = float(AHWounded.rules().SpeedFactor)
+	t.check(hurt.hurt and is_equal_approx(hurt.speed, AHStation.TRAIN_WALK_SPEED * factor), "o ferido desce a %d%% do passo%s" % [roundi(factor * 100), label])
+	t.check(not scratched.hurt and is_equal_approx(scratched.speed, AHStation.TRAIN_WALK_SPEED), "o arranhado, acima do limite, anda normal" + label)
+	t.check(String(hurt.art.get("file", "")).get_file() == AHWounded.POSE_FILE, "com a pose de ferido (%s)%s" % [String(hurt.art.get("file", "")).get_file(), label])
+	t.check(String(scratched.art.get("file", "")).get_file() != AHWounded.POSE_FILE, "o arranhado, com o parado de sempre" + label)
+	# Andando, o ferido pende para os lados (o mancar); o arranhado, não.
+	var tilt := {"hurt": 0.0, "scratched": 0.0}
+	var limit := Time.get_ticks_msec() + 30000
+	while station.team_arriving() and Time.get_ticks_msec() < limit:
+		for pair in [["hurt", hurt], ["scratched", scratched]]:
+			if is_instance_valid(pair[1].card):
+				tilt[pair[0]] = maxf(tilt[pair[0]], absf(pair[1].card.rotation.z))
+		await _tree.process_frame
+	if reduced:
+		t.equal(tilt.hurt, 0.0, "com Reduzir efeitos, o ferido não balança")
+	else:
+		t.check(tilt.hurt > deg_to_rad(1.0), "o ferido manca na descida (até %.1f°)" % rad_to_deg(tilt.hurt))
+	t.equal(tilt.scratched, 0.0, "o arranhado não manca" + label)
+	t.check(await _until(func(): return station.hud.current == "report", 30.0), "o relatório abre" + label)
+	var standing: Array = station.lineup.filter(func(e): return e.hero_id == team[1] and is_instance_valid(e.card))
+	t.check(not standing.is_empty() and is_zero_approx(standing[0].card.rotation.z), "parado na fila, o ferido fica no prumo" + label)
+	t.check(not standing.is_empty() and String(standing[0].card.art().get("file", "")).get_file() == AHWounded.POSE_FILE, "e com a pose de ferido" + label)
+	# A saída da fila: o ferido no mesmo passo e mancando.
+	station.hud._enter_shelter_then(Callable())
+	await _frames(2)
+	var leaving: Array = station._leaving.filter(func(e): return e.hero_id == team[1])
+	if t.check(not leaving.is_empty(), "o ferido sai da fila" + label):
+		var entry: Dictionary = leaving[0]
+		t.check(entry.hurt and is_equal_approx(entry.speed, AHStation.LEAVE_SPEED * factor), "e sai a %d%% do passo%s" % [roundi(factor * 100), label])
+		var most := 0.0
+		limit = Time.get_ticks_msec() + 20000
+		while station._leaving.has(entry) and Time.get_ticks_msec() < limit:
+			if is_instance_valid(entry.card):
+				most = maxf(most, absf(entry.card.rotation.z))
+			await _tree.process_frame
+		t.check((most == 0.0) if reduced else (most > deg_to_rad(1.0)), ("sem balançar" if reduced else "mancando (até %.1f°)" % rad_to_deg(most)) + label)
+	await _until(func(): return not station.lineup_leaving(), 20.0)
+
+
+## Pular a chegada com o ferido no meio do passo (pendendo para o lado): ele vai para o lugar dele na fila, no prumo.
+func _skip_limping() -> void:
+	var team: Array = _returned().station.last_return.team
+	var station := await _open(_returned([team[1]]))
+	if not t.check(station != null, "a Estação abre com um ferido descendo"):
+		return
+	var hurt: Dictionary = {}
+	for arrival in station._arrivals:
+		if arrival.hero_id == team[1]:
+			hurt = arrival
+	var limping := func(): return not hurt.is_empty() and hurt.card != null and absf(hurt.card.rotation.z) > deg_to_rad(1.0)
+	if not t.check(await _until(limping, 30.0), "o ferido pende para o lado no meio do passo"):
+		return
+	station.finish_team_arrival()
+	await _frames(2)
+	var standing: Array = station.lineup.filter(func(e): return e.hero_id == team[1] and is_instance_valid(e.card))
+	var card: AHSpriteCard = standing[0].card if not standing.is_empty() else null
+	t.check(card != null and is_zero_approx(card.rotation.z), "pulada a chegada, ele fica na fila, no prumo")
+	await _until(func(): return station.hud.current == "report", 10.0)
 
 
 func _open(c: Dictionary) -> AHStation:
