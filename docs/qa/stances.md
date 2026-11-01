@@ -46,3 +46,8 @@ A arte é do Codex (PR #231, `docs/design/stances.md`). Os originais ficam na ta
 
   Correção: a pasta entrou no `.gitignore`, como as fontes das poses ajoelhadas (#13). A largura do corpo da guarda
   (a do idle, de propósito) ganhou um comentário na ferramenta.
+
+- **Rodada 2: APROVADO.** A pasta das fontes extraídas fica fora do Git (conferido com o `git check-ignore` e o `git
+  status` depois de extrair a tag). Nenhum código do jogo mudou desde a rodada 1. Ficam observações baixas: a conversão
+  completa refaz as guardas uma vez por herói (o mesmo padrão do `codex_reactions()`), e uma skin sem arte nenhuma
+  perde a guarda padrão (a Sala não lista skins sem arte).

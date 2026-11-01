@@ -1,0 +1,122 @@
+[
+  {
+    "Name": "Canidae",
+    "Kind": "lineage",
+    "DisplayName": "Linhagem dos Cães",
+    "ShortName": "Cães",
+    "Beats": [
+      "Felidae",
+      "Perseguidor"
+    ],
+    "Identity": "Perseguição, resistência e cooperação."
+  },
+  {
+    "Name": "Felidae",
+    "Kind": "lineage",
+    "DisplayName": "Linhagem dos Gatos",
+    "ShortName": "Gatos",
+    "Beats": [
+      "Strigiformes",
+      "Degradado"
+    ],
+    "Identity": "Agilidade, aproximação e precisão."
+  },
+  {
+    "Name": "Anura",
+    "Kind": "lineage",
+    "DisplayName": "Linhagem dos Sapos",
+    "ShortName": "Sapos",
+    "Beats": [
+      "Canidae",
+      "Industrial"
+    ],
+    "Identity": "Compostos, adaptação e desgaste."
+  },
+  {
+    "Name": "Strigiformes",
+    "Kind": "lineage",
+    "DisplayName": "Linhagem das Corujas",
+    "ShortName": "Corujas",
+    "Beats": [
+      "Procyonidae",
+      "Emissor"
+    ],
+    "Identity": "Observação, alcance e antecipação."
+  },
+  {
+    "Name": "Procyonidae",
+    "Kind": "lineage",
+    "DisplayName": "Linhagem dos Guaxinins",
+    "ShortName": "Guaxinins",
+    "Beats": [
+      "Cingulata",
+      "Blindado"
+    ],
+    "Identity": "Manipulação, improvisação e sabotagem."
+  },
+  {
+    "Name": "Cingulata",
+    "Kind": "lineage",
+    "DisplayName": "Linhagem dos Tatus",
+    "ShortName": "Tatus",
+    "Beats": [
+      "Anura",
+      "Condutor"
+    ],
+    "Identity": "Carapaça, escavação e impacto."
+  },
+  {
+    "Name": "Perseguidor",
+    "Kind": "family",
+    "DisplayName": "Família Perseguidora",
+    "ShortName": "Perseguidores",
+    "Beats": [
+      "Strigiformes"
+    ]
+  },
+  {
+    "Name": "Blindado",
+    "Kind": "family",
+    "DisplayName": "Família Blindada",
+    "ShortName": "Blindados",
+    "Beats": [
+      "Felidae"
+    ]
+  },
+  {
+    "Name": "Industrial",
+    "Kind": "family",
+    "DisplayName": "Família Industrial",
+    "ShortName": "Industriais",
+    "Beats": [
+      "Cingulata"
+    ]
+  },
+  {
+    "Name": "Emissor",
+    "Kind": "family",
+    "DisplayName": "Família Emissora",
+    "ShortName": "Emissores",
+    "Beats": [
+      "Canidae"
+    ]
+  },
+  {
+    "Name": "Condutor",
+    "Kind": "family",
+    "DisplayName": "Família Condutora",
+    "ShortName": "Condutores",
+    "Beats": [
+      "Anura"
+    ]
+  },
+  {
+    "Name": "Degradado",
+    "Kind": "family",
+    "DisplayName": "Família Degradada",
+    "ShortName": "Degradados",
+    "Beats": [
+      "Procyonidae"
+    ]
+  }
+]

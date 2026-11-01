@@ -1613,6 +1613,12 @@ character_room.gd: Skin_%s
 *: heroes
 *: default
 station_rules.gd: Unlock
+combat_hud.gd: Advantage
+character_sheet.gd: type
+character_sheet.gd: Type
+combat_hud.gd: type
+combat_hud.gd: Type
+type_advantage.gd: type
 station_rules.gd: %s:merchant
 station_rules.gd: Limit
 station_rules.gd: dormitory_level_%d
@@ -1683,3 +1689,4 @@ station_grid.gd: speaker
 station_grid.gd: Card
 station_grid.gd: Lines
 refuge_hud.gd: Dig_%s
+refuge_hud.gd: A partida não esperou o recusado voltar ao vagão (%.0f s).

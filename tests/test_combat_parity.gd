@@ -71,6 +71,8 @@ func run(t) -> void:
 	var data := AHGameData.new()
 	if not t.check(data.load_from("res://data", "res://data/legacy_kits"), "dados do combate e kits históricos carregam"):
 		return
+	# A vantagem de tipo (#227) não existe na Unreal: a paridade roda com ela desligada, sem mudar nenhum resultado.
+	data.type_advantage.Enabled = false
 	var lines := FileAccess.get_file_as_string("res://data/combat-parity.txt").split("\n")
 	for i in lines.size():
 		lines[i] = lines[i].strip_edges(false, true)
