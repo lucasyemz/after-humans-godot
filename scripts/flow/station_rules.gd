@@ -2296,7 +2296,7 @@ static func yield_text(room_id: String, amount: int) -> String:
 			return TranslationServer.translate("−1 dia de recuperação para %d caído por volta") % amount if amount == 1 \
 				else TranslationServer.translate("−1 dia de recuperação para %d caídos por volta") % amount
 		"dig":
-			return TranslationServer.translate("+%d ponto de obra por volta") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por volta") % amount
+			return TranslationServer.translate("+%d ponto de obra por dia") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por dia") % amount
 	return ""
 
 

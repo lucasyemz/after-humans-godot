@@ -48,6 +48,10 @@ const RELIC_ICONS := {"botao_cobre": "relic-copper-button", "pena_vidro": "relic
 const RESOURCE_ICONS := {"scrap": "lobby-scrap", "fragments": "lobby-fragment", "seeds": "lobby-seed", "bandages": "res-bandages",
 	"water": "lobby-water", "food": "lobby-food", "power": "lobby-energy"}
 const FEEDBACK_WIDTH := 900.0
+## O lugar de um bloco da grade (#186; a interface, #274), ao lado dos ids dos cômodos: "block:1:3", "block:L2".
+const BLOCK := "block:"
+## Quanto tempo o aviso do achado da escavação fica no alto (como o da ferramenta nova, #143).
+const DIG_NOTICE_SECONDS := 7.0
 const FEEDBACK_TOP := 132.0
 
 var station: AHStation
@@ -104,6 +108,19 @@ var _room_tag_label: Label
 var _room_card: PanelContainer
 var _hover_room := ""
 var _room_rects := {}
+## Os blocos da grade na vista geral (#274): {"block:1:3": Rect2}. Com os cômodos, os lugares que o mouse, o toque e as
+## setas escolhem.
+var _block_rects := {}
+## Os marcadores dos blocos (#274): {chave: PanelContainer}, um por vaga livre e por bloco que dá para escavar, e um por
+## trecho soterrado de cada andar.
+var _block_marks := {}
+## O aviso do achado da escavação (#274, no padrão do #143), no alto, ou null.
+var _dig_notice: PanelContainer
+var _dig_tween: Tween
+## O que cada bloco é agora (block_info), refeito só quando a grade, o estoque ou o escavador mudam: os marcadores se
+## reposicionam a cada quadro sem refazer as contas.
+var _block_infos := {}
+var _block_infos_key := ""
 ## O cômodo escolhido pelo teclado ou pelo controle (setas e direcional); o mouse mexendo volta a mandar.
 var _key_room := ""
 var _last_mouse := Vector2(-1, -1)
@@ -142,6 +159,10 @@ var _map_from_platform := false
 var _report_screen: AHStationReport
 ## A Sala dos Personagens no kit (#60): a tela inteira, com o cômodo ao fundo.
 var _room_screen: AHCharacterRoom
+## Escavar e construir (#284): a planta dos subsolos em cartões, aberta como um serviço ("dig").
+var _dig_board: AHDigBoard
+## O bloco que a planta abre escolhido (o soterrado apontado na vista geral).
+var _dig_selected := ""
 ## A tela do kit de onde as Opções ou o Plano foram abertos (a Sala): fechar volta para ela.
 var _back_to := ""
 ## O candidato que o trem já trouxe nesta visita (a chegada toca uma vez).
@@ -279,6 +300,11 @@ func _input(event: InputEvent) -> void:
 	# Com o briefing aberto (#88), a caixa dele fica com o teclado, o controle, o clique e o toque.
 	if briefing_open():
 		return
+	# O aviso do achado (#274, como o da ferramenta nova, #143) sai com qualquer tecla, botão, clique ou toque, que segue
+	# para a tela.
+	if dig_notice_shown() and event.is_pressed() and not event.is_echo() and (event is InputEventKey or event is InputEventJoypadButton \
+			or event is InputEventMouseButton or event is InputEventScreenTouch):
+		hide_dig_notice()
 	# A noite passando (#132): Interagir, Esc, Voltar, um clique ou um toque pulam para o amanhecer.
 	if night_scene_open():
 		if event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton or event is InputEventScreenTouch or event is InputEventAction:
@@ -343,10 +369,11 @@ func _input(event: InputEvent) -> void:
 		return
 	# Com um cômodo aberto, o vizinho do mesmo andar direto, sem voltar à vista geral (#131).
 	var in_training: bool = is_instance_valid(_room_screen) and _room_screen.training
-	if (_room_open() or (current == S.CHARACTERS and not in_training)) and not _map.visible:
+	if (_room_open() or block_of(current) != "" or (current == S.CHARACTERS and not in_training)) and not _map.visible:
 		for spec in [["station_room_prev", -1], ["station_room_next", 1]]:
 			if event.is_action_pressed(spec[0]):
-				var next := neighbor_room(current, spec[1])
+				# Da Sala, só os cômodos; de um cômodo ou de um bloco (#274), também os blocos do andar.
+				var next := neighbor_room(current, spec[1]) if current == S.CHARACTERS else neighbor_place(current, spec[1])
 				if next != "":
 					open_room(next)
 				get_viewport().set_input_as_handled()
@@ -363,7 +390,7 @@ func _input(event: InputEvent) -> void:
 			get_viewport().gui_release_focus()
 			get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("menu"):
+	if event.is_action_pressed("menu") and is_instance_valid(_next_button):
 		U.using_keys = true
 		_next_button.grab_focus()
 		get_viewport().set_input_as_handled()
@@ -400,6 +427,9 @@ func focus_scope() -> Control:
 		return _report_screen
 	if current == S.CHARACTERS and is_instance_valid(_room_screen):
 		return _room_screen
+	# A planta (#284): as setas andam entre os cartões, Interagir escolhe e, no escolhido, aciona o botão grande.
+	if current == "dig" and is_instance_valid(_dig_board):
+		return _dig_board
 	# Na cena do trem, sem painel: o foco fica no pé (as setas não andam entre os cômodos por trás da cena, #61).
 	if current == "train" and not _panel.visible:
 		return _corner
@@ -431,26 +461,27 @@ func set_hud_hidden(on: bool) -> void:
 	_hidden_hint.position = Vector2(960 - _hidden_hint.size.x * 0.5, 1030)
 
 
-## O próximo cômodo na direção: o mais perto, com o desvio para o lado contando o dobro; sem nenhum escolhido, começa
-## pelo do próximo passo (ou o primeiro da esquerda).
+## O próximo lugar na direção (um cômodo ou um bloco da grade, #274): o mais perto, com o desvio para o lado contando o
+## dobro; sem nenhum escolhido, começa pelo do próximo passo (ou o primeiro da esquerda).
 func _step_room(direction: Vector2) -> void:
-	if _room_rects.is_empty():
+	var rects := _place_rects()
+	if rects.is_empty():
 		return
-	if _key_room == "" or not _room_rects.has(_key_room):
+	if _key_room == "" or not rects.has(_key_room):
 		var start: String = _hover_room if _hover_room != "" else _next.get("room", "")
-		if not _room_rects.has(start):
-			var ids: Array = _room_rects.keys()
-			ids.sort_custom(func(a, b): return _room_rects[a].position.x < _room_rects[b].position.x)
+		if not rects.has(start):
+			var ids: Array = rects.keys()
+			ids.sort_custom(func(a, b): return rects[a].position.x < rects[b].position.x)
 			start = ids[0]
 		_key_room = start
 	else:
-		var from: Vector2 = _room_rects[_key_room].get_center()
+		var from: Vector2 = rects[_key_room].get_center()
 		var best := ""
 		var best_score := INF
-		for id in _room_rects:
+		for id in rects:
 			if id == _key_room:
 				continue
-			var offset: Vector2 = _room_rects[id].get_center() - from
+			var offset: Vector2 = rects[id].get_center() - from
 			var along := offset.dot(direction)
 			if along <= 1.0:
 				continue
@@ -462,7 +493,10 @@ func _step_room(direction: Vector2) -> void:
 			_key_room = best
 	_last_mouse = get_viewport().get_mouse_position()
 	# A câmera acompanha o cômodo escolhido pelas setas (o que o menu cobre fica à vista).
-	station.pan_to_room(_key_room, _overview_left() + 12.0, 1900.0)
+	if block_of(_key_room) != "":
+		station.pan_to_block(block_of(_key_room), _overview_left() + 12.0, 1900.0)
+	else:
+		station.pan_to_room(_key_room, _overview_left() + 12.0, 1900.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -491,9 +525,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		_drag_pan_y = station.pan_y
 		_dragged = false
 		get_viewport().set_input_as_handled()
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and _room_open() and not _map.visible:
-		# Com um cômodo aberto, clicar no vizinho (fora do painel) troca direto (#131).
-		var room := _room_at_point(station.room_screen_rects(), event.position)
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and (_room_open() or block_of(current) != "") \
+			and not _map.visible:
+		# Com um cômodo (ou um bloco, #274) aberto, clicar no vizinho (fora do painel) troca direto (#131).
+		var rects := station.room_screen_rects()
+		var blocks := station.block_screen_rects()
+		for key in blocks:
+			rects[block_place(key)] = blocks[key]
+		var room := _room_at_point(rects, event.position)
 		if room != "" and room != current:
 			open_room(room)
 			get_viewport().set_input_as_handled()
@@ -522,6 +561,7 @@ func restyle() -> void:
 
 func refresh() -> void:
 	var c: Dictionary = Campaign.state
+	_block_infos_key = ""
 	_build_frame(c)
 	_build_left(c)
 	if current != "":
@@ -542,12 +582,16 @@ func _screen_name(c: Dictionary) -> String:
 			return tr("Ciclo %d · %s") % [c.station.cycle_number, S.limits_text(c)]
 		"plan":
 			return tr("Plano da Estação")
+		"dig":
+			return tr("Escavar e construir")
 		"train":
 			return tr("Plataforma 1")
 		"departure":
 			return tr("Partida")
 	if not S.room_def(current).is_empty():
 		return tr(S.room_def(current).name)
+	if block_of(current) != "":
+		return block_title(block_of(current))
 	return ""
 
 
@@ -560,6 +604,8 @@ func _active_tab() -> String:
 			return "research"
 		S.PREPARATION:
 			return ""
+		"dig":
+			return "dig"
 	return "facilities"
 
 
@@ -593,7 +639,7 @@ func _build_frame(c: Dictionary) -> void:
 	AHStationFrame.back_button(_frame, close_panel)
 	if current == "options":
 		pairs = [[tr("Setas"), tr("Navegar")], ["interact", tr("Mudar")], ["Esc", tr("Fechar")]]
-	elif _room_open():
+	elif _room_open() or block_of(current) != "":
 		# O cômodo vizinho direto (#131).
 		pairs = [[tr("Setas"), tr("Navegar")], ["interact", tr("Selecionar")], ["station_room_next", tr("Ao lado")], ["Esc", tr("Voltar")], ["hide_hud", tr("Ocultar")]]
 	else:
@@ -605,9 +651,13 @@ func _build_frame(c: Dictionary) -> void:
 func _nav(id: String) -> void:
 	match id:
 		"overview":
+			# A aba vai à vista geral, mesmo de um painel aberto pela planta (#284).
+			_back_to = ""
 			close_panel()
 		"facilities":
 			open_service("plan")
+		"dig":
+			open_service("dig")
 		"characters":
 			open_room(S.CHARACTERS)
 		"research":
@@ -628,7 +678,7 @@ func _build_left(c: Dictionary) -> void:
 	_next_button = null
 	var overview := current == ""
 	var kit_screen := current == "report" or current == S.CHARACTERS or current == "departure"
-	_menu.visible = not kit_screen and current != ARRIVAL and current != "options"
+	_menu.visible = not kit_screen and current != ARRIVAL and current != "options" and current != "dig"
 	if overview:
 		_menu.add_child(_next_card(c))
 		_menu.add_child(_plan_card())
@@ -682,11 +732,16 @@ func _next_card(c: Dictionary) -> PanelContainer:
 
 ## O Plano da Estação: o que cada cômodo destrava.
 func _plan_card() -> Button:
+	return _plaque_card("PlanCard", "plan", tr("Plano da Estação"), tr("o que cada cômodo destrava"), func(): open_service("plan"))
+
+
+## Uma plaqueta da coluna da esquerda: o ícone, o nome e a linha de baixo.
+func _plaque_card(node_name: String, icon: String, title: String, subtitle: String, action: Callable) -> Button:
 	var button := Button.new()
-	button.name = "PlanCard"
+	button.name = node_name
 	AHKit.style_as(button, "plaque", Vector4(4, 4, 4, 4))
 	button.custom_minimum_size = Vector2(LEFT.size.x, 76)
-	button.pressed.connect(func(): open_service("plan"))
+	button.pressed.connect(action)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 14)
 	row.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -694,7 +749,7 @@ func _plan_card() -> Button:
 	row.offset_right = -16
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(row)
-	var glyph := AHKit.glyph("plan", 38, AHKit.TEXT)
+	var glyph := AHKit.glyph(icon, 38, AHKit.TEXT)
 	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(glyph)
 	var names := VBoxContainer.new()
@@ -702,8 +757,8 @@ func _plan_card() -> Button:
 	names.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	names.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(names)
-	names.add_child(AHKit.label(tr("Plano da Estação"), "row", AHKit.TEXT, true, true))
-	names.add_child(AHKit.label(tr("o que cada cômodo destrava"), "small", AHKit.MUTED))
+	names.add_child(AHKit.label(title, "row", AHKit.TEXT, true, true))
+	names.add_child(AHKit.label(subtitle, "small", AHKit.MUTED))
 	var grow := func(): button.custom_minimum_size.y = maxf(76.0, row.get_combined_minimum_size().y + 16.0)
 	row.minimum_size_changed.connect(grow)
 	grow.call()
@@ -913,6 +968,12 @@ func _refresh_room_card() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 10)
 	_room_card.add_child(box)
+	# Um bloco da grade (#274): o estado, o resumo do marcador por extenso e GERENCIAR.
+	if block_of(_hover_room) != "":
+		_block_card(c, box, block_of(_hover_room))
+		_card_without_lock = false
+		_fit_room_card()
+		return
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 12)
 	box.add_child(head)
@@ -1145,15 +1206,38 @@ func _fit_room_card() -> void:
 
 ## O cômodo debaixo de um ponto da tela ("" se nenhum).
 func _room_at(point: Vector2) -> String:
-	for id in _room_rects:
-		if _room_rects[id].has_point(point):
+	var rects := _place_rects()
+	for id in rects:
+		if rects[id].has_point(point):
 			return id
 	return ""
+
+
+## Os cômodos e os blocos da grade na tela (a vista geral).
+func _place_rects() -> Dictionary:
+	var out := _room_rects.duplicate()
+	out.merge(_block_rects)
+	return out
+
+
+## O lugar de um bloco da grade, ao lado dos ids dos cômodos.
+static func block_place(key: String) -> String:
+	return BLOCK + key
+
+
+## O bloco do lugar ("1:3", "L2"), ou "" num cômodo.
+static func block_of(place: String) -> String:
+	return place.trim_prefix(BLOCK) if place.begins_with(BLOCK) else ""
 
 
 func _update_room_hover() -> void:
 	var overview := current == "" and not _map.visible
 	_room_rects = station.room_screen_rects() if overview else {}
+	_block_rects = {}
+	if overview:
+		var blocks := station.block_screen_rects()
+		for key in blocks:
+			_block_rects[block_place(key)] = blocks[key]
 	var hovered := ""
 	var mouse := get_viewport().get_mouse_position()
 	if mouse.distance_to(_last_mouse) > 2.0:
@@ -1161,7 +1245,7 @@ func _update_room_hover() -> void:
 	if tour != null:
 		# Na visita, só o destaque dela: sem a moldura e o cartão do cômodo debaixo do mouse ou do teclado.
 		hovered = ""
-	elif overview and _key_room != "" and _room_rects.has(_key_room):
+	elif overview and _key_room != "" and (_room_rects.has(_key_room) or _block_rects.has(_key_room)):
 		hovered = _key_room
 	elif overview:
 		var over := get_viewport().gui_get_hovered_control()
@@ -1180,6 +1264,7 @@ func _update_room_hover() -> void:
 	var rest: bool = Campaign.state.night.phase != "none" and _room_rects.has(S.DORMITORY) and _hover_room != S.DORMITORY
 	_fit_room_card()
 	_place_lock_marks()
+	_place_block_marks()
 	_rest_tag.visible = rest
 	if rest:
 		_rest_tag.size = _rest_tag.get_combined_minimum_size()
@@ -1194,7 +1279,7 @@ func _update_room_hover() -> void:
 
 func _draw_room_marks() -> void:
 	_room_tag.visible = false
-	if _room_rects.is_empty():
+	if _room_rects.is_empty() and _block_rects.is_empty():
 		return
 	var c: Dictionary = Campaign.state
 	# Com a noite pendente, o Dormitório fica em destaque na vista geral: a luz, os cantos cheios e a etiqueta.
@@ -1206,6 +1291,9 @@ func _draw_room_marks() -> void:
 	var hints := {}
 	if _next.get("room", "") != "":
 		hints[_next.room] = AHKit.AMBER
+	# O Próximo passo de escavar (#186): o bloco da frente.
+	if String(_next.get("block", "")) != "":
+		hints[block_place(_next.block)] = AHKit.AMBER
 	if c.night.phase != "none":
 		hints[S.DORMITORY] = AHKit.NIGHT
 	# Os cômodos por recuperar (#131): o que já dá para recuperar ganha os cantos âmbar; o que ainda não dá, a penumbra.
@@ -1217,16 +1305,23 @@ func _draw_room_marks() -> void:
 			hints[id] = AHKit.AMBER
 		elif id != _hover_room:
 			_room_marks.draw_rect(_room_rects[id], Color(AHKit.SHADE, 0.32))
+	var places := _place_rects()
 	for id in hints:
-		if id != _hover_room and _room_rects.has(id) and not _under_column(_room_rects[id]):
-			_corners(_room_rects[id], Color(hints[id], 0.5), 2.0, 18.0)
-	if _hover_room == "" or not _room_rects.has(_hover_room):
+		if id != _hover_room and places.has(id) and not _under_column(places[id]):
+			_corners(places[id], Color(hints[id], 0.5), 2.0, 18.0)
+	if _hover_room == "" or not places.has(_hover_room):
 		return
-	var rect: Rect2 = _room_rects[_hover_room]
+	var rect: Rect2 = places[_hover_room]
 	_room_marks.draw_rect(rect, Color(AHKit.AMBER, 0.06))
 	_corners(rect, AHKit.AMBER, 4.0, 30.0)
-	_room_tag_label.text = tr(S.room_def(_hover_room).name)
-	_room_tag_icon.texture = AHKit.icon(ROOM_ICONS.get(_hover_room, "station"))
+	var block := block_of(_hover_room)
+	if block != "":
+		var info := block_info(c, block)
+		_room_tag_label.text = info.title
+		_room_tag_icon.texture = AHKit.icon(info.icon)
+	else:
+		_room_tag_label.text = tr(S.room_def(_hover_room).name)
+		_room_tag_icon.texture = AHKit.icon(ROOM_ICONS.get(_hover_room, "station"))
 	_room_tag.reset_size()
 	_room_tag.size = _room_tag.get_combined_minimum_size()
 	_room_tag.position = Vector2(rect.get_center().x - _room_tag.size.x * 0.5, rect.position.y - _room_tag.size.y + 6.0)
@@ -1254,7 +1349,10 @@ func open_room(room_id: String) -> void:
 		_opened_frame = Engine.get_process_frames()
 		_sound_open.call_deferred()
 	current = room_id
-	station.focus_room(room_id)
+	if block_of(room_id) != "":
+		station.focus_block(block_of(room_id))
+	else:
+		station.focus_room(room_id)
 	refresh()
 	_tour_moment("room:" + room_id)
 
@@ -1307,8 +1405,12 @@ func close_panel() -> void:
 	_panel.visible = false
 	_close_report_screen()
 	_close_room_screen()
+	_close_dig_board()
 	var back := _back_to
 	_back_to = ""
+	if back == "dig":
+		open_service("dig")
+		return
 	if back != "":
 		open_room(back)
 		return
@@ -1323,6 +1425,9 @@ func close_panel() -> void:
 	_tour_moment("close")
 	# Fechado o relatório da chegada da abertura, começa a visita guiada (#145).
 	_maybe_tour()
+	# De volta à vista geral depois da volta que abriu um bloco (#274): o aviso do achado, uma vez.
+	if tour == null and Campaign.state.station.get("last_return", {}).get("seen", false):
+		show_dig_notice()
 
 
 # ---------------------------------------------------------------- a visita guiada (#145)
@@ -1499,6 +1604,12 @@ static func _lines_signature(lines: Array) -> String:
 
 func _process(delta: float) -> void:
 	_frame_passed.emit()
+	# Com o mapa ou um painel aberto, o aviso do achado sai (ele é da vista geral).
+	if dig_notice_shown() and (current != "" or _map.visible):
+		hide_dig_notice()
+	elif dig_notice_shown():
+		# Visto só depois de um quadro na tela: o que some no mesmo quadro (a Sala indo ao mapa) volta na vista geral.
+		Campaign.state.station.last_return.dig.noticed = true
 	_pan_overview(delta)
 	_update_room_hover()
 	if _feedback.modulate.a > 0.0 and _feedback.text != "":
@@ -1728,6 +1839,12 @@ func _show(key: String) -> void:
 	# cômodo (#181), antes de cada caminho abaixo.
 	if key != S.CHARACTERS:
 		_close_room_screen()
+	if key != "dig":
+		_close_dig_board()
+	if key == "dig":
+		_panel.visible = false
+		_show_dig_board()
+		return
 	if key == "departure":
 		_panel.visible = false
 		_departure_view()
@@ -1779,7 +1896,10 @@ func _show(key: String) -> void:
 			options.title_requested.connect(func(): GameFlow.travel("title"))
 			_body.add_child(options)
 		_:
-			_room(key)
+			if block_of(key) != "":
+				_block_view(key)
+			else:
+				_room(key)
 	_footer.visible = _footer.get_child_count() > 0
 	_fit_panel()
 	if _panel_focus != null and U.using_keys:
@@ -1832,7 +1952,7 @@ func _dig_front(c: Dictionary) -> void:
 	var blocks := AHStationGrid.dig_blocks(c)
 	if blocks.is_empty():
 		return
-	_text(tr("Escavar: escolha o bloco. Quem fica na Estação cava a cada volta de expedição."), AHKit.MUTED, "small")
+	_text(tr("Escavar: escolha o bloco. Quem fica na Estação cava a cada dia de expedição."), AHKit.MUTED, "small")
 	var chips := HFlowContainer.new()
 	chips.name = "DigFront"
 	chips.add_theme_constant_override("h_separation", 8)
@@ -1851,6 +1971,455 @@ func _dig_front(c: Dictionary) -> void:
 			chip.add_child(AHKit.selected_overlay())
 		chip.pressed.connect(func(): _act(AHStationGrid.set_dig_target(Campaign.state, block), tr("Escavação: a frente agora é %s.") % AHStationGrid.block_name(block)))
 		chips.add_child(chip)
+
+
+# ---------------------------------------------------------------- a grade: escavar e construir (#186; a interface, #274)
+
+## "1º subsolo, vaga 3" ou "Patamar do 2º subsolo": o nome do bloco, com a maiúscula do título.
+static func block_title(key: String) -> String:
+	if AHStationGrid.is_landing(key):
+		return TranslationServer.translate("Patamar do %dº subsolo") % AHStationGrid.block_floor(key)
+	return TranslationServer.translate("%dº subsolo, vaga %d") % [AHStationGrid.block_floor(key), AHStationGrid.block_slot(key)]
+
+
+## O que o bloco é agora: {state, title, mark, note, icon, ready}. state: "free" (vaga livre), "front" (a frente de
+## escavação), "dig" (dá para escavar) ou "buried" (ainda não dá). mark: o texto do marcador; note: o resumo por extenso
+## (o cartão do bloco apontado); ready: a vaga livre tem um cômodo para construir agora.
+static func block_info(c: Dictionary, key: String) -> Dictionary:
+	if AHStationGrid.block_open(c, key):
+		var options := build_options(c, key)
+		var ready := options.any(func(option): return option.block == "")
+		# Só o que cabe nesta vaga (a vaga simples isolada não recebe os duplos).
+		options = options.filter(func(option): return option.spot != "")
+		var note := TranslationServer.translate("Nada para construir aqui: cada cômodo já tem o seu lugar.")
+		if ready:
+			note = TranslationServer.translate("Dá para construir aqui agora.")
+		elif not options.is_empty():
+			note = TranslationServer.translate("Escolha o cômodo: o custo e o que falta ficam no painel.")
+		return {"state": "free", "title": TranslationServer.translate("Vaga livre"), "icon": "place_unlocked", "ready": ready, "note": note,
+			"mark": TranslationServer.translate("Vaga livre · Construir") if not options.is_empty() else TranslationServer.translate("Vaga livre")}
+	var turns := AHStationGrid.returns_text(AHStationGrid.returns_left(c, key))
+	if AHStationGrid.dig_target(c) == key:
+		return {"state": "front", "title": TranslationServer.translate("Escavando"), "icon": "next_step", "ready": false,
+			"mark": TranslationServer.translate("Escavando · %s") % turns,
+			"note": TranslationServer.translate("A frente de escavação: abre em %s.") % turns}
+	if AHStationGrid.diggable(c, key):
+		return {"state": "dig", "title": TranslationServer.translate("Soterrado"), "icon": "lock", "ready": false,
+			"mark": TranslationServer.translate("Escavar · %s") % turns,
+			"note": TranslationServer.translate("Dá para escavar: se virar a frente, abre em %s.") % turns}
+	return {"state": "buried", "title": TranslationServer.translate("Soterrado"), "icon": "lock", "ready": false,
+		"mark": TranslationServer.translate("Soterrado"), "note": dig_reason(c, key)}
+
+
+## Por que o bloco ainda não dá para escavar.
+static func dig_reason(c: Dictionary, key: String) -> String:
+	var f := AHStationGrid.block_floor(key)
+	var landing := "L%d" % (f - 1 if AHStationGrid.is_landing(key) else f)
+	if f > 1 and not AHStationGrid.block_open(c, landing):
+		return TranslationServer.translate("Primeiro é preciso escavar %s.") % AHStationGrid.block_name(landing)
+	return TranslationServer.translate("Só dá para escavar ao lado de uma vaga aberta: escave antes um bloco vizinho.")
+
+
+## O que dá para construir na vaga livre: [{room, spot, block}] na ordem do menu. spot: a vaga da esquerda do cômodo ("" se
+## ele não cabe ali); block: "" ou o que falta (as vagas vizinhas, a sucata, os fragmentos).
+static func build_options(c: Dictionary, key: String) -> Array:
+	var out: Array = []
+	if AHStationGrid.is_landing(key):
+		return out
+	for room_id in AHStation.ROOM_ORDER:
+		if not AHStationGrid.needs_place(c, room_id):
+			continue
+		var spot := build_spot(c, room_id, key)
+		var block := ""
+		if spot == "":
+			var name := S.room_the(room_id)
+			block = TranslationServer.translate("%s precisa de duas vagas livres lado a lado.") % (name.left(1).to_upper() + name.substr(1))
+		else:
+			block = S.upgrade_block(c, room_id)
+		out.append({"room": room_id, "spot": spot, "block": block})
+	return out
+
+
+## A vaga da esquerda do cômodo que ocupa a vaga livre key: ela mesma ou, no duplo, a da esquerda dela; "" se não cabe.
+static func build_spot(c: Dictionary, room_id: String, key: String) -> String:
+	if AHStationGrid.spot_fits(c, room_id, key):
+		return key
+	var slot := AHStationGrid.block_slot(key)
+	if AHStationGrid.room_slots(room_id) >= 2 and slot > 1:
+		var left := "%d:%d" % [AHStationGrid.block_floor(key), slot - 1]
+		if AHStationGrid.spot_fits(c, room_id, left):
+			return left
+	return ""
+
+
+## O cartão do bloco apontado, embaixo à esquerda: o ícone, o nome, o estado, o resumo e GERENCIAR.
+func _block_card(c: Dictionary, box: VBoxContainer, key: String) -> void:
+	var info := block_info(c, key)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 12)
+	box.add_child(head)
+	head.add_child(AHKit.glyph(info.icon, 40, AHKit.AMBER))
+	var name_label := AHKit.label(block_title(key), "card_name", AHKit.TEXT, true, true)
+	name_label.name = "Name"
+	head.add_child(name_label)
+	var state := _status_chip(info.title, AHKit.good() if info.state == "free" else (AHKit.AMBER if info.state == "front" else AHKit.MUTED))
+	state.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(state)
+	var note := _wrapped(info.note, "text", AHKit.AMBER if info.ready else AHKit.TEXT, false, LEFT.size.x - 48.0)
+	note.name = "BlockNote"
+	box.add_child(note)
+	var manage := AHKit.button(tr("Gerenciar"), "secondary")
+	manage.name = "Manage"
+	manage.custom_minimum_size = Vector2(0, 60)
+	manage.focus_mode = Control.FOCUS_NONE
+	var place := block_place(key)
+	manage.pressed.connect(func(): open_room(place))
+	box.add_child(manage)
+
+
+## Os marcadores dos blocos (#274), no alto da boca de cada um, na vista geral: "Vaga livre · Construir", "Escavar · N
+## dias" e "Escavando · N dias" em cada bloco; "Soterrado" uma vez por trecho seguido de blocos que ainda não dá para
+## escavar, no meio dele. O bloco apontado fica sem o marcador (o cartão diz o resto).
+func _place_block_marks() -> void:
+	var c: Dictionary = Campaign.state
+	var infos := _cached_infos(c)
+	var wanted := {}
+	var run: Array = []
+	var order := AHStationGrid.block_keys()
+	var places: Array = _block_rects.keys()
+	places.sort_custom(func(a, b): return order.find(block_of(a)) > order.find(block_of(b)))
+	# Na ordem da tela (da esquerda para a direita, andar por andar): os soterrados vizinhos no mesmo andar viram um trecho.
+	var flush := func(group: Array) -> void:
+		if group.is_empty():
+			return
+		var rect: Rect2 = _block_rects[group[0]]
+		for place in group:
+			rect = rect.merge(_block_rects[place])
+		wanted["run:" + block_of(group[0])] = {"info": infos[block_of(group[0])], "rect": rect, "places": group.duplicate()}
+	for place in places:
+		var key := block_of(place)
+		var info: Dictionary = infos.get(key, {})
+		if info.is_empty():
+			continue
+		if info.state != "buried":
+			flush.call(run)
+			run.clear()
+			wanted[place] = {"info": info, "rect": _block_rects[place], "places": [place]}
+			continue
+		var last: String = block_of(run[-1]) if not run.is_empty() else ""
+		var joined := last != "" and not AHStationGrid.is_landing(key) and not AHStationGrid.is_landing(last) \
+			and AHStationGrid.block_floor(last) == AHStationGrid.block_floor(key) and absi(AHStationGrid.block_slot(last) - AHStationGrid.block_slot(key)) == 1
+		if not joined:
+			flush.call(run)
+			run.clear()
+		run.append(place)
+	flush.call(run)
+	for id in _block_marks.keys():
+		if not wanted.has(id):
+			_block_marks[id].queue_free()
+			_block_marks.erase(id)
+	for id in wanted:
+		var spec: Dictionary = wanted[id]
+		var info: Dictionary = spec.info
+		var signature := "%s|%s|%s|%s" % [info.state, info.mark, info.ready, AHUiStyle.text_scale]
+		var mark: PanelContainer = _block_marks.get(id)
+		if mark == null or String(mark.get_meta("signature", "")) != signature:
+			if mark != null:
+				mark.queue_free()
+			mark = _block_mark(id, info)
+			mark.set_meta("signature", signature)
+			_room_marks.add_child(mark)
+			_room_marks.move_child(mark, 0)
+			_block_marks[id] = mark
+		var rect: Rect2 = spec.rect
+		mark.reset_size()
+		mark.size = mark.get_combined_minimum_size()
+		# O patamar fica na beira da tela: o marcador não sai dela.
+		var screen := get_viewport_rect().size.x
+		mark.position = Vector2(clampf(rect.get_center().x - mark.size.x * 0.5, 8.0, screen - mark.size.x - 8.0), rect.position.y + 8.0)
+		var covered := false
+		for cover in [_menu, _room_card]:
+			if cover != null and cover.visible and cover.get_global_rect().intersects(mark.get_global_rect()):
+				covered = true
+		mark.visible = not spec.places.has(_hover_room) and not covered and tour == null
+	_unstack_marks()
+
+
+## Os marcadores de vagas vizinhas (6 m cabem menos que "Escavando · 2 dias") não ficam um por cima do outro: da
+## esquerda para a direita, o que encosta num já posto desce uma linha dentro do bloco.
+func _unstack_marks() -> void:
+	var placed: Array = _lock_marks.values().filter(func(m): return is_instance_valid(m) and m.visible)
+	var marks: Array = _block_marks.values().filter(func(m): return is_instance_valid(m) and m.visible)
+	marks.sort_custom(func(a, b): return a.position.x < b.position.x)
+	for mark in marks:
+		for i in 2:
+			var rect: Rect2 = Rect2(mark.position, mark.size).grow(2.0)
+			if not placed.any(func(other): return Rect2(other.position, other.size).intersects(rect)):
+				break
+			mark.position.y += mark.size.y + 4.0
+		placed.append(mark)
+
+
+## block_info de todos os blocos, refeito só quando a grade, o estoque, a frente ou o escavador mudam.
+func _cached_infos(c: Dictionary) -> Dictionary:
+	var digger = S.worker(c, AHStationGrid.DIG)
+	var key := "%s|%d|%d|%s|%d" % [var_to_str(c.station.grid), S.quantity(c, "scrap"), S.quantity(c, "fragments"),
+		digger.id if digger != null else "", int(digger.get("recovery_days", 0)) if digger != null else 0]
+	if key != _block_infos_key:
+		_block_infos_key = key
+		_block_infos = {}
+		for block in AHStationGrid.block_keys():
+			_block_infos[block] = block_info(c, block)
+	return _block_infos
+
+
+## O vizinho do mesmo andar (#274): o cômodo ou o bloco da grade mais perto à esquerda (-1) ou à direita (1), pela
+## posição na Estação; "" na ponta.
+static func neighbor_place(place: String, direction: int) -> String:
+	var here := AHStation.block_def(block_of(place)) if block_of(place) != "" else AHStation.room_def(place)
+	if here.is_empty():
+		return ""
+	var best := ""
+	var best_gap := INF
+	var spans: Array = AHStation.rooms().map(func(r): return [r.id, r.x0, r.floor])
+	spans.append_array(AHStation.block_defs().map(func(b): return [block_place(b.key), b.x0, b.floor]))
+	for span in spans:
+		if span[0] == place or not is_equal_approx(float(span[2]), float(here.floor)):
+			continue
+		var gap: float = (float(span[1]) - float(here.x0)) * direction
+		if gap > 0.0 and gap < best_gap:
+			best_gap = gap
+			best = span[0]
+	return best
+
+
+## O marcador do bloco: o ícone e o texto; âmbar na frente de escavação e na vaga livre com o que construir agora.
+func _block_mark(id: String, info: Dictionary) -> PanelContainer:
+	var tone: Color = AHKit.AMBER if info.state == "front" or info.ready else (AHKit.MUTED if info.state == "buried" else AHKit.TEXT)
+	var mark := AHKit.chip("cost")
+	mark.name = "Block_%s" % id.replace(":", "_")
+	mark.set_meta("state", info.state)
+	mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mark.add_child(row)
+	row.add_child(_icon(info.icon, 22, tone))
+	var label := AHKit.label(info.mark, "small", tone, true)
+	label.name = "Text"
+	row.add_child(label)
+	return mark
+
+
+## O painel do bloco (#274): a vaga livre com os cômodos que cabem nela, ou o bloco soterrado com a obra, a frente de
+## escavação e quem cava.
+func _block_view(place: String) -> void:
+	var c: Dictionary = Campaign.state
+	var key := block_of(place)
+	var info := block_info(c, key)
+	_header(info.icon, block_title(key), info.title, AHKit.good() if info.state == "free" else (AHKit.AMBER if info.state == "front" else AHKit.MUTED))
+	if info.state == "free":
+		_free_slot(c, key)
+	else:
+		_buried_block(c, key, info)
+
+
+## A vaga livre: um cartão por cômodo que ainda não tem lugar, com o tamanho, o que ele faz, o custo e CONSTRUIR (ou o
+## que falta).
+func _free_slot(c: Dictionary, key: String) -> void:
+	_text(tr("Uma vaga de 6 m, desentulhada. O cômodo simples ocupa esta vaga; o duplo, esta e a vizinha."))
+	var options := build_options(c, key)
+	if options.is_empty():
+		_text(tr("Nada para construir aqui: cada cômodo já tem o seu lugar."), AHKit.MUTED)
+		return
+	for option in options:
+		var room_id: String = option.room
+		var spot: String = option.spot
+		var box := _inset()
+		box.get_parent().name = "Option_%s" % room_id
+		var head := HBoxContainer.new()
+		head.add_theme_constant_override("separation", 12)
+		box.add_child(head)
+		head.add_child(_icon(ROOM_ICONS.get(room_id, "station"), 36, AHKit.AMBER))
+		var name_label := AHKit.label(tr(S.room_def(room_id).name), "row", AHKit.TEXT, true)
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		head.add_child(name_label)
+		var slots := AHStationGrid.room_slots(room_id)
+		head.add_child(_status_chip(tr("1 vaga") if slots == 1 else tr("%d vagas") % slots, AHKit.MUTED))
+		box.add_child(_wrapped(S.room_benefit(room_id, AHStationGrid.build_level(room_id)), "small", AHKit.TEXT, false, BODY_WIDTH - 40.0))
+		box.add_child(_cost_chips(c, S.next_level_cost(c, room_id)))
+		if option.block != "":
+			var why := _wrapped(option.block, "small", AHKit.alert_text(), false, BODY_WIDTH - 40.0)
+			why.name = "Why"
+			box.add_child(why)
+		var build := AHKit.button(tr("Construir"), "secondary")
+		build.name = "Build_%s" % room_id
+		build.icon = AHKit.icon(ROOM_ICONS.get(room_id, "station"))
+		build.add_theme_constant_override("icon_max_width", 30)
+		build.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		build.custom_minimum_size = Vector2(0, 60)
+		build.disabled = option.block != ""
+		build.tooltip_text = option.block
+		build.pressed.connect(func(): _build_here(room_id, spot))
+		box.add_child(build)
+		if _panel_focus == null and not build.disabled:
+			_panel_focus = build
+
+
+## Constrói o cômodo na vaga e abre o painel dele.
+func _build_here(room_id: String, spot: String) -> void:
+	# O segundo clique no mesmo quadro já encontra o painel do cômodo construído.
+	if block_of(current) == "":
+		return
+	var error := S.build_room(Campaign.state, room_id, spot)
+	if error != "":
+		_act(error)
+		return
+	_act("", tr("Construído: %s.") % tr(S.room_def(room_id).name))
+	open_room(room_id)
+
+
+## O bloco soterrado: o que ele é, a obra (pontos feitos e voltas que faltam), a frente de escavação, o que ele devolve
+## no mínimo e quem cava.
+func _buried_block(c: Dictionary, key: String, info: Dictionary) -> void:
+	if AHStationGrid.is_landing(key):
+		_text(tr("A escada desabada, debaixo da terra. Aberto o patamar, dá para escavar o %dº subsolo.") % AHStationGrid.block_floor(key))
+	else:
+		_text(tr("Terra, entulho e raízes. Escavado, vira uma vaga livre de 6 m para construir."))
+	var work := AHStationGrid.block_work(key)
+	var done := AHStationGrid.block_progress(c, key)
+	var bar := AHKit.bar("instinct", done, work, tr("%d de %d pontos de obra") % [done, work], "small")
+	bar.name = "Work"
+	_body.add_child(bar)
+	if info.state == "buried":
+		var why := _text(dig_reason(c, key), AHKit.alert_text(), "small")
+		why.name = "Why"
+		_body.add_child(_board_button(key))
+		_body.add_child(_divider())
+		return
+	var rate := AHStationGrid.dig_rate(c)
+	var digger = S.worker(c, AHStationGrid.DIG)
+	var pace := tr("A comunidade cava 1 ponto por dia.") if AHStationGrid.community_work() == 1 \
+		else tr("A comunidade cava %d pontos por dia.") % AHStationGrid.community_work()
+	if digger != null and rate > AHStationGrid.community_work():
+		pace = tr("A comunidade e %s cavam %d pontos por dia.") % [digger.display_name, rate]
+	_text(pace, AHKit.MUTED, "small")
+	if info.state == "front":
+		var front := _text(info.note, AHKit.AMBER)
+		front.name = "Front"
+	else:
+		_text(info.note)
+		var chosen := AHStationGrid.dig_target(c)
+		if chosen != "":
+			_text(tr("Agora a frente é %s; o que já foi cavado lá fica guardado.") % AHStationGrid.block_name(chosen), AHKit.MUTED, "small")
+		var place := block_place(key)
+		var go := AHKit.button(tr("Escavar este bloco"), "secondary")
+		go.name = "DigHere"
+		go.icon = AHKit.icon("next_step")
+		go.add_theme_constant_override("icon_max_width", 30)
+		go.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		go.custom_minimum_size = Vector2(0, 60)
+		go.pressed.connect(func(): _act(AHStationGrid.set_dig_target(Campaign.state, key), tr("Escavação: a frente agora é %s.") % AHStationGrid.block_name(key)))
+		_body.add_child(go)
+		_panel_focus = go
+	_body.add_child(_board_button(key))
+	var least := AHStationGrid.finds_text({"scrap": int(AHStationGrid.block_rule(key).get("Scrap", 0)), "fragments": int(AHStationGrid.block_rule(key).get("Fragments", 0))})
+	if least != "":
+		_text(tr("Devolve pelo menos %s, e às vezes um achado.") % least, AHKit.MUTED, "small")
+	_text(tr("Só os dias de expedição contam: esperar um dia na Estação não cava."), AHKit.MUTED, "small")
+	_body.add_child(_divider())
+	_workers(c, AHStationGrid.DIG)
+
+
+## "Ver a planta" (#284): os subsolos em cartões, com este bloco escolhido.
+func _board_button(key: String) -> Button:
+	var plan := AHKit.button(tr("Ver a planta"), "secondary")
+	plan.name = "SeeBoard"
+	plan.custom_minimum_size = Vector2(0, 56)
+	plan.pressed.connect(func():
+		_dig_selected = key
+		open_service("dig"))
+	return plan
+
+
+## Da planta (#284) para um painel (a vaga, o bloco, o cômodo): fechar o painel volta para a planta.
+func open_from_board(place: String) -> void:
+	# A volta reabre a planta com o mesmo escolhido.
+	var chosen := block_of(place)
+	open_room(place)
+	_back_to = "dig"
+	_dig_selected = chosen if chosen != "" else "room:" + place
+
+
+## A fala da primeira volta com escavação (#186, ponto 10) no formato do briefing: [{speaker, text}]; o cartão sem quem
+## fala.
+static func intro_lines(c: Dictionary) -> Array:
+	return AHStationGrid.intro_lines(c).map(func(line): return {
+		"speaker": AHBriefing.speaker(c, String(line.speaker)) if String(line.speaker) != "" else {}, "text": String(line.text)})
+
+
+## O aviso do achado (#274, no padrão do aviso de ganho, #143): no alto, o ícone grande, ACHADO DA ESCAVAÇÃO, o bloco
+## aberto, os textos do que saiu e o que entrou no estoque. Uma vez por volta; some sozinho.
+func show_dig_notice() -> void:
+	var dig: Dictionary = Campaign.state.station.get("last_return", {}).get("dig", {})
+	if not dig.get("opened", false) or dig.get("noticed", false) or dig_notice_shown():
+		return
+	var key := String(dig.block)
+	_dig_notice = AHKit.panel_box("large")
+	_dig_notice.name = "DigNotice"
+	_dig_notice.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_dig_notice)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 22)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_dig_notice.add_child(row)
+	var tile := AHKit.panel(AHKit.piece_of("chip", "resource_tile"))
+	tile.custom_minimum_size = Vector2(120, 120)
+	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var glyph := AHKit.glyph("place_unlocked", 84, AHKit.AMBER)
+	glyph.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	tile.add_child(glyph)
+	row.add_child(tile)
+	var words := VBoxContainer.new()
+	words.add_theme_constant_override("separation", 6)
+	words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(words)
+	# Entre a coluna da esquerda e o painel da direita, também no texto Maior: as linhas quebram nessa largura.
+	var width := RIGHT.position.x - 24.0 - (LEFT.end.x + 24.0) - 120.0 - 22.0 - 72.0
+	words.add_child(_wrapped(tr("Achado da escavação").to_upper(), "small", AHKit.AMBER, true, width))
+	var title := tr("%s: vaga livre") % block_title(key) if not AHStationGrid.is_landing(key) else tr("%s: aberto") % block_title(key)
+	words.add_child(_wrapped(title, "panel_title", AHKit.TEXT, true, width))
+	for text in dig.get("finds", {}).get("texts", []):
+		words.add_child(_wrapped(tr(String(text)), "text", AHKit.TEXT, false, width))
+	var found := AHStationGrid.finds_text(dig.get("finds", {}))
+	if found != "":
+		words.add_child(_wrapped(tr("Entrou no estoque: %s.") % found, "small", AHKit.AMBER, true, width))
+	_dig_notice.reset_size()
+	_dig_notice.size = _dig_notice.get_combined_minimum_size()
+	# Entre a coluna da esquerda e o painel (o menu ainda está escondido quando o relatório fecha).
+	var left := LEFT.end.x + 24.0
+	var right := RIGHT.position.x - 24.0
+	_dig_notice.position = Vector2(maxf(left, (left + right - _dig_notice.size.x) * 0.5), FEEDBACK_TOP + 64.0)
+	Sound.play("res://audio/ui/confirm.ogg")
+	_dig_tween = create_tween()
+	_dig_tween.tween_interval(DIG_NOTICE_SECONDS)
+	_dig_tween.tween_property(_dig_notice, "modulate:a", 0.0, 0.5)
+	_dig_tween.tween_callback(hide_dig_notice)
+
+
+func dig_notice_shown() -> bool:
+	return _dig_notice != null and is_instance_valid(_dig_notice)
+
+
+func hide_dig_notice() -> void:
+	if _dig_tween:
+		_dig_tween.kill()
+		_dig_tween = null
+	if dig_notice_shown():
+		_dig_notice.queue_free()
+	_dig_notice = null
 
 
 ## Começar do zero (com confirmação): o save atual é substituído por uma campanha nova.
@@ -2805,6 +3374,23 @@ func _character_room() -> void:
 	station.hide_residents(true)
 
 
+## Escavar e construir (#284): aberta uma vez e refeita a cada refresh (depois de escolher a frente, de construir).
+func _show_dig_board() -> void:
+	if is_instance_valid(_dig_board):
+		_dig_board.rebuild()
+		return
+	_dig_board = AHDigBoard.make(self, _dig_selected)
+	_dig_selected = ""
+	add_child(_dig_board)
+	move_child(_dig_board, _panel.get_index())
+
+
+func _close_dig_board() -> void:
+	if is_instance_valid(_dig_board):
+		_dig_board.queue_free()
+	_dig_board = null
+
+
 ## Abre as Opções ou o Plano a partir da Sala: fechar volta para a Sala.
 func open_from_room(service: String) -> void:
 	open_service(service)
@@ -2829,7 +3415,20 @@ func _close_report_screen() -> void:
 
 ## Fecha o relatório (visto) e segue: a noite, o trem ou o que foi pedido (then).
 func _enter_shelter_then(then: Callable) -> void:
-	Campaign.state.station.last_return.seen = true
+	var c: Dictionary = Campaign.state
+	c.station.last_return.seen = true
+	# A primeira volta com escavação (#186, ponto 10): a fala do Bento e do Nick (ou o cartão), com a fila ainda na
+	# plataforma; depois a fila sai. Com as falas desligadas (AHBriefing.enabled, nos testes de outras telas), nada.
+	# A fala fica vista (e o relatório também) só depois de passar: quem fecha o jogo no meio dela a vê de novo.
+	if AHBriefing.enabled and AHStationGrid.intro_pending(c) and not briefing_open():
+		if is_instance_valid(_report_screen):
+			_report_screen.visible = false
+		briefing = AHBriefingDialog.open(self, intro_lines(c), tr("Continuar"))
+		await briefing.finished
+		briefing = null
+		if not is_inside_tree():
+			return
+		AHStationGrid.see_intro(c)
 	# A fila sai andando da plataforma (#131): a câmera espera um pouco antes de descer (AHStation.walk_off_lineup);
 	# quem ainda não saiu do quadro vai para o cômodo quando a câmera passar.
 	station.walk_off_lineup()
