@@ -38,10 +38,30 @@ clicando no retrato).
 
 ## Na Estação
 
-A chegada do trem fica em `station.gd`, área do Claude 1: ele usa a mesma `AHWounded.is_wounded` e a `AHWounded.pose`
-(combinado pelo Orquestrador).
+A volta de trem (`scripts/station/station.gd`) usa a mesma regra da exploração: `AHWounded.is_wounded`,
+`AHWounded.speed_factor`, `AHWounded.pose` e os números do mancar de `data/wounded.json`.
+
+![antes e depois: o ferido descendo do trem, com a pose de ferido, a 70% e mancando](wounded/station_arrival.jpg)
+
+- **A descida do trem:** quem está ferido desce com a pose de ferido, a 70% do passo, e manca até o lugar dele na fila do
+  relatório.
+  - Mancar quer dizer duas coisas. Um passo sobe inteiro e o outro só `LimpDip`, e o corpo pende até `LimpTilt` para o
+    lado do passo bom.
+  - Parado na fila, o ferido fica no prumo e com a pose.
+- **A saída da fila depois do relatório:** o ferido vai para o cômodo no mesmo passo e mancando.
+- **O arranhado,** com a vida abaixo da máxima mas acima do limite, anda normal.
+  - Antes, qualquer ferimento fazia o herói descer a 55%, com a pose de sempre.
+  - Agora vale um limite só: o mesmo da exploração e do "Ferimento grave" da Sala.
+- **Com Reduzir efeitos,** ficam a pose e o passo mais lento, sem o balanço.
+- **No cômodo,** o herói veste a roupa do lobby (#249). A pose de ferido é da roupa de expedição, então ela fica na
+  plataforma.
 
 ## Testes
+- `tests/test_return.gd`, a volta de trem (#194):
+  - o ferido desce e sai da fila a 70%, com a pose e mancando;
+  - o arranhado anda normal;
+  - com Reduzir efeitos, sem o balanço;
+  - parado na fila, o ferido fica no prumo.
 
 - `tests/test_wounded.gd` (novo, 33 verificações):
   - o limite (abaixo dele ferido, nele não), o Caído em recuperação, o morto e o herói ausente; o ferido é o

@@ -35,7 +35,8 @@ func _run() -> void:
 	J.start_expedition(c, "fase_1", 17)
 	c.session.expedition.team = team
 	var hurt = S.hero(c, team[1])
-	hurt.hp = maxi(1, int(hurt.max_hp) / 3)
+	# Abaixo do limite de ferido (#194, data/wounded.json): desce com a pose de ferido, mais devagar e mancando.
+	hurt.hp = maxi(1, int(hurt.max_hp) / 5)
 	S.hero(c, team[3]).alive = false
 	c.session.result = "victory"
 	S.finish_return(c)
@@ -52,6 +53,11 @@ func _run() -> void:
 		# Quem desce aparece saindo de trás do vagão (a porta é do lado da plataforma).
 		await _until(func(): return station.lineup.size() >= 2 and station.lineup.any(func(e): return e.card.position.x > 12.2))
 		await _shot("02-team-stepping-out")
+		# O ferido (#194) no meio do caminho entre a porta e o lugar dele na fila.
+		var door: float = station._train_door_x()
+		var walking := func(a): return a.hero_id == team[1] and a.card != null and a.card.position.x > door + 1.2 and absf(a.slot.x - a.card.position.x) > 0.6
+		await _until(func(): return station._arrivals.any(walking))
+		await _shot("02b-wounded-walking")
 		await _until(func(): return station.hud.current == "report")
 		await _frames(20)
 		await _shot("03-report")

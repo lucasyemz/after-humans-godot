@@ -69,9 +69,9 @@ const TRAIN_DOOR_END := TRAIN_DOOR_START + 0.8
 const TRAIN_CLOSE := 0.55
 const TRAIN_LEAVE := 2.6
 const TRAIN_OUT := -32.0
-## A volta da equipe (#76): o intervalo entre quem desce, o passo de quem está ferido e quanto o trem vazio espera.
+## A volta da equipe (#76): o intervalo entre quem desce e quanto o trem vazio espera. Quem está ferido (#194, a regra
+## de AHWounded: a vida abaixo do limite ou Caído em recuperação) desce com a pose de ferido, no passo dele e mancando.
 const TEAM_STEP_OUT := 0.45
-const WOUNDED_PACE := 0.55
 const EMPTY_WAIT := 1.2
 ## Depois do relatório, a fila sai andando para a direita (#131): um de cada vez, a frente primeiro, e cada um só volta
 ## ao seu cômodo depois de sair da câmera.
@@ -162,7 +162,7 @@ var _reopen_pending := false
 var _env: Environment
 ## O pós da Estação (o perfil de ambiência, reaplicado quando a qualidade muda).
 var _post: ShaderMaterial
-## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt}.
+## Quem desce do trem na volta: {hero_id, art, slot, delay, speed, card, hurt, walked}.
 var _arrivals: Array = []
 ## O herói escolhido na Sala dos Personagens (#181): de pé no cômodo, na escala da Estação, enquanto a tela está aberta.
 ## A placa dele de morador só fica escondida (hide_residents), então, ao sair, cada um está onde estava.
@@ -826,7 +826,7 @@ func _line_card(hero_id: String, feet: Vector3) -> void:
 		return
 	var card := AHSpriteCard.new()
 	card.body_height = AHCharacterHeights.find(hero_id)
-	card.show_art(art.idle)
+	card.show_art(_line_art(entry, art))
 	add_child(card)
 	card.position = feet
 	card.set_facing(1.0)
@@ -836,6 +836,28 @@ func _line_card(hero_id: String, feet: Vector3) -> void:
 	# Quem está na fila não aparece ao mesmo tempo no seu cômodo.
 	if residents.has(hero_id):
 		residents[hero_id].visible = false
+
+
+## A arte de quem está na plataforma (a fila do relatório, quem desce do trem): o parado da luta, ou a pose de ferido
+## (#194, a mesma da exploração) com a vida baixa ou em recuperação.
+func _line_art(entry, art: Dictionary) -> Dictionary:
+	return AHWounded.pose(art.idle) if AHWounded.is_wounded(entry) else art.idle
+
+
+## O passo de quem anda na plataforma (a descida do trem e a saída da fila): a placa sobe um pouco a cada passo. Ferido
+## (#194, os números de data/wounded.json, como na rua), o passo é mais lento e manca: um passo sobe inteiro e o outro
+## só LimpDip, e o corpo pende para o lado do passo bom. Com Reduzir efeitos, sem o mancar (fica a pose e o passo).
+func _step(card: AHSpriteCard, walked: float, hurt: bool, _time: float) -> void:
+	var phase := walked * (4.5 if hurt else 7.0)
+	var lift := 0.025 * absf(sin(phase))
+	var tilt := 0.0
+	if hurt and not GameFlow.reduced_effects():
+		var limp: Dictionary = AHWounded.rules()
+		if fmod(phase, TAU) >= PI:
+			lift *= float(limp.LimpDip)
+		tilt = deg_to_rad(float(limp.LimpTilt)) * sin(phase) * card.facing
+	card.scale = Vector3(1, 1.0 + lift, 1)
+	card.rotation.z = tilt
 
 
 ## A fila do relatório sai andando (#131): da direita (a posição 1, mais perto da porta) para a esquerda, cada um com o
@@ -848,7 +870,9 @@ func walk_off_lineup() -> void:
 		var entry: Dictionary = entries[i]
 		var hero = S.hero(Campaign.state, entry.hero_id)
 		entry.delay = i * LEAVE_STEP
-		entry.speed = LEAVE_SPEED * (WOUNDED_PACE if hero != null and int(hero.hp) < int(hero.max_hp) else 1.0)
+		entry.hurt = AHWounded.is_wounded(hero)
+		entry.speed = LEAVE_SPEED * AHWounded.speed_factor(hero)
+		entry.walked = 0.0
 		# A sombra de contato vai junto (filha da carta).
 		if entry.has("contact") and is_instance_valid(entry.contact):
 			_contacts.erase(entry.contact)
@@ -875,7 +899,8 @@ func _tick_leaving(delta: float) -> void:
 			continue
 		card.set_facing(1.0)
 		card.position.x += entry.speed * delta
-		card.scale = Vector3(1, 1.0 + 0.025 * absf(sin(time * 7.0)), 1)
+		entry.walked = float(entry.get("walked", 0.0)) + delta
+		_step(card, float(entry.walked), bool(entry.get("hurt", false)), time)
 		if not _on_screen(card) or card.position.x > DOOR_X + 2.0:
 			_release_leaving(entry)
 
@@ -1135,9 +1160,10 @@ func play_team_arrival(hero_ids: Array) -> void:
 		var art := _hero_art(entry)
 		if art.is_empty():
 			continue
-		var hurt: bool = int(entry.get("hp", 0)) < int(entry.get("max_hp", 0))
-		_arrivals.append({"hero_id": survivors[index], "art": art.idle, "slot": _line_slot(index, survivors.size()),
-			"delay": step * TEAM_STEP_OUT, "speed": TRAIN_WALK_SPEED * (WOUNDED_PACE if hurt else 1.0), "card": null, "hurt": hurt})
+		var hurt := AHWounded.is_wounded(entry)
+		_arrivals.append({"hero_id": survivors[index], "art": _line_art(entry, art), "slot": _line_slot(index, survivors.size()),
+			"delay": step * TEAM_STEP_OUT, "speed": TRAIN_WALK_SPEED * AHWounded.speed_factor(entry), "card": null, "hurt": hurt,
+			"walked": 0.0})
 	# Quem ainda está no trem já não aparece no cômodo (lá, na roupa do lobby): ninguém fica em dois lugares.
 	for arrival in _arrivals:
 		if residents.has(arrival.hero_id):
@@ -1173,6 +1199,7 @@ func finish_team_arrival() -> void:
 			_spawn_arrival(arrival)
 		arrival.card.position = arrival.slot
 		arrival.card.scale = Vector3.ONE
+		arrival.card.rotation.z = 0.0
 		arrival.card.set_facing(1.0)
 	Sound.fade_out(_train_sound, 0.3)
 	_warning_time = -1.0
@@ -1221,14 +1248,15 @@ func _tick_team_arrival(_before: float, step: float) -> void:
 		if absf(gap) < 0.02:
 			card.position.x = arrival.slot.x
 			card.scale = Vector3.ONE
+			card.rotation.z = 0.0
 			card.set_facing(1.0)
 			ahead_x = card.position.x
 			continue
 		placed = false
 		card.position.x = minf(card.position.x + signf(gap) * minf(absf(gap), arrival.speed * step), ahead_x - FOLLOW_GAP)
 		ahead_x = card.position.x
-		# O passo: quem está ferido balança mais devagar.
-		card.scale = Vector3(1, 1.0 + 0.025 * absf(sin(time * (4.5 if arrival.hurt else 7.0))), 1)
+		arrival.walked = float(arrival.get("walked", 0.0)) + step
+		_step(card, float(arrival.walked), bool(arrival.hurt), time)
 	# Ninguém para descer (todos caíram): as portas abrem e o trem espera um instante vazio.
 	if _arrivals.is_empty() and _train_time < TRAIN_DOOR_END + EMPTY_WAIT:
 		placed = false
