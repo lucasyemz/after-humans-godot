@@ -151,10 +151,10 @@ static func learn(campaign: Dictionary, hero_id: String, skill_id: String) -> St
 	return ""
 
 
-## O requisito de uma que ainda não sabe ("Nível 4 · Treino", "Escolha agora"), para a Sala e a ficha.
+## O requisito de uma que ainda não sabe ("Nível 4 · Treino", "Aprenda no Treino"), para a Sala e a ficha.
 static func requirement(hero: Dictionary) -> String:
 	if picks(hero) > 0:
-		return TranslationServer.translate("Escolha agora")
+		return TranslationServer.translate("Aprenda no Treino")
 	var at := next_level(hero)
 	return TranslationServer.translate("Nível %d · Treino") % at if at > 0 else ""
 
@@ -163,11 +163,11 @@ static func requirement(hero: Dictionary) -> String:
 static func level_notice(hero: Dictionary) -> String:
 	if picks(hero) <= 0:
 		return ""
-	return TranslationServer.translate("Nova habilidade de acampamento: escolha na Sala dos Personagens.")
+	return TranslationServer.translate("Nova habilidade de acampamento: aprenda no Treino.")
 
 
 ## Saves de antes do #261 e editados: só ids do papel, sem repetir, até o que o nível deixa; o que levava e não vale
-## volta para as primeiras que sabe. Quem já está no nível 2 ou acima fica com as escolhas para fazer na Sala.
+## volta para as primeiras que sabe. Quem já está no nível 2 ou acima fica com as escolhas para fazer no Treino.
 static func migrate(campaign: Dictionary) -> void:
 	for hero in campaign.get("roster", []):
 		if typeof(hero) != TYPE_DICTIONARY:

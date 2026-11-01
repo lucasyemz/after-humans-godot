@@ -60,6 +60,12 @@ func _training() -> void:
 	t.equal(AHHeroLevels.options(bento).map(func(u): return u.Name), ["vida", "calma"], "o cão escolhe entre mais vida e sangue frio")
 	t.equal(AHHeroLevels.train(c, "hero_cao_bento", "velocidade"), "Essa melhoria não é desta espécie.", "melhoria de outra espécie, não")
 	t.equal(AHHeroLevels.train(c, "hero_cao_bento", "vida"), "", "treina com XP e sementes")
+	# O Treino (#265) recebe um herói por dia no nível 1: o Nick, outro herói, só no dia seguinte.
+	t.check(AHStationServices.training_block(c, "hero_gato_nick").contains("Treino"), "no mesmo dia, o Treino não recebe outro herói (nível 1)")
+	c.station.rooms[S.TRAINING] = 2
+	t.equal(AHStationServices.training_block(c, "hero_gato_nick"), "", "no nível 2, o segundo herói do dia treina")
+	c.station.rooms[S.TRAINING] = 1
+	c.station.cycle_number = int(c.station.cycle_number) + 1
 	t.equal([AHHeroLevels.level(bento), AHHeroLevels.xp(bento), S.quantity(c, "seeds")], [2, 5, seeds - cost.seeds], "nível 2, o XP do nível e as sementes gastos")
 	t.equal(int(bento.max_hp), max_hp + 2, "mais fôlego: +2 de vida máxima")
 	# O limite das melhorias: o gato tem um passo ligeiro (data/hero-upgrades.json), depois só a mão treinada.

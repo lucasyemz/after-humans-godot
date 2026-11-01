@@ -329,11 +329,14 @@ func _build_cards() -> void:
 			text = "%s · %s" % [entry.display_name, away]
 		elif S.recovering(entry):
 			text = "%s · %s · %s" % [entry.display_name, tr("Caído"), S.return_text(S.recovery_days(entry))]
+		elif AHStationServices.treating(entry):
+			text = "%s · %s · %s" % [entry.display_name, tr("Em tratamento"), S.return_text(int(entry.quirk_treatment.days))]
 		elif not ready:
 			text = "%s · %s" % [entry.display_name, tr("sem arte de combate")]
 		# Compacta, o nome e o motivo curto (o toque e o controle não mostram a dica do mouse).
 		if _compact and away == "":
-			text = String(entry.display_name) if ready else "%s · %s" % [entry.display_name, tr("Caído") if S.recovering(entry) else tr("sem arte")]
+			text = String(entry.display_name) if ready else "%s · %s" % [entry.display_name, tr("Caído") if S.recovering(entry)
+				else (tr("Em tratamento") if AHStationServices.treating(entry) else tr("sem arte"))]
 		var button := _chip(text)
 		button.name = "Bench_%s" % id
 		button.custom_minimum_size = Vector2(0, 52)

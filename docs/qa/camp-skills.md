@@ -14,16 +14,16 @@ As fotos saem de `tools/capture_261.gd`, com `--case=camp` ou `--case=room` e, p
 | O quê | Como | Onde fica |
 | --- | --- | --- |
 | Catálogo | 2 comuns e 5 do papel; 3 na chegada (a Conversa ao Fogo e 2 do papel) | `data/camp-skills.json` |
-| Aprender | uma por nível 2, 4, 6 e 8, de graça, à escolha na Sala | `data/hero-skills.json`, linha `camp`; no herói, `camp_unlocked` |
+| Aprender | uma por nível 2, 4, 6 e 8, de graça, à escolha no Treino (#265; conta como o treino do dia) | `data/hero-skills.json`, linha `camp`; no herói, `camp_unlocked` |
 | Levar | 4, trocadas na Sala, fora da expedição | no herói, `camp_loadout` (`[]` são as primeiras que sabe) |
 | Usar | Tempo de fogueira 12 por acampamento; cada herói usa cada uma uma vez | no trecho, `camp` |
 | Próxima luta | Bloqueio, Esquiva, velocidade, a Marca no inimigo da frente, a abertura | no trecho, `camp_next`; sai quando a luta começa |
 | A noite | 1 em 3 de Noite mal dormida (Exposto), a menos que alguém vigie | no trecho, `camp_night`, para o aviso |
 
 - **O sorteio da noite** sai da semente da fase. Por isso a mesma partida dá sempre a mesma noite.
-- **O aviso do Treino:** subir para um nível par diz "Nova habilidade de acampamento: escolha na Sala dos Personagens".
+- **O aviso do Treino:** subir para um nível par diz "Nova habilidade de acampamento: aprenda no Treino".
 - **Saves de antes:** abrem com as 3 da chegada. Quem já está no nível 2 ou acima ganha as escolhas que ficaram para
-  trás, para fazer na Sala.
+  trás, para fazer no Treino.
 - **A Ração e o Curativo** não gastam Tempo e continuam como antes.
 - **A luta de base não muda:** os bônus entram na sessão sem sortear nada no motor, e a paridade continua 48/48.
 
