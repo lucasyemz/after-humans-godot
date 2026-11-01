@@ -138,7 +138,7 @@ func _digger() -> void:
 	cao.perks = ["gloomy"]
 	t.equal(S.post_yield(cao, G.DIG), 0, "o pessimista, 1 a menos")
 	t.equal(S.set_post(c, tatu.id, G.DIG), "", "o tatu fica na escavação")
-	t.equal(S.yield_text(G.DIG, 2), TranslationServer.translate("+%d pontos de obra por volta") % 2, "o rendimento em pontos de obra")
+	t.equal(S.yield_text(G.DIG, 2), TranslationServer.translate("+%d pontos de obra por dia") % 2, "o rendimento em pontos de obra")
 	_open(c, "L2")
 	G.set_dig_target(c, "2:7")
 	t.equal([G.dig_rate(c), G.returns_left(c, "2:7")], [3, 1], "com o tatu, um bloco do 2º subsolo sai em 1 volta")
