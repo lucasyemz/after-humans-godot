@@ -17,6 +17,8 @@ paradas no PR #231 (tag `codex-pr231-originals`). Pela decisão do Lucas de 01/1
   - Os PNG extraídos ficam no `.gitignore`, e as camadas antigas da #211 não entram.
 - **As alturas** (`scripts/world/character_heights.gd`): Guaxinim 1,30 → 1,44 m e Tatu 1,35 → 1,56 m, as de destino do
   redesenho.
+- **A largura:** o Tatu redesenhado mede 0,84 m (antes, 1,48 m) e cabe na posição da fila, como pede a issue. O espaço
+  maior para quem é mais largo que a posição (#196) continua e é testado com um herói largo de teste.
 - **As duas poses (#221):**
   - o Guaxinim ganhou a guarda;
   - o Tatu passou a ter a exploração com as mãos livres (o `idle.webp` novo) e a guarda com a marreta e o escudo (o
@@ -40,6 +42,10 @@ paradas no PR #231 (tag `codex-pr231-originals`). Pela decisão do Lucas de 01/1
   - as alturas de destino;
   - a guarda dos dois;
   - a guarda do recruta na luta, sem herança para o recruta sem guarda.
+- `tests/test_recruit_art.gd`: a escala da #225 no lugar da do #196 (o Guaxinim entre a Íris e o Nick, o Tatu entre o
+  Guaxinim e o Bento).
+- `tests/test_combat_room.gd`: o Tatu e o Guaxinim cabem na posição e ficam na fila de sempre; o espaço maior é testado
+  com um herói largo de teste, na medida do Tatu antigo.
 - `tests/test_combat_art.gd` e `tests/test_skins.gd`.
 - `tools/capture_225.gd`: as fotos acima. Roda também na `main` de antes.
 - `tests/run_all.gd` inteiro e o modo de captura da rua.
