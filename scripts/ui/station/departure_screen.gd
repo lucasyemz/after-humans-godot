@@ -323,7 +323,7 @@ func _build_cards() -> void:
 		var id: String = entry.id
 		var ready := S.can_deploy(entry)
 		var text := "%s · %d/%d" % [entry.display_name, entry.hp, entry.max_hp]
-		# Quem está fora (missão solo, com os robôs ou no trem) aparece com o motivo e a volta (#183).
+		# Quem está fora (missão solo ou com os robôs) aparece com o motivo e a volta (#183).
 		var away := AHSideMissions.away_short(c, entry)
 		if away != "":
 			text = "%s · %s" % [entry.display_name, away]

@@ -29,3 +29,11 @@ indisponível na escolha da equipe, com o motivo.
     - no modo compacto, o motivo vem inteiro e o chip ocupa um terço da linha, mas a lista rola e nada corta;
     - "volta em 1 dia" no lugar de "0 dias" não acontece no jogo, porque a missão volta no início do dia.
   - **Correção:** a partida tira quem está fora, com o teste.
+  - **Rodada 2: APROVADO.** A QA rodou quatro casos:
+    - mandar pelo mapa depois do rascunho: o herói sai da carta e da plataforma e aparece na lista com o motivo;
+    - o caído forçado ainda trava o INICIAR, com o motivo;
+    - com só o Bento livre, a equipe fica só com ele;
+    - com todos fora, a equipe vazia não quebra a tela.
+
+    Fica uma observação baixa: com todos fora, o motivo do INICIAR é o genérico do tamanho da equipe, mas o mapa já
+    avisa antes.
