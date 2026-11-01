@@ -601,9 +601,10 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 		var note := AHKit.label(tr("Trauma da última crise"), "text", AHKit.alert_text())
 		note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		trauma.add_child(note)
-		var treat := _small_button(tr("Tratar (%d sementes)") % S.TRAUMA_COST)
-		var id: String = hero.id
-		treat.pressed.connect(func(): hud._act(S.treat_trauma(Campaign.state, id), tr("Trauma tratado.")))
+		# O trauma se trata no Bar (#265): o botão leva até lá.
+		var treat := _small_button(tr("Tratar no Bar"))
+		treat.name = "TraumaBar"
+		treat.pressed.connect(func(): hud.open_room(S.BAR))
 		trauma.add_child(treat)
 		column.add_child(trauma)
 	var counters := HBoxContainer.new()

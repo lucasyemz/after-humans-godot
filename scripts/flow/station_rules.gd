@@ -105,7 +105,6 @@ const SUPPLY_COST_SEEDS := 2
 const MAX_ROSTER := 12
 ## O preço de antes do + RECRUTAR; o do trem (#122) fica em data/recruitment.json (recruit.Cost).
 const RECRUIT_COST := 10
-const TRAUMA_COST := 5
 ## Uma equipe leva no máximo dois animais da mesma classe.
 const MAX_PER_CLASS := 2
 ## Suprimentos comprados na partida, além dos 4 de graça (FoodCost).

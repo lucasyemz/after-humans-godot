@@ -2556,6 +2556,9 @@ func _room(room_id: String) -> void:
 			_dormitory(c)
 		S.INFIRMARY:
 			_infirmary(c, level)
+			_quirks(c, level)
+		S.BAR:
+			_bar(c)
 	# Quem trabalha aqui (#119), depois do conteúdo do cômodo (as relíquias da Forja ficam no alto).
 	if S.job_rooms(c).has(room_id):
 		_body.add_child(_divider())
@@ -3273,6 +3276,73 @@ func _fallen_card(c: Dictionary, entry: Dictionary) -> Control:
 	if block != "":
 		box.add_child(_wrapped(block, "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
 	return card
+
+
+## A peculiaridade (#265): no nível 2, a Enfermaria trata uma negativa num leito, por alguns dias. Quem já trata e
+## quem tem uma negativa, com o botão de cada uma (apagado com o motivo).
+func _quirks(c: Dictionary, level: int) -> void:
+	var rule := AHStationServices.rule("infirmary_quirk")
+	if level < int(rule.get("Level", 2)):
+		if level >= 1:
+			_text(tr("No nível %d, a Enfermaria também trata uma peculiaridade negativa.") % int(rule.get("Level", 2)), AHKit.MUTED, "small")
+		return
+	_section(tr("Peculiaridades"), "intent-heal")
+	var listed := false
+	for entry in S.living(c):
+		if AHStationServices.treating(entry):
+			_text(entry.display_name + ": " + AHStationServices.treatment_text(entry), AHKit.TEXT, "small")
+			listed = true
+			continue
+		var negatives := AHStationServices.negative_perks(entry)
+		if negatives.is_empty():
+			continue
+		listed = true
+		var box := _inset()
+		box.get_parent().name = "Quirk_%s" % entry.id
+		box.add_child(_wrapped(entry.display_name, "row", AHKit.TEXT, true, BODY_WIDTH - 40.0))
+		var row := HFlowContainer.new()
+		row.add_theme_constant_override("h_separation", 10)
+		box.add_child(row)
+		var hero_id: String = entry.id
+		for perk in negatives:
+			var data = GameData.row("perks", String(perk))
+			var perk_name: String = tr(String(data.DisplayName)) if data != null else String(perk)
+			var button := _chip_button(tr("Tratar: %s · %d dias") % [perk_name, int(rule.get("Days", 2))])
+			button.name = "TreatQuirk_%s" % perk
+			var block := AHStationServices.quirk_block(c, hero_id, String(perk))
+			button.disabled = block != ""
+			button.tooltip_text = block
+			var perk_id := String(perk)
+			button.pressed.connect(func(): _act(AHStationServices.treat_quirk(Campaign.state, hero_id, perk_id),
+				tr("%s fica num leito tratando %s.") % [S.hero(Campaign.state, hero_id).display_name, perk_name]))
+			row.add_child(button)
+		var first_block := AHStationServices.quirk_block(c, hero_id, String(negatives[0]))
+		if first_block != "":
+			box.add_child(_wrapped(first_block, "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
+	if not listed:
+		_text(tr("Ninguém com peculiaridade negativa para tratar."), AHKit.MUTED, "small")
+
+
+## O Bar (#265): o alívio de quem fica e a conversa que trata o trauma (quem tem trauma, com o botão).
+func _bar(c: Dictionary) -> void:
+	if not S.room_available(c, S.BAR):
+		return
+	var troubled: Array = S.living(c).filter(func(h): return bool(h.get("trauma", false)))
+	_section(tr("Conversar"), "night_talk")
+	if troubled.is_empty():
+		_text(tr("Ninguém com trauma agora. Quem fica na Estação descansa a cabeça aqui na volta."), AHKit.MUTED, "small")
+		return
+	for entry in troubled:
+		var box := _inset()
+		box.get_parent().name = "Trauma_%s" % entry.id
+		box.add_child(_wrapped(tr("%s · trauma da última crise") % entry.display_name, "row", AHKit.TEXT, true, BODY_WIDTH - 40.0))
+		var hero_id: String = entry.id
+		var button := _chip_button(tr("Conversar e tratar · %d sementes") % AHStationServices.trauma_cost())
+		button.name = "TreatTrauma"
+		button.disabled = S.quantity(c, "seeds") < AHStationServices.trauma_cost()
+		button.tooltip_text = tr("Sementes insuficientes (custa %d sementes).") % AHStationServices.trauma_cost() if button.disabled else ""
+		button.pressed.connect(func(): _act(S.treat_trauma(Campaign.state, hero_id), tr("Trauma tratado.")))
+		box.add_child(button)
 
 
 ## O planejamento da noite (como o da Unreal): a contagem, o custo do suprimento extra, uma linha por herói com rosto,
