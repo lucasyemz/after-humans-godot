@@ -1564,9 +1564,9 @@ func _tick_arrival(before: float) -> void:
 	if before < TRAIN_DOOR_END and _train_time >= TRAIN_DOOR_END:
 		# Desce pela porta do metrô e anda até a plataforma.
 		var card := _spawn_candidate(Vector3(_train_door_x(), target.y, target.z))
-		# Quem volta ferido de uma missão solo (#183) desce mancando, no passo da equipe ferida.
+		# Quem volta ferido de uma missão solo (#183) desce no passo de ferido (#194, a mesma regra da equipe: AHWounded).
 		var returning = S.hero(Campaign.state, _candidate_id)
-		var pace: float = WOUNDED_PACE if returning != null and int(returning.hp) < int(returning.max_hp) else 1.0
+		var pace: float = AHWounded.speed_factor(returning) if returning != null else 1.0
 		if card:
 			_walkers.append({"card": card, "min": target.x, "max": target.x, "target": target.x, "wait": 0.0, "phase": 0.0,
 				"speed": TRAIN_WALK_SPEED * train_speed() * pace, "stay": true, "home_z": target.z})
