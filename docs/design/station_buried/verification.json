@@ -1,0 +1,216 @@
+{
+  "base_commit": "7345f7a1",
+  "source_tag": null,
+  "design_qa_round": 4,
+  "design_qa_verdict": "APROVADO",
+  "source_files": 14,
+  "source_png_total_including_raw": 24,
+  "ui_cases": 9,
+  "labels_checked": 339,
+  "image_rects_checked": 312,
+  "grid_cells_reviewed": 16,
+  "tests": {
+    "passed": 104,
+    "total": 104,
+    "elapsed_ms": 682991,
+    "combat_parity": [
+      48,
+      48
+    ]
+  },
+  "conversion_byte_equality": 14,
+  "pillow": "13.0.0",
+  "libwebp": "1.6.0",
+  "problems": [],
+  "review_images": [
+    {
+      "file": "art_board.webp",
+      "canvas": [
+        1920,
+        1000
+      ],
+      "bytes": 510208,
+      "sha256": "2d74e566451d630876a32a58b3cca1bf7d6819b9fb643e78c2e37533ea73ef03"
+    },
+    {
+      "file": "art_board_40.webp",
+      "canvas": [
+        768,
+        400
+      ],
+      "bytes": 94542,
+      "sha256": "a5603940123c0a89bdea573845b7a25b521f24221b152c949781dd690e823b96"
+    },
+    {
+      "file": "art_board_gray.webp",
+      "canvas": [
+        1920,
+        1000
+      ],
+      "bytes": 422414,
+      "sha256": "5c5d4559329f2c579f90ae5610c83d37c003ca7b17dc3201fba8c802c8d65bba"
+    },
+    {
+      "file": "before_after_choice.webp",
+      "canvas": [
+        3840,
+        1140
+      ],
+      "bytes": 683808,
+      "sha256": "e1e78d1e8cb353b50e1cbf8517cb2d8d00a9874cfe85c5b15699b2a83fd78ea6"
+    },
+    {
+      "file": "before_after_overview.webp",
+      "canvas": [
+        3840,
+        1140
+      ],
+      "bytes": 694884,
+      "sha256": "00b50fa3bb942f573e58aa02589b880747675c4f624d12405bbb1174e0fd16a2"
+    },
+    {
+      "file": "before_after_work.webp",
+      "canvas": [
+        3840,
+        1140
+      ],
+      "bytes": 714258,
+      "sha256": "9b089eb3f9e87f9ba64452b03b17c0c6759be91597eaa56a29392135a55e77d5"
+    },
+    {
+      "file": "choice_colorblind.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 440674,
+      "sha256": "d93815c76a979c1466c9a5b687acc4d78d041c1e0eba1292e8604c6533c23f24"
+    },
+    {
+      "file": "choice_larger.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 460362,
+      "sha256": "d6fdfb9f95b4cc372ec381cd743cfb44563089ca70deb17dbb91328e18b5c35c"
+    },
+    {
+      "file": "choice_normal.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 438874,
+      "sha256": "4823f6f9222c89d7425b374db9c6eea1b9eb67739f202f304a27d81de699cb99"
+    },
+    {
+      "file": "frame_board.webp",
+      "canvas": [
+        1920,
+        610
+      ],
+      "bytes": 272376,
+      "sha256": "d25d68d89b48dae250ad5fc163bbd7cc932425e9f53ab18246c26d4ea7e61de4"
+    },
+    {
+      "file": "frame_board_gray.webp",
+      "canvas": [
+        1920,
+        610
+      ],
+      "bytes": 220188,
+      "sha256": "b62f69215d1a6f1d5372da8b0ebc146605a320660e16a70e69f901a1cd0a75fa"
+    },
+    {
+      "file": "icons_board.webp",
+      "canvas": [
+        1500,
+        770
+      ],
+      "bytes": 43636,
+      "sha256": "8f266a510fc60965a1507ca7e2c33f6d348892ef8d890bc58b830d6c83d04d3f"
+    },
+    {
+      "file": "overview_40.webp",
+      "canvas": [
+        768,
+        432
+      ],
+      "bytes": 83540,
+      "sha256": "8bbcb820bf0f97cc4e459ca4701a0f0e5f8c54bdd72ea2d1af5fb507c9bca574"
+    },
+    {
+      "file": "overview_colorblind.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 470954,
+      "sha256": "748f9d1f146349ec71a0f4f16256c50479d773321e924ff18430423a92a64ff0"
+    },
+    {
+      "file": "overview_gray.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 383390,
+      "sha256": "abf4f8e905ce45d4f63c4ff6f970ae124fcdaec721a19db8ee40a62c5f34fbff"
+    },
+    {
+      "file": "overview_larger.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 497214,
+      "sha256": "6ee22b97676bed1ae16ad19d244287993775e9729db7230bdf672b10f363f16c"
+    },
+    {
+      "file": "overview_normal.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 470010,
+      "sha256": "2ef43e9e5871216c645ddd760e7fb42ac38ddc868549f218c96d36f3242281ff"
+    },
+    {
+      "file": "work_colorblind.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 468544,
+      "sha256": "326c996b10e89a7941cff79e6b07bc0e0581622721ac6fcdbd875b5985195408"
+    },
+    {
+      "file": "work_larger.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 491120,
+      "sha256": "dcb8f4799a8bd8301520d32b529d71785332377e597fe992c190946703d677a8"
+    },
+    {
+      "file": "work_normal.webp",
+      "canvas": [
+        1920,
+        1080
+      ],
+      "bytes": 467352,
+      "sha256": "9561e027258a409547e352e91b4fe23f15e00986c71257ae3e31e88e5759b9e1"
+    },
+    {
+      "file": "work_stage_board.webp",
+      "canvas": [
+        1320,
+        535
+      ],
+      "bytes": 181208,
+      "sha256": "0162d0c75bc134758e08740433e2337a1e188c08575dc11703df663f1216295d"
+    }
+  ]
+}
