@@ -1,6 +1,6 @@
 {
   "after": "independent illustrated card per actual buried/free grid cell, external textures and HUD review overlay only",
-  "base_commit": "7345f7a1",
+  "base_commit": "69ad7910",
   "before": "unmodified main Station scene; same orthographic review camera, people and frozen time",
   "camera": "Transform3D(1, 0, 0, 0, 0.9986295, 0.05233596, 0, -0.05233596, 0.9986295, 9.6, -6, 40)",
   "engine": "4.7.2-stable (official)",

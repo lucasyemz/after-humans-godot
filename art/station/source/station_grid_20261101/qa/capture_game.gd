@@ -2,6 +2,7 @@
 extends SceneTree
 var output := ""
 var assets := ""
+var previous_assets := ""
 var kit
 var style
 var grid
@@ -27,6 +28,7 @@ func run() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="):output=a.trim_prefix("--out=")
 		if a.begins_with("--assets="):assets=a.trim_prefix("--assets=")
+		if a.begins_with("--previous-assets="):previous_assets=a.trim_prefix("--previous-assets=")
 	if output=="" or assets=="":quit(2);return
 	DirAccess.make_dir_recursive_absolute(output)
 	await process_frame
@@ -76,7 +78,22 @@ func run() -> void:
 			await shot(view+"_"+variant)
 			records.append({"view":view,"variant":variant,"cards":card_log.duplicate(true),"labels":audit.duplicate(true),"images":image_audit()})
 			overlay.queue_free();await frames(2)
-	var report={"base_commit":"7345f7a1","engine":Engine.get_version_info().string,"renderer":"OpenGL Compatibility / Mesa llvmpipe CPU; no physical GPU","resolution":[1920,1080],"camera":var_to_str(camera.global_transform),"orthographic_size":camera.size,"fixture":"seed 6, L2 opened, 2:7 free, 1:2 progress 1 of 2; isolated memory/save only","before":"unmodified main Station scene; same orthographic review camera, people and frozen time","after":"independent illustrated card per actual buried/free grid cell, external textures and HUD review overlay only","records":records}
+	# Previous artwork in the same frozen scene, so actors/time also match exactly.
+	if previous_assets!="":
+		assets=previous_assets;textures.clear()
+		style.text_scale=1.0;root.get_node("Settings").colorblind=false;style.set_colorblind(false)
+		labels=[];audit=[];card_log=[];visuals=[];build("overview")
+		await frames(4)
+		for repeat in 3:
+			for j in labels.size():
+				var lr: Array=audit[j].rect
+				labels[j].size=Vector2(lr[2],lr[3]);labels[j].position=Vector2(lr[0],lr[1])
+			for image in visuals:
+				image.node.size=image.rect.size;image.node.position=image.rect.position
+			await frames(2)
+		await shot("overview_previous_normal")
+		overlay.queue_free();await frames(2)
+	var report={"base_commit":"69ad7910","engine":Engine.get_version_info().string,"renderer":"OpenGL Compatibility / Mesa llvmpipe CPU; no physical GPU","resolution":[1920,1080],"camera":var_to_str(camera.global_transform),"orthographic_size":camera.size,"fixture":"seed 6, L2 opened, 2:7 free, 1:2 progress 1 of 2; isolated memory/save only","before":"unmodified main Station scene; same orthographic review camera, people and frozen time","after":"independent illustrated card per actual buried/free grid cell, external textures and HUD review overlay only","records":records}
 	var f=FileAccess.open(output.path_join("capture.json"),FileAccess.WRITE);f.store_string(JSON.stringify(report,"  "));f.close()
 	unload_current_scene();station=null;overlay=null;labels.clear();textures.clear();await frames(3);root.get_node("Sound").quit(0)
 func shot(name_:String) -> void:

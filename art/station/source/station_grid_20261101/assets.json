@@ -18,13 +18,13 @@
         600,
         320
       ],
-      "source_sha256": "ba681242e071474a96cf95a6260fac192e6bad268b961064b2867edafb96eb67",
+      "source_sha256": "732699bc4c8f0e9fe3a2794e6fe48ff8719a1fe9a26b1c2cd05c7443a6d16606",
       "anchor": [
         0,
         0
       ],
-      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
-      "raw_source": "qa/raw/platform_rubble.png",
+      "notes": "Muted background grade approved direction: restrained highlights, compressed contrast, desaturated warm tones and painted charcoal veil. No additional tint/veil necessary at runtime. No text/UI; opaque; uniform fit to 6:3.2.",
+      "raw_source": "qa/raw/platform_rubble_muted_r2.png",
       "safe_focus_xywh": [
         120,
         150,
@@ -45,13 +45,13 @@
         600,
         320
       ],
-      "source_sha256": "8c28be30fba96f1ede012035a2da85af48e3e0b3d4a001e14eb1636dddce9d40",
+      "source_sha256": "d5d3864166c5e0cda3e0a116a0de14435141729e2fd756afe03727a492df56ec",
       "anchor": [
         0,
         0
       ],
-      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
-      "raw_source": "qa/raw/overturned_wagon_r2.png",
+      "notes": "Muted background grade approved direction: restrained highlights, compressed contrast, desaturated warm tones and painted charcoal veil. No additional tint/veil necessary at runtime. No text/UI; opaque; uniform fit to 6:3.2.",
+      "raw_source": "qa/raw/overturned_wagon_muted_r2.png",
       "safe_focus_xywh": [
         120,
         150,
@@ -72,13 +72,13 @@
         600,
         320
       ],
-      "source_sha256": "888f7940c5fda93fa1c84da62fdf7a75845f69d9ebc0f0ddfa68b9f107d065ce",
+      "source_sha256": "9e3bad3503b163aa7012c4b7dd57deff4465e8f8386340e5f099f42cbde18e38",
       "anchor": [
         0,
         0
       ],
-      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
-      "raw_source": "qa/raw/maintenance_machine.png",
+      "notes": "Muted background grade approved direction: restrained highlights, compressed contrast, desaturated warm tones and painted charcoal veil. No additional tint/veil necessary at runtime. No text/UI; opaque; uniform fit to 6:3.2.",
+      "raw_source": "qa/raw/maintenance_machine_muted_r2.png",
       "safe_focus_xywh": [
         120,
         150,
@@ -99,13 +99,13 @@
         600,
         320
       ],
-      "source_sha256": "2a0682698ed441ea2d68bdc7a42add78b9c06bec0bed20fc0bebda5fa3060340",
+      "source_sha256": "7cb8db3901e426f1c1a2015e25d682a34cb512b16bf5d7b97504233ff2565b83",
       "anchor": [
         0,
         0
       ],
-      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
-      "raw_source": "qa/raw/exposed_cables.png",
+      "notes": "Muted background grade approved direction: restrained highlights, compressed contrast, desaturated warm tones and painted charcoal veil. No additional tint/veil necessary at runtime. No text/UI; opaque; uniform fit to 6:3.2.",
+      "raw_source": "qa/raw/exposed_cables_muted_r2.png",
       "safe_focus_xywh": [
         120,
         150,
@@ -126,13 +126,13 @@
         600,
         320
       ],
-      "source_sha256": "4778be11fb9039b821aa5b1d19ab6a9f07dad6d1a62b1e92ff25a03548524f65",
+      "source_sha256": "fb62eadddac1e1565269af1295bfa13488b66fc5b4389fdb8f239378203981ab",
       "anchor": [
         0,
         0
       ],
-      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
-      "raw_source": "qa/raw/flooded_duct.png",
+      "notes": "Muted background grade approved direction: restrained highlights, compressed contrast, desaturated warm tones and painted charcoal veil. No additional tint/veil necessary at runtime. No text/UI; opaque; uniform fit to 6:3.2.",
+      "raw_source": "qa/raw/flooded_duct_muted_r2.png",
       "safe_focus_xywh": [
         120,
         150,
@@ -153,13 +153,13 @@
         600,
         320
       ],
-      "source_sha256": "9f55f470cc0a2cf60a2be0928012b0b597784e432f61550c52607f06fa0ca021",
+      "source_sha256": "14472aab0d002426f0a4fb136bccc0e156e6ef0d938ee2a90663d7d60a662355",
       "anchor": [
         0,
         0
       ],
-      "notes": "Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.",
-      "raw_source": "qa/raw/root_chamber.png",
+      "notes": "Muted background grade approved direction: restrained highlights, compressed contrast, desaturated warm tones and painted charcoal veil. No additional tint/veil necessary at runtime. No text/UI; opaque; uniform fit to 6:3.2.",
+      "raw_source": "qa/raw/root_chamber_muted_r2.png",
       "safe_focus_xywh": [
         120,
         150,
@@ -484,5 +484,11 @@
         0
       ]
     }
+  },
+  "revision": "r2-muted-background",
+  "render_policy": {
+    "background_grade": "baked into six illustration PNGs and converted WebP",
+    "additional_runtime_veil": "none; do not double-darken",
+    "frames_labels_rewards_icons": "unchanged, full-strength HUD foreground"
   }
 }

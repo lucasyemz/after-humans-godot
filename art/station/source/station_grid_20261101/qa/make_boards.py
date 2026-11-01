@@ -2,7 +2,7 @@
 import argparse,json
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont,ImageOps
-ap=argparse.ArgumentParser();ap.add_argument('--repo',required=True,type=Path);ap.add_argument('--captures',required=True,type=Path);ap.add_argument('--prototypes',required=True,type=Path);ap.add_argument('--out',required=True,type=Path);a=ap.parse_args();a.out.mkdir(parents=True,exist_ok=True)
+ap=argparse.ArgumentParser();ap.add_argument('--repo',required=True,type=Path);ap.add_argument('--captures',required=True,type=Path);ap.add_argument('--prototypes',required=True,type=Path);ap.add_argument('--out',required=True,type=Path);ap.add_argument('--previous-captures',type=Path);a=ap.parse_args();a.out.mkdir(parents=True,exist_ok=True)
 def font(n,bold=False):return ImageFont.truetype(str(a.repo/'art/ui/fonts'/('barlow_condensed_semibold.ttf' if bold else 'barlow_condensed_medium.ttf')),n)
 def canvas(size):return Image.new('RGB',size,'#0d1012')
 def save(im,name):im.save(a.out/(name+'.webp'),quality=92,method=6)
@@ -16,7 +16,7 @@ for i,(key,name) in enumerate(scenes):
  x=30+(i%3)*630;y=96+(i//3)*428
  board.paste(Image.open(a.prototypes/'illustrations'/(key+'.webp')).convert('RGB'),(x,y))
  text(board,(x,y+333),name,30,bold=True)
-text(board,(30,950),'Ilustrações próprias / luz pintada e recuos por bloco / sem texto nas texturas de produção',25)
+text(board,(30,950),'Revisão 2 / ilustrações em segundo plano / contraste, saturação e brilhos contidos / sem texto na produção',25)
 save(board,'art_board');save(board.resize((768,400),Image.Resampling.LANCZOS),'art_board_40');save(ImageOps.grayscale(board).convert('RGB'),'art_board_gray')
 fr=canvas((1920,610));text(fr,(30,18),'MOLDURAS / MESMA ILUSTRAÇÃO, ESTADOS DIFERENTES',38,bold=True)
 for i,(key,title,caption) in enumerate([('frame_locked','BLOQUEADO','Trilho escuro contínuo / patamar fechado'),('frame_available','LIBERADO PARA ESCAVAR','Trilho claro duplo / cantos âmbar'),('frame_neighbor','DEPENDE DO VIZINHO','Faixa vermelha hachurada / trilho interrompido')]):
@@ -47,6 +47,13 @@ for view in ['overview','work','choice']:
   im=Image.open(a.captures/(view+'_'+variant+'.png')).convert('RGB');assert im.size==(1920,1080);save(im,view+'_'+variant)
  variant='normal' if view=='overview' else 'larger'
  before=Image.open(a.captures/('before_'+variant+'.png')).convert('RGB');after=Image.open(a.captures/(view+'_'+variant+'.png')).convert('RGB');pair=canvas((3840,1140));pair.paste(before,(0,60));pair.paste(after,(1920,60))
- text(pair,(28,8),'ANTES / MAIN 7345f7a1 / CÂMERA DE QA / '+variant.upper(),34,bold=True);text(pair,(1948,8),'DEPOIS / MESMA ESTAÇÃO + CARTÕES ILUSTRADOS #275',34,bold=True);save(pair,'before_after_'+view)
+ text(pair,(28,8),'ANTES / MAIN 69ad7910 / CÂMERA DE QA / '+variant.upper(),34,bold=True);text(pair,(1948,8),'DEPOIS / MESMA ESTAÇÃO + CARTÕES ILUSTRADOS #275',34,bold=True);save(pair,'before_after_'+view)
 im=Image.open(a.captures/'overview_normal.png').convert('RGB');save(im.resize((768,432),Image.Resampling.LANCZOS),'overview_40');save(ImageOps.grayscale(im).convert('RGB'),'overview_gray')
 print('Review boards saved:',len(list(a.out.glob('*.webp'))))
+
+if a.previous_captures:
+ before=Image.open(a.previous_captures/'overview_previous_normal.png').convert('RGB');after=Image.open(a.captures/'overview_normal.png').convert('RGB')
+ pair=canvas((3840,1140));pair.paste(before,(0,60));pair.paste(after,(1920,60))
+ text(pair,(28,8),'ANTES / ARTE DO PR #296 / MESMA MAIN 69ad7910',34,bold=True)
+ text(pair,(1948,8),'REVISÃO 2 / PINTURAS EM SEGUNDO PLANO / MESMA CÂMERA',34,bold=True)
+ save(pair,'revision_comparison')

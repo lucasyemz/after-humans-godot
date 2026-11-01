@@ -1,0 +1,86 @@
+{
+  "platform_rubble": {
+    "before": {
+      "mean_luma_8bit": 42.33,
+      "luma_stddev": 44.83,
+      "mean_saturation_8bit": 112.87,
+      "luma_p95": 140
+    },
+    "after": {
+      "mean_luma_8bit": 22.83,
+      "luma_stddev": 18.26,
+      "mean_saturation_8bit": 83.71,
+      "luma_p95": 60
+    }
+  },
+  "overturned_wagon": {
+    "before": {
+      "mean_luma_8bit": 39.48,
+      "luma_stddev": 37.55,
+      "mean_saturation_8bit": 129.72,
+      "luma_p95": 119
+    },
+    "after": {
+      "mean_luma_8bit": 20.22,
+      "luma_stddev": 15.36,
+      "mean_saturation_8bit": 84.02,
+      "luma_p95": 51
+    }
+  },
+  "maintenance_machine": {
+    "before": {
+      "mean_luma_8bit": 40.47,
+      "luma_stddev": 37.42,
+      "mean_saturation_8bit": 118.91,
+      "luma_p95": 118
+    },
+    "after": {
+      "mean_luma_8bit": 23.14,
+      "luma_stddev": 17.88,
+      "mean_saturation_8bit": 79.03,
+      "luma_p95": 56
+    }
+  },
+  "exposed_cables": {
+    "before": {
+      "mean_luma_8bit": 42.4,
+      "luma_stddev": 37.72,
+      "mean_saturation_8bit": 115.13,
+      "luma_p95": 117
+    },
+    "after": {
+      "mean_luma_8bit": 21.5,
+      "luma_stddev": 17.17,
+      "mean_saturation_8bit": 92.84,
+      "luma_p95": 54
+    }
+  },
+  "flooded_duct": {
+    "before": {
+      "mean_luma_8bit": 32.89,
+      "luma_stddev": 35.22,
+      "mean_saturation_8bit": 122.83,
+      "luma_p95": 106
+    },
+    "after": {
+      "mean_luma_8bit": 17.09,
+      "luma_stddev": 15.38,
+      "mean_saturation_8bit": 91.67,
+      "luma_p95": 46
+    }
+  },
+  "root_chamber": {
+    "before": {
+      "mean_luma_8bit": 38.23,
+      "luma_stddev": 33.94,
+      "mean_saturation_8bit": 126.05,
+      "luma_p95": 106
+    },
+    "after": {
+      "mean_luma_8bit": 21.02,
+      "luma_stddev": 13.81,
+      "mean_saturation_8bit": 85.41,
+      "luma_p95": 47
+    }
+  }
+}

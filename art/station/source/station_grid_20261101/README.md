@@ -4,7 +4,7 @@ Originals for the six illustrated buried blocks, three state borders, room choos
 
 ## Approved conversion inputs
 
-Use only the 14 PNG named in `assets.json`, under `illustrations/`, `frames/` and `icons/`. The `qa/raw/` PNG are generation originals and superseded iterations, preserved for traceability; do not convert the old wagon or the halo-bearing icon sheet directly. The normalized wagon uses `overturned_wagon_r2.png`; the masks use `icons_sheet_r2.png` and alpha-mask cleanup.
+Use only the 14 PNG named in `assets.json`, under `illustrations/`, `frames/` and `icons/`. The `qa/raw/` PNG are generation originals and superseded iterations, preserved for traceability; do not convert the old wagon or the halo-bearing icon sheet directly. Revision 2: the six normalized illustrations use `*_muted_r2.png`. Their restrained grade, reduced highlights and charcoal veil are baked into the artwork: **do not add a second dark veil at runtime**. Frames and icons are unchanged. The masks use `icons_sheet_r2.png` and alpha-mask cleanup.
 
 - Room illustrations: source 1200×640, runtime 600×320, matching a 6 m × 3.2 m bay.
 - Borders: source 1200×640 / runtime 600×320. Three states have 96 / 48 px nine-slice margins. Center fully transparent.
@@ -27,7 +27,7 @@ Suggested integration paths are in `assets.json` and in the design page. They ar
 
 ## Review reproduction
 
-The repo used for proof is main `7345f7a1` (Godot 4.7.2). `qa/capture_game.gd` is an external proof harness, not a game script to install. It creates an isolated campaign/save, sets the L2 landing open and 2:7 free, and sets 1:2 progress 1/2. It renders an orthographic cutaway before and after adding the external cards. Actual game rules supply adjacency, reward, ETA, costs and disabled state. No production file is patched.
+The repo used for proof is main `69ad7910` (Godot 4.7.2). `qa/capture_game.gd` is an external proof harness, not a game script to install. It creates an isolated campaign/save, sets the L2 landing open and 2:7 free, and sets 1:2 progress 1/2. It renders an orthographic cutaway before and after adding the external cards. Actual game rules supply adjacency, reward, ETA, costs and disabled state. No production file is patched.
 
 ```bash
 Godot --path /path/to/after-humans-godot --rendering-method gl_compatibility \
@@ -40,3 +40,7 @@ python qa/make_boards.py --repo /path/to/after-humans-godot \
 Set isolated `XDG_DATA_HOME`, `XDG_CONFIG_HOME` and `XDG_CACHE_HOME` on Linux. The captures use CPU/Mesa llvmpipe Compatibility, with no physical GPU. They approve the art/layout, not Forward+ lighting/GI; final integration remains to be checked on Lucas's PC.
 
 `qa/prepare.py --out /tmp/station_275_regenerated` rebuilds normalized inputs from raw generations (requires Pillow, NumPy and SciPy). It is a traceability recipe, not the recommended game import path. Technical cleanup includes transparent-edge RGB, low-alpha haze, tiny disconnected pixels and white glyph masks. Illustration cropping is uniform, never squashed; border normalization preserves corners by nine-slice. No borrowed game image is part of this bundle; the material references are After Humans' own workshop and steel kit.
+
+Revision comparison: convert the previous originals commit to a separate runtime folder, then pass `--previous-assets=/path/to/previous_webp` to the same capture invocation. The harness captures `overview_previous_normal.png` after swapping only textures in the frozen scene. Pass `--previous-captures /tmp/station_275_proof` to the board builder to include the 22nd review image. Do not compare actors from separate launches.
+
+Current main validation: 105/105 tests, combat parity 48/48, 699403 ms.

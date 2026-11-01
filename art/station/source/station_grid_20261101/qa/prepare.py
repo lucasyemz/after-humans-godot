@@ -8,7 +8,8 @@ BASE=Path(__file__).resolve().parents[1]
 ap=argparse.ArgumentParser();ap.add_argument('--out',required=True,type=Path);args=ap.parse_args()
 RAW=BASE/'qa/raw';OUT=args.out.resolve();OUT.mkdir(parents=True,exist_ok=True)
 for folder in ['illustrations','frames','icons']:(BASE/folder).mkdir(exist_ok=True);(OUT/folder).mkdir(exist_ok=True)
-previous_tag=json.loads((BASE/'assets.json').read_text()).get('source_tag') if (BASE/'assets.json').exists() else None
+previous_meta=json.loads((BASE/'assets.json').read_text()) if (BASE/'assets.json').exists() else {}
+previous_tag=previous_meta.get('source_tag')
 meta={'source_tag':previous_tag,'source_folder':'art/station/source/station_grid_20261101','world_cell_m':[6,3.2],'source_scale_to_runtime':0.5,'assets':{}}
 def record(key,im,folder,notes,extra=None):
  path=BASE/folder/(key+'.png');im.save(path)
@@ -20,12 +21,15 @@ def record(key,im,folder,notes,extra=None):
  d['suggested_runtime_path']=('art/station/cards/buried/'+key+'.webp') if folder=='illustrations' else ('art/ui/kit/station/excavation/'+folder+'/'+key+'.webp')
  if extra:d.update(extra)
  meta['assets'][key]=d
+for field in ['revision','render_policy']:
+ if field in previous_meta:meta[field]=previous_meta[field]
 for key in ['platform_rubble','overturned_wagon','maintenance_machine','exposed_cables','flooded_duct','root_chamber']:
  raw=RAW/(key+'.png')
  if key=='overturned_wagon' and (RAW/'overturned_wagon_r2.png').exists():raw=RAW/'overturned_wagon_r2.png'
+ if (RAW/(key+'_muted_r2.png')).exists():raw=RAW/(key+'_muted_r2.png')
  im=Image.open(raw).convert('RGB')
  normalized=ImageOps.fit(im,(1200,640),Image.Resampling.LANCZOS,centering=(.5,.5))
- record(key,normalized,'illustrations','Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.',{'raw_source':'qa/raw/'+raw.name,'safe_focus_xywh':[120,150,960,340],'nine_slice_ltrb':None})
+ record(key,normalized,'illustrations','Muted background grade; restrained highlights, desaturated warm tones and painted charcoal veil baked in; no additional runtime veil; no text/UI; opaque; uniform crop to 6:3.2.' if '_muted_r2' in raw.stem else 'Own inspection-lit station vignette; no text/UI; opaque; crop uniformly to 6:3.2 aspect.',{'raw_source':'qa/raw/'+raw.name,'safe_focus_xywh':[120,150,960,340],'nine_slice_ltrb':None})
 def clean_alpha(im):
  a=np.array(im.convert('RGBA'));alpha=a[:,:,3].copy();alpha[alpha<16]=0;alpha[alpha>=245]=255
  labels,n=ndi.label(alpha>0)
