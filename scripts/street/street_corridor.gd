@@ -206,6 +206,9 @@ func setup(owner_street: Node3D, exploration_hud: AHExplorationHud) -> void:
 	elif AHFightRewards.cargo_pending(campaign):
 		# Reaberto com o guardião vencido e a carga ainda fechada: as mesmas caixas de antes.
 		open_cargo.call_deferred()
+	elif here.type == "rest" and here.resolved and route.current_house < 0 and not session.expedition.get("asked", []).has("rest"):
+		# O descanso no 1º trecho do mapa da fase (#301): a viagem do mapa de passagem entra nele sem o anúncio.
+		_arrive_at_rest.call_deferred()
 
 
 ## A jornada do tutorial (#144) no Corredor de Contenção (#147).
@@ -635,6 +638,17 @@ func _announce(index: int, outcome: String, first_time: bool) -> void:
 		_:
 			if first_time:
 				hud.toast(tr("Trecho %d · %s") % [index + 1, tr(label)], 2.5)
+
+
+## Chegou ao mapa da fase já no descanso (#301): o anúncio e a pergunta saem depois do cartão da viagem.
+func _arrive_at_rest() -> void:
+	while GameFlow.busy and is_inside_tree():
+		await get_tree().process_frame
+	if not is_inside_tree() or not R.in_corridor(Campaign.state):
+		return
+	var route: Dictionary = Campaign.state.session.expedition.corridor
+	if route.steps[route.index].type == "rest" and Campaign.state.session.result == "" and Campaign.state.session.event == null:
+		_announce(route.index, "rest", true)
 
 
 ## A parada de descanso é o acampamento opcional (#143): acampar aqui, seguir ou voltar com metade do achado. O texto diz
