@@ -1038,10 +1038,18 @@ func _gear(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
 	go.name = "GearForge"
 	go.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	var hero_id := String(hero.id)
+	# Sem a Forja ou com o herói fora, o botão fica apagado e o motivo na tela (o toque e o controle não mostram a dica).
+	var reach := AHGear.reach_block(c, hero_id)
+	go.disabled = reach != ""
+	go.tooltip_text = reach
 	go.pressed.connect(func():
 		hud._gear_hero = hero_id
 		hud.open_room(S.FORGE))
 	box.add_child(go)
+	if reach != "":
+		var why := _note(reach, AHKit.alert_text())
+		why.name = "GearBlock"
+		box.add_child(why)
 	column.add_child(_divider())
 
 

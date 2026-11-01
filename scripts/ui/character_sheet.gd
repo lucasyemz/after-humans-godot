@@ -146,10 +146,16 @@ static func role_rows(class_id: String, gear: Dictionary = {}) -> Array:
 	var weapon_crit := int(gear.get("crit", 0))
 	if int(hero_class.CritBonus) > 0 or weapon_crit > 0:
 		var total: int = pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus) + weapon_crit
-		var title := TranslationServer.translate("Crítico %d%% (papel +%d)") % [total, int(hero_class.CritBonus)] if weapon_crit <= 0 \
-			else TranslationServer.translate("Crítico %d%% (papel +%d, Arma +%d)") % [total, int(hero_class.CritBonus), weapon_crit]
-		rows.append([title, TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes.") if weapon_crit <= 0
-			else TranslationServer.translate("Olho para o ponto fraco: o papel e a Arma acertam golpes críticos mais vezes."), true])
+		var role_crit := int(hero_class.CritBonus)
+		var title := TranslationServer.translate("Crítico %d%% (papel +%d)") % [total, role_crit]
+		var about := TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes.")
+		if weapon_crit > 0 and role_crit > 0:
+			title = TranslationServer.translate("Crítico %d%% (papel +%d, Arma +%d)") % [total, role_crit, weapon_crit]
+			about = TranslationServer.translate("Olho para o ponto fraco: o papel e a Arma acertam golpes críticos mais vezes.")
+		elif weapon_crit > 0:
+			title = TranslationServer.translate("Crítico %d%% (Arma +%d)") % [total, weapon_crit]
+			about = TranslationServer.translate("A Arma ajustada na Forja acerta golpes críticos mais vezes.")
+		rows.append([title, about, true])
 	return rows
 
 

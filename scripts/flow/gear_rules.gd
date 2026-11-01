@@ -65,6 +65,22 @@ static func left_today(campaign: Dictionary) -> int:
 	return maxi(0, per_day(campaign) - AHStationServices.used_today(campaign, DAY))
 
 
+## Por que o herói não chega à Forja agora ("" chega): a Forja não recuperada, a expedição ou a missão solo. O nível,
+## os recursos e o dia a própria Forja mostra.
+static func reach_block(campaign: Dictionary, hero_id: String) -> String:
+	var hero = S.hero(campaign, hero_id)
+	if hero == null or not hero.get("alive", true):
+		return TranslationServer.translate("Herói não encontrado.")
+	if not S.room_available(campaign, S.FORGE):
+		return TranslationServer.translate("Recupere a Forja para melhorar as peças.")
+	var expedition = campaign.get("session", {}).get("expedition")
+	if expedition != null and Array(expedition.get("team", [])).has(hero_id):
+		return TranslationServer.translate("%s está na expedição.") % hero.display_name
+	if AHSideMissions.away(hero):
+		return AHSideMissions.away_text(hero)
+	return ""
+
+
 ## Por que a peça não melhora agora ("" melhora).
 static func block(campaign: Dictionary, hero_id: String, piece: String) -> String:
 	var hero = S.hero(campaign, hero_id)
@@ -75,13 +91,9 @@ static func block(campaign: Dictionary, hero_id: String, piece: String) -> Strin
 	var at := level(hero, piece) + 1
 	if at > MAX_LEVEL:
 		return TranslationServer.translate("%s já está no nível máximo.") % piece_name(piece)
-	if not S.room_available(campaign, S.FORGE):
-		return TranslationServer.translate("Recupere a Forja para melhorar as peças.")
-	var expedition = campaign.get("session", {}).get("expedition")
-	if expedition != null and Array(expedition.get("team", [])).has(hero_id):
-		return TranslationServer.translate("%s está na expedição.") % hero.display_name
-	if AHSideMissions.away(hero):
-		return AHSideMissions.away_text(hero)
+	var reach := reach_block(campaign, hero_id)
+	if reach != "":
+		return reach
 	var row := step(piece, at)
 	if AHHeroLevels.level(hero) < int(row.get("HeroLevel", 1)):
 		return TranslationServer.translate("Pede o herói no nível %d.") % int(row.get("HeroLevel", 1))

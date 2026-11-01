@@ -184,6 +184,7 @@ func _sheet() -> void:
 	var crit: Array = rows.filter(func(r): return String(r[0]).begins_with("Crítico"))
 	t.check(crit.size() == 1 and String(crit[0][0]).contains("%d%%" % (10 + int(role.CritBonus) + 4)) and String(crit[0][0]).contains("Arma +4"),
 		"o crítico soma a Arma, mesmo num papel sem crítico (%s)" % (crit[0][0] if not crit.is_empty() else "nada"))
+	t.check(int(role.CritBonus) > 0 or not String(crit[0][0]).contains("papel +0"), "num papel sem crítico, sem \"papel +0\" (%s)" % crit[0][0])
 	t.equal(G.resist_with(0.75, 10), 0.8, "a ficha usa o mesmo teto da luta")
 	var sheet := AHCharacterSheet.from_hero(hero)
 	t.check(sheet.passives.any(func(r): return String(r[0]).contains("Arma +4")), "a ficha do herói mostra o crítico com a Arma")
@@ -239,6 +240,26 @@ func _forge_panel() -> void:
 			var words: Array = weapon_row.find_children("*", "Label", true, false).map(func(l): return String(l.text))
 			t.check(words.any(func(w): return w.contains("nível 1 de 4")) and words.any(func(w): return w.contains("+1 de dano")), "com o nível e o que soma (%s)" % " | ".join(words))
 			t.check(words.any(func(w): return w.begins_with("Próximo: nível 2")), "e o próximo nível")
+		# Herói em missão solo ou a Forja não recuperada: o botão apaga, com o motivo.
+		var nick: Dictionary = S.hero(Campaign.state, c.roster[1].id)
+		nick.side_mission = {"id": String(AHSideMissions.missions()[0].Name), "spot": 0, "sent": AHSideMissions.day(Campaign.state), "back": AHSideMissions.day(Campaign.state) + 2}
+		var away_reason := G.reach_block(Campaign.state, nick.id)
+		screen.selected = nick.id
+		screen.rebuild()
+		await _frames(3)
+		var blocked := screen.find_child("GearForge", true, false) as Button
+		t.check(away_reason != "" and blocked != null and blocked.disabled and screen.find_child("GearBlock", true, false) != null,
+			"em missão solo, o Melhorar na Forja apaga, com o motivo (%s)" % away_reason)
+		nick.erase("side_mission")
+		Campaign.state.station.rooms[S.FORGE] = 0
+		screen.rebuild()
+		await _frames(3)
+		blocked = screen.find_child("GearForge", true, false) as Button
+		t.check(blocked != null and blocked.disabled and G.reach_block(Campaign.state, nick.id).contains("Recupere a Forja"), "sem a Forja, também")
+		Campaign.state.station.rooms[S.FORGE] = 1
+		screen.selected = first.id
+		screen.rebuild()
+		await _frames(3)
 		var go := screen.find_child("GearForge", true, false) as Button
 		if t.check(go != null, "com o Melhorar na Forja"):
 			go.pressed.emit()
