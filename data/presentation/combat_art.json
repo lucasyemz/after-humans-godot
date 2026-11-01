@@ -241,6 +241,19 @@
 					],
 					"body_reference_pixels": 1253
 				}
+			},
+			"combat_idle": {
+				"file": "res://art/combat/heroes/bento/combat_idle.webp",
+				"canvas": [
+					1086,
+					1448
+				],
+				"anchor": [
+					473.0,
+					1429
+				],
+				"body_reference_pixels": 1419,
+				"body_width_pixels": 822
 			}
 		},
 		"hero_gato_nick": {
@@ -483,6 +496,19 @@
 					],
 					"body_reference_pixels": 1294
 				}
+			},
+			"combat_idle": {
+				"file": "res://art/combat/heroes/nick/combat_idle.webp",
+				"canvas": [
+					1178,
+					1335
+				],
+				"anchor": [
+					488.5,
+					1286
+				],
+				"body_reference_pixels": 1255,
+				"body_width_pixels": 825
 			}
 		},
 		"hero_sapo_iris": {
@@ -724,6 +750,19 @@
 					],
 					"body_reference_pixels": 1208
 				}
+			},
+			"combat_idle": {
+				"file": "res://art/combat/heroes/iris/combat_idle.webp",
+				"canvas": [
+					1178,
+					1335
+				],
+				"anchor": [
+					587.5,
+					1264
+				],
+				"body_reference_pixels": 1208,
+				"body_width_pixels": 777
 			}
 		},
 		"hero_coruja_vespera": {
@@ -969,6 +1008,19 @@
 					],
 					"body_reference_pixels": 1271
 				}
+			},
+			"combat_idle": {
+				"file": "res://art/combat/heroes/vespera/combat_idle.webp",
+				"canvas": [
+					1178,
+					1335
+				],
+				"anchor": [
+					451.0,
+					1297
+				],
+				"body_reference_pixels": 1271,
+				"body_width_pixels": 834
 			}
 		}
 	},

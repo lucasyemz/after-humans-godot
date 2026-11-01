@@ -263,7 +263,7 @@ msgid "+1 curativo"
 msgstr "+1 bandage"
 
 #: scripts/flow/fight_rewards.gd:137
-#: scripts/ui/character_sheet.gd:126
+#: scripts/ui/character_sheet.gd:134
 #: scripts/ui/station/character_room.gd:730
 msgid "Relíquia: %s"
 msgstr "Relic: %s"
@@ -337,116 +337,118 @@ msgstr "At 0 health, still standing: the next blow has a 50% chance to bring the
 msgid "Começa cada jornada com 10 de instinto; trata-se no Alojamento."
 msgstr "Starts every journey with 10 instinct; treated in the Quarters."
 
-#: scripts/ui/character_sheet.gd:62
+#: scripts/ui/character_sheet.gd:65
 msgid "Laço com %s"
 msgstr "Bond with %s"
 
-#: scripts/ui/character_sheet.gd:63
+#: scripts/ui/character_sheet.gd:66
 msgid "Amizade %+d · em +3, quando um cai, o outro ergue a guarda (+1 bloqueio)"
 msgstr "Friendship %+d · at +3, when one falls, the other raises their guard (+1 block)"
 
-#: scripts/ui/character_sheet.gd:64
+#: scripts/ui/character_sheet.gd:67
 msgid "Rivalidade %+d · em −3, a falha de um abala o outro (+5 de instinto)"
 msgstr "Rivalry %+d · at −3, one's failure shakes the other (+5 instinct)"
 
-#: scripts/ui/character_sheet.gd:68
+#: scripts/ui/character_sheet.gd:71
 msgid "Máquina"
 msgstr "Machine"
 
-#: scripts/ui/character_sheet.gd:68
+#: scripts/ui/character_sheet.gd:71
 msgid "Criatura"
 msgstr "Creature"
 
-#: scripts/ui/character_sheet.gd:70
+#: scripts/ui/character_sheet.gd:74
 msgid "guardião do trecho"
 msgstr "guardian of the stretch"
 
-#: scripts/ui/character_sheet.gd:76
+#: scripts/ui/character_sheet.gd:80
 msgid "Resiste a dano por turno"
 msgstr "Resists damage over time"
 
-#: scripts/ui/character_sheet.gd:76
+#: scripts/ui/character_sheet.gd:80
 msgid "%d%% de chance de não sangrar nem contaminar"
 msgstr "%d%% chance to avoid bleeding and contamination"
 
-#: scripts/ui/character_sheet.gd:78
+#: scripts/ui/character_sheet.gd:82
 msgid "Resiste a deslocamento"
 msgstr "Resists displacement"
 
-#: scripts/ui/character_sheet.gd:78
+#: scripts/ui/character_sheet.gd:82
 msgid "%d%% de chance de não ser empurrado nem puxado"
 msgstr "%d%% chance to avoid being pushed or pulled"
 
-#: scripts/ui/character_sheet.gd:83
-#: scripts/ui/combat_hud.gd:688
+#: scripts/ui/character_sheet.gd:89
+#: scripts/ui/combat_hud.gd:696
 msgid "Último Fôlego"
 msgstr "Last Breath"
 
-#: scripts/ui/character_sheet.gd:85
-#: scripts/ui/character_sheet.gd:105
-#: scripts/ui/combat_hud.gd:836
-#: scripts/combat/combat_engine.gd:295
+#: scripts/ui/character_sheet.gd:91
+#: scripts/ui/character_sheet.gd:113
+#: scripts/ui/combat_hud.gd:844
+#: scripts/combat/combat_engine.gd:324
 msgid "Trauma"
 msgstr "Trauma"
 
-#: scripts/ui/character_sheet.gd:137
+#: scripts/ui/character_sheet.gd:145
 #: scripts/ui/station/character_room.gd:432
 msgid "%s ×%d"
 msgstr "%s ×%d"
 
-#: scripts/ui/character_sheet.gd:282
-#: scripts/ui/combat_hud.gd:1208
+#: scripts/ui/character_sheet.gd:295
+#: scripts/ui/combat_hud.gd:1258
 #: scripts/ui/inventory_panel.gd:314
 msgid "Vida %d/%d"
 msgstr "Health %d/%d"
 
-#: scripts/ui/character_sheet.gd:285
+#: scripts/ui/character_sheet.gd:298
 #: scripts/ui/camp_hud.gd:333
-#: scripts/ui/combat_hud.gd:1213
+#: scripts/ui/combat_hud.gd:1263
 msgid "Instinto %d/200"
 msgstr "Instinct %d/200"
 
-#: scripts/ui/character_sheet.gd:287
-#: scripts/ui/character_sheet.gd:301
-#: scripts/ui/combat_hud.gd:1167
+#: scripts/ui/character_sheet.gd:300
+#: scripts/ui/character_sheet.gd:314
+#: scripts/ui/combat_hud.gd:1196
 msgid "Efeitos passivos"
 msgstr "Passive effects"
 
-#: scripts/ui/character_sheet.gd:287
-#: scripts/ui/character_sheet.gd:301
-#: scripts/ui/combat_hud.gd:1167
+#: scripts/ui/character_sheet.gd:300
+#: scripts/ui/character_sheet.gd:314
+#: scripts/ui/combat_hud.gd:1196
 #: scripts/ui/station/character_room.gd:633
 msgid "Nenhum"
 msgstr "None"
 
-#: scripts/ui/character_sheet.gd:288
-#: scripts/ui/character_sheet.gd:302
-#: scripts/ui/combat_hud.gd:1168
+#: scripts/ui/character_sheet.gd:301
+#: scripts/ui/character_sheet.gd:315
+#: scripts/ui/combat_hud.gd:1197
+#: scripts/ui/combat_hud.gd:1211
 msgid "Estados"
 msgstr "Conditions"
 
-#: scripts/ui/character_sheet.gd:288
-#: scripts/ui/character_sheet.gd:302
-#: scripts/ui/combat_hud.gd:1168
+#: scripts/ui/character_sheet.gd:301
+#: scripts/ui/character_sheet.gd:315
+#: scripts/ui/combat_hud.gd:1197
+#: scripts/ui/combat_hud.gd:1211
 msgid "Nenhum agora"
 msgstr "None right now"
 
-#: scripts/ui/character_sheet.gd:295
-#: scripts/ui/combat_hud.gd:830
+#: scripts/ui/character_sheet.gd:308
+#: scripts/ui/combat_hud.gd:838
 msgid "Instinto %d/200 · em 200, crise"
 msgstr "Instinct %d/200 · at 200, crisis"
 
-#: scripts/ui/character_sheet.gd:308
-#: scripts/ui/combat_hud.gd:1217
+#: scripts/ui/character_sheet.gd:321
+#: scripts/ui/combat_hud.gd:1267
 #: scripts/ui/station/character_room.gd:459
 msgid "Velocidade %d"
 msgstr "Speed %d"
 
-#: scripts/ui/character_sheet.gd:317
+#: scripts/ui/character_sheet.gd:330
 msgid "Velocidade %d · quem é mais rápido age antes na rodada"
 msgstr "Speed %d · the faster act earlier in the round"
 
-#: scripts/ui/character_sheet.gd:338
+#: scripts/ui/character_sheet.gd:351
 msgid "Nível"
 msgstr "Level"
 
@@ -479,7 +481,7 @@ msgstr "Interact"
 #: scripts/ui/options_panel.gd:18
 #: scripts/ui/exploration_hud.gd:263
 #: scripts/ui/combat_hud.gd:66
-#: scripts/ui/combat_hud.gd:2062
+#: scripts/ui/combat_hud.gd:2160
 msgid "Mochila"
 msgstr "Backpack"
 
@@ -1079,7 +1081,7 @@ msgid "Continuar a expedição"
 msgstr "Continue the expedition"
 
 #: scripts/ui/exploration_hud.gd:1749
-#: scripts/ui/combat_hud.gd:2398
+#: scripts/ui/combat_hud.gd:2504
 msgid "Vitória"
 msgstr "Victory"
 
@@ -1088,12 +1090,12 @@ msgid "Retirada"
 msgstr "Retreat"
 
 #: scripts/ui/exploration_hud.gd:1749
-#: scripts/ui/combat_hud.gd:2398
+#: scripts/ui/combat_hud.gd:2504
 msgid "Fuga"
 msgstr "Escape"
 
 #: scripts/ui/exploration_hud.gd:1749
-#: scripts/ui/combat_hud.gd:2398
+#: scripts/ui/combat_hud.gd:2504
 msgid "Derrota"
 msgstr "Defeat"
 
@@ -1253,284 +1255,293 @@ msgid "%+d instinto"
 msgstr "%+d instinct"
 
 #: scripts/ui/combat_hud.gd:65
-#: scripts/ui/combat_hud.gd:2059
+#: scripts/ui/combat_hud.gd:2157
 msgid "Mover"
 msgstr "Move"
 
 #: scripts/ui/combat_hud.gd:65
-#: scripts/ui/combat_hud.gd:2060
-#: scripts/combat/combat_engine.gd:1212
-#: scripts/combat/combat_engine.gd:1225
+#: scripts/ui/combat_hud.gd:2158
+#: scripts/combat/combat_engine.gd:1252
+#: scripts/combat/combat_engine.gd:1265
 msgid "Defender"
 msgstr "Defend"
 
 #: scripts/ui/combat_hud.gd:66
-#: scripts/ui/combat_hud.gd:2061
+#: scripts/ui/combat_hud.gd:2159
 msgid "Fugir"
 msgstr "Flee"
 
-#: scripts/ui/combat_hud.gd:232
-#: scripts/ui/combat_hud.gd:250
+#: scripts/ui/combat_hud.gd:235
+#: scripts/ui/combat_hud.gd:253
 msgid "REGISTRO"
 msgstr "LOG"
 
-#: scripts/ui/combat_hud.gd:375
+#: scripts/ui/combat_hud.gd:378
 msgid "Inspecionar"
 msgstr "Inspect"
 
-#: scripts/ui/combat_hud.gd:724
+#: scripts/ui/combat_hud.gd:732
 msgid "%s (se cura)"
 msgstr "%s (heals itself)"
 
-#: scripts/ui/combat_hud.gd:728
+#: scripts/ui/combat_hud.gd:736
 msgid "%s (bloqueio)"
 msgstr "%s (block)"
 
-#: scripts/ui/combat_hud.gd:743
+#: scripts/ui/combat_hud.gd:751
 msgid "Intenção: o que ele faria se a vez fosse agora. Muda conforme a luta (quem cai, quem protege, a posição)%s."
 msgstr "Intent: what it would do if its turn were now. It changes with the fight (who falls, who protects, the position)%s."
 
-#: scripts/ui/combat_hud.gd:744
+#: scripts/ui/combat_hud.gd:752
 msgid "; com \"?\", ele está entre dois planos parecidos"
 msgstr "; with \"?\", it's torn between two similar plans"
 
-#: scripts/ui/combat_hud.gd:758
+#: scripts/ui/combat_hud.gd:766
 msgid "RODADA %d"
 msgstr "ROUND %d"
 
-#: scripts/ui/combat_hud.gd:828
+#: scripts/ui/combat_hud.gd:836
 msgid " · Último Fôlego"
 msgstr " · Last Breath"
 
-#: scripts/ui/combat_hud.gd:1097
+#: scripts/ui/combat_hud.gd:1105
 msgid "Inspecionar · %s/%s ou clique · %s fecha"
 msgstr "Inspect · %s/%s or click · %s closes"
 
-#: scripts/ui/combat_hud.gd:1202
+#: scripts/ui/combat_hud.gd:1244
 #: scripts/ui/refuge_hud.gd:894
 #: scripts/ui/refuge_hud.gd:1822
 msgid "Nível %d"
 msgstr "Level %d"
 
-#: scripts/ui/combat_hud.gd:1217
+#: scripts/ui/combat_hud.gd:1267
 msgid "Velocidade %d · quem é mais rápido age antes"
 msgstr "Speed %d · the faster one acts first"
 
-#: scripts/ui/combat_hud.gd:1553
+#: scripts/ui/combat_hud.gd:1614
 msgid "dano ★"
 msgstr "damage ★"
 
-#: scripts/ui/combat_hud.gd:1553
+#: scripts/ui/combat_hud.gd:1614
 msgid "dano"
 msgstr "damage"
 
-#: scripts/ui/combat_hud.gd:1556
+#: scripts/ui/combat_hud.gd:1617
 msgid "cura ★"
 msgstr "healing ★"
 
-#: scripts/ui/combat_hud.gd:1556
+#: scripts/ui/combat_hud.gd:1617
 msgid "cura"
 msgstr "healing"
 
-#: scripts/ui/combat_hud.gd:1594
+#: scripts/ui/combat_hud.gd:1655
 #: scripts/combat/combat_session.gd:173
 msgid "Recarga %d"
 msgstr "Cooldown %d"
 
-#: scripts/ui/combat_hud.gd:1596
+#: scripts/ui/combat_hud.gd:1657
 msgid "%d uso(s)"
 msgstr "%d use(s)"
 
-#: scripts/ui/combat_hud.gd:1638
-#: scripts/combat/combat_arena.gd:504
+#: scripts/ui/combat_hud.gd:1699
+#: scripts/combat/combat_arena.gd:503
 msgid "Vez de %s"
 msgstr "%s's turn"
 
-#: scripts/ui/combat_hud.gd:1648
+#: scripts/ui/combat_hud.gd:1709
 msgid "REGISTRO · %s fecha"
 msgstr "LOG · %s closes"
 
-#: scripts/ui/combat_hud.gd:1648
+#: scripts/ui/combat_hud.gd:1709
 msgid "REGISTRO · %s abre"
 msgstr "LOG · %s opens"
 
-#: scripts/ui/combat_hud.gd:1748
+#: scripts/ui/combat_hud.gd:1809
 msgid "A equipe recuou pelas sombras e largou o que carregava."
 msgstr "The team fell back through the shadows and dropped what it carried."
 
-#: scripts/ui/combat_hud.gd:1748
+#: scripts/ui/combat_hud.gd:1809
 msgid "Todos caíram nas ruínas. O achado ficou para trás."
 msgstr "Everyone fell in the ruins. The finds were left behind."
 
-#: scripts/ui/combat_hud.gd:1755
+#: scripts/ui/combat_hud.gd:1816
 msgid "Nenhum recurso nesta luta"
 msgstr "No resources from this fight"
 
-#: scripts/ui/combat_hud.gd:1780
+#: scripts/ui/combat_hud.gd:1841
 msgid "−%d"
 msgstr "−%d"
 
-#: scripts/ui/combat_hud.gd:1780
+#: scripts/ui/combat_hud.gd:1841
 msgid "+%d"
 msgstr "+%d"
 
-#: scripts/ui/combat_hud.gd:1801
+#: scripts/ui/combat_hud.gd:1862
 #: scripts/flow/station_rules.gd:776
 #: scripts/street/street_corridor.gd:1772
 #: scripts/flow/station_grid.gd:489
 msgid "%s e %s"
 msgstr "%s and %s"
 
-#: scripts/ui/combat_hud.gd:1802
+#: scripts/ui/combat_hud.gd:1863
 msgid "%s caiu"
 msgstr "%s fell"
 
-#: scripts/ui/combat_hud.gd:1802
+#: scripts/ui/combat_hud.gd:1863
 msgid "%s caíram"
 msgstr "%s fell"
 
-#: scripts/ui/combat_hud.gd:1806
+#: scripts/ui/combat_hud.gd:1867
 msgid "Volta à Estação para se recuperar."
 msgstr "Heads back to the Station to recover."
 
-#: scripts/ui/combat_hud.gd:1806
+#: scripts/ui/combat_hud.gd:1867
 msgid "Voltam à Estação para se recuperar."
 msgstr "They head back to the Station to recover."
 
-#: scripts/ui/combat_hud.gd:1827
+#: scripts/ui/combat_hud.gd:1888
 msgid "%s +%d"
 msgstr "%s +%d"
 
-#: scripts/ui/combat_hud.gd:1834
+#: scripts/ui/combat_hud.gd:1895
 msgid "XP: %s"
 msgstr "XP: %s"
 
-#: scripts/ui/combat_hud.gd:1850
+#: scripts/ui/combat_hud.gd:1911
 msgid "%d heróis"
 msgstr "%d heroes"
 
-#: scripts/ui/combat_hud.gd:1851
+#: scripts/ui/combat_hud.gd:1912
 msgid "%s: Treino pronto"
 msgstr "%s: Training ready"
 
-#: scripts/ui/combat_hud.gd:1917
+#: scripts/ui/combat_hud.gd:1978
 msgid "%s de %s"
 msgstr "%s %s"
 
-#: scripts/ui/combat_hud.gd:1919
+#: scripts/ui/combat_hud.gd:1980
 msgid "recarga %d"
 msgstr "cooldown %d"
 
-#: scripts/ui/combat_hud.gd:1921
+#: scripts/ui/combat_hud.gd:1982
 msgid "%d usos por expedição"
 msgstr "%d uses per expedition"
 
-#: scripts/ui/combat_hud.gd:1921
+#: scripts/ui/combat_hud.gd:1982
 #: scripts/combat/combat_session.gd:175
 msgid "%d usos"
 msgstr "%d uses"
 
-#: scripts/ui/combat_hud.gd:1932
+#: scripts/ui/combat_hud.gd:1993
 msgid "Sai das posições %s"
 msgstr "From positions %s"
 
-#: scripts/ui/combat_hud.gd:1934
+#: scripts/ui/combat_hud.gd:1995
 msgid " · alcança %s"
 msgstr " · reaches %s"
 
-#: scripts/ui/combat_hud.gd:1948
+#: scripts/ui/combat_hud.gd:2010
 msgid "%s (vida %d)"
 msgstr "%s (health %d)"
 
-#: scripts/ui/combat_hud.gd:1950
+#: scripts/ui/combat_hud.gd:2018
 msgid " · pode cair"
 msgstr " · may fall"
 
-#: scripts/ui/combat_hud.gd:1955
+#: scripts/ui/combat_hud.gd:2020
+#: scripts/combat/combat_engine.gd:624
+msgid "Vantagem +%d%%"
+msgstr "Advantage +%d%%"
+
+#: scripts/ui/combat_hud.gd:2026
 msgid "Atinge: "
 msgstr "Hits: "
 
-#: scripts/ui/combat_hud.gd:1961
+#: scripts/ui/combat_hud.gd:2034
 msgid "Você:"
 msgstr "You:"
 
-#: scripts/ui/combat_hud.gd:1972
+#: scripts/ui/combat_hud.gd:2045
 msgid "Clique no alvo e clique de novo para usar (%s usa; %s ou B volta)."
 msgstr "Click the target and click again to use (%s uses; %s or B goes back)."
 
-#: scripts/ui/combat_hud.gd:1974
+#: scripts/ui/combat_hud.gd:2047
 msgid "Escolha uma habilidade (%s–%s) ou uma ação."
 msgstr "Choose an ability (%s–%s) or an action."
 
-#: scripts/ui/combat_hud.gd:2005
-#: scripts/ui/combat_hud.gd:2013
-#: scripts/ui/combat_hud.gd:2014
+#: scripts/ui/combat_hud.gd:2081
+msgid "Vantagem +%d%%: a linhagem ou a família de quem ataca vence a do alvo"
+msgstr "Advantage +%d%%: the attacker's lineage or family beats the target's"
+
+#: scripts/ui/combat_hud.gd:2103
+#: scripts/ui/combat_hud.gd:2111
+#: scripts/ui/combat_hud.gd:2112
 #: scripts/flow/journey_rules.gd:475
 msgid " · Guardião"
 msgstr " · Guardian"
 
-#: scripts/ui/combat_hud.gd:2005
-#: scripts/ui/combat_hud.gd:2015
-#: scripts/ui/combat_hud.gd:2016
+#: scripts/ui/combat_hud.gd:2103
+#: scripts/ui/combat_hud.gd:2113
+#: scripts/ui/combat_hud.gd:2114
 #: scripts/flow/journey_rules.gd:355
 msgid " Alfa"
 msgstr " Alpha"
 
-#: scripts/ui/combat_hud.gd:2005
-#: scripts/ui/combat_hud.gd:2017
+#: scripts/ui/combat_hud.gd:2103
+#: scripts/ui/combat_hud.gd:2115
 #: scripts/flow/journey_rules.gd:356
 msgid " Beta"
 msgstr " Beta"
 
-#: scripts/ui/combat_hud.gd:2059
+#: scripts/ui/combat_hud.gd:2157
 msgid "Troca de posição com o aliado vizinho. Gasta a vez."
 msgstr "Swaps places with the neighboring ally. Uses the turn."
 
-#: scripts/ui/combat_hud.gd:2060
+#: scripts/ui/combat_hud.gd:2158
 msgid "+1 Bloqueio e passa a vez. "
 msgstr "+1 Block and passes the turn. "
 
-#: scripts/ui/combat_hud.gd:2061
+#: scripts/ui/combat_hud.gd:2159
 msgid "60% de chance de a equipe recuar e sair da luta. Na fuga, larga o que carregava."
 msgstr "60% chance for the team to fall back and leave the fight. Fleeing, it drops what it was carrying."
 
-#: scripts/ui/combat_hud.gd:2062
+#: scripts/ui/combat_hud.gd:2160
 msgid "Comida ou curativo no herói da vez. Ação livre: a vez continua, um item por vez dele."
 msgstr "Food or a bandage on the active hero. Free action: the turn goes on, one item per turn."
 
-#: scripts/ui/combat_hud.gd:2102
+#: scripts/ui/combat_hud.gd:2200
 msgid "CRISE DE INSTINTO"
 msgstr "INSTINCT CRISIS"
 
-#: scripts/ui/combat_hud.gd:2188
+#: scripts/ui/combat_hud.gd:2286
 msgid "Posição %d"
 msgstr "Position %d"
 
-#: scripts/ui/combat_hud.gd:2203
+#: scripts/ui/combat_hud.gd:2301
 msgid "Escolha um alvo"
 msgstr "Choose a target"
 
-#: scripts/ui/combat_hud.gd:2285
+#: scripts/ui/combat_hud.gd:2383
 msgid "ALVO"
 msgstr "TARGET"
 
-#: scripts/ui/combat_hud.gd:2390
+#: scripts/ui/combat_hud.gd:2496
 msgid "Batalha finalizada"
 msgstr "Battle over"
 
-#: scripts/ui/combat_hud.gd:2415
+#: scripts/ui/combat_hud.gd:2521
 msgid "A carga do guardião abre em seguida"
 msgstr "The guardian's cargo opens next"
 
-#: scripts/ui/combat_hud.gd:2432
+#: scripts/ui/combat_hud.gd:2538
 msgid "Qualquer tecla ou toque para continuar"
 msgstr "Any key or tap to continue"
 
-#: scripts/ui/combat_hud.gd:2432
+#: scripts/ui/combat_hud.gd:2538
 msgid "Fecha sozinho · toque para fechar antes"
 msgstr "Closes on its own · tap to close sooner"
 
-#: scripts/ui/combat_hud.gd:2433
+#: scripts/ui/combat_hud.gd:2539
 msgid "Fecha sozinho · o mouse em cima segura · qualquer tecla fecha"
 msgstr "Closes on its own · hovering holds it · any key closes"
 
@@ -3536,7 +3547,7 @@ msgstr "Block %d"
 #: scripts/ui/ui_style.gd:536
 #: scripts/ui/ui_style.gd:559
 #: scripts/ui/ui_style.gd:574
-#: scripts/combat/combat_engine.gd:213
+#: scripts/combat/combat_engine.gd:242
 msgid "Bloqueio"
 msgstr "Block"
 
@@ -3563,7 +3574,7 @@ msgstr "Vulnerable %d"
 #: scripts/ui/ui_style.gd:539
 #: scripts/ui/ui_style.gd:559
 #: scripts/ui/ui_style.gd:577
-#: scripts/combat/combat_engine.gd:214
+#: scripts/combat/combat_engine.gd:243
 msgid "Vulnerável"
 msgstr "Vulnerable"
 
@@ -4823,500 +4834,500 @@ msgstr "%s already used an item this turn."
 msgid "No Limiar da Morte, só uma habilidade de cura salva."
 msgstr "At Death's Door, only a healing ability saves."
 
-#: scripts/combat/combat_engine.gd:101
+#: scripts/combat/combat_engine.gd:130
 msgid "%s: %d%% de falhar por alvo no próximo ataque de dano direto."
 msgstr "%s: %d%% chance per target to miss the next direct damage attack."
 
-#: scripts/combat/combat_engine.gd:101
-#: scripts/combat/combat_engine.gd:244
+#: scripts/combat/combat_engine.gd:130
+#: scripts/combat/combat_engine.gd:273
 msgid "Interferência"
 msgstr "Interference"
 
-#: scripts/combat/combat_engine.gd:101
-#: scripts/combat/combat_engine.gd:244
+#: scripts/combat/combat_engine.gd:130
+#: scripts/combat/combat_engine.gd:273
 msgid "Cegueira"
 msgstr "Blindness"
 
-#: scripts/combat/combat_engine.gd:103
+#: scripts/combat/combat_engine.gd:132
 msgid "Fraqueza: -%d%% de dano no próximo ataque de dano direto (mínimo 1)."
 msgstr "Weakness: -%d%% damage on the next direct damage attack (minimum 1)."
 
-#: scripts/combat/combat_engine.gd:105
+#: scripts/combat/combat_engine.gd:134
 msgid "Consome ao tentar, mesmo se errar; não acumula. Cura, suporte e dano periódico não consomem. Até atacar ou limpar."
 msgstr "Spent on the attempt, even on a miss; doesn't stack. Healing, support and damage over time don't spend it. Lasts until attacking or being cleansed."
 
-#: scripts/combat/combat_engine.gd:107
+#: scripts/combat/combat_engine.gd:136
 msgid "Imobilização: %d turno(s) sem trocar de posição, avançar ou recuar por habilidade; pode atacar. Empurrões e fuga coletiva ainda funcionam. Diminui ao fim do próprio turno, inclusive atordoado."
 msgstr "Immobilization: %d turn(s) unable to change position, advance or retreat with abilities; can still attack. Pushes and the team's escape still work. Goes down at the end of its own turn, even when stunned."
 
-#: scripts/combat/combat_engine.gd:211
+#: scripts/combat/combat_engine.gd:240
 msgid "Vazamento"
 msgstr "Leak"
 
-#: scripts/combat/combat_engine.gd:211
-#: scripts/combat/combat_engine.gd:686
+#: scripts/combat/combat_engine.gd:240
+#: scripts/combat/combat_engine.gd:724
 msgid "Sangramento"
 msgstr "Bleeding"
 
-#: scripts/combat/combat_engine.gd:212
+#: scripts/combat/combat_engine.gd:241
 msgid "Corrosão"
 msgstr "Corrosion"
 
-#: scripts/combat/combat_engine.gd:212
-#: scripts/combat/combat_engine.gd:686
+#: scripts/combat/combat_engine.gd:241
+#: scripts/combat/combat_engine.gd:724
 msgid "Contaminação"
 msgstr "Contamination"
 
-#: scripts/combat/combat_engine.gd:213
+#: scripts/combat/combat_engine.gd:242
 msgid "Blindagem ativa"
 msgstr "Active plating"
 
-#: scripts/combat/combat_engine.gd:214
+#: scripts/combat/combat_engine.gd:243
 msgid "Estrutura exposta"
 msgstr "Exposed frame"
 
-#: scripts/combat/combat_engine.gd:215
+#: scripts/combat/combat_engine.gd:244
 msgid "Deslocamento"
 msgstr "Displacement"
 
-#: scripts/combat/combat_engine.gd:246
+#: scripts/combat/combat_engine.gd:275
 msgid "Fraqueza"
 msgstr "Weakness"
 
-#: scripts/combat/combat_engine.gd:248
+#: scripts/combat/combat_engine.gd:277
 msgid "Imobilização · %d turnos"
 msgstr "Immobilization · %d turns"
 
-#: scripts/combat/combat_engine.gd:257
+#: scripts/combat/combat_engine.gd:286
 msgid "FALHOU · precisão reduzida"
 msgstr "MISSED · reduced accuracy"
 
-#: scripts/combat/combat_engine.gd:258
+#: scripts/combat/combat_engine.gd:287
 msgid "O ataque falhou por cegueira/interferência contra "
 msgstr "The attack missed from blindness/interference against "
 
-#: scripts/combat/combat_engine.gd:365
+#: scripts/combat/combat_engine.gd:394
 msgid "Combate iniciado nas ruínas do Bairro Submerso!"
 msgstr "Combat started in the ruins of the Sunken District!"
 
-#: scripts/combat/combat_engine.gd:400
+#: scripts/combat/combat_engine.gd:429
 msgid "Fase inicial: um aliado toma a iniciativa."
 msgstr "Opening phase: an ally takes the initiative."
 
-#: scripts/combat/combat_engine.gd:411
+#: scripts/combat/combat_engine.gd:440
 msgid "Vitória! A ameaça foi neutralizada."
 msgstr "Victory! The threat has been neutralized."
 
-#: scripts/combat/combat_engine.gd:416
+#: scripts/combat/combat_engine.gd:445
 msgid "Todos os aliados caíram nas ruínas escuras..."
 msgstr "All allies fell in the dark ruins..."
 
-#: scripts/combat/combat_engine.gd:427
+#: scripts/combat/combat_engine.gd:456
 msgid "--- Rodada %d ---"
 msgstr "--- Round %d ---"
 
-#: scripts/combat/combat_engine.gd:443
+#: scripts/combat/combat_engine.gd:472
 msgid "O Porteiro canalizou energia dos Relés de Defesa e gerou Bloqueio!"
 msgstr "The Gatekeeper channeled power from the Defense Relays and gained Block!"
 
-#: scripts/combat/combat_engine.gd:514
+#: scripts/combat/combat_engine.gd:543
 msgid "%s: %s%d Instinto"
 msgstr "%s: %s%d Instinct"
 
-#: scripts/combat/combat_engine.gd:515
+#: scripts/combat/combat_engine.gd:544
 msgid "%s · %s: %d Instinto"
 msgstr "%s · %s: %d Instinct"
 
-#: scripts/combat/combat_engine.gd:532
+#: scripts/combat/combat_engine.gd:561
 msgid "Colapso"
 msgstr "Collapse"
 
-#: scripts/combat/combat_engine.gd:532
+#: scripts/combat/combat_engine.gd:561
 msgid "Superação"
 msgstr "Breakthrough"
 
-#: scripts/combat/combat_engine.gd:545
+#: scripts/combat/combat_engine.gd:574
 msgid "%s · Colapso: “Não consigo!” · Trauma e Vulnerável"
 msgstr "%s · Collapse: “I can't!” · Trauma and Vulnerable"
 
-#: scripts/combat/combat_engine.gd:546
+#: scripts/combat/combat_engine.gd:575
 msgid "[COLAPSO] %s cedeu ao pânico e desespero! (-%d Vida, Trauma adquirido)"
 msgstr "[COLLAPSE] %s gave in to panic and despair! (-%d Health, Trauma acquired)"
 
-#: scripts/combat/combat_engine.gd:552
+#: scripts/combat/combat_engine.gd:581
 msgid "%s · Superação: “Ainda há esperança!” · Bloqueio"
 msgstr "%s · Breakthrough: “There's still hope!” · Block"
 
-#: scripts/combat/combat_engine.gd:553
+#: scripts/combat/combat_engine.gd:582
 msgid "[SUPERAÇÃO] A coragem de %s resplandece na escuridão! (+%d Vida)"
 msgstr "[BREAKTHROUGH] %s's courage shines in the darkness! (+%d Health)"
 
-#: scripts/combat/combat_engine.gd:584
+#: scripts/combat/combat_engine.gd:613
 msgid "Atordoado · turno perdido"
 msgstr "Stunned · turn lost"
 
-#: scripts/combat/combat_engine.gd:585
+#: scripts/combat/combat_engine.gd:614
 msgid "%s perdeu o turno por atordoamento (%d restantes)."
 msgstr "%s lost the turn to stun (%d left)."
 
-#: scripts/combat/combat_engine.gd:604
-#: scripts/combat/combat_engine.gd:985
-#: scripts/combat/combat_engine.gd:1487
+#: scripts/combat/combat_engine.gd:642
+#: scripts/combat/combat_engine.gd:1025
+#: scripts/combat/combat_engine.gd:1529
 msgid "Vulnerável!"
 msgstr "Vulnerable!"
 
-#: scripts/combat/combat_engine.gd:608
+#: scripts/combat/combat_engine.gd:646
 msgid "Blindagem consumida"
 msgstr "Plating spent"
 
-#: scripts/combat/combat_engine.gd:611
+#: scripts/combat/combat_engine.gd:649
 msgid "Bloqueio!"
 msgstr "Block!"
 
-#: scripts/combat/combat_engine.gd:623
+#: scripts/combat/combat_engine.gd:661
 msgid "MORTE PERMANENTE!"
 msgstr "PERMANENT DEATH!"
 
-#: scripts/combat/combat_engine.gd:624
+#: scripts/combat/combat_engine.gd:662
 msgid "[MORTE] %s sucumbiu ao golpe fatal de %s!"
 msgstr "[DEATH] %s succumbed to the fatal blow from %s!"
 
-#: scripts/combat/combat_engine.gd:630
-#: scripts/combat/combat_engine.gd:645
-#: scripts/combat/combat_engine.gd:657
-#: scripts/combat/combat_engine.gd:1453
+#: scripts/combat/combat_engine.gd:668
+#: scripts/combat/combat_engine.gd:683
+#: scripts/combat/combat_engine.gd:695
+#: scripts/combat/combat_engine.gd:1493
 msgid "Pressão de combate"
 msgstr "Combat pressure"
 
-#: scripts/combat/combat_engine.gd:634
+#: scripts/combat/combat_engine.gd:672
 msgid "Sobreviveu ao Último Fôlego!"
 msgstr "Survived the Last Breath!"
 
-#: scripts/combat/combat_engine.gd:635
+#: scripts/combat/combat_engine.gd:673
 msgid "%s resistiu à morte por um triz!"
 msgstr "%s cheated death by a hair!"
 
-#: scripts/combat/combat_engine.gd:641
+#: scripts/combat/combat_engine.gd:679
 msgid "ÚLTIMO FÔLEGO!"
 msgstr "LAST BREATH!"
 
-#: scripts/combat/combat_engine.gd:642
+#: scripts/combat/combat_engine.gd:680
 msgid "[ÚLTIMO FÔLEGO] %s está à beira da morte!"
 msgstr "[LAST BREATH] %s is on the brink of death!"
 
-#: scripts/combat/combat_engine.gd:652
+#: scripts/combat/combat_engine.gd:690
 msgid "[AMIZADE] %s ergueu a guarda para proteger %s!"
 msgstr "[FRIENDSHIP] %s raised their guard to protect %s!"
 
-#: scripts/combat/combat_engine.gd:666
+#: scripts/combat/combat_engine.gd:704
 msgid "SOBRECARGA DO PORTEIRO!"
 msgstr "GATEKEEPER OVERLOAD!"
 
-#: scripts/combat/combat_engine.gd:667
+#: scripts/combat/combat_engine.gd:705
 msgid "[SOBRECARGA] Os cabos do Porteiro se romperam em chamas verdes! Seus bloqueios caíram e seu ataque tornou-se brutal!"
 msgstr "[OVERLOAD] The Gatekeeper's cables burst into green flames! Its blocks fell and its attack turned brutal!"
 
-#: scripts/combat/combat_engine.gd:672
+#: scripts/combat/combat_engine.gd:710
 msgid "Derrotado!"
 msgstr "Defeated!"
 
-#: scripts/combat/combat_engine.gd:673
+#: scripts/combat/combat_engine.gd:711
 msgid "%s foi destruído."
 msgstr "%s was destroyed."
 
-#: scripts/combat/combat_engine.gd:680
+#: scripts/combat/combat_engine.gd:718
 msgid "Resistiu ao "
 msgstr "Resisted "
 
-#: scripts/combat/combat_engine.gd:688
+#: scripts/combat/combat_engine.gd:726
 msgid "%s aplicado · %d dano (%dt)"
 msgstr "%s applied · %d damage (%dt)"
 
-#: scripts/combat/combat_engine.gd:689
+#: scripts/combat/combat_engine.gd:727
 msgid "%s: %s aplicado!"
 msgstr "%s: %s applied!"
 
-#: scripts/combat/combat_engine.gd:749
+#: scripts/combat/combat_engine.gd:787
 msgid "Unidade não encontrada ou derrotada"
 msgstr "Unit not found or defeated"
 
-#: scripts/combat/combat_engine.gd:752
-#: scripts/combat/combat_engine.gd:792
-#: scripts/combat/combat_engine.gd:808
+#: scripts/combat/combat_engine.gd:790
+#: scripts/combat/combat_engine.gd:830
 #: scripts/combat/combat_engine.gd:846
+#: scripts/combat/combat_engine.gd:884
 msgid "Personagem atordoado."
 msgstr "Character stunned."
 
-#: scripts/combat/combat_engine.gd:755
+#: scripts/combat/combat_engine.gd:793
 msgid "Selecione outra posição da sua equipe."
 msgstr "Select another position on your team."
 
-#: scripts/combat/combat_engine.gd:760
+#: scripts/combat/combat_engine.gd:798
 msgid "Imobilização impede mover ou trocar de posição; ainda é possível atacar."
 msgstr "Immobilization prevents moving or swapping positions; attacking is still possible."
 
-#: scripts/combat/combat_engine.gd:763
+#: scripts/combat/combat_engine.gd:801
 msgid "Esta unidade grande não pode trocar de posição."
 msgstr "This large unit can't swap positions."
 
-#: scripts/combat/combat_engine.gd:779
+#: scripts/combat/combat_engine.gd:817
 msgid "%s manobrou para a posição %d."
 msgstr "%s maneuvered to position %d."
 
-#: scripts/combat/combat_engine.gd:789
+#: scripts/combat/combat_engine.gd:827
 msgid "Unidade não encontrada"
 msgstr "Unit not found"
 
-#: scripts/combat/combat_engine.gd:795
+#: scripts/combat/combat_engine.gd:833
 msgid "%s assumiu postura defensiva (+1 Bloqueio)."
 msgstr "%s took a defensive stance (+1 Block)."
 
-#: scripts/combat/combat_engine.gd:805
+#: scripts/combat/combat_engine.gd:843
 msgid "Apenas aliados podem recuar."
 msgstr "Only allies can retreat."
 
-#: scripts/combat/combat_engine.gd:811
+#: scripts/combat/combat_engine.gd:849
 msgid "Impossível fugir de O Porteiro! As eclusas estão trancadas."
 msgstr "Impossible to flee from the Gatekeeper! The locks are sealed."
 
-#: scripts/combat/combat_engine.gd:818
+#: scripts/combat/combat_engine.gd:856
 msgid "A equipe conseguiu recuar pelas sombras e romper o combate!"
 msgstr "The team managed to fall back through the shadows and break off the fight!"
 
-#: scripts/combat/combat_engine.gd:820
+#: scripts/combat/combat_engine.gd:858
 msgid "Tentativa de fuga falhou! Os inimigos bloquearam a passagem."
 msgstr "Escape attempt failed! The enemies blocked the way."
 
-#: scripts/combat/combat_engine.gd:843
+#: scripts/combat/combat_engine.gd:881
 msgid "Ator não encontrado"
 msgstr "Actor not found"
 
-#: scripts/combat/combat_engine.gd:854
+#: scripts/combat/combat_engine.gd:892
 msgid "Habilidade não encontrada"
 msgstr "Ability not found"
 
-#: scripts/combat/combat_engine.gd:857
+#: scripts/combat/combat_engine.gd:895
 msgid "Habilidade exige outra posição de origem. Posição atual: %d"
 msgstr "The ability needs another starting position. Current position: %d"
 
-#: scripts/combat/combat_engine.gd:860
+#: scripts/combat/combat_engine.gd:898
 msgid "Habilidade em recarga (%d turnos)."
 msgstr "Ability on cooldown (%d turns)."
 
-#: scripts/combat/combat_engine.gd:864
+#: scripts/combat/combat_engine.gd:902
 msgid "Limite de usos desta habilidade esgotado."
 msgstr "This ability's uses are spent."
 
-#: scripts/combat/combat_engine.gd:870
+#: scripts/combat/combat_engine.gd:908
 msgid "Não há inimigo na posição selecionada."
 msgstr "There's no enemy in the selected position."
 
-#: scripts/combat/combat_engine.gd:873
+#: scripts/combat/combat_engine.gd:911
 msgid "Esta habilidade exige que o alvo esteja MARCADO."
 msgstr "This ability needs the target to be MARKED."
 
-#: scripts/combat/combat_engine.gd:876
+#: scripts/combat/combat_engine.gd:914
 msgid "Alvo inválido para esta habilidade."
 msgstr "Invalid target for this ability."
 
-#: scripts/combat/combat_engine.gd:879
+#: scripts/combat/combat_engine.gd:917
 msgid "Alvo fora de alcance."
 msgstr "Target out of reach."
 
-#: scripts/combat/combat_engine.gd:882
+#: scripts/combat/combat_engine.gd:920
 msgid "Exige aliado orgânico ou inimigo Marcado/Vulnerável, conforme a habilidade."
 msgstr "Needs an organic ally or a Marked/Vulnerable enemy, depending on the ability."
 
-#: scripts/combat/combat_engine.gd:912
+#: scripts/combat/combat_engine.gd:950
 msgid "%s interceptou o golpe para proteger seu aliado!"
 msgstr "%s intercepted the blow to protect their ally!"
 
-#: scripts/combat/combat_engine.gd:921
-#: scripts/combat/combat_engine.gd:1443
+#: scripts/combat/combat_engine.gd:959
+#: scripts/combat/combat_engine.gd:1483
 msgid "ESQUIVOU!"
 msgstr "DODGED!"
 
-#: scripts/combat/combat_engine.gd:922
+#: scripts/combat/combat_engine.gd:960
 msgid "%s esquivou do ataque de %s!"
 msgstr "%s dodged %s's attack!"
 
-#: scripts/combat/combat_engine.gd:933
+#: scripts/combat/combat_engine.gd:971
 msgid "CRÍTICO!"
 msgstr "CRITICAL!"
 
-#: scripts/combat/combat_engine.gd:934
+#: scripts/combat/combat_engine.gd:972
 msgid "[CRÍTICO!] %s desferiu um ataque devastador!"
 msgstr "[CRITICAL!] %s landed a devastating attack!"
 
-#: scripts/combat/combat_engine.gd:950
+#: scripts/combat/combat_engine.gd:990
 msgid "%s usou %s em %s causando %d de dano."
 msgstr "%s used %s on %s dealing %d damage."
 
-#: scripts/combat/combat_engine.gd:958
+#: scripts/combat/combat_engine.gd:998
 msgid "%s recuperou o fôlego e saiu de perigo!"
 msgstr "%s caught their breath and is out of danger!"
 
-#: scripts/combat/combat_engine.gd:959
+#: scripts/combat/combat_engine.gd:999
 msgid "+%d Vida"
 msgstr "+%d Health"
 
-#: scripts/combat/combat_engine.gd:960
+#: scripts/combat/combat_engine.gd:1000
 msgid "%s tratou %s, restaurando %d de Vida."
 msgstr "%s treated %s, restoring %d Health."
 
-#: scripts/combat/combat_engine.gd:964
+#: scripts/combat/combat_engine.gd:1004
 msgid "%d Instinto"
 msgstr "%d Instinct"
 
-#: scripts/combat/combat_engine.gd:967
+#: scripts/combat/combat_engine.gd:1007
 msgid "%s acalmou %s (%d Instinto)."
 msgstr "%s calmed %s (%d Instinct)."
 
-#: scripts/combat/combat_engine.gd:971
+#: scripts/combat/combat_engine.gd:1011
 msgid "Armadura reduzida"
 msgstr "Armor reduced"
 
-#: scripts/combat/combat_engine.gd:978
-#: scripts/combat/combat_engine.gd:1480
+#: scripts/combat/combat_engine.gd:1018
+#: scripts/combat/combat_engine.gd:1522
 msgid "Atordoado · %d turnos"
 msgstr "Stunned · %d turns"
 
-#: scripts/combat/combat_engine.gd:986
+#: scripts/combat/combat_engine.gd:1026
 msgid "%s ficou Vulnerável!"
 msgstr "%s became Vulnerable!"
 
-#: scripts/combat/combat_engine.gd:990
+#: scripts/combat/combat_engine.gd:1030
 msgid "MARCADO!"
 msgstr "MARKED!"
 
-#: scripts/combat/combat_engine.gd:991
+#: scripts/combat/combat_engine.gd:1031
 msgid "%s foi MARCADO por 2 turnos!"
 msgstr "%s was MARKED for 2 turns!"
 
-#: scripts/combat/combat_engine.gd:994
+#: scripts/combat/combat_engine.gd:1034
 msgid "+1 esquiva"
 msgstr "+1 dodge"
 
-#: scripts/combat/combat_engine.gd:998
+#: scripts/combat/combat_engine.gd:1038
 msgid "+%d Bloqueio"
 msgstr "+%d Block"
 
-#: scripts/combat/combat_engine.gd:1004
+#: scripts/combat/combat_engine.gd:1044
 msgid "protegido por %s"
 msgstr "protected by %s"
 
-#: scripts/combat/combat_engine.gd:1007
+#: scripts/combat/combat_engine.gd:1047
 msgid "%s está guardando %s!"
 msgstr "%s is guarding %s!"
 
-#: scripts/combat/combat_engine.gd:1011
+#: scripts/combat/combat_engine.gd:1051
 msgid "Interferência removida"
 msgstr "Interference removed"
 
-#: scripts/combat/combat_engine.gd:1011
+#: scripts/combat/combat_engine.gd:1051
 msgid "Cegueira removida"
 msgstr "Blindness removed"
 
-#: scripts/combat/combat_engine.gd:1014
+#: scripts/combat/combat_engine.gd:1054
 msgid "Fraqueza removida"
 msgstr "Weakness removed"
 
-#: scripts/combat/combat_engine.gd:1017
+#: scripts/combat/combat_engine.gd:1057
 msgid "Imobilização removida"
 msgstr "Immobilization removed"
 
-#: scripts/combat/combat_engine.gd:1020
+#: scripts/combat/combat_engine.gd:1060
 msgid "Vulnerável Removido"
 msgstr "Vulnerable Removed"
 
-#: scripts/combat/combat_engine.gd:1025
+#: scripts/combat/combat_engine.gd:1065
 msgid "Efeitos Periódicos Curados"
 msgstr "Periodic Effects Cured"
 
-#: scripts/combat/combat_engine.gd:1028
+#: scripts/combat/combat_engine.gd:1068
 msgid "%s foi purificado de toxinas e feridas."
 msgstr "%s was cleansed of toxins and wounds."
 
-#: scripts/combat/combat_engine.gd:1044
+#: scripts/combat/combat_engine.gd:1084
 msgid "%s: deslocamento bloqueado por uma unidade grande."
 msgstr "%s: displacement blocked by a large unit."
 
-#: scripts/combat/combat_engine.gd:1049
+#: scripts/combat/combat_engine.gd:1089
 msgid "%s foi empurrado para a posição %d!"
 msgstr "%s was pushed to position %d!"
 
-#: scripts/combat/combat_engine.gd:1064
+#: scripts/combat/combat_engine.gd:1104
 msgid "%s mudou para a posição %d."
 msgstr "%s moved to position %d."
 
-#: scripts/combat/combat_engine.gd:1174
-#: scripts/combat/combat_engine.gd:1175
-#: scripts/combat/combat_engine.gd:1208
-#: scripts/combat/combat_engine.gd:1395
+#: scripts/combat/combat_engine.gd:1214
+#: scripts/combat/combat_engine.gd:1215
+#: scripts/combat/combat_engine.gd:1248
+#: scripts/combat/combat_engine.gd:1435
 msgid "Troca de posição"
 msgstr "Position swap"
 
-#: scripts/combat/combat_engine.gd:1179
+#: scripts/combat/combat_engine.gd:1219
 msgid "+1 bloqueio"
 msgstr "+1 block"
 
-#: scripts/combat/combat_engine.gd:1202
+#: scripts/combat/combat_engine.gd:1242
 msgid "Atordoado: perde a vez"
 msgstr "Stunned: loses the turn"
 
-#: scripts/combat/combat_engine.gd:1230
+#: scripts/combat/combat_engine.gd:1270
 msgid "Avançar"
 msgstr "Advance"
 
-#: scripts/combat/combat_engine.gd:1384
+#: scripts/combat/combat_engine.gd:1424
 msgid "%s usou %s e recuperou %d de vida."
 msgstr "%s used %s and recovered %d health."
 
-#: scripts/combat/combat_engine.gd:1389
+#: scripts/combat/combat_engine.gd:1429
 msgid "blindagem +1"
 msgstr "plating +1"
 
-#: scripts/combat/combat_engine.gd:1390
+#: scripts/combat/combat_engine.gd:1430
 msgid "%s assumiu Postura Blindada (+1 Bloqueio)."
 msgstr "%s took an Armored Stance (+1 Block)."
 
-#: scripts/combat/combat_engine.gd:1418
+#: scripts/combat/combat_engine.gd:1458
 msgid "%s ativou %s, emitindo ruídos ensurdecedores do Eco!"
 msgstr "%s activated %s, emitting deafening noises from the Echo!"
 
-#: scripts/combat/combat_engine.gd:1435
+#: scripts/combat/combat_engine.gd:1475
 msgid "%s interceptou o golpe para salvar o companheiro!"
 msgstr "%s intercepted the blow to save their companion!"
 
-#: scripts/combat/combat_engine.gd:1444
+#: scripts/combat/combat_engine.gd:1484
 msgid "%s esquivou com agilidade do ataque de %s!"
 msgstr "%s nimbly dodged %s's attack!"
 
-#: scripts/combat/combat_engine.gd:1451
+#: scripts/combat/combat_engine.gd:1491
 msgid "CRÍTICO INIMIGO!"
 msgstr "ENEMY CRITICAL!"
 
-#: scripts/combat/combat_engine.gd:1452
+#: scripts/combat/combat_engine.gd:1492
 msgid "[CRÍTICO!] %s desferiu um golpe brutal em %s!"
 msgstr "[CRITICAL!] %s landed a brutal blow on %s!"
 
-#: scripts/combat/combat_engine.gd:1459
+#: scripts/combat/combat_engine.gd:1499
 msgid "[RIVALIDADE] %s estremeceu ao ver a falha do rival (+5 Instinto)."
 msgstr "[RIVALRY] %s flinched at seeing the rival's failure (+5 Instinct)."
 
-#: scripts/combat/combat_engine.gd:1469
+#: scripts/combat/combat_engine.gd:1511
 msgid "%s atacou %s causando %d de dano."
 msgstr "%s attacked %s dealing %d damage."
 
-#: scripts/combat/combat_engine.gd:1473
+#: scripts/combat/combat_engine.gd:1515
 msgid "+%d Instinto"
 msgstr "+%d Instinct"
 
-#: scripts/combat/combat_engine.gd:1474
+#: scripts/combat/combat_engine.gd:1516
 msgid "%s desferiu terror psicológico em %s (+%d Instinto)."
 msgstr "%s struck psychological terror into %s (+%d Instinct)."
 
-#: scripts/combat/combat_engine.gd:1498
+#: scripts/combat/combat_engine.gd:1540
 msgid "%s foi arremessado para trás!"
 msgstr "%s was thrown back!"
 
@@ -5849,23 +5860,23 @@ msgstr "No valid save was found. The previous data was kept; a new game will onl
 msgid "Trecho %d de %d"
 msgstr "Stretch %d of %d"
 
-#: scripts/combat/combat_arena.gd:479
+#: scripts/combat/combat_arena.gd:478
 msgid "%s age"
 msgstr "%s acts"
 
-#: scripts/combat/combat_arena.gd:504
+#: scripts/combat/combat_arena.gd:503
 msgid "inimigo"
 msgstr "enemy"
 
-#: scripts/combat/combat_arena.gd:561
+#: scripts/combat/combat_arena.gd:564
 msgid "+1 Bloqueio"
 msgstr "+1 Block"
 
-#: scripts/combat/combat_arena.gd:565
+#: scripts/combat/combat_arena.gd:568
 msgid "Fuga!"
 msgstr "Escaped!"
 
-#: scripts/combat/combat_arena.gd:565
+#: scripts/combat/combat_arena.gd:568
 msgid "Fuga falhou"
 msgstr "Escape failed"
 
@@ -6204,6 +6215,22 @@ msgstr "The team left %s some food."
 #: scripts/flow/rescue_rules.gd:265
 msgid "A equipe deixou %s para trás, sem comida para dividir."
 msgstr "The team left %s behind, with no food to share."
+
+#: scripts/flow/type_advantage.gd:77
+msgid "Dano +%d%% em %s"
+msgstr "Damage +%d%% vs %s"
+
+#: scripts/flow/type_advantage.gd:78
+msgid "Vantagem de tipo: a %s causa +%d%% de dano direto em: %s"
+msgstr "Type advantage: the %s deals +%d%% direct damage to: %s"
+
+#: scripts/flow/type_advantage.gd:81
+msgid "Recebe +%d%% de %s"
+msgstr "Takes +%d%% from %s"
+
+#: scripts/flow/type_advantage.gd:82
+msgid "Vantagem de tipo: recebe +%d%% de dano direto de: %s"
+msgstr "Type advantage: takes +%d%% direct damage from: %s"
 
 #. abilities.0.DisplayName
 msgid "Punho de Sucata"
@@ -7765,6 +7792,102 @@ msgstr "Collapsed Gallery"
 msgid "Uma galeria inteira cedeu sobre os trilhos. De longe se vê onde escavar."
 msgstr "A whole gallery gave way over the tracks. From afar you can see where to dig."
 
+#. type-classes.0.DisplayName
+msgid "Linhagem dos Cães"
+msgstr "Dog Lineage"
+
+#. type-classes.0.ShortName
+msgid "Cães"
+msgstr "Dogs"
+
+#. type-classes.1.DisplayName
+msgid "Linhagem dos Gatos"
+msgstr "Cat Lineage"
+
+#. type-classes.1.ShortName
+msgid "Gatos"
+msgstr "Cats"
+
+#. type-classes.2.DisplayName
+msgid "Linhagem dos Sapos"
+msgstr "Frog Lineage"
+
+#. type-classes.2.ShortName
+msgid "Sapos"
+msgstr "Frogs"
+
+#. type-classes.3.DisplayName
+msgid "Linhagem das Corujas"
+msgstr "Owl Lineage"
+
+#. type-classes.3.ShortName
+msgid "Corujas"
+msgstr "Owls"
+
+#. type-classes.4.DisplayName
+msgid "Linhagem dos Guaxinins"
+msgstr "Raccoon Lineage"
+
+#. type-classes.4.ShortName
+msgid "Guaxinins"
+msgstr "Raccoons"
+
+#. type-classes.5.DisplayName
+msgid "Linhagem dos Tatus"
+msgstr "Armadillo Lineage"
+
+#. type-classes.5.ShortName
+msgid "Tatus"
+msgstr "Armadillos"
+
+#. type-classes.6.DisplayName
+msgid "Família Perseguidora"
+msgstr "Hunter Family"
+
+#. type-classes.6.ShortName
+msgid "Perseguidores"
+msgstr "Hunters"
+
+#. type-classes.7.DisplayName
+msgid "Família Blindada"
+msgstr "Armored Family"
+
+#. type-classes.7.ShortName
+msgid "Blindados"
+msgstr "Armored"
+
+#. type-classes.8.DisplayName
+msgid "Família Industrial"
+msgstr "Industrial Family"
+
+#. type-classes.8.ShortName
+msgid "Industriais"
+msgstr "Industrials"
+
+#. type-classes.9.DisplayName
+msgid "Família Emissora"
+msgstr "Emitter Family"
+
+#. type-classes.9.ShortName
+msgid "Emissores"
+msgstr "Emitters"
+
+#. type-classes.10.DisplayName
+msgid "Família Condutora"
+msgstr "Conductor Family"
+
+#. type-classes.10.ShortName
+msgid "Condutores"
+msgstr "Conductors"
+
+#. type-classes.11.DisplayName
+msgid "Família Degradada"
+msgstr "Decayed Family"
+
+#. type-classes.11.ShortName
+msgid "Degradados"
+msgstr "Decayed"
+
 #. side-missions.rules.narrow.Hint
 msgid "Pede alguém que passe por frestas."
 msgstr "Calls for someone who fits through cracks."
@@ -9078,9 +9201,6 @@ msgstr "Take the tools from the locker"
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
 
-#~ msgid "Receba quem voltou no trem antes de partir."
-#~ msgstr "Welcome back whoever returned on the train before setting out."
-
 #~ msgid "Capturados"
 #~ msgstr "Captured"
 
@@ -9090,20 +9210,8 @@ msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
 #~ msgid "O sinal segue no rádio. O resgate entra na rota da fase, sem prazo: ninguém se perde esperando."
 #~ msgstr "The signal is still on the radio. The rescue joins the phase route, with no deadline: no one is lost by waiting."
 
-#~ msgid "%s voltou de %s com %s."
-#~ msgstr "%s came back from %s with %s."
-
-#~ msgid "%s voltou de %s."
-#~ msgstr "%s came back from %s."
-
-#~ msgid "%s voltou de %s com ferimentos e com %s."
-#~ msgstr "%s came back from %s hurt, with %s."
-
-#~ msgid "%s voltou de %s com ferimentos e de mãos vazias."
-#~ msgstr "%s came back from %s hurt and empty-handed."
-
-#~ msgid "%s caiu nas mãos dos robôs em %s. O resgate fica marcado no mapa."
-#~ msgstr "%s fell into the robots' hands at %s. The rescue is marked on the map."
+#~ msgid "  ·  +%d%%"
+#~ msgstr "  ·  +%d%%"
 
 #~ msgid "ROTAS"
 #~ msgstr "ROUTES"

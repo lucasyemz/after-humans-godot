@@ -136,6 +136,9 @@ var _picked_rank := -1
 var _clicked_rank := -1
 var _via_mouse := false
 var _target_label: Label
+## O ícone da vantagem de tipo (#227): as setas para cima do kit (o mesmo glifo do Treino), até os ícones das 12
+## classificações (um pedido de design à parte).
+const ADVANTAGE_GLYPH := "train"
 ## A prévia da habilidade mirada: uma marca sobre cada outro atingido (o par da granada, o vizinho do coquetel).
 var _preview_marks: Array = []
 var _actor_id := ""
@@ -451,6 +454,11 @@ func _build() -> void:
 	line.offset_left = 14
 	line.offset_right = -14
 	_target_label.add_child(line)
+	# O ícone da vantagem de tipo (#227), dentro da plaqueta à esquerda, quando quem ataca vence o alvo apontado.
+	var advantage := AHKit.glyph(ADVANTAGE_GLYPH, 26, AHKit.good())
+	advantage.name = "Advantage"
+	advantage.visible = false
+	_target_label.add_child(advantage)
 	_tip = AHKit.panel_box("large")
 	_tip.custom_minimum_size = Vector2(460, 0)
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1152,19 +1160,40 @@ func _paint_examine() -> void:
 func _fill_inspect(info: Dictionary) -> void:
 	var margins: Vector2 = _inspect_panel.get_theme_stylebox("panel").get_minimum_size()
 	var inner := KIT_INSPECT_PANEL.size - margins
+	# A vantagem de tipo (#227) só entra quando cabe: em cada nível, primeiro inteira (a classificação numa linha própria
+	# e as duas linhas nos passivos, sem explicação: o título já diz tudo), depois só a classificação e, sem caber, o mesmo
+	# nível sem ela, como era.
+	var plain: Array = info.passives.filter(func(entry): return entry.size() < 4 or entry[3] != "type")
+	var typed: Array = plain + info.passives.filter(func(entry): return entry.size() >= 4 and entry[3] == "type").map(func(entry): return [entry[0], "", entry[2], entry[3]])
+	var steps: Array = []
+	# No inimigo, as duas linhas são a única leitura da luta de quem ele apanha mais: valem mais que as explicações dos
+	# passivos e dos estados, e são tentadas em todos os níveis antes de sair (no herói, elas estão na ficha).
+	if info.enemy and typed.size() > plain.size():
+		for level in 5:
+			steps.append([level, true, true])
 	for level in 5:
+		if typed.size() > plain.size() and not info.enemy:
+			steps.append([level, true, true])
+		if String(info.get("type", "")) != "":
+			steps.append([level, true, false])
+		steps.append([level, false, false])
+	for step in steps:
+		var level: int = step[0]
+		var with_type: bool = step[1]
+		var with_rows: bool = step[2]
 		_clear(_inspect_panel)
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 18)
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_inspect_panel.add_child(row)
-		var identity := _inspect_identity(info, level)
+		var identity := _inspect_identity(info, level, with_type)
 		row.add_child(identity)
 		# As duas colunas dividem o resto pelo que cada uma tem (a dos estados vazia fica estreita).
 		var columns := inner.x - identity.custom_minimum_size.x - 36.0 - 4.0
-		var share := float(maxi(1, info.passives.size())) / float(maxi(1, info.passives.size()) + maxi(1, info.states.size()))
-		var passives := clampf(columns * share, 220.0, columns - 220.0)
-		row.add_child(_inspect_list(tr("Efeitos passivos"), info.passives, tr("Nenhum"), level < 1, level >= 3, passives, "Passives"))
+		var shown: Array = typed if with_rows else plain
+		var share := float(maxi(1, shown.size())) / float(maxi(1, shown.size()) + maxi(1, info.states.size()))
+		var passives := clampf(columns * share, 220.0, columns - _states_floor(info.states))
+		row.add_child(_inspect_list(tr("Efeitos passivos"), shown, tr("Nenhum"), level < 1, level >= 3, passives, "Passives"))
 		row.add_child(_inspect_list(tr("Estados"), info.states, tr("Nenhum agora"), level < 2, level >= 3, columns - passives, "States"))
 		var need := _inspect_panel.get_combined_minimum_size()
 		if need.x <= KIT_INSPECT_PANEL.size.x + 0.5 and need.y <= KIT_INSPECT_PANEL.size.y + 0.5:
@@ -1173,7 +1202,20 @@ func _fill_inspect(info: Dictionary) -> void:
 	_inspect_panel.size = KIT_INSPECT_PANEL.size
 
 
-func _inspect_identity(info: Dictionary, level: int = 0) -> VBoxContainer:
+## A largura mínima da coluna dos estados: 220 com estados; vazia, o que o título e o "Nenhum agora" pedem (#227: a
+## folga vai para os passivos, e as linhas da vantagem cabem no texto Normal).
+func _states_floor(states: Array) -> float:
+	if not states.is_empty():
+		return 220.0
+	var widest := 0.0
+	for spec in [[tr("Estados"), true], [tr("Nenhum agora"), false]]:
+		var probe := AHKit.label(spec[0], "small", AHKit.AMBER, spec[1], spec[1])
+		widest = maxf(widest, probe.get_minimum_size().x)
+		probe.free()
+	return minf(220.0, ceilf(widest) + 8.0)
+
+
+func _inspect_identity(info: Dictionary, level: int = 0, with_type: bool = true) -> VBoxContainer:
 	var column := VBoxContainer.new()
 	column.name = "Identity"
 	column.custom_minimum_size.x = 400 if level < 4 else 340
@@ -1205,6 +1247,14 @@ func _inspect_identity(info: Dictionary, level: int = 0) -> VBoxContainer:
 		kind_label.name = "Kind"
 		kind_label.clip_text = true
 		names.add_child(kind_label)
+	# A linhagem ou a família mecânica (#227): no nível 0, numa linha própria (no fim da espécie, o texto Maior a cortava);
+	# do 1 ao 3, junto da velocidade, que ali é curta; no 4 (a coluna estreita), não cabe.
+	var type_name := String(info.get("type", "")) if with_type and level < 4 else ""
+	if type_name != "" and level < 1:
+		var type_label := AHKit.label(type_name, "small", AHKit.AMBER)
+		type_label.name = "Type"
+		type_label.clip_text = true
+		names.add_child(type_label)
 	var life := AHKit.bar("enemy" if info.enemy else "hero", int(info.hp), maxi(1, int(info.max_hp)), tr("Vida %d/%d") % [info.hp, info.max_hp], "small")
 	life.name = "Life"
 	life.custom_minimum_size = Vector2(0, 24)
@@ -1215,6 +1265,8 @@ func _inspect_identity(info: Dictionary, level: int = 0) -> VBoxContainer:
 		instinct.custom_minimum_size = Vector2(0, 20)
 		column.add_child(instinct)
 	var speed := AHKit.label(tr("Velocidade %d · quem é mais rápido age antes") % info.speed if level < 1 else tr("Velocidade %d") % info.speed, "small", TEXT)
+	if type_name != "" and level >= 1:
+		speed.text += " · " + type_name
 	speed.name = "Speed"
 	speed.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	speed.custom_minimum_size.x = column.custom_minimum_size.x
@@ -1394,7 +1446,16 @@ func _dodge_tip(avoid: Rect2) -> void:
 		return
 	var left := avoid.position.x - 16 - _tip.size.x
 	var right := avoid.end.x + 16
-	_tip.position.x = left if left >= 16 and (avoid.get_center().x > 960 or right + _tip.size.x > 1904) else clampf(right, 16, 1904 - _tip.size.x)
+	if left >= 16 and (avoid.get_center().x > 960 or right + _tip.size.x > 1904):
+		_tip.position.x = left
+		return
+	# Sem a folga de um lado, o que menos cobre (no texto Maior, a dica larga e a plaqueta do ALVO com a vantagem, #227,
+	# não cabem lado a lado com folga: encostada na borda, a dica ainda pode não cobrir nada).
+	var at_left := maxf(16.0, left)
+	var at_right := clampf(right, 16.0, 1904.0 - _tip.size.x)
+	var cover_left := maxf(0.0, at_left + _tip.size.x - avoid.position.x)
+	var cover_right := maxf(0.0, avoid.end.x - at_right)
+	_tip.position.x = at_left if cover_left < cover_right else at_right
 
 
 ## A largura do corpo, em fração da altura, para a área do clique no alvo.
@@ -1941,18 +2002,30 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 	if rank > 0:
 		var ids: Array = session.hit_ids(_actor_id, option.id, rank)
 		var hits := PackedStringArray()
+		var advantage := false
 		for id in ids:
 			var unit := session.state.find_unit(id)
 			if unit == null:
 				continue
 			var note := tr("%s (vida %d)") % [_name(unit), unit.hp]
-			if not unit.is_player and ability.DamageRange.Max > 0 and session.effective_range(option.id, "damage", _actor_id).Max >= unit.hp:
+			# A previsão já com a vantagem de tipo (#227): o dano mais alto, com o tipo, derruba?
+			var bonus := _type_bonus(option.id, unit)
+			var most: int = session.effective_range(option.id, "damage", _actor_id).Max
+			if session.engine.is_machine(unit):
+				most = maxi(1, most * int(ability.MachineDamagePercent) / 100)
+			most = AHCombatEngine.typed_damage(most, bonus)
+			if not unit.is_player and ability.DamageRange.Max > 0 and most >= unit.hp:
 				note += tr(" · pode cair")
+			if bonus > 1.0:
+				note += " · " + tr("Vantagem +%d%%") % AHTypes.percent()
+				advantage = true
 			# Os estados do alvo por extenso: no foco, a dica faz o papel da dica do mouse sobre os ícones (#30).
 			note += _status_words(unit, terms)
 			hits.append(note)
 		if not hits.is_empty():
 			_tip_line(tr("Atinge: ") + "; ".join(hits), S.MIN_TEXT, S.DANGER if option.enemy_side else S.OK, "bold")
+		if advantage:
+			_tip_box.add_child(_advantage_row())
 	else:
 		# Sem mirar (o cartão com foco): os estados de quem está na luta, para quem joga no teclado, no controle ou no toque.
 		var actor := session.state.find_unit(_actor_id)
@@ -1985,6 +2058,31 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 		_tip_box.remove_child(last)
 		last.queue_free()
 	_place_tip(button)
+
+
+## A vantagem de tipo (#227) da habilidade de dano de quem age no alvo: o multiplicador do motor (1 sem vantagem).
+func _type_bonus(ability_id: String, unit: AHCombat.Unit) -> float:
+	var ability = session.data.abilities.get(ability_id) if ability_id != "" else null
+	if unit == null or ability == null or ability.DamageRange.Max <= 0:
+		return 1.0
+	return session.engine.type_multiplier(session.state.find_unit(_actor_id), unit)
+
+
+## A linha da vantagem na dica (#227): o ícone e o texto, além da cor.
+func _advantage_row() -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = "Advantage"
+	row.add_theme_constant_override("separation", 6)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var icon := AHKit.glyph(ADVANTAGE_GLYPH, S.px(20), AHKit.good())
+	icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(icon)
+	# Na largura das outras linhas da dica (sem esticar a caixa): quebra como elas.
+	var text := _kit_label(tr("Vantagem +%d%%: a linhagem ou a família de quem ataca vence a do alvo") % AHTypes.percent(), S.MIN_TEXT, AHKit.good(), "bold")
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.custom_minimum_size = Vector2(430 - S.px(20) - 6, 0)
+	row.add_child(text)
+	return row
 
 
 ## " · Sangra 2, Marcado" (vazio sem estados), e os termos de cada estado entram em terms, uma vez só.
@@ -2283,8 +2381,16 @@ func _paint_targets(pointed: int = -2) -> void:
 		if pointed >= 0 and int(marker.get_meta("rank")) == pointed and marker.has_meta("card"):
 			var unit = session.state.find_unit(String(marker.get_meta("unit_id", "")))
 			_target_label.text = _name(unit) if unit != null else tr("ALVO")
+			# A vantagem de tipo (#227) na plaqueta: o texto e o ícone, além da cor.
+			var bonus := _type_bonus(_pick_ability, unit)
+			if bonus > 1.0:
+				# O espaço do ícone à esquerda, dentro da plaqueta.
+				_target_label.text = "      " + _target_label.text + "  ·  +" + str(AHTypes.percent()) + "%"
+			var mark := _target_label.get_node("Advantage") as TextureRect
+			mark.visible = bonus > 1.0
 			(_target_label.get_node("Line") as ColorRect).color = AHKit.enemy_hp() if unit == null or not unit.is_player else AHKit.hero_hp()
 			_target_label.reset_size()
+			mark.position = Vector2(16, (_target_label.size.y - mark.size.y) * 0.5 - 2)
 			_target_label.visible = true
 			_target_label.set_meta("card", marker.get_meta("card"))
 
