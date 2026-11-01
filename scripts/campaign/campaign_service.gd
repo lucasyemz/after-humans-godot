@@ -177,7 +177,8 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		"inventory": {"seeds": 30, "scrap": 0, "fragments": 0, "bandages": 2, "relics": [], "items": {}},
 		# O memorial (antes do #118): ninguém mais entra; fica vazio, e os saves antigos voltam com os heróis.
 		"memorial": [],
-		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false},
+		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false,
+			"station_chatter": true},
 		# Estação (cômodos, civis, economia), noite da volta e fila de voluntários: AHStationRules.init_new_campaign.
 		"station": {},
 		"session": {"screen": "shelter", "expedition": null},

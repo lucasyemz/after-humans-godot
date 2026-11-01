@@ -25,7 +25,8 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd", "res://scripts/flow/station_grid.gd",
 	"res://scripts/flow/side_mission_rules.gd", "res://scripts/ui/mission_board.gd",
 	"res://scripts/flow/rescue_rules.gd",
-	"res://scripts/flow/type_advantage.gd", "res://scripts/flow/hero_skills.gd", "res://scripts/ui/station/dig_board.gd"]
+	"res://scripts/flow/type_advantage.gd", "res://scripts/flow/hero_skills.gd", "res://scripts/ui/station/dig_board.gd",
+	"res://scripts/flow/station_chatter.gd", "res://scripts/station/station_life.gd", "res://scripts/ui/kit/kit_bubble.gd", "res://scripts/ui/station/comic_reader.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
 	"abilities": ["DisplayName", "Description"], "classes": ["DisplayName", "Species", "Role", "Description"],
@@ -147,6 +148,16 @@ static func data_texts() -> Array:
 			out.append({"text": zone.name, "where": "scenarios.%s.zones" % file.get_basename()})
 		for prop in map.get("props", []):
 			out.append({"text": prop.name, "where": "scenarios.%s.props" % file.get_basename()})
+	# A Estação viva (#207): as falas e os pensamentos dos moradores e as tirinhas (o título, as legendas e quem fala).
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/station-chatter.json")):
+		for index in row.get("Lines", []).size():
+			out.append({"text": row.Lines[index].Text, "where": "station-chatter.%s.%d" % [row.Name, index]})
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/comics.json")):
+		out.append({"text": row.Title, "where": "comics.%s.Title" % row.Name})
+		for index in row.get("Panels", []).size():
+			for field in ["Caption", "Speaker"]:
+				if String(row.Panels[index].get(field, "")).strip_edges() != "":
+					out.append({"text": row.Panels[index][field], "where": "comics.%s.%d.%s" % [row.Name, index, field]})
 	# O tutorial (#144): os cartões da abertura e as dicas de cada passo.
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/tutorial.json")):
 		for index in row.get("Cards", []).size():

@@ -231,6 +231,8 @@ static func _station_defaults() -> Dictionary:
 		# As missões solo (#183): o quadro do dia e os relatórios de quem voltou.
 		# A semente nasce com a campanha (create_initial, ou AHSideMissions.state na migração).
 		"side_missions": {"day": -1, "board": [], "reports": []},
+		# As tirinhas já vistas pelo balão interativo da Estação viva (#207): saem do Próximo passo.
+		"comics_seen": [],
 	}
 
 
@@ -1619,6 +1621,10 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 		return {"title": TranslationServer.translate("Chegou alguém no trem"), "text": (TranslationServer.translate("%s esperam na plataforma. Veja o que trazem e decida quem fica; se a equipe partir antes, vão embora no trem.") if many
 			else TranslationServer.translate("%s espera na plataforma. Veja o que traz e decida se fica; se a equipe partir antes, vai embora no trem.")) % train_candidate_name(campaign),
 			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
+	# A tirinha do balão interativo (#207, decisão do Lucas): o objetivo leva o jogador a ver.
+	var story := AHStationChatter.story_step(campaign)
+	if not story.is_empty():
+		return story
 	if rest_block(campaign) == "":
 		return {"title": TranslationServer.translate("Esperar a recuperação"), "text": TranslationServer.translate("Ninguém pode partir: a equipe está em recuperação. Passe um dia na Estação, e cada caído fica um dia mais perto de voltar."),
 			"action": "rest", "button": TranslationServer.translate("Ver a Enfermaria"), "room": INFIRMARY}
