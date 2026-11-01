@@ -247,14 +247,21 @@ func enemy_art(enemy_id: String) -> Dictionary:
 
 
 func icon_path(ability_id: String) -> String:
-	return art.icons.get(ability_id, "")
+	return art.icons.get(art_id(ability_id), "")
+
+
+## A habilidade cuja arte (o ícone, as poses, o efeito e o som) esta usa: os desbloqueios (#259) ainda não têm arte
+## própria e usam a de uma parecida da mesma classe (ArtOf em data/abilities.json); as outras, a delas.
+static func art_id(ability_id: String) -> String:
+	var row = GameData.row("abilities", ability_id)
+	return String(row.get("ArtOf", ability_id)) if row != null else ability_id
 
 
 ## O ícone de uma habilidade fora da luta (a Sala dos Personagens, #60).
 static func icon_of(ability_id: String) -> String:
 	if _manifest.is_empty():
 		_manifest = JSON.parse_string(FileAccess.get_file_as_string(ART_MANIFEST))
-	return _manifest.get("icons", {}).get(ability_id, "")
+	return _manifest.get("icons", {}).get(art_id(ability_id), "")
 
 
 ## Pose de um personagem pelo nome: idle, hurt, death, attack1, defense, dodge, support ou uma fase de ação.
@@ -264,8 +271,9 @@ func show_pose(unit: AHCombat.Unit, pose: String, ability_id: String = "") -> vo
 		return
 	if unit.is_player:
 		var hero := hero_art(unit.hero_id)
-		if ability_id != "" and hero.get("actions", {}).has(ability_id) and hero.actions[ability_id].has(pose):
-			card.show_art(hero.actions[ability_id][pose])
+		var key := art_id(ability_id) if ability_id != "" else ""
+		if key != "" and hero.get("actions", {}).has(key) and hero.actions[key].has(pose):
+			card.show_art(hero.actions[key][pose])
 		elif hero.get("reactions", {}).has(pose):
 			card.show_art(hero.reactions[pose])
 		else:
@@ -618,7 +626,7 @@ func _play_action(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, 
 	var home := card.position
 	var hostile := targets.any(func(id): return session.state.find_unit(id) != null and session.state.find_unit(id).is_player != actor.is_player)
 	var action = null if actor.is_player else session.enemy_action(actor.enemy_id, ability_id)
-	var hero_action: Dictionary = hero_art(actor.hero_id).get("actions", {}).get(ability_id, {}) if actor.is_player else {}
+	var hero_action: Dictionary = _action_art(actor, ability_id) if actor.is_player else {}
 	var support: bool = not hostile or (action != null and (action.bIsDefend or action.TargetType == "Self"))
 	# Preparo: a pose de quem age, já na frente dos outros.
 	if actor.is_player:
@@ -670,7 +678,15 @@ func _advance(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, hero
 	var gap := struck.position.x - card.position.x
 	var direction := signf(gap)
 	var available := maxf(0.0, absf(gap) - ((card.body_height + struck.body_height) * 0.3 + 0.3))
-	if RANGED.has(ability_id) or ability_id.contains("tiro") or ability_id.contains("descarga"):
+	var key := art_id(ability_id)
+	# O desbloqueio (#259) com a arte de outra anda como a arte; o golpe de dano que só parte da frente (o Ombro de
+	# Carga) anda até o alvo.
+	var own = GameData.row("abilities", ability_id) if key != ability_id else null
+	var damage = own.get("DamageRange") if own != null else null
+	var melee: bool = damage is Dictionary and int(damage.get("Max", 0)) > 0 and Array(own.get("OriginRanks", [])).all(func(r): return int(r) <= 2)
+	# O desbloqueio sem dano (o Alerta de Perigo marca de onde está) dá só um passo curto.
+	var no_damage: bool = own != null and not (damage is Dictionary and int(damage.get("Max", 0)) > 0)
+	if no_damage or (not melee and (RANGED.has(key) or key.contains("tiro") or key.contains("descarga"))):
 		return direction * minf(available, card.body_height * 0.16)
 	if not actor.is_player:
 		return direction * available * 0.4
@@ -856,7 +872,7 @@ func _recoil(card: AHSpriteCard, contact_x, strength: float) -> void:
 
 
 func _spawn_vfx(actor: AHCombat.Unit, ability_id: String, target_id: String) -> void:
-	var vfx: Dictionary = hero_art(actor.hero_id).actions[ability_id].vfx
+	var vfx: Dictionary = _action_art(actor, ability_id).vfx
 	var target_card: AHSpriteCard = cards.get(target_id)
 	if target_card == null:
 		return
@@ -909,11 +925,17 @@ const ENEMY_CUES := "res://audio/combat/enemies/%s/%s.wav"
 
 
 func _hero_cue(actor: AHCombat.Unit, ability_id: String) -> String:
-	var prefix: String = HERO_CUES.get(actor.class_id, "")
-	var hero_class = session.data.classes.get(actor.class_id)
+	# O som é o da habilidade (o do desbloqueio, o da parecida, ArtOf, #259).
+	var key := art_id(ability_id)
+	var ability = session.data.abilities.get(key)
+	var class_id := String(ability.get("ClassId", "")) if ability != null else ""
+	if class_id == "":
+		class_id = actor.class_id
+	var prefix: String = HERO_CUES.get(class_id, "")
+	var hero_class = session.data.classes.get(class_id)
 	if prefix == "" or hero_class == null:
 		return ""
-	var index: int = hero_class.AbilityIds.find(ability_id)
+	var index: int = hero_class.AbilityIds.find(key)
 	return "%s%d" % [prefix, index + 1] if index >= 0 else ""
 
 
@@ -958,3 +980,18 @@ func show_ring(unit_id: String) -> void:
 		add_child(ring)
 	var card: AHSpriteCard = cards.get(unit_id) if unit_id != "" else null
 	ring.follow(card if active else null)
+
+
+## A arte de uma ação do herói: a da arte dele e, sem ela (o recrutado sem a pose daquela habilidade), o efeito do
+## fundador dono da habilidade, com o herói parado (sem pose de golpe própria).
+func _action_art(actor: AHCombat.Unit, ability_id: String) -> Dictionary:
+	var key := art_id(ability_id)
+	var own: Dictionary = hero_art(actor.hero_id).get("actions", {}).get(key, {})
+	if own.has("vfx"):
+		return own
+	for founder_id in art.heroes:
+		var action: Dictionary = art.heroes[founder_id].get("actions", {}).get(key, {})
+		if action.has("vfx"):
+			return own.merged({"vfx": action.vfx})
+	return own
+

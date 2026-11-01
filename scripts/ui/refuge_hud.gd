@@ -2636,9 +2636,14 @@ func _train_hero(hero_id: String, upgrade_id: String) -> void:
 	_training = ""
 	var entry = S.hero(Campaign.state, hero_id)
 	var upgrade = GameData.row("hero_upgrades", upgrade_id)
-	var next := AHHeroLevels.level(entry) + 1
-	_act(AHHeroLevels.train(Campaign.state, hero_id, upgrade_id),
-		tr("%s subiu para o nível %d: %s.") % [entry.display_name, next, tr(upgrade.DisplayName) if upgrade else ""], "res://audio/ui/forge_confirm.ogg")
+	var before := AHHeroLevels.level(entry)
+	var next := before + 1
+	var error := AHHeroLevels.train(Campaign.state, hero_id, upgrade_id)
+	var done := tr("%s subiu para o nível %d: %s.") % [entry.display_name, next, tr(upgrade.DisplayName) if upgrade else ""]
+	# Aprender (#259): a opção não está em hero-upgrades; o aviso diz o que aprendeu e onde escolher as que leva.
+	if upgrade_id.begins_with(AHHeroSkills.LEARN):
+		done = AHHeroSkills.learned_notice(entry, upgrade_id.trim_prefix(AHHeroSkills.LEARN), AHHeroLevels.level(entry) > before)
+	_act(error, done, "res://audio/ui/forge_confirm.ogg")
 
 
 func _cycle_relic(hero_id: String) -> void:
@@ -2673,6 +2678,11 @@ func _reset_draft() -> void:
 	for entry in S.living(c):
 		if team.size() < size and not team.has(entry.id) and S.can_deploy(entry):
 			team.append(entry.id)
+	# Quem entra no lugar de quem caiu vai para o fim: a equipe troca de lugar até cada um ter ataque da sua posição
+	# (#95), com as habilidades que cada um leva (#259).
+	var order := AHHeroSkills.valid_order(c, team)
+	if not order.is_empty():
+		team = order
 	_draft = {"phase": next, "team": team, "focus": S.focus_recommended(c), "extra": 0}
 
 

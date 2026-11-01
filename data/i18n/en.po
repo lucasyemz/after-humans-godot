@@ -151,7 +151,7 @@ msgstr "The save in slot %d could not be opened. A new campaign writes over it, 
 #: scripts/ui/title_screen.gd:514
 #: scripts/ui/exploration_hud.gd:1695
 #: scripts/ui/refuge_hud.gd:2438
-#: scripts/ui/station/character_room.gd:896
+#: scripts/ui/station/character_room.gd:1046
 msgid "Cancelar"
 msgstr "Cancel"
 
@@ -236,16 +236,18 @@ msgstr "+1 scrap"
 
 #: scripts/flow/fight_rewards.gd:130
 #: scripts/ui/station/station_report.gd:522
+#: scripts/flow/hero_skills.gd:197
 msgid "+%d fragmentos"
 msgstr "+%d fragments"
 
 #: scripts/flow/fight_rewards.gd:130
+#: scripts/flow/hero_skills.gd:197
 msgid "+1 fragmento"
 msgstr "+1 fragment"
 
 #: scripts/flow/fight_rewards.gd:132
 #: scripts/ui/station/station_report.gd:526
-#: scripts/flow/station_rules.gd:2081
+#: scripts/flow/station_rules.gd:2084
 msgid "+%d suprimentos"
 msgstr "+%d supplies"
 
@@ -263,8 +265,8 @@ msgid "+1 curativo"
 msgstr "+1 bandage"
 
 #: scripts/flow/fight_rewards.gd:137
-#: scripts/ui/character_sheet.gd:134
-#: scripts/ui/station/character_room.gd:730
+#: scripts/ui/character_sheet.gd:146
+#: scripts/ui/station/character_room.gd:853
 msgid "Relíquia: %s"
 msgstr "Relic: %s"
 
@@ -284,33 +286,42 @@ msgstr "Compartment %d"
 msgid "(sua)"
 msgstr "(yours)"
 
-#: scripts/flow/hero_levels.gd:89
+#: scripts/flow/hero_levels.gd:95
 msgid "Nível máximo."
 msgstr "Max level."
 
-#: scripts/flow/hero_levels.gd:91
-msgid "Falta XP: %d de %d."
-msgstr "Not enough XP: %d of %d."
-
-#: scripts/flow/hero_levels.gd:93
+#: scripts/flow/hero_levels.gd:98
+#: scripts/flow/hero_levels.gd:103
 msgid "Sementes insuficientes para o treino."
 msgstr "Not enough seeds for the training."
 
-#: scripts/flow/hero_levels.gd:95
+#: scripts/flow/hero_levels.gd:101
+msgid "Falta XP: %d de %d."
+msgstr "Not enough XP: %d of %d."
+
+#: scripts/flow/hero_levels.gd:105
 msgid "Nenhuma melhoria disponível."
 msgstr "No upgrade available."
 
-#: scripts/flow/hero_levels.gd:103
+#: scripts/flow/hero_levels.gd:113
 msgid "Herói não encontrado."
 msgstr "Hero not found."
 
-#: scripts/flow/hero_levels.gd:105
+#: scripts/flow/hero_levels.gd:115
 msgid "Só quem está vivo treina."
 msgstr "Only the living can train."
 
-#: scripts/flow/hero_levels.gd:114
+#: scripts/flow/hero_levels.gd:125
+msgid "Essa habilidade já foi aprendida ou ainda não está no Treino."
+msgstr "That ability was already learned or isn't in Training yet."
+
+#: scripts/flow/hero_levels.gd:126
 msgid "Essa melhoria não é desta espécie."
 msgstr "That upgrade is not for this species."
+
+#: scripts/flow/hero_levels.gd:129
+msgid "Fragmentos insuficientes: aprender custa mais %d."
+msgstr "Not enough fragments: learning costs %d more."
 
 #: scripts/ui/briefing_dialog.gd:108
 #: scripts/ui/briefing_dialog.gd:172
@@ -337,118 +348,135 @@ msgstr "At 0 health, still standing: the next blow has a 50% chance to bring the
 msgid "Começa cada jornada com 10 de instinto; trata-se no Alojamento."
 msgstr "Starts every journey with 10 instinct; treated in the Quarters."
 
-#: scripts/ui/character_sheet.gd:65
+#: scripts/ui/character_sheet.gd:66
 msgid "Laço com %s"
 msgstr "Bond with %s"
 
-#: scripts/ui/character_sheet.gd:66
+#: scripts/ui/character_sheet.gd:67
 msgid "Amizade %+d · em +3, quando um cai, o outro ergue a guarda (+1 bloqueio)"
 msgstr "Friendship %+d · at +3, when one falls, the other raises their guard (+1 block)"
 
-#: scripts/ui/character_sheet.gd:67
+#: scripts/ui/character_sheet.gd:68
 msgid "Rivalidade %+d · em −3, a falha de um abala o outro (+5 de instinto)"
 msgstr "Rivalry %+d · at −3, one's failure shakes the other (+5 instinct)"
 
-#: scripts/ui/character_sheet.gd:71
+#: scripts/ui/character_sheet.gd:72
 msgid "Máquina"
 msgstr "Machine"
 
-#: scripts/ui/character_sheet.gd:71
+#: scripts/ui/character_sheet.gd:72
 msgid "Criatura"
 msgstr "Creature"
 
-#: scripts/ui/character_sheet.gd:74
+#: scripts/ui/character_sheet.gd:75
 msgid "guardião do trecho"
 msgstr "guardian of the stretch"
 
-#: scripts/ui/character_sheet.gd:80
+#: scripts/ui/character_sheet.gd:81
 msgid "Resiste a dano por turno"
 msgstr "Resists damage over time"
 
-#: scripts/ui/character_sheet.gd:80
+#: scripts/ui/character_sheet.gd:81
 msgid "%d%% de chance de não sangrar nem contaminar"
 msgstr "%d%% chance to avoid bleeding and contamination"
 
-#: scripts/ui/character_sheet.gd:82
+#: scripts/ui/character_sheet.gd:83
 msgid "Resiste a deslocamento"
 msgstr "Resists displacement"
 
-#: scripts/ui/character_sheet.gd:82
+#: scripts/ui/character_sheet.gd:83
 msgid "%d%% de chance de não ser empurrado nem puxado"
 msgstr "%d%% chance to avoid being pushed or pulled"
 
-#: scripts/ui/character_sheet.gd:89
+#: scripts/ui/character_sheet.gd:90
 #: scripts/ui/combat_hud.gd:696
 msgid "Último Fôlego"
 msgstr "Last Breath"
 
-#: scripts/ui/character_sheet.gd:91
-#: scripts/ui/character_sheet.gd:113
+#: scripts/ui/character_sheet.gd:92
+#: scripts/ui/character_sheet.gd:114
 #: scripts/ui/combat_hud.gd:844
-#: scripts/combat/combat_engine.gd:324
+#: scripts/combat/combat_engine.gd:332
 msgid "Trauma"
 msgstr "Trauma"
 
-#: scripts/ui/character_sheet.gd:145
-#: scripts/ui/station/character_room.gd:432
+#: scripts/ui/character_sheet.gd:157
+#: scripts/ui/station/character_room.gd:549
 msgid "%s ×%d"
 msgstr "%s ×%d"
 
-#: scripts/ui/character_sheet.gd:295
+#: scripts/ui/character_sheet.gd:307
 #: scripts/ui/combat_hud.gd:1258
 #: scripts/ui/inventory_panel.gd:314
 msgid "Vida %d/%d"
 msgstr "Health %d/%d"
 
-#: scripts/ui/character_sheet.gd:298
+#: scripts/ui/character_sheet.gd:310
 #: scripts/ui/camp_hud.gd:333
 #: scripts/ui/combat_hud.gd:1263
 msgid "Instinto %d/200"
 msgstr "Instinct %d/200"
 
-#: scripts/ui/character_sheet.gd:300
-#: scripts/ui/character_sheet.gd:314
+#: scripts/ui/character_sheet.gd:312
+#: scripts/ui/character_sheet.gd:328
 #: scripts/ui/combat_hud.gd:1196
 msgid "Efeitos passivos"
 msgstr "Passive effects"
 
-#: scripts/ui/character_sheet.gd:300
-#: scripts/ui/character_sheet.gd:314
+#: scripts/ui/character_sheet.gd:312
+#: scripts/ui/character_sheet.gd:328
 #: scripts/ui/combat_hud.gd:1196
-#: scripts/ui/station/character_room.gd:633
+#: scripts/ui/station/character_room.gd:750
 msgid "Nenhum"
 msgstr "None"
 
-#: scripts/ui/character_sheet.gd:301
-#: scripts/ui/character_sheet.gd:315
+#: scripts/ui/character_sheet.gd:313
+#: scripts/ui/character_sheet.gd:329
 #: scripts/ui/combat_hud.gd:1197
 #: scripts/ui/combat_hud.gd:1211
 msgid "Estados"
 msgstr "Conditions"
 
-#: scripts/ui/character_sheet.gd:301
-#: scripts/ui/character_sheet.gd:315
+#: scripts/ui/character_sheet.gd:313
+#: scripts/ui/character_sheet.gd:329
 #: scripts/ui/combat_hud.gd:1197
 #: scripts/ui/combat_hud.gd:1211
 msgid "Nenhum agora"
 msgstr "None right now"
 
-#: scripts/ui/character_sheet.gd:308
+#: scripts/ui/character_sheet.gd:320
 #: scripts/ui/combat_hud.gd:838
 msgid "Instinto %d/200 · em 200, crise"
 msgstr "Instinct %d/200 · at 200, crisis"
 
-#: scripts/ui/character_sheet.gd:321
+#: scripts/ui/character_sheet.gd:337
+#: scripts/ui/station/character_room.gd:193
+msgid "Habilidades"
+msgstr "Abilities"
+
+#: scripts/ui/character_sheet.gd:338
+msgid "Na luta: %s"
+msgstr "In the fight: %s"
+
+#: scripts/ui/character_sheet.gd:340
+msgid "Na Estação: %s"
+msgstr "At the Station: %s"
+
+#: scripts/ui/character_sheet.gd:342
+msgid "Bloqueadas: %s"
+msgstr "Locked: %s"
+
+#: scripts/ui/character_sheet.gd:351
 #: scripts/ui/combat_hud.gd:1267
-#: scripts/ui/station/character_room.gd:459
+#: scripts/ui/station/character_room.gd:576
 msgid "Velocidade %d"
 msgstr "Speed %d"
 
-#: scripts/ui/character_sheet.gd:330
+#: scripts/ui/character_sheet.gd:360
 msgid "Velocidade %d · quem é mais rápido age antes na rodada"
 msgstr "Speed %d · the faster act earlier in the round"
 
-#: scripts/ui/character_sheet.gd:351
+#: scripts/ui/character_sheet.gd:381
 msgid "Nível"
 msgstr "Level"
 
@@ -644,7 +672,7 @@ msgstr "Press a key…"
 
 #: scripts/ui/options_panel.gd:121
 #: scripts/ui/exploration_hud.gd:790
-#: scripts/ui/station/character_room.gd:736
+#: scripts/ui/station/character_room.gd:859
 msgid "Trocar"
 msgstr "Change"
 
@@ -738,8 +766,8 @@ msgid "Patrulha"
 msgstr "Patrol"
 
 #: scripts/ui/exploration_hud.gd:32
-#: scripts/ui/refuge_hud.gd:2784
-#: scripts/ui/refuge_hud.gd:2847
+#: scripts/ui/refuge_hud.gd:2794
+#: scripts/ui/refuge_hud.gd:2857
 #: scripts/ui/station/station_report.gd:28
 msgid "Suprimentos"
 msgstr "Supplies"
@@ -791,7 +819,7 @@ msgstr "Finish the journey · Back to the Station"
 #: scripts/ui/exploration_hud.gd:339
 #: scripts/ui/exploration_hud.gd:790
 #: scripts/ui/camp_hud.gd:155
-#: scripts/ui/station/departure_screen.gd:585
+#: scripts/ui/station/departure_screen.gd:583
 msgid "Escolher"
 msgstr "Choose"
 
@@ -874,7 +902,7 @@ msgid "da "
 msgstr "the "
 
 #: scripts/ui/exploration_hud.gd:534
-#: scripts/ui/station/departure_screen.gd:624
+#: scripts/ui/station/departure_screen.gd:622
 #: scripts/ui/inventory_panel.gd:137
 msgid "Comida"
 msgstr "Food"
@@ -884,7 +912,7 @@ msgid "Da expedição: cura (Mochila, I) e o acampamento. O que sobrar não volt
 msgstr "Expedition food: heals (Backpack, I) and feeds the camp. Leftovers don't come back."
 
 #: scripts/ui/exploration_hud.gd:536
-#: scripts/ui/refuge_hud.gd:2866
+#: scripts/ui/refuge_hud.gd:2876
 msgid "Curativos"
 msgstr "Bandages"
 
@@ -1049,7 +1077,7 @@ msgstr "Bandages %d"
 #: scripts/ui/exploration_hud.gd:1637
 #: scripts/ui/exploration_hud.gd:1760
 #: scripts/ui/refuge_hud.gd:1728
-#: scripts/ui/station/character_room.gd:679
+#: scripts/ui/station/character_room.gd:802
 msgid "%d sementes"
 msgstr "%d seeds"
 
@@ -1230,7 +1258,7 @@ msgid "Curativo para %s: vida %d → %d de %d. Nada é gasto até confirmar."
 msgstr "Bandage for %s: life %d → %d of %d. Nothing is spent until you confirm."
 
 #: scripts/ui/camp_hud.gd:351
-#: scripts/flow/exploration_care.gd:160
+#: scripts/flow/exploration_care.gd:165
 msgid "%s está com a vida cheia."
 msgstr "%s is at full health."
 
@@ -1261,8 +1289,8 @@ msgstr "Move"
 
 #: scripts/ui/combat_hud.gd:65
 #: scripts/ui/combat_hud.gd:2158
-#: scripts/combat/combat_engine.gd:1252
-#: scripts/combat/combat_engine.gd:1265
+#: scripts/combat/combat_engine.gd:1260
+#: scripts/combat/combat_engine.gd:1273
 msgid "Defender"
 msgstr "Defend"
 
@@ -1344,7 +1372,7 @@ msgid "%d uso(s)"
 msgstr "%d use(s)"
 
 #: scripts/ui/combat_hud.gd:1699
-#: scripts/combat/combat_arena.gd:506
+#: scripts/combat/combat_arena.gd:514
 msgid "Vez de %s"
 msgstr "%s's turn"
 
@@ -1377,7 +1405,7 @@ msgid "+%d"
 msgstr "+%d"
 
 #: scripts/ui/combat_hud.gd:1862
-#: scripts/flow/station_rules.gd:776
+#: scripts/flow/station_rules.gd:778
 #: scripts/street/street_corridor.gd:1772
 #: scripts/flow/station_grid.gd:489
 msgid "%s e %s"
@@ -1449,7 +1477,7 @@ msgid " · pode cair"
 msgstr " · may fall"
 
 #: scripts/ui/combat_hud.gd:2020
-#: scripts/combat/combat_engine.gd:624
+#: scripts/combat/combat_engine.gd:633
 msgid "Vantagem +%d%%"
 msgstr "Advantage +%d%%"
 
@@ -1581,9 +1609,9 @@ msgid "Plataforma 1"
 msgstr "Platform 1"
 
 #: scripts/ui/refuge_hud.gd:627
-#: scripts/ui/refuge_hud.gd:2705
-#: scripts/ui/station/character_room.gd:937
-#: scripts/flow/station_rules.gd:1642
+#: scripts/ui/refuge_hud.gd:2715
+#: scripts/ui/station/character_room.gd:1087
+#: scripts/flow/station_rules.gd:1645
 msgid "Ir ao mapa"
 msgstr "Go to map"
 
@@ -1608,7 +1636,7 @@ msgstr "Open"
 #: scripts/ui/refuge_hud.gd:636
 #: scripts/ui/refuge_hud.gd:644
 #: scripts/ui/refuge_hud.gd:646
-#: scripts/ui/station/departure_screen.gd:585
+#: scripts/ui/station/departure_screen.gd:583
 msgid "Ocultar"
 msgstr "Hide"
 
@@ -1622,12 +1650,12 @@ msgstr "Camera"
 
 #: scripts/ui/refuge_hud.gd:644
 #: scripts/ui/refuge_hud.gd:646
-#: scripts/ui/station/character_room.gd:934
+#: scripts/ui/station/character_room.gd:1084
 msgid "Selecionar"
 msgstr "Select"
 
 #: scripts/ui/refuge_hud.gd:644
-#: scripts/ui/station/character_room.gd:935
+#: scripts/ui/station/character_room.gd:1085
 msgid "Ao lado"
 msgstr "Next room"
 
@@ -1664,7 +1692,7 @@ msgid "pular"
 msgstr "skip"
 
 #: scripts/ui/refuge_hud.gd:874
-#: scripts/flow/station_rules.gd:1603
+#: scripts/flow/station_rules.gd:1606
 msgid "Ver o relatório"
 msgstr "See the report"
 
@@ -1727,7 +1755,7 @@ msgstr "Still empty."
 #: scripts/ui/refuge_hud.gd:1943
 #: scripts/ui/refuge_hud.gd:2518
 #: scripts/ui/station/station_report.gd:652
-#: scripts/flow/station_rules.gd:1638
+#: scripts/flow/station_rules.gd:1641
 msgid "Recuperar"
 msgstr "Restore"
 
@@ -1736,7 +1764,7 @@ msgid "Ver"
 msgstr "View"
 
 #: scripts/ui/refuge_hud.gd:1948
-#: scripts/flow/station_rules.gd:1639
+#: scripts/flow/station_rules.gd:1642
 msgid "Ver %s"
 msgstr "See %s"
 
@@ -1907,14 +1935,14 @@ msgstr "All progress saved in slot %d (completed phases, rooms, resources and he
 
 #: scripts/ui/refuge_hud.gd:2518
 #: scripts/ui/station/station_report.gd:652
-#: scripts/flow/station_rules.gd:1638
+#: scripts/flow/station_rules.gd:1641
 msgid "Melhorar"
 msgstr "Upgrade"
 
 #: scripts/ui/refuge_hud.gd:2529
 #: scripts/ui/refuge_hud.gd:2610
-#: scripts/ui/refuge_hud.gd:2930
-#: scripts/ui/refuge_hud.gd:3487
+#: scripts/ui/refuge_hud.gd:2940
+#: scripts/ui/refuge_hud.gd:3497
 msgid "%s · %s"
 msgstr "%s · %s"
 
@@ -1955,657 +1983,657 @@ msgid "Pedido entregue: %s."
 msgstr "Request delivered: %s."
 
 #: scripts/ui/refuge_hud.gd:2615
-#: scripts/flow/station_rules.gd:2071
+#: scripts/flow/station_rules.gd:2074
 msgid "Pedido: %s"
 msgstr "Request: %s"
 
-#: scripts/ui/refuge_hud.gd:2641
+#: scripts/ui/refuge_hud.gd:2642
 msgid "%s subiu para o nível %d: %s."
 msgstr "%s reached level %d: %s."
 
-#: scripts/ui/refuge_hud.gd:2656
+#: scripts/ui/refuge_hud.gd:2661
 msgid "%s: %s."
 msgstr "%s: %s."
 
-#: scripts/ui/refuge_hud.gd:2656
+#: scripts/ui/refuge_hud.gd:2661
 msgid "sem relíquia"
 msgstr "no relic"
 
-#: scripts/ui/refuge_hud.gd:2700
-#: scripts/flow/station_rules.gd:1606
+#: scripts/ui/refuge_hud.gd:2710
+#: scripts/flow/station_rules.gd:1609
 msgid "Ir ao Dormitório"
 msgstr "Go to the Dormitory"
 
-#: scripts/ui/refuge_hud.gd:2702
-#: scripts/flow/station_rules.gd:1610
+#: scripts/ui/refuge_hud.gd:2712
 #: scripts/flow/station_rules.gd:1613
-#: scripts/flow/station_rules.gd:1618
+#: scripts/flow/station_rules.gd:1616
+#: scripts/flow/station_rules.gd:1621
 msgid "Ir à plataforma"
 msgstr "Go to the platform"
 
-#: scripts/ui/refuge_hud.gd:2704
+#: scripts/ui/refuge_hud.gd:2714
 msgid "Escolha o lugar no Mapa da Rede; a equipe se monta na Plataforma 1, ao lado do trem."
 msgstr "Choose the place on the Network Map; the team lines up on Platform 1, by the train."
 
-#: scripts/ui/refuge_hud.gd:2729
+#: scripts/ui/refuge_hud.gd:2739
 msgid "Partir"
 msgstr "Depart"
 
-#: scripts/ui/refuge_hud.gd:2781
+#: scripts/ui/refuge_hud.gd:2791
 msgid "Próxima volta (equipe de 4)"
 msgstr "Next return (team of 4)"
 
-#: scripts/ui/refuge_hud.gd:2785
+#: scripts/ui/refuge_hud.gd:2795
 msgid "%d no estoque"
 msgstr "%d in stock"
 
-#: scripts/ui/refuge_hud.gd:2785
+#: scripts/ui/refuge_hud.gd:2795
 msgid "+%d da Cantina"
 msgstr "+%d from the Canteen"
 
-#: scripts/ui/refuge_hud.gd:2786
+#: scripts/ui/refuge_hud.gd:2796
 msgid "%d para os moradores"
 msgstr "%d for the residents"
 
-#: scripts/ui/refuge_hud.gd:2786
+#: scripts/ui/refuge_hud.gd:2796
 msgid "a noite pede %d"
 msgstr "the night needs %d"
 
-#: scripts/ui/refuge_hud.gd:2787
+#: scripts/ui/refuge_hud.gd:2797
 msgid "%d depois da noite"
 msgstr "%d after the night"
 
-#: scripts/ui/refuge_hud.gd:2789
+#: scripts/ui/refuge_hud.gd:2799
 msgid "Acima da capacidade do Depósito (%d): %d estragam."
 msgstr "Above the Storeroom's capacity (%d): %d spoil."
 
-#: scripts/ui/refuge_hud.gd:2792
-#: scripts/ui/refuge_hud.gd:2868
+#: scripts/ui/refuge_hud.gd:2802
+#: scripts/ui/refuge_hud.gd:2878
 #: scripts/ui/station/station_report.gd:27
 #: scripts/ui/station/station_report.gd:27
 msgid "Água"
 msgstr "Water"
 
-#: scripts/ui/refuge_hud.gd:2793
+#: scripts/ui/refuge_hud.gd:2803
 msgid "%d na estação"
 msgstr "%d in the station"
 
-#: scripts/ui/refuge_hud.gd:2793
+#: scripts/ui/refuge_hud.gd:2803
 msgid "+%d do coletor"
 msgstr "+%d from the collector"
 
-#: scripts/ui/refuge_hud.gd:2794
+#: scripts/ui/refuge_hud.gd:2804
 msgid "a equipe e os moradores bebem %d"
 msgstr "the team and the residents drink %d"
 
-#: scripts/ui/refuge_hud.gd:2797
+#: scripts/ui/refuge_hud.gd:2807
 msgid "A água vai faltar na volta."
 msgstr "Water will run out on the return."
 
-#: scripts/ui/refuge_hud.gd:2800
-#: scripts/ui/refuge_hud.gd:3497
+#: scripts/ui/refuge_hud.gd:2810
+#: scripts/ui/refuge_hud.gd:3507
 msgid "Energia"
 msgstr "Power"
 
-#: scripts/ui/refuge_hud.gd:2802
+#: scripts/ui/refuge_hud.gd:2812
 msgid "%d de %d em uso"
 msgstr "%d of %d in use"
 
-#: scripts/ui/refuge_hud.gd:2803
+#: scripts/ui/refuge_hud.gd:2813
 msgid "%d livres"
 msgstr "%d free"
 
-#: scripts/ui/refuge_hud.gd:2803
+#: scripts/ui/refuge_hud.gd:2813
 msgid "1 livre"
 msgstr "1 free"
 
-#: scripts/ui/refuge_hud.gd:2805
+#: scripts/ui/refuge_hud.gd:2815
 msgid "Sem energia: %s."
 msgstr "No power: %s."
 
-#: scripts/ui/refuge_hud.gd:2809
+#: scripts/ui/refuge_hud.gd:2819
 msgid "Último ciclo (%d)"
 msgstr "Last cycle (%d)"
 
-#: scripts/ui/refuge_hud.gd:2810
+#: scripts/ui/refuge_hud.gd:2820
 msgid "A Cantina produziu %d; os moradores comeram %d; estragaram %d; a água foi %d de consumo para %d do coletor%s."
 msgstr "The Canteen produced %d; the residents ate %d; %d spoiled; water was %d consumed for %d from the collector%s."
 
-#: scripts/ui/refuge_hud.gd:2812
+#: scripts/ui/refuge_hud.gd:2822
 msgid " e faltou"
 msgstr " and ran short"
 
-#: scripts/ui/refuge_hud.gd:2859
+#: scripts/ui/refuge_hud.gd:2869
 #. scenarios.FloodedDepot.zones
 msgid "Estoque"
 msgstr "Stock"
 
-#: scripts/ui/refuge_hud.gd:2866
+#: scripts/ui/refuge_hud.gd:2876
 #: scripts/ui/station/station_report.gd:26
 #: scripts/ui/inventory_panel.gd:159
 msgid "Sementes"
 msgstr "Seeds"
 
-#: scripts/ui/refuge_hud.gd:2867
+#: scripts/ui/refuge_hud.gd:2877
 #: scripts/ui/station/station_report.gd:26
 #: scripts/ui/station/station_report.gd:26
 #: scripts/ui/inventory_panel.gd:160
 msgid "Sucata"
 msgstr "Scrap"
 
-#: scripts/ui/refuge_hud.gd:2867
+#: scripts/ui/refuge_hud.gd:2877
 #: scripts/ui/station/station_report.gd:27
 #: scripts/ui/inventory_panel.gd:160
 msgid "Fragmentos"
 msgstr "Fragments"
 
-#: scripts/ui/refuge_hud.gd:2885
+#: scripts/ui/refuge_hud.gd:2895
 msgid "Relíquias no estoque: %s"
 msgstr "Relics in stock: %s"
 
-#: scripts/ui/refuge_hud.gd:2885
-#: scripts/ui/refuge_hud.gd:2886
+#: scripts/ui/refuge_hud.gd:2895
+#: scripts/ui/refuge_hud.gd:2896
 msgid "nenhuma"
 msgstr "none"
 
-#: scripts/ui/refuge_hud.gd:2886
+#: scripts/ui/refuge_hud.gd:2896
 msgid "Ferramentas: %s"
 msgstr "Tools: %s"
 
-#: scripts/ui/refuge_hud.gd:2922
+#: scripts/ui/refuge_hud.gd:2932
 msgid "Relíquias"
 msgstr "Relics"
 
-#: scripts/ui/refuge_hud.gd:2922
+#: scripts/ui/refuge_hud.gd:2932
 msgid "Depois de recuperar"
 msgstr "After recovering"
 
-#: scripts/ui/refuge_hud.gd:2930
+#: scripts/ui/refuge_hud.gd:2940
 msgid "Estoque: %d"
 msgstr "Stock: %d"
 
-#: scripts/ui/refuge_hud.gd:2935
-#: scripts/ui/refuge_hud.gd:2939
+#: scripts/ui/refuge_hud.gd:2945
+#: scripts/ui/refuge_hud.gd:2949
 msgid "Fabricar"
 msgstr "Craft"
 
-#: scripts/ui/refuge_hud.gd:2943
+#: scripts/ui/refuge_hud.gd:2953
 msgid "Faltam %d sucata"
 msgstr "%d scrap missing"
 
-#: scripts/ui/refuge_hud.gd:2943
+#: scripts/ui/refuge_hud.gd:2953
 msgid "Faltam %d sucatas"
 msgstr "%d scrap missing"
 
-#: scripts/ui/refuge_hud.gd:2944
+#: scripts/ui/refuge_hud.gd:2954
 msgid "%s pronta. Equipe no Alojamento."
 msgstr "%s ready. Equip it in the Quarters."
 
-#: scripts/ui/refuge_hud.gd:2951
+#: scripts/ui/refuge_hud.gd:2961
 msgid "+%d Vida Máxima"
 msgstr "+%d Max Health"
 
-#: scripts/ui/refuge_hud.gd:2953
+#: scripts/ui/refuge_hud.gd:2963
 msgid "+%d Velocidade"
 msgstr "+%d Speed"
 
-#: scripts/ui/refuge_hud.gd:2955
+#: scripts/ui/refuge_hud.gd:2965
 msgid "−%d Instinto de eventos"
 msgstr "−%d Event instinct"
 
-#: scripts/ui/refuge_hud.gd:2961
+#: scripts/ui/refuge_hud.gd:2971
 msgid "Melhorias de classe"
 msgstr "Class upgrades"
 
-#: scripts/ui/refuge_hud.gd:2961
+#: scripts/ui/refuge_hud.gd:2971
 msgid "Estação"
 msgstr "Station"
 
-#: scripts/ui/refuge_hud.gd:2961
+#: scripts/ui/refuge_hud.gd:2971
 #: scripts/ui/station/departure_screen.gd:203
 #: scripts/ui/phase_map.gd:695
 msgid "Radar"
 msgstr "Radar"
 
-#: scripts/ui/refuge_hud.gd:2975
+#: scripts/ui/refuge_hud.gd:2985
 msgid "Depois de recuperar: %s"
 msgstr "After recovering: %s"
 
-#: scripts/ui/refuge_hud.gd:2995
+#: scripts/ui/refuge_hud.gd:3005
 msgid "leva %d expedições"
 msgstr "takes %d expeditions"
 
-#: scripts/ui/refuge_hud.gd:2995
+#: scripts/ui/refuge_hud.gd:3005
 msgid "leva 1 expedição"
 msgstr "takes 1 expedition"
 
-#: scripts/ui/refuge_hud.gd:3004
+#: scripts/ui/refuge_hud.gd:3014
 msgid "Pesquisado"
 msgstr "Researched"
 
-#: scripts/ui/refuge_hud.gd:3007
+#: scripts/ui/refuge_hud.gd:3017
 msgid "Requer %s"
 msgstr "Needs %s"
 
-#: scripts/ui/refuge_hud.gd:3011
-#: scripts/ui/refuge_hud.gd:3015
+#: scripts/ui/refuge_hud.gd:3021
+#: scripts/ui/refuge_hud.gd:3025
 msgid "Pesquisar"
 msgstr "Research"
 
-#: scripts/ui/refuge_hud.gd:3015
+#: scripts/ui/refuge_hud.gd:3025
 msgid "%s · %d"
 msgstr "%s · %d"
 
-#: scripts/ui/refuge_hud.gd:3015
+#: scripts/ui/refuge_hud.gd:3025
 msgid " + %d sucata"
 msgstr " + %d scrap"
 
-#: scripts/ui/refuge_hud.gd:3019
+#: scripts/ui/refuge_hud.gd:3029
 msgid "%s concluída."
 msgstr "%s done."
 
-#: scripts/ui/refuge_hud.gd:3032
+#: scripts/ui/refuge_hud.gd:3042
 msgid "Começar o dia"
 msgstr "Start the day"
 
-#: scripts/ui/refuge_hud.gd:3033
+#: scripts/ui/refuge_hud.gd:3043
 msgid "Ainda não amanheceu."
 msgstr "It isn't dawn yet."
 
-#: scripts/ui/refuge_hud.gd:3042
+#: scripts/ui/refuge_hud.gd:3052
 msgid "Ninguém precisa descansar agora. Depois de cada expedição, a equipe passa a noite aqui."
 msgstr "Nobody needs rest right now. After each expedition, the team spends the night here."
 
-#: scripts/ui/refuge_hud.gd:3049
+#: scripts/ui/refuge_hud.gd:3059
 msgid "Amanhecer · Dia %d"
 msgstr "Dawn · Day %d"
 
-#: scripts/ui/refuge_hud.gd:3058
+#: scripts/ui/refuge_hud.gd:3068
 msgid "A noite"
 msgstr "The night"
 
-#: scripts/ui/refuge_hud.gd:3067
+#: scripts/ui/refuge_hud.gd:3077
 msgid "1 suprimento comido"
 msgstr "1 supply eaten"
 
-#: scripts/ui/refuge_hud.gd:3067
+#: scripts/ui/refuge_hud.gd:3077
 msgid "%d suprimentos comidos"
 msgstr "%d supplies eaten"
 
-#: scripts/ui/refuge_hud.gd:3068
+#: scripts/ui/refuge_hud.gd:3078
 msgid "resta 1"
 msgstr "1 left"
 
-#: scripts/ui/refuge_hud.gd:3068
+#: scripts/ui/refuge_hud.gd:3078
 msgid "restam %d"
 msgstr "%d left"
 
-#: scripts/ui/refuge_hud.gd:3069
+#: scripts/ui/refuge_hud.gd:3079
 msgid "Água: %d na Estação"
 msgstr "Water: %d in the Station"
 
-#: scripts/ui/refuge_hud.gd:3082
+#: scripts/ui/refuge_hud.gd:3092
 msgid "Depois: %s"
 msgstr "Next: %s"
 
-#: scripts/ui/refuge_hud.gd:3088
+#: scripts/ui/refuge_hud.gd:3098
 msgid "%s ficou de vigia."
 msgstr "%s kept watch."
 
-#: scripts/ui/refuge_hud.gd:3091
+#: scripts/ui/refuge_hud.gd:3101
 msgid "+%d de vida"
 msgstr "+%d HP"
 
-#: scripts/ui/refuge_hud.gd:3093
+#: scripts/ui/refuge_hud.gd:3103
 msgid "−%d de instinto"
 msgstr "−%d instinct"
 
-#: scripts/ui/refuge_hud.gd:3094
+#: scripts/ui/refuge_hud.gd:3104
 msgid " (sem comida)"
 msgstr " (no food)"
 
-#: scripts/ui/refuge_hud.gd:3099
+#: scripts/ui/refuge_hud.gd:3109
 msgid "%s não pegou no sono: +%d de vida%s."
 msgstr "%s couldn't fall asleep: +%d HP%s."
 
-#: scripts/ui/refuge_hud.gd:3100
+#: scripts/ui/refuge_hud.gd:3110
 msgid "%s não pegou no sono%s."
 msgstr "%s couldn't fall asleep%s."
 
-#: scripts/ui/refuge_hud.gd:3102
+#: scripts/ui/refuge_hud.gd:3112
 msgid "%s dormiu, sem nada a recuperar%s."
 msgstr "%s slept, with nothing to recover%s."
 
-#: scripts/ui/refuge_hud.gd:3119
+#: scripts/ui/refuge_hud.gd:3129
 msgid "A noite não pode passar agora."
 msgstr "The night can't pass right now."
 
-#: scripts/ui/refuge_hud.gd:3147
-#: scripts/ui/refuge_hud.gd:3277
+#: scripts/ui/refuge_hud.gd:3157
+#: scripts/ui/refuge_hud.gd:3287
 msgid "Noite %d"
 msgstr "Night %d"
 
-#: scripts/ui/refuge_hud.gd:3151
+#: scripts/ui/refuge_hud.gd:3161
 msgid "A Estação dorme. O vigia escuta os trilhos."
 msgstr "The Station sleeps. The watch listens to the tracks."
 
-#: scripts/ui/refuge_hud.gd:3151
+#: scripts/ui/refuge_hud.gd:3161
 msgid "A Estação dorme. Ninguém vigia esta noite."
 msgstr "The Station sleeps. No one keeps watch tonight."
 
-#: scripts/ui/refuge_hud.gd:3158
+#: scripts/ui/refuge_hud.gd:3168
 msgid "%s / A: pular a noite"
 msgstr "%s / A: skip the night"
 
-#: scripts/ui/refuge_hud.gd:3204
+#: scripts/ui/refuge_hud.gd:3214
 msgid "Leitos: %d de %d ocupados"
 msgstr "Beds: %d of %d taken"
 
-#: scripts/ui/refuge_hud.gd:3211
+#: scripts/ui/refuge_hud.gd:3221
 msgid "Ninguém em recuperação. Quem cair numa expedição volta para cá antes de lutar de novo."
 msgstr "Nobody is recovering. Whoever falls on an expedition comes back here before fighting again."
 
-#: scripts/ui/refuge_hud.gd:3212
+#: scripts/ui/refuge_hud.gd:3222
 msgid "Ninguém em recuperação. Sem a Enfermaria, quem cair numa expedição se recupera no Dormitório."
 msgstr "Nobody is recovering. Without the Infirmary, whoever falls on an expedition recovers in the Dormitory."
 
-#: scripts/ui/refuge_hud.gd:3216
-#: scripts/ui/refuge_hud.gd:3224
+#: scripts/ui/refuge_hud.gd:3226
+#: scripts/ui/refuge_hud.gd:3234
 #: scripts/ui/mission_board.gd:252
 msgid "Esperar um dia"
 msgstr "Wait a day"
 
-#: scripts/ui/refuge_hud.gd:3216
-#: scripts/ui/refuge_hud.gd:3224
+#: scripts/ui/refuge_hud.gd:3226
+#: scripts/ui/refuge_hud.gd:3234
 msgid "Um dia passou na Estação."
 msgstr "A day went by at the Station."
 
-#: scripts/ui/refuge_hud.gd:3219
+#: scripts/ui/refuge_hud.gd:3229
 msgid "Sem a Enfermaria, quem caiu se recupera devagar no Dormitório."
 msgstr "Without the Infirmary, the fallen recover slowly in the Dormitory."
 
-#: scripts/ui/refuge_hud.gd:3223
+#: scripts/ui/refuge_hud.gd:3233
 msgid "Ninguém pode partir agora. Passar um dia na Estação gasta e produz como uma volta, e cada caído fica um dia mais perto."
 msgstr "Nobody can leave now. Spending a day at the Station uses and produces like a return, and each fallen animal gets one day closer."
 
-#: scripts/ui/refuge_hud.gd:3245
+#: scripts/ui/refuge_hud.gd:3255
 msgid "Vida %d/%d · %s"
 msgstr "Life %d/%d · %s"
 
-#: scripts/ui/refuge_hud.gd:3245
+#: scripts/ui/refuge_hud.gd:3255
 msgid "no leito"
 msgstr "in a bed"
 
-#: scripts/ui/refuge_hud.gd:3245
+#: scripts/ui/refuge_hud.gd:3255
 msgid "no Dormitório"
 msgstr "in the Dormitory"
 
-#: scripts/ui/refuge_hud.gd:3254
+#: scripts/ui/refuge_hud.gd:3264
 msgid "Curativo · −%d dia"
 msgstr "Bandage · −%d day"
 
-#: scripts/ui/refuge_hud.gd:3254
+#: scripts/ui/refuge_hud.gd:3264
 msgid "Curativo · −%d dias"
 msgstr "Bandage · −%d days"
 
-#: scripts/ui/refuge_hud.gd:3260
+#: scripts/ui/refuge_hud.gd:3270
 msgid "Gasta %d curativo(s) (tem %d)."
 msgstr "Uses %d bandage(s) (you have %d)."
 
-#: scripts/ui/refuge_hud.gd:3261
+#: scripts/ui/refuge_hud.gd:3271
 msgid "Curativo aplicado."
 msgstr "Bandage applied."
 
-#: scripts/ui/refuge_hud.gd:3279
+#: scripts/ui/refuge_hud.gd:3289
 msgid "%d dormindo · %d vigiando"
 msgstr "%d sleeping · %d on watch"
 
-#: scripts/ui/refuge_hud.gd:3280
+#: scripts/ui/refuge_hud.gd:3290
 msgid "+1 suprimento · %d sementes"
 msgstr "+1 supply · %d seeds"
 
-#: scripts/ui/refuge_hud.gd:3287
+#: scripts/ui/refuge_hud.gd:3297
 msgid "Sementes insuficientes."
 msgstr "Not enough seeds."
 
-#: scripts/ui/refuge_hud.gd:3287
+#: scripts/ui/refuge_hud.gd:3297
 msgid "Suprimento comprado."
 msgstr "Supply bought."
 
-#: scripts/ui/refuge_hud.gd:3290
+#: scripts/ui/refuge_hud.gd:3300
 msgid "Faltou água na volta: o descanso rende menos instinto."
 msgstr "Water ran short on the way back: rest recovers less instinct."
 
-#: scripts/ui/refuge_hud.gd:3299
+#: scripts/ui/refuge_hud.gd:3309
 msgid "Suprimentos: %d %s · %d %s"
 msgstr "Supplies: %d %s · %d %s"
 
-#: scripts/ui/refuge_hud.gd:3299
+#: scripts/ui/refuge_hud.gd:3309
 msgid "necessário"
 msgstr "needed"
 
-#: scripts/ui/refuge_hud.gd:3299
+#: scripts/ui/refuge_hud.gd:3309
 msgid "necessários"
 msgstr "needed"
 
-#: scripts/ui/refuge_hud.gd:3300
+#: scripts/ui/refuge_hud.gd:3310
 msgid "disponível"
 msgstr "available"
 
-#: scripts/ui/refuge_hud.gd:3300
+#: scripts/ui/refuge_hud.gd:3310
 msgid "disponíveis"
 msgstr "available"
 
-#: scripts/ui/refuge_hud.gd:3302
+#: scripts/ui/refuge_hud.gd:3312
 msgid "Faltam %d: os cartões marcados recuperam menos."
 msgstr "%d short: the marked cards recover less."
 
-#: scripts/ui/refuge_hud.gd:3303
+#: scripts/ui/refuge_hud.gd:3313
 msgid "Quem vigia não descansa, mas evita as perdas da noite (os ruídos, a goteira, as baratas)."
 msgstr "The watch doesn't rest, but prevents the night's losses (the noises, the leak, the cockroaches)."
 
-#: scripts/ui/refuge_hud.gd:3304
+#: scripts/ui/refuge_hud.gd:3314
 msgid "Iniciar descanso"
 msgstr "Start resting"
 
-#: scripts/ui/refuge_hud.gd:3324
+#: scripts/ui/refuge_hud.gd:3334
 msgid "Vida %d/%d  Instinto %d"
 msgstr "Life %d/%d  Instinct %d"
 
-#: scripts/ui/refuge_hud.gd:3326
+#: scripts/ui/refuge_hud.gd:3336
 msgid "Dormir"
 msgstr "Sleep"
 
-#: scripts/ui/refuge_hud.gd:3326
-#: scripts/ui/refuge_hud.gd:3338
+#: scripts/ui/refuge_hud.gd:3336
+#: scripts/ui/refuge_hud.gd:3348
 msgid "Vigiar"
 msgstr "Keep watch"
 
-#: scripts/ui/refuge_hud.gd:3347
+#: scripts/ui/refuge_hud.gd:3357
 msgid "Vigiando · não descansa e evita as perdas"
 msgstr "On watch · doesn't rest and prevents losses"
 
-#: scripts/ui/refuge_hud.gd:3349
+#: scripts/ui/refuge_hud.gd:3359
 msgid "%s · +%d de vida, %+d de instinto"
 msgstr "%s · +%d health, %+d instinct"
 
-#: scripts/ui/refuge_hud.gd:3349
+#: scripts/ui/refuge_hud.gd:3359
 msgid "Alimentado"
 msgstr "Fed"
 
-#: scripts/ui/refuge_hud.gd:3349
+#: scripts/ui/refuge_hud.gd:3359
 msgid "Sem alimentação"
 msgstr "Not fed"
 
-#: scripts/ui/refuge_hud.gd:3463
+#: scripts/ui/refuge_hud.gd:3473
 msgid "O trem parte"
 msgstr "The train leaves"
 
-#: scripts/ui/refuge_hud.gd:3464
+#: scripts/ui/refuge_hud.gd:3474
 msgid "As portas fecham; o trem volta para o túnel."
 msgstr "The doors close; the train heads back into the tunnel."
 
-#: scripts/ui/refuge_hud.gd:3476
-#: scripts/ui/refuge_hud.gd:3532
-#: scripts/ui/refuge_hud.gd:3598
-#: scripts/ui/refuge_hud.gd:3770
+#: scripts/ui/refuge_hud.gd:3486
+#: scripts/ui/refuge_hud.gd:3542
+#: scripts/ui/refuge_hud.gd:3608
+#: scripts/ui/refuge_hud.gd:3780
 msgid "O trem chegou"
 msgstr "The train arrived"
 
-#: scripts/ui/refuge_hud.gd:3484
+#: scripts/ui/refuge_hud.gd:3494
 msgid "%s quer morar na Estação"
 msgstr "%s wants to live at the Station"
 
-#: scripts/ui/refuge_hud.gd:3489
+#: scripts/ui/refuge_hud.gd:3499
 msgid "Ponto forte"
 msgstr "Strength"
 
-#: scripts/ui/refuge_hud.gd:3490
+#: scripts/ui/refuge_hud.gd:3500
 msgid "Ponto fraco"
 msgstr "Weakness"
 
-#: scripts/ui/refuge_hud.gd:3491
-#: scripts/ui/refuge_hud.gd:3565
+#: scripts/ui/refuge_hud.gd:3501
+#: scripts/ui/refuge_hud.gd:3575
 msgid "Pedido"
 msgstr "Request"
 
-#: scripts/ui/refuge_hud.gd:3494
+#: scripts/ui/refuge_hud.gd:3504
 msgid "Na próxima volta"
 msgstr "On the next return"
 
-#: scripts/ui/refuge_hud.gd:3495
+#: scripts/ui/refuge_hud.gd:3505
 msgid "Suprimentos depois da noite"
 msgstr "Supplies after the night"
 
-#: scripts/ui/refuge_hud.gd:3496
+#: scripts/ui/refuge_hud.gd:3506
 msgid "Água depois da noite"
 msgstr "Water after the night"
 
-#: scripts/ui/refuge_hud.gd:3517
+#: scripts/ui/refuge_hud.gd:3527
 msgid "A equipe ainda precisa passar a noite: decida depois do Dormitório, se preferir."
 msgstr "The team still has to spend the night: decide after the Dormitory, if you prefer."
 
-#: scripts/ui/refuge_hud.gd:3519
-#: scripts/ui/refuge_hud.gd:3579
+#: scripts/ui/refuge_hud.gd:3529
+#: scripts/ui/refuge_hud.gd:3589
 msgid "Acolher %s"
 msgstr "Take in %s"
 
-#: scripts/ui/refuge_hud.gd:3520
-#: scripts/ui/refuge_hud.gd:3581
+#: scripts/ui/refuge_hud.gd:3530
+#: scripts/ui/refuge_hud.gd:3591
 msgid "Recusar"
 msgstr "Decline"
 
-#: scripts/ui/refuge_hud.gd:3554
+#: scripts/ui/refuge_hud.gd:3564
 msgid "%s quer entrar na Estação"
 msgstr "%s wants to join the Station"
 
-#: scripts/ui/refuge_hud.gd:3565
+#: scripts/ui/refuge_hud.gd:3575
 msgid "Nada: a Estação ainda não fecha uma equipe de quatro."
 msgstr "Nothing: the Station still can't field a team of four."
 
-#: scripts/ui/refuge_hud.gd:3565
+#: scripts/ui/refuge_hud.gd:3575
 msgid "%d sementes (a Estação tem %d)."
 msgstr "%d seeds (the Station has %d)."
 
-#: scripts/ui/refuge_hud.gd:3576
+#: scripts/ui/refuge_hud.gd:3586
 msgid "Desceram dois: decida cada um, na ordem que quiser. O trem só parte depois dos dois."
 msgstr "Two got off: decide on each one, in any order. The train only leaves after both."
 
-#: scripts/ui/refuge_hud.gd:3577
+#: scripts/ui/refuge_hud.gd:3587
 msgid "Quem a Estação recusa vai embora no trem e não volta. Quem a equipe deixa sem resposta ao partir, também."
 msgstr "Whoever the Station turns away leaves on the train and doesn't come back. So does whoever the team leaves without an answer when it departs."
 
-#: scripts/ui/refuge_hud.gd:3607
+#: scripts/ui/refuge_hud.gd:3617
 msgid "Mercador de passagem"
 msgstr "Merchant passing through"
 
-#: scripts/ui/refuge_hud.gd:3610
+#: scripts/ui/refuge_hud.gd:3620
 msgid "Mercador · jacaré"
 msgstr "Merchant · caiman"
 
-#: scripts/ui/refuge_hud.gd:3611
+#: scripts/ui/refuge_hud.gd:3621
 msgid "Desce do trem sem dizer de onde vem. Abre a bolsa, mostra o que tem e espera a oferta."
 msgstr "He steps off the train without saying where he came from. He opens his bag, shows what he has and waits for an offer."
 
-#: scripts/ui/refuge_hud.gd:3612
+#: scripts/ui/refuge_hud.gd:3622
 msgid "Trocas desta visita"
 msgstr "Trades this visit"
 
-#: scripts/ui/refuge_hud.gd:3625
+#: scripts/ui/refuge_hud.gd:3635
 msgid "A Estação tem"
 msgstr "The Station has"
 
-#: scripts/ui/refuge_hud.gd:3628
+#: scripts/ui/refuge_hud.gd:3638
 msgid "Ele fica na plataforma até ser dispensado. A expedição só parte depois disso."
 msgstr "He stays on the platform until he is dismissed. The expedition can only leave after that."
 
-#: scripts/ui/refuge_hud.gd:3629
+#: scripts/ui/refuge_hud.gd:3639
 msgid "Dispensar o Sr. dos Trilhos"
 msgstr "Dismiss Mr. Rails"
 
-#: scripts/ui/refuge_hud.gd:3660
+#: scripts/ui/refuge_hud.gd:3670
 msgid "Negociar"
 msgstr "Trade"
 
-#: scripts/ui/refuge_hud.gd:3660
+#: scripts/ui/refuge_hud.gd:3670
 msgid "Esgotada"
 msgstr "Sold out"
 
-#: scripts/ui/refuge_hud.gd:3667
+#: scripts/ui/refuge_hud.gd:3677
 msgid "Esgotada nesta visita."
 msgstr "Sold out for this visit."
 
-#: scripts/ui/refuge_hud.gd:3667
+#: scripts/ui/refuge_hud.gd:3677
 msgid "Ainda sai %d vez nesta visita."
 msgstr "Available %d more time this visit."
 
-#: scripts/ui/refuge_hud.gd:3668
+#: scripts/ui/refuge_hud.gd:3678
 msgid "Ainda sai %d vezes nesta visita."
 msgstr "Available %d more times this visit."
 
-#: scripts/ui/refuge_hud.gd:3679
+#: scripts/ui/refuge_hud.gd:3689
 msgid "Troca feita: %s por %s."
 msgstr "Trade done: %s for %s."
 
-#: scripts/ui/refuge_hud.gd:3695
+#: scripts/ui/refuge_hud.gd:3705
 msgid "O Sr. dos Trilhos volta ao trem."
 msgstr "Mr. Rails goes back to the train."
 
-#: scripts/ui/refuge_hud.gd:3771
+#: scripts/ui/refuge_hud.gd:3781
 msgid "Quem estava em missão solo voltou no trem."
 msgstr "Whoever was on a solo mission came back on the train."
 
-#: scripts/ui/refuge_hud.gd:3772
+#: scripts/ui/refuge_hud.gd:3782
 msgid "Relatório das missões"
 msgstr "Mission report"
 
-#: scripts/ui/refuge_hud.gd:3780
+#: scripts/ui/refuge_hud.gd:3790
 #: scripts/ui/station/station_report.gd:637
 #: scripts/flow/side_mission_rules.gd:174
 msgid "Com os robôs"
 msgstr "With the robots"
 
-#: scripts/ui/refuge_hud.gd:3786
+#: scripts/ui/refuge_hud.gd:3796
 msgid "Receber"
 msgstr "Welcome back"
 
-#: scripts/ui/refuge_hud.gd:3793
+#: scripts/ui/refuge_hud.gd:3803
 msgid "%s de volta à Estação."
 msgstr "%s back at the Station."
 
-#: scripts/ui/refuge_hud.gd:3836
+#: scripts/ui/refuge_hud.gd:3846
 msgid "%s entra para a Estação."
 msgstr "%s joins the Station."
 
-#: scripts/ui/refuge_hud.gd:3836
+#: scripts/ui/refuge_hud.gd:3846
 msgid "%s segue no trem."
 msgstr "%s stays on the train."
 
-#: scripts/ui/refuge_hud.gd:3839
+#: scripts/ui/refuge_hud.gd:3849
 msgid "%s vai morar na Estação."
 msgstr "%s will live at the Station."
 
-#: scripts/ui/refuge_hud.gd:3839
+#: scripts/ui/refuge_hud.gd:3849
 msgid "%s segue no trem. Pode voltar numa próxima viagem."
 msgstr "%s stays on the train. They may come back on a later trip."
 
@@ -2721,7 +2749,7 @@ msgid "+%d XP"
 msgstr "+%d XP"
 
 #: scripts/ui/station/station_report.gd:458
-#: scripts/ui/station/character_room.gd:450
+#: scripts/ui/station/character_room.gd:567
 msgid "Vida"
 msgstr "Life"
 
@@ -2734,7 +2762,7 @@ msgid "Abates"
 msgstr "Kills"
 
 #: scripts/ui/station/station_report.gd:498
-#: scripts/ui/station/character_room.gd:730
+#: scripts/ui/station/character_room.gd:853
 msgid "Sem relíquia"
 msgstr "No relic"
 
@@ -2747,7 +2775,7 @@ msgid "+%d fragmento"
 msgstr "+%d fragment"
 
 #: scripts/ui/station/station_report.gd:524
-#: scripts/flow/station_rules.gd:2081
+#: scripts/flow/station_rules.gd:2084
 msgid "+%d sucata"
 msgstr "+%d scrap"
 
@@ -2807,7 +2835,7 @@ msgstr " (%d%% of what was found)"
 
 #: scripts/ui/station/station_report.gd:622
 #: scripts/ui/station/station_frame.gd:14
-#: scripts/flow/station_rules.gd:2246
+#: scripts/flow/station_rules.gd:2249
 msgid "Escavação"
 msgstr "Digging"
 
@@ -2908,7 +2936,7 @@ msgid "Mapa da Rede: %s"
 msgstr "Network Map: %s"
 
 #: scripts/ui/station/departure_screen.gd:224
-#: scripts/ui/station/departure_screen.gd:625
+#: scripts/ui/station/departure_screen.gd:623
 msgid "Foco da rota"
 msgstr "Route focus"
 
@@ -2984,263 +3012,313 @@ msgstr "Low life: bring food or bandages"
 msgid "Com trauma: começa com instinto alto"
 msgstr "Traumatized: starts with high instinct"
 
-#: scripts/ui/station/departure_screen.gd:488
+#: scripts/ui/station/departure_screen.gd:487
 msgid "%d de %d habilidades daqui"
 msgstr "%d of %d abilities from here"
 
-#: scripts/ui/station/departure_screen.gd:517
+#: scripts/ui/station/departure_screen.gd:515
 msgid "Ninguém na equipe cura em combate: leve curativos e comida."
 msgstr "Nobody on the team heals in combat: bring bandages and food."
 
-#: scripts/ui/station/departure_screen.gd:571
+#: scripts/ui/station/departure_screen.gd:569
 msgid "Voltar ao mapa"
 msgstr "Back to map"
 
-#: scripts/ui/station/departure_screen.gd:583
-#: scripts/ui/station/departure_screen.gd:616
-#: scripts/ui/station/departure_screen.gd:647
+#: scripts/ui/station/departure_screen.gd:581
+#: scripts/ui/station/departure_screen.gd:614
+#: scripts/ui/station/departure_screen.gd:645
 msgid "Iniciar expedição"
 msgstr "Start expedition"
 
-#: scripts/ui/station/departure_screen.gd:618
+#: scripts/ui/station/departure_screen.gd:616
 #: scripts/ui/phase_map.gd:193
 msgid "Lugar"
 msgstr "Place"
 
-#: scripts/ui/station/departure_screen.gd:618
+#: scripts/ui/station/departure_screen.gd:616
 msgid "nível %d+"
 msgstr "level %d+"
 
-#: scripts/ui/station/departure_screen.gd:623
+#: scripts/ui/station/departure_screen.gd:621
 msgid "Equipe"
 msgstr "Team"
 
-#: scripts/ui/station/departure_screen.gd:624
+#: scripts/ui/station/departure_screen.gd:622
 msgid "%d grátis + %d extras · %d sementes"
 msgstr "%d free + %d extra · %d seeds"
 
-#: scripts/ui/station/character_room.gd:21
+#: scripts/ui/station/character_room.gd:23
 msgid "Inimigo"
 msgstr "Enemy"
 
-#: scripts/ui/station/character_room.gd:21
+#: scripts/ui/station/character_room.gd:23
 msgid "Aliado"
 msgstr "Ally"
 
-#: scripts/ui/station/character_room.gd:21
+#: scripts/ui/station/character_room.gd:23
 msgid "Outro aliado"
 msgstr "Another ally"
 
-#: scripts/ui/station/character_room.gd:21
+#: scripts/ui/station/character_room.gd:23
 msgid "Si mesmo"
 msgstr "Self"
 
-#: scripts/ui/station/character_room.gd:135
+#: scripts/ui/station/character_room.gd:144
 msgid "Sala dos Personagens"
 msgstr "Characters Room"
 
-#: scripts/ui/station/character_room.gd:176
+#: scripts/ui/station/character_room.gd:187
 msgid "Ninguém no Alojamento agora. Quem chegar no trem aparece aqui."
 msgstr "No one in the Quarters right now. Whoever arrives on the train shows up here."
 
-#: scripts/ui/station/character_room.gd:182
-msgid "Habilidades"
-msgstr "Abilities"
-
-#: scripts/ui/station/character_room.gd:219
+#: scripts/ui/station/character_room.gd:242
 msgid "%d d"
 msgstr "%d d"
 
-#: scripts/ui/station/character_room.gd:294
+#: scripts/ui/station/character_room.gd:287
+msgid "na Estação"
+msgstr "at the Station"
+
+#: scripts/ui/station/character_room.gd:287
+msgid "bloqueada"
+msgstr "locked"
+
+#: scripts/ui/station/character_room.gd:327
+msgid "Bloqueada · %s"
+msgstr "Locked · %s"
+
+#: scripts/ui/station/character_room.gd:327
+msgid "Bloqueada."
+msgstr "Locked."
+
+#: scripts/ui/station/character_room.gd:333
+msgid "As outras se aprendem no Treino: %s."
+msgstr "The others are learned in Training: %s."
+
+#: scripts/ui/station/character_room.gd:338
+msgid "Trocar por"
+msgstr "Swap for"
+
+#: scripts/ui/station/character_room.gd:345
+msgid "Levar no lugar de"
+msgstr "Carry instead of"
+
+#: scripts/ui/station/character_room.gd:373
+msgid "%s leva %s."
+msgstr "%s carries %s."
+
+#: scripts/ui/station/character_room.gd:411
 msgid "Dano %d–%d"
 msgstr "Damage %d–%d"
 
-#: scripts/ui/station/character_room.gd:296
+#: scripts/ui/station/character_room.gd:413
 msgid "Cura %d–%d"
 msgstr "Healing %d–%d"
 
-#: scripts/ui/station/character_room.gd:299
+#: scripts/ui/station/character_room.gd:416
 msgid "Origem: posições %s"
 msgstr "From: positions %s"
 
-#: scripts/ui/station/character_room.gd:301
+#: scripts/ui/station/character_room.gd:418
 msgid "Alvo: posições %s"
 msgstr "Target: positions %s"
 
-#: scripts/ui/station/character_room.gd:315
+#: scripts/ui/station/character_room.gd:432
 msgid "os novos chegam de trem, na volta das expedições"
 msgstr "newcomers arrive by train, when expeditions return"
 
-#: scripts/ui/station/character_room.gd:324
+#: scripts/ui/station/character_room.gd:441
 msgid "Ampliar o Alojamento · %s"
 msgstr "Expand the Quarters · %s"
 
-#: scripts/ui/station/character_room.gd:329
+#: scripts/ui/station/character_room.gd:446
 msgid "Nível %d: %d heróis."
 msgstr "Level %d: %d heroes."
 
-#: scripts/ui/station/character_room.gd:330
+#: scripts/ui/station/character_room.gd:447
 msgid "O Alojamento cresceu: %s."
 msgstr "The Quarters grew: %s."
 
-#: scripts/ui/station/character_room.gd:341
+#: scripts/ui/station/character_room.gd:458
 msgid "%s esperam na plataforma"
 msgstr "%s are waiting on the platform"
 
-#: scripts/ui/station/character_room.gd:341
+#: scripts/ui/station/character_room.gd:458
 msgid "%s espera na plataforma"
 msgstr "%s waits on the platform"
 
-#: scripts/ui/station/character_room.gd:378
+#: scripts/ui/station/character_room.gd:495
 msgid "Personagem"
 msgstr "Character"
 
-#: scripts/ui/station/character_room.gd:393
+#: scripts/ui/station/character_room.gd:510
 msgid "Recruta"
 msgstr "Recruit"
 
-#: scripts/ui/station/character_room.gd:393
+#: scripts/ui/station/character_room.gd:510
 msgid "Fundador"
 msgstr "Founder"
 
-#: scripts/ui/station/character_room.gd:409
+#: scripts/ui/station/character_room.gd:526
 msgid "Nível %d · máximo"
 msgstr "Level %d · max"
 
-#: scripts/ui/station/character_room.gd:411
+#: scripts/ui/station/character_room.gd:528
 msgid "Nível %d · XP %d / %d"
 msgstr "Level %d · XP %d / %d"
 
-#: scripts/ui/station/character_room.gd:434
+#: scripts/ui/station/character_room.gd:551
 msgid "Melhorias: %s"
 msgstr "Upgrades: %s"
 
-#: scripts/ui/station/character_room.gd:460
+#: scripts/ui/station/character_room.gd:577
 msgid "Instinto %d / %d"
 msgstr "Instinct %d / %d"
 
-#: scripts/ui/station/character_room.gd:474
-#: scripts/flow/station_rules.gd:1621
+#: scripts/ui/station/character_room.gd:591
+#: scripts/flow/station_rules.gd:1624
 msgid "Ver a Enfermaria"
 msgstr "See the Infirmary"
 
-#: scripts/ui/station/character_room.gd:484
+#: scripts/ui/station/character_room.gd:601
 msgid "Trauma da última crise"
 msgstr "Trauma from the last crisis"
 
-#: scripts/ui/station/character_room.gd:487
+#: scripts/ui/station/character_room.gd:604
 msgid "Tratar (%d sementes)"
 msgstr "Treat (%d seeds)"
 
-#: scripts/ui/station/character_room.gd:489
+#: scripts/ui/station/character_room.gd:606
 msgid "Trauma tratado."
 msgstr "Trauma treated."
 
-#: scripts/ui/station/character_room.gd:495
+#: scripts/ui/station/character_room.gd:612
 msgid "Expedições %d"
 msgstr "Expeditions %d"
 
-#: scripts/ui/station/character_room.gd:500
+#: scripts/ui/station/character_room.gd:617
 msgid "Abates %d"
 msgstr "Kills %d"
 
-#: scripts/ui/station/character_room.gd:516
+#: scripts/ui/station/character_room.gd:633
 msgid "Roupa"
 msgstr "Outfit"
 
-#: scripts/ui/station/character_room.gd:522
-#: scripts/ui/station/character_room.gd:525
-#: scripts/ui/station/character_room.gd:525
+#: scripts/ui/station/character_room.gd:639
+#: scripts/ui/station/character_room.gd:642
+#: scripts/ui/station/character_room.gd:642
 msgid "Padrão"
 msgstr "Default"
 
-#: scripts/ui/station/character_room.gd:535
+#: scripts/ui/station/character_room.gd:652
 msgid "%s: %s"
 msgstr "%s: %s"
 
-#: scripts/ui/station/character_room.gd:535
+#: scripts/ui/station/character_room.gd:652
 msgid "A roupa de sempre."
 msgstr "The usual outfit."
 
-#: scripts/ui/station/character_room.gd:557
-#: scripts/ui/station/character_room.gd:569
+#: scripts/ui/station/character_room.gd:674
+#: scripts/ui/station/character_room.gd:686
 #: scripts/ui/phase_map.gd:137
 #: scripts/ui/phase_map.gd:846
 msgid "Bloqueada"
 msgstr "Locked"
 
-#: scripts/ui/station/character_room.gd:592
+#: scripts/ui/station/character_room.gd:709
 msgid "%s volta à roupa de sempre."
 msgstr "%s is back in the usual outfit."
 
-#: scripts/ui/station/character_room.gd:592
+#: scripts/ui/station/character_room.gd:709
 msgid "%s veste %s."
 msgstr "%s wears %s."
 
-#: scripts/ui/station/character_room.gd:607
+#: scripts/ui/station/character_room.gd:724
 msgid "Posto"
 msgstr "Post"
 
-#: scripts/ui/station/character_room.gd:611
+#: scripts/ui/station/character_room.gd:728
 msgid "Em recuperação: sem posto até voltar."
 msgstr "Recovering: no post until back."
 
-#: scripts/ui/station/character_room.gd:613
+#: scripts/ui/station/character_room.gd:730
 msgid "Sem posto: descansa enquanto a equipe está fora."
 msgstr "No post: rests while the team is away."
 
-#: scripts/ui/station/character_room.gd:639
+#: scripts/ui/station/character_room.gd:756
 msgid " · %s sai de lá"
 msgstr " · %s leaves it"
 
-#: scripts/ui/station/character_room.gd:673
+#: scripts/ui/station/character_room.gd:792
 msgid "nível máximo"
 msgstr "max level"
 
-#: scripts/ui/station/character_room.gd:675
-msgid "faltam %d XP"
-msgstr "%d XP short"
-
-#: scripts/ui/station/character_room.gd:677
+#: scripts/ui/station/character_room.gd:794
+#: scripts/ui/station/character_room.gd:800
 msgid "faltam sementes"
 msgstr "not enough seeds"
 
-#: scripts/ui/station/character_room.gd:679
-#: scripts/ui/station/character_room.gd:851
+#: scripts/ui/station/character_room.gd:798
+msgid "faltam %d XP"
+msgstr "%d XP short"
+
+#: scripts/ui/station/character_room.gd:802
+#: scripts/ui/station/character_room.gd:979
 #: scripts/flow/station_grid.gd:472
+#: scripts/flow/hero_skills.gd:192
 msgid "1 semente"
 msgstr "1 seed"
 
-#: scripts/ui/station/character_room.gd:680
-#: scripts/ui/station/character_room.gd:909
+#: scripts/ui/station/character_room.gd:803
+#: scripts/ui/station/character_room.gd:1059
 msgid "Treinar"
 msgstr "Train"
 
-#: scripts/ui/station/character_room.gd:731
+#: scripts/ui/station/character_room.gd:854
 msgid "Equipe uma relíquia ao preparar a expedição."
 msgstr "Equip a relic when preparing the expedition."
 
-#: scripts/ui/station/character_room.gd:757
+#: scripts/ui/station/character_room.gd:880
 msgid "Traços"
 msgstr "Traits"
 
-#: scripts/ui/station/character_room.gd:778
+#: scripts/ui/station/character_room.gd:901
 msgid "Pontos fortes"
 msgstr "Strengths"
 
-#: scripts/ui/station/character_room.gd:778
+#: scripts/ui/station/character_room.gd:901
 msgid "Pontos fracos"
 msgstr "Weaknesses"
 
-#: scripts/ui/station/character_room.gd:848
+#: scripts/ui/station/character_room.gd:975
 msgid "Treino · nível %d"
 msgstr "Training · level %d"
 
-#: scripts/ui/station/character_room.gd:851
+#: scripts/ui/station/character_room.gd:975
+msgid "Treino"
+msgstr "Training"
+
+#: scripts/ui/station/character_room.gd:977
+msgid "No nível máximo, o treino ensina o que falta: custa os fragmentos e %s."
+msgstr "At max level, training teaches what is left: it costs the fragments and %s."
+
+#: scripts/ui/station/character_room.gd:980
+msgid "Escolha uma melhoria ou uma habilidade para aprender. O treino gasta o XP do nível e %s."
+msgstr "Choose an upgrade or an ability to learn. Training spends the level's XP and %s."
+
+#: scripts/ui/station/character_room.gd:981
 msgid "Escolha uma melhoria. O treino gasta o XP do nível e %s."
 msgstr "Choose an upgrade. Training spends the level's XP and %s."
 
-#: scripts/ui/station/character_room.gd:879
+#: scripts/ui/station/character_room.gd:1019
+msgid "Custa também %d fragmentos"
+msgstr "Also costs %d fragments"
+
+#: scripts/ui/station/character_room.gd:1019
+msgid "Custa também 1 fragmento"
+msgstr "Also costs 1 fragment"
+
+#: scripts/ui/station/character_room.gd:1025
 msgid "Já tem: %d"
 msgstr "Already has: %d"
 
@@ -3996,780 +4074,781 @@ msgstr "the monitoring records"
 msgid "mais 1 fragmento por volta"
 msgstr "1 more fragment per return"
 
-#: scripts/flow/station_rules.gd:349
+#: scripts/flow/station_rules.gd:351
 msgid "A recuperação deste cômodo chega numa próxima fase."
 msgstr "Restoring this room comes in a later phase."
 
-#: scripts/flow/station_rules.gd:350
+#: scripts/flow/station_rules.gd:352
 msgid "Este cômodo já está no nível máximo."
 msgstr "This room is already at its maximum level."
 
-#: scripts/flow/station_rules.gd:358
+#: scripts/flow/station_rules.gd:360
 msgid "Faltam %s."
 msgstr "%s missing."
 
-#: scripts/flow/station_rules.gd:366
+#: scripts/flow/station_rules.gd:368
 msgid "Este cômodo já mudou de nível."
 msgstr "This room has already changed level."
 
-#: scripts/flow/station_rules.gd:391
+#: scripts/flow/station_rules.gd:393
 msgid "Este cômodo já tem lugar na Estação."
 msgstr "This room already has a place in the Station."
 
-#: scripts/flow/station_rules.gd:400
+#: scripts/flow/station_rules.gd:402
 msgid "%s não cabe nessa vaga."
 msgstr "%s does not fit in that slot."
 
-#: scripts/flow/station_rules.gd:417
+#: scripts/flow/station_rules.gd:419
 #: scripts/street/street_corridor.gd:1567
 #: scripts/ui/mission_board.gd:194
 msgid "sucata"
 msgstr "scrap"
 
-#: scripts/flow/station_rules.gd:417
-#: scripts/flow/station_rules.gd:977
+#: scripts/flow/station_rules.gd:419
+#: scripts/flow/station_rules.gd:979
 #: scripts/street/street_corridor.gd:1567
 msgid "sucatas"
 msgstr "scrap"
 
-#: scripts/flow/station_rules.gd:419
+#: scripts/flow/station_rules.gd:421
 #: scripts/street/street_corridor.gd:1568
 msgid "fragmento"
 msgstr "fragment"
 
-#: scripts/flow/station_rules.gd:419
-#: scripts/flow/station_rules.gd:979
+#: scripts/flow/station_rules.gd:421
+#: scripts/flow/station_rules.gd:981
 #: scripts/street/street_corridor.gd:1568
 #: scripts/ui/mission_board.gd:196
 msgid "fragmentos"
 msgstr "fragments"
 
-#: scripts/flow/station_rules.gd:420
+#: scripts/flow/station_rules.gd:422
 msgid "sem custo"
 msgstr "no cost"
 
-#: scripts/flow/station_rules.gd:420
+#: scripts/flow/station_rules.gd:422
 msgid " e "
 msgstr " and "
 
-#: scripts/flow/station_rules.gd:425
+#: scripts/flow/station_rules.gd:427
 msgid "Conhecer e acompanhar os moradores do abrigo."
 msgstr "Get to know and keep up with the shelter's residents."
 
-#: scripts/flow/station_rules.gd:426
+#: scripts/flow/station_rules.gd:428
 msgid "Preparo e consumo de alimentos."
 msgstr "Preparing and eating food."
 
-#: scripts/flow/station_rules.gd:427
-#: scripts/flow/station_rules.gd:500
+#: scripts/flow/station_rules.gd:429
+#: scripts/flow/station_rules.gd:502
 msgid "Um lugar para conversar e fazer uma pausa."
 msgstr "A place to talk and take a break."
 
-#: scripts/flow/station_rules.gd:428
+#: scripts/flow/station_rules.gd:430
 msgid "Descanso e abrigo para a comunidade."
 msgstr "Rest and shelter for the community."
 
-#: scripts/flow/station_rules.gd:429
+#: scripts/flow/station_rules.gd:431
 msgid "Reparar e adaptar equipamentos recuperados."
 msgstr "Repair and adapt recovered equipment."
 
-#: scripts/flow/station_rules.gd:430
+#: scripts/flow/station_rules.gd:432
 msgid "Guardar e organizar suprimentos."
 msgstr "Store and organize supplies."
 
-#: scripts/flow/station_rules.gd:431
+#: scripts/flow/station_rules.gd:433
 msgid "Analisar materiais e organizar informações recuperadas."
 msgstr "Analyze materials and organize recovered information."
 
-#: scripts/flow/station_rules.gd:432
+#: scripts/flow/station_rules.gd:434
 msgid "Organizar a equipe e os suprimentos antes de sair."
 msgstr "Organize the team and supplies before setting out."
 
-#: scripts/flow/station_rules.gd:451
+#: scripts/flow/station_rules.gd:453
 msgid "! Faltam %d nesta noite"
 msgstr "! %d short tonight"
 
-#: scripts/flow/station_rules.gd:451
+#: scripts/flow/station_rules.gd:453
 msgid "Abastecida · demanda %d"
 msgstr "Stocked · demand %d"
 
-#: scripts/flow/station_rules.gd:453
+#: scripts/flow/station_rules.gd:455
 msgid "! %d acima de %d"
 msgstr "! %d over %d"
 
-#: scripts/flow/station_rules.gd:455
-#: scripts/flow/station_rules.gd:465
+#: scripts/flow/station_rules.gd:457
+#: scripts/flow/station_rules.gd:467
 msgid "! Falta na volta"
 msgstr "! Short on the return"
 
-#: scripts/flow/station_rules.gd:457
-#: scripts/flow/station_rules.gd:465
+#: scripts/flow/station_rules.gd:459
+#: scripts/flow/station_rules.gd:467
 msgid "Próxima volta: %d"
 msgstr "Next return: %d"
 
-#: scripts/flow/station_rules.gd:460
+#: scripts/flow/station_rules.gd:462
 msgid "COMIDA"
 msgstr "FOOD"
 
-#: scripts/flow/station_rules.gd:460
+#: scripts/flow/station_rules.gd:462
 msgid "%d / %d suprimentos"
 msgstr "%d / %d supplies"
 
-#: scripts/flow/station_rules.gd:462
+#: scripts/flow/station_rules.gd:464
 msgid "Estoque e capacidade do Depósito. Na próxima volta, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d."
 msgstr "Storeroom stock and capacity. On the next return, with no loot: +%d from the Canteen, %d for the residents, %d spoil, %d for the night; %d left."
 
-#: scripts/flow/station_rules.gd:464
+#: scripts/flow/station_rules.gd:466
 msgid "ÁGUA"
 msgstr "WATER"
 
-#: scripts/flow/station_rules.gd:464
+#: scripts/flow/station_rules.gd:466
 msgid "%d em estoque"
 msgstr "%d in stock"
 
-#: scripts/flow/station_rules.gd:466
+#: scripts/flow/station_rules.gd:468
 msgid "Na próxima volta, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto."
 msgstr "On the next return, with no loot: the collector adds %d and the team and residents drink %d; %d left. Without water, rest lowers instinct less."
 
-#: scripts/flow/station_rules.gd:468
+#: scripts/flow/station_rules.gd:470
 msgid "ENERGIA"
 msgstr "POWER"
 
-#: scripts/flow/station_rules.gd:468
+#: scripts/flow/station_rules.gd:470
 msgid "%d / %d em uso"
 msgstr "%d / %d in use"
 
-#: scripts/flow/station_rules.gd:469
+#: scripts/flow/station_rules.gd:471
 msgid "! %d %s sem energia"
 msgstr "! %d %s without power"
 
-#: scripts/flow/station_rules.gd:469
+#: scripts/flow/station_rules.gd:471
 msgid "sala"
 msgstr "room"
 
-#: scripts/flow/station_rules.gd:469
+#: scripts/flow/station_rules.gd:471
 msgid "salas"
 msgstr "rooms"
 
-#: scripts/flow/station_rules.gd:470
+#: scripts/flow/station_rules.gd:472
 msgid "livre"
 msgstr "free"
 
-#: scripts/flow/station_rules.gd:470
+#: scripts/flow/station_rules.gd:472
 msgid "livres"
 msgstr "free"
 
-#: scripts/flow/station_rules.gd:471
+#: scripts/flow/station_rules.gd:473
 msgid "Os cômodos ligados gastam energia; sem ela, param."
 msgstr "Powered rooms use power; without it, they stop."
 
-#: scripts/flow/station_rules.gd:489
+#: scripts/flow/station_rules.gd:491
 msgid "Oficina vazia. Recuperada, fabrica relíquias e gasta 1 de energia."
 msgstr "Empty workshop. Restored, it crafts relics and uses 1 power."
 
-#: scripts/flow/station_rules.gd:490
+#: scripts/flow/station_rules.gd:492
 msgid "Fabrica relíquias por 3 sucatas. Gasta 1 de energia."
 msgstr "Crafts relics for 3 scrap. Uses 1 power."
 
-#: scripts/flow/station_rules.gd:490
+#: scripts/flow/station_rules.gd:492
 msgid "Bancada melhorada: relíquias por 2 sucatas."
 msgstr "Upgraded workbench: relics for 2 scrap."
 
-#: scripts/flow/station_rules.gd:492
+#: scripts/flow/station_rules.gd:494
 msgid "Laboratório vazio. Recuperado, libera as melhorias de classe e gasta 1 de energia."
 msgstr "Empty laboratory. Restored, it unlocks class upgrades and uses 1 power."
 
-#: scripts/flow/station_rules.gd:493
+#: scripts/flow/station_rules.gd:495
 msgid "Melhorias de classe com fragmentos. Gasta 1 de energia."
 msgstr "Class upgrades with fragments. Uses 1 power."
 
-#: scripts/flow/station_rules.gd:497
+#: scripts/flow/station_rules.gd:499
 msgid "Sem camas: a equipe dorme no chão depois de cada volta. Com os beliches, cabem %d ajudantes."
 msgstr "No beds: the team sleeps on the floor after each return. With bunks, it fits %d helpers."
 
-#: scripts/flow/station_rules.gd:498
+#: scripts/flow/station_rules.gd:500
 msgid "Beliches de ferro: a equipe dorme neles depois de cada volta. Cabem %d ajudantes."
 msgstr "Iron bunks: the team sleeps in them after each return. It fits %d helpers."
 
-#: scripts/flow/station_rules.gd:500
+#: scripts/flow/station_rules.gd:502
 msgid "Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa."
 msgstr "Empty hall. Restored, it becomes a place to talk and take a break."
 
-#: scripts/flow/station_rules.gd:503
+#: scripts/flow/station_rules.gd:505
 msgid "Cantina construída: com energia, produz %d suprimentos por expedição."
 msgstr "Built Canteen: with power, makes %d supplies per expedition."
 
-#: scripts/flow/station_rules.gd:504
+#: scripts/flow/station_rules.gd:506
 msgid "Com energia, produz 2 suprimentos por expedição."
 msgstr "With power, makes 2 supplies per expedition."
 
-#: scripts/flow/station_rules.gd:506
+#: scripts/flow/station_rules.gd:508
 msgid "Guarda até 12 suprimentos; o excesso estraga na volta."
 msgstr "Holds up to 12 supplies; the excess spoils on the return."
 
-#: scripts/flow/station_rules.gd:506
+#: scripts/flow/station_rules.gd:508
 msgid "Prateleiras extras: guarda até 20."
 msgstr "Extra shelves: holds up to 20."
 
-#: scripts/flow/station_rules.gd:509
+#: scripts/flow/station_rules.gd:511
 msgid "Escolher a fase, a equipe, o foco da rota e os suprimentos da partida."
 msgstr "Choose the phase, the team, the route focus and the departure supplies."
 
-#: scripts/flow/station_rules.gd:510
+#: scripts/flow/station_rules.gd:512
 msgid "Escolher a partida e mandar heróis em missões solo."
 msgstr "Choose the departure and send heroes on solo missions."
 
-#: scripts/flow/station_rules.gd:513
+#: scripts/flow/station_rules.gd:515
 msgid "Elenco, treino, trauma e relíquias. Comporta %d heróis."
 msgstr "Roster, training, trauma and relics. Holds %d heroes."
 
-#: scripts/flow/station_rules.gd:516
+#: scripts/flow/station_rules.gd:518
 msgid "Sala de primeiros socorros da estação, com as macas tombadas. Recuperada, os caídos se recuperam mais rápido num leito."
 msgstr "The station's first-aid room, with the stretchers knocked over. Once restored, the fallen recover faster in a bed."
 
-#: scripts/flow/station_rules.gd:517
+#: scripts/flow/station_rules.gd:519
 msgid "As macas do antigo posto de primeiros socorros viraram leitos. %d leitos: no leito, quem caiu volta em %d dias, e cada curativo tira %d."
 msgstr "The stretchers from the old first-aid post became beds. %d beds: in a bed, the fallen are back in %d days, and each bandage takes off %d."
 
-#: scripts/flow/station_rules.gd:811
+#: scripts/flow/station_rules.gd:813
 msgid "O Alojamento está cheio (%d de %d heróis): não há lugar para %s agora."
 msgstr "The Quarters are full (%d of %d heroes): there is no room for %s right now."
 
-#: scripts/flow/station_rules.gd:814
+#: scripts/flow/station_rules.gd:816
 msgid "Faltam sementes: %s pede %d."
 msgstr "Not enough seeds: %s asks for %d."
 
-#: scripts/flow/station_rules.gd:846
+#: scripts/flow/station_rules.gd:848
 msgid "Ninguém está esperando na plataforma."
 msgstr "Nobody is waiting on the platform."
 
-#: scripts/flow/station_rules.gd:849
+#: scripts/flow/station_rules.gd:851
 msgid "O Sr. dos Trilhos não fica na Estação: ele troca e segue no trem quando for dispensado."
 msgstr "Mr. Rails does not stay at the Station: he trades and leaves on the train when dismissed."
 
-#: scripts/flow/station_rules.gd:862
+#: scripts/flow/station_rules.gd:864
 msgid "Não há lugar para mais ajudantes (%d de %d)."
 msgstr "There is no room for more helpers (%d of %d)."
 
-#: scripts/flow/station_rules.gd:912
+#: scripts/flow/station_rules.gd:914
 msgid "O Sr. dos Trilhos"
 msgstr "Mr. Rails"
 
-#: scripts/flow/station_rules.gd:937
-#: scripts/flow/station_rules.gd:966
+#: scripts/flow/station_rules.gd:939
+#: scripts/flow/station_rules.gd:968
 msgid "O Sr. dos Trilhos não está na plataforma."
 msgstr "Mr. Rails is not on the platform."
 
-#: scripts/flow/station_rules.gd:940
+#: scripts/flow/station_rules.gd:942
 msgid "Troca desconhecida."
 msgstr "Unknown trade."
 
-#: scripts/flow/station_rules.gd:942
+#: scripts/flow/station_rules.gd:944
 msgid "Nesta visita, ele não faz mais essa troca."
 msgstr "He won't make this trade again this visit."
 
-#: scripts/flow/station_rules.gd:946
+#: scripts/flow/station_rules.gd:948
 msgid "Faltam %s: a troca pede %s."
 msgstr "Not enough %s: the trade needs %s."
 
-#: scripts/flow/station_rules.gd:975
+#: scripts/flow/station_rules.gd:977
 #: scripts/street/street_corridor.gd:1018
 #: scripts/street/street_corridor.gd:1567
 #: scripts/ui/mission_board.gd:192
 msgid "sementes"
 msgstr "seeds"
 
-#: scripts/flow/station_rules.gd:986
+#: scripts/flow/station_rules.gd:988
 msgid "%d semente"
 msgstr "%d seed"
 
-#: scripts/flow/station_rules.gd:1247
-#: scripts/flow/station_rules.gd:1262
+#: scripts/flow/station_rules.gd:1249
+#: scripts/flow/station_rules.gd:1264
 msgid "Os suprimentos não bastaram para todos. Quem dormiu sem comida recuperou menos."
 msgstr "The supplies weren't enough for everyone. Whoever slept without food recovered less."
 
-#: scripts/flow/station_rules.gd:1249
-#: scripts/flow/station_rules.gd:1264
+#: scripts/flow/station_rules.gd:1251
+#: scripts/flow/station_rules.gd:1266
 msgid "Faltou água para quem voltou. O descanso foi pior: menos Instinto recuperado."
 msgstr "There wasn't enough water for those who came back. Rest was worse: less Instinct recovered."
 
-#: scripts/flow/station_rules.gd:1251
+#: scripts/flow/station_rules.gd:1253
 msgid "Ruídos distantes inquietaram os adormecidos: recuperação de Instinto reduzida em 3."
 msgstr "Distant noises unsettled the sleepers: Instinct recovery reduced by 3."
 
-#: scripts/flow/station_rules.gd:1252
+#: scripts/flow/station_rules.gd:1254
 msgid "O vigia verificou os ruídos distantes. Os demais puderam descansar em segurança."
 msgstr "The lookout checked the distant noises. The others could rest safely."
 
-#: scripts/flow/station_rules.gd:1253
+#: scripts/flow/station_rules.gd:1255
 #. night-events.0.Text
 msgid "A noite passou tranquila. O abrigo permaneceu seguro."
 msgstr "The night passed quietly. The shelter stayed safe."
 
-#: scripts/flow/station_rules.gd:1317
+#: scripts/flow/station_rules.gd:1319
 msgid "Essa classe ainda não chegou à Estação."
 msgstr "That class hasn't reached the Station yet."
 
-#: scripts/flow/station_rules.gd:1319
+#: scripts/flow/station_rules.gd:1321
 msgid "O Alojamento está cheio (%d de %d heróis)."
 msgstr "The Quarters are full (%d of %d heroes)."
 
-#: scripts/flow/station_rules.gd:1324
+#: scripts/flow/station_rules.gd:1326
 msgid "Ninguém novo dessa classe chega agora: todos os rostos dela já estão na Estação."
 msgstr "No one new of this class is coming now: every face of it is already at the Station."
 
-#: scripts/flow/station_rules.gd:1327
+#: scripts/flow/station_rules.gd:1329
 msgid "Sementes insuficientes (custa 10 sementes)."
 msgstr "Not enough seeds (costs 10 seeds)."
 
-#: scripts/flow/station_rules.gd:1440
+#: scripts/flow/station_rules.gd:1442
 msgid "Somente sobreviventes podem ser tratados."
 msgstr "Only survivors can be treated."
 
-#: scripts/flow/station_rules.gd:1442
+#: scripts/flow/station_rules.gd:1444
 msgid "%s não tem trauma."
 msgstr "%s has no trauma."
 
-#: scripts/flow/station_rules.gd:1444
+#: scripts/flow/station_rules.gd:1446
 msgid "Sementes insuficientes (custa 5 sementes)."
 msgstr "Not enough seeds (costs 5 seeds)."
 
-#: scripts/flow/station_rules.gd:1452
+#: scripts/flow/station_rules.gd:1454
 msgid "Pesquisa desconhecida."
 msgstr "Unknown research."
 
-#: scripts/flow/station_rules.gd:1454
+#: scripts/flow/station_rules.gd:1456
 msgid "Recupere o Centro de Pesquisa para pesquisar."
 msgstr "Restore the Research Center to research."
 
-#: scripts/flow/station_rules.gd:1456
+#: scripts/flow/station_rules.gd:1458
 msgid "Essa melhoria já foi pesquisada."
 msgstr "That upgrade has already been researched."
 
-#: scripts/flow/station_rules.gd:1458
+#: scripts/flow/station_rules.gd:1460
 msgid "Fragmentos insuficientes (custa %d)."
 msgstr "Not enough fragments (costs %d)."
 
-#: scripts/flow/station_rules.gd:1465
+#: scripts/flow/station_rules.gd:1467
 msgid "Relíquia desconhecida."
 msgstr "Unknown relic."
 
-#: scripts/flow/station_rules.gd:1467
+#: scripts/flow/station_rules.gd:1469
 msgid "Recupere a Forja para fabricar relíquias."
 msgstr "Restore the Forge to craft relics."
 
-#: scripts/flow/station_rules.gd:1470
+#: scripts/flow/station_rules.gd:1472
 msgid "Sucata insuficiente (custa %d sucatas)."
 msgstr "Not enough scrap (costs %d scrap)."
 
-#: scripts/flow/station_rules.gd:1479
+#: scripts/flow/station_rules.gd:1481
 msgid "Só animais vivos usam relíquias."
 msgstr "Only living animals use relics."
 
-#: scripts/flow/station_rules.gd:1481
+#: scripts/flow/station_rules.gd:1483
 msgid "Já está equipada."
 msgstr "It's already equipped."
 
-#: scripts/flow/station_rules.gd:1483
+#: scripts/flow/station_rules.gd:1485
 msgid "Essa relíquia não está no estoque."
 msgstr "That relic isn't in stock."
 
-#: scripts/flow/station_rules.gd:1513
-#: scripts/flow/station_rules.gd:1518
+#: scripts/flow/station_rules.gd:1515
+#: scripts/flow/station_rules.gd:1520
 msgid "Esta jornada pede %s vivos na equipe."
 msgstr "This journey needs %s on the team, all alive."
 
-#: scripts/flow/station_rules.gd:1523
+#: scripts/flow/station_rules.gd:1525
 msgid "No máximo dois animais da mesma classe na mesma equipe."
 msgstr "At most two animals of the same class on the same team."
 
-#: scripts/flow/station_rules.gd:1544
+#: scripts/flow/station_rules.gd:1546
 msgid "%s ainda não tem arte de combate e fica na Estação por enquanto."
 msgstr "%s doesn't have combat art yet and stays at the Station for now."
 
-#: scripts/flow/station_rules.gd:1550
+#: scripts/flow/station_rules.gd:1552
 msgid "animal"
 msgstr "animal"
 
-#: scripts/flow/station_rules.gd:1550
+#: scripts/flow/station_rules.gd:1552
 msgid "animais"
 msgstr "animals"
 
-#: scripts/flow/station_rules.gd:1552
+#: scripts/flow/station_rules.gd:1554
 msgid "%d ou %d animais"
 msgstr "%d or %d animals"
 
-#: scripts/flow/station_rules.gd:1553
+#: scripts/flow/station_rules.gd:1555
 msgid "%d a %d animais"
 msgstr "%d to %d animals"
 
-#: scripts/flow/station_rules.gd:1602
+#: scripts/flow/station_rules.gd:1605
 msgid "Ver o que a equipe trouxe"
 msgstr "See what the team brought back"
 
-#: scripts/flow/station_rules.gd:1602
+#: scripts/flow/station_rules.gd:1605
 msgid "O relatório da última expedição está pronto: o achado, quem voltou e como a Estação passou o ciclo."
 msgstr "The report from the last expedition is ready: what was found, who came back and how the Station got through the cycle."
 
-#: scripts/flow/station_rules.gd:1605
+#: scripts/flow/station_rules.gd:1608
 msgid "Passar a noite"
 msgstr "Spend the night"
 
-#: scripts/flow/station_rules.gd:1605
+#: scripts/flow/station_rules.gd:1608
 msgid "A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."
 msgstr "The team needs to sleep before setting out again. In the Dormitory, choose who keeps watch and sleep: whoever sleeps eats and recovers health and instinct."
 
-#: scripts/flow/station_rules.gd:1609
+#: scripts/flow/station_rules.gd:1612
 msgid "O trem trouxe quem estava em missão"
 msgstr "The train brought back whoever was on a mission"
 
-#: scripts/flow/station_rules.gd:1609
+#: scripts/flow/station_rules.gd:1612
 msgid "Quem terminou a missão solo voltou no trem, com o relatório do que achou lá fora."
 msgstr "Whoever finished their solo mission came back on the train, with a report of what they found out there."
 
-#: scripts/flow/station_rules.gd:1612
+#: scripts/flow/station_rules.gd:1615
 msgid "O Mercador está na plataforma"
 msgstr "The Merchant is on the platform"
 
-#: scripts/flow/station_rules.gd:1612
+#: scripts/flow/station_rules.gd:1615
 msgid "O Sr. dos Trilhos veio no trem para trocar sementes, sucata e fragmentos. Troque o que quiser e dispense-o antes de preparar a expedição."
 msgstr "Mr. Rails came on the train to trade seeds, scrap and fragments. Trade what you like and dismiss him before preparing the expedition."
 
-#: scripts/flow/station_rules.gd:1616
+#: scripts/flow/station_rules.gd:1619
 msgid "Chegou alguém no trem"
 msgstr "Someone came on the train"
 
-#: scripts/flow/station_rules.gd:1616
+#: scripts/flow/station_rules.gd:1619
 msgid "%s esperam na plataforma. Veja o que trazem e decida quem fica; se a equipe partir antes, vão embora no trem."
 msgstr "%s are waiting on the platform. See what they bring and decide who stays; if the team leaves first, they go away on the train."
 
-#: scripts/flow/station_rules.gd:1617
+#: scripts/flow/station_rules.gd:1620
 msgid "%s espera na plataforma. Veja o que traz e decida se fica; se a equipe partir antes, vai embora no trem."
 msgstr "%s waits on the platform. See what they bring and decide whether they stay; if the team departs first, they leave on the train."
 
-#: scripts/flow/station_rules.gd:1620
+#: scripts/flow/station_rules.gd:1623
 msgid "Esperar a recuperação"
 msgstr "Wait for recovery"
 
-#: scripts/flow/station_rules.gd:1620
+#: scripts/flow/station_rules.gd:1623
 msgid "Ninguém pode partir: a equipe está em recuperação. Passe um dia na Estação, e cada caído fica um dia mais perto de voltar."
 msgstr "Nobody can leave: the team is recovering. Spend a day at the Station, and each fallen animal gets one day closer to coming back."
 
-#: scripts/flow/station_rules.gd:1638
+#: scripts/flow/station_rules.gd:1641
 msgid "%s Custa %s."
 msgstr "%s Costs %s."
 
-#: scripts/flow/station_rules.gd:1640
+#: scripts/flow/station_rules.gd:1643
 msgid "Trazer %s para %s %s"
 msgstr "Bring %s to %s %s"
 
-#: scripts/flow/station_rules.gd:1640
+#: scripts/flow/station_rules.gd:1643
 msgid "reabrir"
 msgstr "reopen"
 
-#: scripts/flow/station_rules.gd:1640
+#: scripts/flow/station_rules.gd:1643
 msgid "melhorar"
 msgstr "upgrade"
 
-#: scripts/flow/station_rules.gd:1641
+#: scripts/flow/station_rules.gd:1644
 msgid "%s As jornadas trazem sucata e fragmentos das buscas."
 msgstr "%s The journeys bring back scrap and fragments from the searches."
 
-#: scripts/flow/station_rules.gd:1654
+#: scripts/flow/station_rules.gd:1657
 msgid "Partir para %s"
 msgstr "Set out for %s"
 
-#: scripts/flow/station_rules.gd:1658
+#: scripts/flow/station_rules.gd:1661
 msgid "Voltar às ruas"
 msgstr "Back to the streets"
 
-#: scripts/flow/station_rules.gd:1658
+#: scripts/flow/station_rules.gd:1661
 msgid "Os Antigos ainda existem? A pergunta voltou com a equipe. Dá para jogar qualquer fase de novo pelo mapa."
 msgstr "Do the Ancients still exist? The question came back with the team. Any phase can be played again from the map."
 
-#: scripts/flow/station_rules.gd:1687
+#: scripts/flow/station_rules.gd:1690
 msgid "Volta amanhã"
 msgstr "Back tomorrow"
 
-#: scripts/flow/station_rules.gd:1687
+#: scripts/flow/station_rules.gd:1690
 msgid "Volta em %d dias"
 msgstr "Back in %d days"
 
-#: scripts/flow/station_rules.gd:1693
+#: scripts/flow/station_rules.gd:1696
 msgid "na Enfermaria"
 msgstr "in the Infirmary"
 
-#: scripts/flow/station_rules.gd:1693
+#: scripts/flow/station_rules.gd:1696
 msgid "em recuperação no Dormitório"
 msgstr "recovering in the Dormitory"
 
-#: scripts/flow/station_rules.gd:1694
+#: scripts/flow/station_rules.gd:1697
 msgid "%s está %s: %s."
 msgstr "%s is %s: %s."
 
-#: scripts/flow/station_rules.gd:1794
+#: scripts/flow/station_rules.gd:1797
 msgid "Ninguém para tratar."
 msgstr "Nobody to treat."
 
-#: scripts/flow/station_rules.gd:1796
+#: scripts/flow/station_rules.gd:1799
 msgid "O curativo só faz efeito num leito da Enfermaria."
 msgstr "A bandage only works in an Infirmary bed."
 
-#: scripts/flow/station_rules.gd:1798
+#: scripts/flow/station_rules.gd:1801
 msgid "%s já recebeu um curativo hoje."
 msgstr "%s already got a bandage today."
 
-#: scripts/flow/station_rules.gd:1801
-#: scripts/flow/exploration_care.gd:87
-#: scripts/flow/exploration_care.gd:167
+#: scripts/flow/station_rules.gd:1804
+#: scripts/flow/exploration_care.gd:92
+#: scripts/flow/exploration_care.gd:172
 msgid "Sem curativos no estoque."
 msgstr "No bandages in stock."
 
-#: scripts/flow/station_rules.gd:1828
+#: scripts/flow/station_rules.gd:1831
 msgid "Ninguém em recuperação."
 msgstr "Nobody is recovering."
 
-#: scripts/flow/station_rules.gd:1830
+#: scripts/flow/station_rules.gd:1833
 msgid "Ainda há quem possa partir."
 msgstr "Someone can still leave."
 
-#: scripts/flow/station_rules.gd:1882
-#: scripts/flow/station_rules.gd:1882
-#: scripts/flow/station_rules.gd:1882
-#: scripts/flow/station_rules.gd:1883
+#: scripts/flow/station_rules.gd:1885
+#: scripts/flow/station_rules.gd:1885
+#: scripts/flow/station_rules.gd:1885
+#: scripts/flow/station_rules.gd:1886
 msgid "a "
 msgstr "the "
 
-#: scripts/flow/station_rules.gd:1882
-#: scripts/flow/station_rules.gd:1882
-#: scripts/flow/station_rules.gd:1882
-#: scripts/flow/station_rules.gd:1882
+#: scripts/flow/station_rules.gd:1885
+#: scripts/flow/station_rules.gd:1885
+#: scripts/flow/station_rules.gd:1885
+#: scripts/flow/station_rules.gd:1885
 msgid "o "
 msgstr "the "
 
-#: scripts/flow/station_rules.gd:1892
+#: scripts/flow/station_rules.gd:1895
 msgid "Dispense o Sr. dos Trilhos antes de partir."
 msgstr "Dismiss Mr. Rails before leaving."
 
-#: scripts/flow/station_rules.gd:1896
+#: scripts/flow/station_rules.gd:1899
 msgid "Receba o trem antes de partir."
 msgstr "Meet the train before setting out."
 
-#: scripts/flow/station_rules.gd:1903
+#: scripts/flow/station_rules.gd:1906
 msgid "Conclua a noite no Dormitório antes de partir."
 msgstr "Finish the night in the Dormitory before setting out."
 
-#: scripts/flow/station_rules.gd:1905
+#: scripts/flow/station_rules.gd:1908
 msgid "A equipe já está numa expedição."
 msgstr "The team is already on an expedition."
 
-#: scripts/flow/station_rules.gd:1920
+#: scripts/flow/station_rules.gd:1923
 msgid "Esta jornada pede %s diferentes na equipe."
 msgstr "This journey needs %s, all different."
 
-#: scripts/flow/station_rules.gd:1924
+#: scripts/flow/station_rules.gd:1927
 msgid "Só integrantes vivos podem partir."
 msgstr "Only living members can set out."
 
-#: scripts/flow/station_rules.gd:1928
+#: scripts/flow/station_rules.gd:1931
 msgid "%s não tem ataque na posição %d."
 msgstr "%s has no attack from position %d."
 
-#: scripts/flow/station_rules.gd:1933
+#: scripts/flow/station_rules.gd:1936
 msgid "Foco de rota desconhecido."
 msgstr "Unknown route focus."
 
-#: scripts/flow/station_rules.gd:1935
+#: scripts/flow/station_rules.gd:1938
 msgid "Esse pedido não está aberto: o morador não está na Estação ou já recebeu o item."
 msgstr "That request isn't open: the resident isn't at the Station or has already received the item."
 
-#: scripts/flow/station_rules.gd:1937
+#: scripts/flow/station_rules.gd:1940
 msgid "Suprimentos acima do limite."
 msgstr "Supplies over the limit."
 
-#: scripts/flow/station_rules.gd:1939
+#: scripts/flow/station_rules.gd:1942
 msgid "Sementes insuficientes para os suprimentos selecionados."
 msgstr "Not enough seeds for the selected supplies."
 
-#: scripts/flow/station_rules.gd:1941
+#: scripts/flow/station_rules.gd:1944
 msgid "Essa fase ainda está bloqueada."
 msgstr "That phase is still locked."
 
-#: scripts/flow/station_rules.gd:1945
+#: scripts/flow/station_rules.gd:1948
 msgid "A expedição não pôde começar."
 msgstr "The expedition couldn't start."
 
-#: scripts/flow/station_rules.gd:2072
+#: scripts/flow/station_rules.gd:2075
 msgid "Peças"
 msgstr "Parts"
 
-#: scripts/flow/station_rules.gd:2072
+#: scripts/flow/station_rules.gd:2075
 msgid "Provisões"
 msgstr "Provisions"
 
-#: scripts/flow/station_rules.gd:2072
+#: scripts/flow/station_rules.gd:2075
 msgid "Rota básica"
 msgstr "Basic route"
 
-#: scripts/flow/station_rules.gd:2081
+#: scripts/flow/station_rules.gd:2084
 msgid "+%d água"
 msgstr "+%d water"
 
-#: scripts/flow/station_rules.gd:2112
+#: scripts/flow/station_rules.gd:2115
 msgid "%s: %s Entregue, %s."
 msgstr "%s: %s Delivered, %s."
 
-#: scripts/flow/station_rules.gd:2116
+#: scripts/flow/station_rules.gd:2119
 msgid "Água: %d na estação; a equipe bebe %d na volta e vai faltar."
 msgstr "Water: %d at the Station; the team drinks %d on the return and it will run short."
 
-#: scripts/flow/station_rules.gd:2117
+#: scripts/flow/station_rules.gd:2120
 msgid "Água: %d na estação, %d depois da próxima volta."
 msgstr "Water: %d at the Station, %d after the next return."
 
-#: scripts/flow/station_rules.gd:2120
+#: scripts/flow/station_rules.gd:2123
 msgid "Sucata para relíquias e melhorias."
 msgstr "Scrap for relics and upgrades."
 
-#: scripts/flow/station_rules.gd:2120
+#: scripts/flow/station_rules.gd:2123
 msgid "Faltam %d sucatas para %s."
 msgstr "%d scrap missing for %s."
 
-#: scripts/flow/station_rules.gd:2122
+#: scripts/flow/station_rules.gd:2125
 msgid "Suprimentos: %d de %d; a noite da volta pede %d."
 msgstr "Supplies: %d of %d; the night of the return needs %d."
 
-#: scripts/flow/station_rules.gd:2123
+#: scripts/flow/station_rules.gd:2126
 msgid "Sem objetivo: só o que aparecer nas casas."
 msgstr "No goal: just whatever turns up in the houses."
 
-#: scripts/flow/station_rules.gd:2127
+#: scripts/flow/station_rules.gd:2130
 msgid "a Forja"
 msgstr "the Forge"
 
-#: scripts/flow/station_rules.gd:2127
+#: scripts/flow/station_rules.gd:2130
 msgid "a Pesquisa"
 msgstr "the Research Center"
 
-#: scripts/flow/station_rules.gd:2127
+#: scripts/flow/station_rules.gd:2130
 msgid "o Depósito"
 msgstr "the Storeroom"
 
-#: scripts/flow/station_rules.gd:2127
+#: scripts/flow/station_rules.gd:2130
 msgid "um cômodo"
 msgstr "a room"
 
-#: scripts/flow/station_rules.gd:2184
+#: scripts/flow/station_rules.gd:2187
 msgid " Objetivo cumprido (%s): %s, entregue na volta."
 msgstr " Goal done (%s): %s, delivered on the way back."
 
-#: scripts/flow/station_rules.gd:2231
+#: scripts/flow/station_rules.gd:2234
 msgid "Heróis %d de %d · Ajudantes %d de %d"
 msgstr "Heroes %d of %d · Helpers %d of %d"
 
-#: scripts/flow/station_rules.gd:2263
+#: scripts/flow/station_rules.gd:2266
 msgid "na escavação"
 msgstr "at the dig"
 
-#: scripts/flow/station_rules.gd:2265
+#: scripts/flow/station_rules.gd:2268
 msgid "no %s"
 msgstr "at the %s"
 
-#: scripts/flow/station_rules.gd:2265
+#: scripts/flow/station_rules.gd:2268
 msgid "na %s"
 msgstr "at the %s"
 
-#: scripts/flow/station_rules.gd:2271
+#: scripts/flow/station_rules.gd:2274
 msgid "da escavação"
 msgstr "from the dig"
 
-#: scripts/flow/station_rules.gd:2273
+#: scripts/flow/station_rules.gd:2276
 msgid "do %s"
 msgstr "the %s"
 
-#: scripts/flow/station_rules.gd:2273
+#: scripts/flow/station_rules.gd:2276
 msgid "da %s"
 msgstr "the %s"
 
-#: scripts/flow/station_rules.gd:2299
+#: scripts/flow/station_rules.gd:2302
 msgid "+%d fragmento por volta"
 msgstr "+%d fragment per return"
 
-#: scripts/flow/station_rules.gd:2299
+#: scripts/flow/station_rules.gd:2302
 msgid "+%d fragmentos por volta"
 msgstr "+%d fragments per return"
 
-#: scripts/flow/station_rules.gd:2301
+#: scripts/flow/station_rules.gd:2304
 msgid "+%d sucata por volta"
 msgstr "+%d scrap per return"
 
-#: scripts/flow/station_rules.gd:2301
+#: scripts/flow/station_rules.gd:2304
 msgid "+%d sucatas por volta"
 msgstr "+%d scrap per return"
 
-#: scripts/flow/station_rules.gd:2303
+#: scripts/flow/station_rules.gd:2306
 msgid "+%d suprimento por volta"
 msgstr "+%d supply per return"
 
-#: scripts/flow/station_rules.gd:2303
+#: scripts/flow/station_rules.gd:2306
 msgid "+%d suprimentos por volta"
 msgstr "+%d supplies per return"
 
-#: scripts/flow/station_rules.gd:2305
+#: scripts/flow/station_rules.gd:2308
 msgid "−1 dia de recuperação para %d caído por volta"
 msgstr "−1 recovery day for %d fallen per return"
 
-#: scripts/flow/station_rules.gd:2306
+#: scripts/flow/station_rules.gd:2309
 msgid "−1 dia de recuperação para %d caídos por volta"
 msgstr "−1 recovery day for %d fallen per return"
 
-#: scripts/flow/station_rules.gd:2308
+#: scripts/flow/station_rules.gd:2311
 msgid "+%d ponto de obra por dia"
 msgstr "+%d work point per day"
 
-#: scripts/flow/station_rules.gd:2308
+#: scripts/flow/station_rules.gd:2311
 msgid "+%d pontos de obra por dia"
 msgstr "+%d work points per day"
 
-#: scripts/flow/station_rules.gd:2316
-#: scripts/flow/station_rules.gd:2440
+#: scripts/flow/station_rules.gd:2319
+#: scripts/flow/station_rules.gd:2443
 #: scripts/flow/side_mission_rules.gd:262
+#: scripts/flow/hero_skills.gd:98
 msgid "Esse herói não está na Estação."
 msgstr "That hero is not at the Station."
 
-#: scripts/flow/station_rules.gd:2320
+#: scripts/flow/station_rules.gd:2323
 msgid "%s está em recuperação e não trabalha agora."
 msgstr "%s is recovering and can't work now."
 
-#: scripts/flow/station_rules.gd:2324
+#: scripts/flow/station_rules.gd:2327
 msgid "Não há entulho para escavar."
 msgstr "There is no rubble to dig."
 
-#: scripts/flow/station_rules.gd:2326
+#: scripts/flow/station_rules.gd:2329
 msgid "Esse cômodo ainda não tem posto."
 msgstr "That room has no post yet."
 
-#: scripts/flow/station_rules.gd:2430
+#: scripts/flow/station_rules.gd:2433
 msgid "Ainda bloqueada: vem ao terminar %s."
 msgstr "Still locked: comes when you finish %s."
 
-#: scripts/flow/station_rules.gd:2432
+#: scripts/flow/station_rules.gd:2435
 msgid "Ainda bloqueada: vem com os desafios dos chefes."
 msgstr "Still locked: it comes with the boss challenges."
 
-#: scripts/flow/station_rules.gd:2433
+#: scripts/flow/station_rules.gd:2436
 msgid "Ainda bloqueada."
 msgstr "Still locked."
 
-#: scripts/flow/station_rules.gd:2444
+#: scripts/flow/station_rules.gd:2447
 msgid "Essa roupa não é desse herói."
 msgstr "That outfit isn't this hero's."
 
-#: scripts/flow/station_rules.gd:2446
+#: scripts/flow/station_rules.gd:2449
 msgid "Essa roupa ainda não chegou."
 msgstr "That outfit hasn't arrived yet."
 
-#: scripts/flow/station_rules.gd:2450
+#: scripts/flow/station_rules.gd:2453
 msgid "A roupa se troca na Estação, fora da expedição."
 msgstr "Outfits are changed at the Station, outside an expedition."
 
@@ -4945,52 +5024,52 @@ msgstr "Supplies gathered · +1 food and +1 seed"
 msgid "A equipe recupera o fôlego."
 msgstr "The team catches its breath."
 
-#: scripts/flow/exploration_care.gd:68
+#: scripts/flow/exploration_care.gd:73
 msgid "Disponível fora de combate e eventos, durante a exploração."
 msgstr "Available outside combat and events, while exploring."
 
-#: scripts/flow/exploration_care.gd:72
+#: scripts/flow/exploration_care.gd:77
 msgid "Selecione um aliado vivo da expedição."
 msgstr "Select a living ally from the expedition."
 
-#: scripts/flow/exploration_care.gd:79
+#: scripts/flow/exploration_care.gd:84
 msgid "O aliado já está com a vida cheia."
 msgstr "The ally is already at full health."
 
-#: scripts/flow/exploration_care.gd:92
+#: scripts/flow/exploration_care.gd:97
 msgid "Um sapo vivo precisa estar na equipe."
 msgstr "A living frog must be on the team."
 
-#: scripts/flow/exploration_care.gd:96
+#: scripts/flow/exploration_care.gd:101
 msgid "A ampola trata somente aliados orgânicos."
 msgstr "The vial only treats organic allies."
 
-#: scripts/flow/exploration_care.gd:102
+#: scripts/flow/exploration_care.gd:107
 msgid "Sem cargas. A ampola recarrega após uma vitória."
 msgstr "No charges. The ampoule recharges after a victory."
 
-#: scripts/flow/exploration_care.gd:108
-#: scripts/flow/exploration_care.gd:173
+#: scripts/flow/exploration_care.gd:113
+#: scripts/flow/exploration_care.gd:178
 msgid "Comida insuficiente."
 msgstr "Not enough food."
 
-#: scripts/flow/exploration_care.gd:144
+#: scripts/flow/exploration_care.gd:149
 msgid "Nenhuma luta em andamento."
 msgstr "No fight in progress."
 
-#: scripts/flow/exploration_care.gd:147
+#: scripts/flow/exploration_care.gd:152
 msgid "Na luta, a ampola é uma habilidade do sapo."
 msgstr "In battle, the ampoule is the frog's ability."
 
-#: scripts/flow/exploration_care.gd:151
+#: scripts/flow/exploration_care.gd:156
 msgid "Espere a vez de um aliado."
 msgstr "Wait for an ally's turn."
 
-#: scripts/flow/exploration_care.gd:154
+#: scripts/flow/exploration_care.gd:159
 msgid "%s já usou um item nesta vez."
 msgstr "%s already used an item this turn."
 
-#: scripts/flow/exploration_care.gd:157
+#: scripts/flow/exploration_care.gd:162
 msgid "No Limiar da Morte, só uma habilidade de cura salva."
 msgstr "At Death's Door, only a healing ability saves."
 
@@ -5025,7 +5104,7 @@ msgid "Vazamento"
 msgstr "Leak"
 
 #: scripts/combat/combat_engine.gd:240
-#: scripts/combat/combat_engine.gd:724
+#: scripts/combat/combat_engine.gd:733
 msgid "Sangramento"
 msgstr "Bleeding"
 
@@ -5034,7 +5113,7 @@ msgid "Corrosão"
 msgstr "Corrosion"
 
 #: scripts/combat/combat_engine.gd:241
-#: scripts/combat/combat_engine.gd:724
+#: scripts/combat/combat_engine.gd:733
 msgid "Contaminação"
 msgstr "Contamination"
 
@@ -5066,428 +5145,428 @@ msgstr "MISSED · reduced accuracy"
 msgid "O ataque falhou por cegueira/interferência contra "
 msgstr "The attack missed from blindness/interference against "
 
-#: scripts/combat/combat_engine.gd:394
+#: scripts/combat/combat_engine.gd:403
 msgid "Combate iniciado nas ruínas do Bairro Submerso!"
 msgstr "Combat started in the ruins of the Sunken District!"
 
-#: scripts/combat/combat_engine.gd:429
+#: scripts/combat/combat_engine.gd:438
 msgid "Fase inicial: um aliado toma a iniciativa."
 msgstr "Opening phase: an ally takes the initiative."
 
-#: scripts/combat/combat_engine.gd:440
+#: scripts/combat/combat_engine.gd:449
 msgid "Vitória! A ameaça foi neutralizada."
 msgstr "Victory! The threat has been neutralized."
 
-#: scripts/combat/combat_engine.gd:445
+#: scripts/combat/combat_engine.gd:454
 msgid "Todos os aliados caíram nas ruínas escuras..."
 msgstr "All allies fell in the dark ruins..."
 
-#: scripts/combat/combat_engine.gd:456
+#: scripts/combat/combat_engine.gd:465
 msgid "--- Rodada %d ---"
 msgstr "--- Round %d ---"
 
-#: scripts/combat/combat_engine.gd:472
+#: scripts/combat/combat_engine.gd:481
 msgid "O Porteiro canalizou energia dos Relés de Defesa e gerou Bloqueio!"
 msgstr "The Gatekeeper channeled power from the Defense Relays and gained Block!"
 
-#: scripts/combat/combat_engine.gd:543
+#: scripts/combat/combat_engine.gd:552
 msgid "%s: %s%d Instinto"
 msgstr "%s: %s%d Instinct"
 
-#: scripts/combat/combat_engine.gd:544
+#: scripts/combat/combat_engine.gd:553
 msgid "%s · %s: %d Instinto"
 msgstr "%s · %s: %d Instinct"
 
-#: scripts/combat/combat_engine.gd:561
+#: scripts/combat/combat_engine.gd:570
 msgid "Colapso"
 msgstr "Collapse"
 
-#: scripts/combat/combat_engine.gd:561
+#: scripts/combat/combat_engine.gd:570
 msgid "Superação"
 msgstr "Breakthrough"
 
-#: scripts/combat/combat_engine.gd:574
+#: scripts/combat/combat_engine.gd:583
 msgid "%s · Colapso: “Não consigo!” · Trauma e Vulnerável"
 msgstr "%s · Collapse: “I can't!” · Trauma and Vulnerable"
 
-#: scripts/combat/combat_engine.gd:575
+#: scripts/combat/combat_engine.gd:584
 msgid "[COLAPSO] %s cedeu ao pânico e desespero! (-%d Vida, Trauma adquirido)"
 msgstr "[COLLAPSE] %s gave in to panic and despair! (-%d Health, Trauma acquired)"
 
-#: scripts/combat/combat_engine.gd:581
+#: scripts/combat/combat_engine.gd:590
 msgid "%s · Superação: “Ainda há esperança!” · Bloqueio"
 msgstr "%s · Breakthrough: “There's still hope!” · Block"
 
-#: scripts/combat/combat_engine.gd:582
+#: scripts/combat/combat_engine.gd:591
 msgid "[SUPERAÇÃO] A coragem de %s resplandece na escuridão! (+%d Vida)"
 msgstr "[BREAKTHROUGH] %s's courage shines in the darkness! (+%d Health)"
 
-#: scripts/combat/combat_engine.gd:613
+#: scripts/combat/combat_engine.gd:622
 msgid "Atordoado · turno perdido"
 msgstr "Stunned · turn lost"
 
-#: scripts/combat/combat_engine.gd:614
+#: scripts/combat/combat_engine.gd:623
 msgid "%s perdeu o turno por atordoamento (%d restantes)."
 msgstr "%s lost the turn to stun (%d left)."
 
-#: scripts/combat/combat_engine.gd:642
-#: scripts/combat/combat_engine.gd:1025
-#: scripts/combat/combat_engine.gd:1529
+#: scripts/combat/combat_engine.gd:651
+#: scripts/combat/combat_engine.gd:1033
+#: scripts/combat/combat_engine.gd:1537
 msgid "Vulnerável!"
 msgstr "Vulnerable!"
 
-#: scripts/combat/combat_engine.gd:646
+#: scripts/combat/combat_engine.gd:655
 msgid "Blindagem consumida"
 msgstr "Plating spent"
 
-#: scripts/combat/combat_engine.gd:649
+#: scripts/combat/combat_engine.gd:658
 msgid "Bloqueio!"
 msgstr "Block!"
 
-#: scripts/combat/combat_engine.gd:661
+#: scripts/combat/combat_engine.gd:670
 msgid "MORTE PERMANENTE!"
 msgstr "PERMANENT DEATH!"
 
-#: scripts/combat/combat_engine.gd:662
+#: scripts/combat/combat_engine.gd:671
 msgid "[MORTE] %s sucumbiu ao golpe fatal de %s!"
 msgstr "[DEATH] %s succumbed to the fatal blow from %s!"
 
-#: scripts/combat/combat_engine.gd:668
-#: scripts/combat/combat_engine.gd:683
-#: scripts/combat/combat_engine.gd:695
-#: scripts/combat/combat_engine.gd:1493
+#: scripts/combat/combat_engine.gd:677
+#: scripts/combat/combat_engine.gd:692
+#: scripts/combat/combat_engine.gd:704
+#: scripts/combat/combat_engine.gd:1501
 msgid "Pressão de combate"
 msgstr "Combat pressure"
 
-#: scripts/combat/combat_engine.gd:672
+#: scripts/combat/combat_engine.gd:681
 msgid "Sobreviveu ao Último Fôlego!"
 msgstr "Survived the Last Breath!"
 
-#: scripts/combat/combat_engine.gd:673
+#: scripts/combat/combat_engine.gd:682
 msgid "%s resistiu à morte por um triz!"
 msgstr "%s cheated death by a hair!"
 
-#: scripts/combat/combat_engine.gd:679
+#: scripts/combat/combat_engine.gd:688
 msgid "ÚLTIMO FÔLEGO!"
 msgstr "LAST BREATH!"
 
-#: scripts/combat/combat_engine.gd:680
+#: scripts/combat/combat_engine.gd:689
 msgid "[ÚLTIMO FÔLEGO] %s está à beira da morte!"
 msgstr "[LAST BREATH] %s is on the brink of death!"
 
-#: scripts/combat/combat_engine.gd:690
+#: scripts/combat/combat_engine.gd:699
 msgid "[AMIZADE] %s ergueu a guarda para proteger %s!"
 msgstr "[FRIENDSHIP] %s raised their guard to protect %s!"
 
-#: scripts/combat/combat_engine.gd:704
+#: scripts/combat/combat_engine.gd:713
 msgid "SOBRECARGA DO PORTEIRO!"
 msgstr "GATEKEEPER OVERLOAD!"
 
-#: scripts/combat/combat_engine.gd:705
+#: scripts/combat/combat_engine.gd:714
 msgid "[SOBRECARGA] Os cabos do Porteiro se romperam em chamas verdes! Seus bloqueios caíram e seu ataque tornou-se brutal!"
 msgstr "[OVERLOAD] The Gatekeeper's cables burst into green flames! Its blocks fell and its attack turned brutal!"
 
-#: scripts/combat/combat_engine.gd:710
+#: scripts/combat/combat_engine.gd:719
 msgid "Derrotado!"
 msgstr "Defeated!"
 
-#: scripts/combat/combat_engine.gd:711
+#: scripts/combat/combat_engine.gd:720
 msgid "%s foi destruído."
 msgstr "%s was destroyed."
 
-#: scripts/combat/combat_engine.gd:718
+#: scripts/combat/combat_engine.gd:727
 msgid "Resistiu ao "
 msgstr "Resisted "
 
-#: scripts/combat/combat_engine.gd:726
+#: scripts/combat/combat_engine.gd:735
 msgid "%s aplicado · %d dano (%dt)"
 msgstr "%s applied · %d damage (%dt)"
 
-#: scripts/combat/combat_engine.gd:727
+#: scripts/combat/combat_engine.gd:736
 msgid "%s: %s aplicado!"
 msgstr "%s: %s applied!"
 
-#: scripts/combat/combat_engine.gd:787
+#: scripts/combat/combat_engine.gd:796
 msgid "Unidade não encontrada ou derrotada"
 msgstr "Unit not found or defeated"
 
-#: scripts/combat/combat_engine.gd:790
-#: scripts/combat/combat_engine.gd:830
-#: scripts/combat/combat_engine.gd:846
-#: scripts/combat/combat_engine.gd:884
+#: scripts/combat/combat_engine.gd:799
+#: scripts/combat/combat_engine.gd:839
+#: scripts/combat/combat_engine.gd:855
+#: scripts/combat/combat_engine.gd:893
 msgid "Personagem atordoado."
 msgstr "Character stunned."
 
-#: scripts/combat/combat_engine.gd:793
+#: scripts/combat/combat_engine.gd:802
 msgid "Selecione outra posição da sua equipe."
 msgstr "Select another position on your team."
 
-#: scripts/combat/combat_engine.gd:798
+#: scripts/combat/combat_engine.gd:807
 msgid "Imobilização impede mover ou trocar de posição; ainda é possível atacar."
 msgstr "Immobilization prevents moving or swapping positions; attacking is still possible."
 
-#: scripts/combat/combat_engine.gd:801
+#: scripts/combat/combat_engine.gd:810
 msgid "Esta unidade grande não pode trocar de posição."
 msgstr "This large unit can't swap positions."
 
-#: scripts/combat/combat_engine.gd:817
+#: scripts/combat/combat_engine.gd:826
 msgid "%s manobrou para a posição %d."
 msgstr "%s maneuvered to position %d."
 
-#: scripts/combat/combat_engine.gd:827
+#: scripts/combat/combat_engine.gd:836
 msgid "Unidade não encontrada"
 msgstr "Unit not found"
 
-#: scripts/combat/combat_engine.gd:833
+#: scripts/combat/combat_engine.gd:842
 msgid "%s assumiu postura defensiva (+1 Bloqueio)."
 msgstr "%s took a defensive stance (+1 Block)."
 
-#: scripts/combat/combat_engine.gd:843
+#: scripts/combat/combat_engine.gd:852
 msgid "Apenas aliados podem recuar."
 msgstr "Only allies can retreat."
 
-#: scripts/combat/combat_engine.gd:849
+#: scripts/combat/combat_engine.gd:858
 msgid "Impossível fugir de O Porteiro! As eclusas estão trancadas."
 msgstr "Impossible to flee from the Gatekeeper! The locks are sealed."
 
-#: scripts/combat/combat_engine.gd:856
+#: scripts/combat/combat_engine.gd:865
 msgid "A equipe conseguiu recuar pelas sombras e romper o combate!"
 msgstr "The team managed to fall back through the shadows and break off the fight!"
 
-#: scripts/combat/combat_engine.gd:858
+#: scripts/combat/combat_engine.gd:867
 msgid "Tentativa de fuga falhou! Os inimigos bloquearam a passagem."
 msgstr "Escape attempt failed! The enemies blocked the way."
 
-#: scripts/combat/combat_engine.gd:881
+#: scripts/combat/combat_engine.gd:890
 msgid "Ator não encontrado"
 msgstr "Actor not found"
 
-#: scripts/combat/combat_engine.gd:892
+#: scripts/combat/combat_engine.gd:900
 msgid "Habilidade não encontrada"
 msgstr "Ability not found"
 
-#: scripts/combat/combat_engine.gd:895
+#: scripts/combat/combat_engine.gd:903
 msgid "Habilidade exige outra posição de origem. Posição atual: %d"
 msgstr "The ability needs another starting position. Current position: %d"
 
-#: scripts/combat/combat_engine.gd:898
+#: scripts/combat/combat_engine.gd:906
 msgid "Habilidade em recarga (%d turnos)."
 msgstr "Ability on cooldown (%d turns)."
 
-#: scripts/combat/combat_engine.gd:902
+#: scripts/combat/combat_engine.gd:910
 msgid "Limite de usos desta habilidade esgotado."
 msgstr "This ability's uses are spent."
 
-#: scripts/combat/combat_engine.gd:908
+#: scripts/combat/combat_engine.gd:916
 msgid "Não há inimigo na posição selecionada."
 msgstr "There's no enemy in the selected position."
 
-#: scripts/combat/combat_engine.gd:911
+#: scripts/combat/combat_engine.gd:919
 msgid "Esta habilidade exige que o alvo esteja MARCADO."
 msgstr "This ability needs the target to be MARKED."
 
-#: scripts/combat/combat_engine.gd:914
+#: scripts/combat/combat_engine.gd:922
 msgid "Alvo inválido para esta habilidade."
 msgstr "Invalid target for this ability."
 
-#: scripts/combat/combat_engine.gd:917
+#: scripts/combat/combat_engine.gd:925
 msgid "Alvo fora de alcance."
 msgstr "Target out of reach."
 
-#: scripts/combat/combat_engine.gd:920
+#: scripts/combat/combat_engine.gd:928
 msgid "Exige aliado orgânico ou inimigo Marcado/Vulnerável, conforme a habilidade."
 msgstr "Needs an organic ally or a Marked/Vulnerable enemy, depending on the ability."
 
-#: scripts/combat/combat_engine.gd:950
+#: scripts/combat/combat_engine.gd:958
 msgid "%s interceptou o golpe para proteger seu aliado!"
 msgstr "%s intercepted the blow to protect their ally!"
 
-#: scripts/combat/combat_engine.gd:959
-#: scripts/combat/combat_engine.gd:1483
+#: scripts/combat/combat_engine.gd:967
+#: scripts/combat/combat_engine.gd:1491
 msgid "ESQUIVOU!"
 msgstr "DODGED!"
 
-#: scripts/combat/combat_engine.gd:960
+#: scripts/combat/combat_engine.gd:968
 msgid "%s esquivou do ataque de %s!"
 msgstr "%s dodged %s's attack!"
 
-#: scripts/combat/combat_engine.gd:971
+#: scripts/combat/combat_engine.gd:979
 msgid "CRÍTICO!"
 msgstr "CRITICAL!"
 
-#: scripts/combat/combat_engine.gd:972
+#: scripts/combat/combat_engine.gd:980
 msgid "[CRÍTICO!] %s desferiu um ataque devastador!"
 msgstr "[CRITICAL!] %s landed a devastating attack!"
 
-#: scripts/combat/combat_engine.gd:990
+#: scripts/combat/combat_engine.gd:998
 msgid "%s usou %s em %s causando %d de dano."
 msgstr "%s used %s on %s dealing %d damage."
 
-#: scripts/combat/combat_engine.gd:998
+#: scripts/combat/combat_engine.gd:1006
 msgid "%s recuperou o fôlego e saiu de perigo!"
 msgstr "%s caught their breath and is out of danger!"
 
-#: scripts/combat/combat_engine.gd:999
+#: scripts/combat/combat_engine.gd:1007
 msgid "+%d Vida"
 msgstr "+%d Health"
 
-#: scripts/combat/combat_engine.gd:1000
+#: scripts/combat/combat_engine.gd:1008
 msgid "%s tratou %s, restaurando %d de Vida."
 msgstr "%s treated %s, restoring %d Health."
 
-#: scripts/combat/combat_engine.gd:1004
+#: scripts/combat/combat_engine.gd:1012
 msgid "%d Instinto"
 msgstr "%d Instinct"
 
-#: scripts/combat/combat_engine.gd:1007
+#: scripts/combat/combat_engine.gd:1015
 msgid "%s acalmou %s (%d Instinto)."
 msgstr "%s calmed %s (%d Instinct)."
 
-#: scripts/combat/combat_engine.gd:1011
+#: scripts/combat/combat_engine.gd:1019
 msgid "Armadura reduzida"
 msgstr "Armor reduced"
 
-#: scripts/combat/combat_engine.gd:1018
-#: scripts/combat/combat_engine.gd:1522
+#: scripts/combat/combat_engine.gd:1026
+#: scripts/combat/combat_engine.gd:1530
 msgid "Atordoado · %d turnos"
 msgstr "Stunned · %d turns"
 
-#: scripts/combat/combat_engine.gd:1026
+#: scripts/combat/combat_engine.gd:1034
 msgid "%s ficou Vulnerável!"
 msgstr "%s became Vulnerable!"
 
-#: scripts/combat/combat_engine.gd:1030
+#: scripts/combat/combat_engine.gd:1038
 msgid "MARCADO!"
 msgstr "MARKED!"
 
-#: scripts/combat/combat_engine.gd:1031
+#: scripts/combat/combat_engine.gd:1039
 msgid "%s foi MARCADO por 2 turnos!"
 msgstr "%s was MARKED for 2 turns!"
 
-#: scripts/combat/combat_engine.gd:1034
+#: scripts/combat/combat_engine.gd:1042
 msgid "+1 esquiva"
 msgstr "+1 dodge"
 
-#: scripts/combat/combat_engine.gd:1038
+#: scripts/combat/combat_engine.gd:1046
 msgid "+%d Bloqueio"
 msgstr "+%d Block"
 
-#: scripts/combat/combat_engine.gd:1044
+#: scripts/combat/combat_engine.gd:1052
 msgid "protegido por %s"
 msgstr "protected by %s"
 
-#: scripts/combat/combat_engine.gd:1047
+#: scripts/combat/combat_engine.gd:1055
 msgid "%s está guardando %s!"
 msgstr "%s is guarding %s!"
 
-#: scripts/combat/combat_engine.gd:1051
+#: scripts/combat/combat_engine.gd:1059
 msgid "Interferência removida"
 msgstr "Interference removed"
 
-#: scripts/combat/combat_engine.gd:1051
+#: scripts/combat/combat_engine.gd:1059
 msgid "Cegueira removida"
 msgstr "Blindness removed"
 
-#: scripts/combat/combat_engine.gd:1054
+#: scripts/combat/combat_engine.gd:1062
 msgid "Fraqueza removida"
 msgstr "Weakness removed"
 
-#: scripts/combat/combat_engine.gd:1057
+#: scripts/combat/combat_engine.gd:1065
 msgid "Imobilização removida"
 msgstr "Immobilization removed"
 
-#: scripts/combat/combat_engine.gd:1060
+#: scripts/combat/combat_engine.gd:1068
 msgid "Vulnerável Removido"
 msgstr "Vulnerable Removed"
 
-#: scripts/combat/combat_engine.gd:1065
+#: scripts/combat/combat_engine.gd:1073
 msgid "Efeitos Periódicos Curados"
 msgstr "Periodic Effects Cured"
 
-#: scripts/combat/combat_engine.gd:1068
+#: scripts/combat/combat_engine.gd:1076
 msgid "%s foi purificado de toxinas e feridas."
 msgstr "%s was cleansed of toxins and wounds."
 
-#: scripts/combat/combat_engine.gd:1084
+#: scripts/combat/combat_engine.gd:1092
 msgid "%s: deslocamento bloqueado por uma unidade grande."
 msgstr "%s: displacement blocked by a large unit."
 
-#: scripts/combat/combat_engine.gd:1089
+#: scripts/combat/combat_engine.gd:1097
 msgid "%s foi empurrado para a posição %d!"
 msgstr "%s was pushed to position %d!"
 
-#: scripts/combat/combat_engine.gd:1104
+#: scripts/combat/combat_engine.gd:1112
 msgid "%s mudou para a posição %d."
 msgstr "%s moved to position %d."
 
-#: scripts/combat/combat_engine.gd:1214
-#: scripts/combat/combat_engine.gd:1215
-#: scripts/combat/combat_engine.gd:1248
-#: scripts/combat/combat_engine.gd:1435
+#: scripts/combat/combat_engine.gd:1222
+#: scripts/combat/combat_engine.gd:1223
+#: scripts/combat/combat_engine.gd:1256
+#: scripts/combat/combat_engine.gd:1443
 msgid "Troca de posição"
 msgstr "Position swap"
 
-#: scripts/combat/combat_engine.gd:1219
+#: scripts/combat/combat_engine.gd:1227
 msgid "+1 bloqueio"
 msgstr "+1 block"
 
-#: scripts/combat/combat_engine.gd:1242
+#: scripts/combat/combat_engine.gd:1250
 msgid "Atordoado: perde a vez"
 msgstr "Stunned: loses the turn"
 
-#: scripts/combat/combat_engine.gd:1270
+#: scripts/combat/combat_engine.gd:1278
 msgid "Avançar"
 msgstr "Advance"
 
-#: scripts/combat/combat_engine.gd:1424
+#: scripts/combat/combat_engine.gd:1432
 msgid "%s usou %s e recuperou %d de vida."
 msgstr "%s used %s and recovered %d health."
 
-#: scripts/combat/combat_engine.gd:1429
+#: scripts/combat/combat_engine.gd:1437
 msgid "blindagem +1"
 msgstr "plating +1"
 
-#: scripts/combat/combat_engine.gd:1430
+#: scripts/combat/combat_engine.gd:1438
 msgid "%s assumiu Postura Blindada (+1 Bloqueio)."
 msgstr "%s took an Armored Stance (+1 Block)."
 
-#: scripts/combat/combat_engine.gd:1458
+#: scripts/combat/combat_engine.gd:1466
 msgid "%s ativou %s, emitindo ruídos ensurdecedores do Eco!"
 msgstr "%s activated %s, emitting deafening noises from the Echo!"
 
-#: scripts/combat/combat_engine.gd:1475
+#: scripts/combat/combat_engine.gd:1483
 msgid "%s interceptou o golpe para salvar o companheiro!"
 msgstr "%s intercepted the blow to save their companion!"
 
-#: scripts/combat/combat_engine.gd:1484
+#: scripts/combat/combat_engine.gd:1492
 msgid "%s esquivou com agilidade do ataque de %s!"
 msgstr "%s nimbly dodged %s's attack!"
 
-#: scripts/combat/combat_engine.gd:1491
+#: scripts/combat/combat_engine.gd:1499
 msgid "CRÍTICO INIMIGO!"
 msgstr "ENEMY CRITICAL!"
 
-#: scripts/combat/combat_engine.gd:1492
+#: scripts/combat/combat_engine.gd:1500
 msgid "[CRÍTICO!] %s desferiu um golpe brutal em %s!"
 msgstr "[CRITICAL!] %s landed a brutal blow on %s!"
 
-#: scripts/combat/combat_engine.gd:1499
+#: scripts/combat/combat_engine.gd:1507
 msgid "[RIVALIDADE] %s estremeceu ao ver a falha do rival (+5 Instinto)."
 msgstr "[RIVALRY] %s flinched at seeing the rival's failure (+5 Instinct)."
 
-#: scripts/combat/combat_engine.gd:1511
+#: scripts/combat/combat_engine.gd:1519
 msgid "%s atacou %s causando %d de dano."
 msgstr "%s attacked %s dealing %d damage."
 
-#: scripts/combat/combat_engine.gd:1515
+#: scripts/combat/combat_engine.gd:1523
 msgid "+%d Instinto"
 msgstr "+%d Instinct"
 
-#: scripts/combat/combat_engine.gd:1516
+#: scripts/combat/combat_engine.gd:1524
 msgid "%s desferiu terror psicológico em %s (+%d Instinto)."
 msgstr "%s struck psychological terror into %s (+%d Instinct)."
 
-#: scripts/combat/combat_engine.gd:1540
+#: scripts/combat/combat_engine.gd:1548
 msgid "%s foi arremessado para trás!"
 msgstr "%s was thrown back!"
 
@@ -6004,15 +6083,15 @@ msgstr "RECORDS"
 msgid "ANÁLISE"
 msgstr "ANALYSIS"
 
-#: scripts/campaign/campaign_service.gd:425
+#: scripts/campaign/campaign_service.gd:427
 msgid "O último salvamento não pôde ser aberto. Recuperamos uma cópia de segurança. Ações recentes podem não estar nela."
 msgstr "The last save couldn't be opened. We recovered a backup copy. Recent actions may not be in it."
 
-#: scripts/campaign/campaign_service.gd:427
+#: scripts/campaign/campaign_service.gd:429
 msgid "O save do espaço %d não pôde ser aberto (o arquivo foi preservado). As outras campanhas estão em Campanhas."
 msgstr "The save in slot %d couldn't be opened (the file was kept). The other campaigns are in Campaigns."
 
-#: scripts/campaign/campaign_service.gd:429
+#: scripts/campaign/campaign_service.gd:431
 msgid "Nenhum salvamento válido foi encontrado. Os dados anteriores foram preservados; um novo jogo só será salvo ao começar."
 msgstr "No valid save was found. The previous data was kept; a new game will only be saved once it starts."
 
@@ -6020,23 +6099,23 @@ msgstr "No valid save was found. The previous data was kept; a new game will onl
 msgid "Trecho %d de %d"
 msgstr "Stretch %d of %d"
 
-#: scripts/combat/combat_arena.gd:481
+#: scripts/combat/combat_arena.gd:489
 msgid "%s age"
 msgstr "%s acts"
 
-#: scripts/combat/combat_arena.gd:506
+#: scripts/combat/combat_arena.gd:514
 msgid "inimigo"
 msgstr "enemy"
 
-#: scripts/combat/combat_arena.gd:567
+#: scripts/combat/combat_arena.gd:575
 msgid "+1 Bloqueio"
 msgstr "+1 Block"
 
-#: scripts/combat/combat_arena.gd:571
+#: scripts/combat/combat_arena.gd:579
 msgid "Fuga!"
 msgstr "Escaped!"
 
-#: scripts/combat/combat_arena.gd:571
+#: scripts/combat/combat_arena.gd:579
 msgid "Fuga falhou"
 msgstr "Escape failed"
 
@@ -6417,6 +6496,43 @@ msgstr "Takes +%d%% from %s"
 msgid "Vantagem de tipo: recebe +%d%% de dano direto de: %s"
 msgstr "Type advantage: takes +%d%% direct damage from: %s"
 
+#: scripts/flow/hero_skills.gd:79
+#: scripts/flow/hero_skills.gd:83
+msgid "Escolha %d habilidades diferentes."
+msgstr "Choose %d different abilities."
+
+#: scripts/flow/hero_skills.gd:87
+msgid "%s ainda não sabe essa habilidade."
+msgstr "%s doesn't know that ability yet."
+
+#: scripts/flow/hero_skills.gd:90
+msgid "Sem ataque da posição %d."
+msgstr "No attack from position %d."
+
+#: scripts/flow/hero_skills.gd:100
+msgid "As habilidades se trocam na Estação, fora da expedição."
+msgstr "Abilities are swapped at the Station, outside an expedition."
+
+#: scripts/flow/hero_skills.gd:173
+msgid "Aprender: %s"
+msgstr "Learn: %s"
+
+#: scripts/flow/hero_skills.gd:208
+msgid "Treino · %s"
+msgstr "Training · %s"
+
+#: scripts/flow/hero_skills.gd:210
+msgid "Nível %d · Treino · %s"
+msgstr "Level %d · Training · %s"
+
+#: scripts/flow/hero_skills.gd:218
+msgid "%s aprendeu %s. Na Sala, escolha as %d que leva."
+msgstr "%s learned %s. In the Room, choose the %d to carry."
+
+#: scripts/flow/hero_skills.gd:219
+msgid "%s subiu para o nível %d e aprendeu %s. Na Sala, escolha as %d que leva."
+msgstr "%s reached level %d and learned %s. In the Room, choose the %d to carry."
+
 #: scripts/ui/station/dig_board.gd:77
 msgid "Rende %s"
 msgstr "Yields %s"
@@ -6695,6 +6811,150 @@ msgstr "Safe Corridor"
 #. abilities.23.Description
 msgid "Abre uma rota protegida para outro aliado: remove Vulnerável e concede uma carga de Bloqueio. Até 2 usos por combate."
 msgstr "Opens a protected route for another ally: removes Vulnerable and grants a Block charge. Up to 2 uses per combat."
+
+#. abilities.24.DisplayName
+msgid "Ombro de Carga"
+msgstr "Shoulder Charge"
+
+#. abilities.24.Description
+msgid "Investida curta com o ombro: dano baixo e empurra o alvo uma posição."
+msgstr "Short shoulder charge: low damage and pushes the target one position."
+
+#. abilities.25.DisplayName
+msgid "Postura Firme"
+msgstr "Firm Stance"
+
+#. abilities.25.Description
+msgid "Firma a postura: ganha 1 Bloqueio e remove o próprio Vulnerável."
+msgstr "Braces its stance: gains 1 Block and removes its own Vulnerable."
+
+#. abilities.26.DisplayName
+msgid "Alerta de Perigo"
+msgstr "Danger Alert"
+
+#. abilities.26.Description
+msgid "Aponta a ameaça para a equipe: marca um inimigo por 2 turnos, sem dano."
+msgstr "Points out the threat to the team: marks an enemy for 2 turns, no damage."
+
+#. abilities.27.DisplayName
+msgid "Salto da Calha"
+msgstr "Gutter Leap"
+
+#. abilities.27.Description
+msgid "Salta da calha sobre o alvo: dano baixo e Sangramento por 2 turnos."
+msgstr "Leaps from the gutter onto the target: low damage and Bleed for 2 turns."
+
+#. abilities.28.DisplayName
+msgid "Volta pelo Telhado"
+msgstr "Over the Roof"
+
+#. abilities.28.Description
+msgid "Dá a volta por cima: avança uma posição e ganha 1 Esquiva."
+msgstr "Goes around over the top: advances one position and gains 1 Dodge."
+
+#. abilities.29.DisplayName
+msgid "Rasgo Rápido"
+msgstr "Quick Rip"
+
+#. abilities.29.Description
+msgid "Golpe rápido numa brecha: dano baixo e deixa o alvo Vulnerável."
+msgstr "Quick strike at an opening: low damage and leaves the target Vulnerable."
+
+#. abilities.30.DisplayName
+msgid "Névoa Calmante"
+msgstr "Calming Mist"
+
+#. abilities.30.Description
+msgid "Borrifa uma névoa de ervas num aliado: reduz 8 Instinto."
+msgstr "Sprays an herbal mist on an ally: reduces 8 Instinct."
+
+#. abilities.31.DisplayName
+msgid "Frasco Aderente"
+msgstr "Sticky Flask"
+
+#. abilities.31.Description
+msgid "Frasco que gruda no alvo: dano baixo e Contaminação por 2 turnos."
+msgstr "A flask that sticks to the target: low damage and Contamination for 2 turns."
+
+#. abilities.32.DisplayName
+msgid "Curativo Rápido"
+msgstr "Quick Bandage"
+
+#. abilities.32.Description
+msgid "Um curativo às pressas: recupera 2–4 Vida de aliado orgânico. 2 usos por luta."
+msgstr "A hasty bandage: restores 2–4 Health to an organic ally. 2 uses per fight."
+
+#. abilities.33.DisplayName
+msgid "Mira no Marcado"
+msgstr "Aim at the Marked"
+
+#. abilities.33.Description
+msgid "Tiro calculado num inimigo MARCADO."
+msgstr "A calculated shot at a MARKED enemy."
+
+#. abilities.34.DisplayName
+msgid "Tiro de Aviso"
+msgstr "Warning Shot"
+
+#. abilities.34.Description
+msgid "Tiro rápido de qualquer posição: dano baixo e remove 1 Bloqueio."
+msgstr "Quick shot from any position: low damage and removes 1 Block."
+
+#. abilities.35.DisplayName
+msgid "Posição Elevada"
+msgstr "High Ground"
+
+#. abilities.35.Description
+msgid "Sobe para um ponto mais alto: recua uma posição e ganha 1 Esquiva."
+msgstr "Climbs to a higher spot: falls back one position and gains 1 Dodge."
+
+#. abilities.36.DisplayName
+msgid "Curto-Circuito"
+msgstr "Short Circuit"
+
+#. abilities.36.Description
+msgid "Encosta dois fios no alvo: dano baixo, +25% em máquinas, e remove 1 Bloqueio."
+msgstr "Touches two wires to the target: low damage, +25% against machines, and removes 1 Block."
+
+#. abilities.37.DisplayName
+msgid "Faísca nos Olhos"
+msgstr "Spark in the Eyes"
+
+#. abilities.37.Description
+msgid "Uma faísca no rosto do alvo: aplica Cegueira, sem dano."
+msgstr "A spark in the target's face: applies Blindness, no damage."
+
+#. abilities.38.DisplayName
+msgid "Remendo de Fio"
+msgstr "Wire Patch"
+
+#. abilities.38.Description
+msgid "Amarra uma placa solta num aliado: ele ganha 1 Bloqueio. 2 usos por luta."
+msgstr "Ties a loose plate onto an ally: they gain 1 Block. 2 uses per fight."
+
+#. abilities.39.DisplayName
+msgid "Placa de Proteção"
+msgstr "Protective Plate"
+
+#. abilities.39.Description
+msgid "Passa uma placa a um aliado: 1 Bloqueio e remove Sangramento e Contaminação."
+msgstr "Hands a plate to an ally: 1 Block and removes Bleed and Contamination."
+
+#. abilities.40.DisplayName
+msgid "Avanço de Resgate"
+msgstr "Rescue Advance"
+
+#. abilities.40.Description
+msgid "Investe contra o alvo: dano e avança uma posição."
+msgstr "Charges the target: damage and advances one position."
+
+#. abilities.41.DisplayName
+msgid "Fôlego de Resgate"
+msgstr "Rescue Breath"
+
+#. abilities.41.Description
+msgid "Para e recupera o fôlego: recupera 3–5 Vida. 1 uso por luta."
+msgstr "Stops to catch its breath: restores 3–5 Health. 1 use per fight."
 
 #. classes.0.DisplayName
 msgid "Cão Protetor"
@@ -10359,6 +10619,3 @@ msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
 
 #~ msgid "Rivalidade %+d"
 #~ msgstr "Rivalry %+d"
-
-#~ msgid "Treino"
-#~ msgstr "Training"
