@@ -29,3 +29,25 @@ Os 14 PNG normalizados têm canvas, âncora, alfa e margens documentados. Transp
 Passagem narrativa pela §14 concluída sem acrescentar poder, recompensa, facção ou mistério. Vagão tombado, máquina inerte, cabos sem energia, água não potável e raízes naturais.
 
 Suíte da base: 104/104, paridade 48/48, 682,991 s. A prova usa Compatibility por CPU; não atesta Forward+ no PC nem a integração do PR #284. A redução a 40% aprova identificação das imagens e estados; texto longo continua dependendo do detalhe ampliado. Sem bloqueios de design nesta entrega.
+
+
+## Revisão solicitada após o aceite do Lucas — rodada 1 — VEREDITO: REPROVADO
+
+Escopo: baixar o peso visual das seis pinturas, mantendo molduras, nome, estado, recompensa e ação como primeiro nível de leitura. A QA foi refeita pela segunda persona da sessão conforme o checklist; não substitui o aceite artístico do Lucas ou a integração.
+
+- **Direção/hierarquia:** seis cenas reconhecíveis com menos saturação e contraste, véu carvão e lâmpadas/reflexos contidos. Na grade 1920×1080, os títulos e estados vêm antes da ilustração; o detalhe ampliado continua identificando o conteúdo. Os oito PNG de molduras/cartão/ícones permanecem idênticos byte a byte.
+- **Leitura:** conferidas Normal, Maior, daltonismo, cinza e redução real a 40%. Rótulos continuam sobre painéis opacos; hachuras e palavras preservam estados sem depender só de cor. Não se propõe ler todas as notas longas a 40%.
+- **Arquivo/medidas:** os mesmos nomes, canvases, âncoras e margens do kit. 14 fontes com hashes válidos; seis pinturas opacas, centros das molduras transparentes e máscaras brancas com alfa limpo. Os 14 WebP foram reconvertidos independentemente e comparados byte a byte. O escurecimento já está nos arquivos: não somar outro véu na integração.
+- **Prova na Godot:** capturas refeitas na main 69ad7910; nove casos, 16 vagas por vista, 339 rótulos e 312 retângulos de imagem auditados sem overflow. Antes/main e depois/proposta com mesma câmera, campanha, elenco e instante. Comparação adicional da arte anterior e da revisão 2 na mesma main.
+- **Narrativa/escopo:** sem objetos, poderes, recompensas ou informações novas. Mantidos o vagão tombado, máquina inerte, cabos desenergizados, água estagnada e raízes naturais. PR só com documentação e pranchas; originais na tag independente.
+
+**Média — comparação adicional da revisão:** duas execuções separadas deixavam os moradores em posições diferentes, apesar da mesma câmera/campanha. A comparação adicional deve trocar só as texturas dentro da mesma sessão congelada. As demais verificações acima passaram.
+
+
+## Revisão solicitada após o aceite do Lucas — rodada 2 — VEREDITO: APROVADO
+
+Corrigida a comparação adicional: a arte anterior e a revisão agora são capturadas na mesma sessão da Godot, com o tempo congelado e troca só das texturas externas. A área dos moradores/cenário não coberta por cartões foi comparada pixel a pixel e permaneceu idêntica. As três duplas main/proposta também foram recapturadas nessa sessão, na main 69ad7910.
+
+Reconferidas as 22 pranchas finais e os nove casos da HUD. Mantidas as aprovações de direção, leitura, alfa, nomes, medidas, narrativa e escopo da rodada anterior. Sem problemas altos ou médios; as cenas continuam reconhecíveis, subordinadas à moldura e ao texto. A prova é Compatibility/CPU, sem aprovação de Forward+ no PC.
+
+Validação final da main 69ad7910: **105/105**, paridade **48/48**, 699,403 s; saída 0. Verificação do pacote: 30 PNG ao todo, 14 normalizados, 22 pranchas.

@@ -1,6 +1,6 @@
 # Estação em grade — cartões soterrados (#275)
 
-Entrega de arte para a direção do Lucas de 01/11, registrada na [issue #275](https://github.com/lucasyemz/after-humans-godot/issues/275) e no [PR de integração #284](https://github.com/lucasyemz/after-humans-godot/pull/284). **Uma ilustração própria por bloco**, com primeiro plano, objeto principal, fundo recuado e luz local. A grade fica sobre o corte real da Estação; não é uma única imagem cobrindo um trecho inteiro.
+Entrega de arte para a direção do Lucas de 01/11, registrada na [issue #275](https://github.com/lucasyemz/after-humans-godot/issues/275) e no [PR de integração #284](https://github.com/lucasyemz/after-humans-godot/pull/284). **Uma ilustração própria por bloco**, com primeiro plano, objeto principal, fundo recuado e luz local. **Revisão 2, após o aceite do Lucas no #296:** as pinturas ficam em segundo plano, com menor contraste/saturação, véu carvão mais forte e brilhos contidos. Moldura, nome, estado e recompensa permanecem em primeiro plano. O tratamento já está nos PNG/WebP; não somar outro véu na integração. A grade fica sobre o corte real da Estação; não é uma única imagem cobrindo um trecho inteiro.
 
 O PR de arte contém somente esta documentação e as pranchas/capturas. **Os 14 PNG normalizados, os PNG brutos, o contrato e as ferramentas de reprodução ficam na tag de originais**, fora da história do PR para a main. Nenhum arquivo de outro jogo foi adicionado. A integração continua com o Claude 1, no #284.
 
@@ -20,7 +20,7 @@ As pranchas de arte e de componentes são estudos rotulados, não capturas do jo
 
 ## Antes e depois dentro da Godot
 
-Base fixada em **main 7345f7a1**, atualizada ao abrir a branch `codex-275`. Mesma cena, câmera ortográfica de QA, elenco e tempo de jogo congelado nos dois lados. O antes mostra a cena da main sem patch; o depois carrega somente o protótipo externo dos cartões e a moldura da HUD. O enquadramento de QA é declarado: **não se alterou a câmera de produção nem a implementação do PR #284**.
+Base das capturas revisadas: **main 69ad7910**, incorporada à branch `codex-275` antes da revisão. Mesma cena, câmera ortográfica de QA, elenco e tempo de jogo congelado nos dois lados. O antes mostra a cena da main sem patch; o depois carrega somente o protótipo externo dos cartões e a moldura da HUD. O enquadramento de QA é declarado: **não se alterou a câmera de produção nem a implementação do PR #284**.
 
 ![Antes/depois — grade](station_buried/before_after_overview.webp)
 
@@ -37,6 +37,14 @@ Capturas reais de **Godot 4.7.2, 1920×1080, Compatibility/Mesa llvmpipe por CPU
 | Escolha do cômodo | [Abrir](station_buried/choice_normal.webp) | [Abrir](station_buried/choice_larger.webp) | [Abrir](station_buried/choice_colorblind.webp) |
 
 [Grade a 40%](station_buried/overview_40.webp) · [Grade em cinza](station_buried/overview_gray.webp) · [Molduras em cinza](station_buried/frame_board_gray.webp)
+
+![Ajuste solicitado: arte anterior e revisão 2 na mesma main e câmera](station_buried/revision_comparison.webp)
+
+## Hierarquia visual da revisão 2
+
+As seis pinturas foram revisadas sem acrescentar objetos ou alterar a intenção narrativa. As lâmpadas e os reflexos deixaram de ser pontos de alto brilho. A luminosidade média dos arquivos caiu cerca de 43–49%, o contraste global (desvio de luminância) 52–59% e a saturação média 19–35%; medidas descritivas em 8 bits, não parâmetros de shader. A profundidade continua pintada, com identificação pela silhueta, sem disputar com o texto.
+
+Molduras, ícones, tipografia, barras e cores dos estados **não receberam esse tratamento**. O cartão livre e a prévia do cômodo também conservam o desenho aprovado. Os textos continuam sobre os painéis opacos do kit, sem depender do escurecimento da pintura para atingir contraste.
 
 ## Lista final e passagem pela narrativa (§14)
 
@@ -121,4 +129,4 @@ O conversor exige uma pasta de saída nova, confere hashes e medidas antes de gr
 
 [Rodadas da QA de design](station_buried/qa.md) · [Resumo verificável](station_buried/verification.json)
 
-A suíte da base passou **104/104**, incluindo a paridade **48/48**, em 682,991 s. Não houve alteração em `scripts/`, `data/`, `tests/`, `tools/` ou arte de produção. A QA desta entrega avalia pinturas, transparência, legibilidade, coerência narrativa e composição dos cartões. O teste de integração e a conferência Forward+ no PC ainda pertencem ao Claude 1 / Lucas.
+A suíte da **main 69ad7910 passou 105/105**, incluindo a paridade **48/48**, em 699,403 s. Não houve alteração em `scripts/`, `data/`, `tests/`, `tools/` ou arte de produção. A QA desta entrega avalia pinturas, transparência, legibilidade, coerência narrativa e composição dos cartões. O teste de integração e a conferência Forward+ no PC ainda pertencem ao Claude 1 / Lucas.
