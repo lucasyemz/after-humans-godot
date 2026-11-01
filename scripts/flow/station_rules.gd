@@ -185,6 +185,7 @@ static func migrate(campaign: Dictionary) -> void:
 			entry.art_variant = _least_used_variant(campaign, String(entry.get("class_id", ""))) if is_recruit(String(entry.get("id", ""))) else ""
 	# As sete habilidades (#259): os campos novos; o que um save editado traz e não vale volta ao padrão.
 	AHHeroSkills.migrate(campaign)
+	AHStationServices.migrate(campaign)
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
 		if String(entry.get("skin_id", "")) == "":
@@ -491,9 +492,14 @@ static func _room_benefit(room_id: String, level: int) -> String:
 			# Sem camas no nível 1 (a equipe dorme no chão); os beliches chegam com a melhoria (#176).
 			if level <= 1:
 				return TranslationServer.translate("Sem camas: a equipe dorme no chão depois de cada expedição. Com os beliches, cabem %d ajudantes.") % helper_limit_at(2)
-			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada expedição. Cabem %d ajudantes.") % helper_limit_at(level)
+			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada expedição e perde mais %d de Instinto. Cabem %d ajudantes.") % [
+				int(AHStationServices.rule("dormitory").get("BunkInstinct", 3)), helper_limit_at(level)]
 		BAR:
-			return TranslationServer.translate("Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa.") if level <= 0 else TranslationServer.translate("Um lugar para conversar e fazer uma pausa.")
+			# O Bar (#265): o alívio de quem ficou na volta e a conversa que trata o trauma.
+			var bar := AHStationServices.rule("bar")
+			return TranslationServer.translate("Salão vazio. Recuperado, vira um lugar para conversar: alivia quem fica e trata o trauma.") if level <= 0 \
+				else TranslationServer.translate("Um lugar para conversar. Na volta, quem ficou na Estação perde %d de Instinto. A conversa trata o trauma por %d sementes.") % [
+					int(bar.get("Instinct", 5)), int(bar.get("TraumaSeeds", 5))]
 		CANTEEN:
 			if level >= 2:
 				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por dia.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
@@ -506,12 +512,17 @@ static func _room_benefit(room_id: String, level: int) -> String:
 				else TranslationServer.translate("Escolher a partida e mandar heróis em missões solo.")
 		CHARACTERS:
 			# Cada nível comporta mais heróis (#119).
-			return TranslationServer.translate("Elenco, treino, trauma e relíquias. Comporta %d heróis.") % hero_limit_at(level)
+			return TranslationServer.translate("Elenco, treino e relíquias. Comporta %d heróis.") % hero_limit_at(level)
 		INFIRMARY:
 			if level <= 0:
 				return TranslationServer.translate("Sala de primeiros socorros da estação, com as macas tombadas. Recuperada, os caídos se recuperam mais rápido num leito.")
-			return TranslationServer.translate("As macas do antigo posto de primeiros socorros viraram leitos. %d leitos: no leito, quem caiu volta em %d dias, e cada curativo tira %d.") % [
+			var beds := TranslationServer.translate("As macas do antigo posto de primeiros socorros viraram leitos. %d leitos: no leito, quem caiu volta em %d dias, e cada curativo tira %d.") % [
 				infirmary_beds_at(level), int(recovery_rule("infirmary").get("Days", 2)), int(recovery_rule("bandage").get("Days", 1))]
+			# A peculiaridade (#265): no nível da regra, um leito trata uma negativa.
+			var quirk := AHStationServices.rule("infirmary_quirk")
+			if level >= int(quirk.get("Level", 2)):
+				beds += " " + TranslationServer.translate("Trata uma peculiaridade negativa em %d dias, num leito.") % int(quirk.get("Days", 2))
+			return beds
 	return ""
 
 
@@ -1066,7 +1077,8 @@ static func resolve_night(campaign: Dictionary, force: String = "") -> bool:
 			entry.hp = mini(entry.max_hp, entry.hp + maxi(1, entry.max_hp * (35 if result.fed else 15) / 100))
 			var noise := int(event.get("amount", 0)) if event.id == "distant_noise" and not event.get("prevented", false) else 0
 			var thirst := THIRST_INSTINCT_PENALTY if night.thirsty else 0
-			entry.instinct = clampi(entry.instinct - (15 if result.fed else 5) + noise + thirst, 0, 200)
+			# Os beliches (#265): mais Instinto a menos para quem dorme neles.
+			entry.instinct = clampi(entry.instinct - (15 if result.fed else 5) - AHStationServices.bunk_relief(campaign) + noise + thirst, 0, 200)
 			# Quem não dormiu pelo trauma (#132) perde só o desconto do sono: a sede pesa igual.
 			if event.id == "sleepless" and String(event.get("hero_id", "")) == hero_id:
 				entry.instinct = clampi(before_instinct + thirst, 0, 200)
@@ -1439,8 +1451,11 @@ static func treat_trauma(campaign: Dictionary, hero_id: String) -> String:
 		return TranslationServer.translate("Somente sobreviventes podem ser tratados.")
 	if not entry.trauma:
 		return TranslationServer.translate("%s não tem trauma.") % entry.display_name
-	if not consume(campaign, "seeds", TRAUMA_COST):
-		return TranslationServer.translate("Sementes insuficientes (custa 5 sementes).")
+	# O trauma se trata no Bar (#265): a conversa, recuperado o salão.
+	if not room_available(campaign, BAR):
+		return TranslationServer.translate("Recupere o Bar para tratar o trauma.")
+	if not consume(campaign, "seeds", AHStationServices.trauma_cost()):
+		return TranslationServer.translate("Sementes insuficientes (custa %d sementes).") % AHStationServices.trauma_cost()
 	entry.trauma = false
 	return ""
 
@@ -1530,7 +1545,8 @@ static func validate_team(campaign: Dictionary, hero_ids: Array, phase_id: Strin
 ## Quem está em recuperação (#118) também fica: só volta à equipe depois dos dias da Enfermaria.
 ## Quem está numa missão solo ou capturado (#183) também fica fora.
 static func can_deploy(entry) -> bool:
-	return entry != null and not recovering(entry) and not AHSideMissions.away(entry) and not AHCombatArena.hero_art_of(String(entry.id)).is_empty()
+	return entry != null and not recovering(entry) and not AHSideMissions.away(entry) and not AHStationServices.treating(entry) \
+		and not AHCombatArena.hero_art_of(String(entry.id)).is_empty()
 
 
 static func deploy_block(entry) -> String:
@@ -1540,6 +1556,8 @@ static func deploy_block(entry) -> String:
 		return AHSideMissions.away_text(entry)
 	if recovering(entry):
 		return recovery_block(entry)
+	if AHStationServices.treating(entry):
+		return AHStationServices.treatment_text(entry)
 	return TranslationServer.translate("%s ainda não tem arte de combate e fica na Estação por enquanto.") % entry.display_name
 
 
@@ -1718,7 +1736,8 @@ static func ready_heroes(campaign: Dictionary) -> Array:
 ## Os leitos livres vão para quem espera no Dormitório, na ordem do elenco; no leito, os dias nunca passam dos da
 ## Enfermaria.
 static func _fill_beds(campaign: Dictionary) -> void:
-	var free := infirmary_beds(campaign) - fallen(campaign).filter(func(h): return in_bed(h)).size()
+	# Os leitos de quem trata uma peculiaridade (#265) também estão ocupados.
+	var free := infirmary_beds(campaign) - fallen(campaign).filter(func(h): return in_bed(h)).size() - AHStationServices.beds_treating(campaign)
 	var bed_days := int(recovery_rule("infirmary").get("Days", 2))
 	for entry in fallen(campaign):
 		if free <= 0:
@@ -1824,7 +1843,7 @@ static func rest_block(campaign: Dictionary) -> String:
 	if block != "":
 		return block
 	# Quem está numa missão solo (#183) também volta com os dias.
-	if fallen(campaign).is_empty() and AHSideMissions.running(campaign).is_empty():
+	if fallen(campaign).is_empty() and AHSideMissions.running(campaign).is_empty() and AHStationServices.beds_treating(campaign) == 0:
 		return TranslationServer.translate("Ninguém em recuperação.")
 	if ready_heroes(campaign).size() >= _smallest_team(campaign):
 		return TranslationServer.translate("Ainda há quem possa partir.")
@@ -1844,7 +1863,9 @@ static func rest_day(campaign: Dictionary) -> String:
 	if block != "":
 		return block
 	run_cycle(campaign, "rest_%d" % (int(campaign.station.cycle_number) + 1), 0)
-	campaign.station.last_rest = {"cycle": int(campaign.station.cycle_number), "recovered": tick_recovery(campaign)}
+	# Os tratamentos andam primeiro: o leito que vagar já vai para quem espera (#265).
+	var treated := AHStationServices.tick_treatments(campaign)
+	campaign.station.last_rest = {"cycle": int(campaign.station.cycle_number), "recovered": tick_recovery(campaign), "treated": treated}
 	return ""
 
 
@@ -2028,7 +2049,10 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 	run_cycle(campaign, expedition.id, returning)
 	# Ninguém morre (#118): o dia passa para quem já estava em recuperação, e quem caiu nesta expedição chega Caído
 	# (fora da noite: dorme na Enfermaria ou no Dormitório, sem vigiar nem comer da noite).
+	delivered.treated = AHStationServices.tick_treatments(campaign)
 	delivered.recovered = tick_recovery(campaign)
+	# O alívio do Bar (#265): quem ficou na Estação.
+	delivered.bar = AHStationServices.bar_relief(campaign, expedition.team)
 	# Os postos de quem ficou (#119): o que cada um rendeu; quem a Enfermaria pôs de pé volta no relatório.
 	delivered.posts = run_posts(campaign, expedition.team)
 	var digger_points := 0

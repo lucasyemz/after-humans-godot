@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "bar",
+    "Instinct": 5,
+    "TraumaSeeds": 5,
+    "Description": "Aprovado (#265, o Orquestrador em nome do Lucas, 01/11; os números da proposta): o Bar recuperado é o lugar de conversar. Na volta de cada expedição, quem ficou na Estação (vivo, fora da recuperação, da missão solo e do tratamento) perde Instinct de Instinto, sem efeito colateral. A conversa trata o trauma por TraumaSeeds sementes (saiu do Alojamento)."
+  },
+  {
+    "Name": "dormitory",
+    "BunkInstinct": 3,
+    "Description": "Aprovado (#265): com os beliches (o Dormitório no nível 2), quem dorme na noite da volta perde mais BunkInstinct de Instinto (o alívio tranquilo, sem surpresa)."
+  },
+  {
+    "Name": "infirmary_quirk",
+    "Level": 2,
+    "Days": 2,
+    "Description": "Aprovado (#265): a Enfermaria no nível Level trata uma peculiaridade negativa de um herói (perks.json, bPositive falso), sem custo novo. Ele ocupa um leito por Days dias (os ciclos da Estação) e não parte nesse tempo; no fim, a peculiaridade sai. Um tratamento por vez em cada herói; os caídos têm prioridade nos leitos que ficarem livres."
+  }
+]
