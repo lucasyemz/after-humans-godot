@@ -110,5 +110,8 @@ func _report(t) -> void:
 	var lost := _campaign("fase_1")
 	lost.session.result = "defeat"
 	t.equal(S.finish_return(lost).get("story", "x"), "", "a derrota não traz a linha")
+	# A linhagem é palavra da luta desde a #227: a linha da fase 3 não a põe entre as que ninguém entende (#285).
+	t.check(not R.STORY_REPORTS.fase_3.contains("linhagem"), "a fase 3 não diz que ninguém entende \"linhagem\"")
+	t.check(R.STORY_REPORTS.fase_3.contains("\"edição\", \"incubação\""), "e segue com as outras duas palavras")
 	for text in R.STORY_REPORTS.values():
 		t.check(not text.contains("Théo") and not text.contains("VIGIA"), "nenhuma linha revela antes da hora: %s" % text.left(30))
