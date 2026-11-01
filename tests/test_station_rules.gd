@@ -297,9 +297,9 @@ func _shelter(t) -> void:
 	c.station.rooms[S.FORGE] = 1
 	c.inventory.scrap = 3
 	t.equal(S.craft_relic(c, "botao_cobre"), "", "fabrica um Botão de Cobre")
-	t.equal(S.equip_relic(c, "hero_cao_bento", "botao_cobre"), "", "equipa")
-	t.check(c.inventory.relics.is_empty() and S.hero(c, "hero_cao_bento").relic_id == "botao_cobre", "saiu do estoque")
-	t.equal(S.equip_relic(c, "hero_cao_bento", ""), "", "tira")
+	t.equal(AHRelics.equip(c, "hero_cao_bento", 0, "botao_cobre"), "", "equipa")
+	t.check(c.inventory.relics.is_empty() and S.hero(c, "hero_cao_bento").relics == ["botao_cobre", ""], "saiu do estoque")
+	t.equal(AHRelics.equip(c, "hero_cao_bento", 0, ""), "", "tira")
 	t.check(c.inventory.relics == ["botao_cobre"], "voltou ao estoque")
 	c.inventory.seeds = 10
 	# O Alojamento ampliado (#119): cabem os recrutas do teste.

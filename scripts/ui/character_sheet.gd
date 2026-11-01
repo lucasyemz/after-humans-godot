@@ -141,9 +141,11 @@ static func _hero_passives(hero, perks: Array, class_id: String) -> Array:
 		if perk != null:
 			out.append([TranslationServer.translate(String(perk.DisplayName)), TranslationServer.translate(String(perk.get("Description", ""))), bool(perk.get("bPositive", true))])
 	if hero != null:
-		var relic = GameData.row("relics", String(hero.get("relic_id", "")))
-		if relic != null:
-			out.append([TranslationServer.translate("Relíquia: %s") % TranslationServer.translate(String(relic.DisplayName)), TranslationServer.translate(String(relic.get("Description", ""))), true])
+		# Uma linha por relíquia equipada (os dois slots, #263).
+		for relic_id in AHRelics.equipped(hero):
+			var relic = GameData.row("relics", relic_id)
+			if relic != null:
+				out.append([TranslationServer.translate("Relíquia: %s") % TranslationServer.translate(String(relic.DisplayName)), TranslationServer.translate(String(relic.get("Description", ""))), true])
 	# As melhorias do Treino (#90), uma linha por melhoria com quantas vezes foi escolhida.
 	if hero != null:
 		var counts := {}

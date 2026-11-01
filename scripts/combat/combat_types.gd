@@ -55,6 +55,8 @@ class Unit:
 	var max_hp := 1
 	var speed := 0
 	var damage_bonus := 0
+	## Pontos da chance de Superação vindos das relíquias (VirtueBonus, #263): 0.05 é +5 pp.
+	var virtue_bonus := 0.0
 	var instinct := 0
 	var perks: Array = []
 	var crisis_outcome := Crisis.NONE

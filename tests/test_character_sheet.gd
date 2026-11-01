@@ -42,7 +42,7 @@ func _info() -> void:
 	Campaign.state = c
 	var bento: Dictionary = S.hero(c, "hero_cao_bento")
 	bento.perks = ["agile"]
-	bento.relic_id = "botao_cobre"
+	bento.relics = ["botao_cobre", ""]
 	var info := AHCharacterSheet.from_hero(bento)
 	t.equal(info.kind, "Cão · Proteção", "a espécie e o papel (#189)")
 	t.check(info.passives.any(func(p): return p[0] == "Ágil" and p[1].contains("Velocidade")), "o traço com o que faz")

@@ -163,8 +163,8 @@ static func _draw(campaign: Dictionary, expedition: Dictionary) -> Array:
 		var box := {"kind": String(chosen.Kind), "amount": rng.randi_range(int(chosen.Min), int(chosen.Max)), "relic_id": ""}
 		if box.kind == "relic":
 			relic_given = true
-			var relics: Array = GameData.table("relics").keys()
-			relics.sort()
+			# Só as de origem "cargo", comuns ou incomuns, e as de fase só na carga daquela fase (#263).
+			var relics: Array = AHRelics.pool("cargo", String(expedition.get("phase_id", "")))
 			box.relic_id = relics[rng.randi_range(0, relics.size() - 1)] if not relics.is_empty() else ""
 		out.append(box)
 	return out
