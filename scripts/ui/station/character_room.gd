@@ -787,8 +787,13 @@ func _train_button(c: Dictionary, hero: Dictionary) -> Button:
 	var block := AHHeroLevels.train_block(c, hero)
 	var detail := ""
 	if cost.is_empty():
-		# No nível máximo, ainda aprende o que falta (#259).
-		detail = tr("nível máximo") if block != "" else tr("aprender")
+		# No nível máximo, ainda aprende o que falta (#259), pelas sementes de um nível (#299).
+		if AHHeroSkills.learn_options(hero).is_empty():
+			detail = tr("nível máximo")
+		elif block != "":
+			detail = tr("faltam sementes")
+		else:
+			detail = AHHeroSkills.seeds_text(AHHeroSkills.max_level_seeds())
 	elif AHHeroLevels.xp(hero) < int(cost.xp):
 		detail = tr("faltam %d XP") % (int(cost.xp) - AHHeroLevels.xp(hero))
 	elif block != "":
@@ -969,7 +974,7 @@ func _training_dialog(c: Dictionary, hero: Dictionary) -> void:
 	var cost := AHHeroLevels.next_cost(hero)
 	head.add_child(AHKit.label(tr("Treino · nível %d") % (AHHeroLevels.level(hero) + 1) if not cost.is_empty() else tr("Treino"), "panel_title", AHKit.TEXT, true, true))
 	column.add_child(head)
-	var intro_text := tr("No nível máximo, o treino ensina o que falta: custa só os fragmentos.")
+	var intro_text := tr("No nível máximo, o treino ensina o que falta: custa os fragmentos e %s.") % AHHeroSkills.seeds_text(AHHeroSkills.max_level_seeds())
 	if not cost.is_empty():
 		var seeds_text: String = tr("1 semente") if int(cost.seeds) == 1 else tr("%d sementes") % cost.seeds
 		intro_text = (tr("Escolha uma melhoria ou uma habilidade para aprender. O treino gasta o XP do nível e %s.") if wide

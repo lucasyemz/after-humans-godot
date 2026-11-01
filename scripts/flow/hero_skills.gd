@@ -158,7 +158,7 @@ static func next_fragments(hero: Dictionary) -> int:
 ## (um item como os de hero-upgrades.json, com Stat "Learn"). [] sem vaga.
 static func learn_options(hero: Dictionary) -> Array:
 	var learned: Array = hero.get("unlocked", [])
-	# No nível máximo, as vagas que sobraram continuam no Treino (só os fragmentos): nenhuma se perde.
+	# No nível máximo, as vagas que sobraram continuam no Treino (os fragmentos e as sementes de um nível): nenhuma se perde.
 	var at := AHHeroLevels.level(hero) + (0 if at_max(hero) else 1)
 	if slots_at(at) <= learned.size():
 		return []
@@ -180,20 +180,32 @@ static func at_max(hero: Dictionary) -> bool:
 	return AHHeroLevels.level(hero) >= AHHeroLevels.MAX_LEVEL
 
 
+## No nível máximo, aprender custa os fragmentos e as sementes de um nível, as do último (decisão do Lucas no #299):
+## adiar até o nível 10 não sai mais barato.
+static func max_level_seeds() -> int:
+	var row = GameData.row("hero_levels", "level_%d" % AHHeroLevels.MAX_LEVEL)
+	return 0 if row == null else int(row.Seeds)
+
+
+## "1 semente" ou "N sementes".
+static func seeds_text(count: int) -> String:
+	return TranslationServer.translate("1 semente") if count == 1 else TranslationServer.translate("%d sementes") % count
+
+
 ## "1 fragmento" ou "N fragmentos".
 static func fragments_text(count: int) -> String:
 	return TranslationServer.translate("+1 fragmento") if count == 1 else TranslationServer.translate("+%d fragmentos") % count
 
 
-## O que fica bloqueado e o requisito ("Nível 5 · Treino · +2 fragmentos"), para a ficha e a Sala; no nível máximo, só
-## "Treino · +3 fragmentos" (nunca um nível que não existe).
+## O que fica bloqueado e o requisito ("Nível 5 · Treino · +2 fragmentos"), para a ficha e a Sala; no nível máximo,
+## "Treino · +3 fragmentos · 4 sementes" (nunca um nível que não existe).
 static func requirement(hero: Dictionary) -> String:
 	var learned: int = Array(hero.get("unlocked", [])).size()
 	var levels: Array = rule("Levels", [])
 	if learned >= levels.size():
 		return ""
 	if at_max(hero):
-		return TranslationServer.translate("Treino · %s") % fragments_text(next_fragments(hero))
+		return TranslationServer.translate("Treino · %s") % fragments_text(next_fragments(hero)) + " · " + seeds_text(max_level_seeds())
 	var at := maxi(int(levels[learned]), AHHeroLevels.level(hero) + 1)
 	return TranslationServer.translate("Nível %d · Treino · %s") % [at, fragments_text(next_fragments(hero))]
 

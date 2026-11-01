@@ -151,7 +151,7 @@ msgstr "The save in slot %d could not be opened. A new campaign writes over it, 
 #: scripts/ui/title_screen.gd:514
 #: scripts/ui/exploration_hud.gd:1695
 #: scripts/ui/refuge_hud.gd:1862
-#: scripts/ui/station/character_room.gd:1041
+#: scripts/ui/station/character_room.gd:1046
 msgid "Cancelar"
 msgstr "Cancel"
 
@@ -236,12 +236,12 @@ msgstr "+1 scrap"
 
 #: scripts/flow/fight_rewards.gd:130
 #: scripts/ui/station/station_report.gd:521
-#: scripts/flow/hero_skills.gd:185
+#: scripts/flow/hero_skills.gd:197
 msgid "+%d fragmentos"
 msgstr "+%d fragments"
 
 #: scripts/flow/fight_rewards.gd:130
-#: scripts/flow/hero_skills.gd:185
+#: scripts/flow/hero_skills.gd:197
 msgid "+1 fragmento"
 msgstr "+1 fragment"
 
@@ -266,7 +266,7 @@ msgstr "+1 bandage"
 
 #: scripts/flow/fight_rewards.gd:137
 #: scripts/ui/character_sheet.gd:146
-#: scripts/ui/station/character_room.gd:848
+#: scripts/ui/station/character_room.gd:853
 msgid "Relíquia: %s"
 msgstr "Relic: %s"
 
@@ -286,39 +286,40 @@ msgstr "Compartment %d"
 msgid "(sua)"
 msgstr "(yours)"
 
-#: scripts/flow/hero_levels.gd:94
+#: scripts/flow/hero_levels.gd:95
 msgid "Nível máximo."
 msgstr "Max level."
 
-#: scripts/flow/hero_levels.gd:96
-msgid "Falta XP: %d de %d."
-msgstr "Not enough XP: %d of %d."
-
 #: scripts/flow/hero_levels.gd:98
+#: scripts/flow/hero_levels.gd:103
 msgid "Sementes insuficientes para o treino."
 msgstr "Not enough seeds for the training."
 
-#: scripts/flow/hero_levels.gd:100
+#: scripts/flow/hero_levels.gd:101
+msgid "Falta XP: %d de %d."
+msgstr "Not enough XP: %d of %d."
+
+#: scripts/flow/hero_levels.gd:105
 msgid "Nenhuma melhoria disponível."
 msgstr "No upgrade available."
 
-#: scripts/flow/hero_levels.gd:108
+#: scripts/flow/hero_levels.gd:113
 msgid "Herói não encontrado."
 msgstr "Hero not found."
 
-#: scripts/flow/hero_levels.gd:110
+#: scripts/flow/hero_levels.gd:115
 msgid "Só quem está vivo treina."
 msgstr "Only the living can train."
 
-#: scripts/flow/hero_levels.gd:120
+#: scripts/flow/hero_levels.gd:125
 msgid "Essa habilidade já foi aprendida ou ainda não está no Treino."
 msgstr "That ability was already learned or isn't in Training yet."
 
-#: scripts/flow/hero_levels.gd:121
+#: scripts/flow/hero_levels.gd:126
 msgid "Essa melhoria não é desta espécie."
 msgstr "That upgrade is not for this species."
 
-#: scripts/flow/hero_levels.gd:124
+#: scripts/flow/hero_levels.gd:129
 msgid "Fragmentos insuficientes: aprender custa mais %d."
 msgstr "Not enough fragments: learning costs %d more."
 
@@ -671,7 +672,7 @@ msgstr "Press a key…"
 
 #: scripts/ui/options_panel.gd:121
 #: scripts/ui/exploration_hud.gd:790
-#: scripts/ui/station/character_room.gd:854
+#: scripts/ui/station/character_room.gd:859
 msgid "Trocar"
 msgstr "Change"
 
@@ -1076,7 +1077,7 @@ msgstr "Bandages %d"
 #: scripts/ui/exploration_hud.gd:1637
 #: scripts/ui/exploration_hud.gd:1760
 #: scripts/ui/refuge_hud.gd:1610
-#: scripts/ui/station/character_room.gd:797
+#: scripts/ui/station/character_room.gd:802
 msgid "%d sementes"
 msgstr "%d seeds"
 
@@ -1604,7 +1605,7 @@ msgstr "Platform 1"
 
 #: scripts/ui/refuge_hud.gd:581
 #: scripts/ui/refuge_hud.gd:2125
-#: scripts/ui/station/character_room.gd:1082
+#: scripts/ui/station/character_room.gd:1087
 #: scripts/flow/station_rules.gd:1637
 msgid "Ir ao mapa"
 msgstr "Go to map"
@@ -1644,12 +1645,12 @@ msgstr "Camera"
 
 #: scripts/ui/refuge_hud.gd:598
 #: scripts/ui/refuge_hud.gd:600
-#: scripts/ui/station/character_room.gd:1079
+#: scripts/ui/station/character_room.gd:1084
 msgid "Selecionar"
 msgstr "Select"
 
 #: scripts/ui/refuge_hud.gd:598
-#: scripts/ui/station/character_room.gd:1080
+#: scripts/ui/station/character_room.gd:1085
 msgid "Ao lado"
 msgstr "Next room"
 
@@ -2580,7 +2581,7 @@ msgid "Abates"
 msgstr "Kills"
 
 #: scripts/ui/station/station_report.gd:497
-#: scripts/ui/station/character_room.gd:848
+#: scripts/ui/station/character_room.gd:853
 msgid "Sem relíquia"
 msgstr "No relic"
 
@@ -3063,78 +3064,76 @@ msgstr "No post: rests while the team is away."
 msgid " · %s sai de lá"
 msgstr " · %s leaves it"
 
-#: scripts/ui/station/character_room.gd:791
+#: scripts/ui/station/character_room.gd:792
 msgid "nível máximo"
 msgstr "max level"
 
-#: scripts/ui/station/character_room.gd:791
-msgid "aprender"
-msgstr "learn"
-
-#: scripts/ui/station/character_room.gd:793
-msgid "faltam %d XP"
-msgstr "%d XP short"
-
-#: scripts/ui/station/character_room.gd:795
+#: scripts/ui/station/character_room.gd:794
+#: scripts/ui/station/character_room.gd:800
 msgid "faltam sementes"
 msgstr "not enough seeds"
 
-#: scripts/ui/station/character_room.gd:797
-#: scripts/ui/station/character_room.gd:974
+#: scripts/ui/station/character_room.gd:798
+msgid "faltam %d XP"
+msgstr "%d XP short"
+
+#: scripts/ui/station/character_room.gd:802
+#: scripts/ui/station/character_room.gd:979
 #: scripts/flow/station_grid.gd:472
+#: scripts/flow/hero_skills.gd:192
 msgid "1 semente"
 msgstr "1 seed"
 
-#: scripts/ui/station/character_room.gd:798
-#: scripts/ui/station/character_room.gd:1054
+#: scripts/ui/station/character_room.gd:803
+#: scripts/ui/station/character_room.gd:1059
 msgid "Treinar"
 msgstr "Train"
 
-#: scripts/ui/station/character_room.gd:849
+#: scripts/ui/station/character_room.gd:854
 msgid "Equipe uma relíquia ao preparar a expedição."
 msgstr "Equip a relic when preparing the expedition."
 
-#: scripts/ui/station/character_room.gd:875
+#: scripts/ui/station/character_room.gd:880
 msgid "Traços"
 msgstr "Traits"
 
-#: scripts/ui/station/character_room.gd:896
+#: scripts/ui/station/character_room.gd:901
 msgid "Pontos fortes"
 msgstr "Strengths"
 
-#: scripts/ui/station/character_room.gd:896
+#: scripts/ui/station/character_room.gd:901
 msgid "Pontos fracos"
 msgstr "Weaknesses"
 
-#: scripts/ui/station/character_room.gd:970
+#: scripts/ui/station/character_room.gd:975
 msgid "Treino · nível %d"
 msgstr "Training · level %d"
 
-#: scripts/ui/station/character_room.gd:970
+#: scripts/ui/station/character_room.gd:975
 msgid "Treino"
 msgstr "Training"
 
-#: scripts/ui/station/character_room.gd:972
-msgid "No nível máximo, o treino ensina o que falta: custa só os fragmentos."
-msgstr "At max level, training teaches what's left: it costs only fragments."
+#: scripts/ui/station/character_room.gd:977
+msgid "No nível máximo, o treino ensina o que falta: custa os fragmentos e %s."
+msgstr "At max level, training teaches what is left: it costs the fragments and %s."
 
-#: scripts/ui/station/character_room.gd:975
+#: scripts/ui/station/character_room.gd:980
 msgid "Escolha uma melhoria ou uma habilidade para aprender. O treino gasta o XP do nível e %s."
 msgstr "Choose an upgrade or an ability to learn. Training spends the level's XP and %s."
 
-#: scripts/ui/station/character_room.gd:976
+#: scripts/ui/station/character_room.gd:981
 msgid "Escolha uma melhoria. O treino gasta o XP do nível e %s."
 msgstr "Choose an upgrade. Training spends the level's XP and %s."
 
-#: scripts/ui/station/character_room.gd:1014
+#: scripts/ui/station/character_room.gd:1019
 msgid "Custa também %d fragmentos"
 msgstr "Also costs %d fragments"
 
-#: scripts/ui/station/character_room.gd:1014
+#: scripts/ui/station/character_room.gd:1019
 msgid "Custa também 1 fragmento"
 msgstr "Also costs 1 fragment"
 
-#: scripts/ui/station/character_room.gd:1020
+#: scripts/ui/station/character_room.gd:1025
 msgid "Já tem: %d"
 msgstr "Already has: %d"
 
@@ -6164,19 +6163,19 @@ msgstr "Abilities are swapped at the Station, outside an expedition."
 msgid "Aprender: %s"
 msgstr "Learn: %s"
 
-#: scripts/flow/hero_skills.gd:196
+#: scripts/flow/hero_skills.gd:208
 msgid "Treino · %s"
 msgstr "Training · %s"
 
-#: scripts/flow/hero_skills.gd:198
+#: scripts/flow/hero_skills.gd:210
 msgid "Nível %d · Treino · %s"
 msgstr "Level %d · Training · %s"
 
-#: scripts/flow/hero_skills.gd:206
+#: scripts/flow/hero_skills.gd:218
 msgid "%s aprendeu %s. Na Sala, escolha as %d que leva."
 msgstr "%s learned %s. In the Room, choose the %d to carry."
 
-#: scripts/flow/hero_skills.gd:207
+#: scripts/flow/hero_skills.gd:219
 msgid "%s subiu para o nível %d e aprendeu %s. Na Sala, escolha as %d que leva."
 msgstr "%s reached level %d and learned %s. In the Room, choose the %d to carry."
 
@@ -9292,6 +9291,12 @@ msgstr "Take the tools from the locker"
 #. events.busca_prancheta_manutencao.pegar_ferramentas.Success
 msgid "Ferramentas limpas e bem guardadas. Bem demais. (+2 Sucata)"
 msgstr "Clean tools, well stored. Too well. (+2 Scrap)"
+
+#~ msgid "aprender"
+#~ msgstr "learn"
+
+#~ msgid "No nível máximo, o treino ensina o que falta: custa só os fragmentos."
+#~ msgstr "At max level, training teaches what's left: it costs only fragments."
 
 #~ msgid "  ·  +%d%%"
 #~ msgstr "  ·  +%d%%"

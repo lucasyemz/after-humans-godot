@@ -12,6 +12,6 @@
       3
     ],
     "MaxEquipped": 4,
-    "Description": "Proposta aprovada (#259): o Treino ensina um dos 3 desbloqueios da classe ao subir para cada nível de Levels, pelo custo do nível mais os fragmentos da vez (o 1º, o 2º e o 3º). Vão MaxEquipped para a luta."
+    "Description": "Proposta aprovada (#259): o Treino ensina um dos 3 desbloqueios da classe ao subir para cada nível de Levels, pelo custo do nível mais os fragmentos da vez (o 1º, o 2º e o 3º). Vão MaxEquipped para a luta. No nível 10, a vaga que sobrou continua: custa os fragmentos da vez e as sementes de um nível, as do level_10 de hero-levels.json (decisão do Lucas no #299)."
   }
 ]

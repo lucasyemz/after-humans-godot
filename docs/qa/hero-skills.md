@@ -18,7 +18,8 @@ As fotos saem de `tools/capture_259.gd` (`--text-size=2`). O antes é o mesmo ro
 
 - **O Treino:** ao subir para os níveis 3, 5 e 7, uma das opções é "Aprender: \<habilidade\>".
   - Custa o do nível mais 1, 2 e 3 fragmentos (`data/hero-skills.json`).
-  - No nível 10, a vaga que sobrou continua: o Treino ensina só pelos fragmentos, sem subir de nível.
+  - No nível 10, a vaga que sobrou continua: o Treino ensina pelos fragmentos e pelas sementes de um nível (as do nível
+    10, 4), sem subir de nível. Assim adiar não sai mais barato (decisão do Lucas no #299).
   - O jogador escolhe a ordem.
   - Quem escolhe uma melhoria no lugar não perde a vaga: ela continua no treino seguinte.
   - Aprender não equipa. O aviso diz onde escolher: "Na Sala, escolha as 4 que leva.".

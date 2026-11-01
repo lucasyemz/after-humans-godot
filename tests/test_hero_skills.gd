@@ -170,19 +170,30 @@ func _training() -> void:
 	learn = AHHeroLevels.options(bento).filter(func(o): return String(o.get("Stat", "")) == "Learn")
 	t.check(learn.size() == 2, "a vaga continua no treino para o nível 6")
 	t.equal(AHHeroSkills.requirement(bento), "Nível 6 · Treino · +2 fragmentos", "e o requisito diz quando e quanto")
-	# No nível máximo, a vaga que sobrou continua: o Treino ensina só pelos fragmentos, sem subir de nível.
+	# No nível máximo, a vaga que sobrou continua: o Treino ensina pelos fragmentos e pelas sementes de um nível (#299),
+	# sem subir de nível.
 	var tc: Dictionary = _campaign(2603)
 	var top: Dictionary = S.hero(tc, "hero_gato_nick")
 	top.level = AHHeroLevels.MAX_LEVEL
 	top.xp = 0
 	tc.inventory.fragments = 1
-	t.equal(AHHeroSkills.requirement(top), "Treino · +1 fragmento", "no nível 10, o requisito não pede um nível que não existe")
+	var level_seeds: int = int(GameData.row("hero_levels", "level_%d" % AHHeroLevels.MAX_LEVEL).Seeds)
+	t.equal(AHHeroSkills.max_level_seeds(), level_seeds, "no nível 10, aprender custa as sementes de um nível (as do nível 10)")
+	t.equal(AHHeroSkills.requirement(top), "Treino · +1 fragmento · %d sementes" % level_seeds, "no nível 10, o requisito não pede um nível que não existe e diz as sementes")
 	learn = AHHeroLevels.options(top)
 	t.check(learn.size() == 3 and learn.all(func(o): return String(o.get("Stat", "")) == "Learn"), "no nível 10, o Treino só ensina")
-	var seeds_before := S.quantity(tc, "seeds")
+	# Sem as sementes, não aprende e nada é gasto.
+	tc.inventory.seeds = level_seeds - 1
+	t.equal(AHHeroLevels.train(tc, String(top.id), AHHeroSkills.LEARN + "gato_rasgo_rapido"), TranslationServer.translate("Sementes insuficientes para o treino."),
+		"no nível 10, sem as sementes de um nível, não aprende")
+	t.check(S.quantity(tc, "seeds") == level_seeds - 1 and S.quantity(tc, "fragments") == 1 and Array(top.get("unlocked", [])).is_empty(), "e nada é gasto")
+	tc.inventory.seeds = level_seeds + 2
 	t.equal(AHHeroLevels.train(tc, String(top.id), AHHeroSkills.LEARN + "gato_rasgo_rapido"), "", "aprende no nível 10")
-	t.check(AHHeroLevels.level(top) == AHHeroLevels.MAX_LEVEL and S.quantity(tc, "seeds") == seeds_before and S.quantity(tc, "fragments") == 0,
-		"sem subir de nível nem gastar sementes, só o fragmento")
+	t.check(AHHeroLevels.level(top) == AHHeroLevels.MAX_LEVEL and S.quantity(tc, "seeds") == 2 and S.quantity(tc, "fragments") == 0,
+		"sem subir de nível: gasta o fragmento e as sementes de um nível")
+	# Adiar não sai mais barato: aprender no nível 10 custa o mesmo que o nível 10 em sementes.
+	t.check(AHHeroSkills.max_level_seeds() >= int(GameData.row("hero_levels", "level_%d" % (AHHeroLevels.MAX_LEVEL - 1)).Seeds), "o custo do nível 10 não é menor que o de um nível antes")
+	tc.inventory.seeds = 50
 	t.check(AHHeroLevels.train(tc, String(top.id), AHHeroSkills.LEARN + "gato_rasgo_rapido").contains("já foi aprendida"), "aprender de novo diz o motivo")
 	t.check(not AHHeroSkills.learned_notice(top, "gato_rasgo_rapido", false).contains("nível"), "e o aviso não fala de subir de nível")
 	var notice := AHHeroSkills.learned_notice(bento, "cao_ombro_de_carga")

@@ -1750,6 +1750,7 @@ station_grid.gd: Lines
 refuge_hud.gd: Dig_%s
 character_room.gd: Fragments
 hero_levels.gd: Fragments
+hero_skills.gd: level_%d
 hero_skills.gd: Fragments
 character_room.gd: Learn
 hero_levels.gd: Learn

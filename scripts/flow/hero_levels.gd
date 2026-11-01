@@ -91,7 +91,12 @@ static func stacks(hero: Dictionary, upgrade_id: String) -> int:
 static func train_block(campaign: Dictionary, hero: Dictionary) -> String:
 	var cost := next_cost(hero)
 	if cost.is_empty():
-		return "" if not AHHeroSkills.learn_options(hero).is_empty() else TranslationServer.translate("Nível máximo.")
+		if AHHeroSkills.learn_options(hero).is_empty():
+			return TranslationServer.translate("Nível máximo.")
+		# Aprender no nível máximo custa as sementes de um nível (#299), além dos fragmentos.
+		if AHStationRules.quantity(campaign, "seeds") < AHHeroSkills.max_level_seeds():
+			return TranslationServer.translate("Sementes insuficientes para o treino.")
+		return ""
 	if xp(hero) < cost.xp:
 		return TranslationServer.translate("Falta XP: %d de %d.") % [xp(hero), cost.xp]
 	if AHStationRules.quantity(campaign, "seeds") < cost.seeds:
@@ -122,12 +127,14 @@ static func train(campaign: Dictionary, hero_id: String, upgrade_id: String) -> 
 	var fragments := int(upgrade.get("Fragments", 0))
 	if AHStationRules.quantity(campaign, "fragments") < fragments:
 		return TranslationServer.translate("Fragmentos insuficientes: aprender custa mais %d.") % fragments
-	# No nível máximo, aprender não sobe de nível: custa só os fragmentos.
+	# No nível máximo, aprender não sobe de nível: custa os fragmentos e as sementes de um nível (#299).
 	var cost := next_cost(hero)
 	if not cost.is_empty():
 		AHStationRules.adjust(campaign, "seeds", -int(cost.seeds))
 		hero.xp = xp(hero) - int(cost.xp)
 		hero.level = level(hero) + 1
+	else:
+		AHStationRules.adjust(campaign, "seeds", -AHHeroSkills.max_level_seeds())
 	AHStationRules.adjust(campaign, "fragments", -fragments)
 	# Aprender (#259): o desbloqueio entra no que ele sabe, sem equipar sozinho (a escolha das 4 é na Sala).
 	if String(upgrade.Stat) == "Learn":
