@@ -267,10 +267,12 @@ func _screens() -> void:
 			and station._candidate_id == second_id, "e os dois continuam na plataforma, com o escolhido à frente")
 		# Acolher travado (sem sementes) no outro: a ordem e a cena ficam como estavam.
 		Campaign.state.inventory.seeds = 0
+		var cards_before := [station._candidate, station._companion]
 		hud._decide(first_id, true)
 		await _frames(3)
 		t.check(Campaign.state.station.train.candidate_id == second_id and station._candidate_id == second_id
 			and Campaign.state.station.train.next.get("candidate_id", "") == first_id, "a decisão barrada não troca ninguém de lugar")
+		t.check(station._candidate == cards_before[0] and station._companion == cards_before[1], "nem os dois na cena")
 		Campaign.state.inventory.seeds = 500
 		hud.refresh()
 		await _frames(3)
