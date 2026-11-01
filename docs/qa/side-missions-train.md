@@ -62,3 +62,10 @@ trem também", com o relatório da missão.
   da tela.
 
   Correção: o motivo ficou "Receba o trem antes de partir.", que cabe numa linha no Maior, como o do Mercador.
+
+- **Rodada 3: APROVADO.** O `run_all` passa 104/104. No Maior, o motivo cabe numa linha, e a cena da rodada 2 continua
+  certa. Ficam observações baixas:
+  - a captura num dia de espera, sem ninguém voltando, não tem aviso (já era assim antes desta branch);
+  - a lista do que espera diz "O Mercador espera na plataforma" mesmo quando o trem das missões vem primeiro;
+  - o "Quem voltou" do quadro lista quem ainda está no trem;
+  - o Mercador que já estava na plataforma sai de cena e chega de novo depois do RECEBER.
