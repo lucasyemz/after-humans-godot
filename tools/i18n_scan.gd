@@ -24,6 +24,7 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/core/game_data_service.gd", "res://scripts/flow/game_flow.gd", "res://scripts/combat/combat_arena.gd",
 	"res://scripts/ui/tutorial_hint.gd", "res://scripts/street/tutorial_guide.gd", "res://scripts/ui/station/station_tour.gd", "res://scripts/flow/station_grid.gd",
 	"res://scripts/flow/side_mission_rules.gd", "res://scripts/ui/mission_board.gd",
+	"res://scripts/flow/rescue_rules.gd",
 	"res://scripts/flow/type_advantage.gd", "res://scripts/flow/hero_skills.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {

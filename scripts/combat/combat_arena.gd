@@ -190,6 +190,9 @@ static func _variant_entry(founder: Dictionary, variant: String) -> Dictionary:
 	for ability_id in art.get("actions", {}):
 		actions[ability_id] = actions.get(ability_id, {}).merged(art.actions[ability_id])
 	var out := {"name": variant, "variant": variant, "idle": art.idle, "actions": actions, "reactions": art.get("reactions", {})}
+	# A guarda de luta do próprio recruta (#221: o Guaxinim e o Tatu); a do fundador não passa para ele.
+	if art.has("combat_idle"):
+		out.combat_idle = art.combat_idle
 	_variants[key] = out
 	return out
 

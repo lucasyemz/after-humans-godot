@@ -40,9 +40,10 @@ func run(context) -> void:
 
 
 ## O espaço entre heróis vizinhos (o escudo do Tatu, #196): só fundadores, qualquer equipe de 1 a 4 e qualquer
-## distribuição nas posições (com vazias no meio, depois de Recuar ou de uma morte), ficam na fila de sempre; com o Tatu
-## e o Guaxinim, os vizinhos ficam a pelo menos as meias larguras mais a folga, e a posição 4 nunca passa do que o fit()
-## reservou.
+## distribuição nas posições (com vazias no meio, depois de Recuar ou de uma morte), ficam na fila de sempre. Redesenhados
+## (#225), o Tatu e o Guaxinim cabem na posição e ficam também na fila de sempre. Com um herói mais largo que a posição
+## (a medida do Tatu antigo, que fica para um próximo herói largo), os vizinhos ficam a pelo menos as meias larguras mais
+## a folga, e a posição 4 nunca passa do que o fit() reservou.
 func _hero_spacing() -> void:
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Arena.ART_MANIFEST))
 	var halves := {}
@@ -54,7 +55,12 @@ func _hero_spacing() -> void:
 		card.show_art(Arena.art_entry(manifest.heroes, hero_id, variants[0] if class_id in ["rato", "tatu"] else "").idle)
 		halves[hero_id] = Arena.half_width(card)
 		card.free()
-	t.check(halves.hero_tatu_5 > Arena.NARROW_HALF, "o Tatu é mais largo que a posição (%.2f m de meia largura)" % halves.hero_tatu_5)
+	# A #225 pede o Tatu com no máximo uns 1,2 m de largura: redesenhado, ele cabe na posição.
+	t.check(halves.hero_tatu_5 <= Arena.NARROW_HALF, "o Tatu redesenhado cabe na posição (%.2f m de meia largura)" % halves.hero_tatu_5)
+	t.check(halves.hero_rato_6 <= Arena.NARROW_HALF, "e o Guaxinim também (%.2f m)" % halves.hero_rato_6)
+	# O herói largo de teste: a meia largura do Tatu antigo (1,48 m de largura, #196).
+	halves["hero_largo_7"] = 0.74
+	halves["hero_largo_8"] = 0.74
 	var arena = Arena.new()
 	arena.session = AHCombatSession.new()
 	arena.session.state = AHCombat.State.new()
@@ -62,8 +68,10 @@ func _hero_spacing() -> void:
 	var wide_ok := true
 	var wide_inside := true
 	for team in [["hero_cao_bento", "hero_gato_nick", "hero_sapo_iris", "hero_coruja_vespera"],
-			["hero_cao_bento", "hero_tatu_5", "hero_rato_6", "hero_gato_nick"], ["hero_tatu_5", "hero_rato_6"]]:
-		var founders: bool = not team.has("hero_tatu_5")
+			["hero_cao_bento", "hero_tatu_5", "hero_rato_6", "hero_gato_nick"], ["hero_tatu_5", "hero_rato_6"],
+			["hero_largo_7", "hero_tatu_5", "hero_largo_8", "hero_cao_bento"], ["hero_largo_7", "hero_largo_8"]]:
+		# Quem cabe na posição fica na fila de sempre (os fundadores e, depois da #225, o Tatu e o Guaxinim).
+		var founders: bool = not team.has("hero_largo_7")
 		# Cada subconjunto da equipe em cada jeito de ocupar as posições 1 a 4.
 		for mask in range(1, 1 << team.size()):
 			var members: Array = []
@@ -93,9 +101,9 @@ func _hero_spacing() -> void:
 				if arena.hero_offset(Arena.RANKS) > Arena.FRONT_GAP + (Arena.RANKS - 1) * Arena.HERO_GAP + reserve + 0.0001:
 					wide_inside = false
 	arena.free()
-	t.check(founders_same, "só fundadores: a fila de sempre em qualquer equipe e posição")
-	t.check(wide_ok, "com o Tatu: os vizinhos não se cobrem")
-	t.check(wide_inside, "com o Tatu: a posição 4 fica dentro do que o fit() reservou")
+	t.check(founders_same, "quem cabe na posição (os fundadores, o Tatu e o Guaxinim): a fila de sempre em qualquer equipe e posição")
+	t.check(wide_ok, "com um herói largo: os vizinhos não se cobrem")
+	t.check(wide_inside, "com um herói largo: a posição 4 fica dentro do que o fit() reservou")
 
 
 ## Todos os jeitos de pôr count heróis em posições distintas de 1 a RANKS.

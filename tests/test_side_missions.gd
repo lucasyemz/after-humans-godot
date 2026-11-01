@@ -155,15 +155,15 @@ func _away(t) -> void:
 
 
 func _resolve(t) -> void:
-	# Com a captura desligada (até o resgate, #188), quem seria capturado volta com ferimentos e de mãos vazias.
-	t.check(not bool(M.rules().get("CaptureEnabled", true)), "a captura fica desligada nos dados até o resgate")
+	# A captura ligada com o resgate (#188). Desligada, quem seria capturado volta com ferimentos e de mãos vazias.
+	t.check(bool(M.rules().get("CaptureEnabled", false)), "a captura fica ligada nos dados, com o resgate")
+	var rules := M.rules()
+	rules.CaptureEnabled = false
 	var off := _round(t, false)
+	rules.CaptureEnabled = true
 	t.check(off.has("success") and off.has("hurt") and not off.has("captured"), "desligada: o sucesso e o ferido, nunca a captura: %s" % str(off.keys()))
 	t.check(off.has("empty"), "e há quem volte ferido de mãos vazias (a captura evitada)")
-	var rules := M.rules()
-	rules.CaptureEnabled = true
 	var on := _round(t, true)
-	rules.CaptureEnabled = false
 	t.check(on.has("success") and on.has("hurt") and on.has("captured"), "ligada: os três resultados aparecem: %s" % str(on.keys()))
 
 

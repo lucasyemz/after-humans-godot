@@ -335,8 +335,12 @@ func _build_missions(c: Dictionary) -> void:
 	# Com a missão e o herói escolhidos, o foco vai a MANDAR; só a missão, ao primeiro herói; senão, ao pino escolhido.
 	var send: Button = _footer.get_node_or_null("Send")
 	var heroes: Array = side.filter(func(b): return String(b.name).begins_with("Hero_"))
+	var prepare: Button = _footer.get_node_or_null("Prepare")
 	if send != null and not send.disabled:
 		AHKit.focus_later(send)
+	elif prepare != null:
+		# O resgate escolhido (#188): o foco vai a PREPARAR NESTA FASE.
+		AHKit.focus_later(prepare)
 	elif mission != "" and not heroes.is_empty():
 		AHKit.focus_later(heroes.filter(func(b): return String(b.name) == "Hero_%s" % hero_pick)[0] if hero_pick != "" and heroes.any(func(b): return String(b.name) == "Hero_%s" % hero_pick) else heroes[0])
 	else:
