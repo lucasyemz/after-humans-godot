@@ -1,0 +1,8 @@
+[
+  {
+    "Name": "TypeAdvantage",
+    "Enabled": true,
+    "Multiplier": 1.25,
+    "Description": "#227: a vantagem de tipo (inspirada nos confrontos de Pokémon, regra de jogo, não de biologia). No dano direto, o atacante cuja linhagem ou família mecânica vence a classificação do defensor (Beats, em type-classes.json) causa Multiplier vezes o dano, arredondado para o mais próximo (o meio para cima). Hipótese inicial, para medir (decisão do Lucas, 28/10)."
+  }
+]

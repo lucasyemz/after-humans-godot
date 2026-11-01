@@ -1613,6 +1613,12 @@ character_room.gd: Skin_%s
 *: heroes
 *: default
 station_rules.gd: Unlock
+combat_hud.gd: Advantage
+character_sheet.gd: type
+character_sheet.gd: Type
+combat_hud.gd: type
+combat_hud.gd: Type
+type_advantage.gd: type
 station_rules.gd: %s:merchant
 station_rules.gd: Limit
 station_rules.gd: dormitory_level_%d
