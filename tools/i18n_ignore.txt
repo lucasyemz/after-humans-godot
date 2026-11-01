@@ -1663,7 +1663,6 @@ mission_board.gd: Hint
 mission_board.gd: Send
 mission_board.gd: Hero_%s
 mission_board.gd: List_%s
-station_report.gd: missions
 station_rules.gd: missions
 mission_board.gd: spot
 mission_board.gd: Title
@@ -1779,3 +1778,4 @@ rescue_rules.gd: rescue
 rescue_rules.gd: join
 rescue_rules.gd: corridor
 station_rules.gd: help
+refuge_hud.gd: reports

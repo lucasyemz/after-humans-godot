@@ -1382,6 +1382,10 @@ func _spawn_candidate(feet: Vector3) -> AHSpriteCard:
 	var recruit: Dictionary = S.train_recruit(Campaign.state)
 	if art.is_empty() and not recruit.is_empty() and Campaign.state.station.train.candidate_id == _candidate_id:
 		art = AHCombatArena.hero_art_of(_candidate_id, String(recruit.art_variant)).get("idle", {})
+	# Quem volta de uma missão solo (#183): o herói do elenco, na arte dele.
+	var returning = S.hero(Campaign.state, _candidate_id)
+	if art.is_empty() and returning != null:
+		art = AHCombatArena.hero_art_of(_candidate_id, String(returning.get("art_variant", ""))).get("idle", {})
 	# O Mercador (#182, parte 2): a arte dele, de pé (_tick_merchant troca a pose).
 	if art.is_empty() and _candidate_id == S.MERCHANT:
 		art = AHCombatArena.npc_art_of(S.MERCHANT).get("idle", {})

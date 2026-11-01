@@ -668,7 +668,8 @@ static func allocate(campaign: Dictionary, food: int, water: int) -> Dictionary:
 
 
 static func visit_pending(campaign: Dictionary) -> bool:
-	return campaign.station.train.phase != "none"
+	# O trem das missões solo (#183) também: quem volta delas chega nele.
+	return campaign.station.train.phase != "none" or AHSideMissions.train_pending(campaign)
 
 
 ## Um número do trem (#122) em data/recruitment.json.
@@ -1603,6 +1604,10 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 	if campaign.night.phase != "none":
 		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."),
 			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
+	# A volta das missões solo (#183): o trem traz quem terminou a missão, com o relatório.
+	if AHSideMissions.train_pending(campaign):
+		return {"title": TranslationServer.translate("O trem trouxe quem estava em missão"), "text": TranslationServer.translate("Quem terminou a missão solo voltou no trem, com o relatório do que achou lá fora."),
+			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
 	if merchant_here(campaign):
 		return {"title": TranslationServer.translate("O Mercador está na plataforma"), "text": TranslationServer.translate("O Sr. dos Trilhos veio no trem para trocar sementes, sucata e fragmentos. Troque o que quiser e dispense-o antes de preparar a expedição."),
 			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}

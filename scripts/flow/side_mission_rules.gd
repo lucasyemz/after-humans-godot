@@ -126,9 +126,29 @@ static func captured(campaign: Dictionary) -> Array:
 	return campaign.roster.filter(func(entry): return typeof(entry.get("captured")) == TYPE_DICTIONARY)
 
 
-## Fora da Estação: numa missão ou capturado. Não parte, não pega posto e não passa a noite.
+## Fora da Estação: numa missão, capturado ou ainda no trem da volta. Não parte, não pega posto e não passa a noite.
 static func away(entry) -> bool:
-	return entry != null and (typeof(entry.get("side_mission")) == TYPE_DICTIONARY or typeof(entry.get("captured")) == TYPE_DICTIONARY)
+	return entry != null and (typeof(entry.get("side_mission")) == TYPE_DICTIONARY or typeof(entry.get("captured")) == TYPE_DICTIONARY
+		or bool(entry.get("on_train", false)))
+
+
+## A volta no trem (decisão do Lucas de 28/10): quem termina a missão chega depois da missão principal, no trem, com o
+## relatório. Até a chegada ser vista (o painel do trem), fica no trem.
+static func on_train(campaign: Dictionary) -> Array:
+	return campaign.roster.filter(func(entry): return bool(entry.get("on_train", false)))
+
+
+static func train_pending(campaign: Dictionary) -> bool:
+	return not on_train(campaign).is_empty()
+
+
+## O trem chegou: quem estava nele desce na Estação. Devolve os ids.
+static func arrive(campaign: Dictionary) -> Array:
+	var out: Array = []
+	for entry in on_train(campaign):
+		entry.erase("on_train")
+		out.append(entry.id)
+	return out
 
 
 ## Por que o herói está fora ("" se não está).
@@ -137,6 +157,8 @@ static func away_text(entry) -> String:
 		return ""
 	if typeof(entry.get("captured")) == TYPE_DICTIONARY:
 		return TranslationServer.translate("%s está com os robôs e espera o resgate.") % entry.display_name
+	if bool(entry.get("on_train", false)):
+		return TranslationServer.translate("%s chega no trem.") % entry.display_name
 	if typeof(entry.get("side_mission")) == TYPE_DICTIONARY:
 		var row := mission(String(entry.side_mission.id))
 		return TranslationServer.translate("%s está numa missão solo (%s).") % [entry.display_name, TranslationServer.translate(String(row.get("Title", "")))]
@@ -273,6 +295,9 @@ static func _resolve(campaign: Dictionary, entry: Dictionary) -> Dictionary:
 	var entry_spot = entry.side_mission.get("spot", -1)
 	entry.erase("side_mission")
 	var report := {"hero_id": entry.id, "mission": mission_id, "day": day(campaign), "reward": {}}
+	# Quem volta (sem a captura) chega no trem, depois da missão principal.
+	if roll < value + int(r.get("HurtBand", 25)) or not bool(r.get("CaptureEnabled", false)):
+		entry.on_train = true
 	if roll < value:
 		report.result = "success"
 		report.reward = _reward(campaign, row, rng, false)
