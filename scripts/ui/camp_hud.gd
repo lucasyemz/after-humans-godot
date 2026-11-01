@@ -523,13 +523,14 @@ func refresh() -> void:
 		card.custom_minimum_size.y = maxf((card.get_child(0) as Control).get_combined_minimum_size().y + 28.0, 72.0 + 26.0 + 36.0)
 	# ↑/↓: a carta escolhida, RAÇÃO, CURATIVO e CONTINUAR, em roda; ←/→ são do herói (o _input).
 	var chosen_card: Button = _cards.get(hero_id)
-	var order: Array = [chosen_card, eat_button, heal_button] + skill_buttons + [leave_button]
+	# Os apagados ficam fora da roda: ↑/↓ pulam o que não serve agora (com tudo apagado, a carta e CONTINUAR).
+	var order: Array = [chosen_card] + ([eat_button, heal_button] + skill_buttons).filter(func(b): return not b.disabled) + [leave_button]
 	# Ao sair da árvore (o foco que sai do cuidado chama a prévia), os filhos saem antes: sem caminho, sem vizinhos.
 	if (_cards.values() + order).any(func(control): return control == null or not control.is_inside_tree()):
 		return
 	for card in _cards.values():
 		card.focus_neighbor_top = leave_button.get_path()
-		card.focus_neighbor_bottom = eat_button.get_path()
+		card.focus_neighbor_bottom = order[1].get_path()
 	for i in range(1, order.size()):
 		order[i].focus_neighbor_top = order[i - 1].get_path()
 		order[i].focus_neighbor_bottom = order[(i + 1) % order.size()].get_path()

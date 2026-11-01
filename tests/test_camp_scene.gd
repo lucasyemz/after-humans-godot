@@ -190,6 +190,22 @@ func _skills_in_camp() -> void:
 		await _frames(3)
 		var after: Control = street.get_viewport().gui_get_focus_owner()
 		t.check(after != panel.leave_button, "depois de usar, o foco não vai para CONTINUAR (%s)" % (after.name if after else "nenhum"))
+	# Com tudo apagado (o Tempo gasto, a vida cheia, o instinto em 0), ↓ a partir da carta chega a CONTINUAR.
+	for id in ids:
+		var someone = S.hero(Campaign.state, id)
+		someone.hp = someone.max_hp
+		someone.instinct = 0
+	AHCampSkills.camp(Campaign.state).time = AHCampSkills.time_budget()
+	panel.refresh()
+	await _frames(1)
+	(panel._cards.get(bento) as Control).grab_focus()
+	await _frames(1)
+	var down := InputEventAction.new()
+	down.action = "ui_down"
+	down.pressed = true
+	_tree.root.push_input(down)
+	await _frames(2)
+	t.equal(street.get_viewport().gui_get_focus_owner(), panel.leave_button, "com tudo apagado, ↓ a partir da carta chega a CONTINUAR")
 	# Esc desiste do alvo.
 	(panel.find_child("Skill_camp_comum_conversa_ao_fogo", true, false) as Button).pressed.emit()
 	await _frames(1)
