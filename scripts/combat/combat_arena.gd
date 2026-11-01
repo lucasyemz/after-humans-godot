@@ -666,11 +666,12 @@ func _advance(actor: AHCombat.Unit, card: AHSpriteCard, ability_id: String, hero
 	var direction := signf(gap)
 	var available := maxf(0.0, absf(gap) - ((card.body_height + struck.body_height) * 0.3 + 0.3))
 	var key := art_id(ability_id)
-	# A do recruta (#215) com a arte de outra: o alcance é o dela (a Bicada, da frente, anda até o alvo).
+	# A do recruta (#215) com a arte de outra anda como a arte; o golpe de dano que só parte da frente (a Bicada) anda
+	# até o alvo.
 	var own = GameData.row("abilities", ability_id) if key != ability_id else null
-	var ranged: bool = Array(own.get("OriginRanks", [])).map(func(r): return int(r)).min() >= 2 if own != null \
-		else (RANGED.has(key) or key.contains("tiro") or key.contains("descarga"))
-	if ranged:
+	var damage = own.get("DamageRange") if own != null else null
+	var melee: bool = damage is Dictionary and int(damage.get("Max", 0)) > 0 and Array(own.get("OriginRanks", [])).all(func(r): return int(r) <= 2)
+	if not melee and (RANGED.has(key) or key.contains("tiro") or key.contains("descarga")):
 		return direction * minf(available, card.body_height * 0.16)
 	if not actor.is_player:
 		return direction * available * 0.4
