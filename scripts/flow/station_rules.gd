@@ -81,21 +81,21 @@ const REQUEST_BONUS := 1
 const CIVILIANS := [
 	{"id": DORA, "name": "Dora", "species": "Texugo", "role": "Cozinheira", "trait": "Prática, evita desperdício.",
 		"need": "Quer recuperar um caderno de receitas esquecido numa mercearia abandonada.",
-		"benefit": "Na Cantina com energia, produz mais 2 suprimentos por volta.",
-		"drawback": "Cozinhar gasta água: bebe 2 por volta.",
-		"request_item": "o caderno de receitas", "request_reward": "a Cantina rende mais 1 suprimento por volta",
+		"benefit": "Na Cantina com energia, produz mais 2 suprimentos por dia.",
+		"drawback": "Cozinhar gasta água: bebe 2 por dia.",
+		"request_item": "o caderno de receitas", "request_reward": "a Cantina rende mais 1 suprimento por dia",
 		"food": 1, "water": 2, "room": CANTEEN},
 	{"id": OTTO, "name": "Otto", "species": "Castor", "role": "Técnico", "trait": "Paciente, testa antes de improvisar.",
 		"need": "Quer recuperar a maleta da equipe ferroviária.",
 		"benefit": "Mantém o gerador: mais 1 de capacidade de energia. Recuperar e melhorar cômodos custa 1 sucata a menos.",
-		"drawback": "Trabalho pesado: come 2 suprimentos por volta.",
+		"drawback": "Trabalho pesado: come 2 suprimentos por dia.",
 		"request_item": "a maleta da equipe ferroviária", "request_reward": "mais 1 de capacidade de energia",
 		"food": 2, "water": 1, "room": FORGE},
 	{"id": CORA, "name": "Cora", "species": "Gambá", "role": "Pesquisadora", "trait": "Metódica e cética.",
 		"need": "Quer recuperar registros de monitoramento para comparar a água local.",
-		"benefit": "Com a Pesquisa recuperada e ligada, traz 1 fragmento por volta.",
+		"benefit": "Com a Pesquisa recuperada e ligada, traz 1 fragmento por dia.",
 		"drawback": "Equipamentos ligados o tempo todo: a Pesquisa gasta 1 de energia a mais.",
-		"request_item": "os registros de monitoramento", "request_reward": "mais 1 fragmento por volta",
+		"request_item": "os registros de monitoramento", "request_reward": "mais 1 fragmento por dia",
 		"food": 1, "water": 1, "room": RESEARCH},
 ]
 
@@ -448,18 +448,18 @@ static func vitals(campaign: Dictionary, returning: int = 4) -> Array:
 	elif food > f.food_capacity:
 		food_note = TranslationServer.translate("! %d acima de %d") % [food - f.food_capacity, f.food_capacity]
 	elif food_short:
-		food_note = TranslationServer.translate("! Falta na volta")
+		food_note = TranslationServer.translate("! Falta na próxima expedição")
 	else:
-		food_note = TranslationServer.translate("Próxima volta: %d") % f.food_after_night
+		food_note = TranslationServer.translate("Próxima expedição: %d") % f.food_after_night
 	var power_short: bool = not f.unpowered_rooms.is_empty()
 	return [
 		{"id": "food", "label": TranslationServer.translate("COMIDA"), "icon": "lobby-food", "value": TranslationServer.translate("%d / %d suprimentos") % [food, f.food_capacity],
 			"note": food_note, "warn": food_short or food > f.food_capacity,
-			"tip": TranslationServer.translate("Estoque e capacidade do Depósito. Na próxima volta, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d.") % [
+			"tip": TranslationServer.translate("Estoque e capacidade do Depósito. Na próxima expedição, sem saque: +%d da Cantina, %d para os moradores, %d estragam, %d para a noite; restam %d.") % [
 				f.food_produced, f.food_civilians, f.food_spoiled, f.food_night_need, f.food_after_night]},
 		{"id": "water", "label": TranslationServer.translate("ÁGUA"), "icon": "lobby-water", "value": TranslationServer.translate("%d em estoque") % f.water,
-			"note": TranslationServer.translate("! Falta na volta") if f.thirsty else TranslationServer.translate("Próxima volta: %d") % f.water_after, "warn": f.thirsty,
-			"tip": TranslationServer.translate("Na próxima volta, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto.") % [
+			"note": TranslationServer.translate("! Falta na próxima expedição") if f.thirsty else TranslationServer.translate("Próxima expedição: %d") % f.water_after, "warn": f.thirsty,
+			"tip": TranslationServer.translate("Na próxima expedição, sem saque: o coletor repõe %d e a equipe e os moradores bebem %d; restam %d. Sem água, o descanso reduz menos instinto.") % [
 				f.water_produced, f.water_consumed, f.water_after]},
 		{"id": "power", "label": TranslationServer.translate("ENERGIA"), "icon": "lobby-energy", "value": TranslationServer.translate("%d / %d em uso") % [f.power_used, f.power_capacity],
 			"note": (TranslationServer.translate("! %d %s sem energia") % [f.unpowered_rooms.size(), TranslationServer.translate("sala") if f.unpowered_rooms.size() == 1 else TranslationServer.translate("salas")]) if power_short \
@@ -490,16 +490,16 @@ static func _room_benefit(room_id: String, level: int) -> String:
 		DORMITORY:
 			# Sem camas no nível 1 (a equipe dorme no chão); os beliches chegam com a melhoria (#176).
 			if level <= 1:
-				return TranslationServer.translate("Sem camas: a equipe dorme no chão depois de cada volta. Com os beliches, cabem %d ajudantes.") % helper_limit_at(2)
-			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada volta. Cabem %d ajudantes.") % helper_limit_at(level)
+				return TranslationServer.translate("Sem camas: a equipe dorme no chão depois de cada expedição. Com os beliches, cabem %d ajudantes.") % helper_limit_at(2)
+			return TranslationServer.translate("Beliches de ferro: a equipe dorme neles depois de cada expedição. Cabem %d ajudantes.") % helper_limit_at(level)
 		BAR:
 			return TranslationServer.translate("Salão vazio. Recuperado, vira um lugar para conversar e fazer uma pausa.") if level <= 0 else TranslationServer.translate("Um lugar para conversar e fazer uma pausa.")
 		CANTEEN:
 			if level >= 2:
-				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por expedição.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
-			return TranslationServer.translate("Com energia, produz 2 suprimentos por expedição.")
+				return TranslationServer.translate("Cantina construída: com energia, produz %d suprimentos por dia.") % (CANTEEN_FOOD + int(AHStationGrid.rule("canteen_level_2").get("Food", 1)))
+			return TranslationServer.translate("Com energia, produz 2 suprimentos por dia.")
 		DEPOT:
-			return TranslationServer.translate("Guarda até 12 suprimentos; o excesso estraga na volta.") if level <= 1 else TranslationServer.translate("Prateleiras extras: guarda até 20.")
+			return TranslationServer.translate("Guarda até 12 suprimentos; o excesso estraga a cada dia.") if level <= 1 else TranslationServer.translate("Prateleiras extras: guarda até 20.")
 		PREPARATION:
 			# O nível 2 abre as missões solo (#183).
 			return TranslationServer.translate("Escolher a fase, a equipe, o foco da rota e os suprimentos da partida.") if level <= 1 \
@@ -2113,8 +2113,8 @@ static func focus_reason(campaign: Dictionary, focus_id: String, team: int = 4) 
 	var f := forecast(campaign, team)
 	match focus_id:
 		FOCUS_WATER:
-			return (TranslationServer.translate("Água: %d na estação; a equipe bebe %d na volta e vai faltar.") % [f.water, f.water_consumed]) if f.thirsty \
-				else (TranslationServer.translate("Água: %d na estação, %d depois da próxima volta.") % [f.water, f.water_after])
+			return (TranslationServer.translate("Água: %d na estação; a equipe bebe %d na próxima expedição e vai faltar.") % [f.water, f.water_consumed]) if f.thirsty \
+				else (TranslationServer.translate("Água: %d na estação, %d depois da próxima expedição.") % [f.water, f.water_after])
 		FOCUS_PARTS:
 			var need := _needed_room(campaign)
 			return TranslationServer.translate("Sucata para relíquias e melhorias.") if need[0] == "" else TranslationServer.translate("Faltam %d sucatas para %s.") % [need[1], _room_the(need[0])]
@@ -2296,14 +2296,14 @@ static func post_yield(entry: Dictionary, room_id: String) -> int:
 static func yield_text(room_id: String, amount: int) -> String:
 	match String(job_rule(room_id).get("Unit", "")):
 		"fragments":
-			return TranslationServer.translate("+%d fragmento por volta") % amount if amount == 1 else TranslationServer.translate("+%d fragmentos por volta") % amount
+			return TranslationServer.translate("+%d fragmento por dia") % amount if amount == 1 else TranslationServer.translate("+%d fragmentos por dia") % amount
 		"scrap":
-			return TranslationServer.translate("+%d sucata por volta") % amount if amount == 1 else TranslationServer.translate("+%d sucatas por volta") % amount
+			return TranslationServer.translate("+%d sucata por dia") % amount if amount == 1 else TranslationServer.translate("+%d sucatas por dia") % amount
 		"supplies":
-			return TranslationServer.translate("+%d suprimento por volta") % amount if amount == 1 else TranslationServer.translate("+%d suprimentos por volta") % amount
+			return TranslationServer.translate("+%d suprimento por dia") % amount if amount == 1 else TranslationServer.translate("+%d suprimentos por dia") % amount
 		"days":
-			return TranslationServer.translate("−1 dia de recuperação para %d caído por volta") % amount if amount == 1 \
-				else TranslationServer.translate("−1 dia de recuperação para %d caídos por volta") % amount
+			return TranslationServer.translate("−1 dia de recuperação para %d caído por dia") % amount if amount == 1 \
+				else TranslationServer.translate("−1 dia de recuperação para %d caídos por dia") % amount
 		"dig":
 			return TranslationServer.translate("+%d ponto de obra por dia") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por dia") % amount
 	return ""
