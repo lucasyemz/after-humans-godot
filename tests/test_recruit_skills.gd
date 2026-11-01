@@ -259,7 +259,8 @@ func _screen() -> void:
 	Tips.enabled = false
 	Campaign.save_dir = "user://test-recruit-skills-%d" % Time.get_ticks_usec()
 	var c := _campaign(1897)
-	var fresh := _recruit(c, "cao")
+	# Um de cada classe: cada rosto de recruta chega uma vez só.
+	var fresh := _recruit(c, "gato")
 	var vet := _veteran(c, "cao")
 	c.station.last_return = {}
 	Campaign.state = c
@@ -280,7 +281,7 @@ func _screen() -> void:
 		await _frames(3)
 		t.equal(screen.find_children("Ability_*", "Button", true, false).size(), 3, "o recém-chegado mostra as 3")
 		var notes: Array = screen.find_child("SkillChoices", true, false).find_children("*", "Label", true, false).map(func(l): return l.text)
-		t.check(notes.any(func(n): return n.contains("Empurrão")) and notes.any(func(n): return n.contains("Bento")), "e o que vem: a 4ª e a do Bento no Treino (%s)" % [notes])
+		t.check(notes.any(func(n): return n.contains("Bote")) and notes.any(func(n): return n.contains("Nick")), "e o que vem: a 4ª e a do Nick no Treino (%s)" % [notes])
 		screen.selected = vet.id
 		screen.ability = "rec_cao_patada"
 		screen.rebuild()
