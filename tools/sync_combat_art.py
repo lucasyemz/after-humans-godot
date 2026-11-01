@@ -15,6 +15,12 @@
   e as fontes da tag codex-pr54-originals. Sem a pasta da Unreal, só esta parte:
       git archive codex-pr54-originals art/combat/source/reactions | tar -x
       python tools/sync_combat_art.py --codex-reactions
+- As poses de combate (#221, a arte do Codex no PR #231): a guarda com as armas na mão de cada fundador e da skin
+  Bento Ronda (combat_idle.webp, ao lado do idle, na mesma tela e com a mesma âncora), pelo contrato
+  docs/design/stances/contract.json e as fontes da tag codex-pr231-originals. O Guaxinim e o Tatu esperam a integração
+  do redesenho da #225 (as poses deles foram desenhadas sobre ele). Sem a pasta da Unreal, só esta parte:
+      git archive codex-pr231-originals art/combat/source/stances_20261028 | tar -x
+      python tools/sync_combat_art.py --stances
 - O Mercador (#182, parte 2; a arte do Codex na #218, PR #222): as poses de pé, de passada e de oferta e o retrato já
   estão no repositório em WebP, na escala do jogo (os originais ficam na tag codex-pr222-originals). As medidas vêm do
   contrato docs/design/merchant/contract.json: a âncora na bota de apoio de cada pose e a altura do corpo (1,72 m, como
@@ -40,6 +46,11 @@ LEGACY = REPO / "SourceArt" / "Legacy"
 # ficam na tag codex-pr54-originals (git archive codex-pr54-originals art/combat/source/reactions | tar -x).
 CODEX_REACTIONS = PROTO / "docs" / "design" / "combat_reactions_contract.json"
 CODEX_REACTIONS_SOURCE = PROTO / "art" / "combat" / "source" / "reactions" / "kneeling_20261023"
+# As poses de combate (#221, PR #231): o contrato fica na main; os PNG, na tag codex-pr231-originals.
+STANCES_CONTRACT = PROTO / "docs" / "design" / "stances" / "contract.json"
+STANCES_SOURCE = PROTO / "art" / "combat" / "source" / "stances_20261028"
+# Os recrutas da #221 (o Guaxinim e o Tatu) foram desenhados sobre o redesenho da #225, que o jogo ainda não usa.
+STANCES_WAIT_FOR_225 = ("raccoon_recruit_01", "armadillo_recruit_01")
 # O contrato da arte do Mercador (#218): os arquivos e as medidas de cada pose, em pixels do original.
 MERCHANT_CONTRACT = PROTO / "docs" / "design" / "merchant" / "contract.json"
 SCALE = 0.5
@@ -177,6 +188,9 @@ def heroes() -> dict:
                                           "anchor": [pose["foot_x"], pose["foot_y"]],
                                           "body_reference_pixels": pose["foot_y"] - pose["top"]}
         entry["reactions"].update(codex_reactions().get(hero_id, {}))
+        combat = stances().get(hero_id, {})
+        if combat:
+            entry["combat_idle"] = combat
         out[hero_id] = entry
     return out
 
@@ -199,6 +213,45 @@ def codex_reactions(source: Path = CODEX_REACTIONS_SOURCE) -> dict:
                                                               "anchor": pose["anchor"],
                                                               "body_reference_pixels": pose["body_reference_pixels"]}
     return out
+
+
+def stances(source: Path = STANCES_SOURCE) -> dict:
+    """As poses de combate (#221) pelo contrato do Codex: a guarda de cada fundador vira combat_idle.webp ao lado do
+    idle, com a tela, a âncora e a altura do corpo do contrato (as do idle: a escala não muda pela guarda flexionada).
+    A da skin (skin_id) vai para a pasta dela, com o mesmo nome. Devolve {hero_id: entrada do combat_idle} dos
+    fundadores. Sempre reconverte (as fontes saem do git archive com a data da tag)."""
+    if not source.exists():
+        raise SystemExit(f"Faltam as fontes em {source}. Extraia na raiz do projeto com:\n"
+                         "  git archive codex-pr231-originals art/combat/source/stances_20261028 | tar -x")
+    out = {}
+    for key, actor in json.loads(STANCES_CONTRACT.read_text(encoding="utf-8"))["actors"].items():
+        if actor["id"] in STANCES_WAIT_FOR_225:
+            print(f"{key}: espera a integração do redesenho da #225")
+            continue
+        state = actor["states"]["combat"]
+        if not state.get("source_file"):
+            continue
+        base = PROTO / actor["baseline"]["file"].removeprefix("res://")
+        dst = base.parent / "combat_idle.webp"
+        convert(source / state["source_file"], dst, force=True)
+        if actor.get("skin_id"):
+            print(f"{key}: {res(dst)} (skin {actor['skin_id']})")
+            continue
+        entry = {"file": res(dst), "canvas": state["canvas"], "anchor": state["anchor"],
+                 "body_reference_pixels": state["body_reference_pixels"]}
+        if "body_width_pixels" in actor["baseline"]:
+            entry["body_width_pixels"] = actor["baseline"]["body_width_pixels"]
+        out[actor["id"]] = entry
+        print(f"{key}: {res(dst)}")
+    return out
+
+
+def stances_only(source: Path) -> None:
+    """Sem a pasta da Unreal: só as poses de combate, no manifesto que já existe."""
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    for hero_id, entry in stances(source).items():
+        manifest["heroes"][hero_id]["combat_idle"] = entry
+    MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent="\t"), encoding="utf-8", newline="\n")
 
 
 def codex_reactions_only(source: Path) -> None:
@@ -354,5 +407,9 @@ if __name__ == "__main__":
         codex_reactions_only(Path(rest[0]) if rest else CODEX_REACTIONS_SOURCE)
     elif "--npcs" in sys.argv:
         npcs_only()
+    elif "--stances" in sys.argv:
+        # python tools/sync_combat_art.py --stances [pasta das fontes]
+        rest = sys.argv[sys.argv.index("--stances") + 1:]
+        stances_only(Path(rest[0]) if rest else STANCES_SOURCE)
     else:
         main()

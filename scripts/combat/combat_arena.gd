@@ -266,7 +266,8 @@ func show_pose(unit: AHCombat.Unit, pose: String, ability_id: String = "") -> vo
 		elif hero.get("reactions", {}).has(pose):
 			card.show_art(hero.reactions[pose])
 		else:
-			card.show_art(hero.idle)
+			# Na luta, a guarda com as armas na mão (#221), se o herói tem; a pose de exploração volta na rua.
+			card.show_art(hero.get("combat_idle", hero.idle))
 	else:
 		var enemy := enemy_art(unit.enemy_id)
 		card.show_art(enemy.poses[pose] if enemy.get("poses", {}).has(pose) else enemy.idle)
