@@ -312,7 +312,8 @@ func _chips(c: Dictionary, result: String) -> Array:
 	# A escavação (#186): o bloco aberto e o que ele devolveu, ou quanto andou.
 	var dig: Dictionary = report.get("dig", {})
 	if not dig.is_empty():
-		out.append({"icon": "room_quarters", "text": AHStationGrid.report_line(dig), "color": AHKit.AMBER if dig.get("opened", false) else AHKit.TEXT})
+		out.append({"icon": "place_unlocked" if dig.get("opened", false) else "lock", "text": AHStationGrid.report_chip(dig),
+			"color": AHKit.AMBER if dig.get("opened", false) else AHKit.TEXT})
 	# O trem da volta (#122): chegou alguém, ou veio vazio (relatórios de antes não dizem nada).
 	if report.has("train"):
 		var arrived := String(report.train)
@@ -610,18 +611,30 @@ func _details_band() -> PanelContainer:
 		arrived.append(tr("Nada chegou desta vez."))
 	columns.add_child(_detail_column(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent), arrived))
 	var cycle: Dictionary = report.get("cycle", {})
+	# A escavação (#274): a linha inteira do chip, com a Estação do ciclo (uma coluna a
+	# mais não cabe na faixa).
+	var dug: Array = []
+	var dig: Dictionary = report.get("dig", {})
+	if not dig.is_empty():
+		# Os textos do achado ficam no aviso, na vista geral (aqui a coluna passava da faixa).
+		dug.append(AHStationGrid.report_line(dig))
+	if cycle.is_empty() and not dug.is_empty():
+		columns.add_child(_detail_column(tr("Escavação"), dug))
 	if not cycle.is_empty():
 		var lines: Array = [tr("A Cantina produziu %d suprimentos; os moradores comeram %d; estragaram %d. Água: %d bebida, %d do coletor%s.") % [
 			cycle.food_produced, cycle.food_civilians, cycle.food_spoiled, cycle.water_consumed, cycle.water_produced, tr("; faltou para alguém") if cycle.thirsty else ""]]
 		if int(cycle.get("fragments_produced", 0)) > 0:
 			lines.append(tr("A Cora trouxe %d fragmento.") % cycle.fragments_produced)
+		lines.append_array(dug)
 		columns.add_child(_detail_column(tr("A Estação no ciclo %d") % cycle.number, lines))
 	# O resgate (#188): quem saiu do cativeiro, entrou na equipe ou ficou.
 	if String(report.get("rescue", "")) != "":
 		columns.add_child(_detail_column(tr("Resgate"), [String(report.rescue)]))
-	var missions: Array = cycle.get("missions", [])
-	if not missions.is_empty():
-		columns.add_child(_detail_column(tr("Missões solo"), missions.map(func(entry): return AHSideMissions.report_line(c, entry))))
+	# As missões solo (#183): quem volta chega no trem, com o relatório, depois da missão principal; aqui fica só quem foi
+	# capturado (não vem no trem).
+	var captured: Array = cycle.get("missions", []).filter(func(entry): return String(entry.get("result", "")) == "captured")
+	if not captured.is_empty():
+		columns.add_child(_detail_column(tr("Com os robôs"), captured.map(func(entry): return AHSideMissions.report_line(c, entry))))
 	var care := recovery_lines(c, report)
 	if not care.is_empty():
 		columns.add_child(_detail_column(tr("Recuperação"), care))
@@ -635,7 +648,9 @@ func _details_band() -> PanelContainer:
 			var id: String = room_id
 			var level := S.room_level(c, id)
 			var button := Button.new()
-			button.text = tr("%s %s%s (%s)") % [tr("Recuperar") if level == 0 else tr("Melhorar"), tr(S.ROOM_ARTICLE.get(id, "")), tr(S.room_def(id).name), S.cost_text(S.next_level_cost(c, id))]
+			# Na grade (#186), o cômodo que entra numa vaga livre é construído (o Depósito saindo dos caixotes, a Cantina).
+			var verb := tr("Construir") if AHStationGrid.needs_place(c, id) else (tr("Recuperar") if level == 0 else tr("Melhorar"))
+			button.text = tr("%s %s%s (%s)") % [verb, tr(S.ROOM_ARTICLE.get(id, "")), tr(S.room_def(id).name), S.cost_text(S.next_level_cost(c, id))]
 			AHKit.style_as(button, "secondary")
 			button.add_theme_font_size_override("font_size", AHKit.size("text"))
 			button.pressed.connect(func(): room_requested.emit(id))

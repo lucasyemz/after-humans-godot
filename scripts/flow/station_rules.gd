@@ -670,7 +670,8 @@ static func allocate(campaign: Dictionary, food: int, water: int) -> Dictionary:
 
 
 static func visit_pending(campaign: Dictionary) -> bool:
-	return campaign.station.train.phase != "none"
+	# O trem das missões solo (#183) também: quem volta delas chega nele.
+	return campaign.station.train.phase != "none" or AHSideMissions.train_pending(campaign)
 
 
 ## Um número do trem (#122) em data/recruitment.json.
@@ -1606,6 +1607,10 @@ static func next_step(campaign: Dictionary) -> Dictionary:
 	if campaign.night.phase != "none":
 		return {"title": TranslationServer.translate("Passar a noite"), "text": TranslationServer.translate("A equipe precisa dormir antes de partir de novo. No Dormitório, escolha quem vigia e durma: quem dorme come e recupera vida e instinto."),
 			"action": "dormitory", "button": TranslationServer.translate("Ir ao Dormitório"), "room": DORMITORY}
+	# A volta das missões solo (#183): o trem traz quem terminou a missão, com o relatório.
+	if AHSideMissions.train_pending(campaign):
+		return {"title": TranslationServer.translate("O trem trouxe quem estava em missão"), "text": TranslationServer.translate("Quem terminou a missão solo voltou no trem, com o relatório do que achou lá fora."),
+			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
 	if merchant_here(campaign):
 		return {"title": TranslationServer.translate("O Mercador está na plataforma"), "text": TranslationServer.translate("O Sr. dos Trilhos veio no trem para trocar sementes, sucata e fragmentos. Troque o que quiser e dispense-o antes de preparar a expedição."),
 			"action": "train", "button": TranslationServer.translate("Ir à plataforma"), "room": ""}
@@ -1888,6 +1893,10 @@ static func preparation_block(campaign: Dictionary) -> String:
 	# também no botão IR AO MAPA, numa linha.
 	if block == "" and merchant_here(campaign):
 		return TranslationServer.translate("Dispense o Sr. dos Trilhos antes de partir.")
+	# O trem das missões solo (#183): quem voltou nele é recebido antes (o relatório chega com ele). Curto como o do
+	# Mercador: numa linha no botão IR AO MAPA, também no texto Maior.
+	if block == "" and AHSideMissions.train_pending(campaign):
+		return TranslationServer.translate("Receba o trem antes de partir.")
 	return block
 
 
@@ -2299,7 +2308,7 @@ static func yield_text(room_id: String, amount: int) -> String:
 			return TranslationServer.translate("−1 dia de recuperação para %d caído por volta") % amount if amount == 1 \
 				else TranslationServer.translate("−1 dia de recuperação para %d caídos por volta") % amount
 		"dig":
-			return TranslationServer.translate("+%d ponto de obra por volta") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por volta") % amount
+			return TranslationServer.translate("+%d ponto de obra por dia") % amount if amount == 1 else TranslationServer.translate("+%d pontos de obra por dia") % amount
 	return ""
 
 

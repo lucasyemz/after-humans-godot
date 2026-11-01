@@ -126,9 +126,29 @@ static func captured(campaign: Dictionary) -> Array:
 	return campaign.roster.filter(func(entry): return typeof(entry.get("captured")) == TYPE_DICTIONARY)
 
 
-## Fora da Estação: numa missão ou capturado. Não parte, não pega posto e não passa a noite.
+## Fora da Estação: numa missão, capturado ou ainda no trem da volta. Não parte, não pega posto e não passa a noite.
 static func away(entry) -> bool:
-	return entry != null and (typeof(entry.get("side_mission")) == TYPE_DICTIONARY or typeof(entry.get("captured")) == TYPE_DICTIONARY)
+	return entry != null and (typeof(entry.get("side_mission")) == TYPE_DICTIONARY or typeof(entry.get("captured")) == TYPE_DICTIONARY
+		or bool(entry.get("on_train", false)))
+
+
+## A volta no trem (decisão do Lucas de 28/10): quem termina a missão chega depois da missão principal, no trem, com o
+## relatório. Até a chegada ser vista (o painel do trem), fica no trem.
+static func on_train(campaign: Dictionary) -> Array:
+	return campaign.roster.filter(func(entry): return bool(entry.get("on_train", false)))
+
+
+static func train_pending(campaign: Dictionary) -> bool:
+	return not on_train(campaign).is_empty()
+
+
+## O trem chegou: quem estava nele desce na Estação. Devolve os ids.
+static func arrive(campaign: Dictionary) -> Array:
+	var out: Array = []
+	for entry in on_train(campaign):
+		entry.erase("on_train")
+		out.append(entry.id)
+	return out
 
 
 ## Por que o herói está fora ("" se não está).
@@ -137,9 +157,27 @@ static func away_text(entry) -> String:
 		return ""
 	if typeof(entry.get("captured")) == TYPE_DICTIONARY:
 		return TranslationServer.translate("%s está com os robôs e espera o resgate.") % entry.display_name
+	if bool(entry.get("on_train", false)):
+		return TranslationServer.translate("%s chega no trem.") % entry.display_name
 	if typeof(entry.get("side_mission")) == TYPE_DICTIONARY:
 		var row := mission(String(entry.side_mission.id))
 		return TranslationServer.translate("%s está numa missão solo (%s).") % [entry.display_name, TranslationServer.translate(String(row.get("Title", "")))]
+	return ""
+
+
+## O motivo curto de quem está fora, para a lista da partida (decisão do Lucas, 01/11): "Em missão solo · volta em N
+## dias", "Com os robôs" ou "Chega no trem". Vazio para quem está na Estação.
+static func away_short(campaign: Dictionary, entry) -> String:
+	if entry == null:
+		return ""
+	if typeof(entry.get("captured")) == TYPE_DICTIONARY:
+		return TranslationServer.translate("Com os robôs")
+	if bool(entry.get("on_train", false)):
+		return TranslationServer.translate("Chega no trem")
+	if typeof(entry.get("side_mission")) == TYPE_DICTIONARY:
+		var left := maxi(1, days_left(campaign, entry))
+		var back: String = TranslationServer.translate("volta em 1 dia") if left == 1 else TranslationServer.translate("volta em %d dias") % left
+		return " · ".join([TranslationServer.translate("Em missão solo"), back])
 	return ""
 
 
@@ -254,8 +292,11 @@ static func on_new_day(campaign: Dictionary) -> Array:
 	for entry in running(campaign):
 		if int(entry.side_mission.back) <= day(campaign):
 			out.append(_resolve(campaign, entry))
-	# "Quem voltou" mostra só os do dia.
-	state(campaign).reports = out
+	# "Quem voltou" mostra os do dia e, se o trem de antes não foi recebido, os de quem ainda está nele.
+	var still: Array = state(campaign).get("reports", []).filter(func(report):
+		var entry = S.hero(campaign, String(report.get("hero_id", "")))
+		return entry != null and bool(entry.get("on_train", false)) and not out.any(func(other): return other.hero_id == report.hero_id))
+	state(campaign).reports = still + out
 	# O pedido de ajuda (#188) também chega num dia novo.
 	AHRescue.on_new_day(campaign)
 	return out
@@ -273,6 +314,9 @@ static func _resolve(campaign: Dictionary, entry: Dictionary) -> Dictionary:
 	var entry_spot = entry.side_mission.get("spot", -1)
 	entry.erase("side_mission")
 	var report := {"hero_id": entry.id, "mission": mission_id, "day": day(campaign), "reward": {}}
+	# Quem volta (sem a captura) chega no trem, depois da missão principal.
+	if roll < value + int(r.get("HurtBand", 25)) or not bool(r.get("CaptureEnabled", false)):
+		entry.on_train = true
 	if roll < value:
 		report.result = "success"
 		report.reward = _reward(campaign, row, rng, false)
