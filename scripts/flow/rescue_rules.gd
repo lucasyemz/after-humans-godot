@@ -88,7 +88,7 @@ static func assign(campaign: Dictionary) -> void:
 ## O resgate da rota de agora ({} sem nenhum).
 static func current(campaign: Dictionary) -> Dictionary:
 	var expedition = campaign.get("session", {}).get("expedition")
-	if expedition == null:
+	if typeof(expedition) != TYPE_DICTIONARY or typeof(expedition.get("corridor")) != TYPE_DICTIONARY:
 		return {}
 	var value = expedition.corridor.get("rescue", {})
 	return value if typeof(value) == TYPE_DICTIONARY else {}
