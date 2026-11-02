@@ -1,0 +1,52 @@
+{
+  "source_tag": "codex-pr316-originals",
+  "id": "node-rescue",
+  "source": "node-rescue.png",
+  "source_canvas": [
+    128,
+    128
+  ],
+  "runtime_file": "node-rescue.webp",
+  "runtime_canvas": [
+    64,
+    64
+  ],
+  "runtime_destination": "art/ui/kit/station/icons/node-rescue.webp",
+  "kind": "glyph_white_tintable",
+  "anchor": [
+    64,
+    64
+  ],
+  "runtime_anchor": [
+    32,
+    32
+  ],
+  "nine_slice_ltrb": null,
+  "source_sha256": "dc2fd644fe8de9827fe3ef4f8a0d8b50f7d1b1666ee74246148e1aa13d024be4",
+  "runtime_sha256": "01be20325f8bb0df6dd7beb2ffdb211d083b8290c5656259d191a791d138264a",
+  "use_sizes_px": [
+    22,
+    25.76,
+    30,
+    32
+  ],
+  "policy": "One tintable glyph, existing kit colors/states; hidden route nodes retain ?; no new frame or glow.",
+  "source_alpha_bbox_xyxy": [
+    21,
+    12,
+    106,
+    116
+  ],
+  "runtime_alpha_bbox_xyxy": [
+    8,
+    3,
+    56,
+    61
+  ],
+  "runtime_core_bbox_xyxy": [
+    11,
+    6,
+    53,
+    58
+  ]
+}

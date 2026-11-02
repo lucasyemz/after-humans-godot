@@ -1,0 +1,73 @@
+{
+  "base": "e2f0b58a",
+  "fixture": "seed23; Ves captured fase2; expedition4242; route current rescue step; isolated save",
+  "records": [
+    {
+      "after_texture": "/workspace/art-originals/codex-295/art/ui/source/rescue_icon_20261102/node-rescue.webp",
+      "before_texture": "res://art/ui/kit/station/icons/node-loot.webp",
+      "icon_size": [
+        25.7600021362305,
+        25.7600021362305
+      ],
+      "rect": "Rect2(1092, 64, 25.760002, 25.760002)",
+      "variant": "normal",
+      "view": "route"
+    },
+    {
+      "after_texture": "/workspace/art-originals/codex-295/art/ui/source/rescue_icon_20261102/node-rescue.webp",
+      "before_texture": "res://art/ui/kit/station/icons/node-loot.webp",
+      "icon_size": [
+        25.7600021362305,
+        25.7600021362305
+      ],
+      "rect": "Rect2(1092, 64, 25.760002, 25.760002)",
+      "variant": "larger",
+      "view": "route"
+    },
+    {
+      "after_texture": "/workspace/art-originals/codex-295/art/ui/source/rescue_icon_20261102/node-rescue.webp",
+      "before_texture": "res://art/ui/kit/station/icons/node-loot.webp",
+      "icon_size": [
+        25.7600021362305,
+        25.7600021362305
+      ],
+      "rect": "Rect2(1092, 64, 25.760002, 25.760002)",
+      "variant": "colorblind",
+      "view": "route"
+    },
+    {
+      "after_texture": "/workspace/art-originals/codex-295/art/ui/source/rescue_icon_20261102/node-rescue.webp",
+      "before_texture": "res://art/ui/kit/station/icons/alert.webp",
+      "icon_size": [
+        30.0,
+        30.0
+      ],
+      "rect": "Rect2(584.5, 671, 30, 30)",
+      "variant": "normal",
+      "view": "map"
+    },
+    {
+      "after_texture": "/workspace/art-originals/codex-295/art/ui/source/rescue_icon_20261102/node-rescue.webp",
+      "before_texture": "res://art/ui/kit/station/icons/alert.webp",
+      "icon_size": [
+        30.0,
+        30.0
+      ],
+      "rect": "Rect2(565.5, 671, 30, 30)",
+      "variant": "larger",
+      "view": "map"
+    },
+    {
+      "after_texture": "/workspace/art-originals/codex-295/art/ui/source/rescue_icon_20261102/node-rescue.webp",
+      "before_texture": "res://art/ui/kit/station/icons/alert.webp",
+      "icon_size": [
+        30.0,
+        30.0
+      ],
+      "rect": "Rect2(584.5, 671, 30, 30)",
+      "variant": "colorblind",
+      "view": "map"
+    }
+  ],
+  "renderer": "Compatibility / Mesa llvmpipe CPU; no physical GPU"
+}
