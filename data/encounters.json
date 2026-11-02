@@ -106,6 +106,18 @@
     ]
   },
   {
+    "Name": "fase_1_esgoto",
+    "Front": [
+      "robot_fungo"
+    ],
+    "Ranged": [
+      "rastejante_raiz"
+    ],
+    "Support": [
+      "rastejante_raiz"
+    ]
+  },
+  {
     "Name": "fase_2",
     "Front": [
       "enraizado",

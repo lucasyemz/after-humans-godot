@@ -243,8 +243,14 @@ func _search_crates(street, route: Dictionary, index: int) -> bool:
 	var before := _search_snapshot()
 	# Onde o objeto está (perto de uma porta ele sai do ponto do trecho), e o aviso tem que ser o da busca, não o da porta.
 	street._place_leader(Vector3(corridor.props[index].position.x, 0, 0.45))
-	if not await _until(func(): return corridor._action.is_valid() and corridor._action.get_method() == "_search_prop", "o aviso Vasculhar aparecer perto dos caixotes"):
+	if not await _until(func(): return street.exploration_hud.modal_open() or (corridor._action.is_valid() and corridor._action.get_method() == "_search_prop"), "o aviso Vasculhar aparecer perto dos caixotes"):
 		return false
+	# O faro do Bento no bueiro (#289) abre a pergunta ao chegar no trecho 3, às vezes antes dos caixotes: segue pela
+	# rua e volta aos caixotes.
+	if street.exploration_hud.modal_open():
+		if not await _answer_modal(street):
+			return false
+		return await _search_crates(street, route, index)
 	await _action("interact")
 	if not await _until(func(): return route.props.get(str(index), false), "a busca dos caixotes acontecer"):
 		return false
@@ -275,7 +281,8 @@ func _answer_modal(street) -> bool:
 		if not hud.modal_open():
 			return true
 		var options: Array = _buttons(hud._modal).filter(func(b): return b.is_visible_in_tree() and not b.disabled)
-		var forward: Array = options.filter(func(b): return b.text.begins_with("Seguir em frente"))
+		# O bueiro do desvio (#289) pergunta "Descer" ou "Seguir pela rua": a jornada fica na rua (o test_detour desce).
+		var forward: Array = options.filter(func(b): return b.text.to_lower().begins_with("seguir em frente") or b.text.to_lower().begins_with("seguir pela rua"))
 		if not t.check(not options.is_empty(), "o painel da exploração tem um botão para seguir"):
 			return false
 		(forward[0] if not forward.is_empty() else options[0]).pressed.emit()
@@ -306,6 +313,11 @@ func _return_report() -> bool:
 		return false
 	hud_street._finish_button.pressed.emit()
 	await _frames(3)
+	# Quem caiu na luta do guardião e não foi levantado (#179): a volta pergunta antes. O sorteio das lutas segue o
+	# randi() global, que outras chamadas por quadro também gastam, então às vezes alguém cai; a jornada volta mesmo assim.
+	if hud_street.modal_open() and _has_label(hud_street, "Ainda há quem caiu no mapa"):
+		if not await _press(hud_street, "Voltar mesmo assim", "Voltar mesmo assim na pergunta dos caídos"):
+			return false
 	# O resultado já entrega o achado e fecha a expedição (finish_return); a tela mostra o que chegou.
 	if not await _until(func(): return Campaign.state.station.last_return.get("result", "") == "victory", "o resultado da jornada"):
 		return false
