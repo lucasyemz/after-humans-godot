@@ -8858,8 +8858,8 @@ msgid "Plaqueta de Patrulha"
 msgstr "Patrol Tag"
 
 #. relics.6.Description
-msgid "\"Fique Atrás de Mim\" também tira 5 de Instinto do próprio cão. Uma plaqueta de turno de ronda, com as rondas riscadas."
-msgstr "\"Stay Behind Me\" also takes 5 Instinct off the dog himself. A patrol-shift tag, with the rounds crossed out."
+msgid "\"Fique Atrás de Mim\" também tira 5 de Instinto do próprio cão. Uma plaqueta de patrulha, com as rondas riscadas."
+msgstr "\"Stay Behind Me\" also takes 5 Instinct off the dog itself. A patrol tag, with the rounds crossed out."
 
 #. relics.7.DisplayName
 msgid "Gancho de Telhado"

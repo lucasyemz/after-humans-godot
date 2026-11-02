@@ -60,7 +60,7 @@
   {
     "Name": "plaqueta_patrulha",
     "DisplayName": "Plaqueta de Patrulha",
-    "Description": "\"Fique Atrás de Mim\" também tira 5 de Instinto do próprio cão. Uma plaqueta de turno de ronda, com as rondas riscadas.",
+    "Description": "\"Fique Atrás de Mim\" também tira 5 de Instinto do próprio cão. Uma plaqueta de patrulha, com as rondas riscadas.",
     "Rarity": "uncommon",
     "Only": "role:cao",
     "Sources": ["dig", "merchant"],
