@@ -58,6 +58,8 @@ var station: AHStation
 var current := ""
 ## O quadro em que o painel abriu (o som de fechar não toca se ele fechar nesse mesmo quadro).
 var _opened_frame := -1
+## O herói escolhido na seção Arma e Segunda Pele da Forja (#262).
+var _gear_hero := ""
 ## A moldura (o alto e o pé), refeita a cada refresh; as peças de que o resto precisa.
 var _frame: Control
 var _title: Label
@@ -173,6 +175,9 @@ var _merchant_focus := ""
 var _map: AHPhaseMap
 ## A visita guiada da primeira vez (#145), aberta por cima da Estação, ou null.
 var tour: AHStationTour
+## Os balões da Estação viva (#207), por cima da cena e por baixo da coluna e do painel; e a tirinha aberta.
+var bubbles: Control
+var _comic: AHComicReader
 
 
 func _ready() -> void:
@@ -297,8 +302,9 @@ func _queue_fit() -> void:
 ## passo, o Plano, as pendências), que as setas percorrem; Voltar devolve aos cômodos. Com um painel ou o mapa aberto,
 ## o foco fica nos botões dele e Interagir confirma o botão com foco.
 func _input(event: InputEvent) -> void:
-	# Com o briefing aberto (#88), a caixa dele fica com o teclado, o controle, o clique e o toque.
-	if briefing_open():
+	# Com o briefing aberto (#88), a caixa dele fica com o teclado, o controle, o clique e o toque; com a tirinha (#207),
+	# o leitor.
+	if briefing_open() or comic_open():
 		return
 	# O aviso do achado (#274, como o da ferramenta nova, #143) sai com qualquer tecla, botão, clique ou toque, que segue
 	# para a tela.
@@ -382,6 +388,10 @@ func _input(event: InputEvent) -> void:
 	if scope != null:
 		if U.press_focused(scope, event):
 			get_viewport().set_input_as_handled()
+		elif scope == _forced_story() and U.is_back(event):
+			# Voltar desiste da conversa: o Próximo passo continua pedindo.
+			station.life.cancel_story()
+			get_viewport().set_input_as_handled()
 		return
 	if _menu_focused():
 		if U.press_focused(self, event):
@@ -414,13 +424,14 @@ func _reset_focus() -> void:
 ## A tela de cima, onde o foco do teclado e do controle fica: o mapa de fases, a Preparação ou o painel aberto (com o
 ## pé da tela). Na vista geral, nenhuma (as setas andam entre os cômodos).
 func focus_scope() -> Control:
-	# O briefing (#88) cuida do foco dele.
-	if briefing_open():
+	# O briefing (#88) e a tirinha (#207) cuidam do foco deles.
+	if briefing_open() or comic_open():
 		return null
 	if _map.visible:
 		return _map
 	if current == "":
-		return null
+		# O balão da tirinha que o Próximo passo pediu (#207) fica com o foco até ser apertado.
+		return _forced_story()
 	if current == "departure" and is_instance_valid(_departure):
 		return _departure.focus_root()
 	if current == "report" and is_instance_valid(_report_screen):
@@ -891,6 +902,9 @@ func _run_next() -> void:
 			open_service("train")
 		"room", "rest":
 			open_room(_next.room)
+		"story":
+			if not station.life.play_story(String(_next.get("story", ""))):
+				Sound.play("res://audio/ui/deny.ogg")
 		_:
 			open_map()
 
@@ -903,6 +917,11 @@ func _build_room_selection() -> void:
 	_room_marks.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_room_marks.draw.connect(_draw_room_marks)
 	_menu.add_sibling(_room_marks)
+	bubbles = Control.new()
+	bubbles.name = "Bubbles"
+	bubbles.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bubbles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_room_marks.add_sibling(bubbles)
 	# A etiqueta do cômodo apontado, com a ponta para baixo, em cima dele.
 	_room_tag = AHKit.panel(AHKit.piece_of("tag", "room"))
 	_room_tag.name = "RoomTag"
@@ -1394,6 +1413,70 @@ func open_service(service: String) -> void:
 func _sound_open() -> void:
 	if current != "":
 		Sound.play(PANEL_OPEN)
+
+
+# ---------------------------------------------------------------- a Estação viva (#207)
+
+## Os balões e as trocas de cômodo só na vista geral e com um cômodo aberto: nada com uma tela por cima (a Sala, o
+## relatório, a Preparação, o Plano, as Opções, o mapa, a ficha, o briefing, a noite, a tirinha, a visita guiada, o aviso
+## do achado e o quadro da escavação), com a
+## interface oculta, na plataforma, na passagem, na chegada da equipe ou com o trem em cena.
+func life_allowed() -> bool:
+	if station == null or _hud_hidden or _map.visible or briefing_open() or night_scene_open() or comic_open() or tour != null \
+			or dig_notice_shown():
+		return false
+	if sheet != null and sheet.visible:
+		return false
+	if current != "" and (current == S.CHARACTERS or S.room_def(current).is_empty()):
+		return false
+	return not station.on_platform and not station.passage_moving() and not station.train_busy() \
+		and not station.team_arriving() and not station.lineup_leaving()
+
+
+## A área livre da cena para os balões: à direita da coluna da esquerda, à esquerda do painel aberto, entre o alto e
+## as teclas de baixo (px da base de 1080).
+func life_area() -> Rect2:
+	var view := get_viewport_rect().size
+	var left := 0.0
+	if _menu.visible:
+		left = _menu.get_global_rect().end.x + 8.0
+	var right := view.x
+	if _panel.visible:
+		right = _panel.get_global_rect().position.x - 8.0
+	var top := 132.0
+	var bottom := view.y - 120.0
+	return Rect2(left, top, maxf(0.0, right - left), bottom - top)
+
+
+## A conversa da tirinha (#207): a vista geral, com o cômodo de quem conversa à vista.
+func focus_story_room(room_id: String) -> void:
+	if current != "":
+		close_panel()
+	_key_room = room_id
+	station.pan_to_room(room_id, _overview_left() + 12.0, 1900.0)
+
+
+func _forced_story() -> Control:
+	if station == null or station.life == null or station.life.story == "":
+		return null
+	return station.life.story_bubble()
+
+
+func comic_open() -> bool:
+	return _comic != null and is_instance_valid(_comic)
+
+
+## Abre a tirinha (o balão interativo apertado). Lida até o último quadro, fica vista e sai do Próximo passo.
+func open_comic(comic_name: String) -> void:
+	if comic_open():
+		return
+	Sound.play(PANEL_OPEN)
+	_comic = AHComicReader.open(self, comic_name)
+	_comic.finished.connect(func(read: bool):
+		_comic = null
+		if read and AHStationChatter.mark_seen(Campaign.state, comic_name):
+			station.commit()
+		get_viewport().gui_release_focus())
 
 
 func close_panel() -> void:
@@ -2551,6 +2634,7 @@ func _room(room_id: String) -> void:
 			_depot(c)
 		S.FORGE:
 			_forge(c, level)
+			_gear(c, level)
 		S.RESEARCH:
 			_research(c, level)
 		S.DORMITORY:
@@ -2969,6 +3053,72 @@ func _forge(c: Dictionary, level: int) -> void:
 		craft.tooltip_text = (tr("Faltam %d sucata") if cost - scrap == 1 else tr("Faltam %d sucatas")) % (cost - scrap) if scrap < cost else ""
 		craft.pressed.connect(func(): _act(S.craft_relic(Campaign.state, id), tr("%s pronta. Equipe no Alojamento.") % tr(relic.DisplayName), "res://audio/ui/forge_confirm.ogg"))
 		row.add_child(craft)
+
+
+## A Arma e a Segunda Pele (#262): quantas melhorias a Forja ainda faz hoje, o herói escolhido (um chip por quem está
+## na Estação) e as duas peças dele, com o nível, o que já soma, o próximo nível e o Melhorar (apagado, com o motivo
+## na tela: o toque e o controle não mostram a dica).
+func _gear(c: Dictionary, level: int) -> void:
+	if level < 1:
+		return
+	_body.add_child(_divider())
+	_section(tr("Arma e Segunda Pele · restam %d hoje") % AHGear.left_today(c), ROOM_ICONS[S.FORGE])
+	var heroes: Array = S.living(c).filter(func(h): return not AHSideMissions.away(h))
+	if heroes.is_empty():
+		_text(tr("Ninguém na Estação para melhorar as peças."), AHKit.MUTED, "small")
+		return
+	if _gear_hero == "" or not heroes.any(func(h): return h.id == _gear_hero):
+		_gear_hero = String(heroes[0].id)
+	var chips := HFlowContainer.new()
+	chips.add_theme_constant_override("h_separation", 8)
+	chips.add_theme_constant_override("v_separation", 8)
+	_body.add_child(chips)
+	for entry in heroes:
+		var id: String = entry.id
+		var chip := _chip_button(String(entry.display_name))
+		chip.name = "GearHero_%s" % id
+		chip.custom_minimum_size = Vector2(0, 52)
+		if id == _gear_hero:
+			for state in ["font_color", "font_hover_color", "font_focus_color"]:
+				chip.add_theme_color_override(state, AHKit.AMBER)
+			chip.add_child(AHKit.selected_overlay())
+		chip.pressed.connect(func():
+			_gear_hero = id
+			refresh()
+			var again := find_child("GearHero_%s" % id, true, false) as Control
+			if again != null and U.using_keys:
+				AHKit.focus_later(again))
+		chips.add_child(chip)
+	var hero = S.hero(c, _gear_hero)
+	for piece in AHGear.PIECES:
+		var box := _inset()
+		box.get_parent().name = "Gear_%s" % piece
+		var now := AHGear.level(hero, piece)
+		box.add_child(_wrapped(tr("%s · nível %d de %d") % [AHGear.piece_name(piece), now, AHGear.MAX_LEVEL], "row", AHKit.TEXT, true, BODY_WIDTH - 40.0))
+		var total := AHGear.total_text(hero, piece)
+		box.add_child(_wrapped(AHGear.piece_about(piece) + (" " + tr("Agora: %s.") % total if total != "" else ""), "small", AHKit.MUTED, false, BODY_WIDTH - 40.0))
+		if now >= AHGear.MAX_LEVEL:
+			continue
+		var next := AHGear.step(piece, now + 1)
+		box.add_child(_wrapped(tr("Nível %d: %s") % [now + 1, AHGear.step_text(piece, now + 1)], "small", AHKit.TEXT, false, BODY_WIDTH - 40.0))
+		box.add_child(_cost_chips(c, {"scrap": int(next.get("Scrap", 0)), "fragments": int(next.get("Fragments", 0))}))
+		var button := _chip_button(tr("Melhorar"))
+		button.name = "Upgrade_%s" % piece
+		button.icon = AHKit.icon(ROOM_ICONS[S.FORGE])
+		button.add_theme_constant_override("icon_max_width", 26)
+		button.custom_minimum_size = Vector2(0, 56)
+		var reason := AHGear.block(c, _gear_hero, piece)
+		button.disabled = reason != ""
+		button.tooltip_text = reason
+		var hero_id := _gear_hero
+		var which: String = piece
+		button.pressed.connect(func(): _act(AHGear.upgrade(Campaign.state, hero_id, which),
+			tr("%s: %s no nível %d.") % [S.hero(Campaign.state, hero_id).display_name, AHGear.piece_name(which), now + 1], "res://audio/ui/forge_confirm.ogg"))
+		box.add_child(button)
+		if reason != "":
+			var why := _wrapped(reason, "small", AHKit.alert_text(), false, BODY_WIDTH - 40.0)
+			why.name = "GearBlock_%s" % piece
+			box.add_child(why)
 
 
 ## O efeito da relíquia em poucas palavras, a partir dos números dela.

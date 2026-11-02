@@ -1,0 +1,50 @@
+[
+  {
+    "Name": "bento_brother",
+    "Title": "Como o Bento perdeu o irmão",
+    "Unlock": {
+      "Returns": 1
+    },
+    "Speakers": [
+      "hero_cao_bento",
+      "hero_gato_nick"
+    ],
+    "Panels": [
+      {
+        "Image": "",
+        "Caption": "Uma expedição antiga. Bento, o irmão dele e o grupo entram numa instalação dos humanos.",
+        "Speaker": ""
+      },
+      {
+        "Image": "",
+        "Caption": "O irmão entende as máquinas antigas melhor que ninguém. Bento cuida para ninguém ficar para trás.",
+        "Speaker": ""
+      },
+      {
+        "Image": "",
+        "Caption": "As máquinas acordam. O irmão fica isolado do outro lado, cercado.",
+        "Speaker": ""
+      },
+      {
+        "Image": "",
+        "Caption": "Vai com os outros. Eu acho uma saída.",
+        "Speaker": "O irmão"
+      },
+      {
+        "Image": "",
+        "Caption": "Bento queria voltar. Mas o grupo também corria perigo, e a retirada não podia esperar.",
+        "Speaker": ""
+      },
+      {
+        "Image": "",
+        "Caption": "Quando Bento voltou, a instalação já estava fechada. Nunca encontraram o irmão.",
+        "Speaker": ""
+      },
+      {
+        "Image": "",
+        "Caption": "Eu ainda espero que ele tenha achado aquela saída.",
+        "Speaker": "Bento"
+      }
+    ]
+  }
+]

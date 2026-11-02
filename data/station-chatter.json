@@ -1,0 +1,625 @@
+[
+  {
+    "Name": "food_low_dora",
+    "Kind": "think",
+    "Speakers": [
+      "civil_dora"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Dá pra esticar a sopa mais um dia. Dois, não."
+      }
+    ],
+    "When": [
+      "food_low"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "food_low_bento_nick",
+    "Kind": "say",
+    "Speakers": [
+      "hero_cao_bento",
+      "hero_gato_nick"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Se faltar, eu como depois."
+      },
+      {
+        "Who": 1,
+        "Text": "Você sempre come depois."
+      }
+    ],
+    "When": [
+      "food_low"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "food_low_nick",
+    "Kind": "think",
+    "Speakers": [
+      "hero_gato_nick"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Conto as latas de novo. O número não muda."
+      }
+    ],
+    "When": [
+      "food_low"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "water_low_iris",
+    "Kind": "think",
+    "Speakers": [
+      "hero_sapo_iris"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "A cisterna baixou um dedo desde ontem. Eu marquei."
+      }
+    ],
+    "When": [
+      "water_low"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "water_low_dora",
+    "Kind": "say",
+    "Speakers": [
+      "civil_dora"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Cozinhar bebe água também, gente."
+      }
+    ],
+    "When": [
+      "water_low"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "power_full_otto",
+    "Kind": "think",
+    "Speakers": [
+      "civil_otto"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "O gerador tosse antes de parar. Ainda não tossiu."
+      }
+    ],
+    "When": [
+      "power_full"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "power_full_cora_otto",
+    "Kind": "say",
+    "Speakers": [
+      "civil_cora",
+      "civil_otto"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Se eu desligar um monitor, você ganha quanto?"
+      },
+      {
+        "Who": 1,
+        "Text": "Uma lâmpada. Talvez duas."
+      }
+    ],
+    "When": [
+      "power_full"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "fallen_bento",
+    "Kind": "think",
+    "Speakers": [
+      "hero_cao_bento"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Devia ter sido eu no lugar de {nome}."
+      }
+    ],
+    "When": [
+      "fallen"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "fallen_iris",
+    "Kind": "say",
+    "Speakers": [
+      "hero_sapo_iris"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "{nome} vai ficar bem. A febre caiu meio grau."
+      }
+    ],
+    "When": [
+      "fallen"
+    ],
+    "Room": "infirmary",
+    "Weight": 4
+  },
+  {
+    "Name": "fallen_nick",
+    "Kind": "think",
+    "Speakers": [
+      "hero_gato_nick"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "{nome} ainda não acordou direito. Melhor não pensar nisso."
+      }
+    ],
+    "When": [
+      "fallen"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "train_vespera",
+    "Kind": "think",
+    "Speakers": [
+      "hero_coruja_vespera"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Vi o farol do trem antes de ouvir o sino."
+      }
+    ],
+    "When": [
+      "train_waiting"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "train_dora",
+    "Kind": "say",
+    "Speakers": [
+      "civil_dora"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Mais uma boca. Vou pôr água na panela."
+      }
+    ],
+    "When": [
+      "train_waiting"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "train_nick_bento",
+    "Kind": "say",
+    "Speakers": [
+      "hero_gato_nick",
+      "hero_cao_bento"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Você vai deixar entrar de novo."
+      },
+      {
+        "Who": 1,
+        "Text": "Deixei você entrar."
+      },
+      {
+        "Who": 0,
+        "Text": "…Justo."
+      }
+    ],
+    "When": [
+      "train_waiting"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "night_vespera",
+    "Kind": "say",
+    "Speakers": [
+      "hero_coruja_vespera"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Alguém precisa ficar de olho hoje."
+      }
+    ],
+    "When": [
+      "night"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "night_nick",
+    "Kind": "think",
+    "Speakers": [
+      "hero_gato_nick"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Cama perto da porta. Por hábito."
+      }
+    ],
+    "When": [
+      "night"
+    ],
+    "Room": "dormitory",
+    "Weight": 4
+  },
+  {
+    "Name": "night_bento",
+    "Kind": "say",
+    "Speakers": [
+      "hero_cao_bento"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Eu pego o primeiro turno. Sem discussão."
+      }
+    ],
+    "When": [
+      "night"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "forge_otto",
+    "Kind": "say",
+    "Speakers": [
+      "civil_otto"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Mede duas vezes, solda uma."
+      }
+    ],
+    "When": [],
+    "Room": "forge",
+    "Weight": 3
+  },
+  {
+    "Name": "forge_bento",
+    "Kind": "think",
+    "Speakers": [
+      "hero_cao_bento"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Esse punho aguenta mais uma expedição. Acho."
+      }
+    ],
+    "When": [],
+    "Room": "forge",
+    "Weight": 3
+  },
+  {
+    "Name": "research_cora",
+    "Kind": "think",
+    "Speakers": [
+      "civil_cora"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Três amostras, três resultados. Alguém está errado. Talvez eu."
+      }
+    ],
+    "When": [],
+    "Room": "research",
+    "Weight": 3
+  },
+  {
+    "Name": "research_iris_cora",
+    "Kind": "say",
+    "Speakers": [
+      "hero_sapo_iris",
+      "civil_cora"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Seu registro bate com o meu?"
+      },
+      {
+        "Who": 1,
+        "Text": "Bate. Por isso desconfio."
+      }
+    ],
+    "When": [],
+    "Room": "research",
+    "Weight": 3
+  },
+  {
+    "Name": "canteen_dora",
+    "Kind": "say",
+    "Speakers": [
+      "civil_dora"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Quem lavar a panela ganha a raspa."
+      }
+    ],
+    "When": [],
+    "Room": "canteen",
+    "Weight": 3
+  },
+  {
+    "Name": "bar_nick",
+    "Kind": "think",
+    "Speakers": [
+      "hero_gato_nick"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "De costas pra parede. Sempre."
+      }
+    ],
+    "When": [],
+    "Room": "bar",
+    "Weight": 3
+  },
+  {
+    "Name": "depot_iris",
+    "Kind": "think",
+    "Speakers": [
+      "hero_sapo_iris"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Doze ampolas. Treze, se eu não errar a próxima."
+      }
+    ],
+    "When": [],
+    "Room": "depot",
+    "Weight": 3
+  },
+  {
+    "Name": "dormitory_vespera",
+    "Kind": "think",
+    "Speakers": [
+      "hero_coruja_vespera"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Daqui eu ouço a plataforma inteira."
+      }
+    ],
+    "When": [],
+    "Room": "dormitory",
+    "Weight": 3
+  },
+  {
+    "Name": "characters_bento",
+    "Kind": "think",
+    "Speakers": [
+      "hero_cao_bento"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "A Estação cresceu. Mais gente pra cuidar."
+      }
+    ],
+    "When": [],
+    "Room": "characters",
+    "Weight": 3
+  },
+  {
+    "Name": "always_nick_backpack",
+    "Kind": "think",
+    "Speakers": [
+      "hero_gato_nick"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Mochila pronta. Só por precaução."
+      }
+    ],
+    "When": [],
+    "Room": "",
+    "Weight": 1
+  },
+  {
+    "Name": "always_bento_nick_backpack",
+    "Kind": "say",
+    "Speakers": [
+      "hero_cao_bento",
+      "hero_gato_nick"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Ainda dorme com a mochila do lado?"
+      },
+      {
+        "Who": 1,
+        "Text": "Estou só passando."
+      },
+      {
+        "Who": 0,
+        "Text": "Faz tempo que você está só passando."
+      }
+    ],
+    "When": [],
+    "Room": "",
+    "Weight": 1
+  },
+  {
+    "Name": "always_nick_bento_methods",
+    "Kind": "say",
+    "Speakers": [
+      "hero_gato_nick",
+      "hero_cao_bento"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Você planeja demais."
+      },
+      {
+        "Who": 1,
+        "Text": "Você improvisa demais."
+      },
+      {
+        "Who": 0,
+        "Text": "E volta todo mundo."
+      }
+    ],
+    "When": [],
+    "Room": "",
+    "Weight": 2
+  },
+  {
+    "Name": "always_iris_memory",
+    "Kind": "think",
+    "Speakers": [
+      "hero_sapo_iris"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Bento lembra de um jeito. Nick, de outro. O registro, de um terceiro."
+      }
+    ],
+    "When": [],
+    "Room": "",
+    "Weight": 2
+  },
+  {
+    "Name": "recruit_new_alone",
+    "Kind": "think",
+    "Speakers": [
+      "recruit_new"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Ainda decorando o nome de todo mundo."
+      }
+    ],
+    "When": [
+      "recruit_new"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "recruit_new_founder",
+    "Kind": "say",
+    "Speakers": [
+      "recruit_new",
+      "founder"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "É sempre assim, a Estação?"
+      },
+      {
+        "Who": 1,
+        "Text": "Quando dá sorte."
+      }
+    ],
+    "When": [
+      "recruit_new"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "good_return_dora",
+    "Kind": "say",
+    "Speakers": [
+      "civil_dora"
+    ],
+    "Lines": [
+      {
+        "Who": 0,
+        "Text": "Voltou todo mundo. Hoje tem caldo grosso."
+      }
+    ],
+    "When": [
+      "good_return"
+    ],
+    "Room": "",
+    "Weight": 4
+  },
+  {
+    "Name": "bento_brother",
+    "Kind": "say",
+    "Speakers": [
+      "hero_cao_bento",
+      "hero_gato_nick"
+    ],
+    "Lines": [
+      {
+        "Who": 1,
+        "Text": "Você sempre olha pro túnel antes de dormir."
+      },
+      {
+        "Who": 0,
+        "Text": "Ele ficou do outro lado. Disse pra eu seguir com os outros."
+      },
+      {
+        "Who": 0,
+        "Text": "E foi assim que perdi meu irmão…",
+        "Comic": "bento_brother"
+      }
+    ],
+    "When": [],
+    "Room": "",
+    "Weight": 1
+  }
+]

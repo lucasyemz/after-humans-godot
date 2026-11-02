@@ -89,6 +89,11 @@ class Unit:
 	var ability_ids: Array = []
 	## +n nos limites de dano ou cura de uma habilidade (o nível do herói, #90): {ability_id: n}.
 	var ability_bonus := {}
+	## A Arma e a Segunda Pele do herói (#262): +n nos limites de dano (nunca na cura), o crítico e as resistências a
+	## mais (frações, 0,1 = 10 pp).
+	var gear_damage := 0
+	var gear_crit := 0.0
+	var gear_resist := {}
 	var trauma := false
 	var sprite_key := ""
 

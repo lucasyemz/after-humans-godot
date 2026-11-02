@@ -72,6 +72,15 @@ static func _mark_today(campaign: Dictionary, key: String, hero_id: String, each
 	campaign.station[key] = {"cycle": int(campaign.station.get("cycle_number", 0)), "heroes": heroes}
 
 
+## Quantas vezes o serviço foi usado hoje (o dia é o ciclo da Estação); a Forja das peças usa o mesmo dia (#262).
+static func used_today(campaign: Dictionary, key: String) -> int:
+	return _today(campaign, key).size()
+
+
+static func mark_use(campaign: Dictionary, key: String, hero_id: String) -> void:
+	_mark_today(campaign, key, hero_id, true)
+
+
 static func mark_talk(campaign: Dictionary, hero_id: String) -> void:
 	_mark_today(campaign, "bar_talks", hero_id, true)
 
@@ -204,7 +213,7 @@ static func treatment_text(entry: Dictionary) -> String:
 static func migrate(campaign: Dictionary) -> void:
 	var station = campaign.get("station")
 	if typeof(station) == TYPE_DICTIONARY:
-		for key in ["bar_talks", "training"]:
+		for key in ["bar_talks", "training", "forge"]:
 			if station.has(key) and not _valid_day(station[key]):
 				station.erase(key)
 	for entry in campaign.get("roster", []):

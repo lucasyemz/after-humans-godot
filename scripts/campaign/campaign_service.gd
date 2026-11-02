@@ -147,7 +147,7 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
 		"art_variant": "",
 		# As sete habilidades (#259, AHHeroSkills): os desbloqueios aprendidos no Treino e as que leva ([] = as 4 de base).
-		"unlocked": [], "loadout": [], "camp_unlocked": [], "camp_loadout": [],
+		"unlocked": [], "loadout": [], "camp_unlocked": [], "camp_loadout": [], "gear": {"weapon": 0, "armor": 0},
 		# A skin completa que ele veste (#138): "default" é a arte de hoje; as outras ficam em data/skins.json.
 		"skin_id": "default",
 		# O nível (#90): o XP desde o último treino e as melhorias escolhidas (AHHeroLevels).
@@ -182,7 +182,8 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		"relic_given": [],
 		# O memorial (antes do #118): ninguém mais entra; fica vazio, e os saves antigos voltam com os heróis.
 		"memorial": [],
-		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false},
+		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false,
+			"station_chatter": true},
 		# Estação (cômodos, civis, economia), noite da volta e fila de voluntários: AHStationRules.init_new_campaign.
 		"station": {},
 		"session": {"screen": "shelter", "expedition": null},
