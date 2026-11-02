@@ -2180,12 +2180,13 @@ static func choose_doors(focus_id: String, doors: Array, door_shops: Array) -> v
 
 
 ## Marca o ponto-objetivo na primeira casa aberta da loja do foco (sempre um achado fixo, nunca o ponto com escolha).
-static func mark_objective(focus_id: String, route: Dictionary) -> void:
+## avoid: os trechos que o desvio da fase pode pular (#289): o objetivo nunca cai numa casa deles.
+static func mark_objective(focus_id: String, route: Dictionary, avoid: Array = []) -> void:
 	var entry := focus_def(focus_id)
 	if entry.is_empty():
 		return
 	for site in route.sites:
-		if site.shop != entry.shop or site.locked:
+		if site.shop != entry.shop or site.locked or avoid.has(int(site.step)):
 			continue
 		while site.spots.size() <= entry.spot:
 			site.spots.append({"choice": false, "searched": false})
