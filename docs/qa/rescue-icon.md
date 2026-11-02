@@ -39,9 +39,16 @@ O trecho do preso do #188 não acompanhava o desvio do #289. Era um defeito da m
 
 A correção:
 - o `take_detour` leva o trecho do preso junto com os de depois da saída, como já fazia com as casas e os caixotes;
-- o `assign` nunca escolhe um trecho que o desvio pula, como já acontece com o objetivo.
+- o `assign` põe o preso, de preferência, fora dos trechos que o desvio pula;
+- quando a rota não tem nenhum Suprimentos fora deles (cerca de 10% das idas à fase 1), o preso fica num trecho pulável.
+  Se a equipe descer, ele passa para a busca do ramal. Assim a rota sempre tem o preso, como a tela do resgate promete.
 
-O `tests/test_detour.gd` cobre 60 sementes da fase 1 com uma heroína capturada. Sem a correção, o teste falha.
+O `tests/test_detour.gd` cobre 120 sementes da fase 1 com uma heroína capturada:
+- toda ida tem o preso;
+- ele só fica num trecho pulável quando não há outro;
+- descendo, ele vai para a casa certa da rua ou para a busca do ramal.
+
+Sem a correção, o teste falha.
 
 ## Testes
 

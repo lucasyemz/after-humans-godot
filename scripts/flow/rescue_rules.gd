@@ -77,9 +77,13 @@ static func assign(campaign: Dictionary) -> void:
 		return
 	# Um trecho de Suprimentos com uma patrulha antes ("guardado pela patrulha"); sem nenhum, qualquer um depois da
 	# partida.
-	# Nunca num trecho que o desvio do bueiro (#289) pode pular: descendo, o preso sumiria da rota.
+	var loots: Array = range(1, route.steps.size()).filter(func(index): return String(route.steps[index].type) == "loot")
+	# De preferência fora dos trechos que o desvio do bueiro (#289) pode pular; sem nenhum, num deles, e descendo, o preso
+	# passa para a busca do ramal (AHJourneyRules.take_detour).
 	var skippable: Array = AHJourneyRules.detour_skippable(route)
-	var loots: Array = range(1, route.steps.size()).filter(func(index): return String(route.steps[index].type) == "loot" and not skippable.has(index))
+	var outside: Array = loots.filter(func(index): return not skippable.has(index))
+	if not outside.is_empty():
+		loots = outside
 	var guarded: Array = loots.filter(func(index): return range(index).any(func(before): return String(route.steps[before].type) == "combat"))
 	if not guarded.is_empty():
 		loots = guarded
