@@ -619,7 +619,9 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 		var type: String = step.type
 		# O guardião em alerta até ser vencido (#180); vencido, fica verde como os outros trechos resolvidos.
 		var tint: Color = AHKit.good() if step.resolved else (AHKit.alert_text() if boss else (AHKit.AMBER if now else AHKit.TEXT))
-		var glyph := _icon(STEP_ICONS.get(type, "node-event"), CELL * 0.56, tint)
+		# O trecho do preso (#188, #295): a mão erguida no lugar do ícone de suprimentos, só quando a casa já é conhecida.
+		var icon_name: String = "node-rescue" if _is_rescue_step(step, route) else STEP_ICONS.get(type, "node-event")
+		var glyph := _icon(icon_name, CELL * 0.56, tint)
 		glyph.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		cell.add_child(glyph)
 	else:
@@ -635,6 +637,16 @@ func _route_cell(step: Dictionary, now: bool, known: bool, route: Dictionary) ->
 		# A casa é um PanelContainer: o check estica e fica centrado sobre o ícone, como nas outras resolvidas.
 		cell.add_child(AHKit.glyph("state_active", 16, AHKit.good()))
 	return cell
+
+
+## O trecho onde o preso espera (#188): é o mesmo dicionário de route.steps no passo do resgate.
+static func _is_rescue_step(step: Dictionary, route: Dictionary) -> bool:
+	var rescue = route.get("rescue")
+	if typeof(rescue) != TYPE_DICTIONARY or not rescue.has("step"):
+		return false
+	var steps: Array = route.get("steps", [])
+	var index := int(rescue.step)
+	return index >= 0 and index < steps.size() and is_same(steps[index], step)
 
 
 ## Um trecho da rua que o desvio pulou (#289): a casa apagada, com o tipo se a equipe o viu, riscada.
@@ -715,6 +727,9 @@ func _line(at: Vector2, size: Vector2, color: Color) -> void:
 func _step_label(step: Dictionary) -> String:
 	if step.type == "boss" and step.resolved:
 		return tr("Guardião vencido")
+	var expedition = Campaign.state.get("session", {}).get("expedition") if Campaign.state is Dictionary else null
+	if expedition != null and _is_rescue_step(step, expedition.get("corridor", {})):
+		return tr("Resgate")
 	return tr(STEP_LABELS.get(step.type, ""))
 
 

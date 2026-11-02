@@ -23,6 +23,7 @@ func run(t) -> void:
 	_save(t)
 	_old_corridor(t)
 	_gallery_props(t)
+	_rescue(t)
 
 
 func _campaign(seed_value: int, team: Array = []) -> Dictionary:
@@ -270,3 +271,46 @@ func _gallery_props(t) -> void:
 	var first := R.assign_scenario_props(campaign, "SewerDucts", [int(d.first) + 1, int(d.first) + 2], ["Armário de ferramentas", "Mochila de explorador"])
 	t.equal(route.prop_steps.slice(first), [int(d.first) + 1, int(d.first) + 2], "os objetos da Galeria nos trechos do ramal")
 	t.equal(int(route.objective_prop), -1, "e nenhum deles é o objetivo da rota")
+
+
+## O resgate (#188) com o desvio (#295, QA): toda ida à fase tem o preso; ele fica de preferência fora dos trechos que o
+## desvio pula, e descer leva o trecho dele junto com os de depois da saída (a barra marca a casa certa). Sem lugar fora,
+## o preso de um trecho pulado passa para a busca do ramal.
+func _rescue(t) -> void:
+	var assigned := 0
+	var shifted := 0
+	var moved := 0
+	for seed_value in range(1, 121):
+		var campaign: Dictionary = Campaign.create_initial(seed_value)
+		S.hero(campaign, "hero_sapo_iris").captured = {"mission": "cisterna_turva", "spot": 2, "phase": "fase_1", "day": 0}
+		R.start_expedition(campaign, "fase_1", seed_value * 7919 + 13)
+		var route: Dictionary = campaign.session.expedition.corridor
+		# Toda ida à fase do resgate tem o preso: a tela prometeu que a rota passa por ele.
+		if not t.check(route.has("rescue"), "semente %d: a rota da fase do resgate tem o preso" % seed_value) or R.detour(route).is_empty():
+			continue
+		assigned += 1
+		var step := int(route.rescue.step)
+		var loots_outside: Array = range(1, route.steps.size()).filter(func(i): return route.steps[i].type == "loot" and not R.detour_skippable(route).has(i))
+		var inside := R.detour_skippable(route).has(step)
+		var guarded_at := func(i): return range(i).any(func(b): return route.steps[b].type == "combat")
+		var loots_all: Array = range(1, route.steps.size()).filter(func(i): return route.steps[i].type == "loot")
+		var guarded_outside: Array = loots_outside.filter(guarded_at)
+		t.check(guarded_at.call(step) or loots_all.filter(guarded_at).is_empty(),
+			"semente %d: o preso fica guardado por uma patrulha sempre que algum Suprimentos tem" % seed_value)
+		t.check(not inside or guarded_outside.is_empty(), "semente %d: o preso só fica num trecho pulável quando não há um guardado fora" % seed_value)
+		var prisoner: Dictionary = route.steps[step]
+		R.assign_search_sites(route, DOOR_STEPS, DOOR_SHOPS)
+		_at_entry(campaign)
+		R.reveal_detour(campaign)
+		if not R.take_detour(campaign):
+			continue
+		shifted += 1
+		if inside:
+			moved += 1
+			var at := int(route.rescue.step)
+			t.check(route.steps[at].get("detour", false) and route.steps[at].type == "loot", "semente %d: o preso de um trecho pulado vai para a busca do ramal" % seed_value)
+			continue
+		t.check(is_same(route.steps[int(route.rescue.step)], prisoner), "semente %d: depois da descida, o resgate aponta o mesmo trecho" % seed_value)
+		t.check(R.detour_view(route).sub.all(func(cell): return not AHExplorationHud._is_rescue_step(cell.step, route)),
+			"semente %d: nenhuma casa do ramal vira resgate quando o preso está na rua" % seed_value)
+	t.check(assigned > 0 and shifted > 0 and moved > 0, "as sementes cobrem o resgate com o desvio tomado (%d rotas, %d descidas, %d para o ramal)" % [assigned, shifted, moved])

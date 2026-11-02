@@ -1,6 +1,7 @@
 ## A barra de trechos da exploração (#180): a casa do guardião fica em alerta até ser vencido; vencido, fica como as
 ## outras resolvidas (o ícone verde e o check), mesmo sendo o trecho de agora, e o título diz "Guardião vencido". O
-## trecho do trem no tutorial (#147) tem o ícone do trem, na cor dos outros.
+## trecho do trem no tutorial (#147) tem o ícone do trem, na cor dos outros. O trecho do preso e o pino do resgate têm a
+## mão erguida (#295).
 extends RefCounted
 
 var t
@@ -52,7 +53,42 @@ func run(context) -> void:
 	cell = hud._route_cell(train, false, true, route)
 	t.check(_tint(cell).is_equal_approx(AHKit.good()) and _has_check(cell), "e, depois dele, verde e com o check")
 	cell.free()
+	# O trecho do preso (#188, #295): a mão erguida (node-rescue) no lugar do ícone de suprimentos; o outro trecho de
+	# suprimentos segue com o dele, e a casa ainda não alcançada continua com "?".
+	var prisoner := {"type": "loot", "resolved": false}
+	var supplies := {"type": "loot", "resolved": false}
+	var with_rescue := {"steps": [supplies, prisoner], "index": 0, "current_house": -1, "sites": [], "rescue": {"step": 1}}
+	cell = hud._route_cell(prisoner, true, true, with_rescue)
+	t.check((cell.get_child(0) as TextureRect).texture == AHKit.legacy_icon("node-rescue") and AHKit.legacy_icon("node-rescue") != null,
+		"o trecho do preso com o ícone de resgate")
+	t.check(_tint(cell).is_equal_approx(AHKit.AMBER), "na cor do trecho de agora")
+	cell.free()
+	cell = hud._route_cell(supplies, false, true, with_rescue)
+	t.check((cell.get_child(0) as TextureRect).texture == AHKit.legacy_icon("node-loot"), "o outro trecho de suprimentos segue com o dele")
+	cell.free()
+	cell = hud._route_cell(prisoner, false, false, with_rescue)
+	t.check(cell.get_child(0) is Label and (cell.get_child(0) as Label).text == "?", "não alcançado, o trecho do preso continua com ?")
+	cell.free()
+	t.check(not AHExplorationHud._is_rescue_step(prisoner, {"steps": [supplies, prisoner], "index": 0}), "sem resgate na rota, nenhum trecho é o do preso")
+	# O título do trecho: "Resgate" no do preso da expedição de agora; o outro de suprimentos e, sem expedição, o do tipo.
+	var real_state = Campaign.state
+	Campaign.state = {"session": {"expedition": {"corridor": with_rescue}}}
+	t.equal(hud._step_label(prisoner), hud.tr("Resgate"), "o título do trecho do preso diz Resgate")
+	t.equal(hud._step_label(supplies), hud.tr(AHExplorationHud.STEP_LABELS.loot), "o outro trecho de suprimentos segue Suprimentos")
+	Campaign.state = {"session": {"expedition": null}}
+	t.equal(hud._step_label(prisoner), hud.tr(AHExplorationHud.STEP_LABELS.loot), "sem expedição, o título volta ao do tipo")
+	Campaign.state = real_state
+	t.check(not AHExplorationHud._is_rescue_step({"type": "loot", "resolved": false}, with_rescue), "um trecho igual, mas de outra rota, não é o do preso")
 	hud.free()
+	# O pino do resgate no Mapa da Rede (#295): a mão erguida numa placa escura do kit, maior que os outros faróis.
+	var parent := Control.new()
+	AHMissionBoard._pin(parent, "Rescue_0", "Resgatar Véspera", "node-rescue", AHKit.alert_text(), Vector2(300, 300), false, true)
+	AHMissionBoard._pin(parent, "Mission_0", "Uma missão", "marker-here", AHKit.TEXT, Vector2(600, 300), false)
+	var plate := parent.get_node_or_null("Rescue_0/Plate") as PanelContainer
+	t.check(plate != null and plate.get_node_or_null("Beacon") is TextureRect, "o farol do resgate fica na placa")
+	t.check(plate != null and (plate.get_node("Beacon") as TextureRect).texture == AHKit.legacy_icon("node-rescue"), "com o ícone de resgate")
+	t.check(parent.get_node_or_null("Mission_0/Beacon") is TextureRect and parent.get_node_or_null("Mission_0/Plate") == null, "os outros pinos seguem sem a placa")
+	parent.free()
 
 
 ## A cor do ícone do trecho (o primeiro filho, o glifo tingido).

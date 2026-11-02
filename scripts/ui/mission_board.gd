@@ -39,7 +39,7 @@ static func pins(map, c: Dictionary, parent: Control) -> Array:
 		var stack := int(per_phase.get(target.phase, 0))
 		per_phase[target.phase] = stack + 1
 		var at := rescue_spot(Vector2(float(anchor[0]), float(anchor[1])), stack, missions)
-		var pin := _pin(parent, "Rescue_%d" % index, rescue_title(target), "alert", AHKit.alert_text(), at, true)
+		var pin := _pin(parent, "Rescue_%d" % index, rescue_title(target), "node-rescue", AHKit.alert_text(), at, true, true)
 		if map.mission == "rescue:%d" % index:
 			pin.add_child(AHKit.selected_overlay())
 		pin.pressed.connect(map.pick_mission.bind("rescue:%d" % index))
@@ -63,15 +63,28 @@ static func rescue_title(target: Dictionary) -> String:
 
 
 ## Um pino: a fileira com o farol e o rótulo, centrada no ponto da pintura sem sair dela. Devolve o rótulo.
-static func _pin(parent: Control, pin_name: String, text: String, icon_name: String, tint: Color, at: Vector2, blink: bool) -> Button:
+## plate: o farol vai numa placa escura do kit (a do botão de ícone, como o X dos painéis), maior, para se ler sobre a pintura
+## do mapa (o resgate, #295); só o ícone pisca, a placa fica.
+static func _pin(parent: Control, pin_name: String, text: String, icon_name: String, tint: Color, at: Vector2, blink: bool,
+		plate: bool = false) -> Button:
 	var row := HBoxContainer.new()
 	row.name = pin_name
 	row.add_theme_constant_override("separation", 6)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(row)
-	var beacon := AHPhaseMap._mark_icon(icon_name, 30, tint)
+	var beacon := AHPhaseMap._mark_icon(icon_name, 34 if plate else 30, tint)
 	beacon.name = "Beacon"
-	row.add_child(beacon)
+	if plate:
+		var backing := AHKit.panel(AHKit.piece_of("button", "icon"))
+		backing.name = "Plate"
+		backing.custom_minimum_size = Vector2(50, 50)
+		backing.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		backing.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		beacon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		backing.add_child(beacon)
+		row.add_child(backing)
+	else:
+		row.add_child(beacon)
 	var button := Button.new()
 	button.name = "Label"
 	AHKit.style_as(button, "list")
