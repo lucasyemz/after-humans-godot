@@ -89,6 +89,12 @@ static func stacks(hero: Dictionary, upgrade_id: String) -> int:
 
 ## Por que o herói não pode treinar agora ("" pode).
 static func train_block(campaign: Dictionary, hero: Dictionary) -> String:
+	var block := _train_block(campaign, hero)
+	# O Treino (#265): quantos heróis ele recebe por dia.
+	return block if block != "" else AHStationServices.training_block(campaign, String(hero.get("id", "")))
+
+
+static func _train_block(campaign: Dictionary, hero: Dictionary) -> String:
 	var cost := next_cost(hero)
 	if cost.is_empty():
 		if AHHeroSkills.learn_options(hero).is_empty():
@@ -108,6 +114,14 @@ static func train_block(campaign: Dictionary, hero: Dictionary) -> String:
 
 ## Treina: gasta o XP do nível e as sementes, sobe um nível e aplica a melhoria escolhida. Devolve o erro ("" deu certo).
 static func train(campaign: Dictionary, hero_id: String, upgrade_id: String) -> String:
+	var result := _train(campaign, hero_id, upgrade_id)
+	# O Treino (#265): quem treinou ocupa a vaga do dia.
+	if result == "":
+		AHStationServices.mark_training(campaign, hero_id)
+	return result
+
+
+static func _train(campaign: Dictionary, hero_id: String, upgrade_id: String) -> String:
 	var hero = AHStationRules.hero(campaign, hero_id)
 	if hero == null:
 		return TranslationServer.translate("Herói não encontrado.")

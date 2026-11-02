@@ -26,6 +26,7 @@ const CONVERTED := ["res://scripts/ui/title_screen.gd", "res://scripts/flow/figh
 	"res://scripts/flow/side_mission_rules.gd", "res://scripts/ui/mission_board.gd",
 	"res://scripts/flow/rescue_rules.gd",
 	"res://scripts/flow/type_advantage.gd", "res://scripts/flow/hero_skills.gd", "res://scripts/ui/station/dig_board.gd",
+	"res://scripts/flow/station_services.gd",
 	"res://scripts/flow/camp_skills.gd", "res://scripts/flow/species_rules.gd"]
 ## Os campos de texto de cada tabela de data/ (os nomes e as descrições).
 const DATA_FIELDS := {
@@ -173,6 +174,14 @@ static func data_texts() -> Array:
 		var blocks: Dictionary = row.get("Blocks", {})
 		for key in blocks:
 			out.append({"text": blocks[key].Name, "where": "station-grid.%s.%s" % [row.Name, key]})
+	# O desvio (#289): o nome do lugar do ramal, as falas de quem acha o bueiro e da descida e as dicas do barulho.
+	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/detours.json")):
+		for field in ["Display", "ShortName"]:
+			if String(row.get(field, "")).strip_edges() != "":
+				out.append({"text": row[field], "where": "detours.%s.%s" % [row.Name, field]})
+		for group in ["Lines", "Hints"]:
+			for key in row.get(group, {}):
+				out.append({"text": row[group][key], "where": "detours.%s.%s.%s" % [row.Name, group, key]})
 	# As escolhas dos eventos: o texto do botão, o requisito e o resultado de cada saída (#64; o resultado vai traduzido
 	# pelo modelo, com {Heroi} e {Instinto} trocados depois).
 	for row in JSON.parse_string(FileAccess.get_file_as_string("res://data/events.json")):

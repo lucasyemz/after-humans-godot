@@ -261,8 +261,8 @@ func _save() -> void:
 	t.equal(C.picks(old), 2, "quem já está no nível 4 tem as escolhas dos níveis 2 e 4 para fazer na Sala")
 
 
-## A Sala (#261): as 7 de acampamento do papel, com o estado; a escolha do nível ("Escolha agora"); Aprender na
-## bloqueada; a troca entre as que leva e as que ficam.
+## A Sala (#261): as 7 de acampamento do papel, com o estado; a escolha do nível leva ao Treino (#265), onde se aprende
+## (e conta como o treino do dia); a troca entre as que leva e as que ficam continua na Sala.
 func _room() -> void:
 	var real_state: Dictionary = Campaign.state
 	var real_dir: String = Campaign.save_dir
@@ -308,12 +308,65 @@ func _room() -> void:
 		for row in rows:
 			states[String(row.get_meta("state", ""))] = int(states.get(String(row.get_meta("state", "")), 0)) + 1
 		t.equal(states, {"equipped": 4, "locked": 3}, "a Sala mostra as 7 de acampamento: 4 levadas e 3 bloqueadas")
-		t.check(screen.find_child("CampPicks", true, false) != null, "e diz que há uma escolha a fazer")
+		t.check(screen.find_child("CampPicks", true, false) != null, "e diz que há uma escolha a fazer no Treino")
+		t.check(screen.find_child("CampGoTraining", true, false) != null, "com o botão que leva ao Treino")
 		var learn: Button = screen.find_child("CampLearn", true, false)
-		if t.check(learn != null, "a bloqueada tem Aprender"):
+		if t.check(learn != null, "a bloqueada leva ao Treino"):
+			t.check(not C.known(S.hero(Campaign.state, bento.id)).has("camp_cao_dividir_a_carga"), "a Sala sozinha não ensina")
+			var keys: bool = AHUiStyle.using_keys
+			AHUiStyle.using_keys = true
+			learn.grab_focus()
 			learn.pressed.emit()
+			await _frames(6)
+			screen = hud._room_screen
+			var owner := screen.get_viewport().gui_get_focus_owner()
+			t.check(owner != null and String(owner.name) == "CampUpgrade_camp_cao_dividir_a_carga", "pelo teclado, o foco abre no cartão escolhido (%s)" % (owner.name if owner else "nada"))
+			var behind := screen.find_child("CampLearn", true, false) as Control
+			t.check(behind != null and behind.focus_mode == Control.FOCUS_NONE, "e o que fica atrás do diálogo não recebe o foco")
+			AHUiStyle.using_keys = keys
+			var dialog := screen.find_child("Training", true, false) as Control
+			t.check(dialog != null and screen.training and screen.training_camp, "o Treino de acampamento abre")
+			if dialog != null:
+				t.check(screen.find_child("TrainingRoom", true, false) != null, "no nível 1, com o Melhorar o Treino no alto")
+				t.check(absf(dialog.position.x + dialog.size.x * 0.5 - 960.0) <= 1.0, "e o diálogo fica no meio da tela (%.0f)" % (dialog.position.x + dialog.size.x * 0.5))
+				var middle := screen.find_child("CampUpgrade_camp_cao_reforcar_a_segunda_pele", true, false) as Control
+				var last := screen.find_child("CampUpgrade_camp_cao_dividir_a_carga", true, false) as Control
+				if middle != null and last != null:
+					t.equal(middle.get_node(middle.focus_neighbor_right), last, "a seta para a direita anda de cartão em cartão")
+			var card := screen.find_child("CampUpgrade_camp_cao_dividir_a_carga", true, false) as Button
+			t.check(card != null and screen._camp_pick == "camp_cao_dividir_a_carga", "com a apontada já escolhida")
+			t.equal(screen.find_children("CampUpgrade_*", "Button", true, false).size(), 3, "os cartões são as 3 que ele não sabe")
+			var confirm := screen.find_child("Confirm", true, false) as Button
+			if t.check(confirm != null, "e tem Aprender"):
+				confirm.pressed.emit()
+				await _frames(4)
+				t.check(C.known(S.hero(Campaign.state, bento.id)).has("camp_cao_dividir_a_carga"), "Aprender no Treino ensina a escolhida")
+				t.check(AHStationServices.training_block(Campaign.state, bento.id) == "", "quem aprendeu continua podendo treinar hoje")
+				var other: Dictionary = S.hero(Campaign.state, "hero_gato_nick")
+				t.check(AHStationServices.training_block(Campaign.state, String(other.id)) != "", "e conta como o treino do dia (nível 1, um herói)")
+				screen = hud._room_screen
+				screen.rebuild()
+				await _frames(2)
+				t.check(screen.find_child("Training", true, false) == null, "o diálogo fecha depois de aprender")
+		# O Treino no Plano (#265): o Ver abre o painel dele, e o Melhorar compra o nível 2.
+		S.adjust(Campaign.state, "scrap", 20)
+		S.adjust(Campaign.state, "fragments", 5)
+		hud.open_service("plan")
+		await _frames(4)
+		var see := hud.find_child("See_training", true, false) as Button
+		if t.check(see != null, "o Treino está no Plano da Estação"):
+			see.pressed.emit()
 			await _frames(4)
-			t.check(C.known(S.hero(Campaign.state, bento.id)).has("camp_cao_dividir_a_carga"), "Aprender ensina a escolhida")
+			t.equal(hud.current, S.TRAINING, "o Ver abre o painel do Treino")
+			var upgrade := hud.find_child("Upgrade", true, false) as Button
+			if t.check(upgrade != null and not upgrade.disabled, "com o Melhorar"):
+				upgrade.pressed.emit()
+				await _frames(4)
+				t.equal(S.room_level(Campaign.state, S.TRAINING), 2, "que leva o Treino ao nível 2")
+				t.equal(AHStationServices.trainees_per_day(Campaign.state), 2, "e ele recebe dois heróis por dia")
+		hud.open_room(S.CHARACTERS)
+		await _frames(4)
+		screen = hud._room_screen
 		screen = hud._room_screen
 		screen.camp_skill = "camp_cao_dividir_a_carga"
 		screen.rebuild()
