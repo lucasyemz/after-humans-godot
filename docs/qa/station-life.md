@@ -94,8 +94,8 @@ O custo do `AHStationLife` por quadro, medido sem janela:
 
 **Rodadas 4 a 8 (os conflitos com a `main` de 01 e 02/11)**
 - A `main` recebeu o #306 e o #308 (#189: a espécie, os papéis, as resistências e o crítico), o #309 (#261: as
-  habilidades de acampamento), o #311 (#265: os serviços dos cômodos), o #314 (#289: o desvio pelo esgoto) e o #310
-  (#301: o descanso no mapa). Os conflitos foram só no i18n (as listas do `i18n_scan` e do `i18n_ignore` e o `en.po`,
+  habilidades de acampamento), o #311 (#265: os serviços dos cômodos), o #314 (#289: o desvio pelo esgoto), o #310
+  (#301: o descanso no mapa) e o #312 (#263: as relíquias). Os conflitos foram só no i18n (as listas do `i18n_scan` e do `i18n_ignore` e o `en.po`,
   regenerado sem perder nenhuma tradução).
 - Rodada 4, sobre o 1º merge: **APROVADO**, nada perdido dos dois lados. A QA achou um bug anterior ao merge (médio): o
   Bento segurado para a conversa da tirinha voltava ao posto da Forja, e a conversa atrasava de 12 a 26 s. Corrigido
@@ -109,7 +109,9 @@ O custo do `AHStationLife` por quadro, medido sem janela:
 - Rodada 7: **REPROVADO** (médio). A tirinha pendente sem conversa no ar (a câmera a interrompeu) ficava presa e as
   falas comuns sumiam. Corrigido: ela também acaba.
 - Rodada 8, com o merge do #314: **APROVADO**. O #310 entrou depois, sem conflito (só mexe na rua).
-- A suíte inteira passa: 117 de 117, sobre a `main` com o #310.
+- Rodada 9, com o merge do #312 (as relíquias): **APROVADO**. O código da Estação viva não usa a API antiga das
+  relíquias, e o painel delas fica na Sala, onde os balões já não aparecem.
+- A suíte inteira passa: 118 de 118, sobre a `main` com o #312.
 
 ## O que é diferente da proposta
 
