@@ -231,7 +231,7 @@ func _equip(campaign: Dictionary, phase_id: String) -> void:
 	for index in mini(counts[0], formation.size()):
 		for hero in campaign.roster:
 			if hero.id == formation[index]:
-				hero.relic_id = RELIC_ORDER[index]
+				hero.relics = [RELIC_ORDER[index], ""]
 	for index in counts[1]:
 		var row = root.get_node("GameData").row("research", TRAINING_ORDER[index])
 		if not campaign.researched_skills.has(row.SkillId):

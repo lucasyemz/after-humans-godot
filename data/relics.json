@@ -3,18 +3,58 @@
     "Name": "botao_cobre",
     "DisplayName": "Botão de Cobre",
     "Description": "+3 de Vida Máxima. Um talismã sólido do tempo dos Antigos.",
+    "Rarity": "common",
+    "Only": "",
+    "Sources": ["forge", "cargo", "dig"],
     "MaxHpBonus": 3
   },
   {
     "Name": "pena_vidro",
     "DisplayName": "Pena de Vidro",
     "Description": "+1 de Velocidade. Cortada do vidro de uma Casa de Vidro.",
+    "Rarity": "common",
+    "Only": "",
+    "Sources": ["forge", "cargo", "dig"],
     "SpeedBonus": 1
   },
   {
     "Name": "coleira_lembranca",
     "DisplayName": "Coleira de Lembrança",
     "Description": "-2 de Instinto causado por eventos misteriosos (mínimo zero).",
+    "Rarity": "uncommon",
+    "Only": "",
+    "Sources": ["cargo", "dig"],
     "EventInstinctReduction": 2
+  },
+  {
+    "Name": "semente_guardada",
+    "DisplayName": "Semente no Bolso",
+    "Description": "+5 pontos percentuais na chance de Superação. Uma semente da Estação num saquinho de pano, para lembrar o que espera na volta.",
+    "Rarity": "common",
+    "Only": "",
+    "Sources": ["forge"],
+    "VirtueBonus": 0.05
+  },
+  {
+    "Name": "sino_vitrine",
+    "DisplayName": "Sininho de Vitrine",
+    "Description": "+1 de Velocidade e -2 de Vida Máxima. O sino de porta de uma loja da Rua das Vitrines, com uma raiz no laço.",
+    "Rarity": "uncommon",
+    "Only": "",
+    "Sources": ["cargo"],
+    "Phase": "fase_1",
+    "SpeedBonus": 1,
+    "MaxHpBonus": -2
+  },
+  {
+    "Name": "raiz_trancada",
+    "DisplayName": "Raiz Trançada",
+    "Description": "+4 de Vida Máxima e -1 de Velocidade. Uma pulseira trançada com as raízes que seguram a Ponte das Raízes.",
+    "Rarity": "uncommon",
+    "Only": "",
+    "Sources": ["cargo"],
+    "Phase": "fase_2",
+    "MaxHpBonus": 4,
+    "SpeedBonus": -1
   }
 ]

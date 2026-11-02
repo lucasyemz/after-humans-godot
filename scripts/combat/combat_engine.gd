@@ -344,7 +344,8 @@ func abilities_of(unit: Unit) -> Array:
 	return unit_class.AbilityIds if unit_class != null else []
 
 
-## Unidade de herói a partir da campanha. hero: Id, ClassId, Species (opcional), DisplayName, MaxHp, Hp, Instinct, Perks, Trauma, RelicId.
+## Unidade de herói a partir da campanha. hero: Id, ClassId, Species (opcional), DisplayName, MaxHp, Hp, Instinct, Perks, Trauma,
+## RelicIds (os dois slots, #263; RelicId, uma só, continua valendo para a paridade e os testes antigos).
 static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -> Unit:
 	var unit := Unit.new()
 	unit.id = "unit_" + hero.Id
@@ -367,7 +368,10 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 	unit.ability_bonus = hero.get("AbilityBonus", {}).duplicate()
 
 	var hero_class = game_data.classes.get(hero.ClassId)
-	var relic = game_data.relics.get(hero.get("RelicId", ""))
+	# As relíquias (#263): cada uma conta uma vez, e a Velocidade delas tem o teto de AHRelics.SPEED_CAP.
+	var relic_ids: Array = Array(hero.get("RelicIds", [])) if hero.has("RelicIds") else [hero.get("RelicId", "")]
+	var relic := AHRelics.totals(relic_ids, game_data.relics)
+	unit.virtue_bonus = float(relic.virtue)
 	var perk_speed := 0
 	var seen := {}
 	for perk_id in unit.perks:
@@ -377,8 +381,10 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 		var perk = game_data.perks.get(perk_id)
 		if perk != null:
 			perk_speed += perk.Speed
-	unit.max_hp = mini(200, hero.MaxHp + (relic.MaxHpBonus if relic != null else 0))
-	unit.speed = (hero_class.BaseSpeed if hero_class != null and hero_class.BaseSpeed != 0 else 2) + (relic.SpeedBonus if relic != null else 0) + perk_speed \
+	unit.max_hp = mini(200, hero.MaxHp + int(relic.max_hp))
+	# Uma relíquia com custo de Vida (#263) baixa o máximo; a vida de quem entra cheio desce junto.
+	unit.hp = mini(unit.hp, unit.max_hp)
+	unit.speed = (hero_class.BaseSpeed if hero_class != null and hero_class.BaseSpeed != 0 else 2) + int(relic.speed) + perk_speed \
 		+ int(hero.get("SpeedBonus", 0))
 	return unit
 
@@ -557,8 +563,9 @@ func _change_instinct(unit: Unit, delta: int, reason: String) -> void:
 			unit.instinct_history.pop_front()
 
 
-func _virtue_chance(perks: Array) -> float:
-	var total: float = instinct_rules().Crisis.BaseVirtue
+## A chance de Superação na crise: a base, os perks (cada um uma vez) e o bônus das relíquias (VirtueBonus, #263).
+func _virtue_chance(perks: Array, relic_bonus: float = 0.0) -> float:
+	var total: float = instinct_rules().Crisis.BaseVirtue + relic_bonus
 	var seen := {}
 	for perk_id in perks:
 		if seen.has(perk_id):
@@ -592,7 +599,7 @@ func _apply_instinct_crisis(unit: Unit, out_events: Array) -> void:
 		return
 	_crisis_batch[unit.id] = true
 
-	var chance := _virtue_chance(unit.perks)
+	var chance := _virtue_chance(unit.perks, unit.virtue_bonus)
 	unit.crisis_count += 1
 	var collapse := random.next() >= chance
 	_change_instinct(unit, rules.Crisis.Reset - unit.instinct, tr("Colapso") if collapse else tr("Superação"))
