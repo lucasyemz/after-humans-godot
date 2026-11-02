@@ -953,7 +953,6 @@ character_room.gd: perks
 character_room.gd: Speed
 character_room.gd: speed
 character_room.gd: Description
-character_room.gd: Relic
 character_room.gd: Traits
 character_room.gd: Condition
 character_room.gd: Training
@@ -1954,6 +1953,43 @@ comic_reader.gd: “%s”
 comic_reader.gd: %s “%s”
 comic_reader.gd: %d/%d
 station_life.gd: wait
+relic_rules.gd: common
+relic_rules.gd: uncommon
+relic_rules.gd: rare
+relic_rules.gd: personal
+relic_rules.gd: keepsake
+relic_rules.gd: Rarity
+relic_rules.gd: Sources
+relic_rules.gd: forge
+relic_rules.gd: Only
+relic_rules.gd: Phase
+relic_rules.gd: alive
+relic_rules.gd: id
+relic_rules.gd: speed
+relic_rules.gd: virtue
+game_data_service.gd: common
+game_data_service.gd: uncommon
+game_data_service.gd: rare
+game_data_service.gd: personal
+game_data_service.gd: keepsake
+game_data_service.gd: Rarity
+game_data_service.gd: Sources
+game_data_service.gd: forge
+game_data_service.gd: cargo
+game_data_service.gd: dig
+game_data_service.gd: guardian
+game_data_service.gd: solo
+game_data_service.gd: story
+game_data_service.gd: Only
+game_data_service.gd: Phase
+game_data_service.gd: relíquia %s: raridade %s não existe
+game_data_service.gd: relíquia %s: origem %s não existe
+game_data_service.gd: relíquia %s: papel %s não existe
+game_data_service.gd: relíquia %s: restrição %s não existe
+game_data_service.gd: relíquia %s: fase %s sem carga recuperada
+character_room.gd: RelicSlot%d
+character_room.gd: Relic%d
+side_mission_rules.gd: cargo
 station_rules.gd: Level
 station_rules.gd: Instinct
 station_rules.gd: treated

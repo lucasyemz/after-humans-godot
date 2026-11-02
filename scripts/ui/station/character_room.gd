@@ -1001,39 +1001,46 @@ func _speed(hero: Dictionary) -> int:
 	return speed + int(AHHeroLevels.combat_bonus(hero).get("speed", 0))
 
 
+## Os dois slots de relíquia (#263), um por linha: o ícone, o nome, o que faz e o botão de trocar daquele slot.
 func _relic(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	column.add_child(row)
-	var relic = GameData.row("relics", String(hero.get("relic_id", ""))) if String(hero.get("relic_id", "")) != "" else null
-	if relic != null:
-		var icon := TextureRect.new()
-		icon.texture = AHKit.legacy_icon(RELIC_ICONS.get(String(hero.relic_id), "relic-generic"))
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.custom_minimum_size = Vector2(36, 36)
-		icon.modulate = AHKit.AMBER
-		icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-		row.add_child(icon)
-	else:
-		var empty := AHKit.glyph("relic_empty", 36, AHKit.MUTED)
-		empty.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-		row.add_child(empty)
-	var text := VBoxContainer.new()
-	text.add_theme_constant_override("separation", 0)
-	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(text)
-	text.add_child(AHKit.label(tr("Relíquia: %s") % (tr(String(relic.DisplayName)) if relic != null else tr("Sem relíquia")), "row", AHKit.TEXT))
-	var hint := AHKit.label(tr(String(relic.get("Description", ""))) if relic != null else tr("Equipe uma relíquia ao preparar a expedição."), "small", AHKit.MUTED)
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.custom_minimum_size = Vector2(260, 0)
-	text.add_child(hint)
-	if not c.inventory.relics.is_empty() or relic != null:
-		var swap := _small_button(tr("Trocar"))
-		swap.name = "Relic"
-		var id: String = hero.id
-		swap.pressed.connect(func(): hud._cycle_relic(id))
-		row.add_child(swap)
+	var slots := AHRelics.slots(hero)
+	for slot in slots.size():
+		var relic_id: String = slots[slot]
+		var row := HBoxContainer.new()
+		row.name = "RelicSlot%d" % slot
+		row.add_theme_constant_override("separation", 12)
+		column.add_child(row)
+		var relic = GameData.row("relics", relic_id) if relic_id != "" else null
+		if relic != null:
+			var icon := TextureRect.new()
+			icon.texture = AHKit.legacy_icon(RELIC_ICONS.get(relic_id, "relic-generic"))
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.custom_minimum_size = Vector2(36, 36)
+			icon.modulate = AHKit.AMBER
+			icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+			row.add_child(icon)
+		else:
+			var empty := AHKit.glyph("relic_empty", 36, AHKit.MUTED)
+			empty.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+			row.add_child(empty)
+		var text := VBoxContainer.new()
+		text.add_theme_constant_override("separation", 0)
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(text)
+		var title := tr("Relíquia %d: %s") % [slot + 1, tr(String(relic.DisplayName)) if relic != null else tr("Sem relíquia")]
+		text.add_child(AHKit.label(title, "row", AHKit.TEXT))
+		var hint := AHKit.label(tr(String(relic.get("Description", ""))) if relic != null else tr("Equipe uma relíquia ao preparar a expedição."), "small", AHKit.MUTED)
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint.custom_minimum_size = Vector2(260, 0)
+		text.add_child(hint)
+		if not c.inventory.relics.is_empty() or relic != null:
+			var swap := _small_button(tr("Trocar"))
+			swap.name = "Relic%d" % slot
+			var id: String = hero.id
+			var which := slot
+			swap.pressed.connect(func(): hud._cycle_relic(id, which))
+			row.add_child(swap)
 
 
 func _small_button(text: String) -> Button:

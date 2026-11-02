@@ -437,14 +437,13 @@ static func _rare_text(rare: Dictionary, kind: String) -> String:
 	return ""
 
 
-## As relíquias que a equipe ainda não tem (nem no estoque nem equipadas), em ordem.
+## As relíquias de escavação ("dig", comuns ou incomuns, #263) que a equipe ainda não tem (nem no estoque nem
+## equipadas, nos dois slots), em ordem.
 static func _new_relics(campaign: Dictionary) -> Array:
 	var owned: Array = campaign.inventory.get("relics", []).duplicate()
 	for entry in campaign.roster:
-		owned.append(String(entry.get("relic_id", "")))
-	var out: Array = GameData.table("relics").keys().filter(func(id): return not owned.has(String(id)))
-	out.sort()
-	return out
+		owned.append_array(AHRelics.equipped(entry))
+	return AHRelics.pool("dig").filter(func(id): return not owned.has(String(id)))
 
 
 # ================================================================ os textos
