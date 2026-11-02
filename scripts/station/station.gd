@@ -101,6 +101,8 @@ var hud: AHRefugeHud
 ## geral enquadra a Estação à direita dele, para nenhum cômodo (o Dormitório da ponta) ficar embaixo do menu (#76).
 var menu_right := SCREEN_MENU_RIGHT
 var camera: Camera3D
+## A vista de fora no fim da linha (#217).
+var outside: AHStationOutside
 var residents := {}
 ## Os moradores escondidos por uma tela do kit (hide_residents).
 var _residents_hidden := false
@@ -194,6 +196,12 @@ func _ready() -> void:
 		keep[node] = true
 		_wagon_base[node] = node.position
 	builder.merge_static(keep)
+	# A vista de fora no fim da linha (#217), com a hora do dia da Estação.
+	outside = AHStationOutside.new()
+	outside.name = "Outside"
+	add_child(outside)
+	outside.build()
+	refresh_outside(true)
 	# A silhueta dos heróis atrás do mobiliário e o esmaecimento do que tapa (#51).
 	occlusion = AHOcclusion.new()
 	occlusion.name = "Occlusion"
@@ -325,6 +333,7 @@ func refresh() -> void:
 
 func _process(delta: float) -> void:
 	_tick_camera(delta)
+	refresh_outside()
 	# O candidato chega depois de o trem da volta sair de vista (senão o vagão pulava para o túnel).
 	if _pending_arrival != "" and _path.is_empty() and not _team_train_leaving:
 		play_train_arrival(_pending_arrival)
@@ -1713,6 +1722,14 @@ static var night_scene := false
 func set_night_scene(on: bool) -> void:
 	night_scene = on
 	_update_sleepers()
+	refresh_outside()
+
+
+## A vista de fora segue a hora da Estação (#217): a volta, a cena da noite e o amanhecer trocam a hora com uma
+## transição; instant põe a hora de uma vez (a Estação abrindo e as fotos).
+func refresh_outside(instant: bool = false) -> void:
+	if outside != null:
+		outside.show_hour(AHStationOutside.hour_of(Campaign.state, night_scene), instant)
 
 
 ## A cena não sobrevive à Estação (a troca de cena no meio da noite): quem dormiu não fica deitado por engano.
