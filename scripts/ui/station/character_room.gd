@@ -571,7 +571,9 @@ func _ability_detail(c: Dictionary, hero: Dictionary, ability_id: String) -> Pan
 	if int(damage.get("Max", 0)) > 0:
 		box.add_child(AHKit.label(tr("Dano %d–%d") % [int(damage.Min) + bonus, int(damage.Max) + bonus] + star, "card_name", AHKit.AMBER, true))
 	elif int(heal.get("Max", 0)) > 0:
-		box.add_child(AHKit.label(tr("Cura %d–%d") % [int(heal.Min) + bonus, int(heal.Max) + bonus] + star, "card_name", AHKit.good(), true))
+		# As Mãos (#264) somam na cura, como na luta.
+		var hands := roundi(AHPerks.total(AHPerks.of(hero), "HealBonus"))
+		box.add_child(AHKit.label(tr("Cura %d–%d") % [maxi(0, int(heal.Min) + bonus + hands), maxi(0, int(heal.Max) + bonus + hands)] + star, "card_name", AHKit.good(), true))
 	var ranks := HFlowContainer.new()
 	ranks.add_theme_constant_override("h_separation", 24)
 	ranks.add_child(AHKit.label(tr("Origem: posições %s") % " · ".join(data.get("OriginRanks", []).map(func(r): return str(int(r)))), "text", AHKit.MUTED))

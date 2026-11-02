@@ -18,6 +18,7 @@ func run(context) -> void:
 	_combat()
 	_camp()
 	_search()
+	_ampoule()
 	_save()
 	_sheet()
 
@@ -151,6 +152,54 @@ func _camp() -> void:
 	light.instinct = 40
 	C.night(c)
 	t.equal([int(bento.instinct), int(light.instinct)], [45, 35], "na noite: Sono pesado +5, Sono leve −5")
+	# Uma habilidade que só vigia (o Posto Alto da coruja): com Sono pesado, não fica disponível, com o motivo.
+	var d: Dictionary = Campaign.create_initial(17)
+	J.start_expedition(d, "fase_1", 17 * 7919 + 13)
+	J.assign_search_sites(d.session.expedition.corridor, [1, 2, 3, 5, 6, 8], [0, 1, 2, 0, 1, 2])
+	d.session.expedition.team = d.roster.slice(0, 4).map(func(h): return h.id)
+	var other_route: Dictionary = d.session.expedition.corridor
+	var other_site: int = other_route.sites.map(func(s): return s.camp_site).find(true)
+	other_route.index = other_route.sites[other_site].step
+	J.enter_house(d, other_site)
+	other_route.sites[other_site].enemy_defeated = true
+	if t.check(J.start_camp(d), "acampa de novo"):
+		var owl: Dictionary = d.roster.filter(func(h): return h.class_id == "coruja")[0]
+		owl.perks = ["heavy-sleeper"]
+		owl.camp_unlocked = ["camp_coruja_posto_alto"]
+		owl.camp_loadout = C.known(owl).slice(0, C.max_equipped()) if C.known(owl).size() <= C.max_equipped() else []
+		if not C.equipped(owl).has("camp_coruja_posto_alto"):
+			owl.camp_loadout = C.known(owl).filter(func(id): return id != C.known(owl)[0]).slice(0, C.max_equipped())
+		var q := C.quote(d, owl.id, "camp_coruja_posto_alto")
+		var time := C.time_left(d)
+		t.check(not q.available and String(q.reason).contains("Sono pesado"), "o Posto Alto com Sono pesado: indisponível (%s)" % q.reason)
+		t.check(C.use(d, owl.id, "camp_coruja_posto_alto") != "" and C.time_left(d) == time, "e não gasta Tempo")
+		owl.perks = []
+		t.check(C.quote(d, owl.id, "camp_coruja_posto_alto").available, "sem o Sono pesado, vigia")
+
+
+## A Ampola fora da luta (a mesma da luta): as Mãos de quem a leva somam, como na luta.
+func _ampoule() -> void:
+	var c: Dictionary = Campaign.create_initial(12)
+	J.start_expedition(c, "fase_1", 12)
+	c.session.expedition.team = c.roster.slice(0, 4).map(func(h): return h.id)
+	c.session.screen = "corridor"
+	var hurt: Dictionary = S.hero(c, "hero_cao_bento")
+	hurt.hp = 5
+	var iris = AHExplorationCare.iris(c)
+	if not t.check(iris != null, "a Íris está na equipe"):
+		return
+	var row = GameData.combat.abilities[AHExplorationCare.AMPOULE]
+	var ranges: Array = []
+	for hands in [["mender"], ["shaky"], []]:
+		iris.perks = hands
+		var q := AHExplorationCare.quote(c, hurt.id, AHExplorationCare.IRIS_AMPOULE)
+		ranges.append([q.heal_min, q.heal_max])
+	t.equal(ranges, [[int(row.HealRange.Min) + 1, int(row.HealRange.Max) + 1], [int(row.HealRange.Min) - 1, int(row.HealRange.Max) - 1],
+		[int(row.HealRange.Min), int(row.HealRange.Max)]], "a Ampola no mapa: Mãos de remendo +1, Mãos trêmulas −1")
+	# A ficha: Pé firme no deslocamento, como na luta.
+	var role = GameData.combat.classes.get("cao")
+	var rows := AHCharacterSheet.role_rows("cao", ["steady"])
+	t.check(String(rows[0][0]).contains("deslocamento %d%%" % roundi((float(role.DisplacementResist) + 0.1) * 100.0)), "a ficha mostra o deslocamento com Pé firme")
 
 
 func _search() -> void:

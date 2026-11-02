@@ -15,14 +15,16 @@ As fotos saem de `tools/capture_264.gd` (e `--text-size=2` para o Maior).
 | `steady` | Pé firme | + | +10 pp de resistência a deslocamento | `AHCombatEngine.hero_resist` |
 | `stumbling` | Pé pesado | − | −10 pp de resistência a deslocamento | idem (entre 0 e o teto) |
 | `light-sleeper` | Sono leve | + | −5 Instinto na noite do acampamento | `AHCampSkills.night` |
-| `heavy-sleeper` | Sono pesado | − | +5 Instinto na noite, e a vigia dele não conta | `night` e `use` |
-| `mender` | Mãos de remendo | + | +1 nos limites de cura | o motor e a faixa mostrada |
+| `heavy-sleeper` | Sono pesado | − | +5 Instinto na noite; a vigia dele não conta, e a habilidade que só vigia fica indisponível | `night`, `quote` e `use` |
+| `mender` | Mãos de remendo | + | +1 nos limites de cura | o motor, a faixa da luta, a Ampola no mapa e a Sala |
 | `shaky` | Mãos trêmulas | − | −1 nos limites de cura (nunca abaixo de 0) | idem |
 | `scavenger` | Faro de busca | + | +1 sucata na busca que traz sucata | `apply_search_outcome` |
 | `short-fuse` | Pavio curto | − | +3 Instinto ao sofrer um crítico, 1× por rodada | o crítico inimigo |
 
 - **As de cura** (`NeedsHeal`) só são sorteadas para quem tem cura entre as 7 habilidades do papel.
 - **Nenhuma mexe em Vida ou em dano direto.**
+- **A vigia da noite na Estação** (`watch_hero_id`) não muda: a decisão fala da noite do acampamento.
+- **A ficha** mostra o deslocamento com Pé firme e Pé pesado, como na luta.
 - **Os ícones das novas são provisórios**, tirados do kit (`PROVISIONAL_TRAIT_ICONS`), até a arte chegar do design.
 
 ## Os limites e a fixada
