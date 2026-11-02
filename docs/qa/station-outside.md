@@ -68,4 +68,4 @@ pedida ao design na #315, como a issue manda quando falta arte.
 - 23 capturas no Compatibility sem nada vazando do contorno; o feixe clareia o vagão sem mudar os cômodos de baixo.
 - Observações baixas, para a arte da #315: a ponta arredondada da abóbada aparece ao lado do montante direito, e a
   linha da água do panorama fica na altura do pé da abóbada. O feixe do dia é forte para "de leve": vale o Lucas olhar.
-- Depois da rodada 2, a branch recebeu a `main` com o #310 (sem conflito): a suíte inteira passa, 117 de 117.
+- Depois da rodada 2, a branch recebeu a `main` com o #310 e o #312 (sem conflito): a suíte inteira passa, 118 de 118.
