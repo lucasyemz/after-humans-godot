@@ -100,9 +100,9 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 			if GameData.row("classes", target.class_id) == null:
 				q.reason = TranslationServer.translate("A ampola trata somente aliados orgânicos.")
 				return q
-			var bonus := 1 if campaign.get("researched_skills", []).has(AMPOULE) else 0
-			q.heal_min = mini(missing, row.HealRange.Min + bonus)
-			q.heal_max = mini(missing, row.HealRange.Max + bonus)
+			var bonus := ampoule_bonus(campaign)
+			q.heal_min = mini(missing, maxi(0, row.HealRange.Min + bonus))
+			q.heal_max = mini(missing, maxi(0, row.HealRange.Max + bonus))
 			if q.charges <= 0:
 				q.reason = TranslationServer.translate("Sem cargas. A ampola recarrega após uma vitória.")
 				return q
@@ -116,6 +116,15 @@ static func quote(campaign: Dictionary, hero_id: String, kind: String) -> Dictio
 	return q
 
 
+## O que soma na cura da Ampola fora da luta: a Pesquisa e as Mãos (#264) de quem leva a Ampola, como na luta.
+static func ampoule_bonus(campaign: Dictionary) -> int:
+	var bonus := 1 if campaign.get("researched_skills", []).has(AMPOULE) else 0
+	var carrier = iris(campaign)
+	if carrier != null:
+		bonus += roundi(AHPerks.total(AHPerks.of(carrier), "HealBonus"))
+	return bonus
+
+
 ## Usa o cuidado no aliado (Use). Devolve quanto curou (0 se não deu).
 static func use(campaign: Dictionary, hero_id: String, kind: String) -> int:
 	var q := quote(campaign, hero_id, kind)
@@ -126,11 +135,11 @@ static func use(campaign: Dictionary, hero_id: String, kind: String) -> int:
 	match kind:
 		IRIS_AMPOULE:
 			var row = _ampoule_row()
-			var bonus := 1 if campaign.get("researched_skills", []).has(AMPOULE) else 0
+			var bonus := ampoule_bonus(campaign)
 			# A cura sorteada sai da semente da rota e de quantas cargas já foram (o mesmo resultado ao repetir).
 			var route: Dictionary = campaign.session.expedition.corridor
 			var random := AHJourneyRules._rand(int(route.seed) ^ AHJourneyRules._mul(q.charges + 1, 0x6a09e667) ^ hash(hero_id))
-			heal = row.HealRange.Min + bonus + floori(random.next() * (row.HealRange.Max - row.HealRange.Min + 1))
+			heal = maxi(0, row.HealRange.Min + bonus + floori(random.next() * (row.HealRange.Max - row.HealRange.Min + 1)))
 			iris(campaign).expedition_uses[AMPOULE] = q.charges - 1
 		BANDAGE:
 			AHJourneyRules.adjust(campaign, "bandages", -1)

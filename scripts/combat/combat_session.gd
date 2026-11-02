@@ -167,9 +167,10 @@ func effective_range(ability_id: String, kind: String = "damage", actor_id: Stri
 	var trained: bool = base.Max > 0 and bonus > 0
 	if not trained:
 		bonus = 0
-	# A Arma (#262) soma só no dano, nunca na cura.
+	# A Arma (#262) soma só no dano, nunca na cura; Mãos de remendo e Mãos trêmulas (#264), só na cura, como no motor.
 	var gear: int = actor.gear_damage if actor != null and kind == "damage" and int(base.Max) > 0 else 0
-	return {"Min": int(base.Min) + bonus + gear, "Max": int(base.Max) + bonus + gear, "trained": trained}
+	var hands: int = roundi(engine.perk_total(actor, "HealBonus")) if actor != null and kind == "heal" and int(base.Max) > 0 else 0
+	return {"Min": maxi(0, int(base.Min) + bonus + gear + hands), "Max": maxi(0, int(base.Max) + bonus + gear + hands), "trained": trained}
 
 
 ## Texto curto da habilidade: o que faz em números (com o treino da Pesquisa e o nível de quem age) e a descrição de

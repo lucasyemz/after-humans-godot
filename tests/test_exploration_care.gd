@@ -78,12 +78,14 @@ func _exploration(t) -> void:
 	t.equal(C.use(campaign, target.id, C.IRIS_AMPOULE), 0, "vida cheia não gasta carga")
 	t.check(not iris.expedition_uses.has(C.AMPOULE), "a cotação não reserva carga")
 
+	# A cura: 5 a 8, mais as Mãos de quem leva a Ampola (#264; a Íris das campanhas novas tem Mãos de remendo fixada).
+	var hands := C.ampoule_bonus(campaign)
 	var in_range := true
 	for i in 3:
 		target.hp = 1
 		t.check(C.use(campaign, target.id, C.IRIS_AMPOULE) > 0, "ampola na exploração (%d)" % (i + 1))
-		in_range = in_range and target.hp >= 6 and target.hp <= 9
-	t.check(in_range, "a cura respeita 5 a 8")
+		in_range = in_range and target.hp >= 6 + hands and target.hp <= 9 + hands
+	t.check(in_range, "a cura respeita 5 a 8 (+%d das Mãos)" % hands)
 	t.equal(iris.expedition_uses[C.AMPOULE], 0, "as três cargas acabam")
 	target.hp = 1
 	campaign.session.screen = "rest"
