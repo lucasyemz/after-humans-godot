@@ -92,7 +92,7 @@ O custo do `AHStationLife` por quadro, medido sem janela:
 - As fotos acima são de antes desse rebase. A #274 muda os marcadores da grade na vista geral, mas a Estação viva não
   muda.
 
-**Rodadas 4 a 8 (os conflitos com a `main` de 01 e 02/11)**
+**Rodadas 4 a 9 (os conflitos com a `main` de 01 e 02/11)**
 - A `main` recebeu o #306 e o #308 (#189: a espécie, os papéis, as resistências e o crítico), o #309 (#261: as
   habilidades de acampamento), o #311 (#265: os serviços dos cômodos), o #314 (#289: o desvio pelo esgoto), o #310
   (#301: o descanso no mapa) e o #312 (#263: as relíquias). Os conflitos foram só no i18n (as listas do `i18n_scan` e do `i18n_ignore` e o `en.po`,
