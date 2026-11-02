@@ -42,7 +42,7 @@ const ENEMY_ACTION := {
 		"bVuln": false, "Push": 0, "Block": 0,
 	},
 }
-const PERK := {"DisplayName": "", "Value": 0.0, "Speed": 0, "Virtue": 0.0}
+const PERK := {"DisplayName": "", "Value": 0.0, "Speed": 0, "Virtue": 0.0, "DisplacementResist": 0.0, "HealBonus": 0}
 const RELIC := {"DisplayName": "", "MaxHpBonus": 0, "SpeedBonus": 0, "EventInstinctReduction": 0, "VirtueBonus": 0.0}
 ## A vantagem de tipo (#227): as classificações (linhagens e famílias mecânicas) e quem vence quem (Beats), e a chave.
 const TYPE_CLASS := {"Kind": "", "DisplayName": "", "ShortName": "", "Beats": []}

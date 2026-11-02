@@ -134,6 +134,8 @@ func _combat() -> void:
 			healer = entry
 	if not healer.is_empty():
 		healer.gear = {"weapon": 4, "armor": 0}
+		# Só a Arma: sem as Mãos (#264), que somam na cura de propósito.
+		healer.perks = []
 		var heal_session := AHCombatSession.create([healer], [], false, 7)
 		var medic: AHCombat.Unit = heal_session.state.player_team[0]
 		var heals: Array = heal_session.data.classes[medic.class_id].AbilityIds.filter(func(id): return int(heal_session.data.abilities[id].HealRange.Max) > 0)

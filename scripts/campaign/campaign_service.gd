@@ -114,17 +114,16 @@ static func founder_id(class_id: String, display_name: String) -> String:
 
 
 ## Dois ou três perks: um positivo, um negativo e, às vezes, um terceiro qualquer, sem incompatíveis (RollPerks).
-static func roll_perks(perks: Dictionary, rng: RandomNumberGenerator) -> Array:
-	var result: Array = []
-	var compatible := func(id: String) -> bool:
-		for other in result:
-			if perks[id].get("Incompatible", []).has(other) or perks[other].get("Incompatible", []).has(id):
-				return false
-		return true
+## class_id (#264): as de cura só para quem cura. given: as que ele já tem (a positiva fixa do fundador conta como a
+## positiva do sorteio).
+static func roll_perks(perks: Dictionary, rng: RandomNumberGenerator, class_id: String = "", given: Array = []) -> Array:
+	var result: Array = given.duplicate()
 	var take := func(type: String) -> void:
+		if type != "" and result.any(func(id): return perks.has(id) and perks[id].get("Type", "") == type):
+			return
 		var pool: Array = []
 		for id in perks:
-			if not result.has(id) and (type == "" or perks[id].get("Type", "") == type) and compatible.call(id):
+			if (type == "" or perks[id].get("Type", "") == type) and AHPerks.fits(result, id, class_id):
 				pool.append(id)
 		if not pool.is_empty():
 			result.append(pool[mini(pool.size() - 1, floori(rng.randf() * pool.size()))])
@@ -141,7 +140,7 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		"id": id, "class_id": class_id, "display_name": display_name,
 		# A espécie do indivíduo (#189): a classe é o papel; quem chega sem uma fica com a padrão da classe.
 		"species": AHSpecies.default_for(class_id), "alive": true, "hp": max_hp, "max_hp": max_hp,
-		"instinct": 0, "perks": perks, "crisis_outcome": "none", "trauma": false, "trainings": [], "expedition_uses": {},
+		"instinct": 0, "perks": perks, "fixed_perks": [], "crisis_outcome": "none", "trauma": false, "trainings": [], "expedition_uses": {},
 		# Os dois slots de relíquia (#263, AHRelics): o id de cada um, "" vazio.
 		"relics": ["", ""], "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
@@ -200,7 +199,12 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 			continue
 		var display_name: String = founder.DisplayName
 		var id := founder_id(class_id, display_name)
-		campaign.roster.append(new_hero(id, class_id, display_name, int(hero_class.BaseMaxHp), roll_perks(GameData.table("perks"), rng)))
+		# A positiva fixa do fundador (#264), nas campanhas novas: a marca de quem ele é; o resto, sorteado.
+		var own := AHPerks.founder_fixed(class_id)
+		var given: Array = [own] if own != "" and GameData.row("perks", own) != null else []
+		var hero := new_hero(id, class_id, display_name, int(hero_class.BaseMaxHp), roll_perks(GameData.table("perks"), rng, class_id, given))
+		hero.fixed_perks = given.duplicate()
+		campaign.roster.append(hero)
 		campaign.unlocked_classes.append(class_id)
 		campaign.preferred_formation.append(id)
 	AHStationRules.init_new_campaign(campaign)

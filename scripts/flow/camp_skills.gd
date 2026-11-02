@@ -313,7 +313,8 @@ static func quote(campaign: Dictionary, user_id: String, skill_id: String, targe
 		return out
 	out.changes = _changes(campaign, user, who, effects)
 	if out.changes.is_empty():
-		out.reason = TranslationServer.translate("Não faria diferença agora.")
+		out.reason = TranslationServer.translate("Sono pesado: não vigia.") if bool(effects.get("watch", false)) and AHPerks.flag(AHPerks.of(user), "NoWatch") \
+			else TranslationServer.translate("Não faria diferença agora.")
 		return out
 	out.available = true
 	return out
@@ -350,7 +351,8 @@ static func _changes(campaign: Dictionary, user: Dictionary, who: Array, effects
 		out.append(TranslationServer.translate("o inimigo da frente começa Marcado"))
 	if bool(effects.get("opening", false)) and not bool(next.get("opening", false)):
 		out.append(TranslationServer.translate("a equipe age primeiro na próxima luta"))
-	if bool(effects.get("watch", false)) and not bool(camp(campaign).get("watch", false)):
+	# Sono pesado (#264): a vigia de quem dorme pesado não conta (e não aparece como mudança).
+	if bool(effects.get("watch", false)) and not bool(camp(campaign).get("watch", false)) and not AHPerks.flag(AHPerks.of(user), "NoWatch"):
 		out.append(TranslationServer.translate("vigia a noite"))
 	if effects.has("phase") and not Array(route.get("effects", [])).has(String(effects.phase)):
 		out.append(TranslationServer.translate(String(J.PHASE_EFFECTS.get(String(effects.phase), {}).get("text", effects.phase))))
@@ -414,7 +416,8 @@ static func use(campaign: Dictionary, user_id: String, skill_id: String, target_
 		next.mark_front = true
 	if bool(effects.get("opening", false)):
 		next.opening = true
-	if bool(effects.get("watch", false)):
+	# Sono pesado (#264): quem dorme pesado não vigia.
+	if bool(effects.get("watch", false)) and not AHPerks.flag(AHPerks.of(user), "NoWatch"):
 		state.watch = true
 	if typeof(route.get("effects")) != TYPE_ARRAY:
 		route.effects = []
@@ -444,6 +447,11 @@ static func night(campaign: Dictionary) -> String:
 		if not route.effects.has(effect):
 			route.effects.append(effect)
 	route.camp_night = result
+	# Sono leve e Sono pesado (#264): o Instinto de cada um na noite (0 a 200).
+	for hero in J._team_alive(campaign):
+		var change := roundi(AHPerks.total(AHPerks.of(hero), "CampInstinct"))
+		if change != 0:
+			hero.instinct = clampi(int(hero.get("instinct", 0)) + change, 0, 200)
 	route.erase("camp")
 	return result
 
