@@ -142,7 +142,8 @@ static func new_hero(id: String, class_id: String, display_name: String, max_hp:
 		# A espécie do indivíduo (#189): a classe é o papel; quem chega sem uma fica com a padrão da classe.
 		"species": AHSpecies.default_for(class_id), "alive": true, "hp": max_hp, "max_hp": max_hp,
 		"instinct": 0, "perks": perks, "crisis_outcome": "none", "trauma": false, "trainings": [], "expedition_uses": {},
-		"relic_id": "", "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
+		# Os dois slots de relíquia (#263, AHRelics): o id de cada um, "" vazio.
+		"relics": ["", ""], "completed_expeditions": 0, "expeditions_count": 0, "kills_count": 0,
 		# A arte própria do recruta (#32): uma variação da classe no manifesto (dog_recruit_01); "" usa a do fundador.
 		"art_variant": "",
 		# As sete habilidades (#259, AHHeroSkills): os desbloqueios aprendidos no Treino e as que leva ([] = as 4 de base).
@@ -179,7 +180,8 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		"inventory": {"seeds": 30, "scrap": 0, "fragments": 0, "bandages": 2, "relics": [], "items": {}},
 		# O memorial (antes do #118): ninguém mais entra; fica vazio, e os saves antigos voltam com os heróis.
 		"memorial": [],
-		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false},
+		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false,
+			"station_chatter": true},
 		# Estação (cômodos, civis, economia), noite da volta e fila de voluntários: AHStationRules.init_new_campaign.
 		"station": {},
 		"session": {"screen": "shelter", "expedition": null},

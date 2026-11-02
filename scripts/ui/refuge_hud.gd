@@ -175,6 +175,9 @@ var _merchant_focus := ""
 var _map: AHPhaseMap
 ## A visita guiada da primeira vez (#145), aberta por cima da Estação, ou null.
 var tour: AHStationTour
+## Os balões da Estação viva (#207), por cima da cena e por baixo da coluna e do painel; e a tirinha aberta.
+var bubbles: Control
+var _comic: AHComicReader
 
 
 func _ready() -> void:
@@ -299,8 +302,9 @@ func _queue_fit() -> void:
 ## passo, o Plano, as pendências), que as setas percorrem; Voltar devolve aos cômodos. Com um painel ou o mapa aberto,
 ## o foco fica nos botões dele e Interagir confirma o botão com foco.
 func _input(event: InputEvent) -> void:
-	# Com o briefing aberto (#88), a caixa dele fica com o teclado, o controle, o clique e o toque.
-	if briefing_open():
+	# Com o briefing aberto (#88), a caixa dele fica com o teclado, o controle, o clique e o toque; com a tirinha (#207),
+	# o leitor.
+	if briefing_open() or comic_open():
 		return
 	# O aviso do achado (#274, como o da ferramenta nova, #143) sai com qualquer tecla, botão, clique ou toque, que segue
 	# para a tela.
@@ -384,6 +388,10 @@ func _input(event: InputEvent) -> void:
 	if scope != null:
 		if U.press_focused(scope, event):
 			get_viewport().set_input_as_handled()
+		elif scope == _forced_story() and U.is_back(event):
+			# Voltar desiste da conversa: o Próximo passo continua pedindo.
+			station.life.cancel_story()
+			get_viewport().set_input_as_handled()
 		return
 	if _menu_focused():
 		if U.press_focused(self, event):
@@ -416,13 +424,14 @@ func _reset_focus() -> void:
 ## A tela de cima, onde o foco do teclado e do controle fica: o mapa de fases, a Preparação ou o painel aberto (com o
 ## pé da tela). Na vista geral, nenhuma (as setas andam entre os cômodos).
 func focus_scope() -> Control:
-	# O briefing (#88) cuida do foco dele.
-	if briefing_open():
+	# O briefing (#88) e a tirinha (#207) cuidam do foco deles.
+	if briefing_open() or comic_open():
 		return null
 	if _map.visible:
 		return _map
 	if current == "":
-		return null
+		# O balão da tirinha que o Próximo passo pediu (#207) fica com o foco até ser apertado.
+		return _forced_story()
 	if current == "departure" and is_instance_valid(_departure):
 		return _departure.focus_root()
 	if current == "report" and is_instance_valid(_report_screen):
@@ -893,6 +902,9 @@ func _run_next() -> void:
 			open_service("train")
 		"room", "rest":
 			open_room(_next.room)
+		"story":
+			if not station.life.play_story(String(_next.get("story", ""))):
+				Sound.play("res://audio/ui/deny.ogg")
 		_:
 			open_map()
 
@@ -905,6 +917,11 @@ func _build_room_selection() -> void:
 	_room_marks.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_room_marks.draw.connect(_draw_room_marks)
 	_menu.add_sibling(_room_marks)
+	bubbles = Control.new()
+	bubbles.name = "Bubbles"
+	bubbles.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bubbles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_room_marks.add_sibling(bubbles)
 	# A etiqueta do cômodo apontado, com a ponta para baixo, em cima dele.
 	_room_tag = AHKit.panel(AHKit.piece_of("tag", "room"))
 	_room_tag.name = "RoomTag"
@@ -1396,6 +1413,70 @@ func open_service(service: String) -> void:
 func _sound_open() -> void:
 	if current != "":
 		Sound.play(PANEL_OPEN)
+
+
+# ---------------------------------------------------------------- a Estação viva (#207)
+
+## Os balões e as trocas de cômodo só na vista geral e com um cômodo aberto: nada com uma tela por cima (a Sala, o
+## relatório, a Preparação, o Plano, as Opções, o mapa, a ficha, o briefing, a noite, a tirinha, a visita guiada, o aviso
+## do achado e o quadro da escavação), com a
+## interface oculta, na plataforma, na passagem, na chegada da equipe ou com o trem em cena.
+func life_allowed() -> bool:
+	if station == null or _hud_hidden or _map.visible or briefing_open() or night_scene_open() or comic_open() or tour != null \
+			or dig_notice_shown():
+		return false
+	if sheet != null and sheet.visible:
+		return false
+	if current != "" and (current == S.CHARACTERS or S.room_def(current).is_empty()):
+		return false
+	return not station.on_platform and not station.passage_moving() and not station.train_busy() \
+		and not station.team_arriving() and not station.lineup_leaving()
+
+
+## A área livre da cena para os balões: à direita da coluna da esquerda, à esquerda do painel aberto, entre o alto e
+## as teclas de baixo (px da base de 1080).
+func life_area() -> Rect2:
+	var view := get_viewport_rect().size
+	var left := 0.0
+	if _menu.visible:
+		left = _menu.get_global_rect().end.x + 8.0
+	var right := view.x
+	if _panel.visible:
+		right = _panel.get_global_rect().position.x - 8.0
+	var top := 132.0
+	var bottom := view.y - 120.0
+	return Rect2(left, top, maxf(0.0, right - left), bottom - top)
+
+
+## A conversa da tirinha (#207): a vista geral, com o cômodo de quem conversa à vista.
+func focus_story_room(room_id: String) -> void:
+	if current != "":
+		close_panel()
+	_key_room = room_id
+	station.pan_to_room(room_id, _overview_left() + 12.0, 1900.0)
+
+
+func _forced_story() -> Control:
+	if station == null or station.life == null or station.life.story == "":
+		return null
+	return station.life.story_bubble()
+
+
+func comic_open() -> bool:
+	return _comic != null and is_instance_valid(_comic)
+
+
+## Abre a tirinha (o balão interativo apertado). Lida até o último quadro, fica vista e sai do Próximo passo.
+func open_comic(comic_name: String) -> void:
+	if comic_open():
+		return
+	Sound.play(PANEL_OPEN)
+	_comic = AHComicReader.open(self, comic_name)
+	_comic.finished.connect(func(read: bool):
+		_comic = null
+		if read and AHStationChatter.mark_seen(Campaign.state, comic_name):
+			station.commit()
+		get_viewport().gui_release_focus())
 
 
 func close_panel() -> void:
@@ -2656,19 +2737,27 @@ func _train_hero(hero_id: String, upgrade_id: String) -> void:
 	_act(error, done, "res://audio/ui/forge_confirm.ogg")
 
 
-func _cycle_relic(hero_id: String) -> void:
+## O botão Trocar de um slot de relíquia (#263): passa para a próxima opção do estoque que esse slot aceita (e o vazio).
+## Sem outra opção aceita, o aviso diz por que a do estoque não serve ("Já equipada no outro slot.", "Só para Proteção.").
+func _cycle_relic(hero_id: String, slot: int) -> void:
 	var c: Dictionary = Campaign.state
 	var entry = S.hero(c, hero_id)
-	var options: Array = [""]
-	for relic_id in c.inventory.relics:
-		if not options.has(relic_id):
-			options.append(relic_id)
-	if entry.relic_id != "" and not options.has(entry.relic_id):
-		options.append(entry.relic_id)
-	var index := options.find(entry.relic_id)
-	var next: String = options[(index + 1) % options.size()]
+	if entry == null:
+		return
+	var found := AHRelics.options(c, entry, slot)
+	var options: Array = found[0]
+	var blocked: Dictionary = found[1]
+	var current: String = AHRelics.slots(entry)[slot]
+	var next: String = options[(options.find(current) + 1) % options.size()]
+	if next == current:
+		# O motivo de uma que existe na tabela; um id desconhecido (save antigo) só se não houver outra.
+		var known: Array = blocked.keys().filter(func(id): return GameData.row("relics", id) != null)
+		var relic_id: String = known[0] if not known.is_empty() else ""
+		var blocked_row = GameData.row("relics", relic_id)
+		_act(tr("%s: %s") % [tr(blocked_row.DisplayName), blocked[relic_id]] if blocked_row != null else tr("Nenhuma outra relíquia no estoque."))
+		return
 	var relic = GameData.row("relics", next)
-	_act(S.equip_relic(c, hero_id, next), tr("%s: %s.") % [entry.display_name, tr(relic.DisplayName) if relic else tr("sem relíquia")])
+	_act(AHRelics.equip(c, hero_id, slot, next), tr("%s: %s.") % [entry.display_name, tr(relic.DisplayName) if relic else tr("sem relíquia")])
 
 
 # ---------------------------------------------------------------- Preparação
@@ -2940,7 +3029,8 @@ func _forge(c: Dictionary, level: int) -> void:
 	var cost := S.relic_cost(c)
 	var scrap := S.quantity(c, "scrap")
 	_section(tr("Relíquias") if level >= 1 else tr("Depois de recuperar"))
-	for relic_id in GameData.table("relics").keys():
+	# Só as que a Forja fabrica (#263): as comuns de origem "forge"; as outras vêm da carga, da escavação ou da história.
+	for relic_id in AHRelics.forgeable():
 		var relic: Dictionary = GameData.row("relics", relic_id)
 		var id: String = relic_id
 		# O efeito: a primeira frase da descrição ("+3 de Vida Máxima."); o resto (a história da peça) fica no Alojamento.
@@ -3039,6 +3129,8 @@ static func _relic_effect(relic: Dictionary) -> String:
 		return TranslationServer.translate("+%d Velocidade") % int(relic.SpeedBonus)
 	if int(relic.get("EventInstinctReduction", 0)) != 0:
 		return TranslationServer.translate("−%d Instinto de eventos") % int(relic.EventInstinctReduction)
+	if float(relic.get("VirtueBonus", 0.0)) != 0.0:
+		return TranslationServer.translate("+%d pp de Superação") % roundi(float(relic.VirtueBonus) * 100.0)
 	return ""
 
 

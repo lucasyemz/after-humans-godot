@@ -55,7 +55,7 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 		players.append(AHCombatEngine.make_hero_unit({
 			"Id": hero.id, "ClassId": hero.class_id, "Species": String(hero.get("species", "")), "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
 			"Instinct": maxi(0, int(hero.get("instinct", 0)) - int(bonus.calm)), "Perks": hero.get("perks", []), "Trauma": hero.get("trauma", false),
-			"RelicId": hero.get("relic_id", ""), "ExpeditionUses": hero.get("expedition_uses", {}),
+			"RelicIds": AHRelics.equipped(hero), "ExpeditionUses": hero.get("expedition_uses", {}),
 			"AbilityIds": AHHeroSkills.equipped(hero) if not Array(hero.get("loadout", [])).is_empty() else [],
 			"SpeedBonus": int(bonus.speed) + marks.speed + int(own.get("speed", 0)), "AbilityBonus": bonus.abilities,
 			# A Arma e a Segunda Pele (#262): dano (sem cura), crítico e resistências; a vida já está no herói.
