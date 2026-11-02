@@ -184,7 +184,6 @@ refuge_hud.gd: gone
 campaign_service.gd: /root/GameFlow
 campaign_service.gd: Campanha nova: falta o fundador ou a classe %s nas tabelas.
 campaign_service.gd: Falha ao salvar a campanha em %s.
-campaign_service.gd: Incompatible
 campaign_service.gd: Negative
 campaign_service.gd: Positive
 campaign_service.gd: Save recusado: campanha inválida.
