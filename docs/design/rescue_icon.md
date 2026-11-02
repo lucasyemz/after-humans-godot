@@ -40,7 +40,7 @@ A captura mantém o título atual “Suprimentos” do trecho; mudar o rótulo e
 
 ## Originais e QA
 
-Originais serão vinculados à tag do PR. O PR leva somente as pranchas e esta documentação; nenhum arquivo de produção, código, dado ou teste é alterado. O pacote original traz o PNG, WebP reproduzível, medidas/hashes e receitas da prova. A integração cabe ao Claude 2; o Lucas aprova pela prancha.
+Originais na tag **[`codex-pr316-originals`](https://github.com/lucasyemz/after-humans-godot/tree/codex-pr316-originals)**, pasta `art/ui/source/rescue_icon_20261102/`: [Release](https://github.com/lucasyemz/after-humans-godot/releases/tag/codex-pr316-originals) · [ZIP](https://github.com/lucasyemz/after-humans-godot/archive/refs/tags/codex-pr316-originals.zip). **Não juntar a tag na main.** O PR leva somente as pranchas e esta documentação; nenhum arquivo de produção, código, dado ou teste é alterado. O pacote original traz o PNG, WebP reproduzível, medidas/hashes e receitas da prova. A integração cabe ao Claude 2; o Lucas aprova pela prancha.
 
 [QA de design](rescue_icon/qa.md) · [Verificação de arquivos](rescue_icon/verification.json)
 
