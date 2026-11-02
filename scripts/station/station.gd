@@ -101,7 +101,7 @@ var hud: AHRefugeHud
 ## geral enquadra a Estação à direita dele, para nenhum cômodo (o Dormitório da ponta) ficar embaixo do menu (#76).
 var menu_right := SCREEN_MENU_RIGHT
 var camera: Camera3D
-## A vista de fora no fim da linha (#217).
+## A vista de fora na saída do trem (#217).
 var outside: AHStationOutside
 var residents := {}
 ## Os moradores escondidos por uma tela do kit (hide_residents).
@@ -196,7 +196,7 @@ func _ready() -> void:
 		keep[node] = true
 		_wagon_base[node] = node.position
 	builder.merge_static(keep)
-	# A vista de fora no fim da linha (#217), com a hora do dia da Estação.
+	# A vista de fora na saída do trem (#217), com a hora do dia da Estação.
 	outside = AHStationOutside.new()
 	outside.name = "Outside"
 	add_child(outside)
@@ -218,6 +218,8 @@ func _ready() -> void:
 	add_child(layer)
 	_apply_panel(0.0)
 	_arrive(campaign)
+	# A volta entregue aqui abre a noite: a vista de fora já abre na hora dela (sem passar pelo dia).
+	refresh_outside(true)
 	refresh()
 
 

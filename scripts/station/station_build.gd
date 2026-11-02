@@ -36,12 +36,14 @@ const NETWORK_MAP_X := 1721.0
 const NETWORK_MAP_SIZE := Vector2(176, 120)
 const NETWORK_MAP_Z := 96.0
 const PANEL_SLIDE := 300.0
-## A abertura para fora no fim da linha (#217): o vão na abóbada sobre a boca do túnel, entre estes x (cm), nos segmentos
+## A abertura para fora na saída do trem (#217): o vão na abóbada sobre a boca do túnel, entre estes x (cm), nos segmentos
 ## da frente da abóbada (os 6 do corte, de 16: a parte que a câmera vê; a de trás fica escondida por ela). Por ele, a
-## vista de fora (AHStationOutside).
+## vista de fora (AHStationOutside), até OUTSIDE_TOP: o alto da abóbada como a câmera da plataforma o vê no corte (a
+## coroa fica 5 m para o fundo), para a vista não passar do contorno da Estação.
 const OUTSIDE_X0 := 80.0
 const OUTSIDE_X1 := 720.0
 const OUTSIDE_SEGMENTS := 6
+const OUTSIDE_TOP := 555.0
 const LANE_FRONT0 := -400.0
 const LANE_FRONT1 := -580.0
 const LANE_BACK0 := -760.0
@@ -324,8 +326,12 @@ func _station() -> void:
 			if not (open and rib > OUTSIDE_X0 - 25 and rib < OUTSIDE_X1 + 25):
 				b.beam(Vector3(rib, mid.y, mid.z - 6), Vector3(50, length, 14), Vector3(0, 0, -angle), concrete)
 			rib += 800
-	# O lintel no alto do vão da vista de fora (#217): a borda de cima, reta, no lugar da coroa da abóbada que saiu.
-	box(Vector3(OUTSIDE_X0 - 40, -40, VAULT_SPRING + VAULT_RISE), Vector3(OUTSIDE_X1 + 40, 0, VAULT_SPRING + VAULT_RISE + 34), concrete)
+	# A moldura do vão da vista de fora (#217): o peitoril no pé da abóbada, o lintel no alto e os montantes dos lados,
+	# no plano do corte e com a largura do vão, para o recorte ficar limpo.
+	box(Vector3(OUTSIDE_X0 - 14, -40, VAULT_SPRING - 4), Vector3(OUTSIDE_X1 + 14, 0, VAULT_SPRING + 22), concrete)
+	box(Vector3(OUTSIDE_X0 - 14, -40, OUTSIDE_TOP), Vector3(OUTSIDE_X1 + 14, 0, OUTSIDE_TOP + 26), concrete)
+	for side in [OUTSIDE_X0, OUTSIDE_X1]:
+		box(Vector3(side - 14, -40, VAULT_SPRING - 4), Vector3(side + 14, 0, OUTSIDE_TOP + 26), concrete)
 	# Muro de início com a boca do túnel por onde o trem chega.
 	b.wall_with_openings(-40, 0, STATION_BACK, 0, -140, VAULT_SPRING + VAULT_RISE, [b.hole(-340, -140, -20, 340)], concrete, false)
 	box(Vector3(TRACK_END, PLATFORM_FRONT, -140), Vector3(STATION_END, 0, VAULT_SPRING), concrete)
