@@ -71,4 +71,20 @@ func validate() -> PackedStringArray:
 		for other in table("perks")[perk_id].get("Incompatible", []):
 			if not table("perks").has(other):
 				found.append("perk %s: incompatível %s não existe" % [perk_id, other])
+	# As relíquias (#263): a raridade, as origens, a restrição por papel e a fase (a da carga recuperada) conhecidas.
+	for relic_id in table("relics"):
+		var relic: Dictionary = table("relics")[relic_id]
+		if not ["common", "uncommon", "rare", "personal", "keepsake"].has(String(relic.get("Rarity", "common"))):
+			found.append("relíquia %s: raridade %s não existe" % [relic_id, relic.get("Rarity")])
+		for source in relic.get("Sources", []):
+			if not ["forge", "cargo", "dig", "guardian", "solo", "merchant", "story"].has(String(source)):
+				found.append("relíquia %s: origem %s não existe" % [relic_id, source])
+		var only := String(relic.get("Only", ""))
+		if only.begins_with("role:") and not table("classes").has(only.trim_prefix("role:")):
+			found.append("relíquia %s: papel %s não existe" % [relic_id, only])
+		elif only != "" and not only.begins_with("role:") and not only.begins_with("hero:"):
+			found.append("relíquia %s: restrição %s não existe" % [relic_id, only])
+		var phase := String(relic.get("Phase", ""))
+		if phase != "" and not table("recovered_cargo").has(phase):
+			found.append("relíquia %s: fase %s sem carga recuperada" % [relic_id, phase])
 	return found

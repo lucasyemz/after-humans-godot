@@ -101,7 +101,7 @@ func _write_back(t, campaign: Dictionary) -> void:
 func _relic_hp(t, campaign: Dictionary) -> void:
 	var copy: Dictionary = campaign.duplicate(true)
 	var hero = copy.roster.filter(func(h): return h.id == "hero_cao_bento")[0]
-	hero.relic_id = "botao_cobre"
+	hero.relics = ["botao_cobre", ""]
 	var session := AHCombatSession.create(copy.roster, PATROLS[0], false, 5)
 	var bento := session.state.find_unit("unit_hero_cao_bento")
 	t.check(bento.max_hp > hero.max_hp, "na luta, a relíquia aumenta a vida máxima (%d > %d)" % [bento.max_hp, hero.max_hp])

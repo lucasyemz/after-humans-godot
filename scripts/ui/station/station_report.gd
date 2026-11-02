@@ -483,16 +483,22 @@ func _card(hero_id: String) -> Control:
 	column.add_child(counters)
 	var relic_row := HBoxContainer.new()
 	relic_row.add_theme_constant_override("separation", 10)
-	var relic = GameData.row("relics", String(hero.get("relic_id", "")))
-	if relic != null:
+	# Os dois slots (#263): o ícone de cada relíquia equipada; os nomes juntos, depois.
+	var relic_names: Array = []
+	for relic_id in AHRelics.equipped(hero):
+		var relic = GameData.row("relics", relic_id)
+		if relic == null:
+			continue
 		var relic_icon := TextureRect.new()
-		relic_icon.texture = AHKit.legacy_icon(RELIC_ICONS.get(String(hero.relic_id), "relic-generic"))
+		relic_icon.texture = AHKit.legacy_icon(RELIC_ICONS.get(String(relic_id), "relic-generic"))
 		relic_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		relic_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		relic_icon.custom_minimum_size = Vector2(26, 26)
 		relic_icon.modulate = AHKit.AMBER
 		relic_row.add_child(relic_icon)
-		relic_row.add_child(AHKit.label(tr(String(relic.DisplayName)), "text", AHKit.TEXT))
+		relic_names.append(tr(String(relic.DisplayName)))
+	if not relic_names.is_empty():
+		relic_row.add_child(AHKit.label(" · ".join(relic_names), "text", AHKit.TEXT))
 	else:
 		relic_row.add_child(AHKit.glyph("relic_empty", 26, AHKit.MUTED))
 		relic_row.add_child(AHKit.label(tr("Sem relíquia"), "text", AHKit.TEXT))

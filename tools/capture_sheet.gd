@@ -40,7 +40,7 @@ func _run() -> void:
 	var c: Dictionary = campaign.create_initial(6)
 	var bento: Dictionary = S.hero(c, "hero_cao_bento")
 	bento.perks = ["agile"]
-	bento.relic_id = "botao_cobre"
+	bento.relics = ["botao_cobre", ""]
 	load("res://scripts/flow/journey_rules.gd").start_expedition(c, "fase_1", 4242)
 	campaign.state = c
 	flow.change_to("street", {}, false)
@@ -106,7 +106,7 @@ func _run() -> void:
 	arena.hud.close()
 	campaign.state = campaign.create_initial(89)
 	S.hero(campaign.state, "hero_cao_bento").perks = ["agile"]
-	S.hero(campaign.state, "hero_cao_bento").relic_id = "botao_cobre"
+	S.hero(campaign.state, "hero_cao_bento").relics = ["botao_cobre", ""]
 	campaign.save()
 	flow.change_to("station", {}, false)
 	for frame in 900:
