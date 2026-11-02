@@ -123,9 +123,11 @@ Vitrine", logo abaixo dos recursos (e na coluna do que chegou, nos detalhes). An
   - **a história:** a escolha "Levar a coleira com o nome" do Caixote de Coleiras dá a Coleira com Nome no lugar do
     Fragmento. Com ela na equipe, a escolha some, porque ela é única.
 - **O recuo e a derrota:** o que entra no estoque na expedição (a carga, o evento, o guardião) fica anotado no achado
-  dela (`expedition.found_relics`, que vai no save). Na derrota total, essas cópias saem, menos a Lembrança; a rara e a
-  pessoal perdidas voltam a poder sair. No recuo e na fuga, a equipe fica com tudo. As de antes e as equipadas antes
-  ficam sempre.
+  dela (`expedition.found_relics`, que vai no save). Na derrota total e na fuga (que já "larga o que carregava" e não
+  entrega nada), essas cópias saem, menos a Lembrança; a rara e a pessoal perdidas voltam a poder sair. No recuo, a
+  equipe fica com tudo. As de antes e as equipadas antes ficam sempre.
+- **A luta mostra as relíquias:** a carta e a dica somam o dano a mais (a Pilha: 3–5), contam as cargas e os usos a
+  mais (a Rolha: 4 usos por expedição; o Caderno: 3) e a previsão "pode cair" conta o +25% do Cartão contra máquinas.
 - **Os ícones** das novas são o genérico (`relic-generic`) até a arte do ciclo de design.
 
 ## O que ficou de fora
@@ -139,10 +141,10 @@ Vitrine", logo abaixo dos recursos (e na coluna do que chegou, nos detalhes). An
 
 - `tests/test_relics.gd`: o catálogo, as restrições das reais, o sorteio comum sem as especiais, cada gatilho da luta
   (com e sem a relíquia, na mesma semente), o guardião uma vez, a missão solo, o Mercador, a coleira pelo evento, a
-  derrota e o recuo (também com o save gravado e relido no meio).
+  derrota, a fuga e o recuo (também com o save gravado e relido no meio) e a carta e a dica da luta com as relíquias.
 - **Em Play:**
   - vença o Porteiro na fase 5: o popup mostra o Cartão da Eclusa; na segunda vitória, nada;
   - na Sala Esquecida, abra o Caixote de Coleiras e leve a coleira: a Coleira com Nome entra no estoque, e numa próxima
     vez a escolha não aparece;
   - com o Mercador na plataforma, compre a Plaqueta de Patrulha;
-  - caia com a equipe inteira depois de pegar uma relíquia na carga: o relatório diz o que ficou para trás.
+  - caia com a equipe inteira depois de pegar uma relíquia na carga: o relatório diz o que ficou para trás (também ao fugir de uma luta).

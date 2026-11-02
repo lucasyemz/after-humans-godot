@@ -1985,7 +1985,9 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 	if ability.Cooldown > 0:
 		facts.append(tr("recarga %d") % ability.Cooldown)
 	if ability.UsesMax > 0:
-		facts.append(tr("%d usos por expedição") % ability.UsesMax if ability.bUsesPerExpedition else tr("%d usos") % ability.UsesMax)
+		# Com as cargas e os usos a mais das relíquias (#263).
+		var uses := session.uses_max(option.id, _actor_id)
+		facts.append(tr("%d usos por expedição") % uses if ability.bUsesPerExpedition else tr("%d usos") % uses)
 	if not facts.is_empty():
 		_tip_box.add_child(_kit_label(" · ".join(facts), S.MIN_TEXT, TEXT, "bold"))
 	var row = GameData.row("abilities", option.id)
@@ -2016,10 +2018,8 @@ func _describe(option: Dictionary, button: Control = null, rank: int = -1) -> vo
 			var note := tr("%s (vida %d)") % [_name(unit), unit.hp]
 			# A previsão já com a vantagem de tipo (#227): o dano mais alto, com o tipo, derruba?
 			var bonus := _type_bonus(option.id, unit)
-			var most: int = session.effective_range(option.id, "damage", _actor_id).Max
-			if session.engine.is_machine(unit):
-				most = maxi(1, most * int(ability.MachineDamagePercent) / 100)
-			most = AHCombatEngine.typed_damage(most, bonus)
+			# O dano mais alto como o motor conta (a máquina, o Cartão da Eclusa e o tipo).
+			var most: int = session.most_damage(option.id, _actor_id, unit, bonus)
 			if not unit.is_player and ability.DamageRange.Max > 0 and most >= unit.hp:
 				note += tr(" · pode cair")
 			if bonus > 1.0:

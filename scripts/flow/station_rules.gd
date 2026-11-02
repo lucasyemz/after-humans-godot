@@ -2028,9 +2028,10 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 		"supplies": floori(loot.get("supplies", 0) * factor), "request": "", "team": expedition.team.duplicate(),
 		"food_left": maxi(0, int(expedition.food)), "stats": expedition.get("stats", {}).duplicate(true),
 		"focus": String(expedition.get("focus", "")), "objective_done": bool(expedition.get("objective_done", false)), "unlocked_phase": ""}
-	# A derrota total (#263): as relíquias achadas nesta expedição ficam para trás, menos a Lembrança. No recuo e na fuga,
-	# a equipe fica com elas. Antes de tudo: a escavação e as missões solo do ciclo abaixo não são achado da expedição.
-	delivered.lost_relics = AHRelics.lose_finds(campaign, expedition) if session.result == "defeat" else []
+	# A derrota total e a fuga (#263): as relíquias achadas nesta expedição ficam para trás, como o resto do achado ("largou
+	# o que carregava"), menos a Lembrança. No recuo e na vitória, a equipe fica com elas. Antes de tudo: a escavação e as
+	# missões solo do ciclo abaixo não são achado da expedição.
+	delivered.lost_relics = AHRelics.lose_finds(campaign, expedition) if ["defeat", "fled"].has(session.result) else []
 	# A fase seguinte liberada pela primeira vitória (as expedições salvas antes do #60 não têm a marca: sem o chip).
 	if session.result == "victory" and expedition.get("first_clear", false):
 		for i in AHJourneyRules.PHASES.size() - 1:

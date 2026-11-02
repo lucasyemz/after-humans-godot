@@ -247,7 +247,7 @@ msgstr "+1 fragment"
 
 #: scripts/flow/fight_rewards.gd:133
 #: scripts/ui/station/station_report.gd:540
-#: scripts/flow/station_rules.gd:2137
+#: scripts/flow/station_rules.gd:2138
 msgid "+%d suprimentos"
 msgstr "+%d supplies"
 
@@ -1416,7 +1416,7 @@ msgid "cura"
 msgstr "healing"
 
 #: scripts/ui/combat_hud.gd:1655
-#: scripts/combat/combat_session.gd:188
+#: scripts/combat/combat_session.gd:213
 msgid "Recarga %d"
 msgstr "Cooldown %d"
 
@@ -1504,24 +1504,24 @@ msgstr "%s %s"
 msgid "recarga %d"
 msgstr "cooldown %d"
 
-#: scripts/ui/combat_hud.gd:1988
+#: scripts/ui/combat_hud.gd:1990
 msgid "%d usos por expedição"
 msgstr "%d uses per expedition"
 
-#: scripts/ui/combat_hud.gd:1988
-#: scripts/combat/combat_session.gd:190
+#: scripts/ui/combat_hud.gd:1990
+#: scripts/combat/combat_session.gd:216
 msgid "%d usos"
 msgstr "%d uses"
 
-#: scripts/ui/combat_hud.gd:1999
+#: scripts/ui/combat_hud.gd:2001
 msgid "Sai das posições %s"
 msgstr "From positions %s"
 
-#: scripts/ui/combat_hud.gd:2001
+#: scripts/ui/combat_hud.gd:2003
 msgid " · alcança %s"
 msgstr " · reaches %s"
 
-#: scripts/ui/combat_hud.gd:2016
+#: scripts/ui/combat_hud.gd:2018
 msgid "%s (vida %d)"
 msgstr "%s (health %d)"
 
@@ -2030,7 +2030,7 @@ msgid "Pedido entregue: %s."
 msgstr "Request delivered: %s."
 
 #: scripts/ui/refuge_hud.gd:2703
-#: scripts/flow/station_rules.gd:2127
+#: scripts/flow/station_rules.gd:2128
 msgid "Pedido: %s"
 msgstr "Request: %s"
 
@@ -2915,7 +2915,7 @@ msgid "+%d fragmento"
 msgstr "+%d fragment"
 
 #: scripts/ui/station/station_report.gd:538
-#: scripts/flow/station_rules.gd:2137
+#: scripts/flow/station_rules.gd:2138
 msgid "+%d sucata"
 msgstr "+%d scrap"
 
@@ -2975,7 +2975,7 @@ msgstr " (%d%% of what was found)"
 
 #: scripts/ui/station/station_report.gd:647
 #: scripts/ui/station/station_frame.gd:14
-#: scripts/flow/station_rules.gd:2303
+#: scripts/flow/station_rules.gd:2304
 msgid "Escavação"
 msgstr "Digging"
 
@@ -4916,178 +4916,178 @@ msgstr "That phase is still locked."
 msgid "A expedição não pôde começar."
 msgstr "The expedition couldn't start."
 
-#: scripts/flow/station_rules.gd:2128
+#: scripts/flow/station_rules.gd:2129
 msgid "Peças"
 msgstr "Parts"
 
-#: scripts/flow/station_rules.gd:2128
+#: scripts/flow/station_rules.gd:2129
 msgid "Provisões"
 msgstr "Provisions"
 
-#: scripts/flow/station_rules.gd:2128
+#: scripts/flow/station_rules.gd:2129
 msgid "Rota básica"
 msgstr "Basic route"
 
-#: scripts/flow/station_rules.gd:2137
+#: scripts/flow/station_rules.gd:2138
 msgid "+%d água"
 msgstr "+%d water"
 
-#: scripts/flow/station_rules.gd:2168
+#: scripts/flow/station_rules.gd:2169
 msgid "%s: %s Entregue, %s."
 msgstr "%s: %s Delivered, %s."
 
-#: scripts/flow/station_rules.gd:2172
+#: scripts/flow/station_rules.gd:2173
 msgid "Água: %d na estação; a equipe bebe %d na próxima expedição e vai faltar."
 msgstr "Water: %d at the Station; the team drinks %d on the next expedition and it will run short."
 
-#: scripts/flow/station_rules.gd:2173
+#: scripts/flow/station_rules.gd:2174
 msgid "Água: %d na estação, %d depois da próxima expedição."
 msgstr "Water: %d at the Station, %d after the next expedition."
 
-#: scripts/flow/station_rules.gd:2176
+#: scripts/flow/station_rules.gd:2177
 msgid "Sucata para relíquias e melhorias."
 msgstr "Scrap for relics and upgrades."
 
-#: scripts/flow/station_rules.gd:2176
+#: scripts/flow/station_rules.gd:2177
 msgid "Faltam %d sucatas para %s."
 msgstr "%d scrap missing for %s."
 
-#: scripts/flow/station_rules.gd:2178
+#: scripts/flow/station_rules.gd:2179
 msgid "Suprimentos: %d de %d; a noite da volta pede %d."
 msgstr "Supplies: %d of %d; the night of the return needs %d."
 
-#: scripts/flow/station_rules.gd:2179
+#: scripts/flow/station_rules.gd:2180
 msgid "Sem objetivo: só o que aparecer nas casas."
 msgstr "No goal: just whatever turns up in the houses."
 
-#: scripts/flow/station_rules.gd:2183
+#: scripts/flow/station_rules.gd:2184
 msgid "a Forja"
 msgstr "the Forge"
 
-#: scripts/flow/station_rules.gd:2183
+#: scripts/flow/station_rules.gd:2184
 msgid "a Pesquisa"
 msgstr "the Research Center"
 
-#: scripts/flow/station_rules.gd:2183
+#: scripts/flow/station_rules.gd:2184
 msgid "o Depósito"
 msgstr "the Storeroom"
 
-#: scripts/flow/station_rules.gd:2183
+#: scripts/flow/station_rules.gd:2184
 msgid "um cômodo"
 msgstr "a room"
 
-#: scripts/flow/station_rules.gd:2241
+#: scripts/flow/station_rules.gd:2242
 msgid " Objetivo cumprido (%s): %s, entregue na volta."
 msgstr " Goal done (%s): %s, delivered on the way back."
 
-#: scripts/flow/station_rules.gd:2288
+#: scripts/flow/station_rules.gd:2289
 msgid "Heróis %d de %d · Ajudantes %d de %d"
 msgstr "Heroes %d of %d · Helpers %d of %d"
 
-#: scripts/flow/station_rules.gd:2320
+#: scripts/flow/station_rules.gd:2321
 msgid "na escavação"
 msgstr "at the dig"
 
-#: scripts/flow/station_rules.gd:2322
+#: scripts/flow/station_rules.gd:2323
 msgid "no %s"
 msgstr "at the %s"
 
-#: scripts/flow/station_rules.gd:2322
+#: scripts/flow/station_rules.gd:2323
 msgid "na %s"
 msgstr "at the %s"
 
-#: scripts/flow/station_rules.gd:2328
+#: scripts/flow/station_rules.gd:2329
 msgid "da escavação"
 msgstr "from the dig"
 
-#: scripts/flow/station_rules.gd:2330
+#: scripts/flow/station_rules.gd:2331
 msgid "do %s"
 msgstr "the %s"
 
-#: scripts/flow/station_rules.gd:2330
+#: scripts/flow/station_rules.gd:2331
 msgid "da %s"
 msgstr "the %s"
 
-#: scripts/flow/station_rules.gd:2356
+#: scripts/flow/station_rules.gd:2357
 msgid "+%d fragmento por dia"
 msgstr "+%d fragment per day"
 
-#: scripts/flow/station_rules.gd:2356
+#: scripts/flow/station_rules.gd:2357
 msgid "+%d fragmentos por dia"
 msgstr "+%d fragments per day"
 
-#: scripts/flow/station_rules.gd:2358
+#: scripts/flow/station_rules.gd:2359
 msgid "+%d sucata por dia"
 msgstr "+%d scrap per day"
 
-#: scripts/flow/station_rules.gd:2358
+#: scripts/flow/station_rules.gd:2359
 msgid "+%d sucatas por dia"
 msgstr "+%d scrap per day"
 
-#: scripts/flow/station_rules.gd:2360
+#: scripts/flow/station_rules.gd:2361
 msgid "+%d suprimento por dia"
 msgstr "+%d supply per day"
 
-#: scripts/flow/station_rules.gd:2360
+#: scripts/flow/station_rules.gd:2361
 msgid "+%d suprimentos por dia"
 msgstr "+%d supplies per day"
 
-#: scripts/flow/station_rules.gd:2362
+#: scripts/flow/station_rules.gd:2363
 msgid "−1 dia de recuperação para %d caído por dia"
 msgstr "−1 recovery day for %d fallen per day"
 
-#: scripts/flow/station_rules.gd:2363
+#: scripts/flow/station_rules.gd:2364
 msgid "−1 dia de recuperação para %d caídos por dia"
 msgstr "−1 recovery day for %d fallen per day"
 
-#: scripts/flow/station_rules.gd:2365
+#: scripts/flow/station_rules.gd:2366
 msgid "+%d ponto de obra por dia"
 msgstr "+%d work point per day"
 
-#: scripts/flow/station_rules.gd:2365
+#: scripts/flow/station_rules.gd:2366
 msgid "+%d pontos de obra por dia"
 msgstr "+%d work points per day"
 
-#: scripts/flow/station_rules.gd:2373
-#: scripts/flow/station_rules.gd:2499
+#: scripts/flow/station_rules.gd:2374
+#: scripts/flow/station_rules.gd:2500
 #: scripts/flow/side_mission_rules.gd:262
 #: scripts/flow/hero_skills.gd:98
 msgid "Esse herói não está na Estação."
 msgstr "That hero is not at the Station."
 
-#: scripts/flow/station_rules.gd:2377
+#: scripts/flow/station_rules.gd:2378
 msgid "%s está em recuperação e não trabalha agora."
 msgstr "%s is recovering and can't work now."
 
-#: scripts/flow/station_rules.gd:2383
+#: scripts/flow/station_rules.gd:2384
 msgid "Não há entulho para escavar."
 msgstr "There is no rubble to dig."
 
-#: scripts/flow/station_rules.gd:2385
+#: scripts/flow/station_rules.gd:2386
 msgid "Esse cômodo ainda não tem posto."
 msgstr "That room has no post yet."
 
-#: scripts/flow/station_rules.gd:2489
+#: scripts/flow/station_rules.gd:2490
 msgid "Ainda bloqueada: vem ao terminar %s."
 msgstr "Still locked: comes when you finish %s."
 
-#: scripts/flow/station_rules.gd:2491
+#: scripts/flow/station_rules.gd:2492
 msgid "Ainda bloqueada: vem com os desafios dos chefes."
 msgstr "Still locked: it comes with the boss challenges."
 
-#: scripts/flow/station_rules.gd:2492
+#: scripts/flow/station_rules.gd:2493
 msgid "Ainda bloqueada."
 msgstr "Still locked."
 
-#: scripts/flow/station_rules.gd:2503
+#: scripts/flow/station_rules.gd:2504
 msgid "Essa roupa não é desse herói."
 msgstr "That outfit isn't this hero's."
 
-#: scripts/flow/station_rules.gd:2505
+#: scripts/flow/station_rules.gd:2506
 msgid "Essa roupa ainda não chegou."
 msgstr "That outfit hasn't arrived yet."
 
-#: scripts/flow/station_rules.gd:2509
+#: scripts/flow/station_rules.gd:2510
 msgid "A roupa se troca na Estação, fora da expedição."
 msgstr "Outfits are changed at the Station, outside an expedition."
 
@@ -5854,33 +5854,33 @@ msgstr "No uses left"
 msgid "Sem alvo válido"
 msgstr "No valid target"
 
-#: scripts/combat/combat_session.gd:183
+#: scripts/combat/combat_session.gd:208
 msgid "Dano %d–%d%s"
 msgstr "Damage %d–%d%s"
 
-#: scripts/combat/combat_session.gd:183
-#: scripts/combat/combat_session.gd:186
+#: scripts/combat/combat_session.gd:208
+#: scripts/combat/combat_session.gd:211
 msgid " (treinado)"
 msgstr " (trained)"
 
-#: scripts/combat/combat_session.gd:186
+#: scripts/combat/combat_session.gd:211
 msgid "Cura %d–%d%s"
 msgstr "Healing %d–%d%s"
 
-#: scripts/combat/combat_session.gd:250
+#: scripts/combat/combat_session.gd:276
 msgid "usou um curativo"
 msgstr "used a bandage"
 
-#: scripts/combat/combat_session.gd:250
+#: scripts/combat/combat_session.gd:276
 msgid "comeu pouco"
 msgstr "ate a little"
 
-#: scripts/combat/combat_session.gd:250
+#: scripts/combat/combat_session.gd:276
 msgid "comeu bem"
 msgstr "ate well"
 
-#: scripts/combat/combat_session.gd:256
-#: scripts/combat/combat_session.gd:260
+#: scripts/combat/combat_session.gd:282
+#: scripts/combat/combat_session.gd:286
 msgid "%s %s: +%d de vida."
 msgstr "%s %s: +%d health."
 
@@ -8858,8 +8858,8 @@ msgid "Plaqueta de Patrulha"
 msgstr "Patrol Tag"
 
 #. relics.6.Description
-msgid "\"Fique Atrás de Mim\" também tira 5 de Instinto do próprio cão. Uma plaqueta de turno de vigia, com as rondas riscadas."
-msgstr "\"Stay Behind Me\" also takes 5 Instinct off the dog himself. A watch-shift tag, with the rounds crossed out."
+msgid "\"Fique Atrás de Mim\" também tira 5 de Instinto do próprio cão. Uma plaqueta de turno de ronda, com as rondas riscadas."
+msgstr "\"Stay Behind Me\" also takes 5 Instinct off the dog himself. A patrol-shift tag, with the rounds crossed out."
 
 #. relics.7.DisplayName
 msgid "Gancho de Telhado"

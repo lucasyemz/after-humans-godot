@@ -65,6 +65,7 @@ func run(context) -> void:
 	_coleira()
 	_story_again()
 	await _defeat_and_retreat()
+	await _combat_screen()
 
 
 static func _sorted(ids: Array) -> Array:
@@ -672,13 +673,13 @@ func _story_again() -> void:
 	t.check(not GameData.row("events", "porta_espera").Choices[1].Success.has("GrantRelic"), "a linha de teste sai")
 
 
-## A derrota total perde as relíquias achadas na expedição (menos a Lembrança); as de antes ficam. O recuo e a fuga
-## mantêm tudo. Também com o save gravado e lido no meio da expedição.
+## A derrota total e a fuga perdem as relíquias achadas na expedição (menos a Lembrança); as de antes ficam. O recuo
+## mantém tudo. Também com o save gravado e lido no meio da expedição.
 func _defeat_and_retreat() -> void:
 	var real_dir: String = Campaign.save_dir
 	var real_state = Campaign.state
 	Campaign.save_dir = "user://test-relics-%d" % Time.get_ticks_usec()
-	for spec in [["defeat", false], ["defeat", true], ["retreat", true], ["fled", false]]:
+	for spec in [["defeat", false], ["defeat", true], ["retreat", true], ["fled", false], ["fled", true]]:
 		var result: String = spec[0]
 		var reload: bool = spec[1]
 		var c := _campaign()
@@ -707,9 +708,9 @@ func _defeat_and_retreat() -> void:
 		var nick: Dictionary = S.hero(c, "hero_gato_nick")
 		# Só as desta conta: a escavação da volta pode achar outra.
 		var mine: Array = c.inventory.relics.filter(func(id): return ["botao_cobre", "sino_vitrine", "coleira_nome"].has(id))
-		if result == "defeat":
-			t.equal(mine, ["sino_vitrine", "coleira_nome"], "derrota%s: o Sininho achado sai; o de antes e a Lembrança ficam" % (" (com o save relido)" if reload else ""))
-			t.equal(delivered.get("lost_relics", []), ["sino_vitrine"], "derrota: o relatório diz o que ficou para trás")
+		if result != "retreat":
+			t.equal(mine, ["sino_vitrine", "coleira_nome"], "%s%s: o Sininho achado sai; o de antes e a Lembrança ficam" % [result, " (com o save relido)" if reload else ""])
+			t.equal(delivered.get("lost_relics", []), ["sino_vitrine"], "%s: o relatório diz o que ficou para trás" % result)
 		else:
 			t.equal(mine, ["sino_vitrine", "sino_vitrine", "coleira_nome"], "%s: a equipe fica com o achado" % result)
 			t.equal(delivered.get("lost_relics", []), [], "%s: nada perdido" % result)
@@ -739,3 +740,84 @@ func _defeat_and_retreat() -> void:
 		DirAccess.remove_absolute(dir)
 	Campaign.save_dir = real_dir
 	Campaign.state = real_state
+
+
+## Um herói da campanha para a sessão de luta, de outra classe (os fundadores não têm rato), com as 4 da classe.
+func _session_hero(c: Dictionary, id: String, class_id: String, relics: Array) -> Dictionary:
+	var hero: Dictionary = S.hero(c, "hero_cao_bento").duplicate(true)
+	hero.id = id
+	hero.class_id = class_id
+	hero.display_name = id
+	hero.loadout = []
+	hero.relics = relics
+	return hero
+
+
+func _labels(node: Node) -> String:
+	var out := PackedStringArray()
+	for label in node.find_children("*", "Label", true, false):
+		out.append(String(label.text))
+	return " | ".join(out)
+
+
+## A carta e a dica da luta contam as relíquias: o dano a mais da Pilha, as cargas e os usos a mais da Rolha e do
+## Caderno e o +25% do Cartão na previsão "pode cair".
+func _combat_screen() -> void:
+	var c := _campaign()
+	var rat := _session_hero(c, "hero_rato_9", "rato", ["pilha_remendada", ""])
+	var plain_rat := _session_hero(c, "hero_rato_8", "rato", ["", ""])
+	var session := AHCombatSession.create([rat, plain_rat], PATROL, false, 5)
+	var bolt: Dictionary = GameData.combat.abilities.rato_frasco.DamageRange
+	var with_cell := session.effective_range("rato_frasco", "damage", "unit_hero_rato_9")
+	t.equal([with_cell.Min, with_cell.Max], [int(bolt.Min) + 1, int(bolt.Max) + 1], "a Pilha: a carta mostra o dano a mais (%d–%d)" % [with_cell.Min, with_cell.Max])
+	var without := session.effective_range("rato_frasco", "damage", "unit_hero_rato_8")
+	t.equal([without.Min, without.Max], [int(bolt.Min), int(bolt.Max)], "sem ela, o dano da tabela")
+	t.check(session.describe("rato_frasco", "unit_hero_rato_9").contains("Dano %d–%d" % [with_cell.Min, with_cell.Max]), "e o texto curto também")
+	# Os usos: a Rolha (+1 carga da Ampola) e o Caderno (+1 uso do Antídoto) na Íris.
+	var iris: Dictionary = S.hero(c, "hero_sapo_iris").duplicate(true)
+	iris.loadout = []
+	iris.relics = ["rolha_cisterna", "caderno_medidas"]
+	var healer := AHCombatSession.create([iris], PATROL, false, 5)
+	var ampoule: int = GameData.combat.abilities.sapo_ampola_reparo_vivo.UsesMax
+	var antidote: int = GameData.combat.abilities.sapo_antidoto_campo.UsesMax
+	t.equal([healer.uses_max("sapo_ampola_reparo_vivo", "unit_hero_sapo_iris"), healer.uses_max("sapo_antidoto_campo", "unit_hero_sapo_iris")],
+		[ampoule + 1, antidote + 1], "os usos com a Rolha e o Caderno")
+	t.check(healer.describe("sapo_ampola_reparo_vivo", "unit_hero_sapo_iris").contains("%d usos" % (ampoule + 1)), "o texto curto da Ampola diz %d usos" % (ampoule + 1))
+	t.check(healer.describe("sapo_antidoto_campo", "unit_hero_sapo_iris").contains("%d usos" % (antidote + 1)), "o do Antídoto, %d usos" % (antidote + 1))
+	# A dica da habilidade no HUD da luta: os usos e o "pode cair".
+	var hud := AHCombatHud.new()
+	Engine.get_main_loop().root.add_child(hud)
+	await Engine.get_main_loop().process_frame
+	hud.session = healer
+	hud._actor_id = "unit_hero_sapo_iris"
+	for option in healer.ability_options("unit_hero_sapo_iris"):
+		if option.id == "sapo_ampola_reparo_vivo":
+			hud._describe(option)
+			t.check(_labels(hud._tip_box).contains("%d usos por expedição" % (ampoule + 1)), "a dica da Ampola: %s" % _labels(hud._tip_box))
+		elif option.id == "sapo_antidoto_campo":
+			hud._describe(option)
+			t.check(_labels(hud._tip_box).contains("%d usos por expedição" % (antidote + 1)), "a dica do Antídoto: %s" % _labels(hud._tip_box))
+	# O Cartão: um robô com a vida entre o golpe mais alto sem ele e com ele só cai na previsão de quem o leva.
+	var bento: Dictionary = S.hero(c, "hero_cao_bento").duplicate(true)
+	bento.loadout = []
+	bento.relics = ["cartao_eclusa", ""]
+	var carded := AHCombatSession.create([bento], ["robot"], false, 5)
+	var bare := AHCombatSession.create([S.hero(c, "hero_cao_bento")], ["robot"], false, 5)
+	var robot: AHCombat.Unit = carded.state.enemy_team[0]
+	var base_most := bare.most_damage("cao_punho_sucata", "unit_hero_cao_bento", bare.state.enemy_team[0], 1.0)
+	var card_most := carded.most_damage("cao_punho_sucata", "unit_hero_cao_bento", robot, 1.0)
+	t.equal(card_most, AHCombatEngine.typed_damage(base_most, 1.25), "a previsão soma o +25%% do Cartão (%d → %d)" % [base_most, card_most])
+	robot.hp = card_most
+	bare.state.enemy_team[0].hp = card_most
+	for pair in [[carded, true], [bare, false]]:
+		var fight: AHCombatSession = pair[0]
+		hud.session = fight
+		hud._actor_id = "unit_hero_cao_bento"
+		fight.state.current_turn_unit_id = "unit_hero_cao_bento"
+		for option in fight.ability_options("unit_hero_cao_bento"):
+			if option.id == "cao_punho_sucata":
+				hud._describe(option, null, fight.state.enemy_team[0].rank)
+		var tip := _labels(hud._tip_box)
+		t.equal(tip.contains(TranslationServer.translate(" · pode cair")), pair[1], "\"pode cair\" %s o Cartão: %s" % ["com" if pair[1] else "sem", tip])
+	hud.queue_free()
+	await Engine.get_main_loop().process_frame

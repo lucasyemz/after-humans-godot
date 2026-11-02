@@ -170,7 +170,32 @@ func effective_range(ability_id: String, kind: String = "damage", actor_id: Stri
 		bonus = 0
 	# A Arma (#262) soma só no dano, nunca na cura.
 	var gear: int = actor.gear_damage if actor != null and kind == "damage" and int(base.Max) > 0 else 0
+	# O "+N" de dano das relíquias (#263, a Pilha Remendada), como o motor soma.
+	if actor != null and kind == "damage" and int(base.Max) > 0:
+		gear += int(actor.relic_mods.get(ability_id, {}).get("damage", 0))
 	return {"Min": int(base.Min) + bonus + gear, "Max": int(base.Max) + bonus + gear, "trained": trained}
+
+
+## As cargas ou os usos da habilidade para quem age: os da tabela e os das relíquias (#263); 0 sem limite.
+func uses_max(ability_id: String, actor_id: String = "") -> int:
+	var actor := state.find_unit(actor_id) if actor_id != "" else null
+	if actor != null:
+		return engine.uses_max(actor, ability_id)
+	var ability = data.abilities.get(ability_id)
+	return int(ability.UsesMax) if ability != null else 0
+
+
+## O dano mais alto do golpe no alvo, como o motor conta: o percentual contra máquina, o +N% do Cartão da Eclusa
+## contra a família mecânica (#263) e a vantagem de tipo (type_bonus, #227). A previsão "pode cair" da dica.
+func most_damage(ability_id: String, actor_id: String, target: Unit, type_bonus: float) -> int:
+	var ability: Dictionary = data.abilities[ability_id]
+	var most: int = effective_range(ability_id, "damage", actor_id).Max
+	if engine.is_machine(target):
+		most = maxi(1, most * int(ability.MachineDamagePercent) / 100)
+	var actor := state.find_unit(actor_id) if actor_id != "" else null
+	if actor != null and actor.machine_damage_bonus > 0 and engine.is_mech_family(target):
+		most = AHCombatEngine.typed_damage(most, 1.0 + actor.machine_damage_bonus / 100.0)
+	return AHCombatEngine.typed_damage(most, type_bonus)
 
 
 ## Texto curto da habilidade: o que faz em números (com o treino da Pesquisa e o nível de quem age) e a descrição de
@@ -187,7 +212,8 @@ func describe(ability_id: String, actor_id: String = "") -> String:
 	if ability.Cooldown > 0:
 		parts.append(tr("Recarga %d") % ability.Cooldown)
 	if ability.UsesMax > 0:
-		parts.append(tr("%d usos") % ability.UsesMax)
+		# As cargas e os usos a mais das relíquias (#263) entram no número.
+		parts.append(tr("%d usos") % uses_max(ability_id, actor_id))
 	var row = GameData.row("abilities", ability_id)
 	var text: String = tr(row.get("Description", "")) if row != null and row.get("Description", "") != "" else ""
 	var summary := " · ".join(parts)
