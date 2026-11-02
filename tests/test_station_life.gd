@@ -214,6 +214,43 @@ func _treatment():
 		t.check(not station.life.present().has(C.NICK), "sem falar nem pensar")
 	nick.quirk_treatment = {}
 	t.check(C.story_pending(c) != "", "acabado o tratamento, a tirinha volta a valer")
+	station.refresh()
+	await tree.process_frame
+	walker = _walker(station, C.NICK)
+	t.check(walker != null and not walker.get("recovering", false), "e o Nick levanta do leito")
+	# Com a Estação aberta: o tratamento começa no meio da conversa da tirinha (QA da #207, rodada 4).
+	var life: AHStationLife = station.life
+	t.check(life.play_story("bento_brother"), "a conversa da tirinha começa")
+	for frame in 120:
+		await tree.process_frame
+		if not life.talk.is_empty():
+			break
+	t.check(Array(life.talk.get("ids", [])).has(C.NICK), "com o Nick falando")
+	AHStationServices.treat_quirk(c, C.NICK, "machine-fear")
+	station.refresh()
+	await tree.process_frame
+	walker = _walker(station, C.NICK)
+	t.check(walker.get("recovering", false) and String(walker.room) == S.INFIRMARY, "o Nick vai para o leito")
+	t.check(life.talk.is_empty() and life.story == "" and life.bubble == null, "e a conversa da tirinha acaba")
+	var bento = _walker(station, C.BENTO)
+	t.check(bento != null and not is_inf(float(bento.wait)), "o Bento é solto e volta a passear")
+	t.check(not C.comic_seen(c, "bento_brother"), "a tirinha não conta como vista")
+	# E no meio de uma troca de cômodo: a viagem para e ele deita.
+	nick.quirk_treatment = {}
+	station.refresh()
+	await tree.process_frame
+	walker = _walker(station, C.NICK)
+	var to: String = S.CANTEEN if String(walker.room) != S.CANTEEN else S.BAR
+	if t.check(life.start_trip(walker, to), "o Nick sai para outro cômodo"):
+		for frame in 20:
+			await tree.process_frame
+		AHStationServices.treat_quirk(c, C.NICK, "machine-fear")
+		station.refresh()
+		await tree.process_frame
+		t.check(life.trip.is_empty(), "a troca de cômodo para")
+		t.check(walker.get("recovering", false) and String(walker.room) == S.INFIRMARY, "e ele deita no leito")
+		var spot := AHStation.recovery_spot(c, C.NICK)
+		t.check(spot == Vector3.INF or walker.card.position.is_equal_approx(spot), "no lugar do leito")
 	return station
 
 

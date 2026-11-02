@@ -307,6 +307,17 @@ func cancel_story() -> void:
 	stop_talk()
 
 
+## O morador saiu da vida da Estação de repente (foi para o leito com ela aberta): a troca de cômodo dele para, e a
+## conversa em que ele está (ou a da tirinha, que o segura) acaba; os outros voltam a passear.
+func release(hero_id: String) -> void:
+	if not trip.is_empty() and String(trip.walker.get("hero_id", "")) == hero_id:
+		abort_trip()
+	var walker = _walker_of(hero_id)
+	var talking: bool = Array(talk.get("ids", [])).has(hero_id) or (walker != null and _held.has(walker))
+	if talking:
+		cancel_story()
+
+
 func _walker_of(id: String):
 	for walker in station.walkers():
 		if String(walker.get("hero_id", "")) == id and is_instance_valid(walker.card):

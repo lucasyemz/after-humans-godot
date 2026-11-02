@@ -1776,6 +1776,11 @@ func _update_sleepers() -> void:
 		# Em recuperação (#118): deitado no leito da Enfermaria (ou num lugar do Dormitório), sem passear. Sem a pose
 		# de dormir ou sem lugar, fica de pé, parado, no cômodo onde se recupera.
 		if in_care(S.hero(campaign, walker.hero_id)):
+			# Entrou no leito com a Estação aberta (o tratamento começou agora, #265): sai da conversa e da troca de
+			# cômodo antes de deitar (QA da #207).
+			if not walker.get("recovering", false) and life != null:
+				life.release(String(walker.hero_id))
+			walker.room = S.INFIRMARY if care_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY
 			walker.sleeping = true
 			walker.recovering = true
 			var spot := recovery_spot(campaign, walker.hero_id)
