@@ -108,7 +108,7 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 		"kind": _kind(String(hero.get("class_id", "")), AHSpecies.of_hero(hero)), "type": AHTypes.label(AHTypes.of_hero(hero)),
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
 		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))) \
-			+ role_rows(String(hero.get("class_id", "")), AHPerks.of(hero)) \
+			+ role_rows(String(hero.get("class_id", "")), AHGear.combat_bonus(hero), AHPerks.of(hero)) \
 			+ AHTypes.sheet_rows(AHTypes.of_hero(hero)), "states": [], "enemy": false,
 		"level": AHHeroLevels.level(hero), "skills": skills_of(hero),
 		"art": AHCombatArena.hero_art_of(String(hero.get("id", "")), String(hero.get("art_variant", ""))).get("idle", {})}
@@ -129,24 +129,43 @@ static func skills_of(hero: Dictionary) -> Dictionary:
 
 
 ## O que o papel dá (#258): as três resistências numa linha e, se o papel soma, a chance de crítico. Os números ficam no
-## título: no texto Maior a ficha encolhe e esconde as explicações.
-## perks (#264): Pé firme e Pé pesado somam no deslocamento, como na luta (entre 0 e o teto).
-static func role_rows(class_id: String, perks: Array = []) -> Array:
+## título: no texto Maior a ficha encolhe e esconde as explicações. gear: AHGear.combat_bonus do herói (#262): a
+## Segunda Pele soma nas resistências e a Arma no crítico, como na luta. perks (#264): Pé firme e Pé pesado somam no
+## deslocamento, como na luta (entre 0 e o teto).
+static func role_rows(class_id: String, gear: Dictionary = {}, perks: Array = []) -> Array:
 	var hero_class = GameData.combat.classes.get(class_id)
 	if hero_class == null:
 		return []
 	var pct := func(value): return roundi(float(value) * 100.0)
+	var dot := AHGear.resist_with(float(hero_class.DotResist), int(gear.get("dot", 0)))
+	var stun := AHGear.resist_with(float(hero_class.StunResist), int(gear.get("stun", 0)))
 	var displacement := float(hero_class.DisplacementResist)
 	var feet := AHPerks.total(perks, "DisplacementResist")
 	if feet != 0.0:
 		displacement = clampf(displacement + feet, 0.0, maxf(displacement, AHCombatEngine.HERO_RESIST_CAP))
+	var skin := int(gear.get("dot", 0)) + int(gear.get("stun", 0)) > 0
+	var why := TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel.")
+	if skin and feet != 0.0:
+		why = TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel, pela Segunda Pele e pelos traços.")
+	elif skin:
+		why = TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel e pela Segunda Pele.")
+	elif feet != 0.0:
+		why = TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel e pelos traços.")
 	var rows: Array = [[TranslationServer.translate("Resiste: dano por turno %d%% · deslocamento %d%% · atordoamento %d%%")
-		% [pct.call(hero_class.DotResist), pct.call(displacement), pct.call(hero_class.StunResist)],
-		TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel.") if feet == 0.0
-		else TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel e pelos traços."), true]]
-	if int(hero_class.CritBonus) > 0:
-		rows.append([TranslationServer.translate("Crítico %d%% (papel +%d)") % [pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus), int(hero_class.CritBonus)],
-			TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes."), true])
+		% [pct.call(dot), pct.call(displacement), pct.call(stun)], why, true]]
+	var weapon_crit := int(gear.get("crit", 0))
+	if int(hero_class.CritBonus) > 0 or weapon_crit > 0:
+		var total: int = pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus) + weapon_crit
+		var role_crit := int(hero_class.CritBonus)
+		var title := TranslationServer.translate("Crítico %d%% (papel +%d)") % [total, role_crit]
+		var about := TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes.")
+		if weapon_crit > 0 and role_crit > 0:
+			title = TranslationServer.translate("Crítico %d%% (papel +%d, Arma +%d)") % [total, role_crit, weapon_crit]
+			about = TranslationServer.translate("Olho para o ponto fraco: o papel e a Arma acertam golpes críticos mais vezes.")
+		elif weapon_crit > 0:
+			title = TranslationServer.translate("Crítico %d%% (Arma +%d)") % [total, weapon_crit]
+			about = TranslationServer.translate("A Arma ajustada na Forja acerta golpes críticos mais vezes.")
+		rows.append([title, about, true])
 	return rows
 
 

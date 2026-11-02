@@ -769,6 +769,7 @@ func _right(c: Dictionary, hero: Dictionary) -> void:
 		row.add_child(see)
 		column.add_child(row)
 		column.add_child(_divider())
+	_gear(c, hero, column)
 	_relic(c, hero, column)
 	_post(c, hero, column)
 	if hero.get("trauma", false):
@@ -1004,6 +1005,57 @@ func _speed(hero: Dictionary) -> int:
 		if perk != null:
 			speed += int(perk.get("Speed", 0))
 	return speed + int(AHHeroLevels.combat_bonus(hero).get("speed", 0))
+
+
+## A Arma e a Segunda Pele (#262): cada peça com o nível, o que soma e o próximo nível (o requisito e o custo); o
+## "Melhorar na Forja" abre a Forja com este herói escolhido.
+func _gear(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
+	var box := VBoxContainer.new()
+	box.name = "Gear"
+	box.add_theme_constant_override("separation", 6)
+	column.add_child(box)
+	for piece in AHGear.PIECES:
+		var row := HBoxContainer.new()
+		row.name = "Gear_%s" % piece
+		row.add_theme_constant_override("separation", 12)
+		box.add_child(row)
+		var icon := AHKit.glyph("room_forge", 36, AHKit.AMBER if AHGear.level(hero, piece) > 0 else AHKit.MUTED)
+		icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		row.add_child(icon)
+		var text := VBoxContainer.new()
+		text.add_theme_constant_override("separation", 0)
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(text)
+		text.add_child(AHKit.label(tr("%s · nível %d de %d") % [AHGear.piece_name(piece), AHGear.level(hero, piece), AHGear.MAX_LEVEL], "row", AHKit.TEXT))
+		var total := AHGear.total_text(hero, piece)
+		var now := AHKit.label(total if total != "" else AHGear.piece_about(piece), "small", AHKit.TEXT if total != "" else AHKit.MUTED)
+		now.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		now.custom_minimum_size = Vector2(300, 0)
+		text.add_child(now)
+		var next := AHGear.next_text(hero, piece)
+		if next != "":
+			var hint := AHKit.label(next, "small", AHKit.MUTED)
+			hint.name = "Next"
+			hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			hint.custom_minimum_size = Vector2(300, 0)
+			text.add_child(hint)
+	var go := _small_button(tr("Melhorar na Forja"))
+	go.name = "GearForge"
+	go.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	var hero_id := String(hero.id)
+	# Sem a Forja ou com o herói fora, o botão fica apagado e o motivo na tela (o toque e o controle não mostram a dica).
+	var reach := AHGear.reach_block(c, hero_id)
+	go.disabled = reach != ""
+	go.tooltip_text = reach
+	go.pressed.connect(func():
+		hud._gear_hero = hero_id
+		hud.open_room(S.FORGE))
+	box.add_child(go)
+	if reach != "":
+		var why := _note(reach, AHKit.alert_text())
+		why.name = "GearBlock"
+		box.add_child(why)
+	column.add_child(_divider())
 
 
 ## Os dois slots de relíquia (#263), um por linha: o ícone, o nome, o que faz e o botão de trocar daquele slot.

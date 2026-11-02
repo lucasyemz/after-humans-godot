@@ -198,7 +198,7 @@ func _ampoule() -> void:
 		[int(row.HealRange.Min), int(row.HealRange.Max)]], "a Ampola no mapa: Mãos de remendo +1, Mãos trêmulas −1")
 	# A ficha: Pé firme no deslocamento, como na luta.
 	var role = GameData.combat.classes.get("cao")
-	var rows := AHCharacterSheet.role_rows("cao", ["steady"])
+	var rows := AHCharacterSheet.role_rows("cao", {}, ["steady"])
 	t.check(String(rows[0][0]).contains("deslocamento %d%%" % roundi((float(role.DisplacementResist) + 0.1) * 100.0)), "a ficha mostra o deslocamento com Pé firme")
 
 

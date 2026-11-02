@@ -2,12 +2,14 @@
 
 A proposta aprovada pelo Orquestrador em nome do Lucas (01/11) está na #262. Cada herói tem duas peças que só sobem,
 de 0 a 4, melhoradas na Forja, **sem mudar o visual**. Os números ficam em `data/gear.json`, e a regra em
-`scripts/flow/gear_rules.gd` (`AHGear`). Este é o PR 1 (as regras, os dados, o save e a Forja); a ficha da Sala vem no
-PR 2.
+`scripts/flow/gear_rules.gd` (`AHGear`). O PR 1 trouxe as regras, os dados, o save e a Forja; o PR 2 traz a ficha da
+Sala.
 
 ![a Forja: a seção Arma e Segunda Pele, antes e depois, Normal e Maior](gear/forge.jpg)
 
-As fotos saem de `tools/capture_262.gd` (e `--text-size=2` para o Maior).
+![a Sala: as duas peças do herói, o próximo nível e o Melhorar na Forja, antes e depois, Normal e Maior](gear/room.jpg)
+
+As fotos saem de `tools/capture_262.gd` (`--case=room` para a Sala, e `--text-size=2` para o Maior).
 
 ## A regra
 
@@ -36,6 +38,14 @@ As fotos saem de `tools/capture_262.gd` (e `--text-size=2` para o Maior).
   6. os efeitos temporários.
 - **Nomes:** "Arma" e "Segunda Pele" (lore §16) para todos. O nome próprio das peças dos fundadores fica com o Lucas.
 
+## Na Sala (PR 2)
+
+- **As duas peças**, cada uma com o nível ("Arma · nível 2 de 4"), o que já soma e o próximo nível, com o requisito e o
+  custo.
+- **O "Melhorar na Forja"** abre a Forja com o herói já escolhido.
+- **A ficha fora da luta** (os chips da Estação e a Partida) mostra a resistência e o crítico com as peças, pelo mesmo
+  cálculo da luta (`AHGear.resist_with`, com o teto de 80%).
+
 ## Save
 
 - No herói, `gear = {weapon, armor}`. Na Estação, `forge = {cycle, heroes}`, o dia.
@@ -51,6 +61,8 @@ As fotos saem de `tools/capture_262.gd` (e `--text-size=2` para o Maior).
 - o dia da Forja;
 - a luta: o dano sem cura, o crítico, as resistências e o teto;
 - o save: o de antes, o editado e o JSON;
-- a seção na Forja: o Melhorar, o motivo na tela e o chip do herói.
+- a seção na Forja: o Melhorar, o motivo na tela e o chip do herói;
+- a ficha: a resistência e o crítico com as peças, e o próximo nível;
+- a Sala: as duas peças e o Melhorar na Forja com o herói escolhido.
 
 A paridade 48/48 não muda, porque sem peças tudo fica zero.
