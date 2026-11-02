@@ -1829,6 +1829,7 @@ street_corridor.gd: Manhole%d
 street_corridor.gd: Down
 street_corridor.gd: Up
 journey_rules.gd: live
+journey_rules.gd: rescue
 street_corridor.gd: taken
 street_corridor.gd: done
 street_corridor.gd: hidden

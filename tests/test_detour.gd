@@ -23,6 +23,7 @@ func run(t) -> void:
 	_save(t)
 	_old_corridor(t)
 	_gallery_props(t)
+	_rescue(t)
 
 
 func _campaign(seed_value: int, team: Array = []) -> Dictionary:
@@ -270,3 +271,32 @@ func _gallery_props(t) -> void:
 	var first := R.assign_scenario_props(campaign, "SewerDucts", [int(d.first) + 1, int(d.first) + 2], ["Armário de ferramentas", "Mochila de explorador"])
 	t.equal(route.prop_steps.slice(first), [int(d.first) + 1, int(d.first) + 2], "os objetos da Galeria nos trechos do ramal")
 	t.equal(int(route.objective_prop), -1, "e nenhum deles é o objetivo da rota")
+
+
+## O resgate (#188) com o desvio (#295, QA): o preso nunca fica num trecho que o desvio pula, e descer leva o trecho
+## dele junto com os de depois da saída (a barra marca a casa certa, nunca uma do ramal).
+func _rescue(t) -> void:
+	var assigned := 0
+	var shifted := 0
+	for seed_value in range(1, 61):
+		var campaign: Dictionary = Campaign.create_initial(seed_value)
+		S.hero(campaign, "hero_sapo_iris").captured = {"mission": "cisterna_turva", "spot": 2, "phase": "fase_1", "day": 0}
+		R.start_expedition(campaign, "fase_1", seed_value * 7919 + 13)
+		var route: Dictionary = campaign.session.expedition.corridor
+		if not route.has("rescue") or R.detour(route).is_empty():
+			continue
+		assigned += 1
+		var step := int(route.rescue.step)
+		if not t.check(not R.detour_skippable(route).has(step), "semente %d: o preso fica fora dos trechos que o desvio pula (trecho %d)" % [seed_value, step + 1]):
+			continue
+		var prisoner: Dictionary = route.steps[step]
+		R.assign_search_sites(route, DOOR_STEPS, DOOR_SHOPS)
+		_at_entry(campaign)
+		R.reveal_detour(campaign)
+		if not R.take_detour(campaign):
+			continue
+		shifted += 1
+		t.check(is_same(route.steps[int(route.rescue.step)], prisoner), "semente %d: depois da descida, o resgate aponta o mesmo trecho" % seed_value)
+		t.check(R.detour_view(route).sub.all(func(cell): return not AHExplorationHud._is_rescue_step(cell.step, route)),
+			"semente %d: nenhuma casa do ramal vira resgate" % seed_value)
+	t.check(assigned > 0 and shifted > 0, "as sementes cobrem o resgate com o desvio tomado (%d rotas, %d descidas)" % [assigned, shifted])

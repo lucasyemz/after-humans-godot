@@ -13,8 +13,8 @@ capturada na fase 2 e expedição 4242. Tudo em 1920x1080, por software (xvfb).
 ![a barra de trechos, antes e depois](rescue-icon/before_after_route.jpg)
 
 - **Antes:** o trecho do preso mostrava o ícone de suprimentos e o título "Suprimentos".
-- **Agora:** a mão erguida, na cor de sempre, que é âmbar no trecho de agora, verde no resolvido e clara à frente. O
-  título passa a dizer "Resgate".
+- **Agora:** a mão erguida, na cor de sempre: âmbar no trecho de agora e verde, com o check, depois de resolvido. O título
+  passa a dizer "Resgate". Depois que o preso é solto, levado ou deixado, o trecho continua com a mão, como histórico.
 - **O que não muda:** o trecho ainda não alcançado continua com "?", pelas regras de sempre, e os outros trechos de
   suprimentos seguem com o ícone deles.
 
@@ -29,6 +29,19 @@ O Lucas pediu destaque, porque o farol se perdia na pintura do mapa. Agora o far
 - **o ícone maior:** 34 px em vez dos 30 dos outros pinos.
 
 A cor continua a de alerta, e só o ícone pisca; a placa fica parada. Os outros pinos não mudam.
+
+## O resgate com o desvio (achado da QA)
+
+O trecho do preso do #188 não acompanhava o desvio do #289. Era um defeito da main, e não só da tela:
+- ao descer pelo bueiro, `route.rescue.step` continuava com o índice antigo. A mão, o título e o próprio preso (`_spawn_prisoner`, `can_free`) iam
+  parar numa casa do ramal ou em outra luta da rua;
+- o `assign` podia pôr o preso num trecho que o desvio pula, e aí ele sumia da rota.
+
+A correção:
+- o `take_detour` leva o trecho do preso junto com os de depois da saída, como já fazia com as casas e os caixotes;
+- o `assign` nunca escolhe um trecho que o desvio pula, como já acontece com o objetivo.
+
+O `tests/test_detour.gd` cobre 60 sementes da fase 1 com uma heroína capturada. Sem a correção, o teste falha.
 
 ## Testes
 

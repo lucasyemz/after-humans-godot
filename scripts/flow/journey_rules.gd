@@ -1202,6 +1202,10 @@ static func take_detour(campaign: Dictionary) -> bool:
 	for key in route.props:
 		moved[str(int(key) + int(d.shift)) if int(key) >= exit else key] = route.props[key]
 	route.props = moved
+	# O trecho do preso (#188) anda junto com os de depois da saída, como as casas e os caixotes.
+	var rescue = route.get("rescue")
+	if typeof(rescue) == TYPE_DICTIONARY and rescue.has("step") and int(rescue.step) >= exit:
+		rescue.step = int(rescue.step) + int(d.shift)
 	d.state = "taken"
 	d.announce_down = true
 	var cost := int(detour_def(campaign.session.expedition.phase_id).get("InstinctCost", 0))

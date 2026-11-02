@@ -70,6 +70,14 @@ func run(context) -> void:
 	t.check(cell.get_child(0) is Label and (cell.get_child(0) as Label).text == "?", "não alcançado, o trecho do preso continua com ?")
 	cell.free()
 	t.check(not AHExplorationHud._is_rescue_step(prisoner, {"steps": [supplies, prisoner], "index": 0}), "sem resgate na rota, nenhum trecho é o do preso")
+	# O título do trecho: "Resgate" no do preso da expedição de agora; o outro de suprimentos e, sem expedição, o do tipo.
+	var real_state = Campaign.state
+	Campaign.state = {"session": {"expedition": {"corridor": with_rescue}}}
+	t.equal(hud._step_label(prisoner), hud.tr("Resgate"), "o título do trecho do preso diz Resgate")
+	t.equal(hud._step_label(supplies), hud.tr(AHExplorationHud.STEP_LABELS.loot), "o outro trecho de suprimentos segue Suprimentos")
+	Campaign.state = {"session": {"expedition": null}}
+	t.equal(hud._step_label(prisoner), hud.tr(AHExplorationHud.STEP_LABELS.loot), "sem expedição, o título volta ao do tipo")
+	Campaign.state = real_state
 	t.check(not AHExplorationHud._is_rescue_step({"type": "loot", "resolved": false}, with_rescue), "um trecho igual, mas de outra rota, não é o do preso")
 	hud.free()
 	# O pino do resgate no Mapa da Rede (#295): a mão erguida numa placa escura do kit, maior que os outros faróis.
