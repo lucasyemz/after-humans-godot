@@ -198,6 +198,8 @@ static func migrate(campaign: Dictionary) -> void:
 		campaign.inventory.relics = []
 	for entry in campaign.get("roster", []):
 		AHRelics.migrate_hero(campaign, entry)
+	# As que só saem uma vez (a rara do guardião e a pessoal, #263, parte 2): o save de antes começa sem nenhuma.
+	AHRelics.given(campaign)
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
 		if String(entry.get("skin_id", "")) == "":
@@ -967,6 +969,8 @@ static func trade_block(campaign: Dictionary, trade_id: String) -> String:
 		return TranslationServer.translate("Troca desconhecida.")
 	if trades_left(campaign, trade_id) <= 0:
 		return TranslationServer.translate("Nesta visita, ele não faz mais essa troca.")
+	if String(row.Get) == "relic" and AHRelics.merchant_offer(campaign) == "":
+		return TranslationServer.translate("Nesta visita, ele não trouxe relíquia.")
 	var give := String(row.Give)
 	var amount := int(row.GiveAmount)
 	if quantity(campaign, give) < amount:
@@ -981,7 +985,12 @@ static func merchant_trade(campaign: Dictionary, trade_id: String) -> String:
 		return block
 	var row = GameData.row("merchant", trade_id)
 	adjust(campaign, String(row.Give), -int(row.GiveAmount))
-	adjust(campaign, String(row.Get), int(row.GetAmount))
+	# A relíquia da visita (#263): a Incomum que ele trouxe, direto no estoque (a Estação não perde o que comprou).
+	if String(row.Get) == "relic":
+		for i in int(row.GetAmount):
+			campaign.inventory.relics.append(AHRelics.merchant_offer(campaign))
+	else:
+		adjust(campaign, String(row.Get), int(row.GetAmount))
 	var trades: Dictionary = campaign.station.train.trades
 	trades[trade_id] = int(trades.get(trade_id, 0)) + 1
 	return ""
@@ -1005,6 +1014,14 @@ static func resource_noun(resource: String) -> String:
 		"fragments":
 			return TranslationServer.translate("fragmentos")
 	return resource
+
+
+## O que a troca dá, na tela: a quantidade do recurso ou o nome da relíquia da visita (#263).
+static func trade_get_text(campaign: Dictionary, row: Dictionary) -> String:
+	if String(row.Get) == "relic":
+		var relic = GameData.row("relics", AHRelics.merchant_offer(campaign))
+		return TranslationServer.translate(String(relic.DisplayName)) if relic != null else TranslationServer.translate("relíquia")
+	return resource_amount(String(row.Get), int(row.GetAmount))
 
 
 ## Uma quantidade de um recurso das trocas ("1 fragmento", "4 sementes").
@@ -2012,6 +2029,10 @@ static func finish_return(campaign: Dictionary) -> Dictionary:
 		"supplies": floori(loot.get("supplies", 0) * factor), "request": "", "team": expedition.team.duplicate(),
 		"food_left": maxi(0, int(expedition.food)), "stats": expedition.get("stats", {}).duplicate(true),
 		"focus": String(expedition.get("focus", "")), "objective_done": bool(expedition.get("objective_done", false)), "unlocked_phase": ""}
+	# A derrota total e a fuga (#263): as relíquias achadas nesta expedição ficam para trás, como o resto do achado ("largou
+	# o que carregava"), menos a Lembrança. No recuo e na vitória, a equipe fica com elas. Antes de tudo: a escavação e as
+	# missões solo do ciclo abaixo não são achado da expedição.
+	delivered.lost_relics = AHRelics.lose_finds(campaign, expedition) if ["defeat", "fled"].has(session.result) else []
 	# A fase seguinte liberada pela primeira vitória (as expedições salvas antes do #60 não têm a marca: sem o chip).
 	if session.result == "victory" and expedition.get("first_clear", false):
 		for i in AHJourneyRules.PHASES.size() - 1:

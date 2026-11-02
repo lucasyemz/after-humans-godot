@@ -220,6 +220,14 @@ func _band() -> void:
 	right.add_child(tiles)
 	if shown.is_empty():
 		tiles.add_child(AHKit.label(tr("Nada chegou desta vez."), "text", AHKit.MUTED))
+	# A derrota total (#263): a relíquia achada que ficou para trás, logo abaixo do que chegou.
+	var left_behind := _lost_relics()
+	if not left_behind.is_empty():
+		var lost := AHKit.label(tr("Ficou para trás: %s") % ", ".join(left_behind), "small", AHKit.alert_text())
+		lost.name = "LostRelics"
+		lost.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lost.custom_minimum_size = Vector2(right_width, 0)
+		right.add_child(lost)
 	for i in boxes.size():
 		var tile: Control = boxes[i]
 		tiles.add_child(tile)
@@ -591,6 +599,13 @@ func _research_for(c: Dictionary, class_id: String) -> Dictionary:
 
 # ---------------------------------------------------------------- os detalhes
 
+## Os nomes das relíquias que a derrota total deixou para trás (#263), no idioma do jogo.
+func _lost_relics() -> Array:
+	return Array(report.get("lost_relics", [])).map(func(id):
+		var relic = GameData.row("relics", String(id))
+		return tr(String(relic.DisplayName)) if relic != null else String(id))
+
+
 func _details_band() -> PanelContainer:
 	var c: Dictionary = Campaign.state
 	var band := AHKit.panel_box("band")
@@ -615,6 +630,10 @@ func _details_band() -> PanelContainer:
 		arrived.append(tr("%s recebeu %s: %s") % [who.name, tr(who.request_item), tr(who.request_reward)])
 	if arrived.is_empty():
 		arrived.append(tr("Nada chegou desta vez."))
+	# A derrota total (#263): as relíquias achadas na expedição ficaram para trás (a Lembrança nunca fica).
+	var lost_relics := _lost_relics()
+	if not lost_relics.is_empty():
+		arrived.append(tr("Ficou para trás: %s") % ", ".join(lost_relics))
 	columns.add_child(_detail_column(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent), arrived))
 	var cycle: Dictionary = report.get("cycle", {})
 	# A escavação (#274): a linha inteira do chip, com a Estação do ciclo (uma coluna a

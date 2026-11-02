@@ -350,7 +350,6 @@ game_flow.gd: title
 game_flow.gd: backdrop
 game_flow.gd: GameFlow: a cena %s não carregou.
 inventory_panel.gd: %d / %d
-inventory_panel.gd: Description
 inventory_panel.gd: ampoule
 inventory_panel.gd: count
 inventory_panel.gd: food
@@ -951,7 +950,6 @@ character_room.gd: %s  %s
 character_room.gd: perks
 character_room.gd: Speed
 character_room.gd: speed
-character_room.gd: Description
 character_room.gd: Traits
 character_room.gd: Condition
 character_room.gd: Training
@@ -2050,6 +2048,33 @@ character_room.gd: CampUpgrade_%s
 character_room.gd: Treatment
 character_room.gd: Control
 station_services.gd: treated
+relic_rules.gd: uses
+relic_rules.gd: Ability
+relic_rules.gd: roster
+relic_rules.gd: guardian
+relic_rules.gd: Guardian
+relic_rules.gd: solo
+relic_rules.gd: %s:merchant_relic
+relic_rules.gd: Description
+relic_rules.gd: Effect
+relic_rules.gd: %s %s
+journey_rules.gd: keepsake
+combat_engine.gd: uses
+combat_engine.gd: family
+exploration_hud.gd: relic
+combat_hud.gd: relic
+combat_hud.gd: Trophy
+refuge_hud.gd: relic
+station_rules.gd: relic
+journey_rules.gd: relic
+game_data_service.gd: Guardian
+game_data_service.gd: Ability
+game_data_service.gd: Choices
+game_data_service.gd: Success
+game_data_service.gd: Failure
+game_data_service.gd: relíquia %s: guardião %s não existe
+game_data_service.gd: relíquia %s: habilidade %s não existe
+game_data_service.gd: evento %s: relíquia %s não existe
 character_room.gd: steady
 character_room.gd: stumbling
 character_room.gd: night

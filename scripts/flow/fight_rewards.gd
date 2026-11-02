@@ -111,7 +111,8 @@ static func choose(campaign: Dictionary, index: int) -> String:
 		"bandages":
 			campaign.inventory.bandages = int(campaign.inventory.bandages) + int(box.amount)
 		"relic":
-			campaign.inventory.relics.append(String(box.relic_id))
+			# Achado da expedição (#263): a derrota total o tira de volta.
+			AHRelics.find(campaign, String(box.relic_id))
 		_:
 			expedition.loot[box.kind] = int(expedition.loot.get(box.kind, 0)) + int(box.amount)
 	expedition.cargo.chosen = index

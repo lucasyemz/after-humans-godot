@@ -344,6 +344,9 @@ static func story_event(campaign: Dictionary) -> String:
 		for choice in row.get("Choices", []):
 			var unlock: String = choice.get("Success", {}).get("UnlockClass", "")
 			locked = locked or (unlock != "" and not campaign.unlocked_classes.has(unlock))
+			# A Lembrança (#263) nunca se perde: se escapou (a escolha não foi feita), o evento oferece de novo.
+			var keepsake: String = choice.get("Success", {}).get("GrantRelic", "")
+			locked = locked or (keepsake != "" and AHRelics.rarity(keepsake) == "keepsake" and not AHRelics.owned(campaign, keepsake))
 		if not locked:
 			return ""
 	return event_id
@@ -573,6 +576,10 @@ static func combat_loot(campaign: Dictionary, result: String, boss: bool) -> Dic
 		out.fragments += int(detour_def(route.get("node_id", "")).get("FragmentsPerPatrol", 0))
 	if not boss:
 		return out
+	# A rara do guardião (#263), na primeira vitória sobre ele.
+	var trophies := AHRelics.guardian_preview(campaign, guardian_ids(expedition))
+	if not trophies.is_empty():
+		out.relic = trophies[0]
 	out.seeds += 6
 	out.scrap += 1
 	if not expedition.get("objective_completed", false):
@@ -580,6 +587,17 @@ static func combat_loot(campaign: Dictionary, result: String, boss: bool) -> Dic
 		out.scrap += 2
 		out.fragments += 1
 	return out
+
+
+## Os inimigos da luta do guardião desta expedição (os ids da tabela), sem mudar nada: quem a rara de guardião procura
+## (Guardian, #263). [] fora da rota ou sem guardião.
+static func guardian_ids(expedition: Dictionary) -> Array:
+	var route: Dictionary = expedition.get("corridor", {})
+	var steps: Array = route.get("steps", [])
+	for index in steps.size():
+		if String(steps[index].get("type", "")) == "boss":
+			return corridor_enemies(expedition, index).map(func(spec): return String(spec.enemy_id))
+	return []
 
 
 ## Fim de uma luta do corredor (EndCombat). result: "victory", "defeat" ou "escaped". Ninguém morre (#118): quem caiu
@@ -607,6 +625,8 @@ static func end_combat(campaign: Dictionary, result: String, boss: bool, _cause:
 	if boss:
 		expedition.loot.seeds += 6
 		expedition.loot.scrap += 1
+		# A rara de cada guardião, uma vez por campanha (#263): achado da expedição, que a derrota total tira.
+		AHRelics.guardian_trophies(campaign, guardian_ids(expedition))
 		finish_corridor(campaign)
 
 
@@ -1424,6 +1444,10 @@ static func can_choose(campaign: Dictionary, choice: Dictionary) -> bool:
 	var unavailable: String = choice.get("UnavailableIfUnlocked", "")
 	if unavailable != "" and campaign.unlocked_classes.has(unavailable):
 		return false
+	# A Lembrança é única (#263): com ela na equipe, a escolha que a dá some.
+	var owned_relic: String = choice.get("UnavailableIfRelic", "")
+	if owned_relic != "" and AHRelics.owned(campaign, owned_relic):
+		return false
 	var expedition: Dictionary = campaign.session.expedition
 	match choice.get("Requirement", ""):
 		"ClassInTeam":
@@ -1490,6 +1514,12 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 			hurt = hero.display_name
 			if hero.hp != hp_before:
 				changes.push_front({"kind": "life", "amount": hero.hp - hp_before, "hero": hurt})
+	# A relíquia do evento (#263): a Lembrança só uma vez (única); entra como achado da expedição.
+	var relic_id := String(effects.get("GrantRelic", ""))
+	if relic_id != "" and GameData.row("relics", relic_id) != null \
+			and not (AHRelics.rarity(relic_id) == "keepsake" and AHRelics.owned(campaign, relic_id)):
+		AHRelics.find(campaign, relic_id)
+		changes.append({"kind": "relic", "amount": 1, "hero": "", "id": relic_id})
 	if grant_tool(campaign, String(effects.get("GrantTool", ""))):
 		changes.append({"kind": "tool", "amount": 1, "hero": "", "id": String(effects.GrantTool)})
 	if bool(effects.get("bLoseTool", false)) and String(choice.get("RequirementTool", "")) != "" and has_tool(campaign, choice.RequirementTool):

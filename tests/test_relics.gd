@@ -6,6 +6,7 @@ extends RefCounted
 const S = preload("res://scripts/flow/station_rules.gd")
 const G = preload("res://scripts/flow/station_grid.gd")
 const M = preload("res://scripts/flow/side_mission_rules.gd")
+const J = preload("res://scripts/flow/journey_rules.gd")
 const PATROL := ["robot", "robot_fungo"]
 ## As linhas de teste, injetadas na tabela e tiradas no fim: o que nenhum sorteio pode escolher, as restrições e um +2.
 const TEST_ROWS := {
@@ -17,6 +18,25 @@ const TEST_ROWS := {
 	"teste_fase": {"Name": "teste_fase", "DisplayName": "Teste Fase", "Rarity": "uncommon", "Only": "", "Sources": ["cargo"], "Phase": "fase_3"},
 }
 const NEVER := ["teste_rara", "teste_pessoal", "teste_lembranca"]
+## A carga sem fase (#263, parte 2): as de antes e as quatro de papel.
+const CARGO := ["botao_cobre", "coleira_lembranca", "gancho_telhado", "mira_torre", "pena_vidro", "placa_laranja", "rolha_cisterna"]
+## As 13 da parte 2: [id, raridade, Only, origens].
+const PART2 := [
+	["plaqueta_patrulha", "uncommon", "role:cao", ["dig", "merchant"]],
+	["gancho_telhado", "uncommon", "role:gato", ["cargo"]],
+	["rolha_cisterna", "uncommon", "role:sapo", ["cargo"]],
+	["mira_torre", "uncommon", "role:coruja", ["cargo"]],
+	["pilha_remendada", "uncommon", "role:rato", ["dig"]],
+	["placa_laranja", "uncommon", "role:tatu", ["cargo"]],
+	["luva_sucata", "personal", "hero:hero_cao_bento", ["solo"]],
+	["fivela_mochila", "personal", "hero:hero_gato_nick", ["solo"]],
+	["caderno_medidas", "personal", "hero:hero_sapo_iris", ["solo"]],
+	["luneta_torre", "personal", "hero:hero_coruja_vespera", ["solo"]],
+	["cartao_eclusa", "rare", "", ["guardian"]],
+	["coleira_nome", "keepsake", "", ["story"]],
+	["colar_circuito", "keepsake", "hero:hero_cao_bento", ["story"]],
+]
+const COLAR_TEXT := "Um pingente feito à mão com uma peça de terminal dos Antigos. Bento guarda no bolso e não diz de quem é."
 
 var t
 
@@ -34,6 +54,24 @@ func run(context) -> void:
 	_draws()
 	_combat()
 	_remove()
+	# A parte 2: o catálogo, os sorteios, os gatilhos da luta e as origens especiais.
+	_catalog()
+	_real_restrictions()
+	_never_drawn()
+	_triggers()
+	_guardian()
+	_solo()
+	_merchant()
+	_coleira()
+	_story_again()
+	await _defeat_and_retreat()
+	await _combat_screen()
+
+
+static func _sorted(ids: Array) -> Array:
+	var out := ids.duplicate()
+	out.sort()
+	return out
 
 
 func _data() -> void:
@@ -43,10 +81,11 @@ func _data() -> void:
 	t.equal(AHRelics.rarity("botao_cobre"), "common", "o Botão de Cobre é comum")
 	t.equal(AHRelics.rarity("coleira_lembranca"), "uncommon", "a Coleira de Lembrança é incomum")
 	t.equal(AHRelics.forgeable(), ["botao_cobre", "pena_vidro", "semente_guardada"], "a Forja fabrica as comuns de origem forge")
-	t.equal(AHRelics.pool("dig"), ["botao_cobre", "coleira_lembranca", "pena_vidro"], "a escavação só tem as de dig")
-	t.equal(AHRelics.pool("cargo"), ["botao_cobre", "coleira_lembranca", "pena_vidro"], "a carga sem fase não tem as de fase")
-	t.equal(AHRelics.pool("cargo", "fase_1"), ["botao_cobre", "coleira_lembranca", "pena_vidro", "sino_vitrine"], "o Sininho só na carga da fase 1")
-	t.equal(AHRelics.pool("cargo", "fase_2"), ["botao_cobre", "coleira_lembranca", "pena_vidro", "raiz_trancada"], "a Raiz Trançada só na carga da fase 2")
+	t.equal(AHRelics.pool("dig"), ["botao_cobre", "coleira_lembranca", "pena_vidro", "pilha_remendada", "plaqueta_patrulha"], "a escavação só tem as de dig")
+	t.equal(AHRelics.pool("cargo"), CARGO, "a carga sem fase não tem as de fase")
+	t.equal(AHRelics.pool("cargo", "fase_1"), _sorted(CARGO + ["sino_vitrine"]), "o Sininho só na carga da fase 1")
+	t.equal(AHRelics.pool("cargo", "fase_2"), _sorted(CARGO + ["raiz_trancada"]), "a Raiz Trançada só na carga da fase 2")
+	t.equal(AHRelics.pool("merchant"), ["plaqueta_patrulha"], "o Mercador só tem a Plaqueta")
 
 
 ## O save de antes: o relic_id vira o slot 0, a chave sai, o estoque fica igual; de novo, nada muda.
@@ -261,7 +300,7 @@ func _draws() -> void:
 			dig_ok = dig_ok and AHRelics.pool("dig").has(f.relic) and not NEVER.has(f.relic)
 	t.check(dig_any and dig_ok, "a escavação só dá as de dig")
 	var full := _campaign()
-	full.inventory.relics = ["botao_cobre", "pena_vidro", "coleira_lembranca"]
+	full.inventory.relics = ["botao_cobre", "pena_vidro", "coleira_lembranca", "pilha_remendada", "plaqueta_patrulha"]
 	S.hero(full, "hero_cao_bento").relics = ["teste_vel2", ""]
 	t.equal(G._new_relics(full), [], "com as de dig no estoque ou equipadas (nos dois slots), nada novo para escavar")
 	# A missão solo: só as de cargo sem fase.
@@ -313,3 +352,472 @@ func _combat() -> void:
 	var session := AHCombatSession.create(c.roster, PATROL, false, 5)
 	var chance: float = session.engine._virtue_chance([])
 	t.check(absf(session.engine._virtue_chance([], 0.05) - chance - 0.05) < 0.001, "o VirtueBonus soma na chance de Superação")
+
+
+
+# ================================================================ a parte 2
+
+## As 13 relíquias novas, com a raridade, a restrição e as origens do desenho; o texto do colar, sem nome.
+func _catalog() -> void:
+	for spec in PART2:
+		var row = GameData.row("relics", spec[0])
+		if not t.check(row != null, "%s na tabela" % spec[0]):
+			continue
+		t.equal([AHRelics.rarity(spec[0]), String(row.get("Only", "")), Array(row.get("Sources", []))], [spec[1], spec[2], spec[3]],
+			"%s: raridade, quem usa e de onde sai" % spec[0])
+		t.check(String(row.get("Description", "")) != "", "%s tem texto" % spec[0])
+	var colar: Dictionary = GameData.row("relics", "colar_circuito")
+	t.equal([String(colar.DisplayName), String(colar.Description)], ["Colar de Circuito", COLAR_TEXT], "o colar: só o nome genérico e o texto do desenho")
+	t.check(not JSON.stringify(colar).contains("Théo"), "nada no colar cita o irmão")
+	t.equal(AHRelics.text("colar_circuito"), "%s %s" % [String(colar.Effect), COLAR_TEXT], "a tela mostra o efeito antes do texto")
+	t.equal(AHRelics.text("botao_cobre"), String(GameData.row("relics", "botao_cobre").Description), "sem Effect, a descrição de sempre")
+	t.equal([AHRelics.rarity_name("cartao_eclusa"), AHRelics.rarity_name("luva_sucata"), AHRelics.rarity_name("coleira_nome")], ["Rara", "Pessoal", "Lembrança"],
+		"o nome de cada raridade")
+	t.check(AHRelics.has_cost("gancho_telhado") and AHRelics.has_cost("fivela_mochila") and not AHRelics.has_cost("luva_sucata"), "o custo na ficha")
+	# Os ids de habilidade do "+N" existem e são da classe certa.
+	for relic_id in GameData.table("relics"):
+		var ability := String(GameData.row("relics", relic_id).get("Ability", ""))
+		if ability != "":
+			t.check(GameData.combat.abilities.has(ability), "%s: a habilidade %s existe" % [relic_id, ability])
+
+
+## As restrições das relíquias reais: o papel e o fundador de cada uma.
+func _real_restrictions() -> void:
+	var c := _campaign()
+	var heroes := {}
+	for class_id in ["cao", "gato", "sapo", "coruja", "rato", "tatu"]:
+		heroes[class_id] = {"id": "hero_%s_9" % class_id, "class_id": class_id, "alive": true, "relics": ["", ""]}
+	for spec in PART2:
+		var only: String = spec[2]
+		if only.begins_with("role:"):
+			var role := only.trim_prefix("role:")
+			for class_id in heroes:
+				var why := AHRelics.block(c, heroes[class_id], 0, spec[0])
+				t.check((why == "") == (class_id == role), "%s no %s: %s" % [spec[0], class_id, why if why != "" else "aceita"])
+		elif only.begins_with("hero:"):
+			var owner := only.trim_prefix("hero:")
+			for founder in c.roster:
+				var why := AHRelics.block(c, founder, 0, spec[0])
+				t.check((why == "") == (String(founder.id) == owner), "%s no %s: %s" % [spec[0], founder.id, why if why != "" else "aceita"])
+			# O recruta da mesma classe também não usa: é do fundador.
+			var recruit := {"id": "hero_x_7", "class_id": String(S.hero(c, owner).class_id), "alive": true}
+			t.check(AHRelics.block(c, recruit, 0, spec[0]) != "", "%s: o recruta da mesma classe não usa" % spec[0])
+		else:
+			for founder in c.roster:
+				t.equal(AHRelics.block(c, founder, 0, spec[0]), "", "%s serve em %s" % [spec[0], founder.id])
+	# Pela troca de verdade: a Luva no Nick é recusada com o nome do Bento; no Bento, entra.
+	c.inventory.relics = ["luva_sucata"]
+	t.equal(AHRelics.equip(c, "hero_gato_nick", 0, "luva_sucata"), "Só %s usa." % String(S.hero(c, "hero_cao_bento").display_name), "a Luva no Nick")
+	t.equal(AHRelics.equip(c, "hero_cao_bento", 0, "luva_sucata"), "", "e no Bento")
+
+
+## O sorteio comum (a carga, a escavação, a missão solo, a Forja, o Mercador) nunca escolhe rara, pessoal ou lembrança,
+## nem uma fora das Sources dela.
+func _never_drawn() -> void:
+	var phases: Array = [""] + AHJourneyRules.PHASES.map(func(p): return String(p.id))
+	for source in ["cargo", "dig", "forge", "merchant", "solo"]:
+		for phase_id in phases:
+			var found := AHRelics.pool(source, phase_id)
+			t.check(found.all(func(id): return AHRelics.DRAWABLE.has(AHRelics.rarity(id)) and AHRelics.has_source(id, source)),
+				"%s %s: só comuns e incomuns da origem (%s)" % [source, phase_id, found])
+	t.equal(AHRelics.pool("solo"), [], "nenhuma de missão solo cai por sorteio (são pessoais)")
+	t.equal(AHRelics.pool("guardian"), [], "nem a do guardião")
+	t.equal(AHRelics.pool("story"), [], "nem as de história")
+	t.check(not AHRelics.pool("cargo").has("pilha_remendada") and not AHRelics.pool("dig").has("gancho_telhado"), "a de papel só na origem dela")
+	# A carga e a missão solo de verdade, muitas vezes: nenhuma especial.
+	var special := ["luva_sucata", "fivela_mochila", "caderno_medidas", "luneta_torre", "cartao_eclusa", "coleira_nome", "colar_circuito"]
+	var c := _campaign()
+	var bad := []
+	for phase_id in phases.slice(1):
+		for i in 300:
+			for box in AHFightRewards._draw(c, {"phase_id": phase_id, "seed": i, "id": "exp_p2_%d" % i}):
+				if box.kind == "relic" and special.has(String(box.relic_id)):
+					bad.append(box.relic_id)
+	for i in 400:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = i
+		var reward: Dictionary = M._reward(_campaign(), {"Reward": "seeds", "RelicChance": 1}, rng, false)
+		if special.has(String(reward.relic_id)):
+			bad.append(reward.relic_id)
+		var d := _campaign()
+		var f: Dictionary = G._find(d, "exp_dig_p2_%d" % i, "3:7")
+		if special.has(String(f.relic)):
+			bad.append(f.relic)
+	t.equal(bad, [], "a carga, a missão solo e a escavação nunca dão uma especial")
+
+
+func _hero(id: String, class_id: String, relics: Array, extra: Dictionary = {}) -> Dictionary:
+	var out := {"Id": id, "ClassId": class_id, "DisplayName": id, "MaxHp": 30, "Hp": 30, "Instinct": 50, "RelicIds": relics}
+	out.merge(extra, true)
+	return out
+
+
+## Uma luta direto no motor, contra dois robôs, com a mesma semente: com e sem a relíquia, o mesmo sorteio.
+func _engine(heroes: Array, seed_value: int = 11) -> AHCombatEngine:
+	var units: Array = []
+	for i in heroes.size():
+		units.append(AHCombatEngine.make_hero_unit(heroes[i], i + 1, GameData.combat))
+	var enemies := [AHCombatEngine.make_enemy_unit("robot", "enemy_a", 1, GameData.combat),
+		AHCombatEngine.make_enemy_unit("robot", "enemy_b", 2, GameData.combat)]
+	var random := AHCombatRandom.new(seed_value)
+	var context := AHCombat.Context.new()
+	var state := AHCombatEngine.init_combat(units, enemies, context, GameData.combat, random, false)
+	return AHCombatEngine.new(state, context, GameData.combat, random)
+
+
+static func _damage(result: AHCombat.ActionResult) -> int:
+	var total := 0
+	for event in result.events:
+		if event.type == AHCombat.EventType.DAMAGE:
+			total += event.amount
+	return total
+
+
+## Cada gatilho novo da luta, com e sem a relíquia, na mesma semente.
+func _triggers() -> void:
+	# No início da luta: a Esquiva do Gancho e o Bloqueio da Placa, também pela sessão de verdade.
+	var hook := AHCombatEngine.make_hero_unit(_hero("hero_gato_nick", "gato", ["gancho_telhado"]), 1, GameData.combat)
+	t.equal([hook.tokens.dodge, hook.max_hp], [1, 28], "o Gancho: 1 Esquiva no início e -2 de Vida Máxima")
+	var plate := AHCombatEngine.make_hero_unit(_hero("hero_tatu_9", "tatu", ["placa_laranja"]), 1, GameData.combat)
+	t.equal([plate.tokens.block, plate.speed], [1, int(GameData.combat.classes.tatu.BaseSpeed) - 1], "a Placa: 1 Bloqueio no início e -1 de Velocidade")
+	var c := _campaign()
+	S.hero(c, "hero_gato_nick").relics = ["gancho_telhado", ""]
+	S.hero(c, "hero_cao_bento").relics = ["placa_laranja", ""]
+	var session := AHCombatSession.create(c.roster, PATROL, false, 5, 80, ["preparado"])
+	var nick := session.state.find_unit("unit_hero_gato_nick")
+	var bento := session.state.find_unit("unit_hero_cao_bento")
+	t.equal([nick.tokens.dodge, bento.tokens.block], [1, 2], "na sessão: a Esquiva do Gancho, e o Bloqueio da Placa soma com o Preparado")
+	var plain := AHCombatSession.create(_campaign().roster, PATROL, false, 5).state.find_unit("unit_hero_gato_nick")
+	t.equal(plain.tokens.dodge, 0, "sem a relíquia, nenhuma ficha")
+	# +1 de Velocidade só na primeira rodada (a Luneta da Torre), no mesmo sorteio.
+	var base := _engine([_hero("hero_coruja_vespera", "coruja", [])], 21)
+	var scope := _engine([_hero("hero_coruja_vespera", "coruja", ["luneta_torre"])], 21)
+	var initiative := func(engine: AHCombatEngine) -> int:
+		for item in engine.state.initiative_queue:
+			if item.unit_id == "unit_hero_coruja_vespera":
+				return item.initiative
+		return -99
+	t.equal(initiative.call(scope) - initiative.call(base), 1, "a Luneta: +1 na iniciativa da primeira rodada")
+	t.equal(scope.state.find_unit("unit_hero_coruja_vespera").speed, base.state.find_unit("unit_hero_coruja_vespera").speed, "e a Velocidade de sempre igual")
+	for engine in [base, scope]:
+		engine.state.round = 2
+		engine._roll_initiative_for_round()
+	t.equal(initiative.call(scope) - initiative.call(base), 0, "na segunda rodada, nada a mais")
+	t.equal(AHRelics.totals(["luneta_torre", "pena_vidro", "sino_vitrine"], GameData.combat.relics).first_turn_speed, 0, "dentro do teto de +2 com as outras (+1 e +1)")
+	# +1 carga da Ampola (a Rolha) e +1 uso do Antídoto (o Caderno).
+	var iris := _engine([_hero("hero_sapo_iris", "sapo", ["rolha_cisterna", "caderno_medidas"])]).state.find_unit("unit_hero_sapo_iris")
+	var ampoule: int = GameData.combat.abilities.sapo_ampola_reparo_vivo.UsesMax
+	var antidote: int = GameData.combat.abilities.sapo_antidoto_campo.UsesMax
+	t.equal([iris.remaining_uses.sapo_ampola_reparo_vivo, iris.remaining_uses.sapo_antidoto_campo], [ampoule + 1, antidote + 1], "a Rolha e o Caderno: +1 carga e +1 uso")
+	var spent := _engine([_hero("hero_sapo_iris", "sapo", ["rolha_cisterna"], {"ExpeditionUses": {"sapo_ampola_reparo_vivo": 1}})]).state.find_unit("unit_hero_sapo_iris")
+	t.equal(spent.remaining_uses.sapo_ampola_reparo_vivo, 1, "as cargas gastas na expedição continuam gastas")
+	var d := _campaign()
+	J.start_expedition(d, "fase_1", 2631)
+	var iris_hero: Dictionary = S.hero(d, "hero_sapo_iris")
+	iris_hero.relics = ["rolha_cisterna", ""]
+	if d.session.expedition.team.has("hero_sapo_iris"):
+		t.equal(AHExplorationCare.ampoule_charges(d), ampoule + 1, "fora da luta, a Ampola também tem a carga a mais")
+	# "Punho de Sucata" tira 2 Bloqueios (a Luva).
+	var punch := func(relics: Array) -> int:
+		var engine := _engine([_hero("hero_cao_bento", "cao", relics)])
+		engine.state.enemy_team[0].tokens.block = 3
+		engine.execute_player_ability("unit_hero_cao_bento", "cao_punho_sucata", 1)
+		return engine.state.enemy_team[0].tokens.block
+	t.equal(punch.call([]) - punch.call(["luva_sucata"]), 1, "a Luva: o Punho de Sucata tira um Bloqueio a mais")
+	# "Fique Atrás de Mim": +1 Bloqueio (o Colar) e -5 de Instinto próprio (a Plaqueta).
+	var guard := func(relics: Array) -> AHCombat.Unit:
+		var engine := _engine([_hero("hero_cao_bento", "cao", relics), _hero("hero_gato_nick", "gato", [])])
+		engine.execute_player_ability("unit_hero_cao_bento", "cao_fique_atras_de_mim", 2)
+		return engine.state.find_unit("unit_hero_cao_bento")
+	var plain_guard: AHCombat.Unit = guard.call([])
+	var collar_guard: AHCombat.Unit = guard.call(["colar_circuito"])
+	var tag_guard: AHCombat.Unit = guard.call(["plaqueta_patrulha"])
+	t.equal([collar_guard.tokens.block - plain_guard.tokens.block, collar_guard.instinct - plain_guard.instinct], [1, 0], "o Colar: +1 Bloqueio no Fique Atrás de Mim")
+	t.equal([tag_guard.instinct - plain_guard.instinct, tag_guard.tokens.block - plain_guard.tokens.block], [-5, 0], "a Plaqueta: -5 de Instinto no próprio cão")
+	# "Olho nas Ruínas" dura +1 turno (a Mira).
+	var mark := func(relics: Array) -> int:
+		var engine := _engine([_hero("hero_cao_bento", "cao", []), _hero("hero_coruja_vespera", "coruja", relics)])
+		engine.execute_player_ability("unit_hero_coruja_vespera", "coruja_olho_nas_ruinas", 1)
+		return engine.state.enemy_team[0].mark_duration
+	t.equal([mark.call([]), mark.call(["mira_torre"])], [2, 3], "a Mira: a Marca dura 3 turnos em vez de 2")
+	# Carga de Eletrólito +1 de dano (a Pilha).
+	var bolt := func(relics: Array) -> int:
+		var engine := _engine([_hero("hero_cao_bento", "cao", []), _hero("hero_gato_nick", "gato", []), _hero("hero_rato_9", "rato", relics)])
+		return _damage(engine.execute_player_ability("unit_hero_rato_9", "rato_frasco", 1))
+	var bolt_plain: int = bolt.call([])
+	var bolt_cell: int = bolt.call(["pilha_remendada"])
+	t.check(bolt_plain > 0 and bolt_cell >= bolt_plain + 1, "a Pilha: +1 de dano na Carga de Eletrólito (%d → %d)" % [bolt_plain, bolt_cell])
+	# +25% de dano em máquinas (o Cartão da Eclusa).
+	var card := func(relics: Array) -> int:
+		return _damage(_engine([_hero("hero_cao_bento", "cao", relics)]).execute_player_ability("unit_hero_cao_bento", "cao_punho_sucata", 1))
+	var card_plain: int = card.call([])
+	var card_on: int = card.call(["cartao_eclusa"])
+	t.equal(card_on, AHCombatEngine.typed_damage(card_plain, 1.25), "o Cartão: +25%% contra a máquina (%d → %d)" % [card_plain, card_on])
+	t.check(_engine([_hero("hero_cao_bento", "cao", [])]).is_mech_family(_engine([_hero("hero_cao_bento", "cao", [])]).state.enemy_team[0]), "o robô é da família mecânica")
+	# +3 de Instinto quando um aliado cai (o Colar).
+	var fall := func(relics: Array) -> int:
+		var engine := _engine([_hero("hero_cao_bento", "cao", relics, {"Instinct": 10}), _hero("hero_gato_nick", "gato", [], {"Hp": 2})])
+		engine._apply_damage(engine.state.find_unit("unit_hero_gato_nick"), 10, false, [], "teste")
+		return engine.state.find_unit("unit_hero_cao_bento").instinct
+	t.equal([fall.call([]), fall.call(["colar_circuito"])], [18, 21], "o Colar: +3 de Instinto a mais quando um aliado cai")
+
+
+## A rara do guardião: o Porteiro da fase 5 dá o Cartão da Eclusa na vitória, uma vez por campanha.
+func _guardian() -> void:
+	var c := _campaign()
+	var expedition := _at_boss(c, "fase_5", 2635)
+	t.check(J.guardian_ids(expedition).has("porteiro"), "o guardião da fase 5 é o Porteiro")
+	t.equal(String(J.combat_loot(c, "victory", true).get("relic", "")), "cartao_eclusa", "o popup mostra o Cartão antes de a luta fechar")
+	J.end_combat(c, "victory", true)
+	t.equal(c.inventory.relics, ["cartao_eclusa"], "a vitória sobre o Porteiro dá o Cartão")
+	t.check(AHRelics.given(c).has("cartao_eclusa") and expedition.found_relics.has("cartao_eclusa"), "anotado na campanha e no achado da expedição")
+	_at_boss(c, "fase_5", 2636)
+	t.check(not J.combat_loot(c, "victory", true).has("relic"), "na segunda vez, o popup não promete nada")
+	J.end_combat(c, "victory", true)
+	t.equal(c.inventory.relics.count("cartao_eclusa"), 1, "e não dá de novo")
+	# O guardião de outra fase não dá raridade nenhuma.
+	var other := _campaign()
+	_at_boss(other, "fase_1", 2637)
+	J.end_combat(other, "victory", true)
+	t.equal(other.inventory.relics, [], "o guardião da fase 1 não dá o Cartão")
+
+
+## Uma expedição parada na luta do guardião.
+func _at_boss(c: Dictionary, phase_id: String, seed_value: int) -> Dictionary:
+	c.session = {"screen": "shelter", "result": "", "expedition": null, "event": null}
+	J.start_expedition(c, phase_id, seed_value)
+	var route: Dictionary = c.session.expedition.corridor
+	for step in route.steps:
+		step.resolved = step.type != "boss"
+	route.index = route.steps.size() - 1
+	return c.session.expedition
+
+
+## A missão solo do fundador dá a pessoal dele, uma vez; o recruta não ganha nada.
+func _solo() -> void:
+	var done := false
+	for i in 200:
+		var c := _campaign()
+		M.state(c).seed = i
+		var bento: Dictionary = S.hero(c, "hero_cao_bento")
+		bento.side_mission = {"id": "fresta_galerias", "spot": 0, "sent": 0, "back": 0}
+		var report: Dictionary = M._resolve(c, bento)
+		if report.result != "success":
+			continue
+		done = true
+		t.equal(String(report.reward.personal_id), "luva_sucata", "a primeira missão cumprida do Bento dá a Luva")
+		t.check(c.inventory.relics.has("luva_sucata") and AHRelics.given(c).has("luva_sucata"), "no estoque, e anotada")
+		t.check(M.report_line(c, report).contains("Luva de Sucata"), "o relatório diz: %s" % M.report_line(c, report))
+		t.equal(AHRelics.solo_personal(c, "hero_cao_bento"), "", "na segunda, nada")
+		t.equal(AHRelics.solo_personal(c, "hero_gato_nick"), "fivela_mochila", "a do Nick é a Fivela")
+		t.equal([AHRelics.solo_personal(c, "hero_sapo_iris"), AHRelics.solo_personal(c, "hero_coruja_vespera")], ["caderno_medidas", "luneta_torre"],
+			"a da Íris e a da Véspera")
+		t.equal(AHRelics.solo_personal(c, "hero_cao_4"), "", "o recruta não tem pessoal")
+		break
+	t.check(done, "uma missão solo do Bento deu certo")
+
+
+## O Mercador: uma Incomum por visita (a Plaqueta), pelo preço da tabela.
+func _merchant() -> void:
+	var c := _campaign()
+	S.train_on_return(c, "relic-merchant-%d" % Time.get_ticks_usec(), "merchant")
+	t.check(S.merchant_here(c), "o Mercador está na plataforma")
+	var row: Dictionary = GameData.row("merchant", "buy_relic")
+	t.equal([String(row.Give), String(row.Get), int(row.Limit)], ["seeds", "relic", 1], "a troca: sementes por uma relíquia, uma por visita")
+	t.equal(AHRelics.merchant_offer(c), "plaqueta_patrulha", "ele traz a Plaqueta, a única Incomum de origem merchant")
+	t.equal(S.trade_get_text(c, row), "Plaqueta de Patrulha", "a troca mostra o nome")
+	c.inventory.seeds = int(row.GiveAmount) * 2
+	t.equal(S.merchant_trade(c, "buy_relic"), "", "a compra sai")
+	t.equal([c.inventory.relics, S.quantity(c, "seeds")], [["plaqueta_patrulha"], int(row.GiveAmount)], "a Plaqueta no estoque, pelo preço")
+	t.check(S.merchant_trade(c, "buy_relic") != "" and c.inventory.relics.size() == 1, "uma por visita")
+	var poor := _campaign()
+	S.train_on_return(poor, "relic-poor-%d" % Time.get_ticks_usec(), "merchant")
+	poor.inventory.seeds = 1
+	t.check(S.trade_block(poor, "buy_relic") != "", "sem sementes, não sai")
+	t.check(S.trade_block(_campaign(), "buy_relic") != "", "sem o Mercador, não sai")
+
+
+## O Caixote de Coleiras: "Levar a coleira com o nome" dá a Coleira com Nome (não mais o Fragmento), uma vez.
+func _coleira() -> void:
+	var c := _campaign()
+	J.start_expedition(c, "fase_3", 2638)
+	var fragments := int(c.session.expedition.loot.fragments)
+	c.session.event = {"event_id": "busca_coleiras_numeradas", "from_search": true, "resolution": "", "pending_hard_combat": false, "object": "carga"}
+	t.check(J.choose_event_option(c, "levar_coleira_nome", 1), "a escolha sai")
+	t.check(c.inventory.relics.has("coleira_nome"), "a Coleira com Nome vai para o estoque")
+	t.equal(int(c.session.expedition.loot.fragments), fragments, "e não dá mais o Fragmento")
+	t.check(c.session.event.changes.any(func(ch): return ch.kind == "relic" and ch.id == "coleira_nome"), "o chip do resultado mostra a relíquia")
+	t.check(c.session.expedition.found_relics.has("coleira_nome"), "é achado da expedição")
+	J.finish_event(c)
+	c.session.event = {"event_id": "busca_coleiras_numeradas", "from_search": true, "resolution": "", "pending_hard_combat": false, "object": "carga"}
+	var take: Dictionary = GameData.row("events", "busca_coleiras_numeradas").Choices[0]
+	t.check(not J.can_choose(c, take), "com a Coleira na equipe, a escolha some (é única)")
+	S.hero(c, "hero_cao_bento").relics = ["coleira_nome", ""]
+	c.inventory.relics.erase("coleira_nome")
+	t.check(not J.can_choose(c, take), "também com ela equipada")
+
+
+## A Lembrança da história volta ao mesmo ponto enquanto não está com a equipe (o evento fixo oferece de novo).
+func _story_again() -> void:
+	var row: Dictionary = GameData.row("events", "porta_espera")
+	var choice: Dictionary = row.Choices[1]
+	var original: Dictionary = choice.Success.duplicate(true)
+	choice.Success.GrantRelic = "colar_circuito"
+	var c := _campaign()
+	J.start_expedition(c, "fase_3", 2639)
+	c.station.story_events = ["fase_3"]
+	t.equal(J.story_event(c), "porta_espera", "o evento já visto volta enquanto a Lembrança não veio")
+	c.inventory.relics.append("colar_circuito")
+	t.equal(J.story_event(c), "", "com ela na equipe, não volta")
+	choice.Success = original
+	t.check(not GameData.row("events", "porta_espera").Choices[1].Success.has("GrantRelic"), "a linha de teste sai")
+
+
+## A derrota total e a fuga perdem as relíquias achadas na expedição (menos a Lembrança); as de antes ficam. O recuo
+## mantém tudo. Também com o save gravado e lido no meio da expedição.
+func _defeat_and_retreat() -> void:
+	var real_dir: String = Campaign.save_dir
+	var real_state = Campaign.state
+	Campaign.save_dir = "user://test-relics-%d" % Time.get_ticks_usec()
+	for spec in [["defeat", false], ["defeat", true], ["retreat", true], ["fled", false], ["fled", true]]:
+		var result: String = spec[0]
+		var reload: bool = spec[1]
+		var c := _campaign()
+		c.inventory.relics = ["botao_cobre", "sino_vitrine"]
+		AHRelics.equip(c, "hero_gato_nick", 0, "botao_cobre")
+		J.start_expedition(c, "fase_1", 2640)
+		var expedition: Dictionary = c.session.expedition
+		# A carga (a caixa da relíquia) e o evento (a Lembrança).
+		expedition.objective_completed = true
+		expedition.cargo = {"boxes": [{"kind": "relic", "amount": 1, "relic_id": "sino_vitrine"}], "chosen": -1}
+		t.equal(AHFightRewards.choose(c, 0), "", "%s: a caixa da relíquia" % result)
+		c.session.event = {"event_id": "busca_coleiras_numeradas", "from_search": true, "resolution": "", "pending_hard_combat": false, "object": "carga"}
+		J.choose_event_option(c, "levar_coleira_nome", 1)
+		J.finish_event(c)
+		t.equal(c.inventory.relics, ["sino_vitrine", "sino_vitrine", "coleira_nome"], "%s: o estoque durante a expedição" % result)
+		if reload:
+			Campaign.state = c
+			t.check(Campaign.save(), "%s: o save no meio da expedição grava" % result)
+			Campaign.state = {}
+			Campaign.load_or_new()
+			c = Campaign.state
+			t.equal(Array(c.session.expedition.get("found_relics", [])), ["sino_vitrine", "coleira_nome"], "%s: o achado volta com o save" % result)
+		c.session.result = result
+		c.session.screen = "result"
+		var delivered: Dictionary = S.finish_return(c)
+		var nick: Dictionary = S.hero(c, "hero_gato_nick")
+		# Só as desta conta: a escavação da volta pode achar outra.
+		var mine: Array = c.inventory.relics.filter(func(id): return ["botao_cobre", "sino_vitrine", "coleira_nome"].has(id))
+		if result != "retreat":
+			t.equal(mine, ["sino_vitrine", "coleira_nome"], "%s%s: o Sininho achado sai; o de antes e a Lembrança ficam" % [result, " (com o save relido)" if reload else ""])
+			t.equal(delivered.get("lost_relics", []), ["sino_vitrine"], "%s: o relatório diz o que ficou para trás" % result)
+		else:
+			t.equal(mine, ["sino_vitrine", "sino_vitrine", "coleira_nome"], "%s: a equipe fica com o achado" % result)
+			t.equal(delivered.get("lost_relics", []), [], "%s: nada perdido" % result)
+		t.equal(AHRelics.equipped(nick), ["botao_cobre"], "%s: a equipada antes fica" % result)
+	# A rara achada e perdida na derrota volta a poder sair do guardião.
+	var lost := _campaign()
+	_at_boss(lost, "fase_5", 2641)
+	J.end_combat(lost, "victory", true)
+	lost.session.result = "defeat"
+	lost.session.screen = "result"
+	S.finish_return(lost)
+	t.check(not lost.inventory.relics.has("cartao_eclusa") and not AHRelics.given(lost).has("cartao_eclusa"), "o Cartão perdido na derrota pode sair de novo")
+	_at_boss(lost, "fase_5", 2642)
+	J.end_combat(lost, "victory", true)
+	t.check(lost.inventory.relics.has("cartao_eclusa"), "e sai na próxima vitória sobre o Porteiro")
+	# Equipada no meio (um save editado): a derrota a tira do slot.
+	var slot := _campaign()
+	J.start_expedition(slot, "fase_1", 2643)
+	AHRelics.find(slot, "pena_vidro")
+	AHRelics.equip(slot, "hero_cao_bento", 1, "pena_vidro")
+	t.equal(AHRelics.lose_finds(slot, slot.session.expedition), ["pena_vidro"], "a achada e já equipada também sai")
+	t.equal(AHRelics.slots(S.hero(slot, "hero_cao_bento")), ["", ""], "do slot")
+	var dir := ProjectSettings.globalize_path(Campaign.save_dir)
+	if DirAccess.dir_exists_absolute(dir):
+		for file in DirAccess.get_files_at(dir):
+			DirAccess.remove_absolute(dir.path_join(file))
+		DirAccess.remove_absolute(dir)
+	Campaign.save_dir = real_dir
+	Campaign.state = real_state
+
+
+## Um herói da campanha para a sessão de luta, de outra classe (os fundadores não têm rato), com as 4 da classe.
+func _session_hero(c: Dictionary, id: String, class_id: String, relics: Array) -> Dictionary:
+	var hero: Dictionary = S.hero(c, "hero_cao_bento").duplicate(true)
+	hero.id = id
+	hero.class_id = class_id
+	hero.display_name = id
+	hero.loadout = []
+	hero.relics = relics
+	return hero
+
+
+func _labels(node: Node) -> String:
+	var out := PackedStringArray()
+	for label in node.find_children("*", "Label", true, false):
+		out.append(String(label.text))
+	return " | ".join(out)
+
+
+## A carta e a dica da luta contam as relíquias: o dano a mais da Pilha, as cargas e os usos a mais da Rolha e do
+## Caderno e o +25% do Cartão na previsão "pode cair".
+func _combat_screen() -> void:
+	var c := _campaign()
+	var rat := _session_hero(c, "hero_rato_9", "rato", ["pilha_remendada", ""])
+	var plain_rat := _session_hero(c, "hero_rato_8", "rato", ["", ""])
+	var session := AHCombatSession.create([rat, plain_rat], PATROL, false, 5)
+	var bolt: Dictionary = GameData.combat.abilities.rato_frasco.DamageRange
+	var with_cell := session.effective_range("rato_frasco", "damage", "unit_hero_rato_9")
+	t.equal([with_cell.Min, with_cell.Max], [int(bolt.Min) + 1, int(bolt.Max) + 1], "a Pilha: a carta mostra o dano a mais (%d–%d)" % [with_cell.Min, with_cell.Max])
+	var without := session.effective_range("rato_frasco", "damage", "unit_hero_rato_8")
+	t.equal([without.Min, without.Max], [int(bolt.Min), int(bolt.Max)], "sem ela, o dano da tabela")
+	t.check(session.describe("rato_frasco", "unit_hero_rato_9").contains("Dano %d–%d" % [with_cell.Min, with_cell.Max]), "e o texto curto também")
+	# Os usos: a Rolha (+1 carga da Ampola) e o Caderno (+1 uso do Antídoto) na Íris.
+	var iris: Dictionary = S.hero(c, "hero_sapo_iris").duplicate(true)
+	iris.loadout = []
+	iris.relics = ["rolha_cisterna", "caderno_medidas"]
+	var healer := AHCombatSession.create([iris], PATROL, false, 5)
+	var ampoule: int = GameData.combat.abilities.sapo_ampola_reparo_vivo.UsesMax
+	var antidote: int = GameData.combat.abilities.sapo_antidoto_campo.UsesMax
+	t.equal([healer.uses_max("sapo_ampola_reparo_vivo", "unit_hero_sapo_iris"), healer.uses_max("sapo_antidoto_campo", "unit_hero_sapo_iris")],
+		[ampoule + 1, antidote + 1], "os usos com a Rolha e o Caderno")
+	t.check(healer.describe("sapo_ampola_reparo_vivo", "unit_hero_sapo_iris").contains("%d usos" % (ampoule + 1)), "o texto curto da Ampola diz %d usos" % (ampoule + 1))
+	t.check(healer.describe("sapo_antidoto_campo", "unit_hero_sapo_iris").contains("%d usos" % (antidote + 1)), "o do Antídoto, %d usos" % (antidote + 1))
+	# A dica da habilidade no HUD da luta: os usos e o "pode cair".
+	var hud := AHCombatHud.new()
+	Engine.get_main_loop().root.add_child(hud)
+	await Engine.get_main_loop().process_frame
+	hud.session = healer
+	hud._actor_id = "unit_hero_sapo_iris"
+	for option in healer.ability_options("unit_hero_sapo_iris"):
+		if option.id == "sapo_ampola_reparo_vivo":
+			hud._describe(option)
+			t.check(_labels(hud._tip_box).contains("%d usos por expedição" % (ampoule + 1)), "a dica da Ampola: %s" % _labels(hud._tip_box))
+		elif option.id == "sapo_antidoto_campo":
+			hud._describe(option)
+			t.check(_labels(hud._tip_box).contains("%d usos por expedição" % (antidote + 1)), "a dica do Antídoto: %s" % _labels(hud._tip_box))
+	# O Cartão: um robô com a vida entre o golpe mais alto sem ele e com ele só cai na previsão de quem o leva.
+	var bento: Dictionary = S.hero(c, "hero_cao_bento").duplicate(true)
+	bento.loadout = []
+	bento.relics = ["cartao_eclusa", ""]
+	var carded := AHCombatSession.create([bento], ["robot"], false, 5)
+	var bare := AHCombatSession.create([S.hero(c, "hero_cao_bento")], ["robot"], false, 5)
+	var robot: AHCombat.Unit = carded.state.enemy_team[0]
+	var base_most := bare.most_damage("cao_punho_sucata", "unit_hero_cao_bento", bare.state.enemy_team[0], 1.0)
+	var card_most := carded.most_damage("cao_punho_sucata", "unit_hero_cao_bento", robot, 1.0)
+	t.equal(card_most, AHCombatEngine.typed_damage(base_most, 1.25), "a previsão soma o +25%% do Cartão (%d → %d)" % [base_most, card_most])
+	robot.hp = card_most
+	bare.state.enemy_team[0].hp = card_most
+	for pair in [[carded, true], [bare, false]]:
+		var fight: AHCombatSession = pair[0]
+		hud.session = fight
+		hud._actor_id = "unit_hero_cao_bento"
+		fight.state.current_turn_unit_id = "unit_hero_cao_bento"
+		for option in fight.ability_options("unit_hero_cao_bento"):
+			if option.id == "cao_punho_sucata":
+				hud._describe(option, null, fight.state.enemy_team[0].rank)
+		var tip := _labels(hud._tip_box)
+		t.equal(tip.contains(TranslationServer.translate(" · pode cair")), pair[1], "\"pode cair\" %s o Cartão: %s" % ["com" if pair[1] else "sem", tip])
+	hud.queue_free()
+	await Engine.get_main_loop().process_frame

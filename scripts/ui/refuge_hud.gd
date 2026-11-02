@@ -3874,6 +3874,9 @@ func _train_merchant(c: Dictionary) -> void:
 	# volta nem para DISPENSAR) ou, no começo da visita, na primeira.
 	var first: Button = null
 	for row in S.merchant_trades():
+		# A relíquia da visita (#263): sem uma que ele traga, a troca nem aparece.
+		if String(row.Get) == "relic" and AHRelics.merchant_offer(c) == "":
+			continue
 		var button := _trade_row(c, row)
 		if first == null or String(row.Name) == _merchant_focus:
 			first = button
@@ -3912,7 +3915,9 @@ func _trade_row(c: Dictionary, row: Dictionary) -> Button:
 	give_chip.name = "Give"
 	line.add_child(give_chip)
 	line.add_child(_icon("ui-arrow-right", 22, AHKit.AMBER))
-	var get_chip := _chip(RESOURCE_ICONS[String(row.Get)], S.resource_amount(String(row.Get), int(row.GetAmount)), AHKit.good())
+	var relic_trade := String(row.Get) == "relic"
+	var get_icon: String = RELIC_ICONS.get(AHRelics.merchant_offer(c), "relic-generic") if relic_trade else RESOURCE_ICONS[String(row.Get)]
+	var get_chip := _chip(get_icon, S.trade_get_text(c, row), AHKit.good())
 	get_chip.name = "Get"
 	get_chip.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_BEGIN
 	line.add_child(get_chip)
@@ -3937,7 +3942,7 @@ func _trade(trade_id: String) -> void:
 	var row = GameData.row("merchant", trade_id)
 	var error := S.merchant_trade(Campaign.state, trade_id)
 	var done := "" if row == null else tr("Troca feita: %s por %s.") % [S.resource_amount(String(row.Give), int(row.GiveAmount)),
-		S.resource_amount(String(row.Get), int(row.GetAmount))]
+		S.trade_get_text(Campaign.state, row)]
 	_merchant_focus = trade_id
 	_act(error, done, "res://audio/ui/confirm.ogg")
 	if error == "":

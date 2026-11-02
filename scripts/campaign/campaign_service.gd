@@ -177,6 +177,8 @@ func create_initial(seed_value: int = -1) -> Dictionary:
 		"mission_stars": {},
 		"researched_skills": [],
 		"inventory": {"seeds": 30, "scrap": 0, "fragments": 0, "bandages": 2, "relics": [], "items": {}},
+		# As relíquias que só saem uma vez e já saíram: a rara de cada guardião e a pessoal de cada fundador (#263).
+		"relic_given": [],
 		# O memorial (antes do #118): ninguém mais entra; fica vazio, e os saves antigos voltam com os heróis.
 		"memorial": [],
 		"settings": {"sfx_volume": 0.6, "ambience_volume": 0.6, "music_volume": 0.6, "battle_speed": 1, "reduced_environment_effects": false,

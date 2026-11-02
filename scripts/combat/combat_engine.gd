@@ -232,6 +232,24 @@ func can_reach(ranks: Array, unit: Unit) -> bool:
 	return false
 
 
+## As cargas ou os usos de uma habilidade limitada para a unidade: os da tabela e os das relíquias (#263); 0 sem limite.
+func uses_max(unit: Unit, ability_id: String) -> int:
+	var ability = find_ability(ability_id)
+	if ability == null or ability.UsesMax <= 0:
+		return 0
+	return ability.UsesMax + int(unit.relic_mods.get(ability_id, {}).get("uses", 0))
+
+
+## O alvo é da família mecânica (#227, as famílias de type-classes.json); sem a tabela, a categoria de máquina.
+func is_mech_family(unit: Unit) -> bool:
+	if unit == null or unit.is_player:
+		return false
+	if data.type_classes.is_empty():
+		return is_machine(unit)
+	var row = data.type_classes.get(type_of(unit))
+	return row != null and String(row.Kind) == "family"
+
+
 func is_machine(unit: Unit) -> bool:
 	var enemy = find_enemy(unit.enemy_id)
 	return enemy != null and enemy.Category == "Machine"
@@ -402,6 +420,13 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 	var relic_ids: Array = Array(hero.get("RelicIds", [])) if hero.has("RelicIds") else [hero.get("RelicId", "")]
 	var relic := AHRelics.totals(relic_ids, game_data.relics)
 	unit.virtue_bonus = float(relic.virtue)
+	# Os gatilhos da parte 2 (#263): as fichas do início da luta e o resto, que o motor lê na hora.
+	unit.tokens.block = mini(TOKEN_CAP, int(relic.start_block))
+	unit.tokens.dodge = mini(TOKEN_CAP, int(relic.start_dodge))
+	unit.first_turn_speed = int(relic.first_turn_speed)
+	unit.ally_down_instinct = int(relic.ally_down_instinct)
+	unit.machine_damage_bonus = int(relic.machine_damage)
+	unit.relic_mods = relic.abilities.duplicate(true)
 	var perk_speed := 0
 	var seen := {}
 	for perk_id in unit.perks:
@@ -460,7 +485,7 @@ static func init_combat(player_units: Array, enemy_units: Array, in_context: AHC
 				var ability = engine.find_ability(ability_id)
 				if ability != null and ability.UsesMax > 0:
 					if not ability.bUsesPerExpedition or not unit.remaining_uses.has(ability_id):
-						unit.remaining_uses[ability_id] = ability.UsesMax
+						unit.remaining_uses[ability_id] = engine.uses_max(unit, ability_id)
 
 	new_state.player_team = player_units.duplicate()
 	new_state.enemy_team = enemy_units
@@ -475,7 +500,8 @@ func _roll_initiative_for_round(opening_ally_first: bool = false) -> void:
 		var item := AHCombat.InitiativeItem.new()
 		item.unit_id = unit.id
 		item.is_player = unit.is_player
-		item.initiative = unit.speed + floori(random.next() * 4)
+		# A Luneta da Torre (#263): a Velocidade a mais só na primeira rodada (o mesmo sorteio de sempre).
+		item.initiative = unit.speed + (unit.first_turn_speed if state.round == 1 else 0) + floori(random.next() * 4)
 		queue.append(item)
 	for unit in state.player_team:
 		if unit.hp > 0 or unit.deaths_door:
@@ -754,7 +780,8 @@ func _apply_damage(unit: Unit, raw_damage: int, direct_attack: bool, out_events:
 			_log(tr("[ÚLTIMO FÔLEGO] %s está à beira da morte!") % _n(unit))
 			for ally in state.player_team:
 				if ally.id != unit.id and (ally.hp > 0 or ally.deaths_door):
-					_change_instinct(ally, 8, tr("Pressão de combate"))
+					# O Colar de Circuito (#263): quem tem o gatilho sente mais o aliado que cai.
+					_change_instinct(ally, 8 + ally.ally_down_instinct, tr("Pressão de combate"))
 					_apply_instinct_crisis(ally, out_events)
 			# Amizade (+3): o parceiro ergue a guarda.
 			if unit.hero_id != "":
@@ -970,7 +997,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 	if user.cooldowns.get(ability_id, 0) > 0:
 		result.error = tr("Habilidade em recarga (%d turnos).") % user.cooldowns[ability_id]
 		return result
-	var remaining: int = user.remaining_uses.get(ability_id, ability.UsesMax)
+	var remaining: int = user.remaining_uses.get(ability_id, uses_max(user, ability_id))
 	if ability.UsesMax > 0 and remaining <= 0:
 		result.error = tr("Limite de usos desta habilidade esgotado.")
 		return result
@@ -1004,6 +1031,8 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 
 	var hit_ids := _hit_ids_from(target, ability, target_rank, opposing)
 	var hit_any_target := false
+	# O "+N" das relíquias nesta habilidade (#263, parte 2); vazio sem relíquia.
+	var mods: Dictionary = user.relic_mods.get(ability_id, {})
 	for hit_target_id in hit_ids:
 		target = _find_unit(hit_target_id)
 		user = _find_unit(unit_id)
@@ -1037,7 +1066,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 		var ability_name: String = ability.DisplayName
 		hit_any_target = true
 		if has_damage:
-			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0)) + user.gear_damage
+			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0)) + int(mods.get("damage", 0)) + user.gear_damage
 			var rolled := _roll_range(ability.DamageRange.Min + bonus, ability.DamageRange.Max + bonus)
 			if random.next() < hero_crit_chance(user):
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)
@@ -1046,9 +1075,12 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			rolled = status_damage(rolled, attempt.weak)
 			if is_machine(target):
 				rolled = maxi(1, rolled * ability.MachineDamagePercent / 100)
+			# O Cartão da Eclusa (#263): os pontos a mais contra a família mecânica, junto com o percentual contra máquina.
+			if user.machine_damage_bonus > 0 and is_mech_family(target):
+				rolled = typed_damage(rolled, 1.0 + user.machine_damage_bonus / 100.0)
 			# O tipo (#227): depois do percentual contra máquina, antes do Vulnerável e do Bloqueio (_apply_damage).
 			rolled = _apply_type(user, target, rolled, events)
-			target.tokens.block = maxi(0, target.tokens.block - ability.RemoveBlock)
+			target.tokens.block = maxi(0, target.tokens.block - ability.RemoveBlock - int(mods.get("remove_block", 0)))
 			if ability.bRequiresMarkOrVuln:
 				if target.mark_duration > 0:
 					target.mark_duration = 0
@@ -1099,17 +1131,21 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			_add_event(events, tr("Vulnerável!"), EventType.INFO, target.id)
 			_log(tr("%s ficou Vulnerável!") % _n(target))
 		if inflicts.bMark:
-			target.mark_duration = 2
+			# A Mira de Torre (#263): a Marca dura mais.
+			var mark_turns := 2 + int(mods.get("mark_turns", 0))
+			target.mark_duration = mark_turns
 			target.tokens.mark = 1
 			_add_event(events, tr("MARCADO!"), EventType.INFO, target.id).outcome = Outcome.MARK_APPLIED
-			_log(tr("%s foi MARCADO por 2 turnos!") % _n(target))
+			_log(tr("%s foi MARCADO por 2 turnos!") % _n(target) if mark_turns == 2 else tr("%s foi MARCADO por %d turnos!") % [_n(target), mark_turns])
 		if inflicts.bDodge:
 			target.tokens.dodge = mini(TOKEN_CAP, target.tokens.dodge + 1)
 			_add_event(events, tr("+1 esquiva"), EventType.INFO, target.id).outcome = Outcome.DODGE_GRANTED
-		if inflicts.Block > 0:
+		# O Colar de Circuito (#263): o Bloqueio da habilidade vem com +N.
+		var block_amount: int = inflicts.Block + (int(mods.get("block", 0)) if inflicts.Block > 0 else 0)
+		if block_amount > 0:
 			var recipient: Unit = target if ability.TargetType == "SingleOtherAlly" and not ability.bBlockToSelf else user
-			recipient.tokens.block = mini(TOKEN_CAP, recipient.tokens.block + inflicts.Block)
-			_add_event(events, tr("+%d Bloqueio") % inflicts.Block, EventType.BLOCK, recipient.id).outcome = Outcome.BLOCK_GRANTED
+			recipient.tokens.block = mini(TOKEN_CAP, recipient.tokens.block + block_amount)
+			_add_event(events, tr("+%d Bloqueio") % block_amount, EventType.BLOCK, recipient.id).outcome = Outcome.BLOCK_GRANTED
 		if inflicts.bGuard:
 			user.guard_target_rank = target.rank
 			user.guard_target_id = target.id
@@ -1164,6 +1200,15 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 						_log(tr("%s foi empurrado para a posição %d!") % [_n(target), new_rank])
 
 	user = _find_unit(unit_id)
+	# A Plaqueta de Patrulha (#263): usar a habilidade mexe no Instinto do próprio usuário, uma vez por uso.
+	var self_instinct := int(mods.get("self_instinct", 0))
+	if hit_any_target and self_instinct != 0 and user.is_standing():
+		var before := user.instinct
+		_change_instinct(user, self_instinct, ability.DisplayName)
+		if user.instinct != before:
+			var calm_event := _add_event(events, tr("%d Instinto") % (user.instinct - before), EventType.INSTINCT, user.id)
+			if user.instinct < before:
+				calm_event.outcome = Outcome.INSTINCT_REDUCED
 	if hit_any_target and ability.AdvanceSelf != 0 and can_move_voluntarily(user):
 		var team: Array = state.player_team if user.is_player else state.enemy_team
 		var new_rank := clampi(user.rank - ability.AdvanceSelf, 1, 4)
@@ -1692,7 +1737,7 @@ func play_auto_turn(actor_id: String) -> AHCombat.ActionResult:
 		var ability = find_ability(ability_id)
 		if ability == null or not ability.OriginRanks.has(actor.rank) or actor.cooldowns.get(ability_id, 0) > 0:
 			continue
-		if ability.UsesMax > 0 and actor.remaining_uses.get(ability_id, ability.UsesMax) <= 0:
+		if ability.UsesMax > 0 and actor.remaining_uses.get(ability_id, uses_max(actor, ability_id)) <= 0:
 			continue
 		var target_rank := first_valid_target(actor_id, ability_id)
 		if target_rank == 0:

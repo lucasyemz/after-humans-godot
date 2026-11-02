@@ -174,7 +174,9 @@ static func _hero_passives(hero, perks: Array, class_id: String) -> Array:
 		for relic_id in AHRelics.equipped(hero):
 			var relic = GameData.row("relics", relic_id)
 			if relic != null:
-				out.append([TranslationServer.translate("Relíquia: %s") % TranslationServer.translate(String(relic.DisplayName)), TranslationServer.translate(String(relic.get("Description", ""))), int(relic.get("MaxHpBonus", 0)) >= 0 and int(relic.get("SpeedBonus", 0)) >= 0])
+				# O nome com a raridade e o que faz (#263, parte 2); no tom de custo quando piora algum número.
+				var named := TranslationServer.translate("%s · %s") % [TranslationServer.translate(String(relic.DisplayName)), AHRelics.rarity_name(relic_id)]
+				out.append([TranslationServer.translate("Relíquia: %s") % named, AHRelics.text(relic_id), not AHRelics.has_cost(relic_id)])
 	# As melhorias do Treino (#90), uma linha por melhoria com quantas vezes foi escolhida.
 	if hero != null:
 		var counts := {}

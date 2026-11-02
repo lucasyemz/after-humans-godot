@@ -11,6 +11,16 @@
 ## - Phase: opcional; com ela, a relíquia só cai num sorteio daquela fase (a carga da expedição).
 ## - Os efeitos: MaxHpBonus, SpeedBonus (o total das relíquias tem teto de SPEED_CAP), EventInstinctReduction e
 ##   VirtueBonus (pontos da chance de Superação, como o Virtue dos perks: 0.05 é +5 pp).
+## - Os gatilhos da luta (parte 2): StartBlock e StartDodge (as fichas com que a unidade entra na luta), FirstTurnSpeed
+##   (a Velocidade a mais só na iniciativa da primeira rodada, dentro do mesmo teto), AllyDownInstinct (o Instinto a mais
+##   quando um aliado cai no Último Fôlego), MachineDamageBonus (os pontos percentuais a mais no dano direto contra a
+##   família mecânica, #227) e o "+N" numa habilidade: Ability (o id) com AbilityUses (cargas e usos), AbilityDamage,
+##   AbilityBlock, AbilityRemoveBlock, AbilityMarkTurns (a duração da Marca) e AbilitySelfInstinct (no próprio usuário).
+## - Guardian: o inimigo que dá a rara na vitória sobre o guardião, uma vez (campaign.relic_given). Effect: o efeito na
+##   tela quando a Description é só o texto do objeto (o Colar de Circuito).
+##
+## A perda na derrota (parte 2): o que entra no estoque durante a expedição (a carga, o evento, o guardião) fica anotado
+## em expedition.found_relics; a derrota total tira de volta essas cópias, menos a Lembrança, que nunca se perde.
 class_name AHRelics
 extends RefCounted
 
@@ -150,10 +160,18 @@ static func options(campaign: Dictionary, hero, slot: int) -> Array:
 
 # ---------------------------------------------------------------- os bônus
 
+## Os campos do "+N" numa habilidade (Ability) e a chave de cada um em totals().abilities.
+const ABILITY_FIELDS := {"AbilityUses": "uses", "AbilityDamage": "damage", "AbilityBlock": "block",
+	"AbilityRemoveBlock": "remove_block", "AbilityMarkTurns": "mark_turns", "AbilitySelfInstinct": "self_instinct"}
+
+
 ## O total dos bônus de uma lista de ids, numa tabela de relíquias (a de GameData ou a tipada do motor): cada relíquia
-## conta uma vez, e a Velocidade tem o teto de SPEED_CAP. {max_hp, speed, event_instinct, virtue}.
+## conta uma vez, e a Velocidade tem o teto de SPEED_CAP (a da primeira rodada também, somada à de sempre).
+## {max_hp, speed, event_instinct, virtue, start_block, start_dodge, first_turn_speed, ally_down_instinct,
+## machine_damage, abilities: {ability_id: {uses, damage, block, remove_block, mark_turns, self_instinct}}}.
 static func totals(ids: Array, table: Dictionary) -> Dictionary:
-	var out := {"max_hp": 0, "speed": 0, "event_instinct": 0, "virtue": 0.0}
+	var out := {"max_hp": 0, "speed": 0, "event_instinct": 0, "virtue": 0.0, "start_block": 0, "start_dodge": 0,
+		"first_turn_speed": 0, "ally_down_instinct": 0, "machine_damage": 0, "abilities": {}}
 	var seen := {}
 	for relic_id in ids:
 		var id := String(relic_id)
@@ -167,8 +185,31 @@ static func totals(ids: Array, table: Dictionary) -> Dictionary:
 		out.speed += int(row.get("SpeedBonus", 0))
 		out.event_instinct += int(row.get("EventInstinctReduction", 0))
 		out.virtue += float(row.get("VirtueBonus", 0.0))
+		out.start_block += int(row.get("StartBlock", 0))
+		out.start_dodge += int(row.get("StartDodge", 0))
+		out.first_turn_speed += int(row.get("FirstTurnSpeed", 0))
+		out.ally_down_instinct += int(row.get("AllyDownInstinct", 0))
+		out.machine_damage += int(row.get("MachineDamageBonus", 0))
+		var ability := String(row.get("Ability", ""))
+		if ability != "":
+			var mods: Dictionary = out.abilities.get(ability, {})
+			for field in ABILITY_FIELDS:
+				var key: String = ABILITY_FIELDS[field]
+				mods[key] = int(mods.get(key, 0)) + int(row.get(field, 0))
+			out.abilities[ability] = mods
 	out.speed = mini(SPEED_CAP, int(out.speed))
+	out.first_turn_speed = clampi(int(out.first_turn_speed), 0, maxi(0, SPEED_CAP - maxi(0, int(out.speed))))
 	return out
+
+
+## O "+N" de uma habilidade ({uses, damage, ...}) das relíquias do herói; {} sem nenhum.
+static func ability_mods(hero, ability_id: String) -> Dictionary:
+	return totals(equipped(hero), GameData.table("relics")).abilities.get(ability_id, {})
+
+
+## As cargas ou os usos a mais de uma habilidade (a Rolha de Cisterna na Ampola, o Caderno no Antídoto).
+static func extra_uses(hero, ability_id: String) -> int:
+	return int(ability_mods(hero, ability_id).get("uses", 0))
 
 
 static func max_hp_bonus(hero) -> int:
@@ -224,3 +265,140 @@ static func forgeable() -> Array:
 
 static func can_forge(relic_id: String) -> bool:
 	return forgeable().has(relic_id)
+
+
+# ---------------------------------------------------------------- as origens especiais (parte 2)
+
+## As relíquias que só saem uma vez por campanha e já saíram: a rara de cada guardião e a pessoal de cada fundador.
+static func given(campaign: Dictionary) -> Array:
+	if typeof(campaign.get("relic_given")) != TYPE_ARRAY:
+		campaign.relic_given = []
+	return campaign.relic_given
+
+
+## A relíquia está com a equipe: no estoque ou num slot de alguém do elenco.
+static func owned(campaign: Dictionary, relic_id: String) -> bool:
+	if campaign.get("inventory", {}).get("relics", []).has(relic_id):
+		return true
+	return campaign.get("roster", []).any(func(entry): return slots(entry).has(relic_id))
+
+
+## A relíquia que a equipe acha na expedição (a carga, o evento, o guardião): entra no estoque e fica anotada no achado
+## da expedição (expedition.found_relics), para a derrota total tirar de volta. Fora da expedição, só entra no estoque.
+static func find(campaign: Dictionary, relic_id: String) -> void:
+	if relic_id == "":
+		return
+	campaign.inventory.relics.append(relic_id)
+	var expedition = campaign.get("session", {}).get("expedition")
+	if typeof(expedition) == TYPE_DICTIONARY:
+		if typeof(expedition.get("found_relics")) != TYPE_ARRAY:
+			expedition.found_relics = []
+		expedition.found_relics.append(relic_id)
+
+
+## A derrota total: as relíquias achadas nesta expedição saem de novo (do estoque ou, se alguém já a pôs num slot, do
+## slot), menos a Lembrança, que nunca se perde. A rara e a pessoal voltam a poder sair (relic_given). As equipadas
+## antes e o estoque de antes ficam. Devolve os ids perdidos, na ordem em que foram achados.
+static func lose_finds(campaign: Dictionary, expedition: Dictionary) -> Array:
+	var lost: Array = []
+	for relic_id in expedition.get("found_relics", []):
+		var id := String(relic_id)
+		if rarity(id) == "keepsake":
+			continue
+		if campaign.inventory.relics.has(id):
+			campaign.inventory.relics.erase(id)
+		else:
+			var taken := false
+			for entry in campaign.roster:
+				var current := slots(entry)
+				var at := current.find(id)
+				if at >= 0 and not taken:
+					current[at] = ""
+					entry.relics = current
+					taken = true
+			if not taken:
+				continue
+		given(campaign).erase(id)
+		lost.append(id)
+	expedition.found_relics = []
+	return lost
+
+
+## A rara de cada guardião vencido (Guardian com o id do inimigo), uma vez por campanha. enemy_ids: quem estava na luta.
+## Devolve as que saíram agora (achadas na expedição: a derrota total as tira).
+static func guardian_trophies(campaign: Dictionary, enemy_ids: Array) -> Array:
+	var out: Array = []
+	for id in _sorted_ids():
+		var row: Dictionary = GameData.row("relics", id)
+		if rarity(id) != "rare" or not has_source(id, "guardian") or not enemy_ids.has(String(row.get("Guardian", ""))):
+			continue
+		if given(campaign).has(id):
+			continue
+		given(campaign).append(id)
+		find(campaign, id)
+		out.append(id)
+	return out
+
+
+## A rara que o guardião desta luta ainda daria (sem mudar nada): o popup do fim da luta mostra antes de ela fechar.
+static func guardian_preview(campaign: Dictionary, enemy_ids: Array) -> Array:
+	return _sorted_ids().filter(func(id): return rarity(id) == "rare" and has_source(id, "guardian") \
+		and enemy_ids.has(String(GameData.row("relics", id).get("Guardian", ""))) and not given(campaign).has(id))
+
+
+## A pessoal do fundador (Only "hero:<id>", origem "solo") na primeira missão solo que ele cumpre, uma vez. Devolve o
+## id ("" sem nenhuma, ou já dada). Fica na Estação: a missão solo não é a expedição, e nada a tira.
+static func solo_personal(campaign: Dictionary, hero_id: String) -> String:
+	for id in _sorted_ids():
+		var row: Dictionary = GameData.row("relics", id)
+		if rarity(id) != "personal" or not has_source(id, "solo") or String(row.get("Only", "")) != "hero:" + hero_id:
+			continue
+		if given(campaign).has(id):
+			continue
+		given(campaign).append(id)
+		campaign.inventory.relics.append(id)
+		return id
+	return ""
+
+
+## A Incomum que o Mercador traz nesta visita ("" sem nenhuma): uma das de origem "merchant", sorteada à parte pela
+## expedição da visita (o mesmo ao salvar e voltar; nenhum outro sorteio muda).
+static func merchant_offer(campaign: Dictionary) -> String:
+	var offers: Array = pool("merchant").filter(func(id): return rarity(id) == "uncommon")
+	if offers.is_empty():
+		return ""
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("%s:merchant_relic" % String(campaign.get("station", {}).get("train", {}).get("expedition_id", "")))
+	return offers[rng.randi_range(0, offers.size() - 1)]
+
+
+# ---------------------------------------------------------------- na tela
+
+const RARITY_NAMES := {"common": "Comum", "uncommon": "Incomum", "rare": "Rara", "personal": "Pessoal", "keepsake": "Lembrança"}
+
+
+## O nome da raridade, no idioma do jogo.
+static func rarity_name(relic_id: String) -> String:
+	return TranslationServer.translate(RARITY_NAMES.get(rarity(relic_id), "Comum"))
+
+
+## O que a relíquia faz e o texto dela, no idioma do jogo: o Effect antes, quando a Description é só o objeto.
+static func text(relic_id: String) -> String:
+	var row = GameData.row("relics", relic_id)
+	if row == null:
+		return ""
+	var description := TranslationServer.translate(String(row.get("Description", "")))
+	var effect := String(row.get("Effect", ""))
+	return description if effect == "" else "%s %s" % [TranslationServer.translate(effect), description]
+
+
+## A relíquia piora algum número (a Vida, a Velocidade ou a Superação): a ficha a mostra no tom de custo.
+static func has_cost(relic_id: String) -> bool:
+	var row = GameData.row("relics", relic_id)
+	return row != null and (int(row.get("MaxHpBonus", 0)) < 0 or int(row.get("SpeedBonus", 0)) < 0 or float(row.get("VirtueBonus", 0.0)) < 0.0)
+
+
+static func _sorted_ids() -> Array:
+	var ids: Array = GameData.table("relics").keys().map(func(id): return String(id))
+	ids.sort()
+	return ids
