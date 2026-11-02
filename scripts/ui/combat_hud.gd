@@ -532,6 +532,10 @@ func open(new_session: AHCombatSession) -> void:
 			bar.get_meta("intent").queue_free()
 		bar.queue_free()
 	_unit_bars.clear()
+	_has_plate.clear()
+	_crowded.clear()
+	_struck = ""
+	_spot_actor = ""
 	for unit in session.units():
 		_unit_bars[unit.id] = _make_plate(unit)
 	_reset_log()
@@ -691,6 +695,8 @@ func refresh() -> void:
 		# Quem caiu (o inimigo derrubado, o herói Caído, #178) perde a placa inteira: a barra, a moldura de quem age e os
 		# estados. O herói no Último Fôlego (vida 0, ainda na luta) fica com ela.
 		plate.visible = card != null and card.visible and AHCombatEngine.alive_any(unit)
+		# Quem tem placa, mesmo escondida no aperto (_crowded): as larguras e o aperto contam com ela.
+		_has_plate[unit.id] = plate.visible
 		var box := plate.get_child(0)
 		var hp: AHKitBar = box.get_node("Hp")
 		hp.set_value(unit.hp, unit.max_hp, "%d/%d" % [unit.hp, unit.max_hp] if not unit.deaths_door else tr("Último Fôlego"))
@@ -708,6 +714,8 @@ func refresh() -> void:
 			status.add_child(_status_chip(entry))
 		# A placa encolhe de volta quando a intenção ou os estados ficam mais curtos.
 		plate.reset_size.call_deferred()
+	# A regra do aperto já no refresh: o golpe chama o refresh fora do _process, e a placa escondida piscava (#72).
+	_show_crowded()
 	_refresh_order(current)
 	arena.show_ring(current)
 	_refresh_log()
@@ -889,9 +897,10 @@ func _process(_delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
 		return
-	# As placas e intenções acima da cabeça (o ALVO desvia delas), lidas depois de as escalonadas subirem.
+	# As placas e intenções acima da cabeça (o ALVO desvia delas).
 	var short_controls: Array[Control] = []
 	var widths := _plate_widths(camera)
+	_show_crowded()
 	for unit_id in _unit_bars:
 		var plate: Control = _unit_bars[unit_id]
 		var card: AHSpriteCard = arena.cards.get(unit_id)
@@ -913,7 +922,7 @@ func _process(_delta: float) -> void:
 			plate.size = Vector2(widths[unit_id], 0)
 		var feet := camera.unproject_position(card.global_position)
 		var head := camera.unproject_position(card.global_position + Vector3(0, card.body_height * 1.05, 0))
-		var short := card.body_height < SHORT_HEIGHT or _plate_stagger.has(unit_id)
+		var short := card.body_height < SHORT_HEIGHT
 		# O limite é o da barra (a última da placa): o resto sobe por cima dela.
 		var bar_height: float = (plate.get_child(0).get_node("Hp") as Control).size.y
 		var dock_limit := _dock_top() - bar_height - 6 if _panel.visible else INF
@@ -943,7 +952,6 @@ func _process(_delta: float) -> void:
 			var bottom := minf(crown.y, plate.position.y - 4.0) if short else crown.y
 			tag.position = Vector2(feet.x - tag.size.x * 0.5, maxf(INTENT_TOP, bottom - tag.size.y))
 			short_controls.append(tag)
-	_lift_staggered()
 	var short_plates: Array[Rect2] = []
 	for control in short_controls:
 		short_plates.append(Rect2(control.position, control.size))
@@ -1349,66 +1357,60 @@ func unit_at(point: Vector2) -> String:
 	return best
 
 
-## As placas escalonadas (_plate_stagger) sobem, com a intenção delas, para cima do que cobririam nos vizinhos (a
-## placa e a intenção deles; a intenção fica na altura da cabeça, e a de quem é mais alto, mais embaixo).
-func _lift_staggered() -> void:
-	for unit_id in _plate_stagger:
-		var plate: Control = _unit_bars.get(unit_id)
-		if plate == null or not plate.visible:
-			continue
-		var tag := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
-		if tag != null and not tag.visible:
-			tag = null
-		var player: bool = session.state.find_unit(unit_id).is_player
-		var theirs: Array[Rect2] = []
-		for other_id in _unit_bars:
-			var other: Control = _unit_bars[other_id]
-			var unit = session.state.find_unit(other_id)
-			if other_id == unit_id or _plate_stagger.has(other_id) or not other.visible or unit == null or unit.is_player != player:
-				continue
-			theirs.append(Rect2(other.position, other.size))
-			var other_tag := (other.get_meta("intent") if other.has_meta("intent") else null) as Control
-			if other_tag != null and other_tag.visible:
-				theirs.append(Rect2(other_tag.position, other_tag.size))
-		# Subir pela intenção pode pôr a placa sobre outra coisa do vizinho: sobe de novo, até não cobrir nada.
-		for round in 4:
-			var lift := 0.0
-			var mine: Array[Rect2] = [Rect2(plate.position, plate.size)]
-			if tag != null:
-				mine.append(Rect2(tag.position, tag.size))
-			for rect in theirs:
-				for own in mine:
-					if own.grow(-1).intersects(rect.grow(-1)):
-						lift = maxf(lift, own.end.y - rect.position.y + 4.0)
-			if lift <= 0.0:
-				break
-			plate.position.y -= lift
-			if tag != null:
-				tag.position.y = maxf(INTENT_TOP, tag.position.y - lift)
+## No aperto (#72, decisão do Lucas de 28/10): quem tem o vizinho mais perto que a placa mínima (_crowded) fica sem a
+## placa e a intenção, menos o personagem da vez e o alvo (o apontado na mira e, depois de confirmado, o atingido até a
+## próxima vez começar). Quem age e o alvo vizinhos do mesmo lado (a cura no do lado): só o alvo, as duas se cobririam.
+## Nada de placa em cima e embaixo; a formação já deixa espaço no começo da luta (test_plates_crowd). Roda a cada quadro
+## e no fim do refresh.
+func _show_crowded() -> void:
+	if session == null or arena == null:
+		return
+	# A vez de quem age vem do começo dela (start_turn): o motor passa a vez antes da animação do golpe.
+	var current := _spot_actor if _spot_actor != "" else session.state.current_turn_unit_id
+	var target := _struck
+	if _target_label.visible and _target_label.has_meta("card"):
+		for unit_id in arena.cards:
+			if arena.cards[unit_id] == _target_label.get_meta("card"):
+				target = unit_id
+	var actor := session.state.find_unit(current)
+	var aimed := session.state.find_unit(target) if target != "" else null
+	var beside := actor != null and aimed != null and target != current and actor.is_player == aimed.is_player \
+		and absi(actor.rank - aimed.rank) <= 1 and _crowded.has(target)
+	for unit_id in _unit_bars:
+		var plate: Control = _unit_bars[unit_id]
+		var unit := session.state.find_unit(unit_id)
+		var shown: bool = _has_plate.get(unit_id, plate.visible)
+		if shown and _crowded.has(unit_id):
+			shown = unit_id == target or (unit_id == current and not beside)
+		plate.visible = shown
+		var row := (plate.get_meta("intent") if plate.has_meta("intent") else null) as Control
+		if row != null:
+			row.visible = shown and unit != null and unit.hp > 0
 
 
 ## A largura das placas de cada lado: a de sempre (176 dos heróis, 246 dos inimigos), estreitada até caber entre os pés
 ## vizinhos (com quatro inimigos a ~200 px um do outro, as placas de 246 px se cobriam: "Fa|ísca", #63).
 func _plate_widths(camera: Camera3D) -> Dictionary:
 	var out := {}
-	_plate_stagger.clear()
+	_crowded.clear()
 	for player in [true, false]:
 		var xs: Array = []
 		var slots: Array = []
 		for unit_id in _unit_bars:
 			var unit = session.state.find_unit(unit_id)
 			var card: AHSpriteCard = arena.cards.get(unit_id)
-			if unit != null and unit.is_player == player and card != null and _unit_bars[unit_id].visible:
+			if unit != null and unit.is_player == player and card != null and _has_plate.get(unit_id, _unit_bars[unit_id].visible):
 				xs.append([camera.unproject_position(card.global_position).x, unit_id])
 				if unit.rank > 0:
 					slots.append([camera.unproject_position(arena.slot_position(unit)).x, unit_id])
 		xs.sort_custom(func(a, b): return a[0] < b[0])
 		slots.sort_custom(func(a, b): return a[0] < b[0])
-		# O escalonamento (#72) sai do lugar de destino de cada um, e não de onde a placa está no quadro: numa troca de
-		# posição as placas não pulam de linha enquanto os dois se cruzam, e nas lutas de espaço normal nada sobe.
+		# O aperto (#72) sai do lugar de destino de cada um, e não de onde a placa está no quadro: numa troca de posição
+		# as placas não somem enquanto os dois se cruzam, e nas lutas de espaço normal nenhuma some.
 		for i in range(1, slots.size()):
-			if slots[i][0] - slots[i - 1][0] < PLATE_MIN + PLATE_GAP and not _plate_stagger.has(slots[i - 1][1]):
-				_plate_stagger[slots[i][1]] = true
+			if slots[i][0] - slots[i - 1][0] < PLATE_MIN + PLATE_GAP:
+				_crowded[slots[i][1]] = true
+				_crowded[slots[i - 1][1]] = true
 		# Cada placa com a sua largura: a de sempre, ou o que cabe até o vizinho de cada lado (metade da distância de
 		# cada um), para quem tem espaço não estreitar por causa dos outros.
 		for i in xs.size():
@@ -1425,9 +1427,15 @@ const PLATE_PLAYER := 200.0
 const PLATE_ENEMY := 200.0
 const PLATE_MIN := 140.0
 const PLATE_GAP := 8.0
-## As placas escalonadas (acima da cabeça) porque o lugar do vizinho está mais perto que a placa mínima: _plate_widths
-## as marca, pelo lugar de destino de cada um.
-var _plate_stagger := {}
+## Quem tem o lugar do vizinho mais perto que a placa mínima (o aperto, #72): _plate_widths marca, pelo lugar de destino
+## de cada um, e _show_crowded esconde a placa, menos a da vez e a do alvo.
+var _crowded := {}
+## Quem tem placa pelo estado (refresh): vivo ou no Último Fôlego, mesmo com ela escondida no aperto.
+var _has_plate := {}
+## O alvo confirmado na mira: no aperto, a placa dele fica durante o golpe, até a próxima vez começar (start_turn).
+var _struck := ""
+## De quem é a vez para o aperto, desde o começo dela (o motor passa a vez antes da animação do golpe).
+var _spot_actor := ""
 
 
 ## O retângulo do corpo de um personagem na tela: do pé à cabeça e com a largura do corpo (a placa tem margem
@@ -1494,6 +1502,7 @@ static func plate_y(feet_y: float, head_y: float, short: bool, plate_height: flo
 ## note: um aviso que fica na tela enquanto ele decide (o item da Mochila que acabou de usar).
 func ask_command(actor_id: String, note: String = "") -> Dictionary:
 	_actor_id = actor_id
+	_spot_actor = actor_id
 	_message.text = note
 	_panel.visible = true
 	_build_abilities()
@@ -1547,6 +1556,14 @@ func tutorial_rect(kind: String) -> Rect2:
 					found = marker.get_global_rect() if not found.has_area() else found.merge(marker.get_global_rect())
 			return found
 	return Rect2()
+
+
+## O começo de uma vez (AHCombatArena._run, antes dos eventos dela): no aperto (#72), a placa que fica é a de quem age
+## agora, e o alvo do golpe anterior perde a dele. O motor passa a vez antes da animação do golpe, então o aperto não lê
+## a vez do estado.
+func start_turn() -> void:
+	_spot_actor = session.state.current_turn_unit_id if session != null else ""
+	_struck = ""
 
 
 func show_waiting(text: String) -> void:
@@ -2320,6 +2337,10 @@ func _press_target(rank: int, on_pick: Callable) -> void:
 		_clicked_rank = rank
 		_select_target(rank)
 		return
+	# O alvo confirmado fica com a placa no aperto até a vez passar (a barra descendo no golpe).
+	for marker in _markers:
+		if int(marker.get_meta("rank")) == rank and marker.has_meta("unit_id"):
+			_struck = String(marker.get_meta("unit_id"))
 	_clear_markers()
 	_set_enabled(true)
 	on_pick.call(rank)
