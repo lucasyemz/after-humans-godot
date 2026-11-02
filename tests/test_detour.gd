@@ -292,7 +292,12 @@ func _rescue(t) -> void:
 		var step := int(route.rescue.step)
 		var loots_outside: Array = range(1, route.steps.size()).filter(func(i): return route.steps[i].type == "loot" and not R.detour_skippable(route).has(i))
 		var inside := R.detour_skippable(route).has(step)
-		t.check(not inside or loots_outside.is_empty(), "semente %d: o preso só fica num trecho pulável quando não há outro" % seed_value)
+		var guarded_at := func(i): return range(i).any(func(b): return route.steps[b].type == "combat")
+		var loots_all: Array = range(1, route.steps.size()).filter(func(i): return route.steps[i].type == "loot")
+		var guarded_outside: Array = loots_outside.filter(guarded_at)
+		t.check(guarded_at.call(step) or loots_all.filter(guarded_at).is_empty(),
+			"semente %d: o preso fica guardado por uma patrulha sempre que algum Suprimentos tem" % seed_value)
+		t.check(not inside or guarded_outside.is_empty(), "semente %d: o preso só fica num trecho pulável quando não há um guardado fora" % seed_value)
 		var prisoner: Dictionary = route.steps[step]
 		R.assign_search_sites(route, DOOR_STEPS, DOOR_SHOPS)
 		_at_entry(campaign)

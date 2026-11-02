@@ -75,18 +75,19 @@ static func assign(campaign: Dictionary) -> void:
 	var targets := pending(campaign).filter(func(target): return target.phase == String(expedition.phase_id))
 	if targets.is_empty():
 		return
-	# Um trecho de Suprimentos com uma patrulha antes ("guardado pela patrulha"); sem nenhum, qualquer um depois da
-	# partida.
-	var loots: Array = range(1, route.steps.size()).filter(func(index): return String(route.steps[index].type) == "loot")
-	# De preferência fora dos trechos que o desvio do bueiro (#289) pode pular; sem nenhum, num deles, e descendo, o preso
-	# passa para a busca do ramal (AHJourneyRules.take_detour).
+	# Um trecho de Suprimentos com uma patrulha antes ("guardado pela patrulha", a promessa da tela) e, de preferência,
+	# fora dos trechos que o desvio do bueiro (#289) pode pular. A ordem: guardado fora do desvio; guardado num trecho
+	# pulável (descendo, o preso passa para a busca do ramal, AHJourneyRules.take_detour); sem guardado, fora do desvio;
+	# e, por fim, qualquer um depois da partida.
+	var all_loots: Array = range(1, route.steps.size()).filter(func(index): return String(route.steps[index].type) == "loot")
 	var skippable: Array = AHJourneyRules.detour_skippable(route)
-	var outside: Array = loots.filter(func(index): return not skippable.has(index))
-	if not outside.is_empty():
-		loots = outside
-	var guarded: Array = loots.filter(func(index): return range(index).any(func(before): return String(route.steps[before].type) == "combat"))
-	if not guarded.is_empty():
-		loots = guarded
+	var guarded: Array = all_loots.filter(func(index): return range(index).any(func(before): return String(route.steps[before].type) == "combat"))
+	var outside := func(list: Array) -> Array: return list.filter(func(index): return not skippable.has(index))
+	var loots: Array = all_loots
+	for choice in [outside.call(guarded), guarded, outside.call(all_loots)]:
+		if not (choice as Array).is_empty():
+			loots = choice
+			break
 	if loots.is_empty():
 		return
 	var rng := RandomNumberGenerator.new()
