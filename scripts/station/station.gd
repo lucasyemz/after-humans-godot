@@ -97,6 +97,8 @@ const SCREEN_MENU_RIGHT := 380.0
 const SCREEN_PANEL_LEFT := 1200.0
 
 var hud: AHRefugeHud
+## A Estação viva (#207): as falas, os pensamentos e quem troca de cômodo pelas portas.
+var life: AHStationLife
 ## Onde termina, na tela, o menu da esquerda da vista geral (o HUD mede: cresce com o texto Maior e o inglês). A vista
 ## geral enquadra a Estação à direita dele, para nenhum cômodo (o Dormitório da ponta) ficar embaixo do menu (#76).
 var menu_right := SCREEN_MENU_RIGHT
@@ -216,6 +218,10 @@ func _ready() -> void:
 	layer.layer = 2
 	layer.add_child(hud)
 	add_child(layer)
+	life = AHStationLife.new(self)
+	add_child(life)
+	life.layer = hud.bubbles
+	life.comic_requested.connect(hud.open_comic)
 	_apply_panel(0.0)
 	_arrive(campaign)
 	# A volta entregue aqui abre a noite: a vista de fora já abre na hora dela (sem passar pelo dia).
@@ -625,6 +631,10 @@ func hide_residents(hidden: bool) -> void:
 			card.visible = not hidden and not away.has(id)
 
 
+func residents_hidden() -> bool:
+	return _residents_hidden
+
+
 ## Com a plataforma ocupada (a fila do relatório ou da partida, quem sai dela, o trem e quem desceu dele), quem mora nos
 ## cantos dela (o fogareiro, a Preparação, os caixotes; #186) sai de cena: ninguém fica atrás da fila nem na frente do
 ## trem.
@@ -643,6 +653,8 @@ func _away_ids() -> Array:
 	var away: Array = lineup.map(func(e): return e.hero_id) + _leaving.map(func(e): return e.hero_id)
 	if _train_mode == 4:
 		away.append_array(_arrivals.filter(func(a): return a.card == null).map(func(a): return a.hero_id))
+	if life != null:
+		away.append_array(life.away_ids())
 	if _platform_busy:
 		for walker in _walkers:
 			if room_def(String(walker.get("room", ""))).get("place", "") == "platform":
@@ -783,6 +795,9 @@ func _departure_slot(position: int) -> Vector3:
 
 ## O relatório: os sobreviventes de pé na plataforma, a câmera baixa e próxima olhando um pouco para cima (ShowReport).
 func show_report(hero_ids: Array, instant: bool = true) -> void:
+	# Quem trocava de cômodo (#207) volta na hora ao lugar dele.
+	if life != null:
+		life.abort_trip()
 	clear_lineup()
 	for index in hero_ids.size():
 		_line_card(hero_ids[index], Vector3(LINE_CENTER_X + (index - (maxi(1, hero_ids.size()) - 1) * 0.5) * REPORT_SPACING, 0, LINE_Z))
@@ -827,6 +842,8 @@ func align_lineup(centers: Dictionary) -> void:
 ## A partida (#123): a equipe em fila na Plataforma 1, na câmera do relatório, cada um de pé sobre a sua carta
 ## (align_lineup); do abrigo, a câmera sobe pela passagem. hero_ids vem na ordem da cena (a posição 1 à direita).
 func show_departure(hero_ids: Array) -> void:
+	if life != null:
+		life.abort_trip()
 	clear_lineup()
 	_release_boarding()
 	for index in hero_ids.size():
@@ -936,7 +953,12 @@ func _release_leaving(entry: Dictionary) -> void:
 	if is_instance_valid(entry.card):
 		entry.card.queue_free()
 	if residents.has(entry.hero_id):
-		residents[entry.hero_id].visible = not _residents_hidden
+		residents[entry.hero_id].visible = not _residents_hidden and not _in_corridor(entry.hero_id)
+
+
+## Entre as duas portas de uma troca de cômodo (#207): não aparece em lugar nenhum.
+func _in_corridor(hero_id: String) -> bool:
+	return life != null and life.away_ids().has(hero_id)
 
 
 func clear_lineup() -> void:
@@ -944,7 +966,7 @@ func clear_lineup() -> void:
 		if is_instance_valid(entry.card):
 			entry.card.queue_free()
 		if residents.has(entry.hero_id):
-			residents[entry.hero_id].visible = not _residents_hidden
+			residents[entry.hero_id].visible = not _residents_hidden and not _in_corridor(entry.hero_id)
 	lineup.clear()
 	for contact in _contacts:
 		if is_instance_valid(contact):
@@ -1694,6 +1716,13 @@ static func infirmary_slots() -> Array:
 static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	var entry = S.hero(campaign, hero_id)
 	var fallen := S.fallen(campaign)
+	if AHStationServices.treating(entry) and not S.recovering(entry):
+		# O tratamento da peculiaridade (#265) ocupa um leito da Enfermaria, depois dos caídos que estão nos leitos.
+		var beds: int = fallen.filter(func(h): return S.in_bed(h)).size()
+		var order: int = campaign.roster.filter(func(h): return AHStationServices.treating(h) and not S.recovering(h)).map(
+			func(h): return h.id).find(hero_id)
+		var beds_slots := infirmary_slots()
+		return beds_slots[beds + order] if order >= 0 and beds + order < beds_slots.size() else Vector3.INF
 	if S.in_bed(entry):
 		var index: int = fallen.filter(func(h): return S.in_bed(h)).map(func(h): return h.id).find(hero_id)
 		var slots := infirmary_slots()
@@ -1705,6 +1734,17 @@ static func recovery_spot(campaign: Dictionary, hero_id: String) -> Vector3:
 	var taken: Array = sleepers(campaign).map(func(id): return campaign.night.participants.find(id))
 	var free: Array = range(slots.size() - 1, -1, -1).filter(func(slot): return not taken.has(slot))
 	return slots[free[index]] if index >= 0 and index < free.size() else Vector3.INF
+
+
+## Fora do passeio (a Estação viva, #207): quem se recupera (#118) e quem trata uma peculiaridade (#265), que ocupa
+## um leito da Enfermaria; nos dois casos, deitado, sem andar e sem falar.
+static func in_care(entry) -> bool:
+	return S.recovering(entry) or AHStationServices.treating(entry)
+
+
+## No leito da Enfermaria (e não no Dormitório): o caído no leito e quem está em tratamento.
+static func care_bed(entry) -> bool:
+	return S.in_bed(entry) or (AHStationServices.treating(entry) and not S.recovering(entry))
 
 
 ## Quem dorme esta noite: os participantes vivos da noite por resolver, menos o vigia (S.night_preview). Durante a
@@ -1754,7 +1794,12 @@ func _update_sleepers() -> void:
 		var card: AHSpriteCard = walker.card
 		# Em recuperação (#118): deitado no leito da Enfermaria (ou num lugar do Dormitório), sem passear. Sem a pose
 		# de dormir ou sem lugar, fica de pé, parado, no cômodo onde se recupera.
-		if S.recovering(S.hero(campaign, walker.hero_id)):
+		if in_care(S.hero(campaign, walker.hero_id)):
+			# Entrou no leito com a Estação aberta (o tratamento começou agora, #265): sai da conversa e da troca de
+			# cômodo antes de deitar (QA da #207).
+			if not walker.get("recovering", false) and life != null:
+				life.release(String(walker.hero_id))
+			walker.room = S.INFIRMARY if care_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY
 			walker.sleeping = true
 			walker.recovering = true
 			var spot := recovery_spot(campaign, walker.hero_id)
@@ -1762,7 +1807,7 @@ func _update_sleepers() -> void:
 				card.show_art(walker.poses.sleep)
 				card.position = spot
 			else:
-				var place := room_def(S.INFIRMARY if S.in_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
+				var place := room_def(S.INFIRMARY if care_bed(S.hero(campaign, walker.hero_id)) else S.DORMITORY)
 				card.show_art(walker.idle)
 				# Sem lugar no beliche, de pé no cômodo, cada um no seu ponto da faixa (nunca um por cima do outro).
 				var order: int = S.fallen(campaign).map(func(h): return h.id).find(walker.hero_id)
@@ -1809,6 +1854,9 @@ func _update_sleepers() -> void:
 func _place_residents(rng: RandomNumberGenerator) -> void:
 	# Quem voltava ao vagão (#182) não fica parado na plataforma sem o passeio.
 	_release_boarding()
+	# Quem trocava de cômodo (#207) é refeito junto, no cômodo sorteado agora.
+	if life != null:
+		life.reset()
 	for card in residents.values():
 		card.queue_free()
 	residents.clear()
@@ -1824,14 +1872,15 @@ func _place_residents(rng: RandomNumberGenerator) -> void:
 			continue
 		var room_id: String
 		var shared: Array = occupancy.keys().filter(func(id): return occupancy[id] < 2)
-		if S.recovering(entry):
-			# Quem se recupera não passeia (_update_sleepers deita no leito); não toma o cômodo de ninguém.
-			room_id = S.INFIRMARY if S.in_bed(entry) else S.DORMITORY
+		if in_care(entry):
+			# Quem se recupera ou trata uma peculiaridade (#265) não passeia (_update_sleepers deita no leito); não toma o
+			# cômodo de ninguém.
+			room_id = S.INFIRMARY if care_bed(entry) else S.DORMITORY
 		elif free_rooms.is_empty() or (not shared.is_empty() and rng.randf() < SHARE_ROOM_CHANCE):
 			room_id = shared[rng.randi_range(0, shared.size() - 1)] if not shared.is_empty() else S.DORMITORY
 		else:
 			room_id = free_rooms.pop_at(rng.randi_range(0, free_rooms.size() - 1))
-		if not S.recovering(entry):
+		if not in_care(entry):
 			occupancy[room_id] = int(occupancy.get(room_id, 0)) + 1
 		var room := room_def(room_id)
 		var poses := _resident_poses(entry, art)
@@ -1946,6 +1995,55 @@ func _resident_poses(entry, art: Dictionary) -> Dictionary:
 	return out
 
 
+## Os passeios de agora (heróis e civis), para a Estação viva (#207).
+func walkers() -> Array:
+	return _walkers.filter(func(w): return is_instance_valid(w.card))
+
+
+## O herói passa a morar (por agora) no cômodo: a faixa, o andar, a profundidade e a pose de trabalho de lá; quem
+## trabalhava ou estava sentado levanta. place: põe a placa num lugar livre da faixa (senão, ela fica onde está, como
+## quem sai pela porta do cômodo, #207).
+func settle_in(walker: Dictionary, room_id: String, place: bool = true) -> void:
+	var room := room_def(room_id)
+	if room.is_empty() or not walker.has("hero_id"):
+		return
+	var card: AHSpriteCard = walker.card
+	if float(walker.get("sitting", 0.0)) > 0.0 or int(walker.get("seat", -1)) >= 0:
+		_seats.erase(walker.seat)
+		walker.seat = -1
+		walker.sitting = 0.0
+	walker.working = 0.0
+	card.show_art(walker.idle)
+	card.scale = Vector3.ONE
+	walker.room = room_id
+	walker.min = room.lane[0]
+	walker.max = room.lane[1]
+	walker.floor = room.floor
+	walker.home_z = room.z + randf_range(-0.3, 0.3)
+	walker.work_z = room.work_z
+	walker.work = WORK_POSES.get(walker.hero_id, "") == room_id and walker.poses.has("work")
+	walker.rerouted = 0
+	if not place:
+		return
+	var spot := randf_range(walker.min, walker.max)
+	card.position = Vector3(spot, room.floor, walker.home_z)
+	var best := _clearance(walker, spot)
+	for attempt in 16:
+		var x := randf_range(walker.min, walker.max)
+		var room_left := _clearance(walker, x)
+		if room_left > best:
+			best = room_left
+			spot = x
+	card.position.x = spot
+	walker.target = spot
+	walker.wait = randf_range(2.0, 5.0)
+
+
+## A folha e o vão da porta do fundo do cômodo (#207), ou {}.
+func door_parts(room_id: String) -> Dictionary:
+	return _build.doors.get(room_id, {}) if _build != null else {}
+
+
 func civilian_art(civilian_id: String) -> Dictionary:
 	return _civilian_art.get(civilian_id, {})
 
@@ -1960,7 +2058,7 @@ func _walk(delta: float) -> void:
 	_walkers = _walkers.filter(func(w): return is_instance_valid(w.card))
 	for walker in _walkers:
 		var card: AHSpriteCard = walker.card
-		if not card.visible or walker.get("sleeping", false):
+		if not card.visible or walker.get("sleeping", false) or walker.get("life", false):
 			continue
 		if walker.has("civilian"):
 			walker.civil_timer -= delta
@@ -1992,10 +2090,12 @@ func _walk(delta: float) -> void:
 							_choose_target(walker)
 					continue
 				walker.pause -= delta
-				# O posto do meio da faixa é de um só: com alguém trabalhando nele, espera a vez.
-				if walker.pause <= 0.0 and walker.wait > 0.0 and _post_taken(walker):
+				# O posto do meio da faixa é de um só: com alguém trabalhando nele, espera a vez. Quem está segurado (a
+				# conversa da tirinha, wait INF) não vai trabalhar: ficava longe do outro até o trabalho acabar (QA da #207).
+				var free: bool = walker.wait > 0.0 and not is_inf(float(walker.wait))
+				if walker.pause <= 0.0 and free and _post_taken(walker):
 					walker.pause = randf_range(3.0, 6.0)
-				if walker.pause <= 0.0 and walker.wait > 0.0:
+				if walker.pause <= 0.0 and free:
 					card.show_art(walker.poses.work)
 					card.position = Vector3(_work_post(walker), walker.floor, walker.get("work_z", -5.6))
 					card.set_facing(1.0)

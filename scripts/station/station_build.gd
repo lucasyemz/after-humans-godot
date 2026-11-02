@@ -92,6 +92,9 @@ var train_car: AHTrainCar
 ## A luz fria que sai das portas do lado da plataforma quando elas abrem (as luzes e a energia cheia de cada uma).
 var train_door_lights: Array = []
 var room_lights := {}
+## A porta do fundo de cada cômodo da grade (#207, a Estação viva): a folha pintada, o vão escuro atrás dela, a dobradiça
+## (a borda esquerda da folha) e a largura (m). A folha gira no batente quando alguém sai ou chega (AHStationLife).
+var doors := {}
 var ember_light: OmniLight3D
 ## A brasa do fogareiro da plataforma (a Cantina de nível 1, #186): tremula como a da Forja.
 var stove_light: OmniLight3D
@@ -159,6 +162,7 @@ func clear_grid() -> void:
 	dressing.clear()
 	stock.clear()
 	room_lights.clear()
+	doors.clear()
 	ember_light = null
 	stove_light = null
 
@@ -722,7 +726,23 @@ func _back_door(r: Dictionary) -> void:
 	var leaf_left: float = r.door + (120.0 - leaf_width) * 0.5
 	box(Vector3(r.door, ROOM_BACK - 4, r.floor), Vector3(leaf_left + 0.5, ROOM_BACK + 2, r.floor + leaf_height), frame, false)
 	box(Vector3(leaf_left + leaf_width - 0.5, ROOM_BACK - 4, r.floor), Vector3(r.door + 120, ROOM_BACK + 2, r.floor + leaf_height), frame, false)
-	b.card("Door", Vector3(r.door + 60, ROOM_BACK + 3, r.floor), leaf_width, leaf_height)
+	var leaf := b.card("Door", Vector3(r.door + 60, ROOM_BACK + 3, r.floor), leaf_width, leaf_height)
+	if leaf != null:
+		# O vão do corredor atrás da folha (só aparece com a porta aberta).
+		var dark := StandardMaterial3D.new()
+		dark.albedo_color = Color(0.015, 0.014, 0.013)
+		dark.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		var quad := QuadMesh.new()
+		quad.size = Vector2(120.0, leaf_height) * 0.01
+		var gap := MeshInstance3D.new()
+		gap.name = "DoorGap"
+		gap.mesh = quad
+		gap.material_override = dark
+		gap.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		gap.position = AHStationBuilder.vu(Vector3(r.door + 60, ROOM_BACK + 1.5, r.floor + leaf_height * 0.5))
+		gap.visible = false
+		b.root.add_child(gap)
+		doors[r.id] = {"leaf": leaf, "gap": gap, "hinge": leaf_left * 0.01, "width": leaf_width * 0.01}
 
 
 ## As paredes do lado (cada vaga tem a sua, de 30 cm, na emenda), as bordas escuras do corte na laje do piso e do teto, o

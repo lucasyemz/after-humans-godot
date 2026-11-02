@@ -73,6 +73,10 @@ func _ready() -> void:
 		_save()
 		Settings.changed.emit())
 	_toggle(tr("Dicas da primeira vez"), Tips.enabled, func(on): Tips.set_enabled(on))
+	# A Estação viva (#207): os balões das falas e dos pensamentos dos moradores.
+	_toggle(tr("Falas na Estação"), bool(settings.get("station_chatter", true)), func(on):
+		Campaign.state.settings.station_chatter = on
+		_save())
 	_toggle(tr("Cores para daltonismo (azul e laranja)"), Settings.colorblind, func(on):
 		Settings.set_colorblind(on)
 		_rebuild())

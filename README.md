@@ -115,6 +115,10 @@ Para rodar só alguns, acrescente `-- --filter=campaign` (o filtro casa com o no
   - Na Estação: o cartão "Próximo passo" diz o que fazer; os cômodos abrem clicando no nome deles no corte; Esc volta à
     vista geral. Ir ao mapa abre o Mapa da Rede; Preparar neste lugar sobe a equipe para a Plataforma 1, onde se monta
     a equipe, o foco e a comida, e Iniciar expedição (G) confirma a partida. Esc volta um passo (#123).
+  - A Estação viva (#207): os moradores falam e pensam em balões (data/station-chatter.json), um por vez, e de tempos em
+    tempos um herói sai pela porta do fundo do cômodo e aparece pela de outro. O balão em âmbar e sublinhado se aperta
+    (clique, toque, ou E com o foco nele) e abre a tirinha (data/comics.json; setas trocam de quadro, Esc fecha). As
+    falas desligam em Opções > Jogo > Falas na Estação.
   - Na luta: 1 a 4 escolhem a habilidade (ou o clique), depois o alvo; Q move, W defende, I abre a Mochila, F foge
     (no gamepad, setas e Enter/A; Backspace/B volta).
     Mover, Defender e Fugir ficam à direita.
