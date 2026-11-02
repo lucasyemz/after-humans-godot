@@ -184,7 +184,6 @@ refuge_hud.gd: gone
 campaign_service.gd: /root/GameFlow
 campaign_service.gd: Campanha nova: falta o fundador ou a classe %s nas tabelas.
 campaign_service.gd: Falha ao salvar a campanha em %s.
-campaign_service.gd: Incompatible
 campaign_service.gd: Negative
 campaign_service.gd: Positive
 campaign_service.gd: Save recusado: campanha inválida.
@@ -2076,6 +2075,16 @@ game_data_service.gd: Failure
 game_data_service.gd: relíquia %s: guardião %s não existe
 game_data_service.gd: relíquia %s: habilidade %s não existe
 game_data_service.gd: evento %s: relíquia %s não existe
+character_room.gd: steady
+character_room.gd: stumbling
+character_room.gd: night
+character_room.gd: mender
+character_room.gd: shaky
+character_room.gd: scavenger
+character_room.gd: Fixed
+perk_rules.gd: perks
+perk_rules.gd: Incompatible
+perk_rules.gd: roster
 refuge_hud.gd: GearHero_%s
 refuge_hud.gd: Gear_%s
 refuge_hud.gd: Upgrade_%s

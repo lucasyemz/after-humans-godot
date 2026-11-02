@@ -190,6 +190,7 @@ static func migrate(campaign: Dictionary) -> void:
 	# As sete habilidades (#259): os campos novos; o que um save editado traz e não vale volta ao padrão.
 	AHHeroSkills.migrate(campaign)
 	AHStationServices.migrate(campaign)
+	AHPerks.migrate(campaign)
 	AHGear.migrate(campaign)
 	AHCampSkills.migrate(campaign)
 	# Os dois slots de relíquia (#263): o relic_id antigo vira o slot 0; o estoque não muda.
@@ -794,7 +795,7 @@ static func _train_animal(campaign: Dictionary, classes: Array, rng: RandomNumbe
 		suffix += 1
 		candidate_id = "hero_%s_%d" % [class_id, suffix]
 	return {"candidate_id": candidate_id, "recruit": {"class_id": class_id, "display_name": hero_name(campaign, class_id),
-		"perks": Campaign.roll_perks(GameData.table("perks"), rng), "art_variant": pick_art_variant(campaign, class_id),
+		"perks": Campaign.roll_perks(GameData.table("perks"), rng, class_id), "art_variant": pick_art_variant(campaign, class_id),
 		"origin": String(origins[rng.randi() % origins.size()].Text) if not origins.is_empty() else ""}}
 
 
@@ -1376,7 +1377,7 @@ static func recruit(campaign: Dictionary, class_id: String, rng: RandomNumberGen
 		adjust(campaign, "seeds", -RECRUIT_COST)
 	var hero_id := _next_hero_id(campaign, class_id)
 	var display := given_name if given_name != "" else hero_name(campaign, class_id)
-	_add_hero(campaign, hero_id, class_id, display, Campaign.roll_perks(GameData.table("perks"), rng), variant)
+	_add_hero(campaign, hero_id, class_id, display, Campaign.roll_perks(GameData.table("perks"), rng, class_id), variant)
 	return {"error": "", "hero_id": hero_id}
 
 

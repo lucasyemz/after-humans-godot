@@ -108,7 +108,7 @@ static func from_hero(hero: Dictionary) -> Dictionary:
 		"kind": _kind(String(hero.get("class_id", "")), AHSpecies.of_hero(hero)), "type": AHTypes.label(AHTypes.of_hero(hero)),
 		"hp": int(hero.get("hp", 0)), "max_hp": int(hero.get("max_hp", 1)), "speed": speed, "instinct": int(hero.get("instinct", 0)),
 		"passives": _hero_passives(hero, hero.get("perks", []), String(hero.get("class_id", ""))) \
-			+ role_rows(String(hero.get("class_id", ""))) \
+			+ role_rows(String(hero.get("class_id", "")), AHPerks.of(hero)) \
 			+ AHTypes.sheet_rows(AHTypes.of_hero(hero)), "states": [], "enemy": false,
 		"level": AHHeroLevels.level(hero), "skills": skills_of(hero),
 		"art": AHCombatArena.hero_art_of(String(hero.get("id", "")), String(hero.get("art_variant", ""))).get("idle", {})}
@@ -130,14 +130,20 @@ static func skills_of(hero: Dictionary) -> Dictionary:
 
 ## O que o papel dá (#258): as três resistências numa linha e, se o papel soma, a chance de crítico. Os números ficam no
 ## título: no texto Maior a ficha encolhe e esconde as explicações.
-static func role_rows(class_id: String) -> Array:
+## perks (#264): Pé firme e Pé pesado somam no deslocamento, como na luta (entre 0 e o teto).
+static func role_rows(class_id: String, perks: Array = []) -> Array:
 	var hero_class = GameData.combat.classes.get(class_id)
 	if hero_class == null:
 		return []
 	var pct := func(value): return roundi(float(value) * 100.0)
+	var displacement := float(hero_class.DisplacementResist)
+	var feet := AHPerks.total(perks, "DisplacementResist")
+	if feet != 0.0:
+		displacement = clampf(displacement + feet, 0.0, maxf(displacement, AHCombatEngine.HERO_RESIST_CAP))
 	var rows: Array = [[TranslationServer.translate("Resiste: dano por turno %d%% · deslocamento %d%% · atordoamento %d%%")
-		% [pct.call(hero_class.DotResist), pct.call(hero_class.DisplacementResist), pct.call(hero_class.StunResist)],
-		TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel."), true]]
+		% [pct.call(hero_class.DotResist), pct.call(displacement), pct.call(hero_class.StunResist)],
+		TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel.") if feet == 0.0
+		else TranslationServer.translate("A chance de não sangrar nem contaminar, de não ser empurrado nem puxado e de não ficar atordoado, pelo papel e pelos traços."), true]]
 	if int(hero_class.CritBonus) > 0:
 		rows.append([TranslationServer.translate("Crítico %d%% (papel +%d)") % [pct.call(AHCombatEngine.CRITICAL_CHANCE) + int(hero_class.CritBonus), int(hero_class.CritBonus)],
 			TranslationServer.translate("Olho para o ponto fraco: o papel acerta golpes críticos mais vezes."), true])
@@ -158,7 +164,11 @@ static func _hero_passives(hero, perks: Array, class_id: String) -> Array:
 	for perk_id in perks:
 		var perk = GameData.row("perks", perk_id)
 		if perk != null:
-			out.append([TranslationServer.translate(String(perk.DisplayName)), TranslationServer.translate(String(perk.get("Description", ""))), bool(perk.get("bPositive", true))])
+			# A fixada (#264) diz que não se perde.
+			var title := TranslationServer.translate(String(perk.DisplayName))
+			if hero != null and AHPerks.is_fixed(hero, String(perk_id)):
+				title = TranslationServer.translate("%s · fixada") % title
+			out.append([title, TranslationServer.translate(String(perk.get("Description", ""))), bool(perk.get("bPositive", true))])
 	if hero != null:
 		# Uma linha por relíquia equipada (os dois slots, #263).
 		for relic_id in AHRelics.equipped(hero):

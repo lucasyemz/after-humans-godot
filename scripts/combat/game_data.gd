@@ -42,7 +42,7 @@ const ENEMY_ACTION := {
 		"bVuln": false, "Push": 0, "Block": 0,
 	},
 }
-const PERK := {"DisplayName": "", "Value": 0.0, "Speed": 0, "Virtue": 0.0}
+const PERK := {"DisplayName": "", "Value": 0.0, "Speed": 0, "Virtue": 0.0, "DisplacementResist": 0.0, "HealBonus": 0}
 ## Os gatilhos da luta das relíquias (#263, parte 2; AHRelics.totals): as fichas do início, a Velocidade da primeira
 ## rodada, o Instinto quando um aliado cai, o dano a mais em máquinas e o "+N" numa habilidade.
 const RELIC := {"DisplayName": "", "MaxHpBonus": 0, "SpeedBonus": 0, "EventInstinctReduction": 0, "VirtueBonus": 0.0,

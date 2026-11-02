@@ -122,5 +122,132 @@
     "Limit": "OncePerRound",
     "Incompatible": [],
     "Target": "self"
+  },
+  {
+    "Name": "steady",
+    "DisplayName": "Pé firme",
+    "bPositive": true,
+    "Type": "Positive",
+    "Description": "+10 pontos percentuais de resistência a deslocamento.",
+    "Trigger": "Stats",
+    "Condition": "Na luta",
+    "Value": 10,
+    "Unit": "PercentagePoints",
+    "Incompatible": [
+      "stumbling"
+    ],
+    "DisplacementResist": 0.1,
+    "Target": "self"
+  },
+  {
+    "Name": "stumbling",
+    "DisplayName": "Pé pesado",
+    "bPositive": false,
+    "Type": "Negative",
+    "Description": "−10 pontos percentuais de resistência a deslocamento.",
+    "Trigger": "Stats",
+    "Condition": "Na luta",
+    "Value": -10,
+    "Unit": "PercentagePoints",
+    "Incompatible": [
+      "steady"
+    ],
+    "DisplacementResist": -0.1,
+    "Target": "self"
+  },
+  {
+    "Name": "light-sleeper",
+    "DisplayName": "Sono leve",
+    "bPositive": true,
+    "Type": "Positive",
+    "Description": "−5 Instinto na noite do acampamento.",
+    "Trigger": "CampNight",
+    "Condition": "Ao levantar acampamento",
+    "Value": -5,
+    "Unit": "Instinct",
+    "Incompatible": [
+      "heavy-sleeper"
+    ],
+    "CampInstinct": -5,
+    "Target": "self"
+  },
+  {
+    "Name": "heavy-sleeper",
+    "DisplayName": "Sono pesado",
+    "bPositive": false,
+    "Type": "Negative",
+    "Description": "+5 Instinto na noite do acampamento, e não vigia.",
+    "Trigger": "CampNight",
+    "Condition": "Ao levantar acampamento",
+    "Value": 5,
+    "Unit": "Instinct",
+    "Incompatible": [
+      "light-sleeper"
+    ],
+    "CampInstinct": 5,
+    "NoWatch": true,
+    "Target": "self"
+  },
+  {
+    "Name": "mender",
+    "DisplayName": "Mãos de remendo",
+    "bPositive": true,
+    "Type": "Positive",
+    "Description": "+1 nos limites de cura das próprias habilidades.",
+    "Trigger": "Heal",
+    "Condition": "Ao curar",
+    "Value": 1,
+    "Unit": "Heal",
+    "Incompatible": [
+      "shaky"
+    ],
+    "HealBonus": 1,
+    "NeedsHeal": true,
+    "Target": "self"
+  },
+  {
+    "Name": "shaky",
+    "DisplayName": "Mãos trêmulas",
+    "bPositive": false,
+    "Type": "Negative",
+    "Description": "−1 nos limites de cura das próprias habilidades.",
+    "Trigger": "Heal",
+    "Condition": "Ao curar",
+    "Value": -1,
+    "Unit": "Heal",
+    "Incompatible": [
+      "mender"
+    ],
+    "HealBonus": -1,
+    "NeedsHeal": true,
+    "Target": "self"
+  },
+  {
+    "Name": "scavenger",
+    "DisplayName": "Faro de busca",
+    "bPositive": true,
+    "Type": "Positive",
+    "Description": "+1 sucata nas buscas da rua que trazem sucata.",
+    "Trigger": "Search",
+    "Condition": "Na equipe, numa busca com sucata",
+    "Value": 1,
+    "Unit": "Scrap",
+    "Incompatible": [],
+    "SearchScrap": 1,
+    "Target": "team"
+  },
+  {
+    "Name": "short-fuse",
+    "DisplayName": "Pavio curto",
+    "bPositive": false,
+    "Type": "Negative",
+    "Description": "Ao sofrer um golpe crítico: +3 Instinto próprio, uma vez por rodada.",
+    "Trigger": "CritHit",
+    "Condition": "Recebe um golpe crítico",
+    "Value": 3,
+    "Unit": "Instinct",
+    "Limit": "OncePerRound",
+    "Incompatible": [],
+    "Target": "self"
   }
 ]

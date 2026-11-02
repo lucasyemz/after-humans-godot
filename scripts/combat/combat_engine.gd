@@ -280,9 +280,28 @@ func _resisted_effect(unit: Unit, dot: bool) -> bool:
 func hero_resist(unit: Unit, key: String) -> float:
 	var hero_class = find_class(unit.class_id)
 	var value := float(hero_class[key]) if hero_class != null else float(AHGameData.CLASS[key])
-	# A Segunda Pele (#262) soma, até o teto de 80% (#258); sem ela, o valor do papel como antes.
+	# A Segunda Pele (#262) soma, até o teto de 80% (#258), sem baixar a do papel; Pé firme e Pé pesado (#264) somam no
+	# deslocamento, entre 0 e o teto. Sem nada disso, o valor do papel como antes.
 	var extra := float(unit.gear_resist.get(key, 0.0))
-	return maxf(value, minf(HERO_RESIST_CAP, value + extra)) if extra > 0.0 else value
+	var feet := perk_total(unit, key) if key == "DisplacementResist" else 0.0
+	if extra <= 0.0 and feet == 0.0:
+		return value
+	var raised := maxf(value, minf(HERO_RESIST_CAP, value + extra)) if extra > 0.0 else value
+	return clampf(raised + feet, 0.0, maxf(raised, HERO_RESIST_CAP)) if feet != 0.0 else raised
+
+
+## A soma de um campo numérico das peculiaridades da unidade (cada uma uma vez).
+func perk_total(unit: Unit, field: String) -> float:
+	var out := 0.0
+	var seen := {}
+	for perk_id in unit.perks:
+		if seen.has(perk_id):
+			continue
+		seen[perk_id] = true
+		var perk = find_perk(perk_id)
+		if perk != null:
+			out += float(perk.get(field, 0))
+	return out
 
 
 ## A chance de crítico de um herói: a de todos mais o crítico do papel (#258, CritBonus em pontos percentuais). Quem não é
@@ -1076,8 +1095,9 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 			_log(tr("%s usou %s em %s causando %d de dano.") % [_n(user), tr(ability_name), _n(target), rolled])
 
 		if has_heal:
-			var heal_bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0))
-			var healed := mini(target.max_hp - target.hp, _roll_range(ability.HealRange.Min + heal_bonus, ability.HealRange.Max + heal_bonus))
+			# Mãos de remendo e Mãos trêmulas (#264): ±1 nos limites da cura de quem cura (nunca abaixo de 0).
+			var heal_bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0)) + roundi(perk_total(user, "HealBonus"))
+			var healed := mini(target.max_hp - target.hp, _roll_range(maxi(0, ability.HealRange.Min + heal_bonus), maxi(0, ability.HealRange.Max + heal_bonus)))
 			target.hp = mini(target.max_hp, target.hp + healed)
 			if target.deaths_door and target.hp > 0:
 				target.deaths_door = false
@@ -1591,6 +1611,8 @@ func _execute_enemy_plan(enemy: Unit, action: Dictionary, action_short_id: Strin
 				_add_event(events, tr("CRÍTICO INIMIGO!"), EventType.CRIT, chosen.id).critical_roll = true
 				_log(tr("[CRÍTICO!] %s desferiu um golpe brutal em %s!") % [_n(enemy), _n(chosen)])
 				_change_instinct(chosen, 12, tr("Pressão de combate"))
+				# Pavio curto (#264): mais Instinto ao sofrer o crítico, uma vez por rodada.
+				_activate_perk(chosen, "short-fuse", events)
 				# Rivalidade (-3): o rival estremece ao ver a falha.
 				if chosen.hero_id != "":
 					for other in state.player_team:

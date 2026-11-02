@@ -2,21 +2,25 @@
   {
     "Name": "cao",
     "ClassId": "cao",
-    "DisplayName": "Bento"
+    "DisplayName": "Bento",
+    "FixedPerk": "loyal"
   },
   {
     "Name": "gato",
     "ClassId": "gato",
-    "DisplayName": "Nick"
+    "DisplayName": "Nick",
+    "FixedPerk": "agile"
   },
   {
     "Name": "sapo",
     "ClassId": "sapo",
-    "DisplayName": "Íris"
+    "DisplayName": "Íris",
+    "FixedPerk": "mender"
   },
   {
     "Name": "coruja",
     "ClassId": "coruja",
-    "DisplayName": "Véspera"
+    "DisplayName": "Véspera",
+    "FixedPerk": "light-sleeper"
   }
 ]

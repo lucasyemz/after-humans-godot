@@ -970,6 +970,9 @@ static func apply_search_outcome(campaign: Dictionary, random: AHCombatRandom, f
 	adjust(campaign, "bandages", int(outcome.get("BandagesDelta", 0)))
 	adjust(campaign, "seeds", int(outcome.get("SeedsDelta", 0)))
 	adjust(campaign, "scrap", int(outcome.get("ScrapDelta", 0)))
+	# Faro de busca (#264): +1 sucata na busca que traz sucata, se alguém da equipe tem.
+	if int(outcome.get("ScrapDelta", 0)) > 0 and _team_alive(campaign).any(func(h): return AHPerks.total(AHPerks.of(h), "SearchScrap") > 0):
+		adjust(campaign, "scrap", 1)
 	expedition.hope = clampi(expedition.hope + int(outcome.get("HopeDelta", 0)), 0, 100)
 	var team := _team_alive(campaign)
 	var hero_name := ""
