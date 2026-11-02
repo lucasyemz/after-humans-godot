@@ -49,3 +49,23 @@ pedida ao design na #315, como a issue manda quando falta arte.
 - `tests/test_station_outside.gd`: a hora em cada fase, as quatro vistas e feixes diferentes, a troca acompanhando a
   volta, a cena da noite (pelo caminho do HUD) e o amanhecer, a abertura na câmera da plataforma, a vista dentro da
   moldura e fora do salão, e o save intacto.
+
+## As rodadas da QA
+
+**Rodada 1: REPROVADO**
+- **[alta]** O teste do save falhava na suíte inteira: o tempo jogado de um teste anterior entrava no save na chegada.
+  Agora o retrato é tirado depois de a Estação abrir, sem o tempo jogado.
+- **[média]** Na câmera da plataforma, a vista passava do contorno da Estação, com um degrau embaixo. Agora ela fica
+  exatamente no vão, até o alto da abóbada como a câmera o vê, com peitoril, lintel e montantes do mesmo tamanho.
+- **[média]** A luz que entra não aparecia no Compatibility (o renderer da web). Agora um feixe aditivo desce do vão
+  sobre o vagão e a via, com a cor da hora.
+- **[média]** A volta entregue na própria Estação abria de dia e passava para o fim de tarde. Agora já abre na hora.
+- **[baixa]** O céu do dia estourava no glow; "fim da linha" chamava a ponta errada; faltava o `.uid` do teste; o
+  teste não passava pela noite do HUD. Corrigidos.
+
+**Rodada 2: APROVADO**
+- A suíte inteira passa (116 de 116); o teste do save passa com 0, 3,5 e 120 s de tempo jogado sobrando.
+- 23 capturas no Compatibility sem nada vazando do contorno; o feixe clareia o vagão sem mudar os cômodos de baixo.
+- Observações baixas, para a arte da #315: a ponta arredondada da abóbada aparece ao lado do montante direito, e a
+  linha da água do panorama fica na altura do pé da abóbada. O feixe do dia é forte para "de leve": vale o Lucas olhar.
+- Depois da rodada 2, a branch recebeu a `main` com o #310 (sem conflito): a suíte inteira passa, 117 de 117.
