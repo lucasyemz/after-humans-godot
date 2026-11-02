@@ -158,7 +158,11 @@ static func _hero_passives(hero, perks: Array, class_id: String) -> Array:
 	for perk_id in perks:
 		var perk = GameData.row("perks", perk_id)
 		if perk != null:
-			out.append([TranslationServer.translate(String(perk.DisplayName)), TranslationServer.translate(String(perk.get("Description", ""))), bool(perk.get("bPositive", true))])
+			# A fixada (#264) diz que não se perde.
+			var title := TranslationServer.translate(String(perk.DisplayName))
+			if hero != null and AHPerks.is_fixed(hero, String(perk_id)):
+				title = TranslationServer.translate("%s · fixada") % title
+			out.append([title, TranslationServer.translate(String(perk.get("Description", ""))), bool(perk.get("bPositive", true))])
 	if hero != null:
 		var relic = GameData.row("relics", String(hero.get("relic_id", "")))
 		if relic != null:

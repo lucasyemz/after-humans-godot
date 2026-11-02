@@ -41,6 +41,9 @@ var _upgrade := ""
 var _camp_pick := ""
 var _first_focus: Control
 var _trait_ids := {}
+## Os ícones provisórios das peculiaridades novas (#264), do próprio kit, até a arte delas chegar do design.
+const PROVISIONAL_TRAIT_ICONS := {"steady": "trait_agile", "stumbling": "trait_sluggish", "light-sleeper": "sleep",
+	"heavy-sleeper": "night", "mender": "intent-heal", "shaky": "intent-heal", "scavenger": "resource_scrap", "short-fuse": "trait_anxious"}
 ## O vão do último enquadramento (_frame_stage).
 var _framing := Vector2(-1, -1)
 
@@ -1079,12 +1082,12 @@ func _traits(hero: Dictionary, column: VBoxContainer) -> void:
 			if perk == null or bool(perk.get("bPositive", false)) != positive:
 				continue
 			count += 1
-			side.add_child(_trait(perk, color))
+			side.add_child(_trait(perk, color, AHPerks.is_fixed(hero, String(perk_id))))
 		if count == 0:
 			side.add_child(AHKit.label(tr("Nenhum"), "text", AHKit.MUTED))
 
 
-func _trait(perk: Dictionary, color: Color) -> Control:
+func _trait(perk: Dictionary, color: Color, kept: bool = false) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	row.tooltip_text = tr(String(perk.get("Condition", "")))
@@ -1094,7 +1097,7 @@ func _trait(perk: Dictionary, color: Color) -> Control:
 	tile.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var icon := TextureRect.new()
-	icon.texture = AHKit.icon(String(_trait_ids.get(String(perk.Name), "")))
+	icon.texture = AHKit.icon(String(_trait_ids.get(String(perk.Name), PROVISIONAL_TRAIT_ICONS.get(String(perk.Name), ""))))
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1108,6 +1111,11 @@ func _trait(perk: Dictionary, color: Color) -> Control:
 	name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name.custom_minimum_size = Vector2(110, 0)
 	text.add_child(name)
+	# A fixada (#264) não se perde: o selo logo abaixo do nome.
+	if kept:
+		var seal := AHKit.label(tr("Fixada"), "small", AHKit.AMBER, true)
+		seal.name = "Fixed"
+		text.add_child(seal)
 	var effect := AHKit.label(tr(String(perk.Description)), "small", AHKit.TEXT)
 	effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	effect.custom_minimum_size = Vector2(110, 0)

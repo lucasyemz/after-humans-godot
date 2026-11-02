@@ -1865,3 +1865,13 @@ character_room.gd: CampUpgrade_%s
 character_room.gd: Treatment
 character_room.gd: Control
 station_services.gd: treated
+character_room.gd: steady
+character_room.gd: stumbling
+character_room.gd: night
+character_room.gd: mender
+character_room.gd: shaky
+character_room.gd: scavenger
+character_room.gd: Fixed
+perk_rules.gd: perks
+perk_rules.gd: Incompatible
+perk_rules.gd: roster
