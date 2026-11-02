@@ -192,6 +192,11 @@ static func migrate(campaign: Dictionary) -> void:
 	AHStationServices.migrate(campaign)
 	AHGear.migrate(campaign)
 	AHCampSkills.migrate(campaign)
+	# Os dois slots de relíquia (#263): o relic_id antigo vira o slot 0; o estoque não muda.
+	if typeof(campaign.inventory.get("relics")) != TYPE_ARRAY:
+		campaign.inventory.relics = []
+	for entry in campaign.get("roster", []):
+		AHRelics.migrate_hero(campaign, entry)
 	# As skins (#138): o herói de antes veste a padrão; a campanha ganha a lista das liberadas, com as do começo.
 	for entry in campaign.get("roster", []):
 		if String(entry.get("skin_id", "")) == "":
@@ -1492,29 +1497,15 @@ static func research(campaign: Dictionary, research_id: String) -> String:
 static func craft_relic(campaign: Dictionary, relic_id: String) -> String:
 	if GameData.row("relics", relic_id) == null:
 		return TranslationServer.translate("Relíquia desconhecida.")
+	# A Forja só fabrica as comuns de origem "forge" (#263); as outras vêm da carga, da escavação ou da história.
+	if not AHRelics.can_forge(relic_id):
+		return TranslationServer.translate("A Forja não fabrica essa relíquia.")
 	if not room_available(campaign, FORGE):
 		return TranslationServer.translate("Recupere a Forja para fabricar relíquias.")
 	var cost := relic_cost(campaign)
 	if not consume(campaign, "scrap", cost):
 		return TranslationServer.translate("Sucata insuficiente (custa %d sucatas).") % cost
 	campaign.inventory.relics.append(relic_id)
-	return ""
-
-
-## Troca a relíquia do animal ("" tira); a antiga volta ao estoque.
-static func equip_relic(campaign: Dictionary, hero_id: String, relic_id: String) -> String:
-	var entry = hero(campaign, hero_id)
-	if entry == null or not entry.alive:
-		return TranslationServer.translate("Só animais vivos usam relíquias.")
-	if entry.relic_id == relic_id:
-		return TranslationServer.translate("Já está equipada.")
-	if relic_id != "" and not campaign.inventory.relics.has(relic_id):
-		return TranslationServer.translate("Essa relíquia não está no estoque.")
-	if entry.relic_id != "":
-		campaign.inventory.relics.append(entry.relic_id)
-	if relic_id != "":
-		campaign.inventory.relics.erase(relic_id)
-	entry.relic_id = relic_id
 	return ""
 
 
@@ -2181,12 +2172,13 @@ static func choose_doors(focus_id: String, doors: Array, door_shops: Array) -> v
 
 
 ## Marca o ponto-objetivo na primeira casa aberta da loja do foco (sempre um achado fixo, nunca o ponto com escolha).
-static func mark_objective(focus_id: String, route: Dictionary) -> void:
+## avoid: os trechos que o desvio da fase pode pular (#289): o objetivo nunca cai numa casa deles.
+static func mark_objective(focus_id: String, route: Dictionary, avoid: Array = []) -> void:
 	var entry := focus_def(focus_id)
 	if entry.is_empty():
 		return
 	for site in route.sites:
-		if site.shop != entry.shop or site.locked:
+		if site.shop != entry.shop or site.locked or avoid.has(int(site.step)):
 			continue
 		while site.spots.size() <= entry.spot:
 			site.spots.append({"choice": false, "searched": false})

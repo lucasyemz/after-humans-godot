@@ -2656,19 +2656,27 @@ func _train_hero(hero_id: String, upgrade_id: String) -> void:
 	_act(error, done, "res://audio/ui/forge_confirm.ogg")
 
 
-func _cycle_relic(hero_id: String) -> void:
+## O botão Trocar de um slot de relíquia (#263): passa para a próxima opção do estoque que esse slot aceita (e o vazio).
+## Sem outra opção aceita, o aviso diz por que a do estoque não serve ("Já equipada no outro slot.", "Só para Proteção.").
+func _cycle_relic(hero_id: String, slot: int) -> void:
 	var c: Dictionary = Campaign.state
 	var entry = S.hero(c, hero_id)
-	var options: Array = [""]
-	for relic_id in c.inventory.relics:
-		if not options.has(relic_id):
-			options.append(relic_id)
-	if entry.relic_id != "" and not options.has(entry.relic_id):
-		options.append(entry.relic_id)
-	var index := options.find(entry.relic_id)
-	var next: String = options[(index + 1) % options.size()]
+	if entry == null:
+		return
+	var found := AHRelics.options(c, entry, slot)
+	var options: Array = found[0]
+	var blocked: Dictionary = found[1]
+	var current: String = AHRelics.slots(entry)[slot]
+	var next: String = options[(options.find(current) + 1) % options.size()]
+	if next == current:
+		# O motivo de uma que existe na tabela; um id desconhecido (save antigo) só se não houver outra.
+		var known: Array = blocked.keys().filter(func(id): return GameData.row("relics", id) != null)
+		var relic_id: String = known[0] if not known.is_empty() else ""
+		var blocked_row = GameData.row("relics", relic_id)
+		_act(tr("%s: %s") % [tr(blocked_row.DisplayName), blocked[relic_id]] if blocked_row != null else tr("Nenhuma outra relíquia no estoque."))
+		return
 	var relic = GameData.row("relics", next)
-	_act(S.equip_relic(c, hero_id, next), tr("%s: %s.") % [entry.display_name, tr(relic.DisplayName) if relic else tr("sem relíquia")])
+	_act(AHRelics.equip(c, hero_id, slot, next), tr("%s: %s.") % [entry.display_name, tr(relic.DisplayName) if relic else tr("sem relíquia")])
 
 
 # ---------------------------------------------------------------- Preparação
@@ -2940,7 +2948,8 @@ func _forge(c: Dictionary, level: int) -> void:
 	var cost := S.relic_cost(c)
 	var scrap := S.quantity(c, "scrap")
 	_section(tr("Relíquias") if level >= 1 else tr("Depois de recuperar"))
-	for relic_id in GameData.table("relics").keys():
+	# Só as que a Forja fabrica (#263): as comuns de origem "forge"; as outras vêm da carga, da escavação ou da história.
+	for relic_id in AHRelics.forgeable():
 		var relic: Dictionary = GameData.row("relics", relic_id)
 		var id: String = relic_id
 		# O efeito: a primeira frase da descrição ("+3 de Vida Máxima."); o resto (a história da peça) fica no Alojamento.
@@ -3039,6 +3048,8 @@ static func _relic_effect(relic: Dictionary) -> String:
 		return TranslationServer.translate("+%d Velocidade") % int(relic.SpeedBonus)
 	if int(relic.get("EventInstinctReduction", 0)) != 0:
 		return TranslationServer.translate("−%d Instinto de eventos") % int(relic.EventInstinctReduction)
+	if float(relic.get("VirtueBonus", 0.0)) != 0.0:
+		return TranslationServer.translate("+%d pp de Superação") % roundi(float(relic.VirtueBonus) * 100.0)
 	return ""
 
 

@@ -362,8 +362,8 @@ static func _reward(campaign: Dictionary, row: Dictionary, rng: RandomNumberGene
 	if amount > 0:
 		S.adjust(campaign, S.SUPPLIES if kind == "supplies" else kind, amount)
 	if not half and int(row.get("RelicChance", 0)) > 0 and rng.randi_range(1, 14) == 1:
-		var relics: Array = GameData.table("relics").keys()
-		relics.sort()
+		# As da carga (#263), sem as de fase: comuns ou incomuns, nunca rara, pessoal ou lembrança.
+		var relics: Array = AHRelics.pool("cargo")
 		if not relics.is_empty():
 			reward.relic_id = relics[rng.randi_range(0, relics.size() - 1)]
 			campaign.inventory.relics.append(reward.relic_id)
