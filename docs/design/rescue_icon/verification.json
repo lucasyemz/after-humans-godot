@@ -1,0 +1,213 @@
+{
+  "base": "e2f0b58a",
+  "source_tag": null,
+  "assets": 1,
+  "qa_verdict": "APROVADO",
+  "qa_rounds": 1,
+  "source_pngs": 3,
+  "white_tintable": true,
+  "single_core_alpha_component": true,
+  "converter_byte_equality": true,
+  "proof_cases": [
+    {
+      "view": "route",
+      "variant": "normal",
+      "rect": [
+        1092.0,
+        64.0,
+        25.760002,
+        25.760002
+      ],
+      "pixels_changed": 471,
+      "outside_glyph_changed": 0
+    },
+    {
+      "view": "route",
+      "variant": "larger",
+      "rect": [
+        1092.0,
+        64.0,
+        25.760002,
+        25.760002
+      ],
+      "pixels_changed": 471,
+      "outside_glyph_changed": 0
+    },
+    {
+      "view": "route",
+      "variant": "colorblind",
+      "rect": [
+        1092.0,
+        64.0,
+        25.760002,
+        25.760002
+      ],
+      "pixels_changed": 471,
+      "outside_glyph_changed": 0
+    },
+    {
+      "view": "map",
+      "variant": "normal",
+      "rect": [
+        584.5,
+        671.0,
+        30.0,
+        30.0
+      ],
+      "pixels_changed": 527,
+      "outside_glyph_changed": 0
+    },
+    {
+      "view": "map",
+      "variant": "larger",
+      "rect": [
+        565.5,
+        671.0,
+        30.0,
+        30.0
+      ],
+      "pixels_changed": 525,
+      "outside_glyph_changed": 0
+    },
+    {
+      "view": "map",
+      "variant": "colorblind",
+      "rect": [
+        584.5,
+        671.0,
+        30.0,
+        30.0
+      ],
+      "pixels_changed": 532,
+      "outside_glyph_changed": 0
+    }
+  ],
+  "review_images": [
+    {
+      "file": "before_after_map_colorblind.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "sha256": "c149d506cbadfc5a4bbca4e0770f60e6b4b0200eccbfdeec7e5d68d81a22ede2",
+      "bytes": 1263176
+    },
+    {
+      "file": "before_after_map_larger.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "sha256": "84832a46b95642fe8a8c68081ada018caa016ccd633cb2e2480de9ac73d6c4a7",
+      "bytes": 1279514
+    },
+    {
+      "file": "before_after_map_normal.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "sha256": "796842b4663601705ac6f30929a20069f04a6948b6562fe97a425dd2d7ec15b7",
+      "bytes": 1262590
+    },
+    {
+      "file": "before_after_route_colorblind.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "sha256": "a3fbc1b569333b5168cf07dd65400e6e096804a427ac4c69c01998df3d13f6e5",
+      "bytes": 1307798
+    },
+    {
+      "file": "before_after_route_larger.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "sha256": "00222c8733cfb0d7222de39de939efdf2504554b094714ba2b8c906caf4851f8",
+      "bytes": 1307518
+    },
+    {
+      "file": "before_after_route_normal.webp",
+      "size": [
+        3840,
+        1140
+      ],
+      "sha256": "facd5f78edac276301c86a875ef252a1aba951a31e809b4dc34b358bd94338c8",
+      "bytes": 1306336
+    },
+    {
+      "file": "board.webp",
+      "size": [
+        1600,
+        1000
+      ],
+      "sha256": "bd7e68446114e6528b6ee78a9c136261ba25771544e42d1c77ddd3c101b77e38",
+      "bytes": 102878
+    },
+    {
+      "file": "board_40.webp",
+      "size": [
+        640,
+        400
+      ],
+      "sha256": "8f2bf2947c717ba59c48534b8c9c9ac0a0a17ab0a03c8250f831985f044c4a6f",
+      "bytes": 31110
+    },
+    {
+      "file": "board_gray.webp",
+      "size": [
+        1600,
+        1000
+      ],
+      "sha256": "c4f01f4330091a8b89131f29bfac5d87b73d2b4c6ca7317ad9a9405fe43485fc",
+      "bytes": 80028
+    },
+    {
+      "file": "map_40.webp",
+      "size": [
+        768,
+        432
+      ],
+      "sha256": "67276de43642dc9a57e3212c2c91c174ce215f1456be4dbf36cabea3984a2544",
+      "bytes": 109028
+    },
+    {
+      "file": "map_gray.webp",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "64362f91964b7b3f0dd0334d28897be9d2bc1f0f7c64c38681e2a237077bf0f4",
+      "bytes": 519348
+    },
+    {
+      "file": "route_40.webp",
+      "size": [
+        768,
+        432
+      ],
+      "sha256": "ac0bcf6f56f5d838d9ca37a0dc1b1dd03086fa949649c4bd73b6688a68a0ff74",
+      "bytes": 122858
+    },
+    {
+      "file": "route_gray.webp",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "702a4b20f4ac93b06971be154541dc21d08c5538982f21c96f1bbe8ba0fe72dc",
+      "bytes": 518028
+    }
+  ],
+  "tests": {
+    "passed": 115,
+    "total": 115,
+    "elapsed_ms": 809604,
+    "combat_parity": [
+      48,
+      48
+    ]
+  }
+}
