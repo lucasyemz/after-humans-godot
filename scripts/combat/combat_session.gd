@@ -61,7 +61,8 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 		}, index + 1, session.data))
 		var unit: Unit = players[-1]
 		unit.tokens.vuln = mini(AHCombatEngine.TOKEN_CAP, marks.vuln)
-		unit.tokens.block = mini(AHCombatEngine.TOKEN_CAP, marks.block + int(own.get("block", 0)))
+		# O Bloqueio do início da luta soma: o da relíquia (#263, já na unidade), o do efeito de fase e o do acampamento.
+		unit.tokens.block = mini(AHCombatEngine.TOKEN_CAP, unit.tokens.block + marks.block + int(own.get("block", 0)))
 		unit.tokens.dodge = mini(AHCombatEngine.TOKEN_CAP, unit.tokens.dodge + int(own.get("dodge", 0)))
 	var enemies: Array = []
 	var next_rank := 1
@@ -131,7 +132,7 @@ func ability_options(actor_id: String) -> Array:
 		if ability == null:
 			continue
 		var cooldown: int = actor.cooldowns.get(ability_id, 0)
-		var uses: int = actor.remaining_uses.get(ability_id, ability.UsesMax) if ability.UsesMax > 0 else -1
+		var uses: int = actor.remaining_uses.get(ability_id, engine.uses_max(actor, ability_id)) if ability.UsesMax > 0 else -1
 		var targets := engine.valid_targets(actor_id, ability_id)
 		var reason := ""
 		if actor.stun_turns > 0:

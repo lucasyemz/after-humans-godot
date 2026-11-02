@@ -1360,6 +1360,8 @@ func _change_icon(change: Dictionary) -> String:
 	match String(change.kind):
 		"tool":
 			return AHInventoryPanel.TOOL_ICONS.get(String(change.get("id", "")), "tool-generic")
+		"relic":
+			return AHInventoryPanel.RELIC_ICONS.get(String(change.get("id", "")), "relic-generic")
 		"effect":
 			return EFFECT_ICONS.get(String(change.get("id", "")), "intent-unknown")
 	return CHANGE_ICONS.get(String(change.kind), "intent-unknown")
@@ -1372,6 +1374,9 @@ func _change_text(kind: String, amount: int, id: String = "") -> String:
 		"tool":
 			var tool := tr(AHInventoryPanel.TOOL_NAMES.get(id, id.capitalize()))
 			return (tr("+ %s") if amount > 0 else tr("- %s")) % tool
+		"relic":
+			var relic = GameData.row("relics", id)
+			return (tr("+ %s") if amount > 0 else tr("- %s")) % (tr(String(relic.DisplayName)) if relic != null else id)
 		"effect":
 			return tr(String(AHJourneyRules.PHASE_EFFECTS.get(id, {}).get("text", id)))
 		"life": return tr("%+d de vida") % amount
@@ -1446,6 +1451,9 @@ func show_event(campaign: Dictionary) -> void:
 			# A escolha de quem já liberou uma classe (trocar com Risco) só aparece quando dá para escolher: desligada, ela
 			# prometia algo que o evento de história, uma vez por campanha, não deixaria acontecer (#64).
 			if not available and choice.get("Requirement", "") == "ClassUnlocked":
+				continue
+			# A escolha que dá a Lembrança (#263) some quando ela já está com a equipe: ela é única.
+			if not available and String(choice.get("UnavailableIfRelic", "")) != "" and AHRelics.owned(campaign, String(choice.UnavailableIfRelic)):
 				continue
 			var button := _choice_row(campaign, choice, available)
 			button.pressed.connect(func(): event_choice.emit(choice.Id))

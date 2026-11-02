@@ -615,6 +615,12 @@ func _details_band() -> PanelContainer:
 		arrived.append(tr("%s recebeu %s: %s") % [who.name, tr(who.request_item), tr(who.request_reward)])
 	if arrived.is_empty():
 		arrived.append(tr("Nada chegou desta vez."))
+	# A derrota total (#263): as relíquias achadas na expedição ficaram para trás (a Lembrança nunca fica).
+	var lost_relics: Array = report.get("lost_relics", []).map(func(id):
+		var relic = GameData.row("relics", String(id))
+		return tr(String(relic.DisplayName)) if relic != null else String(id))
+	if not lost_relics.is_empty():
+		arrived.append(tr("Ficou para trás: %s") % ", ".join(lost_relics))
 	columns.add_child(_detail_column(tr("O que chegou%s") % ("" if percent >= 100 else tr(" (%d%% do achado)") % percent), arrived))
 	var cycle: Dictionary = report.get("cycle", {})
 	# A escavação (#274): a linha inteira do chip, com a Estação do ciclo (uma coluna a

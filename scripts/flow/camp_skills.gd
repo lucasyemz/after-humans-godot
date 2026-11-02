@@ -336,8 +336,7 @@ static func _changes(campaign: Dictionary, user: Dictionary, who: Array, effects
 	if effects.has("bandage"):
 		out.append(TranslationServer.translate("+%d curativo") % int(effects.bandage))
 	if effects.has("ampoule") and AHExplorationCare.iris(campaign) == user:
-		var row = GameData.combat.abilities.get(AHExplorationCare.AMPOULE)
-		if row != null and AHExplorationCare.ampoule_charges(campaign) < int(row.UsesMax):
+		if AHExplorationCare.ampoule_charges(campaign) < AHExplorationCare.ampoule_max(user):
 			out.append(TranslationServer.translate("+%d carga da Ampola") % int(effects.ampoule))
 	for kind in ["block", "dodge"]:
 		if effects.has(kind) and who.any(func(h): return _next_of(next, h.id, kind) < AHCombatEngine.TOKEN_CAP):
@@ -406,10 +405,9 @@ static func use(campaign: Dictionary, user_id: String, skill_id: String, target_
 	if effects.has("bandage"):
 		J.adjust(campaign, "bandages", int(effects.bandage))
 	if effects.has("ampoule"):
-		var row_ampoule = GameData.combat.abilities.get(AHExplorationCare.AMPOULE)
 		if typeof(user.get("expedition_uses")) != TYPE_DICTIONARY:
 			user.expedition_uses = {}
-		user.expedition_uses[AHExplorationCare.AMPOULE] = mini(int(row_ampoule.UsesMax), AHExplorationCare.ampoule_charges(campaign) + int(effects.ampoule))
+		user.expedition_uses[AHExplorationCare.AMPOULE] = mini(AHExplorationCare.ampoule_max(user), AHExplorationCare.ampoule_charges(campaign) + int(effects.ampoule))
 	if bool(effects.get("mark_front", false)):
 		next.mark_front = true
 	if bool(effects.get("opening", false)):

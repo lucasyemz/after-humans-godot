@@ -57,6 +57,13 @@ class Unit:
 	var damage_bonus := 0
 	## Pontos da chance de Superação vindos das relíquias (VirtueBonus, #263): 0.05 é +5 pp.
 	var virtue_bonus := 0.0
+	## Os gatilhos das relíquias (#263, parte 2): a Velocidade a mais na iniciativa da primeira rodada, o Instinto a mais
+	## quando um aliado cai, os pontos percentuais a mais no dano direto contra máquinas e o "+N" de cada habilidade
+	## ({ability_id: {uses, damage, block, remove_block, mark_turns, self_instinct}}). Sem relíquia, tudo zero.
+	var first_turn_speed := 0
+	var ally_down_instinct := 0
+	var machine_damage_bonus := 0
+	var relic_mods := {}
 	var instinct := 0
 	var perks: Array = []
 	var crisis_outcome := Crisis.NONE

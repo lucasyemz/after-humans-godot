@@ -1804,6 +1804,12 @@ func _popup_loot(box: VBoxContainer, result: String) -> void:
 	else:
 		amounts = AHJourneyRules.combat_loot(campaign, result, arena != null and arena.boss_fight)
 	var shown: Array = ["seeds", "scrap", "fragments"].filter(func(k): return int(amounts.get(k, 0)) > 0)
+	# A rara do guardião (#263), na primeira vitória sobre ele: o nome, no tom do achado.
+	if not lost and String(amounts.get("relic", "")) != "":
+		var trophy := AHKit.label(AHFightRewards.box_text({"kind": "relic", "relic_id": String(amounts.relic)}), "row", AHKit.AMBER, true)
+		trophy.name = "Trophy"
+		trophy.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(trophy)
 	# A frase do que se perdeu só quando havia o que perder (a derrota diz sempre como a equipe caiu).
 	if lost and (not shown.is_empty() or result == "defeat"):
 		var note := AHKit.label(tr("A equipe recuou pelas sombras e largou o que carregava.") if result == "escaped" else tr("Todos caíram nas ruínas. O achado ficou para trás."), "text", TEXT)

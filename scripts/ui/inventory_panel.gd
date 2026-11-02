@@ -166,7 +166,8 @@ func _make_slots() -> Array:
 	for relic_id in relics:
 		var row = GameData.row("relics", relic_id)
 		var name: String = tr(row.get("DisplayName", relic_id)) if row else relic_id
-		var text: String = (tr(row.get("Description", "")) + " ") if row else ""
+		# O que faz e o texto (#263: o Effect do colar antes da descrição).
+		var text: String = (AHRelics.text(relic_id) + " ") if row else ""
 		out.append({"id": relic_id, "name": name, "icon": RELIC_ICONS.get(relic_id, "relic-generic"), "count": str(relics[relic_id]),
 			"group": 2, "owned": true, "text": text + tr("Equipe no Alojamento.")})
 	return out

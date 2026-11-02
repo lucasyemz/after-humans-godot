@@ -56,5 +56,138 @@
     "Phase": "fase_2",
     "MaxHpBonus": 4,
     "SpeedBonus": -1
+  },
+  {
+    "Name": "plaqueta_patrulha",
+    "DisplayName": "Plaqueta de Patrulha",
+    "Description": "\"Fique Atrás de Mim\" também tira 5 de Instinto do próprio cão. Uma plaqueta de turno de vigia, com as rondas riscadas.",
+    "Rarity": "uncommon",
+    "Only": "role:cao",
+    "Sources": ["dig", "merchant"],
+    "Ability": "cao_fique_atras_de_mim",
+    "AbilitySelfInstinct": -5
+  },
+  {
+    "Name": "gancho_telhado",
+    "DisplayName": "Gancho de Telhado",
+    "Description": "1 Esquiva no início da luta e -2 de Vida Máxima. Um gancho de escada de incêndio, gasto de tanto telhado.",
+    "Rarity": "uncommon",
+    "Only": "role:gato",
+    "Sources": ["cargo"],
+    "StartDodge": 1,
+    "MaxHpBonus": -2
+  },
+  {
+    "Name": "rolha_cisterna",
+    "DisplayName": "Rolha de Cisterna",
+    "Description": "+1 carga da Ampola de Reparo Vivo e -1 de Velocidade. Uma rolha de cisterna com o selo verde ainda inteiro.",
+    "Rarity": "uncommon",
+    "Only": "role:sapo",
+    "Sources": ["cargo"],
+    "Ability": "sapo_ampola_reparo_vivo",
+    "AbilityUses": 1,
+    "SpeedBonus": -1
+  },
+  {
+    "Name": "mira_torre",
+    "DisplayName": "Mira de Torre",
+    "Description": "\"Olho nas Ruínas\" marca por mais 1 turno. O retículo de uma antena, preso com fio.",
+    "Rarity": "uncommon",
+    "Only": "role:coruja",
+    "Sources": ["cargo"],
+    "Ability": "coruja_olho_nas_ruinas",
+    "AbilityMarkTurns": 1
+  },
+  {
+    "Name": "pilha_remendada",
+    "DisplayName": "Pilha Remendada",
+    "Description": "+1 de dano na \"Carga de Eletrólito\" e -2 de Vida Máxima. Uma bateria remendada com fita isolante.",
+    "Rarity": "uncommon",
+    "Only": "role:rato",
+    "Sources": ["dig"],
+    "Ability": "rato_frasco",
+    "AbilityDamage": 1,
+    "MaxHpBonus": -2
+  },
+  {
+    "Name": "placa_laranja",
+    "DisplayName": "Placa Laranja Extra",
+    "Description": "1 Bloqueio no início da luta e -1 de Velocidade. Uma placa laranja de resgate, rebitada por cima da armadura.",
+    "Rarity": "uncommon",
+    "Only": "role:tatu",
+    "Sources": ["cargo"],
+    "StartBlock": 1,
+    "SpeedBonus": -1
+  },
+  {
+    "Name": "luva_sucata",
+    "DisplayName": "Luva de Sucata",
+    "Description": "\"Punho de Sucata\" remove um Bloqueio a mais. Uma luva com nós de cobre, feita para o golpe do Bento.",
+    "Rarity": "personal",
+    "Only": "hero:hero_cao_bento",
+    "Sources": ["solo"],
+    "Ability": "cao_punho_sucata",
+    "AbilityRemoveBlock": 1
+  },
+  {
+    "Name": "fivela_mochila",
+    "DisplayName": "Fivela da Mochila",
+    "Description": "+1 de Velocidade e -5 pontos percentuais na chance de Superação. A fivela gasta da mochila do Nick.",
+    "Rarity": "personal",
+    "Only": "hero:hero_gato_nick",
+    "Sources": ["solo"],
+    "SpeedBonus": 1,
+    "VirtueBonus": -0.05
+  },
+  {
+    "Name": "caderno_medidas",
+    "DisplayName": "Caderno de Medidas",
+    "Description": "+1 uso do \"Antídoto de Campo\". Um caderno úmido, com uma escala de pH na contracapa.",
+    "Rarity": "personal",
+    "Only": "hero:hero_sapo_iris",
+    "Sources": ["solo"],
+    "Ability": "sapo_antidoto_campo",
+    "AbilityUses": 1
+  },
+  {
+    "Name": "luneta_torre",
+    "DisplayName": "Luneta da Torre",
+    "Description": "+1 de Velocidade no primeiro turno da luta. Uma luneta curta das torres de observação.",
+    "Rarity": "personal",
+    "Only": "hero:hero_coruja_vespera",
+    "Sources": ["solo"],
+    "FirstTurnSpeed": 1
+  },
+  {
+    "Name": "cartao_eclusa",
+    "DisplayName": "Cartão da Eclusa",
+    "Description": "+25% de dano em máquinas e -1 de Velocidade. Um cartão rachado da eclusa central, com uma luz fraca que ainda pisca \"autenticação válida\".",
+    "Rarity": "rare",
+    "Only": "",
+    "Sources": ["guardian"],
+    "Guardian": "porteiro",
+    "MachineDamageBonus": 25,
+    "SpeedBonus": -1
+  },
+  {
+    "Name": "coleira_nome",
+    "DisplayName": "Coleira com Nome",
+    "Description": "+10 pontos percentuais na chance de Superação. Uma coleira numerada com um nome riscado por cima do número.",
+    "Rarity": "keepsake",
+    "Only": "",
+    "Sources": ["story"],
+    "VirtueBonus": 0.1
+  },
+  {
+    "Name": "colar_circuito",
+    "DisplayName": "Colar de Circuito",
+    "Effect": "\"Fique Atrás de Mim\" dá +1 Bloqueio, e Bento ganha +3 de Instinto quando um aliado cai.",
+    "Description": "Um pingente feito à mão com uma peça de terminal dos Antigos. Bento guarda no bolso e não diz de quem é.",
+    "Rarity": "keepsake",
+    "Only": "hero:hero_cao_bento",
+    "Sources": ["story"],
+    "Ability": "cao_fique_atras_de_mim",
+    "AbilityBlock": 1,
+    "AllyDownInstinct": 3
   }
 ]

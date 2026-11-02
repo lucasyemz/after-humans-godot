@@ -46,6 +46,14 @@ static func _carries_ampoule(hero: Dictionary) -> bool:
 	return AHHeroSkills.equipped(hero).has(AMPOULE)
 
 
+## As cargas cheias da ampola de quem a leva: as da tabela e as das relíquias (a Rolha de Cisterna, #263).
+static func ampoule_max(healer) -> int:
+	var row = _ampoule_row()
+	if row == null:
+		return 0
+	return int(row.UsesMax) + (AHRelics.extra_uses(healer, AMPOULE) if healer != null else 0)
+
+
 ## Cargas da ampola que a Íris ainda tem nesta expedição (sem reservar nada).
 static func ampoule_charges(campaign: Dictionary) -> int:
 	var healer = iris(campaign)
@@ -53,7 +61,8 @@ static func ampoule_charges(campaign: Dictionary) -> int:
 	if healer == null or row == null:
 		return 0
 	var uses: Dictionary = healer.get("expedition_uses", {})
-	return clampi(int(uses[AMPOULE]), 0, row.UsesMax) if uses.has(AMPOULE) else row.UsesMax
+	var full := ampoule_max(healer)
+	return clampi(int(uses[AMPOULE]), 0, full) if uses.has(AMPOULE) else full
 
 
 static func _meal_heal(kind: String, max_hp: int, missing: int) -> int:
@@ -191,5 +200,5 @@ static func restore_iris_after_victory(campaign: Dictionary, session: AHCombatSe
 	for unit in session.state.player_team:
 		var hero = _hero(campaign, unit.hero_id)
 		if hero != null and hero.alive and hero.hp > 0 and hero.class_id == "sapo" and _carries_ampoule(hero):
-			hero.expedition_uses[AMPOULE] = row.UsesMax
-			unit.remaining_uses[AMPOULE] = row.UsesMax
+			hero.expedition_uses[AMPOULE] = ampoule_max(hero)
+			unit.remaining_uses[AMPOULE] = ampoule_max(hero)

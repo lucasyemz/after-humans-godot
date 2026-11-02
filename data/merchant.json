@@ -34,5 +34,14 @@
     "GetAmount": 1,
     "Limit": 3,
     "Description": "Proposta (#182, parte 2): 1 sucata por 4 sementes, até 3 por visita."
+  },
+  {
+    "Name": "buy_relic",
+    "Give": "seeds",
+    "GiveAmount": 20,
+    "Get": "relic",
+    "GetAmount": 1,
+    "Limit": 1,
+    "Description": "Proposta (#263, parte 2): a Incomum que o Mercador traz na visita (uma das de origem merchant em data/relics.json, sorteada pela expedição da visita), 1 por visita, por 20 sementes. Por analogia: a Forja fabrica uma Comum por 3 sucatas (12 sementes na compra de sucata dele) e 1 fragmento custa 12 sementes; a Incomum, com efeito próprio, fica entre uma Comum e dois fragmentos."
   }
 ]

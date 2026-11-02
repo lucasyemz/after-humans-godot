@@ -87,4 +87,18 @@ func validate() -> PackedStringArray:
 		var phase := String(relic.get("Phase", ""))
 		if phase != "" and not table("recovered_cargo").has(phase):
 			found.append("relíquia %s: fase %s sem carga recuperada" % [relic_id, phase])
+		# A parte 2: o guardião que dá a rara e a habilidade do "+N" existem.
+		var guardian := String(relic.get("Guardian", ""))
+		if guardian != "" and not table("enemies").has(guardian):
+			found.append("relíquia %s: guardião %s não existe" % [relic_id, guardian])
+		var ability := String(relic.get("Ability", ""))
+		if ability != "" and not table("abilities").has(ability):
+			found.append("relíquia %s: habilidade %s não existe" % [relic_id, ability])
+	# A relíquia que um evento dá (GrantRelic, #263) e a que some a escolha (UnavailableIfRelic) existem.
+	for event_id in table("events"):
+		for choice in table("events")[event_id].get("Choices", []):
+			for relic_id in [String(choice.get("UnavailableIfRelic", "")), String(choice.get("Success", {}).get("GrantRelic", "")),
+					String(choice.get("Failure", {}).get("GrantRelic", ""))]:
+				if relic_id != "" and not table("relics").has(relic_id):
+					found.append("evento %s: relíquia %s não existe" % [event_id, relic_id])
 	return found

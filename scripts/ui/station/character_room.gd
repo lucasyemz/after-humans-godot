@@ -1028,9 +1028,11 @@ func _relic(c: Dictionary, hero: Dictionary, column: VBoxContainer) -> void:
 		text.add_theme_constant_override("separation", 0)
 		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(text)
-		var title := tr("Relíquia %d: %s") % [slot + 1, tr(String(relic.DisplayName)) if relic != null else tr("Sem relíquia")]
+		# O nome com a raridade (#263, parte 2): "Luva de Sucata · Pessoal".
+		var shown_name := tr("%s · %s") % [tr(String(relic.DisplayName)), AHRelics.rarity_name(relic_id)] if relic != null else tr("Sem relíquia")
+		var title := tr("Relíquia %d: %s") % [slot + 1, shown_name]
 		text.add_child(AHKit.label(title, "row", AHKit.TEXT))
-		var hint := AHKit.label(tr(String(relic.get("Description", ""))) if relic != null else tr("Equipe uma relíquia ao preparar a expedição."), "small", AHKit.MUTED)
+		var hint := AHKit.label(AHRelics.text(relic_id) if relic != null else tr("Equipe uma relíquia ao preparar a expedição."), "small", AHKit.MUTED)
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		hint.custom_minimum_size = Vector2(260, 0)
 		text.add_child(hint)

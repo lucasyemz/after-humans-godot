@@ -321,6 +321,8 @@ static func _resolve(campaign: Dictionary, entry: Dictionary) -> Dictionary:
 		report.result = "success"
 		report.reward = _reward(campaign, row, rng, false)
 		report.xp = AHHeroLevels.gain(entry, int(r.get("Xp", 10)))
+		# A Pessoal do fundador (#263): na primeira missão solo que ele cumpre, uma vez; sem sorteio (os outros não mudam).
+		report.reward.personal_id = AHRelics.solo_personal(campaign, String(entry.id))
 	elif roll < value + int(r.get("HurtBand", 25)):
 		report.result = "hurt"
 		_hurt(entry)
@@ -381,6 +383,8 @@ static func report_line(campaign: Dictionary, report: Dictionary) -> String:
 		found.append(AHFightRewards.box_text({"kind": reward.kind, "amount": reward.amount}))
 	if String(reward.get("relic_id", "")) != "":
 		found.append(AHFightRewards.box_text({"kind": "relic", "relic_id": reward.relic_id}))
+	if String(reward.get("personal_id", "")) != "":
+		found.append(AHFightRewards.box_text({"kind": "relic", "relic_id": reward.personal_id}))
 	match String(report.get("result", "")):
 		"success":
 			return TranslationServer.translate("%s voltou da missão %s com %s.") % [hero_name, title, ", ".join(found)] if not found.is_empty() \

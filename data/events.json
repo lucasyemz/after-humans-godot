@@ -879,9 +879,10 @@
       {
         "Id": "levar_coleira_nome",
         "Text": "Levar a coleira com o nome",
+        "UnavailableIfRelic": "coleira_nome",
         "Success": {
-          "Result": "Alguém, um dia, quis ser mais que um número. A coleira vai para a Estação. (+1 Fragmento, +5 de Esperança)",
-          "FragmentsDelta": 1,
+          "Result": "Alguém, um dia, quis ser mais que um número. A coleira vai para a Estação. (Coleira com Nome, +5 de Esperança)",
+          "GrantRelic": "coleira_nome",
           "HopeDelta": 5
         }
       },

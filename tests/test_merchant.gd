@@ -99,9 +99,9 @@ func _with_merchant() -> Dictionary:
 
 ## As trocas nos números da tabela: dá o que pede, recebe o que oferece, até o limite da visita; sem o que dar, não sai.
 func _trades() -> void:
-	t.equal(S.merchant_trades().map(func(r): return String(r.Name)), ["sell_fragments", "buy_fragments", "sell_scrap", "buy_scrap"],
-		"as quatro trocas, na ordem da tabela")
-	for row in S.merchant_trades():
+	t.equal(S.merchant_trades().map(func(r): return String(r.Name)), ["sell_fragments", "buy_fragments", "sell_scrap", "buy_scrap", "buy_relic"],
+		"as cinco trocas, na ordem da tabela (a relíquia da visita, #263, é testada em test_relics)")
+	for row in S.merchant_trades().filter(func(r): return String(r.Get) != "relic"):
 		var c := _with_merchant()
 		var id := String(row.Name)
 		var give := String(row.Give)
@@ -241,7 +241,7 @@ func _screens() -> void:
 		t.check(is_instance_valid(station._candidate) and is_equal_approx(station._candidate.body_height, 1.72), "na altura do Bento")
 		t.check(_label(hud._panel, TranslationServer.translate(S.MERCHANT_NAME)), "o painel é dele")
 		var rows: Array = S.merchant_trades().map(func(r): return hud._body.find_child("Trade_%s" % r.Name, true, false))
-		t.check(rows.all(func(r): return r != null), "com as quatro trocas")
+		t.check(rows.all(func(r): return r != null), "com as cinco trocas (a relíquia da visita, #263)")
 		var buy: Node = hud._body.find_child("Trade_buy_fragments", true, false)
 		var button: Button = buy.find_child("Do", true, false) if buy else null
 		if t.check(button != null and not button.disabled, "comprar um fragmento está liberado"):

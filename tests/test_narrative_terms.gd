@@ -19,7 +19,7 @@ const KNOWN := "res://docs/narrative/known_names.txt"
 ## As tabelas com texto de tela (as mesmas do i18n) e os campos que são texto.
 const TABLES := ["abilities", "classes", "species", "enemies", "enemy-actions", "events", "expedition-nodes", "perks", "relics", "research",
 	"scenarios", "search-outcomes", "hero-upgrades", "briefings", "side-missions"]
-const TEXT_FIELDS := ["DisplayName", "Description", "Title", "Text", "Label", "Result", "Species", "Role"]
+const TEXT_FIELDS := ["DisplayName", "Description", "Effect", "Title", "Text", "Label", "Result", "Species", "Role"]
 ## Os campos que definem um nome (o que eles dizem passa a ser conhecido).
 const NAME_FIELDS := ["DisplayName", "Title", "Species", "Role"]
 
