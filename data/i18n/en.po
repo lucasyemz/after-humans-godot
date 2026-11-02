@@ -6290,39 +6290,39 @@ msgstr "Triage Gate"
 msgid "Corredor de Contenção"
 msgstr "Containment Corridor"
 
-#: scripts/station/station_build.gd:322
+#: scripts/station/station_build.gd:345
 msgid "ESTAÇÃO RAIZ"
 msgstr "ROOT STATION"
 
-#: scripts/station/station_build.gd:324
+#: scripts/station/station_build.gd:347
 msgid "PLATAFORMA 1"
 msgstr "PLATFORM 1"
 
-#: scripts/station/station_build.gd:328
+#: scripts/station/station_build.gd:351
 msgid "FIM DA LINHA"
 msgstr "END OF THE LINE"
 
-#: scripts/station/station_build.gd:592
+#: scripts/station/station_build.gd:615
 msgid "MAPA DA REDE"
 msgstr "NETWORK MAP"
 
-#: scripts/station/station_build.gd:593
+#: scripts/station/station_build.gd:616
 msgid "RAIZ"
 msgstr "ROOT"
 
-#: scripts/station/station_build.gd:654
+#: scripts/station/station_build.gd:677
 msgid "ABRIGO"
 msgstr "SHELTER"
 
-#: scripts/station/station_build.gd:1190
+#: scripts/station/station_build.gd:1213
 msgid "AMOSTRAS"
 msgstr "SAMPLES"
 
-#: scripts/station/station_build.gd:1190
+#: scripts/station/station_build.gd:1213
 msgid "REGISTROS"
 msgstr "RECORDS"
 
-#: scripts/station/station_build.gd:1190
+#: scripts/station/station_build.gd:1213
 msgid "ANÁLISE"
 msgstr "ANALYSIS"
 
