@@ -1,0 +1,12 @@
+[
+  {"Name": "_about", "Note": "Aprovado (#262, 01/11): a Arma e a Segunda Pele de cada herói, melhoradas na Forja, sem mudança visual. Cada linha é um nível da peça: HeroLevel (o nível do herói), ForgeLevel (o da Forja), o custo (Scrap, Fragments) e o que soma (Damage nos limites de dano, sem cura; Crit em pontos percentuais; MaxHp, somada no herói na compra; DotResist e StunResist em pontos percentuais). Os números são proposta, para o Lucas ajustar depois de jogar."},
+  {"Name": "forge_day", "PerDay": [1, 2], "Note": "Aprovado (#262): melhorias de peça por dia na Forja nível 1 e 2 (como o Treino e o Bar, #265)."},
+  {"Name": "weapon_1", "Piece": "weapon", "Level": 1, "HeroLevel": 2, "ForgeLevel": 1, "Scrap": 3, "Fragments": 0, "Damage": 1},
+  {"Name": "weapon_2", "Piece": "weapon", "Level": 2, "HeroLevel": 4, "ForgeLevel": 1, "Scrap": 4, "Fragments": 1, "Crit": 2},
+  {"Name": "weapon_3", "Piece": "weapon", "Level": 3, "HeroLevel": 6, "ForgeLevel": 2, "Scrap": 5, "Fragments": 2, "Damage": 1},
+  {"Name": "weapon_4", "Piece": "weapon", "Level": 4, "HeroLevel": 8, "ForgeLevel": 2, "Scrap": 6, "Fragments": 3, "Crit": 2},
+  {"Name": "armor_1", "Piece": "armor", "Level": 1, "HeroLevel": 2, "ForgeLevel": 1, "Scrap": 3, "Fragments": 0, "MaxHp": 3},
+  {"Name": "armor_2", "Piece": "armor", "Level": 2, "HeroLevel": 4, "ForgeLevel": 1, "Scrap": 4, "Fragments": 1, "DotResist": 10},
+  {"Name": "armor_3", "Piece": "armor", "Level": 3, "HeroLevel": 6, "ForgeLevel": 2, "Scrap": 5, "Fragments": 2, "MaxHp": 3},
+  {"Name": "armor_4", "Piece": "armor", "Level": 4, "HeroLevel": 8, "ForgeLevel": 2, "Scrap": 6, "Fragments": 3, "StunResist": 10}
+]

@@ -1470,8 +1470,8 @@ static func choose_event_option(campaign: Dictionary, choice_id: String, seed_va
 	if int(effects.get("InstinctDelta", 0)) != 0 and choice.get("Requirement", "") == "ClassInTeam":
 		for hero in _team_alive(campaign):
 			if hero.class_id == choice.get("RequirementClass", ""):
-				var relic = GameData.row("relics", hero.get("relic_id", ""))
-				instinct = maxi(0, int(effects.InstinctDelta) - (int(relic.get("EventInstinctReduction", 0)) if relic != null else 0))
+				# As relíquias dos dois slots (#263), cada uma contando uma vez.
+				instinct = maxi(0, int(effects.InstinctDelta) - AHRelics.event_instinct_reduction(hero))
 				var instinct_before: int = hero.instinct
 				hero.instinct = clampi(hero.instinct + instinct, 0, 200)
 				# O texto ({Instinto}) e o chip dizem a mudança de fato (no limite de 200, menos que a dos dados).

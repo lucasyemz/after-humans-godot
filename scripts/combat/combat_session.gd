@@ -55,9 +55,11 @@ static func create(heroes: Array, enemies_in: Array, opening: bool = false, seed
 		players.append(AHCombatEngine.make_hero_unit({
 			"Id": hero.id, "ClassId": hero.class_id, "Species": String(hero.get("species", "")), "DisplayName": hero.display_name, "MaxHp": hero.max_hp, "Hp": hero.hp,
 			"Instinct": maxi(0, int(hero.get("instinct", 0)) - int(bonus.calm)), "Perks": hero.get("perks", []), "Trauma": hero.get("trauma", false),
-			"RelicId": hero.get("relic_id", ""), "ExpeditionUses": hero.get("expedition_uses", {}),
+			"RelicIds": AHRelics.equipped(hero), "ExpeditionUses": hero.get("expedition_uses", {}),
 			"AbilityIds": AHHeroSkills.equipped(hero) if not Array(hero.get("loadout", [])).is_empty() else [],
 			"SpeedBonus": int(bonus.speed) + marks.speed + int(own.get("speed", 0)), "AbilityBonus": bonus.abilities,
+			# A Arma e a Segunda Pele (#262): dano (sem cura), crítico e resistências; a vida já está no herói.
+			"Gear": AHGear.combat_bonus(hero),
 		}, index + 1, session.data))
 		var unit: Unit = players[-1]
 		unit.tokens.vuln = mini(AHCombatEngine.TOKEN_CAP, marks.vuln)
@@ -165,9 +167,10 @@ func effective_range(ability_id: String, kind: String = "damage", actor_id: Stri
 	var trained: bool = base.Max > 0 and bonus > 0
 	if not trained:
 		bonus = 0
-	# Mãos de remendo e Mãos trêmulas (#264) na cura, como no motor.
+	# A Arma (#262) soma só no dano, nunca na cura; Mãos de remendo e Mãos trêmulas (#264), só na cura, como no motor.
+	var gear: int = actor.gear_damage if actor != null and kind == "damage" and int(base.Max) > 0 else 0
 	var hands: int = roundi(engine.perk_total(actor, "HealBonus")) if actor != null and kind == "heal" and int(base.Max) > 0 else 0
-	return {"Min": maxi(0, int(base.Min) + bonus + hands), "Max": maxi(0, int(base.Max) + bonus + hands), "trained": trained}
+	return {"Min": maxi(0, int(base.Min) + bonus + gear + hands), "Max": maxi(0, int(base.Max) + bonus + gear + hands), "trained": trained}
 
 
 ## Texto curto da habilidade: o que faz em números (com o treino da Pesquisa e o nível de quem age) e a descrição de

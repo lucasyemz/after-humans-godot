@@ -5,7 +5,7 @@ class_name AHCombatEngine
 extends RefCounted
 
 const CRITICAL_CHANCE := 0.1
-## O teto das resistências do herói (#258).
+## O teto das resistências do herói (#258), com a Segunda Pele (#262).
 const HERO_RESIST_CAP := 0.8
 const CRITICAL_MULTIPLIER := 1.5
 const TOKEN_CAP := 3
@@ -262,9 +262,14 @@ func _resisted_effect(unit: Unit, dot: bool) -> bool:
 func hero_resist(unit: Unit, key: String) -> float:
 	var hero_class = find_class(unit.class_id)
 	var value := float(hero_class[key]) if hero_class != null else float(AHGameData.CLASS[key])
-	# As peculiaridades (#264, Pé firme e Pé pesado): somam na resistência, entre 0 e o teto de 80%; sem elas, como antes.
-	var extra := perk_total(unit, key) if key == "DisplacementResist" else 0.0
-	return clampf(value + extra, 0.0, maxf(value, HERO_RESIST_CAP)) if extra != 0.0 else value
+	# A Segunda Pele (#262) soma, até o teto de 80% (#258), sem baixar a do papel; Pé firme e Pé pesado (#264) somam no
+	# deslocamento, entre 0 e o teto. Sem nada disso, o valor do papel como antes.
+	var extra := float(unit.gear_resist.get(key, 0.0))
+	var feet := perk_total(unit, key) if key == "DisplacementResist" else 0.0
+	if extra <= 0.0 and feet == 0.0:
+		return value
+	var raised := maxf(value, minf(HERO_RESIST_CAP, value + extra)) if extra > 0.0 else value
+	return clampf(raised + feet, 0.0, maxf(raised, HERO_RESIST_CAP)) if feet != 0.0 else raised
 
 
 ## A soma de um campo numérico das peculiaridades da unidade (cada uma uma vez).
@@ -285,7 +290,8 @@ func perk_total(unit: Unit, field: String) -> float:
 ## herói (o inimigo que usa uma habilidade de classe) fica com a de todos.
 func hero_crit_chance(unit: Unit) -> float:
 	var hero_class = find_class(unit.class_id) if unit.is_player else null
-	return CRITICAL_CHANCE + (float(hero_class.CritBonus) / 100.0 if hero_class != null else 0.0)
+	# A Arma (#262) soma no crítico do herói.
+	return CRITICAL_CHANCE + (float(hero_class.CritBonus) / 100.0 if hero_class != null else 0.0) + (unit.gear_crit if unit.is_player else 0.0)
 
 
 ## O herói resiste a ser empurrado ou puxado? Um sorteio sempre (como antes do papel), contra o DisplacementResist dele.
@@ -363,7 +369,8 @@ func abilities_of(unit: Unit) -> Array:
 	return unit_class.AbilityIds if unit_class != null else []
 
 
-## Unidade de herói a partir da campanha. hero: Id, ClassId, Species (opcional), DisplayName, MaxHp, Hp, Instinct, Perks, Trauma, RelicId.
+## Unidade de herói a partir da campanha. hero: Id, ClassId, Species (opcional), DisplayName, MaxHp, Hp, Instinct, Perks, Trauma,
+## RelicIds (os dois slots, #263; RelicId, uma só, continua valendo para a paridade e os testes antigos).
 static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -> Unit:
 	var unit := Unit.new()
 	unit.id = "unit_" + hero.Id
@@ -384,9 +391,17 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 	unit.ability_ids = Array(hero.get("AbilityIds", [])).duplicate()
 	# O nível do herói (#90): +1 numa habilidade (como o treino da Pesquisa) e a velocidade; sem nível, nada muda.
 	unit.ability_bonus = hero.get("AbilityBonus", {}).duplicate()
+	# A Arma e a Segunda Pele (#262); sem elas (a paridade, o tutorial), tudo zero.
+	var gear: Dictionary = hero.get("Gear", {})
+	unit.gear_damage = int(gear.get("damage", 0))
+	unit.gear_crit = float(gear.get("crit", 0)) / 100.0
+	unit.gear_resist = {"DotResist": float(gear.get("dot", 0)) / 100.0, "StunResist": float(gear.get("stun", 0)) / 100.0}
 
 	var hero_class = game_data.classes.get(hero.ClassId)
-	var relic = game_data.relics.get(hero.get("RelicId", ""))
+	# As relíquias (#263): cada uma conta uma vez, e a Velocidade delas tem o teto de AHRelics.SPEED_CAP.
+	var relic_ids: Array = Array(hero.get("RelicIds", [])) if hero.has("RelicIds") else [hero.get("RelicId", "")]
+	var relic := AHRelics.totals(relic_ids, game_data.relics)
+	unit.virtue_bonus = float(relic.virtue)
 	var perk_speed := 0
 	var seen := {}
 	for perk_id in unit.perks:
@@ -396,8 +411,10 @@ static func make_hero_unit(hero: Dictionary, rank: int, game_data: AHGameData) -
 		var perk = game_data.perks.get(perk_id)
 		if perk != null:
 			perk_speed += perk.Speed
-	unit.max_hp = mini(200, hero.MaxHp + (relic.MaxHpBonus if relic != null else 0))
-	unit.speed = (hero_class.BaseSpeed if hero_class != null and hero_class.BaseSpeed != 0 else 2) + (relic.SpeedBonus if relic != null else 0) + perk_speed \
+	unit.max_hp = mini(200, hero.MaxHp + int(relic.max_hp))
+	# Uma relíquia com custo de Vida (#263) baixa o máximo; a vida de quem entra cheio desce junto.
+	unit.hp = mini(unit.hp, unit.max_hp)
+	unit.speed = (hero_class.BaseSpeed if hero_class != null and hero_class.BaseSpeed != 0 else 2) + int(relic.speed) + perk_speed \
 		+ int(hero.get("SpeedBonus", 0))
 	return unit
 
@@ -576,8 +593,9 @@ func _change_instinct(unit: Unit, delta: int, reason: String) -> void:
 			unit.instinct_history.pop_front()
 
 
-func _virtue_chance(perks: Array) -> float:
-	var total: float = instinct_rules().Crisis.BaseVirtue
+## A chance de Superação na crise: a base, os perks (cada um uma vez) e o bônus das relíquias (VirtueBonus, #263).
+func _virtue_chance(perks: Array, relic_bonus: float = 0.0) -> float:
+	var total: float = instinct_rules().Crisis.BaseVirtue + relic_bonus
 	var seen := {}
 	for perk_id in perks:
 		if seen.has(perk_id):
@@ -611,7 +629,7 @@ func _apply_instinct_crisis(unit: Unit, out_events: Array) -> void:
 		return
 	_crisis_batch[unit.id] = true
 
-	var chance := _virtue_chance(unit.perks)
+	var chance := _virtue_chance(unit.perks, unit.virtue_bonus)
 	unit.crisis_count += 1
 	var collapse := random.next() >= chance
 	_change_instinct(unit, rules.Crisis.Reset - unit.instinct, tr("Colapso") if collapse else tr("Superação"))
@@ -1019,7 +1037,7 @@ func execute_player_ability(unit_id: String, ability_id: String, target_rank: in
 		var ability_name: String = ability.DisplayName
 		hit_any_target = true
 		if has_damage:
-			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0))
+			var bonus: int = (1 if researched else 0) + int(user.ability_bonus.get(ability_id, 0)) + user.gear_damage
 			var rolled := _roll_range(ability.DamageRange.Min + bonus, ability.DamageRange.Max + bonus)
 			if random.next() < hero_crit_chance(user):
 				rolled = floori(rolled * CRITICAL_MULTIPLIER)

@@ -55,6 +55,8 @@ class Unit:
 	var max_hp := 1
 	var speed := 0
 	var damage_bonus := 0
+	## Pontos da chance de Superação vindos das relíquias (VirtueBonus, #263): 0.05 é +5 pp.
+	var virtue_bonus := 0.0
 	var instinct := 0
 	var perks: Array = []
 	var crisis_outcome := Crisis.NONE
@@ -80,6 +82,11 @@ class Unit:
 	var ability_ids: Array = []
 	## +n nos limites de dano ou cura de uma habilidade (o nível do herói, #90): {ability_id: n}.
 	var ability_bonus := {}
+	## A Arma e a Segunda Pele do herói (#262): +n nos limites de dano (nunca na cura), o crítico e as resistências a
+	## mais (frações, 0,1 = 10 pp).
+	var gear_damage := 0
+	var gear_crit := 0.0
+	var gear_resist := {}
 	var trauma := false
 	var sprite_key := ""
 
