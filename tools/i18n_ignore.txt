@@ -1781,6 +1781,7 @@ rescue_rules.gd: downed
 rescue_rules.gd: perks
 rescue_rules.gd: Instinct
 mission_board.gd: captured
+mission_board.gd: Plate
 rescue_rules.gd: captured
 rescue_rules.gd: rescue
 rescue_rules.gd: join
@@ -1836,6 +1837,9 @@ exploration_hud.gd: blind
 exploration_hud.gd: type
 exploration_hud.gd: resolved
 exploration_hud.gd: Detour0
+exploration_hud.gd: rescue
+exploration_hud.gd: steps
+exploration_hud.gd: corridor
 combat_engine.gd: Species
 combat_session.gd: Species
 campaign_service.gd: species
