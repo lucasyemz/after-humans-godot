@@ -235,12 +235,33 @@ func _treatment():
 	var bento = _walker(station, C.BENTO)
 	t.check(bento != null and not is_inf(float(bento.wait)), "o Bento é solto e volta a passear")
 	t.check(not C.comic_seen(c, "bento_brother"), "a tirinha não conta como vista")
+	# A tirinha pendente sem conversa no ar (a câmera interrompeu a conversa) também acaba (QA da #207, rodada 5).
+	nick.quirk_treatment = {}
+	station.refresh()
+	await tree.process_frame
+	t.check(life.play_story("bento_brother"), "a conversa da tirinha começa de novo")
+	for frame in 120:
+		await tree.process_frame
+		if not life.talk.is_empty():
+			break
+	life.stop_talk()
+	t.equal(life.story, "bento_brother", "interrompida pela câmera, a tirinha fica pendente")
+	AHStationServices.treat_quirk(c, C.NICK, "machine-fear")
+	station.refresh()
+	await tree.process_frame
+	t.equal(life.story, "", "o Nick no leito: a tirinha pendente acaba (volta pelo Próximo passo depois)")
 	# E no meio de uma troca de cômodo: a viagem para e ele deita.
 	nick.quirk_treatment = {}
 	station.refresh()
 	await tree.process_frame
 	walker = _walker(station, C.NICK)
-	var to: String = S.CANTEEN if String(walker.room) != S.CANTEEN else S.BAR
+	# Livre para sair (o Nick trabalha no Depósito: fora do posto) e num cômodo da grade, com um destino com porta.
+	if AHStation.room_def(String(walker.room)).get("place", "") != "grid":
+		station.settle_in(walker, S.BAR)
+	walker.working = 0.0
+	walker.sitting = 0.0
+	var dest: Dictionary = life.destinations(String(walker.room))
+	var to: String = String(dest.keys()[0]) if not dest.is_empty() else S.BAR
 	if t.check(life.start_trip(walker, to), "o Nick sai para outro cômodo"):
 		for frame in 20:
 			await tree.process_frame

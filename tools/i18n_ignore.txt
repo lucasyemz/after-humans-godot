@@ -1820,6 +1820,7 @@ station_rules.gd: night
 station_chatter.gd: any
 station_chatter.gd: founder
 station_chatter.gd: Speakers
+station_life.gd: Speakers
 station_chatter.gd: say
 station_life.gd: say
 kit_bubble.gd: say

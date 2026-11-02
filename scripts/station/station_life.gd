@@ -314,6 +314,8 @@ func release(hero_id: String) -> void:
 		abort_trip()
 	var walker = _walker_of(hero_id)
 	var talking: bool = Array(talk.get("ids", [])).has(hero_id) or (walker != null and _held.has(walker))
+	# A tirinha pendente sem conversa no ar (a câmera a interrompeu) também acaba: senão ficava esperando por ele.
+	talking = talking or (story != "" and Array(C.chatter_for(story).get("Speakers", [])).has(hero_id))
 	if talking:
 		cancel_story()
 
